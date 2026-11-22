@@ -21,6 +21,36 @@ def point(obj, target):
     obj.rotation_euler=(target-obj.location).to_track_quat("-Z","Y").to_euler()
 
 
+def studio_lights(scene, center):
+    lights=[]
+    world=bpy.data.worlds.new("Soft skylight")
+    scene.world=world
+    world.use_nodes=True
+    world.node_tree.nodes["Background"].inputs[0].default_value=(.82,.89,.99,1)
+    world.node_tree.nodes["Background"].inputs[1].default_value=.68
+    for offset,power in (((-2,-3,4),2.9),((3,2,3),2.15)):
+        bpy.ops.object.light_add(type="SUN",location=center+Vector(offset))
+        sun=bpy.context.object
+        sun.data.energy=power
+        sun.data.angle=radians(18)
+        point(sun,center)
+        lights.append(sun)
+    return lights
+
+
+def configure_cycles(scene, pixels=784, samples=10):
+    scene.render.engine="CYCLES"
+    scene.cycles.samples=samples
+    scene.cycles.use_denoising=False
+    scene.cycles.transparent_max_bounces=16
+    scene.render.film_transparent=True
+    scene.render.resolution_x=pixels
+    scene.render.resolution_y=pixels
+    scene.render.resolution_percentage=100
+    scene.render.image_settings.color_mode="RGBA"
+    scene.render.image_settings.file_format="PNG"
+
+
 def render(name):
     group = "soldiers" if name in GROUPS["soldiers"] else "landscape"
     if name in GROUPS["roman"]:
@@ -46,17 +76,7 @@ def render(name):
     lo,hi=[Vector([fn(v[i] for v in vertices) for i in range(3)]) for fn in (min,max)]
     center=(hi+lo)/2
     distance=(hi-lo).length
-    world=bpy.data.worlds.new("Soft skylight")
-    scene.world=world
-    world.use_nodes=True
-    world.node_tree.nodes["Background"].inputs[0].default_value=(.82,.89,.99,1)
-    world.node_tree.nodes["Background"].inputs[1].default_value=.68
-    for offset,power in (((-2,-3,4),2.9),((3,2,3),2.15)):
-        bpy.ops.object.light_add(type="SUN",location=center+Vector(offset))
-        sun=bpy.context.object
-        sun.data.energy=power
-        sun.data.angle=radians(18)
-        point(sun,center)
+    studio_lights(scene,center)
     viewpoint=(.20,-1,.11) if name in POSES else (1,-1.52,.55)
     bpy.ops.object.camera_add(location=center+Vector(viewpoint).normalized()*distance*2.3)
     camera=bpy.context.object
@@ -67,16 +87,7 @@ def render(name):
     span=max(max(v[i] for v in coords)-min(v[i] for v in coords) for i in (0,1))
     camera.data.ortho_scale=span*1.07
     scene.camera=camera
-    scene.render.engine="CYCLES"
-    scene.cycles.samples=10
-    scene.cycles.use_denoising=False
-    scene.cycles.transparent_max_bounces=16
-    scene.render.film_transparent=True
-    scene.render.resolution_x=784
-    scene.render.resolution_y=784
-    scene.render.resolution_percentage=100
-    scene.render.image_settings.color_mode="RGBA"
-    scene.render.image_settings.file_format="PNG"
+    configure_cycles(scene)
     path=OUT/f"{name}.png"
     scene.render.filepath=str(path)
     bpy.ops.render.render(write_still=True)
