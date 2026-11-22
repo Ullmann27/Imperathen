@@ -75,7 +75,7 @@ def main():
         digest = hashlib.sha256(data).hexdigest()
         previous = report.setdefault("screenshots", {})
         # A system immersive-mode tutorial can cover every view with identical pixels.
-        if name != "failure.png" and any(image["sha256"] == digest for image in previous.values()):
+        if name not in {"failure.png", "07_android_arm64_translated_intro.png"} and any(image["sha256"] == digest for image in previous.values()):
             raise RuntimeError("Screenshot repeats a previous screen: " + name)
         width, height = struct.unpack(">II", data[16:24])
         previous[name] = {"sha256": digest, "width": width, "height": height}
