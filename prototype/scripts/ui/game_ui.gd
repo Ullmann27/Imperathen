@@ -202,6 +202,7 @@ func show_menu(can_continue: bool) -> void:
 	buttons.add_child(new_button)
 	var demo_button := _button("Talgefecht erproben", func(): _emit("valley_demo"))
 	buttons.add_child(demo_button)
+	buttons.add_child(_button("Weltkugel erkunden", func(): _emit("atlas_demo")))
 	if OS.is_debug_build() and OS.has_feature("android"):
 		_log_menu_buttons.call_deferred(demo_button, continue_button)
 	buttons.add_child(_button("Einstellungen", func(): _show_settings("menu")))
@@ -317,6 +318,7 @@ func show_pause() -> void:
 	var column := _modal("EIN AUGENBLICK RUHE", "Spiel pausiert", "Die Welt wartet. Dein nächster Schritt gehört dir.", 490)
 	var resume_button := _button("Weiterspielen", func(): _emit("resume"), true)
 	column.add_child(resume_button)
+	column.add_child(_button("Weltkugel", func(): _emit("atlas")))
 	var legion := _button("Grenzlegion im Tal", func(): _emit("valley"))
 	legion.disabled = not bool(_state.get("progress", {}).get("skirmish_won", false)) or not _state.get("story", {}).get("choices", []).is_empty()
 	legion.tooltip_text = "Verteidige zuerst das Dorf und entscheide über seine Zukunft." if legion.disabled else "Befehle die regionale Legion. Deine Dorftruppe bleibt zu Hause."
@@ -403,6 +405,7 @@ func set_mode(mode: String) -> void:
 			"city": "Hütte wählen · Freien Bauplatz antippen · Zum Beenden Bau abbrechen wählen.",
 			"map": "Im freien Bild ziehen · Figur wählen, um zurückzukehren · Deine Figur bleibt an ihrem Ort."
 		}
+	_action_buttons["atlas"].visible = mode == "map"
 	_hud_labels["controls"].text = hints[mode]
 	var objective := _objective(_state)
 	_hud_labels["objective_title"].text = objective[0]
@@ -659,6 +662,10 @@ func _build_toolbar() -> void:
 		var button := _button(item[1], _emit.bind("mode_" + item[0], {}), false, 12 if _compact_layout else 13)
 		_mode_buttons[item[0]] = button
 		row.add_child(button)
+	var atlas := _button("Weltkugel", func(): _emit("atlas"), false, 13)
+	atlas.visible = _mode == "map"
+	row.add_child(atlas)
+	_action_buttons["atlas"] = atlas
 	var actions := [
 		["build", "Hütte · 8 Holz", "Bauplan öffnen. Mit Linksklick einen erlaubten Platz bestätigen."],
 		["train", "Ausbildung", "Benötigt eine fertige Hütte, eine Gefährtenentscheidung und keine offene Baustelle. Am Trainingsplatz fortsetzen."],

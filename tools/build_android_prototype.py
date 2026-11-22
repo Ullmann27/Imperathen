@@ -300,7 +300,7 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         verification = temporary / "validation.json"
         build_tools = Path(toolchain["sdk_root"]) / "build-tools" / BUILD_TOOLS
         run([sys.executable, toolchain["validator"], "--apk", str(apk),
-             "--sdk-root", toolchain["sdk_root"], "--expected-package", PACKAGE,
+             "--sdk-root", toolchain["sdk_root"], "--source-root", toolchain["project"], "--expected-package", PACKAGE,
              "--expected-abi", args.abi, "--report", str(verification),
              "--aapt", str(build_tools / "aapt"), "--apksigner", str(build_tools / "apksigner"),
              "--zipalign", str(build_tools / "zipalign")],

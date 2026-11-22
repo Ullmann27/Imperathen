@@ -39,6 +39,15 @@ EXPECTED_RESOURCES = (
     "scripts/ui/game_ui.gd",
     "scripts/ui/touch_pad.gd",
     "scripts/ui/touch_action.gd",
+    "scripts/ui/runtime_display.gd",
+    "scripts/battle/battle_model.gd",
+    "scripts/battle/formation_slots.gd",
+    "scripts/tactics/valley_scene.gd",
+    "scripts/tactics/valley_hud.gd",
+    "scripts/visuals/soldier_visual.gd",
+    "assets/quality_profiles.json",
+    *(f"assets/soldiers/{role}_{level}.glb"
+      for role in ("heavy", "spear", "archer", "officer") for level in ("near", "mid", "far")),
 )
 ARCHITECTURES = {"arm64-v8a": 183, "x86_64": 62}
 TOOL_NAMES = ("aapt", "aapt2", "apkanalyzer", "apksigner", "zipalign", "adb", "emulator", "sdkmanager")
@@ -126,7 +135,7 @@ def resolve_resource(archive: zipfile.ZipFile, names: set[str], source: str) -> 
     raw = "assets/" + source
     if raw in names and archive.getinfo(raw).file_size > 0:
         return {"source": source, "entry": raw, "mode": "direct"}
-    remap = raw + ".remap"
+    remap = raw + (".import" if source.endswith(".glb") else ".remap")
     if remap in names and archive.getinfo(remap).file_size <= 65536:
         text = archive.read(remap).decode("utf-8", errors="replace")
         match = re.search(r'^\s*path\s*=\s*"res://([^"\r\n]+)"', text, re.MULTILINE)
