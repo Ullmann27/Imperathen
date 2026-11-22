@@ -51,7 +51,8 @@ var _map_focus := Vector3(-7, 0, -7)
 var _quality_profile := "balanced"
 var _sun: DirectionalLight3D
 var _player: CharacterBody3D
-var _figure: Node3D
+const VillagePerson := preload("res://scripts/visuals/village_person.gd")
+var _figure: VillagePerson
 var _camera: Camera3D
 var _camera_initialized := false
 var _companion: Node3D
@@ -120,9 +121,8 @@ func sync_state(state: Dictionary) -> void:
 	_sync_squad()
 	var player_data: Dictionary = _state.get("player", {})
 	var age := int(player_data.get("age", 12))
-	_figure.scale = Vector3.ONE * (0.88 if age < 18 else 1.0)
-	_figure.get_node("ArmRight/Sword").visible = age >= 18
-	_figure.get_node("ArmRight/SwordGuard").visible = age >= 18
+	_figure.configure("player",_state.get("origin_id","italia"),age)
+	_companion.get_node("Figure").configure("companion",_state.get("origin_id","italia"),age)
 	var progress: Dictionary = _state.get("progress", {})
 	var trained := bool(progress.get("training_complete", false))
 	var hits := int(progress.get("training_hits", 0))
@@ -161,6 +161,9 @@ func set_active(active: bool) -> void:
 		_reset_touch_input()
 	if _player != null and not active:
 		_player.velocity = Vector3.ZERO
+		_figure.drive(0.0)
+		for recruit in _squad_views:
+			recruit.get_node("Figure").drive(0.0)
 	if _preview != null:
 		_preview.visible = active and _build_mode and _mode == "city"
 	if _hint != null:
@@ -462,7 +465,7 @@ func _create_player() -> void:
 	shape.shape = capsule
 	_player.add_child(shape)
 	add_child(_player)
-	_figure = Art.person(_player, Color(0.53, 0.25, 0.15))
+	_figure = Art.person(_player,"player","italia",12)
 	var player_ring := Art.cylinder(_player, 0.46, 0.018, Vector3(0, -0.87, 0), Art.transparent_material(Color(0.91, 0.76, 0.41, 0.48)))
 	player_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
@@ -472,21 +475,29 @@ func _create_companion_and_training() -> void:
 	_companion.name = "Marcus"
 	_companion.position = COMPANION_LOCATION + Vector3.UP * 0.9
 	add_child(_companion)
-	Art.person(_companion, Color(0.31, 0.39, 0.29))
+	Art.person(_companion,"companion","italia",12)
 	_companion_label = Art.label(_companion, "Marcus · E\nGefährten kennenlernen", Vector3(0, 1.15, 0), Color(0.85, 0.92, 0.74), 36)
 	var training := Node3D.new()
 	training.name = "TrainingGround"
 	training.position = TRAINING_LOCATION
 	add_child(training)
 	Art.box(training, Vector3(6, 0.04, 5), Vector3(0, 0.01, 0), _materials["path"])
-	Art.cylinder(training, 0.16, 2.0, Vector3(0, 1.0, 0), _materials["timber"], 0.13, true)
-	Art.box(training, Vector3(1.5, 0.18, 0.18), Vector3(0, 1.4, 0), _materials["timber"])
-	Art.sphere(training, 0.32, Vector3(0, 1.4, 0), _materials["straw"], Vector3(1.0, 1.6, 0.7))
+	var post := Art.cylinder(training, 0.16, 2.0, Vector3(0, 1.0, 0), _materials["timber"], 0.13, true)
+	var dummy_path := "res://assets/village/training_dummy.glb"
+	if ResourceLoader.exists(dummy_path):
+		post.visible = false
+		var dummy: Node3D = load(dummy_path).instantiate()
+		dummy.name = "TrainingDummy"
+		training.add_child(dummy)
+	else:
+		Art.box(training, Vector3(1.5, 0.18, 0.18), Vector3(0, 1.4, 0), _materials["timber"])
+		Art.sphere(training, 0.32, Vector3(0, 1.4, 0), _materials["straw"], Vector3(1.0, 1.6, 0.7))
 	_training_label = Art.label(training, "Übungsplatz · E", Vector3(0, 2.8, 0), Color(0.97, 0.84, 0.58), 39)
 	var mentor := Node3D.new()
+	mentor.name = "Mentor"
 	mentor.position = Vector3(-2.0, 0.9, -1.5)
 	training.add_child(mentor)
-	Art.person(mentor, Color(0.42, 0.16, 0.13), true)
+	Art.person(mentor,"mentor")
 	Art.label(mentor, "Ausbilder", Vector3(0, 1.05, 0), Color(0.90, 0.83, 0.66), 29)
 
 
@@ -647,7 +658,7 @@ func _sync_enemies() -> void:
 			var actor := Node3D.new()
 			actor.name = identity
 			_enemies_root.add_child(actor)
-			Art.person(actor, Color(0.29, 0.25, 0.22))
+			Art.person(actor,"enemy")
 			var name_label := Art.label(actor, "", Vector3(0, 1.15, 0), Color(1, 0.57, 0.39), 33)
 			name_label.name = "HealthLabel"
 			var body := StaticBody3D.new()
@@ -666,8 +677,9 @@ func _sync_enemies() -> void:
 		var health := int(enemy.get("health", 0))
 		visual.position = Vector3(float(enemy.get("x", 0)), 0.9, float(enemy.get("z", 0)))
 		var figure: Node3D = visual.get_node("Figure")
-		figure.rotation.z = 0.0 if health > 0 else PI * 0.5
-		figure.position.y = 0.0 if health > 0 else -0.65
+		if health <= 0: figure.cue("death")
+		elif health < int(visual.get_meta("previous_health",health)): figure.cue("hit")
+		visual.set_meta("previous_health",health)
 		var name_label: Label3D = visual.get_node("HealthLabel")
 		name_label.text = "Räuber · %d / 60" % health
 		name_label.visible = health > 0
@@ -695,7 +707,7 @@ func _sync_squad() -> void:
 		collider.shape = capsule
 		soldier.add_child(collider)
 		_squad_root.add_child(soldier)
-		Art.person(soldier, Color(0.46, 0.14, 0.11), true)
+		Art.person(soldier,"recruit")
 		Art.label(soldier, "Rekrut %d" % (_squad_views.size() + 1), Vector3(0, 1.05, 0), Color(0.78, 0.88, 0.74), 28)
 		soldier.position = _player.position + Vector3(2 + _squad_views.size(), 0, 2)
 		_squad_views.append(soldier)
@@ -792,15 +804,7 @@ func _update_camera(delta: float) -> void:
 
 func _animate_figure() -> void:
 	var speed := Vector2(_player.velocity.x, _player.velocity.z).length()
-	var stride := sin(_animation_time * 10.5) * minf(0.48, speed * 0.10)
-	var left_leg: Node3D = _figure.get_node("LegLeft")
-	var right_leg: Node3D = _figure.get_node("LegRight")
-	var left_arm: Node3D = _figure.get_node("ArmLeft")
-	var right_arm: Node3D = _figure.get_node("ArmRight")
-	left_leg.rotation.x = stride
-	right_leg.rotation.x = -stride
-	left_arm.rotation.x = -stride * 0.6
-	right_arm.rotation.x = stride * 0.6 if _attack_animation <= 0.0 else -1.7 + (0.28 - _attack_animation) * 6.0
+	_figure.drive(speed if _mode == "person" else 0.0)
 
 
 func _update_followers(delta: float) -> void:
@@ -819,13 +823,7 @@ func _update_followers(delta: float) -> void:
 		if horizontal.length_squared() > 0.04:
 			var figure: Node3D = soldier.get_node("Figure")
 			figure.rotation.y = atan2(-displacement.x, -displacement.z)
-			var leg: Node3D = figure.get_node("LegLeft")
-			leg.rotation.x = sin(_animation_time * 10 + index) * 0.40
-			var other_leg: Node3D = figure.get_node("LegRight")
-			other_leg.rotation.x = -leg.rotation.x
-		else:
-			soldier.get_node("Figure/LegLeft").rotation.x = 0.0
-			soldier.get_node("Figure/LegRight").rotation.x = 0.0
+		soldier.get_node("Figure").drive(Vector2(soldier.get_real_velocity().x,soldier.get_real_velocity().z).length())
 
 
 func _update_encounter() -> void:
@@ -851,8 +849,8 @@ func _update_encounter() -> void:
 			var figure: Node3D = actor.get_node("Figure")
 			var direction := _player.position - actor.position
 			figure.rotation.y = atan2(-direction.x, -direction.z)
-			var arm: Node3D = figure.get_node("ArmRight")
-			arm.rotation.x = sin(_animation_time * 5.0) * 0.8 - 0.7 if distance <= 2.3 else 0.0
+			if distance <= 2.3 and _enemy_attack_cooldown <= 0.0:
+				figure.cue("attack")
 	if living == 0 and not enemies.is_empty() and not _resolve_requested:
 		_resolve_requested = true
 		action_requested.emit("resolve_skirmish", {})
@@ -1011,6 +1009,7 @@ func _interact() -> void:
 		return
 	var companion: Dictionary = _state.get("companion", {})
 	if _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS and not bool(companion.get("met", false)):
+		_companion.get_node("Figure").cue("talk")
 		action_requested.emit("companion_interact", {})
 		return
 	var closest_id := ""
@@ -1028,10 +1027,12 @@ func _interact() -> void:
 			closest_distance = distance
 			closest_id = str(resource.get("id", ""))
 	if not closest_id.is_empty():
+		_figure.cue("gather")
 		action_requested.emit("gather", {"node_id": closest_id})
 	elif _horizontal_distance(_player.position, TRAINING_LOCATION) <= INTERACTION_RADIUS:
 		action_requested.emit("train", {})
 	elif _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS:
+		_companion.get_node("Figure").cue("talk")
 		action_requested.emit("companion_interact", {})
 
 
@@ -1040,6 +1041,7 @@ func _attack() -> void:
 		return
 	_attack_cooldown = 0.65
 	_attack_animation = 0.28
+	_figure.cue("attack" if _state.get("encounter",{}).get("active",false) else "train")
 	var encounter: Dictionary = _state.get("encounter", {})
 	var enemies: Array = encounter.get("enemies", [])
 	var closest_id := ""
