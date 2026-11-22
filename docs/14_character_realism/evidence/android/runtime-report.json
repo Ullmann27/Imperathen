@@ -1,0 +1,614 @@
+{
+  "platform": "Android emulator",
+  "apk_sha256": "e68766af6851aca6296e73bc31aec4f522b2982385c93cb18df71b42cb9af589",
+  "physical_device_test": false,
+  "arm64_runtime_test": true,
+  "status": "passed",
+  "checks": [
+    {
+      "name": "single_emulator_target",
+      "passed": true,
+      "detail": [
+        {
+          "serial": "emulator-5554",
+          "state": "offline"
+        }
+      ]
+    },
+    {
+      "name": "emulator_verified",
+      "passed": true,
+      "detail": {
+        "serial": "emulator-5554",
+        "ro.kernel.qemu": "1"
+      }
+    },
+    {
+      "name": "expected_android_emulator",
+      "passed": true,
+      "detail": {
+        "api_level": "35",
+        "abi": "x86_64",
+        "model": "sdk_gphone64_x86_64"
+      }
+    },
+    {
+      "name": "apk_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "clean_test_app_data",
+      "passed": true,
+      "detail": "Success"
+    },
+    {
+      "name": "launcher",
+      "passed": true,
+      "detail": "at.heinz.imperathen/com.godot.game.GodotAppLauncher"
+    },
+    {
+      "name": "activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 3391\nWaitTime: 3394\nComplete"
+    },
+    {
+      "name": "process_started",
+      "passed": true,
+      "detail": "3059"
+    },
+    {
+      "name": "first_launch_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "first_launch_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "real_menu",
+      "passed": true,
+      "detail": {
+        "new_game": [
+          156.75,
+          237.0
+        ]
+      }
+    },
+    {
+      "name": "menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "touch_starts_saved_game",
+      "passed": true,
+      "detail": "New game button produced a saved village"
+    },
+    {
+      "name": "world_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "world_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "android_back_pauses",
+      "passed": true,
+      "detail": "Back opened a new pause without terminating the app"
+    },
+    {
+      "name": "background_resume",
+      "passed": true,
+      "detail": "Process survived Home and return"
+    },
+    {
+      "name": "launch_4458_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_4458_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "persistent_save_after_restart",
+      "passed": true,
+      "detail": {
+        "atlas": [
+          156.75,
+          462.0
+        ],
+        "can_continue": true,
+        "continue": [
+          156.75,
+          220.5
+        ],
+        "demo": [
+          156.75,
+          421.5
+        ],
+        "gallery": [
+          156.75,
+          502.5
+        ],
+        "gallery_visible": true
+      }
+    },
+    {
+      "name": "continue_after_process_death",
+      "passed": true,
+      "detail": "Loaded the village in a new process"
+    },
+    {
+      "name": "launch_4653_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_4653_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "formation_valley",
+      "passed": true,
+      "detail": "Actual practice menu touch opened the valley scene"
+    },
+    {
+      "name": "touch_advances_marching_soldier",
+      "passed": true,
+      "detail": {
+        "paused_step": 0,
+        "member": "ridge_guard_00",
+        "meters": 0.796524882316589,
+        "pose": "run",
+        "step": 1
+      }
+    },
+    {
+      "name": "square_display_alive",
+      "passed": true,
+      "detail": "Physical size: 1080x2400\nOverride size: 900x920"
+    },
+    {
+      "name": "measured_valley_frames",
+      "passed": true,
+      "detail": {
+        "intervals": 11,
+        "scope": "Software-rendered emulator; CPU/GPU values are latest renderer timings, frame time is an interval mean"
+      }
+    },
+    {
+      "name": "launch_4941_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_4941_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "world_globe",
+      "passed": true,
+      "detail": "Opened the playable globe through the main menu on a square display"
+    },
+    {
+      "name": "gallery_menu_action",
+      "passed": true,
+      "detail": {
+        "atlas": [
+          199.21875,
+          442.811492919922
+        ],
+        "can_continue": true,
+        "continue": [
+          199.21875,
+          211.341857910156
+        ],
+        "demo": [
+          199.21875,
+          403.993621826172
+        ],
+        "gallery": [
+          199.21875,
+          481.62939453125
+        ],
+        "gallery_visible": true
+      }
+    },
+    {
+      "name": "gallery_menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "gallery_menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "gallery_button_visible",
+      "passed": true,
+      "detail": [
+        199.21875,
+        481.62939453125
+      ]
+    },
+    {
+      "name": "real_portrait_loaded",
+      "passed": true,
+      "detail": "Tapped Figuren and rendered the legionary portrait from the exported game"
+    },
+    {
+      "name": "gallery_back_to_menu",
+      "passed": true,
+      "detail": "Android Back restored the menu"
+    },
+    {
+      "name": "no_runtime_errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "arm64_download_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "arm64_selected",
+      "passed": true,
+      "detail": "PackageManager primaryCpuAbi"
+    },
+    {
+      "name": "arm64_activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 2598\nWaitTime: 2602\nComplete"
+    },
+    {
+      "name": "arm64_engine_running",
+      "passed": true,
+      "detail": "Godot rendered the new ARM64 process's intro control"
+    },
+    {
+      "name": "arm64_no_runtime_errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "source_commit": "d54478ec21db4c849dfa29bf7e39eab04b88c9d5",
+  "test_harness_commit": "d54478ec21db4c849dfa29bf7e39eab04b88c9d5",
+  "apk_file": "IMPERATHEN-d54478ec-emulator.apk",
+  "serial": "emulator-5554",
+  "android_version": "15",
+  "api_level": "35",
+  "abi": "x86_64",
+  "model": "sdk_gphone64_x86_64",
+  "pid": "5221",
+  "screenshots": {
+    "00_android_intro.png": {
+      "sha256": "00414ec75125d405c92debf88ccfe9be13ed81406ef9a503f2aba140438ec4be",
+      "width": 960,
+      "height": 540
+    },
+    "01_android_menu.png": {
+      "sha256": "d58baa5e2f577b77262b2a462ffdb905d39e2387f2d1bc47b7906e7203ae4199",
+      "width": 960,
+      "height": 540
+    },
+    "02_android_world.png": {
+      "sha256": "dd52c3cdc17ea970dd3033395dadcbb72550f35da58c8cf924c180e7410db04e",
+      "width": 960,
+      "height": 540
+    },
+    "03_android_pause.png": {
+      "sha256": "84126ad63873487383c6c260f6e4d439b9334495471d00634d613543d50f3d6e",
+      "width": 960,
+      "height": 540
+    },
+    "04_android_valley.png": {
+      "sha256": "9daf8eef56d41225d647d4efe7c005cc666b99b627fef4797a1bfcf06697cd57",
+      "width": 960,
+      "height": 540
+    },
+    "09_android_marching.png": {
+      "sha256": "1322dc916907fd9fcada729757f6b6422eae9ef3bb44bd2f7be2207c108db5a3",
+      "width": 960,
+      "height": 540
+    },
+    "05_android_valley_square.png": {
+      "sha256": "e10bb2b9d7814e3f83128cdba09f28aa50b64ad03a7d33d0289c38875cf22867",
+      "width": 920,
+      "height": 900
+    },
+    "06_android_globe.png": {
+      "sha256": "af82c6fd40fa886ee7046a1dc3f43356c0b264b0356230248c089360e7f7e1c3",
+      "width": 920,
+      "height": 900
+    },
+    "08_android_figuren.png": {
+      "sha256": "1b180f7403d351325d8cd8cb6d71349f2b6f04b1c728c6104635081d2605ead4",
+      "width": 920,
+      "height": 900
+    },
+    "07_android_arm64_translated_intro.png": {
+      "sha256": "7bceb7e185f6cc66691b18e1cc5d3feb6413f7b46870341f220254ecc11b2c05",
+      "width": 920,
+      "height": 900
+    }
+  },
+  "valley_render_samples": [
+    {
+      "draw_calls": 141,
+      "driver": "opengl3",
+      "fps": 0.426725839316385,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 2343.425,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 10406.845703125,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 101843
+    },
+    {
+      "draw_calls": 141,
+      "driver": "opengl3",
+      "fps": 0.723011429364675,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1383.104,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 17.8619995117188,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 101843
+    },
+    {
+      "draw_calls": 141,
+      "driver": "opengl3",
+      "fps": 1.18151775407653,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 846.369,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 6.55999994277954,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 101843
+    },
+    {
+      "draw_calls": 141,
+      "driver": "opengl3",
+      "fps": 1.12783947686294,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 886.651,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 2332.75,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 101843
+    },
+    {
+      "draw_calls": 141,
+      "driver": "opengl3",
+      "fps": 0.816870666501114,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1224.184,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 35.4850006103516,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 101843
+    },
+    {
+      "draw_calls": 141,
+      "driver": "opengl3",
+      "fps": 1.73036425898016,
+      "frames": 3,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 577.913,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 108.944999694824,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 101843
+    },
+    {
+      "draw_calls": 141,
+      "driver": "opengl3",
+      "fps": 1.1441300692828,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 874.0265,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 36.8819999694824,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 101843
+    },
+    {
+      "draw_calls": 141,
+      "driver": "opengl3",
+      "fps": 0.923024381689042,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1083.395,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 6.74399995803833,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 101843
+    },
+    {
+      "draw_calls": 141,
+      "driver": "opengl3",
+      "fps": 0.543849349379427,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1838.7445,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 36.9309997558594,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 101843
+    },
+    {
+      "draw_calls": 121,
+      "driver": "opengl3",
+      "fps": 0.665221362386655,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1503.259,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 37.1520004272461,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 97267
+    },
+    {
+      "draw_calls": 121,
+      "driver": "opengl3",
+      "fps": 2.30600005841867,
+      "frames": 3,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 433.651333333333,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 50.568000793457,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 97267
+    }
+  ],
+  "arm64_package": {
+    "available_abis": [
+      "x86_64",
+      "arm64-v8a"
+    ],
+    "sha256": "89b7bb22914c033f8dc5c41d7a40fc6db26e7da25220c00bfb339a1fa887f76f",
+    "name": "IMPERATHEN-d54478ec-arm64.apk",
+    "status": "started_under_translation"
+  }
+}

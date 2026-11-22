@@ -1,0 +1,396 @@
+{
+  "actor_script": "res://scripts/visuals/village_person.gd",
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "captures": [
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.415, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "child-low.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "low",
+      "scale_3d": 0.800000011920929
+    },
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.415, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "child-balanced.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "balanced",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.415, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "child-high.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.415, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "child-very_high.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-1.0, 0.0, 0.0), Y: (0.0, 0.999896, 0.014422), Z: (-0.0, 0.014422, -0.999896), O: (0.0, 1.415, -1.04)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "child-front.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.090672, 0.0, 0.995881), Y: (0.014362, 0.999896, 0.001308), Z: (-0.995777, 0.014422, -0.090662), O: (-1.035716, 1.415, -0.094298)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "child-profile.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 22,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-1.0, 0.0, 0.0), Y: (0.0, 0.999896, 0.014422), Z: (-0.0, 0.014422, -0.999896), O: (0.0, 1.595, -1.04)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "adult-front.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 22,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.852524, 0.0, 0.522687), Y: (0.007538, 0.999896, 0.012295), Z: (-0.522633, 0.014422, -0.852436), O: (-0.543595, 1.595, -0.886625)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "adult-three-quarter.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 22,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.090672, 0.0, 0.995881), Y: (0.014362, 0.999896, 0.001308), Z: (-0.995777, 0.014422, -0.090662), O: (-1.035716, 1.595, -0.094298)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "adult-profile.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.415, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "asset-lod-0.png",
+      "forced_asset_lod": true,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_1.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.415, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "asset-lod-1.png",
+      "forced_asset_lod": true,
+      "lod": 1,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_2.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.415, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "asset-lod-2.png",
+      "forced_asset_lod": true,
+      "lod": 2,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_3.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.415, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "asset-lod-3.png",
+      "forced_asset_lod": true,
+      "lod": 3,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle + natural blink",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.415, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.907853364944458,
+        "Blink_R": 0.673168778419495,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "child-blink.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle + natural blink",
+      "age": 22,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.595, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.912166714668274,
+        "Blink_R": 0.98088264465332,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "adult-blink.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle body + talk face",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 32.0,
+      "camera_transform": "[X: (-0.983844, 0.0, 0.17903), Y: (0.002582, 0.999896, 0.014189), Z: (-0.179011, 0.014422, -0.983741), O: (-0.186191, 1.415, -1.023197)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.309999376535416,
+        "Smile": 0.0799999982118607
+      },
+      "file": "child-talking.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 12,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.961055, 0.0, 0.276356), Y: (0.009973, 0.999349, 0.034682), Z: (-0.276176, 0.036088, -0.960429), O: (-0.99488, 0.95, -3.4598)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "full-body-12.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    },
+    {
+      "action": "idle",
+      "age": 22,
+      "asset": "res://assets/characters/hero_quality_0.glb",
+      "bones": 15,
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.961055, 0.0, 0.276356), Y: (0.002303, 0.999965, 0.008009), Z: (-0.276346, 0.008333, -0.961022), O: (-0.99488, 0.95, -3.4598)]",
+      "face_weights": {
+        "Blink_L": 0.0,
+        "Blink_R": 0.0,
+        "BrowDown": 0.0,
+        "JawOpen": 0.0,
+        "Smile": 0.0
+      },
+      "file": "full-body-22.png",
+      "forced_asset_lod": false,
+      "lod": 0,
+      "profile": "very_high",
+      "scale_3d": 1.0
+    }
+  ],
+  "driver": "opengl3",
+  "engine": "4.7.2-stable (official)",
+  "environment": "Controlled Godot studio with the production VillagePerson actor; not a village screenshot",
+  "errors": [],
+  "legacy_asset_forced_for_comparison": false,
+  "motion": {
+    "action": "march",
+    "frames": 72,
+    "measured_device_fps": false,
+    "playback_fps": 24,
+    "source": "Production player GLB animation sampled at exact times"
+  },
+  "output_pixels": [
+    1600,
+    900
+  ],
+  "renderer": "gl_compatibility",
+  "source_sha256": {
+    "prototype/assets/characters/hero_quality_0.glb": "69df0f6c2546a5dd075eee07570e071746d5c46e9fcc28e3a7bac11c3a55caeb",
+    "prototype/assets/characters/hero_quality_1.glb": "af6a9dfc26ddec361702157943f21fd756ef5ebb476aab73bdfdb0f4de30fc91",
+    "prototype/assets/characters/hero_quality_2.glb": "8f91895bb39608febf1df54ede111d39a0c709fa2a57036553e4ce3cc5e247f1",
+    "prototype/assets/characters/hero_quality_3.glb": "103845fd62f6aa73284db552cd92be776deb1ec3546bb5ec30bd391cdb5b4b12",
+    "prototype/assets/quality_profiles.json": "42a868f6bb979e2d091ae1c1d156be3e7f3f9c09b1749ec45551ae38e05fb774",
+    "prototype/project.godot": "02914329ec13ac77710c08ca0d55b2f196366001cb7943f44285d1dca4d72dfe",
+    "prototype/scripts/ui/runtime_display.gd": "e0d6c335f53e32129ec94d5d3b5c9d2a74002e0724e0c6728432fa774e2f22e4",
+    "prototype/scripts/visuals/facial_motion.gd": "e87c5bc3b32c43cb70c4ae5f1fff13a562148bb5faf911e6cb725095fb611a16",
+    "prototype/scripts/visuals/village_person.gd": "7e537c4e3895b90bedaffe70e58b6a6d717687885285cc34316db14a1427d52a",
+    "prototype/tests/hero_graphics_review.gd": "6946f2a5b0412a12f414e3b3a4d6cd69d002ceafa57b722573a540824308502d"
+  }
+}

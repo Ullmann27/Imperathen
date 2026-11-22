@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-22",
+  "repository": "Ullmann27/Imperathen",
+  "branch": "feature/hero-realism-20261122",
+  "pull_request": 34,
+  "local_commit": "d54478ec21db4c849dfa29bf7e39eab04b88c9d5",
+  "remote_tree": "1f90bbf0c3c9546d6ad5c318e19d129a0ee000fc",
+  "local_paths": 977,
+  "remote_paths": 977,
+  "mismatches": [],
+  "extra_remote": [],
+  "bundle": {
+    "bytes": 85441894,
+    "sha256": "aff704aac6995643dae23e08c2e729301404a8aa21d6f8873d5b2d09aea22e04",
+    "parts": 11,
+    "all_parts_verified": true
+  },
+  "local_regression": {
+    "groups": 16,
+    "passed": 16,
+    "hero_checks": 55,
+    "village_people_checks": 221,
+    "apk_payload_tests": 5,
+    "report": "../checks/validation_report.json",
+    "report_sha256": "f05df783c156c369db91e2fe760f11924cc6c25d00607e99d3d29d2900791147"
+  },
+  "scope": "Byte-identical source recovery and local regression checks; Android runtime and physical-device quality are separate evidence."
+}

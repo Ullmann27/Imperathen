@@ -67,6 +67,11 @@ VILLAGE_RESOURCES = (
     *(f"assets/village/{name}.png" for name in ("valdorf_color", "valdorf_normal", "valdorf_orm",
       "track_color", "track_relief", "verge_color", "verge_relief", "sky_clouds")),
 )
+HERO_FACE_SCRIPT = "scripts/visuals/facial_motion.gd"
+HERO_RESOURCES = (
+    HERO_FACE_SCRIPT,
+    *(f"assets/characters/hero_quality_{level}.glb" for level in range(4)),
+)
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (
     "legionary", "auxiliary_spear", "archer", "centurion", "signifer", "emperor",
@@ -176,6 +181,20 @@ def resolve_resource(archive: zipfile.ZipFile, names: set[str], source: str) -> 
     return {"source": source, "entry": None, "mode": "missing"}
 
 
+def record_payload_hash(archive: zipfile.ZipFile, resource: dict) -> None:
+    """Record the actual exported payload, which may differ from source bytes."""
+    if resource["entry"] is None:
+        return
+    digest = hashlib.sha256()
+    with archive.open(resource["entry"]) as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    resource["size_bytes"] = archive.getinfo(resource["entry"]).file_size
+    resource["sha256"] = digest.hexdigest()
+    if resource.get("remap"):
+        resource["remap_sha256"] = hashlib.sha256(archive.read(resource["remap"])).hexdigest()
+
+
 def inspect_zip(apk: Path, report: dict, expected_abi: str, source_root: Path) -> bool:
     try:
         with zipfile.ZipFile(apk) as archive:
@@ -252,9 +271,25 @@ def inspect_zip(apk: Path, report: dict, expected_abi: str, source_root: Path) -
                 required_resources += VILLAGE_RESOURCES
             if (source_root / GALLERY_SCRIPT).is_file() or resolve_resource(archive, names, GALLERY_SCRIPT)["entry"]:
                 required_resources += GALLERY_RESOURCES
+            hero_in_source = (source_root / HERO_FACE_SCRIPT).is_file()
+            hero_in_archive = any(resolve_resource(archive, names, source)["entry"] for source in HERO_RESOURCES)
+            require_hero = hero_in_source or hero_in_archive
+            if require_hero:
+                required_resources += HERO_RESOURCES
             resolved = [resolve_resource(archive, names, source) for source in required_resources]
             missing_resources = [item["source"] for item in resolved if item["entry"] is None]
             packs = sorted(name for name in names if name.startswith("assets/") and name.endswith(".pck"))
+            if require_hero:
+                hero_payloads = [item for item in resolved if item["source"] in HERO_RESOURCES]
+                for item in hero_payloads:
+                    record_payload_hash(archive, item)
+                missing_hero = [item["source"] for item in hero_payloads if item["entry"] is None]
+                status = "incomplete" if not valid_config and packs else "fail" if missing_hero else "pass"
+                add_check(report, "hero_character_content", status,
+                          "The anatomical hero requires all four LOD resources and the facial-motion script in the actual APK, including resolved remaps.",
+                          required_by_source=hero_in_source, detected_in_archive=hero_in_archive,
+                          resources=hero_payloads, missing_resources=missing_hero,
+                          hash_scope="SHA-256 of exported APK payloads and remaps; not an assertion that transformed bytes equal the local sources.")
             if not valid_config and packs:
                 add_check(report, "godot_project_content", "incomplete",
                           "A packed Godot project was found, but this checker does not inspect PCK indexes. Project contents are not confirmed.", packs=packs)
