@@ -1,10 +1,10 @@
-# Vorbereiteter späterer Entwicklungsauftrag
+# Nächster Implementierungsauftrag
 
-**Nicht aktiviert. Diese Datei ist Vorarbeit und keine aktuelle Erlaubnis zur Spielprogrammierung.**
+**Aktualisiert 22.11.2026:** Der Nutzer hat den begrenzten Entwicklungsstart inzwischen beauftragt. Vorspann, Menü, gespeicherter Dorfanfang und lokale Agent-Pipeline bilden die erste Lieferung. Dieser Text beschreibt den anschließenden nativen Spielabschnitt; seine echten Engine-Nachweise stehen noch aus.
 
 ## Wofür dieser Auftrag gedacht ist
 
-Sobald der Nutzer einen konkreten Entwicklungsstart beauftragt, soll der erste Schritt einen kleinen zuverlässigen Zusammenhang schaffen. Die alte Mappe bündelt unter einem „P0“ mehrere große Produktionsphasen. Dieser Auftrag trennt sie und verhindert einen unkontrollierten Start aller Systeme gleichzeitig.
+Die vorhandene Einstiegsvorschau demonstriert den ersten Zustand und die drei Handlungen. Der nächste Schritt überträgt den zuverlässigen Zusammenhang in eine tatsächlich begehbare Engine-Szene. Die alte Mappe bündelt unter einem „P0“ mehrere große Produktionsphasen; sie werden weiterhin in prüfbaren Abschnitten umgesetzt.
 
 ## Vor Beginn tatsächlich feststellen
 
@@ -12,7 +12,7 @@ Aktuelle Nutzervorgabe, Repository-Kopf, verfügbare Engine und Version, Toolcha
 
 ## Vorgeschlagene erste Lieferung
 
-Ein minimaler Spielbereich, in dem eine kontrollierte Figur eine vorhandene Ressource einsammelt, eine einfache Baustelle auf erlaubtem Grund anlegt, den Bestand konsistent verändert und diesen Zustand speichern und laden kann. Der Wechsel in eine einfache Bauansicht darf weder Inventar noch Aufenthaltsort duplizieren. Die Darstellungsqualität ist zunächst funktional.
+Zuerst `game/Imperathen/Imperathen.uproject` auf einer tatsächlich vorhandenen Unreal-Installation kompilieren und starten. Danach einen minimalen Spielbereich umsetzen, in dem eine kontrollierte Figur eine vorhandene Ressource einsammelt, eine einfache Baustelle auf erlaubtem Grund anlegt, den Bestand konsistent verändert und diesen Zustand speichern und laden kann. Der Wechsel in eine einfache Bauansicht darf weder Inventar noch Aufenthaltsort duplizieren. Die Darstellungsqualität ist zunächst funktional.
 
 Diese erste Lieferung hat absichtlich weniger Umfang als der vollständige spätere Dorfabschnitt. Gefährte, Kampf, regionale Karte und adaptive Fortsetzung werden in anschließenden getrennten Lieferungen angeschlossen. So wird ein Speicher- oder Zustandsfehler nicht erst nach großer Inhaltsproduktion entdeckt.
 

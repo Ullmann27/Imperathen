@@ -26,3 +26,10 @@ Neue Erkenntnisse ergänzen eine Folgeentscheidung mit Bezug auf die alte ID. Ei
 ## Reihenfolge für die nächsten Fachentscheidungen
 
 Erst der kleine durchgängige Spielablauf, dann sein Zeit- und Speichervertrag, danach Engine und Hardware anhand dieses Ablaufs. Endgültige Zahlen zu Armeengröße, Weltumfang oder Spielstunden werden aus einem gemessenen Prototyp abgeleitet. Markenentscheidung und Assetrechte laufen parallel, ohne die gegenwärtige Vorarbeit künstlich zu sperren.
+
+
+## 22.11.2026 – Begrenzten Entwicklungsstart aktiviert
+
+Neuere Nutzervorgabe: mit drei Agents bestehender Arbeit beitreten, Vorspann/Hauptmenü aufbauen und Agent-Pipeline einrichten. R-031 entsprechend erweitert. Eigener Entwicklungsbranch auf PR #1; Koordination #16; kein Main-Merge. Tatsächlich zugängliches Repository weiterhin public, separates privates Rome-Projekt nicht sichtbar.
+
+Praktische Umsetzung: dependencyfreie Browser-Vorschau als ausführbarer Einstieg plus getrennte Unreal-Projektbasis. Kein endgültiger Enginewechsel und keine behauptete UE-Versionabnahme. Valdora, Marcus, drei Handlungsschritte sowie 10s Intro sind reversible Prototypentscheidungen, keine nachträglich erfundenen verbindlichen Vorgaben der Ausgangsmappe. Neue Bilder/Musikdateien aus Fremdquellen wurden nicht importiert; SVGs und optionale Klangatmosphäre sind hier erstellt.
