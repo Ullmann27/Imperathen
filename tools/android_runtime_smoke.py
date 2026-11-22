@@ -40,6 +40,7 @@ def main():
     parser.add_argument("--adb", required=True)
     parser.add_argument("--apk", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--device-apk", type=Path, help="Also run the actual ARM64 download if the emulator supports translation")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     package = "at.heinz.imperathen"
@@ -279,6 +280,30 @@ def main():
         final_log = logs() + "\n" + "\n".join(path.read_text(encoding="utf-8") for path in args.output.glob("logcat-*.txt"))
         errors = runtime_error_lines(final_log)
         record("no_runtime_errors", not errors, errors)
+        if args.device_apk:
+            supported = adb("shell", "getprop", "ro.product.cpu.abilist").split(",")
+            device_report = {"available_abis": supported, "sha256": hashlib.sha256(args.device_apk.read_bytes()).hexdigest(),
+                             "name": args.device_apk.name, "status": "no_arm64_translation"}
+            report["arm64_package"] = device_report
+            if "arm64-v8a" in supported:
+                # Only the verified disposable emulator is modified. Both ABI-specific
+                # CI builds use the same private prototype key, so data survives.
+                device_report["status"] = "attempted"
+                (args.output / ("logcat-" + report["pid"] + ".txt")).write_text(logs(), encoding="utf-8")
+                adb("shell", "am", "force-stop", package)
+                install = adb("install", "-r", "-t", "--abi", "arm64-v8a", str(args.device_apk.resolve()), timeout=120)
+                record("arm64_download_install", "Success" in install, install)
+                info = adb("shell", "dumpsys", "package", package)
+                record("arm64_selected", bool(re.search(r"primaryCpuAbi=arm64-v8a\b", info)), "PackageManager primaryCpuAbi")
+                opened = adb("shell", "am", "start", "-W", "-n", component, timeout=90)
+                record("arm64_activity_launch", "Status: ok" in opened, opened)
+                report["pid"] = adb("shell", "pidof", package)
+                wait_marker("IMPERATHEN_INTRO_READY ", timeout=140)
+                screenshot("07_android_arm64_translated_intro.png")
+                record("arm64_engine_running", True, "Godot rendered the new ARM64 process's intro control")
+                record("arm64_no_runtime_errors", not runtime_error_lines(logs()), runtime_error_lines(logs()))
+                device_report["status"] = "started_under_translation"
+                report["arm64_runtime_test"] = True
         report["status"] = "passed"
     except (RuntimeError, subprocess.TimeoutExpired, json.JSONDecodeError, ET.ParseError, OSError) as error:
         report["errors"].append(str(error))
