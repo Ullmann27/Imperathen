@@ -67,6 +67,13 @@ def main():
     def logs():
         return adb("logcat", "-d", "--pid", report["pid"], timeout=20)
 
+    def checked_logs():
+        text = logs()
+        errors = runtime_error_lines(text)
+        if errors:
+            record("no_runtime_errors", False, errors)
+        return text
+
     def screenshot(name):
         data = adb("exec-out", "screencap", "-p", binary=True)
         if not data.startswith(b"\x89PNG\r\n\x1a\n"):
@@ -120,7 +127,7 @@ def main():
     def wait_marker(marker, timeout=80):
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
-            for line in reversed(logs().splitlines()):
+            for line in reversed(checked_logs().splitlines()):
                 if marker in line:
                     return line.split(marker, 1)[1].strip()
             time.sleep(1)
@@ -143,8 +150,9 @@ def main():
             raise RuntimeError("Unable to enable frame counters in emulator test preferences")
 
     def skip_intro(stage):
-        point = json.loads(wait_marker("IMPERATHEN_INTRO_READY ", timeout=120))["skip"]
+        wait_marker("IMPERATHEN_READY:", timeout=120)
         dismiss_fullscreen_hint(stage)
+        point = json.loads(wait_marker("IMPERATHEN_INTRO_READY ", timeout=120))["skip"]
         if stage == "first_launch":
             screenshot("00_android_intro.png")
         if "IMPERATHEN_MENU_READY " not in logs():
@@ -237,9 +245,13 @@ def main():
         time.sleep(3)
         dismiss_fullscreen_hint("world")
         screenshot("02_android_world.png")
+        previous_pauses = checked_logs().count("IMPERATHEN_PAUSED")
         adb("shell", "input", "keyevent", "4")
-        wait_marker("IMPERATHEN_PAUSED")
-        record("android_back_pauses", "IMPERATHEN_PAUSED" in logs() and adb("shell", "pidof", package) == pid, "Back opened pause without terminating the app")
+        deadline = time.monotonic() + 40
+        while time.monotonic() < deadline and checked_logs().count("IMPERATHEN_PAUSED") <= previous_pauses:
+            time.sleep(1)
+        record("android_back_pauses", checked_logs().count("IMPERATHEN_PAUSED") > previous_pauses
+               and adb("shell", "pidof", package) == pid, "Back opened a new pause without terminating the app")
         screenshot("03_android_pause.png")
         adb("shell", "input", "keyevent", "3")
         time.sleep(1)
