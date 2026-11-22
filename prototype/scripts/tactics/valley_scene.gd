@@ -77,7 +77,7 @@ func _ready() -> void:
 	hud.requested.connect(_action)
 	_sync_units()
 	_refresh()
-	print("IMPERATHEN_VALLEY_READY")
+	hud.report_ready(model.steps)
 
 func _surface(p: Vector2) -> Vector3:
 	return Vector3(p.x,Rules.ground_height(p.x,p.y),p.y)
@@ -219,6 +219,8 @@ func _sample_motion(id: String, destination: Vector3, yaw: float, pose: String, 
 	if pose in ["walk","idle","retreat"] and distance > 0.018:
 		pose = "retreat" if pose == "retreat" else ("run" if distance / period > 2.65 else "march")
 		track.phase1 += distance / float(Soldier.STRIDES[pose])
+		if hud.probe_step >= 0 and model.steps > hud.probe_step:
+			hud.report_first_stride(model.steps, id, pose, distance)
 		track.yaw = atan2(displacement.x,displacement.y)
 	elif pose in ["walk","retreat"]:
 		pose = ("march" if pose == "walk" else "retreat") if first_sample else "idle"

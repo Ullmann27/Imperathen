@@ -306,11 +306,24 @@ def main():
         record("continue_after_process_death", True, "Loaded the village in a new process")
         practice_menu = relaunch(diagnostics=True)
         tap(practice_menu["demo"])
-        wait_marker("IMPERATHEN_VALLEY_READY")
+        valley_ready = wait_marker("IMPERATHEN_VALLEY_READY")
         record("formation_valley", True, "Actual practice menu touch opened the valley scene")
         time.sleep(4)
         screenshot("04_android_valley.png")
         (args.output / "valley-meminfo.txt").write_text(adb("shell", "dumpsys", "meminfo", package), encoding="utf-8")
+        # Older packages log only the ready marker. New debug packages also expose
+        # the native screen position of Fortsetzen and the paused simulation step.
+        if valley_ready:
+            controls = json.loads(valley_ready)
+            stride_marker = "IMPERATHEN_VALLEY_STRIDE "
+            previous = checked_logs().count(stride_marker)
+            tap(controls["resume"])
+            stride = json.loads(wait_for_new_marker(stride_marker, previous))
+            record("touch_advances_marching_soldier", stride["step"] > controls["step"] and
+                   stride["meters"] > 0 and stride["pose"] in {"march", "run", "retreat"},
+                   {"paused_step": controls["step"], **stride})
+            time.sleep(2)
+            screenshot("09_android_marching.png")
         # A square logical display exercises live fold-style resizing. The virtual
         # hardware remains an emulator and this does not measure a physical hinge.
         adb("shell", "wm", "size", "900x920")

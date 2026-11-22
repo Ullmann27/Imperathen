@@ -12,6 +12,7 @@ var command_row := HBoxContainer.new()
 var status := Label.new()
 var heading := Label.new()
 var pause_button: Button
+var probe_step := -1
 var group_button: Button
 var card_by_id := {}
 var marquee := ColorRect.new()
@@ -71,6 +72,20 @@ func populate(model) -> void:
 	_button(command_row,"−","zoom_out")
 	_button(command_row,"+","zoom_in")
 	_resize()
+
+func report_ready(step: int) -> void:
+	if not OS.is_debug_build():
+		print("IMPERATHEN_VALLEY_READY")
+		return
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var center := get_viewport().get_screen_transform() * pause_button.get_global_rect().get_center()
+	probe_step = step
+	print("IMPERATHEN_VALLEY_READY " + JSON.stringify({"resume":[center.x,center.y],"step":step}))
+
+func report_first_stride(step: int, member_id: String, pose: String, distance: float) -> void:
+	probe_step = -1
+	print("IMPERATHEN_VALLEY_STRIDE " + JSON.stringify({"step":step,"member":member_id,"pose":pose,"meters":distance}))
 
 func refresh(model, selected: Array, paused: bool, rate: float, message: String) -> void:
 	var counts := {"ally":0,"enemy":0}
