@@ -118,6 +118,8 @@ def main():
             "api_level": report["api_level"], "abi": report["abi"], "model": report["model"]})
         adb("shell", "wm", "size", "720x1280")
         adb("shell", "wm", "density", "160")
+        adb("shell", "wm", "dismiss-keyguard")
+        adb("shell", "settings", "put", "secure", "immersive_mode_confirmations", "confirmed")
         adb("shell", "input", "keyevent", "82")
         installed = adb("install", "-r", "-t", str(args.apk.resolve()), timeout=90)
         record("apk_install", "Success" in installed, installed)
@@ -175,6 +177,17 @@ def main():
         report["status"] = "passed"
     except (RuntimeError, subprocess.TimeoutExpired, json.JSONDecodeError, OSError) as error:
         report["errors"].append(str(error))
+        if verified_emulator:
+            try:
+                focus = adb("shell", "dumpsys", "window", "displays", checked=False)
+                report["focused_windows"] = [line.strip() for line in focus.splitlines() if "Focus" in line][:10]
+                if "pid" in report:
+                    diagnostics = [line for line in logs().splitlines() if any(tag in line for tag in (
+                        "IMPERATHEN", "SCRIPT ERROR", "FATAL", "Godot", "BackInvoked", "BackDispatcher"))]
+                    report["last_game_messages"] = diagnostics[-18:]
+                screenshot("failure.png")
+            except (RuntimeError, subprocess.TimeoutExpired, OSError):
+                pass
     finally:
         try:
             if verified_emulator:
