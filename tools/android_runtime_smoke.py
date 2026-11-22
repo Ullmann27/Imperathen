@@ -1,6 +1,8 @@
-"""Install and exercise the actual APK on an already-started Android emulator.
+"""Install and exercise the actual APK on one disposable Android emulator.
 
 This is an Android runtime check, not evidence about a physical ARM64 phone.
+Physical devices and ambiguous ADB targets are refused. The verified emulator's
+test-app data is cleared after installation so repeated runs start from one state.
 It waits for the real menu geometry logged by a debug build and taps that actual
 button. Screenshots and logcat remain inspectable; errors never become fake passes.
 """
@@ -23,9 +25,13 @@ def main():
     package = "at.heinz.imperathen"
     report = {"platform": "Android API 35 x86_64 emulator", "physical_device_test": False,
               "arm64_runtime_test": False, "status": "failed", "checks": [], "errors": []}
+    serial = ""
+    verified_emulator = False
 
     def adb(*parts, binary=False, timeout=30, checked=True):
-        result = subprocess.run([args.adb, *parts], capture_output=True, timeout=timeout)
+        if not serial:
+            raise RuntimeError("No unambiguous emulator target selected")
+        result = subprocess.run([args.adb, "-s", serial, *parts], capture_output=True, timeout=timeout)
         if checked and result.returncode:
             raise RuntimeError("adb command failed: " + " ".join(parts[:3]) + ": " + result.stderr.decode(errors="replace"))
         return result.stdout if binary else result.stdout.decode(errors="replace").strip()
@@ -45,6 +51,29 @@ def main():
         (args.output / name).write_bytes(data)
 
     try:
+        inventory_deadline = time.monotonic() + 60
+        targets = []
+        while time.monotonic() < inventory_deadline:
+            inventory = subprocess.run([args.adb, "devices"], capture_output=True, timeout=15)
+            if inventory.returncode:
+                raise RuntimeError("adb devices failed: " + inventory.stderr.decode(errors="replace"))
+            targets = []
+            for line in inventory.stdout.decode(errors="replace").splitlines():
+                fields = line.split()
+                if len(fields) >= 2 and fields[0] != "List":
+                    targets.append({"serial": fields[0], "state": fields[1]})
+            if targets:
+                break
+            time.sleep(2)
+        record("single_emulator_target", len(targets) == 1
+               and targets[0]["serial"].startswith("emulator-")
+               and targets[0]["state"] in {"device", "offline"}, targets)
+        serial = targets[0]["serial"]
+        report["serial"] = serial
+        adb("wait-for-device", timeout=60)
+        emulator_flag = adb("shell", "getprop", "ro.kernel.qemu")
+        record("emulator_verified", emulator_flag == "1", {"serial": serial, "ro.kernel.qemu": emulator_flag})
+        verified_emulator = True
         deadline = time.monotonic() + 300
         while time.monotonic() < deadline:
             if adb("shell", "getprop", "sys.boot_completed", checked=False, timeout=10) == "1":
@@ -57,6 +86,8 @@ def main():
         adb("shell", "input", "keyevent", "82")
         installed = adb("install", "-r", "-t", str(args.apk.resolve()), timeout=90)
         record("apk_install", "Success" in installed, installed)
+        cleared = adb("shell", "pm", "clear", package)
+        record("clean_test_app_data", cleared == "Success", cleared)
         activity = adb("shell", "cmd", "package", "resolve-activity", "--brief", package)
         component = next((line.strip() for line in activity.splitlines() if line.startswith(package + "/")), "")
         record("launcher", bool(component), component)
@@ -104,7 +135,8 @@ def main():
         report["errors"].append(str(error))
     finally:
         try:
-            (args.output / "logcat.txt").write_text(logs() if "pid" in report else adb("logcat", "-d", checked=False), encoding="utf-8")
+            if verified_emulator:
+                (args.output / "logcat.txt").write_text(logs() if "pid" in report else adb("logcat", "-d", checked=False), encoding="utf-8")
         except (OSError, subprocess.TimeoutExpired, RuntimeError):
             pass
         (args.output / "runtime-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

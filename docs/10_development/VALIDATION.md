@@ -16,7 +16,7 @@ Engine: **Godot 4.7.2.stable.official.ed1daf0bf**. Alle sechs Schritte endeten m
 | --- | --- | --- |
 | Ressourcenimport | Projekt und vorhandene GLB-/WAV-Ressourcen durch die Engine importiert | [import.log](evidence/import.log) |
 | Regeln und Speicherung | 12 Prüfsuiten, **326 Assertions**: atomare Regeln, Reichweiten, Bilanzen, Zeit, Alter, Sieg/Niederlage, Save/Backup und Fehlerinjektion | [domain.log](evidence/domain.log) |
-| Oberfläche und Touch | **66 Prüfungen**, darunter native Touchereignisse, zwei Finger, Fokusverlust, Settings, Dialogrückwege und Layoutgrenzen | [ui.log](evidence/ui.log) |
+| Oberfläche und Touch | **115 Prüfungen**, darunter native Touchereignisse, zwei Finger, Fokusverlust, Android-Zurück, App-Hintergrund, Safe Area, Settings, Dialogrückwege und Größenwechsel | [ui.log](evidence/ui.log) |
 | Welt | Echte Bewegung, Kollision, Kamerawechsel, Bautaps, Modellimport, Wiederaufbau und Grafikprofile | [world.log](evidence/world.log) |
 | Gesamtablauf | **32 Prüfungen** vom realen Einstieg über UI/Weltbefehle bis Kampfentscheidung, Backup-Laden und App-Pause | [integration.log](evidence/integration.log) |
 | Hauptszene | Tatsächlicher Start von main.tscn; 420 Simulationsframes ohne Skriptfehler | [main_scene.log](evidence/main_scene.log) |
@@ -31,7 +31,7 @@ Baustellen benötigen anwesende Arbeit. Zwei nahe Baustellen verdoppeln nicht di
 
 Saveprüfungen umfassen unvollständige Dateien, unbekannte Versionen, ungültige Felder, Prüfsummenfehler, widersprüchliche Ressourcen, sichere Backupwahl, vorzeitig liegengebliebene temporäre Dateien und Schreibfehler. Laden übernimmt erst den vollständig validierten Zustand. Prüfsummen sind ausdrücklich kein Manipulationsschutz gegen den Dateiinhaber.
 
-Die UI-Prüfungen senden `InputEventScreenTouch` und `InputEventScreenDrag` über Godots Viewport. Nachgewiesen sind gleichzeitiges Bewegen und Angreifen mit zwei Fingern, Loslassen außerhalb der Padfläche und Rücksetzen bei Dialog, Moduswechsel oder Fokusverlust. Layoutgrenzen wurden bei **1280×720 und 960×540**, jeweils mit **125 % UI-Skalierung**, rechnerisch im tatsächlichen UI-Baum geprüft. Das ersetzt keine optische Sichtung auf einem Handy.
+Die UI-Prüfungen senden `InputEventScreenTouch` und `InputEventScreenDrag` über Godots Viewport. Nachgewiesen sind gleichzeitiges Bewegen und Angreifen mit zwei Fingern, Loslassen außerhalb der Padfläche und Rücksetzen bei Dialog, Moduswechsel oder Fokusverlust. Layoutgrenzen wurden bei **1280×720, 960×540 und 1200×900**, jeweils mit **125 % UI-Skalierung**, rechnerisch im tatsächlichen UI-Baum geprüft. Das ersetzt keine optische Sichtung auf einem Handy.
 
 Die Weltprüfungen führen `CharacterBody3D`-Bewegung und Kollision aus. Sie prüfen eine Palisadenbarriere, Ortserhaltung bei Kamerawechseln, Reichweite von Interaktionen, gültige und ungültige Bautaps und korrektes Entfernen alter Gebäude beim erneuten Aufbau. Die Grafikprofile ändern echte Engine-Einstellungen, ohne maßgebliche Weltdaten oder Kollisionskörper zu ändern.
 

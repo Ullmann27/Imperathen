@@ -151,6 +151,8 @@ def preflight(args: argparse.Namespace) -> tuple[dict, dict[str, str]]:
     for key in ("renderer/rendering_method", "renderer/rendering_method.mobile"):
         if unquote(config.get("rendering", key, fallback='""')) != "gl_compatibility":
             raise BuildError(f"Android-Projekt benötigt explizit Compatibility: rendering/{key}.")
+    if not config.getboolean("rendering", "textures/vram_compression/import_etc2_astc", fallback=False):
+        raise BuildError("Android-Export benötigt rendering/textures/vram_compression/import_etc2_astc=true.")
     orientation = config.getint("display", "window/handheld/orientation", fallback=0)
     if orientation not in (0, 4):
         raise BuildError("Querformat erwartet: display/window/handheld/orientation muss 0 oder 4 sein.")
