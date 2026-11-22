@@ -1,0 +1,74 @@
+[
+  {
+    "kind": "pine",
+    "lod": "near",
+    "triangles": 30742,
+    "branches": 557,
+    "leaf_sprays": 2310,
+    "bytes": 1737084
+  },
+  {
+    "kind": "pine",
+    "lod": "mid",
+    "triangles": 9586,
+    "branches": 293,
+    "leaf_sprays": 880,
+    "bytes": 713552
+  },
+  {
+    "kind": "pine",
+    "lod": "far",
+    "triangles": 1762,
+    "branches": 48,
+    "leaf_sprays": 495,
+    "bytes": 379812
+  },
+  {
+    "kind": "oak",
+    "lod": "near",
+    "triangles": 36222,
+    "branches": 657,
+    "leaf_sprays": 2730,
+    "bytes": 1978772
+  },
+  {
+    "kind": "oak",
+    "lod": "mid",
+    "triangles": 11258,
+    "branches": 345,
+    "leaf_sprays": 1040,
+    "bytes": 770344
+  },
+  {
+    "kind": "oak",
+    "lod": "far",
+    "triangles": 2054,
+    "branches": 56,
+    "leaf_sprays": 585,
+    "bytes": 377384
+  },
+  {
+    "kind": "olive",
+    "lod": "near",
+    "triangles": 29654,
+    "branches": 607,
+    "leaf_sprays": 1512,
+    "bytes": 1599012
+  },
+  {
+    "kind": "olive",
+    "lod": "mid",
+    "triangles": 10074,
+    "branches": 319,
+    "leaf_sprays": 720,
+    "bytes": 729832
+  },
+  {
+    "kind": "olive",
+    "lod": "far",
+    "triangles": 1776,
+    "branches": 52,
+    "leaf_sprays": 432,
+    "bytes": 383780
+  }
+]

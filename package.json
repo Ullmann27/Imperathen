@@ -1,0 +1,17 @@
+{
+  "name": "imperathen-entry-foundation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local entry preview and coordination tools for the IMPERATHEN game project.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test": "node --test tests/core.test.mjs",
+    "check": "python3 tools/agent_pipeline.py run",
+    "agents": "python3 tools/agent_pipeline.py status",
+    "check:unreal": "python3 tools/verify_unreal.py",
+    "check:browser": "node tools/browser_check.mjs",
+    "build:preview": "python3 tools/build_preview.py"
+  }
+}

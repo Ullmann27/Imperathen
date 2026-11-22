@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "primary_platform": "Android",
+  "default_profile": "balanced",
+  "resolution_policy": "Preserve display aspect ratio; cap 3D pixel count without supersampling. UI stays at output resolution.",
+  "preserved_in_all_profiles": ["actors", "interactive_buildings", "doors", "navigation", "game_rules", "combat_cues", "readable_ui"],
+  "reduction_order": ["decorative_vegetation_density", "distant_mesh_detail", "shadow_distance_and_resolution", "antialiasing_samples", "3d_pixel_count"],
+  "profiles": {
+    "low": {
+      "label": "Niedrig",
+      "max_3d_pixels": 921600,
+      "msaa_samples": 0,
+      "shadow_atlas_size": 1024,
+      "shadow_distance_metres": 24.0,
+      "mesh_lod_threshold": 3.0,
+      "decoration_fraction": 0.22,
+      "glow": false
+    },
+    "balanced": {
+      "label": "Ausgewogen",
+      "max_3d_pixels": 2073600,
+      "msaa_samples": 2,
+      "shadow_atlas_size": 2048,
+      "shadow_distance_metres": 48.0,
+      "mesh_lod_threshold": 1.5,
+      "decoration_fraction": 0.6,
+      "glow": false
+    },
+    "high": {
+      "label": "Hoch",
+      "max_3d_pixels": 3686400,
+      "desktop_max_3d_pixels": 8294400,
+      "msaa_samples": 4,
+      "shadow_atlas_size": 4096,
+      "shadow_distance_metres": 85.0,
+      "mesh_lod_threshold": 0.65,
+      "decoration_fraction": 1.0,
+      "glow": true
+    }
+  },
+  "device_validation": {
+    "status": "not_yet_run_on_android_hardware",
+    "required": ["frame_time_p50_p95_p99", "sustained_20_minute_run", "thermal_state", "peak_memory", "touch_ui", "fold_resize", "same_game_state_across_profiles"],
+    "no_claim": "A demanding high preset is an art target, not a claim to saturate or run smoothly on a particular mobile chip."
+  }
+}

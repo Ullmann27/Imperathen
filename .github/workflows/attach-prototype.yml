@@ -1,0 +1,58 @@
+name: Attach tested prototype downloads
+on:
+  push:
+    tags: ['qa-assets/*']
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  attach:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Attach the existing packages to their matching draft prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          run_id="${GITHUB_REF_NAME#qa-assets/}"
+          [[ "$run_id" =~ ^[0-9]+$ ]]
+          source_sha=$(gh api "repos/$GH_REPO/actions/runs/$run_id" --jq 'select(.path==".github/workflows/android-prototype.yml" and .event=="push" and .head_branch=="integration/android-formation-20261122") | .head_sha')
+          [[ "$source_sha" =~ ^[0-9a-f]{40}$ ]]
+          tag=$(gh api "repos/$GH_REPO/releases" | jq -er --arg sha "$source_sha" '[.[] | select(.draft and .prerelease and .target_commitish==$sha)] | select(length==1) | .[0].tag_name')
+          prefix="IMPERATHEN-${source_sha:0:8}"
+          mkdir files
+          gh run download "$run_id" --pattern 'imperathen-android-*' --dir source-android
+          gh run download "$run_id" --pattern 'imperathen-desktop-*' --dir source-desktop
+          cp source-android/imperathen-android-*/"$prefix-arm64.apk" files/
+          cp source-desktop/imperathen-desktop-*/"$prefix-Windows-x86_64.zip" files/
+          cp source-desktop/imperathen-desktop-*/"$prefix-Linux-x86_64.tar.gz" files/
+          # The alpha portraits in the source archive are the exact textures imported by Godot.
+          gh api "repos/$GH_REPO/tarball/$source_sha" > source.tar.gz
+          python3 - "$prefix" <<'PYTHON'
+          import pathlib, sys, tarfile, zipfile
+          output = pathlib.Path("files") / (sys.argv[1] + "-Figuren.zip")
+          with tarfile.open("source.tar.gz") as archive:
+              march = next((m for m in archive.getmembers() if m.isfile()
+                            and m.name.split("/")[1:] == ["art", "soldiers", "field_march.webm"]), None)
+              if march:
+                  (output.parent / (sys.argv[1] + "-Marsch.webm")).write_bytes(archive.extractfile(march).read())
+              portraits = sorted((m for m in archive.getmembers() if m.isfile()
+                                  and m.name.split("/")[1:-1] == ["prototype", "assets", "portraits"]
+                                  and m.name.endswith(".webp")), key=lambda m: m.name)
+              if portraits:
+                  with zipfile.ZipFile(output, "w") as bundle:
+                      for member in portraits:
+                          name = pathlib.PurePosixPath(member.name).name
+                          bundle.writestr(zipfile.ZipInfo(name), archive.extractfile(member).read())
+          PYTHON
+          cd files
+          downloads=("$prefix-arm64.apk" "$prefix-Windows-x86_64.zip" "$prefix-Linux-x86_64.tar.gz")
+          if [[ -f "$prefix-Figuren.zip" ]]; then downloads+=("$prefix-Figuren.zip"); fi
+          if [[ -f "$prefix-Marsch.webm" ]]; then downloads+=("$prefix-Marsch.webm"); fi
+          sha256sum "${downloads[@]}" > "$prefix-SHA256SUMS.txt"
+          gh release upload "$tag" "${downloads[@]}" "$prefix-SHA256SUMS.txt"

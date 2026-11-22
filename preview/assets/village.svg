@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 640" role="img" aria-label="Isometrische Illustration des ersten Bauplatzes in Valdora">
+<defs>
+<linearGradient id="soil" x2=".5" y2="1"><stop stop-color="#6e7850"/><stop offset="1" stop-color="#40563a"/></linearGradient>
+<linearGradient id="river" x2=".2" y2="1"><stop stop-color="#9aa888"/><stop offset="1" stop-color="#536e5b"/></linearGradient>
+<linearGradient id="path" x2="1" y2=".5"><stop stop-color="#a09569"/><stop offset="1" stop-color="#918960"/></linearGradient>
+<radialGradient id="light"><stop stop-color="#cfbc7255"/><stop offset="1" stop-color="#cfbc7200"/></radialGradient>
+<g id="tree"><path d="M0 9 1-39M0-25l-22-15M2-24l19-21" fill="none" stroke="#4c4831" stroke-width="7"/><ellipse cx="-16" cy="-44" rx="28" ry="18" fill="#60794c"/><ellipse cx="20" cy="-51" rx="29" ry="20" fill="#557147"/><ellipse cx="0" cy="-61" rx="32" ry="18" fill="#7d8a59"/><ellipse cx="-16" cy="-64" rx="16" ry="9" fill="#9b9f68"/></g>
+<g id="grass"><path d="m0 0-4-9M0 0l3-12M1 0l7-6" stroke="#80935a" stroke-width="2" fill="none"/></g>
+<g id="fence"><path d="m0 0 33 16m-33-9 33 16" stroke="#b19862" stroke-width="3"/><path d="M0-7v24m33-8v24" stroke="#7b7750" stroke-width="4"/></g>
+<g id="log"><path d="m0 0 41-18 6 6L6 6Z" fill="#9c8152"/><path d="M0 0v6l6 5V6Z" fill="#5a4a32"/><path d="m6 6 41-18v6L6 12Z" fill="#76633f"/><path d="m11 2 28-13" stroke="#b39a63" stroke-width="1.5"/></g>
+</defs>
+<ellipse cx="421" cy="365" rx="324" ry="219" fill="url(#light)"/>
+<path d="m88 317 337-172 315 167-315 204Z" fill="url(#soil)"/>
+<path d="m88 317 337 199 315-204v28L425 545 88 344Z" fill="#30472e"/>
+<path d="m88 317 337 199v29L88 344Z" fill="#465438"/>
+<path d="M555 221q-6 40 27 49 35 10 11 43-19 26 38 41 9 4 20 5l-26 18q-86-17-69-56 16-35-16-48-31-17-7-63Z" fill="url(#river)"/>
+<path d="M551 219q-14 32 13 48m23 31q-12 14-6 23m6 14q19 17 52 20" fill="none" stroke="#c0c6a1" stroke-width="2" opacity=".6"/>
+<path d="M189 265q39 50 98 68t131 77q41 49 107 42l-26 18q-68-2-99-43t-128-77q-58-19-99-76Z" fill="url(#path)"/>
+<path d="m256 278 156-72 164 87-150 84Z" fill="#827e4f" opacity=".58"/>
+<path d="m271 288 143-67 146 77-137 72Z" fill="none" stroke="#b29e62" stroke-width="1.5" stroke-dasharray="5 7" opacity=".6"/>
+<path d="m279 314 142-68 130 69-136 77Z" fill="#aa9460" opacity=".22"/>
+<path d="m299 329 122-57 104 58-115 67Z" fill="none" stroke="#ceb278" stroke-width="2" stroke-dasharray="9 6" opacity=".7"/>
+<path d="m303 329 6 4m112-60-4 8m104 51-6 3m-107 57 2-7" stroke="#e0c287" stroke-width="3"/>
+<path d="m208 230 92-42 68 35-87 47Z" fill="#6c704b"/>
+<path d="m212 231 65 35v68l-65-37Z" fill="#b19e73"/>
+<path d="m277 266 87-45v69l-87 44Z" fill="#7b8057"/>
+<path d="m196 232 72-75 112 63-102 57Z" fill="#916846"/>
+<path d="m196 232 72-75 10 120Z" fill="#ac8051"/>
+<path d="m295 280 24-12v50l-24 12Z" fill="#3d4530"/>
+<path d="m225 256 20 11v21l-20-12Z" fill="#5e5c3d"/>
+<path d="m331 230 8-4v-44l-8 3Z" fill="#9f8a60"/><path d="m339 226 10-5v-43l-10 4Z" fill="#767752"/>
+<path d="m557 315 40-21 21 12-40 23Z" fill="#b3a06f"/>
+<path d="m557 315 21 14v12l-21-13Z" fill="#827953"/>
+<path d="m578 329 40-23v13l-40 23Z" fill="#606b48"/>
+
+<use href="#tree" transform="translate(157 277) scale(1.1)"/>
+<use href="#tree" transform="translate(167 405) scale(0.8)"/>
+<use href="#tree" transform="translate(603 253) scale(0.8)"/>
+<use href="#tree" transform="translate(674 326) scale(0.95)"/>
+<use href="#tree" transform="translate(499 192) scale(0.66)"/>
+<use href="#tree" transform="translate(105 325) scale(0.68)"/>
+<use href="#tree" transform="translate(569 456) scale(1.05)"/>
+<use href="#tree" transform="translate(228 439) scale(0.75)"/>
+<use href="#fence" transform="translate(304 187)"/>
+<use href="#fence" transform="translate(338 205)"/>
+<use href="#fence" transform="translate(372 223)"/>
+<use href="#fence" transform="translate(406 241)"/>
+<use href="#fence" transform="translate(440 259)"/>
+<use href="#fence" transform="translate(474 277)"/>
+<use href="#fence" transform="translate(637 381)"/>
+<use href="#fence" transform="translate(605 400)"/>
+<use href="#fence" transform="translate(573 419)"/>
+<use href="#log" transform="translate(210 330) scale(.65)"/>
+<use href="#log" transform="translate(218 342) scale(.65)"/>
+<use href="#log" transform="translate(210 338) scale(.65)"/>
+<use href="#log" transform="translate(225 333) scale(.65)"/>
+<use href="#log" transform="translate(216 332) scale(.65)"/>
+<use href="#grass" transform="translate(136 340)"/>
+<use href="#grass" transform="translate(192 371)"/>
+<use href="#grass" transform="translate(275 400)"/>
+<use href="#grass" transform="translate(311 442)"/>
+<use href="#grass" transform="translate(479 483)"/>
+<use href="#grass" transform="translate(637 341)"/>
+<use href="#grass" transform="translate(468 217)"/>
+<use href="#grass" transform="translate(379 202)"/>
+<use href="#grass" transform="translate(355 275)"/>
+<use href="#grass" transform="translate(539 292)"/>
+<use href="#grass" transform="translate(600 424)"/>
+<use href="#grass" transform="translate(513 372)"/>
+<use href="#grass" transform="translate(460 439)"/>
+<g transform="translate(351 382)"><ellipse cx="3" cy="23" rx="11" ry="4" fill="#263c2b" opacity=".55"/><path d="M-2 9-4 24m8-14 4 12" stroke="#353b27" stroke-width="4"/><path d="M-5-3 6-3l5 18-17-1Z" fill="#b29866"/><path d="m-5-1-5 10m15-10 8 7" stroke="#b2a079" stroke-width="3"/><circle cy="-8" r="5" fill="#bda581"/><path d="M-5-8q-2-8 6-6 5 1 4 6" fill="#3a3a26"/></g>
+<path d="m423 437 16-7 10 6-18 7Z" fill="#ac9668"/>
+<path d="m423 437 8 6v12l-8-5Zm8 6 18-7v12l-18 7Z" fill="#897c50"/>
+<ellipse cx="472" cy="387" rx="7" ry="4" fill="#7b7e55"/><ellipse cx="486" cy="382" rx="5" ry="3" fill="#a29767"/>
+<path d="m630 279-2-17 6-3 2 17" fill="#736c47"/>
+<path d="m617 259 27-15 10 6-27 16Z" fill="#b2a06a"/>
+</svg>

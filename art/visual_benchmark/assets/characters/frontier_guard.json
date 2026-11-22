@@ -1,0 +1,34 @@
+{
+  "asset_id": "frontier_guard",
+  "source": "frontier_guard.blend",
+  "file": "frontier_guard.glb",
+  "source_blender_version": "4.3.2",
+  "unit": "metre",
+  "gltf_up_axis": "Y",
+  "gltf_front": "+Z",
+  "triangles": 18931,
+  "mesh_batches": 7,
+  "bounds_blender_z_up": [
+    [
+      -0.3418511748313904,
+      -0.2986184358596802,
+      -1.0372993529017549e-05
+    ],
+    [
+      0.6522034406661987,
+      0.1912417858839035,
+      1.7785987854003906
+    ]
+  ],
+  "dimensions_blender_z_up": [
+    0.9940546154975891,
+    0.4898602217435837,
+    1.7786091583939196
+  ],
+  "sha256": "7f037f2e2149b6e6dceaeb51ef88fcedf486f019969d0f72a2124216e19239d2",
+  "bytes": 1925088,
+  "provenance": "Original procedural geometry and texture maps authored for IMPERATHEN; no third-party model downloads.",
+  "license": "Project owner rights; no public redistribution license asserted.",
+  "rigged": false,
+  "collision_tested": false
+}

@@ -1,0 +1,147 @@
+{
+  "platform": "Android API 35 x86_64 emulator",
+  "physical_device_test": false,
+  "arm64_runtime_test": false,
+  "apk_file": "IMPERATHEN-0.1.0-emulator.apk",
+  "apk_sha256": "12a386d73f62c524495851734c9b247af2f1320411499a6f922af863e64f7db2",
+  "source_commit": "b3d8e01e64663480d228777a7244a2a882bcac18",
+  "status": "passed",
+  "checks": [
+    {
+      "name": "single_emulator_target",
+      "passed": true,
+      "detail": [
+        {
+          "serial": "emulator-5554",
+          "state": "offline"
+        }
+      ]
+    },
+    {
+      "name": "emulator_verified",
+      "passed": true,
+      "detail": {
+        "serial": "emulator-5554",
+        "ro.kernel.qemu": "1"
+      }
+    },
+    {
+      "name": "apk_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "clean_test_app_data",
+      "passed": true,
+      "detail": "Success"
+    },
+    {
+      "name": "launcher",
+      "passed": true,
+      "detail": "at.heinz.imperathen/com.godot.game.GodotAppLauncher"
+    },
+    {
+      "name": "activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 2364\nWaitTime: 2485\nComplete"
+    },
+    {
+      "name": "process_started",
+      "passed": true,
+      "detail": "2950"
+    },
+    {
+      "name": "godot_ready",
+      "passed": true,
+      "detail": {
+        "marker": "IMPERATHEN_READY",
+        "deadline_seconds": 120,
+        "elapsed_seconds": 6.15
+      }
+    },
+    {
+      "name": "startup_system_fullscreen_button",
+      "passed": true,
+      "detail": {
+        "matching_enabled_buttons": 1,
+        "xml": "startup_before_ui.xml"
+      }
+    },
+    {
+      "name": "startup_system_fullscreen_bounds",
+      "passed": true,
+      "detail": {
+        "package": "android",
+        "text": "Got it",
+        "resource_id": "android:id/ok",
+        "bounds": "[845,166][916,214]"
+      }
+    },
+    {
+      "name": "startup_system_fullscreen_hint_dismissed",
+      "passed": true,
+      "detail": {
+        "before_xml": "startup_before_ui.xml",
+        "after_xml": "startup_after_ui.xml"
+      }
+    },
+    {
+      "name": "real_menu",
+      "passed": true,
+      "detail": {
+        "geometry": {
+          "new_game": [
+            209.0,
+            348.0
+          ]
+        },
+        "deadline_seconds": 120,
+        "elapsed_seconds": 27.61,
+        "intro_transition": "automatic; no Enter key sent"
+      }
+    },
+    {
+      "name": "menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "touch_starts_saved_game",
+      "passed": true,
+      "detail": "Tapped real menu button; main confirmed the new saved world"
+    },
+    {
+      "name": "world_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "world_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "android_back_pauses",
+      "passed": true,
+      "detail": {
+        "new_pause_marker_after_Back": true,
+        "deadline_seconds": 20,
+        "detail": "Back must open a new pause without terminating the app"
+      }
+    },
+    {
+      "name": "background_resume",
+      "passed": true,
+      "detail": "Process survived Home and return"
+    },
+    {
+      "name": "no_runtime_errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "serial": "emulator-5554",
+  "pid": "2950"
+}

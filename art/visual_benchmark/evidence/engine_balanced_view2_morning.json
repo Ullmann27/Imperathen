@@ -1,0 +1,62 @@
+{
+	"adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+	"android_hardware": false,
+	"camera": 2,
+	"camera_position": [
+		-0.538066864013672,
+		1.17479991912842,
+		6.50727605819702
+	],
+	"created_at_utc": "2026-11-22T14:41:37",
+	"engine": {
+		"build": "official",
+		"hash": "ed1daf0bf001b61586d9930840f2f1394092c079",
+		"hex": 263938,
+		"major": 4,
+		"minor": 7,
+		"patch": 2,
+		"status": "stable",
+		"string": "4.7.2-stable (official)",
+		"timestamp": 0
+	},
+	"essential_assets_visible": 6,
+	"kind": "actual_godot_viewport_capture",
+	"light": "morning",
+	"png_result": 0,
+	"profile": {
+		"label": "Ausgewogen",
+		"msaa_samples": 2,
+		"output_size": [
+			1280,
+			720
+		],
+		"profile": "balanced",
+		"render_scale": 1.0,
+		"renderer": "gl_compatibility",
+		"shadow_distance_metres": 48.0,
+		"visible_decorations": 960
+	},
+	"renderer": "gl_compatibility",
+	"scenery": {
+		"terrain": {
+			"flat_village_extent_m": 54.0,
+			"front_winding": "clockwise",
+			"material_batches": 2,
+			"road_triangles": 640,
+			"terrain_bounds": [
+				"(-125.0, -0.16, -150.0)",
+				"(125.0, 34.60358, 90.0)"
+			],
+			"terrain_triangles": 19200,
+			"upward_normals": true
+		},
+		"trees": {
+			"bounds": "[P: (-35.81962, -0.9, -48.62061), S: (70.62195, 24.00002, 63.2369)]",
+			"crown_triangles_per_tree": 336,
+			"crown_variants": 3,
+			"material_batches": 4,
+			"quality_visibility": "unchanged for all presets",
+			"trees": 18
+		}
+	}
+}

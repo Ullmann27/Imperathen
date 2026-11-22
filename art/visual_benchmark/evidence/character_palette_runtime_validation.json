@@ -1,0 +1,46 @@
+{
+  "assets": [
+    {
+      "asset": "civilian_youth",
+      "palette_colour_count": 8957,
+      "palette_surfaces": 1,
+      "repaired_surfaces": 1,
+      "second_application_changes": 0,
+      "status": "passed",
+      "surfaces": 4
+    },
+    {
+      "asset": "frontier_guard",
+      "palette_colour_count": 5121,
+      "palette_surfaces": 1,
+      "repaired_surfaces": 1,
+      "second_application_changes": 0,
+      "status": "passed",
+      "surfaces": 7
+    },
+    {
+      "asset": "civilian_youth_lod1",
+      "palette_colour_count": 4535,
+      "palette_surfaces": 1,
+      "repaired_surfaces": 1,
+      "second_application_changes": 0,
+      "status": "passed",
+      "surfaces": 4
+    },
+    {
+      "asset": "frontier_guard_lod1",
+      "palette_colour_count": 2782,
+      "palette_surfaces": 1,
+      "repaired_surfaces": 1,
+      "second_application_changes": 0,
+      "status": "passed",
+      "surfaces": 7
+    }
+  ],
+  "assets_checked": 4,
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "schema_version": 1,
+  "scope": "Imported GLB palette flags, complete colour/position arrays, source-resource isolation and idempotence; visual rendering is checked separately.",
+  "status": "passed"
+}

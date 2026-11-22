@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171912">
+  <meta name="description" content="IMPERATHEN – ein erstes Leben im Schatten eines großen Reiches. Interaktiver Vorspann, Hauptmenü und gespeicherter Dorfanfang.">
+  <title>IMPERATHEN · Der erste Morgen</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/sigil.svg">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-menu">Zum Hauptmenü</a>
+  <div class="landscape" aria-hidden="true">
+    <img class="landscape-art" src="./assets/valley.svg" alt="" width="1920" height="1080">
+    <div class="sun-bloom"></div>
+    <div class="atmosphere atmosphere-near"></div>
+    <div class="atmosphere atmosphere-far"></div>
+    <div class="standard standard-left"><span class="standard-cloth"><img src="./assets/sigil.svg" alt=""></span></div>
+    <div class="standard standard-right"><span class="standard-cloth"><img src="./assets/sigil.svg" alt=""></span></div>
+    <div class="vignette"></div>
+  </div>
+
+  <header class="topbar">
+    <a class="brand-mark" href="#main-menu" aria-label="IMPERATHEN – Hauptmenü"><img src="./assets/sigil.svg" alt="" width="34" height="44"><span>IMPERATHEN</span></a>
+    <span class="edition">ERSTER SPIELANFANG <i></i> 0.1</span>
+  </header>
+
+  <main id="main-menu" class="menu-screen" tabindex="-1">
+    <section class="menu-content" aria-labelledby="game-title">
+      <div class="overline"><span></span> EINE WELT. DEIN LEBEN.</div>
+      <h1 id="game-title">IMPERATHEN</h1>
+      <p class="title-caption">CHRONIK EINES UNGESCHRIEBENEN LEBENS</p>
+      <div class="title-rule" aria-hidden="true"><span>◆</span></div>
+      <p class="opening-copy">Reiche werden nicht geboren.<br><em>Menschen schon.</em></p>
+
+      <nav class="main-actions" aria-label="Hauptmenü">
+        <button id="new-life" class="menu-button menu-button-primary"><span class="button-ornament" aria-hidden="true">✦</span><span>Neues Leben</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+        <button id="continue-life" class="menu-button" disabled><span class="button-ornament" aria-hidden="true">◈</span><span>Fortsetzen<small id="continue-detail">Noch kein Spielstand</small></span><span class="button-arrow" aria-hidden="true">→</span></button>
+        <button id="open-saves" class="menu-button"><span class="button-ornament" aria-hidden="true">▤</span><span>Spielstände</span><span class="button-arrow" aria-hidden="true">→</span></button>
+        <button id="open-settings" class="menu-button"><span class="button-ornament" aria-hidden="true">☼</span><span>Einstellungen</span><span class="button-arrow" aria-hidden="true">→</span></button>
+      </nav>
+      <p class="menu-footnote">Ein Anfang ohne Rang. Ein Weg, den du bestimmst.</p>
+    </section>
+    <aside class="world-caption" aria-label="Schauplatz">
+      <span class="world-number">I</span><div><p>DIE GRENZPROVINZ</p><h2>Der erste Morgen.</h2><span>Am Rand des Reiches beginnt deine Geschichte.</span></div>
+    </aside>
+  </main>
+
+  <section id="village-screen" class="village-screen" aria-labelledby="village-title" hidden>
+    <header class="village-heading"><button id="return-menu" class="text-button">← Hauptmenü</button><span class="overline">KAPITEL I · VALDORA</span><span id="save-indicator" class="save-indicator">Fortschritt lokal gespeichert</span></header>
+    <div class="village-layout">
+      <section class="village-panel">
+        <p class="overline">DER ERSTE MORGEN</p><h1 id="village-title">Ein Platz in der Welt.</h1>
+        <p id="village-greeting" class="village-greeting"></p>
+        <div class="resources" aria-label="Deine Vorräte"><div><span>HOLZ</span><strong id="wood-value">0</strong></div><div><span>GETREIDE</span><strong id="grain-value">0</strong></div><div><span>TAG</span><strong id="day-value">1</strong></div></div>
+        <div class="objective"><span class="objective-diamond" aria-hidden="true">◇</span><div><h2>Dein nächster Schritt</h2><p id="current-objective"></p></div></div>
+        <div id="village-actions" class="village-actions" aria-label="Handlungen im Dorf"></div>
+        <p class="prototype-note">Erste spielbare Skizze: drei Handlungen und ein gespeicherter Lebensanfang. Die begehbare Welt entsteht im nächsten Entwicklungsschritt.</p>
+      </section>
+      <section class="village-illustration" aria-label="Dein Bauplatz im Dorf">
+        <div class="plot-label"><span class="overline">DEIN BAUPLATZ</span><h2 id="shelter-state">Unter freiem Himmel</h2></div>
+        <div class="village-art-wrap"><img class="village-art" src="./assets/village.svg" alt="Ein freigegebener Bauplatz zwischen einem Dorfweg, einem Bach und Olivenbäumen." width="800" height="640"><svg id="shelter-visual" class="shelter-visual" viewBox="0 0 800 640" aria-label="Deine errichtete Unterkunft" role="img" hidden><path fill="#a88c60" d="M304 328 426 294 520 341 394 382Z"/><path fill="#bba579" d="M304 328 394 382 394 487 304 433Z"/><path fill="#806644" d="M394 382 520 341 520 446 394 487Z"/><path fill="#503829" d="M286 329 411 246 538 341 394 395Z"/><path fill="#9d7450" d="M286 329 411 246 394 395Z"/><path stroke="#c39457" stroke-width="4" d="m300 327 108-72m-87 87 86-87m-66 99 66-99m-45 113 45-113m-23 124 23-124"/><path fill="#342c21" d="m433 405 40-15v77l-40 13Z"/><path fill="#d6b76e" d="m321 371 28 16v24l-28-16Z"/><path fill="#d9c491" d="m485 344 8-3v-51l-8 2Z"/><path fill="#84734e" d="m493 341 12-4v-51l-12 4Z"/><path fill="#aa9462" d="m483 292 12-5 14 2-16 6Z"/></svg></div>
+        <div class="plot-details"><span id="plot-description">Genehmigter Grund · Material fehlt</span><span id="chapter-progress">0 / 3 Schritte</span></div>
+      </section>
+    </div>
+    <section class="chronicle" aria-labelledby="chronicle-title"><div class="chronicle-title"><span class="overline">DEINE CHRONIK</span><h2 id="chronicle-title">Was bleibt.</h2></div><ol id="journal-list"></ol></section>
+  </section>
+
+  <footer class="bottom-bar"><div class="bottom-tools"><button id="replay-intro" class="text-button"><span aria-hidden="true">▷</span> Vorspann</button><span class="tool-divider"></span><button id="toggle-audio" class="text-button" aria-pressed="false"><span aria-hidden="true">♪</span> Ton aktivieren</button></div><span class="build-note">IMPERATHEN · ARBEITSTITEL</span></footer>
+
+  <section id="intro" class="intro" aria-label="Vorspann" aria-modal="true" role="dialog">
+    <div class="intro-bar intro-bar-top"></div><div class="intro-bar intro-bar-bottom"></div>
+    <div class="intro-content"><img class="intro-sigil" src="./assets/sigil.svg" alt="" width="76" height="94"><p id="intro-eyebrow" class="overline">AM RAND EINES GROSSEN REICHES</p><h2 id="intro-line">Manche erben ein Reich.</h2><p id="intro-subline">Andere beginnen mit nichts.</p><div class="intro-chapters" aria-hidden="true"><span class="active"></span><span></span><span></span></div></div>
+    <button id="skip-intro" class="intro-skip">Vorspann überspringen <span>ESC</span></button>
+  </section>
+
+  <dialog id="new-life-dialog" class="sheet" aria-labelledby="new-life-title"><form id="new-life-form"><button type="button" class="close-dialog" data-close aria-label="Schließen">×</button><p class="overline">DEINE GESCHICHTE BEGINNT</p><h2 id="new-life-title">Wer wirst du sein?</h2><p class="sheet-copy">Ein Morgen in Valdora. Kein Titel, kein eigener Grundbesitz. Nur dein Name und die Möglichkeiten eines neuen Tages.</p><label class="field-label" for="player-name">Dein Name</label><input id="player-name" name="playerName" placeholder="Wie heißt du?" minlength="1" maxlength="64" autocomplete="off" required><p class="field-hint">1–32 Zeichen · Dies ist der Name deiner Spielfigur.</p><label id="replace-label" class="check-row" hidden><input id="replace-save" type="checkbox"><span>Mein bisheriges Leben durch dieses neue Leben ersetzen. Der vorherige gültige Stand bleibt als Sicherung erhalten.</span></label><p id="new-life-error" class="form-error" role="alert" hidden></p><button id="begin-life" class="solid-button" type="submit">Das erste Kapitel beginnen <span aria-hidden="true">→</span></button><p class="sheet-footnote">Du startest einen kleinen Dorfprototyp. Der volle Lebensweg folgt später.</p></form></dialog>
+
+  <dialog id="settings-dialog" class="sheet" aria-labelledby="settings-title"><button class="close-dialog" data-close aria-label="Schließen">×</button><p class="overline">SO, WIE DU SPIELST</p><h2 id="settings-title">Einstellungen</h2><p class="sheet-copy">Deine Einstellungen gelten sofort und bleiben auf diesem Gerät erhalten.</p><label class="setting-row" for="text-scale"><span><strong>Textgröße</strong><small>Menüs und Spieltexte</small></span><select id="text-scale"><option value="1">100 %</option><option value="1.15">115 %</option><option value="1.3">130 %</option></select></label><label class="setting-row" for="high-contrast"><span><strong>Hoher Kontrast</strong><small>Deutlichere Flächen und Konturen</small></span><input id="high-contrast" class="switch" type="checkbox"></label><label class="setting-row" for="reduced-motion"><span><strong>Weniger Bewegung</strong><small>Ruhiger Hintergrund, direkte Übergänge</small></span><input id="reduced-motion" class="switch" type="checkbox"></label><div class="volume-setting"><label for="master-volume"><strong>Lautstärke</strong><output id="volume-value" for="master-volume">0 %</output></label><input id="master-volume" type="range" min="0" max="100" step="1" value="0"><p class="field-hint">Leise, lokal erzeugte Klangatmosphäre. Startet erst durch deine Eingabe.</p></div><p id="settings-error" class="form-error" role="alert" hidden></p><button class="solid-button" data-close>Zurück zum Spiel</button></dialog>
+
+  <dialog id="saves-dialog" class="sheet" aria-labelledby="saves-title"><button class="close-dialog" data-close aria-label="Schließen">×</button><p class="overline">DEIN WEG BLEIBT ERHALTEN</p><h2 id="saves-title">Spielstände</h2><div id="save-content"></div><p class="sheet-footnote">Der Spielstand liegt in diesem Browser. Ein anderes Gerät oder das Löschen der Browserdaten übernimmt ihn nicht automatisch.</p><button class="outline-button" data-close>Zurück</button></dialog>
+
+  <div id="notification" class="notification" role="status" aria-live="polite" hidden></div>
+  <noscript><div class="noscript-note">Für den interaktiven Einstieg muss JavaScript aktiviert sein.</div></noscript>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

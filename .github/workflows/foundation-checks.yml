@@ -1,0 +1,39 @@
+name: Foundation checks
+
+on:
+  pull_request:
+    paths:
+      - 'preview/**'
+      - 'game/**'
+      - 'tools/**'
+      - 'tests/**'
+      - 'coordination/**'
+      - 'package.json'
+      - '.github/workflows/foundation-checks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: foundation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  local-checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Show actual runtime versions
+        run: |
+          python3 --version
+          node --version
+      - name: Validate ownership and handoffs
+        run: python3 tools/agent_pipeline.py check
+      - name: Run available foundation checks
+        run: python3 tools/agent_pipeline.py run

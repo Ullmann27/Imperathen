@@ -1,8 +1,16 @@
 # IMPERATHEN
 
-**Arbeitstitel · Vorproduktion · Stand: 22. November 2026**
+IMPERATHEN verbindet das Leben in einer antik inspirierten Grenzsiedlung mit Formationskämpfen und einer drehbaren Weltkugel. Android ARM64 ist die erste Zielplattform. Dieselbe Godot-Spielbasis exportiert für Windows und Linux.
 
-IMPERATHEN ist ein geplantes historisches Strategiespiel mit persönlichem Rollenspiel, Echtzeit-Städtebau, einer strategischen Weltkarte, Diplomatie und einer an Entscheidungen anknüpfenden Geschichte. Diese Sammlung beschreibt das Vorhaben und bereitet seine Entwicklung vor. Ein spielbarer Build existiert in diesem Repository noch nicht.
+**Figuren.** Das Hauptmenü zeigt unter **Figuren** 18 freigestellte historische Charakterbilder. Die Chronik enthält die zu deinem Lebenslauf gehörenden Personen. [Figuren und Originaldateien](art/portraits/README.md) · [Android-, Windows- und Bilddownloads](https://github.com/Ullmann27/Imperathen/releases)
+
+**Spielen.** Im Hauptmenü startet **Neues Leben** einen gespeicherten Lebenslauf aus einer von fünf Herkünften. **Talgefecht erproben** führt sofort in die Schlacht mit 60 Soldaten. **Weltkugel erkunden** öffnet eine freie Saisonkampagne. Im Lebenslauf werden die regionalen Aufträge nach der Dorfverteidigung zugänglich. [Spielanleitung](prototype/README.md)
+
+**In der 3D-Welt.** Die Talwache setzt bei Marsch, Lauf und Rückzug ihre Füße entsprechend der zurückgelegten Strecke. Das römische Atriumhaus ist durch die offene Eingangspassage begehbar. [Marschaufnahme](art/soldiers/field_march.webm) · [Gebäude im Vergleich](art/architecture/review/vergleich.jpg) · [Optionale Vulkan-Anbindung für PC](docs/12_integration/GRAPHICS.md)
+
+**Bauen.** Godot **4.7.2** öffnen und `prototype/project.godot` starten. Die Android-Paketkennung lautet `at.heinz.imperathen`. Der Android-Workflow liefert nach Commit benannte APKs, Windows-ZIP, Linux-Archiv, Prüfsummen und Laufzeitprotokolle. [Integration und Prüfergebnisse](docs/12_integration/DELIVERY.md) · [Android-Bauweg](docs/10_development/ANDROID_BUILD.md) · [Engineentscheidung](docs/03_engineering/ADR_GODOT_ANDROID.md)
+
+**Weitere Projekteinstiege.** Die technische Unreal-Referenz liegt in `game/Imperathen/`. `npm start` öffnet die lokale Webvorschau aus PR #19. Originalmodelle, Blender-Quellen und Grafik-Schauraum aus #20 und #21 sind im Integrationsbranch enthalten. [Historischer Rahmen und Kartenherkunft](docs/12_integration/ATLAS_SOURCES.md) · [Freigestellte Grafikstudien](art/landscape/README.md)
 
 ## Hier anfangen
 
@@ -26,12 +34,6 @@ IMPERATHEN ist ein geplantes historisches Strategiespiel mit persönlichem Rolle
 | Entscheidungen und Risiken | [Entscheidungsprotokoll](docs/00_governance/DECISION_LOG.md), [Risiken](docs/00_governance/RISK_REGISTER.md) |
 | Name und Rechte | [Namensprüfung](docs/07_legal/NAME_REVIEW.md), [Rechteplan](docs/07_legal/RIGHTS_AND_PROVENANCE.md) |
 
-## Arbeitsstand und Regeln
+## Entwicklung
 
-Das Repository bleibt auf ausdrücklichen Wunsch des Projektinhabers **öffentlich**. Eine Umstellung auf privat ist keine Voraussetzung für diese Vorarbeit. Die technischen Schutz- und Kontoeinstellungen sind getrennt vom dokumentierten Arbeitsablauf zu prüfen.
-
-Der aktuelle Auftrag umfasst Dokumentation, Ordnerstruktur, Aufgaben, Quellenabgleich und Entwicklungsvorbereitung. **Spielprogrammierung, Engine-Projekt, Renderjobs und kostenpflichtige Dienste sind noch nicht beauftragt.** Der spätere Entwicklungsstart richtet sich nach einem neuen ausdrücklichen Auftrag. Siehe [AGENTS.md](AGENTS.md).
-
-IMPERATHEN ist ein vorläufiger Name. Dieses Repository behauptet weder eine abgeschlossene Markenprüfung noch eine Markenregistrierung. Die ältere Projektmappe „IRON BANNERS“ bleibt als Herkunftsquelle erkennbar. Ihre früheren Anweisungen zum sofortigen Programmieren sind für die aktuelle Phase überholt.
-
-Konzeptbilder, Zielwerte und Testpläne sind keine Nachweise eines fertigen Spiels. Fortschritt wird mit Dateien, Entscheidungen, Aufgaben und später mit tatsächlich ausgeführten Tests und Builds dokumentiert.
+Aktuelle Entwicklung und Abnahme erfolgen im [Integrations-PR #22](https://github.com/Ullmann27/Imperathen/pull/22). Die früheren Fachkonzepte und Prüfberichte beschreiben ihre jeweiligen historischen Lieferstände.

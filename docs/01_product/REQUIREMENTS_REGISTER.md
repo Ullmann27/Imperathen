@@ -46,7 +46,7 @@
 | ID | Typ | Anforderung / Frage | Behandlung |
 | --- | --- | --- | --- |
 | R-030 | U | IMPERATHEN bleibt zunächst Arbeitstitel; vor endgültiger Festlegung vertieft prüfen | [Namensakte](../07_legal/NAME_REVIEW.md), keine Freigabe fingieren |
-| R-031 | U | In dieser Phase keine eigentliche Spielprogrammierung | AGENTS.md und Agentenübergabe verbindlich aktuell halten |
+| R-031 | U, aktualisiert 22.11.2026 | Begrenzter Entwicklungsstart: Vorspann, Menü, Spielfundament und drei Agents | Neueren Auftrag in DEVELOPMENT_START.md und tatsächliche Prüfgrenzen beachten |
 | R-032 | U | Öffentliches Repository beibehalten | Keine Privat-Voraussetzung oder eigenmächtige Umstellung |
 | R-033 | U | Kosten-/Nutzungslimits schonen und nötige Zusatzleistungen vorher erklären | [Rechenplan](../06_production/COST_AND_COMPUTE_POLICY.md), kein unprüfbares „unbegrenzt“ versprechen |
 | R-034 | O | Exakte Epoche, Startalter und Übergang zur erwachsenen Figur | Entscheidungsprotokoll, keine militärische Karriere eines Kindes stillschweigend annehmen |

@@ -1,12 +1,22 @@
 # Projektstatus
 
-**Stand: 22.11.2026 · Phase: Vorproduktion · Arbeitstitel: IMPERATHEN**
+**Aktueller Integrationsstand.** Die zusammengeführte Android- und Desktop-Linie, Abnahme und offene Punkte stehen im [Lieferbericht](../12_integration/DELIVERY.md). Die folgenden Angaben dokumentieren den vorausgehenden Arbeitsstand.
+
+**Stand: 22.11.2026 · Phase: erster ausführbarer Funktionsprototyp · Arbeitstitel: IMPERATHEN**
+
+## Neuer Entwicklungsauftrag
+
+Der Nutzer hat nach der Dokumentenlieferung ausdrücklich den weiteren Spielaufbau mit drei Agenten beauftragt. Die frühere Programmierpause ist für diesen Block aufgehoben. Aktueller eigener Branch: `feature/prototype-foundation-20261122`, Ausgangscommit `a3e036ba24b99416b016337d81ab2b4067350fa3`, Koordination [#17](https://github.com/Ullmann27/Imperathen/issues/17).
+
+Aktuelle Lieferung: [`prototype/`](../../prototype/README.md), eine tatsächlich gebaute ARM64-Test-APK, erfolgreicher separater Android-x86_64-Emulatorlauf, eigene Blender-Assetquelle und Headless-Prüfungen. Für den tatsächlichen Teststatus und Nachweisgrenzen gilt [VALIDATION.md](../10_development/VALIDATION.md), für die Zusammenführung der parallelen Arbeitslinien [NEXT_AGENT.md](../10_development/NEXT_AGENT.md). Die folgenden Zahlen zur Dokumentenlieferung bleiben ein historischer Ausgangsstand und beschreiben nicht den heutigen Codeumfang.
+
+Der Nutzer hat ausdrücklich festgelegt: zuerst Android. PC ist eine spätere Erweiterung. Der Prototyp besitzt Touchsteuerung, skalierbare Darstellung, Android-Zurück-Verhalten, Hintergrundspeicherung und einen automatisierten APK-Export. Der konkrete Liefer- und Laufzeitstand steht in [ANDROID_INSTALL.md](../10_development/ANDROID_INSTALL.md). Die langfristige Engineentscheidung und der Nachweis auf physischen ARM64-Geräten bleiben offen.
 
 ## Verbindlicher aktueller Rahmen
 
 Der Nutzer hat die autonome Vorarbeit beauftragt und anschließend ausdrücklich bestimmt, dass das Repository öffentlich bleiben soll. Eine Privatisierung ist keine Voraussetzung. Der frühere Planpunkt „zuerst privat stellen“ ist damit aufgehoben. Der Nutzer entscheidet selbst über einen späteren Sichtbarkeitswechsel.
 
-Der Auftrag zur Vorarbeit ist keine Freigabe zur eigentlichen Spielprogrammierung. Diese Sammlung beschreibt Anforderungen, Abhängigkeiten, Entscheidungen und spätere Prüfungen. Es gibt hier keinen fertigen Spielkern und keinen ausgelieferten Build.
+Die erste Dokumentenlieferung war noch keine Programmierfreigabe. Der nachfolgende ausdrückliche Entwicklungsauftrag erweitert diese Phase; ausführbarer Prototypcode wird getrennt von der langfristigen Produktvision geliefert. Ein veröffentlichter Store-Build besteht weiterhin nicht.
 
 ## Nachgewiesener Ausgangsstand
 
@@ -28,10 +38,10 @@ Anforderungsregister, Fachkonzepte, Architekturverträge in Prosa, Asset- und Re
 ## Noch offen
 
 - Abschließende Namens- und Ähnlichkeitsprüfung; keine Markenfreigabe oder Anmeldung behauptet.
-- Engine-Version, Zielrechner, verbindliches Leistungsbudget und endgültiger Umfang des ersten spielbaren Abschnitts.
+- Langfristige Produktionsengine, konkrete Android-Zielgeräte und verbindliches Leistungsbudget. Der vorhandene begrenzte Prototyp verwendet nachgewiesen Godot 4.7.2.
 - Fachentscheidungen zu Zeitmodell, Alterssprung, Karrieregrenzen, Storyreserve und Reichweiten der Simulation.
-- Tatsächliche Engine-, Blender-, Build-, Spiel- und Leistungstests: nicht begonnen.
-- Technische Branch-Regeln, ein echtes GitHub-Projects-Board und Build-Automatisierung: nicht eingerichtet. Dokumentierte Regeln sind nicht mit technisch erzwungenen Einstellungen gleichzusetzen.
+- Tatsächliche Engine-/Blender-Ausführung und Funktionsprüfungen: siehe aktuellen Entwicklungsnachweis. Grafikleistung, Geräteabnahme und Store-Build sind noch offen.
+- Technische Branch-Regeln und ein echtes GitHub-Projects-Board sind weiterhin nicht eingerichtet. Eine Android-Baupipeline ist inzwischen vorhanden; sie ersetzt keine Branch-Regeln oder Storefreigabe.
 
 ## Belegregeln
 

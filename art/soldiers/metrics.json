@@ -1,0 +1,86 @@
+[
+  {
+    "role": "heavy",
+    "lod": "near",
+    "triangles": 4814,
+    "bones": 15,
+    "bytes": 440464
+  },
+  {
+    "role": "heavy",
+    "lod": "mid",
+    "triangles": 2962,
+    "bones": 15,
+    "bytes": 345940
+  },
+  {
+    "role": "heavy",
+    "lod": "far",
+    "triangles": 170,
+    "bones": 0,
+    "bytes": 23244
+  },
+  {
+    "role": "spear",
+    "lod": "near",
+    "triangles": 4682,
+    "bones": 15,
+    "bytes": 431456
+  },
+  {
+    "role": "spear",
+    "lod": "mid",
+    "triangles": 2920,
+    "bones": 15,
+    "bytes": 342672
+  },
+  {
+    "role": "spear",
+    "lod": "far",
+    "triangles": 168,
+    "bones": 0,
+    "bytes": 22976
+  },
+  {
+    "role": "archer",
+    "lod": "near",
+    "triangles": 3600,
+    "bones": 17,
+    "bytes": 382936
+  },
+  {
+    "role": "archer",
+    "lod": "mid",
+    "triangles": 2130,
+    "bones": 17,
+    "bytes": 307396
+  },
+  {
+    "role": "archer",
+    "lod": "far",
+    "triangles": 136,
+    "bones": 0,
+    "bytes": 20932
+  },
+  {
+    "role": "officer",
+    "lod": "near",
+    "triangles": 5154,
+    "bones": 15,
+    "bytes": 466324
+  },
+  {
+    "role": "officer",
+    "lod": "mid",
+    "triangles": 3096,
+    "bones": 15,
+    "bytes": 356420
+  },
+  {
+    "role": "officer",
+    "lod": "far",
+    "triangles": 198,
+    "bones": 0,
+    "bytes": 25148
+  }
+]

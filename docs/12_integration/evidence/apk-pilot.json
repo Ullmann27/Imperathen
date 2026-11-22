@@ -1,0 +1,673 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-11-22T15:30:29.891721+00:00",
+  "apk": {
+    "path": "/workspace/shared/downloads/IMPERATHEN-02c56681-arm64.apk",
+    "size_bytes": 58597583,
+    "sha256": "dede9302c2f96b3b4908aba04c7d50675215c1fa5bdca2812618695501295cc2"
+  },
+  "expected_package": "at.heinz.imperathen",
+  "expected_abi": "arm64-v8a",
+  "tool_paths": {
+    "aapt": "/tmp/imperathen-mobile/sdk/build-tools/35.0.1/aapt",
+    "aapt2": "/tmp/imperathen-mobile/sdk/build-tools/35.0.1/aapt2",
+    "apkanalyzer": "/tmp/imperathen-mobile/sdk/cmdline-tools/latest/bin/apkanalyzer",
+    "apksigner": "/tmp/imperathen-mobile/sdk/build-tools/35.0.1/apksigner",
+    "zipalign": "/tmp/imperathen-mobile/sdk/build-tools/35.0.1/zipalign",
+    "adb": "/tmp/imperathen-mobile/sdk/platform-tools/adb",
+    "emulator": "/tmp/imperathen-mobile/sdk/emulator/emulator",
+    "sdkmanager": "/tmp/imperathen-mobile/sdk/cmdline-tools/latest/bin/sdkmanager"
+  },
+  "sdk_roots": [
+    "/tmp/imperathen-mobile/sdk"
+  ],
+  "sdk_platforms": [
+    "android-35"
+  ],
+  "emulator_inventory": {
+    "emulator_binary": "/tmp/imperathen-mobile/sdk/emulator/emulator",
+    "adb_binary": "/tmp/imperathen-mobile/sdk/platform-tools/adb",
+    "kvm_device_present": false,
+    "avd_config_count": 0,
+    "devices_queried": false,
+    "device_or_emulator_started": false
+  },
+  "manifest": {
+    "package": "at.heinz.imperathen",
+    "version_code": "1",
+    "version_name": "0.1.0-prototype",
+    "min_sdk": "24",
+    "target_sdk": "36",
+    "debuggable": true,
+    "launchable_activity": "com.godot.game.GodotAppLauncher",
+    "permissions": [],
+    "launcher_diagnostics": {
+      "application_present": true,
+      "application_enabled": true,
+      "components": [
+        {
+          "type": "activity",
+          "name": "com.godot.game.GodotApp",
+          "enabled": true,
+          "exported": false,
+          "exported_attribute": "false",
+          "intent_filters": [],
+          "has_launcher_filter": false,
+          "rejection_reasons": [
+            "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+            "component_exported_false"
+          ],
+          "unresolved_attributes": [],
+          "usable_launcher": false
+        },
+        {
+          "type": "activity-alias",
+          "name": "com.godot.game.GodotAppLauncher",
+          "enabled": true,
+          "exported": true,
+          "exported_attribute": "true",
+          "intent_filters": [
+            {
+              "actions": [
+                "android.intent.action.MAIN"
+              ],
+              "categories": [
+                "android.intent.category.DEFAULT",
+                "android.intent.category.LAUNCHER"
+              ]
+            }
+          ],
+          "has_launcher_filter": true,
+          "target_activity": "com.godot.game.GodotApp",
+          "target_declared_before_alias": true,
+          "target_enabled": true,
+          "target_exported": false,
+          "rejection_reasons": [],
+          "unresolved_attributes": [],
+          "usable_launcher": true
+        },
+        {
+          "type": "activity",
+          "name": "org.godotengine.godot.utils.ProcessPhoenix",
+          "enabled": true,
+          "exported": false,
+          "exported_attribute": "false",
+          "intent_filters": [],
+          "has_launcher_filter": false,
+          "rejection_reasons": [
+            "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+            "component_exported_false"
+          ],
+          "unresolved_attributes": [],
+          "usable_launcher": false
+        }
+      ],
+      "unresolved_candidate": false
+    },
+    "decoded_with": "apkanalyzer"
+  },
+  "checks": [
+    {
+      "id": "apk_file",
+      "status": "pass",
+      "required": true,
+      "detail": "APK file found; its extension alone is not accepted as proof of format.",
+      "evidence": {}
+    },
+    {
+      "id": "zip_structure",
+      "status": "pass",
+      "required": true,
+      "detail": "ZIP directory inspected before reading payloads; no extraction is performed.",
+      "evidence": {
+        "entries": 230,
+        "expanded_bytes": 114291166,
+        "duplicate_entries": [],
+        "unsafe_entries": [],
+        "within_limits": true
+      }
+    },
+    {
+      "id": "zip_crc",
+      "status": "pass",
+      "required": true,
+      "detail": "All ZIP member payloads were decompressed and CRC checked.",
+      "evidence": {
+        "damaged_entry": null
+      }
+    },
+    {
+      "id": "apk_core_entries",
+      "status": "pass",
+      "required": true,
+      "detail": "A renamed project ZIP is not accepted as an Android application.",
+      "evidence": {
+        "missing": []
+      }
+    },
+    {
+      "id": "binary_manifest_header",
+      "status": "pass",
+      "required": true,
+      "detail": "Compiled Android binary XML container checked; semantic decoding is separate.",
+      "evidence": {
+        "bytes": 7604
+      }
+    },
+    {
+      "id": "resource_table_header",
+      "status": "pass",
+      "required": true,
+      "detail": "Compiled Android resource table header checked.",
+      "evidence": {}
+    },
+    {
+      "id": "dex_header",
+      "status": "pass",
+      "required": true,
+      "detail": "DEX magic and declared file length checked; no bytecode correctness claim.",
+      "evidence": {}
+    },
+    {
+      "id": "godot_native_library",
+      "status": "pass",
+      "required": true,
+      "detail": "Expected Godot shared library must be a 64-bit little-endian ELF for the requested architecture.",
+      "evidence": {
+        "expected_abi": "arm64-v8a",
+        "entry": "lib/arm64-v8a/libgodot_android.so",
+        "elf_machine": 183,
+        "available_abis": [
+          "arm64-v8a"
+        ]
+      }
+    },
+    {
+      "id": "godot_project_content",
+      "status": "pass",
+      "required": true,
+      "detail": "Godot project configuration and the prototype's required scene/scripts must be present, including resolved remaps.",
+      "evidence": {
+        "config": "assets/project.binary",
+        "config_header_valid": true,
+        "resources": [
+          {
+            "source": "main.tscn",
+            "entry": "assets/.godot/exported/133200997/export-3070c538c03ee49b7677ff960a3f5195-main.scn",
+            "remap": "assets/main.tscn.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/main.gd",
+            "entry": "assets/scripts/main.gdc",
+            "remap": "assets/scripts/main.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/domain/world_model.gd",
+            "entry": "assets/scripts/domain/world_model.gdc",
+            "remap": "assets/scripts/domain/world_model.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/world/game_world.gd",
+            "entry": "assets/scripts/world/game_world.gdc",
+            "remap": "assets/scripts/world/game_world.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/world/village_art.gd",
+            "entry": "assets/scripts/world/village_art.gdc",
+            "remap": "assets/scripts/world/village_art.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/game_ui.gd",
+            "entry": "assets/scripts/ui/game_ui.gdc",
+            "remap": "assets/scripts/ui/game_ui.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/touch_pad.gd",
+            "entry": "assets/scripts/ui/touch_pad.gdc",
+            "remap": "assets/scripts/ui/touch_pad.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/touch_action.gd",
+            "entry": "assets/scripts/ui/touch_action.gdc",
+            "remap": "assets/scripts/ui/touch_action.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/runtime_display.gd",
+            "entry": "assets/scripts/ui/runtime_display.gdc",
+            "remap": "assets/scripts/ui/runtime_display.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/battle/battle_model.gd",
+            "entry": "assets/scripts/battle/battle_model.gdc",
+            "remap": "assets/scripts/battle/battle_model.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/battle/formation_slots.gd",
+            "entry": "assets/scripts/battle/formation_slots.gdc",
+            "remap": "assets/scripts/battle/formation_slots.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/tactics/valley_scene.gd",
+            "entry": "assets/scripts/tactics/valley_scene.gdc",
+            "remap": "assets/scripts/tactics/valley_scene.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/tactics/valley_hud.gd",
+            "entry": "assets/scripts/tactics/valley_hud.gdc",
+            "remap": "assets/scripts/tactics/valley_hud.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/strategy/atlas_screen.gd",
+            "entry": "assets/scripts/strategy/atlas_screen.gdc",
+            "remap": "assets/scripts/strategy/atlas_screen.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/strategy/globe.gd",
+            "entry": "assets/scripts/strategy/globe.gdc",
+            "remap": "assets/scripts/strategy/globe.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/strategy/origins.gd",
+            "entry": "assets/scripts/strategy/origins.gdc",
+            "remap": "assets/scripts/strategy/origins.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/strategy/season_campaign.gd",
+            "entry": "assets/scripts/strategy/season_campaign.gdc",
+            "remap": "assets/scripts/strategy/season_campaign.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/atlas/earth.jpg",
+            "entry": "assets/.godot/imported/earth.jpg-cfacefd5b1b419fd407d3408d830b865.ctex",
+            "remap": "assets/assets/atlas/earth.jpg.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/visuals/soldier_visual.gd",
+            "entry": "assets/scripts/visuals/soldier_visual.gdc",
+            "remap": "assets/scripts/visuals/soldier_visual.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/quality_profiles.json",
+            "entry": "assets/assets/quality_profiles.json",
+            "mode": "direct"
+          },
+          {
+            "source": "assets/soldiers/heavy_near.glb",
+            "entry": "assets/.godot/imported/heavy_near.glb-0a7fce4937ffb3d5f6f36fb6db0efcd1.scn",
+            "remap": "assets/assets/soldiers/heavy_near.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/heavy_mid.glb",
+            "entry": "assets/.godot/imported/heavy_mid.glb-da250611a7bbc371ff9346dd9849bf92.scn",
+            "remap": "assets/assets/soldiers/heavy_mid.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/heavy_far.glb",
+            "entry": "assets/.godot/imported/heavy_far.glb-f42691d0bcb3c75ada387ca448b30f68.scn",
+            "remap": "assets/assets/soldiers/heavy_far.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/spear_near.glb",
+            "entry": "assets/.godot/imported/spear_near.glb-71a5641160ac955240a1e607b254ea97.scn",
+            "remap": "assets/assets/soldiers/spear_near.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/spear_mid.glb",
+            "entry": "assets/.godot/imported/spear_mid.glb-d76b2b1dd64fe8113f807e50d3ff9d13.scn",
+            "remap": "assets/assets/soldiers/spear_mid.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/spear_far.glb",
+            "entry": "assets/.godot/imported/spear_far.glb-e9c47942334c3dd65b826ff42cc82d08.scn",
+            "remap": "assets/assets/soldiers/spear_far.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/archer_near.glb",
+            "entry": "assets/.godot/imported/archer_near.glb-f6bba15985f80f28a37df08278b4a8c8.scn",
+            "remap": "assets/assets/soldiers/archer_near.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/archer_mid.glb",
+            "entry": "assets/.godot/imported/archer_mid.glb-83c67f46f1756d8861c0e7c2ca5156d3.scn",
+            "remap": "assets/assets/soldiers/archer_mid.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/archer_far.glb",
+            "entry": "assets/.godot/imported/archer_far.glb-b56a390e2bb4d9fd45179f6f59c931f0.scn",
+            "remap": "assets/assets/soldiers/archer_far.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/officer_near.glb",
+            "entry": "assets/.godot/imported/officer_near.glb-a051cb4c23b87082b935d6c07de9e02f.scn",
+            "remap": "assets/assets/soldiers/officer_near.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/officer_mid.glb",
+            "entry": "assets/.godot/imported/officer_mid.glb-51fe0df5be24b3b786a9fa50e6df3844.scn",
+            "remap": "assets/assets/soldiers/officer_mid.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/officer_far.glb",
+            "entry": "assets/.godot/imported/officer_far.glb-aea57b4516300cee83f2ce3536ea4370.scn",
+            "remap": "assets/assets/soldiers/officer_far.glb.import",
+            "mode": "remapped"
+          }
+        ],
+        "missing_resources": []
+      }
+    },
+    {
+      "id": "manifest_metadata",
+      "status": "pass",
+      "required": true,
+      "detail": "Compiled manifest decoded by an existing Android SDK tool.",
+      "evidence": {
+        "attempts": [
+          {
+            "command": [
+              "/tmp/imperathen-mobile/sdk/build-tools/35.0.1/aapt",
+              "dump",
+              "badging",
+              "/workspace/shared/downloads/IMPERATHEN-02c56681-arm64.apk"
+            ],
+            "exit_code": 0,
+            "error": null,
+            "stdout_tail": "package: name='at.heinz.imperathen' versionCode='1' versionName='0.1.0-prototype' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'\ninstall-location:'auto'\nsdkVersion:'24'\ntargetSdkVersion:'36'\napplication-label:'IMPERATHEN'\napplication-label-af:'IMPERATHEN'\napplication-label-am:'IMPERATHEN'\napplication-label-ar:'IMPERATHEN'\napplication-label-as:'IMPERATHEN'\napplication-label-az:'IMPERATHEN'\napplication-label-be:'IMPERATHEN'\napplication-label-bg:'IMPERATHEN'\napplication-label-bn:'IMPERATHEN'\napplication-label-bs:'IMPERATHEN'\napplication-label-ca:'IMPERATHEN'\napplication-label-cs:'IMPERATHEN'\napplication-label-da:'IMPERATHEN'\napplication-label-de:'IMPERATHEN'\napplication-label-el:'IMPERATHEN'\napplication-label-en:'IMPERATHEN'\napplication-label-en-AU:'IMPERATHEN'\napplication-label-en-CA:'IMPERATHEN'\napplication-label-en-GB:'IMPERATHEN'\napplication-label-en-IN:'IMPERATHEN'\napplication-label-en-XC:'IMPERATHEN'\napplication-label-es:'IMPERATHEN'\napplication-label-es-ES:'IMPERATHEN'\napplication-label-es-US:'IMPERATHEN'\napplication-label-et:'IMPERATHEN'\napplication-label-eu:'IMPERATHEN'\napplication-label-fa:'IMPERATHEN'\napplication-label-fi:'IMPERATHEN'\napplication-label-fr:'IMPERATHEN'\napplication-label-fr-CA:'IMPERATHEN'\napplication-label-gl:'IMPERATHEN'\napplication-label-gu:'IMPERATHEN'\napplication-label-hi:'IMPERATHEN'\napplication-label-hr:'IMPERATHEN'\napplication-label-hu:'IMPERATHEN'\napplication-label-hy:'IMPERATHEN'\napplication-label-in:'IMPERATHEN'\napplication-label-is:'IMPERATHEN'\napplication-label-it:'IMPERATHEN'\napplication-label-iw:'IMPERATHEN'\napplication-label-ja:'IMPERATHEN'\napplication-label-ka:'IMPERATHEN'\napplication-label-kk:'IMPERATHEN'\napplication-label-km:'IMPERATHEN'\napplication-label-kn:'IMPERATHEN'\napplication-label-ko:'IMPERATHEN'\napplication-label-ky:'IMPERATHEN'\napplication-label-lo:'IMPERATHEN'\napplication-label-lt:'IMPERATHEN'\napplication-label-lv:'IMPERATHEN'\napplication-label-mk:'IMPERATHEN'\napplication-label-ml:'IMPERATHEN'\napplication-label-mn:'IMPERATHEN'\napplication-label-mr:'IMPERATHEN'\napplication-label-ms:'IMPERATHEN'\napplication-label-my:'IMPERATHEN'\napplication-label-nb:'IMPERATHEN'\napplication-label-ne:'IMPERATHEN'\napplication-label-nl:'IMPERATHEN'\napplication-label-or:'IMPERATHEN'\napplication-label-pa:'IMPERATHEN'\napplication-label-pl:'IMPERATHEN'\napplication-label-pt:'IMPERATHEN'\napplication-label-pt-BR:'IMPERATHEN'\napplication-label-pt-PT:'IMPERATHEN'\napplication-label-ro:'IMPERATHEN'\napplication-label-ru:'IMPERATHEN'\napplication-label-si:'IMPERATHEN'\napplication-label-sk:'IMPERATHEN'\napplication-label-sl:'IMPERATHEN'\napplication-label-sq:'IMPERATHEN'\napplication-label-sr:'IMPERATHEN'\napplication-label-sr-Latn:'IMPERATHEN'\napplication-label-sv:'IMPERATHEN'\napplication-label-sw:'IMPERATHEN'\napplication-label-ta:'IMPERATHEN'\napplication-label-te:'IMPERATHEN'\napplication-label-th:'IMPERATHEN'\napplication-label-tl:'IMPERATHEN'\napplication-label-tr:'IMPERATHEN'\napplication-label-uk:'IMPERATHEN'\napplication-label-ur:'IMPERATHEN'\napplication-label-uz:'IMPERATHEN'\napplication-label-vi:'IMPERATHEN'\napplication-label-zh:'IMPERATHEN'\napplication-label-zh-CN:'IMPERATHEN'\napplication-label-zh-HK:'IMPERATHEN'\napplication-label-zh-TW:'IMPERATHEN'\napplication-label-zu:'IMPERATHEN'\napplication-icon-160:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-240:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-320:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-480:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-640:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-65534:'res/mipmap-anydpi-v26/icon.xml'\napplication: label='IMPERATHEN' icon='res/mipmap-anydpi-v26/icon.xml'\napplication-debuggable\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\nother-activities\nother-receivers\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--' 'af' 'am' 'ar' 'as' 'az' 'be' 'bg' 'bn' 'bs' 'ca' 'cs' 'da' 'de' 'el' 'en' 'en-AU' 'en-CA' 'en-GB' 'en-IN' 'en-XC' 'es' 'es-ES' 'es-US' 'et' 'eu' 'fa' 'fi' 'fr' 'fr-CA' 'gl' 'gu' 'hi' 'hr' 'hu' 'hy' 'in' 'is' 'it' 'iw' 'ja' 'ka' 'kk' 'km' 'kn' 'ko' 'ky' 'lo' 'lt' 'lv' 'mk' 'ml' 'mn' 'mr' 'ms' 'my' 'nb' 'ne' 'nl' 'or' 'pa' 'pl' 'pt' 'pt-BR' 'pt-PT' 'ro' 'ru' 'si' 'sk' 'sl' 'sq' 'sr' 'sr-Latn' 'sv' 'sw' 'ta' 'te' 'th' 'tl' 'tr' 'uk' 'ur' 'uz' 'vi' 'zh' 'zh-CN' 'zh-HK' 'zh-TW' 'zu'\ndensities: '160' '240' '320' '480' '640' '65534'\nnative-code: 'arm64-v8a'\n",
+            "stderr_tail": "",
+            "output_truncated": false,
+            "decoded_package": "at.heinz.imperathen",
+            "decoded_launcher": null
+          },
+          {
+            "command": [
+              "/tmp/imperathen-mobile/sdk/build-tools/35.0.1/aapt2",
+              "dump",
+              "badging",
+              "/workspace/shared/downloads/IMPERATHEN-02c56681-arm64.apk"
+            ],
+            "exit_code": 0,
+            "error": null,
+            "stdout_tail": "package: name='at.heinz.imperathen' versionCode='1' versionName='0.1.0-prototype' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'\ninstall-location:'auto'\nminSdkVersion:'24'\ntargetSdkVersion:'36'\napplication-label:'IMPERATHEN'\napplication-label-af:'IMPERATHEN'\napplication-label-am:'IMPERATHEN'\napplication-label-ar:'IMPERATHEN'\napplication-label-as:'IMPERATHEN'\napplication-label-az:'IMPERATHEN'\napplication-label-be:'IMPERATHEN'\napplication-label-bg:'IMPERATHEN'\napplication-label-bn:'IMPERATHEN'\napplication-label-bs:'IMPERATHEN'\napplication-label-ca:'IMPERATHEN'\napplication-label-cs:'IMPERATHEN'\napplication-label-da:'IMPERATHEN'\napplication-label-de:'IMPERATHEN'\napplication-label-el:'IMPERATHEN'\napplication-label-en:'IMPERATHEN'\napplication-label-en-AU:'IMPERATHEN'\napplication-label-en-CA:'IMPERATHEN'\napplication-label-en-GB:'IMPERATHEN'\napplication-label-en-IN:'IMPERATHEN'\napplication-label-en-XC:'IMPERATHEN'\napplication-label-es:'IMPERATHEN'\napplication-label-es-ES:'IMPERATHEN'\napplication-label-es-US:'IMPERATHEN'\napplication-label-et:'IMPERATHEN'\napplication-label-eu:'IMPERATHEN'\napplication-label-fa:'IMPERATHEN'\napplication-label-fi:'IMPERATHEN'\napplication-label-fr:'IMPERATHEN'\napplication-label-fr-CA:'IMPERATHEN'\napplication-label-gl:'IMPERATHEN'\napplication-label-gu:'IMPERATHEN'\napplication-label-hi:'IMPERATHEN'\napplication-label-hr:'IMPERATHEN'\napplication-label-hu:'IMPERATHEN'\napplication-label-hy:'IMPERATHEN'\napplication-label-in:'IMPERATHEN'\napplication-label-is:'IMPERATHEN'\napplication-label-it:'IMPERATHEN'\napplication-label-iw:'IMPERATHEN'\napplication-label-ja:'IMPERATHEN'\napplication-label-ka:'IMPERATHEN'\napplication-label-kk:'IMPERATHEN'\napplication-label-km:'IMPERATHEN'\napplication-label-kn:'IMPERATHEN'\napplication-label-ko:'IMPERATHEN'\napplication-label-ky:'IMPERATHEN'\napplication-label-lo:'IMPERATHEN'\napplication-label-lt:'IMPERATHEN'\napplication-label-lv:'IMPERATHEN'\napplication-label-mk:'IMPERATHEN'\napplication-label-ml:'IMPERATHEN'\napplication-label-mn:'IMPERATHEN'\napplication-label-mr:'IMPERATHEN'\napplication-label-ms:'IMPERATHEN'\napplication-label-my:'IMPERATHEN'\napplication-label-nb:'IMPERATHEN'\napplication-label-ne:'IMPERATHEN'\napplication-label-nl:'IMPERATHEN'\napplication-label-or:'IMPERATHEN'\napplication-label-pa:'IMPERATHEN'\napplication-label-pl:'IMPERATHEN'\napplication-label-pt:'IMPERATHEN'\napplication-label-pt-BR:'IMPERATHEN'\napplication-label-pt-PT:'IMPERATHEN'\napplication-label-ro:'IMPERATHEN'\napplication-label-ru:'IMPERATHEN'\napplication-label-si:'IMPERATHEN'\napplication-label-sk:'IMPERATHEN'\napplication-label-sl:'IMPERATHEN'\napplication-label-sq:'IMPERATHEN'\napplication-label-sr:'IMPERATHEN'\napplication-label-sr-Latn:'IMPERATHEN'\napplication-label-sv:'IMPERATHEN'\napplication-label-sw:'IMPERATHEN'\napplication-label-ta:'IMPERATHEN'\napplication-label-te:'IMPERATHEN'\napplication-label-th:'IMPERATHEN'\napplication-label-tl:'IMPERATHEN'\napplication-label-tr:'IMPERATHEN'\napplication-label-uk:'IMPERATHEN'\napplication-label-ur:'IMPERATHEN'\napplication-label-uz:'IMPERATHEN'\napplication-label-vi:'IMPERATHEN'\napplication-label-zh:'IMPERATHEN'\napplication-label-zh-CN:'IMPERATHEN'\napplication-label-zh-HK:'IMPERATHEN'\napplication-label-zh-TW:'IMPERATHEN'\napplication-label-zu:'IMPERATHEN'\napplication-icon-160:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-240:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-320:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-480:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-640:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-65534:'res/mipmap-anydpi-v26/icon.xml'\napplication: label='IMPERATHEN' icon='res/mipmap-anydpi-v26/icon.xml'\napplication-debuggable\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\nother-activities\nother-receivers\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--' 'af' 'am' 'ar' 'as' 'az' 'be' 'bg' 'bn' 'bs' 'ca' 'cs' 'da' 'de' 'el' 'en' 'en-AU' 'en-CA' 'en-GB' 'en-IN' 'en-XC' 'es' 'es-ES' 'es-US' 'et' 'eu' 'fa' 'fi' 'fr' 'fr-CA' 'gl' 'gu' 'hi' 'hr' 'hu' 'hy' 'in' 'is' 'it' 'iw' 'ja' 'ka' 'kk' 'km' 'kn' 'ko' 'ky' 'lo' 'lt' 'lv' 'mk' 'ml' 'mn' 'mr' 'ms' 'my' 'nb' 'ne' 'nl' 'or' 'pa' 'pl' 'pt' 'pt-BR' 'pt-PT' 'ro' 'ru' 'si' 'sk' 'sl' 'sq' 'sr' 'sr-Latn' 'sv' 'sw' 'ta' 'te' 'th' 'tl' 'tr' 'uk' 'ur' 'uz' 'vi' 'zh' 'zh-CN' 'zh-HK' 'zh-TW' 'zu'\ndensities: '160' '240' '320' '480' '640' '65534'\nnative-code: 'arm64-v8a'\n",
+            "stderr_tail": "warn: resource com.godot.game:mipmap/themed_icon for config 'anydpi-v26' is a file reference to 'res/mipmap-anydpi-v26/themed_icon.xml' but no such path exists.\n",
+            "output_truncated": false,
+            "decoded_package": "at.heinz.imperathen",
+            "decoded_launcher": null
+          },
+          {
+            "command": [
+              "/tmp/imperathen-mobile/sdk/cmdline-tools/latest/bin/apkanalyzer",
+              "manifest",
+              "print",
+              "/workspace/shared/downloads/IMPERATHEN-02c56681-arm64.apk"
+            ],
+            "exit_code": 0,
+            "error": null,
+            "stdout_tail": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest\n    xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    android:versionCode=\"1\"\n    android:versionName=\"0.1.0-prototype\"\n    android:installLocation=\"0\"\n    android:compileSdkVersion=\"36\"\n    android:compileSdkVersionCodename=\"16\"\n    package=\"at.heinz.imperathen\"\n    platformBuildVersionCode=\"36\"\n    platformBuildVersionName=\"16\">\n\n    <uses-sdk\n        android:minSdkVersion=\"24\"\n        android:targetSdkVersion=\"36\" />\n\n    <supports-screens\n        android:smallScreens=\"true\"\n        android:normalScreens=\"true\"\n        android:largeScreens=\"true\"\n        android:xlargeScreens=\"true\" />\n\n    <uses-feature\n        android:glEsVersion=\"0x30000\"\n        android:required=\"true\" />\n\n    <application\n        android:label=\"@ref/0x7f0b0008\"\n        android:icon=\"@ref/0x7f0a0000\"\n        android:debuggable=\"true\"\n        android:allowBackup=\"false\"\n        android:isGame=\"false\"\n        android:extractNativeLibs=\"true\"\n        android:appCategory=\"8\"\n        android:appComponentFactory=\"androidx.core.app.CoreComponentFactory\"\n        android:hasFragileUserData=\"false\"\n        android:requestLegacyExternalStorage=\"false\">\n\n        <profileable\n            android:enabled=\"true\"\n            android:shell=\"true\" />\n\n        <activity\n            android:theme=\"@ref/0x7f0c0008\"\n            android:name=\"com.godot.game.GodotApp\"\n            android:exported=\"false\"\n            android:excludeFromRecents=\"false\"\n            android:launchMode=\"4\"\n            android:screenOrientation=\"11\"\n            android:configChanges=\"0x3ff4\"\n            android:windowSoftInputMode=\"0x10\"\n            android:resizeableActivity=\"true\"\n            android:supportsPictureInPicture=\"true\" />\n\n        <activity-alias\n            android:name=\"com.godot.game.GodotAppLauncher\"\n            android:exported=\"true\"\n            android:targetActivity=\"com.godot.game.GodotApp\">\n\n            <intent-filter>\n\n                <action\n                    android:name=\"android.intent.action.MAIN\" />\n\n                <category\n                    android:name=\"android.intent.category.DEFAULT\" />\n\n                <category\n                    android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity-alias>\n\n        <meta-data\n            android:name=\"org.godotengine.library.version\"\n            android:value=\"4.7.2.stable\" />\n\n        <activity\n            android:theme=\"@ref/0x1030010\"\n            android:name=\"org.godotengine.godot.utils.ProcessPhoenix\"\n            android:exported=\"false\"\n            android:process=\":phoenix\" />\n\n        <provider\n            android:name=\"androidx.core.content.FileProvider\"\n            android:exported=\"false\"\n            android:authorities=\"at.heinz.imperathen.fileprovider\"\n            android:grantUriPermissions=\"true\">\n\n            <meta-data\n                android:name=\"android.support.FILE_PROVIDER_PATHS\"\n                android:resource=\"@ref/0x7f0e0000\" />\n        </provider>\n\n        <provider\n            android:name=\"androidx.startup.InitializationProvider\"\n            android:exported=\"false\"\n            android:authorities=\"at.heinz.imperathen.fileprovider\">\n\n            <meta-data\n                android:name=\"androidx.profileinstaller.ProfileInstallerInitializer\"\n                android:value=\"androidx.startup\" />\n        </provider>\n\n        <receiver\n            android:name=\"androidx.profileinstaller.ProfileInstallReceiver\"\n            android:permission=\"android.permission.DUMP\"\n            android:enabled=\"true\"\n            android:exported=\"true\"\n            android:directBootAware=\"false\">\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.INSTALL_PROFILE\" />\n            </intent-filter>\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.SKIP_FILE\" />\n            </intent-filter>\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.SAVE_PROFILE\" />\n            </intent-filter>\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.BENCHMARK_OPERATION\" />\n            </intent-filter>\n        </receiver>\n\n        <meta-data\n            android:name=\"org.godotengine.rendering.method\"\n            android:value=\"gl_compatibility\" />\n\n        <meta-data\n            android:name=\"org.godotengine.editor.version\"\n            android:value=\"4.7.2.stable\" />\n    </application>\n</manifest>\n",
+            "stderr_tail": "",
+            "output_truncated": false,
+            "decoded_package": "at.heinz.imperathen",
+            "decoded_launcher": "com.godot.game.GodotAppLauncher"
+          }
+        ]
+      }
+    },
+    {
+      "id": "package_identity",
+      "status": "pass",
+      "required": true,
+      "detail": "Decoded package must equal the intended application ID.",
+      "evidence": {
+        "expected": "at.heinz.imperathen",
+        "actual": "at.heinz.imperathen"
+      }
+    },
+    {
+      "id": "launcher_activity",
+      "status": "pass",
+      "required": true,
+      "detail": "A launcher activity or alias must be enabled and exported, with MAIN and LAUNCHER in the same intent filter. A private alias target is permitted. Missing XML evidence never creates a PASS.",
+      "evidence": {
+        "activity": "com.godot.game.GodotAppLauncher",
+        "decoded_with": "apkanalyzer",
+        "diagnostics": {
+          "application_present": true,
+          "application_enabled": true,
+          "components": [
+            {
+              "type": "activity",
+              "name": "com.godot.game.GodotApp",
+              "enabled": true,
+              "exported": false,
+              "exported_attribute": "false",
+              "intent_filters": [],
+              "has_launcher_filter": false,
+              "rejection_reasons": [
+                "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+                "component_exported_false"
+              ],
+              "unresolved_attributes": [],
+              "usable_launcher": false
+            },
+            {
+              "type": "activity-alias",
+              "name": "com.godot.game.GodotAppLauncher",
+              "enabled": true,
+              "exported": true,
+              "exported_attribute": "true",
+              "intent_filters": [
+                {
+                  "actions": [
+                    "android.intent.action.MAIN"
+                  ],
+                  "categories": [
+                    "android.intent.category.DEFAULT",
+                    "android.intent.category.LAUNCHER"
+                  ]
+                }
+              ],
+              "has_launcher_filter": true,
+              "target_activity": "com.godot.game.GodotApp",
+              "target_declared_before_alias": true,
+              "target_enabled": true,
+              "target_exported": false,
+              "rejection_reasons": [],
+              "unresolved_attributes": [],
+              "usable_launcher": true
+            },
+            {
+              "type": "activity",
+              "name": "org.godotengine.godot.utils.ProcessPhoenix",
+              "enabled": true,
+              "exported": false,
+              "exported_attribute": "false",
+              "intent_filters": [],
+              "has_launcher_filter": false,
+              "rejection_reasons": [
+                "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+                "component_exported_false"
+              ],
+              "unresolved_attributes": [],
+              "usable_launcher": false
+            }
+          ],
+          "unresolved_candidate": false
+        }
+      }
+    },
+    {
+      "id": "signature_verification",
+      "status": "pass",
+      "required": true,
+      "detail": "apksigner verify checks the supplied APK, using its declared Android compatibility range; it does not establish publisher ownership.",
+      "evidence": {
+        "schemes": {
+          "v1": false,
+          "v2": true,
+          "v3": true,
+          "v3.1": false,
+          "v4": false
+        },
+        "command": [
+          "/tmp/imperathen-mobile/sdk/build-tools/35.0.1/apksigner",
+          "verify",
+          "--verbose",
+          "/workspace/shared/downloads/IMPERATHEN-02c56681-arm64.apk"
+        ],
+        "exit_code": 0,
+        "error": null,
+        "stdout_tail": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\n",
+        "stderr_tail": "",
+        "output_truncated": false
+      }
+    },
+    {
+      "id": "zip_alignment",
+      "status": "pass",
+      "required": true,
+      "detail": "Existing zipalign checks ordinary 4-byte ZIP alignment; this does not establish 16-KB native page compatibility.",
+      "evidence": {
+        "command": [
+          "/tmp/imperathen-mobile/sdk/build-tools/35.0.1/zipalign",
+          "-c",
+          "-v",
+          "4",
+          "/workspace/shared/downloads/IMPERATHEN-02c56681-arm64.apk"
+        ],
+        "exit_code": 0,
+        "error": null,
+        "stdout_tail": "7 res/layout/snackbar.xml (OK - compressed)\n28115187 res/layout/splash_screen_view.xml (OK - compressed)\n28115556 res/mipmap-anydpi-v26/icon.xml (OK - compressed)\n28115840 res/mipmap-hdpi-v4/icon.webp (OK)\n28120120 res/mipmap-hdpi-v4/icon_background.webp (OK)\n28120240 res/mipmap-hdpi-v4/icon_foreground.webp (OK)\n28130100 res/mipmap-hdpi-v4/icon_monochrome.webp (OK)\n28131288 res/mipmap-mdpi-v4/icon.webp (OK)\n28134152 res/mipmap-mdpi-v4/icon_background.webp (OK)\n28134272 res/mipmap-mdpi-v4/icon_foreground.webp (OK)\n28141568 res/mipmap-mdpi-v4/icon_monochrome.webp (OK)\n28142372 res/mipmap-xhdpi-v4/icon.webp (OK)\n28148144 res/mipmap-xhdpi-v4/icon_background.webp (OK)\n28148268 res/mipmap-xhdpi-v4/icon_foreground.webp (OK)\n28161076 res/mipmap-xhdpi-v4/icon_monochrome.webp (OK)\n28162660 res/mipmap-xxhdpi-v4/icon.webp (OK)\n28171092 res/mipmap-xxhdpi-v4/icon_background.webp (OK)\n28171224 res/mipmap-xxhdpi-v4/icon_foreground.webp (OK)\n28191544 res/mipmap-xxhdpi-v4/icon_monochrome.webp (OK)\n28193856 res/mipmap-xxxhdpi-v4/icon.webp (OK)\n28205180 res/mipmap-xxxhdpi-v4/icon_background.webp (OK)\n28205312 res/mipmap-xxxhdpi-v4/icon_foreground.webp (OK)\n28233220 res/mipmap-xxxhdpi-v4/icon_monochrome.webp (OK)\n28236300 res/mipmap/icon.webp (OK)\n28247616 res/mipmap/icon_background.webp (OK)\n28247728 res/mipmap/icon_foreground.webp (OK)\n28275624 res/mipmap/icon_monochrome.webp (OK)\n28276422 res/xml/godot_provider_paths.xml (OK - compressed)\n28276756 resources.arsc (OK)\n28316203 DebugProbesKt.bin (OK - compressed)\n28317059 kotlin/annotation/annotation.kotlin_builtins (OK - compressed)\n28317658 kotlin/collections/collections.kotlin_builtins (OK - compressed)\n28319226 kotlin/concurrent/atomics/atomics.kotlin_builtins (OK - compressed)\n28320320 kotlin/coroutines/coroutines.kotlin_builtins (OK - compressed)\n28320506 kotlin/internal/internal.kotlin_builtins (OK - compressed)\n28320920 kotlin/kotlin.kotlin_builtins (OK - compressed)\n28326115 kotlin/ranges/ranges.kotlin_builtins (OK - compressed)\n28327439 kotlin/reflect/reflect.kotlin_builtins (OK - compressed)\n28328800 assets/.godot/imported/atrium_house.glb-1686c657423a6c245006a35590ad2dd6.scn (OK)\n28442247 assets/assets/architecture/atrium_house.glb.import (OK - compressed)\n28442524 assets/.godot/imported/atrium_house_settlement_surfaces.png-0953e66138ab9a0101cf4522275fb90b.ctex (OK)\n28751030 assets/assets/architecture/atrium_house_settlement_surfaces.png.import (OK - compressed)\n28751368 assets/.godot/imported/frontier_house.glb-8a9c7782a3dfe0c451dde48768a551a3.scn (OK)\n35563412 assets/assets/architecture/frontier_house.glb.import (OK - compressed)\n35563668 assets/.godot/imported/village_well.glb-44fbf079f055634d93323f7cd21554d0.scn (OK)\n41527903 assets/assets/architecture/village_well.glb.import (OK - compressed)\n41528156 assets/.godot/imported/earth.jpg-cfacefd5b1b419fd407d3408d830b865.ctex (OK)\n45389898 assets/assets/atlas/earth.jpg.import (OK - compressed)\n45390168 assets/.godot/imported/farmer.glb-14731f3eb6a2100546623f02eddaa52f.scn (OK)\n45496513 assets/assets/landscape/farmer.glb.import (OK - compressed)\n45496764 assets/.godot/imported/han_farmer.glb-dad60327e3b24f7a903537d1e9c2bd25.scn (OK)\n45614607 assets/assets/landscape/han_farmer.glb.import (OK - compressed)\n45614860 assets/.godot/imported/han_house.glb-d0995679a34210b76fb0a125f2408823.scn (OK)\n46296175 assets/assets/landscape/han_house.glb.import (OK - compressed)\n46296428 assets/.godot/imported/oak_far.glb-91318924c7b9410f944a2433cfa78b59.scn (OK)\n46734674 assets/assets/landscape/oak_far.glb.import (OK - compressed)\n46734924 assets/.godot/imported/oak_mid.glb-0ee1b26716fb56828340ab0bafa6d863.scn (OK)\n47490747 assets/assets/landscape/oak_mid.glb.import (OK - compressed)\n47490996 assets/.godot/imported/oak_near.glb-e68a6cde557ffd14b3a8d7ad93e8ef23.scn (OK)\n49079758 assets/assets/landscape/oak_near.glb.import (OK - compressed)\n49080008 assets/.godot/imported/olive_far.glb-b7787054b8bc97259437bfd33b3f1121.scn (OK)\n49568178 assets/assets/landscape/olive_far.glb.import (OK - compressed)\n49568432 assets/.godot/imported/olive_mid.glb-76c0d66211301c3651e61a93f94c3b2e.scn (OK)\n50341197 assets/assets/landscape/olive_mid.glb.import (OK - compressed)\n50341452 assets/.godot/imported/olive_near.glb-99663c791c513704823bf2eee0593ce9.scn (OK)\n51759347 assets/assets/landscape/olive_near.glb.import (OK - compressed)\n51759600 assets/.godot/imported/pine_far.glb-09b278276c111922a39f75d1a6f8cefe.scn (OK)\n52223906 assets/assets/landscape/pine_far.glb.import (OK - compressed)\n52224156 assets/.godot/imported/pine_mid.glb-870e9ecf9e7b0114c9f10f61424c744c.scn (OK)\n52957333 assets/assets/landscape/pine_mid.glb.import (OK - compressed)\n52957584 assets/.godot/imported/pine_near.glb-116282c1c08e9cf84ccc6f913027a530.scn (OK)\n54395042 assets/assets/landscape/pine_near.glb.import (OK - compressed)\n54395296 assets/.godot/imported/wa_farmer.glb-f4d84da322f4b65ef6ab82cd4546b55b.scn (OK)\n54504255 assets/assets/landscape/wa_farmer.glb.import (OK - compressed)\n54504508 assets/.godot/imported/wa_house.glb-3201e861a3bf43d0ef05b7e7739697c5.scn (OK)\n55242157 assets/assets/landscape/wa_house.glb.import (OK - compressed)\n55242408 assets/.godot/imported/wa_store.glb-dcde42e8eb91e82ce01caa2619faf56a.scn (OK)\n55951747 assets/assets/landscape/wa_store.glb.import (OK - compressed)\n55952004 assets/.godot/imported/wood_longhouse.glb-cd0674a1f3e05ffaae6c1cbb4c0a9736.scn (OK)\n56801044 assets/assets/landscape/wood_longhouse.glb.import (OK - compressed)\n56801300 assets/.godot/imported/archer_far.glb-b56a390e2bb4d9fd45179f6f59c931f0.scn (OK)\n56831200 assets/assets/soldiers/archer_far.glb.import (OK - compressed)\n56831452 assets/.godot/imported/archer_mid.glb-83c67f46f1756d8861c0e7c2ca5156d3.scn (OK)\n56934501 assets/assets/soldiers/archer_mid.glb.import (OK - compressed)\n56934756 assets/.godot/imported/archer_near.glb-f6bba15985f80f28a37df08278b4a8c8.scn (OK)\n57067850 assets/assets/soldiers/archer_near.glb.import (OK - compressed)\n57068104 assets/.godot/imported/heavy_far.glb-f42691d0bcb3c75ada387ca448b30f68.scn (OK)\n57098330 assets/assets/soldiers/heavy_far.glb.import (OK - compressed)\n57098584 assets/.godot/imported/heavy_mid.glb-da250611a7bbc371ff9346dd9849bf92.scn (OK)\n57214775 assets/assets/soldiers/heavy_mid.glb.import (OK - compressed)\n57215028 assets/.godot/imported/heavy_near.glb-0a7fce4937ffb3d5f6f36fb6db0efcd1.scn (OK)\n57369907 assets/assets/soldiers/heavy_near.glb.import (OK - compressed)\n57370160 assets/.godot/imported/officer_far.glb-aea57b4516300cee83f2ce3536ea4370.scn (OK)\n57400971 assets/assets/soldiers/officer_far.glb.import (OK - compressed)\n57401228 assets/.godot/imported/officer_mid.glb-51fe0df5be24b3b786a9fa50e6df3844.scn (OK)\n57523062 assets/assets/soldiers/officer_mid.glb.import (OK - compressed)\n57523320 assets/.godot/imported/officer_near.glb-a051cb4c23b87082b935d6c07de9e02f.scn (OK)\n57688015 assets/assets/soldiers/officer_near.glb.import (OK - compressed)\n57688272 assets/.godot/imported/spear_far.glb-e9c47942334c3dd65b826ff42cc82d08.scn (OK)\n57718670 assets/assets/soldiers/spear_far.glb.import (OK - compressed)\n57718924 assets/.godot/imported/spear_mid.glb-d76b2b1dd64fe8113f807e50d3ff9d13.scn (OK)\n57835704 assets/assets/soldiers/spear_mid.glb.import (OK - compressed)\n57835960 assets/.godot/imported/spear_near.glb-71a5641160ac955240a1e607b254ea97.scn (OK)\n57989213 assets/assets/soldiers/spear_near.glb.import (OK - compressed)\n57989472 assets/.godot/imported/earth_basecolor.png-40bab6f32a47eb135eb8fb734eb1599c.ctex (OK)\n58082542 assets/assets/terrain/earth_basecolor.png.import (OK - compressed)\n58082776 assets/assets/asset_manifest.json (OK - compressed)\n58083394 assets/.godot/imported/frontier_ambience.wav-648aeae78421492de7942fff867912ee.sample (OK - compressed)\n58147399 assets/assets/frontier_ambience.wav.import (OK - compressed)\n58147652 assets/.godot/imported/frontier_hut.glb-4acdf649ad4d9d2b98907bcec4487c22.scn (OK)\n58271354 assets/assets/frontier_hut.glb.import (OK - compressed)\n58271604 assets/.godot/imported/icon.svg-56083ea2a1f1a4f1e49773bdc6d7826c.ctex (OK)\n58289317 assets/assets/icon.svg.import (OK - compressed)\n58289543 assets/assets/quality_profiles.json (OK - compressed)\n58290341 assets/scripts/battle/battle_model.gdc (OK - compressed)\n58312502 assets/scripts/battle/formation_slots.gdc (OK - compressed)\n58314579 assets/scripts/battle/valley_field.gdc (OK - compressed)\n58317261 assets/scripts/domain/world_model.gdc (OK - compressed)\n58351202 assets/scripts/strategy/atlas_data.gdc (OK - compressed)\n58355613 assets/scripts/strategy/atlas_screen.gdc (OK - compressed)\n58361585 assets/scripts/strategy/globe.gdc (OK - compressed)\n58368264 assets/scripts/strategy/origins.gdc (OK - compressed)\n58369436 assets/scripts/strategy/season_campaign.gdc (OK - compressed)\n58383592 assets/scripts/tactics/valley_hud.gdc (OK - compressed)\n58389412 assets/scripts/tactics/valley_landscape.gdc (OK - compressed)\n58395633 assets/scripts/tactics/valley_scene.gdc (OK - compressed)\n58410413 assets/scripts/ui/game_ui.gdc (OK - compressed)\n58450083 assets/scripts/ui/runtime_display.gdc (OK - compressed)\n58455211 assets/scripts/ui/safe_area.gdc (OK - compressed)\n58456074 assets/scripts/ui/touch_action.gdc (OK - compressed)\n58457704 assets/scripts/ui/touch_pad.gdc (OK - compressed)\n58461000 assets/.godot/exported/133200997/export-3070c538c03ee49b7677ff960a3f5195-main.scn (OK)\n58461747 assets/scripts/visuals/far_ranks.gdc (OK - compressed)\n58463034 assets/scripts/visuals/grove.gdc (OK - compressed)\n58467758 assets/scripts/visuals/soldier_visual.gdc (OK - compressed)\n58471176 assets/scripts/world/game_world.gdc (OK - compressed)\n58508647 assets/scripts/world/regional_village.gdc (OK - compressed)\n58511568 assets/scripts/world/village_art.gdc (OK - compressed)\n58518409 assets/scripts/main.gdc (OK - compressed)\n58532943 assets/scripts/battle/battle_model.gd.remap (OK - compressed)\n58533069 assets/scripts/battle/formation_slots.gd.remap (OK - compressed)\n58533201 assets/scripts/battle/valley_field.gd.remap (OK - compressed)\n58533329 assets/scripts/domain/world_model.gd.remap (OK - compressed)\n58533457 assets/scripts/strategy/atlas_data.gd.remap (OK - compressed)\n58533588 assets/scripts/strategy/atlas_screen.gd.remap (OK - compressed)\n58533713 assets/scripts/strategy/globe.gd.remap (OK - compressed)\n58533834 assets/scripts/strategy/origins.gd.remap (OK - compressed)\n58533965 assets/scripts/strategy/season_campaign.gd.remap (OK - compressed)\n58534098 assets/scripts/tactics/valley_hud.gd.remap (OK - compressed)\n58534231 assets/scripts/tactics/valley_landscape.gd.remap (OK - compressed)\n58534366 assets/scripts/tactics/valley_scene.gd.remap (OK - compressed)\n58534487 assets/scripts/ui/game_ui.gd.remap (OK - compressed)\n58534606 assets/scripts/ui/runtime_display.gd.remap (OK - compressed)\n58534727 assets/scripts/ui/safe_area.gd.remap (OK - compressed)\n58534845 assets/scripts/ui/touch_action.gd.remap (OK - compressed)\n58534963 assets/scripts/ui/touch_pad.gd.remap (OK - compressed)\n58535064 assets/main.tscn.remap (OK - compressed)\n58535224 assets/scripts/visuals/far_ranks.gd.remap (OK - compressed)\n58535345 assets/scripts/visuals/grove.gd.remap (OK - compressed)\n58535471 assets/scripts/visuals/soldier_visual.gd.remap (OK - compressed)\n58535595 assets/scripts/world/game_world.gd.remap (OK - compressed)\n58535720 assets/scripts/world/regional_village.gd.remap (OK - compressed)\n58535850 assets/scripts/world/village_art.gd.remap (OK - compressed)\n58535962 assets/scripts/main.gd.remap (OK - compressed)\n58536076 assets/.godot/global_script_class_cache.cfg (OK - compressed)\n58536138 assets/assets/icon.svg (OK - compressed)\n58536577 assets/.godot/uid_cache.bin (OK - compressed)\n58537863 assets/project.binary (OK - compressed)\n58538372 assets/assets.sparsepck (OK)\n58549564 assets/_cl_ (OK)\n58549708 META-INF/IMPERATH.SF (OK - compressed)\n58560614 META-INF/IMPERATH.RSA (OK - compressed)\n58562139 META-INF/MANIFEST.MF (OK - compressed)\nVerification succesful\n",
+        "stderr_tail": "",
+        "output_truncated": true
+      }
+    },
+    {
+      "id": "apk_unchanged",
+      "status": "pass",
+      "required": true,
+      "detail": "The inspected APK must retain the same size and SHA-256 throughout validation.",
+      "evidence": {}
+    }
+  ],
+  "device_tests": {
+    "status": "not_run",
+    "reason": "Static validator never installs or launches an APK or queries a connected device."
+  },
+  "installability": "not_demonstrated_on_a_device",
+  "source_snapshot": {
+    "status": "recorded",
+    "sha256": {
+      "assets/architecture/atrium_house.glb": "9d842959af17aac158da5d56162ba5d45ce57f22102bc0cebca08e78850da765",
+      "assets/architecture/frontier_house.glb": "2fb464187ecec393558d9ba24790ec54a6b9e3c66558413c266664650fbc6372",
+      "assets/architecture/village_well.glb": "21555082045da623d48eafa04ba69ed3d94126d8db006d638dca06912949e0a0",
+      "assets/asset_manifest.json": "1e497f5be2bcc6de7f77a681897b0746b0704ed87e810c7a7d1a97d3f8b31419",
+      "assets/frontier_ambience.wav": "69bdcc1ef52336b462db932f7c28db5014a6109c4225307903a7881bc01b6433",
+      "assets/frontier_hut.glb": "8069c0fc868ee6cb7bdeb2ecadb1351100c8605ea6cdca5c04dcb61e7bb1a230",
+      "assets/landscape/farmer.glb": "98c8c33d6cfdcd6a7fac60895e2daf0202d779bf473b7eff599f7f174384f061",
+      "assets/landscape/han_farmer.glb": "0fd9ba3505bec96b9a987a614e8048f1f52684ca5b371c44ee89af64a3bbdb83",
+      "assets/landscape/han_house.glb": "98c3986a5d6e0cbbdc050860ee4d872dfff8120aa48d4df520afee44c996a639",
+      "assets/landscape/oak_far.glb": "64918a9763984ee3b94778dd9bf10abb3454b5792d3a7af2da305c7040436afa",
+      "assets/landscape/oak_mid.glb": "cf081de1a080a7dba933bf93cec0dafb89ea27bddc6c6f4fd546f4893baaf125",
+      "assets/landscape/oak_near.glb": "cdf59618e11ba18dabb1d247ca69b6956c29a096c8a2fd3344bf233dfe9c6606",
+      "assets/landscape/olive_far.glb": "cb1b1a214c146c00357ce02fc9fd2880c3b9c8cef25a5b74facf21f8505e009b",
+      "assets/landscape/olive_mid.glb": "fee6116413166bc140ae7bfe64a134c9afb7db8c3eef1a7e018959dd025b0b08",
+      "assets/landscape/olive_near.glb": "18bdbfa5fbe83842be9162bacd9f54e607800d5e8dfae81048bd12629dd38f39",
+      "assets/landscape/pine_far.glb": "cfa2f16c31819a942e0498cc40921120f8d3bf289394218ac9458cca0677e2cc",
+      "assets/landscape/pine_mid.glb": "087e5f0c4881e3435f2783dc589a9276424dcd7168736722ac0282dc1fa6600c",
+      "assets/landscape/pine_near.glb": "17a83f875c33a046cf708b2997f03398b8a360f925bf47bd9acf2d49507e4bb6",
+      "assets/landscape/wa_farmer.glb": "b87f8c1fd0c30d0ea91ffefa427dab45fcccd7066067d71b98f6e236255d63c1",
+      "assets/landscape/wa_house.glb": "4b60525d6ae432878b7cc45056bdea3701fefa24f8b64801a3fbe234e6b1c9bc",
+      "assets/landscape/wa_store.glb": "b0209f67fb15e6dde8c892aa509fd2863455e583920a0d72ae398c72a96149fb",
+      "assets/landscape/wood_longhouse.glb": "47ebe37b8fcd0b39206f87564d43f7e5a91e59848bd18ba82704c833e2611dad",
+      "assets/quality_profiles.json": "1f26d30e22b21771582245cea32ac4245e4572811e887b07f66d9e5b650c97b3",
+      "assets/soldiers/archer_far.glb": "4b53630f2f26ca560fa78dbc035c21c1c20a0f81ec85880e0fdc26c1461be0a1",
+      "assets/soldiers/archer_mid.glb": "2eb99ed5d9057936acc9623ea678df9ffde92b48534bc9123c70452b7f05663e",
+      "assets/soldiers/archer_near.glb": "8ca12581953d67c627b909bc615a3c9473852e8c3f977871e6a3d762431b6574",
+      "assets/soldiers/heavy_far.glb": "48b36528c72b4416393d75fdb57aa104aea74b8717e4cadf7d76daf05ce0e10b",
+      "assets/soldiers/heavy_mid.glb": "02b200d0a2e2b6837866b9606cf287359cb2787c6d5feb7faec5b3e41a2512ca",
+      "assets/soldiers/heavy_near.glb": "c89a4e1a7ab75a92a92be93c9410666edd97ec460a955b09f5372e9c6fc24909",
+      "assets/soldiers/officer_far.glb": "19b4de5c958618e11d0748c1376d8f9c4808418503710208633d296e1fc88673",
+      "assets/soldiers/officer_mid.glb": "d21a3df4189be188b70d525ccdbd63427aebbb6b133114e64684e76d2dade16b",
+      "assets/soldiers/officer_near.glb": "a2363f2dcd65d62df6c1792a0aaff0845523b152f3ed5b6712a4b27f76d028ff",
+      "assets/soldiers/spear_far.glb": "7e39502c68fd97537bebd41c310ac0dd72ee05bb30876cdd4ba3497c27142a3a",
+      "assets/soldiers/spear_mid.glb": "e7a11712ba760b614ad5de570acbf0c63075abe70bf736de0bee7da4ffe33ea6",
+      "assets/soldiers/spear_near.glb": "99da1706893970d048ffd01279117aed97659da2625de21425765127219851cf",
+      "main.tscn": "a9f4f0edd8bfb7a776b7c2a0647bfb1324cf615a23065331e09baf24b5263892",
+      "project.godot": "02914329ec13ac77710c08ca0d55b2f196366001cb7943f44285d1dca4d72dfe",
+      "scripts/battle/battle_model.gd": "674fa5fa9fd6e16610d9b633f58fa91d01a4b3a8f7db9db8702f386308d19a3d",
+      "scripts/battle/formation_slots.gd": "2f3eb1513e588bdbb0fb9a5b20de3bb2f7dc2b2d12786b3a89b73169d7c5df9f",
+      "scripts/battle/valley_field.gd": "991b46c8e7113f6b1ac708af644d29df3aa601c5d49abc04f7181d8f05e252f6",
+      "scripts/domain/world_model.gd": "4a428cdf677c2595e1079a9e5865ea2cb41b545a23d4e3b63905cc86b24f2a02",
+      "scripts/main.gd": "12417e19dbb4a70d1052e60773c0f5be8e60272562d1f585242504b9aa92911e",
+      "scripts/strategy/atlas_data.gd": "43583ad13e9695cd2f24e07ac4f8ebddc8c3f17333fd46820d6903a35b6a055a",
+      "scripts/strategy/atlas_screen.gd": "5cf7c34421427a7f9f85aef16559f38d7f99483c08ad48457d42eb5bb11877f1",
+      "scripts/strategy/globe.gd": "19ee901590d639f4063a54f0ec514f74ff41bbe70746cf88a71c6349c51fa016",
+      "scripts/strategy/origins.gd": "9fd501a065cf7f1763384da16ba5d0741ac04bed27c4269a3e90fc8859afadf6",
+      "scripts/strategy/season_campaign.gd": "ba8571353ce4c4329cba2d926b6615c8f075da6f1964bd7dd7a16804a2ea2b96",
+      "scripts/tactics/valley_hud.gd": "a71152f2a81000cd4cee36efc3337838dc742e729645408bf871b081aae31304",
+      "scripts/tactics/valley_landscape.gd": "63a0f3f4ac59c8772fed5393dc7a6806a05d0182b8c445556439db1154dffd32",
+      "scripts/tactics/valley_scene.gd": "3d936b70375a6fc90d0ea6db906f1c663836e7378f549ae57478e801195c2012",
+      "scripts/ui/game_ui.gd": "90bba517a4790c2d2e7423351a05b28f1f28479c8220853436eee3db2defb72e",
+      "scripts/ui/runtime_display.gd": "4c1f2831e162c8022ac40613cf5d6791651c59efdc113cd9cbb569c2451e67e6",
+      "scripts/ui/safe_area.gd": "7caee67ed88278c3cb3ece2c899fc8c10a7d2bd0d26e272981ae488394e47dfb",
+      "scripts/ui/touch_action.gd": "51881f22f50fdd788b119220687013f1cf0a6719b2197941b0f2eb7c8651ca02",
+      "scripts/ui/touch_pad.gd": "d4834fd301f5cecdc7c92fee152b6febddc4205cecac66cc0ab09bbbc07336e6",
+      "scripts/ui/ui_smoke.gd": "c454929d4662580dd923082445792d7aa4119d3bbc1c3f1853ae499681dc28cd",
+      "scripts/visuals/far_ranks.gd": "4053d75d722f4ac454c8d6bfab3f409673191eadaf6a9747e9c07012dec6ec1d",
+      "scripts/visuals/grove.gd": "b1d2c51467e1e012643179eb9985b5f562cfc55b40a5d00eb2507f92ac4d3842",
+      "scripts/visuals/soldier_visual.gd": "ab63c3d5085a71df499841834c77c8d6fe279a486ff1fdaf50999a578a1eb71a",
+      "scripts/world/game_world.gd": "4e97c5bc18c7447079f8383e547fa431f607cbdb032e5a78936a4d691749414a",
+      "scripts/world/regional_village.gd": "471f9c8074756f00151621896581890ceeff54e8108917c275c7ff5b0e6373f8",
+      "scripts/world/village_art.gd": "bd9d6bd11e12fd13d05b5cefc65060dde1a0219c74caa263b1443eb4f92f222d",
+      "scripts/world/world_smoke.gd": "55a4f6f68316a7e96ca3c9e0a08e5c10149c513d4430daa4a255cfa1114e4160",
+      "tests/battle_rules_test.gd": "acfae4b31b795534bdd09d21d1a122d0f63723d6b709fc810ebb254c2d09b424",
+      "tests/domain_test.gd": "87f0a8d42de174afaa1b354d9a8e724763748aa128ffa796aa464273d5d02e2d",
+      "tests/integration_test.gd": "29c383faa98682c7dd574ddfc5b0f9d72890eebfd0ef06dce58f12fb7971c0bf",
+      "tests/season_campaign_test.gd": "2e72280a43152844c5f0251416860305de6556791f0b15eeb7a1e681353a4e5f",
+      "tests/soldier_visual_test.gd": "7cf0dc38849d822f79f56ee2a692ff3eefb9199c033bcae452e3c65e5ed03672",
+      "tests/visual_benchmark.gd": "4150a366a3dda13afbcc4d1e3b1e59be0f22a1ad86abef964eee53268f660e60"
+    },
+    "scope": "Local source snapshot only; not proof that transformed APK bytes were produced from these exact sources."
+  },
+  "available_abis": [
+    "arm64-v8a"
+  ],
+  "signature_indicators": {
+    "v1_certificate_entries": [
+      "META-INF/IMPERATH.RSA"
+    ],
+    "apk_signing_block_marker": true
+  },
+  "overall_status": "pass",
+  "passed": true,
+  "scope": "Static APK/package/signature evidence only. No graphics, touch, audio, FPS, thermal, installation, launch, or real-device success is claimed."
+}

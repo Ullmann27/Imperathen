@@ -1,0 +1,44 @@
+name: Recheck frozen Android APKs
+
+on:
+  push:
+    branches: ['integration/android-formation-20261122']
+    paths: ['.github/workflows/android-runtime-recheck.yml']
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      IMPERATHEN_APK_COMMIT: '02c566815deebabe6b96c2f25ec0c52a94d35415'
+      IMPERATHEN_BUILD: 'IMPERATHEN-02c56681'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fetch the published emulator and ARM64 deliverables
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh run download 45038276162 --repo "$GITHUB_REPOSITORY" --name imperathen-android-11 --dir artifacts
+          test "$(cat artifacts/source-commit.txt)" = "$IMPERATHEN_APK_COMMIT"
+          sha256sum -c artifacts/SHA256SUMS.txt
+          echo 'dede9302c2f96b3b4908aba04c7d50675215c1fa5bdca2812618695501295cc2  artifacts/IMPERATHEN-02c56681-arm64.apk' | sha256sum -c -
+      - name: Install and exercise the exact downloads
+        run: bash tools/run_android_emulator.sh
+      - name: Upload the runtime evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-frozen-runtime-${{ github.run_number }}
+          path: |
+            android-runtime/
+            ${{ runner.temp }}/android-emulator.log
+          if-no-files-found: warn
+          retention-days: 30

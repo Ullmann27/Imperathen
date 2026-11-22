@@ -1,5 +1,7 @@
 # Arbeitsplan
 
+**Aktualisierung 22.11.2026:** Der begrenzte Entwicklungsstart ist jetzt beauftragt; siehe [aktueller Auftrag](../00_governance/DEVELOPMENT_START.md). Frühere Phasenbeschränkungen unten dokumentieren die Vorproduktion. Große Gameplay-, Engine- und Leistungsnachweise bleiben eigene Aufgaben.
+
 ## 1. Gegenwärtige Lieferung
 
 Das Projekt erhält eine vollständige, navigierbare Dokumentationsgrundlage statt leerer Engine-Verzeichnisse: Anforderungen, Spielsysteme, technische Verträge, Assetplanung, Qualitätsmaßstäbe, Quellen, offene Entscheidungen und reale GitHub-Aufgaben. Die Übersicht in [BACKLOG.md](BACKLOG.md) verbindet die Fachbereiche mit den angelegten Issues.

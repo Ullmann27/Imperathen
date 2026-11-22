@@ -1,0 +1,495 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-11-22T15:27:50.426724+00:00",
+  "apk": {
+    "path": "/tmp/imperathen-android-build-f7jy76e4/IMPERATHEN.apk",
+    "size_bytes": 28698864,
+    "sha256": "0bd67a686c3b5ca59e1ceed9b77a8fc47fa9fa091f00d1b06513c428720457ff"
+  },
+  "expected_package": "at.heinz.imperathen",
+  "expected_abi": "arm64-v8a",
+  "tool_paths": {
+    "aapt": "/usr/local/lib/android/sdk/build-tools/35.0.1/aapt",
+    "aapt2": "/usr/local/lib/android/sdk/build-tools/37.0.0/aapt2",
+    "apkanalyzer": "/usr/local/lib/android/sdk/cmdline-tools/latest/bin/apkanalyzer",
+    "apksigner": "/usr/local/lib/android/sdk/build-tools/35.0.1/apksigner",
+    "zipalign": "/usr/local/lib/android/sdk/build-tools/35.0.1/zipalign",
+    "adb": "/usr/local/lib/android/sdk/platform-tools/adb",
+    "emulator": null,
+    "sdkmanager": "/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager"
+  },
+  "sdk_roots": [
+    "/usr/local/lib/android/sdk",
+    "/tmp/imperathen-android-build-f7jy76e4/sdk"
+  ],
+  "sdk_platforms": [
+    "android-34",
+    "android-34-ext10",
+    "android-34-ext11",
+    "android-34-ext12",
+    "android-34-ext8",
+    "android-35",
+    "android-35-ext14",
+    "android-35-ext15",
+    "android-36",
+    "android-36-ext18",
+    "android-36-ext19",
+    "android-36.1",
+    "android-37.0",
+    "android-37.1",
+    "android-37.2",
+    "android-37.2-beta1",
+    "android-37.2-beta2",
+    "android-37.2-beta3"
+  ],
+  "emulator_inventory": {
+    "emulator_binary": null,
+    "adb_binary": "/usr/local/lib/android/sdk/platform-tools/adb",
+    "kvm_device_present": true,
+    "avd_config_count": 0,
+    "devices_queried": false,
+    "device_or_emulator_started": false
+  },
+  "manifest": {
+    "package": "at.heinz.imperathen",
+    "version_code": "1",
+    "version_name": "0.1.0-prototype",
+    "min_sdk": "24",
+    "target_sdk": "36",
+    "debuggable": true,
+    "launchable_activity": "com.godot.game.GodotAppLauncher",
+    "permissions": [],
+    "launcher_diagnostics": {
+      "application_present": true,
+      "application_enabled": true,
+      "components": [
+        {
+          "type": "activity",
+          "name": "com.godot.game.GodotApp",
+          "enabled": true,
+          "exported": false,
+          "exported_attribute": "false",
+          "intent_filters": [],
+          "has_launcher_filter": false,
+          "rejection_reasons": [
+            "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+            "component_exported_false"
+          ],
+          "unresolved_attributes": [],
+          "usable_launcher": false
+        },
+        {
+          "type": "activity-alias",
+          "name": "com.godot.game.GodotAppLauncher",
+          "enabled": true,
+          "exported": true,
+          "exported_attribute": "true",
+          "intent_filters": [
+            {
+              "actions": [
+                "android.intent.action.MAIN"
+              ],
+              "categories": [
+                "android.intent.category.DEFAULT",
+                "android.intent.category.LAUNCHER"
+              ]
+            }
+          ],
+          "has_launcher_filter": true,
+          "target_activity": "com.godot.game.GodotApp",
+          "target_declared_before_alias": true,
+          "target_enabled": true,
+          "target_exported": false,
+          "rejection_reasons": [],
+          "unresolved_attributes": [],
+          "usable_launcher": true
+        },
+        {
+          "type": "activity",
+          "name": "org.godotengine.godot.utils.ProcessPhoenix",
+          "enabled": true,
+          "exported": false,
+          "exported_attribute": "false",
+          "intent_filters": [],
+          "has_launcher_filter": false,
+          "rejection_reasons": [
+            "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+            "component_exported_false"
+          ],
+          "unresolved_attributes": [],
+          "usable_launcher": false
+        }
+      ],
+      "unresolved_candidate": false
+    },
+    "decoded_with": "apkanalyzer"
+  },
+  "checks": [
+    {
+      "id": "apk_file",
+      "status": "pass",
+      "required": true,
+      "detail": "APK file found; its extension alone is not accepted as proof of format.",
+      "evidence": {}
+    },
+    {
+      "id": "zip_structure",
+      "status": "pass",
+      "required": true,
+      "detail": "ZIP directory inspected before reading payloads; no extraction is performed.",
+      "evidence": {
+        "entries": 127,
+        "expanded_bytes": 84391194,
+        "duplicate_entries": [],
+        "unsafe_entries": [],
+        "within_limits": true
+      }
+    },
+    {
+      "id": "zip_crc",
+      "status": "pass",
+      "required": true,
+      "detail": "All ZIP member payloads were decompressed and CRC checked.",
+      "evidence": {
+        "damaged_entry": null
+      }
+    },
+    {
+      "id": "apk_core_entries",
+      "status": "pass",
+      "required": true,
+      "detail": "A renamed project ZIP is not accepted as an Android application.",
+      "evidence": {
+        "missing": []
+      }
+    },
+    {
+      "id": "binary_manifest_header",
+      "status": "pass",
+      "required": true,
+      "detail": "Compiled Android binary XML container checked; semantic decoding is separate.",
+      "evidence": {
+        "bytes": 7604
+      }
+    },
+    {
+      "id": "resource_table_header",
+      "status": "pass",
+      "required": true,
+      "detail": "Compiled Android resource table header checked.",
+      "evidence": {}
+    },
+    {
+      "id": "dex_header",
+      "status": "pass",
+      "required": true,
+      "detail": "DEX magic and declared file length checked; no bytecode correctness claim.",
+      "evidence": {}
+    },
+    {
+      "id": "godot_native_library",
+      "status": "pass",
+      "required": true,
+      "detail": "Expected Godot shared library must be a 64-bit little-endian ELF for the requested architecture.",
+      "evidence": {
+        "expected_abi": "arm64-v8a",
+        "entry": "lib/arm64-v8a/libgodot_android.so",
+        "elf_machine": 183,
+        "available_abis": [
+          "arm64-v8a"
+        ]
+      }
+    },
+    {
+      "id": "godot_project_content",
+      "status": "pass",
+      "required": true,
+      "detail": "Godot project configuration and the prototype's required scene/scripts must be present, including resolved remaps.",
+      "evidence": {
+        "config": "assets/project.binary",
+        "config_header_valid": true,
+        "resources": [
+          {
+            "source": "main.tscn",
+            "entry": "assets/.godot/exported/133200997/export-3070c538c03ee49b7677ff960a3f5195-main.scn",
+            "remap": "assets/main.tscn.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/main.gd",
+            "entry": "assets/scripts/main.gdc",
+            "remap": "assets/scripts/main.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/domain/world_model.gd",
+            "entry": "assets/scripts/domain/world_model.gdc",
+            "remap": "assets/scripts/domain/world_model.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/world/game_world.gd",
+            "entry": "assets/scripts/world/game_world.gdc",
+            "remap": "assets/scripts/world/game_world.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/world/village_art.gd",
+            "entry": "assets/scripts/world/village_art.gdc",
+            "remap": "assets/scripts/world/village_art.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/game_ui.gd",
+            "entry": "assets/scripts/ui/game_ui.gdc",
+            "remap": "assets/scripts/ui/game_ui.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/touch_pad.gd",
+            "entry": "assets/scripts/ui/touch_pad.gdc",
+            "remap": "assets/scripts/ui/touch_pad.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/touch_action.gd",
+            "entry": "assets/scripts/ui/touch_action.gdc",
+            "remap": "assets/scripts/ui/touch_action.gd.remap",
+            "mode": "remapped"
+          }
+        ],
+        "missing_resources": []
+      }
+    },
+    {
+      "id": "manifest_metadata",
+      "status": "pass",
+      "required": true,
+      "detail": "Compiled manifest decoded by an existing Android SDK tool.",
+      "evidence": {
+        "attempts": [
+          {
+            "command": [
+              "/usr/local/lib/android/sdk/build-tools/35.0.1/aapt",
+              "dump",
+              "badging",
+              "/tmp/imperathen-android-build-f7jy76e4/IMPERATHEN.apk"
+            ],
+            "exit_code": 0,
+            "error": null,
+            "stdout_tail": "package: name='at.heinz.imperathen' versionCode='1' versionName='0.1.0-prototype' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'\ninstall-location:'auto'\nsdkVersion:'24'\ntargetSdkVersion:'36'\napplication-label:'IMPERATHEN'\napplication-label-af:'IMPERATHEN'\napplication-label-am:'IMPERATHEN'\napplication-label-ar:'IMPERATHEN'\napplication-label-as:'IMPERATHEN'\napplication-label-az:'IMPERATHEN'\napplication-label-be:'IMPERATHEN'\napplication-label-bg:'IMPERATHEN'\napplication-label-bn:'IMPERATHEN'\napplication-label-bs:'IMPERATHEN'\napplication-label-ca:'IMPERATHEN'\napplication-label-cs:'IMPERATHEN'\napplication-label-da:'IMPERATHEN'\napplication-label-de:'IMPERATHEN'\napplication-label-el:'IMPERATHEN'\napplication-label-en:'IMPERATHEN'\napplication-label-en-AU:'IMPERATHEN'\napplication-label-en-CA:'IMPERATHEN'\napplication-label-en-GB:'IMPERATHEN'\napplication-label-en-IN:'IMPERATHEN'\napplication-label-en-XC:'IMPERATHEN'\napplication-label-es:'IMPERATHEN'\napplication-label-es-ES:'IMPERATHEN'\napplication-label-es-US:'IMPERATHEN'\napplication-label-et:'IMPERATHEN'\napplication-label-eu:'IMPERATHEN'\napplication-label-fa:'IMPERATHEN'\napplication-label-fi:'IMPERATHEN'\napplication-label-fr:'IMPERATHEN'\napplication-label-fr-CA:'IMPERATHEN'\napplication-label-gl:'IMPERATHEN'\napplication-label-gu:'IMPERATHEN'\napplication-label-hi:'IMPERATHEN'\napplication-label-hr:'IMPERATHEN'\napplication-label-hu:'IMPERATHEN'\napplication-label-hy:'IMPERATHEN'\napplication-label-in:'IMPERATHEN'\napplication-label-is:'IMPERATHEN'\napplication-label-it:'IMPERATHEN'\napplication-label-iw:'IMPERATHEN'\napplication-label-ja:'IMPERATHEN'\napplication-label-ka:'IMPERATHEN'\napplication-label-kk:'IMPERATHEN'\napplication-label-km:'IMPERATHEN'\napplication-label-kn:'IMPERATHEN'\napplication-label-ko:'IMPERATHEN'\napplication-label-ky:'IMPERATHEN'\napplication-label-lo:'IMPERATHEN'\napplication-label-lt:'IMPERATHEN'\napplication-label-lv:'IMPERATHEN'\napplication-label-mk:'IMPERATHEN'\napplication-label-ml:'IMPERATHEN'\napplication-label-mn:'IMPERATHEN'\napplication-label-mr:'IMPERATHEN'\napplication-label-ms:'IMPERATHEN'\napplication-label-my:'IMPERATHEN'\napplication-label-nb:'IMPERATHEN'\napplication-label-ne:'IMPERATHEN'\napplication-label-nl:'IMPERATHEN'\napplication-label-or:'IMPERATHEN'\napplication-label-pa:'IMPERATHEN'\napplication-label-pl:'IMPERATHEN'\napplication-label-pt:'IMPERATHEN'\napplication-label-pt-BR:'IMPERATHEN'\napplication-label-pt-PT:'IMPERATHEN'\napplication-label-ro:'IMPERATHEN'\napplication-label-ru:'IMPERATHEN'\napplication-label-si:'IMPERATHEN'\napplication-label-sk:'IMPERATHEN'\napplication-label-sl:'IMPERATHEN'\napplication-label-sq:'IMPERATHEN'\napplication-label-sr:'IMPERATHEN'\napplication-label-sr-Latn:'IMPERATHEN'\napplication-label-sv:'IMPERATHEN'\napplication-label-sw:'IMPERATHEN'\napplication-label-ta:'IMPERATHEN'\napplication-label-te:'IMPERATHEN'\napplication-label-th:'IMPERATHEN'\napplication-label-tl:'IMPERATHEN'\napplication-label-tr:'IMPERATHEN'\napplication-label-uk:'IMPERATHEN'\napplication-label-ur:'IMPERATHEN'\napplication-label-uz:'IMPERATHEN'\napplication-label-vi:'IMPERATHEN'\napplication-label-zh:'IMPERATHEN'\napplication-label-zh-CN:'IMPERATHEN'\napplication-label-zh-HK:'IMPERATHEN'\napplication-label-zh-TW:'IMPERATHEN'\napplication-label-zu:'IMPERATHEN'\napplication-icon-160:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-240:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-320:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-480:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-640:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-65534:'res/mipmap-anydpi-v26/icon.xml'\napplication: label='IMPERATHEN' icon='res/mipmap-anydpi-v26/icon.xml'\napplication-debuggable\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\nother-activities\nother-receivers\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--' 'af' 'am' 'ar' 'as' 'az' 'be' 'bg' 'bn' 'bs' 'ca' 'cs' 'da' 'de' 'el' 'en' 'en-AU' 'en-CA' 'en-GB' 'en-IN' 'en-XC' 'es' 'es-ES' 'es-US' 'et' 'eu' 'fa' 'fi' 'fr' 'fr-CA' 'gl' 'gu' 'hi' 'hr' 'hu' 'hy' 'in' 'is' 'it' 'iw' 'ja' 'ka' 'kk' 'km' 'kn' 'ko' 'ky' 'lo' 'lt' 'lv' 'mk' 'ml' 'mn' 'mr' 'ms' 'my' 'nb' 'ne' 'nl' 'or' 'pa' 'pl' 'pt' 'pt-BR' 'pt-PT' 'ro' 'ru' 'si' 'sk' 'sl' 'sq' 'sr' 'sr-Latn' 'sv' 'sw' 'ta' 'te' 'th' 'tl' 'tr' 'uk' 'ur' 'uz' 'vi' 'zh' 'zh-CN' 'zh-HK' 'zh-TW' 'zu'\ndensities: '160' '240' '320' '480' '640' '65534'\nnative-code: 'arm64-v8a'\n",
+            "stderr_tail": "",
+            "output_truncated": false,
+            "decoded_package": "at.heinz.imperathen",
+            "decoded_launcher": null
+          },
+          {
+            "command": [
+              "/usr/local/lib/android/sdk/build-tools/37.0.0/aapt2",
+              "dump",
+              "badging",
+              "/tmp/imperathen-android-build-f7jy76e4/IMPERATHEN.apk"
+            ],
+            "exit_code": 0,
+            "error": null,
+            "stdout_tail": "package: name='at.heinz.imperathen' versionCode='1' versionName='0.1.0-prototype' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'\ninstall-location:'auto'\nminSdkVersion:'24'\ntargetSdkVersion:'36'\napplication-label:'IMPERATHEN'\napplication-label-af:'IMPERATHEN'\napplication-label-am:'IMPERATHEN'\napplication-label-ar:'IMPERATHEN'\napplication-label-as:'IMPERATHEN'\napplication-label-az:'IMPERATHEN'\napplication-label-be:'IMPERATHEN'\napplication-label-bg:'IMPERATHEN'\napplication-label-bn:'IMPERATHEN'\napplication-label-bs:'IMPERATHEN'\napplication-label-ca:'IMPERATHEN'\napplication-label-cs:'IMPERATHEN'\napplication-label-da:'IMPERATHEN'\napplication-label-de:'IMPERATHEN'\napplication-label-el:'IMPERATHEN'\napplication-label-en:'IMPERATHEN'\napplication-label-en-AU:'IMPERATHEN'\napplication-label-en-CA:'IMPERATHEN'\napplication-label-en-GB:'IMPERATHEN'\napplication-label-en-IN:'IMPERATHEN'\napplication-label-en-XC:'IMPERATHEN'\napplication-label-es:'IMPERATHEN'\napplication-label-es-ES:'IMPERATHEN'\napplication-label-es-US:'IMPERATHEN'\napplication-label-et:'IMPERATHEN'\napplication-label-eu:'IMPERATHEN'\napplication-label-fa:'IMPERATHEN'\napplication-label-fi:'IMPERATHEN'\napplication-label-fr:'IMPERATHEN'\napplication-label-fr-CA:'IMPERATHEN'\napplication-label-gl:'IMPERATHEN'\napplication-label-gu:'IMPERATHEN'\napplication-label-hi:'IMPERATHEN'\napplication-label-hr:'IMPERATHEN'\napplication-label-hu:'IMPERATHEN'\napplication-label-hy:'IMPERATHEN'\napplication-label-in:'IMPERATHEN'\napplication-label-is:'IMPERATHEN'\napplication-label-it:'IMPERATHEN'\napplication-label-iw:'IMPERATHEN'\napplication-label-ja:'IMPERATHEN'\napplication-label-ka:'IMPERATHEN'\napplication-label-kk:'IMPERATHEN'\napplication-label-km:'IMPERATHEN'\napplication-label-kn:'IMPERATHEN'\napplication-label-ko:'IMPERATHEN'\napplication-label-ky:'IMPERATHEN'\napplication-label-lo:'IMPERATHEN'\napplication-label-lt:'IMPERATHEN'\napplication-label-lv:'IMPERATHEN'\napplication-label-mk:'IMPERATHEN'\napplication-label-ml:'IMPERATHEN'\napplication-label-mn:'IMPERATHEN'\napplication-label-mr:'IMPERATHEN'\napplication-label-ms:'IMPERATHEN'\napplication-label-my:'IMPERATHEN'\napplication-label-nb:'IMPERATHEN'\napplication-label-ne:'IMPERATHEN'\napplication-label-nl:'IMPERATHEN'\napplication-label-or:'IMPERATHEN'\napplication-label-pa:'IMPERATHEN'\napplication-label-pl:'IMPERATHEN'\napplication-label-pt:'IMPERATHEN'\napplication-label-pt-BR:'IMPERATHEN'\napplication-label-pt-PT:'IMPERATHEN'\napplication-label-ro:'IMPERATHEN'\napplication-label-ru:'IMPERATHEN'\napplication-label-si:'IMPERATHEN'\napplication-label-sk:'IMPERATHEN'\napplication-label-sl:'IMPERATHEN'\napplication-label-sq:'IMPERATHEN'\napplication-label-sr:'IMPERATHEN'\napplication-label-sr-Latn:'IMPERATHEN'\napplication-label-sv:'IMPERATHEN'\napplication-label-sw:'IMPERATHEN'\napplication-label-ta:'IMPERATHEN'\napplication-label-te:'IMPERATHEN'\napplication-label-th:'IMPERATHEN'\napplication-label-tl:'IMPERATHEN'\napplication-label-tr:'IMPERATHEN'\napplication-label-uk:'IMPERATHEN'\napplication-label-ur:'IMPERATHEN'\napplication-label-uz:'IMPERATHEN'\napplication-label-vi:'IMPERATHEN'\napplication-label-zh:'IMPERATHEN'\napplication-label-zh-CN:'IMPERATHEN'\napplication-label-zh-HK:'IMPERATHEN'\napplication-label-zh-TW:'IMPERATHEN'\napplication-label-zu:'IMPERATHEN'\napplication-icon-160:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-240:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-320:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-480:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-640:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-65534:'res/mipmap-anydpi-v26/icon.xml'\napplication: label='IMPERATHEN' icon='res/mipmap-anydpi-v26/icon.xml'\napplication-debuggable\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\nother-activities\nother-receivers\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--' 'af' 'am' 'ar' 'as' 'az' 'be' 'bg' 'bn' 'bs' 'ca' 'cs' 'da' 'de' 'el' 'en' 'en-AU' 'en-CA' 'en-GB' 'en-IN' 'en-XC' 'es' 'es-ES' 'es-US' 'et' 'eu' 'fa' 'fi' 'fr' 'fr-CA' 'gl' 'gu' 'hi' 'hr' 'hu' 'hy' 'in' 'is' 'it' 'iw' 'ja' 'ka' 'kk' 'km' 'kn' 'ko' 'ky' 'lo' 'lt' 'lv' 'mk' 'ml' 'mn' 'mr' 'ms' 'my' 'nb' 'ne' 'nl' 'or' 'pa' 'pl' 'pt' 'pt-BR' 'pt-PT' 'ro' 'ru' 'si' 'sk' 'sl' 'sq' 'sr' 'sr-Latn' 'sv' 'sw' 'ta' 'te' 'th' 'tl' 'tr' 'uk' 'ur' 'uz' 'vi' 'zh' 'zh-CN' 'zh-HK' 'zh-TW' 'zu'\ndensities: '160' '240' '320' '480' '640' '65534'\nnative-code: 'arm64-v8a'\n",
+            "stderr_tail": "warn: resource com.godot.game:mipmap/themed_icon for config 'anydpi-v26' is a file reference to 'res/mipmap-anydpi-v26/themed_icon.xml' but no such path exists.\n",
+            "output_truncated": false,
+            "decoded_package": "at.heinz.imperathen",
+            "decoded_launcher": null
+          },
+          {
+            "command": [
+              "/usr/local/lib/android/sdk/cmdline-tools/latest/bin/apkanalyzer",
+              "manifest",
+              "print",
+              "/tmp/imperathen-android-build-f7jy76e4/IMPERATHEN.apk"
+            ],
+            "exit_code": 0,
+            "error": null,
+            "stdout_tail": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest\n    xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    android:versionCode=\"1\"\n    android:versionName=\"0.1.0-prototype\"\n    android:installLocation=\"0\"\n    android:compileSdkVersion=\"36\"\n    android:compileSdkVersionCodename=\"16\"\n    package=\"at.heinz.imperathen\"\n    platformBuildVersionCode=\"36\"\n    platformBuildVersionName=\"16\">\n\n    <uses-sdk\n        android:minSdkVersion=\"24\"\n        android:targetSdkVersion=\"36\" />\n\n    <supports-screens\n        android:smallScreens=\"true\"\n        android:normalScreens=\"true\"\n        android:largeScreens=\"true\"\n        android:xlargeScreens=\"true\" />\n\n    <uses-feature\n        android:glEsVersion=\"0x30000\"\n        android:required=\"true\" />\n\n    <application\n        android:label=\"@ref/0x7f0b0008\"\n        android:icon=\"@ref/0x7f0a0000\"\n        android:debuggable=\"true\"\n        android:allowBackup=\"false\"\n        android:isGame=\"false\"\n        android:extractNativeLibs=\"true\"\n        android:appCategory=\"8\"\n        android:appComponentFactory=\"androidx.core.app.CoreComponentFactory\"\n        android:hasFragileUserData=\"false\"\n        android:requestLegacyExternalStorage=\"false\">\n\n        <profileable\n            android:enabled=\"true\"\n            android:shell=\"true\" />\n\n        <activity\n            android:theme=\"@ref/0x7f0c0008\"\n            android:name=\"com.godot.game.GodotApp\"\n            android:exported=\"false\"\n            android:excludeFromRecents=\"false\"\n            android:launchMode=\"4\"\n            android:screenOrientation=\"11\"\n            android:configChanges=\"0x3ff4\"\n            android:windowSoftInputMode=\"0x10\"\n            android:resizeableActivity=\"true\"\n            android:supportsPictureInPicture=\"true\" />\n\n        <activity-alias\n            android:name=\"com.godot.game.GodotAppLauncher\"\n            android:exported=\"true\"\n            android:targetActivity=\"com.godot.game.GodotApp\">\n\n            <intent-filter>\n\n                <action\n                    android:name=\"android.intent.action.MAIN\" />\n\n                <category\n                    android:name=\"android.intent.category.DEFAULT\" />\n\n                <category\n                    android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity-alias>\n\n        <meta-data\n            android:name=\"org.godotengine.library.version\"\n            android:value=\"4.7.2.stable\" />\n\n        <activity\n            android:theme=\"@ref/0x01030010\"\n            android:name=\"org.godotengine.godot.utils.ProcessPhoenix\"\n            android:exported=\"false\"\n            android:process=\":phoenix\" />\n\n        <provider\n            android:name=\"androidx.core.content.FileProvider\"\n            android:exported=\"false\"\n            android:authorities=\"at.heinz.imperathen.fileprovider\"\n            android:grantUriPermissions=\"true\">\n\n            <meta-data\n                android:name=\"android.support.FILE_PROVIDER_PATHS\"\n                android:resource=\"@ref/0x7f0e0000\" />\n        </provider>\n\n        <provider\n            android:name=\"androidx.startup.InitializationProvider\"\n            android:exported=\"false\"\n            android:authorities=\"at.heinz.imperathen.fileprovider\">\n\n            <meta-data\n                android:name=\"androidx.profileinstaller.ProfileInstallerInitializer\"\n                android:value=\"androidx.startup\" />\n        </provider>\n\n        <receiver\n            android:name=\"androidx.profileinstaller.ProfileInstallReceiver\"\n            android:permission=\"android.permission.DUMP\"\n            android:enabled=\"true\"\n            android:exported=\"true\"\n            android:directBootAware=\"false\">\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.INSTALL_PROFILE\" />\n            </intent-filter>\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.SKIP_FILE\" />\n            </intent-filter>\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.SAVE_PROFILE\" />\n            </intent-filter>\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.BENCHMARK_OPERATION\" />\n            </intent-filter>\n        </receiver>\n\n        <meta-data\n            android:name=\"org.godotengine.rendering.method\"\n            android:value=\"gl_compatibility\" />\n\n        <meta-data\n            android:name=\"org.godotengine.editor.version\"\n            android:value=\"4.7.2.stable\" />\n    </application>\n</manifest>\n",
+            "stderr_tail": "",
+            "output_truncated": false,
+            "decoded_package": "at.heinz.imperathen",
+            "decoded_launcher": "com.godot.game.GodotAppLauncher"
+          }
+        ]
+      }
+    },
+    {
+      "id": "package_identity",
+      "status": "pass",
+      "required": true,
+      "detail": "Decoded package must equal the intended application ID.",
+      "evidence": {
+        "expected": "at.heinz.imperathen",
+        "actual": "at.heinz.imperathen"
+      }
+    },
+    {
+      "id": "launcher_activity",
+      "status": "pass",
+      "required": true,
+      "detail": "A launcher activity or alias must be enabled and exported, with MAIN and LAUNCHER in the same intent filter. A private alias target is permitted. Missing XML evidence never creates a PASS.",
+      "evidence": {
+        "activity": "com.godot.game.GodotAppLauncher",
+        "decoded_with": "apkanalyzer",
+        "diagnostics": {
+          "application_present": true,
+          "application_enabled": true,
+          "components": [
+            {
+              "type": "activity",
+              "name": "com.godot.game.GodotApp",
+              "enabled": true,
+              "exported": false,
+              "exported_attribute": "false",
+              "intent_filters": [],
+              "has_launcher_filter": false,
+              "rejection_reasons": [
+                "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+                "component_exported_false"
+              ],
+              "unresolved_attributes": [],
+              "usable_launcher": false
+            },
+            {
+              "type": "activity-alias",
+              "name": "com.godot.game.GodotAppLauncher",
+              "enabled": true,
+              "exported": true,
+              "exported_attribute": "true",
+              "intent_filters": [
+                {
+                  "actions": [
+                    "android.intent.action.MAIN"
+                  ],
+                  "categories": [
+                    "android.intent.category.DEFAULT",
+                    "android.intent.category.LAUNCHER"
+                  ]
+                }
+              ],
+              "has_launcher_filter": true,
+              "target_activity": "com.godot.game.GodotApp",
+              "target_declared_before_alias": true,
+              "target_enabled": true,
+              "target_exported": false,
+              "rejection_reasons": [],
+              "unresolved_attributes": [],
+              "usable_launcher": true
+            },
+            {
+              "type": "activity",
+              "name": "org.godotengine.godot.utils.ProcessPhoenix",
+              "enabled": true,
+              "exported": false,
+              "exported_attribute": "false",
+              "intent_filters": [],
+              "has_launcher_filter": false,
+              "rejection_reasons": [
+                "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+                "component_exported_false"
+              ],
+              "unresolved_attributes": [],
+              "usable_launcher": false
+            }
+          ],
+          "unresolved_candidate": false
+        }
+      }
+    },
+    {
+      "id": "signature_verification",
+      "status": "pass",
+      "required": true,
+      "detail": "apksigner verify checks the supplied APK, using its declared Android compatibility range; it does not establish publisher ownership.",
+      "evidence": {
+        "schemes": {
+          "v1": false,
+          "v2": true,
+          "v3": true,
+          "v3.1": false,
+          "v4": false
+        },
+        "command": [
+          "/usr/local/lib/android/sdk/build-tools/35.0.1/apksigner",
+          "verify",
+          "--verbose",
+          "/tmp/imperathen-android-build-f7jy76e4/IMPERATHEN.apk"
+        ],
+        "exit_code": 0,
+        "error": null,
+        "stdout_tail": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\n",
+        "stderr_tail": "",
+        "output_truncated": false
+      }
+    },
+    {
+      "id": "zip_alignment",
+      "status": "pass",
+      "required": true,
+      "detail": "Existing zipalign checks ordinary 4-byte ZIP alignment; this does not establish 16-KB native page compatibility.",
+      "evidence": {
+        "command": [
+          "/usr/local/lib/android/sdk/build-tools/35.0.1/zipalign",
+          "-c",
+          "-v",
+          "4",
+          "/tmp/imperathen-android-build-f7jy76e4/IMPERATHEN.apk"
+        ],
+        "exit_code": 0,
+        "error": null,
+        "stdout_tail": "Verifying alignment of /tmp/imperathen-android-build-f7jy76e4/IMPERATHEN.apk (4)...\n      41 classes.dex (OK - compressed)\n 1960129 classes10.dex (OK - compressed)\n 1973408 classes11.dex (OK - compressed)\n 1994504 classes12.dex (OK - compressed)\n 2006132 classes13.dex (OK - compressed)\n 2008442 classes2.dex (OK - compressed)\n 2009636 classes3.dex (OK - compressed)\n 2029368 classes4.dex (OK - compressed)\n 2057144 classes5.dex (OK - compressed)\n 2067070 classes6.dex (OK - compressed)\n 2087891 classes7.dex (OK - compressed)\n 2146360 classes8.dex (OK - compressed)\n 2156050 classes9.dex (OK - compressed)\n 2159982 lib/arm64-v8a/libc++_shared.so (OK - compressed)\n 2614895 lib/arm64-v8a/libgodot_android.so (OK - compressed)\n28080223 AndroidManifest.xml (OK - compressed)\n28082524 res/anim-v21/fragment_fast_out_extra_slow_in.xml (OK - compressed)\n28082809 res/animator/fragment_close_enter.xml (OK - compressed)\n28083271 res/animator/fragment_close_exit.xml (OK - compressed)\n28083732 res/animator/fragment_fade_enter.xml (OK - compressed)\n28084062 res/animator/fragment_fade_exit.xml (OK - compressed)\n28084393 res/animator/fragment_open_enter.xml (OK - compressed)\n28084846 res/animator/fragment_open_exit.xml (OK - compressed)\n28085328 res/drawable-hdpi-v4/notification_bg_low_normal.9.png (OK)\n28085632 res/drawable-hdpi-v4/notification_bg_low_pressed.9.png (OK)\n28085944 res/drawable-hdpi-v4/notification_bg_normal.9.png (OK)\n28086252 res/drawable-hdpi-v4/notification_bg_normal_pressed.9.png (OK)\n28086572 res/drawable-hdpi-v4/notify_panel_notification_icon_bg.png (OK)\n28086768 res/drawable-mdpi-v4/notification_bg_low_normal.9.png (OK)\n28087076 res/drawable-mdpi-v4/notification_bg_low_pressed.9.png (OK)\n28087384 res/drawable-mdpi-v4/notification_bg_normal.9.png (OK)\n28087692 res/drawable-mdpi-v4/notification_bg_normal_pressed.9.png (OK)\n28088012 res/drawable-mdpi-v4/notify_panel_notification_icon_bg.png (OK)\n28088191 res/drawable-v21/notification_action_background.xml (OK - compressed)\n28088729 res/drawable-v23/compat_splash_screen.xml (OK - compressed)\n28089232 res/drawable-v23/compat_splash_screen_no_icon_background.xml (OK - compressed)\n28089720 res/drawable-xhdpi-v4/notification_bg_low_normal.9.png (OK)\n28090032 res/drawable-xhdpi-v4/notification_bg_low_pressed.9.png (OK)\n28090372 res/drawable-xhdpi-v4/notification_bg_normal.9.png (OK)\n28090688 res/drawable-xhdpi-v4/notification_bg_normal_pressed.9.png (OK)\n28091032 res/drawable-xhdpi-v4/notify_panel_notification_icon_bg.png (OK)\n28091232 res/drawable/icon_background.xml (OK - compressed)\n28091476 res/drawable/notification_bg.xml (OK - compressed)\n28091794 res/drawable/notification_bg_low.xml (OK - compressed)\n28092120 res/drawable/notification_icon_background.xml (OK - compressed)\n28092371 res/drawable/notification_tile_bg.xml (OK - compressed)\n28092620 res/drawable/splash_branding_image.webp (OK)\n28092788 res/drawable/splash_icon.webp (OK)\n28110454 res/layout-v21/notification_action.xml (OK - compressed)\n28111018 res/layout-v21/notification_action_tombstone.xml (OK - compressed)\n28111636 res/layout-v21/notification_template_custom_big.xml (OK - compressed)\n28112507 res/layout-v21/notification_template_icon_group.xml (OK - compressed)\n28112983 res/layout/custom_dialog.xml (OK - compressed)\n28113353 res/layout/godot_app_layout.xml (OK - compressed)\n28113635 res/layout/notification_template_part_chronometer.xml (OK - compressed)\n28113970 res/layout/notification_template_part_time.xml (OK - compressed)\n28114303 res/layout/remote_godot_fragment_layout.xml (OK - compressed)\n28114597 res/layout/snackbar.xml (OK - compressed)\n28115187 res/layout/splash_screen_view.xml (OK - compressed)\n28115556 res/mipmap-anydpi-v26/icon.xml (OK - compressed)\n28115840 res/mipmap-hdpi-v4/icon.webp (OK)\n28120120 res/mipmap-hdpi-v4/icon_background.webp (OK)\n28120240 res/mipmap-hdpi-v4/icon_foreground.webp (OK)\n28130100 res/mipmap-hdpi-v4/icon_monochrome.webp (OK)\n28131288 res/mipmap-mdpi-v4/icon.webp (OK)\n28134152 res/mipmap-mdpi-v4/icon_background.webp (OK)\n28134272 res/mipmap-mdpi-v4/icon_foreground.webp (OK)\n28141568 res/mipmap-mdpi-v4/icon_monochrome.webp (OK)\n28142372 res/mipmap-xhdpi-v4/icon.webp (OK)\n28148144 res/mipmap-xhdpi-v4/icon_background.webp (OK)\n28148268 res/mipmap-xhdpi-v4/icon_foreground.webp (OK)\n28161076 res/mipmap-xhdpi-v4/icon_monochrome.webp (OK)\n28162660 res/mipmap-xxhdpi-v4/icon.webp (OK)\n28171092 res/mipmap-xxhdpi-v4/icon_background.webp (OK)\n28171224 res/mipmap-xxhdpi-v4/icon_foreground.webp (OK)\n28191544 res/mipmap-xxhdpi-v4/icon_monochrome.webp (OK)\n28193856 res/mipmap-xxxhdpi-v4/icon.webp (OK)\n28205180 res/mipmap-xxxhdpi-v4/icon_background.webp (OK)\n28205312 res/mipmap-xxxhdpi-v4/icon_foreground.webp (OK)\n28233220 res/mipmap-xxxhdpi-v4/icon_monochrome.webp (OK)\n28236300 res/mipmap/icon.webp (OK)\n28247616 res/mipmap/icon_background.webp (OK)\n28247728 res/mipmap/icon_foreground.webp (OK)\n28275624 res/mipmap/icon_monochrome.webp (OK)\n28276422 res/xml/godot_provider_paths.xml (OK - compressed)\n28276756 resources.arsc (OK)\n28316203 DebugProbesKt.bin (OK - compressed)\n28317059 kotlin/annotation/annotation.kotlin_builtins (OK - compressed)\n28317658 kotlin/collections/collections.kotlin_builtins (OK - compressed)\n28319226 kotlin/concurrent/atomics/atomics.kotlin_builtins (OK - compressed)\n28320320 kotlin/coroutines/coroutines.kotlin_builtins (OK - compressed)\n28320506 kotlin/internal/internal.kotlin_builtins (OK - compressed)\n28320920 kotlin/kotlin.kotlin_builtins (OK - compressed)\n28326115 kotlin/ranges/ranges.kotlin_builtins (OK - compressed)\n28327439 kotlin/reflect/reflect.kotlin_builtins (OK - compressed)\n28328748 assets/assets/asset_manifest.json (OK - compressed)\n28329366 assets/.godot/imported/frontier_ambience.wav-648aeae78421492de7942fff867912ee.sample (OK - compressed)\n28393371 assets/assets/frontier_ambience.wav.import (OK - compressed)\n28393624 assets/.godot/imported/frontier_hut.glb-4acdf649ad4d9d2b98907bcec4487c22.scn (OK)\n28517328 assets/assets/frontier_hut.glb.import (OK - compressed)\n28517576 assets/.godot/imported/icon.svg-56083ea2a1f1a4f1e49773bdc6d7826c.ctex (OK)\n28535289 assets/assets/icon.svg.import (OK - compressed)\n28535517 assets/scripts/domain/world_model.gdc (OK - compressed)\n28565822 assets/scripts/ui/game_ui.gdc (OK - compressed)\n28606192 assets/scripts/ui/touch_action.gdc (OK - compressed)\n28607822 assets/scripts/ui/touch_pad.gdc (OK - compressed)\n28611116 assets/.godot/exported/133200997/export-3070c538c03ee49b7677ff960a3f5195-main.scn (OK)\n28611862 assets/scripts/world/game_world.gdc (OK - compressed)\n28648604 assets/scripts/world/village_art.gdc (OK - compressed)\n28655445 assets/scripts/main.gdc (OK - compressed)\n28665905 assets/scripts/domain/world_model.gd.remap (OK - compressed)\n28666024 assets/scripts/ui/game_ui.gd.remap (OK - compressed)\n28666140 assets/scripts/ui/touch_action.gd.remap (OK - compressed)\n28666258 assets/scripts/ui/touch_pad.gd.remap (OK - compressed)\n28666359 assets/main.tscn.remap (OK - compressed)\n28666518 assets/scripts/world/game_world.gd.remap (OK - compressed)\n28666638 assets/scripts/world/village_art.gd.remap (OK - compressed)\n28666750 assets/scripts/main.gd.remap (OK - compressed)\n28666864 assets/.godot/global_script_class_cache.cfg (OK - compressed)\n28666926 assets/assets/icon.svg (OK - compressed)\n28667365 assets/.godot/uid_cache.bin (OK - compressed)\n28667671 assets/project.binary (OK - compressed)\n28668128 assets/assets.sparsepck (OK)\n28670288 assets/_cl_ (OK)\n28670432 META-INF/IMPERATH.SF (OK - compressed)\n28676139 META-INF/IMPERATH.RSA (OK - compressed)\n28677664 META-INF/MANIFEST.MF (OK - compressed)\nVerification succesful\n",
+        "stderr_tail": "",
+        "output_truncated": false
+      }
+    },
+    {
+      "id": "apk_unchanged",
+      "status": "pass",
+      "required": true,
+      "detail": "The inspected APK must retain the same size and SHA-256 throughout validation.",
+      "evidence": {}
+    }
+  ],
+  "device_tests": {
+    "status": "not_run",
+    "reason": "Static validator never installs or launches an APK or queries a connected device."
+  },
+  "installability": "not_demonstrated_on_a_device",
+  "source_snapshot": {
+    "status": "recorded",
+    "sha256": {
+      "assets/asset_manifest.json": "1e497f5be2bcc6de7f77a681897b0746b0704ed87e810c7a7d1a97d3f8b31419",
+      "assets/frontier_ambience.wav": "69bdcc1ef52336b462db932f7c28db5014a6109c4225307903a7881bc01b6433",
+      "assets/frontier_hut.glb": "8069c0fc868ee6cb7bdeb2ecadb1351100c8605ea6cdca5c04dcb61e7bb1a230",
+      "main.tscn": "a9f4f0edd8bfb7a776b7c2a0647bfb1324cf615a23065331e09baf24b5263892",
+      "project.godot": "af115082658e52e0da2e934faaf2756db7035a5123acebf278ede6e5f014b174",
+      "scripts/domain/world_model.gd": "6e58dc1a08d6d6cade997b3e1af0441032584deb4ce4b33dd906242403854866",
+      "scripts/main.gd": "ce7aa349ee5bd56349cf6b35a26a9ddd76da55b676d111182bbcbf6bdf9c5934",
+      "scripts/ui/game_ui.gd": "d9fa7feba6e3c65d55291856e2e8da576bfc688537ea1abbae0c30454e384151",
+      "scripts/ui/touch_action.gd": "51881f22f50fdd788b119220687013f1cf0a6719b2197941b0f2eb7c8651ca02",
+      "scripts/ui/touch_pad.gd": "d4834fd301f5cecdc7c92fee152b6febddc4205cecac66cc0ab09bbbc07336e6",
+      "scripts/ui/ui_smoke.gd": "862476f3e63e73372713af0a00bf333f47eede46c0324125f05e3f8d91d514a4",
+      "scripts/world/game_world.gd": "67dc22ed6ca46faa1eeff36037f763610c46e50919a001e2aff10a2301735b3c",
+      "scripts/world/village_art.gd": "bd9d6bd11e12fd13d05b5cefc65060dde1a0219c74caa263b1443eb4f92f222d",
+      "scripts/world/world_smoke.gd": "55a4f6f68316a7e96ca3c9e0a08e5c10149c513d4430daa4a255cfa1114e4160",
+      "tests/domain_test.gd": "a5771875ee64e27890518b45710e56dba46a0152667190c667d1a2dc7d803ea5",
+      "tests/integration_test.gd": "593f25d3be340350c9c99dee41167dc9d7c13eb7b2d2937591adea7b92081547"
+    },
+    "scope": "Local source snapshot only; not proof that transformed APK bytes were produced from these exact sources."
+  },
+  "available_abis": [
+    "arm64-v8a"
+  ],
+  "signature_indicators": {
+    "v1_certificate_entries": [
+      "META-INF/IMPERATH.RSA"
+    ],
+    "apk_signing_block_marker": true
+  },
+  "overall_status": "pass",
+  "passed": true,
+  "scope": "Static APK/package/signature evidence only. No graphics, touch, audio, FPS, thermal, installation, launch, or real-device success is claimed."
+}

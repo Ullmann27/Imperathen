@@ -42,3 +42,10 @@ Die nächste sachliche Reihenfolge lautet: vorhandenes Material prüfen, Widersp
 Für eine Änderung sind Anlass, betroffene IDs, verworfene Alternativen, Risiken und erwarteter Prüfbeleg festzuhalten. Routineentscheidungen innerhalb freigegebener Grenzen kann der verantwortliche Agent selbst treffen. Änderungen an Spielerlebnis, Plattform, Kosten oder Veröffentlichung müssen sichtbar als Entscheidung erfolgen. Rückwirkendes Umschreiben früherer Nachweise ist ausgeschlossen; eine neue Entscheidung verweist auf die ersetzte.
 
 **Verwandte Spezifikationen:** [Weltzustand und Zeit](WORLD_STATE_AND_TIME_CONTRACT.md), [Narrative](NARRATIVE_CONTRACT.md), [Leistungsplanung](PLATFORM_AND_PERFORMANCE_PLAN.md).
+
+
+## ADR-012 – Erste ausführbare Einstiegsvorschau (22.11.2026)
+
+Status: umgesetzt für den begrenzten Entwicklungsauftrag. Die Vorschau unter preview/ kann ohne Engine-Download und ohne externe Dienste gestartet und gebündelt werden. Die geplante Unreal-Richtung bleibt offen bis zur echten Toolchain-Abnahme; game/Imperathen ist ein separater nativer Anfang. Kein Ersatz der langfristigen 3D-Spielvision durch reine Menüverwaltung.
+
+Die Vorstufen besitzen getrennte, ausdrücklich benannte Saveformate. Kein Konverter und keine allgemeine Produktionssave-Migration werden behauptet. Die nativen Ressourcenregeln entsprechen dem ersten Browserabschnitt. Visuelle und native UI-Qualität brauchen ihren noch ausstehenden Lauf in einer zulässigen Testumgebung.

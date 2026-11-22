@@ -15,3 +15,31 @@ Thumbs.db
 # Arbeitsmaterial wird vor Import gezielt geprüft
 scratch/
 local-only/
+
+# Godot imports, editor state, local exports and Python caches
+.godot/
+__pycache__/
+*.pyc
+exports/
+*.blend1
+
+# Android build outputs and private signing material
+builds/
+artifacts/
+android-runtime/
+*.apk
+*.aab
+*.keystore
+*.jks
+# Reproduzierbare lokale Entwicklungsartefakte
+node_modules/
+artifacts/
+dist/
+__pycache__/
+*.pyc
+game/**/Binaries/
+game/**/DerivedDataCache/
+game/**/Intermediate/
+game/**/Saved/
+*.sln
+*.vcxproj*
