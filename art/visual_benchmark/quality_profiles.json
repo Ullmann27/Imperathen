@@ -48,7 +48,8 @@
       "shadow_distance_metres": 85,
       "mesh_lod_threshold": 0.65,
       "decoration_fraction": 1,
-      "glow": true
+      "glow": true,
+      "desktop_max_3d_pixels": 8294400
     },
     "very_high": {
       "label": "Sehr hoch",
