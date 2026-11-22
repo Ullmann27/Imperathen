@@ -206,9 +206,10 @@ func show_menu(can_continue: bool) -> void:
 	buttons.add_child(new_button)
 	var demo_button := _button("Talgefecht erproben", func(): _emit("valley_demo"))
 	buttons.add_child(demo_button)
-	buttons.add_child(_button("Weltkugel erkunden", func(): _emit("atlas_demo")))
+	var atlas_button := _button("Weltkugel erkunden", func(): _emit("atlas_demo"))
+	buttons.add_child(atlas_button)
 	if OS.is_debug_build() and OS.has_feature("android"):
-		_log_menu_buttons.call_deferred(demo_button, continue_button)
+		_log_menu_buttons.call_deferred(demo_button, atlas_button, continue_button)
 	buttons.add_child(_button("Einstellungen", func(): _show_settings("menu")))
 	buttons.add_child(_button("Spiel beenden", func(): _confirm("Spiel beenden?", "Ein laufender Lebensweg wird vor dem Beenden gespeichert.", "quit", {})))
 	var filler := Control.new()
@@ -250,7 +251,7 @@ func _add_origin_picker(parent: VBoxContainer) -> void:
 	)
 
 
-func _log_menu_buttons(demo: Button, resume: Button) -> void:
+func _log_menu_buttons(demo: Button, atlas: Button, resume: Button) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	if not is_instance_valid(demo) or not demo.is_visible_in_tree():
@@ -258,8 +259,10 @@ func _log_menu_buttons(demo: Button, resume: Button) -> void:
 	var transform := get_viewport().get_screen_transform()
 	var demo_center := transform * demo.get_global_rect().get_center()
 	var resume_center := transform * resume.get_global_rect().get_center()
+	var atlas_center := transform * atlas.get_global_rect().get_center()
 	print("IMPERATHEN_MENU_TOUCH " + JSON.stringify({
 		"demo": [demo_center.x, demo_center.y],
+		"atlas": [atlas_center.x, atlas_center.y],
 		"continue": [resume_center.x, resume_center.y],
 		"can_continue": not resume.disabled}))
 

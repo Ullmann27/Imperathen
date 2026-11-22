@@ -201,6 +201,12 @@ def main():
         record("measured_valley_frames", bool(samples), {"intervals": len(samples),
                "scope": "Software-rendered emulator; CPU/GPU values are latest renderer timings, frame time is an interval mean"})
 
+        atlas_menu = relaunch()
+        tap(atlas_menu["atlas"])
+        wait_marker("IMPERATHEN_ATLAS_READY")
+        time.sleep(2)
+        screenshot("06_android_globe.png")
+        record("world_globe", True, "Opened the playable globe through the main menu on a square display")
         final_log = logs() + "\n" + "\n".join(path.read_text(encoding="utf-8") for path in args.output.glob("logcat-*.txt"))
         errors = [line for line in final_log.splitlines() if re.search(r"SCRIPT ERROR:|Parse Error:|FATAL EXCEPTION|Fatal signal|ERROR:.*res://", line)]
         record("no_runtime_script_crash", not errors, errors)
