@@ -10,11 +10,29 @@ button. Screenshots and logcat remain inspectable; errors never become fake pass
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 import struct
 import subprocess
 import time
+import xml.etree.ElementTree as ET
+
+
+def runtime_error_lines(text):
+    pattern = re.compile(
+        r"SCRIPT ERROR:|Parse Error:|FATAL EXCEPTION|Fatal signal|"
+        r"\bgodot(?:\(\s*\d+\))?\s*:\s*ERROR:|ERROR:.*res://", re.IGNORECASE)
+    return [line for line in text.splitlines() if pattern.search(line)]
+
+
+def fullscreen_hint_nodes(hierarchy):
+    nodes = [node for node in hierarchy.iter("node")
+             if node.get("package") == "com.android.systemui"]
+    hint = any(node.get("text", "").strip().casefold() == "viewing full screen" for node in nodes)
+    buttons = [node for node in nodes if node.get("text", "").strip().casefold() == "got it"
+               and node.get("clickable") == "true" and node.get("enabled") == "true"]
+    return hint, buttons
 
 
 def main():
@@ -27,6 +45,8 @@ def main():
     package = "at.heinz.imperathen"
     report = {"platform": "Android emulator", "apk_sha256": hashlib.sha256(args.apk.read_bytes()).hexdigest(), "physical_device_test": False,
               "arm64_runtime_test": False, "status": "failed", "checks": [], "errors": []}
+    report["source_commit"] = os.environ.get("GITHUB_SHA")
+    report["apk_file"] = args.apk.name
     serial = ""
     verified_emulator = False
 
@@ -58,6 +78,43 @@ def main():
             raise RuntimeError("Screenshot repeats a previous screen: " + name)
         width, height = struct.unpack(">II", data[16:24])
         previous[name] = {"sha256": digest, "width": width, "height": height}
+
+    def ui_hierarchy(stage):
+        if not verified_emulator:
+            raise RuntimeError("System UI inspection requires a verified disposable emulator")
+        remote = "/sdcard/imperathen-runtime-ui.xml"
+        adb("shell", "rm", "-f", remote)
+        dumped = adb("shell", "uiautomator", "dump", "--compressed", remote, timeout=30)
+        xml = adb("shell", "cat", remote)
+        (args.output / (stage + "_ui.xml")).write_text(xml + "\n", encoding="utf-8")
+        hierarchy = ET.fromstring(xml)
+        if hierarchy.tag != "hierarchy":
+            raise RuntimeError("UIAutomator did not return a window hierarchy: " + dumped)
+        return hierarchy
+
+    def dismiss_fullscreen_hint(stage):
+        hierarchy = ui_hierarchy(stage + "_before")
+        hint, buttons = fullscreen_hint_nodes(hierarchy)
+        if not hint:
+            report["checks"].append({"name": stage + "_system_fullscreen_hint_absent", "passed": True,
+                                     "detail": {"xml": stage + "_before_ui.xml", "clicked": False}})
+            return
+        record(stage + "_system_fullscreen_button", len(buttons) == 1,
+               {"matching_enabled_buttons": len(buttons), "xml": stage + "_before_ui.xml"})
+        button = buttons[0]
+        bounds = re.fullmatch(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", button.get("bounds", ""))
+        if not bounds:
+            raise RuntimeError("Observed SystemUI button has no usable bounds")
+        left, top, right, bottom = map(int, bounds.groups())
+        record(stage + "_system_fullscreen_bounds", right > left and bottom > top,
+               {"package": button.get("package"), "text": button.get("text"),
+                "resource_id": button.get("resource-id"), "bounds": button.get("bounds")})
+        # Coordinates come only from the current, verified SystemUI hierarchy.
+        adb("shell", "input", "tap", str((left + right) // 2), str((top + bottom) // 2))
+        time.sleep(1)
+        still_present, _ = fullscreen_hint_nodes(ui_hierarchy(stage + "_after"))
+        record(stage + "_system_fullscreen_hint_dismissed", not still_present,
+               {"before_xml": stage + "_before_ui.xml", "after_xml": stage + "_after_ui.xml"})
 
     def wait_marker(marker, timeout=80):
         deadline = time.monotonic() + timeout
@@ -137,7 +194,7 @@ def main():
         report["api_level"] = adb("shell", "getprop", "ro.build.version.sdk")
         report["abi"] = adb("shell", "getprop", "ro.product.cpu.abi")
         report["model"] = adb("shell", "getprop", "ro.product.model")
-        record("android_17_emulator", report["api_level"] == "37" and report["abi"] == "x86_64", {
+        record("expected_android_emulator", report["api_level"] == "35" and report["abi"] == "x86_64", {
             "api_level": report["api_level"], "abi": report["abi"], "model": report["model"]})
         adb("shell", "wm", "size", "720x1280")
         adb("shell", "wm", "density", "160")
@@ -161,11 +218,13 @@ def main():
         report["pid"] = pid
         menu = json.loads(wait_marker("IMPERATHEN_MENU_READY "))
         record("real_menu", "new_game" in menu, menu)
+        dismiss_fullscreen_hint("menu")
         screenshot("01_android_menu.png")
         tap(menu["new_game"])
         wait_marker("IMPERATHEN_SESSION_STARTED")
         record("touch_starts_saved_game", True, "New game button produced a saved village")
         time.sleep(3)
+        dismiss_fullscreen_hint("world")
         screenshot("02_android_world.png")
         adb("shell", "input", "keyevent", "4")
         wait_marker("IMPERATHEN_PAUSED")
@@ -208,10 +267,10 @@ def main():
         screenshot("06_android_globe.png")
         record("world_globe", True, "Opened the playable globe through the main menu on a square display")
         final_log = logs() + "\n" + "\n".join(path.read_text(encoding="utf-8") for path in args.output.glob("logcat-*.txt"))
-        errors = [line for line in final_log.splitlines() if re.search(r"SCRIPT ERROR:|Parse Error:|FATAL EXCEPTION|Fatal signal|ERROR:.*res://", line)]
-        record("no_runtime_script_crash", not errors, errors)
+        errors = runtime_error_lines(final_log)
+        record("no_runtime_errors", not errors, errors)
         report["status"] = "passed"
-    except (RuntimeError, subprocess.TimeoutExpired, json.JSONDecodeError, OSError) as error:
+    except (RuntimeError, subprocess.TimeoutExpired, json.JSONDecodeError, ET.ParseError, OSError) as error:
         report["errors"].append(str(error))
         if verified_emulator:
             try:
@@ -229,7 +288,7 @@ def main():
             if verified_emulator:
                 (args.output / "logcat.txt").write_text(logs() if "pid" in report else adb("logcat", "-d", checked=False), encoding="utf-8")
         except (OSError, subprocess.TimeoutExpired, RuntimeError):
-            pass
+            report.setdefault("diagnostic_errors", []).append("Unable to capture final logcat")
         (args.output / "runtime-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
     raise SystemExit(0 if report["status"] == "passed" else 1)

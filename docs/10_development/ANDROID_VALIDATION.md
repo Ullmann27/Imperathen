@@ -77,6 +77,9 @@ Das Tal-APK wird zusätzlich auf die kompilierten Taktik- und Darstellungsskript
 
 ## 5. Gesonderter Android-Lauf
 
+Beim Android-17-Versuch mit API 37 und x86_64 auf dem Runner bestätigte ADB die Geräteversion und ABI. Der Android-Compositor SurfaceFlinger brach vor der App-Installation wiederholt im `mapper.ranchu`-Modul ab (Assertion `!rcEnc->featureInfo()->hasReadColorBufferDma`). Der Paketdienst verlor daraufhin die Verbindung. Die ARM64- und x86_64-Artefakte waren vorher im selben Workflow exportiert und verifiziert worden. Für den regulären Lauf verwendet der Workflow API 35 und ANGLE über SwiftShader. [Android-17-Versuch und Berichte](https://github.com/Ullmann27/Imperathen/actions/runs/45036842382)
+
+
 Ein weiterer Bericht muss das konkrete APK anhand seiner Prüfsumme zu einem tatsächlichen Installations- und Startversuch zuordnen. Zu dokumentieren sind mindestens Android-Version, Geräte-/Emulatorart, ABI, Installationsresultat, gestartete Activity und beobachtetes Verhalten. Eine fehlende oder nicht autorisierte Geräteverbindung wird als fehlende Evidenz geführt. [4]
 
 Für den ersten Spieltest werden Vorspann, Menü, neuer Spielstand, Touchbewegung samt gleichzeitigem Angriff, Bauplatzierung, Ausbildung, Kampf, Folgeentscheidung, Speichern/Laden und App-Hintergrundwechsel überprüft. Audio, sichtbare Bildfehler und Bildschirmränder benötigen echte Beobachtungen. FPS, Energieverbrauch und thermisches Verhalten werden nur mit passenden tatsächlichen Messungen berichtet.
