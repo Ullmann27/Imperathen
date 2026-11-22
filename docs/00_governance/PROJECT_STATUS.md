@@ -1,5 +1,7 @@
 # Projektstatus
 
+**Aktuelle Charakterfortsetzung, 22.11.2026.** Der Arbeitsbranch `feature/hero-realism-20261122` baut auf `integration/realistic-android-23` auf. Ausführbare Änderungen, Originalmodelle, Renderings und aktuelle Prüfungen stehen im [Charakter-Lieferbericht](../14_character_realism/DELIVERY.md). Die vom Nutzer mit einem Spielbild konkretisierte PC-/Konsolenqualität bleibt der visuelle Maßstab; weder ein Konzeptbild noch ein bestandener Dateivertrag schließen die Qualitätsanforderung aus [Issue #33](https://github.com/Ullmann27/Imperathen/issues/33).
+
 **Aktueller Integrationsstand.** Die zusammengeführte Android- und Desktop-Linie, Abnahme und offene Punkte stehen im [Lieferbericht](../12_integration/DELIVERY.md). Die folgenden Angaben dokumentieren den vorausgehenden Arbeitsstand.
 
 **Stand: 22.11.2026 · Phase: erster ausführbarer Funktionsprototyp · Arbeitstitel: IMPERATHEN**

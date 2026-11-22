@@ -1,0 +1,38 @@
+name: Blender Roman weapons validation
+on:
+  push:
+    branches: ['feature/blender-weapons-procedural-20261122', 'feature/hero-realism-20261122']
+    paths:
+      - 'tools/build_roman_weapons.py'
+      - 'tools/validate_weapon_glb.py'
+      - 'tools/art/validate_visual_assets.py'
+      - 'tools/art/common.py'
+      - 'art/visual_benchmark/materials/**'
+      - '.github/workflows/blender-weapons.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  blender-weapons:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender
+        run: sudo apt-get update && sudo apt-get install -y blender python3-numpy
+      - name: Validate generator syntax
+        run: python3 -m py_compile tools/build_roman_weapons.py tools/validate_weapon_glb.py
+      - name: Generate original assets
+        run: |
+          mkdir -p generated/weapons
+          blender --background --python tools/build_roman_weapons.py -- --output "$PWD/generated/weapons"
+          test -s generated/weapons/gladius_lod0.glb
+          test -s generated/weapons/scutum_lod0.glb
+      - name: Validate generated GLBs
+        run: python3 tools/validate_weapon_glb.py generated/weapons/gladius_lod0.glb generated/weapons/scutum_lod0.glb
+      - name: Archive Blender sources and GLB assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: imperathen-gladius-scutum-source-and-glb
+          path: generated/weapons/
+          retention-days: 14

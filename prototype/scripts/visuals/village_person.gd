@@ -6,6 +6,9 @@ const COMPANION_COLORS := {"italia":"ddd0ab","germania":"91907a","han":"8197a4",
 const HAIR := {"italia":["",""],"germania":["","braid"],"han":["knot","knot"],"wa":["tie","tie"],"vistula":["braid","braid"]}
 const COMPANIONS := {"italia":"marcus","germania":"albrun","han":"lin","wa":"aki","vistula":"mira"}
 const LOOPS := ["idle","march","run","talk","work"]
+const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
+const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
+const LOD_DISTANCES := [11.0,23.0,44.0]
 static var scenes := {}
 static var materials := {}
 var role := "player"
@@ -16,6 +19,7 @@ var profile := "balanced"
 var detail := -1
 var body: Node3D
 var animator: AnimationPlayer
+var active_model_path := ""
 var clip := "idle"
 var phase := 0.0
 var speed := 0.0
@@ -23,6 +27,8 @@ var _remaining := 0.0
 var _check_lod := 0.0
 var _posed := false
 var _blade: MeshInstance3D
+var _face := FacialMotion.new()
+var _lod_profile := ""
 
 
 func _ready() -> void:
@@ -40,6 +46,19 @@ func configure(kind: String, origin: String, years: int) -> void:
 
 
 func _path(level: int) -> String:
+	# This asset has an authored Italia identity. Other origins and companions
+	# keep their own appearances until their replacement models are available.
+	if role == "player" and home == "italia":
+		var complete_set := true
+		for candidate in 4:
+			if not ResourceLoader.exists(HERO_PATH % candidate, "PackedScene"):
+				complete_set = false
+		if complete_set:
+			return HERO_PATH % level
+	return _legacy_path(level)
+
+
+func _legacy_path(level: int) -> String:
 	if role in ["mentor","recruit","enemy"]:
 		var equipment := "officer" if role == "mentor" else ("spear" if role == "recruit" else "heavy")
 		if level >= 2:
@@ -50,16 +69,26 @@ func _path(level: int) -> String:
 
 
 func _reload(level: int) -> void:
+	level = clampi(level, 0, 3)
 	var saved_phase := phase
+	var previous_path := active_model_path
 	var path := _path(level)
-	if not scenes.has(path):
-		scenes[path] = load(path)
+	var replacement := _instantiate(path)
+	if not replacement and path != _legacy_path(level):
+		path = _legacy_path(level)
+		replacement = _instantiate(path)
+	if not replacement:
+		push_warning("Character model unavailable: " + path)
+		return
+	# Load and validate before removing the current model. A failed optional
+	# asset must not make a visible actor disappear during a quality transition.
 	_blade = null
 	if body:
 		remove_child(body)
 		body.free()
 	detail = level
-	body = scenes[path].instantiate()
+	body = replacement
+	active_model_path = path
 	body.name = "Model"
 	body.rotation.y = PI
 	var size_factor := 1.0
@@ -74,10 +103,35 @@ func _reload(level: int) -> void:
 		animator.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	for shape: MeshInstance3D in body.find_children("*","MeshInstance3D",true,false):
 		_style(shape)
+	_face.bind(body, identity)
 	_play(clip,saved_phase,0)
+	_face.pose(clip,saved_phase,detail)
+	# Retaining every hero PackedScene would also retain every embedded texture
+	# tier. Live instances keep their own references; inactive tiers may unload.
+	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
+		for cached_path: String in scenes.keys():
+			if cached_path.begins_with("res://assets/characters/hero_quality_") and cached_path != path:
+				scenes.erase(cached_path)
+
+
+func _instantiate(path: String) -> Node3D:
+	if not scenes.has(path):
+		if not ResourceLoader.exists(path, "PackedScene"):
+			return null
+		var scene := load(path) as PackedScene
+		if not scene:
+			return null
+		scenes[path] = scene
+	var instance: Node = (scenes[path] as PackedScene).instantiate()
+	if instance is Node3D:
+		return instance as Node3D
+	instance.free()
+	scenes.erase(path)
+	return null
 
 
 func _style(shape: MeshInstance3D) -> void:
+	if not shape.mesh: return
 	var part := String(shape.name)
 	if part.begins_with("Garment_"):
 		shape.visible = part == "Garment_"+home
@@ -135,6 +189,7 @@ func reset_motion() -> void:
 	speed = 0
 	_posed = false
 	_play("idle",0,0)
+	_face.pose("idle",0,detail)
 
 
 func keep_working() -> void:
@@ -145,6 +200,7 @@ func keep_working() -> void:
 func sample_pose(action: String, normalized: float) -> void:
 	_posed = true
 	_play(action,normalized,0)
+	_face.pose(action,normalized,detail)
 
 
 func _play(action: String, normalized: float, blend: float) -> void:
@@ -155,6 +211,7 @@ func _play(action: String, normalized: float, blend: float) -> void:
 	var name_in_file := action
 	if not animator.has_animation(name_in_file):
 		name_in_file = "attack" if action == "train" else "idle"
+	if not animator.has_animation(name_in_file): return
 	var animation := animator.get_animation(name_in_file)
 	animation.loop_mode = Animation.LOOP_LINEAR if action in LOOPS else Animation.LOOP_NONE
 	animator.play(name_in_file,blend)
@@ -167,8 +224,17 @@ func refresh_lod(camera: Camera3D) -> void:
 	var distance := global_position.distance_to(camera.global_position)
 	var factor := float({"low":0.55,"balanced":0.86,"high":1.15,"very_high":1.5}.get(profile,1.0))
 	var level := 0
-	for threshold: float in [11.0,23.0,44.0]:
+	for threshold: float in LOD_DISTANCES:
 		if distance >= threshold * factor: level += 1
+	var same_profile := profile == _lod_profile
+	_lod_profile = profile
+	# A narrow dead band prevents repeated asset loads when walking along a LOD
+	# boundary. An explicit graphics-profile change is applied without delay.
+	if same_profile and detail >= 0:
+		if level > detail and distance < LOD_DISTANCES[detail] * factor * 1.10:
+			return
+		if level < detail and distance > LOD_DISTANCES[detail - 1] * factor * 0.90:
+			return
 	if level != detail: _reload(level)
 
 
@@ -192,3 +258,4 @@ func _process(delta: float) -> void:
 		animator.advance(advance)
 		if animator.current_animation != "":
 			phase = animator.current_animation_position / animator.current_animation_length
+	_face.advance(delta,clip,detail)

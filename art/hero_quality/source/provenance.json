@@ -1,0 +1,84 @@
+{
+  "upstream_repository": "https://github.com/makehumancommunity/makehuman",
+  "revision": "a8bc2d54ff0ac92e78ff71431b1023eda42bf482",
+  "license": "CC0-1.0 (graphical assets only; no MakeHuman program source imported)",
+  "license_evidence": [
+    "LICENSE.md section C",
+    "LICENSE.ASSETS.md",
+    "CC0 declaration in every .mhclo/.mhmat header"
+  ],
+  "files": [
+    {
+      "local": "base.obj",
+      "sha256": "8e761e6624b8f54536409135d1636da63b32486a90d4897f84e121d144f6fb4c",
+      "bytes": 1749303,
+      "upstream_path": "makehuman/data/3dobjs/base.obj",
+      "git_blob_sha": "d26635e9326e3cca30778fd7b9c00062b03cce09"
+    },
+    {
+      "local": "caucasian-male-child.target",
+      "sha256": "401b9b0349c88dc7aacb81e71f67daf747fecde0f7fd7f3f6e10fb2ce5586d1e",
+      "bytes": 441028,
+      "upstream_path": "makehuman/data/targets/macrodetails/caucasian-male-child.target",
+      "git_blob_sha": "027c36a1fdb0e47efb33700c29ef012f8c6ccfe3"
+    },
+    {
+      "local": "caucasian-male-young.target",
+      "sha256": "70e228ba7164737dae664454394536fc5935fa48d333c1a97d77e2dc6eacc5f5",
+      "bytes": 396479,
+      "upstream_path": "makehuman/data/targets/macrodetails/caucasian-male-young.target",
+      "git_blob_sha": "c3b82f92c5ced85599199cd184b0faf3b3fc6881"
+    },
+    {
+      "local": "universal-male-young-maxmuscle-averageweight.target",
+      "sha256": "c171ff9cc95e96273beb3e3b1969a01988c2d4982ebc6fe04bf81cf72ee3b295",
+      "bytes": 147110,
+      "upstream_path": "makehuman/data/targets/macrodetails/universal-male-young-maxmuscle-averageweight.target",
+      "git_blob_sha": "b7c039c7f463fe1f1721b9ab269c7248d9c4f2f7"
+    },
+    {
+      "local": "high-poly.obj",
+      "sha256": "da2493215b708a344c33dc72f2a9a5b8fa985dcc5a70ad3b208995cf871da8e1",
+      "bytes": 100882,
+      "upstream_path": "makehuman/data/eyes/high-poly/high-poly.obj",
+      "git_blob_sha": "01562a9caf4dca9ebb1fd5c24db083c17e724330"
+    },
+    {
+      "local": "high-poly.mhclo",
+      "sha256": "b183cfe37120ab726f9b3f2ea6cd3a64c44ce7b4bd91a77c841cf70c04f83a0d",
+      "bytes": 72490,
+      "upstream_path": "makehuman/data/eyes/high-poly/high-poly.mhclo",
+      "git_blob_sha": "22bc5f77f398c59088804f7f4c9bb0e39d38661d"
+    },
+    {
+      "local": "brown_eye.png",
+      "sha256": "4659691c7295ad6206c78b003e5fd0e5f91dcd53032fa914a229bb48cabe424b",
+      "bytes": 610817,
+      "upstream_path": "makehuman/data/eyes/materials/brown_eye.png",
+      "git_blob_sha": "bda1b4b0d94f4b7b34ca4f58063eab04f05cd2e7"
+    },
+    {
+      "local": "default_weights.mhw",
+      "sha256": "0f3641d651ae3d00ad6b4ccee43142edb109d3bd909d27d9e4139ef1beed8625",
+      "bytes": 897521,
+      "upstream_path": "makehuman/data/rigs/default_weights.mhw",
+      "git_blob_sha": "66185806afacf87749be8e5cf6dbf66496b2a6b0"
+    },
+    {
+      "local": "LICENSE.md",
+      "sha256": "edd99571ca62698f78c943fd4fffb159a413c315fa0d4819d3cec5cadaf8b4f1",
+      "bytes": 3598,
+      "upstream_path": "LICENSE.md",
+      "git_blob_sha": "5d1a49d31ebdaa46b06c52eae2c005c678a63ffa"
+    },
+    {
+      "local": "LICENSE.ASSETS.md",
+      "sha256": "f6089cba01cb570a24712b41ab8a586ccd3cc5ef53dc266ca50b95c288956d2c",
+      "bytes": 6962,
+      "upstream_path": "LICENSE.ASSETS.md",
+      "git_blob_sha": "f3ede1fc3318f8d794e2cb51924186c62f02f71a"
+    }
+  ],
+  "system_assets_receipt": "system_assets/provenance.json",
+  "modifications": "Custom age blend, axis/height normalization, mapped15joint weights, tailored clothing, original procedural micro normal/roughness, facial shapes and fourGLB LOD exports."
+}

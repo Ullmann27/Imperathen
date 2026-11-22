@@ -2,6 +2,8 @@
 
 IMPERATHEN verbindet das Leben in einer antik inspirierten Grenzsiedlung mit Formationskämpfen und einer drehbaren Weltkugel. Android ARM64 ist die erste Zielplattform. Dieselbe Godot-Spielbasis exportiert für Windows und Linux.
 
+**Aktueller Charakterausbau.** Der Italia-Hauptcharakter erhält eine anatomisch modellierte 3D-Figur mit separaten Augen, Gesichtsmorphs, vier Detailstufen und einer Blender-Quelle. Die Lieferung dokumentiert echte Blender-Renderings, Godot-Aufnahmen und die noch offenen Unterschiede zur vom Nutzer vorgegebenen PC-/Konsolenqualität. [Charakterlieferung und Prüfnachweise](docs/14_character_realism/DELIVERY.md) · [Historische Gesichtsquellen](docs/art/CHARACTER_REFERENCE_SOURCES_2026_11_22.md) · [Gladius und Scutum](art/weapons/README.md)
+
 **Figuren.** Das Hauptmenü zeigt unter **Figuren** 18 freigestellte historische Charakterbilder. Die Chronik enthält die zu deinem Lebenslauf gehörenden Personen. [Figuren und Originaldateien](art/portraits/README.md) · [Android-, Windows- und Bilddownloads](https://github.com/Ullmann27/Imperathen/releases)
 
 **Spielen.** Im Hauptmenü startet **Neues Leben** einen gespeicherten Lebenslauf aus einer von fünf Herkünften. **Talgefecht erproben** führt sofort in die Schlacht mit 60 Soldaten. **Weltkugel erkunden** öffnet eine freie Saisonkampagne. Im Lebenslauf werden die regionalen Aufträge nach der Dorfverteidigung zugänglich. [Spielanleitung](prototype/README.md)
@@ -36,4 +38,4 @@ IMPERATHEN verbindet das Leben in einer antik inspirierten Grenzsiedlung mit For
 
 ## Entwicklung
 
-Aktuelle Entwicklung und Abnahme erfolgen im [Integrations-PR #22](https://github.com/Ullmann27/Imperathen/pull/22). Die früheren Fachkonzepte und Prüfberichte beschreiben ihre jeweiligen historischen Lieferstände.
+Die Charakterfortsetzung liegt auf `feature/hero-realism-20261122`, ausgehend von `integration/realistic-android-23` ([PR #25](https://github.com/Ullmann27/Imperathen/pull/25)). Der [ursprüngliche Integrations-PR #22](https://github.com/Ullmann27/Imperathen/pull/22), die früheren Fachkonzepte und Prüfberichte beschreiben ihre jeweiligen historischen Lieferstände. Die offene visuelle Abnahme des Hauptcharakters bleibt in [Issue #33](https://github.com/Ullmann27/Imperathen/issues/33) festgehalten.

@@ -1,0 +1,24 @@
+[
+  {
+    "asset": "gladius_lod0",
+    "geometry": [
+      {
+        "mesh": "WeaponGeometry",
+        "nonmanifold_edges": 0,
+        "zero_area_faces": 0
+      }
+    ],
+    "external_image_count": 0
+  },
+  {
+    "asset": "scutum_lod0",
+    "geometry": [
+      {
+        "mesh": "WeaponGeometry",
+        "nonmanifold_edges": 0,
+        "zero_area_faces": 0
+      }
+    ],
+    "external_image_count": 0
+  }
+]

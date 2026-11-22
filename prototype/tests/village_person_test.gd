@@ -47,17 +47,23 @@ func run() -> void:
 		var friend: Person = world.get_node("Marcus/Figure")
 		var state_before := model.data.duplicate(true)
 		for person: Person in [hero,friend]:
-			var civilian: MeshInstance3D = person.body.find_child("Civilian",true,false)
+			var hero_asset := person.active_model_path.begins_with("res://assets/characters/hero_quality_")
+			var civilian: MeshInstance3D = person.body.find_child("HeroBody" if hero_asset else "Civilian",true,false)
 			var skeleton: Skeleton3D = person.body.find_children("*","Skeleton3D",true,false)[0]
 			check(civilian.skin != null and skeleton.get_bone_count() == 15,home+" uses the imported skin")
-			var face := surface(civilian,"PortraitSkin")
+			var face := surface(civilian,"HeroSkin" if hero_asset else "PortraitSkin")
 			var expected: String = "hero_"+home if person == hero else Person.COMPANIONS[home]
-			check(face != null and face.albedo_texture.resource_path.ends_with("/"+expected+".webp"),expected+" face texture on visible skin")
-			var tunic := surface(civilian,"Civilian_Linen")
+			if hero_asset:
+				check(face != null and face.albedo_texture != null,expected+" authored UV skin is preserved")
+			else:
+				check(face != null and face.albedo_texture.resource_path.ends_with("/"+expected+".webp"),expected+" face texture on visible skin")
+			var garment := person.body.find_child("HeroTunic",true,false) as MeshInstance3D if hero_asset else civilian
+			var tunic := surface(garment,"HeroLinen" if hero_asset else "Civilian_Linen")
 			check(tunic != null and tunic.albedo_texture != null and tunic.normal_texture != null and tunic.roughness_texture != null,expected+" linen texture, normal and roughness")
 			if person == hero: swatches[tunic.albedo_color.to_html()] = true
-			for region: String in Person.COMPANIONS:
-				check(person.body.find_child("Garment_"+region,true,false).visible == (region == home), expected+" only equips its regional garment")
+			if not hero_asset:
+				for region: String in Person.COMPANIONS:
+					check(person.body.find_child("Garment_"+region,true,false).visible == (region == home), expected+" only equips its regional garment")
 			check(civilian.get_blend_shape_value(civilian.find_blend_shape_by_name("Companion")) == float(person == friend),expected+" identity shape")
 			check(civilian.get_blend_shape_value(civilian.find_blend_shape_by_name("Mature")) == 0.0,expected+" youth shape")
 		var previous := 1000000
@@ -102,9 +108,13 @@ func run() -> void:
 	state.buildings[0].progress = .12
 	world.sync_state(state)
 	check(hero.clip == "work" and is_equal_approx(hero.phase,time_before),"construction progress preserves work phase")
-	var adult: MeshInstance3D = hero.body.find_child("Civilian",true,false)
+	var hero_asset := hero.active_model_path.begins_with("res://assets/characters/hero_quality_")
+	var adult: MeshInstance3D = hero.body.find_child("HeroBody" if hero_asset else "Civilian",true,false)
 	check(hero.body.scale.y > 1.10 and adult.get_blend_shape_value(adult.find_blend_shape_by_name("Mature")) > .99,"adult height and proportions")
-	check(surface(adult,"PortraitSkin").albedo_texture.resource_path.ends_with("/adult_italia.webp"),"adult Italian portrait UV")
+	if hero_asset:
+		check(surface(adult,"HeroSkin").albedo_texture != null,"adult keeps authored skin UV")
+	else:
+		check(surface(adult,"PortraitSkin").albedo_texture.resource_path.ends_with("/adult_italia.webp"),"adult Italian portrait UV")
 	hero.sample_pose("train",.4)
 	check(hero.body.find_child("PracticeBlade",true,false).visible,"adult practice equipment follows action")
 	hero.sample_pose("idle",.4)

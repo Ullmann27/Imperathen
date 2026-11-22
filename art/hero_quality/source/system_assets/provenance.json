@@ -1,0 +1,138 @@
+{
+  "url": "https://files.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+  "download_sha256": "b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107",
+  "files": [
+    {
+      "path": "skins/young_caucasian_male/young_lightskinned_male_diffuse.png",
+      "sha256": "862a26e335e958b70534cb5f0d7c47ef30ab148a56c42b3e9da969cf76f12963",
+      "bytes": 3693828,
+      "zip_crc": "e723c591"
+    },
+    {
+      "path": "skins/young_caucasian_male/young_caucasian_male.thumb",
+      "sha256": "9ea46d1b5c4230bcff248b1262eaf4f5b4b14bbffd8fc09d2c20c6058f02e12d",
+      "bytes": 79031,
+      "zip_crc": "d8cd0171"
+    },
+    {
+      "path": "skins/young_caucasian_male/young_caucasian_male.mhmat",
+      "sha256": "6eda60b07ff2afbde078a2535ef3913593d84e9de92b2eb76c30f396a181fe2e",
+      "bytes": 1462,
+      "zip_crc": "dc98b0ac"
+    },
+    {
+      "path": "skins/young_caucasian_female/young_caucasian_female.mhmat",
+      "sha256": "0bdea7786201f0b1132a24088336a97496ccdc54e9984db65d253a6a6d66f24f",
+      "bytes": 1464,
+      "zip_crc": "e4faa467"
+    },
+    {
+      "path": "skins/young_caucasian_female/young_caucasian_female.thumb",
+      "sha256": "4bacaa13c1f58321221822e6f9ce1b222eb0e328e5015d9518c8a7184fb34b34",
+      "bytes": 78304,
+      "zip_crc": "50fcc387"
+    },
+    {
+      "path": "skins/young_caucasian_female/young_lightskinned_female_diffuse.png",
+      "sha256": "b2a6ac8cd4f9febdb447368e29c76cd68410bb66e46d9dcfa2d5f75126eea8fc",
+      "bytes": 4391156,
+      "zip_crc": "fa5bc375"
+    },
+    {
+      "path": "eyelashes/eyelashes01/eyelashes01.obj",
+      "sha256": "f78f5b93fea1946fcae103d32c4f082dd9612a1ec2e7e2f90b03ebe59b0baf20",
+      "bytes": 18832,
+      "zip_crc": "c57f8242"
+    },
+    {
+      "path": "eyelashes/eyelashes01/eyelashes01.mhclo",
+      "sha256": "5a86b29c15649273d723084954b7fa7bf199112571d4f58539b46734d397ee6b",
+      "bytes": 2265,
+      "zip_crc": "5bc81988"
+    },
+    {
+      "path": "eyelashes/eyelashes01/eyelashes01.png",
+      "sha256": "4b69c0fff2648874460e9caf80c31413c444218a5c50afebc425aeaa65484a35",
+      "bytes": 91600,
+      "zip_crc": "c9506eef"
+    },
+    {
+      "path": "eyelashes/eyelashes01/eyelashes01.mhmat",
+      "sha256": "8029c99d94f3d87a1e81825fad6b90eec773ae6955a5b2592222ef237377e190",
+      "bytes": 1074,
+      "zip_crc": "8e1cee4a"
+    },
+    {
+      "path": "eyelashes/eyelashes01/eyelashes01.thumb",
+      "sha256": "34ab06601745c2b74fcfa6f63a374fcea58cb4501e728a3c6935a3a1ed794aa3",
+      "bytes": 140641,
+      "zip_crc": "155feda4"
+    },
+    {
+      "path": "hair/short02/short02.thumb",
+      "sha256": "af21a0e84bfcc294b9840d90a04f1b6655ad909bc09328251886adffbc0727e8",
+      "bytes": 41127,
+      "zip_crc": "5bfecd72"
+    },
+    {
+      "path": "hair/short02/short02.obj",
+      "sha256": "48f979114adfa712165a69cc55c45a70831af1fb3cba8e2a89120f0c87407b64",
+      "bytes": 139742,
+      "zip_crc": "3bf3a7f3"
+    },
+    {
+      "path": "hair/short02/short02.mhclo",
+      "sha256": "625736cdb73e6d094df6e5a2df18f371781f1d2cd37b0ae15795c5d7051c3ec2",
+      "bytes": 119240,
+      "zip_crc": "167acceb"
+    },
+    {
+      "path": "hair/short02/short02.mhmat",
+      "sha256": "2ed04c8aad9c1a35d858ca72091525d32b1da3b61b5a031634dd528fd8530f6d",
+      "bytes": 1323,
+      "zip_crc": "15ecc99c"
+    },
+    {
+      "path": "hair/short02/short02_diffuse.png",
+      "sha256": "47fe33831a3929567c733356dd66243116e05df2ace1f884ddca0080b728229f",
+      "bytes": 3553543,
+      "zip_crc": "58be4110"
+    },
+    {
+      "path": "hair/short02/short02_normal.png",
+      "sha256": "2cfac7619f8eec77dd90df979d912415058f4f0fc16940cba40a8eb1ae6d74b5",
+      "bytes": 1626745,
+      "zip_crc": "cd9d1dbd"
+    },
+    {
+      "path": "eyebrows/eyebrow001/eyebrow001.obj",
+      "sha256": "88b13146395133f3901715e11706cdfd293e5d6087ad7c5e01efe1485a26b513",
+      "bytes": 8227,
+      "zip_crc": "07e9d5f6"
+    },
+    {
+      "path": "eyebrows/eyebrow001/eyebrow001.png",
+      "sha256": "9940f7d0b1b223709a19b05156ba6f6e9e4dbdbced02d7574f4d51d72c58967b",
+      "bytes": 89619,
+      "zip_crc": "d5ee806a"
+    },
+    {
+      "path": "eyebrows/eyebrow001/eyebrow001.mhclo",
+      "sha256": "54c8892c2ba577f4152d779ce1f20f7cd323beb8cbd9cb701796165c221b4f5b",
+      "bytes": 9141,
+      "zip_crc": "593a400e"
+    },
+    {
+      "path": "eyebrows/eyebrow001/eyebrow001.thumb",
+      "sha256": "98b68eccf50977ff00242a33eb1dc6e3eaf4cc262e1f6c4ceca5c1c564f6c745",
+      "bytes": 137534,
+      "zip_crc": "9bd45523"
+    },
+    {
+      "path": "eyebrows/eyebrow001/eyebrow001.mhmat",
+      "sha256": "976e5f4f1d3922d7a11c6e2db233f8b4584b068d00619d5749687e81c92d61fc",
+      "bytes": 1098,
+      "zip_crc": "63d073c4"
+    }
+  ]
+}
