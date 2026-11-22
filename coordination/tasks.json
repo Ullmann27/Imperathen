@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "project": "IMPERATHEN — Einstieg und Spielgrundlage",
+  "coordination_issue": "https://github.com/Ullmann27/Imperathen/issues/16",
+  "integration": {
+    "agent": "root",
+    "reserved_paths": [
+      "game/**",
+      "package.json",
+      "README.md",
+      "AGENTS.md",
+      "tools/verify_unreal.py"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "foundation_qa",
+      "agent": "foundation_qa",
+      "title": "Spielzustand, Einstellungen und Speichern",
+      "allowed_paths": ["preview/core/**", "tests/core.test.mjs"],
+      "depends_on": [],
+      "checks": ["core-tests"],
+      "status": "open",
+      "handoff": null
+    },
+    {
+      "id": "frontend_intro",
+      "agent": "frontend_intro",
+      "title": "Vorspann, Hauptmenü und sichtbarer Einstieg",
+      "allowed_paths": ["preview/index.html", "preview/styles.css", "preview/app.mjs", "preview/assets/**"],
+      "depends_on": ["foundation_qa"],
+      "checks": ["frontend-syntax"],
+      "status": "open",
+      "handoff": null
+    },
+    {
+      "id": "pipeline",
+      "agent": "pipeline",
+      "title": "Agentenkoordination und gemeinsame Prüfung",
+      "allowed_paths": ["tools/agent_pipeline.py", "coordination/**", ".github/workflows/foundation-checks.yml", "docs/08_agent_handoff/AGENT_PIPELINE.md", "tests/pipeline_test.py"],
+      "depends_on": ["foundation_qa", "frontend_intro"],
+      "checks": ["pipeline-tests"],
+      "status": "open",
+      "handoff": null
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # Phasen und konkrete Übergänge
 
+**Aktualisierung 22.11.2026:** Der begrenzte Entwicklungsstart ist jetzt beauftragt; siehe [aktueller Auftrag](../00_governance/DEVELOPMENT_START.md). Frühere Phasenbeschränkungen unten dokumentieren die Vorproduktion. Große Gameplay-, Engine- und Leistungsnachweise bleiben eigene Aufgaben.
+
 **Stand: 22.11.2026.** Ein Übergang ist eine inhaltliche Abnahme, keine pauschale Aufforderung, für jeden Vorbereitungsschritt neue Erlaubnis einzuholen.
 
 ## P0 – Vorarbeit, aktueller Auftrag
