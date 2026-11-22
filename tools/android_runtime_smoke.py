@@ -67,6 +67,13 @@ def main():
     def logs():
         return adb("logcat", "-d", "--pid", report["pid"], timeout=20)
 
+    def checked_logs():
+        text = logs()
+        errors = runtime_error_lines(text)
+        if errors:
+            record("no_runtime_errors", False, errors)
+        return text
+
     def screenshot(name):
         data = adb("exec-out", "screencap", "-p", binary=True)
         if not data.startswith(b"\x89PNG\r\n\x1a\n"):
@@ -159,31 +166,58 @@ def main():
         pid = adb("shell", "pidof", package)
         record("process_started", pid.isdigit(), pid)
         report["pid"] = pid
-        menu = None
-        deadline = time.monotonic() + 45
+        ready_started = time.monotonic()
+        deadline = ready_started + 120
+        ready = False
         while time.monotonic() < deadline:
-            text = logs()
+            if "IMPERATHEN_READY:" in checked_logs():
+                ready = True
+                break
+            time.sleep(2)
+        record("godot_ready", ready, {"marker": "IMPERATHEN_READY", "deadline_seconds": 120,
+                                       "elapsed_seconds": round(time.monotonic() - ready_started, 2)})
+        # Dismiss Android's first-fullscreen overlay as soon as Godot has reached
+        # the intro. Do not send Enter: the menu marker is logged after layout,
+        # so a key intended for Skip could otherwise activate the new-game button.
+        dismiss_fullscreen_hint("startup")
+        menu = None
+        menu_started = time.monotonic()
+        deadline = menu_started + 120
+        while time.monotonic() < deadline:
+            text = checked_logs()
             for line in text.splitlines():
                 if "IMPERATHEN_MENU_READY " in line:
                     menu = json.loads(line.split("IMPERATHEN_MENU_READY ", 1)[1])
             if menu:
                 break
             time.sleep(2)
-        record("real_menu", menu is not None, menu)
+        record("real_menu", menu is not None,
+               {"geometry": menu, "deadline_seconds": 120,
+                "elapsed_seconds": round(time.monotonic() - menu_started, 2),
+                "intro_transition": "automatic; no Enter key sent"})
         dismiss_fullscreen_hint("menu")
         screenshot("01_android_menu.png")
         point = menu["new_game"]
         adb("shell", "input", "tap", str(round(point[0])), str(round(point[1])))
         deadline = time.monotonic() + 30
-        while time.monotonic() < deadline and "IMPERATHEN_SESSION_STARTED" not in logs():
+        while time.monotonic() < deadline and "IMPERATHEN_SESSION_STARTED" not in checked_logs():
             time.sleep(2)
-        record("touch_starts_saved_game", "IMPERATHEN_SESSION_STARTED" in logs(), "Tapped real menu button; main confirmed the new saved world")
+        record("touch_starts_saved_game", "IMPERATHEN_SESSION_STARTED" in checked_logs(), "Tapped real menu button; main confirmed the new saved world")
         time.sleep(3)
         dismiss_fullscreen_hint("world")
         screenshot("02_android_world.png")
+        previous_pauses = checked_logs().count("IMPERATHEN_PAUSED")
         adb("shell", "input", "keyevent", "4")
-        time.sleep(1)
-        record("android_back_pauses", "IMPERATHEN_PAUSED" in logs() and adb("shell", "pidof", package) == pid, "Back opened pause without terminating the app")
+        deadline = time.monotonic() + 20
+        pause_observed = False
+        while time.monotonic() < deadline:
+            if checked_logs().count("IMPERATHEN_PAUSED") > previous_pauses:
+                pause_observed = True
+                break
+            time.sleep(1)
+        record("android_back_pauses", pause_observed and adb("shell", "pidof", package) == pid,
+               {"new_pause_marker_after_Back": pause_observed, "deadline_seconds": 20,
+                "detail": "Back must open a new pause without terminating the app"})
         screenshot("03_android_pause.png")
         adb("shell", "input", "keyevent", "3")
         time.sleep(1)
