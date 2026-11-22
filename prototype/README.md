@@ -1,6 +1,6 @@
 # IMPERATHEN – Grenzdorf
 
-Ein ausführbarer, bewusst begrenzter 3D-Funktionsprototyp für den Anfang des Lebenswegs. Die größere Vision bleibt in der Projektmappe beschrieben; dieses Kapitel verbindet ihre ersten Systeme tatsächlich miteinander.
+Ein spielbarer historischer Strategieprototyp mit Dorfleben, taktischem Talgefecht und saisonaler Weltkampagne. Android, Windows und Linux führen dieselben Spielbefehle aus.
 
 ## Start
 
@@ -11,7 +11,32 @@ Ein ausführbarer, bewusst begrenzter 3D-Funktionsprototyp für den Anfang des L
 
 Alternativ im Repository: `godot --path prototype`. Für Headless-Prüfungen: `python tools/check_prototype.py`.
 
-Es werden keine Python-Pakete, Cloudschlüssel oder Modell-APIs zum Spielen gebraucht. Blender wird nur zum Neuerzeugen des eigenen Hüttenmodells benötigt; die fertige GLB liegt bereits im Projekt. Keine Engine-Binärdatei ist Teil des Repositorys. Godot-Exportvorlagen, Android-SDK und ein tatsächlich getestetes APK sind in dieser Lieferung nicht enthalten.
+Der Android-Workflow baut die Prüfpakete mit den passenden offiziellen Exportvorlagen. Auf dem Spielgerät genügt die ARM64-APK. [Android-Bauweg](../docs/10_development/ANDROID_BUILD.md)
+
+## Herkunft und Spielstand
+
+Italien unter römischer Herrschaft, die Gemeinschaft östlich des Rheins, der Weichselraum, die Östlichen Han und Wa in der Yayoi-Zeit bieten unterschiedliche Einstiege, Gefährten, Siedlungsbilder und saisonale Geschichten. Rom ist vorausgewählt. Die Dorfaufgaben nutzen denselben geprüften Regelkern. Der nachstehende Dorfweg beschreibt den römischen Einstieg.
+
+## Formationskampf im Tal
+
+Im Hauptmenü **Talgefecht erproben** öffnen. Die Schlacht beginnt in taktischer Pause. Eine Einheitenkarte oder einen Verband auf dem Gelände wählen und mit **Fortsetzen** die Zeit starten. Das Talzeichen 120 Spielsekunden verteidigen oder die Gegenseite zum Rückzug bringen. Beide Seiten beginnen mit 30 Soldaten.
+
+| Eingabe | Wirkung |
+| --- | --- |
+| Touch | Antippen selektiert einen Verband. Danach befiehlt ein Geländetipp den Marsch. **Gruppe +** schaltet Mehrfachauswahl. Lang drücken und ziehen zeigt die neue Front mit einem Platz pro Soldat. Loslassen bestätigt. Zwei Finger verschieben oder zoomen die Kamera. |
+| Maus | Linksklick wählt, Umschalt ergänzt die Auswahl, Linksziehen spannt das Rechteck. Rechtsklick erteilt den Zielbefehl, Rechtsziehen richtet die Formation aus. Mitteltaste verschiebt, das Rad zoomt. |
+| Tastatur | WASD verschiebt die Kamera, Q/E drehen. Leertaste pausiert, H hält, R sammelt. Strg+Ziffer speichert eine Gruppe, Ziffer ruft sie auf. |
+| Befehlsleiste | Verband, Formation und Befehl wählen. Zielgerichtete Aufträge erwarten anschließend einen Geländepunkt oder Gegner. **Tempo** wechselt zwischen Echtzeit und 0,35-facher Geschwindigkeit. |
+
+Die sieben räumlichen Formationen sind Linie, Kolonne, Schildwall, Testudo, Keil, lockere Ordnung und Phalanx. Ausrüstung und Ordnung bestimmen, ob ein Wechsel möglich ist. Das Pausenmenü des Dorfes öffnet nach dem gewonnenen Dorfgefecht und der Folgeentscheidung den persistenten Einsatz der Grenzlegion. Android-Hintergrundwechsel und Rückkehr ins Dorf sichern den Gefechtsstand. Fällt die Talstraße, verbraucht der Umweg bei Nachschubaufträgen einen zusätzlichen Reisevorrat.
+
+## Weltkugel und Winter
+
+Im freien Szenario beginnt die Regionalkampagne im Frühjahr 100 n. Chr. am gewählten Herkunftsort. Die Weltkugel lässt sich ziehen und zoomen. Punkte auf der Kugel und die Ortsliste wählen dieselben 32 Regionen. Linien markieren erfundene Verbindungen des Strategiespiels. Eigene Gebiete erscheinen türkis, das gewählte Gebiet goldfarben.
+
+Pro Saison stehen zwei Vorbereitungen zur Verfügung. Die Anzeige nennt Korn, eingelagerte Menge, Winterbedarf, Reisevorräte und Unruhe. **Ernten** und **Einlagern** bereiten die Mission vor. Der erste schlecht versorgte Winter lässt Zeit zur Erholung. Zwei mangelhaft versorgte Winter können den Auftrag beenden. Ein erneuter Auftrag bleibt möglich. Ein größeres Mandat erhöht Bedarf und mögliche Gebietsverluste. Die persönliche Kaiser- oder Königslaufbahn ist ein Ausbauziel.
+
+Der Lebenslauf beginnt 94 n. Chr. mit zwölf Jahren. Nach dem sechsjährigen Ausbildungsübergang und der Dorfverteidigung wirkt die Kartenzeit auf dieselbe Welt und auf das Alter der Figuren. Jede Herkunft hat eine Herbstentscheidung mit konkreten Folgen und einem späteren Chronikeintrag. Die Jahreszeiten sind ein vereinfachtes Versorgungsmodell. Südliche Auftragsregionen haben entgegengesetzte Jahreszeiten. [Zeitstellung und historische Einordnung](../docs/12_integration/ATLAS_SOURCES.md)
 
 ## Spielweg
 
@@ -55,20 +80,16 @@ Gespeichert wird bei wichtigen bestätigten Entscheidungen, über die Speichern-
 
 Die Sicherung ist kein Archiv mehrerer Lebensläufe. Eine neue Partie ersetzt die aktive Partie nach Bestätigung. Prüfsummen erkennen Beschädigung und sind kein Schutz gegen absichtliches Editieren durch den Eigentümer der Datei.
 
-## Aufbau und derzeitige Grenzen
+## Aufbau und Ausbaugrenzen
 
-- `scripts/domain/`: maßgeblicher Weltzustand, Regeln, Kapitel und Speicherung.
-- `scripts/world/`: 3D-Darstellung, Kollision, Kamera und Eingaben; sie bucht keine Ressourcen selbst.
-- `scripts/ui/`: Menüs, HUD, Dialoge und Eingabeelemente; sie fordert Änderungen über Signale an.
-- `scripts/main.gd`: verbindet alle drei Teile, steuert Pause und Speicherung.
-- `assets/`: eigenes Hüttenmodell und selbst erzeugter Umgebungston; Herkunft und Hashes im Manifest.
+- `scripts/domain/` verwaltet Lebenslauf, Dorf, Saisonkampagne und versionierte Spielstände.
+- `scripts/battle/` verarbeitet Gefechtsbefehle, löst Formation und Verluste auf und zeichnet die taktische Szene.
+- `scripts/world/` enthält Dorf, Kamera und Weltkugel. Menüs und HUD liegen in `scripts/ui/`.
+- `scripts/main.gd` verbindet die Szenen mit dem gemeinsamen Spielstand. Die freien Szenarien im Hauptmenü erlauben das Erproben unabhängig vom laufenden Lebenslauf.
+- `assets/` enthält importierbare GLBs, Texturen und Umgebungston. Blender-Quellen und Freisteller liegen unter [art/](../art).
 
-Die regionale Ansicht zeigt dieselbe Dorfwelt aus größerer Entfernung. Eine strategische Provinzkarte, Eroberung, Politik, Handel zwischen Städten, Kaiserkarriere, große Formationsschlachten, eine generative KI-Geschichte, Wochenbalance und Fotorealismus sind noch nicht umgesetzt. Die Gegner stehen aktuell fest und reagieren in Nahkampfreichweite; Rekruten folgen in einer einfachen Formation. Komplexe Wegsuche und vollständige Kampfanimationen fehlen.
+Im Dorf ist die Hütte der erste selbst errichtbare Gebäudetyp. Die Weltkampagne bildet 32 Orte über ein Routennetz ab. Politische Laufbahnen, Diplomatie und regionale Kampagnenarmeen sind weitere Ausbauschritte. Das Talgefecht verwendet für alle Herkünfte dasselbe Grenzlegion-Szenario. Der Regelkern bewahrt bis zu 1.024 erfolgreiche explizite Befehlskennungen und 256 Chronikeinträge.
 
-Das Bauen umfasst einen Gebäudetyp, die Ressourcen sind begrenzt. Der Regelkern bewahrt höchstens 1024 erfolgreiche explizite Befehlskennungen und 256 Chronikeinträge. Ein unbegrenztes Langzeitspiel benötigt ein anderes Aufbewahrungs- und Fortschrittsmodell. Diese Grenzen sind bewusst sichtbar und werden nicht als fertige Großspielarchitektur ausgegeben.
+## Spielbilder und Originalmodelle
 
-## Grafikquelle
-
-![Originales Hüttenmodell – Blender-Assetrender, kein Spielbild](../docs/10_development/evidence/frontier_hut_preview.png)
-
-Die Bilddatei wurde aus der mitgelieferten `.blend`-Quelle gerendert. Sie zeigt das tatsächliche Modell, das auch in Godot importiert wird. Sie ist **kein Ingame-Screenshot**. Die Prototypfiguren und viele Umgebungsobjekte bestehen aus eigener einfacher Geometrie. Das parallel laufende Grafikteam liefert eine getrennte, detailliertere Assetlinie; deren Übernahme erfordert einen eigenen Abgleich.
+[Das Tal in Godot](../docs/12_integration/evidence/valley-balanced.webp) · [Das römische Dorf](../docs/12_integration/evidence/village-italia.webp) · [Die Weltkugel mit Han-Einstieg](../docs/12_integration/evidence/globe-han.webp) · [Transparente Modellstudien](../art/landscape/README.md)
