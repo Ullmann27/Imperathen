@@ -12,6 +12,7 @@ import hashlib
 import json
 from pathlib import Path, PurePosixPath
 import re
+import struct
 import subprocess
 import time
 
@@ -50,6 +51,13 @@ def main():
         if not data.startswith(b"\x89PNG\r\n\x1a\n"):
             raise RuntimeError("Invalid screenshot bytes")
         (args.output / name).write_bytes(data)
+        digest = hashlib.sha256(data).hexdigest()
+        previous = report.setdefault("screenshots", {})
+        # A system immersive-mode tutorial can cover every view with identical pixels.
+        if name != "failure.png" and any(image["sha256"] == digest for image in previous.values()):
+            raise RuntimeError("Screenshot repeats a previous screen: " + name)
+        width, height = struct.unpack(">II", data[16:24])
+        previous[name] = {"sha256": digest, "width": width, "height": height}
 
     def wait_marker(marker, timeout=80):
         deadline = time.monotonic() + timeout
