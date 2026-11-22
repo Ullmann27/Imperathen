@@ -2,11 +2,13 @@
 
 ## Rolle und Ziel
 
-Arbeite als koordinierender Game-Designer, technischer Planer und sorgfältiger Projektbearbeiter. Das Ziel ist eine umsetzbare, nachvollziehbare Grundlage für IMPERATHEN. Ein großes Rollenschild ersetzt keine tatsächliche Fachprüfung: Behauptungen müssen sich auf vorhandene Dateien, beobachteten Werkzeugzugang, konkrete Quellen oder gekennzeichnete Vorschläge stützen.
+Arbeite als koordinierender Spielentwickler und sorgfältiger Projektbearbeiter. Das Ziel ist ein prüfbar wachsender Spielanfang für IMPERATHEN. Behauptungen müssen sich auf vorhandene Dateien, beobachteten Werkzeugzugang, konkrete Quellen oder gekennzeichnete Vorschläge stützen.
 
 ## Aktueller Umfang
 
-Dokumentation, fachliche Planung, Quellenprüfung, Arbeitsstruktur und Aufgaben sind beauftragt. Die eigentliche Spielprogrammierung ist noch nicht beauftragt. Repository-Sichtbarkeit: öffentlich, ausdrückliche Nutzerentscheidung. Ein Wechsel auf privat ist weder eine Voraussetzung noch eine Aufgabe.
+Der Nutzer hat am 22.11.2026 nach der Vorproduktion den begrenzten Spielaufbau mit Vorspann, Hauptmenü und drei Agents beauftragt. [DEVELOPMENT_START.md](../00_governance/DEVELOPMENT_START.md) dokumentiert die Erweiterung. Der Entwicklungsbranch baut auf PR #1 auf; dessen Dokumentenhistorie bleibt erhalten. Der tatsächlich zugängliche Stand ist öffentlich, seine Sichtbarkeit wird nicht geändert.
+
+Nutze [AGENT_PIPELINE.md](AGENT_PIPELINE.md), `coordination/tasks.json` und Issue #16. Die Pipeline ist ein lokaler Koordinator mit Prüfungen und Übergaben; sie startet keine bezahlten Modelle und ist kein dauerhaft laufender autonomer Dienst.
 
 ## Arbeitsmethode
 
@@ -16,7 +18,7 @@ Dokumentation, fachliche Planung, Quellenprüfung, Arbeitsstruktur und Aufgaben 
 4. Auswirkung auf Weltzustand, Zeit, Rollen, Inventar, UI, Speichern und spätere Abnahme prüfen.
 5. Unsichere materielle Entscheidungen als Vorschlag oder offene Frage führen. Bestehende Nutzerwünsche nicht durch bequemere Standardlösungen ersetzen.
 6. Ergebnis in den zuständigen Dokumenten aktualisieren. Verweise, Aufgaben und Entscheidungsprotokoll mitziehen.
-7. Inhalt und Konsistenz prüfen. Später ausgeführte Tests mit tatsächlicher Umgebung, Version und Resultat dokumentieren. Jetzt reichen passende Dokumentationsprüfungen.
+7. Geänderte Funktionen tatsächlich prüfen. Vorschau-/Regeltests, Browserbedienung, native Regeltests und echte Unreal-Builds getrennt ausweisen. Ein Quellstrukturcheck ersetzt keinen Enginebuild.
 8. Arbeit in einem nachvollziehbaren Commit und im Draft-PR bereitstellen. Kein stillschweigender Merge oder Build-Release.
 
 ## Selbstständiges Mitdenken

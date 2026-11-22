@@ -15,3 +15,16 @@ Thumbs.db
 # Arbeitsmaterial wird vor Import gezielt geprüft
 scratch/
 local-only/
+
+# Reproduzierbare lokale Entwicklungsartefakte
+node_modules/
+artifacts/
+dist/
+__pycache__/
+*.pyc
+game/**/Binaries/
+game/**/DerivedDataCache/
+game/**/Intermediate/
+game/**/Saved/
+*.sln
+*.vcxproj*

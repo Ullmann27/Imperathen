@@ -1,5 +1,36 @@
 # Projektstatus
 
+**22.11.2026 · Phase: erster Entwicklungsstand · Arbeitstitel IMPERATHEN**
+
+Der neuere Nutzerauftrag aktiviert den begrenzten Spielaufbau mit drei Agents. [Entwicklungsstart](DEVELOPMENT_START.md) dokumentiert Auftrag und beobachteten Ausgangsstand. Der frühere Vorproduktionsstatus unten bleibt zur Nachvollziehbarkeit erhalten und ist für diese Lieferung überholt.
+
+## Aktuelle Implementierung
+
+- Deutschsprachiger dreiteiliger Vorspann, Hauptmenü und eigenständige römische SVG-Szene.
+- Neues Leben, Fortsetzen, ein Browser-Spielstand mit Sicherung, Einstellungen und drei endliche Dorfhandlungen.
+- Sichtbarer Unterstand nach erfolgreicher Bauaktion, Chronik und persistente Beziehung zu Marcus im Browserkern.
+- Lokale Drei-Agent-Pipeline mit Dateibesitz, Claims, Pflichtprüfungen, Abhängigkeiten und nachvollziehbarer Übergabe.
+- Native Unreal-Projektbasis in game/Imperathen; unabhängig kompilierter C++-Regelkern.
+- Einzeln lieferbare HTML-Vorschau, reproduzierbar mit `npm run build:preview`.
+
+## Nachweise und Grenzen
+
+[Prüfbericht](../05_quality/FOUNDATION_REVIEW.md): 18 JavaScript-Kerntests, 14 Pipeline-Regressionstests und der native C++-Regeltest bestanden. Frontend und eingebettetes Bundle sind syntaktisch geprüft; Dateiverweise und SVG-Struktur sind geprüft. Alle drei tatsächlichen Agents haben mit aktuellen Nachweisen übergeben.
+
+Die visuelle Browserprüfung war in dieser Umgebung blockiert: Chromium konnte keine erforderliche Unix-Socket-Funktion nutzen, und der bereitgestellte Browser lehnte die lokale Datei-URL ausdrücklich ab. Es gibt daher keinen behaupteten Screenshot eines laufenden Spiels oder bestandenen Browser-Bedienlauf. Die Unreal-Engine fehlt; ihr Build, die native UI und das Cooken sind nicht ausgeführt.
+
+Die 3D-Welt, freies Begehen, Kampf, große Städtebau-/Wirtschaftssimulation und vollständige Karriere sind weiterhin offen. Der Name bleibt vorläufig. Die vorhandene Repository-Sichtbarkeit wurde nicht geändert.
+
+## Zusammenarbeit
+
+Koordination: [Issue #16](https://github.com/Ullmann27/Imperathen/issues/16). Eigener Branch: `feat/entry-foundation-three-agents-20261122`, aufgebaut auf Dokumentations-PR #1. Die Übergabe nennt den tatsächlichen Liefercommit; main und der vorhandene Dokumentationsbranch werden nicht überschrieben.
+
+Die Pipeline startet keine Modelle und arbeitet nicht unbeaufsichtigt weiter, sobald eine Sitzung endet. Die Aufgaben- und Übergabedokumente ermöglichen dem nächsten Bearbeiter den geordneten Anschluss. Zusätzliche bezahlte Dienste/Modell-APIs wurden nicht beauftragt. Ein persönliches ChatGPT-Restkontingent kann nicht verlässlich eingesehen werden.
+
+---
+
+# Historischer Vorproduktionsstand
+
 **Stand: 22.11.2026 · Phase: Vorproduktion · Arbeitstitel: IMPERATHEN**
 
 ## Verbindlicher aktueller Rahmen

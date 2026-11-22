@@ -1,0 +1,7 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "",
+  "Category": "Games",
+  "Description": "IMPERATHEN entry foundation. Select an installed Unreal Engine 5 version and validate before integration.",
+  "Modules": [{ "Name": "Imperathen", "Type": "Runtime", "LoadingPhase": "Default" }]
+}
