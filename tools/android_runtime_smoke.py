@@ -141,6 +141,14 @@ def main():
         if written.returncode:
             raise RuntimeError("Unable to enable frame counters in emulator test preferences")
 
+    def skip_intro(stage):
+        point = json.loads(wait_marker("IMPERATHEN_INTRO_READY ", timeout=120))["skip"]
+        dismiss_fullscreen_hint(stage)
+        if stage == "first_launch":
+            screenshot("00_android_intro.png")
+        if "IMPERATHEN_MENU_READY " not in logs():
+            tap(point)
+
     def relaunch(diagnostics=False):
         previous = report["pid"]
         (args.output / ("logcat-" + previous + ".txt")).write_text(logs(), encoding="utf-8")
@@ -155,6 +163,7 @@ def main():
             new_pid = adb("shell", "pidof", package, checked=False)
             if new_pid.isdigit() and new_pid != previous:
                 report["pid"] = new_pid
+                skip_intro("launch_" + new_pid)
                 return json.loads(wait_marker("IMPERATHEN_MENU_TOUCH "))
             time.sleep(1)
         raise RuntimeError("Relaunch did not produce a new game process")
@@ -196,7 +205,7 @@ def main():
         report["model"] = adb("shell", "getprop", "ro.product.model")
         record("expected_android_emulator", report["api_level"] == "35" and report["abi"] == "x86_64", {
             "api_level": report["api_level"], "abi": report["abi"], "model": report["model"]})
-        adb("shell", "wm", "size", "720x1280")
+        adb("shell", "wm", "size", "540x960")
         adb("shell", "wm", "density", "160")
         adb("shell", "wm", "dismiss-keyguard")
         adb("shell", "settings", "put", "secure", "immersive_mode_confirmations", "confirmed")
@@ -216,6 +225,7 @@ def main():
         pid = adb("shell", "pidof", package)
         record("process_started", pid.isdigit(), pid)
         report["pid"] = pid
+        skip_intro("first_launch")
         menu = json.loads(wait_marker("IMPERATHEN_MENU_READY "))
         record("real_menu", "new_game" in menu, menu)
         dismiss_fullscreen_hint("menu")

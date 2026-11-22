@@ -44,6 +44,11 @@ EXPECTED_RESOURCES = (
     "scripts/battle/formation_slots.gd",
     "scripts/tactics/valley_scene.gd",
     "scripts/tactics/valley_hud.gd",
+    "scripts/strategy/atlas_screen.gd",
+    "scripts/strategy/globe.gd",
+    "scripts/strategy/origins.gd",
+    "scripts/strategy/season_campaign.gd",
+    "assets/atlas/earth.jpg",
     "scripts/visuals/soldier_visual.gd",
     "assets/quality_profiles.json",
     *(f"assets/soldiers/{role}_{level}.glb"
@@ -135,11 +140,10 @@ def resolve_resource(archive: zipfile.ZipFile, names: set[str], source: str) -> 
     raw = "assets/" + source
     if raw in names and archive.getinfo(raw).file_size > 0:
         return {"source": source, "entry": raw, "mode": "direct"}
-    remap = raw + (".import" if source.endswith(".glb") else ".remap")
+    remap = raw + (".import" if source.endswith((".glb", ".jpg")) else ".remap")
     if remap in names and archive.getinfo(remap).file_size <= 65536:
         text = archive.read(remap).decode("utf-8", errors="replace")
-        match = re.search(r'^\s*path\s*=\s*"res://([^"\r\n]+)"', text, re.MULTILINE)
-        if match:
+        for match in re.finditer(r'^\s*path(?:\.[\w.-]+)?\s*=\s*"res://([^"\r\n]+)"', text, re.MULTILINE):
             target = "assets/" + match.group(1)
             if target in names and archive.getinfo(target).file_size > 0:
                 return {"source": source, "entry": target, "remap": remap, "mode": "remapped"}

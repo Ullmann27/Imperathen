@@ -155,6 +155,8 @@ func show_intro() -> void:
 	skip.offset_bottom = -34
 	_screen.add_child(skip)
 	skip.grab_focus.call_deferred()
+	if OS.is_debug_build() and OS.has_feature("android"):
+		_log_intro_skip.call_deferred(skip)
 	_intro_tween = create_tween()
 	if _reduce_motion:
 		_intro_tween.tween_interval(3.0)
@@ -249,6 +251,14 @@ func _add_origin_picker(parent: VBoxContainer) -> void:
 		origin_id = ORIGIN_IDS[index]
 		description.text = String(Origins.PEOPLES[origin_id].intro)
 	)
+
+
+func _log_intro_skip(skip: Button) -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if is_instance_valid(skip) and skip.is_visible_in_tree():
+		var point := get_viewport().get_screen_transform() * skip.get_global_rect().get_center()
+		print("IMPERATHEN_INTRO_READY " + JSON.stringify({"skip": [point.x, point.y]}))
 
 
 func _log_menu_buttons(demo: Button, atlas: Button, resume: Button) -> void:
