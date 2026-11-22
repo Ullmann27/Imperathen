@@ -2,7 +2,11 @@
 
 **Spielstand vom 22. November 2026.** Android, Windows und Linux werden aus demselben Godot-Projekt gebaut. Die APK ist ein mit einem privaten Debugschlüssel signierter Prüfbau. [Spielanleitung](../../prototype/README.md) · [Pull Request #22](https://github.com/Ullmann27/Imperathen/pull/22)
 
-## Aktuelle Fassung mit Figurengalerie
+## Aktuelle Fassung mit marschierendem Verband und Atriumhaus
+
+Der Spielbuild `ebefe0b78bcce696affd935d8dd381c763731e27` umfasst die unten beschriebenen Funktionen und die neuen 3D-Bewegungen, das römische Atriumhaus mit fünf reduzierten Detailstufen und die optionale Windows-Vulkan-Ausgabe. 13 Godot-Prüfgruppen sind bestanden. Dazu gehören 107 Gangprüfungen, die Kontrolle aller 18 Porträts, Kollisionsprüfungen mit der wirklichen Spielerkapsel und das 4K-Pixelbudget für Desktop. [APK, PC-Builds, Figuren und Marschaufnahme](https://github.com/Ullmann27/Imperathen/releases/tag/prototype-2026-11-22-ebefe0b7) · [Grafischer Vergleich und Messungen](GRAPHICS.md) · [13 Prüfgruppen](evidence/motion/validation_report.json) · [GitHub-Lauf](https://github.com/Ullmann27/Imperathen/actions/runs/45042378543)
+
+## Vorherige Fassung mit Figurengalerie
 
 Spielquellen `a2d321d87a340a8a38b09eba34f5fc548d69a73c`. Hauptmenü → **Figuren** öffnet die Sammlung der 18 Personen. Im gespeicherten Lebenslauf zeigt die Chronik die Hauptfigur und den Gefährten der gewählten Herkunft. Bei der ersten Begegnung ist der junge Gefährte im Dialog zu sehen. Im italienischen Lebenslauf kommen ab 18 zwei weitere Darstellungen hinzu. Erstellt wurden drei Figurenbögen und drei separate hochauflösende Bilder für Legionär, Kaiser und erwachsene Hauptfigur. Die 3D-Kampfszene verwendet weiterhin die vier animierten Blender-Figuren. [Freigegebene Downloads](https://github.com/Ullmann27/Imperathen/releases/tag/prototype-2026-11-22-a2d321d8) · [Darsteller und Bildquellen](../../art/portraits/README.md) · [Galerie im Spiel](evidence/portraits/legionary.webp) · [Aki in der Chronik](evidence/portraits/chronicle-wa.webp)
 

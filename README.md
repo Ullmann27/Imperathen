@@ -2,9 +2,11 @@
 
 IMPERATHEN verbindet das Leben in einer antik inspirierten Grenzsiedlung mit Formationskämpfen und einer drehbaren Weltkugel. Android ARM64 ist die erste Zielplattform. Dieselbe Godot-Spielbasis exportiert für Windows und Linux.
 
-**Figuren.** Das Hauptmenü zeigt unter **Figuren** 18 freigestellte historische Charakterbilder. Die Chronik enthält die zu deinem Lebenslauf gehörenden Personen. [Figuren und Originaldateien](art/portraits/README.md) · [Android-, Windows- und Bilddownloads](https://github.com/Ullmann27/Imperathen/releases/tag/prototype-2026-11-22-a2d321d8)
+**Figuren.** Das Hauptmenü zeigt unter **Figuren** 18 freigestellte historische Charakterbilder. Die Chronik enthält die zu deinem Lebenslauf gehörenden Personen. [Figuren und Originaldateien](art/portraits/README.md) · [Android-, Windows- und Bilddownloads](https://github.com/Ullmann27/Imperathen/releases)
 
 **Spielen.** Im Hauptmenü startet **Neues Leben** einen gespeicherten Lebenslauf aus einer von fünf Herkünften. **Talgefecht erproben** führt sofort in die Schlacht mit 60 Soldaten. **Weltkugel erkunden** öffnet eine freie Saisonkampagne. Im Lebenslauf werden die regionalen Aufträge nach der Dorfverteidigung zugänglich. [Spielanleitung](prototype/README.md)
+
+**In der 3D-Welt.** Die Talwache setzt bei Marsch, Lauf und Rückzug ihre Füße entsprechend der zurückgelegten Strecke. Das römische Atriumhaus ist durch die offene Eingangspassage begehbar. [Marschaufnahme](art/soldiers/field_march.webm) · [Gebäude im Vergleich](art/architecture/review/vergleich.jpg) · [Optionale Vulkan-Anbindung für PC](docs/12_integration/GRAPHICS.md)
 
 **Bauen.** Godot **4.7.2** öffnen und `prototype/project.godot` starten. Die Android-Paketkennung lautet `at.heinz.imperathen`. Der Android-Workflow liefert nach Commit benannte APKs, Windows-ZIP, Linux-Archiv, Prüfsummen und Laufzeitprotokolle. [Integration und Prüfergebnisse](docs/12_integration/DELIVERY.md) · [Android-Bauweg](docs/10_development/ANDROID_BUILD.md) · [Engineentscheidung](docs/03_engineering/ADR_GODOT_ANDROID.md)
 

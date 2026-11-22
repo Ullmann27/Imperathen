@@ -1,6 +1,6 @@
 # IMPERATHEN auf Android installieren und spielen
 
-**Aktuelle Integration mit Weltkugel, Talgefecht und Figuren.** [Aktueller APK-Download](https://github.com/Ullmann27/Imperathen/releases/tag/prototype-2026-11-22-a2d321d8) · [Prüfergebnisse](../12_integration/DELIVERY.md). Die folgenden Prüfsummen gehören zur früheren Dorf-Lieferung aus PR #20.
+**Aktuelle Integration mit Weltkugel, Talgefecht und Figuren.** [Aktueller APK-Download](https://github.com/Ullmann27/Imperathen/releases) · [Prüfergebnisse](../12_integration/DELIVERY.md). Die folgenden Prüfsummen gehören zur früheren Dorf-Lieferung aus PR #20.
 
 **IMPERATHEN – Grenzdorf ist ein begrenzter 3D-Spielprototyp für Android.** Die Fassung verbindet Holzsammeln, eine eigene Hütte, die Entscheidung über einen Gefährten, Ausbildung, eine kleine Truppe und einen Dorfkampf. Du spielst lokal mit Touch-Steuerung. Zum Spielen brauchst du weder einen PC noch Godot, Blender oder einen KI-API-Schlüssel.
 
