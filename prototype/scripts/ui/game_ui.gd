@@ -392,7 +392,15 @@ func show_pause() -> void:
 func show_dialog(title: String, text: String, choices: Array) -> void:
 	_dialog_data = {"title": title, "text": text, "choices": choices.duplicate(true)}
 	_open_screen("dialog", true)
-	var column := _modal("DEINE ENTSCHEIDUNG", title, text, 670)
+	var speaker := ""
+	var youth: bool = int(_state.get("player",{}).get("age",18)) < 18
+	if youth and not _state.get("companion",{}).get("met",false):
+		for choice in choices:
+			if choice is Dictionary and choice.get("action") == "companion_help":
+				speaker = String(FigureGallery.FRIENDS.get(_state.get("origin_id","italia"),""))
+				break
+	var heading := "Begegnung mit %s" % FigureGallery.caption(speaker).name if speaker != "" else title
+	var column := _modal("DEINE ENTSCHEIDUNG", heading, text, 670, speaker)
 	column.add_child(_label("Die Welt ist während dieses Gesprächs pausiert.", 12, MUTED))
 	_spacer(column, 3)
 	var first_button: Button
@@ -1102,7 +1110,7 @@ func _show_settings(return_screen: String) -> void:
 	scale_slider.grab_focus.call_deferred()
 
 
-func _modal(kicker: String, title: String, body: String, width: float) -> VBoxContainer:
+func _modal(kicker: String, title: String, body: String, width: float, portrait_id: String = "") -> VBoxContainer:
 	width = minf(width, _content_size().x - 100)
 	var margin := _margin(30, 46, 30, 46)
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -1128,7 +1136,22 @@ func _modal(kicker: String, title: String, body: String, width: float) -> VBoxCo
 	column.add_child(heading)
 	var description := _label(body, 17, MUTED)
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	column.add_child(description)
+	var portrait := FigureGallery.texture(portrait_id) if portrait_id != "" else null
+	if portrait:
+		var speaker_row := _row(12)
+		column.add_child(speaker_row)
+		var image := TextureRect.new()
+		image.name = "Speaker_" + portrait_id
+		image.texture = portrait
+		image.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		image.custom_minimum_size = Vector2(78,106) if _compact_layout else Vector2(100,132)
+		speaker_row.add_child(image)
+		description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		speaker_row.add_child(description)
+	else:
+		column.add_child(description)
 	_spacer(column, 6)
 	# Fit long story text and large type while keeping the choices reachable by scroll.
 	column.minimum_size_changed.connect(func():
