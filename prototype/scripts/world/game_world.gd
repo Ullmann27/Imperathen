@@ -193,7 +193,7 @@ func is_build_active() -> bool:
 
 
 func set_quality(profile: String) -> void:
-	if profile not in ["low", "balanced", "high"]:
+	if profile not in ["low", "balanced", "high", "very_high"]:
 		return
 	_quality_profile = profile
 	grove.set_quality(profile)
@@ -217,11 +217,15 @@ func _apply_quality() -> void:
 			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
 		"balanced":
 			viewport.msaa_3d = Viewport.MSAA_2X
-			_sun.directional_shadow_max_distance = 55.0
+			_sun.directional_shadow_max_distance = 48.0
 			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
 		"high":
 			viewport.msaa_3d = Viewport.MSAA_4X
-			_sun.directional_shadow_max_distance = 95.0
+			_sun.directional_shadow_max_distance = 85.0
+			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
+		"very_high":
+			viewport.msaa_3d = Viewport.MSAA_4X
+			_sun.directional_shadow_max_distance = 110.0
 			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
 
 

@@ -60,6 +60,7 @@ func _run() -> void:
 	_ui.set("_volume", 0.35)
 	_ui._apply_scale(_ui.get("_root"))
 	var quality: OptionButton = _ui.get("_screen").find_child("QualitySetting", true, false)
+	_check(quality.item_count == 4 and quality.get_item_text(3).begins_with("Sehr hoch"), "four graphics settings are visible")
 	quality.select(2)
 	quality.item_selected.emit(2)
 	var display := root.get_node("RuntimeDisplay")
@@ -69,6 +70,10 @@ func _run() -> void:
 	root.size = Vector2i(1280, 720)
 	display.apply_quality("low")
 	_check(is_equal_approx(root.scaling_3d_scale, 1.0) and Engine.max_fps == 30, "low budget at native 720p")
+	display.apply_quality("high")
+	var ultra: Dictionary = display._profiles.very_high
+	display.apply_quality("very_high")
+	_check(Engine.max_fps == 30 and ultra.label == "Sehr hoch", "ultra profile has safe provisional 30 FPS cap")
 	display.apply_quality("high")
 	var high: Dictionary = display._profiles.high
 	var uhd := Vector2i(3840, 2160)

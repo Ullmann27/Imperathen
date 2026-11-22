@@ -1062,11 +1062,12 @@ func _show_settings(return_screen: String) -> void:
 	column.add_child(_label("Grafikqualität", 16, CREAM))
 	var quality_select := OptionButton.new()
 	quality_select.name = "QualitySetting"
-	quality_select.add_item("Niedrig · Limit 30 FPS")
+	quality_select.add_item("Leicht · Limit 30 FPS")
 	quality_select.add_item("Ausgewogen · Limit 60 FPS")
 	quality_select.add_item("Hoch · bis 4K · Limit 60 FPS" if OS.has_feature("pc") else "Hoch · Limit 60 FPS")
+	quality_select.add_item("Sehr hoch · Limit 30 FPS")
 	quality_select.custom_minimum_size.y = 46
-	var profiles := ["low", "balanced", "high"]
+	var profiles := ["low", "balanced", "high", "very_high"]
 	quality_select.selected = profiles.find(_quality)
 	column.add_child(quality_select)
 	quality_select.item_selected.connect(func(index: int):
@@ -1320,7 +1321,7 @@ func _load_settings() -> void:
 		_touch_enabled = bool(config.get_value("input", "touch_controls", _touch_enabled))
 		_diagnostics = bool(config.get_value("graphics", "diagnostics", false))
 		_quality = String(config.get_value("graphics", "quality", "balanced"))
-		if _quality not in ["low", "balanced", "high"]:
+		if _quality not in ["low", "balanced", "high", "very_high"]:
 			_quality = "balanced"
 	_apply_volume()
 

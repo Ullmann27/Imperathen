@@ -269,7 +269,11 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 		"mode_person": _set_mode("person")
 		"mode_city": _set_mode("city")
 		"mode_map": _set_mode("map")
-		"quality_changed": world.set_quality(str(payload.get("profile", "balanced")))
+		"quality_changed":
+			var selected_profile: String = str(payload.get("profile", "balanced"))
+			world.set_quality(selected_profile)
+			if is_instance_valid(valley):
+				valley.set_quality(selected_profile)
 		"move_axis":
 			if screen == "playing":
 				world.set_touch_move(Vector2(float(payload.get("x", 0.0)), float(payload.get("y", 0.0))))

@@ -208,7 +208,7 @@ func _build_ui() -> void:
 	row.add_theme_constant_override("v_separation",8)
 	column.add_child(row)
 	var quality_group := ButtonGroup.new()
-	for entry in [["Niedrig","low"],["Ausgewogen","balanced"],["Hoch","high"]]:
+	for entry in [["Leicht","low"],["Ausgewogen","balanced"],["Hoch","high"],["Sehr hoch","very_high"]]:
 		var button := Button.new()
 		button.text = entry[0]
 		button.custom_minimum_size = Vector2(125,44)
@@ -335,7 +335,7 @@ func _verify_invariants() -> void:
 	var failures: Array[String] = []
 	if essential_assets.size()!=6: failures.append("Expected six essential placed assets")
 	var runs: Array = []
-	for id in ["low","balanced","high","low","balanced"]:
+	for id in ["low","balanced","high","very_high","low","balanced"]:
 		_apply_quality(id,false)
 		runs.append(last_profile.duplicate(true))
 		for index in range(essential_assets.size()):
