@@ -14,7 +14,7 @@ var season_index := -1
 const PLAYER_SPEED := 4.6
 const START_YAW := 0.62
 const START_PITCH := 0.18
-const PERSON_ZOOM_MIN := 1.7
+const PERSON_ZOOM_MIN := 1.25
 const PERSON_ZOOM_MAX := 12.0
 const INTERACTION_RADIUS := 3.0
 const TRAINING_LOCATION := Vector3(0, 0, -7)
@@ -32,7 +32,7 @@ var _preview_valid := false
 var _preview_position := Vector3.ZERO
 var _camera_yaw := START_YAW
 var _camera_pitch := START_PITCH
-var _person_zoom := 3.8
+var _person_zoom := 3.05
 var _city_zoom := 43.0
 var _city_focus := Vector3(7, 0, 1)
 var _attack_cooldown := 0.0
@@ -300,7 +300,7 @@ func _build_scene() -> void:
 	_create_preview()
 	_camera = Camera3D.new()
 	_camera.name = "WorldCamera"
-	_camera.fov = 66.0
+	_camera.fov = 54.0
 	_camera.near = 0.12
 	_camera.far = 300.0
 	add_child(_camera)
