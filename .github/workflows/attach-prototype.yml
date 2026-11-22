@@ -37,6 +37,10 @@ jobs:
           import pathlib, sys, tarfile, zipfile
           output = pathlib.Path("files") / (sys.argv[1] + "-Figuren.zip")
           with tarfile.open("source.tar.gz") as archive:
+              march = next((m for m in archive.getmembers() if m.isfile()
+                            and m.name.split("/")[1:] == ["art", "soldiers", "field_march.webm"]), None)
+              if march:
+                  (output.parent / (sys.argv[1] + "-Marsch.webm")).write_bytes(archive.extractfile(march).read())
               portraits = sorted((m for m in archive.getmembers() if m.isfile()
                                   and m.name.split("/")[1:-1] == ["prototype", "assets", "portraits"]
                                   and m.name.endswith(".webp")), key=lambda m: m.name)
@@ -49,5 +53,6 @@ jobs:
           cd files
           downloads=("$prefix-arm64.apk" "$prefix-Windows-x86_64.zip" "$prefix-Linux-x86_64.tar.gz")
           if [[ -f "$prefix-Figuren.zip" ]]; then downloads+=("$prefix-Figuren.zip"); fi
+          if [[ -f "$prefix-Marsch.webm" ]]; then downloads+=("$prefix-Marsch.webm"); fi
           sha256sum "${downloads[@]}" > "$prefix-SHA256SUMS.txt"
           gh release upload "$tag" "${downloads[@]}" "$prefix-SHA256SUMS.txt"
