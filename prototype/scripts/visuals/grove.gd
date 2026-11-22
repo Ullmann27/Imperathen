@@ -3,7 +3,7 @@ extends Node3D
 
 const KINDS := ["pine", "olive", "oak"]
 const LEVELS := ["near", "mid", "far"]
-const DISTANCES := {"low": Vector2(0, 24), "balanced": Vector2(17, 52), "high": Vector2(28, 76)}
+const DISTANCES := {"low": Vector2(0, 24), "balanced": Vector2(17, 52), "high": Vector2(28, 76), "very_high": Vector2(38, 110)}
 # Outward-rounded union of the three native GLB bounds, including foliage cards
 # and the root skirt. The landscape import test checks every LOD against these.
 const CANOPY_BOUNDS := {
