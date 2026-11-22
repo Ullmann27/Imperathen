@@ -105,7 +105,8 @@ func _test_empire() -> void:
 		if not result.ok:
 			printerr("Empire turn rejected ",command," ",result.message)
 			break
-	_check(data.owned.size() == Atlas.REGIONS.size() and Campaign.validate(data), "Every modeled territory is conquerable through legal turns from Italia")
+	var peak: int = data.owned.size()
+	_check(peak == Atlas.REGIONS.size() and Campaign.validate(data), "Every modeled territory is conquerable through legal turns from Italia")
 	_check(crossing_seen, "Conquest includes a longer sea connection")
 	_check(data.mandate == 0 and not last_frontier.is_empty(), "Expansion alone does not promote")
 	if data.actions == 0:
@@ -129,7 +130,7 @@ func _test_empire() -> void:
 	_advance(data,20)
 	_check(data.unrest >= 45 and data.owned.size() < size_before and data.home in data.owned, "Prolonged shortage in a large realm costs border control")
 	_check(Campaign.validate(data),"Border losses preserve connectivity to home")
-	print("Atlas test territories=%d year=%d via=%s" % [size_before,Campaign.summary(data).year,str(last_frontier.get("id"))])
+	print("Atlas test peak=%d remaining_after_shortages=%d year=%d last_conquest=%s" % [peak,data.owned.size(),Campaign.summary(data).year,str(last_frontier.get("id"))])
 
 
 func _test_rejection() -> void:
