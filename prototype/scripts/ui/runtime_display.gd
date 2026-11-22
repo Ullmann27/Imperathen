@@ -101,6 +101,15 @@ func _process(_delta: float) -> void:
 		"%.1f MiB" % (ram / 1024.0) if ram > 0 else "unbekannt", draws, primitives]
 	if _units.x >= 0:
 		_label.text += "\nSoldaten nah / mittel / fern: %d / %d / %d" % [_units.x, _units.y, _units.z]
+	if OS.is_debug_build() and OS.has_feature("android"):
+		print("IMPERATHEN_DISPLAY_SAMPLE " + JSON.stringify({
+			"gpu": RenderingServer.get_video_adapter_name(), "quality": _quality,
+			"fps": 1000.0 / frame_ms, "mean_frame_ms": frame_ms, "frames": _sample_frames,
+			"render_cpu_ms": cpu_ms if cpu_ms > 0 else null,
+			"render_gpu_ms": gpu_ms if gpu_ms > 0 else null,
+			"rss_kib": ram if ram > 0 else null, "visible_primitives": primitives,
+			"draw_calls": draws, "near_mid_far": [_units.x, _units.y, _units.z],
+			"output": [get_window().size.x, get_window().size.y], "scale_3d": viewport.scaling_3d_scale}))
 	_restart_sample()
 
 

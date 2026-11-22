@@ -10,7 +10,7 @@ button. Screenshots and logcat remain inspectable; errors never become fake pass
 import argparse
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import time
@@ -63,10 +63,25 @@ def main():
     def tap(point):
         adb("shell", "input", "tap", str(round(point[0])), str(round(point[1])))
 
-    def relaunch():
+    def enable_diagnostics_for_emulator():
+        # The clean test account has just saved via the real game. Locate its
+        # actual data directory before enabling the same persisted UI preference.
+        paths = adb("shell", "run-as", package, "find", "files", "-name", "imperathen_campaign.json").splitlines()
+        paths = [PurePosixPath(value.strip()) for value in paths if value.strip().startswith("files/")]
+        if len(paths) != 1:
+            raise RuntimeError("Expected one campaign file in the disposable emulator app")
+        settings_path = paths[0].with_name("imperathen_ui.cfg")
+        written = subprocess.run([args.adb, "-s", serial, "shell", "run-as", package, "tee", str(settings_path)],
+                                 input=b"[graphics]\ndiagnostics=true\n", capture_output=True, timeout=15)
+        if written.returncode:
+            raise RuntimeError("Unable to enable frame counters in emulator test preferences")
+
+    def relaunch(diagnostics=False):
         previous = report["pid"]
         (args.output / ("logcat-" + previous + ".txt")).write_text(logs(), encoding="utf-8")
         adb("shell", "am", "force-stop", package)
+        if diagnostics:
+            enable_diagnostics_for_emulator()
         started = adb("shell", "am", "start", "-W", "-n", component, timeout=60)
         if "Status: ok" not in started:
             raise RuntimeError("Relaunch failed: " + started)
@@ -158,7 +173,7 @@ def main():
         tap(resumed_menu["continue"])
         wait_marker("IMPERATHEN_CONTINUED")
         record("continue_after_process_death", True, "Loaded the village in a new process")
-        practice_menu = relaunch()
+        practice_menu = relaunch(diagnostics=True)
         tap(practice_menu["demo"])
         wait_marker("IMPERATHEN_VALLEY_READY")
         record("formation_valley", True, "Actual practice menu touch opened the valley scene")
@@ -171,6 +186,13 @@ def main():
         time.sleep(4)
         record("square_display_alive", adb("shell", "pidof", package) == report["pid"], adb("shell", "wm", "size"))
         screenshot("05_android_valley_square.png")
+        scene_log = logs().split("IMPERATHEN_VALLEY_READY", 1)[-1]
+        samples = [json.loads(line.split("IMPERATHEN_DISPLAY_SAMPLE ", 1)[1])
+                   for line in scene_log.splitlines() if "IMPERATHEN_DISPLAY_SAMPLE " in line]
+        report["valley_render_samples"] = samples
+        record("measured_valley_frames", bool(samples), {"intervals": len(samples),
+               "scope": "Software-rendered emulator; CPU/GPU values are latest renderer timings, frame time is an interval mean"})
+
         final_log = logs() + "\n" + "\n".join(path.read_text(encoding="utf-8") for path in args.output.glob("logcat-*.txt"))
         errors = [line for line in final_log.splitlines() if re.search(r"SCRIPT ERROR:|Parse Error:|FATAL EXCEPTION|Fatal signal|ERROR:.*res://", line)]
         record("no_runtime_script_crash", not errors, errors)
