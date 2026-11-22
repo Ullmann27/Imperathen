@@ -17,6 +17,7 @@ var distance := 38.0
 var azimuth := 0.0
 var selected := []
 var actors := {}
+var render_profiles: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/quality_profiles.json")).profiles
 var motion := {}
 var frame_remainder := 0.0
 var standards := {}
@@ -130,6 +131,7 @@ func _process(delta: float) -> void:
 		_sync_units()
 		_refresh()
 	var fraction := clampf(frame_remainder / Rules.STEP,0.0,1.0)
+	far_ranks.set_step_fraction(fraction)
 	for id in actors:
 		var track: Dictionary = motion[id]
 		var actor = actors[id]
@@ -144,6 +146,26 @@ func _process(delta: float) -> void:
 func _sync_units() -> void:
 	var live := {}
 	var distant := {}
+	var far_gaits := {}
+	var roster := {}
+	var ranked := []
+	var near_limit := float({"low":13, "balanced":18, "high":25, "very_high":35}[profile])
+	var mid_limit := near_limit + float({"low":30, "balanced":30, "high":42, "very_high":55}[profile])
+	for s: Dictionary in model.squads.values():
+		if s.strength <= 0 or s.status == "withdrawn":
+			continue
+		roster[s.id] = model.soldiers(s.id)
+		for man: Dictionary in roster[s.id]:
+			var at := _surface(Vector2(man.x, man.z)) + Vector3.UP
+			var distance := camera.global_position.distance_to(at)
+			if distance <= mid_limit and camera.is_position_in_frustum(at):
+				# A small margin stabilises the cutoff when neighbouring soldiers exchange places.
+				ranked.append([distance - (0.7 if actors.has(man.id) else 0.0), man.id])
+	ranked.sort()
+	var rigged := {}
+	var budget: int = render_profiles[profile].review_limits.animated_valley_actors
+	for i in mini(budget, ranked.size()):
+		rigged[ranked[i][1]] = true
 	var counts := [0,0,0]
 	for s: Dictionary in model.squads.values():
 		var flag: Label3D = standards[s.id]
@@ -155,14 +177,12 @@ func _sync_units() -> void:
 		if not flag.visible:
 			continue
 		var i := 0
-		for man in model.soldiers(s.id):
+		for man in roster[s.id]:
 			var id: String = man.id
 			live[id] = true
 			var destination := _surface(Vector2(man.x,man.z))
 			var dist := camera.position.distance_to(destination)
-			var near_limit := 13.0 if profile == "low" else (35.0 if profile == "very_high" else (25.0 if profile == "high" else 18.0))
-			var mid_limit := near_limit + (55.0 if profile == "very_high" else (42.0 if profile == "high" else 30.0))
-			var detail := 0 if dist < near_limit else (1 if dist < mid_limit else 2)
+			var detail := (0 if dist < near_limit else 1) if rigged.has(id) else 2
 			var role := "spear" if s.kind == "spear" else ("archer" if s.kind == "archer" else "heavy")
 			if id == s.officer_id and s.side == "ally" and s.kind == "infantry":
 				role = "officer"
@@ -171,7 +191,12 @@ func _sync_units() -> void:
 			if detail == 2:
 				if not distant.has(role):
 					distant[role] = []
-				distant[role].append(Transform3D(Basis(Vector3.UP,float(man.facing)+PI),destination))
+					far_gaits[role] = []
+				var track: Dictionary = motion[id]
+				var travel := Vector3(track.start).distance_to(track.end)
+				var walking := Soldier.STRIDES.has(track.pose)
+				distant[role].append(Transform3D(Basis(Vector3.UP, track.yaw), destination))
+				far_gaits[role].append(Color(track.phase0, track.phase1-track.phase0, minf(travel*0.5, 1.0), 1.0 if walking else 0.0))
 				if actors.has(id):
 					actors[id].queue_free()
 					actors.erase(id)
@@ -192,7 +217,7 @@ func _sync_units() -> void:
 			node.set_detail(detail)
 
 			i += 1
-	far_ranks.sync(distant)
+	far_ranks.sync(distant, far_gaits)
 	get_node("/root/RuntimeDisplay").set_unit_counts(counts[0],counts[1],counts[2])
 	for id in actors.keys():
 		if not live.has(id):

@@ -76,6 +76,8 @@ var _ui_theme: Theme
 var _hud_labels: Dictionary = {}
 var _action_buttons: Dictionary = {}
 var _mode_buttons: Dictionary = {}
+var _life_panel: PanelContainer
+var _chronicle_panel: PanelContainer
 var _health_bar: ProgressBar
 var _touch_enabled := false
 var _compact_layout := false
@@ -467,6 +469,9 @@ func set_mode(mode: String) -> void:
 			"city": "Hütte wählen · Freien Bauplatz antippen · Zum Beenden Bau abbrechen wählen.",
 			"map": "Im freien Bild ziehen · Figur wählen, um zurückzukehren · Deine Figur bleibt an ihrem Ort."
 		}
+	_life_panel.visible = not _compact_layout and mode != "person"
+	_chronicle_panel.visible = _life_panel.visible
+	_hud_labels.compact_life.visible = not _life_panel.visible
 	_action_buttons["atlas"].visible = mode == "map"
 	_hud_labels["controls"].text = hints[mode]
 	var objective := _objective(_state)
@@ -485,6 +490,15 @@ func _update_map_objective() -> void:
 func set_build_active(active: bool) -> void:
 	_build_active = active
 	_update_touch_visibility()
+
+
+func set_quality(profile: String) -> void:
+	if profile not in ["low", "balanced", "high", "very_high"]:
+		return
+	_quality = profile
+	_apply_display_settings()
+	_save_settings()
+	_emit("quality_changed", {"profile": _quality})
 
 
 func get_quality() -> String:
@@ -614,8 +628,8 @@ func _build_top_bar() -> void:
 	_hud_labels["time"] = _label("", 12, MUTED)
 	_hud_labels["time"].vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(_hud_labels["time"])
+	row.add_child(_button("Chronik", _show_journal, false, 12))
 	if _compact_layout:
-		row.add_child(_button("Chronik", _show_journal, false, 12))
 		row.add_child(_button("Pause", func(): _emit("pause"), false, 12))
 	else:
 		row.add_child(_button("Speichern", func(): _emit("save"), false, 13))
@@ -641,14 +655,14 @@ func _build_objective_card() -> void:
 		_hud_labels["objective_text"].max_lines_visible = 2 if _content_size().y < 520 else 3 if short_layout else 4
 		_hud_labels["objective_text"].text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	column.add_child(_hud_labels["objective_text"])
-	if _compact_layout:
-		_hud_labels["compact_life"] = _label("", 12, BRONZE)
-		_hud_labels["compact_life"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		column.add_child(_hud_labels["compact_life"])
+	_hud_labels["compact_life"] = _label("", 12, BRONZE)
+	_hud_labels["compact_life"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	column.add_child(_hud_labels["compact_life"])
 
 
 func _build_character_card() -> void:
 	var panel := _panel(false)
+	_life_panel = panel
 	panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	panel.offset_left = -282
 	panel.offset_right = -24
@@ -678,6 +692,7 @@ func _build_character_card() -> void:
 	_hud_labels["squad"].tooltip_text = "Lebende Soldaten im Verhältnis zu allen bisher rekrutierten Soldaten."
 	column.add_child(_hud_labels["squad"])
 	var chronicle_panel := _panel(false)
+	_chronicle_panel = chronicle_panel
 	chronicle_panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	chronicle_panel.offset_left = -282
 	chronicle_panel.offset_right = -24
@@ -1071,10 +1086,7 @@ func _show_settings(return_screen: String) -> void:
 	quality_select.selected = profiles.find(_quality)
 	column.add_child(quality_select)
 	quality_select.item_selected.connect(func(index: int):
-		_quality = profiles[index]
-		_apply_display_settings()
-		_save_settings()
-		_emit("quality_changed", {"profile": _quality})
+		set_quality(profiles[index])
 	)
 	var diagnostics := CheckButton.new()
 	diagnostics.name = "DiagnosticsSetting"

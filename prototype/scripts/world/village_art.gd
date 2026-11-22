@@ -94,6 +94,8 @@ static func label(parent: Node3D, words: String, location: Vector3, color: Color
 	result.modulate = color
 	result.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	result.no_depth_test = false
+	result.visibility_range_end = 12.0
+	result.visibility_range_end_margin = 1.0
 	parent.add_child(result)
 	return result
 
@@ -150,43 +152,11 @@ static func hut(parent: Node3D, stone: Material, timber: Material, tiles: Materi
 	return home
 
 
-static func person(parent: Node3D, tunic_color: Color, armored: bool = false) -> Node3D:
-	var actor := Node3D.new()
+static func person(parent: Node3D, role: String, home := "italia", age := 18) -> Node3D:
+	var actor := preload("res://scripts/visuals/village_person.gd").new()
 	actor.name = "Figure"
 	parent.add_child(actor)
-	var tunic := material(tunic_color)
-	var skin := material(Color(0.66, 0.46, 0.31))
-	var leather := material(Color(0.19, 0.13, 0.09))
-	var metal := material(Color(0.45, 0.46, 0.43), 0.5)
-	box(actor, Vector3(0.48, 0.55, 0.29), Vector3(0, 0.05, 0), tunic)
-	cylinder(actor, 0.30, 0.30, Vector3(0, -0.29, 0), tunic, 0.24)
-	box(actor, Vector3(0.50, 0.07, 0.32), Vector3(0, -0.16, 0), leather)
-	cylinder(actor, 0.075, 0.13, Vector3(0, 0.41, 0), skin)
-	sphere(actor, 0.17, Vector3(0, 0.60, -0.015), skin, Vector3(0.90, 1.12, 0.95))
-	sphere(actor, 0.174, Vector3(0, 0.68, 0.02), leather, Vector3(0.91, 0.65, 0.90))
-	for side: float in [-1.0, 1.0]:
-		var leg := Node3D.new()
-		leg.name = "LegLeft" if side < 0.0 else "LegRight"
-		leg.position = Vector3(side * 0.13, -0.36, 0)
-		actor.add_child(leg)
-		cylinder(leg, 0.085, 0.39, Vector3(0, -0.19, 0), skin)
-		box(leg, Vector3(0.19, 0.12, 0.30), Vector3(0, -0.44, -0.055), leather)
-		var arm := Node3D.new()
-		arm.name = "ArmLeft" if side < 0.0 else "ArmRight"
-		arm.position = Vector3(side * 0.31, 0.24, 0)
-		actor.add_child(arm)
-		cylinder(arm, 0.075, 0.20, Vector3(0, -0.09, 0), tunic)
-		cylinder(arm, 0.057, 0.31, Vector3(0, -0.32, 0), skin)
-		if side > 0.0:
-			var weapon := box(arm, Vector3(0.075, 0.08, 0.52), Vector3(0, -0.48, -0.24), metal)
-			weapon.name = "Sword"
-			var guard := box(arm, Vector3(0.16, 0.055, 0.07), Vector3(0, -0.48, -0.04), leather)
-			guard.name = "SwordGuard"
-	if armored:
-		box(actor, Vector3(0.50, 0.42, 0.33), Vector3(0, 0.11, 0), metal)
-		cylinder(actor, 0.185, 0.17, Vector3(0, 0.72, 0), metal, 0.15)
-		var shield := box(actor, Vector3(0.12, 0.63, 0.46), Vector3(-0.47, -0.05, -0.10), tunic)
-		box(shield, Vector3(0.15, 0.08, 0.40), Vector3.ZERO, metal)
+	actor.configure(role,home,age)
 	return actor
 
 

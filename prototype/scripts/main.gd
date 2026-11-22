@@ -425,6 +425,10 @@ func _open_valley(demo: bool) -> void:
 		ui.notify("Verteidige zuerst das Dorf und schließe die Folgeentscheidung ab.")
 		return
 	valley = ValleyScene.new()
+	valley.hud.requested.connect(func(action: String, arg: String):
+		if action == "quality":
+			ui.set_quality(arg)
+	)
 	if not demo and not model.data.valley.is_empty():
 		if not valley.model.restore(model.data.valley.snapshot):
 			valley.free()

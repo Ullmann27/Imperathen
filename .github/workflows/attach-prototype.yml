@@ -21,7 +21,7 @@ jobs:
           set -euo pipefail
           run_id="${GITHUB_REF_NAME#qa-assets/}"
           [[ "$run_id" =~ ^[0-9]+$ ]]
-          source_sha=$(gh api "repos/$GH_REPO/actions/runs/$run_id" --jq 'select(.path==".github/workflows/android-prototype.yml" and .event=="push" and .head_branch=="integration/android-formation-20261122") | .head_sha')
+          source_sha=$(gh api "repos/$GH_REPO/actions/runs/$run_id" --jq 'select(.path==".github/workflows/android-prototype.yml" and .event=="push" and (.head_branch=="integration/android-formation-20261122" or .head_branch=="integration/realistic-android-23")) | .head_sha')
           [[ "$source_sha" =~ ^[0-9a-f]{40}$ ]]
           tag=$(gh api "repos/$GH_REPO/releases" | jq -er --arg sha "$source_sha" '[.[] | select(.draft and .prerelease and .target_commitish==$sha)] | select(length==1) | .[0].tag_name')
           prefix="IMPERATHEN-${source_sha:0:8}"
@@ -29,6 +29,9 @@ jobs:
           gh run download "$run_id" --pattern 'imperathen-android-*' --dir source-android
           gh run download "$run_id" --pattern 'imperathen-desktop-*' --dir source-desktop
           cp source-android/imperathen-android-*/"$prefix-arm64.apk" files/
+          for mobile in source-android/imperathen-android-*/"$prefix-arm64-vulkan.apk"; do
+            if [[ -f "$mobile" ]]; then cp "$mobile" files/; fi
+          done
           cp source-desktop/imperathen-desktop-*/"$prefix-Windows-x86_64.zip" files/
           cp source-desktop/imperathen-desktop-*/"$prefix-Linux-x86_64.tar.gz" files/
           # The alpha portraits in the source archive are the exact textures imported by Godot.
@@ -52,6 +55,7 @@ jobs:
           PYTHON
           cd files
           downloads=("$prefix-arm64.apk" "$prefix-Windows-x86_64.zip" "$prefix-Linux-x86_64.tar.gz")
+          if [[ -f "$prefix-arm64-vulkan.apk" ]]; then downloads+=("$prefix-arm64-vulkan.apk"); fi
           if [[ -f "$prefix-Figuren.zip" ]]; then downloads+=("$prefix-Figuren.zip"); fi
           if [[ -f "$prefix-Marsch.webm" ]]; then downloads+=("$prefix-Marsch.webm"); fi
           sha256sum "${downloads[@]}" > "$prefix-SHA256SUMS.txt"

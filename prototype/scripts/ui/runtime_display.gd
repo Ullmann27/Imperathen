@@ -11,6 +11,8 @@ var _panel: PanelContainer
 var _sample_start := 0
 var _sample_frames := 0
 var _adapter_line := ""
+var _previous_frame_usec := 0
+var _recent_times: Array[float] = []
 
 
 func _ready() -> void:
@@ -30,11 +32,17 @@ func _ready() -> void:
 	_panel.add_child(_label)
 	get_viewport().size_changed.connect(_on_size_changed)
 	set_diagnostics(false)
+	if OS.is_debug_build() and OS.has_feature("android") and FileAccess.file_exists("user://graphics-probe.txt"):
+		var probe = preload("res://scripts/ui/android_graphics_probe.gd").new()
+		add_child.call_deferred(probe)
 
 
 func apply_quality(profile: String) -> void:
 	if not _profiles.has(profile):
 		return
+	if profile != _quality:
+		_previous_frame_usec = 0
+		_recent_times.clear()
 	_quality = profile
 	var settings: Dictionary = _profiles[profile]
 	Engine.max_fps = 30 if profile in ["low", "very_high"] else 60
@@ -71,6 +79,8 @@ func set_diagnostics(enabled: bool) -> void:
 		RenderingServer.viewport_set_measure_render_time(get_viewport().get_viewport_rid(), enabled)
 	if enabled:
 		_adapter_line = "%s · %s" % [RenderingServer.get_current_rendering_method(), RenderingServer.get_video_adapter_name()]
+		_previous_frame_usec = 0
+		_recent_times.clear()
 		_label.text = "Bildzeiten werden erfasst …"
 		_place_overlay()
 		_restart_sample()
@@ -88,13 +98,21 @@ func _restart_sample() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_RESUMED and is_instance_valid(_panel) and _panel.visible:
+		_previous_frame_usec = 0
+		_recent_times.clear()
 		_restart_sample()
 		_place_overlay.call_deferred()
 
 
 func _process(_delta: float) -> void:
+	var now := Time.get_ticks_usec()
+	if _previous_frame_usec > 0:
+		_recent_times.append((now - _previous_frame_usec) * 0.001)
+		if _recent_times.size() > 180:
+			_recent_times.pop_front()
+	_previous_frame_usec = now
 	_sample_frames += 1
-	var interval := Time.get_ticks_usec() - _sample_start
+	var interval := now - _sample_start
 	if interval < 1000000:
 		return
 	var viewport := get_viewport()
@@ -108,6 +126,14 @@ func _process(_delta: float) -> void:
 	_label.text = "%.1f FPS · %.1f ms/Bild\nRender-CPU %s · GPU %s\nRAM (RSS) %s · %d Draw Calls\n%d sichtbare Primitive" % [
 		1000.0 / frame_ms, frame_ms, _timing(cpu_ms), _timing(gpu_ms),
 		"%.1f MiB" % (ram / 1024.0) if ram > 0 else "unbekannt", draws, primitives]
+	if _recent_times.size() >= 10:
+		var sorted := _recent_times.duplicate()
+		sorted.sort()
+		var n := sorted.size()
+		_label.text += "\nBildzeit P50/P95/P99: %.1f / %.1f / %.1f ms" % [
+			sorted[ceili(n * 0.50)-1], sorted[ceili(n * 0.95)-1], sorted[ceili(n * 0.99)-1]]
+		if n == 180 and sorted[ceili(n * 0.95)-1] > 1000.0 / 30.0:
+			_label.text += "\nÜber 33 ms: Grafikstufe bei Bedarf senken."
 	var output := get_window().size
 	var internal := Vector2i((Vector2(output) * viewport.scaling_3d_scale).round())
 	_label.text += "\n%s\n3D %d × %d · Ausgabe %d × %d" % [_adapter_line, internal.x, internal.y, output.x, output.y]
@@ -116,6 +142,7 @@ func _process(_delta: float) -> void:
 	if OS.is_debug_build() and OS.has_feature("android"):
 		print("IMPERATHEN_DISPLAY_SAMPLE " + JSON.stringify({
 			"gpu": RenderingServer.get_video_adapter_name(), "quality": _quality,
+			"renderer": RenderingServer.get_current_rendering_method(), "driver": RenderingServer.get_current_rendering_driver_name(),
 			"fps": 1000.0 / frame_ms, "mean_frame_ms": frame_ms, "frames": _sample_frames,
 			"render_cpu_ms": cpu_ms if cpu_ms > 0 else null,
 			"render_gpu_ms": gpu_ms if gpu_ms > 0 else null,

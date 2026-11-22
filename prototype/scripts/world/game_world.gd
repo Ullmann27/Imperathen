@@ -8,11 +8,14 @@ const Grove = preload("res://scripts/visuals/grove.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 var regional = preload("res://scripts/world/regional_village.gd").new()
 var grove = Grove.new()
+var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
 var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
 const PLAYER_SPEED := 4.6
-const PERSON_ZOOM_MIN := 1.7
+const START_YAW := 0.62
+const START_PITCH := 0.18
+const PERSON_ZOOM_MIN := 1.25
 const PERSON_ZOOM_MAX := 12.0
 const INTERACTION_RADIUS := 3.0
 const TRAINING_LOCATION := Vector3(0, 0, -7)
@@ -28,9 +31,9 @@ var _mode := "person"
 var _build_mode := false
 var _preview_valid := false
 var _preview_position := Vector3.ZERO
-var _camera_yaw := 0.0
-var _camera_pitch := 0.40
-var _person_zoom := 7.5
+var _camera_yaw := START_YAW
+var _camera_pitch := START_PITCH
+var _person_zoom := 3.05
 var _city_zoom := 43.0
 var _city_focus := Vector3(7, 0, 1)
 var _attack_cooldown := 0.0
@@ -48,8 +51,12 @@ var _touch_preview_position := Vector2.ZERO
 var _map_focus := Vector3(-7, 0, -7)
 var _quality_profile := "balanced"
 var _sun: DirectionalLight3D
+var _village_environment := Environment.new()
 var _player: CharacterBody3D
-var _figure: Node3D
+const VillagePerson := preload("res://scripts/visuals/village_person.gd")
+var _shown_health := -1
+var _shown_work := -1.0
+var _figure: VillagePerson
 var _camera: Camera3D
 var _camera_initialized := false
 var _companion: Node3D
@@ -77,7 +84,11 @@ func _ready() -> void:
 
 
 func setup(state: Dictionary) -> void:
+	_shown_health = -1
+	_shown_work = -1.0
 	_build_scene()
+	for actor in get_tree().get_nodes_in_group("village_people"):
+		if is_ancestor_of(actor): actor.reset_motion()
 	set_build_mode(false)
 	_reset_touch_input()
 	_resolve_requested = false
@@ -90,8 +101,9 @@ func setup(state: Dictionary) -> void:
 	else:
 		_player.position = Vector3(0, 1, 8)
 	_player.velocity = Vector3.ZERO
-	_camera_yaw = 0.0
-	_camera_pitch = 0.40
+	_camera_yaw = START_YAW
+	_camera_pitch = START_PITCH
+	_figure.rotation.y = START_YAW
 	_camera_initialized = false
 	if regional.current_origin != state.get("origin_id","italia"):
 		var id: String = state.get("origin_id","italia")
@@ -117,9 +129,19 @@ func sync_state(state: Dictionary) -> void:
 	_sync_squad()
 	var player_data: Dictionary = _state.get("player", {})
 	var age := int(player_data.get("age", 12))
-	_figure.scale = Vector3.ONE * (0.88 if age < 18 else 1.0)
-	_figure.get_node("ArmRight/Sword").visible = age >= 18
-	_figure.get_node("ArmRight/SwordGuard").visible = age >= 18
+	_figure.configure("player",_state.get("origin_id","italia"),age)
+	_update_people_profile()
+	var health_now := int(player_data.get("health",100))
+	var construction := 0.0
+	for hut: Dictionary in _state.get("buildings",[]):
+		construction += 1.0 + float(hut.get("progress",0.0))
+	if health_now == 0 or (_shown_health >= 0 and health_now < _shown_health):
+		_figure.cue("death" if health_now == 0 else "hit")
+	elif _shown_work >= 0 and construction > _shown_work:
+		_figure.keep_working()
+	_shown_health = health_now
+	_shown_work = construction
+	_companion.get_node("Figure").configure("companion",_state.get("origin_id","italia"),age)
 	var progress: Dictionary = _state.get("progress", {})
 	var trained := bool(progress.get("training_complete", false))
 	var hits := int(progress.get("training_hits", 0))
@@ -158,6 +180,9 @@ func set_active(active: bool) -> void:
 		_reset_touch_input()
 	if _player != null and not active:
 		_player.velocity = Vector3.ZERO
+		_figure.drive(0.0)
+		for recruit in _squad_views:
+			recruit.get_node("Figure").drive(0.0)
 	if _preview != null:
 		_preview.visible = active and _build_mode and _mode == "city"
 	if _hint != null:
@@ -196,8 +221,21 @@ func set_quality(profile: String) -> void:
 	if profile not in ["low", "balanced", "high", "very_high"]:
 		return
 	_quality_profile = profile
+	_update_people_profile()
 	grove.set_quality(profile)
+	scenery.set_quality(profile)
 	_apply_quality()
+
+
+func _update_people_profile() -> void:
+	for actor in get_tree().get_nodes_in_group("village_people"):
+		if is_ancestor_of(actor) and actor.profile != _quality_profile:
+			actor.profile = _quality_profile
+			actor.refresh_lod(_camera)
+
+
+func set_presentation_time(seconds: float) -> void:
+	scenery.set_presentation_time(seconds)
 
 
 func get_quality_profile() -> String:
@@ -294,7 +332,7 @@ func _build_scene() -> void:
 	_create_preview()
 	_camera = Camera3D.new()
 	_camera.name = "WorldCamera"
-	_camera.fov = 66.0
+	_camera.fov = 54.0
 	_camera.near = 0.12
 	_camera.far = 300.0
 	add_child(_camera)
@@ -306,21 +344,20 @@ func _build_scene() -> void:
 
 func _create_atmosphere() -> void:
 	var world_environment := WorldEnvironment.new()
-	var environment := Environment.new()
+	var environment := _village_environment
 	environment.background_mode = Environment.BG_SKY
 	var sky := Sky.new()
-	var sky_paint := ProceduralSkyMaterial.new()
-	sky_paint.sky_top_color = Color(0.25, 0.40, 0.54)
-	sky_paint.sky_horizon_color = Color(0.77, 0.73, 0.60)
-	sky_paint.ground_bottom_color = Color(0.17, 0.20, 0.16)
-	sky_paint.ground_horizon_color = Color(0.64, 0.61, 0.49)
-	sky.sky_material = sky_paint
+	sky.radiance_size = Sky.RADIANCE_SIZE_64
+	sky.sky_material = scenery.sky_material
 	environment.sky = sky
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color(0.69, 0.77, 0.85)
 	environment.ambient_light_energy = 0.58
-	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	environment.ambient_light_sky_contribution = 0.0
+	environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	environment.fog_enabled = true
+	environment.fog_sky_affect = 0.06
+	environment.fog_sun_scatter = 0.04
 	environment.fog_density = 0.0015
 	environment.fog_light_color = Color(0.63, 0.69, 0.66)
 	world_environment.environment = environment
@@ -329,7 +366,7 @@ func _create_atmosphere() -> void:
 	sun.name = "AfternoonSun"
 	sun.rotation_degrees = Vector3(-42, -28, 0)
 	sun.light_color = Color(1.0, 0.88, 0.69)
-	sun.light_energy = 1.45
+	sun.light_energy = 0.46
 	sun.shadow_enabled = true
 	sun.directional_shadow_max_distance = 95.0
 	add_child(sun)
@@ -340,12 +377,9 @@ func _create_terrain() -> void:
 	var ground := Node3D.new()
 	ground.name = "Landscape"
 	add_child(ground)
-	Art.box(ground, Vector3(180, 0.5, 170), Vector3(0, -0.26, -15), _materials["earth"], true)
-	Art.box(ground, Vector3(4.3, 0.05, 105), Vector3(0, 0.005, -12), _materials["path"])
-	Art.box(ground, Vector3(50, 0.055, 3.2), Vector3(-2, 0.01, 4), _materials["path"])
-	Art.box(ground, Vector3(8, 0.025, 160), Vector3(-28, 0.025, -15), _materials["water"])
-	for side: float in [-1.0, 1.0]:
-		Art.box(ground, Vector3(1.5, 0.06, 160), Vector3(-28 + side * 4.6, -0.01, -15), _materials["dark_stone"])
+	ground.add_child(scenery)
+	scenery.name = "VillageScenery"
+	scenery.create_land()
 	var bridge := Node3D.new()
 	bridge.position = Vector3(-28, 0.03, 4)
 	ground.add_child(bridge)
@@ -372,8 +406,6 @@ func _create_terrain() -> void:
 		if location.x > -20 and location.x < 29 and location.z > -22 and location.z < 19:
 			continue
 		Art.sphere(ground, random.randf_range(0.35, 0.90), location, _materials["dark_stone"], Vector3(1.3, 0.6, 1.0))
-	for index in range(10):
-		Art.sphere(ground, 12.0 + index % 3 * 4.0, Vector3(-75 + index * 17, -4, -78 - index % 2 * 12), _materials["foliage"], Vector3(1.2, 0.7, 0.9))
 	for x: float in [-64, 58]:
 		Art.box_collider(ground, Vector3(1, 15, 105), Vector3(x, 7, -8))
 	for z: float in [-58, 40]:
@@ -385,21 +417,10 @@ func _create_village() -> void:
 	village.name = "FrontierVillage"
 	add_child(village)
 	village.add_child(regional)
-	var market := Node3D.new()
-	market.position = Vector3(-9, 0, 0)
-	village.add_child(market)
-	Art.box(market, Vector3(3, 0.16, 1.2), Vector3(0, 0.85, 0), _materials["timber"], true)
-	for x: float in [-1.4, 1.4]:
-		for z: float in [-0.45, 0.45]:
-			Art.box(market, Vector3(0.10, 2.4, 0.10), Vector3(x, 1.2, z), _materials["timber"])
-	Art.box(market, Vector3(3.3, 0.08, 1.5), Vector3(0, 2.4, 0), _materials["red"])
-	for index in range(4):
-		Art.sphere(market, 0.28, Vector3(-0.9 + index * 0.6, 1.10, 0), _materials["wheat"], Vector3(0.8, 0.9, 0.8))
+	scenery.add_businesses(village)
 	_create_palisade(village)
-	Art.box(village, Vector3(10, 0.055, 5), Vector3(11, 0.0, -17), _materials["field"])
 	village.add_child(crops)
-	for index in range(12):
-		Art.box(crops, Vector3(0.18, 0.28, 4.6), Vector3(6.7 + index * 0.75, 0.12, -17), _materials["wheat"])
+	scenery.sow_field(crops)
 	for x: float in [-3, 3]:
 		Art.box(village, Vector3(0.22, 4.6, 0.22), Vector3(x, 2.3, 18), _materials["timber"], true)
 		Art.box(village, Vector3(1.2, 1.8, 0.04), Vector3(x + 0.56, 3.6, 18), _materials["red"])
@@ -408,21 +429,23 @@ func _create_village() -> void:
 
 func _create_palisade(parent: Node3D) -> void:
 	for z: float in [-21.0, 18.0]:
+		var poses := []
 		for index in range(34):
 			var x := -19.0 + index * 1.4
 			if absf(x) < 3.0:
 				continue
-			Art.cylinder(parent, 0.23, 2.5, Vector3(x, 1.25, z), _materials["timber"], 0.13)
-			Art.box(parent, Vector3(1.55, 0.16, 0.12), Vector3(x, 1.55, z), _materials["cut_wood"])
+			poses.append(Transform3D(Basis.IDENTITY,Vector3(x,0,z)))
+		scenery.palisade_bays(parent,poses)
 		Art.box_collider(parent, Vector3(16, 2.5, 0.5), Vector3(-11, 1.25, z))
 		Art.box_collider(parent, Vector3(25, 2.5, 0.5), Vector3(15.5, 1.25, z))
 	for x: float in [-19.0, 28.0]:
+		var poses := []
 		for index in range(28):
 			var z := -20.0 + index * 1.4
 			if x < 0.0 and absf(z - 4.0) < 2.2:
 				continue
-			Art.cylinder(parent, 0.23, 2.5, Vector3(x, 1.25, z), _materials["timber"], 0.13)
-			Art.box(parent, Vector3(0.12, 0.16, 1.55), Vector3(x, 1.55, z), _materials["cut_wood"])
+			poses.append(Transform3D(Basis(Vector3.UP,PI/2),Vector3(x,0,z)))
+		scenery.palisade_bays(parent,poses)
 		if x > 0.0:
 			Art.box_collider(parent, Vector3(0.5, 2.5, 39), Vector3(x, 1.25, -1.5))
 		else:
@@ -459,7 +482,7 @@ func _create_player() -> void:
 	shape.shape = capsule
 	_player.add_child(shape)
 	add_child(_player)
-	_figure = Art.person(_player, Color(0.53, 0.25, 0.15))
+	_figure = Art.person(_player,"player","italia",12)
 	var player_ring := Art.cylinder(_player, 0.46, 0.018, Vector3(0, -0.87, 0), Art.transparent_material(Color(0.91, 0.76, 0.41, 0.48)))
 	player_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
@@ -469,21 +492,28 @@ func _create_companion_and_training() -> void:
 	_companion.name = "Marcus"
 	_companion.position = COMPANION_LOCATION + Vector3.UP * 0.9
 	add_child(_companion)
-	Art.person(_companion, Color(0.31, 0.39, 0.29))
+	Art.person(_companion,"companion","italia",12)
 	_companion_label = Art.label(_companion, "Marcus · E\nGefährten kennenlernen", Vector3(0, 1.15, 0), Color(0.85, 0.92, 0.74), 36)
 	var training := Node3D.new()
 	training.name = "TrainingGround"
 	training.position = TRAINING_LOCATION
 	add_child(training)
-	Art.box(training, Vector3(6, 0.04, 5), Vector3(0, 0.01, 0), _materials["path"])
-	Art.cylinder(training, 0.16, 2.0, Vector3(0, 1.0, 0), _materials["timber"], 0.13, true)
-	Art.box(training, Vector3(1.5, 0.18, 0.18), Vector3(0, 1.4, 0), _materials["timber"])
-	Art.sphere(training, 0.32, Vector3(0, 1.4, 0), _materials["straw"], Vector3(1.0, 1.6, 0.7))
+	var post := Art.cylinder(training, 0.16, 2.0, Vector3(0, 1.0, 0), _materials["timber"], 0.13, true)
+	var dummy_path := "res://assets/village/training_dummy.glb"
+	if ResourceLoader.exists(dummy_path):
+		post.visible = false
+		var dummy: Node3D = load(dummy_path).instantiate()
+		dummy.name = "TrainingDummy"
+		training.add_child(dummy)
+	else:
+		Art.box(training, Vector3(1.5, 0.18, 0.18), Vector3(0, 1.4, 0), _materials["timber"])
+		Art.sphere(training, 0.32, Vector3(0, 1.4, 0), _materials["straw"], Vector3(1.0, 1.6, 0.7))
 	_training_label = Art.label(training, "Übungsplatz · E", Vector3(0, 2.8, 0), Color(0.97, 0.84, 0.58), 39)
 	var mentor := Node3D.new()
+	mentor.name = "Mentor"
 	mentor.position = Vector3(-2.0, 0.9, -1.5)
 	training.add_child(mentor)
-	Art.person(mentor, Color(0.42, 0.16, 0.13), true)
+	Art.person(mentor,"mentor")
 	Art.label(mentor, "Ausbilder", Vector3(0, 1.05, 0), Color(0.90, 0.83, 0.66), 29)
 
 
@@ -498,6 +528,7 @@ func _create_map_markers() -> void:
 	for child: Node in _markers.get_children():
 		if child is Label3D:
 			child.pixel_size = 0.035
+			child.visibility_range_end = 0
 	_markers.visible = false
 
 
@@ -526,9 +557,10 @@ func _sync_resources() -> void:
 			stock.name = identity
 			_resources_root.add_child(stock)
 			for index in range(4):
-				var log_view := Art.cylinder(stock, 0.20, 1.9, Vector3(-0.35 + index % 2 * 0.55, 0.22 + index / 2 * 0.32, 0), _materials["cut_wood"])
+				var log_view := preload("res://assets/village/timber_billet.glb").instantiate() as Node3D
+				log_view.position = Vector3(-0.35 + index % 2 * 0.55, 0.22 + index / 2 * 0.32, 0)
+				stock.add_child(log_view)
 				log_view.name = "Log%d" % index
-				log_view.rotation.x = PI * 0.5
 			var stock_label := Art.label(stock, "", Vector3(0, 1.55, 0), Color(0.94, 0.84, 0.59), 36)
 			stock_label.name = "StockLabel"
 			_resource_views[identity] = stock
@@ -606,6 +638,7 @@ func _create_building_view(identity: String) -> Node3D:
 	Art.box(scaffold, Vector3(4.5, 0.10, 0.10), Vector3(0, 1.8, 2.0), _materials["timber"])
 	var title := Art.label(building, "Baustelle", Vector3(0, 4.2, 0), Color(0.98, 0.90, 0.65), 36)
 	title.name = "Title"
+	title.visibility_range_end = 0
 	return building
 
 
@@ -642,7 +675,7 @@ func _sync_enemies() -> void:
 			var actor := Node3D.new()
 			actor.name = identity
 			_enemies_root.add_child(actor)
-			Art.person(actor, Color(0.29, 0.25, 0.22))
+			Art.person(actor,"enemy")
 			var name_label := Art.label(actor, "", Vector3(0, 1.15, 0), Color(1, 0.57, 0.39), 33)
 			name_label.name = "HealthLabel"
 			var body := StaticBody3D.new()
@@ -661,8 +694,9 @@ func _sync_enemies() -> void:
 		var health := int(enemy.get("health", 0))
 		visual.position = Vector3(float(enemy.get("x", 0)), 0.9, float(enemy.get("z", 0)))
 		var figure: Node3D = visual.get_node("Figure")
-		figure.rotation.z = 0.0 if health > 0 else PI * 0.5
-		figure.position.y = 0.0 if health > 0 else -0.65
+		if health <= 0: figure.cue("death")
+		elif health < int(visual.get_meta("previous_health",health)): figure.cue("hit")
+		visual.set_meta("previous_health",health)
 		var name_label: Label3D = visual.get_node("HealthLabel")
 		name_label.text = "Räuber · %d / 60" % health
 		name_label.visible = health > 0
@@ -690,7 +724,7 @@ func _sync_squad() -> void:
 		collider.shape = capsule
 		soldier.add_child(collider)
 		_squad_root.add_child(soldier)
-		Art.person(soldier, Color(0.46, 0.14, 0.11), true)
+		Art.person(soldier,"recruit")
 		Art.label(soldier, "Rekrut %d" % (_squad_views.size() + 1), Vector3(0, 1.05, 0), Color(0.78, 0.88, 0.74), 28)
 		soldier.position = _player.position + Vector3(2 + _squad_views.size(), 0, 2)
 		_squad_views.append(soldier)
@@ -757,7 +791,7 @@ func _update_camera(delta: float) -> void:
 	var desired: Vector3
 	if _mode == "person":
 		target = _player.global_position + Vector3(0, 0.40, 0)
-		var offset := Vector3(0, sin(_camera_pitch) * _person_zoom + 1.1, cos(_camera_pitch) * _person_zoom)
+		var offset := Vector3(0.36, sin(_camera_pitch) * _person_zoom + 0.22, cos(_camera_pitch) * _person_zoom)
 		desired = target + offset.rotated(Vector3.UP, _camera_yaw)
 		if is_inside_tree():
 			var query := PhysicsRayQueryParameters3D.create(target, desired, 1)
@@ -766,6 +800,8 @@ func _update_camera(delta: float) -> void:
 			if not hit.is_empty():
 				var hit_position: Vector3 = hit["position"]
 				desired = hit_position + (target - hit_position).normalized() * 0.4
+		# Look beyond the shoulder so the horizon and the path remain visible.
+		target += Vector3(0.36, 0.05, -3.6).rotated(Vector3.UP, _camera_yaw)
 	elif _mode == "city":
 		target = _city_focus
 		desired = target + Vector3(10, 38, 28)
@@ -785,15 +821,7 @@ func _update_camera(delta: float) -> void:
 
 func _animate_figure() -> void:
 	var speed := Vector2(_player.velocity.x, _player.velocity.z).length()
-	var stride := sin(_animation_time * 10.5) * minf(0.48, speed * 0.10)
-	var left_leg: Node3D = _figure.get_node("LegLeft")
-	var right_leg: Node3D = _figure.get_node("LegRight")
-	var left_arm: Node3D = _figure.get_node("ArmLeft")
-	var right_arm: Node3D = _figure.get_node("ArmRight")
-	left_leg.rotation.x = stride
-	right_leg.rotation.x = -stride
-	left_arm.rotation.x = -stride * 0.6
-	right_arm.rotation.x = stride * 0.6 if _attack_animation <= 0.0 else -1.7 + (0.28 - _attack_animation) * 6.0
+	_figure.drive(speed if _mode == "person" else 0.0)
 
 
 func _update_followers(delta: float) -> void:
@@ -812,13 +840,7 @@ func _update_followers(delta: float) -> void:
 		if horizontal.length_squared() > 0.04:
 			var figure: Node3D = soldier.get_node("Figure")
 			figure.rotation.y = atan2(-displacement.x, -displacement.z)
-			var leg: Node3D = figure.get_node("LegLeft")
-			leg.rotation.x = sin(_animation_time * 10 + index) * 0.40
-			var other_leg: Node3D = figure.get_node("LegRight")
-			other_leg.rotation.x = -leg.rotation.x
-		else:
-			soldier.get_node("Figure/LegLeft").rotation.x = 0.0
-			soldier.get_node("Figure/LegRight").rotation.x = 0.0
+		soldier.get_node("Figure").drive(Vector2(soldier.get_real_velocity().x,soldier.get_real_velocity().z).length())
 
 
 func _update_encounter() -> void:
@@ -844,8 +866,8 @@ func _update_encounter() -> void:
 			var figure: Node3D = actor.get_node("Figure")
 			var direction := _player.position - actor.position
 			figure.rotation.y = atan2(-direction.x, -direction.z)
-			var arm: Node3D = figure.get_node("ArmRight")
-			arm.rotation.x = sin(_animation_time * 5.0) * 0.8 - 0.7 if distance <= 2.3 else 0.0
+			if distance <= 2.3 and _enemy_attack_cooldown <= 0.0:
+				figure.cue("attack")
 	if living == 0 and not enemies.is_empty() and not _resolve_requested:
 		_resolve_requested = true
 		action_requested.emit("resolve_skirmish", {})
@@ -1004,6 +1026,7 @@ func _interact() -> void:
 		return
 	var companion: Dictionary = _state.get("companion", {})
 	if _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS and not bool(companion.get("met", false)):
+		_companion.get_node("Figure").cue("talk")
 		action_requested.emit("companion_interact", {})
 		return
 	var closest_id := ""
@@ -1021,10 +1044,12 @@ func _interact() -> void:
 			closest_distance = distance
 			closest_id = str(resource.get("id", ""))
 	if not closest_id.is_empty():
+		_figure.cue("gather")
 		action_requested.emit("gather", {"node_id": closest_id})
 	elif _horizontal_distance(_player.position, TRAINING_LOCATION) <= INTERACTION_RADIUS:
 		action_requested.emit("train", {})
 	elif _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS:
+		_companion.get_node("Figure").cue("talk")
 		action_requested.emit("companion_interact", {})
 
 
@@ -1033,6 +1058,7 @@ func _attack() -> void:
 		return
 	_attack_cooldown = 0.65
 	_attack_animation = 0.28
+	_figure.cue("attack" if _state.get("encounter",{}).get("active",false) else "train")
 	var encounter: Dictionary = _state.get("encounter", {})
 	var enemies: Array = encounter.get("enemies", [])
 	var closest_id := ""
@@ -1054,6 +1080,7 @@ func _attack() -> void:
 	if not closest_id.is_empty():
 		action_requested.emit("strike_enemy", {"enemy_id": closest_id})
 	elif _horizontal_distance(_player.position, TRAINING_LOCATION) <= INTERACTION_RADIUS:
+		get_node("TrainingGround/Mentor/Figure").cue("block")
 		action_requested.emit("training_hit", {})
 
 
@@ -1142,8 +1169,7 @@ func _apply_season(index: int) -> void:
 	season_index = index
 	var soil := [Color("#61704c"),Color("#72734b"),Color("#807250"),Color("#889590")]
 	var grain := [Color("#77a95d"),Color("#b4a04e"),Color("#b59a55"),Color("#807968")]
-	var light := [Color("#fff0d0"),Color("#ffe6b0"),Color("#ffdaa4"),Color("#dce8f5")]
 	_materials.earth.albedo_color = soil[index]
 	_materials.wheat.albedo_color = grain[index]
-	_sun.light_color = light[index]
+	scenery.apply_season(index,_sun,_village_environment)
 	crops.visible = index != 3

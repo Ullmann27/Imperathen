@@ -56,6 +56,17 @@ CAMPAIGN_RESOURCES = (
     *(f"assets/soldiers/{role}_{level}.glb"
       for role in ("heavy", "spear", "archer", "officer") for level in ("near", "mid", "far")),
 )
+POPULATION_SCRIPT = "scripts/visuals/village_person.gd"
+VILLAGE_RESOURCES = (
+    POPULATION_SCRIPT,
+    *(f"assets/village_characters/villager_{level}.glb" for level in range(4)),
+    *(f"assets/village_characters/{role}_{level}.glb"
+      for role in ("officer", "heavy", "spear") for level in (2, 3)),
+    *(f"assets/village/{asset}.glb" for asset in
+      ("market", "workshop", "storehouse", "palisade_bay", "palisade_silhouette", "training_dummy", "timber_billet")),
+    *(f"assets/village/{name}.png" for name in ("valdorf_color", "valdorf_normal", "valdorf_orm",
+      "track_color", "track_relief", "verge_color", "verge_relief", "sky_clouds")),
+)
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (
     "legionary", "auxiliary_spear", "archer", "centurion", "signifer", "emperor",
@@ -149,7 +160,7 @@ def resolve_resource(archive: zipfile.ZipFile, names: set[str], source: str) -> 
     raw = "assets/" + source
     if raw in names and archive.getinfo(raw).file_size > 0:
         return {"source": source, "entry": raw, "mode": "direct"}
-    remap = raw + (".import" if source.endswith((".glb", ".jpg", ".webp")) else ".remap")
+    remap = raw + (".import" if source.endswith((".glb", ".jpg", ".png", ".webp")) else ".remap")
     if remap in names and archive.getinfo(remap).file_size <= 65536:
         text = archive.read(remap).decode("utf-8", errors="replace")
         for match in re.finditer(r'^\s*path(?:\.[\w.-]+)?\s*=\s*"res://([^"\r\n]+)"', text, re.MULTILINE):
@@ -237,6 +248,8 @@ def inspect_zip(apk: Path, report: dict, expected_abi: str, source_root: Path) -
             campaign_script = "scripts/battle/battle_model.gd"
             if (source_root / campaign_script).is_file() or resolve_resource(archive, names, campaign_script)["entry"]:
                 required_resources += CAMPAIGN_RESOURCES
+            if (source_root / POPULATION_SCRIPT).is_file() or resolve_resource(archive, names, POPULATION_SCRIPT)["entry"]:
+                required_resources += VILLAGE_RESOURCES
             if (source_root / GALLERY_SCRIPT).is_file() or resolve_resource(archive, names, GALLERY_SCRIPT)["entry"]:
                 required_resources += GALLERY_RESOURCES
             resolved = [resolve_resource(archive, names, source) for source in required_resources]
