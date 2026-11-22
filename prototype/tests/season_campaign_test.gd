@@ -11,6 +11,7 @@ func _initialize() -> void:
 	_test_winter()
 	_test_empire()
 	_test_rejection()
+	_test_origin_stories()
 	print("SEASON_CAMPAIGN_RESULT checks=%d failures=%d" % [checks,failures])
 	quit(1 if failures else 0)
 
@@ -154,3 +155,42 @@ func _test_rejection() -> void:
 	Campaign.act(data,"supply")
 	saved = data.duplicate(true)
 	_check(not Campaign.act(data,"harvest").ok and data == saved,"Seasonal preparation budget enforced")
+
+func _test_origin_stories() -> void:
+	var ids := {}
+	var titles := {}
+	var followups := {}
+	for home in Campaign.HOMES:
+		var base := Campaign.new_game(home)
+		_check(Campaign.story_options(base).is_empty() and Campaign.summary(base).story_title == "", "No autumn story at start")
+		_advance(base,2)
+		var options := Campaign.story_options(base)
+		_check(options.size() == 2 and options[0].label != options[1].label, "Two previewable autumn choices for " + home)
+		titles[Campaign.summary(base).story_title] = true
+		for i in options.size():
+			var world := base.duplicate(true)
+			var chosen: Dictionary = options[i]
+			ids[chosen.id] = true
+			var effect: Array = Campaign.ORIGIN_EVENTS[home].choices[i]
+			Campaign.act(world,"harvest")
+			Campaign.act(world,"supply")
+			var before := int(world[effect[2]])
+			_check(Campaign.act(world,"story",chosen.id).ok and world.actions == 0, "Story works after season actions are spent")
+			_check(world[effect[2]] == before + effect[3] and world.origin_story.log[0].text == chosen.label, "Preview, ledger and credited goods agree")
+			if effect.size() > 5:
+				_check(world.unrest == maxi(0, effect[5]), "Unrest changes by the previewed amount")
+			var after := world.duplicate(true)
+			_check(not Campaign.act(world,"story",chosen.id).ok and world == after, "Choice cannot award twice")
+			world = JSON.parse_string(JSON.stringify(world))
+			_advance(world,2)
+			_check(Campaign.validate(world) and world.origin_story.log.size() == 2 and world.origin_story.log[1].turn == 4,"Follow-up survives a saved decision")
+			_check(Campaign.summary(world).story_text == effect[4] and Campaign.story_options(world).is_empty(), "Follow-up matches chosen option")
+			followups[Campaign.summary(world).story_text] = true
+			world.origin_story.log[1].text = "Falscher Verlauf"
+			_check(not Campaign.validate(world), "Conflicting chronicle text rejected")
+	_check(titles.size() == 5 and ids.size() == 10 and followups.size() == 10, "Every origin and branch has its own story")
+	var older := Campaign.new_game("wa")
+	older.erase("origin_story")
+	_check(not Campaign.validate(older), "Current saves require the origin chronicle")
+	older.schema = 1
+	_check(Campaign.validate(older) and Campaign.act(older,"advance").ok and older.has("origin_story"), "Earlier campaign gains its pending regional episode")

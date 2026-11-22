@@ -6,15 +6,91 @@ const HOMES := ["italia","germania","han","wa","vistula"]
 const SEASONS := ["Frühling", "Sommer", "Herbst", "Winter"]
 const MANDATES := ["Ortsmandat", "Provinzmandat", "Reichsmandat"]
 const SEASON_ACTIONS := 2
+# These are fictional local stories for this playthrough. Each includes an immediate
+# mechanical result and a distinct later scene recalling the player's choice.
+const ORIGIN_EVENTS := {
+	"italia":{"title":"Die Mühle am Ufer", "intro":"Nach Regen wartet das Dorf auf Mehl. Mühlenpächterin Livia bittet um eine Entscheidung.",
+		"choices":[["muehltag","Gemeinsam mahlen","grain",4,"Livia öffnet den Mühlhof. Familien bringen erstmals ihre eigenen kleinen Säcke zum Mahltag.",-2],
+		["faehrwagen","Die Fährleute unterstützen","supply",3,"Am Fährplatz steht nun ein überdachter Wagen. Bei Regen kommen die Mehlsäcke trocken über den Fluss.",2]]},
+	"germania":{"title":"Der umgestürzte Baum", "intro":"Ein umgestürzter Stamm unterbricht den Weg zwischen den Höfen. Zwei Nachbarn haben Pläne für das Holz.",
+		"choices":[["bohlenweg","Bohlen für den Hofweg sägen","supply",3,"Die Boten bringen nasse Stiefel mit, aber die Wagen erreichen den Hof über deinen Bohlenweg."],
+		["speicherwand","Die Speicherwand ausbessern","stores",4,"Die neue Speicherwand hält. Die Familien legen ihr erstes gemeinsam verwahrtes Saatgut hinein."]]},
+	"han":{"title":"Die Listen der Kornwache", "intro":"Im fiktiven Dorf bei Luoyang zählt Schreiberin Lin zwei unbeschriftete Lieferungen. Helfer warten am Speicher.",
+		"choices":[["lagerbuch","Ein gemeinsames Lagerbuch beginnen","stores",4,"Lin liest die ersten Einträge vor. Die Speicherwache findet jede eingelagerte Lieferung wieder.",-2],
+		["korbtraeger","Tragekörbe an die Höfe geben","grain",5,"Die Hofboten bringen ihre Körbe zurück. Beim nächsten Erntetag teilen mehrere Familien die Tragewege.",3]]},
+	"wa":{"title":"Wasser für die jungen Felder", "intro":"Im Dorf am Hang hat Regen eine Rinne geöffnet. Die Nachbarn beraten, wohin das Wasser fließen soll.",
+		"choices":[["feldrinne","Eine Feldrinne ausheben","grain",4,"Das erste Wasser erreicht das untere Feld. Die Helfer markieren die Rinne mit kleinen Pfählen."],
+		["uferlager","Ein Uferlager anlegen","supply",3,"Vom Hang führt ein Trittpfad zum Uferlager. Der erste Transport kann dort seine Ladung trocken umpacken."]]},
+	"vistula":{"title":"Am alten Brennplatz", "intro":"Im Dorf im Weichselraum bietet eine Töpferin einen gemeinsamen Brand an. Der trockene Ton reicht für einen Auftrag.",
+		"choices":[["vorratstopf","Große Vorratsgefäße brennen","stores",4,"Die Töpferin stellt die letzten gedeckelten Gefäße auf. Die Familien erkennen ihren Vorrat an eingeritzten Zeichen."],
+		["reisegefaess","Kleine Reisegefäße formen","supply",4,"Mit den ersten Reisegefäßen kehrt ein Bote zurück. Das kleine Gefäß hat den langen Weg unbeschadet überstanden."]]}
+}
+const RESOURCE_NAMES := {"grain":"Korn", "stores":"Wintervorrat", "supply":"Reisevorrat"}
+
+
+static func _empty_story() -> Dictionary:
+	return {"choice":"", "turn":-1, "log":[]}
+
+
+static func _story(data: Dictionary) -> Dictionary:
+	return data.get("origin_story", _empty_story())
+
+
+static func _option(data: Dictionary, id: String) -> Array:
+	for option: Array in ORIGIN_EVENTS[data.home].choices:
+		if option[0] == id:
+			return option
+	return []
+
+
+static func _decision_line(option: Array) -> String:
+	var change := "+%d %s" % [option[3], RESOURCE_NAMES[option[2]]]
+	if option.size() > 5:
+		change += ", %+d Unruhe" % int(option[5])
+	return "%s (%s)." % [option[1],change]
+
+
+static func story_options(data: Dictionary) -> Array:
+	var options := []
+	if data.turn >= 2 and _story(data).choice == "":
+		for option: Array in ORIGIN_EVENTS[data.home].choices:
+			options.append({"id":option[0], "label":_decision_line(option)})
+	return options
+
+
+static func _valid_story(data: Dictionary) -> bool:
+	if not data.has("origin_story"):
+		return true # First world-map build stored the campaign before origin episodes existed.
+	var story: Variant = data.origin_story
+	if typeof(story) != TYPE_DICTIONARY or story.size() != 3 or not story.has_all(["choice","turn","log"]):
+		return false
+	if typeof(story.log) != TYPE_ARRAY or not _int(story.turn,-1,data.turn) or typeof(story.choice) != TYPE_STRING:
+		return false
+	if story.choice == "":
+		return story.turn == -1 and story.log.is_empty()
+	var option := _option(data,story.choice)
+	if option.is_empty() or story.turn < 2:
+		return false
+	var next_year := (floori(story.turn/4.0) + 1) * 4
+	var due: bool = data.turn >= next_year
+	if story.log.size() != (2 if due else 1):
+		return false
+	for i in story.log.size():
+		var line: Variant = story.log[i]
+		if typeof(line) != TYPE_DICTIONARY or line.size() != 2 or not line.has_all(["turn","text"]):
+			return false
+		if line.turn != (story.turn if i == 0 else next_year) or line.text != (_decision_line(option) if i == 0 else option[4]):
+			return false
+	return true
 
 
 static func new_game(home_id: String = "italia") -> Dictionary:
 	if home_id not in HOMES or not Atlas.REGIONS.has(home_id):
 		return {}
-	return {"schema":1, "turn":0, "home":home_id, "owned":[home_id], "grain":6, "stores":0,
+	return {"schema":2, "turn":0, "home":home_id, "owned":[home_id], "grain":6, "stores":0,
 		"supply":0, "actions":SEASON_ACTIONS, "unrest":0, "mandate":0,
 		"mission":{"id":1,"target":home_id,"status":"active","misses":0},
-		"wins":0, "failures":0, "history":[], "last_event":"%s erhält den Auftrag, Nahrung für den Winter einzulagern." % Atlas.REGIONS[home_id].name}
+		"origin_story":_empty_story(), "wins":0, "failures":0, "history":[], "last_event":"%s erhält den Auftrag, Nahrung für den Winter einzulagern." % Atlas.REGIONS[home_id].name}
 
 
 static func _int(v: Variant, low: int, high: int) -> bool:
@@ -41,7 +117,11 @@ static func _connected(owned: Array, home_id: String) -> bool:
 static func validate(data: Dictionary) -> bool:
 	var required := ["schema","turn","home","owned","grain","stores","supply","actions","unrest",
 		"mandate","mission","wins","failures","history","last_event"]
-	if data.size() != required.size() or not data.has_all(required) or not _int(data.schema,1,1):
+	if not _int(data.get("schema"),1,2):
+		return false
+	if data.schema == 2:
+		required.append("origin_story")
+	if data.size() != required.size() or not data.has_all(required):
 		return false
 	if not _int(data.turn,0,1000000) or not _int(data.actions,0,SEASON_ACTIONS):
 		return false
@@ -59,7 +139,7 @@ static func validate(data: Dictionary) -> bool:
 		if typeof(id) != TYPE_STRING or not Atlas.REGIONS.has(id) or seen.has(id):
 			return false
 		seen[id] = true
-	if data.home not in HOMES or not _connected(data.owned, data.home):
+	if data.home not in HOMES or not _connected(data.owned, data.home) or not _valid_story(data):
 		return false
 	var spent := int(data.turn) * SEASON_ACTIONS + SEASON_ACTIONS - int(data.actions)
 	if data.owned.size() - 1 + int(data.mandate) > spent:
@@ -117,7 +197,13 @@ static func summary(data: Dictionary) -> Dictionary:
 			warning += " Ein zweiter Mangel beendet den Auftrag."
 	elif int(data.stores) < needed and (_season(turn, data.home) == 2 or (data.mission.status == "active" and local_season == 2)):
 		warning = "Vor dem Winter noch %d Vorräte einlagern." % (needed - int(data.stores))
-	return {"year":100 + floori(turn / 4.0), "season":SEASONS[turn % 4], "winter_need":needed,
+	var title := ""
+	var story_text := ""
+	if turn >= 2:
+		var state := _story(data)
+		title = ORIGIN_EVENTS[data.home].title
+		story_text = ORIGIN_EVENTS[data.home].intro if state.log.is_empty() else state.log.back().text
+	return {"story_title":title,"story_text":story_text, "year":100 + floori(turn / 4.0), "season":SEASONS[turn % 4], "winter_need":needed,
 		"harvest_yield":harvest, "warning":warning, "mission_season":SEASONS[local_season],
 		"mandate_name":MANDATES[int(data.mandate)]}
 
@@ -198,6 +284,11 @@ static func _advance(data: Dictionary) -> String:
 					notes.append("%s löst sich wegen Versorgungsmangels vom Mandat." % lost)
 				data.supply = maxi(0, int(data.supply)-3)
 				notes.append("Die Transporte verlieren bis zu drei Reisevorräte.")
+	var story := _story(data)
+	if story.choice != "" and story.log.size() == 1 and int(data.turn) % 4 == 0:
+		var followup: String = _option(data,story.choice)[4]
+		story.log.append({"turn":data.turn, "text":followup})
+		notes.append(followup)
 	if notes.is_empty():
 		notes.append("Neue Saison. Zwei Vorbereitungen sind verfügbar.")
 	return " ".join(notes)
@@ -207,8 +298,21 @@ static func act(data: Dictionary, command: String, target_id: String = "") -> Di
 	if not validate(data):
 		return {"ok":false,"message":"Der Kampagnenstand ist ungültig."}
 	var next := data.duplicate(true)
+	if next.schema == 1:
+		next.origin_story = _empty_story()
+		next.schema = 2
 	var message := ""
-	if command == "advance":
+	if command == "story":
+		var option := _option(next, target_id)
+		if next.turn < 2 or next.origin_story.choice != "" or option.is_empty():
+			return {"ok":false,"message":"Diese Entscheidung ist zurzeit nicht verfügbar."}
+		message = _decision_line(option)
+		next[option[2]] += int(option[3])
+		if option.size() > 5:
+			next.unrest = clampi(int(next.unrest) + int(option[5]),0,100)
+		next.origin_story = {"choice":target_id, "turn":next.turn,
+			"log":[{"turn":next.turn, "text":message}]}
+	elif command == "advance":
 		message = _advance(next)
 	elif next.actions < 1:
 		return {"ok":false,"message":"Alle Vorbereitungen dieser Saison sind verbraucht."}
