@@ -39,6 +39,10 @@ func _write(row: Dictionary) -> void:
 	output.store_line(JSON.stringify(row))
 	output.flush()
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_APPLICATION_RESUMED:
+		last_frame = 0
+
 func _process(_delta: float) -> void:
 	var game = get_tree().current_scene
 	if not is_instance_valid(game) or not is_instance_valid(game.get("ui")):
@@ -108,6 +112,10 @@ func _process(_delta: float) -> void:
 		return
 	var frame_usec := now - last_frame
 	last_frame = now
+	if frame_usec > 20000000:
+		_write({"event":"excluded_gap","quality":PROFILES[phase],"seconds":frame_usec / 1000000.0})
+		last_progress = now
+		return
 	var step := int(valley.model.steps)
 	if step > last_step:
 		total_steps += step - last_step
