@@ -26,6 +26,10 @@ func _run() -> void:
 	_check(game.screen == "playing", "New game starts an active world through the UI signal")
 	_check(int(game.model.data.player.age) == 12, "A new life starts as a child")
 	_check(FileAccess.file_exists(game.SAVE_PATH), "New game creates a real save")
+	_request_window_back()
+	_check(game.screen == "paused" and game.ui.get("_view_state") == "pause", "A window Back request reaches the real UI and pauses exactly once")
+	_request_window_back()
+	_check(game.screen == "playing", "A second window Back request resumes the paused session")
 	var before: int = game.model.data.resources.wood
 	game.world.action_requested.emit("gather", {"node_id": "timber_0"})
 	_check(game.model.data.resources.wood == before, "The shared command gateway rejects distant gathering")
@@ -44,6 +48,9 @@ func _run() -> void:
 	_move_fixture(Vector3(8, 1, 8))
 	game.ui.action_requested.emit("build", {})
 	_check(game.mode == "city", "The build action switches camera mode")
+	_request_window_back()
+	_check(game.screen == "playing" and not game.world.is_build_active(), "Window Back cancels construction preview before opening pause")
+	game.ui.action_requested.emit("build", {})
 	game.world._update_camera(0.016)
 	var build_pixel: Vector2 = game.world.get_node("WorldCamera").unproject_position(Vector3(8, 0.04, 5))
 	var touch := InputEventScreenTouch.new()
@@ -129,6 +136,13 @@ func _run() -> void:
 		for failure: String in failures:
 			push_error(failure)
 		quit(1)
+
+
+func _request_window_back() -> void:
+	# Model the documented notification-before-signal order as well as the
+	# public Window signal, so a duplicate Main handler fails this regression.
+	root.propagate_notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	root.go_back_requested.emit()
 
 
 func _move_fixture(position: Vector3) -> void:

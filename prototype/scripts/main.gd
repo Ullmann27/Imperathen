@@ -22,6 +22,7 @@ var run_id := ""
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
 	get_tree().quit_on_go_back = false
+	get_window().go_back_requested.connect(_on_go_back_requested)
 	run_id = "%s_%s" % [Time.get_unix_time_from_system(), Time.get_ticks_usec()]
 	model = ModelScript.new()
 	model.new_game()
@@ -63,11 +64,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+func _on_go_back_requested() -> void:
+	# The window signal is the single Android Back entry point. Handling the
+	# preceding node notification too would process one request twice.
+	if is_instance_valid(ui):
+		ui.handle_back()
+
+
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if is_instance_valid(ui):
-			ui.handle_back()
-		return
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		if session_started and screen == "playing":
 			_pause()
