@@ -107,9 +107,9 @@ func _batch(mesh: Mesh, places: Array[Transform3D], tint: Color) -> MultiMeshIns
 func apply_quality(profile: String) -> void:
 	grove.set_quality(profile)
 	sun.shadow_enabled = profile != "low"
-	sun.directional_shadow_max_distance = 85.0 if profile == "high" else 48.0
+	sun.directional_shadow_max_distance = 110.0 if profile == "very_high" else (85.0 if profile == "high" else (48.0 if profile == "balanced" else 24.0))
 	for node in foliage:
-		var fraction := 1.0 if profile == "high" else (0.6 if profile == "balanced" else 0.22)
+		var fraction := 1.0 if profile in ["high", "very_high"] else (0.6 if profile == "balanced" else 0.22)
 		node.multimesh.visible_instance_count = int(node.multimesh.instance_count * fraction)
 
 func _land_height(x: float,z: float) -> float:
