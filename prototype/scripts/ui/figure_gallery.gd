@@ -176,6 +176,8 @@ func _select(index: int) -> void:
 	_picker.select(index)
 	_image.texture = texture(current_id)
 	_missing.visible = _image.texture == null
+	if _image.texture != null and OS.is_debug_build() and OS.has_feature("android"):
+		print("IMPERATHEN_GALLERY_PORTRAIT " + current_id)
 	var data := caption(current_id)
 	_title.text = data.name
 	_caption.text = data.context

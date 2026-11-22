@@ -212,9 +212,13 @@ func show_menu(can_continue: bool) -> void:
 	buttons.add_child(demo_button)
 	var atlas_button := _button("Weltkugel erkunden", func(): _emit("atlas_demo"))
 	buttons.add_child(atlas_button)
+	var gallery_button := _button("Figuren", func(): _show_gallery("menu"))
+	buttons.add_child(gallery_button)
 	if OS.is_debug_build() and OS.has_feature("android"):
-		_log_menu_buttons.call_deferred(demo_button, atlas_button, continue_button)
-	buttons.add_child(_button("Figuren", func(): _show_gallery("menu")))
+		_log_menu_buttons.call_deferred(demo_button, atlas_button, continue_button, gallery_button, scroll)
+		scroll.get_v_scroll_bar().value_changed.connect(func(_value: float):
+			_log_gallery_button.call_deferred(gallery_button,scroll)
+		)
 	buttons.add_child(_button("Einstellungen", func(): _show_settings("menu")))
 	buttons.add_child(_button("Spiel beenden", func(): _confirm("Spiel beenden?", "Ein laufender Lebensweg wird vor dem Beenden gespeichert.", "quit", {})))
 	var filler := Control.new()
@@ -264,7 +268,16 @@ func _log_intro_skip(skip: Button) -> void:
 		print("IMPERATHEN_INTRO_READY " + JSON.stringify({"skip": [point.x, point.y]}))
 
 
-func _log_menu_buttons(demo: Button, atlas: Button, resume: Button) -> void:
+func _log_gallery_button(button: Button, scroll: ScrollContainer) -> void:
+	if not is_instance_valid(button) or not button.is_visible_in_tree() or not is_instance_valid(scroll):
+		return
+	var center := button.get_global_rect().get_center()
+	var point := get_viewport().get_screen_transform() * center
+	print("IMPERATHEN_GALLERY_MENU_BUTTON " + JSON.stringify({"center":[point.x,point.y],
+		"visible":scroll.get_global_rect().has_point(center)}))
+
+
+func _log_menu_buttons(demo: Button, atlas: Button, resume: Button, gallery: Button, scroll: ScrollContainer) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	if not is_instance_valid(demo) or not demo.is_visible_in_tree():
@@ -273,9 +286,12 @@ func _log_menu_buttons(demo: Button, atlas: Button, resume: Button) -> void:
 	var demo_center := transform * demo.get_global_rect().get_center()
 	var resume_center := transform * resume.get_global_rect().get_center()
 	var atlas_center := transform * atlas.get_global_rect().get_center()
+	var gallery_center := transform * gallery.get_global_rect().get_center()
 	print("IMPERATHEN_MENU_TOUCH " + JSON.stringify({
 		"demo": [demo_center.x, demo_center.y],
 		"atlas": [atlas_center.x, atlas_center.y],
+		"gallery": [gallery_center.x, gallery_center.y],
+		"gallery_visible": scroll.get_global_rect().has_point(gallery.get_global_rect().get_center()),
 		"continue": [resume_center.x, resume_center.y],
 		"can_continue": not resume.disabled}))
 
@@ -827,10 +843,14 @@ func _show_gallery(source: String, selected: String = "") -> void:
 		gallery.filter = "journal"
 		gallery.current_id = selected if selected != "" else "hero_" + gallery.origin
 	gallery.closed.connect(_close_gallery)
+	if OS.is_debug_build() and OS.has_feature("android"):
+		print("IMPERATHEN_GALLERY_OPEN " + source)
 	_screen.add_child(gallery)
 
 
 func _close_gallery() -> void:
+	if OS.is_debug_build() and OS.has_feature("android"):
+		print("IMPERATHEN_GALLERY_CLOSED " + _gallery_from)
 	if _gallery_from == "journal":
 		_show_journal(false)
 	else:
