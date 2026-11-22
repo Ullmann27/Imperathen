@@ -53,6 +53,10 @@ Der Name einer `.RSA`-Datei oder ein erkennbarer APK-Signaturblock ist nur ein H
 
 Manifestwerte werden vom tatsächlichen APK gelesen. `apkanalyzer manifest print` ist ein offizieller Weg zur XML-Darstellung; ein im Quellprojekt eingetragener Paketname wird nicht als Ersatz für das exportierte Manifest übernommen. [3]
 
+Ein Paketname aus `aapt dump badging` beendet die Decoder-Kette nicht vorzeitig. Wenn `apkanalyzer` vorhanden ist, hat dessen tatsächliche XML-Dekodierung Vorrang. Das ist für Godots Start-Alias wichtig: Ein `activity-alias` kann den öffentlichen Einstieg bereitstellen, während seine Zielaktivität `exported="false"` behält. Eine private Zielaktivität wird deshalb nicht als Fehler behandelt. [5]
+
+Im XML müssen `MAIN` und `LAUNCHER` im selben Intent-Filter einer aktivierten und exportierten Startkomponente stehen. Anwendung und Komponente müssen aktiviert sein; bei einem Alias prüft der Prototyp-Validator zusätzlich das vorher deklarierte und aktivierte Ziel. Ab Ziel-API 31 wird ein fehlendes explizites `exported` bei einer Komponente mit Intent-Filter nicht als gültiger Einstieg akzeptiert. Im Bericht stehen die tatsächlichen Attribute, Filter und Ablehnungsgründe unter `manifest.launcher_diagnostics`, außerdem die begrenzte Originalausgabe des XML-Werkzeugs. Fehlende oder unaufgelöste XML-Evidenz erzeugt keinen erfolgreichen Launcherbefund; ein nachweislich fehlender Einstieg bleibt ein Fehler. [5]
+
 ## 4. JSON-Bericht und Exitcodes
 
 Der Bericht enthält Zeitpunkt, APK-Pfad, Größe und SHA-256, erwartetes Paket und ABI, gefundene SDK-/Werkzeugpfade, Manifestmetadaten, einzelne Prüfergebnisse und begrenzte Ausgaben der tatsächlich ausgeführten Prüfkommandos.
@@ -89,3 +93,4 @@ Der Validator wurde mit dreizehn gezielten Negativ- und Parserprüfungen ausgef�
 2. [Android – apksigner](https://developer.android.com/tools/apksigner) und [offizielle Hilfe zu verify](https://android.googlesource.com/platform/tools/apksig/+/master/src/apksigner/java/com/android/apksigner/help_verify.txt)
 3. [Android – apkanalyzer](https://developer.android.com/tools/apkanalyzer)
 4. [Android – ADB und Installation einer APK](https://developer.android.com/tools/adb)
+5. [Android – activity-alias](https://developer.android.com/guide/topics/manifest/activity-alias-element) und [activity](https://developer.android.com/guide/topics/manifest/activity-element)
