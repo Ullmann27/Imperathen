@@ -6,6 +6,11 @@ const Field := preload("res://scripts/battle/valley_field.gd")
 const Slots := preload("res://scripts/battle/formation_slots.gd")
 const FORMATIONS := Slots.NAMES
 const OBSTACLES := Field.ROCKS
+const ARMIES := {
+	"talwache": {"name":"Heer der Talwache", "side":"ally"},
+	"hoehenbund": {"name":"Heer des Höhenbundes", "side":"enemy"}
+}
+const GROUP_NAMES := {"front":"Linienverband", "support":"Unterstützungsverband"}
 const OBJECTIVE := Vector2(0.0, 15.0)
 const STEP := 0.2
 const DEFENCE_SECONDS := 120
@@ -61,6 +66,43 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 	squads[id] = s
 
 
+static func _soldier_id(company_id: String, index: int) -> String:
+	return "%s_%02d" % [company_id, index]
+
+
+func company_ids(formation_group_id: String, active_only: bool = true) -> Array[String]:
+	var ids: Array[String] = []
+	for s: Dictionary in squads.values():
+		var group_id: String = s.army_id + ("_support" if s.kind == "archer" else "_front")
+		if group_id == formation_group_id and (not active_only or _active(s)):
+			ids.append(s.id)
+	return ids
+
+
+func hierarchy() -> Dictionary:
+	var result := {}
+	for army_id: String in ARMIES:
+		var army := {"id":army_id, "name":ARMIES[army_id].name, "side":ARMIES[army_id].side,
+			"initial_strength":0, "strength":0, "groups":[]}
+		for role: String in GROUP_NAMES:
+			var group_id := army_id + "_" + role
+			var group := {"id":group_id, "name":GROUP_NAMES[role], "initial_strength":0, "strength":0, "companies":[]}
+			for id in company_ids(group_id, false):
+				var s: Dictionary = squads[id]
+				var members: Array[String] = []
+				for i in range(s.strength):
+					members.append(_soldier_id(id, i))
+				group.companies.append({"id":id, "name":s.name, "status":s.status,
+					"initial_strength":s.initial_strength, "strength":s.strength, "soldier_ids":members})
+				group.initial_strength += s.initial_strength
+				group.strength += s.strength
+			army.groups.append(group)
+			army.initial_strength += group.initial_strength
+			army.strength += group.strength
+		result[army_id] = army
+	return result
+
+
 func soldiers(id: String) -> Array:
 	var result := []
 	if not squads.has(id):
@@ -79,7 +121,7 @@ func soldiers(id: String) -> Array:
 			pose = s.last_action
 		elif s.status == "moving":
 			pose = "walk"
-		result.append({"id": "%s_%02d" % [id, i], "x": m[0], "z": m[1], "facing": s.facing, "pose": pose})
+		result.append({"id": _soldier_id(id, i), "x": m[0], "z": m[1], "facing": s.facing, "pose": pose})
 	return result
 
 

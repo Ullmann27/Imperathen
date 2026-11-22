@@ -13,6 +13,7 @@ var failures := 0
 
 func _initialize() -> void:
 	_test_orders()
+	_test_hierarchy()
 	_test_slots_and_routes()
 	_test_battle_and_reentry()
 	_test_defeat()
@@ -264,3 +265,44 @@ func _test_pending_and_validation() -> void:
 			squad.erase(key)
 	legacy.squads[BOWS].formation = "testudo"
 	check(fresh.restore(JSON.parse_string(JSON.stringify(legacy))) and fresh.squads[BOWS].formation == "line", "Retain older snapshots with equipment-compatible shape")
+
+func _test_hierarchy() -> void:
+	var m := Battle.new()
+	var all_ids := {}
+	var h := m.hierarchy()
+	for army: Dictionary in h.values():
+		_check_hierarchy_army(m,army,all_ids)
+	check(all_ids.size() == 60, "Both army trees cover the original 60 distinct soldiers exactly once")
+	check(m.company_ids("talwache_front") == [GUARD,SPEARS] and m.company_ids("talwache_support") == [BOWS], "Player front and support command groups")
+	check(m.company_ids("hoehenbund_front") == [ENEMY,"ridge_spears"] and m.company_ids("?").is_empty(), "Enemy groups retain stable IDs")
+	check(m.order(m.company_ids("talwache_front"),"defend").ok and m.squads[BOWS].command == "hold", "Group order acts on the two front companies")
+	h.talwache.groups[0].companies[0].soldier_ids.clear()
+	check(m.soldiers(GUARD).size() == 12, "Changing a hierarchy view never changes the roster")
+	m.tick(200)
+	var persisted := Battle.new()
+	check(persisted.restore(JSON.parse_string(JSON.stringify(m.snapshot()))) and persisted.hierarchy() == m.hierarchy(), "Hierarchy and losses survive a normal JSON save")
+	all_ids.clear()
+	for army: Dictionary in persisted.hierarchy().values():
+		_check_hierarchy_army(persisted,army,all_ids)
+	check(persisted.company_ids("hoehenbund_front",false) == [ENEMY,"ridge_spears"], "Historical companies remain in their group after losses")
+	for id in persisted.company_ids("hoehenbund_front"):
+		check(persisted.squads[id].status not in ["routed","withdrawn","destroyed"], "Default group selection includes only active companies")
+
+
+func _check_hierarchy_army(m, army: Dictionary, all_ids: Dictionary) -> void:
+	var total := 0
+	for group: Dictionary in army.groups:
+		var count := 0
+		for company: Dictionary in group.companies:
+			var visible := []
+			for soldier in m.soldiers(company.id):
+				visible.append(soldier.id)
+			check(company.soldier_ids == visible and company.strength == visible.size(), "View and simulation share the same live member IDs")
+			for id in company.soldier_ids:
+				if all_ids.has(id):
+					check(false,"Duplicate member ID")
+				all_ids[id] = true
+			count += company.strength
+		check(count == group.strength,"Group balance")
+		total += count
+	check(total == army.strength and total == m.summary()[army.side].strength and army.initial_strength == 30,"Army balance")
