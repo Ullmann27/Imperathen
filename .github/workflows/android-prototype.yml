@@ -2,12 +2,13 @@ name: Android prototype APK
 
 on:
   push:
-    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122']
+    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122', 'integration/realistic-android-23']
     paths:
       - 'prototype/**'
       - 'tools/build_android_prototype.py'
       - 'tools/validate_android_apk.py'
       - 'tools/android_runtime_smoke.py'
+      - 'tools/android_graphics_benchmark.py'
       - 'tools/run_android_emulator.sh'
       - 'tools/desktop/IMPERATHEN-Vulkan.cmd'
       - 'tools/android_signing_recovery_public.crt'
@@ -24,8 +25,9 @@ concurrency:
 jobs:
   build-and-check:
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 65
     env:
+      IMPERATHEN_GRAPHICS_QA: ${{ github.ref_name == 'integration/realistic-android-23' && '1' || '0' }}
       GODOT_VERSION: '4.7.2'
       GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
     steps:
@@ -84,6 +86,13 @@ jobs:
         run: |
           python3 tools/build_android_prototype.py --godot "$GODOT_BIN" --sdk-root "$ANDROID_HOME" --java-home "$JAVA_HOME_17_X64" --template-dir "$IMPERATHEN_TEMPLATE_DIR" --keystore "$RUNNER_TEMP/imperathen-debug.keystore" --keystore-user imperathen-debug --abi x86_64 --output "$GITHUB_WORKSPACE/artifacts/${IMPERATHEN_BUILD}-emulator.apk"
           python3 tools/validate_android_apk.py --apk artifacts/${IMPERATHEN_BUILD}-emulator.apk --sdk-root "$ANDROID_HOME" --expected-abi x86_64 --report artifacts/emulator-apk-validation.json
+          if [[ "$IMPERATHEN_GRAPHICS_QA" == 1 ]]; then
+            for target in arm64-v8a x86_64; do
+              name=arm64
+              if [[ "$target" == x86_64 ]]; then name=emulator; fi
+              python3 tools/build_android_prototype.py --godot "$GODOT_BIN" --sdk-root "$ANDROID_HOME" --java-home "$JAVA_HOME_17_X64" --template-dir "$IMPERATHEN_TEMPLATE_DIR" --keystore "$RUNNER_TEMP/imperathen-debug.keystore" --keystore-user imperathen-debug --abi "$target" --renderer mobile --output "$GITHUB_WORKSPACE/artifacts/${IMPERATHEN_BUILD}-$name-vulkan.apk"
+            done
+          fi
           sha256sum artifacts/*.apk > artifacts/SHA256SUMS.txt
           printf '%s\n' "$GITHUB_SHA" > artifacts/source-commit.txt
       - name: Upload the completed APK and build proofs
@@ -121,7 +130,7 @@ jobs:
             desktop/*.log
           retention-days: 30
       - name: Start a real Android emulator and inspect the app runtime
-        timeout-minutes: 14
+        timeout-minutes: 45
         shell: bash
         run: |
           bash tools/run_android_emulator.sh

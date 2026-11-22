@@ -250,7 +250,16 @@ def write_isolated_settings(directory: Path, toolchain: dict, environment: dict[
         environment.pop("GODOT_ANDROID_KEYSTORE_RELEASE_" + suffix, None)
 
 
-def configure_copy(project: Path, toolchain: dict) -> None:
+def configure_copy(project: Path, toolchain: dict, renderer: str = "compatibility") -> None:
+    if renderer == "mobile":
+        settings = project / "project.godot"
+        source = settings.read_text()
+        for key in ("renderer/rendering_method", "renderer/rendering_method.mobile"):
+            old = key + '="gl_compatibility"'
+            if old not in source:
+                raise BuildError("Cannot locate renderer setting: " + key)
+            source = source.replace(old, key + '="mobile"')
+        settings.write_text(source)
     config = read_config(project / "export_presets.cfg")
     options = toolchain["preset_section"] + ".options"
     config.set(options, "custom_template/debug", json.dumps(str(Path(toolchain["template_dir"]) / "android_debug.apk")))
@@ -288,7 +297,7 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         project = temporary / "project"
         shutil.copytree(toolchain["project"], project,
                         ignore=shutil.ignore_patterns(".godot", ".git", "android", "*.tmp", "*.bak"))
-        configure_copy(project, toolchain)
+        configure_copy(project, toolchain, args.renderer)
         write_isolated_settings(temporary, toolchain, environment)
         apk = temporary / "IMPERATHEN.apk"
         run([toolchain["godot"], "--headless", "--path", str(project), "--editor", "--import"],
@@ -321,7 +330,7 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         atomic_copy(sha_file, output.with_suffix(".apk.sha256"))
         build_report = {key: value for key, value in toolchain.items()
                         if key not in {"preset_section", "validator"}}
-        build_report.update({"status": "verified_debug_apk", "created_utc": datetime.now(timezone.utc).isoformat(),
+        build_report.update({"requested_renderer": args.renderer, "status": "verified_debug_apk", "created_utc": datetime.now(timezone.utc).isoformat(),
                              "apk": output.name, "apk_sha256": checksum, "apk_size_bytes": output.stat().st_size,
                              "signing": "externally_supplied_debug_key", "device_test": "not_run_by_build_tool",
                              "validation_report": output.with_suffix(".validation.json").name})
@@ -346,6 +355,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--keystore", type=Path, help="Private debug key outside the repository")
     parser.add_argument("--keystore-user", help="Key alias; password is accepted only through the environment")
     parser.add_argument("--abi", choices=ABIS, default="arm64-v8a")
+    parser.add_argument("--renderer", choices=("compatibility", "mobile"), default="compatibility")
     parser.add_argument("--output", type=Path, help="Destination .apk; previous file remains untouched on export failure")
     parser.add_argument("--check", action="store_true", help="Check local prerequisites without exporting")
     parser.add_argument("--timeout", type=int, default=300, help="Per-tool timeout in seconds")
