@@ -12,6 +12,8 @@ var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
 const PLAYER_SPEED := 4.6
+const START_YAW := 0.62
+const START_PITCH := 0.18
 const PERSON_ZOOM_MIN := 1.7
 const PERSON_ZOOM_MAX := 12.0
 const INTERACTION_RADIUS := 3.0
@@ -28,9 +30,9 @@ var _mode := "person"
 var _build_mode := false
 var _preview_valid := false
 var _preview_position := Vector3.ZERO
-var _camera_yaw := 0.0
-var _camera_pitch := 0.40
-var _person_zoom := 7.5
+var _camera_yaw := START_YAW
+var _camera_pitch := START_PITCH
+var _person_zoom := 3.8
 var _city_zoom := 43.0
 var _city_focus := Vector3(7, 0, 1)
 var _attack_cooldown := 0.0
@@ -90,8 +92,9 @@ func setup(state: Dictionary) -> void:
 	else:
 		_player.position = Vector3(0, 1, 8)
 	_player.velocity = Vector3.ZERO
-	_camera_yaw = 0.0
-	_camera_pitch = 0.40
+	_camera_yaw = START_YAW
+	_camera_pitch = START_PITCH
+	_figure.rotation.y = START_YAW
 	_camera_initialized = false
 	if regional.current_origin != state.get("origin_id","italia"):
 		var id: String = state.get("origin_id","italia")
@@ -498,6 +501,7 @@ func _create_map_markers() -> void:
 	for child: Node in _markers.get_children():
 		if child is Label3D:
 			child.pixel_size = 0.035
+			child.visibility_range_end = 0
 	_markers.visible = false
 
 
@@ -606,6 +610,7 @@ func _create_building_view(identity: String) -> Node3D:
 	Art.box(scaffold, Vector3(4.5, 0.10, 0.10), Vector3(0, 1.8, 2.0), _materials["timber"])
 	var title := Art.label(building, "Baustelle", Vector3(0, 4.2, 0), Color(0.98, 0.90, 0.65), 36)
 	title.name = "Title"
+	title.visibility_range_end = 0
 	return building
 
 
@@ -757,7 +762,7 @@ func _update_camera(delta: float) -> void:
 	var desired: Vector3
 	if _mode == "person":
 		target = _player.global_position + Vector3(0, 0.40, 0)
-		var offset := Vector3(0, sin(_camera_pitch) * _person_zoom + 1.1, cos(_camera_pitch) * _person_zoom)
+		var offset := Vector3(0.36, sin(_camera_pitch) * _person_zoom + 0.22, cos(_camera_pitch) * _person_zoom)
 		desired = target + offset.rotated(Vector3.UP, _camera_yaw)
 		if is_inside_tree():
 			var query := PhysicsRayQueryParameters3D.create(target, desired, 1)
@@ -766,6 +771,8 @@ func _update_camera(delta: float) -> void:
 			if not hit.is_empty():
 				var hit_position: Vector3 = hit["position"]
 				desired = hit_position + (target - hit_position).normalized() * 0.4
+		# Look beyond the shoulder so the horizon and the path remain visible.
+		target += Vector3(0.36, 0.05, -3.6).rotated(Vector3.UP, _camera_yaw)
 	elif _mode == "city":
 		target = _city_focus
 		desired = target + Vector3(10, 38, 28)

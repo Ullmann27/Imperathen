@@ -94,6 +94,8 @@ static func label(parent: Node3D, words: String, location: Vector3, color: Color
 	result.modulate = color
 	result.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	result.no_depth_test = false
+	result.visibility_range_end = 12.0
+	result.visibility_range_end_margin = 1.0
 	parent.add_child(result)
 	return result
 
