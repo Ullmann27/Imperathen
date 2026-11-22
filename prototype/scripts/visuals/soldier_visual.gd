@@ -5,6 +5,7 @@ const ROLES := ["heavy", "spear", "archer", "officer"]
 const LODS := ["near", "mid", "far"]
 const LOOPING := ["idle", "march", "run", "block", "wall", "testudo", "retreat"]
 const ALIASES := {"walk": "march", "fall": "death", "shield_wall": "wall", "bow": "shoot"}
+const STRIDES := {"march":1.30, "run":1.75, "retreat":1.48}
 const TINTS := [Color.WHITE, Color(0.96, 0.88, 0.77), Color(0.83, 0.91, 0.97)]
 
 static var _scenes: Dictionary = {}
@@ -17,6 +18,7 @@ var state := "idle"
 var player: AnimationPlayer
 var _body: Node3D
 var _phase := 0.0
+var _manual_live := false
 
 func _ready() -> void:
 	if _body == null:
@@ -41,12 +43,44 @@ func set_detail(level: int) -> void:
 	_replace_body()
 
 func play_state(new_state: String, phase: float = 0.0) -> void:
+	_manual_live = false
+	if player:
+		player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_IDLE
 	var clip: String = ALIASES.get(new_state, new_state)
 	if clip == state and player and player.is_playing():
 		return
 	state = clip
 	_phase = clampf(phase, 0.0, 1.0)
 	_play_clip()
+
+# Distance along a rendered step sets the gait phase. Other poses advance in
+# simulation seconds, so pause and slow time affect the whole pose consistently.
+func present(pose: String, phase: float, delta: float) -> void:
+	if not player:
+		return
+	var clip: String = ALIASES.get(pose,pose)
+	var gait := STRIDES.has(clip)
+	player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+	if not _manual_live or state != clip or player.assigned_animation != clip:
+		_manual_live = true
+		state = clip
+		var animation := player.get_animation(clip)
+		animation.loop_mode = Animation.LOOP_LINEAR if clip in LOOPING else Animation.LOOP_NONE
+		player.play(clip,0.12)
+		if gait or clip == "idle":
+			player.seek(fposmod(phase,1.0) * animation.length,true)
+		player.advance(0)
+	if gait:
+		var length := player.current_animation_length
+		var target := fposmod(phase,1.0)*length
+		var forward := fposmod(target-player.current_animation_position,length)
+		if forward > length * 0.5:
+			player.seek(target,true)
+		else:
+			player.advance(forward)
+	elif delta > 0.0 and player.is_playing():
+		player.advance(delta)
+
 
 static func _scene(role_name: String, level: int) -> PackedScene:
 	var path := "res://assets/soldiers/%s_%s.glb" % [role_name, LODS[level]]

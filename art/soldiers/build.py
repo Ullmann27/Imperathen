@@ -407,23 +407,65 @@ LENGTHS={"idle":2,"march":1,"run":.72,"attack":.8,"shoot":1.28,"block":1.2,
 LOOPS={"idle","march","run","block","wall","testudo","retreat"}
 
 
+# One full cycle advances this many metres. The presentation adapter uses the
+# same distances for imported GLB playback, including a forward-facing retreat.
+STRIDES = {"march": (1.30, .58, .106), "run": (1.75, .40, .19), "retreat": (1.48, .51, .134)}
+
+
+def locomotion(clip, t, role):
+    stride, stance, clearance = STRIDES[clip]
+    phase = math.tau * t
+    lift = -.088 - .035 * math.cos(phase * 2) if clip != "run" else -.068 - .062 * math.cos(phase * 2)
+    angles = {}
+    for offset, suffix in ((0.0, "R"), (.5, "L")):
+        cycle = (t + offset) % 1
+        foot_height = 0.0
+        foot_pitch = 0.0
+        if cycle <= stance:
+            # Forward is -Y. A planted ankle travels backwards in model space
+            # exactly as fast as the figure advances in world space.
+            foot_y = stride * (cycle - stance / 2)
+        else:
+            u = (cycle - stance) / (1 - stance)
+            smooth = u * u * (3 - 2 * u)
+            foot_y = stride * (stance / 2 + (1 - stance) * u - smooth)
+            foot_height = clearance * math.sin(math.pi * u) ** 2
+            foot_pitch = 14 * math.sin(math.tau * u) * math.sin(math.pi * u)
+        # Analytic two-link sagittal IK. The bend stays forward of the hip;
+        # the foot compensates both joint angles to keep the sole flat in stance.
+        vertical = .89 + lift - (.12 + foot_height)
+        a, b = math.hypot(.4, .012), math.hypot(.37, .012)
+        reach = min(math.hypot(foot_y, vertical), a + b - .00001)
+        hip = math.atan2(foot_y, vertical) - math.acos((a*a + reach*reach - b*b)/(2*a*reach))
+        bend = math.pi - math.acos((a*a + b*b - reach*reach)/(2*a*b))
+        thigh = math.degrees(hip - math.atan2(-.012, .4))
+        shin = math.degrees(bend - (math.atan2(.012,.37) - math.atan2(-.012,.4)))
+        angles["Thigh_" + suffix] = (thigh, 0, 0)
+        angles["Shin_" + suffix] = (shin, 0, 0)
+        angles["Foot_" + suffix] = (foot_pitch - thigh - shin, 0, 0)
+        counter = math.cos(math.tau * cycle)
+        # Hands carry equipment. The shield stays near the torso, and the
+        # spear hand counter-rotates to prevent its tip sweeping the rank.
+        amplitude = 9 if suffix == "L" else (11 if role == "spear" else 18)
+        upper = -6 + amplitude * counter
+        elbow = -13 - (5 if clip != "run" else 14) * (1 - counter)
+        angles["Arm_" + suffix] = (upper, 0, 0)
+        angles["Forearm_" + suffix] = (elbow, 0, 0)
+        angles["Hand_" + suffix] = (-.82 * (upper + elbow + 12), 0, 0)
+    sway = math.sin(phase)
+    angles["Spine"] = (5 if clip == "run" else 2, 2.2*sway, 4.2*math.cos(phase))
+    angles["Head"] = (-2 if clip == "run" else -1, -1.6*sway, -3.4*math.cos(phase))
+    return angles, lift
+
+
 def pose(clip,t,role):
     angles={}
     lift=0
     wave=math.sin(TAU*t)
     if clip=="idle":
         angles={"Spine":(2*wave,0,0),"Head":(-wave,0,3*wave),"Forearm_R":(-3+2*wave,0,0)}
-    elif clip in ("march","run","retreat"):
-        speed={"march":24,"run":40,"retreat":-23}[clip]
-        for sign,suffix in ((1,"R"),(-1,"L")):
-            stride=speed*wave*sign
-            angles["Thigh_"+suffix]=(stride,0,0)
-            angles["Shin_"+suffix]=(max(0,-stride)*1.12,0,0)
-            angles["Foot_"+suffix]=(-max(0,-stride)*.5,0,0)
-            angles["Arm_"+suffix]=(-stride*.70,0,0)
-            angles["Forearm_"+suffix]=(-12-abs(stride)*.18,0,0)
-        angles["Spine"]=((8 if clip=="run" else 3),0,-4*wave)
-        lift=-.010*(1-math.cos(2*TAU*t))
+    elif clip in STRIDES:
+        return locomotion(clip, t, role)
     elif clip=="attack":
         wind=max(0,1-abs(t-.28)/.28)
         swing=max(0,1-abs(t-.59)/.28)
@@ -501,7 +543,8 @@ def animate(arm, role):
         arm.animation_data.action=action
         count=round(seconds*25)
         # Every clip includes the complete rest pose, allowing arbitrary transitions.
-        for frame in sorted({round(i*count/12) for i in range(13)}):
+        samples = range(count + 1) if clip in STRIDES else sorted({round(i*count/12) for i in range(13)})
+        for frame in samples:
             angles,lift=pose(clip,frame/count,role)
             for bone in arm.pose.bones:
                 ax,ay,az=angles.get(bone.name,(0,0,0))
@@ -525,7 +568,7 @@ def animate(arm, role):
                     archery_pose(arm,frame/count)
                 nock.keyframe_insert("location",frame=frame)
                 arrow.keyframe_insert("scale",frame=frame)
-            if clip in ("march","run","retreat","block","wall","testudo"):
+            if clip in ("block","wall","testudo"):
                 # Place the lower sole on the ground in each sample. Bone matrices
                 # here are computed from the pose, independent of evaluation time.
                 matrices={}
@@ -622,7 +665,7 @@ def build(role,detail):
     filename=OUTPUT/f"{role}_{suffix}.glb"
     bpy.ops.export_scene.gltf(filepath=str(filename),export_format="GLB",
                               export_animations=bool(arm),export_animation_mode="NLA_TRACKS",
-                              export_force_sampling=True,export_frame_step=2,
+                              export_force_sampling=True,export_frame_step=1,
                               export_optimize_animation_size=True,export_def_bones=False)
     obj.data.calc_loop_triangles()
     return {"role":role,"lod":suffix,"triangles":len(obj.data.loop_triangles),

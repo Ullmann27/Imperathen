@@ -17,7 +17,8 @@ var distance := 38.0
 var azimuth := 0.0
 var selected := []
 var actors := {}
-var targets := {}
+var motion := {}
+var frame_remainder := 0.0
 var standards := {}
 var groups := {}
 var profile := "balanced"
@@ -35,6 +36,7 @@ var sampled_step := -1
 var lod_due := 0.0
 
 func _ready() -> void:
+	frame_remainder = float(model.snapshot().remainder)
 	add_child(land)
 	add_child(far_ranks)
 	land.apply_quality(profile)
@@ -97,8 +99,11 @@ func _place_camera() -> void:
 	camera.look_at(center,Vector3.UP)
 
 func _process(delta: float) -> void:
+	var elapsed := 0.0
 	if not paused and model.outcome == "ongoing":
-		model.tick(minf(delta,0.5)*speed)
+		elapsed = minf(delta,0.5)*speed
+		frame_remainder = fposmod(frame_remainder + elapsed,Rules.STEP)
+		model.tick(elapsed)
 		if model.outcome != "ongoing":
 			paused = true
 			battle_finished.emit()
@@ -115,9 +120,13 @@ func _process(delta: float) -> void:
 		sampled_step = model.steps
 		_sync_units()
 		_refresh()
-	for id in targets:
-		var actor: Node3D = actors[id]
-		actor.position = actor.position.lerp(targets[id],1.0-exp(-delta*19.0))
+	var fraction := clampf(frame_remainder / Rules.STEP,0.0,1.0)
+	for id in actors:
+		var track: Dictionary = motion[id]
+		var actor = actors[id]
+		actor.position = track.start.lerp(track.end,fraction)
+		actor.rotation.y = lerp_angle(track.start_yaw, track.yaw, fraction)
+		actor.present(track.pose,lerpf(track.phase0,track.phase1,fraction),elapsed)
 	if gesture == "touch" and not selected.is_empty() and Time.get_ticks_msec()-pressed_at >= 360:
 		gesture = "deploy"
 		message = "Ziehe die Front. Loslassen bestätigt die markierten Plätze."
@@ -149,6 +158,7 @@ func _sync_units() -> void:
 			if id == s.officer_id and s.side == "ally" and s.kind == "infantry":
 				role = "officer"
 			counts[detail] += 1
+			_sample_motion(id, destination, float(man.facing)+PI, man.pose, s.formation)
 			if detail == 2:
 				if not distant.has(role):
 					distant[role] = []
@@ -156,7 +166,6 @@ func _sync_units() -> void:
 				if actors.has(id):
 					actors[id].queue_free()
 					actors.erase(id)
-					targets.erase(id)
 				i += 1
 				continue
 			if not actors.has(id):
@@ -166,30 +175,58 @@ func _sync_units() -> void:
 				actor.detail = detail
 				actors[id] = actor
 				actor.position = destination
+				actor.rotation.y = float(man.facing)+PI
 				add_child(actor)
 			var node = actors[id]
 			if node.role != role:
 				node.configure(role,node.variant)
 			node.set_detail(detail)
-			node.rotation.y = float(man.facing) + PI
-			var pose: String = man.pose
-			if pose == "idle" and s.formation in ["shield_wall","testudo"]:
-				pose = "wall" if s.formation == "shield_wall" else "testudo"
-			if node.state != pose or (pose in ["attack","shoot"] and node.player and not node.player.is_playing()):
-				node.play_state(pose)
-			targets[id] = destination
+
 			i += 1
 	far_ranks.sync(distant)
 	get_node("/root/RuntimeDisplay").set_unit_counts(counts[0],counts[1],counts[2])
 	for id in actors.keys():
 		if not live.has(id):
 			var fallen = actors[id]
-			targets.erase(id)
 			actors.erase(id)
 			fallen.play_state("death")
 			var fade := create_tween()
 			fade.tween_interval(1.25)
 			fade.tween_callback(fallen.queue_free)
+
+func _sample_motion(id: String, destination: Vector3, yaw: float, pose: String, formation: String) -> void:
+	var first_sample := not motion.has(id)
+	if first_sample:
+		# Adjacent files keep the same cadence with individual placement across
+		# the step. The same saved member always receives the same initial phase.
+		var seed_phase := fposmod((id.hash() % 997)/997.0 + int(id.right(2))*0.381966, 1.0)
+		var heading := Vector2(sin(yaw),cos(yaw))
+		seed_phase = fposmod(seed_phase + Vector2(destination.x,destination.z).dot(heading)/float(Soldier.STRIDES.march),1.0)
+		motion[id] = {"step":-1, "start":destination, "end":destination, "start_yaw":yaw, "yaw":yaw,
+			"phase0":seed_phase, "phase1":seed_phase, "pose":"idle"}
+	var track: Dictionary = motion[id]
+	if track.step == model.steps:
+		return
+	var displacement := Vector2(destination.x-track.end.x,destination.z-track.end.z)
+	var distance := displacement.length()
+	var period := maxi(1,model.steps-int(track.step))*Rules.STEP
+	track.start = track.end
+	track.end = destination
+	track.start_yaw = track.yaw
+	track.yaw = yaw
+	track.phase0 = fposmod(track.phase1,1.0)
+	track.phase1 = track.phase0
+	if pose in ["walk","idle","retreat"] and distance > 0.018:
+		pose = "retreat" if pose == "retreat" else ("run" if distance / period > 2.65 else "march")
+		track.phase1 += distance / float(Soldier.STRIDES[pose])
+		track.yaw = atan2(displacement.x,displacement.y)
+	elif pose in ["walk","retreat"]:
+		pose = ("march" if pose == "walk" else "retreat") if first_sample else "idle"
+	if pose == "idle" and formation in ["shield_wall","testudo"]:
+		pose = "wall" if formation == "shield_wall" else "testudo"
+	track.pose = pose
+	track.step = model.steps
+
 
 func _refresh() -> void:
 	hud.refresh(model,selected,paused,speed,message)

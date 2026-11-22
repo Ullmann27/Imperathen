@@ -28,3 +28,19 @@ godot --path prototype --resolution 1280x720 --rendering-method gl_compatibility
 ```
 
 [Godot-Nahaufnahme der exportierten Figuren](runtime_review.png) · [Exportgrößen und Meshstatistik](metrics.json). Der grafische Test vergleicht einen leeren Viewport und 64 Ferndarstellungen bei gleichem Kamerastand. Godot Compatibility mit Mesa llvmpipe meldete 0 bzw. 4 Draw Calls im sichtbaren Pass. Diese Messung betrifft die isolierte Figurenansicht.
+
+## Marschierende Talwache
+
+Die [drei Sekunden lange Nahaufnahme](field_march.webm) zeigt einen Bewegungsbefehl in der Talverteidigung bei 768 × 432 Pixeln. Die 72 Einzelbilder stammen aus dem Godot-Viewport. Die Wiedergabe mit 24 Bildern pro Sekunde folgt dem Aufnahmeschritt der Simulation.
+
+Marsch, Lauf und Flucht haben jeweils eine eigene Schrittlänge pro vollständigem Zyklus von 1,30 m, 1,75 m und 1,48 m. Die gebackene Standphase führt den Fuß entgegen der Fortbewegung. Die Schwungphase hebt den Fuß und beugt das Knie. Arme und Oberkörper bewegen sich gegenläufig. Die Handgelenke gleichen einen Teil des Schwungs beim Tragen von Schild und Speer aus. Position, Blickrichtung und Gangphase werden zwischen den Simulationsschritten dargestellt. Bei einer Neuöffnung beginnt jede Figur anhand ihrer gespeicherten Position, Richtung und Kennung. Die genaue frühere Beinphase entlang einer gekrümmten Strecke wird nicht im Spielstand gespeichert.
+
+Die Godot-Bewegungsprobe prüft die importierten Knochen beider animierten Detailstufen. Auf ebenem Boden betrug die größte Längsabweichung des Standknöchels 1,19 cm und seine größte Höhenabweichung 0,56 cm. Der niedrigste Prüfpunkt an Sohle oder Ferse lag 0,54 cm über der Bodenebene. Beim Marsch blieb die Neigung der aus den Handknochen abgeleiteten Schild- und Speerachsen unter 16 Grad. Unebenes Gelände verschiebt den Figurenpivot auf die Terrainhöhe. Die Füße besitzen keine individuelle Hangkorrektur.
+
+Bei der Aufnahme mit Mesa llvmpipe lagen die Mediane des ganzen sichtbaren Viewports bei 197,57 ms Render-CPU, 207,65 ms Render-GPU und 109 Draw Calls. Beide Zeitmessungen betreffen Software-Rendering der vollständigen Szene mit Bildauslese. Die Aufnahme misst keine Android-Bildrate.
+
+```sh
+godot --headless --path prototype --script res://tests/soldier_gait_test.gd
+godot --path prototype --rendering-method gl_compatibility --script "$PWD/art/soldiers/gait_review.gd" -- /tmp/imperathen-gait-frames
+ffmpeg -framerate 24 -i /tmp/imperathen-gait-frames/march_%03d.png -c:v libvpx-vp9 -b:v 0 -crf 33 -pix_fmt yuv420p /tmp/field_march.webm
+```
