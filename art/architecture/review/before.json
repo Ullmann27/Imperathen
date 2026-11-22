@@ -1,0 +1,25 @@
+{
+  "bounds_min_m": [
+    -5.75,
+    0.0,
+    -5.25
+  ],
+  "bounds_size_m": [
+    11.5,
+    3.64999985694885,
+    10.5
+  ],
+  "imported_lod_triangles": [
+    1144,
+    332
+  ],
+  "rendered_lod_probe": {
+    "12": 4912,
+    "150": 4912,
+    "330": 4912,
+    "70": 4912
+  },
+  "surfaces": 1,
+  "triangles": 4912,
+  "vertices": 8640
+}
