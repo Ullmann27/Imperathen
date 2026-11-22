@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "platform": "Android",
+  "presets": [
+    {"id": "leicht", "target_fps": 30, "frame_budget_ms": 33.33, "dynamic_resolution": true, "character_lod": 3, "shadow_tier": 0},
+    {"id": "ausgewogen", "target_fps": 30, "frame_budget_ms": 33.33, "dynamic_resolution": true, "character_lod": 2, "shadow_tier": 1},
+    {"id": "hoch", "target_fps": 45, "frame_budget_ms": 22.22, "dynamic_resolution": true, "character_lod": 1, "shadow_tier": 2},
+    {"id": "sehr_hoch", "target_fps": 60, "frame_budget_ms": 16.67, "dynamic_resolution": false, "character_lod": 0, "shadow_tier": 3}
+  ],
+  "notes": "Performance targets only; not measured, and hardware-dependent. Graphics tiers must not change gameplay outcomes."
+}
