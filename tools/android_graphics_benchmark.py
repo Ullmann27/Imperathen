@@ -77,6 +77,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--adb", required=True)
     parser.add_argument("--apk", required=True, type=Path)
+    parser.add_argument("--abi", choices=("x86_64", "arm64-v8a"), default="x86_64")
     parser.add_argument("--mode", choices=("soak", "renderer"), required=True)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
@@ -109,12 +110,19 @@ def main():
         report["api"] = adb("shell", "getprop", "ro.build.version.sdk")
         report["device_abis"] = adb("shell", "getprop", "ro.product.cpu.abilist")
         report["vulkan_features"] = [line for line in adb("shell", "pm", "list", "features").splitlines() if "vulkan" in line]
+        if args.abi not in report["device_abis"].split(","):
+            if args.mode == "renderer" and args.abi == "arm64-v8a":
+                report.update(status="unavailable", reason="Emulator does not advertise ARM64 translation")
+                return
+            raise RuntimeError("Requested ABI unavailable")
         adb("shell", "am", "force-stop", PACKAGE)
-        if "Success" not in adb("install", "-r", "-t", "--abi", "x86_64", str(args.apk)):
+        if "Success" not in adb("install", "-r", "-t", "--abi", args.abi, str(args.apk)):
             raise RuntimeError("Installation failed")
         info = adb("shell", "dumpsys", "package", PACKAGE)
-        if "primaryCpuAbi=x86_64" not in info:
-            raise RuntimeError("Emulator did not select the native x86_64 ABI")
+        report["selected_abi"] = args.abi
+        report["translated"] = args.abi != adb("shell", "getprop", "ro.product.cpu.abi")
+        if not re.search(r"primaryCpuAbi=" + re.escape(args.abi) + r"\b", info):
+            raise RuntimeError("PackageManager selected the wrong ABI")
         paths = adb("shell", "run-as", PACKAGE, "find", "files", "-name", "imperathen_campaign.json").splitlines()
         if len(paths) != 1 or not paths[0].startswith("files/"):
             raise RuntimeError("Saved campaign from the preceding Android smoke is required")
@@ -165,7 +173,7 @@ def main():
         if ([r["quality"] for r in report["village_profiles"]] != list(PROFILES)
                 or any(not r["visible"] for r in report["village_profiles"])):
             raise RuntimeError("Village did not render all four profiles")
-        if report["device"]["architecture"] != "x86_64":
+        if report["device"]["architecture"] != {"x86_64":"x86_64", "arm64-v8a":"arm64"}[args.abi]:
             raise RuntimeError("Unexpected Godot runtime architecture")
         if args.mode == "soak":
             budgets = json.loads((Path(__file__).resolve().parents[1] / "prototype/assets/quality_profiles.json").read_text())["profiles"]

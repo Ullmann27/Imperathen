@@ -37,7 +37,8 @@
         "animated_valley_actors": 24,
         "process_pss_mib": 384,
         "visible_lights": 1,
-        "shadow_casting_lights": 1
+        "shadow_casting_lights": 1,
+        "animation_keys": 30000
       }
     },
     "balanced": {
@@ -57,7 +58,8 @@
         "animated_valley_actors": 40,
         "process_pss_mib": 512,
         "visible_lights": 1,
-        "shadow_casting_lights": 1
+        "shadow_casting_lights": 1,
+        "animation_keys": 60000
       }
     },
     "high": {
@@ -78,7 +80,8 @@
         "animated_valley_actors": 64,
         "process_pss_mib": 768,
         "visible_lights": 1,
-        "shadow_casting_lights": 1
+        "shadow_casting_lights": 1,
+        "animation_keys": 100000
       }
     },
     "very_high": {
@@ -99,7 +102,8 @@
         "animated_valley_actors": 90,
         "process_pss_mib": 1024,
         "visible_lights": 1,
-        "shadow_casting_lights": 1
+        "shadow_casting_lights": 1,
+        "animation_keys": 160000
       }
     }
   },

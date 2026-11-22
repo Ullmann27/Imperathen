@@ -19,6 +19,7 @@ var frames := []
 var last_flush := 0
 var last_progress := 0
 var phase_started := 0
+var animation_census := {}
 
 func _ready() -> void:
 	mode = FileAccess.get_file_as_string("user://graphics-probe.txt").strip_edges()
@@ -82,6 +83,7 @@ func _process(_delta: float) -> void:
 		return
 	if previous_battle != valley.get_instance_id() or valley.profile != PROFILES[phase]:
 		previous_battle = valley.get_instance_id()
+		animation_census.clear()
 		valley.hud.quality_picker.select(phase)
 		valley.hud.quality_picker.item_selected.emit(phase)
 		if valley.profile != PROFILES[phase] or game.ui.get_quality() != valley.profile:
@@ -144,13 +146,32 @@ func _counters(scene: Node) -> Dictionary:
 			lights += 1
 			if light.shadow_enabled:
 				shadows += 1
+	if stage == "village" or animation_census.is_empty():
+		animation_census = _animations(scene)
 	var texture := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TEXTURE_MEM_USED)
 	var buffers := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_BUFFER_MEM_USED)
 	return {"draw_calls":viewport.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_DRAW_CALLS_IN_FRAME),
 		"visible_primitives":viewport.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE,Viewport.RENDER_INFO_PRIMITIVES_IN_FRAME),
 		"texture_mib":texture / 1048576.0 if texture > 0 else null,"mesh_buffer_mib":buffers / 1048576.0 if buffers > 0 else null,
 		"animated_valley_actors":scene.actors.size() if stage == "battle" else null,
-		"visible_lights":lights,"shadow_casting_lights":shadows}
+		"visible_lights":lights,"shadow_casting_lights":shadows, "animation_keys":animation_census.keys_total,
+		"shared_animation_clips":animation_census.clips, "animation_only_resident_mib":null}
+
+func _animations(scene: Node) -> Dictionary:
+	# Shared clips are counted once per scene/profile. Godot does not publish
+	# animation-only resident bytes; PSS and graphics memory are measured separately.
+	var visited := {}
+	var keys := 0
+	for player: AnimationPlayer in scene.find_children("*", "AnimationPlayer", true, false):
+		for clip in player.get_animation_list():
+			var animation := player.get_animation(clip)
+			var id := animation.get_instance_id()
+			if visited.has(id):
+				continue
+			visited[id] = true
+			for track in animation.get_track_count():
+				keys += animation.track_get_key_count(track)
+	return {"clips":visited.size(),"keys_total":keys}
 
 func _flush() -> void:
 	if not frames.is_empty():
