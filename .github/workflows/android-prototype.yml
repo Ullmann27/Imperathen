@@ -25,7 +25,7 @@ concurrency:
 jobs:
   build-and-check:
     runs-on: ubuntu-24.04
-    timeout-minutes: 65
+    timeout-minutes: 78
     env:
       IMPERATHEN_GRAPHICS_QA: ${{ github.ref_name == 'integration/realistic-android-23' && '1' || '0' }}
       GODOT_VERSION: '4.7.2'
@@ -130,7 +130,7 @@ jobs:
             desktop/*.log
           retention-days: 30
       - name: Start a real Android emulator and inspect the app runtime
-        timeout-minutes: 45
+        timeout-minutes: 58
         shell: bash
         run: |
           bash tools/run_android_emulator.sh

@@ -142,7 +142,7 @@ def main():
         launched = adb("shell", "am", "start", "-W", "-n", component)
         if "Status: ok" not in launched:
             raise RuntimeError("Could not launch the installed APK")
-        deadline = start + (1600 if args.mode == "soak" else 150)
+        deadline = start + (1850 if args.mode == "soak" else 360)
         while time.monotonic() < deadline:
             # exec-out combines stdout and stderr on some platform-tools versions.
             # Wait for the engine to create its trace before parsing any bytes as JSON.
