@@ -177,7 +177,11 @@ func _select(index: int) -> void:
 	_image.texture = texture(current_id)
 	_missing.visible = _image.texture == null
 	if _image.texture != null and OS.is_debug_build() and OS.has_feature("android"):
-		print("IMPERATHEN_GALLERY_PORTRAIT " + current_id)
+		RenderingServer.frame_post_draw.connect(_report_drawn.bind(current_id,_image.texture),CONNECT_ONE_SHOT)
 	var data := caption(current_id)
 	_title.text = data.name
 	_caption.text = data.context
+
+func _report_drawn(id: String, shown: Texture2D) -> void:
+	if is_visible_in_tree() and current_id == id and _image.texture == shown:
+		print("IMPERATHEN_GALLERY_PORTRAIT " + id)
