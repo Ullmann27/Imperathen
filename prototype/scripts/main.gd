@@ -3,6 +3,7 @@ extends Node
 const ModelScript = preload("res://scripts/domain/world_model.gd")
 const WorldScript = preload("res://scripts/world/game_world.gd")
 const UIScript = preload("res://scripts/ui/game_ui.gd")
+const ValleyScene = preload("res://scripts/tactics/valley_scene.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -10,6 +11,8 @@ var world
 var ui
 var screen := "intro"
 var mode := "person"
+var valley
+var valley_demo := false
 var session_started := false
 var refresh_pending := true
 var refresh_elapsed := 0.0
@@ -42,6 +45,13 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if screen == "valley":
+		if not valley_demo and not valley.paused:
+			autosave_elapsed += delta
+			if autosave_elapsed >= 15:
+				autosave_elapsed = 0
+				_save(false)
+		return
 	if screen == "playing":
 		model.set_player_position(world.get_player_position())
 		model.advance(delta)
@@ -64,6 +74,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _notification(what: int) -> void:
+	if screen == "valley" and is_instance_valid(valley):
+		if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+			_leave_valley()
+			return
+		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
+			valley.paused = true
+			valley.reset_gesture()
+			if not valley_demo:
+				_save(false)
+			return
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if is_instance_valid(ui):
 			ui.handle_back()
@@ -144,6 +164,7 @@ func _continue_game() -> void:
 	last_story_id = ""
 	_resume()
 	ui.notify(str(result.get("message", "Spielstand geladen.")))
+	print("IMPERATHEN_CONTINUED")
 
 
 func _resume() -> void:
@@ -172,6 +193,8 @@ func _save(show_feedback: bool = true) -> Dictionary:
 	if not session_started:
 		return {"ok": false, "message": "Es läuft noch keine Partie."}
 	model.set_player_position(world.get_player_position())
+	if screen == "valley" and not valley_demo:
+		model.checkpoint_valley(valley.model)
 	var result: Dictionary = model.save_game(SAVE_PATH)
 	if show_feedback or not result.get("ok", false):
 		ui.notify(str(result.get("message", "Spielstand gespeichert.")))
@@ -200,6 +223,8 @@ func _set_mode(next_mode: String) -> void:
 
 func _on_ui_action(action: String, payload: Dictionary) -> void:
 	match action:
+		"valley_demo": _open_valley(true)
+		"valley": _open_valley(false)
 		"intro_finished": _show_menu()
 		"new_game": _request_new_game()
 		"confirm_new_game": _start_new_game()
@@ -361,3 +386,59 @@ func _find_start_button(node: Node) -> Button:
 		if found != null:
 			return found
 	return null
+
+
+func _open_valley(demo: bool) -> void:
+	if valley != null:
+		return
+	if demo:
+		if screen != "menu":
+			return
+	elif screen not in ["paused", "playing"] or not model.data.progress.skirmish_won or not model.data.story.choices.is_empty():
+		ui.notify("Verteidige zuerst das Dorf und schließe die Folgeentscheidung ab.")
+		return
+	valley = ValleyScene.new()
+	if not demo and not model.data.valley.is_empty():
+		if not valley.model.restore(model.data.valley.snapshot):
+			valley.free()
+			valley = null
+			ui.notify("Das Talgefecht konnte nicht wiederhergestellt werden.")
+			return
+	valley_demo = demo
+	valley.profile = ui.get_quality()
+	valley.leave_requested.connect(_leave_valley)
+	valley.battle_finished.connect(_valley_finished)
+	world.set_active(false)
+	world.hide()
+	world.process_mode = Node.PROCESS_MODE_DISABLED
+	ui.hide()
+	ui.process_mode = Node.PROCESS_MODE_DISABLED
+	screen = "valley"
+	autosave_elapsed = 0.0
+	add_child(valley)
+
+
+func _valley_finished() -> void:
+	if not valley_demo:
+		_save(false)
+
+
+func _leave_valley() -> void:
+	if not valley_demo and not _save(false).ok:
+		valley.paused = true
+		valley.message = "Speichern fehlgeschlagen. Bitte erneut versuchen."
+		return
+	var was_demo := valley_demo
+	valley_demo = false
+	remove_child(valley)
+	valley.queue_free()
+	valley = null
+	world.process_mode = Node.PROCESS_MODE_INHERIT
+	ui.process_mode = Node.PROCESS_MODE_INHERIT
+	world.show()
+	ui.show()
+	world.get_node("WorldCamera").current = true
+	if was_demo:
+		_show_menu()
+	else:
+		_resume()

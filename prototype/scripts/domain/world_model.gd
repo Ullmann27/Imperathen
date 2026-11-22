@@ -5,7 +5,8 @@ extends RefCounted
 
 signal changed
 
-const SCHEMA_VERSION := 1
+const BattleModel = preload("res://scripts/battle/battle_model.gd")
+const SCHEMA_VERSION := 2
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
 const MAX_COMMAND_IDS := 1024
@@ -52,7 +53,7 @@ func new_game() -> void:
 		"timers": {"training": 0.0, "strike": 0.0, "damage": 0.0},
 		"chronicle": [{"time": 0.0, "text": "Du erreichst die Grenzsiedlung. Ein geliehenes Werkzeug und eine erlaubte Baufläche sind dein Anfang."}],
 		"story": {"title": "Ein Anfang am Fluss", "text": "Sammle Holz, sprich mit Marcus und baue deine erste Unterkunft östlich des Weges.", "choices": [], "choice": ""},
-		"command_log": {}
+		"valley": {}, "command_log": {}
 	}
 	for index in NODE_POSITIONS.size():
 		data.resource_nodes.append({"id": "timber_%d" % index, "x": NODE_POSITIONS[index][0], "z": NODE_POSITIONS[index][1], "amount": 16})
@@ -82,7 +83,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 		return _fail("Das Wiederholungsprotokoll ist voll; ein neuer Auftrag benötigt eine neue Spielwelt.")
 	if data.progress.career_terminal:
 		return _fail("Dieser Lebensbogen ist abgeschlossen. Ein neues Leben beginnt im Hauptmenü.")
-	var candidate: Dictionary = data.duplicate(true)
+	var candidate := _world_copy()
 	var result := _apply_command(candidate, command, args)
 	if not result.ok:
 		return result
@@ -117,7 +118,7 @@ func advance(delta: float) -> void:
 		return
 	if float(data.world_seconds) + delta > 1000000000000.0:
 		return
-	var candidate: Dictionary = data.duplicate(true)
+	var candidate := _world_copy()
 	var notify_ui := int(candidate.world_seconds) != int(float(candidate.world_seconds) + delta)
 	candidate.world_seconds = float(candidate.world_seconds) + delta
 	for key in candidate.timers:
@@ -147,6 +148,42 @@ func advance(delta: float) -> void:
 	data = candidate
 	if notify_ui:
 		changed.emit()
+
+
+## Regional troops are a separate contingent from the village recruits.
+## Only the live rules object publishes a checkpoint. Counters derive from its roster.
+func checkpoint_valley(battle) -> bool:
+	if not data.progress.skirmish_won or data.progress.career_terminal:
+		return false
+	var previous: Dictionary = data.valley
+	var summary: Dictionary = battle.summary()
+	var previous_steps := int(previous.get("snapshot", {}).get("steps", 0))
+	if battle.steps < previous_steps or previous.get("outcome","ongoing") != "ongoing":
+		return false
+	data.world_seconds += (battle.steps - previous_steps) * BattleModel.STEP
+	data.valley = {"snapshot":battle.snapshot(), "outcome":battle.outcome,
+		"allied_losses":summary.ally.losses, "enemy_losses":summary.enemy.losses}
+	if battle.outcome != "ongoing":
+		var result: String = {"victory":"Die Grenzlegion hält die Talstraße.", "defeat":"Der Höhenbund kontrolliert die Talstraße.", "draw":"Die Talstraße bleibt umkämpft."}[battle.outcome]
+		_record(data, "%s Ausfälle: Legion %d, Höhenbund %d." % [result,summary.ally.losses,summary.enemy.losses])
+	data.revision += 1
+	changed.emit()
+	return true
+
+
+func _valid_valley(state: Dictionary) -> bool:
+	if typeof(state.valley) != TYPE_DICTIONARY:
+		return false
+	if state.valley.is_empty():
+		return true
+	var valley: Dictionary = state.valley
+	if not state.progress.skirmish_won or not _exact_keys(valley, ["snapshot","outcome","allied_losses","enemy_losses"]):
+		return false
+	var battle = BattleModel.new()
+	if typeof(valley.snapshot) != TYPE_DICTIONARY or not battle.restore(valley.snapshot):
+		return false
+	var summary: Dictionary = battle.summary()
+	return valley.outcome == summary.outcome and valley.allied_losses == summary.ally.losses and valley.enemy_losses == summary.enemy.losses
 
 
 func save_game(path: String) -> Dictionary:
@@ -447,9 +484,9 @@ func _validate_arguments(command: String, args: Dictionary) -> String:
 
 
 func _validate_state(state: Variant) -> String:
-	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log"]):
+	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley"]):
 		return "Unvollständiger oder unbekannter Datenvertrag."
-	if not _integer(state.schema_version, 1, 1):
+	if not _integer(state.schema_version, SCHEMA_VERSION, SCHEMA_VERSION):
 		return "Diese Schemaversion wird nicht unterstützt; es wurde keine Migration ausgeführt."
 	if not _text(state.world_id, 1, 100) or not _integer(state.revision, 0, 9007199254740990) or not _number(state.world_seconds, 0.0, 1000000000000.0):
 		return "Ungültige Weltkennung, Revision oder Zeit."
@@ -634,7 +671,13 @@ func _read_save(path: String) -> Dictionary:
 	var payload_parser := JSON.new()
 	if payload_parser.parse(envelope.payload) != OK:
 		return _fail("Der gespeicherte Weltzustand ist kein gültiges JSON.")
-	var error := _validate_state(payload_parser.data)
+	var state: Variant = payload_parser.data
+	if typeof(state) == TYPE_DICTIONARY and state.get("schema_version") == 1 and not state.has("valley"):
+		state.schema_version = SCHEMA_VERSION
+		state.valley = {}
+	var error := _validate_state(state)
+	if error.is_empty() and not _valid_valley(state):
+		error = "Das gespeicherte Talgefecht enthält widersprüchliche Daten."
 	if not error.is_empty():
 		return _fail(error)
 	# JSON numbers may arrive as floats. Restore schema-defined integer types only
@@ -794,3 +837,13 @@ func _ok(message: String) -> Dictionary:
 
 func _fail(message: String) -> Dictionary:
 	return {"ok": false, "message": message}
+
+func _world_copy() -> Dictionary:
+	var candidate := {}
+	for key in data:
+		var value: Variant = data[key]
+		if key != "valley" and typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY]:
+			candidate[key] = value.duplicate(true)
+		else:
+			candidate[key] = value
+	return candidate

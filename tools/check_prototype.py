@@ -72,6 +72,8 @@ def main():
             ("ui", ["--fixed-fps", "60", "--script", "res://scripts/ui/ui_smoke.gd"], "UI_SMOKE_PASS"),
             ("world", ["--fixed-fps", "60", "--script", "res://scripts/world/world_smoke.gd"], "WORLD_SMOKE_PASS"),
             ("integration", ["--fixed-fps", "60", "--script", "res://tests/integration_test.gd"], "INTEGRATION_PASS"),
+            ("battle_rules", ["--script", "res://tests/battle_rules_test.gd"], "failures=0"),
+            ("soldier_visuals", ["--script", "res://tests/soldier_visual_test.gd"], "0 failed"),
             ("main_scene", ["--fixed-fps", "60", "--quit-after", "420"], "IMPERATHEN_READY"),
         ]
         for name, arguments, marker in checks:
@@ -83,7 +85,7 @@ def main():
     for path in sorted(PROJECT.rglob("*")):
         if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".tscn", ".godot", ".glb", ".wav", ".json"}:
             source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
-    result = {"engine": version, "passed": len(records) == 6 and all(item["passed"] for item in records),
+    result = {"engine": version, "passed": len(records) == len(checks) and all(item["passed"] for item in records),
               "renderer": "headless/dummy; no graphical FPS or screenshot claim",
               "save_isolation": "Disposable XDG data/config/cache directories",
               "checks": records, "source_sha256": source_hashes}

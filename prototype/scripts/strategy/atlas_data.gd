@@ -1,0 +1,37 @@
+extends RefCounted
+## Site coordinates anchor representative regions. Edges are fictional campaign routes.
+## Named communities and archaeological traditions do not imply unified states.
+const REGIONS := {
+	"italia":{"name":"Rom · Italia","lat":41.9,"lon":12.5,"links":["gallia","germania","aegyptus","greek","africa"],"note":"Unter Trajan ist Rom das Zentrum des Reiches. Beginn der Referenzkampagne um 100 n. Chr."},
+	"gallia":{"name":"Lugdunum · Gallien","lat":45.76,"lon":4.83,"links":["italia","britannia","hispania","germania"],"note":"Römische Provinzlandschaft am Zusammenfluss von Rhône und Saône."},
+	"britannia":{"name":"Britannia · Londinium","lat":51.51,"lon":-0.09,"links":["gallia","woodlands"],"note":"Londinium liegt in der römisch beherrschten Provinz. Die Atlantikpassage ist ein späteres Spielziel."},
+	"hispania":{"name":"Hispania · Baetica","lat":37.9,"lon":-4.8,"links":["gallia","africa"],"note":"Städte und Landgüter der römischen Baetica am Baetis."},
+	"germania":{"name":"Gemeinschaften östlich des Rheins","lat":51.4,"lon":10.1,"links":["gallia","italia","vistula","northern"],"note":"Mehrere Gemeinschaften mit unterschiedlichen Bündnissen. Germania bezeichnet hier die Region."},
+	"northern":{"name":"Südskandinavien","lat":55.6,"lon":12.0,"links":["germania","vistula"],"note":"Höfe und Austauschplätze der nordischen römischen Eisenzeit."},
+	"vistula":{"name":"Weichselraum · Przeworsk-Kultur","lat":50.1,"lon":20.1,"links":["germania","northern","steppe"],"note":"Archäologischer Fundzusammenhang im heutigen Polen. Eine politische Einheit ist daraus nicht abzuleiten."},
+	"greek":{"name":"Ägäis · Achaia","lat":37.98,"lon":23.73,"links":["italia","parthia","aegyptus","steppe"],"note":"Griechische Städte innerhalb des römischen Provinzsystems."},
+	"africa":{"name":"Africa Proconsularis · Karthago","lat":36.85,"lon":10.33,"links":["hispania","aegyptus","sahel","italia"],"note":"Karthago ist eine bedeutende Stadt der römischen Provinz."},
+	"aegyptus":{"name":"Alexandria · Ägypten","lat":31.2,"lon":29.9,"links":["africa","italia","greek","kush","parthia"],"note":"Hafen und Verwaltungszentrum des römischen Ägypten."},
+	"kush":{"name":"Kusch · Meroë","lat":16.94,"lon":33.75,"links":["aegyptus","aksum","sahel"],"note":"Das meroitische Königreich am mittleren Nil."},
+	"aksum":{"name":"Aksum · Horn von Afrika","lat":14.13,"lon":38.72,"links":["kush","indus","eastafrica"],"note":"Frühes Aksum und der Handel im Roten Meer."},
+	"sahel":{"name":"Mittlerer Niger","lat":13.9,"lon":-4.55,"links":["africa","kush","eastafrica"],"note":"Siedlungsräume am Binnendelta. Der Atlas fasst mehrere Gemeinschaften zusammen."},
+	"eastafrica":{"name":"Ostafrikanische Küste","lat":-6.4,"lon":38.9,"links":["aksum","sahel","southafrica"],"note":"Ein geographischer Knoten für die frühe Küstenbesiedlung."},
+	"southafrica":{"name":"Südliches Afrika","lat":-28.6,"lon":23.8,"links":["eastafrica"],"note":"Regionaler Spielknoten für verschiedene Gemeinschaften."},
+	"parthia":{"name":"Arsakiden · Ktesiphon","lat":33.09,"lon":44.58,"links":["greek","aegyptus","indus","steppe"],"note":"Die Arsakiden herrschen über das Partherreich."},
+	"steppe":{"name":"Pontische Steppe","lat":47.3,"lon":40.0,"links":["vistula","greek","parthia","tarim"],"note":"Sarmatisch geprägte Gruppen und wechselnde Verbindungen über die Steppe."},
+	"indus":{"name":"Kuschan · Gandhāra","lat":34.01,"lon":71.58,"links":["parthia","aksum","tarim","deccan"],"note":"Kuschanzeitlicher Kulturraum im Nordwesten des indischen Subkontinents."},
+	"deccan":{"name":"Dekkan · Sātavāhana","lat":19.5,"lon":75.4,"links":["indus","mekong"],"note":"Herrschaftsraum auf dem Dekkan mit regional wechselnden Machtzentren."},
+	"tarim":{"name":"Oasen des Tarimbeckens","lat":39.47,"lon":75.99,"links":["steppe","indus","han"],"note":"Oasenreiche zwischen den westlichen und östlichen Handelswegen."},
+	"han":{"name":"Östliche Han · Luoyang","lat":34.68,"lon":112.45,"links":["tarim","mekong","korea"],"note":"Luoyang ist Hauptstadt der Östlichen Han. Die Dynastie regiert von 25 bis 220 n. Chr."},
+	"korea":{"name":"Südliche Halbinsel · Samhan","lat":35.23,"lon":128.88,"links":["han","wa"],"note":"Mahan, Jinhan und Byeonhan bezeichnen mehrere Gemeinschaften der südlichen koreanischen Halbinsel."},
+	"wa":{"name":"Wa · nördliches Kyūshū","lat":33.32,"lon":130.38,"links":["korea","pacific"],"note":"Gemeinschaften der Yayoi-Zeit mit Reisanbau und umgrabenen Siedlungen. Wa ist eine historische Fremdbezeichnung."},
+	"mekong":{"name":"Unterer Mekong","lat":10.8,"lon":105.1,"links":["han","deccan","sunda"],"note":"Regionale Fluss- und Küstenverbindungen in Südostasien."},
+	"sunda":{"name":"Sundainseln","lat":-7.5,"lon":110.8,"links":["mekong","australia","pacific"],"note":"Maritime Gemeinschaften im Inselraum. Der Knoten steht für einen regionalen Auftrag."},
+	"australia":{"name":"Australische Nordküste","lat":-12.4,"lon":132.9,"links":["sunda","pacific"],"note":"Aboriginal-Gemeinschaften mit eigenen Ländern und Überlieferungen."},
+	"pacific":{"name":"Westpolynesien · Tonga","lat":-21.14,"lon":-175.2,"links":["sunda","australia","wa","andes"],"note":"Schon lange besiedelte Inseln Westpolynesiens. Die transozeanischen Kanten gehören zur Spielsimulation."},
+	"woodlands":{"name":"Ohio-Tal · Hopewell","lat":39.35,"lon":-82.99,"links":["britannia","mesoamerica"],"note":"Archäologische Tradition mit weitreichendem Austausch und monumentalen Erdwerken."},
+	"mesoamerica":{"name":"Hochland · Teotihuacán","lat":19.69,"lon":-98.84,"links":["woodlands","maya"],"note":"Im zentralmexikanischen Hochland wächst ein urbanes Zentrum."},
+	"maya":{"name":"Maya-Tiefland","lat":17.75,"lon":-89.9,"links":["mesoamerica","andes"],"note":"Spätpräklassische Maya-Gemeinschaften und städtische Zentren."},
+	"andes":{"name":"Anden · Nordküste","lat":-8.1,"lon":-79.0,"links":["maya","pacific","amazon"],"note":"Regionale Gesellschaften der Andenküste in einer Zeit früher Moche-Traditionen."},
+	"amazon":{"name":"Amazonasbecken","lat":-3.15,"lon":-59.9,"links":["andes"],"note":"Vielfältige Flussgemeinschaften. Der Kartenknoten fasst ein sehr großes Gebiet zusammen."}
+}

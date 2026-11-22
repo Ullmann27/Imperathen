@@ -22,6 +22,44 @@ func _run() -> void:
 	_check(game.screen == "intro", "The actual main scene begins with the intro")
 	game.ui._finish_intro()
 	_check(game.screen == "menu", "Skipping the intro opens the real main menu")
+	game.ui.action_requested.emit("valley_demo", {})
+	_check(game.screen == "valley" and game.valley.actors.size() > 0, "The menu opens the independent valley scenario")
+	var scene = game.valley
+	var guard: Dictionary = scene.model.squads.valley_guard
+	var ally_pixel: Vector2 = scene.camera.unproject_position(scene._surface(Vector2(guard.x,guard.z))+Vector3.UP*0.65)
+	_mouse(scene,ally_pixel,MOUSE_BUTTON_LEFT,true)
+	_mouse(scene,ally_pixel,MOUSE_BUTTON_LEFT,false)
+	_check("valley_guard" in scene.selected, "A projected friendly company is selectable via the PC input path")
+	var line_a: Vector2 = scene.camera.unproject_position(scene._surface(Vector2(-9,4)))
+	var line_b: Vector2 = scene.camera.unproject_position(scene._surface(Vector2(-4,4)))
+	_mouse(scene,line_a,MOUSE_BUTTON_RIGHT,true)
+	var motion := InputEventMouseMotion.new()
+	motion.position = line_b
+	scene._input(motion)
+	_check(scene.ghost.multimesh.instance_count == guard.strength, "Dragging previews one attainable slot per soldier")
+	_mouse(scene,line_b,MOUSE_BUTTON_RIGHT,false)
+	_check(guard.command == "deploy", "Mouse release submits the displayed line")
+	var before_pinch := JSON.stringify(scene.model.snapshot())
+	var initial_distance: float = scene.distance
+	_touch(scene,0,line_a,true)
+	_touch(scene,1,line_b,true)
+	var drag := InputEventScreenDrag.new()
+	drag.index = 1
+	drag.position = line_b+Vector2(75,0)
+	scene._input(drag)
+	_touch(scene,1,drag.position,false)
+	_touch(scene,0,line_a,false)
+	_check(scene.distance != initial_distance and before_pinch == JSON.stringify(scene.model.snapshot()), "Two fingers zoom and pan without submitting an order")
+	_touch(scene,0,line_a,true)
+	scene.pressed_at = Time.get_ticks_msec()-500
+	scene._process(0)
+	drag.index = 0
+	drag.position = line_b
+	scene._input(drag)
+	_check(scene.gesture == "deploy" and scene.ghost.multimesh.instance_count > 0, "Long touch displays the same planned front")
+	_touch(scene,0,line_b,false)
+	scene._action("leave")
+	_check(game.screen == "menu" and not FileAccess.file_exists(game.SAVE_PATH), "The scenario preview never creates a campaign save")
 	game.ui.action_requested.emit("new_game", {})
 	_check(game.screen == "playing", "New game starts an active world through the UI signal")
 	_check(int(game.model.data.player.age) == 12, "A new life starts as a child")
@@ -120,6 +158,37 @@ func _run() -> void:
 	place = game.world.get_player_position()
 	await _wait_physics(10)
 	_check(game.world.get_player_position().is_equal_approx(place), "Pausing cancels held touch movement")
+	game.ui.action_requested.emit("valley",{})
+	_check(game.screen == "valley","Earned village defence opens the campaign deployment")
+	var valley = game.valley
+	var initial_time: float = game.model.data.world_seconds
+	valley.model.tick(3.0)
+	game.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+	var seconds: float = game.model.data.world_seconds
+	_check(is_equal_approx(seconds,initial_time+3.0),"Android suspension checkpoints elapsed battle time once")
+	var persisted := JSON.stringify(game.model.data.valley.snapshot)
+	valley._action("leave")
+	_check(game.model.data.world_seconds == seconds,"Returning from a tactical camera does not advance world time twice")
+	game._show_menu()
+	game._continue_game()
+	game._pause()
+	game._open_valley(false)
+	_check(JSON.stringify(game.valley.model.snapshot()) == persisted or game.valley.model.steps == 15,"A fresh load resumes the same tactical tick")
+	var local_population: Dictionary = game.model.data.population.duplicate()
+	var retreat := []
+	for squad in game.valley.model.squads.values():
+		if squad.side == "ally":
+			retreat.append(squad.id)
+	game.valley.model.order(retreat,"retreat")
+	for i in 605:
+		game.valley.model.tick(0.2)
+	game._valley_finished()
+	_check(game.model.data.valley.outcome == "defeat","Retreat transfers loss of the pass to the strategic ledger")
+	var history_count: int = game.model.data.chronicle.size()
+	game._leave_valley()
+	game._show_menu()
+	game._continue_game()
+	_check(game.model.data.valley.outcome == "defeat" and game.model.data.chronicle.size()==history_count and game.model.data.population==local_population,"Reload preserves the outcome, does not double-book casualties or spend village recruits")
 	game.queue_free()
 	await process_frame
 	if failures.is_empty():
@@ -147,3 +216,17 @@ func _check(condition: bool, description: String) -> void:
 	checks += 1
 	if not condition:
 		failures.append(description)
+
+func _mouse(scene,p: Vector2,button: MouseButton,down: bool) -> void:
+	var event := InputEventMouseButton.new()
+	event.position = p
+	event.button_index = button
+	event.pressed = down
+	scene._input(event)
+
+func _touch(scene,index: int,p: Vector2,down: bool) -> void:
+	var event := InputEventScreenTouch.new()
+	event.index = index
+	event.position = p
+	event.pressed = down
+	scene._input(event)
