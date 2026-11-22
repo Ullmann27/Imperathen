@@ -61,6 +61,7 @@ def summarize(rows, system, budgets):
         graphics["process_pss_mib"] = distribution(r["pss_kib"] / 1024 for r in system_rows if r["pss_kib"] is not None)
         result[profile] = {"active_seconds": end["active_usec"] / 1e6, "wall_seconds": end["wall_usec"] / 1e6,
                            "advanced_steps": end["total_steps"] - previous_steps, "frames": len(frames),
+                           "mean_fps": len(frames) * 1e6 / end["active_usec"],
                            "frame_ms": distribution(f[0] for f in frames),
                            "render_cpu_ms": distribution(f[1] for f in frames),
                            "render_gpu_ms": distribution(f[2] for f in frames), "counters": graphics,
@@ -143,7 +144,11 @@ def main():
             raise RuntimeError("Could not launch the installed APK")
         deadline = start + (1600 if args.mode == "soak" else 150)
         while time.monotonic() < deadline:
-            raw = adb("exec-out", "run-as", PACKAGE, "cat", trace, raw=True, check=False)
+            # exec-out combines stdout and stderr on some platform-tools versions.
+            # Wait for the engine to create its trace before parsing any bytes as JSON.
+            raw = b""
+            if adb("shell", "run-as", PACKAGE, "ls", trace, check=False) == trace:
+                raw = adb("exec-out", "run-as", PACKAGE, "cat", trace, raw=True)
             complete = raw[:raw.rfind(b"\n") + 1]
             if complete:
                 (args.output / "frames.jsonl").write_bytes(complete)
@@ -159,11 +164,12 @@ def main():
                 break
             if time.monotonic() - start > 75 and not adb("shell", "pidof", PACKAGE, check=False):
                 raise RuntimeError("The game process exited")
-            if args.mode == "soak" and time.monotonic() - start > 100:
-                elapsed = [r["elapsed_usec"] for r in rows if r["event"] == "sample"]
-                if not elapsed or len(samples) > 4 and all(s.get("last_sample") == elapsed[-1] for s in samples[-4:-1]):
-                    raise RuntimeError("No recent unpaused gameplay sample")
-                item["last_sample"] = elapsed[-1]
+            if args.mode == "soak":
+                marker = next((r["elapsed_usec"] for r in reversed(rows) if r["event"] == "sample"), None)
+                item["last_sample"] = marker
+                if time.monotonic() - start > 180 and len(samples) >= 5:
+                    if all(s.get("last_sample") == marker for s in samples[-5:]):
+                        raise RuntimeError("No recent unpaused gameplay sample")
             time.sleep(12 if args.mode == "soak" else 3)
         else:
             raise RuntimeError("Graphics probe timed out")
