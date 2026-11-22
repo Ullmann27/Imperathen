@@ -1,0 +1,77 @@
+{
+  "commit": "d54478ec21db4c849dfa29bf7e39eab04b88c9d5",
+  "tree": "1f90bbf0c3c9546d6ad5c318e19d129a0ee000fc",
+  "parent": "0f23134460ed0565b36c44adefd22bc6a7da75b1",
+  "bundle_sha256": "aff704aac6995643dae23e08c2e729301404a8aa21d6f8873d5b2d09aea22e04",
+  "bundle_bytes": 85441894,
+  "source_ref": "refs/heads/feature/hero-realism-20261122",
+  "target_ref": "refs/heads/staging/hero-imported-20261122",
+  "parts": [
+    {
+      "name": "part-000.bin",
+      "size": 8388608,
+      "sha256": "cfb6412814c9ddc4695e61a4e2f3b013cd41625169a6d036da0bc07aba7990ae",
+      "git_blob_sha": "7fc429ce81ad785a6c4c50ec93ec1a55915ec434"
+    },
+    {
+      "name": "part-001.bin",
+      "size": 8388608,
+      "sha256": "932ee1ba5db3b0016047e5b2ca72534eea768c5ad66fcd3da5b28b78cf874c52",
+      "git_blob_sha": "afd6d698c8a0e897991c64272c88f0f1a0be83c2"
+    },
+    {
+      "name": "part-002.bin",
+      "size": 8388608,
+      "sha256": "0023ecd9ca5934df697aa8c5d0eae7d073876443a6c3921772f9c9d3977951a8",
+      "git_blob_sha": "150b4add1bc59b1096096ba4f3ec9c455247a4ac"
+    },
+    {
+      "name": "part-003.bin",
+      "size": 8388608,
+      "sha256": "480a6c70d81beac1eae4fadd33184c68a67c8ef75c3bc855ec6bb8d5b680c0a1",
+      "git_blob_sha": "6a6ae4ccdbed0d7f30d246a7f57c36c099aa122b"
+    },
+    {
+      "name": "part-004.bin",
+      "size": 8388608,
+      "sha256": "28a8be3413ad433b4c77fd710bf67ac9a618bf44c80d1697de5d09919987a32a",
+      "git_blob_sha": "d188a1d58fbde2d13768d361c56babdb58988f4b"
+    },
+    {
+      "name": "part-005.bin",
+      "size": 8388608,
+      "sha256": "c3970b25e86cc941479ccd58fff2c3756ed3fbfaae70636e7d17d0775aeff892",
+      "git_blob_sha": "54ab18240c2e03053b92e7e168d9e477bcb05134"
+    },
+    {
+      "name": "part-006.bin",
+      "size": 8388608,
+      "sha256": "601195ed340f7b3d48cedf3f0103f6218bc742d3a2add601a968092f2c256830",
+      "git_blob_sha": "b1d245d0b7b06b0ef1f8a243e6ad750308ded1d8"
+    },
+    {
+      "name": "part-007.bin",
+      "size": 8388608,
+      "sha256": "643a523229098ea3447520dea906f9b1f63e9c4d2852c53ba92ada7bde807684",
+      "git_blob_sha": "1f4ea859869e8600617bf4e12115cb3211c52ace"
+    },
+    {
+      "name": "part-008.bin",
+      "size": 8388608,
+      "sha256": "2f5242440041924db31a21260cbfd502ea85de4eea05bbc74366104fa38746c5",
+      "git_blob_sha": "27c1c0a2d34d11c5260f2cf45fca5d09f9bab8ce"
+    },
+    {
+      "name": "part-009.bin",
+      "size": 8388608,
+      "sha256": "24ba2fd42a69d7bfbf3e20b7d5e7a52947c4c3406c75a088be8d1854c207f7f7",
+      "git_blob_sha": "4db5cca277eca431d455c0e49d390efe46e971b6"
+    },
+    {
+      "name": "part-010.bin",
+      "size": 1555814,
+      "sha256": "fe2cfed07e70ea30e4abf26825ab8f2e26ef75f218d52af27839f786dca969db",
+      "git_blob_sha": "645c02fc5cdc58989448cf253f2c0ae1777a1e2a"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+name: Import verified hero work
+
+on:
+  push:
+    branches: ['staging/hero-transfer-20261122']
+    paths: ['.github/workflows/hero-transfer.yml', '_hero_transfer/**']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hero-transfer-20261122
+  cancel-in-progress: false
+
+jobs:
+  import-verified-bundle:
+    if: github.repository == 'Ullmann27/Imperathen' && github.ref == 'refs/heads/staging/hero-transfer-20261122'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      EXPECTED_COMMIT: 'd54478ec21db4c849dfa29bf7e39eab04b88c9d5'
+      EXPECTED_TREE: '1f90bbf0c3c9546d6ad5c318e19d129a0ee000fc'
+      EXPECTED_PARENT: '0f23134460ed0565b36c44adefd22bc6a7da75b1'
+      EXPECTED_BUNDLE: 'aff704aac6995643dae23e08c2e729301404a8aa21d6f8873d5b2d09aea22e04'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 2
+          persist-credentials: true
+      - name: Reassemble only the verified development bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY_VERIFY'
+          import hashlib, json, os, re
+          from pathlib import Path
+          source = Path('_hero_transfer')
+          manifest = json.loads((source/'manifest.json').read_text())
+          for key, variable in [('commit','EXPECTED_COMMIT'), ('tree','EXPECTED_TREE'), ('parent','EXPECTED_PARENT'), ('bundle_sha256','EXPECTED_BUNDLE')]:
+              assert manifest[key] == os.environ[variable], key
+          assert manifest['source_ref'] == 'refs/heads/feature/hero-realism-20261122'
+          assert manifest['target_ref'] == 'refs/heads/staging/hero-imported-20261122'
+          assert 0 < len(manifest['parts']) <= 32
+          destination = Path(os.environ['RUNNER_TEMP'])/'imperathen-verified-hero.bundle'
+          total = 0
+          digest = hashlib.sha256()
+          with destination.open('xb') as output:
+              for index, item in enumerate(manifest['parts']):
+                  assert item['name'] == f'part-{index:03d}.bin'
+                  path = source/item['name']
+                  assert path.is_file() and not path.is_symlink()
+                  assert 0 < item['size'] <= 8*1024*1024
+                  data = path.read_bytes()
+                  assert len(data) == item['size']
+                  assert hashlib.sha256(data).hexdigest() == item['sha256']
+                  output.write(data)
+                  digest.update(data)
+                  total += len(data)
+          assert total == manifest['bundle_bytes']
+          assert digest.hexdigest() == os.environ['EXPECTED_BUNDLE']
+          print('Verified bundle bytes:', total)
+          PY_VERIFY
+      - name: Verify Git history and publish only the staging candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle="$RUNNER_TEMP/imperathen-verified-hero.bundle"
+          git cat-file -e "$EXPECTED_PARENT^{commit}"
+          git bundle verify "$bundle"
+          test "$(git bundle list-heads "$bundle")" = "$EXPECTED_COMMIT refs/heads/feature/hero-realism-20261122"
+          git fetch --no-tags "$bundle" refs/heads/feature/hero-realism-20261122:refs/remotes/hero-transfer/candidate
+          test "$(git rev-parse refs/remotes/hero-transfer/candidate)" = "$EXPECTED_COMMIT"
+          test "$(git rev-parse "$EXPECTED_COMMIT^{tree}")" = "$EXPECTED_TREE"
+          test "$(git rev-list --parents -n 1 "$EXPECTED_COMMIT")" = "$EXPECTED_COMMIT $EXPECTED_PARENT"
+          ref='refs/heads/staging/hero-imported-20261122'
+          existing="$(git ls-remote --heads origin "$ref")"
+          if [[ -n "$existing" ]]; then
+            test "$existing" = "$EXPECTED_COMMIT"$'\t'"$ref"
+            printf 'The exact candidate already exists.\n'
+          else
+            # An empty lease permits creation only; an existing ref is never replaced.
+            git push --force-with-lease="$ref:" origin "$EXPECTED_COMMIT:$ref"
+          fi
+          printf 'Verified candidate: %s\n' "$EXPECTED_COMMIT"
