@@ -11,6 +11,7 @@ import shutil
 import struct
 import subprocess
 import tempfile
+import time
 import zipfile
 
 
@@ -20,6 +21,7 @@ RUN_NUMBER = 19
 SOURCE = "d54478ec21db4c849dfa29bf7e39eab04b88c9d5"
 BRANCH = "feature/hero-realism-20261122"
 TAG = "hero-2026-11-22-d54478ec"
+RELEASE_ID = 454684839
 PREFIX = "IMPERATHEN-d54478ec"
 PACKAGE = "at.heinz.imperathen"
 APK_NAME = PREFIX + "-arm64.apk"
@@ -50,11 +52,24 @@ def api(path: str, *, missing_ok: bool = False):
     return None if output is None else json.loads(output)
 
 
-def find_release() -> dict | None:
-    pages = json.loads(gh("api", f"repos/{REPO}/releases?per_page=100", "--paginate", "--slurp"))
-    matches = [release for page in pages for release in page if release.get("tag_name") == TAG]
-    require(len(matches) <= 1, "Ambiguous hero release")
-    return matches[0] if matches else None
+def read_release(*, asset_names: set[str] | None = None, published: bool = False) -> dict:
+    # Resume the already created draft by ID. Only reads are retried; a delayed
+    # collection response can never cause another draft or a repeated upload.
+    for delay in (0, 1, 2, 4, 8):
+        if delay:
+            time.sleep(delay)
+        release = api(f"releases/{RELEASE_ID}", missing_ok=True)
+        if release is None:
+            continue
+        require(release.get("id") == RELEASE_ID and release.get("tag_name") == TAG
+                and release.get("target_commitish") == SOURCE and release.get("prerelease") is True,
+                "Existing release has a different source or purpose")
+        if asset_names is not None and not asset_names <= {item["name"] for item in release.get("assets", [])}:
+            continue
+        if published and release.get("draft") is not False:
+            continue
+        return release
+    raise RuntimeError("Expected release state was not visible by ID after five bounded reads; no write was retried")
 
 
 def read_json(path: Path) -> dict:
@@ -215,23 +230,19 @@ def publish(files: list[Path], notes: Path, temporary: Path) -> str:
                 break
             obj = api("git/tags/" + obj["sha"])["object"]
         require(obj.get("type") == "commit" and obj.get("sha") == SOURCE, "Existing tag points to another source")
-    release = find_release()
-    if release is None:
-        gh("release", "create", TAG, "--repo", REPO, "--target", SOURCE, "--draft", "--prerelease", "--latest=false",
-           "--title", "IMPERATHEN – Hauptfigur · Android-Prüffassung", "--notes-file", str(notes))
-        release = find_release()
-        require(release is not None, "The draft release was not created")
+    release = read_release()
     missing = verify_existing_assets(release, files, temporary)
     if missing:
         gh("release", "upload", TAG, "--repo", REPO, *(str(path) for path in missing))
-    release = find_release()
-    require(release is not None, "The release disappeared during upload")
+    asset_names = {path.name for path in files}
+    release = read_release(asset_names=asset_names)
     require(not verify_existing_assets(release, files, temporary), "Public download is still incomplete")
     if release.get("draft"):
-        gh("release", "edit", TAG, "--repo", REPO, "--draft=false", "--prerelease", "--latest=false")
-    release = find_release()
-    require(release is not None and release.get("draft") is False and release.get("prerelease") is True,
-            "The verified prerelease was not published")
+        request = temporary / "publish-release.json"
+        request.write_text(json.dumps({"draft": False, "prerelease": True, "make_latest": "false",
+                                       "body": notes.read_text(encoding="utf-8")}), encoding="utf-8")
+        gh("api", f"repos/{REPO}/releases/{RELEASE_ID}", "--method", "PATCH", "--input", str(request))
+    read_release(asset_names=asset_names, published=True)
     return f"https://github.com/{REPO}/releases/tag/{TAG}"
 
 

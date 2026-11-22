@@ -3,7 +3,7 @@ name: Publish verified hero APK
 on:
   push:
     branches: ['feature/hero-realism-20261122']
-    paths: ['.github/workflows/hero-download.yml']
+    paths: ['.github/workflows/hero-download.yml', 'tools/publish_hero_download.py']
 
 permissions:
   actions: read
