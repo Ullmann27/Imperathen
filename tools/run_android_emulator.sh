@@ -19,4 +19,5 @@ python3 tools/android_runtime_smoke.py --adb "$ANDROID_HOME/platform-tools/adb" 
 if [[ "${IMPERATHEN_GRAPHICS_QA:-0}" == 1 ]]; then
   python3 tools/android_graphics_benchmark.py --mode soak --adb "$ANDROID_HOME/platform-tools/adb" --apk "artifacts/${IMPERATHEN_BUILD}-emulator.apk" --output android-runtime/soak
   python3 tools/android_graphics_benchmark.py --mode renderer --adb "$ANDROID_HOME/platform-tools/adb" --apk "artifacts/${IMPERATHEN_BUILD}-emulator-vulkan.apk" --output android-runtime/vulkan
+  python3 tools/android_graphics_benchmark.py --mode renderer --abi arm64-v8a --adb "$ANDROID_HOME/platform-tools/adb" --apk "artifacts/${IMPERATHEN_BUILD}-arm64-vulkan.apk" --output android-runtime/vulkan-arm64
 fi
