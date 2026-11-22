@@ -11,6 +11,7 @@ const INK := Color("111a1b")
 const SETTINGS_PATH := "user://imperathen_ui.cfg"
 const Origins = preload("res://scripts/strategy/origins.gd")
 const ORIGIN_IDS := ["italia", "germania", "han", "wa", "vistula"]
+const FigureGallery = preload("res://scripts/ui/figure_gallery.gd")
 const SafeArea = preload("res://scripts/ui/safe_area.gd")
 const TouchPadScript := preload("res://scripts/ui/touch_pad.gd")
 const TouchActionScript := preload("res://scripts/ui/touch_action.gd")
@@ -60,6 +61,7 @@ var _toast_tween: Tween
 var _intro_tween: Tween
 var _intro_done := false
 var _view_state := ""
+var _gallery_from := "menu"
 var _settings_return := "menu"
 var _confirm_return := "menu"
 var _can_continue := false
@@ -212,6 +214,7 @@ func show_menu(can_continue: bool) -> void:
 	buttons.add_child(atlas_button)
 	if OS.is_debug_build() and OS.has_feature("android"):
 		_log_menu_buttons.call_deferred(demo_button, atlas_button, continue_button)
+	buttons.add_child(_button("Figuren", func(): _show_gallery("menu")))
 	buttons.add_child(_button("Einstellungen", func(): _show_settings("menu")))
 	buttons.add_child(_button("Spiel beenden", func(): _confirm("Spiel beenden?", "Ein laufender Lebensweg wird vor dem Beenden gespeichert.", "quit", {})))
 	var filler := Control.new()
@@ -481,6 +484,7 @@ func handle_back() -> bool:
 		"intro": _finish_intro()
 		"game": _emit("cancel_build" if _build_active else "pause")
 		"pause", "journal": _emit("resume")
+		"gallery": _close_gallery()
 		"settings": _return_to(_settings_return)
 		"confirm": _return_to(_confirm_return)
 		"menu": _confirm("Spiel beenden?", "Ein laufender Lebensweg wird vor dem Beenden gespeichert.", "quit", {})
@@ -811,6 +815,56 @@ func _region_report() -> String:
 		status, int(region.get("allied_losses", 0)), int(region.get("enemy_losses", 0))]
 
 
+func _show_gallery(source: String, selected: String = "") -> void:
+	_gallery_from = source
+	_open_screen("gallery",true)
+	var gallery := FigureGallery.new()
+	gallery.name = "FigureGallery"
+	gallery.from_journal = source == "journal"
+	gallery.origin = String(_state.get("origin_id",origin_id)) if gallery.from_journal else origin_id
+	gallery.age = int(_state.get("player",{}).get("age",12))
+	if gallery.from_journal:
+		gallery.filter = "journal"
+		gallery.current_id = selected if selected != "" else "hero_" + gallery.origin
+	gallery.closed.connect(_close_gallery)
+	_screen.add_child(gallery)
+
+
+func _close_gallery() -> void:
+	if _gallery_from == "journal":
+		_show_journal(false)
+	else:
+		show_menu(_can_continue)
+
+
+func _add_journal_portraits(column: VBoxContainer) -> void:
+	var home := String(_state.get("origin_id","italia"))
+	var ids := FigureGallery.arrival_ids(home,int(_state.get("player",{}).get("age",12)))
+	for pair in range(0,ids.size(),2):
+		column.add_child(_label("Bei der Ankunft" if pair == 0 else "Im Erwachsenenalter",16,BRONZE,true))
+		var row := _row(10)
+		column.add_child(row)
+		for i in range(pair,pair+2):
+			var id: String = ids[i]
+			var cell := _column(4)
+			cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			row.add_child(cell)
+			var picture := TextureRect.new()
+			picture.name = "Journal_" + id
+			picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			picture.texture = FigureGallery.texture(id)
+			picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			picture.custom_minimum_size.y = 115
+			picture.visible = picture.texture != null
+			cell.add_child(picture)
+			var title: String = FigureGallery.caption(id).name
+			var button := _button(title,func(): _show_gallery("journal",id),false,14)
+			button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			cell.add_child(button)
+	column.add_child(_button("Figuren",func(): _show_gallery("journal")))
+
+
 func _show_journal(pause_world := true) -> void:
 	# Root pauses the authoritative world before the reading screen replaces its pause UI.
 	if pause_world:
@@ -828,6 +882,7 @@ func _show_journal(pause_world := true) -> void:
 	if not report.is_empty():
 		summary += "\n\n" + report
 	var column := _modal("DEIN LEBENSWEG", "Chronik", summary, 650)
+	_add_journal_portraits(column)
 	for entry in _state.get("chronicle", []):
 		var line := _label(String(entry.get("text", "")) if entry is Dictionary else str(entry), 14, MUTED)
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
