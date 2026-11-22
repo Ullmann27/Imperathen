@@ -29,7 +29,7 @@ func _run() -> void:
 		"adapter":RenderingServer.get_video_adapter_name(),"output_px":[root.size.x,root.size.y],
 		"sample_frames":sample_count,"scene":"60 stationary soldiers, overview, simulation paused across profiles","profiles":{},"scope":"Linux graphical viewport. Whole-frame wall time includes frame limiter. Render CPU/GPU are viewport timestamps; on llvmpipe the GPU work is software."}
 	var before := JSON.stringify(scene.model.snapshot())
-	for profile in ["low","balanced","high"]:
+	for profile in ["low","balanced","high","very_high"]:
 		display.apply_quality(profile)
 		scene.profile = profile
 		scene.land.apply_quality(profile)
