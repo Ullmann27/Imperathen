@@ -27,10 +27,16 @@ def runtime_error_lines(text):
 
 
 def fullscreen_hint_nodes(hierarchy):
-    nodes = [node for node in hierarchy.iter("node")
-             if node.get("package") == "com.android.systemui"]
-    hint = any(node.get("text", "").strip().casefold() == "viewing full screen" for node in nodes)
-    buttons = [node for node in nodes if node.get("text", "").strip().casefold() == "got it"
+    nodes = list(hierarchy.iter("node"))
+    # API 35's observed immersive-cling window belongs to package "android".
+    # A visible title must never be reported absent merely because its package
+    # differs; an unrecognized button then fails explicitly instead of clicking.
+    hint = any(node.get("resource-id") == "android:id/immersive_cling_title"
+               or node.get("text", "").strip().casefold() == "viewing full screen" for node in nodes)
+    buttons = [node for node in nodes if node.get("package") == "android"
+               and node.get("resource-id") == "android:id/ok"
+               and node.get("class") == "android.widget.Button"
+               and node.get("text", "").strip().casefold() == "got it"
                and node.get("clickable") == "true" and node.get("enabled") == "true"]
     return hint, buttons
 
@@ -252,6 +258,7 @@ def main():
             time.sleep(1)
         record("android_back_pauses", checked_logs().count("IMPERATHEN_PAUSED") > previous_pauses
                and adb("shell", "pidof", package) == pid, "Back opened a new pause without terminating the app")
+        time.sleep(2)
         screenshot("03_android_pause.png")
         adb("shell", "input", "keyevent", "3")
         time.sleep(1)
