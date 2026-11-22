@@ -56,4 +56,20 @@ Neben der APK entstehen eine SHA-256-Datei, ein Bericht über Engine, Vorlage un
 
 Der Bauablauf ist durch festgelegte Werkzeuge, Quell- und Vorlagenprüfsummen nachvollziehbar wiederholbar. Eine bitidentische ZIP-Datei über sämtliche Laufzeit- und Signierumgebungen wird damit nicht behauptet. Ein erfolgreicher APK-Export belegt außerdem noch keine Bildrate oder Bedienbarkeit auf einem bestimmten Telefon. Dafür folgt ein Start- und Spieltest unter Android; der zusätzliche Emulatorlauf muss mit seiner tatsächlichen Architektur und seinen Grenzen ausgewiesen werden.
 
-**Status dieser Anleitung:** Bauverfahren und Prüfbedingungen sind implementiert. Ob ein konkreter Export oder Gerätelauf bestanden ist, ergibt sich aus dessen erzeugten Berichten und dem Workflow-Ergebnis, nicht aus dieser Anleitung.
+## Dorf-Basis vom 22. November 2026
+
+Vor der Integration des Talgefechts wurde der zusammengeführte Dorfstand `ebcf2d8` mit Godot 4.7.2 als ARM64-APK exportiert. Der lokale Prüfbau umfasst 28.698.864 Byte und hat SHA-256 `5e3f049bd5e93ffa647a3395be648f5c11d44dd56b0acbf40ad608a8ad311e87`. Das kompilierte Manifest nennt API 24 als Minimum, API 36 als Ziel, die Launcher-Alias-Klasse `com.godot.game.GodotAppLauncher` und keine angeforderten Berechtigungen. Die Signaturen v2 und v3 wurden verifiziert. Der CI-Export desselben Quellstands erzeugte zwei separat signierte APKs. [Dorf-Baulauf](https://github.com/Ullmann27/Imperathen/actions/runs/45035264853)
+
+## Desktop aus denselben Spielquellen
+
+Die offiziellen Vorlagen für Godot 4.7.2 enthalten `linux_debug.x86_64` und `windows_debug_x86_64.exe`. Die Presets betten die Spieldaten in die jeweilige ausführbare Datei ein. Von der Repository-Wurzel aus:
+
+```sh
+mkdir -p builds/desktop
+godot --headless --path prototype --editor --import
+godot --headless --path prototype --export-debug "Linux x86_64" "$PWD/builds/desktop/IMPERATHEN.x86_64"
+godot --headless --path prototype --export-debug "Windows x86_64" "$PWD/builds/desktop/IMPERATHEN.exe"
+builds/desktop/IMPERATHEN.x86_64 --headless --quit-after 10
+```
+
+Der Workflow speichert die Windows-EXE, ein Linux-Tararchiv mit Ausführungsrecht und SHA-256-Werte im Desktop-Artefakt. Beide Desktop-Ausgaben unterstützen Maus und Tastatur. [Exportpresets](../../prototype/export_presets.cfg)

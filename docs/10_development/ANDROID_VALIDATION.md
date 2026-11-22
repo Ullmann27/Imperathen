@@ -73,6 +73,8 @@ Ungültige CLI-Argumente können ebenfalls Exitcode 2 liefern, bevor ein Bericht
 
 `device_tests.status` bleibt in diesem Validator immer `not_run`; `installability` bleibt `not_demonstrated_on_a_device`. Ein separater Lauf darf diese Grenzen nicht durch Umbenennen eines statischen Reports verdecken.
 
+Das Tal-APK wird zusätzlich auf die kompilierten Taktik- und Darstellungsskripte, Grafikprofile und alle zwölf exportierten Soldatenmodelle geprüft. Für jede der vier Rollen müssen Nah-, Mittel- und Fernmodell über den Importverweis auf eine tatsächlich gepackte Szene führen.
+
 ## 5. Gesonderter Android-Lauf
 
 Ein weiterer Bericht muss das konkrete APK anhand seiner Prüfsumme zu einem tatsächlichen Installations- und Startversuch zuordnen. Zu dokumentieren sind mindestens Android-Version, Geräte-/Emulatorart, ABI, Installationsresultat, gestartete Activity und beobachtetes Verhalten. Eine fehlende oder nicht autorisierte Geräteverbindung wird als fehlende Evidenz geführt. [4]
