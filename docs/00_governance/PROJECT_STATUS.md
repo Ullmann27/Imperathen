@@ -21,6 +21,10 @@ Der Auftrag zur Vorarbeit ist keine Freigabe zur eigentlichen Spielprogrammierun
 
 Anforderungsregister, Fachkonzepte, Architekturverträge in Prosa, Asset- und Rechteplanung, Qualitäts- und Abnahmekriterien, Aufgabenstruktur, Entscheidungsprotokoll und aktuelle Agentenübergabe. Die [Aufgabenübersicht](../06_production/BACKLOG.md) nennt den tatsächlichen GitHub-Stand und trennt vorbereitete Unterlagen von noch offenen Entscheidungen.
 
+## Aktuelle Dokumentenlieferung
+
+42 Dateien, darunter 39 Markdown-Dokumente und zwei Quellen-/Referenzregister, mit 37 Anforderungen und 28 geplanten Akzeptanzfällen. Die erste Inhaltslieferung liegt in Commit `cb97c920f1cd6f3e1e5eee8ff2de080e32635f52`; alle 42 Dateien wurden nach dem Speichern anhand ihrer Git-Blob-Prüfsummen abgeglichen, ohne Abweichung. 62 relative Dateiverweise sind auflösbar. Vier Vorbereitungsissues wurden mit Liefernachweis geschlossen; zehn bleiben für weitere Entscheidungen und Vertiefung offen.
+
 ## Noch offen
 
 - Abschließende Namens- und Ähnlichkeitsprüfung; keine Markenfreigabe oder Anmeldung behauptet.
