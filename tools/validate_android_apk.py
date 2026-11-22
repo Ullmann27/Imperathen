@@ -245,8 +245,24 @@ def parse_badging(text: str) -> dict:
     return result
 
 
+def manifest_boolean(value: str | None, default: bool | None) -> bool | None:
+    if value is None:
+        return default
+    return {"true": True, "false": False, "1": True, "0": False}.get(value.lower())
+
+
+def component_name(package: str, name: str | None) -> str | None:
+    if not name:
+        return None
+    if name.startswith("."):
+        return package + name
+    return name if "." in name else package + "." + name
+
+
 def parse_xml_manifest(text: str) -> dict:
     manifest = ET.fromstring(text)
+    if manifest.tag != "manifest":
+        raise ValueError("Decoded XML root is not an Android manifest.")
     sdk = manifest.find("uses-sdk")
     application = manifest.find("application")
     result = {"package": manifest.get("package"), "version_code": manifest.get(ANDROID_NS + "versionCode"),
@@ -256,13 +272,67 @@ def parse_xml_manifest(text: str) -> dict:
               "debuggable": application.get(ANDROID_NS + "debuggable", "false") == "true" if application is not None else None,
               "launchable_activity": None,
               "permissions": sorted({node.get(ANDROID_NS + "name", "") for node in manifest.findall("uses-permission")})}
+    diagnostics = {"application_present": application is not None, "application_enabled": None,
+                   "components": [], "unresolved_candidate": False}
+    result["launcher_diagnostics"] = diagnostics
     if application is not None:
-        for activity in list(application.findall("activity")) + list(application.findall("activity-alias")):
-            for intent in activity.findall("intent-filter"):
-                actions = {item.get(ANDROID_NS + "name") for item in intent.findall("action")}
-                categories = {item.get(ANDROID_NS + "name") for item in intent.findall("category")}
-                if "android.intent.action.MAIN" in actions and "android.intent.category.LAUNCHER" in categories:
-                    result["launchable_activity"] = activity.get(ANDROID_NS + "name")
+        application_enabled = manifest_boolean(application.get(ANDROID_NS + "enabled"), True)
+        diagnostics["application_enabled"] = application_enabled
+        target_sdk = result["target_sdk"] or result["min_sdk"] or "1"
+        target_sdk_number = int(target_sdk) if target_sdk.isdigit() else None
+        preceding_activities = {}
+        for activity in application:
+            if activity.tag not in ("activity", "activity-alias"):
+                continue
+            name = component_name(result["package"] or "", activity.get(ANDROID_NS + "name"))
+            filters = [{"actions": sorted({item.get(ANDROID_NS + "name", "") for item in intent.findall("action")}),
+                        "categories": sorted({item.get(ANDROID_NS + "name", "") for item in intent.findall("category")})}
+                       for intent in activity.findall("intent-filter")]
+            matching_filter = any("android.intent.action.MAIN" in item["actions"] and
+                                  "android.intent.category.LAUNCHER" in item["categories"] for item in filters)
+            enabled = manifest_boolean(activity.get(ANDROID_NS + "enabled"), True)
+            exported_raw = activity.get(ANDROID_NS + "exported")
+            exported = manifest_boolean(exported_raw, bool(filters) if target_sdk_number is not None and target_sdk_number < 31 else None)
+            reasons = []
+            unknown = []
+            if not name:
+                reasons.append("missing_component_name")
+            if not matching_filter:
+                reasons.append("no_MAIN_and_LAUNCHER_in_same_intent_filter")
+            for label, value in (("application_enabled", application_enabled), ("component_enabled", enabled), ("component_exported", exported)):
+                if value is False:
+                    reasons.append(label + "_false")
+                elif value is None:
+                    unknown.append(label + "_unresolved")
+            if exported_raw is None and target_sdk_number is not None and target_sdk_number >= 31 and filters:
+                reasons.append("explicit_exported_required_for_target_sdk_31_or_newer")
+            component = {"type": activity.tag, "name": name, "enabled": enabled, "exported": exported,
+                         "exported_attribute": exported_raw, "intent_filters": filters,
+                         "has_launcher_filter": matching_filter}
+            if activity.tag == "activity-alias":
+                target_name = component_name(result["package"] or "", activity.get(ANDROID_NS + "targetActivity"))
+                target = preceding_activities.get(target_name)
+                component["target_activity"] = target_name
+                component["target_declared_before_alias"] = target is not None
+                component["target_enabled"] = target["enabled"] if target is not None else None
+                # The alias owns its exported attribute; its target may correctly be private.
+                component["target_exported"] = target["exported"] if target is not None else None
+                if target is None:
+                    reasons.append("alias_target_not_declared_before_alias")
+                elif target["enabled"] is False:
+                    reasons.append("alias_target_disabled")
+                elif target["enabled"] is None:
+                    unknown.append("alias_target_enabled_unresolved")
+            else:
+                preceding_activities[name] = component
+            component["rejection_reasons"] = reasons
+            component["unresolved_attributes"] = unknown
+            component["usable_launcher"] = not reasons and not unknown
+            diagnostics["components"].append(component)
+            if component["usable_launcher"] and result["launchable_activity"] is None:
+                result["launchable_activity"] = name
+            if matching_filter and not reasons and unknown:
+                diagnostics["unresolved_candidate"] = True
     return result
 
 
@@ -284,9 +354,16 @@ def inspect_manifest(apk: Path, report: dict, tools: dict, expected_package: str
             evidence["parse_error"] = str(error)
             continue
         if candidate.get("package"):
-            metadata = candidate
-            metadata["decoded_with"] = name
-            break
+            candidate["decoded_with"] = name
+            evidence["decoded_package"] = candidate["package"]
+            evidence["decoded_launcher"] = candidate.get("launchable_activity")
+            # AAPT can omit activity-alias launchers. A package-only result is not
+            # a reason to stop before decoding the actual manifest XML.
+            if name == "apkanalyzer":
+                metadata = candidate
+                break
+            if metadata is None or (not metadata.get("launchable_activity") and candidate.get("launchable_activity")):
+                metadata = candidate
     if metadata is None:
         status = "not_run" if not attempts else "incomplete"
         add_check(report, "manifest_metadata", status,
@@ -296,8 +373,13 @@ def inspect_manifest(apk: Path, report: dict, tools: dict, expected_package: str
     add_check(report, "manifest_metadata", "pass", "Compiled manifest decoded by an existing Android SDK tool.", attempts=attempts)
     add_check(report, "package_identity", "pass" if metadata["package"] == expected_package else "fail",
               "Decoded package must equal the intended application ID.", expected=expected_package, actual=metadata["package"])
-    add_check(report, "launcher_activity", "pass" if metadata.get("launchable_activity") else "fail",
-              "The standalone game must declare a launchable activity.", activity=metadata.get("launchable_activity"))
+    diagnostics = metadata.get("launcher_diagnostics")
+    launcher_status = "pass" if metadata.get("launchable_activity") else "fail"
+    if not metadata.get("launchable_activity") and (diagnostics is None or diagnostics["unresolved_candidate"]):
+        launcher_status = "incomplete"
+    add_check(report, "launcher_activity", launcher_status,
+              "A launcher activity or alias must be enabled and exported, with MAIN and LAUNCHER in the same intent filter. A private alias target is permitted. Missing XML evidence never creates a PASS.",
+              activity=metadata.get("launchable_activity"), decoded_with=metadata["decoded_with"], diagnostics=diagnostics)
 
 
 def inspect_signing(apk: Path, report: dict, tools: dict, timeout: int) -> None:

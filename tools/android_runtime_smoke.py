@@ -88,7 +88,8 @@ def main():
         record("apk_install", "Success" in installed, installed)
         cleared = adb("shell", "pm", "clear", package)
         record("clean_test_app_data", cleared == "Success", cleared)
-        activity = adb("shell", "cmd", "package", "resolve-activity", "--brief", package)
+        activity = adb("shell", "cmd", "package", "resolve-activity", "--brief",
+                       "-a", "android.intent.action.MAIN", "-c", "android.intent.category.LAUNCHER", package)
         component = next((line.strip() for line in activity.splitlines() if line.startswith(package + "/")), "")
         record("launcher", bool(component), component)
         adb("logcat", "-c")
