@@ -41,6 +41,15 @@ def fullscreen_hint_nodes(hierarchy):
     return hint, buttons
 
 
+def launcher_anr_close_button(hierarchy):
+    nodes = [node for node in hierarchy.iter("node") if node.get("package") == "android"]
+    title = any(node.get("resource-id") == "android:id/alertTitle" and
+                node.get("text", "").replace("’", "'") == "Pixel Launcher isn't responding" for node in nodes)
+    buttons = [node for node in nodes if node.get("resource-id") == "android:id/aerr_close"
+               and node.get("clickable") == "true" and node.get("enabled") == "true"]
+    return buttons[0] if title and len(buttons) == 1 else None
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--adb", required=True)
@@ -52,7 +61,8 @@ def main():
     package = "at.heinz.imperathen"
     report = {"platform": "Android emulator", "apk_sha256": hashlib.sha256(args.apk.read_bytes()).hexdigest(), "physical_device_test": False,
               "arm64_runtime_test": False, "status": "failed", "checks": [], "errors": []}
-    report["source_commit"] = os.environ.get("GITHUB_SHA")
+    report["source_commit"] = os.environ.get("IMPERATHEN_APK_COMMIT", os.environ.get("GITHUB_SHA"))
+    report["test_harness_commit"] = os.environ.get("GITHUB_SHA")
     report["apk_file"] = args.apk.name
     serial = ""
     verified_emulator = False
@@ -108,6 +118,20 @@ def main():
 
     def dismiss_fullscreen_hint(stage):
         hierarchy = ui_hierarchy(stage + "_before")
+        launcher_button = launcher_anr_close_button(hierarchy)
+        if launcher_button is not None:
+            focus = adb("shell", "dumpsys", "window", "displays")
+            launcher_focus = any("mCurrentFocus=" in line and "Application Not Responding: com.google.android.apps.nexuslauncher" in line for line in focus.splitlines())
+            record(stage + "_stock_launcher_anr", launcher_focus, "Verified the system dialog belongs to the stock Pixel Launcher")
+            coords = re.fullmatch(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", launcher_button.get("bounds", ""))
+            if not coords:
+                raise RuntimeError("Stock launcher dialog button has no screen bounds")
+            x1, y1, x2, y2 = map(int, coords.groups())
+            tap(((x1 + x2) / 2, (y1 + y2) / 2))
+            time.sleep(1)
+            hierarchy = ui_hierarchy(stage + "_launcher_closed")
+            record(stage + "_stock_launcher_dialog_closed", launcher_anr_close_button(hierarchy) is None,
+                   "Pressed Close app on the verified launcher ANR; the game process remains under test")
         hint, buttons = fullscreen_hint_nodes(hierarchy)
         if not hint:
             report["checks"].append({"name": stage + "_system_fullscreen_hint_absent", "passed": True,
