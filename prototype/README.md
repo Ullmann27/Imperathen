@@ -17,6 +17,10 @@ Alternativ im Repository: `godot --path prototype`. Für Headless-Prüfungen: `p
 
 Der Android-Workflow baut die Prüfpakete mit den passenden offiziellen Exportvorlagen. Auf dem Spielgerät genügt die ARM64-APK. [Android-Bauweg](../docs/10_development/ANDROID_BUILD.md)
 
+## PC-Grafikkarte
+
+Im Windows-Archiv startet `IMPERATHEN.exe` die Compatibility-Fassung. `IMPERATHEN-Vulkan.cmd` startet dieselbe EXE mit Vulkan und dem Godot-Renderer Forward+. Unter Linux funktioniert `./IMPERATHEN.x86_64 --rendering-method forward_plus --rendering-driver vulkan`. `--verbose` zeigt die erkannten Vulkan-Geräte an. `--gpu-index 0` wählt den Adapter mit Index 0. Auf dem PC umfasst das Profil Hoch ein 3D-Pixelbudget bis 3.840 × 2.160, auf Android bis 2.560 × 1.440. Die tatsächlich verwendete Auflösung, der Renderer und der Adapter stehen in der Leistungsdiagnose. Die Szenen und gespeicherten Spielregeln sind gemeinsam.
+
 ## Herkunft und Spielstand
 
 Italien unter römischer Herrschaft, die Gemeinschaft östlich des Rheins, der Weichselraum, die Östlichen Han und Wa in der Yayoi-Zeit bieten unterschiedliche Einstiege, Gefährten, Siedlungsbilder und saisonale Geschichten. Rom ist vorausgewählt. Die Dorfaufgaben nutzen denselben geprüften Regelkern. Der nachstehende Dorfweg beschreibt den römischen Einstieg.
@@ -69,7 +73,7 @@ Wirst du im Gefecht besiegt, endet dieser Lebensbogen. Das Hauptmenü erlaubt ei
 | Bauplatz bestätigen | freie Fläche anklicken | freie Fläche antippen |
 | Bauplan abbrechen | Escape oder B | Bau abbrechen |
 | Person/Stadt/Karte | HUD, Tab, M | entsprechende HUD-Schaltfläche |
-| Kameraabstand | Mausrad | die festen Ansichten verwenden |
+| Kameraabstand im Dorf | Mausrad | zwei Finger im freien Weltbereich spreizen oder zusammenführen |
 | Pause | Escape oder Menü im HUD | Menü im HUD |
 
 Touch wird auf passenden Geräten automatisch angeboten und kann in den Einstellungen auch manuell eingeschaltet werden. Mehrfingerbedienung, Eingabeabbruch in Dialogen und dieselben Spielregeln für beide Eingabearten sind Teil der Funktionsprüfung. Ein realer Handytest steht noch aus.

@@ -12,6 +12,8 @@ var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
 const PLAYER_SPEED := 4.6
+const PERSON_ZOOM_MIN := 1.7
+const PERSON_ZOOM_MAX := 12.0
 const INTERACTION_RADIUS := 3.0
 const TRAINING_LOCATION := Vector3(0, 0, -7)
 const COMPANION_LOCATION := Vector3(-3, 0, 4)
@@ -38,6 +40,7 @@ var _animation_time := 0.0
 var _resolve_requested := false
 var _touch_move := Vector2.ZERO
 var _gesture_index := -1
+var _camera_contacts: Dictionary[int, Vector2] = {}
 var _gesture_start := Vector2.ZERO
 var _gesture_moved := false
 var _touch_preview_active := false
@@ -237,6 +240,7 @@ func perform_attack() -> void:
 
 
 func _reset_touch_input() -> void:
+	_camera_contacts.clear()
 	_touch_move = Vector2.ZERO
 	_gesture_index = -1
 	_gesture_moved = false
@@ -896,7 +900,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif mouse.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			var direction := -1.0 if mouse.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0
 			if _mode == "person":
-				_person_zoom = clampf(_person_zoom + direction * 0.7, 3.0, 12.0)
+				_person_zoom = clampf(_person_zoom + direction * 0.7, PERSON_ZOOM_MIN, PERSON_ZOOM_MAX)
 			elif _mode == "city":
 				_city_zoom = clampf(_city_zoom + direction * 3.0, 24.0, 70.0)
 			get_viewport().set_input_as_handled()
@@ -911,6 +915,22 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _handle_touch(event: InputEventScreenTouch) -> void:
+	# Only free world touches reach this handler. The HUD retains its analog-stick finger.
+	if _mode == "person":
+		if event.pressed:
+			if _camera_contacts.size() >= 2:
+				return
+			_camera_contacts[event.index] = event.position
+			if _camera_contacts.size() == 2:
+				get_viewport().set_input_as_handled()
+				return
+		elif _camera_contacts.has(event.index):
+			_camera_contacts.erase(event.index)
+			_gesture_index = -1 if _camera_contacts.is_empty() else _camera_contacts.keys()[0]
+			if _gesture_index >= 0:
+				_gesture_start = _camera_contacts[_gesture_index]
+			get_viewport().set_input_as_handled()
+			return
 	if event.pressed:
 		if _gesture_index >= 0:
 			return
@@ -933,6 +953,20 @@ func _handle_touch(event: InputEventScreenTouch) -> void:
 
 
 func _handle_touch_drag(event: InputEventScreenDrag) -> void:
+	if _mode == "person" and _camera_contacts.has(event.index):
+		if _camera_contacts.size() == 2:
+			var other: int = _camera_contacts.keys()[0]
+			if other == event.index:
+				other = _camera_contacts.keys()[1]
+			var anchor := _camera_contacts[other]
+			var before := anchor.distance_to(_camera_contacts[event.index])
+			var after := anchor.distance_to(event.position)
+			if minf(before, after) >= 12.0:
+				_person_zoom = clampf(_person_zoom * before / after, PERSON_ZOOM_MIN, PERSON_ZOOM_MAX)
+			_camera_contacts[event.index] = event.position
+			get_viewport().set_input_as_handled()
+			return
+		_camera_contacts[event.index] = event.position
 	if event.index != _gesture_index:
 		return
 	_gesture_moved = _gesture_moved or event.position.distance_to(_gesture_start) > 14.0

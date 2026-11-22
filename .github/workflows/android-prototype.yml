@@ -8,6 +8,8 @@ on:
       - 'tools/build_android_prototype.py'
       - 'tools/validate_android_apk.py'
       - 'tools/android_runtime_smoke.py'
+      - 'tools/run_android_emulator.sh'
+      - 'tools/desktop/IMPERATHEN-Vulkan.cmd'
       - 'tools/android_signing_recovery_public.crt'
       - '.github/workflows/android-prototype.yml'
   workflow_dispatch:
@@ -104,7 +106,8 @@ jobs:
           (
             cd desktop
             tar czf "${IMPERATHEN_BUILD}-Linux-x86_64.tar.gz" IMPERATHEN.x86_64
-            zip -q "${IMPERATHEN_BUILD}-Windows-x86_64.zip" IMPERATHEN.exe
+            cp "$GITHUB_WORKSPACE/tools/desktop/IMPERATHEN-Vulkan.cmd" .
+            zip -q "${IMPERATHEN_BUILD}-Windows-x86_64.zip" IMPERATHEN.exe IMPERATHEN-Vulkan.cmd
             sha256sum *.zip *.tar.gz > SHA256SUMS.txt
           )
       - name: Upload desktop builds

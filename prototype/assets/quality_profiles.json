@@ -29,6 +29,7 @@
     "high": {
       "label": "Hoch",
       "max_3d_pixels": 3686400,
+      "desktop_max_3d_pixels": 8294400,
       "msaa_samples": 4,
       "shadow_atlas_size": 4096,
       "shadow_distance_metres": 85.0,

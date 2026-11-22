@@ -65,6 +65,31 @@ func _run() -> void:
 	world.set_touch_move(Vector2.RIGHT)
 	world.setup(initial)
 	_check(world._touch_move == Vector2.ZERO, "Loading or new game must clear touch input")
+	var first := InputEventScreenTouch.new()
+	first.index = 81
+	first.pressed = true
+	first.position = Vector2(300, 175)
+	world._unhandled_input(first)
+	var second := first.duplicate() as InputEventScreenTouch
+	second.index = 82
+	second.position = Vector2(420, 175)
+	world._unhandled_input(second)
+	var drag := InputEventScreenDrag.new()
+	drag.index = 82
+	drag.position = Vector2(540, 175)
+	drag.relative = Vector2(120, 0)
+	var zoom: float = world._person_zoom
+	var yaw: float = world._camera_yaw
+	world._unhandled_input(drag)
+	_check(is_equal_approx(world._person_zoom, zoom * 0.5) and world._camera_yaw == yaw, "Spreading two free world fingers halves distance without rotating")
+	first.pressed = false
+	world._unhandled_input(first)
+	drag.position.x += 10
+	drag.relative = Vector2(10, 0)
+	world._unhandled_input(drag)
+	_check(world._camera_yaw != yaw and is_equal_approx(world._person_zoom, zoom * 0.5), "Remaining finger resumes orbit without a zoom jump")
+	world.set_active(false)
+	_check(world._camera_contacts.is_empty(), "Pausing cancels both camera fingers")
 	var key := InputEventKey.new()
 	key.physical_keycode = KEY_E
 	key.pressed = true

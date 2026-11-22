@@ -70,6 +70,11 @@ func _run() -> void:
 	display.apply_quality("low")
 	_check(is_equal_approx(root.scaling_3d_scale, 1.0) and Engine.max_fps == 30, "low budget at native 720p")
 	display.apply_quality("high")
+	var high: Dictionary = display._profiles.high
+	var uhd := Vector2i(3840, 2160)
+	_check(is_equal_approx(display.render_scale_for(uhd, high, true), 1.0), "Desktop high resolves native UHD")
+	_check(is_equal_approx(display.render_scale_for(uhd, high, false), 2.0 / 3.0), "Mobile high retains its 1440p pixel budget")
+	_check(is_equal_approx(display.render_scale_for(Vector2i(720, 1280), high, true), 1.0), "A smaller monitor avoids supersampling")
 	var diag: CheckButton = _ui.get("_screen").find_child("DiagnosticsSetting", true, false)
 	diag.button_pressed = true
 	_check(display.get("_panel").visible, "diagnostics is enabled through the actual option")

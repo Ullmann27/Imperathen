@@ -10,6 +10,7 @@ var _label: Label
 var _panel: PanelContainer
 var _sample_start := 0
 var _sample_frames := 0
+var _adapter_line := ""
 
 
 func _ready() -> void:
@@ -47,9 +48,16 @@ func apply_quality(profile: String) -> void:
 func _on_size_changed() -> void:
 	# The window size is in output pixels. The canvas visible rectangle uses UI units.
 	var output := get_window().size
-	var pixels := maxf(float(output.x) * float(output.y), 1.0)
-	get_viewport().scaling_3d_scale = clampf(sqrt(float(_profiles[_quality].max_3d_pixels) / pixels), 0.25, 1.0)
+	get_viewport().scaling_3d_scale = render_scale_for(output, _profiles[_quality], OS.has_feature("pc"))
 	_place_overlay()
+
+
+static func render_scale_for(output: Vector2i, settings: Dictionary, desktop: bool) -> float:
+	var budget: float = settings.max_3d_pixels
+	if desktop:
+		budget = settings.get("desktop_max_3d_pixels", budget)
+	var pixels := maxf(float(output.x) * float(output.y), 1.0)
+	return clampf(sqrt(budget / pixels), 0.25, 1.0)
 
 
 func set_unit_counts(near_count: int, middle_count: int, far_count: int) -> void:
@@ -62,6 +70,7 @@ func set_diagnostics(enabled: bool) -> void:
 	if DisplayServer.get_name() != "headless":
 		RenderingServer.viewport_set_measure_render_time(get_viewport().get_viewport_rid(), enabled)
 	if enabled:
+		_adapter_line = "%s · %s" % [RenderingServer.get_current_rendering_method(), RenderingServer.get_video_adapter_name()]
 		_label.text = "Bildzeiten werden erfasst …"
 		_place_overlay()
 		_restart_sample()
@@ -99,6 +108,9 @@ func _process(_delta: float) -> void:
 	_label.text = "%.1f FPS · %.1f ms/Bild\nRender-CPU %s · GPU %s\nRAM (RSS) %s · %d Draw Calls\n%d sichtbare Primitive" % [
 		1000.0 / frame_ms, frame_ms, _timing(cpu_ms), _timing(gpu_ms),
 		"%.1f MiB" % (ram / 1024.0) if ram > 0 else "unbekannt", draws, primitives]
+	var output := get_window().size
+	var internal := Vector2i((Vector2(output) * viewport.scaling_3d_scale).round())
+	_label.text += "\n%s\n3D %d × %d · Ausgabe %d × %d" % [_adapter_line, internal.x, internal.y, output.x, output.y]
 	if _units.x >= 0:
 		_label.text += "\nSoldaten nah / mittel / fern: %d / %d / %d" % [_units.x, _units.y, _units.z]
 	if OS.is_debug_build() and OS.has_feature("android"):

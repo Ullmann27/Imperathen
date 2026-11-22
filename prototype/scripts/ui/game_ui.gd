@@ -1062,9 +1062,9 @@ func _show_settings(return_screen: String) -> void:
 	column.add_child(_label("Grafikqualität", 16, CREAM))
 	var quality_select := OptionButton.new()
 	quality_select.name = "QualitySetting"
-	quality_select.add_item("Niedrig · 30 FPS")
-	quality_select.add_item("Ausgewogen · 60 FPS")
-	quality_select.add_item("Hoch · 60 FPS")
+	quality_select.add_item("Niedrig · Limit 30 FPS")
+	quality_select.add_item("Ausgewogen · Limit 60 FPS")
+	quality_select.add_item("Hoch · bis 4K · Limit 60 FPS" if OS.has_feature("pc") else "Hoch · Limit 60 FPS")
 	quality_select.custom_minimum_size.y = 46
 	var profiles := ["low", "balanced", "high"]
 	quality_select.selected = profiles.find(_quality)
