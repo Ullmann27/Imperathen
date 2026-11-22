@@ -40,6 +40,9 @@ func _ready() -> void:
 func apply_quality(profile: String) -> void:
 	if not _profiles.has(profile):
 		return
+	if profile != _quality:
+		_previous_frame_usec = 0
+		_recent_times.clear()
 	_quality = profile
 	var settings: Dictionary = _profiles[profile]
 	Engine.max_fps = 30 if profile in ["low", "very_high"] else 60
