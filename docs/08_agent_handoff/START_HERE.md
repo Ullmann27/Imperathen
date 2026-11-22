@@ -1,5 +1,7 @@
 # Hier weiterarbeiten
 
+**Aktueller Integrationsstand.** Die zusammengeführte Android- und Desktop-Linie, Abnahme und offene Punkte stehen im [Lieferbericht](../12_integration/DELIVERY.md). Die folgenden Angaben dokumentieren den vorausgehenden Arbeitsstand.
+
 **Aktueller Modus: begrenzter Entwicklungsstart, drei Agents.** Der neue Auftrag vom 22.11.2026 erweitert die frühere Vorproduktionssperre; siehe [Entwicklungsstart](../00_governance/DEVELOPMENT_START.md).
 
 ## Vor Änderungen

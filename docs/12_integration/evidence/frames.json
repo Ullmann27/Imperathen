@@ -1,0 +1,107 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "engine": "4.7.2-stable (official)",
+  "output_px": [
+    1280,
+    800
+  ],
+  "profiles": {
+    "balanced": {
+      "draw_calls": {
+        "p50": 139,
+        "p95": 139,
+        "p99": 139
+      },
+      "frame_ms": {
+        "p50": 298.129,
+        "p95": 355.975,
+        "p99": 373.556
+      },
+      "peak_sampled_rss_mib": 510.41015625,
+      "render_scale": 1.0,
+      "same_simulation": true,
+      "submitted_trees": 54,
+      "viewport_cpu_ms": {
+        "p50": 295.555999755859,
+        "p95": 351.690002441406,
+        "p99": 369.4169921875
+      },
+      "viewport_gpu_ms": {
+        "p50": 291.947998046875,
+        "p95": 348.006988525391,
+        "p99": 365.579010009766
+      },
+      "visible_soldiers_near_mid_far": [
+        0,
+        30,
+        30
+      ]
+    },
+    "high": {
+      "draw_calls": {
+        "p50": 246,
+        "p95": 246,
+        "p99": 246
+      },
+      "frame_ms": {
+        "p50": 540.026,
+        "p95": 842.528,
+        "p99": 881.84
+      },
+      "peak_sampled_rss_mib": 616.765625,
+      "render_scale": 1.0,
+      "same_simulation": true,
+      "submitted_trees": 54,
+      "viewport_cpu_ms": {
+        "p50": 518.4169921875,
+        "p95": 765.950012207031,
+        "p99": 805.531982421875
+      },
+      "viewport_gpu_ms": {
+        "p50": 511.367004394531,
+        "p95": 761.226013183594,
+        "p99": 801.651000976562
+      },
+      "visible_soldiers_near_mid_far": [
+        0,
+        60,
+        0
+      ]
+    },
+    "low": {
+      "draw_calls": {
+        "p50": 70,
+        "p95": 70,
+        "p99": 70
+      },
+      "frame_ms": {
+        "p50": 63.945,
+        "p95": 73.722,
+        "p99": 79.279
+      },
+      "peak_sampled_rss_mib": 425.3984375,
+      "render_scale": 0.948683321475983,
+      "same_simulation": true,
+      "submitted_trees": 54,
+      "viewport_cpu_ms": {
+        "p50": 59.0379981994629,
+        "p95": 65.7050018310547,
+        "p99": 71.8239974975586
+      },
+      "viewport_gpu_ms": {
+        "p50": 55.015998840332,
+        "p95": 62.0169982910156,
+        "p99": 68.484001159668
+      },
+      "visible_soldiers_near_mid_far": [
+        0,
+        30,
+        30
+      ]
+    }
+  },
+  "renderer": "gl_compatibility",
+  "sample_frames": 55,
+  "scene": "60 stationary soldiers, overview, simulation paused across profiles",
+  "scope": "Linux graphical viewport. Whole-frame wall time includes frame limiter. Render CPU/GPU are viewport timestamps; on llvmpipe the GPU work is software."
+}

@@ -1,5 +1,7 @@
 # Übergabe für den nächsten Entwicklungsdurchgang
 
+**Aktueller Integrationsstand.** Die zusammengeführte Android- und Desktop-Linie, Abnahme und offene Punkte stehen im [Lieferbericht](../12_integration/DELIVERY.md). Die folgenden Angaben dokumentieren den vorausgehenden Arbeitsstand.
+
 Stand 22.11.2026. Arbeitszweig `feature/prototype-foundation-20261122`, Koordination [#17](https://github.com/Ullmann27/Imperathen/issues/17). Die spätere Bearbeitung mit Sol 6.2 oder Astra 6.2 wurde vom Nutzer vorgesehen; dieser Entwicklungsblock schaltet selbst kein Modell und keinen Tarif um.
 
 ## Erst vorhandenen Stand prüfen
