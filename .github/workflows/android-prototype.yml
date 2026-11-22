@@ -2,7 +2,7 @@ name: Android prototype APK
 
 on:
   push:
-    branches: ['feature/prototype-foundation-20261122']
+    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122']
     paths:
       - 'prototype/**'
       - 'tools/build_android_prototype.py'

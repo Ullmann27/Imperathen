@@ -269,7 +269,7 @@ def parse_xml_manifest(text: str) -> dict:
 def inspect_manifest(apk: Path, report: dict, tools: dict, expected_package: str, timeout: int) -> None:
     attempts = []
     metadata = None
-    for name in ("aapt", "aapt2", "apkanalyzer"):
+    for name in ("apkanalyzer", "aapt", "aapt2"):
         if not tools.get(name):
             continue
         command = [tools[name], "manifest", "print", str(apk)] if name == "apkanalyzer" else [tools[name], "dump", "badging", str(apk)]
@@ -284,9 +284,11 @@ def inspect_manifest(apk: Path, report: dict, tools: dict, expected_package: str
             evidence["parse_error"] = str(error)
             continue
         if candidate.get("package"):
-            metadata = candidate
-            metadata["decoded_with"] = name
-            break
+            if metadata is None or candidate.get("launchable_activity"):
+                metadata = candidate
+                metadata["decoded_with"] = name
+            if candidate.get("launchable_activity"):
+                break
     if metadata is None:
         status = "not_run" if not attempts else "incomplete"
         add_check(report, "manifest_metadata", status,
