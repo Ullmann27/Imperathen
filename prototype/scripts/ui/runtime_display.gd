@@ -30,6 +30,9 @@ func _ready() -> void:
 	_panel.add_child(_label)
 	get_viewport().size_changed.connect(_on_size_changed)
 	set_diagnostics(false)
+	if OS.is_debug_build() and OS.has_feature("android") and FileAccess.file_exists("user://graphics-probe.txt"):
+		var probe = preload("res://scripts/ui/android_graphics_probe.gd").new()
+		add_child.call_deferred(probe)
 
 
 func apply_quality(profile: String) -> void:
@@ -116,6 +119,7 @@ func _process(_delta: float) -> void:
 	if OS.is_debug_build() and OS.has_feature("android"):
 		print("IMPERATHEN_DISPLAY_SAMPLE " + JSON.stringify({
 			"gpu": RenderingServer.get_video_adapter_name(), "quality": _quality,
+			"renderer": RenderingServer.get_current_rendering_method(), "driver": RenderingServer.get_current_rendering_driver_name(),
 			"fps": 1000.0 / frame_ms, "mean_frame_ms": frame_ms, "frames": _sample_frames,
 			"render_cpu_ms": cpu_ms if cpu_ms > 0 else null,
 			"render_gpu_ms": gpu_ms if gpu_ms > 0 else null,

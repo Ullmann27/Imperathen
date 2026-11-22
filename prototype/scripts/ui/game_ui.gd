@@ -487,6 +487,15 @@ func set_build_active(active: bool) -> void:
 	_update_touch_visibility()
 
 
+func set_quality(profile: String) -> void:
+	if profile not in ["low", "balanced", "high", "very_high"]:
+		return
+	_quality = profile
+	_apply_display_settings()
+	_save_settings()
+	_emit("quality_changed", {"profile": _quality})
+
+
 func get_quality() -> String:
 	return _quality
 
@@ -1071,10 +1080,7 @@ func _show_settings(return_screen: String) -> void:
 	quality_select.selected = profiles.find(_quality)
 	column.add_child(quality_select)
 	quality_select.item_selected.connect(func(index: int):
-		_quality = profiles[index]
-		_apply_display_settings()
-		_save_settings()
-		_emit("quality_changed", {"profile": _quality})
+		set_quality(profiles[index])
 	)
 	var diagnostics := CheckButton.new()
 	diagnostics.name = "DiagnosticsSetting"

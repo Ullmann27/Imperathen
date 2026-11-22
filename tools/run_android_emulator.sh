@@ -16,3 +16,7 @@ df -h "$RUNNER_TEMP"
 emulator_pid=$!
 trap 'tail -80 "$RUNNER_TEMP/android-emulator.log"; kill "$emulator_pid" 2>/dev/null || true' EXIT
 python3 tools/android_runtime_smoke.py --adb "$ANDROID_HOME/platform-tools/adb" --apk "artifacts/${IMPERATHEN_BUILD}-emulator.apk" --output android-runtime --device-apk "artifacts/${IMPERATHEN_BUILD}-arm64.apk"
+if [[ "${IMPERATHEN_GRAPHICS_QA:-0}" == 1 ]]; then
+  python3 tools/android_graphics_benchmark.py --mode soak --adb "$ANDROID_HOME/platform-tools/adb" --apk "artifacts/${IMPERATHEN_BUILD}-emulator.apk" --output android-runtime/soak
+  python3 tools/android_graphics_benchmark.py --mode renderer --adb "$ANDROID_HOME/platform-tools/adb" --apk "artifacts/${IMPERATHEN_BUILD}-emulator-vulkan.apk" --output android-runtime/vulkan
+fi
