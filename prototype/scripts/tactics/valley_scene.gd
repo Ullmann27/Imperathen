@@ -35,6 +35,15 @@ var ghost := MultiMeshInstance3D.new()
 var sampled_step := -1
 var lod_due := 0.0
 
+func set_quality(new_profile: String) -> void:
+	if new_profile not in ["low", "balanced", "high", "very_high"]:
+		return
+	profile = new_profile
+	if is_inside_tree():
+		land.apply_quality(profile)
+		_sync_units()
+
+
 func _ready() -> void:
 	frame_remainder = float(model.snapshot().remainder)
 	add_child(land)
@@ -151,8 +160,8 @@ func _sync_units() -> void:
 			live[id] = true
 			var destination := _surface(Vector2(man.x,man.z))
 			var dist := camera.position.distance_to(destination)
-			var near_limit := 13.0 if profile == "low" else (25.0 if profile == "high" else 18.0)
-			var mid_limit := near_limit + (42.0 if profile == "high" else 30.0)
+			var near_limit := 13.0 if profile == "low" else (35.0 if profile == "very_high" else (25.0 if profile == "high" else 18.0))
+			var mid_limit := near_limit + (55.0 if profile == "very_high" else (42.0 if profile == "high" else 30.0))
 			var detail := 0 if dist < near_limit else (1 if dist < mid_limit else 2)
 			var role := "spear" if s.kind == "spear" else ("archer" if s.kind == "archer" else "heavy")
 			if id == s.officer_id and s.side == "ally" and s.kind == "infantry":
