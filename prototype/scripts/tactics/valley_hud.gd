@@ -15,7 +15,6 @@ var pause_button: Button
 var group_button: Button
 var card_by_id := {}
 var marquee := ColorRect.new()
-var pending_caption := ""
 
 func _ready() -> void:
 	add_child(frame)
@@ -65,6 +64,7 @@ func populate(model) -> void:
 			var card := _button(cards,s.name,"select",id)
 			card.toggle_mode = true
 			card_by_id[id] = card
+	_menu(command_row,"Verband",{"talwache_front":"Linienverband","talwache_support":"Unterstützung","talwache":"Gesamte Legion"},"group")
 	_menu(command_row,"Formation",model.FORMATIONS,"form")
 	_menu(command_row,"Befehl",{"move":"Marschieren","hold":"Halten","attack":"Angriff","attack_move":"Angriffsmarsch","defend":"Verteidigen","flank":"Flanke","retreat":"Rückzug","rally":"Sammeln","reserve":"Reserve","focus_fire":"Feuer bündeln","cease_fire":"Feuer einstellen"},"command")
 	_button(command_row,"Tempo","speed")
@@ -80,7 +80,7 @@ func refresh(model, selected: Array, paused: bool, rate: float, message: String)
 			var card: Button = card_by_id[s.id]
 			card.set_pressed_no_signal(s.id in selected)
 			card.text = "%s · %d" % [s.name,s.strength]
-	heading.text = "TALWACHT   ·   Legion %d   /   Stämme %d" % [counts.ally,counts.enemy]
+	heading.text = "TALWACHT   ·   %d:%02d   ·   Legion %d   /   Stämme %d" % [floori((model.DEFENCE_SECONDS-model.steps*model.STEP)/60.0),int(model.DEFENCE_SECONDS-model.steps*model.STEP)%60,counts.ally,counts.enemy]
 	pause_button.text = "Fortsetzen" if paused else "Pause"
 	var outcome_labels := {"victory":"Sieg der Grenzlegion","defeat":"Die Talstraße ist verloren","draw":"Unentschieden"}
 	if model.outcome != "ongoing":

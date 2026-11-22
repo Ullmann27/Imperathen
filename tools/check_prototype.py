@@ -74,6 +74,8 @@ def main():
             ("integration", ["--fixed-fps", "60", "--script", "res://tests/integration_test.gd"], "INTEGRATION_PASS"),
             ("battle_rules", ["--script", "res://tests/battle_rules_test.gd"], "failures=0"),
             ("soldier_visuals", ["--script", "res://tests/soldier_visual_test.gd"], "0 failed"),
+            ("seasons", ["--script", "res://tests/season_campaign_test.gd"], "failures=0"),
+            ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
             ("main_scene", ["--fixed-fps", "60", "--quit-after", "420"], "IMPERATHEN_READY"),
         ]
         for name, arguments, marker in checks:

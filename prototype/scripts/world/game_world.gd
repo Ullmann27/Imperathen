@@ -9,6 +9,8 @@ const Origins = preload("res://scripts/strategy/origins.gd")
 var regional = preload("res://scripts/world/regional_village.gd").new()
 var grove = Grove.new()
 var tree_sites := []
+var crops := Node3D.new()
+var season_index := -1
 const PLAYER_SPEED := 4.6
 const INTERACTION_RADIUS := 3.0
 const TRAINING_LOCATION := Vector3(0, 0, -7)
@@ -104,6 +106,7 @@ func setup(state: Dictionary) -> void:
 func sync_state(state: Dictionary) -> void:
 	_build_scene()
 	_state = state
+	_apply_season(int(state.get("strategy",{}).get("turn",0))%4)
 	_sync_resources()
 	_sync_buildings()
 	_sync_companion()
@@ -386,8 +389,9 @@ func _create_village() -> void:
 		Art.sphere(market, 0.28, Vector3(-0.9 + index * 0.6, 1.10, 0), _materials["wheat"], Vector3(0.8, 0.9, 0.8))
 	_create_palisade(village)
 	Art.box(village, Vector3(10, 0.055, 5), Vector3(11, 0.0, -17), _materials["field"])
+	village.add_child(crops)
 	for index in range(12):
-		Art.box(village, Vector3(0.18, 0.28, 4.6), Vector3(6.7 + index * 0.75, 0.12, -17), _materials["wheat"])
+		Art.box(crops, Vector3(0.18, 0.28, 4.6), Vector3(6.7 + index * 0.75, 0.12, -17), _materials["wheat"])
 	for x: float in [-3, 3]:
 		Art.box(village, Vector3(0.22, 4.6, 0.22), Vector3(x, 2.3, 18), _materials["timber"], true)
 		Art.box(village, Vector3(1.2, 1.8, 0.04), Vector3(x + 0.56, 3.6, 18), _materials["red"])
@@ -1093,3 +1097,15 @@ func _ui_blocks_pointer() -> bool:
 
 func _horizontal_distance(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
+
+func _apply_season(index: int) -> void:
+	if index == season_index:
+		return
+	season_index = index
+	var soil := [Color("#61704c"),Color("#72734b"),Color("#807250"),Color("#889590")]
+	var grain := [Color("#77a95d"),Color("#b4a04e"),Color("#b59a55"),Color("#807968")]
+	var light := [Color("#fff0d0"),Color("#ffe6b0"),Color("#ffdaa4"),Color("#dce8f5")]
+	_materials.earth.albedo_color = soil[index]
+	_materials.wheat.albedo_color = grain[index]
+	_sun.light_color = light[index]
+	crops.visible = index != 3

@@ -42,6 +42,7 @@ func _ready() -> void:
 	dot.rings = 4
 	for id in Atlas.REGIONS:
 		var pin := MeshInstance3D.new()
+		pin.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		pin.mesh = dot
 		pin.position = _normal(Atlas.REGIONS[id]) * 1.012
 		pin.material_override = _ink(Color("#fff0c1"))

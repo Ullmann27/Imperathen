@@ -20,12 +20,14 @@ func show_origin(id: String) -> void:
 		elif id == "wa" and i != 0 and ResourceLoader.exists("res://assets/landscape/wa_house.glb"):
 			path = "res://assets/landscape/wa_house.glb"
 		var model := _add_scene(path,places[i])
-		# Exact surface collision only for static scenery. One BVH per building,
-		# preserving open doorways, posts and verandas across different footprints.
-		_static_collision(model)
+		# Shared collision per wall profile keeps tiled roofs out of the physics broad phase.
+		_static_collision(model,house if id != "italia" else "roman")
 	if id == "italia":
-		_static_collision(_add_scene("res://assets/architecture/atrium_house.glb", Vector3(-18,0,-23)))
-		_static_collision(_add_scene("res://assets/architecture/village_well.glb",Vector3(-7,0,6)))
+		_static_collision(_add_scene("res://assets/architecture/atrium_house.glb",Vector3(14,0,-30)),"atrium")
+		var well := _add_scene("res://assets/architecture/village_well.glb",Vector3(-7,0,6))
+		for i in 10:
+			var a := TAU*i/10.0
+			Art.box_collider(well,Vector3(.55,.80,.22),Vector3(sin(a)*.82,.40,cos(a)*.82)).rotation.y = a
 	else:
 		# A communal timber-lined water point for the regional encounter.
 		var wood := Art.material(Color("#785538"))
@@ -49,7 +51,16 @@ func _add_scene(path: String,where: Vector3) -> Node3D:
 	add_child(node)
 	return node
 
-func _static_collision(model: Node3D) -> void:
+func _static_collision(model: Node3D,kind: String) -> void:
+	if kind in ["roman","atrium"]:
+		var x := 2.85 if kind == "roman" else 5.35
+		var z := 2.35 if kind == "roman" else 4.90
+		var door := 0.69 if kind == "roman" else 0.92
+		for side in [-1,1]:
+			Art.box_collider(model,Vector3(0.29,3.35,z*2),Vector3(x*side,1.68,0))
+			Art.box_collider(model,Vector3(x-door,3.35,0.29),Vector3(side*(x+door)*0.5,1.68,z))
+		Art.box_collider(model,Vector3(x*2,3.35,0.29),Vector3(0,1.68,-z))
+		return
 	var meshes := model.find_children("*","MeshInstance3D",true,false)
 	if model is MeshInstance3D:
 		meshes.append(model)

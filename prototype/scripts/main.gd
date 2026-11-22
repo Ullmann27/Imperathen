@@ -365,7 +365,7 @@ func _check_special_dialog() -> void:
 func _setup_ambient() -> void:
 	# Headless runs have no audio device. The dummy backend retains asynchronous
 	# playback until its audio tick, so logic checks intentionally remain silent.
-	if DisplayServer.get_name() == "headless":
+	if DisplayServer.get_name() == "headless" or AudioServer.get_driver_name() == "Dummy":
 		return
 	if not ResourceLoader.exists("res://assets/frontier_ambience.wav"):
 		return
@@ -475,8 +475,10 @@ func _open_atlas(demo: bool) -> void:
 	atlas.demo = demo
 	atlas.data = Seasons.new_game(ui.origin_id) if demo else model.data.strategy
 	atlas.selected = atlas.data.home
+	atlas.pass_status = "" if demo else model.data.valley.get("outcome","")
 	atlas.young = not demo and model.data.player.age < 18
 	atlas.can_act = demo or (model.data.progress.skirmish_won and model.data.story.choices.is_empty() and not model.data.progress.career_terminal)
+	world.hide()
 	world.set_active(false)
 	world.process_mode = Node.PROCESS_MODE_DISABLED
 	ui.hide()
@@ -512,6 +514,7 @@ func _leave_atlas() -> void:
 	remove_child(atlas)
 	atlas.queue_free()
 	atlas = null
+	world.show()
 	world.process_mode = Node.PROCESS_MODE_INHERIT
 	ui.process_mode = Node.PROCESS_MODE_INHERIT
 	ui.show()

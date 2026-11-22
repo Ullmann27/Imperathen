@@ -14,14 +14,14 @@ func _ready() -> void:
 	for z in range(-48,49):
 		for x in range(-60,61):
 			var p := Vector2(x,z) * step
-			var h := Rules.ground_height(p.x,p.y)
+			var h := _land_height(p.x,p.y)
 			var ridge := 0.5 + 0.25 * sin(p.x * 0.42 + p.y * 0.19) + 0.25 * sin(p.y * 0.83)
 			var tint := Color("#405738").lerp(Color("#72884d"),ridge)
 			var road := absf(p.x - 7.0 * sin(p.y * 0.054) + 0.1 * sin(p.y * 1.7))
 			tint = Color("#ae926c").lerp(tint, smoothstep(1.0, 2.6, road))
 			surface.set_color(tint)
 			surface.set_uv(p * 0.43)
-			surface.set_normal(Vector3(Rules.ground_height(p.x-0.1,p.y)-Rules.ground_height(p.x+0.1,p.y),0.2,Rules.ground_height(p.x,p.y-0.1)-Rules.ground_height(p.x,p.y+0.1)).normalized())
+			surface.set_normal(Vector3(_land_height(p.x-0.1,p.y)-_land_height(p.x+0.1,p.y),0.2,_land_height(p.x,p.y-0.1)-_land_height(p.x,p.y+0.1)).normalized())
 			surface.add_vertex(Vector3(p.x,h,p.y))
 	for z in 96:
 		for x in 120:
@@ -48,37 +48,39 @@ func _ready() -> void:
 		rock.radial_segments = 7
 		rock.rings = 3
 		_prop(rock, p, 0.03, Vector3(r*1.86,r*0.83,r*1.78), Color("#7b7969"))
-	# A camp outside the deployment area and cypress groves beyond both flanks.
+	# A camp outside the deployment area and wooded slopes beyond both flanks.
 	for i in range(5):
 		var tent := PrismMesh.new()
 		tent.size = Vector3(3, 1.9, 3.8)
-		_prop(tent, Vector2(-22.5 + i*2.7, 16 + (i%2)*2.8), 0.95, Vector3.ONE, Color("#ba926e") if i%2 else Color("#d4bd8d"))
+		_prop(tent, Vector2(-22.5 + i*2.7, 24.6 + (i%2)*2.8), 0.95, Vector3.ONE, Color("#ba926e") if i%2 else Color("#d4bd8d"))
 	var objective: Vector2 = Rules.OBJECTIVE
 	_prop(BoxMesh.new(),objective,1.6,Vector3(0.16,3.2,0.16),Color("#6e4d2f"))
 	_prop(BoxMesh.new(),objective + Vector2(0.62,0),2.7,Vector3(1.25,0.8,0.06),Color("#9e433f"))
 	for i in range(3):
-		var p := Vector2(-22 + i*5, 14.8)
+		var p := Vector2(-22 + i*5, 22.8)
 		_prop(BoxMesh.new(),p,2.1,Vector3(0.11,4.2,0.11), Color("#704627"))
 		_prop(BoxMesh.new(),p + Vector2(0.55,0),3.62,Vector3(1.1,0.86,0.06),Color("#933d32"))
 	add_child(grove)
 	var places := []
 	for i in 114:
 		var p := Vector2(rng.randf_range(25,52) * (-1 if i%2 else 1),rng.randf_range(-43,39))
-		places.append({"kind":grove.KINDS[i%3],"position":Vector3(p.x, Rules.ground_height(p.x,p.y),p.y),"scale":rng.randf_range(0.7,1.12),"yaw":rng.randf_range(0,TAU)})
+		places.append({"kind":grove.KINDS[i%3],"position":Vector3(p.x, _land_height(p.x,p.y),p.y),"scale":rng.randf_range(0.7,1.12),"yaw":rng.randf_range(0,TAU)})
 	grove.populate(places)
-	var blade := PrismMesh.new()
-	blade.size = Vector3(0.19,0.32,0.085)
+	var blade := _grass_tuft()
 	var blades: Array[Transform3D] = []
 	for i in 1150:
 		var p := Vector2(rng.randf_range(-32,32),rng.randf_range(-24,24))
 		if absf(p.x-7.0*sin(p.y*0.054)) > 2.25:
-			blades.append(Transform3D(Basis(Vector3.UP,rng.randf_range(0,PI)),Vector3(p.x, Rules.ground_height(p.x,p.y)+0.1,p.y)))
-	foliage.append(_batch(blade,blades,Color("#788348")))
+			blades.append(Transform3D(Basis(Vector3.UP,rng.randf_range(0,PI)),Vector3(p.x, _land_height(p.x,p.y)+0.01,p.y)))
+	var tufts := _batch(blade,blades,Color("#667343"))
+	tufts.material_override.cull_mode = BaseMaterial3D.CULL_DISABLED
+	tufts.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	foliage.append(tufts)
 
 func _prop(mesh: Mesh, p: Vector2, y: float, size: Vector3, tint: Color) -> void:
 	var item := MeshInstance3D.new()
 	item.mesh = mesh
-	item.position = Vector3(p.x,Rules.ground_height(p.x,p.y)+y,p.y)
+	item.position = Vector3(p.x,_land_height(p.x,p.y)+y,p.y)
 	item.scale = size
 	item.material_override = _paint(tint)
 	add_child(item)
@@ -109,3 +111,23 @@ func apply_quality(profile: String) -> void:
 	for node in foliage:
 		var fraction := 1.0 if profile == "high" else (0.6 if profile == "balanced" else 0.22)
 		node.multimesh.visible_instance_count = int(node.multimesh.instance_count * fraction)
+
+func _land_height(x: float,z: float) -> float:
+	var border := smoothstep(0,20,maxf(absf(x)-29,absf(z)-24))
+	return Rules.ground_height(x,z) + border * (3.8 + 2.5*sin(x*.133+z*.076) + 1.7*cos(z*.21-x*.047))
+
+func _grass_tuft() -> Mesh:
+	var tuft := SurfaceTool.new()
+	tuft.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in 9:
+		var angle := TAU*i/9
+		var outward := Vector3(sin(angle),0,cos(angle))
+		var across := outward.cross(Vector3.UP)*rng.randf_range(0.015,0.026)
+		var foot := outward*rng.randf_range(0.01,0.08)
+		var height := rng.randf_range(0.16,0.35)
+		var middle := foot+Vector3.UP*height*0.65+outward*0.03
+		var tip := foot+Vector3.UP*height+outward*rng.randf_range(0.06,0.14)
+		for v in [foot-across,foot+across,middle+across*0.54,foot-across,middle+across*0.54,middle-across*0.54,middle-across*0.54,middle+across*0.54,tip]:
+			tuft.set_normal(Vector3.UP)
+			tuft.add_vertex(v)
+	return tuft.commit()

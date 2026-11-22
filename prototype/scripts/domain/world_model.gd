@@ -203,7 +203,7 @@ func save_game(path: String) -> Dictionary:
 	var directory_error := DirAccess.make_dir_recursive_absolute(absolute.get_base_dir())
 	if directory_error != OK:
 		return _fail("Der Speicherordner kann nicht angelegt werden (Fehler %d)." % directory_error)
-	var payload := JSON.stringify(data)
+	var payload := JSON.stringify(data, "", true, true)
 	var envelope := JSON.stringify({"format": SAVE_FORMAT, "format_version": 1, "payload": payload, "sha256": payload.sha256_text()})
 	if envelope.to_utf8_buffer().size() > MAX_SAVE_BYTES:
 		return _fail("Der Spielstand überschreitet die erlaubte Dateigröße.")
@@ -874,6 +874,10 @@ func act_region(command: String,target: String) -> Dictionary:
 		return _fail("Erfülle zuerst den Auftrag zur Dorfverteidigung.")
 	var result: Dictionary = Seasons.act(data.strategy,command,target)
 	if result.ok:
+		if command == "supply" and data.valley.get("outcome","") == "defeat":
+			data.strategy.supply -= 1
+			result.message += " Wegen der verlorenen Talstraße verbraucht der Umweg einen Reisevorrat."
+			data.strategy.last_event = result.message
 		if command == "advance":
 			data.world_seconds += YEAR_SECONDS/4.0
 			data.progress.years_elapsed = 6 + floori(data.strategy.turn/4.0)

@@ -8,6 +8,7 @@ var data: Dictionary
 var can_act := true
 var demo := false
 var young := false
+var pass_status := ""
 var selected := "italia"
 var frame := Control.new()
 var globe = preload("res://scripts/strategy/globe.gd").new()
@@ -116,6 +117,10 @@ func refresh(feedback := "") -> void:
 	stock.text = "%s · %d/%d Gebiete\nKorn %d   ·   Speicher %d/%d   ·   Reisevorrat %d\nUnruhe %d   ·   Saisonaktionen %d" % [season.mandate_name,data.owned.size(),Atlas.REGIONS.size(),data.grain,data.stores,season.winter_need,data.supply,data.unrest,data.actions]
 	journal.text = "Auftrag · %s\n%s" % [Atlas.REGIONS[data.mission.target].name, data.last_event]
 	var route := "Eigenes Gebiet" if info.owned else ("Übernahme kostet %d Reisevorräte" % info.cost if info.reachable else "Kein Anschluss an dein Gebiet")
+	if pass_status == "defeat":
+		route += "\nTalstraße verloren · jeder Transport kostet einen Reisevorrat zusätzlich."
+	elif pass_status == "victory":
+		route += "\nDie Grenzlegion sichert die Talstraße."
 	message.text = "\n".join(PackedStringArray([route,season.warning,feedback])).strip_edges()
 	if not can_act:
 		message.text = "Erkundung · Regionale Aufträge werden nach der Dorfverteidigung zugänglich."

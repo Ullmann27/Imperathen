@@ -14,6 +14,7 @@ var far_ranks = preload("res://scripts/visuals/far_ranks.gd").new()
 var camera := Camera3D.new()
 var focus := Vector2(0,4.5)
 var distance := 38.0
+var azimuth := 0.0
 var selected := []
 var actors := {}
 var targets := {}
@@ -92,7 +93,7 @@ func _marker(id: String,caption: String,tint: Color) -> void:
 
 func _place_camera() -> void:
 	var center := _surface(focus)
-	camera.position = center + Vector3(0,0.79,0.69)*distance
+	camera.position = center + Vector3(0,0.79,0.69).rotated(Vector3.UP,azimuth)*distance
 	camera.look_at(center,Vector3.UP)
 
 func _process(delta: float) -> void:
@@ -101,9 +102,13 @@ func _process(delta: float) -> void:
 		if model.outcome != "ongoing":
 			paused = true
 			battle_finished.emit()
+	var turn := float(Input.is_key_pressed(KEY_E))-float(Input.is_key_pressed(KEY_Q))
+	if turn != 0:
+		azimuth += turn*delta*1.2
+		_place_camera()
 	var direction := Vector2(float(Input.is_key_pressed(KEY_D))-float(Input.is_key_pressed(KEY_A)),float(Input.is_key_pressed(KEY_S))-float(Input.is_key_pressed(KEY_W)))
 	if direction != Vector2.ZERO:
-		_pan(direction.normalized()*delta*distance*0.55)
+		_pan(direction.normalized().rotated(-azimuth)*delta*distance*0.55)
 	lod_due -= delta
 	if sampled_step != model.steps or lod_due <= 0:
 		lod_due = 0.28
@@ -125,6 +130,7 @@ func _sync_units() -> void:
 	for s: Dictionary in model.squads.values():
 		var flag: Label3D = standards[s.id]
 		flag.position = _surface(Vector2(s.x,s.z))+Vector3.UP*2.75
+		flag.pixel_size = clampf(camera.position.distance_to(flag.position)*0.00062,0.004,0.032)
 		flag.visible = s.strength > 0 and s.status != "withdrawn"
 		flag.text = ("◆ " if s.id in selected else "") + str(s.name).to_upper()
 		flag.modulate = Color("#ffe098") if s.id in selected else SIDES[s.side]
@@ -201,6 +207,13 @@ func _action(action: String,arg: String = "") -> void:
 		"zoom_in": _zoom(0.8)
 		"zoom_out": _zoom(1.25)
 		"multi": pass
+		"group":
+			if arg == "talwache":
+				selected = model.company_ids("talwache_front")+model.company_ids("talwache_support")
+			else:
+				selected = model.company_ids(arg)
+			pending = ""
+			message = "%d Kohorten ausgewählt." % selected.size()
 		"select": _select(arg,hud.group_button.button_pressed)
 		"form": _issue("form",arg)
 		"command":

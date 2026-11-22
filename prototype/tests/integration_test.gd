@@ -173,14 +173,21 @@ func _run() -> void:
 	game.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
 	var seconds: float = game.model.data.world_seconds
 	_check(is_equal_approx(seconds,initial_time+3.0),"Android suspension checkpoints elapsed battle time once")
-	var persisted := JSON.stringify(game.model.data.valley.snapshot)
+	var persisted: Dictionary = game.model.data.valley.snapshot.duplicate(true)
 	valley._action("leave")
 	_check(game.model.data.world_seconds == seconds,"Returning from a tactical camera does not advance world time twice")
 	game._show_menu()
 	game._continue_game()
 	game._pause()
 	game._open_valley(false)
-	_check(JSON.stringify(game.valley.model.snapshot()) == persisted or game.valley.model.steps == 15,"A fresh load resumes the same tactical tick")
+	var same_slots := true
+	for id in persisted.squads:
+		var restored: Array = game.valley.model.squads[id].members
+		var expected: Array = persisted.squads[id].members
+		same_slots = same_slots and restored.size() == expected.size()
+		for slot in mini(restored.size(),expected.size()):
+			same_slots = same_slots and Vector2(restored[slot][0],restored[slot][1]).distance_to(Vector2(expected[slot][0],expected[slot][1])) < 0.00001
+	_check(game.valley.model.steps == 15 and same_slots and game.valley.model.squads.ridge_bows.ammo == persisted.squads.ridge_bows.ammo,"A fresh load resumes the same tactical tick")
 	var local_population: Dictionary = game.model.data.population.duplicate()
 	var retreat := []
 	for squad in game.valley.model.squads.values():
@@ -196,6 +203,42 @@ func _run() -> void:
 	game._show_menu()
 	game._continue_game()
 	_check(game.model.data.valley.outcome == "defeat" and game.model.data.chronicle.size()==history_count and game.model.data.population==local_population,"Reload preserves the outcome, does not double-book casualties or spend village recruits")
+	game._pause()
+	game.ui.action_requested.emit("atlas",{})
+	_check(game.screen == "atlas" and game.atlas.can_act and game.atlas.pass_status == "defeat","The shared strategic map reports the lost valley")
+	game._act_atlas("supply","")
+	_check(game.model.data.strategy.supply == 4,"Taking the detour after defeat consumes one unit of real transport supplies")
+	game._act_atlas("advance","")
+	game._act_atlas("advance","")
+	var narrative: Array = game.Seasons.story_options(game.atlas.data)
+	_check(narrative.size()==2,"The actual campaign screen offers both Roman harvest decisions")
+	game._act_atlas("story",narrative[0].id)
+	game._act_atlas("advance","")
+	game._act_atlas("advance","")
+	_request_window_back()
+	game._show_menu()
+	game._continue_game()
+	_check(game.model.data.player.age == 19 and game.model.data.companion.age == 19 and game.model.data.strategy.turn == 4,"A year on the globe ages both characters and reloads as the same year")
+	_check(game.model.data.strategy.origin_story.log.size()==2,"The regional autumn decision and following spring both persist")
+	for id in ["han","wa","germania","vistula"]:
+		game.ui.origin_id = id
+		game._start_new_game()
+		_check(game.model.data.origin_id == id and game.model.data.strategy.owned == [id] and game.world.regional.current_origin == id,"Selected homeland builds and owns the matching settlement: "+id)
+		_check(game.model.data.companion.id != "marcus" and game.model.data.story.title == game.Origins.PEOPLES[id].calling,"Each origin starts its own chronicle and companion")
+	game._pause()
+	game._open_atlas(false)
+	var childhood_stock: int = game.model.data.strategy.grain
+	game._act_atlas("harvest","")
+	_check(game.model.data.strategy.grain == childhood_stock and not game.atlas.can_act,"Exploring the globe as a child grants no strategic command")
+	_request_window_back()
+	game._show_menu()
+	game._open_atlas(true)
+	var a = game.atlas
+	a._select("wa",true)
+	_check(a.selected=="wa" and a.globe.pins.size()==32 and a.data.home=="vistula","The worldwide scenario selects a distant culture without changing the campaign's homeland")
+	game._act_atlas("advance","")
+	_request_window_back()
+	_check(game.screen == "menu" and game.model.data.strategy.turn == 0,"Back from the globe demo preserves the village timeline")
 	game.queue_free()
 	await process_frame
 	if failures.is_empty():
