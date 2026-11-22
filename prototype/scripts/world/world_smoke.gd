@@ -23,6 +23,16 @@ func _run() -> void:
 	for frame in range(4):
 		await physics_frame
 	_check(world.get_player_position().y > 0.7, "Player capsule must remain above ground")
+	# Sweep the real 0.56 m-wide player capsule in world coordinates.
+	var house := Vector3(14, 1.02, -30)
+	var player: CharacterBody3D = world.get_node("Player")
+	var entry := Transform3D(Basis.IDENTITY, house + Vector3(0, 0, 6.2))
+	_check(not player.test_move(entry, Vector3(0, 0, -4.0)), "Capsule can enter the Roman house from the street")
+	var passage := Transform3D(Basis.IDENTITY, house + Vector3(0, 0, 3.7))
+	_check(player.test_move(passage, Vector3(1.4, 0, 0)), "Entrance walls block a sideways capsule")
+	for side in [-1, 1]:
+		var aisle := Transform3D(Basis.IDENTITY, house + Vector3(side * 2.0, 0, 3.9))
+		_check(player.test_move(aisle, Vector3(0, 0, -2.5)), "The atrium column blocks the capsule")
 	var position: Vector3 = world.get_player_position()
 	world.set_mode("city")
 	world.set_mode("map")

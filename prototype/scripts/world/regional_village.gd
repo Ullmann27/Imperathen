@@ -60,6 +60,12 @@ func _static_collision(model: Node3D,kind: String) -> void:
 			Art.box_collider(model,Vector3(0.29,3.35,z*2),Vector3(x*side,1.68,0))
 			Art.box_collider(model,Vector3(x-door,3.35,0.29),Vector3(side*(x+door)*0.5,1.68,z))
 		Art.box_collider(model,Vector3(x*2,3.35,0.29),Vector3(0,1.68,-z))
+		if kind == "atrium":
+			# The open door leaves lie against the side walls of the entrance passage.
+			for side in [-1, 1]:
+				Art.box_collider(model, Vector3(0.20, 2.65, 2.10), Vector3(side * 1.03, 1.325, 3.7))
+				for end in [-1, 1]:
+					Art.box_collider(model, Vector3(0.42, 3.02, 0.42), Vector3(side * 2.0, 1.51, end * 2.15))
 		return
 	var meshes := model.find_children("*","MeshInstance3D",true,false)
 	if model is MeshInstance3D:

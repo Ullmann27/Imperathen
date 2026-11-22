@@ -74,6 +74,8 @@ def main():
             ("integration", ["--fixed-fps", "60", "--script", "res://tests/integration_test.gd"], "INTEGRATION_PASS"),
             ("battle_rules", ["--script", "res://tests/battle_rules_test.gd"], "failures=0"),
             ("soldier_visuals", ["--script", "res://tests/soldier_visual_test.gd"], "0 failed"),
+            ("soldier_gait", ["--fixed-fps", "60", "--script", "res://tests/soldier_gait_test.gd"], "failures=0"),
+            ("atrium", ["--script", str(ROOT / "art/architecture/verify_atrium.gd")], "ATR_VISUAL errors []"),
             ("seasons", ["--script", "res://tests/season_campaign_test.gd"], "failures=0"),
             ("figure_gallery", ["--fixed-fps", "60", "--script", "res://tests/figure_gallery_test.gd"], "failures=0 real_textures=true"),
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
@@ -86,7 +88,7 @@ def main():
                 break
     source_hashes = {}
     for path in sorted(PROJECT.rglob("*")):
-        if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".tscn", ".godot", ".glb", ".wav", ".json"}:
+        if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".tscn", ".godot", ".glb", ".wav", ".json", ".webp", ".jpg"}:
             source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
     result = {"engine": version, "passed": len(records) == len(checks) and all(item["passed"] for item in records),
               "renderer": "headless/dummy; no graphical FPS or screenshot claim",
