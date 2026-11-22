@@ -8,6 +8,7 @@ button. Screenshots and logcat remain inspectable; errors never become fake pass
 """
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -23,7 +24,7 @@ def main():
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     package = "at.heinz.imperathen"
-    report = {"platform": "Android API 35 x86_64 emulator", "physical_device_test": False,
+    report = {"platform": "Android emulator", "apk_sha256": hashlib.sha256(args.apk.read_bytes()).hexdigest(), "physical_device_test": False,
               "arm64_runtime_test": False, "status": "failed", "checks": [], "errors": []}
     serial = ""
     verified_emulator = False
@@ -51,7 +52,7 @@ def main():
         (args.output / name).write_bytes(data)
 
     try:
-        inventory_deadline = time.monotonic() + 60
+        inventory_deadline = time.monotonic() + 110
         targets = []
         while time.monotonic() < inventory_deadline:
             inventory = subprocess.run([args.adb, "devices"], capture_output=True, timeout=15)
@@ -81,7 +82,13 @@ def main():
             time.sleep(3)
         else:
             raise RuntimeError("Android emulator did not complete boot within 300 seconds")
-        adb("shell", "wm", "size", "1280x720")
+        report["android_version"] = adb("shell", "getprop", "ro.build.version.release")
+        report["api_level"] = adb("shell", "getprop", "ro.build.version.sdk")
+        report["abi"] = adb("shell", "getprop", "ro.product.cpu.abi")
+        report["model"] = adb("shell", "getprop", "ro.product.model")
+        record("android_17_emulator", report["api_level"] == "37" and report["abi"] == "x86_64", {
+            "api_level": report["api_level"], "abi": report["abi"], "model": report["model"]})
+        adb("shell", "wm", "size", "720x1280")
         adb("shell", "wm", "density", "160")
         adb("shell", "input", "keyevent", "82")
         installed = adb("install", "-r", "-t", str(args.apk.resolve()), timeout=90)
