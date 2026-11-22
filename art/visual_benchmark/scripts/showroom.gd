@@ -2,6 +2,8 @@ extends Node3D
 ## A real-time review scene for the shared art kit, not the campaign implementation.
 
 const QualityController = preload("res://scripts/quality_controller.gd")
+const CharacterMaterials = preload("res://scripts/character_materials.gd")
+const EnvironmentBuilder = preload("res://scripts/environment_builder.gd")
 var quality = QualityController.new()
 var camera := Camera3D.new()
 var sun := DirectionalLight3D.new()
@@ -20,10 +22,13 @@ var verification := false
 var frames := 0
 var neutral := false
 var spin := false
+var quality_buttons: Dictionary = {}
+var view_buttons: Array[Button] = []
+var scenery_report: Dictionary = {}
 
 func _ready() -> void:
 	_build_environment()
-	_build_ground()
+	scenery_report["terrain"] = EnvironmentBuilder.build_ground(self)
 	_add_asset("architecture/frontier_house", Vector3(-5.0, 0, -3.0), 0.12)
 	_add_asset("architecture/frontier_house", Vector3(5.8, 0, -5.5), -0.28)
 	_add_asset("architecture/village_well", Vector3(1.5, 0, 2.2), 0.0)
@@ -31,12 +36,13 @@ func _ready() -> void:
 	_add_asset("characters/civilian_youth", Vector3(-2.0, 0.01, 3.2), -0.2)
 	_add_asset("characters/frontier_guard", Vector3(-0.6, 0.01, 3.0), -0.5)
 	_build_vegetation()
-	_build_trees()
+	scenery_report["trees"] = EnvironmentBuilder.build_trees(self)
 	add_child(camera)
 	camera.fov = 48.0
 	camera.far = 250.0
 	camera.current = true
 	_build_ui()
+	_set_view(0)
 	_read_arguments()
 	if not verification:
 		_load_preference()
@@ -88,62 +94,9 @@ func _build_environment() -> void:
 
 func _set_light() -> void:
 	sun.rotation_degrees = Vector3(-52, -32, 0) if neutral else Vector3(-30, -28, 0)
-	sun.light_color = Color("fff6e5") if neutral else Color("ffdbac")
-	sun.light_energy = 1.35 if neutral else 1.55
-	environment.ambient_light_energy = 0.58 if neutral else 0.43
-
-func _surface_material(color: Color, texture: String = "") -> StandardMaterial3D:
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = color
-	mat.roughness = 0.9
-	if texture != "":
-		mat.albedo_texture = load("res://materials/" + texture + "_basecolor.png")
-		mat.normal_enabled = true
-		mat.normal_texture = load("res://materials/" + texture + "_normal.png")
-		mat.normal_scale = 0.55
-		mat.roughness_texture = load("res://materials/" + texture + "_roughness.png")
-		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
-	return mat
-
-func _build_ground() -> void:
-	var surface := SurfaceTool.new()
-	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for z in range(-32, 33):
-		for x in range(-32, 33):
-			var corners := [Vector3(x, 0, z), Vector3(x+1, 0, z), Vector3(x+1, 0, z+1), Vector3(x, 0, z+1)]
-			for index in [0, 2, 1, 0, 3, 2]:
-				var point: Vector3 = corners[index]
-				var edge := clampf((absf(point.x)-13.0)/15.0, 0, 1)
-				point.y = sin(point.x*0.31)*cos(point.z*0.27)*0.25*edge
-				surface.set_uv(Vector2(point.x, point.z)*0.42)
-				surface.add_vertex(point)
-	surface.generate_normals()
-	var ground := MeshInstance3D.new()
-	ground.mesh = surface.commit()
-	ground.material_override = _surface_material(Color("b1a58b"), "earth")
-	add_child(ground)
-	# The traffic strip is lighter and rough; it remains present in every profile.
-	var road := MeshInstance3D.new()
-	var plane := PlaneMesh.new()
-	plane.size = Vector2(3.8, 58)
-	road.mesh = plane
-	road.position = Vector3(-0.3, 0.009, 1)
-	road.material_override = _surface_material(Color("d5c5a4"), "earth")
-	(road.material_override as StandardMaterial3D).uv1_scale = Vector3(1.6, 22, 1)
-	add_child(road)
-	var mountain_mat := _surface_material(Color("52614b"))
-	for index in range(10):
-		var hill := MeshInstance3D.new()
-		var shape := SphereMesh.new()
-		shape.radius = 15.0
-		shape.height = 17.0
-		shape.radial_segments = 20
-		shape.rings = 10
-		hill.mesh = shape
-		hill.material_override = mountain_mat
-		hill.position = Vector3(-75.0 + index*17.0, -3.0, -55.0 - sin(index*2.1)*12.0)
-		hill.scale = Vector3(1.4, 0.8 + (index%3)*0.25, 1.0)
-		add_child(hill)
+	sun.light_color = Color("fff6e5") if neutral else Color("ffe2bd")
+	sun.light_energy = 1.0 if neutral else 1.12
+	environment.ambient_light_energy = 0.48 if neutral else 0.38
 
 func _add_asset(id: String, at: Vector3, angle: float) -> void:
 	var path := "res://assets/" + id + ".glb"
@@ -152,11 +105,21 @@ func _add_asset(id: String, at: Vector3, angle: float) -> void:
 		return
 	var asset := load(path) as PackedScene
 	var instance := asset.instantiate() as Node3D
+	CharacterMaterials.apply_to(instance)
+	_preserve_essential_detail(instance)
 	instance.position = at
 	instance.rotation.y = angle
 	instance.set_meta("essential", true)
 	add_child(instance)
 	essential_assets.append(instance)
+
+func _preserve_essential_detail(node: Node) -> void:
+	# Real low-profile review showed automatic LOD dropping thin window/roof parts.
+	# Keep important silhouettes longer; save decoration and fill-rate first.
+	if node is GeometryInstance3D:
+		(node as GeometryInstance3D).lod_bias = 8.0
+	for child in node.get_children():
+		_preserve_essential_detail(child)
 
 func _build_vegetation() -> void:
 	var blades := SurfaceTool.new()
@@ -191,34 +154,6 @@ func _build_vegetation() -> void:
 	vegetation.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(vegetation)
 
-func _build_trees() -> void:
-	var bark := _surface_material(Color("6e5230"))
-	var leaves := _surface_material(Color("37472d"))
-	for index in range(12):
-		var x := -17.0 if index%2 == 0 else 18.0
-		var z := -20.0 + (index/2)*7.0
-		var trunk := MeshInstance3D.new()
-		var cylinder := CylinderMesh.new()
-		cylinder.top_radius = 0.13
-		cylinder.bottom_radius = 0.22
-		cylinder.height = 4.7
-		cylinder.radial_segments = 8
-		trunk.mesh = cylinder
-		trunk.material_override = bark
-		trunk.position = Vector3(x,2.35,z)
-		add_child(trunk)
-		for tier in range(3):
-			var crown := MeshInstance3D.new()
-			var cone := CylinderMesh.new()
-			cone.top_radius = 0.15
-			cone.bottom_radius = 1.1-tier*0.22
-			cone.height = 2.8-tier*0.3
-			cone.radial_segments = 9
-			crown.mesh = cone
-			crown.material_override = leaves
-			crown.position = Vector3(x,3.1+tier*0.9,z)
-			add_child(crown)
-
 func _build_ui() -> void:
 	ui = CanvasLayer.new()
 	add_child(ui)
@@ -227,11 +162,17 @@ func _build_ui() -> void:
 	title.position = Vector2(30,22)
 	title.add_theme_font_size_override("font_size",30)
 	title.add_theme_color_override("font_color",Color("efd39b"))
+	title.add_theme_color_override("font_shadow_color",Color(0.03,0.025,0.02,0.9))
+	title.add_theme_constant_override("shadow_offset_x",1)
+	title.add_theme_constant_override("shadow_offset_y",2)
 	ui.add_child(title)
 	var subtitle := Label.new()
 	subtitle.text = "D I E   G R E N Z P R O V I N Z"
 	subtitle.position = Vector2(32,60)
 	subtitle.add_theme_font_size_override("font_size",12)
+	subtitle.add_theme_color_override("font_shadow_color",Color(0.03,0.025,0.02,0.9))
+	subtitle.add_theme_constant_override("shadow_offset_x",1)
+	subtitle.add_theme_constant_override("shadow_offset_y",1)
 	ui.add_child(subtitle)
 	var panel := PanelContainer.new()
 	panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
@@ -249,6 +190,16 @@ func _build_ui() -> void:
 	style.content_margin_top = 10
 	style.content_margin_bottom = 10
 	panel.add_theme_stylebox_override("panel",style)
+	var theme := Theme.new()
+	theme.set_font_size("font_size","Button",16)
+	for state in ["normal","hover","pressed","focus"]:
+		var button_style := StyleBoxFlat.new()
+		button_style.bg_color = Color("292b29") if state == "pressed" else Color(0.11,0.12,0.11,0.65)
+		button_style.border_color = Color("d0ae70") if state in ["pressed","focus"] else Color("555348")
+		button_style.set_border_width_all(1 if state in ["pressed","hover","focus"] else 0)
+		button_style.set_corner_radius_all(3)
+		theme.set_stylebox(state,"Button",button_style)
+	panel.theme = theme
 	ui.add_child(panel)
 	var column := VBoxContainer.new()
 	panel.add_child(column)
@@ -256,16 +207,24 @@ func _build_ui() -> void:
 	row.add_theme_constant_override("h_separation",10)
 	row.add_theme_constant_override("v_separation",8)
 	column.add_child(row)
+	var quality_group := ButtonGroup.new()
 	for entry in [["Niedrig","low"],["Ausgewogen","balanced"],["Hoch","high"]]:
 		var button := Button.new()
 		button.text = entry[0]
 		button.custom_minimum_size = Vector2(125,44)
+		button.toggle_mode = true
+		button.button_group = quality_group
+		quality_buttons[entry[1]] = button
 		button.pressed.connect(_apply_quality.bind(entry[1],true))
 		row.add_child(button)
+	var view_group := ButtonGroup.new()
 	for index in range(4):
 		var button := Button.new()
 		button.text = ["Dorf","Haus","Figuren","Übersicht"][index]
 		button.custom_minimum_size = Vector2(95,44)
+		button.toggle_mode = true
+		button.button_group = view_group
+		view_buttons.append(button)
 		button.pressed.connect(_set_view.bind(index))
 		row.add_child(button)
 	var light_button := Button.new()
@@ -286,6 +245,8 @@ func _build_ui() -> void:
 
 func _apply_quality(id: String, persist: bool = true) -> void:
 	last_profile = quality.apply(id,get_viewport(),sun,environment,vegetation)
+	for key in quality_buttons:
+		(quality_buttons[key] as Button).set_pressed_no_signal(key == id)
 	caption.text = str(last_profile.get("label",id)) + "  ·  Ziehen: Kamera drehen  ·  Zwei Finger / Mausrad: Abstand  ·  Alle Figuren und Gebäude bleiben erhalten"
 	if persist:
 		var config := ConfigFile.new()
@@ -303,6 +264,8 @@ func _load_preference() -> void:
 
 func _set_view(index: int) -> void:
 	current_view = clampi(index,0,3)
+	for button_index in range(view_buttons.size()):
+		view_buttons[button_index].set_pressed_no_signal(button_index == current_view)
 	match current_view:
 		0: target=Vector3(0,1.8,-0.5); orbit=Vector2(0.67,0.28); distance=22.0
 		1: target=Vector3(-5,2.0,-3); orbit=Vector2(-0.72,0.23); distance=11.8
@@ -338,8 +301,12 @@ func _save_evidence() -> void:
 	var stem: String = "res://evidence/engine_" + str(quality.active_id) + "_view" + str(current_view) + ("_neutral" if neutral else "_morning")
 	var result := get_viewport().get_texture().get_image().save_png(stem + ".png")
 	var receipt := {"kind":"actual_godot_viewport_capture","engine":Engine.get_version_info(),
+		"created_at_utc":Time.get_datetime_string_from_system(true),
 		"renderer":RenderingServer.get_current_rendering_method(),"adapter":RenderingServer.get_video_adapter_name(),
 		"profile":last_profile,"camera":current_view,"light":"neutral" if neutral else "morning",
+		"camera_position":[camera.position.x,camera.position.y,camera.position.z],
+		"essential_assets_visible":essential_assets.filter(func(node): return node.visible).size(),
+		"scenery":scenery_report,
 		"android_hardware":OS.get_name()=="Android","png_result":result}
 	var file := FileAccess.open(stem+".json",FileAccess.WRITE)
 	if file: file.store_string(JSON.stringify(receipt,"\t")+"\n")

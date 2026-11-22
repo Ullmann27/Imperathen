@@ -136,6 +136,35 @@ Lieferbestandteile. Vorhandene sichtbare Körperteile oder Posen belegen kein
 fertiges Rig. Animationen, Gewichtung, Gang, Interaktionsposen und Clipping werden
 erst nach einem tatsächlichen Test als geprüft markiert.
 
+### Beobachtete Importprobleme und notwendige Übernahme
+
+Im tatsächlichen Godot-4.7.2-Lauf waren Haut und Haare zunächst weiß. Die
+`COLOR_0`-Werte waren im Mesh vorhanden, aber das importierte Palettenmaterial
+hatte `vertex_color_use_as_albedo=false`. Deshalb beim Instanziieren dieser
+Figuren den mitgelieferten Helper verwenden:
+
+```gdscript
+const CharacterMaterials = preload("res://scripts/character_materials.gd")
+
+var visual = character_scene.instantiate()
+CharacterMaterials.apply_to(visual)
+```
+
+Bei Übernahme in einen anderen Ordner ist nur der Helper-Pfad anzupassen.
+Die Funktion kopiert ausschließlich die betroffenen Palettenmaterialien und
+verändert weder Meshdaten noch die gemeinsam gecachten Importressourcen.
+glTF-Vertexfarben bleiben linear. Der Regressionstest prüft alle vier Figuren-
+und LOD-Dateien, unveränderte Geometrie und einen zweiten folgenlosen Aufruf.
+
+Die Bildprüfung auf Niedrig zeigte zudem sichtbare Verluste dünner Fenster- und
+Dachteile durch automatische Mesh-LODs. Der Schauraum setzt deshalb für seine
+wichtigen Modellinstanzen rekursiv `GeometryInstance3D.lod_bias = 8.0`.
+Diese Priorisierung schützt wichtige Silhouetten. Sie ist bei einer Übernahme
+mitzuprüfen; ein bloßes Übernehmen der globalen LOD-Schwelle reicht nicht.
+Für eine große Welt sind gesondert geprüfte Architektur-LODs weiterhin offen.
+Godots [Dokumentation zu Mesh-LODs](https://docs.godotengine.org/en/stable/tutorials/3d/mesh_lod.html)
+erläutert das Zusammenspiel von Viewport-Schwelle und Instanz-Bias.
+
 ## Anschluss an Team #16: Einstieg und spätere PC-Vorbereitung
 
 Die Einstiegsvorschau darf geprüfte Aufnahmen des Grafikpakets verwenden. Als

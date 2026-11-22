@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-11-22T14:22:04+00:00",
+  "generated_at_utc": "2026-11-22T14:39:43+00:00",
   "validator": "imperathen-visual-assets-stdlib-v1",
   "scope": "Static GLB export gate: container, embedded data, accessor bytes, meshes, materials and default-scene bounds",
   "not_verified": [

@@ -23,6 +23,25 @@ ist [`quality_profiles.json`](../../art/visual_benchmark/quality_profiles.json).
 
 ## GLB-Dateiprüfung
 
+Der eigene GitHub-Workflow `.github/workflows/visual-quality.yml` führt bei
+Änderungen am Grafikpaket den statischen Dateivertrag aus. Dieser CI-Job benötigt
+keine zusätzlichen Pakete und keine GPU. Sein Name beschreibt bewusst nur die
+GLB-Prüfung; ein grüner Lauf ist kein Android- oder Rendernachweis.
+
+Der vollständige Einstieg lautet `python tools/art/run_visual_pipeline.py`.
+Er führt den GLB-Vertrag, frischen Godot-Import, Profilinvarianten und die konkrete
+Regression für die Figurenpaletten aus. Die zusätzliche Materialprüfung ist
+wegen eines im echten Bildtest gefundenen Importfehlers erforderlich.
+Für einen einzelnen Aufruf:
+
+```bash
+godot --headless --path art/visual_benchmark --script res://scripts/verify_character_materials.gd
+```
+
+`pipeline_receipt.json` enthält die tatsächlichen Schritte sowie SHA-256-Werte
+der GLBs, Szenenskripte, Einstellungen und Pipelinequellen. Der Bildtest bleibt
+eine getrennte, durch tatsächliche PNG-Aufnahmen belegte Prüfung.
+
 Vom Repository-Hauptverzeichnis aus:
 
 ```bash

@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-11-22T14:44:30.819997+00:00",
+  "status": "reviewed_initial_art_not_final_quality",
+  "capture_kind": "actual_godot_viewport",
+  "renderer": "gl_compatibility",
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_hardware_tested": false,
+  "native_ui_observed": [
+    "low village",
+    "balanced village",
+    "high village",
+    "high house",
+    "high characters",
+    "balanced characters in neutral light"
+  ],
+  "same_village_camera_across_profiles": true,
+  "essential_assets_visible_in_every_capture": 6,
+  "not_claimed": [
+    "Android frame rate",
+    "Mobile renderer visual parity",
+    "final realistic character quality",
+    "rigged animations",
+    "campaign integration"
+  ],
+  "captures": [
+    {
+      "file": "art/visual_benchmark/evidence/engine_balanced_view0_morning.png",
+      "sha256": "c5f4533bfd0bfedbeffa88173c06acff17126ea5dc5420935e6b78657fe5b5fc",
+      "metadata": "art/visual_benchmark/evidence/engine_balanced_view0_morning.json",
+      "profile": "balanced",
+      "camera": 0,
+      "light": "morning",
+      "camera_position": [
+        13.1296443939209,
+        7.8798246383667,
+        16.0725135803223
+      ],
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "art/visual_benchmark/evidence/engine_balanced_view2_morning.png",
+      "sha256": "7cd56bddf8a153a19b45f9d768a542ad530a2f2c1f13997b0847ca6fe6277461",
+      "metadata": "art/visual_benchmark/evidence/engine_balanced_view2_morning.json",
+      "profile": "balanced",
+      "camera": 2,
+      "light": "morning",
+      "camera_position": [
+        -0.538066864013672,
+        1.17479991912842,
+        6.50727605819702
+      ],
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "art/visual_benchmark/evidence/engine_balanced_view2_neutral.png",
+      "sha256": "6b61b3aa540c169f13ef744bb97f7264af0fd72685b7345651e88ee90c9672ea",
+      "metadata": "art/visual_benchmark/evidence/engine_balanced_view2_neutral.json",
+      "profile": "balanced",
+      "camera": 2,
+      "light": "neutral",
+      "camera_position": [
+        -0.538066864013672,
+        1.17479991912842,
+        6.50727605819702
+      ],
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "art/visual_benchmark/evidence/engine_high_view0_morning.png",
+      "sha256": "a3cf69c290a93cbd4a9edbff15b3eec9e25924c87c741f20d808a54f35acc8c9",
+      "metadata": "art/visual_benchmark/evidence/engine_high_view0_morning.json",
+      "profile": "high",
+      "camera": 0,
+      "light": "morning",
+      "camera_position": [
+        13.1296443939209,
+        7.8798246383667,
+        16.0725135803223
+      ],
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "art/visual_benchmark/evidence/engine_high_view1_morning.png",
+      "sha256": "5e3940b8641ef47a258aa79057b46000cbbfcd71e212a10dc8814d471f3e155c",
+      "metadata": "art/visual_benchmark/evidence/engine_high_view1_morning.json",
+      "profile": "high",
+      "camera": 1,
+      "light": "morning",
+      "camera_position": [
+        -12.5758438110352,
+        4.69013500213623,
+        5.63769435882568
+      ],
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "art/visual_benchmark/evidence/engine_high_view2_morning.png",
+      "sha256": "28654e8ae4c3d2e624a4b84b68e9e81ad99d73ab2c8d628fbc4f4467024c3e9b",
+      "metadata": "art/visual_benchmark/evidence/engine_high_view2_morning.json",
+      "profile": "high",
+      "camera": 2,
+      "light": "morning",
+      "camera_position": [
+        -0.538066864013672,
+        1.17479991912842,
+        6.50727605819702
+      ],
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "art/visual_benchmark/evidence/engine_low_view0_morning.png",
+      "sha256": "2ecf5f28ea590ab774fb77c213619405a193be619e1fb6c5a3b55b7ea386cf18",
+      "metadata": "art/visual_benchmark/evidence/engine_low_view0_morning.json",
+      "profile": "low",
+      "camera": 0,
+      "light": "morning",
+      "camera_position": [
+        13.1296443939209,
+        7.8798246383667,
+        16.0725135803223
+      ],
+      "width": 1280,
+      "height": 720
+    }
+  ]
+}

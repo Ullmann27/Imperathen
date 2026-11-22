@@ -74,6 +74,8 @@ def main():
         found={p.stem for p in (PROJECT/"assets").rglob("*.glb")}
         if not expected.issubset(found): raise RuntimeError("Missing contracted assets: "+str(sorted(expected-found)))
         report["asset_hashes"]={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((PROJECT/"assets").rglob("*.glb"))}
+        source_files=[PROJECT/"project.godot",PROJECT/"quality_profiles.json",*(PROJECT/"scripts").glob("*.gd"),*(ROOT/"tools/art").glob("*.py")]
+        report["source_hashes"]={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(source_files)}
         report["assets_checked"]=assets["assets_checked"]
 
         if not args.assets_only:
@@ -90,10 +92,14 @@ def main():
             invariant=json.loads(rows[0])
             if not invariant.get("passed"): raise RuntimeError("Engine invariant receipt failed")
             (EVIDENCE/"engine_invariants.json").write_text(json.dumps(invariant,indent=2)+"\n",encoding="utf-8")
+            palette_output=run("character_palette",[godot,"--headless","--path",str(PROJECT),"--script","res://scripts/verify_character_materials.gd"],60)
+            palette_rows=[line.partition("CHARACTER_PALETTE_VALIDATION ")[2] for line in palette_output.splitlines() if line.startswith("CHARACTER_PALETTE_VALIDATION ")]
+            if len(palette_rows)!=1 or json.loads(palette_rows[0]).get("status")!="passed":
+                raise RuntimeError("Character palette regression check failed")
         else:
             report["engine_skipped"]=True
         report["passed"]=True
-    except RuntimeError as error:
+    except (RuntimeError,OSError,ValueError,subprocess.SubprocessError) as error:
         report["passed"]=False
         report["error"]=str(error)
         print(str(error),file=sys.stderr)

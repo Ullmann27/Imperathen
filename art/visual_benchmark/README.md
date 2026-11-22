@@ -34,6 +34,8 @@ Das Display-Seitenverhältnis bleibt erhalten, auch auf Fold-Geräten. Ausgewoge
 
 Alle Stufen bewahren dieselben Hauptobjekte. Die Unterschiede betreffen Grasdekoration, entfernte Meshdetails, Schatten und Kantenglättung. Texturdateien werden in diesem ersten Stand nicht je Profil ausgewechselt. Der Mobile-Renderer ist vorgesehen; Compatibility dient als unterstützter Fallback. Desktop-Forward+-Effekte sind keine Android-Pflicht.
 
+Die echten Bildvergleiche zeigten, dass ungebremste automatische LODs bereits Fenster- und Dachteile sichtbar verschlechtern können. Deshalb besitzen die wichtigen Modellinstanzen einen `lod_bias` von 8,0. Niedrig spart damit zuerst an kosmetischer Vegetation, Schatten und Bildauflösung. Das ersetzt noch keine manuell geprüften Fern-LODs für eine große Spielwelt.
+
 ## Geliefertes Assetpaket
 
 - `assets/architecture/frontier_house.glb`: detailliertes Grenzhaus mit echter Tür-/Fensteröffnung und Inneneinrichtung.
@@ -43,6 +45,8 @@ Alle Stufen bewahren dieselben Hauptobjekte. Die Unterschiede betreffen Grasdeko
 - `assets/characters/*_lod1.glb`: reduzierte Varianten mit identischer Ausdehnung.
 
 Die Dateien sind vollständig lokal erzeugt. Die `.blend`-Quellen enthalten die Materialkarten; die GLBs enthalten ihre eigenen Texturen. Der Import nutzt generierte LODs und eingebettete Basis-Universal-Texturen. Es wurden keine fremden Modelle oder Materialpakete heruntergeladen.
+
+Für die Figuren gehört `scripts/character_materials.gd` zum Godot-Importvertrag: Nach dem Instanziieren `CharacterMaterials.apply_to(instance)` aufrufen. Der tatsächlich verwendete Godot-Importer lieferte vorhandene Vertexfarben mit ausgeschalteter Albedo-Verwendung. Der Helper korrigiert gezielt die Palettenmaterialien, sodass Haut und Haare korrekt erscheinen. Die vier Modelle werden darauf in einem eigenen Regressionstest geprüft.
 
 **Qualitätsstand:** Die Gebäude sind detaillierte erste wiederverwendbare Assets. Die Figuren sind erkennbare Rollenmodelle; Gesichter, Haare, Haut und Stoffsilhouetten erreichen das angestrebte Realismusniveau noch nicht. Rigging und Bewegungen fehlen. Ein erfolgreicher Dateicheck ersetzt diese künstlerische Abnahme nicht.
 
@@ -67,6 +71,8 @@ python tools/art/run_visual_pipeline.py --rebuild --render-previews
 ```
 
 Die Pipeline prüft GLB-Bytes, Materialien, Maße, Indexdaten und eingebettete Texturen, führt einen echten Godot-Import aus und testet wiederholte Profilwechsel. Ein Headless-Test ist ausdrücklich kein GPU- oder Android-Leistungstest. `evidence/asset_validation.json`, `engine_invariants.json` und `pipeline_receipt.json` nennen den tatsächlichen Umfang. Blender-Vorschauen werden von Godot-Aufnahmen getrennt bezeichnet.
+
+Die [visuelle Abnahme vom 22. November](../../docs/11_visual_quality/REVIEW_2026-11-22.md) dokumentiert die tatsächlichen Godot-Bilder, korrigierte Darstellungsfehler und verbleibende gestalterische Grenzen.
 
 ## Anschluss an das Spielteam
 
