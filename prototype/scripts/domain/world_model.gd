@@ -6,7 +6,9 @@ extends RefCounted
 signal changed
 
 const BattleModel = preload("res://scripts/battle/battle_model.gd")
-const SCHEMA_VERSION := 2
+const Seasons = preload("res://scripts/strategy/season_campaign.gd")
+const Origins = preload("res://scripts/strategy/origins.gd")
+const SCHEMA_VERSION := 3
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
 const MAX_COMMAND_IDS := 1024
@@ -36,14 +38,17 @@ func _init() -> void:
 	new_game()
 
 
-func new_game() -> void:
+func new_game(origin_id := "italia") -> void:
+	if not Origins.PEOPLES.has(origin_id):
+		origin_id = "italia"
+	var origin: Dictionary = Origins.PEOPLES[origin_id]
 	data = {
 		"schema_version": SCHEMA_VERSION,
 		"world_id": "%s-%s" % [Time.get_ticks_usec(), randi()],
 		"revision": 0, "world_seconds": 0.0,
 		"resources": {"wood": 0, "grain": 12, "denarii": 30},
 		"player": {"position": [0.0, 1.0, 8.0], "health": 100, "age": 12, "role": "child"},
-		"companion": {"id": "marcus", "met": false, "choice": "", "trust": 0, "age": 12},
+		"companion": {"id": origin.companion.to_lower(), "met": false, "choice": "", "trust": 0, "age": 12},
 		"progress": {"stage": "prologue", "training_hits": 0, "training_complete": false,
 			"skirmish_won": false, "years_elapsed": 0, "chapter_complete": false, "career_terminal": false},
 		"buildings": [], "resource_nodes": [],
@@ -51,9 +56,9 @@ func new_game() -> void:
 		"population": {"total": 4, "workers": 4, "soldiers": 0, "dead": 0},
 		"encounter": {"started": false, "active": false, "resolved": false, "damage_taken": 0, "enemies": []},
 		"timers": {"training": 0.0, "strike": 0.0, "damage": 0.0},
-		"chronicle": [{"time": 0.0, "text": "Du erreichst die Grenzsiedlung. Ein geliehenes Werkzeug und eine erlaubte Baufläche sind dein Anfang."}],
-		"story": {"title": "Ein Anfang am Fluss", "text": "Sammle Holz, sprich mit Marcus und baue deine erste Unterkunft östlich des Weges.", "choices": [], "choice": ""},
-		"valley": {}, "command_log": {}
+		"chronicle": [{"time": 0.0, "text": origin.intro}],
+		"story": {"title": origin.calling, "text": "Sammle Holz, sprich mit %s und baue deine erste Unterkunft östlich des Weges." % origin.companion, "choices": [], "choice": ""},
+		"origin_id":origin_id, "strategy":Seasons.new_game(origin_id), "valley": {}, "command_log": {}
 	}
 	for index in NODE_POSITIONS.size():
 		data.resource_nodes.append({"id": "timber_%d" % index, "x": NODE_POSITIONS[index][0], "z": NODE_POSITIONS[index][1], "amount": 16})
@@ -85,8 +90,10 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 		return _fail("Dieser Lebensbogen ist abgeschlossen. Ein neues Leben beginnt im Hauptmenü.")
 	var candidate := _world_copy()
 	var result := _apply_command(candidate, command, args)
+	result.message = _regional_text(candidate, result.message)
 	if not result.ok:
 		return result
+	candidate.story.text = _regional_text(candidate,candidate.story.text)
 	candidate.revision = int(data.revision) + 1
 	result["revision"] = candidate.revision
 	if not command_id.is_empty():
@@ -484,10 +491,14 @@ func _validate_arguments(command: String, args: Dictionary) -> String:
 
 
 func _validate_state(state: Variant) -> String:
-	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley"]):
+	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley", "origin_id", "strategy"]):
 		return "Unvollständiger oder unbekannter Datenvertrag."
 	if not _integer(state.schema_version, SCHEMA_VERSION, SCHEMA_VERSION):
 		return "Diese Schemaversion wird nicht unterstützt; es wurde keine Migration ausgeführt."
+	if typeof(state.origin_id) != TYPE_STRING or not Origins.PEOPLES.has(state.origin_id) or typeof(state.strategy) != TYPE_DICTIONARY or not Seasons.validate(state.strategy) or state.strategy.home != state.origin_id:
+		return "Unbekannte Herkunft oder ungültige Regionalkampagne."
+	if state.strategy.turn > 0 and (typeof(state.progress) != TYPE_DICTIONARY or not state.progress.get("skirmish_won",false)):
+		return "Der Regionalauftrag setzt eine abgeschlossene Dorfverteidigung voraus."
 	if not _text(state.world_id, 1, 100) or not _integer(state.revision, 0, 9007199254740990) or not _number(state.world_seconds, 0.0, 1000000000000.0):
 		return "Ungültige Weltkennung, Revision oder Zeit."
 	if not _exact_keys(state.resources, ["wood", "grain", "denarii"]):
@@ -497,25 +508,26 @@ func _validate_state(state: Variant) -> String:
 			return "Güter müssen endliche nichtnegative ganze Mengen sein."
 	if not _exact_keys(state.player, ["position", "health", "age", "role"]):
 		return "Ungültige Spielerfigur."
-	if not _valid_position(state.player.position) or not _integer(state.player.health, 0, 100) or not _integer(state.player.age, 12, 18) or not _text(state.player.role, 1, 20):
+	if not _valid_position(state.player.position) or not _integer(state.player.health, 0, 100) or not _integer(state.player.age, 12, 250018) or not _text(state.player.role, 1, 20):
 		return "Ungültiger Ort, Gesundheit, Alter oder Rolle."
 	if not _exact_keys(state.companion, ["id", "met", "choice", "trust", "age"]):
 		return "Ungültiger Gefährtenzustand."
 	var companion: Dictionary = state.companion
-	if companion.id != "marcus" or typeof(companion.met) != TYPE_BOOL or not _text(companion.choice, 0, 16) or companion.choice not in ["", "help", "decline"]:
+	if companion.id != Origins.PEOPLES[state.origin_id].companion.to_lower() or typeof(companion.met) != TYPE_BOOL or not _text(companion.choice, 0, 16) or companion.choice not in ["", "help", "decline"]:
 		return "Ungültige Gefährtenidentität oder Auswahl."
-	if companion.met != (companion.choice != "") or not _integer(companion.trust, -100, 100) or not _integer(companion.age, 12, 18) or companion.age != state.player.age:
+	if companion.met != (companion.choice != "") or not _integer(companion.trust, -100, 100) or not _integer(companion.age, 12, 250018) or companion.age != state.player.age:
 		return "Gefährtenentscheidung, Vertrauen oder Alter widersprechen sich."
 	if not _exact_keys(state.progress, ["stage", "training_hits", "training_complete", "skirmish_won", "years_elapsed", "chapter_complete", "career_terminal"]):
 		return "Ungültiger Kapitelzustand."
 	var progress: Dictionary = state.progress
-	if not _text(progress.stage, 1, 32) or progress.stage not in STAGES or not _integer(progress.training_hits, 0, 3) or not _integer(progress.years_elapsed, 0, 6):
+	if not _text(progress.stage, 1, 32) or progress.stage not in STAGES or not _integer(progress.training_hits, 0, 3) or not _integer(progress.years_elapsed, 0, 250006):
 		return "Unbekannte Spielphase oder Ausbildung."
 	for key in ["training_complete", "skirmish_won", "chapter_complete", "career_terminal"]:
 		if typeof(progress[key]) != TYPE_BOOL:
 			return "Kapitelmerkmale müssen Wahrheitswerte sein."
 	var adult: bool = progress.stage not in ["prologue", "settlement"]
-	if state.player.age != (18 if adult else 12) or progress.years_elapsed != (6 if adult else 0):
+	var elapsed_years := (6 if adult else 0) + floori(state.strategy.turn / 4.0)
+	if state.player.age != 12 + elapsed_years or progress.years_elapsed != elapsed_years:
 		return "Alterssprung und Weltphase widersprechen sich."
 	if float(state.world_seconds) < float(progress.years_elapsed) * YEAR_SECONDS:
 		return "Der Alterssprung fehlt in der gemeinsamen Weltzeit."
@@ -673,8 +685,12 @@ func _read_save(path: String) -> Dictionary:
 		return _fail("Der gespeicherte Weltzustand ist kein gültiges JSON.")
 	var state: Variant = payload_parser.data
 	if typeof(state) == TYPE_DICTIONARY and state.get("schema_version") == 1 and not state.has("valley"):
-		state.schema_version = SCHEMA_VERSION
+		state.schema_version = 2
 		state.valley = {}
+	if typeof(state) == TYPE_DICTIONARY and state.get("schema_version") == 2 and not state.has("strategy") and not state.has("origin_id"):
+		state.schema_version = SCHEMA_VERSION
+		state.origin_id = "italia"
+		state.strategy = Seasons.new_game("italia")
 	var error := _validate_state(state)
 	if error.is_empty() and not _valid_valley(state):
 		error = "Das gespeicherte Talgefecht enthält widersprüchliche Daten."
@@ -819,7 +835,12 @@ func _update_morale(state: Dictionary) -> void:
 	state.squad.morale = mini(100, 60 + 5 * int(state.squad.recruits) - 15 * int(state.population.dead) + (10 if state.progress.skirmish_won else 0))
 
 
+func _regional_text(state: Dictionary, text: String) -> String:
+	return text.replace("Marcus", Origins.PEOPLES[state.origin_id].companion)
+
+
 func _record(state: Dictionary, text: String) -> void:
+	text = _regional_text(state,text)
 	state.chronicle.append({"time": state.world_seconds, "text": text})
 	while state.chronicle.size() > MAX_CHRONICLE:
 		state.chronicle.pop_front()
@@ -827,7 +848,7 @@ func _record(state: Dictionary, text: String) -> void:
 
 func _set_story(state: Dictionary, title: String, text: String) -> void:
 	state.story.title = title
-	state.story.text = text
+	state.story.text = _regional_text(state,text)
 	state.story.choices = []
 
 
@@ -842,8 +863,23 @@ func _world_copy() -> Dictionary:
 	var candidate := {}
 	for key in data:
 		var value: Variant = data[key]
-		if key != "valley" and typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY]:
+		if key not in ["strategy","valley"] and typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY]:
 			candidate[key] = value.duplicate(true)
 		else:
 			candidate[key] = value
 	return candidate
+
+func act_region(command: String,target: String) -> Dictionary:
+	if not data.progress.skirmish_won or data.progress.career_terminal or not data.story.choices.is_empty():
+		return _fail("Erfülle zuerst den Auftrag zur Dorfverteidigung.")
+	var result: Dictionary = Seasons.act(data.strategy,command,target)
+	if result.ok:
+		if command == "advance":
+			data.world_seconds += YEAR_SECONDS/4.0
+			data.progress.years_elapsed = 6 + floori(data.strategy.turn/4.0)
+			data.player.age = 12 + data.progress.years_elapsed
+			data.companion.age = data.player.age
+		_record(data,result.message)
+		data.revision += 1
+		changed.emit()
+	return result

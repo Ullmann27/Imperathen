@@ -3,6 +3,9 @@ extends Node
 const ModelScript = preload("res://scripts/domain/world_model.gd")
 const WorldScript = preload("res://scripts/world/game_world.gd")
 const UIScript = preload("res://scripts/ui/game_ui.gd")
+const AtlasScreen = preload("res://scripts/strategy/atlas_screen.gd")
+const Seasons = preload("res://scripts/strategy/season_campaign.gd")
+const Origins = preload("res://scripts/strategy/origins.gd")
 const ValleyScene = preload("res://scripts/tactics/valley_scene.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
@@ -11,6 +14,8 @@ var world
 var ui
 var screen := "intro"
 var mode := "person"
+var atlas
+var atlas_return := ""
 var valley
 var valley_demo := false
 var session_started := false
@@ -45,6 +50,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if screen == "atlas":
+		return
 	if screen == "valley":
 		if not valley_demo and not valley.paused:
 			autosave_elapsed += delta
@@ -66,6 +73,10 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
+		if screen == "atlas":
+			_leave_atlas()
+			get_viewport().set_input_as_handled()
+			return
 		if screen == "playing":
 			_pause()
 		elif screen == "paused":
@@ -74,6 +85,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _notification(what: int) -> void:
+	if screen == "atlas" and is_instance_valid(atlas):
+		if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+			_leave_atlas()
+			return
+		if what in [NOTIFICATION_APPLICATION_PAUSED,NOTIFICATION_APPLICATION_FOCUS_OUT]:
+			if not atlas.demo and session_started:
+				_save(false)
+			return
 	if screen == "valley" and is_instance_valid(valley):
 		if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 			_leave_valley()
@@ -142,7 +161,7 @@ func _request_new_game() -> void:
 
 
 func _start_new_game() -> void:
-	model.new_game()
+	model.new_game(ui.origin_id)
 	last_story_id = ""
 	world.setup(model.data)
 	session_started = true
@@ -150,7 +169,7 @@ func _start_new_game() -> void:
 	_resume()
 	var saved := _save(false)
 	if saved.get("ok", false):
-		ui.notify("Willkommen in der Grenzsiedlung. Sprich mit dem Gefährten und suche Holz.")
+		ui.notify(Origins.PEOPLES[model.data.origin_id].intro)
 		print("IMPERATHEN_SESSION_STARTED: saved frontier world")
 
 
@@ -223,6 +242,8 @@ func _set_mode(next_mode: String) -> void:
 
 func _on_ui_action(action: String, payload: Dictionary) -> void:
 	match action:
+		"atlas_demo": _open_atlas(true)
+		"atlas": _open_atlas(false)
 		"valley_demo": _open_valley(true)
 		"valley": _open_valley(false)
 		"intro_finished": _show_menu()
@@ -316,7 +337,7 @@ func _show_companion() -> void:
 		return
 	screen = "dialog"
 	world.set_active(false)
-	ui.show_dialog("Ein Fremder am Brunnen", "Der junge Marcus trägt einen zerbrochenen Korb. Er braucht vier Holzstücke für die Reparatur. Hilfst du ihm, obwohl du selbst erst eine Unterkunft bauen musst?", [
+	ui.show_dialog("Ein Fremder am Brunnen", "%s Vier Holzstücke genügen für die Reparatur. Möchtest du teilen?" % Origins.PEOPLES[model.data.origin_id].intro, [
 		{"label": "Vier Holz teilen und helfen", "action": "companion_help", "choice": "help"},
 		{"label": "Meine Vorräte behalte ich", "action": "companion_decline", "choice": "decline"},
 		{"label": "Ich komme später wieder", "action": "resume"}
@@ -440,5 +461,61 @@ func _leave_valley() -> void:
 	world.get_node("WorldCamera").current = true
 	if was_demo:
 		_show_menu()
+	else:
+		_resume()
+
+
+func _open_atlas(demo: bool) -> void:
+	if atlas or (screen != "menu" if demo else screen not in ["paused","playing"]):
+		return
+	atlas_return = screen
+	atlas = AtlasScreen.new()
+	atlas.demo = demo
+	atlas.data = Seasons.new_game(ui.origin_id) if demo else model.data.strategy
+	atlas.selected = atlas.data.home
+	atlas.young = not demo and model.data.player.age < 18
+	atlas.can_act = demo or (model.data.progress.skirmish_won and model.data.story.choices.is_empty() and not model.data.progress.career_terminal)
+	world.set_active(false)
+	world.process_mode = Node.PROCESS_MODE_DISABLED
+	ui.hide()
+	ui.process_mode = Node.PROCESS_MODE_DISABLED
+	screen = "atlas"
+	atlas.leave_requested.connect(_leave_atlas)
+	atlas.acted.connect(_act_atlas)
+	add_child(atlas)
+
+
+func _act_atlas(command: String,target: String) -> void:
+	if not atlas or not atlas.can_act:
+		return
+	var result: Dictionary
+	if atlas.demo:
+		result = Seasons.act(atlas.data,command,target)
+	else:
+		result = model.act_region(command,target)
+		atlas.data = model.data.strategy
+		if result.ok:
+			var saved := _save(false)
+			if not saved.ok:
+				result.message += " " + saved.message
+	atlas.refresh(result.message)
+
+
+func _leave_atlas() -> void:
+	if not atlas:
+		return
+	if not atlas.demo and not _save(false).ok:
+		atlas.refresh("Der Spielstand konnte nicht geschrieben werden.")
+		return
+	remove_child(atlas)
+	atlas.queue_free()
+	atlas = null
+	world.process_mode = Node.PROCESS_MODE_INHERIT
+	ui.process_mode = Node.PROCESS_MODE_INHERIT
+	ui.show()
+	if atlas_return == "menu":
+		_show_menu()
+	elif atlas_return == "paused":
+		_pause()
 	else:
 		_resume()

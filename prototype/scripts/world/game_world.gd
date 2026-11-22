@@ -4,6 +4,11 @@ extends Node3D
 signal action_requested(action: String, payload: Dictionary)
 
 const Art = preload("res://scripts/world/village_art.gd")
+const Grove = preload("res://scripts/visuals/grove.gd")
+const Origins = preload("res://scripts/strategy/origins.gd")
+var regional = preload("res://scripts/world/regional_village.gd").new()
+var grove = Grove.new()
+var tree_sites := []
 const PLAYER_SPEED := 4.6
 const INTERACTION_RADIUS := 3.0
 const TRAINING_LOCATION := Vector3(0, 0, -7)
@@ -83,13 +88,22 @@ func setup(state: Dictionary) -> void:
 	_camera_yaw = 0.0
 	_camera_pitch = 0.40
 	_camera_initialized = false
+	if regional.current_origin != state.get("origin_id","italia"):
+		var id: String = state.get("origin_id","italia")
+		regional.show_origin(id)
+		var placements := tree_sites.duplicate(true)
+		if id != "italia":
+			for tree in placements:
+				if tree.kind == "olive":
+					tree.kind = "oak"
+		grove.populate(placements)
 	sync_state(state)
 	set_mode("person")
 
 
 func sync_state(state: Dictionary) -> void:
 	_build_scene()
-	_state = state.duplicate(true)
+	_state = state
 	_sync_resources()
 	_sync_buildings()
 	_sync_companion()
@@ -176,6 +190,7 @@ func set_quality(profile: String) -> void:
 	if profile not in ["low", "balanced", "high"]:
 		return
 	_quality_profile = profile
+	grove.set_quality(profile)
 	_apply_quality()
 
 
@@ -331,10 +346,16 @@ func _create_terrain() -> void:
 			Art.cylinder(bridge, 0.09, 1.0, Vector3(x, 0.43, z), _materials["timber"])
 	var random := RandomNumberGenerator.new()
 	random.seed = 104729
+	ground.add_child(grove)
 	for index in range(38):
 		var x := random.randf_range(-61, -33) if index < 22 else random.randf_range(-20, 43)
 		var z := random.randf_range(-42, 28) if index < 22 else random.randf_range(-46, -27)
-		Art.tree(ground, Vector3(x, 0, z), random.randf_range(4.0, 7.0), _materials["timber"], _materials["foliage"])
+		var at := Vector3(x,0,z)
+		tree_sites.append({"kind":Grove.KINDS[index%3],"position":at,"scale":random.randf_range(0.8,1.15),"yaw":random.randf_range(-PI,PI)})
+		Art.box_collider(ground, Vector3(0.44,2.6,0.44), at+Vector3.UP*1.3)
+	for at in [Vector3(-12,0,4),Vector3(6,0,-12),Vector3(-19,0,15),Vector3(26,0,16)]:
+		tree_sites.append({"kind":Grove.KINDS[tree_sites.size()%3],"position":at,"scale":0.92,"yaw":random.randf_range(-PI,PI)})
+		Art.box_collider(ground, Vector3(0.42,2.6,0.42),at+Vector3.UP*1.3)
 	for index in range(26):
 		var location := Vector3(random.randf_range(-58, 48), -0.05, random.randf_range(-45, 31))
 		if location.x > -20 and location.x < 29 and location.z > -22 and location.z < 19:
@@ -352,31 +373,7 @@ func _create_village() -> void:
 	var village := Node3D.new()
 	village.name = "FrontierVillage"
 	add_child(village)
-	for entry: Vector3 in [Vector3(-13, 0, 10), Vector3(-14, 0, -10), Vector3(-6, 0, -16), Vector3(20, 0, -17)]:
-		var home := Node3D.new()
-		village.add_child(home)
-		home.position = entry
-		var imported := false
-		if ResourceLoader.exists("res://assets/frontier_hut.glb"):
-			var hut_scene: PackedScene = load("res://assets/frontier_hut.glb") as PackedScene
-			if hut_scene != null:
-				home.add_child(hut_scene.instantiate())
-				_add_finished_hut_collision(home)
-				imported = true
-		if not imported:
-			Art.hut(home, _materials["plaster"], _materials["timber"], _materials["tiles"])
-	var well := Node3D.new()
-	well.position = Vector3(-7, 0, 6)
-	village.add_child(well)
-	for segment in range(10):
-		var angle := TAU * float(segment) / 10.0
-		var stone := Art.box(well, Vector3(0.60, 0.70, 0.28), Vector3(sin(angle) * 0.9, 0.35, cos(angle) * 0.9), _materials["stone"], true)
-		stone.rotation.y = angle
-	Art.cylinder(well, 0.68, 0.05, Vector3(0, 0.19, 0), _materials["water"])
-	for x: float in [-1.0, 1.0]:
-		Art.box(well, Vector3(0.13, 2.4, 0.13), Vector3(x, 1.2, 0), _materials["timber"])
-	Art.box(well, Vector3(2.2, 0.13, 0.13), Vector3(0, 2.35, 0), _materials["timber"])
-	Art.box(well, Vector3(0.025, 1.5, 0.025), Vector3(0.1, 1.55, 0), _materials["straw"])
+	village.add_child(regional)
 	var market := Node3D.new()
 	market.position = Vector3(-9, 0, 0)
 	village.add_child(market)
@@ -614,9 +611,9 @@ func _add_finished_hut_collision(building: Node3D) -> void:
 func _sync_companion() -> void:
 	var companion: Dictionary = _state.get("companion", {})
 	if not bool(companion.get("met", false)):
-		_companion_label.text = "Marcus · E\nGefährten kennenlernen"
+		_companion_label.text = "%s · E\nGefährten kennenlernen" % Origins.PEOPLES[_state.get("origin_id","italia")].companion
 	else:
-		_companion_label.text = "Marcus\nVertrauen: %d" % int(companion.get("trust", 0))
+		_companion_label.text = "%s\nVertrauen: %d" % [Origins.PEOPLES[_state.get("origin_id","italia")].companion,int(companion.get("trust",0))]
 
 
 func _sync_enemies() -> void:
@@ -1064,7 +1061,7 @@ func _update_context_hint() -> void:
 		return
 	var companion: Dictionary = _state.get("companion", {})
 	if _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS and not bool(companion.get("met", false)):
-		_hint.text = "E · Mit Marcus sprechen"
+		_hint.text = "E · Mit %s sprechen" % Origins.PEOPLES[_state.get("origin_id","italia")].companion
 		return
 	var nodes: Array = _state.get("resource_nodes", [])
 	for value: Variant in nodes:

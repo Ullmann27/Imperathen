@@ -280,6 +280,8 @@ func _test_save_roundtrip_and_command_replay() -> void:
 	_check(loaded.data.world_id == model.data.world_id and loaded.data.revision == model.data.revision, "World identity and revision survive the roundtrip")
 	var old: Dictionary = loaded.data.duplicate(true)
 	old.erase("valley")
+	old.erase("origin_id")
+	old.erase("strategy")
 	old.schema_version = 1
 	var old_path := _path("v1")
 	_write_envelope(old_path,old)
