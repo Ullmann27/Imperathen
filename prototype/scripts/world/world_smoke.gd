@@ -166,6 +166,8 @@ func _run() -> void:
 	_check(root.msaa_3d == Viewport.MSAA_2X and sun.directional_shadow_max_distance > 24.0 and sun.directional_shadow_max_distance <= 55.0, "Balanced quality must apply 2x MSAA and an intermediate shadow range")
 	world.set_quality("high")
 	_check(root.msaa_3d == Viewport.MSAA_4X and sun.directional_shadow_max_distance > 55.0, "High quality must apply 4x MSAA and a larger shadow range")
+	world.set_quality("very_high")
+	_check(root.msaa_3d == Viewport.MSAA_4X and sun.directional_shadow_max_distance >= 110.0, "Ultra quality keeps 4x MSAA and expands directional shadows")
 	_check(world._state == state_before_quality and _count_collision_bodies(world) == bodies_before_quality, "Graphics quality must preserve canonical state and collision bodies")
 	world.set_quality("balanced")
 	scene.queue_free()
