@@ -10,6 +10,10 @@ const OBJECTIVE := Vector2(0.0, 15.0)
 const STEP := 0.2
 const DEFENCE_SECONDS := 120
 const CAPTURE_SECONDS := 8
+const VOLLEY_STEPS := 9
+const STRIKE_STEPS := 6
+const EQUIPPED_FORMATIONS := {"shield_wall": ["infantry", "spear"], "testudo": ["infantry"],
+	"phalanx": ["spear"], "wedge": ["infantry", "spear"]}
 const COMMANDS := ["move", "hold", "form", "deploy", "attack", "attack_move", "defend",
 	"flank", "retreat", "rally", "reserve", "focus_fire", "cease_fire"]
 
@@ -49,6 +53,8 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 		"equipment": {"infantry":"Schwert und Schild", "spear":"Speer und Schild", "archer":"Bogen"}[kind],
 		"ammo": 18 if kind == "archer" else 0, "next_volley": 0,
 		"experience": 52 if side == "ally" else 45, "discipline": 72 if side == "ally" else 62,
+		"pending_formation": "", "formation_at": 0,
+		"last_action": "", "action_step": -1, "hit_step": -1, "block_step": -1,
 		"wounded": 0, "dead": 0, "cohesion": 100.0, "reaction_seconds": 0.4, "ready_at": 0}
 	for slot in Slots.world_slots(shape, count, 0.0, at, facing):
 		s.members.append([slot.x, slot.y])
@@ -63,10 +69,16 @@ func soldiers(id: String) -> Array:
 	for i in range(s.members.size()):
 		var m: Array = s.members[i]
 		var pose := "idle"
-		match s.status:
-			"moving": pose = "walk"
-			"engaged": pose = "attack"
-			"routed": pose = "retreat"
+		if s.status == "routed":
+			pose = "retreat"
+		elif s.hit_step >= 0 and steps - s.hit_step < 2 and i % 3 == s.hit_step % 3:
+			pose = "hit"
+		elif s.block_step >= 0 and steps - s.block_step < 3 and i % 2 == 0:
+			pose = "block"
+		elif s.action_step >= 0 and steps - s.action_step < (5 if s.last_action == "shoot" else 3):
+			pose = s.last_action
+		elif s.status == "moving":
+			pose = "walk"
 		result.append({"id": "%s_%02d" % [id, i], "x": m[0], "z": m[1], "facing": s.facing, "pose": pose})
 	return result
 
@@ -78,7 +90,8 @@ func preview(id: String, start: Vector2, end: Vector2) -> Array:
 	if span.length() < 0.75 or not Field.clear_segment(start, end):
 		return []
 	var s: Dictionary = squads[id]
-	var points := Slots.world_slots(s.formation, s.strength, span.length(), (start + end) * 0.5, -span.angle())
+	var shape: String = s.formation if s.pending_formation == "" else s.pending_formation
+	var points := Slots.world_slots(shape, s.strength, span.length(), (start + end) * 0.5, -span.angle())
 	for point in points:
 		if not Field.clear_segment(point, point):
 			return []
@@ -100,6 +113,22 @@ func preview_group(ids: Array, start: Vector2, end: Vector2) -> Array:
 	return points
 
 
+static func can_form(kind: String, shape: String) -> bool:
+	return FORMATIONS.has(shape) and (not EQUIPPED_FORMATIONS.has(shape) or kind in EQUIPPED_FORMATIONS[shape])
+
+
+func _queue_formation(s: Dictionary, shape: String) -> void:
+	if s.pending_formation == shape or (s.formation == shape and s.pending_formation == ""):
+		return
+	_delay(s)
+	var enemy := _nearest(s)
+	var pressed := not enemy.is_empty() and _pos(s).distance_to(_pos(enemy)) <= 5.0
+	pressed = pressed or (s.hit_step >= 0 and steps - s.hit_step <= 6)
+	s.formation_at = s.ready_at + (5 if pressed else 1)
+	s.pending_formation = shape
+	s.width = 0.0
+
+
 func _reply(ok: bool, message: String) -> Dictionary:
 	return {"ok": ok, "message": message}
 
@@ -117,6 +146,8 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 			return _reply(false, "Dieser Verband untersteht dem Befehl nicht.")
 		if s.status == "routed" and command != "rally":
 			return _reply(false, "Der Verband flieht. Sammeln ist noch möglich.")
+		if command == "form" and (typeof(target) != TYPE_STRING or not can_form(s.kind, target)):
+			return _reply(false, "Die Ausrüstung passt nicht zu dieser Formation.")
 		if command == "focus_fire" and s.kind == "archer" and s.ammo == 0:
 			return _reply(false, "Keine Salven mehr verfügbar.")
 		if command in ["focus_fire", "cease_fire"] and s.kind != "archer":
@@ -124,8 +155,6 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 		destinations[id] = _pos(s)
 		group_center += _pos(s)
 	group_center /= float(ids.size())
-	if command == "form" and (typeof(target) != TYPE_STRING or not FORMATIONS.has(target)):
-		return _reply(false, "Unbekannte Formation.")
 	if command in ["attack", "flank", "focus_fire"]:
 		if typeof(target) != TYPE_STRING or not squads.has(target) or squads[target].side != "enemy" or not _active(squads[target]):
 			return _reply(false, "Ein aktiver gegnerischer Verband wird benötigt.")
@@ -147,11 +176,10 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 	for i in range(ids.size()):
 		var id: String = ids[i]
 		var s: Dictionary = squads[id]
-		_delay(s)
 		if command == "form":
-			s.formation = target
-			s.width = 0.0
+			_queue_formation(s, target)
 			continue
+		_delay(s)
 		if command == "cease_fire":
 			s.fire = false
 			continue
@@ -260,7 +288,7 @@ func _ai(s: Dictionary, enemy: Dictionary) -> void:
 			s.ai_reason = "Gegner am Talweg"
 		s.target = enemy.id
 		if enemy.kind == "archer" and enemy.ammo > 0 and s.kind == "infantry":
-			s.formation = "shield_wall"
+			_queue_formation(s, "shield_wall")
 			s.ai_reason = "Schließt die Schilde unter Beschuss"
 	else:
 		s.command = "attack_move"
@@ -277,6 +305,10 @@ func _step() -> void:
 	for s: Dictionary in squads.values():
 		if s.strength == 0 or s.status == "withdrawn":
 			continue
+		if s.pending_formation != "" and steps >= s.formation_at:
+			s.formation = s.pending_formation
+			s.pending_formation = ""
+			s.formation_at = 0
 		var enemy := _nearest(s)
 		if s.side == "enemy" and (steps == 1 or steps % 5 == 0):
 			_ai(s, enemy)
@@ -291,11 +323,12 @@ func _step() -> void:
 	# another squad's hit from the same simulation step.
 	for id in hits:
 		var s: Dictionary = squads[id]
+		s.hit_step = steps
 		s.damage += hits[id]
 		var lost := mini(s.strength, floori(s.damage + 0.000001))
 		if lost == 0:
 			continue
-		s.damage = maxf(0, s.damage - lost)
+		s.damage = maxf(0, s.damage - lost) if lost < s.strength else 0.0
 		s.strength -= lost
 		s.members.resize(s.strength)
 		var total_lost: int = s.initial_strength - s.strength
@@ -314,7 +347,7 @@ func _step() -> void:
 
 
 func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
-	if steps < s.ready_at:
+	if steps < s.ready_at or s.pending_formation != "":
 		s.status = "ready"
 		return
 	var dest := Vector2(s.goal_x, s.goal_z)
@@ -342,14 +375,20 @@ func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
 	if engaged:
 		s.status = "engaged"
 		var direction := _pos(s).direction_to(_pos(enemy))
-		s.facing = atan2(-direction.x, -direction.y)
-		if not ranged or steps >= s.next_volley:
-			var period := STEP
+		var bearing := atan2(-direction.x, -direction.y)
+		s.facing = rotate_toward(s.facing, bearing, STEP * 3.6)
+		var aligned := absf(angle_difference(s.facing, bearing)) <= 0.3
+		var interval := VOLLEY_STEPS if ranged else STRIKE_STEPS
+		var recovered: bool = s.action_step < 0 or steps - s.action_step >= interval
+		if aligned and recovered and (not ranged or steps >= s.next_volley):
+			s.action_step = steps
+			s.last_action = "shoot" if ranged else "attack"
 			if ranged:
 				s.ammo -= 1
-				s.next_volley = steps + 9
-				period = STEP * 9
-			var damage := _attack_power(s, enemy, ranged) * period
+				s.next_volley = steps + VOLLEY_STEPS
+			if _shield_factor(s, enemy, ranged) < 1.0:
+				enemy.block_step = steps
+			var damage := _attack_power(s, enemy, ranged) * STEP * interval
 			hits[enemy.id] = float(hits.get(enemy.id, 0.0)) + damage
 		s.fatigue = minf(100, s.fatigue + STEP)
 	elif s.command in ["hold", "reserve", "rally"]:
@@ -378,15 +417,19 @@ func _attack_power(s: Dictionary, enemy: Dictionary, ranged: bool) -> float:
 	var elevation := ground_height(s.x, s.z) - ground_height(enemy.x, enemy.z)
 	power *= clampf(1.0 + 0.1 * elevation, 0.85, 1.15)
 	var guard := 0.76 if enemy.command in ["defend", "hold"] else 1.0
-	var front := Vector2(-sin(enemy.facing), -cos(enemy.facing))
-	var from_target := _pos(enemy).direction_to(_pos(s))
-	if ranged and enemy.formation == "testudo":
-		guard *= 0.62
-	elif enemy.formation == "shield_wall" and front.dot(from_target) > 0.25:
-		guard *= 0.72 if ranged else 0.87
+	guard *= _shield_factor(s, enemy, ranged)
 	if s.formation == "phalanx" and s.kind == "spear":
 		power *= 1.12
 	return power * guard * (0.043 if ranged else 0.075)
+
+
+func _shield_factor(s: Dictionary, enemy: Dictionary, ranged: bool) -> float:
+	if ranged and enemy.formation == "testudo":
+		return 0.62
+	var front := Vector2(-sin(enemy.facing), -cos(enemy.facing))
+	if enemy.formation == "shield_wall" and front.dot(_pos(enemy).direction_to(_pos(s))) > 0.25:
+		return 0.72 if ranged else 0.87
+	return 1.0
 
 
 func _walk(s: Dictionary, dest: Vector2, speed: float) -> bool:
@@ -460,7 +503,7 @@ func summary() -> Dictionary:
 
 
 func snapshot() -> Dictionary:
-	return {"schema": 1, "steps": steps, "capture": capture, "remainder": _remainder,
+	return {"schema": 2, "steps": steps, "capture": capture, "remainder": _remainder,
 		"outcome": outcome, "reason": reason, "squads": squads.duplicate(true)}
 
 
@@ -469,17 +512,29 @@ func _number(v: Variant, low: float, high: float, integer: bool = false) -> bool
 
 
 func restore(save: Dictionary) -> bool:
-	if save.get("schema") != 1 or typeof(save.get("squads")) != TYPE_DICTIONARY or save.squads.size() != squads.size():
+	if save.size() != 7 or not _number(save.get("schema"), 1, 2, true) or typeof(save.get("squads")) != TYPE_DICTIONARY or save.squads.size() != squads.size():
 		return false
 	if not _number(save.get("steps"), 0, DEFENCE_SECONDS / STEP, true) or not _number(save.get("capture"), 0, CAPTURE_SECONDS / STEP, true):
 		return false
 	if not _number(save.get("remainder"), 0, STEP) or not save.get("outcome") in ["ongoing", "victory", "defeat", "draw"] or typeof(save.get("reason")) != TYPE_STRING:
 		return false
+	if save.capture > save.steps or save.remainder >= STEP or (save.outcome != "ongoing" and save.remainder != 0):
+		return false
 	var restored := {}
 	for id in squads:
 		var original: Dictionary = squads[id]
 		var s: Variant = save.squads.get(id)
-		if typeof(s) != TYPE_DICTIONARY or s.size() != original.size():
+		if typeof(s) != TYPE_DICTIONARY:
+			return false
+		if save.schema == 1:
+			s = s.duplicate(true)
+			for key in ["pending_formation", "formation_at", "last_action", "action_step", "hit_step", "block_step"]:
+				if s.has(key):
+					return false
+			s.merge({"pending_formation":"", "formation_at":0, "last_action":"", "action_step":-1, "hit_step":-1, "block_step":-1})
+			if s.has("kind") and s.has("formation") and typeof(s.kind) == TYPE_STRING and typeof(s.formation) == TYPE_STRING and FORMATIONS.has(s.formation) and not can_form(s.kind, s.formation):
+				s.formation = "line"
+		if s.size() != original.size() or not s.has_all(original.keys()):
 			return false
 		for key in ["id", "army_id", "side", "name", "kind", "initial_strength", "equipment", "experience", "discipline", "commander_id", "deputy_id"]:
 			if s.get(key) != original[key]:
@@ -495,9 +550,34 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if not _number(s.get("ammo"), 0, 18 if original.kind == "archer" else 0, true) or not _number(s.get("next_volley"), 0, save.steps + 9, true):
 			return false
-		if not FORMATIONS.has(s.get("formation")) or not COMMANDS.has(s.get("command")) or not s.get("status") in ["ready","engaged","moving","routed","withdrawn","destroyed"]:
+		if typeof(s.pending_formation) != TYPE_STRING or not _number(s.formation_at, 0, save.steps + 11, true):
+			return false
+		if (s.pending_formation == "") != (s.formation_at == 0):
+			return false
+		if s.pending_formation != "" and (not can_form(s.kind, s.pending_formation) or (s.formation_at <= save.steps and s.status not in ["destroyed","withdrawn"])):
+			return false
+		if s.last_action not in ["","attack","shoot"] or s.last_action == "shoot" and s.kind != "archer":
+			return false
+		for key in ["action_step", "hit_step", "block_step"]:
+			if not _number(s[key], -1, save.steps, true) or s[key] == 0:
+				return false
+		if (s.action_step < 0) != (s.last_action == "") or (s.kind != "archer" and (s.next_volley != 0 or not s.fire)):
+			return false
+		if s.kind == "archer" and ((s.ammo == 18) != (s.next_volley == 0)):
+			return false
+		if s.last_action == "shoot" and s.next_volley != s.action_step + VOLLEY_STEPS:
+			return false
+		if not is_equal_approx(s.reaction_seconds / STEP, roundf(s.reaction_seconds / STEP)) or s.ready_at > save.steps + roundi(s.reaction_seconds / STEP):
+			return false
+		if s.reaction_seconds < 2 * STEP or s.reaction_seconds > 6 * STEP + 0.00001:
+			return false
+		if typeof(s.formation) != TYPE_STRING or not can_form(s.kind, s.formation) or not COMMANDS.has(s.get("command")) or not s.get("status") in ["ready","engaged","moving","routed","withdrawn","destroyed"]:
 			return false
 		if typeof(s.get("fire")) != TYPE_BOOL or typeof(s.get("ai_reason")) != TYPE_STRING or typeof(s.get("target")) != TYPE_STRING:
+			return false
+		if s.command in ["form", "cease_fire"] or (s.command == "focus_fire" and s.kind != "archer"):
+			return false
+		if s.command in ["attack","flank","focus_fire"] and s.target == "":
 			return false
 		if s.target != "" and (not squads.has(s.target) or squads[s.target].side == original.side):
 			return false
@@ -507,6 +587,11 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if not _number(s.get("x"), -28, 28) or not _number(s.get("z"), -22, 22) or not _number(s.get("goal_x"), -28, 28) or not _number(s.get("goal_z"), -22, 22):
 			return false
+		var goal := Vector2(s.goal_x, s.goal_z)
+		if not Field.clear_segment(goal, goal) or s.damage >= 1.0:
+			return false
+		if s.dead != floori((s.initial_strength - s.strength) / 3.0):
+			return false
 		if not Field.clear_segment(_pos(s), _pos(s)) or (s.strength == 0) != (s.status == "destroyed"):
 			return false
 		for m in s.members:
@@ -515,7 +600,7 @@ func restore(save: Dictionary) -> bool:
 			if not Field.clear_segment(Vector2(m[0], m[1]), Vector2(m[0], m[1])):
 				return false
 		restored[id] = s.duplicate(true)
-		for key in ["strength", "initial_strength", "ready_at", "next_volley", "ammo", "experience", "discipline", "wounded", "dead"]:
+		for key in ["strength", "initial_strength", "action_step", "hit_step", "block_step", "formation_at", "ready_at", "next_volley", "ammo", "experience", "discipline", "wounded", "dead"]:
 			restored[id][key] = int(s[key])
 	if _result(restored, int(save.steps), int(save.capture)) != [save.outcome, save.reason]:
 		return false

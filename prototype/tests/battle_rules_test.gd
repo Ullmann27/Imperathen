@@ -18,6 +18,8 @@ func _initialize() -> void:
 	_test_defeat()
 	_test_battle_factors()
 	_test_objective()
+	_test_contact_windows()
+	_test_pending_and_validation()
 	print("BATTLE_RULES_RESULT checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
 
@@ -34,7 +36,8 @@ func _test_orders() -> void:
 	var before := m.snapshot()
 	check(m.squads.size() == 6 and m.summary().ally.initial == 30 and m.summary().enemy.initial == 30, "Army rosters")
 	for pair in [[[], "hold", null], [[GUARD, ENEMY], "hold", null], [[GUARD, GUARD], "hold", null],
-			[[GUARD], "form", "?"], [[GUARD], "attack", BOWS], [[GUARD], "flank", ""],
+			[[GUARD], "form", "?"], [[GUARD],"form","phalanx"], [[BOWS],"form","testudo"],
+			[[SPEARS],"form","testudo"], [[BOWS],"form","shield_wall"], [[GUARD,BOWS],"form","wedge"], [[GUARD], "attack", BOWS], [[GUARD], "flank", ""],
 			[[BOWS, GUARD], "focus_fire", ENEMY], [[GUARD], "move", Vector2(INF,0)],
 			[[GUARD], "move", Vector2(100,0)], [[GUARD], "move", Vector2(-12,-2)],
 			[[GUARD], "deploy", {"start": Vector2.ZERO, "end": Vector2.ZERO}]]:
@@ -54,9 +57,10 @@ func _test_slots_and_routes() -> void:
 	var m := Battle.new()
 	var layouts := {}
 	for shape in Battle.FORMATIONS:
-		m.order([GUARD], "form", shape)
-		var points := m.preview(GUARD, Vector2(-11,13), Vector2(-4,13))
-		check(points.size() == m.squads[GUARD].strength, "Every member has a deploy slot: " + shape)
+		var unit := SPEARS if shape == "phalanx" else GUARD
+		check(m.order([unit], "form", shape).ok, "Equipped formation accepted: " + shape)
+		var points := m.preview(unit, Vector2(-11,13), Vector2(-4,13))
+		check(points.size() == m.squads[unit].strength, "Every member has a deploy slot: " + shape)
 		layouts[str(points)] = true
 	check(layouts.size() == 7, "Seven distinct formations even on the same drawn front")
 	m.order([GUARD], "form", "line")
@@ -179,3 +183,84 @@ func _test_objective() -> void:
 	check(m.outcome == "ongoing" and m.capture > 0, "Marker capture takes time")
 	m.tick(0.2)
 	check(m.outcome == "defeat" and m.reason == "Das Talzeichen ist gefallen.", "Uncontested marker lost after eight seconds")
+
+
+func _positions(m, changes: Dictionary) -> void:
+	var save: Dictionary = m.snapshot()
+	for id in changes:
+		var squad: Dictionary = save.squads[id]
+		var at: Vector2 = changes[id]
+		squad.x = at.x
+		squad.z = at.y
+		squad.goal_x = at.x
+		squad.goal_z = at.y
+		squad.members.clear()
+		for p in Battle.Slots.world_slots(squad.formation, squad.strength, squad.width, at, squad.facing):
+			squad.members.append([p.x, p.y])
+	check(m.restore(save), "Contact fixture respects valid field positions")
+
+
+func _has_pose(m, id: String, pose: String) -> bool:
+	for soldier in m.soldiers(id):
+		if soldier.pose == pose:
+			return true
+	return false
+
+
+func _test_contact_windows() -> void:
+	var m := Battle.new()
+	_positions(m, {GUARD:Vector2(-7,8), ENEMY:Vector2(-7,5), BOWS:Vector2(-7,14)})
+	var enemy: Dictionary = m.squads[ENEMY]
+	enemy.formation = "shield_wall"
+	var guard: Dictionary = m.squads[GUARD]
+	guard.facing = PI
+	m.tick(Battle.STEP)
+	check(not _has_pose(m, GUARD, "attack") and guard.action_step == -1, "Backward-facing melee unit turns before connecting")
+	check(_has_pose(m, BOWS, "shoot") and m.squads[BOWS].ammo == 17, "Shoot pose starts at an actual volley")
+	check(_has_pose(m, ENEMY, "block") and _has_pose(m, ENEMY, "hit"), "Facing wall responds to incoming volley")
+	for step in 4:
+		m.tick(Battle.STEP)
+	check(_has_pose(m, GUARD, "attack") and guard.action_step > 0, "In-range, aligned unit lands its strike")
+	var first_attack: int = guard.action_step
+	m.tick(0.6)
+	check(guard.action_step == first_attack and not _has_pose(m, GUARD, "attack"), "Sword has a recovery window")
+	check(not _has_pose(m, BOWS, "shoot") and m.squads[BOWS].ammo == 17, "No shooting through the reload")
+	m.order([BOWS], "cease_fire")
+	m.tick(2.0)
+	check(m.squads[BOWS].ammo == 17 and not _has_pose(m, BOWS, "shoot"), "Cease fire prevents volleys and their poses")
+	var far := Battle.new()
+	far.tick(2)
+	check(not _has_pose(far, GUARD, "attack") and not _has_pose(far, BOWS, "shoot"), "No attack poses out of range")
+
+
+func _test_pending_and_validation() -> void:
+	var m := Battle.new()
+	m.order([GUARD],"form","testudo")
+	var calm: int = m.squads[GUARD].formation_at
+	_positions(m, {ENEMY:Vector2(-7,5)})
+	check(m.order([GUARD],"form","line").ok, "Can issue compatible formation under pressure")
+	var s: Dictionary = m.squads[GUARD]
+	check(s.formation_at > calm and s.formation == "shield_wall", "Contact delays the new formation")
+	var pending := m.snapshot()
+	var fresh := Battle.new()
+	check(fresh.restore(JSON.parse_string(JSON.stringify(pending))), "Pending reformation survives JSON")
+	var deadline: int = s.formation_at
+	m.tick((deadline - 1) * Battle.STEP)
+	check(s.formation == "shield_wall", "No shape or defence bonus before transition")
+	m.tick(Battle.STEP)
+	fresh.tick(deadline * Battle.STEP)
+	check(s.formation == "line" and s.pending_formation == "" and fresh.squads[GUARD].formation == "line", "Delayed formation becomes active at deadline")
+	for change in [["ready_at", 90], ["reaction_seconds", 0.517], ["action_step", 0], ["block_step", 999],
+			["goal_x", -12], ["pending_formation", "phalanx"], ["next_volley",1], ["last_action","shoot"]]:
+		var bad := pending.duplicate(true)
+		bad.squads[GUARD][change[0]] = change[1]
+		if change[0] == "goal_x":
+			bad.squads[GUARD].goal_z = -2
+		check(not fresh.restore(bad), "Reject invalid snapshot field " + change[0])
+	var legacy := Battle.new().snapshot()
+	legacy.schema = 1
+	for squad in legacy.squads.values():
+		for key in ["pending_formation","formation_at","last_action","action_step","hit_step","block_step"]:
+			squad.erase(key)
+	legacy.squads[BOWS].formation = "testudo"
+	check(fresh.restore(JSON.parse_string(JSON.stringify(legacy))) and fresh.squads[BOWS].formation == "line", "Retain older snapshots with equipment-compatible shape")
