@@ -1,0 +1,73 @@
+{
+  "essential_assets": 6,
+  "failures": [],
+  "passed": true,
+  "profile_runs": [
+    {
+      "label": "Niedrig",
+      "msaa_samples": 0,
+      "output_size": [
+        64,
+        64
+      ],
+      "profile": "low",
+      "render_scale": 1.0,
+      "renderer": "mobile",
+      "shadow_distance_metres": 24.0,
+      "visible_decorations": 352
+    },
+    {
+      "label": "Ausgewogen",
+      "msaa_samples": 2,
+      "output_size": [
+        64,
+        64
+      ],
+      "profile": "balanced",
+      "render_scale": 1.0,
+      "renderer": "mobile",
+      "shadow_distance_metres": 48.0,
+      "visible_decorations": 960
+    },
+    {
+      "label": "Hoch",
+      "msaa_samples": 4,
+      "output_size": [
+        64,
+        64
+      ],
+      "profile": "high",
+      "render_scale": 1.0,
+      "renderer": "mobile",
+      "shadow_distance_metres": 85.0,
+      "visible_decorations": 1600
+    },
+    {
+      "label": "Niedrig",
+      "msaa_samples": 0,
+      "output_size": [
+        64,
+        64
+      ],
+      "profile": "low",
+      "render_scale": 1.0,
+      "renderer": "mobile",
+      "shadow_distance_metres": 24.0,
+      "visible_decorations": 352
+    },
+    {
+      "label": "Ausgewogen",
+      "msaa_samples": 2,
+      "output_size": [
+        64,
+        64
+      ],
+      "profile": "balanced",
+      "render_scale": 1.0,
+      "renderer": "mobile",
+      "shadow_distance_metres": 48.0,
+      "visible_decorations": 960
+    }
+  ],
+  "render_proof": false
+}

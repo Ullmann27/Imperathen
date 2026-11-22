@@ -1,0 +1,133 @@
+{
+  "generator": "tools/art/generate_materials.py",
+  "seed_base": 8421,
+  "resolution": [
+    512,
+    512
+  ],
+  "tile_size_metres": 1,
+  "source": "Original periodic procedural fields; no source photos or external material packs.",
+  "normal_convention": "OpenGL tangent normal (+Y); Blender glTF export",
+  "files": [
+    {
+      "path": "plaster_basecolor.png",
+      "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+      "bytes": 161720
+    },
+    {
+      "path": "plaster_normal.png",
+      "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+      "bytes": 308124
+    },
+    {
+      "path": "plaster_roughness.png",
+      "sha256": "66202b56cd022837b785fc98ce08a57fc66eed94b2a753e0c8e98cae2ee87e39",
+      "bytes": 69561
+    },
+    {
+      "path": "limestone_basecolor.png",
+      "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+      "bytes": 137714
+    },
+    {
+      "path": "limestone_normal.png",
+      "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+      "bytes": 309224
+    },
+    {
+      "path": "limestone_roughness.png",
+      "sha256": "66a97034f3d4f1f3a875f4f769fac2294cb6b8ef3a18d87c1174e3ccb128b70c",
+      "bytes": 69433
+    },
+    {
+      "path": "oak_basecolor.png",
+      "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+      "bytes": 115206
+    },
+    {
+      "path": "oak_normal.png",
+      "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+      "bytes": 364306
+    },
+    {
+      "path": "oak_roughness.png",
+      "sha256": "b31aa9c6b040a73d7c245f6827768bbc3d51877e5bbcfebd1120dbeff8ca8e75",
+      "bytes": 72507
+    },
+    {
+      "path": "terracotta_basecolor.png",
+      "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+      "bytes": 139322
+    },
+    {
+      "path": "terracotta_normal.png",
+      "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+      "bytes": 324447
+    },
+    {
+      "path": "terracotta_roughness.png",
+      "sha256": "66ed17d4ac01a41d60032f9f4cc85da654c16957832a7dd7bfdebc5b1442b13b",
+      "bytes": 71611
+    },
+    {
+      "path": "linen_basecolor.png",
+      "sha256": "7c2713a515d1fb427e4615a61259ba42728ce5289fd221d26b3ca0ef8d6192d9",
+      "bytes": 172622
+    },
+    {
+      "path": "linen_normal.png",
+      "sha256": "d62f8e8870d0a15c6df4c96c2f513c205d28666f18ecff2769db9836ebd7d162",
+      "bytes": 330013
+    },
+    {
+      "path": "linen_roughness.png",
+      "sha256": "191ec71547dd24baa58ec539d13488c0855dd13cf31a9b5c703cced9ce4f4d98",
+      "bytes": 68722
+    },
+    {
+      "path": "leather_basecolor.png",
+      "sha256": "3da4fec606ee3ddd1de830a5e95511496d80b10497459f94585b5de16d3481de",
+      "bytes": 79377
+    },
+    {
+      "path": "leather_normal.png",
+      "sha256": "fb8e2a7077c5006903df04e6441bdb5fe2574c728dcd35336ace159ca4c6014a",
+      "bytes": 353206
+    },
+    {
+      "path": "leather_roughness.png",
+      "sha256": "6be5969fd95c10c05ec91553c906e8ccb455e83aa0c1e3fd1e43c97a46f0c9f6",
+      "bytes": 65197
+    },
+    {
+      "path": "bronze_basecolor.png",
+      "sha256": "ecbfa3242436275c538f96f055877c3ad82f7e34e214068bcb270678d60bac14",
+      "bytes": 135678
+    },
+    {
+      "path": "bronze_normal.png",
+      "sha256": "234b5d74731a6c4c8a61a4e00980f94b4c3cf6bc230480246f934ad85e4dfcf4",
+      "bytes": 298673
+    },
+    {
+      "path": "bronze_roughness.png",
+      "sha256": "f320837c6d798dc6c6390261b1b41a2dcefc8a1f13995da213b4764562fafb07",
+      "bytes": 72779
+    },
+    {
+      "path": "earth_basecolor.png",
+      "sha256": "fe36eac8927bdd8d7c1371732ca408669b355fb1df308db802c30af7787cdab9",
+      "bytes": 131820
+    },
+    {
+      "path": "earth_normal.png",
+      "sha256": "0d3e0f14cccde761d988a45b48157c58e7399a9e9e9cad74067a425e9080e009",
+      "bytes": 353297
+    },
+    {
+      "path": "earth_roughness.png",
+      "sha256": "1fabb050109c2c8a18a2cbb0a016bb9816e7e090e81ef725de1cb85bb9356baa",
+      "bytes": 69470
+    }
+  ]
+}

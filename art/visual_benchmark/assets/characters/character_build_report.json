@@ -1,0 +1,81 @@
+{
+  "blender_version": "4.3.2",
+  "source": "Original procedural geometry authored for IMPERATHEN; no external model provider.",
+  "status": "Static character modelling studies; no skeletal animation claim.",
+  "assets": {
+    "civilian_youth": {
+      "mesh_objects": 104,
+      "source_vertices": 9848,
+      "source_triangles": 18939,
+      "dimensions_m": [
+        0.584,
+        0.2698,
+        1.5189
+      ],
+      "bounds_min_m": [
+        -0.292,
+        -0.153,
+        0.0
+      ],
+      "rigged": false,
+      "animations": [],
+      "intended_use": "Static art reference and scene population; rigging, deformation and gameplay integration remain unverified."
+    },
+    "civilian_youth_lod1": {
+      "mesh_objects": 4,
+      "source_vertices": 5445,
+      "source_triangles": 7898,
+      "dimensions_m": [
+        0.584,
+        0.2698,
+        1.5189
+      ],
+      "bounds_min_m": [
+        -0.292,
+        -0.153,
+        0.0
+      ],
+      "rigged": false,
+      "animations": [],
+      "intended_use": "Reduced detail for distant/static scene population. The base asset remains the close-up source.",
+      "lod_of": "civilian_youth"
+    },
+    "frontier_guard": {
+      "mesh_objects": 151,
+      "source_vertices": 10266,
+      "source_triangles": 18931,
+      "dimensions_m": [
+        0.9941,
+        0.4899,
+        1.7786
+      ],
+      "bounds_min_m": [
+        -0.3419,
+        -0.2986,
+        -0.0
+      ],
+      "rigged": false,
+      "animations": [],
+      "intended_use": "Static art reference and scene population; rigging, deformation and gameplay integration remain unverified."
+    },
+    "frontier_guard_lod1": {
+      "mesh_objects": 7,
+      "source_vertices": 6035,
+      "source_triangles": 7895,
+      "dimensions_m": [
+        0.9941,
+        0.4899,
+        1.7786
+      ],
+      "bounds_min_m": [
+        -0.3419,
+        -0.2986,
+        -0.0
+      ],
+      "rigged": false,
+      "animations": [],
+      "intended_use": "Reduced detail for distant/static scene population. The base asset remains the close-up source.",
+      "lod_of": "frontier_guard"
+    }
+  }
+}
