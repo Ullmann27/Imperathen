@@ -21,6 +21,8 @@ func _run() -> void:
 		for level in Grove.LEVELS:
 			var batch := grove.get_node(kind + "_" + level) as MultiMeshInstance3D
 			var mesh := batch.multimesh.mesh
+			if not Grove.CANOPY_BOUNDS[kind].encloses(mesh.get_aabb()):
+				errors.append("Culling bound clips native mesh " + batch.name)
 			if mesh.get_surface_count() != 2 or batch.multimesh.visible_instance_count != 1:
 				errors.append("Mesh or batch " + batch.name)
 			var count := 0
@@ -64,5 +66,64 @@ func _run() -> void:
 				errors.append("Farmer playback")
 		object.free()
 	grove.free()
+	await _verify_frustum(errors)
 	print("Tree import, instancing and LOD checks: ", errors)
 	quit(0 if errors.is_empty() else 1)
+
+func _verify_frustum(errors: Array[String]) -> void:
+	var view := SubViewport.new()
+	view.size = Vector2i(320,320)
+	view.own_world_3d = true
+	root.add_child(view)
+	var camera := Camera3D.new()
+	view.add_child(camera)
+	camera.position = Vector3(0,4,0)
+	camera.set_orthogonal(16,0.2,70)
+	camera.current = true
+	var grove := Grove.new()
+	view.add_child(grove)
+	var sites := [
+		{"kind":"oak", "position":Vector3(0,0,-16)}, # Entire canopy inside.
+		{"kind":"oak", "position":Vector3(11,0,-12)}, # Only its canopy is inside.
+		{"kind":"olive", "position":Vector3(19,0,-18)}, # Outside until a wider view.
+		{"kind":"pine", "position":Vector3(0,0,24)}, # Behind the camera.
+		{"kind":"oak", "position":Vector3(0,0,-90)}, # Beyond the far plane.
+		{"kind":"pine", "position":Vector3(0,-15,-29), "scale":2.0, "yaw":1.24},
+	]
+	grove.populate(sites)
+	var counts: Array[int] = []
+	_expect_visible(grove,3,"narrow view including two boundary canopies",counts,errors)
+	camera.rotation.y = PI
+	_expect_visible(grove,1,"camera turns in place",counts,errors)
+	camera.rotation.y = 0
+	camera.size = 44
+	_expect_visible(grove,4,"orthographic zoom",counts,errors)
+	camera.size = 16
+	view.size = Vector2i(640,320)
+	await process_frame
+	_expect_visible(grove,4,"wider aspect",counts,errors)
+	view.size = Vector2i(320,320)
+	await process_frame
+	camera.far = 120
+	_expect_visible(grove,4,"far clip change",counts,errors)
+	camera.far = 70
+	grove.position.x = 80
+	_expect_visible(grove,0,"translated grove",counts,errors)
+	grove.position.x = 0
+	camera.set_perspective(27,0.2,70)
+	_expect_visible(grove,2,"perspective narrows",counts,errors)
+	camera.fov = 110
+	_expect_visible(grove,4,"perspective zoom in place",counts,errors)
+	print("Fixed six-tree camera fixture, submitted counts: ", counts)
+	view.free()
+
+func _expect_visible(grove, expected: int, label_text: String, counts: Array[int], errors: Array[String]) -> void:
+	grove._process(0.0)
+	counts.append(grove.visible_tree_count)
+	var submitted := 0
+	for batch: MultiMeshInstance3D in grove.get_children():
+		if batch.visible:
+			submitted += batch.multimesh.visible_instance_count
+	var lod: Vector3i = grove.visible_tree_lods
+	if grove.visible_tree_count != expected or submitted != expected or lod.x+lod.y+lod.z != expected:
+		errors.append("%s: expected %d trees, submitted %d" % [label_text,expected,submitted])
