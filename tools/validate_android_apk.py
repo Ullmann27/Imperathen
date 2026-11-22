@@ -63,7 +63,7 @@ VILLAGE_RESOURCES = (
     *(f"assets/village_characters/{role}_{level}.glb"
       for role in ("officer", "heavy", "spear") for level in (2, 3)),
     *(f"assets/village/{asset}.glb" for asset in
-      ("market", "workshop", "storehouse", "palisade_bay", "training_dummy", "timber_billet")),
+      ("market", "workshop", "storehouse", "palisade_bay", "palisade_silhouette", "training_dummy", "timber_billet")),
     *(f"assets/village/{name}.png" for name in ("valdorf_color", "valdorf_normal", "valdorf_orm",
       "track_color", "track_relief", "verge_color", "verge_relief", "sky_clouds")),
 )
