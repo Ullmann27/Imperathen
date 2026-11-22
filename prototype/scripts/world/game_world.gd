@@ -8,6 +8,7 @@ const Grove = preload("res://scripts/visuals/grove.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 var regional = preload("res://scripts/world/regional_village.gd").new()
 var grove = Grove.new()
+var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
 var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
@@ -48,6 +49,7 @@ var _touch_preview_position := Vector2.ZERO
 var _map_focus := Vector3(-7, 0, -7)
 var _quality_profile := "balanced"
 var _sun: DirectionalLight3D
+var _village_environment := Environment.new()
 var _player: CharacterBody3D
 var _figure: Node3D
 var _camera: Camera3D
@@ -197,7 +199,12 @@ func set_quality(profile: String) -> void:
 		return
 	_quality_profile = profile
 	grove.set_quality(profile)
+	scenery.set_quality(profile)
 	_apply_quality()
+
+
+func set_presentation_time(seconds: float) -> void:
+	scenery.set_presentation_time(seconds)
 
 
 func get_quality_profile() -> String:
@@ -306,21 +313,20 @@ func _build_scene() -> void:
 
 func _create_atmosphere() -> void:
 	var world_environment := WorldEnvironment.new()
-	var environment := Environment.new()
+	var environment := _village_environment
 	environment.background_mode = Environment.BG_SKY
 	var sky := Sky.new()
-	var sky_paint := ProceduralSkyMaterial.new()
-	sky_paint.sky_top_color = Color(0.25, 0.40, 0.54)
-	sky_paint.sky_horizon_color = Color(0.77, 0.73, 0.60)
-	sky_paint.ground_bottom_color = Color(0.17, 0.20, 0.16)
-	sky_paint.ground_horizon_color = Color(0.64, 0.61, 0.49)
-	sky.sky_material = sky_paint
+	sky.radiance_size = Sky.RADIANCE_SIZE_64
+	sky.sky_material = scenery.sky_material
 	environment.sky = sky
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color(0.69, 0.77, 0.85)
 	environment.ambient_light_energy = 0.58
-	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	environment.ambient_light_sky_contribution = 0.0
+	environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	environment.fog_enabled = true
+	environment.fog_sky_affect = 0.06
+	environment.fog_sun_scatter = 0.04
 	environment.fog_density = 0.0015
 	environment.fog_light_color = Color(0.63, 0.69, 0.66)
 	world_environment.environment = environment
@@ -329,7 +335,7 @@ func _create_atmosphere() -> void:
 	sun.name = "AfternoonSun"
 	sun.rotation_degrees = Vector3(-42, -28, 0)
 	sun.light_color = Color(1.0, 0.88, 0.69)
-	sun.light_energy = 1.45
+	sun.light_energy = 0.46
 	sun.shadow_enabled = true
 	sun.directional_shadow_max_distance = 95.0
 	add_child(sun)
@@ -340,12 +346,9 @@ func _create_terrain() -> void:
 	var ground := Node3D.new()
 	ground.name = "Landscape"
 	add_child(ground)
-	Art.box(ground, Vector3(180, 0.5, 170), Vector3(0, -0.26, -15), _materials["earth"], true)
-	Art.box(ground, Vector3(4.3, 0.05, 105), Vector3(0, 0.005, -12), _materials["path"])
-	Art.box(ground, Vector3(50, 0.055, 3.2), Vector3(-2, 0.01, 4), _materials["path"])
-	Art.box(ground, Vector3(8, 0.025, 160), Vector3(-28, 0.025, -15), _materials["water"])
-	for side: float in [-1.0, 1.0]:
-		Art.box(ground, Vector3(1.5, 0.06, 160), Vector3(-28 + side * 4.6, -0.01, -15), _materials["dark_stone"])
+	ground.add_child(scenery)
+	scenery.name = "VillageScenery"
+	scenery.create_land()
 	var bridge := Node3D.new()
 	bridge.position = Vector3(-28, 0.03, 4)
 	ground.add_child(bridge)
@@ -372,8 +375,6 @@ func _create_terrain() -> void:
 		if location.x > -20 and location.x < 29 and location.z > -22 and location.z < 19:
 			continue
 		Art.sphere(ground, random.randf_range(0.35, 0.90), location, _materials["dark_stone"], Vector3(1.3, 0.6, 1.0))
-	for index in range(10):
-		Art.sphere(ground, 12.0 + index % 3 * 4.0, Vector3(-75 + index * 17, -4, -78 - index % 2 * 12), _materials["foliage"], Vector3(1.2, 0.7, 0.9))
 	for x: float in [-64, 58]:
 		Art.box_collider(ground, Vector3(1, 15, 105), Vector3(x, 7, -8))
 	for z: float in [-58, 40]:
@@ -385,21 +386,10 @@ func _create_village() -> void:
 	village.name = "FrontierVillage"
 	add_child(village)
 	village.add_child(regional)
-	var market := Node3D.new()
-	market.position = Vector3(-9, 0, 0)
-	village.add_child(market)
-	Art.box(market, Vector3(3, 0.16, 1.2), Vector3(0, 0.85, 0), _materials["timber"], true)
-	for x: float in [-1.4, 1.4]:
-		for z: float in [-0.45, 0.45]:
-			Art.box(market, Vector3(0.10, 2.4, 0.10), Vector3(x, 1.2, z), _materials["timber"])
-	Art.box(market, Vector3(3.3, 0.08, 1.5), Vector3(0, 2.4, 0), _materials["red"])
-	for index in range(4):
-		Art.sphere(market, 0.28, Vector3(-0.9 + index * 0.6, 1.10, 0), _materials["wheat"], Vector3(0.8, 0.9, 0.8))
+	scenery.add_businesses(village)
 	_create_palisade(village)
-	Art.box(village, Vector3(10, 0.055, 5), Vector3(11, 0.0, -17), _materials["field"])
 	village.add_child(crops)
-	for index in range(12):
-		Art.box(crops, Vector3(0.18, 0.28, 4.6), Vector3(6.7 + index * 0.75, 0.12, -17), _materials["wheat"])
+	scenery.sow_field(crops)
 	for x: float in [-3, 3]:
 		Art.box(village, Vector3(0.22, 4.6, 0.22), Vector3(x, 2.3, 18), _materials["timber"], true)
 		Art.box(village, Vector3(1.2, 1.8, 0.04), Vector3(x + 0.56, 3.6, 18), _materials["red"])
@@ -408,21 +398,23 @@ func _create_village() -> void:
 
 func _create_palisade(parent: Node3D) -> void:
 	for z: float in [-21.0, 18.0]:
+		var poses := []
 		for index in range(34):
 			var x := -19.0 + index * 1.4
 			if absf(x) < 3.0:
 				continue
-			Art.cylinder(parent, 0.23, 2.5, Vector3(x, 1.25, z), _materials["timber"], 0.13)
-			Art.box(parent, Vector3(1.55, 0.16, 0.12), Vector3(x, 1.55, z), _materials["cut_wood"])
+			poses.append(Transform3D(Basis.IDENTITY,Vector3(x,0,z)))
+		scenery.palisade_bays(parent,poses)
 		Art.box_collider(parent, Vector3(16, 2.5, 0.5), Vector3(-11, 1.25, z))
 		Art.box_collider(parent, Vector3(25, 2.5, 0.5), Vector3(15.5, 1.25, z))
 	for x: float in [-19.0, 28.0]:
+		var poses := []
 		for index in range(28):
 			var z := -20.0 + index * 1.4
 			if x < 0.0 and absf(z - 4.0) < 2.2:
 				continue
-			Art.cylinder(parent, 0.23, 2.5, Vector3(x, 1.25, z), _materials["timber"], 0.13)
-			Art.box(parent, Vector3(0.12, 0.16, 1.55), Vector3(x, 1.55, z), _materials["cut_wood"])
+			poses.append(Transform3D(Basis(Vector3.UP,PI/2),Vector3(x,0,z)))
+		scenery.palisade_bays(parent,poses)
 		if x > 0.0:
 			Art.box_collider(parent, Vector3(0.5, 2.5, 39), Vector3(x, 1.25, -1.5))
 		else:
@@ -526,9 +518,10 @@ func _sync_resources() -> void:
 			stock.name = identity
 			_resources_root.add_child(stock)
 			for index in range(4):
-				var log_view := Art.cylinder(stock, 0.20, 1.9, Vector3(-0.35 + index % 2 * 0.55, 0.22 + index / 2 * 0.32, 0), _materials["cut_wood"])
+				var log_view := preload("res://assets/village/timber_billet.glb").instantiate() as Node3D
+				log_view.position = Vector3(-0.35 + index % 2 * 0.55, 0.22 + index / 2 * 0.32, 0)
+				stock.add_child(log_view)
 				log_view.name = "Log%d" % index
-				log_view.rotation.x = PI * 0.5
 			var stock_label := Art.label(stock, "", Vector3(0, 1.55, 0), Color(0.94, 0.84, 0.59), 36)
 			stock_label.name = "StockLabel"
 			_resource_views[identity] = stock
@@ -1142,8 +1135,7 @@ func _apply_season(index: int) -> void:
 	season_index = index
 	var soil := [Color("#61704c"),Color("#72734b"),Color("#807250"),Color("#889590")]
 	var grain := [Color("#77a95d"),Color("#b4a04e"),Color("#b59a55"),Color("#807968")]
-	var light := [Color("#fff0d0"),Color("#ffe6b0"),Color("#ffdaa4"),Color("#dce8f5")]
 	_materials.earth.albedo_color = soil[index]
 	_materials.wheat.albedo_color = grain[index]
-	_sun.light_color = light[index]
+	scenery.apply_season(index,_sun,_village_environment)
 	crops.visible = index != 3
