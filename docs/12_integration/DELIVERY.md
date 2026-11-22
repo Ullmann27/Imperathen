@@ -8,6 +8,8 @@ Spielquellen `a2d321d87a340a8a38b09eba34f5fc548d69a73c`. Hauptmenü → **Figure
 
 Alle elf Godot-Prüfgruppen bestanden. Der lokale Galerietest meldete 49 erfolgreiche Prüfungen mit echten Texturen. Er öffnete alle 18 Darstellungen, durchlief die Kategorien, prüfte Aki im ersten Dialog und den Rückweg in die pausierte Chronik ohne Änderung am Weltzustand. Der alte Dorfspielstand bleibt ladbar. [Galerieprotokoll](evidence/portraits/figure_gallery.log) · [Alle Gruppen](evidence/portraits/validation_report.json) · [Buildlauf](https://github.com/Ullmann27/Imperathen/actions/runs/45040762060)
 
+Die 64.802.890 Byte große ARM64-APK trägt SHA-256 `f88f0b8a5359744bfbe1284679bc9d19878edda324c0dce6eacf1cb30911ebf3`. 37 von 37 Android-15-Laufzeitprüfungen bestanden. Der x86-64-Prüfbau zeichnete den Legionär nach einem echten Tipp im Menü und kehrte per Android-Zurück zurück. Seine 18 importierten Texturen entsprechen bytegenau denen der ARM64-APK. Die veröffentlichte ARM64-Datei startete per Übersetzung bis zum sichtbaren Vorspann. Die Windows-EXE startete unter Wine und der Linux-Build nativ, jeweils im grafischen Fenster. [Originaler Android-Screenshot](evidence/portraits/android-gallery.webp) · [Laufzeitbericht](evidence/portraits/runtime.json) · [Alle Prüfsummen](https://github.com/Ullmann27/Imperathen/releases/download/prototype-2026-11-22-a2d321d8/IMPERATHEN-a2d321d8-SHA256SUMS.txt)
+
 ## Basisbuild vor der Figurengalerie
 
 | Download aus demselben Build | Größe in Byte | SHA-256 |
