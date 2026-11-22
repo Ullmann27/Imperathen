@@ -4,4 +4,5 @@ IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop
 IMPERATHEN_SESSION_STARTED: saved frontier world
 IMPERATHEN_PAUSED
 IMPERATHEN_PAUSED
-INTEGRATION_PASS: 32 checks; real scene, UI/world command path, construction, story, combat, save recovery, pause
+IMPERATHEN_PAUSED
+INTEGRATION_PASS: 35 checks; real scene, UI/world command path, construction, story, combat, save recovery, pause

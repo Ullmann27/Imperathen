@@ -8,7 +8,7 @@
       "check": "import",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 8.792,
+      "elapsed_seconds": 9.825,
       "expected_marker": null,
       "log": "import.log",
       "warnings": []
@@ -17,7 +17,7 @@
       "check": "domain",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.488,
+      "elapsed_seconds": 0.407,
       "expected_marker": "DOMAIN_TEST_PASS",
       "log": "domain.log",
       "warnings": []
@@ -26,7 +26,7 @@
       "check": "ui",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.36,
+      "elapsed_seconds": 0.438,
       "expected_marker": "UI_SMOKE_PASS",
       "log": "ui.log",
       "warnings": []
@@ -35,7 +35,7 @@
       "check": "world",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.398,
+      "elapsed_seconds": 0.618,
       "expected_marker": "WORLD_SMOKE_PASS",
       "log": "world.log",
       "warnings": []
@@ -44,7 +44,7 @@
       "check": "integration",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 1.319,
+      "elapsed_seconds": 1.1,
       "expected_marker": "INTEGRATION_PASS",
       "log": "integration.log",
       "warnings": []
@@ -53,7 +53,7 @@
       "check": "main_scene",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.515,
+      "elapsed_seconds": 0.953,
       "expected_marker": "IMPERATHEN_READY",
       "log": "main_scene.log",
       "warnings": []
@@ -66,7 +66,7 @@
     "prototype/main.tscn": "a9f4f0edd8bfb7a776b7c2a0647bfb1324cf615a23065331e09baf24b5263892",
     "prototype/project.godot": "af115082658e52e0da2e934faaf2756db7035a5123acebf278ede6e5f014b174",
     "prototype/scripts/domain/world_model.gd": "6e58dc1a08d6d6cade997b3e1af0441032584deb4ce4b33dd906242403854866",
-    "prototype/scripts/main.gd": "0f0f51efafaacf3d61945f21b2e051cd1e1036a45e2bec1533147d590d2333dc",
+    "prototype/scripts/main.gd": "ce7aa349ee5bd56349cf6b35a26a9ddd76da55b676d111182bbcbf6bdf9c5934",
     "prototype/scripts/ui/game_ui.gd": "d9fa7feba6e3c65d55291856e2e8da576bfc688537ea1abbae0c30454e384151",
     "prototype/scripts/ui/touch_action.gd": "51881f22f50fdd788b119220687013f1cf0a6719b2197941b0f2eb7c8651ca02",
     "prototype/scripts/ui/touch_pad.gd": "d4834fd301f5cecdc7c92fee152b6febddc4205cecac66cc0ab09bbbc07336e6",
@@ -75,6 +75,6 @@
     "prototype/scripts/world/village_art.gd": "bd9d6bd11e12fd13d05b5cefc65060dde1a0219c74caa263b1443eb4f92f222d",
     "prototype/scripts/world/world_smoke.gd": "55a4f6f68316a7e96ca3c9e0a08e5c10149c513d4430daa4a255cfa1114e4160",
     "prototype/tests/domain_test.gd": "a5771875ee64e27890518b45710e56dba46a0152667190c667d1a2dc7d803ea5",
-    "prototype/tests/integration_test.gd": "ebf907da0263134b17f3cd77a9268cef932c2a702eadf21f1853812d31d9f2af"
+    "prototype/tests/integration_test.gd": "593f25d3be340350c9c99dee41167dc9d7c13eb7b2d2937591adea7b92081547"
   }
 }

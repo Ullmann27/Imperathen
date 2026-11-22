@@ -30,6 +30,7 @@ var run_id := ""
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
 	get_tree().quit_on_go_back = false
+	get_window().go_back_requested.connect(_on_go_back_requested)
 	run_id = "%s_%s" % [Time.get_unix_time_from_system(), Time.get_ticks_usec()]
 	model = ModelScript.new()
 	model.new_game()
@@ -84,29 +85,30 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+func _on_go_back_requested() -> void:
+	# The window signal is the single Android Back entry point. Handling the
+	# preceding node notification too would process one request twice.
+	if screen == "atlas":
+		_leave_atlas()
+	elif screen == "valley":
+		_leave_valley()
+	elif is_instance_valid(ui):
+		ui.handle_back()
+
+
 func _notification(what: int) -> void:
 	if screen == "atlas" and is_instance_valid(atlas):
-		if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-			_leave_atlas()
-			return
 		if what in [NOTIFICATION_APPLICATION_PAUSED,NOTIFICATION_APPLICATION_FOCUS_OUT]:
 			if not atlas.demo and session_started:
 				_save(false)
 			return
 	if screen == "valley" and is_instance_valid(valley):
-		if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-			_leave_valley()
-			return
 		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
 			valley.paused = true
 			valley.reset_gesture()
 			if not valley_demo:
 				_save(false)
 			return
-	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if is_instance_valid(ui):
-			ui.handle_back()
-		return
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		if session_started and screen == "playing":
 			_pause()
