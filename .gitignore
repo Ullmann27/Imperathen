@@ -1,0 +1,17 @@
+# Zugangsdaten und lokale Arbeitskopien
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*credentials*.json
+
+# Lokale Betriebssystem- und Editorreste
+.DS_Store
+Thumbs.db
+*~
+*.tmp
+
+# Arbeitsmaterial wird vor Import gezielt geprüft
+scratch/
+local-only/
