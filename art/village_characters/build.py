@@ -81,46 +81,144 @@ def village_pose(clip, t, role):
 original_pose=company.pose
 company.pose=village_pose
 company.LENGTHS={"idle":2,"march":1,"run":.72,"gather":1.15,"talk":1.35,
-                "train":.86,"work":1.6,"attack":.8,"hit":.48,"death":1.2}
+                "train":.86,"work":1.6,"block":1.2,"attack":.8,"hit":.48,"death":1.2}
+
+
+def add_costumes():
+    cloth = art.material("Overgarment", (.42,.34,.23,1), roughness=.86, texture="linen")
+    thread = art.material("WovenBorder", (.34,.18,.078,1), roughness=.8)
+    metal = art.material("CopperBrooch", (.53,.31,.12,1),roughness=.38,metallic=.6)
+    hair = art.material("HairBraid", (.073,.041,.022,1),roughness=.77)
+    for side in (-1,1):
+        art._tube("Garment_italia_WovenBand",[(side*.105,-.063,1.216),(side*.099,-.102,1.13),
+                  (side*.087,-.111,1.036),(side*.084,-.094,.94)],[.006]*4,thread,sides=8,depth_ratio=.32)
+    for home in ("germania","vistula"):
+        name="Garment_"+home
+        art._loft(name+"_Mantle",[(0,.007,1.052,.151,.100),(0,.006,1.095,.172,.114),
+                  (0,.006,1.154,.194,.115),(0,.008,1.207,.160,.089),(0,.007,1.228,.078,.061)],cloth,40,.008,cap=False)
+        art._ellipsoid(name+"_Brooch",(.112,-.087,1.151),(.017,.008,.018),metal)
+        art._tube(name+"_Trim",[(-.145,-.079,1.106),(-.066,-.111,1.067),
+                  (.005,-.115,1.064),(.082,-.104,1.090),(.12,-.082,1.14)],[.004]*5,thread,sides=8)
+    for home in ("han","wa"):
+        name="Garment_"+home
+        art._loft(name+"_Wrap",[(0,.001,.729,.174,.117),(0,0,.792,.161,.106),
+                  (0,0,.936,.145,.103),(0,0,1.076,.152,.107),(0,0,1.18,.171,.103),
+                  (0,.007,1.223,.135,.084),(0,.005,1.25,.071,.059)],cloth,44,.006,cap=False)
+        for side in (-1,1):
+            art._tube(name+"_Lapel_"+str(side),[(.045*side,-.048,1.246),(.019*side,-.096,1.177),
+                      (-.040*side,-.106,1.108),(-.088*side,-.098,1.026)],[.009]*4,thread,sides=10,depth_ratio=.49)
+        art._loft(name+"_Sash",[(0,0,.909,.148,.103),(0,0,.944,.148,.104)],thread,40,cap=False)
+    for style in ("braid","knot","tie"):
+        name="Hair_"+style
+        if style=="knot":
+            art._ellipsoid(name+"_Bun",(0,.032,1.519),(.052,.041,.043),hair)
+        else:
+            length=.23 if style=="braid" else .14
+            for side in (-1,1) if style=="braid" else (0,):
+                for k in range(6):
+                    z=1.426-length*k/6
+                    x=side*(.072+.012*k/6)+(.008 if k%2 else -.008)
+                    art._ellipsoid(name+"_Lock",(x,.065-k*.004,z),(.020,.023,.029),hair,8,12)
+    wood=art.material("TrainingWood",(.31,.16,.071,1),roughness=.78)
+    art._tube("PracticeBlade_Grip",[(-.259,-.046,.734),(-.259,-.046,.849)],[.012,.013],wood,10)
+    art._tube("PracticeBlade_Guard",[(-.315,-.046,.839),(-.203,-.046,.839)],[.012,.012],wood,8)
+    art._tube("PracticeBlade_Blade",[(-.259,-.046,.848),(-.259,-.046,1.184),(-.259,-.046,1.239)],[.021,.017,.002],wood,sides=6,depth_ratio=.48)
+
+
+def mesh_set(name):
+    if name.startswith(("Garment_","Hair_")): return "_".join(name.split("_")[:2])
+    if name.startswith("PracticeBlade"): return "PracticeBlade"
+    return "Civilian"
+
+
+def face_uv(obj, mat):
+    name=obj.name
+    if not any(marker in name for marker in ("_Head","_Nose","_Nostril","_Lip","_Mouth","_Iris","_Pupil","_Lid","_Eye","_Brow","_UpperLip","_LowerLip")): return
+    obj.data.materials.clear()
+    obj.data.materials.append(mat)
+    uv=obj.data.uv_layers.active or obj.data.uv_layers.new(name="FaceUV")
+    for loop in obj.data.loops:
+        x,y,z=obj.matrix_world @ obj.data.vertices[loop.vertex_index].co
+        # Collapse the back to the map's neutral border.
+        u=(x+.105)/.21 if y < .005 else (.004 if x<0 else .996)
+        uv.data[loop.index].uv=(max(.004,min(.996,u)),max(.004,min(.996,(z-1.297)/.22)))
 
 
 def build_source():
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    objects=art.build_civilian()
+    art.build_civilian()
+    add_costumes()
+    facemat=art.material("PortraitSkin",(1,1,1,1),roughness=.72)
+    objects=[o for o in bpy.context.scene.objects if o.type=="MESH"]
     arm=tailored_rig()
+    bundles={}
     for obj in objects:
+        face_uv(obj,facemat)
+        key=mesh_set(obj.name)
+        bundles.setdefault(key,[]).append(obj)
         for vert in obj.data.vertices:
-            for joint, value in weights(obj.name,obj.matrix_world @ vert.co):
+            if key.startswith("Hair_"): influences=[("Head",1)]
+            elif key=="PracticeBlade": influences=[("Hand_R",1)]
+            elif key.startswith("Garment_"): influences=weights("Civilian_Tunic",obj.matrix_world @ vert.co)
+            else: influences=weights(obj.name,obj.matrix_world @ vert.co)
+            for joint, value in influences:
                 if value > 0:
                     group=obj.vertex_groups.get(joint) or obj.vertex_groups.new(name=joint)
                     group.add([vert.index], value, "REPLACE")
-    bpy.ops.object.select_all(action="DESELECT")
-    for obj in objects: obj.select_set(True)
-    bpy.context.view_layer.objects.active=objects[0]
-    bpy.ops.object.join()
-    mesh=bpy.context.object
-    mesh.name="Civilian"
-    mesh.parent=arm
-    deform=mesh.modifiers.new("Village skin","ARMATURE")
-    deform.object=arm
+    for name,parts in bundles.items():
+        bpy.ops.object.select_all(action="DESELECT")
+        for obj in parts: obj.select_set(True)
+        bpy.context.view_layer.objects.active=parts[0]
+        bpy.ops.object.join()
+        mesh=bpy.context.object
+        mesh.name=name
+        mesh.parent=arm
+        deform=mesh.modifiers.new("Village skin","ARMATURE")
+        deform.object=arm
+    for mesh in bpy.context.scene.objects:
+        if mesh.type=="MESH": age_and_identity(mesh)
     company.animate(arm,"civilian")
     bpy.context.preferences.filepaths.save_version=0
     bpy.ops.wm.save_as_mainfile(filepath=str(HERE/"villager.blend"),compress=True)
 
 
+def age_and_identity(mesh):
+    # Delta shapes alter proportions independently from the actor's final height.
+    mesh.shape_key_add(name="Basis")
+    adult=mesh.shape_key_add(name="Mature")
+    companion=mesh.shape_key_add(name="Companion")
+    matrix=mesh.matrix_world
+    inv=matrix.inverted()
+    for i,vertex in enumerate(mesh.data.vertices):
+        x,y,z=matrix @ vertex.co
+        if z >= 1.275:
+            jaw=max(0,min(1,(1.425-z)/.12))
+            adult_point=(x*(1.02+.18*jaw),y*(1+.13*jaw),1.275+(z-1.275)*.94)
+            companion_point=(x*(.95+.06*jaw),y*.97,1.275+(z-1.275)*1.025)
+        else:
+            shoulders=max(0,1-abs(z-1.15)/.30)
+            adult_point=(x*(1+.16*shoulders),y*(1+.16*shoulders),z)
+            companion_point=(x*(1-.045*shoulders),y,z)
+        adult.data[i].co=inv @ Vector(adult_point)
+        companion.data[i].co=inv @ Vector(companion_point)
+
+
 def export():
     for lod, ratio in enumerate([1,.48,.19,.045]):
         bpy.ops.wm.open_mainfile(filepath=str(HERE/"villager.blend"))
-        mesh=bpy.data.objects["Civilian"]
-        if ratio < 1:
+        for mesh in list(bpy.context.scene.objects):
+            if ratio == 1 or mesh.type != "MESH": continue
+            mesh.shape_key_clear()
             bpy.context.view_layer.objects.active=mesh
             dec=mesh.modifiers.new("Distance budget","DECIMATE")
             dec.ratio=ratio
             bpy.ops.object.modifier_move_to_index(modifier=dec.name,index=0)
             bpy.ops.object.modifier_apply(modifier=dec.name)
+        for mesh in bpy.context.scene.objects:
+            if mesh.type=="MESH" and mesh.data.shape_keys is None: age_and_identity(mesh)
         bpy.ops.export_scene.gltf(filepath=str(OUT/f"villager_{lod}.glb"),export_format="GLB",
                                   export_animation_mode="NLA_TRACKS", export_force_sampling=True,
-                                  export_frame_step=1,export_animations=True,export_all_vertex_colors=True)
+                                  export_frame_step=1,export_animations=True,export_morph_animation=False,export_all_vertex_colors=True)
 
 
 if __name__=="__main__":

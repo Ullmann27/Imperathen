@@ -1,7 +1,9 @@
 extends Node3D
 ## Presentation of a domain person. The enclosing body owns collision and movement.
 
-const COLORS := {"italia":"b88753","germania":"718675","han":"6f8792","wa":"cebb8d","vistula":"948095"}
+const COLORS := {"italia":"a45c47","germania":"809081","han":"ad9865","wa":"e0d1b7","vistula":"797b78"}
+const COMPANION_COLORS := {"italia":"ddd0ab","germania":"91907a","han":"8197a4","wa":"d4c7ac","vistula":"ac6853"}
+const HAIR := {"italia":["",""],"germania":["","braid"],"han":["knot","knot"],"wa":["tie","tie"],"vistula":["braid","braid"]}
 const COMPANIONS := {"italia":"marcus","germania":"albrun","han":"lin","wa":"aki","vistula":"mira"}
 const LOOPS := ["idle","march","run","talk","work"]
 static var scenes := {}
@@ -20,6 +22,11 @@ var speed := 0.0
 var _remaining := 0.0
 var _check_lod := 0.0
 var _posed := false
+var _blade: MeshInstance3D
+
+
+func _ready() -> void:
+	add_to_group("village_people")
 
 
 func configure(kind: String, origin: String, years: int) -> void:
@@ -28,14 +35,16 @@ func configure(kind: String, origin: String, years: int) -> void:
 	role = kind
 	home = origin
 	age = years
-	identity = COMPANIONS.get(home,"marcus") if role == "companion" else role
+	identity = COMPANIONS.get(home,"marcus") if role == "companion" else ("hero_"+home if role == "player" else role)
 	_reload(maxi(0,detail))
 
 
 func _path(level: int) -> String:
 	if role in ["mentor","recruit","enemy"]:
 		var equipment := "officer" if role == "mentor" else ("spear" if role == "recruit" else "heavy")
-		var lod: String = ["near","mid","mid","far"][level]
+		if level >= 2:
+			return "res://assets/village_characters/%s_%d.glb" % [equipment,level]
+		var lod: String = ["near","mid"][level]
 		return "res://assets/soldiers/%s_%s.glb" % [equipment,lod]
 	return "res://assets/village_characters/villager_%d.glb" % level
 
@@ -45,6 +54,7 @@ func _reload(level: int) -> void:
 	var path := _path(level)
 	if not scenes.has(path):
 		scenes[path] = load(path)
+	_blade = null
 	if body:
 		remove_child(body)
 		body.free()
@@ -68,17 +78,40 @@ func _reload(level: int) -> void:
 
 
 func _style(shape: MeshInstance3D) -> void:
+	var part := String(shape.name)
+	if part.begins_with("Garment_"):
+		shape.visible = part == "Garment_"+home
+	if part.begins_with("Hair_"):
+		var style: String = HAIR.get(home,["",""])[int(role=="companion")]
+		shape.visible = part == "Hair_"+style
+	if part == "PracticeBlade":
+		_blade = shape
+		shape.visible = false
+	for key in ["Mature","Companion"]:
+		var slot := shape.find_blend_shape_by_name(key)
+		if slot >= 0:
+			shape.set_blend_shape_value(slot,float(age >= 18 if key == "Mature" else role == "companion"))
 	for i in range(shape.mesh.get_surface_count()):
 		var source := shape.mesh.surface_get_material(i) as StandardMaterial3D
 		if not source: continue
 		if "CharacterPalette" in source.resource_name:
 			source.vertex_color_use_as_albedo = true
-		elif "Linen" in source.resource_name or role == "enemy":
+		elif source.resource_name == "PortraitSkin":
+			var face_id := identity
+			if age >= 18 and home == "italia": face_id = "adult_marcus" if role == "companion" else "adult_italia"
+			if not materials.has(face_id):
+				var face := source.duplicate() as StandardMaterial3D
+				face.vertex_color_use_as_albedo = false
+				face.albedo_texture = load("res://assets/village_characters/faces/%s.webp" % face_id)
+				face.roughness = 0.77
+				materials[face_id] = face
+			shape.set_surface_override_material(i,materials[face_id])
+		elif source.resource_name in ["Civilian_Linen","Overgarment"] or role == "enemy":
 			var key := "%d/%s/%s" % [source.get_instance_id(),home,role]
 			if not materials.has(key):
 				var mat := source.duplicate() as StandardMaterial3D
 				var color := Color(COLORS.get(home,"b88753"))
-				if role == "companion": color = color.lerp(Color("#697b84"),0.52)
+				if role == "companion": color = Color(COMPANION_COLORS.get(home,"ddd0ab"))
 				if role == "enemy": color = Color("#a78f79")
 				mat.albedo_color = color
 				materials[key] = mat
@@ -97,6 +130,18 @@ func cue(action: String) -> void:
 	_remaining = animator.current_animation_length if animator and animator.current_animation != "" else 0.8
 
 
+func reset_motion() -> void:
+	_remaining = 0
+	speed = 0
+	_posed = false
+	_play("idle",0,0)
+
+
+func keep_working() -> void:
+	if clip != "work": cue("work")
+	_remaining = maxf(_remaining,0.3)
+
+
 func sample_pose(action: String, normalized: float) -> void:
 	_posed = true
 	_play(action,normalized,0)
@@ -104,6 +149,7 @@ func sample_pose(action: String, normalized: float) -> void:
 
 func _play(action: String, normalized: float, blend: float) -> void:
 	clip = action
+	if _blade: _blade.visible = role == "player" and age >= 18 and clip in ["attack","train","block"]
 	phase = clampf(normalized,0,1)
 	if not animator: return
 	var name_in_file := action
@@ -116,16 +162,21 @@ func _play(action: String, normalized: float, blend: float) -> void:
 	animator.advance(0)
 
 
+func refresh_lod(camera: Camera3D) -> void:
+	if not is_instance_valid(camera) or not body: return
+	var distance := global_position.distance_to(camera.global_position)
+	var factor := float({"low":0.55,"balanced":0.86,"high":1.15,"very_high":1.5}.get(profile,1.0))
+	var level := 0
+	for threshold: float in [11.0,23.0,44.0]:
+		if distance >= threshold * factor: level += 1
+	if level != detail: _reload(level)
+
+
 func _process(delta: float) -> void:
 	_check_lod -= delta
 	if _check_lod <= 0:
 		_check_lod = 0.32
-		var camera := get_viewport().get_camera_3d()
-		if camera:
-			var d := global_position.distance_to(camera.global_position)
-			var factor := float({"low":0.55,"balanced":0.86,"high":1.15,"very_high":1.5}.get(profile,1.0))
-			var lod := 0 if d < 11*factor else (1 if d < 23*factor else (2 if d < 44*factor else 3))
-			if lod != detail: _reload(lod)
+		refresh_lod(get_viewport().get_camera_3d())
 	if _posed: return
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)

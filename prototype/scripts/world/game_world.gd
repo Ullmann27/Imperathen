@@ -52,6 +52,8 @@ var _quality_profile := "balanced"
 var _sun: DirectionalLight3D
 var _player: CharacterBody3D
 const VillagePerson := preload("res://scripts/visuals/village_person.gd")
+var _shown_health := -1
+var _shown_work := -1.0
 var _figure: VillagePerson
 var _camera: Camera3D
 var _camera_initialized := false
@@ -80,7 +82,11 @@ func _ready() -> void:
 
 
 func setup(state: Dictionary) -> void:
+	_shown_health = -1
+	_shown_work = -1.0
 	_build_scene()
+	for actor in get_tree().get_nodes_in_group("village_people"):
+		if is_ancestor_of(actor): actor.reset_motion()
 	set_build_mode(false)
 	_reset_touch_input()
 	_resolve_requested = false
@@ -122,6 +128,17 @@ func sync_state(state: Dictionary) -> void:
 	var player_data: Dictionary = _state.get("player", {})
 	var age := int(player_data.get("age", 12))
 	_figure.configure("player",_state.get("origin_id","italia"),age)
+	_update_people_profile()
+	var health_now := int(player_data.get("health",100))
+	var construction := 0.0
+	for hut: Dictionary in _state.get("buildings",[]):
+		construction += 1.0 + float(hut.get("progress",0.0))
+	if health_now == 0 or (_shown_health >= 0 and health_now < _shown_health):
+		_figure.cue("death" if health_now == 0 else "hit")
+	elif _shown_work >= 0 and construction > _shown_work:
+		_figure.keep_working()
+	_shown_health = health_now
+	_shown_work = construction
 	_companion.get_node("Figure").configure("companion",_state.get("origin_id","italia"),age)
 	var progress: Dictionary = _state.get("progress", {})
 	var trained := bool(progress.get("training_complete", false))
@@ -202,8 +219,16 @@ func set_quality(profile: String) -> void:
 	if profile not in ["low", "balanced", "high", "very_high"]:
 		return
 	_quality_profile = profile
+	_update_people_profile()
 	grove.set_quality(profile)
 	_apply_quality()
+
+
+func _update_people_profile() -> void:
+	for actor in get_tree().get_nodes_in_group("village_people"):
+		if is_ancestor_of(actor) and actor.profile != _quality_profile:
+			actor.profile = _quality_profile
+			actor.refresh_lod(_camera)
 
 
 func get_quality_profile() -> String:
@@ -1063,6 +1088,7 @@ func _attack() -> void:
 	if not closest_id.is_empty():
 		action_requested.emit("strike_enemy", {"enemy_id": closest_id})
 	elif _horizontal_distance(_player.position, TRAINING_LOCATION) <= INTERACTION_RADIUS:
+		get_node("TrainingGround/Mentor/Figure").cue("block")
 		action_requested.emit("training_hit", {})
 
 
