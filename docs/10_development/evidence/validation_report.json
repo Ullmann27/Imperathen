@@ -1,0 +1,80 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "passed": true,
+  "renderer": "headless/dummy; no graphical FPS or screenshot claim",
+  "save_isolation": "Disposable XDG data/config/cache directories",
+  "checks": [
+    {
+      "check": "import",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 5.093,
+      "expected_marker": null,
+      "log": "import.log",
+      "warnings": []
+    },
+    {
+      "check": "domain",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.235,
+      "expected_marker": "DOMAIN_TEST_PASS",
+      "log": "domain.log",
+      "warnings": []
+    },
+    {
+      "check": "ui",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.247,
+      "expected_marker": "UI_SMOKE_PASS",
+      "log": "ui.log",
+      "warnings": []
+    },
+    {
+      "check": "world",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.231,
+      "expected_marker": "WORLD_SMOKE_PASS",
+      "log": "world.log",
+      "warnings": []
+    },
+    {
+      "check": "integration",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.612,
+      "expected_marker": "INTEGRATION_PASS",
+      "log": "integration.log",
+      "warnings": []
+    },
+    {
+      "check": "main_scene",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.334,
+      "expected_marker": "IMPERATHEN_READY",
+      "log": "main_scene.log",
+      "warnings": []
+    }
+  ],
+  "source_sha256": {
+    "prototype/assets/asset_manifest.json": "1e497f5be2bcc6de7f77a681897b0746b0704ed87e810c7a7d1a97d3f8b31419",
+    "prototype/assets/frontier_ambience.wav": "69bdcc1ef52336b462db932f7c28db5014a6109c4225307903a7881bc01b6433",
+    "prototype/assets/frontier_hut.glb": "8069c0fc868ee6cb7bdeb2ecadb1351100c8605ea6cdca5c04dcb61e7bb1a230",
+    "prototype/main.tscn": "a9f4f0edd8bfb7a776b7c2a0647bfb1324cf615a23065331e09baf24b5263892",
+    "prototype/project.godot": "dbfb9f67ef7c3a3871003837a4119d8fa7fa6a78f73bb17a06233e98a6139d51",
+    "prototype/scripts/domain/world_model.gd": "6e58dc1a08d6d6cade997b3e1af0441032584deb4ce4b33dd906242403854866",
+    "prototype/scripts/main.gd": "206e10a06ab2bd66f367103c3bb26447d88e2b53ee4e9e859080f0b4ae98e415",
+    "prototype/scripts/ui/game_ui.gd": "3b5edbae83f332cf4bc2c816e11f0faacfab8c9eb29b69b649bfc71c06973d06",
+    "prototype/scripts/ui/touch_action.gd": "7f56248c1991915503f4e0db621f46096bc1273ecdf8abce554bed5e10d3e481",
+    "prototype/scripts/ui/touch_pad.gd": "cf676481abb0f493280458c27811f193cfc88b24dbcb8e7e30e423c9340e1c79",
+    "prototype/scripts/ui/ui_smoke.gd": "6d21a3a535dc08f601dabcf966a218619f40173fa70600d8b7ae0b721acd3baf",
+    "prototype/scripts/world/game_world.gd": "67dc22ed6ca46faa1eeff36037f763610c46e50919a001e2aff10a2301735b3c",
+    "prototype/scripts/world/village_art.gd": "bd9d6bd11e12fd13d05b5cefc65060dde1a0219c74caa263b1443eb4f92f222d",
+    "prototype/scripts/world/world_smoke.gd": "55a4f6f68316a7e96ca3c9e0a08e5c10149c513d4430daa4a255cfa1114e4160",
+    "prototype/tests/domain_test.gd": "a5771875ee64e27890518b45710e56dba46a0152667190c667d1a2dc7d803ea5",
+    "prototype/tests/integration_test.gd": "ebf907da0263134b17f3cd77a9268cef932c2a702eadf21f1853812d31d9f2af"
+  }
+}

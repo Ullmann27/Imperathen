@@ -1,0 +1,10 @@
+*.gd text eol=lf
+*.tscn text eol=lf
+*.godot text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.glb binary
+*.blend binary
+*.wav binary
+*.png binary

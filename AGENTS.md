@@ -1,6 +1,12 @@
 # Arbeitsauftrag für Agenten – IMPERATHEN
 
-## Aktueller Auftrag
+## Aktueller Entwicklungsauftrag – 22.11.2026
+
+Der neueste ausdrückliche Nutzerauftrag lautet: mit drei Agenten das Spiel so weit wie möglich aufbauen; ein späterer Durchgang mit Sol 6.2 oder Astra 6.2 folgt separat. Damit ist die frühere Programmierpause für diesen Entwicklungsblock aufgehoben. Erlaubt sind eigener Spielcode, lokale Engine- und Blenderarbeit, Tests sowie ein isolierter Entwicklungsbranch und Draft-PR. Das Repository bleibt öffentlich. Keine neuen kostenpflichtigen Dienste beauftragen, keinen eigenmächtigen Modell-/Tarifwechsel vornehmen und nicht ohne passenden Auftrag nach main mergen.
+
+Für einen ersten ausführbaren 3D-Prototypen wird die vorhandene Godot-Installation genutzt. Dies entscheidet nicht die endgültige Produktionsengine. Die Pipeline und Dateizuständigkeiten stehen in docs/10_development/AGENT_PIPELINE.md.
+
+## Historischer Vorbereitungsauftrag (durch obigen Entwicklungsauftrag erweitert)
 
 Stand 22.11.2026: Die Projektgründung und Vorproduktion autonom vervollständigen. Das Repository bleibt auf ausdrücklichen Nutzerwunsch öffentlich. Nicht eigenmächtig die Sichtbarkeit ändern. Der Nutzer entscheidet später selbst, ob er sie ändern will.
 
