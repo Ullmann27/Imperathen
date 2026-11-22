@@ -39,6 +39,8 @@ EXPECTED_RESOURCES = (
     "scripts/ui/game_ui.gd",
     "scripts/ui/touch_pad.gd",
     "scripts/ui/touch_action.gd",
+)
+CAMPAIGN_RESOURCES = (
     "scripts/ui/runtime_display.gd",
     "scripts/battle/battle_model.gd",
     "scripts/battle/formation_slots.gd",
@@ -54,6 +56,13 @@ EXPECTED_RESOURCES = (
     *(f"assets/soldiers/{role}_{level}.glb"
       for role in ("heavy", "spear", "archer", "officer") for level in ("near", "mid", "far")),
 )
+GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
+PORTRAIT_IDS = (
+    "legionary", "auxiliary_spear", "archer", "centurion", "signifer", "emperor",
+    "hero_italia", "hero_germania", "hero_han", "hero_wa", "hero_vistula",
+    "marcus", "albrun", "lin", "aki", "mira", "adult_italia", "adult_marcus",
+)
+GALLERY_RESOURCES = (GALLERY_SCRIPT, *(f"assets/portraits/{name}.webp" for name in PORTRAIT_IDS))
 ARCHITECTURES = {"arm64-v8a": 183, "x86_64": 62}
 TOOL_NAMES = ("aapt", "aapt2", "apkanalyzer", "apksigner", "zipalign", "adb", "emulator", "sdkmanager")
 
@@ -140,7 +149,7 @@ def resolve_resource(archive: zipfile.ZipFile, names: set[str], source: str) -> 
     raw = "assets/" + source
     if raw in names and archive.getinfo(raw).file_size > 0:
         return {"source": source, "entry": raw, "mode": "direct"}
-    remap = raw + (".import" if source.endswith((".glb", ".jpg")) else ".remap")
+    remap = raw + (".import" if source.endswith((".glb", ".jpg", ".webp")) else ".remap")
     if remap in names and archive.getinfo(remap).file_size <= 65536:
         text = archive.read(remap).decode("utf-8", errors="replace")
         for match in re.finditer(r'^\s*path(?:\.[\w.-]+)?\s*=\s*"res://([^"\r\n]+)"', text, re.MULTILINE):
@@ -156,7 +165,7 @@ def resolve_resource(archive: zipfile.ZipFile, names: set[str], source: str) -> 
     return {"source": source, "entry": None, "mode": "missing"}
 
 
-def inspect_zip(apk: Path, report: dict, expected_abi: str) -> bool:
+def inspect_zip(apk: Path, report: dict, expected_abi: str, source_root: Path) -> bool:
     try:
         with zipfile.ZipFile(apk) as archive:
             entries = archive.infolist()
@@ -222,7 +231,15 @@ def inspect_zip(apk: Path, report: dict, expected_abi: str) -> bool:
             if config in names:
                 prefix = read_header(archive, config, 4096)
                 valid_config = prefix.startswith(b"ECFG") if config.endswith(".binary") else b"config_version=" in prefix
-            resolved = [resolve_resource(archive, names, source) for source in EXPECTED_RESOURCES]
+            # Older village snapshots predate the campaign and portrait gallery. The
+            # source requirement also detects a new APK that omitted the entire feature.
+            required_resources = EXPECTED_RESOURCES
+            campaign_script = "scripts/battle/battle_model.gd"
+            if (source_root / campaign_script).is_file() or resolve_resource(archive, names, campaign_script)["entry"]:
+                required_resources += CAMPAIGN_RESOURCES
+            if (source_root / GALLERY_SCRIPT).is_file() or resolve_resource(archive, names, GALLERY_SCRIPT)["entry"]:
+                required_resources += GALLERY_RESOURCES
+            resolved = [resolve_resource(archive, names, source) for source in required_resources]
             missing_resources = [item["source"] for item in resolved if item["entry"] is None]
             packs = sorted(name for name in names if name.startswith("assets/") and name.endswith(".pck"))
             if not valid_config and packs:
@@ -418,7 +435,7 @@ def snapshot_sources(project: Path) -> dict:
     if not project.is_dir():
         return {"status": "not_run", "reason": "Source project directory not available."}
     for path in sorted(project.rglob("*")):
-        if path.is_file() and ".godot" not in path.relative_to(project).parts and path.suffix in {".gd", ".tscn", ".godot", ".json", ".glb", ".wav"}:
+        if path.is_file() and ".godot" not in path.relative_to(project).parts and path.suffix in {".gd", ".tscn", ".godot", ".json", ".glb", ".wav", ".webp"}:
             hashes[str(path.relative_to(project))] = sha256_file(path)
     return {"status": "recorded", "sha256": hashes,
             "scope": "Local source snapshot only; not proof that transformed APK bytes were produced from these exact sources."}
@@ -447,7 +464,7 @@ def validate(args: argparse.Namespace) -> dict:
     report["apk"].update(size_bytes=apk.stat().st_size, sha256=sha256_file(apk))
     add_check(report, "apk_file", "pass" if apk.suffix.lower() == ".apk" else "fail",
               "APK file found; its extension alone is not accepted as proof of format.")
-    if inspect_zip(apk, report, args.expected_abi):
+    if inspect_zip(apk, report, args.expected_abi, args.source_root):
         inspect_manifest(apk, report, tools, args.expected_package, args.tool_timeout)
         inspect_signing(apk, report, tools, args.tool_timeout)
         if tools.get("zipalign"):

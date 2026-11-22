@@ -17,6 +17,7 @@ import struct
 import subprocess
 import time
 import xml.etree.ElementTree as ET
+import zipfile
 
 
 def runtime_error_lines(text):
@@ -162,6 +163,15 @@ def main():
                     return line.split(marker, 1)[1].strip()
             time.sleep(1)
         raise RuntimeError("Missing Android runtime marker " + marker)
+
+    def wait_for_new_marker(marker, previous, timeout=60):
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            text = checked_logs()
+            if text.count(marker) > previous:
+                return text.rsplit(marker, 1)[1].splitlines()[0].strip()
+            time.sleep(1)
+        raise RuntimeError("No new Android runtime marker " + marker)
 
     def tap(point):
         adb("shell", "input", "tap", str(round(point[0])), str(round(point[1])))
@@ -320,6 +330,40 @@ def main():
         time.sleep(2)
         screenshot("06_android_globe.png")
         record("world_globe", True, "Opened the playable globe through the main menu on a square display")
+        with zipfile.ZipFile(args.apk) as package_zip:
+            has_portraits = any(name.startswith("assets/assets/portraits/") for name in package_zip.namelist())
+        if has_portraits:
+            menu_marker = "IMPERATHEN_MENU_TOUCH "
+            before_menu = checked_logs().count(menu_marker)
+            adb("shell", "input", "keyevent", "4")
+            gallery_menu = json.loads(wait_for_new_marker(menu_marker, before_menu))
+            record("gallery_menu_action", "gallery" in gallery_menu, gallery_menu)
+            dismiss_fullscreen_hint("gallery_menu")
+            center = gallery_menu["gallery"]
+            visible = gallery_menu.get("gallery_visible", False)
+            extent = report["screenshots"]["06_android_globe.png"]
+            scroll_marker = "IMPERATHEN_GALLERY_MENU_BUTTON "
+            for _ in range(3):
+                if visible:
+                    break
+                before_scroll = checked_logs().count(scroll_marker)
+                x = str(round(extent["width"] * 0.25))
+                adb("shell", "input", "swipe", x, str(round(extent["height"] * 0.8)),
+                    x, str(round(extent["height"] * 0.3)), "400")
+                button = json.loads(wait_for_new_marker(scroll_marker, before_scroll, timeout=15))
+                center, visible = button["center"], button["visible"]
+            record("gallery_button_visible", visible, center)
+            tap(center)
+            wait_marker("IMPERATHEN_GALLERY_OPEN menu")
+            wait_marker("IMPERATHEN_GALLERY_PORTRAIT legionary")
+            screenshot("08_android_figuren.png")
+            record("real_portrait_loaded", True, "Tapped Figuren and rendered the legionary portrait from the exported game")
+            before_menu = checked_logs().count(menu_marker)
+            adb("shell", "input", "keyevent", "4")
+            wait_marker("IMPERATHEN_GALLERY_CLOSED menu")
+            wait_for_new_marker(menu_marker, before_menu)
+            record("gallery_back_to_menu", True, "Android Back restored the menu")
+
         final_log = logs() + "\n" + "\n".join(path.read_text(encoding="utf-8") for path in args.output.glob("logcat-*.txt"))
         errors = runtime_error_lines(final_log)
         record("no_runtime_errors", not errors, errors)
