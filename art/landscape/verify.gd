@@ -40,7 +40,7 @@ func _run() -> void:
 	for batch in grove.get_children():
 		if batch.visible or batch.multimesh.visible_instance_count != 0:
 			errors.append("Stale batch " + batch.name)
-	for name in ["han_house","wa_store","wood_longhouse","farmer"]:
+	for name in ["han_house","wa_store","wa_house","wood_longhouse","farmer","han_farmer","wa_farmer"]:
 		var packed := load("res://assets/landscape/%s.glb" % name) as PackedScene
 		var object := packed.instantiate()
 		root.add_child(object)
@@ -53,7 +53,7 @@ func _run() -> void:
 			errors.append("Architecture/worker atlas: " + name)
 		if mesh.get_aabb().size.y < 1.6:
 			errors.append("Metre scale: " + name)
-		if name == "farmer":
+		if name.ends_with("farmer"):
 			var player := object.find_child("AnimationPlayer",true,false) as AnimationPlayer
 			if not (player.has_animation("idle") and player.has_animation("march")):
 				errors.append("Farmer animation clips")

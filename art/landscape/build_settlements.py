@@ -281,27 +281,128 @@ def longhouse(g):
     thatch(g,6.03,2.77,1.94,4.18,"thatch",rng)
 
 
-def farmer():
+def pit_house(g):
+    """Low hipped dwelling with floor below its enclosing earth rim and entrance hood."""
+    rng=random.Random(139)
+    width,depth,ridge_x,ridge=2.74,2.30,.99,3.04
+    # Positive-Z relief keeps the floor visible on a continuous game terrain.
+    g.box(0,0,.012,4.71,3.89,.07,"earth")
+    for x in (-2.39,2.39):
+        g.box(x,0,.015,.37,4.07,.46,"earth")
+    g.box(0,1.90,.015,4.63,.41,.46,"earth")
+    for sign in (-1,1):
+        g.box(sign*1.51,-1.89,.015,1.65,.39,.46,"earth")
+    for x in (-1.18,1.18):
+        for y in (-.94,.94):
+            g.beam((x,y,.073),(x,y,1.82),.119,"timber",8)
+    for y in (-.94,.94):
+        g.beam((-1.4,y,1.83),(1.4,y,1.83),.114,"oak",8)
+    # The south slope stops at the doorway, beneath a separate thatched hood.
+    for side in (-1,1):
+        split=(-1,-.23,.23,1) if side==-1 else (-1,1)
+        for a,b in zip(split,split[1:]):
+            t0=.38 if side==-1 and a<0<b else 0
+            ext=width+(ridge_x-width)*t0
+            y=side*depth*(1-t0)
+            eave=.47+(ridge-.47)*t0
+            g.prism([(a*ext,y,eave),(b*ext,y,eave),(b*ridge_x,0,ridge),
+                     (a*ridge_x,0,ridge)],(0,0,-.14),"thatch")
+        g.prism([(side*width,-depth,.47),(side*width,depth,.47),(side*ridge_x,0,ridge)],
+                (0,0,-.14),"thatch")
+        for i in range(155):
+            k=rng.uniform(-.99,.99)
+            t=rng.uniform(.02,.92)
+            if side==-1 and abs(k)<.245 and t<.42:
+                continue
+            end=max(-.015,t-rng.uniform(.07,.20))
+            if side==-1 and abs(k)<.245:
+                end=max(.38,end)
+            def point(v):
+                return (k*(width+(ridge_x-width)*v),side*depth*(1-v),.492+(ridge-.47)*v)
+            g.beam(point(t),point(end),rng.uniform(.012,.021),rng.choice(("straw","thatch")),4)
+        for k in range(14):
+            y=-depth+2*depth*k/13
+            g.beam((side*width,y,.47),(side*ridge_x,0,ridge),.012,"straw",4)
+    # Two low sidewalls frame the entrance rather than painting a dark opening on the roof.
+    for sign in (-1,1):
+        g.box(sign*.626,-1.87,.080,.12,1.58,1.1,"wattle")
+        g.beam((sign*.62,-2.57,.065),(sign*.62,-2.57,1.31),.074,"timber",8)
+        g.prism([(sign*.83,-2.74,1.22),(sign*.79,-1.12,1.47),(0,-1.04,2.17),(0,-2.77,1.88)],
+                (0,0,-.14),"straw")
+        for i in range(19):
+            t=i/18
+            y=-2.72+t*1.60
+            g.beam((sign*.814,y,1.235+t*.23),(0,y,1.89+t*.28),.013,"thatch",4)
+    g.beam((-.68,-2.56,1.31),(.68,-2.56,1.31),.083,"timber",8)
+    g.beam((-ridge_x-.13,0,ridge+.05),(ridge_x+.13,0,ridge+.05),.115,"oak",9)
+    for x in (-.83,-.46,0,.46,.83):
+        for side in (-1,1):
+            g.beam((x,side*.20,ridge-.07),(x,0,ridge+.16),.017,"rope",5)
+
+
+def farmer(name):
     # The original adult body gets work clothes, a woven brim and a hand hoe.
     g=soldier.Geometry(0)
     soldier.body(g,"archer")
     # Recolour the existing tunic UVs in place so the cloth has a single surface.
     cells=list(soldier.PALETTE)
-    old,new=cells.index("pine"),cells.index("linen")
+    tunic={"farmer":"linen","han_farmer":"pine","wa_farmer":"linen"}[name]
+    old,new=cells.index("pine"),cells.index(tunic)
     for idx,coords in enumerate(g.uvs):
         u,v=coords[0]
-        if int(u*4)+4*int(v*4)==old:
-            g.uvs[idx]=[(a+(new%4-old%4)/4,b+(new//4-old//4)/4) for a,b in coords]
+        src=int(u*4)+4*int(v*4)
+        dst=src
+        influence=g.weights[g.faces[idx][0]]
+        dominant=influence if isinstance(influence,str) else influence[0][0]
+        if src==old:
+            dst=new
+        if name=="han_farmer" and dominant.startswith(("Shin","Thigh")) and src==cells.index("skin"):
+            dst=cells.index("charcoal")
+        if dst!=src:
+            g.uvs[idx]=[(a+(dst%4-src%4)/4,b+(dst//4-src//4)/4) for a,b in coords]
     g.module="Work_clothes"
-    g.tube([(0,.008,1.63,.218,.193),(0,.008,1.653,.205,.185),
-            (0,.012,1.703,.119,.115),(0,.013,1.777,.057,.058)],"linen","Head",26,.015)
-    g.tube([(0,.009,1.666,.175,.155),(0,.01,1.68,.159,.146)],"hide","Head",22)
+    if name=="farmer":
+        g.tube([(0,.008,1.63,.218,.193),(0,.008,1.653,.205,.185),
+                (0,.012,1.703,.119,.115),(0,.013,1.777,.057,.058)],"linen","Head",26,.015)
+        g.tube([(0,.009,1.666,.175,.155),(0,.01,1.68,.159,.146)],"hide","Head",22)
+    elif name=="han_farmer":
+        # Wrapped headcloth, crossing jacket edges, a cloth sash and leg wraps.
+        g.tube([(0,.014,1.637,.116,.108),(0,.016,1.69,.118,.105),
+                (0,.02,1.746,.075,.072)],"charcoal","Head",19)
+        g.tube([(-.01,.028,1.73,.045,.046),(-.01,.03,1.788,.043,.041),
+                (-.015,.03,1.80,.025,.026)],"brow","Head",14)
+        g.tube([(0,.012,1.632,.12,.111),(0,.013,1.656,.12,.112)],"linen","Head",20)
+        g.panel([(-.09,-.10,1.445),(-.058,-.12,1.43),(.101,-.151,1.221),
+                 (.066,-.148,1.212)],"linen","Spine")
+        g.panel([(.077,-.106,1.44),(.103,-.104,1.43),(.026,-.144,1.326),
+                 (.004,-.142,1.34)],"linen","Spine")
+        for s,suffix in ((-1,"R"),(1,"L")):
+            g.tube([(.12*s,.004,.107,.055,.064),(.12*s,.007,.32,.073,.078),
+                    (.12*s,-.002,.40,.073,.076)],"charcoal","Shin_"+suffix,14)
+            for z in (.159,.225,.288,.349):
+                r=.061 if z<.23 else .074
+                g.tube([(.12*s,.005,z,r,.08),(.12*s,.005,z+.011,r,.08)],"hide","Shin_"+suffix,14)
+        g.tube([(0,0,1.002,.166,.127),(0,0,1.06,.161,.124)],"oxblood","Pelvis",22,.018)
+    else:
+        # A simple shoulder-wrap, long tied hair and woven fibre belt.
+        g.tube([(0,.014,1.637,.115,.106),(0,.012,1.690,.119,.107),
+                (0,.009,1.74,.085,.09),(0,.02,1.763,.041,.054)],"brow","Head",21)
+        g.tube([(0,.100,1.503,.029,.030),(0,.102,1.574,.040,.038),
+                (0,.09,1.641,.046,.045)],"brow","Head",13)
+        g.tube([(0,.012,1.636,.118,.109),(0,.012,1.652,.118,.109)],"oxblood","Head",22)
+        g.panel([(-.150,-.141,1.414),(-.066,-.152,1.432),(.14,-.163,1.107),
+                 (.104,-.159,1.070)],"wood","Spine")
+        g.tube([(0,0,1.006,.166,.126),(0,0,1.045,.161,.123)],"wood","Pelvis",20,.025)
     # Tied waist cloth and belt pouch hang forward of the neutral working tunic.
     g.panel([(.046,-.125,1.035),(.145,-.117,1.035),(.156,-.14,.933),
              (.123,-.152,.911),(.055,-.153,.930)],"hide","Pelvis",.033)
     g.module="Farm_tool"
     g.rod([(-.34,-.27,.02),(-.31,-.16,1.23)],[.021,.019],"wood","Hand_R",9)
-    g.panel([(-.39,-.42,.034),(-.289,-.42,.034),(-.298,-.269,.073),(-.377,-.269,.073)],
+    if name=="wa_farmer":
+        g.panel([(-.414,-.29,.007),(-.267,-.29,.007),(-.274,-.279,.131),
+                 (-.322,-.273,.185),(-.387,-.279,.128)],"wood","Hand_R",.020)
+    else:
+        g.panel([(-.39,-.42,.034),(-.289,-.42,.034),(-.298,-.269,.073),(-.377,-.269,.073)],
             "iron","Hand_R",.015)
     arm=soldier.skeleton("farmer")
     obj=g.object("Field_worker",soldier.atlas_material(),arm)
@@ -315,22 +416,22 @@ def farmer():
 
 def build(name,folder):
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    if name=="farmer":
-        obj=farmer()
+    if name.endswith("farmer"):
+        obj=farmer(name)
     else:
         model=House()
-        {"han_house":han,"wa_store":wa,"wood_longhouse":longhouse}[name](model)
+        {"han_house":han,"wa_store":wa,"wa_house":pit_house,"wood_longhouse":longhouse}[name](model)
         obj=model.to_mesh(name,palette(folder))
     obj.data.calc_loop_triangles()
     bpy.context.preferences.filepaths.save_version=0
     bpy.ops.wm.save_as_mainfile(filepath=str(SOURCE/(name+".blend")),compress=True)
     path=OUTPUT/(name+".glb")
-    bpy.ops.export_scene.gltf(filepath=str(path),export_format="GLB",export_animations=(name=="farmer"),
+    bpy.ops.export_scene.gltf(filepath=str(path),export_format="GLB",export_animations=name.endswith("farmer"),
                               export_animation_mode="NLA_TRACKS",export_frame_step=2)
     return {"name":name,"triangles":len(obj.data.loop_triangles),"bytes":path.stat().st_size}
 
 
 if __name__=="__main__":
     with TemporaryDirectory() as folder:
-        metrics=[build(name,Path(folder)) for name in ("han_house","wa_store","wood_longhouse","farmer")]
+        metrics=[build(name,Path(folder)) for name in ("han_house","wa_store","wa_house","wood_longhouse","farmer","han_farmer","wa_farmer")]
     (SOURCE/"settlement_metrics.json").write_text(json.dumps(metrics,indent=2)+"\n")

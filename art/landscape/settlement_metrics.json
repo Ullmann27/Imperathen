@@ -10,6 +10,11 @@
     "bytes": 702296
   },
   {
+    "name": "wa_house",
+    "triangles": 5020,
+    "bytes": 696416
+  },
+  {
     "name": "wood_longhouse",
     "triangles": 9408,
     "bytes": 992708
@@ -18,5 +23,15 @@
     "name": "farmer",
     "triangles": 3328,
     "bytes": 220224
+  },
+  {
+    "name": "han_farmer",
+    "triangles": 3990,
+    "bytes": 263252
+  },
+  {
+    "name": "wa_farmer",
+    "triangles": 3454,
+    "bytes": 228780
   }
 ]

@@ -11,7 +11,9 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "art/landscape/review"
 OUT.mkdir(exist_ok=True)
 GROUPS = {"soldiers":["heavy","spear","archer","officer"], "trees":["pine","olive","oak"],
-          "settlements":["han_house","wa_store","wood_longhouse","farmer"]}
+          "settlements":["han_house","wa_store","wa_house","wood_longhouse","farmer"],
+          "roman":["frontier_house","village_well","atrium_house"],
+          "workers":["farmer","han_farmer","wa_farmer"]}
 POSES = {"heavy":("wall",9), "spear":("idle",9), "archer":("shoot",19), "officer":("march",4)}
 
 
@@ -21,6 +23,8 @@ def point(obj, target):
 
 def render(name):
     group = "soldiers" if name in GROUPS["soldiers"] else "landscape"
+    if name in GROUPS["roman"]:
+        group="architecture"
     suffix = "_near" if name in GROUPS["soldiers"]+GROUPS["trees"] else ""
     file=ROOT/f"prototype/assets/{group}/{name}{suffix}.glb"
     bpy.ops.wm.read_factory_settings(use_empty=True)
