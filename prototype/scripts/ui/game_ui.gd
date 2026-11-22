@@ -9,6 +9,7 @@ const BRONZE := Color("b99563")
 const CRIMSON := Color("722b32")
 const INK := Color("111a1b")
 const SETTINGS_PATH := "user://imperathen_ui.cfg"
+const SafeArea = preload("res://scripts/ui/safe_area.gd")
 const TouchPadScript := preload("res://scripts/ui/touch_pad.gd")
 const TouchActionScript := preload("res://scripts/ui/touch_action.gd")
 
@@ -78,6 +79,7 @@ var _touch_actions: Array[Button] = []
 var _cancel_build_button: Button
 var _build_active := false
 var _quality := "balanced"
+var _diagnostics := false
 var _layout_queued := false
 var _dialog_data: Dictionary = {}
 var _confirm_data: Dictionary = {}
@@ -87,6 +89,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 20
 	_load_settings()
+	_apply_display_settings()
 	_setup_theme()
 	_root = Control.new()
 	_root.name = "Interface"
@@ -197,6 +200,10 @@ func show_menu(can_continue: bool) -> void:
 	buttons.add_child(continue_button)
 	var new_button := _button("Neues Leben", _request_new_game, not can_continue)
 	buttons.add_child(new_button)
+	var demo_button := _button("Talgefecht erproben", func(): _emit("valley_demo"))
+	buttons.add_child(demo_button)
+	if OS.is_debug_build() and OS.has_feature("android"):
+		_log_menu_buttons.call_deferred(demo_button, continue_button)
 	buttons.add_child(_button("Einstellungen", func(): _show_settings("menu")))
 	buttons.add_child(_button("Spiel beenden", func(): _confirm("Spiel beenden?", "Ein laufender Lebensweg wird vor dem Beenden gespeichert.", "quit", {})))
 	var filler := Control.new()
@@ -218,6 +225,20 @@ func show_menu(can_continue: bool) -> void:
 	province_content.add_child(_label("AN DER GRENZE DES REICHES", 12, BRONZE))
 	province_content.add_child(_label("Eine Heimat. Eine Entscheidung.", 17, CREAM, true))
 	province.visible = not _compact_layout
+
+
+func _log_menu_buttons(demo: Button, resume: Button) -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if not is_instance_valid(demo) or not demo.is_visible_in_tree():
+		return
+	var transform := get_viewport().get_screen_transform()
+	var demo_center := transform * demo.get_global_rect().get_center()
+	var resume_center := transform * resume.get_global_rect().get_center()
+	print("IMPERATHEN_MENU_TOUCH " + JSON.stringify({
+		"demo": [demo_center.x, demo_center.y],
+		"continue": [resume_center.x, resume_center.y],
+		"can_continue": not resume.disabled}))
 
 
 func show_game(state: Dictionary) -> void:
@@ -261,6 +282,7 @@ func update_state(state: Dictionary) -> void:
 	var objective := _objective(state)
 	_hud_labels["objective_title"].text = objective[0]
 	_hud_labels["objective_text"].text = objective[1]
+	_update_map_objective()
 	var chronicle: Array = state.get("chronicle", [])
 	var entries: Array[String] = []
 	for index in range(maxi(0, chronicle.size() - 3), chronicle.size()):
@@ -295,6 +317,15 @@ func show_pause() -> void:
 	var column := _modal("EIN AUGENBLICK RUHE", "Spiel pausiert", "Die Welt wartet. Dein nächster Schritt gehört dir.", 490)
 	var resume_button := _button("Weiterspielen", func(): _emit("resume"), true)
 	column.add_child(resume_button)
+	var legion := _button("Grenzlegion im Tal", func(): _emit("valley"))
+	legion.disabled = not bool(_state.get("progress", {}).get("skirmish_won", false)) or not _state.get("story", {}).get("choices", []).is_empty()
+	legion.tooltip_text = "Verteidige zuerst das Dorf und entscheide über seine Zukunft." if legion.disabled else "Befehle die regionale Legion. Deine Dorftruppe bleibt zu Hause."
+	column.add_child(legion)
+	if legion.disabled:
+		var requirement := _label("Nach erfolgreicher Dorfverteidigung und Folgeentscheidung verfügbar.", 13, MUTED)
+		requirement.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		column.add_child(requirement)
+	column.add_child(_button("Chronik", func(): _show_journal(false)))
 	column.add_child(_button("Spiel speichern", func(): _emit("save")))
 	column.add_child(_button("Einstellungen", func(): _show_settings("pause")))
 	column.add_child(_button("Zum Hauptmenü", func(): _emit("menu")))
@@ -373,7 +404,17 @@ func set_mode(mode: String) -> void:
 			"map": "Im freien Bild ziehen · Figur wählen, um zurückzukehren · Deine Figur bleibt an ihrem Ort."
 		}
 	_hud_labels["controls"].text = hints[mode]
+	var objective := _objective(_state)
+	_hud_labels["objective_title"].text = objective[0]
+	_hud_labels["objective_text"].text = objective[1]
+	_update_map_objective()
 	_update_touch_visibility()
+
+
+func _update_map_objective() -> void:
+	if _mode == "map" and not _state.get("valley", {}).is_empty():
+		_hud_labels["objective_title"].text = "Regionaler Lagebericht"
+		_hud_labels["objective_text"].text = _region_report()
 
 
 func set_build_active(active: bool) -> void:
@@ -718,6 +759,16 @@ func _update_touch_visibility() -> void:
 		_cancel_build_button.visible = _build_active
 
 
+func _region_report() -> String:
+	var region: Dictionary = _state.get("valley", {})
+	if region.is_empty():
+		return ""
+	var outcome := String(region.get("outcome", ""))
+	var status := String({"victory": "Sieg", "defeat": "Niederlage", "draw": "Unentschieden"}.get(outcome, "Einsatz läuft"))
+	return "Grenzlegion im Tal · %s\nVerluste: %d eigene · %d gegnerische" % [
+		status, int(region.get("allied_losses", 0)), int(region.get("enemy_losses", 0))]
+
+
 func _show_journal(pause_world := true) -> void:
 	# Root pauses the authoritative world before the reading screen replaces its pause UI.
 	if pause_world:
@@ -731,6 +782,9 @@ func _show_journal(pause_world := true) -> void:
 		int(player.get("age", 12)), int(player.get("health", 100)), int(squad.get("alive", 0)), int(squad.get("recruits", 0)), int(squad.get("morale", 0)),
 		"Vertrauen %+d" % int(companion.get("trust", 0)) if bool(companion.get("met", false)) else "noch nicht kennengelernt", objective[0], objective[1]
 	]
+	var report := _region_report()
+	if not report.is_empty():
+		summary += "\n\n" + report
 	var column := _modal("DEIN LEBENSWEG", "Chronik", summary, 650)
 	for entry in _state.get("chronicle", []):
 		var line := _label(String(entry.get("text", "")) if entry is Dictionary else str(entry), 14, MUTED)
@@ -771,20 +825,11 @@ func _content_size() -> Vector2:
 
 
 func _update_safe_area() -> void:
-	var viewport_size := get_viewport().get_visible_rect().size
-	var safe := Rect2(Vector2.ZERO, viewport_size)
-	if OS.has_feature("mobile"):
-		safe = _safe_rect_from_display(Rect2(DisplayServer.get_display_safe_area()), get_viewport().get_screen_transform(), viewport_size)
-	_apply_safe_rect(safe)
+	_apply_safe_rect(SafeArea.for_viewport(get_viewport()))
 
 
 func _safe_rect_from_display(screen_safe: Rect2, screen_transform: Transform2D, viewport_size: Vector2) -> Rect2:
-	var full := Rect2(Vector2.ZERO, viewport_size)
-	if screen_safe.size.x <= 0 or screen_safe.size.y <= 0 or is_zero_approx(screen_transform.determinant()):
-		return full
-	var mapped: Rect2 = screen_transform.affine_inverse() * screen_safe
-	var clipped := mapped.intersection(full)
-	return clipped if clipped.size.x > 0 and clipped.size.y > 0 else full
+	return SafeArea.from_display(screen_safe, screen_transform, viewport_size)
 
 
 func _apply_safe_rect(safe: Rect2) -> void:
@@ -887,17 +932,29 @@ func _show_settings(return_screen: String) -> void:
 	column.add_child(_label("Grafikqualität", 16, CREAM))
 	var quality_select := OptionButton.new()
 	quality_select.name = "QualitySetting"
-	quality_select.add_item("Niedrig")
-	quality_select.add_item("Ausgewogen")
-	quality_select.add_item("Hoch")
+	quality_select.add_item("Niedrig · 30 FPS")
+	quality_select.add_item("Ausgewogen · 60 FPS")
+	quality_select.add_item("Hoch · 60 FPS")
 	quality_select.custom_minimum_size.y = 46
 	var profiles := ["low", "balanced", "high"]
 	quality_select.selected = profiles.find(_quality)
 	column.add_child(quality_select)
 	quality_select.item_selected.connect(func(index: int):
 		_quality = profiles[index]
+		_apply_display_settings()
 		_save_settings()
 		_emit("quality_changed", {"profile": _quality})
+	)
+	var diagnostics := CheckButton.new()
+	diagnostics.name = "DiagnosticsSetting"
+	diagnostics.text = "Leistungsdiagnose anzeigen"
+	diagnostics.button_pressed = _diagnostics
+	diagnostics.custom_minimum_size.y = 48
+	column.add_child(diagnostics)
+	diagnostics.toggled.connect(func(value: bool):
+		_diagnostics = value
+		_apply_display_settings()
+		_save_settings()
 	)
 	var volume_caption := _label("Gesamtlautstärke  ·  %d %%" % int(_volume * 100), 16, CREAM)
 	column.add_child(volume_caption)
@@ -1116,10 +1173,18 @@ func _load_settings() -> void:
 		_reduce_motion = bool(config.get_value("interface", "reduce_motion", false))
 		_volume = clampf(float(config.get_value("audio", "volume", 0.55)), 0.0, 1.0)
 		_touch_enabled = bool(config.get_value("input", "touch_controls", _touch_enabled))
+		_diagnostics = bool(config.get_value("graphics", "diagnostics", false))
 		_quality = String(config.get_value("graphics", "quality", "balanced"))
 		if _quality not in ["low", "balanced", "high"]:
 			_quality = "balanced"
 	_apply_volume()
+
+
+func _apply_display_settings() -> void:
+	var display := get_node_or_null("/root/RuntimeDisplay")
+	if is_instance_valid(display):
+		display.apply_quality(_quality)
+		display.set_diagnostics(_diagnostics)
 
 
 func _save_settings() -> void:
@@ -1129,6 +1194,7 @@ func _save_settings() -> void:
 	config.set_value("audio", "volume", _volume)
 	config.set_value("input", "touch_controls", _touch_enabled)
 	config.set_value("graphics", "quality", _quality)
+	config.set_value("graphics", "diagnostics", _diagnostics)
 	if config.save(SETTINGS_PATH) != OK:
 		notify("Die Einstellungen konnten nicht auf diesem Gerät gespeichert werden.")
 

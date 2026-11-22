@@ -51,7 +51,7 @@ jobs:
           with zipfile.ZipFile(root/'godot.zip') as z: z.extractall(root)
           target=pathlib.Path(os.environ['RUNNER_TEMP'])/'templates/4.7.2.stable'
           with zipfile.ZipFile(root/'templates.tpz') as z:
-              for name in ('android_debug.apk','android_release.apk','version.txt'):
+              for name in ('android_debug.apk','android_release.apk','linux_debug.x86_64','windows_debug_x86_64.exe','version.txt'):
                   (target/name).write_bytes(z.read('templates/'+name))
           PY
           rm templates.tpz godot.zip
@@ -90,6 +90,26 @@ jobs:
           path: artifacts/
           if-no-files-found: error
           retention-days: 30
+      - name: Export Linux and Windows desktop builds
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.local/share/godot/export_templates" desktop
+          ln -s "$IMPERATHEN_TEMPLATE_DIR" "$HOME/.local/share/godot/export_templates/4.7.2.stable"
+          "$GODOT_BIN" --headless --path prototype --export-debug "Linux x86_64" "$PWD/desktop/IMPERATHEN.x86_64"
+          "$GODOT_BIN" --headless --path prototype --export-debug "Windows x86_64" "$PWD/desktop/IMPERATHEN.exe"
+          desktop/IMPERATHEN.x86_64 --headless --quit-after 3 | tee desktop/linux-start.log
+          grep -q IMPERATHEN_READY desktop/linux-start.log
+          (cd desktop && sha256sum IMPERATHEN.* > SHA256SUMS.txt && tar czf IMPERATHEN-linux-x86_64.tar.gz IMPERATHEN.x86_64)
+      - name: Upload desktop builds
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-desktop-${{ github.run_number }}
+          path: |
+            desktop/*.tar.gz
+            desktop/*.exe
+            desktop/*.txt
+            desktop/*.log
+          retention-days: 30
       - name: Start a real Android emulator and inspect the app runtime
         timeout-minutes: 14
         shell: bash
@@ -97,7 +117,12 @@ jobs:
           set -euo pipefail
           image='system-images;android-37.0;google_apis;x86_64'
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'emulator' "$image"
-          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name imperathen --device pixel_6 --package "$image"
+          export ANDROID_USER_HOME="$RUNNER_TEMP/android-user"
+          export ANDROID_AVD_HOME="$RUNNER_TEMP/android-avd"
+          mkdir -p "$ANDROID_USER_HOME" "$ANDROID_AVD_HOME"
+          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name imperathen --device pixel_6 --path "$ANDROID_AVD_HOME/imperathen.avd" --package "$image"
+          test -f "$ANDROID_AVD_HOME/imperathen.ini"
+          "$ANDROID_HOME/emulator/emulator" -list-avds
           sudo chmod a+rw /dev/kvm
           "$ANDROID_HOME/emulator/emulator" -accel-check
           "$ANDROID_HOME/platform-tools/adb" start-server
