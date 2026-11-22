@@ -27,7 +27,7 @@ func _run() -> void:
 	RenderingServer.viewport_set_measure_render_time(rid,true)
 	report = {"engine":Engine.get_version_info().string,"renderer":RenderingServer.get_current_rendering_method(),
 		"adapter":RenderingServer.get_video_adapter_name(),"output_px":[root.size.x,root.size.y],
-		"sample_frames":sample_count,"profiles":{},"scope":"Linux graphical viewport. Whole-frame wall time includes frame limiter. Render CPU/GPU are viewport timestamps; on llvmpipe the GPU work is software."}
+		"sample_frames":sample_count,"scene":"60 stationary soldiers, overview, simulation paused across profiles","profiles":{},"scope":"Linux graphical viewport. Whole-frame wall time includes frame limiter. Render CPU/GPU are viewport timestamps; on llvmpipe the GPU work is software."}
 	var before := JSON.stringify(scene.model.snapshot())
 	for profile in ["low","balanced","high"]:
 		display.apply_quality(profile)
@@ -56,6 +56,7 @@ func _run() -> void:
 			"viewport_gpu_ms":_quantiles(gpu),"draw_calls":_quantiles(calls),"peak_sampled_rss_mib":memory.max(),
 			"visible_soldiers_near_mid_far":[display._units.x,display._units.y,display._units.z],
 			"same_simulation":before == JSON.stringify(scene.model.snapshot()),
+			"submitted_trees":scene.land.grove.visible_tree_count,
 			"render_scale":root.scaling_3d_scale}
 		_capture("valley-"+profile)
 	scene.focus = Vector2(-7,8)
