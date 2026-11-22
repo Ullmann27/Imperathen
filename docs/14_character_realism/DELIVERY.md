@@ -2,6 +2,8 @@
 
 **22. November 2026 · Arbeitsbranch `feature/hero-realism-20261122` · Bezug: [Issue #33](https://github.com/Ullmann27/Imperathen/issues/33).**
 
+**Fortsetzung abgeschlossen:** Der vollständige Quellstand ist in [PR #34](https://github.com/Ullmann27/Imperathen/pull/34) wiederhergestellt. Der Android-Bau und 36 Emulatorprüfungen sind erfolgreich; aktuelle Quellabgleiche, Paketdaten und echte Android-Bilder stehen im [Wiederherstellungs- und Liefernachweis](RECOVERY.md).
+
 Die Italia-Hauptfigur verwendet jetzt ein anatomisch aufgebautes, animiertes 3D-Modell mit separaten Augen und eigenen Gesichtsmorphs. Die Figur liegt als bearbeitbare Blender-Datei und als vier tatsächlich importierte Godot-Modelle vor. Die ursprüngliche vereinfachte Figur bleibt für andere Herkünfte und als Ersatz bei fehlenden neuen Modellen erhalten.
 
 Der neue Stand ist ein überprüfter Ausbau des Prototyps. Die vom Nutzer mit einer hochwertigen Spielszene konkretisierte PC-/Konsolenqualität ist noch nicht erreicht. Issue #33 bleibt deshalb offen. Die [unabhängige visuelle Prüfung](../art/HERO_INDEPENDENT_REVIEW_2026_11_22.md) beschreibt die verbleibenden Unterschiede ausdrücklich.

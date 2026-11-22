@@ -8,7 +8,7 @@
       "check": "import",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 5.078,
+      "elapsed_seconds": 4.734,
       "expected_marker": null,
       "log": "import.log",
       "warnings": []
@@ -17,7 +17,7 @@
       "check": "domain",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.338,
+      "elapsed_seconds": 0.349,
       "expected_marker": "DOMAIN_TEST_PASS",
       "log": "domain.log",
       "warnings": []
@@ -26,7 +26,7 @@
       "check": "ui",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.421,
+      "elapsed_seconds": 0.564,
       "expected_marker": "UI_SMOKE_PASS",
       "log": "ui.log",
       "warnings": []
@@ -35,7 +35,7 @@
       "check": "world",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.794,
+      "elapsed_seconds": 0.909,
       "expected_marker": "WORLD_SMOKE_PASS",
       "log": "world.log",
       "warnings": []
@@ -44,7 +44,7 @@
       "check": "integration",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 2.017,
+      "elapsed_seconds": 2.103,
       "expected_marker": "INTEGRATION_PASS",
       "log": "integration.log",
       "warnings": []
@@ -53,7 +53,7 @@
       "check": "battle_rules",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.435,
+      "elapsed_seconds": 0.426,
       "expected_marker": "failures=0",
       "log": "battle_rules.log",
       "warnings": []
@@ -62,7 +62,7 @@
       "check": "soldier_visuals",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.15,
+      "elapsed_seconds": 0.301,
       "expected_marker": "0 failed",
       "log": "soldier_visuals.log",
       "warnings": []
@@ -71,7 +71,7 @@
       "check": "soldier_gait",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.426,
+      "elapsed_seconds": 0.425,
       "expected_marker": "failures=0",
       "log": "soldier_gait.log",
       "warnings": []
@@ -80,7 +80,7 @@
       "check": "village_people",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 1.644,
+      "elapsed_seconds": 1.832,
       "expected_marker": "checks, 0 failed",
       "log": "village_people.log",
       "warnings": []
@@ -89,7 +89,7 @@
       "check": "hero_faces",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 1.084,
+      "elapsed_seconds": 0.985,
       "expected_marker": "checks, 0 failed",
       "log": "hero_faces.log",
       "warnings": []
@@ -98,7 +98,7 @@
       "check": "village_scenery",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.243,
+      "elapsed_seconds": 0.239,
       "expected_marker": "VILLAGE_SCENERY errors []",
       "log": "village_scenery.log",
       "warnings": []
@@ -107,7 +107,7 @@
       "check": "atrium",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.427,
+      "elapsed_seconds": 0.329,
       "expected_marker": "ATR_VISUAL errors []",
       "log": "atrium.log",
       "warnings": []
@@ -116,7 +116,7 @@
       "check": "seasons",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.238,
+      "elapsed_seconds": 0.248,
       "expected_marker": "failures=0",
       "log": "seasons.log",
       "warnings": []
@@ -125,7 +125,7 @@
       "check": "figure_gallery",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 1.452,
+      "elapsed_seconds": 1.178,
       "expected_marker": "failures=0 real_textures=true",
       "log": "figure_gallery.log",
       "warnings": []
@@ -134,7 +134,7 @@
       "check": "landscape",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 0.239,
+      "elapsed_seconds": 0.242,
       "expected_marker": null,
       "log": "landscape.log",
       "warnings": []
@@ -143,7 +143,7 @@
       "check": "main_scene",
       "passed": true,
       "exit_code": 0,
-      "elapsed_seconds": 1.08,
+      "elapsed_seconds": 1.081,
       "expected_marker": "IMPERATHEN_READY",
       "log": "main_scene.log",
       "warnings": []
@@ -276,7 +276,7 @@
     "prototype/tests/domain_test.gd": "87f0a8d42de174afaa1b354d9a8e724763748aa128ffa796aa464273d5d02e2d",
     "prototype/tests/figure_gallery_test.gd": "655e4954773ada72e1532e59709361ef02f2d64d8a54b2cf12bf10de33da5ca6",
     "prototype/tests/hero_face_test.gd": "4e732243d987cc8c1d6563802e4954647013db34fd46965b2171c16cf839a475",
-    "prototype/tests/hero_graphics_review.gd": "59504ca6e293d37a771186f1c22e04829d401337e13de98fbcd3cd37e5a089d0",
+    "prototype/tests/hero_graphics_review.gd": "6946f2a5b0412a12f414e3b3a4d6cd69d002ceafa57b722573a540824308502d",
     "prototype/tests/integration_test.gd": "29c383faa98682c7dd574ddfc5b0f9d72890eebfd0ef06dce58f12fb7971c0bf",
     "prototype/tests/live_graphics_review.gd": "0a54c73e6f63b3cbfce33161cf60c218697dc9cfbbe8639a1566f3de5ffd147f",
     "prototype/tests/season_campaign_test.gd": "2e72280a43152844c5f0251416860305de6556791f0b15eeb7a1e681353a4e5f",

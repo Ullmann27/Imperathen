@@ -1,0 +1,31 @@
+name: Publish verified hero APK
+
+on:
+  push:
+    branches: ['feature/hero-realism-20261122']
+    paths: ['.github/workflows/hero-download.yml']
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: hero-download-d54478ec
+  cancel-in-progress: false
+
+jobs:
+  publish-verified-download:
+    if: github.repository == 'Ullmann27/Imperathen' && github.ref == 'refs/heads/feature/hero-realism-20261122'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout: tools/publish_hero_download.py
+          sparse-checkout-cone-mode: false
+      - name: Verify the completed source build and publish its ARM64 download
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 tools/publish_hero_download.py
