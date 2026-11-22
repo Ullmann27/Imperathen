@@ -1,0 +1,34 @@
+{
+  "asset_id": "village_well",
+  "source": "village_well.blend",
+  "file": "village_well.glb",
+  "source_blender_version": "4.3.2",
+  "unit": "metre",
+  "gltf_up_axis": "Y",
+  "gltf_front": "+Z",
+  "triangles": 12644,
+  "mesh_batches": 10,
+  "bounds_blender_z_up": [
+    [
+      -1.4882135391235352,
+      -1.0783514976501465,
+      0.0
+    ],
+    [
+      1.7100000381469727,
+      1.0783514976501465,
+      3.265000104904175
+    ]
+  ],
+  "dimensions_blender_z_up": [
+    3.198213577270508,
+    2.156702995300293,
+    3.265000104904175
+  ],
+  "sha256": "21555082045da623d48eafa04ba69ed3d94126d8db006d638dca06912949e0a0",
+  "bytes": 4310940,
+  "provenance": "Original procedural geometry and texture maps authored for IMPERATHEN; no third-party model downloads.",
+  "license": "Project owner rights; no public redistribution license asserted.",
+  "rigged": false,
+  "collision_tested": false
+}

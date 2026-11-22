@@ -1,0 +1,34 @@
+{
+  "asset_id": "civilian_youth",
+  "source": "civilian_youth.blend",
+  "file": "civilian_youth.glb",
+  "source_blender_version": "4.3.2",
+  "unit": "metre",
+  "gltf_up_axis": "Y",
+  "gltf_front": "+Z",
+  "triangles": 18939,
+  "mesh_batches": 4,
+  "bounds_blender_z_up": [
+    [
+      -0.2919999957084656,
+      -0.15299999713897705,
+      0.0
+    ],
+    [
+      0.2919999957084656,
+      0.11680000275373459,
+      1.5189238786697388
+    ]
+  ],
+  "dimensions_blender_z_up": [
+    0.5839999914169312,
+    0.26979999989271164,
+    1.5189238786697388
+  ],
+  "sha256": "d67bfa8cb612ff5d6e91cb8aa30bafa313dcbf5ff9c858b181fadc2bd2ff014c",
+  "bytes": 2578104,
+  "provenance": "Original procedural geometry and texture maps authored for IMPERATHEN; no third-party model downloads.",
+  "license": "Project owner rights; no public redistribution license asserted.",
+  "rigged": false,
+  "collision_tested": false
+}

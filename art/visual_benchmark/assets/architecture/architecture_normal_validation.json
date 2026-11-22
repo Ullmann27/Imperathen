@@ -1,0 +1,14 @@
+{
+  "frontier_house": {
+    "mesh_components": 1088,
+    "negative_volume_components": []
+  },
+  "village_well": {
+    "mesh_components": 439,
+    "negative_volume_components": []
+  },
+  "house_foundation": {
+    "mesh_components": 173,
+    "negative_volume_components": []
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "authorship": "Original procedural geometry authored for IMPERATHEN; no third-party model or texture downloads.",
+  "seed": 73122,
+  "coordinate_system": "metres, Z-up, entrance -Y, ground pivot at origin",
+  "validation_boundary": "Blender geometry/export only; Unreal import, navigation, collision and hardware performance unverified.",
+  "assets": {
+    "frontier_house": {
+      "source_mesh_objects": 28,
+      "evaluated_vertices": 17772,
+      "evaluated_triangles": 31192,
+      "closed_component_orientation_checks": 1088,
+      "negative_volume_components": 0,
+      "bounds_min_m": [
+        -3.4698221683502197,
+        -3.385000228881836,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.4698221683502197,
+        2.927999973297119,
+        5.025000095367432
+      ],
+      "dimensions_m": [
+        6.9396443367004395,
+        6.313000202178955,
+        5.025000095367432
+      ],
+      "material_names": [
+        "ARCH_Aged_Bronze",
+        "ARCH_Lime_Plaster",
+        "ARCH_Limestone",
+        "ARCH_Limestone_Damp",
+        "ARCH_Oak",
+        "ARCH_Oak_Cut",
+        "ARCH_Terracotta",
+        "ARCH_Terracotta_Dark",
+        "ARCH_Terracotta_Light"
+      ],
+      "openings": {
+        "geometry_rays_clear": 17,
+        "door_frame_clear_width_m": 1.12,
+        "door_frame_clear_height_m": 2.09,
+        "engine_collision_tested": false
+      },
+      "review_image": {
+        "file": "frontier_house_review.png",
+        "renderer": "Blender Cycles CPU",
+        "samples": 48,
+        "width": 1280,
+        "height": 960,
+        "game_runtime_capture": false
+      }
+    },
+    "village_well": {
+      "source_mesh_objects": 18,
+      "evaluated_vertices": 7200,
+      "evaluated_triangles": 12644,
+      "closed_component_orientation_checks": 439,
+      "negative_volume_components": 0,
+      "bounds_min_m": [
+        -1.4882135391235352,
+        -1.0783514976501465,
+        0.0
+      ],
+      "bounds_max_m": [
+        1.709999918937683,
+        1.0783514976501465,
+        3.265000104904175
+      ],
+      "dimensions_m": [
+        3.198213577270508,
+        2.156702995300293,
+        3.265000104904175
+      ],
+      "material_names": [
+        "ARCH_Aged_Bronze",
+        "ARCH_Hemp",
+        "ARCH_Limestone",
+        "ARCH_Limestone_Damp",
+        "ARCH_Oak",
+        "ARCH_Oak_Cut",
+        "ARCH_Terracotta",
+        "ARCH_Terracotta_Dark",
+        "ARCH_Terracotta_Light",
+        "ARCH_Well_Water"
+      ],
+      "review_image": {
+        "file": "village_well_review.png",
+        "renderer": "Blender Cycles CPU",
+        "samples": 48,
+        "width": 1280,
+        "height": 960,
+        "game_runtime_capture": false
+      }
+    },
+    "house_foundation": {
+      "source_mesh_objects": 7,
+      "evaluated_vertices": 4152,
+      "evaluated_triangles": 7612,
+      "closed_component_orientation_checks": 173,
+      "negative_volume_components": 0,
+      "bounds_min_m": [
+        -3.0309083461761475,
+        -3.126697063446045,
+        0.0
+      ],
+      "bounds_max_m": [
+        4.309999942779541,
+        2.57033371925354,
+        3.319999933242798
+      ],
+      "dimensions_m": [
+        7.340908050537109,
+        5.697031021118164,
+        3.319999933242798
+      ],
+      "material_names": [
+        "ARCH_Limestone",
+        "ARCH_Limestone_Damp",
+        "ARCH_Oak",
+        "ARCH_Oak_Cut"
+      ],
+      "review_image": {
+        "file": "house_foundation_review.png",
+        "renderer": "Blender Cycles CPU",
+        "samples": 48,
+        "width": 1280,
+        "height": 960,
+        "game_runtime_capture": false
+      }
+    }
+  }
+}

@@ -1,0 +1,1690 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-11-22T14:22:04+00:00",
+  "validator": "imperathen-visual-assets-stdlib-v1",
+  "scope": "Static GLB export gate: container, embedded data, accessor bytes, meshes, materials and default-scene bounds",
+  "not_verified": [
+    "complete glTF schema/extension conformance",
+    "pixel decoding or visual quality",
+    "rig/animation quality",
+    "engine integration",
+    "FPS or GPU memory",
+    "legal rights"
+  ],
+  "specification": "https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html",
+  "status": "passed",
+  "assets_checked": 7,
+  "assets_failed": 0,
+  "errors": [],
+  "assets": [
+    {
+      "path": "art/visual_benchmark/assets/architecture/frontier_house.glb",
+      "status": "passed",
+      "errors": [],
+      "warnings": [],
+      "bytes": 6320092,
+      "sha256": "2fb464187ecec393558d9ba24790ec54a6b9e3c66558413c266664650fbc6372",
+      "triangles_unique_meshes": 31192,
+      "primitives": 9,
+      "meshes": 9,
+      "materials": 9,
+      "material_details": [
+        {
+          "index": 0,
+          "name": "ARCH_Limestone",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 1,
+          "name": "ARCH_Limestone_Damp",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 2,
+          "name": "ARCH_Lime_Plaster",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 3,
+          "name": "ARCH_Oak",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 4,
+          "name": "ARCH_Oak_Cut",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 5,
+          "name": "ARCH_Terracotta",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 6,
+          "name": "ARCH_Terracotta_Light",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 7,
+          "name": "ARCH_Terracotta_Dark",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 8,
+          "name": "ARCH_Aged_Bronze",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0.7200000286102295,
+          "roughness_factor": 1
+        }
+      ],
+      "textured_materials": 9,
+      "accessors": 45,
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 309224,
+          "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+          "index": 0,
+          "name": "limestone_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 137714,
+          "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+          "index": 1,
+          "name": "limestone_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 142722,
+          "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+          "index": 2,
+          "name": "limestone_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 308124,
+          "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+          "index": 3,
+          "name": "plaster_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 161720,
+          "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+          "index": 4,
+          "name": "plaster_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 141555,
+          "sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+          "index": 5,
+          "name": "plaster_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 364306,
+          "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+          "index": 6,
+          "name": "oak_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 115206,
+          "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+          "index": 7,
+          "name": "oak_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 146455,
+          "sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+          "index": 8,
+          "name": "oak_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 324447,
+          "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+          "index": 9,
+          "name": "terracotta_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 139322,
+          "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+          "index": 10,
+          "name": "terracotta_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 144587,
+          "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+          "index": 11,
+          "name": "terracotta_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 298673,
+          "sha256": "234b5d74731a6c4c8a61a4e00980f94b4c3cf6bc230480246f934ad85e4dfcf4",
+          "index": 12,
+          "name": "bronze_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 135678,
+          "sha256": "ecbfa3242436275c538f96f055877c3ad82f7e34e214068bcb270678d60bac14",
+          "index": 13,
+          "name": "bronze_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 146599,
+          "sha256": "f11fd653301d7487891c715587ac11234326cf0871deba758b06d978667fdd26",
+          "index": 14,
+          "name": "bronze_roughness",
+          "embedded": true
+        }
+      ],
+      "unique_embedded_image_count": 15,
+      "rgba8_top_level_texture_bytes_estimate": 15728640,
+      "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+      "skins": 0,
+      "animations": 0,
+      "default_scene": 0,
+      "mesh_instances": 9,
+      "triangles_with_scene_instances": 31192,
+      "primitive_instances_before_renderer_batching": 9,
+      "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+      "bounds_m": {
+        "min": [
+          -3.4698221683502197,
+          0.0,
+          -2.927999973297119
+        ],
+        "max": [
+          3.4698221683502197,
+          5.025000095367432,
+          3.385000228881836
+        ]
+      },
+      "dimensions_m_xyz": [
+        6.9396443367004395,
+        5.025000095367432,
+        6.313000202178955
+      ],
+      "coordinate_system": "glTF right-handed, Y up; project front +Z"
+    },
+    {
+      "path": "art/visual_benchmark/assets/architecture/house_foundation.glb",
+      "status": "passed",
+      "errors": [],
+      "warnings": [],
+      "bytes": 2253860,
+      "sha256": "741dc9cd2988b32542862752ab77ebe4facd7c55d9edc8731f87f600b36b7f2e",
+      "triangles_unique_meshes": 7612,
+      "primitives": 4,
+      "meshes": 4,
+      "materials": 4,
+      "material_details": [
+        {
+          "index": 0,
+          "name": "ARCH_Limestone",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 1,
+          "name": "ARCH_Limestone_Damp",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 2,
+          "name": "ARCH_Oak_Cut",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 3,
+          "name": "ARCH_Oak",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        }
+      ],
+      "textured_materials": 4,
+      "accessors": 20,
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 309224,
+          "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+          "index": 0,
+          "name": "limestone_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 137714,
+          "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+          "index": 1,
+          "name": "limestone_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 142722,
+          "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+          "index": 2,
+          "name": "limestone_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 364306,
+          "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+          "index": 3,
+          "name": "oak_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 115206,
+          "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+          "index": 4,
+          "name": "oak_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 146455,
+          "sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+          "index": 5,
+          "name": "oak_roughness",
+          "embedded": true
+        }
+      ],
+      "unique_embedded_image_count": 6,
+      "rgba8_top_level_texture_bytes_estimate": 6291456,
+      "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+      "skins": 0,
+      "animations": 0,
+      "default_scene": 0,
+      "mesh_instances": 4,
+      "triangles_with_scene_instances": 7612,
+      "primitive_instances_before_renderer_batching": 4,
+      "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+      "bounds_m": {
+        "min": [
+          -3.0309083461761475,
+          0.0,
+          -2.57033371925354
+        ],
+        "max": [
+          4.309999942779541,
+          3.319999933242798,
+          3.126697063446045
+        ]
+      },
+      "dimensions_m_xyz": [
+        7.3409082889556885,
+        3.319999933242798,
+        5.697030782699585
+      ],
+      "coordinate_system": "glTF right-handed, Y up; project front +Z"
+    },
+    {
+      "path": "art/visual_benchmark/assets/architecture/village_well.glb",
+      "status": "passed",
+      "errors": [],
+      "warnings": [],
+      "bytes": 4310940,
+      "sha256": "21555082045da623d48eafa04ba69ed3d94126d8db006d638dca06912949e0a0",
+      "triangles_unique_meshes": 12644,
+      "primitives": 10,
+      "meshes": 10,
+      "materials": 10,
+      "material_details": [
+        {
+          "index": 0,
+          "name": "ARCH_Limestone",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 1,
+          "name": "ARCH_Limestone_Damp",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 2,
+          "name": "ARCH_Well_Water",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0.05000000074505806,
+          "roughness_factor": 0.23999999463558197
+        },
+        {
+          "index": 3,
+          "name": "ARCH_Oak",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 4,
+          "name": "ARCH_Terracotta",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 5,
+          "name": "ARCH_Terracotta_Light",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 6,
+          "name": "ARCH_Terracotta_Dark",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 7,
+          "name": "ARCH_Oak_Cut",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 8,
+          "name": "ARCH_Hemp",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 9,
+          "name": "ARCH_Aged_Bronze",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0.7200000286102295,
+          "roughness_factor": 1
+        }
+      ],
+      "textured_materials": 9,
+      "accessors": 50,
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 309224,
+          "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+          "index": 0,
+          "name": "limestone_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 137714,
+          "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+          "index": 1,
+          "name": "limestone_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 142722,
+          "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+          "index": 2,
+          "name": "limestone_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 364306,
+          "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+          "index": 3,
+          "name": "oak_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 115206,
+          "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+          "index": 4,
+          "name": "oak_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 146455,
+          "sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+          "index": 5,
+          "name": "oak_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 324447,
+          "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+          "index": 6,
+          "name": "terracotta_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 139322,
+          "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+          "index": 7,
+          "name": "terracotta_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 144587,
+          "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+          "index": 8,
+          "name": "terracotta_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 330013,
+          "sha256": "d62f8e8870d0a15c6df4c96c2f513c205d28666f18ecff2769db9836ebd7d162",
+          "index": 9,
+          "name": "linen_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 172622,
+          "sha256": "7c2713a515d1fb427e4615a61259ba42728ce5289fd221d26b3ca0ef8d6192d9",
+          "index": 10,
+          "name": "linen_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 140915,
+          "sha256": "3b125719a8184838dbcfb0f33f41fc4a4e1e28fd8ed94f4dbda2b439afbd661a",
+          "index": 11,
+          "name": "linen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 298673,
+          "sha256": "234b5d74731a6c4c8a61a4e00980f94b4c3cf6bc230480246f934ad85e4dfcf4",
+          "index": 12,
+          "name": "bronze_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 135678,
+          "sha256": "ecbfa3242436275c538f96f055877c3ad82f7e34e214068bcb270678d60bac14",
+          "index": 13,
+          "name": "bronze_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 146599,
+          "sha256": "f11fd653301d7487891c715587ac11234326cf0871deba758b06d978667fdd26",
+          "index": 14,
+          "name": "bronze_roughness",
+          "embedded": true
+        }
+      ],
+      "unique_embedded_image_count": 15,
+      "rgba8_top_level_texture_bytes_estimate": 15728640,
+      "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+      "skins": 0,
+      "animations": 0,
+      "default_scene": 0,
+      "mesh_instances": 10,
+      "triangles_with_scene_instances": 12644,
+      "primitive_instances_before_renderer_batching": 10,
+      "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+      "bounds_m": {
+        "min": [
+          -1.4882135391235352,
+          0.0,
+          -1.0783514976501465
+        ],
+        "max": [
+          1.7100003269855384,
+          3.265000104904175,
+          1.0783514976501465
+        ]
+      },
+      "dimensions_m_xyz": [
+        3.1982138661090733,
+        3.265000104904175,
+        2.156702995300293
+      ],
+      "coordinate_system": "glTF right-handed, Y up; project front +Z"
+    },
+    {
+      "path": "art/visual_benchmark/assets/characters/civilian_youth.glb",
+      "status": "passed",
+      "errors": [],
+      "warnings": [],
+      "bytes": 2578104,
+      "sha256": "d67bfa8cb612ff5d6e91cb8aa30bafa313dcbf5ff9c858b181fadc2bd2ff014c",
+      "triangles_unique_meshes": 18939,
+      "primitives": 4,
+      "meshes": 4,
+      "materials": 4,
+      "material_details": [
+        {
+          "index": 0,
+          "name": "Civilian_CharacterPalette",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0,
+          "roughness_factor": 0.7599999904632568
+        },
+        {
+          "index": 1,
+          "name": "Civilian_Linen",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 2,
+          "name": "Civilian_Leather",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 3,
+          "name": "Civilian_Bronze",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0.7200000286102295,
+          "roughness_factor": 1
+        }
+      ],
+      "textured_materials": 3,
+      "accessors": 21,
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 330013,
+          "sha256": "d62f8e8870d0a15c6df4c96c2f513c205d28666f18ecff2769db9836ebd7d162",
+          "index": 0,
+          "name": "linen_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 172622,
+          "sha256": "7c2713a515d1fb427e4615a61259ba42728ce5289fd221d26b3ca0ef8d6192d9",
+          "index": 1,
+          "name": "linen_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 140915,
+          "sha256": "3b125719a8184838dbcfb0f33f41fc4a4e1e28fd8ed94f4dbda2b439afbd661a",
+          "index": 2,
+          "name": "linen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 353206,
+          "sha256": "fb8e2a7077c5006903df04e6441bdb5fe2574c728dcd35336ace159ca4c6014a",
+          "index": 3,
+          "name": "leather_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 79377,
+          "sha256": "3da4fec606ee3ddd1de830a5e95511496d80b10497459f94585b5de16d3481de",
+          "index": 4,
+          "name": "leather_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 135813,
+          "sha256": "e8b5d60ca4ef0a632d6b3a14d3762e5b2cd792fa18c87bf77121850f628f7193",
+          "index": 5,
+          "name": "leather_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 298673,
+          "sha256": "234b5d74731a6c4c8a61a4e00980f94b4c3cf6bc230480246f934ad85e4dfcf4",
+          "index": 6,
+          "name": "bronze_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 135678,
+          "sha256": "ecbfa3242436275c538f96f055877c3ad82f7e34e214068bcb270678d60bac14",
+          "index": 7,
+          "name": "bronze_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 146599,
+          "sha256": "f11fd653301d7487891c715587ac11234326cf0871deba758b06d978667fdd26",
+          "index": 8,
+          "name": "bronze_roughness",
+          "embedded": true
+        }
+      ],
+      "unique_embedded_image_count": 9,
+      "rgba8_top_level_texture_bytes_estimate": 9437184,
+      "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+      "skins": 0,
+      "animations": 0,
+      "default_scene": 0,
+      "mesh_instances": 4,
+      "triangles_with_scene_instances": 18939,
+      "primitive_instances_before_renderer_batching": 4,
+      "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+      "bounds_m": {
+        "min": [
+          -0.2919999957084656,
+          0.0,
+          -0.11680000275373459
+        ],
+        "max": [
+          0.2919999957084656,
+          1.5189238786697388,
+          0.15299999713897705
+        ]
+      },
+      "dimensions_m_xyz": [
+        0.5839999914169312,
+        1.5189238786697388,
+        0.26979999989271164
+      ],
+      "coordinate_system": "glTF right-handed, Y up; project front +Z"
+    },
+    {
+      "path": "art/visual_benchmark/assets/characters/civilian_youth_lod1.glb",
+      "status": "passed",
+      "errors": [],
+      "warnings": [],
+      "bytes": 2186472,
+      "sha256": "8c842170eec09ac67c3aa084b80da7bcdd90de7b38ce957c153b28eac75423cf",
+      "triangles_unique_meshes": 7898,
+      "primitives": 4,
+      "meshes": 4,
+      "materials": 4,
+      "material_details": [
+        {
+          "index": 0,
+          "name": "Civilian_CharacterPalette.001",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0,
+          "roughness_factor": 0.7599999904632568
+        },
+        {
+          "index": 1,
+          "name": "Civilian_Linen.001",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 2,
+          "name": "Civilian_Leather.001",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 3,
+          "name": "Civilian_Bronze.001",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0.7200000286102295,
+          "roughness_factor": 1
+        }
+      ],
+      "textured_materials": 3,
+      "accessors": 21,
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 330013,
+          "sha256": "d62f8e8870d0a15c6df4c96c2f513c205d28666f18ecff2769db9836ebd7d162",
+          "index": 0,
+          "name": "linen_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 172622,
+          "sha256": "7c2713a515d1fb427e4615a61259ba42728ce5289fd221d26b3ca0ef8d6192d9",
+          "index": 1,
+          "name": "linen_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 140915,
+          "sha256": "3b125719a8184838dbcfb0f33f41fc4a4e1e28fd8ed94f4dbda2b439afbd661a",
+          "index": 2,
+          "name": "linen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 353206,
+          "sha256": "fb8e2a7077c5006903df04e6441bdb5fe2574c728dcd35336ace159ca4c6014a",
+          "index": 3,
+          "name": "leather_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 79377,
+          "sha256": "3da4fec606ee3ddd1de830a5e95511496d80b10497459f94585b5de16d3481de",
+          "index": 4,
+          "name": "leather_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 135813,
+          "sha256": "e8b5d60ca4ef0a632d6b3a14d3762e5b2cd792fa18c87bf77121850f628f7193",
+          "index": 5,
+          "name": "leather_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 298673,
+          "sha256": "234b5d74731a6c4c8a61a4e00980f94b4c3cf6bc230480246f934ad85e4dfcf4",
+          "index": 6,
+          "name": "bronze_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 135678,
+          "sha256": "ecbfa3242436275c538f96f055877c3ad82f7e34e214068bcb270678d60bac14",
+          "index": 7,
+          "name": "bronze_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 146599,
+          "sha256": "f11fd653301d7487891c715587ac11234326cf0871deba758b06d978667fdd26",
+          "index": 8,
+          "name": "bronze_roughness",
+          "embedded": true
+        }
+      ],
+      "unique_embedded_image_count": 9,
+      "rgba8_top_level_texture_bytes_estimate": 9437184,
+      "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+      "skins": 0,
+      "animations": 0,
+      "default_scene": 0,
+      "mesh_instances": 4,
+      "triangles_with_scene_instances": 7898,
+      "primitive_instances_before_renderer_batching": 4,
+      "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+      "bounds_m": {
+        "min": [
+          -0.2919999957084656,
+          0.0,
+          -0.11680000275373459
+        ],
+        "max": [
+          0.2919999957084656,
+          1.5189238786697388,
+          0.15299999713897705
+        ]
+      },
+      "dimensions_m_xyz": [
+        0.5839999914169312,
+        1.5189238786697388,
+        0.26979999989271164
+      ],
+      "coordinate_system": "glTF right-handed, Y up; project front +Z"
+    },
+    {
+      "path": "art/visual_benchmark/assets/characters/frontier_guard.glb",
+      "status": "passed",
+      "errors": [],
+      "warnings": [],
+      "bytes": 1925088,
+      "sha256": "7f037f2e2149b6e6dceaeb51ef88fcedf486f019969d0f72a2124216e19239d2",
+      "triangles_unique_meshes": 18931,
+      "primitives": 7,
+      "meshes": 7,
+      "materials": 7,
+      "material_details": [
+        {
+          "index": 0,
+          "name": "Guard_CharacterPalette",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0,
+          "roughness_factor": 0.7599999904632568
+        },
+        {
+          "index": 1,
+          "name": "Guard_Linen",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0,
+          "roughness_factor": 0.9300000071525574
+        },
+        {
+          "index": 2,
+          "name": "Guard_Leather",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 3,
+          "name": "Guard_Iron",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0.7799999713897705,
+          "roughness_factor": 0.5299999713897705
+        },
+        {
+          "index": 4,
+          "name": "Guard_Bronze",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0.7200000286102295,
+          "roughness_factor": 1
+        },
+        {
+          "index": 5,
+          "name": "Guard_Mantle",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0,
+          "roughness_factor": 0.9200000166893005
+        },
+        {
+          "index": 6,
+          "name": "Guard_ShieldPaint",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0,
+          "roughness_factor": 0.8199999928474426
+        }
+      ],
+      "textured_materials": 2,
+      "accessors": 36,
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 353206,
+          "sha256": "fb8e2a7077c5006903df04e6441bdb5fe2574c728dcd35336ace159ca4c6014a",
+          "index": 0,
+          "name": "leather_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 79377,
+          "sha256": "3da4fec606ee3ddd1de830a5e95511496d80b10497459f94585b5de16d3481de",
+          "index": 1,
+          "name": "leather_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 135813,
+          "sha256": "e8b5d60ca4ef0a632d6b3a14d3762e5b2cd792fa18c87bf77121850f628f7193",
+          "index": 2,
+          "name": "leather_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 298673,
+          "sha256": "234b5d74731a6c4c8a61a4e00980f94b4c3cf6bc230480246f934ad85e4dfcf4",
+          "index": 3,
+          "name": "bronze_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 135678,
+          "sha256": "ecbfa3242436275c538f96f055877c3ad82f7e34e214068bcb270678d60bac14",
+          "index": 4,
+          "name": "bronze_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 146599,
+          "sha256": "f11fd653301d7487891c715587ac11234326cf0871deba758b06d978667fdd26",
+          "index": 5,
+          "name": "bronze_roughness",
+          "embedded": true
+        }
+      ],
+      "unique_embedded_image_count": 6,
+      "rgba8_top_level_texture_bytes_estimate": 6291456,
+      "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+      "skins": 0,
+      "animations": 0,
+      "default_scene": 0,
+      "mesh_instances": 7,
+      "triangles_with_scene_instances": 18931,
+      "primitive_instances_before_renderer_batching": 7,
+      "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+      "bounds_m": {
+        "min": [
+          -0.3418511748313904,
+          -1.0372993529017549e-05,
+          -0.1912417858839035
+        ],
+        "max": [
+          0.6522034406661987,
+          1.7785987854003906,
+          0.2986184358596802
+        ]
+      },
+      "dimensions_m_xyz": [
+        0.9940546154975891,
+        1.7786091583939196,
+        0.4898602217435837
+      ],
+      "coordinate_system": "glTF right-handed, Y up; project front +Z"
+    },
+    {
+      "path": "art/visual_benchmark/assets/characters/frontier_guard_lod1.glb",
+      "status": "passed",
+      "errors": [],
+      "warnings": [],
+      "bytes": 1562112,
+      "sha256": "2e478bd728147d3afb71dbb4f06102cf86138dc337bc17e4622c9e72c06e9775",
+      "triangles_unique_meshes": 7895,
+      "primitives": 7,
+      "meshes": 7,
+      "materials": 7,
+      "material_details": [
+        {
+          "index": 0,
+          "name": "Guard_CharacterPalette.001",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0,
+          "roughness_factor": 0.7599999904632568
+        },
+        {
+          "index": 1,
+          "name": "Guard_Linen.001",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0,
+          "roughness_factor": 0.9300000071525574
+        },
+        {
+          "index": 2,
+          "name": "Guard_Leather.001",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0,
+          "roughness_factor": 1
+        },
+        {
+          "index": 3,
+          "name": "Guard_Iron.001",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0.7799999713897705,
+          "roughness_factor": 0.5299999713897705
+        },
+        {
+          "index": 4,
+          "name": "Guard_Bronze.001",
+          "texture_slots": [
+            "baseColorTexture",
+            "metallicRoughnessTexture",
+            "normalTexture"
+          ],
+          "required_uv_channels": [
+            0
+          ],
+          "has_basecolor_texture": true,
+          "has_normal_texture": true,
+          "has_metallic_roughness_texture": true,
+          "metallic_factor": 0.7200000286102295,
+          "roughness_factor": 1
+        },
+        {
+          "index": 5,
+          "name": "Guard_Mantle.001",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0,
+          "roughness_factor": 0.9200000166893005
+        },
+        {
+          "index": 6,
+          "name": "Guard_ShieldPaint.001",
+          "texture_slots": [],
+          "required_uv_channels": [],
+          "has_basecolor_texture": false,
+          "has_normal_texture": false,
+          "has_metallic_roughness_texture": false,
+          "metallic_factor": 0,
+          "roughness_factor": 0.8199999928474426
+        }
+      ],
+      "textured_materials": 2,
+      "accessors": 36,
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 353206,
+          "sha256": "fb8e2a7077c5006903df04e6441bdb5fe2574c728dcd35336ace159ca4c6014a",
+          "index": 0,
+          "name": "leather_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 79377,
+          "sha256": "3da4fec606ee3ddd1de830a5e95511496d80b10497459f94585b5de16d3481de",
+          "index": 1,
+          "name": "leather_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 135813,
+          "sha256": "e8b5d60ca4ef0a632d6b3a14d3762e5b2cd792fa18c87bf77121850f628f7193",
+          "index": 2,
+          "name": "leather_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 298673,
+          "sha256": "234b5d74731a6c4c8a61a4e00980f94b4c3cf6bc230480246f934ad85e4dfcf4",
+          "index": 3,
+          "name": "bronze_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 135678,
+          "sha256": "ecbfa3242436275c538f96f055877c3ad82f7e34e214068bcb270678d60bac14",
+          "index": 4,
+          "name": "bronze_basecolor",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 146599,
+          "sha256": "f11fd653301d7487891c715587ac11234326cf0871deba758b06d978667fdd26",
+          "index": 5,
+          "name": "bronze_roughness",
+          "embedded": true
+        }
+      ],
+      "unique_embedded_image_count": 6,
+      "rgba8_top_level_texture_bytes_estimate": 6291456,
+      "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+      "skins": 0,
+      "animations": 0,
+      "default_scene": 0,
+      "mesh_instances": 7,
+      "triangles_with_scene_instances": 7895,
+      "primitive_instances_before_renderer_batching": 7,
+      "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+      "bounds_m": {
+        "min": [
+          -0.3418511748313904,
+          -1.0372993529017549e-05,
+          -0.1912417858839035
+        ],
+        "max": [
+          0.6522034406661987,
+          1.7785987854003906,
+          0.2986184358596802
+        ]
+      },
+      "dimensions_m_xyz": [
+        0.9940546154975891,
+        1.7786091583939196,
+        0.4898602217435837
+      ],
+      "coordinate_system": "glTF right-handed, Y up; project front +Z"
+    }
+  ]
+}
