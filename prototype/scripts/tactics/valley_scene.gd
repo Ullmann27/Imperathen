@@ -152,6 +152,8 @@ func _sync_units() -> void:
 	var near_limit := float({"low":13, "balanced":18, "high":25, "very_high":35}[profile])
 	var mid_limit := near_limit + float({"low":30, "balanced":30, "high":42, "very_high":55}[profile])
 	for s: Dictionary in model.squads.values():
+		if s.strength <= 0 or s.status == "withdrawn":
+			continue
 		roster[s.id] = model.soldiers(s.id)
 		for man: Dictionary in roster[s.id]:
 			var at := _surface(Vector2(man.x, man.z)) + Vector3.UP

@@ -56,7 +56,9 @@ func _run() -> void:
 	for profile in PROFILES:
 		_apply(profile)
 		for path in ["Player/Figure", "Marcus/Figure", "TrainingGround/Mentor/Figure"]:
-			game.world.get_node(path).sample_pose("idle", 0.25)
+			var figure = game.world.get_node(path)
+			figure.refresh_lod(play_camera)
+			figure.sample_pose("idle", 0.25)
 		await _settle()
 		report.village[profile] = await _measure()
 		_capture("village-" + profile)
@@ -123,6 +125,9 @@ func _portrait(label: String, figure: Node3D, eye_height: float, camera: Camera3
 	camera.look_at(target, Vector3.UP)
 	var original_fov := camera.fov
 	camera.fov = 40
+	if figure.has_method("refresh_lod"):
+		figure.refresh_lod(camera)
+		figure.sample_pose("idle", 0.25)
 	await _settle()
 	_capture("close-" + label)
 	camera.fov = original_fov
