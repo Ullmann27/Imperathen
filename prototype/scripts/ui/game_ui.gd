@@ -9,6 +9,8 @@ const BRONZE := Color("b99563")
 const CRIMSON := Color("722b32")
 const INK := Color("111a1b")
 const SETTINGS_PATH := "user://imperathen_ui.cfg"
+const Origins = preload("res://scripts/strategy/origins.gd")
+const ORIGIN_IDS := ["italia", "germania", "han", "wa", "vistula"]
 const SafeArea = preload("res://scripts/ui/safe_area.gd")
 const TouchPadScript := preload("res://scripts/ui/touch_pad.gd")
 const TouchActionScript := preload("res://scripts/ui/touch_action.gd")
@@ -49,6 +51,7 @@ class ImperialMark extends Control:
 		draw_line(center + Vector2(-radius * 0.75, -radius * 0.45), center + Vector2(radius * 0.75, -radius * 0.45), color, 2.0, true)
 		draw_polyline(PackedVector2Array([center + Vector2(-radius * 0.8, -radius * 0.55), center + Vector2(0, -radius * 0.91), center + Vector2(radius * 0.8, -radius * 0.55)]), color, 1.5, true)
 
+var origin_id := "italia"
 var _root: Control
 var _screen: Control
 var _toast_panel: PanelContainer
@@ -198,6 +201,7 @@ func show_menu(can_continue: bool) -> void:
 	continue_button.disabled = not can_continue
 	continue_button.tooltip_text = "Deinen gespeicherten Lebensweg fortsetzen." if can_continue else "Es wurde noch kein Spielstand gefunden."
 	buttons.add_child(continue_button)
+	_add_origin_picker(buttons)
 	var new_button := _button("Neues Leben", _request_new_game, not can_continue)
 	buttons.add_child(new_button)
 	var demo_button := _button("Talgefecht erproben", func(): _emit("valley_demo"))
@@ -226,6 +230,24 @@ func show_menu(can_continue: bool) -> void:
 	province_content.add_child(_label("AN DER GRENZE DES REICHES", 12, BRONZE))
 	province_content.add_child(_label("Eine Heimat. Eine Entscheidung.", 17, CREAM, true))
 	province.visible = not _compact_layout
+
+
+func _add_origin_picker(parent: VBoxContainer) -> void:
+	parent.add_child(_label("Herkunft für ein neues Leben", 13, BRONZE))
+	var picker := OptionButton.new()
+	picker.name = "OriginPicker"
+	picker.custom_minimum_size.y = 46
+	for id in ORIGIN_IDS:
+		picker.add_item(String(Origins.PEOPLES[id].name))
+	picker.selected = ORIGIN_IDS.find(origin_id)
+	parent.add_child(picker)
+	var description := _label(String(Origins.PEOPLES[origin_id].intro), 14, MUTED)
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	parent.add_child(description)
+	picker.item_selected.connect(func(index: int):
+		origin_id = ORIGIN_IDS[index]
+		description.text = String(Origins.PEOPLES[origin_id].intro)
+	)
 
 
 func _log_menu_buttons(demo: Button, resume: Button) -> void:
@@ -276,7 +298,7 @@ func update_state(state: Dictionary) -> void:
 	var health := clampf(float(player.get("health", 100)), 0, 100)
 	_health_bar.value = health
 	_hud_labels["health"].text = "Lebenskraft   %d / 100" % int(health)
-	_hud_labels["companion"].text = "Marcus  ·  Vertrauen %+d" % int(companion.get("trust", 0)) if bool(companion.get("met", false)) else "Dein Gefährte wartet im Dorf."
+	_hud_labels["companion"].text = "%s · Vertrauen %+d" % [_companion_name(state), int(companion.get("trust", 0))] if bool(companion.get("met", false)) else "%s wartet im Dorf." % _companion_name(state)
 	_hud_labels["squad"].text = "Truppe   %d / %d am Leben\nMoral   %d / 100" % [int(squad.get("alive", 0)), int(squad.get("recruits", 0)), int(squad.get("morale", 0))]
 	if _hud_labels.has("compact_life"):
 		_hud_labels["compact_life"].text = "Leben %d/100  ·  Truppe %d/%d" % [int(health), int(squad.get("alive", 0)), int(squad.get("recruits", 0))]
@@ -785,9 +807,9 @@ func _show_journal(pause_world := true) -> void:
 	var player: Dictionary = _state.get("player", {})
 	var squad: Dictionary = _state.get("squad", {})
 	var companion: Dictionary = _state.get("companion", {})
-	var summary := "%d Jahre · Leben %d / 100\nTruppe: %d / %d am Leben · Moral %d\nMarcus: %s\n\n%s\n%s" % [
+	var summary := "%d Jahre · Leben %d / 100\nTruppe: %d / %d am Leben · Moral %d\n%s: %s\n\n%s\n%s" % [
 		int(player.get("age", 12)), int(player.get("health", 100)), int(squad.get("alive", 0)), int(squad.get("recruits", 0)), int(squad.get("morale", 0)),
-		"Vertrauen %+d" % int(companion.get("trust", 0)) if bool(companion.get("met", false)) else "noch nicht kennengelernt", objective[0], objective[1]
+		_companion_name(_state), "Vertrauen %+d" % int(companion.get("trust", 0)) if bool(companion.get("met", false)) else "noch nicht kennengelernt", objective[0], objective[1]
 	]
 	var report := _region_report()
 	if not report.is_empty():
@@ -856,6 +878,11 @@ func _title_font_size(text: String, desired: int, available_width: float) -> int
 	return maxi(24, floori(desired * maxf(available_width, 100) / measured))
 
 
+func _companion_name(state: Dictionary) -> String:
+	var origin: Dictionary = Origins.PEOPLES.get(state.get("origin_id", "italia"), Origins.PEOPLES.italia)
+	return String(origin.companion)
+
+
 func _objective(state: Dictionary) -> Array[String]:
 	var progress: Dictionary = state.get("progress", {})
 	var stage := String(progress.get("stage", "prologue"))
@@ -876,7 +903,7 @@ func _objective(state: Dictionary) -> Array[String]:
 		if not bool(building.get("completed", false)):
 			return ["Ein Zuhause entsteht", "Bleibe bei der Baustelle und arbeite an deiner Hütte. Baufortschritt und verbrauchtes Material bleiben erhalten."]
 	if not bool(state.get("companion", {}).get("met", false)):
-		return ["Du bist nicht allein", "Marcus steht im Dorf. Nähere dich ihm und wähle %s. Deine Antwort hat Folgen." % ("„Interagieren“" if _touch_enabled else "E")]
+		return ["Du bist nicht allein", "%s wartet im Dorf. Geh näher und wähle %s. Deine Antwort hat Folgen." % [_companion_name(state), "„Interagieren“" if _touch_enabled else "E"]]
 	if not bool(progress.get("training_complete", false)):
 		return ["Der nächste Lebensabschnitt", "Gehe zum Trainingsplatz. Beginne die Ausbildung und triff den Übungspfahl dreimal. Treffer: %d / 3." % int(progress.get("training_hits", 0))]
 	if int(state.get("squad", {}).get("alive", 0)) == 0:
