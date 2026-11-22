@@ -1,0 +1,108 @@
+--------- beginning of main
+11-22 15:29:38.336  2950  2950 I einz.imperathen: Late-enabling -Xcheck:jni
+11-22 15:29:38.428  2950  2950 I einz.imperathen: Using CollectorTypeCMC GC.
+11-22 15:29:38.429  2950  2950 W einz.imperathen: Unexpected CPU variant for x86: x86_64.
+11-22 15:29:38.429  2950  2950 W einz.imperathen: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, default
+11-22 15:29:38.585  2950  2950 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+11-22 15:29:38.860  2950  2950 W ziparchive: Unable to open '/data/app/~~Xg5RC5jm9I3dN-zD1gz8Mg==/at.heinz.imperathen-LlNg0qMV2y1tCIIYoU8ueA==/base.dm': No such file or directory
+11-22 15:29:38.860  2950  2950 W ziparchive: Unable to open '/data/app/~~Xg5RC5jm9I3dN-zD1gz8Mg==/at.heinz.imperathen-LlNg0qMV2y1tCIIYoU8ueA==/base.dm': No such file or directory
+11-22 15:29:39.019  2950  2950 D nativeloader: Configuring clns-7 for other apk /data/app/~~Xg5RC5jm9I3dN-zD1gz8Mg==/at.heinz.imperathen-LlNg0qMV2y1tCIIYoU8ueA==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~Xg5RC5jm9I3dN-zD1gz8Mg==/at.heinz.imperathen-LlNg0qMV2y1tCIIYoU8ueA==/lib/x86_64:/data/app/~~Xg5RC5jm9I3dN-zD1gz8Mg==/at.heinz.imperathen-LlNg0qMV2y1tCIIYoU8ueA==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/at.heinz.imperathen
+11-22 15:29:39.043  2950  2950 V GraphicsEnvironment: Currently set values for:
+11-22 15:29:39.043  2950  2950 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+11-22 15:29:39.043  2950  2950 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+11-22 15:29:39.043  2950  2950 V GraphicsEnvironment: Global.Settings values are invalid: number of packages: 0, number of values: 0
+11-22 15:29:39.043  2950  2950 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+11-22 15:29:39.382  2950  2950 D GodotActivity: Project command line parameters: [--xr_mode_regular, --xr-mode, off, --fullscreen, --background_color, #000000]
+11-22 15:29:39.382  2950  2950 D GodotActivity: Launch intent Intent { flg=0x10000000 cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher } with parameters []
+11-22 15:29:39.430  2950  2950 V GodotActivity: Creating new Godot fragment instance.
+11-22 15:29:39.611  2950  2950 V Godot   : Initializing Godot plugin registry
+11-22 15:29:39.638  2950  2950 I GodotPluginRegistry: Registering runtime plugin AndroidRuntime
+11-22 15:29:39.650  2950  2950 V Godot   : InitEngine with params: [--xr_mode_regular, --xr-mode, off, --fullscreen, --background_color, #000000]
+11-22 15:29:39.699  2950  2950 D nativeloader: Load /data/app/~~Xg5RC5jm9I3dN-zD1gz8Mg==/at.heinz.imperathen-LlNg0qMV2y1tCIIYoU8ueA==/lib/x86_64/libgodot_android.so using ns clns-7 from class loader (caller=/data/app/~~Xg5RC5jm9I3dN-zD1gz8Mg==/at.heinz.imperathen-LlNg0qMV2y1tCIIYoU8ueA==/base.apk!classes7.dex): ok
+11-22 15:29:39.700  2950  2950 V Godot   : Godot native layer initialization completed: true
+11-22 15:29:39.700  2950  2950 V Godot   : Setting up native layer with params: [--xr-mode, off, --fullscreen]
+11-22 15:29:39.767  2950  2950 V Godot   : Godot native layer setup completed
+11-22 15:29:39.771  2950  2950 V Godot   : OnInitRenderView: GodotFragment{9c419d8} (8ccf9bf5-629f-424d-94da-a578f3282a66 id=0x7f07002c)
+11-22 15:29:39.835  2950  2950 D Godot   : Render view should be transparent: false
+11-22 15:29:39.865  2950  2950 D Godot   : renderingDevice: opengl3 (ProjectSettings)
+11-22 15:29:39.865  2950  2950 D Godot   : 			renderer: gl_compatibility (ProjectSettings)
+11-22 15:29:39.880  2950  2950 W WindowOnBackDispatcher: OnBackInvokedCallback is not enabled for the application.
+11-22 15:29:39.880  2950  2950 W WindowOnBackDispatcher: Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+11-22 15:29:39.897  2950  2950 V Godot   : OnStart: GodotFragment{9c419d8} (8ccf9bf5-629f-424d-94da-a578f3282a66 id=0x7f07002c)
+11-22 15:29:39.905  2950  2950 V Godot   : OnResume: GodotFragment{9c419d8} (8ccf9bf5-629f-424d-94da-a578f3282a66 id=0x7f07002c)
+11-22 15:29:39.925  2950  2950 W HWUI    : Unknown dataspace 0
+11-22 15:29:40.066  2950  3006 I EGL_emulation: Opening libGLESv1_CM_emulation.so
+11-22 15:29:40.066  2950  3006 I EGL_emulation: Opening libGLESv2_emulation.so
+11-22 15:29:40.106  2950  3006 W HWUI    : Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+11-22 15:29:40.106  2950  3006 W HWUI    : Failed to initialize 101010-2 format, error = EGL_SUCCESS
+11-22 15:29:40.146  2950  3036 W RegularContextFactory: creating OpenGL ES 3.0 context :
+11-22 15:29:40.179  2950  3036 I Gralloc4: mapper 4.x is not supported
+11-22 15:29:40.240  2950  3036 I godot   : Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+11-22 15:29:40.640  2950  2950 W InteractionJankMonitor: Initializing without READ_DEVICE_CONFIG permission. enabled=true, interval=1, missedFrameThreshold=3, frameTimeThreshold=64, package=at.heinz.imperathen
+11-22 15:29:41.098  2950  3045 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(wmsSync-VRI[GodotAppLauncher]#1) as ready
+11-22 15:29:41.098  2950  3045 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(VRI[GodotAppLauncher]#2) as ready
+11-22 15:29:41.098  2950  3045 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(SurfaceView[at.heinz.imperathen/com.godot.game.GodotAppLauncher]#0) as ready
+11-22 15:29:41.779  2950  2958 I einz.imperathen: Compiler allocated 4219KB to compile void android.widget.TextView.<init>(android.content.Context, android.util.AttributeSet, int, int)
+11-22 15:29:43.281  2950  2958 I einz.imperathen: Compiler allocated 5174KB to compile void android.view.ViewRootImpl.performTraversals()
+11-22 15:29:43.297  2950  3036 I godot   : OpenGL API OpenGL ES 3.1 (OpenGL ES 3.1.0 (ANGLE 2.1.17841 git hash: 5fa2e61da947)) - Compatibility - Using Device: Google (Google Inc. (Google)) - Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))
+11-22 15:29:43.302  2950  3036 D einz.imperathen: PlayerBase::PlayerBase()
+11-22 15:29:43.303  2950  3036 D einz.imperathen: TrackPlayerBase::TrackPlayerBase()
+11-22 15:29:43.303  2950  3036 I libOpenSLES: Emulating old channel mask behavior (ignoring positional mask 0x3, using default mask 0x3 based on channel count of 2)
+11-22 15:29:43.434  2950  3036 I godot   : 
+11-22 15:29:43.706  2950  3006 D EGL_emulation: app_time_stats: avg=198.91ms min=0.74ms max=2964.23ms count=17
+11-22 15:29:44.473  2950  3036 V Godot   : OnGodotSetupCompleted
+11-22 15:29:46.835  2950  3036 I godot   : IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop
+11-22 15:29:46.835  2950  3036 V Godot   : OnGodotMainLoopStarted
+11-22 15:29:49.610  2950  2959 I einz.imperathen: Background concurrent mark compact GC freed 9212KB AllocSpace bytes, 9(708KB) LOS objects, 49% free, 2518KB/5036KB, paused 40us,27.851ms total 84.047ms
+11-22 15:29:55.842  2950  3036 D EGL_emulation: app_time_stats: avg=6075.99ms min=66.59ms max=12085.39ms count=2
+11-22 15:29:56.963  2950  3036 D EGL_emulation: app_time_stats: avg=360.63ms min=56.95ms max=516.72ms count=3
+11-22 15:29:58.020  2950  3036 D EGL_emulation: app_time_stats: avg=1057.07ms min=1057.07ms max=1057.07ms count=1
+11-22 15:29:59.595  2950  3036 D EGL_emulation: app_time_stats: avg=525.03ms min=36.86ms max=1013.28ms count=3
+11-22 15:30:00.616  2950  3036 D EGL_emulation: app_time_stats: avg=340.09ms min=78.04ms max=474.21ms count=3
+11-22 15:30:02.073  2950  3036 D EGL_emulation: app_time_stats: avg=728.55ms min=555.84ms max=901.26ms count=2
+11-22 15:30:03.660  2950  3036 D EGL_emulation: app_time_stats: avg=528.95ms min=53.87ms max=1000.45ms count=3
+11-22 15:30:05.107  2950  3036 D EGL_emulation: app_time_stats: avg=257.74ms min=39.08ms max=460.98ms count=4
+11-22 15:30:06.139  2950  3036 D EGL_emulation: app_time_stats: avg=515.80ms min=515.66ms max=515.95ms count=2
+11-22 15:30:07.686  2950  3036 D EGL_emulation: app_time_stats: avg=743.77ms min=566.67ms max=920.87ms count=2
+11-22 15:30:08.707  2950  3036 D EGL_emulation: app_time_stats: avg=340.37ms min=51.75ms max=503.94ms count=3
+11-22 15:30:09.710  2950  3036 D EGL_emulation: app_time_stats: avg=501.10ms min=458.89ms max=543.31ms count=2
+11-22 15:30:11.215  2950  3036 D EGL_emulation: app_time_stats: avg=752.73ms min=544.87ms max=960.60ms count=2
+11-22 15:30:12.254  2950  3036 D EGL_emulation: app_time_stats: avg=519.66ms min=43.47ms max=995.86ms count=2
+11-22 15:30:13.405  2950  3036 D EGL_emulation: app_time_stats: avg=383.43ms min=60.58ms max=551.45ms count=3
+11-22 15:30:14.783  2950  3036 D EGL_emulation: app_time_stats: avg=688.85ms min=463.46ms max=914.25ms count=2
+11-22 15:30:15.876  2950  3036 D EGL_emulation: app_time_stats: avg=364.28ms min=47.00ms max=528.18ms count=3
+11-22 15:30:17.795  2950  3036 D EGL_emulation: app_time_stats: avg=639.92ms min=44.47ms max=968.40ms count=3
+11-22 15:30:18.905  2950  3036 D EGL_emulation: app_time_stats: avg=369.86ms min=59.42ms max=564.53ms count=3
+11-22 15:30:19.968  2950  3036 D EGL_emulation: app_time_stats: avg=531.59ms min=525.73ms max=537.45ms count=2
+11-22 15:30:21.062  2950  3036 D EGL_emulation: app_time_stats: avg=546.61ms min=537.29ms max=555.94ms count=2
+11-22 15:30:22.011  2950  3036 I godot   : IMPERATHEN_MENU_READY {"new_game":[209.0,348.0]}
+11-22 15:30:22.072  2950  3036 D EGL_emulation: app_time_stats: avg=504.87ms min=63.31ms max=946.43ms count=2
+11-22 15:30:23.659  2950  3036 D EGL_emulation: app_time_stats: avg=529.12ms min=30.60ms max=966.24ms count=3
+11-22 15:30:25.207  2950  3036 D EGL_emulation: app_time_stats: avg=774.06ms min=601.43ms max=946.69ms count=2
+11-22 15:30:26.436  2950  3036 D EGL_emulation: app_time_stats: avg=409.68ms min=78.72ms max=618.36ms count=3
+11-22 15:30:27.708  2950  2950 D AutofillManager: Fill dialog is enabled:false, hints=[]
+11-22 15:30:27.792  2950  3036 D EGL_emulation: app_time_stats: avg=677.57ms min=547.70ms max=807.44ms count=2
+11-22 15:30:27.901  2950  3036 I godot   : IMPERATHEN_SESSION_STARTED: saved frontier world
+11-22 15:30:29.708  2950  3036 D EGL_emulation: app_time_stats: avg=638.59ms min=304.05ms max=1037.55ms count=3
+11-22 15:30:31.068  2950  3036 D EGL_emulation: app_time_stats: avg=453.33ms min=63.92ms max=742.99ms count=3
+11-22 15:30:32.298  2950  3036 D EGL_emulation: app_time_stats: avg=614.33ms min=605.44ms max=623.21ms count=2
+11-22 15:30:33.387  2950  3036 D EGL_emulation: app_time_stats: avg=544.39ms min=508.33ms max=580.45ms count=2
+11-22 15:30:34.438  2950  3036 D EGL_emulation: app_time_stats: avg=1051.13ms min=1051.13ms max=1051.13ms count=1
+11-22 15:30:35.662  2950  3036 D EGL_emulation: app_time_stats: avg=407.89ms min=62.97ms max=588.90ms count=3
+11-22 15:30:36.805  2950  3036 D EGL_emulation: app_time_stats: avg=571.80ms min=549.94ms max=593.66ms count=2
+11-22 15:30:37.956  2950  3036 D EGL_emulation: app_time_stats: avg=575.28ms min=533.08ms max=617.48ms count=2
+11-22 15:30:39.030  2950  3036 D EGL_emulation: app_time_stats: avg=534.95ms min=101.03ms max=968.87ms count=2
+11-22 15:30:40.097  2950  3036 D EGL_emulation: app_time_stats: avg=1067.00ms min=1067.00ms max=1067.00ms count=1
+11-22 15:30:40.104  2950  3036 I godot   : IMPERATHEN_PAUSED
+11-22 15:30:41.257  2950  3036 D EGL_emulation: app_time_stats: avg=579.98ms min=96.02ms max=1063.93ms count=2
+11-22 15:30:42.337  2950  3036 D EGL_emulation: app_time_stats: avg=539.96ms min=536.17ms max=543.74ms count=2
+11-22 15:30:43.681  2950  3036 D EGL_emulation: app_time_stats: avg=447.66ms min=51.17ms max=660.25ms count=3
+11-22 15:30:44.155  2950  2950 V Godot   : OnPause: GodotFragment{9c419d8} (8ccf9bf5-629f-424d-94da-a578f3282a66 id=0x7f07002c)
+11-22 15:30:44.792  2950  3036 D EGL_emulation: app_time_stats: avg=1111.36ms min=1111.36ms max=1111.36ms count=1
+11-22 15:30:44.810  2950  3036 D einz.imperathen: PlayerBase::pause() from IPlayer
+11-22 15:30:45.666  2950  2950 V Godot   : OnResume: GodotFragment{9c419d8} (8ccf9bf5-629f-424d-94da-a578f3282a66 id=0x7f07002c)
+11-22 15:30:45.729  2950  3006 D EGL_emulation: app_time_stats: avg=62023.01ms min=62023.01ms max=62023.01ms count=1
+11-22 15:30:45.825  2950  3036 D EGL_emulation: app_time_stats: avg=1032.96ms min=1032.96ms max=1032.96ms count=1
+11-22 15:30:46.636  2950  2950 D InsetsController: hide(ime(), fromIme=true)
+11-22 15:30:46.636  2950  2950 I ImeTracker: at.heinz.imperathen:b1c6e667: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+11-22 15:30:47.753  2950  3036 D EGL_emulation: app_time_stats: avg=642.48ms min=56.76ms max=990.24ms count=3

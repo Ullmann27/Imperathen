@@ -6,9 +6,9 @@
 
 Der Nutzer hat nach der Dokumentenlieferung ausdrücklich den weiteren Spielaufbau mit drei Agenten beauftragt. Die frühere Programmierpause ist für diesen Block aufgehoben. Aktueller eigener Branch: `feature/prototype-foundation-20261122`, Ausgangscommit `a3e036ba24b99416b016337d81ab2b4067350fa3`, Koordination [#17](https://github.com/Ullmann27/Imperathen/issues/17).
 
-Aktuelle Lieferung: [`prototype/`](../../prototype/README.md), original erzeugte Blender-Assetquelle und Headless-Prüfungen. Für den tatsächlichen Teststatus und Nachweisgrenzen gilt [VALIDATION.md](../10_development/VALIDATION.md), für die Zusammenführung der parallelen Arbeitslinien [NEXT_AGENT.md](../10_development/NEXT_AGENT.md). Die folgenden Zahlen zur Dokumentenlieferung bleiben ein historischer Ausgangsstand und beschreiben nicht den heutigen Codeumfang.
+Aktuelle Lieferung: [`prototype/`](../../prototype/README.md), eine tatsächlich gebaute ARM64-Test-APK, erfolgreicher separater Android-x86_64-Emulatorlauf, eigene Blender-Assetquelle und Headless-Prüfungen. Für den tatsächlichen Teststatus und Nachweisgrenzen gilt [VALIDATION.md](../10_development/VALIDATION.md), für die Zusammenführung der parallelen Arbeitslinien [NEXT_AGENT.md](../10_development/NEXT_AGENT.md). Die folgenden Zahlen zur Dokumentenlieferung bleiben ein historischer Ausgangsstand und beschreiben nicht den heutigen Codeumfang.
 
-Die gemeinsame Abstimmung in #17 und #18 nennt inzwischen Android als Hauptplattform, PC als spätere Erweiterung. Entsprechend werden Touchsteuerung und skalierbare Darstellung vorbereitet. Die endgültige Engineentscheidung und der Nachweis auf echten Android-Geräten bleiben offen.
+Der Nutzer hat ausdrücklich festgelegt: zuerst Android. PC ist eine spätere Erweiterung. Der Prototyp besitzt Touchsteuerung, skalierbare Darstellung, Android-Zurück-Verhalten, Hintergrundspeicherung und einen automatisierten APK-Export. Der konkrete Liefer- und Laufzeitstand steht in [ANDROID_INSTALL.md](../10_development/ANDROID_INSTALL.md). Die langfristige Engineentscheidung und der Nachweis auf physischen ARM64-Geräten bleiben offen.
 
 ## Verbindlicher aktueller Rahmen
 
@@ -36,10 +36,10 @@ Anforderungsregister, Fachkonzepte, Architekturverträge in Prosa, Asset- und Re
 ## Noch offen
 
 - Abschließende Namens- und Ähnlichkeitsprüfung; keine Markenfreigabe oder Anmeldung behauptet.
-- Engine-Version, Zielrechner, verbindliches Leistungsbudget und endgültiger Umfang des ersten spielbaren Abschnitts.
+- Langfristige Produktionsengine, konkrete Android-Zielgeräte und verbindliches Leistungsbudget. Der vorhandene begrenzte Prototyp verwendet nachgewiesen Godot 4.7.2.
 - Fachentscheidungen zu Zeitmodell, Alterssprung, Karrieregrenzen, Storyreserve und Reichweiten der Simulation.
 - Tatsächliche Engine-/Blender-Ausführung und Funktionsprüfungen: siehe aktuellen Entwicklungsnachweis. Grafikleistung, Geräteabnahme und Store-Build sind noch offen.
-- Technische Branch-Regeln, ein echtes GitHub-Projects-Board und Build-Automatisierung: nicht eingerichtet. Dokumentierte Regeln sind nicht mit technisch erzwungenen Einstellungen gleichzusetzen.
+- Technische Branch-Regeln und ein echtes GitHub-Projects-Board sind weiterhin nicht eingerichtet. Eine Android-Baupipeline ist inzwischen vorhanden; sie ersetzt keine Branch-Regeln oder Storefreigabe.
 
 ## Belegregeln
 

@@ -1,14 +1,24 @@
 # IMPERATHEN
 
-**Arbeitstitel · erster 3D-Funktionsprototyp · Stand: 22. November 2026**
+**Arbeitstitel · Android als Hauptplattform · erster 3D-Funktionsprototyp · Stand: 22. November 2026**
 
 IMPERATHEN verbindet als langfristiges Spielziel persönliches Rollenspiel, Echtzeit-Städtebau, strategische Weltkarte, Diplomatie und eine an Entscheidungen anknüpfende Geschichte. Unter [`prototype/`](prototype/README.md) entsteht jetzt der erste ausführbare Abschnitt: ein römisch geprägtes Grenzdorf mit Sammeln, Bauen, Gefährtenentscheidung, Ausbildung, kleinem Gefecht und persistenten Folgen. Er setzt einen begrenzten Teil der größeren Projektmappe um.
 
-## Den Prototyp starten
+## Auf Android anfangen
 
-[`prototype/project.godot`](prototype/project.godot) in **Godot 4.7.2** importieren und mit **F5** starten. Ohne Editor: `godot --path prototype`. [Bedienung und vollständiger Ablauf](prototype/README.md). [Ausführbare Prüfungen](tools/check_prototype.py) und [Entwicklungsnachweise](docs/10_development/VALIDATION.md) dokumentieren den überprüften Umfang.
+Der Einstieg für Spieler ist die **ARM64-Test-APK**. Die APK wurde bereits exportiert; Download, Prüfsumme, Installationsschritte und der aktuelle Android-Prüfbefund werden in der [Android-Installationsanleitung](docs/10_development/ANDROID_INSTALL.md) geführt. Der vollständige [Android-CI-Lauf](https://github.com/Ullmann27/Imperathen/actions/runs/45038377950) ist erfolgreich: Installation, Menü, Touch-Spielstart, Android-Zurück/Pause und App-Wechsel wurden im x86_64-Emulator tatsächlich ausgeführt. Eine Ausführung auf einem echten ARM64-Handy ist weiterhin nicht nachgewiesen.
 
-Android wird gemäß der aktuellen [gemeinsamen Projektabstimmung](https://github.com/Ullmann27/Imperathen/issues/17#issuecomment-7080358655) als Hauptplattform vorbereitet; Touchsteuerung und Grafikprofile gehören deshalb bereits zu dieser Basis. Ein Android-Export, ein echter Gerätetest und Bildraten sind noch nicht nachgewiesen. Der vorhandene Desktop-Editor dient der aktuellen Ausführung und Prüfung, ohne damit eine endgültige Produktionsengine festzulegen.
+Nach der Installation **IMPERATHEN im Querformat** starten, den Vorspann ansehen oder überspringen und **Neues Leben** wählen. Linkes Analogpad: bewegen. Rechte Tasten: interagieren und angreifen. **Pause**, **Chronik** und die Ansichten sind über sichtbare Schaltflächen erreichbar. [Touchbedienung, Android-Zurück und vollständiger Spielweg](prototype/README.md).
+
+Die Spielschleife umfasst Holzsammeln, eine gespeicherte Gefährtenentscheidung, frei platzierbare Hütten auf der erlaubten Baufläche, einen erklärten Altersübergang, Ausbildung, bis zu drei Rekruten, ein Gefecht gegen drei Gegner und eine abschließende Folgeentscheidung. Eine Niederlage beendet diesen Lebensbogen. Provinzeroberung, Politik, Kaiserkarriere, große Armeen und generativ erweiterte Kapitel sind noch nicht umgesetzt.
+
+Android ist gemäß dem aktuellen Nutzerauftrag und der [gemeinsamen Projektabstimmung](https://github.com/Ullmann27/Imperathen/issues/17#issuecomment-7080358655) die Hauptplattform; PC folgt als spätere Erweiterung. Zum Spielen der APK sind kein Editor, Blender oder KI-API-Schlüssel erforderlich.
+
+## Entwicklungsstand prüfen
+
+Die automatischen Headless-Läufe umfassen derzeit **115 UI-Prüfungen** und **35 Integrationsprüfungen** mit der tatsächlichen Hauptszene. Die Integration prüft unter anderem den Fensterpfad für Android-Zurück, Bauabbruch, Spielpause, Entscheidungen und gespeicherte Folgen. Nachweise: [UI-Protokoll](docs/10_development/evidence/ui.log), [Integrationsprotokoll](docs/10_development/evidence/integration.log) und [Prüfläufer](tools/check_prototype.py). Diese Läufe belegen keine Bildrate oder Gerätefreigabe.
+
+Für Entwickler: [`prototype/project.godot`](prototype/project.godot) in **Godot 4.7.2** importieren und mit **F5** starten; alternativ `godot --path prototype`. [Entwicklerstart und Prüfungen](prototype/README.md#für-die-entwicklung-editor-und-prüfungen), [Android-Bauweg](docs/10_development/ANDROID_BUILD.md) und [nächster Entwicklungsdurchgang](docs/10_development/NEXT_AGENT.md). Die vorhandene Godot-Linie legt die endgültige Produktionsengine noch nicht fest.
 
 ## Hier anfangen
 
