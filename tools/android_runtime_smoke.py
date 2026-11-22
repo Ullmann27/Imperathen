@@ -51,6 +51,34 @@ def main():
             raise RuntimeError("Invalid screenshot bytes")
         (args.output / name).write_bytes(data)
 
+    def wait_marker(marker, timeout=80):
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            for line in reversed(logs().splitlines()):
+                if marker in line:
+                    return line.split(marker, 1)[1].strip()
+            time.sleep(1)
+        raise RuntimeError("Missing Android runtime marker " + marker)
+
+    def tap(point):
+        adb("shell", "input", "tap", str(round(point[0])), str(round(point[1])))
+
+    def relaunch():
+        previous = report["pid"]
+        (args.output / ("logcat-" + previous + ".txt")).write_text(logs(), encoding="utf-8")
+        adb("shell", "am", "force-stop", package)
+        started = adb("shell", "am", "start", "-W", "-n", component, timeout=60)
+        if "Status: ok" not in started:
+            raise RuntimeError("Relaunch failed: " + started)
+        deadline = time.monotonic() + 40
+        while time.monotonic() < deadline:
+            new_pid = adb("shell", "pidof", package, checked=False)
+            if new_pid.isdigit() and new_pid != previous:
+                report["pid"] = new_pid
+                return json.loads(wait_marker("IMPERATHEN_MENU_TOUCH "))
+            time.sleep(1)
+        raise RuntimeError("Relaunch did not produce a new game process")
+
     try:
         inventory_deadline = time.monotonic() + 110
         targets = []
@@ -106,28 +134,16 @@ def main():
         pid = adb("shell", "pidof", package)
         record("process_started", pid.isdigit(), pid)
         report["pid"] = pid
-        menu = None
-        deadline = time.monotonic() + 45
-        while time.monotonic() < deadline:
-            text = logs()
-            for line in text.splitlines():
-                if "IMPERATHEN_MENU_READY " in line:
-                    menu = json.loads(line.split("IMPERATHEN_MENU_READY ", 1)[1])
-            if menu:
-                break
-            time.sleep(2)
-        record("real_menu", menu is not None, menu)
+        menu = json.loads(wait_marker("IMPERATHEN_MENU_READY "))
+        record("real_menu", "new_game" in menu, menu)
         screenshot("01_android_menu.png")
-        point = menu["new_game"]
-        adb("shell", "input", "tap", str(round(point[0])), str(round(point[1])))
-        deadline = time.monotonic() + 30
-        while time.monotonic() < deadline and "IMPERATHEN_SESSION_STARTED" not in logs():
-            time.sleep(2)
-        record("touch_starts_saved_game", "IMPERATHEN_SESSION_STARTED" in logs(), "Tapped real menu button; main confirmed the new saved world")
+        tap(menu["new_game"])
+        wait_marker("IMPERATHEN_SESSION_STARTED")
+        record("touch_starts_saved_game", True, "New game button produced a saved village")
         time.sleep(3)
         screenshot("02_android_world.png")
         adb("shell", "input", "keyevent", "4")
-        time.sleep(1)
+        wait_marker("IMPERATHEN_PAUSED")
         record("android_back_pauses", "IMPERATHEN_PAUSED" in logs() and adb("shell", "pidof", package) == pid, "Back opened pause without terminating the app")
         screenshot("03_android_pause.png")
         adb("shell", "input", "keyevent", "3")
@@ -135,7 +151,25 @@ def main():
         adb("shell", "am", "start", "-W", "-n", component)
         time.sleep(2)
         record("background_resume", adb("shell", "pidof", package) == pid, "Process survived Home and return")
-        final_log = logs()
+        resumed_menu = relaunch()
+        record("persistent_save_after_restart", resumed_menu["can_continue"], resumed_menu)
+        tap(resumed_menu["continue"])
+        wait_marker("IMPERATHEN_CONTINUED")
+        record("continue_after_process_death", True, "Loaded the village in a new process")
+        practice_menu = relaunch()
+        tap(practice_menu["demo"])
+        wait_marker("IMPERATHEN_VALLEY_READY")
+        record("formation_valley", True, "Actual practice menu touch opened the valley scene")
+        time.sleep(4)
+        screenshot("04_android_valley.png")
+        (args.output / "valley-meminfo.txt").write_text(adb("shell", "dumpsys", "meminfo", package), encoding="utf-8")
+        # A square logical display exercises live fold-style resizing. The virtual
+        # hardware remains an emulator and this does not measure a physical hinge.
+        adb("shell", "wm", "size", "900x920")
+        time.sleep(4)
+        record("square_display_alive", adb("shell", "pidof", package) == report["pid"], adb("shell", "wm", "size"))
+        screenshot("05_android_valley_square.png")
+        final_log = logs() + "\n" + "\n".join(path.read_text(encoding="utf-8") for path in args.output.glob("logcat-*.txt"))
         errors = [line for line in final_log.splitlines() if re.search(r"SCRIPT ERROR:|Parse Error:|FATAL EXCEPTION|Fatal signal|ERROR:.*res://", line)]
         record("no_runtime_script_crash", not errors, errors)
         report["status"] = "passed"
