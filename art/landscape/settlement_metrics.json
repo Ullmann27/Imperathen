@@ -1,0 +1,22 @@
+[
+  {
+    "name": "han_house",
+    "triangles": 4888,
+    "bytes": 659716
+  },
+  {
+    "name": "wa_store",
+    "triangles": 5200,
+    "bytes": 702296
+  },
+  {
+    "name": "wood_longhouse",
+    "triangles": 9408,
+    "bytes": 992708
+  },
+  {
+    "name": "farmer",
+    "triangles": 3328,
+    "bytes": 220224
+  }
+]
