@@ -37,7 +37,7 @@ func apply_quality(profile: String) -> void:
 		return
 	_quality = profile
 	var settings: Dictionary = _profiles[profile]
-	Engine.max_fps = 30 if profile == "low" else 60
+	Engine.max_fps = 30 if profile in ["low", "very_high"] else 60
 	var viewport := get_viewport()
 	viewport.mesh_lod_threshold = float(settings.mesh_lod_threshold)
 	viewport.msaa_3d = Viewport.MSAA_4X if settings.msaa_samples == 4 else (Viewport.MSAA_2X if settings.msaa_samples == 2 else Viewport.MSAA_DISABLED)
