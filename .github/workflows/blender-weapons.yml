@@ -16,13 +16,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Blender
-        run: sudo apt-get update && sudo apt-get install -y blender
+        run: sudo apt-get update && sudo apt-get install -y blender python3-numpy
       - name: Validate generator syntax
         run: python3 -m py_compile tools/build_roman_weapons.py tools/validate_weapon_glb.py
       - name: Generate original assets
         run: |
           mkdir -p generated/weapons
           blender --background --python tools/build_roman_weapons.py -- --output "$PWD/generated/weapons"
+          test -s generated/weapons/gladius_lod0.glb
+          test -s generated/weapons/scutum_lod0.glb
       - name: Validate generated GLBs
         run: python3 tools/validate_weapon_glb.py generated/weapons/gladius_lod0.glb generated/weapons/scutum_lod0.glb
       - name: Archive Blender sources and GLB assets
