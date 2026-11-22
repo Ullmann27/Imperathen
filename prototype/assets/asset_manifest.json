@@ -1,0 +1,28 @@
+{
+  "hut": {
+    "format": "glTF 2.0 binary",
+    "header_valid": true,
+    "materials": 8,
+    "meshes": 8,
+    "triangles": 6450,
+    "bytes": 497340,
+    "sha256": "8069c0fc868ee6cb7bdeb2ecadb1351100c8605ea6cdca5c04dcb61e7bb1a230",
+    "provenance": "Original procedural Blender geometry in tools/build_frontier_hut.py; no external models or textures.",
+    "source": "art/source/frontier_hut.blend",
+    "axis": "glTF Y-up; front door toward +Z",
+    "usage": "Small prototype; not final realism or historical reconstruction.",
+    "bounds_m": [
+      4.386826,
+      3.74,
+      4.24
+    ]
+  },
+  "ambience": {
+    "file": "frontier_ambience.wav",
+    "generator": "tools/build_frontier_ambience.py",
+    "source": "Original deterministic additive synthesis; no external recordings.",
+    "seconds": 8,
+    "sample_rate": 22050,
+    "sha256": "69bdcc1ef52336b462db932f7c28db5014a6109c4225307903a7881bc01b6433"
+  }
+}

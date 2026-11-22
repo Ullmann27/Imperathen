@@ -1,0 +1,39 @@
+{
+  "source_commit": "b3d8e01e64663480d228777a7244a2a882bcac18",
+  "workflow_run": 45038377950,
+  "workflow_url": "https://github.com/Ullmann27/Imperathen/actions/runs/45038377950",
+  "workflow_conclusion": "success",
+  "arm64": {
+    "filename": "IMPERATHEN-0.1.0-arm64.apk",
+    "size_bytes": 28698864,
+    "sha256": "0bd67a686c3b5ca59e1ceed9b77a8fc47fa9fa091f00d1b06513c428720457ff",
+    "static_validation": "pass",
+    "physical_device_test": false
+  },
+  "x86_64": {
+    "filename": "IMPERATHEN-0.1.0-emulator.apk",
+    "sha256": "12a386d73f62c524495851734c9b247af2f1320411499a6f922af863e64f7db2",
+    "runtime_status": "passed",
+    "runtime_checks": 18
+  },
+  "artifacts": {
+    "build": {
+      "id": 14760940482,
+      "sha256": "8c9db5d727fac8e88ebce0c261831d5d2a062e2db3a0924c50bf9eade54be049"
+    },
+    "runtime": {
+      "id": 14761016267,
+      "sha256": "1ff5f0e20af1eb072442806fa2e32cc48b5f31e3b0317e838b972ae9f323d8ff"
+    }
+  },
+  "visual_review": {
+    "images": [
+      "01_android_menu.png",
+      "02_android_world.png",
+      "03_android_pause.png"
+    ],
+    "observed": "Menu, 3D village, touch controls and paused screen visible; immersive hint absent. Temporary welcome notification overlaps lower pause menu.",
+    "final_art_quality": false
+  },
+  "physical_performance_measured": false
+}
