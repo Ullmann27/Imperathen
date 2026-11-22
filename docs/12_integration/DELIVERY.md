@@ -26,7 +26,7 @@ Der gebaute Commit ist `02c566815deebabe6b96c2f25ec0c52a94d35415`, Paketkennung 
 | --- | --- | --- |
 | #1 | `a3e036b` | Governance, Abnahmematrix, GDD-Auswertung und Fachverträge |
 | #19 | `201298a` | Unreal-Projekt, Webvorschau und bestehende Agentenwerkzeuge |
-| #20 | `ea430f5`, Nachträge bis `b3d8e01` | Godot-Dorf, Gefährte, Bau, persönlicher Kampf, geprüfte Speicherung und Android-Bauweg |
+| #20 | `ea430f5`, Laufzeitkorrekturen bis `b3d8e01`, Lieferbelege `11909b7` | Godot-Dorf, Gefährte, Bau, persönlicher Kampf, geprüfte Speicherung und Android-Bauweg |
 | #21 | `1afdbf4` | Originalassets, Blender-Quellen, Schauraum und Qualitätsstufen |
 
 Die drei Entwicklungsagents arbeiteten in getrennten Dateibereichen. Agent A lieferte Regeln, Formationen, KI und Tests (`6a24724`, `a4260d8`, `d07fd51`). Agent B lieferte Rigs, Animation, Architektur, Vegetation und Freisteller (`8ace3c8`, `be3863b`, `4caf7d5`, `94ee544`). Agent C betreute Export, Diagnose, Safe-Area- und Emulatorprüfungen für Android und Desktop (`3d72400`, `b35e3ac`, `035e263`). Die Integration verband die Szenen mit der Kampagne (`90a2617`, `eb0d6b2`) und prüfte die Ergebnisse (`ffffaf9`, `02c5668`). Der separate Integrationsbranch heißt `integration/android-formation-20261122` und basiert im PR auf `docs/bootstrap-governance-20261122`. [Engineentscheidung und Projektbibel](../03_engineering/ADR_GODOT_ANDROID.md)

@@ -2,6 +2,8 @@
 
 Stand 22.11.2026. Der neueste Nutzerauftrag gibt den Beginn der Spielentwicklung frei. Der frühere Planungsstopp ist für diesen Block aufgehoben. Öffentliches Repository; keine eigenmächtige Änderung der Sichtbarkeit, keine neuen kostenpflichtigen Dienste und kein Merge nach main.
 
+Die anschließende ausdrückliche Plattformkorrektur verlangt eine auf Android installierbare Fassung. Nutzerstart, APK-Datei und konkrete Nachweise stehen in [ANDROID_INSTALL.md](ANDROID_INSTALL.md). Desktop-Editor und Headless-Lauf dienen der Entwicklung. Für diesen Android-Block übernahmen die drei Agenten Export/Bauanleitung, Touch-/Back-Integration und unabhängige APK-/Laufzeitprüfung; die gemeinsame Integration führt ihre tatsächlichen Ergebnisse zusammen.
+
 ## Arbeitszweig
 
 `feature/prototype-foundation-20261122`, aus dem geprüften Dokumentationsstand `a3e036ba24b99416b016337d81ab2b4067350fa3`. Die erste Bestandsprüfung fand nur diesen Dokumentationsstand und main; weitere Arbeiten dürfen bei späteren Prüfungen nicht überschrieben werden.
@@ -59,3 +61,7 @@ Die gemeinsame Koordination in #17/#18 hat Android zum Hauptziel und PC zur spä
 ## Lieferung und Prüfnachweis
 
 Alle drei Agenten haben ihre Implementierungsbereiche geliefert. Der abschließende Prüfläufer ist `python tools/check_prototype.py`. Seine tatsächlichen Ergebnisse, behobenen Integrationsfehler und verbleibenden Grenzen stehen in [VALIDATION.md](VALIDATION.md). Diese Prüfungen verwenden echte Godot-Szenen und Eingaben, aber einen Renderer ohne grafische Ausgabe. Das ist kein Android-Hardware- oder Leistungsnachweis.
+
+## Android-Lieferabschluss
+
+Die drei Arbeitsbereiche wurden in den tatsächlich erfolgreichen [Android-Lauf 45038377950](https://github.com/Ullmann27/Imperathen/actions/runs/45038377950) integriert. ARM64-APK und separate x86_64-Prüffassung stammen aus Commit `b3d8e01e64663480d228777a7244a2a882bcac18`. Installationsweg, statische Berichte, tatsächliche Menü-/Dorf-/Pausebilder und Android-Laufzeitbericht stehen in [ANDROID_INSTALL.md](ANDROID_INSTALL.md). Ein physischer ARM64-Test und eine vollständige mobile Kampagne bleiben offene Folgearbeit.

@@ -2,7 +2,11 @@
 
 Ein spielbarer historischer Strategieprototyp mit Dorfleben, taktischem Talgefecht und saisonaler Weltkampagne. Android, Windows und Linux führen dieselben Spielbefehle aus.
 
-## Start
+## Auf Android anfangen
+
+Lade **IMPERATHEN-a2d321d8-arm64.apk** herunter und öffne sie auf dem Gerät. Nach dem Vorspann zeigt **Figuren** die 18 Charakterbilder. Wähle eine Herkunft und **Neues Leben**, um im Dorf anzufangen. Godot und Blender werden nur auf dem Entwicklungsrechner benötigt. Frühere Debugbauten können eine andere Signatur tragen. [Aktueller Download](https://github.com/Ullmann27/Imperathen/releases/tag/prototype-2026-11-22-a2d321d8) · [Installationshinweise des Dorf-Prototyps](../docs/10_development/ANDROID_INSTALL.md)
+
+## Editorstart
 
 1. Godot **4.7.2** verwenden; genau diese Version wurde in diesem Entwicklungsblock ausgeführt.
 2. Dieses Repository herunterladen oder den Entwicklungsbranch auschecken.

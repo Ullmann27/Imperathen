@@ -18,10 +18,16 @@ Engine: **Godot 4.7.2.stable.official.ed1daf0bf**. Alle sechs Schritte endeten m
 | Regeln und Speicherung | 12 Prüfsuiten, **326 Assertions**: atomare Regeln, Reichweiten, Bilanzen, Zeit, Alter, Sieg/Niederlage, Save/Backup und Fehlerinjektion | [domain.log](evidence/domain.log) |
 | Oberfläche und Touch | **115 Prüfungen**, darunter native Touchereignisse, zwei Finger, Fokusverlust, Android-Zurück, App-Hintergrund, Safe Area, Settings, Dialogrückwege und Größenwechsel | [ui.log](evidence/ui.log) |
 | Welt | Echte Bewegung, Kollision, Kamerawechsel, Bautaps, Modellimport, Wiederaufbau und Grafikprofile | [world.log](evidence/world.log) |
-| Gesamtablauf | **32 Prüfungen** vom realen Einstieg über UI/Weltbefehle bis Kampfentscheidung, Backup-Laden und App-Pause | [integration.log](evidence/integration.log) |
+| Gesamtablauf | **35 Prüfungen** vom realen Einstieg über UI/Weltbefehle bis Kampfentscheidung, Backup-Laden, App-Pause und Android-Zurück über das echte Root-Window-Signal | [integration.log](evidence/integration.log) |
 | Hauptszene | Tatsächlicher Start von main.tscn; 420 Simulationsframes ohne Skriptfehler | [main_scene.log](evidence/main_scene.log) |
 
 Die Zahlen beschreiben Prüfungen in einem kleinen Prototyp. Sie sind keine Garantie allgemeiner Fehlerfreiheit und kein Test einer späteren Großkampagne.
+
+## Zusätzlich nachgewiesen: Android-Bau und tatsächlicher Emulatorlauf
+
+Für Commit `b3d8e01e64663480d228777a7244a2a882bcac18` ist [CI-Lauf 45038377950](https://github.com/Ullmann27/Imperathen/actions/runs/45038377950) vollständig erfolgreich. ARM64-APK: 28.698.864 Bytes, SHA-256 `0bd67a686c3b5ca59e1ceed9b77a8fc47fa9fa091f00d1b06513c428720457ff`. Beide Architekturvarianten bestehen jeweils 15 verpflichtende statische Prüfungen einschließlich tatsächlicher Signaturprüfung. Der separate Android-API-35-x86_64-Lauf besteht 18 protokollierte Prüfungen für Installation, Start, Systemhinweis, Menü, Touch-Neustart, Android-Zurück/Pause, App-Wechsel und erfasste Runtimefehler. Paket-, Bau- und Laufzeitberichte sind über ihre tatsächlichen Prüfsummen zugeordnet.
+
+Drei echte Android-Bilder wurden gesichtet. Sichtbarer kleiner Befund: Im Pausebild liegt die vorübergehende Willkommensmeldung über dem unteren Menüteil. Kein physisches ARM64-Gerät, kein vollständiger Android-Kampf-/Bau-Durchgang und keine Mobil-FPS-Messung wurden dadurch behauptet. Dateien, Bilder und genaue Grenzen: [ANDROID_INSTALL.md](ANDROID_INSTALL.md).
 
 ## Was die Prüfungen konkret absichern
 
@@ -58,14 +64,16 @@ Das Modell enthält **8 Materialbatches und 6.450 Dreiecke**, seine GLB-Datei is
 
 Das Bild ist ein Assetrender und **kein Ingame-Screenshot**. Es wurden keine fremden Spielmodelle oder Texturen verwendet. Der Umgebungston entstand ebenfalls lokal durch eigene Synthese. Die optionale Draco-Kompressionsbibliothek fehlt im Blender-Build; der unkomprimierte GLB-Export wurde erfolgreich importiert und verwendet.
 
-## Grenzen der Ausführung
+## Lokale Ausführung und gesonderter Android-Nachweis
 
 Godot wurde mit seinem **Headless-/Dummy-Renderer** ausgeführt. Der Versuch, für ein echtes Enginebild eine grafische Anzeige bereitzustellen, scheiterte an der fehlenden lokalen Displaymöglichkeit: Xorg konnte keine erforderlichen lokalen Listening-Sockets anlegen. Es wurde keine Sicherheitsgrenze umgangen. Der Blender-CPU-Render funktioniert unabhängig davon.
 
-Damit sind folgende Punkte weiterhin **nicht** nachgewiesen:
+Die Android-APK wird getrennt über die vorhandene GitHub-Baupipeline exportiert und geprüft. Ihr konkreter Quellstand, ihre Prüfsumme, die statischen Berichte und der tatsächliche Laufzeitbefund stehen in [ANDROID_INSTALL.md](ANDROID_INSTALL.md). Die lokale Headless-Ausführung wird dadurch nicht nachträglich zu einem grafischen Test erklärt.
 
-- Ingame-Screenshot, vollständige optische Abnahme und hörbare Audioausgabe.
-- Exportiertes Android-APK, echter Handydurchlauf, sichere Bildschirmränder und Verhalten auf konkreten Mobilchips.
+Unabhängig von einem zusätzlichen Emulatorlauf bleiben folgende Punkte **nicht** nachgewiesen:
+
+- Vollständige optische Abnahme aller Spielsituationen und hörbare Audioausgabe.
+- Echter ARM64-Handydurchlauf, sichere Bildschirmränder und Verhalten auf konkreten Mobilchips.
 - Bildraten, Stromverbrauch, thermisches Verhalten oder Massenschlachtleistung.
 - Windows-/Konsolenexport und Produktions-Unreal-Lauf.
 - Vollständige Provinzkarte, Politik, Handel zwischen Städten, Kaiserkarriere, generative KI-Geschichte oder Wochenkampagne.
@@ -76,4 +84,4 @@ Die Headless-Testzeiten im JSON-Report sind Laufzeiten der Prüfprogramme und d�
 
 Der Prüfläufer verwendet wegwerfbare XDG-Daten-, Konfigurations- und Cacheverzeichnisse, damit echte Spielstände unangetastet bleiben. Er prüft neben Exitcodes auch Fehlertexte und Erfolgsmarker, weil ein Godot-Skriptfehler nicht in jedem Fall einen passenden Prozessfehlercode liefert. Der Report enthält SHA-256-Werte der geprüften Spielquellen und Assets.
 
-Weitere Arbeit folgt [NEXT_AGENT.md](NEXT_AGENT.md). Als nächster belastbarer Nachweis ist ein grafischer Durchlauf beziehungsweise ein echter Android-Gerätetest sinnvoll; zusätzliche simulierte Testzahlen ersetzen ihn nicht.
+Weitere Arbeit folgt [NEXT_AGENT.md](NEXT_AGENT.md). Der vollständige Android-Spielweg auf einem tatsächlich verfügbaren ARM64-Gerät ist gesondert zu prüfen; zusätzliche simulierte Testzahlen ersetzen ihn nicht.

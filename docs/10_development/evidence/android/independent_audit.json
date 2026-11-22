@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "audited_at_utc": "2026-11-22T15:33:02.797975+00:00",
+  "conclusion": "passed_for_documented_static_and_x86_64_emulator_checks",
+  "method": "Unabhängiger Abgleich heruntergeladener Bytes, bestehender CI-Berichte, GitHub-Metadaten, XML, Logcat und drei tatsächlich betrachteter Screenshots. Keine neuen Engine-, SDK- oder Android-Testläufe.",
+  "source_commit": "b3d8e01e64663480d228777a7244a2a882bcac18",
+  "github": {
+    "repository": "Ullmann27/Imperathen",
+    "run_id": 45038377950,
+    "run_url": "https://github.com/Ullmann27/Imperathen/actions/runs/45038377950",
+    "job_id": 137257098156,
+    "job_conclusion": "success",
+    "android_runtime_step_conclusion": "success",
+    "artifact_head_commit_matches": true,
+    "build_artifact_id": 14760940482,
+    "runtime_artifact_id": 14761016267
+  },
+  "archives": {
+    "build": {
+      "size_bytes": 59795558,
+      "sha256": "8c9db5d727fac8e88ebce0c261831d5d2a062e2db3a0924c50bf9eade54be049",
+      "matches_github_artifact_digest": true
+    },
+    "runtime": {
+      "size_bytes": 668740,
+      "sha256": "1ff5f0e20af1eb072442806fa2e32cc48b5f31e3b0317e838b972ae9f323d8ff",
+      "matches_github_artifact_digest": true
+    }
+  },
+  "packages": [
+    {
+      "file": "IMPERATHEN-0.1.0-arm64.apk",
+      "abi": "arm64-v8a",
+      "size_bytes": 28698864,
+      "sha256": "0bd67a686c3b5ca59e1ceed9b77a8fc47fa9fa091f00d1b06513c428720457ff",
+      "matches_build_both_validation_reports_and_sidecar": true,
+      "build_commit_matches": true,
+      "required_static_checks_passed": 15,
+      "matching_source_hashes_with_engine_report": 16,
+      "ci_signature_verified_schemes": [
+        "v2",
+        "v3"
+      ]
+    },
+    {
+      "file": "IMPERATHEN-0.1.0-emulator.apk",
+      "abi": "x86_64",
+      "size_bytes": 31480042,
+      "sha256": "12a386d73f62c524495851734c9b247af2f1320411499a6f922af863e64f7db2",
+      "matches_build_both_validation_reports_and_sidecar": true,
+      "build_commit_matches": true,
+      "required_static_checks_passed": 15,
+      "matching_source_hashes_with_engine_report": 16,
+      "ci_signature_verified_schemes": [
+        "v2",
+        "v3"
+      ]
+    }
+  ],
+  "existing_engine_report": {
+    "version": "4.7.2.stable.official.ed1daf0bf",
+    "all_six_checks_passed": true,
+    "scope": "headless/dummy; no graphical FPS or screenshot claim"
+  },
+  "manifest_from_ci_xml": {
+    "package": "at.heinz.imperathen",
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "debuggable": true,
+    "launcher": "com.godot.game.GodotAppLauncher",
+    "permissions": []
+  },
+  "runtime": {
+    "reported_platform": "Android API 35 x86_64 emulator",
+    "status": "passed",
+    "apk_file": "IMPERATHEN-0.1.0-emulator.apk",
+    "apk_sha256": "12a386d73f62c524495851734c9b247af2f1320411499a6f922af863e64f7db2",
+    "apk_hash_matches_downloaded_x86_64_package": true,
+    "source_commit_matches": true,
+    "check_count": 18,
+    "all_checks_passed": true,
+    "check_names": [
+      "single_emulator_target",
+      "emulator_verified",
+      "apk_install",
+      "clean_test_app_data",
+      "launcher",
+      "activity_launch",
+      "process_started",
+      "godot_ready",
+      "startup_system_fullscreen_button",
+      "startup_system_fullscreen_bounds",
+      "startup_system_fullscreen_hint_dismissed",
+      "real_menu",
+      "menu_system_fullscreen_hint_absent",
+      "touch_starts_saved_game",
+      "world_system_fullscreen_hint_absent",
+      "android_back_pauses",
+      "background_resume",
+      "no_runtime_errors"
+    ],
+    "reported_errors": [],
+    "matching_godot_script_or_fatal_log_errors": 0,
+    "observed_log_markers": [
+      "IMPERATHEN_READY",
+      "IMPERATHEN_MENU_READY",
+      "IMPERATHEN_SESSION_STARTED",
+      "IMPERATHEN_PAUSED"
+    ],
+    "fullscreen_hint_title_count_before": 1,
+    "fullscreen_hint_title_count_after": 0
+  },
+  "visual_review": {
+    "screenshots_reviewed": 3,
+    "observations": [
+      "Menü mit real gerenderter Dorfszene und sichtbarem Neues-Leben-Button.",
+      "Sichtbare 3D-Spielwelt mit Figur, Dorf, HUD und Touchsteuerung; kein Vollbildhinweis darüber.",
+      "Pausenmenü mit Spiel-pausiert-Titel tatsächlich sichtbar."
+    ],
+    "known_ui_issue": "Die Willkommensmeldung überlagert im Pausebild vorübergehend den unteren Menübereich. Kein vollständiger Usability-PASS aus diesem Smoke-Test abgeleitet."
+  },
+  "evidence_sha256": {
+    "runtime-report.json": "79040177d66f0bd7a2b2552522be96a0146d6b7a799c3a1c4b33297bf3eb57e4",
+    "logcat.txt": "fdd37640d8215a634da3613598657de23e961749d178e8ebf54c824ad230225c",
+    "startup_before_ui.xml": "273af6f22d8c994a80cce51fc35476f80ba1a29848c1cd9786e86c77fb2b8b01",
+    "startup_after_ui.xml": "d904834882bff24b10a30aed8c6ddf7c003aed71666db77b5328cb6d5b936b36",
+    "01_android_menu.png": "c0111b7b79b2aa61ac0e9d4d0eeba872897f89eab570f88f7d5753040ad12cba",
+    "02_android_world.png": "e433608dda98d89a49a112b334d4dd233f8269fba7b581cbe7fd7cde4ac0bd24",
+    "03_android_pause.png": "6a7acc28681665a42985bdd09bd4f1b57e7c424e6480a9ade65708b9877fff3d"
+  },
+  "limits": {
+    "physical_device_test": false,
+    "arm64_runtime_test": false,
+    "local_signature_reverification": false,
+    "fps_measurement_available": false,
+    "performance_on_user_phone": "unknown",
+    "touch_gameplay_path_on_android": "Nicht vollständig ausgeführt; der tatsächliche Tap auf Neues Leben ist nachgewiesen, Bewegung/Kampf/Bauen haben hier keinen Android-Gerätenachweis.",
+    "audio_and_thermal_behavior": "not_tested",
+    "scope": "Erfolgreicher Installations-/Start-/Menü-/Back-/Hintergrund-Smoke-Test auf dem separaten x86_64-Emulatorpaket. ARM64-Paket statisch geprüft; sein Gerätebetrieb ist weiterhin offen."
+  }
+}
