@@ -1,0 +1,10 @@
+.godot/
+*.blend1
+evidence/*.log
+# Disposable images extracted by Godot before the tracked BasisU import settings.
+assets/**/*_basecolor.png
+assets/**/*_basecolor.png.import
+assets/**/*_normal.png
+assets/**/*_normal.png.import
+assets/**/*_roughness.png
+assets/**/*_roughness.png.import

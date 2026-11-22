@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-11-22T14:39:41.465233+00:00",
+  "pipeline": "third-team-mobile-art",
+  "primary_platform": "Android",
+  "steps": [
+    {
+      "name": "asset_gate",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "tools/art/validate_visual_assets.py",
+        "--output",
+        "/workspace/scratch/bd99b7b7e057/render_diagnostics/clean_validation/art/visual_benchmark/evidence/asset_validation.json"
+      ],
+      "passed": true,
+      "exit_code": 0,
+      "duration_seconds": 1.637,
+      "engine_errors": []
+    },
+    {
+      "name": "godot_import",
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/scratch/bd99b7b7e057/render_diagnostics/clean_validation/art/visual_benchmark",
+        "--import"
+      ],
+      "passed": true,
+      "exit_code": 0,
+      "duration_seconds": 15.062,
+      "engine_errors": []
+    },
+    {
+      "name": "godot_invariants",
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/scratch/bd99b7b7e057/render_diagnostics/clean_validation/art/visual_benchmark",
+        "--",
+        "--verify"
+      ],
+      "passed": true,
+      "exit_code": 0,
+      "duration_seconds": 1.136,
+      "engine_errors": []
+    },
+    {
+      "name": "character_palette",
+      "command": [
+        "/usr/local/bin/godot",
+        "--headless",
+        "--path",
+        "/workspace/scratch/bd99b7b7e057/render_diagnostics/clean_validation/art/visual_benchmark",
+        "--script",
+        "res://scripts/verify_character_materials.gd"
+      ],
+      "passed": true,
+      "exit_code": 0,
+      "duration_seconds": 0.423,
+      "engine_errors": []
+    }
+  ],
+  "android_device_tested": false,
+  "screenshots_verified_by_this_script": false,
+  "asset_hashes": {
+    "art/visual_benchmark/assets/architecture/frontier_house.glb": "2fb464187ecec393558d9ba24790ec54a6b9e3c66558413c266664650fbc6372",
+    "art/visual_benchmark/assets/architecture/house_foundation.glb": "741dc9cd2988b32542862752ab77ebe4facd7c55d9edc8731f87f600b36b7f2e",
+    "art/visual_benchmark/assets/architecture/village_well.glb": "21555082045da623d48eafa04ba69ed3d94126d8db006d638dca06912949e0a0",
+    "art/visual_benchmark/assets/characters/civilian_youth.glb": "d67bfa8cb612ff5d6e91cb8aa30bafa313dcbf5ff9c858b181fadc2bd2ff014c",
+    "art/visual_benchmark/assets/characters/civilian_youth_lod1.glb": "8c842170eec09ac67c3aa084b80da7bcdd90de7b38ce957c153b28eac75423cf",
+    "art/visual_benchmark/assets/characters/frontier_guard.glb": "7f037f2e2149b6e6dceaeb51ef88fcedf486f019969d0f72a2124216e19239d2",
+    "art/visual_benchmark/assets/characters/frontier_guard_lod1.glb": "2e478bd728147d3afb71dbb4f06102cf86138dc337bc17e4622c9e72c06e9775"
+  },
+  "source_hashes": {
+    "art/visual_benchmark/project.godot": "e2329ddb4868fca12bb3cb3a2f6769c11c77603db28191fe39108cb4c3a12522",
+    "art/visual_benchmark/quality_profiles.json": "1f26d30e22b21771582245cea32ac4245e4572811e887b07f66d9e5b650c97b3",
+    "art/visual_benchmark/scripts/character_materials.gd": "f408abab24d59301017bb1fe18dd1145c0a8046041ed2eac8f482ca9e0394f2d",
+    "art/visual_benchmark/scripts/environment_builder.gd": "26b9ce5050b5e3ca6e9496a75f421a55fd4f9293f735af5a47394fed5c81b523",
+    "art/visual_benchmark/scripts/quality_controller.gd": "c497ce33e732949ae458e26112f1e8f45472bc640d535b38c030df8588f95a06",
+    "art/visual_benchmark/scripts/showroom.gd": "2ea124fa04fb818e93017b4ae0661a64a2a5d40214472de5e255f827ec126fe0",
+    "art/visual_benchmark/scripts/verify_character_materials.gd": "3d5edfeb64565bdd0c51392e18aaac6c7a50a7acf9861189283ab5962445900b",
+    "tools/art/build_architecture.py": "38db43c56588757b3b22d88f2c3b46fcd6c8692e7a2754eac53aed1a8a6e52e5",
+    "tools/art/build_characters.py": "5493f6443ac4256f00ac6e7b3cac3e380f7c9949c42b7549e389469b74491444",
+    "tools/art/common.py": "bb0158fe55c7866d1fd21a95501c7c1569375128cb0f61d84e351153f65f65aa",
+    "tools/art/generate_materials.py": "0451fadcf0127bf298a608add98adb0f7485a79317e9127c92cda9fd97535640",
+    "tools/art/run_visual_pipeline.py": "98a5f50257f3dc52312bfbe88c550512311c47da53c5d49855ad15249d332e23",
+    "tools/art/validate_visual_assets.py": "4872ed2e564fa804d85399534f9451855a1f324cb3ee69c7940bcc2c82e850c3"
+  },
+  "assets_checked": 7,
+  "engine_version": "4.7.2.stable.official.ed1daf0bf",
+  "passed": true
+}
