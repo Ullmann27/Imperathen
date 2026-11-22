@@ -79,6 +79,8 @@ var _cancel_build_button: Button
 var _build_active := false
 var _quality := "balanced"
 var _layout_queued := false
+var _dialog_data: Dictionary = {}
+var _confirm_data: Dictionary = {}
 
 
 func _ready() -> void:
@@ -92,9 +94,17 @@ func _ready() -> void:
 	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_root.theme = _ui_theme
 	add_child(_root)
+	_update_safe_area()
 	_setup_sound()
 	_setup_toast()
 	get_viewport().size_changed.connect(_viewport_changed)
+
+
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_WM_WINDOW_FOCUS_OUT]:
+		_reset_touch()
+	elif what == NOTIFICATION_APPLICATION_RESUMED and is_instance_valid(_root):
+		_viewport_changed()
 
 
 func _exit_tree() -> void:
@@ -115,7 +125,7 @@ func show_intro() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_screen.add_child(center)
 	var column := _column(15)
-	column.custom_minimum_size.x = 760
+	column.custom_minimum_size.x = minf(760, _content_size().x - 48)
 	center.add_child(column)
 	var mark := ImperialMark.new()
 	mark.custom_minimum_size = Vector2(88, 88)
@@ -124,11 +134,12 @@ func show_intro() -> void:
 	var kicker := _label("EIN LEBEN. EIN REICH.", 15, BRONZE)
 	kicker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(kicker)
-	var title := _label("IMPERATHEN", 76, CREAM, true)
+	var title := _label("IMPERATHEN", _title_font_size("IMPERATHEN", 76, _content_size().x - 64), CREAM, true)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(title)
 	var subtitle := _label("Nicht jeder Aufstieg führt auf einen Thron.\nJede Entscheidung hinterlässt eine Spur.", 21, MUTED)
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(subtitle)
 	var skip := _button("Überspringen" if _touch_enabled else "Überspringen  ·  Enter", func(): _finish_intro(), false, 14)
 	skip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -161,7 +172,7 @@ func show_menu(can_continue: bool) -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	scroll.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	scroll.custom_minimum_size.x = minf(620, get_viewport().get_visible_rect().size.x - 76)
+	scroll.custom_minimum_size.x = minf(620, _content_size().x - 76)
 	margin.add_child(scroll)
 	var layout := _column(8)
 	layout.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -172,7 +183,7 @@ func show_menu(can_continue: bool) -> void:
 	layout.add_child(mark)
 	mark.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	layout.add_child(_label("DIE CHRONIK EINES AUFSTIEGS", 13, BRONZE))
-	layout.add_child(_label("IMPERATHEN", 57, CREAM, true))
+	layout.add_child(_label("IMPERATHEN", _title_font_size("IMPERATHEN", 57, scroll.custom_minimum_size.x - 20), CREAM, true))
 	var pitch := _label("Dein Anfang ist klein.\nWas daraus wird, entscheidest du.", 18, MUTED)
 	layout.add_child(pitch)
 	_spacer(layout, 16)
@@ -292,6 +303,7 @@ func show_pause() -> void:
 
 
 func show_dialog(title: String, text: String, choices: Array) -> void:
+	_dialog_data = {"title": title, "text": text, "choices": choices.duplicate(true)}
 	_open_screen("dialog", true)
 	var column := _modal("DEINE ENTSCHEIDUNG", title, text, 670)
 	column.add_child(_label("Die Welt ist während dieses Gesprächs pausiert.", 12, MUTED))
@@ -354,6 +366,12 @@ func set_mode(mode: String) -> void:
 		"city": "B Bauplan öffnen  ·  Linksklick platzieren  ·  Tab zur Figur  ·  Die Figur bleibt an ihrem Ort.",
 		"map": "M zurück zur Figur  ·  Strategischer Überblick  ·  Die Fernansicht versetzt deine Figur nicht."
 	}
+	if _touch_enabled:
+		hints = {
+			"person": "Links bewegen · Rechts interagieren oder angreifen · Im freien Bild ziehen, um die Kamera zu drehen.",
+			"city": "Hütte wählen · Freien Bauplatz antippen · Zum Beenden Bau abbrechen wählen.",
+			"map": "Im freien Bild ziehen · Figur wählen, um zurückzukehren · Deine Figur bleibt an ihrem Ort."
+		}
 	_hud_labels["controls"].text = hints[mode]
 	_update_touch_visibility()
 
@@ -374,21 +392,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		_finish_intro()
 	elif event.keycode == KEY_ESCAPE:
-		if _view_state == "game":
+		if handle_back():
 			get_viewport().set_input_as_handled()
-			_emit("cancel_build" if _build_active else "pause")
-		elif _view_state == "pause":
-			get_viewport().set_input_as_handled()
-			_emit("resume")
-		elif _view_state == "settings":
-			get_viewport().set_input_as_handled()
-			_return_to(_settings_return)
-		elif _view_state == "confirm":
-			get_viewport().set_input_as_handled()
-			_return_to(_confirm_return)
-		elif _view_state == "journal":
-			get_viewport().set_input_as_handled()
-			_emit("resume")
+
+
+func handle_back() -> bool:
+	# Root forwards Android's go-back notification with SceneTree.quit_on_go_back disabled.
+	match _view_state:
+		"intro": _finish_intro()
+		"game": _emit("cancel_build" if _build_active else "pause")
+		"pause", "journal": _emit("resume")
+		"settings": _return_to(_settings_return)
+		"confirm": _return_to(_confirm_return)
+		"menu": _confirm("Spiel beenden?", "Ein laufender Lebensweg wird vor dem Beenden gespeichert.", "quit", {})
+		"dialog": notify("Wähle eine Antwort, um dieses Gespräch abzuschließen.")
+		_: return false
+	return true
 
 
 func _open_screen(screen_name: String, darken: bool, menu_style := false) -> void:
@@ -402,7 +421,7 @@ func _open_screen(screen_name: String, darken: bool, menu_style := false) -> voi
 		_screen.hide()
 		_screen.queue_free()
 	_view_state = screen_name
-	var viewport_size := get_viewport().get_visible_rect().size
+	var viewport_size := _content_size()
 	_compact_layout = _touch_enabled or viewport_size.x < 1120 or viewport_size.y < 640
 	_screen = Control.new()
 	_screen.name = screen_name.capitalize()
@@ -439,9 +458,14 @@ func _request_new_game() -> void:
 
 func _confirm(title: String, body: String, action: String, payload: Dictionary) -> void:
 	_confirm_return = _view_state
+	_confirm_data = {"title": title, "body": body, "action": action, "payload": payload.duplicate(true)}
+	_render_confirmation()
+
+
+func _render_confirmation() -> void:
 	_open_screen("confirm", true)
-	var column := _modal("BITTE BESTÄTIGEN", title, body, 540)
-	column.add_child(_button("Bestätigen", _emit.bind(action, payload), true))
+	var column := _modal("BITTE BESTÄTIGEN", String(_confirm_data.title), String(_confirm_data.body), 540)
+	column.add_child(_button("Bestätigen", _emit.bind(String(_confirm_data.action), _confirm_data.payload), true))
 	var back := _button("Zurück", func(): _return_to(_confirm_return))
 	column.add_child(back)
 	back.grab_focus.call_deferred()
@@ -470,6 +494,7 @@ func _build_top_bar() -> void:
 	brand.add_child(_label("IMPERATHEN", 17 if _compact_layout else 23, CREAM, true))
 	_hud_labels["status"] = _label("GRENZDORF", 10, BRONZE)
 	brand.add_child(_hud_labels["status"])
+	brand.visible = not (_compact_layout and _content_size().x < 1000)
 	for resource in ["wood", "grain", "denarii"]:
 		var metric := _label("", 13 if _compact_layout else 18, CREAM)
 		metric.custom_minimum_size.x = 72 if _compact_layout else 115
@@ -495,16 +520,18 @@ func _build_objective_card() -> void:
 	panel.position = Vector2(24, 110)
 	panel.size = Vector2(272, 150) if _compact_layout else Vector2(300, 180)
 	_screen.add_child(panel)
-	var column := _column(10)
+	var short_layout := _compact_layout and _content_size().y < 600
+	var column := _column(6 if short_layout else 10)
 	panel.add_child(column)
-	column.add_child(_label("DEIN NÄCHSTER SCHRITT", 11, BRONZE))
-	_hud_labels["objective_title"] = _label("", 19 if _compact_layout else 23, CREAM, true)
+	if not (_compact_layout and _content_size().y < 520):
+		column.add_child(_label("DEIN NÄCHSTER SCHRITT", 11, BRONZE))
+	_hud_labels["objective_title"] = _label("", 17 if short_layout else 19 if _compact_layout else 23, CREAM, true)
 	_hud_labels["objective_title"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(_hud_labels["objective_title"])
-	_hud_labels["objective_text"] = _label("", 13 if _compact_layout else 15, MUTED)
+	_hud_labels["objective_text"] = _label("", 12 if short_layout else 13 if _compact_layout else 15, MUTED)
 	_hud_labels["objective_text"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if _compact_layout:
-		_hud_labels["objective_text"].max_lines_visible = 4
+		_hud_labels["objective_text"].max_lines_visible = 2 if _content_size().y < 520 else 3 if short_layout else 4
 		_hud_labels["objective_text"].text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	column.add_child(_hud_labels["objective_text"])
 	if _compact_layout:
@@ -691,9 +718,10 @@ func _update_touch_visibility() -> void:
 		_cancel_build_button.visible = _build_active
 
 
-func _show_journal() -> void:
+func _show_journal(pause_world := true) -> void:
 	# Root pauses the authoritative world before the reading screen replaces its pause UI.
-	_emit("pause")
+	if pause_world:
+		_emit("pause")
 	_open_screen("journal", true)
 	var objective := _objective(_state)
 	var player: Dictionary = _state.get("player", {})
@@ -726,12 +754,54 @@ func _viewport_changed() -> void:
 
 func _rebuild_layout() -> void:
 	_layout_queued = false
-	if _view_state == "game":
-		show_game(_state)
-	elif _view_state == "menu":
-		show_menu(_can_continue)
-	elif _view_state == "settings":
-		_show_settings(_settings_return)
+	_update_safe_area()
+	match _view_state:
+		"intro": show_intro()
+		"game": show_game(_state)
+		"menu": show_menu(_can_continue)
+		"settings": _show_settings(_settings_return)
+		"pause": show_pause()
+		"journal": _show_journal(false)
+		"confirm": _render_confirmation()
+		"dialog": show_dialog(String(_dialog_data.title), String(_dialog_data.text), _dialog_data.choices)
+
+
+func _content_size() -> Vector2:
+	return _root.size if is_instance_valid(_root) else get_viewport().get_visible_rect().size
+
+
+func _update_safe_area() -> void:
+	var viewport_size := get_viewport().get_visible_rect().size
+	var safe := Rect2(Vector2.ZERO, viewport_size)
+	if OS.has_feature("mobile"):
+		safe = _safe_rect_from_display(Rect2(DisplayServer.get_display_safe_area()), get_viewport().get_screen_transform(), viewport_size)
+	_apply_safe_rect(safe)
+
+
+func _safe_rect_from_display(screen_safe: Rect2, screen_transform: Transform2D, viewport_size: Vector2) -> Rect2:
+	var full := Rect2(Vector2.ZERO, viewport_size)
+	if screen_safe.size.x <= 0 or screen_safe.size.y <= 0 or is_zero_approx(screen_transform.determinant()):
+		return full
+	var mapped: Rect2 = screen_transform.affine_inverse() * screen_safe
+	var clipped := mapped.intersection(full)
+	return clipped if clipped.size.x > 0 and clipped.size.y > 0 else full
+
+
+func _apply_safe_rect(safe: Rect2) -> void:
+	if not is_instance_valid(_root):
+		return
+	var viewport_size := get_viewport().get_visible_rect().size
+	_root.offset_left = safe.position.x
+	_root.offset_top = safe.position.y
+	_root.offset_right = safe.end.x - viewport_size.x
+	_root.offset_bottom = safe.end.y - viewport_size.y
+
+
+func _title_font_size(text: String, desired: int, available_width: float) -> int:
+	var measured := _serif.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(desired * _ui_scale)).x
+	if measured <= available_width or measured <= 0:
+		return desired
+	return maxi(24, floori(desired * maxf(available_width, 100) / measured))
 
 
 func _objective(state: Dictionary) -> Array[String]:
@@ -854,7 +924,7 @@ func _show_settings(return_screen: String) -> void:
 
 
 func _modal(kicker: String, title: String, body: String, width: float) -> VBoxContainer:
-	width = minf(width, get_viewport().get_visible_rect().size.x - 100)
+	width = minf(width, _content_size().x - 100)
 	var margin := _margin(30, 46, 30, 46)
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_screen.add_child(margin)
@@ -884,7 +954,7 @@ func _modal(kicker: String, title: String, body: String, width: float) -> VBoxCo
 	# Fit long story text and large type while keeping the choices reachable by scroll.
 	column.minimum_size_changed.connect(func():
 		if is_instance_valid(scroll):
-			scroll.custom_minimum_size.y = minf(column.get_combined_minimum_size().y, get_viewport().get_visible_rect().size.y - 144)
+			scroll.custom_minimum_size.y = minf(column.get_combined_minimum_size().y, maxf(120, _content_size().y - 144))
 	)
 	return column
 

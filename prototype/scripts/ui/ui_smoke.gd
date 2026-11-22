@@ -149,6 +149,7 @@ func _run() -> void:
 	_check(_button("Zurück ins Spiel") != null, "empty choices retain exit")
 	_ui.notify("Spielstand gespeichert.")
 	_check(_ui.get("_toast_panel").visible, "notification visible")
+	await _check_android_lifecycle(state)
 	_ui.set("_touch_enabled", false)
 	_ui.set("_ui_scale", 1.0)
 	_ui.set("_quality", "balanced")
@@ -158,7 +159,7 @@ func _run() -> void:
 	await _frames()
 	await create_timer(0.15).timeout
 	if _failures.is_empty():
-		print("UI_SMOKE_PASS checks=", _checks, " native touch/persistence/modal/layout checks; headless, no device or visual performance claim")
+		print("UI_SMOKE_PASS checks=", _checks, " native touch/back/background/safe-area/resize/persistence checks; headless, no device or visual performance claim")
 	else:
 		for failure in _failures:
 			push_error(failure)
@@ -169,6 +170,86 @@ func _frames() -> void:
 	await process_frame
 	await process_frame
 	await process_frame
+
+
+func _check_android_lifecycle(state: Dictionary) -> void:
+	_ui.show_game(state)
+	_ui.set_mode("person")
+	_ui.set_build_active(false)
+	await _frames()
+	var pad: Control = _ui.get("_touch_pad")
+	var center := pad.get_global_rect().get_center()
+	_touch(31, true, center + Vector2(35, -10))
+	_ui.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+	_check(_axis().is_zero_approx() and pad.get("touch_index") == -1, "app background clears native capture")
+	var movement_events := _count("move_axis")
+	_drag(31, center + Vector2(100, -60))
+	_check(_count("move_axis") == movement_events, "stale background drag cannot restart movement")
+	_ui.show_pause()
+	var resumes := _count("resume")
+	_ui.notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	await _frames()
+	_check(_ui.get("_view_state") == "pause" and _count("resume") == resumes, "app resume retains pause instead of resuming combat")
+	_ui._show_settings("pause")
+	await _frames()
+	_check(_ui.handle_back() and _ui.get("_view_state") == "pause", "Android back from settings returns to pause")
+	_check(_count("resume") == resumes, "leaving settings does not resume world")
+	_ui.handle_back()
+	_check(_events.back().action == "resume", "Android back resumes from pause")
+	_ui.show_menu(true)
+	await _frames()
+	var quits := _count("quit")
+	_ui.handle_back()
+	_check(_ui.get("_view_state") == "confirm" and _count("quit") == quits, "Android back at main menu confirms instead of quitting")
+	root.size = Vector2i(1200, 900)
+	await _frames()
+	await _frames()
+	_check(_ui.get("_view_state") == "confirm", "tablet resize preserves confirmation")
+	_ui.handle_back()
+	_check(_ui.get("_view_state") == "menu" and _count("quit") == quits, "resized confirmation keeps original return screen")
+	var choices := [{"id": "protect", "label": "Beim Dorf bleiben"}, {"id": "pursue", "label": "Die Angreifer verfolgen"}]
+	_ui.show_dialog("Ein offener Entschluss", "Diese Wahl darf beim Falten des Geräts nicht verschwinden.", choices)
+	var decisions := _count("story_choice")
+	_ui.handle_back()
+	_check(_ui.get("_view_state") == "dialog" and _count("story_choice") == decisions, "Android back cannot fabricate or discard a story choice")
+	root.size = Vector2i(960, 540)
+	await _frames()
+	await _frames()
+	_check(_ui.get("_view_state") == "dialog" and _button("Beim Dorf bleiben") != null, "fold-size transition retains live dialog options")
+	_check(_count("story_choice") == decisions, "dialog resize does not choose an answer")
+	_check_modal_bounds(Rect2(Vector2.ZERO, Vector2(960, 540)), "resized dialog")
+	var screen_transform := Transform2D(Vector2(2, 0), Vector2(0, 2), Vector2.ZERO)
+	var safe: Rect2 = _ui._safe_rect_from_display(Rect2(96, 48, 1728, 936), screen_transform, Vector2(960, 540))
+	_check(safe.is_equal_approx(Rect2(48, 24, 864, 468)), "physical display insets map to logical viewport coordinates")
+	_check(_ui._safe_rect_from_display(Rect2(), screen_transform, Vector2(960, 540)).is_equal_approx(Rect2(0, 0, 960, 540)), "missing display safe area falls back to full viewport")
+	_ui._apply_safe_rect(safe)
+	_ui.show_game(state)
+	_ui.set_mode("person")
+	await _frames()
+	_check_layout_region(safe, "landscape with cutout and navigation insets")
+	pad = _ui.get("_touch_pad")
+	var objective: Control = _ui.get("_hud_labels").objective_title.get_parent().get_parent()
+	_check(not objective.get_global_rect().intersects(pad.get_global_rect()), "compact objective does not cover movement pad inside safe area")
+	center = pad.get_global_rect().get_center()
+	_touch(41, true, center + Vector2(0, -35))
+	_check(_axis().y < 0 and absf(_axis().x) < 0.01, "touch coordinates remain correct after safe-area offset")
+	_touch(41, false, center)
+	_ui.show_dialog("Sichere Bildschirmfläche", "Auch eine lange Antwort bleibt zwischen Kameraausschnitt und Systemleiste erreichbar.", choices)
+	await _frames()
+	_check_modal_bounds(safe, "dialog inside display safe area")
+	_ui._apply_safe_rect(Rect2(Vector2.ZERO, Vector2(960, 540)))
+	root.size = Vector2i(1200, 900)
+	await _frames()
+	await _frames()
+	_ui.show_game(state)
+	await _frames()
+	_check_layout(Vector2(1200, 900), "tablet landscape at 125 percent")
+	_check("WASD" not in _ui.get("_hud_labels").controls.text and "Linksklick" not in _ui.get("_hud_labels").controls.text, "mobile guidance does not require keyboard or mouse")
+
+
+func _check_modal_bounds(region: Rect2, description: String) -> void:
+	var scroll := _find_scroll(_ui.get("_screen"))
+	_check(scroll != null and region.encloses(scroll.get_parent().get_global_rect()), description + " outer panel stays inside safe area")
 
 
 func _check(value: bool, description: String) -> void:
@@ -230,6 +311,10 @@ func _find_scroll(node: Node) -> ScrollContainer:
 
 
 func _check_layout(viewport_size: Vector2, description: String) -> void:
+	_check_layout_region(Rect2(Vector2.ZERO, viewport_size), description)
+
+
+func _check_layout_region(region: Rect2, description: String) -> void:
 	var controls: Array[Control] = []
 	_collect_controls(_ui.get("_screen"), controls)
 	for control in controls:
@@ -237,7 +322,7 @@ func _check_layout(viewport_size: Vector2, description: String) -> void:
 			continue
 		if control is Button or control is PanelContainer or control == _ui.get("_touch_pad"):
 			var rect: Rect2 = control.get_global_rect()
-			_check(rect.position.x >= -0.5 and rect.position.y >= -0.5 and rect.end.x <= viewport_size.x + 0.5 and rect.end.y <= viewport_size.y + 0.5, "%s: %s within viewport: %s" % [description, control.name, rect])
+			_check(region.grow(0.5).encloses(rect), "%s: %s within usable area: %s" % [description, control.name, rect])
 
 
 func _collect_controls(node: Node, target: Array[Control]) -> void:

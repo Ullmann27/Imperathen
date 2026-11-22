@@ -22,3 +22,12 @@ __pycache__/
 *.pyc
 exports/
 *.blend1
+
+# Android build outputs and private signing material
+builds/
+artifacts/
+android-runtime/
+*.apk
+*.aab
+*.keystore
+*.jks

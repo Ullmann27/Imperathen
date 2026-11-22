@@ -21,6 +21,7 @@ var run_id := ""
 
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
+	get_tree().quit_on_go_back = false
 	run_id = "%s_%s" % [Time.get_unix_time_from_system(), Time.get_ticks_usec()]
 	model = ModelScript.new()
 	model.new_game()
@@ -63,6 +64,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if is_instance_valid(ui):
+			ui.handle_back()
+		return
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		if session_started and screen == "playing":
+			_pause()
+		return
 	if what == NOTIFICATION_APPLICATION_PAUSED:
 		if session_started:
 			if screen == "playing":
@@ -97,6 +106,7 @@ func _show_menu() -> void:
 	world.set_mode("city")
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	ui.show_menu(FileAccess.file_exists(SAVE_PATH) or FileAccess.file_exists(SAVE_PATH + ".bak"))
+	_log_menu_geometry.call_deferred()
 
 
 func _request_new_game() -> void:
@@ -121,6 +131,7 @@ func _start_new_game() -> void:
 	var saved := _save(false)
 	if saved.get("ok", false):
 		ui.notify("Willkommen in der Grenzsiedlung. Sprich mit dem Gefährten und suche Holz.")
+		print("IMPERATHEN_SESSION_STARTED: saved frontier world")
 
 
 func _continue_game() -> void:
@@ -154,6 +165,7 @@ func _pause() -> void:
 	world.set_active(false)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	ui.show_pause()
+	print("IMPERATHEN_PAUSED")
 
 
 func _save(show_feedback: bool = true) -> Dictionary:
@@ -323,3 +335,29 @@ func _exit_tree() -> void:
 	if ambience != null:
 		ambience.stop()
 		ambience.stream = null
+
+
+func _log_menu_geometry() -> void:
+	# Debug builds expose only this button's screen coordinates so Android smoke
+	# checks can tap the actual laid-out control without guessed pixel positions.
+	if not OS.is_debug_build() or screen != "menu":
+		return
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if screen != "menu":
+		return
+	var button := _find_start_button(ui)
+	if button != null:
+		var center := button.get_global_rect().get_center()
+		var position := get_viewport().get_screen_transform() * center
+		print("IMPERATHEN_MENU_READY " + JSON.stringify({"new_game": [position.x, position.y]}))
+
+
+func _find_start_button(node: Node) -> Button:
+	if node is Button and node.text == "Neues Leben":
+		return node
+	for child: Node in node.get_children():
+		var found := _find_start_button(child)
+		if found != null:
+			return found
+	return null
