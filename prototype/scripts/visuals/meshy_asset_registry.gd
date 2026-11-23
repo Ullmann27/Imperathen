@@ -21,7 +21,11 @@ static func metadata(stable_id: String) -> Dictionary:
 
 static func source_path(stable_id: String) -> String:
 	var entry := metadata(stable_id)
-	return str(entry.get("intended_source_path", ""))
+	var path := str(entry.get("intended_source_path", ""))
+	const PROJECT_PREFIX := "prototype/"
+	if path.begins_with(PROJECT_PREFIX):
+		return "res://" + path.substr(PROJECT_PREFIX.length())
+	return path
 
 
 static func has_source(stable_id: String) -> bool:
