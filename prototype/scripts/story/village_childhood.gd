@@ -277,10 +277,14 @@ static func talk(data: Dictionary, id: String, choice: String) -> Dictionary:
 static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dictionary:
 	var child: Dictionary = data.village.childhood
 	if command == "village_childhood_begin_raid":
-		if child.completed.size() != STEPS.size() or child.night_event != "pending":
+		if child.completed.size() != STEPS.size() or child.night_event != "pending" or child.screenplay.i10 != "pending":
 			return _fail("Diese Nacht wurde noch nicht durch den tatsächlichen Dorfanfang erreicht.")
+		# Compatibility entry for existing automation: historically this command
+		# meant "release the first raid". It now maps to the canonical defend path.
+		child.screenplay.i10 = "complete"
+		child.screenplay.raid_path = "defend"
 		child.night_event = "released"
-		return _ok("In der Nacht brechen fremde Reiter in die vertraute Ruhe des Dorfes ein.")
+		return _ok("In der Nacht brechen fremde Reiter in Valdora ein. Du gehst hinaus, um Menschen zu helfen.")
 	var step := _current(data)
 	if step.is_empty():
 		return _fail("Die Aufgaben dieses Kindheitskapitels sind bereits abgeschlossen.")
