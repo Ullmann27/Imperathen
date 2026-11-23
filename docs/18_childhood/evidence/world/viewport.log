@@ -1,0 +1,17 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+SETTLEMENT_REVIEW_STAGE script_ready profile=low
+SETTLEMENT_REVIEW_STAGE model_ready
+SETTLEMENT_REVIEW_STAGE world_added
+SETTLEMENT_REVIEW_STAGE world_configured
+SETTLEMENT_REVIEW_STAGE floor_settled
+SETTLEMENT_REVIEW_CAPTURE 01-family-interior
+SETTLEMENT_REVIEW_CAPTURE 02-family-doorstep
+SETTLEMENT_REVIEW_CAPTURE 03-village-forge
+SETTLEMENT_REVIEW_CAPTURE 04-market-homes
+SETTLEMENT_REVIEW_CAPTURE 05-residential-street
+SETTLEMENT_REVIEW_CAPTURE 06-settlement-overview
+SETTLEMENT_GRAPHICS_REVIEW []

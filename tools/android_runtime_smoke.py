@@ -158,7 +158,25 @@ def execute_childhood(*, read_snapshot, read_logs, read_control, tap, swipe,
            and moved["world_seconds"] > initial["world_seconds"],
            {"gesture":gesture, "distance_metres":distance, "intended_direction_metres":along, "before":child["position"],
             "after":moved_child["position"]})
-    nearby = moved_child.get("nearby", {})
+    # A completed ADB swipe does not prove that a slow rendered frame has
+    # consumed its release. Observe bounded deceleration, then a separate quiet
+    # interval with no further input. The original travel limit remains binding.
+    previous = village_runtime_cursor(read_logs())
+    settled = read_snapshot("playing", after=previous,
+                            predicate=lambda state: state["world_seconds"] >= moved["world_seconds"] + 0.25)
+    previous = village_runtime_cursor(read_logs())
+    stopped = read_snapshot("playing", after=previous,
+                            predicate=lambda state: state["world_seconds"] >= settled["world_seconds"] + 0.5)
+    settled_child, stopped_child = observed_childhood(settled), observed_childhood(stopped)
+    drift = _childhood_distance(settled, stopped)
+    record("childhood_native_touch_stops_after_release", drift <= 0.02
+           and _childhood_distance(initial, settled) <= 1.6
+           and _childhood_distance(initial, stopped) <= 1.6
+           and _childhood_identity(initial) == _childhood_identity(settled) == _childhood_identity(stopped),
+           {"settled_position":settled_child["position"], "stopped_position":stopped_child["position"],
+            "drift_metres":drift, "quiet_world_seconds":stopped["world_seconds"] - settled["world_seconds"],
+            "total_distance_metres":_childhood_distance(initial, stopped)})
+    nearby = stopped_child.get("nearby", {})
     record("childhood_julia_remains_reachable", nearby.get("available") is True
            and nearby.get("npc_id") == "julia", nearby)
     screenshot("12_android_childhood_home.png")

@@ -2,6 +2,7 @@ extends Node3D
 ## Walkable additions to existing houses. This view never creates people or goods.
 
 const Art = preload("res://scripts/world/village_art.gd")
+const Childhood = preload("res://scripts/story/childhood_story.gd")
 const FLOOR_HEIGHT := 0.3925
 const DOOR_WIDTH := 1.12
 const RAMP_INNER := 2.08
@@ -195,7 +196,7 @@ func _build_lane() -> void:
 
 
 func sync_state(data: Dictionary) -> void:
-	_set_enabled(bool(data.get("village",{}).get("childhood",{}).get("enabled",false)))
+	_set_enabled(Childhood.enabled(data))
 	var deceased: Array[String] = []
 	for person: Dictionary in data.get("village",{}).get("economy",{}).get("people",[]):
 		if not bool(person.get("alive",true)):

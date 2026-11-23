@@ -1,5 +1,13 @@
 # Arbeitsauftrag für Agenten – IMPERATHEN
 
+## Präzisierung nach dem Spieltest – 23.11.2026
+
+Heinz bewertet die bisherige APK als sehr frühe Rohfassung. Der neue Anfang soll einen Zwölfjährigen in einem **bereits bestehenden, funktionierenden Dorf** mit Eltern, Nachbarn, Markt und Handwerk zeigen. Der frühere sofortige Wiederaufbau und die erste selbst gebaute Hütte sind für diesen neuen Einstieg überholt. Beziehungen, sinnvolle verbundene Aufgaben, Schmiedelehre, beaufsichtigte Kontrollrunde und vorübergehende Wachhilfe gehen dem überraschenden nächtlichen Überfall voraus. Kein automatischer kurzer Sprung vom Kind zum Erwachsenen, Soldaten oder Kaiser.
+
+Weitere ausdrückliche Ziele sind natürliche Arm- und Körperbewegungen, normales Gehtempo und getrenntes Laufen, erlernbare unbewaffnete Techniken, später ausrüstungsgebundener Schwert-/Schildkampf, ein größeres bewohntes Dorf, nutzbare Innenräume ohne Boden- oder Personendurchdringung, eine Zielkarte und größere Touchflächen. Konsolenqualität bleibt ein Ziel; Entlastung und Wärmeverhalten des Handys müssen gemessen werden. Die vorhandenen Befugnisse und Grenzen für Entwicklung, Android-Prüfbau, isolierte Branches und Draft-PRs bestehen weiter.
+
+Der Koordinatorzweig heißt `feature/childhood-village-20261123`; die aktuelle Chat-B-Fortsetzung liegt auf `feature/chat-b-village-world-20261123` in Entwurfs-PR #37. Vor Änderungen [die aktuelle zusammengeführte Übergabe](docs/18_childhood/CHAT_B_DELIVERY.md) lesen; [HANDOFF.md](docs/18_childhood/HANDOFF.md) beschreibt den erhaltenen früheren Koordinatorstand. Die spätere Nutzervorgabe legt fest: Der Schmied ist der beste Freund des Vaters, beide sterben beim Überfall. Tatsächliche Hilfe rettet die Mutter, gemeinsames Verstecken mit den Eltern führt zum Tod beider Eltern. Darauf folgt der Racheschwur. Neue Partien verwenden Julia, Silvanus und Sextus; vorhandene Saves behalten ihre damalige Familiengeschichte. Vier Filmstunden sind der dramaturgische Ausbaumaßstab, kein belegter Lieferumfang. Die zwei Folgechat-Prompts liegen unter `docs/18_childhood/CHAT_A_BEWEGUNG_KAMPF_STEUERUNG.md` und `CHAT_B_DORF_GESCHICHTE_WELT.md`, jeweils mit drei Arbeitsagenten. Den Remote-Stand prüfen und fremde Änderungen erhalten.
+
 ## Aktueller Entwicklungsauftrag – 22.11.2026
 
 ### Erweiterung vom 23.11.2026: gelebtes Dorf und offene Römerwelt

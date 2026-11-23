@@ -170,7 +170,7 @@ func _verify_outcome(expected: String, alive_count: int) -> void:
 		var person := _person(id)
 		var actor: Node3D = game.world.village_life_world.actors[id]
 		_check(not person.alive and person.health==0 and person.assignment=="idle","The shared authority permanently removes dead resident work: " + id)
-		_check(not actor.visible and actor.get_node("ResidentBody").collision_layer==0,"The actual dead resident neither renders nor leaves an invisible body: " + id)
+		_check(not actor.visible and actor.collision_layer==0,"The actual dead resident neither renders nor leaves an invisible body: " + id)
 	_check(game.world.village_life_world.actors.julia.visible==(expected=="mother_survived"),"The actual mother projection matches the saved survivor branch")
 	var economy: Dictionary = game.VillageEconomy.view(game.model.data)
 	_check(economy.population.alive==alive_count and economy.people.size()==14,"The same fourteen identities produce the correct actual survivor count")

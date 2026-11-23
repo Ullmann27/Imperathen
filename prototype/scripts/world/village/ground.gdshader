@@ -25,11 +25,13 @@ void fragment() {
 	float wear=max(max(longitudinal,transverse),max(square,bank));
 	float east=(1.0-smoothstep(1.35,2.40,abs(p.x-30.0)+grain))*(1.0-smoothstep(34.0,38.0,abs(p.y+9.0)));
 	float north=(1.0-smoothstep(1.15,2.20,abs(p.y+36.5)+grain))*(1.0-smoothstep(24.0,27.0,abs(p.x-7.0)));
-	float south=(1.0-smoothstep(1.10,2.10,abs(p.y-24.0)+grain))*(1.0-smoothstep(30.0,33.0,abs(p.x-12.0)));
+	// Branch streets follow village_layout.gd and leave the south house plots clear.
+	float south=(1.0-smoothstep(.65,1.20,abs(p.y-28.0)+grain))*(1.0-smoothstep(30.0,32.0,abs(p.x-13.0)));
+	float yard_lane=(1.0-smoothstep(.80,1.30,abs(p.y-24.0)+grain))*(1.0-smoothstep(12.0,14.0,abs(p.x-15.0)));
 	float lane_west=(1.0-smoothstep(.90,1.75,abs(p.x+7.0)+grain))*(1.0-smoothstep(8.0,10.0,abs(p.y+28.5)));
 	float scribe_square=1.0-smoothstep(.64,1.03,length((p-vec2(12.5,-23.0))/vec2(8.0,3.4))+grain*.06);
 	float wagon_yard=1.0-smoothstep(.60,1.04,length((p-vec2(7.0,24.0))/vec2(6.0,4.1))+grain*.06);
-	float new_streets=max(max(east,north),max(max(south,lane_west),max(scribe_square,wagon_yard)));
+	float new_streets=max(max(east,north),max(max(max(south,yard_lane),lane_west),max(scribe_square,wagon_yard)));
 	wear=max(wear,new_streets*frontier_expanded);
 	vec2 vuv=p*.31;
 	vec2 ruv=mat2(vec2(.97,.24),vec2(-.24,.97))*p*.42;

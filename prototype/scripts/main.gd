@@ -16,6 +16,8 @@ const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
 const Childhood = preload("res://scripts/story/childhood_story.gd")
 const ChildhoodOpening = preload("res://scripts/story/childhood_opening.gd")
 const VillageTrade = preload("res://scripts/domain/village_trade.gd")
+const LegacyChildhood = preload("res://scripts/story/village_childhood.gd")
+const Combat = preload("res://scripts/domain/unarmed_combat.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -47,6 +49,7 @@ var frontier_npc := ""
 var village_npc := ""
 var village_tab := "overview"
 var childhood_npc := ""
+var simulation_elapsed := 0.0
 
 
 func _ready() -> void:
@@ -60,6 +63,7 @@ func _ready() -> void:
 	world = WorldScript.new()
 	add_child(world)
 	world.setup(model.data)
+	model.combat_sight_check = world.combat_line_clear
 	world.action_requested.connect(_on_world_action)
 	world.set_active(false)
 	world.set_mode("city")
@@ -91,10 +95,21 @@ func _process(delta: float) -> void:
 		return
 	if screen == "playing":
 		model.set_player_position(world.get_player_position())
-		var escort_limit: float = world.village_life_world.escort_progress_limit(model.data, delta)
-		model.advance(delta, escort_limit)
-		world.village_life_world.sync_escort(model.data, delta)
+		if Childhood.enabled(model.data):
+			# The saved escort is capped by this frame's actual collision sweep.
+			var escort_limit: float = world.village_life_world.escort_progress_limit(model.data, delta)
+			model.advance(delta, escort_limit)
+			world.village_life_world.sync_escort(model.data, delta)
+		elif LegacyChildhood.enabled(model.data):
+			simulation_elapsed += delta
+			if simulation_elapsed >= 0.1:
+				model.advance(simulation_elapsed)
+				simulation_elapsed = 0.0
+		else:
+			model.advance(delta)
 		world.set_frontier_time(float(model.data.world_seconds))
+		if Childhood.enabled(model.data) or LegacyChildhood.enabled(model.data):
+			ui.update_navigation(world.navigation_view())
 		ui.update_childhood_navigation(world.childhood_navigation())
 		autosave_elapsed += delta
 		if autosave_elapsed >= 45.0:
@@ -195,6 +210,11 @@ func _ui_state() -> Dictionary:
 		state["childhood_view"] = model.get_childhood_view()
 		state["village_economy_view"]["day"] = int(state.childhood_view.day)
 		state["village_view"]["objective"] = str(state.childhood_view.title) + "\n" + str(state.childhood_view.text)
+	elif LegacyChildhood.enabled(model.data):
+		state["childhood_view"] = LegacyChildhood.view(model.data)
+	if Combat.enabled(model.data):
+		state["combat_view"] = Combat.view(model.data)
+		state["running"] = world.is_running()
 	return state
 
 
@@ -226,6 +246,7 @@ func _start_new_game() -> void:
 	_release_opening()
 	pending_opening = {}
 	model.new_game(ui.origin_id, true, true)
+	simulation_elapsed = 0.0
 	last_story_id = ""
 	world.setup(model.data)
 	session_started = true
@@ -247,6 +268,7 @@ func _continue_game() -> void:
 		return
 	world.setup(model.data)
 	pending_opening = {}
+	simulation_elapsed = 0.0
 	session_started = true
 	last_story_id = ""
 	if not _restore_opening():
@@ -340,6 +362,27 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 		"childhood_close", "trade_close": _resume()
 		"trade_open": _show_trade()
 		"trade_command": _trade_command(str(payload.get("command", "")), payload.get("args", {}))
+		"run_toggle":
+			if screen == "playing":
+				world.set_running(not world.is_running())
+				_refresh()
+		"unarmed_attack":
+			if screen == "playing":
+				world.perform_unarmed(str(payload.get("technique","jab_left")))
+		"combat_palette":
+			if screen == "playing" and Combat.enabled(model.data):
+				screen = "combat_palette"
+				world.set_active(false)
+				ui.show_combat_palette(_ui_state())
+		"combat_select":
+			if screen == "combat_palette" and Combat.available(model.data,str(payload.get("technique",""))):
+				ui.select_combat_technique(str(payload.technique))
+				_resume()
+		"unarmed_guard", "unarmed_dodge":
+			if screen == "playing":
+				var result := _command("village_"+action,{})
+				if result.get("ok",false):
+					world.cue_village_defense("village_dodge" if action=="unarmed_dodge" else "village_block")
 		"village_panel": _show_village_panel(str(payload.get("tab", "overview")))
 		"village_command": _village_command(str(payload.get("command", "")), payload.get("args", {}))
 		"village_close": _resume()
@@ -431,8 +474,13 @@ func _on_world_action(action: String, payload: Dictionary) -> void:
 		"companion_interact":
 			if Childhood.enabled(model.data): _show_childhood_dialog(str(model.data.companion.id))
 			else: _show_companion()
+		"village_unarmed_attack":
+			var result := _command(action,payload)
+			if result.get("ok",false):
+				world.cue_unarmed(str(payload.technique))
 		"village_npc": _show_village_npc(str(payload.get("npc_id", "")))
 		"village_panel": _show_village_panel("overview")
+		"combat_palette": _on_ui_action(action,payload)
 		"village_block", "village_dodge": _on_ui_action(action, payload)
 		"frontier_talk": _show_frontier(str(payload.get("npc_id", "")))
 		"mode_person", "mode_city", "mode_map": _on_ui_action(action, payload)
@@ -451,11 +499,11 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	model.set_player_position(world.get_player_position())
 	command_serial += 1
 	var result: Dictionary = model.execute(command, payload, "%s_%d" % [run_id, command_serial])
-	if not result.get("ok", false) or command not in ["receive_damage", "train"]:
+	if not result.get("ok", false) or command not in ["receive_damage", "train", "village_unarmed_attack", "village_unarmed_guard", "village_unarmed_dodge"]:
 		ui.notify(str(result.get("message", "")))
 	_refresh()
 	var persisted := true
-	if result.get("ok", false) and (command in ["childhood_choose", "choose_companion", "train", "recruit", "resolve_skirmish", "choose_story", "frontier_talk", "frontier_choice"] or (command.begins_with("village_") and command not in ["village_strike", "village_block", "village_dodge"]) or model.data.progress.stage in ["aftermath", "fallen"]):
+	if result.get("ok", false) and (command in ["childhood_choose", "choose_companion", "train", "recruit", "resolve_skirmish", "choose_story", "frontier_talk", "frontier_choice"] or (command.begins_with("village_") and command not in ["village_strike", "village_block", "village_dodge", "village_unarmed_attack", "village_unarmed_guard", "village_unarmed_dodge"]) or model.data.progress.stage in ["aftermath", "fallen"]):
 		persisted = bool(_save(false).get("ok", false))
 	if result.get("ok", false) and command == "train":
 		if persisted:
@@ -555,7 +603,7 @@ func _show_village_panel(tab := "overview") -> void:
 
 
 func _show_village_npc(npc_id: String) -> void:
-	if screen != "playing" or not VillageLife.NPCS.has(npc_id):
+	if screen != "playing" or not VillageLife.has_npc(model.data,npc_id):
 		return
 	model.set_player_position(world.get_player_position())
 	var at: Vector2 = VillageLife.actor_position(model.data, npc_id)
@@ -563,7 +611,7 @@ func _show_village_npc(npc_id: String) -> void:
 	if Vector2(player.x, player.z).distance_to(at) > VillageLife.RANGE:
 		ui.notify("Geh näher, um das Gespräch zu beginnen.")
 		return
-	if not model.data.village.social.npcs[npc_id].met:
+	if not VillageLife.relationship(model.data,npc_id).get("met",false):
 		var result := _command("village_talk", {"npc_id":npc_id, "choice":"meet"})
 		if not result.get("ok", false):
 			return
@@ -597,7 +645,7 @@ func _village_command(command: String, args: Dictionary) -> void:
 func _show_frontier(npc_id: String) -> void:
 	if screen != "playing":
 		return
-	var dialog: Dictionary = model.get_frontier_dialog(npc_id)
+	var dialog: Dictionary = {} if Childhood.enabled(model.data) or LegacyChildhood.enabled(model.data) else model.get_frontier_dialog(npc_id)
 	if dialog.is_empty():
 		var person: Dictionary = world.get_frontier_npc_info(npc_id)
 		if person.is_empty():
@@ -792,6 +840,8 @@ func _restore_opening() -> bool:
 	var sequence: Dictionary = OpeningStory.sequence(str(model.data.origin_id)) if int(model.data.player.age) < 18 else OpeningStory.adulthood(model.data)
 	if Childhood.enabled(model.data):
 		sequence = ChildhoodOpening.sequence()
+	elif LegacyChildhood.enabled(model.data):
+		sequence = OpeningStory.childhood()
 	if sequence.is_empty() or str(sequence.id) != str(checkpoint.sequence_id):
 		return false
 	if int(checkpoint.index) > sequence.beats.size():

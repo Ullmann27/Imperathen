@@ -3,6 +3,8 @@ extends SceneTree
 
 const Model = preload("res://scripts/domain/world_model.gd")
 const World = preload("res://scripts/world/game_world.gd")
+const Layout = preload("res://scripts/world/village/village_layout.gd")
+const BaseFixture = preload("res://tests/base_childhood_fixture.gd")
 var checks := 0
 var failures: Array[String] = []
 
@@ -14,6 +16,7 @@ func _initialize() -> void:
 func _run() -> void:
 	var model := Model.new()
 	model.new_game("italia",true,true)
+	var modern_state: Dictionary = model.data.duplicate(true)
 	var world := World.new()
 	root.add_child(world)
 	world.setup(model.data)
@@ -28,15 +31,15 @@ func _run() -> void:
 	capsule.radius = .28
 	capsule.height = 1.70
 	for id: String in village.actors:
-		var actor: Node3D = village.actors[id]
+		var actor: StaticBody3D = village.actors[id]
 		stable_ids[id] = actor.get_instance_id()
 		_check(actor.get_meta("resident_id","")==id,"Scene identity matches authoritative dictionary key: "+id)
-		_check(actor.get_node("ResidentBody").collision_layer==1,"A living resident has a solid body: "+id)
+		_check(actor.collision_layer==Layout.CITIZEN_LAYER,"A living resident has a solid body: "+id)
 		if world.population.actors.has(id):
 			_check(not world.population.actors[id].visible,"The ambient layer does not duplicate economy identity: "+id)
 		var query := PhysicsShapeQueryParameters3D.new()
 		query.shape = capsule
-		query.collision_mask = 1
+		query.collision_mask = 1 | Layout.CITIZEN_LAYER
 		query.margin = .003
 		query.exclude = [village.actor_collision_rid(id)]
 		query.transform.origin = actor.global_position+Vector3.UP*.88
@@ -60,18 +63,32 @@ func _run() -> void:
 	world.sync_state(bereaved)
 	for id in ["silvanus","sextus"]:
 		_check(not village.actors[id].visible,"The saved dead person is absent: "+id)
-		_check(village.actors[id].get_node("ResidentBody").collision_layer==0,"The absent person leaves no invisible collider: "+id)
+		_check(village.actors[id].collision_layer==0,"The absent person leaves no invisible collider: "+id)
 		_check(not world.can_talk_childhood(id),"A dead person cannot reopen a conversation: "+id)
 	_check(village.actors.julia.visible,"The saved surviving mother stays visible")
 	world.set_quality("low")
 	world.sync_state(bereaved)
 	for id: String in stable_ids:
 		_check(village.actors[id].get_instance_id()==stable_ids[id],"Quality and scene sync preserve the existing person node: "+id)
+	var legacy: Dictionary = BaseFixture.restore(model)
+	_check(bool(legacy.get("ok",false)),"The actual published Base childhood save loads without converting its family")
+	if legacy.get("ok",false):
+		world.setup(model.data)
+		_check(not world.childhood_neighborhood.enabled,"The Base childhood does not activate modern household props")
+		_check(world.regional.household_overrides.is_empty(),"The Base childhood restores the complete base household kit")
+		for id: String in ["south_weaver_home","south_baker_home","smith_home"]:
+			_check(world.regional.get_node(id+"/WalkableFloor").collision_layer==1,"Legacy restores one base floor: "+id)
+		_check(world.regional.get_node("baker_home/FamilyHome").visible,"The previous family's original household stays visible")
+		world.setup(modern_state)
+		_check(world.childhood_neighborhood.enabled,"Restoring a modern save activates its own household view again")
+		for id: String in ["south_weaver_home","south_baker_home","smith_home"]:
+			_check(world.regional.get_node(id+"/WalkableFloor").collision_layer==0,"Modern restore removes the overlapping base floor: "+id)
+		_check(village.actors.julia.get_instance_id()==stable_ids.julia,"Switching story formats preserves one scene node per actual identity")
 	model.new_game("han",false,false)
 	world.setup(model.data)
 	_check(not village.visible,"A different regional game hides the Roman economy population")
 	for id: String in village.actors:
-		_check(village.actors[id].get_node("ResidentBody").collision_layer==0,"A later legacy/region game leaves no Roman ghost body: "+id)
+		_check(village.actors[id].collision_layer==0,"A later legacy/region game leaves no Roman ghost body: "+id)
 	world.free()
 	await process_frame
 	print("CHILDHOOD_RESIDENT_IDENTITY_RESULT checks=%d failures=%d"%[checks,failures.size()])

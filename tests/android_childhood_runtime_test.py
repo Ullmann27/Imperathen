@@ -37,6 +37,8 @@ class SyntheticTouchFlow:
         self.states = [
             snapshot(),
             snapshot(seconds=10.6, grain=17, position=at),
+            snapshot(seconds=11.0, grain=17, position=at),
+            snapshot(seconds=11.6, grain=17, position=at),
             snapshot(screen="childhood_dialog", seconds=12.0, grain=17, position=at),
             snapshot(screen="childhood_dialog", seconds=12.0, grain=17, position=at),
             snapshot(scene="father_lunch", screen="childhood_dialog", seconds=12.0, grain=15, position=at),
@@ -167,10 +169,37 @@ class ChildhoodRuntimeRouteTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "childhood_native_touch_moves_player"):
             flow.run()
 
+    def test_released_swipe_must_stop_without_an_extra_input(self):
+        flow = SyntheticTouchFlow()
+        flow.states[3]["childhood"]["position"][2] += 0.3
+        with self.assertRaisesRegex(RuntimeError, "childhood_native_touch_stops_after_release"):
+            flow.run()
+        self.assertEqual([item[0] for item in flow.inputs], ["swipe"])
+
+    def test_deceleration_cannot_evade_the_original_travel_limit(self):
+        flow = SyntheticTouchFlow()
+        for index in (2,3):
+            flow.states[index]["childhood"]["position"][2] = 27.1
+        with self.assertRaisesRegex(RuntimeError, "childhood_native_touch_stops_after_release"):
+            flow.run()
+
+    def test_quiet_interval_needs_fresh_advancing_world_time(self):
+        for index, seconds in ((2,10.6), (3,11.0)):
+            flow = SyntheticTouchFlow()
+            flow.states[index]["world_seconds"] = seconds
+            with self.subTest(index=index), self.assertRaisesRegex(RuntimeError, "No matching village runtime state"):
+                flow.run()
+
+    def test_stationary_position_in_a_different_world_is_not_release_evidence(self):
+        flow = SyntheticTouchFlow()
+        flow.states[3]["childhood"]["world_id"] = "another-world"
+        with self.assertRaisesRegex(RuntimeError, "childhood_native_touch_stops_after_release"):
+            flow.run()
+
     def test_world_or_economy_running_in_dialogue_fails_before_choice(self):
         for changed in ("world_seconds", "grain", "denarii", "night"):
             flow = SyntheticTouchFlow()
-            held = flow.states[3]
+            held = flow.states[5]
             if changed == "world_seconds": held[changed] += 0.25
             elif changed == "night": held["childhood"][changed]["elapsed"] = 1.0
             else: held["childhood"][changed] += 1
@@ -181,19 +210,19 @@ class ChildhoodRuntimeRouteTest(unittest.TestCase):
     def test_choice_must_transfer_exactly_two_actual_grain(self):
         for grain in (17,16,14):
             flow = SyntheticTouchFlow()
-            flow.states[4]["childhood"]["grain"] = grain
+            flow.states[6]["childhood"]["grain"] = grain
             with self.subTest(grain=grain), self.assertRaisesRegex(RuntimeError, "childhood_touch_promise_transfers_actual_grain"):
                 flow.run()
 
     def test_unaccepted_choice_cannot_be_counted_from_a_tap_alone(self):
         flow = SyntheticTouchFlow()
-        flow.states[4]["childhood"]["objective"]["id"] = "family_morning"
+        flow.states[6]["childhood"]["objective"]["id"] = "family_morning"
         with self.assertRaisesRegex(RuntimeError, "No matching village runtime state"):
             flow.run()
 
     def test_disabled_choice_is_not_retried_into_an_invented_success(self):
         flow = SyntheticTouchFlow()
-        flow.states[3]["controls"]["choice_promise"]["enabled"] = False
+        flow.states[5]["controls"]["choice_promise"]["enabled"] = False
         with self.assertRaisesRegex(RuntimeError, "disabled"):
             flow.run()
         self.assertEqual([item[0] for item in flow.inputs], ["swipe","tap"])

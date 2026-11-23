@@ -1,0 +1,52 @@
+{
+  "base_commit": "f2900eb86b90b185627dcd490fef550fd0cbed11",
+  "working_tree_changes": true,
+  "engine": "Godot4.7.2",
+  "physics_checks": {
+    "settlement_geometry": 1496,
+    "village_collision": 184,
+    "frontier_population": 841
+  },
+  "all_physics_checks_passed": true,
+  "viewport": {
+    "real_opengl": true,
+    "resolution": [
+      854,
+      480
+    ],
+    "quality": "low",
+    "renderer": "Mesa llvmpipe, OpenGL Compatibility",
+    "captures": 6,
+    "all_images_visually_inspected": true
+  },
+  "android_device_test": false,
+  "source_hash_checkpoint": "Recorded after successful capture and final three physics runs; no assertion that these hashes were captured before rendering.",
+  "source_sha256": {
+    "prototype/scripts/world/regional_village.gd": "7c663c279be2b8e26902bacc77c7a5c00a6740a09b8108bfa4073280f3bb1670",
+    "prototype/scripts/world/village/village_layout.gd": "93f6f952cbcaa628182ad327471b67feadc76fe4065efe4e45be8c76246f1550",
+    "prototype/scripts/world/village/village_population.gd": "1d86064b3ddc8f2e57bfa95ae0c1c75c30f43ce63b84f0c032d81faf765ea783",
+    "prototype/scripts/world/village/settlement_dressing.gd": "2c8ef3ed71373f88a8fd3c9c786dc2abf01b2b92a0bf04c2df8d9ad2ec1c14bb",
+    "prototype/scripts/world/village_life_world.gd": "ba51dbdc8b1ee0105157805d8b5f7c1864d13666fbf0a9bef955640d19e98c45",
+    "prototype/scripts/visuals/village_person.gd": "788ea1d055138b04dbc7cb2b127017bd48199b45841b34a58bfd69f2d2e8ac78",
+    "prototype/scripts/visuals/natural_motion.gd": "4bfe57079dca1a799c25315034b1f1cc9f90aa92f5e38d5f6ba5023c5347110c",
+    "prototype/scripts/world/village/ground.gdshader": "de44949c80c03eec4cbdaa26519ea8bbb04d48ba3bee3ded002308a7a445b81d",
+    "prototype/tests/settlement_geometry_test.gd": "aa13c5f57dd58190966b6212e9f06bbae068ce9e0896e51ed74183976cba5488",
+    "prototype/tests/village_collision_test.gd": "166148277c3f323eebe0cdbf2fb5f7fdaa46430e47936f599c0979593ecc0f59",
+    "prototype/tests/frontier_population_test.gd": "bd3342263fd0aa29c20f9aa402b24782a42de914ac1edb1adcca6ad21874d44e",
+    "prototype/tests/settlement_graphics_review.gd": "be32fc36697481991d74711c91bc0165df87848d2152c7d77938cb2bd1e7796c"
+  },
+  "evidence_sha256": {
+    "01-family-interior.png": "7d50e14111498d58ca96a16d028023c3ef6270eab240db394935760b7b52aebd",
+    "02-family-doorstep.png": "1bf0156ce0256e56e796befd64357a357ea5a3881f9c85cede718296005c77e9",
+    "03-village-forge.png": "3a3d13fdbe48b4617e6a074b021575ecf80051842c76153608867728fdeaefb9",
+    "04-market-homes.png": "db4348b38d683c72e133e78c914bd3a885b4a337a645bc37de501799646ec227",
+    "05-residential-street.png": "39cdb6431276492a8ec02e28594e5bf4fdfa11fef8a906987eabf537cbc779a7",
+    "06-settlement-overview.png": "d2d0840d9f53b799fca215e6253307295ec12f0e64a5fe7527029b5a720971c9",
+    "capture-receipt.json": "e9030901ee6c6acf3c8eb56d0a442d14048c353cd57a2b1e4d32b2dfa0a5f129",
+    "frontier-population.log": "ab3be09c2df7de71406b6f1a3f7a010740ebc7d15fcfc4558645a19d22094bac",
+    "geometry.log": "9ab93107e7ce4052e1d96d7cfe92534d18a364beb011a6acaf487f76b04f9fd0",
+    "settlement-review.json": "187cc04e2df782999d0d116f84b746b40acfd53d0cca192a45302722facf5118",
+    "viewport.log": "ef050e507dcde75d48255ad9470362e2f9f87d479ff8ec1811a969cf0141c02b",
+    "village-collision.log": "a911fc9f4bc9250ac8c9d212245ad021b3f37aecd9328dd53b8f535078b7d133"
+  }
+}

@@ -1,0 +1,8 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+VILLAGE_TOUCH_SCROLL viewport=(960, 540) swipes=3 offset=744 initial_y=1128.00 final_y=384.00 world_touches=0 actions=[]
+VILLAGE_BUTTON_SWIPE viewport=(960, 540) offset_before=744 offset_after=950 world_touches=0 actions=[]
+VILLAGE_TOUCH_SCROLL viewport=(1280, 720) swipes=2 offset=723 initial_y=1128.00 final_y=405.00 world_touches=0 actions=[]
+VILLAGE_BUTTON_SWIPE viewport=(1280, 720) offset_before=723 offset_after=932 world_touches=0 actions=[]
+VILLAGE_PANEL_RESULT checks=41 failures=0
+VILLAGE_PANEL_PASS

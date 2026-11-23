@@ -2,9 +2,17 @@ extends RefCounted
 ## Named people are assigned once. Production, food and repair share real elapsed time.
 ## Owns data.village.economy; all spendable goods remain in data.resources.
 
+const ChildhoodFormat = preload("res://scripts/domain/childhood_format.gd")
 const DAY_SECONDS := 120.0
 const MAX_RESOURCE := 1000000
 const EPSILON := 0.000001
+
+static func day_length(data: Dictionary) -> float:
+	# Active economic time is independent from explicitly ended narrative days.
+	# The previous published childhood used an hour. Preserve that saved clock;
+	# the newer family arc and inactive contracts retain their 120-second clock.
+	return 3600.0 if ChildhoodFormat.kind(data) == ChildhoodFormat.LEGACY else DAY_SECONDS
+
 const RESOURCE_KEYS := ["wood", "grain", "denarii", "stone"]
 const COMMAND_FIELDS := {
 	"village_request_work": [],
@@ -178,7 +186,7 @@ static func _execute(data: Dictionary, command: String, args: Dictionary) -> Dic
 			if int(data.resources.grain) < 4:
 				return _fail("Für die neue Aussaat fehlen 4 Getreide.")
 			_transfer(data, "grain", -4)
-			farm.project = {"kind":"sow", "remaining":DAY_SECONDS, "total":DAY_SECONDS}
+			farm.project = {"kind":"sow", "remaining":day_length(data), "total":day_length(data)}
 			return _ok("4 Getreide ausgesät. Zwei Feldarbeiter benötigen einen Dorftag bis zur nächsten Ernte.")
 	return _fail("Dieser Dorfauftrag wird nicht unterstützt.")
 
@@ -199,7 +207,7 @@ static func _advance(data: Dictionary, delta: float) -> void:
 	var economy: Dictionary = data.village.economy
 	var remaining := delta
 	while remaining > 0.0:
-		var step := minf(remaining, DAY_SECONDS - float(economy.day_seconds))
+		var step := minf(remaining, day_length(data) - float(economy.day_seconds))
 		var work_modes: Dictionary = {}
 		for id in WORKPLACES:
 			var place: Dictionary = economy.workplaces[id]
@@ -232,7 +240,7 @@ static func _advance(data: Dictionary, delta: float) -> void:
 				if float(place.cycle_seconds) + EPSILON >= float(WORKPLACES[id].period):
 					place.cycle_seconds = 0.0
 					_produce(data, id)
-		if float(economy.day_seconds) + EPSILON >= DAY_SECONDS:
+		if float(economy.day_seconds) + EPSILON >= day_length(data):
 			economy.day_seconds = 0.0
 			economy.day += 1
 			_meal(data)
@@ -321,7 +329,7 @@ static func view(data: Dictionary) -> Dictionary:
 			population.working += 1
 		if not _fit(person):
 			population.unfit += 1
-	return {"valid":true, "authority":economy.authority.duplicate(true), "day":int(economy.day)+1, "day_progress":float(economy.day_seconds)/DAY_SECONDS, "day_seconds":DAY_SECONDS, "workplaces":places, "people":economy.people.duplicate(true), "population":population, "stocks":economy.stocks.duplicate(true), "grain_needed_per_day":population.alive, "grain_shortfall":economy.grain_shortfall, "patrols_completed":economy.patrols_completed, "last_report":economy.last_report}
+	return {"valid":true, "authority":economy.authority.duplicate(true), "day":int(economy.day)+1, "day_progress":float(economy.day_seconds)/day_length(data), "day_seconds":day_length(data), "workplaces":places, "people":economy.people.duplicate(true), "population":population, "stocks":economy.stocks.duplicate(true), "grain_needed_per_day":population.alive, "grain_shortfall":economy.grain_shortfall, "patrols_completed":economy.patrols_completed, "last_report":economy.last_report}
 
 
 static func repair_cost(economy: Dictionary, id: String) -> Dictionary:
@@ -429,7 +437,7 @@ static func validate(data: Dictionary) -> String:
 	for key in ["day", "meals_served", "grain_shortfall", "patrols_completed", "repair_count"]:
 		if not _integer(economy[key], 0, 1000000000):
 			return "Ungültiger Tageszähler"
-	if not _number(economy.day_seconds, 0.0, DAY_SECONDS - EPSILON) or not _integer(economy.meal_offset, 0, PEOPLE.size()-1):
+	if not _number(economy.day_seconds, 0.0, day_length(data) - EPSILON) or not _integer(economy.meal_offset, 0, PEOPLE.size()-1):
 		return "Ungültige Dorfzeit"
 	if typeof(economy.authority) != TYPE_DICTIONARY or economy.authority.get("id") != "decimus" or economy.authority.get("player_is_ruler") != false or typeof(economy.authority.get("work_permit")) != TYPE_BOOL:
 		return "Ungültige Amtsgewalt"
@@ -478,7 +486,7 @@ static func validate(data: Dictionary) -> String:
 				return "Ungültiger Bauauftrag"
 			if place.project.kind == "sow" and id != "farm":
 				return "Aussaat außerhalb der Felder"
-			var expected := DAY_SECONDS if place.project.kind == "sow" else float(WORKPLACES[id].repair_seconds)
+			var expected := day_length(data) if place.project.kind == "sow" else float(WORKPLACES[id].repair_seconds)
 			if not _number(place.project.total, expected, expected) or not _number(place.project.remaining, EPSILON, expected):
 				return "Ungültige Arbeitszeit"
 	return ""

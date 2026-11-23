@@ -66,6 +66,20 @@ const REGIONS := {
 }
 
 
+static func childhood() -> Dictionary:
+	var chapter := "Kapitel I · Menschen, die dich kennen"
+	var location := "Valdora · Römisches Grenzland · um 100 n. Chr."
+	return {"id":"childhood_home","version":2,"origin_id":"italia",
+		"title":"Ein Morgen zu Hause","location":location,"chapter":chapter,
+		"beats":[
+			_beat("home_morning","player","Chronik","Du bist zwölf","Du wachst im Haus deiner Familie auf. Draußen öffnen die Werkstätten. Auf dem Markt wird schon gehandelt. Diesen Ort musst du nicht erst erschaffen: Hier lebst du.",9.0,chapter,location),
+			_beat("family_voice","player","Antonia","Deine Mutter","Bist du schon wach? Dein Vater ist vor dem Haus. Komm erst zu mir; für Cassia habe ich eine kleine Besorgung. Zum Erkunden bleibt danach noch Zeit.",9.0,chapter,location),
+			_beat("village_lives","market","Chronik","Ein Dorf voller Geschichten","Du wirst Menschen wiedersehen, Versprechen halten und manchmal etwas falsch machen. Nimm dir Zeit. Heute musst du weder Soldat werden noch ein Dorf regieren.",9.0,chapter,location)
+		],
+		"objective_title":"Ein Morgen zu Hause",
+		"objective_text":"Geh durch die Haustür zu deiner Mutter Antonia. Die Karte zeigt dir den Weg. Du gehst zunächst in ruhigem Schritttempo; mit „Laufen“ wechselst du das Tempo."}
+
+
 static func sequence(origin_id: String = "italia") -> Dictionary:
 	var selected := _origin_id(origin_id)
 	var region: Dictionary = REGIONS[selected]

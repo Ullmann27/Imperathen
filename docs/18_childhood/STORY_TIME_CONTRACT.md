@@ -198,10 +198,28 @@ Schaltfläche ist nicht die einzige Sperre.
 ## Zustand, Bilanzen und Speichermigration
 
 Der Weltvertrag steigt von Schema 5 auf Schema 6. Der normale Dateilader ergänzt
-bei einem gültigen alten Schema-5-Spielstand `childhood.enabled=false` und den
-leeren Handelsvertrag. Er verändert weder vorhandenes Alter, Szene, Ressourcen,
-Arbeitszuweisung noch die Bruchteile der Wirtschaftszeit. Bereits erwachsene
-Spielstände bleiben erwachsen. Es wird kein neuer Prolog rückwirkend erzwungen.
+bei einem gültigen alten Schema-5-Spielstand ohne Kindheitsabschnitt einen
+deaktivierten modernen Abschnitt und den Handelsvertrag. Besitzt der Spielstand
+bereits den früheren Bogen aus `village_childhood.gd`, bleibt genau dieser mit
+seinen damaligen Personen, Aufträgen, Arbeitszuständen und Bilanzen erhalten.
+`childhood_format.gd` unterscheidet beide Formen anhand ihrer vollständigen
+Kennfelder. Beide nutzen intern Version 1; allein diese Versionszahl erlaubt
+deshalb keine Zuordnung. Gemischte oder unvollständige Formen werden abgelehnt.
+
+Der frühere Kindheitsbogen behält seinen 3.600-Sekunden-Versorgungszyklus, der
+neue Bogen und der gewöhnliche Dorfweg ihren bisherigen 120-Sekunden-Zyklus.
+Keiner dieser Zyklen ersetzt die ausdrücklichen erzählten Tagesabschlüsse.
+Der Lader verändert weder vorhandenes Alter, Szene, Ressourcen, Arbeitszuweisung
+noch die Bruchteile der Wirtschaftszeit. Bereits erwachsene Spielstände bleiben
+erwachsen. Es wird kein neuer Prolog rückwirkend erzwungen. Bei veröffentlichten
+modernen Schema-6-Saves ohne Faustkampffeld ergänzt der Lader einen leeren
+optionalen Zustand. Er erfindet keine erlernten Techniken oder Treffer und
+überschreibt keine vorhandenen Schläge oder ihre laufende Auflösung.
+
+Die Migrationsprüfung verwendet eingefrorene Start-, Arbeits- und Kampfstände,
+die direkt aus dem unveränderten Basiscommit `e5735509622c9a94564dc5fe21257c07074f9df5`
+erzeugt wurden. Sie prüft den wirklichen Dateilader, unveränderte Teilzustände,
+Fortsetzen im alten Bogen und erneutes Speichern/Laden unter Schema 6.
 
 Die bestehende Ressourcenprüfung addiert jetzt vier getrennt belegte Salden:
 Wirtschaft, bisherige Gespräche, Kindheit und Handel. Übernommene Waren werden

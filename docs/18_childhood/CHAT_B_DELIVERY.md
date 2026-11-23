@@ -2,7 +2,10 @@
 
 Stand: 23. November 2026. Arbeitsbranch: `feature/chat-b-village-world-20261123`.
 Ausgangspunkt: `2909040deeb33b99ad4180b884b38921f28233a9` auf
-`feature/childhood-village-20261123`. Die alten veröffentlichten APKs sind kein
+`feature/childhood-village-20261123`. Der zwischenzeitliche Koordinatorstand
+`e5735509622c9a94564dc5fe21257c07074f9df5` ist in diese Fassung integriert.
+[Entwurfs-PR #37](https://github.com/Ullmann27/Imperathen/pull/37) führt die Arbeit
+zurück zum Koordinatorzweig. Die alten veröffentlichten APKs sind kein
 Prüfnachweis für diese Änderungen.
 
 ## Ergebnis und neue Erzählvorgabe
@@ -63,18 +66,24 @@ in [STORY_TIME_CONTRACT.md](STORY_TIME_CONTRACT.md).
 
 ### Häuser und Personen
 
-Zwei südliche Häuser ergänzen die 13 vorhandenen Wohnhäuser. Familienhaus,
-Nachbarhaus und bestehende Schmiede besitzen nun nutzbare Innenräume, Möbel,
+Die Zusammenführung erhält alle 20 Wohnhäuser des parallelen Koordinatorstands.
+Familienhaus, Nachbarhaus und bestehende Schmiede besitzen eigene Innenräume, Möbel,
 Krüge, Geschirr, Vorräte, Schlafstellen und Arbeitsgegenstände. Eine Gasse
 verbindet die Häuser. Türen, Eingangsschrägen, Fußböden und Möbel wurden mit
 echten Physikkörpern geprüft; beim Betreten blendet die Darstellung das Dach
-des betreffenden Hauses aus.
+des betreffenden Hauses aus. Standardböden und Möbel dieser drei Häuser werden
+gezielt umgeschaltet, sodass keine doppelten Kollisionskörper entstehen. Die
+anderen 17 Häuser behalten die zwischenzeitlich gebaute Grundausstattung.
 
 Julia, Silvanus und Sextus behalten ihre vorhandenen IDs. Die Szene erzeugt
 keine zusätzlichen Wirtschaftspersonen für die Familie. Überschneidungen mit
 der älteren Hintergrundbevölkerung werden gezielt ausgeschlossen. Tote
 Einwohner verschwinden als aktive Personen und hinterlassen keine unsichtbaren
-Kollisionskörper. Die Dorfübersicht zählt die tatsächlich Lebenden.
+Kollisionskörper. Die Dorfübersicht zählt die tatsächlich Lebenden. Im neuen
+Dorf werden 26 Hintergrundbewohner sowie 14 Wirtschaftspersonen und Decimus
+dargestellt, jeweils mit einem Körper auf Bürgerschicht 8. Marcus bleibt ein
+gesonderter Gefährte: zusammen 42 benannte NPCs neben dem Spieler. Diese Zahl
+ist keine zusätzliche Wirtschaftsbevölkerung.
 
 Julias Weg zum Nachbarhaus ist 15,718 Meter lang. Ihr gespeicherter Fortschritt
 wird vor jedem Schritt durch eine echte Kapselprüfung gegen Häuser, Gegenstände,
@@ -129,7 +138,7 @@ zugeschrieben. Quellen und Aussagegrenzen stehen in
 
 ## Prüfung und Bildbelege
 
-Die zehn neuen gezielten Modul- und Integrationsszenarien wurden einzeln mit
+Die elf neuen gezielten Modul- und Integrationsszenarien wurden einzeln mit
 Godot 4.7.2 ausgeführt:
 
 | Szenario | Einzelprüfungen |
@@ -138,13 +147,14 @@ Godot 4.7.2 ausgeführt:
 | Handel | 101 |
 | Handel über das tatsächliche WorldModel | 39 |
 | Reiterzustand und Darstellung | 144 |
-| Hauszugänge, Böden und Dächer | 116 |
-| Einwohneridentitäten und Todeszustände | 89 |
+| Hauszugänge, Böden und Dächer, Umschaltung alter Einrichtung | 138 |
+| Einwohneridentitäten, Todeszustände und Wechsel alter/neuer Saves | 101 |
 | Physischer Fluchtweg und Blockaden | 22 |
 | Sichtbare Leih-/Eigentumsausrüstung | 37 |
 | Tatsächliche Oberfläche: erste Tage, Arbeit, Handel, Neustart | 116 |
 | Beide Nächte bis zum Schwur mit tatsächlichen Main-Neustarts | 231 |
-| **Summe dieser zehn Szenarien** | **1.240** |
+| Migration echter Basis-Saves, getrennte Storyformen, neuer Faustkampf im Nachtzweig | 65 |
+| **Summe dieser elf Szenarien** | **1.339** |
 
 Der Nachtlauf führte beide Zweige mit gültigen Befehlen durch. Er enthält fünf
 vollständige Main-Neustarts zusätzlich zur anfänglichen Instanz. Reiseabschnitte
@@ -152,22 +162,27 @@ der Integrationsfälle verwenden ausdrücklich gesetzte Testpositionen; die
 separaten Haustür- und Eskortentests prüfen tatsächliche Bewegung und Kollision.
 Diese Unterscheidung steht auch in den jeweiligen Testquellen.
 
-Der vollständige aktuelle Gesamtlauf ist unter
-[evidence/validation/validation_report.json](evidence/validation/validation_report.json)
-einschließlich Einzelprotokollen und Quellhashes abgelegt. Aufruf:
+Der zusammengeführte Gesamtlauf ist unter
+[evidence/merged-validation/validation_report.json](evidence/merged-validation/validation_report.json)
+einschließlich Einzelprotokollen und Quellhashes abgelegt. Er enthält 51 Gruppen,
+darunter die erhaltenen Prüfungen für Bewegung, Faustkampf, alle Häuser und den
+früheren Kindheitsbogen. Der erste Chat-B-Lauf mit 43 Gruppen bleibt unter
+`evidence/validation` erhalten; die 40 Gruppen unter `evidence/engine` gehören
+zum früheren Koordinatorstand und werden nicht als neue Mergeprüfung ausgegeben. Aufruf:
 
 ```bash
-python3 tools/check_prototype.py --report docs/18_childhood/evidence/validation
+python3 tools/check_prototype.py --report docs/18_childhood/evidence/merged-validation
 python3 -m unittest discover -s tests -p 'android_*_test.py'
 ```
 
-Die 78 Python-Prüfungen des Android-Werkzeugs verwenden ausdrücklich synthetische
+Die 92 Python-Prüfungen des Android-Werkzeugs und der bewachten APK-Bereitstellung verwenden ausdrücklich synthetische
 Paket- und Beobachterdaten. Das Protokoll steht unter
 [evidence/android-harness](evidence/android-harness). Sie ersetzen keinen APK-Lauf.
 
 Die folgenden Bilder stammen aus der tatsächlichen Godot-Engine, mit
 GL Compatibility und llvmpipe. Sie sind keine Konzeptbilder:
 
+- [Zusammengeführter Spielstart mit größerer Touchbedienung](evidence/merged-ui-review/01-childhood-hud.png)
 - [Familienhaus von außen](evidence/after/family-street.png)
 - [Familienhaus von innen](evidence/after/family-room.png)
 - [Erweiterte Häusergruppe](evidence/after/neighbourhood.png)
@@ -181,7 +196,12 @@ fest. Die drei Ansichten unter `evidence/after` verwenden dieselben Kameras,
 Blickziele, Bildgrößen und dasselbe Grafikprofil. Metadaten und Laufprotokolle
 liegen neben den Bildern. Die Reiteraufnahmen zeigen ausdrücklich eine isolierte
 Prüfbühne. Aus diesen Softwareaufnahmen folgt keine Android-Bildrate oder
-Aussage zur Temperatur eines echten Handys.
+Aussage zur Temperatur eines echten Handys. Die Bilder unter `after` und
+`runtime-ui` zeigen den ersten Chat-B-Stand vor der Zusammenführung. Vom neuen
+grafischen Main-Lauf entstand genau das verlinkte HUD-Bild; der Prozess endete
+danach mit Code −9, bevor das Julia-Bild und die Abschlussmeldung entstanden.
+[Umfang und Fehlerbeleg](evidence/merged-ui-review/review-scope.json) grenzen
+diese einzelne Aufnahme ausdrücklich von einer vollständigen Grafikabnahme ab.
 
 ## Android-Lieferweg
 
@@ -192,13 +212,30 @@ Emulator-Prüfbau, prüft die tatsächlichen exportierten Module und startet den
 vorhandenen Android-Emulatorlauf.
 
 Die neue Android-Strecke bedient die echte Touchoberfläche: kurze Bewegung im
-Familienhaus, Julia ansprechen, den Essenskorb zusagen, angehaltene Dialogzeit
+Familienhaus, nach dem Loslassen nachgewiesener Stillstand, Julia ansprechen,
+den Essenskorb zusagen, angehaltene Dialogzeit
 prüfen, zurückkehren und nach Prozessneustart dieselbe Welt, Szene, Position,
 Tag und Alter nachweisen. Sie schreibt keine Spielentscheidungen über einen
 Testkanal. Das endgültige Ergebnis gehört zum konkreten Workflowlauf und dessen
 APK-Hash; ein älterer erfolgreicher Android-Bericht gilt dafür nicht.
 
-## Gemeinsame Dateien und nächste Integration
+Der erste Lauf von `98bec146` erzeugte beide APKs und bestand die Engine- und
+Paketprüfungen, scheiterte jedoch bei der nativen Touchbewegung: 2,389 Meter
+überschritten die unveränderte Obergrenze von 1,6 Metern. Dieser alte Stand
+verwendete noch 4,6 m/s statt des integrierten Kindheits-Gehtempos von 1,5 m/s.
+Der zusammengeführte Stand erhält außerdem den Touch-Loslassfix des Koordinators.
+Er benötigt seinen eigenen neuen Emulatorbeleg; der frühere Fehlerlauf wird
+nicht nachträglich als Erfolg gewertet.
+
+Die Bereitstellung ist auf die erlaubten Aufgabenbranches begrenzt. Der
+Publisher verlangt den erfolgreichen Vorgängerjob desselben Workflowlaufs,
+alle Kindheits-/Migrations-/Kampfgruppen und die acht nativen Kindheitschecks.
+Er gleicht Quellcommit, ARM64-APK, Emulator-APK, exportierte Module, Prüfsummen
+und Berichte ab. Erst dann entsteht eine gesonderte Vorabversion mit APK und
+sechs nicht geheimen Belegdateien. Es gibt keinen Merge nach `main` und keine
+Storeveröffentlichung.
+
+## Erhaltene parallele Arbeit und nächste Integration
 
 Chat B ergänzt in `main.gd` den neuen Start, Dialoge, Handel, Journal und die
 Kette Kollision prüfen → autoritativen Schritt anwenden → gespeicherte Julia
@@ -207,10 +244,20 @@ sichtbare Ausrüstungsflag. Die UI ergänzt Tagesanzeige, Kompass und passende
 Dialogaktionen. `android_village_diagnostics.gd` erweitert ausschließlich die
 lesende Beobachtung um aktuelle Kindheits- und Touchdaten.
 
-Der einzige Anschluss an die Figur in `village_person.gd` schaltet das vorhandene
-Übungsmesh sichtbar. Chat As Bewegungs- und Kampfparameter werden dadurch nicht
-ersetzt. Bei der Zusammenführung sind insbesondere diese gemeinsam berührten
-Dateien gezielt zu prüfen; fremde uncommittete Worktrees wurden nicht verändert.
+Der Anschluss an die Figur in `village_person.gd` schaltet das vorhandene
+Übungsmesh sichtbar. Die parallelen Bewegungs-, Faustkampf-, Ausrüstungs- und
+Touchänderungen bleiben erhalten: getrenntes Gehen/Laufen, größere Bedienflächen,
+zehn Übungstechniken, tatsächliche Trefferprüfung und Knochenanbindung der
+früheren Wachausrüstung. Die alte Kindheitsgeschichte verwendet ihre damaligen
+Personenzuordnungen nur beim Fortsetzen tatsächlicher alter Saves. Neue Partien
+verwenden die aktuelle Vorgabe mit Julia, Silvanus und Sextus. Gemischte
+Zustandsformen werden abgelehnt. Echte unveränderte Basis-Saves belegen diese
+Migration; sie wurden nicht mit dem neuen Modell nachgebaut.
+
+Die moderne Julia-Begleitung bleibt in jedem aktiven Frame durch die Weltkollision
+begrenzt. Die ältere Simulation behält ihre vorhandene gebündelte Verarbeitung.
+Der Anschluss `combat_sight_check` bleibt mit der tatsächlichen Sichtprüfung
+verbunden. Fremde uncommittete Worktrees wurden nicht verändert.
 
 Für den nächsten Inhaltsblock sind die ersten Ermittlungs- und Verfolgungsmissionen
 nach dem Schwur auszuarbeiten. Der aktuelle Abschluss bleibt ein gespeicherter

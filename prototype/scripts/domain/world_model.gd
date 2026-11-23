@@ -12,7 +12,10 @@ const Frontier = preload("res://scripts/story/frontier_chapter.gd")
 const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
 const Childhood = preload("res://scripts/story/childhood_story.gd")
+const LegacyChildhood = preload("res://scripts/story/village_childhood.gd")
+const ChildhoodFormat = preload("res://scripts/domain/childhood_format.gd")
 const VillageTrade = preload("res://scripts/domain/village_trade.gd")
+const Combat = preload("res://scripts/domain/unarmed_combat.gd")
 const SCHEMA_VERSION := 6
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
@@ -38,6 +41,7 @@ const COMMAND_FIELDS := {
 }
 
 var data: Dictionary = {}
+var combat_sight_check := Callable()
 
 
 func _init() -> void:
@@ -76,6 +80,8 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 	data.village.militia = []
 	VillageTrade.ensure(data)
 	Childhood.ensure(data, childhood_enabled and data.village.enabled)
+	if Childhood.enabled(data):
+		Combat.start(data)
 	changed.emit()
 
 
@@ -85,6 +91,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	command_fields.merge(VillageLife.COMMAND_FIELDS)
 	command_fields.merge(Childhood.COMMAND_FIELDS)
 	command_fields.merge(VillageTrade.COMMAND_FIELDS)
+	command_fields.merge(Combat.COMMAND_FIELDS)
 	if not command_fields.has(command):
 		return _fail("Unbekannter Spielbefehl: %s" % command)
 	if not _exact_keys(args, command_fields[command]):
@@ -151,6 +158,7 @@ func advance(delta: float, escort_limit: float = INF) -> void:
 	if candidate.village.enabled:
 		# All ongoing systems share the actual life-tick boundaries. Resources
 		# produced before an alarm remain valid; an attack cannot cancel earlier work.
+		LegacyChildhood.advance(candidate, delta)
 		var remaining := delta
 		while remaining > 0.0:
 			var until_tick := maxf(0.00000001, VillageLife.STEP - float(candidate.village.social.accumulator))
@@ -158,7 +166,7 @@ func advance(delta: float, escort_limit: float = INF) -> void:
 			candidate.world_seconds = float(candidate.world_seconds) + step
 			if not candidate.village.raid.active:
 				notify_ui = _advance_construction(candidate, step) or notify_ui
-			var frontier_event := Frontier.advance(candidate, step)
+			var frontier_event := "" if Childhood.enabled(candidate) or LegacyChildhood.enabled(candidate) else Frontier.advance(candidate, step)
 			if not frontier_event.is_empty():
 				_record(candidate, frontier_event)
 			var previous_health := int(candidate.player.health)
@@ -166,11 +174,13 @@ func advance(delta: float, escort_limit: float = INF) -> void:
 				return
 			if Childhood.advance(candidate, step, escort_limit):
 				VillageLife.begin_childhood_raid(candidate)
+			Combat.advance(candidate, step, combat_sight_check)
 			VillageLife.advance(candidate, step)
-			var had_consequences: bool = candidate.village.childhood.night_raid.consequences_applied
-			Childhood.observe_defense(candidate)
-			if not had_consequences and candidate.village.childhood.night_raid.consequences_applied:
-				_record(candidate, "Silvanus und Sextus sterben beim nächtlichen Überfall. " + ("Julia überlebt durch deine tatsächliche Hilfe." if candidate.village.childhood.night_raid.outcome == "mother_survived" else "Auch Julia stirbt; ihr hattet euch gemeinsam im Haus versteckt."))
+			if Childhood.enabled(candidate):
+				var had_consequences: bool = candidate.village.childhood.night_raid.consequences_applied
+				Childhood.observe_defense(candidate)
+				if not had_consequences and candidate.village.childhood.night_raid.consequences_applied:
+					_record(candidate, "Silvanus und Sextus sterben beim nächtlichen Überfall. " + ("Julia überlebt durch deine tatsächliche Hilfe." if candidate.village.childhood.night_raid.outcome == "mother_survived" else "Auch Julia stirbt; ihr hattet euch gemeinsam im Haus versteckt."))
 			candidate.village.health_delta += int(candidate.player.health) - previous_health
 			remaining = maxf(0.0, remaining - step)
 		notify_ui = true
@@ -352,11 +362,13 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			return _fail("Du lebst als Zwölfjähriger im bestehenden Dorf. Dein aktueller Auftrag öffnet den nächsten Schritt; ein alter Befehl überspringt weder deine Kindheit noch die Entscheidungen dieser Geschichte.")
 		if command in ["village_request_work","village_assign","village_shift","village_repair","village_resow"]:
 			return _fail("Decimus und die Erwachsenen verwalten die Arbeitsgruppen. Du kannst helfen, handeln und lernen, aber nicht die Bewohner wie ein Dorfherrscher umverteilen.")
-		if state.village.childhood.night_raid.decision=="hide" and not state.village.childhood.night_raid.consequences_applied and command in ["village_strike","village_block","village_dodge","village_rescue","village_alarm"]:
+		if state.village.childhood.night_raid.decision=="hide" and not state.village.childhood.night_raid.consequences_applied and command in ["village_strike","village_block","village_dodge","village_rescue","village_alarm","village_unarmed_attack","village_unarmed_guard","village_unarmed_dodge"]:
 			return _fail("Du hast dich ausdrücklich mit deinen Eltern versteckt. Diese Entscheidung wird nicht nachträglich in eine geleistete Verteidigung umgeschrieben.")
 	if command.begins_with("village_"):
 		if not state.village.enabled:
 			return _fail("Dieser Lebensweg verwendet den bisherigen regionalen Dorfabschnitt.")
+		if LegacyChildhood.enabled(state) and command in ["village_request_work","village_assign","village_shift","village_repair","village_resow"]:
+			return _fail("Die Erwachsenen organisieren das Dorf. Du hilfst mit deinen eigenen Aufträgen und lernst ihre Arbeit kennen.")
 		if command in ["village_assign", "village_shift"] and state.village.militia.has(args.resident_id):
 			return _fail("Diese Person gehört bereits zum angeworbenen Trupp und kann nicht zugleich eine Dorfstelle übernehmen.")
 		var village_result: Dictionary
@@ -365,14 +377,18 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			village_result = VillageTrade.execute(state, command, args)
 		elif VillageEconomy.COMMAND_FIELDS.has(command):
 			village_result = VillageEconomy.execute(state, command, args)
+		elif Combat.COMMAND_FIELDS.has(command):
+			village_result = Combat.execute(state, command, args)
 		else:
 			village_result = VillageLife.execute(state, command, args)
 		state.village.health_delta += int(state.player.health) - previous_health
 		Childhood.observe_defense(state)
-		if village_result.get("ok", false) and command not in ["village_strike", "village_block", "village_dodge"]:
+		if village_result.get("ok", false) and command not in ["village_strike", "village_block", "village_dodge", "village_unarmed_attack", "village_unarmed_guard", "village_unarmed_dodge"]:
 			_record(state, str(village_result.message))
 		return village_result
 	if command in ["frontier_talk", "frontier_choice"]:
+		if LegacyChildhood.enabled(state):
+			return _fail("Die Straße zur Legion gehört zu einem späteren Lebensabschnitt. Jetzt stehen Familie und Dorf im Mittelpunkt.")
 		var frontier_result := Frontier.talk(state, args.npc_id) if command == "frontier_talk" else Frontier.choose(state, args.npc_id, args.choice)
 		if frontier_result.has("chronicle"):
 			_record(state, frontier_result.chronicle)
@@ -410,6 +426,8 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			_record(state, "Du behältst dein Holz. Marcus sucht seinen eigenen Weg.")
 			return _ok("Du lehnst ab. Marcus merkt sich deine Entscheidung.")
 		"build":
+			if LegacyChildhood.enabled(state) and state.village.childhood.night_event!="released":
+				return _fail("Deine Familie hat ein Zuhause. Lerne zuerst das Dorf und seine Handwerker kennen.")
 			var x := float(args.x)
 			var z := float(args.z)
 			if not _inside_plot(x, z):
@@ -426,6 +444,8 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			_record(state, "Du setzt einen Bauauftrag und verbrauchst acht Holz. Die Arbeit beginnt erst bei deiner Anwesenheit.")
 			return _ok("Bauauftrag gesetzt. Bleibe für die Arbeit höchstens 4,5 Meter entfernt.")
 		"train":
+			if LegacyChildhood.enabled(state):
+				return _fail("Du bleibst zwölf. Am Übungspfahl kannst du Fausttechniken lernen; ein Sprung in die erwachsene Militärlaufbahn findet hier nicht statt.")
 			if state.player.age >= 18:
 				return _fail("Du befindest dich bereits im erwachsenen Ausbildungsabschnitt.")
 			if state.village.enabled and state.village.raid.status in ["warning", "active"]:
@@ -607,6 +627,11 @@ func _validate_arguments(command: String, args: Dictionary) -> String:
 	if VillageTrade.COMMAND_FIELDS.has(command):
 		if not _text(args.resource,1,16) or args.resource not in ["wood","grain","stone"] or not _integer(args.quantity,1,20) or not _integer(args.quote_revision,0,1000000000):
 			return "Ein Handel braucht eine gültige Ware, eine ganze Menge und den aktuellen Angebotsstand."
+	elif command == "village_unarmed_attack":
+		if not _text(args.technique,1,32) or not Combat.TECHNIQUES.has(args.technique) or not _text(args.target_id,1,64):
+			return "Ungültige Nahkampftechnik oder Zielkennung."
+		if not _number(args.facing_x,-1.0,1.0) or not _number(args.facing_z,-1.0,1.0):
+			return "Ungültige Blickrichtung."
 	elif command.begins_with("village_") or Childhood.COMMAND_FIELDS.has(command):
 		# Reject NaN and foreign types before JSON fingerprinting, not only in
 		# the subordinate command handler after the replay record was prepared.
@@ -670,9 +695,12 @@ func _validate_state(state: Variant) -> String:
 	var trade_error := VillageTrade.validate(state)
 	if not trade_error.is_empty():
 		return trade_error
+	var combat_error := Combat.validate(state)
+	if not combat_error.is_empty():
+		return combat_error
 	if float(state.village.social.accumulator) >= VillageLife.STEP + 0.00000001:
 		return "Die Dorfzeit enthält einen nicht abgearbeiteten Zeitsprung."
-	var economic_seconds := int(state.village.economy.day) * VillageEconomy.DAY_SECONDS + float(state.village.economy.day_seconds)
+	var economic_seconds := int(state.village.economy.day) * VillageEconomy.day_length(state) + float(state.village.economy.day_seconds)
 	var social_seconds := float(state.village.social.seconds) + float(state.village.social.accumulator)
 	if absf(economic_seconds - social_seconds) > 0.0001:
 		return "Arbeitszeit und Dorfereignisse laufen nicht auf derselben Uhr."
@@ -824,7 +852,8 @@ func _validate_state(state: Variant) -> String:
 	var frontier_effects := Frontier.effects(state.frontier)
 	var village_ledger := {"wood":0, "grain":0, "denarii":0, "stone":0}
 	for key in village_ledger:
-		village_ledger[key] = int(state.village.economy.ledger[key]) + int(state.village.social.ledger[key]) + int(state.village.childhood.ledger[key]) + int(state.village.trade.ledger[key])
+		var authored_delta := int(state.village.childhood.ledger[key]) if ChildhoodFormat.kind(state) == ChildhoodFormat.AUTHORED else 0
+		village_ledger[key] = int(state.village.economy.ledger[key]) + int(state.village.social.ledger[key]) + authored_delta + int(state.village.trade.ledger[key])
 	var help_cost := 4 if companion.choice == "help" else 0
 	if int(state.resources.wood) + HUT_COST * state.buildings.size() + help_cost != 48 - remaining_wood + int(village_ledger.wood):
 		return "Die Holzbilanz wurde verletzt."
@@ -906,12 +935,18 @@ func _read_save(path: String) -> Dictionary:
 		state.village.health_delta = 0
 		state.village.militia = []
 		state.schema_version = 5
-	if typeof(state) == TYPE_DICTIONARY and state.get("schema_version") == 5 and typeof(state.get("village")) == TYPE_DICTIONARY and not state.village.has("childhood") and not state.village.has("trade"):
+	if typeof(state) == TYPE_DICTIONARY and state.get("schema_version") == 5 and typeof(state.get("village")) == TYPE_DICTIONARY:
 		# Existing careers keep their people, clocks, money, quests and adult phase.
 		# The new childhood is an explicit new-game choice, never a retroactive reset.
 		VillageTrade.ensure(state)
+		# ensure is deliberately non-destructive: a valid legacy childhood keeps
+		# its completed actions, family roles, possessions, work and economic clock.
 		Childhood.ensure(state, false)
 		state.schema_version = SCHEMA_VERSION
+	if typeof(state) == TYPE_DICTIONARY and Childhood.enabled(state) and not Combat.enabled(state):
+		# Published schema-6 family saves predate the new combat module. Add its
+		# empty optional capability, never replace recorded practice or a windup.
+		Combat.start(state)
 	var error := _validate_state(state)
 	if error.is_empty() and not _valid_valley(state):
 		error = "Das gespeicherte Talgefecht enthält widersprüchliche Daten."
@@ -974,6 +1009,15 @@ func _restore_integer_fields(state: Dictionary) -> void:
 		state.village.attributes[key] = int(state.village.attributes[key])
 	state.village.history.start_year = int(state.village.history.start_year)
 	Childhood.restore_integer_fields(state)
+	if LegacyChildhood.enabled(state):
+		state.village.childhood.version = int(state.village.childhood.version)
+		state.village.childhood.day = int(state.village.childhood.day)
+		state.village.childhood.guard_absence.previous_health = int(state.village.childhood.guard_absence.previous_health)
+		for relation: Dictionary in state.village.childhood.relationships.values():
+			relation.trust = int(relation.trust)
+	if Combat.enabled(state):
+		for key: String in ["version","practice_hits","resolved_hits"]:
+			state.village.unarmed[key] = int(state.village.unarmed[key])
 	for key in ["version","change_asses","merchant_asses","cash_delta_asses","revision"]:
 		state.village.trade[key] = int(state.village.trade[key])
 	for section in ["stock","ledger","bought","sold"]:

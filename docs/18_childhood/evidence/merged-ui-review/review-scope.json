@@ -1,0 +1,12 @@
+{
+  "source_basis": [
+    "98bec146310877a60d2bfb36f5aa42d6f82abbce",
+    "e5735509622c9a94564dc5fe21257c07074f9df5"
+  ],
+  "scope": "Actual merged Main HUD, 1280x720, GL Compatibility llvmpipe. The first image exists and was inspected; the process was killed with exit -9 before the Julia dialogue image and final success marker.",
+  "complete_graphical_review": false,
+  "images": [
+    "01-childhood-hud.png"
+  ],
+  "android_device_test": false
+}

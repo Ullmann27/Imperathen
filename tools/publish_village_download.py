@@ -16,11 +16,26 @@ import subprocess
 import tempfile
 import zipfile
 
-from validate_android_apk import FRONTIER_RESOURCES, HERO_RESOURCES, OPENING_RESOURCES, VILLAGE_LIFE_RESOURCES
+from validate_android_apk import CHILDHOOD_RESOURCES, FRONTIER_RESOURCES, HERO_RESOURCES, OPENING_RESOURCES, VILLAGE_LIFE_RESOURCES
 
 REPO = "Ullmann27/Imperathen"
 BRANCH = "feature/village-life-delivery-20261123"
+CHILDHOOD_BRANCH = "feature/chat-b-village-world-20261123"
 PACKAGE = "at.heinz.imperathen"
+CHILDHOOD_ENGINE_CHECKS = {
+    "childhood_story", "village_trade", "village_trade_model", "childhood_raiders",
+    "childhood_neighborhood", "childhood_resident_identity", "childhood_escort_physics",
+    "childhood_equipment_visual", "childhood_experience", "childhood_night_integration",
+    "village_childhood", "unarmed_combat", "childhood_integration", "settlement_geometry",
+    "village_collision", "natural_motion", "village_static_art", "childhood_merge_migration",
+}
+CHILDHOOD_RUNTIME_CHECKS = {
+    "childhood_starts_at_home", "childhood_native_touch_moves_player",
+    "childhood_native_touch_stops_after_release",
+    "childhood_julia_remains_reachable", "childhood_dialogue_freezes_world",
+    "childhood_touch_promise_transfers_actual_grain", "childhood_back_closes_dialogue",
+    "childhood_decision_survives_restart",
+}
 
 
 def require(condition: bool, message: str) -> None:
@@ -73,9 +88,10 @@ def find_release(tag: str) -> dict | None:
     return api(f"releases/{release['databaseId']}")
 
 
-def verify_run(source: str, run_id: str, number: str) -> None:
+def verify_run(source: str, run_id: str, number: str, branch: str = BRANCH) -> None:
+    require(branch in {BRANCH, CHILDHOOD_BRANCH}, "Unapproved publication branch")
     run = api(f"actions/runs/{run_id}")
-    for key, value in {"head_sha": source, "head_branch": BRANCH,
+    for key, value in {"head_sha": source, "head_branch": branch,
                        "path": ".github/workflows/android-prototype.yml",
                        "id": int(run_id), "run_number": int(number)}.items():
         require(run.get(key) == value, "Unexpected source build: " + key)
@@ -89,7 +105,9 @@ def verify_run(source: str, run_id: str, number: str) -> None:
             and build_jobs[0].get("conclusion") == "success", "The build/emulator job has not passed")
 
 
-def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, run_id: str) -> dict:
+def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, run_id: str, branch: str = BRANCH) -> dict:
+    require(branch in {BRANCH, CHILDHOOD_BRANCH}, "Unapproved publication branch")
+    childhood = branch == CHILDHOOD_BRANCH
     prefix = "IMPERATHEN-" + source[:8]
     apk_name = prefix + "-arm64.apk"
     apk = android / apk_name
@@ -108,8 +126,8 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
     require(validation.get("apk", {}).get("sha256") == checksum
             and validation["apk"].get("size_bytes") == size, "Validation describes other bytes")
     require(validation.get("manifest", {}).get("package") == PACKAGE
-            and validation["manifest"].get("version_code") == "3"
-            and validation["manifest"].get("version_name") == "0.3.0-village"
+            and validation["manifest"].get("version_code") == ("4" if childhood else "3")
+            and validation["manifest"].get("version_name") == ("0.4.0-childhood" if childhood else "0.3.0-village")
             and validation.get("expected_abi") == "arm64-v8a"
             and validation.get("available_abis") == ["arm64-v8a"], "Package or ABI mismatch")
     checks = {item["id"]: item for item in validation["checks"]}
@@ -117,15 +135,20 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
     required = {"apk_file", "zip_structure", "zip_crc", "godot_native_library", "godot_project_content",
                 "hero_character_content", "living_frontier_content", "cinematic_opening_content", "village_life_content", "manifest_metadata",
                 "package_identity", "signature_verification", "apk_unchanged"}
+    if childhood:
+        required.add("childhood_content")
     require(all(checks.get(key, {}).get("status") == "pass" for key in required), "Missing required APK proof")
     require(all(item.get("status") == "pass" for item in checks.values() if item.get("required")),
             "An additional required check failed")
     with zipfile.ZipFile(apk) as archive:
         require(len(archive.namelist()) == len(set(archive.namelist())), "Duplicate archive entries")
-        for identifier, expected in (("hero_character_content", set(HERO_RESOURCES)),
-                                     ("living_frontier_content", set(FRONTIER_RESOURCES)),
-                                     ("cinematic_opening_content", set(OPENING_RESOURCES)),
-                                     ("village_life_content", set(VILLAGE_LIFE_RESOURCES))):
+        features = [("hero_character_content", set(HERO_RESOURCES)),
+                    ("living_frontier_content", set(FRONTIER_RESOURCES)),
+                    ("cinematic_opening_content", set(OPENING_RESOURCES)),
+                    ("village_life_content", set(VILLAGE_LIFE_RESOURCES))]
+        if childhood:
+            features.append(("childhood_content", set(CHILDHOOD_RESOURCES)))
+        for identifier, expected in features:
             evidence = checks[identifier]["evidence"]
             resources = evidence.get("resources", [])
             require(evidence.get("required_by_source") is True and evidence.get("missing_resources") == []
@@ -149,6 +172,8 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
     require({"frontier_story", "frontier_population", "frontier_people", "frontier_integration",
              "village_economy", "village_life", "village_model", "village_experience", "opening_flow"} <= names,
             "Village gameplay, opening or people tests were not executed")
+    if childhood:
+        require(CHILDHOOD_ENGINE_CHECKS <= names, "Merged childhood, legacy, physics or combat tests were not executed")
     candidates = list(runtime.rglob("runtime-report.json"))
     require(len(candidates) == 1, "Expected one emulator report")
     runtime_report = read_json(candidates[0])
@@ -157,9 +182,14 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
             and runtime_report.get("checks") and all(c.get("passed") is True for c in runtime_report["checks"]),
             "Emulator check failed or belongs to another source")
     runtime_checks = {item.get("name") for item in runtime_report["checks"]}
-    require({"opening_before_gameplay", "objective_hands_over_control", "village_actual_population",
-             "village_touch_meets_decimus", "village_touch_work_permission", "village_actual_worker_assignment",
-             "village_decisions_survive_restart"} <= runtime_checks, "The Android village journey was not exercised")
+    required_runtime = {"opening_before_gameplay", "objective_hands_over_control"}
+    if childhood:
+        required_runtime.update(CHILDHOOD_RUNTIME_CHECKS)
+    else:
+        required_runtime.update({"village_actual_population", "village_touch_meets_decimus",
+                                 "village_touch_work_permission", "village_actual_worker_assignment",
+                                 "village_decisions_survive_restart"})
+    require(required_runtime <= runtime_checks, "The Android village journey was not exercised")
     require(runtime_report.get("arm64_package", {}).get("sha256") == checksum
             and runtime_report["arm64_package"].get("name") == apk_name, "ARM64 runtime proof mismatch")
     emulator = android / (prefix + "-emulator.apk")
@@ -173,7 +203,7 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
     public.mkdir()
     shutil.copyfile(apk, public / apk_name)
     build_public = {key: build[key] for key in ("source_commit", "apk", "apk_sha256", "apk_size_bytes", "abi", "package", "status", "godot_version", "requested_renderer")}
-    build_public.update(source_run=int(run_id), source_branch=BRANCH,
+    build_public.update(source_run=int(run_id), source_branch=branch,
                         source_run_url=f"https://github.com/{REPO}/actions/runs/{run_id}")
     for suffix, value in {"APK-Pruefung": validation, "Godot-Pruefungen": engine,
                           "Emulatorpruefung": runtime_report, "Buildnachweis": build_public}.items():
@@ -184,13 +214,24 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
     return {"apk": apk_name, "sha256": checksum, "size_bytes": size}
 
 
-def publish(public: Path, temporary: Path, source: str, run_id: str, proof: dict) -> str:
-    tag = "village-2026-11-23-" + source[:8]
-    notes = ("## IMPERATHEN 0.3.0 – Wiederaufbau und Leben im Dorf\n\n"
+def publish(public: Path, temporary: Path, source: str, run_id: str, proof: dict, branch: str = BRANCH) -> str:
+    require(branch in {BRANCH, CHILDHOOD_BRANCH}, "Unapproved publication branch")
+    childhood = branch == CHILDHOOD_BRANCH
+    tag = ("childhood-2026-11-23-" if childhood else "village-2026-11-23-") + source[:8]
+    heading = "IMPERATHEN 0.4.0 – Kindheit, Familie und der Schwur" if childhood else "IMPERATHEN 0.3.0 – Wiederaufbau und Leben im Dorf"
+    description = ("Vier ausdrücklich erzählte Dorftage mit Julia, Silvanus und Sextus, begehbare Häuser, "
+                   "endlicher Handel, Nachtüberfall mit beiden Familienfolgen und Racheschwur. "
+                   "Die vorherige Bewegungs-, Faustkampf- und Toucharbeit ist integriert. "
+                   "Die Android-Prüfung bewegt die Figur per tatsächlichem Touch, spricht Julia an, "
+                   "übernimmt den Essenskorb und erhält diese Entscheidung nach einem Prozessneustart. "
+                   "Vier Filmstunden bleiben ein Ausbauziel; dreißig sichtbare Reiter sind noch keine "
+                   "dreißig ausgearbeiteten berittenen Einzelkämpfer.\n\n" if childhood else
+                   "Überarbeiteter Spielbeginn unter Verwalter Decimus, vierzehn echte Arbeitskräfte, fünf Betriebe, "
+                   "Gespräche und Berufe sowie Dorfverteidigung. Die Android-Prüfung startet die Partie, spricht mit Decimus, "
+                   "erteilt einen tatsächlichen Arbeitsauftrag und prüft seine Erhaltung nach einem Prozessneustart.\n\n")
+    notes = ("## " + heading + "\n\n"
              f"Android ARM64: **{proof['apk']}**. Größe: {proof['size_bytes']} Bytes.\n\n"
-             "Überarbeiteter Spielbeginn unter Verwalter Decimus, vierzehn echte Arbeitskräfte, fünf Betriebe, "
-             "Gespräche und Berufe sowie Dorfverteidigung. Die Android-Prüfung startet die Partie, spricht mit Decimus, "
-             "erteilt einen tatsächlichen Arbeitsauftrag und prüft seine Erhaltung nach einem Prozessneustart.\n\n"
+             + description +
              f"Spielquellstand: `{source}`. [Bau und Emulatorprüfung](https://github.com/{REPO}/actions/runs/{run_id}). "
              "Die beigefügten Berichte gehören zu genau diesem Paket. Eine physische Fold7- oder thermische Dauerprüfung "
              "ist damit nicht belegt.\n\n"
@@ -202,7 +243,7 @@ def publish(public: Path, temporary: Path, source: str, run_id: str, proof: dict
     if release is None:
         request = temporary / "create-release.json"
         request.write_text(json.dumps({"tag_name": tag, "target_commitish": source,
-                                      "name": "IMPERATHEN · Dorfleben 0.3.0 · " + source[:8],
+                                      "name": ("IMPERATHEN · Kindheit 0.4.0 · " if childhood else "IMPERATHEN · Dorfleben 0.3.0 · ") + source[:8],
                                       "body": notes, "draft": True, "prerelease": True}), encoding="utf-8")
         release = json.loads(gh("api", f"repos/{REPO}/releases", "--method", "POST", "--input", str(request)))
     require(release.get("tag_name") == tag and release.get("target_commitish") == source
@@ -245,17 +286,19 @@ def publish(public: Path, temporary: Path, source: str, run_id: str, proof: dict
 
 def main() -> None:
     source, run_id, number = (os.environ.get(key, "") for key in ("GITHUB_SHA", "GITHUB_RUN_ID", "GITHUB_RUN_NUMBER"))
+    reference = os.environ.get("GITHUB_REF", "")
+    branch = reference.removeprefix("refs/heads/")
     require(os.environ.get("GH_REPO") == REPO and bool(os.environ.get("GH_TOKEN"))
-            and os.environ.get("GITHUB_REF") == "refs/heads/" + BRANCH, "Expected repository publication context is missing")
+            and reference.startswith("refs/heads/") and branch in {BRANCH, CHILDHOOD_BRANCH}, "Expected repository publication context is missing")
     require(re.fullmatch(r"[0-9a-f]{40}", source) is not None and run_id.isdigit() and number.isdigit(), "Invalid source/run identity")
-    verify_run(source, run_id, number)
+    verify_run(source, run_id, number, branch)
     with tempfile.TemporaryDirectory(prefix="imperathen-village-release-") as work:
         temporary = Path(work)
         android, runtime, public = (temporary / p for p in ("android", "runtime", "public"))
         for name, target in ((f"imperathen-android-{number}", android), (f"imperathen-android-runtime-{number}", runtime)):
             gh("run", "download", run_id, "--repo", REPO, "--name", name, "--dir", str(target))
-        proof = verify_and_stage(android, runtime, public, source, run_id)
-        print("VILLAGE_DOWNLOAD_PUBLISHED", publish(public, temporary, source, run_id, proof))
+        proof = verify_and_stage(android, runtime, public, source, run_id, branch)
+        print("VILLAGE_DOWNLOAD_PUBLISHED", publish(public, temporary, source, run_id, proof, branch))
 
 
 if __name__ == "__main__":

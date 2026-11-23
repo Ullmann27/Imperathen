@@ -3,7 +3,9 @@ extends SceneTree
 
 const EntryScene = preload("res://main.tscn")
 const VillageLife = preload("res://scripts/story/village_life.gd")
-const LegacyCampaign = preload("res://tests/legacy_campaign_fixture.gd")
+const Model = preload("res://scripts/domain/world_model.gd")
+const Childhood = preload("res://scripts/story/childhood_story.gd")
+const LegacyChildhood = preload("res://scripts/story/village_childhood.gd")
 var failures: Array[String] = []
 var checks := 0
 var game
@@ -63,18 +65,26 @@ func _run() -> void:
 	scene._action("leave")
 	_check(game.screen == "menu" and not FileAccess.file_exists(game.SAVE_PATH), "The scenario preview never creates a campaign save")
 	game.ui.action_requested.emit("new_game", {})
-	_check(game.screen == "opening", "New game begins with the in-world prologue")
+	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_first_day" and Childhood.enabled(game.model.data), "New Roman game begins with the family childhood prologue")
 	game._opening_skip()
 	_check(game.screen == "opening", "Skipping the prologue retains its explicit first objective")
 	game._opening_next()
 	_check(game.screen == "playing", "New game starts an active world through the UI signal")
 	_check(int(game.model.data.player.age) == 12, "A new life starts as a child")
 	_check(FileAccess.file_exists(game.SAVE_PATH), "New game creates a real save")
+	# The following original chapter/recruitment/strategy journey is a legacy
+	# save compatibility scenario. The fresh family UI has its own integration test.
+	var legacy := Model.new()
+	legacy.new_game("italia", true, false)
+	var saved: Dictionary = legacy.save_game(game.SAVE_PATH)
+	_check(saved.get("ok", false) and not Childhood.enabled(legacy.data) and not LegacyChildhood.enabled(legacy.data), "The original chapter fixture is an explicit valid legacy save")
+	game._show_menu()
+	game.ui.action_requested.emit("continue", {})
+	_check(game.screen == "playing" and game.model.data.world_id == legacy.data.world_id and not Childhood.enabled(game.model.data) and not LegacyChildhood.enabled(game.model.data), "Real Continue restores the legacy campaign before its original chapter actions")
 	_request_window_back()
 	_check(game.screen == "paused" and game.ui.get("_view_state") == "pause", "A window Back request reaches the real UI and pauses exactly once")
 	_request_window_back()
 	_check(game.screen == "playing", "A second window Back request resumes the paused session")
-	_check(LegacyCampaign.load_into(game), "The existing village career loads through the production save gateway")
 	var before: int = game.model.data.resources.wood
 	game.world.action_requested.emit("gather", {"node_id": "timber_0"})
 	_check(game.model.data.resources.wood == before, "The shared command gateway rejects distant gathering")
@@ -303,8 +313,8 @@ func _touch(scene,index: int,p: Vector2,down: bool) -> void:
 
 
 func _complete_village_phase() -> void:
-	# New lives require real village encounters and a resolved first raid before
-	# the legacy adulthood/persistence scenario may continue. Never inject flags.
+	# Saved legacy villages require real encounters and a resolved first raid
+	# before their adulthood/persistence scenario. Never inject completion flags.
 	for npc_id: String in ["decimus", "aelia", "varro"]:
 		var at: Vector2 = VillageLife.actor_position(game.model.data, npc_id)
 		_move_fixture(Vector3(at.x, 1.0, at.y + 1.0))
@@ -323,4 +333,4 @@ func _complete_village_phase() -> void:
 		if VillageLife.training_ready(game.model.data):
 			break
 	_check(saw_warning and saw_attack and game.model.data.village.raid.completed == 1, "The real warning and first village attack finish before adulthood")
-	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days satisfy the new training gate")
+	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days still satisfy the legacy training gate")

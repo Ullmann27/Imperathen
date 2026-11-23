@@ -8,6 +8,7 @@ const Person = preload("res://scripts/visuals/village_person.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const Neighborhood = preload("res://scripts/world/village/childhood_neighborhood.gd")
 const Childhood = preload("res://scripts/story/childhood_story.gd")
+const Layout = preload("res://scripts/world/village/village_layout.gd")
 const PLACES := {"farm":Vector2(24,-30), "woodcamp":Vector2(-43,14),
 	"quarry":Vector2(48,-12), "trade":Vector2(25,24), "watchpost":Vector2(0,-48)}
 var actors: Dictionary = {}
@@ -48,13 +49,11 @@ func sync_state(data: Dictionary, profile: String) -> void:
 	quality = profile
 	visible = bool(data.get("village", {}).get("enabled", false))
 	if not visible:
-		# Hiding a Node3D does not disable PhysicsServer collision. A later
-		# regional/legacy game must not retain invisible childhood residents.
-		for actor: Node3D in actors.values():
-			actor.get_node("ResidentBody").collision_layer = 0
+		_set_collisions(false)
 		return
 	if not _ready_scene:
 		_create()
+	_set_collisions(true)
 	var people: Array = data.village.economy.people
 	for person: Dictionary in people:
 		_sync_actor(str(person.id), str(person.name), str(person.profession), person)
@@ -67,6 +66,13 @@ func sync_state(data: Dictionary, profile: String) -> void:
 		item.repaired.visible = int(place.condition) == 100
 		item.label.modulate = Color("d8e2a8") if place.working else Color("e1c493")
 	_sync_raiders()
+
+
+func _set_collisions(enabled: bool) -> void:
+	for body: StaticBody3D in find_children("*","StaticBody3D",true,false):
+		if not body.has_meta("visible_layer"):
+			body.set_meta("visible_layer",body.collision_layer)
+		body.collision_layer = int(body.get_meta("visible_layer")) if enabled else 0
 
 
 func _create() -> void:
@@ -100,13 +106,12 @@ func _create_workplace(id: String, at: Vector2) -> void:
 	node.add_child(repaired)
 	for x in [-2.1, 2.1]:
 		for z in [-1.3, 1.3]:
-			Art.box(node, Vector3(.16,2.2,.16), Vector3(x,1.1,z), _wood)
+			Art.box(node, Vector3(.16,2.2,.16), Vector3(x,1.1,z), _wood, true)
 	Art.roof(repaired, 4.6, 3.2, 2.2, .8, _linen)
 	var broken := Art.box(damaged, Vector3(3.7,.14,.24), Vector3(0,.4,0), _wood)
 	broken.rotation.z = -.28
-	# The workyard shares the existing ground collider. Keep its visible top at
-	# that height; a decorative ten-centimetre slab would bury residents' feet.
-	Art.box(node, Vector3(4.5,.12,2.9), Vector3(0,-.06,0), _stone)
+	# The workplace apron is flush with the path, including its collision.
+	Art.box(node, Vector3(4.5,.12,2.9), Vector3(0,-.06,0), _stone, true)
 	if id == "woodcamp":
 		for index in 6:
 			var log := Art.cylinder(node, .17, 2.5, Vector3(-1.2 + (index % 3) * .4, .3 + (index / 3) * .3, .5), _wood)
@@ -126,56 +131,55 @@ func _create_workplace(id: String, at: Vector2) -> void:
 
 
 func _sync_actor(id: String, caption: String, profession: String, person: Dictionary) -> void:
+	var at: Vector2 = Life.actor_position(state,id)
 	if not actors.has(id):
-		var actor := Node3D.new()
+		# One authoritative citizen body replaces the old nested duplicate body.
+		# Citizens use their own layer so movement and combat can choose it explicitly.
+		var actor := StaticBody3D.new()
 		actor.name = "Resident_" + id
+		actor.position = Vector3(at.x,0,at.y)
+		actor.collision_layer = Layout.CITIZEN_LAYER
+		actor.collision_mask = 0
 		actor.set_meta("resident_id",id)
 		actor.set_meta("identity_source","village_economy" if id != "decimus" else "village_authority")
+		var collision := CollisionShape3D.new()
+		collision.name = "PersonalSpace"
+		var capsule := CapsuleShape3D.new()
+		capsule.radius = Layout.CITIZEN_RADIUS
+		capsule.height = 1.72
+		collision.shape = capsule
+		collision.position.y = .86
+		actor.add_child(collision)
 		add_child(actor)
 		var figure := Person.new()
 		figure.name = "Figure"
 		figure.position.y = .9
+		figure.profile = quality
 		actor.add_child(figure)
-		figure.configure("resident", "italia", 32 + actors.size() % 20)
-		var appearance := "civilian_woman" if id in ["aelia", "aurelia", "cassia", "drusa", "julia", "valeria", "antonia"] else "civilian_man"
-		if id == "severus":
-			appearance = "legionary"
-		if id == "decimus":
-			appearance = "elder"
-		figure.configure_appearance(appearance, actors.size())
-		var label := Art.label(actor, caption + " · " + profession, Vector3(0,2.08,0), Color("efdbad"), 27)
+		var appearance := "civilian_woman" if id in ["aelia","aurelia","cassia","drusa","julia","valeria","antonia"] else "civilian_man"
+		if id == "severus": appearance = "legionary"
+		if id == "decimus": appearance = "elder"
+		figure.configure_resident("italia",32+actors.size()%20,appearance,actors.size(),get_viewport().get_camera_3d())
+		var label := Art.label(actor,caption+" · "+profession,Vector3(0,2.08,0),Color("efdbad"),27)
 		label.name = "Nameplate"
 		label.pixel_size = .003
 		label.visibility_range_begin = 3.0
 		label.visibility_range_end = 6
 		label.hide()
-		var body := StaticBody3D.new()
-		body.name = "ResidentBody"
-		body.collision_layer = 1
-		body.collision_mask = 0
-		var collision := CollisionShape3D.new()
-		var capsule := CapsuleShape3D.new()
-		capsule.radius = .29
-		capsule.height = 1.72
-		collision.shape = capsule
-		collision.position.y = .86
-		body.add_child(collision)
-		actor.add_child(body)
 		actors[id] = actor
-	var actor: Node3D = actors[id]
-	var at: Vector2 = Life.actor_position(state, id)
-	var childhood := bool(state.get("village",{}).get("childhood",{}).get("enabled",false))
+	var actor: StaticBody3D = actors[id]
+	var childhood := Childhood.enabled(state)
 	actor.position = Vector3(at.x,Neighborhood.resident_floor_height_at(at) if childhood else 0.0,at.y)
-	actor.visible = bool(person.get("alive", true)) and not state.village.get("militia", []).has(id)
-	actor.get_node("ResidentBody").collision_layer = 1 if actor.visible and visible and childhood else 0
-	actor.set_meta("assignment", person.get("assignment", "idle"))
+	actor.visible = bool(person.get("alive",true)) and not state.village.get("militia",[]).has(id)
+	actor.collision_layer = Layout.CITIZEN_LAYER if actor.visible and visible else 0
+	actor.set_meta("assignment",person.get("assignment","idle"))
 	actor.set_meta("display_name",caption)
 	var displayed_role: String = str(Neighborhood.IDENTITY_ROLES.get(id,profession)) if childhood else profession
 	actor.get_node("Nameplate").text = caption+" · "+displayed_role
 	var figure: Node3D = actor.get_node("Figure")
 	figure.profile = quality
 	figure.refresh_lod(get_viewport().get_camera_3d())
-	if person.get("assignment", "idle") not in ["idle", "watchpost", "defense"] and active:
+	if person.get("assignment","idle") not in ["idle","watchpost","defense"] and active:
 		figure.keep_working()
 
 
@@ -244,7 +248,7 @@ func nearest(position: Vector3, radius := 3.2) -> String:
 		return ""
 	var best := ""
 	var distance := radius
-	for npc: Dictionary in Life.npc_catalog():
+	for npc: Dictionary in Life.npc_catalog(state):
 		if not actors.has(npc.id):
 			continue
 		var actor: Node3D = actors[npc.id]
@@ -271,7 +275,7 @@ func actor_position(id: String) -> Vector3:
 func actor_collision_rid(id: String) -> RID:
 	if not actors.has(id):
 		return RID()
-	var body := actors[id].get_node_or_null("ResidentBody") as StaticBody3D
+	var body := actors[id] as StaticBody3D
 	return body.get_rid() if body != null else RID()
 
 
@@ -292,7 +296,7 @@ func escort_progress_limit(data: Dictionary, delta: float) -> float:
 		_escort_shape.height = 1.72
 	var query := PhysicsShapeQueryParameters3D.new()
 	query.shape = _escort_shape
-	query.collision_mask = 1 | 2 | 4
+	query.collision_mask = 1 | 2 | 4 | Layout.CITIZEN_LAYER
 	query.margin = .002
 	query.exclude = [actor_collision_rid("julia")]
 	var space := get_world_3d().direct_space_state

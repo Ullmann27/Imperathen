@@ -1,0 +1,321 @@
+{
+  "baseline_commit": "f2900eb86b90b185627dcd490fef550fd0cbed11",
+  "engine": "4.7.2-stable (official)",
+  "display": "X11",
+  "fixture": "Existing frontier decorative props only, plus one actual imported Italian youth rig. The newly expanded settlement is outside this equal-scene geometry comparison.",
+  "geometry_before": {
+    "authored_triangles": 24064,
+    "batched_instances": 0,
+    "collision_shapes": 8,
+    "mesh_nodes": 214,
+    "multimesh_nodes": 0,
+    "unique_materials": 19,
+    "unique_mesh_resources": 214
+  },
+  "geometry_after": {
+    "authored_triangles": 24064,
+    "batched_instances": 186,
+    "collision_shapes": 8,
+    "mesh_nodes": 28,
+    "multimesh_nodes": 28,
+    "unique_materials": 19,
+    "unique_mesh_resources": 37
+  },
+  "submission_object_reduction_percent": 73.83177570093457,
+  "unique_mesh_resource_reduction_percent": 82.71028037383178,
+  "graphical_frame_drawcall_measurements_available": true,
+  "physical_android_test": false,
+  "thermal_reduction_measured": false,
+  "construction_ms_single_sample": {
+    "before": 2.801,
+    "after": 3.523,
+    "claim": "Not a benchmark or a measured steady-state improvement. Batching adds a bounded one-time construction pass."
+  },
+  "tests": {
+    "natural_motion_checks": 102,
+    "static_art_checks": 17,
+    "existing_village_person_checks": 221,
+    "opening_flow_checks": 41,
+    "village_experience_checks": 142,
+    "integration_checks": 74,
+    "frontier_integration_checks": 119,
+    "failures": 0
+  },
+  "baseline_source_sha256": {
+    "prototype/scripts/world/village_art.gd": "39a2167535dc3b5b27dae1f9f7057a8390a9fcd252d82ea66a2ccf9d31bb46f2",
+    "prototype/scripts/world/village/frontier_dressing.gd": "79ae134e2095f526b3fdbf1b2b5fafb1d958fb51a278cf44a14a350eb202c78e",
+    "prototype/scripts/visuals/village_person.gd": "88ebb9578bcb5dc1c5af07d183663a0a58f8e087fd63014dd3fed15d2d2861bb"
+  },
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "renderer": "gl_compatibility",
+  "measurement_limitations": "One sequential 60-frame sample per view after 12 warm-up frames, shared desktop host and llvmpipe software rendering. Frame timings are observational samples, not physical Android FPS or sustained thermal/battery measurements.",
+  "graphical_views": {
+    "wagon": {
+      "before": {
+        "draw_calls": {
+          "p50": 130,
+          "p95": 130
+        },
+        "frame_ms": {
+          "p50": 43.429,
+          "p95": 69.529
+        },
+        "viewport_cpu_ms": {
+          "p50": 39.3110008239746,
+          "p95": 56.0340003967285
+        },
+        "viewport_gpu_ms": {
+          "p50": 40.8320007324219,
+          "p95": 57.8050003051758
+        },
+        "visible_primitives": {
+          "p50": 2522,
+          "p95": 2522
+        }
+      },
+      "after": {
+        "draw_calls": {
+          "p50": 31,
+          "p95": 31
+        },
+        "frame_ms": {
+          "p50": 42.608,
+          "p95": 58.338
+        },
+        "viewport_cpu_ms": {
+          "p50": 38.9189987182617,
+          "p95": 53.4560012817383
+        },
+        "viewport_gpu_ms": {
+          "p50": 40.6539993286133,
+          "p95": 56.3419990539551
+        },
+        "visible_primitives": {
+          "p50": 2522,
+          "p95": 2522
+        }
+      },
+      "draw_call_reduction_percent": 76.15384615384615
+    },
+    "garden": {
+      "before": {
+        "draw_calls": {
+          "p50": 169,
+          "p95": 169
+        },
+        "frame_ms": {
+          "p50": 46.608,
+          "p95": 63.991
+        },
+        "viewport_cpu_ms": {
+          "p50": 42.6609992980957,
+          "p95": 59.648998260498
+        },
+        "viewport_gpu_ms": {
+          "p50": 44.560001373291,
+          "p95": 61.5309982299805
+        },
+        "visible_primitives": {
+          "p50": 10724,
+          "p95": 10724
+        }
+      },
+      "after": {
+        "draw_calls": {
+          "p50": 49,
+          "p95": 49
+        },
+        "frame_ms": {
+          "p50": 42.622,
+          "p95": 60.498
+        },
+        "viewport_cpu_ms": {
+          "p50": 38.6339988708496,
+          "p95": 56.148998260498
+        },
+        "viewport_gpu_ms": {
+          "p50": 40.2560005187988,
+          "p95": 57.7200012207031
+        },
+        "visible_primitives": {
+          "p50": 10724,
+          "p95": 10724
+        }
+      },
+      "draw_call_reduction_percent": 71.00591715976333
+    },
+    "street": {
+      "before": {
+        "draw_calls": {
+          "p50": 125,
+          "p95": 125
+        },
+        "frame_ms": {
+          "p50": 46.064,
+          "p95": 57.389
+        },
+        "viewport_cpu_ms": {
+          "p50": 35.7039985656738,
+          "p95": 48.6049995422363
+        },
+        "viewport_gpu_ms": {
+          "p50": 38.4650001525879,
+          "p95": 50.5779991149902
+        },
+        "visible_primitives": {
+          "p50": 9858,
+          "p95": 9858
+        }
+      },
+      "after": {
+        "draw_calls": {
+          "p50": 36,
+          "p95": 36
+        },
+        "frame_ms": {
+          "p50": 36.557,
+          "p95": 50.391
+        },
+        "viewport_cpu_ms": {
+          "p50": 32.1189994812012,
+          "p95": 45.8190002441406
+        },
+        "viewport_gpu_ms": {
+          "p50": 33.6990013122559,
+          "p95": 47.6780014038086
+        },
+        "visible_primitives": {
+          "p50": 10542,
+          "p95": 10542
+        }
+      },
+      "draw_call_reduction_percent": 71.2
+    }
+  },
+  "graphical_construction_ms_single_sample": {
+    "before": 5.693,
+    "after": 4.564
+  },
+  "rendered_pixel_comparison": {
+    "wagon": {
+      "mean_absolute_channel_difference_0_255": 0.12128150720164609,
+      "equal_pixel_fraction": 0.9914930555555556,
+      "interpretation": "Actual rendered pixel comparison; batching can change rasterization and shadow order. This is not a claim of bit-identical images."
+    },
+    "garden": {
+      "mean_absolute_channel_difference_0_255": 0.1149363425925926,
+      "equal_pixel_fraction": 0.988065200617284,
+      "interpretation": "Actual rendered pixel comparison; batching can change rasterization and shadow order. This is not a claim of bit-identical images."
+    },
+    "street": {
+      "mean_absolute_channel_difference_0_255": 0.02186792695473251,
+      "equal_pixel_fraction": 0.9971161265432099,
+      "interpretation": "Actual rendered pixel comparison; batching can change rasterization and shadow order. This is not a claim of bit-identical images."
+    }
+  },
+  "representative_screenshots": [
+    {
+      "file": "before-wagon.png",
+      "size": 229168,
+      "sha256": "24a16b88f71ca88d549431f527716563a83a4fc28c6a8598e735a8b0b1626bb6",
+      "dimensions": [
+        960,
+        540
+      ]
+    },
+    {
+      "file": "before-motion-idle-0.png",
+      "size": 209605,
+      "sha256": "eb54ecffc4a489aa945d671ed2edd6e5130bf50368f924ea7334511d2e8b4ddb",
+      "dimensions": [
+        960,
+        540
+      ]
+    },
+    {
+      "file": "after-wagon.png",
+      "size": 229930,
+      "sha256": "1f3192edd110fdd48462f5342b018b3f4859ddddbd1773508bc4d43906fc6839",
+      "dimensions": [
+        960,
+        540
+      ]
+    },
+    {
+      "file": "after-motion-idle-0.png",
+      "size": 209104,
+      "sha256": "b1ff6aba10232587d31316323cc51b085adc651b36ac0d038cf449efa9bfea66",
+      "dimensions": [
+        960,
+        540
+      ]
+    },
+    {
+      "file": "after-motion-march-0.png",
+      "size": 209149,
+      "sha256": "3b0616277028961afa681b6899ab7c2c0b1248b4e46e3577481483b77445e965",
+      "dimensions": [
+        960,
+        540
+      ]
+    },
+    {
+      "file": "after-motion-march-50.png",
+      "size": 209558,
+      "sha256": "8c046521cb405e05e01800d3d866f4a9d7208bcfb650b8212d8b2a496797a2f6",
+      "dimensions": [
+        960,
+        540
+      ]
+    },
+    {
+      "file": "after-borrowed-practice-gear.png",
+      "size": 208655,
+      "sha256": "f06f3b657b87f3a9ae970b7b3067f001d1ef48928abf22ee924de5b038f927b9",
+      "dimensions": [
+        960,
+        540
+      ]
+    },
+    {
+      "file": "after-unarmed-high_kick.png",
+      "size": 208737,
+      "sha256": "c596da065dc72c0d70c1ccaf73f5332d521f47518733e4fd400c5aaa94bc2b26",
+      "dimensions": [
+        960,
+        540
+      ]
+    }
+  ],
+  "graphical_capture_scope_note": "Capture precedes atomic resident initialization helper. This fixture only configures one player, not population residents; the helper does not change these captured props or poses. The later south-street shader change is outside the fixture plain ground.",
+  "captured_candidate_source_sha256": {
+    "prototype/scripts/world/village_art.gd": "208107abde07ad512bbdabf2bf18aa7e30740aece7a535e9831c0fee6bfa918e",
+    "prototype/scripts/world/village/frontier_dressing.gd": "217caf0538c5b2acb55570e917298fdcf4b31fc84b939f989e0b8728e19b2deb",
+    "prototype/scripts/visuals/village_person.gd": "cfaa4adb7484603472e58fcf76b1d0969511734f883d2b8f795f580600d74b80",
+    "prototype/scripts/visuals/natural_motion.gd": "4bfe57079dca1a799c25315034b1f1cc9f90aa92f5e38d5f6ba5023c5347110c",
+    "prototype/scripts/visuals/practice_gear.gd": "e9f01e23ee7d702658d4b3855f4c5ab2095e8ed070651e1c47aca9e11263a2f5",
+    "prototype/tests/village_render_probe.gd": "5b64cc9a9ba73e7c5f2d7883c2963c28b282cd2e2aebd4cefdefe5dc37db39fd",
+    "prototype/tests/natural_motion_test.gd": "e2ee36024c7ffbe7cbb58a71c98031182957f2ad9d2210f1e124b2a94e31af30",
+    "prototype/tests/village_static_art_test.gd": "ec708cdc0c36a150c785177077faf5f27e0acdf03c99badea415760703d53c37"
+  },
+  "current_source_sha256": {
+    "prototype/scripts/world/village_art.gd": "208107abde07ad512bbdabf2bf18aa7e30740aece7a535e9831c0fee6bfa918e",
+    "prototype/scripts/world/village/frontier_dressing.gd": "217caf0538c5b2acb55570e917298fdcf4b31fc84b939f989e0b8728e19b2deb",
+    "prototype/scripts/visuals/village_person.gd": "788ea1d055138b04dbc7cb2b127017bd48199b45841b34a58bfd69f2d2e8ac78",
+    "prototype/scripts/visuals/natural_motion.gd": "4bfe57079dca1a799c25315034b1f1cc9f90aa92f5e38d5f6ba5023c5347110c",
+    "prototype/scripts/visuals/practice_gear.gd": "e9f01e23ee7d702658d4b3855f4c5ab2095e8ed070651e1c47aca9e11263a2f5",
+    "prototype/tests/village_render_probe.gd": "5b64cc9a9ba73e7c5f2d7883c2963c28b282cd2e2aebd4cefdefe5dc37db39fd",
+    "prototype/tests/natural_motion_test.gd": "386f087b7490db8a3a4917b49e8c9fd0bea5b51853329873fcc8fa50bb119f5f",
+    "prototype/tests/village_static_art_test.gd": "ec708cdc0c36a150c785177077faf5f27e0acdf03c99badea415760703d53c37",
+    "prototype/scripts/world/village/ground.gdshader": "de44949c80c03eec4cbdaa26519ea8bbb04d48ba3bee3ded002308a7a445b81d"
+  },
+  "central_validation": {
+    "report": "../engine/validation_report.json",
+    "sha256": "ed1812bfa4579f96780b6b0efc9de1a20438d843ffdfd638b58d5d42eeb0fea2",
+    "passed": true,
+    "groups": 40,
+    "warnings": 0,
+    "source_hashes": 220,
+    "total_seconds": 72.885
+  }
+}

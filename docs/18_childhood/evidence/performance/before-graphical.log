@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+VILLAGE_RENDER_PROBE_PASS {"authored_triangles":24064,"batched_instances":0,"collision_shapes":8,"mesh_nodes":214,"multimesh_nodes":0,"unique_materials":19,"unique_mesh_resources":214}

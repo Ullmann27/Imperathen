@@ -1,12 +1,12 @@
 # Dorf, Haushalte und Einwohneridentitäten
 
-Stand: 23. November 2026. Chat B, Agent 2. Ausgangscommit `2909040deeb33b99ad4180b884b38921f28233a9`.
+Stand: 23. November 2026. Chat B, Agent 2. Ausgangscommit `2909040deeb33b99ad4180b884b38921f28233a9`; anschließend mit dem parallelen Koordinatorstand `e5735509622c9a94564dc5fe21257c07074f9df5` zusammengeführt.
 
 ## Tatsächlich implementierter Umfang
 
-Der geprüfte Ausgangsstand enthält 13 Wohnhausinstanzen. Zwei weitere Instanzen des bereits vorhandenen originalen `frontier_house.glb` ergänzen das südliche Wohnviertel; damit stehen 15 Wohnhäuser im selben Dorf. Die neuen Häuser belegen weder den bestehenden Baugrund noch den Wagenplatz. Eine texturierte Gasse bei z = 28,7 verbindet ihre Eingänge mit dem südlichen Hauptweg und der Oststraße. Rufinas bisher durch dieses Gebiet verlaufender Weg führt jetzt um die Hausgruppe herum.
+Der erste Chat-B-Schritt ergänzte die 13 Wohnhausinstanzen des Ausgangsstands um zwei südliche Häuser. Die Zusammenführung erhält inzwischen alle 20 Wohnhäuser des Koordinatorstands. Unsere beiden südlichen Haushalte verwenden dieselben Hauskennungen; sie werden nicht nochmals erzeugt. Die neuen Häuser belegen weder den bestehenden Baugrund noch den Wagenplatz. Eine texturierte Gasse bei z = 28,7 verbindet ihre Eingänge mit dem südlichen Hauptweg und der Oststraße. Rufinas bisher durch dieses Gebiet verlaufender Weg führt jetzt um die Hausgruppe herum.
 
-Drei Häuser besitzen im Kindheitskapitel nutzbare Innenräume:
+Alle 20 Häuser behalten ihre begehbare Grundausstattung. Drei Häuser besitzen für den neuen Kindheitsbogen eine eigene Einrichtung:
 
 | Haushalt | Szenenkennung | Hausmitte x/z | Eingang außen x/z | Verwendung |
 | --- | --- | --- | --- | --- |
@@ -15,6 +15,8 @@ Drei Häuser besitzen im Kindheitskapitel nutzbare Innenräume:
 | Schmiede | `smith_home` | 38 / −26 | 34,35 / −26 | Sextus; Werkbank, Amboss, Handwerkzeuge, Wasser und Vorräte |
 
 Die tatsächlichen Innenböden des Modells liegen 0,3925 m über Gelände. Der vorherige regionale Kollisionsaufbau besaß dort nur Wände. `childhood_neighborhood.gd` ergänzt für diese drei Häuser durchgehende Böden, eine sichtbare steinerne Eingangsschräge, passende Kollisionskeile, Türrahmen sowie Tisch- und Bankkollisionen. Die Kollisionsöffnung entspricht der 1,12 m breiten Modelltür. Die bestehende Spieler-Kapsel kann ohne Sprung hinein- und wieder hinausgehen.
+
+Für diese drei Häuser werden die während der parallelen Arbeit ergänzten Standardböden und Standardmöbel im modernen Kapitel gezielt abgeschaltet. So liegen weder doppelte Böden noch doppelte Möbelkörper übereinander. Beim Laden des früheren Kindheitsbogens kehrt dessen ursprüngliche Einrichtung wieder zurück. Ein tatsächlicher Wechsel vom früheren Save zurück zur neuen Partie gehört zur Identitätsprüfung.
 
 Die ausgelieferte GLB bündelt Bauteile nach Material: Dachholz und Möbel befinden sich teilweise im selben Mesh. Deshalb werden die für eine Innenansicht nötigen Flächen einmal aus genau dieser vorhandenen Geometrie ausgewählt. Material, UVs, Normalen und Instanztransformationen bleiben erhalten. Beim Eintritt wird die betreffende obere Gebäudeansicht ausgeblendet; Tisch, Bank und Wände bleiben stehen. Beim Austritt erscheint das Originaldach wieder. Die Original-GLB und die reproduzierbare Blenderquelle `tools/art/build_architecture.py` wurden nicht verändert oder ersetzt.
 
@@ -31,7 +33,7 @@ Die ausgelieferte GLB bündelt Bauteile nach Material: Dachholz und Möbel befin
 
 Die gespeicherte Wirtschaftsperson entscheidet über `alive`. Tote Personen bleiben unsichtbar und ihre Kollisionskörper werden deaktiviert. Ein Eintrag in der Miliz entfernt dieselbe Person aus der zivilen Darstellung. Das Laden, der Grafikprofilwechsel und das Betreten eines Hauses dürfen diese Entscheidungen nicht umkehren.
 
-Im aktiven Kindheitskapitel besitzt jede dargestellte Wirtschaftsperson eine feste Kollisionskapsel. Die vorhandenen Hintergrundbewegungen und das Kampfsystem werden durch diese Arbeit nicht neu implementiert. Das ist kein Nachweis einer vollständigen stadtweiten Navigation aller Figuren.
+Die moderne neue Partie zeigt 26 Hintergrundbewohner sowie 14 autoritative Wirtschaftspersonen und Decimus. Diese 41 Bürger besitzen jeweils genau einen Kollisionskörper auf der gemeinsamen Schicht 8. Marcus wird zusätzlich als bestehender Gefährte geführt: insgesamt 42 benannte NPC-Instanzen neben dem Spieler. Diese Darstellungszahl ist keine Behauptung von 42 Arbeitskräften. Die vorhandenen Hintergrundbewegungen und das Kampfsystem bleiben erhalten. Das ist kein Nachweis einer vollständigen stadtweiten Navigation aller Figuren.
 
 ## Sichtbar ausgeliehener oder erworbener Übungsstab
 
@@ -55,7 +57,7 @@ Gespräche im Kindheitsmodus prüfen Sichtkontakt zum verfügbaren Sprecher. Dur
 
 Die Rettung führt dieselbe Julia aus dem Familienhaus über dessen Tür und die südliche Gasse durch die Nachbartür. Die sechs Wegabschnitte ergeben zusammen rund 15,718 m. `childhood.escort.progress` und `childhood.escort.position` speichern den erreichten Standort; ein bloßer Versatz zur Spielerposition wird nicht verwendet. Die Geschichte begrenzt das Gehen auf 1,35 m/s und verlangt Julias eigene Ankunft im Schutzraum.
 
-Vor jedem aktiven Fortschritt prüft `village_life_world.escort_progress_limit(data, delta)` den nächsten Wegabschnitt mit einer Kapsel von 0,29 m Radius und 1,72 m Höhe. Diese Maße entsprechen Julias vorhandenem Kollisionskörper. Die Form wird entlang der Route gegen Häuser, andere Personen, Spieler und Truppen geführt. Ein Hindernis gewährt keinen weiteren Fortschritt. Der Aufruf `model.advance(delta, limit)` übergibt genau diese Grenze an die Geschichte. Anschließend projiziert `sync_escort(data, delta)` den akzeptierten gespeicherten Standort und ruft die vorhandene Gehanimation auf. Das Verfahren erzeugt weder eine zweite Bewegungsquelle noch eine zusätzliche Mutterfigur.
+Vor jedem aktiven Fortschritt prüft `village_life_world.escort_progress_limit(data, delta)` den nächsten Wegabschnitt mit einer Kapsel von 0,29 m Radius und 1,72 m Höhe. Diese Maße entsprechen Julias vorhandenem Kollisionskörper. Die Form wird entlang der Route gegen Häuser, andere Personen, Spieler und Truppen geführt; dazu gehört ausdrücklich die gemeinsame Bürgerschicht 8. Ein Hindernis gewährt keinen weiteren Fortschritt. Der Aufruf `model.advance(delta, limit)` übergibt genau diese Grenze an die Geschichte. Anschließend projiziert `sync_escort(data, delta)` den akzeptierten gespeicherten Standort und ruft die vorhandene Gehanimation auf. Das Verfahren erzeugt weder eine zweite Bewegungsquelle noch eine zusätzliche Mutterfigur.
 
 `resident_floor_height_at` berücksichtigt die runde Kapselauflage an der Kante zwischen dem erhöhten Innenboden und der steinernen Schräge. Ohne diese Auflage würde eine reine Höhenabfrage unter dem Figurenmittelpunkt den Körper kurz in die Bodenkante drücken und eine ansonsten freie Tür fälschlich blockieren. Die tatsächlich begehbare Route wurde zusätzlich vollständig mit einer `CharacterBody3D` derselben Maße abgelaufen. Das ist ein gezielter Fluchtweg für diesen Abschnitt; eine allgemeine Wegsuche durch das gesamte Dorf ist damit nicht verbunden.
 
@@ -82,10 +84,10 @@ Ausgeführt mit lokalem Godot `4.7.2.stable.official.ed1daf0bf`:
 
 ```text
 godot --headless --path prototype --script res://tests/childhood_neighborhood_test.gd
-CHILDHOOD_NEIGHBORHOOD_RESULT checks=116 failures=0
+CHILDHOOD_NEIGHBORHOOD_RESULT checks=138 failures=0
 
 godot --headless --path prototype --script res://tests/childhood_resident_identity_test.gd
-CHILDHOOD_RESIDENT_IDENTITY_RESULT checks=89 failures=0
+CHILDHOOD_RESIDENT_IDENTITY_RESULT checks=101 failures=0
 
 godot --headless --path prototype --script res://tests/childhood_escort_physics_test.gd
 CHILDHOOD_ESCORT_PHYSICS_RESULT checks=22 failures=0

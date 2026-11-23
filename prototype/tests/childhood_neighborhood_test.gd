@@ -5,6 +5,7 @@ const Neighborhood = preload("res://scripts/world/village/childhood_neighborhood
 const Regional = preload("res://scripts/world/regional_village.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Art = preload("res://scripts/world/village_art.gd")
+const Childhood = preload("res://scripts/story/childhood_story.gd")
 var checks := 0
 var failures: Array[String] = []
 var stage: Node3D
@@ -22,19 +23,22 @@ func _run() -> void:
 	var regional := Regional.new()
 	stage.add_child(regional)
 	regional.show_origin("italia")
+	regional.set_household_overrides(["south_weaver_home","south_baker_home","smith_home"])
 	var neighborhood := Neighborhood.new()
 	stage.add_child(neighborhood)
 	neighborhood.build(regional)
-	var living := {"village":{"childhood":{"enabled":true},"economy":{"people":[{"id":"julia","alive":true},{"id":"silvanus","alive":true},{"id":"sextus","alive":true}]}}}
+	var living := {"village":{"childhood":Childhood._base(true),"economy":{"people":[{"id":"julia","alive":true},{"id":"silvanus","alive":true},{"id":"sextus","alive":true}]}}}
 	neighborhood.sync_state(living)
 	_check(neighborhood.homes.size()==3,"Three functional houses use existing architecture instances")
-	_check(regional.house_count==15,"Two compact households extend thirteen existing houses")
+	_check(regional.house_count==20,"All twenty merged households retain one scene instance")
 	var body_count: int = neighborhood.snapshot().collision_bodies
 	neighborhood.build(regional)
 	_check(neighborhood.snapshot().collision_bodies==body_count,"Repeated setup does not duplicate colliders or household objects")
 	_check(neighborhood.snapshot().new_residents==0,"Interior presentation creates no duplicate people")
 	for id: String in Neighborhood.HOMES:
 		var home: Node3D = neighborhood.homes[id]
+		_check(home.get_node("WalkableFloor").collision_layer==0,"The chapter replaces the base floor instead of doubling it: "+id)
+		_check(not home.get_node("Household").visible,"The chapter replaces the base furnishings instead of doubling them: "+id)
 		_check(home.has_node("ChildhoodInterior/ContinuousFloor"),"A solid continuous floor exists: "+id)
 		_check(home.has_node("ChildhoodInterior/EntranceSlopeBody"),"A matching colliding entrance slope exists: "+id)
 		_check(home.find_child("DrinkingCup",true,false)!=null,"House has a real drinking vessel: "+id)
@@ -110,6 +114,10 @@ func _run() -> void:
 	_check(not neighborhood.enabled,"Legacy games do not acquire childhood household state")
 	for body: StaticBody3D in neighborhood._solids:
 		_check(body.collision_layer==0,"Optional chapter collisions disable for legacy mode")
+	regional.set_household_overrides([])
+	for id: String in Neighborhood.HOMES:
+		_check(neighborhood.homes[id].get_node("WalkableFloor").collision_layer==1,"Leaving the chapter restores the base floor: "+id)
+		_check(neighborhood.homes[id].get_node("Household").visible,"Leaving the chapter restores the base furnishings: "+id)
 	stage.free()
 	await process_frame
 	print("CHILDHOOD_NEIGHBORHOOD_RESULT checks=%d failures=%d"%[checks,failures.size()])

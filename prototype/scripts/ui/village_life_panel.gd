@@ -3,6 +3,7 @@ extends RefCounted
 
 const Economy = preload("res://scripts/domain/village_economy.gd")
 const Life = preload("res://scripts/story/village_life.gd")
+const LegacyChildhood = preload("res://scripts/story/village_childhood.gd")
 const Plan = preload("res://scripts/world/world_stream_plan.gd")
 const Childhood = preload("res://scripts/story/childhood_story.gd")
 
@@ -70,7 +71,8 @@ static func show(ui, data: Dictionary, tab := "overview") -> void:
 	ui._village_tab = tab
 	var economy: Dictionary = Economy.view(data)
 	var life: Dictionary = Life.view(data)
-	var column: VBoxContainer = ui._modal("DEIN LEBEN IM DORF", "Dein Dorf unter Decimus" if Childhood.enabled(data) else "Wiederaufbau unter Decimus", "Du bist Bewohner. Vertrauen, Arbeit und gemeinsame Entscheidungen bestimmen deinen Einfluss.", 880)
+	var title := "Dein Dorf unter Decimus" if Childhood.enabled(data) else "Deine Familie und die Nachbarn" if LegacyChildhood.enabled(data) else "Wiederaufbau unter Decimus"
+	var column: VBoxContainer = ui._modal("DEIN LEBEN IM DORF", title, "Du bist Bewohner. Vertrauen, Arbeit und gemeinsame Entscheidungen bestimmen deinen Einfluss.", 880)
 	var tabs := HFlowContainer.new()
 	tabs.mouse_filter = Control.MOUSE_FILTER_PASS
 	column.add_child(tabs)
@@ -121,6 +123,17 @@ static func _restore_position(column: VBoxContainer, active_tab: Button, offset:
 
 
 static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dictionary, life: Dictionary) -> void:
+	if LegacyChildhood.enabled(data):
+		var chapter:=LegacyChildhood.view(data)
+		_text(ui,column,str(chapter.get("title","Ein Morgen zu Hause")),22)
+		_text(ui,column,str(chapter.get("objective","")),18)
+		_text(ui,column,"Dorftag %d · Du bist zwölf. Der nächste Tag beginnt, wenn du zu Hause bewusst schlafen gehst."%int(chapter.get("day",1)),15,true)
+		if not chapter.get("carried",[]).is_empty():
+			_text(ui,column,"Bei dir: "+", ".join(chapter.carried),16)
+		_text(ui,column,"Deine Lehre: "+str(chapter.get("apprenticeship","none")).replace("none","noch offen").replace("smith","bei Quintus"),16)
+		_text(ui,column,"Deine Mutter Antonia und dein Vater Sextus warten an eurem Haus. Die Karte zeigt das Ziel deines nächsten Auftrags. Zum Kennenlernen und Helfen gehst du zu den Menschen.",15,true)
+		_text(ui,column,"Ansehen wächst durch gehaltene Zusagen. Decimus führt das Dorf; deine Aufgaben gehören zu deinem eigenen Lebensweg.",15,true)
+		return
 	_text(ui, column, str(life.get("objective", "Lerne Decimus und deine Nachbarn kennen.")), 18)
 	var childhood := Childhood.enabled(data)
 	var day := int(data.village.childhood.day) if childhood else int(economy.get("day", 1))
@@ -141,6 +154,12 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 
 
 static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictionary) -> void:
+	if LegacyChildhood.enabled(data):
+		_text(ui,column,"Das Dorf arbeitet bereits. Du kannst bei den Menschen Aufgaben übernehmen; die Arbeitsplätze verteilen die Erwachsenen.",17)
+		for place: Dictionary in economy.get("workplaces",[]):
+			_text(ui,column,"%s · %d Menschen arbeiten hier"%( [place.name,place.available]),17)
+			_text(ui,column,"In Betrieb" if str(place.reason).is_empty() else str(place.reason),14,true)
+		return
 	var permit: bool = economy.get("authority", {}).get("work_permit", false)
 	var childhood := Childhood.enabled(data)
 	_text(ui, column, "Jede Person kann nur einen Arbeitsplatz oder Verteidigungsdienst übernehmen. Nahrung und Gesundheit entscheiden, wer tatsächlich arbeiten kann.", 15)
@@ -211,8 +230,8 @@ static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictiona
 
 static func _people(ui, column: VBoxContainer, data: Dictionary, life: Dictionary) -> void:
 	_text(ui, column, "Berufe lernst du bei Menschen, die dich kennen. Ihre Sorgen, dein Verhalten und deine Hilfe bestimmen die Beziehung.", 15)
-	for npc: Dictionary in Life.npc_catalog():
-		var bond: Dictionary = data.village.social.npcs.get(npc.id, {})
+	for npc: Dictionary in Life.npc_catalog(data):
+		var bond: Dictionary = Life.relationship(data,npc.id)
 		_text(ui, column, "%s · %s" % [npc.name, npc.role], 19)
 		if not Life.is_available(data, str(npc.id)):
 			_text(ui, column, "Für Gespräche nicht verfügbar", 14, true)

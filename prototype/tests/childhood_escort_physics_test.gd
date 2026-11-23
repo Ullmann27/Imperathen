@@ -62,11 +62,11 @@ func _run() -> void:
 	_check(absf(village.escort_progress_limit(data,100.0)-length)<.001,"Removing an obstacle reopens the same route without changing saved identity")
 	# Walk the complete same route with the resident's real capsule, including
 	# the two door thresholds and both changes between the raised floor and lane.
-	village.actors.julia.get_node("ResidentBody").collision_layer = 0
+	village.actors.julia.collision_layer = 0
 	probe = CharacterBody3D.new()
 	probe.name = "JuliaCapsuleRouteProbe"
 	probe.collision_layer = 2
-	probe.collision_mask = 1
+	probe.collision_mask = 1 | 8
 	probe.floor_snap_length = .25
 	var shape := CollisionShape3D.new()
 	var capsule := CapsuleShape3D.new()

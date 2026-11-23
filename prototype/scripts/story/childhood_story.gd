@@ -2,6 +2,7 @@ extends RefCounted
 ## An authored childhood in the existing village. Decisions, not idle time, open scenes.
 ## WorldModel owns the outer transaction, resource authority and save envelope.
 
+const Format = preload("res://scripts/domain/childhood_format.gd")
 const VERSION := 1
 const RANGE := 3.2
 const APPROACH_SECONDS := 32.0
@@ -25,7 +26,7 @@ const ESCORT_ROUTE := [Vector2(-4.0,24.9),Vector2(-5.0,25.4),Vector2(-5.0,27.0),
 const COMMAND_FIELDS := {"childhood_choose":["scene_id", "choice"]}
 const NIGHT_SCENES := ["night_mother", "night_escort", "night_wait", "night_hidden"]
 const WORKPLACES := {"farm":Vector2(24.0,-30.0), "woodcamp":Vector2(-43.0,14.0), "quarry":Vector2(48.0,-12.0), "trade":Vector2(25.0,24.0), "watchpost":Vector2(0.0,-48.0), "defense":Vector2(0.0,-16.0)}
-const DEFAULT_POSITIONS := {"cassia":Vector2(5.0,0.0), "varro":Vector2(-14.0,-7.2), "severus":Vector2(0.0,-7.0), "aurelia":Vector2(8.0,16.5)}
+const DEFAULT_POSITIONS := {"cassia":Vector2(5.0,0.0), "varro":Vector2(-14.0,-6.6), "severus":Vector2(0.0,-7.0), "aurelia":Vector2(8.0,16.5)}
 
 # Choice: id, label, following scene, authored effects. A receipt stores only the
 # accepted scene/choice and observed clocks; the effects are rebuilt on validation.
@@ -130,8 +131,7 @@ const SCENES := {
 
 
 static func enabled(data: Dictionary) -> bool:
-	var village: Variant = data.get("village", {})
-	return typeof(village) == TYPE_DICTIONARY and typeof(village.get("childhood")) == TYPE_DICTIONARY and village.childhood.get("enabled", false) == true
+	return Format.kind(data) == Format.AUTHORED and data.village.childhood.enabled == true
 
 
 static func _base(active: bool) -> Dictionary:
@@ -524,6 +524,9 @@ static func _schedule(data: Dictionary) -> void:
 
 
 static func validate(data: Dictionary) -> String:
+	if Format.kind(data) == Format.LEGACY:
+		# The older authored life is validated by its own module, without rewrite.
+		return ""
 	if typeof(data.get("village")) != TYPE_DICTIONARY or typeof(data.village.get("childhood")) != TYPE_DICTIONARY:
 		return "Der gespeicherte Kindheitsvertrag fehlt."
 	var state: Dictionary = data.village.childhood
@@ -626,6 +629,8 @@ static func validate(data: Dictionary) -> String:
 
 
 static func restore_integer_fields(data: Dictionary) -> void:
+	if Format.kind(data) != Format.AUTHORED:
+		return
 	var state: Dictionary = data.village.childhood
 	state.version = int(state.version)
 	state.day = int(state.day)
