@@ -1,0 +1,757 @@
+{
+  "remote_commit": "f60fd4e1b5ff8a0ed9b21861bc8515ca64da33b8",
+  "verified": "All matching local bytes hashed into remote Git blobs; every registered frontier SHA-256 checked",
+  "files": [
+    {
+      "path": "art/architecture/atrium_house.blend",
+      "sha": "806a48afe94aa4d5d1d81247dbdb4d5399ee89d6",
+      "size": 2214906,
+      "local_bytes": 2214906,
+      "local_sha256": "98152f23be8cbec676d7fa1fdd5e11a8bbab99cf414f859351a5b24eb67f0b90",
+      "local_blob": "806a48afe94aa4d5d1d81247dbdb4d5399ee89d6",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/frontier_people/archer.blend",
+      "sha": "26d18dc9b3214eeea1166fede4a08872a810ebb4",
+      "size": 11332000,
+      "local_bytes": 11332000,
+      "local_sha256": "e96a8e58d65ba7042b5c6aae013b10f3419e0118ccd15b14b716c13b0a3f069b",
+      "local_blob": "26d18dc9b3214eeea1166fede4a08872a810ebb4",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "art/frontier_people/build_report.json",
+      "sha": "ea6bf1a6eaf214d374b87f27c2e714f930050009",
+      "size": 10132,
+      "local_bytes": 10132,
+      "local_sha256": "e6b75e6eb3d6d7dbfcdce6c837052a329ad2944686159cb8190462526e9ea29b",
+      "local_blob": "ea6bf1a6eaf214d374b87f27c2e714f930050009",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/frontier_people/civilian_man.blend",
+      "sha": "ae634e4073096a5c5a20b96ef0d863136fe18426",
+      "size": 11198529,
+      "local_bytes": 11198529,
+      "local_sha256": "ffe6b0355a84a269372d8e3b8e4dedeba7c04189354fde692672583f1c1178eb",
+      "local_blob": "ae634e4073096a5c5a20b96ef0d863136fe18426",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "art/frontier_people/civilian_woman.blend",
+      "sha": "0291f33630616ae187356f5c4f4bfc507ec60f2f",
+      "size": 11940470,
+      "local_bytes": 11940470,
+      "local_sha256": "7a5743a7c15694e4d33d3a0e277515def2fcfe9342c353c3c0c830dfe068835e",
+      "local_blob": "0291f33630616ae187356f5c4f4bfc507ec60f2f",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "art/frontier_people/elder.blend",
+      "sha": "8904794701f1ad68d7e16b6229dd75a735a0932d",
+      "size": 12983176,
+      "local_bytes": 12983176,
+      "local_sha256": "75153c7f3922567fb2b03dcd1a6f3f179b6d95a07b7f77c9460940c4e0e6b826",
+      "local_blob": "8904794701f1ad68d7e16b6229dd75a735a0932d",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "art/frontier_people/legionary.blend",
+      "sha": "bf6f6ffc272ae6961e48b01e2a02b02ce73db2f1",
+      "size": 11305095,
+      "local_bytes": 11305095,
+      "local_sha256": "abd5ec1fbe10ac4f28cbc789806e0f198980ba776b0194c5b917ae8ef4e882ef",
+      "local_blob": "bf6f6ffc272ae6961e48b01e2a02b02ce73db2f1",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "art/frontier_people/officer.blend",
+      "sha": "0acae6a4642623dcf5f18a8f35f106f79c8b3cb5",
+      "size": 11340286,
+      "local_bytes": 11340286,
+      "local_sha256": "80cb42ed0ad80ce38c3c1f5d069dab5878b851b1ed72bca93952b50e5f4b7e74",
+      "local_blob": "0acae6a4642623dcf5f18a8f35f106f79c8b3cb5",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "art/frontier_people/provenance.json",
+      "sha": "3e171008b662dcbb7dde2bc9940a3b06ebccf0a2",
+      "size": 2182,
+      "local_bytes": 2182,
+      "local_sha256": "751be3d4659f11d00c973d96e2d37acde9ceb0edcbcafbf706366006fb0c878c",
+      "local_blob": "3e171008b662dcbb7dde2bc9940a3b06ebccf0a2",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/frontier_people/spearman.blend",
+      "sha": "e662f56f52eb87bacf888470b5332fdd449e836d",
+      "size": 11335557,
+      "local_bytes": 11335557,
+      "local_sha256": "6a1e7df1656811da8f2b7e23e1e11d386f546a9748e70eee82e33632ced20cd2",
+      "local_blob": "e662f56f52eb87bacf888470b5332fdd449e836d",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "art/hero_quality/hero.blend",
+      "sha": "fd06ee044eabb26e1bd9ae9e89c57ef641d73597",
+      "size": 12711366,
+      "local_bytes": 12711366,
+      "local_sha256": "e7ebd5f7c0b84eff67694b35697187615085fc26a75468590b4a585d1252c63e",
+      "local_blob": "fd06ee044eabb26e1bd9ae9e89c57ef641d73597",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/landscape/farmer.blend",
+      "sha": "f88369db34bea67693692209d08295d87fa97a7a",
+      "size": 166128,
+      "local_bytes": 166128,
+      "local_sha256": "d9d157e392798ab232d0a920edad6e33aba523faab0b1fb4747d130efa088429",
+      "local_blob": "f88369db34bea67693692209d08295d87fa97a7a",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/landscape/han_farmer.blend",
+      "sha": "3640a3e8a26e11905b02ce4e5f77fddb24a630bd",
+      "size": 177426,
+      "local_bytes": 177426,
+      "local_sha256": "afc307db93cdc3e0d7352ffcefa86d20ddbeeca393b6efa7979e625c9e72bb31",
+      "local_blob": "3640a3e8a26e11905b02ce4e5f77fddb24a630bd",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/landscape/han_house.blend",
+      "sha": "1f38aede9b42afed6ed25615cbf57ceb26515faf",
+      "size": 497415,
+      "local_bytes": 497415,
+      "local_sha256": "ebdccc93a30fb5ea17022a07b3124b787efe86c36d45f2dbd7bac07173e8630d",
+      "local_blob": "1f38aede9b42afed6ed25615cbf57ceb26515faf",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/landscape/oak.blend",
+      "sha": "52b532bee460f1f89e062e496131b8ab3fb33f95",
+      "size": 1148961,
+      "local_bytes": 1148961,
+      "local_sha256": "00f8eef604cc7afbdea2e7870b9bacb6229664e09d7786848f6063cfee51bba8",
+      "local_blob": "52b532bee460f1f89e062e496131b8ab3fb33f95",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/landscape/olive.blend",
+      "sha": "e7bd5a96701d73f72c8fdec8adecfa9cdb0a279b",
+      "size": 994496,
+      "local_bytes": 994496,
+      "local_sha256": "198eefac4435e64048b9b4bb5b91b3a6010587fca4bc820a5acb53b2a881146f",
+      "local_blob": "e7bd5a96701d73f72c8fdec8adecfa9cdb0a279b",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/landscape/pine.blend",
+      "sha": "ff02fa35cc5ffcf864f064319c10bf9bdbdbdb9e",
+      "size": 1046558,
+      "local_bytes": 1046558,
+      "local_sha256": "2342f2a609f6d020a4427ac57b4986e15473351c080a8d294c82ff1b121bb5e9",
+      "local_blob": "ff02fa35cc5ffcf864f064319c10bf9bdbdbdb9e",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/landscape/wa_farmer.blend",
+      "sha": "d6c32f97407aa8bcddabc4a73ddbab2d5eb125f6",
+      "size": 169347,
+      "local_bytes": 169347,
+      "local_sha256": "a29207ed6aa1505306fcf14df5e56e0b88512adbfabfd2ff53acc4c1a5315ec5",
+      "local_blob": "d6c32f97407aa8bcddabc4a73ddbab2d5eb125f6",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/landscape/wa_house.blend",
+      "sha": "f93252dd5d40559feb4fcdbba9937bd5116a644f",
+      "size": 515402,
+      "local_bytes": 515402,
+      "local_sha256": "afc31c30a497b62cdca3172a52087704368da94afebcb060dcc0a0bfb1a343a3",
+      "local_blob": "f93252dd5d40559feb4fcdbba9937bd5116a644f",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/landscape/wa_store.blend",
+      "sha": "ee6e06fe4bcfc79a2cd0bcc2da36c2b52e0bd417",
+      "size": 508336,
+      "local_bytes": 508336,
+      "local_sha256": "20e4f87a0cf3e930dbf0f72fb78f8f4f6ea1e4c29de4005d3300e4b67d648a3e",
+      "local_blob": "ee6e06fe4bcfc79a2cd0bcc2da36c2b52e0bd417",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/landscape/wood_longhouse.blend",
+      "sha": "5d2b718359e3a93ca6860a035735b70e9a08ffb3",
+      "size": 575676,
+      "local_bytes": 575676,
+      "local_sha256": "16bf77c9ec4f983855b56de805c1ecd965648c8b89c1550fb1a0a175bc5c4c2f",
+      "local_blob": "5d2b718359e3a93ca6860a035735b70e9a08ffb3",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/soldiers/archer.blend",
+      "sha": "41194136953757f92181d562a986354c7d275613",
+      "size": 268275,
+      "local_bytes": 268275,
+      "local_sha256": "758b13b9199a8f0d99cae387a2db77643be5ed2f2c793ec0aa471f8725bd4fa4",
+      "local_blob": "41194136953757f92181d562a986354c7d275613",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/soldiers/build.py",
+      "sha": "03f48f2d8cab378be2cb9db8b7097a358b1987cb",
+      "size": 34798,
+      "local_bytes": 34798,
+      "local_sha256": "2611a30e85118026e9d10fe515c5b56096b484f2ea9bc4756e372dc1119fb340",
+      "local_blob": "03f48f2d8cab378be2cb9db8b7097a358b1987cb",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/soldiers/heavy.blend",
+      "sha": "e6cbc125f417adf95ffea5cf5616dfcdc5b5b1ae",
+      "size": 278305,
+      "local_bytes": 278305,
+      "local_sha256": "4f74ae7b8ebdd766dab83e3381665214fb9bdaff112c6a679dc7b71d2b7b2094",
+      "local_blob": "e6cbc125f417adf95ffea5cf5616dfcdc5b5b1ae",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/soldiers/officer.blend",
+      "sha": "c5c927f368e39cf62095e04361501a367e770e32",
+      "size": 284234,
+      "local_bytes": 284234,
+      "local_sha256": "02e7871da706d34ec3749de066d5a5e4e1400b96f4c600c2ce904a8045d6a5c9",
+      "local_blob": "c5c927f368e39cf62095e04361501a367e770e32",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/soldiers/spear.blend",
+      "sha": "1525634c7f4fc31978798c355894545172fc9b57",
+      "size": 275795,
+      "local_bytes": 275795,
+      "local_sha256": "1cc144716fc48858372fba0ad45726baa2e6a9afb23aec0e360286a97e59051a",
+      "local_blob": "1525634c7f4fc31978798c355894545172fc9b57",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/source/frontier_hut.blend",
+      "sha": "56f7bfc71416b2ef418f181b232007a002ec951e",
+      "size": 156379,
+      "local_bytes": 156379,
+      "local_sha256": "5372dc04bb5fc63bb293694bcab8c82bc1c7e158baba9f10500963ac3cbcfa82",
+      "local_blob": "56f7bfc71416b2ef418f181b232007a002ec951e",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/village/market.blend",
+      "sha": "2e5fd47f6a8a5315addae65ea3b1b899e8b0ea11",
+      "size": 1212508,
+      "local_bytes": 1212508,
+      "local_sha256": "500b9738976de11930323d4706e8ca7072f1d059e2ee59c2369d487bc5cc1bc2",
+      "local_blob": "2e5fd47f6a8a5315addae65ea3b1b899e8b0ea11",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/village/palisade_bay.blend",
+      "sha": "bd94406653267ee7733c497d4966b8e7f73a6280",
+      "size": 1129200,
+      "local_bytes": 1129200,
+      "local_sha256": "3911c045ddde960ea7d4728b54679a2322bc87b7ec1a2c38f5fc3c5a3bd531cf",
+      "local_blob": "bd94406653267ee7733c497d4966b8e7f73a6280",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/village/palisade_silhouette.blend",
+      "sha": "84984ce316dc2ad8e2e5284b4a3f2fce580cc871",
+      "size": 1119802,
+      "local_bytes": 1119802,
+      "local_sha256": "c1a717c79c37aff17d00637cf43e656712bcda36482359d7e9b500f87b5a5c22",
+      "local_blob": "84984ce316dc2ad8e2e5284b4a3f2fce580cc871",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/village/storehouse.blend",
+      "sha": "378ffefd4374f19ec154906f05691f1d011a2ca2",
+      "size": 1191671,
+      "local_bytes": 1191671,
+      "local_sha256": "ba0a9e2eed8a21f7420104930bcbc1f6390e0d34465a120320ab80e7853ec59f",
+      "local_blob": "378ffefd4374f19ec154906f05691f1d011a2ca2",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/village/timber_billet.blend",
+      "sha": "67912f72ee8867bdced1afd814f5b880385a3f62",
+      "size": 1121555,
+      "local_bytes": 1121555,
+      "local_sha256": "22ec279859f19912372342e51a700c2acecf4c0739e6bd67caf8179d946db7b1",
+      "local_blob": "67912f72ee8867bdced1afd814f5b880385a3f62",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/village/training_dummy.blend",
+      "sha": "fee00e0b4c3fe94b8f43d6e71997d5bc02044913",
+      "size": 1147683,
+      "local_bytes": 1147683,
+      "local_sha256": "cad8c2ca9d3494cb50c016c506b6e1d66bed47b2e9ec1b92eb215f60639e4af2",
+      "local_blob": "fee00e0b4c3fe94b8f43d6e71997d5bc02044913",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/village/workshop.blend",
+      "sha": "78db34ab416b8080dd759ff56a85da76d2a5b1f4",
+      "size": 1227585,
+      "local_bytes": 1227585,
+      "local_sha256": "19b6e1a14fd9d0ec2d59d2988eeab5676f955862a13d38f74be61cdf8c2fad8f",
+      "local_blob": "78db34ab416b8080dd759ff56a85da76d2a5b1f4",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/village_characters/villager.blend",
+      "sha": "edb208bef19cf1fa7d1152a0ea1d5c8b5cfa9741",
+      "size": 948088,
+      "local_bytes": 948088,
+      "local_sha256": "bfb2103bd5f8289fa357f7edd84126b898192806b8aa1ea1baa88e75adfafdfe",
+      "local_blob": "edb208bef19cf1fa7d1152a0ea1d5c8b5cfa9741",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/visual_benchmark/assets/architecture/frontier_house.blend",
+      "sha": "42a8f3612c13312aa4af13cecbaffeb0aae9b914",
+      "size": 4102438,
+      "local_bytes": 4102438,
+      "local_sha256": "eddc3b96a5fb0de14442e9ae53a4a0fe833afc1bc4b29eaaa208881c192d7722",
+      "local_blob": "42a8f3612c13312aa4af13cecbaffeb0aae9b914",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/visual_benchmark/assets/architecture/house_foundation.blend",
+      "sha": "276db61ee73209cf84eb6f2248212f11c0f40098",
+      "size": 3566148,
+      "local_bytes": 3566148,
+      "local_sha256": "6d4392b9be665d2a62d4657d913d191c0003be5269ed45e0ec004403c08f7987",
+      "local_blob": "276db61ee73209cf84eb6f2248212f11c0f40098",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/visual_benchmark/assets/architecture/village_well.blend",
+      "sha": "51b41bdcde82426e5ddf58a7f65ceb812f24c0d2",
+      "size": 3619168,
+      "local_bytes": 3619168,
+      "local_sha256": "51b74c8a3495dc953d004e1b1b64dfad771a132ef5deb73507db61e46a8a39df",
+      "local_blob": "51b41bdcde82426e5ddf58a7f65ceb812f24c0d2",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/visual_benchmark/assets/characters/civilian_youth.blend",
+      "sha": "64a524aa7832b8a4abccc90f7d15921a7c7eba52",
+      "size": 2015316,
+      "local_bytes": 2015316,
+      "local_sha256": "f09fdf0c09c62b8102da028af9028864ba49d583a3dac7f047e975dedcd257c1",
+      "local_blob": "64a524aa7832b8a4abccc90f7d15921a7c7eba52",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/visual_benchmark/assets/characters/civilian_youth_lod1.blend",
+      "sha": "dca8735c9a83425e832dab49679836890d5e979c",
+      "size": 2383268,
+      "local_bytes": 2383268,
+      "local_sha256": "e77912cef5e57e658b850bc15eb93e4a7655f9a8be901d4827627d247ceaca60",
+      "local_blob": "dca8735c9a83425e832dab49679836890d5e979c",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/visual_benchmark/assets/characters/frontier_guard.blend",
+      "sha": "3798ac6477fde44c69d73bce4e93e7e068588a00",
+      "size": 2566380,
+      "local_bytes": 2566380,
+      "local_sha256": "e245fb94cab91e341f3ef6a65ce5992c1fb6d481d50ae4a3d057d18066a02102",
+      "local_blob": "3798ac6477fde44c69d73bce4e93e7e068588a00",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/visual_benchmark/assets/characters/frontier_guard_lod1.blend",
+      "sha": "f81ea4308d1b234d085ec56937ec189473a57284",
+      "size": 2748406,
+      "local_bytes": 2748406,
+      "local_sha256": "5fbca04b5108f5d4e750a963f436ae99e0f6ed3cd8c9d86082c1edb37e02caf4",
+      "local_blob": "f81ea4308d1b234d085ec56937ec189473a57284",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/weapons/gladius_lod0.blend",
+      "sha": "0393c2b12330f518aa67d12f67dae35e306aee52",
+      "size": 1777000,
+      "local_bytes": 1777000,
+      "local_sha256": "0e7c1dd037091a7c9ff78806993022beb921caac419a0d7e71c09cf54f68e487",
+      "local_blob": "0393c2b12330f518aa67d12f67dae35e306aee52",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/weapons/scutum_lod0.blend",
+      "sha": "50b95250b41c22c735ef60d7ffab41d8c07facff",
+      "size": 3384972,
+      "local_bytes": 3384972,
+      "local_sha256": "3f5eaa5d94e8a4b1d965f9c27f2f32434b9a3a9ea094a4c9f4b3cd7066df9d48",
+      "local_blob": "50b95250b41c22c735ef60d7ffab41d8c07facff",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "art/weapons/weapons_review.blend",
+      "sha": "573d52461b291d7b14e2532cac3fd04181a58999",
+      "size": 7183817,
+      "local_bytes": 7183817,
+      "local_sha256": "26e00a88263911f34d97f8af1a5cd2d494d02389d09eef6670f27cf6df1feda2",
+      "local_blob": "573d52461b291d7b14e2532cac3fd04181a58999",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "prototype/assets/characters/frontier_archer_0.glb",
+      "sha": "326571bc388d4092463e591bd980e8b3caadc50a",
+      "size": 3609796,
+      "local_bytes": 3609796,
+      "local_sha256": "b6f00b194403079db32647f2239e4d8fab90c245059e23a6c9dc6d089e461722",
+      "local_blob": "326571bc388d4092463e591bd980e8b3caadc50a",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_archer_1.glb",
+      "sha": "ea16278389a28d1dcdf02d29a5a935ad9237d798",
+      "size": 2289128,
+      "local_bytes": 2289128,
+      "local_sha256": "14b2ffaab3191d75e4a624e6c7f2cbdfa8db6d470470783f302553adcb52fb6c",
+      "local_blob": "ea16278389a28d1dcdf02d29a5a935ad9237d798",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_archer_2.glb",
+      "sha": "65d1eaaacf91a1d52ca106a4cb417bc236a507af",
+      "size": 688556,
+      "local_bytes": 688556,
+      "local_sha256": "fcc4c04e26446f3b122852a3fb9c3252f84d403b41ddcb126e4636eeb7a6e87b",
+      "local_blob": "65d1eaaacf91a1d52ca106a4cb417bc236a507af",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_archer_3.glb",
+      "sha": "1468aabb75dbf56fa46fd602b89732ccca939e95",
+      "size": 322296,
+      "local_bytes": 322296,
+      "local_sha256": "b148570829a68da85d5bacd69845c8158d1b59584f95092571638e3d71aa0b6b",
+      "local_blob": "1468aabb75dbf56fa46fd602b89732ccca939e95",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_man_0.glb",
+      "sha": "91a3128828d0ed069706254607f40b77257f0e22",
+      "size": 5003724,
+      "local_bytes": 5003724,
+      "local_sha256": "477001694752dd67f6802da6c30cf246df0a97240914fc75e79315ebfe443622",
+      "local_blob": "91a3128828d0ed069706254607f40b77257f0e22",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_man_1.glb",
+      "sha": "e38466e3fed003945358b17fe0c1d72525ceba1e",
+      "size": 2544848,
+      "local_bytes": 2544848,
+      "local_sha256": "30aabba76fa5db4b2fa8b879905611d340998d6294f3e8a1a6636de55de1ecef",
+      "local_blob": "e38466e3fed003945358b17fe0c1d72525ceba1e",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_man_2.glb",
+      "sha": "42828023dab3cb0f2a3608b99055e32d547d2daf",
+      "size": 763304,
+      "local_bytes": 763304,
+      "local_sha256": "fcae8394615557c9b4eee7f64ac683be88344295e2b8a7f07a4a536de92c0ec9",
+      "local_blob": "42828023dab3cb0f2a3608b99055e32d547d2daf",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_man_3.glb",
+      "sha": "37fc166f69a72f4f92bfc9fb6f31be62c393d3ea",
+      "size": 334192,
+      "local_bytes": 334192,
+      "local_sha256": "69a97af3b49b3c8d4b996758470b83cc818b690a3833affc4913a1d25040075a",
+      "local_blob": "37fc166f69a72f4f92bfc9fb6f31be62c393d3ea",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_woman_0.glb",
+      "sha": "5a3270f6397c5cf22d7a56a26910141d7eb3db92",
+      "size": 5308548,
+      "local_bytes": 5308548,
+      "local_sha256": "3f445fed8e5564b5b5a8338564e343d8ec9f5e92c4117eff1c2b86acd0b54ca2",
+      "local_blob": "5a3270f6397c5cf22d7a56a26910141d7eb3db92",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_woman_1.glb",
+      "sha": "877cfebc76ed7c0df895c7dab9ab77eea092c0b3",
+      "size": 2637320,
+      "local_bytes": 2637320,
+      "local_sha256": "0060242580c098f5d94ce144cdf320a4f47b26d84026042ab136c583c81acca1",
+      "local_blob": "877cfebc76ed7c0df895c7dab9ab77eea092c0b3",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_woman_2.glb",
+      "sha": "5ee22ed4f001d79f79eaaeba7fdf5aae150ce93b",
+      "size": 793672,
+      "local_bytes": 793672,
+      "local_sha256": "c7d02261332c880df124ca75f437f5352ae9143777c61804745120706160c594",
+      "local_blob": "5ee22ed4f001d79f79eaaeba7fdf5aae150ce93b",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_woman_3.glb",
+      "sha": "a2d0e95bade4b4f651c18576b9919a7f70772882",
+      "size": 344532,
+      "local_bytes": 344532,
+      "local_sha256": "c191923876021d4fec0e4fe7e343a101ac69925dc36ebe2b2f8de4ed626f3dc0",
+      "local_blob": "a2d0e95bade4b4f651c18576b9919a7f70772882",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_elder_0.glb",
+      "sha": "7cfb9353faacbb523b81becd45aa22db1e89167e",
+      "size": 4448876,
+      "local_bytes": 4448876,
+      "local_sha256": "b03051329d7e344fb95bb5a7e6a0eab953163f1549f103f4592ebfc1e3f4fefb",
+      "local_blob": "7cfb9353faacbb523b81becd45aa22db1e89167e",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_elder_1.glb",
+      "sha": "91270ec5041ffe1b72a86f01c83d131c432d8515",
+      "size": 2395952,
+      "local_bytes": 2395952,
+      "local_sha256": "5b1b3453f984f3e2c91c5535ecd5fef57f9733e4e41be33dc82111e073f5a12e",
+      "local_blob": "91270ec5041ffe1b72a86f01c83d131c432d8515",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_elder_2.glb",
+      "sha": "3c83417f4102debbaa6e2d279aaf5ac1029df268",
+      "size": 725508,
+      "local_bytes": 725508,
+      "local_sha256": "80435022982a4521a963185efd005d9413746c82c17247f5b1e4071a05f2e146",
+      "local_blob": "3c83417f4102debbaa6e2d279aaf5ac1029df268",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_elder_3.glb",
+      "sha": "a23737178fd7115858445b783c9f75e3c22dce94",
+      "size": 324288,
+      "local_bytes": 324288,
+      "local_sha256": "42f713f0b05aace710e337a468e5ccffb9a32b6238234a93cbec56b334909a3a",
+      "local_blob": "a23737178fd7115858445b783c9f75e3c22dce94",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_legionary_0.glb",
+      "sha": "de81b8c26c10fd45a92f05f19688f6f22caa4f3a",
+      "size": 3613592,
+      "local_bytes": 3613592,
+      "local_sha256": "7937cbb3c3a510609d7a9d62b8adebf9f6a6678d997436faa2cce735146e8bda",
+      "local_blob": "de81b8c26c10fd45a92f05f19688f6f22caa4f3a",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_legionary_1.glb",
+      "sha": "dbc4948a8a4edffb43c79a054d3bad5f79a28e6d",
+      "size": 2265392,
+      "local_bytes": 2265392,
+      "local_sha256": "a7b3d582f378c6cd6fadbb2d42a778a5b2b567e7c64312c054d8eae207cd6148",
+      "local_blob": "dbc4948a8a4edffb43c79a054d3bad5f79a28e6d",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_legionary_2.glb",
+      "sha": "385820a117f0054bfce253a0af1bf2cef6107df4",
+      "size": 677524,
+      "local_bytes": 677524,
+      "local_sha256": "5e929aa27938c60fb94bad246c5ab7b6391110d0a12157df090a8eb6346eab05",
+      "local_blob": "385820a117f0054bfce253a0af1bf2cef6107df4",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_legionary_3.glb",
+      "sha": "3899eea4027aeef77e8beae15cdc6269107b24df",
+      "size": 302912,
+      "local_bytes": 302912,
+      "local_sha256": "05cced36031ec8f7627302dbed9235df8404617873d91e0f6ad569c9d65e47e3",
+      "local_blob": "3899eea4027aeef77e8beae15cdc6269107b24df",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_officer_0.glb",
+      "sha": "c65cc8ca5c05ccd7ec233ebe9df343604499fe11",
+      "size": 3652028,
+      "local_bytes": 3652028,
+      "local_sha256": "46152dd3fc4da12bc772ab04084947f40f3c1d391c37435402af2bab4f0f2e86",
+      "local_blob": "c65cc8ca5c05ccd7ec233ebe9df343604499fe11",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_officer_1.glb",
+      "sha": "c82e461511b27e03fd5998d75c99102d162be87e",
+      "size": 2296496,
+      "local_bytes": 2296496,
+      "local_sha256": "2d47a6f35dc7ce73ec959384090271c88ff3e0ea0a420197403912a4ed159bfc",
+      "local_blob": "c82e461511b27e03fd5998d75c99102d162be87e",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_officer_2.glb",
+      "sha": "42f6e0123828ea74ce6653a0027c970b3b7893ef",
+      "size": 683916,
+      "local_bytes": 683916,
+      "local_sha256": "3ae746ffe5f0380b7bf38ab8b098b387257c9a74e784f613872cde013f0ef66b",
+      "local_blob": "42f6e0123828ea74ce6653a0027c970b3b7893ef",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_officer_3.glb",
+      "sha": "4874a3d8e82cf18e336180304590787804618789",
+      "size": 309616,
+      "local_bytes": 309616,
+      "local_sha256": "39eccc496ad4f61f5ba7473ee2fec5fc08a4b77c574c477fd728100f349f43d4",
+      "local_blob": "4874a3d8e82cf18e336180304590787804618789",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_spearman_0.glb",
+      "sha": "3e91ca82a4eac43c175f5b0fecb70cad3f268e05",
+      "size": 3636424,
+      "local_bytes": 3636424,
+      "local_sha256": "46a06aff153e865667933c22b9aec4173b9be987d40d2e6c9226829061a8e2b4",
+      "local_blob": "3e91ca82a4eac43c175f5b0fecb70cad3f268e05",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_spearman_1.glb",
+      "sha": "40b0f524ba795785048d0b556437cfcf1b8127de",
+      "size": 2291108,
+      "local_bytes": 2291108,
+      "local_sha256": "534e6d54304a3ffc75ad528fcb8f76063a0e75fafb744d0de18fe232fa3040a5",
+      "local_blob": "40b0f524ba795785048d0b556437cfcf1b8127de",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_spearman_2.glb",
+      "sha": "e22652b4ed807da78583683c5a84614e0246f213",
+      "size": 680212,
+      "local_bytes": 680212,
+      "local_sha256": "fe2e7b71db6487e04bf5663996aabc770a4ae1422b205084922b3ea6602c828b",
+      "local_blob": "e22652b4ed807da78583683c5a84614e0246f213",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "prototype/assets/characters/frontier_spearman_3.glb",
+      "sha": "43a2cab714f19e75f3cd32f5735bc4dbe0236839",
+      "size": 306508,
+      "local_bytes": 306508,
+      "local_sha256": "8751356259a6caa85f66e74b84da9b8613ac2702f13ed25f91b004c875530e98",
+      "local_blob": "43a2cab714f19e75f3cd32f5735bc4dbe0236839",
+      "remote_matches": true,
+      "provenance_matches": true
+    },
+    {
+      "path": "tools/characters/build_frontier_people.py",
+      "sha": "76916baa2a13f5a33356cf56c5b53e5eb6537552",
+      "size": 24827,
+      "local_bytes": 24827,
+      "local_sha256": "d730a890f64b410ff181a040d96ae0856d310f009305012d418faa4d2bdb1c70",
+      "local_blob": "76916baa2a13f5a33356cf56c5b53e5eb6537552",
+      "remote_matches": true,
+      "provenance_matches": null
+    },
+    {
+      "path": "tools/characters/build_hero.py",
+      "sha": "685216f90dff754dae1a236f9244db4557f83374",
+      "size": 37347,
+      "local_bytes": 37347,
+      "local_sha256": "65f10af79e663cfc843b777a915a32b7a12e128c0333737213219a23bfa7b194",
+      "local_blob": "685216f90dff754dae1a236f9244db4557f83374",
+      "remote_matches": true,
+      "provenance_matches": null
+    }
+  ],
+  "passed": true
+}

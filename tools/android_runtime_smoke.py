@@ -20,6 +20,38 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 
+VILLAGE_RUNTIME_MARKER = "IMPERATHEN_VILLAGE_RUNTIME "
+
+
+def wait_for_village_snapshot(read_logs, screen=None, *, predicate=None,
+                             required_control=None, after=-1, timeout=100):
+    """Wait for the latest observed state, including a pending same-screen change.
+
+    Android input returns before Godot necessarily processes the event. The
+    village tabs all share one screen name, so a previous panel snapshot must
+    not prove that the requested tab has opened. Missing controls remain a
+    bounded failure, and disabled controls are returned for the caller to reject.
+    """
+    deadline = time.monotonic() + timeout
+    latest = None
+    while time.monotonic() < deadline:
+        text = read_logs()
+        lines = [line for line in text.splitlines() if VILLAGE_RUNTIME_MARKER in line]
+        if lines:
+            latest = json.loads(lines[-1].split(VILLAGE_RUNTIME_MARKER, 1)[1])
+            if (len(lines) > after
+                    and (screen is None or latest.get("screen") == screen)
+                    and (required_control is None or required_control in latest.get("controls", {}))
+                    and (predicate is None or predicate(latest))):
+                return latest
+        time.sleep(1)
+    observed = {} if latest is None else {
+        "screen": latest.get("screen"), "controls": sorted(latest.get("controls", {}))}
+    raise RuntimeError("No matching village runtime state: " + str(screen)
+                       + "; required control: " + str(required_control)
+                       + "; last observed: " + json.dumps(observed, sort_keys=True))
+
+
 def runtime_error_lines(text):
     pattern = re.compile(
         r"SCRIPT ERROR:|Parse Error:|FATAL EXCEPTION|Fatal signal|"
@@ -227,22 +259,12 @@ def main():
         wait_marker("IMPERATHEN_OPENING_COMPLETE")
         record("objective_hands_over_control", True, "Actual touch accepted the objective after a separate skip action")
 
-    def village_snapshot(screen=None, *, predicate=None, after=-1, timeout=100):
-        marker = "IMPERATHEN_VILLAGE_RUNTIME "
-        deadline = time.monotonic() + timeout
-        while time.monotonic() < deadline:
-            text = checked_logs()
-            if text.count(marker) > after:
-                lines = [line for line in text.splitlines() if marker in line]
-                if lines:
-                    value = json.loads(lines[-1].split(marker, 1)[1])
-                    if (screen is None or value.get("screen") == screen) and (predicate is None or predicate(value)):
-                        return value
-            time.sleep(1)
-        raise RuntimeError("No matching village runtime state: " + str(screen))
+    def village_snapshot(screen=None, *, predicate=None, required_control=None, after=-1, timeout=100):
+        return wait_for_village_snapshot(checked_logs, screen, predicate=predicate,
+                                         required_control=required_control, after=after, timeout=timeout)
 
-    def village_control(name, screen):
-        state = village_snapshot(screen)
+    def village_control(name, screen, *, after=-1):
+        state = village_snapshot(screen, required_control=name, after=after)
         for _ in range(14):
             control = state.get("controls", {}).get(name)
             if control is None:
@@ -256,9 +278,9 @@ def main():
                 raise RuntimeError("A clipped village control has no visible scroll area: " + name)
             top, bottom = scroll["top"], scroll["bottom"]
             start, end = (bottom, top) if control["center"][1] > top[1] else (top, bottom)
-            previous = checked_logs().count("IMPERATHEN_VILLAGE_RUNTIME ")
+            previous = checked_logs().count(VILLAGE_RUNTIME_MARKER)
             adb("shell", "input", "swipe", *(str(round(v)) for v in (*start, *end)), "600")
-            state = village_snapshot(screen, after=previous)
+            state = village_snapshot(screen, required_control=name, after=previous)
         raise RuntimeError("Could not scroll the actual village control into view: " + name)
 
     def exercise_village_life():
@@ -276,8 +298,10 @@ def main():
         village_snapshot("playing")
         record("village_back_closes_dialogue", True, "Android Back returned from the real steward conversation")
         tap(village_control("village", "playing")["center"])
-        tap(village_control("work_tab", "village_panel")["center"])
-        selector = village_control("aelia_assignment", "village_panel")
+        work_tab = village_control("work_tab", "village_panel")
+        previous = checked_logs().count(VILLAGE_RUNTIME_MARKER)
+        tap(work_tab["center"])
+        selector = village_control("aelia_assignment", "village_panel", after=previous)
         record("village_unassigned_resident", selector.get("selected") == 0, selector)
         tap(selector["center"])
         # The native OptionButton popup is opened by the real touch above. Its

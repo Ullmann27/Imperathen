@@ -6,6 +6,7 @@ extends SceneTree
 const Entry = preload("res://main.tscn")
 const Life = preload("res://scripts/story/village_life.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
+const VillageDiagnostics = preload("res://scripts/ui/android_village_diagnostics.gd")
 var game
 var checks := 0
 var failures: Array[String] = []
@@ -103,7 +104,30 @@ func _run() -> void:
 	_check(game.model.data.buildings.size()==1 and game.model.data.buildings[0].completed,"The legal placement command and real work complete the first home")
 	_check(game.model.data.player.age==12 and not Life.training_ready(game.model.data),"A single home no longer skips the lived village phase")
 
-	await _open_panel("work")
+	# Exercise the Android failure path through native touch and the real UI
+	# dispatcher, then inspect the same read-only observer used by the APK run.
+	# The overview and work tab share a screen name but have different controls.
+	var diagnostics := VillageDiagnostics.new()
+	diagnostics.session = game
+	game.add_child(diagnostics)
+	diagnostics.set_process(false)
+	await _open_panel("overview")
+	var overview_snapshot: Dictionary = diagnostics.snapshot()
+	_check(overview_snapshot.get("screen", "") == "village_panel" and overview_snapshot.controls.has("work_tab") and not overview_snapshot.controls.has("aelia_assignment"), "The real overview snapshot cannot stand in for the work tab")
+	await _tap("Arbeit & Versorgung")
+	await _frames()
+	var work_snapshot: Dictionary = diagnostics.snapshot()
+	_check(game.ui.get("_village_tab") == "work" and work_snapshot.controls.has("aelia_assignment"), "A native touch reaches the work tab and exposes Aelia in a new diagnostic snapshot")
+	_check(work_snapshot.controls.get("aelia_assignment", {}).get("enabled", false), "The diagnostic selector is enabled after the real steward's permission")
+	var aelia_selector := _selector("Aelia")
+	if aelia_selector != null:
+		var work_scrolls: Array[Node] = game.ui.get("_screen").find_children("*", "ScrollContainer", true, false)
+		if not work_scrolls.is_empty():
+			(work_scrolls[0] as ScrollContainer).ensure_control_visible(aelia_selector)
+			await _frames()
+	var visible_snapshot: Dictionary = diagnostics.snapshot()
+	_check(visible_snapshot.controls.get("aelia_assignment", {}).get("visible", false), "Scrolling reveals the actual enabled Aelia selector inside the clipped work panel")
+	_check(_person("aelia").assignment == "idle", "Opening and inspecting work controls does not invent a worker assignment")
 	_check(game.screen=="village_panel" and game.ui.get("_view_state")=="village","The HUD opens the actual work panel")
 	_modal_bounds("landscape workplace panel")
 	await _assign("Fabius",2)
@@ -335,15 +359,34 @@ func _open_panel(tab: String) -> void:
 	if game.screen!="playing":
 		game.ui.action_requested.emit("resume",{})
 	await _frames()
-	_click("Dorfleben")
+	await _tap("Dorfleben")
 	await _frames()
 	if tab=="work":
-		_click("Arbeit & Versorgung")
+		await _tap("Arbeit & Versorgung")
 	elif tab=="map":
-		_click("Region")
+		await _tap("Region")
 	elif tab=="people":
-		_click("Menschen & Berufe")
+		await _tap("Menschen & Berufe")
 	await _frames()
+
+
+func _tap(prefix: String) -> void:
+	for node: Node in _nodes(game.ui.get("_screen")):
+		if node is Button and not node is OptionButton and node.text.begins_with(prefix):
+			_check(not node.disabled and node.is_visible_in_tree(), "The native touch target is available: " + prefix)
+			if node.disabled or not node.is_visible_in_tree():
+				return
+			var point: Vector2 = node.get_global_rect().get_center()
+			_check(root.get_visible_rect().has_point(point), "The native touch target is inside the viewport: " + prefix)
+			for down in [true, false]:
+				var event := InputEventScreenTouch.new()
+				event.index = 0
+				event.position = point
+				event.pressed = down
+				Input.parse_input_event(event)
+				await process_frame
+			return
+	_check(false, "Missing native touch target: " + prefix)
 
 
 func _assign(name: String, selection: int) -> void:

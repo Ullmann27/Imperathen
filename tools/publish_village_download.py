@@ -51,6 +51,28 @@ def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def find_release(tag: str) -> dict | None:
+    # REST /releases/tags/{tag} only finds published releases. Resolve the
+    # pending tag through GraphQL as gh release does, then read the known ID.
+    # A failed or incomplete lookup must never create a second draft.
+    owner, repository = REPO.split("/", 1)
+    query = ("query($owner:String!,$repository:String!,$tag:String!){"
+             "repository(owner:$owner,name:$repository){release(tagName:$tag){databaseId}}}")
+    result = json.loads(gh("api", "graphql", "-f", "query=" + query,
+                           "-f", "owner=" + owner, "-f", "repository=" + repository,
+                           "-f", "tag=" + tag))
+    require(not result.get("errors"), "Release lookup returned GraphQL errors")
+    repository_result = (result.get("data") or {}).get("repository")
+    require(isinstance(repository_result, dict) and "release" in repository_result,
+            "Release lookup did not return repository data")
+    release = repository_result["release"]
+    if release is None:
+        return None
+    require(isinstance(release, dict) and type(release.get("databaseId")) is int
+            and release["databaseId"] > 0, "Release lookup returned an invalid ID")
+    return api(f"releases/{release['databaseId']}")
+
+
 def verify_run(source: str, run_id: str, number: str) -> None:
     run = api(f"actions/runs/{run_id}")
     for key, value in {"head_sha": source, "head_branch": BRANCH,
@@ -176,7 +198,7 @@ def publish(public: Path, temporary: Path, source: str, run_id: str, proof: dict
              "Ein direktes Update über frühere Prüfbauten und die Übernahme ihrer App-Daten sind daher nicht zugesagt. "
              "Eine vorhandene Installation mit wichtigem Spielstand nicht ungeprüft deinstallieren.\n\n"
              f"SHA-256: `{proof['sha256']}`.\n")
-    release = api("releases/tags/" + tag, missing_ok=True)
+    release = find_release(tag)
     if release is None:
         request = temporary / "create-release.json"
         request.write_text(json.dumps({"tag_name": tag, "target_commitish": source,
