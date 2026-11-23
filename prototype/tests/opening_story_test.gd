@@ -34,7 +34,10 @@ func _test_historical_prologue() -> void:
 	for beat: Dictionary in sequence.beats:
 		valid = valid and beat.shot_id in Opening.SHOT_IDS and str(beat.text).length() > 0 and float(beat.duration) > 0.0
 	_check(valid, "Every historical cold-open beat uses a registered camera shot")
-	_check(str(sequence.beats[2].text).contains("was du gesehen hast") and str(sequence.beats[4].text).contains("falschen Annahme"), "The Caesar production dialogue remains source-derived")
+	_check(str(sequence.beats[2].text).contains("was du gesehen hast") and str(sequence.beats[3].text).contains("Wenn du Zweifel hast") and str(sequence.beats[4].text).contains("Brot, Wege und Befehle"), "The Caesar and Labienus production dialogue remains source-derived")
+	var serialized := JSON.stringify(sequence)
+	_check(not serialized.contains("persistenten Weltzustand") and not serialized.contains("abstrakten Menü") and not serialized.contains("HISTORICAL CORE"), "The cinematic never exposes implementation or production jargon to the player")
+	_check(sequence.get("source_mission_id", "") == "I-00" and str(sequence.get("historical_source", "")).contains("Bellum Gallicum I.10"), "I-00 retains an explicit source anchor without presenting dramatized dialogue as quotation")
 	var childhood: Dictionary = Opening.childhood()
 	_check(childhood.location.contains("58 v. Chr.") and not childhood.location.contains("100 n. Chr."), "The family opening now displays the same 58 BCE campaign date as the domain state")
 	_check(JSON.stringify(model.data) == before, "Reading I-00 and the family opening cannot mutate the saved campaign")
