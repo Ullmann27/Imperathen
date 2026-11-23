@@ -2,7 +2,8 @@ extends RefCounted
 ## Authored childhood chapters. Only explicit, nearby actions advance their order.
 ## This optional state is created for fresh games; loading a legacy save never adds it.
 
-const VERSION := 2\nconst LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
+const VERSION := 2
+const LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
 const POINT_RANGE := 1.6
 const MAX_RESOURCE := 1000000
@@ -18,9 +19,9 @@ const POINTS := {
 	"sick_guard":Vector2(10.0,18.5)
 }
 const EXTRA_NPCS := {
-	"julia":{"name":"Julia", "role":"Deine Mutter · Töpferin", "point":"mother", "profession":""},
-	"silvanus":{"name":"Silvanus", "role":"Dein Vater · Zimmermann", "point":"father", "profession":""},
-	"sextus":{"name":"Sextus", "role":"Dorfschmied", "point":"smith", "profession":"smith"}
+	"julia":{"name":"Julia", "role":"Deine Mutter", "point":"mother", "profession":""},
+	"silvanus":{"name":"Silvanus", "role":"Dein Vater", "point":"father", "profession":""},
+	"sextus":{"name":"Sextus", "role":"Dorfschmied · Freund deines Vaters", "point":"smith", "profession":"smith"}
 }
 const NEIGHBORS := {
 	"decimus":{"name":"Decimus", "role":"Dorfverwalter", "position":Vector2(2.0,9.0), "text":"Deine Eltern wohnen schon lange hier. Schau dir das Dorf an und halte die Zusagen, die du den Nachbarn gibst. Die Amtsgeschäfte erledigen wir Erwachsenen."},
@@ -470,7 +471,7 @@ static func validate(data: Dictionary) -> String:
 			return "Die eigene Familie darf nicht nachträglich unbekannt sein."
 		if _person(data,id).is_empty():
 			return "Eine Familien- oder Lehrperson fehlt im gemeinsamen Einwohnerroster."
-	if child.relationships.quintus.helped != child.completed.has("deliver_kindling") or child.relationships.quintus.learned != (expected_apprenticeship == "apprentice"):
+	if child.relationships.sextus.helped != child.completed.has("deliver_kindling") or child.relationships.sextus.learned != (expected_apprenticeship == "apprentice"):
 		return "Sextus’ Hilfe und Lehre müssen durch die gemeinsame Auftragsfolge belegt sein."
 	var current := _current(data)
 	var limit := float(current.get("seconds", 0.0))
