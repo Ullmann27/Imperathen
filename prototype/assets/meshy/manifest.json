@@ -7,7 +7,7 @@
   "target_engine": "Godot 4.7.2",
   "target_platform": "Android primary; PC portable GLB path",
   "binary_delivery_status": "not_committed_from_this_session",
-  "binary_delivery_note": "Meshy tasks succeeded and expose downloadable GLB files, but this session cannot transfer the signed Meshy binary URLs into the repository. Runtime integration must wait for the exact GLBs to be downloaded and validated.",
+  "binary_delivery_note": "Meshy tasks expose downloadable GLB files, but this session cannot transfer the signed Meshy binary URLs into the repository. Runtime integration waits for the exact GLBs to be downloaded and validated. Canonical horse and galena entries are currently geometry-ready but untextured.",
   "import_contract": {
     "source_format": "glb",
     "scene_scale": "1 unit = 1 meter",
@@ -451,6 +451,21 @@
       "rigging_required": false,
       "runtime_ready": false,
       "historical_status": "natural_resource"
+    },
+    {
+      "stable_id": "mount_ancient_cavalry_horse",
+      "category": "mount",
+      "display_name": "Ancient cavalry horse",
+      "status": "geometry_ready_untextured",
+      "meshy_task_id": null,
+      "meshy_preview_task_id": "01a20934-c44a-77ea-95a7-5e2c2c804d5e",
+      "intended_source_path": "prototype/assets/meshy/source/mount/mount_ancient_cavalry_horse.glb",
+      "format": "glb",
+      "texture_profile": "none",
+      "target_polycount": 28000,
+      "rigging_required": true,
+      "runtime_ready": false,
+      "historical_status": "historically_grounded_game_mount"
     }
   ],
   "legacy_generated_unmapped": [
