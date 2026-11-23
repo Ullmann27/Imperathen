@@ -93,7 +93,7 @@ func _test_fresh_opt_in_and_legacy() -> void:
 	var model = _new()
 	_check(model.data.village.economy.people.size() == 14 and Life.npc_catalog(model.data).size() == 10, "Parents and smith reuse the fourteen real adults and expand seven dialogue people to ten")
 	_check(model.data.buildings.is_empty() and _current(model) == "mother_morning", "Family beginning needs no newly built hut")
-	_check(Life.relationship(model.data, "antonia").met and Life.relationship(model.data, "sextus").met and not Life.relationship(model.data, "quintus").met, "Parents are already known; the smith is met in play")
+	_check(Life.relationship(model.data, "julia").met and Life.relationship(model.data, "silvanus").met and not Life.relationship(model.data, "sextus").met, "Parents are already known; the smith is met in play")
 	for place: Dictionary in model.data.village.economy.workplaces.values():
 		_check(place.condition == 100, "The fresh existing village is not a ruin awaiting reconstruction")
 	_check(Economy.day_length(model.data) == 3600.0 and model.data.village.childhood.day == 1, "Narrative day one and the longer economic cycle are distinct")
@@ -127,7 +127,7 @@ func _test_idle_and_bypasses() -> void:
 	_check(model.data.village.economy.day == 0 and model.data.village.economy.day_seconds > 599.9, "Six hundred seconds do not turn into five economic days")
 	_check(not Life.training_ready(model.data), "The legacy training gate stays closed")
 	var before := _snapshot(model.data)
-	for item: Array in [["train", {}], ["village_childhood_begin_raid", {}], ["village_request_work", {}], ["village_assign", {"resident_id":"quintus", "workplace_id":"quarry"}], ["village_shift", {"resident_id":"severus", "duty":"defense"}], ["frontier_talk", {"npc_id":"marcus"}]]:
+	for item: Array in [["train", {}], ["village_childhood_begin_raid", {}], ["village_request_work", {}], ["village_assign", {"resident_id":"sextus", "workplace_id":"quarry"}], ["village_shift", {"resident_id":"severus", "duty":"defense"}], ["frontier_talk", {"npc_id":"marcus"}]]:
 		_check(not model.execute(item[0], item[1]).ok and _snapshot(model.data) == before, "Old authority or chapter shortcut is atomically rejected: " + str(item[0]))
 	_meet(model, "cassia")
 	before = _snapshot(model.data)
@@ -140,7 +140,7 @@ func _test_action_transactions() -> void:
 	_at(model, Vector2(70.0, 70.0))
 	var before := _snapshot(model.data)
 	_check(not _action(model, "mother_morning").ok and _snapshot(model.data) == before, "Remote parent action cannot advance or grant an item")
-	_near(model, "antonia")
+	_near(model, "julia")
 	before = _snapshot(model.data)
 	for args: Dictionary in [{"action_id":"night_rest"}, {"action_id":"unknown"}, {"action_id":"mother_morning", "denarii":999}, {"action_id":42}, {"action_id":NAN}, {}]:
 		_check(not model.execute("village_childhood_action", args).ok and _snapshot(model.data) == before, "Out-of-order, fabricated or malformed quest command stays atomic")
@@ -210,7 +210,7 @@ func _test_full_journey_and_guard() -> void:
 	if not _until(model, "patrol_inner"):
 		return
 	_check(model.data.village.childhood.day == 3 and model.data.village.childhood.apprenticeship == "apprentice" and model.data.village.social.profession == "smith", "Actual trial work, delivery, trust and family rest establish a beginning apprenticeship")
-	_check(model.data.village.childhood.relationships.quintus.learned and model.data.village.childhood.relationships.quintus.trust >= 8, "The smith records earned trust and the agreed apprenticeship")
+	_check(model.data.village.childhood.relationships.sextus.learned and model.data.village.childhood.relationships.sextus.trust >= 8, "The smith records earned trust and the agreed apprenticeship")
 	_check(model.data.village.social.ledger.denarii == 4, "The first delivery and fair-price choice pay exactly four real denarii")
 	_at(model, Childhood.POINTS.patrol_gate)
 	var before := _snapshot(model.data)
@@ -299,7 +299,7 @@ func _test_branch_and_replay() -> void:
 	_ok(_action(model, "market_fair", "fair-once"), "Choose the agreed full price")
 	_ok(_action(other, "market_neighbor", "neighbor-once"), "Choose the voluntary one-denarius neighbor concession")
 	_check(model.data.resources.denarii == other.data.resources.denarii + 1 and model.data.village.social.ledger.denarii == other.data.village.social.ledger.denarii + 1, "The trade choice changes real money and its conservation ledger together")
-	_check(other.data.village.childhood.relationships.antonia.trust == model.data.village.childhood.relationships.antonia.trust + 2, "Voluntary help has a distinct relationship consequence")
+	_check(other.data.village.childhood.relationships.julia.trust == model.data.village.childhood.relationships.julia.trust + 2, "Voluntary help has a distinct relationship consequence")
 	var before := _snapshot(other.data)
 	_ok(_action(other, "market_neighbor", "neighbor-once"), "Replay the saved market decision")
 	_check(_snapshot(other.data) == before and not _action(other, "market_fair").ok and _snapshot(other.data) == before, "The alternative cannot be collected after the saved choice")
@@ -317,11 +317,11 @@ func _test_invalid_persistence_and_read_isolation() -> void:
 		bad.village.childhood[key] = {"day":2, "version":true, "gear":"loaned", "night_event":"released", "completed":["night_rest"], "carried":["family_parcel"], "active_work":"forge_bellows", "work_seconds":NAN}[key]
 		invalids.append(bad)
 	var absent: Dictionary = model.data.duplicate(true)
-	absent.village.childhood.relationships.erase("antonia")
+	absent.village.childhood.relationships.erase("julia")
 	invalids.append(absent)
 	var apprentice: Dictionary = model.data.duplicate(true)
-	apprentice.village.childhood.relationships.quintus.met = true
-	apprentice.village.childhood.relationships.quintus.learned = true
+	apprentice.village.childhood.relationships.sextus.met = true
+	apprentice.village.childhood.relationships.sextus.learned = true
 	invalids.append(apprentice)
 	var parent: Dictionary = model.data.duplicate(true)
 	parent.village.childhood.relationships.sextus.met = false
@@ -342,15 +342,15 @@ func _test_invalid_persistence_and_read_isolation() -> void:
 	var before := _snapshot(model.data)
 	_check(not model.load_game(_path("forged")).ok and _snapshot(model.data) == before, "A correctly checksummed but contradictory save cannot replace the live world")
 	var display: Dictionary = Childhood.view(model.data)
-	display.relationships.antonia.trust = 99
+	display.relationships.julia.trust = 99
 	display.carried.append("Invented goods")
-	var relation: Dictionary = Life.relationship(model.data, "antonia")
+	var relation: Dictionary = Life.relationship(model.data, "julia")
 	relation.trust = -100
 	var catalog: Array[Dictionary] = Life.npc_catalog(model.data)
 	catalog.back().name = "Invented name"
 	_check(_snapshot(model.data) == before, "Mutating returned UI views, relationship copies or catalogs cannot alter authoritative state")
 	var copy: Dictionary = model.data.duplicate(true)
-	_check(Childhood.view(copy).objective.length() > 0 and Childhood.dialogue(copy, "antonia").choices.size() == 1, "Fresh state exposes an actionable family conversation")
+	_check(Childhood.view(copy).objective.length() > 0 and Childhood.dialogue(copy, "julia").choices.size() == 1, "Fresh state exposes an actionable family conversation")
 
 
 func _person(model, id: String) -> Dictionary:
