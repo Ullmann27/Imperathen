@@ -245,6 +245,74 @@ def activate_observed_village_popup(observe_popup, press_key, target_text, *,
         moves += 1
 
 
+def action_runtime_state(snapshot):
+    """Validate the new read-only action observation; missing fields never pass."""
+    state = snapshot.get("action_runtime") if isinstance(snapshot, dict) else None
+    if not isinstance(state, dict) or type(state.get("version")) is not int or state.get("version") != 1:
+        raise RuntimeError("Missing or unsupported actual action runtime observation")
+    for name, length in (("position", 3), ("velocity", 3), ("body_velocity", 3), ("move_axis", 2)):
+        values = state.get(name)
+        if (not isinstance(values, list) or len(values) != length
+                or not all(type(value) in (int, float) and math.isfinite(value) for value in values)):
+            raise RuntimeError("Invalid observed action vector: " + name)
+    for name in ("world_active", "running", "touch_camera_managed"):
+        if type(state.get(name)) is not bool:
+            raise RuntimeError("Invalid observed action flag: " + name)
+    for name in ("movement_touch", "camera_touches", "action_touches", "world_camera_touches"):
+        value = state.get(name)
+        minimum = -1 if name == "movement_touch" else 0
+        if type(value) is not int or not minimum <= value <= 32:
+            raise RuntimeError("Invalid observed action contact count: " + name)
+    if state.get("mode") not in ("person", "city", "map"):
+        raise RuntimeError("Invalid observed action mode")
+    if state.get("overlay") not in ("none", "techniques", "commands"):
+        raise RuntimeError("Invalid observed action overlay")
+    if not isinstance(state.get("selected_technique"), str):
+        raise RuntimeError("Missing observed technique selection")
+    return state
+
+
+def action_input_is_neutral(snapshot):
+    state = action_runtime_state(snapshot)
+    return (state["movement_touch"] == -1
+            and state["camera_touches"] == state["action_touches"] == state["world_camera_touches"] == 0
+            and math.hypot(*state["move_axis"]) <= 0.001
+            and math.hypot(state["body_velocity"][0], state["body_velocity"][2]) <= 0.05)
+
+
+def action_position_distance(before, after):
+    first = action_runtime_state(before)["position"]
+    second = action_runtime_state(after)["position"]
+    return math.hypot(first[0] - second[0], first[2] - second[2])
+
+
+def observed_movement_points(control, direction="right"):
+    """Use points observed from the actual pad, never a screen-size guess."""
+    if (not isinstance(control, dict) or control.get("visible") is not True
+            or control.get("enabled") is not True):
+        raise RuntimeError("The actual movement pad is not visible and enabled")
+    rect = control.get("rect")
+    if (not isinstance(rect, list) or len(rect) != 4
+            or not all(type(value) in (int, float) and math.isfinite(value) for value in rect)
+            or min(rect[2:]) <= 0):
+        raise RuntimeError("The actual movement pad has invalid native bounds")
+    points = control.get("axis_points")
+    if not isinstance(points, dict) or direction not in ("left", "right", "up", "down"):
+        raise RuntimeError("The actual movement pad has no requested native axis")
+    selected = []
+    for name in ("center", direction):
+        point = points.get(name)
+        if (not isinstance(point, list) or len(point) != 2
+                or not all(type(value) in (int, float) and math.isfinite(value) for value in point)
+                or not rect[0] <= point[0] <= rect[0] + rect[2]
+                or not rect[1] <= point[1] <= rect[1] + rect[3]):
+            raise RuntimeError("The observed movement point is outside the actual pad: " + name)
+        selected.append(tuple(point))
+    if math.dist(*selected) < 4:
+        raise RuntimeError("The observed movement gesture has no usable displacement")
+    return tuple(selected)
+
+
 def runtime_error_lines(text):
     pattern = re.compile(
         r"SCRIPT ERROR:|Parse Error:|FATAL EXCEPTION|Fatal signal|"
@@ -285,14 +353,18 @@ def main():
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(args.apk) as archive:
-        has_village_life = any(name.startswith("assets/scripts/story/village_life.")
-                               for name in archive.namelist())
+        entries = archive.namelist()
+        has_village_life = any(name.startswith("assets/scripts/story/village_life.") for name in entries)
+        has_action_controls = (has_village_life
+                               and any(name.startswith("assets/scripts/ui/touch_look.") for name in entries)
+                               and any(name.startswith("assets/scripts/domain/combat_actions.") for name in entries))
     package = "at.heinz.imperathen"
     report = {"platform": "Android emulator", "apk_sha256": hashlib.sha256(args.apk.read_bytes()).hexdigest(), "physical_device_test": False,
               "arm64_runtime_test": False, "status": "failed", "checks": [], "errors": []}
     report["source_commit"] = os.environ.get("IMPERATHEN_APK_COMMIT", os.environ.get("GITHUB_SHA"))
     report["test_harness_commit"] = os.environ.get("GITHUB_SHA")
     report["apk_file"] = args.apk.name
+    report["action_controls_expected"] = has_action_controls
     serial = ""
     verified_emulator = False
 
@@ -530,6 +602,89 @@ def main():
         village_snapshot("playing", predicate=lambda state: state.get("aelia_assignment") == "woodcamp")
         record("village_back_closes_work_panel", True, "The worker stays assigned when the work panel closes")
 
+    def verify_action_rest(screen, stage):
+        previous = village_runtime_cursor(checked_logs())
+        first = village_snapshot(screen, after=previous, predicate=action_input_is_neutral)
+        state = action_runtime_state(first)
+        record(stage + "_neutral_inputs", state["mode"] == "person" and state["overlay"] == "none", state)
+        previous = village_runtime_cursor(checked_logs())
+        second = village_snapshot(screen, after=previous, predicate=action_input_is_neutral)
+        distance = action_position_distance(first, second)
+        record(stage + "_no_player_drift", distance <= 0.05,
+               {"distance_m": distance, "first": first["action_runtime"], "second": second["action_runtime"]})
+        return second
+
+    def exercise_action_controls():
+        initial = village_snapshot("playing", required_control="move_pad")
+        state = action_runtime_state(initial)
+        record("action_hud_from_new_childhood", initial.get("action_mode") == "unarmed"
+               and state["mode"] == "person" and state["ui_view"] == "game"
+               and state["touch_camera_managed"] and not state["running"], state)
+        control = stable_village_control("move_pad", "playing")
+        start, finish = observed_movement_points(control)
+        before = village_snapshot("playing", predicate=action_input_is_neutral)
+        previous = village_runtime_cursor(checked_logs())
+        adb("shell", "input", "swipe", *(str(round(v)) for v in (*start, *finish)), "1400")
+        moved = village_snapshot("playing", after=previous,
+                                 predicate=lambda item: action_input_is_neutral(item)
+                                 and action_position_distance(before, item) >= 0.10)
+        distance = action_position_distance(before, moved)
+        record("native_pad_moves_actual_player", distance >= 0.10,
+               {"input": "adb input swipe", "start": start, "finish": finish,
+                "duration_ms": 1400, "distance_m": distance,
+                "before": before["action_runtime"], "after": moved["action_runtime"]})
+        verify_action_rest("playing", "released_movement")
+        for running in (True, False):
+            pace = stable_village_control("pace", "playing")
+            previous = village_runtime_cursor(checked_logs())
+            tap(pace["center"])
+            changed = village_snapshot("playing", after=previous,
+                                       predicate=lambda item: action_runtime_state(item)["running"] is running)
+            record("native_tap_selects_running" if running else "native_tap_restores_walking", True,
+                   changed["action_runtime"])
+        techniques = stable_village_control("techniques", "playing")
+        previous = village_runtime_cursor(checked_logs())
+        tap(techniques["center"])
+        opened = village_snapshot("playing", required_control="technique_jab_right", after=previous,
+                                  predicate=lambda item: action_runtime_state(item)["overlay"] == "techniques")
+        record("native_tap_opens_techniques", action_input_is_neutral(opened), opened)
+        screenshot("14_android_techniques.png")
+        choice = stable_village_control("technique_jab_right", "playing")
+        previous = village_runtime_cursor(checked_logs())
+        tap(choice["center"])
+        chosen = village_snapshot("playing", required_control="attack", after=previous,
+                                 predicate=lambda item: action_runtime_state(item)["selected_technique"] == "jab_right"
+                                 and action_runtime_state(item)["overlay"] == "none")
+        record("native_tap_selects_right_straight", action_input_is_neutral(chosen), chosen)
+        help_text = adb("shell", "input", "help", checked=False)
+        record("native_pointer_command_available", "motionevent" in help_text,
+               "The verified Android input command advertises native pointer DOWN/UP support")
+        control = stable_village_control("move_pad", "playing")
+        _, held_point = observed_movement_points(control)
+        native_point = tuple(str(round(value)) for value in held_point)
+        previous = village_runtime_cursor(checked_logs())
+        pointer_down = False
+        try:
+            adb("shell", "input", "motionevent", "DOWN", *native_point)
+            pointer_down = True
+            held = village_snapshot("playing", after=previous,
+                                    predicate=lambda item: action_runtime_state(item)["movement_touch"] >= 0
+                                    and math.hypot(*action_runtime_state(item)["move_axis"]) > 0.3,
+                                    timeout=60)
+            record("native_pointer_is_held_before_pause", True, held["action_runtime"])
+            previous = village_runtime_cursor(checked_logs())
+            adb("shell", "input", "keyevent", "4")
+            paused = village_snapshot("paused", after=previous, predicate=action_input_is_neutral)
+            record("pause_cancels_held_native_pointer", not action_runtime_state(paused)["world_active"],
+                   paused["action_runtime"])
+        finally:
+            if pointer_down:
+                adb("shell", "input", "motionevent", "UP", *native_point)
+        previous = village_runtime_cursor(checked_logs())
+        adb("shell", "input", "keyevent", "4")
+        village_snapshot("playing", after=previous, predicate=action_input_is_neutral)
+        verify_action_rest("playing", "resume_after_held_pointer")
+
     def relaunch(diagnostics=False):
         previous = report["pid"]
         (args.output / ("logcat-" + previous + ".txt")).write_text(logs(), encoding="utf-8")
@@ -617,6 +772,8 @@ def main():
         finish_first_day_opening()
         if has_village_life:
             exercise_village_life()
+        if has_action_controls:
+            exercise_action_controls()
         time.sleep(3)
         dismiss_fullscreen_hint("world")
         screenshot("02_android_world.png")
@@ -644,6 +801,8 @@ def main():
             record("village_decisions_survive_restart", restored.get("decimus_met") is True
                    and restored.get("work_permit") is True and restored.get("aelia_assignment") == "woodcamp"
                    and restored.get("people") == 14 and restored.get("player_is_ruler") is False, restored)
+        if has_action_controls:
+            verify_action_rest("playing", "restart_action_controls")
         practice_menu = relaunch(diagnostics=True)
         tap(practice_menu["demo"])
         valley_ready = wait_marker("IMPERATHEN_VALLEY_READY")

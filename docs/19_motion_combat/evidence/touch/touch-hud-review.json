@@ -1,0 +1,124 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "captures": [
+    {
+      "file": "phone-1280x720.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "quality": "balanced",
+      "screen": "playing",
+      "ui_state": "game"
+    },
+    {
+      "file": "fold-884x760.png",
+      "pixels": [
+        884,
+        760
+      ],
+      "quality": "balanced",
+      "screen": "playing",
+      "ui_state": "game"
+    },
+    {
+      "file": "fold-techniques-884x760.png",
+      "pixels": [
+        884,
+        760
+      ],
+      "quality": "balanced",
+      "screen": "playing",
+      "ui_state": "game"
+    }
+  ],
+  "checks": [
+    {
+      "message": "The actual new childhood start is playable",
+      "ok": true
+    },
+    {
+      "message": "Main routes touch-camera ownership to the actual world",
+      "ok": true
+    },
+    {
+      "message": "Android geometry observer does not mutate authoritative state",
+      "ok": true
+    },
+    {
+      "message": "Android observer identifies the actual new action mode",
+      "ok": true
+    },
+    {
+      "message": "Android observer exposes current HUD controls including the renamed Dorf button",
+      "ok": true
+    },
+    {
+      "message": "Android movement coordinates come from the actual visible pad",
+      "ok": true
+    },
+    {
+      "message": "Actual rendered capture: phone-1280x720",
+      "ok": true
+    },
+    {
+      "message": "Android observer reports all three actual held native contacts",
+      "ok": true
+    },
+    {
+      "message": "One native camera drag changes actual yaw exactly once while move and attack are held",
+      "ok": true
+    },
+    {
+      "message": "The actual world retains simultaneous movement",
+      "ok": true
+    },
+    {
+      "message": "The world's old contact path cannot capture the same finger",
+      "ok": true
+    },
+    {
+      "message": "Releasing movement forwards the neutral axis into the actual world",
+      "ok": true
+    },
+    {
+      "message": "Pause uses the actual main screen transition",
+      "ok": true
+    },
+    {
+      "message": "Android observer confirms neutral captures in the actual pause screen",
+      "ok": true
+    },
+    {
+      "message": "Resume has no old camera contact in either input owner",
+      "ok": true
+    },
+    {
+      "message": "Actual rendered capture: fold-884x760",
+      "ok": true
+    },
+    {
+      "message": "Actual rendered capture: fold-techniques-884x760",
+      "ok": true
+    },
+    {
+      "message": "Android observer exposes selectable techniques without blocked controls behind the modal",
+      "ok": true
+    }
+  ],
+  "engine": "4.7.2-stable (official)",
+  "renderer": "gl_compatibility",
+  "source": "Actual main.tscn with a fresh childhood game and native multi-touch events",
+  "source_sha256": {
+    "prototype/scripts/ui/game_ui.gd": "fe81424e1329f5a44c3610e49f21468686736447ac9083119c180b552d7e53e3",
+    "prototype/scripts/ui/touch_pad.gd": "630008051d4a42dfddcfeecfe6c0e595892de24d297cec0f8e805cbd5e6f8541",
+    "prototype/scripts/ui/touch_action.gd": "1ac1671fcc48f6613d1689286655beaa5fe40a096804545162fc8011fd4d4f6b",
+    "prototype/scripts/ui/touch_look.gd": "3978ef6f09c854459fbfdd3626f3ec75fdd9538a48e7513ffb3a1c2a8a58e183",
+    "prototype/scripts/ui/touch_modal.gd": "6d92ed3d5777c60d7b2eb8ca1993e4525628ffcd811955e4f7edc6647a30cf07",
+    "prototype/scripts/ui/android_village_diagnostics.gd": "bde132ba807ce136c036217222aa3143ddfb1ad0e03988e75465b4558c52ed6d",
+    "prototype/tests/touch_hud_review.gd": "4b81f6922014f7af319f608494b35140701b4dec023635952b07049f88c9149c",
+    "prototype/scripts/main.gd": "4063d84a1e429861c6c1d6288d162bd216f0885b0b2506704e8c849f61c8e577",
+    "prototype/scripts/world/game_world.gd": "6df0b9d93ad000206e9057fa63211d439e2ace4d50e4d8cda56d6a93529713d8"
+  }
+}

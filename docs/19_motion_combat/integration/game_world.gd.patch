@@ -1,0 +1,275 @@
+diff --git a/prototype/scripts/world/game_world.gd b/prototype/scripts/world/game_world.gd
+index 5212d6d..ecdef75 100644
+--- a/prototype/scripts/world/game_world.gd
++++ b/prototype/scripts/world/game_world.gd
+@@ -9,6 +9,8 @@ const Origins = preload("res://scripts/strategy/origins.gd")
+ const VillageLifeWorld = preload("res://scripts/world/village_life_world.gd")
+ const VillageLife = preload("res://scripts/story/village_life.gd")
+ const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
++const CombatActions = preload("res://scripts/domain/combat_actions.gd")
++const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
+ var village_life_world: Node3D
+ var regional_terrain: Node3D
+ var _village_focus := ""
+@@ -24,6 +26,8 @@ var tree_sites := []
+ var crops := Node3D.new()
+ var season_index := -1
+ const PLAYER_SPEED := 4.6
++const WALK_SPEED := 1.45
++const CHILD_RUN_SPEED := 3.8
+ const START_YAW := 0.62
+ const START_PITCH := 0.18
+ const PERSON_ZOOM_MIN := 1.25
+@@ -88,6 +92,10 @@ var _enemy_views: Dictionary = {}
+ var _squad_views: Array[Node3D] = []
+ var _frontier_focus := ""
+ var _frontier_camera_direction := Vector3.BACK
++var _running := false
++var _turn_rate := 0.0
++var _touch_camera_managed := false
++var _actions = PlayerActionWorld.new(self)
+ 
+ 
+ func _ready() -> void:
+@@ -115,6 +123,8 @@ func setup(state: Dictionary) -> void:
+ 	else:
+ 		_player.position = Vector3(0, 1, 8)
+ 	_player.velocity = Vector3.ZERO
++	_running = false
++	_actions.reset()
+ 	_camera_yaw = START_YAW
+ 	_camera_pitch = START_PITCH
+ 	_figure.rotation.y = START_YAW
+@@ -178,6 +188,8 @@ func sync_state(state: Dictionary) -> void:
+ 	if not bool(encounter.get("active", false)):
+ 		_resolve_requested = false
+ 	_update_context_hint()
++	_actions.sync(state)
++	_actions.sync_personal_space()
+ 
+ 
+ func set_mode(mode: String) -> void:
+@@ -185,6 +197,9 @@ func set_mode(mode: String) -> void:
+ 		return
+ 	_mode = mode
+ 	if mode != "person":
++		action_requested.emit("combat_interrupt", {})
++		_actions.reset()
++		_dodge_remaining = 0.0
+ 		clear_frontier_focus()
+ 	_reset_touch_input()
+ 	if _player != null:
+@@ -212,6 +227,9 @@ func set_active(active: bool) -> void:
+ 	if active:
+ 		clear_frontier_focus()
+ 	if not active:
++		action_requested.emit("combat_interrupt", {})
++		_actions.reset()
++		_dodge_remaining = 0.0
+ 		_reset_touch_input()
+ 	if _player != null and not active:
+ 		_player.velocity = Vector3.ZERO
+@@ -371,16 +389,55 @@ func perform_interaction() -> void:
+ 		_interact()
+ 
+ 
+-func perform_attack() -> void:
++func perform_attack(technique := "") -> void:
+ 	if _active:
++		if not technique.is_empty():
++			set_selected_technique(technique)
+ 		_attack()
+ 
+ 
++func set_running(value: bool) -> void:
++	_running = value
++
++
++func set_selected_technique(technique: String) -> void:
++	if CombatActions.TECHNIQUES.has(technique):
++		_actions.selected = technique
++
++
++func set_touch_camera_managed(value: bool) -> void:
++	_touch_camera_managed = value
++	_reset_touch_input()
++
++
++func apply_camera_look(relative: Vector2) -> void:
++	if _active and _mode == "person" and relative.is_finite():
++		_camera_yaw = wrapf(_camera_yaw - relative.x * 0.006, -PI, PI)
++		_camera_pitch = clampf(_camera_pitch + relative.y * 0.004, 0.12, 1.10)
++
++
++func apply_camera_zoom(factor: float) -> void:
++	if _active and _mode == "person" and is_finite(factor) and factor > 0.0:
++		_person_zoom = clampf(_person_zoom * clampf(factor, 0.5, 2.0), PERSON_ZOOM_MIN, PERSON_ZOOM_MAX)
++
++
++func sync_combat_state(state: Dictionary) -> void:
++	_actions.sync(state)
++
++
++func combat_sight_clear(from: Vector2, to: Vector2) -> bool:
++	return _actions.sight_clear(from, to)
++
++
++func combat_safe_motion(from: Vector2, to: Vector2) -> Vector2:
++	return _actions.safe_actor_motion(from, to)
++
++
+ func cue_village_defense(action: String) -> void:
+ 	if _active and _figure != null:
+ 		_figure.cue("block" if action == "village_block" else "march")
+ 		if action == "village_dodge":
+-			_dodge_remaining = 0.24
++			_dodge_remaining = 0.26
+ 			_dodge_direction = Vector3.BACK.rotated(Vector3.UP, _figure.rotation.y)
+ 
+ 
+@@ -451,6 +508,9 @@ func _build_scene() -> void:
+ 	add_child(_camera)
+ 	_camera.current = true
+ 	_hint = Art.label(_player, "", Vector3(0, 1.25, 0), Color(1, 0.92, 0.70), 33)
++	_hint.font_size = 28
++	_hint.pixel_size = 0.0019
++	_hint.outline_size = 3
+ 	_hint.visible = false
+ 	village_life_world = VillageLifeWorld.new()
+ 	village_life_world.name = "VillageLife"
+@@ -649,6 +709,9 @@ func _create_companion_and_training() -> void:
+ 	add_child(_companion)
+ 	Art.person(_companion,"companion","italia",12)
+ 	_companion_label = Art.label(_companion, "Marcus · E\nGefährten kennenlernen", Vector3(0, 1.15, 0), Color(0.85, 0.92, 0.74), 36)
++	_companion_label.font_size = 24
++	_companion_label.pixel_size = 0.0024
++	_companion_label.visibility_range_end = 5.0
+ 	var training := Node3D.new()
+ 	training.name = "TrainingGround"
+ 	training.position = TRAINING_LOCATION
+@@ -664,6 +727,9 @@ func _create_companion_and_training() -> void:
+ 		Art.box(training, Vector3(1.5, 0.18, 0.18), Vector3(0, 1.4, 0), _materials["timber"])
+ 		Art.sphere(training, 0.32, Vector3(0, 1.4, 0), _materials["straw"], Vector3(1.0, 1.6, 0.7))
+ 	_training_label = Art.label(training, "Übungsplatz · E", Vector3(0, 2.8, 0), Color(0.97, 0.84, 0.58), 39)
++	_training_label.font_size = 26
++	_training_label.pixel_size = 0.0024
++	_training_label.visibility_range_end = 8.0
+ 	var mentor := Node3D.new()
+ 	mentor.name = "Mentor"
+ 	mentor.position = Vector3(-2.0, 0.9, -1.5)
+@@ -948,12 +1014,24 @@ func _move_player(delta: float) -> void:
+ 		direction.x += float(Input.is_physical_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT))
+ 		direction.z += float(Input.is_physical_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP))
+ 	direction = direction.limit_length(1.0).rotated(Vector3.UP, _camera_yaw)
+-	_player.velocity.x = move_toward(_player.velocity.x, direction.x * PLAYER_SPEED, delta * 22.0)
+-	_player.velocity.z = move_toward(_player.velocity.z, direction.z * PLAYER_SPEED, delta * 22.0)
++	var running := _running or (not editing_text and Input.is_physical_key_pressed(KEY_SHIFT))
++	var top_speed := (CHILD_RUN_SPEED if int(_state.get("player", {}).get("age", 12)) < 18 else PLAYER_SPEED) if running else WALK_SPEED
++	var in_action := CombatActions.busy(_actions.state)
++	var previous_yaw := _figure.rotation.y
++	if direction.length_squared() > 0.01 and not in_action:
++		var desired_yaw := atan2(-direction.x, -direction.z)
++		_figure.rotation.y = rotate_toward(_figure.rotation.y, desired_yaw, delta * (5.5 if running else 4.2))
++		var alignment := maxf(0.0, Vector3.FORWARD.rotated(Vector3.UP, _figure.rotation.y).dot(direction.normalized()))
++		top_speed *= lerpf(0.3, 1.0, alignment)
++	_turn_rate = angle_difference(previous_yaw, _figure.rotation.y) / maxf(delta, 0.000001)
++	var desired := direction * top_speed if not in_action else Vector3.ZERO
++	var acceleration := 9.0 if desired.length_squared() < 0.01 else (8.0 if running else 5.0)
++	_player.velocity.x = move_toward(_player.velocity.x, desired.x, delta * acceleration)
++	_player.velocity.z = move_toward(_player.velocity.z, desired.z, delta * acceleration)
+ 	if _dodge_remaining > 0:
+ 		_dodge_remaining = maxf(0.0, _dodge_remaining - delta)
+-		_player.velocity.x = _dodge_direction.x * 8.0
+-		_player.velocity.z = _dodge_direction.z * 8.0
++		_player.velocity.x = _dodge_direction.x * 3.4
++		_player.velocity.z = _dodge_direction.z * 3.4
+ 	if not _player.is_on_floor():
+ 		_player.velocity.y -= delta * 19.6
+ 	else:
+@@ -961,8 +1039,6 @@ func _move_player(delta: float) -> void:
+ 	_player.move_and_slide()
+ 	_player.position.x = clampf(_player.position.x, -15999.0, 15999.0)
+ 	_player.position.z = clampf(_player.position.z, -15999.0, 15999.0)
+-	if direction.length_squared() > 0.01:
+-		_figure.rotation.y = lerp_angle(_figure.rotation.y, atan2(-direction.x, -direction.z), minf(1.0, delta * 12.0))
+ 
+ 
+ func _pan_city_camera(delta: float) -> void:
+@@ -1024,8 +1100,9 @@ func _update_camera(delta: float) -> void:
+ 
+ 
+ func _animate_figure() -> void:
+-	var speed := Vector2(_player.velocity.x, _player.velocity.z).length()
+-	_figure.drive(speed if _mode == "person" else 0.0)
++	var actual := _player.get_real_velocity()
++	var speed := Vector2(actual.x, actual.z).length()
++	_figure.drive(speed if _mode == "person" else 0.0, _turn_rate)
+ 
+ 
+ func _update_followers(delta: float) -> void:
+@@ -1063,6 +1140,8 @@ func _update_encounter() -> void:
+ 		living += 1
+ 		var location := Vector3(float(enemy.get("x", 0)), 0, float(enemy.get("z", 0)))
+ 		var distance := _horizontal_distance(_player.position, location)
++		if CombatActions.enabled(_actions.state) and not combat_sight_clear(Vector2(location.x, location.z), Vector2(_player.position.x, _player.position.z)):
++			distance = INF
+ 		nearest_distance = minf(nearest_distance, distance)
+ 		var identity := str(enemy.get("id", ""))
+ 		if _enemy_views.has(identity):
+@@ -1084,9 +1163,13 @@ func _unhandled_input(event: InputEvent) -> void:
+ 	if not _active:
+ 		return
+ 	if event is InputEventScreenTouch:
++		if _mode == "person" and _touch_camera_managed:
++			return
+ 		_handle_touch(event as InputEventScreenTouch)
+ 		return
+ 	if event is InputEventScreenDrag:
++		if _mode == "person" and _touch_camera_managed:
++			return
+ 		_handle_touch_drag(event as InputEventScreenDrag)
+ 		return
+ 	# Touch already has a dedicated path. Ignore its emulated duplicate mouse event.
+@@ -1101,9 +1184,9 @@ func _unhandled_input(event: InputEvent) -> void:
+ 			KEY_SPACE:
+ 				_attack()
+ 			KEY_Q:
+-				action_requested.emit("village_block", {})
++				action_requested.emit("village_unarmed_guard" if CombatActions.enabled(_actions.state) else "village_block", {})
+ 			KEY_R:
+-				action_requested.emit("village_dodge", {})
++				action_requested.emit("village_unarmed_dodge" if CombatActions.enabled(_actions.state) else "village_dodge", {})
+ 			KEY_J:
+ 				action_requested.emit("village_panel", {})
+ 			KEY_B:
+@@ -1295,6 +1378,9 @@ func _nearest_visible_npc() -> String:
+ func _attack() -> void:
+ 	if _mode != "person" or _attack_cooldown > 0.0:
+ 		return
++	if CombatActions.enabled(_actions.state):
++		_actions.attack()
++		return
+ 	_attack_cooldown = 0.65
+ 	_attack_animation = 0.28
+ 	if _state.get("village", {}).get("enabled", false) and _state.village.raid.active:
+@@ -1383,7 +1469,7 @@ func _update_context_hint() -> void:
+ 	if village_life_world != null:
+ 		var village_hint: String = village_life_world.hint(_player.position)
+ 		if not village_hint.is_empty():
+-			_hint.text = village_hint
++			_hint.text = village_hint.trim_prefix("Interagieren · ")
+ 			return
+ 	var companion: Dictionary = _state.get("companion", {})
+ 	if _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS and not bool(companion.get("met", false)):
+@@ -1399,7 +1485,10 @@ func _update_context_hint() -> void:
+ 				return
+ 	if _horizontal_distance(_player.position, TRAINING_LOCATION) <= INTERACTION_RADIUS:
+ 		var progress: Dictionary = _state.get("progress", {})
+-		_hint.text = "Ausbildung abgeschlossen" if bool(progress.get("training_complete", false)) else "E · Ausbildung beginnen\nLMB / Leertaste · Übungsschlag"
++		if CombatActions.enabled(_actions.state):
++			_hint.text = "Technik wählen · Am Pfahl üben"
++		else:
++			_hint.text = "Ausbildung abgeschlossen" if bool(progress.get("training_complete", false)) else "E · Ausbildung beginnen\nLMB / Leertaste · Übungsschlag"
+ 		return
+ 	var encounter: Dictionary = _state.get("encounter", {})
+ 	if bool(encounter.get("active", false)):

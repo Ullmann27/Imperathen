@@ -391,5 +391,95 @@ class VillageChunkTransportTest(unittest.TestCase):
         self.assertEqual(SMOKE.village_runtime_cursor("unrelated log output"), -1)
 
 
+def action_snapshot(**changes):
+    state = {"version": 1, "mode": "person", "ui_view": "game", "world_active": True,
+             "running": False, "touch_camera_managed": True, "selected_technique": "jab_left",
+             "overlay": "none", "position": [2.0, 1.0, 9.0], "velocity": [0.0, 0.0, 0.0],
+             "body_velocity": [0.0, 0.0, 0.0], "move_axis": [0.0, 0.0], "movement_touch": -1,
+             "camera_touches": 0, "action_touches": 0, "world_camera_touches": 0}
+    state.update(changes)
+    return {"screen": "playing", "action_mode": "unarmed", "action_runtime": state, "controls": {}}
+
+
+def movement_pad():
+    return {"center": [210.0, 370.0], "rect": [110.0, 270.0, 200.0, 200.0],
+            "visible": True, "enabled": True, "instance_id": "movement-1",
+            "axis_points": {"center": [210.0, 370.0], "right": [274.0, 370.0]}}
+
+
+class ActionRuntimeObservationTest(unittest.TestCase):
+    def test_missing_or_incompatible_action_diagnostics_cannot_pass(self):
+        for value in ({}, {"action_runtime": {}}, action_snapshot(version=2), action_snapshot(version=True)):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(RuntimeError, "Missing or unsupported"):
+                    SMOKE.action_input_is_neutral(value)
+
+    def test_active_contact_or_nonzero_world_input_is_never_neutral(self):
+        changes = [{"movement_touch": 0}, {"camera_touches": 1}, {"action_touches": 1},
+                   {"world_camera_touches": 1}, {"move_axis": [0.2, 0]},
+                   {"body_velocity": [0.0, 0.0, 0.4]}]
+        self.assertTrue(SMOKE.action_input_is_neutral(action_snapshot()))
+        for change in changes:
+            with self.subTest(change=change):
+                self.assertFalse(SMOKE.action_input_is_neutral(action_snapshot(**change)))
+
+    def test_invalid_coordinates_or_boolean_numbers_abort_the_observation(self):
+        for values in ([float("nan"), 1, 9], [2, float("inf"), 9], [True, 1, 9], [2, 9], "2,1,9"):
+            with self.subTest(values=values):
+                with self.assertRaisesRegex(RuntimeError, "Invalid observed action vector"):
+                    SMOKE.action_position_distance(action_snapshot(position=values), action_snapshot())
+
+    def test_invalid_contact_counts_and_flag_types_are_rejected(self):
+        for change in ({"movement_touch": False}, {"camera_touches": -1},
+                       {"action_touches": 33}, {"running": 1}, {"world_active": None}):
+            with self.subTest(change=change):
+                with self.assertRaisesRegex(RuntimeError, "Invalid observed action"):
+                    SMOKE.action_input_is_neutral(action_snapshot(**change))
+
+    def test_gravity_and_vertical_settling_do_not_prove_walking(self):
+        before = action_snapshot()
+        after = action_snapshot(position=[2, 0.7, 9])
+        self.assertEqual(SMOKE.action_position_distance(before, after), 0)
+        after = action_snapshot(position=[2.3, 0.7, 9.4])
+        self.assertAlmostEqual(SMOKE.action_position_distance(before, after), 0.5)
+
+    def test_delayed_native_motion_must_change_position_before_passing(self):
+        before = action_snapshot()
+        held = action_snapshot(movement_touch=0, move_axis=[1, 0], body_velocity=[1.2, 0, 0],
+                               position=[2.2, 1, 9])
+        released = action_snapshot(position=[2.4, 1, 9])
+        cursor = SMOKE.village_runtime_cursor(log(before))
+        logs = Mock(side_effect=[log(before, before), log(before, before, held), log(before, before, held, released)])
+        with patch.object(SMOKE.time, "sleep", lambda _seconds: None):
+            result = SMOKE.wait_for_village_snapshot(
+                logs, "playing", after=cursor,
+                predicate=lambda item: SMOKE.action_input_is_neutral(item)
+                and SMOKE.action_position_distance(before, item) >= 0.10)
+        self.assertEqual(result, released)
+        self.assertEqual(logs.call_count, 3)
+
+    def test_movement_gesture_uses_observed_translated_native_coordinates(self):
+        self.assertEqual(SMOKE.observed_movement_points(movement_pad()),
+                         ((210.0, 370.0), (274.0, 370.0)))
+
+    def test_hidden_disabled_or_invalid_pad_fails_before_any_native_input(self):
+        for change in ({"visible": False}, {"enabled": False}, {"rect": [0, 0, 0, 100]},
+                       {"rect": [0, 0, float("nan"), 100]}, {"axis_points": {}}):
+            with self.subTest(change=change):
+                control = movement_pad()
+                control.update(change)
+                with self.assertRaises(RuntimeError):
+                    SMOKE.observed_movement_points(control)
+
+    def test_out_of_pad_or_degenerate_axis_cannot_fall_back_to_guessed_coordinates(self):
+        for point in ([1000, 370], [210, 370], [True, 370], [274, float("inf")]):
+            with self.subTest(point=point):
+                control = movement_pad()
+                control["axis_points"]["right"] = point
+                with self.assertRaises(RuntimeError):
+                    SMOKE.observed_movement_points(control)
+
+
+
 if __name__ == "__main__":
     unittest.main()

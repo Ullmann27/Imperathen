@@ -245,7 +245,28 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	return _fail("Dieser Dorfauftrag ist nicht unterstützt.")
 
 
-static func advance(data: Dictionary, delta: float) -> bool:
+static func apply_unarmed_hit(data: Dictionary, target_id: String, damage: int) -> bool:
+	# Internal hit transaction: timing, direction and geometry were checked by
+	# CombatActions. No public command accepts a caller-selected damage value.
+	if damage <= 0 or damage > 32 or not data.village.raid.active:
+		return false
+	var raid: Dictionary = data.village.raid
+	var enemy := _enemy(raid, target_id)
+	if enemy.is_empty() or int(enemy.health) <= 0:
+		return false
+	enemy.health = maxi(0, int(enemy.health) - damage)
+	raid.player_hits += 1
+	raid.participation += 1
+	if not raid.joined:
+		raid.joined = true
+		_gain(data, "courage", 1)
+	_gain(data, "combat", 2 if int(enemy.health) == 0 else 1)
+	if _living_enemies(raid) == 0:
+		_finish_raid(data, "defended")
+	return true
+
+
+static func advance(data: Dictionary, delta: float, sight_check: Callable = Callable(), motion_check: Callable = Callable()) -> bool:
 	if not is_finite(delta) or delta<=0.0 or delta>3600.0 or not validate(data).is_empty():
 		return false
 	var social: Dictionary = data.village.social
@@ -256,12 +277,12 @@ static func advance(data: Dictionary, delta: float) -> bool:
 		if social.accumulator<0.00000001:
 			social.accumulator = 0.0
 		social.seconds = snappedf(float(social.seconds)+STEP,STEP)
-		_tick(data)
+		_tick(data, sight_check, motion_check)
 		changed = true
 	return changed
 
 
-static func _tick(data: Dictionary) -> void:
+static func _tick(data: Dictionary, sight_check: Callable = Callable(), motion_check: Callable = Callable()) -> void:
 	if data.get("encounter",{}).get("active",false):
 		return
 	var raid: Dictionary = data.village.raid
@@ -285,6 +306,8 @@ static func _tick(data: Dictionary) -> void:
 		var point := Vector2(enemy.x,enemy.z)
 		var player := _player_point(data)
 		var near := point.distance_to(player)<=2.2
+		if data.village.has("unarmed") and near:
+			near = sight_check.is_valid() and bool(sight_check.call(point, player))
 		if near:
 			enemy.attack_timer = maxf(0.0,float(enemy.attack_timer)-STEP)
 			if float(enemy.attack_timer)<=0.000001:
@@ -293,7 +316,14 @@ static func _tick(data: Dictionary) -> void:
 		else:
 			enemy.attack_timer = 0.9
 			var target := player if point.distance_to(player)<7.0 else Vector2(5.0,5.0)
-			point = point.move_toward(target,0.12)
+			var next_point := point.move_toward(target,0.12)
+			if data.village.has("unarmed"):
+				# New combat never teleports a raider through the live collision world.
+				var checked: Variant = motion_check.call(point, next_point) if motion_check.is_valid() else point
+				if checked is Vector2 and checked.is_finite() and point.distance_to(checked) <= 0.120001:
+					point = checked
+			else:
+				point = next_point
 			enemy.x = point.x
 			enemy.z = point.y
 			if point.distance_to(Vector2(5.0,5.0))<2.0:

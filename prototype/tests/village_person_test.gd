@@ -94,8 +94,9 @@ func run() -> void:
 		check(changed,clip+" actually rotates the rig")
 		check(not hero.body.find_child("PracticeBlade",true,false).visible,"child uses bare hands")
 	world._player.position = World.TRAINING_LOCATION
-	world._attack()
-	check(hero.clip == "train" and mentor.animator.current_animation == "block","live training action triggers two independent clips")
+	hero.cue("train")
+	mentor.cue("block")
+	check(hero.clip == "train" and mentor.animator.current_animation == "block","legacy training and mentor presentation retain independent clips")
 	var state := model.data.duplicate(true)
 	state.buildings = [{"id":"hut_1","x":8.0,"z":4.0,"progress":0.0,"completed":false}]
 	state.player.age = 18
@@ -116,9 +117,13 @@ func run() -> void:
 	else:
 		check(surface(adult,"PortraitSkin").albedo_texture.resource_path.ends_with("/adult_italia.webp"),"adult Italian portrait UV")
 	hero.sample_pose("train",.4)
-	check(hero.body.find_child("PracticeBlade",true,false).visible,"adult practice equipment follows action")
+	check(not hero.body.find_child("PracticeBlade",true,false).visible,"adulthood alone does not grant equipment")
+	hero.set_equipment(true)
+	hero.sample_pose("train",.4)
+	check(hero.body.find_child("PracticeBlade",true,false).visible,"explicitly equipped adult blade follows action")
 	hero.sample_pose("idle",.4)
 	check(not hero.body.find_child("PracticeBlade",true,false).visible,"idle stows equipment")
+	hero.set_equipment(false)
 	for node_path in ["TrainingGround/Mentor/Figure","Squad/Recruit1/Figure","Encounter/rover/Figure"]:
 		var soldier: Person = world.get_node(node_path)
 		var previous := 1000000

@@ -22,6 +22,8 @@ func _run() -> void:
 	root.add_child(game)
 	await process_frame
 	game.set_process(false)
+	game.set_physics_process(false)
+	game.world.set_physics_process(false)
 	game.ui._finish_intro()
 	game.ui.action_requested.emit("new_game", {})
 	await process_frame
@@ -29,7 +31,7 @@ func _run() -> void:
 	_check(FileAccess.file_exists(game.SAVE_PATH), "The campaign is saved before its introduction")
 	var campaign: String = JSON.stringify(game.model.data)
 	var player: Vector3 = game.world.get_player_position()
-	game._process(2.0)
+	_advance_game(2.0)
 	_check(JSON.stringify(game.model.data) == campaign and game.world.get_player_position() == player, "Cinematic playback changes neither simulation nor player position")
 	game.ui.action_requested.emit("attack", {})
 	game.world.action_requested.emit("gather", {"node_id": "timber_0"})
@@ -37,14 +39,14 @@ func _run() -> void:
 	root.go_back_requested.emit()
 	var paused_time: float = game.opening_elapsed
 	var paused_camera: Transform3D = game.opening_director.camera.global_transform
-	game._process(50.0)
+	_advance_game(50.0)
 	_check(game.opening_paused and game.opening_elapsed == paused_time and game.opening_director.camera.global_transform == paused_camera, "Android Back pauses the cinematic clock and camera")
 	game.opening_overlay._request_advance()
 	root.go_back_requested.emit()
 	game.opening_overlay._request_advance()
 	_check(not game.opening_paused and game.opening_index == 1, "Paused Advance cannot lock the same subtitle after resuming")
 	game.opening_overlay._toggle_reading()
-	game._process(100.0)
+	_advance_game(100.0)
 	_check(game.opening_manual and game.opening_index == 1, "Reading mode holds the chosen subtitle after its camera travel completes")
 	game.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
 	_check(game.opening_paused, "Application suspension holds the opening instead of skipping unseen lines")
@@ -61,7 +63,7 @@ func _run() -> void:
 	game.opening_overlay._request_skip()
 	_check(game.screen == "opening" and bool(game.opening_sequence.beats[game.opening_index].final), "Skip presents the first objective and waits for explicit player control")
 	_check(game.opening_director.camera.global_transform.is_equal_approx(game.world.get_node("WorldCamera").global_transform), "The objective holds the exact eventual gameplay camera")
-	game._process(500.0)
+	_advance_game(500.0)
 	_check(game.screen == "opening", "Even a long idle interval cannot auto-confirm the first objective")
 	game.opening_overlay._request_advance()
 	_check(game.screen == "playing" and game.world.get_node("WorldCamera").current and game.world.get("_active"), "Explicit acceptance returns the ordinary camera and movement")
@@ -87,7 +89,7 @@ func _run() -> void:
 	_check(game.model.data.resources.wood == 8 and game.model.data.companion.trust == 20, "The real dialogue commits exactly its stated cost and relationship change")
 	_move(Vector3(8, 1, 4))
 	game.world.action_requested.emit("build", {"x": 8.0, "z": 4.0})
-	game._process(13.0)
+	_advance_game(13.0)
 	_check(game.model.data.buildings[0].completed, "The opening leads into a real completed shelter")
 	_complete_village_phase()
 	_move(Vector3(0, 1, -7))
@@ -161,10 +163,17 @@ func _complete_village_phase() -> void:
 	var saw_warning := false
 	var saw_attack := false
 	for step in 70:
-		game._process(5.0)
+		_advance_game(5.0)
 		saw_warning = saw_warning or game.model.data.village.raid.status == "warning"
 		saw_attack = saw_attack or game.model.data.village.raid.active
 		if VillageLife.training_ready(game.model.data):
 			break
 	_check(saw_warning and saw_attack and game.model.data.village.raid.completed == 1, "The real warning and first village attack finish before adulthood")
 	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days satisfy the new training gate")
+
+
+func _advance_game(delta: float) -> void:
+	# Main owns the authoritative physics clock; presentation retains its own
+	# process callback. Both run explicitly so awaited UI frames add no time.
+	game._physics_process(delta)
+	game._process(delta)

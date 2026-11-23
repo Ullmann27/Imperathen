@@ -15,6 +15,9 @@ const FigureGallery = preload("res://scripts/ui/figure_gallery.gd")
 const SafeArea = preload("res://scripts/ui/safe_area.gd")
 const TouchPadScript := preload("res://scripts/ui/touch_pad.gd")
 const TouchActionScript := preload("res://scripts/ui/touch_action.gd")
+const TouchLookScript := preload("res://scripts/ui/touch_look.gd")
+const TouchModalScript := preload("res://scripts/ui/touch_modal.gd")
+const CombatActions := preload("res://scripts/domain/combat_actions.gd")
 const VillagePanel = preload("res://scripts/ui/village_life_panel.gd")
 var _village_tab := "overview"
 
@@ -86,6 +89,14 @@ var _touch_enabled := false
 var _compact_layout := false
 var _touch_pad: Control
 var _touch_actions: Array[Button] = []
+var _touch_look: Control
+var _touch_menu_layer: Control
+var _technique_menu_layer: Control
+var _touch_attack_button: Button
+var _touch_technique_button: Button
+var _pace_button: Button
+var _running := false
+var _selected_technique := "jab_left"
 var _cancel_build_button: Button
 var _build_active := false
 var _quality := "balanced"
@@ -315,6 +326,9 @@ func show_game(state: Dictionary) -> void:
 	_build_touch_controls()
 	update_state(state)
 	set_mode(_mode)
+	_emit("touch_camera_managed", {"enabled": _touch_enabled})
+	_emit("movement_pace", {"running": _running})
+	_emit("select_technique", {"technique": _selected_technique})
 
 
 func show_cinematic() -> void:
@@ -398,6 +412,7 @@ func update_state(state: Dictionary) -> void:
 			_hud_labels["status"].text = "SPUREN VOR DEM DORF · %d s" % ceili(float(raid.remaining))
 		elif raid.active:
 			_hud_labels["status"].text = "ÜBERFALL · AUSDAUER %d" % int(raid.stamina)
+	_update_combat_controls()
 
 
 func show_pause() -> void:
@@ -616,13 +631,13 @@ func set_mode(mode: String) -> void:
 	}
 	if _touch_enabled:
 		hints = {
-			"person": "Links bewegen · Rechts interagieren oder angreifen · Im freien Bild ziehen, um die Kamera zu drehen.",
+			"person": "Links bewegen · Rechts im freien Bild umsehen · Gehen/Laufen umschalten · Technik wählen und schlagen.",
 			"city": "Hütte wählen · Freien Bauplatz antippen · Zum Beenden Bau abbrechen wählen.",
 			"map": "Im freien Bild ziehen · Figur wählen, um zurückzukehren · Deine Figur bleibt an ihrem Ort."
 		}
 	_life_panel.visible = not _compact_layout and mode != "person"
 	_chronicle_panel.visible = _life_panel.visible
-	_hud_labels.compact_life.visible = not _life_panel.visible
+	_hud_labels.compact_life.visible = not _life_panel.visible and not (_touch_enabled and _content_size().y < 520)
 	_action_buttons["atlas"].visible = mode == "map"
 	_hud_labels["controls"].text = hints[mode]
 	var objective := _objective(_state)
@@ -671,7 +686,11 @@ func handle_back() -> bool:
 	# Root forwards Android's go-back notification with SceneTree.quit_on_go_back disabled.
 	match _view_state:
 		"intro": _finish_intro()
-		"game": _emit("cancel_build" if _build_active else "pause")
+		"game":
+			if _touch_overlay_open():
+				_close_touch_overlays()
+			else:
+				_emit("cancel_build" if _build_active else "pause")
 		"pause", "journal", "village": _emit("resume")
 		"gallery": _close_gallery()
 		"settings": _return_to(_settings_return)
@@ -686,6 +705,12 @@ func handle_back() -> bool:
 func _open_screen(screen_name: String, darken: bool, menu_style := false) -> void:
 	_reset_touch()
 	_touch_pad = null
+	_touch_look = null
+	_touch_menu_layer = null
+	_technique_menu_layer = null
+	_touch_attack_button = null
+	_touch_technique_button = null
+	_pace_button = null
 	_touch_actions.clear()
 	_cancel_build_button = null
 	if _intro_tween != null and _intro_tween.is_valid():
@@ -753,13 +778,20 @@ func _return_to(screen_name: String) -> void:
 
 func _build_top_bar() -> void:
 	var panel := _panel(false)
+	panel.name = "ResourceBar"
 	panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	panel.offset_left = 24
 	panel.offset_right = -24
 	panel.offset_top = 24
 	panel.offset_bottom = 91
+	if _touch_enabled:
+		_compact_panel(panel, 10, 8)
+		panel.offset_left = 12
+		panel.offset_right = -12
+		panel.offset_top = 8 if _content_size().y < 470 else 12
+		panel.offset_bottom = panel.offset_top + 64
 	_screen.add_child(panel)
-	var row := _row(10 if _compact_layout else 22)
+	var row := _row(5 if _touch_enabled else 10 if _compact_layout else 22)
 	panel.add_child(row)
 	var brand := _column(2)
 	brand.custom_minimum_size.x = 130 if _compact_layout else 190
@@ -770,7 +802,7 @@ func _build_top_bar() -> void:
 	brand.visible = not (_compact_layout and _content_size().x < 1000)
 	for resource in ["wood", "grain", "denarii"]:
 		var metric := _label("", 13 if _compact_layout else 18, CREAM)
-		metric.custom_minimum_size.x = 72 if _compact_layout else 115
+		metric.custom_minimum_size.x = 60 if _touch_enabled else 72 if _compact_layout else 115
 		metric.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		row.add_child(metric)
 		_hud_labels[resource] = metric
@@ -780,27 +812,45 @@ func _build_top_bar() -> void:
 	_hud_labels["time"] = _label("", 12, MUTED)
 	_hud_labels["time"].vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(_hud_labels["time"])
+	_hud_labels["time"].visible = not _touch_enabled or _content_size().x >= 760
 	row.add_child(_button("Chronik", _show_journal, false, 12))
 	if _compact_layout:
 		row.add_child(_button("Pause", func(): _emit("pause"), false, 12))
 	else:
 		row.add_child(_button("Speichern", func(): _emit("save"), false, 13))
 		row.add_child(_button("Pause  ·  Esc", func(): _emit("pause"), false, 13))
+	if _touch_enabled:
+		for child: Node in row.get_children():
+			if child is Button:
+				child.custom_minimum_size.y = 48
 
 
 func _build_objective_card() -> void:
 	var panel := _panel(true)
+	panel.name = "ObjectiveCard"
 	panel.position = Vector2(24, 110)
 	panel.size = Vector2(272, 150) if _compact_layout else Vector2(300, 180)
+	var minimal_touch := _touch_enabled and _content_size().y < 470
+	if _touch_enabled:
+		panel.position = Vector2(16, 80 if minimal_touch else 92)
+		_compact_panel(panel, 10, 4 if minimal_touch else 10)
+	if _touch_enabled and not minimal_touch:
+		var pad_size := clampf(_content_size().y * 0.36, 156.0, 216.0)
+		panel.size.y = minf(150, _content_size().y - 88 - pad_size - panel.position.y - 12)
+	if minimal_touch:
+		panel.size = Vector2(_content_size().x - 32, 32)
 	_screen.add_child(panel)
 	var short_layout := _compact_layout and _content_size().y < 600
-	var column := _column(6 if short_layout else 10)
+	var column := _column(0 if minimal_touch else 6 if short_layout else 10)
 	panel.add_child(column)
 	if not (_compact_layout and _content_size().y < 520):
 		column.add_child(_label("DEIN NÄCHSTER SCHRITT", 11, BRONZE))
 	_hud_labels["objective_title"] = _label("", 17 if short_layout else 19 if _compact_layout else 23, CREAM, true)
 	_hud_labels["objective_title"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(_hud_labels["objective_title"])
+	if _touch_enabled and _content_size().y < 600:
+		_hud_labels["objective_title"].max_lines_visible = 1
+		_hud_labels["objective_title"].text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_hud_labels["objective_text"] = _label("", 12 if short_layout else 13 if _compact_layout else 15, MUTED)
 	_hud_labels["objective_text"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if _compact_layout:
@@ -810,6 +860,16 @@ func _build_objective_card() -> void:
 	_hud_labels["compact_life"] = _label("", 12, BRONZE)
 	_hud_labels["compact_life"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(_hud_labels["compact_life"])
+	if minimal_touch:
+		_hud_labels["objective_title"].add_theme_font_size_override("font_size", roundi(14 * _ui_scale))
+		_hud_labels["objective_title"].max_lines_visible = 1
+		_hud_labels["objective_title"].text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		_hud_labels["objective_text"].hide()
+		_hud_labels["compact_life"].hide()
+		panel.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				_show_journal()
+		)
 
 
 func _build_character_card() -> void:
@@ -871,6 +931,9 @@ func _build_character_card() -> void:
 
 
 func _build_toolbar() -> void:
+	if _touch_enabled:
+		_build_touch_toolbar()
+		return
 	var panel := _panel(false)
 	panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	panel.offset_left = 24
@@ -922,45 +985,115 @@ func _build_toolbar() -> void:
 	)
 
 
+func _build_touch_toolbar() -> void:
+	var panel := _panel(false)
+	panel.name = "TouchToolbar"
+	_compact_panel(panel, 10, 8)
+	panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	panel.offset_left = 12
+	panel.offset_right = -12
+	panel.offset_top = -76
+	panel.offset_bottom = -12
+	_screen.add_child(panel)
+	var row := _row(6)
+	panel.add_child(row)
+	for item in [["person", "Figur"], ["city", "Stadt"], ["map", "Karte"]]:
+		var button := _touch_button(item[1], _emit.bind("mode_" + item[0], {}), false)
+		button.custom_minimum_size.y = 48
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_mode_buttons[item[0]] = button
+		row.add_child(button)
+	if _state.get("village", {}).get("enabled", false):
+		var village := _touch_button("Dorf", _emit.bind("village_panel", {}), false)
+		village.custom_minimum_size.y = 48
+		village.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(village)
+	var commands := _touch_button("Vorhaben", _toggle_command_menu, false)
+	commands.name = "OpenCommands"
+	commands.custom_minimum_size.y = 48
+	commands.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(commands)
+	_hud_labels["controls"] = _label("", 12, MUTED)
+	_hud_labels["controls"].hide()
+	_screen.add_child(_hud_labels["controls"])
+	_touch_menu_layer = _new_touch_overlay("CommandMenu", "Dein nächster Schritt")
+	var column: VBoxContainer = _touch_menu_layer.get_meta("content")
+	var actions := [["build", "Hütte bauen · 8 Holz"], ["train", "Ausbildung"], ["recruit", "Truppe verstärken"], ["skirmish", "Dorf verteidigen"], ["atlas", "Weltkugel"]]
+	for item in actions:
+		var button := _button(item[1], func():
+			_close_touch_overlays()
+			_emit(item[0])
+		, false, 14)
+		button.name = "Command_" + item[0]
+		button.custom_minimum_size.y = 50
+		column.add_child(button)
+		_action_buttons[item[0]] = button
+	_touch_menu_layer.hide()
+
+
 func _build_touch_controls() -> void:
 	if _touch_enabled:
+		var extent := _content_size()
+		var short_screen := extent.y < 470
+		var pad_size := clampf(extent.y * 0.36, 156.0, 216.0)
+		pad_size = minf(pad_size, maxf(150.0, extent.x * 0.43))
 		_touch_pad = TouchPadScript.new()
 		_touch_pad.name = "MovementPad"
 		_touch_pad.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
-		_touch_pad.offset_left = 16
-		_touch_pad.offset_right = 168
-		_touch_pad.offset_top = -172
-		_touch_pad.offset_bottom = -20
+		_touch_pad.offset_left = 12
+		_touch_pad.offset_right = 12 + pad_size
+		_touch_pad.offset_top = -88 - pad_size
+		_touch_pad.offset_bottom = -88
 		_screen.add_child(_touch_pad)
 		_touch_pad.axis_changed.connect(func(axis: Vector2): _emit("move_axis", {"x": axis.x, "y": axis.y}))
-		var right := VBoxContainer.new()
+		_touch_look = TouchLookScript.new()
+		_touch_look.name = "CameraLook"
+		_touch_look.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_touch_look.anchor_left = 0.35
+		_screen.add_child(_touch_look)
+		_touch_look.look_changed.connect(func(delta: Vector2): _emit("camera_look", {"x": delta.x, "y": delta.y}))
+		_touch_look.zoom_changed.connect(func(factor: float): _emit("camera_zoom", {"factor": factor}))
+		var right := GridContainer.new()
 		right.name = "TouchActions"
+		right.columns = 2
 		right.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-		right.offset_left = -168
-		right.offset_right = -16
-		right.offset_top = -164
-		if _state.get("village", {}).get("enabled", false):
-			right.offset_top = -292
-		right.offset_bottom = -20
-		right.add_theme_constant_override("separation", 10)
+		right.offset_left = -12 - clampf(extent.x * 0.31, 224.0, 304.0)
+		right.offset_right = -12
+		right.offset_top = -88 - (156 if short_screen else 196)
+		right.offset_bottom = -88
+		right.add_theme_constant_override("h_separation", 8)
+		right.add_theme_constant_override("v_separation", 6 if short_screen else 8)
 		right.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_screen.add_child(right)
-		var touch_entries := [["interact", "Interagieren"], ["attack", "Angreifen"]]
-		if _state.get("village", {}).get("enabled", false):
-			touch_entries.append_array([["village_block", "Blocken"], ["village_dodge", "Ausweichen"]])
-		for item in touch_entries:
-			var button: Button = _touch_button(item[1], _emit.bind(item[0], {}), item[0] == "attack")
-			button.name = item[0].capitalize()
-			button.custom_minimum_size.y = 62
+		var entries := [["interact", "Interagieren"], ["attack", "Schlagen"], ["guard", "Deckung"], ["dodge", "Ausweichen"], ["techniques", "Techniken"], ["pace", "Gehen"]]
+		for item in entries:
+			var action_id := str(item[0])
+			var button := _touch_button(item[1], _touch_action.bind(action_id), action_id == "attack")
+			button.name = action_id.capitalize()
+			button.set_action_icon(action_id)
+			button.custom_minimum_size = Vector2(0, 48 if short_screen else 60)
+			button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			button.size_flags_vertical = Control.SIZE_EXPAND_FILL
 			_touch_actions.append(button)
 			right.add_child(button)
+			if action_id == "attack":
+				_touch_attack_button = button
+			elif action_id == "techniques":
+				_touch_technique_button = button
+			elif action_id == "pace":
+				_pace_button = button
+			button.set_meta("touch_action", action_id)
+		_update_pace_caption()
+		# Modal native handlers run above every gameplay input control.
+		if is_instance_valid(_touch_menu_layer):
+			_screen.move_child(_touch_menu_layer, -1)
 	_cancel_build_button = _touch_button("Bau abbrechen", func(): _emit("cancel_build"), false) if _touch_enabled else _button("Bau abbrechen", func(): _emit("cancel_build"), false, 14)
 	_cancel_build_button.name = "CancelBuild"
 	_cancel_build_button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	_cancel_build_button.offset_left = -174 if _touch_enabled else -220
+	_cancel_build_button.offset_left = -194 if _touch_enabled else -220
 	_cancel_build_button.offset_right = -16 if _touch_enabled else -24
-	_cancel_build_button.offset_top = -86 if _touch_enabled else -210
-	_cancel_build_button.offset_bottom = -24 if _touch_enabled else -154
+	_cancel_build_button.offset_top = -150 if _touch_enabled else -210
+	_cancel_build_button.offset_bottom = -92 if _touch_enabled else -154
 	_screen.add_child(_cancel_build_button)
 	_update_touch_visibility()
 
@@ -970,8 +1103,15 @@ func _touch_button(caption: String, callback: Callable, primary: bool) -> Button
 	button.text = caption
 	button.set_meta("base_font_size", 13)
 	button.add_theme_font_size_override("font_size", roundi(13 * _ui_scale))
-	button.add_theme_stylebox_override("normal", _button_style(primary, false))
-	button.add_theme_stylebox_override("hover", _button_style(primary, true))
+	var normal := _button_style(primary, false)
+	var hover := _button_style(primary, true)
+	for style in [normal, hover]:
+		style.content_margin_left = 10
+		style.content_margin_right = 10
+		style.content_margin_top = 6
+		style.content_margin_bottom = 6
+	button.add_theme_stylebox_override("normal", normal)
+	button.add_theme_stylebox_override("hover", hover)
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.pressed.connect(func():
 		_play_click()
@@ -980,12 +1120,172 @@ func _touch_button(caption: String, callback: Callable, primary: bool) -> Button
 	return button
 
 
+func _touch_action(action: String) -> void:
+	match action:
+		"attack": _emit("attack", {"technique": _selected_technique} if CombatActions.enabled(_state) else {})
+		"guard": _emit("village_unarmed_guard" if CombatActions.enabled(_state) else "village_block")
+		"dodge": _emit("village_unarmed_dodge" if CombatActions.enabled(_state) else "village_dodge")
+		"techniques": _show_technique_menu()
+		"pace":
+			_running = not _running
+			_update_pace_caption()
+			_emit("movement_pace", {"running": _running})
+		_: _emit(action)
+
+
+func _update_pace_caption() -> void:
+	if is_instance_valid(_pace_button):
+		_pace_button.text = "Laufen" if _running else "Gehen"
+		_pace_button.set_action_icon("run" if _running else "pace")
+		_pace_button.tooltip_text = "Antippen: zum Gehen wechseln." if _running else "Antippen: zum Laufen wechseln."
+		_pace_button.add_theme_stylebox_override("normal", _button_style(_running, false))
+
+
+func _update_combat_controls() -> void:
+	if not is_instance_valid(_touch_attack_button):
+		return
+	var enabled := CombatActions.enabled(_state)
+	if enabled and not CombatActions.available(_state, _selected_technique):
+		_selected_technique = "jab_left"
+		_emit("select_technique", {"technique": _selected_technique})
+	_touch_attack_button.text = "Schlag\n" + str(CombatActions.TECHNIQUES[_selected_technique].short) if enabled else "Angreifen"
+	_touch_technique_button.disabled = not enabled
+	_touch_technique_button.tooltip_text = "Wähle eine erlernte Bewegung." if enabled else "Techniken stehen in deinem neuen Dorfleben zur Verfügung."
+	if enabled:
+		var stamina: float = float(_state.village.unarmed.stamina)
+		_touch_attack_button.tooltip_text = "%s · %d Ausdauer" % [CombatActions.TECHNIQUES[_selected_technique].label, int(CombatActions.TECHNIQUES[_selected_technique].cost)]
+		_touch_attack_button.disabled = stamina < float(CombatActions.TECHNIQUES[_selected_technique].cost) or float(_state.get("player", {}).get("health", 0)) <= 0
+	else:
+		_touch_attack_button.disabled = false
+
+
+func _new_touch_overlay(node_name: String, title: String) -> Control:
+	var overlay: Control = TouchModalScript.new()
+	overlay.name = node_name
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_screen.add_child(overlay)
+	var shade := ColorRect.new()
+	shade.color = Color(0.015, 0.025, 0.025, 0.72)
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(shade)
+	var panel := _panel(true)
+	_compact_panel(panel, 14, 12)
+	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	var extent := _content_size()
+	var width := minf(630.0, extent.x - 40.0)
+	var height := minf(510.0, extent.y - 42.0)
+	panel.offset_left = -width * 0.5
+	panel.offset_right = width * 0.5
+	panel.offset_top = -height * 0.5
+	panel.offset_bottom = height * 0.5
+	overlay.add_child(panel)
+	var layout := _column(10)
+	panel.add_child(layout)
+	var header := _row(12)
+	layout.add_child(header)
+	var heading := _label(title, 20, CREAM, true)
+	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	heading.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	header.add_child(heading)
+	var close := _button("Zurück", _close_touch_overlays, false, 13)
+	close.name = "CloseOverlay"
+	close.custom_minimum_size.y = 48
+	header.add_child(close)
+	var scroll := ScrollContainer.new()
+	scroll.name = "ChoicesScroll"
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layout.add_child(scroll)
+	var content := _column(8)
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(content)
+	overlay.set_meta("content", content)
+	return overlay
+
+
+func _show_technique_menu() -> void:
+	if not CombatActions.enabled(_state):
+		return
+	_reset_touch()
+	if is_instance_valid(_touch_menu_layer):
+		_touch_menu_layer.hide()
+	if is_instance_valid(_technique_menu_layer):
+		_technique_menu_layer.queue_free()
+	_technique_menu_layer = _new_touch_overlay("TechniqueMenu", "Deine Techniken")
+	var column: VBoxContainer = _technique_menu_layer.get_meta("content")
+	var combat: Dictionary = CombatActions.view(_state)
+	var help := _label("Ausdauer %d/100 · %d kontrollierte Übungstreffer\nEine Technik wählen, dann im Spiel mit der Schlagtaste ausführen." % [int(combat.stamina), int(combat.practice_hits)], 13, MUTED)
+	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	column.add_child(help)
+	for technique: Dictionary in combat.techniques:
+		var id := str(technique.id)
+		var available := bool(technique.available)
+		var caption := "%s · %d Ausdauer" % [technique.label, int(technique.cost)]
+		if not available:
+			caption += "\nErlernbar ab %d Übungstreffern" % int(technique.practice)
+		var button := _button(caption, _choose_technique.bind(id), id == _selected_technique, 14)
+		button.name = "Technique_" + id
+		button.custom_minimum_size.y = 56 if available else 68
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.disabled = not available
+		column.add_child(button)
+	_update_touch_visibility()
+
+
+func _choose_technique(id: String) -> void:
+	if not CombatActions.available(_state, id):
+		return
+	_selected_technique = id
+	_close_touch_overlays()
+	_update_combat_controls()
+	_emit("select_technique", {"technique": id})
+
+
+func _toggle_command_menu() -> void:
+	if not is_instance_valid(_touch_menu_layer):
+		return
+	var opening := not _touch_menu_layer.visible
+	_close_touch_overlays()
+	_touch_menu_layer.visible = opening
+	_update_touch_visibility()
+
+
+func _close_touch_overlays() -> void:
+	_reset_touch()
+	if is_instance_valid(_touch_menu_layer):
+		_touch_menu_layer.hide()
+	if is_instance_valid(_technique_menu_layer):
+		_technique_menu_layer.hide()
+	_update_touch_visibility()
+
+
+func _touch_overlay_open() -> bool:
+	return (is_instance_valid(_touch_menu_layer) and _touch_menu_layer.visible) or (is_instance_valid(_technique_menu_layer) and _technique_menu_layer.visible)
+
+
+func _compact_panel(panel: PanelContainer, horizontal: int, vertical: int) -> void:
+	var style := panel.get_theme_stylebox("panel").duplicate() as StyleBoxFlat
+	style.content_margin_left = horizontal
+	style.content_margin_right = horizontal
+	style.content_margin_top = vertical
+	style.content_margin_bottom = vertical
+	panel.add_theme_stylebox_override("panel", style)
+
+
 func _reset_touch() -> void:
 	if is_instance_valid(_touch_pad):
 		_touch_pad.reset()
+	if is_instance_valid(_touch_look):
+		_touch_look.reset()
 	for button in _touch_actions:
 		if is_instance_valid(button):
 			button.reset()
+	if is_instance_valid(_screen):
+		for button: Node in _screen.find_children("*", "Button", true, false):
+			if button.has_method("reset"):
+				button.reset()
 	if is_instance_valid(_cancel_build_button) and _cancel_build_button.has_method("reset"):
 		_cancel_build_button.reset()
 
@@ -993,14 +1293,21 @@ func _reset_touch() -> void:
 func _update_touch_visibility() -> void:
 	if _view_state != "game":
 		return
-	var personal := _mode == "person" and not _build_active
+	var overlay := _touch_overlay_open()
+	var toolbar := _screen.get_node_or_null("TouchToolbar")
+	if toolbar != null:
+		toolbar.visible = not overlay
+	var personal := _mode == "person" and not _build_active and not overlay
 	if is_instance_valid(_touch_pad):
 		_touch_pad.visible = personal
+	if is_instance_valid(_touch_look):
+		_touch_look.visible = personal
 	for button in _touch_actions:
 		if is_instance_valid(button):
-			button.visible = personal
+			var action := str(button.get_meta("touch_action", ""))
+			button.visible = personal and (action not in ["guard", "dodge"] or _state.get("village", {}).get("enabled", false))
 	if is_instance_valid(_cancel_build_button):
-		_cancel_build_button.visible = _build_active
+		_cancel_build_button.visible = _build_active and not overlay
 
 
 func _region_report() -> String:
@@ -1089,7 +1396,7 @@ func _show_journal(pause_world := true) -> void:
 		var line := _label(String(entry.get("text", "")) if entry is Dictionary else str(entry), 14, MUTED)
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		column.add_child(line)
-	var controls := "Links bewegen. Rechts interagieren oder angreifen. Im freien Bild ziehen, um die Kamera zu drehen. Zum Bauen Hütte wählen und einen freien Bauplatz antippen." if _touch_enabled else "WASD bewegen · E interagieren · Linksklick / Leertaste kämpfen · B bauen · Tab Stadt · M Karte"
+	var controls := "Links bewegen. Rechts im freien Bild umsehen. Gehen und Laufen mit der Temposchaltfläche wechseln. Unter Techniken eine Bewegung wählen, dann mit Schlag ausführen. Vorhaben öffnet Bau und Ausbildung." if _touch_enabled else "WASD bewegen · E interagieren · Linksklick / Leertaste kämpfen · B bauen · Tab Stadt · M Karte"
 	var help := _label(controls, 13, BRONZE)
 	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(help)

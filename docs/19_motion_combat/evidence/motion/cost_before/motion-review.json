@@ -1,0 +1,41 @@
+{
+  "actor_script": "res://motion_baseline_1kg6go08.gd",
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "captures": [],
+  "cost": {
+    "actor_meshes": 14,
+    "actor_nodes": 20,
+    "actor_visible_triangles": 32804,
+    "cpu_mean_us": 4.49,
+    "cpu_median_us": 5.0,
+    "cpu_p95_us": 6.0,
+    "cpu_scope": "600 synchronous actor._process calls after 60 warmup calls, dt=1/60; excludes rendering, physics, loading, and OS frame pacing",
+    "measured_fps": false,
+    "phone_temperature_measured": false,
+    "resolution": [
+      1100,
+      800
+    ],
+    "scenario": "One child player, LOD0, very_high, fixed studio/camera, 1.45 m/s walking; same original assets",
+    "scene_draw_calls": 31.0,
+    "scene_rendered_objects": 33.0
+  },
+  "engine": "4.7.2-stable (official)",
+  "renderer": "gl_compatibility",
+  "source": "Actual production VillagePerson in a fixed Godot studio",
+  "source_sha256": {
+    "prototype/scripts/visuals/village_person.gd": "88ebb9578bcb5dc1c5af07d183663a0a58f8e087fd63014dd3fed15d2d2861bb",
+    "prototype/tests/character_motion_review.gd": "d4feec8b0486b6a4286b6036bd87041b964820e83ca09dd7a8c61a6742943426",
+    "prototype/scripts/visuals/facial_motion.gd": "e87c5bc3b32c43cb70c4ae5f1fff13a562148bb5faf911e6cb725095fb611a16",
+    "tools/characters/capture_motion.py": "3ccb0e51ba405805a4ed6e31ff1279312a53e3d96172aa444309e45118581e41",
+    "prototype/assets/characters/hero_quality_0.glb": "69df0f6c2546a5dd075eee07570e071746d5c46e9fcc28e3a7bac11c3a55caeb",
+    "prototype/assets/characters/hero_quality_1.glb": "af6a9dfc26ddec361702157943f21fd756ef5ebb476aab73bdfdb0f4de30fc91",
+    "prototype/assets/characters/hero_quality_2.glb": "8f91895bb39608febf1df54ede111d39a0c709fa2a57036553e4ce3cc5e247f1",
+    "prototype/assets/characters/hero_quality_3.glb": "103845fd62f6aa73284db552cd92be776deb1ec3546bb5ec30bd391cdb5b4b12"
+  },
+  "baseline": {
+    "commit": "2909040deeb33b99ad4180b884b38921f28233a9",
+    "village_person_sha256": "88ebb9578bcb5dc1c5af07d183663a0a58f8e087fd63014dd3fed15d2d2861bb"
+  }
+}

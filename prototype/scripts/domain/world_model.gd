@@ -11,6 +11,7 @@ const Origins = preload("res://scripts/strategy/origins.gd")
 const Frontier = preload("res://scripts/story/frontier_chapter.gd")
 const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
+const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const SCHEMA_VERSION := 5
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
@@ -36,13 +37,15 @@ const COMMAND_FIELDS := {
 }
 
 var data: Dictionary = {}
+var combat_sight_check: Callable
+var combat_motion_check: Callable
 
 
 func _init() -> void:
 	new_game()
 
 
-func new_game(origin_id := "italia", extended_village := false) -> void:
+func new_game(origin_id := "italia", extended_village := false, action_combat := false) -> void:
 	if not Origins.PEOPLES.has(origin_id):
 		origin_id = "italia"
 	var origin: Dictionary = Origins.PEOPLES[origin_id]
@@ -72,6 +75,8 @@ func new_game(origin_id := "italia", extended_village := false) -> void:
 	data.village.enabled = extended_village and origin_id == "italia"
 	data.village.health_delta = 0
 	data.village.militia = []
+	if data.village.enabled and action_combat:
+		CombatActions.start(data)
 	changed.emit()
 
 
@@ -79,6 +84,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	var command_fields: Dictionary = COMMAND_FIELDS.duplicate()
 	command_fields.merge(VillageEconomy.COMMAND_FIELDS)
 	command_fields.merge(VillageLife.COMMAND_FIELDS)
+	command_fields.merge(CombatActions.COMMAND_FIELDS)
 	if not command_fields.has(command):
 		return _fail("Unbekannter Spielbefehl: %s" % command)
 	if not _exact_keys(args, command_fields[command]):
@@ -131,6 +137,12 @@ func set_player_position(position: Vector3) -> void:
 	# The renderer already owns this observed movement. Avoid rebuilding UI per step.
 
 
+func interrupt_combat() -> void:
+	if CombatActions.interrupt(data):
+		data.revision = int(data.revision) + 1
+		changed.emit()
+
+
 func advance(delta: float) -> void:
 	if not is_finite(delta) or delta <= 0.0 or delta > 3600.0 or data.is_empty():
 		return
@@ -158,7 +170,12 @@ func advance(delta: float) -> void:
 			var previous_health := int(candidate.player.health)
 			if not VillageEconomy.advance(candidate, step):
 				return
-			VillageLife.advance(candidate, step)
+			VillageLife.advance(candidate, step, combat_sight_check, combat_motion_check)
+			if int(candidate.player.health) < previous_health:
+				CombatActions.interrupt(candidate)
+			var contact := CombatActions.advance(candidate, step, combat_sight_check, _apply_combat_hit)
+			if contact.practice and int(candidate.player.age) >= 18 and candidate.progress.stage == "training":
+				_apply_training_contact(candidate)
 			candidate.village.health_delta += int(candidate.player.health) - previous_health
 			remaining = maxf(0.0, remaining - step)
 		notify_ui = true
@@ -317,7 +334,50 @@ func get_frontier_objective() -> Dictionary:
 	return Frontier.objective(data)
 
 
+func _apply_combat_hit(state: Dictionary, target_id: String, damage: int) -> bool:
+	# Only CombatActions calls this after its active-window and geometry checks.
+	if VillageLife.apply_unarmed_hit(state, target_id, damage):
+		return true
+	if not state.encounter.active or damage <= 0 or damage > 32:
+		return false
+	var index := _find_id(state.encounter.enemies, target_id)
+	if index < 0 or int(state.encounter.enemies[index].health) <= 0:
+		return false
+	var enemy: Dictionary = state.encounter.enemies[index]
+	enemy.health = maxi(0, int(enemy.health) - damage)
+	if int(enemy.health) == 0:
+		_record(state, "Der Gegner %s ist ausgeschaltet; sein Zustand bleibt gespeichert." % target_id)
+	if _all_enemies_defeated(state):
+		_resolve_skirmish(state)
+	return true
+
+
+func _apply_training_contact(state: Dictionary) -> Dictionary:
+	if state.progress.stage != "training" or int(state.player.age) < 18:
+		return _fail("Beginne zuerst die erwachsene Ausbildung beim Übungsplatz.")
+	if _distance_to(state, 0.0, -7.0) > INTERACTION_RANGE:
+		return _fail("Das Übungsziel liegt außerhalb deiner Reichweite.")
+	if float(state.timers.training) > 0.000001:
+		return _fail("Lass den Übungsschlag erst ausklingen.")
+	state.timers.training = ATTACK_COOLDOWN
+	state.progress.training_hits = int(state.progress.training_hits) + 1
+	if int(state.progress.training_hits) == 3:
+		state.progress.training_complete = true
+		state.progress.stage = "trained"
+		state.player.role = "soldier"
+		_record(state, "Du beendest die erste Kampfausbildung. Als ausgebildeter Soldat darfst du einen kleinen Wachtrupp anwerben.")
+		_set_story(state, "Eine erste Verantwortung", "Wirb bis zu drei Freiwillige an. Jeder kostet 5 Denarii und 2 Getreide und fehlt anschließend als zivile Arbeitskraft.")
+		return _ok("Ausbildung abgeschlossen. Du darfst einen kleinen Trupp anwerben.")
+	return _ok("Gültiger Übungstreffer %d/3." % int(state.progress.training_hits))
+
+
 func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dictionary:
+	if CombatActions.COMMAND_FIELDS.has(command):
+		if not state.village.enabled:
+			return _fail("Diese Partie verwendet den bisherigen regionalen Dorfabschnitt.")
+		return CombatActions.execute(state, command, args)
+	if CombatActions.enabled(state) and command in ["village_strike", "village_block", "village_dodge", "strike_enemy", "training_hit"]:
+		return _fail("Verwende die gewählte Technik. Treffer zählen erst während der tatsächlichen Bewegung.")
 	if command.begins_with("village_"):
 		if not state.village.enabled:
 			return _fail("Dieser Lebensweg verwendet den bisherigen regionalen Dorfabschnitt.")
@@ -410,22 +470,7 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			_set_story(state, "Sechs Jahre später", "Du bist jetzt 18. Übe am Ziel drei kontrollierte Treffer. Abstand und Erholung zählen.")
 			return _ok("Sechs Jahre später: Die erwachsene Ausbildung beginnt.")
 		"training_hit":
-			if state.progress.stage != "training":
-				return _fail("Beginne zuerst die Ausbildung beim Übungsplatz.")
-			if _distance_to(state, 0.0, -7.0) > INTERACTION_RANGE:
-				return _fail("Das Übungsziel liegt außerhalb deiner Reichweite.")
-			if float(state.timers.training) > 0.000001:
-				return _fail("Lass den Übungsschlag erst ausklingen.")
-			state.timers.training = ATTACK_COOLDOWN
-			state.progress.training_hits = int(state.progress.training_hits) + 1
-			if int(state.progress.training_hits) == 3:
-				state.progress.training_complete = true
-				state.progress.stage = "trained"
-				state.player.role = "soldier"
-				_record(state, "Du beendest die erste Waffenübung. Als ausgebildeter Soldat darfst du einen kleinen Wachtrupp anwerben.")
-				_set_story(state, "Eine erste Verantwortung", "Wirb bis zu drei Freiwillige an. Jeder kostet 5 Denarii und 2 Getreide und fehlt anschließend als zivile Arbeitskraft.")
-				return _ok("Ausbildung abgeschlossen. Du darfst einen kleinen Trupp anwerben.")
-			return _ok("Gültiger Übungstreffer %d/3." % int(state.progress.training_hits))
+			return _apply_training_contact(state)
 		"recruit":
 			if not state.progress.training_complete:
 				return _fail("Beende zuerst die erwachsene Ausbildung.")
@@ -497,6 +542,14 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			if float(state.timers.damage) > 0.000001:
 				return _fail("Dieser gegnerische Angriff wurde bereits berücksichtigt.")
 			state.timers.damage = DAMAGE_COOLDOWN
+			if CombatActions.enabled(state):
+				if float(state.village.raid.dodge_window) > 0.0:
+					state.village.raid.dodge_window = 0.0
+					return _ok("Du bist dem tatsächlichen gegnerischen Treffer ausgewichen.")
+				if float(state.village.raid.block_window) > 0.0:
+					state.village.raid.block_window = 0.0
+					return _ok("Deine Deckung fängt den tatsächlichen gegnerischen Treffer ab.")
+				CombatActions.interrupt(state)
 			var actual := mini(int(args.amount), int(state.player.health))
 			state.player.health = int(state.player.health) - actual
 			state.encounter.damage_taken = int(state.encounter.damage_taken) + actual
@@ -565,6 +618,8 @@ func _resolve_skirmish(state: Dictionary) -> Dictionary:
 
 
 func _validate_arguments(command: String, args: Dictionary) -> String:
+	if CombatActions.COMMAND_FIELDS.has(command):
+		return CombatActions.validate_arguments(command, args)
 	if command.begins_with("village_"):
 		# Reject NaN and foreign types before JSON fingerprinting, not only in
 		# the subordinate command handler after the replay record was prepared.
@@ -616,6 +671,11 @@ func _validate_state(state: Variant) -> String:
 		return "Die persönliche Dorfmiliz ist ungültig."
 	if state.village.enabled and state.origin_id != "italia":
 		return "Der römische Dorfabschnitt passt nicht zur Herkunft."
+	if CombatActions.enabled(state) and not state.village.enabled:
+		return "Die neue Kampfsteuerung benötigt den zugehörigen Dorfabschnitt."
+	var combat_error := CombatActions.validate(state)
+	if not combat_error.is_empty():
+		return combat_error
 	var economy_error := VillageEconomy.validate(state)
 	if not economy_error.is_empty():
 		return economy_error
@@ -894,6 +954,9 @@ func _restore_integer_fields(state: Dictionary) -> void:
 	for key in state.command_log:
 		state.command_log[key].result.revision = int(state.command_log[key].result.revision)
 	state.village.health_delta = int(state.village.health_delta)
+	if CombatActions.enabled(state):
+		for key in ["version", "practice_hits", "resolved_hits"]:
+			state.village.unarmed[key] = int(state.village.unarmed[key])
 	var economy: Dictionary = state.village.economy
 	for key in ["version", "day", "meal_offset", "meals_served", "grain_shortfall", "patrols_completed", "repair_count"]:
 		economy[key] = int(economy[key])
@@ -1029,6 +1092,11 @@ func _has_completed_hut(state: Dictionary) -> bool:
 func _enemy_in_range(state: Dictionary, reach: float) -> bool:
 	for enemy in state.encounter.enemies:
 		if int(enemy.health) > 0 and _distance_to(state, float(enemy.x), float(enemy.z)) <= reach:
+			if CombatActions.enabled(state):
+				var source := Vector2(float(enemy.x), float(enemy.z))
+				var target := Vector2(float(state.player.position[0]), float(state.player.position[2]))
+				if not combat_sight_check.is_valid() or not bool(combat_sight_check.call(source, target)):
+					continue
 			return true
 	return false
 

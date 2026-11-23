@@ -1,0 +1,84 @@
+{
+  "blender": "4.3.2",
+  "source": "Bundled MakeHuman CC0 finger joints and original skin weights; original pose authored here",
+  "glbs_changed": false,
+  "runtime_bones_added": 0,
+  "finger_angles_degrees": {
+    "1.L": [
+      65,
+      75,
+      45
+    ],
+    "2.L": [
+      76,
+      92,
+      58
+    ],
+    "3.L": [
+      76,
+      92,
+      58
+    ],
+    "4.L": [
+      76,
+      92,
+      58
+    ],
+    "5.L": [
+      76,
+      92,
+      58
+    ],
+    "1.R": [
+      65,
+      75,
+      45
+    ],
+    "2.R": [
+      76,
+      92,
+      58
+    ],
+    "3.R": [
+      76,
+      92,
+      58
+    ],
+    "4.R": [
+      76,
+      92,
+      58
+    ],
+    "5.R": [
+      76,
+      92,
+      58
+    ]
+  },
+  "lods": [
+    {
+      "lod": 0,
+      "records": 3422,
+      "source_sha256": "69df0f6c2546a5dd075eee07570e071746d5c46e9fcc28e3a7bac11c3a55caeb",
+      "resource": "res://assets/characters/hero_hand_grip_0.res"
+    },
+    {
+      "lod": 1,
+      "records": 1441,
+      "source_sha256": "af6a9dfc26ddec361702157943f21fd756ef5ebb476aab73bdfdb0f4de30fc91",
+      "resource": "res://assets/characters/hero_hand_grip_1.res"
+    },
+    {
+      "lod": 2,
+      "records": 684,
+      "source_sha256": "8f91895bb39608febf1df54ede111d39a0c709fa2a57036553e4ce3cc5e247f1",
+      "resource": "res://assets/characters/hero_hand_grip_2.res"
+    },
+    {
+      "lod": 3,
+      "records": 294,
+      "source_sha256": "103845fd62f6aa73284db552cd92be776deb1ec3546bb5ec30bd391cdb5b4b12",
+      "resource": "res://assets/characters/hero_hand_grip_3.res"
+    }
+  ]
+}

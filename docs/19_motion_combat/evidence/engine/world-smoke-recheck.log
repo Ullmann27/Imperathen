@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WORLD_KEYBOARD_MOTION: displacement=(-0.722306, -0.076493, -0.971913) velocity=(-0.842501, 0.0, -1.180124)
+WORLD_TOUCH_MOTION: displacement=(-0.391549, -0.10916, -0.539074) velocity=(-0.42125, 0.0, -0.590062)
+WORLD_ASSET_IMPORT: frontier_hut.glb bounds (4.386826, 3.74, 4.24)
+WORLD_SMOKE_PASS: keyboard/touch movement, analog limits/reset, touch build placement, collision, camera continuity, pause, interaction range, reload, quality settings, and presentation isolation

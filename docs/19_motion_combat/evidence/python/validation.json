@@ -1,0 +1,16 @@
+{
+  "command": "python3 -m unittest discover -s tests -p android_*_test.py",
+  "passed": true,
+  "exit_code": 0,
+  "scope": "Packaging and Android harness unit tests; synthetic fixtures are not emulator runtime proof.",
+  "source_sha256": {
+    "tests/android_action_payload_test.py": "4a61075ec9b8e42cd83d0f6bb954d991d69e2be3a70fc51c78f6ac0f3dc4056b",
+    "tests/android_frontier_payload_test.py": "3ca2f66fb4d20d9846c3bfd5a922db6bfa104dff6ed4c654420e8319f0963897",
+    "tests/android_hero_payload_test.py": "4cc64b01bc273b860d771d7f77acdbaf7352af3876894b1d408767919a8d3a3b",
+    "tests/android_runtime_smoke_test.py": "bdf82c19ebcfbb926f5e27882813747b3248ca98df76e3c41bd41457b99d5383",
+    "tests/android_village_payload_test.py": "b0e2ccf9490d64050342205994da3b18dbc324d273b00ebde6e9f75d9b257672",
+    "tests/android_village_publication_test.py": "67108c764fab7e91090fe0462a5fb21b01cbca95a3e8bff3a065897999d38824",
+    "tools/validate_android_apk.py": "c4c00520705c391efa3fb8d666b38a527917c5772c9a21bde4d766fc92d1cb12",
+    "tools/android_runtime_smoke.py": "c0eee04148433bd2be24c5029e3de06bc3347dcc9051664b1cd85d8bf8b06de9"
+  }
+}

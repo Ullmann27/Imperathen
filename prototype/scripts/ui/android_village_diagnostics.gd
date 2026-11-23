@@ -56,7 +56,14 @@ func snapshot() -> Dictionary:
 	for person: Dictionary in economy.people:
 		if person.id == "aelia":
 			value["aelia_assignment"] = person.assignment
-	_collect(session.ui, value)
+	value["action_mode"] = "unarmed" if village.has("unarmed") else "legacy"
+	value["action_runtime"] = _action_state()
+	var collection_root: Node = session.ui
+	if value.action_runtime.overlay == "techniques":
+		collection_root = session.ui.get("_technique_menu_layer")
+	elif value.action_runtime.overlay == "commands":
+		collection_root = session.ui.get("_touch_menu_layer")
+	_collect(collection_root, value)
 	return value
 
 
@@ -70,15 +77,28 @@ func _collect(node: Node, value: Dictionary) -> void:
 		var bottom := transform * (rect.position + Vector2(rect.size.x * 0.82, rect.size.y * 0.80))
 		value["scroll"] = {"top":[top.x,top.y], "bottom":[bottom.x,bottom.y],
 			"offset":node.scroll_vertical}
+	if node is Control and node.name == "MovementPad":
+		value.controls["move_pad"] = _geometry(node)
+		value.controls["move_pad"]["axis_points"] = _movement_points(node)
 	if node is Button:
 		var key := ""
 		match node.text:
 			"Interagieren": key = "interact"
-			"Dorfleben": key = "village"
+			"Dorfleben", "Dorf": key = "village"
+			"Pause": key = "pause"
+			"Weiterspielen": key = "resume"
 			"Arbeit & Versorgung": key = "work_tab"
 			"Beim Wiederaufbau mithelfen": key = "permit"
 			"Gespräch beenden": key = "dialog_close"
 			"Zurück ins Dorf": key = "panel_close"
+		if node.has_meta("touch_action"):
+			key = str(node.get_meta("touch_action"))
+		if str(node.name).begins_with("Technique_"):
+			key = "technique_" + str(node.name).trim_prefix("Technique_")
+		elif node.name == "OpenCommands":
+			key = "commands"
+		elif node.name == "CloseOverlay":
+			key = "techniques_close" if _under_named(node, "TechniqueMenu") else "commands_close"
 		if node is OptionButton:
 			for sibling: Node in node.get_parent().get_children():
 				if sibling is Label and sibling.text.begins_with("Aelia ·"):
@@ -92,7 +112,7 @@ func _collect(node: Node, value: Dictionary) -> void:
 		_collect(child, value)
 
 
-func _geometry(control: Button) -> Dictionary:
+func _geometry(control: Control) -> Dictionary:
 	var center := control.get_global_rect().get_center()
 	var native := control.get_viewport().get_screen_transform() * center
 	var visible := control.get_viewport_rect().has_point(center)
@@ -101,7 +121,9 @@ func _geometry(control: Button) -> Dictionary:
 		if ancestor is Control and ancestor.clip_contents:
 			visible = visible and ancestor.get_global_rect().has_point(center)
 		ancestor = ancestor.get_parent()
-	return {"center":[native.x,native.y], "visible":visible, "enabled":not control.disabled,
+	var native_rect: Rect2 = control.get_viewport().get_screen_transform() * control.get_global_rect()
+	return {"center":[native.x,native.y], "visible":visible, "enabled":not control.disabled if control is BaseButton else true,
+		"rect":[native_rect.position.x,native_rect.position.y,native_rect.size.x,native_rect.size.y],
 		"instance_id":str(control.get_instance_id())}
 
 
@@ -112,3 +134,57 @@ func _popup_state(popup: PopupMenu) -> Dictionary:
 			"enabled":not popup.is_item_disabled(index) and not popup.is_item_separator(index)})
 	return {"visible":popup.is_visible(), "focused":popup.get_focused_item(),
 		"instance_id":str(popup.get_instance_id()), "items":items}
+
+
+func _action_state() -> Dictionary:
+	var ui = session.ui
+	var game_world = session.world
+	var pad: Control = ui.get("_touch_pad")
+	var look: Control = ui.get("_touch_look")
+	var actor := game_world.get_node_or_null("Player") as CharacterBody3D
+	var position: Vector3 = game_world.get_player_position()
+	var velocity := actor.get_real_velocity() if actor != null else Vector3.ZERO
+	var body_velocity := actor.velocity if actor != null else Vector3.ZERO
+	var axis: Vector2 = game_world.get("_touch_move")
+	var action_touches := 0
+	for button: Button in ui.get("_touch_actions"):
+		if is_instance_valid(button) and int(button.get("touch_index")) >= 0:
+			action_touches += 1
+	var techniques: Control = ui.get("_technique_menu_layer")
+	var commands: Control = ui.get("_touch_menu_layer")
+	var overlay := "none"
+	if is_instance_valid(techniques) and techniques.is_visible_in_tree():
+		overlay = "techniques"
+	elif is_instance_valid(commands) and commands.is_visible_in_tree():
+		overlay = "commands"
+	return {"version":1, "mode":str(session.mode), "ui_view":str(ui.get("_view_state")),
+		"world_active":bool(game_world.get("_active")), "running":bool(game_world.get("_running")),
+		"selected_technique":str(ui.get("_selected_technique")), "overlay":overlay,
+		"position":[position.x,position.y,position.z], "velocity":[velocity.x,velocity.y,velocity.z],
+		"body_velocity":[body_velocity.x,body_velocity.y,body_velocity.z], "move_axis":[axis.x,axis.y],
+		"movement_touch":int(pad.get("touch_index")) if is_instance_valid(pad) else -1,
+		"camera_touches":look.get("contacts").size() if is_instance_valid(look) else 0,
+		"action_touches":action_touches, "world_camera_touches":game_world.get("_camera_contacts").size(),
+		"touch_camera_managed":bool(game_world.get("_touch_camera_managed"))}
+
+
+func _movement_points(control: Control) -> Dictionary:
+	var rect := control.get_global_rect()
+	var center := rect.get_center()
+	var distance := minf(rect.size.x,rect.size.y)*0.32
+	var transform := control.get_viewport().get_screen_transform()
+	var points := {}
+	for direction: String in ["center","up","right","down","left"]:
+		var offset: Vector2 = {"center":Vector2.ZERO,"up":Vector2.UP,"right":Vector2.RIGHT,"down":Vector2.DOWN,"left":Vector2.LEFT}[direction]
+		var native := transform * (center+offset*distance)
+		points[direction] = [native.x,native.y]
+	return points
+
+
+func _under_named(node: Node, ancestor_name: String) -> bool:
+	var ancestor := node.get_parent()
+	while ancestor != null:
+		if ancestor.name == ancestor_name:
+			return true
+		ancestor = ancestor.get_parent()
+	return false

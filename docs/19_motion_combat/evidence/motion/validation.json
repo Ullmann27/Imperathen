@@ -1,0 +1,101 @@
+{
+  "tests": [
+    {
+      "command": "godot --headless --path prototype --script res://tests/character_motion_test.gd",
+      "checks": 344,
+      "failed": 0,
+      "maximum_stance_bone_height_error_m": 2.3841858e-07
+    },
+    {
+      "command": "godot --headless --path prototype --script res://tests/village_person_test.gd",
+      "checks": 222,
+      "failed": 0
+    }
+  ],
+  "identical_views": [
+    {
+      "file": "idle_front.png",
+      "same_camera": true,
+      "same_asset": true
+    },
+    {
+      "file": "idle_side.png",
+      "same_camera": true,
+      "same_asset": true
+    },
+    {
+      "file": "walk_front.png",
+      "same_camera": true,
+      "same_asset": true
+    },
+    {
+      "file": "walk_side.png",
+      "same_camera": true,
+      "same_asset": true
+    },
+    {
+      "file": "run_side.png",
+      "same_camera": true,
+      "same_asset": true
+    }
+  ],
+  "final_capture_matches_current_sources": {
+    "prototype/scripts/visuals/village_person.gd": true,
+    "prototype/tests/character_motion_review.gd": true,
+    "prototype/scripts/visuals/facial_motion.gd": true,
+    "tools/characters/capture_motion.py": true,
+    "prototype/scripts/visuals/character_motion.gd": true,
+    "prototype/scripts/visuals/hand_pose.gd": true,
+    "prototype/assets/characters/hero_hand_grip_0.res": true,
+    "prototype/assets/characters/hero_hand_grip_1.res": true,
+    "prototype/assets/characters/hero_hand_grip_2.res": true,
+    "prototype/assets/characters/hero_hand_grip_3.res": true,
+    "prototype/assets/characters/hero_quality_0.glb": true,
+    "prototype/assets/characters/hero_quality_1.glb": true,
+    "prototype/assets/characters/hero_quality_2.glb": true,
+    "prototype/assets/characters/hero_quality_3.glb": true
+  },
+  "cost_before": {
+    "actor_meshes": 14,
+    "actor_nodes": 20,
+    "actor_visible_triangles": 32804,
+    "cpu_mean_us": 4.49,
+    "cpu_median_us": 5.0,
+    "cpu_p95_us": 6.0,
+    "cpu_scope": "600 synchronous actor._process calls after 60 warmup calls, dt=1/60; excludes rendering, physics, loading, and OS frame pacing",
+    "measured_fps": false,
+    "phone_temperature_measured": false,
+    "resolution": [
+      1100,
+      800
+    ],
+    "scenario": "One child player, LOD0, very_high, fixed studio/camera, 1.45 m/s walking; same original assets",
+    "scene_draw_calls": 31.0,
+    "scene_rendered_objects": 33.0
+  },
+  "cost_after": {
+    "actor_meshes": 14,
+    "actor_nodes": 20,
+    "actor_visible_triangles": 32804,
+    "cpu_mean_us": 39.6633333333333,
+    "cpu_median_us": 34.0,
+    "cpu_p95_us": 82.0,
+    "cpu_scope": "600 synchronous actor._process calls after 60 warmup calls, dt=1/60; excludes rendering, physics, loading, and OS frame pacing",
+    "measured_fps": false,
+    "phone_temperature_measured": false,
+    "resolution": [
+      1100,
+      800
+    ],
+    "scenario": "One child player, LOD0, very_high, fixed studio/camera, 1.45 m/s walking; same original assets",
+    "scene_draw_calls": 31.0,
+    "scene_rendered_objects": 33.0
+  },
+  "android_device_test": false,
+  "limitations": [
+    "Kinematic sole-height test refers to authored foot-bone height, not physical foot pressure.",
+    "CPU sample is actor._process only; rendering, physics, loading and Android thermals are not included.",
+    "Cloth remains skinned to the original fifteen-bone model, without cloth simulation.",
+    "Authored finger-grip resource targets the detailed Italia player; other origin assets retain their existing hand geometry."
+  ]
+}

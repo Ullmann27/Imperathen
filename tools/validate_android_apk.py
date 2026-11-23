@@ -99,10 +99,20 @@ VILLAGE_LIFE_RESOURCES = (
     "scripts/world/regional_terrain.gd",
     "scripts/world/world_stream_plan.gd",
 )
+ACTION_COMBAT_RESOURCES = (
+    "scripts/domain/combat_actions.gd",
+    "scripts/world/player_action_world.gd",
+    "scripts/visuals/character_motion.gd",
+    "scripts/visuals/hand_pose.gd",
+    "scripts/ui/touch_look.gd",
+    "scripts/ui/touch_modal.gd",
+    *(f"assets/characters/hero_hand_grip_{lod}.res" for lod in range(4)),
+)
 FEATURE_RESOURCE_GROUPS = (
     ("living_frontier_content", FRONTIER_RESOURCES),
     ("cinematic_opening_content", OPENING_RESOURCES),
     ("village_life_content", VILLAGE_LIFE_RESOURCES),
+    ("action_combat_content", ACTION_COMBAT_RESOURCES),
 )
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (

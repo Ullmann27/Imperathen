@@ -43,10 +43,14 @@ func _run() -> void:
 	movement_key.keycode = KEY_W
 	movement_key.pressed = true
 	Input.parse_input_event(movement_key.duplicate())
-	for frame in range(18):
+	# Walking accelerates from rest. Keep the required physical distance, but
+	# allow one actual second instead of assuming the former immediate run.
+	for frame in range(Engine.physics_ticks_per_second):
 		await physics_frame
 	movement_key.pressed = false
 	Input.parse_input_event(movement_key.duplicate())
+	var keyboard_speed := Vector2(player.velocity.x, player.velocity.z).length()
+	print("WORLD_KEYBOARD_MOTION: displacement=", world.get_player_position() - position, " velocity=", player.velocity)
 	_check(world.get_player_position().z < position.z - 0.4, "Actual physical W input must move the character")
 	world.get_node("Player").position = Vector3(12, 1, 16.8)
 	world.get_node("Player").velocity = Vector3.ZERO
@@ -54,19 +58,24 @@ func _run() -> void:
 	movement_key.keycode = KEY_S
 	movement_key.pressed = true
 	Input.parse_input_event(movement_key.duplicate())
-	for frame in range(24):
+	var reached_wall := false
+	for frame in range(ceili(1.5 * Engine.physics_ticks_per_second)):
 		await physics_frame
+		reached_wall = reached_wall or _has_south_wall_contact(player)
 	movement_key.pressed = false
 	Input.parse_input_event(movement_key.duplicate())
 	_check(world.get_player_position().z < 17.6, "Palisade must block the moving capsule outside the gate")
-	world.get_node("Player").position = Vector3(0, 1, 8)
-	world.get_node("Player").velocity = Vector3.ZERO
+	_check(reached_wall, "Palisade test must actually reach a blocking wall rather than only touch the ground")
+	# Compare analog and keyboard travel from the same position and facing.
+	world.setup(initial)
 	world.set_touch_move(Vector2(0, -0.5))
 	var before_touch: Vector3 = world.get_player_position()
-	for frame in range(18):
+	for frame in range(Engine.physics_ticks_per_second):
 		await physics_frame
+	print("WORLD_TOUCH_MOTION: displacement=", world.get_player_position() - before_touch, " velocity=", player.velocity)
 	_check(world.get_player_position().z < before_touch.z - 0.25, "Analog touch axis must move the real character")
-	_check(absf(world.get_node("Player").velocity.z) < 3.0, "Half touch axis must preserve analog speed")
+	var touch_speed := Vector2(player.velocity.x, player.velocity.z).length()
+	_check(absf(player.velocity.z) < 3.0 and touch_speed > keyboard_speed * 0.45 and touch_speed < keyboard_speed * 0.55, "Half touch axis must preserve analog speed at half the measured keyboard speed")
 	world.set_touch_move(Vector2(8, 8))
 	_check(world._touch_move.length() <= 1.001, "Touch input must not exceed full movement speed")
 	world.set_active(false)
@@ -103,7 +112,10 @@ func _run() -> void:
 	var key := InputEventKey.new()
 	key.physical_keycode = KEY_E
 	key.pressed = true
+	actions.clear()
 	world.set_active(false)
+	_check(actions == [{"action":"combat_interrupt", "payload":{}}], "Pausing requests exactly the authority interrupt and no gameplay action")
+	actions.clear()
 	world._unhandled_input(key)
 	_check(actions.is_empty(), "Paused world must not emit interactions")
 	world.set_active(true)
@@ -154,6 +166,8 @@ func _run() -> void:
 	_check(not world.is_build_active(), "Leaving city mode must clear building UI state")
 	actions.clear()
 	world.set_active(false)
+	_check(actions == [{"action":"combat_interrupt", "payload":{}}], "Touch pause requests exactly the authority interrupt and no gameplay action")
+	actions.clear()
 	world.perform_interaction()
 	world.perform_attack()
 	_check(actions.is_empty(), "Touch action buttons must respect the same paused-world boundary")
@@ -197,6 +211,15 @@ func _touch_tap(world: Node3D, position: Vector2) -> void:
 	release.position = position
 	release.pressed = false
 	world._unhandled_input(release)
+
+
+func _has_south_wall_contact(player: CharacterBody3D) -> bool:
+	for index in player.get_slide_collision_count():
+		var collision := player.get_slide_collision(index)
+		for contact in collision.get_collision_count():
+			if collision.get_normal(contact).dot(Vector3.FORWARD) > 0.7:
+				return true
+	return false
 
 
 func _count_collision_bodies(node: Node) -> int:

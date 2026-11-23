@@ -1,0 +1,101 @@
+{
+  "base_commit": "2909040deeb33b99ad4180b884b38921f28233a9",
+  "base_branch": "feature/childhood-village-20261123",
+  "delivery_branch": "feature/chat-a-movement-combat-20261123",
+  "policy": "These patches describe bounded integration against the exact base files. Do not automatically apply to another active chat checkout. Review changed baseline files and merge intentionally.",
+  "shared_files": [
+    {
+      "path": "prototype/scripts/domain/world_model.gd",
+      "base_sha256": "fcc0f93e16e391fec677a6d7f793e46a1d5685b92ec42c9f7e3786ff8e61fa58",
+      "delivered_sha256": "c13655bb81247008d2f0faf98426df597ddd0d4791e37018b9cc03a4b0f9f7b0",
+      "patch": "world_model.gd.patch",
+      "patch_sha256": "c530eb78197c79e9d0cef02c899d68608efff8f95679b7c2cd0954a5d88f7e9f"
+    },
+    {
+      "path": "prototype/scripts/main.gd",
+      "base_sha256": "ad4eae7ef5e5ae6d2b4104daad8a893b51250bbea60b5752ae2e66302ba34f68",
+      "delivered_sha256": "4063d84a1e429861c6c1d6288d162bd216f0885b0b2506704e8c849f61c8e577",
+      "patch": "main.gd.patch",
+      "patch_sha256": "ba9c12f523113599f496ea22ad8131651b1a1a3683ccb9cd96ba8ecd4b8e827a"
+    },
+    {
+      "path": "prototype/scripts/world/game_world.gd",
+      "base_sha256": "48aa53383334eb1c0b4f566b62e5ac8cf4b9733ab1e3e69295ed237269d601b4",
+      "delivered_sha256": "6df0b9d93ad000206e9057fa63211d439e2ace4d50e4d8cda56d6a93529713d8",
+      "patch": "game_world.gd.patch",
+      "patch_sha256": "b64a80edc4011015cd2b4bf154fc18dcafd6af8de43730c0ba5f89e7378c2376"
+    },
+    {
+      "path": "prototype/scripts/story/village_life.gd",
+      "base_sha256": "68c1d7f8066c997950efb1edf174d6b5ff20cfc01a474b265b160b44a8891bbb",
+      "delivered_sha256": "4cc98a41db497e0c64785890df2148dedf9f2b75328b899823c3ce31d79400f7",
+      "patch": "village_life.gd.patch",
+      "patch_sha256": "a4f182ff50cac9dc647d2f295c6de62cc1385089399d5d439ac81707c4c4bdb8"
+    },
+    {
+      "path": "prototype/scripts/world/village/village_population.gd",
+      "base_sha256": "d6b886261c63f340ee01ab7293130f0688da002967fbbd5ec470475503f9a9ed",
+      "delivered_sha256": "88ad2b422077b6177516c1f3de95854dc8780c2bff7800da839473f935c934b3",
+      "patch": "village_population.gd.patch",
+      "patch_sha256": "989eb6ec785b76b5e2a3dbd7a5a75e531a09cfb37e1adabbf67df9016a70f8b2"
+    }
+  ],
+  "required_files": [
+    {
+      "path": "prototype/scripts/domain/combat_actions.gd",
+      "sha256": "109b20c8be47c7408454eab81e40961e9fd068eb4035fd2b7a09963a6d7ea35b"
+    },
+    {
+      "path": "prototype/scripts/world/player_action_world.gd",
+      "sha256": "d4e184e15c00414608bf22994e98d8220c6584174ab32cdb3a12367c5227e244"
+    },
+    {
+      "path": "prototype/scripts/visuals/character_motion.gd",
+      "sha256": "da1db696fc36c66ba30e1203ae0a814eac2fca19e9a9e6776a1188fb99922b6f"
+    },
+    {
+      "path": "prototype/scripts/visuals/hand_pose.gd",
+      "sha256": "566f0f7d99c955465a7b710e1cfead7b1480a6e0edc3d3951de8d722cf8a88d5"
+    },
+    {
+      "path": "prototype/scripts/visuals/village_person.gd",
+      "sha256": "228029fdc1b3718f8109537b53f545fdf4574e9a4f6d1cf5c26ade5103919f29"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_look.gd",
+      "sha256": "3978ef6f09c854459fbfdd3626f3ec75fdd9538a48e7513ffb3a1c2a8a58e183"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_modal.gd",
+      "sha256": "6d92ed3d5777c60d7b2eb8ca1993e4525628ffcd811955e4f7edc6647a30cf07"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_pad.gd",
+      "sha256": "630008051d4a42dfddcfeecfe6c0e595892de24d297cec0f8e805cbd5e6f8541"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_action.gd",
+      "sha256": "1ac1671fcc48f6613d1689286655beaa5fe40a096804545162fc8011fd4d4f6b"
+    },
+    {
+      "path": "prototype/scripts/ui/game_ui.gd",
+      "sha256": "fe81424e1329f5a44c3610e49f21468686736447ac9083119c180b552d7e53e3"
+    },
+    {
+      "path": "prototype/assets/characters/hero_hand_grip_0.res",
+      "sha256": "6de601e365fe669f41eab913c932c1e591873cb320a26c1b8d25e0f00675bb77"
+    },
+    {
+      "path": "prototype/assets/characters/hero_hand_grip_1.res",
+      "sha256": "523a1220ada6d94f6e8b82cc8da62583611915310cbaf52dbc6b01fcc60d133b"
+    },
+    {
+      "path": "prototype/assets/characters/hero_hand_grip_2.res",
+      "sha256": "4e759227bd3671c313ab929e0e361075c32eaf9112ee25d0e3eeefb97bb87eff"
+    },
+    {
+      "path": "prototype/assets/characters/hero_hand_grip_3.res",
+      "sha256": "f33641d52fb8516862435d041ecf04ce43abc4853d558c59bedadedd3c5ecd1f"
+    }
+  ]
+}

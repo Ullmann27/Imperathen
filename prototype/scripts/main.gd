@@ -13,6 +13,7 @@ const OpeningOverlay = preload("res://scripts/ui/opening_overlay.gd")
 const OpeningCheckpoint = preload("res://scripts/cinematic/opening_checkpoint.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
 const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
+const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -57,6 +58,8 @@ func _ready() -> void:
 	add_child(world)
 	world.setup(model.data)
 	world.action_requested.connect(_on_world_action)
+	model.combat_sight_check = world.combat_sight_clear
+	model.combat_motion_check = world.combat_safe_motion
 	world.set_active(false)
 	world.set_mode("city")
 	ui = UIScript.new()
@@ -86,8 +89,6 @@ func _process(delta: float) -> void:
 				_save(false)
 		return
 	if screen == "playing":
-		model.set_player_position(world.get_player_position())
-		model.advance(delta)
 		world.set_frontier_time(float(model.data.world_seconds))
 		autosave_elapsed += delta
 		if autosave_elapsed >= 45.0:
@@ -96,6 +97,16 @@ func _process(delta: float) -> void:
 	refresh_elapsed += delta
 	if refresh_pending and refresh_elapsed >= 0.12:
 		_refresh()
+
+
+func _physics_process(delta: float) -> void:
+	if screen != "playing" or not is_instance_valid(world):
+		return
+	# Geometry queries, authoritative motion and contact windows share the
+	# physics clock. Rendering or a slow UI refresh cannot create extra hits.
+	model.set_player_position(world.get_player_position())
+	model.advance(delta)
+	world.sync_combat_state(model.data)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -214,7 +225,7 @@ func _request_new_game() -> void:
 func _start_new_game() -> void:
 	_release_opening()
 	pending_opening = {}
-	model.new_game(ui.origin_id, true)
+	model.new_game(ui.origin_id, true, true)
 	last_story_id = ""
 	world.setup(model.data)
 	session_started = true
@@ -323,6 +334,20 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 	if screen == "opening" and action != "quality_changed":
 		return
 	match action:
+		"touch_camera_managed": world.set_touch_camera_managed(bool(payload.get("enabled", false)))
+		"movement_pace":
+			if screen == "playing":
+				world.set_running(bool(payload.get("running", false)))
+		"select_technique": world.set_selected_technique(str(payload.get("technique", "jab_left")))
+		"camera_look":
+			if screen == "playing":
+				world.apply_camera_look(Vector2(float(payload.get("x", 0)), float(payload.get("y", 0))))
+		"camera_zoom":
+			if screen == "playing":
+				world.apply_camera_zoom(float(payload.get("factor", 1.0)))
+		"village_unarmed_guard", "village_unarmed_dodge":
+			if screen == "playing":
+				_command(action, {})
 		"village_panel": _show_village_panel(str(payload.get("tab", "overview")))
 		"village_command": _village_command(str(payload.get("command", "")), payload.get("args", {}))
 		"village_close": _resume()
@@ -369,7 +394,7 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 				world.perform_interaction()
 		"attack":
 			if screen == "playing":
-				world.perform_attack()
+				world.perform_attack(str(payload.get("technique", "")))
 		"cancel_build":
 			if screen == "playing":
 				world.set_build_mode(false)
@@ -403,6 +428,9 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 
 
 func _on_world_action(action: String, payload: Dictionary) -> void:
+	if action == "combat_interrupt":
+		model.interrupt_combat()
+		return
 	if action == "build_mode_changed":
 		if ui != null:
 			ui.set_build_active(bool(payload.get("active", false)))
@@ -428,12 +456,16 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 		return {"ok": false, "message": "Die Welt ist pausiert."}
 	model.set_player_position(world.get_player_position())
 	command_serial += 1
-	var result: Dictionary = model.execute(command, payload, "%s_%d" % [run_id, command_serial])
-	if not result.get("ok", false) or command not in ["receive_damage", "train"]:
+	var realtime_combat := CombatActions.COMMAND_FIELDS.has(command)
+	# Real-time button presses are guarded by the active movement, not stored
+	# as thousands of permanent economic orders. Their consequences are saved.
+	var command_id := "" if realtime_combat else "%s_%d" % [run_id, command_serial]
+	var result: Dictionary = model.execute(command, payload, command_id)
+	if not result.get("ok", false) or (not realtime_combat and command not in ["receive_damage", "train"]):
 		ui.notify(str(result.get("message", "")))
 	_refresh()
 	var persisted := true
-	if result.get("ok", false) and (command in ["choose_companion", "train", "recruit", "resolve_skirmish", "choose_story", "frontier_talk", "frontier_choice"] or (command.begins_with("village_") and command not in ["village_strike", "village_block", "village_dodge"]) or model.data.progress.stage in ["aftermath", "fallen"]):
+	if result.get("ok", false) and (command in ["choose_companion", "train", "recruit", "resolve_skirmish", "choose_story", "frontier_talk", "frontier_choice"] or (command.begins_with("village_") and not realtime_combat and command not in ["village_strike", "village_block", "village_dodge"]) or model.data.progress.stage in ["aftermath", "fallen"]):
 		persisted = bool(_save(false).get("ok", false))
 	if result.get("ok", false) and command == "train":
 		if persisted:

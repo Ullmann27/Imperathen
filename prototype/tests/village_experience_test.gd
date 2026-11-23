@@ -36,6 +36,7 @@ func _run() -> void:
 	root.add_child(game)
 	await _frames()
 	game.set_process(false)
+	game.set_physics_process(false)
 	game.world.set_physics_process(false)
 	game.ui._finish_intro()
 	await _frames()
@@ -141,7 +142,7 @@ func _run() -> void:
 	_check(not game.model.data.village.economy.workplaces.woodcamp.project.is_empty(),"The visible repair button spends resources and starts real work")
 	await _capture("03-workplace-panel")
 	before = _state()
-	game._process(20.0)
+	_advance_game(20.0)
 	_check(_state()==before,"Open work panels hold simulation time")
 	root.go_back_requested.emit()
 	_check(game.screen=="playing","Android Back closes the village panel")
@@ -213,22 +214,22 @@ func _run() -> void:
 	_move(Vector3(enemy.x+3.0,1,enemy.z+2.0))
 	game.world._update_camera(1.0)
 	await _capture("04-raid-in-world")
-	game.ui.action_requested.emit("village_block",{})
+	game.ui.action_requested.emit("village_unarmed_guard",{})
 	_check(game.model.data.village.raid.block_window>0.0 and game.world.get("_figure").clip=="block","An accepted block reaches the actual character cue")
 	before = _state()
 	old_motion = game.world.get("_dodge_remaining")
-	game.ui.action_requested.emit("village_dodge",{})
+	game.ui.action_requested.emit("village_unarmed_dodge",{})
 	_check(_state()==before and game.world.get("_dodge_remaining")==old_motion,"Rejected shared-cooldown dodge does not run its motion")
 	_advance(1.2)
-	game.ui.action_requested.emit("village_dodge",{})
+	game.ui.action_requested.emit("village_unarmed_dodge",{})
 	_check(game.model.data.village.raid.dodge_window>0.0 and game.world.get("_dodge_remaining")>0.0,"Accepted dodge starts both rule protection and actual movement")
 	var start_position: Vector3 = game.world.get_player_position()
-	_advance(0.1)
+	await _advance_real_motion(0.1)
 	_check(game.world.get_player_position().distance_to(start_position)>0.01,"Accepted dodge produces a measured change in the rendered player's position")
 	game.ui.action_requested.emit("pause",{})
 	await _frames()
 	before = _state()
-	game._process(15.0)
+	_advance_game(15.0)
 	_check(game.screen=="paused" and _state()==before,"Pause holds the ongoing raid and shared resource state")
 	_click("Spiel speichern")
 	await _frames()
@@ -251,13 +252,21 @@ func _run() -> void:
 	_check(game.model.data.village.raid.rescued and int(_person(rescued_id).health)==100,"Continued world interaction rescues and treats the actual existing resident")
 	for index in game.model.data.village.raid.enemies.size():
 		var attempts := 0
-		while int(game.model.data.village.raid.enemies[index].health)>0 and attempts<5:
+		while int(game.model.data.village.raid.enemies[index].health)>0 and attempts<12:
 			var current: Dictionary = game.model.data.village.raid.enemies[index]
-			_move(Vector3(current.x,1,current.z+0.5))
+			var reached := _approach_combat_target(current)
+			_check(reached,"The combat fixture uses an unoccupied approach with a clear actual contact ray")
+			if not reached:
+				break
 			var health_before := int(current.health)
-			game.ui.action_requested.emit("attack",{})
-			_check(int(game.model.data.village.raid.enemies[index].health)<health_before,"The actual attack input damages the live in-range village raider")
-			_advance(0.75)
+			var player_health_before := int(game.model.data.player.health)
+			game.ui.action_requested.emit("attack",{"technique":"jab_left"})
+			_check(int(game.model.data.village.raid.enemies[index].health)==health_before,"An actual attack input starts a motion without instant damage")
+			_advance(0.25)
+			var interrupted: bool = int(game.model.data.player.health)<player_health_before and game.model.data.village.unarmed.technique==""
+			_check(int(game.model.data.village.raid.enemies[index].health)<health_before or interrupted,"Active contact damages a live in-range raider unless a real incoming hit interrupted it")
+			_move(Vector3(35,1,20))
+			_advance(1.0)
 			attempts += 1
 	_check(game.model.data.village.raid.won==1 and not game.model.data.village.raid.active,"The actual player wins after all enemies are genuinely defeated")
 	_check(game.model.data.village.attributes.combat>=9 and game.model.data.village.attributes.courage>=3,"Real fighting and rescue develop the actual saved abilities")
@@ -280,7 +289,7 @@ func _run() -> void:
 	_click("4 Holz teilen")
 	await _frames()
 	_check(game.model.data.companion.met and game.model.data.companion.choice=="help","The required earlier companion choice is made through its actual dialogue")
-	_move(Vector3(0,1,-7))
+	_move(Vector3(0,1,-6))
 	game.ui.action_requested.emit("interact",{})
 	await _frames()
 	_check(game.screen=="opening" and game.opening_sequence.id=="adulthood" and game.model.data.player.age==18,"The eligible actual training interaction starts the saved adult transition")
@@ -288,8 +297,9 @@ func _run() -> void:
 		game.opening_overlay._request_skip()
 		game.opening_overlay._request_advance()
 	await _frames()
+	game.world._figure.rotation.y = 0.0
 	for index in 3:
-		game.ui.action_requested.emit("attack",{})
+		game.ui.action_requested.emit("attack",{"technique":"jab_left"})
 		_advance(0.7)
 	_check(game.model.data.progress.training_complete and game.model.data.progress.training_hits==3,"Three genuine training attacks complete the adult qualification")
 	var recruit_button: Button = game.ui.get("_action_buttons").get("recruit")
@@ -329,10 +339,48 @@ func _advance(seconds: float) -> void:
 	var remaining := seconds
 	while remaining>0.000001:
 		var step := minf(0.1,remaining)
-		game._process(step)
+		_advance_game(step)
 		game.world._physics_process(step)
 		remaining -= step
 	game._refresh()
+
+
+func _advance_real_motion(seconds: float) -> void:
+	# CharacterBody3D.move_and_slide reads the engine physics delta, so a
+	# movement assertion must run on real physics frames rather than invoke
+	# the method repeatedly inside one rendered frame.
+	var remaining := seconds
+	while remaining > 0.000001:
+		await physics_frame
+		var step := minf(1.0 / 60.0, remaining)
+		_advance_game(step)
+		game.world._physics_process(step)
+		remaining -= step
+	game._refresh()
+
+
+func _approach_combat_target(target: Dictionary) -> bool:
+	# These tests teleport for travel, but never through a wall to fabricate a
+	# melee hit. The north palisade can separate a raider from the old +Z fixture.
+	var point := Vector2(float(target.x), float(target.z))
+	var shape: CapsuleShape3D = game.world._player.get_child(0).shape
+	for index in 8:
+		var offset := Vector2(0.0, 1.0).rotated(float(index) * PI / 4.0)
+		var candidate := point + offset
+		if not game.world.combat_sight_clear(candidate, point):
+			continue
+		var query := PhysicsShapeQueryParameters3D.new()
+		query.shape = shape
+		query.transform = Transform3D(Basis.IDENTITY, Vector3(candidate.x, 1.0, candidate.y))
+		query.collision_mask = 1 | 4
+		query.exclude = [game.world._player.get_rid()]
+		if not game.world.get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty():
+			continue
+		_move(Vector3(candidate.x, 1.0, candidate.y))
+		var direction := (point - candidate).normalized()
+		game.world._figure.rotation.y = atan2(-direction.x, -direction.y)
+		return true
+	return false
 
 
 func _move(position: Vector3) -> void:
@@ -525,3 +573,10 @@ func _equivalent(left: Variant, right: Variant) -> bool:
 				return false
 		return true
 	return left==right
+
+
+func _advance_game(delta: float) -> void:
+	# Main owns the authoritative physics clock; presentation retains its own
+	# process callback. Both run explicitly so awaited UI frames add no time.
+	game._physics_process(delta)
+	game._process(delta)
