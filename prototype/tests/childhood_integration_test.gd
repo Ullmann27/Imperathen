@@ -53,7 +53,7 @@ func _run() -> void:
 	await frames()
 	check(game.screen=="opening" and game.opening_sequence.id=="i00_aquileia","New Life begins with the I-00 Aquileia cold open")
 	check(Childhood.enabled(game.model.data),"Fresh Roman campaign contains the new chapter")
-	var before_i00 := JSON.parse_string(JSON.stringify(game.model.data))
+	var before_i00: Variant = JSON.parse_string(JSON.stringify(game.model.data))
 	game._opening_skip()
 	game._opening_next()
 	await frames(8)
