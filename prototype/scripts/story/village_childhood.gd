@@ -16,7 +16,8 @@ const POINTS := {
 	"bellows":Vector2(32.7,-28.4), "anvil":Vector2(32.8,-26.2), "quench":Vector2(32.7,-23.8),
 	"wood_bundle":Vector2(-43.0,17.0), "patrol_inner":Vector2(0.0,-16.0),
 	"patrol_road":Vector2(0.0,-35.0), "patrol_gate":Vector2(0.0,-46.0),
-	"sick_guard":Vector2(10.0,18.5)
+	"sick_guard":Vector2(10.0,18.5), "marcus":Vector2(-3.0,4.0),
+	"hoof_tracks":Vector2(0.0,-35.0)
 }
 const EXTRA_NPCS := {
 	"julia":{"name":"Julia", "role":"Deine Mutter", "point":"mother", "profession":""},
@@ -71,7 +72,7 @@ const STEPS := [
 ]
 const CARRIED_EFFECTS := {
 	"mother_morning":{"add":["household_coin"]}, "fill_water":{"add":["water_jug"]},
-	"father_morning":{"remove":["water_jug"]},
+	"father_morning":{"remove":["water_jug"],"add":["neighbor_basket"]},
 	"market_purchase":{"remove":["household_coin"],"add":["family_parcel"]},
 	"deliver_food":{"remove":["family_parcel"]}, "collect_kindling":{"add":["kindling_bundle"]},
 	"deliver_kindling":{"remove":["kindling_bundle"]},
@@ -79,7 +80,7 @@ const CARRIED_EFFECTS := {
 	"healer_request":{"add":["medicine_parcel"]}, "deliver_medicine":{"remove":["medicine_parcel"]},
 	"watch_post":{"add":["gate_message"]}, "watch_message":{"remove":["gate_message"]}
 }
-const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Fabius’ Kleinholzbündel", "checked_hinge":"Geprüftes Scharnier", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
+const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Fabius’ Kleinholzbündel", "checked_hinge":"Geprüftes Scharnier", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
 
 
@@ -96,6 +97,7 @@ static func start(data: Dictionary) -> bool:
 	data.village.childhood = {"version":VERSION,"completed":[],"day":1,"carried":[],
 		"relationships":relationships,"active_work":"","work_seconds":0.0,
 		"gear":"none","apprenticeship":"none","night_event":"none",
+		"screenplay":{"version":1,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i08":"locked","hoof_evidence":false},
 		"guard_absence":{"active":false,"previous_assignment":"idle","previous_health":100}}
 	return true
 
@@ -127,6 +129,22 @@ static func migrate_legacy_ids(data: Dictionary) -> bool:
 		relationships[canonical_id] = legacy_relation.duplicate(true)
 	child.relationships = relationships
 	child.version = VERSION
+	var old_completed: Array = child.get("completed", [])
+	var passed_family_morning := old_completed.size() >= 3
+	var passed_watch_service := old_completed.has("return_gear") or old_completed.has("family_evening") or old_completed.has("night_rest")
+	child.screenplay = {
+		"version":1,
+		"i02":"complete" if passed_family_morning else "pending",
+		"i02_outcome":"legacy" if passed_family_morning else "",
+		"i03":"complete" if passed_family_morning else "locked",
+		"i03_outcome":"legacy" if passed_family_morning else "",
+		"i08":"complete" if passed_watch_service else "locked",
+		"hoof_evidence":passed_watch_service
+	}
+	# Old saves that had already passed the family morning never carried the
+	# newly authored basket; do not invent it retroactively.
+	if passed_family_morning:
+		child.carried.erase("neighbor_basket")
 
 	# Restore generic villagers that no longer carry a family/story role.
 	var antonia := _person(data, "antonia")
@@ -490,7 +508,50 @@ static func validate(data: Dictionary) -> String:
 	return ""
 
 
+static func _screenplay_step(data: Dictionary) -> Dictionary:
+	var child: Dictionary = data.village.childhood
+	var screenplay: Dictionary = child.screenplay
+	# I-02 and I-03 sit after the established family morning. They are separate
+	# from completed[] so older 35-step saves keep their exact sequence indices.
+	if child.completed.size() >= 3:
+		if screenplay.i02 == "pending":
+			return {"id":"i02_basket","mission":"I-02","screenplay":true,"npc":"aurelia",
+				"chapter":"Der falsche Korb","label":"Julias Korb zu Aurelia bringen",
+				"objective":"Bring Julias Nachbarschaftskorb zu Aurelia. Prüfe den Korb oder handle hastig.",
+				"text":"»Zeig mir erst, welchen Korb Julia dir gegeben hat. Ein Fehler ist kein Weltende, aber wir müssen dann mit seinen Folgen weiterarbeiten.«",
+				"result":"Aurelia prüft den Korb."}
+		if screenplay.i02 == "correction":
+			return {"id":"i02_correct","mission":"I-02","screenplay":true,"npc":"julia",
+				"chapter":"Der falsche Korb","label":"Den falschen Korb mit Julia korrigieren",
+				"objective":"Kehre zu Julia zurück. Der falsche Korb bleibt Teil der Geschichte, bis du ihn korrigierst.",
+				"text":"»Gut, dass du zurückkommst. Fehler verschwinden nicht, weil man sie nicht mag. Wir bringen jetzt den richtigen Korb auf den Weg.«",
+				"result":"Der Fehler ist korrigiert und bleibt als Erinnerung gespeichert."}
+		if screenplay.i02 == "complete" and screenplay.i03 == "pending":
+			return {"id":"i03_marcus","mission":"I-03","screenplay":true,"point":"marcus",
+				"chapter":"Marcus kennt eine Abkürzung","label":"Mit Marcus über Marktweg und Münzstreit entscheiden",
+				"objective":"Triff Marcus bei der Gasse zum Markt. Entscheide, ob ihr den Streit als Freunde löst oder euch gegeneinander verhärtet.",
+				"text":"","result":"Die Beziehung zu Marcus erhält eine konkrete Erinnerung."}
+	# I-08 must happen after the bounded watch service and before the last normal
+	# family evening. No people or faction are identified from hoofprints alone.
+	if child.completed.has("return_gear"):
+		if screenplay.i08 == "pending":
+			return {"id":"i08_tracks","mission":"I-08","screenplay":true,"point":"hoof_tracks",
+				"chapter":"Hufspuren im Regen","label":"Die frischen Hufspuren am Nordweg prüfen",
+				"objective":"Untersuche am Nordweg die frischen Hufspuren. Halte Beobachtung und Vermutung getrennt.",
+				"text":"","result":"Du sicherst die Beobachtung: mehrere frische Hufspuren, aber noch keinen belastbaren Täter."}
+		if screenplay.i08 == "report":
+			return {"id":"i08_report","mission":"I-08","screenplay":true,"npc":"decimus",
+				"chapter":"Hufspuren im Regen","label":"Decimus nur die belegten Spuren melden",
+				"objective":"Berichte Decimus, was du tatsächlich gesehen hast. Beschuldige kein Volk ohne Beleg.",
+				"text":"»Zeig mir, was du weißt. Nicht, was du vermutest.«",
+				"result":"Die Hufspuren werden als offene Warnung protokolliert; ein Täter bleibt unbekannt."}
+	return {}
+
+
 static func _current(data: Dictionary) -> Dictionary:
+	var screenplay_step := _screenplay_step(data)
+	if not screenplay_step.is_empty():
+		return screenplay_step
 	var index: int = data.village.childhood.completed.size()
 	return STEPS[index] if index < STEPS.size() else {}
 
