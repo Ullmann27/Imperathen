@@ -19,7 +19,7 @@ func check(ok: bool, message: String) -> void:
 func run() -> void:
 	Registry.reset_cache_for_tests()
 	var entries := Registry.all_metadata()
-	check(entries.size() == 28, "canonical Meshy manifest exposes 28 assets")
+	check(entries.size() == 29, "canonical Meshy manifest exposes 29 assets")
 	var ids := {}
 	var categories := {}
 	for entry: Dictionary in entries:
@@ -41,8 +41,8 @@ func run() -> void:
 	check(int(categories.get("weapon", 0)) == 8, "eight weapons registered")
 	check(int(categories.get("character", 0)) == 7, "seven character sources registered")
 	check(int(categories.get("equipment", 0)) == 7, "seven equipment sources registered")
-	check(int(categories.get("resource", 0)) == 6, "six resource sources registered")
-	var galena := Registry.metadata("resource_galena")
+	check(int(categories.get("resource", 0)) == 6, "six resource sources registered")\n\tcheck(int(categories.get("mount", 0)) == 1, "one canonical cavalry mount registered")
+	var horse := Registry.metadata("mount_ancient_cavalry_horse")\n\tcheck(str(horse.get("status", "")) == "geometry_ready_untextured", "cavalry horse remains explicitly untextured")\n\tcheck(str(horse.get("meshy_preview_task_id", "")) == "01a20934-c44a-77ea-95a7-5e2c2c804d5e", "cavalry horse keeps the exact Meshy preview task")\n\tvar galena := Registry.metadata("resource_galena")
 	check(str(galena.get("status", "")) == "geometry_ready_untextured", "galena stays explicitly untextured")
 	check(str(galena.get("meshy_task_id", "")) == "", "galena cannot claim a final task")
 	check(not Registry.metadata("not_an_asset").size(), "unknown id returns empty metadata")
