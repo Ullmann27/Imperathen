@@ -106,6 +106,8 @@ static func start(data: Dictionary) -> bool:
 		var person := _person(data, id)
 		if not person.is_empty():
 			person.profession = EXTRA_NPCS[id].role
+			person.assignment = "idle"
+			person.previous_assignment = "idle"
 	# The production screenplay begins in 58 BCE. Legacy village careers keep\n	# their older Trajan-era history; only an explicitly enabled childhood\n	# campaign moves this shared village history anchor.\n	data.village.history.start_year = -58\n	data.village.history.mode = "historical_baseline"\n	data.village.childhood = {"version":VERSION,"completed":[],"day":1,"carried":[],
 		"relationships":relationships,"active_work":"","work_seconds":0.0,
 		"gear":"none","apprenticeship":"none","night_event":"none",
@@ -634,37 +636,105 @@ static func validate(data: Dictionary) -> String:
 			expected_gear = "returned"
 			absent = false
 	var screenplay: Variant = child.screenplay
-	if not _keys(screenplay,["version","i02","i02_outcome","i03","i03_outcome","i08","hoof_evidence"]) or not _integer(screenplay.version,1,1):
+	var screenplay_keys := ["version","i02","i02_outcome","i03","i03_outcome","i08","hoof_evidence",
+		"i10","raid_path","visible_raiders","i11","i12","i13","i14","julia_outcome","oath"]
+	if not _keys(screenplay, screenplay_keys) or not _integer(screenplay.version,2,2):
 		return "Ungültiger Drehbuch-Brückenstand."
 	if screenplay.i02 not in ["pending","correction","complete"] or screenplay.i03 not in ["locked","pending","complete"] or screenplay.i08 not in ["locked","pending","report","complete"]:
 		return "Ungültiger Status einer frühen Drehbuchmission."
+	for key: String in ["i10","i11","i12","i13","i14"]:
+		if typeof(screenplay[key]) != TYPE_STRING or screenplay[key] not in ["locked","pending","complete"]:
+			return "Ungültiger Status einer Nachtraid-Drehbuchmission."
 	if typeof(screenplay.i02_outcome) != TYPE_STRING or screenplay.i02_outcome not in ["","checked","wrong","legacy"]:
 		return "Ungültige Folge des Korbauftrags."
 	if typeof(screenplay.i03_outcome) != TYPE_STRING or screenplay.i03_outcome not in ["","friend","rival","legacy"]:
 		return "Ungültige Marcus-Erinnerung."
-	if typeof(screenplay.hoof_evidence) != TYPE_BOOL:
-		return "Hufspurbeleg benötigt einen Wahrheitswert."
+	if typeof(screenplay.raid_path) != TYPE_STRING or screenplay.raid_path not in ["","defend","hide","legacy"]:
+		return "Ungültiger Weg durch die Nacht der Reiter."
+	if typeof(screenplay.julia_outcome) != TYPE_STRING or screenplay.julia_outcome not in ["undecided","survived","dead","legacy"]:
+		return "Ungültiger gespeicherter Ausgang für Julia."
+	if typeof(screenplay.hoof_evidence) != TYPE_BOOL or typeof(screenplay.oath) != TYPE_BOOL or not _integer(screenplay.visible_raiders,30,30):
+		return "Drehbuchbeleg, Schwur oder sichtbare Reiterzahl ist ungültig."
+
 	if screenplay.i02 == "complete":
 		expected_items.erase("neighbor_basket")
+	if screenplay.i14 == "complete":
+		expected_items.append("memory_token")
 	if screenplay.i03 == "complete" and screenplay.i03_outcome != "legacy":
 		if not data.companion.met or screenplay.i03_outcome == "friend" and data.companion.choice != "help" or screenplay.i03_outcome == "rival" and data.companion.choice != "decline":
 			return "Marcus-Beziehung und I-03 widersprechen sich."
-	elif data.companion.met:
+	elif screenplay.i03 != "complete" and data.companion.met:
 		return "Marcus darf vor I-03 nicht stillschweigend als Gefährte entschieden sein."
 	if screenplay.i08 in ["report","complete"] and not screenplay.hoof_evidence:
 		return "Die gemeldeten Hufspuren wurden nicht tatsächlich untersucht."
 	if screenplay.i08 == "complete" and not child.completed.has("return_gear"):
 		return "I-08 darf nicht vor dem begrenzten Wachtdienst abgeschlossen sein."
+
+	var base_complete: bool = child.completed.size() == STEPS.size()
+	var bridges_complete: bool = screenplay.i02 == "complete" and screenplay.i03 == "complete" and screenplay.i08 == "complete"
+	if screenplay.i10 != "locked" and (not base_complete or not bridges_complete):
+		return "I-10 darf erst nach dem vollständigen gewöhnlichen Dorfabend beginnen."
+	if not base_complete and screenplay.i10 != "locked":
+		return "Die Nacht der Reiter wurde vor dem letzten gewöhnlichen Abend geöffnet."
+	if base_complete and bridges_complete and screenplay.i10 == "locked":
+		return "Nach dem letzten gewöhnlichen Abend muss I-10 als nächste Mission bereitstehen."
+	if screenplay.i10 == "pending" and screenplay.raid_path != "":
+		return "Vor der Nachtentscheidung darf kein Raid-Weg feststehen."
+	if screenplay.i10 == "complete" and screenplay.raid_path == "":
+		return "Die abgeschlossene Nachtentscheidung benötigt einen gespeicherten Weg."
+	if screenplay.i10 != "complete" and screenplay.i11 != "locked":
+		return "I-11 darf nicht vor der Nachtentscheidung beginnen."
+
+	var raid: Dictionary = data.village.get("raid", {})
+	if screenplay.i11 in ["pending","complete"] and (raid.get("status","") != "aftermath" or int(raid.get("completed",0)) < 1):
+		return "I-11 benötigt einen tatsächlich abgeschlossenen Angriff."
+	if raid.get("status","") == "aftermath" and screenplay.i10 == "complete" and screenplay.i11 == "locked":
+		return "Nach dem Angriff muss I-11 freigeschaltet sein."
+	if screenplay.i11 == "pending" and screenplay.i12 != "locked":
+		return "I-12 darf erst nach Sextus’ Schmiedeszene beginnen."
+	if screenplay.i11 == "complete":
+		var smith := _person(data,"sextus")
+		if smith.is_empty() or smith.alive or int(smith.health) != 0 or smith.assignment != "idle":
+			return "I-11 und Sextus’ tatsächlicher Einwohnerzustand widersprechen sich."
+		if screenplay.i12 == "locked":
+			return "Nach I-11 muss I-12 bereitstehen."
+	if screenplay.i12 == "pending" and screenplay.i13 != "locked":
+		return "I-13 darf erst nach dem letzten Weg des Vaters beginnen."
+	if screenplay.i12 == "complete":
+		var father := _person(data,"silvanus")
+		var mother := _person(data,"julia")
+		if father.is_empty() or father.alive or int(father.health) != 0 or father.assignment != "idle":
+			return "I-12 und Silvanus’ tatsächlicher Einwohnerzustand widersprechen sich."
+		if screenplay.julia_outcome not in ["survived","dead"]:
+			return "I-12 benötigt einen eindeutigen Ausgang für Julia."
+		if mother.is_empty() or screenplay.julia_outcome == "survived" and (not mother.alive or int(mother.health) <= 0) or screenplay.julia_outcome == "dead" and (mother.alive or int(mother.health) != 0):
+			return "Julias gespeicherter Ausgang widerspricht ihrem Einwohnerzustand."
+		if screenplay.i13 == "locked":
+			return "Nach I-12 muss I-13 bereitstehen."
+	elif screenplay.julia_outcome not in ["undecided","legacy"]:
+		return "Julias Endzustand wurde vor I-12 festgeschrieben."
+	if screenplay.i13 == "complete" and screenplay.i14 == "locked":
+		return "Nach I-13 muss I-14 bereitstehen."
+	if screenplay.i14 == "complete":
+		if not screenplay.oath or not expected_items.has("memory_token"):
+			return "I-14 benötigt Schwur und Erinnerungsstück."
+	elif screenplay.oath:
+		return "Der Schwur darf nicht vor I-14 gesetzt sein."
+
+	var expected_night := "none"
+	if base_complete and bridges_complete:
+		expected_night = "pending" if screenplay.i10 == "pending" else ("resolved" if screenplay.i14 == "complete" else "released")
+	if typeof(child.night_event) != TYPE_STRING or child.night_event != expected_night:
+		return "Nachtstatus und Drehbuchfortschritt widersprechen sich."
+	if child.night_event in ["none","pending"] and (raid.get("status","") != "quiet" or int(raid.get("number",-1)) != 0 or int(raid.get("completed",-1)) != 0):
+		return "Vor der freigegebenen Nacht darf kein Überfall begonnen oder abgeschlossen sein."
+	if child.night_event == "resolved" and (raid.get("status","") != "aftermath" or int(raid.get("completed",0)) < 1):
+		return "Der Schwur darf keinen unabgeschlossenen Nachtangriff überspringen."
+
 	if not _integer(child.day,1,4) or child.day != expected_day or child.carried != expected_items:
 		return "Tag oder Auftragsgegenstände sind nicht durch erledigte Handlungen belegt."
 	if typeof(child.apprenticeship) != TYPE_STRING or child.apprenticeship != expected_apprenticeship or typeof(child.gear) != TYPE_STRING or child.gear != expected_gear:
 		return "Lehre oder Leihgegenstände widersprechen der Auftragsfolge."
-	var bridges_complete: bool = screenplay.i02 == "complete" and screenplay.i03 == "complete" and screenplay.i08 == "complete"
-	if typeof(child.night_event) != TYPE_STRING or child.night_event not in (["pending","released"] if child.completed.size() == STEPS.size() and bridges_complete else ["none"]):
-		return "Die Nacht darf nicht vor dem vollständigen Dorfanfang beginnen."
-	var raid: Dictionary = data.village.get("raid", {})
-	if child.night_event != "released" and (raid.get("status", "") != "quiet" or raid.get("number", -1) != 0 or raid.get("completed", -1) != 0):
-		return "Vor dem ausdrücklich freigegebenen Nachtereignis darf kein Überfall begonnen oder abgeschlossen sein."
 	if not _keys(child.relationships,EXTRA_NPCS.keys()):
 		return "Die Familien- oder Lehrbeziehungen fehlen."
 	for id: String in EXTRA_NPCS:
