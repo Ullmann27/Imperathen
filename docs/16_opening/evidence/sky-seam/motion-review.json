@@ -1,0 +1,152 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "captures": [
+    {
+      "camera_transform": "[X: (-0.692897, 0.0, -0.721037), Y: (-0.125588, 0.984714, 0.120687), Z: (0.710015, 0.174178, -0.682305), O: (-0.117275, 1.677575, 0.887375)]",
+      "choice": "",
+      "file": "well-before-help.png",
+      "fov": 46.701000213623,
+      "pixels": [
+        1280,
+        720
+      ],
+      "purpose": "Before and after the confirmed companion choice",
+      "quality": "balanced",
+      "shot_id": "well",
+      "wood": 0
+    },
+    {
+      "camera_transform": "[X: (-0.692897, 0.0, -0.721037), Y: (-0.125588, 0.984714, 0.120687), Z: (0.710015, 0.174178, -0.682305), O: (-0.117275, 1.677575, 0.887375)]",
+      "choice": "help",
+      "file": "well-after-help.png",
+      "fov": 46.701000213623,
+      "pixels": [
+        1280,
+        720
+      ],
+      "purpose": "Before and after the confirmed companion choice",
+      "quality": "balanced",
+      "shot_id": "well",
+      "wood": 0
+    }
+  ],
+  "driver": "opengl3",
+  "engine": "4.7.2-stable (official)",
+  "errors": [],
+  "hardware_fps_claim": false,
+  "motion": {
+    "audio": "Existing frontier ambience added after image rendering; no voice recordings",
+    "beat_durations": [
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "captured_from_actual_renderer": true,
+    "excerpt": true,
+    "frames": 144,
+    "objective_card_hold_seconds": 2.0,
+    "playback_fps": 12,
+    "quality": "balanced",
+    "real_time_benchmark": false,
+    "sampling": "Centered excerpts with authored camera speed",
+    "seconds": 12.0,
+    "seconds_per_shot": 2.0,
+    "audio_postmix": {
+      "source": "prototype/assets/frontier_ambience.wav",
+      "source_sha256": "69bdcc1ef52336b462db932f7c28db5014a6109c4225307903a7881bc01b6433",
+      "gain_db": -15,
+      "looped": true,
+      "postmixed": true,
+      "captured_from_runtime_audio": false,
+      "voice_recordings": false,
+      "encoder": "AAC",
+      "sample_rate_hz": 44100,
+      "channels": 1,
+      "bitrate_requested": 64000
+    },
+    "video": {
+      "file": "opening-runtime-excerpt.mp4",
+      "sha256": "23c9671f625bd9b45184eff7197e90cfb9425a2697be5f09b28a958dfb7b393b",
+      "size_bytes": 2862933,
+      "duration_seconds": 12.0,
+      "width": 1280,
+      "height": 720,
+      "codec": "h264",
+      "playback_fps": "12/1",
+      "decoded_frames": 144,
+      "full_decode_check_passed": true,
+      "review_excerpt_not_full_intro": true
+    }
+  },
+  "player_unchanged": true,
+  "renderer": "gl_compatibility",
+  "repair": {
+    "choice": "help",
+    "choose_companion_result": {
+      "message": "Marcus nimmt deine Hilfe an. Vertrauen +20.",
+      "ok": true,
+      "revision": 3
+    },
+    "gather_result": {
+      "message": "4 Holz gesammelt.",
+      "ok": true,
+      "revision": 2
+    },
+    "movement": "Production touch-axis input and CharacterBody3D physics",
+    "player_position": "(-5.334193, 0.89084, 3.150053)",
+    "trust": 20,
+    "unchanged_camera": true,
+    "wood_after_help": 0,
+    "wood_before_help": 4
+  },
+  "skip_to_gameplay": true,
+  "source": "Production Main scene -> New Game -> opening, sampled deterministically",
+  "state_after_sha256": "c1960a5166dbd5b2f4cc59ea2369faf838655cb6e37438a905a20437bd1a4536",
+  "state_before_sha256": "c1960a5166dbd5b2f4cc59ea2369faf838655cb6e37438a905a20437bd1a4536",
+  "source_sha256": {
+    "prototype/assets/quality_profiles.json": "42a868f6bb979e2d091ae1c1d156be3e7f3f9c09b1749ec45551ae38e05fb774",
+    "prototype/project.godot": "02914329ec13ac77710c08ca0d55b2f196366001cb7943f44285d1dca4d72dfe",
+    "prototype/scripts/cinematic/opening_director.gd": "052fc95a16a82fa61a4b168b0c85050a64f1278d89f03631859532dfa9b83064",
+    "prototype/scripts/main.gd": "55b491370bb132b1bdb657c960b52377b0b14675037ecd71db65c504d9156842",
+    "prototype/scripts/story/opening_story.gd": "4664b3a3d4c3af425579c297d89d1e8af6842a699ecee1250f9263a58dc7bc60",
+    "prototype/scripts/ui/opening_overlay.gd": "7b229a254f19660e2c2a1b1420865ab53d8e92100d27aa19233447e548c0af1b",
+    "prototype/scripts/world/game_world.gd": "f5901dcdde1df523067ae235f6ecbda4ba4c49eeb37796c876965ed5af30ab48",
+    "prototype/scripts/world/village/opening_props.gd": "09f6e37d1fb91aeba7dcc0377c79299c1ea2021e90ebfcbf7cde7c729df47b3d",
+    "prototype/tests/opening_graphics_review.gd": "7a7d4c4e8894954a6bfe451876c9ba61e09ec33e9040530c32f14d4f95a80e39",
+    "prototype/scripts/world/village/clouds.gdshader": "be8a689ab1f4ef3bafd02360a7c30dbde6aa6183bf4510c71b4fd529cc6eb391",
+    "prototype/assets/village/sky_clouds.png": "bd91813b1128bd5253eb588d6c444e7b25313b83be27cbe4a1c0f31045d33554",
+    "prototype/scripts/world/village/village_scenery.gd": "dd7bd892a12d71ee55fb5ce4b9e9683d719cdb30e08ef049c4d5e8de64168c2e",
+    "prototype/assets/frontier_ambience.wav": "69bdcc1ef52336b462db932f7c28db5014a6109c4225307903a7881bc01b6433",
+    "tools/cinematic/capture_opening.py": "c9b0a69f5f379c542f7ffcdbb7ce5260db09f3e68548e90d1f2f2e15848fd703"
+  },
+  "artifact_sha256": {
+    "well-before-help.png": "7e386ca365dd0ad48e6783df8837cbabe49bfd7cbe107f88064d213801bedeb6",
+    "well-after-help.png": "2c4c751e6785a0bfa49383f87c4186c88c63c6501ab0d4746170293af0c40157",
+    "opening-runtime-excerpt.mp4": "23c9671f625bd9b45184eff7197e90cfb9425a2697be5f09b28a958dfb7b393b",
+    "motion-runtime.log": "9a9b20a9aed78c2b6c2947a817d4ca2f1b91c9aea5adddaac1033c91ca92b0fa"
+  },
+  "sources_unchanged_during_capture": true,
+  "source_tree_at_start": {
+    "base_commit": "cac84fdf4dedbde4c624975f9c1150013fdca626",
+    "shader_fix_in_worktree": true
+  },
+  "capture_command": [
+    "python",
+    "tools/cinematic/capture_opening.py",
+    "--software-x11",
+    "--output",
+    "/tmp/imperathen-sky-fixed-motion",
+    "--motion",
+    "--skip-stills",
+    "--motion-fps",
+    "12",
+    "--motion-seconds-per-shot",
+    "2",
+    "--motion-profile",
+    "balanced"
+  ]
+}

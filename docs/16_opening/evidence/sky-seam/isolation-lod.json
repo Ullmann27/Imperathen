@@ -1,0 +1,58 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "camera": "[X: (0.941219, 0.0, -0.337797), Y: (-0.068775, 0.979055, -0.19163), Z: (0.330722, 0.203598, 0.921505), O: (9.913625, 8.418275, 31.47675)]",
+  "captures": [
+    {
+      "file": "01-baseline-with-ui.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "render_scale": 1.0,
+      "result": 0
+    },
+    {
+      "file": "02-baseline-without-ui.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "render_scale": 1.0,
+      "result": 0
+    },
+    {
+      "file": "03-original-sky-only.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "render_scale": 1.0,
+      "result": 0
+    },
+    {
+      "file": "04-explicit-lod-sky-only.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "render_scale": 1.0,
+      "result": 0
+    },
+    {
+      "file": "05-explicit-lod-full-scene.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "render_scale": 1.0,
+      "result": 0
+    }
+  ],
+  "hidden_geometry_count": 315,
+  "renderer": "gl_compatibility",
+  "source_shader_sha256": "54c25d9207c817a50727fa9c2cd938ad79e79b457b83a4b06f86690c545891e3",
+  "source_unchanged": true,
+  "state_before": "f856ae82f521e8f71365d4b2390523ec18e4299b9827b016462d755f15e156ed",
+  "state_unchanged": true,
+  "temporary_change": "Only a runtime material clone sampled textureLod(cloud_field,coords,0.0) instead of texture(cloud_field,coords). No production file changed."
+}

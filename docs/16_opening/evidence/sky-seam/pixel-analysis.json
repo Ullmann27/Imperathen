@@ -1,0 +1,23 @@
+{
+  "region_top_sky": {
+    "x": 0,
+    "y": 0,
+    "width": 1280,
+    "height": 165
+  },
+  "changed_pixel_threshold_per_channel": 2,
+  "changed_pixels": 160,
+  "maximum_channel_change_8bit": 61,
+  "derivative_mask_pixels": 170,
+  "changed_pixels_on_derivative_mask": 158,
+  "changed_pixels_off_derivative_mask": 2,
+  "control_region": {
+    "x": 100,
+    "y": 0,
+    "width": 750,
+    "height": 165,
+    "maximum_channel_difference_8bit": 0,
+    "identical": true
+  },
+  "independent_lod_zero_probe_pixels_identical": true
+}

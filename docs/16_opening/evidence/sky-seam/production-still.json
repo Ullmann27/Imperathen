@@ -1,0 +1,25 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "camera_transform": "[X: (0.941219, 0.0, -0.337797), Y: (-0.068775, 0.979055, -0.19163), Z: (0.330722, 0.203598, 0.921505), O: (9.913625, 8.418275, 31.47675)]",
+  "engine": "4.7.2-stable (official)",
+  "fov": 53.701000213623,
+  "hardware_fps_claim": false,
+  "normalized_shot_time": 0.55,
+  "pixels": [
+    1280,
+    720
+  ],
+  "player_unchanged": true,
+  "png_result": 0,
+  "presentation_time": 4.0,
+  "quality": "very_high",
+  "render_scale": 1.0,
+  "renderer": "gl_compatibility",
+  "shader_sha256": "be8a689ab1f4ef3bafd02360a7c30dbde6aa6183bf4510c71b4fd529cc6eb391",
+  "shot": "valley",
+  "source": "Production Main -> New Game -> first day opening; no shader or material replaced at runtime",
+  "state_after_sha256": "d31b21e62735ec9b81abc32182988b8490ea59dccacd79c3ab19f4dcb6ca4c73",
+  "state_before_sha256": "d31b21e62735ec9b81abc32182988b8490ea59dccacd79c3ab19f4dcb6ca4c73",
+  "state_unchanged": true
+}

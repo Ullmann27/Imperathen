@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+DOMAIN_SUITE 01 initial state, finite input and rejected command atomicity
+DOMAIN_SUITE 02 resource conservation and durable command identities
+DOMAIN_SUITE 03 companion range, costs, alternatives and once-only decisions
+DOMAIN_SUITE 04 valid plot, spacing and construction using real elapsed work
+DOMAIN_SUITE 05 single-worker conservation and frame partition invariance
+DOMAIN_SUITE 06 age transition, training limits and worker-to-soldier bookkeeping
+DOMAIN_SUITE 07 range-checked combat, casualties, one-time resolution and saved encounter
+DOMAIN_SUITE 08 causal story alternatives, chapter end and terminal life end
+DOMAIN_SUITE 09 strict save roundtrip and cross-reload idempotency
+DOMAIN_SUITE 10 verified backup recovery and ignored incomplete temp files
+DOMAIN_SUITE 11 structural, numeric, identity and conservation validation of signed saves
+DOMAIN_SUITE 12 failed save never silently replaces a valid save
+DOMAIN_TEST_RESULT suites=12 checks=329 failures=0
+DOMAIN_TEST_PASS
