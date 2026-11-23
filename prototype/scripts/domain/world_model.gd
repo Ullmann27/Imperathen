@@ -944,6 +944,11 @@ func _read_save(path: String) -> Dictionary:
 		state.village.health_delta = 0
 		state.village.militia = []
 		state.schema_version = SCHEMA_VERSION
+	# Nested childhood actor IDs changed when the production screenplay fixed
+	# Julia/Silvanus/Sextus as mother/father/smith. Migrate only version-1
+	# childhood saves before strict state validation; all other saves are untouched.
+	if typeof(state) == TYPE_DICTIONARY:
+		Childhood.migrate_legacy_ids(state)
 	var error := _validate_state(state)
 	if error.is_empty() and not _valid_valley(state):
 		error = "Das gespeicherte Talgefecht enthält widersprüchliche Daten."
