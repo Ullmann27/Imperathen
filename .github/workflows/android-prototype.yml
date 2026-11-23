@@ -2,7 +2,7 @@ name: Android prototype APK
 
 on:
   push:
-    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122', 'integration/realistic-android-23', 'feature/hero-realism-20261122', 'feature/cinematic-opening-20261123', 'feature/village-life-20261123', 'feature/village-life-delivery-20261123', 'feature/chat-a-movement-combat-20261123']
+    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122', 'integration/realistic-android-23', 'feature/hero-realism-20261122', 'feature/cinematic-opening-20261123', 'feature/village-life-20261123', 'feature/village-life-delivery-20261123', 'feature/chat-a-movement-combat-20261123', 'art/meshy-unit-library-20261123']
     paths:
       - 'prototype/**'
       - 'tools/build_android_prototype.py'
@@ -14,6 +14,7 @@ on:
       - 'tools/android_signing_recovery_public.crt'
       - 'tools/publish_village_download.py'
       - 'tools/check_prototype.py'
+      - 'tools/art/**'
       - 'tests/android_*_test.py'
       - '.github/workflows/android-prototype.yml'
   workflow_dispatch:
@@ -23,7 +24,9 @@ permissions:
 
 concurrency:
   group: android-prototype-${{ github.ref }}
-  cancel-in-progress: false
+  # Asset-integration branches produce many small commits; only their newest
+  # Android build is useful. Stable delivery branches keep every requested run.
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/heads/art/meshy-unit-library-') }}
 
 jobs:
   build-and-check:

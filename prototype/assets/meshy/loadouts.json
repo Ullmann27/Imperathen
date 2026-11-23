@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "note": "Presentation/loadout contract only. Inventory, story, combat authority and historical acceptance remain separate.",
+  "loadouts": [
+    {
+      "id": "roman_heavy_cavalry",
+      "body": "unit_roman_heavy_cavalry_rider",
+      "mount": "mount_ancient_cavalry_horse",
+      "saddle": "gear_roman_four_horn_saddle",
+      "primary": "gear_roman_cavalry_lance",
+      "sidearm": "weap_roman_spatha",
+      "shield": "gear_roman_cavalry_oval_shield",
+      "runtime_enabled": false,
+      "historical_review": "pending"
+    },
+    {
+      "id": "roman_light_cavalry",
+      "body": "unit_roman_light_cavalry_rider",
+      "mount": "mount_ancient_cavalry_horse",
+      "saddle": "gear_roman_four_horn_saddle",
+      "primary": "gear_roman_cavalry_lance",
+      "sidearm": "weap_roman_spatha",
+      "shield": "gear_roman_cavalry_oval_shield",
+      "runtime_enabled": false,
+      "historical_review": "pending"
+    },
+    {
+      "id": "roman_aux_archer",
+      "body": "unit_roman_aux_archer",
+      "primary": "weap_roman_aux_bow",
+      "runtime_enabled": false,
+      "historical_review": "pending"
+    },
+    {
+      "id": "germanic_axe_fighter",
+      "body": "unit_germanic_axe_fighter",
+      "primary": "weap_germanic_hand_axe",
+      "shield": "gear_germanic_round_shield",
+      "runtime_enabled": false,
+      "historical_review": "pending"
+    },
+    {
+      "id": "germanic_light_spearman",
+      "body": "unit_germanic_light_spearman",
+      "primary": "weap_germanic_spear",
+      "shield": "gear_germanic_round_shield",
+      "runtime_enabled": false,
+      "historical_review": "pending"
+    },
+    {
+      "id": "roman_signifer",
+      "body": "unit_roman_signifer",
+      "primary": "gear_roman_signum",
+      "runtime_enabled": false,
+      "historical_review": "pending"
+    },
+    {
+      "id": "germanic_mounted_retainer",
+      "body": "unit_germanic_mounted_retainer",
+      "mount": "mount_ancient_cavalry_horse",
+      "primary": "weap_germanic_spear",
+      "shield": "gear_germanic_round_shield",
+      "runtime_enabled": false,
+      "historical_review": "pending"
+    }
+  ],
+  "resource_bindings": [
+    {
+      "asset_id": "resource_iron_ore",
+      "economy_key": "iron_ore"
+    },
+    {
+      "asset_id": "resource_firewood",
+      "economy_key": "wood"
+    },
+    {
+      "asset_id": "resource_clay",
+      "economy_key": "clay"
+    },
+    {
+      "asset_id": "resource_limestone",
+      "economy_key": "stone"
+    },
+    {
+      "asset_id": "resource_copper_ore",
+      "economy_key": "copper_ore"
+    },
+    {
+      "asset_id": "resource_galena",
+      "economy_key": "lead_silver_ore"
+    }
+  ]
+}
