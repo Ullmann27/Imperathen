@@ -1,0 +1,46 @@
+{
+  "format": "imperathen-guarded-patch",
+  "version": 1,
+  "created_at_utc": "2026-11-23T04:24:46.658958+00:00",
+  "repository": "Ullmann27/Imperathen",
+  "base_commit": "148dd69a417c155392791e3b20afc6f8e599e730",
+  "patch_file": "chat1-opening.patch",
+  "files": [
+    {
+      "path": "prototype/scripts/main.gd",
+      "expected_peer_sha256": "d0ac16283e8aa3449751270dc3f79b6ee5498d7993978caf47fd4b574e067bed",
+      "resolved_sha256": "cbee5b4a9a5ae2a45eb11d216f99ca70f0ec8a032a3798b8cf96ddd9c3f27c0e",
+      "opening_snapshot_sha256": "55b491370bb132b1bdb657c960b52377b0b14675037ecd71db65c504d9156842"
+    },
+    {
+      "path": "prototype/scripts/world/game_world.gd",
+      "expected_peer_sha256": "704f150a60e1d729af6d83d40beed3e4b33443f1e22f70ffcca24227eda6a02f",
+      "resolved_sha256": "e878efeed3356884254a5a46a796880bf45454cf29cd0e9b817d087d8757ee27",
+      "opening_snapshot_sha256": "f5901dcdde1df523067ae235f6ecbda4ba4c49eeb37796c876965ed5af30ab48"
+    },
+    {
+      "path": "prototype/scripts/ui/game_ui.gd",
+      "expected_peer_sha256": "e2965978b50eda8c883468ca6c44e6cbeb886b0459e96f80c3d69564c7aa0ddf",
+      "resolved_sha256": "04b98a14a472896255fb6dfb1bf6f820c46935acd1c8d62372f30c3c9b82c52c",
+      "opening_snapshot_sha256": "3e172520c446a37043ed114a06a23b3bdd5649880364df06dcb4f1a161c04d0c"
+    }
+  ],
+  "required_additive_files": [
+    "prototype/scripts/story/opening_story.gd",
+    "prototype/scripts/cinematic/opening_director.gd",
+    "prototype/scripts/cinematic/opening_checkpoint.gd",
+    "prototype/scripts/ui/opening_overlay.gd",
+    "prototype/scripts/world/village/opening_props.gd"
+  ],
+  "verification": {
+    "three_way_conflicts_resolved": {
+      "main.gd": 4,
+      "game_world.gd": 2,
+      "game_ui.gd": 0
+    },
+    "live_peer_mutated": false,
+    "live_opening_main_files_mutated": false,
+    "combined_runtime_test": "passed; combined-evidence/combined-validation-report.json"
+  },
+  "patch_sha256": "973b7999809a3ef50bc2d468757d1f3df37af4f2abf6ae56aba61088d428df3f"
+}

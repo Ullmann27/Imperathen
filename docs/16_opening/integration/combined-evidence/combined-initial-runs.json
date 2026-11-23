@@ -1,0 +1,65 @@
+[
+  {
+    "check": "fresh_import",
+    "passed": true,
+    "exit_code": 0,
+    "elapsed_seconds": 21.892,
+    "expected_marker": null,
+    "log": "fresh_import.log",
+    "warnings": []
+  },
+  {
+    "check": "frontier_story",
+    "passed": true,
+    "exit_code": 0,
+    "elapsed_seconds": 0.423,
+    "expected_marker": "FRONTIER_STORY_PASS",
+    "log": "frontier_story.log",
+    "warnings": []
+  },
+  {
+    "check": "frontier_people",
+    "passed": true,
+    "exit_code": 0,
+    "elapsed_seconds": 1.269,
+    "expected_marker": "FRONTIER_PEOPLE_PASS",
+    "log": "frontier_people.log",
+    "warnings": []
+  },
+  {
+    "check": "frontier_population",
+    "passed": true,
+    "exit_code": 0,
+    "elapsed_seconds": 1.358,
+    "expected_marker": "FRONTIER_POPULATION_OK",
+    "log": "frontier_population.log",
+    "warnings": []
+  },
+  {
+    "check": "opening_flow",
+    "passed": true,
+    "exit_code": 0,
+    "elapsed_seconds": 1.448,
+    "expected_marker": "OPENING_FLOW_PASS",
+    "log": "opening_flow.log",
+    "warnings": []
+  },
+  {
+    "check": "integration",
+    "passed": true,
+    "exit_code": 0,
+    "elapsed_seconds": 2.656,
+    "expected_marker": "INTEGRATION_PASS",
+    "log": "integration.log",
+    "warnings": []
+  },
+  {
+    "check": "frontier_integration_unchanged",
+    "passed": false,
+    "exit_code": 1,
+    "elapsed_seconds": 1.387,
+    "expected_marker": "FRONTIER_INTEGRATION_PASS",
+    "log": "frontier_integration_unchanged.log",
+    "warnings": []
+  }
+]

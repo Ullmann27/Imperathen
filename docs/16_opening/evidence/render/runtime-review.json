@@ -1,0 +1,178 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "captures": [
+    {
+      "camera_transform": "[X: (-0.692897, 0.0, -0.721037), Y: (-0.125588, 0.984714, 0.120687), Z: (0.710015, 0.174178, -0.682305), O: (-0.117275, 1.677575, 0.887375)]",
+      "choice": "",
+      "file": "well-before-help.png",
+      "fov": 46.701000213623,
+      "pixels": [
+        1280,
+        720
+      ],
+      "purpose": "Before and after the confirmed companion choice",
+      "quality": "balanced",
+      "shot_id": "well",
+      "wood": 0
+    },
+    {
+      "camera_transform": "[X: (-0.692897, 0.0, -0.721037), Y: (-0.125588, 0.984714, 0.120687), Z: (0.710015, 0.174178, -0.682305), O: (-0.117275, 1.677575, 0.887375)]",
+      "choice": "help",
+      "file": "well-after-help.png",
+      "fov": 46.701000213623,
+      "pixels": [
+        1280,
+        720
+      ],
+      "purpose": "Before and after the confirmed companion choice",
+      "quality": "balanced",
+      "shot_id": "well",
+      "wood": 0
+    }
+  ],
+  "driver": "opengl3",
+  "engine": "4.7.2-stable (official)",
+  "errors": [],
+  "hardware_fps_claim": false,
+  "motion": {
+    "audio": {
+      "capture": "No audio device was recorded during viewport rendering. Existing game ambience was mixed afterward.",
+      "source": "prototype/assets/frontier_ambience.wav",
+      "source_sha256": "69bdcc1ef52336b462db932f7c28db5014a6109c4225307903a7881bc01b6433",
+      "source_loop_seconds": 8.0,
+      "gain_db": -15.0,
+      "spoken_voices": false,
+      "codec": "AAC mono 44100 Hz at 64 kbit/s"
+    },
+    "beat_durations": [
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "captured_from_actual_renderer": true,
+    "excerpt": true,
+    "frames": 144,
+    "objective_card_hold_seconds": 2.0,
+    "playback_fps": 12,
+    "quality": "balanced",
+    "real_time_benchmark": false,
+    "sampling": "Centered excerpts with authored camera speed",
+    "seconds": 12.0,
+    "seconds_per_shot": 2.0,
+    "file": "opening-runtime-excerpt.mp4",
+    "title": "12-second direction excerpt from the authored opening, not the complete introduction",
+    "encoded_media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1280,
+          "height": 720,
+          "r_frame_rate": "12/1"
+        },
+        {
+          "codec_name": "aac",
+          "sample_rate": "44100",
+          "channels": 1,
+          "r_frame_rate": "0/0"
+        }
+      ],
+      "format": {
+        "duration": "12.000000",
+        "size": "2880433"
+      }
+    },
+    "video_encoding": "H.264 CRF 25, 1280x720, 12 fps playback; this is not a measured device frame rate",
+    "post_mix_command": [
+      "ffmpeg",
+      "-i",
+      "opening-runtime.mp4",
+      "-stream_loop",
+      "-1",
+      "-i",
+      "prototype/assets/frontier_ambience.wav",
+      "-map",
+      "0:v:0",
+      "-map",
+      "1:a:0",
+      "-c:v",
+      "copy",
+      "-c:a",
+      "aac",
+      "-b:a",
+      "64k",
+      "-ar",
+      "44100",
+      "-af",
+      "volume=-15dB",
+      "-t",
+      "12",
+      "-movflags",
+      "+faststart",
+      "opening-runtime-excerpt.mp4"
+    ],
+    "visual_source_encode_sha256": "dc09fdb12b4fe464d25a11c8743c9f412a9b4abf5a0bac2657b982ab45121fff"
+  },
+  "player_unchanged": true,
+  "renderer": "gl_compatibility",
+  "repair": {
+    "choice": "help",
+    "choose_companion_result": {
+      "message": "Marcus nimmt deine Hilfe an. Vertrauen +20.",
+      "ok": true,
+      "revision": 3
+    },
+    "gather_result": {
+      "message": "4 Holz gesammelt.",
+      "ok": true,
+      "revision": 2
+    },
+    "movement": "Production touch-axis input and CharacterBody3D physics",
+    "player_position": "(-5.334193, 0.89084, 3.150053)",
+    "trust": 20,
+    "unchanged_camera": true,
+    "wood_after_help": 0,
+    "wood_before_help": 4
+  },
+  "retained_stills_receipt": "stills-pass.json",
+  "skip_to_gameplay": true,
+  "source": "Production Main scene -> New Game -> opening, sampled deterministically",
+  "state_after_sha256": "0954922cd573c9718001d71fe3e670e1af438faf398547e886d5cf490d2fde21",
+  "state_before_sha256": "0954922cd573c9718001d71fe3e670e1af438faf398547e886d5cf490d2fde21",
+  "source_sha256": {
+    "prototype/assets/quality_profiles.json": "42a868f6bb979e2d091ae1c1d156be3e7f3f9c09b1749ec45551ae38e05fb774",
+    "prototype/project.godot": "02914329ec13ac77710c08ca0d55b2f196366001cb7943f44285d1dca4d72dfe",
+    "prototype/scripts/cinematic/opening_director.gd": "052fc95a16a82fa61a4b168b0c85050a64f1278d89f03631859532dfa9b83064",
+    "prototype/scripts/main.gd": "55b491370bb132b1bdb657c960b52377b0b14675037ecd71db65c504d9156842",
+    "prototype/scripts/story/opening_story.gd": "4664b3a3d4c3af425579c297d89d1e8af6842a699ecee1250f9263a58dc7bc60",
+    "prototype/scripts/ui/opening_overlay.gd": "7b229a254f19660e2c2a1b1420865ab53d8e92100d27aa19233447e548c0af1b",
+    "prototype/scripts/world/game_world.gd": "f5901dcdde1df523067ae235f6ecbda4ba4c49eeb37796c876965ed5af30ab48",
+    "prototype/scripts/world/village/opening_props.gd": "09f6e37d1fb91aeba7dcc0377c79299c1ea2021e90ebfcbf7cde7c729df47b3d",
+    "prototype/tests/opening_graphics_review.gd": "7a7d4c4e8894954a6bfe451876c9ba61e09ec33e9040530c32f14d4f95a80e39",
+    "prototype/assets/frontier_ambience.wav": "69bdcc1ef52336b462db932f7c28db5014a6109c4225307903a7881bc01b6433"
+  },
+  "artifact_sha256": {
+    "1024x1024-03-well.png": "0887bcf5918350f32112149a5f0ea2c49db6e3b2bb099328126caa9a2ca25d4b",
+    "1280x720-01-valley.png": "1a0753a843fa05e658b636c3a5144836c6685ad6e0acca34a24ea81f639dfdf4",
+    "1280x720-03-well.png": "5bd3129f9e6e64d1c14a040a1cb46a608976e0a9ea7c8f725c3d8f268ea3332f",
+    "1280x720-05-player.png": "f0ad39fb9fd58fe0534ebdf0ff5111b7141e73345156bd0a31a01c36bb08b646",
+    "1280x720-06-player.png": "3ea275284aaefbec270bc67d6137bac34729f61cbef38cdd90f7a98f4cbcb198",
+    "well-after-help.png": "12f49013f32c2eb8bf0140ea608f27425bd740c11d901687b07a45678f3b19d3",
+    "well-before-help.png": "62ef615226a0fec732fde62b197ddce653b8cd4f3173e62e68d2ecf5c11b788a",
+    "opening-runtime-excerpt.mp4": "c2d1e8b930dc9f71fc5f094a3db9e4e6ede6f4eb908768343f9bfba9a731ed27"
+  },
+  "state_integrity_scope": "Opening rendering before the separate real movement/gather/help check; the repair check then intentionally changes the campaign through valid production commands.",
+  "known_visual_observations": [
+    {
+      "file": "1280x720-01-valley.png",
+      "observation": "A thin bluish vertical broken line is visible in the sky near x=912, y=0..180.",
+      "cause": "Not established; also visible in the earlier pass. Existing sky/terrain/weather shaders were not changed in this work.",
+      "status": "Open visual detail; no late shader change was made."
+    }
+  ]
+}

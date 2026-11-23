@@ -1,0 +1,54 @@
+diff --git a/prototype/tests/frontier_integration_test.gd b/prototype/tests/frontier_integration_test.gd
+--- a/prototype/tests/frontier_integration_test.gd
++++ b/prototype/tests/frontier_integration_test.gd
+@@ -37,8 +37,9 @@
+ 		_check(can_replace, "Existing saved world offers the real new-life confirmation")
+ 		if can_replace:
+ 			game.ui.action_requested.emit("confirm_new_game", {})
+ 			await _frames()
++	_enter_opening("first_day")
+ 	_check(game.screen == "playing" and game.model.data.player.age == 12, "Actual entry creates a saved childhood world")
+ 	_check(game.world.population.actors.size() >= 16, "Main world contains the enlarged populated village")
+ 	for npc_id: String in Chapter.NPCS:
+ 		var actual: Vector3 = game.world.get_frontier_npc_position(npc_id)
+@@ -159,8 +160,9 @@
+ func _paid_alternative() -> void:
+ 	game.ui.action_requested.emit("new_game", {})
+ 	game.ui.action_requested.emit("confirm_new_game", {})
+ 	await _frames()
++	_enter_opening("first_day")
+ 	await _complete_original_chapter()
+ 	if not game.model.data.progress.chapter_complete:
+ 		return
+ 	if not await _open_resident("livia"):
+@@ -192,8 +194,9 @@
+ 	_move(Vector3(8, 1, 5))
+ 	game._process(12.0)
+ 	_move(Vector3(0, 1, -7))
+ 	game.ui.action_requested.emit("train", {})
++	_enter_opening("adulthood")
+ 	for hit in 3:
+ 		game._process(0.65)
+ 		game.world.action_requested.emit("training_hit", {})
+ 	game.ui.action_requested.emit("recruit", {})
+@@ -277,8 +280,20 @@
+ 	root.propagate_notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+ 	root.go_back_requested.emit()
+ 
+ 
++func _enter_opening(expected_sequence: String) -> void:
++	var opened: bool = game.screen == "opening" and game.opening_sequence.get("id", "") == expected_sequence
++	_check(opened, "Expected cinematic precedes the next playable phase: " + expected_sequence)
++	if not opened:
++		return
++	var before := _snapshot()
++	game.opening_overlay._request_skip()
++	_check(game.screen == "opening" and bool(game.opening_sequence.beats[game.opening_index].get("final", false)), "Skipping keeps the explicit objective handoff: " + expected_sequence)
++	game.opening_overlay._request_advance()
++	_check(game.screen == "playing" and _snapshot() == before, "Accepting the objective releases play without changing the campaign: " + expected_sequence)
++
++
+ func _frames() -> void:
+ 	for frame in 4:
+ 		await process_frame
+ 

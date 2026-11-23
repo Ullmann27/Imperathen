@@ -1,0 +1,590 @@
+diff --git a/prototype/scripts/main.gd b/prototype/scripts/main.gd
+--- a/prototype/scripts/main.gd
++++ b/prototype/scripts/main.gd
+@@ -6,8 +6,12 @@
+ const AtlasScreen = preload("res://scripts/strategy/atlas_screen.gd")
+ const Seasons = preload("res://scripts/strategy/season_campaign.gd")
+ const Origins = preload("res://scripts/strategy/origins.gd")
+ const ValleyScene = preload("res://scripts/tactics/valley_scene.gd")
++const OpeningStory = preload("res://scripts/story/opening_story.gd")
++const OpeningDirector = preload("res://scripts/cinematic/opening_director.gd")
++const OpeningOverlay = preload("res://scripts/ui/opening_overlay.gd")
++const OpeningCheckpoint = preload("res://scripts/cinematic/opening_checkpoint.gd")
+ const SAVE_PATH = "user://imperathen_campaign.json"
+ 
+ var model
+ var world
+@@ -24,8 +28,17 @@
+ var autosave_elapsed := 0.0
+ var last_story_id := ""
+ var command_serial := 0
+ var run_id := ""
++var opening_director
++var opening_overlay
++var opening_sequence: Dictionary = {}
++var opening_index := 0
++var opening_elapsed := 0.0
++var opening_paused := false
++var opening_manual := false
++var opening_checkpoint_failed := false
++var pending_opening: Dictionary = {}
+ var frontier_npc := ""
+ 
+ 
+ func _ready() -> void:
+@@ -51,8 +64,11 @@
+ 	print("IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop")
+ 
+ 
+ func _process(delta: float) -> void:
++	if screen == "opening":
++		_opening_process(delta)
++		return
+ 	if screen == "atlas":
+ 		return
+ 	if screen == "valley":
+ 		if not valley_demo and not valley.paused:
+@@ -74,8 +90,10 @@
+ 		_refresh()
+ 
+ 
+ func _unhandled_input(event: InputEvent) -> void:
++	if screen == "opening":
++		return
+ 	if event.is_action_pressed("ui_cancel"):
+ 		if screen == "atlas":
+ 			_leave_atlas()
+ 			get_viewport().set_input_as_handled()
+@@ -89,17 +107,25 @@
+ 
+ func _on_go_back_requested() -> void:
+ 	# The window signal is the single Android Back entry point. Handling the
+ 	# preceding node notification too would process one request twice.
+-	if screen == "atlas":
++	if screen == "opening" and is_instance_valid(opening_overlay):
++		opening_overlay.handle_back()
++	elif screen == "atlas":
+ 		_leave_atlas()
+ 	elif screen == "valley":
+ 		_leave_valley()
+ 	elif is_instance_valid(ui):
+ 		ui.handle_back()
+ 
+ 
+ func _notification(what: int) -> void:
++	if screen == "opening" and what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
++		_opening_set_paused(true)
++		_write_opening_checkpoint(false)
++		if session_started:
++			_save(false)
++		return
+ 	if screen == "atlas" and is_instance_valid(atlas):
+ 		if what in [NOTIFICATION_APPLICATION_PAUSED,NOTIFICATION_APPLICATION_FOCUS_OUT]:
+ 			if not atlas.demo and session_started:
+ 				_save(false)
+@@ -150,8 +176,9 @@
+ 	return state
+ 
+ 
+ func _show_menu() -> void:
++	_release_opening()
+ 	frontier_npc = ""
+ 	world.clear_frontier_focus()
+ 	screen = "menu"
+ 	world.set_active(false)
+@@ -173,39 +200,57 @@
+ 		_start_new_game()
+ 
+ 
+ func _start_new_game() -> void:
++	_release_opening()
++	pending_opening = {}
+ 	model.new_game(ui.origin_id)
+ 	last_story_id = ""
+ 	world.setup(model.data)
+ 	session_started = true
+ 	autosave_elapsed = 0.0
+-	_resume()
++	mode = "person"
++	world.set_active(false)
+ 	var saved := _save(false)
+ 	if saved.get("ok", false):
+-		ui.notify(Origins.PEOPLES[model.data.origin_id].intro)
++		_begin_opening(OpeningStory.sequence(str(model.data.origin_id)))
+ 		print("IMPERATHEN_SESSION_STARTED: saved frontier world")
++	else:
++		_resume()
+ 
+ 
+ func _continue_game() -> void:
+ 	var result: Dictionary = model.load_game(SAVE_PATH)
+ 	if not result.get("ok", false):
+ 		ui.notify(str(result.get("message", "Der Spielstand konnte nicht geladen werden.")))
+ 		return
+ 	world.setup(model.data)
++	pending_opening = {}
+ 	session_started = true
+ 	last_story_id = ""
+-	_resume()
+-	ui.notify(str(result.get("message", "Spielstand geladen.")))
++	if not _restore_opening():
++		_resume()
++		ui.notify(str(result.get("message", "Spielstand geladen.")))
+ 	print("IMPERATHEN_CONTINUED")
+ 
+ 
+ func _resume() -> void:
++	if screen == "opening":
++		_opening_set_paused(false)
++		return
+ 	if not session_started:
+ 		_show_menu()
+ 		return
+ 	frontier_npc = ""
+ 	world.clear_frontier_focus()
++	if not pending_opening.is_empty():
++		if not _save(false).get("ok", false):
++			_pause()
++			return
++		var next_opening: Dictionary = pending_opening
++		pending_opening = {}
++		_begin_opening(next_opening)
++		return
+ 	screen = "playing"
+ 	world.set_mode(mode)
+ 	world.set_active(true)
+ 	ui.show_game(_ui_state())
+@@ -213,8 +258,11 @@
+ 	refresh_pending = true
+ 
+ 
+ func _pause() -> void:
++	if screen == "opening":
++		_opening_set_paused(true)
++		return
+ 	if not session_started:
+ 		return
+ 	screen = "paused"
+ 	world.set_active(false)
+@@ -229,8 +277,12 @@
+ 	model.set_player_position(world.get_player_position())
+ 	if screen == "valley" and not valley_demo:
+ 		model.checkpoint_valley(valley.model)
+ 	var result: Dictionary = model.save_game(SAVE_PATH)
++	if screen == "opening":
++		_write_opening_checkpoint(false)
++	elif bool(result.get("ok", false)) and not pending_opening.is_empty():
++		OpeningCheckpoint.write(str(model.data.world_id), str(pending_opening.id), 0, false)
+ 	if show_feedback or not result.get("ok", false):
+ 		ui.notify(str(result.get("message", "Spielstand gespeichert.")))
+ 	return result
+ 
+@@ -255,8 +307,10 @@
+ 	ui.set_mode(mode)
+ 
+ 
+ func _on_ui_action(action: String, payload: Dictionary) -> void:
++	if screen == "opening" and action != "quality_changed":
++		return
+ 	match action:
+ 		"atlas_demo": _open_atlas(true)
+ 		"atlas": _open_atlas(false)
+ 		"valley_demo": _open_valley(true)
+@@ -305,9 +359,13 @@
+ 				world.set_build_mode(true)
+ 				ui.notify("Wähle einen freien Bauplatz auf der markierten Fläche. Kosten: 8 Holz.")
+ 		"companion_help", "companion_decline":
+ 			_resume()
+-			_command("choose_companion", {"choice": "help" if action == "companion_help" else "decline"})
++			var companion_result := _command("choose_companion", {"choice": "help" if action == "companion_help" else "decline"})
++			if companion_result.get("ok", false):
++				ui.notify(OpeningStory.companion_reply(model.data))
++			else:
++				_show_companion()
+ 		"train", "recruit": _command(action, payload)
+ 		"skirmish": _command("start_skirmish", payload)
+ 		"story_choice":
+ 			_resume()
+@@ -346,13 +404,20 @@
+ 		return {"ok": false, "message": "Die Welt ist pausiert."}
+ 	model.set_player_position(world.get_player_position())
+ 	command_serial += 1
+ 	var result: Dictionary = model.execute(command, payload, "%s_%d" % [run_id, command_serial])
+-	if not result.get("ok", false) or command != "receive_damage":
++	if not result.get("ok", false) or command not in ["receive_damage", "train"]:
+ 		ui.notify(str(result.get("message", "")))
+ 	_refresh()
++	var persisted := true
+ 	if result.get("ok", false) and (command in ["choose_companion", "train", "recruit", "resolve_skirmish", "choose_story", "frontier_talk", "frontier_choice"] or model.data.progress.stage in ["aftermath", "fallen"]):
+-		_save(false)
++		persisted = bool(_save(false).get("ok", false))
++	if result.get("ok", false) and command == "train":
++		if persisted:
++			_begin_opening(OpeningStory.adulthood(model.data))
++		else:
++			pending_opening = OpeningStory.adulthood(model.data)
++			_pause()
+ 	return result
+ 
+ 
+ func _show_frontier(npc_id: String) -> void:
+@@ -397,17 +462,193 @@
+ 
+ func _show_companion() -> void:
+ 	var companion: Dictionary = model.data.get("companion", {})
+ 	if not str(companion.get("choice", "")).is_empty():
+-		ui.notify("Deine Entscheidung bleibt Teil eurer Geschichte. Vertrauen: %s" % companion.get("trust", 0))
++		ui.notify(OpeningStory.companion_reply(model.data))
+ 		return
+ 	screen = "dialog"
+ 	world.set_active(false)
+-	ui.show_dialog("Ein Fremder am Brunnen", "%s Vier Holzstücke genügen für die Reparatur. Möchtest du teilen?" % Origins.PEOPLES[model.data.origin_id].intro, [
+-		{"label": "Vier Holz teilen und helfen", "action": "companion_help", "choice": "help"},
+-		{"label": "Meine Vorräte behalte ich", "action": "companion_decline", "choice": "decline"},
+-		{"label": "Ich komme später wieder", "action": "resume"}
+-	])
++	var dialogue: Dictionary = OpeningStory.companion_dialog(model.data)
++	ui.show_dialog(str(dialogue.title), str(dialogue.text), dialogue.choices)
++
++
++func _begin_opening(sequence: Dictionary, start_index: int = 0) -> void:
++	_release_opening()
++	if sequence.get("beats", []).is_empty():
++		screen = "playing"
++		_resume()
++		return
++	frontier_npc = ""
++	world.clear_frontier_focus()
++	opening_sequence = sequence.duplicate(true)
++	var beats: Array = opening_sequence.beats
++	beats.append({"id": "objective_handoff", "shot_id": "player", "speaker": "", "role": "",
++		"text": str(sequence.get("objective_text", "")), "duration": 0.0,
++		"chapter": str(sequence.get("title", "")), "location": str(sequence.get("location", "")),
++		"objective": true, "final": true,
++		"objective_title": str(sequence.get("objective_title", "Dein nächster Schritt")),
++		"objective_text": str(sequence.get("objective_text", "")),
++		"advance_label": "Zur Ausbildung" if int(model.data.player.age) >= 18 else "Ins Dorf"})
++	screen = "opening"
++	mode = "person"
++	world.set_mode(mode)
++	world.set_active(false)
++	world.set_build_mode(false)
++	world.prepare_cinematic_camera()
++	ui.show_cinematic()
++	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
++	var preferences: Dictionary = ui.opening_preferences()
++	opening_manual = bool(preferences.get("manual_reading", false))
++	opening_index = clampi(start_index, 0, beats.size() - 1)
++	opening_paused = false
++	opening_checkpoint_failed = false
++	opening_director = OpeningDirector.new()
++	add_child(opening_director)
++	opening_director.setup(world)
++	opening_overlay = OpeningOverlay.new()
++	add_child(opening_overlay)
++	opening_overlay.configure(preferences)
++	opening_overlay.advance_requested.connect(_opening_next)
++	opening_overlay.pause_requested.connect(func(): _opening_set_paused(not opening_paused))
++	opening_overlay.skip_requested.connect(_opening_skip)
++	opening_overlay.reading_mode_changed.connect(_opening_reading_changed)
++	_opening_present()
++	print("IMPERATHEN_OPENING_STARTED " + str(opening_sequence.id))
++
++
++func _opening_present() -> void:
++	if screen != "opening" or not is_instance_valid(opening_overlay):
++		return
++	var beat: Dictionary = opening_sequence.beats[opening_index]
++	opening_elapsed = 0.0
++	opening_overlay.present(beat, opening_index, opening_sequence.beats.size())
++	opening_overlay.set_paused(opening_paused)
++	opening_director.play(str(beat.shot_id), maxf(0.1, float(beat.duration)), bool(ui.opening_preferences().reduce_motion))
++	# One clock drives subtitle timing and camera travel. Reading mode can hold
++	# the finished composition without skipping a sentence or simulating time.
++	opening_director.set_process(false)
++	opening_director.set_paused(opening_paused)
++	if bool(beat.get("final", false)):
++		opening_director.sample(str(beat.shot_id), 1.0)
++		opening_overlay.set_progress(1.0)
++	else:
++		opening_overlay.set_progress(0.0)
++	_write_opening_checkpoint(false)
++	_log_opening_geometry.call_deferred()
++
++
++func _opening_process(delta: float) -> void:
++	if opening_paused or not is_instance_valid(opening_overlay):
++		return
++	var beat: Dictionary = opening_sequence.beats[opening_index]
++	if bool(beat.get("final", false)):
++		return
++	var duration := maxf(0.1, float(beat.duration))
++	opening_elapsed = minf(duration, opening_elapsed + maxf(0.0, delta))
++	opening_director.sample(str(beat.shot_id), opening_elapsed / duration)
++	opening_overlay.set_progress(opening_elapsed / duration)
++	if opening_elapsed >= duration and not opening_manual:
++		_opening_next()
++
++
++func _opening_next() -> void:
++	if screen != "opening" or opening_paused:
++		return
++	if opening_index >= opening_sequence.beats.size() - 1:
++		_opening_finish()
++		return
++	opening_index += 1
++	_opening_present()
++
++
++func _opening_skip() -> void:
++	if screen != "opening":
++		return
++	# Skipping cinematics still explains the objective, then waits for the player.
++	opening_index = opening_sequence.beats.size() - 1
++	opening_paused = false
++	_opening_present()
++
++
++func _opening_set_paused(value: bool) -> void:
++	if screen != "opening":
++		return
++	opening_paused = value
++	if is_instance_valid(opening_overlay):
++		opening_overlay.set_paused(value)
++	if is_instance_valid(opening_director):
++		opening_director.set_paused(value)
++	_log_opening_geometry.call_deferred()
++
++
++func _log_opening_geometry() -> void:
++	if not OS.is_debug_build() or screen != "opening":
++		return
++	await get_tree().process_frame
++	await get_tree().process_frame
++	if screen != "opening" or not is_instance_valid(opening_overlay):
++		return
++	var buttons := {}
++	for name_key: String in ["OpeningSkip", "OpeningAdvance", "OpeningPause"]:
++		var button := opening_overlay.find_child(name_key, true, false) as Button
++		if button != null and button.is_visible_in_tree():
++			var point: Vector2 = get_viewport().get_screen_transform() * button.get_global_rect().get_center()
++			buttons[name_key] = [point.x, point.y]
++	print("IMPERATHEN_OPENING_READY " + JSON.stringify({"sequence": str(opening_sequence.id),
++		"index": opening_index, "final": opening_index == opening_sequence.beats.size() - 1,
++		"paused": opening_paused, "elapsed": opening_elapsed, "world_seconds": model.data.world_seconds,
++		"companion_choice": model.data.companion.choice, "buttons": buttons}))
++
++
++func _opening_reading_changed(value: bool) -> void:
++	opening_manual = value
++	ui.set_opening_reading(value)
++
++
++func _write_opening_checkpoint(completed: bool) -> void:
++	if opening_sequence.is_empty() or model == null:
++		return
++	var result := OpeningCheckpoint.write(str(model.data.world_id), str(opening_sequence.id), opening_index, completed)
++	opening_checkpoint_failed = result != OK
++
++
++func _restore_opening() -> bool:
++	var checkpoint: Dictionary = OpeningCheckpoint.read(str(model.data.world_id))
++	if checkpoint.is_empty() or bool(checkpoint.completed):
++		return false
++	var sequence: Dictionary = OpeningStory.sequence(str(model.data.origin_id)) if int(model.data.player.age) < 18 else OpeningStory.adulthood(model.data)
++	if sequence.is_empty() or str(sequence.id) != str(checkpoint.sequence_id):
++		return false
++	if int(checkpoint.index) > sequence.beats.size():
++		return false
++	_begin_opening(sequence, int(checkpoint.index))
++	return true
++
++
++func _opening_finish() -> void:
++	if screen != "opening":
++		return
++	_write_opening_checkpoint(true)
++	var checkpoint_failed := opening_checkpoint_failed
++	_release_opening()
++	screen = "playing"
++	_resume()
++	if checkpoint_failed:
++		ui.notify("Der Vorspann-Fortschritt konnte nicht gespeichert werden. Beim Fortsetzen kann die Szene erneut erscheinen.")
++	print("IMPERATHEN_OPENING_COMPLETE")
++
++
++func _release_opening() -> void:
++	if is_instance_valid(opening_director):
++		opening_director.finish()
++		opening_director.queue_free()
++	opening_director = null
++	if is_instance_valid(opening_overlay):
++		opening_overlay.finish()
++		opening_overlay.queue_free()
++	opening_overlay = null
++	opening_sequence = {}
++	opening_paused = false
+ 
+ 
+ func _check_special_dialog() -> void:
+ 	if int(model.data.get("player", {}).get("health", 1)) <= 0:
+diff --git a/prototype/scripts/world/game_world.gd b/prototype/scripts/world/game_world.gd
+--- a/prototype/scripts/world/game_world.gd
++++ b/prototype/scripts/world/game_world.gd
+@@ -10,8 +10,9 @@
+ var population = preload("res://scripts/world/village/village_population.gd").new()
+ var regional = preload("res://scripts/world/regional_village.gd").new()
+ var grove = Grove.new()
+ var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
++var opening_props = preload("res://scripts/world/village/opening_props.gd").new()
+ var tree_sites := []
+ var crops := Node3D.new()
+ var season_index := -1
+ const PLAYER_SPEED := 4.6
+@@ -126,8 +127,9 @@
+ 
+ func sync_state(state: Dictionary) -> void:
+ 	_build_scene()
+ 	_state = state
++	opening_props.sync_state(state)
+ 	population.show_origin(str(state.get("origin_id","italia")),float(state.get("world_seconds",0)),int(state.get("squad",{}).get("recruits",0)))
+ 	if regional.frontier_details:
+ 		regional.frontier_details.set_wagon_progress(float(state.get("frontier",{}).get("work_seconds",0))/12.0)
+ 	_apply_season(int(state.get("strategy",{}).get("turn",0))%4)
+@@ -210,8 +212,29 @@
+ func get_player_position() -> Vector3:
+ 	return _player.global_position if _player != null else Vector3(0, 1, 8)
+ 
+ 
++func prepare_cinematic_camera() -> void:
++	# Settle the ordinary camera first so the closing shot has an exact target.
++	_camera_initialized = false
++	_update_camera(0.0)
++	_camera.make_current()
++
++
++func get_cinematic_anchor(key: String) -> Vector3:
++	match key:
++		"road": return to_global(Vector3(0, 0, 18))
++		"market": return scenery.to_global(scenery.MARKET)
++		"companion": return _companion.global_position - Vector3.UP * 0.9
++		"plot":
++			var buildings: Array = _state.get("buildings", [])
++			if not buildings.is_empty():
++				return to_global(Vector3(float(buildings[0].x), 0, float(buildings[0].z)))
++			return to_global(Vector3(14.5, 0, 4.5))
++		"training": return to_global(TRAINING_LOCATION)
++		_: return get_player_position()
++
++
+ func set_frontier_time(seconds: float) -> void:
+ 	population.advance_to(seconds)
+ 
+ 
+@@ -362,8 +385,9 @@
+ 	}
+ 	_create_atmosphere()
+ 	_create_terrain()
+ 	_create_village()
++	add_child(opening_props)
+ 	_create_build_plot()
+ 	_buildings_root = Node3D.new()
+ 	_buildings_root.name = "PlayerBuildings"
+ 	add_child(_buildings_root)
+diff --git a/prototype/scripts/ui/game_ui.gd b/prototype/scripts/ui/game_ui.gd
+--- a/prototype/scripts/ui/game_ui.gd
++++ b/prototype/scripts/ui/game_ui.gd
+@@ -68,8 +68,9 @@
+ var _state: Dictionary = {}
+ var _mode := "person"
+ var _ui_scale := 1.0
+ var _reduce_motion := false
++var _opening_reading := false
+ var _volume := 0.55
+ var _sound_player: AudioStreamPlayer
+ var _serif: SystemFont
+ var _ui_theme: Theme
+@@ -313,8 +314,25 @@
+ 	update_state(state)
+ 	set_mode(_mode)
+ 
+ 
++func show_cinematic() -> void:
++	_open_screen("cinematic", false)
++	if _toast_tween != null and _toast_tween.is_valid():
++		_toast_tween.kill()
++	_toast_panel.hide()
++
++
++func opening_preferences() -> Dictionary:
++	return {"ui_scale": _ui_scale, "reduce_motion": _reduce_motion,
++		"touch_enabled": _touch_enabled, "manual_reading": _opening_reading}
++
++
++func set_opening_reading(enabled: bool) -> void:
++	_opening_reading = enabled
++	_save_settings()
++
++
+ func update_state(state: Dictionary) -> void:
+ 	_state = state.duplicate(true)
+ 	if _view_state != "game":
+ 		return
+@@ -423,15 +441,24 @@
+ 			payload["choice"] = str(entry)
+ 		var choice_button := _button(caption, _emit.bind(action, payload), index == 0, 17)
+ 		choice_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+ 		choice_button.tooltip_text = caption
++		if entry is Dictionary:
++			choice_button.disabled = not bool(entry.get("enabled", true))
++			if choice_button.disabled and not str(entry.get("reason", "")).is_empty():
++				choice_button.tooltip_text = str(entry.reason)
+ 		column.add_child(choice_button)
+-		if first_button == null:
++		if choice_button.disabled and entry is Dictionary and not str(entry.get("reason", "")).is_empty():
++			var reason := _label(str(entry.reason), 13, MUTED)
++			reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
++			column.add_child(reason)
++		if first_button == null and not choice_button.disabled:
+ 			first_button = choice_button
+ 	if choices.is_empty():
+ 		first_button = _button("Zurück ins Spiel", func(): _emit("resume"), true)
+ 		column.add_child(first_button)
+-	first_button.grab_focus.call_deferred()
++	if first_button != null:
++		first_button.grab_focus.call_deferred()
+ 
+ 
+ func show_frontier_dialog(dialog: Dictionary) -> void:
+ 	_frontier_dialog_data = dialog.duplicate(true)
+@@ -1100,8 +1127,10 @@
+ 			return ["Ein Zuhause entsteht", "Bleibe bei der Baustelle und arbeite an deiner Hütte. Baufortschritt und verbrauchtes Material bleiben erhalten."]
+ 	if not bool(state.get("companion", {}).get("met", false)):
+ 		return ["Du bist nicht allein", "%s wartet im Dorf. Geh näher und wähle %s. Deine Antwort hat Folgen." % [_companion_name(state), "„Interagieren“" if _touch_enabled else "E"]]
+ 	if not bool(progress.get("training_complete", false)):
++		if int(state.get("player", {}).get("age", 12)) < 18:
++			return ["Wenn du bereit bist", "Am Übungsplatz kannst du den nächsten Lebensabschnitt beginnen. Dann vergehen ausdrücklich sechs Jahre. Deine Hütte und eure Entscheidung bleiben erhalten."]
+ 		return ["Der nächste Lebensabschnitt", "Gehe zum Trainingsplatz. Beginne die Ausbildung und triff den Übungspfahl dreimal. Treffer: %d / 3." % int(progress.get("training_hits", 0))]
+ 	if int(state.get("squad", {}).get("alive", 0)) == 0:
+ 		return ["Gemeinsam stärker", "Du hast die Grundlagen gelernt. Rekrutiere eine kleine Truppe. Jeder Rekrut braucht Sold und Nahrung."]
+ 	return ["Verantwortung übernehmen", "Deine Truppe ist bereit. Bereite die Verteidigung vor und kämpfe persönlich an ihrer Seite."]
+@@ -1413,8 +1442,9 @@
+ 	var config := ConfigFile.new()
+ 	if config.load(SETTINGS_PATH) == OK:
+ 		_ui_scale = clampf(float(config.get_value("interface", "scale", 1.0)), 0.85, 1.25)
+ 		_reduce_motion = bool(config.get_value("interface", "reduce_motion", false))
++		_opening_reading = bool(config.get_value("interface", "opening_reading", false))
+ 		_volume = clampf(float(config.get_value("audio", "volume", 0.55)), 0.0, 1.0)
+ 		_touch_enabled = bool(config.get_value("input", "touch_controls", _touch_enabled))
+ 		_diagnostics = bool(config.get_value("graphics", "diagnostics", false))
+ 		_quality = String(config.get_value("graphics", "quality", "balanced"))
+@@ -1433,8 +1463,9 @@
+ func _save_settings() -> void:
+ 	var config := ConfigFile.new()
+ 	config.set_value("interface", "scale", _ui_scale)
+ 	config.set_value("interface", "reduce_motion", _reduce_motion)
++	config.set_value("interface", "opening_reading", _opening_reading)
+ 	config.set_value("audio", "volume", _volume)
+ 	config.set_value("input", "touch_controls", _touch_enabled)
+ 	config.set_value("graphics", "quality", _quality)
+ 	config.set_value("graphics", "diagnostics", _diagnostics)

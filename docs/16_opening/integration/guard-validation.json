@@ -1,0 +1,27 @@
+{
+  "created_at_utc": "2026-11-23T04:25:59.004576+00:00",
+  "scope": "isolated snapshot only; no live checkout modified",
+  "patch_sha256": "973b7999809a3ef50bc2d468757d1f3df37af4f2abf6ae56aba61088d428df3f",
+  "checks": [
+    {
+      "name": "read_only_guard",
+      "exit_code": 0,
+      "stdout": "CHECK PASS: exact Chat-1 snapshot, three target files, additive modules and patch verified. No files changed.",
+      "stderr": ""
+    },
+    {
+      "name": "stale_snapshot_rejected",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Chat-1 file changed since the reviewed snapshot; no files changed: prototype/scripts/main.gd"
+    },
+    {
+      "name": "guarded_staging_apply",
+      "exit_code": 0,
+      "stdout": "APPLY PASS: all three files match the reviewed resolution. No commit or index update was made.",
+      "stderr": ""
+    }
+  ],
+  "live_peer_still_matches_snapshot": true,
+  "all_resolved_hashes_match_after_staging_apply": true
+}
