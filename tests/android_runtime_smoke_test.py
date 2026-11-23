@@ -540,20 +540,31 @@ def childhood_snapshot(**changes):
 
 
 class ChildhoodRuntimeObservationTest(unittest.TestCase):
-    def test_exported_childhood_uses_family_route_with_the_existing_action_controls(self):
+    def test_exported_childhood_detects_i00_and_existing_action_controls(self):
         entries = ["assets/scripts/story/village_life.gdc",
                    "assets/scripts/story/village_childhood.gd.remap",
+                   "assets/scripts/cinematic/i00_stage.gdc",
                    "assets/scripts/ui/touch_look.gdc",
                    "assets/scripts/domain/combat_actions.gdc"]
-        self.assertEqual(SMOKE.apk_runtime_features(entries),
-                         {"village_life": True, "childhood": True, "action_controls": True})
+        self.assertEqual(
+            SMOKE.apk_runtime_features(entries),
+            {"village_life": True, "childhood": True,
+             "historical_prologue": True, "action_controls": True})
 
-    def test_legacy_village_apk_remains_a_distinct_route(self):
-        features = SMOKE.apk_runtime_features(["assets/scripts/story/village_life.gdc",
-                                               "assets/scripts/story/village_childhood_backup.gdc"])
-        self.assertTrue(features["village_life"])
-        self.assertFalse(features["childhood"])
-        self.assertFalse(features["action_controls"])
+    def test_pre_i00_childhood_and_legacy_village_remain_distinct_routes(self):
+        childhood = SMOKE.apk_runtime_features(
+            ["assets/scripts/story/village_life.gdc",
+             "assets/scripts/story/village_childhood.gdc"])
+        self.assertTrue(childhood["childhood"])
+        self.assertFalse(childhood["historical_prologue"])
+
+        legacy = SMOKE.apk_runtime_features(
+            ["assets/scripts/story/village_life.gdc",
+             "assets/scripts/story/village_childhood_backup.gdc"])
+        self.assertTrue(legacy["village_life"])
+        self.assertFalse(legacy["childhood"])
+        self.assertFalse(legacy["historical_prologue"])
+        self.assertFalse(legacy["action_controls"])
 
     def test_missing_or_invalid_family_contract_cannot_be_reported_as_a_fresh_start(self):
         for value in ({}, {"childhood_runtime": {}}, childhood_snapshot(version=True),

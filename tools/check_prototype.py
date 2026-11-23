@@ -86,6 +86,7 @@ def main():
             ("village_panels", ["--fixed-fps", "60", "--script", "res://tests/village_panel_test.gd"], "VILLAGE_PANEL_PASS"),
             ("village_nameplates", ["--fixed-fps", "60", "--script", "res://tests/village_nameplates_test.gd"], "VILLAGE_NAMEPLATES_PASS"),
             ("opening_story", ["--script", "res://tests/opening_story_test.gd"], "OPENING_STORY_PASS"),
+            ("i00_stage", ["--script", "res://tests/i00_stage_test.gd"], "I00_STAGE_PASS"),
             ("campaign_bible", ["--script", "res://tests/campaign_bible_test.gd"], "CAMPAIGN_BIBLE_TEST"),
             ("opening_props", ["--script", "res://tests/opening_props_test.gd"], "failures=0"),
             ("opening_director", ["--script", "res://tests/opening_director_test.gd"], "checks []"),

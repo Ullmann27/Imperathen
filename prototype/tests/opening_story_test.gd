@@ -10,6 +10,7 @@ var failures: Array[String] = []
 
 
 func _initialize() -> void:
+	_test_historical_prologue()
 	_test_origins_and_non_mutating_dialogues()
 	_test_dialogue_costs_and_rejected_help()
 	_test_confirmed_age_transition_and_saved_memory()
@@ -19,6 +20,28 @@ func _initialize() -> void:
 		printerr("FAIL: " + failure)
 	print("OPENING_STORY_PASS" if failures.is_empty() else "OPENING_STORY_FAIL")
 	quit(0 if failures.is_empty() else 1)
+
+
+func _test_historical_prologue() -> void:
+	var model = Model.new()
+	model.new_game("italia", true, true)
+	var before := JSON.stringify(model.data)
+	var sequence: Dictionary = Opening.historical_prologue()
+	_check(sequence.id == "i00_aquileia" and sequence.chain_to == "childhood_home", "I-00 is a chained historical cold open before the family scene")
+	_check(sequence.location.contains("Aquileia") and sequence.location.contains("58 v. Chr."), "I-00 carries the authored place and date")
+	_check(sequence.beats.size() == 5 and sequence.beats[2].speaker == "Caesar" and sequence.beats[3].speaker == "Labienus", "I-00 keeps the authored historical cast and five-shot production structure")
+	var valid := true
+	for beat: Dictionary in sequence.beats:
+		valid = valid and beat.shot_id in Opening.SHOT_IDS and str(beat.text).length() > 0 and float(beat.duration) > 0.0
+	_check(valid, "Every historical cold-open beat uses a registered camera shot")
+	_check(str(sequence.beats[2].text).contains("was du gesehen hast") and str(sequence.beats[3].text).contains("Wenn du Zweifel hast") and str(sequence.beats[4].text).contains("Brot, Wege und Befehle"), "The Caesar and Labienus production dialogue remains source-derived")
+	var serialized := JSON.stringify(sequence)
+	_check(not serialized.contains("persistenten Weltzustand") and not serialized.contains("abstrakten Menü") and not serialized.contains("HISTORICAL CORE"), "The cinematic never exposes implementation or production jargon to the player")
+	_check(sequence.get("source_mission_id", "") == "I-00" and str(sequence.get("historical_source", "")).contains("Bellum Gallicum I.10"), "I-00 retains an explicit source anchor without presenting dramatized dialogue as quotation")
+	var childhood: Dictionary = Opening.childhood()
+	_check(childhood.location.contains("58 v. Chr.") and not childhood.location.contains("100 n. Chr."), "The family opening now displays the same 58 BCE campaign date as the domain state")
+	_check(JSON.stringify(model.data) == before, "Reading I-00 and the family opening cannot mutate the saved campaign")
+
 
 
 func _test_origins_and_non_mutating_dialogues() -> void:

@@ -258,7 +258,7 @@ func _start_new_game() -> void:
 	world.set_active(false)
 	var saved := _save(false)
 	if saved.get("ok", false):
-		_begin_opening(OpeningStory.childhood() if Childhood.enabled(model.data) else OpeningStory.sequence(str(model.data.origin_id)))
+		_begin_opening(OpeningStory.historical_prologue() if Childhood.enabled(model.data) else OpeningStory.sequence(str(model.data.origin_id)))
 		print("IMPERATHEN_SESSION_STARTED: saved frontier world")
 	else:
 		_resume()
@@ -774,8 +774,16 @@ func _restore_opening() -> bool:
 	var checkpoint: Dictionary = OpeningCheckpoint.read(str(model.data.world_id))
 	if checkpoint.is_empty() or bool(checkpoint.completed):
 		return false
-	var sequence: Dictionary = OpeningStory.childhood() if Childhood.enabled(model.data) else OpeningStory.sequence(str(model.data.origin_id)) if int(model.data.player.age) < 18 else OpeningStory.adulthood(model.data)
-	if sequence.is_empty() or str(sequence.id) != str(checkpoint.sequence_id):
+	var sequence: Dictionary = {}
+	var sequence_id := str(checkpoint.sequence_id)
+	if Childhood.enabled(model.data):
+		if sequence_id == "i00_aquileia":
+			sequence = OpeningStory.historical_prologue()
+		elif sequence_id == "childhood_home":
+			sequence = OpeningStory.childhood()
+	else:
+		sequence = OpeningStory.sequence(str(model.data.origin_id)) if int(model.data.player.age) < 18 else OpeningStory.adulthood(model.data)
+	if sequence.is_empty() or str(sequence.id) != sequence_id:
 		return false
 	if int(checkpoint.index) > sequence.beats.size():
 		return false
@@ -786,9 +794,17 @@ func _restore_opening() -> bool:
 func _opening_finish() -> void:
 	if screen != "opening":
 		return
+	var chain_to := str(opening_sequence.get("chain_to", ""))
+	var finished_id := str(opening_sequence.get("id", ""))
 	_write_opening_checkpoint(true)
 	var checkpoint_failed := opening_checkpoint_failed
 	_release_opening()
+	if chain_to == "childhood_home" and Childhood.enabled(model.data):
+		_begin_opening(OpeningStory.childhood())
+		if checkpoint_failed:
+			ui.notify("Der Prolog-Fortschritt konnte nicht gespeichert werden. Die Kindheitsszene läuft weiter; beim Fortsetzen kann der Prolog erneut erscheinen.")
+		print("IMPERATHEN_OPENING_CHAINED " + finished_id + " -> childhood_home")
+		return
 	screen = "playing"
 	_resume()
 	if checkpoint_failed:

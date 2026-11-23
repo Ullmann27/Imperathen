@@ -70,7 +70,7 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 		_at(model, view.point)
 		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):
 			return false
-		var screenplay_action := {
+		var screenplay_actions: Dictionary = {
 			"i02_basket":"basket_check",
 			"i02_correct":"basket_correct",
 			"i03_marcus":"marcus_friend",
@@ -80,7 +80,8 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 			"i12_father":"i12_father",
 			"i13_morning":"i13_morning",
 			"i14_oath":"i14_oath"
-		}[stage]
+		}
+		var screenplay_action: String = str(screenplay_actions.get(stage, ""))
 		if not _ok(_action(model, screenplay_action), "Complete screenplay bridge: " + stage):
 			return false
 		_check(model.data.player.age == 12 and model.data.player.role == "child", "Screenplay bridge cannot change life stage: " + stage)
@@ -119,6 +120,7 @@ func _test_fresh_opt_in_and_legacy() -> void:
 	_check(model.data.village.economy.people.size() == 14 and Life.npc_catalog(model.data).size() == 10, "Parents and smith reuse the fourteen real adults and expand seven dialogue people to ten")
 	_check(model.data.buildings.is_empty() and _current(model) == "mother_morning", "Family beginning needs no newly built hut")
 	_check(Life.relationship(model.data, "julia").met and Life.relationship(model.data, "silvanus").met and not Life.relationship(model.data, "sextus").met, "Parents are already known; the smith is met in play")
+	_check(Life.actor_position(model.data, "julia") == Childhood.POINTS.mother and Life.actor_position(model.data, "silvanus") == Childhood.POINTS.father and Life.actor_position(model.data, "sextus") == Childhood.POINTS.smith, "Canonical family and smith render at the same authored points used by childhood interactions")
 	for place: Dictionary in model.data.village.economy.workplaces.values():
 		_check(place.condition == 100, "The fresh existing village is not a ruin awaiting reconstruction")
 	_check(Economy.day_length(model.data) == 3600.0 and model.data.village.childhood.day == 1, "Narrative day one and the longer economic cycle are distinct")
@@ -240,7 +242,10 @@ func _test_nearby_work_and_save() -> void:
 	_ok(model.save_game(_path("midwork")), "Save a partially worked station while away")
 	var resumed = WorldModel.new()
 	_ok(resumed.load_game(_path("midwork")), "Reload the actual mid-work save")
-	_check(_snapshot(resumed.data.village.childhood) == frozen, "Save/load preserves partial work, tasks, possessions and family relations")
+	# JSON persistence does not preserve an int-vs-float token distinction.
+	# Normalize both complete structures through the same parser; every key,
+	# collection and numeric value still has to match.
+	_check(JSON.parse_string(_snapshot(resumed.data.village.childhood)) == JSON.parse_string(frozen), "Save/load preserves partial work, tasks, possessions and family relations")
 	_at(resumed, Childhood.POINTS.bellows)
 	var whole = WorldModel.new()
 	whole.data = resumed.data.duplicate(true)

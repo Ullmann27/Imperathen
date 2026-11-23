@@ -286,10 +286,11 @@ def apk_runtime_features(entries):
     def contains(prefix):
         return any(name.startswith("assets/scripts/" + prefix + ".") for name in entries)
     village = contains("story/village_life")
+    childhood = village and contains("story/village_childhood")
     return {"village_life": village,
-            "childhood": village and contains("story/village_childhood"),
+            "childhood": childhood,
+            "historical_prologue": childhood and contains("cinematic/i00_stage"),
             "action_controls": village and contains("ui/touch_look") and contains("domain/combat_actions")}
-
 
 def childhood_runtime_state(snapshot):
     state = snapshot.get("childhood_runtime") if isinstance(snapshot, dict) else None
@@ -575,6 +576,7 @@ def main():
         features = apk_runtime_features(entries)
         has_village_life = features["village_life"]
         has_childhood = features["childhood"]
+        has_historical_prologue = features["historical_prologue"]
         has_action_controls = features["action_controls"]
     package = "at.heinz.imperathen"
     report = {"platform": "Android emulator", "apk_sha256": hashlib.sha256(args.apk.read_bytes()).hexdigest(), "physical_device_test": False,
@@ -583,7 +585,8 @@ def main():
     report["test_harness_commit"] = os.environ.get("GITHUB_SHA")
     report["apk_file"] = args.apk.name
     report["action_controls_expected"] = has_action_controls
-    report["story_route"] = "childhood_home" if has_childhood else "legacy_village"
+    report["story_route"] = ("i00_aquileia->childhood_home" if has_historical_prologue
+                             else "childhood_home" if has_childhood else "legacy_village")
     serial = ""
     verified_emulator = False
 
@@ -718,28 +721,66 @@ def main():
             tap(point)
 
     def finish_story_opening():
-        # Older release APKs have no in-world prologue. New builds expose actual
-        # laid-out buttons; this test never substitutes guessed screen positions.
-        expected = "childhood_home" if has_childhood else "first_day"
+        # Derive the route from files inside the APK under test. Current childhood
+        # builds must prove the historical I-00 -> family opening chain with actual
+        # observed controls; older published APKs remain separate supported routes.
+        expected = ("i00_aquileia" if has_historical_prologue
+                    else "childhood_home" if has_childhood else "first_day")
         if has_childhood:
             started = wait_marker("IMPERATHEN_OPENING_STARTED ")
-            record("family_opening_is_actual_new_game", started == expected, started)
+            record("authored_opening_is_actual_new_game", started == expected, started)
         elif "IMPERATHEN_OPENING_STARTED first_day" not in checked_logs():
             return
+
         marker = "IMPERATHEN_OPENING_READY "
         opening = json.loads(wait_marker(marker))
-        record("opening_before_gameplay", not opening["final"] and not opening["companion_choice"], opening)
+        record("opening_before_gameplay",
+               opening.get("sequence") == expected
+               and not opening["final"] and not opening["companion_choice"], opening)
         screenshot("10_android_opening.png")
+
         previous = checked_logs().count(marker)
         adb("shell", "input", "keyevent", "4")
         paused = json.loads(wait_for_new_marker(marker, previous))
-        record("android_back_pauses_opening", paused["paused"] and paused["world_seconds"] == opening["world_seconds"], paused)
+        record("android_back_pauses_opening",
+               paused["paused"] and paused["world_seconds"] == opening["world_seconds"], paused)
+
         previous = checked_logs().count(marker)
         adb("shell", "input", "keyevent", "4")
         resumed = json.loads(wait_for_new_marker(marker, previous))
         record("android_back_resumes_opening", not resumed["paused"], resumed)
-        if has_childhood:
+
+        if has_historical_prologue:
+            previous_index = resumed["index"]
+            previous = checked_logs().count(marker)
+            tap(resumed["buttons"]["OpeningAdvance"])
+            historical = json.loads(wait_for_new_marker(marker, previous))
+            record("native_i00_intro_advance",
+                   historical.get("sequence") == "i00_aquileia"
+                   and historical["index"] > previous_index
+                   and not historical["paused"], historical)
+
+            previous = checked_logs().count(marker)
+            tap(historical["buttons"]["OpeningSkip"])
+            historical_objective = json.loads(wait_for_new_marker(marker, previous))
+            record("i00_skip_reaches_handoff",
+                   historical_objective.get("sequence") == "i00_aquileia"
+                   and historical_objective["final"]
+                   and not historical_objective["companion_choice"], historical_objective)
+
+            starts_before = checked_logs().count("IMPERATHEN_OPENING_STARTED ")
+            ready_before = checked_logs().count(marker)
+            tap(historical_objective["buttons"]["OpeningAdvance"])
+            family_started = wait_for_new_marker("IMPERATHEN_OPENING_STARTED ", starts_before)
+            record("i00_hands_to_family_opening", family_started == "childhood_home", family_started)
+            objective = json.loads(wait_for_new_marker(marker, ready_before))
+            record("family_opening_after_i00",
+                   objective.get("sequence") == "childhood_home"
+                   and not objective["final"] and not objective["companion_choice"], objective)
+        else:
             objective = resumed
+
+        if has_childhood:
             for _ in range(8):
                 if objective["final"]:
                     break
@@ -747,19 +788,25 @@ def main():
                 previous = checked_logs().count(marker)
                 tap(objective["buttons"]["OpeningAdvance"])
                 objective = json.loads(wait_for_new_marker(marker, previous))
-                record("native_family_intro_advance", objective.get("sequence") == "childhood_home"
-                       and objective["index"] > previous_index and not objective["paused"], objective)
+                record("native_family_intro_advance",
+                       objective.get("sequence") == "childhood_home"
+                       and objective["index"] > previous_index
+                       and not objective["paused"], objective)
             record("family_intro_reaches_first_objective",
                    objective["final"] and not objective["companion_choice"], objective)
         else:
             previous = checked_logs().count(marker)
             tap(resumed["buttons"]["OpeningSkip"])
             objective = json.loads(wait_for_new_marker(marker, previous))
-            record("skip_keeps_first_objective", objective["final"] and not objective["companion_choice"], objective)
+            record("skip_keeps_first_objective",
+                   objective["final"] and not objective["companion_choice"], objective)
+
         screenshot("11_android_opening_objective.png")
+        complete_before = checked_logs().count("IMPERATHEN_OPENING_COMPLETE")
         tap(objective["buttons"]["OpeningAdvance"])
-        wait_marker("IMPERATHEN_OPENING_COMPLETE")
-        record("objective_hands_over_control", True, "Actual touch accepted the objective after the opening controls")
+        wait_for_new_marker("IMPERATHEN_OPENING_COMPLETE", complete_before)
+        record("objective_hands_over_control", True,
+               "Actual touch accepted the objective after the opening controls")
 
     def village_snapshot(screen=None, *, predicate=None, required_control=None, after=-1, timeout=100):
         return wait_for_village_snapshot(checked_logs, screen, predicate=predicate,

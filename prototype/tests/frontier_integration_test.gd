@@ -43,7 +43,7 @@ func _run() -> void:
 		if can_replace:
 			game.ui.action_requested.emit("confirm_new_game", {})
 			await _frames()
-	_enter_opening("childhood_home")
+	_enter_fresh_childhood()
 	_check(game.screen == "playing" and game.model.data.player.age == 12 and Childhood.enabled(game.model.data), "Actual entry creates the new saved family childhood world")
 	_load_legacy_village()
 	_enter_opening("first_day")
@@ -300,6 +300,22 @@ func _check_dialog_layout(size: Vector2i) -> void:
 func _request_back() -> void:
 	root.propagate_notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	root.go_back_requested.emit()
+
+
+func _enter_fresh_childhood() -> void:
+	var opened_i00: bool = game.screen == "opening" and game.opening_sequence.get("id", "") == "i00_aquileia"
+	_check(opened_i00, "Expected I-00 Aquileia before the fresh family childhood")
+	if not opened_i00:
+		return
+	var before := _snapshot()
+	game.opening_overlay._request_skip()
+	_check(bool(game.opening_sequence.beats[game.opening_index].get("final", false)), "Skipping I-00 keeps its explicit handoff")
+	game.opening_overlay._request_advance()
+	_check(game.screen == "opening" and game.opening_sequence.get("id", "") == "childhood_home" and _snapshot() == before, "I-00 chains into the family opening without mutating the campaign")
+	game.opening_overlay._request_skip()
+	_check(game.screen == "opening" and bool(game.opening_sequence.beats[game.opening_index].get("final", false)), "Skipping the family opening keeps its explicit objective")
+	game.opening_overlay._request_advance()
+	_check(game.screen == "playing" and _snapshot() == before, "Accepting the family objective releases play without changing the campaign")
 
 
 func _enter_opening(expected_sequence: String) -> void:

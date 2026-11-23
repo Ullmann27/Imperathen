@@ -6,7 +6,7 @@ const Origins = preload("res://scripts/strategy/origins.gd")
 const STORY_VERSION := 1
 const HELP_WOOD := 4
 const HUT_WOOD := 8
-const SHOT_IDS := ["valley", "market", "well", "plot", "player"]
+const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player"]
 const REGIONS := {
 	"italia": {
 		"location": "Römische Grenzsiedlung",
@@ -66,9 +66,40 @@ const REGIONS := {
 }
 
 
+static func historical_prologue() -> Dictionary:
+	var chapter := "Prolog · I-00 · Drei Legionen im Regen"
+	var location := "Aquileia und Umland · 58 v. Chr."
+	return {
+		"id":"i00_aquileia","version":2,"origin_id":"italia",
+		"source_mission_id":"I-00",
+		"historical_source":"C. Julius Caesar · Bellum Gallicum I.10",
+		"title":"Drei Legionen im Regen","location":location,"chapter":chapter,
+		"chain_to":"childhood_home",
+		"beats":[
+			_beat("i00_detail","aquileia_detail","Chronik","Aquileia · 58 v. Chr.",
+				"Regen läuft über Leder, Holz und Metall. Bei Aquileia werden Caesars Legionen zum Marsch bereitgemacht; erst das Detail, dann öffnet sich der Blick auf Lager und Straße.",
+				7.0,chapter,location),
+			_beat("i00_legions","legions_rain","Chronik","Drei Legionen",
+				"Drei Legionen stehen bei Aquileia bereit. Männer ordnen Gepäck und Waffen, Befehle gehen durch die Reihen. Der Aufbruch hängt ebenso an Versorgung und Wegen wie am Mut.",
+				8.0,chapter,location),
+			_beat("i00_caesar","caesar_orders","Caesar","Dramatisierter Produktionsdialog",
+				"»Berichte, was du gesehen hast. Nicht, was du glaubst, dass ich hören will.«",
+				7.5,chapter,location),
+			_beat("i00_labienus","labienus_orders","Labienus","Dramatisierter Produktionsdialog",
+				"»Wenn du Zweifel hast, melde sie. Wenn du Befehle hast, führe sie aus.«",
+				7.5,chapter,location),
+			_beat("i00_departure","legions_depart","Caesar","Dramatisierter Produktionsdialog",
+				"»Eine Armee bewegt sich nicht durch Mut allein. Sie bewegt sich, weil Brot, Wege und Befehle zur gleichen Zeit ankommen.«",
+				8.0,chapter,location)
+		],
+		"objective_title":"Valdora · Am selben Morgen",
+		"objective_text":"Im Raum Aquileia liegt Valdora. Dort beginnt am selben Morgen die Geschichte eines zwölfjährigen Kindes, seiner Familie und der drei Becher."
+	}
+
+
 static func childhood() -> Dictionary:
-	var chapter := "Kapitel I · Menschen, die dich kennen"
-	var location := "Valdora · Römisches Grenzland · um 100 n. Chr."
+	var chapter := "Kapitel I · I-01 · Die drei Becher"
+	var location := "Valdora · Aquileia-Region · 58 v. Chr."
 	return {"id":"childhood_home","version":2,"origin_id":"italia",
 		"title":"Ein Morgen zu Hause","location":location,"chapter":chapter,
 		"beats":[
