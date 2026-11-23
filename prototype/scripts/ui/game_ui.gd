@@ -69,6 +69,7 @@ var _state: Dictionary = {}
 var _mode := "person"
 var _ui_scale := 1.0
 var _reduce_motion := false
+var _opening_reading := false
 var _volume := 0.55
 var _sound_player: AudioStreamPlayer
 var _serif: SystemFont
@@ -313,6 +314,23 @@ func show_game(state: Dictionary) -> void:
 	set_mode(_mode)
 
 
+func show_cinematic() -> void:
+	_open_screen("cinematic", false)
+	if _toast_tween != null and _toast_tween.is_valid():
+		_toast_tween.kill()
+	_toast_panel.hide()
+
+
+func opening_preferences() -> Dictionary:
+	return {"ui_scale": _ui_scale, "reduce_motion": _reduce_motion,
+		"touch_enabled": _touch_enabled, "manual_reading": _opening_reading}
+
+
+func set_opening_reading(enabled: bool) -> void:
+	_opening_reading = enabled
+	_save_settings()
+
+
 func update_state(state: Dictionary) -> void:
 	_state = state.duplicate(true)
 	if _view_state != "game":
@@ -423,13 +441,22 @@ func show_dialog(title: String, text: String, choices: Array) -> void:
 		var choice_button := _button(caption, _emit.bind(action, payload), index == 0, 17)
 		choice_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		choice_button.tooltip_text = caption
+		if entry is Dictionary:
+			choice_button.disabled = not bool(entry.get("enabled", true))
+			if choice_button.disabled and not str(entry.get("reason", "")).is_empty():
+				choice_button.tooltip_text = str(entry.reason)
 		column.add_child(choice_button)
-		if first_button == null:
+		if choice_button.disabled and entry is Dictionary and not str(entry.get("reason", "")).is_empty():
+			var reason := _label(str(entry.reason), 13, MUTED)
+			reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			column.add_child(reason)
+		if first_button == null and not choice_button.disabled:
 			first_button = choice_button
 	if choices.is_empty():
 		first_button = _button("Zurück ins Spiel", func(): _emit("resume"), true)
 		column.add_child(first_button)
-	first_button.grab_focus.call_deferred()
+	if first_button != null:
+		first_button.grab_focus.call_deferred()
 
 
 func notify(message: String) -> void:
@@ -1016,6 +1043,8 @@ func _objective(state: Dictionary) -> Array[String]:
 	if not bool(state.get("companion", {}).get("met", false)):
 		return ["Du bist nicht allein", "%s wartet im Dorf. Geh näher und wähle %s. Deine Antwort hat Folgen." % [_companion_name(state), "„Interagieren“" if _touch_enabled else "E"]]
 	if not bool(progress.get("training_complete", false)):
+		if int(state.get("player", {}).get("age", 12)) < 18:
+			return ["Wenn du bereit bist", "Am Übungsplatz kannst du den nächsten Lebensabschnitt beginnen. Dann vergehen ausdrücklich sechs Jahre. Deine Hütte und eure Entscheidung bleiben erhalten."]
 		return ["Der nächste Lebensabschnitt", "Gehe zum Trainingsplatz. Beginne die Ausbildung und triff den Übungspfahl dreimal. Treffer: %d / 3." % int(progress.get("training_hits", 0))]
 	if int(state.get("squad", {}).get("alive", 0)) == 0:
 		return ["Gemeinsam stärker", "Du hast die Grundlagen gelernt. Rekrutiere eine kleine Truppe. Jeder Rekrut braucht Sold und Nahrung."]
@@ -1329,6 +1358,7 @@ func _load_settings() -> void:
 	if config.load(SETTINGS_PATH) == OK:
 		_ui_scale = clampf(float(config.get_value("interface", "scale", 1.0)), 0.85, 1.25)
 		_reduce_motion = bool(config.get_value("interface", "reduce_motion", false))
+		_opening_reading = bool(config.get_value("interface", "opening_reading", false))
 		_volume = clampf(float(config.get_value("audio", "volume", 0.55)), 0.0, 1.0)
 		_touch_enabled = bool(config.get_value("input", "touch_controls", _touch_enabled))
 		_diagnostics = bool(config.get_value("graphics", "diagnostics", false))
@@ -1349,6 +1379,7 @@ func _save_settings() -> void:
 	var config := ConfigFile.new()
 	config.set_value("interface", "scale", _ui_scale)
 	config.set_value("interface", "reduce_motion", _reduce_motion)
+	config.set_value("interface", "opening_reading", _opening_reading)
 	config.set_value("audio", "volume", _volume)
 	config.set_value("input", "touch_controls", _touch_enabled)
 	config.set_value("graphics", "quality", _quality)

@@ -73,6 +73,8 @@ func _run() -> void:
 	game._leave_atlas()
 	game.ui.origin_id = "italia"
 	game._start_new_game()
+	game._opening_skip()
+	game._opening_next()
 	game._set_mode("city")
 	game.world._city_focus = Vector3(-11,0,-9)
 	game.world._city_zoom = 37
