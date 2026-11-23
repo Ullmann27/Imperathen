@@ -97,7 +97,7 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 	invalid = validate(candidate)
 	if not invalid.is_empty():
 		return _fail("Dorfauftrag verworfen: " + invalid)
-	for key: String in ["village", "resources", "player"]:
+	for key: String in ["village", "resources", "player", "companion"]:
 		data[key] = candidate[key]
 	return result
 
