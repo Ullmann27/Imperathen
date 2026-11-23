@@ -21,6 +21,7 @@ var _built := false
 var _speakers: Dictionary = {}
 var _iron: StandardMaterial3D
 var _cloth: StandardMaterial3D
+var _shield: StandardMaterial3D
 var _mud: StandardMaterial3D
 var _wood: StandardMaterial3D
 
@@ -33,7 +34,9 @@ func ensure_built() -> void:
 	_iron = Art.material(Color("5e625f"), 0.62)
 	_iron.metallic = 0.42
 	_cloth = Art.material(Color("7b4037"), 0.92)
-	_mud = Art.material(Color("37342e"), 1.0)
+	_shield = Art.material(Color("6d3029"), 0.70)
+	_shield.metallic = 0.10
+	_mud = Art.material(Color("37342e"), 0.82)
 	_wood = Art.material(Color("554638"), 0.94)
 	_build_ground()
 	_build_legions()
@@ -75,6 +78,8 @@ func _standard(at: Vector3) -> void:
 
 
 func _build_legions() -> void:
+	# Three symbolic formation blocks keep the cold open Android-safe. They are
+	# distant cinematic silhouettes, not the eventual full legion simulation.
 	var body_mesh := CapsuleMesh.new()
 	body_mesh.radius = 0.20
 	body_mesh.height = 1.58
@@ -93,6 +98,12 @@ func _build_legions() -> void:
 	spears.transform_format = MultiMesh.TRANSFORM_3D
 	spears.mesh = spear_mesh
 	spears.instance_count = 54
+	var shield_mesh := BoxMesh.new()
+	shield_mesh.size = Vector3(0.52, 0.88, 0.08)
+	var shields := MultiMesh.new()
+	shields.transform_format = MultiMesh.TRANSFORM_3D
+	shields.mesh = shield_mesh
+	shields.instance_count = 54
 	var index := 0
 	for block in 3:
 		var center_x := -9.0 + float(block) * 9.0
@@ -101,6 +112,8 @@ func _build_legions() -> void:
 				var at := Vector3(center_x + float(column - 1) * 0.92, 0.82, -8.0 - float(row) * 1.28)
 				bodies.set_instance_transform(index, Transform3D(Basis.IDENTITY, at))
 				spears.set_instance_transform(index, Transform3D(Basis.IDENTITY, at + Vector3(0.36, 0.72, 0.0)))
+				var shield_basis := Basis(Vector3.UP, deg_to_rad(-7.0 + float(column) * 7.0))
+				shields.set_instance_transform(index, Transform3D(shield_basis, at + Vector3(-0.27, 0.03, 0.18)))
 				index += 1
 	var body_node := MultiMeshInstance3D.new()
 	body_node.name = "LegionBlocks"
@@ -115,6 +128,13 @@ func _build_legions() -> void:
 	spear_node.material_override = _wood
 	spear_node.visibility_range_end = 100.0
 	add_child(spear_node)
+	var shield_node := MultiMeshInstance3D.new()
+	shield_node.name = "LegionShields"
+	shield_node.multimesh = shields
+	shield_node.material_override = _shield
+	shield_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	shield_node.visibility_range_end = 105.0
+	add_child(shield_node)
 
 
 func _build_commanders() -> void:
