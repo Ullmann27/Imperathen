@@ -56,7 +56,7 @@ func _run() -> void:
 			_check(actor.position.distance_to(previous)>.59,"Economic residents have distinct personal spaces")
 		positions.append(actor.position)
 		_check(actor.collision_layer == Layout.CITIZEN_LAYER,"Living resident blocks player movement: "+id)
-	for id: String in ["antonia","sextus","quintus"]:
+	for id: String in ["julia","silvanus","sextus"]:
 		var at: Vector3 = world.village_life_world.actor_position(id)
 		_check(world.village_life_world.nearest(at) == id,"Childhood family and smith can be reached through the live interaction lookup: "+id)
 	for id: String in ["family_water","family_rest","bellows","anvil","quench","patrol_inner","patrol_road","patrol_gate"]:
@@ -87,7 +87,7 @@ func _run() -> void:
 		world._move_player(1.0/60.0)
 	_check(absf(player.position.y-.9-Layout.HOUSE_FLOOR)<.025,"The production boy's foot origin rests on the raised family floor")
 	_check((player.collision_mask & Layout.CITIZEN_LAYER) != 0,"The production player observes citizen collisions")
-	var mother: Node3D = world.village_life_world.actors.antonia
+	var mother: Node3D = world.village_life_world.actors.julia
 	player.position = mother.position+Vector3(-1.5,.9,0)
 	await physics_frame
 	player.move_and_collide(Vector3(3,0,0))

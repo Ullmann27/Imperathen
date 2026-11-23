@@ -128,8 +128,8 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 		_text(ui,column,"Dorftag %d · Du bist zwölf. Der nächste Tag beginnt, wenn du zu Hause bewusst schlafen gehst."%int(chapter.get("day",1)),15,true)
 		if not chapter.get("carried",[]).is_empty():
 			_text(ui,column,"Bei dir: "+", ".join(chapter.carried),16)
-		_text(ui,column,"Deine Lehre: "+str(chapter.get("apprenticeship","none")).replace("none","noch offen").replace("smith","bei Quintus"),16)
-		_text(ui,column,"Deine Mutter Antonia und dein Vater Sextus warten an eurem Haus. Die Karte zeigt das Ziel deines nächsten Auftrags. Zum Kennenlernen und Helfen gehst du zu den Menschen.",15,true)
+		_text(ui,column,"Deine Lehre: "+str(chapter.get("apprenticeship","none")).replace("none","noch offen").replace("smith","bei Sextus"),16)
+		_text(ui,column,"Deine Mutter Julia und dein Vater Silvanus warten an eurem Haus. Die Karte zeigt das Ziel deines nächsten Auftrags. Zum Kennenlernen und Helfen gehst du zu den Menschen.",15,true)
 		_text(ui,column,"Ansehen wächst durch gehaltene Zusagen. Decimus führt das Dorf; deine Aufgaben gehören zu deinem eigenen Lebensweg.",15,true)
 		return
 	_text(ui, column, str(life.get("objective", "Lerne Decimus und deine Nachbarn kennen.")), 18)

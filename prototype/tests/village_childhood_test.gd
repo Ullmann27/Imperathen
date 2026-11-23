@@ -18,6 +18,8 @@ func _initialize() -> void:
 	_test_nearby_work_and_save()
 	_test_full_journey_and_guard()
 	_test_branch_and_replay()
+	_test_screenplay_failure_and_relationship_branches()
+	_test_night_hide_consequences()
 	_test_invalid_persistence_and_read_isolation()
 	_cleanup()
 	print("VILLAGE_CHILDHOOD_RESULT checks=%d failures=%d" % [checks, failures.size()])
@@ -60,7 +62,30 @@ func _current(model) -> String:
 
 func _complete(model, trade_choice := "market_fair") -> bool:
 	var view: Dictionary = Childhood.view(model.data)
-	if view.is_empty() or int(view.completed_steps) >= Childhood.STEPS.size():
+	if view.is_empty():
+		_check(false, "A valid next childhood action exists")
+		return false
+	var stage := str(view.get("stage", ""))
+	if stage in ["i02_basket", "i02_correct", "i03_marcus", "i08_tracks", "i08_report", "i11_forge", "i12_father", "i13_morning", "i14_oath"]:
+		_at(model, view.point)
+		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):
+			return false
+		var screenplay_action := {
+			"i02_basket":"basket_check",
+			"i02_correct":"basket_correct",
+			"i03_marcus":"marcus_friend",
+			"i08_tracks":"i08_inspect",
+			"i08_report":"i08_report",
+			"i11_forge":"i11_forge",
+			"i12_father":"i12_father",
+			"i13_morning":"i13_morning",
+			"i14_oath":"i14_oath"
+		}[stage]
+		if not _ok(_action(model, screenplay_action), "Complete screenplay bridge: " + stage):
+			return false
+		_check(model.data.player.age == 12 and model.data.player.role == "child", "Screenplay bridge cannot change life stage: " + stage)
+		return true
+	if int(view.completed_steps) >= Childhood.STEPS.size():
 		_check(false, "A valid next childhood action exists")
 		return false
 	var step: Dictionary = Childhood.STEPS[int(view.completed_steps)]
@@ -80,7 +105,7 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 
 
 func _until(model, stage: String, trade_choice := "market_fair") -> bool:
-	for _index in Childhood.STEPS.size() + 1:
+	for _index in Childhood.STEPS.size() + 16:
 		if _current(model) == stage:
 			return true
 		if not _complete(model, trade_choice):
@@ -93,12 +118,40 @@ func _test_fresh_opt_in_and_legacy() -> void:
 	var model = _new()
 	_check(model.data.village.economy.people.size() == 14 and Life.npc_catalog(model.data).size() == 10, "Parents and smith reuse the fourteen real adults and expand seven dialogue people to ten")
 	_check(model.data.buildings.is_empty() and _current(model) == "mother_morning", "Family beginning needs no newly built hut")
-	_check(Life.relationship(model.data, "antonia").met and Life.relationship(model.data, "sextus").met and not Life.relationship(model.data, "quintus").met, "Parents are already known; the smith is met in play")
+	_check(Life.relationship(model.data, "julia").met and Life.relationship(model.data, "silvanus").met and not Life.relationship(model.data, "sextus").met, "Parents are already known; the smith is met in play")
 	for place: Dictionary in model.data.village.economy.workplaces.values():
 		_check(place.condition == 100, "The fresh existing village is not a ruin awaiting reconstruction")
 	_check(Economy.day_length(model.data) == 3600.0 and model.data.village.childhood.day == 1, "Narrative day one and the longer economic cycle are distinct")
 	var before := _snapshot(model.data)
 	_check(not Childhood.start(model.data) and _snapshot(model.data) == before, "Repeated initialization cannot erase an existing childhood")
+	# Reproduce the first playable childhood identity layout and prove that the
+	# save loader migrates it without losing progress, trust or actor continuity.
+	var legacy_names: Dictionary = model.data.duplicate(true)
+	legacy_names.village.childhood.version = 1
+	legacy_names.village.childhood.erase("screenplay")
+	legacy_names.village.history.start_year = 100
+	legacy_names.village.childhood.relationships = {
+		"antonia": legacy_names.village.childhood.relationships.julia.duplicate(true),
+		"sextus": legacy_names.village.childhood.relationships.silvanus.duplicate(true),
+		"quintus": legacy_names.village.childhood.relationships.sextus.duplicate(true)
+	}
+	for person: Dictionary in legacy_names.village.economy.people:
+		if person.id == "antonia": person.profession = "Deine Mutter · Töpferin"
+		if person.id == "sextus": person.profession = "Dein Vater · Zimmermann"
+		if person.id == "quintus": person.profession = "Dorfschmied"
+		if person.id == "julia":
+			person.profession = "Bäuerin"
+			person.assignment = "farm"
+		if person.id == "silvanus": person.profession = "Lastenträger"
+	_write(_path("legacy-childhood-names"), legacy_names)
+	var migrated_names = WorldModel.new()
+	_ok(migrated_names.load_game(_path("legacy-childhood-names")), "Load and migrate version-one childhood actor identities")
+	_check(migrated_names.data.village.childhood.version == Childhood.VERSION, "Nested childhood identity migration advances its own version")
+	_check(migrated_names.data.village.history.start_year == -58, "Legacy childhood migration moves the campaign anchor from the old Trajan-era marker to 58 BCE")
+	_check(migrated_names.data.village.childhood.relationships.has("julia") and migrated_names.data.village.childhood.relationships.has("silvanus") and migrated_names.data.village.childhood.relationships.has("sextus"), "Legacy relationships become Julia, Silvanus and Sextus")
+	_check(not migrated_names.data.village.childhood.relationships.has("antonia") and not migrated_names.data.village.childhood.relationships.has("quintus"), "Legacy family/smith aliases do not remain authoritative")
+	_check(Life.relationship(migrated_names.data, "julia").met and Life.relationship(migrated_names.data, "silvanus").met and not Life.relationship(migrated_names.data, "sextus").met, "Migration preserves known parents and not-yet-met smith state")
+	_check(_person(migrated_names, "julia").profession == "Deine Mutter" and _person(migrated_names, "silvanus").profession == "Dein Vater" and _person(migrated_names, "sextus").profession.begins_with("Dorfschmied"), "Canonical actors receive screenplay roles after migration")
 	var old = WorldModel.new()
 	old.new_game("italia", true)
 	Life.ensure(old.data)
@@ -127,7 +180,7 @@ func _test_idle_and_bypasses() -> void:
 	_check(model.data.village.economy.day == 0 and model.data.village.economy.day_seconds > 599.9, "Six hundred seconds do not turn into five economic days")
 	_check(not Life.training_ready(model.data), "The legacy training gate stays closed")
 	var before := _snapshot(model.data)
-	for item: Array in [["train", {}], ["village_childhood_begin_raid", {}], ["village_request_work", {}], ["village_assign", {"resident_id":"quintus", "workplace_id":"quarry"}], ["village_shift", {"resident_id":"severus", "duty":"defense"}], ["frontier_talk", {"npc_id":"marcus"}]]:
+	for item: Array in [["train", {}], ["village_childhood_begin_raid", {}], ["village_request_work", {}], ["village_assign", {"resident_id":"sextus", "workplace_id":"quarry"}], ["village_shift", {"resident_id":"severus", "duty":"defense"}], ["frontier_talk", {"npc_id":"marcus"}]]:
 		_check(not model.execute(item[0], item[1]).ok and _snapshot(model.data) == before, "Old authority or chapter shortcut is atomically rejected: " + str(item[0]))
 	_meet(model, "cassia")
 	before = _snapshot(model.data)
@@ -140,7 +193,7 @@ func _test_action_transactions() -> void:
 	_at(model, Vector2(70.0, 70.0))
 	var before := _snapshot(model.data)
 	_check(not _action(model, "mother_morning").ok and _snapshot(model.data) == before, "Remote parent action cannot advance or grant an item")
-	_near(model, "antonia")
+	_near(model, "julia")
 	before = _snapshot(model.data)
 	for args: Dictionary in [{"action_id":"night_rest"}, {"action_id":"unknown"}, {"action_id":"mother_morning", "denarii":999}, {"action_id":42}, {"action_id":NAN}, {}]:
 		_check(not model.execute("village_childhood_action", args).ok and _snapshot(model.data) == before, "Out-of-order, fabricated or malformed quest command stays atomic")
@@ -210,7 +263,7 @@ func _test_full_journey_and_guard() -> void:
 	if not _until(model, "patrol_inner"):
 		return
 	_check(model.data.village.childhood.day == 3 and model.data.village.childhood.apprenticeship == "apprentice" and model.data.village.social.profession == "smith", "Actual trial work, delivery, trust and family rest establish a beginning apprenticeship")
-	_check(model.data.village.childhood.relationships.quintus.learned and model.data.village.childhood.relationships.quintus.trust >= 8, "The smith records earned trust and the agreed apprenticeship")
+	_check(model.data.village.childhood.relationships.sextus.learned and model.data.village.childhood.relationships.sextus.trust >= 8, "The smith records earned trust and the agreed apprenticeship")
 	_check(model.data.village.social.ledger.denarii == 4, "The first delivery and fair-price choice pay exactly four real denarii")
 	_at(model, Childhood.POINTS.patrol_gate)
 	var before := _snapshot(model.data)
@@ -262,6 +315,10 @@ func _test_released_combat(model) -> void:
 	# Domain timing uses explicit geometry; actual wall/body sweeps are separate.
 	model.combat_sight_check = func(_from: Vector2, _to: Vector2) -> bool: return true
 	model.combat_motion_check = func(from: Vector2, _to: Vector2) -> Vector2: return from
+	_check(model.data.village.raid.rescue_person_id == "julia" and model.data.village.raid.rescue_available, "Canonical night raid exposes Julia as the actual rescue target")
+	_at(model, Life.RESCUE_POINT)
+	_ok(model.execute("village_rescue"), "Defend path physically rescues Julia before the raid outcome")
+	_check(model.data.village.raid.rescued and _person(model, "julia").alive, "Julia rescue is recorded on the same real resident")
 	var first: Dictionary = model.data.village.raid.enemies[0]
 	var initial_health := int(first.health)
 	var initial_experience := int(model.data.village.attributes.combat)
@@ -284,6 +341,18 @@ func _test_released_combat(model) -> void:
 	_at(model, Childhood.POINTS.family_rest)
 	model.advance(160.0)
 	_check(not model.data.village.raid.active and model.data.village.raid.completed == 1, "The released raid reaches a real bounded outcome")
+	_check(_current(model) == "i11_forge", "A completed night raid releases I-11 instead of restarting the old village loop")
+	_check(_complete(model), "Play I-11 at the forge")
+	_check(not _person(model, "sextus").alive and _person(model, "sextus").health == 0, "Sextus dies as a persistent shared resident in I-11")
+	_check(_complete(model), "Play I-12 at Silvanus")
+	_check(not _person(model, "silvanus").alive and _person(model, "julia").alive and model.data.village.childhood.screenplay.julia_outcome == "survived", "Defend/rescue path kills Silvanus but preserves the actually rescued Julia")
+	_check(_complete(model), "Play I-13 with Aurelia")
+	_check(_complete(model), "Play I-14 at the ridge")
+	_check(model.data.village.childhood.screenplay.oath and model.data.village.childhood.night_event == "resolved" and model.data.village.childhood.carried.has("memory_token"), "The oath and keepsake close I-14 without granting adulthood")
+	_ok(model.save_game(_path("oath-defend")), "Save the defended oath outcome")
+	var oath_reload = WorldModel.new()
+	_ok(oath_reload.load_game(_path("oath-defend")), "Reload the defended oath outcome")
+	_check(oath_reload.data.village.childhood.screenplay.julia_outcome == "survived" and oath_reload.data.village.childhood.screenplay.oath and _person(oath_reload, "julia").alive, "Rescue, oath and Julia survival persist across save/load")
 	model.advance(600.0)
 	_check(model.data.village.raid.status == "aftermath" and model.data.village.raid.number == 1, "An ended childhood raid cannot restart itself on the old repeating timer")
 
@@ -299,7 +368,7 @@ func _test_branch_and_replay() -> void:
 	_ok(_action(model, "market_fair", "fair-once"), "Choose the agreed full price")
 	_ok(_action(other, "market_neighbor", "neighbor-once"), "Choose the voluntary one-denarius neighbor concession")
 	_check(model.data.resources.denarii == other.data.resources.denarii + 1 and model.data.village.social.ledger.denarii == other.data.village.social.ledger.denarii + 1, "The trade choice changes real money and its conservation ledger together")
-	_check(other.data.village.childhood.relationships.antonia.trust == model.data.village.childhood.relationships.antonia.trust + 2, "Voluntary help has a distinct relationship consequence")
+	_check(other.data.village.childhood.relationships.julia.trust == model.data.village.childhood.relationships.julia.trust + 2, "Voluntary help has a distinct relationship consequence")
 	var before := _snapshot(other.data)
 	_ok(_action(other, "market_neighbor", "neighbor-once"), "Replay the saved market decision")
 	_check(_snapshot(other.data) == before and not _action(other, "market_fair").ok and _snapshot(other.data) == before, "The alternative cannot be collected after the saved choice")
@@ -307,6 +376,48 @@ func _test_branch_and_replay() -> void:
 	var saved = WorldModel.new()
 	_ok(saved.load_game(_path("branch")), "Reload the selected trade branch")
 	_check(saved.data.village.childhood.completed.has("market_neighbor") and not saved.data.village.childhood.completed.has("market_fair"), "The choice is persisted as history rather than inferred from the latest UI")
+
+
+func _test_screenplay_failure_and_relationship_branches() -> void:
+	var model = _new()
+	_until(model, "i02_basket")
+	_near(model, "aurelia")
+	_meet(model, "aurelia")
+	_ok(_action(model, "basket_rush"), "I-02 permits the wrong basket without reloading")
+	_check(_current(model) == "i02_correct" and model.data.village.childhood.screenplay.i02_outcome == "wrong", "Wrong basket creates a correction world state")
+	_near(model, "julia")
+	_ok(_action(model, "basket_correct"), "Julia helps correct the basket mistake")
+	_check(_current(model) == "i03_marcus" and not model.data.companion.met, "I-03 follows I-02 with Marcus still undecided")
+	_at(model, Childhood.POINTS.marcus)
+	_ok(_action(model, "marcus_rival"), "I-03 permits a rivalry outcome")
+	_check(model.data.companion.met and model.data.companion.choice == "decline" and model.data.companion.trust == -5, "Marcus rivalry uses the persistent companion state")
+	_check(model.data.village.childhood.screenplay.i03_outcome == "rival", "I-03 concrete memory is stored in childhood screenplay state")
+	var before := _snapshot(model.data)
+	_check(not _action(model, "marcus_friend").ok and _snapshot(model.data) == before, "I-03 cannot be collected twice or silently rewritten")
+	_ok(model.save_game(_path("screenplay-branches")), "Save I-02/I-03 branch state")
+	var reloaded = WorldModel.new()
+	_ok(reloaded.load_game(_path("screenplay-branches")), "Reload I-02/I-03 branch state")
+	_check(reloaded.data.village.childhood.screenplay.i02_outcome == "wrong" and reloaded.data.village.childhood.screenplay.i03_outcome == "rival", "Failure and relationship memories survive save/load")
+
+
+func _test_night_hide_consequences() -> void:
+	var model = _new()
+	if not _until(model, "i10_choice"):
+		return
+	_at(model, Childhood.POINTS.father)
+	_ok(_action(model, "i10_hide"), "I-10 permits hiding with the parents as a real branch")
+	_check(model.data.village.raid.status == "aftermath" and model.data.village.raid.completed == 1 and not model.data.village.raid.active, "Hiding does not erase the attack; it resolves persistent raid losses")
+	_check(model.data.village.childhood.screenplay.raid_path == "hide" and _current(model) == "i11_forge", "Hide branch stores its path and still reaches the forge aftermath")
+	_check(_complete(model), "Hide route plays I-11")
+	_check(_complete(model), "Hide route plays I-12")
+	_check(not _person(model, "sextus").alive and not _person(model, "silvanus").alive and not _person(model, "julia").alive, "Hide route leaves Sextus, Silvanus and Julia dead in the shared resident roster")
+	_check(model.data.village.childhood.screenplay.julia_outcome == "dead", "Hide route records Julia's death explicitly")
+	_check(_complete(model) and _complete(model), "Hide route reaches morning and the oath")
+	_check(model.data.village.childhood.screenplay.oath and model.data.village.childhood.carried.has("memory_token"), "Hide route can swear the same investigation oath without rewriting its losses")
+	_ok(model.save_game(_path("oath-hide")), "Save the hidden oath outcome")
+	var reloaded = WorldModel.new()
+	_ok(reloaded.load_game(_path("oath-hide")), "Reload the hidden oath outcome")
+	_check(not _person(reloaded, "julia").alive and not _person(reloaded, "silvanus").alive and not _person(reloaded, "sextus").alive, "Hide-route deaths remain real after reload")
 
 
 func _test_invalid_persistence_and_read_isolation() -> void:
@@ -317,14 +428,14 @@ func _test_invalid_persistence_and_read_isolation() -> void:
 		bad.village.childhood[key] = {"day":2, "version":true, "gear":"loaned", "night_event":"released", "completed":["night_rest"], "carried":["family_parcel"], "active_work":"forge_bellows", "work_seconds":NAN}[key]
 		invalids.append(bad)
 	var absent: Dictionary = model.data.duplicate(true)
-	absent.village.childhood.relationships.erase("antonia")
+	absent.village.childhood.relationships.erase("julia")
 	invalids.append(absent)
 	var apprentice: Dictionary = model.data.duplicate(true)
-	apprentice.village.childhood.relationships.quintus.met = true
-	apprentice.village.childhood.relationships.quintus.learned = true
+	apprentice.village.childhood.relationships.sextus.met = true
+	apprentice.village.childhood.relationships.sextus.learned = true
 	invalids.append(apprentice)
 	var parent: Dictionary = model.data.duplicate(true)
-	parent.village.childhood.relationships.sextus.met = false
+	parent.village.childhood.relationships.silvanus.met = false
 	invalids.append(parent)
 	var early_raid: Dictionary = model.data.duplicate(true)
 	early_raid.village.raid.status = "warning"
@@ -342,15 +453,15 @@ func _test_invalid_persistence_and_read_isolation() -> void:
 	var before := _snapshot(model.data)
 	_check(not model.load_game(_path("forged")).ok and _snapshot(model.data) == before, "A correctly checksummed but contradictory save cannot replace the live world")
 	var display: Dictionary = Childhood.view(model.data)
-	display.relationships.antonia.trust = 99
+	display.relationships.julia.trust = 99
 	display.carried.append("Invented goods")
-	var relation: Dictionary = Life.relationship(model.data, "antonia")
+	var relation: Dictionary = Life.relationship(model.data, "julia")
 	relation.trust = -100
 	var catalog: Array[Dictionary] = Life.npc_catalog(model.data)
 	catalog.back().name = "Invented name"
 	_check(_snapshot(model.data) == before, "Mutating returned UI views, relationship copies or catalogs cannot alter authoritative state")
 	var copy: Dictionary = model.data.duplicate(true)
-	_check(Childhood.view(copy).objective.length() > 0 and Childhood.dialogue(copy, "antonia").choices.size() == 1, "Fresh state exposes an actionable family conversation")
+	_check(Childhood.view(copy).objective.length() > 0 and Childhood.dialogue(copy, "julia").choices.size() == 1, "Fresh state exposes an actionable family conversation")
 
 
 func _person(model, id: String) -> Dictionary:

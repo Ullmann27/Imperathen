@@ -2,7 +2,8 @@ extends RefCounted
 ## Authored childhood chapters. Only explicit, nearby actions advance their order.
 ## This optional state is created for fresh games; loading a legacy save never adds it.
 
-const VERSION := 1
+const VERSION := 2
+const LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
 const POINT_RANGE := 1.6
 const MAX_RESOURCE := 1000000
@@ -15,12 +16,13 @@ const POINTS := {
 	"bellows":Vector2(32.7,-28.4), "anvil":Vector2(32.8,-26.2), "quench":Vector2(32.7,-23.8),
 	"wood_bundle":Vector2(-43.0,17.0), "patrol_inner":Vector2(0.0,-16.0),
 	"patrol_road":Vector2(0.0,-35.0), "patrol_gate":Vector2(0.0,-46.0),
-	"sick_guard":Vector2(10.0,18.5)
+	"sick_guard":Vector2(10.0,18.5), "marcus":Vector2(-3.0,4.0),
+	"hoof_tracks":Vector2(0.0,-35.0), "oath_ridge":Vector2(-16.0,-19.0)
 }
 const EXTRA_NPCS := {
-	"antonia":{"name":"Antonia", "role":"Deine Mutter · Töpferin", "point":"mother", "profession":""},
-	"sextus":{"name":"Sextus", "role":"Dein Vater · Zimmermann", "point":"father", "profession":""},
-	"quintus":{"name":"Quintus", "role":"Dorfschmied", "point":"smith", "profession":"smith"}
+	"julia":{"name":"Julia", "role":"Deine Mutter", "point":"mother", "profession":""},
+	"silvanus":{"name":"Silvanus", "role":"Dein Vater", "point":"father", "profession":""},
+	"sextus":{"name":"Sextus", "role":"Dorfschmied · Freund deines Vaters", "point":"smith", "profession":"smith"}
 }
 const NEIGHBORS := {
 	"decimus":{"name":"Decimus", "role":"Dorfverwalter", "position":Vector2(2.0,9.0), "text":"Deine Eltern wohnen schon lange hier. Schau dir das Dorf an und halte die Zusagen, die du den Nachbarn gibst. Die Amtsgeschäfte erledigen wir Erwachsenen."},
@@ -32,25 +34,25 @@ const NEIGHBORS := {
 	"severus":{"name":"Severus", "role":"Dorfwache", "position":Vector2(-1.2,-45.9), "text":"Eine Runde mit der Wache ist kein Feldzug. Wir sehen nach Wegen und Toren, helfen den Leuten und melden, was wir tatsächlich beobachtet haben."}
 }
 const STEPS := [
-	{"id":"mother_morning", "chapter":"Ein Morgen zu Hause", "npc":"antonia", "label":"Mit Mutter den Morgen besprechen", "objective":"Sprich vor eurem Haus mit deiner Mutter Antonia.", "text":"»Du bist wach. Dein Vater arbeitet heute an einer Tür. Hol bitte zuerst Wasser im Haus, dann bringt ihr gemeinsam die Besorgungen in Ordnung. Für Cassia lege ich einen Haushaltsdenar bereit.«", "result":"Mutter vertraut dir den zweckgebundenen Haushaltsdenar an. Er ist für die Besorgung, nicht dein Taschengeld."},
+	{"id":"mother_morning", "chapter":"Ein Morgen zu Hause", "npc":"julia", "label":"Mit Mutter den Morgen besprechen", "objective":"Sprich vor eurem Haus mit deiner Mutter Julia.", "text":"»Du bist wach. Dein Vater arbeitet heute an einer Tür. Hol bitte zuerst Wasser im Haus, dann bringt ihr gemeinsam die Besorgungen in Ordnung. Für Cassia lege ich einen Haushaltsdenar bereit.«", "result":"Mutter vertraut dir den zweckgebundenen Haushaltsdenar an. Er ist für die Besorgung, nicht dein Taschengeld."},
 	{"id":"fill_water", "chapter":"Ein Morgen zu Hause", "point":"family_water", "label":"Den Wasserkrug füllen", "objective":"Gehe ins Familienhaus und fülle den Krug am Wassertisch.", "text":"", "result":"Du füllst den bereitgestellten Krug. Dein Vater wartet draußen auf dich."},
-	{"id":"father_morning", "chapter":"Ein Morgen zu Hause", "npc":"sextus", "label":"Vater den Krug bringen und zuhören", "objective":"Bring den Krug zu deinem Vater Sextus vor dem Haus.", "text":"»Danke. Eine Tür braucht gerade Angeln; ein Versprechen braucht jemanden, der es hält. Geh zu Cassia auf den Markt und frage nach unserer Bestellung. Komm anschließend zu Mutter zurück.«", "result":"Vater nimmt den Krug. Die Familie verabredet die Besorgung auf dem Markt."},
-	{"id":"market_meeting", "chapter":"Menschen auf dem Markt", "npc":"cassia", "label":"Nach der Familienbestellung fragen", "objective":"Lerne Cassia am Markt kennen und frage nach der Bestellung deiner Familie.", "text":"»Antonia hat Brot und Grütze bestellt. Das Päckchen kostet den mitgegebenen Denar. Prüfe erst, ob Name und Bestellung stimmen; dann kaufen wir es gemeinsam.«", "result":"Du hast die richtige Bestellung und ihren Preis erfragt."},
+	{"id":"father_morning", "chapter":"Ein Morgen zu Hause", "npc":"silvanus", "label":"Vater den Krug bringen und zuhören", "objective":"Bring den Krug zu deinem Vater Silvanus vor dem Haus.", "text":"»Danke. Eine Tür braucht gerade Angeln; ein Versprechen braucht jemanden, der es hält. Geh zu Cassia auf den Markt und frage nach unserer Bestellung. Komm anschließend zu Mutter zurück.«", "result":"Vater nimmt den Krug. Die Familie verabredet die Besorgung auf dem Markt."},
+	{"id":"market_meeting", "chapter":"Menschen auf dem Markt", "npc":"cassia", "label":"Nach der Familienbestellung fragen", "objective":"Lerne Cassia am Markt kennen und frage nach der Bestellung deiner Familie.", "text":"»Julia hat Brot und Grütze bestellt. Das Päckchen kostet den mitgegebenen Denar. Prüfe erst, ob Name und Bestellung stimmen; dann kaufen wir es gemeinsam.«", "result":"Du hast die richtige Bestellung und ihren Preis erfragt."},
 	{"id":"market_purchase", "chapter":"Menschen auf dem Markt", "npc":"cassia", "label":"Den Haushaltsdenar gegen die Bestellung tauschen", "objective":"Kaufe bei Cassia das Familienpäckchen mit dem reservierten Haushaltsdenar.", "text":"»Hier ist das verschnürte Päckchen für eure Küche. Trag es selbst nach Hause; die Besorgung ist erst fertig, wenn es bei deiner Mutter angekommen ist.«", "result":"Der Haushaltsdenar ist bezahlt. Du trägst das Familienpäckchen tatsächlich im Auftragsinventar."},
-	{"id":"deliver_food", "chapter":"Menschen auf dem Markt", "npc":"antonia", "label":"Mutter die Bestellung übergeben", "objective":"Kehre mit dem Familienpäckchen zu Antonia zurück.", "text":"»Du hast zugehört und die richtige Bestellung gebracht. Dein Vater hat noch eine Frage an Fabius. Danach kannst du Quintus an der Schmiede kennenlernen.«", "result":"Die Bestellung erreicht die Küche. Antonia merkt sich, dass sie sich auf dich verlassen konnte."},
-	{"id":"woodcutter_request", "chapter":"Ein Weg für die Nachbarn", "npc":"fabius", "label":"Fabius nach dem Kleinholz für die Schmiede fragen", "objective":"Suche Fabius auf und frage nach dem vorbereiteten Kleinholz.", "text":"»Für Quintus liegt ein kleines Bündel am Holzlager westlich des Dorfes bereit. Nur das markierte Kleinholz mitnehmen. Die schweren Stämme bleiben liegen.«", "result":"Fabius beschreibt dir den Lagerplatz. Jetzt weißt du, welches Bündel abgeholt werden darf."},
-	{"id":"collect_kindling", "chapter":"Ein Weg für die Nachbarn", "point":"wood_bundle", "label":"Das bereitgelegte Kleinholzbündel aufnehmen", "objective":"Gehe zum westlichen Holzlager und hole das kleine Bündel für Quintus.", "text":"", "result":"Du nimmst das vorbereitete Bündel auf. Es muss noch zur Schmiede auf der anderen Dorfseite."},
-	{"id":"deliver_kindling", "chapter":"Ein Weg für die Nachbarn", "npc":"quintus", "label":"Quintus das Kleinholz bringen", "objective":"Lerne Quintus an der Schmiede kennen und bring ihm Fabius’ Bündel.", "text":"»Du hast den Weg selbst gemacht und das richtige Holz gebracht. Beim Schmieden zählt dieselbe Sorgfalt. Wenn du einen Probemorgen versuchen möchtest, rede vorher mit deinem Vater.«", "result":"Quintus nimmt das Bündel an. Er bietet einen begleiteten Probemorgen an, keine fertige Berufsausbildung."},
-	{"id":"apprentice_permission", "chapter":"Eine erste Lehre", "npc":"sextus", "label":"Vater um Erlaubnis für den Probemorgen bitten", "objective":"Sprich zu Hause mit Sextus über Quintus’ Angebot.", "text":"»Ein Probemorgen ist in Ordnung, wenn Quintus dabeibleibt und du auf seine Anweisungen hörst. Geh heute noch zu ihm und vereinbare, was du morgen tun darfst.«", "result":"Vater stimmt dem beaufsichtigten Probemorgen zu. Du bleibst zwölf und wohnst weiter bei deiner Familie."},
-	{"id":"smith_trial", "chapter":"Eine erste Lehre", "npc":"quintus", "label":"Den begleiteten Probemorgen vereinbaren", "objective":"Bestätige bei Quintus die Erlaubnis deiner Eltern.", "text":"»Morgen zeige ich dir Blasebalg, Amboss und Kühlbottich. Heute ruhst du dich aus. Du fasst kein heißes Werkstück an, bevor ich es dir sage.«", "result":"Der Probemorgen ist verabredet. Geh nach Hause; der nächste Tag beginnt erst, wenn du dort bewusst ruhst."},
+	{"id":"deliver_food", "chapter":"Menschen auf dem Markt", "npc":"julia", "label":"Mutter die Bestellung übergeben", "objective":"Kehre mit dem Familienpäckchen zu Julia zurück.", "text":"»Du hast zugehört und die richtige Bestellung gebracht. Dein Vater hat noch eine Frage an Fabius. Danach kannst du Sextus an der Schmiede kennenlernen.«", "result":"Die Bestellung erreicht die Küche. Julia merkt sich, dass sie sich auf dich verlassen konnte."},
+	{"id":"woodcutter_request", "chapter":"Ein Weg für die Nachbarn", "npc":"fabius", "label":"Fabius nach dem Kleinholz für die Schmiede fragen", "objective":"Suche Fabius auf und frage nach dem vorbereiteten Kleinholz.", "text":"»Für Sextus liegt ein kleines Bündel am Holzlager westlich des Dorfes bereit. Nur das markierte Kleinholz mitnehmen. Die schweren Stämme bleiben liegen.«", "result":"Fabius beschreibt dir den Lagerplatz. Jetzt weißt du, welches Bündel abgeholt werden darf."},
+	{"id":"collect_kindling", "chapter":"Ein Weg für die Nachbarn", "point":"wood_bundle", "label":"Das bereitgelegte Kleinholzbündel aufnehmen", "objective":"Gehe zum westlichen Holzlager und hole das kleine Bündel für Sextus.", "text":"", "result":"Du nimmst das vorbereitete Bündel auf. Es muss noch zur Schmiede auf der anderen Dorfseite."},
+	{"id":"deliver_kindling", "chapter":"Ein Weg für die Nachbarn", "npc":"sextus", "label":"Sextus das Kleinholz bringen", "objective":"Lerne Sextus an der Schmiede kennen und bring ihm Fabius’ Bündel.", "text":"»Du hast den Weg selbst gemacht und das richtige Holz gebracht. Beim Schmieden zählt dieselbe Sorgfalt. Wenn du einen Probemorgen versuchen möchtest, rede vorher mit deinem Vater.«", "result":"Sextus nimmt das Bündel an. Er bietet einen begleiteten Probemorgen an, keine fertige Berufsausbildung."},
+	{"id":"apprentice_permission", "chapter":"Eine erste Lehre", "npc":"silvanus", "label":"Vater um Erlaubnis für den Probemorgen bitten", "objective":"Sprich zu Hause mit Silvanus über Sextus’ Angebot.", "text":"»Ein Probemorgen ist in Ordnung, wenn Sextus dabeibleibt und du auf seine Anweisungen hörst. Geh heute noch zu ihm und vereinbare, was du morgen tun darfst.«", "result":"Vater stimmt dem beaufsichtigten Probemorgen zu. Du bleibst zwölf und wohnst weiter bei deiner Familie."},
+	{"id":"smith_trial", "chapter":"Eine erste Lehre", "npc":"sextus", "label":"Den begleiteten Probemorgen vereinbaren", "objective":"Bestätige bei Sextus die Erlaubnis deiner Eltern.", "text":"»Morgen zeige ich dir Blasebalg, Amboss und Kühlbottich. Heute ruhst du dich aus. Du fasst kein heißes Werkstück an, bevor ich es dir sage.«", "result":"Der Probemorgen ist verabredet. Geh nach Hause; der nächste Tag beginnt erst, wenn du dort bewusst ruhst."},
 	{"id":"rest_first", "chapter":"Eine erste Lehre", "point":"family_rest", "label":"Zu Hause essen und bis zum nächsten Morgen ruhen", "objective":"Kehre in euer Familienhaus zurück und beende den ersten Tag bewusst.", "text":"", "result":"Nach Essen und Schlaf beginnt der zweite erzählte Dorftag. Dein Alter bleibt zwölf.", "rest":true},
-	{"id":"forge_bellows", "chapter":"Arbeit unter Anleitung", "point":"bellows", "label":"Den Blasebalg unter Quintus’ Anleitung bedienen", "objective":"Gehe zum Blasebalg der Schmiede und beginne die angeleitete Arbeit.", "text":"", "result":"Die erste angeleitete Arbeitsfolge ist beendet. Quintus legt ein vorbereitetes Werkstück auf den Amboss.", "seconds":8.0},
-	{"id":"forge_anvil", "chapter":"Arbeit unter Anleitung", "point":"anvil", "label":"Das vorbereitete Scharnier am Amboss richten", "objective":"Wechsle zum Amboss und richte das vorbereitete Scharnier mit Quintus.", "text":"", "result":"Du hast am richtigen Arbeitsplatz mitgearbeitet. Das Scharnier muss noch am Kühlbottich geprüft werden.", "seconds":10.0},
-	{"id":"forge_quench", "chapter":"Arbeit unter Anleitung", "point":"quench", "label":"Das Werkstück mit Quintus kühlen und prüfen", "objective":"Gehe zum Kühlbottich und schließe die begleitete Arbeitsfolge ab.", "text":"", "result":"Quintus prüft das fertige Scharnier und gibt es dir für Cassias Markttruhe mit.", "seconds":4.0},
+	{"id":"forge_bellows", "chapter":"Arbeit unter Anleitung", "point":"bellows", "label":"Den Blasebalg unter Sextus’ Anleitung bedienen", "objective":"Gehe zum Blasebalg der Schmiede und beginne die angeleitete Arbeit.", "text":"", "result":"Die erste angeleitete Arbeitsfolge ist beendet. Sextus legt ein vorbereitetes Werkstück auf den Amboss.", "seconds":8.0},
+	{"id":"forge_anvil", "chapter":"Arbeit unter Anleitung", "point":"anvil", "label":"Das vorbereitete Scharnier am Amboss richten", "objective":"Wechsle zum Amboss und richte das vorbereitete Scharnier mit Sextus.", "text":"", "result":"Du hast am richtigen Arbeitsplatz mitgearbeitet. Das Scharnier muss noch am Kühlbottich geprüft werden.", "seconds":10.0},
+	{"id":"forge_quench", "chapter":"Arbeit unter Anleitung", "point":"quench", "label":"Das Werkstück mit Sextus kühlen und prüfen", "objective":"Gehe zum Kühlbottich und schließe die begleitete Arbeitsfolge ab.", "text":"", "result":"Sextus prüft das fertige Scharnier und gibt es dir für Cassias Markttruhe mit.", "seconds":4.0},
 	{"id":"deliver_hinge", "chapter":"Eine ehrliche Lieferung", "npc":"cassia", "label":"Cassia das reparierte Scharnier übergeben", "objective":"Trage das geprüfte Scharnier von der Schmiede zu Cassias Marktstand.", "text":"»Das ist das Stück für meine Truhe. Du hast nicht nur davon erzählt, du hast es hergebracht. Zwei Denare sind dein vereinbarter Botenlohn. Hilfst du mir auch bei der Abrechnung einer kleinen Nachbarschaftsbestellung?«", "result":"Die Truhe erhält ihr Scharnier. Du verdienst einmalig zwei Denare für die tatsächliche Lieferung."},
 	{"id":"market_trade", "chapter":"Eine ehrliche Lieferung", "npc":"cassia", "label":"Die kleine Bestellung abrechnen", "objective":"Entscheide bei Cassia, wie du die Nachbarschaftsbestellung abrechnest.", "text":"»Du kannst den vereinbarten Lohn von zwei Denaren nehmen. Oder du lässt einen Denar beim Nachbarn, dessen Krug zerbrochen ist. Ich merke mir beides: einen eingehaltenen Preis und eine freiwillige Hilfe.«", "result":"Die Abrechnung bleibt als konkrete Entscheidung gespeichert."},
-	{"id":"smith_apprentice", "chapter":"Ein Platz an der Schmiede", "npc":"quintus", "label":"Die angefangene Schmiedelehre fortsetzen", "objective":"Berichte Quintus von der Lieferung und besprich die weitere Lehre.", "text":"»Du bist wiedergekommen, hast das Werkstück geliefert und Rechenschaft abgelegt. Du kannst bei mir weiterlernen. Ein paar Arbeitsfolgen machen dich noch nicht zum Meister; wir nehmen uns Zeit.«", "result":"Quintus nimmt dich als beginnenden Schmiedelehrling an. Deine praktische Arbeit und sein Vertrauen tragen diese Entscheidung."},
-	{"id":"family_report", "chapter":"Ein Platz an der Schmiede", "npc":"antonia", "label":"Zu Hause vom Probemorgen und dem Markt erzählen", "objective":"Kehre zu Antonia zurück und erzähle von deiner Arbeit.", "text":"»Du hast heute Menschen geholfen und selbst etwas verdient. Beides hat Zeit gekostet. Leg die Arbeit für heute beiseite; morgen kannst du Severus nach einer begleiteten Dorfrunde fragen.«", "result":"Die Familie hört von deinen tatsächlichen Lieferungen und der begonnenen Lehre."},
+	{"id":"smith_apprentice", "chapter":"Ein Platz an der Schmiede", "npc":"sextus", "label":"Die angefangene Schmiedelehre fortsetzen", "objective":"Berichte Sextus von der Lieferung und besprich die weitere Lehre.", "text":"»Du bist wiedergekommen, hast das Werkstück geliefert und Rechenschaft abgelegt. Du kannst bei mir weiterlernen. Ein paar Arbeitsfolgen machen dich noch nicht zum Meister; wir nehmen uns Zeit.«", "result":"Sextus nimmt dich als beginnenden Schmiedelehrling an. Deine praktische Arbeit und sein Vertrauen tragen diese Entscheidung."},
+	{"id":"family_report", "chapter":"Ein Platz an der Schmiede", "npc":"julia", "label":"Zu Hause vom Probemorgen und dem Markt erzählen", "objective":"Kehre zu Julia zurück und erzähle von deiner Arbeit.", "text":"»Du hast heute Menschen geholfen und selbst etwas verdient. Beides hat Zeit gekostet. Leg die Arbeit für heute beiseite; morgen kannst du Severus nach einer begleiteten Dorfrunde fragen.«", "result":"Die Familie hört von deinen tatsächlichen Lieferungen und der begonnenen Lehre."},
 	{"id":"rest_second", "chapter":"Ein Platz an der Schmiede", "point":"family_rest", "label":"Den zweiten Tag zu Hause beenden", "objective":"Beende den Arbeitstag im Familienhaus, wenn du bereit bist.", "text":"", "result":"Der dritte erzählte Tag beginnt. Du bist weiterhin ein zwölfjähriger Dorfbewohner.", "rest":true},
 	{"id":"patrol_brief", "chapter":"Mit der Dorfwache unterwegs", "npc":"severus", "label":"Um eine begleitete Dorfrunde bitten", "objective":"Sprich mit Severus am inneren Nordweg über eine begleitete Runde.", "text":"»Du gehst heute mit mir, nicht allein auf Wache. Wir prüfen den inneren Weg, die Wagenstraße und das Tor. Wir beobachten und melden; wir suchen keinen Kampf.«", "result":"Severus übernimmt die Aufsicht. Die drei Wegabschnitte müssen wirklich erreicht und geprüft werden."},
 	{"id":"patrol_inner", "chapter":"Mit der Dorfwache unterwegs", "point":"patrol_inner", "label":"Mit Severus den inneren Weg prüfen", "objective":"Prüfe mit Severus den inneren Nordweg.", "text":"", "result":"Der innere Weg ist geprüft. Gehe mit Severus weiter zur Wagenstraße."},
@@ -60,17 +62,17 @@ const STEPS := [
 	{"id":"rest_patrol", "chapter":"Wenn ein Nachbar ausfällt", "point":"family_rest", "label":"Nach dem Rundgang zu Hause schlafen", "objective":"Kehre ins Familienhaus zurück und beende den dritten Tag.", "text":"", "result":"Am vierten Morgen lässt Aurelia ausrichten, dass Severus krank ist. Seine Stelle im Wachroster bleibt tatsächlich unbesetzt.", "rest":true},
 	{"id":"healer_request", "chapter":"Wenn ein Nachbar ausfällt", "npc":"aurelia", "label":"Aurelia nach Severus fragen", "objective":"Suche Aurelia auf und frage nach dem erkrankten Severus.", "text":"»Er braucht Ruhe und soll heute nicht am Tor stehen. Bring ihm dieses vorbereitete Päckchen. Danach kann er mit deinen Eltern klären, ob du Valeria für einen kurzen Tagesdienst unterstützen darfst.«", "result":"Aurelia übergibt dir das vorbereitete Versorgungspäckchen für Severus."},
 	{"id":"deliver_medicine", "chapter":"Wenn ein Nachbar ausfällt", "npc":"severus", "label":"Severus Aurelias Päckchen bringen", "objective":"Bring Aurelias Päckchen zum erkrankten Severus bei ihrem Haus.", "text":"»Danke. Ich bleibe heute hier. Valeria führt die Wache; du könntest ihr nach der bekannten Runde eine kurze Nachricht überbringen. Frag erst deinen Vater. Die Leihsachen bleiben Eigentum der Wache.«", "result":"Das Versorgungspäckchen erreicht Severus. Er ist versorgt, bleibt aber für diesen Dienst aus dem Arbeitsroster genommen."},
-	{"id":"watch_permission", "chapter":"Ein begrenzter Tagesdienst", "npc":"sextus", "label":"Vater um Erlaubnis für die Aushilfe bitten", "objective":"Besprich den begrenzten Tagesdienst zu Hause mit Sextus.", "text":"»Du kennst den Weg und Valeria bleibt verantwortlich. Eine kurze Aushilfe am inneren Tor ist erlaubt. Du gehst nicht auf einen Feldzug und kommst mit den Leihsachen zu Severus zurück.«", "result":"Vater erlaubt eine begrenzte Aushilfe unter Valerias Verantwortung. Dein Lebensalter und deine zivile Rolle ändern sich nicht."},
+	{"id":"watch_permission", "chapter":"Ein begrenzter Tagesdienst", "npc":"silvanus", "label":"Vater um Erlaubnis für die Aushilfe bitten", "objective":"Besprich den begrenzten Tagesdienst zu Hause mit Silvanus.", "text":"»Du kennst den Weg und Valeria bleibt verantwortlich. Eine kurze Aushilfe am inneren Tor ist erlaubt. Du gehst nicht auf einen Feldzug und kommst mit den Leihsachen zu Severus zurück.«", "result":"Vater erlaubt eine begrenzte Aushilfe unter Valerias Verantwortung. Dein Lebensalter und deine zivile Rolle ändern sich nicht."},
 	{"id":"borrow_gear", "chapter":"Ein begrenzter Tagesdienst", "npc":"severus", "label":"Die Leihsachen für den Tagesdienst entgegennehmen", "objective":"Hole bei Severus den geliehenen Helm und hölzernen Schild ab.", "text":"»Helm und kleiner Holzschild gehören der Wache. Prüfe den Weg, bleib bei Valerias Abschnitt und melde Cassia, dass ihr Wagen passieren kann. Danach bringst du alles zurück.«", "result":"Du erhältst begrenzte Leihgegenstände für diesen Auftrag. Sie werden nicht zu dauerhaftem Eigentum."},
 	{"id":"watch_post", "chapter":"Ein begrenzter Tagesdienst", "point":"patrol_gate", "label":"Valeria am bekannten Torabschnitt unterstützen", "objective":"Gehe zum Nordtor und übernimm den besprochenen kurzen Tagesdienst.", "text":"", "result":"Der bekannte Torabschnitt ist geprüft. Du erhältst die Durchlassnachricht für Cassias Wagen.", "seconds":12.0},
 	{"id":"watch_message", "chapter":"Ein begrenzter Tagesdienst", "npc":"cassia", "label":"Cassia die tatsächliche Durchlassnachricht bringen", "objective":"Trage die Nachricht vom Tor zu Cassia auf den Markt.", "text":"»Gut, dann schicke ich den Wagen über den geprüften Weg. Geh jetzt zu Severus und gib die Leihsachen ab. Ein Dienst endet mit einer ordentlichen Übergabe.«", "result":"Cassia erhält die Nachricht vom tatsächlich geprüften Tor. Der Dienst muss noch an Severus übergeben werden."},
 	{"id":"return_gear", "chapter":"Ein begrenzter Tagesdienst", "npc":"severus", "label":"Den Dienst übergeben und alle Leihsachen zurückgeben", "objective":"Kehre zu Severus zurück, berichte und gib Helm und Holzschild ab.", "text":"»Du hast die Nachricht gebracht und die Sachen vollständig zurückgegeben. Zwei Denare sind dein Botenlohn. Ich erhole mich und übernehme meine bisherige Stelle wieder, sobald sie frei ist. Geh nach Hause.«", "result":"Der Dienst ist übergeben, die Leihsachen sind zurück und zwei Denare sind bezahlt. Du bist weiter zwölf, kein angeworbener Soldat."},
-	{"id":"family_evening", "chapter":"Ein Abend im vertrauten Dorf", "npc":"antonia", "label":"Den Abend mit der Familie verbringen", "objective":"Erzähle Antonia zu Hause von deinem Tag.", "text":"»Du kennst inzwischen den Markt, die Werkstätten und den Weg zum Tor. Morgen ist wieder Zeit für deine Lehre. Für heute essen wir zusammen und machen die Tür zu.«", "result":"Du verbringst den Abend bei deiner Familie. Die offenen Aufgaben dieses Tages sind wirklich erledigt."},
+	{"id":"family_evening", "chapter":"Ein Abend im vertrauten Dorf", "npc":"julia", "label":"Den Abend mit der Familie verbringen", "objective":"Erzähle Julia zu Hause von deinem Tag.", "text":"»Du kennst inzwischen den Markt, die Werkstätten und den Weg zum Tor. Morgen ist wieder Zeit für deine Lehre. Für heute essen wir zusammen und machen die Tür zu.«", "result":"Du verbringst den Abend bei deiner Familie. Die offenen Aufgaben dieses Tages sind wirklich erledigt."},
 	{"id":"night_rest", "chapter":"Ein Abend im vertrauten Dorf", "point":"family_rest", "label":"Im Familienhaus schlafen gehen", "objective":"Gehe ins Familienhaus und lege dich schlafen, wenn du den Tag beenden möchtest.", "text":"", "result":"Du legst dich im vertrauten Familienhaus schlafen. Das Dorf wird still."}
 ]
 const CARRIED_EFFECTS := {
 	"mother_morning":{"add":["household_coin"]}, "fill_water":{"add":["water_jug"]},
-	"father_morning":{"remove":["water_jug"]},
+	"father_morning":{"remove":["water_jug"],"add":["neighbor_basket"]},
 	"market_purchase":{"remove":["household_coin"],"add":["family_parcel"]},
 	"deliver_food":{"remove":["family_parcel"]}, "collect_kindling":{"add":["kindling_bundle"]},
 	"deliver_kindling":{"remove":["kindling_bundle"]},
@@ -78,8 +80,20 @@ const CARRIED_EFFECTS := {
 	"healer_request":{"add":["medicine_parcel"]}, "deliver_medicine":{"remove":["medicine_parcel"]},
 	"watch_post":{"add":["gate_message"]}, "watch_message":{"remove":["gate_message"]}
 }
-const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Fabius’ Kleinholzbündel", "checked_hinge":"Geprüftes Scharnier", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
+const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Fabius’ Kleinholzbündel", "checked_hinge":"Geprüftes Scharnier", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
+const SOURCE_MISSION_BY_STEP := {
+	"mother_morning":"I-01","fill_water":"I-01","father_morning":"I-01",
+	"market_meeting":"I-03","market_purchase":"I-03","deliver_food":"I-03",
+	"woodcutter_request":"I-04","collect_kindling":"I-04","deliver_kindling":"I-04",
+	"apprentice_permission":"I-04","smith_trial":"I-04",
+	"rest_forge":"I-05","forge_bellows":"I-05","forge_anvil":"I-05","forge_quench":"I-05","deliver_hinge":"I-05",
+	"market_trade":"I-06","smith_apprentice":"I-06",
+	"family_report":"I-07","rest_patrol":"I-07","healer_request":"I-07","deliver_medicine":"I-07",
+	"patrol_brief":"I-07","patrol_inner":"I-07","patrol_road":"I-07","patrol_gate":"I-07","patrol_report":"I-07",
+	"watch_permission":"I-07","borrow_gear":"I-07","watch_post":"I-07","watch_message":"I-07","return_gear":"I-07",
+	"family_evening":"I-09","night_rest":"I-09"
+}
 
 
 static func start(data: Dictionary) -> bool:
@@ -87,20 +101,103 @@ static func start(data: Dictionary) -> bool:
 		return false
 	var relationships := {}
 	for id: String in EXTRA_NPCS:
-		var parent := id in ["antonia", "sextus"]
+		var parent := id in ["julia", "silvanus"]
 		relationships[id] = {"met":parent,"trust":4 if parent else 0,"helped":false,"declined":false,"learned":false,"ally":false}
 		var person := _person(data, id)
 		if not person.is_empty():
 			person.profession = EXTRA_NPCS[id].role
+			person.assignment = "idle"
+			person.previous_assignment = "idle"
+	# The production screenplay begins in 58 BCE. Legacy village careers keep
+	# their older Trajan-era history; only an explicitly enabled childhood
+	# campaign moves this shared village history anchor.
+	data.village.history.start_year = -58
+	data.village.history.mode = "historical_baseline"
 	data.village.childhood = {"version":VERSION,"completed":[],"day":1,"carried":[],
 		"relationships":relationships,"active_work":"","work_seconds":0.0,
 		"gear":"none","apprenticeship":"none","night_event":"none",
+		"screenplay":{"version":2,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i08":"locked","hoof_evidence":false,"i10":"locked","raid_path":"","visible_raiders":30,"i11":"locked","i12":"locked","i13":"locked","i14":"locked","julia_outcome":"undecided","oath":false},
 		"guard_absence":{"active":false,"previous_assignment":"idle","previous_health":100}}
 	return true
 
 
 static func enabled(data: Dictionary) -> bool:
 	return typeof(data.get("village")) == TYPE_DICTIONARY and data.village.has("childhood")
+
+
+static func migrate_legacy_ids(data: Dictionary) -> bool:
+	# The first playable childhood build used Antonia/Sextus/Quintus for
+	# mother/father/smith. The production screenplay fixes those roles as
+	# Julia/Silvanus/Sextus. Preserve completed steps, trust and inventory while
+	# moving only the actor identity keys.
+	if not enabled(data):
+		return false
+	var child: Variant = data.village.childhood
+	if typeof(child) != TYPE_DICTIONARY or int(child.get("version", 0)) != 1:
+		return false
+	var old_relationships: Variant = child.get("relationships", {})
+	if typeof(old_relationships) != TYPE_DICTIONARY:
+		return false
+	for legacy_id: String in LEGACY_RELATION_IDS:
+		if not old_relationships.has(legacy_id) or typeof(old_relationships[legacy_id]) != TYPE_DICTIONARY:
+			return false
+	var relationships := {}
+	for legacy_id: String in LEGACY_RELATION_IDS:
+		var canonical_id: String = LEGACY_RELATION_IDS[legacy_id]
+		var legacy_relation: Dictionary = old_relationships[legacy_id]
+		relationships[canonical_id] = legacy_relation.duplicate(true)
+	child.relationships = relationships
+	child.version = VERSION
+	# Version-one childhood saves were produced before the four-volume campaign
+	# was made authoritative and therefore carried the generic Trajan-era marker.
+	# The existence of childhood itself proves this is the Valdora campaign path.
+	data.village.history.start_year = -58
+	data.village.history.mode = "historical_baseline"
+	var old_completed: Array = child.get("completed", [])
+	var passed_family_morning := old_completed.size() >= 3
+	var passed_watch_service := old_completed.has("return_gear") or old_completed.has("family_evening") or old_completed.has("night_rest")
+	var legacy_night: String = str(child.get("night_event", "none"))
+	var legacy_released := legacy_night == "released"
+	var legacy_raid: Dictionary = data.village.get("raid", {})
+	var legacy_raid_finished := legacy_released and str(legacy_raid.get("status", "")) == "aftermath"
+	child.screenplay = {
+		"version":2,
+		"i02":"complete" if passed_family_morning else "pending",
+		"i02_outcome":"legacy" if passed_family_morning else "",
+		"i03":"complete" if passed_family_morning or bool(data.get("companion", {}).get("met", false)) else "locked",
+		"i03_outcome":"legacy" if passed_family_morning or bool(data.get("companion", {}).get("met", false)) else "",
+		"i08":"complete" if passed_watch_service else "locked",
+		"hoof_evidence":passed_watch_service,
+		"i10":"complete" if legacy_released else ("pending" if legacy_night == "pending" else "locked"),
+		"raid_path":"legacy" if legacy_released else "",
+		"visible_raiders":30,
+		"i11":"pending" if legacy_raid_finished else "locked",
+		"i12":"locked","i13":"locked","i14":"locked",
+		"julia_outcome":"legacy" if legacy_released else "undecided",
+		"oath":false
+	}
+	# Old saves that had already passed the family morning never carried the
+	# newly authored basket; do not invent it retroactively.
+	if passed_family_morning:
+		child.carried.erase("neighbor_basket")
+
+	# Restore generic villagers that no longer carry a family/story role.
+	var antonia := _person(data, "antonia")
+	if not antonia.is_empty():
+		antonia.profession = "Töpferin"
+	var quintus := _person(data, "quintus")
+	if not quintus.is_empty():
+		quintus.profession = "Steinbrecher"
+
+	# Canonical actors inherit the authored presentation roles and stay at the
+	# family/smith locations during the childhood chapter.
+	for id: String in EXTRA_NPCS:
+		var person := _person(data, id)
+		if not person.is_empty():
+			person.profession = EXTRA_NPCS[id].role
+			person.assignment = "idle"
+			person.previous_assignment = "idle"
+	return true
 
 
 static func has_npc(data: Dictionary, id: String) -> bool:
@@ -170,6 +267,7 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 		return _fail("Kindheitsauftrag vollständig verworfen: " + error)
 	data.village = candidate.village
 	data.resources = candidate.resources
+	data.companion = candidate.companion
 	return result
 
 
@@ -189,15 +287,24 @@ static func talk(data: Dictionary, id: String, choice: String) -> Dictionary:
 static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dictionary:
 	var child: Dictionary = data.village.childhood
 	if command == "village_childhood_begin_raid":
-		if child.completed.size() != STEPS.size() or child.night_event != "pending":
+		if child.completed.size() != STEPS.size() or child.night_event != "pending" or child.screenplay.i10 != "pending":
 			return _fail("Diese Nacht wurde noch nicht durch den tatsächlichen Dorfanfang erreicht.")
+		# Compatibility entry for existing automation: historically this command
+		# meant "release the first raid". It now maps to the canonical defend path.
+		child.screenplay.i10 = "complete"
+		child.screenplay.raid_path = "defend"
 		child.night_event = "released"
-		return _ok("In der Nacht brechen fremde Reiter in die vertraute Ruhe des Dorfes ein.")
+		return _ok("In der Nacht brechen fremde Reiter in Valdora ein. Du gehst hinaus, um Menschen zu helfen.")
 	var step := _current(data)
 	if step.is_empty():
 		return _fail("Die Aufgaben dieses Kindheitskapitels sind bereits abgeschlossen.")
 	var action: String = args.action_id
 	var id: String = step.id
+	if step.get("screenplay", false):
+		var reason := _action_reason(data, step)
+		if not reason.is_empty():
+			return _fail(reason)
+		return _apply_screenplay(data, step, action)
 	var starting := action == "begin_" + id and step.has("seconds")
 	if not starting and not _matches(id, action):
 		return _fail("Diese Handlung passt noch nicht zu deinem aktuellen Auftrag.")
@@ -213,8 +320,8 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 			return _ok("Die angeleitete Arbeit beginnt. Nur deine tatsächliche Anwesenheit an dieser Station zählt.")
 		if child.active_work != id or float(child.work_seconds) + 0.000001 < float(step.seconds):
 			return _fail("Diese Arbeitsfolge ist noch nicht fertig. Beginne sie vor Ort und bleibe an der Station.")
-	if id == "smith_apprentice" and int(_relation(data, "quintus").trust) < 8:
-		return _fail("Quintus braucht Vertrauen aus eurer tatsächlich erledigten Arbeit.")
+	if id == "smith_apprentice" and int(_relation(data, "sextus").trust) < 8:
+		return _fail("Sextus braucht Vertrauen aus eurer tatsächlich erledigten Arbeit.")
 	if id == "rest_patrol":
 		var guard := _person(data, "severus")
 		if guard.is_empty() or not guard.alive or data.village.get("militia", []).has("severus") or guard.assignment == "defense":
@@ -246,17 +353,17 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	if step.has("npc"):
 		_gain_trust(data, step.npc, 2)
 	if id in ["forge_bellows", "forge_anvil", "forge_quench"]:
-		_gain_trust(data, "quintus", 1)
+		_gain_trust(data, "sextus", 1)
 	if action == "market_neighbor":
-		_gain_trust(data, "antonia", 2)
+		_gain_trust(data, "julia", 2)
 	if id == "deliver_kindling":
-		_relation(data, "quintus").helped = true
+		_relation(data, "sextus").helped = true
 	if id == "smith_trial":
 		child.apprenticeship = "trial"
 	if id == "smith_apprentice":
 		child.apprenticeship = "apprentice"
 		data.village.social.profession = "smith"
-		_relation(data, "quintus").learned = true
+		_relation(data, "sextus").learned = true
 	if id == "borrow_gear":
 		child.gear = "loaned"
 	if id == "deliver_medicine":
@@ -265,6 +372,8 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	if id == "return_gear":
 		child.gear = "returned"
 		_restore_guard(data)
+		if child.screenplay.i08 == "locked":
+			child.screenplay.i08 = "pending"
 	if id in ["patrol_inner", "patrol_road", "patrol_gate"]:
 		var attribute: String = {"patrol_inner":"insight","patrol_road":"tactics","patrol_gate":"courage"}[id]
 		data.village.attributes[attribute] = mini(10000, int(data.village.attributes[attribute]) + 1)
@@ -272,6 +381,7 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 		child.day += 1
 	if id == "night_rest":
 		child.night_event = "pending"
+		child.screenplay.i10 = "pending"
 	child.active_work = ""
 	child.work_seconds = 0.0
 	child.completed.append(action)
@@ -279,7 +389,133 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	if action == "market_fair":
 		message = "Der vereinbarte Preis gilt. Du erhältst einmalig zwei Denare; Cassia merkt sich deine verlässliche Abrechnung."
 	elif action == "market_neighbor":
-		message = "Du nimmst einen Denar und lässt einen dem Nachbarn. Antonia hört von deiner freiwilligen Hilfe."
+		message = "Du nimmst einen Denar und lässt einen dem Nachbarn. Julia hört von deiner freiwilligen Hilfe."
+	_record(data, action, message)
+	return _ok(message)
+
+
+static func _apply_screenplay(data: Dictionary, step: Dictionary, action: String) -> Dictionary:
+	var child: Dictionary = data.village.childhood
+	var screenplay: Dictionary = child.screenplay
+	var id: String = step.id
+	var message := ""
+	match id:
+		"i02_basket":
+			if action == "basket_check":
+				screenplay.i02 = "complete"
+				screenplay.i02_outcome = "checked"
+				screenplay.i03 = "pending"
+				child.carried.erase("neighbor_basket")
+				message = "Du prüfst den Korb mit Aurelia. Die Lieferung stimmt; Sorgfalt wird als konkrete Erinnerung gespeichert."
+			elif action == "basket_rush":
+				screenplay.i02 = "correction"
+				screenplay.i02_outcome = "wrong"
+				message = "Du hast den falschen Korb erwischt. Die Mission scheitert nicht: Julia muss dir helfen, den Fehler zu korrigieren."
+			else:
+				return _fail("Entscheide, ob du den Korb prüfst oder ungeprüft abgibst.")
+		"i02_correct":
+			if action != "basket_correct":
+				return _fail("Korrigiere den falschen Korb gemeinsam mit Julia.")
+			screenplay.i02 = "complete"
+			screenplay.i03 = "pending"
+			child.carried.erase("neighbor_basket")
+			message = "Julia hilft dir, den Fehler zu korrigieren. Der falsche Korb bleibt als Ereignis erhalten, statt durch einen Reload zu verschwinden."
+		"i03_marcus":
+			if data.companion.met:
+				return _fail("Die Beziehung zu Marcus wurde bereits festgelegt.")
+			if action == "marcus_friend":
+				data.companion.met = true
+				data.companion.choice = "help"
+				data.companion.trust = 20
+				screenplay.i03_outcome = "friend"
+				message = "Ihr beendet den Münzstreit als Freunde. Marcus merkt sich, dass ihr gemeinsam weitergeht."
+			elif action == "marcus_rival":
+				data.companion.met = true
+				data.companion.choice = "decline"
+				data.companion.trust = -5
+				screenplay.i03_outcome = "rival"
+				message = "Der Münzstreit bleibt zwischen euch. Marcus geht mit, aber eure Beziehung beginnt angespannt."
+			else:
+				return _fail("Entscheide, wie du den Streit mit Marcus beendest.")
+			screenplay.i03 = "complete"
+		"i08_tracks":
+			if action != "i08_inspect":
+				return _fail("Untersuche zuerst die Hufspuren selbst.")
+			screenplay.i08 = "report"
+			screenplay.hoof_evidence = true
+			_gain(data, "insight", 1)
+			message = "Du sicherst mehrere frische Hufspuren als Beobachtung. Herkunft und Täter bleiben ausdrücklich offen."
+		"i08_report":
+			if action != "i08_report" or not screenplay.hoof_evidence:
+				return _fail("Du kannst nur berichten, was du zuvor tatsächlich untersucht hast.")
+			screenplay.i08 = "complete"
+			_gain(data, "tactics", 1)
+			message = "Decimus protokolliert die Spuren ohne vorschnelle Schuldzuweisung. Die Warnung bleibt im Event-Ledger."
+		"i10_choice":
+			if action not in ["i10_defend","i10_hide"]:
+				return _fail("Entscheide ausdrücklich zwischen Hilfe draußen und Verstecken bei deinen Eltern.")
+			screenplay.i10 = "complete"
+			screenplay.raid_path = "defend" if action == "i10_defend" else "hide"
+			child.night_event = "released"
+			message = "Du gehst hinaus, um Menschen zu helfen. Die Nacht läuft nun in der realen Dorfwelt." if action == "i10_defend" else "Du bleibst bei deinen Eltern. Die Welt läuft weiter; dieses Versteck schützt nicht automatisch alle."
+		"i11_forge":
+			if action != "i11_forge":
+				return _fail("Erreiche die Schmiede und den offenen Fluchtweg.")
+			var smith := _person(data, "sextus")
+			if smith.is_empty() or not smith.alive:
+				return _fail("Sextus’ Zustand passt nicht mehr zu diesem Storyschritt.")
+			smith.alive = false
+			smith.health = 0
+			smith.assignment = "idle"
+			smith.previous_assignment = "idle"
+			screenplay.i11 = "complete"
+			screenplay.i12 = "pending"
+			message = "Sextus hält den Fluchtweg offen und stirbt. Sein Arbeitsplatz bleibt danach tatsächlich unbesetzt."
+		"i12_father":
+			if action != "i12_father":
+				return _fail("Folge Silvanus auf seinem letzten Weg.")
+			var father := _person(data, "silvanus")
+			if father.is_empty() or not father.alive:
+				return _fail("Silvanus’ Zustand passt nicht mehr zu diesem Storyschritt.")
+			father.alive = false
+			father.health = 0
+			father.assignment = "idle"
+			father.previous_assignment = "idle"
+			var mother := _person(data, "julia")
+			var julia_survives := true
+			if screenplay.raid_path == "hide":
+				julia_survives = false
+			elif screenplay.raid_path == "defend":
+				var raid: Dictionary = data.village.raid
+				julia_survives = bool(raid.get("rescued", false)) and str(raid.get("rescue_person_id", "")) == "julia"
+			elif screenplay.raid_path == "legacy":
+				julia_survives = not mother.is_empty() and bool(mother.get("alive", true))
+			if not julia_survives and not mother.is_empty():
+				mother.alive = false
+				mother.health = 0
+				mother.assignment = "idle"
+				mother.previous_assignment = "idle"
+			screenplay.julia_outcome = "survived" if julia_survives else "dead"
+			screenplay.i12 = "complete"
+			screenplay.i13 = "pending"
+			message = "Silvanus stirbt. Julia überlebt, weil du sie tatsächlich aus der Gefahrenzone gebracht hast." if julia_survives else "Silvanus stirbt. Julia überlebt diesen Weg nicht; die Entscheidung bleibt dauerhaft im Weltzustand."
+		"i13_morning":
+			if action != "i13_morning":
+				return _fail("Erfasse mit Aurelia die tatsächlichen Folgen des Angriffs.")
+			screenplay.i13 = "complete"
+			screenplay.i14 = "pending"
+			message = "Am Morgen bleiben Tote, Verletzte, verlorene Arbeitsplätze und beschädigte Vorräte Teil derselben Welt."
+		"i14_oath":
+			if action != "i14_oath":
+				return _fail("Der Schwur wird nur am Waldrand als bewusste Handlung abgeschlossen.")
+			if not child.carried.has("memory_token"):
+				child.carried.append("memory_token")
+			screenplay.i14 = "complete"
+			screenplay.oath = true
+			child.night_event = "resolved"
+			message = "»Ich werde euch rächen. Ich finde die Verantwortlichen.« Der Schwur öffnet die Ermittlung; er macht dich nicht automatisch zum Soldaten."
+		_:
+			return _fail("Unbekannter Drehbuchschritt.")
 	_record(data, action, message)
 	return _ok(message)
 
@@ -297,7 +533,15 @@ static func advance(data: Dictionary, delta: float) -> bool:
 
 
 static func raids_allowed(data: Dictionary) -> bool:
-	return not enabled(data) or data.village.childhood.night_event == "released"
+	return not enabled(data) or data.village.childhood.night_event in ["released","resolved"]
+
+
+static func on_raid_finished(data: Dictionary) -> void:
+	if not enabled(data):
+		return
+	var screenplay: Dictionary = data.village.childhood.screenplay
+	if screenplay.i10 == "complete" and screenplay.i11 == "locked":
+		screenplay.i11 = "pending"
 
 
 static func view(data: Dictionary) -> Dictionary:
@@ -310,7 +554,8 @@ static func view(data: Dictionary) -> Dictionary:
 		items.append(ITEM_NAMES[item])
 	var result := {"enabled":true,"day":child.day,"age":int(data.player.age),
 		"completed_steps":child.completed.size(),"total_steps":STEPS.size(),
-		"stage":step.get("id", "village_night"),"chapter":step.get("chapter", "Die Nacht im Dorf"),
+		"stage":step.get("id", "village_night"),"source_mission_id":step.get("mission", SOURCE_MISSION_BY_STEP.get(step.get("id", ""), "")),
+		"chapter":step.get("chapter", "Die Nacht im Dorf"),
 		"title":step.get("chapter", "Die Nacht im Dorf"),
 		"objective":step.get("objective", "Du bist bei deiner Familie. Die nächste Nacht setzt eure gemeinsame Geschichte fort."),
 		"carried":items,"relationships":child.relationships.duplicate(true),
@@ -353,7 +598,7 @@ static func interactables(data: Dictionary) -> Array[Dictionary]:
 	if not enabled(data) or not validate(data).is_empty():
 		return result
 	var step := _current(data)
-	if not step.has("point"):
+	if not step.has("point") or step.get("id", "") == "i03_marcus":
 		return result
 	var point: Vector2 = POINTS[step.point]
 	for choice: Dictionary in _choices(data, step):
@@ -370,7 +615,7 @@ static func validate(data: Dictionary) -> String:
 	if data.get("origin_id", "") != "italia" or not data.village.get("enabled", false) or not _integer(data.get("player", {}).get("age"), 12, 12) or data.get("progress", {}).get("years_elapsed", -1) != 0:
 		return "Dieses Kindheitskapitel beginnt im römischen Dorf mit zwölf Jahren und ohne übersprungene Lebensjahre."
 	var child: Variant = data.village.childhood
-	if not _keys(child,["version","completed","day","carried","relationships","active_work","work_seconds","gear","apprenticeship","night_event","guard_absence"]) or not _integer(child.version,VERSION,VERSION):
+	if not _keys(child,["version","completed","day","carried","relationships","active_work","work_seconds","gear","apprenticeship","night_event","screenplay","guard_absence"]) or not _integer(child.version,VERSION,VERSION):
 		return "Unbekannte oder unvollständige Kindheitsversion."
 	if typeof(child.completed) != TYPE_ARRAY or child.completed.size() > STEPS.size() or typeof(child.carried) != TYPE_ARRAY:
 		return "Ungültige Aufgabenfolge oder Traglast."
@@ -404,15 +649,106 @@ static func validate(data: Dictionary) -> String:
 		if step.id == "return_gear":
 			expected_gear = "returned"
 			absent = false
+	var screenplay: Variant = child.screenplay
+	var screenplay_keys := ["version","i02","i02_outcome","i03","i03_outcome","i08","hoof_evidence",
+		"i10","raid_path","visible_raiders","i11","i12","i13","i14","julia_outcome","oath"]
+	if not _keys(screenplay, screenplay_keys) or not _integer(screenplay.version,2,2):
+		return "Ungültiger Drehbuch-Brückenstand."
+	if screenplay.i02 not in ["pending","correction","complete"] or screenplay.i03 not in ["locked","pending","complete"] or screenplay.i08 not in ["locked","pending","report","complete"]:
+		return "Ungültiger Status einer frühen Drehbuchmission."
+	for key: String in ["i10","i11","i12","i13","i14"]:
+		if typeof(screenplay[key]) != TYPE_STRING or screenplay[key] not in ["locked","pending","complete"]:
+			return "Ungültiger Status einer Nachtraid-Drehbuchmission."
+	if typeof(screenplay.i02_outcome) != TYPE_STRING or screenplay.i02_outcome not in ["","checked","wrong","legacy"]:
+		return "Ungültige Folge des Korbauftrags."
+	if typeof(screenplay.i03_outcome) != TYPE_STRING or screenplay.i03_outcome not in ["","friend","rival","legacy"]:
+		return "Ungültige Marcus-Erinnerung."
+	if typeof(screenplay.raid_path) != TYPE_STRING or screenplay.raid_path not in ["","defend","hide","legacy"]:
+		return "Ungültiger Weg durch die Nacht der Reiter."
+	if typeof(screenplay.julia_outcome) != TYPE_STRING or screenplay.julia_outcome not in ["undecided","survived","dead","legacy"]:
+		return "Ungültiger gespeicherter Ausgang für Julia."
+	if typeof(screenplay.hoof_evidence) != TYPE_BOOL or typeof(screenplay.oath) != TYPE_BOOL or not _integer(screenplay.visible_raiders,30,30):
+		return "Drehbuchbeleg, Schwur oder sichtbare Reiterzahl ist ungültig."
+
+	if screenplay.i02 == "complete":
+		expected_items.erase("neighbor_basket")
+	if screenplay.i14 == "complete":
+		expected_items.append("memory_token")
+	if screenplay.i03 == "complete" and screenplay.i03_outcome != "legacy":
+		if not data.companion.met or screenplay.i03_outcome == "friend" and data.companion.choice != "help" or screenplay.i03_outcome == "rival" and data.companion.choice != "decline":
+			return "Marcus-Beziehung und I-03 widersprechen sich."
+	elif screenplay.i03 != "complete" and data.companion.met:
+		return "Marcus darf vor I-03 nicht stillschweigend als Gefährte entschieden sein."
+	if screenplay.i08 in ["report","complete"] and not screenplay.hoof_evidence:
+		return "Die gemeldeten Hufspuren wurden nicht tatsächlich untersucht."
+	if screenplay.i08 == "complete" and not child.completed.has("return_gear"):
+		return "I-08 darf nicht vor dem begrenzten Wachtdienst abgeschlossen sein."
+
+	var base_complete: bool = child.completed.size() == STEPS.size()
+	var bridges_complete: bool = screenplay.i02 == "complete" and screenplay.i03 == "complete" and screenplay.i08 == "complete"
+	if screenplay.i10 != "locked" and (not base_complete or not bridges_complete):
+		return "I-10 darf erst nach dem vollständigen gewöhnlichen Dorfabend beginnen."
+	if not base_complete and screenplay.i10 != "locked":
+		return "Die Nacht der Reiter wurde vor dem letzten gewöhnlichen Abend geöffnet."
+	if base_complete and bridges_complete and screenplay.i10 == "locked":
+		return "Nach dem letzten gewöhnlichen Abend muss I-10 als nächste Mission bereitstehen."
+	if screenplay.i10 == "pending" and screenplay.raid_path != "":
+		return "Vor der Nachtentscheidung darf kein Raid-Weg feststehen."
+	if screenplay.i10 == "complete" and screenplay.raid_path == "":
+		return "Die abgeschlossene Nachtentscheidung benötigt einen gespeicherten Weg."
+	if screenplay.i10 != "complete" and screenplay.i11 != "locked":
+		return "I-11 darf nicht vor der Nachtentscheidung beginnen."
+
+	var raid: Dictionary = data.village.get("raid", {})
+	if screenplay.i11 in ["pending","complete"] and (raid.get("status","") != "aftermath" or int(raid.get("completed",0)) < 1):
+		return "I-11 benötigt einen tatsächlich abgeschlossenen Angriff."
+	if raid.get("status","") == "aftermath" and screenplay.i10 == "complete" and screenplay.i11 == "locked":
+		return "Nach dem Angriff muss I-11 freigeschaltet sein."
+	if screenplay.i11 == "pending" and screenplay.i12 != "locked":
+		return "I-12 darf erst nach Sextus’ Schmiedeszene beginnen."
+	if screenplay.i11 == "complete":
+		var smith := _person(data,"sextus")
+		if smith.is_empty() or smith.alive or int(smith.health) != 0 or smith.assignment != "idle":
+			return "I-11 und Sextus’ tatsächlicher Einwohnerzustand widersprechen sich."
+		if screenplay.i12 == "locked":
+			return "Nach I-11 muss I-12 bereitstehen."
+	if screenplay.i12 == "pending" and screenplay.i13 != "locked":
+		return "I-13 darf erst nach dem letzten Weg des Vaters beginnen."
+	if screenplay.i12 == "complete":
+		var father := _person(data,"silvanus")
+		var mother := _person(data,"julia")
+		if father.is_empty() or father.alive or int(father.health) != 0 or father.assignment != "idle":
+			return "I-12 und Silvanus’ tatsächlicher Einwohnerzustand widersprechen sich."
+		if screenplay.julia_outcome not in ["survived","dead"]:
+			return "I-12 benötigt einen eindeutigen Ausgang für Julia."
+		if mother.is_empty() or screenplay.julia_outcome == "survived" and (not mother.alive or int(mother.health) <= 0) or screenplay.julia_outcome == "dead" and (mother.alive or int(mother.health) != 0):
+			return "Julias gespeicherter Ausgang widerspricht ihrem Einwohnerzustand."
+		if screenplay.i13 == "locked":
+			return "Nach I-12 muss I-13 bereitstehen."
+	elif screenplay.julia_outcome not in ["undecided","legacy"]:
+		return "Julias Endzustand wurde vor I-12 festgeschrieben."
+	if screenplay.i13 == "complete" and screenplay.i14 == "locked":
+		return "Nach I-13 muss I-14 bereitstehen."
+	if screenplay.i14 == "complete":
+		if not screenplay.oath or not expected_items.has("memory_token"):
+			return "I-14 benötigt Schwur und Erinnerungsstück."
+	elif screenplay.oath:
+		return "Der Schwur darf nicht vor I-14 gesetzt sein."
+
+	var expected_night := "none"
+	if base_complete and bridges_complete:
+		expected_night = "pending" if screenplay.i10 == "pending" else ("resolved" if screenplay.i14 == "complete" else "released")
+	if typeof(child.night_event) != TYPE_STRING or child.night_event != expected_night:
+		return "Nachtstatus und Drehbuchfortschritt widersprechen sich."
+	if child.night_event in ["none","pending"] and (raid.get("status","") != "quiet" or int(raid.get("number",-1)) != 0 or int(raid.get("completed",-1)) != 0):
+		return "Vor der freigegebenen Nacht darf kein Überfall begonnen oder abgeschlossen sein."
+	if child.night_event == "resolved" and (raid.get("status","") != "aftermath" or int(raid.get("completed",0)) < 1):
+		return "Der Schwur darf keinen unabgeschlossenen Nachtangriff überspringen."
+
 	if not _integer(child.day,1,4) or child.day != expected_day or child.carried != expected_items:
 		return "Tag oder Auftragsgegenstände sind nicht durch erledigte Handlungen belegt."
 	if typeof(child.apprenticeship) != TYPE_STRING or child.apprenticeship != expected_apprenticeship or typeof(child.gear) != TYPE_STRING or child.gear != expected_gear:
 		return "Lehre oder Leihgegenstände widersprechen der Auftragsfolge."
-	if typeof(child.night_event) != TYPE_STRING or child.night_event not in (["pending","released"] if child.completed.size() == STEPS.size() else ["none"]):
-		return "Die Nacht darf nicht vor dem vollständigen Dorfanfang beginnen."
-	var raid: Dictionary = data.village.get("raid", {})
-	if child.night_event != "released" and (raid.get("status", "") != "quiet" or raid.get("number", -1) != 0 or raid.get("completed", -1) != 0):
-		return "Vor dem ausdrücklich freigegebenen Nachtereignis darf kein Überfall begonnen oder abgeschlossen sein."
 	if not _keys(child.relationships,EXTRA_NPCS.keys()):
 		return "Die Familien- oder Lehrbeziehungen fehlen."
 	for id: String in EXTRA_NPCS:
@@ -424,12 +760,12 @@ static func validate(data: Dictionary) -> String:
 				return "Beziehungsmerkmale benötigen Wahrheitswerte."
 		if (relation.helped or relation.learned or relation.ally or relation.declined) and not relation.met or relation.helped and relation.declined:
 			return "Widersprüchliche Kindheitsbeziehung."
-		if id in ["antonia","sextus"] and not relation.met:
+		if id in ["julia","silvanus"] and not relation.met:
 			return "Die eigene Familie darf nicht nachträglich unbekannt sein."
 		if _person(data,id).is_empty():
 			return "Eine Familien- oder Lehrperson fehlt im gemeinsamen Einwohnerroster."
-	if child.relationships.quintus.helped != child.completed.has("deliver_kindling") or child.relationships.quintus.learned != (expected_apprenticeship == "apprentice"):
-		return "Quintus’ Hilfe und Lehre müssen durch die gemeinsame Auftragsfolge belegt sein."
+	if child.relationships.sextus.helped != child.completed.has("deliver_kindling") or child.relationships.sextus.learned != (expected_apprenticeship == "apprentice"):
+		return "Sextus’ Hilfe und Lehre müssen durch die gemeinsame Auftragsfolge belegt sein."
 	var current := _current(data)
 	var limit := float(current.get("seconds", 0.0))
 	if typeof(child.active_work) != TYPE_STRING or not _number(child.work_seconds,0.0,limit):
@@ -446,7 +782,79 @@ static func validate(data: Dictionary) -> String:
 	return ""
 
 
+static func _screenplay_step(data: Dictionary) -> Dictionary:
+	var child: Dictionary = data.village.childhood
+	var screenplay: Dictionary = child.screenplay
+	# I-02 and I-03 sit after the established family morning. They are separate
+	# from completed[] so older 35-step saves keep their exact sequence indices.
+	if child.completed.size() >= 3:
+		if screenplay.i02 == "pending":
+			return {"id":"i02_basket","mission":"I-02","screenplay":true,"npc":"aurelia",
+				"chapter":"Der falsche Korb","label":"Julias Korb zu Aurelia bringen",
+				"objective":"Bring Julias Nachbarschaftskorb zu Aurelia. Prüfe den Korb oder handle hastig.",
+				"text":"»Zeig mir erst, welchen Korb Julia dir gegeben hat. Ein Fehler ist kein Weltende, aber wir müssen dann mit seinen Folgen weiterarbeiten.«",
+				"result":"Aurelia prüft den Korb."}
+		if screenplay.i02 == "correction":
+			return {"id":"i02_correct","mission":"I-02","screenplay":true,"npc":"julia",
+				"chapter":"Der falsche Korb","label":"Den falschen Korb mit Julia korrigieren",
+				"objective":"Kehre zu Julia zurück. Der falsche Korb bleibt Teil der Geschichte, bis du ihn korrigierst.",
+				"text":"»Gut, dass du zurückkommst. Fehler verschwinden nicht, weil man sie nicht mag. Wir bringen jetzt den richtigen Korb auf den Weg.«",
+				"result":"Der Fehler ist korrigiert und bleibt als Erinnerung gespeichert."}
+		if screenplay.i02 == "complete" and screenplay.i03 == "pending":
+			return {"id":"i03_marcus","mission":"I-03","screenplay":true,"point":"marcus",
+				"chapter":"Marcus kennt eine Abkürzung","label":"Mit Marcus über Marktweg und Münzstreit entscheiden",
+				"objective":"Triff Marcus bei der Gasse zum Markt. Entscheide, ob ihr den Streit als Freunde löst oder euch gegeneinander verhärtet.",
+				"text":"","result":"Die Beziehung zu Marcus erhält eine konkrete Erinnerung."}
+	# I-08 must happen after the bounded watch service and before the last normal
+	# family evening. No people or faction are identified from hoofprints alone.
+	if child.completed.has("return_gear"):
+		if screenplay.i08 == "pending":
+			return {"id":"i08_tracks","mission":"I-08","screenplay":true,"point":"hoof_tracks",
+				"chapter":"Hufspuren im Regen","label":"Die frischen Hufspuren am Nordweg prüfen",
+				"objective":"Untersuche am Nordweg die frischen Hufspuren. Halte Beobachtung und Vermutung getrennt.",
+				"text":"","result":"Du sicherst die Beobachtung: mehrere frische Hufspuren, aber noch keinen belastbaren Täter."}
+		if screenplay.i08 == "report":
+			return {"id":"i08_report","mission":"I-08","screenplay":true,"npc":"decimus",
+				"chapter":"Hufspuren im Regen","label":"Decimus nur die belegten Spuren melden",
+				"objective":"Berichte Decimus, was du tatsächlich gesehen hast. Beschuldige kein Volk ohne Beleg.",
+				"text":"»Zeig mir, was du weißt. Nicht, was du vermutest.«",
+				"result":"Die Hufspuren werden als offene Warnung protokolliert; ein Täter bleibt unbekannt."}
+	if child.completed.size() == STEPS.size():
+		if screenplay.i10 == "pending":
+			return {"id":"i10_choice","mission":"I-10","screenplay":true,"npc":"silvanus",
+				"chapter":"Die Nacht der Reiter","label":"Entscheiden, wie du auf den Angriff reagierst",
+				"objective":"Hufschläge, Feuer und Rufe reißen Valdora aus der Nacht. Entscheide: hilfst du bei Verteidigung und Rettung oder versteckst du dich bei deinen Eltern?",
+				"text":"»Bleib bei uns, wenn du dich versteckst. Wenn du hinausgehst, dann um Menschen zu helfen – nicht um ein Held zu spielen.«",
+				"result":"Deine Nachtentscheidung wird dauerhaft gespeichert."}
+		if screenplay.i10 == "complete" and screenplay.i11 == "pending":
+			return {"id":"i11_forge","mission":"I-11","screenplay":true,"point":"smith",
+				"chapter":"Die Schmiede im Feuer","label":"Zur brennenden Schmiede zurückkehren",
+				"objective":"Erreiche die Schmiede. Sextus hält einen Fluchtweg offen; die Werkstatt und ihr Arbeiter sind Teil derselben Welt.",
+				"text":"","result":"Sextus stirbt, während er den Fluchtweg offen hält. Die Schmiede verliert ihren realen Arbeiter."}
+		if screenplay.i11 == "complete" and screenplay.i12 == "pending":
+			return {"id":"i12_father","mission":"I-12","screenplay":true,"npc":"silvanus",
+				"chapter":"Der letzte Weg des Vaters","label":"Silvanus auf seinem letzten Weg folgen",
+				"objective":"Geh zu deinem Vater in der Familiengasse. Sein Ende ist in beiden Hauptwegen fest; Julias Schicksal hängt von tatsächlich geleisteter Hilfe ab.",
+				"text":"»Sieh nach deiner Mutter. Und wenn du später wütend bist – entscheide erst, wenn du wieder sehen kannst, was vor dir liegt.«",
+				"result":"Silvanus stirbt. Julias Zustand folgt aus deiner tatsächlichen Rettung oder dem Versteckweg."}
+		if screenplay.i12 == "complete" and screenplay.i13 == "pending":
+			return {"id":"i13_morning","mission":"I-13","screenplay":true,"npc":"aurelia",
+				"chapter":"Morgen ohne Stimmen","label":"Mit Aurelia die wirklichen Verluste erfassen",
+				"objective":"Gehe am Morgen zu Aurelia. Leere Arbeitsplätze, Verletzte und Tote bleiben reale Zustände statt Kulisse.",
+				"text":"»Wir zählen keine Schatten. Wir zählen Menschen. Wer fehlt, fehlt auch morgen noch an seinem Arbeitsplatz.«",
+				"result":"Der Morgen übernimmt die tatsächlichen Personen- und Verlustzustände der Nacht."}
+		if screenplay.i13 == "complete" and screenplay.i14 == "pending":
+			return {"id":"i14_oath","mission":"I-14","screenplay":true,"point":"oath_ridge",
+				"chapter":"Der Schwur","label":"Am Waldrand das Erinnerungsstück nehmen und schwören",
+				"objective":"Geh zum Waldrand oberhalb Valdoras. Nimm ein Erinnerungsstück und entscheide dich für die Suche nach den Verantwortlichen.",
+				"text":"","result":"Du schwörst, die Verantwortlichen zu finden. Der Schwur eröffnet Ermittlung – keine sofortige Soldatenkarriere."}
+	return {}
+
+
 static func _current(data: Dictionary) -> Dictionary:
+	var screenplay_step := _screenplay_step(data)
+	if not screenplay_step.is_empty():
+		return screenplay_step
 	var index: int = data.village.childhood.completed.size()
 	return STEPS[index] if index < STEPS.size() else {}
 
@@ -463,6 +871,29 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 	if step.id == "market_trade":
 		options = [{"id":"market_fair","label":"Den vereinbarten Lohn nehmen · 2 Denare"},
 			{"id":"market_neighbor","label":"Dem Nachbarn einen Denar lassen · 1 Denar Lohn"}]
+	elif step.id == "i02_basket":
+		options = [{"id":"basket_check","label":"Korb gemeinsam prüfen"},
+			{"id":"basket_rush","label":"Ohne Prüfung abgeben"}]
+	elif step.id == "i02_correct":
+		options = [{"id":"basket_correct","label":"Fehler korrigieren und richtigen Korb schicken"}]
+	elif step.id == "i03_marcus":
+		options = [{"id":"marcus_friend","label":"Den Münzstreit beilegen und gemeinsam gehen"},
+			{"id":"marcus_rival","label":"Auf dem eigenen Standpunkt beharren"}]
+	elif step.id == "i08_tracks":
+		options = [{"id":"i08_inspect","label":"Hufspuren untersuchen und nur Beobachtungen sichern"}]
+	elif step.id == "i08_report":
+		options = [{"id":"i08_report","label":"Decimus nur belegte Spuren melden"}]
+	elif step.id == "i10_choice":
+		options = [{"id":"i10_defend","label":"Hinausgehen · verteidigen und Menschen retten"},
+			{"id":"i10_hide","label":"Bei den Eltern bleiben und sich verstecken"}]
+	elif step.id == "i11_forge":
+		options = [{"id":"i11_forge","label":"Sextus’ Fluchtweg erreichen"}]
+	elif step.id == "i12_father":
+		options = [{"id":"i12_father","label":"Beim Vater bleiben und nach Julia sehen"}]
+	elif step.id == "i13_morning":
+		options = [{"id":"i13_morning","label":"Verluste mit Aurelia erfassen"}]
+	elif step.id == "i14_oath":
+		options = [{"id":"i14_oath","label":"Erinnerungsstück nehmen und den Schwur sprechen"}]
 	elif step.has("seconds"):
 		if data.village.childhood.active_work == "":
 			options[0].id = "begin_" + str(step.id)
@@ -487,8 +918,8 @@ static func _action_reason(data: Dictionary, step: Dictionary) -> String:
 			return "Lerne diese Person zuerst im Gespräch kennen."
 	if _distance(data, _target(data, step)) > (NPC_RANGE if step.has("npc") else POINT_RANGE):
 		return "Gehe selbst zum angegebenen Menschen oder Arbeitsplatz."
-	if step.has("seconds") and step.id.begins_with("forge_") and not _available(data,"quintus"):
-		return "Die heiße Arbeit findet nur unter Quintus’ Aufsicht statt."
+	if step.has("seconds") and step.id.begins_with("forge_") and not _available(data,"sextus"):
+		return "Die heiße Arbeit findet nur unter Sextus’ Aufsicht statt."
 	return ""
 
 
@@ -553,9 +984,9 @@ static func _restore_guard(data: Dictionary) -> void:
 static func _idle_text(id: String) -> String:
 	if NEIGHBORS.has(id):
 		return NEIGHBORS[id].text
-	return {"antonia":"»Hier ist dein Zuhause. Erzähle mir, was du heute vorhast, und komm mit deinen Fragen wieder.«",
-		"sextus":"»Du musst noch kein Soldat und kein Verwalter sein. Lerne die Menschen kennen und führe deine Zusagen selbst zu Ende.«",
-		"quintus":"»Eine Schmiede ist ein Arbeitsplatz, keine Abkürzung zum Heldentum. Erst zuhören, dann gemeinsam üben und die Arbeit ordentlich übergeben.«"}.get(id, "")
+	return {"julia":"»Hier ist dein Zuhause. Erzähle mir, was du heute vorhast, und komm mit deinen Fragen wieder.«",
+		"silvanus":"»Du musst noch kein Soldat und kein Verwalter sein. Lerne die Menschen kennen und führe deine Zusagen selbst zu Ende.«",
+		"sextus":"»Eine Schmiede ist ein Arbeitsplatz, keine Abkürzung zum Heldentum. Erst zuhören, dann gemeinsam üben und die Arbeit ordentlich übergeben.«"}.get(id, "")
 
 
 static func _record(data: Dictionary, id: String, message: String) -> void:

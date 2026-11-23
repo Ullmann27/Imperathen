@@ -97,7 +97,7 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 	invalid = validate(candidate)
 	if not invalid.is_empty():
 		return _fail("Dorfauftrag verworfen: " + invalid)
-	for key: String in ["village", "resources", "player"]:
+	for key: String in ["village", "resources", "player", "companion"]:
 		data[key] = candidate[key]
 	return result
 
@@ -107,9 +107,23 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	var raid: Dictionary = data.village.raid
 	if Childhood.COMMAND_FIELDS.has(command):
 		var result := Childhood.execute(data, command, args)
-		if result.ok and command == "village_childhood_begin_raid":
+		if not result.ok:
+			return result
+		if command == "village_childhood_begin_raid":
 			_begin_warning(data, true)
-			_begin_raid(data)
+			data.village.raid.scouted = true
+			data.village.raid.alarm = true
+			_begin_raid(data, true)
+		elif command == "village_childhood_action":
+			var childhood_action := str(args.get("action_id", ""))
+			if childhood_action == "i10_defend":
+				_begin_warning(data, true)
+				data.village.raid.scouted = true
+				data.village.raid.alarm = true
+				_begin_raid(data, true)
+			elif childhood_action == "i10_hide":
+				_begin_warning(data, true)
+				_resolve_hidden_childhood_raid(data)
 		return result
 	if Childhood.enabled(data) and command in ["village_learn", "village_ally"]:
 		return _fail("Deine erste Lehre und dein Vertrauen entstehen in den gemeinsamen Kindheitsaufgaben, nicht durch einen sofortigen Karrierewechsel.")
@@ -482,22 +496,49 @@ static func _begin_warning(data: Dictionary, childhood_night := false) -> void:
 	_event(data,"night_alarm" if childhood_night else "warning", "In der Nacht zerreißen Hufschläge und Rufe die vertraute Ruhe. Der Angriff trifft das inzwischen kennengelernte Dorf." if childhood_night else "Am Nordweg wurden bewaffnete Plünderer gesehen. Spähe die Spur aus, löse Alarm aus und teile die Verteidigung ein.")
 
 
-static func _begin_raid(data: Dictionary) -> void:
+static func _begin_raid(data: Dictionary, childhood_night := false) -> void:
 	var raid: Dictionary = data.village.raid
 	raid.status = "active"
 	raid.active = true
 	raid.remaining = RAID_SECONDS
 	raid.guard_clock = 0.0
 	raid.rescue_person_id = ""
-	for person: Dictionary in data.get("village",{}).get("economy",{}).get("people",[]):
-		if person.get("alive",false) and str(person.get("assignment","")) not in ["defense","watchpost"]:
-			raid.rescue_person_id = str(person.id)
-			person.health = maxi(1,int(person.health)-10)
-			break
+	if childhood_night and Childhood.enabled(data):
+		var mother := _person(data, "julia")
+		if not mother.is_empty() and mother.get("alive", false):
+			raid.rescue_person_id = "julia"
+			mother.health = maxi(1, int(mother.health) - 10)
+	else:
+		for person: Dictionary in data.get("village",{}).get("economy",{}).get("people",[]):
+			if person.get("alive",false) and str(person.get("assignment","")) not in ["defense","watchpost"]:
+				raid.rescue_person_id = str(person.id)
+				person.health = maxi(1,int(person.health)-10)
+				break
 	raid.rescue_available = raid.rescue_person_id!=""
 	for index in _enemy_count(raid.number):
 		raid.enemies.append({"id":"raid_%d_%d" % [int(raid.number),index], "x":float(index*5-5),"z":-62.0-float(index%2)*2.0,"health":45,"max_health":45,"attack_timer":0.9,"loot_timer":0.0})
-	_event(data,"raid", "Die Plünderer erreichen den Nordweg. Ihr Angriff und die Gefahr für die Vorräte laufen nun in der Spielwelt.")
+	_event(data,"raid", "Etwa 30 Reiter brechen über Valdora herein. Die Nahkampf-Simulation bildet nur die unmittelbar relevanten Angreifer als volle Kampf-AIs ab; die übrige Formation bleibt eine sichtbare Angriffsmasse." if childhood_night and Childhood.enabled(data) else "Die Plünderer erreichen den Nordweg. Ihr Angriff und die Gefahr für die Vorräte laufen nun in der Spielwelt.")
+
+
+static func _resolve_hidden_childhood_raid(data: Dictionary) -> void:
+	var raid: Dictionary = data.village.raid
+	raid.status = "aftermath"
+	raid.active = false
+	raid.completed += 1
+	raid.remaining = 0.0
+	raid.enemies = []
+	raid.rescue_available = false
+	raid.rescue_person_id = ""
+	raid.outcome = "raided"
+	var stolen := mini(4, int(data.resources.grain))
+	if stolen > 0:
+		_pay(data, {"grain":stolen})
+		raid.stolen = stolen
+	raid.next_at = float(data.village.social.seconds) + RAID_INTERVAL
+	raid.last_summary = "Du bleibst bei deinen Eltern, während der Angriff durch Valdora geht. Vorräte und Menschen tragen die Folgen weiter."
+	_event(data, "raid_hidden", raid.last_summary)
+	_change(data, "raid_%d_hidden" % int(raid.number), raid.last_summary)
+	Childhood.on_raid_finished(data)
 
 
 static func _finish_raid(data: Dictionary, outcome: String) -> void:
@@ -530,6 +571,8 @@ static func _finish_raid(data: Dictionary, outcome: String) -> void:
 				break
 		raid.last_summary = "Der Angriff endet. Verlorenes Getreide: %d. Versorge Verletzte und sichere den Wiederaufbau." % int(raid.stolen)
 	_change(data,"raid_%d_%s" % [int(raid.number),outcome],raid.last_summary)
+	if Childhood.enabled(data):
+		Childhood.on_raid_finished(data)
 
 
 static func training_ready(data: Dictionary) -> bool:
@@ -668,7 +711,8 @@ static func validate(data: Dictionary) -> String:
 		if not _integer(enemy.max_health,45,45) or not _integer(enemy.health,0,45) or not _number(enemy.x,-200.0,200.0) or not _number(enemy.z,-200.0,200.0) or not _number(enemy.attack_timer,0.0,3.0) or not _number(enemy.loot_timer,0.0,RAID_SECONDS+1.0):
 			return "Ungültiger Angreiferzustand."
 	var history: Dictionary = village.history
-	if not _keys(history,["start_year","mode","player_changes","events"]) or history.start_year!=100 or typeof(history.mode)!=TYPE_STRING or history.mode not in ["historical_baseline","fictional_branch"]:
+	var expected_start_year := -58 if Childhood.enabled(data) else 100
+	if not _keys(history,["start_year","mode","player_changes","events"]) or history.start_year!=expected_start_year or typeof(history.mode)!=TYPE_STRING or history.mode not in ["historical_baseline","fictional_branch"]:
 		return "Ungültiger Geschichtsrahmen."
 	if typeof(history.player_changes)!=TYPE_ARRAY or history.player_changes.size()>128 or typeof(history.events)!=TYPE_ARRAY or history.events.size()>64:
 		return "Unbegrenztes Geschichtsprotokoll."

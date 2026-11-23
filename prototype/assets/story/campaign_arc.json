@@ -1,0 +1,932 @@
+{
+  "schema_version": 1,
+  "project": "IMPERATHEN — RISE OF AN EMPIRE",
+  "source_status": "Production screenplay 1.0, 23 November 2026",
+  "source_rule": "The four screenplay volumes are the canonical authored campaign order. Runtime state and historical divergence rules decide whether a mission is available; this registry does not auto-complete gameplay.",
+  "canonical_childhood_cast": {
+    "mother": {
+      "actor_id": "julia",
+      "name": "Julia"
+    },
+    "father": {
+      "actor_id": "silvanus",
+      "name": "Silvanus"
+    },
+    "smith_mentor": {
+      "actor_id": "sextus",
+      "name": "Sextus",
+      "relationship": "oldest friend of Silvanus"
+    },
+    "friend": {
+      "actor_id": "marcus",
+      "name": "Marcus"
+    },
+    "merchant": {
+      "actor_id": "cassia",
+      "name": "Cassia"
+    },
+    "healer": {
+      "actor_id": "aurelia",
+      "name": "Aurelia"
+    },
+    "steward": {
+      "actor_id": "decimus",
+      "name": "Decimus"
+    }
+  },
+  "campaign_rules": {
+    "start_year_bce": 58,
+    "start_age": 12,
+    "start_location": "Valdora in the Aquileia region",
+    "save_driven_cinematics": true,
+    "historical_anchor_mode": "Major historical anchor events remain stable until an explicitly unlocked divergence point changes them.",
+    "knowledge_rule": "Quest/journal knowledge must come from observed, reported or credibly transmitted facts.",
+    "failure_rule": "Social/economic/political/tactical failure should create a new world state instead of a reload unless the player dies or the state becomes technically unplayable."
+  },
+  "bands": [
+    {
+      "band": 1,
+      "roman": "I",
+      "title": "BAND 1 — DAS FEUER VON VALDORA",
+      "period": "58–52 v. Chr. · Kindheit, Überfall, Wiederaufbau, Rachespur, Gallien und Alesia",
+      "tagline": "Vom vertrauten Dorf zur ersten großen Schlacht",
+      "source_file": "IMPERATHEN_Drehbuch_Band_1_DAS_FEUER_VON_VALDORA(1).docx",
+      "main_missions": [
+        {
+          "id": "I-00",
+          "title": "Drei Legionen im Regen"
+        },
+        {
+          "id": "I-01",
+          "title": "Die drei Becher"
+        },
+        {
+          "id": "I-02",
+          "title": "Der falsche Korb"
+        },
+        {
+          "id": "I-03",
+          "title": "Marcus kennt eine Abkürzung"
+        },
+        {
+          "id": "I-04",
+          "title": "Der Freund meines Vaters"
+        },
+        {
+          "id": "I-05",
+          "title": "Sieh hin, bevor du Kraft brauchst"
+        },
+        {
+          "id": "I-06",
+          "title": "Ein Preis ist eine Zusage"
+        },
+        {
+          "id": "I-07",
+          "title": "Der kranke Wachmann"
+        },
+        {
+          "id": "I-08",
+          "title": "Hufspuren im Regen"
+        },
+        {
+          "id": "I-09",
+          "title": "Der letzte gewöhnliche Abend"
+        },
+        {
+          "id": "I-10",
+          "title": "Die Nacht der Reiter"
+        },
+        {
+          "id": "I-11",
+          "title": "Die Schmiede im Feuer"
+        },
+        {
+          "id": "I-12",
+          "title": "Der letzte Weg des Vaters"
+        },
+        {
+          "id": "I-13",
+          "title": "Morgen ohne Stimmen"
+        },
+        {
+          "id": "I-14",
+          "title": "Der Schwur"
+        },
+        {
+          "id": "I-15",
+          "title": "Asche hat Namen"
+        },
+        {
+          "id": "I-16",
+          "title": "Valdora steht wieder"
+        },
+        {
+          "id": "I-17",
+          "title": "Der Preis des Holzes"
+        },
+        {
+          "id": "I-18",
+          "title": "Der erste Winter ohne ihn"
+        },
+        {
+          "id": "I-19",
+          "title": "Der Mann, den alle ansehen"
+        },
+        {
+          "id": "I-20",
+          "title": "Das rote Siegel"
+        },
+        {
+          "id": "I-21",
+          "title": "Marcus entscheidet sich"
+        },
+        {
+          "id": "I-22",
+          "title": "Die zweite Klinge"
+        },
+        {
+          "id": "I-23",
+          "title": "Die Straße über die Alpen"
+        },
+        {
+          "id": "I-24",
+          "title": "Ein Dorf, das nicht deins ist"
+        },
+        {
+          "id": "I-25",
+          "title": "Der Veteran am Feuer"
+        },
+        {
+          "id": "I-26",
+          "title": "Ein Name in der Liste"
+        },
+        {
+          "id": "I-27",
+          "title": "Nach Norden"
+        },
+        {
+          "id": "I-28",
+          "title": "Vor Alesia"
+        },
+        {
+          "id": "I-29",
+          "title": "Der Ring schließt sich"
+        },
+        {
+          "id": "I-30",
+          "title": "Der Gefangene und der Blick"
+        },
+        {
+          "id": "I-31",
+          "title": "Der Quartiermeister mit dem roten Wachs"
+        }
+      ],
+      "side_quests": [
+        {
+          "id": "NQ-1-01",
+          "title": "Ein Pferd kennt seinen Weg"
+        },
+        {
+          "id": "NQ-1-02",
+          "title": "Der Schuldbrief"
+        },
+        {
+          "id": "NQ-1-03",
+          "title": "Die Nachtwache"
+        },
+        {
+          "id": "NQ-1-04",
+          "title": "Der Brunnen schmeckt bitter"
+        },
+        {
+          "id": "NQ-1-05",
+          "title": "Zwei Brüder, ein Feld"
+        },
+        {
+          "id": "NQ-1-06",
+          "title": "Der Händler ohne Wagen"
+        },
+        {
+          "id": "NQ-1-07",
+          "title": "Streit am Schankraum"
+        },
+        {
+          "id": "NQ-1-08",
+          "title": "Die verlorene Wachstafel"
+        },
+        {
+          "id": "NQ-1-09",
+          "title": "Das Feuer im Speicher"
+        },
+        {
+          "id": "NQ-1-10",
+          "title": "Der fremde Veteran"
+        },
+        {
+          "id": "NQ-1-11",
+          "title": "Die verschwundene Ziege"
+        },
+        {
+          "id": "NQ-1-12",
+          "title": "Der Bote kommt nicht"
+        },
+        {
+          "id": "NQ-1-13",
+          "title": "Die Witwe und der Helm"
+        },
+        {
+          "id": "NQ-1-14",
+          "title": "Der Grenzstein"
+        },
+        {
+          "id": "NQ-1-15",
+          "title": "Ein Lied zu viel"
+        },
+        {
+          "id": "NQ-1-16",
+          "title": "Die Maultiere streiken nicht"
+        },
+        {
+          "id": "NQ-1-17",
+          "title": "Der junge Dieb"
+        },
+        {
+          "id": "NQ-1-18",
+          "title": "Die leere Werkbank"
+        },
+        {
+          "id": "NQ-1-19",
+          "title": "Der alte Brunnen"
+        },
+        {
+          "id": "NQ-1-20",
+          "title": "Die falsche Anklage"
+        },
+        {
+          "id": "NQ-1-21",
+          "title": "Ein Fest trotz allem"
+        },
+        {
+          "id": "NQ-1-22",
+          "title": "Der verschwundene Werkzeugkasten"
+        },
+        {
+          "id": "NQ-1-23",
+          "title": "Der Preis des Brotes"
+        },
+        {
+          "id": "NQ-1-24",
+          "title": "Die falsche Münze"
+        }
+      ]
+    },
+    {
+      "band": 2,
+      "roman": "II",
+      "title": "BAND 2 — DER ADLER UND DER RUBIKON",
+      "period": "51–47 v. Chr. · Heimkehr, Rom, Bürgerkrieg, Pharsalos und Alexandria",
+      "tagline": "Die persönliche Rache gerät in einen Krieg um die Republik",
+      "source_file": "IMPERATHEN_Drehbuch_Band_2_DER_ADLER_UND_DER_RUBIKON(1).docx",
+      "main_missions": [
+        {
+          "id": "II-00",
+          "title": "Nach dem Sieg ist vor der Schuld"
+        },
+        {
+          "id": "II-01",
+          "title": "Heimkehr nach Valdora"
+        },
+        {
+          "id": "II-02",
+          "title": "Eine Rechnung in Aquileia"
+        },
+        {
+          "id": "II-03",
+          "title": "Briefe aus Rom"
+        },
+        {
+          "id": "II-04",
+          "title": "Labienus geht"
+        },
+        {
+          "id": "II-05",
+          "title": "Der Fluss, den man nicht zurücknimmt"
+        },
+        {
+          "id": "II-06",
+          "title": "Ariminum vor Sonnenaufgang"
+        },
+        {
+          "id": "II-07",
+          "title": "Corfinium"
+        },
+        {
+          "id": "II-08",
+          "title": "Rom ohne Herren"
+        },
+        {
+          "id": "II-09",
+          "title": "Das versiegelte Archiv"
+        },
+        {
+          "id": "II-10",
+          "title": "Massilia schließt die Tore"
+        },
+        {
+          "id": "II-11",
+          "title": "Ilerda: Der Regen gewinnt zuerst"
+        },
+        {
+          "id": "II-12",
+          "title": "Der Mann aus dem Dorf im gegnerischen Lager"
+        },
+        {
+          "id": "II-13",
+          "title": "Das Meer im Winter"
+        },
+        {
+          "id": "II-14",
+          "title": "Dyrrhachium"
+        },
+        {
+          "id": "II-15",
+          "title": "Kein Heldentod"
+        },
+        {
+          "id": "II-16",
+          "title": "Pharsalos: Staub vor der Sonne"
+        },
+        {
+          "id": "II-17",
+          "title": "Ein Zelt bleibt leer"
+        },
+        {
+          "id": "II-18",
+          "title": "Der Weg des Pompeius"
+        },
+        {
+          "id": "II-19",
+          "title": "Die Küste von Pelusion"
+        },
+        {
+          "id": "II-20",
+          "title": "Alexandria: Eine Stadt aus Stimmen"
+        },
+        {
+          "id": "II-21",
+          "title": "Die Königin im Schatten"
+        },
+        {
+          "id": "II-22",
+          "title": "Das Buch, das Serranus nicht besitzt"
+        },
+        {
+          "id": "II-23",
+          "title": "Die Stadt brennt"
+        },
+        {
+          "id": "II-24",
+          "title": "Der Nil entscheidet nicht allein"
+        }
+      ],
+      "side_quests": [
+        {
+          "id": "NQ-2-01",
+          "title": "Der Brunnen schmeckt bitter"
+        },
+        {
+          "id": "NQ-2-02",
+          "title": "Zwei Brüder, ein Feld"
+        },
+        {
+          "id": "NQ-2-03",
+          "title": "Der Händler ohne Wagen"
+        },
+        {
+          "id": "NQ-2-04",
+          "title": "Streit am Schankraum"
+        },
+        {
+          "id": "NQ-2-05",
+          "title": "Die verlorene Wachstafel"
+        },
+        {
+          "id": "NQ-2-06",
+          "title": "Das Feuer im Speicher"
+        },
+        {
+          "id": "NQ-2-07",
+          "title": "Der fremde Veteran"
+        },
+        {
+          "id": "NQ-2-08",
+          "title": "Die verschwundene Ziege"
+        },
+        {
+          "id": "NQ-2-09",
+          "title": "Der Bote kommt nicht"
+        },
+        {
+          "id": "NQ-2-10",
+          "title": "Die Witwe und der Helm"
+        },
+        {
+          "id": "NQ-2-11",
+          "title": "Der Grenzstein"
+        },
+        {
+          "id": "NQ-2-12",
+          "title": "Ein Lied zu viel"
+        },
+        {
+          "id": "NQ-2-13",
+          "title": "Die Maultiere streiken nicht"
+        },
+        {
+          "id": "NQ-2-14",
+          "title": "Der junge Dieb"
+        },
+        {
+          "id": "NQ-2-15",
+          "title": "Die leere Werkbank"
+        },
+        {
+          "id": "NQ-2-16",
+          "title": "Der alte Brunnen"
+        },
+        {
+          "id": "NQ-2-17",
+          "title": "Die falsche Anklage"
+        },
+        {
+          "id": "NQ-2-18",
+          "title": "Ein Fest trotz allem"
+        },
+        {
+          "id": "NQ-2-19",
+          "title": "Der verschwundene Werkzeugkasten"
+        },
+        {
+          "id": "NQ-2-20",
+          "title": "Der Preis des Brotes"
+        },
+        {
+          "id": "NQ-2-21",
+          "title": "Die falsche Münze"
+        },
+        {
+          "id": "NQ-2-22",
+          "title": "Ein Pferd kennt seinen Weg"
+        },
+        {
+          "id": "NQ-2-23",
+          "title": "Der Schuldbrief"
+        },
+        {
+          "id": "NQ-2-24",
+          "title": "Die Nachtwache"
+        }
+      ]
+    },
+    {
+      "band": 3,
+      "roman": "III",
+      "title": "BAND 3 — DIE IDEN",
+      "period": "47–44 v. Chr. · Zela, Afrika, Munda, Rachefinale, Caesar und der 15. März",
+      "tagline": "Sieg, Rache und die Frage, was Macht mit Menschen macht",
+      "source_file": "IMPERATHEN_Drehbuch_Band_3_DIE_IDEN(1).docx",
+      "main_missions": [
+        {
+          "id": "III-00",
+          "title": "Zela: Fünf Tage sind kein Märchen"
+        },
+        {
+          "id": "III-01",
+          "title": "Rom empfängt den Sieger"
+        },
+        {
+          "id": "III-02",
+          "title": "Afrika ruft"
+        },
+        {
+          "id": "III-03",
+          "title": "Thapsus"
+        },
+        {
+          "id": "III-04",
+          "title": "Nach Utica"
+        },
+        {
+          "id": "III-05",
+          "title": "Die letzte Armee in Hispania"
+        },
+        {
+          "id": "III-06",
+          "title": "Munda"
+        },
+        {
+          "id": "III-07",
+          "title": "Das Haus des roten Siegels"
+        },
+        {
+          "id": "III-08",
+          "title": "Gerechtigkeit ist langsamer als Stahl"
+        },
+        {
+          "id": "III-09",
+          "title": "Stahl fordert Stahl"
+        },
+        {
+          "id": "III-10",
+          "title": "Der Mann, der Befehle kaufte"
+        },
+        {
+          "id": "III-11",
+          "title": "Der letzte Satz des Sextus"
+        },
+        {
+          "id": "III-12",
+          "title": "Caesar in Rom"
+        },
+        {
+          "id": "III-13",
+          "title": "Land für die Lebenden"
+        },
+        {
+          "id": "III-14",
+          "title": "Marcus trägt einen anderen Mantel"
+        },
+        {
+          "id": "III-15",
+          "title": "Eine Mutter wartet nicht ewig"
+        },
+        {
+          "id": "III-16",
+          "title": "Brot und Spiele, aber kein Schweigen"
+        },
+        {
+          "id": "III-17",
+          "title": "Flüstern im Portikus"
+        },
+        {
+          "id": "III-18",
+          "title": "Brutus’ Frage"
+        },
+        {
+          "id": "III-19",
+          "title": "Cassius zählt Risiken"
+        },
+        {
+          "id": "III-20",
+          "title": "Antonius lacht zu laut"
+        },
+        {
+          "id": "III-21",
+          "title": "Warnzeichen"
+        },
+        {
+          "id": "III-22",
+          "title": "Der Morgen der Iden"
+        },
+        {
+          "id": "III-23",
+          "title": "Das Theater des Pompeius"
+        },
+        {
+          "id": "III-24",
+          "title": "Blut auf Marmor"
+        }
+      ],
+      "side_quests": [
+        {
+          "id": "NQ-3-01",
+          "title": "Streit am Schankraum"
+        },
+        {
+          "id": "NQ-3-02",
+          "title": "Die verlorene Wachstafel"
+        },
+        {
+          "id": "NQ-3-03",
+          "title": "Das Feuer im Speicher"
+        },
+        {
+          "id": "NQ-3-04",
+          "title": "Der fremde Veteran"
+        },
+        {
+          "id": "NQ-3-05",
+          "title": "Die verschwundene Ziege"
+        },
+        {
+          "id": "NQ-3-06",
+          "title": "Der Bote kommt nicht"
+        },
+        {
+          "id": "NQ-3-07",
+          "title": "Die Witwe und der Helm"
+        },
+        {
+          "id": "NQ-3-08",
+          "title": "Der Grenzstein"
+        },
+        {
+          "id": "NQ-3-09",
+          "title": "Ein Lied zu viel"
+        },
+        {
+          "id": "NQ-3-10",
+          "title": "Die Maultiere streiken nicht"
+        },
+        {
+          "id": "NQ-3-11",
+          "title": "Der junge Dieb"
+        },
+        {
+          "id": "NQ-3-12",
+          "title": "Die leere Werkbank"
+        },
+        {
+          "id": "NQ-3-13",
+          "title": "Der alte Brunnen"
+        },
+        {
+          "id": "NQ-3-14",
+          "title": "Die falsche Anklage"
+        },
+        {
+          "id": "NQ-3-15",
+          "title": "Ein Fest trotz allem"
+        },
+        {
+          "id": "NQ-3-16",
+          "title": "Der verschwundene Werkzeugkasten"
+        },
+        {
+          "id": "NQ-3-17",
+          "title": "Der Preis des Brotes"
+        },
+        {
+          "id": "NQ-3-18",
+          "title": "Die falsche Münze"
+        },
+        {
+          "id": "NQ-3-19",
+          "title": "Ein Pferd kennt seinen Weg"
+        },
+        {
+          "id": "NQ-3-20",
+          "title": "Der Schuldbrief"
+        },
+        {
+          "id": "NQ-3-21",
+          "title": "Die Nachtwache"
+        },
+        {
+          "id": "NQ-3-22",
+          "title": "Der Brunnen schmeckt bitter"
+        },
+        {
+          "id": "NQ-3-23",
+          "title": "Zwei Brüder, ein Feld"
+        },
+        {
+          "id": "NQ-3-24",
+          "title": "Der Händler ohne Wagen"
+        }
+      ]
+    },
+    {
+      "band": 4,
+      "roman": "IV",
+      "title": "BAND 4 — DAS REICH DANACH",
+      "period": "44–27 v. Chr. und Sandbox · Octavian, Antonius, Philippi, Actium und Enden",
+      "tagline": "Nach Caesar entscheidet der Spieler, wofür sein Leben gestanden hat",
+      "source_file": "IMPERATHEN_Drehbuch_Band_4_DAS_REICH_DANACH(1).docx",
+      "main_missions": [
+        {
+          "id": "IV-00",
+          "title": "Die Stadt nach Caesar"
+        },
+        {
+          "id": "IV-01",
+          "title": "Ein Erbe kommt nach Italien"
+        },
+        {
+          "id": "IV-02",
+          "title": "Antonius will Zeit"
+        },
+        {
+          "id": "IV-03",
+          "title": "Ciceros Feder"
+        },
+        {
+          "id": "IV-04",
+          "title": "Mutina"
+        },
+        {
+          "id": "IV-05",
+          "title": "Drei Männer teilen eine Republik"
+        },
+        {
+          "id": "IV-06",
+          "title": "Die Listen"
+        },
+        {
+          "id": "IV-07",
+          "title": "Ciceros letzter Weg"
+        },
+        {
+          "id": "IV-08",
+          "title": "Über die Adria nach Osten"
+        },
+        {
+          "id": "IV-09",
+          "title": "Philippi I"
+        },
+        {
+          "id": "IV-10",
+          "title": "Philippi II"
+        },
+        {
+          "id": "IV-11",
+          "title": "Land für Sieger"
+        },
+        {
+          "id": "IV-12",
+          "title": "Perusia"
+        },
+        {
+          "id": "IV-13",
+          "title": "Der Mann, der das Meer hält"
+        },
+        {
+          "id": "IV-14",
+          "title": "Brotpreis"
+        },
+        {
+          "id": "IV-15",
+          "title": "Misenum"
+        },
+        {
+          "id": "IV-16",
+          "title": "Naulochus"
+        },
+        {
+          "id": "IV-17",
+          "title": "Der Osten des Antonius"
+        },
+        {
+          "id": "IV-18",
+          "title": "Zwei Höfe, eine Propagandaschlacht"
+        },
+        {
+          "id": "IV-19",
+          "title": "Vor Actium"
+        },
+        {
+          "id": "IV-20",
+          "title": "Actium"
+        },
+        {
+          "id": "IV-21",
+          "title": "Alexandria danach"
+        },
+        {
+          "id": "IV-22",
+          "title": "27 v. Chr.: Ein neuer Name für Macht"
+        },
+        {
+          "id": "IV-23",
+          "title": "Das Haus, das geblieben ist"
+        },
+        {
+          "id": "IV-24",
+          "title": "Historisches Ende: Statthalter"
+        },
+        {
+          "id": "IV-25",
+          "title": "Historisches Ende: Veteran und Erbauer"
+        },
+        {
+          "id": "IV-26",
+          "title": "Historisches Ende: Handelsfürst"
+        },
+        {
+          "id": "IV-27",
+          "title": "Historisches Ende: Verbannt"
+        },
+        {
+          "id": "IV-28",
+          "title": "Divergenz: Caesar lebt"
+        },
+        {
+          "id": "IV-29",
+          "title": "Divergenz: Der Spieler greift nach der Krone"
+        },
+        {
+          "id": "IV-30",
+          "title": "Die Chronik deines Lebens"
+        }
+      ],
+      "side_quests": [
+        {
+          "id": "NQ-4-01",
+          "title": "Der fremde Veteran"
+        },
+        {
+          "id": "NQ-4-02",
+          "title": "Die verschwundene Ziege"
+        },
+        {
+          "id": "NQ-4-03",
+          "title": "Der Bote kommt nicht"
+        },
+        {
+          "id": "NQ-4-04",
+          "title": "Die Witwe und der Helm"
+        },
+        {
+          "id": "NQ-4-05",
+          "title": "Der Grenzstein"
+        },
+        {
+          "id": "NQ-4-06",
+          "title": "Ein Lied zu viel"
+        },
+        {
+          "id": "NQ-4-07",
+          "title": "Die Maultiere streiken nicht"
+        },
+        {
+          "id": "NQ-4-08",
+          "title": "Der junge Dieb"
+        },
+        {
+          "id": "NQ-4-09",
+          "title": "Die leere Werkbank"
+        },
+        {
+          "id": "NQ-4-10",
+          "title": "Der alte Brunnen"
+        },
+        {
+          "id": "NQ-4-11",
+          "title": "Die falsche Anklage"
+        },
+        {
+          "id": "NQ-4-12",
+          "title": "Ein Fest trotz allem"
+        },
+        {
+          "id": "NQ-4-13",
+          "title": "Der verschwundene Werkzeugkasten"
+        },
+        {
+          "id": "NQ-4-14",
+          "title": "Der Preis des Brotes"
+        },
+        {
+          "id": "NQ-4-15",
+          "title": "Die falsche Münze"
+        },
+        {
+          "id": "NQ-4-16",
+          "title": "Ein Pferd kennt seinen Weg"
+        },
+        {
+          "id": "NQ-4-17",
+          "title": "Der Schuldbrief"
+        },
+        {
+          "id": "NQ-4-18",
+          "title": "Die Nachtwache"
+        },
+        {
+          "id": "NQ-4-19",
+          "title": "Der Brunnen schmeckt bitter"
+        },
+        {
+          "id": "NQ-4-20",
+          "title": "Zwei Brüder, ein Feld"
+        },
+        {
+          "id": "NQ-4-21",
+          "title": "Der Händler ohne Wagen"
+        },
+        {
+          "id": "NQ-4-22",
+          "title": "Streit am Schankraum"
+        },
+        {
+          "id": "NQ-4-23",
+          "title": "Die verlorene Wachstafel"
+        },
+        {
+          "id": "NQ-4-24",
+          "title": "Das Feuer im Speicher"
+        }
+      ]
+    }
+  ]
+}
