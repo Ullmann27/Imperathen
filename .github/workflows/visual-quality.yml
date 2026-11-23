@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - 'art/visual_benchmark/**'
+      - 'prototype/assets/meshy/**'
+      - 'prototype/scripts/visuals/meshy_*'
+      - 'prototype/tests/meshy_*'
+      - 'tests/android_meshy_asset_test.py'
       - 'tools/art/**'
       - '.github/workflows/visual-quality.yml'
   workflow_dispatch:
@@ -17,7 +21,7 @@ concurrency:
 
 jobs:
   static-glb-contract:
-    name: Seven GLB assets (static contract)
+    name: Visual and Meshy asset contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     env:
@@ -28,3 +32,9 @@ jobs:
           persist-credentials: false
       - name: Validate embedded models and materials
         run: python3 tools/art/run_visual_pipeline.py --assets-only
+      - name: Validate Meshy registry and modular loadouts
+        run: |
+          python3 tools/art/validate_meshy_manifest.py
+          python3 tools/art/validate_meshy_loadouts.py
+      - name: Exercise Meshy GLB inspector and staging gates
+        run: python3 -m unittest discover -s tests -p 'android_meshy_asset_test.py'
