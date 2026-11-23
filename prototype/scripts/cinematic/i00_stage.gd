@@ -46,7 +46,14 @@ func ensure_built() -> void:
 
 func anchor(key: String) -> Vector3:
 	ensure_built()
-	return to_global(ANCHORS.get(key, Vector3.ZERO))
+	var local_anchor: Vector3 = ANCHORS.get(key, Vector3.ZERO)
+	# Tests and editor tooling may query the deterministic authored anchors before
+	# this presentation-only stage is attached to the SceneTree. Avoid emitting
+	# an engine error there; production still respects the complete parent/global
+	# transform once the stage is actually mounted.
+	if not is_inside_tree():
+		return position + local_anchor
+	return to_global(local_anchor)
 
 
 func speaker(id: String) -> Node3D:

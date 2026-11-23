@@ -27,10 +27,13 @@ func _run() -> void:
 	game.world.set_physics_process(false)
 	game.ui._finish_intro()
 	game.ui.action_requested.emit("new_game", {})
-	_check(game.screen == "opening", "Production New Life reaches the authored village beginning")
+	_check(game.screen == "opening" and game.opening_sequence.id == "i00_aquileia", "Production New Life reaches the I-00 Aquileia cold open")
 	game._opening_skip()
 	game._opening_next()
-	_check(game.screen == "playing" and game.model.data.player.age == 12 and Combat.enabled(game.model.data), "The actual new child receives movement and combat controls")
+	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_home", "I-00 hands the same saved life to the family opening")
+	game._opening_skip()
+	game._opening_next()
+	_check(game.screen == "playing" and game.model.data.player.age == 12 and Combat.enabled(game.model.data), "The actual new child receives movement and combat controls after both authored openings")
 	await _frames(3)
 
 	# Clear existing terrain allows a measured straight-line pace comparison.

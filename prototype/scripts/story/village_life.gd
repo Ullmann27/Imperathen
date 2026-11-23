@@ -97,7 +97,10 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 	invalid = validate(candidate)
 	if not invalid.is_empty():
 		return _fail("Dorfauftrag verworfen: " + invalid)
-	for key: String in ["village", "resources", "player", "companion"]:
+	# Village-life commands in this module mutate only these authoritative
+	# domains. Companion state is neither read nor changed here, so requiring it
+	# would make the reusable village contract depend on unrelated campaign data.
+	for key: String in ["village", "resources", "player"]:
 		data[key] = candidate[key]
 	return result
 
