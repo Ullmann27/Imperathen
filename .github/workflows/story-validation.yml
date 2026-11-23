@@ -15,6 +15,7 @@ on:
       - 'prototype/tests/opening_story_test.gd'
       - 'prototype/tests/opening_director_test.gd'
       - 'prototype/tests/opening_flow_test.gd'
+      - 'prototype/tests/i00_stage_test.gd'
       - 'tools/story/**'
       - 'tests/android_campaign_bible_test.py'
       - '.github/workflows/story-validation.yml'
@@ -37,7 +38,7 @@ jobs:
       GODOT_SILENCE_ROOT_WARNING: '1'
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
       - name: Validate source-derived campaign registry
@@ -71,4 +72,5 @@ jobs:
         run: |
           "$GODOT_BIN" --headless --path prototype --script res://tests/opening_story_test.gd
           "$GODOT_BIN" --headless --path prototype --script res://tests/opening_director_test.gd
+          "$GODOT_BIN" --headless --path prototype --script res://tests/i00_stage_test.gd
           "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/opening_flow_test.gd
