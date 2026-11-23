@@ -10,7 +10,7 @@ import sys
 
 
 ALLOWED_STATUS = {"ready_in_meshy", "geometry_ready_untextured"}
-ALLOWED_CATEGORIES = {"weapon", "character", "equipment", "resource"}
+ALLOWED_CATEGORIES = {"weapon", "character", "equipment", "resource", "mount"}
 
 
 def fail(message: str) -> None:
@@ -83,8 +83,8 @@ def validate(path: Path) -> dict:
 
         if asset.get("format") != "glb":
             fail(f"{label}: format must be glb")
-        if category == "character" and asset.get("rigging_required") is not True:
-            fail(f"{label}: character must require rigging")
+        if category in {"character", "mount"} and asset.get("rigging_required") is not True:
+            fail(f"{label}: {category} must require rigging")
 
     return {
         "assets": len(assets),
