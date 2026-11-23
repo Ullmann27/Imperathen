@@ -242,7 +242,10 @@ func _test_nearby_work_and_save() -> void:
 	_ok(model.save_game(_path("midwork")), "Save a partially worked station while away")
 	var resumed = WorldModel.new()
 	_ok(resumed.load_game(_path("midwork")), "Reload the actual mid-work save")
-	_check(_snapshot(resumed.data.village.childhood) == frozen, "Save/load preserves partial work, tasks, possessions and family relations")
+	# JSON persistence does not preserve an int-vs-float token distinction.
+	# Normalize both complete structures through the same parser; every key,
+	# collection and numeric value still has to match.
+	_check(JSON.parse_string(_snapshot(resumed.data.village.childhood)) == JSON.parse_string(frozen), "Save/load preserves partial work, tasks, possessions and family relations")
 	_at(resumed, Childhood.POINTS.bellows)
 	var whole = WorldModel.new()
 	whole.data = resumed.data.duplicate(true)
