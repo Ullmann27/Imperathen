@@ -143,6 +143,11 @@ static func migrate_legacy_ids(data: Dictionary) -> bool:
 		relationships[canonical_id] = legacy_relation.duplicate(true)
 	child.relationships = relationships
 	child.version = VERSION
+	# Version-one childhood saves were produced before the four-volume campaign
+	# was made authoritative and therefore carried the generic Trajan-era marker.
+	# The existence of childhood itself proves this is the Valdora campaign path.
+	data.village.history.start_year = -58
+	data.village.history.mode = "historical_baseline"
 	var old_completed: Array = child.get("completed", [])
 	var passed_family_morning := old_completed.size() >= 3
 	var passed_watch_service := old_completed.has("return_gear") or old_completed.has("family_evening") or old_completed.has("night_rest")
