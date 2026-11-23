@@ -1,0 +1,9 @@
+{
+  "run_id": 45210298631,
+  "job_id": 137816986101,
+  "artifact_id": 14837331432,
+  "source_commit": "a87e3918872ad2aa76aa2359f810658b4821ca0b",
+  "zip_sha256": "359c2a2e8c3829bebae492ae09075993c3b05fe278653cbfc1056379becd0025",
+  "github_digest_verified": true,
+  "zip_bytes": 7402555
+}

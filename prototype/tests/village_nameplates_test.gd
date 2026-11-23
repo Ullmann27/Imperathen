@@ -60,6 +60,23 @@ func _run() -> void:
 	world.set_active(true)
 	village._update_nameplates()
 	_check(label.visible, "Returning to play restores a readable resident label")
+	# The older authored population also appears on the continuous atrium route.
+	# Its names must obey the same camera-depth rule as the newer village people.
+	var population: Node3D = world.population
+	var cassian: Node3D = population.actors.cassian
+	var legacy_label := cassian.get_node("Nameplate") as Label3D
+	for offset: Vector3 in [Vector3(-3.5, 0, 0.2), Vector3(0, 0, 0.2), Vector3(0, 0, -4.0)]:
+		camera.global_transform = Transform3D(Basis.IDENTITY, legacy_label.global_position + offset)
+		population.update_nearby(cassian.global_position, true)
+		_check(not legacy_label.visible, "Atrium resident label stays hidden beside, near or behind the camera: " + str(offset))
+	camera.global_transform = Transform3D(Basis.IDENTITY, legacy_label.global_position + Vector3(0, 0, 4.0))
+	population.update_nearby(cassian.global_position, true)
+	_check(legacy_label.visible and _projected_width(camera, legacy_label) < root.size.x * 0.42, "The actual Cassian label remains readable without covering the atrium entrance")
+	population.update_nearby(cassian.global_position, false)
+	_check(not legacy_label.visible, "Hiding world labels also hides the authored population")
+	population.update_nearby(cassian.global_position, true)
+	population.set_active(false)
+	_check(not legacy_label.visible, "Pausing immediately hides the authored population label")
 	world.free()
 	await process_frame
 	print("VILLAGE_NAMEPLATES_RESULT checks=%d failures=%d" % [checks, failures.size()])

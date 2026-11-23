@@ -3,6 +3,7 @@ extends SceneTree
 const Entry=preload("res://main.tscn")
 const Childhood=preload("res://scripts/story/village_childhood.gd")
 const Life=preload("res://scripts/story/village_life.gd")
+const Diagnostics=preload("res://scripts/ui/android_village_diagnostics.gd")
 var game
 var checks:=0
 var failures: Array[String]=[]
@@ -45,6 +46,7 @@ func _run() -> void:
 		game.ui.set_quality(capture_quality)
 	await frames()
 	game.set_process(false)
+	game.set_physics_process(false)
 	game.ui._touch_enabled=true
 	game.ui._finish_intro()
 	game.ui.action_requested.emit("new_game",{})
@@ -60,9 +62,19 @@ func _run() -> void:
 	check(game.ui._objective(game._ui_state())[0]=="Ein Morgen zu Hause","HUD points to mother, not rebuilding")
 	game.ui.update_navigation(game.world.navigation_view())
 	check(game.world.navigation_view().has_target,"First map goal is ready without completing an errand")
+	var observer=Diagnostics.new()
+	observer.session=game
+	root.add_child(observer)
+	observer.set_process(false)
+	var observed_before:=var_to_bytes(game.model.data)
+	var observed:Dictionary=observer.snapshot()
+	check(observed.has("childhood_runtime") and observed.childhood_runtime.stage=="mother_morning","Android observer exposes the actual family start")
+	check(var_to_bytes(game.model.data)==observed_before,"Android family observer cannot mutate authoritative state")
+	check(observed.action_runtime.touch_camera_managed,"Family controls retain managed camera ownership")
 	await capture("01-family-home")
-	var life_state:=JSON.stringify(game.model.data)
 	game._pause()
+	var life_state:=JSON.stringify(game.model.data)
+	game._physics_process(20.0)
 	game._process(20.0)
 	check(JSON.stringify(game.model.data)==life_state,"Pause does not consume childhood or work time")
 	game._resume()
@@ -76,6 +88,7 @@ func _run() -> void:
 	check(game.screen=="village_dialog" and game.village_npc=="antonia","Actual interaction reaches named mother")
 	var choice:=find_button(game.ui,"Mit Mutter den Morgen besprechen")
 	check(choice!=null,"Connected first errand has a real dialogue control")
+	check(observer.snapshot().get("controls",{}).has("childhood_mother_morning"),"Actual mother choice retains command metadata for read-only Android geometry")
 	if choice!=null:
 		touch(choice.get_global_rect().get_center(),7,true)
 		touch(choice.get_global_rect().get_center(),7,false)
@@ -90,13 +103,31 @@ func _run() -> void:
 	var target:Vector2=game.world.navigation_view().target
 	check(target.distance_to(Childhood.POINTS.family_water)<.01,"Map goal follows next quest station")
 	await capture("03-village-controls")
+	# Explicit fixture placement checks the production item action; ADB uses
+	# the actual joystick route instead and never writes the player position.
+	var water:Vector2=Childhood.POINTS.family_water
+	game.world.get_node("Player").position=Vector3(water.x,1.35,water.y)
+	game.model.set_player_position(game.world.get_player_position())
+	game.world.sync_state(game.model.data)
+	await frames()
+	var interact:=find_action(game.ui,"interact")
+	check(interact!=null,"Family item action has the actual touch control")
+	if interact!=null:
+		touch(interact.get_global_rect().get_center(),8,true)
+		touch(interact.get_global_rect().get_center(),8,false)
+	await frames()
+	check(game.model.data.village.childhood.completed==["mother_morning","fill_water"],"Native interaction completes the real water station after the mother action")
+	check(game.model.data.village.childhood.carried.has("water_jug"),"The filled family jug is an actual carried item")
+	var checkpoint:Dictionary=observer.snapshot().get("childhood_runtime",{})
+	check(checkpoint.get("stage")=="father_morning" and checkpoint.get("carried",[]).has("water_jug"),"Android observer reports the new target and stable carried item ID")
 	var saved_id:String=game.model.data.world_id
 	check(game._save(false).ok,"Childhood state saves through production Main")
 	game._show_menu()
 	game._continue_game()
 	await frames()
-	check(game.model.data.world_id==saved_id and game.model.data.village.childhood.completed==["mother_morning"],"Continue retains the completed errand without another reward")
+	check(game.model.data.world_id==saved_id and game.model.data.village.childhood.completed==["mother_morning","fill_water"],"Continue retains both completed family actions without another reward")
 	check(game.model.data.player.age==12,"Continue does not age the boy")
+	check(game.model.data.village.childhood.carried.has("household_coin") and game.model.data.village.childhood.carried.has("water_jug"),"Continue retains the actual household coin and filled jug")
 	for resolution in [Vector2i(960,540),Vector2i(1280,720),Vector2i(1384,1536)]:
 		root.size=resolution
 		await frames(12)
@@ -108,6 +139,10 @@ func _run() -> void:
 		check(rect.end.y<=game.ui._content_size().y-70,"Touch pad raised above bottom edge at "+str(resolution))
 		var navigation=game.ui._screen.find_child("VillageCompass",true,false)
 		check(navigation!=null and navigation.is_visible_in_tree(),"Compass visible at "+str(resolution))
+		if navigation!=null:
+			var objective:Control=game.ui._screen.find_child("ObjectiveCard",true,false)
+			check(not navigation.get_global_rect().intersects(objective.get_global_rect()),"Family objective and north map remain separate")
+			check(not navigation.get_global_rect().intersects(rect),"North map does not cover movement")
 		var combat_controls:Control=game.ui._screen.find_child("TouchActions",true,false)
 		check(combat_controls!=null and not rect.intersects(combat_controls.get_global_rect()),"Combat and movement hit areas do not overlap")
 		var all: Array[Node]=combat_controls.find_children("*","Button",true,false)
@@ -118,7 +153,8 @@ func _run() -> void:
 		await frames(2)
 		var axis:Vector2=game.world.get("_touch_move")
 		check(axis.length()>.25,"Native larger pad generates analog movement")
-		var jab:=find_button(game.ui,"Gerade L")
+		var jab:=find_action(game.ui,"attack")
+		check(jab!=null,"Selected technique uses the actual merged attack control")
 		if jab!=null:
 			touch(jab.get_global_rect().get_center(),4,true)
 			touch(jab.get_global_rect().get_center(),4,false)
@@ -129,26 +165,72 @@ func _run() -> void:
 		if game.world.get("_touch_move")!=Vector2.ZERO:
 			print("PAD_RELEASE_DIAGNOSTIC ",{"index":game.ui._touch_pad.touch_index,"mouse":game.ui._touch_pad._mouse_captured,"axis":game.ui._touch_pad.axis,"world":game.world.get("_touch_move"),"screen":game.screen,"same_pad":pad==game.ui._touch_pad})
 		check(game.world.get("_touch_move")==Vector2.ZERO,"Movement release cannot stick")
+		game._physics_process(.8)
 		game._process(.8)
 	root.size=Vector2i(1280,720)
 	await frames(12)
 	game.ui.show_game(game._ui_state())
-	game.ui.action_requested.emit("run_toggle",{})
-	check(game.world.is_running(),"Dedicated run control switches pace")
-	game.ui.action_requested.emit("run_toggle",{})
-	check(not game.world.is_running(),"Walk remains explicitly selectable")
-	game.ui.action_requested.emit("combat_palette",{})
 	await frames()
-	check(game.screen=="combat_palette","Technique selection pauses the world")
+	var pace:=find_action(game.ui,"pace")
+	var pace_events:Array=[]
+	game.ui.action_requested.connect(func(action:String,payload:Dictionary):
+		if action=="movement_pace":pace_events.append(payload.duplicate(true))
+	)
+	check(pace!=null,"Merged walking/running control exists")
+	if pace!=null:
+		touch(pace.get_global_rect().get_center(),9,true)
+		touch(pace.get_global_rect().get_center(),9,false)
+	await frames()
+	check(game.world.is_running(),"Native tempo control selects running")
+	pace=find_action(game.ui,"pace")
+	if pace!=null:
+		touch(pace.get_global_rect().get_center(),9,true)
+		touch(pace.get_global_rect().get_center(),9,false)
+	await frames()
+	check(not game.world.is_running(),"Walk remains explicitly selectable")
+	check(pace_events==[{"running":true},{"running":false}],"Two native tempo taps send exactly one command each")
+	check(not game.ui._running and find_action(game.ui,"pace").text=="Gehen","Walking caption and UI state agree with the actual world")
+	await tap_action("pace",11)
+	check(game.world.is_running() and game.ui._state.get("running",false),"A native run tap updates the cached layout state immediately")
+	root.size=Vector2i(480,840)
+	await frames(12)
+	check(game.world.is_running() and game.ui._running and find_action(game.ui,"pace").text=="Laufen","Portrait resize preserves the selected running mode and caption")
+	game.ui.show_game(game._ui_state())
+	await frames()
+	check(game.world.is_running() and game.ui._running,"Explicit show_game reads the current world pace without changing it")
+	root.size=Vector2i(1280,720)
+	await frames(12)
+	check(game._save(false).ok,"Running session saves through the actual Main path")
+	game._show_menu()
+	game._continue_game()
+	await frames(12)
+	check(not game.world.is_running() and not game.ui._running and find_action(game.ui,"pace").text=="Gehen","Continue reflects the world's fresh walking mode instead of reapplying stale UI running")
+	game.world.set_running(true)
+	game._refresh()
+	check(game.ui._running and find_action(game.ui,"pace").text=="Laufen","Live state refresh reflects running selected by the world")
+	game.world.set_running(false)
+	game._refresh()
+	check(not game.ui._running and find_action(game.ui,"pace").text=="Gehen","Live state refresh reflects walking selected by the world")
+	var techniques:=find_action(game.ui,"techniques")
+	check(techniques!=null,"Merged technique picker exists")
+	if techniques!=null:
+		touch(techniques.get_global_rect().get_center(),10,true)
+		touch(techniques.get_global_rect().get_center(),10,false)
+	await frames()
+	check(game.screen=="playing" and game.ui._technique_menu_layer.visible,"Technique selection uses the existing modal inside gameplay")
+	check(not game.ui._touch_pad.is_visible_in_tree() and game.world.get("_touch_move")==Vector2.ZERO,"Technique modal cancels and hides gameplay contacts")
+	var palette:Dictionary=observer.snapshot()
+	check(palette.get("controls",{}).has("technique_jab_right") and not palette.get("controls",{}).has("move_pad"),"Android geometry includes selectable techniques and excludes blocked controls")
 	await capture("04-techniques")
 	root.go_back_requested.emit()
-	check(game.screen=="playing","Android Back leaves the technique selection")
+	check(game.screen=="playing" and not game.ui._technique_menu_layer.visible,"Android Back closes the technique modal first")
 	check(not game.model.execute("train",{}).ok,"New chapter rejects old six-year shortcut")
 	check(not game.model.execute("village_request_work",{}).ok,"A child cannot redistribute all villagers")
 	if not capture_dir.is_empty():
 		var file:=FileAccess.open(capture_dir.path_join("integration-report.json"),FileAccess.WRITE)
 		file.store_string(JSON.stringify({"checks":checks,"failures":failures,"captures":captures,"quality":game.world.get_quality_profile(),"travel":"explicit test fixture positioning; not a timed player walkthrough"}, "\t"))
 		file.close()
+	observer.queue_free()
 	game.queue_free()
 	await frames()
 	print(("CHILDHOOD_INTEGRATION_PASS" if failures.is_empty() else "CHILDHOOD_INTEGRATION_FAILED")+" checks=%d failures=%d"%[checks,failures.size()])
@@ -160,6 +242,26 @@ func touch(at:Vector2,index:int,pressed:bool) -> void:
 	event.position=at
 	event.pressed=pressed
 	Input.parse_input_event(event)
+
+func tap_action(action:String,index:int) -> void:
+	var button:=find_action(game.ui,action)
+	check(button!=null,"Visible native action exists: "+action)
+	if button==null:return
+	var at:=button.get_global_rect().get_center()
+	touch(at,index,true)
+	await process_frame
+	touch(at,index,false)
+	await frames()
+
+func find_action(node:Node,action:String) -> Button:
+	if node.is_queued_for_deletion() or (node is Control and not node.is_visible_in_tree()):
+		return null
+	if node is Button and str(node.get_meta("touch_action",""))==action:
+		return node
+	for child:Node in node.get_children():
+		var found:=find_action(child,action)
+		if found!=null:return found
+	return null
 
 func find_button(node:Node,caption:String) -> Button:
 	if node is Button and node.text.strip_edges().begins_with(caption):

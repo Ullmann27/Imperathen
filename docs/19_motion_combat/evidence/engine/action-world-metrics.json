@@ -1,0 +1,17 @@
+{
+  "android_device_test": false,
+  "atrium_end_position": [
+    14.0,
+    0.8883136510849,
+    -28.8433055877686
+  ],
+  "checks": 43,
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "physics_step_hz": 60,
+  "practice_hits_after_restart": 24,
+  "run_speed_m_s": 3.80001044273376,
+  "test_scenario": "Actual main scene; controlled placements isolate terrain, atrium, residents and practice. No claim of a continuous manual walk between fixtures.",
+  "walk_distance_in_2_seconds_m": 2.70169448852539,
+  "walk_speed_m_s": 1.45019519329071
+}

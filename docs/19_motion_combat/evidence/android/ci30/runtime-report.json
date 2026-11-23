@@ -1,0 +1,385 @@
+{
+  "platform": "Android emulator",
+  "apk_sha256": "80f3f0f10123ac0a2c456f73e0d32bb14444292849dd17617b0fac743a0be39a",
+  "physical_device_test": false,
+  "arm64_runtime_test": false,
+  "status": "failed",
+  "checks": [
+    {
+      "name": "single_emulator_target",
+      "passed": true,
+      "detail": [
+        {
+          "serial": "emulator-5554",
+          "state": "offline"
+        }
+      ]
+    },
+    {
+      "name": "emulator_verified",
+      "passed": true,
+      "detail": {
+        "serial": "emulator-5554",
+        "ro.kernel.qemu": "1"
+      }
+    },
+    {
+      "name": "expected_android_emulator",
+      "passed": true,
+      "detail": {
+        "api_level": "35",
+        "abi": "x86_64",
+        "model": "sdk_gphone64_x86_64"
+      }
+    },
+    {
+      "name": "apk_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "clean_test_app_data",
+      "passed": true,
+      "detail": "Success"
+    },
+    {
+      "name": "launcher",
+      "passed": true,
+      "detail": "at.heinz.imperathen/com.godot.game.GodotAppLauncher"
+    },
+    {
+      "name": "activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 3206\nWaitTime: 3287\nComplete"
+    },
+    {
+      "name": "process_started",
+      "passed": true,
+      "detail": "3389"
+    },
+    {
+      "name": "first_launch_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "first_launch_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "real_menu",
+      "passed": true,
+      "detail": {
+        "new_game": [
+          156.75,
+          237.0
+        ]
+      }
+    },
+    {
+      "name": "menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "touch_starts_saved_game",
+      "passed": true,
+      "detail": "New game button produced a saved village"
+    },
+    {
+      "name": "family_opening_is_actual_new_game",
+      "passed": true,
+      "detail": "childhood_home"
+    },
+    {
+      "name": "opening_before_gameplay",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.15,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "android_back_pauses_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            799.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.4,
+        "final": false,
+        "index": 0,
+        "paused": true,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "android_back_resumes_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.541140666666666,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.14228,
+        "final": false,
+        "index": 1,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.117729333333334,
+        "final": false,
+        "index": 2,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            911.625,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.0,
+        "final": true,
+        "index": 3,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "family_intro_reaches_first_objective",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            911.625,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.0,
+        "final": true,
+        "index": 3,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "objective_hands_over_control",
+      "passed": true,
+      "detail": "Actual touch accepted the objective after the opening controls"
+    },
+    {
+      "name": "actual_family_start",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [],
+        "completed": [],
+        "day": 1,
+        "dialog_npc": "",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "mother_morning",
+        "target_npc": "antonia",
+        "target_point": "",
+        "target_position": [
+          -15.3000001907349,
+          14.8000001907349
+        ],
+        "target_radius": 3.2,
+        "version": 1,
+        "world_id": "52941009-2352555344"
+      }
+    }
+  ],
+  "errors": [
+    "No matching village runtime state: playing; required control: None; last observed: {\"controls\": [\"attack\", \"commands\", \"dodge\", \"guard\", \"interact\", \"move_pad\", \"pace\", \"pause\", \"techniques\", \"village\"], \"feedback\": \"\", \"screen\": \"playing\"}"
+  ],
+  "source_commit": "db90dee785cbaef97a5d85357b7b9cda762dc9cd",
+  "test_harness_commit": "db90dee785cbaef97a5d85357b7b9cda762dc9cd",
+  "apk_file": "IMPERATHEN-db90dee7-emulator.apk",
+  "action_controls_expected": true,
+  "story_route": "childhood_home",
+  "serial": "emulator-5554",
+  "android_version": "15",
+  "api_level": "35",
+  "abi": "x86_64",
+  "model": "sdk_gphone64_x86_64",
+  "pid": "3389",
+  "screenshots": {
+    "00_android_intro.png": {
+      "sha256": "487552af8bfc17bb28ebfe165119cff1589b537a3ad091598f5efdcd23b3b054",
+      "width": 960,
+      "height": 540
+    },
+    "01_android_menu.png": {
+      "sha256": "b37cc62783746ea65e5a66cef0c849a684fbbf8a95c14e465609f49ad0050f7a",
+      "width": 960,
+      "height": 540
+    },
+    "10_android_opening.png": {
+      "sha256": "7b02fc8706f8bea156bdbb8f1dedae58af6a6d667e081afe217e862c01aa0ddf",
+      "width": 960,
+      "height": 540
+    },
+    "11_android_opening_objective.png": {
+      "sha256": "df58496a23aae44850d230d43e50f7ab79c24b3d6b7833fffdee64f712365d03",
+      "width": 960,
+      "height": 540
+    },
+    "15_android_family_home.png": {
+      "sha256": "f7e182183b202507acee6ba5c48db69ad53250689162ce6dd1504b4e2dfaa4dd",
+      "width": 960,
+      "height": 540
+    },
+    "failure.png": {
+      "sha256": "0ce5b4068777480c534c039d47b3fd502924e158fd0381599f5b8b5f613c832d",
+      "width": 960,
+      "height": 540
+    }
+  },
+  "focused_windows": [
+    "mCurrentFocus=Window{165ce70 u0 at.heinz.imperathen/com.godot.game.GodotAppLauncher}",
+    "mFocusedApp=ActivityRecord{fc196ce u0 at.heinz.imperathen/com.godot.game.GodotAppLauncher t8}",
+    "mPreferredTopFocusableRootTask=Task{53f516f #8 type=standard A=10209:at.heinz.imperathen}",
+    "mLastFocusedRootTask=Task{53f516f #8 type=standard A=10209:at.heinz.imperathen}",
+    "mFocusedWindow=Window{165ce70 u0 at.heinz.imperathen/com.godot.game.GodotAppLauncher}"
+  ],
+  "last_game_messages": [
+    "11-23 15:29:17.046  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-3 3 7 IjI4NzEyNTI4MjA0NCIsInJlY3QiOls4NDAuMCwzNzguMCwxMTEuMCw0NS4wXSwidmlzaWJsZSI6dHJ1ZX0sImd1YXJkIjp7ImNlbnRlciI6Wzc3OC41LDQwMC41XSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODY5OTEwNjQzMTAiLCJyZWN0IjpbNzIzLjAsMzc4LjAsMTExLjAsNDUuMF0sInZpc2libGUiOnRydWV9LCJpbnRlcmFjdCI6eyJjZW50ZXIiOls3NzguNSwzNDkuNV0sImVuYWJsZWQiOnRydWUsImluc3RhbmNlX2lkIjoiMjg2NzIyNjI4ODQzIiwicmVjdCI6WzcyMy4wLDMyNy4wLDExMS4wLDQ1LjBdLCJ2aXNpYmxlIjp0cnVlfSwibW92ZV9wYWQiOnsiYXhpc19wb2ludHMiOnsiY2VudGVyIjpbOTAuMCwzOTMuMF0sImRvd24iOls5MC4wLDQ0NC44Mzk5",
+    "11-23 15:29:17.046  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-3 4 7 OTYzMzc4OTFdLCJsZWZ0IjpbMzguMTU5OTk2MDMyNzE0OCwzOTMuMF0sInJpZ2h0IjpbMTQxLjgzOTk5NjMzNzg5MSwzOTMuMF0sInVwIjpbOTAuMCwzNDEuMTYwMDAzNjYyMTA5XX0sImNlbnRlciI6WzkwLjAsMzkzLjBdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjI4NjYyMTk2NTU0MSIsInJlY3QiOls5LjAsMzEyLjAsMTYyLjAsMTYyLjBdLCJ2aXNpYmxlIjp0cnVlfSwicGFjZSI6eyJjZW50ZXIiOls4OTUuNSw0NTEuNV0sImVuYWJsZWQiOnRydWUsImluc3RhbmNlX2lkIjoiMjg3MzkzNzE3NTEyIiwicmVjdCI6Wzg0MC4wLDQyOS4wLDExMS4wLDQ1LjBdLCJ2aXNpYmxlIjp0cnVlfSwicGF1c2UiOnsiY2VudGVyIjpbOTE2Ljg3NSwzMy4wXSwiZW5hYmxlZCI6",
+    "11-23 15:29:17.046  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-3 5 7 dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODQyMzk1OTg0MDIiLCJyZWN0IjpbODkwLjI1LDE1LjAsNTMuMjUsMzYuMF0sInZpc2libGUiOnRydWV9LCJ0ZWNobmlxdWVzIjp7ImNlbnRlciI6Wzc3OC41LDQ1MS41XSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODcyNTk0OTk3NzgiLCJyZWN0IjpbNzIzLjAsNDI5LjAsMTExLjAsNDUuMF0sInZpc2libGUiOnRydWV9LCJ2aWxsYWdlIjp7ImNlbnRlciI6WzY2Ni4wLDUwNy4wXSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODU0MzA3ODMxMzUiLCJyZWN0IjpbNTc1LjI1LDQ4OS4wLDE4MS41LDM2LjBdLCJ2aXNpYmxlIjp0cnVlfX0sImRlY2ltdXNfbWV0IjpmYWxzZSwiZmVlZGJhY2siOiIiLCJwZW9wbGUiOjE0",
+    "11-23 15:29:17.046  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-3 6 7 LCJwbGF5ZXJfaXNfcnVsZXIiOmZhbHNlLCJzY3JlZW4iOiJwbGF5aW5nIiwid29ya19wZXJtaXQiOmZhbHNlLCJ3b3JrcGxhY2VzIjo1LCJ3b3JsZF9zZWNvbmRzIjoyLjl9",
+    "11-23 15:29:32.175  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-4 0 7 eyJhY3Rpb25fbW9kZSI6InVuYXJtZWQiLCJhY3Rpb25fcnVudGltZSI6eyJhY3Rpb25fdG91Y2hlcyI6MCwiYm9keV92ZWxvY2l0eSI6WzAuMCwwLjAsMC4wXSwiY2FtZXJhX3RvdWNoZXMiOjAsImNhbWVyYV95YXciOjAuNjIsIm1vZGUiOiJwZXJzb24iLCJtb3ZlX2F4aXMiOlswLjAsMC4wXSwibW92ZW1lbnRfdG91Y2giOi0xLCJvdmVybGF5Ijoibm9uZSIsInBvc2l0aW9uIjpbLTEyLjAsMS4yOTI1NzgyMjAzNjc0MywxMS42OTk5OTk4MDkyNjUxXSwicnVubmluZyI6ZmFsc2UsInNlbGVjdGVkX3RlY2huaXF1ZSI6ImphYl9sZWZ0IiwidG91Y2hfY2FtZXJhX21hbmFnZWQiOnRydWUsInVpX3ZpZXciOiJnYW1lIiwidmVsb2NpdHkiOlswLjAsMC4wLDAuMF0sInZlcnNpb24i",
+    "11-23 15:29:32.175  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-4 1 7 OjEsIndvcmxkX2FjdGl2ZSI6dHJ1ZSwid29ybGRfY2FtZXJhX3RvdWNoZXMiOjB9LCJhY3RvcnMiOjE1LCJhZWxpYV9hc3NpZ25tZW50IjoiaWRsZSIsImNoaWxkaG9vZF9ydW50aW1lIjp7ImFnZSI6MTIsImNhcnJpZWQiOltdLCJjb21wbGV0ZWQiOltdLCJkYXkiOjEsImRpYWxvZ19ucGMiOiIiLCJmYW1pbHlfZW50cmFuY2UiOlstMTMuMCwxNC42OTk5OTk4MDkyNjUxXSwiZmFtaWx5X3dhdGVyIjpbLTEyLjAsMTEuNjk5OTk5ODA5MjY1MV0sInN0YWdlIjoibW90aGVyX21vcm5pbmciLCJ0YXJnZXRfbnBjIjoiYW50b25pYSIsInRhcmdldF9wb2ludCI6IiIsInRhcmdldF9wb3NpdGlvbiI6Wy0xNS4zMDAwMDAxOTA3MzQ5LDE0LjgwMDAwMDE5MDczNDldLCJ0YXJnZXRfcmFk",
+    "11-23 15:29:32.175  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-4 2 7 aXVzIjozLjIsInZlcnNpb24iOjEsIndvcmxkX2lkIjoiNTI5NDEwMDktMjM1MjU1NTM0NCJ9LCJjb250cm9scyI6eyJhdHRhY2siOnsiY2VudGVyIjpbODk1LjUsMzQ5LjVdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjI4Njg1Njg0NjU3NiIsInJlY3QiOls4NDAuMCwzMjcuMCwxMTEuMCw0NS4wXSwidmlzaWJsZSI6dHJ1ZX0sImNvbW1hbmRzIjp7ImNlbnRlciI6Wzg1Mi4zNzUsNTA3LjBdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjI4NTUxNDY2OTIyMCIsInJlY3QiOls3NjEuMjUsNDg5LjAsMTgyLjI1LDM2LjBdLCJ2aXNpYmxlIjp0cnVlfSwiZG9kZ2UiOnsiY2VudGVyIjpbODk1LjUsNDAwLjVdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6",
+    "11-23 15:29:32.175  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-4 3 7 IjI4NzEyNTI4MjA0NCIsInJlY3QiOls4NDAuMCwzNzguMCwxMTEuMCw0NS4wXSwidmlzaWJsZSI6dHJ1ZX0sImd1YXJkIjp7ImNlbnRlciI6Wzc3OC41LDQwMC41XSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODY5OTEwNjQzMTAiLCJyZWN0IjpbNzIzLjAsMzc4LjAsMTExLjAsNDUuMF0sInZpc2libGUiOnRydWV9LCJpbnRlcmFjdCI6eyJjZW50ZXIiOls3NzguNSwzNDkuNV0sImVuYWJsZWQiOnRydWUsImluc3RhbmNlX2lkIjoiMjg2NzIyNjI4ODQzIiwicmVjdCI6WzcyMy4wLDMyNy4wLDExMS4wLDQ1LjBdLCJ2aXNpYmxlIjp0cnVlfSwibW92ZV9wYWQiOnsiYXhpc19wb2ludHMiOnsiY2VudGVyIjpbOTAuMCwzOTMuMF0sImRvd24iOls5MC4wLDQ0NC44Mzk5",
+    "11-23 15:29:32.175  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-4 4 7 OTYzMzc4OTFdLCJsZWZ0IjpbMzguMTU5OTk2MDMyNzE0OCwzOTMuMF0sInJpZ2h0IjpbMTQxLjgzOTk5NjMzNzg5MSwzOTMuMF0sInVwIjpbOTAuMCwzNDEuMTYwMDAzNjYyMTA5XX0sImNlbnRlciI6WzkwLjAsMzkzLjBdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjI4NjYyMTk2NTU0MSIsInJlY3QiOls5LjAsMzEyLjAsMTYyLjAsMTYyLjBdLCJ2aXNpYmxlIjp0cnVlfSwicGFjZSI6eyJjZW50ZXIiOls4OTUuNSw0NTEuNV0sImVuYWJsZWQiOnRydWUsImluc3RhbmNlX2lkIjoiMjg3MzkzNzE3NTEyIiwicmVjdCI6Wzg0MC4wLDQyOS4wLDExMS4wLDQ1LjBdLCJ2aXNpYmxlIjp0cnVlfSwicGF1c2UiOnsiY2VudGVyIjpbOTE2Ljg3NSwzMy4wXSwiZW5hYmxlZCI6",
+    "11-23 15:29:32.175  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-4 5 7 dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODQyMzk1OTg0MDIiLCJyZWN0IjpbODkwLjI1LDE1LjAsNTMuMjUsMzYuMF0sInZpc2libGUiOnRydWV9LCJ0ZWNobmlxdWVzIjp7ImNlbnRlciI6Wzc3OC41LDQ1MS41XSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODcyNTk0OTk3NzgiLCJyZWN0IjpbNzIzLjAsNDI5LjAsMTExLjAsNDUuMF0sInZpc2libGUiOnRydWV9LCJ2aWxsYWdlIjp7ImNlbnRlciI6WzY2Ni4wLDUwNy4wXSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODU0MzA3ODMxMzUiLCJyZWN0IjpbNTc1LjI1LDQ4OS4wLDE4MS41LDM2LjBdLCJ2aXNpYmxlIjp0cnVlfX0sImRlY2ltdXNfbWV0IjpmYWxzZSwiZmVlZGJhY2siOiIiLCJwZW9wbGUiOjE0",
+    "11-23 15:29:32.175  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-4 6 7 LCJwbGF5ZXJfaXNfcnVsZXIiOmZhbHNlLCJzY3JlZW4iOiJwbGF5aW5nIiwid29ya19wZXJtaXQiOmZhbHNlLCJ3b3JrcGxhY2VzIjo1LCJ3b3JsZF9zZWNvbmRzIjo0LjB9",
+    "11-23 15:29:47.245  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-5 0 7 eyJhY3Rpb25fbW9kZSI6InVuYXJtZWQiLCJhY3Rpb25fcnVudGltZSI6eyJhY3Rpb25fdG91Y2hlcyI6MCwiYm9keV92ZWxvY2l0eSI6WzAuMCwwLjAsMC4wXSwiY2FtZXJhX3RvdWNoZXMiOjAsImNhbWVyYV95YXciOjAuNjIsIm1vZGUiOiJwZXJzb24iLCJtb3ZlX2F4aXMiOlswLjAsMC4wXSwibW92ZW1lbnRfdG91Y2giOi0xLCJvdmVybGF5Ijoibm9uZSIsInBvc2l0aW9uIjpbLTEyLjAsMS4yOTI1NzgyMjAzNjc0MywxMS42OTk5OTk4MDkyNjUxXSwicnVubmluZyI6ZmFsc2UsInNlbGVjdGVkX3RlY2huaXF1ZSI6ImphYl9sZWZ0IiwidG91Y2hfY2FtZXJhX21hbmFnZWQiOnRydWUsInVpX3ZpZXciOiJnYW1lIiwidmVsb2NpdHkiOlswLjAsMC4wLDAuMF0sInZlcnNpb24i",
+    "11-23 15:29:47.247  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-5 1 7 OjEsIndvcmxkX2FjdGl2ZSI6dHJ1ZSwid29ybGRfY2FtZXJhX3RvdWNoZXMiOjB9LCJhY3RvcnMiOjE1LCJhZWxpYV9hc3NpZ25tZW50IjoiaWRsZSIsImNoaWxkaG9vZF9ydW50aW1lIjp7ImFnZSI6MTIsImNhcnJpZWQiOltdLCJjb21wbGV0ZWQiOltdLCJkYXkiOjEsImRpYWxvZ19ucGMiOiIiLCJmYW1pbHlfZW50cmFuY2UiOlstMTMuMCwxNC42OTk5OTk4MDkyNjUxXSwiZmFtaWx5X3dhdGVyIjpbLTEyLjAsMTEuNjk5OTk5ODA5MjY1MV0sInN0YWdlIjoibW90aGVyX21vcm5pbmciLCJ0YXJnZXRfbnBjIjoiYW50b25pYSIsInRhcmdldF9wb2ludCI6IiIsInRhcmdldF9wb3NpdGlvbiI6Wy0xNS4zMDAwMDAxOTA3MzQ5LDE0LjgwMDAwMDE5MDczNDldLCJ0YXJnZXRfcmFk",
+    "11-23 15:29:47.247  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-5 2 7 aXVzIjozLjIsInZlcnNpb24iOjEsIndvcmxkX2lkIjoiNTI5NDEwMDktMjM1MjU1NTM0NCJ9LCJjb250cm9scyI6eyJhdHRhY2siOnsiY2VudGVyIjpbODk1LjUsMzQ5LjVdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjI4Njg1Njg0NjU3NiIsInJlY3QiOls4NDAuMCwzMjcuMCwxMTEuMCw0NS4wXSwidmlzaWJsZSI6dHJ1ZX0sImNvbW1hbmRzIjp7ImNlbnRlciI6Wzg1Mi4zNzUsNTA3LjBdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjI4NTUxNDY2OTIyMCIsInJlY3QiOls3NjEuMjUsNDg5LjAsMTgyLjI1LDM2LjBdLCJ2aXNpYmxlIjp0cnVlfSwiZG9kZ2UiOnsiY2VudGVyIjpbODk1LjUsNDAwLjVdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6",
+    "11-23 15:29:47.247  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-5 3 7 IjI4NzEyNTI4MjA0NCIsInJlY3QiOls4NDAuMCwzNzguMCwxMTEuMCw0NS4wXSwidmlzaWJsZSI6dHJ1ZX0sImd1YXJkIjp7ImNlbnRlciI6Wzc3OC41LDQwMC41XSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODY5OTEwNjQzMTAiLCJyZWN0IjpbNzIzLjAsMzc4LjAsMTExLjAsNDUuMF0sInZpc2libGUiOnRydWV9LCJpbnRlcmFjdCI6eyJjZW50ZXIiOls3NzguNSwzNDkuNV0sImVuYWJsZWQiOnRydWUsImluc3RhbmNlX2lkIjoiMjg2NzIyNjI4ODQzIiwicmVjdCI6WzcyMy4wLDMyNy4wLDExMS4wLDQ1LjBdLCJ2aXNpYmxlIjp0cnVlfSwibW92ZV9wYWQiOnsiYXhpc19wb2ludHMiOnsiY2VudGVyIjpbOTAuMCwzOTMuMF0sImRvd24iOls5MC4wLDQ0NC44Mzk5",
+    "11-23 15:29:47.247  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-5 4 7 OTYzMzc4OTFdLCJsZWZ0IjpbMzguMTU5OTk2MDMyNzE0OCwzOTMuMF0sInJpZ2h0IjpbMTQxLjgzOTk5NjMzNzg5MSwzOTMuMF0sInVwIjpbOTAuMCwzNDEuMTYwMDAzNjYyMTA5XX0sImNlbnRlciI6WzkwLjAsMzkzLjBdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjI4NjYyMTk2NTU0MSIsInJlY3QiOls5LjAsMzEyLjAsMTYyLjAsMTYyLjBdLCJ2aXNpYmxlIjp0cnVlfSwicGFjZSI6eyJjZW50ZXIiOls4OTUuNSw0NTEuNV0sImVuYWJsZWQiOnRydWUsImluc3RhbmNlX2lkIjoiMjg3MzkzNzE3NTEyIiwicmVjdCI6Wzg0MC4wLDQyOS4wLDExMS4wLDQ1LjBdLCJ2aXNpYmxlIjp0cnVlfSwicGF1c2UiOnsiY2VudGVyIjpbOTE2Ljg3NSwzMy4wXSwiZW5hYmxlZCI6",
+    "11-23 15:29:47.247  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-5 5 7 dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODQyMzk1OTg0MDIiLCJyZWN0IjpbODkwLjI1LDE1LjAsNTMuMjUsMzYuMF0sInZpc2libGUiOnRydWV9LCJ0ZWNobmlxdWVzIjp7ImNlbnRlciI6Wzc3OC41LDQ1MS41XSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODcyNTk0OTk3NzgiLCJyZWN0IjpbNzIzLjAsNDI5LjAsMTExLjAsNDUuMF0sInZpc2libGUiOnRydWV9LCJ2aWxsYWdlIjp7ImNlbnRlciI6WzY2Ni4wLDUwNy4wXSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIyODU0MzA3ODMxMzUiLCJyZWN0IjpbNTc1LjI1LDQ4OS4wLDE4MS41LDM2LjBdLCJ2aXNpYmxlIjp0cnVlfX0sImRlY2ltdXNfbWV0IjpmYWxzZSwiZmVlZGJhY2siOiIiLCJwZW9wbGUiOjE0",
+    "11-23 15:29:47.247  3389  3472 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 182821328711-5 6 7 LCJwbGF5ZXJfaXNfcnVsZXIiOmZhbHNlLCJzY3JlZW4iOiJwbGF5aW5nIiwid29ya19wZXJtaXQiOmZhbHNlLCJ3b3JrcGxhY2VzIjo1LCJ3b3JsZF9zZWNvbmRzIjo1LjF9"
+  ]
+}

@@ -57,6 +57,8 @@ func _add_resident(item: Dictionary, index: int) -> void:
 	figure.configure_resident("italia",int(item.age),item.appearance,index,get_viewport().get_camera_3d())
 	var nameplate := Art.label(actor,item.name+" · "+item.occupation,Vector3(0,2.05,0),Color("#efdbad"),29)
 	nameplate.name = "Nameplate"
+	nameplate.pixel_size = .003
+	nameplate.visibility_range_begin = 3.0
 	nameplate.visibility_range_end = 7.0
 	nameplate.hide()
 	actors[item.id] = actor
@@ -81,6 +83,7 @@ func set_active(enabled: bool) -> void:
 	if not active:
 		for actor: Node3D in actors.values():
 			actor.get_node("Figure").drive(0.0)
+			actor.get_node("Nameplate").hide()
 
 func advance_to(time: float, force := false) -> void:
 	if not active and not force:
@@ -190,9 +193,17 @@ func _free_start(desired: Vector3, origin: Vector3, occupied: Array[Vector3], ex
 func update_nearby(player_position: Vector3, show_labels: bool) -> void:
 	_player_position = player_position
 	var closest := nearest_npc(player_position,5.0)
+	var camera := get_viewport().get_camera_3d()
 	for id: String in actors:
 		var actor: Node3D = actors[id]
-		actor.get_node("Nameplate").visible = show_labels and actor.visible and id == closest and focused_id.is_empty()
+		var label := actor.get_node("Nameplate") as Label3D
+		label.visible = false
+		if not show_labels or not actor.visible or id != closest or not focused_id.is_empty() or camera == null:
+			continue
+		# The radial range alone allows a nearby side label to cross the camera's
+		# near plane at enormous size. Match the inhabited-village depth guard.
+		var camera_position := camera.global_transform.affine_inverse() * label.global_position
+		label.visible = -camera_position.z >= 3.0 and camera_position.length() <= 7.0
 
 func nearest_npc(position: Vector3, radius: float) -> String:
 	var best := ""

@@ -1,6 +1,7 @@
 extends RefCounted
-## Corrected locomotion and non-graphic practice poses, baked once per rig.
-## Imported leg placement stays authoritative. No per-frame IK or model mutation.
+## Original baked animation alternative from the childhood branch.
+## Production VillagePerson uses CharacterMotion and never installs this second
+## library: locomotion and sampled combat must have one skeletal pose owner.
 
 const DURATIONS := {"jab_left":.62, "jab_right":.68, "hook_left":.82, "hook_right":.82,
 	"uppercut_left":.90, "uppercut_right":.90, "headbutt":.76,

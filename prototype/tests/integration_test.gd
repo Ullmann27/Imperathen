@@ -22,6 +22,9 @@ func _run() -> void:
 	game = EntryScene.instantiate()
 	root.add_child(game)
 	await process_frame
+	game.set_process(false)
+	game.set_physics_process(false)
+	game.world.set_physics_process(false)
 	_check(game.screen == "intro", "The actual main scene begins with the intro")
 	game.ui._finish_intro()
 	_check(game.screen == "menu", "Skipping the intro opens the real main menu")
@@ -95,7 +98,7 @@ func _run() -> void:
 	game.ui.action_requested.emit("interact", {})
 	_check(game.screen == "dialog", "The nearby companion opens a modal dialogue")
 	var frozen_time: float = game.model.data.world_seconds
-	game._process(20.0)
+	_advance_game(20.0)
 	_check(game.model.data.world_seconds == frozen_time, "A companion dialogue pauses simulation time")
 	game.ui.action_requested.emit("companion_help", {"choice": "help"})
 	_check(game.model.data.companion.trust == 20 and game.model.data.resources.wood == 8, "Helping the companion spends actual wood and persists trust")
@@ -124,10 +127,10 @@ func _run() -> void:
 		quit(1)
 		return
 	game.ui.action_requested.emit("pause", {})
-	game._process(30.0)
+	_advance_game(30.0)
 	_check(game.model.data.buildings[0].progress == 0.0, "Construction does not advance while paused")
 	game.ui.action_requested.emit("resume", {})
-	game._process(13.0)
+	_advance_game(13.0)
 	_check(game.model.data.buildings[0].completed, "Nearby player work completes construction")
 	_check(game.world.get_node("PlayerBuildings").get_child_count() == 1, "The finished domain building appears in the 3D world")
 	var place: Vector3 = game.world.get_player_position()
@@ -135,12 +138,13 @@ func _run() -> void:
 		game.ui.action_requested.emit("mode_" + view, {})
 	_check(game.world.get_player_position().is_equal_approx(place), "All three camera modes preserve the same person and world")
 	_complete_village_phase()
-	_move_fixture(Vector3(0, 1, -7))
+	_move_fixture(Vector3(0, 1, -6))
 	game.ui.action_requested.emit("train", {})
 	_check(game.model.data.player.age == 18 and game.model.data.companion.age == 18, "Training advances both childhood companions consistently")
 	_check(game.screen == "opening" and game.opening_sequence.id == "adulthood", "Confirmed adulthood is introduced by the six-year transition")
 	game._opening_skip()
 	game._opening_next()
+	# A saved legacy campaign retains its original real-world attack/cooldown path.
 	for hit in range(3):
 		game.ui.action_requested.emit("attack", {})
 		await _wait_physics(48)
@@ -288,6 +292,8 @@ func _move_fixture(position: Vector3) -> void:
 
 func _wait_physics(frames: int) -> void:
 	for frame in range(frames):
+		_advance_game(1.0 / 60.0)
+		game.world._physics_process(1.0 / 60.0)
 		await physics_frame
 
 
@@ -326,10 +332,17 @@ func _complete_village_phase() -> void:
 	var saw_warning := false
 	var saw_attack := false
 	for step in 70:
-		game._process(5.0)
+		_advance_game(5.0)
 		saw_warning = saw_warning or game.model.data.village.raid.status == "warning"
 		saw_attack = saw_attack or game.model.data.village.raid.active
 		if VillageLife.training_ready(game.model.data):
 			break
 	_check(saw_warning and saw_attack and game.model.data.village.raid.completed == 1, "The real warning and first village attack finish before adulthood")
 	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days still satisfy the legacy training gate")
+
+
+func _advance_game(delta: float) -> void:
+	# Main owns the authoritative physics clock; presentation retains its own
+	# process callback. Both run explicitly so awaited UI frames add no time.
+	game._physics_process(delta)
+	game._process(delta)

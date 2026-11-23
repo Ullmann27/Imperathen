@@ -16,20 +16,25 @@ func expect(value: bool, message: String) -> void:
 func attack(model, id: String="jab_left", target: String="practice", facing:=Vector2(0,-1)) -> Dictionary:
 	return model.execute("village_unarmed_attack",{"technique":id,"target_id":target,"facing_x":facing.x,"facing_z":facing.y})
 
+func _clear(_from: Vector2, _to: Vector2) -> bool:
+	return true
+
 func _run() -> void:
 	var model=Model.new()
 	model.new_game("italia",true,true)
+	# This is a rule test. Physical obstructions are checked by real-world tests.
+	model.combat_sight_check = _clear
 	expect(model._validate_state(model.data).is_empty(),"fresh childhood state is valid")
 	expect(Combat.enabled(model.data),"new chapter has unarmed authority")
 	model.set_player_position(Vector3(0,1,-5.7))
 	expect(attack(model).ok,"basic jab accepted at twelve")
 	expect(model.data.village.unarmed.practice_hits==0,"accepting a button awards no hit")
 	expect(not attack(model).ok,"cannot overlap recovery with another attack")
-	model.advance(.20)
+	model.advance(.10)
 	expect(model.data.village.unarmed.practice_hits==0,"windup awards no hit")
 	model.advance(.10)
 	expect(model.data.village.unarmed.practice_hits==1,"hit resolves inside actual impact time")
-	model.advance(.40)
+	model.advance(.50)
 	expect(model.data.village.unarmed.practice_hits==1,"one animation resolves once")
 	expect(attack(model,"jab_left","practice",Vector2(0,1)).ok,"backwards swing may be attempted")
 	model.advance(.7)
@@ -44,6 +49,10 @@ func _run() -> void:
 	model.advance(.7)
 	expect(model.data.village.unarmed.practice_hits==1,"wall rejects hit at correct distance")
 	model.combat_sight_check=Callable()
+	expect(attack(model).ok,"motion may start before geometry is connected")
+	model.advance(.7)
+	expect(model.data.village.unarmed.practice_hits==1,"missing geometry cannot silently approve a contact")
+	model.combat_sight_check=_clear
 	expect(not attack(model,"high_kick").ok,"advanced motion requires practice")
 	attack(model)
 	model.advance(.10)
@@ -51,6 +60,7 @@ func _run() -> void:
 	expect(model.save_game(path).ok,"save during windup")
 	var restored=Model.new()
 	expect(restored.load_game(path).ok,"restore during windup")
+	restored.combat_sight_check=_clear
 	restored.advance(.60)
 	expect(restored.data.village.unarmed.practice_hits==2,"restored windup resolves exactly once")
 	restored.advance(.60)

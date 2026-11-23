@@ -28,6 +28,7 @@ func _run() -> void:
 	# Fixed calls below drive the real production process method deterministically.
 	# The physics server still contains the actual collision/raycast scene.
 	game.set_process(false)
+	game.set_physics_process(false)
 	game.world.set_physics_process(false)
 	game.ui._finish_intro()
 	game.ui.action_requested.emit("new_game", {})
@@ -60,7 +61,7 @@ func _run() -> void:
 	_check(game.ui._frontier_dialog_data.choices.is_empty() and game.ui._frontier_dialog_data.text.contains("zwölf"), "Child meets Aulus through the real Interact signal with age-appropriate dialogue")
 	var clock: float = game.model.data.world_seconds
 	var residents: Array = game.world.population.snapshot()
-	game._process(20.0)
+	_advance_game(20.0)
 	_check(game.model.data.world_seconds == clock and game.world.population.snapshot() == residents, "Conversation freezes simulation and resident routines")
 	await _check_dialog_layout(Vector2i(960, 540))
 	await _check_dialog_layout(Vector2i(900, 900))
@@ -68,7 +69,7 @@ func _run() -> void:
 	_check(game.screen == "playing" and game.world._frontier_focus.is_empty(), "Android Back closes the conversation and releases camera focus")
 	game._pause()
 	clock = game.model.data.world_seconds
-	game._process(5.0)
+	_advance_game(5.0)
 	_check(game.model.data.world_seconds == clock, "Ordinary pause also stops world time")
 	_request_back()
 	_check(game.screen == "playing", "Android Back returns from pause without losing the story")
@@ -109,19 +110,19 @@ func _run() -> void:
 		return
 	_press_choice("work")
 	_check(game.model.data.frontier.work_seconds == 0.0 and game.screen == "frontier_dialog", "Work choice stays in dialogue without silently advancing labour")
-	game._process(15.0)
+	_advance_game(15.0)
 	_check(game.model.data.frontier.work_seconds == 0.0, "Leaving the work conversation open cannot complete the job")
 	_close_button()
 	_move(Vector3(3, 1, 29))
-	game._process(5.0)
+	_advance_game(5.0)
 	_check(game.model.data.frontier.work_seconds == 0.0, "Running world away from the wagon earns no work")
 	_move_to_resident("titus")
-	game._process(5.0)
+	_advance_game(5.0)
 	game._refresh()
 	_check(is_equal_approx(game.model.data.frontier.work_seconds, 5.0), "Five nearby simulation seconds produce five real work seconds")
 	_check(game.ui._hud_labels.objective_text.text.contains("5/12"), "Visible objective shows actual partial work")
 	game.ui.action_requested.emit("pause", {})
-	game._process(20.0)
+	_advance_game(20.0)
 	_check(game.model.data.frontier.work_seconds == 5.0, "Pausing the real scene freezes partial work")
 	_request_back()
 	game.ui.action_requested.emit("save", {})
@@ -131,7 +132,7 @@ func _run() -> void:
 	_check(game.ui._hud_labels.objective_text.text.contains("5/12"), "Continue rebuilds the correct partial objective")
 	var loaded: Dictionary = game.model._read_save(ProjectSettings.globalize_path(game.SAVE_PATH))
 	_check(loaded.ok and not loaded.state.has("frontier_objective"), "Actual saved payload contains only authoritative story state")
-	game._process(7.0)
+	_advance_game(7.0)
 	game._refresh()
 	_check(game.model.data.frontier.step == 3 and game.model.data.frontier.work_seconds == 12.0, "Remaining seven seconds finish the work after reload")
 	_check(game.ui._hud_labels.objective_title.text == "Ein eigener Weg", "Finished work points the HUD to Aulus")
@@ -210,20 +211,21 @@ func _complete_original_chapter() -> void:
 	game.ui.action_requested.emit("companion_help", {})
 	game.world.action_requested.emit("build", {"x": 8.0, "z": 5.0})
 	_move(Vector3(8, 1, 5))
-	game._process(12.0)
+	_advance_game(12.0)
 	_complete_village_phase()
-	_move(Vector3(0, 1, -7))
+	_move(Vector3(0, 1, -6))
 	game.ui.action_requested.emit("train", {})
 	_enter_opening("adulthood")
+	# Preserve the legacy command path; timed action combat is covered separately.
 	for hit in 3:
-		game._process(0.65)
+		_advance_game(0.65)
 		game.world.action_requested.emit("training_hit", {})
 	game.ui.action_requested.emit("recruit", {})
 	game.ui.action_requested.emit("skirmish", {})
 	for enemy: Dictionary in game.model.data.encounter.enemies.duplicate(true):
 		_move(Vector3(enemy.x, 1, enemy.z))
 		for strike in 3:
-			game._process(0.65)
+			_advance_game(0.65)
 			if game.model.data.encounter.active:
 				game.world.action_requested.emit("strike_enemy", {"enemy_id": enemy.id})
 	_check(game.screen == "dialog" and game.model.data.progress.skirmish_won, "Existing prologue reaches victory through valid Main/world commands")
@@ -353,10 +355,17 @@ func _complete_village_phase() -> void:
 	var saw_warning := false
 	var saw_attack := false
 	for step in 70:
-		game._process(5.0)
+		_advance_game(5.0)
 		saw_warning = saw_warning or game.model.data.village.raid.status == "warning"
 		saw_attack = saw_attack or game.model.data.village.raid.active
 		if VillageLife.training_ready(game.model.data):
 			break
 	_check(saw_warning and saw_attack and game.model.data.village.raid.completed == 1, "The real warning and first village attack finish before adulthood")
 	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days still satisfy the legacy training gate")
+
+
+func _advance_game(delta: float) -> void:
+	# Main owns the authoritative physics clock; presentation retains its own
+	# process callback. Both run explicitly so awaited UI frames add no time.
+	game._physics_process(delta)
+	game._process(delta)

@@ -259,18 +259,21 @@ func _test_full_journey_and_guard() -> void:
 func _test_released_combat(model) -> void:
 	# The enemy exists because the full authored arc and release command ran above.
 	# No fixture injects raid state, health, attack clocks or combat experience.
+	# Domain timing uses explicit geometry; actual wall/body sweeps are separate.
+	model.combat_sight_check = func(_from: Vector2, _to: Vector2) -> bool: return true
+	model.combat_motion_check = func(from: Vector2, _to: Vector2) -> Vector2: return from
 	var first: Dictionary = model.data.village.raid.enemies[0]
 	var initial_health := int(first.health)
 	var initial_experience := int(model.data.village.attributes.combat)
 	_at(model, Vector2(float(first.x), float(first.z) + 1.0))
 	_ok(model.execute("village_unarmed_attack", {"technique":"jab_left", "target_id":first.id, "facing_x":0.0, "facing_z":-1.0}), "Begin a real jab against a legitimately spawned attacker")
 	_check(model.data.village.raid.enemies[0].health == initial_health and model.data.village.raid.player_hits == 0, "Accepted attack input is not a free hit")
-	model.advance(0.2)
+	model.advance(0.1)
 	_check(model.data.village.raid.enemies[0].health == initial_health, "The real enemy remains unharmed during wind-up")
 	model.advance(0.1)
 	_check(model.data.village.raid.enemies[0].health == initial_health - 6 and model.data.village.raid.player_hits == 1 and model.data.village.unarmed.resolved_hits == 1, "The measured impact changes one actual enemy once")
 	_check(model.data.village.attributes.combat == initial_experience + 1 and model.data.village.raid.stamina == 100.0, "An actual impact earns experience without charging the old stamina pool")
-	model.advance(0.4)
+	model.advance(0.5)
 	_ok(model.execute("village_unarmed_guard"), "Start guard after the jab has recovered")
 	var player_health := int(model.data.player.health)
 	model.advance(0.2)

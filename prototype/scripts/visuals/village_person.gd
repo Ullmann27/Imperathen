@@ -7,7 +7,8 @@ const HAIR := {"italia":["",""],"germania":["","braid"],"han":["knot","knot"],"w
 const COMPANIONS := {"italia":"marcus","germania":"albrun","han":"lin","wa":"aki","vistula":"mira"}
 const LOOPS := ["idle","march","run","talk","work"]
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
-const NaturalMotion := preload("res://scripts/visuals/natural_motion.gd")
+const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
+const HandPose := preload("res://scripts/visuals/hand_pose.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
 const FRONTIER_PATH := "res://assets/characters/frontier_%s_%d.glb"
@@ -35,6 +36,15 @@ var _check_lod := 0.0
 var _posed := false
 var _blade: MeshInstance3D
 var _face := FacialMotion.new()
+var _motion := CharacterMotion.new()
+var _hands := HandPose.new()
+var _turn_rate := 0.0
+var _combat_id := ""
+var _combat_progress := 0.0
+var _combat_duration := 0.0
+var _combat_external := false
+var _has_sword := false
+var _has_shield := false
 var _lod_profile := ""
 var appearance_id := ""
 var appearance_variation := 0
@@ -169,13 +179,16 @@ func _reload(level: int) -> void:
 	animator = body.find_child("AnimationPlayer",true,false) as AnimationPlayer
 	if animator:
 		animator.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
-		var armed := role in ["mentor", "recruit", "enemy"] or _frontier_identity() in ["legionary", "officer", "spearman", "archer"]
-		NaturalMotion.install(body, animator, active_model_path, not armed)
 	for shape: MeshInstance3D in body.find_children("*","MeshInstance3D",true,false):
 		_style(shape)
+	_hands.bind(body, active_model_path)
 	_face.bind(body, identity)
+	_motion.bind(body, role in ["player", "companion"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"]))
 	_play(clip,saved_phase,0)
-	_face.pose(clip,saved_phase,detail)
+	_face.pose("attack" if not _combat_id.is_empty() else clip,saved_phase,detail)
+	if not _combat_id.is_empty():
+		_motion.combat(_combat_id, _combat_progress)
+		_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
 	_sync_loaned_gear()
 	# Retaining every hero PackedScene would also retain every embedded texture
 	# tier. Live instances keep their own references; inactive tiers may unload.
@@ -267,22 +280,72 @@ func _style(shape: MeshInstance3D) -> void:
 			shape.set_surface_override_material(i,materials[key])
 
 
-func drive(metres_per_second: float) -> void:
-	speed = metres_per_second
+func drive(metres_per_second: float, turn_radians_per_second: float = 0.0) -> void:
+	speed = maxf(0.0, metres_per_second) if is_finite(metres_per_second) else 0.0
+	_turn_rate = clampf(turn_radians_per_second, -3.0, 3.0) if is_finite(turn_radians_per_second) else 0.0
+	if _combat_id.is_empty():
+		_posed = false
+
+
+func set_equipment(sword: bool, shield: bool = false) -> void:
+	_has_sword = sword
+	_has_shield = shield
+	if _blade:
+		_blade.visible = _has_sword and role == "player" and age >= 18 and clip in ["attack", "train", "block"]
+
+
+func sample_combat(technique: String, normalized: float) -> void:
+	if not technique in CharacterMotion.TECHNIQUES:
+		return
+	if _combat_id.is_empty():
+		_play("idle", 0.0, 0.0)
+	_combat_id = technique
+	_combat_progress = clampf(normalized, 0.0, 1.0)
+	_combat_external = true
+	_posed = true
+	clip = technique
+	phase = _combat_progress
+	if _blade:
+		_blade.visible = false
+	_motion.combat(technique, _combat_progress)
+	_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
+	_face.pose("attack", _combat_progress, detail)
+
+
+func cue_combat(technique: String, duration: float) -> void:
+	if not technique in CharacterMotion.TECHNIQUES or not is_finite(duration) or duration <= 0.0:
+		return
+	sample_combat(technique, 0.0)
+	_combat_duration = duration
+	_combat_external = false
 	_posed = false
+
+
+func cancel_action() -> void:
+	_combat_id = ""
+	_combat_duration = 0.0
+	_combat_progress = 0.0
+	_combat_external = false
+	_remaining = 0.0
+	_posed = false
+	_play("idle", 0.0, 0.12)
 
 
 func cue(action: String) -> void:
 	if action == "death" and clip == "death": return
+	_combat_id = ""
+	_combat_external = false
 	_posed = false
 	_play(action,0,0.12)
 	_remaining = animator.current_animation_length if animator and animator.current_animation != "" else 0.8
 
 
 func cue_unarmed(action: String) -> bool:
-	if not NaturalMotion.DURATIONS.has(action) or not animator or not animator.has_animation(action):
+	# Compatibility for authored presentation cues. Actual hits and the live
+	# action clock remain in the model and reach us through sample_combat.
+	if not CharacterMotion.TIMING.has(action) or not animator or not _motion.available:
 		return false
-	cue(action)
+	cue_combat(action, float(CharacterMotion.TIMING[action].z))
 	return true
 
 
@@ -300,6 +363,9 @@ func _sync_loaned_gear() -> void:
 
 
 func reset_motion() -> void:
+	_combat_id = ""
+	_combat_external = false
+	_combat_progress = 0.0
 	_remaining = 0
 	speed = 0
 	_posed = false
@@ -313,14 +379,21 @@ func keep_working() -> void:
 
 
 func sample_pose(action: String, normalized: float) -> void:
+	if action in CharacterMotion.TECHNIQUES:
+		sample_combat(action, normalized)
+		return
+	_combat_id = ""
+	_combat_external = false
 	_posed = true
 	_play(action,normalized,0)
 	_face.pose(action,normalized,detail)
+	_apply_motion(true)
 
 
 func _play(action: String, normalized: float, blend: float) -> void:
+	_motion.capture_transition(blend if action != clip and action in ["idle", "march", "run"] else 0.0)
 	clip = action
-	if _blade: _blade.visible = role == "player" and age >= 18 and clip in ["attack","train","block"]
+	if _blade: _blade.visible = _has_sword and role == "player" and age >= 18 and clip in ["attack","train","block"]
 	phase = clampf(normalized,0,1)
 	if not animator: return
 	var name_in_file := action
@@ -332,6 +405,18 @@ func _play(action: String, normalized: float, blend: float) -> void:
 	animator.play(name_in_file,blend)
 	animator.seek(phase*animation.length,true)
 	animator.advance(0)
+	_apply_motion()
+
+
+func _apply_motion(review: bool = false) -> void:
+	if clip in ["idle", "march", "run"]:
+		_hands.set_grip(0.18 if clip != "run" else 0.34)
+		_motion.locomotion(clip, phase, -1.0 if review and clip != "idle" else speed / maxf(body.scale.y, 0.01), _turn_rate)
+	elif clip in ["attack", "train"] and role in ["player", "companion"] and not _has_sword:
+		_hands.set_grip(0.18 + 0.82 * sin(phase * PI))
+		_motion.combat("jab_right", phase)
+	else:
+		_hands.set_grip(0.18)
 
 
 func _distance_lod(distance: float) -> int:
@@ -362,21 +447,38 @@ func refresh_lod(camera: Camera3D) -> void:
 
 
 func _process(delta: float) -> void:
+	_motion.advance(delta)
 	_check_lod -= delta
 	if _check_lod <= 0:
 		_check_lod = 0.32
 		refresh_lod(get_viewport().get_camera_3d())
+	if not _combat_id.is_empty():
+		if not _combat_external and _combat_duration > 0.0:
+			_combat_progress = minf(1.0, _combat_progress + delta / _combat_duration)
+			phase = _combat_progress
+			_motion.combat(_combat_id, _combat_progress)
+			_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
+			_face.advance(delta, "attack", detail)
+			if _combat_progress >= 1.0:
+				cancel_action()
+		return
 	if _posed: return
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)
 		if _remaining <= 0:
-			var next := "idle" if speed < 0.15 else ("march" if speed < 2.65 else "run")
-			if next != clip: _play(next,0,0.13)
+			var stop_threshold := 0.06 if clip in ["march", "run"] else 0.10
+			var run_threshold := 2.25 if clip == "run" else 2.55
+			var next := "idle" if speed < stop_threshold else ("march" if speed < run_threshold else "run")
+			if next != clip:
+				var carry_phase := phase if clip in ["march", "run"] and next in ["march", "run"] else 0.0
+				_play(next, carry_phase, 0.13)
 	if animator and animator.is_playing():
 		var advance := delta
 		if clip in ["march","run"]:
 			var stride := 1.10 if clip == "march" else 1.49
-			if _frontier_identity() in ["legionary", "officer", "spearman", "archer"] and active_model_path.begins_with("res://assets/characters/frontier_"):
+			if _motion.available and _motion.civilian:
+				stride = maxf(0.01, _motion.gait_stride(clip, speed / body.scale.y) * body.scale.y)
+			elif _frontier_identity() in ["legionary", "officer", "spearman", "archer"] and active_model_path.begins_with("res://assets/characters/frontier_"):
 				stride = 1.30 if clip == "march" else 1.75
 			else:
 				stride *= body.scale.y
@@ -384,4 +486,5 @@ func _process(delta: float) -> void:
 		animator.advance(advance)
 		if animator.current_animation != "":
 			phase = animator.current_animation_position / animator.current_animation_length
+	_apply_motion()
 	_face.advance(delta,clip,detail)

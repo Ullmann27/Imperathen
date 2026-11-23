@@ -1,0 +1,16 @@
+{
+  "exit_code": 0,
+  "passed": true,
+  "scope": "Python package/harness regression only; not Android runtime",
+  "source_sha256": {
+    "tools/validate_android_apk.py": "7dce685a2e55419c2975a4a6508c3ae33556af70511f03535902c7e260770fd3",
+    "tools/android_runtime_smoke.py": "3db2d802ebf310e41afcf76747c8396525a88e55e1f4769231d9d5c87a6c3f76",
+    "tests/android_action_payload_test.py": "4a61075ec9b8e42cd83d0f6bb954d991d69e2be3a70fc51c78f6ac0f3dc4056b",
+    "tests/android_childhood_payload_test.py": "c5781103f4fedeed5cdca7c84e1c76ff5fea8096b87ad75b3f2c95f2b03c46e6",
+    "tests/android_frontier_payload_test.py": "3ca2f66fb4d20d9846c3bfd5a922db6bfa104dff6ed4c654420e8319f0963897",
+    "tests/android_hero_payload_test.py": "4cc64b01bc273b860d771d7f77acdbaf7352af3876894b1d408767919a8d3a3b",
+    "tests/android_runtime_smoke_test.py": "020d57eae1515ec24003fe3085f1f8f0e7acfbe2c9e357d5b253a970f585911b",
+    "tests/android_village_payload_test.py": "b0e2ccf9490d64050342205994da3b18dbc324d273b00ebde6e9f75d9b257672",
+    "tests/android_village_publication_test.py": "67108c764fab7e91090fe0462a5fb21b01cbca95a3e8bff3a065897999d38824"
+  }
+}

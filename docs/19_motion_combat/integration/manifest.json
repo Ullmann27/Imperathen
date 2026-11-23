@@ -1,0 +1,163 @@
+{
+  "base_commit": "e5735509622c9a94564dc5fe21257c07074f9df5",
+  "base_branch": "feature/childhood-village-20261123",
+  "delivery_branch": "feature/chat-a-movement-combat-20261123",
+  "previous_chat_a_commit": "5d95676626d8eeee5589973603cb1da523ca4970",
+  "policy": "Bounded patches against the exact full family-village base. Required files accompany the patches; review another changed base before applying.",
+  "shared_files": [
+    {
+      "path": "prototype/scripts/domain/world_model.gd",
+      "base_sha256": "e2532609f4db4fc09f62a79b0bc6dd0f13055828cd0f8dd1722b69ff5bdc8c89",
+      "delivered_sha256": "e6b772460ac6a5489503e81079a25a71382ae5f785028669c6a5db8b33a234ea",
+      "patch": "world_model.gd.patch",
+      "patch_sha256": "2b040a3a73a0870ed6fc7fd68f1c739b3cc487ef2710bfc1f9e5384d603df2be",
+      "reapplied_bytes_match": true
+    },
+    {
+      "path": "prototype/scripts/main.gd",
+      "base_sha256": "012a59f540ced8860d4faff210c1b8d8dec150ae2c31e910f8928ae41e718459",
+      "delivered_sha256": "8ea1191de0feb3e5d08ec96ec6c642bd2dea8764966fc81e695f2c6770b09e9b",
+      "patch": "main.gd.patch",
+      "patch_sha256": "4aada6950b9167fd88ae61ad099f43e17d56b6ff8d9806e46c966436f1df99d4",
+      "reapplied_bytes_match": true
+    },
+    {
+      "path": "prototype/scripts/world/game_world.gd",
+      "base_sha256": "be2a835dbeb71886812d2a9cd17217a2b17d4019fda4afaf3f93521a0351f0dd",
+      "delivered_sha256": "71548359f88ca20cea068b9e55b9353d5be1ece24ef5dbd1805f42c9cc6c1333",
+      "patch": "game_world.gd.patch",
+      "patch_sha256": "e28026ef3c3ed1b6c136e1a2e7a152eab442f984528ff6b5d2279ba80ead24d4",
+      "reapplied_bytes_match": true
+    },
+    {
+      "path": "prototype/scripts/story/village_life.gd",
+      "base_sha256": "e6b64b3bff63cd80819ae13e8e8fc4702ea95b733d0ea6c9825b137ee471f0ca",
+      "delivered_sha256": "8d2e03e97e0ccc355b506fba4b0a3ee941185064dc5aaf2d91e173f54536c4f5",
+      "patch": "village_life.gd.patch",
+      "patch_sha256": "c776bd1e609dd20104867984bcb6bd6d72b85e9ddbdecc1006358f403c4ac332",
+      "reapplied_bytes_match": true
+    },
+    {
+      "path": "prototype/scripts/world/village/village_population.gd",
+      "base_sha256": "1d86064b3ddc8f2e57bfa95ae0c1c75c30f43ce63b84f0c032d81faf765ea783",
+      "delivered_sha256": "f16cfe7dc79e995d1774335af128a5d16fab8f64564e2126ce2eb686ca163244",
+      "patch": "village_population.gd.patch",
+      "patch_sha256": "6a00476350f6dc34e13e5ee865bd786a2de6ca46d7d847dce7ea51d1872321ae",
+      "reapplied_bytes_match": true
+    }
+  ],
+  "required_files": [
+    {
+      "path": "prototype/assets/characters/hero_hand_grip_0.res",
+      "sha256": "6de601e365fe669f41eab913c932c1e591873cb320a26c1b8d25e0f00675bb77"
+    },
+    {
+      "path": "prototype/assets/characters/hero_hand_grip_1.res",
+      "sha256": "523a1220ada6d94f6e8b82cc8da62583611915310cbaf52dbc6b01fcc60d133b"
+    },
+    {
+      "path": "prototype/assets/characters/hero_hand_grip_2.res",
+      "sha256": "4e759227bd3671c313ab929e0e361075c32eaf9112ee25d0e3eeefb97bb87eff"
+    },
+    {
+      "path": "prototype/assets/characters/hero_hand_grip_3.res",
+      "sha256": "f33641d52fb8516862435d041ecf04ce43abc4853d558c59bedadedd3c5ecd1f"
+    },
+    {
+      "path": "prototype/scripts/domain/combat_actions.gd",
+      "sha256": "109b20c8be47c7408454eab81e40961e9fd068eb4035fd2b7a09963a6d7ea35b"
+    },
+    {
+      "path": "prototype/scripts/domain/combat_actions.gd.uid",
+      "sha256": "a16d8059d42b69b3f15c5c811803438c481a5da4ee4934c4c831bb1615d98ce4"
+    },
+    {
+      "path": "prototype/scripts/domain/unarmed_combat.gd",
+      "sha256": "b44361bc9f5738efed67b9f2347dd7aa84db4319bd849888749cdec48da59a6c"
+    },
+    {
+      "path": "prototype/scripts/domain/unarmed_combat.gd.uid",
+      "sha256": "bc78c7227ed7c327c61b84573bbf1502c843c7531a4b4e9a28480a1fa336e635"
+    },
+    {
+      "path": "prototype/scripts/ui/game_ui.gd",
+      "sha256": "85188fb3c1ddc53a93505ea587123e5e02bdd3e3afe0d23e089847c04b5576f9"
+    },
+    {
+      "path": "prototype/scripts/ui/game_ui.gd.uid",
+      "sha256": "f2d390d16eeb0dd98b94bab37b7bad3f9a0c19dbfda95be8e0b828dc9e2f400d"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_action.gd",
+      "sha256": "3ece003dcdafcf27d2aa0e51df063f2e9a04bfefa1c089398411322bc4b75c73"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_action.gd.uid",
+      "sha256": "6bf4818ec6cf5d674b6749c064269c24293848909899f0f26ca30e4320a873b2"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_look.gd",
+      "sha256": "3978ef6f09c854459fbfdd3626f3ec75fdd9538a48e7513ffb3a1c2a8a58e183"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_look.gd.uid",
+      "sha256": "f4a667ed09d959f27d9a82ee5653709d1d47854d8c51009f869b6c0c97f93835"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_modal.gd",
+      "sha256": "6d92ed3d5777c60d7b2eb8ca1993e4525628ffcd811955e4f7edc6647a30cf07"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_modal.gd.uid",
+      "sha256": "f2ee9a8f6177fa731a23b119a175aaf40ea307730a2eba0dfa4da3f9eadb784d"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_pad.gd",
+      "sha256": "f2288c2d6e6a2b0dbecf10721260d1bf15b3ff2ebf9576d58623fc560552c628"
+    },
+    {
+      "path": "prototype/scripts/ui/touch_pad.gd.uid",
+      "sha256": "9349c298eacc8ea76cbb8f680993bbe3e1188648484e50794f444968e9d295a8"
+    },
+    {
+      "path": "prototype/scripts/visuals/character_motion.gd",
+      "sha256": "da1db696fc36c66ba30e1203ae0a814eac2fca19e9a9e6776a1188fb99922b6f"
+    },
+    {
+      "path": "prototype/scripts/visuals/character_motion.gd.uid",
+      "sha256": "6a785878da270232221c2d859f4b096dd7ca6570a3ca2a291c2a8b53fdbec60d"
+    },
+    {
+      "path": "prototype/scripts/visuals/hand_pose.gd",
+      "sha256": "566f0f7d99c955465a7b710e1cfead7b1480a6e0edc3d3951de8d722cf8a88d5"
+    },
+    {
+      "path": "prototype/scripts/visuals/hand_pose.gd.uid",
+      "sha256": "58b919b82ff57b65ed2a9a2e82c286b06330a7bce01c0e3c7e01523199a80b4b"
+    },
+    {
+      "path": "prototype/scripts/visuals/village_person.gd",
+      "sha256": "88c84b771140648d21955199c00937f7aaed6318ac16be7b9d2d6341851da4c3"
+    },
+    {
+      "path": "prototype/scripts/visuals/village_person.gd.uid",
+      "sha256": "b69b212bdcc8abd5fe482890a97e46d576073a9b25907759f32f86aa4fda22e2"
+    },
+    {
+      "path": "prototype/scripts/world/player_action_world.gd",
+      "sha256": "bd7d8f8894f01f812d2c9ebdb8ae41f4ed32b33a655cc134bdf49ce4f8fc2479"
+    },
+    {
+      "path": "prototype/scripts/world/player_action_world.gd.uid",
+      "sha256": "8cef75a94b1d558d394ce5c1c1d31aaa80c17a7ee965536cc7861e4c751ad390"
+    },
+    {
+      "path": "prototype/scripts/ui/android_village_diagnostics.gd",
+      "sha256": "53c3c552a4c3c859f5ae97f1f8faeb5ec70af029fc0eebadeb8f8f1b27721586"
+    },
+    {
+      "path": "prototype/scripts/ui/android_village_diagnostics.gd.uid",
+      "sha256": "93b9a4f9009e01491955a9eaa72053279e1fb78e1adb0b852a13bcd8ea45ad94"
+    }
+  ]
+}

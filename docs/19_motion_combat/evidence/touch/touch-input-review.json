@@ -1,0 +1,65 @@
+{
+  "test": "prototype/tests/touch_controls_test.gd",
+  "command": [
+    "godot",
+    "--headless",
+    "--path",
+    "prototype",
+    "--fixed-fps",
+    "60",
+    "--script",
+    "res://tests/touch_controls_test.gd"
+  ],
+  "exit_code": 0,
+  "passed": true,
+  "checks": 196,
+  "failures": 0,
+  "scope": "Native InputEventScreenTouch/Drag through the actual Godot viewport; headless layout and input, no Android hardware/FPS claim.",
+  "viewports": [
+    [
+      1280,
+      720
+    ],
+    [
+      960,
+      540
+    ],
+    [
+      820,
+      480
+    ],
+    [
+      900,
+      900
+    ],
+    [
+      480,
+      840
+    ],
+    [
+      640,
+      360
+    ]
+  ],
+  "safe_area_check": {
+    "viewport": [
+      960,
+      720
+    ],
+    "safe_rect": [
+      34,
+      16,
+      892,
+      680
+    ],
+    "text_scale": 1.25
+  },
+  "source_sha256": {
+    "prototype/scripts/ui/game_ui.gd": "fe81424e1329f5a44c3610e49f21468686736447ac9083119c180b552d7e53e3",
+    "prototype/scripts/ui/touch_pad.gd": "630008051d4a42dfddcfeecfe6c0e595892de24d297cec0f8e805cbd5e6f8541",
+    "prototype/scripts/ui/touch_action.gd": "1ac1671fcc48f6613d1689286655beaa5fe40a096804545162fc8011fd4d4f6b",
+    "prototype/scripts/ui/touch_look.gd": "3978ef6f09c854459fbfdd3626f3ec75fdd9538a48e7513ffb3a1c2a8a58e183",
+    "prototype/scripts/ui/touch_modal.gd": "6d92ed3d5777c60d7b2eb8ca1993e4525628ffcd811955e4f7edc6647a30cf07",
+    "prototype/tests/touch_controls_test.gd": "d9ec1eb9f0300b3e32147235c56ed78ac8e9c0464ab35239a04c679446367cca"
+  }
+}

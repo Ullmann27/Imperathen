@@ -1,6 +1,7 @@
 extends SceneTree
 const Person = preload("res://scripts/visuals/village_person.gd")
-const Motion = preload("res://scripts/visuals/natural_motion.gd")
+const Motion = preload("res://scripts/visuals/character_motion.gd")
+const Combat = preload("res://scripts/domain/combat_actions.gd")
 class TrackedResident extends Person:
 	var loaded_paths: Array[String] = []
 	func _instantiate(path: String) -> Node3D:
@@ -43,18 +44,17 @@ func run() -> void:
 	root.add_child(person)
 	person.set_process(false)
 	person.configure("player", "italia", 12)
-	check(person.animator.get_animation("idle") != original_idle, "Corrected clips do not mutate the imported shared animation")
+	check(fingerprint == clip_fingerprint(person.animator.get_animation("idle")), "The integrated pose solver preserves the imported animation tracks")
+	check(person._motion.available and person._motion.civilian, "The actual civilian actor uses the single anatomical pose solver")
 	for action: String in ["idle", "march", "run"]:
 		var old_clip := original_player.get_animation(action)
 		var new_clip := person.animator.get_animation(action)
 		var preserved := old_clip.length == new_clip.length and old_clip.get_track_count() == new_clip.get_track_count()
 		for track in old_clip.get_track_count():
-			var path := old_clip.track_get_path(track)
-			if old_clip.track_get_type(track) == Animation.TYPE_ROTATION_3D and str(path.get_subname(0)) in Motion.ARM_BONES: continue
 			for key in old_clip.track_get_key_count(track):
 				preserved = preserved and old_clip.track_get_key_time(track, key) == new_clip.track_get_key_time(track, key)
 				preserved = preserved and old_clip.track_get_key_value(track, key) == new_clip.track_get_key_value(track, key)
-		check(preserved, action+" keeps all original leg, pelvis, spine and head tracks and their timing")
+		check(preserved, action+" preserves all imported tracks and timing while the single solver controls the actual skeleton")
 	for origin: String in ["italia", "germania", "han", "wa", "vistula"]:
 		person.configure("player", origin, 12)
 		for level in [0, 3]:
@@ -83,9 +83,9 @@ func run() -> void:
 	check(head_before.angle_to(skeleton.get_bone_pose_rotation(skeleton.find_bone("Head")))>.01, "Walking retains actual head counter-motion")
 	var signatures := {}
 	var foot_heights := {}
-	for action: String in Motion.DURATIONS:
+	for action: String in Motion.TECHNIQUES:
 		check(person.cue_unarmed(action), action+" is an available actual animation cue")
-		check(is_equal_approx(person.animator.current_animation_length, float(Motion.DURATIONS[action])), action+" duration matches the gameplay recovery contract")
+		check(is_equal_approx(person._combat_duration, float(Combat.TECHNIQUES[action].duration)), action+" visual cue duration matches the authoritative recovery contract")
 		person.sample_pose(action, .4)
 		var pose := []
 		for bone: String in ["Hand_L", "Hand_R", "Foot_R", "Head"]:
@@ -94,11 +94,15 @@ func run() -> void:
 		foot_heights[action] = joint(skeleton,"Foot_R").y
 		check(not person.body.find_child("PracticeBlade",true,false).visible, action+" remains unarmed")
 		person._reload(3)
-		check(person.clip==action and is_equal_approx(person.phase,.4) and person.animator.current_animation==action, action+" keeps its impact pose across LOD changes")
+		check(person.clip==action and is_equal_approx(person.phase,.4) and person._combat_id==action and person._combat_external, action+" keeps the authoritative sampled impact pose across LOD changes")
 		person._reload(0)
 		skeleton = rig(person)
-	check(signatures.size()==Motion.DURATIONS.size(), "All ten techniques have distinct actual skeletal impact poses")
+	check(signatures.size()==Motion.TECHNIQUES.size(), "All ten techniques have distinct actual skeletal impact poses")
 	check(float(foot_heights.high_kick)>float(foot_heights.front_kick)+.20, "High kick raises the actual foot above the front-kick height")
+	person.sample_combat("hook_left", .4)
+	var authoritative_hand := joint(skeleton, "Hand_L")
+	person._process(2.0)
+	check(person._combat_external and is_equal_approx(person.phase,.4) and joint(skeleton,"Hand_L").distance_to(authoritative_hand)<.0001, "Render updates cannot advance a combat pose sampled from the model clock")
 	person.cue_unarmed("jab_left")
 	person._process(.8)
 	check(person.clip=="idle", "Completed technique returns to normal locomotion")
@@ -108,21 +112,29 @@ func run() -> void:
 	root.add_child(neighbour)
 	neighbour.set_process(false)
 	neighbour.configure("player", "italia", 12)
-	check(person.animator.get_animation("idle")==neighbour.animator.get_animation("idle"), "Live actors share generated clips rather than rebaking per instance")
+	check(person.animator.get_animation("idle")==neighbour.animator.get_animation("idle"), "Live actors share imported animation resources without rebaking them")
+	check(person._motion != neighbour._motion and person._motion.skeleton != neighbour._motion.skeleton, "Each visible actor owns its own skeletal pose")
 	check(fingerprint==clip_fingerprint(original_idle), "Original source idle animation remains unchanged")
 	person.set_loaned_gear(true)
 	var helmet := person.body.find_child("LoanedPracticeHelmet", true, false) as BoneAttachment3D
 	var shield := person.body.find_child("LoanedPracticeShield", true, false) as BoneAttachment3D
 	check(helmet!=null and shield!=null and helmet.bone_name=="Head" and shield.bone_name=="Hand_L", "Borrowed helmet and practice shield follow actual named bones")
 	check(helmet.visible and shield.visible and not helmet.override_pose and not shield.override_pose, "Borrowed props do not override the actor's pose")
+	await process_frame
+	check(helmet.global_position.distance_to(skeleton.global_transform * joint(skeleton, "Head")) < .001, "The visible borrowed helmet follows the actual head transform")
+	check(shield.global_position.distance_to(skeleton.global_transform * joint(skeleton, "Hand_L")) < .001, "The visible borrowed shield follows the actual left hand transform")
 	var props := person.body.find_children("LoanedPractice*", "BoneAttachment3D", true, false).size()
 	person.set_loaned_gear(true)
 	check(person.body.find_children("LoanedPractice*", "BoneAttachment3D", true, false).size()==props, "Repeated state sync does not duplicate borrowed props")
 	person.sample_pose("jab_right", .4)
+	await process_frame
+	check(shield.global_position.distance_to(skeleton.global_transform * joint(skeleton, "Hand_L")) < .001, "Borrowed shield follows the new combat solver's moving guard hand")
 	person._reload(3)
 	helmet = person.body.find_child("LoanedPracticeHelmet", true, false) as BoneAttachment3D
 	shield = person.body.find_child("LoanedPracticeShield", true, false) as BoneAttachment3D
 	check(helmet!=null and shield!=null and helmet.visible and shield.visible and person.clip=="jab_right", "LOD reload retains the loaned props and active motion")
+	var low_body: MeshInstance3D = person.body.find_child("HeroBody", true, false)
+	check(low_body.get_blend_shape_value(low_body.find_blend_shape_by_name("HandGrip")) > .98, "Loaned gear retains the closed striking hand at the low LOD")
 	person.set_loaned_gear(false)
 	check(not helmet.visible and not shield.visible, "Returning loaned gear removes it from the actual scene")
 	check(not person.body.find_child("PracticeBlade",true,false).visible, "Loaned practice gear does not expose a blade")

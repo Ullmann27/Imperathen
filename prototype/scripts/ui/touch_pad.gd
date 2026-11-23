@@ -31,7 +31,10 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 		return
 	if event is InputEventScreenTouch:
-		if event.pressed and _contains(event.position):
+		if event.canceled and event.index == touch_index:
+			get_viewport().set_input_as_handled()
+			reset()
+		elif event.pressed and not event.canceled and _contains(event.position):
 			get_viewport().set_input_as_handled()
 			_ignore_mouse_until = Time.get_ticks_msec() + 180
 			if touch_index == -1 and not _mouse_captured:
@@ -87,7 +90,7 @@ func _contains(point: Vector2) -> bool:
 
 func _update_axis(point: Vector2) -> void:
 	var local := get_global_transform_with_canvas().affine_inverse() * point
-	var radius := maxf(24.0, minf(size.x, size.y) * 0.5 - 21.0)
+	var radius := maxf(24.0, minf(size.x, size.y) * 0.5 - 35.0)
 	var raw := (local - size * 0.5) / radius
 	_knob = raw.limit_length(1.0)
 	if raw.length() <= DEAD_ZONE:
@@ -100,7 +103,7 @@ func _update_axis(point: Vector2) -> void:
 
 func _draw() -> void:
 	var center := size * 0.5
-	var radius := maxf(24.0, minf(size.x, size.y) * 0.5 - 7.0)
+	var radius := maxf(24.0, minf(size.x, size.y) * 0.5 - 19.0)
 	var bronze := Color("b99563")
 	draw_circle(center, radius, Color(0.04, 0.07, 0.07, 0.65))
 	draw_arc(center, radius, 0, TAU, 64, Color(bronze, 0.78), 1.5, true)
