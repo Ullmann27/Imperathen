@@ -66,9 +66,38 @@ const REGIONS := {
 }
 
 
+static func historical_prologue() -> Dictionary:
+	var chapter := "I-00 · Drei Legionen im Regen"
+	var location := "Aquileia und Umland · 58 v. Chr."
+	return {
+		"id":"i00_aquileia","version":1,"origin_id":"italia",
+		"title":"Drei Legionen im Regen","location":location,"chapter":chapter,
+		"chain_to":"childhood_home",
+		"beats":[
+			_beat("i00_detail","aquileia_detail","Chronik","HISTORICAL CORE",
+				"Caesar mobilisiert die bei Aquileia liegenden Legionen. Erst ein konkretes Detail, dann öffnet sich der Raum auf Lager, Regen und Marschvorbereitung.",
+				7.0,chapter,location),
+			_beat("i00_legions","legions_rain","Chronik","Formation · Versorgung · Befehlskette",
+				"Drei Legionblöcke stehen im Regen bereit. Die große Politik beginnt hier mit Formation, Versorgung, Befehlskette und Moral – nicht mit einem abstrakten Menü.",
+				8.0,chapter,location),
+			_beat("i00_caesar","caesar_orders","Caesar","Dramatisierter Produktionsdialog",
+				"»Berichte, was du gesehen hast. Nicht, was du glaubst, dass ich hören will.«",
+				7.5,chapter,location),
+			_beat("i00_labienus","labienus_orders","Labienus","Dramatisierter Produktionsdialog",
+				"»Dann halten wir uns an das, was wir wissen: die Situation selbst beobachten, eine konkrete Aufgabe lösen und anschließend mit einem persistenten Weltzustand weiterspielen.«",
+				9.0,chapter,location),
+			_beat("i00_departure","legions_depart","Caesar","Dramatisierter Produktionsdialog",
+				"»Der schnellste Entschluss ist wertlos, wenn er auf einer falschen Annahme ruht.«",
+				7.5,chapter,location)
+		],
+		"objective_title":"Valdora · Am selben Morgen",
+		"objective_text":"Die große Politik bewegt Legionen. Danach wird der Blick auf Valdora, ein Familienhaus und drei Becher heruntergebrochen."
+	}
+
+
 static func childhood() -> Dictionary:
 	var chapter := "Kapitel I · Menschen, die dich kennen"
-	var location := "Valdora · Römisches Grenzland · um 100 n. Chr."
+	var location := "Valdora · Aquileia-Region · 58 v. Chr."
 	return {"id":"childhood_home","version":2,"origin_id":"italia",
 		"title":"Ein Morgen zu Hause","location":location,"chapter":chapter,
 		"beats":[
