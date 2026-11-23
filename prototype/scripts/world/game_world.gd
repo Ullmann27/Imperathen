@@ -6,6 +6,16 @@ signal action_requested(action: String, payload: Dictionary)
 const Art = preload("res://scripts/world/village_art.gd")
 const Grove = preload("res://scripts/visuals/grove.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
+const VillageLifeWorld = preload("res://scripts/world/village_life_world.gd")
+const VillageLife = preload("res://scripts/story/village_life.gd")
+const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
+var village_life_world: Node3D
+var regional_terrain: Node3D
+var _village_focus := ""
+var _dodge_remaining := 0.0
+var _dodge_direction := Vector3.ZERO
+const VillageLayout = preload("res://scripts/world/village/village_layout.gd")
+var population = preload("res://scripts/world/village/village_population.gd").new()
 var regional = preload("res://scripts/world/regional_village.gd").new()
 var grove = Grove.new()
 var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
@@ -76,6 +86,8 @@ var _buildings: Dictionary = {}
 var _resource_views: Dictionary = {}
 var _enemy_views: Dictionary = {}
 var _squad_views: Array[Node3D] = []
+var _frontier_focus := ""
+var _frontier_camera_direction := Vector3.BACK
 
 
 func _ready() -> void:
@@ -85,6 +97,7 @@ func _ready() -> void:
 
 
 func setup(state: Dictionary) -> void:
+	clear_frontier_focus()
 	_shown_health = -1
 	_shown_work = -1.0
 	_build_scene()
@@ -109,6 +122,7 @@ func setup(state: Dictionary) -> void:
 	if regional.current_origin != state.get("origin_id","italia"):
 		var id: String = state.get("origin_id","italia")
 		regional.show_origin(id)
+		scenery.set_origin(id)
 		var placements := tree_sites.duplicate(true)
 		if id != "italia":
 			for tree in placements:
@@ -123,6 +137,18 @@ func sync_state(state: Dictionary) -> void:
 	_build_scene()
 	_state = state
 	opening_props.sync_state(state)
+	village_life_world.sync_state(state, _quality_profile)
+	var mentor := get_node_or_null("TrainingGround/Mentor")
+	if mentor != null:
+		mentor.visible = not bool(state.get("village", {}).get("enabled", false))
+	var legacy_boundary := get_node_or_null("Landscape/LegacyBoundary")
+	if legacy_boundary != null:
+		for body: StaticBody3D in legacy_boundary.get_children():
+			body.collision_layer = 0 if state.get("village", {}).get("enabled", false) else 1
+	var legacy_recruits := 0 if state.get("village", {}).get("enabled", false) else int(state.get("squad", {}).get("recruits", 0))
+	population.show_origin(str(state.get("origin_id","italia")),float(state.get("world_seconds",0)),legacy_recruits)
+	if regional.frontier_details:
+		regional.frontier_details.set_wagon_progress(float(state.get("frontier",{}).get("work_seconds",0))/12.0)
 	_apply_season(int(state.get("strategy",{}).get("turn",0))%4)
 	_sync_resources()
 	_sync_buildings()
@@ -158,6 +184,8 @@ func set_mode(mode: String) -> void:
 	if mode not in ["person", "city", "map"]:
 		return
 	_mode = mode
+	if mode != "person":
+		clear_frontier_focus()
 	_reset_touch_input()
 	if _player != null:
 		_player.velocity.x = 0.0
@@ -178,6 +206,11 @@ func set_mode(mode: String) -> void:
 
 func set_active(active: bool) -> void:
 	_active = active
+	population.set_active(active)
+	if village_life_world != null:
+		village_life_world.set_active(active)
+	if active:
+		clear_frontier_focus()
 	if not active:
 		_reset_touch_input()
 	if _player != null and not active:
@@ -220,6 +253,43 @@ func get_cinematic_anchor(key: String) -> Vector3:
 		_: return get_player_position()
 
 
+func set_frontier_time(seconds: float) -> void:
+	population.advance_to(seconds)
+
+
+func get_frontier_npc_position(id: String) -> Vector3:
+	return population.actor_position(id)
+
+
+func get_frontier_npc_info(id: String) -> Dictionary:
+	return population.info(id)
+
+
+func focus_frontier_npc(id: String) -> bool:
+	if _mode != "person" or not _player or not _camera or population.info(id).is_empty():
+		return false
+	var at: Vector3 = population.actor_position(id)
+	if _horizontal_distance(_player.global_position,at) > INTERACTION_RADIUS+.3:
+		return false
+	var direction := _player.global_position-at
+	direction.y = 0
+	_frontier_camera_direction = direction.normalized() if direction.length() > .2 else Vector3.BACK
+	_frontier_focus = id
+	population.focus(id,at+_frontier_camera_direction*3)
+	_camera.fov = 44.0
+	return true
+
+
+func clear_frontier_focus() -> void:
+	_frontier_focus = ""
+	_village_focus = ""
+	if village_life_world != null:
+		village_life_world.focused = ""
+	population.clear_focus()
+	if _camera:
+		_camera.fov = 54.0
+
+
 func set_build_mode(enabled: bool) -> void:
 	_build_scene()
 	if enabled and _mode != "city":
@@ -247,6 +317,8 @@ func set_quality(profile: String) -> void:
 	_update_people_profile()
 	grove.set_quality(profile)
 	scenery.set_quality(profile)
+	regional.set_quality(profile)
+	population.set_quality(profile)
 	_apply_quality()
 
 
@@ -302,6 +374,23 @@ func perform_interaction() -> void:
 func perform_attack() -> void:
 	if _active:
 		_attack()
+
+
+func cue_village_defense(action: String) -> void:
+	if _active and _figure != null:
+		_figure.cue("block" if action == "village_block" else "march")
+		if action == "village_dodge":
+			_dodge_remaining = 0.24
+			_dodge_direction = Vector3.BACK.rotated(Vector3.UP, _figure.rotation.y)
+
+
+func focus_village_npc(id: String) -> void:
+	_village_focus = id
+	village_life_world.focus(id, get_player_position())
+	var direction: Vector3 = get_player_position() - village_life_world.actor_position(id)
+	direction.y = 0
+	_frontier_camera_direction = direction.normalized() if direction.length() > .1 else Vector3.BACK
+	_camera_initialized = false
 
 
 func _reset_touch_input() -> void:
@@ -363,6 +452,12 @@ func _build_scene() -> void:
 	_camera.current = true
 	_hint = Art.label(_player, "", Vector3(0, 1.25, 0), Color(1, 0.92, 0.70), 33)
 	_hint.visible = false
+	village_life_world = VillageLifeWorld.new()
+	village_life_world.name = "VillageLife"
+	add_child(village_life_world)
+	regional_terrain = RegionalTerrain.new()
+	regional_terrain.name = "RegionalTerrain"
+	add_child(regional_terrain)
 	_update_camera(0.016)
 
 
@@ -420,20 +515,28 @@ func _create_terrain() -> void:
 		var x := random.randf_range(-61, -33) if index < 22 else random.randf_range(-20, 43)
 		var z := random.randf_range(-42, 28) if index < 22 else random.randf_range(-46, -27)
 		var at := Vector3(x,0,z)
+		if VillageLayout.reserved(Vector2(x,z),1.3) or VillageLayout.road(Vector2(x,z)):
+			continue
 		tree_sites.append({"kind":Grove.KINDS[index%3],"position":at,"scale":random.randf_range(0.8,1.15),"yaw":random.randf_range(-PI,PI)})
 		Art.box_collider(ground, Vector3(0.44,2.6,0.44), at+Vector3.UP*1.3)
-	for at in [Vector3(-12,0,4),Vector3(6,0,-12),Vector3(-19,0,15),Vector3(26,0,16)]:
+	for at in [Vector3(-18,0,8),Vector3(6,0,-12),Vector3(-19,0,15),Vector3(26,0,16)]:
 		tree_sites.append({"kind":Grove.KINDS[tree_sites.size()%3],"position":at,"scale":0.92,"yaw":random.randf_range(-PI,PI)})
 		Art.box_collider(ground, Vector3(0.42,2.6,0.42),at+Vector3.UP*1.3)
 	for index in range(26):
 		var location := Vector3(random.randf_range(-58, 48), -0.05, random.randf_range(-45, 31))
 		if location.x > -20 and location.x < 29 and location.z > -22 and location.z < 19:
 			continue
+		if VillageLayout.reserved(Vector2(location.x,location.z),1.0) or VillageLayout.road(Vector2(location.x,location.z)):
+			continue
 		Art.sphere(ground, random.randf_range(0.35, 0.90), location, _materials["dark_stone"], Vector3(1.3, 0.6, 1.0))
+	# Older saved careers retain their old boundary; new village lives stream beyond it.
+	var boundary := Node3D.new()
+	boundary.name = "LegacyBoundary"
+	ground.add_child(boundary)
 	for x: float in [-64, 58]:
-		Art.box_collider(ground, Vector3(1, 15, 105), Vector3(x, 7, -8))
+		Art.box_collider(boundary, Vector3(1, 15, 105), Vector3(x, 7, -8))
 	for z: float in [-58, 40]:
-		Art.box_collider(ground, Vector3(125, 15, 1), Vector3(-3, 7, z))
+		Art.box_collider(boundary, Vector3(125, 15, 1), Vector3(-3, 7, z))
 
 
 func _create_village() -> void:
@@ -441,8 +544,11 @@ func _create_village() -> void:
 	village.name = "FrontierVillage"
 	add_child(village)
 	village.add_child(regional)
+	population.name = "VillagePopulation"
+	village.add_child(population)
 	scenery.add_businesses(village)
 	_create_palisade(village)
+	_create_outer_palisade(village)
 	village.add_child(crops)
 	scenery.sow_field(crops)
 	for x: float in [-3, 3]:
@@ -452,7 +558,9 @@ func _create_village() -> void:
 
 
 func _create_palisade(parent: Node3D) -> void:
-	for z: float in [-21.0, 18.0]:
+	# The southern enclosure still protects the existing personal building plot.
+	# Its old northern wall is opened toward the new civic and residential quarter.
+	for z: float in [18.0]:
 		var poses := []
 		for index in range(34):
 			var x := -19.0 + index * 1.4
@@ -475,6 +583,29 @@ func _create_palisade(parent: Node3D) -> void:
 		else:
 			Art.box_collider(parent, Vector3(0.5, 2.5, 22), Vector3(x, 1.25, -10))
 			Art.box_collider(parent, Vector3(0.5, 2.5, 11), Vector3(x, 1.25, 12.5))
+
+
+func _create_outer_palisade(parent: Node3D) -> void:
+	var outer := Node3D.new()
+	outer.name = "OuterVillageBoundary"
+	parent.add_child(outer)
+	for z in [-49.0,30.0]:
+		for span: Vector2 in [Vector2(-21,-3),Vector2(3,48)]:
+			var poses := []
+			var count := ceili((span.y-span.x)/1.4)
+			for i in count:
+				poses.append(Transform3D(Basis.IDENTITY,Vector3(span.x+i*1.4,0,z)))
+			scenery.palisade_bays(outer,poses)
+			Art.box_collider(outer,Vector3(span.y-span.x,2.5,.5),Vector3((span.x+span.y)*.5,1.25,z))
+	for x in [-21.0,48.0]:
+		var gaps := [Vector2(-49,1),Vector2(7,30)] if x < 0 else [Vector2(-49,-16),Vector2(-10,30)]
+		for span: Vector2 in gaps:
+			var poses := []
+			var count := ceili((span.y-span.x)/1.4)
+			for i in count:
+				poses.append(Transform3D(Basis(Vector3.UP,PI/2),Vector3(x,0,span.x+i*1.4)))
+			scenery.palisade_bays(outer,poses)
+			Art.box_collider(outer,Vector3(.5,2.5,span.y-span.x),Vector3(x,1.25,(span.x+span.y)*.5))
 
 
 func _create_build_plot() -> void:
@@ -735,6 +866,14 @@ func _sync_enemies() -> void:
 func _sync_squad() -> void:
 	var squad: Dictionary = _state.get("squad", {})
 	var alive := clampi(int(squad.get("alive", 0)), 0, 3)
+	var residents: Array = _state.get("village", {}).get("economy", {}).get("people", [])
+	var named_militia: Array[Dictionary] = []
+	if _state.get("village", {}).get("enabled", false):
+		for id: String in _state.village.get("militia", []):
+			for person: Dictionary in residents:
+				if person.id == id and person.alive:
+					named_militia.append(person)
+		alive = named_militia.size()
 	while _squad_views.size() < alive:
 		var soldier := CharacterBody3D.new()
 		soldier.name = "Recruit%d" % (_squad_views.size() + 1)
@@ -749,18 +888,32 @@ func _sync_squad() -> void:
 		soldier.add_child(collider)
 		_squad_root.add_child(soldier)
 		Art.person(soldier,"recruit")
-		Art.label(soldier, "Rekrut %d" % (_squad_views.size() + 1), Vector3(0, 1.05, 0), Color(0.78, 0.88, 0.74), 28)
+		var label := Art.label(soldier,"",Vector3(0,1.05,0),Color(0.78,0.88,0.74),28)
+		label.name = "RecruitName"
 		soldier.position = _player.position + Vector3(2 + _squad_views.size(), 0, 2)
 		_squad_views.append(soldier)
 	while _squad_views.size() > alive:
 		var removed: Node3D = _squad_views.pop_back()
 		removed.queue_free()
+	for index in range(_squad_views.size()):
+		var recruit_name := "Rekrut %d" % (index + 1)
+		var resident_id := ""
+		if not named_militia.is_empty():
+			recruit_name = str(named_militia[index].name)
+			resident_id = str(named_militia[index].id)
+		elif _state.get("origin_id", "italia") == "italia":
+			recruit_name = VillageLayout.resident(VillageLayout.VOLUNTEERS[index]).name
+		_squad_views[index].set_meta("resident_id", resident_id)
+		_squad_views[index].get_node("RecruitName").text = recruit_name
 
 
 func _physics_process(delta: float) -> void:
 	if not _built or _camera == null:
 		return
 	_update_camera(delta)
+	if _state.get("village", {}).get("enabled", false):
+		regional_terrain.follow(get_player_position(), _quality_profile)
+	population.update_nearby(get_player_position(),_active and _mode == "person")
 	if not _active:
 		return
 	_animation_time += delta
@@ -776,6 +929,11 @@ func _physics_process(delta: float) -> void:
 	elif _mode == "city" and not _build_mode:
 		_pan_city_camera(delta)
 	_animate_figure()
+	var frontier: Dictionary = _state.get("frontier",{})
+	var wagon_work: bool = int(frontier.get("step",0)) == 2 and frontier.get("preparation","") == "work" and float(frontier.get("work_seconds",0)) < 12.0 and _horizontal_distance(_player.position,Vector3(3,0,24)) <= 3.0
+	if wagon_work:
+		_figure.keep_working()
+	population.set_wagon_work(wagon_work)
 	_update_followers(delta)
 	_update_encounter()
 	_update_preview()
@@ -792,11 +950,17 @@ func _move_player(delta: float) -> void:
 	direction = direction.limit_length(1.0).rotated(Vector3.UP, _camera_yaw)
 	_player.velocity.x = move_toward(_player.velocity.x, direction.x * PLAYER_SPEED, delta * 22.0)
 	_player.velocity.z = move_toward(_player.velocity.z, direction.z * PLAYER_SPEED, delta * 22.0)
+	if _dodge_remaining > 0:
+		_dodge_remaining = maxf(0.0, _dodge_remaining - delta)
+		_player.velocity.x = _dodge_direction.x * 8.0
+		_player.velocity.z = _dodge_direction.z * 8.0
 	if not _player.is_on_floor():
 		_player.velocity.y -= delta * 19.6
 	else:
 		_player.velocity.y = -0.3
 	_player.move_and_slide()
+	_player.position.x = clampf(_player.position.x, -15999.0, 15999.0)
+	_player.position.z = clampf(_player.position.z, -15999.0, 15999.0)
 	if direction.length_squared() > 0.01:
 		_figure.rotation.y = lerp_angle(_figure.rotation.y, atan2(-direction.x, -direction.z), minf(1.0, delta * 12.0))
 
@@ -806,14 +970,30 @@ func _pan_city_camera(delta: float) -> void:
 	direction.x += float(Input.is_physical_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT))
 	direction.z += float(Input.is_physical_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP))
 	_city_focus += direction.limit_length(1.0) * delta * 14.0
-	_city_focus.x = clampf(_city_focus.x, -25, 30)
-	_city_focus.z = clampf(_city_focus.z, -25, 20)
+	_city_focus.x = clampf(_city_focus.x, -25, 48)
+	_city_focus.z = clampf(_city_focus.z, -48, 30)
 
 
 func _update_camera(delta: float) -> void:
 	var target: Vector3
 	var desired: Vector3
-	if _mode == "person":
+	if not _village_focus.is_empty() and village_life_world != null and village_life_world.actors.has(_village_focus):
+		var actor: Vector3 = village_life_world.actor_position(_village_focus)
+		var right := Vector3.UP.cross(_frontier_camera_direction)
+		target = actor + Vector3.UP * 1.48 + right * .65
+		desired = actor + Vector3.UP * 1.65 + _frontier_camera_direction * 3.0
+	elif not _frontier_focus.is_empty() and not population.info(_frontier_focus).is_empty():
+		var actor: Vector3 = population.actor_position(_frontier_focus)
+		var head := actor+Vector3.UP*1.48
+		var right := Vector3.UP.cross(_frontier_camera_direction)
+		target = head+right*.64
+		desired = actor+Vector3.UP*1.60+_frontier_camera_direction*3.0
+		if is_inside_tree():
+			var query := PhysicsRayQueryParameters3D.create(head,desired,1)
+			var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+			if not hit.is_empty():
+				desired = hit.position+(head-hit.position).normalized()*.28
+	elif _mode == "person":
 		target = _player.global_position + Vector3(0, 0.40, 0)
 		var offset := Vector3(0.36, sin(_camera_pitch) * _person_zoom + 0.22, cos(_camera_pitch) * _person_zoom)
 		desired = target + offset.rotated(Vector3.UP, _camera_yaw)
@@ -920,6 +1100,12 @@ func _unhandled_input(event: InputEvent) -> void:
 				_interact()
 			KEY_SPACE:
 				_attack()
+			KEY_Q:
+				action_requested.emit("village_block", {})
+			KEY_R:
+				action_requested.emit("village_dodge", {})
+			KEY_J:
+				action_requested.emit("village_panel", {})
 			KEY_B:
 				var enable := not _build_mode
 				if enable:
@@ -1036,8 +1222,8 @@ func _handle_touch_drag(event: InputEventScreenDrag) -> void:
 			var offset: Vector3 = current - previous
 			if _mode == "city":
 				_city_focus -= offset
-				_city_focus.x = clampf(_city_focus.x, -25, 30)
-				_city_focus.z = clampf(_city_focus.z, -25, 20)
+				_city_focus.x = clampf(_city_focus.x, -25, 48)
+				_city_focus.z = clampf(_city_focus.z, -48, 30)
 			else:
 				_map_focus -= offset
 				_map_focus.x = clampf(_map_focus.x, -30, 20)
@@ -1048,6 +1234,22 @@ func _handle_touch_drag(event: InputEventScreenDrag) -> void:
 func _interact() -> void:
 	if _mode != "person":
 		return
+	if _state.get("village", {}).get("enabled", false):
+		var raid: Dictionary = _state.village.raid
+		var point := Vector2(_player.position.x, _player.position.z)
+		if raid.status == "warning" and point.distance_to(VillageLife.SCOUT_POINT) <= VillageLife.RANGE and not raid.scouted:
+			action_requested.emit("village_scout", {})
+			return
+		if raid.status == "warning" and point.distance_to(VillageLife.ALARM_POINT) <= VillageLife.RANGE and not raid.alarm:
+			action_requested.emit("village_alarm", {})
+			return
+		if raid.active and raid.rescue_available and not raid.rescued and point.distance_to(VillageLife.RESCUE_POINT) <= VillageLife.RANGE:
+			action_requested.emit("village_rescue", {})
+			return
+		var villager: String = village_life_world.nearest(_player.position)
+		if not villager.is_empty():
+			action_requested.emit("village_npc", {"npc_id":villager})
+			return
 	var companion: Dictionary = _state.get("companion", {})
 	if _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS and not bool(companion.get("met", false)):
 		_companion.get_node("Figure").cue("talk")
@@ -1075,6 +1277,19 @@ func _interact() -> void:
 	elif _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS:
 		_companion.get_node("Figure").cue("talk")
 		action_requested.emit("companion_interact", {})
+	elif not bool(_state.get("encounter",{}).get("active",false)):
+		var npc := _nearest_visible_npc()
+		if not npc.is_empty():
+			action_requested.emit("frontier_talk",{"npc_id":npc})
+
+
+func _nearest_visible_npc() -> String:
+	var npc: String = population.nearest_npc(_player.global_position,INTERACTION_RADIUS)
+	if npc.is_empty():
+		return ""
+	var target: Vector3 = population.actor_position(npc)+Vector3.UP*1.4
+	var query := PhysicsRayQueryParameters3D.create(_player.global_position+Vector3.UP*.4,target,1)
+	return npc if get_world_3d().direct_space_state.intersect_ray(query).is_empty() else ""
 
 
 func _attack() -> void:
@@ -1082,6 +1297,19 @@ func _attack() -> void:
 		return
 	_attack_cooldown = 0.65
 	_attack_animation = 0.28
+	if _state.get("village", {}).get("enabled", false) and _state.village.raid.active:
+		_figure.cue("attack")
+		var target_id := ""
+		var distance := 2.8
+		for enemy: Dictionary in _state.village.raid.enemies:
+			var target := Vector3(enemy.x, 0, enemy.z)
+			var next_distance := _horizontal_distance(_player.position, target)
+			if int(enemy.health) > 0 and next_distance <= distance:
+				distance = next_distance
+				target_id = enemy.id
+		if not target_id.is_empty():
+			action_requested.emit("village_strike", {"enemy_id":target_id})
+		return
 	_figure.cue("attack" if _state.get("encounter",{}).get("active",false) else "train")
 	var encounter: Dictionary = _state.get("encounter", {})
 	var enemies: Array = encounter.get("enemies", [])
@@ -1152,6 +1380,11 @@ func _update_context_hint() -> void:
 	_hint.text = ""
 	if not _hint.visible:
 		return
+	if village_life_world != null:
+		var village_hint: String = village_life_world.hint(_player.position)
+		if not village_hint.is_empty():
+			_hint.text = village_hint
+			return
 	var companion: Dictionary = _state.get("companion", {})
 	if _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS and not bool(companion.get("met", false)):
 		_hint.text = "E · Mit %s sprechen" % Origins.PEOPLES[_state.get("origin_id","italia")].companion
@@ -1171,6 +1404,11 @@ func _update_context_hint() -> void:
 	var encounter: Dictionary = _state.get("encounter", {})
 	if bool(encounter.get("active", false)):
 		_hint.text = "LMB / Leertaste · Nahkampf\nAbstand unter 3 m"
+		return
+	var npc := _nearest_visible_npc()
+	if not npc.is_empty():
+		var info: Dictionary = population.info(npc)
+		_hint.text = "Interagieren · %s\n%s" % [info.name,info.occupation]
 
 
 func _ui_blocks_pointer() -> bool:

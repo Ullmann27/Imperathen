@@ -1,0 +1,84 @@
+extends Node
+## Read-only geometry/state observer for debug Android runtime verification.
+## It does not accept commands, move people, change resources or write saves.
+
+var session: Node
+var _elapsed := 0.0
+
+
+func _process(delta: float) -> void:
+	_elapsed += delta
+	if _elapsed < 1.0:
+		return
+	_elapsed = 0.0
+	var value := snapshot()
+	if not value.is_empty():
+		print("IMPERATHEN_VILLAGE_RUNTIME " + JSON.stringify(value))
+
+
+func snapshot() -> Dictionary:
+	if not is_instance_valid(session) or not is_instance_valid(session.ui):
+		return {}
+	var screen := str(session.screen)
+	if screen not in ["playing", "village_panel", "village_dialog", "paused"]:
+		return {}
+	var data: Dictionary = session.model.data
+	var village: Dictionary = data.get("village", {})
+	if not village.get("enabled", false):
+		return {}
+	var economy: Dictionary = village.economy
+	var world = session.world.village_life_world
+	if not is_instance_valid(world):
+		return {}
+	var value := {"screen":screen, "world_seconds":data.world_seconds,
+		"people":economy.people.size(), "actors":world.actors.size(),
+		"workplaces":world.workplaces.size(), "work_permit":economy.authority.work_permit,
+		"player_is_ruler":economy.authority.player_is_ruler,
+		"decimus_met":village.social.npcs.decimus.met, "controls":{}}
+	for person: Dictionary in economy.people:
+		if person.id == "aelia":
+			value["aelia_assignment"] = person.assignment
+	_collect(session.ui, value)
+	return value
+
+
+func _collect(node: Node, value: Dictionary) -> void:
+	if node is Control and not node.is_visible_in_tree():
+		return
+	if node is ScrollContainer and not value.has("scroll"):
+		var rect: Rect2 = node.get_global_rect()
+		var transform := node.get_viewport().get_screen_transform()
+		var top := transform * (rect.position + Vector2(rect.size.x * 0.82, rect.size.y * 0.25))
+		var bottom := transform * (rect.position + Vector2(rect.size.x * 0.82, rect.size.y * 0.80))
+		value["scroll"] = {"top":[top.x,top.y], "bottom":[bottom.x,bottom.y]}
+	if node is Button:
+		var key := ""
+		match node.text:
+			"Interagieren": key = "interact"
+			"Dorfleben": key = "village"
+			"Arbeit & Versorgung": key = "work_tab"
+			"Beim Wiederaufbau mithelfen": key = "permit"
+			"Gespräch beenden": key = "dialog_close"
+			"Zurück ins Dorf": key = "panel_close"
+		if node is OptionButton:
+			for sibling: Node in node.get_parent().get_children():
+				if sibling is Label and sibling.text.begins_with("Aelia ·"):
+					key = "aelia_assignment"
+		if not key.is_empty():
+			value.controls[key] = _geometry(node)
+			if node is OptionButton:
+				value.controls[key]["selected"] = node.selected
+	for child: Node in node.get_children():
+		_collect(child, value)
+
+
+func _geometry(control: Button) -> Dictionary:
+	var center := control.get_global_rect().get_center()
+	var native := control.get_viewport().get_screen_transform() * center
+	var visible := control.get_viewport_rect().has_point(center)
+	var ancestor := control.get_parent()
+	while ancestor != null:
+		if ancestor is Control and ancestor.clip_contents:
+			visible = visible and ancestor.get_global_rect().has_point(center)
+		ancestor = ancestor.get_parent()
+	return {"center":[native.x,native.y], "visible":visible, "enabled":not control.disabled}

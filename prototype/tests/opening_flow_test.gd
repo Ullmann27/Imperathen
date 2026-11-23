@@ -3,6 +3,7 @@ extends SceneTree
 
 const Entry = preload("res://main.tscn")
 const Checkpoint = preload("res://scripts/cinematic/opening_checkpoint.gd")
+const VillageLife = preload("res://scripts/story/village_life.gd")
 var failures: Array[String] = []
 var checks := 0
 var game
@@ -88,6 +89,7 @@ func _run() -> void:
 	game.world.action_requested.emit("build", {"x": 8.0, "z": 4.0})
 	game._process(13.0)
 	_check(game.model.data.buildings[0].completed, "The opening leads into a real completed shelter")
+	_complete_village_phase()
 	_move(Vector3(0, 1, -7))
 	var blocked_save := ProjectSettings.globalize_path(game.SAVE_PATH + ".tmp")
 	_check(DirAccess.make_dir_recursive_absolute(blocked_save) == OK, "A disposable blocked save path can exercise real persistence failure")
@@ -100,7 +102,9 @@ func _run() -> void:
 	var adult_state: String = JSON.stringify(game.model.data)
 	game._show_menu()
 	game._continue_game()
-	_check(game.screen == "opening" and game.opening_sequence.id == "adulthood" and JSON.stringify(game.model.data) == adult_state, "Adult continuation cannot apply the six-year jump twice")
+	# A sub-tick float may serialize with a different last decimal after JSON
+	# reload; compare the complete parsed state, as for the childhood reload above.
+	_check(game.screen == "opening" and game.opening_sequence.id == "adulthood" and JSON.parse_string(JSON.stringify(game.model.data)) == JSON.parse_string(adult_state), "Adult continuation cannot apply the six-year jump twice")
 	game._opening_skip()
 	_check(game.opening_sequence.beats[game.opening_index].advance_label == "Zur Ausbildung", "Adult handoff points to training, not the already completed first day")
 	game._opening_next()
@@ -140,3 +144,27 @@ func _check(condition: bool, message: String) -> void:
 	checks += 1
 	if not condition:
 		failures.append(message)
+
+
+func _complete_village_phase() -> void:
+	# New lives require real village encounters and a resolved first raid before
+	# the legacy adulthood/persistence scenario may continue. Never inject flags.
+	for npc_id: String in ["decimus", "aelia", "varro"]:
+		var at: Vector2 = VillageLife.actor_position(game.model.data, npc_id)
+		_move(Vector3(at.x, 1.0, at.y + 1.0))
+		game.world.action_requested.emit("village_npc", {"npc_id":npc_id})
+		_check(game.screen == "village_dialog" and game.model.data.village.social.npcs[npc_id].met, "Required village resident is met through the actual conversation gateway: " + npc_id)
+		game.ui.action_requested.emit("resume", {})
+	# This fixture observes the real loss branch from a safe position. It neither
+	# creates a victory nor awards combat XP; the dedicated experience test fights.
+	_move(Vector3(35.0, 1.0, 20.0))
+	var saw_warning := false
+	var saw_attack := false
+	for step in 70:
+		game._process(5.0)
+		saw_warning = saw_warning or game.model.data.village.raid.status == "warning"
+		saw_attack = saw_attack or game.model.data.village.raid.active
+		if VillageLife.training_ready(game.model.data):
+			break
+	_check(saw_warning and saw_attack and game.model.data.village.raid.completed == 1, "The real warning and first village attack finish before adulthood")
+	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days satisfy the new training gate")

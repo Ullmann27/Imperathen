@@ -1,5 +1,7 @@
 # Projektstatus
 
+**Aktuelle Fortsetzung, 23.11.2026.** `feature/village-life-delivery-20261123` sichert die unterbrochene Dorfleben-Arbeit und verbindet sie mit dem filmischen Einstieg aus `ea9987c`. Die aktuelle Quelle enthält Wiederaufbau mit vierzehn konkreten erwachsenen Arbeitskräften, fünf Arbeitsstätten, Gespräche/Berufe, Überfälle, gemeinsame Spielstände und 28 Frontier-GLBs. Drei ergänzende Arbeitsbereiche prüfen Spielregeln, Darstellung und Android-Lieferung. Der maßgebliche aktuelle Status einschließlich tatsächlicher Prüfungen und offener Grenzen steht in [DELIVERY.md](../17_village_life/DELIVERY.md). Die folgenden Abschnitte bleiben die historischen Ausgangsstände.
+
 **Aktuelle Charakterfortsetzung, 22.11.2026.** Der Arbeitsbranch `feature/hero-realism-20261122` baut auf `integration/realistic-android-23` auf. Ausführbare Änderungen, Originalmodelle, Renderings und aktuelle Prüfungen stehen im [Charakter-Lieferbericht](../14_character_realism/DELIVERY.md). Die vom Nutzer mit einem Spielbild konkretisierte PC-/Konsolenqualität bleibt der visuelle Maßstab; weder ein Konzeptbild noch ein bestandener Dateivertrag schließen die Qualitätsanforderung aus [Issue #33](https://github.com/Ullmann27/Imperathen/issues/33).
 
 **Aktueller Integrationsstand.** Die zusammengeführte Android- und Desktop-Linie, Abnahme und offene Punkte stehen im [Lieferbericht](../12_integration/DELIVERY.md). Die folgenden Angaben dokumentieren den vorausgehenden Arbeitsstand.

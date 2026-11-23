@@ -1,0 +1,4 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Valley default: { "outcome": "victory", "reason": "Der Höhenbund zieht ab.", "seconds": 55.4, "capture_seconds": 0.0, "defence_seconds": 120, "ally": { "initial": 30, "strength": 17, "losses": 13, "routed": 2, "wounded": 10, "dead": 3 }, "enemy": { "initial": 30, "strength": 7, "losses": 23, "routed": 7, "wounded": 16, "dead": 7 } }
+BATTLE_RULES_RESULT checks=142 failures=0

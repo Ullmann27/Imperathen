@@ -8,7 +8,12 @@ const COMPANIONS := {"italia":"marcus","germania":"albrun","han":"lin","wa":"aki
 const LOOPS := ["idle","march","run","talk","work"]
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
+const FRONTIER_PATH := "res://assets/characters/frontier_%s_%d.glb"
+const APPEARANCES := ["civilian_man", "civilian_woman", "elder", "legionary", "officer", "spearman", "archer"]
+const CLOTH_TINTS := [Color(1.0, 1.0, 1.0), Color(0.72, 0.90, 1.10), Color(1.10, 0.75, 0.60), Color(0.75, 1.05, 0.79), Color(1.15, 1.06, 0.76), Color(0.76, 0.73, 0.84)]
+const RESIDENT_HEIGHTS := [0.97, 1.03, 1.0, 0.95, 1.04, 0.99]
 const LOD_DISTANCES := [11.0,23.0,44.0]
+const CROWD_LOD_DISTANCES := [6.0,15.0,30.0]
 static var scenes := {}
 static var materials := {}
 var role := "player"
@@ -29,6 +34,8 @@ var _posed := false
 var _blade: MeshInstance3D
 var _face := FacialMotion.new()
 var _lod_profile := ""
+var appearance_id := ""
+var appearance_variation := 0
 
 
 func _ready() -> void:
@@ -45,6 +52,30 @@ func configure(kind: String, origin: String, years: int) -> void:
 	_reload(maxi(0,detail))
 
 
+func configure_appearance(new_appearance: String, variation: int = 0) -> void:
+	var selected := new_appearance if new_appearance in APPEARANCES else ""
+	var selected_variation := posmod(variation, 18)
+	if selected == appearance_id and selected_variation == appearance_variation and body:
+		return
+	appearance_id = selected
+	appearance_variation = selected_variation
+	if not appearance_id.is_empty():
+		identity = "resident_%s_%d" % [appearance_id, appearance_variation]
+	_reload(maxi(0, detail))
+
+
+func _frontier_identity() -> String:
+	# The new civilian anatomy is adult. Existing youth characters keep their
+	# original age route and cannot accidentally receive an adult resident mesh.
+	if age < 18:
+		return ""
+	if not appearance_id.is_empty():
+		return appearance_id
+	if home == "italia":
+		return {"mentor": "officer", "recruit": "spearman", "enemy": "legionary"}.get(role, "")
+	return ""
+
+
 func _path(level: int) -> String:
 	# This asset has an authored Italia identity. Other origins and companions
 	# keep their own appearances until their replacement models are available.
@@ -55,6 +86,14 @@ func _path(level: int) -> String:
 				complete_set = false
 		if complete_set:
 			return HERO_PATH % level
+	var frontier := _frontier_identity()
+	if not frontier.is_empty():
+		var complete_set := true
+		for candidate in 4:
+			if not ResourceLoader.exists(FRONTIER_PATH % [frontier, candidate], "PackedScene"):
+				complete_set = false
+		if complete_set:
+			return FRONTIER_PATH % [frontier, level]
 	return _legacy_path(level)
 
 
@@ -95,6 +134,8 @@ func _reload(level: int) -> void:
 	if role in ["player","companion"]:
 		size_factor = 1.14 if age >= 18 else 1.0
 		if role == "companion": size_factor *= 0.97
+	elif active_model_path.begins_with("res://assets/characters/frontier_") and _frontier_identity() in ["civilian_man", "civilian_woman", "elder"]:
+		size_factor = 1.14 * float(RESIDENT_HEIGHTS[appearance_variation % RESIDENT_HEIGHTS.size()])
 	body.scale = Vector3.ONE * size_factor
 	add_child(body)
 	body.position.y = -0.9
@@ -111,6 +152,11 @@ func _reload(level: int) -> void:
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
 		for cached_path: String in scenes.keys():
 			if cached_path.begins_with("res://assets/characters/hero_quality_") and cached_path != path:
+				scenes.erase(cached_path)
+	elif path.begins_with("res://assets/characters/frontier_"):
+		var family := "res://assets/characters/frontier_" + _frontier_identity() + "_"
+		for cached_path: String in scenes.keys():
+			if cached_path.begins_with(family) and cached_path != path:
 				scenes.erase(cached_path)
 
 
@@ -152,6 +198,7 @@ func _style(shape: MeshInstance3D) -> void:
 			source.vertex_color_use_as_albedo = true
 		elif source.resource_name == "PortraitSkin":
 			var face_id := identity
+			if role == "resident": face_id = "hero_" + home
 			if age >= 18 and home == "italia": face_id = "adult_marcus" if role == "companion" else "adult_italia"
 			if not materials.has(face_id):
 				var face := source.duplicate() as StandardMaterial3D
@@ -160,7 +207,25 @@ func _style(shape: MeshInstance3D) -> void:
 				face.roughness = 0.77
 				materials[face_id] = face
 			shape.set_surface_override_material(i,materials[face_id])
-		elif source.resource_name in ["Civilian_Linen","Overgarment"] or role == "enemy":
+		elif active_model_path.begins_with("res://assets/characters/frontier_") and source.resource_name in ["FrontierCloth", "HeroHair", "FrontierGreyHair"]:
+			var key := "%d/frontier/%d" % [source.get_instance_id(), appearance_variation]
+			var mat: StandardMaterial3D
+			if materials.has(key):
+				mat = (materials[key] as WeakRef).get_ref() as StandardMaterial3D
+			if not mat:
+				mat = source.duplicate() as StandardMaterial3D
+				if source.resource_name == "FrontierCloth":
+					mat.albedo_color *= CLOTH_TINTS[appearance_variation % CLOTH_TINTS.size()]
+				elif source.resource_name == "HeroHair":
+					var hair_variant := floori(float(appearance_variation) / 6.0) % 3
+					mat.albedo_color *= [Color(0.60, 0.52, 0.44), Color(1.0, 0.88, 0.68), Color(0.72, 0.76, 0.76)][hair_variant]
+				else:
+					mat.albedo_color *= Color(0.84, 0.86, 0.84) if appearance_variation % 2 else Color(1.15, 1.13, 1.09)
+				# Inactive LOD textures may unload; live actor overrides own the
+				# material. A cache must not retain all four texture tiers forever.
+				materials[key] = weakref(mat)
+			shape.set_surface_override_material(i, mat)
+		elif source.resource_name in ["Civilian_Linen","Overgarment"] or (role == "enemy" and not active_model_path.begins_with("res://assets/characters/frontier_")):
 			var key := "%d/%s/%s" % [source.get_instance_id(),home,role]
 			if not materials.has(key):
 				var mat := source.duplicate() as StandardMaterial3D
@@ -223,17 +288,18 @@ func refresh_lod(camera: Camera3D) -> void:
 	if not is_instance_valid(camera) or not body: return
 	var distance := global_position.distance_to(camera.global_position)
 	var factor := float({"low":0.55,"balanced":0.86,"high":1.15,"very_high":1.5}.get(profile,1.0))
+	var distances: Array = CROWD_LOD_DISTANCES if role == "resident" else LOD_DISTANCES
 	var level := 0
-	for threshold: float in LOD_DISTANCES:
+	for threshold: float in distances:
 		if distance >= threshold * factor: level += 1
 	var same_profile := profile == _lod_profile
 	_lod_profile = profile
 	# A narrow dead band prevents repeated asset loads when walking along a LOD
 	# boundary. An explicit graphics-profile change is applied without delay.
 	if same_profile and detail >= 0:
-		if level > detail and distance < LOD_DISTANCES[detail] * factor * 1.10:
+		if level > detail and distance < float(distances[detail]) * factor * 1.10:
 			return
-		if level < detail and distance > LOD_DISTANCES[detail - 1] * factor * 0.90:
+		if level < detail and distance > float(distances[detail - 1]) * factor * 0.90:
 			return
 	if level != detail: _reload(level)
 
@@ -253,7 +319,10 @@ func _process(delta: float) -> void:
 		var advance := delta
 		if clip in ["march","run"]:
 			var stride := 1.10 if clip == "march" else 1.49
-			if age >= 18: stride *= 1.14
+			if _frontier_identity() in ["legionary", "officer", "spearman", "archer"] and active_model_path.begins_with("res://assets/characters/frontier_"):
+				stride = 1.30 if clip == "march" else 1.75
+			else:
+				stride *= body.scale.y
 			advance *= speed * animator.current_animation_length / stride
 		animator.advance(advance)
 		if animator.current_animation != "":

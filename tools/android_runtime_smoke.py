@@ -59,6 +59,9 @@ def main():
     parser.add_argument("--device-apk", type=Path, help="Also run the actual ARM64 download if the emulator supports translation")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(args.apk) as archive:
+        has_village_life = any(name.startswith("assets/scripts/story/village_life.")
+                               for name in archive.namelist())
     package = "at.heinz.imperathen"
     report = {"platform": "Android emulator", "apk_sha256": hashlib.sha256(args.apk.read_bytes()).hexdigest(), "physical_device_test": False,
               "arm64_runtime_test": False, "status": "failed", "checks": [], "errors": []}
@@ -224,6 +227,71 @@ def main():
         wait_marker("IMPERATHEN_OPENING_COMPLETE")
         record("objective_hands_over_control", True, "Actual touch accepted the objective after a separate skip action")
 
+    def village_snapshot(screen=None, *, predicate=None, after=-1, timeout=100):
+        marker = "IMPERATHEN_VILLAGE_RUNTIME "
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            text = checked_logs()
+            if text.count(marker) > after:
+                lines = [line for line in text.splitlines() if marker in line]
+                if lines:
+                    value = json.loads(lines[-1].split(marker, 1)[1])
+                    if (screen is None or value.get("screen") == screen) and (predicate is None or predicate(value)):
+                        return value
+            time.sleep(1)
+        raise RuntimeError("No matching village runtime state: " + str(screen))
+
+    def village_control(name, screen):
+        state = village_snapshot(screen)
+        for _ in range(14):
+            control = state.get("controls", {}).get(name)
+            if control is None:
+                raise RuntimeError("The current village UI has no control: " + name)
+            if control.get("visible") and control.get("enabled"):
+                return control
+            if not control.get("enabled"):
+                raise RuntimeError("The actual village control is disabled: " + name)
+            scroll = state.get("scroll")
+            if not scroll:
+                raise RuntimeError("A clipped village control has no visible scroll area: " + name)
+            top, bottom = scroll["top"], scroll["bottom"]
+            start, end = (bottom, top) if control["center"][1] > top[1] else (top, bottom)
+            previous = checked_logs().count("IMPERATHEN_VILLAGE_RUNTIME ")
+            adb("shell", "input", "swipe", *(str(round(v)) for v in (*start, *end)), "600")
+            state = village_snapshot(screen, after=previous)
+        raise RuntimeError("Could not scroll the actual village control into view: " + name)
+
+    def exercise_village_life():
+        initial = village_snapshot("playing")
+        record("village_actual_population", initial.get("people") == 14 and initial.get("actors") == 15
+               and initial.get("workplaces") == 5 and initial.get("player_is_ruler") is False, initial)
+        tap(village_control("interact", "playing")["center"])
+        conversation = village_snapshot("village_dialog", predicate=lambda state: state.get("decimus_met") is True)
+        record("village_touch_meets_decimus", True, conversation)
+        tap(village_control("permit", "village_dialog")["center"])
+        permission = village_snapshot("village_dialog", predicate=lambda state: state.get("work_permit") is True)
+        record("village_touch_work_permission", permission.get("player_is_ruler") is False, permission)
+        screenshot("12_android_decimus.png")
+        adb("shell", "input", "keyevent", "4")
+        village_snapshot("playing")
+        record("village_back_closes_dialogue", True, "Android Back returned from the real steward conversation")
+        tap(village_control("village", "playing")["center"])
+        tap(village_control("work_tab", "village_panel")["center"])
+        selector = village_control("aelia_assignment", "village_panel")
+        record("village_unassigned_resident", selector.get("selected") == 0, selector)
+        tap(selector["center"])
+        # The native OptionButton popup is opened by the real touch above. Its
+        # current item is observed; Android navigation chooses the next two rows.
+        adb("shell", "input", "keyevent", "KEYCODE_DPAD_DOWN")
+        adb("shell", "input", "keyevent", "KEYCODE_DPAD_DOWN")
+        adb("shell", "input", "keyevent", "KEYCODE_ENTER")
+        assigned = village_snapshot("village_panel", predicate=lambda state: state.get("aelia_assignment") == "woodcamp")
+        record("village_actual_worker_assignment", assigned.get("people") == 14, assigned)
+        screenshot("13_android_work_assignment.png")
+        adb("shell", "input", "keyevent", "4")
+        village_snapshot("playing", predicate=lambda state: state.get("aelia_assignment") == "woodcamp")
+        record("village_back_closes_work_panel", True, "The worker stays assigned when the work panel closes")
+
     def relaunch(diagnostics=False):
         previous = report["pid"]
         (args.output / ("logcat-" + previous + ".txt")).write_text(logs(), encoding="utf-8")
@@ -309,6 +377,8 @@ def main():
         wait_marker("IMPERATHEN_SESSION_STARTED")
         record("touch_starts_saved_game", True, "New game button produced a saved village")
         finish_first_day_opening()
+        if has_village_life:
+            exercise_village_life()
         time.sleep(3)
         dismiss_fullscreen_hint("world")
         screenshot("02_android_world.png")
@@ -331,6 +401,11 @@ def main():
         tap(resumed_menu["continue"])
         wait_marker("IMPERATHEN_CONTINUED")
         record("continue_after_process_death", True, "Loaded the village in a new process")
+        if has_village_life:
+            restored = village_snapshot("playing")
+            record("village_decisions_survive_restart", restored.get("decimus_met") is True
+                   and restored.get("work_permit") is True and restored.get("aelia_assignment") == "woodcamp"
+                   and restored.get("people") == 14 and restored.get("player_is_ruler") is False, restored)
         practice_menu = relaunch(diagnostics=True)
         tap(practice_menu["demo"])
         valley_ready = wait_marker("IMPERATHEN_VALLEY_READY")

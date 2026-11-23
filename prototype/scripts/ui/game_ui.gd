@@ -15,6 +15,8 @@ const FigureGallery = preload("res://scripts/ui/figure_gallery.gd")
 const SafeArea = preload("res://scripts/ui/safe_area.gd")
 const TouchPadScript := preload("res://scripts/ui/touch_pad.gd")
 const TouchActionScript := preload("res://scripts/ui/touch_action.gd")
+const VillagePanel = preload("res://scripts/ui/village_life_panel.gd")
+var _village_tab := "overview"
 
 class Atmosphere extends Control:
 
@@ -90,6 +92,7 @@ var _quality := "balanced"
 var _diagnostics := false
 var _layout_queued := false
 var _dialog_data: Dictionary = {}
+var _frontier_dialog_data: Dictionary = {}
 var _confirm_data: Dictionary = {}
 
 
@@ -346,6 +349,8 @@ func update_state(state: Dictionary) -> void:
 	_hud_labels["denarii"].text = "%d  Denare" % int(resources.get("denarii", 0))
 	var seconds := maxi(0, int(state.get("world_seconds", 0)))
 	_hud_labels["time"].text = "TAG %d  ·  %02d:%02d" % [seconds / 86400 + 1, (seconds / 3600) % 24, (seconds / 60) % 60]
+	if state.get("village", {}).get("enabled", false):
+		_hud_labels["time"].text = "DORFTAG %d" % int(state.village_economy_view.get("day", 1))
 	_hud_labels["age"].text = "%d Jahre  ·  %s" % [int(player.get("age", 12)), _career_name(String(progress.get("stage", "prologue")))]
 	var health := clampf(float(player.get("health", 100)), 0, 100)
 	_health_bar.value = health
@@ -372,9 +377,11 @@ func update_state(state: Dictionary) -> void:
 		completed = completed or bool(building.get("completed", false))
 		unfinished = unfinished or not bool(building.get("completed", false))
 	var trained := bool(progress.get("training_complete", false))
-	var ended := String(progress.get("stage", "")) in ["ended", "fallen"]
+	var ended := bool(progress.get("career_terminal", false)) or String(progress.get("stage", "")) == "fallen"
 	_action_buttons["build"].disabled = int(resources.get("wood", 0)) < 8 or ended
 	_action_buttons["train"].disabled = not completed or not bool(companion.get("met", false)) or unfinished or trained or ended
+	if state.get("village", {}).get("enabled", false) and int(player.get("age", 12)) < 18:
+		_action_buttons["train"].disabled = _action_buttons["train"].disabled or not bool(state.get("village_view", {}).get("training_ready", false))
 	_action_buttons["recruit"].disabled = not trained or int(squad.get("recruits", 0)) >= 3 or int(resources.get("denarii", 0)) < 5 or int(resources.get("grain", 0)) < 2 or ended
 	_action_buttons["skirmish"].disabled = not trained or int(squad.get("alive", 0)) <= 0 or bool(encounter.get("active", false)) or bool(progress.get("skirmish_won", false)) or ended
 	if bool(encounter.get("active", false)):
@@ -385,6 +392,12 @@ func update_state(state: Dictionary) -> void:
 		_hud_labels["status"].text = ("ANGRIFF  ·  %d Gegner" if _compact_layout else "VERTEIDIGUNG  ·  %d Gegner") % remaining
 	else:
 		_hud_labels["status"].text = ("ABSCHLUSS" if ended else "GRENZDORF") if _compact_layout else "GRENZDORF  ·  " + ("ABSCHNITT BEENDET" if ended else "DEIN LEBENSWEG")
+	if state.get("village", {}).get("enabled", false):
+		var raid: Dictionary = state.village.raid
+		if raid.status == "warning":
+			_hud_labels["status"].text = "SPUREN VOR DEM DORF · %d s" % ceili(float(raid.remaining))
+		elif raid.active:
+			_hud_labels["status"].text = "ÜBERFALL · AUSDAUER %d" % int(raid.stamina)
 
 
 func show_pause() -> void:
@@ -402,6 +415,8 @@ func show_pause() -> void:
 		requirement.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		column.add_child(requirement)
 	column.add_child(_button("Chronik", func(): _show_journal(false)))
+	if _state.get("village", {}).get("enabled", false):
+		column.add_child(_button("Dorfleben und Wiederaufbau", _emit.bind("village_panel", {})))
 	column.add_child(_button("Spiel speichern", func(): _emit("save")))
 	column.add_child(_button("Einstellungen", func(): _show_settings("pause")))
 	column.add_child(_button("Zum Hauptmenü", func(): _emit("menu")))
@@ -457,6 +472,115 @@ func show_dialog(title: String, text: String, choices: Array) -> void:
 		column.add_child(first_button)
 	if first_button != null:
 		first_button.grab_focus.call_deferred()
+
+
+func show_frontier_dialog(dialog: Dictionary) -> void:
+	clear_notification()
+	_frontier_dialog_data = dialog.duplicate(true)
+	_open_screen("frontier_dialog", false)
+	_screen.mouse_filter = Control.MOUSE_FILTER_STOP
+	var shade := ColorRect.new()
+	shade.color = Color(0.025, 0.035, 0.04, 0.20)
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_screen.add_child(shade)
+	var extent := _content_size()
+	var wide := extent.x >= 820 and extent.x >= extent.y * 1.25
+	var width := minf(560.0, extent.x * 0.53) if wide else minf(560.0, extent.x - 40.0)
+	var margin := _margin(20, 22, 20, 22)
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_screen.add_child(margin)
+	var row := _row(0)
+	margin.add_child(row)
+	var space := Control.new()
+	space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(space)
+	var panel := _panel(true)
+	panel.name = "FrontierConversation"
+	panel.custom_minimum_size.x = width
+	panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(panel)
+	if not wide:
+		var right_space := Control.new()
+		right_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(right_space)
+	var scroll := ScrollContainer.new()
+	scroll.name = "FrontierConversationScroll"
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	scroll.custom_minimum_size = Vector2(width - 36.0, 0)
+	panel.add_child(scroll)
+	var column := _column(12)
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.custom_minimum_size.x = width - 48.0
+	scroll.add_child(column)
+	column.add_child(_label(str(dialog.get("kicker", "DIE STRASSE ZUR LEGION")), 12, BRONZE))
+	var heading := _label(str(dialog.get("title", "Ein Gespräch im Dorf")), 28, CREAM, true)
+	heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	column.add_child(heading)
+	var body := _label(str(dialog.get("text", "")), 17, CREAM)
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	column.add_child(body)
+	if not str(dialog.get("feedback", "")).is_empty():
+		var feedback := _label(str(dialog.feedback), 15, BRONZE)
+		feedback.name = "ConversationFeedback"
+		feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		column.add_child(feedback)
+	_spacer(column, 4)
+	var first_button: Button
+	for value in dialog.get("choices", []):
+		if not value is Dictionary:
+			continue
+		var entry: Dictionary = value
+		var choice_id := str(entry.get("id", ""))
+		var payload := {"npc_id": str(dialog.get("npc_id", "")), "choice": choice_id}
+		var action := "frontier_choice"
+		if entry.has("command"):
+			action = "village_command"
+			payload = {"command":entry.command, "args":entry.get("payload", {})}
+		var available := bool(entry.get("enabled", true))
+		var button := _button(str(entry.get("label", "Antworten")), _emit.bind(action, payload), first_button == null and available, 16)
+		button.name = "FrontierChoice_" + choice_id
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.custom_minimum_size.y = 52
+		button.disabled = not available
+		button.tooltip_text = str(entry.get("reason", ""))
+		column.add_child(button)
+		if available and first_button == null:
+			first_button = button
+		if not available and not button.tooltip_text.is_empty():
+			var reason := _label(button.tooltip_text, 13, MUTED)
+			reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			column.add_child(reason)
+	var close_button := _button("Gespräch beenden", _emit.bind(str(dialog.get("close_action", "frontier_close")), {}), false, 15)
+	close_button.name = "FrontierConversationClose"
+	column.add_child(close_button)
+	var fit := func():
+		if is_instance_valid(scroll):
+			scroll.custom_minimum_size.y = minf(column.get_combined_minimum_size().y, maxf(100.0, _content_size().y - 100.0))
+	column.minimum_size_changed.connect(fit)
+	fit.call_deferred()
+	(first_button if first_button != null else close_button).grab_focus.call_deferred()
+
+
+func show_village_dialog(dialog: Dictionary) -> void:
+	var content := dialog.duplicate(true)
+	content.kicker = "MENSCHEN DEINES DORFES"
+	content.close_action = "village_close"
+	show_frontier_dialog(content)
+
+
+func show_village_panel(state: Dictionary, tab := "overview") -> void:
+	clear_notification()
+	_state = state.duplicate(true)
+	VillagePanel.show(self, state, tab)
+
+
+func clear_notification() -> void:
+	if _toast_tween != null and _toast_tween.is_valid():
+		_toast_tween.kill()
+	if is_instance_valid(_toast_panel):
+		_toast_panel.hide()
 
 
 func notify(message: String) -> void:
@@ -548,12 +672,13 @@ func handle_back() -> bool:
 	match _view_state:
 		"intro": _finish_intro()
 		"game": _emit("cancel_build" if _build_active else "pause")
-		"pause", "journal": _emit("resume")
+		"pause", "journal", "village": _emit("resume")
 		"gallery": _close_gallery()
 		"settings": _return_to(_settings_return)
 		"confirm": _return_to(_confirm_return)
 		"menu": _confirm("Spiel beenden?", "Ein laufender Lebensweg wird vor dem Beenden gespeichert.", "quit", {})
 		"dialog": notify("Wähle eine Antwort, um dieses Gespräch abzuschließen.")
+		"frontier_dialog": _emit(str(_frontier_dialog_data.get("close_action", "frontier_close")))
 		_: return false
 	return true
 
@@ -771,6 +896,8 @@ func _build_toolbar() -> void:
 	atlas.visible = _mode == "map"
 	row.add_child(atlas)
 	_action_buttons["atlas"] = atlas
+	if _state.get("village", {}).get("enabled", false):
+		row.add_child(_button("Dorfleben", _emit.bind("village_panel", {}), true, 13))
 	var actions := [
 		["build", "Hütte · 8 Holz", "Bauplan öffnen. Mit Linksklick einen erlaubten Platz bestätigen."],
 		["train", "Ausbildung", "Benötigt eine fertige Hütte, eine Gefährtenentscheidung und keine offene Baustelle. Am Trainingsplatz fortsetzen."],
@@ -812,11 +939,16 @@ func _build_touch_controls() -> void:
 		right.offset_left = -168
 		right.offset_right = -16
 		right.offset_top = -164
+		if _state.get("village", {}).get("enabled", false):
+			right.offset_top = -292
 		right.offset_bottom = -20
 		right.add_theme_constant_override("separation", 10)
 		right.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_screen.add_child(right)
-		for item in [["interact", "Interagieren"], ["attack", "Angreifen"]]:
+		var touch_entries := [["interact", "Interagieren"], ["attack", "Angreifen"]]
+		if _state.get("village", {}).get("enabled", false):
+			touch_entries.append_array([["village_block", "Blocken"], ["village_dodge", "Ausweichen"]])
+		for item in touch_entries:
 			var button: Button = _touch_button(item[1], _emit.bind(item[0], {}), item[0] == "attack")
 			button.name = item[0].capitalize()
 			button.custom_minimum_size.y = 62
@@ -983,8 +1115,10 @@ func _rebuild_layout() -> void:
 		"settings": _show_settings(_settings_return)
 		"pause": show_pause()
 		"journal": _show_journal(false)
+		"village": show_village_panel(_state, _village_tab)
 		"confirm": _render_confirmation()
 		"dialog": show_dialog(String(_dialog_data.title), String(_dialog_data.text), _dialog_data.choices)
+		"frontier_dialog": show_frontier_dialog(_frontier_dialog_data)
 
 
 func _content_size() -> Vector2:
@@ -1026,10 +1160,20 @@ func _objective(state: Dictionary) -> Array[String]:
 	var stage := String(progress.get("stage", "prologue"))
 	if stage == "fallen":
 		return ["Dein Weg ist zu Ende", "Du bist im Kampf gefallen. Im Menü kannst du einen gespeicherten Stand laden oder ein neues Leben beginnen."]
-	if stage == "ended":
-		return ["Eine Spur bleibt", "Dieser erste Abschnitt ist abgeschlossen. Deine Entscheidung steht in der Chronik. Speichere deinen Lebensweg."]
+	var village: Dictionary = state.get("village_view", {})
+	if state.get("village", {}).get("enabled", false):
+		var has_roof := false
+		for hut: Dictionary in state.get("buildings", []):
+			has_roof = has_roof or bool(hut.get("completed", false))
+		if state.village.raid.status == "warning" or state.village.raid.active or (has_roof and int(state.player.age) < 18):
+			return [str(village.get("title", "Dein Platz im Dorf")), str(village.get("objective", "Sprich mit Decimus und lerne die Nachbarn kennen."))]
 	if bool(state.get("encounter", {}).get("active", false)):
 		return ["Für das Dorf", "Bleibe bei deiner Truppe. Nutze Abstand und gezielte Treffer. Ein gefallener Gefährte kehrt nicht durch einen Kamerawechsel zurück."]
+	var journey: Dictionary = state.get("frontier_objective", {})
+	if bool(journey.get("active", false)):
+		return [str(journey.get("title", "Die Straße zur Legion")), str(journey.get("text", ""))]
+	if stage == "ended":
+		return ["Eine Spur bleibt", "Dieser erste Abschnitt ist abgeschlossen. Deine Entscheidung steht in der Chronik. Speichere deinen Lebensweg."]
 	if bool(progress.get("skirmish_won", false)):
 		return ["Was bleibt nach dem Sieg?", "Die Verteidigung ist entschieden. Deine nächste Wahl bestimmt den Abschluss dieses Abschnitts."]
 	var buildings: Array = state.get("buildings", [])
@@ -1056,7 +1200,7 @@ func _career_name(stage: String) -> String:
 		"training": return "In Ausbildung"
 		"trained": return "Ausgebildet"
 		"skirmish", "aftermath": return "Truppenführer"
-		"ended": return "Chronik abgeschlossen"
+		"ended": return "Auf eigenem Weg"
 		"fallen": return "Gefallen"
 		_: return "Dorfkind"
 

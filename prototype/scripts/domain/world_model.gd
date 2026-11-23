@@ -8,7 +8,10 @@ signal changed
 const BattleModel = preload("res://scripts/battle/battle_model.gd")
 const Seasons = preload("res://scripts/strategy/season_campaign.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
-const SCHEMA_VERSION := 3
+const Frontier = preload("res://scripts/story/frontier_chapter.gd")
+const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
+const VillageLife = preload("res://scripts/story/village_life.gd")
+const SCHEMA_VERSION := 5
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
 const MAX_COMMAND_IDS := 1024
@@ -28,7 +31,8 @@ const COMMAND_FIELDS := {
 	"gather": ["node_id"], "choose_companion": ["choice"], "build": ["x", "z"],
 	"train": [], "training_hit": [], "recruit": [], "start_skirmish": [],
 	"strike_enemy": ["enemy_id"], "receive_damage": ["amount"],
-	"resolve_skirmish": [], "choose_story": ["choice"]
+	"resolve_skirmish": [], "choose_story": ["choice"],
+	"frontier_talk": ["npc_id"], "frontier_choice": ["npc_id", "choice"]
 }
 
 var data: Dictionary = {}
@@ -38,7 +42,7 @@ func _init() -> void:
 	new_game()
 
 
-func new_game(origin_id := "italia") -> void:
+func new_game(origin_id := "italia", extended_village := false) -> void:
 	if not Origins.PEOPLES.has(origin_id):
 		origin_id = "italia"
 	var origin: Dictionary = Origins.PEOPLES[origin_id]
@@ -58,17 +62,26 @@ func new_game(origin_id := "italia") -> void:
 		"timers": {"training": 0.0, "strike": 0.0, "damage": 0.0},
 		"chronicle": [{"time": 0.0, "text": origin.intro}],
 		"story": {"title": origin.calling, "text": "Sammle Holz, sprich mit %s und baue deine erste Unterkunft östlich des Weges." % origin.companion, "choices": [], "choice": ""},
-		"origin_id":origin_id, "strategy":Seasons.new_game(origin_id), "valley": {}, "command_log": {}
+		"origin_id":origin_id, "strategy":Seasons.new_game(origin_id), "valley": {}, "command_log": {},
+		"frontier": Frontier.new_state()
 	}
 	for index in NODE_POSITIONS.size():
 		data.resource_nodes.append({"id": "timber_%d" % index, "x": NODE_POSITIONS[index][0], "z": NODE_POSITIONS[index][1], "amount": 16})
+	VillageEconomy.ensure(data)
+	VillageLife.ensure(data)
+	data.village.enabled = extended_village and origin_id == "italia"
+	data.village.health_delta = 0
+	data.village.militia = []
 	changed.emit()
 
 
 func execute(command: String, args: Dictionary = {}, command_id: String = "") -> Dictionary:
-	if not COMMAND_FIELDS.has(command):
+	var command_fields: Dictionary = COMMAND_FIELDS.duplicate()
+	command_fields.merge(VillageEconomy.COMMAND_FIELDS)
+	command_fields.merge(VillageLife.COMMAND_FIELDS)
+	if not command_fields.has(command):
 		return _fail("Unbekannter Spielbefehl: %s" % command)
-	if not _exact_keys(args, COMMAND_FIELDS[command]):
+	if not _exact_keys(args, command_fields[command]):
 		return _fail("Der Befehl enthält fehlende oder unerlaubte Angaben.")
 	if command_id.length() > 96:
 		return _fail("Die Befehlskennung ist zu lang.")
@@ -121,16 +134,51 @@ func set_player_position(position: Vector3) -> void:
 func advance(delta: float) -> void:
 	if not is_finite(delta) or delta <= 0.0 or delta > 3600.0 or data.is_empty():
 		return
-	if data.progress.career_terminal:
+	if not _validate_state(data).is_empty() or data.progress.career_terminal:
 		return
 	if float(data.world_seconds) + delta > 1000000000000.0:
 		return
 	var candidate := _world_copy()
 	var notify_ui := int(candidate.world_seconds) != int(float(candidate.world_seconds) + delta)
-	candidate.world_seconds = float(candidate.world_seconds) + delta
 	for key in candidate.timers:
 		candidate.timers[key] = maxf(0.0, float(candidate.timers[key]) - delta)
-	# One player supplies one work budget, even when two work sites are nearby.
+	if candidate.village.enabled:
+		# All ongoing systems share the actual life-tick boundaries. Resources
+		# produced before an alarm remain valid; an attack cannot cancel earlier work.
+		var remaining := delta
+		while remaining > 0.0:
+			var until_tick := maxf(0.00000001, VillageLife.STEP - float(candidate.village.social.accumulator))
+			var step := minf(remaining, until_tick)
+			candidate.world_seconds = float(candidate.world_seconds) + step
+			if not candidate.village.raid.active:
+				notify_ui = _advance_construction(candidate, step) or notify_ui
+			var frontier_event := Frontier.advance(candidate, step)
+			if not frontier_event.is_empty():
+				_record(candidate, frontier_event)
+			var previous_health := int(candidate.player.health)
+			if not VillageEconomy.advance(candidate, step):
+				return
+			VillageLife.advance(candidate, step)
+			candidate.village.health_delta += int(candidate.player.health) - previous_health
+			remaining = maxf(0.0, remaining - step)
+		notify_ui = true
+	else:
+		candidate.world_seconds = float(candidate.world_seconds) + delta
+		notify_ui = _advance_construction(candidate, delta) or notify_ui
+		var frontier_event := Frontier.advance(candidate, delta)
+		if not frontier_event.is_empty():
+			_record(candidate, frontier_event)
+	candidate.revision = int(data.revision) + 1
+	if not _validate_state(candidate).is_empty():
+		return
+	data = candidate
+	if notify_ui:
+		changed.emit()
+
+
+func _advance_construction(candidate: Dictionary, delta: float) -> bool:
+	var changed_work := false
+	# One player supplies one work budget, even when two sites are nearby.
 	var work_budget := delta
 	while work_budget > 0.000001:
 		var index := _nearest_unfinished_hut(candidate)
@@ -141,7 +189,7 @@ func advance(delta: float) -> void:
 		var applied := minf(needed, work_budget)
 		hut.progress = minf(1.0, float(hut.progress) + applied / HUT_SECONDS)
 		work_budget -= applied
-		notify_ui = true
+		changed_work = true
 		if float(hut.progress) >= 1.0 - 0.000001:
 			hut.progress = 1.0
 			hut.completed = true
@@ -151,10 +199,7 @@ func advance(delta: float) -> void:
 				_set_story(candidate, "Ein Dach über dem Kopf", "Deine Hütte steht. Triff Marcus und suche danach den Ausbilder am Übungsplatz auf.")
 		else:
 			break
-	candidate.revision = int(data.revision) + 1
-	data = candidate
-	if notify_ui:
-		changed.emit()
+	return changed_work
 
 
 ## Regional troops are a separate contingent from the village recruits.
@@ -264,7 +309,36 @@ func load_game(path: String) -> Dictionary:
 	return result
 
 
+func get_frontier_dialog(npc_id: String) -> Dictionary:
+	return Frontier.dialog(data, npc_id)
+
+
+func get_frontier_objective() -> Dictionary:
+	return Frontier.objective(data)
+
+
 func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dictionary:
+	if command.begins_with("village_"):
+		if not state.village.enabled:
+			return _fail("Dieser Lebensweg verwendet den bisherigen regionalen Dorfabschnitt.")
+		if command in ["village_assign", "village_shift"] and state.village.militia.has(args.resident_id):
+			return _fail("Diese Person gehört bereits zum angeworbenen Trupp und kann nicht zugleich eine Dorfstelle übernehmen.")
+		var village_result: Dictionary
+		var previous_health := int(state.player.health)
+		if VillageEconomy.COMMAND_FIELDS.has(command):
+			village_result = VillageEconomy.execute(state, command, args)
+		else:
+			village_result = VillageLife.execute(state, command, args)
+		state.village.health_delta += int(state.player.health) - previous_health
+		if village_result.get("ok", false) and command not in ["village_strike", "village_block", "village_dodge"]:
+			_record(state, str(village_result.message))
+		return village_result
+	if command in ["frontier_talk", "frontier_choice"]:
+		var frontier_result := Frontier.talk(state, args.npc_id) if command == "frontier_talk" else Frontier.choose(state, args.npc_id, args.choice)
+		if frontier_result.has("chronicle"):
+			_record(state, frontier_result.chronicle)
+			frontier_result.erase("chronicle")
+		return frontier_result
 	match command:
 		"gather":
 			var index := _find_id(state.resource_nodes, args.node_id)
@@ -315,6 +389,10 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 		"train":
 			if state.player.age >= 18:
 				return _fail("Du befindest dich bereits im erwachsenen Ausbildungsabschnitt.")
+			if state.village.enabled and state.village.raid.status in ["warning", "active"]:
+				return _fail("Kläre zuerst die unmittelbare Gefahr. Ein Überfall kann nicht durch einen Zeitsprung übersprungen werden.")
+			if state.village.enabled and not VillageLife.training_ready(state):
+				return _fail("Lebe zuerst im Dorf: lerne drei Menschen kennen, hilf beim Wiederaufbau und erlebe die erste Verteidigung. Der nächste Lebensabschnitt beginnt frühestens nach zwei Dorftagen.")
 			if not state.companion.met or not _has_completed_hut(state):
 				return _fail("Baue zuerst eine Unterkunft fertig und entscheide die Begegnung mit Marcus.")
 			for hut in state.buildings:
@@ -357,6 +435,15 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 				return _fail("Dieser Wachtrupp umfasst höchstens drei Freiwillige.")
 			if int(state.resources.denarii) < 5 or int(state.resources.grain) < 2:
 				return _fail("Ein Freiwilliger benötigt 5 Denarii und 2 Getreide.")
+			var recruit_name := "Ein Freiwilliger"
+			if state.village.enabled:
+				var person := _available_village_recruit(state)
+				if person.is_empty():
+					return _fail("Für den Trupp fehlt ein gesunder freier Helfer. Gib zuerst einen Nicht-Mentor aus seiner Arbeit für die Reserve frei.")
+				state.village.militia.append(person.id)
+				person.previous_assignment = "idle"
+				person.assignment = "defense"
+				recruit_name = person.name
 			state.resources.denarii = int(state.resources.denarii) - 5
 			state.resources.grain = int(state.resources.grain) - 2
 			state.squad.recruits = int(state.squad.recruits) + 1
@@ -364,9 +451,11 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			state.population.workers = int(state.population.workers) - 1
 			state.population.soldiers = int(state.population.soldiers) + 1
 			_update_morale(state)
-			_record(state, "Ein Freiwilliger wechselt aus der Dorfarbeit in deinen Wachtrupp.")
-			return _ok("Ein Freiwilliger angeworben. 5 Denarii und 2 Getreide verbraucht.")
+			_record(state, "%s wechselt aus der Dorfarbeit in deinen Wachtrupp." % recruit_name)
+			return _ok("%s angeworben. 5 Denarii und 2 Getreide verbraucht." % recruit_name)
 		"start_skirmish":
+			if state.village.enabled and state.village.raid.status in ["warning", "active"]:
+				return _fail("Die laufende Dorfgefahr muss zuerst enden. Derselbe Trupp kann nicht zwei Gefechte gleichzeitig führen.")
 			if not state.progress.training_complete or int(state.squad.alive) < 1:
 				return _fail("Du brauchst eine abgeschlossene Ausbildung und mindestens einen Freiwilligen.")
 			if state.encounter.started:
@@ -414,6 +503,11 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			var expected_dead := mini(int(state.squad.recruits), int(state.encounter.damage_taken) / 32)
 			var newly_dead := expected_dead - int(state.population.dead)
 			if newly_dead > 0:
+				if state.village.enabled:
+					for casualty in range(int(state.population.dead), expected_dead):
+						var resident := _village_resident(state, state.village.militia[casualty])
+						resident.alive = false
+						resident.health = 0
 				state.population.dead = expected_dead
 				state.population.soldiers = int(state.population.soldiers) - newly_dead
 				state.squad.alive = int(state.squad.alive) - newly_dead
@@ -471,7 +565,18 @@ func _resolve_skirmish(state: Dictionary) -> Dictionary:
 
 
 func _validate_arguments(command: String, args: Dictionary) -> String:
-	if command in ["gather", "strike_enemy"]:
+	if command.begins_with("village_"):
+		# Reject NaN and foreign types before JSON fingerprinting, not only in
+		# the subordinate command handler after the replay record was prepared.
+		for key in args:
+			if not _text(args[key], 1, 64):
+				return "Der Dorfauftrag benötigt gültige Personen-, Ziel- und Antwortkennungen."
+	elif command in ["frontier_talk", "frontier_choice"]:
+		if not _text(args.npc_id, 1, 32) or not Frontier.NPCS.has(args.npc_id):
+			return "Eine gültige Dorfperson fehlt."
+		if command == "frontier_choice" and not _text(args.choice, 1, 32):
+			return "Eine gültige Gesprächsantwort fehlt."
+	elif command in ["gather", "strike_enemy"]:
 		var key := "node_id" if command == "gather" else "enemy_id"
 		if not _text(args[key], 1, 64):
 			return "Eine gültige Zielkennung fehlt."
@@ -491,7 +596,7 @@ func _validate_arguments(command: String, args: Dictionary) -> String:
 
 
 func _validate_state(state: Variant) -> String:
-	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley", "origin_id", "strategy"]):
+	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley", "origin_id", "strategy", "frontier", "village"]):
 		return "Unvollständiger oder unbekannter Datenvertrag."
 	if not _integer(state.schema_version, SCHEMA_VERSION, SCHEMA_VERSION):
 		return "Diese Schemaversion wird nicht unterstützt; es wurde keine Migration ausgeführt."
@@ -501,8 +606,28 @@ func _validate_state(state: Variant) -> String:
 		return "Der Regionalauftrag setzt eine abgeschlossene Dorfverteidigung voraus."
 	if not _text(state.world_id, 1, 100) or not _integer(state.revision, 0, 9007199254740990) or not _number(state.world_seconds, 0.0, 1000000000000.0):
 		return "Ungültige Weltkennung, Revision oder Zeit."
-	if not _exact_keys(state.resources, ["wood", "grain", "denarii"]):
+	if not _exact_keys(state.resources, ["wood", "grain", "denarii", "stone"]):
 		return "Ungültiger Güterbestand."
+	if typeof(state.village) != TYPE_DICTIONARY or typeof(state.village.get("enabled")) != TYPE_BOOL:
+		return "Der Dorfvertrag fehlt."
+	if not _integer(state.village.get("health_delta"), -1000000, 1000000):
+		return "Die Gesundheitsbilanz des Dorflebens ist ungültig."
+	if typeof(state.village.get("militia")) != TYPE_ARRAY or state.village.militia.size() > 3:
+		return "Die persönliche Dorfmiliz ist ungültig."
+	if state.village.enabled and state.origin_id != "italia":
+		return "Der römische Dorfabschnitt passt nicht zur Herkunft."
+	var economy_error := VillageEconomy.validate(state)
+	if not economy_error.is_empty():
+		return economy_error
+	var life_error := VillageLife.validate(state)
+	if not life_error.is_empty():
+		return life_error
+	if float(state.village.social.accumulator) >= VillageLife.STEP + 0.00000001:
+		return "Die Dorfzeit enthält einen nicht abgearbeiteten Zeitsprung."
+	var economic_seconds := int(state.village.economy.day) * VillageEconomy.DAY_SECONDS + float(state.village.economy.day_seconds)
+	var social_seconds := float(state.village.social.seconds) + float(state.village.social.accumulator)
+	if absf(economic_seconds - social_seconds) > 0.0001:
+		return "Arbeitszeit und Dorfereignisse laufen nicht auf derselben Uhr."
 	for key in state.resources:
 		if not _integer(state.resources[key], 0, 1000000):
 			return "Güter müssen endliche nichtnegative ganze Mengen sein."
@@ -587,13 +712,30 @@ func _validate_state(state: Variant) -> String:
 	var dead := int(state.squad.recruits) - int(state.squad.alive)
 	if state.population.total != 4 or state.population.workers != 4 - int(state.squad.recruits) or state.population.soldiers != state.squad.alive or state.population.dead != dead:
 		return "Arbeiter, Soldaten und Gefallene sind nicht bilanziert."
+	if state.village.enabled:
+		if state.village.militia.size() != int(state.squad.recruits):
+			return "Ein Rekrut besitzt keine tatsächliche Dorfperson."
+		var seen_militia := {}
+		for index in state.village.militia.size():
+			var id: Variant = state.village.militia[index]
+			if not _text(id, 1, 48) or seen_militia.has(id):
+				return "Eine Dorfperson wurde mehrfach angeworben."
+			seen_militia[id] = true
+			var resident := _village_resident(state, id)
+			if resident.is_empty() or resident.assignment != "defense" or resident.previous_assignment != "idle":
+				return "Der Truppangehörige fehlt nicht an seiner zivilen Arbeitsstelle."
+			var casualty: bool = int(index) < dead
+			if resident.alive == casualty or (casualty and int(resident.health) != 0):
+				return "Truppverluste und tatsächliche Dorfpersonen widersprechen sich."
+	elif not state.village.militia.is_empty():
+		return "Die bisherige Karriere hat keine neue Dorfmiliz."
 	if not _exact_keys(state.encounter, ["started", "active", "resolved", "damage_taken", "enemies"]):
 		return "Ungültiger Gefechtszustand."
 	var encounter: Dictionary = state.encounter
 	for key in ["started", "active", "resolved"]:
 		if typeof(encounter[key]) != TYPE_BOOL:
 			return "Gefechtsmerkmale müssen Wahrheitswerte sein."
-	if not _integer(encounter.damage_taken, 0, 100) or typeof(encounter.enemies) != TYPE_ARRAY:
+	if not _integer(encounter.damage_taken, 0, 1000000) or typeof(encounter.enemies) != TYPE_ARRAY:
 		return "Ungültige Gegner- oder Schadensdaten."
 	if encounter.enemies.size() != (3 if encounter.started else 0):
 		return "Die Gegnerliste passt nicht zum begonnenen Gefecht."
@@ -611,7 +753,7 @@ func _validate_state(state: Variant) -> String:
 		return "Das Gefecht benötigt einen tatsächlich angeworbenen Trupp."
 	if encounter.resolved != _all_enemies_defeated(state):
 		return "Der Sieg ist nicht durch tatsächliche Gegnerzustände belegt."
-	if int(encounter.damage_taken) != 100 - int(state.player.health) or dead != mini(int(state.squad.recruits), int(encounter.damage_taken) / 32):
+	if int(encounter.damage_taken) != 100 + int(state.village.health_delta) - int(state.player.health) or dead != mini(int(state.squad.recruits), int(encounter.damage_taken) / 32):
 		return "Schaden, Gesundheit und Verluste widersprechen sich."
 	var expected_morale := mini(100, 60 + 5 * int(state.squad.recruits) - 15 * dead + (10 if progress.skirmish_won else 0))
 	if int(state.squad.morale) != expected_morale:
@@ -628,14 +770,28 @@ func _validate_state(state: Variant) -> String:
 		var choice: Variant = state.story.choices[index]
 		if not _exact_keys(choice, ["id", "label"]) or choice.id != ["protect", "pursue"][index] or not _text(choice.label, 1, 160):
 			return "Ungültige Geschichtenoption."
+	var frontier_error := Frontier.validate(state)
+	if not frontier_error.is_empty():
+		return frontier_error
+	var frontier_effects := Frontier.effects(state.frontier)
+	var village_ledger := {"wood":0, "grain":0, "denarii":0, "stone":0}
+	for key in village_ledger:
+		village_ledger[key] = int(state.village.economy.ledger[key]) + int(state.village.social.ledger[key])
 	var help_cost := 4 if companion.choice == "help" else 0
-	if int(state.resources.wood) + HUT_COST * state.buildings.size() + help_cost != 48 - remaining_wood:
+	if int(state.resources.wood) + HUT_COST * state.buildings.size() + help_cost != 48 - remaining_wood + int(village_ledger.wood):
 		return "Die Holzbilanz wurde verletzt."
+	if int(state.resources.stone) != int(village_ledger.stone):
+		return "Die Steinbilanz wurde verletzt."
 	var expected_grain := 12 - 2 * int(state.squad.recruits) + (4 if progress.skirmish_won else 0) + (4 if state.story.choice == "protect" else 0)
 	var expected_money := 30 - 5 * int(state.squad.recruits) + (15 if progress.skirmish_won else 0) + (12 if state.story.choice == "pursue" else 0)
+	expected_grain += int(frontier_effects.grain)
+	expected_money += int(frontier_effects.denarii)
+	expected_grain += int(village_ledger.grain)
+	expected_money += int(village_ledger.denarii)
 	if state.resources.grain != expected_grain or state.resources.denarii != expected_money:
 		return "Die Versorgungs- oder Geldbilanz wurde verletzt."
 	var expected_trust := (20 if companion.choice == "help" else (-5 if companion.choice == "decline" else 0)) + (5 if state.story.choice == "protect" else (-5 if state.story.choice == "pursue" else 0))
+	expected_trust += int(frontier_effects.trust)
 	if int(companion.trust) != expected_trust:
 		return "Die Beziehung ist nicht durch gewählte Ereignisse belegt."
 	if typeof(state.chronicle) != TYPE_ARRAY or state.chronicle.is_empty() or state.chronicle.size() > MAX_CHRONICLE:
@@ -688,9 +844,20 @@ func _read_save(path: String) -> Dictionary:
 		state.schema_version = 2
 		state.valley = {}
 	if typeof(state) == TYPE_DICTIONARY and state.get("schema_version") == 2 and not state.has("strategy") and not state.has("origin_id"):
-		state.schema_version = SCHEMA_VERSION
+		state.schema_version = 3
 		state.origin_id = "italia"
 		state.strategy = Seasons.new_game("italia")
+	if typeof(state) == TYPE_DICTIONARY and state.get("schema_version") == 3 and not state.has("frontier"):
+		state.schema_version = 4
+		state.frontier = Frontier.new_state()
+	if typeof(state) == TYPE_DICTIONARY and state.get("schema_version") == 4 and not state.has("village"):
+		VillageEconomy.ensure(state)
+		VillageLife.ensure(state)
+		# Old careers continue without retroactively imposing the new prologue.
+		state.village.enabled = false
+		state.village.health_delta = 0
+		state.village.militia = []
+		state.schema_version = SCHEMA_VERSION
 	var error := _validate_state(state)
 	if error.is_empty() and not _valid_valley(state):
 		error = "Das gespeicherte Talgefecht enthält widersprüchliche Daten."
@@ -705,6 +872,8 @@ func _read_save(path: String) -> Dictionary:
 func _restore_integer_fields(state: Dictionary) -> void:
 	for key in ["schema_version", "revision"]:
 		state[key] = int(state[key])
+	state.frontier.schema = int(state.frontier.schema)
+	state.frontier.step = int(state.frontier.step)
 	for key in state.resources:
 		state.resources[key] = int(state.resources[key])
 	for key in ["health", "age"]:
@@ -724,6 +893,32 @@ func _restore_integer_fields(state: Dictionary) -> void:
 		node.amount = int(node.amount)
 	for key in state.command_log:
 		state.command_log[key].result.revision = int(state.command_log[key].result.revision)
+	state.village.health_delta = int(state.village.health_delta)
+	var economy: Dictionary = state.village.economy
+	for key in ["version", "day", "meal_offset", "meals_served", "grain_shortfall", "patrols_completed", "repair_count"]:
+		economy[key] = int(economy[key])
+	for section in ["stocks", "ledger"]:
+		for key in economy[section]:
+			economy[section][key] = int(economy[section][key])
+	for person in economy.people:
+		person.health = int(person.health)
+		person.hunger = int(person.hunger)
+	for place in economy.workplaces.values():
+		place.condition = int(place.condition)
+		place.produced_cycles = int(place.produced_cycles)
+	state.village.social.version = int(state.village.social.version)
+	for key in state.village.social.ledger:
+		state.village.social.ledger[key] = int(state.village.social.ledger[key])
+	for relation in state.village.social.npcs.values():
+		relation.trust = int(relation.trust)
+	for key in ["number", "completed", "won", "participation", "player_hits", "blocks", "dodges", "stolen"]:
+		state.village.raid[key] = int(state.village.raid[key])
+	for enemy in state.village.raid.enemies:
+		enemy.health = int(enemy.health)
+		enemy.max_health = int(enemy.max_health)
+	for key in state.village.attributes:
+		state.village.attributes[key] = int(state.village.attributes[key])
+	state.village.history.start_year = int(state.village.history.start_year)
 
 
 func _write_file(path: String, text: String) -> Dictionary:
@@ -775,7 +970,7 @@ func _text(value: Variant, low: int, high: int) -> bool:
 
 
 func _valid_position(value: Variant) -> bool:
-	return typeof(value) == TYPE_ARRAY and value.size() == 3 and _number(value[0], -200.0, 200.0) and _number(value[1], -10.0, 50.0) and _number(value[2], -200.0, 200.0)
+	return typeof(value) == TYPE_ARRAY and value.size() == 3 and _number(value[0], -16000.0, 16000.0) and _number(value[1], -100.0, 500.0) and _number(value[2], -16000.0, 16000.0)
 
 
 func _inside_plot(x: float, z: float) -> bool:
@@ -806,6 +1001,22 @@ func _nearest_unfinished_hut(state: Dictionary) -> int:
 			nearest = index
 			best = distance
 	return nearest
+
+
+func _village_resident(state: Dictionary, id: String) -> Dictionary:
+	for person in state.village.economy.people:
+		if person.id == id:
+			return person
+	return {}
+
+
+func _available_village_recruit(state: Dictionary) -> Dictionary:
+	for person in state.village.economy.people:
+		if VillageLife.NPCS.has(person.id):
+			continue
+		if person.alive and int(person.health) > 30 and int(person.hunger) < 2 and person.assignment == "idle":
+			return person
+	return {}
 
 
 func _has_completed_hut(state: Dictionary) -> bool:

@@ -1,0 +1,4 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+REGIONAL_TERRAIN_TIMING calls=280 total_ms=212.865 maximum_call_ms=2.794 environment=headless_cpu_not_device_fps
+REGIONAL_TERRAIN_RESULT checks=862 failures=0

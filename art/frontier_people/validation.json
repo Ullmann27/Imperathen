@@ -1,0 +1,3523 @@
+{
+  "status": "passed",
+  "scope": "Decoded exported GLB bytes; no visual or device approval",
+  "assets": [
+    {
+      "identity": "civilian_man",
+      "lod": 0,
+      "sha256": "477001694752dd67f6802da6c30cf246df0a97240914fc75e79315ebfe443622",
+      "bytes": 5003724,
+      "triangles": 19719,
+      "skin_weights": {
+        "vertex_rows": 11020,
+        "maximum_sum_error": 1.1859810911118984e-07,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 0,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1115093,
+          "sha256": "16ffc81333623e15f656bddbff9811fdaa5b33b3dcb784067a87f2245297d543",
+          "index": 1,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 2,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 3,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 255363,
+          "sha256": "8b08b09cd889f2ef052e16a72ac6714639c16e9e4263a908fe2444fedaf25e18",
+          "index": 4,
+          "name": "FrontierLinen_civilian_man",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 5,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 6,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 551086,
+          "sha256": "0da14bf7738aff074e1190eb5f14285464757c7064eb420a188e8190d76ba8e3",
+          "index": 7,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1027321,
+          "sha256": "89dd3e56a44b6d59729f6431f4aa42d3812cff4fc01d30e0256df902fa4dcd3a",
+          "index": 8,
+          "name": "short02_diffuse",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "civilian_man",
+      "lod": 1,
+      "sha256": "30aabba76fa5db4b2fa8b879905611d340998d6294f3e8a1a6636de55de1ecef",
+      "bytes": 2544848,
+      "triangles": 7628,
+      "skin_weights": {
+        "vertex_rows": 4519,
+        "maximum_sum_error": 1.1082738637924194e-07,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 0,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 293962,
+          "sha256": "64109c9aa5f17a384d6613ae1651b5f1b796a2c853cdbc227d652f5414376e8e",
+          "index": 1,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 2,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 3,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 255363,
+          "sha256": "8b08b09cd889f2ef052e16a72ac6714639c16e9e4263a908fe2444fedaf25e18",
+          "index": 4,
+          "name": "FrontierLinen_civilian_man",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 5,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 6,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 186023,
+          "sha256": "858a8bd289026351587d6d5a84538b1d7615332b2d86cbab08cccbb4334a6440",
+          "index": 7,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 269168,
+          "sha256": "bee7c6d6994c404e7aaa1999f835026bd96aef2cd2fd6ad59b8090122248518f",
+          "index": 8,
+          "name": "short02_diffuse",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "civilian_man",
+      "lod": 2,
+      "sha256": "fcae8394615557c9b4eee7f64ac683be88344295e2b8a7f07a4a536de92c0ec9",
+      "bytes": 763304,
+      "triangles": 2406,
+      "skin_weights": {
+        "vertex_rows": 1611,
+        "maximum_sum_error": 9.220093488693237e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 90730,
+          "sha256": "77b0eee955cdd80c532f851fd3cf3e906368ad19fb92bf960f5e6d24b10bcb5a",
+          "index": 0,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 78231,
+          "sha256": "18e957f218bea0c5e777a4d0c9e4dcac822a6370b2c25d0c03505eaa04267593",
+          "index": 1,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56580,
+          "sha256": "0cc33a058353c32cd0507d0aad3d844c060b5729537a1a7cdc94b4d67efabb2c",
+          "index": 2,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 2090,
+          "sha256": "7bbfba8fbf4124f4c3483a19914a1e6dc236dc031c0a7c698bc048f48560525f",
+          "index": 3,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 64390,
+          "sha256": "aa3affa0d8cce2c2e8bb8f2cec13b609672b362f3d1753bf4ae8e91e7d563481",
+          "index": 4,
+          "name": "FrontierLinen_civilian_man",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56474,
+          "sha256": "56e752f6de36461cc634dd1043b8dfbca0e6d21ca40197e9a6da2c35156bdd49",
+          "index": 5,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 13327,
+          "sha256": "ab034ee220de978fba38afd73d6f3734f3c576271f68c521c24279a8ed023f38",
+          "index": 6,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 60071,
+          "sha256": "3524254819145c0ef4d70a7c2b651033f9d2b57ef15e7a5f31ed6e2e934026c6",
+          "index": 7,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 69890,
+          "sha256": "b08c13981c5127e3283c733d5062ca554b4e1dc8903d5a41a91dede4f31bdf32",
+          "index": 8,
+          "name": "short02_diffuse",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "civilian_man",
+      "lod": 3,
+      "sha256": "69a97af3b49b3c8d4b996758470b83cc818b690a3833affc4913a1d25040075a",
+      "bytes": 334192,
+      "triangles": 846,
+      "skin_weights": {
+        "vertex_rows": 677,
+        "maximum_sum_error": 7.450580596923828e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 18446,
+          "sha256": "5a3bf8c3f0e8227aa3db36278b1aa03390cb1d37661b8ad4bc102a33a9578b89",
+          "index": 0,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 22014,
+          "sha256": "2be2db4b3bbc26dbf9e3ec5f2eff63af8de0ce7d463d4ae855c5cb7e40134679",
+          "index": 1,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12058,
+          "sha256": "d350fe6eb14af37ec810789722877f0ede5e124c658017a9c3068f25a38a8cf2",
+          "index": 2,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 828,
+          "sha256": "78864679748044ba0d71a97792c43c028aa9dc47df4045176797ab4964581a55",
+          "index": 3,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 13173,
+          "sha256": "3d6f557f70d2ed99d84199192b8e0d19e7b0311fd1aebe6e27caddb734e76aab",
+          "index": 4,
+          "name": "FrontierLinen_civilian_man",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12069,
+          "sha256": "43db9e8b24055409844c15e8fceecbadaf1c5fed35a5c800bceacf3d9a3d0161",
+          "index": 5,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 4194,
+          "sha256": "6e34efcb81bb314a912735030129297fa10c4e40bdc7d742e98e3f11577eb60c",
+          "index": 6,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 18454,
+          "sha256": "291ed42f0c0c71fa16dad7113ab6c10bb40656c1ea0ab923f2e60aebf1cf2908",
+          "index": 7,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 19384,
+          "sha256": "7c903e524e636d541d4e3a63a6d06476fea3f78f248ebe8a2c8a76cc08df1ab6",
+          "index": 8,
+          "name": "short02_diffuse",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "civilian_woman",
+      "lod": 0,
+      "sha256": "3f445fed8e5564b5b5a8338564e343d8ec9f5e92c4117eff1c2b86acd0b54ca2",
+      "bytes": 5308548,
+      "triangles": 20395,
+      "skin_weights": {
+        "vertex_rows": 12593,
+        "maximum_sum_error": 9.685754776000977e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 551086,
+          "sha256": "0da14bf7738aff074e1190eb5f14285464757c7064eb420a188e8190d76ba8e3",
+          "index": 0,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1027321,
+          "sha256": "89dd3e56a44b6d59729f6431f4aa42d3812cff4fc01d30e0256df902fa4dcd3a",
+          "index": 1,
+          "name": "short02_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1349313,
+          "sha256": "31fe2cb067f680617e586d64f00b36baf2f6a912be07d7cc8cb379dbb4b1bbad",
+          "index": 3,
+          "name": "young_lightskinned_female_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 238103,
+          "sha256": "dca02a1c5b9014c1ead0becb98a8b7cbb893f82c4905afaea45540017eb9e432",
+          "index": 6,
+          "name": "FrontierLinen_civilian_woman",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "civilian_woman",
+      "lod": 1,
+      "sha256": "0060242580c098f5d94ce144cdf320a4f47b26d84026042ab136c583c81acca1",
+      "bytes": 2637320,
+      "triangles": 7889,
+      "skin_weights": {
+        "vertex_rows": 5136,
+        "maximum_sum_error": 9.592622518539429e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 186023,
+          "sha256": "858a8bd289026351587d6d5a84538b1d7615332b2d86cbab08cccbb4334a6440",
+          "index": 0,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 269168,
+          "sha256": "bee7c6d6994c404e7aaa1999f835026bd96aef2cd2fd6ad59b8090122248518f",
+          "index": 1,
+          "name": "short02_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 367153,
+          "sha256": "5a4bf988586b1709a33b6b5d5c4a394a1e20e4a3896a0da68dba2c23d6460a6d",
+          "index": 3,
+          "name": "young_lightskinned_female_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 238103,
+          "sha256": "dca02a1c5b9014c1ead0becb98a8b7cbb893f82c4905afaea45540017eb9e432",
+          "index": 6,
+          "name": "FrontierLinen_civilian_woman",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "civilian_woman",
+      "lod": 2,
+      "sha256": "c7d02261332c880df124ca75f437f5352ae9143777c61804745120706160c594",
+      "bytes": 793672,
+      "triangles": 2491,
+      "skin_weights": {
+        "vertex_rows": 1828,
+        "maximum_sum_error": 1.0104849934577942e-07,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 60071,
+          "sha256": "3524254819145c0ef4d70a7c2b651033f9d2b57ef15e7a5f31ed6e2e934026c6",
+          "index": 0,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 69890,
+          "sha256": "b08c13981c5127e3283c733d5062ca554b4e1dc8903d5a41a91dede4f31bdf32",
+          "index": 1,
+          "name": "short02_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 90730,
+          "sha256": "77b0eee955cdd80c532f851fd3cf3e906368ad19fb92bf960f5e6d24b10bcb5a",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 99424,
+          "sha256": "fc079fb446537386d0736a016fa03aaaf4d326e40d4061d8a26ec5e178b2dc95",
+          "index": 3,
+          "name": "young_lightskinned_female_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56580,
+          "sha256": "0cc33a058353c32cd0507d0aad3d844c060b5729537a1a7cdc94b4d67efabb2c",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 2090,
+          "sha256": "7bbfba8fbf4124f4c3483a19914a1e6dc236dc031c0a7c698bc048f48560525f",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 58688,
+          "sha256": "fda8ab8b25c55e9a7350679a40a3786dc465d2a0fafdf0e10151436d980461f2",
+          "index": 6,
+          "name": "FrontierLinen_civilian_woman",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56474,
+          "sha256": "56e752f6de36461cc634dd1043b8dfbca0e6d21ca40197e9a6da2c35156bdd49",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 13327,
+          "sha256": "ab034ee220de978fba38afd73d6f3734f3c576271f68c521c24279a8ed023f38",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "civilian_woman",
+      "lod": 3,
+      "sha256": "c191923876021d4fec0e4fe7e343a101ac69925dc36ebe2b2f8de4ed626f3dc0",
+      "bytes": 344532,
+      "triangles": 877,
+      "skin_weights": {
+        "vertex_rows": 755,
+        "maximum_sum_error": 1.026783138513565e-07,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 18454,
+          "sha256": "291ed42f0c0c71fa16dad7113ab6c10bb40656c1ea0ab923f2e60aebf1cf2908",
+          "index": 0,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 19384,
+          "sha256": "7c903e524e636d541d4e3a63a6d06476fea3f78f248ebe8a2c8a76cc08df1ab6",
+          "index": 1,
+          "name": "short02_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 18446,
+          "sha256": "5a3bf8c3f0e8227aa3db36278b1aa03390cb1d37661b8ad4bc102a33a9578b89",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 26655,
+          "sha256": "9ef64964bf5a47d347f183ae9b61f250ecf0affa111caba4f86926f084261d98",
+          "index": 3,
+          "name": "young_lightskinned_female_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12058,
+          "sha256": "d350fe6eb14af37ec810789722877f0ede5e124c658017a9c3068f25a38a8cf2",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 828,
+          "sha256": "78864679748044ba0d71a97792c43c028aa9dc47df4045176797ab4964581a55",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 11725,
+          "sha256": "cc0629f61ce301caa2631b3e36072e4f19ffda6a765f6d7b9da30e55ba38b3e9",
+          "index": 6,
+          "name": "FrontierLinen_civilian_woman",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12069,
+          "sha256": "43db9e8b24055409844c15e8fceecbadaf1c5fed35a5c800bceacf3d9a3d0161",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 4194,
+          "sha256": "6e34efcb81bb314a912735030129297fa10c4e40bdc7d742e98e3f11577eb60c",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "elder",
+      "lod": 0,
+      "sha256": "b03051329d7e344fb95bb5a7e6a0eab953163f1549f103f4592ebfc1e3f4fefb",
+      "bytes": 4448876,
+      "triangles": 19817,
+      "skin_weights": {
+        "vertex_rows": 11085,
+        "maximum_sum_error": 1.1859810911118984e-07,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 0,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1115093,
+          "sha256": "16ffc81333623e15f656bddbff9811fdaa5b33b3dcb784067a87f2245297d543",
+          "index": 1,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 2,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 3,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 252445,
+          "sha256": "0695bc7ff8d4f0c6ebfc18027c83dcc55f45ebc9f2bfc36a94a27c690ede1c41",
+          "index": 4,
+          "name": "FrontierLinen_elder",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 5,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 6,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 551086,
+          "sha256": "0da14bf7738aff074e1190eb5f14285464757c7064eb420a188e8190d76ba8e3",
+          "index": 7,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 472302,
+          "sha256": "bc20b7daf71876a248457a1ba92d936f1a4b4c6ea6a32f254b93da2f466cdbb6",
+          "index": 8,
+          "name": "FrontierGreyHair_albedo",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "elder",
+      "lod": 1,
+      "sha256": "5b1b3453f984f3e2c91c5535ecd5fef57f9733e4e41be33dc82111e073f5a12e",
+      "bytes": 2395952,
+      "triangles": 7666,
+      "skin_weights": {
+        "vertex_rows": 4553,
+        "maximum_sum_error": 1.1082738637924194e-07,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 0,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 293962,
+          "sha256": "64109c9aa5f17a384d6613ae1651b5f1b796a2c853cdbc227d652f5414376e8e",
+          "index": 1,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 2,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 3,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 252445,
+          "sha256": "0695bc7ff8d4f0c6ebfc18027c83dcc55f45ebc9f2bfc36a94a27c690ede1c41",
+          "index": 4,
+          "name": "FrontierLinen_elder",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 5,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 6,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 186023,
+          "sha256": "858a8bd289026351587d6d5a84538b1d7615332b2d86cbab08cccbb4334a6440",
+          "index": 7,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 120386,
+          "sha256": "8c372f8a7962537b4ad72544b319d7fbf1b240d32b4aff653d64fa9090dd5bfe",
+          "index": 8,
+          "name": "FrontierGreyHair_albedo",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "elder",
+      "lod": 2,
+      "sha256": "80435022982a4521a963185efd005d9413746c82c17247f5b1e4071a05f2e146",
+      "bytes": 725508,
+      "triangles": 2417,
+      "skin_weights": {
+        "vertex_rows": 1619,
+        "maximum_sum_error": 9.220093488693237e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 90730,
+          "sha256": "77b0eee955cdd80c532f851fd3cf3e906368ad19fb92bf960f5e6d24b10bcb5a",
+          "index": 0,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 78231,
+          "sha256": "18e957f218bea0c5e777a4d0c9e4dcac822a6370b2c25d0c03505eaa04267593",
+          "index": 1,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56580,
+          "sha256": "0cc33a058353c32cd0507d0aad3d844c060b5729537a1a7cdc94b4d67efabb2c",
+          "index": 2,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 2090,
+          "sha256": "7bbfba8fbf4124f4c3483a19914a1e6dc236dc031c0a7c698bc048f48560525f",
+          "index": 3,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 63565,
+          "sha256": "924930e683f626488b3021e6a18183f2d1cf86da885086f732c6d8024c55a23a",
+          "index": 4,
+          "name": "FrontierLinen_elder",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56474,
+          "sha256": "56e752f6de36461cc634dd1043b8dfbca0e6d21ca40197e9a6da2c35156bdd49",
+          "index": 5,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 13327,
+          "sha256": "ab034ee220de978fba38afd73d6f3734f3c576271f68c521c24279a8ed023f38",
+          "index": 6,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 60071,
+          "sha256": "3524254819145c0ef4d70a7c2b651033f9d2b57ef15e7a5f31ed6e2e934026c6",
+          "index": 7,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 31035,
+          "sha256": "d0aa611dcaf1d841a94bea43c2b4f11320be3a8196887b9fe11a4cd7d0055211",
+          "index": 8,
+          "name": "FrontierGreyHair_albedo",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "elder",
+      "lod": 3,
+      "sha256": "42f713f0b05aace710e337a468e5ccffb9a32b6238234a93cbec56b334909a3a",
+      "bytes": 324288,
+      "triangles": 850,
+      "skin_weights": {
+        "vertex_rows": 680,
+        "maximum_sum_error": 7.450580596923828e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "gather",
+        "hit",
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "train",
+        "work"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 18446,
+          "sha256": "5a3bf8c3f0e8227aa3db36278b1aa03390cb1d37661b8ad4bc102a33a9578b89",
+          "index": 0,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 22014,
+          "sha256": "2be2db4b3bbc26dbf9e3ec5f2eff63af8de0ce7d463d4ae855c5cb7e40134679",
+          "index": 1,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12058,
+          "sha256": "d350fe6eb14af37ec810789722877f0ede5e124c658017a9c3068f25a38a8cf2",
+          "index": 2,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 828,
+          "sha256": "78864679748044ba0d71a97792c43c028aa9dc47df4045176797ab4964581a55",
+          "index": 3,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12425,
+          "sha256": "946f18b7001c405dc67a50ec3c88dc621787af92fe1c1efc279e7a42f53982df",
+          "index": 4,
+          "name": "FrontierLinen_elder",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12069,
+          "sha256": "43db9e8b24055409844c15e8fceecbadaf1c5fed35a5c800bceacf3d9a3d0161",
+          "index": 5,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 4194,
+          "sha256": "6e34efcb81bb314a912735030129297fa10c4e40bdc7d742e98e3f11577eb60c",
+          "index": 6,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 18454,
+          "sha256": "291ed42f0c0c71fa16dad7113ab6c10bb40656c1ea0ab923f2e60aebf1cf2908",
+          "index": 7,
+          "name": "short02_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 8650,
+          "sha256": "b6554afb57a816a5a2102cc32d9f4d5a1f2afb8ecd3542c7b0400e4c4c46e3eb",
+          "index": 8,
+          "name": "FrontierGreyHair_albedo",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "legionary",
+      "lod": 0,
+      "sha256": "7937cbb3c3a510609d7a9d62b8adebf9f6a6678d997436faa2cce735146e8bda",
+      "bytes": 3613592,
+      "triangles": 19060,
+      "skin_weights": {
+        "vertex_rows": 11580,
+        "maximum_sum_error": 1.1859810911118984e-07,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 217083,
+          "sha256": "74b24197c70c3342ae71fc69467ff9fdafb5c20a00d6aee9a61170955cb08b43",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1115093,
+          "sha256": "16ffc81333623e15f656bddbff9811fdaa5b33b3dcb784067a87f2245297d543",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 203618,
+          "sha256": "fd61c28b9999fd9efc1e695898a5454f330dc0e9cb4fc33a2278050dded7c84b",
+          "index": 6,
+          "name": "FrontierLinen_legionary",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.034100 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "legionary",
+      "lod": 1,
+      "sha256": "a7b3d582f378c6cd6fadbb2d42a778a5b2b567e7c64312c054d8eae207cd6148",
+      "bytes": 2265392,
+      "triangles": 7345,
+      "skin_weights": {
+        "vertex_rows": 4788,
+        "maximum_sum_error": 8.940696716308594e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 217083,
+          "sha256": "74b24197c70c3342ae71fc69467ff9fdafb5c20a00d6aee9a61170955cb08b43",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 293962,
+          "sha256": "64109c9aa5f17a384d6613ae1651b5f1b796a2c853cdbc227d652f5414376e8e",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 203618,
+          "sha256": "fd61c28b9999fd9efc1e695898a5454f330dc0e9cb4fc33a2278050dded7c84b",
+          "index": 6,
+          "name": "FrontierLinen_legionary",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.034404 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "legionary",
+      "lod": 2,
+      "sha256": "5e929aa27938c60fb94bad246c5ab7b6391110d0a12157df090a8eb6346eab05",
+      "bytes": 677524,
+      "triangles": 2289,
+      "skin_weights": {
+        "vertex_rows": 1722,
+        "maximum_sum_error": 8.42846930027008e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 50404,
+          "sha256": "fe52c79ddc005187bba5e3870605474449d60e26e2eadf5832c43dbb6c986e91",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 90730,
+          "sha256": "77b0eee955cdd80c532f851fd3cf3e906368ad19fb92bf960f5e6d24b10bcb5a",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 78231,
+          "sha256": "18e957f218bea0c5e777a4d0c9e4dcac822a6370b2c25d0c03505eaa04267593",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56580,
+          "sha256": "0cc33a058353c32cd0507d0aad3d844c060b5729537a1a7cdc94b4d67efabb2c",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 2090,
+          "sha256": "7bbfba8fbf4124f4c3483a19914a1e6dc236dc031c0a7c698bc048f48560525f",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 53730,
+          "sha256": "6a4c4b7e9fc75c5db482c20559654dde38a897fd3dc9cdae1841c13d8dce9311",
+          "index": 6,
+          "name": "FrontierLinen_legionary",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56474,
+          "sha256": "56e752f6de36461cc634dd1043b8dfbca0e6d21ca40197e9a6da2c35156bdd49",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 13327,
+          "sha256": "ab034ee220de978fba38afd73d6f3734f3c576271f68c521c24279a8ed023f38",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.032259 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "legionary",
+      "lod": 3,
+      "sha256": "05cced36031ec8f7627302dbed9235df8404617873d91e0f6ad569c9d65e47e3",
+      "bytes": 302912,
+      "triangles": 807,
+      "skin_weights": {
+        "vertex_rows": 751,
+        "maximum_sum_error": 9.639188647270203e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 9422,
+          "sha256": "b4b787f6a91d774dc7ffb443f0ad6101eee78021ab8212816a1c0393f4c03824",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 18446,
+          "sha256": "5a3bf8c3f0e8227aa3db36278b1aa03390cb1d37661b8ad4bc102a33a9578b89",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 22014,
+          "sha256": "2be2db4b3bbc26dbf9e3ec5f2eff63af8de0ce7d463d4ae855c5cb7e40134679",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12058,
+          "sha256": "d350fe6eb14af37ec810789722877f0ede5e124c658017a9c3068f25a38a8cf2",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 828,
+          "sha256": "78864679748044ba0d71a97792c43c028aa9dc47df4045176797ab4964581a55",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 7333,
+          "sha256": "91a04d34a4a41fe90b30a1a48cb55da868db550c41c690a88b2435d5f992a4c7",
+          "index": 6,
+          "name": "FrontierLinen_legionary",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12069,
+          "sha256": "43db9e8b24055409844c15e8fceecbadaf1c5fed35a5c800bceacf3d9a3d0161",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 4194,
+          "sha256": "6e34efcb81bb314a912735030129297fa10c4e40bdc7d742e98e3f11577eb60c",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.030882 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "officer",
+      "lod": 0,
+      "sha256": "46152dd3fc4da12bc772ab04084947f40f3c1d391c37435402af2bab4f0f2e86",
+      "bytes": 3652028,
+      "triangles": 19264,
+      "skin_weights": {
+        "vertex_rows": 11849,
+        "maximum_sum_error": 1.1859810911118984e-07,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 217083,
+          "sha256": "74b24197c70c3342ae71fc69467ff9fdafb5c20a00d6aee9a61170955cb08b43",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1115093,
+          "sha256": "16ffc81333623e15f656bddbff9811fdaa5b33b3dcb784067a87f2245297d543",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 226845,
+          "sha256": "105c7067d236d66628212199f10bc6b6422973c1a0f018fa9af6b7f8093229ff",
+          "index": 6,
+          "name": "FrontierLinen_officer",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.034100 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "officer",
+      "lod": 1,
+      "sha256": "2d47a6f35dc7ce73ec959384090271c88ff3e0ea0a420197403912a4ed159bfc",
+      "bytes": 2296496,
+      "triangles": 7418,
+      "skin_weights": {
+        "vertex_rows": 4931,
+        "maximum_sum_error": 8.940696716308594e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 217083,
+          "sha256": "74b24197c70c3342ae71fc69467ff9fdafb5c20a00d6aee9a61170955cb08b43",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 293962,
+          "sha256": "64109c9aa5f17a384d6613ae1651b5f1b796a2c853cdbc227d652f5414376e8e",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 226845,
+          "sha256": "105c7067d236d66628212199f10bc6b6422973c1a0f018fa9af6b7f8093229ff",
+          "index": 6,
+          "name": "FrontierLinen_officer",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.034404 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "officer",
+      "lod": 2,
+      "sha256": "3ae746ffe5f0380b7bf38ab8b098b387257c9a74e784f613872cde013f0ef66b",
+      "bytes": 683916,
+      "triangles": 2300,
+      "skin_weights": {
+        "vertex_rows": 1764,
+        "maximum_sum_error": 8.42846930027008e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 50404,
+          "sha256": "fe52c79ddc005187bba5e3870605474449d60e26e2eadf5832c43dbb6c986e91",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 90730,
+          "sha256": "77b0eee955cdd80c532f851fd3cf3e906368ad19fb92bf960f5e6d24b10bcb5a",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 78231,
+          "sha256": "18e957f218bea0c5e777a4d0c9e4dcac822a6370b2c25d0c03505eaa04267593",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56580,
+          "sha256": "0cc33a058353c32cd0507d0aad3d844c060b5729537a1a7cdc94b4d67efabb2c",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 2090,
+          "sha256": "7bbfba8fbf4124f4c3483a19914a1e6dc236dc031c0a7c698bc048f48560525f",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 57875,
+          "sha256": "44a1a1e09308e7f6c0d666b971bf8b5f45cf8c5fef9d2887e9e55deff79e9dd5",
+          "index": 6,
+          "name": "FrontierLinen_officer",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56474,
+          "sha256": "56e752f6de36461cc634dd1043b8dfbca0e6d21ca40197e9a6da2c35156bdd49",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 13327,
+          "sha256": "ab034ee220de978fba38afd73d6f3734f3c576271f68c521c24279a8ed023f38",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.032259 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "officer",
+      "lod": 3,
+      "sha256": "39eccc496ad4f61f5ba7473ee2fec5fc08a4b77c574c477fd728100f349f43d4",
+      "bytes": 309616,
+      "triangles": 822,
+      "skin_weights": {
+        "vertex_rows": 796,
+        "maximum_sum_error": 9.639188647270203e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 9422,
+          "sha256": "b4b787f6a91d774dc7ffb443f0ad6101eee78021ab8212816a1c0393f4c03824",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 18446,
+          "sha256": "5a3bf8c3f0e8227aa3db36278b1aa03390cb1d37661b8ad4bc102a33a9578b89",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 22014,
+          "sha256": "2be2db4b3bbc26dbf9e3ec5f2eff63af8de0ce7d463d4ae855c5cb7e40134679",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12058,
+          "sha256": "d350fe6eb14af37ec810789722877f0ede5e124c658017a9c3068f25a38a8cf2",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 828,
+          "sha256": "78864679748044ba0d71a97792c43c028aa9dc47df4045176797ab4964581a55",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 11601,
+          "sha256": "81ffa00487e45af5288c4aad0e542aba1a2bcb2ed2cfb81f6018cfafe5bfe627",
+          "index": 6,
+          "name": "FrontierLinen_officer",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12069,
+          "sha256": "43db9e8b24055409844c15e8fceecbadaf1c5fed35a5c800bceacf3d9a3d0161",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 4194,
+          "sha256": "6e34efcb81bb314a912735030129297fa10c4e40bdc7d742e98e3f11577eb60c",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.030882 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "spearman",
+      "lod": 0,
+      "sha256": "46a06aff153e865667933c22b9aec4173b9be987d40d2e6c9226829061a8e2b4",
+      "bytes": 3636424,
+      "triangles": 18978,
+      "skin_weights": {
+        "vertex_rows": 11495,
+        "maximum_sum_error": 1.1859810911118984e-07,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 217083,
+          "sha256": "74b24197c70c3342ae71fc69467ff9fdafb5c20a00d6aee9a61170955cb08b43",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1115093,
+          "sha256": "16ffc81333623e15f656bddbff9811fdaa5b33b3dcb784067a87f2245297d543",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 231367,
+          "sha256": "a9e853d8babf95badd7e9b113366ae1e184faf88701ebafcf0b80a3a5036cd33",
+          "index": 6,
+          "name": "FrontierLinen_spearman",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.034100 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "spearman",
+      "lod": 1,
+      "sha256": "534e6d54304a3ffc75ad528fcb8f76063a0e75fafb744d0de18fe232fa3040a5",
+      "bytes": 2291108,
+      "triangles": 7319,
+      "skin_weights": {
+        "vertex_rows": 4752,
+        "maximum_sum_error": 8.940696716308594e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 217083,
+          "sha256": "74b24197c70c3342ae71fc69467ff9fdafb5c20a00d6aee9a61170955cb08b43",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 293962,
+          "sha256": "64109c9aa5f17a384d6613ae1651b5f1b796a2c853cdbc227d652f5414376e8e",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 231367,
+          "sha256": "a9e853d8babf95badd7e9b113366ae1e184faf88701ebafcf0b80a3a5036cd33",
+          "index": 6,
+          "name": "FrontierLinen_spearman",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.034404 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "spearman",
+      "lod": 2,
+      "sha256": "fe2e7b71db6487e04bf5663996aabc770a4ae1422b205084922b3ea6602c828b",
+      "bytes": 680212,
+      "triangles": 2284,
+      "skin_weights": {
+        "vertex_rows": 1707,
+        "maximum_sum_error": 8.42846930027008e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 50404,
+          "sha256": "fe52c79ddc005187bba5e3870605474449d60e26e2eadf5832c43dbb6c986e91",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 90730,
+          "sha256": "77b0eee955cdd80c532f851fd3cf3e906368ad19fb92bf960f5e6d24b10bcb5a",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 78231,
+          "sha256": "18e957f218bea0c5e777a4d0c9e4dcac822a6370b2c25d0c03505eaa04267593",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56580,
+          "sha256": "0cc33a058353c32cd0507d0aad3d844c060b5729537a1a7cdc94b4d67efabb2c",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 2090,
+          "sha256": "7bbfba8fbf4124f4c3483a19914a1e6dc236dc031c0a7c698bc048f48560525f",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 57232,
+          "sha256": "81373bdba663e50144fd62d40fe9d76591ba2cb512ccbe3a18477852586e8123",
+          "index": 6,
+          "name": "FrontierLinen_spearman",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56474,
+          "sha256": "56e752f6de36461cc634dd1043b8dfbca0e6d21ca40197e9a6da2c35156bdd49",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 13327,
+          "sha256": "ab034ee220de978fba38afd73d6f3734f3c576271f68c521c24279a8ed023f38",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.032259 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "spearman",
+      "lod": 3,
+      "sha256": "8751356259a6caa85f66e74b84da9b8613ac2702f13ed25f91b004c875530e98",
+      "bytes": 306508,
+      "triangles": 802,
+      "skin_weights": {
+        "vertex_rows": 736,
+        "maximum_sum_error": 9.639188647270203e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 9422,
+          "sha256": "b4b787f6a91d774dc7ffb443f0ad6101eee78021ab8212816a1c0393f4c03824",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 18446,
+          "sha256": "5a3bf8c3f0e8227aa3db36278b1aa03390cb1d37661b8ad4bc102a33a9578b89",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 22014,
+          "sha256": "2be2db4b3bbc26dbf9e3ec5f2eff63af8de0ce7d463d4ae855c5cb7e40134679",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12058,
+          "sha256": "d350fe6eb14af37ec810789722877f0ede5e124c658017a9c3068f25a38a8cf2",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 828,
+          "sha256": "78864679748044ba0d71a97792c43c028aa9dc47df4045176797ab4964581a55",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 11748,
+          "sha256": "8bbd2d0230dfce82b1b7219a57bde6113d4e2e21b0102e59cdcd79f2e62b40ca",
+          "index": 6,
+          "name": "FrontierLinen_spearman",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12069,
+          "sha256": "43db9e8b24055409844c15e8fceecbadaf1c5fed35a5c800bceacf3d9a3d0161",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 4194,
+          "sha256": "6e34efcb81bb314a912735030129297fa10c4e40bdc7d742e98e3f11577eb60c",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.030882 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "archer",
+      "lod": 0,
+      "sha256": "b6f00b194403079db32647f2239e4d8fab90c245059e23a6c9dc6d089e461722",
+      "bytes": 3609796,
+      "triangles": 18308,
+      "skin_weights": {
+        "vertex_rows": 10713,
+        "maximum_sum_error": 1.1859810911118984e-07,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 217083,
+          "sha256": "74b24197c70c3342ae71fc69467ff9fdafb5c20a00d6aee9a61170955cb08b43",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1115093,
+          "sha256": "16ffc81333623e15f656bddbff9811fdaa5b33b3dcb784067a87f2245297d543",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 231897,
+          "sha256": "f784aa10babd57291bf16174b2c0b313695cb5f05fc4e0d6a5b1560e44a34850",
+          "index": 6,
+          "name": "FrontierLinen_archer",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.034100 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "archer",
+      "lod": 1,
+      "sha256": "14b2ffaab3191d75e4a624e6c7f2cbdfa8db6d470470783f302553adcb52fb6c",
+      "bytes": 2289128,
+      "triangles": 7064,
+      "skin_weights": {
+        "vertex_rows": 4396,
+        "maximum_sum_error": 8.940696716308594e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 217083,
+          "sha256": "74b24197c70c3342ae71fc69467ff9fdafb5c20a00d6aee9a61170955cb08b43",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 423373,
+          "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 293962,
+          "sha256": "64109c9aa5f17a384d6613ae1651b5f1b796a2c853cdbc227d652f5414376e8e",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 266342,
+          "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 5740,
+          "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 231897,
+          "sha256": "f784aa10babd57291bf16174b2c0b313695cb5f05fc4e0d6a5b1560e44a34850",
+          "index": 6,
+          "name": "FrontierLinen_archer",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 268651,
+          "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 512,
+          "height": 512,
+          "bytes": 46105,
+          "sha256": "a02a4a1e91c9f439b0495d20186dcc0f8c79e7d8c7f3ba7a3afeb2d50b12b9b3",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.034404 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "archer",
+      "lod": 2,
+      "sha256": "fcc4c04e26446f3b122852a3fb9c3252f84d403b41ddcb126e4636eeb7a6e87b",
+      "bytes": 688556,
+      "triangles": 2207,
+      "skin_weights": {
+        "vertex_rows": 1562,
+        "maximum_sum_error": 8.42846930027008e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 50404,
+          "sha256": "fe52c79ddc005187bba5e3870605474449d60e26e2eadf5832c43dbb6c986e91",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 90730,
+          "sha256": "77b0eee955cdd80c532f851fd3cf3e906368ad19fb92bf960f5e6d24b10bcb5a",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 78231,
+          "sha256": "18e957f218bea0c5e777a4d0c9e4dcac822a6370b2c25d0c03505eaa04267593",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56580,
+          "sha256": "0cc33a058353c32cd0507d0aad3d844c060b5729537a1a7cdc94b4d67efabb2c",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 2090,
+          "sha256": "7bbfba8fbf4124f4c3483a19914a1e6dc236dc031c0a7c698bc048f48560525f",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56118,
+          "sha256": "2c57936ee72622a70deda0c55ecb674fc855a5756cb87327455d74f283a68d97",
+          "index": 6,
+          "name": "FrontierLinen_archer",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 56474,
+          "sha256": "56e752f6de36461cc634dd1043b8dfbca0e6d21ca40197e9a6da2c35156bdd49",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 256,
+          "height": 256,
+          "bytes": 13327,
+          "sha256": "ab034ee220de978fba38afd73d6f3734f3c576271f68c521c24279a8ed023f38",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.032259 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    },
+    {
+      "identity": "archer",
+      "lod": 3,
+      "sha256": "b148570829a68da85d5bacd69845c8158d1b59584f95092571638e3d71aa0b6b",
+      "bytes": 322296,
+      "triangles": 791,
+      "skin_weights": {
+        "vertex_rows": 703,
+        "maximum_sum_error": 9.639188647270203e-08,
+        "invalid_joint_indices": 0,
+        "invalid_weights": 0
+      },
+      "face_shapes": [],
+      "clips": [
+        "attack",
+        "block",
+        "death",
+        "hit",
+        "idle",
+        "march",
+        "retreat",
+        "run",
+        "shoot",
+        "testudo",
+        "wall"
+      ],
+      "images": [
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 9422,
+          "sha256": "b4b787f6a91d774dc7ffb443f0ad6101eee78021ab8212816a1c0393f4c03824",
+          "index": 0,
+          "name": "FrontierKit_pigments512",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 4,
+          "height": 4,
+          "bytes": 197,
+          "sha256": "61d6b89d1da0c3abdb454a0afbec545ed20b10f208344333122a4015042d1013",
+          "index": 1,
+          "name": "Field_company_finish",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 18446,
+          "sha256": "5a3bf8c3f0e8227aa3db36278b1aa03390cb1d37661b8ad4bc102a33a9578b89",
+          "index": 2,
+          "name": "HeroSkin_micro_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 22014,
+          "sha256": "2be2db4b3bbc26dbf9e3ec5f2eff63af8de0ce7d463d4ae855c5cb7e40134679",
+          "index": 3,
+          "name": "young_lightskinned_male_diffuse",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12058,
+          "sha256": "d350fe6eb14af37ec810789722877f0ede5e124c658017a9c3068f25a38a8cf2",
+          "index": 4,
+          "name": "HeroSkin_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 828,
+          "sha256": "78864679748044ba0d71a97792c43c028aa9dc47df4045176797ab4964581a55",
+          "index": 5,
+          "name": "HeroLinen_weave_normal",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 11859,
+          "sha256": "92164c90cc7b89ccf65d3b1da646735d1901b6f67cbf1d6b7213d82cd5dcf7a6",
+          "index": 6,
+          "name": "FrontierLinen_archer",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 12069,
+          "sha256": "43db9e8b24055409844c15e8fceecbadaf1c5fed35a5c800bceacf3d9a3d0161",
+          "index": 7,
+          "name": "HeroLinen_roughness",
+          "embedded": true
+        },
+        {
+          "mime_type": "image/png",
+          "width": 128,
+          "height": 128,
+          "bytes": 4194,
+          "sha256": "6e34efcb81bb314a912735030129297fa10c4e40bdc7d742e98e3f11577eb60c",
+          "index": 8,
+          "name": "FrontierEye_hazel",
+          "embedded": true
+        }
+      ],
+      "warnings": [
+        "Ground pivot review: minimum glTF Y is 0.030882 m, expected near 0",
+        "Skin/animation runtime behavior is outside this static export gate"
+      ]
+    }
+  ],
+  "errors": []
+}
