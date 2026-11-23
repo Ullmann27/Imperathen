@@ -20,6 +20,12 @@ SPEC.loader.exec_module(INSPECTOR)
 STAGE_SPEC = importlib.util.spec_from_file_location("stage_meshy_assets", TOOLS_ART / "stage_meshy_assets.py")
 STAGER = importlib.util.module_from_spec(STAGE_SPEC)
 STAGE_SPEC.loader.exec_module(STAGER)
+MANIFEST_SPEC = importlib.util.spec_from_file_location("validate_meshy_manifest", TOOLS_ART / "validate_meshy_manifest.py")
+MANIFEST_VALIDATOR = importlib.util.module_from_spec(MANIFEST_SPEC)
+MANIFEST_SPEC.loader.exec_module(MANIFEST_VALIDATOR)
+LOADOUT_SPEC = importlib.util.spec_from_file_location("validate_meshy_loadouts", TOOLS_ART / "validate_meshy_loadouts.py")
+LOADOUT_VALIDATOR = importlib.util.module_from_spec(LOADOUT_SPEC)
+LOADOUT_SPEC.loader.exec_module(LOADOUT_VALIDATOR)
 
 
 def png_1x1() -> bytes:
@@ -89,6 +95,21 @@ def write_glb(path: Path) -> None:
         stream.write(json_bytes)
         stream.write(struct.pack("<II", len(blob), 0x004E4942))
         stream.write(blob)
+
+
+class RepositoryMeshyContractTest(unittest.TestCase):
+    def test_repository_manifest_and_loadouts_are_consistent(self):
+        manifest = ROOT / "prototype/assets/meshy/manifest.json"
+        loadouts = ROOT / "prototype/assets/meshy/loadouts.json"
+        manifest_report = MANIFEST_VALIDATOR.validate(manifest)
+        loadout_report = LOADOUT_VALIDATOR.validate(manifest, loadouts)
+        self.assertEqual(manifest_report["assets"], 29)
+        self.assertEqual(manifest_report["categories"]["mount"], 1)
+        self.assertEqual(manifest_report["states"]["ready_in_meshy"], 27)
+        self.assertEqual(manifest_report["states"]["geometry_ready_untextured"], 2)
+        self.assertEqual(loadout_report["loadouts"], 7)
+        self.assertEqual(loadout_report["resource_bindings"], 6)
+        self.assertGreater(loadout_report["component_references"], 20)
 
 
 class MeshyGlbInspectorTest(unittest.TestCase):
