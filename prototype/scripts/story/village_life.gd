@@ -97,11 +97,13 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 	invalid = validate(candidate)
 	if not invalid.is_empty():
 		return _fail("Dorfauftrag verworfen: " + invalid)
-	# Village-life commands in this module mutate only these authoritative
-	# domains. Companion state is neither read nor changed here, so requiring it
-	# would make the reusable village contract depend on unrelated campaign data.
+	# Core village commands mutate these domains. Delegated childhood actions may
+	# also change the persistent companion relationship (for example I-03 Marcus),
+	# but standalone village fixtures legitimately have no companion object.
 	for key: String in ["village", "resources", "player"]:
 		data[key] = candidate[key]
+	if candidate.has("companion"):
+		data["companion"] = candidate["companion"]
 	return result
 
 
