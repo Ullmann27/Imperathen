@@ -6,7 +6,7 @@ const Origins = preload("res://scripts/strategy/origins.gd")
 const STORY_VERSION := 1
 const HELP_WOOD := 4
 const HUT_WOOD := 8
-const SHOT_IDS := ["valley", "market", "well", "plot", "player"]
+const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player"]
 const REGIONS := {
 	"italia": {
 		"location": "Römische Grenzsiedlung",
