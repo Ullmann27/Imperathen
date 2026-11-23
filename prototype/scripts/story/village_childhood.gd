@@ -17,7 +17,7 @@ const POINTS := {
 	"wood_bundle":Vector2(-43.0,17.0), "patrol_inner":Vector2(0.0,-16.0),
 	"patrol_road":Vector2(0.0,-35.0), "patrol_gate":Vector2(0.0,-46.0),
 	"sick_guard":Vector2(10.0,18.5), "marcus":Vector2(-3.0,4.0),
-	"hoof_tracks":Vector2(0.0,-35.0)
+	"hoof_tracks":Vector2(0.0,-35.0), "oath_ridge":Vector2(-16.0,-19.0)
 }
 const EXTRA_NPCS := {
 	"julia":{"name":"Julia", "role":"Deine Mutter", "point":"mother", "profession":""},
@@ -80,7 +80,7 @@ const CARRIED_EFFECTS := {
 	"healer_request":{"add":["medicine_parcel"]}, "deliver_medicine":{"remove":["medicine_parcel"]},
 	"watch_post":{"add":["gate_message"]}, "watch_message":{"remove":["gate_message"]}
 }
-const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Fabius’ Kleinholzbündel", "checked_hinge":"Geprüftes Scharnier", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
+const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Fabius’ Kleinholzbündel", "checked_hinge":"Geprüftes Scharnier", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
 const SOURCE_MISSION_BY_STEP := {
 	"mother_morning":"I-01","fill_water":"I-01","father_morning":"I-01",
@@ -109,7 +109,7 @@ static func start(data: Dictionary) -> bool:
 	# The production screenplay begins in 58 BCE. Legacy village careers keep\n	# their older Trajan-era history; only an explicitly enabled childhood\n	# campaign moves this shared village history anchor.\n	data.village.history.start_year = -58\n	data.village.history.mode = "historical_baseline"\n	data.village.childhood = {"version":VERSION,"completed":[],"day":1,"carried":[],
 		"relationships":relationships,"active_work":"","work_seconds":0.0,
 		"gear":"none","apprenticeship":"none","night_event":"none",
-		"screenplay":{"version":1,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i08":"locked","hoof_evidence":false},
+		"screenplay":{"version":2,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i08":"locked","hoof_evidence":false,"i10":"locked","raid_path":"","visible_raiders":30,"i11":"locked","i12":"locked","i13":"locked","i14":"locked","julia_outcome":"undecided","oath":false},
 		"guard_absence":{"active":false,"previous_assignment":"idle","previous_health":100}}
 	return true
 
@@ -144,14 +144,25 @@ static func migrate_legacy_ids(data: Dictionary) -> bool:
 	var old_completed: Array = child.get("completed", [])
 	var passed_family_morning := old_completed.size() >= 3
 	var passed_watch_service := old_completed.has("return_gear") or old_completed.has("family_evening") or old_completed.has("night_rest")
+	var legacy_night: String = str(child.get("night_event", "none"))
+	var legacy_released := legacy_night == "released"
+	var legacy_raid: Dictionary = data.village.get("raid", {})
+	var legacy_raid_finished := legacy_released and str(legacy_raid.get("status", "")) == "aftermath"
 	child.screenplay = {
-		"version":1,
+		"version":2,
 		"i02":"complete" if passed_family_morning else "pending",
 		"i02_outcome":"legacy" if passed_family_morning else "",
-		"i03":"complete" if passed_family_morning else "locked",
-		"i03_outcome":"legacy" if passed_family_morning else "",
+		"i03":"complete" if passed_family_morning or bool(data.get("companion", {}).get("met", false)) else "locked",
+		"i03_outcome":"legacy" if passed_family_morning or bool(data.get("companion", {}).get("met", false)) else "",
 		"i08":"complete" if passed_watch_service else "locked",
-		"hoof_evidence":passed_watch_service
+		"hoof_evidence":passed_watch_service,
+		"i10":"complete" if legacy_released else ("pending" if legacy_night == "pending" else "locked"),
+		"raid_path":"legacy" if legacy_released else "",
+		"visible_raiders":30,
+		"i11":"pending" if legacy_raid_finished else "locked",
+		"i12":"locked","i13":"locked","i14":"locked",
+		"julia_outcome":"legacy" if legacy_released else "undecided",
+		"oath":false
 	}
 	# Old saves that had already passed the family morning never carried the
 	# newly authored basket; do not invent it retroactively.
@@ -354,6 +365,7 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 		child.day += 1
 	if id == "night_rest":
 		child.night_event = "pending"
+		child.screenplay.i10 = "pending"
 	child.active_work = ""
 	child.work_seconds = 0.0
 	child.completed.append(action)
@@ -423,6 +435,69 @@ static func _apply_screenplay(data: Dictionary, step: Dictionary, action: String
 			screenplay.i08 = "complete"
 			_gain(data, "tactics", 1)
 			message = "Decimus protokolliert die Spuren ohne vorschnelle Schuldzuweisung. Die Warnung bleibt im Event-Ledger."
+		"i10_choice":
+			if action not in ["i10_defend","i10_hide"]:
+				return _fail("Entscheide ausdrücklich zwischen Hilfe draußen und Verstecken bei deinen Eltern.")
+			screenplay.i10 = "complete"
+			screenplay.raid_path = "defend" if action == "i10_defend" else "hide"
+			child.night_event = "released"
+			message = "Du gehst hinaus, um Menschen zu helfen. Die Nacht läuft nun in der realen Dorfwelt." if action == "i10_defend" else "Du bleibst bei deinen Eltern. Die Welt läuft weiter; dieses Versteck schützt nicht automatisch alle."
+		"i11_forge":
+			if action != "i11_forge":
+				return _fail("Erreiche die Schmiede und den offenen Fluchtweg.")
+			var smith := _person(data, "sextus")
+			if smith.is_empty() or not smith.alive:
+				return _fail("Sextus’ Zustand passt nicht mehr zu diesem Storyschritt.")
+			smith.alive = false
+			smith.health = 0
+			smith.assignment = "idle"
+			smith.previous_assignment = "idle"
+			screenplay.i11 = "complete"
+			screenplay.i12 = "pending"
+			message = "Sextus hält den Fluchtweg offen und stirbt. Sein Arbeitsplatz bleibt danach tatsächlich unbesetzt."
+		"i12_father":
+			if action != "i12_father":
+				return _fail("Folge Silvanus auf seinem letzten Weg.")
+			var father := _person(data, "silvanus")
+			if father.is_empty() or not father.alive:
+				return _fail("Silvanus’ Zustand passt nicht mehr zu diesem Storyschritt.")
+			father.alive = false
+			father.health = 0
+			father.assignment = "idle"
+			father.previous_assignment = "idle"
+			var mother := _person(data, "julia")
+			var julia_survives := true
+			if screenplay.raid_path == "hide":
+				julia_survives = false
+			elif screenplay.raid_path == "defend":
+				var raid: Dictionary = data.village.raid
+				julia_survives = bool(raid.get("rescued", false)) and str(raid.get("rescue_person_id", "")) == "julia"
+			elif screenplay.raid_path == "legacy":
+				julia_survives = not mother.is_empty() and bool(mother.get("alive", true))
+			if not julia_survives and not mother.is_empty():
+				mother.alive = false
+				mother.health = 0
+				mother.assignment = "idle"
+				mother.previous_assignment = "idle"
+			screenplay.julia_outcome = "survived" if julia_survives else "dead"
+			screenplay.i12 = "complete"
+			screenplay.i13 = "pending"
+			message = "Silvanus stirbt. Julia überlebt, weil du sie tatsächlich aus der Gefahrenzone gebracht hast." if julia_survives else "Silvanus stirbt. Julia überlebt diesen Weg nicht; die Entscheidung bleibt dauerhaft im Weltzustand."
+		"i13_morning":
+			if action != "i13_morning":
+				return _fail("Erfasse mit Aurelia die tatsächlichen Folgen des Angriffs.")
+			screenplay.i13 = "complete"
+			screenplay.i14 = "pending"
+			message = "Am Morgen bleiben Tote, Verletzte, verlorene Arbeitsplätze und beschädigte Vorräte Teil derselben Welt."
+		"i14_oath":
+			if action != "i14_oath":
+				return _fail("Der Schwur wird nur am Waldrand als bewusste Handlung abgeschlossen.")
+			if not child.carried.has("memory_token"):
+				child.carried.append("memory_token")
+			screenplay.i14 = "complete"
+			screenplay.oath = true
+			child.night_event = "resolved"
+			message = "»Ich werde euch rächen. Ich finde die Verantwortlichen.« Der Schwur öffnet die Ermittlung; er macht dich nicht automatisch zum Soldaten."
 		_:
 			return _fail("Unbekannter Drehbuchschritt.")
 	_record(data, action, message)
@@ -442,7 +517,15 @@ static func advance(data: Dictionary, delta: float) -> bool:
 
 
 static func raids_allowed(data: Dictionary) -> bool:
-	return not enabled(data) or data.village.childhood.night_event == "released"
+	return not enabled(data) or data.village.childhood.night_event in ["released","resolved"]
+
+
+static func on_raid_finished(data: Dictionary) -> void:
+	if not enabled(data):
+		return
+	var screenplay: Dictionary = data.village.childhood.screenplay
+	if screenplay.i10 == "complete" and screenplay.i11 == "locked":
+		screenplay.i11 = "pending"
 
 
 static func view(data: Dictionary) -> Dictionary:
@@ -652,6 +735,35 @@ static func _screenplay_step(data: Dictionary) -> Dictionary:
 				"objective":"Berichte Decimus, was du tatsächlich gesehen hast. Beschuldige kein Volk ohne Beleg.",
 				"text":"»Zeig mir, was du weißt. Nicht, was du vermutest.«",
 				"result":"Die Hufspuren werden als offene Warnung protokolliert; ein Täter bleibt unbekannt."}
+	if child.completed.size() == STEPS.size():
+		if screenplay.i10 == "pending":
+			return {"id":"i10_choice","mission":"I-10","screenplay":true,"npc":"silvanus",
+				"chapter":"Die Nacht der Reiter","label":"Entscheiden, wie du auf den Angriff reagierst",
+				"objective":"Hufschläge, Feuer und Rufe reißen Valdora aus der Nacht. Entscheide: hilfst du bei Verteidigung und Rettung oder versteckst du dich bei deinen Eltern?",
+				"text":"»Bleib bei uns, wenn du dich versteckst. Wenn du hinausgehst, dann um Menschen zu helfen – nicht um ein Held zu spielen.«",
+				"result":"Deine Nachtentscheidung wird dauerhaft gespeichert."}
+		if screenplay.i10 == "complete" and screenplay.i11 == "pending":
+			return {"id":"i11_forge","mission":"I-11","screenplay":true,"point":"smith",
+				"chapter":"Die Schmiede im Feuer","label":"Zur brennenden Schmiede zurückkehren",
+				"objective":"Erreiche die Schmiede. Sextus hält einen Fluchtweg offen; die Werkstatt und ihr Arbeiter sind Teil derselben Welt.",
+				"text":"","result":"Sextus stirbt, während er den Fluchtweg offen hält. Die Schmiede verliert ihren realen Arbeiter."}
+		if screenplay.i11 == "complete" and screenplay.i12 == "pending":
+			return {"id":"i12_father","mission":"I-12","screenplay":true,"npc":"silvanus",
+				"chapter":"Der letzte Weg des Vaters","label":"Silvanus auf seinem letzten Weg folgen",
+				"objective":"Geh zu deinem Vater in der Familiengasse. Sein Ende ist in beiden Hauptwegen fest; Julias Schicksal hängt von tatsächlich geleisteter Hilfe ab.",
+				"text":"»Sieh nach deiner Mutter. Und wenn du später wütend bist – entscheide erst, wenn du wieder sehen kannst, was vor dir liegt.«",
+				"result":"Silvanus stirbt. Julias Zustand folgt aus deiner tatsächlichen Rettung oder dem Versteckweg."}
+		if screenplay.i12 == "complete" and screenplay.i13 == "pending":
+			return {"id":"i13_morning","mission":"I-13","screenplay":true,"npc":"aurelia",
+				"chapter":"Morgen ohne Stimmen","label":"Mit Aurelia die wirklichen Verluste erfassen",
+				"objective":"Gehe am Morgen zu Aurelia. Leere Arbeitsplätze, Verletzte und Tote bleiben reale Zustände statt Kulisse.",
+				"text":"»Wir zählen keine Schatten. Wir zählen Menschen. Wer fehlt, fehlt auch morgen noch an seinem Arbeitsplatz.«",
+				"result":"Der Morgen übernimmt die tatsächlichen Personen- und Verlustzustände der Nacht."}
+		if screenplay.i13 == "complete" and screenplay.i14 == "pending":
+			return {"id":"i14_oath","mission":"I-14","screenplay":true,"point":"oath_ridge",
+				"chapter":"Der Schwur","label":"Am Waldrand das Erinnerungsstück nehmen und schwören",
+				"objective":"Geh zum Waldrand oberhalb Valdoras. Nimm ein Erinnerungsstück und entscheide dich für die Suche nach den Verantwortlichen.",
+				"text":"","result":"Du schwörst, die Verantwortlichen zu finden. Der Schwur eröffnet Ermittlung – keine sofortige Soldatenkarriere."}
 	return {}
 
 
@@ -687,6 +799,17 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 		options = [{"id":"i08_inspect","label":"Hufspuren untersuchen und nur Beobachtungen sichern"}]
 	elif step.id == "i08_report":
 		options = [{"id":"i08_report","label":"Decimus nur belegte Spuren melden"}]
+	elif step.id == "i10_choice":
+		options = [{"id":"i10_defend","label":"Hinausgehen · verteidigen und Menschen retten"},
+			{"id":"i10_hide","label":"Bei den Eltern bleiben und sich verstecken"}]
+	elif step.id == "i11_forge":
+		options = [{"id":"i11_forge","label":"Sextus’ Fluchtweg erreichen"}]
+	elif step.id == "i12_father":
+		options = [{"id":"i12_father","label":"Beim Vater bleiben und nach Julia sehen"}]
+	elif step.id == "i13_morning":
+		options = [{"id":"i13_morning","label":"Verluste mit Aurelia erfassen"}]
+	elif step.id == "i14_oath":
+		options = [{"id":"i14_oath","label":"Erinnerungsstück nehmen und den Schwur sprechen"}]
 	elif step.has("seconds"):
 		if data.village.childhood.active_work == "":
 			options[0].id = "begin_" + str(step.id)
