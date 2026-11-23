@@ -65,12 +65,39 @@ Frisch ausgeführte Prüfungen dieses Wiederaufnahmedurchgangs:
 
 ## Android und Bildnachweise
 
-Die beiden lokalen Korrekturen werden mit dieser Quellsicherung in den bestehenden
-Lieferzweig übernommen und lösen den vorhandenen Android-Workflow aus. Der frische
-Android-Lauf und die Veröffentlichung sind an diesem Quellcheckpoint noch nicht
-abgeschlossen. Ein APK-Download wird erst nach erfolgreichem Bau, tatsächlichem
-Android-Lauf und Prüfung der passenden Quelldateien angegeben. Frühere Hero- oder
-Opening-APKs werden nicht als neue Dorfleben-APK ausgegeben.
+Der anschließend ausgeführte [Android-Lauf 22](https://github.com/Ullmann27/Imperathen/actions/runs/45169603293)
+baute und prüfte beide APKs erfolgreich. Die neue Zustandswarteprüfung erreichte
+die echte Arbeitsübersicht, deckte aber einen weiteren Bedienungsfehler auf:
+Die Arbeitskarten blockierten die Wischbewegungen zum übergeordneten Scrollbereich.
+Nach 14 echten Android-Wischbewegungen blieb Aelias aktiviertes Auswahlfeld
+unterhalb des sichtbaren Ausschnitts. Der Lauf schlug deshalb korrekt fehl;
+die Veröffentlichung wurde übersprungen.
+[Androidbericht](evidence/touch-scroll/android22-runtime-report.json) und
+[Downloadbeleg](evidence/touch-scroll/android22-download-receipt.json) gehören
+ausdrücklich zu diesem fehlgeschlagenen Stand `00d5d041`.
+
+Die Korrektur ist auf das Dorfmenü begrenzt: Karten und gewöhnliche Schaltflächen
+reichen Ziehbewegungen an den Scrollbereich weiter. Auswahlmenüs behalten ihre
+eigene Eingabebehandlung; der äußere Dialog fängt weiterhin Eingaben vor der
+Spielwelt ab. Eine native Touchregression reproduziert den Fehler vor der
+Korrektur bei 960 × 540 und 1280 × 720: jeweils 14 Wischbewegungen ohne Bewegung.
+Danach wird Aelia mit drei beziehungsweise zwei Wischbewegungen sichtbar.
+Eine zusätzliche Wischbewegung, die direkt auf einer aktiven Reparaturschaltfläche
+beginnt, scrollt ebenfalls, ohne einen Auftrag auszulösen. Alle 41 Panelprüfungen
+bestehen, der Modellzustand bleibt dabei unverändert und es gelangen keine
+unbehandelten Berührungen an die Spielwelt.
+[Vorher](evidence/touch-scroll/native-drag-before.log) ·
+[Nachher](evidence/touch-scroll/native-drag-after.log).
+
+Nach dieser UI-Korrektur wurde der vollständige Godot-Durchlauf erneut ausgeführt:
+**33 von 33 Gruppen bestanden, keine Warnungen**, darunter 41 Panelprüfungen und
+140 Prüfungen des gesamten Dorfablaufs. Der Android-Python-Prüflauf bestand erneut
+alle 30 Tests. [Vollständiger neuer Bericht](evidence/touch-scroll/engine/validation_report.json).
+
+Der erneute Android-Bau mit dieser tatsächlichen UI-Korrektur folgt auf die
+bestandene Engineprüfung. Ein APK-Download wird erst nach erfolgreichem Bau,
+tatsächlichem Android-Lauf und Prüfung der passenden Quelldateien angegeben.
+Frühere Hero- oder Opening-APKs werden nicht als neue Dorfleben-APK ausgegeben.
 
 ## Konkrete Grenzen
 
@@ -78,6 +105,7 @@ Opening-APKs werden nicht als neue Dorfleben-APK ausgegeben.
 - 32 × 32 km sind ein adressierbarer Geländerahmen mit getesteten Sektoren. Dreizehn entfernte Orte sind geplant; ihre Markierungen bedeuten keine fertig bewohnten Städte.
 - Der historische Rahmen nennt Trajan; örtliche Figuren und Überfälle sind eigene Fiktion. Spielbare Missionen, die belegte Großereignisse verändern, sind noch nicht umgesetzt. [Quellen und Trennung](HISTORICAL_SOURCES.json)
 - Das geerbte Replay-Protokoll begrenzt erfolgreiche gekennzeichnete Befehle auf 1.024. Dieser Stand ist deshalb noch keine unbegrenzt fortsetzbare Kampagne. Eine dauerhafte monotone Empfangsbestätigung muss vor dem langen Kampagnentest folgen.
+- Die Dorfchronik beginnt bei 100 n. Chr. und erreicht beim Altersübergang 106 n. Chr.; die Saisonanzeige der Weltkugel übernimmt diesen sechsjährigen Versatz noch nicht. Die beiden Kalenderanzeigen sind nach dem Übergang noch nicht synchron.
 - Physische Android-Geräte, dauerhafte Temperaturentwicklung und mobile Bildraten sind nicht durch die lokalen Engine- oder Softwarebilder nachgewiesen.
 
 Es erfolgt kein Merge nach `main` und kein Store-Release.

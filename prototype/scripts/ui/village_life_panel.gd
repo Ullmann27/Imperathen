@@ -46,6 +46,8 @@ static func _text(ui, column: VBoxContainer, value: String, size := 16, muted :=
 
 static func _action(ui, column: VBoxContainer, label: String, command: String, args: Dictionary = {}, enabled := true) -> Button:
 	var button: Button = ui._button(label, ui._emit.bind("village_command", {"command":command, "args":args}), false, 15)
+	# Let the enclosing scroll container capture a swipe and cancel the press.
+	button.mouse_filter = Control.MOUSE_FILTER_PASS
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.disabled = not enabled
 	button.set_meta("village_focus_id", command + ":" + JSON.stringify(args))
@@ -69,10 +71,12 @@ static func show(ui, data: Dictionary, tab := "overview") -> void:
 	var life: Dictionary = Life.view(data)
 	var column: VBoxContainer = ui._modal("DEIN LEBEN IM DORF", "Wiederaufbau unter Decimus", "Du bist Bewohner. Vertrauen, Arbeit und gemeinsame Entscheidungen bestimmen deinen Einfluss.", 880)
 	var tabs := HFlowContainer.new()
+	tabs.mouse_filter = Control.MOUSE_FILTER_PASS
 	column.add_child(tabs)
 	var active_tab: Button
 	for entry in [["overview", "Dorfleben"], ["work", "Arbeit & Versorgung"], ["people", "Menschen & Berufe"], ["map", "Region"]]:
 		var button: Button = ui._button(entry[1], ui._emit.bind("village_panel", {"tab":entry[0]}), entry[0] == tab, 14)
+		button.mouse_filter = Control.MOUSE_FILTER_PASS
 		button.set_meta("village_focus_id", "tab:" + str(entry[0]))
 		tabs.add_child(button)
 		if entry[0] == tab:
@@ -88,6 +92,7 @@ static func show(ui, data: Dictionary, tab := "overview") -> void:
 	else:
 		_overview(ui, column, data, economy, life)
 	var close: Button = ui._button("Zurück ins Dorf", ui._emit.bind("resume", {}), true)
+	close.mouse_filter = Control.MOUSE_FILTER_PASS
 	close.set_meta("village_focus_id", "close")
 	column.add_child(close)
 	_restore_position.call_deferred(column, active_tab, previous_scroll, previous_focus)
@@ -135,6 +140,8 @@ static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictiona
 		_text(ui, column, "Sprich mit Decimus und vereinbare zuerst die Mithilfe beim Wiederaufbau.", 15)
 	for place: Dictionary in economy.get("workplaces", []):
 		var card: PanelContainer = ui._panel(false)
+		# Cards share the modal's scroll gesture; its outer boundary still blocks the world.
+		card.mouse_filter = Control.MOUSE_FILTER_PASS
 		column.add_child(card)
 		var inner: VBoxContainer = ui._column(8)
 		card.add_child(inner)
@@ -142,6 +149,7 @@ static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictiona
 		_text(ui, inner, "In Betrieb" if place.reason.is_empty() else str(place.reason), 14, true)
 		if not place.project.is_empty():
 			var progress := ProgressBar.new()
+			progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			progress.value = float(place.project_progress) * 100
 			progress.custom_minimum_size.y = 20
 			inner.add_child(progress)
@@ -150,11 +158,14 @@ static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictiona
 	_text(ui, column, "Einwohner zuweisen", 20)
 	for person: Dictionary in economy.get("people", []):
 		var row := HBoxContainer.new()
+		row.mouse_filter = Control.MOUSE_FILTER_PASS
 		column.add_child(row)
 		var label: Label = ui._label("%s · Hunger %d/3" % [person.name, person.hunger], 14, ui.CREAM)
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(label)
 		var select := OptionButton.new()
+		# Popup selectors own their press/release; swipes can begin on the adjacent label.
+		select.mouse_filter = Control.MOUSE_FILTER_STOP
 		select.set_meta("village_focus_id", "assignment:" + str(person.id))
 		select.custom_minimum_size = Vector2(160, 46)
 		var in_militia: bool = data.village.get("militia", []).has(person.id)

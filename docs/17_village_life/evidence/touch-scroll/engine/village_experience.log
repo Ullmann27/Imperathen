@@ -1,0 +1,23 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop
+IMPERATHEN_MENU_READY {"new_game":[233.0,316.0]}
+IMPERATHEN_OPENING_STARTED first_day
+IMPERATHEN_SESSION_STARTED: saved frontier world
+IMPERATHEN_OPENING_READY {"buttons":{"OpeningAdvance":[1022.0,652.0],"OpeningPause":[1082.5,52.0],"OpeningSkip":[1189.5,52.0]},"companion_choice":"","elapsed":0.0,"final":false,"index":0,"paused":false,"sequence":"first_day","world_seconds":0.0}
+IMPERATHEN_OPENING_COMPLETE
+IMPERATHEN_VILLAGE_DIALOG: decimus
+IMPERATHEN_VILLAGE_DIALOG: fabius
+IMPERATHEN_VILLAGE_DIALOG: aelia
+IMPERATHEN_PAUSED
+IMPERATHEN_VILLAGE_DIALOG: varro
+IMPERATHEN_PAUSED
+IMPERATHEN_MENU_READY {"new_game":[233.0,520.0]}
+IMPERATHEN_CONTINUED
+IMPERATHEN_PAUSED
+IMPERATHEN_OPENING_STARTED adulthood
+IMPERATHEN_OPENING_READY {"buttons":{"OpeningAdvance":[1022.0,652.0],"OpeningPause":[1082.5,52.0],"OpeningSkip":[1189.5,52.0]},"companion_choice":"help","elapsed":0.0,"final":false,"index":0,"paused":false,"sequence":"adulthood","world_seconds":189216240.15}
+IMPERATHEN_OPENING_COMPLETE
+IMPERATHEN_PAUSED
+VILLAGE_EXPERIENCE_RESULT checks=140 failures=0 captures=0
+VILLAGE_EXPERIENCE_PASS
