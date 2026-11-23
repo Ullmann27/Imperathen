@@ -10,9 +10,9 @@ const SHOT_IDS := ["valley", "market", "well", "plot", "player"]
 const REGIONS := {
 	"italia": {
 		"location": "Römische Grenzsiedlung",
-		"opening": "Für die Händler ist das Dorf ein Halt auf dem Weg nach Rom. Für dich kann es ein Zuhause werden.",
+		"opening": "Trajan herrscht in Rom. Hier führt Decimus das Dorf. Der Überfall hat Dächer und Vorräte gekostet. Du gehörst zu denen, die bleiben.",
 		"host": "Livia", "host_role": "Händlerin",
-		"permission": "Du brauchst einen trockenen Schlafplatz. Das Holz westlich vom Brunnen ist freigegeben. Östlich des Weges darfst du bauen.",
+		"permission": "Das Holz westlich vom Brunnen ist freigegeben. Östlich des Weges darfst du bauen. Sprich danach mit Decimus und unseren Handwerkern.",
 		"companion_role": "Am Brunnen",
 		"request": "He, bleib kurz! Am Brunnen ist eine Strebe gebrochen. Vier Holzstücke würden reichen. Hilfst du mir, bevor du dein Dach baust?",
 		"meeting": "Marcus wartet beim Brunnen.\n\n»Eine Strebe hält keinen vollen Eimer mehr. Vier Holzstücke, dann kann ich sie ersetzen. Ich weiß, du brauchst selbst ein Dach. Kannst du trotzdem etwas entbehren?«",
@@ -75,7 +75,7 @@ static func sequence(origin_id: String = "italia") -> Dictionary:
 		_beat("road_dawn", "valley", "Chronik", "Dein erster Tag · 12 Jahre", region.opening, 7.5, chapter, region.location),
 		_beat("livia_market" if selected == "italia" else "village_permission", "market", region.host, region.host_role, region.permission, 9.5, chapter, region.location),
 		_beat("marcus_well" if selected == "italia" else "companion_request", "well", friend, region.companion_role, region.request, 10.0, chapter, region.location),
-		_beat("first_roof", "plot", "Chronik", "Ein Platz für dich", "Dein erstes Ziel ist ein Dach. Deinen Platz im Dorf findest du auch darin, wie du mit den anderen umgehst.", 8.0, chapter, region.location),
+		_beat("first_roof", "plot", "Chronik", "Ein Platz für dich", "Erst brauchst du ein Dach. Dann folgen Arbeit, Begegnungen und Entscheidungen. Wer dir vertraut, steht vielleicht in Gefahr an deiner Seite.", 8.0, chapter, region.location),
 		_beat("player_handoff", "player", "Chronik", "Deine Geschichte beginnt", "Finde das Holz westlich des Brunnens. Sprich mit %s. Deinen Bauplatz wählst du östlich des Weges." % friend, 7.5, chapter, region.location)
 	]
 	return {

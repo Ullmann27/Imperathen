@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "fixture": "Synthetic Unicode snapshot through unmodified production _process logger; no gameplay mutation",
+  "decoded_utf8_bytes": 5756,
+  "frames": 2,
+  "chunks_per_frame": [
+    15,
+    15
+  ],
+  "maximum_ascii_line_bytes_including_marker": 565,
+  "roundtrip": "exact byte-for-byte UTF-8 equality",
+  "sequence": [
+    1,
+    2
+  ]
+}

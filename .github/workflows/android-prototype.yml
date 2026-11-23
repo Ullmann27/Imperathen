@@ -2,7 +2,7 @@ name: Android prototype APK
 
 on:
   push:
-    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122', 'integration/realistic-android-23', 'feature/hero-realism-20261122', 'feature/cinematic-opening-20261123']
+    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122', 'integration/realistic-android-23', 'feature/hero-realism-20261122', 'feature/cinematic-opening-20261123', 'feature/village-life-20261123', 'feature/village-life-delivery-20261123']
     paths:
       - 'prototype/**'
       - 'tools/build_android_prototype.py'
@@ -12,6 +12,9 @@ on:
       - 'tools/run_android_emulator.sh'
       - 'tools/desktop/IMPERATHEN-Vulkan.cmd'
       - 'tools/android_signing_recovery_public.crt'
+      - 'tools/publish_village_download.py'
+      - 'tools/check_prototype.py'
+      - 'tests/android_*_test.py'
       - '.github/workflows/android-prototype.yml'
   workflow_dispatch:
 
@@ -77,7 +80,9 @@ jobs:
           openssl cms -encrypt -binary -aes-256-gcm -in "$RUNNER_TEMP/imperathen-debug.keystore" -outform DER -out artifacts/android-debug-keystore.cms tools/android_signing_recovery_public.crt
           cp tools/android_signing_recovery_public.crt artifacts/
       - name: Run existing engine regression checks
-        run: python3 tools/check_prototype.py --godot "$GODOT_BIN" --report artifacts/engine-checks
+        run: |
+          python3 -m unittest discover -s tests -p 'android_*_test.py'
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --report artifacts/engine-checks
       - name: Export the installable ARM64 prototype
         run: |
           python3 tools/build_android_prototype.py --godot "$GODOT_BIN" --sdk-root "$ANDROID_HOME" --java-home "$JAVA_HOME_17_X64" --template-dir "$IMPERATHEN_TEMPLATE_DIR" --keystore "$RUNNER_TEMP/imperathen-debug.keystore" --keystore-user imperathen-debug --abi arm64-v8a --output "$GITHUB_WORKSPACE/artifacts/${IMPERATHEN_BUILD}-arm64.apk"
@@ -103,6 +108,7 @@ jobs:
           path: artifacts/
           if-no-files-found: error
           retention-days: 30
+
       - name: Export Linux and Windows desktop builds
         run: |
           set -euo pipefail
@@ -144,3 +150,25 @@ jobs:
             ${{ runner.temp }}/android-emulator.log
           if-no-files-found: warn
           retention-days: 30
+
+  publish-village:
+    if: github.ref == 'refs/heads/feature/village-life-delivery-20261123' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: build-and-check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            tools/publish_village_download.py
+            tools/validate_android_apk.py
+          sparse-checkout-cone-mode: false
+      - name: Publish the verified village APK and matching public evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 tools/publish_village_download.py

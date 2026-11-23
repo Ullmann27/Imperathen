@@ -58,6 +58,10 @@ def start_display(directory: Path, env: dict[str, str]):
         raise RuntimeError("A graphical DISPLAY or Xorg with its dummy driver is required.")
     display = None
     for candidate in range(91, 121):
+        # The process can have its own network namespace while sharing /tmp
+        # with another review. A free TCP port does not make that X display free.
+        if Path(f"/tmp/.X{candidate}-lock").exists() or Path(f"/tmp/.X11-unix/X{candidate}").exists():
+            continue
         with socket.socket() as probe:
             try:
                 probe.bind(("127.0.0.1", 6000 + candidate))

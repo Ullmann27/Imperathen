@@ -20,6 +20,9 @@ local-only/
 .godot/
 __pycache__/
 *.pyc
+# Godot extracts these textures from the tracked, self-contained Frontier GLBs.
+prototype/assets/characters/frontier_*.png
+prototype/assets/characters/frontier_*.png.import
 exports/
 *.blend1
 

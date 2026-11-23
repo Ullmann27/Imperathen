@@ -1,0 +1,13 @@
+{
+  "run_id": 45169603293,
+  "source_commit": "00d5d041eb9acc50053762d508e5a1b482a81ae4",
+  "runtime_artifact_id": 14816781978,
+  "runtime_artifact_sha256": "3a20b054f0393f31e340f8a4e36b02b930f33fdb9e72933b4426ee6275dd84b9",
+  "android_artifact_id": 14815748981,
+  "android_artifact_sha256": "619d0051348751b02b4b5880422bca230eecc7c0796cc61cd90379fd0ab796de",
+  "apk_sha256": "f0dc7776996cee13c29b6a7ed0e86911ab380aac7927163113a78a20a353e426",
+  "apk_bytes": 150393060,
+  "runtime_passed": false,
+  "failure": "Could not scroll the actual village control into view: aelia_assignment",
+  "published": false
+}

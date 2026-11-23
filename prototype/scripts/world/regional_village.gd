@@ -2,18 +2,34 @@ extends Node3D
 ## Static settlement dressing never owns the player's building, labour or resource ledger.
 const Art = preload("res://scripts/world/village_art.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
+const Layout = preload("res://scripts/world/village/village_layout.gd")
+const Dressing = preload("res://scripts/world/village/frontier_dressing.gd")
 var current_origin := ""
+var quality := "balanced"
+var frontier_details: Node3D
+var house_count := 0
 
 func show_origin(id: String) -> void:
 	if current_origin == id:
 		return
 	current_origin = id
+	frontier_details = null
+	house_count = 0
 	for child in get_children():
 		remove_child(child)
 		child.free()
 	var house: String = Origins.PEOPLES[id].house
 	var places := [Vector3(-13,0,11),Vector3(-14,0,-11),Vector3(-5,0,-19),Vector3(20,0,-18)]
-	for i in places.size():
+	if id == "italia":
+		for home: Dictionary in Layout.HOMES:
+			var model := _add_scene("res://assets/architecture/frontier_house.glb",home.at)
+			model.name = home.id
+			model.rotation.y = float(home.yaw)
+			model.set_meta("household_id",home.id)
+			_tint_house(model,Color(home.tint))
+			_static_collision(model,"roman")
+			house_count += 1
+	for i in (0 if id == "italia" else places.size()):
 		var path := "res://assets/landscape/%s.glb" % house
 		if id == "italia":
 			path = "res://assets/architecture/frontier_house.glb"
@@ -22,18 +38,28 @@ func show_origin(id: String) -> void:
 		var model := _add_scene(path,places[i])
 		# Shared collision per wall profile keeps tiled roofs out of the physics broad phase.
 		_static_collision(model,house if id != "italia" else "roman")
+		house_count += 1
 	if id == "italia":
 		_static_collision(_add_scene("res://assets/architecture/atrium_house.glb",Vector3(14,0,-30)),"atrium")
 		var well := _add_scene("res://assets/architecture/village_well.glb",Vector3(-7,0,6))
 		for i in 10:
 			var a := TAU*i/10.0
 			Art.box_collider(well,Vector3(.55,.80,.22),Vector3(sin(a)*.82,.40,cos(a)*.82)).rotation.y = a
+		frontier_details = Dressing.new()
+		frontier_details.name = "FrontierDetails"
+		add_child(frontier_details)
+		frontier_details.build()
+		frontier_details.set_quality(quality)
 	else:
 		# A communal timber-lined water point for the regional encounter.
 		var wood := Art.material(Color("#785538"))
 		for k in 4:
 			var yaw := k * PI * 0.5
 			Art.box(self, Vector3(1.8,0.56,0.14), Vector3(-7+sin(yaw)*0.85,0.28,6+cos(yaw)*0.85),wood,true).rotation.y = yaw
+	# The Italian farmer now belongs to the named population and can become a
+	# recruit. Regional background figures retain their established model route.
+	if id == "italia":
+		return
 	var farmer_path := "res://assets/landscape/farmer.glb"
 	if id in ["wa","han"] and ResourceLoader.exists("res://assets/landscape/%s_farmer.glb" % id):
 		farmer_path = "res://assets/landscape/%s_farmer.glb" % id
@@ -43,6 +69,26 @@ func show_origin(id: String) -> void:
 		if player.has_animation("idle"):
 			player.get_animation("idle").loop_mode = Animation.LOOP_LINEAR
 			player.play("idle")
+
+func set_quality(profile: String) -> void:
+	quality = profile
+	if frontier_details:
+		frontier_details.set_quality(profile)
+
+func _tint_house(model: Node3D, tint: Color) -> void:
+	var overrides := {}
+	for shape: MeshInstance3D in model.find_children("*","MeshInstance3D",true,false):
+		if not shape.mesh:
+			continue
+		for surface in shape.mesh.get_surface_count():
+			var original := shape.mesh.surface_get_material(surface) as StandardMaterial3D
+			if not original or original.resource_name != "ARCH_Lime_Plaster":
+				continue
+			if not overrides.has(original.get_instance_id()):
+				var material := original.duplicate() as StandardMaterial3D
+				material.albedo_color = tint
+				overrides[original.get_instance_id()] = material
+			shape.set_surface_override_material(surface,overrides[original.get_instance_id()])
 
 func _add_scene(path: String,where: Vector3) -> Node3D:
 	var scene: PackedScene = load(path)

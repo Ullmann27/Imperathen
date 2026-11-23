@@ -1,0 +1,18 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop
+IMPERATHEN_SESSION_STARTED: saved frontier world
+IMPERATHEN_PAUSED
+IMPERATHEN_PAUSED
+IMPERATHEN_CONTINUED
+IMPERATHEN_PAUSED
+IMPERATHEN_CONTINUED
+IMPERATHEN_PAUSED
+IMPERATHEN_CONTINUED
+IMPERATHEN_PAUSED
+IMPERATHEN_ATLAS_READY
+IMPERATHEN_PAUSED
+IMPERATHEN_CONTINUED
+IMPERATHEN_PAUSED
+IMPERATHEN_ATLAS_READY
+INTEGRATION_PASS: 64 checks; real scene, UI/world command path, construction, story, combat, save recovery, pause

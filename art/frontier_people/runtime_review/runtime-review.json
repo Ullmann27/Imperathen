@@ -1,0 +1,191 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "captures": [
+    {
+      "action": "idle",
+      "asset": "res://assets/characters/frontier_legionary_0.glb",
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.982102, 0.0, -0.188348), Y: (-0.009616, 0.998696, 0.050143), Z: (0.188103, 0.051056, -0.980821), O: (0.7, 1.14, -3.65)]",
+      "file": "legionary-full.png",
+      "identity": "legionary",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "idle",
+      "asset": "res://assets/characters/frontier_legionary_0.glb",
+      "camera_fov": 30.0,
+      "camera_transform": "[X: (-0.981249, 0.0, -0.192745), Y: (-0.008435, 0.999042, 0.042943), Z: (0.192561, 0.043764, -0.980309), O: (0.22, 1.62, -1.12)]",
+      "file": "legionary-face.png",
+      "identity": "legionary",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "march",
+      "asset": "res://assets/characters/frontier_legionary_0.glb",
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.982102, 0.0, -0.188348), Y: (-0.009616, 0.998696, 0.050143), Z: (0.188103, 0.051056, -0.980821), O: (0.7, 1.14, -3.65)]",
+      "file": "legionary-march.png",
+      "identity": "legionary",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "idle",
+      "asset": "res://assets/characters/frontier_officer_0.glb",
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.982102, 0.0, -0.188348), Y: (-0.009616, 0.998696, 0.050143), Z: (0.188103, 0.051056, -0.980821), O: (0.7, 1.14, -3.65)]",
+      "file": "officer-full.png",
+      "identity": "officer",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "idle",
+      "asset": "res://assets/characters/frontier_spearman_0.glb",
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.982102, 0.0, -0.188348), Y: (-0.009616, 0.998696, 0.050143), Z: (0.188103, 0.051056, -0.980821), O: (0.7, 1.14, -3.65)]",
+      "file": "spearman-full.png",
+      "identity": "spearman",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "idle",
+      "asset": "res://assets/characters/frontier_archer_0.glb",
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.982102, 0.0, -0.188348), Y: (-0.009616, 0.998696, 0.050143), Z: (0.188103, 0.051056, -0.980821), O: (0.7, 1.14, -3.65)]",
+      "file": "archer-full.png",
+      "identity": "archer",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "shoot",
+      "asset": "res://assets/characters/frontier_archer_0.glb",
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.982102, 0.0, -0.188348), Y: (-0.009616, 0.998696, 0.050143), Z: (0.188103, 0.051056, -0.980821), O: (0.7, 1.14, -3.65)]",
+      "file": "archer-shoot.png",
+      "identity": "archer",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "idle",
+      "asset": "res://assets/characters/frontier_civilian_man_0.glb",
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.982102, 0.0, -0.188348), Y: (-0.009616, 0.998696, 0.050143), Z: (0.188103, 0.051056, -0.980821), O: (0.7, 1.14, -3.65)]",
+      "file": "civilian_man-full.png",
+      "identity": "civilian_man",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "idle",
+      "asset": "res://assets/characters/frontier_civilian_woman_0.glb",
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.982102, 0.0, -0.188348), Y: (-0.009616, 0.998696, 0.050143), Z: (0.188103, 0.051056, -0.980821), O: (0.7, 1.14, -3.65)]",
+      "file": "civilian_woman-full.png",
+      "identity": "civilian_woman",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "idle",
+      "asset": "res://assets/characters/frontier_civilian_woman_0.glb",
+      "camera_fov": 30.0,
+      "camera_transform": "[X: (-0.981249, 0.0, -0.192745), Y: (-0.008435, 0.999042, 0.042943), Z: (0.192561, 0.043764, -0.980309), O: (0.22, 1.62, -1.12)]",
+      "file": "civilian_woman-face.png",
+      "identity": "civilian_woman",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "march",
+      "asset": "res://assets/characters/frontier_civilian_woman_0.glb",
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.982102, 0.0, -0.188348), Y: (-0.009616, 0.998696, 0.050143), Z: (0.188103, 0.051056, -0.980821), O: (0.7, 1.14, -3.65)]",
+      "file": "civilian_woman-march.png",
+      "identity": "civilian_woman",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "idle",
+      "asset": "res://assets/characters/frontier_elder_0.glb",
+      "camera_fov": 34.0,
+      "camera_transform": "[X: (-0.982102, 0.0, -0.188348), Y: (-0.009616, 0.998696, 0.050143), Z: (0.188103, 0.051056, -0.980821), O: (0.7, 1.14, -3.65)]",
+      "file": "elder-full.png",
+      "identity": "elder",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "action": "idle",
+      "asset": "res://assets/characters/frontier_elder_0.glb",
+      "camera_fov": 30.0,
+      "camera_transform": "[X: (-0.981249, 0.0, -0.192745), Y: (-0.008435, 0.999042, 0.042943), Z: (0.192561, 0.043764, -0.980309), O: (0.22, 1.62, -1.12)]",
+      "file": "elder-face.png",
+      "identity": "elder",
+      "lod": 0,
+      "output_pixels": [
+        1000,
+        1000
+      ]
+    }
+  ],
+  "engine": "4.7.2-stable (official)",
+  "environment": "Controlled Godot studio with the production VillagePerson actor; not a village screenshot",
+  "errors": [],
+  "profile": "very_high",
+  "renderer": "gl_compatibility",
+  "source_sha256": {
+    "prototype/assets/characters/frontier_archer_0.glb": "b6f00b194403079db32647f2239e4d8fab90c245059e23a6c9dc6d089e461722",
+    "prototype/assets/characters/frontier_civilian_man_0.glb": "477001694752dd67f6802da6c30cf246df0a97240914fc75e79315ebfe443622",
+    "prototype/assets/characters/frontier_civilian_woman_0.glb": "3f445fed8e5564b5b5a8338564e343d8ec9f5e92c4117eff1c2b86acd0b54ca2",
+    "prototype/assets/characters/frontier_elder_0.glb": "b03051329d7e344fb95bb5a7e6a0eab953163f1549f103f4592ebfc1e3f4fefb",
+    "prototype/assets/characters/frontier_legionary_0.glb": "7937cbb3c3a510609d7a9d62b8adebf9f6a6678d997436faa2cce735146e8bda",
+    "prototype/assets/characters/frontier_officer_0.glb": "46152dd3fc4da12bc772ab04084947f40f3c1d391c37435402af2bab4f0f2e86",
+    "prototype/assets/characters/frontier_spearman_0.glb": "46a06aff153e865667933c22b9aec4173b9be987d40d2e6c9226829061a8e2b4",
+    "prototype/scripts/visuals/village_person.gd": "88ebb9578bcb5dc1c5af07d183663a0a58f8e087fd63014dd3fed15d2d2861bb",
+    "prototype/tests/frontier_people_review.gd": "5017f486cb5ebef0b83b1d6cd53d9e8e264c5ec9e632b87bfa1814606c9e26aa"
+  }
+}

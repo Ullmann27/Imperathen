@@ -2,6 +2,7 @@ extends SceneTree
 ## Run through tools/check_prototype.py so this test never replaces a player's save.
 
 const EntryScene = preload("res://main.tscn")
+const VillageLife = preload("res://scripts/story/village_life.gd")
 var failures: Array[String] = []
 var checks := 0
 var game
@@ -122,6 +123,7 @@ func _run() -> void:
 	for view in ["map", "city", "person"]:
 		game.ui.action_requested.emit("mode_" + view, {})
 	_check(game.world.get_player_position().is_equal_approx(place), "All three camera modes preserve the same person and world")
+	_complete_village_phase()
 	_move_fixture(Vector3(0, 1, -7))
 	game.ui.action_requested.emit("train", {})
 	_check(game.model.data.player.age == 18 and game.model.data.companion.age == 18, "Training advances both childhood companions consistently")
@@ -296,3 +298,27 @@ func _touch(scene,index: int,p: Vector2,down: bool) -> void:
 	event.position = p
 	event.pressed = down
 	scene._input(event)
+
+
+func _complete_village_phase() -> void:
+	# New lives require real village encounters and a resolved first raid before
+	# the legacy adulthood/persistence scenario may continue. Never inject flags.
+	for npc_id: String in ["decimus", "aelia", "varro"]:
+		var at: Vector2 = VillageLife.actor_position(game.model.data, npc_id)
+		_move_fixture(Vector3(at.x, 1.0, at.y + 1.0))
+		game.world.action_requested.emit("village_npc", {"npc_id":npc_id})
+		_check(game.screen == "village_dialog" and game.model.data.village.social.npcs[npc_id].met, "Required village resident is met through the actual conversation gateway: " + npc_id)
+		game.ui.action_requested.emit("resume", {})
+	# This fixture observes the real loss branch from a safe position. It neither
+	# creates a victory nor awards combat XP; the dedicated experience test fights.
+	_move_fixture(Vector3(35.0, 1.0, 20.0))
+	var saw_warning := false
+	var saw_attack := false
+	for step in 70:
+		game._process(5.0)
+		saw_warning = saw_warning or game.model.data.village.raid.status == "warning"
+		saw_attack = saw_attack or game.model.data.village.raid.active
+		if VillageLife.training_ready(game.model.data):
+			break
+	_check(saw_warning and saw_attack and game.model.data.village.raid.completed == 1, "The real warning and first village attack finish before adulthood")
+	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days satisfy the new training gate")

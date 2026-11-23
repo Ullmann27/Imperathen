@@ -8,8 +8,10 @@ button. Screenshots and logcat remain inspectable; errors never become fake pass
 """
 
 import argparse
+import base64
 import hashlib
 import json
+import math
 import os
 from pathlib import Path, PurePosixPath
 import re
@@ -18,6 +20,229 @@ import subprocess
 import time
 import xml.etree.ElementTree as ET
 import zipfile
+
+
+VILLAGE_RUNTIME_MARKER = "IMPERATHEN_VILLAGE_RUNTIME "
+
+
+VILLAGE_CHUNK_MARKER = "IMPERATHEN_VILLAGE_RUNTIME_CHUNK "
+VILLAGE_CHUNK_SIZE = 512
+MAX_VILLAGE_CHUNKS = 64
+MAX_VILLAGE_FRAMES = 256
+
+
+def village_runtime_observations(text):
+    """Read complete or pending frames without joining different observations."""
+    observations = []
+    frames = {}
+    stream = None
+    newest_sequence = 0
+    legacy_sequence = 0
+    envelope = re.compile(r"([1-9][0-9]{0,19})-([1-9][0-9]{0,19}) (0|[1-9][0-9]?) ([1-9][0-9]?) ([A-Za-z0-9+/]+={0,2})")
+
+    def decode_snapshot(payload):
+        def invalid_constant(value):
+            raise ValueError("Non-finite JSON constant: " + value)
+        try:
+            value = json.loads(payload, parse_constant=invalid_constant)
+        except (ValueError, UnicodeDecodeError) as error:
+            raise RuntimeError("Invalid village runtime JSON: " + str(error)) from error
+        if not isinstance(value, dict):
+            raise RuntimeError("A village runtime snapshot must be an object")
+        return value
+
+    def append_observation(observation):
+        if len(observations) >= MAX_VILLAGE_FRAMES:
+            raise RuntimeError("Village runtime diagnostics exceeded the bounded frame history")
+        observations.append(observation)
+
+    for line in text.splitlines():
+        if VILLAGE_CHUNK_MARKER in line:
+            payload = line.split(VILLAGE_CHUNK_MARKER, 1)[1]
+            match = envelope.fullmatch(payload)
+            if match is None:
+                raise RuntimeError("Invalid or truncated village runtime chunk envelope")
+            observer, sequence, part, total, data = match.groups()
+            sequence, part, total = int(sequence), int(part), int(total)
+            if (not 1 <= total <= MAX_VILLAGE_CHUNKS or not 0 <= part < total
+                    or not 1 <= len(data) <= VILLAGE_CHUNK_SIZE
+                    or (part < total - 1 and (len(data) != VILLAGE_CHUNK_SIZE or "=" in data))):
+                raise RuntimeError("Invalid village runtime chunk bounds")
+            if stream is None:
+                stream = observer
+            elif stream != observer:
+                raise RuntimeError("Village runtime diagnostic producer changed within one process")
+            if sequence not in frames:
+                if sequence <= newest_sequence:
+                    raise RuntimeError("Village runtime frames began out of sequence")
+                newest_sequence = sequence
+                record = {"kind": "chunk", "stream": observer, "sequence": sequence,
+                          "snapshot": None}
+                append_observation(record)
+                frames[sequence] = {"total": total, "parts": {}, "record": record}
+            frame = frames[sequence]
+            if frame["total"] != total:
+                raise RuntimeError("Conflicting village runtime chunk counts")
+            if part in frame["parts"] and frame["parts"][part] != data:
+                raise RuntimeError("Conflicting duplicate village runtime chunk")
+            frame["parts"][part] = data
+            if len(frame["parts"]) == total and frame["record"]["snapshot"] is None:
+                encoded = "".join(frame["parts"][index] for index in range(total))
+                try:
+                    decoded = base64.b64decode(encoded, validate=True).decode("utf-8")
+                except (ValueError, UnicodeDecodeError) as error:
+                    raise RuntimeError("Invalid village runtime Base64 or UTF-8") from error
+                frame["record"]["snapshot"] = decode_snapshot(decoded)
+        elif VILLAGE_RUNTIME_MARKER in line:
+            legacy_sequence += 1
+            append_observation({"kind": "legacy", "stream": None, "sequence": legacy_sequence,
+                                "snapshot": decode_snapshot(line.split(VILLAGE_RUNTIME_MARKER, 1)[1])})
+    return observations
+
+
+def village_runtime_cursor(text):
+    """Capture the latest STARTED frame, even while some of its parts are absent."""
+    observations = village_runtime_observations(text)
+    if not observations:
+        return -1
+    latest = observations[-1]
+    return (latest["kind"], latest["stream"], latest["sequence"])
+
+
+def wait_for_village_snapshot(read_logs, screen=None, *, predicate=None,
+                             required_control=None, after=-1, timeout=100):
+    """Accept only the latest complete observation, newer than the input cursor."""
+    deadline = time.monotonic() + timeout
+    latest = None
+    latest_frame = None
+    while time.monotonic() < deadline:
+        observations = village_runtime_observations(read_logs())
+        if observations:
+            latest_frame = observations[-1]
+            latest = latest_frame["snapshot"]
+            if isinstance(after, tuple) and len(after) == 3:
+                if (latest_frame["kind"], latest_frame["stream"]) != after[:2]:
+                    raise RuntimeError("Village runtime diagnostic stream changed after input")
+                fresh = latest_frame["sequence"] > after[2]
+            elif type(after) is int:
+                # Keep existing legacy log fixtures and already-published APKs readable.
+                fresh = len(observations) > after
+            else:
+                raise RuntimeError("Invalid village runtime observation cursor")
+            if (latest is not None and fresh
+                    and (screen is None or latest.get("screen") == screen)
+                    and (required_control is None or required_control in latest.get("controls", {}))
+                    and (predicate is None or predicate(latest))):
+                return latest
+        time.sleep(1)
+    if latest_frame is not None and latest is None:
+        observed = {"incomplete_frame": [latest_frame["stream"], latest_frame["sequence"]]}
+    else:
+        observed = {} if latest is None else {
+            "screen": latest.get("screen"), "controls": sorted(latest.get("controls", {})),
+            "feedback": latest.get("feedback", "")}
+    raise RuntimeError("No matching village runtime state: " + str(screen)
+                       + "; required control: " + str(required_control)
+                       + "; last observed: " + json.dumps(observed, sort_keys=True))
+
+
+def wait_for_stable_village_control(read_control, *, timeout=60, tolerance=1.0,
+                                   max_observations=8):
+    """Use fresh, unchanged native geometry before tapping a scrolled control."""
+    deadline = time.monotonic() + timeout
+    previous_center = None
+    previous_instance = None
+    for _ in range(max_observations):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        control = read_control(remaining)
+        if not isinstance(control, dict) or control.get("enabled") is not True:
+            raise RuntimeError("The observed village control is absent or disabled")
+        center = control.get("center")
+        instance = control.get("instance_id")
+        if (not isinstance(center, list) or len(center) != 2
+                or not all(isinstance(value, (int, float)) and math.isfinite(value) for value in center)
+                or not isinstance(instance, str) or not instance):
+            raise RuntimeError("The observed village control has no valid native geometry or identity")
+        if control.get("visible") is True:
+            if (previous_center is not None and previous_instance == instance
+                    and max(abs(center[index] - previous_center[index]) for index in range(2)) <= tolerance):
+                return control
+            previous_center = list(center)
+            previous_instance = instance
+        else:
+            previous_center = None
+            previous_instance = None
+    raise RuntimeError("The actual village control did not remain visible at stable native coordinates")
+
+
+def activate_observed_village_popup(observe_popup, press_key, target_text, *,
+                                   timeout=120, max_moves=16, expected_control_instance=None):
+    """Navigate the actual popup using its observed focus, then confirm that row.
+
+    A touch-opened OptionButton may begin with no focused item. Never infer a
+    row from a fixed number of DOWN presses, and never mutate the game state.
+    observe_popup waits for visibility initially and changed focus after input.
+    """
+    deadline = time.monotonic() + timeout
+    previous_focus = None
+    identity = None
+    inventory = None
+    seen_focus = set()
+    moves = 0
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise RuntimeError("Timed out while observing the actual village assignment popup")
+        control = observe_popup(previous_focus, remaining)
+        popup = control.get("popup") if isinstance(control, dict) else None
+        if (not isinstance(control, dict) or control.get("enabled") is not True
+                or not isinstance(popup, dict) or popup.get("visible") is not True):
+            raise RuntimeError("The actual village assignment popup closed or became unavailable")
+        current_identity = (control.get("instance_id"), popup.get("instance_id"))
+        if not all(isinstance(value, str) and value for value in current_identity):
+            raise RuntimeError("The observed village assignment popup has no stable identity")
+        if expected_control_instance is not None and current_identity[0] != expected_control_instance:
+            raise RuntimeError("The actual village assignment control changed after the native tap")
+        if identity is None:
+            identity = current_identity
+        elif current_identity != identity:
+            raise RuntimeError("The actual village assignment popup was replaced during navigation")
+        items = popup.get("items")
+        if not isinstance(items, list) or not items:
+            raise RuntimeError("The observed village assignment popup has no item inventory")
+        normalized = []
+        for index, item in enumerate(items):
+            if (not isinstance(item, dict) or type(item.get("index")) is not int
+                    or item["index"] != index or not isinstance(item.get("text"), str)
+                    or type(item.get("enabled")) is not bool):
+                raise RuntimeError("The observed village assignment popup item inventory is invalid")
+            normalized.append((index, item["text"], item["enabled"]))
+        current_inventory = tuple(normalized)
+        if inventory is None:
+            inventory = current_inventory
+        elif current_inventory != inventory:
+            raise RuntimeError("The actual village assignment popup items changed during navigation")
+        matches = [item for item in items if item["text"] == target_text]
+        if len(matches) != 1 or not matches[0]["enabled"]:
+            raise RuntimeError("The actual assignment popup has no unique enabled target: " + target_text)
+        target_index = matches[0]["index"]
+        focused = popup.get("focused")
+        if type(focused) is not int or not -1 <= focused < len(items):
+            raise RuntimeError("The observed village assignment popup focus is invalid")
+        if focused == target_index:
+            press_key("KEYCODE_ENTER")
+            return {"control_instance": identity[0], "popup_instance": identity[1],
+                    "focused_index": focused, "text": target_text, "down_presses": moves}
+        if focused in seen_focus:
+            raise RuntimeError("The actual village assignment popup focus did not progress")
+        if moves >= min(max_moves, len(items) + 1):
+            raise RuntimeError("The actual village assignment popup exceeded bounded navigation")
+        seen_focus.add(focused)
+        press_key("KEYCODE_DPAD_DOWN")
+        previous_focus = focused
+        moves += 1
 
 
 def runtime_error_lines(text):
@@ -59,6 +284,9 @@ def main():
     parser.add_argument("--device-apk", type=Path, help="Also run the actual ARM64 download if the emulator supports translation")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(args.apk) as archive:
+        has_village_life = any(name.startswith("assets/scripts/story/village_life.")
+                               for name in archive.namelist())
     package = "at.heinz.imperathen"
     report = {"platform": "Android emulator", "apk_sha256": hashlib.sha256(args.apk.read_bytes()).hexdigest(), "physical_device_test": False,
               "arm64_runtime_test": False, "status": "failed", "checks": [], "errors": []}
@@ -224,6 +452,84 @@ def main():
         wait_marker("IMPERATHEN_OPENING_COMPLETE")
         record("objective_hands_over_control", True, "Actual touch accepted the objective after a separate skip action")
 
+    def village_snapshot(screen=None, *, predicate=None, required_control=None, after=-1, timeout=100):
+        return wait_for_village_snapshot(checked_logs, screen, predicate=predicate,
+                                         required_control=required_control, after=after, timeout=timeout)
+
+    def village_control(name, screen, *, after=-1):
+        state = village_snapshot(screen, required_control=name, after=after)
+        for _ in range(14):
+            control = state.get("controls", {}).get(name)
+            if control is None:
+                raise RuntimeError("The current village UI has no control: " + name)
+            if control.get("visible") and control.get("enabled"):
+                return control
+            if not control.get("enabled"):
+                raise RuntimeError("The actual village control is disabled: " + name)
+            scroll = state.get("scroll")
+            if not scroll:
+                raise RuntimeError("A clipped village control has no visible scroll area: " + name)
+            top, bottom = scroll["top"], scroll["bottom"]
+            start, end = (bottom, top) if control["center"][1] > top[1] else (top, bottom)
+            previous = village_runtime_cursor(checked_logs())
+            adb("shell", "input", "swipe", *(str(round(v)) for v in (*start, *end)), "600")
+            state = village_snapshot(screen, required_control=name, after=previous)
+        raise RuntimeError("Could not scroll the actual village control into view: " + name)
+
+    def stable_village_control(name, screen):
+        def fresh_control(timeout):
+            previous = village_runtime_cursor(checked_logs())
+            state = village_snapshot(screen, required_control=name, after=previous, timeout=timeout)
+            return state["controls"][name]
+        return wait_for_stable_village_control(fresh_control)
+
+    def observe_assignment_popup(previous_focus, timeout):
+        previous = village_runtime_cursor(checked_logs())
+        def changed(state):
+            popup = state.get("controls", {}).get("aelia_assignment", {}).get("popup", {})
+            if previous_focus is None:
+                return popup.get("visible") is True
+            return popup.get("visible") is not True or popup.get("focused") != previous_focus
+        state = village_snapshot("village_panel", required_control="aelia_assignment",
+                                 predicate=changed, after=previous, timeout=timeout)
+        return state["controls"]["aelia_assignment"]
+
+    def exercise_village_life():
+        initial = village_snapshot("playing")
+        record("village_actual_population", initial.get("people") == 14 and initial.get("actors") == 15
+               and initial.get("workplaces") == 5 and initial.get("player_is_ruler") is False, initial)
+        tap(village_control("interact", "playing")["center"])
+        conversation = village_snapshot("village_dialog", predicate=lambda state: state.get("decimus_met") is True)
+        record("village_touch_meets_decimus", True, conversation)
+        tap(village_control("permit", "village_dialog")["center"])
+        permission = village_snapshot("village_dialog", predicate=lambda state: state.get("work_permit") is True)
+        record("village_touch_work_permission", permission.get("player_is_ruler") is False, permission)
+        screenshot("12_android_decimus.png")
+        adb("shell", "input", "keyevent", "4")
+        village_snapshot("playing")
+        record("village_back_closes_dialogue", True, "Android Back returned from the real steward conversation")
+        tap(village_control("village", "playing")["center"])
+        work_tab = village_control("work_tab", "village_panel")
+        previous = village_runtime_cursor(checked_logs())
+        tap(work_tab["center"])
+        village_control("aelia_assignment", "village_panel", after=previous)
+        selector = stable_village_control("aelia_assignment", "village_panel")
+        record("village_unassigned_resident", selector.get("selected") == 0, selector)
+        before_assignment = village_runtime_cursor(checked_logs())
+        tap(selector["center"])
+        selected = activate_observed_village_popup(
+            observe_assignment_popup,
+            lambda key: adb("shell", "input", "keyevent", key),
+            "Holzfällerlager", expected_control_instance=selector["instance_id"])
+        record("village_popup_target_observed", True, selected)
+        assigned = village_snapshot("village_panel", after=before_assignment,
+                                    predicate=lambda state: state.get("aelia_assignment") == "woodcamp")
+        record("village_actual_worker_assignment", assigned.get("people") == 14, assigned)
+        screenshot("13_android_work_assignment.png")
+        adb("shell", "input", "keyevent", "4")
+        village_snapshot("playing", predicate=lambda state: state.get("aelia_assignment") == "woodcamp")
+        record("village_back_closes_work_panel", True, "The worker stays assigned when the work panel closes")
+
     def relaunch(diagnostics=False):
         previous = report["pid"]
         (args.output / ("logcat-" + previous + ".txt")).write_text(logs(), encoding="utf-8")
@@ -309,6 +615,8 @@ def main():
         wait_marker("IMPERATHEN_SESSION_STARTED")
         record("touch_starts_saved_game", True, "New game button produced a saved village")
         finish_first_day_opening()
+        if has_village_life:
+            exercise_village_life()
         time.sleep(3)
         dismiss_fullscreen_hint("world")
         screenshot("02_android_world.png")
@@ -331,6 +639,11 @@ def main():
         tap(resumed_menu["continue"])
         wait_marker("IMPERATHEN_CONTINUED")
         record("continue_after_process_death", True, "Loaded the village in a new process")
+        if has_village_life:
+            restored = village_snapshot("playing")
+            record("village_decisions_survive_restart", restored.get("decimus_met") is True
+                   and restored.get("work_permit") is True and restored.get("aelia_assignment") == "woodcamp"
+                   and restored.get("people") == 14 and restored.get("player_is_ruler") is False, restored)
         practice_menu = relaunch(diagnostics=True)
         tap(practice_menu["demo"])
         valley_ready = wait_marker("IMPERATHEN_VALLEY_READY")

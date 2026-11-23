@@ -1,0 +1,409 @@
+{
+  "platform": "Android emulator",
+  "apk_sha256": "74f750098d2e5d5f6c519dab399b9e0f82f3af49b5aa4113a3aae0f0d4562b65",
+  "physical_device_test": false,
+  "arm64_runtime_test": false,
+  "status": "failed",
+  "checks": [
+    {
+      "name": "single_emulator_target",
+      "passed": true,
+      "detail": [
+        {
+          "serial": "emulator-5554",
+          "state": "offline"
+        }
+      ]
+    },
+    {
+      "name": "emulator_verified",
+      "passed": true,
+      "detail": {
+        "serial": "emulator-5554",
+        "ro.kernel.qemu": "1"
+      }
+    },
+    {
+      "name": "expected_android_emulator",
+      "passed": true,
+      "detail": {
+        "api_level": "35",
+        "abi": "x86_64",
+        "model": "sdk_gphone64_x86_64"
+      }
+    },
+    {
+      "name": "apk_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "clean_test_app_data",
+      "passed": true,
+      "detail": "Success"
+    },
+    {
+      "name": "launcher",
+      "passed": true,
+      "detail": "at.heinz.imperathen/com.godot.game.GodotAppLauncher"
+    },
+    {
+      "name": "activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 3541\nWaitTime: 3565\nComplete"
+    },
+    {
+      "name": "process_started",
+      "passed": true,
+      "detail": "3452"
+    },
+    {
+      "name": "first_launch_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "first_launch_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "real_menu",
+      "passed": true,
+      "detail": {
+        "new_game": [
+          156.75,
+          237
+        ]
+      }
+    },
+    {
+      "name": "menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "touch_starts_saved_game",
+      "passed": true,
+      "detail": "New game button produced a saved village"
+    },
+    {
+      "name": "opening_before_gameplay",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            811.875,
+            39
+          ],
+          "OpeningSkip": [
+            892.125,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.143161333333331,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "first_day",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "android_back_pauses_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            799.875,
+            39
+          ],
+          "OpeningSkip": [
+            892.125,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.543161333333331,
+        "final": false,
+        "index": 0,
+        "paused": true,
+        "sequence": "first_day",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "android_back_resumes_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            811.875,
+            39
+          ],
+          "OpeningSkip": [
+            892.125,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.681417333333331,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "first_day",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "skip_keeps_first_objective",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            911.625,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0,
+        "final": true,
+        "index": 5,
+        "paused": false,
+        "sequence": "first_day",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "objective_hands_over_control",
+      "passed": true,
+      "detail": "Actual touch accepted the objective after a separate skip action"
+    },
+    {
+      "name": "village_actual_population",
+      "passed": true,
+      "detail": {
+        "actors": 15,
+        "aelia_assignment": "idle",
+        "controls": {
+          "interact": {
+            "center": [
+              891,
+              344.25
+            ],
+            "enabled": true,
+            "visible": true
+          },
+          "village": {
+            "center": [
+              361.875,
+              490.5
+            ],
+            "enabled": true,
+            "visible": true
+          }
+        },
+        "decimus_met": false,
+        "people": 14,
+        "player_is_ruler": false,
+        "screen": "playing",
+        "work_permit": false,
+        "workplaces": 5,
+        "world_seconds": 0.650439000000003
+      }
+    },
+    {
+      "name": "village_touch_meets_decimus",
+      "passed": true,
+      "detail": {
+        "actors": 15,
+        "aelia_assignment": "idle",
+        "controls": {
+          "dialog_close": {
+            "center": [
+              735,
+              361.5
+            ],
+            "enabled": true,
+            "visible": true
+          },
+          "permit": {
+            "center": [
+              735,
+              316.5
+            ],
+            "enabled": true,
+            "visible": true
+          }
+        },
+        "decimus_met": true,
+        "people": 14,
+        "player_is_ruler": false,
+        "screen": "village_dialog",
+        "scroll": {
+          "bottom": [
+            860.759948730469,
+            334.799987792969
+          ],
+          "top": [
+            860.759948730469,
+            216
+          ]
+        },
+        "work_permit": false,
+        "workplaces": 5,
+        "world_seconds": 0.786083333333336
+      }
+    },
+    {
+      "name": "village_touch_work_permission",
+      "passed": true,
+      "detail": {
+        "actors": 15,
+        "aelia_assignment": "idle",
+        "controls": {
+          "dialog_close": {
+            "center": [
+              735,
+              383.25
+            ],
+            "enabled": true,
+            "visible": true
+          },
+          "permit": {
+            "center": [
+              735,
+              338.25
+            ],
+            "enabled": true,
+            "visible": true
+          }
+        },
+        "decimus_met": true,
+        "people": 14,
+        "player_is_ruler": false,
+        "screen": "village_dialog",
+        "scroll": {
+          "bottom": [
+            860.759948730469,
+            347.700012207031
+          ],
+          "top": [
+            860.759948730469,
+            204.5625
+          ]
+        },
+        "work_permit": true,
+        "workplaces": 5,
+        "world_seconds": 0.786083333333336
+      }
+    },
+    {
+      "name": "village_back_closes_dialogue",
+      "passed": true,
+      "detail": "Android Back returned from the real steward conversation"
+    },
+    {
+      "name": "village_unassigned_resident",
+      "passed": true,
+      "detail": {
+        "center": [
+          728.625,
+          376.5
+        ],
+        "enabled": true,
+        "selected": 0,
+        "visible": true
+      }
+    }
+  ],
+  "errors": [
+    "No matching village runtime state: village_panel; required control: None; last observed: {\"controls\": [\"aelia_assignment\", \"panel_close\", \"village\", \"work_tab\"], \"screen\": \"village_panel\"}"
+  ],
+  "source_commit": "87fec53f0433b5f718b6e5843509a34839e56e59",
+  "test_harness_commit": "87fec53f0433b5f718b6e5843509a34839e56e59",
+  "apk_file": "IMPERATHEN-87fec53f-emulator.apk",
+  "serial": "emulator-5554",
+  "android_version": "15",
+  "api_level": "35",
+  "abi": "x86_64",
+  "model": "sdk_gphone64_x86_64",
+  "pid": "3452",
+  "screenshots": {
+    "00_android_intro.png": {
+      "sha256": "1a4564b37b6a788ceff7cfa3e279102ef0662ad442cd56a69b4c6f33c564b553",
+      "width": 960,
+      "height": 540
+    },
+    "01_android_menu.png": {
+      "sha256": "efa14fc504522d6708ef4d2e42ee05505a0f6869256731257faba35844fbb90f",
+      "width": 960,
+      "height": 540
+    },
+    "10_android_opening.png": {
+      "sha256": "8ff194411f154f86179d5c1faf98ae5d38757b0c32afaeaebaf53b38818cc551",
+      "width": 960,
+      "height": 540
+    },
+    "11_android_opening_objective.png": {
+      "sha256": "731a387c43f856432a520b7e4ab762d3faf9e8cedcf00309c8d4e4a2169cc72c",
+      "width": 960,
+      "height": 540
+    },
+    "12_android_decimus.png": {
+      "sha256": "416ae953372467c83241c47f1b8c8e8e6916a334b51e74cdeac6fef84c1e7505",
+      "width": 960,
+      "height": 540
+    },
+    "failure.png": {
+      "sha256": "fb5af4fe622d5b6607a2e665f1a2b6d22a303a23e9a4914fd8920200b7418538",
+      "width": 960,
+      "height": 540
+    }
+  },
+  "focused_windows": [
+    "mCurrentFocus=Window{f9ad5ce u0 at.heinz.imperathen/com.godot.game.GodotAppLauncher}",
+    "mFocusedApp=ActivityRecord{ec4c00b u0 at.heinz.imperathen/com.godot.game.GodotAppLauncher t8}",
+    "mPreferredTopFocusableRootTask=Task{b0b7901 #8 type=standard A=10209:at.heinz.imperathen}",
+    "mLastFocusedRootTask=Task{b0b7901 #8 type=standard A=10209:at.heinz.imperathen}",
+    "mFocusedWindow=Window{f9ad5ce u0 at.heinz.imperathen/com.godot.game.GodotAppLauncher}"
+  ],
+  "last_game_messages": [
+    "11-23 12:21:56.651  3452  3521 I godot   : IMPERATHEN_OPENING_COMPLETE",
+    "11-23 12:22:04.328  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"interact\":{\"center\":[891.0,344.25],\"enabled\":true,\"visible\":true},\"village\":{\"center\":[361.875,490.5],\"enabled\":true,\"visible\":true}},\"decimus_met\":false,\"people\":14,\"player_is_ruler\":false,\"screen\":\"playing\",\"work_permit\":false,\"workplaces\":5,\"world_seconds\":0.650439000000003}",
+    "11-23 12:22:05.779  3452  3521 I godot   : IMPERATHEN_VILLAGE_DIALOG: decimus",
+    "11-23 12:22:10.130  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"dialog_close\":{\"center\":[735.0,361.5],\"enabled\":true,\"visible\":true},\"permit\":{\"center\":[735.0,316.5],\"enabled\":true,\"visible\":true}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_dialog\",\"scroll\":{\"bottom\":[860.759948730469,334.799987792969],\"top\":[860.759948730469,216.0]},\"work_permit\":false,\"workplaces\":5,\"world_seconds\":0.786083333333336}",
+    "11-23 12:22:15.008  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"dialog_close\":{\"center\":[735.0,383.25],\"enabled\":true,\"visible\":true},\"permit\":{\"center\":[735.0,338.25],\"enabled\":true,\"visible\":true}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_dialog\",\"scroll\":{\"bottom\":[860.759948730469,347.700012207031],\"top\":[860.759948730469,204.5625]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":0.786083333333336}",
+    "11-23 12:22:23.810  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"interact\":{\"center\":[891.0,344.25],\"enabled\":true,\"visible\":true},\"village\":{\"center\":[361.875,490.5],\"enabled\":true,\"visible\":true}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"playing\",\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.46157633333334}",
+    "11-23 12:22:33.579  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"panel_close\":{\"center\":[477.0,525.0],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,175.5],\"enabled\":true,\"visible\":true},\"work_tab\":{\"center\":[309.375,175.5],\"enabled\":true,\"visible\":true}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:22:44.598  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,846.0],\"enabled\":true,\"selected\":0,\"visible\":false},\"panel_close\":{\"center\":[477.0,1592.25],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,175.5],\"enabled\":true,\"visible\":true},\"work_tab\":{\"center\":[309.375,175.5],\"enabled\":true,\"visible\":true}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:22:55.643  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,607.5],\"enabled\":true,\"selected\":0,\"visible\":false},\"panel_close\":{\"center\":[477.0,1353.75],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,-63.0],\"enabled\":true,\"visible\":false},\"work_tab\":{\"center\":[309.375,-63.0],\"enabled\":true,\"visible\":false}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:23:08.828  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,376.5],\"enabled\":true,\"selected\":0,\"visible\":true},\"panel_close\":{\"center\":[477.0,1122.75],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,-294.0],\"enabled\":true,\"visible\":false},\"work_tab\":{\"center\":[309.375,-294.0],\"enabled\":true,\"visible\":false}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:23:19.832  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,402.75],\"enabled\":true,\"selected\":0,\"visible\":true},\"panel_close\":{\"center\":[477.0,1149.0],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,-294.0],\"enabled\":true,\"visible\":false},\"work_tab\":{\"center\":[309.375,-294.0],\"enabled\":true,\"visible\":false}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:23:31.183  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,402.75],\"enabled\":true,\"selected\":0,\"visible\":true},\"panel_close\":{\"center\":[477.0,1149.0],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,-294.0],\"enabled\":true,\"visible\":false},\"work_tab\":{\"center\":[309.375,-294.0],\"enabled\":true,\"visible\":false}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:23:42.158  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,402.75],\"enabled\":true,\"selected\":0,\"visible\":true},\"panel_close\":{\"center\":[477.0,1149.0],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,-294.0],\"enabled\":true,\"visible\":false},\"work_tab\":{\"center\":[309.375,-294.0],\"enabled\":true,\"visible\":false}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:23:54.989  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,402.75],\"enabled\":true,\"selected\":0,\"visible\":true},\"panel_close\":{\"center\":[477.0,1149.0],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,-294.0],\"enabled\":true,\"visible\":false},\"work_tab\":{\"center\":[309.375,-294.0],\"enabled\":true,\"visible\":false}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:24:07.247  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,402.75],\"enabled\":true,\"selected\":0,\"visible\":true},\"panel_close\":{\"center\":[477.0,1149.0],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,-294.0],\"enabled\":true,\"visible\":false},\"work_tab\":{\"center\":[309.375,-294.0],\"enabled\":true,\"visible\":false}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:24:18.276  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,402.75],\"enabled\":true,\"selected\":0,\"visible\":true},\"panel_close\":{\"center\":[477.0,1149.0],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,-294.0],\"enabled\":true,\"visible\":false},\"work_tab\":{\"center\":[309.375,-294.0],\"enabled\":true,\"visible\":false}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:24:29.295  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,402.75],\"enabled\":true,\"selected\":0,\"visible\":true},\"panel_close\":{\"center\":[477.0,1149.0],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,-294.0],\"enabled\":true,\"visible\":false},\"work_tab\":{\"center\":[309.375,-294.0],\"enabled\":true,\"visible\":false}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}",
+    "11-23 12:24:40.282  3452  3521 I godot   : IMPERATHEN_VILLAGE_RUNTIME {\"actors\":15,\"aelia_assignment\":\"idle\",\"controls\":{\"aelia_assignment\":{\"center\":[728.625,402.75],\"enabled\":true,\"selected\":0,\"visible\":true},\"panel_close\":{\"center\":[477.0,1149.0],\"enabled\":true,\"visible\":false},\"village\":{\"center\":[202.5,-294.0],\"enabled\":true,\"visible\":false},\"work_tab\":{\"center\":[309.375,-294.0],\"enabled\":true,\"visible\":false}},\"decimus_met\":true,\"people\":14,\"player_is_ruler\":false,\"screen\":\"village_panel\",\"scroll\":{\"bottom\":[682.559997558594,399.599975585938],\"top\":[682.559997558594,162.0]},\"work_permit\":true,\"workplaces\":5,\"world_seconds\":1.59163333333334}"
+  ]
+}

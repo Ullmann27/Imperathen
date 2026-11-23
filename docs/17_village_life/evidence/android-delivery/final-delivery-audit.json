@@ -1,0 +1,304 @@
+{
+  "passed": true,
+  "checked_at_utc": "2026-11-23T13:10:49.969247+00:00",
+  "source_commit": "e1b1c1fb16d63056e4eb80891d84ed75c79b4ed6",
+  "source_tree": "a68cfe1f5576b140044f78efba3e2bab7163d07f",
+  "source_run": 45178232563,
+  "source_run_number": 25,
+  "source_branch": "feature/village-life-delivery-20261123",
+  "source_run_url": "https://github.com/Ullmann27/Imperathen/actions/runs/45178232563",
+  "checks": {
+    "actual_build_byte_audit": true,
+    "source_snapshots_match_committed_git_tree": true,
+    "actual_runtime_report_and_all_checks_passed": true,
+    "all_14_screenshot_hashes_and_dimensions_match_actual_files": true,
+    "full_publisher_verify_and_stage": true,
+    "workflow_build_and_publication_jobs_passed": true,
+    "published_release_tag_points_to_source_commit": true,
+    "all_7_public_asset_sizes_and_sha256_digests_match": true,
+    "checksum_manifest_covers_all_6_other_public_assets": true
+  },
+  "build": {
+    "source_commit": "e1b1c1fb16d63056e4eb80891d84ed75c79b4ed6",
+    "source_tree": "a68cfe1f5576b140044f78efba3e2bab7163d07f",
+    "source_run": 45178232563,
+    "source_run_number": 25,
+    "checked_at_utc": "2026-11-23T12:58:23.440882+00:00",
+    "passed": true,
+    "scope": "Actual downloaded build bytes, ZIP structure and feature payload hashes; source snapshots compared with GitHub commit-tree hashes. Runtime and public release are not established by this static audit.",
+    "source_tree_files_verified": 568,
+    "packages": {
+      "arm64": {
+        "file": "/tmp/imperathen-artifacts-25/build/IMPERATHEN-e1b1c1fb-arm64.apk",
+        "sha256": "9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015",
+        "size_bytes": 150393060,
+        "abi": "arm64-v8a",
+        "native_elf_machine": 183,
+        "zip_entries": 1060,
+        "zip_crc_passed": true,
+        "no_duplicate_zip_entries": true,
+        "required_validation_checks_passed": 19,
+        "feature_payloads_rehashed": 48,
+        "feature_remaps_rehashed": 48,
+        "source_snapshot_files_matched_to_commit": 197,
+        "manifest_package": "at.heinz.imperathen",
+        "manifest_version_code": "3",
+        "manifest_version_name": "0.3.0-village",
+        "signing": {
+          "embedded_certificate_sha256": "85a92850b4c4824c22bda2809617415ae26854155f754ed753380556acf69aab",
+          "certificate_entry": "META-INF/IMPERATH.RSA",
+          "certificate_subject": "CN=IMPERATHEN Prototype,O=IMPERATHEN,C=AT",
+          "certificate_count": 1,
+          "ci_apksigner_exit_code": 0,
+          "ci_verified_schemes": {
+            "v1": false,
+            "v2": true,
+            "v3": true,
+            "v3.1": false,
+            "v4": false
+          },
+          "local_apksigner_rerun": false,
+          "scope": "Certificate DER extracted and hashed from the actual APK; signature verification result is from the matching CI validation report."
+        }
+      },
+      "emulator": {
+        "file": "/tmp/imperathen-artifacts-25/build/IMPERATHEN-e1b1c1fb-emulator.apk",
+        "sha256": "bb03388e5bfc5b8775f900f2010943802ee991037a892d264060d60de6b7c587",
+        "size_bytes": 153174238,
+        "abi": "x86_64",
+        "native_elf_machine": 62,
+        "zip_entries": 1060,
+        "zip_crc_passed": true,
+        "no_duplicate_zip_entries": true,
+        "required_validation_checks_passed": 19,
+        "feature_payloads_rehashed": 48,
+        "feature_remaps_rehashed": 48,
+        "source_snapshot_files_matched_to_commit": 197,
+        "manifest_package": "at.heinz.imperathen",
+        "manifest_version_code": "3",
+        "manifest_version_name": "0.3.0-village",
+        "signing": {
+          "embedded_certificate_sha256": "85a92850b4c4824c22bda2809617415ae26854155f754ed753380556acf69aab",
+          "certificate_entry": "META-INF/IMPERATH.RSA",
+          "certificate_subject": "CN=IMPERATHEN Prototype,O=IMPERATHEN,C=AT",
+          "certificate_count": 1,
+          "ci_apksigner_exit_code": 0,
+          "ci_verified_schemes": {
+            "v1": false,
+            "v2": true,
+            "v3": true,
+            "v3.1": false,
+            "v4": false
+          },
+          "local_apksigner_rerun": false,
+          "scope": "Certificate DER extracted and hashed from the actual APK; signature verification result is from the matching CI validation report."
+        }
+      }
+    },
+    "errors": [],
+    "engine": {
+      "version": "4.7.2.stable.official.ed1daf0bf",
+      "passed_groups": 33,
+      "source_files_matched_to_commit": 198
+    }
+  },
+  "runtime": {
+    "checked_at_utc": "2026-11-23T13:09:59.383479+00:00",
+    "passed": true,
+    "source_commit": "e1b1c1fb16d63056e4eb80891d84ed75c79b4ed6",
+    "source_run": 45178232563,
+    "runtime_report_sha256": "a7c0a77a18966c53a9f51c2b79ea237c847a4e4310904f4e3769c6e435cd1eb8",
+    "runtime_checks_passed": 50,
+    "runtime_errors": [],
+    "emulator_apk_sha256": "bb03388e5bfc5b8775f900f2010943802ee991037a892d264060d60de6b7c587",
+    "arm64_apk_sha256": "9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015",
+    "physical_device_test": false,
+    "arm64_runtime_scope": "Installed and started under ARM64 translation on the verified Android 15 x86_64 emulator.",
+    "village_popup_target_observed": {
+      "control_instance": "326534960707",
+      "popup_instance": "326585292358",
+      "focused_index": 2,
+      "text": "Holzfällerlager",
+      "down_presses": 3
+    },
+    "village_assignment": "woodcamp",
+    "village_assignment_after_restart": "woodcamp",
+    "screenshots_matched": 14,
+    "screenshots": {
+      "00_android_intro.png": {
+        "sha256": "5488aa2e5b40c8350c68b4bc9f707e328a1e54cd67b87d4791aebcadd4c10a03",
+        "size_bytes": 447239,
+        "width": 960,
+        "height": 540
+      },
+      "01_android_menu.png": {
+        "sha256": "18f469b8cfedea2cf18a5571c2ddd3909db752c81ae4ac7dd692b67ab60f3d76",
+        "size_bytes": 583006,
+        "width": 960,
+        "height": 540
+      },
+      "10_android_opening.png": {
+        "sha256": "858baf5a7c5aa5ebbf8ad6f8ac928d54760407af0b4bb251efcc5932c6841dc9",
+        "size_bytes": 542403,
+        "width": 960,
+        "height": 540
+      },
+      "11_android_opening_objective.png": {
+        "sha256": "c1447ff0d50b84087a758e1f588d39868844f3ee15fce9b029a6a575277eccc8",
+        "size_bytes": 598966,
+        "width": 960,
+        "height": 540
+      },
+      "12_android_decimus.png": {
+        "sha256": "cdb39ce33e838380df028d8b6141423b3062f76e950bcc5f415f440dc522e7da",
+        "size_bytes": 429564,
+        "width": 960,
+        "height": 540
+      },
+      "13_android_work_assignment.png": {
+        "sha256": "167857d58c1e4d0377dee9d324052ecd380d3214a8ab6a6b49fed674208aa496",
+        "size_bytes": 231556,
+        "width": 960,
+        "height": 540
+      },
+      "02_android_world.png": {
+        "sha256": "0f07cbe6cef310dbab26bd774b54a345d588b0ab8dbc559a406e7af9de66a10a",
+        "size_bytes": 602118,
+        "width": 960,
+        "height": 540
+      },
+      "03_android_pause.png": {
+        "sha256": "2dddeda5c72606a13cc5d54e64497f5ac9fa1d90ae034569302e51ea080df379",
+        "size_bytes": 293295,
+        "width": 960,
+        "height": 540
+      },
+      "04_android_valley.png": {
+        "sha256": "d101d768aeca54cd6ccde7ae72c4b95b851ee5988e3dca813f0e8299f50093a6",
+        "size_bytes": 514611,
+        "width": 960,
+        "height": 540
+      },
+      "09_android_marching.png": {
+        "sha256": "bb30b9c7cfb832802c4d73e055429186d23e6a2aaa0f2d42ff25554a01bc8c4b",
+        "size_bytes": 505380,
+        "width": 960,
+        "height": 540
+      },
+      "05_android_valley_square.png": {
+        "sha256": "8491f6fdc351f5e7bd0b5ee84c3ef4e10af53851d5ae9024326f104b7bc5aec9",
+        "size_bytes": 466705,
+        "width": 920,
+        "height": 900
+      },
+      "06_android_globe.png": {
+        "sha256": "421b579ab029151f66b7834efdf8574504068894376a7d0ef059f90c1bd476f8",
+        "size_bytes": 220111,
+        "width": 920,
+        "height": 900
+      },
+      "08_android_figuren.png": {
+        "sha256": "180326185ff03ddef37e99be85b9b4c9721802c7c46a27ddd8d311e2c22c2456",
+        "size_bytes": 976564,
+        "width": 920,
+        "height": 900
+      },
+      "07_android_arm64_translated_intro.png": {
+        "sha256": "40d35dbc49f6d4db0f4207586996aca1e4ec0cd2c7b10693a9ab9a7c2be8d3ae",
+        "size_bytes": 708452,
+        "width": 920,
+        "height": 900
+      }
+    },
+    "full_publisher_verify_and_stage_passed": true,
+    "staged_apk_proof": {
+      "apk": "IMPERATHEN-e1b1c1fb-arm64.apk",
+      "sha256": "9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015",
+      "size_bytes": 150393060
+    }
+  },
+  "publication": {
+    "release_id": 455442520,
+    "tag": "village-2026-11-23-e1b1c1fb",
+    "url": "https://github.com/Ullmann27/Imperathen/releases/tag/village-2026-11-23-e1b1c1fb",
+    "published_at": "2026-11-23T13:09:02Z",
+    "draft": false,
+    "prerelease": true,
+    "assets": [
+      {
+        "name": "IMPERATHEN-e1b1c1fb-APK-Pruefung.json",
+        "asset_id": 782993612,
+        "size_bytes": 134607,
+        "sha256": "ee00a4a2d287faf2984cfc6da57428ca777d8c47a6b2a0ea32ad4f2d2137ab17",
+        "browser_download_url": "https://github.com/Ullmann27/Imperathen/releases/download/village-2026-11-23-e1b1c1fb/IMPERATHEN-e1b1c1fb-APK-Pruefung.json",
+        "actual_artifact_and_reconstructed_public_bytes_match_release_api": true
+      },
+      {
+        "name": "IMPERATHEN-e1b1c1fb-Buildnachweis.json",
+        "asset_id": 782993660,
+        "size_bytes": 588,
+        "sha256": "5206fea21c9597b48a24c4fb6a94e294515788aee08a4a1480e88db33302aaa1",
+        "browser_download_url": "https://github.com/Ullmann27/Imperathen/releases/download/village-2026-11-23-e1b1c1fb/IMPERATHEN-e1b1c1fb-Buildnachweis.json",
+        "actual_artifact_and_reconstructed_public_bytes_match_release_api": true
+      },
+      {
+        "name": "IMPERATHEN-e1b1c1fb-Emulatorpruefung.json",
+        "asset_id": 782993606,
+        "size_bytes": 28902,
+        "sha256": "a7c0a77a18966c53a9f51c2b79ea237c847a4e4310904f4e3769c6e435cd1eb8",
+        "browser_download_url": "https://github.com/Ullmann27/Imperathen/releases/download/village-2026-11-23-e1b1c1fb/IMPERATHEN-e1b1c1fb-Emulatorpruefung.json",
+        "actual_artifact_and_reconstructed_public_bytes_match_release_api": true
+      },
+      {
+        "name": "IMPERATHEN-e1b1c1fb-Godot-Pruefungen.json",
+        "asset_id": 782993617,
+        "size_bytes": 31076,
+        "sha256": "e307322e8675187be3fff0d1d5909537103dbd0e94c3635723e9d2478fb9c0a3",
+        "browser_download_url": "https://github.com/Ullmann27/Imperathen/releases/download/village-2026-11-23-e1b1c1fb/IMPERATHEN-e1b1c1fb-Godot-Pruefungen.json",
+        "actual_artifact_and_reconstructed_public_bytes_match_release_api": true
+      },
+      {
+        "name": "IMPERATHEN-e1b1c1fb-SHA256SUMS.txt",
+        "asset_id": 782993616,
+        "size_bytes": 625,
+        "sha256": "5485a5b286d4446639818bd291dee3bfcd69b978e03be34677d4f92119ebda6b",
+        "browser_download_url": "https://github.com/Ullmann27/Imperathen/releases/download/village-2026-11-23-e1b1c1fb/IMPERATHEN-e1b1c1fb-SHA256SUMS.txt",
+        "actual_artifact_and_reconstructed_public_bytes_match_release_api": true
+      },
+      {
+        "name": "IMPERATHEN-e1b1c1fb-arm64.apk",
+        "asset_id": 782993661,
+        "size_bytes": 150393060,
+        "sha256": "9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015",
+        "browser_download_url": "https://github.com/Ullmann27/Imperathen/releases/download/village-2026-11-23-e1b1c1fb/IMPERATHEN-e1b1c1fb-arm64.apk",
+        "actual_artifact_and_reconstructed_public_bytes_match_release_api": true
+      },
+      {
+        "name": "IMPERATHEN-e1b1c1fb-source-commit.txt",
+        "asset_id": 782993615,
+        "size_bytes": 41,
+        "sha256": "e1912ab52b6030a79987d56347877d41120a2fc68b20b38161d2bce8ac14ec44",
+        "browser_download_url": "https://github.com/Ullmann27/Imperathen/releases/download/village-2026-11-23-e1b1c1fb/IMPERATHEN-e1b1c1fb-source-commit.txt",
+        "actual_artifact_and_reconstructed_public_bytes_match_release_api": true
+      }
+    ],
+    "tag_commit": "e1b1c1fb16d63056e4eb80891d84ed75c79b4ed6",
+    "build_job_id": 137704962028,
+    "publish_job_id": 137714198014
+  },
+  "evidence_scope": {
+    "downloaded_build_and_runtime_artifact_bytes_audited": true,
+    "public_release_bytes_compared_using_github_asset_sha256_and_size": true,
+    "second_download_of_public_apk_performed": false,
+    "physical_device_test": false,
+    "arm64_runtime": "Install and startup under translation on Android 15 x86_64 emulator; complete village journey exercised by matching x86_64 APK.",
+    "signature": "Embedded certificate hashed locally; matching CI apksigner verifies v2 and v3. No local apksigner rerun."
+  },
+  "metadata_sources": [
+    "https://api.github.com/repos/Ullmann27/Imperathen/releases/tags/village-2026-11-23-e1b1c1fb",
+    "https://api.github.com/repos/Ullmann27/Imperathen/git/ref/tags/village-2026-11-23-e1b1c1fb",
+    "https://api.github.com/repos/Ullmann27/Imperathen/actions/runs/45178232563",
+    "https://api.github.com/repos/Ullmann27/Imperathen/actions/runs/45178232563/jobs?filter=latest&per_page=100"
+  ],
+  "errors": []
+}

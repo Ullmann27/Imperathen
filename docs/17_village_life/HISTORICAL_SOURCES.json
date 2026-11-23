@@ -1,0 +1,24 @@
+{
+  "checked_on": "2026-11-23",
+  "scope": "Historical frame for the existing Roman origin around AD 100; no finished historical war campaign is claimed.",
+  "sources": [
+    {
+      "id": "italian_ministry_trajan_column",
+      "title": "Parco archeologico del Colosseo - Colonna Traiana",
+      "publisher": "Ministero della cultura, Italia",
+      "url": "https://cultura.gov.it/luogo/parco-archeologico-del-colosseo-colonna-traiana",
+      "supports": ["Trajan ruled AD 98–117", "First Dacian campaign AD 101–102", "Second Dacian campaign AD 105–106"],
+      "use": "Paraphrased factual chronology; no images, artwork or text copied into assets."
+    },
+    {
+      "id": "italian_ministry_interactive_column",
+      "title": "Trajan's Column",
+      "publisher": "Ministero della cultura, Italia",
+      "url": "https://colonnatraiana.cultura.gov.it/",
+      "supports": ["First War AD 101–102", "Second War AD 105–106", "Monument depicts troop movement, fort construction, siege and other campaign scenes"],
+      "use": "Historical scene reference only; no mesh, texture or reconstruction imported."
+    }
+  ],
+  "fictional_content": ["Decimus and all newly authored village mentors", "The playable reconstruction village", "Local raider events and personal dialogues", "Player-derived friendship and career choices"],
+  "future_work": ["Historically sourced large mission scripts", "Explicit mission-level branch points that can depart from documented outcomes", "Separate chronological starting eras without mixing Caesar and Trajan"]
+}

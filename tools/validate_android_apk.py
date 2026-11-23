@@ -72,6 +72,38 @@ HERO_RESOURCES = (
     HERO_FACE_SCRIPT,
     *(f"assets/characters/hero_quality_{level}.glb" for level in range(4)),
 )
+FRONTIER_SCRIPT = "scripts/story/frontier_chapter.gd"
+FRONTIER_RESOURCES = (
+    FRONTIER_SCRIPT,
+    "scripts/world/village/village_layout.gd",
+    "scripts/world/village/village_population.gd",
+    "scripts/world/village/frontier_dressing.gd",
+    *(f"assets/characters/frontier_{role}_{level}.glb"
+      for role in ("civilian_man", "civilian_woman", "elder", "legionary", "officer", "spearman", "archer")
+      for level in range(4)),
+)
+OPENING_SCRIPT = "scripts/story/opening_story.gd"
+OPENING_RESOURCES = (
+    OPENING_SCRIPT,
+    "scripts/cinematic/opening_director.gd",
+    "scripts/cinematic/opening_checkpoint.gd",
+    "scripts/ui/opening_overlay.gd",
+)
+VILLAGE_LIFE_SCRIPT = "scripts/story/village_life.gd"
+VILLAGE_LIFE_RESOURCES = (
+    VILLAGE_LIFE_SCRIPT,
+    "scripts/domain/village_economy.gd",
+    "scripts/ui/village_life_panel.gd",
+    "scripts/ui/android_village_diagnostics.gd",
+    "scripts/world/village_life_world.gd",
+    "scripts/world/regional_terrain.gd",
+    "scripts/world/world_stream_plan.gd",
+)
+FEATURE_RESOURCE_GROUPS = (
+    ("living_frontier_content", FRONTIER_RESOURCES),
+    ("cinematic_opening_content", OPENING_RESOURCES),
+    ("village_life_content", VILLAGE_LIFE_RESOURCES),
+)
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (
     "legionary", "auxiliary_spear", "archer", "centurion", "signifer", "emperor",
@@ -276,6 +308,13 @@ def inspect_zip(apk: Path, report: dict, expected_abi: str, source_root: Path) -
             require_hero = hero_in_source or hero_in_archive
             if require_hero:
                 required_resources += HERO_RESOURCES
+            features = []
+            for identifier, resources in FEATURE_RESOURCE_GROUPS:
+                required_by_source = any((source_root / source).is_file() for source in resources)
+                detected_in_archive = any(resolve_resource(archive, names, source)["entry"] for source in resources)
+                if required_by_source or detected_in_archive:
+                    required_resources += resources
+                    features.append((identifier, resources, required_by_source, detected_in_archive))
             resolved = [resolve_resource(archive, names, source) for source in required_resources]
             missing_resources = [item["source"] for item in resolved if item["entry"] is None]
             packs = sorted(name for name in names if name.startswith("assets/") and name.endswith(".pck"))
@@ -290,6 +329,17 @@ def inspect_zip(apk: Path, report: dict, expected_abi: str, source_root: Path) -
                           required_by_source=hero_in_source, detected_in_archive=hero_in_archive,
                           resources=hero_payloads, missing_resources=missing_hero,
                           hash_scope="SHA-256 of exported APK payloads and remaps; not an assertion that transformed bytes equal the local sources.")
+            for identifier, resources, required_by_source, detected_in_archive in features:
+                payloads = [item for item in resolved if item["source"] in resources]
+                for item in payloads:
+                    record_payload_hash(archive, item)
+                missing_payloads = [item["source"] for item in payloads if item["entry"] is None]
+                status = "incomplete" if not valid_config and packs else "fail" if missing_payloads else "pass"
+                add_check(report, identifier, status,
+                          "Every required feature script and model must resolve to nonempty bytes inside this APK.",
+                          required_by_source=required_by_source, detected_in_archive=detected_in_archive,
+                          resources=payloads, missing_resources=missing_payloads,
+                          hash_scope="SHA-256 of actual exported APK payloads and import remaps; not a device runtime claim.")
             if not valid_config and packs:
                 add_check(report, "godot_project_content", "incomplete",
                           "A packed Godot project was found, but this checker does not inspect PCK indexes. Project contents are not confirmed.", packs=packs)

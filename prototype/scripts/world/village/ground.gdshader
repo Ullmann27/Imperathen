@@ -7,6 +7,7 @@ uniform sampler2D verge_relief : repeat_enable, filter_linear_mipmap;
 uniform vec3 season_tint : source_color = vec3(1.0);
 uniform float wetness : hint_range(0,1) = 0.0;
 uniform float relief_strength = 0.75;
+uniform float frontier_expanded = 0.0;
 varying vec2 ground_xz;
 void vertex() {
 	ground_xz = (MODEL_MATRIX * vec4(VERTEX,1.0)).xz;
@@ -22,6 +23,14 @@ void fragment() {
 	float stream=abs(p.x+28.0-.52*sin(p.y*.18)-.23*sin(p.y*.46));
 	float bank=1.0-smoothstep(3.5,5.6,stream+grain);
 	float wear=max(max(longitudinal,transverse),max(square,bank));
+	float east=(1.0-smoothstep(1.35,2.40,abs(p.x-30.0)+grain))*(1.0-smoothstep(34.0,38.0,abs(p.y+9.0)));
+	float north=(1.0-smoothstep(1.15,2.20,abs(p.y+36.5)+grain))*(1.0-smoothstep(24.0,27.0,abs(p.x-7.0)));
+	float south=(1.0-smoothstep(1.10,2.10,abs(p.y-24.0)+grain))*(1.0-smoothstep(30.0,33.0,abs(p.x-12.0)));
+	float lane_west=(1.0-smoothstep(.90,1.75,abs(p.x+7.0)+grain))*(1.0-smoothstep(8.0,10.0,abs(p.y+28.5)));
+	float scribe_square=1.0-smoothstep(.64,1.03,length((p-vec2(12.5,-23.0))/vec2(8.0,3.4))+grain*.06);
+	float wagon_yard=1.0-smoothstep(.60,1.04,length((p-vec2(7.0,24.0))/vec2(6.0,4.1))+grain*.06);
+	float new_streets=max(max(east,north),max(max(south,lane_west),max(scribe_square,wagon_yard)));
+	wear=max(wear,new_streets*frontier_expanded);
 	vec2 vuv=p*.31;
 	vec2 ruv=mat2(vec2(.97,.24),vec2(-.24,.97))*p*.42;
 	vec3 soil=texture(road_color,ruv).rgb;

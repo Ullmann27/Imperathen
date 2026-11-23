@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+VILLAGE_TOUCH_SCROLL viewport=(960, 540) swipes=14 offset=0 initial_y=1128.00 final_y=1128.00 world_touches=0 actions=[]
+VILLAGE_TOUCH_SCROLL viewport=(1280, 720) swipes=14 offset=0 initial_y=1128.00 final_y=1128.00 world_touches=0 actions=[]
+VILLAGE_PANEL_RESULT checks=31 failures=4
+VILLAGE_PANEL_FAIL
+FAIL: A native card swipe moves actual work content at (960, 540)
+FAIL: Native swipes reveal Aelia inside the clipped panel at (960, 540)
+FAIL: A native card swipe moves actual work content at (1280, 720)
+FAIL: Native swipes reveal Aelia inside the clipped panel at (1280, 720)

@@ -7,6 +7,8 @@ const LOOPING := ["idle", "march", "run", "block", "wall", "testudo", "retreat"]
 const ALIASES := {"walk": "march", "fall": "death", "shield_wall": "wall", "bow": "shoot"}
 const STRIDES := {"march":1.30, "run":1.75, "retreat":1.48}
 const TINTS := [Color.WHITE, Color(0.96, 0.88, 0.77), Color(0.83, 0.91, 0.97)]
+const FRONTIER_ROLES := {"heavy": "legionary", "spear": "spearman", "archer": "archer", "officer": "officer"}
+const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 
 static var _scenes: Dictionary = {}
 static var _far_meshes: Dictionary = {}
@@ -19,6 +21,7 @@ var player: AnimationPlayer
 var _body: Node3D
 var _phase := 0.0
 var _manual_live := false
+var _face := FacialMotion.new()
 
 func _ready() -> void:
 	if _body == null:
@@ -80,10 +83,15 @@ func present(pose: String, phase: float, delta: float) -> void:
 			player.advance(forward)
 	elif delta > 0.0 and player.is_playing():
 		player.advance(delta)
+	_face.advance(delta, clip, detail)
 
 
 static func _scene(role_name: String, level: int) -> PackedScene:
 	var path := "res://assets/soldiers/%s_%s.glb" % [role_name, LODS[level]]
+	if level < 2:
+		var candidate := "res://assets/characters/frontier_%s_%d.glb" % [FRONTIER_ROLES[role_name], level]
+		if ResourceLoader.exists(candidate, "PackedScene"):
+			path = candidate
 	if not _scenes.has(path):
 		_scenes[path] = load(path) as PackedScene
 	return _scenes[path]
@@ -116,13 +124,16 @@ func _replace_body() -> void:
 		for instance in _body.find_children("*", "MeshInstance3D", true, false):
 			_apply_tint(instance as MeshInstance3D)
 	add_child(_body)
+	_face.bind(_body, "soldier_%s_%d" % [role, variant])
 	_play_clip()
 
 func _apply_tint(instance: MeshInstance3D) -> void:
 	if variant == 0:
 		return
 	var base := instance.mesh.surface_get_material(0) as StandardMaterial3D
-	var key := "%s/%d/%d" % [role, detail, variant]
+	if not base:
+		return
+	var key := "%s/%d/%d/%d" % [role, detail, variant, base.get_instance_id()]
 	if not _materials.has(key):
 		var tinted := base.duplicate() as StandardMaterial3D
 		tinted.albedo_color *= TINTS[variant]
@@ -137,3 +148,4 @@ func _play_clip() -> void:
 	animation.loop_mode = Animation.LOOP_LINEAR if clip in LOOPING else Animation.LOOP_NONE
 	player.play(clip)
 	player.seek(_phase * animation.length, true)
+	_face.pose(clip, _phase, detail)

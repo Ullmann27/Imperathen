@@ -1,0 +1,53 @@
+{
+  "checked_at": "2026-11-23",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "exit_code": 0,
+  "passed": true,
+  "stdout": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nWORLD_STREAM_PLAN_RESULT checks=5241 failures=0\n",
+  "stderr": "",
+  "sources": [
+    {
+      "path": "prototype/scripts/world/world_stream_plan.gd",
+      "sha256": "7aadf9fa2b0a258078e42119b5a2007a3fb72039ab1efd767287192302ea0a45"
+    },
+    {
+      "path": "prototype/tests/world_stream_plan_test.gd",
+      "sha256": "bb3afbed0c57a5c8277a9d0106c92564b0cd0748f78985d746d55ebe595202d3"
+    }
+  ],
+  "external_models_downloaded": false,
+  "external_models_imported": false,
+  "game_dev_cli_available": false,
+  "world_size_is_project_choice": true,
+  "gta_vi_area_verified": false,
+  "actual_render_test": false,
+  "physical_android_performance_test": false,
+  "terrain_adapter": {
+    "command": "godot --headless --path prototype --script res://tests/regional_terrain_test.gd",
+    "passed": true,
+    "checks": 862,
+    "failures": 0,
+    "stdout": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nREGIONAL_TERRAIN_TIMING calls=280 total_ms=223.066 maximum_call_ms=3.244 environment=headless_cpu_not_device_fps\nREGIONAL_TERRAIN_RESULT checks=862 failures=0\n",
+    "actual_mesh_test": true,
+    "actual_physics_rays": true,
+    "actual_character_body_walk": true,
+    "rendered_image_test": false,
+    "physical_android_performance_test": false,
+    "source_files": [
+      {
+        "path": "prototype/scripts/world/regional_terrain.gd",
+        "sha256": "f08d6b216455b98f2fbadaab1a1f65077d7de52fd36142d62d9ca4c81e9fdd9e"
+      },
+      {
+        "path": "prototype/scripts/world/world_stream_plan.gd",
+        "sha256": "6d639396433ac87a9849c5343967d8a8e55a81bdbb99f1b5363aff4042d98bfc"
+      },
+      {
+        "path": "prototype/tests/regional_terrain_test.gd",
+        "sha256": "1932a4a95cf2c6a6140dbfa631608ea7cf7c34e73da02f66473711b06ca211ef"
+      }
+    ],
+    "world_overview_status_refined_after_test": true,
+    "world_overview_status_refinement": "Presentation string only; planner regression rerun passed. Terrain adapter byte-identical."
+  }
+}

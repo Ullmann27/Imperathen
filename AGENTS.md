@@ -2,6 +2,12 @@
 
 ## Aktueller Entwicklungsauftrag – 22.11.2026
 
+### Erweiterung vom 23.11.2026: gelebtes Dorf und offene Römerwelt
+
+Heinz beauftragt drei Agenten, den Anfang mit Handlung, Gesprächen und tatsächlicher Spielmechanik auszubauen. Zunächst regiert ein anderer. Der Spieler hilft beim Wiederaufbau, lernt Menschen und Berufe kennen, lebt im Dorf, verteidigt es und entwickelt Fähigkeiten durch seine Handlungen. Reale Einwohner besetzen Arbeitsplätze und fehlen dort, wenn sie verteidigen oder zur Truppe wechseln. Die langfristige Richtung ist eine offene Römerwelt mit historisch belegter Ausgangslage und durch Spielerhandlungen abweichenden Verläufen. Das vorhandene Startjahr um 100 n. Chr. bleibt erhalten; lokale Fiktion, belegte Ereignisse und alternative Geschichte sind ausdrücklich zu unterscheiden.
+
+Der integrierte Entwicklungsstand und die tatsächlichen Grenzen stehen in `docs/17_village_life/PLAYER_VISION.md`, `ECONOMY.md`, `STORY.md` und `ASSETS_AND_WORLD.md`. 32 × 32 km sind eine eigene technische Geländeplanung, keine verifizierte GTA-VI-Fläche und keine Behauptung einer fertig bevölkerten Welt. Android bleibt erstes Ziel; ein PS5-/AAA-Niveau ist das Gestaltungsziel, kein bereits belegtes Ergebnis. Die bisherigen Befugnisse für isolierte Implementierung, Tests, Android-Prüfbau und Draft-PR gelten weiter.
+
 Der neueste ausdrückliche Nutzerauftrag lautet: mit drei Agenten das Spiel so weit wie möglich aufbauen; ein späterer Durchgang mit Sol 6.2 oder Astra 6.2 folgt separat. Damit ist die frühere Programmierpause für diesen Entwicklungsblock aufgehoben. Erlaubt sind eigener Spielcode, lokale Engine- und Blenderarbeit, Tests sowie ein isolierter Entwicklungsbranch und Draft-PR. Das Repository bleibt öffentlich. Keine neuen kostenpflichtigen Dienste beauftragen, keinen eigenmächtigen Modell-/Tarifwechsel vornehmen und nicht ohne passenden Auftrag nach main mergen.
 
 Für einen ersten ausführbaren 3D-Prototypen wird die vorhandene Godot-Installation genutzt. Dies entscheidet nicht die endgültige Produktionsengine. Die Pipeline und Dateizuständigkeiten stehen in docs/10_development/AGENT_PIPELINE.md.

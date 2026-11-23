@@ -11,6 +11,8 @@ const OpeningStory = preload("res://scripts/story/opening_story.gd")
 const OpeningDirector = preload("res://scripts/cinematic/opening_director.gd")
 const OpeningOverlay = preload("res://scripts/ui/opening_overlay.gd")
 const OpeningCheckpoint = preload("res://scripts/cinematic/opening_checkpoint.gd")
+const VillageLife = preload("res://scripts/story/village_life.gd")
+const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -38,6 +40,9 @@ var opening_paused := false
 var opening_manual := false
 var opening_checkpoint_failed := false
 var pending_opening: Dictionary = {}
+var frontier_npc := ""
+var village_npc := ""
+var village_tab := "overview"
 
 
 func _ready() -> void:
@@ -60,6 +65,10 @@ func _ready() -> void:
 	world.set_quality(ui.get_quality())
 	_setup_ambient()
 	ui.show_intro()
+	if OS.is_debug_build() and OS.has_feature("android"):
+		var diagnostics = preload("res://scripts/ui/android_village_diagnostics.gd").new()
+		diagnostics.session = self
+		add_child(diagnostics)
 	print("IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop")
 
 
@@ -79,6 +88,7 @@ func _process(delta: float) -> void:
 	if screen == "playing":
 		model.set_player_position(world.get_player_position())
 		model.advance(delta)
+		world.set_frontier_time(float(model.data.world_seconds))
 		autosave_elapsed += delta
 		if autosave_elapsed >= 45.0:
 			autosave_elapsed = 0.0
@@ -161,14 +171,26 @@ func _refresh() -> void:
 	refresh_pending = false
 	refresh_elapsed = 0.0
 	world.sync_state(model.data)
-	ui.update_state(model.data)
+	ui.update_state(_ui_state())
 	ui.set_build_active(world.is_build_active())
 	if screen == "playing":
 		_check_special_dialog()
 
 
+func _ui_state() -> Dictionary:
+	# Presentation data is derived from the authoritative chapter and never saved.
+	var state: Dictionary = model.data.duplicate(true)
+	state["frontier_objective"] = model.get_frontier_objective()
+	if state.get("village", {}).get("enabled", false):
+		state["village_view"] = VillageLife.view(model.data)
+		state["village_economy_view"] = VillageEconomy.view(model.data)
+	return state
+
+
 func _show_menu() -> void:
 	_release_opening()
+	frontier_npc = ""
+	world.clear_frontier_focus()
 	screen = "menu"
 	world.set_active(false)
 	world.set_mode("city")
@@ -192,7 +214,7 @@ func _request_new_game() -> void:
 func _start_new_game() -> void:
 	_release_opening()
 	pending_opening = {}
-	model.new_game(ui.origin_id)
+	model.new_game(ui.origin_id, true)
 	last_story_id = ""
 	world.setup(model.data)
 	session_started = true
@@ -229,6 +251,9 @@ func _resume() -> void:
 	if not session_started:
 		_show_menu()
 		return
+	frontier_npc = ""
+	village_npc = ""
+	world.clear_frontier_focus()
 	if not pending_opening.is_empty():
 		if not _save(false).get("ok", false):
 			_pause()
@@ -240,7 +265,7 @@ func _resume() -> void:
 	screen = "playing"
 	world.set_mode(mode)
 	world.set_active(true)
-	ui.show_game(model.data)
+	ui.show_game(_ui_state())
 	ui.set_mode(mode)
 	refresh_pending = true
 
@@ -298,6 +323,14 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 	if screen == "opening" and action != "quality_changed":
 		return
 	match action:
+		"village_panel": _show_village_panel(str(payload.get("tab", "overview")))
+		"village_command": _village_command(str(payload.get("command", "")), payload.get("args", {}))
+		"village_close": _resume()
+		"village_block", "village_dodge":
+			if screen == "playing":
+				var defense_result := _command(action, {})
+				if defense_result.get("ok", false):
+					world.cue_village_defense(action)
 		"atlas_demo": _open_atlas(true)
 		"atlas": _open_atlas(false)
 		"valley_demo": _open_valley(true)
@@ -360,6 +393,10 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 			if not choice_result.get("ok", false):
 				last_story_id = ""
 				_check_special_dialog()
+		"frontier_choice": _choose_frontier(payload)
+		"frontier_close":
+			if screen == "frontier_dialog":
+				_resume()
 		"death_menu": _show_menu()
 		_:
 			ui.notify("Diese Aktion ist im Prototyp noch nicht verfügbar: " + action)
@@ -374,6 +411,10 @@ func _on_world_action(action: String, payload: Dictionary) -> void:
 		return
 	match action:
 		"companion_interact": _show_companion()
+		"village_npc": _show_village_npc(str(payload.get("npc_id", "")))
+		"village_panel": _show_village_panel("overview")
+		"village_block", "village_dodge": _on_ui_action(action, payload)
+		"frontier_talk": _show_frontier(str(payload.get("npc_id", "")))
 		"mode_person", "mode_city", "mode_map": _on_ui_action(action, payload)
 		"pause": _pause()
 		_:
@@ -381,7 +422,9 @@ func _on_world_action(action: String, payload: Dictionary) -> void:
 
 
 func _command(command: String, payload: Dictionary) -> Dictionary:
-	if screen != "playing":
+	var chapter_choice := screen == "frontier_dialog" and command == "frontier_choice"
+	var village_choice := screen in ["village_panel", "village_dialog"] and command.begins_with("village_")
+	if screen != "playing" and not chapter_choice and not village_choice:
 		return {"ok": false, "message": "Die Welt ist pausiert."}
 	model.set_player_position(world.get_player_position())
 	command_serial += 1
@@ -390,7 +433,7 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 		ui.notify(str(result.get("message", "")))
 	_refresh()
 	var persisted := true
-	if result.get("ok", false) and (command in ["choose_companion", "train", "recruit", "resolve_skirmish", "choose_story"] or model.data.progress.stage in ["aftermath", "fallen"]):
+	if result.get("ok", false) and (command in ["choose_companion", "train", "recruit", "resolve_skirmish", "choose_story", "frontier_talk", "frontier_choice"] or (command.begins_with("village_") and command not in ["village_strike", "village_block", "village_dodge"]) or model.data.progress.stage in ["aftermath", "fallen"]):
 		persisted = bool(_save(false).get("ok", false))
 	if result.get("ok", false) and command == "train":
 		if persisted:
@@ -399,6 +442,95 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 			pending_opening = OpeningStory.adulthood(model.data)
 			_pause()
 	return result
+
+
+func _show_village_panel(tab := "overview") -> void:
+	if not session_started or not model.data.get("village", {}).get("enabled", false):
+		return
+	if screen not in ["playing", "village_panel", "paused"]:
+		return
+	village_tab = tab if tab in ["overview", "work", "people", "map"] else "overview"
+	screen = "village_panel"
+	world.set_active(false)
+	world.clear_frontier_focus()
+	ui.show_village_panel(_ui_state(), village_tab)
+
+
+func _show_village_npc(npc_id: String) -> void:
+	if screen != "playing" or not VillageLife.NPCS.has(npc_id):
+		return
+	model.set_player_position(world.get_player_position())
+	var at: Vector2 = VillageLife.actor_position(model.data, npc_id)
+	var player: Vector3 = world.get_player_position()
+	if Vector2(player.x, player.z).distance_to(at) > VillageLife.RANGE:
+		ui.notify("Geh näher, um das Gespräch zu beginnen.")
+		return
+	if not model.data.village.social.npcs[npc_id].met:
+		var result := _command("village_talk", {"npc_id":npc_id, "choice":"meet"})
+		if not result.get("ok", false):
+			return
+	village_npc = npc_id
+	screen = "village_dialog"
+	world.set_active(false)
+	world.focus_village_npc(npc_id)
+	ui.show_village_dialog(VillageLife.dialogue(model.data, npc_id))
+	print("IMPERATHEN_VILLAGE_DIALOG: " + npc_id)
+
+
+func _village_command(command: String, args: Dictionary) -> void:
+	if not command.begins_with("village_") or screen not in ["playing", "village_panel", "village_dialog"]:
+		return
+	var previous_screen := screen
+	var result := _command(command, args)
+	if previous_screen == "village_panel":
+		var state := _ui_state()
+		state["village_feedback"] = str(result.get("message", ""))
+		ui.show_village_panel(state, village_tab)
+	elif previous_screen == "village_dialog" and not village_npc.is_empty():
+		world.focus_village_npc(village_npc)
+		var dialog := VillageLife.dialogue(model.data, village_npc)
+		dialog["feedback"] = str(result.get("message", ""))
+		ui.show_village_dialog(dialog)
+
+
+func _show_frontier(npc_id: String) -> void:
+	if screen != "playing":
+		return
+	var dialog: Dictionary = model.get_frontier_dialog(npc_id)
+	if dialog.is_empty():
+		var person: Dictionary = world.get_frontier_npc_info(npc_id)
+		if person.is_empty():
+			return
+		var delta: Vector3 = world.get_player_position() - world.get_frontier_npc_position(npc_id)
+		if Vector2(delta.x, delta.z).length() > 3.0:
+			ui.notify("Geh näher, um das Gespräch zu beginnen.")
+			return
+		dialog = {"npc_id": npc_id, "title": "%s · %s" % [person.get("name", "Dorfbewohner"), person.get("occupation", "")], "text": str(person.get("greeting", "Guten Tag. Auf dem Markt erfährst du, was unser Dorf bewegt.")), "choices": []}
+	else:
+		var result := _command("frontier_talk", {"npc_id": npc_id})
+		if not result.get("ok", false):
+			return
+		dialog = model.get_frontier_dialog(npc_id)
+	frontier_npc = npc_id
+	screen = "frontier_dialog"
+	world.set_active(false)
+	world.focus_frontier_npc(npc_id)
+	ui.show_frontier_dialog(dialog)
+	print("IMPERATHEN_FRONTIER_DIALOG: " + npc_id)
+
+
+func _choose_frontier(payload: Dictionary) -> void:
+	if screen != "frontier_dialog" or frontier_npc.is_empty():
+		return
+	if payload.get("npc_id") != frontier_npc or not payload.get("choice") is String:
+		ui.notify("Diese Antwort gehört nicht zum geöffneten Gespräch.")
+		return
+	_command("frontier_choice", {"npc_id": frontier_npc, "choice": payload.choice})
+	var dialog: Dictionary = model.get_frontier_dialog(frontier_npc)
+	if dialog.is_empty():
+		_resume()
+	else:
+		ui.show_frontier_dialog(dialog)
 
 
 func _show_companion() -> void:
@@ -418,6 +550,8 @@ func _begin_opening(sequence: Dictionary, start_index: int = 0) -> void:
 		screen = "playing"
 		_resume()
 		return
+	frontier_npc = ""
+	world.clear_frontier_focus()
 	opening_sequence = sequence.duplicate(true)
 	var beats: Array = opening_sequence.beats
 	beats.append({"id": "objective_handoff", "shot_id": "player", "speaker": "", "role": "",

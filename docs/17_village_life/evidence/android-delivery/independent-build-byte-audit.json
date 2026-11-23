@@ -1,0 +1,84 @@
+{
+  "source_commit": "e1b1c1fb16d63056e4eb80891d84ed75c79b4ed6",
+  "source_tree": "a68cfe1f5576b140044f78efba3e2bab7163d07f",
+  "source_run": 45178232563,
+  "source_run_number": 25,
+  "checked_at_utc": "2026-11-23T12:58:23.440882+00:00",
+  "passed": true,
+  "scope": "Actual downloaded build bytes, ZIP structure and feature payload hashes; source snapshots compared with GitHub commit-tree hashes. Runtime and public release are not established by this static audit.",
+  "source_tree_files_verified": 568,
+  "packages": {
+    "arm64": {
+      "file": "/tmp/imperathen-artifacts-25/build/IMPERATHEN-e1b1c1fb-arm64.apk",
+      "sha256": "9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015",
+      "size_bytes": 150393060,
+      "abi": "arm64-v8a",
+      "native_elf_machine": 183,
+      "zip_entries": 1060,
+      "zip_crc_passed": true,
+      "no_duplicate_zip_entries": true,
+      "required_validation_checks_passed": 19,
+      "feature_payloads_rehashed": 48,
+      "feature_remaps_rehashed": 48,
+      "source_snapshot_files_matched_to_commit": 197,
+      "manifest_package": "at.heinz.imperathen",
+      "manifest_version_code": "3",
+      "manifest_version_name": "0.3.0-village",
+      "signing": {
+        "embedded_certificate_sha256": "85a92850b4c4824c22bda2809617415ae26854155f754ed753380556acf69aab",
+        "certificate_entry": "META-INF/IMPERATH.RSA",
+        "certificate_subject": "CN=IMPERATHEN Prototype,O=IMPERATHEN,C=AT",
+        "certificate_count": 1,
+        "ci_apksigner_exit_code": 0,
+        "ci_verified_schemes": {
+          "v1": false,
+          "v2": true,
+          "v3": true,
+          "v3.1": false,
+          "v4": false
+        },
+        "local_apksigner_rerun": false,
+        "scope": "Certificate DER extracted and hashed from the actual APK; signature verification result is from the matching CI validation report."
+      }
+    },
+    "emulator": {
+      "file": "/tmp/imperathen-artifacts-25/build/IMPERATHEN-e1b1c1fb-emulator.apk",
+      "sha256": "bb03388e5bfc5b8775f900f2010943802ee991037a892d264060d60de6b7c587",
+      "size_bytes": 153174238,
+      "abi": "x86_64",
+      "native_elf_machine": 62,
+      "zip_entries": 1060,
+      "zip_crc_passed": true,
+      "no_duplicate_zip_entries": true,
+      "required_validation_checks_passed": 19,
+      "feature_payloads_rehashed": 48,
+      "feature_remaps_rehashed": 48,
+      "source_snapshot_files_matched_to_commit": 197,
+      "manifest_package": "at.heinz.imperathen",
+      "manifest_version_code": "3",
+      "manifest_version_name": "0.3.0-village",
+      "signing": {
+        "embedded_certificate_sha256": "85a92850b4c4824c22bda2809617415ae26854155f754ed753380556acf69aab",
+        "certificate_entry": "META-INF/IMPERATH.RSA",
+        "certificate_subject": "CN=IMPERATHEN Prototype,O=IMPERATHEN,C=AT",
+        "certificate_count": 1,
+        "ci_apksigner_exit_code": 0,
+        "ci_verified_schemes": {
+          "v1": false,
+          "v2": true,
+          "v3": true,
+          "v3.1": false,
+          "v4": false
+        },
+        "local_apksigner_rerun": false,
+        "scope": "Certificate DER extracted and hashed from the actual APK; signature verification result is from the matching CI validation report."
+      }
+    }
+  },
+  "errors": [],
+  "engine": {
+    "version": "4.7.2.stable.official.ed1daf0bf",
+    "passed_groups": 33,
+    "source_files_matched_to_commit": 198
+  }
+}

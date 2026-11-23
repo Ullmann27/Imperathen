@@ -51,7 +51,7 @@ func _test_initial_state_and_invalid_input() -> void:
 	_check(not model.execute("receive_damage", {"amount": 1.5}).ok, "Fractional damage is rejected")
 	_check(not model.execute("unknown", {}).ok, "Unknown command rejected")
 	model.set_player_position(Vector3(NAN, 1.0, 0.0))
-	model.set_player_position(Vector3(201.0, 1.0, 0.0))
+	model.set_player_position(Vector3(16001.0, 1.0, 0.0))
 	for delta in [0.0, -1.0, NAN, INF, 3601.0]:
 		model.advance(delta)
 	_check(_snapshot(model) == before, "Rejected commands, positions and deltas are all non-mutating")
@@ -282,6 +282,9 @@ func _test_save_roundtrip_and_command_replay() -> void:
 	old.erase("valley")
 	old.erase("origin_id")
 	old.erase("strategy")
+	old.erase("frontier")
+	old.erase("village")
+	old.resources.erase("stone")
 	old.schema_version = 1
 	var old_path := _path("v1")
 	_write_envelope(old_path,old)

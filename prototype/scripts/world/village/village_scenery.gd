@@ -3,6 +3,7 @@ extends Node3D
 
 const Art = preload("res://scripts/world/village_art.gd")
 const PROFILE_DATA = preload("res://assets/quality_profiles.json")
+const Layout = preload("res://scripts/world/village/village_layout.gd")
 const WORKSHOP := Vector3(-9.2,0,-7.35)
 const STORE := Vector3(-10.6,0,15.6)
 const MARKET := Vector3(-9,0,0)
@@ -42,6 +43,9 @@ func set_presentation_time(seconds: float) -> void:
 	for material in [water_material,grass_material,rain_material]:
 		material.set_shader_parameter("fixed_time",seconds)
 	sky_material.set_shader_parameter("phase",seconds if seconds >= 0 else _time)
+
+func set_origin(id: String) -> void:
+	ground_material.set_shader_parameter("frontier_expanded",1.0 if id == "italia" else 0.0)
 
 func _process(delta: float) -> void:
 	if not is_visible_in_tree():
@@ -205,6 +209,8 @@ func _make_flora() -> void:
 		add_child(patch)
 
 func _free_verge(p: Vector2,kind: String) -> bool:
+	if Layout.reserved(p,.45) or Layout.road(p):
+		return false
 	if absf(p.y-4)<1.53 and p.x>-34 and p.x<24:
 		return false
 	if absf(p.x)<1.80 or Rect2(4.8,-4.2,19.4,17.5).has_point(p):
