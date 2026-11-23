@@ -75,8 +75,8 @@ func _run() -> void:
 	# Existing named residents now have collision, including work assignments.
 	var resident: Node3D = game.world.village_life_world.actors.aelia
 	var resident_at := resident.global_position
-	var personal_space := resident.get_node_or_null("PersonalSpace") as CollisionObject3D
-	_check(personal_space != null and personal_space.collision_layer == 4, "A living named resident owns a real personal-space collider")
+	var personal_space := resident as CollisionObject3D
+	_check(personal_space != null and personal_space.collision_layer == 8 and resident.get_node_or_null("PersonalSpace") is CollisionShape3D, "A living named resident retains its native civilian body and shape")
 	_place(Vector3(resident_at.x, 0.92, resident_at.z + 1.7))
 	game.world.set_touch_move(Vector2(0, -1))
 	await _frames(120)

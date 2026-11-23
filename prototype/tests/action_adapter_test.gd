@@ -21,6 +21,7 @@ func _run() -> void:
 	_reset()
 	await physics_frame
 	await _test_camera_interrupts()
+	await _test_dodge_authority_interrupt()
 	_test_damage_pose_priority()
 	_test_air_contact()
 	await _test_participant_identity()
@@ -34,7 +35,7 @@ func _run() -> void:
 
 
 func _reset() -> void:
-	model.new_game("italia", true, true)
+	model.new_game("italia", true, false, true)
 	world.setup(model.data)
 	world.set_active(true)
 	model.combat_sight_check = world.combat_sight_clear
@@ -75,6 +76,27 @@ func _test_camera_interrupts() -> void:
 			world._physics_process(1.0 / 60.0)
 		var after: Vector3 = world.get_player_position()
 		_check(Vector2(before.x, before.z).distance_to(Vector2(after.x, after.z)) < 0.001, mode + ": returning to person cannot resume phantom dodge")
+
+
+func _test_dodge_authority_interrupt() -> void:
+	_reset()
+	_check(model.execute("village_unarmed_dodge", {}).ok, "Dodge interruption fixture starts through authority")
+	world.sync_combat_state(model.data)
+	_check(world._dodge_remaining > 0.0, "An accepted dodge starts real physical motion")
+	model.interrupt_combat()
+	world.sync_combat_state(model.data)
+	_check(not Combat.busy(model.data) and world._dodge_remaining == 0.0, "Domain interruption also cancels remaining physical dodge time")
+	var before: Vector3 = world.get_player_position()
+	for frame in 4:
+		await physics_frame
+		world._physics_process(1.0 / 60.0)
+	var after: Vector3 = world.get_player_position()
+	_check(Vector2(before.x, before.z).distance_to(Vector2(after.x, after.z)) < 0.001, "An interrupted dodge cannot continue moving the player")
+	_check(model.execute("village_unarmed_dodge", {}).ok, "Second accepted dodge prepares reset regression")
+	world.sync_combat_state(model.data)
+	_check(world._dodge_remaining > 0.0, "Reset regression owns unfinished physical dodge time")
+	_reset()
+	_check(world._dodge_remaining == 0.0 and not Combat.busy(model.data), "A fresh world setup cannot inherit old physical dodge time")
 
 
 func _test_damage_pose_priority() -> void:
@@ -133,28 +155,35 @@ func _test_participant_identity() -> void:
 	target.global_position = Vector3(100.0, 0.0, 100.0)
 	bystander.global_position = Vector3(100.0, 0.0, 99.8)
 	world._player.global_position = Vector3(100.0, 1.0, 98.5)
-	var target_body := target.get_node("PersonalSpace") as StaticBody3D
-	var bystander_body := bystander.get_node("PersonalSpace") as StaticBody3D
+	var target_body := target as CollisionObject3D
+	var bystander_body := bystander as CollisionObject3D
+	_check(target_body != null and bystander_body != null, "Resident identity uses the native civilian collision bodies")
+	var children_before := target.get_child_count()
+	for repeat in 12:
+		world._actions.sync_personal_space()
+	_check(target.get_child_count() == children_before, "Repeated sync does not add duplicate bodies beside the native PersonalSpace shape")
 	await physics_frame
 	var excluded: Array[RID] = world._actions._bodies_at(Vector2(100.0, 100.0))
 	_check(excluded.has(target_body.get_rid()), "Contact excludes the intended target body")
 	_check(not excluded.has(bystander_body.get_rid()), "Contact does not exempt a nearby third person")
 	_check(not world.combat_sight_clear(Vector2(100.0, 98.5), Vector2(100.0, 100.0)), "Real physics ray is blocked by the nearby third person")
 	bystander_body.collision_layer = 0
+	world._actions.sync_personal_space()
+	_check(bystander_body.collision_layer == 0, "Combat sync preserves a native civilian body disabled by its owner")
 	await physics_frame
 	_check(world.combat_sight_clear(Vector2(100.0, 98.5), Vector2(100.0, 100.0)), "Removing only the third-person obstruction restores the ray")
 
 
 func _test_legacy_collision_reset() -> void:
 	_reset()
-	_check(world._actions._personal_bodies.size() > 0 and world._player.collision_mask == 5, "New mode creates actual personal space and player collision mask")
+	_check(world._actions._personal_bodies.size() > 0 and world._player.collision_mask == 13, "New mode creates actual personal space and player collision mask")
 	model.new_game("italia", true)
 	world.setup(model.data)
-	_check(not Combat.enabled(model.data) and world._player.collision_mask == 1, "Legacy village restores the original player mask")
+	_check(not Combat.enabled(model.data) and world._player.collision_mask == 9, "Legacy village keeps native civilians and removes only optional combat colliders")
 	_check(_all_personal_space_disabled(), "Legacy village disables every previously created personal-space body")
 	model.new_game("germania", true, true)
 	world.setup(model.data)
-	_check(not Combat.enabled(model.data) and world._player.collision_mask == 1, "A different origin also retains its original collision mode")
+	_check(not Combat.enabled(model.data) and world._player.collision_mask == 9, "A different origin retains the shared civilian collision mask without enabling combat")
 	_check(_all_personal_space_disabled(), "A different origin cannot inherit stale personal-space collisions")
 
 

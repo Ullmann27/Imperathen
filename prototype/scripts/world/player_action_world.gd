@@ -3,6 +3,7 @@ extends RefCounted
 
 const Combat = preload("res://scripts/domain/combat_actions.gd")
 const PEOPLE_LAYER := 4
+const CIVILIAN_LAYER := 8
 var world: Node3D
 var state: Dictionary = {}
 var selected := "jab_left"
@@ -37,6 +38,8 @@ func sync(data: Dictionary) -> void:
 		world._figure.cue("block")
 	if dodging and not _dodging:
 		world.cue_village_defense("village_dodge")
+	if _dodging and not dodging:
+		world._dodge_remaining = 0.0
 	_guarding = guarding
 	_dodging = dodging
 	world._figure.set_equipment(false, false)
@@ -44,6 +47,7 @@ func sync(data: Dictionary) -> void:
 
 
 func reset() -> void:
+	world._dodge_remaining = 0.0
 	var owns_pose := not _last_technique.is_empty() or _guarding or _dodging
 	_last_technique = ""
 	_guarding = false
@@ -80,8 +84,8 @@ func attack() -> void:
 func sight_clear(from: Vector2, to: Vector2) -> bool:
 	if not world.is_inside_tree() or not from.is_finite() or not to.is_finite():
 		return false
-	var height := 1.0
-	var query := PhysicsRayQueryParameters3D.create(Vector3(from.x, height, from.y), Vector3(to.x, height, to.y), 1 | 2 | PEOPLE_LAYER)
+	var height: float = float(world._player.global_position.y) + 0.15
+	var query := PhysicsRayQueryParameters3D.create(Vector3(from.x, height, from.y), Vector3(to.x, height, to.y), 1 | 2 | PEOPLE_LAYER | CIVILIAN_LAYER)
 	# Exclude the two participating bodies by identity/location, never the wall
 	# near a target. Other residents still obstruct the line of contact.
 	var excluded: Array[RID] = _bodies_at(from)
@@ -104,7 +108,7 @@ func safe_actor_motion(from: Vector2, to: Vector2) -> Vector2:
 	query.transform = Transform3D(Basis.IDENTITY, Vector3(from.x, 0.92, from.y))
 	query.motion = motion
 	query.margin = 0.015
-	query.collision_mask = 1 | 2 | PEOPLE_LAYER
+	query.collision_mask = 1 | 2 | PEOPLE_LAYER | CIVILIAN_LAYER
 	query.exclude = _bodies_at(from)
 	var result := world.get_world_3d().direct_space_state.cast_motion(query)
 	return from + Vector2(motion.x, motion.z) * maxf(0.0, float(result[0]) - 0.01) if result.size() == 2 else from
@@ -112,7 +116,7 @@ func safe_actor_motion(from: Vector2, to: Vector2) -> Vector2:
 
 func sync_personal_space() -> void:
 	var enabled := Combat.enabled(state)
-	world._player.collision_mask = (1 | PEOPLE_LAYER) if enabled else 1
+	world._player.collision_mask = (1 | PEOPLE_LAYER | CIVILIAN_LAYER) if enabled else (1 | CIVILIAN_LAYER)
 	for index in range(_personal_bodies.size() - 1, -1, -1):
 		var body := _personal_bodies[index]
 		if not is_instance_valid(body):
@@ -132,6 +136,10 @@ func sync_personal_space() -> void:
 
 
 func _ensure_body(actor: Node3D, center_y: float) -> void:
+	# Civilian actors already own their collision body and its life-state layer.
+	# PersonalSpace on those actors is the shape, not a child StaticBody3D.
+	if actor is CollisionObject3D:
+		return
 	var body := actor.get_node_or_null("PersonalSpace") as StaticBody3D
 	if body == null:
 		body = StaticBody3D.new()

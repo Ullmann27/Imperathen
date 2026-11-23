@@ -1,14 +1,19 @@
 # Chat A: Bewegung, unbewaffneter Kampf und Touchsteuerung
 
 Dieser Arbeitszweig setzt den Auftrag aus
-`docs/18_childhood/CHAT_A_BEWEGUNG_KAMPF_STEUERUNG.md` auf Grundlage von
-`2909040deeb33b99ad4180b884b38921f28233a9` um. Die Änderungen bleiben auf einem
-eigenen Branch und werden als Draft-PR zur Integration geliefert.
+`docs/18_childhood/CHAT_A_BEWEGUNG_KAMPF_STEUERUNG.md` um. Die erste Fassung
+`5d95676626d8eeee5589973603cb1da523ca4970` basierte auf
+`2909040deeb33b99ad4180b884b38921f28233a9`. Die anschließende Integration
+übernimmt den inzwischen veröffentlichten Familien- und Dorfstand
+`e5735509622c9a94564dc5fe21257c07074f9df5` vollständig als zweiten Elternstand.
+Der eigene Branch wird in [Draft-PR 39](https://github.com/Ullmann27/Imperathen/pull/39)
+geführt. Ein Merge nach `main` gehört nicht zu dieser Lieferung.
 
 ## Spielverhalten
 
-Eine neue Italia-Partie beginnt weiterhin mit der zwölfjährigen Figur und dem
-vorhandenen Dorfanfang. Das neue Steuerfeld lässt die Figur mit analoger
+Eine neue Italia-Partie beginnt mit der zwölfjährigen Figur im Familienhaus,
+Antonia, Sextus und dem verbundenen Kindheitskapitel des Dorfzweigs.
+Das neue Steuerfeld lässt die Figur mit analoger
 Auslenkung gehen; der Tempoknopf schaltet auf Laufen. Tatsächliche Kollision und
 Geschwindigkeit treiben die Körperbewegung. Ruhehaltung, Gegenschwung,
 Abbremsen und Richtungswechsel besitzen getrennte Darstellung.
@@ -48,10 +53,15 @@ python3 tools/check_prototype.py --godot godot --report /dev/shm/imperathen-chat
 ```
 
 Die Android-Pipeline baut ARM64 und x86_64 aus demselben Commit, prüft den
-Paketinhalt und startet anschließend die x86_64-Ausgabe in einem echten
-Android-Emulator. Das zusätzliche native Eingabeszenario prüft Padbewegung,
+Paketinhalt einschließlich der sechs Familien-/Dorfmodule und startet anschließend
+die x86_64-Ausgabe in einem echten Android-Emulator. Der Familienweg verwendet
+das normale Intro, Antonia, den Wasserauftrag und wirkliche Wege durch die Tür.
+Das zusätzliche native Eingabeszenario prüft Padbewegung,
 Tempowechsel, Technikmenü und eine Pause mit gehaltenem Pointer. Ein erfolgreicher
 Python-Test dieses Testwerkzeugs ist noch kein erfolgreicher Emulatorlauf.
+Die ersten Bilder und 39-Gruppen-Berichte in diesem Ordner gehören ausdrücklich
+zum Quellstand `5d956…` vor der Familienintegration. Sie belegen diese neue
+Zusammenführung nicht pauschal.
 Der abschließende Lieferbericht benennt den tatsächlichen Build- und
 Laufzeitstatus sowie die zugehörigen Commits.
 

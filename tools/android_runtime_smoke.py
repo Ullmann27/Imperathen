@@ -147,7 +147,7 @@ def wait_for_village_snapshot(read_logs, screen=None, *, predicate=None,
 
 
 def wait_for_stable_village_control(read_control, *, timeout=60, tolerance=1.0,
-                                   max_observations=8):
+                                   max_observations=8, require_visible=True):
     """Use fresh, unchanged native geometry before tapping a scrolled control."""
     deadline = time.monotonic() + timeout
     previous_center = None
@@ -165,7 +165,7 @@ def wait_for_stable_village_control(read_control, *, timeout=60, tolerance=1.0,
                 or not all(isinstance(value, (int, float)) and math.isfinite(value) for value in center)
                 or not isinstance(instance, str) or not instance):
             raise RuntimeError("The observed village control has no valid native geometry or identity")
-        if control.get("visible") is True:
+        if not require_visible or control.get("visible") is True:
             if (previous_center is not None and previous_instance == instance
                     and max(abs(center[index] - previous_center[index]) for index in range(2)) <= tolerance):
                 return control
@@ -243,6 +243,97 @@ def activate_observed_village_popup(observe_popup, press_key, target_text, *,
         press_key("KEYCODE_DPAD_DOWN")
         previous_focus = focused
         moves += 1
+
+
+def observed_scroll_gesture(control, scroll):
+    """Move a clipped control toward the observed viewport without a full-page fling."""
+    if not isinstance(control, dict) or control.get("enabled") is not True or not isinstance(scroll, dict):
+        raise RuntimeError("Missing usable control or observed scroll geometry")
+    values = [control.get("center"), scroll.get("top"), scroll.get("bottom")]
+    if any(not isinstance(point, list) or len(point) != 2
+           or any(type(number) not in (int, float) or not math.isfinite(number) for number in point)
+           for point in values):
+        raise RuntimeError("Invalid observed scroll coordinates")
+    center, top, bottom = values
+    span = bottom[1] - top[1]
+    if span <= 4 or abs(bottom[0] - top[0]) > 1:
+        raise RuntimeError("Invalid observed vertical scroll area")
+    middle = (top[1] + bottom[1]) * 0.5
+    correction = middle - center[1]
+    if abs(correction) < 1:
+        raise RuntimeError("A centered hidden control cannot be revealed by vertical scrolling")
+    # Keep both endpoints in the current visible band and reduce speed near the
+    # target. CI27 exposed oscillation when every correction used a full swipe.
+    distance = min(abs(correction) * 0.5, span * 0.35)
+    distance = math.copysign(max(1.0, distance), correction)
+    return (top[0], middle), (top[0], middle + distance)
+
+
+def apk_runtime_features(entries):
+    """Choose the story route from files actually present in the tested APK."""
+    def contains(prefix):
+        return any(name.startswith("assets/scripts/" + prefix + ".") for name in entries)
+    village = contains("story/village_life")
+    return {"village_life": village,
+            "childhood": village and contains("story/village_childhood"),
+            "action_controls": village and contains("ui/touch_look") and contains("domain/combat_actions")}
+
+
+def childhood_runtime_state(snapshot):
+    state = snapshot.get("childhood_runtime") if isinstance(snapshot, dict) else None
+    if not isinstance(state, dict) or type(state.get("version")) is not int or state["version"] != 1:
+        raise RuntimeError("Missing or unsupported actual childhood runtime state")
+    for name in ("world_id", "stage", "target_npc", "target_point", "dialog_npc"):
+        if not isinstance(state.get(name), str):
+            raise RuntimeError("Invalid childhood field: " + name)
+    if not state["world_id"] or not state["stage"]:
+        raise RuntimeError("Childhood identity and stage must be observed")
+    for name in ("age", "day"):
+        if type(state.get(name)) is not int or state[name] < 1:
+            raise RuntimeError("Invalid childhood integer: " + name)
+    for name in ("completed", "carried"):
+        items = state.get(name)
+        if not isinstance(items, list) or any(not isinstance(item, str) or not item for item in items):
+            raise RuntimeError("Invalid childhood items: " + name)
+        if len(set(items)) != len(items):
+            raise RuntimeError("Duplicated childhood items: " + name)
+    for name in ("target_position", "family_entrance", "family_water"):
+        values = state.get(name)
+        if (not isinstance(values, list) or len(values) != 2
+                or any(type(value) not in (int, float) or not math.isfinite(value) for value in values)):
+            raise RuntimeError("Invalid childhood point: " + name)
+    radius = state.get("target_radius")
+    if type(radius) not in (int, float) or not math.isfinite(radius) or not 0 < radius <= 4:
+        raise RuntimeError("Invalid childhood interaction radius")
+    return state
+
+
+def observed_walk_point(snapshot, target):
+    """Native pad position toward a read-only world waypoint, relative to camera."""
+    state = action_runtime_state(snapshot)
+    yaw = state.get("camera_yaw")
+    if type(yaw) not in (int, float) or not math.isfinite(yaw):
+        raise RuntimeError("Camera orientation was not observed for native walking")
+    if (not isinstance(target, (tuple, list)) or len(target) != 2
+            or any(type(value) not in (int, float) or not math.isfinite(value) for value in target)):
+        raise RuntimeError("Invalid observed world waypoint")
+    pad = snapshot.get("controls", {}).get("move_pad")
+    center, right = observed_movement_points(pad, "right")
+    _, down = observed_movement_points(pad, "down")
+    dx, dz = target[0] - state["position"][0], target[1] - state["position"][2]
+    distance = math.hypot(dx, dz)
+    if distance < 0.001:
+        return center, distance
+    # Godot rotates the local x/z pad direction around +Y by the camera yaw.
+    strength = min(1.0, max(0.35, distance / 1.2))
+    x = (math.cos(yaw) * dx - math.sin(yaw) * dz) / distance * strength
+    y = (math.sin(yaw) * dx + math.cos(yaw) * dz) / distance * strength
+    point = [center[0] + (right[0] - center[0]) * x + (down[0] - center[0]) * y,
+             center[1] + (right[1] - center[1]) * x + (down[1] - center[1]) * y]
+    left, top, width, height = pad["rect"]
+    if not (left <= point[0] <= left + width and top <= point[1] <= top + height):
+        raise RuntimeError("Native walking point falls outside the observed pad")
+    return point, distance
 
 
 def action_runtime_state(snapshot):
@@ -354,10 +445,10 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(args.apk) as archive:
         entries = archive.namelist()
-        has_village_life = any(name.startswith("assets/scripts/story/village_life.") for name in entries)
-        has_action_controls = (has_village_life
-                               and any(name.startswith("assets/scripts/ui/touch_look.") for name in entries)
-                               and any(name.startswith("assets/scripts/domain/combat_actions.") for name in entries))
+        features = apk_runtime_features(entries)
+        has_village_life = features["village_life"]
+        has_childhood = features["childhood"]
+        has_action_controls = features["action_controls"]
     package = "at.heinz.imperathen"
     report = {"platform": "Android emulator", "apk_sha256": hashlib.sha256(args.apk.read_bytes()).hexdigest(), "physical_device_test": False,
               "arm64_runtime_test": False, "status": "failed", "checks": [], "errors": []}
@@ -365,6 +456,7 @@ def main():
     report["test_harness_commit"] = os.environ.get("GITHUB_SHA")
     report["apk_file"] = args.apk.name
     report["action_controls_expected"] = has_action_controls
+    report["story_route"] = "childhood_home" if has_childhood else "legacy_village"
     serial = ""
     verified_emulator = False
 
@@ -498,10 +590,14 @@ def main():
         if "IMPERATHEN_MENU_READY " not in logs():
             tap(point)
 
-    def finish_first_day_opening():
+    def finish_story_opening():
         # Older release APKs have no in-world prologue. New builds expose actual
         # laid-out buttons; this test never substitutes guessed screen positions.
-        if "IMPERATHEN_OPENING_STARTED first_day" not in checked_logs():
+        expected = "childhood_home" if has_childhood else "first_day"
+        if has_childhood:
+            started = wait_marker("IMPERATHEN_OPENING_STARTED ")
+            record("family_opening_is_actual_new_game", started == expected, started)
+        elif "IMPERATHEN_OPENING_STARTED first_day" not in checked_logs():
             return
         marker = "IMPERATHEN_OPENING_READY "
         opening = json.loads(wait_marker(marker))
@@ -515,14 +611,28 @@ def main():
         adb("shell", "input", "keyevent", "4")
         resumed = json.loads(wait_for_new_marker(marker, previous))
         record("android_back_resumes_opening", not resumed["paused"], resumed)
-        previous = checked_logs().count(marker)
-        tap(resumed["buttons"]["OpeningSkip"])
-        objective = json.loads(wait_for_new_marker(marker, previous))
-        record("skip_keeps_first_objective", objective["final"] and not objective["companion_choice"], objective)
+        if has_childhood:
+            objective = resumed
+            for _ in range(8):
+                if objective["final"]:
+                    break
+                previous_index = objective["index"]
+                previous = checked_logs().count(marker)
+                tap(objective["buttons"]["OpeningAdvance"])
+                objective = json.loads(wait_for_new_marker(marker, previous))
+                record("native_family_intro_advance", objective.get("sequence") == "childhood_home"
+                       and objective["index"] > previous_index and not objective["paused"], objective)
+            record("family_intro_reaches_first_objective",
+                   objective["final"] and not objective["companion_choice"], objective)
+        else:
+            previous = checked_logs().count(marker)
+            tap(resumed["buttons"]["OpeningSkip"])
+            objective = json.loads(wait_for_new_marker(marker, previous))
+            record("skip_keeps_first_objective", objective["final"] and not objective["companion_choice"], objective)
         screenshot("11_android_opening_objective.png")
         tap(objective["buttons"]["OpeningAdvance"])
         wait_marker("IMPERATHEN_OPENING_COMPLETE")
-        record("objective_hands_over_control", True, "Actual touch accepted the objective after a separate skip action")
+        record("objective_hands_over_control", True, "Actual touch accepted the objective after the opening controls")
 
     def village_snapshot(screen=None, *, predicate=None, required_control=None, after=-1, timeout=100):
         return wait_for_village_snapshot(checked_logs, screen, predicate=predicate,
@@ -530,7 +640,7 @@ def main():
 
     def village_control(name, screen, *, after=-1):
         state = village_snapshot(screen, required_control=name, after=after)
-        for _ in range(14):
+        for _ in range(24):
             control = state.get("controls", {}).get(name)
             if control is None:
                 raise RuntimeError("The current village UI has no control: " + name)
@@ -541,11 +651,18 @@ def main():
             scroll = state.get("scroll")
             if not scroll:
                 raise RuntimeError("A clipped village control has no visible scroll area: " + name)
-            top, bottom = scroll["top"], scroll["bottom"]
-            start, end = (bottom, top) if control["center"][1] > top[1] else (top, bottom)
+            start, end = observed_scroll_gesture(control, scroll)
             previous = village_runtime_cursor(checked_logs())
-            adb("shell", "input", "swipe", *(str(round(v)) for v in (*start, *end)), "600")
+            adb("shell", "input", "swipe", *(str(round(v)) for v in (*start, *end)), "900")
             state = village_snapshot(screen, required_control=name, after=previous)
+            # ScrollContainer may still coast after UP. Wait for unchanged actual
+            # geometry, including clipped states, before calculating another swipe.
+            def settled_control(timeout):
+                nonlocal state
+                cursor = village_runtime_cursor(checked_logs())
+                state = village_snapshot(screen, required_control=name, after=cursor, timeout=timeout)
+                return state["controls"][name]
+            wait_for_stable_village_control(settled_control, require_visible=False)
         raise RuntimeError("Could not scroll the actual village control into view: " + name)
 
     def stable_village_control(name, screen):
@@ -602,6 +719,82 @@ def main():
         village_snapshot("playing", predicate=lambda state: state.get("aelia_assignment") == "woodcamp")
         record("village_back_closes_work_panel", True, "The worker stays assigned when the work panel closes")
 
+    def walk_to_childhood_point(target, label, radius=0.25):
+        # These are short authored family-home routes, not general pathfinding.
+        # The observer only reads the live world; every movement is an ADB touch.
+        for attempt in range(24):
+            previous = village_runtime_cursor(checked_logs())
+            before = village_snapshot("playing", required_control="move_pad", after=previous,
+                                      predicate=action_input_is_neutral)
+            point, distance = observed_walk_point(before, target)
+            if distance <= radius:
+                record(label + "_reached_by_native_walk", True,
+                       {"target": target, "distance_m": distance, "position": before["action_runtime"]["position"]})
+                return before
+            previous = village_runtime_cursor(checked_logs())
+            native = tuple(str(round(value)) for value in point)
+            # A stationary native swipe holds the analog pad at the observed
+            # direction, including the DOWN frame on a slow software renderer.
+            duration = 900 if distance > 0.8 else 650
+            adb("shell", "input", "swipe", *native, *native, str(duration))
+            after = village_snapshot("playing", after=previous,
+                                     predicate=lambda item: action_input_is_neutral(item)
+                                     and action_position_distance(before, item) >= 0.02,
+                                     timeout=45)
+            traveled = action_position_distance(before, after)
+            report.setdefault("childhood_native_walks", []).append({
+                "route": label, "attempt": attempt + 1, "input": "adb input swipe",
+                "native_point": point, "duration_ms": duration, "target": list(target),
+                "distance_m": traveled, "before": before["action_runtime"]["position"],
+                "after": after["action_runtime"]["position"]})
+        raise RuntimeError("Native childhood waypoint was not reached: " + label)
+
+    def exercise_childhood_start():
+        initial = village_snapshot("playing", required_control="move_pad")
+        child = childhood_runtime_state(initial)
+        record("actual_family_start", child["stage"] == "mother_morning" and child["completed"] == []
+               and child["carried"] == [] and child["age"] == 12 and child["day"] == 1
+               and child["target_npc"] == "antonia" and initial.get("player_is_ruler") is False, child)
+        screenshot("15_android_family_home.png")
+        entrance, water = child["family_entrance"], child["family_water"]
+        # Align with the actual doorway before crossing the front wall.
+        walk_to_childhood_point([entrance[0], water[1]], "family_door_alignment", radius=0.20)
+        walk_to_childhood_point(entrance, "family_doorstep", radius=0.30)
+        previous = village_runtime_cursor(checked_logs())
+        tap(stable_village_control("interact", "playing")["center"])
+        conversation = village_snapshot("village_dialog", required_control="childhood_mother_morning", after=previous,
+                                        predicate=lambda item: childhood_runtime_state(item)["dialog_npc"] == "antonia")
+        record("native_interaction_reaches_mother", True, childhood_runtime_state(conversation))
+        choice = village_control("childhood_mother_morning", "village_dialog")
+        previous = village_runtime_cursor(checked_logs())
+        tap(choice["center"])
+        agreed = village_snapshot("village_dialog", after=previous,
+                                  predicate=lambda item: childhood_runtime_state(item)["stage"] == "fill_water")
+        agreed_child = childhood_runtime_state(agreed)
+        record("native_mother_choice_carries_real_household_coin",
+               agreed_child["completed"] == ["mother_morning"] and agreed_child["carried"] == ["household_coin"], agreed_child)
+        screenshot("16_android_mother_conversation.png")
+        previous = village_runtime_cursor(checked_logs())
+        adb("shell", "input", "keyevent", "4")
+        returned = village_snapshot("playing", required_control="move_pad", after=previous)
+        task = childhood_runtime_state(returned)
+        record("family_goal_moves_to_real_water_station", task["target_point"] == "family_water"
+               and task["target_position"] == water, task)
+        walk_to_childhood_point([entrance[0], water[1]], "return_inside_family_house", radius=0.25)
+        walk_to_childhood_point(task["target_position"], "family_water_station", radius=task["target_radius"] * 0.7)
+        previous = village_runtime_cursor(checked_logs())
+        tap(stable_village_control("interact", "playing")["center"])
+        filled = village_snapshot("playing", after=previous,
+                                  predicate=lambda item: childhood_runtime_state(item)["stage"] == "father_morning")
+        saved = childhood_runtime_state(filled)
+        record("native_item_action_fills_family_jug",
+               saved["completed"] == ["mother_morning", "fill_water"]
+               and sorted(saved["carried"]) == ["household_coin", "water_jug"]
+               and saved["world_id"] == child["world_id"] and saved["age"] == 12 and saved["day"] == 1, saved)
+        screenshot("17_android_family_jug.png")
+        report["childhood_scope"] = "First two actual actions only: mother conversation and filling the family jug; no quest, item or position injection."
+        return {key: saved[key] for key in ("world_id", "stage", "completed", "carried", "age", "day")}
+
     def verify_action_rest(screen, stage):
         previous = village_runtime_cursor(checked_logs())
         first = village_snapshot(screen, after=previous, predicate=action_input_is_neutral)
@@ -617,7 +810,7 @@ def main():
     def exercise_action_controls():
         initial = village_snapshot("playing", required_control="move_pad")
         state = action_runtime_state(initial)
-        record("action_hud_from_new_childhood", initial.get("action_mode") == "unarmed"
+        record("action_hud_from_new_game", initial.get("action_mode") == "unarmed"
                and state["mode"] == "person" and state["ui_view"] == "game"
                and state["touch_camera_managed"] and not state["running"], state)
         control = stable_village_control("move_pad", "playing")
@@ -769,8 +962,9 @@ def main():
         tap(menu["new_game"])
         wait_marker("IMPERATHEN_SESSION_STARTED")
         record("touch_starts_saved_game", True, "New game button produced a saved village")
-        finish_first_day_opening()
-        if has_village_life:
+        finish_story_opening()
+        childhood_checkpoint = exercise_childhood_start() if has_childhood else None
+        if has_village_life and not has_childhood:
             exercise_village_life()
         if has_action_controls:
             exercise_action_controls()
@@ -796,7 +990,12 @@ def main():
         tap(resumed_menu["continue"])
         wait_marker("IMPERATHEN_CONTINUED")
         record("continue_after_process_death", True, "Loaded the village in a new process")
-        if has_village_life:
+        if has_childhood:
+            restored = village_snapshot("playing")
+            restored_child = childhood_runtime_state(restored)
+            record("family_actions_and_items_survive_restart",
+                   all(restored_child[key] == value for key, value in childhood_checkpoint.items()), restored_child)
+        elif has_village_life:
             restored = village_snapshot("playing")
             record("village_decisions_survive_restart", restored.get("decimus_met") is True
                    and restored.get("work_permit") is True and restored.get("aelia_assignment") == "woodcamp"

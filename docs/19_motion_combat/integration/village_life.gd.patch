@@ -1,8 +1,8 @@
 diff --git a/prototype/scripts/story/village_life.gd b/prototype/scripts/story/village_life.gd
-index 6031b07..18fa53d 100644
+index 9c68db6..06b6d16 100644
 --- a/prototype/scripts/story/village_life.gd
 +++ b/prototype/scripts/story/village_life.gd
-@@ -245,7 +245,28 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
+@@ -270,7 +270,28 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
  	return _fail("Dieser Dorfauftrag ist nicht unterstützt.")
  
  
@@ -32,7 +32,7 @@ index 6031b07..18fa53d 100644
  	if not is_finite(delta) or delta<=0.0 or delta>3600.0 or not validate(data).is_empty():
  		return false
  	var social: Dictionary = data.village.social
-@@ -256,12 +277,12 @@ static func advance(data: Dictionary, delta: float) -> bool:
+@@ -281,12 +302,12 @@ static func advance(data: Dictionary, delta: float) -> bool:
  		if social.accumulator<0.00000001:
  			social.accumulator = 0.0
  		social.seconds = snappedf(float(social.seconds)+STEP,STEP)
@@ -47,7 +47,7 @@ index 6031b07..18fa53d 100644
  	if data.get("encounter",{}).get("active",false):
  		return
  	var raid: Dictionary = data.village.raid
-@@ -285,6 +306,8 @@ static func _tick(data: Dictionary) -> void:
+@@ -314,6 +335,8 @@ static func _tick(data: Dictionary) -> void:
  		var point := Vector2(enemy.x,enemy.z)
  		var player := _player_point(data)
  		var near := point.distance_to(player)<=2.2
@@ -56,7 +56,7 @@ index 6031b07..18fa53d 100644
  		if near:
  			enemy.attack_timer = maxf(0.0,float(enemy.attack_timer)-STEP)
  			if float(enemy.attack_timer)<=0.000001:
-@@ -293,7 +316,14 @@ static func _tick(data: Dictionary) -> void:
+@@ -322,7 +345,14 @@ static func _tick(data: Dictionary) -> void:
  		else:
  			enemy.attack_timer = 0.9
  			var target := player if point.distance_to(player)<7.0 else Vector2(5.0,5.0)
@@ -72,3 +72,31 @@ index 6031b07..18fa53d 100644
  			enemy.x = point.x
  			enemy.z = point.y
  			if point.distance_to(Vector2(5.0,5.0))<2.0:
+@@ -730,27 +760,6 @@ static func _enemy_count(number: int) -> int:
+ 	return mini(6,2+number)
+ 
+ 
+-## Called by the measured unarmed-combat resolver after its range/facing/window checks.
+-## This is not a player command and grants no free hit merely from pressing attack.
+-static func apply_unarmed_hit(data: Dictionary, enemy_id: String, damage: int) -> bool:
+-	if damage < 1 or damage > 45 or not data.get("village", {}).get("raid", {}).get("active", false):
+-		return false
+-	var raid: Dictionary = data.village.raid
+-	var enemy := _enemy(raid, enemy_id)
+-	if enemy.is_empty() or int(enemy.health) <= 0:
+-		return false
+-	enemy.health = maxi(0, int(enemy.health) - damage)
+-	raid.player_hits += 1
+-	raid.participation += 1
+-	if not raid.joined:
+-		raid.joined = true
+-		_gain(data, "courage", 1)
+-	_gain(data, "combat", 2 if int(enemy.health) == 0 else 1)
+-	if _living_enemies(raid) == 0:
+-		_finish_raid(data, "defended")
+-	return true
+-
+-
+ static func _living_enemies(raid: Dictionary) -> int:
+ 	var count := 0
+ 	for enemy: Dictionary in raid.enemies:

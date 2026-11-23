@@ -2,6 +2,7 @@ extends SceneTree
 
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Combat = preload("res://scripts/domain/combat_actions.gd")
+const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 var checks := 0
 var failures: Array[String] = []
@@ -10,6 +11,7 @@ var directory := "user://combat_model_%s" % Time.get_ticks_usec()
 
 func _initialize() -> void:
 	_test_practice_commands_and_persistence()
+	_test_childhood_single_combat_clock()
 	_test_contradictory_mode_rejected()
 	_test_clock_partition()
 	_test_health_interruption_and_defense()
@@ -39,11 +41,33 @@ func _connect_geometry(model) -> void:
 
 func _new():
 	var model = WorldModel.new()
-	model.new_game("italia", true, true)
+	model.new_game("italia", true, false, true)
 	_connect_geometry(model)
 	_check(Combat.enabled(model.data), "New opted-in village uses action combat")
 	_valid(model, "Initial action-combat world")
 	return model
+
+
+func _test_childhood_single_combat_clock() -> void:
+	var model = WorldModel.new()
+	model.new_game("italia", true, true)
+	_connect_geometry(model)
+	_check(Childhood.enabled(model.data) and Combat.enabled(model.data), "The published third flag starts family childhood with the same combat authority")
+	_check(model.data.village.childhood.completed.is_empty() and model.data.village.childhood.carried.is_empty(), "Combat initialization cannot invent completed childhood or inventory")
+	model.set_player_position(Vector3(0.0, 1.0, -6.0))
+	_ok(_attack(model), "A family child starts a real practice motion")
+	model.advance(0.1)
+	_check(is_equal_approx(float(model.data.village.unarmed.elapsed), 0.1) and model.data.village.unarmed.practice_hits == 0, "A childhood frame advances exactly one combat clock and stays in preparation")
+	_check(model.data.village.unarmed.stamina == 93.0, "The childhood bridge cannot regenerate stamina during windup")
+	_ok(model.save_game(_path("childhood-windup")), "Save family childhood during a pending movement")
+	var loaded = WorldModel.new()
+	_ok(loaded.load_game(_path("childhood-windup")), "Load both optional v1 contracts together")
+	_connect_geometry(loaded)
+	loaded.advance(0.1)
+	_check(loaded.data.village.unarmed.practice_hits == 1 and is_equal_approx(float(loaded.data.village.unarmed.elapsed), 0.2), "Restored childhood motion resolves once on the same active window")
+	_check(loaded.data.player.age == 12 and loaded.data.progress.training_hits == 0 and loaded.data.village.childhood.completed.is_empty(), "Practice preserves the family chapter, age and later adult training")
+	_check(not loaded.execute("train", {}).ok, "Modern combat cannot restore the obsolete childhood age jump")
+	_valid(loaded, "Family and combat remain jointly saveable")
 
 
 func _attack(model, target := "practice", technique := "jab_left", command_id := "") -> Dictionary:
@@ -120,7 +144,7 @@ func _test_practice_commands_and_persistence() -> void:
 
 func _test_contradictory_mode_rejected() -> void:
 	var model = WorldModel.new()
-	model.new_game("italia", true, true)
+	model.new_game("italia", true, false, true)
 	model.data.village.enabled = false
 	_check(not model._validate_state(model.data).is_empty(), "Unarmed state cannot coexist with a disabled village")
 	var before := JSON.stringify(model.data)

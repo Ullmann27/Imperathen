@@ -12,34 +12,49 @@ var profile := "balanced"
 var focused_id := ""
 var recruited := 0
 var _player_position := Vector3.ZERO
+var _route_clocks: Dictionary = {}
+var _initialized := false
 
 func show_origin(id: String, time: float, recruited_count: int) -> void:
+	var rebuild := origin_id != id
 	if origin_id != id:
 		origin_id = id
 		for actor: Node3D in actors.values():
 			remove_child(actor)
 			actor.free()
 		actors.clear()
+		_route_clocks.clear()
+		_initialized = false
 		if id == "italia":
 			for index in Layout.RESIDENTS.size():
 				_add_resident(Layout.RESIDENTS[index],index)
 	set_recruited(recruited_count)
-	advance_to(time,true)
+	advance_to(time,rebuild or not _initialized)
 
 func _add_resident(item: Dictionary, index: int) -> void:
-	var actor := Node3D.new()
+	var actor := CharacterBody3D.new()
 	actor.name = item.id
+	actor.position = item.at
+	actor.collision_layer = Layout.CITIZEN_LAYER
+	actor.collision_mask = 1 | 2 | Layout.CITIZEN_LAYER
+	actor.safe_margin = .006
+	var shape := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = Layout.CITIZEN_RADIUS
+	capsule.height = 1.72
+	shape.shape = capsule
+	shape.position.y = .90
+	shape.name = "PersonalSpace"
+	actor.add_child(shape)
 	actor.set_meta("resident_id",item.id)
 	actor.set_meta("occupation",item.occupation)
 	add_child(actor)
 	var figure := Person.new()
 	figure.name = "Figure"
 	figure.position.y = .9
-	actor.add_child(figure)
-	figure.configure("resident","italia",int(item.age))
-	if figure.has_method("configure_appearance"):
-		figure.configure_appearance(item.appearance,index)
 	figure.profile = profile
+	actor.add_child(figure)
+	figure.configure_resident("italia",int(item.age),item.appearance,index,get_viewport().get_camera_3d())
 	var nameplate := Art.label(actor,item.name+" · "+item.occupation,Vector3(0,2.05,0),Color("#efdbad"),29)
 	nameplate.name = "Nameplate"
 	nameplate.pixel_size = .003
@@ -53,6 +68,7 @@ func set_recruited(count: int) -> void:
 	for id: String in actors:
 		var index := Layout.VOLUNTEERS.find(id)
 		actors[id].visible = index < 0 or index >= recruited
+		actors[id].collision_layer = Layout.CITIZEN_LAYER if actors[id].visible else 0
 
 func set_quality(next_profile: String) -> void:
 	if next_profile not in ["low","balanced","high","very_high"]:
@@ -72,24 +88,107 @@ func set_active(enabled: bool) -> void:
 func advance_to(time: float, force := false) -> void:
 	if not active and not force:
 		return
-	seconds = maxf(0.0,time)
+	var next_time := maxf(0.0,time)
+	var elapsed := next_time-seconds
+	# Loading a saved time is an explicit placement operation. Ordinary play
+	# never teleports along the routine: each displacement is swept by physics.
+	if force or elapsed < 0.0 or elapsed > 2.0:
+		_place_routines(next_time)
+		seconds = next_time
+		return
+	seconds = next_time
+	if elapsed <= 0.0:
+		return
 	for index in Layout.RESIDENTS.size():
 		var item: Dictionary = Layout.RESIDENTS[index]
 		if not actors.has(item.id):
 			continue
-		var actor: Node3D = actors[item.id]
+		var actor: CharacterBody3D = actors[item.id]
 		if not actor.visible or focused_id == item.id:
 			continue
-		var pose: Dictionary = Layout.pose_at(item,seconds,index)
-		actor.position = pose.position
-		var facing: Vector3 = pose.direction
-		if float(pose.speed) > .01:
-			actor.rotation.y = atan2(-facing.x,-facing.z)
+		var clock := float(_route_clocks.get(item.id,seconds-elapsed))
+		var previous: Dictionary = Layout.pose_at(item,clock,index)
+		# A blocked resident waits for space rather than allowing its invisible
+		# schedule to run far ahead and cutting across a house on the next turn.
+		if actor.position.distance_to(previous.position) < .42:
+			clock += elapsed
+		_route_clocks[item.id] = clock
+		var pose: Dictionary = Layout.pose_at(item,clock,index)
+		var target: Vector3 = pose.position
+		var motion := (target-actor.position).limit_length((.82+float(index%5)*.085)*elapsed)
+		motion.y = 0
+		var before := actor.position
+		var hit: KinematicCollision3D
+		if motion.length_squared() > .00000001:
+			hit = actor.move_and_collide(motion)
+		if hit != null:
+			var blocker := hit.get_collider() as CollisionObject3D
+			# Give way to a person using a short tested sideways step. An actual
+			# wall is never bypassed by assigning a new transform through it.
+			if blocker != null and (blocker.collision_layer & (2 | Layout.CITIZEN_LAYER)) != 0:
+				var side := Vector3(-motion.z,0,motion.x).normalized() * .62 * elapsed
+				if not actor.test_move(actor.global_transform,side):
+					actor.move_and_collide(side)
+		actor.set_meta("yielding",hit != null)
+		var travelled := actor.position-before
+		var actual_speed := travelled.length()/maxf(.0001,elapsed)
+		if travelled.length_squared() > .00000001:
+			actor.rotation.y = lerp_angle(actor.rotation.y,atan2(-travelled.x,-travelled.z),minf(1.0,elapsed*8.0))
 		var figure: Node3D = actor.get_node("Figure")
-		figure.drive(pose.speed)
-		if pose.activity == "work":
+		figure.drive(actual_speed)
+		if pose.activity == "work" and actual_speed < .05:
 			figure.keep_working()
+		actor.set_meta("activity","march" if actual_speed > .05 else pose.activity)
+
+
+func _place_routines(time: float) -> void:
+	_initialized = true
+	var occupied: Array[Vector3] = []
+	var excluded: Array[RID] = []
+	for actor: CharacterBody3D in actors.values():
+		excluded.append(actor.get_rid())
+	for index in Layout.RESIDENTS.size():
+		var item: Dictionary = Layout.RESIDENTS[index]
+		if not actors.has(item.id):
+			continue
+		var actor: CharacterBody3D = actors[item.id]
+		var pose := Layout.pose_at(item,time,index)
+		actor.position = _free_start(pose.position,item.at,occupied,excluded)
+		_route_clocks[item.id] = time
+		if actor.visible:
+			occupied.append(actor.position)
 		actor.set_meta("activity",pose.activity)
+		actor.set_meta("yielding",false)
+		actor.get_node("Figure").drive(0.0)
+
+
+func _free_start(desired: Vector3, origin: Vector3, occupied: Array[Vector3], excluded: Array[RID]) -> Vector3:
+	var candidates: Array[Vector3] = [desired]
+	for radius in [.7,1.15,1.8]:
+		for index in 8:
+			var angle := TAU*index/8.0
+			candidates.append(desired+Vector3(cos(angle),0,sin(angle))*radius)
+	candidates.append(origin)
+	var query := PhysicsShapeQueryParameters3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = Layout.CITIZEN_RADIUS
+	capsule.height = 1.72
+	query.shape = capsule
+	query.collision_mask = 1 | 2 | Layout.CITIZEN_LAYER
+	query.exclude = excluded
+	for point: Vector3 in candidates:
+		var clear := true
+		for other: Vector3 in occupied:
+			if point.distance_to(other) < Layout.CITIZEN_RADIUS*2+.04:
+				clear = false
+				break
+		if not clear:
+			continue
+		query.transform = Transform3D(Basis.IDENTITY,point+Vector3.UP*.90)
+		if get_world_3d().direct_space_state.intersect_shape(query,1).is_empty():
+			return point
+	push_error("No clear resident spawn beside %s" % desired)
+	return origin
 
 func update_nearby(player_position: Vector3, show_labels: bool) -> void:
 	_player_position = player_position

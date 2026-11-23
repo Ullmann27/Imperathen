@@ -4,6 +4,7 @@ extends Node
 
 const LOG_CHUNK_SIZE := 512
 const MAX_LOG_CHUNKS := 64
+const Childhood = preload("res://scripts/story/village_childhood.gd")
 
 var session: Node
 var _elapsed := 0.0
@@ -58,6 +59,8 @@ func snapshot() -> Dictionary:
 			value["aelia_assignment"] = person.assignment
 	value["action_mode"] = "unarmed" if village.has("unarmed") else "legacy"
 	value["action_runtime"] = _action_state()
+	if Childhood.enabled(data):
+		value["childhood_runtime"] = _childhood_state(data)
 	var collection_root: Node = session.ui
 	if value.action_runtime.overlay == "techniques":
 		collection_root = session.ui.get("_technique_menu_layer")
@@ -93,6 +96,9 @@ func _collect(node: Node, value: Dictionary) -> void:
 			"Zurück ins Dorf": key = "panel_close"
 		if node.has_meta("touch_action"):
 			key = str(node.get_meta("touch_action"))
+		if node.get_meta("village_command", "") == "village_childhood_action":
+			var args: Dictionary = node.get_meta("village_args", {})
+			key = "childhood_" + str(args.get("action_id", ""))
 		if str(node.name).begins_with("Technique_"):
 			key = "technique_" + str(node.name).trim_prefix("Technique_")
 		elif node.name == "OpenCommands":
@@ -159,6 +165,7 @@ func _action_state() -> Dictionary:
 		overlay = "commands"
 	return {"version":1, "mode":str(session.mode), "ui_view":str(ui.get("_view_state")),
 		"world_active":bool(game_world.get("_active")), "running":bool(game_world.get("_running")),
+		"camera_yaw":float(game_world.get("_camera_yaw")),
 		"selected_technique":str(ui.get("_selected_technique")), "overlay":overlay,
 		"position":[position.x,position.y,position.z], "velocity":[velocity.x,velocity.y,velocity.z],
 		"body_velocity":[body_velocity.x,body_velocity.y,body_velocity.z], "move_axis":[axis.x,axis.y],
@@ -166,6 +173,22 @@ func _action_state() -> Dictionary:
 		"camera_touches":look.get("contacts").size() if is_instance_valid(look) else 0,
 		"action_touches":action_touches, "world_camera_touches":game_world.get("_camera_contacts").size(),
 		"touch_camera_managed":bool(game_world.get("_touch_camera_managed"))}
+
+
+func _childhood_state(data: Dictionary) -> Dictionary:
+	var chapter := Childhood.view(data)
+	var child: Dictionary = data.village.childhood
+	var entrance: Vector2 = Childhood.POINTS.family_entrance
+	var water: Vector2 = Childhood.POINTS.family_water
+	return {"version":1, "world_id":str(data.world_id), "age":int(data.player.age),
+		"day":int(child.day), "stage":str(chapter.get("stage", "")),
+		"completed":child.completed.duplicate(), "carried":child.carried.duplicate(),
+		"target_npc":str(chapter.get("target_npc", "")),
+		"target_point":str(chapter.get("target_point", "")),
+		"target_position":chapter.get("target_position", []).duplicate(),
+		"target_radius":Childhood.NPC_RANGE if not str(chapter.get("target_npc", "")).is_empty() else Childhood.POINT_RANGE,
+		"family_entrance":[entrance.x,entrance.y], "family_water":[water.x,water.y],
+		"dialog_npc":str(session.village_npc) if str(session.screen) == "village_dialog" else ""}
 
 
 func _movement_points(control: Control) -> Dictionary:

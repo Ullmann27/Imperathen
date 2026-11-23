@@ -108,11 +108,20 @@ ACTION_COMBAT_RESOURCES = (
     "scripts/ui/touch_modal.gd",
     *(f"assets/characters/hero_hand_grip_{lod}.res" for lod in range(4)),
 )
+CHILDHOOD_RESOURCES = (
+    "scripts/story/village_childhood.gd",
+    "scripts/domain/unarmed_combat.gd",
+    "scripts/visuals/practice_gear.gd",
+    "scripts/ui/village_navigation.gd",
+    "scripts/world/village/settlement_dressing.gd",
+    "scripts/world/regional_village.gd",
+)
 FEATURE_RESOURCE_GROUPS = (
     ("living_frontier_content", FRONTIER_RESOURCES),
     ("cinematic_opening_content", OPENING_RESOURCES),
     ("village_life_content", VILLAGE_LIFE_RESOURCES),
     ("action_combat_content", ACTION_COMBAT_RESOURCES),
+    ("childhood_content", CHILDHOOD_RESOURCES),
 )
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (
@@ -543,7 +552,7 @@ def snapshot_sources(project: Path) -> dict:
     if not project.is_dir():
         return {"status": "not_run", "reason": "Source project directory not available."}
     for path in sorted(project.rglob("*")):
-        if path.is_file() and ".godot" not in path.relative_to(project).parts and path.suffix in {".gd", ".tscn", ".godot", ".json", ".glb", ".wav", ".webp"}:
+        if path.is_file() and ".godot" not in path.relative_to(project).parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".json", ".glb", ".res", ".wav", ".webp", ".png", ".jpg"}:
             hashes[str(path.relative_to(project))] = sha256_file(path)
     return {"status": "recorded", "sha256": hashes,
             "scope": "Local source snapshot only; not proof that transformed APK bytes were produced from these exact sources."}

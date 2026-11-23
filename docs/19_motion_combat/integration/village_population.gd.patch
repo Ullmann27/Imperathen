@@ -1,9 +1,9 @@
 diff --git a/prototype/scripts/world/village/village_population.gd b/prototype/scripts/world/village/village_population.gd
-index a45214c..34a48e0 100644
+index 068dec6..e67dcad 100644
 --- a/prototype/scripts/world/village/village_population.gd
 +++ b/prototype/scripts/world/village/village_population.gd
-@@ -42,6 +42,8 @@ func _add_resident(item: Dictionary, index: int) -> void:
- 	figure.profile = profile
+@@ -57,6 +57,8 @@ func _add_resident(item: Dictionary, index: int) -> void:
+ 	figure.configure_resident("italia",int(item.age),item.appearance,index,get_viewport().get_camera_3d())
  	var nameplate := Art.label(actor,item.name+" · "+item.occupation,Vector3(0,2.05,0),Color("#efdbad"),29)
  	nameplate.name = "Nameplate"
 +	nameplate.pixel_size = .003
@@ -11,7 +11,7 @@ index a45214c..34a48e0 100644
  	nameplate.visibility_range_end = 7.0
  	nameplate.hide()
  	actors[item.id] = actor
-@@ -65,6 +67,7 @@ func set_active(enabled: bool) -> void:
+@@ -81,6 +83,7 @@ func set_active(enabled: bool) -> void:
  	if not active:
  		for actor: Node3D in actors.values():
  			actor.get_node("Figure").drive(0.0)
@@ -19,7 +19,7 @@ index a45214c..34a48e0 100644
  
  func advance_to(time: float, force := false) -> void:
  	if not active and not force:
-@@ -91,9 +94,17 @@ func advance_to(time: float, force := false) -> void:
+@@ -190,9 +193,17 @@ func _free_start(desired: Vector3, origin: Vector3, occupied: Array[Vector3], ex
  func update_nearby(player_position: Vector3, show_labels: bool) -> void:
  	_player_position = player_position
  	var closest := nearest_npc(player_position,5.0)

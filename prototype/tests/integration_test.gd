@@ -3,6 +3,8 @@ extends SceneTree
 
 const EntryScene = preload("res://main.tscn")
 const VillageLife = preload("res://scripts/story/village_life.gd")
+const Model = preload("res://scripts/domain/world_model.gd")
+const Childhood = preload("res://scripts/story/village_childhood.gd")
 var failures: Array[String] = []
 var checks := 0
 var game
@@ -65,13 +67,22 @@ func _run() -> void:
 	scene._action("leave")
 	_check(game.screen == "menu" and not FileAccess.file_exists(game.SAVE_PATH), "The scenario preview never creates a campaign save")
 	game.ui.action_requested.emit("new_game", {})
-	_check(game.screen == "opening", "New game begins with the in-world prologue")
+	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_home" and Childhood.enabled(game.model.data), "New Roman game begins with the family childhood prologue")
 	game._opening_skip()
 	_check(game.screen == "opening", "Skipping the prologue retains its explicit first objective")
 	game._opening_next()
 	_check(game.screen == "playing", "New game starts an active world through the UI signal")
 	_check(int(game.model.data.player.age) == 12, "A new life starts as a child")
 	_check(FileAccess.file_exists(game.SAVE_PATH), "New game creates a real save")
+	# The following original chapter/recruitment/strategy journey is a legacy
+	# save compatibility scenario. The fresh family UI has its own integration test.
+	var legacy := Model.new()
+	legacy.new_game("italia", true, false)
+	var saved: Dictionary = legacy.save_game(game.SAVE_PATH)
+	_check(saved.get("ok", false) and not Childhood.enabled(legacy.data), "The original chapter fixture is an explicit valid legacy save")
+	game._show_menu()
+	game.ui.action_requested.emit("continue", {})
+	_check(game.screen == "playing" and game.model.data.world_id == legacy.data.world_id and not Childhood.enabled(game.model.data), "Real Continue restores the legacy campaign before its original chapter actions")
 	_request_window_back()
 	_check(game.screen == "paused" and game.ui.get("_view_state") == "pause", "A window Back request reaches the real UI and pauses exactly once")
 	_request_window_back()
@@ -133,10 +144,10 @@ func _run() -> void:
 	_check(game.screen == "opening" and game.opening_sequence.id == "adulthood", "Confirmed adulthood is introduced by the six-year transition")
 	game._opening_skip()
 	game._opening_next()
-	game.world._figure.rotation.y = 0.0
+	# A saved legacy campaign retains its original real-world attack/cooldown path.
 	for hit in range(3):
-		game.ui.action_requested.emit("attack", {"technique":"jab_left"})
-		_advance_game(0.7)
+		game.ui.action_requested.emit("attack", {})
+		await _wait_physics(48)
 	_check(game.model.data.progress.training_complete, "Actual attack input completes the three timed training hits")
 	for recruit in range(3):
 		game.ui.action_requested.emit("recruit", {})
@@ -145,12 +156,10 @@ func _run() -> void:
 	_check(game.model.data.encounter.active, "The UI starts the encounter only after preparation")
 	for opponent in range(3):
 		var foe: Dictionary = game.model.data.encounter.enemies[opponent]
-		_move_fixture(Vector3(float(foe.x), 1, float(foe.z) + 1.0))
-		game.world._figure.rotation.y = 0.0
-		for strike in range(10):
-			if game.model.data.encounter.active:
-				game.ui.action_requested.emit("attack", {"technique":"jab_left"})
-				_advance_game(1.3)
+		_move_fixture(Vector3(float(foe.x), 1, float(foe.z) + 2.0))
+		for strike in range(2):
+			game.ui.action_requested.emit("attack", {})
+			await _wait_physics(48)
 	_check(game.model.data.progress.skirmish_won, "Real world attack signals defeat the finite persistent enemies")
 	_check(game.screen == "dialog", "The last enemy hit automatically opens the consequence dialogue")
 	_check(game.model.data.story.choices.size() == 2, "The consequence dialogue offers two actual branches")
@@ -309,8 +318,8 @@ func _touch(scene,index: int,p: Vector2,down: bool) -> void:
 
 
 func _complete_village_phase() -> void:
-	# New lives require real village encounters and a resolved first raid before
-	# the legacy adulthood/persistence scenario may continue. Never inject flags.
+	# Saved legacy villages require real encounters and a resolved first raid
+	# before their adulthood/persistence scenario. Never inject completion flags.
 	for npc_id: String in ["decimus", "aelia", "varro"]:
 		var at: Vector2 = VillageLife.actor_position(game.model.data, npc_id)
 		_move_fixture(Vector3(at.x, 1.0, at.y + 1.0))
@@ -329,7 +338,7 @@ func _complete_village_phase() -> void:
 		if VillageLife.training_ready(game.model.data):
 			break
 	_check(saw_warning and saw_attack and game.model.data.village.raid.completed == 1, "The real warning and first village attack finish before adulthood")
-	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days satisfy the new training gate")
+	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days still satisfy the legacy training gate")
 
 
 func _advance_game(delta: float) -> void:

@@ -19,7 +19,10 @@ const TouchLookScript := preload("res://scripts/ui/touch_look.gd")
 const TouchModalScript := preload("res://scripts/ui/touch_modal.gd")
 const CombatActions := preload("res://scripts/domain/combat_actions.gd")
 const VillagePanel = preload("res://scripts/ui/village_life_panel.gd")
+const Childhood = preload("res://scripts/story/village_childhood.gd")
+const Navigation = preload("res://scripts/ui/village_navigation.gd")
 var _village_tab := "overview"
+var _navigation: Control
 
 class Atmosphere extends Control:
 
@@ -314,20 +317,22 @@ func _log_menu_buttons(demo: Button, atlas: Button, resume: Button, gallery: But
 
 
 func show_game(state: Dictionary) -> void:
+	_sync_pace_from_state(state)
 	_state = state.duplicate(true)
+	_state["running"] = _running
 	_open_screen("game", false)
 	_hud_labels.clear()
 	_action_buttons.clear()
 	_mode_buttons.clear()
 	_build_top_bar()
 	_build_objective_card()
+	_build_navigation()
 	_build_character_card()
 	_build_toolbar()
 	_build_touch_controls()
 	update_state(state)
 	set_mode(_mode)
 	_emit("touch_camera_managed", {"enabled": _touch_enabled})
-	_emit("movement_pace", {"running": _running})
 	_emit("select_technique", {"technique": _selected_technique})
 
 
@@ -349,9 +354,12 @@ func set_opening_reading(enabled: bool) -> void:
 
 
 func update_state(state: Dictionary) -> void:
+	_sync_pace_from_state(state)
 	_state = state.duplicate(true)
+	_state["running"] = _running
 	if _view_state != "game":
 		return
+	_update_pace_caption()
 	var resources: Dictionary = state.get("resources", {})
 	var player: Dictionary = state.get("player", {})
 	var progress: Dictionary = state.get("progress", {})
@@ -365,6 +373,8 @@ func update_state(state: Dictionary) -> void:
 	_hud_labels["time"].text = "TAG %d  ·  %02d:%02d" % [seconds / 86400 + 1, (seconds / 3600) % 24, (seconds / 60) % 60]
 	if state.get("village", {}).get("enabled", false):
 		_hud_labels["time"].text = "DORFTAG %d" % int(state.village_economy_view.get("day", 1))
+	if Childhood.enabled(state):
+		_hud_labels["time"].text = "TAG %d · 12 JAHRE" % int(state.get("childhood_view", Childhood.view(state)).get("day", 1))
 	_hud_labels["age"].text = "%d Jahre  ·  %s" % [int(player.get("age", 12)), _career_name(String(progress.get("stage", "prologue")))]
 	var health := clampf(float(player.get("health", 100)), 0, 100)
 	_health_bar.value = health
@@ -373,6 +383,8 @@ func update_state(state: Dictionary) -> void:
 	_hud_labels["squad"].text = "Truppe   %d / %d am Leben\nMoral   %d / 100" % [int(squad.get("alive", 0)), int(squad.get("recruits", 0)), int(squad.get("morale", 0))]
 	if _hud_labels.has("compact_life"):
 		_hud_labels["compact_life"].text = "Leben %d/100  ·  Truppe %d/%d" % [int(health), int(squad.get("alive", 0)), int(squad.get("recruits", 0))]
+		if Childhood.enabled(state):
+			_hud_labels["compact_life"].text = "Leben %d · Ausdauer %d" % [int(health), int(CombatActions.view(state).get("stamina", 100))]
 	var objective := _objective(state)
 	_hud_labels["objective_title"].text = objective[0]
 	_hud_labels["objective_text"].text = objective[1]
@@ -398,6 +410,9 @@ func update_state(state: Dictionary) -> void:
 		_action_buttons["train"].disabled = _action_buttons["train"].disabled or not bool(state.get("village_view", {}).get("training_ready", false))
 	_action_buttons["recruit"].disabled = not trained or int(squad.get("recruits", 0)) >= 3 or int(resources.get("denarii", 0)) < 5 or int(resources.get("grain", 0)) < 2 or ended
 	_action_buttons["skirmish"].disabled = not trained or int(squad.get("alive", 0)) <= 0 or bool(encounter.get("active", false)) or bool(progress.get("skirmish_won", false)) or ended
+	if Childhood.enabled(state):
+		for key in ["build", "train", "recruit", "skirmish"]:
+			_action_buttons[key].hide()
 	if bool(encounter.get("active", false)):
 		var remaining := 0
 		for enemy in encounter.get("enemies", []):
@@ -556,6 +571,9 @@ func show_frontier_dialog(dialog: Dictionary) -> void:
 		var available := bool(entry.get("enabled", true))
 		var button := _button(str(entry.get("label", "Antworten")), _emit.bind(action, payload), first_button == null and available, 16)
 		button.name = "FrontierChoice_" + choice_id
+		if entry.has("command"):
+			button.set_meta("village_command", str(entry.command))
+			button.set_meta("village_args", entry.get("payload", {}).duplicate(true))
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.custom_minimum_size.y = 52
 		button.disabled = not available
@@ -589,6 +607,24 @@ func show_village_panel(state: Dictionary, tab := "overview") -> void:
 	clear_notification()
 	_state = state.duplicate(true)
 	VillagePanel.show(self, state, tab)
+
+
+func update_navigation(value: Dictionary) -> void:
+	if _view_state == "game" and is_instance_valid(_navigation):
+		_navigation.update_view(value)
+
+
+func select_combat_technique(id: String) -> void:
+	if CombatActions.available(_state, id):
+		_selected_technique = id
+		_update_combat_controls()
+
+
+func show_combat_palette(state: Dictionary) -> void:
+	if _view_state != "game":
+		return
+	_state = state.duplicate(true)
+	_show_technique_menu()
 
 
 func clear_notification() -> void:
@@ -825,10 +861,28 @@ func _build_top_bar() -> void:
 				child.custom_minimum_size.y = 48
 
 
+func _build_navigation() -> void:
+	if not Childhood.enabled(_state):
+		return
+	_navigation = Navigation.new()
+	_navigation.name = "VillageCompass"
+	_navigation.size = Vector2(158, 148)
+	_navigation.position = Vector2(24, 110)
+	if _touch_enabled:
+		var extent := _content_size()
+		if extent.y < 470:
+			_navigation.size = Vector2(128, 110)
+			_navigation.position = Vector2((extent.x - _navigation.size.x) * 0.5, 124)
+		else:
+			_navigation.size.y = minf(148, extent.y - 88 - 196 - 92 - 12)
+			_navigation.position = Vector2(extent.x - _navigation.size.x - 16, 92)
+	_screen.add_child(_navigation)
+
+
 func _build_objective_card() -> void:
 	var panel := _panel(true)
 	panel.name = "ObjectiveCard"
-	panel.position = Vector2(24, 110)
+	panel.position = Vector2(196, 110) if Childhood.enabled(_state) and not _touch_enabled else Vector2(24, 110)
 	panel.size = Vector2(272, 150) if _compact_layout else Vector2(300, 180)
 	var minimal_touch := _touch_enabled and _content_size().y < 470
 	if _touch_enabled:
@@ -1128,9 +1182,17 @@ func _touch_action(action: String) -> void:
 		"techniques": _show_technique_menu()
 		"pace":
 			_running = not _running
+			_state["running"] = _running
 			_update_pace_caption()
 			_emit("movement_pace", {"running": _running})
 		_: _emit(action)
+
+
+func _sync_pace_from_state(state: Dictionary) -> void:
+	if state.has("running"):
+		_running = bool(state.running)
+	elif state.get("world_id", "") != _state.get("world_id", ""):
+		_running = false
 
 
 func _update_pace_caption() -> void:
@@ -1467,6 +1529,9 @@ func _objective(state: Dictionary) -> Array[String]:
 	var stage := String(progress.get("stage", "prologue"))
 	if stage == "fallen":
 		return ["Dein Weg ist zu Ende", "Du bist im Kampf gefallen. Im Menü kannst du einen gespeicherten Stand laden oder ein neues Leben beginnen."]
+	if Childhood.enabled(state):
+		var childhood: Dictionary = state.get("childhood_view", Childhood.view(state))
+		return [str(childhood.get("title", "Ein Morgen zu Hause")), str(childhood.get("objective", "Sprich mit deiner Mutter vor dem Haus."))]
 	var village: Dictionary = state.get("village_view", {})
 	if state.get("village", {}).get("enabled", false):
 		var has_roof := false

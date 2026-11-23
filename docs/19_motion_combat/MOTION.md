@@ -38,6 +38,13 @@ Technik-IDs: `jab_left`, `jab_right`, `hook_left`, `hook_right`, `uppercut_left`
 
 ## Nachweise
 
+Die Studioaufnahmen und der folgende Vorher-/Nachher-Kostenvergleich wurden
+für den ersten Chat-A-Stand `5d95676626d8eeee5589973603cb1da523ca4970` erstellt.
+Sie sind keine neue grafische Abnahme des Familienanfangs. Die später erneut
+ausgeführten 344 Rig-, 222 Figuren- und 109 kombinierten Bewegungs-/Leihchecks
+stehen unter `evidence/integration/`; aktuelle Routenergebnisse werden getrennt
+mit ihren eigenen Quellen und Bildern ausgewiesen.
+
 `evidence/motion/before/` enthält den tatsächlichen alten Stand, `after/` den neuen. Die fünf gemeinsamen Ansichten verwenden dasselbe Asset und exakt dieselbe Kamera. In `after/` liegen zusätzlich alle zehn Techniken, eine Faustnahaufnahme und vier LOD-Ansichten. `character-motion.mp4` enthält acht Sekunden reproduzierbare Engine-Aufnahmen mit 1,45 m/s Gehphase, 3,8 m/s Laufphase und zeitlich abgestimmten Techniken. Das ist ein Studio mit zentrierter Figur, kein Android-Gerätetest und kein gemessener FPS-Nachweis.
 
 Tatsächlich erfolgreiche Prüfungen:

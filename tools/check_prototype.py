@@ -50,6 +50,7 @@ def run_check(engine, name, arguments, marker, environment, report):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--godot", default="godot")
+    parser.add_argument("--keep-going", action="store_true", help="Collect every check result; any failed check still fails the run.")
     parser.add_argument("--report", type=Path, default=ROOT / "docs/10_development/evidence")
     args = parser.parse_args()
     engine = shutil.which(args.godot)
@@ -70,11 +71,16 @@ def main():
             ("village_economy", ["--script", "res://tests/village_economy_test.gd"], "VILLAGE_ECONOMY_PASS"),
             ("village_life", ["--script", "res://tests/village_life_test.gd"], "VILLAGE_LIFE_PASS"),
             ("village_model", ["--script", "res://tests/village_model_test.gd"], "VILLAGE_MODEL_PASS"),
+            ("village_childhood", ["--script", "res://tests/village_childhood_test.gd"], "VILLAGE_CHILDHOOD_PASS"),
+            ("unarmed_combat", ["--script", "res://tests/unarmed_combat_test.gd"], "UNARMED_COMBAT_PASS"),
+            ("childhood_integration", ["--fixed-fps", "60", "--script", "res://tests/childhood_integration_test.gd"], "CHILDHOOD_INTEGRATION_PASS"),
             ("world_stream_plan", ["--script", "res://tests/world_stream_plan_test.gd"], "failures=0"),
             ("regional_terrain", ["--fixed-fps", "60", "--script", "res://tests/regional_terrain_test.gd"], "failures=0"),
             ("frontier_story", ["--script", "res://tests/frontier_story_test.gd"], "FRONTIER_STORY_PASS"),
             ("frontier_people", ["--fixed-fps", "60", "--script", "res://tests/frontier_people_test.gd"], "FRONTIER_PEOPLE_PASS"),
             ("frontier_population", ["--fixed-fps", "60", "--script", "res://tests/frontier_population_test.gd"], "FRONTIER_POPULATION_OK"),
+            ("settlement_geometry", ["--fixed-fps", "60", "--script", "res://tests/settlement_geometry_test.gd"], "SETTLEMENT_GEOMETRY_PASS"),
+            ("village_collision", ["--fixed-fps", "60", "--script", "res://tests/village_collision_test.gd"], "VILLAGE_COLLISION_PASS"),
             ("frontier_integration", ["--fixed-fps", "60", "--script", "res://tests/frontier_integration_test.gd"], "FRONTIER_INTEGRATION_PASS"),
             ("village_experience", ["--fixed-fps", "60", "--script", "res://tests/village_experience_test.gd"], "VILLAGE_EXPERIENCE_PASS"),
             ("village_panels", ["--fixed-fps", "60", "--script", "res://tests/village_panel_test.gd"], "VILLAGE_PANEL_PASS"),
@@ -95,6 +101,8 @@ def main():
             ("soldier_gait", ["--fixed-fps", "60", "--script", "res://tests/soldier_gait_test.gd"], "failures=0"),
             ("village_people", ["--fixed-fps", "60", "--script", "res://tests/village_person_test.gd"], "checks, 0 failed"),
             ("character_motion", ["--fixed-fps", "60", "--script", "res://tests/character_motion_test.gd"], "checks; 0 failed;"),
+            ("natural_motion", ["--fixed-fps", "60", "--script", "res://tests/natural_motion_test.gd"], "checks, 0 failed"),
+            ("village_static_art", ["--script", "res://tests/village_static_art_test.gd"], "checks, 0 failed"),
             ("hero_faces", ["--fixed-fps", "60", "--script", "res://tests/hero_face_test.gd"], "checks, 0 failed"),
             ("village_scenery", ["--script", str(ROOT / "art/village/verify.gd")], "VILLAGE_SCENERY errors []"),
             ("atrium", ["--script", str(ROOT / "art/architecture/verify_atrium.gd")], "ATR_VISUAL errors []"),
@@ -112,11 +120,11 @@ def main():
                 environment[variable] = str(location)
             record = run_check(engine, name, arguments, marker, environment, report)
             records.append(record)
-            if not record["passed"]:
+            if not record["passed"] and not args.keep_going:
                 break
     source_hashes = {}
     for path in sorted(PROJECT.rglob("*")):
-        if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".tscn", ".godot", ".glb", ".res", ".wav", ".json", ".webp", ".jpg"}:
+        if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".glb", ".res", ".wav", ".json", ".webp", ".jpg"}:
             source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
     result = {"engine": version, "passed": len(records) == len(checks) and all(item["passed"] for item in records),
               "renderer": "headless/dummy; no graphical FPS or screenshot claim",

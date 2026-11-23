@@ -3,6 +3,7 @@
 import base64
 import importlib.util
 import json
+import math
 from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch
@@ -479,6 +480,134 @@ class ActionRuntimeObservationTest(unittest.TestCase):
                 with self.assertRaises(RuntimeError):
                     SMOKE.observed_movement_points(control)
 
+
+
+def childhood_snapshot(**changes):
+    result = action_snapshot(camera_yaw=0.0)
+    result["controls"]["move_pad"] = movement_pad()
+    result["controls"]["move_pad"]["axis_points"]["down"] = [210.0, 434.0]
+    child = {"version": 1, "world_id": "observed-family-world", "age": 12, "day": 1,
+             "stage": "mother_morning", "completed": [], "carried": [],
+             "target_npc": "antonia", "target_point": "", "target_position": [-15.3, 14.8],
+             "target_radius": 3.2, "family_entrance": [-13.0, 14.7], "family_water": [-12.0, 11.7],
+             "dialog_npc": ""}
+    child.update(changes)
+    result["childhood_runtime"] = child
+    return result
+
+
+class ChildhoodRuntimeObservationTest(unittest.TestCase):
+    def test_exported_childhood_uses_family_route_with_the_existing_action_controls(self):
+        entries = ["assets/scripts/story/village_life.gdc",
+                   "assets/scripts/story/village_childhood.gd.remap",
+                   "assets/scripts/ui/touch_look.gdc",
+                   "assets/scripts/domain/combat_actions.gdc"]
+        self.assertEqual(SMOKE.apk_runtime_features(entries),
+                         {"village_life": True, "childhood": True, "action_controls": True})
+
+    def test_legacy_village_apk_remains_a_distinct_route(self):
+        features = SMOKE.apk_runtime_features(["assets/scripts/story/village_life.gdc",
+                                               "assets/scripts/story/village_childhood_backup.gdc"])
+        self.assertTrue(features["village_life"])
+        self.assertFalse(features["childhood"])
+        self.assertFalse(features["action_controls"])
+
+    def test_missing_or_invalid_family_contract_cannot_be_reported_as_a_fresh_start(self):
+        for value in ({}, {"childhood_runtime": {}}, childhood_snapshot(version=True),
+                      childhood_snapshot(version=2), childhood_snapshot(world_id="")):
+            with self.subTest(value=value):
+                with self.assertRaises(RuntimeError):
+                    SMOKE.childhood_runtime_state(value)
+
+    def test_family_observation_keeps_real_item_ids_and_completed_order(self):
+        state = childhood_snapshot(stage="father_morning",
+                                   completed=["mother_morning", "fill_water"],
+                                   carried=["household_coin", "water_jug"])
+        actual = SMOKE.childhood_runtime_state(state)
+        self.assertEqual(actual["completed"], ["mother_morning", "fill_water"])
+        self.assertEqual(actual["carried"], ["household_coin", "water_jug"])
+        self.assertEqual(actual["age"], 12)
+
+    def test_inconsistent_family_geometry_and_duplicates_are_rejected(self):
+        changes = [{"age": True}, {"day": 0}, {"target_position": [True, 1]},
+                   {"target_position": [float("nan"), 1]}, {"family_water": [1]},
+                   {"target_radius": float("inf")}, {"target_radius": 0},
+                   {"completed": ["mother_morning", "mother_morning"]},
+                   {"carried": ["water_jug", "water_jug"]}, {"dialog_npc": None}]
+        for change in changes:
+            with self.subTest(change=change):
+                with self.assertRaises(RuntimeError):
+                    SMOKE.childhood_runtime_state(childhood_snapshot(**change))
+
+    def test_native_walk_point_uses_live_pad_translation_and_world_direction(self):
+        point, distance = SMOKE.observed_walk_point(childhood_snapshot(), [5.0, 9.0])
+        self.assertEqual(point, [274.0, 370.0])
+        self.assertEqual(distance, 3.0)
+
+    def test_native_walk_direction_is_relative_to_actual_camera_yaw(self):
+        state = childhood_snapshot()
+        state["action_runtime"]["camera_yaw"] = math.pi / 2
+        point, distance = SMOKE.observed_walk_point(state, [5.0, 9.0])
+        self.assertAlmostEqual(point[0], 210.0)
+        self.assertAlmostEqual(point[1], 434.0)
+        self.assertEqual(distance, 3.0)
+
+    def test_native_walk_has_no_guessed_camera_or_axis_fallback(self):
+        for invalid_yaw in (None, True, float("nan")):
+            state = childhood_snapshot()
+            state["action_runtime"]["camera_yaw"] = invalid_yaw
+            with self.assertRaises(RuntimeError):
+                SMOKE.observed_walk_point(state, [5.0, 9.0])
+        state = childhood_snapshot()
+        del state["controls"]["move_pad"]["axis_points"]["down"]
+        with self.assertRaises(RuntimeError):
+            SMOKE.observed_walk_point(state, [5.0, 9.0])
+
+    def test_native_walk_rejects_invalid_waypoints_and_centers_at_destination(self):
+        for target in ([True, 9], [float("inf"), 9], [2]):
+            with self.subTest(target=target):
+                with self.assertRaises(RuntimeError):
+                    SMOKE.observed_walk_point(childhood_snapshot(), target)
+        point, distance = SMOKE.observed_walk_point(childhood_snapshot(), [2.0, 9.0])
+        self.assertEqual(point, (210.0, 370.0))
+        self.assertEqual(distance, 0.0)
+
+
+class ObservedVillageScrollTest(unittest.TestCase):
+    def test_ci27_aelia_above_viewport_gets_a_bounded_downward_correction(self):
+        # Coordinates from the failed real Android run, not a claimed device test.
+        control = {"enabled": True, "visible": False, "center": [728.625, -276.75]}
+        scroll = {"top": [682.56, 162.0], "bottom": [682.56, 399.6], "offset": 1497}
+        start, end = SMOKE.observed_scroll_gesture(control, scroll)
+        self.assertEqual(start[0], 682.56)
+        self.assertEqual(end[0], 682.56)
+        self.assertGreater(end[1], start[1])
+        self.assertLessEqual(end[1] - start[1], (399.6 - 162.0) * 0.35 + 1e-9)
+        self.assertGreaterEqual(start[1], 162.0)
+        self.assertLessEqual(end[1], 399.6)
+
+    def test_below_viewport_reverses_direction_without_leaving_visible_scroll_band(self):
+        scroll = {"top": [100.0, 200.0], "bottom": [100.0, 400.0]}
+        start, end = SMOKE.observed_scroll_gesture({"enabled": True, "center": [200.0, 900.0]}, scroll)
+        self.assertLess(end[1], start[1])
+        self.assertGreaterEqual(end[1], 200.0)
+        self.assertLessEqual(start[1], 400.0)
+
+    def test_missing_or_nonfinite_scroll_geometry_cannot_generate_a_gesture(self):
+        control = {"enabled": True, "center": [200.0, -20.0]}
+        for scroll in ({}, {"top": [100, 200], "bottom": [100, 200]},
+                       {"top": [100, float("nan")], "bottom": [100, 400]}):
+            with self.subTest(scroll=scroll):
+                with self.assertRaises(RuntimeError):
+                    SMOKE.observed_scroll_gesture(control, scroll)
+
+    def test_scrolling_waits_for_settled_coordinates_even_while_target_is_clipped(self):
+        first = {"enabled": True, "visible": False, "center": [728.625, -276.75], "instance_id": "aelia"}
+        moving = {**first, "center": [728.625, -200.0]}
+        read = Mock(side_effect=[first, moving, moving])
+        result = SMOKE.wait_for_stable_village_control(read, require_visible=False, max_observations=3)
+        self.assertEqual(result, moving)
+        self.assertEqual(read.call_count, 3)
 
 
 if __name__ == "__main__":

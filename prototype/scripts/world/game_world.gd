@@ -8,6 +8,7 @@ const Grove = preload("res://scripts/visuals/grove.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 const VillageLifeWorld = preload("res://scripts/world/village_life_world.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
+const Childhood = preload("res://scripts/story/village_childhood.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
@@ -41,6 +42,7 @@ const PLOT_MAX := Vector2(24, 13)
 var _state: Dictionary = {}
 var _materials: Dictionary = {}
 var _active := false
+var _running := false
 var _built := false
 var _mode := "person"
 var _build_mode := false
@@ -92,7 +94,6 @@ var _enemy_views: Dictionary = {}
 var _squad_views: Array[Node3D] = []
 var _frontier_focus := ""
 var _frontier_camera_direction := Vector3.BACK
-var _running := false
 var _turn_rate := 0.0
 var _touch_camera_managed := false
 var _actions = PlayerActionWorld.new(self)
@@ -114,6 +115,7 @@ func setup(state: Dictionary) -> void:
 	set_build_mode(false)
 	_reset_touch_input()
 	_resolve_requested = false
+	_running=false
 	_attack_cooldown = 0.0
 	_enemy_attack_cooldown = 1.3
 	var person_data: Dictionary = state.get("player", {})
@@ -146,6 +148,15 @@ func setup(state: Dictionary) -> void:
 func sync_state(state: Dictionary) -> void:
 	_build_scene()
 	_state = state
+	# Keep nearby interaction text compact; large 3D labels can cover the map.
+	_hint.font_size = 28
+	_hint.pixel_size = 0.0019
+	_hint.outline_size = 3
+	var inner := get_node_or_null("FrontierVillage/InnerLegacyPalisade")
+	if inner != null:
+		inner.visible=not bool(state.get("village",{}).get("enabled",false))
+		for body in inner.find_children("*","StaticBody3D",true,false):
+			body.collision_layer=1 if inner.visible else 0
 	opening_props.sync_state(state)
 	village_life_world.sync_state(state, _quality_profile)
 	var mentor := get_node_or_null("TrainingGround/Mentor")
@@ -168,6 +179,7 @@ func sync_state(state: Dictionary) -> void:
 	var player_data: Dictionary = _state.get("player", {})
 	var age := int(player_data.get("age", 12))
 	_figure.configure("player",_state.get("origin_id","italia"),age)
+	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -184,6 +196,8 @@ func sync_state(state: Dictionary) -> void:
 	var trained := bool(progress.get("training_complete", false))
 	var hits := int(progress.get("training_hits", 0))
 	_training_label.text = "Übungsplatz\nAusbildung bestanden" if trained else "Übungsplatz · E\nTreffer %d / 3" % hits
+	if CombatActions.enabled(state):
+		_training_label.text="Übungspfahl · Fausttechniken\n%d kontrollierte Treffer"%int(state.village.unarmed.practice_hits)
 	var encounter: Dictionary = _state.get("encounter", {})
 	if not bool(encounter.get("active", false)):
 		_resolve_requested = false
@@ -382,6 +396,37 @@ func _apply_quality() -> void:
 
 func set_touch_move(axis: Vector2) -> void:
 	_touch_move = axis.limit_length(1.0) if _active else Vector2.ZERO
+
+
+func is_running() -> bool:
+	return _running
+
+
+func combat_line_clear(from: Vector2, to: Vector2) -> bool:
+	return combat_sight_clear(from, to)
+
+
+func perform_unarmed(technique: String) -> void:
+	perform_attack(technique)
+
+
+func cue_unarmed(technique: String) -> void:
+	_figure.cue_unarmed(technique)
+
+
+func navigation_view() -> Dictionary:
+	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false}
+	if not Childhood.enabled(_state):
+		return result
+	var chapter:=Childhood.view(_state)
+	var target: Variant=chapter.get("point",null)
+	var npc:=str(chapter.get("target_npc",""))
+	if not npc.is_empty() and VillageLife.has_npc(_state,npc):
+		target=VillageLife.actor_position(_state,npc)
+	if typeof(target)==TYPE_VECTOR2:
+		result["target"]=target
+		result.has_target=true
+	return result
 
 
 func perform_interaction() -> void:
@@ -620,6 +665,10 @@ func _create_village() -> void:
 func _create_palisade(parent: Node3D) -> void:
 	# The southern enclosure still protects the existing personal building plot.
 	# Its old northern wall is opened toward the new civic and residential quarter.
+	var inner:=Node3D.new()
+	inner.name="InnerLegacyPalisade"
+	parent.add_child(inner)
+	parent=inner
 	for z: float in [18.0]:
 		var poses := []
 		for index in range(34):
@@ -688,7 +737,7 @@ func _create_player() -> void:
 	_player.name = "Player"
 	_player.position = Vector3(0, 1, 8)
 	_player.collision_layer = 2
-	_player.collision_mask = 1
+	_player.collision_mask = 1 | 4 | 8
 	_player.floor_snap_length = 0.25
 	var shape := CollisionShape3D.new()
 	var capsule := CapsuleShape3D.new()
@@ -867,6 +916,15 @@ func _add_finished_hut_collision(building: Node3D) -> void:
 	var collision := Node3D.new()
 	collision.name = "FinishedCollision"
 	building.add_child(collision)
+	Art.box_collider(collision,Vector3(3.7,.14,3.5),Vector3(0,.07,0))
+	var ramp:=StaticBody3D.new()
+	ramp.name="EntranceRamp"
+	collision.add_child(ramp)
+	var ramp_shape:=CollisionShape3D.new()
+	var hull:=ConvexPolygonShape3D.new()
+	hull.points=PackedVector3Array([Vector3(-.55,0,1.55),Vector3(.55,0,1.55),Vector3(-.55,.14,1.55),Vector3(.55,.14,1.55),Vector3(-.55,0,2.35),Vector3(.55,0,2.35)])
+	ramp_shape.shape=hull
+	ramp.add_child(ramp_shape)
 	Art.box_collider(collision, Vector3(0.22, 2.25, 3.7), Vector3(-1.9, 1.18, 0))
 	Art.box_collider(collision, Vector3(0.22, 2.25, 3.7), Vector3(1.9, 1.18, 0))
 	Art.box_collider(collision, Vector3(3.7, 2.25, 0.22), Vector3(0, 1.18, -1.8))
@@ -995,6 +1053,8 @@ func _physics_process(delta: float) -> void:
 	elif _mode == "city" and not _build_mode:
 		_pan_city_camera(delta)
 	_animate_figure()
+	if Childhood.enabled(_state) and not str(_state.village.childhood.active_work).is_empty():
+		_figure.keep_working()
 	var frontier: Dictionary = _state.get("frontier",{})
 	var wagon_work: bool = int(frontier.get("step",0)) == 2 and frontier.get("preparation","") == "work" and float(frontier.get("work_seconds",0)) < 12.0 and _horizontal_distance(_player.position,Vector3(3,0,24)) <= 3.0
 	if wagon_work:
@@ -1317,6 +1377,13 @@ func _handle_touch_drag(event: InputEventScreenDrag) -> void:
 func _interact() -> void:
 	if _mode != "person":
 		return
+	if Childhood.enabled(_state):
+		var at:=Vector2(_player.position.x,_player.position.z)
+		for item: Dictionary in Childhood.interactables(_state):
+			if at.distance_to(item.point)<=float(item.radius):
+				_figure.cue("gather")
+				action_requested.emit(item.command,item.payload)
+				return
 	if _state.get("village", {}).get("enabled", false):
 		var raid: Dictionary = _state.village.raid
 		var point := Vector2(_player.position.x, _player.position.z)
@@ -1356,7 +1423,7 @@ func _interact() -> void:
 		_figure.cue("gather")
 		action_requested.emit("gather", {"node_id": closest_id})
 	elif _horizontal_distance(_player.position, TRAINING_LOCATION) <= INTERACTION_RADIUS:
-		action_requested.emit("train", {})
+		action_requested.emit("combat_palette" if Childhood.enabled(_state) else "train", {})
 	elif _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS:
 		_companion.get_node("Figure").cue("talk")
 		action_requested.emit("companion_interact", {})
@@ -1466,6 +1533,15 @@ func _update_context_hint() -> void:
 	_hint.text = ""
 	if not _hint.visible:
 		return
+	if Childhood.enabled(_state):
+		var at:=Vector2(_player.position.x,_player.position.z)
+		for item: Dictionary in Childhood.interactables(_state):
+			if at.distance_to(item.point)<=float(item.radius):
+				_hint.text=str(item.label)
+				return
+		if at.distance_to(CombatActions.PRACTICE_POINT)<2.4:
+			_hint.text="Am Pfahl üben\nTechniken wählen"
+			return
 	if village_life_world != null:
 		var village_hint: String = village_life_world.hint(_player.position)
 		if not village_hint.is_empty():

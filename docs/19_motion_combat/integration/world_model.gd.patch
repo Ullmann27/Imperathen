@@ -1,19 +1,22 @@
 diff --git a/prototype/scripts/domain/world_model.gd b/prototype/scripts/domain/world_model.gd
-index cfe78a8..4d887ae 100644
+index 9eb2a5c..b8bc0a0 100644
 --- a/prototype/scripts/domain/world_model.gd
 +++ b/prototype/scripts/domain/world_model.gd
-@@ -11,6 +11,7 @@ const Origins = preload("res://scripts/strategy/origins.gd")
+@@ -11,8 +11,8 @@ const Origins = preload("res://scripts/strategy/origins.gd")
  const Frontier = preload("res://scripts/story/frontier_chapter.gd")
  const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
  const VillageLife = preload("res://scripts/story/village_life.gd")
 +const CombatActions = preload("res://scripts/domain/combat_actions.gd")
+ const Childhood = preload("res://scripts/story/village_childhood.gd")
+-const Combat = preload("res://scripts/domain/unarmed_combat.gd")
  const SCHEMA_VERSION := 5
  const SAVE_FORMAT := "imperathen-offline-save"
  const MAX_SAVE_BYTES := 2097152
-@@ -36,13 +37,15 @@ const COMMAND_FIELDS := {
+@@ -38,14 +38,15 @@ const COMMAND_FIELDS := {
  }
  
  var data: Dictionary = {}
+-var combat_sight_check := Callable()
 +var combat_sight_check: Callable
 +var combat_motion_check: Callable
  
@@ -22,29 +25,40 @@ index cfe78a8..4d887ae 100644
  	new_game()
  
  
--func new_game(origin_id := "italia", extended_village := false) -> void:
-+func new_game(origin_id := "italia", extended_village := false, action_combat := false) -> void:
+-func new_game(origin_id := "italia", extended_village := false, childhood_enabled := false) -> void:
++func new_game(origin_id := "italia", extended_village := false, childhood_enabled := false, action_combat := false) -> void:
  	if not Origins.PEOPLES.has(origin_id):
  		origin_id = "italia"
  	var origin: Dictionary = Origins.PEOPLES[origin_id]
-@@ -72,6 +75,8 @@ func new_game(origin_id := "italia", extended_village := false) -> void:
- 	data.village.enabled = extended_village and origin_id == "italia"
- 	data.village.health_delta = 0
+@@ -77,7 +78,6 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
  	data.village.militia = []
-+	if data.village.enabled and action_combat:
+ 	if data.village.enabled and childhood_enabled:
+ 		Childhood.start(data)
+-		Combat.start(data)
+ 		for place: Dictionary in data.village.economy.workplaces.values():
+ 			place.condition = 100
+ 		for person: Dictionary in data.village.economy.people:
+@@ -90,6 +90,10 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
+ 		data.story.title = "Ein Morgen zu Hause"
+ 		data.story.text = "Deine Familie und das Dorf sind schon da. Geh zu deiner Mutter vor dem Haus. Heute beginnt deine Geschichte mit den Menschen, die dich kennen."
+ 		data.chronicle = [{"time":0.0,"text":"Du bist zwölf. In Valdora beginnt ein gewöhnlicher Morgen zwischen Familie, Handwerk und Markt."}]
++	# The third argument retains the family chapter's published contract.
++	# An explicit fourth argument also enables modern combat in legacy careers.
++	if data.village.enabled and (childhood_enabled or action_combat):
 +		CombatActions.start(data)
  	changed.emit()
  
  
-@@ -79,6 +84,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
+@@ -97,7 +101,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
  	var command_fields: Dictionary = COMMAND_FIELDS.duplicate()
  	command_fields.merge(VillageEconomy.COMMAND_FIELDS)
  	command_fields.merge(VillageLife.COMMAND_FIELDS)
+-	command_fields.merge(Combat.COMMAND_FIELDS)
 +	command_fields.merge(CombatActions.COMMAND_FIELDS)
  	if not command_fields.has(command):
  		return _fail("Unbekannter Spielbefehl: %s" % command)
  	if not _exact_keys(args, command_fields[command]):
-@@ -131,6 +137,12 @@ func set_player_position(position: Vector3) -> void:
+@@ -150,6 +154,12 @@ func set_player_position(position: Vector3) -> void:
  	# The renderer already owns this observed movement. Avoid rebuilding UI per step.
  
  
@@ -57,7 +71,15 @@ index cfe78a8..4d887ae 100644
  func advance(delta: float) -> void:
  	if not is_finite(delta) or delta <= 0.0 or delta > 3600.0 or data.is_empty():
  		return
-@@ -158,7 +170,12 @@ func advance(delta: float) -> void:
+@@ -164,7 +174,6 @@ func advance(delta: float) -> void:
+ 	if candidate.village.enabled:
+ 		# All ongoing systems share the actual life-tick boundaries. Resources
+ 		# produced before an alarm remain valid; an attack cannot cancel earlier work.
+-		Combat.advance(candidate, delta, combat_sight_check)
+ 		Childhood.advance(candidate, delta)
+ 		var remaining := delta
+ 		while remaining > 0.0:
+@@ -179,7 +188,12 @@ func advance(delta: float) -> void:
  			var previous_health := int(candidate.player.health)
  			if not VillageEconomy.advance(candidate, step):
  				return
@@ -71,7 +93,7 @@ index cfe78a8..4d887ae 100644
  			candidate.village.health_delta += int(candidate.player.health) - previous_health
  			remaining = maxf(0.0, remaining - step)
  		notify_ui = true
-@@ -317,7 +334,50 @@ func get_frontier_objective() -> Dictionary:
+@@ -338,7 +352,50 @@ func get_frontier_objective() -> Dictionary:
  	return Frontier.objective(data)
  
  
@@ -122,7 +144,16 @@ index cfe78a8..4d887ae 100644
  	if command.begins_with("village_"):
  		if not state.village.enabled:
  			return _fail("Dieser Lebensweg verwendet den bisherigen regionalen Dorfabschnitt.")
-@@ -410,22 +470,7 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
+@@ -350,8 +407,6 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
+ 		var previous_health := int(state.player.health)
+ 		if VillageEconomy.COMMAND_FIELDS.has(command):
+ 			village_result = VillageEconomy.execute(state, command, args)
+-		elif Combat.COMMAND_FIELDS.has(command):
+-			village_result = Combat.execute(state, command, args)
+ 		else:
+ 			village_result = VillageLife.execute(state, command, args)
+ 		state.village.health_delta += int(state.player.health) - previous_health
+@@ -441,22 +496,7 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
  			_set_story(state, "Sechs Jahre später", "Du bist jetzt 18. Übe am Ziel drei kontrollierte Treffer. Abstand und Erholung zählen.")
  			return _ok("Sechs Jahre später: Die erwachsene Ausbildung beginnt.")
  		"training_hit":
@@ -146,7 +177,7 @@ index cfe78a8..4d887ae 100644
  		"recruit":
  			if not state.progress.training_complete:
  				return _fail("Beende zuerst die erwachsene Ausbildung.")
-@@ -497,6 +542,14 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
+@@ -528,6 +568,14 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
  			if float(state.timers.damage) > 0.000001:
  				return _fail("Dieser gegnerische Angriff wurde bereits berücksichtigt.")
  			state.timers.damage = DAMAGE_COOLDOWN
@@ -161,16 +192,23 @@ index cfe78a8..4d887ae 100644
  			var actual := mini(int(args.amount), int(state.player.health))
  			state.player.health = int(state.player.health) - actual
  			state.encounter.damage_taken = int(state.encounter.damage_taken) + actual
-@@ -565,6 +618,8 @@ func _resolve_skirmish(state: Dictionary) -> Dictionary:
+@@ -596,12 +644,9 @@ func _resolve_skirmish(state: Dictionary) -> Dictionary:
  
  
  func _validate_arguments(command: String, args: Dictionary) -> String:
+-	if command == "village_unarmed_attack":
+-		if not _text(args.technique,1,32) or not Combat.TECHNIQUES.has(args.technique) or not _text(args.target_id,1,64):
+-			return "Ungültige Nahkampftechnik oder Zielkennung."
+-		if not _number(args.facing_x,-1.0,1.0) or not _number(args.facing_z,-1.0,1.0):
+-			return "Ungültige Blickrichtung."
+-	elif command.begins_with("village_"):
 +	if CombatActions.COMMAND_FIELDS.has(command):
 +		return CombatActions.validate_arguments(command, args)
- 	if command.begins_with("village_"):
++	if command.begins_with("village_"):
  		# Reject NaN and foreign types before JSON fingerprinting, not only in
  		# the subordinate command handler after the replay record was prepared.
-@@ -616,6 +671,11 @@ func _validate_state(state: Variant) -> String:
+ 		for key in args:
+@@ -652,15 +697,17 @@ func _validate_state(state: Variant) -> String:
  		return "Die persönliche Dorfmiliz ist ungültig."
  	if state.village.enabled and state.origin_id != "italia":
  		return "Der römische Dorfabschnitt passt nicht zur Herkunft."
@@ -182,7 +220,16 @@ index cfe78a8..4d887ae 100644
  	var economy_error := VillageEconomy.validate(state)
  	if not economy_error.is_empty():
  		return economy_error
-@@ -894,6 +954,9 @@ func _restore_integer_fields(state: Dictionary) -> void:
+ 	var life_error := VillageLife.validate(state)
+ 	if not life_error.is_empty():
+ 		return life_error
+-	var combat_error := Combat.validate(state)
+-	if not combat_error.is_empty():
+-		return combat_error
+ 	if float(state.village.social.accumulator) >= VillageLife.STEP + 0.00000001:
+ 		return "Die Dorfzeit enthält einen nicht abgearbeiteten Zeitsprung."
+ 	var economic_seconds := int(state.village.economy.day) * VillageEconomy.day_length(state) + float(state.village.economy.day_seconds)
+@@ -933,6 +980,9 @@ func _restore_integer_fields(state: Dictionary) -> void:
  	for key in state.command_log:
  		state.command_log[key].result.revision = int(state.command_log[key].result.revision)
  	state.village.health_delta = int(state.village.health_delta)
@@ -192,7 +239,17 @@ index cfe78a8..4d887ae 100644
  	var economy: Dictionary = state.village.economy
  	for key in ["version", "day", "meal_offset", "meals_served", "grain_shortfall", "patrols_completed", "repair_count"]:
  		economy[key] = int(economy[key])
-@@ -1029,6 +1092,11 @@ func _has_completed_hut(state: Dictionary) -> bool:
+@@ -964,9 +1014,6 @@ func _restore_integer_fields(state: Dictionary) -> void:
+ 		state.village.childhood.guard_absence.previous_health=int(state.village.childhood.guard_absence.previous_health)
+ 		for relation:Dictionary in state.village.childhood.relationships.values():
+ 			relation.trust=int(relation.trust)
+-	if Combat.enabled(state):
+-		for key in ["version","practice_hits","resolved_hits"]:
+-			state.village.unarmed[key]=int(state.village.unarmed[key])
+ 
+ 
+ func _write_file(path: String, text: String) -> Dictionary:
+@@ -1077,6 +1124,11 @@ func _has_completed_hut(state: Dictionary) -> bool:
  func _enemy_in_range(state: Dictionary, reach: float) -> bool:
  	for enemy in state.encounter.enemies:
  		if int(enemy.health) > 0 and _distance_to(state, float(enemy.x), float(enemy.z)) <= reach:

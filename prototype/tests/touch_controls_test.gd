@@ -4,6 +4,7 @@ extends SceneTree
 const UI = preload("res://scripts/ui/game_ui.gd")
 const Model = preload("res://scripts/domain/world_model.gd")
 const Combat = preload("res://scripts/domain/combat_actions.gd")
+const Childhood = preload("res://scripts/story/village_childhood.gd")
 var failures: Array[String] = []
 var checks := 0
 var events: Array[Dictionary] = []
@@ -59,6 +60,8 @@ func _run() -> void:
 	await _lifecycle()
 	await _techniques()
 	await _command_menu()
+	await _emulated_mouse_copy()
+	await _childhood_navigation()
 	# One folded layout with text scaling and a real safe rectangle.
 	root.size = Vector2i(960,720)
 	await _frames()
@@ -104,7 +107,10 @@ func _check_bounds(extent: Vector2i) -> void:
 
 func _check_controls_inside(bounds: Rect2, name: String) -> void:
 	var screen: Control = ui.get("_screen")
-	for id in ["MovementPad", "TouchActions", "TouchToolbar", "ResourceBar", "ObjectiveCard"]:
+	var names := ["MovementPad", "TouchActions", "TouchToolbar", "ResourceBar", "ObjectiveCard"]
+	if screen.has_node("VillageCompass"):
+		names.append("VillageCompass")
+	for id in names:
 		var control: Control = screen.get_node(id)
 		_check(bounds.grow(1).encloses(control.get_global_rect()), name + ": " + id + " stays inside the usable display")
 	for button: Button in ui.get("_touch_actions"):
@@ -258,6 +264,51 @@ func _command_menu() -> void:
 	_check(probe.touches == 0, "Touching the menu backdrop never leaks into world camera handling")
 	_check(ui.handle_back() and not ui.get("_touch_menu_layer").visible, "Android Back first closes the open action menu")
 	_check(ui.get("_touch_pad").visible, "Closing the menu restores movement with a fresh contact")
+
+
+func _emulated_mouse_copy() -> void:
+	# An old synthesized mouse event can arrive after a screen rebuild. Fresh
+	# controls have no wall-clock suppression window and still must ignore it.
+	ui.show_game(_ui_state())
+	await _frames()
+	var old_emulation := Input.emulate_touch_from_mouse
+	Input.emulate_touch_from_mouse = false
+	var pad: Control = ui.get("_touch_pad")
+	events.clear()
+	for point: Vector2 in [pad.get_global_rect().get_center()+Vector2(30,0), _button("attack").get_global_rect().get_center()]:
+		for down in [true,false]:
+			var copy := InputEventMouseButton.new()
+			copy.device = InputEvent.DEVICE_ID_EMULATION
+			copy.button_index = MOUSE_BUTTON_LEFT
+			copy.pressed = down
+			copy.position = point
+			root.push_input(copy,true)
+			await process_frame
+	_check(pad.axis.is_zero_approx() and pad.touch_index == -1 and not pad._mouse_captured, "A delayed synthetic mouse copy cannot restart movement on rebuilt controls")
+	_check(_count("attack") == 0, "A delayed synthetic mouse copy cannot issue a duplicate attack")
+	Input.emulate_touch_from_mouse = old_emulation
+
+
+func _childhood_navigation() -> void:
+	model.new_game("italia", true, true)
+	_check(Childhood.enabled(model.data) and Combat.enabled(model.data), "The explicit family start retains the modern combat controls")
+	for extent: Vector2i in [Vector2i(1280,720), Vector2i(960,540), Vector2i(820,480), Vector2i(900,900), Vector2i(480,840), Vector2i(640,360)]:
+		root.size = extent
+		await _frames()
+		ui.show_game(_ui_state())
+		await _frames()
+		var screen: Control = ui.get("_screen")
+		var map: Control = screen.get_node("VillageCompass")
+		var bounds := map.get_global_rect()
+		_check(Rect2(Vector2.ZERO,Vector2(extent)).encloses(bounds), str(extent)+": north map stays inside the display")
+		for id in ["ObjectiveCard","MovementPad","TouchActions","TouchToolbar"]:
+			var control: Control = screen.get_node(id)
+			_check(not bounds.intersects(control.get_global_rect()), str(extent)+": north map does not cover "+id)
+		var chapter := Childhood.view(model.data)
+		ui.update_navigation({"player":Vector2(-12,11.7),"has_target":true,"target":chapter.point,"heading":0.0})
+		_check(map.view.has_target and map.view.target == chapter.point, "North map receives the actual current family objective")
+	for action in ["build","train","recruit","skirmish"]:
+		_check(not ui.get("_action_buttons")[action].visible, "Childhood keeps the old adult shortcut hidden: "+action)
 
 
 func _button(action: String) -> Button:

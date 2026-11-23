@@ -14,6 +14,7 @@ const OpeningCheckpoint = preload("res://scripts/cinematic/opening_checkpoint.gd
 const VillageLife = preload("res://scripts/story/village_life.gd")
 const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
+const Childhood = preload("res://scripts/story/village_childhood.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -44,6 +45,7 @@ var pending_opening: Dictionary = {}
 var frontier_npc := ""
 var village_npc := ""
 var village_tab := "overview"
+var simulation_elapsed := 0.0
 
 
 func _ready() -> void:
@@ -90,6 +92,8 @@ func _process(delta: float) -> void:
 		return
 	if screen == "playing":
 		world.set_frontier_time(float(model.data.world_seconds))
+		if Childhood.enabled(model.data):
+			ui.update_navigation(world.navigation_view())
 		autosave_elapsed += delta
 		if autosave_elapsed >= 45.0:
 			autosave_elapsed = 0.0
@@ -105,7 +109,23 @@ func _physics_process(delta: float) -> void:
 	# Geometry queries, authoritative motion and contact windows share the
 	# physics clock. Rendering or a slow UI refresh cannot create extra hits.
 	model.set_player_position(world.get_player_position())
-	model.advance(delta)
+	if Childhood.enabled(model.data):
+		simulation_elapsed += delta
+		var fighting := CombatActions.busy(model.data) or bool(model.data.village.raid.active) or bool(model.data.encounter.active)
+		if fighting or simulation_elapsed + 0.000001 >= 0.1:
+			_flush_simulation()
+	else:
+		model.advance(delta)
+	world.sync_combat_state(model.data)
+
+
+func _flush_simulation() -> void:
+	if simulation_elapsed <= 0.0 or not is_instance_valid(world):
+		return
+	var elapsed := simulation_elapsed
+	simulation_elapsed = 0.0
+	model.set_player_position(world.get_player_position())
+	model.advance(elapsed)
 	world.sync_combat_state(model.data)
 
 
@@ -195,6 +215,9 @@ func _ui_state() -> Dictionary:
 	if state.get("village", {}).get("enabled", false):
 		state["village_view"] = VillageLife.view(model.data)
 		state["village_economy_view"] = VillageEconomy.view(model.data)
+		state["childhood_view"] = Childhood.view(model.data)
+		state["combat_view"] = CombatActions.view(model.data)
+		state["running"] = world.is_running()
 	return state
 
 
@@ -226,6 +249,7 @@ func _start_new_game() -> void:
 	_release_opening()
 	pending_opening = {}
 	model.new_game(ui.origin_id, true, true)
+	simulation_elapsed = 0.0
 	last_story_id = ""
 	world.setup(model.data)
 	session_started = true
@@ -234,13 +258,14 @@ func _start_new_game() -> void:
 	world.set_active(false)
 	var saved := _save(false)
 	if saved.get("ok", false):
-		_begin_opening(OpeningStory.sequence(str(model.data.origin_id)))
+		_begin_opening(OpeningStory.childhood() if Childhood.enabled(model.data) else OpeningStory.sequence(str(model.data.origin_id)))
 		print("IMPERATHEN_SESSION_STARTED: saved frontier world")
 	else:
 		_resume()
 
 
 func _continue_game() -> void:
+	simulation_elapsed = 0.0
 	var result: Dictionary = model.load_game(SAVE_PATH)
 	if not result.get("ok", false):
 		ui.notify(str(result.get("message", "Der Spielstand konnte nicht geladen werden.")))
@@ -287,6 +312,7 @@ func _pause() -> void:
 		return
 	if not session_started:
 		return
+	_flush_simulation()
 	screen = "paused"
 	world.set_active(false)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -297,6 +323,7 @@ func _pause() -> void:
 func _save(show_feedback: bool = true) -> Dictionary:
 	if not session_started:
 		return {"ok": false, "message": "Es läuft noch keine Partie."}
+	_flush_simulation()
 	model.set_player_position(world.get_player_position())
 	if screen == "valley" and not valley_demo:
 		model.checkpoint_valley(valley.model)
@@ -348,6 +375,9 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 		"village_unarmed_guard", "village_unarmed_dodge":
 			if screen == "playing":
 				_command(action, {})
+		"combat_palette":
+			if screen == "playing":
+				ui.show_combat_palette(_ui_state())
 		"village_panel": _show_village_panel(str(payload.get("tab", "overview")))
 		"village_command": _village_command(str(payload.get("command", "")), payload.get("args", {}))
 		"village_close": _resume()
@@ -429,6 +459,7 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 
 func _on_world_action(action: String, payload: Dictionary) -> void:
 	if action == "combat_interrupt":
+		_flush_simulation()
 		model.interrupt_combat()
 		return
 	if action == "build_mode_changed":
@@ -438,9 +469,12 @@ func _on_world_action(action: String, payload: Dictionary) -> void:
 	if screen != "playing":
 		return
 	match action:
+		"village_unarmed_attack":
+			_command(action, payload)
 		"companion_interact": _show_companion()
 		"village_npc": _show_village_npc(str(payload.get("npc_id", "")))
 		"village_panel": _show_village_panel("overview")
+		"combat_palette": _on_ui_action(action,payload)
 		"village_block", "village_dodge": _on_ui_action(action, payload)
 		"frontier_talk": _show_frontier(str(payload.get("npc_id", "")))
 		"mode_person", "mode_city", "mode_map": _on_ui_action(action, payload)
@@ -454,6 +488,7 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	var village_choice := screen in ["village_panel", "village_dialog"] and command.begins_with("village_")
 	if screen != "playing" and not chapter_choice and not village_choice:
 		return {"ok": false, "message": "Die Welt ist pausiert."}
+	_flush_simulation()
 	model.set_player_position(world.get_player_position())
 	command_serial += 1
 	var realtime_combat := CombatActions.COMMAND_FIELDS.has(command)
@@ -489,7 +524,7 @@ func _show_village_panel(tab := "overview") -> void:
 
 
 func _show_village_npc(npc_id: String) -> void:
-	if screen != "playing" or not VillageLife.NPCS.has(npc_id):
+	if screen != "playing" or not VillageLife.has_npc(model.data,npc_id):
 		return
 	model.set_player_position(world.get_player_position())
 	var at: Vector2 = VillageLife.actor_position(model.data, npc_id)
@@ -497,7 +532,7 @@ func _show_village_npc(npc_id: String) -> void:
 	if Vector2(player.x, player.z).distance_to(at) > VillageLife.RANGE:
 		ui.notify("Geh näher, um das Gespräch zu beginnen.")
 		return
-	if not model.data.village.social.npcs[npc_id].met:
+	if not VillageLife.relationship(model.data,npc_id).get("met",false):
 		var result := _command("village_talk", {"npc_id":npc_id, "choice":"meet"})
 		if not result.get("ok", false):
 			return
@@ -528,7 +563,7 @@ func _village_command(command: String, args: Dictionary) -> void:
 func _show_frontier(npc_id: String) -> void:
 	if screen != "playing":
 		return
-	var dialog: Dictionary = model.get_frontier_dialog(npc_id)
+	var dialog: Dictionary = {} if Childhood.enabled(model.data) else model.get_frontier_dialog(npc_id)
 	if dialog.is_empty():
 		var person: Dictionary = world.get_frontier_npc_info(npc_id)
 		if person.is_empty():
@@ -720,7 +755,7 @@ func _restore_opening() -> bool:
 	var checkpoint: Dictionary = OpeningCheckpoint.read(str(model.data.world_id))
 	if checkpoint.is_empty() or bool(checkpoint.completed):
 		return false
-	var sequence: Dictionary = OpeningStory.sequence(str(model.data.origin_id)) if int(model.data.player.age) < 18 else OpeningStory.adulthood(model.data)
+	var sequence: Dictionary = OpeningStory.childhood() if Childhood.enabled(model.data) else OpeningStory.sequence(str(model.data.origin_id)) if int(model.data.player.age) < 18 else OpeningStory.adulthood(model.data)
 	if sequence.is_empty() or str(sequence.id) != str(checkpoint.sequence_id):
 		return false
 	if int(checkpoint.index) > sequence.beats.size():

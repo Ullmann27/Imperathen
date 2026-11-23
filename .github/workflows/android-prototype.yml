@@ -82,7 +82,7 @@ jobs:
       - name: Run existing engine regression checks
         run: |
           python3 -m unittest discover -s tests -p 'android_*_test.py'
-          python3 tools/check_prototype.py --godot "$GODOT_BIN" --report artifacts/engine-checks
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --report artifacts/engine-checks
       - name: Export the installable ARM64 prototype
         run: |
           python3 tools/build_android_prototype.py --godot "$GODOT_BIN" --sdk-root "$ANDROID_HOME" --java-home "$JAVA_HOME_17_X64" --template-dir "$IMPERATHEN_TEMPLATE_DIR" --keystore "$RUNNER_TEMP/imperathen-debug.keystore" --keystore-user imperathen-debug --abi arm64-v8a --output "$GITHUB_WORKSPACE/artifacts/${IMPERATHEN_BUILD}-arm64.apk"

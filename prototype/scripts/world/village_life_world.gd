@@ -6,6 +6,7 @@ const Life = preload("res://scripts/story/village_life.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
 const Art = preload("res://scripts/world/village_art.gd")
+const Layout = preload("res://scripts/world/village/village_layout.gd")
 const PLACES := {"farm":Vector2(24,-30), "woodcamp":Vector2(-43,14),
 	"quarry":Vector2(48,-12), "trade":Vector2(25,24), "watchpost":Vector2(0,-48)}
 var actors: Dictionary = {}
@@ -44,9 +45,11 @@ func sync_state(data: Dictionary, profile: String) -> void:
 	quality = profile
 	visible = bool(data.get("village", {}).get("enabled", false))
 	if not visible:
+		_set_collisions(false)
 		return
 	if not _ready_scene:
 		_create()
+	_set_collisions(true)
 	var people: Array = data.village.economy.people
 	for person: Dictionary in people:
 		_sync_actor(str(person.id), str(person.name), str(person.profession), person)
@@ -59,6 +62,13 @@ func sync_state(data: Dictionary, profile: String) -> void:
 		item.repaired.visible = int(place.condition) == 100
 		item.label.modulate = Color("d8e2a8") if place.working else Color("e1c493")
 	_sync_raiders()
+
+
+func _set_collisions(enabled: bool) -> void:
+	for body: StaticBody3D in find_children("*","StaticBody3D",true,false):
+		if not body.has_meta("visible_layer"):
+			body.set_meta("visible_layer",body.collision_layer)
+		body.collision_layer = int(body.get_meta("visible_layer")) if enabled else 0
 
 
 func _create() -> void:
@@ -92,11 +102,12 @@ func _create_workplace(id: String, at: Vector2) -> void:
 	node.add_child(repaired)
 	for x in [-2.1, 2.1]:
 		for z in [-1.3, 1.3]:
-			Art.box(node, Vector3(.16,2.2,.16), Vector3(x,1.1,z), _wood)
+			Art.box(node, Vector3(.16,2.2,.16), Vector3(x,1.1,z), _wood, true)
 	Art.roof(repaired, 4.6, 3.2, 2.2, .8, _linen)
 	var broken := Art.box(damaged, Vector3(3.7,.14,.24), Vector3(0,.4,0), _wood)
 	broken.rotation.z = -.28
-	Art.box(node, Vector3(4.5,.12,2.9), Vector3(0,.04,0), _stone)
+	# The workplace apron is flush with the path, including its collision.
+	Art.box(node, Vector3(4.5,.12,2.9), Vector3(0,-.06,0), _stone, true)
 	if id == "woodcamp":
 		for index in 6:
 			var log := Art.cylinder(node, .17, 2.5, Vector3(-1.2 + (index % 3) * .4, .3 + (index / 3) * .3, .5), _wood)
@@ -116,21 +127,33 @@ func _create_workplace(id: String, at: Vector2) -> void:
 
 
 func _sync_actor(id: String, caption: String, profession: String, person: Dictionary) -> void:
+	var at: Vector2 = Life.actor_position(state, id)
 	if not actors.has(id):
-		var actor := Node3D.new()
+		var actor := StaticBody3D.new()
 		actor.name = "Resident_" + id
+		actor.position = Vector3(at.x,0,at.y)
+		actor.collision_layer = Layout.CITIZEN_LAYER
+		actor.collision_mask = 0
+		var collision := CollisionShape3D.new()
+		collision.name = "PersonalSpace"
+		var capsule := CapsuleShape3D.new()
+		capsule.radius = Layout.CITIZEN_RADIUS
+		capsule.height = 1.72
+		collision.shape = capsule
+		collision.position.y = .90
+		actor.add_child(collision)
 		add_child(actor)
 		var figure := Person.new()
 		figure.name = "Figure"
 		figure.position.y = .9
+		figure.profile = quality
 		actor.add_child(figure)
-		figure.configure("resident", "italia", 32 + actors.size() % 20)
 		var appearance := "civilian_woman" if id in ["aelia", "aurelia", "cassia", "drusa", "julia", "valeria", "antonia"] else "civilian_man"
 		if id == "severus":
 			appearance = "legionary"
 		if id == "decimus":
 			appearance = "elder"
-		figure.configure_appearance(appearance, actors.size())
+		figure.configure_resident("italia",32+actors.size()%20,appearance,actors.size(),get_viewport().get_camera_3d())
 		var label := Art.label(actor, caption + " · " + profession, Vector3(0,2.08,0), Color("efdbad"), 27)
 		label.name = "Nameplate"
 		label.pixel_size = .003
@@ -138,10 +161,11 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 		label.visibility_range_end = 6
 		label.hide()
 		actors[id] = actor
-	var actor: Node3D = actors[id]
-	var at: Vector2 = Life.actor_position(state, id)
+	var actor: StaticBody3D = actors[id]
+	actor.set_meta("display_name",caption)
 	actor.position = Vector3(at.x, 0, at.y)
 	actor.visible = bool(person.get("alive", true)) and not state.village.get("militia", []).has(id)
+	actor.collision_layer = Layout.CITIZEN_LAYER if actor.visible and visible else 0
 	actor.set_meta("assignment", person.get("assignment", "idle"))
 	var figure: Node3D = actor.get_node("Figure")
 	figure.profile = quality
@@ -215,7 +239,7 @@ func nearest(position: Vector3, radius := 3.2) -> String:
 		return ""
 	var best := ""
 	var distance := radius
-	for npc: Dictionary in Life.npc_catalog():
+	for npc: Dictionary in Life.npc_catalog(state):
 		if not actors.has(npc.id):
 			continue
 		var actor: Node3D = actors[npc.id]
@@ -264,7 +288,7 @@ func hint(position: Vector3) -> String:
 		return "Interagieren · Verletzte in Sicherheit bringen"
 	var id := nearest(position)
 	if not id.is_empty():
-		return "Interagieren · Mit %s sprechen" % Life.NPCS[id].name
+		return "Interagieren · Mit %s sprechen" % str(actors[id].get_meta("display_name",id))
 	if raid.active:
 		return "Angreifen · Blocken Q · Ausweichen R\nAusdauer %d / 100" % int(raid.stamina)
 	return ""
