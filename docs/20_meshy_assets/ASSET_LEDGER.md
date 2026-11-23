@@ -94,3 +94,16 @@ Meshy-Preview `01a20926-85e5-70be-a646-d57d40c474d0` ist eine untexturierte
 Caesar-A-Pose. Sie wird als `historical_caesar_58bce_candidate` gesichert,
 aber **nicht** unter die 28 kanonischen Assets gezählt. Vor einer Übernahme sind
 historischer Referenzvergleich, Texturpass, Rigging und echte Bildprüfung nötig.
+
+## Kanonisches Kavalleriepferd
+
+`mount_ancient_cavalry_horse` verwendet die Meshy-Preview
+`01a20934-c44a-77ea-95a7-5e2c2c804d5e`. Die 28k-Smart-Topology-Geometrie
+ist fertig und texturierbar, aber mit dem verbliebenen Guthaben nicht mehr
+texturiert worden. Sie ist deshalb kanonisch registriert, bleibt jedoch
+`geometry_ready_untextured`, `rigging_required=true` und `runtime_ready=false`.
+
+Damit umfasst der kanonische Bestand **29 Assets**: 27 texturierte Finals sowie
+zwei untexturierte Geometrien (Galena und Kavalleriepferd). Die Kavallerie wird
+nicht als verschmolzenes Modell behandelt; Reiter, Pferd, Vierhornsattel,
+Schild und Waffen sind getrennte Komponenten in `loadouts.json`.
