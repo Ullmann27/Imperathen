@@ -486,7 +486,7 @@ static func interactables(data: Dictionary) -> Array[Dictionary]:
 	if not enabled(data) or not validate(data).is_empty():
 		return result
 	var step := _current(data)
-	if not step.has("point"):
+	if not step.has("point") or step.get("id", "") == "i03_marcus":
 		return result
 	var point: Vector2 = POINTS[step.point]
 	for choice: Dictionary in _choices(data, step):
@@ -550,7 +550,7 @@ static func validate(data: Dictionary) -> String:
 		return "Hufspurbeleg benötigt einen Wahrheitswert."
 	if screenplay.i02 == "complete":
 		expected_items.erase("neighbor_basket")
-	if screenplay.i03 == "complete":
+	if screenplay.i03 == "complete" and screenplay.i03_outcome != "legacy":
 		if not data.companion.met or screenplay.i03_outcome == "friend" and data.companion.choice != "help" or screenplay.i03_outcome == "rival" and data.companion.choice != "decline":
 			return "Marcus-Beziehung und I-03 widersprechen sich."
 	elif data.companion.met:
