@@ -531,7 +531,7 @@ def childhood_snapshot(**changes):
     result["controls"]["move_pad"]["axis_points"]["down"] = [210.0, 434.0]
     child = {"version": 1, "world_id": "observed-family-world", "age": 12, "day": 1,
              "stage": "mother_morning", "completed": [], "carried": [],
-             "target_npc": "antonia", "target_point": "", "target_position": [-15.3, 14.8],
+             "target_npc": "julia", "target_point": "", "target_position": [-15.3, 14.8],
              "target_radius": 3.2, "family_entrance": [-13.0, 14.7], "family_water": [-12.0, 11.7],
              "dialog_npc": ""}
     child.update(changes)
