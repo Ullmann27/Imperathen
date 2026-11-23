@@ -23,7 +23,7 @@ permissions:
 
 concurrency:
   group: android-prototype-${{ github.ref }}
-  cancel-in-progress: ${{ startsWith(github.ref, 'refs/heads/story/canonical-bible-alignment-') }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/heads/story/canonical-bible-alignment-') || startsWith(github.ref, 'refs/heads/story/i00-aquileia-cold-open-') }}
 
 jobs:
   build-and-check:
