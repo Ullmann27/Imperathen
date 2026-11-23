@@ -8,6 +8,8 @@ Ausgangspunkt: `2909040deeb33b99ad4180b884b38921f28233a9` auf
 zurück zum Koordinatorzweig. Die alten veröffentlichten APKs sind kein
 Prüfnachweis für diese Änderungen.
 
+**Abgeschlossen:** Die [geprüfte Android-APK und ihre vollständigen Nachweise](ANDROID_DELIVERY.md) sind veröffentlicht. Der abschließende Cloudlauf zum Spielquellstand `3325a0b3` bestand 103 Python-Prüfungen, 51 Godot-Prüfgruppen und 50 Android-Laufzeitprüfungen.
+
 ## Ergebnis und neue Erzählvorgabe
 
 Eine neue römische Partie beginnt als Zwölfjähriger bei Julia und Silvanus in
@@ -179,7 +181,7 @@ Die 92 Python-Prüfungen zum Quellstand `9d90a8fe` verwenden ausdrücklich synth
 Paket- und Beobachterdaten. Das damalige Protokoll steht unter
 [evidence/android-harness](evidence/android-harness). Die nachfolgend ergänzte
 native Touchkontaktsteuerung erhält elf weitere synthetische Regressionen.
-Die insgesamt 103 Python-Fälle werden im abschließenden Cloudlauf geprüft; dessen Bericht trägt den tatsächlichen neuen
+Die insgesamt 103 Python-Fälle wurden im erfolgreichen abschließenden Cloudlauf geprüft; dessen Bericht trägt den tatsächlichen neuen
 Quellcommit. Synthetische Prüfungen ersetzen keinen APK-Lauf.
 
 Die folgenden Bilder stammen aus der tatsächlichen Godot-Engine, mit
@@ -240,7 +242,7 @@ beobachteten Steuerfelds wird bis zur ersten tatsächlich beobachteten Bewegung
 gehalten. Loslassen wird auch bei Fehlern ausgeführt. Die Grenze von insgesamt
 1,6 Metern und der anschließende Stillstandsnachweis von höchstens 0,02 Metern
 bleiben bestehen. Dieser Eingabeweg verändert keinen Spielzustand über einen
-Testkanal. Nur ein erfolgreicher neuer Lauf kann die APK-Bereitstellung öffnen;
+Testkanal. Der erfolgreiche neue Lauf `45200099195` hat die APK-Bereitstellung geöffnet;
 keiner der früheren Fehlerläufe wird nachträglich als Erfolg gewertet.
 
 Die letzte Textüberarbeitung entfernt technische Speicher-/Prüfformulierungen
