@@ -32,11 +32,13 @@ func build() -> void:
 		_make_garden(Vector3(43.5,0,-37+index*14),index)
 	_make_laundry(Vector3(35,0,-17.1))
 	_make_laundry(Vector3(-14,0,-34.2))
+	for group: Node3D in get_children():
+		Art.batch_static(group, [_wagon_axle])
 
 func set_quality(profile: String) -> void:
 	var range_end := float({"low":24,"balanced":42,"high":65,"very_high":90}.get(profile,42))
 	for root: Node3D in _detail_nodes:
-		for item: MeshInstance3D in root.find_children("*","MeshInstance3D",true,false):
+		for item: GeometryInstance3D in root.find_children("*","GeometryInstance3D",true,false):
 			item.visibility_range_end = range_end
 			item.visibility_range_end_margin = 3
 

@@ -1,0 +1,32 @@
+{
+	"captures": [
+		{
+			"file": "01-family-home.png",
+			"height": 720,
+			"id": "01-family-home",
+			"width": 1280
+		},
+		{
+			"file": "02-mother-conversation.png",
+			"height": 720,
+			"id": "02-mother-conversation",
+			"width": 1280
+		},
+		{
+			"file": "03-village-controls.png",
+			"height": 720,
+			"id": "03-village-controls",
+			"width": 1280
+		},
+		{
+			"file": "04-techniques.png",
+			"height": 720,
+			"id": "04-techniques",
+			"width": 1280
+		}
+	],
+	"checks": 69,
+	"failures": [],
+	"quality": "low",
+	"travel": "explicit test fixture positioning; not a timed player walkthrough"
+}

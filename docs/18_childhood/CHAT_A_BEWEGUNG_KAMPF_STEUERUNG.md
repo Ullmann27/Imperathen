@@ -37,3 +37,4 @@ Führe einen zusammenhängenden Weg aus: neuer Dorfanfang → Gehen → Laufen �
 Miss Aufwand mit identischem Szenario und Profil. Weniger Nodes oder Drawcalls sind zunächst technische Messwerte, kein Beweis für ein kühleres Handy oder Konsolenqualität. Erhalte bzw. verbessere sinnvolle LODs, Material-/Meshwiederverwendung und Offline-Vorbereitung.
 
 Liefere lauffähige Änderungen, gezielte Regressionstests, Herkunft der selbst erzeugten Assets, einen prüfbaren Draft-PR und eine Übergabe mit exakten Commits, Dateien, Schnittstellen und offenen Problemen. Eine APK nur mit nachgewiesenem Build- und Laufzeitstatus als getestet bezeichnen. Führe notwendige autorisierte Arbeiten selbst aus; frage nicht nach jeder Routineentscheidung. Das Ziel ist ein deutlich besser spielbarer Abschnitt, keine Liste angeblich erledigter AAA-Funktionen.
+

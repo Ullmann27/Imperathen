@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "exit_code": 0,
+  "script": "res://tests/settlement_graphics_review.gd",
+  "requested_resolution": "854x480",
+  "requested_quality": "low",
+  "renderer": "Godot OpenGL Compatibility with a private Xorg server and software Mesa",
+  "android_device_test": false,
+  "images": {
+    "01-family-interior.png": "7d50e14111498d58ca96a16d028023c3ef6270eab240db394935760b7b52aebd",
+    "02-family-doorstep.png": "1bf0156ce0256e56e796befd64357a357ea5a3881f9c85cede718296005c77e9",
+    "03-village-forge.png": "3a3d13fdbe48b4617e6a074b021575ecf80051842c76153608867728fdeaefb9",
+    "04-market-homes.png": "db4348b38d683c72e133e78c914bd3a885b4a337a645bc37de501799646ec227",
+    "05-residential-street.png": "39cdb6431276492a8ec02e28594e5bf4fdfa11fef8a906987eabf537cbc779a7",
+    "06-settlement-overview.png": "d2d0840d9f53b799fca215e6253307295ec12f0e64a5fe7527029b5a720971c9"
+  }
+}

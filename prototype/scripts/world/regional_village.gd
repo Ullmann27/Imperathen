@@ -4,9 +4,11 @@ const Art = preload("res://scripts/world/village_art.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Dressing = preload("res://scripts/world/village/frontier_dressing.gd")
+const Settlement = preload("res://scripts/world/village/settlement_dressing.gd")
 var current_origin := ""
 var quality := "balanced"
 var frontier_details: Node3D
+var settlement_details: Node3D
 var house_count := 0
 
 func show_origin(id: String) -> void:
@@ -14,6 +16,7 @@ func show_origin(id: String) -> void:
 		return
 	current_origin = id
 	frontier_details = null
+	settlement_details = null
 	house_count = 0
 	for child in get_children():
 		remove_child(child)
@@ -40,7 +43,9 @@ func show_origin(id: String) -> void:
 		_static_collision(model,house if id != "italia" else "roman")
 		house_count += 1
 	if id == "italia":
-		_static_collision(_add_scene("res://assets/architecture/atrium_house.glb",Vector3(14,0,-30)),"atrium")
+		var atrium := _add_scene("res://assets/architecture/atrium_house.glb",Vector3(14,0,-30))
+		atrium.name = "AtriumHouse"
+		_static_collision(atrium,"atrium")
 		var well := _add_scene("res://assets/architecture/village_well.glb",Vector3(-7,0,6))
 		for i in 10:
 			var a := TAU*i/10.0
@@ -50,6 +55,11 @@ func show_origin(id: String) -> void:
 		add_child(frontier_details)
 		frontier_details.build()
 		frontier_details.set_quality(quality)
+		settlement_details = Settlement.new()
+		settlement_details.name = "HouseholdsAndForge"
+		add_child(settlement_details)
+		settlement_details.build(self)
+		settlement_details.set_quality(quality)
 	else:
 		# A communal timber-lined water point for the regional encounter.
 		var wood := Art.material(Color("#785538"))
@@ -74,6 +84,8 @@ func set_quality(profile: String) -> void:
 	quality = profile
 	if frontier_details:
 		frontier_details.set_quality(profile)
+	if settlement_details:
+		settlement_details.set_quality(profile)
 
 func _tint_house(model: Node3D, tint: Color) -> void:
 	var overrides := {}
@@ -106,7 +118,34 @@ func _static_collision(model: Node3D,kind: String) -> void:
 			Art.box_collider(model,Vector3(0.29,3.35,z*2),Vector3(x*side,1.68,0))
 			Art.box_collider(model,Vector3(x-door,3.35,0.29),Vector3(side*(x+door)*0.5,1.68,z))
 		Art.box_collider(model,Vector3(x*2,3.35,0.29),Vector3(0,1.68,-z))
+		# These meshes contain raised floors. Wall-only collision left the
+		# player's capsule on the landscape, burying both legs in the paving.
+		if kind == "roman":
+			var floor_body := Art.box_collider(model, Vector3(5.28,Layout.HOUSE_FLOOR,4.26),Vector3(0,Layout.HOUSE_FLOOR*.5,0))
+			floor_body.name = "WalkableFloor"
+			floor_body.set_meta("surface_height",Layout.HOUSE_FLOOR)
+			_house_entry(model)
+			# The imported table and wall bench are already visible geometry.
+			Art.box_collider(model,Vector3(1.45,.86,1.10),Vector3(-1.1,Layout.HOUSE_FLOOR+.43,-.61)).name = "TableCollision"
+			Art.box_collider(model,Vector3(.5,.52,1.9),Vector3(1.93,Layout.HOUSE_FLOOR+.26,0)).name = "BenchCollision"
+			var door_angle := deg_to_rad(100)
+			var leaf_center := Vector3(-.575,.415+1.04,2.15)+Vector3(.56,0,0).rotated(Vector3.UP,door_angle)
+			var leaf := Art.box_collider(model,Vector3(1.12,2.08,.085),leaf_center)
+			leaf.name = "OpenDoorLeafCollision"
+			leaf.rotation.y = door_angle
 		if kind == "atrium":
+			var floor_body := Art.box_collider(model,Vector3(10.4,.065,9.7),Vector3(0,.0325,0))
+			floor_body.name = "WalkableFloor"
+			floor_body.set_meta("surface_height",.065)
+			Art.box_collider(model,Vector3(1.83,.113,.60),Vector3(0,.0565,4.98)).name = "ThresholdCollision"
+			var ramp_pitch := atan2(.113,.70)
+			var ramp := Art.box(model,Vector3(1.68,.04,Vector2(.70,.113).length()),Vector3(0,.0565-.02*cos(ramp_pitch),5.62-.02*sin(ramp_pitch)),Art.material(Color("aaa38f")),true)
+			ramp.name = "AtriumEntryRamp"
+			ramp.rotation.x = ramp_pitch
+			# The catch basin and rear furniture remain obstacles; the central
+			# water surface is not an invisible walk-through shortcut.
+			Art.box_collider(model,Vector3(3.26,.247,3.73),Vector3(0,.1235,0)).name = "BasinCollision"
+			Art.box_collider(model,Vector3(1.94,.554,.56),Vector3(-3.13,.277,-4.09)).name = "BenchCollision"
 			# The open door leaves lie against the side walls of the entrance passage.
 			for side in [-1, 1]:
 				Art.box_collider(model, Vector3(0.20, 2.65, 2.10), Vector3(side * 1.03, 1.325, 3.7))
@@ -119,3 +158,23 @@ func _static_collision(model: Node3D,kind: String) -> void:
 	for mesh: MeshInstance3D in meshes:
 		if mesh.mesh != null:
 			mesh.create_trimesh_collision()
+
+
+func _house_entry(model: Node3D) -> void:
+	# A visible oak board ramp bridges the two stone steps. Its top and its
+	# collision share one transform, so walking does not need a height cheat.
+	var entry := Node3D.new()
+	entry.name = "WalkableEntrance"
+	model.add_child(entry)
+	var wood := Art.material(Color("8b795c"),.94)
+	var landing := Art.box(entry,Vector3(1.25,.06,.90),Vector3(0,.415,2.50),wood,true)
+	landing.name = "ThresholdLanding"
+	var run := 1.05
+	var rise := .445
+	var pitch := atan2(rise,run)
+	var ramp := Art.box(entry,Vector3(1.25,.06,Vector2(run,rise).length()),Vector3(0,rise*.5-.03*cos(pitch),3.475-.03*sin(pitch)),wood,true)
+	ramp.name = "EntryRamp"
+	ramp.rotation.x = pitch
+	for side in [-1.0,1.0]:
+		var strip := Art.box(entry,Vector3(.025,.018,Vector2(run,rise).length()),ramp.position+Vector3(side*.39,.04,0),wood)
+		strip.rotation.x = pitch

@@ -1,6 +1,41 @@
 extends RefCounted
 ## Original primitive art for the frontier prototype. All dimensions are metres.
 
+const MAX_CACHED_PRIMITIVES := 128
+static var _boxes: Dictionary = {}
+static var _cylinders: Dictionary = {}
+static var _spheres: Dictionary = {}
+
+## Returned primitive meshes are shared immutable geometry. Change the node's
+## transform or duplicate its mesh before changing mesh dimensions directly.
+static func _box_mesh(size: Vector3) -> BoxMesh:
+	if _boxes.has(size): return _boxes[size]
+	var result := BoxMesh.new()
+	result.size = size
+	if _boxes.size() < MAX_CACHED_PRIMITIVES: _boxes[size] = result
+	return result
+
+static func _cylinder_mesh(radius: float, height: float, top: float) -> CylinderMesh:
+	var key := Vector3(radius, height, top)
+	if _cylinders.has(key): return _cylinders[key]
+	var result := CylinderMesh.new()
+	result.bottom_radius = radius
+	result.top_radius = top
+	result.height = height
+	result.radial_segments = 10
+	if _cylinders.size() < MAX_CACHED_PRIMITIVES: _cylinders[key] = result
+	return result
+
+static func _sphere_mesh(radius: float) -> SphereMesh:
+	if _spheres.has(radius): return _spheres[radius]
+	var result := SphereMesh.new()
+	result.radius = radius
+	result.height = radius*2.0
+	result.radial_segments = 12
+	result.rings = 6
+	if _spheres.size() < MAX_CACHED_PRIMITIVES: _spheres[radius] = result
+	return result
+
 static func material(color: Color, roughness: float = 0.88) -> StandardMaterial3D:
 	var result := StandardMaterial3D.new()
 	result.albedo_color = color
@@ -18,9 +53,7 @@ static func transparent_material(color: Color) -> StandardMaterial3D:
 
 static func box(parent: Node3D, size: Vector3, location: Vector3, paint: Material, solid: bool = false) -> MeshInstance3D:
 	var mesh_node := MeshInstance3D.new()
-	var geometry := BoxMesh.new()
-	geometry.size = size
-	mesh_node.mesh = geometry
+	mesh_node.mesh = _box_mesh(size)
 	mesh_node.material_override = paint
 	mesh_node.position = location
 	parent.add_child(mesh_node)
@@ -45,12 +78,7 @@ static func box_collider(parent: Node3D, size: Vector3, location: Vector3 = Vect
 
 static func cylinder(parent: Node3D, radius: float, height: float, location: Vector3, paint: Material, top_radius: float = -1.0, solid: bool = false) -> MeshInstance3D:
 	var node := MeshInstance3D.new()
-	var geometry := CylinderMesh.new()
-	geometry.bottom_radius = radius
-	geometry.top_radius = radius if top_radius < 0.0 else top_radius
-	geometry.height = height
-	geometry.radial_segments = 10
-	node.mesh = geometry
+	node.mesh = _cylinder_mesh(radius, height, radius if top_radius < 0.0 else top_radius)
 	node.material_override = paint
 	node.position = location
 	parent.add_child(node)
@@ -70,17 +98,76 @@ static func cylinder(parent: Node3D, radius: float, height: float, location: Vec
 
 static func sphere(parent: Node3D, radius: float, location: Vector3, paint: Material, proportions: Vector3 = Vector3.ONE) -> MeshInstance3D:
 	var node := MeshInstance3D.new()
-	var geometry := SphereMesh.new()
-	geometry.radius = radius
-	geometry.height = radius * 2.0
-	geometry.radial_segments = 12
-	geometry.rings = 6
-	node.mesh = geometry
+	node.mesh = _sphere_mesh(radius)
 	node.material_override = paint
 	node.position = location
 	node.scale = proportions
 	parent.add_child(node)
 	return node
+
+
+static func batch_static(root: Node3D, excluded: Array = []) -> Dictionary:
+	# Call once on a compact, explicitly static prop group after authoring it.
+	# Each group remains independently culled. Never batch a whole settlement.
+	var groups := {}
+	for node: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
+		if node in excluded or node.get_child_count() > 0 or node.get_script() != null or node.skin != null or not node.visible or not node.mesh:
+			continue
+		if node.material_overlay or not is_zero_approx(node.transparency): continue
+		var overridden := false
+		for surface in node.mesh.get_surface_count():
+			overridden = overridden or node.get_surface_override_material(surface) != null
+		if overridden: continue
+		var paint := node.material_override
+		if paint is BaseMaterial3D and paint.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED: continue
+		var key := str([node.mesh.get_instance_id(), paint.get_instance_id() if paint else 0,
+			node.layers, node.cast_shadow, node.gi_mode, node.lod_bias, node.extra_cull_margin,
+			node.visibility_range_begin, node.visibility_range_end, node.visibility_range_begin_margin,
+			node.visibility_range_end_margin, node.visibility_range_fade_mode, node.ignore_occlusion_culling])
+		if not groups.has(key): groups[key] = []
+		groups[key].append(node)
+	var removed := 0
+	var batches := 0
+	for members: Array in groups.values():
+		if members.size() < 2: continue
+		var original := members[0] as MeshInstance3D
+		var mesh := original.mesh
+		var multi := MultiMesh.new()
+		multi.transform_format = MultiMesh.TRANSFORM_3D
+		multi.mesh = mesh
+		multi.instance_count = members.size()
+		var bounds := AABB()
+		for index in members.size():
+			var instance := members[index] as MeshInstance3D
+			var pose := _relative_transform(instance, root)
+			multi.set_instance_transform(index, pose)
+			var box: AABB = pose*mesh.get_aabb()
+			bounds = box if index == 0 else bounds.merge(box)
+		multi.custom_aabb = bounds
+		var batch := MultiMeshInstance3D.new()
+		batch.name = "StaticBatch%d" % batches
+		batch.multimesh = multi
+		batch.material_override = original.material_override
+		for property: String in ["layers", "cast_shadow", "gi_mode", "lod_bias", "extra_cull_margin",
+			"visibility_range_begin", "visibility_range_end", "visibility_range_begin_margin",
+			"visibility_range_end_margin", "visibility_range_fade_mode", "ignore_occlusion_culling"]:
+			batch.set(property, original.get(property))
+		root.add_child(batch)
+		for instance: MeshInstance3D in members:
+			instance.get_parent().remove_child(instance)
+			instance.free()
+		removed += members.size()
+		batches += 1
+	return {"replaced_mesh_nodes":removed, "multimesh_nodes":batches}
+
+
+static func _relative_transform(instance: Node3D, root: Node3D) -> Transform3D:
+	var pose := instance.transform
+	var parent := instance.get_parent()
+	while parent != root and parent is Node3D:
+		pose = (parent as Node3D).transform*pose
+		parent = parent.get_parent()
+	return pose
 
 
 static func label(parent: Node3D, words: String, location: Vector3, color: Color = Color(0.94, 0.88, 0.72), font_size: int = 40) -> Label3D:
