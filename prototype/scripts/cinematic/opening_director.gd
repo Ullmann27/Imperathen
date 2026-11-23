@@ -5,7 +5,8 @@ extends Node3D
 signal shot_started(shot_id: String)
 signal shot_finished(shot_id: String)
 
-const SHOT_IDS := ["valley", "market", "well", "plot", "player"]
+const HistoricalStage = preload("res://scripts/cinematic/i00_stage.gd")
+const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player"]
 const DEFAULT_ANCHORS := {
 	"road": Vector3(0, 0, 18),
 	"market": Vector3(-14, 0, 4),
@@ -31,6 +32,7 @@ var _speaker: Node3D
 var _sun: DirectionalLight3D
 var _environment: Environment
 var _lighting: Dictionary = {}
+var _i00_stage: Node3D
 
 
 func setup(world: Node3D) -> bool:
@@ -103,6 +105,8 @@ func finish() -> void:
 	_release_speaker()
 	_apply_grade(0.0)
 	_lighting.clear()
+	if is_instance_valid(_i00_stage):
+		_i00_stage.visible = false
 	paused = false
 	_completed = false
 	for item: Dictionary in _labels:
@@ -149,7 +153,19 @@ func _process(delta: float) -> void:
 		shot_finished.emit(shot_id)
 
 
+func _ensure_i00_stage() -> Node3D:
+	if not is_instance_valid(_i00_stage):
+		_i00_stage = HistoricalStage.new()
+		_i00_stage.name = "I00AquileiaStage"
+		add_child(_i00_stage)
+		_i00_stage.call("ensure_built")
+	_i00_stage.visible = true
+	return _i00_stage
+
+
 func _anchor(key: String) -> Vector3:
+	if key.begins_with("i00_"):
+		return _ensure_i00_stage().call("anchor", key) as Vector3
 	if is_instance_valid(_world) and _world.has_method("get_cinematic_anchor"):
 		var value: Variant = _world.call("get_cinematic_anchor", key)
 		if value is Vector3 and (value as Vector3).is_finite():
@@ -178,6 +194,46 @@ func _apply_sample(normalized_time: float) -> void:
 	var fov_start := 49.0
 	var fov_end := 46.0
 	match shot_id:
+		"aquileia_detail":
+			var anchor := _anchor("i00_standard")
+			start = anchor + Vector3(0.85, 1.35, 1.55)
+			end = anchor + Vector3(0.48, 1.15, 1.0)
+			target_start = anchor + Vector3(0.0, 2.0, 0.0)
+			target_end = anchor + Vector3(0.0, 1.75, -0.1)
+			fov_start = 42.0
+			fov_end = 38.0
+		"legions_rain":
+			var anchor := _anchor("i00_legions")
+			start = anchor + Vector3(17.0, 8.4, 18.0)
+			end = anchor + Vector3(12.0, 6.2, 13.5)
+			target_start = anchor + Vector3(0.0, 1.2, -5.5)
+			target_end = anchor + Vector3(0.0, 1.0, -8.0)
+			fov_start = 57.0
+			fov_end = 51.0
+		"caesar_orders":
+			var anchor := _anchor("i00_caesar")
+			start = anchor + Vector3(3.2, 1.95, 3.1)
+			end = anchor + Vector3(2.45, 1.72, 2.55)
+			target_start = anchor + Vector3(0.0, 1.35, 0.0)
+			target_end = anchor + Vector3(0.0, 1.42, 0.0)
+			fov_start = 48.0
+			fov_end = 43.0
+		"labienus_orders":
+			var anchor := _anchor("i00_labienus")
+			start = anchor + Vector3(-3.0, 1.9, 3.0)
+			end = anchor + Vector3(-2.35, 1.68, 2.45)
+			target_start = anchor + Vector3(0.0, 1.35, 0.0)
+			target_end = anchor + Vector3(0.0, 1.40, 0.0)
+			fov_start = 48.0
+			fov_end = 44.0
+		"legions_depart":
+			var anchor := _anchor("i00_road")
+			start = anchor + Vector3(14.0, 7.0, 18.0)
+			end = anchor + Vector3(9.0, 5.2, 12.0)
+			target_start = anchor + Vector3(0.0, 1.0, 8.0)
+			target_end = anchor + Vector3(0.0, 1.0, 3.0)
+			fov_start = 55.0
+			fov_end = 50.0
 		"valley":
 			var anchor := _anchor("road")
 			start = anchor + Vector3(12.5, 10.2, 17.5)
@@ -247,7 +303,12 @@ func _change_speaker(next_shot: String) -> void:
 	if next_shot == shot_id and is_instance_valid(_speaker):
 		return
 	_release_speaker()
-	if next_shot == "well":
+	if next_shot in ["caesar_orders", "labienus_orders"]:
+		var historical_id := "caesar" if next_shot == "caesar_orders" else "labienus"
+		var figure := _ensure_i00_stage().call("speaker", historical_id) as Node3D
+		if figure and figure.has_method("sample_pose") and figure.has_method("reset_motion"):
+			_speaker = figure
+	elif next_shot == "well":
 		var figure := _world.get_node_or_null("Marcus/Figure") as Node3D
 		if figure and figure.has_method("sample_pose") and figure.has_method("reset_motion"):
 			_speaker = figure
@@ -263,7 +324,10 @@ func _apply_grade(amount: float) -> void:
 	# Reuse the existing sun and ambient fill. No extra lights, shadows,
 	# postprocessing requirement or quality-profile override is introduced.
 	var weight := clampf(amount, 0.0, 1.0)
+	var historical := shot_id in ["aquileia_detail","legions_rain","caesar_orders","labienus_orders","legions_depart"]
 	if is_instance_valid(_sun) and _lighting.has("sun_color"):
-		_sun.light_color = (_lighting.sun_color as Color).lerp(Color(1.0, 0.89, 0.75), 0.26 * weight)
+		var grade := Color(0.70, 0.76, 0.83) if historical else Color(1.0, 0.89, 0.75)
+		var strength := 0.42 if historical else 0.26
+		_sun.light_color = (_lighting.sun_color as Color).lerp(grade, strength * weight)
 	if _environment and _lighting.has("ambient_energy"):
-		_environment.ambient_light_energy = float(_lighting.ambient_energy) * lerpf(1.0, 0.90, weight)
+		_environment.ambient_light_energy = float(_lighting.ambient_energy) * lerpf(1.0, 0.72 if historical else 0.90, weight)
