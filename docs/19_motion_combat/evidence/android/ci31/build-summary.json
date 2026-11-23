@@ -1,0 +1,346 @@
+{
+  "schema_version": 1,
+  "source_commit": "a87e3918872ad2aa76aa2359f810658b4821ca0b",
+  "test_harness_commit": "a87e3918872ad2aa76aa2359f810658b4821ca0b",
+  "workflow_run_id": 45210298631,
+  "workflow_run_url": "https://github.com/Ullmann27/Imperathen/actions/runs/45210298631",
+  "job_id": 137816986101,
+  "workflow_conclusion": "success",
+  "engine_groups": [
+    "PASS import: exit=0",
+    "PASS domain: exit=0",
+    "PASS combat_actions: exit=0",
+    "PASS combat_model: exit=0",
+    "PASS village_economy: exit=0",
+    "PASS village_life: exit=0",
+    "PASS village_model: exit=0",
+    "PASS village_childhood: exit=0",
+    "PASS unarmed_combat: exit=0",
+    "PASS childhood_integration: exit=0",
+    "PASS world_stream_plan: exit=0",
+    "PASS regional_terrain: exit=0",
+    "PASS frontier_story: exit=0",
+    "PASS frontier_people: exit=0",
+    "PASS frontier_population: exit=0",
+    "PASS settlement_geometry: exit=0",
+    "PASS village_collision: exit=0",
+    "PASS frontier_integration: exit=0",
+    "PASS village_experience: exit=0",
+    "PASS village_panels: exit=0",
+    "PASS village_nameplates: exit=0",
+    "PASS opening_story: exit=0",
+    "PASS opening_props: exit=0",
+    "PASS opening_director: exit=0",
+    "PASS opening_overlay: exit=0",
+    "PASS opening_flow: exit=0",
+    "PASS ui: exit=0",
+    "PASS touch_controls: exit=0",
+    "PASS action_adapter: exit=0",
+    "PASS action_world: exit=0",
+    "PASS world: exit=0",
+    "PASS integration: exit=0",
+    "PASS battle_rules: exit=0",
+    "PASS soldier_visuals: exit=0",
+    "PASS soldier_gait: exit=0",
+    "PASS village_people: exit=0",
+    "PASS character_motion: exit=0",
+    "PASS natural_motion: exit=0",
+    "PASS village_static_art: exit=0",
+    "PASS hero_faces: exit=0",
+    "PASS village_scenery: exit=0",
+    "PASS atrium: exit=0",
+    "PASS seasons: exit=0",
+    "PASS figure_gallery: exit=0",
+    "PASS landscape: exit=0",
+    "PASS main_scene: exit=0"
+  ],
+  "python_tests": 103,
+  "python_result": "Ran 103 tests in 0.116s",
+  "python_passed": true,
+  "packages": [
+    {
+      "apk": {
+        "path": "/home/runner/work/Imperathen/Imperathen/artifacts/IMPERATHEN-a87e3918-arm64.apk",
+        "size_bytes": 150719305,
+        "sha256": "2b6eb0147af7a11040d80c4378ad4f7e4d239e78ffe537bf0773c1cd0f2a177a"
+      },
+      "expected_abi": "arm64-v8a",
+      "checked_at_utc": "2026-11-23T15:57:03.417697+00:00",
+      "passed": true,
+      "overall_status": "pass",
+      "checks": [
+        {
+          "id": "apk_file",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "zip_structure",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "zip_crc",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "apk_core_entries",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "binary_manifest_header",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "resource_table_header",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "dex_header",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "godot_native_library",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "hero_character_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "living_frontier_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "cinematic_opening_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "village_life_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "action_combat_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "childhood_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "godot_project_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "manifest_metadata",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "package_identity",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "launcher_activity",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "signature_verification",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "zip_alignment",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "apk_unchanged",
+          "status": "pass",
+          "required": true
+        }
+      ],
+      "scope": "Static APK/package/signature evidence only. No graphics, touch, audio, FPS, thermal, installation, launch, or real-device success is claimed."
+    },
+    {
+      "apk": {
+        "path": "/home/runner/work/Imperathen/Imperathen/artifacts/IMPERATHEN-a87e3918-emulator.apk",
+        "size_bytes": 153500483,
+        "sha256": "5c619f2626550c901844345ba00686247735fef1139e3014d08d2f081ae713ad"
+      },
+      "expected_abi": "x86_64",
+      "checked_at_utc": "2026-11-23T15:57:42.264265+00:00",
+      "passed": true,
+      "overall_status": "pass",
+      "checks": [
+        {
+          "id": "apk_file",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "zip_structure",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "zip_crc",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "apk_core_entries",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "binary_manifest_header",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "resource_table_header",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "dex_header",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "godot_native_library",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "hero_character_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "living_frontier_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "cinematic_opening_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "village_life_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "action_combat_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "childhood_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "godot_project_content",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "manifest_metadata",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "package_identity",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "launcher_activity",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "signature_verification",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "zip_alignment",
+          "status": "pass",
+          "required": true
+        },
+        {
+          "id": "apk_unchanged",
+          "status": "pass",
+          "required": true
+        }
+      ],
+      "scope": "Static APK/package/signature evidence only. No graphics, touch, audio, FPS, thermal, installation, launch, or real-device success is claimed."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 14837331432,
+      "name": "imperathen-android-runtime-31",
+      "size_in_bytes": 7402555,
+      "digest": "sha256:359c2a2e8c3829bebae492ae09075993c3b05fe278653cbfc1056379becd0025",
+      "created_at": "2026-11-23T16:06:53Z",
+      "expires_at": "2026-12-23T16:06:52Z"
+    },
+    {
+      "id": 14837110101,
+      "name": "imperathen-desktop-31",
+      "size_in_bytes": 302302421,
+      "digest": "sha256:40eb2556eb7484e7cbcb59b1260f897c663ff0d81b984df6005f27c942d2673c",
+      "created_at": "2026-11-23T15:58:24Z",
+      "expires_at": "2026-12-23T15:58:16Z"
+    },
+    {
+      "id": 14836885891,
+      "name": "imperathen-android-31",
+      "size_in_bytes": 300334323,
+      "digest": "sha256:ffec461271ad9b2bb8231e0832b73307679d28f6491758638e75ed7bfd5da258",
+      "created_at": "2026-11-23T15:57:53Z",
+      "expires_at": "2026-12-23T15:57:44Z"
+    }
+  ],
+  "runtime_report": "runtime-report.json",
+  "runtime_report_sha256": "69f545103821f69daaf3fcd29f2679e7f25ceadac8454c0935cb1aa3c05651c6",
+  "runtime_status": "passed",
+  "runtime_successful_checks": 73,
+  "runtime_total_checks": 73,
+  "runtime_errors": [],
+  "android_version": "15",
+  "api_level": "35",
+  "full_route_abi": "x86_64",
+  "childhood_scope": "First two actual actions only: mother conversation and filling the family jug; no quest, item or position injection.",
+  "arm64_package_runtime": {
+    "available_abis": [
+      "x86_64",
+      "arm64-v8a"
+    ],
+    "sha256": "2b6eb0147af7a11040d80c4378ad4f7e4d239e78ffe537bf0773c1cd0f2a177a",
+    "name": "IMPERATHEN-a87e3918-arm64.apk",
+    "status": "started_under_translation"
+  },
+  "physical_device_test": false
+}

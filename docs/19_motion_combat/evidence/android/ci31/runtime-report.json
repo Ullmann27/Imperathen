@@ -1,0 +1,3562 @@
+{
+  "platform": "Android emulator",
+  "apk_sha256": "5c619f2626550c901844345ba00686247735fef1139e3014d08d2f081ae713ad",
+  "physical_device_test": false,
+  "arm64_runtime_test": true,
+  "status": "passed",
+  "checks": [
+    {
+      "name": "single_emulator_target",
+      "passed": true,
+      "detail": [
+        {
+          "serial": "emulator-5554",
+          "state": "offline"
+        }
+      ]
+    },
+    {
+      "name": "emulator_verified",
+      "passed": true,
+      "detail": {
+        "serial": "emulator-5554",
+        "ro.kernel.qemu": "1"
+      }
+    },
+    {
+      "name": "expected_android_emulator",
+      "passed": true,
+      "detail": {
+        "api_level": "35",
+        "abi": "x86_64",
+        "model": "sdk_gphone64_x86_64"
+      }
+    },
+    {
+      "name": "apk_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "clean_test_app_data",
+      "passed": true,
+      "detail": "Success"
+    },
+    {
+      "name": "launcher",
+      "passed": true,
+      "detail": "at.heinz.imperathen/com.godot.game.GodotAppLauncher"
+    },
+    {
+      "name": "activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 4324\nWaitTime: 4362\nComplete"
+    },
+    {
+      "name": "process_started",
+      "passed": true,
+      "detail": "3209"
+    },
+    {
+      "name": "first_launch_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "first_launch_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "real_menu",
+      "passed": true,
+      "detail": {
+        "new_game": [
+          156.75,
+          237.0
+        ]
+      }
+    },
+    {
+      "name": "menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "touch_starts_saved_game",
+      "passed": true,
+      "detail": "New game button produced a saved village"
+    },
+    {
+      "name": "family_opening_is_actual_new_game",
+      "passed": true,
+      "detail": "childhood_home"
+    },
+    {
+      "name": "opening_before_gameplay",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.15,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "android_back_pauses_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            799.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.266666666666667,
+        "final": false,
+        "index": 0,
+        "paused": true,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "android_back_resumes_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.409757666666668,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.141647333333335,
+        "final": false,
+        "index": 1,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.134017,
+        "final": false,
+        "index": 2,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            911.625,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.0,
+        "final": true,
+        "index": 3,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "family_intro_reaches_first_objective",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            911.625,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.0,
+        "final": true,
+        "index": 3,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "objective_hands_over_control",
+      "passed": true,
+      "detail": "Actual touch accepted the objective after the opening controls"
+    },
+    {
+      "name": "native_pointer_command_available",
+      "passed": true,
+      "detail": "The verified Android input command advertises native pointer DOWN/MOVE/UP support"
+    },
+    {
+      "name": "native_back_opens_quality_pause",
+      "passed": true,
+      "detail": {
+        "ui_profile": "balanced",
+        "world_profile": "balanced"
+      }
+    },
+    {
+      "name": "native_settings_select_light_graphics",
+      "passed": true,
+      "detail": {
+        "popup": {
+          "control_instance": "306519743473",
+          "popup_instance": "306570070116",
+          "focused_index": 0,
+          "text": "Leicht · Limit 30 FPS",
+          "down_presses": 1
+        },
+        "profiles": {
+          "ui_profile": "low",
+          "world_profile": "low"
+        }
+      }
+    },
+    {
+      "name": "native_settings_resume_preserves_light_graphics",
+      "passed": true,
+      "detail": {
+        "ui_profile": "low",
+        "world_profile": "low"
+      }
+    },
+    {
+      "name": "actual_family_start",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [],
+        "completed": [],
+        "day": 1,
+        "dialog_npc": "",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "mother_morning",
+        "target_npc": "antonia",
+        "target_point": "",
+        "target_position": [
+          -15.3000001907349,
+          14.8000001907349
+        ],
+        "target_radius": 3.2,
+        "version": 1,
+        "world_id": "53010432-1451708246"
+      }
+    },
+    {
+      "name": "family_door_alignment_reached_by_native_walk",
+      "passed": true,
+      "detail": {
+        "target": [
+          -13.0,
+          12.0999998092651
+        ],
+        "distance_m": 0.04206785824638764,
+        "position": [
+          -13.0409555435181,
+          1.29333055019379,
+          12.1096096038818
+        ]
+      }
+    },
+    {
+      "name": "family_doorstep_reached_by_native_walk",
+      "passed": true,
+      "detail": {
+        "target": [
+          -13.0,
+          15.1999998092651
+        ],
+        "distance_m": 0.15619282370474077,
+        "position": [
+          -13.003231048584,
+          0.906435549259186,
+          15.0438404083252
+        ]
+      }
+    },
+    {
+      "name": "native_interaction_reaches_mother",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [],
+        "completed": [],
+        "day": 1,
+        "dialog_npc": "antonia",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "mother_morning",
+        "target_npc": "antonia",
+        "target_point": "",
+        "target_position": [
+          -15.3000001907349,
+          14.8000001907349
+        ],
+        "target_radius": 3.2,
+        "version": 1,
+        "world_id": "53010432-1451708246"
+      }
+    },
+    {
+      "name": "native_mother_choice_carries_real_household_coin",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [
+          "household_coin"
+        ],
+        "completed": [
+          "mother_morning"
+        ],
+        "day": 1,
+        "dialog_npc": "antonia",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "fill_water",
+        "target_npc": "",
+        "target_point": "family_water",
+        "target_position": [
+          -12.0,
+          11.6999998092651
+        ],
+        "target_radius": 1.6,
+        "version": 1,
+        "world_id": "53010432-1451708246"
+      }
+    },
+    {
+      "name": "family_goal_moves_to_real_water_station",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [
+          "household_coin"
+        ],
+        "completed": [
+          "mother_morning"
+        ],
+        "day": 1,
+        "dialog_npc": "",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "fill_water",
+        "target_npc": "",
+        "target_point": "family_water",
+        "target_position": [
+          -12.0,
+          11.6999998092651
+        ],
+        "target_radius": 1.6,
+        "version": 1,
+        "world_id": "53010432-1451708246"
+      }
+    },
+    {
+      "name": "return_inside_family_house_reached_by_native_walk",
+      "passed": true,
+      "detail": {
+        "target": [
+          -13.0,
+          12.0999998092651
+        ],
+        "distance_m": 0.12933344811600345,
+        "position": [
+          -12.9965467453003,
+          1.29332733154297,
+          12.229287147522
+        ]
+      }
+    },
+    {
+      "name": "family_water_station_reached_by_native_walk",
+      "passed": true,
+      "detail": {
+        "target": [
+          -12.0,
+          11.6999998092651
+        ],
+        "distance_m": 0.6823451544160428,
+        "position": [
+          -12.6081914901733,
+          1.29332709312439,
+          12.0093507766724
+        ]
+      }
+    },
+    {
+      "name": "native_item_action_fills_family_jug",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [
+          "household_coin",
+          "water_jug"
+        ],
+        "completed": [
+          "mother_morning",
+          "fill_water"
+        ],
+        "day": 1,
+        "dialog_npc": "",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "father_morning",
+        "target_npc": "sextus",
+        "target_point": "",
+        "target_position": [
+          -16.2000007629395,
+          16.7000007629395
+        ],
+        "target_radius": 3.2,
+        "version": 1,
+        "world_id": "53010432-1451708246"
+      }
+    },
+    {
+      "name": "action_hud_from_new_game",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.6081914901733,
+          1.29332709312439,
+          12.0093507766724
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "native_pad_moves_actual_player",
+      "passed": true,
+      "detail": {
+        "input": "adb input motionevent",
+        "events": [
+          {
+            "event": "DOWN",
+            "point": [
+              90,
+              393
+            ],
+            "command_returned": true
+          },
+          {
+            "event": "MOVE",
+            "point": [
+              142,
+              393
+            ],
+            "command_returned": true
+          },
+          {
+            "event": "MOVE",
+            "point": [
+              142,
+              393
+            ],
+            "command_returned": true
+          },
+          {
+            "event": "UP",
+            "point": [
+              142,
+              393
+            ],
+            "command_returned": true
+          }
+        ],
+        "observations": [
+          {
+            "phase": "DOWN",
+            "position": [
+              -12.6081914901733,
+              1.29332709312439,
+              12.0093507766724
+            ],
+            "movement_touch": 0,
+            "move_axis": [
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "phase": "MOVE",
+            "position": [
+              -12.5581922531128,
+              1.29332828521729,
+              11.9593515396118
+            ],
+            "movement_touch": 0,
+            "move_axis": [
+              0.942922532558441,
+              0.0
+            ]
+          },
+          {
+            "phase": "MOVE",
+            "position": [
+              -12.129430770874,
+              1.29333102703094,
+              11.6423244476318
+            ],
+            "movement_touch": 0,
+            "move_axis": [
+              0.942922532558441,
+              0.0
+            ]
+          },
+          {
+            "phase": "UP",
+            "position": [
+              -11.9212436676025,
+              1.29333984851837,
+              11.5077028274536
+            ],
+            "movement_touch": -1,
+            "move_axis": [
+              0.0,
+              0.0
+            ]
+          }
+        ],
+        "before": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -12.6081914901733,
+            1.29332709312439,
+            12.0093507766724
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "target": null,
+        "after": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.9212436676025,
+            1.29333984851837,
+            11.5077028274536
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "distance_m": 0.850616233027675
+      }
+    },
+    {
+      "name": "released_movement_neutral_inputs",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -11.9212436676025,
+          1.29333984851837,
+          11.5077028274536
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "released_movement_no_player_drift",
+      "passed": true,
+      "detail": {
+        "distance_m": 0.0,
+        "first": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.9212436676025,
+            1.29333984851837,
+            11.5077028274536
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "second": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.9212436676025,
+            1.29333984851837,
+            11.5077028274536
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        }
+      }
+    },
+    {
+      "name": "native_tap_selects_running",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -11.9212436676025,
+          1.29333984851837,
+          11.5077028274536
+        ],
+        "running": true,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "native_tap_restores_walking",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -11.9212436676025,
+          1.29333984851837,
+          11.5077028274536
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "native_tap_opens_techniques",
+      "passed": true,
+      "detail": {
+        "action_mode": "unarmed",
+        "action_runtime": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "techniques",
+          "position": [
+            -11.9212436676025,
+            1.29333984851837,
+            11.5077028274536
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "actors": 15,
+        "aelia_assignment": "idle",
+        "childhood_runtime": {
+          "age": 12,
+          "carried": [
+            "household_coin",
+            "water_jug"
+          ],
+          "completed": [
+            "mother_morning",
+            "fill_water"
+          ],
+          "day": 1,
+          "dialog_npc": "",
+          "family_entrance": [
+            -13.0,
+            14.6999998092651
+          ],
+          "family_water": [
+            -12.0,
+            11.6999998092651
+          ],
+          "stage": "father_morning",
+          "target_npc": "sextus",
+          "target_point": "",
+          "target_position": [
+            -16.2000007629395,
+            16.7000007629395
+          ],
+          "target_radius": 3.2,
+          "version": 1,
+          "world_id": "53010432-1451708246"
+        },
+        "controls": {
+          "technique_front_kick": {
+            "center": [
+              477.0,
+              573.0
+            ],
+            "enabled": false,
+            "instance_id": "367286817601",
+            "rect": [
+              254.25,
+              547.5,
+              445.5,
+              51.0
+            ],
+            "visible": false
+          },
+          "technique_headbutt": {
+            "center": [
+              477.0,
+              516.0
+            ],
+            "enabled": false,
+            "instance_id": "367202931525",
+            "rect": [
+              254.25,
+              490.5,
+              445.5,
+              51.0
+            ],
+            "visible": false
+          },
+          "technique_high_kick": {
+            "center": [
+              477.0,
+              687.0
+            ],
+            "enabled": false,
+            "instance_id": "367454592200",
+            "rect": [
+              254.25,
+              661.5,
+              445.5,
+              51.0
+            ],
+            "visible": false
+          },
+          "technique_hook_left": {
+            "center": [
+              477.0,
+              288.0
+            ],
+            "enabled": false,
+            "instance_id": "366867384554",
+            "rect": [
+              254.25,
+              262.5,
+              445.5,
+              51.0
+            ],
+            "visible": true
+          },
+          "technique_hook_right": {
+            "center": [
+              477.0,
+              345.0
+            ],
+            "enabled": false,
+            "instance_id": "366951275448",
+            "rect": [
+              254.25,
+              319.5,
+              445.5,
+              51.0
+            ],
+            "visible": true
+          },
+          "technique_jab_left": {
+            "center": [
+              477.0,
+              187.5
+            ],
+            "enabled": true,
+            "instance_id": "366699616865",
+            "rect": [
+              254.25,
+              166.5,
+              445.5,
+              42.0
+            ],
+            "visible": true
+          },
+          "technique_jab_right": {
+            "center": [
+              477.0,
+              235.5
+            ],
+            "enabled": true,
+            "instance_id": "366783502516",
+            "rect": [
+              254.25,
+              214.5,
+              445.5,
+              42.0
+            ],
+            "visible": true
+          },
+          "technique_side_kick": {
+            "center": [
+              477.0,
+              630.0
+            ],
+            "enabled": false,
+            "instance_id": "367370704411",
+            "rect": [
+              254.25,
+              604.5,
+              445.5,
+              51.0
+            ],
+            "visible": false
+          },
+          "technique_uppercut_left": {
+            "center": [
+              477.0,
+              402.0
+            ],
+            "enabled": false,
+            "instance_id": "367035161822",
+            "rect": [
+              254.25,
+              376.5,
+              445.5,
+              51.0
+            ],
+            "visible": true
+          },
+          "technique_uppercut_right": {
+            "center": [
+              477.0,
+              459.0
+            ],
+            "enabled": false,
+            "instance_id": "367119045443",
+            "rect": [
+              254.25,
+              433.5,
+              445.5,
+              51.0
+            ],
+            "visible": false
+          },
+          "techniques_close": {
+            "center": [
+              675.75,
+              105.75
+            ],
+            "enabled": true,
+            "instance_id": "366347295332",
+            "rect": [
+              645.75,
+              87.75,
+              60.0,
+              36.0
+            ],
+            "visible": true
+          }
+        },
+        "decimus_met": false,
+        "feedback": "",
+        "graphics_runtime": {
+          "ui_profile": "low",
+          "world_profile": "low"
+        },
+        "people": 14,
+        "player_is_ruler": false,
+        "screen": "playing",
+        "scroll": {
+          "bottom": [
+            624.47998046875,
+            388.050018310547
+          ],
+          "offset": 0,
+          "top": [
+            624.47998046875,
+            211.5
+          ]
+        },
+        "work_permit": false,
+        "workplaces": 5,
+        "world_seconds": 19.6833333333332
+      }
+    },
+    {
+      "name": "native_tap_selects_right_straight",
+      "passed": true,
+      "detail": {
+        "action_mode": "unarmed",
+        "action_runtime": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.9212436676025,
+            1.29333984851837,
+            11.5077028274536
+          ],
+          "running": false,
+          "selected_technique": "jab_right",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "actors": 15,
+        "aelia_assignment": "idle",
+        "childhood_runtime": {
+          "age": 12,
+          "carried": [
+            "household_coin",
+            "water_jug"
+          ],
+          "completed": [
+            "mother_morning",
+            "fill_water"
+          ],
+          "day": 1,
+          "dialog_npc": "",
+          "family_entrance": [
+            -13.0,
+            14.6999998092651
+          ],
+          "family_water": [
+            -12.0,
+            11.6999998092651
+          ],
+          "stage": "father_morning",
+          "target_npc": "sextus",
+          "target_point": "",
+          "target_position": [
+            -16.2000007629395,
+            16.7000007629395
+          ],
+          "target_radius": 3.2,
+          "version": 1,
+          "world_id": "53010432-1451708246"
+        },
+        "controls": {
+          "attack": {
+            "center": [
+              895.5,
+              349.5
+            ],
+            "enabled": true,
+            "instance_id": "347909135357",
+            "rect": [
+              840.0,
+              327.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "commands": {
+            "center": [
+              852.375,
+              507.0
+            ],
+            "enabled": true,
+            "instance_id": "346634062042",
+            "rect": [
+              761.25,
+              489.0,
+              182.25,
+              36.0
+            ],
+            "visible": true
+          },
+          "dodge": {
+            "center": [
+              895.5,
+              400.5
+            ],
+            "enabled": true,
+            "instance_id": "348076907076",
+            "rect": [
+              840.0,
+              378.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "guard": {
+            "center": [
+              778.5,
+              400.5
+            ],
+            "enabled": true,
+            "instance_id": "347993020989",
+            "rect": [
+              723.0,
+              378.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "interact": {
+            "center": [
+              778.5,
+              349.5
+            ],
+            "enabled": true,
+            "instance_id": "347825248749",
+            "rect": [
+              723.0,
+              327.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "move_pad": {
+            "axis_points": {
+              "center": [
+                90.0,
+                393.0
+              ],
+              "down": [
+                90.0,
+                444.839996337891
+              ],
+              "left": [
+                38.1599960327148,
+                393.0
+              ],
+              "right": [
+                141.839996337891,
+                393.0
+              ],
+              "up": [
+                90.0,
+                341.160003662109
+              ]
+            },
+            "center": [
+              90.0,
+              393.0
+            ],
+            "enabled": true,
+            "instance_id": "347724585484",
+            "rect": [
+              9.0,
+              312.0,
+              162.0,
+              162.0
+            ],
+            "visible": true
+          },
+          "pace": {
+            "center": [
+              895.5,
+              451.5
+            ],
+            "enabled": true,
+            "instance_id": "348244679247",
+            "rect": [
+              840.0,
+              429.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "pause": {
+            "center": [
+              916.875,
+              33.0
+            ],
+            "enabled": true,
+            "instance_id": "345375775406",
+            "rect": [
+              890.25,
+              15.0,
+              53.25,
+              36.0
+            ],
+            "visible": true
+          },
+          "techniques": {
+            "center": [
+              778.5,
+              451.5
+            ],
+            "enabled": true,
+            "instance_id": "348160793162",
+            "rect": [
+              723.0,
+              429.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "village": {
+            "center": [
+              666.0,
+              507.0
+            ],
+            "enabled": true,
+            "instance_id": "346550181085",
+            "rect": [
+              575.25,
+              489.0,
+              181.5,
+              36.0
+            ],
+            "visible": true
+          }
+        },
+        "decimus_met": false,
+        "feedback": "",
+        "graphics_runtime": {
+          "ui_profile": "low",
+          "world_profile": "low"
+        },
+        "people": 14,
+        "player_is_ruler": false,
+        "screen": "playing",
+        "work_permit": false,
+        "workplaces": 5,
+        "world_seconds": 20.4833333333332
+      }
+    },
+    {
+      "name": "native_pointer_is_held_before_pause",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.666666626930237,
+          0.0,
+          -0.666666626930237
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.942922532558441,
+          0.0
+        ],
+        "movement_touch": 0,
+        "overlay": "none",
+        "position": [
+          -11.871244430542,
+          1.29334080219269,
+          11.4577035903931
+        ],
+        "running": false,
+        "selected_technique": "jab_right",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.666675508022308,
+          0.000622272433247417,
+          -0.666675508022308
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "pause_cancels_held_native_pointer",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -11.7206716537476,
+          1.29333114624023,
+          11.339282989502
+        ],
+        "running": false,
+        "selected_technique": "jab_right",
+        "touch_camera_managed": true,
+        "ui_view": "pause",
+        "velocity": [
+          1.11276626586914,
+          2.14576703001512e-05,
+          -0.794391572475433
+        ],
+        "version": 1,
+        "world_active": false,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "resume_after_held_pointer_neutral_inputs",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -11.7206716537476,
+          1.29333114624023,
+          11.339282989502
+        ],
+        "running": false,
+        "selected_technique": "jab_right",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "resume_after_held_pointer_no_player_drift",
+      "passed": true,
+      "detail": {
+        "distance_m": 0.0,
+        "first": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.7206716537476,
+            1.29333114624023,
+            11.339282989502
+          ],
+          "running": false,
+          "selected_technique": "jab_right",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "second": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.7206716537476,
+            1.29333114624023,
+            11.339282989502
+          ],
+          "running": false,
+          "selected_technique": "jab_right",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        }
+      }
+    },
+    {
+      "name": "world_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "world_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "android_back_pauses",
+      "passed": true,
+      "detail": "Back opened a new pause without terminating the app"
+    },
+    {
+      "name": "background_resume",
+      "passed": true,
+      "detail": "Process survived Home and return"
+    },
+    {
+      "name": "launch_6048_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_6048_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "persistent_save_after_restart",
+      "passed": true,
+      "detail": {
+        "atlas": [
+          156.75,
+          462.0
+        ],
+        "can_continue": true,
+        "continue": [
+          156.75,
+          220.5
+        ],
+        "demo": [
+          156.75,
+          421.5
+        ],
+        "gallery": [
+          156.75,
+          502.5
+        ],
+        "gallery_visible": true
+      }
+    },
+    {
+      "name": "continue_after_process_death",
+      "passed": true,
+      "detail": "Loaded the village in a new process"
+    },
+    {
+      "name": "family_actions_and_items_survive_restart",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [
+          "household_coin",
+          "water_jug"
+        ],
+        "completed": [
+          "mother_morning",
+          "fill_water"
+        ],
+        "day": 1,
+        "dialog_npc": "",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "father_morning",
+        "target_npc": "sextus",
+        "target_point": "",
+        "target_position": [
+          -16.2000007629395,
+          16.7000007629395
+        ],
+        "target_radius": 3.2,
+        "version": 1,
+        "world_id": "53010432-1451708246"
+      }
+    },
+    {
+      "name": "restart_action_controls_neutral_inputs",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -11.7206716537476,
+          1.29333114624023,
+          11.339282989502
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "restart_action_controls_no_player_drift",
+      "passed": true,
+      "detail": {
+        "distance_m": 0.0,
+        "first": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.7206716537476,
+            1.29333114624023,
+            11.339282989502
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "second": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.7206716537476,
+            1.29333114624023,
+            11.339282989502
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        }
+      }
+    },
+    {
+      "name": "launch_6246_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_6246_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "formation_valley",
+      "passed": true,
+      "detail": "Actual practice menu touch opened the valley scene"
+    },
+    {
+      "name": "touch_advances_marching_soldier",
+      "passed": true,
+      "detail": {
+        "paused_step": 0,
+        "member": "ridge_guard_00",
+        "meters": 0.796524882316589,
+        "pose": "run",
+        "step": 1
+      }
+    },
+    {
+      "name": "square_display_alive",
+      "passed": true,
+      "detail": "Physical size: 1080x2400\nOverride size: 900x920"
+    },
+    {
+      "name": "measured_valley_frames",
+      "passed": true,
+      "detail": {
+        "intervals": 11,
+        "scope": "Software-rendered emulator; CPU/GPU values are latest renderer timings, frame time is an interval mean"
+      }
+    },
+    {
+      "name": "launch_6592_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_6592_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "world_globe",
+      "passed": true,
+      "detail": "Opened the playable globe through the main menu on a square display"
+    },
+    {
+      "name": "gallery_menu_action",
+      "passed": true,
+      "detail": {
+        "atlas": [
+          199.21875,
+          442.811492919922
+        ],
+        "can_continue": true,
+        "continue": [
+          199.21875,
+          211.341857910156
+        ],
+        "demo": [
+          199.21875,
+          403.993621826172
+        ],
+        "gallery": [
+          199.21875,
+          481.62939453125
+        ],
+        "gallery_visible": true
+      }
+    },
+    {
+      "name": "gallery_menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "gallery_menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "gallery_button_visible",
+      "passed": true,
+      "detail": [
+        199.21875,
+        481.62939453125
+      ]
+    },
+    {
+      "name": "real_portrait_loaded",
+      "passed": true,
+      "detail": "Tapped Figuren and rendered the legionary portrait from the exported game"
+    },
+    {
+      "name": "gallery_back_to_menu",
+      "passed": true,
+      "detail": "Android Back restored the menu"
+    },
+    {
+      "name": "no_runtime_errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "arm64_download_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "arm64_selected",
+      "passed": true,
+      "detail": "PackageManager primaryCpuAbi"
+    },
+    {
+      "name": "arm64_activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 3026\nWaitTime: 3028\nComplete"
+    },
+    {
+      "name": "arm64_engine_running",
+      "passed": true,
+      "detail": "Godot rendered the new ARM64 process's intro control"
+    },
+    {
+      "name": "arm64_no_runtime_errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "source_commit": "a87e3918872ad2aa76aa2359f810658b4821ca0b",
+  "test_harness_commit": "a87e3918872ad2aa76aa2359f810658b4821ca0b",
+  "apk_file": "IMPERATHEN-a87e3918-emulator.apk",
+  "action_controls_expected": true,
+  "story_route": "childhood_home",
+  "serial": "emulator-5554",
+  "android_version": "15",
+  "api_level": "35",
+  "abi": "x86_64",
+  "model": "sdk_gphone64_x86_64",
+  "pid": "6915",
+  "screenshots": {
+    "00_android_intro.png": {
+      "sha256": "98cbd655201c7f7a27dc90c63a0754f62058648a3da45ce481d439e06dcbda87",
+      "width": 960,
+      "height": 540
+    },
+    "01_android_menu.png": {
+      "sha256": "3e78ab8816e3e53e3a5dd11235bdd32ee858ee01d9e171637a47f13c9c8b7828",
+      "width": 960,
+      "height": 540
+    },
+    "10_android_opening.png": {
+      "sha256": "12990f0783f8902c025f15947dee3891483f844773bd0658ec83b9745eab0eee",
+      "width": 960,
+      "height": 540
+    },
+    "11_android_opening_objective.png": {
+      "sha256": "67942e5f3edbb1ca69b457f64d1620c4f33a3af0b52078320f1b311ce3406c01",
+      "width": 960,
+      "height": 540
+    },
+    "18_android_light_settings.png": {
+      "sha256": "8bd3784392e616c7e6aea7ab0aac06dabee733a8f94b7f566d638d322456677f",
+      "width": 960,
+      "height": 540
+    },
+    "15_android_family_home.png": {
+      "sha256": "8827d0d9f7d705dc702df94d36a6bd74318f12a4fa02fb672b7cbddbb158cab3",
+      "width": 960,
+      "height": 540
+    },
+    "16_android_mother_conversation.png": {
+      "sha256": "eeab4ee9b3f0626c67c65a0ceff872b11a518f66760e0d7a974565abd751f3f9",
+      "width": 960,
+      "height": 540
+    },
+    "17_android_family_jug.png": {
+      "sha256": "9796f23e0d7eef757133930b89346825bd7d8b29efed13009785467194c12baf",
+      "width": 960,
+      "height": 540
+    },
+    "14_android_techniques.png": {
+      "sha256": "696e737740a83e26b8b973348ff7892200862ee451203adc477ad737a61d232e",
+      "width": 960,
+      "height": 540
+    },
+    "02_android_world.png": {
+      "sha256": "9ff9a7e564dc23c47b84e54ae40faa13e6e85bae80b3d6d27f3e40b9af4ff77b",
+      "width": 960,
+      "height": 540
+    },
+    "03_android_pause.png": {
+      "sha256": "1ae9139293f24ed7ccd057c49a91528709360c44628c2f8424be0cac8d5eb29d",
+      "width": 960,
+      "height": 540
+    },
+    "04_android_valley.png": {
+      "sha256": "95b0c004466fd9a43206c439ee4e35c77596de6ec71729e8b7b93efce951deb4",
+      "width": 960,
+      "height": 540
+    },
+    "09_android_marching.png": {
+      "sha256": "ec47f0bf1ce1ae73c4010bdd889214274294570f43802d5e904e728670689b85",
+      "width": 960,
+      "height": 540
+    },
+    "05_android_valley_square.png": {
+      "sha256": "cc3eb3e534fb6d7f870a96f868ebe6250fffcead53d3d513198bdb957fd85236",
+      "width": 920,
+      "height": 900
+    },
+    "06_android_globe.png": {
+      "sha256": "b00fc2c17fd8c1c9517f8e099afe762d311ee0ad6bb76f7995670e3d90c3203b",
+      "width": 920,
+      "height": 900
+    },
+    "08_android_figuren.png": {
+      "sha256": "5972bfa68262f4eb0681db2e09d64597ffe5ad3e6d0d506aeff70c26fd795b84",
+      "width": 920,
+      "height": 900
+    },
+    "07_android_arm64_translated_intro.png": {
+      "sha256": "aaaf24f61a8dc91eeb9920ddb2c6b45ceaff9f767f1fa751636a04bcd43490f0",
+      "width": 920,
+      "height": 900
+    }
+  },
+  "childhood_native_walks": [
+    {
+      "route": "family_door_alignment",
+      "attempt": 1,
+      "input": "adb input motionevent",
+      "events": [
+        {
+          "event": "DOWN",
+          "point": [
+            90,
+            393
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            45,
+            382
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            47,
+            382
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            385
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            72,
+            388
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "UP",
+          "point": [
+            72,
+            388
+          ],
+          "command_returned": true
+        }
+      ],
+      "observations": [
+        {
+          "phase": "DOWN",
+          "position": [
+            -12.0,
+            1.29257822036743,
+            11.6999998092651
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.0499982833862,
+            1.29331994056702,
+            11.7352313995361
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.801533997058868,
+            -0.195930391550064
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.3210487365723,
+            1.29332792758942,
+            11.8444871902466
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.760376989841461,
+            -0.194514915347099
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.7068748474121,
+            1.29333078861237,
+            11.9897947311401
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.49090564250946,
+            -0.130907669663429
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9456949234009,
+            1.29333102703094,
+            12.076361656189
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.242210119962692,
+            -0.0672801807522774
+          ]
+        },
+        {
+          "phase": "UP",
+          "position": [
+            -13.0409555435181,
+            1.29333055019379,
+            12.1096096038818
+          ],
+          "movement_touch": -1,
+          "move_axis": [
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "before": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.0,
+          1.29257822036743,
+          11.6999998092651
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "target": [
+        -13.0,
+        12.0999998092651
+      ],
+      "after": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -13.0409555435181,
+          1.29333055019379,
+          12.1096096038818
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "distance_m": 1.1186458900952523
+    },
+    {
+      "route": "family_doorstep",
+      "attempt": 1,
+      "input": "adb input motionevent",
+      "events": [
+        {
+          "event": "DOWN",
+          "point": [
+            90,
+            393
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            61,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            63,
+            432
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            71,
+            420
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            78,
+            410
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "UP",
+          "point": [
+            78,
+            410
+          ],
+          "command_returned": true
+        }
+      ],
+      "observations": [
+        {
+          "phase": "DOWN",
+          "position": [
+            -13.0409555435181,
+            1.29333055019379,
+            12.1096096038818
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0395212173462,
+            1.293328166008,
+            12.1596069335938
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0336446762085,
+            1.29332458972931,
+            12.6665115356445
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0300245285034,
+            1.34119009971619,
+            12.9963884353638
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0260515213013,
+            1.34583151340485,
+            13.3623323440552
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0220594406128,
+            1.34583401679993,
+            13.7303657531738
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0152130126953,
+            1.30761206150055,
+            14.0966339111328
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.525662899017334,
+            0.779431819915771
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0079793930054,
+            1.16007959842682,
+            14.4442825317383
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.482778936624527,
+            0.697347402572632
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0048742294312,
+            1.03963136672974,
+            14.7307653427124
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.315878063440323,
+            0.448879420757294
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0038442611694,
+            0.963634550571442,
+            14.9088840484619
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.170427441596985,
+            0.241439089179039
+          ]
+        },
+        {
+          "phase": "UP",
+          "position": [
+            -13.003231048584,
+            0.906435549259186,
+            15.0438404083252
+          ],
+          "movement_touch": -1,
+          "move_axis": [
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "before": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -13.0409555435181,
+          1.29333055019379,
+          12.1096096038818
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "target": [
+        -13.0,
+        15.1999998092651
+      ],
+      "after": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -13.003231048584,
+          0.906435549259186,
+          15.0438404083252
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "distance_m": 2.9344733004855565
+    },
+    {
+      "route": "return_inside_family_house",
+      "attempt": 1,
+      "input": "adb input motionevent",
+      "events": [
+        {
+          "event": "DOWN",
+          "point": [
+            90,
+            393
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            113,
+            361
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            105,
+            373
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            101,
+            378
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "UP",
+          "point": [
+            101,
+            378
+          ],
+          "command_returned": true
+        }
+      ],
+      "observations": [
+        {
+          "phase": "DOWN",
+          "position": [
+            -13.003231048584,
+            0.906435549259186,
+            15.0438404083252
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.003231048584,
+            0.906435549259186,
+            15.0438404083252
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0032176971436,
+            0.928651690483093,
+            14.9914274215698
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0031938552856,
+            0.975040972232819,
+            14.8819808959961
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0031366348267,
+            1.08443105220795,
+            14.6238670349121
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0030755996704,
+            1.20212733745575,
+            14.3461465835571
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0030145645142,
+            1.3198230266571,
+            14.0684242248535
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0029287338257,
+            1.34583401679993,
+            13.7227363586426
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0028371810913,
+            1.34582531452179,
+            13.3612384796143
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0027456283569,
+            1.34052884578705,
+            12.9994487762451
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0022792816162,
+            1.29332435131073,
+            12.6758699417114
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.397789835929871,
+            -0.553446531295776
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0001211166382,
+            1.29332208633423,
+            12.454852104187
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.229514300823212,
+            -0.306018948554993
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9977674484253,
+            1.2933247089386,
+            12.3304014205933
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.147670060396194,
+            -0.201368182897568
+          ]
+        },
+        {
+          "phase": "UP",
+          "position": [
+            -12.9965467453003,
+            1.29332733154297,
+            12.229287147522
+          ],
+          "movement_touch": -1,
+          "move_axis": [
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "before": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -13.003231048584,
+          0.906435549259186,
+          15.0438404083252
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "target": [
+        -13.0,
+        12.0999998092651
+      ],
+      "after": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.9965467453003,
+          1.29332733154297,
+          12.229287147522
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "distance_m": 2.814561198092577
+    },
+    {
+      "route": "family_water_station",
+      "attempt": 1,
+      "input": "adb input motionevent",
+      "events": [
+        {
+          "event": "DOWN",
+          "point": [
+            90,
+            393
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            138,
+            399
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "UP",
+          "point": [
+            138,
+            399
+          ],
+          "command_returned": true
+        }
+      ],
+      "observations": [
+        {
+          "phase": "DOWN",
+          "position": [
+            -12.9965467453003,
+            1.29332733154297,
+            12.229287147522
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9465475082397,
+            1.293328166008,
+            12.1821517944336
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.860953330993652,
+            0.107619166374207
+          ]
+        },
+        {
+          "phase": "UP",
+          "position": [
+            -12.6081914901733,
+            1.29332709312439,
+            12.0093507766724
+          ],
+          "movement_touch": -1,
+          "move_axis": [
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "before": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.9965467453003,
+          1.29332733154297,
+          12.229287147522
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "target": [
+        -12.0,
+        11.6999998092651
+      ],
+      "after": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.6081914901733,
+          1.29332709312439,
+          12.0093507766724
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "distance_m": 0.4463090985037712
+    }
+  ],
+  "childhood_scope": "First two actual actions only: mother conversation and filling the family jug; no quest, item or position injection.",
+  "action_native_walk": {
+    "input": "adb input motionevent",
+    "events": [
+      {
+        "event": "DOWN",
+        "point": [
+          90,
+          393
+        ],
+        "command_returned": true
+      },
+      {
+        "event": "MOVE",
+        "point": [
+          142,
+          393
+        ],
+        "command_returned": true
+      },
+      {
+        "event": "MOVE",
+        "point": [
+          142,
+          393
+        ],
+        "command_returned": true
+      },
+      {
+        "event": "UP",
+        "point": [
+          142,
+          393
+        ],
+        "command_returned": true
+      }
+    ],
+    "observations": [
+      {
+        "phase": "DOWN",
+        "position": [
+          -12.6081914901733,
+          1.29332709312439,
+          12.0093507766724
+        ],
+        "movement_touch": 0,
+        "move_axis": [
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "phase": "MOVE",
+        "position": [
+          -12.5581922531128,
+          1.29332828521729,
+          11.9593515396118
+        ],
+        "movement_touch": 0,
+        "move_axis": [
+          0.942922532558441,
+          0.0
+        ]
+      },
+      {
+        "phase": "MOVE",
+        "position": [
+          -12.129430770874,
+          1.29333102703094,
+          11.6423244476318
+        ],
+        "movement_touch": 0,
+        "move_axis": [
+          0.942922532558441,
+          0.0
+        ]
+      },
+      {
+        "phase": "UP",
+        "position": [
+          -11.9212436676025,
+          1.29333984851837,
+          11.5077028274536
+        ],
+        "movement_touch": -1,
+        "move_axis": [
+          0.0,
+          0.0
+        ]
+      }
+    ],
+    "before": {
+      "action_touches": 0,
+      "body_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "camera_touches": 0,
+      "camera_yaw": 0.62,
+      "mode": "person",
+      "move_axis": [
+        0.0,
+        0.0
+      ],
+      "movement_touch": -1,
+      "overlay": "none",
+      "position": [
+        -12.6081914901733,
+        1.29332709312439,
+        12.0093507766724
+      ],
+      "running": false,
+      "selected_technique": "jab_left",
+      "touch_camera_managed": true,
+      "ui_view": "game",
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "version": 1,
+      "world_active": true,
+      "world_camera_touches": 0
+    },
+    "target": null,
+    "after": {
+      "action_touches": 0,
+      "body_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "camera_touches": 0,
+      "camera_yaw": 0.62,
+      "mode": "person",
+      "move_axis": [
+        0.0,
+        0.0
+      ],
+      "movement_touch": -1,
+      "overlay": "none",
+      "position": [
+        -11.9212436676025,
+        1.29333984851837,
+        11.5077028274536
+      ],
+      "running": false,
+      "selected_technique": "jab_left",
+      "touch_camera_managed": true,
+      "ui_view": "game",
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "version": 1,
+      "world_active": true,
+      "world_camera_touches": 0
+    },
+    "distance_m": 0.850616233027675
+  },
+  "valley_render_samples": [
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.282170466515254,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 3543.957,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 11880.2080078125,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.732136777792827,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1365.865,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 38.7900009155273,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 1.11550869427476,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 896.452,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 15.3229999542236,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 1.02502653537443,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 975.5845,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 3531.51904296875,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.951128180691527,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1051.383,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 49.3870010375977,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.504040387748189,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1983.968,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 45.4020004272461,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 1.58628686728965,
+      "frames": 3,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 630.403,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 183.055999755859,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.654179470866935,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1528.6325,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 41.9869995117188,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.670509580576142,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1491.403,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 39.1679992675781,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 843,
+      "driver": "opengl3",
+      "fps": 0.568195377389688,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1759.958,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 40.8079986572266,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 111810
+    },
+    {
+      "draw_calls": 841,
+      "driver": "opengl3",
+      "fps": 1.97817805844461,
+      "frames": 3,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 505.515666666667,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 19.0639991760254,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 111810
+    }
+  ],
+  "arm64_package": {
+    "available_abis": [
+      "x86_64",
+      "arm64-v8a"
+    ],
+    "sha256": "2b6eb0147af7a11040d80c4378ad4f7e4d239e78ffe537bf0773c1cd0f2a177a",
+    "name": "IMPERATHEN-a87e3918-arm64.apk",
+    "status": "started_under_translation"
+  }
+}

@@ -9,6 +9,15 @@ Dieser Arbeitszweig setzt den Auftrag aus
 Der eigene Branch wird in [Draft-PR 39](https://github.com/Ullmann27/Imperathen/pull/39)
 geführt. Ein Merge nach `main` gehört nicht zu dieser Lieferung.
 
+**Geprüfter Spiel-/APK-Stand: `a87e3918872ad2aa76aa2359f810658b4821ca0b`.**
+[Android-CI 31](https://github.com/Ullmann27/Imperathen/actions/runs/45210298631)
+bestand 46 Engine-Gruppen, 103 Pythonprüfungen und 73 tatsächliche
+Android-Laufzeitchecks. Der vollständige Familien-/Touchweg lief auf x86_64;
+die ARM64-Download-APK wurde zusätzlich unter Übersetzung bis zum Intro
+gestartet. Der getrennte [grafische Familienweg](CONTINUOUS_ROUTE.md) bestand
+77 Headless- und 89 grafische Prüfungen. Downloads und verbleibende Fehler
+stehen im [Lieferbericht](DELIVERY.md).
+
 ## Spielverhalten
 
 Eine neue Italia-Partie beginnt mit der zwölfjährigen Figur im Familienhaus,

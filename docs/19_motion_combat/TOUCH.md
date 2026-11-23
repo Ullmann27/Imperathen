@@ -72,11 +72,16 @@ Testhilfe gekennzeichnet; die Android-Prüfstrecke setzt keine Positionen.
 
 ### Prüfstand dieser Zusammenführung
 
-Im wiederhergestellten gemeinsamen Checkout wurden **85 Python-Tests tatsächlich
+Im wiederhergestellten Integrationsstand db90dee wurden **85 Python-Tests tatsächlich
 ausgeführt und bestanden**. Darin enthalten sind **55 Tests** aus
 `tests/android_runtime_smoke_test.py`: die bisherigen 42 und 13 zusätzliche
 Fälle für APK-Routenauswahl, Familienzustand, Kamerarichtung, native
 Steuerkoordinaten und die konkrete Scrollregression aus CI 27.
+Nach der Korrektur des Android-Prüfwegs in `a87e391…` bestanden insgesamt
+**103 Android-bezogene Python-Tests**, davon **73 Harnessfälle**. Die 18 neuen
+Fälle prüfen insbesondere echte Kontaktbestätigung, Positionsfortschritt,
+Freigabe trotz Fehler, eine neue Beobachtung nach UP, das begrenzte
+Diagnosefenster und beobachtete Qualitätswerte.
 
 Nach einer gezielten Korrektur der Temposynchronisierung bestand der tatsächliche
 Kindheitsintegrationstest **94/94 Checks, Exitcode 0**. Er prüft beide nativen
@@ -100,9 +105,13 @@ Belege bleiben von den historischen Aufnahmen im nächsten Abschnitt getrennt.
 Android-CI 30 baute und prüfte die ARM64- und x86_64-Pakete statisch.
 Tatsächlich gestartet wurde die x86_64-Ausgabe. Sie bestand 22 Laufzeitchecks
 bis ins Familienhaus, scheiterte
-danach aber am ersten automatisierten Bewegungsversuch. Der Android-Abschluss
-steht deshalb noch aus; der Originalbericht liegt unter
-`evidence/android/ci30/runtime-report.json`.
+danach aber am ersten automatisierten Bewegungsversuch. Der Originalbericht
+bleibt unter `evidence/android/ci30/runtime-report.json` erhalten.
+Der korrigierte **Android-Nachlauf 31 zu a87e391 bestand anschließend 73/73
+Laufzeitchecks**, einschließlich der vollständigen Familien-/Touchstrecke
+und des Prozessneustarts auf x86_64. Die ARM64-Ausgabe wurde zusätzlich unter
+Übersetzung installiert und bis zum Intro gestartet. Der
+[Originalbericht](evidence/android/ci31/runtime-report.json) trennt diese Umfänge.
 
 ## Schnittstelle zwischen UI und Spielwelt
 
@@ -161,7 +170,7 @@ Laufzeitausgabe. `touch-input-review.json` und `touch-input.log` belegen die
 umetikettiert. Eine neue Aufnahme muss den zusammengeführten Quellstand mit
 eigenem Rückgabecode, Prüfbericht und Quellhashes belegen.
 
-## Android: tatsächlicher erster Lauf und begrenzte Prüfstrecke
+## Android: bestandener Nachlauf und genauer Prüfumfang
 
 `prototype/scripts/ui/android_village_diagnostics.gd` beobachtet den aktuellen
 Modus, die Weltposition, Geschwindigkeit, Bewegungseingabe und gehaltene
@@ -175,6 +184,8 @@ den 18 historischen Main-Prüfungen mitgeprüft. Neu hinzu kommen
 Familienziel und Haustür-/Wasserpunkt sowie der tatsächliche Kamerawinkel in
 `action_runtime`. Android-CI 30 beobachtete diese Familienfelder tatsächlich
 in der gestarteten APK; sein vollständiger Bewegungsweg bestand noch nicht.
+Nachlauf 31 bestätigt den unten beschriebenen Weg vollständig. Der Beobachter
+verwendet dabei monotone Wanduhrzeit, ohne Spielzeit oder Modell zu verändern.
 
 `tools/android_runtime_smoke.py` erkennt anhand des tatsächlichen APK-Inhalts,
 ob die Familiengeschichte vorhanden ist. Nur APKs ohne Kindheitsmodul verwenden
@@ -187,8 +198,9 @@ weiter den alten Decimus-/Arbeitsverteilungsweg. Der neue Weg verwendet:
    `fill_water` durch Interagieren. Nur diese ersten zwei Handlungen sind
    Prüfgegenstand; der Haushaltsdenar und der gefüllte Krug müssen wirklich
    im Auftragsinventar stehen. Keine Teleports oder geschriebenen Questdaten.
-3. Neue Partie im unbewaffneten Aktionsmodus erkennen; mit einem echten ADB-Swipe
-   am beobachteten Steuerfeld mindestens 0,10 m horizontale Bewegung erreichen.
+3. Neue Partie im unbewaffneten Aktionsmodus erkennen; über native ADB-Ereignisse
+   DOWN/MOVE/UP am beobachteten Steuerfeld mindestens 0,10 m horizontale
+   Bewegung erreichen. DOWN muss vor MOVE als echter Kontakt beobachtet sein.
 4. Nach Loslassen neutrale Kontakte und Stillstand prüfen; Gehen/Laufen durch
    reale Taps umschalten und den tatsächlichen Modus beobachten.
 5. Techniken durch einen realen Tap öffnen und die rechte Gerade auswählen;
@@ -212,8 +224,24 @@ sie ersetzen keinen Android-Emulator- oder Gerätelauf. Der Lauf installierte
 und startete die x86_64-APK und bestätigte 22 Checks bis zum Familienhaus.
 Ein 900-ms-Steuerimpuls führte anschließend zu keiner beobachteten Bewegung;
 der damalige Beobachter meldete seinen Zustand nur etwa alle 13–17 realen
-Sekunden. Der notwendige Nachlauf prüft einen tatsächlich gehaltenen nativen
-Pointer und eine monotone Beobachtungszeit. Seine genauen Ergebnisse werden
-im Lieferbericht benannt. Die Ausführung verwendet weiterhin das ADB-Szenario aus
-demselben Commit.
+Sekunden. Der [erfolgreiche Nachlauf 31](https://github.com/Ullmann27/Imperathen/actions/runs/45210298631)
+verwendete `a87e3918872ad2aa76aa2359f810658b4821ca0b` für APK und Prüfer:
+103 Pythonprüfungen, 46 Engine-Gruppen und **73 tatsächliche Androidchecks**
+bestanden. Vor dem Familienweg öffnete er über Android-Zurück die Pause und
+wählte das leichte Grafikprofil über Einstellungen und das tatsächliche
+Qualitäts-Popup. UI und Welt meldeten beide `low`; nach Rückkehr blieb diese
+Beobachtung erhalten. Es wurden keine Qualitäts-Konfigurationsdaten direkt
+für diesen Wechsel geschrieben. Das entsprechende Screenshotbild 18 zeigt
+noch einen früheren Popupzustand und wird nicht als Beleg des abgeschlossenen
+Wechsels verwendet.
+
+Vier native Wege führten durch die Tür zu Antonia und zurück zum Wasserpunkt.
+Der zusätzliche Padtest bewegte die wirkliche Figur um 0,8506 m. Pause beendete
+den gehaltenen Fingerkontakt; nach Freigabe, Fortsetzen und neuem Prozess
+waren die Eingaben neutral und die Figur driftete nicht. Die Mutterhandlung,
+der Wasserauftrag, Haushaltsdenar und Wasserkrug blieben nach Prozessneustart
+erhalten. Der komplette Ablauf lief auf x86_64 / Android 15, API 35. Die
+ARM64-Download-APK wurde zusätzlich unter Übersetzung bis zum Intro gestartet;
+damit ist kein kompletter ARM64-Familienweg belegt. Einzelne Bildgrenzen stehen
+in [VISUAL_REVIEW.md](evidence/android/ci31/VISUAL_REVIEW.md).
 Physische Geräte, tatsächliches Falten und Dauerlast bleiben gesonderte Prüfungen.

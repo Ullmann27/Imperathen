@@ -10,6 +10,13 @@ und `e5735509622c9a94564dc5fe21257c07074f9df5` (vollständiger Dorf-/Familienanf
 zusammen. Sein Git-Tree `d4ca46c2199e6d2a755bb921aa954b4c66125851` stimmt exakt
 mit dem lokal geprüften und anschließend übertragenen Baum überein.
 
+Der nachfolgende Android-Prüfstand ist
+**`a87e3918872ad2aa76aa2359f810658b4821ca0b`**. Im Produktionscode ändert er
+gegenüber der Zusammenführung ausschließlich den rein lesenden
+Android-Diagnosebeobachter: monotone Beobachtungszeit und beobachtbare
+Qualitätsbedienelemente. Bewegung, Physik, Modell und Spieltempo bleiben
+bytegleich. Hinzu kommen der korrigierte native Prüfweg und seine Regressionen.
+
 [Draft-PR 39](https://github.com/Ullmann27/Imperathen/pull/39) ist auf den
 Kindheitszweig gerichtet und hat auf dieser Grundlage keine Mergekonflikte mehr.
 Es wurde nicht nach `main` gemergt und kein Store-Release veröffentlicht.
@@ -50,6 +57,9 @@ bestanden 45; ein Kindheitsprozess endete mit SIGKILL, dessen Ursache nicht
 gesichert ist. Der unveränderte Wiederholungslauf bestand alle 94 Checks.
 Originalabbruch und Wiederholung bleiben beide nachvollziehbar erhalten.
 Die **85 Pythonprüfungen** bestanden ebenfalls.
+Nach der späteren Android-Harnesskorrektur bestanden **103 Android-bezogene
+Pythonprüfungen**, davon 73 Fälle für den Laufzeitprüfer. Die ältere
+85er-Aufzeichnung wird als Beleg des Integrationscommits unverändert erhalten.
 
 | Bereich | Bestandene Checks |
 | --- | ---: |
@@ -77,6 +87,53 @@ API und gemeinsame Autorität stehen in [INTEGRATION.md](INTEGRATION.md) und
 
 ## Android und kontinuierlicher Familienweg
 
+Der aktuelle [Android-Nachlauf 31](https://github.com/Ullmann27/Imperathen/actions/runs/45210298631)
+bestand auf **`a87e3918872ad2aa76aa2359f810658b4821ca0b` vollständig**:
+46 Engine-Prüfgruppen, 103 Pythonprüfungen, beide APK-Exporte samt jeweils
+21 statischen Paket-/Signaturprüfungen und **73/73 tatsächliche Android-
+Laufzeitchecks**. Der Originalbericht enthält keine Laufzeitfehler.
+
+Die vollständige Familien- und Eingabestrecke lief auf Android 15 / API 35
+mit x86_64: normales Intro, Low-Auswahl über das Einstellungsmenü, vier echte
+Joystickwege durch die Haustür, Mutterantwort, Haushaltsdenar und Wasserkrug,
+weitere 0,8506 m über das Steuerfeld, beide Tempowechsel, rechte Gerade auswählen,
+Pause bei gehaltenem Kontakt, Hintergrund/Rückkehr und Prozessneustart.
+Weltidentität, beide Familienhandlungen und beide Gegenstände blieben danach
+erhalten. Die zusätzlichen bestehenden Tal-/Marsch-, quadratischen Anzeige-,
+Weltkugel- und Portraitprüfungen bestanden ebenfalls.
+
+Die **ARM64-Download-APK wurde anschließend separat installiert und unter
+ARM-Übersetzung im Emulator bis zum gerenderten Intro gestartet**. Das ist
+ein zusätzlicher Startnachweis; der komplette Familienweg wurde nicht nochmals
+mit der ARM64-Ausgabe durchgeführt. Ein physisches Telefon wurde nicht benutzt.
+
+[Originalbericht](evidence/android/ci31/runtime-report.json),
+[Bau-/Prüfübersicht](evidence/android/ci31/build-summary.json) und
+[Android-Bildprüfung](evidence/android/ci31/VISUAL_REVIEW.md) enthalten die
+genauen Abgrenzungen. Alle 17 Original-Androidbilder sind erhalten. Bild 18
+zeigt noch das offene Qualitäts-Popup und den alten Auswahltext; es belegt
+den abgeschlossenen Wechsel nicht. Dafür sind die neuen Laufzeitbeobachtungen
+maßgeblich, die vor und nach der Rückkehr UI sowie Welt als `low` bestätigen.
+
+### Downloads aus demselben geprüften Commit
+
+- [Android-APKs und Bauprotokolle](https://github.com/Ullmann27/Imperathen/actions/runs/45210298631/artifacts/14836885891)
+- [Windows und Linux](https://github.com/Ullmann27/Imperathen/actions/runs/45210298631/artifacts/14837110101)
+- [Vollständiger Android-Laufzeitnachweis](https://github.com/Ullmann27/Imperathen/actions/runs/45210298631/artifacts/14837331432)
+
+| Paket | Größe | SHA-256 |
+| --- | ---: | --- |
+| `IMPERATHEN-a87e3918-arm64.apk` | 150.719.305 Bytes | `2b6eb0147af7a11040d80c4378ad4f7e4d239e78ffe537bf0773c1cd0f2a177a` |
+| `IMPERATHEN-a87e3918-emulator.apk` | 153.500.483 Bytes | `5c619f2626550c901844345ba00686247735fef1139e3014d08d2f081ae713ad` |
+
+Die Actions-Artefakte laufen laut GitHub am 23. Dezember 2026 ab. Die hier
+im Repository erhaltenen Berichte und Bilder haben diese Artefaktfrist nicht.
+Der vorhandene Workflow erzeugt pro Lauf einen neuen Testsignierschlüssel;
+dieser Download ist daher kein zugesichertes Update einer früher installierten
+Testfassung. Die Prüfung verwendete ausschließlich eine leere Emulatorinstallation.
+
+### Erhaltene vorherige Fehler und ihre Korrektur
+
 Der [Android-Lauf 30](https://github.com/Ullmann27/Imperathen/actions/runs/45204185930)
 verwendete exakt den Integrationscommit. Seine komplette Engine-Regressionsstufe,
 beide APK-Exporte samt statischer Prüfung und die Desktop-Exporte bestanden.
@@ -86,6 +143,12 @@ automatisierten Bewegungsimpuls. Er ist keine bestandene Android-Laufzeitabnahme
 Der Beobachter protokollierte auf dem langsamen Emulator nur etwa alle 13–17
 Wanduhrsekunden; die 900-ms-Geste ergab keinen beobachteten Ortswechsel.
 Die anschließende Korrektur und ihr neuer Lauf werden getrennt nachgewiesen.
+Der korrigierte Prüfer wartet nach DOWN auf den echten Fingerkontakt, hält
+MOVE bis zum beobachteten Ortswechsel und gibt den Kontakt in `finally` frei.
+Nach UP muss eine neuere neutrale Beobachtung folgen. Ein Rollfenster begrenzt
+die gespeicherten Diagnoseframes; ungültige ältere Meldungen bleiben weiterhin
+Fehler. Das leichte Grafikprofil wird über die normale Pause-/Einstellungs-
+oberfläche gewählt und von UI sowie Welt bestätigt.
 
 Der vorherige [Lauf 27](https://github.com/Ullmann27/Imperathen/actions/runs/45195592091)
 baute und startete die frühere APK, scheiterte aber beim Scrollen zu einer
@@ -134,6 +197,9 @@ abgeschnitten. Die Füße liegen in mehreren Stationsbildern unter der unteren
 Navigation oder außerhalb des Bilds; diese Ansichten belegen keinen
 vollständigen Fußkontakt. Die Stationsbilder sind keine Daueraufnahme oder
 FPS-Messung.
+Das Hauptmenü enthält noch ältere Marcus-/Holzformulierungen, die nicht
+vollständig zum neuen Familienbeginn passen. Diese erzählerische Nacharbeit
+ist im Android-Bildreview an der tatsächlichen Menüaufnahme festgehalten.
 Ein physisches Telefon, tatsächliches Falten und thermische Dauerlast wurden
 nicht geprüft. Auch das größere Dorf und verbundene Aufgaben machen diesen
 Abschnitt noch nicht zu einer fertigen offenen Welt oder einem AAA-Spiel.
