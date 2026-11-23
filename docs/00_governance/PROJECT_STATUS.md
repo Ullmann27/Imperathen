@@ -1,5 +1,15 @@
 # Projektstatus
 
+**Android-Lieferung abgeschlossen, 23.11.2026.** Die Dorfleben-Prüffassung
+`0.3.0-village` aus `e1b1c1fb` ist als
+[ARM64-APK](https://github.com/Ullmann27/Imperathen/releases/download/village-2026-11-23-e1b1c1fb/IMPERATHEN-e1b1c1fb-arm64.apk) veröffentlicht.
+Lauf 25 bestand 55 Pythonprüfungen, 33 Godot-Prüfgruppen und 50 Android-Laufzeitprüfungen;
+Aelias echte Arbeitszuweisung blieb nach einem Prozessneustart erhalten.
+Die Downloadbytes und alle sieben öffentlichen Prüfdateien wurden unabhängig
+abgeglichen. ARM64-Installation und Appstart sind unter Übersetzung bestätigt;
+ein physisches Telefon ist noch nicht geprüft. Quelle, vollständige Bildserie,
+Installationsweg und Grenzen stehen im [aktuellen Lieferbericht](../17_village_life/DELIVERY.md).
+
 **Aktuelle Fortsetzung, 23.11.2026.** `feature/village-life-delivery-20261123` sichert die unterbrochene Dorfleben-Arbeit und verbindet sie mit dem filmischen Einstieg aus `ea9987c`. Die aktuelle Quelle enthält Wiederaufbau mit vierzehn konkreten erwachsenen Arbeitskräften, fünf Arbeitsstätten, Gespräche/Berufe, Überfälle, gemeinsame Spielstände und 28 Frontier-GLBs. Drei ergänzende Arbeitsbereiche prüfen Spielregeln, Darstellung und Android-Lieferung. Der maßgebliche aktuelle Status einschließlich tatsächlicher Prüfungen und offener Grenzen steht in [DELIVERY.md](../17_village_life/DELIVERY.md). Die folgenden Abschnitte bleiben die historischen Ausgangsstände.
 
 **Aktuelle Charakterfortsetzung, 22.11.2026.** Der Arbeitsbranch `feature/hero-realism-20261122` baut auf `integration/realistic-android-23` auf. Ausführbare Änderungen, Originalmodelle, Renderings und aktuelle Prüfungen stehen im [Charakter-Lieferbericht](../14_character_realism/DELIVERY.md). Die vom Nutzer mit einem Spielbild konkretisierte PC-/Konsolenqualität bleibt der visuelle Maßstab; weder ein Konzeptbild noch ein bestandener Dateivertrag schließen die Qualitätsanforderung aus [Issue #33](https://github.com/Ullmann27/Imperathen/issues/33).

@@ -1,0 +1,1142 @@
+{
+  "platform": "Android emulator",
+  "apk_sha256": "bb03388e5bfc5b8775f900f2010943802ee991037a892d264060d60de6b7c587",
+  "physical_device_test": false,
+  "arm64_runtime_test": true,
+  "status": "passed",
+  "checks": [
+    {
+      "name": "single_emulator_target",
+      "passed": true,
+      "detail": [
+        {
+          "serial": "emulator-5554",
+          "state": "offline"
+        }
+      ]
+    },
+    {
+      "name": "emulator_verified",
+      "passed": true,
+      "detail": {
+        "serial": "emulator-5554",
+        "ro.kernel.qemu": "1"
+      }
+    },
+    {
+      "name": "expected_android_emulator",
+      "passed": true,
+      "detail": {
+        "api_level": "35",
+        "abi": "x86_64",
+        "model": "sdk_gphone64_x86_64"
+      }
+    },
+    {
+      "name": "apk_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "clean_test_app_data",
+      "passed": true,
+      "detail": "Success"
+    },
+    {
+      "name": "launcher",
+      "passed": true,
+      "detail": "at.heinz.imperathen/com.godot.game.GodotAppLauncher"
+    },
+    {
+      "name": "activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 5735\nWaitTime: 5815\nComplete"
+    },
+    {
+      "name": "process_started",
+      "passed": true,
+      "detail": "3210"
+    },
+    {
+      "name": "first_launch_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "first_launch_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "real_menu",
+      "passed": true,
+      "detail": {
+        "new_game": [
+          156.75,
+          237.0
+        ]
+      }
+    },
+    {
+      "name": "menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "touch_starts_saved_game",
+      "passed": true,
+      "detail": "New game button produced a saved village"
+    },
+    {
+      "name": "opening_before_gameplay",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.133333333333334,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "first_day",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "android_back_pauses_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            799.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.516666666666667,
+        "final": false,
+        "index": 0,
+        "paused": true,
+        "sequence": "first_day",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "android_back_resumes_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.666666666666667,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "first_day",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "skip_keeps_first_objective",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            911.625,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.0,
+        "final": true,
+        "index": 5,
+        "paused": false,
+        "sequence": "first_day",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "objective_hands_over_control",
+      "passed": true,
+      "detail": "Actual touch accepted the objective after a separate skip action"
+    },
+    {
+      "name": "village_actual_population",
+      "passed": true,
+      "detail": {
+        "actors": 15,
+        "aelia_assignment": "idle",
+        "controls": {
+          "interact": {
+            "center": [
+              891.0,
+              344.25
+            ],
+            "enabled": true,
+            "instance_id": "308600116799",
+            "visible": true
+          },
+          "village": {
+            "center": [
+              361.875,
+              490.5
+            ],
+            "enabled": true,
+            "instance_id": "308080023072",
+            "visible": true
+          }
+        },
+        "decimus_met": false,
+        "feedback": "",
+        "people": 14,
+        "player_is_ruler": false,
+        "screen": "playing",
+        "work_permit": false,
+        "workplaces": 5,
+        "world_seconds": 0.660097666666666
+      }
+    },
+    {
+      "name": "village_touch_meets_decimus",
+      "passed": true,
+      "detail": {
+        "actors": 15,
+        "aelia_assignment": "idle",
+        "controls": {
+          "dialog_close": {
+            "center": [
+              735.0,
+              361.5
+            ],
+            "enabled": true,
+            "instance_id": "311536129033",
+            "visible": true
+          },
+          "permit": {
+            "center": [
+              735.0,
+              316.5
+            ],
+            "enabled": true,
+            "instance_id": "311452242911",
+            "visible": true
+          }
+        },
+        "decimus_met": true,
+        "feedback": "",
+        "people": 14,
+        "player_is_ruler": false,
+        "screen": "village_dialog",
+        "scroll": {
+          "bottom": [
+            860.759948730469,
+            334.799987792969
+          ],
+          "offset": 0,
+          "top": [
+            860.759948730469,
+            216.0
+          ]
+        },
+        "work_permit": false,
+        "workplaces": 5,
+        "world_seconds": 0.793431
+      }
+    },
+    {
+      "name": "village_touch_work_permission",
+      "passed": true,
+      "detail": {
+        "actors": 15,
+        "aelia_assignment": "idle",
+        "controls": {
+          "dialog_close": {
+            "center": [
+              735.0,
+              383.25
+            ],
+            "enabled": true,
+            "instance_id": "313499063787",
+            "visible": true
+          },
+          "permit": {
+            "center": [
+              735.0,
+              338.25
+            ],
+            "enabled": true,
+            "instance_id": "313415177701",
+            "visible": true
+          }
+        },
+        "decimus_met": true,
+        "feedback": "",
+        "people": 14,
+        "player_is_ruler": false,
+        "screen": "village_dialog",
+        "scroll": {
+          "bottom": [
+            860.759948730469,
+            347.700012207031
+          ],
+          "offset": 0,
+          "top": [
+            860.759948730469,
+            204.5625
+          ]
+        },
+        "work_permit": true,
+        "workplaces": 5,
+        "world_seconds": 0.793431
+      }
+    },
+    {
+      "name": "village_back_closes_dialogue",
+      "passed": true,
+      "detail": "Android Back returned from the real steward conversation"
+    },
+    {
+      "name": "village_unassigned_resident",
+      "passed": true,
+      "detail": {
+        "center": [
+          728.625,
+          376.5
+        ],
+        "enabled": true,
+        "instance_id": "326534960707",
+        "popup": {
+          "focused": -1,
+          "instance_id": "326585292358",
+          "items": [
+            {
+              "enabled": true,
+              "index": 0,
+              "text": "Frei / Erholen"
+            },
+            {
+              "enabled": true,
+              "index": 1,
+              "text": "Dorffelder"
+            },
+            {
+              "enabled": true,
+              "index": 2,
+              "text": "Holzfällerlager"
+            },
+            {
+              "enabled": true,
+              "index": 3,
+              "text": "Steinbruch"
+            },
+            {
+              "enabled": true,
+              "index": 4,
+              "text": "Handelsplatz"
+            },
+            {
+              "enabled": true,
+              "index": 5,
+              "text": "Stadtposten"
+            },
+            {
+              "enabled": true,
+              "index": 6,
+              "text": "Verteidigung"
+            }
+          ],
+          "visible": false
+        },
+        "selected": 0,
+        "visible": true
+      }
+    },
+    {
+      "name": "village_popup_target_observed",
+      "passed": true,
+      "detail": {
+        "control_instance": "326534960707",
+        "popup_instance": "326585292358",
+        "focused_index": 2,
+        "text": "Holzfällerlager",
+        "down_presses": 3
+      }
+    },
+    {
+      "name": "village_actual_worker_assignment",
+      "passed": true,
+      "detail": {
+        "actors": 15,
+        "aelia_assignment": "woodcamp",
+        "controls": {
+          "aelia_assignment": {
+            "center": [
+              728.625,
+              402.75
+            ],
+            "enabled": true,
+            "instance_id": "360659818804",
+            "popup": {
+              "focused": -1,
+              "instance_id": "360710150455",
+              "items": [
+                {
+                  "enabled": true,
+                  "index": 0,
+                  "text": "Frei / Erholen"
+                },
+                {
+                  "enabled": true,
+                  "index": 1,
+                  "text": "Dorffelder"
+                },
+                {
+                  "enabled": true,
+                  "index": 2,
+                  "text": "Holzfällerlager"
+                },
+                {
+                  "enabled": true,
+                  "index": 3,
+                  "text": "Steinbruch"
+                },
+                {
+                  "enabled": true,
+                  "index": 4,
+                  "text": "Handelsplatz"
+                },
+                {
+                  "enabled": true,
+                  "index": 5,
+                  "text": "Stadtposten"
+                },
+                {
+                  "enabled": true,
+                  "index": 6,
+                  "text": "Verteidigung"
+                }
+              ],
+              "visible": false
+            },
+            "selected": 2,
+            "visible": true
+          },
+          "panel_close": {
+            "center": [
+              477.0,
+              1149.0
+            ],
+            "enabled": true,
+            "instance_id": "375356660700",
+            "visible": false
+          },
+          "village": {
+            "center": [
+              202.5,
+              -294.0
+            ],
+            "enabled": true,
+            "instance_id": "358982096363",
+            "visible": false
+          },
+          "work_tab": {
+            "center": [
+              309.375,
+              -294.0
+            ],
+            "enabled": true,
+            "instance_id": "359065982482",
+            "visible": false
+          }
+        },
+        "decimus_met": true,
+        "feedback": "Aelia hilft jetzt bei: Holzfällerlager.",
+        "people": 14,
+        "player_is_ruler": false,
+        "screen": "village_panel",
+        "scroll": {
+          "bottom": [
+            682.559997558594,
+            399.599975585938
+          ],
+          "offset": 626,
+          "top": [
+            682.559997558594,
+            162.0
+          ]
+        },
+        "work_permit": true,
+        "workplaces": 5,
+        "world_seconds": 1.73484866666667
+      }
+    },
+    {
+      "name": "village_back_closes_work_panel",
+      "passed": true,
+      "detail": "The worker stays assigned when the work panel closes"
+    },
+    {
+      "name": "world_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "world_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "android_back_pauses",
+      "passed": true,
+      "detail": "Back opened a new pause without terminating the app"
+    },
+    {
+      "name": "background_resume",
+      "passed": true,
+      "detail": "Process survived Home and return"
+    },
+    {
+      "name": "launch_5450_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_5450_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "persistent_save_after_restart",
+      "passed": true,
+      "detail": {
+        "atlas": [
+          156.75,
+          462.0
+        ],
+        "can_continue": true,
+        "continue": [
+          156.75,
+          220.5
+        ],
+        "demo": [
+          156.75,
+          421.5
+        ],
+        "gallery": [
+          156.75,
+          502.5
+        ],
+        "gallery_visible": true
+      }
+    },
+    {
+      "name": "continue_after_process_death",
+      "passed": true,
+      "detail": "Loaded the village in a new process"
+    },
+    {
+      "name": "village_decisions_survive_restart",
+      "passed": true,
+      "detail": {
+        "actors": 15,
+        "aelia_assignment": "woodcamp",
+        "controls": {
+          "interact": {
+            "center": [
+              891.0,
+              344.25
+            ],
+            "enabled": true,
+            "instance_id": "262261445758",
+            "visible": true
+          },
+          "village": {
+            "center": [
+              361.875,
+              490.5
+            ],
+            "enabled": true,
+            "instance_id": "261741352031",
+            "visible": true
+          }
+        },
+        "decimus_met": true,
+        "feedback": "",
+        "people": 14,
+        "player_is_ruler": false,
+        "screen": "playing",
+        "work_permit": true,
+        "workplaces": 5,
+        "world_seconds": 2.27338733333333
+      }
+    },
+    {
+      "name": "launch_5816_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_5816_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "formation_valley",
+      "passed": true,
+      "detail": "Actual practice menu touch opened the valley scene"
+    },
+    {
+      "name": "touch_advances_marching_soldier",
+      "passed": true,
+      "detail": {
+        "paused_step": 0,
+        "member": "ridge_guard_00",
+        "meters": 0.796524882316589,
+        "pose": "run",
+        "step": 1
+      }
+    },
+    {
+      "name": "square_display_alive",
+      "passed": true,
+      "detail": "Physical size: 1080x2400\nOverride size: 900x920"
+    },
+    {
+      "name": "measured_valley_frames",
+      "passed": true,
+      "detail": {
+        "intervals": 13,
+        "scope": "Software-rendered emulator; CPU/GPU values are latest renderer timings, frame time is an interval mean"
+      }
+    },
+    {
+      "name": "launch_6245_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_6245_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "world_globe",
+      "passed": true,
+      "detail": "Opened the playable globe through the main menu on a square display"
+    },
+    {
+      "name": "gallery_menu_action",
+      "passed": true,
+      "detail": {
+        "atlas": [
+          199.21875,
+          442.811492919922
+        ],
+        "can_continue": true,
+        "continue": [
+          199.21875,
+          211.341857910156
+        ],
+        "demo": [
+          199.21875,
+          403.993621826172
+        ],
+        "gallery": [
+          199.21875,
+          481.62939453125
+        ],
+        "gallery_visible": true
+      }
+    },
+    {
+      "name": "gallery_menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "gallery_menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "gallery_button_visible",
+      "passed": true,
+      "detail": [
+        199.21875,
+        481.62939453125
+      ]
+    },
+    {
+      "name": "real_portrait_loaded",
+      "passed": true,
+      "detail": "Tapped Figuren and rendered the legionary portrait from the exported game"
+    },
+    {
+      "name": "gallery_back_to_menu",
+      "passed": true,
+      "detail": "Android Back restored the menu"
+    },
+    {
+      "name": "no_runtime_errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "arm64_download_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "arm64_selected",
+      "passed": true,
+      "detail": "PackageManager primaryCpuAbi"
+    },
+    {
+      "name": "arm64_activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 4589\nWaitTime: 4596\nComplete"
+    },
+    {
+      "name": "arm64_engine_running",
+      "passed": true,
+      "detail": "Godot rendered the new ARM64 process's intro control"
+    },
+    {
+      "name": "arm64_no_runtime_errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "source_commit": "e1b1c1fb16d63056e4eb80891d84ed75c79b4ed6",
+  "test_harness_commit": "e1b1c1fb16d63056e4eb80891d84ed75c79b4ed6",
+  "apk_file": "IMPERATHEN-e1b1c1fb-emulator.apk",
+  "serial": "emulator-5554",
+  "android_version": "15",
+  "api_level": "35",
+  "abi": "x86_64",
+  "model": "sdk_gphone64_x86_64",
+  "pid": "6649",
+  "screenshots": {
+    "00_android_intro.png": {
+      "sha256": "5488aa2e5b40c8350c68b4bc9f707e328a1e54cd67b87d4791aebcadd4c10a03",
+      "width": 960,
+      "height": 540
+    },
+    "01_android_menu.png": {
+      "sha256": "18f469b8cfedea2cf18a5571c2ddd3909db752c81ae4ac7dd692b67ab60f3d76",
+      "width": 960,
+      "height": 540
+    },
+    "10_android_opening.png": {
+      "sha256": "858baf5a7c5aa5ebbf8ad6f8ac928d54760407af0b4bb251efcc5932c6841dc9",
+      "width": 960,
+      "height": 540
+    },
+    "11_android_opening_objective.png": {
+      "sha256": "c1447ff0d50b84087a758e1f588d39868844f3ee15fce9b029a6a575277eccc8",
+      "width": 960,
+      "height": 540
+    },
+    "12_android_decimus.png": {
+      "sha256": "cdb39ce33e838380df028d8b6141423b3062f76e950bcc5f415f440dc522e7da",
+      "width": 960,
+      "height": 540
+    },
+    "13_android_work_assignment.png": {
+      "sha256": "167857d58c1e4d0377dee9d324052ecd380d3214a8ab6a6b49fed674208aa496",
+      "width": 960,
+      "height": 540
+    },
+    "02_android_world.png": {
+      "sha256": "0f07cbe6cef310dbab26bd774b54a345d588b0ab8dbc559a406e7af9de66a10a",
+      "width": 960,
+      "height": 540
+    },
+    "03_android_pause.png": {
+      "sha256": "2dddeda5c72606a13cc5d54e64497f5ac9fa1d90ae034569302e51ea080df379",
+      "width": 960,
+      "height": 540
+    },
+    "04_android_valley.png": {
+      "sha256": "d101d768aeca54cd6ccde7ae72c4b95b851ee5988e3dca813f0e8299f50093a6",
+      "width": 960,
+      "height": 540
+    },
+    "09_android_marching.png": {
+      "sha256": "bb30b9c7cfb832802c4d73e055429186d23e6a2aaa0f2d42ff25554a01bc8c4b",
+      "width": 960,
+      "height": 540
+    },
+    "05_android_valley_square.png": {
+      "sha256": "8491f6fdc351f5e7bd0b5ee84c3ef4e10af53851d5ae9024326f104b7bc5aec9",
+      "width": 920,
+      "height": 900
+    },
+    "06_android_globe.png": {
+      "sha256": "421b579ab029151f66b7834efdf8574504068894376a7d0ef059f90c1bd476f8",
+      "width": 920,
+      "height": 900
+    },
+    "08_android_figuren.png": {
+      "sha256": "180326185ff03ddef37e99be85b9b4c9721802c7c46a27ddd8d311e2c22c2456",
+      "width": 920,
+      "height": 900
+    },
+    "07_android_arm64_translated_intro.png": {
+      "sha256": "40d35dbc49f6d4db0f4207586996aca1e4ec0cd2c7b10693a9ab9a7c2be8d3ae",
+      "width": 920,
+      "height": 900
+    }
+  },
+  "valley_render_samples": [
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.218271793783794,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 4581.444,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": null,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.464689413213443,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 2151.975,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 17896.380859375,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.721037717483001,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1386.89,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 122.388000488281,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.682761634258248,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1464.64,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 39.8190002441406,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.614191006032584,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1628.158,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 1799.12194824219,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.329579097829952,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 3034.173,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 4562.68408203125,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 1.35448313600772,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 738.289,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 65.125,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.698990308499373,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1430.635,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 123.416999816895,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.281873874970896,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 3547.686,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 81.1839981079102,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.388423956202868,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 2574.5065,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 21.2369995117188,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 843,
+      "driver": "opengl3",
+      "fps": 0.362308732691153,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 2760.077,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 80.6780014038086,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 111810
+    },
+    {
+      "draw_calls": 841,
+      "driver": "opengl3",
+      "fps": 0.8358611166603,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1196.371,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 46.423999786377,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 111810
+    },
+    {
+      "draw_calls": 841,
+      "driver": "opengl3",
+      "fps": 1.698746070588,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 588.6695,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 24.4449996948242,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 111810
+    }
+  ],
+  "arm64_package": {
+    "available_abis": [
+      "x86_64",
+      "arm64-v8a"
+    ],
+    "sha256": "9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015",
+    "name": "IMPERATHEN-e1b1c1fb-arm64.apk",
+    "status": "started_under_translation"
+  }
+}

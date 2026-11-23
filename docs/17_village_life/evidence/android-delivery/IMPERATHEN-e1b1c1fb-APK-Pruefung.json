@@ -1,0 +1,2009 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-11-23T12:54:28.523620+00:00",
+  "apk": {
+    "path": "/tmp/imperathen-android-build-jf_v6mr4/IMPERATHEN.apk",
+    "size_bytes": 150393060,
+    "sha256": "9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015"
+  },
+  "expected_package": "at.heinz.imperathen",
+  "expected_abi": "arm64-v8a",
+  "tool_paths": {
+    "aapt": "/usr/local/lib/android/sdk/build-tools/35.0.1/aapt",
+    "aapt2": "/usr/local/lib/android/sdk/build-tools/37.0.0/aapt2",
+    "apkanalyzer": "/usr/local/lib/android/sdk/cmdline-tools/latest/bin/apkanalyzer",
+    "apksigner": "/usr/local/lib/android/sdk/build-tools/35.0.1/apksigner",
+    "zipalign": "/usr/local/lib/android/sdk/build-tools/35.0.1/zipalign",
+    "adb": "/usr/local/lib/android/sdk/platform-tools/adb",
+    "emulator": null,
+    "sdkmanager": "/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager"
+  },
+  "sdk_roots": [
+    "/usr/local/lib/android/sdk",
+    "/tmp/imperathen-android-build-jf_v6mr4/sdk"
+  ],
+  "sdk_platforms": [
+    "android-34",
+    "android-34-ext10",
+    "android-34-ext11",
+    "android-34-ext12",
+    "android-34-ext8",
+    "android-35",
+    "android-35-ext14",
+    "android-35-ext15",
+    "android-36",
+    "android-36-ext18",
+    "android-36-ext19",
+    "android-36.1",
+    "android-37.0",
+    "android-37.1",
+    "android-37.2",
+    "android-37.2-beta1",
+    "android-37.2-beta2",
+    "android-37.2-beta3"
+  ],
+  "emulator_inventory": {
+    "emulator_binary": null,
+    "adb_binary": "/usr/local/lib/android/sdk/platform-tools/adb",
+    "kvm_device_present": true,
+    "avd_config_count": 0,
+    "devices_queried": false,
+    "device_or_emulator_started": false
+  },
+  "manifest": {
+    "package": "at.heinz.imperathen",
+    "version_code": "3",
+    "version_name": "0.3.0-village",
+    "min_sdk": "24",
+    "target_sdk": "36",
+    "debuggable": true,
+    "launchable_activity": "com.godot.game.GodotAppLauncher",
+    "permissions": [],
+    "launcher_diagnostics": {
+      "application_present": true,
+      "application_enabled": true,
+      "components": [
+        {
+          "type": "activity",
+          "name": "com.godot.game.GodotApp",
+          "enabled": true,
+          "exported": false,
+          "exported_attribute": "false",
+          "intent_filters": [],
+          "has_launcher_filter": false,
+          "rejection_reasons": [
+            "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+            "component_exported_false"
+          ],
+          "unresolved_attributes": [],
+          "usable_launcher": false
+        },
+        {
+          "type": "activity-alias",
+          "name": "com.godot.game.GodotAppLauncher",
+          "enabled": true,
+          "exported": true,
+          "exported_attribute": "true",
+          "intent_filters": [
+            {
+              "actions": [
+                "android.intent.action.MAIN"
+              ],
+              "categories": [
+                "android.intent.category.DEFAULT",
+                "android.intent.category.LAUNCHER"
+              ]
+            }
+          ],
+          "has_launcher_filter": true,
+          "target_activity": "com.godot.game.GodotApp",
+          "target_declared_before_alias": true,
+          "target_enabled": true,
+          "target_exported": false,
+          "rejection_reasons": [],
+          "unresolved_attributes": [],
+          "usable_launcher": true
+        },
+        {
+          "type": "activity",
+          "name": "org.godotengine.godot.utils.ProcessPhoenix",
+          "enabled": true,
+          "exported": false,
+          "exported_attribute": "false",
+          "intent_filters": [],
+          "has_launcher_filter": false,
+          "rejection_reasons": [
+            "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+            "component_exported_false"
+          ],
+          "unresolved_attributes": [],
+          "usable_launcher": false
+        }
+      ],
+      "unresolved_candidate": false
+    },
+    "decoded_with": "apkanalyzer"
+  },
+  "checks": [
+    {
+      "id": "apk_file",
+      "status": "pass",
+      "required": true,
+      "detail": "APK file found; its extension alone is not accepted as proof of format.",
+      "evidence": {}
+    },
+    {
+      "id": "zip_structure",
+      "status": "pass",
+      "required": true,
+      "detail": "ZIP directory inspected before reading payloads; no extraction is performed.",
+      "evidence": {
+        "entries": 1060,
+        "expanded_bytes": 206116630,
+        "duplicate_entries": [],
+        "unsafe_entries": [],
+        "within_limits": true
+      }
+    },
+    {
+      "id": "zip_crc",
+      "status": "pass",
+      "required": true,
+      "detail": "All ZIP member payloads were decompressed and CRC checked.",
+      "evidence": {
+        "damaged_entry": null
+      }
+    },
+    {
+      "id": "apk_core_entries",
+      "status": "pass",
+      "required": true,
+      "detail": "A renamed project ZIP is not accepted as an Android application.",
+      "evidence": {
+        "missing": []
+      }
+    },
+    {
+      "id": "binary_manifest_header",
+      "status": "pass",
+      "required": true,
+      "detail": "Compiled Android binary XML container checked; semantic decoding is separate.",
+      "evidence": {
+        "bytes": 7600
+      }
+    },
+    {
+      "id": "resource_table_header",
+      "status": "pass",
+      "required": true,
+      "detail": "Compiled Android resource table header checked.",
+      "evidence": {}
+    },
+    {
+      "id": "dex_header",
+      "status": "pass",
+      "required": true,
+      "detail": "DEX magic and declared file length checked; no bytecode correctness claim.",
+      "evidence": {}
+    },
+    {
+      "id": "godot_native_library",
+      "status": "pass",
+      "required": true,
+      "detail": "Expected Godot shared library must be a 64-bit little-endian ELF for the requested architecture.",
+      "evidence": {
+        "expected_abi": "arm64-v8a",
+        "entry": "lib/arm64-v8a/libgodot_android.so",
+        "elf_machine": 183,
+        "available_abis": [
+          "arm64-v8a"
+        ]
+      }
+    },
+    {
+      "id": "hero_character_content",
+      "status": "pass",
+      "required": true,
+      "detail": "The anatomical hero requires all four LOD resources and the facial-motion script in the actual APK, including resolved remaps.",
+      "evidence": {
+        "required_by_source": true,
+        "detected_in_archive": true,
+        "resources": [
+          {
+            "source": "scripts/visuals/facial_motion.gd",
+            "entry": "assets/scripts/visuals/facial_motion.gdc",
+            "remap": "assets/scripts/visuals/facial_motion.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 3369,
+            "sha256": "1a067f141326183522ff25ef34f32bc7a626a4de6936f1305d9fcdb28be2adcc",
+            "remap_sha256": "0a727ef3c26e8e394045d04bd4589982ac615796519d62fe6e3743ea68743c66"
+          },
+          {
+            "source": "assets/characters/hero_quality_0.glb",
+            "entry": "assets/.godot/imported/hero_quality_0.glb-cf75979247420736a31ae9d994d34d08.scn",
+            "remap": "assets/assets/characters/hero_quality_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 2451778,
+            "sha256": "c0a2fe40b38ad293baa36316436a84f64a75c7908c3b25a0c44483009d39bd24",
+            "remap_sha256": "3dc7cf78d678d6287604dd72debd2b0116dd58ef64e1642508e04f511f1a84ce"
+          },
+          {
+            "source": "assets/characters/hero_quality_1.glb",
+            "entry": "assets/.godot/imported/hero_quality_1.glb-e4339ca63ccea68d128c7e5e7f657b2b.scn",
+            "remap": "assets/assets/characters/hero_quality_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1282724,
+            "sha256": "e1994340663e2b44ddd2685430d2280fd2258d11bf0131e9f7fe0ad6dedbbf90",
+            "remap_sha256": "61721b5c769636546fe2eb49501a1f6994518505cc9e206014543e7a5c48e239"
+          },
+          {
+            "source": "assets/characters/hero_quality_2.glb",
+            "entry": "assets/.godot/imported/hero_quality_2.glb-ffc0756d2c5d8e07a32557f4c8f29ba7.scn",
+            "remap": "assets/assets/characters/hero_quality_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 607635,
+            "sha256": "344a98a68cdde6e94f9698bc63bfba876a9f03d646b2ce51f08f992ff0e9ed11",
+            "remap_sha256": "369444887b0c28098a8f8ec2d8fa9e8eb7183ab57dbe8f7a99259bfe1880851f"
+          },
+          {
+            "source": "assets/characters/hero_quality_3.glb",
+            "entry": "assets/.godot/imported/hero_quality_3.glb-ac74447bffeceb7f12e5301485252aab.scn",
+            "remap": "assets/assets/characters/hero_quality_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 272281,
+            "sha256": "710c5e91752501d9a97e5afd0477097907cf36ea23f77e54d047ae48aa17d3cb",
+            "remap_sha256": "3393915c3ba25c4c2550381398ff0e3da2ea43e0c51b9ccdfbdc76f64f116989"
+          }
+        ],
+        "missing_resources": [],
+        "hash_scope": "SHA-256 of exported APK payloads and remaps; not an assertion that transformed bytes equal the local sources."
+      }
+    },
+    {
+      "id": "living_frontier_content",
+      "status": "pass",
+      "required": true,
+      "detail": "Every required feature script and model must resolve to nonempty bytes inside this APK.",
+      "evidence": {
+        "required_by_source": true,
+        "detected_in_archive": true,
+        "resources": [
+          {
+            "source": "scripts/story/frontier_chapter.gd",
+            "entry": "assets/scripts/story/frontier_chapter.gdc",
+            "remap": "assets/scripts/story/frontier_chapter.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 13700,
+            "sha256": "b1a17b88f11ac337afe192cb77d0ad6921e01e5d367a96785547938a8286eea0",
+            "remap_sha256": "88083a48f39b204a0f9fa586028f311f7c44ddf08457e967baf41ad0ff1df799"
+          },
+          {
+            "source": "scripts/world/village/village_layout.gd",
+            "entry": "assets/scripts/world/village/village_layout.gdc",
+            "remap": "assets/scripts/world/village/village_layout.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 6953,
+            "sha256": "ddc76a72f9ca5a4bc5109cb3a11fbac1d82a24a143a3e762e02c7d9844b9a45d",
+            "remap_sha256": "77cffc16a8942057bb1635ddf65037d1983c17ffa1a649ff6a30732dc097f0de"
+          },
+          {
+            "source": "scripts/world/village/village_population.gd",
+            "entry": "assets/scripts/world/village/village_population.gdc",
+            "remap": "assets/scripts/world/village/village_population.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 5017,
+            "sha256": "1d191dc54a3ba21b0b82a9d0b3eab58aed7ac4e6d40bdb0c35a9ddb3254bb793",
+            "remap_sha256": "05582fb2510be730f3ed1bffd9fc91938d087f075eefb3ec057f235c9d831fea"
+          },
+          {
+            "source": "scripts/world/village/frontier_dressing.gd",
+            "entry": "assets/scripts/world/village/frontier_dressing.gdc",
+            "remap": "assets/scripts/world/village/frontier_dressing.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 7384,
+            "sha256": "0f6f2969c4a8606acf13af165b19cbf11cdc03ad10229842096120c5427ce816",
+            "remap_sha256": "75b5765495918285f2ac9cf6d0a5bdc8f0d10f516b527663aab6bb697c5669e4"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_man_0.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_man_0.glb-0e5a43ac16030956ab69afbfc04573c6.scn",
+            "remap": "assets/assets/characters/frontier_civilian_man_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1210835,
+            "sha256": "4dc162319b72a73347aa8dfa3e09e5ef6e779a2adda72150fceb72070c7d967d",
+            "remap_sha256": "1a235f880dd166d502b5660eb6231cb59e4ba213a22de609d16695aa08d26e2a"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_man_1.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_man_1.glb-50332d56c069f5634420fc96f033d39e.scn",
+            "remap": "assets/assets/characters/frontier_civilian_man_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 510990,
+            "sha256": "bd4e36a70679ec92cf066ac0ad52a4eecbf8e24258a3a49fc8552c27c132c665",
+            "remap_sha256": "6b06f95c1b99cf81eed0d01a71fef51c6545a90eb8896d7e17363caee54c44b1"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_man_2.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_man_2.glb-e7a2766c971943a5153fb6a53606ba57.scn",
+            "remap": "assets/assets/characters/frontier_civilian_man_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 102341,
+            "sha256": "f1fd73bc2c0dbcae7c5733df890d17eee0a148710d663598b267451a0502ddc3",
+            "remap_sha256": "4177c2037f1556fa3cdea48404e02606aef2041afdf454ab74a0624cb601e49a"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_man_3.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_man_3.glb-f7a6b8f564674e942905845100cef4ab.scn",
+            "remap": "assets/assets/characters/frontier_civilian_man_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 62886,
+            "sha256": "4383283b193f4a83d9009a58de6d710246e9b85f2eb94eda4920ab84aaff3502",
+            "remap_sha256": "46a93a3018606468bb9c596c8a7ed2cb7da2c9f61e296716cf3f37c3a72a06d4"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_woman_0.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_woman_0.glb-e3b9c9886755719cd6da665f2073672b.scn",
+            "remap": "assets/assets/characters/frontier_civilian_woman_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1237961,
+            "sha256": "e57fc2a0a54bcea25a8ac9df7d5fc6aea7752adf4458efbbe46be9a2e432b375",
+            "remap_sha256": "d3561a2db3a50f1d1d362d9f5b2b3ef00ea7a7a7a5f2d55c17b7c7e9e5490c0d"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_woman_1.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_woman_1.glb-ccdd96f946bf3735c217dafab6e4e5b4.scn",
+            "remap": "assets/assets/characters/frontier_civilian_woman_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 521683,
+            "sha256": "9a785d094e6c9232b861c71913730ea0d5c974499b0b14193368491fd02884ea",
+            "remap_sha256": "1ff1e2f3d2c40a72b2cb67927b8dcc14ff85d1ee970ec9101cafb2d21d86eb89"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_woman_2.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_woman_2.glb-248cefabf879f942890ff18ff694c8c5.scn",
+            "remap": "assets/assets/characters/frontier_civilian_woman_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 105359,
+            "sha256": "9e7ea4ca761a2b10338a2b5d3135d112d4d0bbcd7b232a55ac6de4c9f0ebbaab",
+            "remap_sha256": "4ff1ea767e747a66383eb1607e565e7363b74d16d1b41f3106c125941c31cd82"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_woman_3.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_woman_3.glb-0f309cd82e2fe89403ac173b21e4f953.scn",
+            "remap": "assets/assets/characters/frontier_civilian_woman_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 64284,
+            "sha256": "72212d7e667d815d1e4760d7aaa8b4e21742fa4048a72c1aaa8216cfdda35dde",
+            "remap_sha256": "268f7af5400e6b829c070859387a1b5783811accf436e420fb0125380cffa0b5"
+          },
+          {
+            "source": "assets/characters/frontier_elder_0.glb",
+            "entry": "assets/.godot/imported/frontier_elder_0.glb-1ef0b40f0c22a9ef25a94a02a222908d.scn",
+            "remap": "assets/assets/characters/frontier_elder_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1211966,
+            "sha256": "c0ef90a74fdecd22910cb7f0a03533385a6694361ad5ddb44f9c2e8ede7a5250",
+            "remap_sha256": "dba7e934ff99fd9af9b3928f2b544ebbeaae9856e7c2075137637ae09b0c0157"
+          },
+          {
+            "source": "assets/characters/frontier_elder_1.glb",
+            "entry": "assets/.godot/imported/frontier_elder_1.glb-d09b13bfee7c0d4687e5d234410577db.scn",
+            "remap": "assets/assets/characters/frontier_elder_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 511917,
+            "sha256": "b41bc90465845cda96f5419100e5cfb8a1060fcd5c442a741fea0abc184df155",
+            "remap_sha256": "620f5289c87d50658f221af6f8861f44ce1c672f1e3caecd2571288c5f06fc77"
+          },
+          {
+            "source": "assets/characters/frontier_elder_2.glb",
+            "entry": "assets/.godot/imported/frontier_elder_2.glb-29001af8c2b50a99e01596e81f5de272.scn",
+            "remap": "assets/assets/characters/frontier_elder_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 102865,
+            "sha256": "32e1cb426291cb2dcc796d9f870249432c997e362e554d66935d99da6f99daaa",
+            "remap_sha256": "5fd16d0241a39213001b11dc0e3dd5ca6bcf329214942cf1af51a4dd208ec6e2"
+          },
+          {
+            "source": "assets/characters/frontier_elder_3.glb",
+            "entry": "assets/.godot/imported/frontier_elder_3.glb-ed9874c5eaabdbca80651a5310e63a74.scn",
+            "remap": "assets/assets/characters/frontier_elder_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 63061,
+            "sha256": "0b6df3f524c4162947e8184b4b61d96dabcb7280f8a5367ebd02fa06ab0b9a74",
+            "remap_sha256": "f8dd0c4fa674da7f548ea63bbfa9988fb41641aedb5535f72553c5d8251b2039"
+          },
+          {
+            "source": "assets/characters/frontier_legionary_0.glb",
+            "entry": "assets/.godot/imported/frontier_legionary_0.glb-c77f6922cc83bc97fc78c90a295af8aa.scn",
+            "remap": "assets/assets/characters/frontier_legionary_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1201251,
+            "sha256": "d3d7324f50b0e93807c2101150446a03b48f29b4f95569cba3a8980001906dab",
+            "remap_sha256": "7fda63abe0c3607d8095bdcf1171c0dafd13b97bf03c5b4baea73a51416a704d"
+          },
+          {
+            "source": "assets/characters/frontier_legionary_1.glb",
+            "entry": "assets/.godot/imported/frontier_legionary_1.glb-5a8b1b456223d9630b34c221fdd351ac.scn",
+            "remap": "assets/assets/characters/frontier_legionary_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 512642,
+            "sha256": "3a41a54625c9d38d8c4c8cc87960c98d574cf5d4d30eb9b61d9782a2ef6b55fa",
+            "remap_sha256": "c8450bd9d7a45246d637fed4a311b2346324e0ca8a7e544e6911de83fddf9789"
+          },
+          {
+            "source": "assets/characters/frontier_legionary_2.glb",
+            "entry": "assets/.godot/imported/frontier_legionary_2.glb-675260b363300d4b48cb169f6ea63fdd.scn",
+            "remap": "assets/assets/characters/frontier_legionary_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 104602,
+            "sha256": "f9e4e980967c1e8b0ce88dbbf60367eae9658de9828893736ca9e6107dfc55c7",
+            "remap_sha256": "57c12ab4842ac002a46a0a79d9a83208963c0e4251c78030e92e0ae924992af5"
+          },
+          {
+            "source": "assets/characters/frontier_legionary_3.glb",
+            "entry": "assets/.godot/imported/frontier_legionary_3.glb-279fc4a3f7f9446142ad652a15938044.scn",
+            "remap": "assets/assets/characters/frontier_legionary_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 66138,
+            "sha256": "56ebe36095c931c6d4b3abdfa3cfbef8e3de44541b655594510e0ba477d18726",
+            "remap_sha256": "f54adeac00e82f84dfb803d0ac2ef738bd72d61b783aecd83e22653d883ae5e0"
+          },
+          {
+            "source": "assets/characters/frontier_officer_0.glb",
+            "entry": "assets/.godot/imported/frontier_officer_0.glb-af4cee85e26ce4f3bd8aef0096f80804.scn",
+            "remap": "assets/assets/characters/frontier_officer_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1207436,
+            "sha256": "1331f139d3652cc6a40c900eb5504e5f0e26106f1dad22a73d6445776f57a6b9",
+            "remap_sha256": "f6f6bedcf910d89b74d41189871987ee100e6fc4d6c5b515830d5d30f4bb947e"
+          },
+          {
+            "source": "assets/characters/frontier_officer_1.glb",
+            "entry": "assets/.godot/imported/frontier_officer_1.glb-ddde241e8401bf0ab81372d150de2297.scn",
+            "remap": "assets/assets/characters/frontier_officer_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 515358,
+            "sha256": "671c3265bc98a82413dc3027061931978d4012fe628d07c9724437d8b28881fd",
+            "remap_sha256": "211ed2a52e9b211885843e63a27a2716e833eeaa65cc0f1f52c0f22bac5a545d"
+          },
+          {
+            "source": "assets/characters/frontier_officer_2.glb",
+            "entry": "assets/.godot/imported/frontier_officer_2.glb-ff026e97e6d2c0a36245bc9a7b18c594.scn",
+            "remap": "assets/assets/characters/frontier_officer_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 105898,
+            "sha256": "af4df96aa3601f8af676d4a6158f99d8bc1a76c5b5e53986166b21b42c375652",
+            "remap_sha256": "b94f091ec2b008156ec4f9df0d2ef3de260034e639d01280d43caeb5873227ec"
+          },
+          {
+            "source": "assets/characters/frontier_officer_3.glb",
+            "entry": "assets/.godot/imported/frontier_officer_3.glb-f01e26e83f38a958283dc326685dea17.scn",
+            "remap": "assets/assets/characters/frontier_officer_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 67692,
+            "sha256": "b2269cc980dfa64eb2902ee6b9fd643c5bd34610a0c17b0a10013a3b530fe47e",
+            "remap_sha256": "edde86dcab647cc12b650a4e3411c798b411d7617f7385a6ced82455b0d3d56b"
+          },
+          {
+            "source": "assets/characters/frontier_spearman_0.glb",
+            "entry": "assets/.godot/imported/frontier_spearman_0.glb-b4d75be17e79737f88d620fbc0cb367b.scn",
+            "remap": "assets/assets/characters/frontier_spearman_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1199762,
+            "sha256": "02f8326e8fde1e0e7ef9b8f54eedbff19fd206250b081161a6bd43d82badd09a",
+            "remap_sha256": "dfafa4685896c886d17170b08d6aaf1ffc69b68c0f5f1af09a735fb3ec699f64"
+          },
+          {
+            "source": "assets/characters/frontier_spearman_1.glb",
+            "entry": "assets/.godot/imported/frontier_spearman_1.glb-63ac118f76fb4275d648d75488bed262.scn",
+            "remap": "assets/assets/characters/frontier_spearman_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 510758,
+            "sha256": "28e457242a180ce5bc7409e34d8c1e3d57ab335794d407f813d72198b7375828",
+            "remap_sha256": "78e72b78c9842eb6fdf04fce9a4deddfbdd77c1651d16229cd2fd2db6cfac80a"
+          },
+          {
+            "source": "assets/characters/frontier_spearman_2.glb",
+            "entry": "assets/.godot/imported/frontier_spearman_2.glb-100add7b20265bc8795c8b899e3b0acb.scn",
+            "remap": "assets/assets/characters/frontier_spearman_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 104381,
+            "sha256": "dee82d6895443c7dbc06e9318dcc276c87de674528b3618cb0f806ac8608db38",
+            "remap_sha256": "8b740de59f0a087df1cd00d5ec95071ff5ba839e5061e5247561eef3110ac614"
+          },
+          {
+            "source": "assets/characters/frontier_spearman_3.glb",
+            "entry": "assets/.godot/imported/frontier_spearman_3.glb-e791dce3ee59976311e13558fc98652e.scn",
+            "remap": "assets/assets/characters/frontier_spearman_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 66270,
+            "sha256": "a4f62d7526c91cd40a131139c73d886f97ef9d3c7a148ec122b0ecd43bc80582",
+            "remap_sha256": "b3081f2e9c1a82f9e1f727ad75a6f706f4549f4805ae67cf288c5f1e3d33606c"
+          },
+          {
+            "source": "assets/characters/frontier_archer_0.glb",
+            "entry": "assets/.godot/imported/frontier_archer_0.glb-0724ec2542620e9231b16377d2390213.scn",
+            "remap": "assets/assets/characters/frontier_archer_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1186264,
+            "sha256": "b24e7388d2cf64d59e5336050b5a0246e76226934c42c9fffeda494ee3625ec3",
+            "remap_sha256": "bca74ec1fcdabaaea1b8a52488fcd7163bbf723c6e665ab8c1a94cb70b902430"
+          },
+          {
+            "source": "assets/characters/frontier_archer_1.glb",
+            "entry": "assets/.godot/imported/frontier_archer_1.glb-d8952aaf0d73f5fd8072dc6a788b04a7.scn",
+            "remap": "assets/assets/characters/frontier_archer_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 506479,
+            "sha256": "aa0be6c142b89c027003ad9df6c3c2fb82d447fd2274d4385f0720dc6f484575",
+            "remap_sha256": "1c919ee98ead857acdc4c6b47d1bd482483ebea2a0df8cd540fa9585120b8266"
+          },
+          {
+            "source": "assets/characters/frontier_archer_2.glb",
+            "entry": "assets/.godot/imported/frontier_archer_2.glb-88b3a1a47afc53ce59d61e23de8e1bb2.scn",
+            "remap": "assets/assets/characters/frontier_archer_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 104249,
+            "sha256": "e4a38e7730e550e2867dc94ee58d6d0beb8f6e75bb614e10d03542c25a995ab0",
+            "remap_sha256": "04d929063e9a0cd54e94da8af4e3ae81ac7da93cace6841cd487be0e7d9e643d"
+          },
+          {
+            "source": "assets/characters/frontier_archer_3.glb",
+            "entry": "assets/.godot/imported/frontier_archer_3.glb-275f59094a1e8ac76482c122c0a06685.scn",
+            "remap": "assets/assets/characters/frontier_archer_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 68696,
+            "sha256": "e8633df2cfac456863fca44d7d6a6c73bd96d91681281885d66cdca6675974f2",
+            "remap_sha256": "4704071180e9a58aacb268724c85204e3206b59c5eaa9cfa3df4e4ed07b44d86"
+          }
+        ],
+        "missing_resources": [],
+        "hash_scope": "SHA-256 of actual exported APK payloads and import remaps; not a device runtime claim."
+      }
+    },
+    {
+      "id": "cinematic_opening_content",
+      "status": "pass",
+      "required": true,
+      "detail": "Every required feature script and model must resolve to nonempty bytes inside this APK.",
+      "evidence": {
+        "required_by_source": true,
+        "detected_in_archive": true,
+        "resources": [
+          {
+            "source": "scripts/story/opening_story.gd",
+            "entry": "assets/scripts/story/opening_story.gdc",
+            "remap": "assets/scripts/story/opening_story.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 7527,
+            "sha256": "9e0821ee02d773cf3fdfc4b60108be071fe7cd7b4a5bd8e0e478fc88455700c4",
+            "remap_sha256": "40064ccd5eea63aae5195657823755b7d9d882c819568ad45b181a0b4e63f5b1"
+          },
+          {
+            "source": "scripts/cinematic/opening_director.gd",
+            "entry": "assets/scripts/cinematic/opening_director.gdc",
+            "remap": "assets/scripts/cinematic/opening_director.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 7030,
+            "sha256": "511728c63a184cb6d54325083217b69fc7faefc4eb7006a58464231707c7a73d",
+            "remap_sha256": "1fff439c8821ec104e1a43dd12e5d9dfddac88c66b4972b3bc4628ff0f12529a"
+          },
+          {
+            "source": "scripts/cinematic/opening_checkpoint.gd",
+            "entry": "assets/scripts/cinematic/opening_checkpoint.gdc",
+            "remap": "assets/scripts/cinematic/opening_checkpoint.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 1911,
+            "sha256": "d9ed3d453587e6e6efde0f113b0b34da1a0fdcce6009f03cde59450b4aaa5ccb",
+            "remap_sha256": "4630302602ec9c784a77a537186dd55aec21fb19e296a4b593729018d1ccf185"
+          },
+          {
+            "source": "scripts/ui/opening_overlay.gd",
+            "entry": "assets/scripts/ui/opening_overlay.gdc",
+            "remap": "assets/scripts/ui/opening_overlay.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 13674,
+            "sha256": "308c9c6dc31a7419af07ba75641a7404eddb5ef32c2ab4e0bc295406fccc24df",
+            "remap_sha256": "b0f3d5ff6a383cf1874718df94bd5e42f7c1418e6b0360889393c652190adb9f"
+          }
+        ],
+        "missing_resources": [],
+        "hash_scope": "SHA-256 of actual exported APK payloads and import remaps; not a device runtime claim."
+      }
+    },
+    {
+      "id": "village_life_content",
+      "status": "pass",
+      "required": true,
+      "detail": "Every required feature script and model must resolve to nonempty bytes inside this APK.",
+      "evidence": {
+        "required_by_source": true,
+        "detected_in_archive": true,
+        "resources": [
+          {
+            "source": "scripts/story/village_life.gd",
+            "entry": "assets/scripts/story/village_life.gdc",
+            "remap": "assets/scripts/story/village_life.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 30956,
+            "sha256": "41533b8d74c032d3935434fb7bab55b7e22d21549c4a36643a3ffc57ccd49ae1",
+            "remap_sha256": "7ea6367aaaade5d730536162d0d08b9aa1898dde1ded8f97b174850c26a73a8a"
+          },
+          {
+            "source": "scripts/domain/village_economy.gd",
+            "entry": "assets/scripts/domain/village_economy.gdc",
+            "remap": "assets/scripts/domain/village_economy.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 18032,
+            "sha256": "e1a6f1ab97878b0a7526d52f7a9eee8d8f0df3fb3ccedbec6e1b2a51d593d3fc",
+            "remap_sha256": "b187199c4268275c58bc6e84b630083f9b1f419488b23b756d5ecbaef6e8d752"
+          },
+          {
+            "source": "scripts/ui/village_life_panel.gd",
+            "entry": "assets/scripts/ui/village_life_panel.gdc",
+            "remap": "assets/scripts/ui/village_life_panel.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 10958,
+            "sha256": "b4a63c2290ddff46bd8c5a8273321a1532fc36dec8a0cb6173945921e8b0345d",
+            "remap_sha256": "931501420990ced25043e68cb114e56a48f951534a5d1eff89b709ce6947bcfd"
+          },
+          {
+            "source": "scripts/ui/android_village_diagnostics.gd",
+            "entry": "assets/scripts/ui/android_village_diagnostics.gdc",
+            "remap": "assets/scripts/ui/android_village_diagnostics.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 4344,
+            "sha256": "9ae1caab0de772c3776c499de3480c312d4210f1b9a5bdf7d61c57af37c73ebf",
+            "remap_sha256": "6abe1018feff00886b777d48f060210570e97aadd0fc7d2e40f7a79ec41c6baf"
+          },
+          {
+            "source": "scripts/world/village_life_world.gd",
+            "entry": "assets/scripts/world/village_life_world.gdc",
+            "remap": "assets/scripts/world/village_life_world.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 9288,
+            "sha256": "99f1e9bcc0c5dfb34cde5e147dd2fb086610923ee06b00726b87f5462ba031a1",
+            "remap_sha256": "d775cfd87cd038c157b790ca0232d3066c3f56ed1f626e234a1e1f621f456677"
+          },
+          {
+            "source": "scripts/world/regional_terrain.gd",
+            "entry": "assets/scripts/world/regional_terrain.gdc",
+            "remap": "assets/scripts/world/regional_terrain.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 4000,
+            "sha256": "ef7b7c5e070998d2272d16d55be0d1810a5b08416d76d2c629e4a1047bcc69f7",
+            "remap_sha256": "ccaaaa32a8044ff6668f7258a61e12014e66e2d8779c92118cccedcc83607dc4"
+          },
+          {
+            "source": "scripts/world/world_stream_plan.gd",
+            "entry": "assets/scripts/world/world_stream_plan.gdc",
+            "remap": "assets/scripts/world/world_stream_plan.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 8670,
+            "sha256": "8ee1c07f17d327d67df5010a8b9af5a4682abb21ad67cd56244fb01bcdfd745a",
+            "remap_sha256": "0cbf103a3982a9180bb4cf8500435f7f0a3d37872190f2ddccb19fe304eebbf4"
+          }
+        ],
+        "missing_resources": [],
+        "hash_scope": "SHA-256 of actual exported APK payloads and import remaps; not a device runtime claim."
+      }
+    },
+    {
+      "id": "godot_project_content",
+      "status": "pass",
+      "required": true,
+      "detail": "Godot project configuration and the prototype's required scene/scripts must be present, including resolved remaps.",
+      "evidence": {
+        "config": "assets/project.binary",
+        "config_header_valid": true,
+        "resources": [
+          {
+            "source": "main.tscn",
+            "entry": "assets/.godot/exported/133200997/export-3070c538c03ee49b7677ff960a3f5195-main.scn",
+            "remap": "assets/main.tscn.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/main.gd",
+            "entry": "assets/scripts/main.gdc",
+            "remap": "assets/scripts/main.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/domain/world_model.gd",
+            "entry": "assets/scripts/domain/world_model.gdc",
+            "remap": "assets/scripts/domain/world_model.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/world/game_world.gd",
+            "entry": "assets/scripts/world/game_world.gdc",
+            "remap": "assets/scripts/world/game_world.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/world/village_art.gd",
+            "entry": "assets/scripts/world/village_art.gdc",
+            "remap": "assets/scripts/world/village_art.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/game_ui.gd",
+            "entry": "assets/scripts/ui/game_ui.gdc",
+            "remap": "assets/scripts/ui/game_ui.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/touch_pad.gd",
+            "entry": "assets/scripts/ui/touch_pad.gdc",
+            "remap": "assets/scripts/ui/touch_pad.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/touch_action.gd",
+            "entry": "assets/scripts/ui/touch_action.gdc",
+            "remap": "assets/scripts/ui/touch_action.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/runtime_display.gd",
+            "entry": "assets/scripts/ui/runtime_display.gdc",
+            "remap": "assets/scripts/ui/runtime_display.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/battle/battle_model.gd",
+            "entry": "assets/scripts/battle/battle_model.gdc",
+            "remap": "assets/scripts/battle/battle_model.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/battle/formation_slots.gd",
+            "entry": "assets/scripts/battle/formation_slots.gdc",
+            "remap": "assets/scripts/battle/formation_slots.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/tactics/valley_scene.gd",
+            "entry": "assets/scripts/tactics/valley_scene.gdc",
+            "remap": "assets/scripts/tactics/valley_scene.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/tactics/valley_hud.gd",
+            "entry": "assets/scripts/tactics/valley_hud.gdc",
+            "remap": "assets/scripts/tactics/valley_hud.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/strategy/atlas_screen.gd",
+            "entry": "assets/scripts/strategy/atlas_screen.gdc",
+            "remap": "assets/scripts/strategy/atlas_screen.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/strategy/globe.gd",
+            "entry": "assets/scripts/strategy/globe.gdc",
+            "remap": "assets/scripts/strategy/globe.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/strategy/origins.gd",
+            "entry": "assets/scripts/strategy/origins.gdc",
+            "remap": "assets/scripts/strategy/origins.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/strategy/season_campaign.gd",
+            "entry": "assets/scripts/strategy/season_campaign.gdc",
+            "remap": "assets/scripts/strategy/season_campaign.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/atlas/earth.jpg",
+            "entry": "assets/.godot/imported/earth.jpg-cfacefd5b1b419fd407d3408d830b865.ctex",
+            "remap": "assets/assets/atlas/earth.jpg.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/visuals/soldier_visual.gd",
+            "entry": "assets/scripts/visuals/soldier_visual.gdc",
+            "remap": "assets/scripts/visuals/soldier_visual.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/quality_profiles.json",
+            "entry": "assets/assets/quality_profiles.json",
+            "mode": "direct"
+          },
+          {
+            "source": "assets/soldiers/heavy_near.glb",
+            "entry": "assets/.godot/imported/heavy_near.glb-0a7fce4937ffb3d5f6f36fb6db0efcd1.scn",
+            "remap": "assets/assets/soldiers/heavy_near.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/heavy_mid.glb",
+            "entry": "assets/.godot/imported/heavy_mid.glb-da250611a7bbc371ff9346dd9849bf92.scn",
+            "remap": "assets/assets/soldiers/heavy_mid.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/heavy_far.glb",
+            "entry": "assets/.godot/imported/heavy_far.glb-f42691d0bcb3c75ada387ca448b30f68.scn",
+            "remap": "assets/assets/soldiers/heavy_far.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/spear_near.glb",
+            "entry": "assets/.godot/imported/spear_near.glb-71a5641160ac955240a1e607b254ea97.scn",
+            "remap": "assets/assets/soldiers/spear_near.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/spear_mid.glb",
+            "entry": "assets/.godot/imported/spear_mid.glb-d76b2b1dd64fe8113f807e50d3ff9d13.scn",
+            "remap": "assets/assets/soldiers/spear_mid.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/spear_far.glb",
+            "entry": "assets/.godot/imported/spear_far.glb-e9c47942334c3dd65b826ff42cc82d08.scn",
+            "remap": "assets/assets/soldiers/spear_far.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/archer_near.glb",
+            "entry": "assets/.godot/imported/archer_near.glb-f6bba15985f80f28a37df08278b4a8c8.scn",
+            "remap": "assets/assets/soldiers/archer_near.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/archer_mid.glb",
+            "entry": "assets/.godot/imported/archer_mid.glb-83c67f46f1756d8861c0e7c2ca5156d3.scn",
+            "remap": "assets/assets/soldiers/archer_mid.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/archer_far.glb",
+            "entry": "assets/.godot/imported/archer_far.glb-b56a390e2bb4d9fd45179f6f59c931f0.scn",
+            "remap": "assets/assets/soldiers/archer_far.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/officer_near.glb",
+            "entry": "assets/.godot/imported/officer_near.glb-a051cb4c23b87082b935d6c07de9e02f.scn",
+            "remap": "assets/assets/soldiers/officer_near.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/officer_mid.glb",
+            "entry": "assets/.godot/imported/officer_mid.glb-51fe0df5be24b3b786a9fa50e6df3844.scn",
+            "remap": "assets/assets/soldiers/officer_mid.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/soldiers/officer_far.glb",
+            "entry": "assets/.godot/imported/officer_far.glb-aea57b4516300cee83f2ce3536ea4370.scn",
+            "remap": "assets/assets/soldiers/officer_far.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/visuals/village_person.gd",
+            "entry": "assets/scripts/visuals/village_person.gdc",
+            "remap": "assets/scripts/visuals/village_person.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village_characters/villager_0.glb",
+            "entry": "assets/.godot/imported/villager_0.glb-e90733a330507a3c93f7156d7cbf0d32.scn",
+            "remap": "assets/assets/village_characters/villager_0.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village_characters/villager_1.glb",
+            "entry": "assets/.godot/imported/villager_1.glb-1cfa14e05d845c1252c31036699f0ff1.scn",
+            "remap": "assets/assets/village_characters/villager_1.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village_characters/villager_2.glb",
+            "entry": "assets/.godot/imported/villager_2.glb-d519b0e02e616c7fd87382e8317b7089.scn",
+            "remap": "assets/assets/village_characters/villager_2.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village_characters/villager_3.glb",
+            "entry": "assets/.godot/imported/villager_3.glb-331528a69c3fa82d0b7daca7821ddde0.scn",
+            "remap": "assets/assets/village_characters/villager_3.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village_characters/officer_2.glb",
+            "entry": "assets/.godot/imported/officer_2.glb-ba361dd8b04d3a296e87823ce62db206.scn",
+            "remap": "assets/assets/village_characters/officer_2.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village_characters/officer_3.glb",
+            "entry": "assets/.godot/imported/officer_3.glb-2bb3a926bf35b400be76066853b4365b.scn",
+            "remap": "assets/assets/village_characters/officer_3.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village_characters/heavy_2.glb",
+            "entry": "assets/.godot/imported/heavy_2.glb-2d8cd6bb4e25bdec71d88f7c9f670575.scn",
+            "remap": "assets/assets/village_characters/heavy_2.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village_characters/heavy_3.glb",
+            "entry": "assets/.godot/imported/heavy_3.glb-dff66042a80274911ecc2cd07bc9dc63.scn",
+            "remap": "assets/assets/village_characters/heavy_3.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village_characters/spear_2.glb",
+            "entry": "assets/.godot/imported/spear_2.glb-092a1d8ecea2f6bc30cefc5575e94894.scn",
+            "remap": "assets/assets/village_characters/spear_2.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village_characters/spear_3.glb",
+            "entry": "assets/.godot/imported/spear_3.glb-46e200def8d1139826f7f51d956b8da0.scn",
+            "remap": "assets/assets/village_characters/spear_3.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/market.glb",
+            "entry": "assets/.godot/imported/market.glb-2e7b425a52eab26b2f409ece757966f4.scn",
+            "remap": "assets/assets/village/market.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/workshop.glb",
+            "entry": "assets/.godot/imported/workshop.glb-bbf991e1bac2b51ad545d71703720056.scn",
+            "remap": "assets/assets/village/workshop.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/storehouse.glb",
+            "entry": "assets/.godot/imported/storehouse.glb-e6ff23693f8c94f9c904af575ff07595.scn",
+            "remap": "assets/assets/village/storehouse.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/palisade_bay.glb",
+            "entry": "assets/.godot/imported/palisade_bay.glb-89f32a185c313e0b7e6113a525153dbb.scn",
+            "remap": "assets/assets/village/palisade_bay.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/palisade_silhouette.glb",
+            "entry": "assets/.godot/imported/palisade_silhouette.glb-2edd6fc9436f4f740a712738fdb7becf.scn",
+            "remap": "assets/assets/village/palisade_silhouette.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/training_dummy.glb",
+            "entry": "assets/.godot/imported/training_dummy.glb-da440b2746ddec1ec53b7e2fbaa51d6b.scn",
+            "remap": "assets/assets/village/training_dummy.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/timber_billet.glb",
+            "entry": "assets/.godot/imported/timber_billet.glb-8a5f3315f235d7d9c046292b52b2b8f3.scn",
+            "remap": "assets/assets/village/timber_billet.glb.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/valdorf_color.png",
+            "entry": "assets/.godot/imported/valdorf_color.png-b465c8c7dbb689110e596836cc9bfd4d.etc2.ctex",
+            "remap": "assets/assets/village/valdorf_color.png.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/valdorf_normal.png",
+            "entry": "assets/.godot/imported/valdorf_normal.png-86e22f34da0cb5720bead8a02e0b3c7c.etc2.ctex",
+            "remap": "assets/assets/village/valdorf_normal.png.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/valdorf_orm.png",
+            "entry": "assets/.godot/imported/valdorf_orm.png-d9dedf6a82b0d3d7c818efdb8c84928b.etc2.ctex",
+            "remap": "assets/assets/village/valdorf_orm.png.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/track_color.png",
+            "entry": "assets/.godot/imported/track_color.png-4b6aeda0189055a3adf17a41fdda1f9e.etc2.ctex",
+            "remap": "assets/assets/village/track_color.png.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/track_relief.png",
+            "entry": "assets/.godot/imported/track_relief.png-4bea996dad862c2787c3c92d50cf5cfe.etc2.ctex",
+            "remap": "assets/assets/village/track_relief.png.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/verge_color.png",
+            "entry": "assets/.godot/imported/verge_color.png-dd1b2fb8064b0056db5bb17d6c506e03.etc2.ctex",
+            "remap": "assets/assets/village/verge_color.png.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/verge_relief.png",
+            "entry": "assets/.godot/imported/verge_relief.png-c43e346c13678730422ec21667c27f3a.etc2.ctex",
+            "remap": "assets/assets/village/verge_relief.png.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/village/sky_clouds.png",
+            "entry": "assets/.godot/imported/sky_clouds.png-4f42deae6716e0476bbe16218dcc89c6.ctex",
+            "remap": "assets/assets/village/sky_clouds.png.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/ui/figure_gallery.gd",
+            "entry": "assets/scripts/ui/figure_gallery.gdc",
+            "remap": "assets/scripts/ui/figure_gallery.gd.remap",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/legionary.webp",
+            "entry": "assets/.godot/imported/legionary.webp-4ad29b90eb69e07c00d195e9ff096f68.ctex",
+            "remap": "assets/assets/portraits/legionary.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/auxiliary_spear.webp",
+            "entry": "assets/.godot/imported/auxiliary_spear.webp-eb5cf04124f8e9e88ca0061f7b9fe3da.ctex",
+            "remap": "assets/assets/portraits/auxiliary_spear.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/archer.webp",
+            "entry": "assets/.godot/imported/archer.webp-fe2738538f0c1dcbabf1dafccbcc4001.ctex",
+            "remap": "assets/assets/portraits/archer.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/centurion.webp",
+            "entry": "assets/.godot/imported/centurion.webp-7b51ba035584da9fd0c93b2004d51001.ctex",
+            "remap": "assets/assets/portraits/centurion.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/signifer.webp",
+            "entry": "assets/.godot/imported/signifer.webp-6ff4115dda02cbb267a828fdbb4655a7.ctex",
+            "remap": "assets/assets/portraits/signifer.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/emperor.webp",
+            "entry": "assets/.godot/imported/emperor.webp-5f18ffd14874eb6ba07cc07aa3f084f4.ctex",
+            "remap": "assets/assets/portraits/emperor.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/hero_italia.webp",
+            "entry": "assets/.godot/imported/hero_italia.webp-04bcc84e696e803bc9af5aee5cd7cd47.ctex",
+            "remap": "assets/assets/portraits/hero_italia.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/hero_germania.webp",
+            "entry": "assets/.godot/imported/hero_germania.webp-a894f08977f6329cd6f5ac87d05feb89.ctex",
+            "remap": "assets/assets/portraits/hero_germania.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/hero_han.webp",
+            "entry": "assets/.godot/imported/hero_han.webp-0abfd86f3e61f0c0f0ecbf0c811ffef1.ctex",
+            "remap": "assets/assets/portraits/hero_han.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/hero_wa.webp",
+            "entry": "assets/.godot/imported/hero_wa.webp-1873cdb7c599e1bc35c5a00c027b848b.ctex",
+            "remap": "assets/assets/portraits/hero_wa.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/hero_vistula.webp",
+            "entry": "assets/.godot/imported/hero_vistula.webp-feb862ee2455fb95b11129a33d2496a3.ctex",
+            "remap": "assets/assets/portraits/hero_vistula.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/marcus.webp",
+            "entry": "assets/.godot/imported/marcus.webp-9ed9754c95464625fa41582935b7dc9e.ctex",
+            "remap": "assets/assets/portraits/marcus.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/albrun.webp",
+            "entry": "assets/.godot/imported/albrun.webp-4a5733342f1eb891af87a500dc4623cb.ctex",
+            "remap": "assets/assets/portraits/albrun.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/lin.webp",
+            "entry": "assets/.godot/imported/lin.webp-461fc05bc7e59ee5e22f73df87c907f5.ctex",
+            "remap": "assets/assets/portraits/lin.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/aki.webp",
+            "entry": "assets/.godot/imported/aki.webp-d8084d398aa90fe9c9dfeb9ff7905223.ctex",
+            "remap": "assets/assets/portraits/aki.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/mira.webp",
+            "entry": "assets/.godot/imported/mira.webp-0feda30dc74b5f66bd39a8c7f9ceb179.ctex",
+            "remap": "assets/assets/portraits/mira.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/adult_italia.webp",
+            "entry": "assets/.godot/imported/adult_italia.webp-7837295c348a1760af2e9c4f14a99dbd.ctex",
+            "remap": "assets/assets/portraits/adult_italia.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "assets/portraits/adult_marcus.webp",
+            "entry": "assets/.godot/imported/adult_marcus.webp-c9dd81a099179c32fc9b219419fd2c81.ctex",
+            "remap": "assets/assets/portraits/adult_marcus.webp.import",
+            "mode": "remapped"
+          },
+          {
+            "source": "scripts/visuals/facial_motion.gd",
+            "entry": "assets/scripts/visuals/facial_motion.gdc",
+            "remap": "assets/scripts/visuals/facial_motion.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 3369,
+            "sha256": "1a067f141326183522ff25ef34f32bc7a626a4de6936f1305d9fcdb28be2adcc",
+            "remap_sha256": "0a727ef3c26e8e394045d04bd4589982ac615796519d62fe6e3743ea68743c66"
+          },
+          {
+            "source": "assets/characters/hero_quality_0.glb",
+            "entry": "assets/.godot/imported/hero_quality_0.glb-cf75979247420736a31ae9d994d34d08.scn",
+            "remap": "assets/assets/characters/hero_quality_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 2451778,
+            "sha256": "c0a2fe40b38ad293baa36316436a84f64a75c7908c3b25a0c44483009d39bd24",
+            "remap_sha256": "3dc7cf78d678d6287604dd72debd2b0116dd58ef64e1642508e04f511f1a84ce"
+          },
+          {
+            "source": "assets/characters/hero_quality_1.glb",
+            "entry": "assets/.godot/imported/hero_quality_1.glb-e4339ca63ccea68d128c7e5e7f657b2b.scn",
+            "remap": "assets/assets/characters/hero_quality_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1282724,
+            "sha256": "e1994340663e2b44ddd2685430d2280fd2258d11bf0131e9f7fe0ad6dedbbf90",
+            "remap_sha256": "61721b5c769636546fe2eb49501a1f6994518505cc9e206014543e7a5c48e239"
+          },
+          {
+            "source": "assets/characters/hero_quality_2.glb",
+            "entry": "assets/.godot/imported/hero_quality_2.glb-ffc0756d2c5d8e07a32557f4c8f29ba7.scn",
+            "remap": "assets/assets/characters/hero_quality_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 607635,
+            "sha256": "344a98a68cdde6e94f9698bc63bfba876a9f03d646b2ce51f08f992ff0e9ed11",
+            "remap_sha256": "369444887b0c28098a8f8ec2d8fa9e8eb7183ab57dbe8f7a99259bfe1880851f"
+          },
+          {
+            "source": "assets/characters/hero_quality_3.glb",
+            "entry": "assets/.godot/imported/hero_quality_3.glb-ac74447bffeceb7f12e5301485252aab.scn",
+            "remap": "assets/assets/characters/hero_quality_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 272281,
+            "sha256": "710c5e91752501d9a97e5afd0477097907cf36ea23f77e54d047ae48aa17d3cb",
+            "remap_sha256": "3393915c3ba25c4c2550381398ff0e3da2ea43e0c51b9ccdfbdc76f64f116989"
+          },
+          {
+            "source": "scripts/story/frontier_chapter.gd",
+            "entry": "assets/scripts/story/frontier_chapter.gdc",
+            "remap": "assets/scripts/story/frontier_chapter.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 13700,
+            "sha256": "b1a17b88f11ac337afe192cb77d0ad6921e01e5d367a96785547938a8286eea0",
+            "remap_sha256": "88083a48f39b204a0f9fa586028f311f7c44ddf08457e967baf41ad0ff1df799"
+          },
+          {
+            "source": "scripts/world/village/village_layout.gd",
+            "entry": "assets/scripts/world/village/village_layout.gdc",
+            "remap": "assets/scripts/world/village/village_layout.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 6953,
+            "sha256": "ddc76a72f9ca5a4bc5109cb3a11fbac1d82a24a143a3e762e02c7d9844b9a45d",
+            "remap_sha256": "77cffc16a8942057bb1635ddf65037d1983c17ffa1a649ff6a30732dc097f0de"
+          },
+          {
+            "source": "scripts/world/village/village_population.gd",
+            "entry": "assets/scripts/world/village/village_population.gdc",
+            "remap": "assets/scripts/world/village/village_population.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 5017,
+            "sha256": "1d191dc54a3ba21b0b82a9d0b3eab58aed7ac4e6d40bdb0c35a9ddb3254bb793",
+            "remap_sha256": "05582fb2510be730f3ed1bffd9fc91938d087f075eefb3ec057f235c9d831fea"
+          },
+          {
+            "source": "scripts/world/village/frontier_dressing.gd",
+            "entry": "assets/scripts/world/village/frontier_dressing.gdc",
+            "remap": "assets/scripts/world/village/frontier_dressing.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 7384,
+            "sha256": "0f6f2969c4a8606acf13af165b19cbf11cdc03ad10229842096120c5427ce816",
+            "remap_sha256": "75b5765495918285f2ac9cf6d0a5bdc8f0d10f516b527663aab6bb697c5669e4"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_man_0.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_man_0.glb-0e5a43ac16030956ab69afbfc04573c6.scn",
+            "remap": "assets/assets/characters/frontier_civilian_man_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1210835,
+            "sha256": "4dc162319b72a73347aa8dfa3e09e5ef6e779a2adda72150fceb72070c7d967d",
+            "remap_sha256": "1a235f880dd166d502b5660eb6231cb59e4ba213a22de609d16695aa08d26e2a"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_man_1.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_man_1.glb-50332d56c069f5634420fc96f033d39e.scn",
+            "remap": "assets/assets/characters/frontier_civilian_man_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 510990,
+            "sha256": "bd4e36a70679ec92cf066ac0ad52a4eecbf8e24258a3a49fc8552c27c132c665",
+            "remap_sha256": "6b06f95c1b99cf81eed0d01a71fef51c6545a90eb8896d7e17363caee54c44b1"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_man_2.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_man_2.glb-e7a2766c971943a5153fb6a53606ba57.scn",
+            "remap": "assets/assets/characters/frontier_civilian_man_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 102341,
+            "sha256": "f1fd73bc2c0dbcae7c5733df890d17eee0a148710d663598b267451a0502ddc3",
+            "remap_sha256": "4177c2037f1556fa3cdea48404e02606aef2041afdf454ab74a0624cb601e49a"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_man_3.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_man_3.glb-f7a6b8f564674e942905845100cef4ab.scn",
+            "remap": "assets/assets/characters/frontier_civilian_man_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 62886,
+            "sha256": "4383283b193f4a83d9009a58de6d710246e9b85f2eb94eda4920ab84aaff3502",
+            "remap_sha256": "46a93a3018606468bb9c596c8a7ed2cb7da2c9f61e296716cf3f37c3a72a06d4"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_woman_0.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_woman_0.glb-e3b9c9886755719cd6da665f2073672b.scn",
+            "remap": "assets/assets/characters/frontier_civilian_woman_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1237961,
+            "sha256": "e57fc2a0a54bcea25a8ac9df7d5fc6aea7752adf4458efbbe46be9a2e432b375",
+            "remap_sha256": "d3561a2db3a50f1d1d362d9f5b2b3ef00ea7a7a7a5f2d55c17b7c7e9e5490c0d"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_woman_1.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_woman_1.glb-ccdd96f946bf3735c217dafab6e4e5b4.scn",
+            "remap": "assets/assets/characters/frontier_civilian_woman_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 521683,
+            "sha256": "9a785d094e6c9232b861c71913730ea0d5c974499b0b14193368491fd02884ea",
+            "remap_sha256": "1ff1e2f3d2c40a72b2cb67927b8dcc14ff85d1ee970ec9101cafb2d21d86eb89"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_woman_2.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_woman_2.glb-248cefabf879f942890ff18ff694c8c5.scn",
+            "remap": "assets/assets/characters/frontier_civilian_woman_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 105359,
+            "sha256": "9e7ea4ca761a2b10338a2b5d3135d112d4d0bbcd7b232a55ac6de4c9f0ebbaab",
+            "remap_sha256": "4ff1ea767e747a66383eb1607e565e7363b74d16d1b41f3106c125941c31cd82"
+          },
+          {
+            "source": "assets/characters/frontier_civilian_woman_3.glb",
+            "entry": "assets/.godot/imported/frontier_civilian_woman_3.glb-0f309cd82e2fe89403ac173b21e4f953.scn",
+            "remap": "assets/assets/characters/frontier_civilian_woman_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 64284,
+            "sha256": "72212d7e667d815d1e4760d7aaa8b4e21742fa4048a72c1aaa8216cfdda35dde",
+            "remap_sha256": "268f7af5400e6b829c070859387a1b5783811accf436e420fb0125380cffa0b5"
+          },
+          {
+            "source": "assets/characters/frontier_elder_0.glb",
+            "entry": "assets/.godot/imported/frontier_elder_0.glb-1ef0b40f0c22a9ef25a94a02a222908d.scn",
+            "remap": "assets/assets/characters/frontier_elder_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1211966,
+            "sha256": "c0ef90a74fdecd22910cb7f0a03533385a6694361ad5ddb44f9c2e8ede7a5250",
+            "remap_sha256": "dba7e934ff99fd9af9b3928f2b544ebbeaae9856e7c2075137637ae09b0c0157"
+          },
+          {
+            "source": "assets/characters/frontier_elder_1.glb",
+            "entry": "assets/.godot/imported/frontier_elder_1.glb-d09b13bfee7c0d4687e5d234410577db.scn",
+            "remap": "assets/assets/characters/frontier_elder_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 511917,
+            "sha256": "b41bc90465845cda96f5419100e5cfb8a1060fcd5c442a741fea0abc184df155",
+            "remap_sha256": "620f5289c87d50658f221af6f8861f44ce1c672f1e3caecd2571288c5f06fc77"
+          },
+          {
+            "source": "assets/characters/frontier_elder_2.glb",
+            "entry": "assets/.godot/imported/frontier_elder_2.glb-29001af8c2b50a99e01596e81f5de272.scn",
+            "remap": "assets/assets/characters/frontier_elder_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 102865,
+            "sha256": "32e1cb426291cb2dcc796d9f870249432c997e362e554d66935d99da6f99daaa",
+            "remap_sha256": "5fd16d0241a39213001b11dc0e3dd5ca6bcf329214942cf1af51a4dd208ec6e2"
+          },
+          {
+            "source": "assets/characters/frontier_elder_3.glb",
+            "entry": "assets/.godot/imported/frontier_elder_3.glb-ed9874c5eaabdbca80651a5310e63a74.scn",
+            "remap": "assets/assets/characters/frontier_elder_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 63061,
+            "sha256": "0b6df3f524c4162947e8184b4b61d96dabcb7280f8a5367ebd02fa06ab0b9a74",
+            "remap_sha256": "f8dd0c4fa674da7f548ea63bbfa9988fb41641aedb5535f72553c5d8251b2039"
+          },
+          {
+            "source": "assets/characters/frontier_legionary_0.glb",
+            "entry": "assets/.godot/imported/frontier_legionary_0.glb-c77f6922cc83bc97fc78c90a295af8aa.scn",
+            "remap": "assets/assets/characters/frontier_legionary_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1201251,
+            "sha256": "d3d7324f50b0e93807c2101150446a03b48f29b4f95569cba3a8980001906dab",
+            "remap_sha256": "7fda63abe0c3607d8095bdcf1171c0dafd13b97bf03c5b4baea73a51416a704d"
+          },
+          {
+            "source": "assets/characters/frontier_legionary_1.glb",
+            "entry": "assets/.godot/imported/frontier_legionary_1.glb-5a8b1b456223d9630b34c221fdd351ac.scn",
+            "remap": "assets/assets/characters/frontier_legionary_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 512642,
+            "sha256": "3a41a54625c9d38d8c4c8cc87960c98d574cf5d4d30eb9b61d9782a2ef6b55fa",
+            "remap_sha256": "c8450bd9d7a45246d637fed4a311b2346324e0ca8a7e544e6911de83fddf9789"
+          },
+          {
+            "source": "assets/characters/frontier_legionary_2.glb",
+            "entry": "assets/.godot/imported/frontier_legionary_2.glb-675260b363300d4b48cb169f6ea63fdd.scn",
+            "remap": "assets/assets/characters/frontier_legionary_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 104602,
+            "sha256": "f9e4e980967c1e8b0ce88dbbf60367eae9658de9828893736ca9e6107dfc55c7",
+            "remap_sha256": "57c12ab4842ac002a46a0a79d9a83208963c0e4251c78030e92e0ae924992af5"
+          },
+          {
+            "source": "assets/characters/frontier_legionary_3.glb",
+            "entry": "assets/.godot/imported/frontier_legionary_3.glb-279fc4a3f7f9446142ad652a15938044.scn",
+            "remap": "assets/assets/characters/frontier_legionary_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 66138,
+            "sha256": "56ebe36095c931c6d4b3abdfa3cfbef8e3de44541b655594510e0ba477d18726",
+            "remap_sha256": "f54adeac00e82f84dfb803d0ac2ef738bd72d61b783aecd83e22653d883ae5e0"
+          },
+          {
+            "source": "assets/characters/frontier_officer_0.glb",
+            "entry": "assets/.godot/imported/frontier_officer_0.glb-af4cee85e26ce4f3bd8aef0096f80804.scn",
+            "remap": "assets/assets/characters/frontier_officer_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1207436,
+            "sha256": "1331f139d3652cc6a40c900eb5504e5f0e26106f1dad22a73d6445776f57a6b9",
+            "remap_sha256": "f6f6bedcf910d89b74d41189871987ee100e6fc4d6c5b515830d5d30f4bb947e"
+          },
+          {
+            "source": "assets/characters/frontier_officer_1.glb",
+            "entry": "assets/.godot/imported/frontier_officer_1.glb-ddde241e8401bf0ab81372d150de2297.scn",
+            "remap": "assets/assets/characters/frontier_officer_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 515358,
+            "sha256": "671c3265bc98a82413dc3027061931978d4012fe628d07c9724437d8b28881fd",
+            "remap_sha256": "211ed2a52e9b211885843e63a27a2716e833eeaa65cc0f1f52c0f22bac5a545d"
+          },
+          {
+            "source": "assets/characters/frontier_officer_2.glb",
+            "entry": "assets/.godot/imported/frontier_officer_2.glb-ff026e97e6d2c0a36245bc9a7b18c594.scn",
+            "remap": "assets/assets/characters/frontier_officer_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 105898,
+            "sha256": "af4df96aa3601f8af676d4a6158f99d8bc1a76c5b5e53986166b21b42c375652",
+            "remap_sha256": "b94f091ec2b008156ec4f9df0d2ef3de260034e639d01280d43caeb5873227ec"
+          },
+          {
+            "source": "assets/characters/frontier_officer_3.glb",
+            "entry": "assets/.godot/imported/frontier_officer_3.glb-f01e26e83f38a958283dc326685dea17.scn",
+            "remap": "assets/assets/characters/frontier_officer_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 67692,
+            "sha256": "b2269cc980dfa64eb2902ee6b9fd643c5bd34610a0c17b0a10013a3b530fe47e",
+            "remap_sha256": "edde86dcab647cc12b650a4e3411c798b411d7617f7385a6ced82455b0d3d56b"
+          },
+          {
+            "source": "assets/characters/frontier_spearman_0.glb",
+            "entry": "assets/.godot/imported/frontier_spearman_0.glb-b4d75be17e79737f88d620fbc0cb367b.scn",
+            "remap": "assets/assets/characters/frontier_spearman_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1199762,
+            "sha256": "02f8326e8fde1e0e7ef9b8f54eedbff19fd206250b081161a6bd43d82badd09a",
+            "remap_sha256": "dfafa4685896c886d17170b08d6aaf1ffc69b68c0f5f1af09a735fb3ec699f64"
+          },
+          {
+            "source": "assets/characters/frontier_spearman_1.glb",
+            "entry": "assets/.godot/imported/frontier_spearman_1.glb-63ac118f76fb4275d648d75488bed262.scn",
+            "remap": "assets/assets/characters/frontier_spearman_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 510758,
+            "sha256": "28e457242a180ce5bc7409e34d8c1e3d57ab335794d407f813d72198b7375828",
+            "remap_sha256": "78e72b78c9842eb6fdf04fce9a4deddfbdd77c1651d16229cd2fd2db6cfac80a"
+          },
+          {
+            "source": "assets/characters/frontier_spearman_2.glb",
+            "entry": "assets/.godot/imported/frontier_spearman_2.glb-100add7b20265bc8795c8b899e3b0acb.scn",
+            "remap": "assets/assets/characters/frontier_spearman_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 104381,
+            "sha256": "dee82d6895443c7dbc06e9318dcc276c87de674528b3618cb0f806ac8608db38",
+            "remap_sha256": "8b740de59f0a087df1cd00d5ec95071ff5ba839e5061e5247561eef3110ac614"
+          },
+          {
+            "source": "assets/characters/frontier_spearman_3.glb",
+            "entry": "assets/.godot/imported/frontier_spearman_3.glb-e791dce3ee59976311e13558fc98652e.scn",
+            "remap": "assets/assets/characters/frontier_spearman_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 66270,
+            "sha256": "a4f62d7526c91cd40a131139c73d886f97ef9d3c7a148ec122b0ecd43bc80582",
+            "remap_sha256": "b3081f2e9c1a82f9e1f727ad75a6f706f4549f4805ae67cf288c5f1e3d33606c"
+          },
+          {
+            "source": "assets/characters/frontier_archer_0.glb",
+            "entry": "assets/.godot/imported/frontier_archer_0.glb-0724ec2542620e9231b16377d2390213.scn",
+            "remap": "assets/assets/characters/frontier_archer_0.glb.import",
+            "mode": "remapped",
+            "size_bytes": 1186264,
+            "sha256": "b24e7388d2cf64d59e5336050b5a0246e76226934c42c9fffeda494ee3625ec3",
+            "remap_sha256": "bca74ec1fcdabaaea1b8a52488fcd7163bbf723c6e665ab8c1a94cb70b902430"
+          },
+          {
+            "source": "assets/characters/frontier_archer_1.glb",
+            "entry": "assets/.godot/imported/frontier_archer_1.glb-d8952aaf0d73f5fd8072dc6a788b04a7.scn",
+            "remap": "assets/assets/characters/frontier_archer_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 506479,
+            "sha256": "aa0be6c142b89c027003ad9df6c3c2fb82d447fd2274d4385f0720dc6f484575",
+            "remap_sha256": "1c919ee98ead857acdc4c6b47d1bd482483ebea2a0df8cd540fa9585120b8266"
+          },
+          {
+            "source": "assets/characters/frontier_archer_2.glb",
+            "entry": "assets/.godot/imported/frontier_archer_2.glb-88b3a1a47afc53ce59d61e23de8e1bb2.scn",
+            "remap": "assets/assets/characters/frontier_archer_2.glb.import",
+            "mode": "remapped",
+            "size_bytes": 104249,
+            "sha256": "e4a38e7730e550e2867dc94ee58d6d0beb8f6e75bb614e10d03542c25a995ab0",
+            "remap_sha256": "04d929063e9a0cd54e94da8af4e3ae81ac7da93cace6841cd487be0e7d9e643d"
+          },
+          {
+            "source": "assets/characters/frontier_archer_3.glb",
+            "entry": "assets/.godot/imported/frontier_archer_3.glb-275f59094a1e8ac76482c122c0a06685.scn",
+            "remap": "assets/assets/characters/frontier_archer_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 68696,
+            "sha256": "e8633df2cfac456863fca44d7d6a6c73bd96d91681281885d66cdca6675974f2",
+            "remap_sha256": "4704071180e9a58aacb268724c85204e3206b59c5eaa9cfa3df4e4ed07b44d86"
+          },
+          {
+            "source": "scripts/story/opening_story.gd",
+            "entry": "assets/scripts/story/opening_story.gdc",
+            "remap": "assets/scripts/story/opening_story.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 7527,
+            "sha256": "9e0821ee02d773cf3fdfc4b60108be071fe7cd7b4a5bd8e0e478fc88455700c4",
+            "remap_sha256": "40064ccd5eea63aae5195657823755b7d9d882c819568ad45b181a0b4e63f5b1"
+          },
+          {
+            "source": "scripts/cinematic/opening_director.gd",
+            "entry": "assets/scripts/cinematic/opening_director.gdc",
+            "remap": "assets/scripts/cinematic/opening_director.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 7030,
+            "sha256": "511728c63a184cb6d54325083217b69fc7faefc4eb7006a58464231707c7a73d",
+            "remap_sha256": "1fff439c8821ec104e1a43dd12e5d9dfddac88c66b4972b3bc4628ff0f12529a"
+          },
+          {
+            "source": "scripts/cinematic/opening_checkpoint.gd",
+            "entry": "assets/scripts/cinematic/opening_checkpoint.gdc",
+            "remap": "assets/scripts/cinematic/opening_checkpoint.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 1911,
+            "sha256": "d9ed3d453587e6e6efde0f113b0b34da1a0fdcce6009f03cde59450b4aaa5ccb",
+            "remap_sha256": "4630302602ec9c784a77a537186dd55aec21fb19e296a4b593729018d1ccf185"
+          },
+          {
+            "source": "scripts/ui/opening_overlay.gd",
+            "entry": "assets/scripts/ui/opening_overlay.gdc",
+            "remap": "assets/scripts/ui/opening_overlay.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 13674,
+            "sha256": "308c9c6dc31a7419af07ba75641a7404eddb5ef32c2ab4e0bc295406fccc24df",
+            "remap_sha256": "b0f3d5ff6a383cf1874718df94bd5e42f7c1418e6b0360889393c652190adb9f"
+          },
+          {
+            "source": "scripts/story/village_life.gd",
+            "entry": "assets/scripts/story/village_life.gdc",
+            "remap": "assets/scripts/story/village_life.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 30956,
+            "sha256": "41533b8d74c032d3935434fb7bab55b7e22d21549c4a36643a3ffc57ccd49ae1",
+            "remap_sha256": "7ea6367aaaade5d730536162d0d08b9aa1898dde1ded8f97b174850c26a73a8a"
+          },
+          {
+            "source": "scripts/domain/village_economy.gd",
+            "entry": "assets/scripts/domain/village_economy.gdc",
+            "remap": "assets/scripts/domain/village_economy.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 18032,
+            "sha256": "e1a6f1ab97878b0a7526d52f7a9eee8d8f0df3fb3ccedbec6e1b2a51d593d3fc",
+            "remap_sha256": "b187199c4268275c58bc6e84b630083f9b1f419488b23b756d5ecbaef6e8d752"
+          },
+          {
+            "source": "scripts/ui/village_life_panel.gd",
+            "entry": "assets/scripts/ui/village_life_panel.gdc",
+            "remap": "assets/scripts/ui/village_life_panel.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 10958,
+            "sha256": "b4a63c2290ddff46bd8c5a8273321a1532fc36dec8a0cb6173945921e8b0345d",
+            "remap_sha256": "931501420990ced25043e68cb114e56a48f951534a5d1eff89b709ce6947bcfd"
+          },
+          {
+            "source": "scripts/ui/android_village_diagnostics.gd",
+            "entry": "assets/scripts/ui/android_village_diagnostics.gdc",
+            "remap": "assets/scripts/ui/android_village_diagnostics.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 4344,
+            "sha256": "9ae1caab0de772c3776c499de3480c312d4210f1b9a5bdf7d61c57af37c73ebf",
+            "remap_sha256": "6abe1018feff00886b777d48f060210570e97aadd0fc7d2e40f7a79ec41c6baf"
+          },
+          {
+            "source": "scripts/world/village_life_world.gd",
+            "entry": "assets/scripts/world/village_life_world.gdc",
+            "remap": "assets/scripts/world/village_life_world.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 9288,
+            "sha256": "99f1e9bcc0c5dfb34cde5e147dd2fb086610923ee06b00726b87f5462ba031a1",
+            "remap_sha256": "d775cfd87cd038c157b790ca0232d3066c3f56ed1f626e234a1e1f621f456677"
+          },
+          {
+            "source": "scripts/world/regional_terrain.gd",
+            "entry": "assets/scripts/world/regional_terrain.gdc",
+            "remap": "assets/scripts/world/regional_terrain.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 4000,
+            "sha256": "ef7b7c5e070998d2272d16d55be0d1810a5b08416d76d2c629e4a1047bcc69f7",
+            "remap_sha256": "ccaaaa32a8044ff6668f7258a61e12014e66e2d8779c92118cccedcc83607dc4"
+          },
+          {
+            "source": "scripts/world/world_stream_plan.gd",
+            "entry": "assets/scripts/world/world_stream_plan.gdc",
+            "remap": "assets/scripts/world/world_stream_plan.gd.remap",
+            "mode": "remapped",
+            "size_bytes": 8670,
+            "sha256": "8ee1c07f17d327d67df5010a8b9af5a4682abb21ad67cd56244fb01bcdfd745a",
+            "remap_sha256": "0cbf103a3982a9180bb4cf8500435f7f0a3d37872190f2ddccb19fe304eebbf4"
+          }
+        ],
+        "missing_resources": []
+      }
+    },
+    {
+      "id": "manifest_metadata",
+      "status": "pass",
+      "required": true,
+      "detail": "Compiled manifest decoded by an existing Android SDK tool.",
+      "evidence": {
+        "attempts": [
+          {
+            "command": [
+              "/usr/local/lib/android/sdk/build-tools/35.0.1/aapt",
+              "dump",
+              "badging",
+              "/tmp/imperathen-android-build-jf_v6mr4/IMPERATHEN.apk"
+            ],
+            "exit_code": 0,
+            "error": null,
+            "stdout_tail": "package: name='at.heinz.imperathen' versionCode='3' versionName='0.3.0-village' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'\ninstall-location:'auto'\nsdkVersion:'24'\ntargetSdkVersion:'36'\napplication-label:'IMPERATHEN'\napplication-label-af:'IMPERATHEN'\napplication-label-am:'IMPERATHEN'\napplication-label-ar:'IMPERATHEN'\napplication-label-as:'IMPERATHEN'\napplication-label-az:'IMPERATHEN'\napplication-label-be:'IMPERATHEN'\napplication-label-bg:'IMPERATHEN'\napplication-label-bn:'IMPERATHEN'\napplication-label-bs:'IMPERATHEN'\napplication-label-ca:'IMPERATHEN'\napplication-label-cs:'IMPERATHEN'\napplication-label-da:'IMPERATHEN'\napplication-label-de:'IMPERATHEN'\napplication-label-el:'IMPERATHEN'\napplication-label-en:'IMPERATHEN'\napplication-label-en-AU:'IMPERATHEN'\napplication-label-en-CA:'IMPERATHEN'\napplication-label-en-GB:'IMPERATHEN'\napplication-label-en-IN:'IMPERATHEN'\napplication-label-en-XC:'IMPERATHEN'\napplication-label-es:'IMPERATHEN'\napplication-label-es-ES:'IMPERATHEN'\napplication-label-es-US:'IMPERATHEN'\napplication-label-et:'IMPERATHEN'\napplication-label-eu:'IMPERATHEN'\napplication-label-fa:'IMPERATHEN'\napplication-label-fi:'IMPERATHEN'\napplication-label-fr:'IMPERATHEN'\napplication-label-fr-CA:'IMPERATHEN'\napplication-label-gl:'IMPERATHEN'\napplication-label-gu:'IMPERATHEN'\napplication-label-hi:'IMPERATHEN'\napplication-label-hr:'IMPERATHEN'\napplication-label-hu:'IMPERATHEN'\napplication-label-hy:'IMPERATHEN'\napplication-label-in:'IMPERATHEN'\napplication-label-is:'IMPERATHEN'\napplication-label-it:'IMPERATHEN'\napplication-label-iw:'IMPERATHEN'\napplication-label-ja:'IMPERATHEN'\napplication-label-ka:'IMPERATHEN'\napplication-label-kk:'IMPERATHEN'\napplication-label-km:'IMPERATHEN'\napplication-label-kn:'IMPERATHEN'\napplication-label-ko:'IMPERATHEN'\napplication-label-ky:'IMPERATHEN'\napplication-label-lo:'IMPERATHEN'\napplication-label-lt:'IMPERATHEN'\napplication-label-lv:'IMPERATHEN'\napplication-label-mk:'IMPERATHEN'\napplication-label-ml:'IMPERATHEN'\napplication-label-mn:'IMPERATHEN'\napplication-label-mr:'IMPERATHEN'\napplication-label-ms:'IMPERATHEN'\napplication-label-my:'IMPERATHEN'\napplication-label-nb:'IMPERATHEN'\napplication-label-ne:'IMPERATHEN'\napplication-label-nl:'IMPERATHEN'\napplication-label-or:'IMPERATHEN'\napplication-label-pa:'IMPERATHEN'\napplication-label-pl:'IMPERATHEN'\napplication-label-pt:'IMPERATHEN'\napplication-label-pt-BR:'IMPERATHEN'\napplication-label-pt-PT:'IMPERATHEN'\napplication-label-ro:'IMPERATHEN'\napplication-label-ru:'IMPERATHEN'\napplication-label-si:'IMPERATHEN'\napplication-label-sk:'IMPERATHEN'\napplication-label-sl:'IMPERATHEN'\napplication-label-sq:'IMPERATHEN'\napplication-label-sr:'IMPERATHEN'\napplication-label-sr-Latn:'IMPERATHEN'\napplication-label-sv:'IMPERATHEN'\napplication-label-sw:'IMPERATHEN'\napplication-label-ta:'IMPERATHEN'\napplication-label-te:'IMPERATHEN'\napplication-label-th:'IMPERATHEN'\napplication-label-tl:'IMPERATHEN'\napplication-label-tr:'IMPERATHEN'\napplication-label-uk:'IMPERATHEN'\napplication-label-ur:'IMPERATHEN'\napplication-label-uz:'IMPERATHEN'\napplication-label-vi:'IMPERATHEN'\napplication-label-zh:'IMPERATHEN'\napplication-label-zh-CN:'IMPERATHEN'\napplication-label-zh-HK:'IMPERATHEN'\napplication-label-zh-TW:'IMPERATHEN'\napplication-label-zu:'IMPERATHEN'\napplication-icon-160:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-240:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-320:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-480:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-640:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-65534:'res/mipmap-anydpi-v26/icon.xml'\napplication: label='IMPERATHEN' icon='res/mipmap-anydpi-v26/icon.xml'\napplication-debuggable\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\nother-activities\nother-receivers\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--' 'af' 'am' 'ar' 'as' 'az' 'be' 'bg' 'bn' 'bs' 'ca' 'cs' 'da' 'de' 'el' 'en' 'en-AU' 'en-CA' 'en-GB' 'en-IN' 'en-XC' 'es' 'es-ES' 'es-US' 'et' 'eu' 'fa' 'fi' 'fr' 'fr-CA' 'gl' 'gu' 'hi' 'hr' 'hu' 'hy' 'in' 'is' 'it' 'iw' 'ja' 'ka' 'kk' 'km' 'kn' 'ko' 'ky' 'lo' 'lt' 'lv' 'mk' 'ml' 'mn' 'mr' 'ms' 'my' 'nb' 'ne' 'nl' 'or' 'pa' 'pl' 'pt' 'pt-BR' 'pt-PT' 'ro' 'ru' 'si' 'sk' 'sl' 'sq' 'sr' 'sr-Latn' 'sv' 'sw' 'ta' 'te' 'th' 'tl' 'tr' 'uk' 'ur' 'uz' 'vi' 'zh' 'zh-CN' 'zh-HK' 'zh-TW' 'zu'\ndensities: '160' '240' '320' '480' '640' '65534'\nnative-code: 'arm64-v8a'\n",
+            "stderr_tail": "",
+            "output_truncated": false,
+            "decoded_package": "at.heinz.imperathen",
+            "decoded_launcher": null
+          },
+          {
+            "command": [
+              "/usr/local/lib/android/sdk/build-tools/37.0.0/aapt2",
+              "dump",
+              "badging",
+              "/tmp/imperathen-android-build-jf_v6mr4/IMPERATHEN.apk"
+            ],
+            "exit_code": 0,
+            "error": null,
+            "stdout_tail": "package: name='at.heinz.imperathen' versionCode='3' versionName='0.3.0-village' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'\ninstall-location:'auto'\nminSdkVersion:'24'\ntargetSdkVersion:'36'\napplication-label:'IMPERATHEN'\napplication-label-af:'IMPERATHEN'\napplication-label-am:'IMPERATHEN'\napplication-label-ar:'IMPERATHEN'\napplication-label-as:'IMPERATHEN'\napplication-label-az:'IMPERATHEN'\napplication-label-be:'IMPERATHEN'\napplication-label-bg:'IMPERATHEN'\napplication-label-bn:'IMPERATHEN'\napplication-label-bs:'IMPERATHEN'\napplication-label-ca:'IMPERATHEN'\napplication-label-cs:'IMPERATHEN'\napplication-label-da:'IMPERATHEN'\napplication-label-de:'IMPERATHEN'\napplication-label-el:'IMPERATHEN'\napplication-label-en:'IMPERATHEN'\napplication-label-en-AU:'IMPERATHEN'\napplication-label-en-CA:'IMPERATHEN'\napplication-label-en-GB:'IMPERATHEN'\napplication-label-en-IN:'IMPERATHEN'\napplication-label-en-XC:'IMPERATHEN'\napplication-label-es:'IMPERATHEN'\napplication-label-es-ES:'IMPERATHEN'\napplication-label-es-US:'IMPERATHEN'\napplication-label-et:'IMPERATHEN'\napplication-label-eu:'IMPERATHEN'\napplication-label-fa:'IMPERATHEN'\napplication-label-fi:'IMPERATHEN'\napplication-label-fr:'IMPERATHEN'\napplication-label-fr-CA:'IMPERATHEN'\napplication-label-gl:'IMPERATHEN'\napplication-label-gu:'IMPERATHEN'\napplication-label-hi:'IMPERATHEN'\napplication-label-hr:'IMPERATHEN'\napplication-label-hu:'IMPERATHEN'\napplication-label-hy:'IMPERATHEN'\napplication-label-in:'IMPERATHEN'\napplication-label-is:'IMPERATHEN'\napplication-label-it:'IMPERATHEN'\napplication-label-iw:'IMPERATHEN'\napplication-label-ja:'IMPERATHEN'\napplication-label-ka:'IMPERATHEN'\napplication-label-kk:'IMPERATHEN'\napplication-label-km:'IMPERATHEN'\napplication-label-kn:'IMPERATHEN'\napplication-label-ko:'IMPERATHEN'\napplication-label-ky:'IMPERATHEN'\napplication-label-lo:'IMPERATHEN'\napplication-label-lt:'IMPERATHEN'\napplication-label-lv:'IMPERATHEN'\napplication-label-mk:'IMPERATHEN'\napplication-label-ml:'IMPERATHEN'\napplication-label-mn:'IMPERATHEN'\napplication-label-mr:'IMPERATHEN'\napplication-label-ms:'IMPERATHEN'\napplication-label-my:'IMPERATHEN'\napplication-label-nb:'IMPERATHEN'\napplication-label-ne:'IMPERATHEN'\napplication-label-nl:'IMPERATHEN'\napplication-label-or:'IMPERATHEN'\napplication-label-pa:'IMPERATHEN'\napplication-label-pl:'IMPERATHEN'\napplication-label-pt:'IMPERATHEN'\napplication-label-pt-BR:'IMPERATHEN'\napplication-label-pt-PT:'IMPERATHEN'\napplication-label-ro:'IMPERATHEN'\napplication-label-ru:'IMPERATHEN'\napplication-label-si:'IMPERATHEN'\napplication-label-sk:'IMPERATHEN'\napplication-label-sl:'IMPERATHEN'\napplication-label-sq:'IMPERATHEN'\napplication-label-sr:'IMPERATHEN'\napplication-label-sr-Latn:'IMPERATHEN'\napplication-label-sv:'IMPERATHEN'\napplication-label-sw:'IMPERATHEN'\napplication-label-ta:'IMPERATHEN'\napplication-label-te:'IMPERATHEN'\napplication-label-th:'IMPERATHEN'\napplication-label-tl:'IMPERATHEN'\napplication-label-tr:'IMPERATHEN'\napplication-label-uk:'IMPERATHEN'\napplication-label-ur:'IMPERATHEN'\napplication-label-uz:'IMPERATHEN'\napplication-label-vi:'IMPERATHEN'\napplication-label-zh:'IMPERATHEN'\napplication-label-zh-CN:'IMPERATHEN'\napplication-label-zh-HK:'IMPERATHEN'\napplication-label-zh-TW:'IMPERATHEN'\napplication-label-zu:'IMPERATHEN'\napplication-icon-160:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-240:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-320:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-480:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-640:'res/mipmap-anydpi-v26/icon.xml'\napplication-icon-65534:'res/mipmap-anydpi-v26/icon.xml'\napplication: label='IMPERATHEN' icon='res/mipmap-anydpi-v26/icon.xml'\napplication-debuggable\nfeature-group: label=''\n  uses-gl-es: '0x30000'\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\nother-activities\nother-receivers\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--' 'af' 'am' 'ar' 'as' 'az' 'be' 'bg' 'bn' 'bs' 'ca' 'cs' 'da' 'de' 'el' 'en' 'en-AU' 'en-CA' 'en-GB' 'en-IN' 'en-XC' 'es' 'es-ES' 'es-US' 'et' 'eu' 'fa' 'fi' 'fr' 'fr-CA' 'gl' 'gu' 'hi' 'hr' 'hu' 'hy' 'in' 'is' 'it' 'iw' 'ja' 'ka' 'kk' 'km' 'kn' 'ko' 'ky' 'lo' 'lt' 'lv' 'mk' 'ml' 'mn' 'mr' 'ms' 'my' 'nb' 'ne' 'nl' 'or' 'pa' 'pl' 'pt' 'pt-BR' 'pt-PT' 'ro' 'ru' 'si' 'sk' 'sl' 'sq' 'sr' 'sr-Latn' 'sv' 'sw' 'ta' 'te' 'th' 'tl' 'tr' 'uk' 'ur' 'uz' 'vi' 'zh' 'zh-CN' 'zh-HK' 'zh-TW' 'zu'\ndensities: '160' '240' '320' '480' '640' '65534'\nnative-code: 'arm64-v8a'\n",
+            "stderr_tail": "warn: resource com.godot.game:mipmap/themed_icon for config 'anydpi-v26' is a file reference to 'res/mipmap-anydpi-v26/themed_icon.xml' but no such path exists.\n",
+            "output_truncated": false,
+            "decoded_package": "at.heinz.imperathen",
+            "decoded_launcher": null
+          },
+          {
+            "command": [
+              "/usr/local/lib/android/sdk/cmdline-tools/latest/bin/apkanalyzer",
+              "manifest",
+              "print",
+              "/tmp/imperathen-android-build-jf_v6mr4/IMPERATHEN.apk"
+            ],
+            "exit_code": 0,
+            "error": null,
+            "stdout_tail": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest\n    xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    android:versionCode=\"3\"\n    android:versionName=\"0.3.0-village\"\n    android:installLocation=\"0\"\n    android:compileSdkVersion=\"36\"\n    android:compileSdkVersionCodename=\"16\"\n    package=\"at.heinz.imperathen\"\n    platformBuildVersionCode=\"36\"\n    platformBuildVersionName=\"16\">\n\n    <uses-sdk\n        android:minSdkVersion=\"24\"\n        android:targetSdkVersion=\"36\" />\n\n    <supports-screens\n        android:smallScreens=\"true\"\n        android:normalScreens=\"true\"\n        android:largeScreens=\"true\"\n        android:xlargeScreens=\"true\" />\n\n    <uses-feature\n        android:glEsVersion=\"0x30000\"\n        android:required=\"true\" />\n\n    <application\n        android:label=\"@ref/0x7f0b0008\"\n        android:icon=\"@ref/0x7f0a0000\"\n        android:debuggable=\"true\"\n        android:allowBackup=\"false\"\n        android:isGame=\"false\"\n        android:extractNativeLibs=\"true\"\n        android:appCategory=\"8\"\n        android:appComponentFactory=\"androidx.core.app.CoreComponentFactory\"\n        android:hasFragileUserData=\"false\"\n        android:requestLegacyExternalStorage=\"false\">\n\n        <profileable\n            android:enabled=\"true\"\n            android:shell=\"true\" />\n\n        <activity\n            android:theme=\"@ref/0x7f0c0008\"\n            android:name=\"com.godot.game.GodotApp\"\n            android:exported=\"false\"\n            android:excludeFromRecents=\"false\"\n            android:launchMode=\"4\"\n            android:screenOrientation=\"11\"\n            android:configChanges=\"0x3ff4\"\n            android:windowSoftInputMode=\"0x10\"\n            android:resizeableActivity=\"true\"\n            android:supportsPictureInPicture=\"true\" />\n\n        <activity-alias\n            android:name=\"com.godot.game.GodotAppLauncher\"\n            android:exported=\"true\"\n            android:targetActivity=\"com.godot.game.GodotApp\">\n\n            <intent-filter>\n\n                <action\n                    android:name=\"android.intent.action.MAIN\" />\n\n                <category\n                    android:name=\"android.intent.category.DEFAULT\" />\n\n                <category\n                    android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity-alias>\n\n        <meta-data\n            android:name=\"org.godotengine.library.version\"\n            android:value=\"4.7.2.stable\" />\n\n        <activity\n            android:theme=\"@ref/0x01030010\"\n            android:name=\"org.godotengine.godot.utils.ProcessPhoenix\"\n            android:exported=\"false\"\n            android:process=\":phoenix\" />\n\n        <provider\n            android:name=\"androidx.core.content.FileProvider\"\n            android:exported=\"false\"\n            android:authorities=\"at.heinz.imperathen.fileprovider\"\n            android:grantUriPermissions=\"true\">\n\n            <meta-data\n                android:name=\"android.support.FILE_PROVIDER_PATHS\"\n                android:resource=\"@ref/0x7f0e0000\" />\n        </provider>\n\n        <provider\n            android:name=\"androidx.startup.InitializationProvider\"\n            android:exported=\"false\"\n            android:authorities=\"at.heinz.imperathen.fileprovider\">\n\n            <meta-data\n                android:name=\"androidx.profileinstaller.ProfileInstallerInitializer\"\n                android:value=\"androidx.startup\" />\n        </provider>\n\n        <receiver\n            android:name=\"androidx.profileinstaller.ProfileInstallReceiver\"\n            android:permission=\"android.permission.DUMP\"\n            android:enabled=\"true\"\n            android:exported=\"true\"\n            android:directBootAware=\"false\">\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.INSTALL_PROFILE\" />\n            </intent-filter>\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.SKIP_FILE\" />\n            </intent-filter>\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.SAVE_PROFILE\" />\n            </intent-filter>\n\n            <intent-filter>\n\n                <action\n                    android:name=\"androidx.profileinstaller.action.BENCHMARK_OPERATION\" />\n            </intent-filter>\n        </receiver>\n\n        <meta-data\n            android:name=\"org.godotengine.rendering.method\"\n            android:value=\"gl_compatibility\" />\n\n        <meta-data\n            android:name=\"org.godotengine.editor.version\"\n            android:value=\"4.7.2.stable\" />\n    </application>\n</manifest>\n",
+            "stderr_tail": "",
+            "output_truncated": false,
+            "decoded_package": "at.heinz.imperathen",
+            "decoded_launcher": "com.godot.game.GodotAppLauncher"
+          }
+        ]
+      }
+    },
+    {
+      "id": "package_identity",
+      "status": "pass",
+      "required": true,
+      "detail": "Decoded package must equal the intended application ID.",
+      "evidence": {
+        "expected": "at.heinz.imperathen",
+        "actual": "at.heinz.imperathen"
+      }
+    },
+    {
+      "id": "launcher_activity",
+      "status": "pass",
+      "required": true,
+      "detail": "A launcher activity or alias must be enabled and exported, with MAIN and LAUNCHER in the same intent filter. A private alias target is permitted. Missing XML evidence never creates a PASS.",
+      "evidence": {
+        "activity": "com.godot.game.GodotAppLauncher",
+        "decoded_with": "apkanalyzer",
+        "diagnostics": {
+          "application_present": true,
+          "application_enabled": true,
+          "components": [
+            {
+              "type": "activity",
+              "name": "com.godot.game.GodotApp",
+              "enabled": true,
+              "exported": false,
+              "exported_attribute": "false",
+              "intent_filters": [],
+              "has_launcher_filter": false,
+              "rejection_reasons": [
+                "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+                "component_exported_false"
+              ],
+              "unresolved_attributes": [],
+              "usable_launcher": false
+            },
+            {
+              "type": "activity-alias",
+              "name": "com.godot.game.GodotAppLauncher",
+              "enabled": true,
+              "exported": true,
+              "exported_attribute": "true",
+              "intent_filters": [
+                {
+                  "actions": [
+                    "android.intent.action.MAIN"
+                  ],
+                  "categories": [
+                    "android.intent.category.DEFAULT",
+                    "android.intent.category.LAUNCHER"
+                  ]
+                }
+              ],
+              "has_launcher_filter": true,
+              "target_activity": "com.godot.game.GodotApp",
+              "target_declared_before_alias": true,
+              "target_enabled": true,
+              "target_exported": false,
+              "rejection_reasons": [],
+              "unresolved_attributes": [],
+              "usable_launcher": true
+            },
+            {
+              "type": "activity",
+              "name": "org.godotengine.godot.utils.ProcessPhoenix",
+              "enabled": true,
+              "exported": false,
+              "exported_attribute": "false",
+              "intent_filters": [],
+              "has_launcher_filter": false,
+              "rejection_reasons": [
+                "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+                "component_exported_false"
+              ],
+              "unresolved_attributes": [],
+              "usable_launcher": false
+            }
+          ],
+          "unresolved_candidate": false
+        }
+      }
+    },
+    {
+      "id": "signature_verification",
+      "status": "pass",
+      "required": true,
+      "detail": "apksigner verify checks the supplied APK, using its declared Android compatibility range; it does not establish publisher ownership.",
+      "evidence": {
+        "schemes": {
+          "v1": false,
+          "v2": true,
+          "v3": true,
+          "v3.1": false,
+          "v4": false
+        },
+        "command": [
+          "/usr/local/lib/android/sdk/build-tools/35.0.1/apksigner",
+          "verify",
+          "--verbose",
+          "/tmp/imperathen-android-build-jf_v6mr4/IMPERATHEN.apk"
+        ],
+        "exit_code": 0,
+        "error": null,
+        "stdout_tail": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\n",
+        "stderr_tail": "",
+        "output_truncated": false
+      }
+    },
+    {
+      "id": "zip_alignment",
+      "status": "pass",
+      "required": true,
+      "detail": "Existing zipalign checks ordinary 4-byte ZIP alignment; this does not establish 16-KB native page compatibility.",
+      "evidence": {
+        "command": [
+          "/usr/local/lib/android/sdk/build-tools/35.0.1/zipalign",
+          "-c",
+          "-v",
+          "4",
+          "/tmp/imperathen-android-build-jf_v6mr4/IMPERATHEN.apk"
+        ],
+        "exit_code": 0,
+        "error": null,
+        "stdout_tail": "00784 assets/.godot/imported/villager_0.glb-e90733a330507a3c93f7156d7cbf0d32.scn (OK)\n137061035 assets/assets/village_characters/villager_0.glb.import (OK - compressed)\n137061288 assets/.godot/imported/villager_1.glb-1cfa14e05d845c1252c31036699f0ff1.scn (OK)\n140189746 assets/assets/village_characters/villager_1.glb.import (OK - compressed)\n140190000 assets/.godot/imported/villager_2.glb-d519b0e02e616c7fd87382e8317b7089.scn (OK)\n143015960 assets/assets/village_characters/villager_2.glb.import (OK - compressed)\n143016212 assets/.godot/imported/villager_3.glb-331528a69c3fa82d0b7daca7821ddde0.scn (OK)\n145665221 assets/assets/village_characters/villager_3.glb.import (OK - compressed)\n145665476 assets/.godot/imported/gladius_lod0.glb-d213b543551067bd8d2aa1a917865c03.scn (OK)\n145717260 assets/assets/weapons/gladius_lod0.glb.import (OK - compressed)\n145717536 assets/.godot/imported/gladius_lod0_bronze_basecolor.png-6b1c3cc471f6fcdd8572f6a85d6a0601.ctex (OK)\n145897212 assets/assets/weapons/gladius_lod0_bronze_basecolor.png.import (OK - compressed)\n145897560 assets/.godot/imported/gladius_lod0_bronze_normal.png-dab44f45523f640fa12ed0db3730e4da.ctex (OK)\n146263037 assets/assets/weapons/gladius_lod0_bronze_normal.png.import (OK - compressed)\n146263388 assets/.godot/imported/gladius_lod0_bronze_roughness.png-ad34a6e47d11ee023123cdd079fcc772.ctex (OK)\n146383868 assets/assets/weapons/gladius_lod0_bronze_roughness.png.import (OK - compressed)\n146384220 assets/.godot/imported/gladius_lod0_oak_basecolor.png-a04ae27969d0dab2c017b32239dc107e.ctex (OK)\n146571773 assets/assets/weapons/gladius_lod0_oak_basecolor.png.import (OK - compressed)\n146572120 assets/.godot/imported/gladius_lod0_oak_normal.png-189853edd32162f506c31f52bef69870.ctex (OK)\n147057704 assets/assets/weapons/gladius_lod0_oak_normal.png.import (OK - compressed)\n147058052 assets/.godot/imported/gladius_lod0_oak_roughness.png-d709ef7abf0bc8402ca1cfb7f2823e30.ctex (OK)\n147176873 assets/assets/weapons/gladius_lod0_oak_roughness.png.import (OK - compressed)\n147177208 assets/.godot/imported/scutum_lod0.glb-a4f1ff7044ead227d3d2a041747e3501.scn (OK)\n147337898 assets/assets/weapons/scutum_lod0.glb.import (OK - compressed)\n147338172 assets/.godot/imported/scutum_lod0_bronze_basecolor.png-ccacc4f3b74ffe41fc6e02022add59c9.ctex (OK)\n147517847 assets/assets/weapons/scutum_lod0_bronze_basecolor.png.import (OK - compressed)\n147518196 assets/.godot/imported/scutum_lod0_bronze_normal.png-1717b112d55f00a32a509adf341d3fd6.ctex (OK)\n147883672 assets/assets/weapons/scutum_lod0_bronze_normal.png.import (OK - compressed)\n147884020 assets/.godot/imported/scutum_lod0_bronze_roughness.png-65a91b021e3ba1e4e8e55db627460522.ctex (OK)\n148004499 assets/assets/weapons/scutum_lod0_bronze_roughness.png.import (OK - compressed)\n148004852 assets/.godot/imported/scutum_lod0_leather_basecolor.png-a798691e980109573427ef0799d81846.ctex (OK)\n148120360 assets/assets/weapons/scutum_lod0_leather_basecolor.png.import (OK - compressed)\n148120712 assets/.godot/imported/scutum_lod0_leather_normal.png-bfd8f2182bf0b477598b00d8e4542cc6.ctex (OK)\n148546927 assets/assets/weapons/scutum_lod0_leather_normal.png.import (OK - compressed)\n148547276 assets/.godot/imported/scutum_lod0_leather_roughness.png-3c1d4a96e6f2757acd8186e751bf8af3.ctex (OK)\n148654836 assets/assets/weapons/scutum_lod0_leather_roughness.png.import (OK - compressed)\n148655184 assets/.godot/imported/scutum_lod0_linen_basecolor.png-6679c95bc77250ebde4ee3e95caf7e03.ctex (OK)\n148881118 assets/assets/weapons/scutum_lod0_linen_basecolor.png.import (OK - compressed)\n148881464 assets/.godot/imported/scutum_lod0_linen_normal.png-5c4e774982ad3f5524c1389385329050.ctex (OK)\n149234229 assets/assets/weapons/scutum_lod0_linen_normal.png.import (OK - compressed)\n149234576 assets/.godot/imported/scutum_lod0_linen_roughness.png-687a3e5004ec2af1272137dc7ad2a9c6.ctex (OK)\n149343594 assets/assets/weapons/scutum_lod0_linen_roughness.png.import (OK - compressed)\n149343875 assets/assets/asset_manifest.json (OK - compressed)\n149344493 assets/.godot/imported/frontier_ambience.wav-648aeae78421492de7942fff867912ee.sample (OK - compressed)\n149408498 assets/assets/frontier_ambience.wav.import (OK - compressed)\n149408752 assets/.godot/imported/frontier_hut.glb-4acdf649ad4d9d2b98907bcec4487c22.scn (OK)\n149532453 assets/assets/frontier_hut.glb.import (OK - compressed)\n149532704 assets/.godot/imported/icon.svg-56083ea2a1f1a4f1e49773bdc6d7826c.ctex (OK)\n149550417 assets/assets/icon.svg.import (OK - compressed)\n149550643 assets/assets/quality_profiles.json (OK - compressed)\n149551801 assets/scripts/battle/battle_model.gdc (OK - compressed)\n149573962 assets/scripts/battle/formation_slots.gdc (OK - compressed)\n149576039 assets/scripts/battle/valley_field.gdc (OK - compressed)\n149578731 assets/scripts/cinematic/opening_checkpoint.gdc (OK - compressed)\n149580722 assets/scripts/cinematic/opening_director.gdc (OK - compressed)\n149587796 assets/scripts/domain/village_economy.gdc (OK - compressed)\n149605658 assets/scripts/domain/world_model.gdc (OK - compressed)\n149643828 assets/scripts/story/frontier_chapter.gdc (OK - compressed)\n149657469 assets/scripts/story/opening_story.gdc (OK - compressed)\n149665041 assets/scripts/story/village_life.gdc (OK - compressed)\n149695742 assets/scripts/strategy/atlas_data.gdc (OK - compressed)\n149700153 assets/scripts/strategy/atlas_screen.gdc (OK - compressed)\n149706125 assets/scripts/strategy/globe.gdc (OK - compressed)\n149712804 assets/scripts/strategy/origins.gdc (OK - compressed)\n149713976 assets/scripts/strategy/season_campaign.gdc (OK - compressed)\n149728132 assets/scripts/tactics/valley_hud.gdc (OK - compressed)\n149735111 assets/scripts/tactics/valley_landscape.gdc (OK - compressed)\n149741389 assets/scripts/tactics/valley_scene.gdc (OK - compressed)\n149759248 assets/scripts/ui/android_graphics_probe.gdc (OK - compressed)\n149766042 assets/scripts/ui/android_village_diagnostics.gdc (OK - compressed)\n149770457 assets/scripts/ui/figure_gallery.gdc (OK - compressed)\n149777576 assets/scripts/ui/game_ui.gdc (OK - compressed)\n149826064 assets/scripts/ui/opening_overlay.gdc (OK - compressed)\n149839619 assets/scripts/ui/runtime_display.gdc (OK - compressed)\n149846134 assets/scripts/ui/safe_area.gdc (OK - compressed)\n149846997 assets/scripts/ui/touch_action.gdc (OK - compressed)\n149848627 assets/scripts/ui/touch_pad.gdc (OK - compressed)\n149851869 assets/shaders/rank_stride.gdshader (OK - compressed)\n149852486 assets/scripts/ui/village_life_panel.gdc (OK - compressed)\n149863423 assets/scripts/visuals/facial_motion.gdc (OK - compressed)\n149866863 assets/scripts/visuals/far_ranks.gdc (OK - compressed)\n149868958 assets/scripts/visuals/grove.gdc (OK - compressed)\n149873778 assets/scripts/visuals/soldier_visual.gdc (OK - compressed)\n149878598 assets/scripts/visuals/village_person.gdc (OK - compressed)\n149889065 assets/scripts/world/village/breeze.gdshader (OK - compressed)\n149889516 assets/scripts/world/village/clouds.gdshader (OK - compressed)\n149890153 assets/scripts/world/village/drizzle.gdshader (OK - compressed)\n149890462 assets/scripts/world/village/frontier_dressing.gdc (OK - compressed)\n149897879 assets/scripts/world/village/ground.gdshader (OK - compressed)\n149899291 assets/scripts/world/village/opening_props.gdc (OK - compressed)\n149906491 assets/scripts/world/village/village_layout.gdc (OK - compressed)\n149913434 assets/scripts/world/village/village_population.gdc (OK - compressed)\n149918534 assets/scripts/world/village/village_scenery.gdc (OK - compressed)\n149933208 assets/scripts/world/village/water.gdshader (OK - compressed)\n149933803 assets/scripts/world/game_world.gdc (OK - compressed)\n149975869 assets/scripts/world/regional_terrain.gdc (OK - compressed)\n149979945 assets/scripts/world/regional_village.gdc (OK - compressed)\n149984367 assets/scripts/world/village_art.gdc (OK - compressed)\n149989966 assets/scripts/world/village_life_world.gdc (OK - compressed)\n149999284 assets/.godot/exported/133200997/export-3070c538c03ee49b7677ff960a3f5195-main.scn (OK)\n150000037 assets/scripts/world/world_stream_plan.gdc (OK - compressed)\n150008710 assets/scripts/main.gdc (OK - compressed)\n150034534 assets/scripts/battle/battle_model.gd.remap (OK - compressed)\n150034660 assets/scripts/battle/formation_slots.gd.remap (OK - compressed)\n150034792 assets/scripts/battle/valley_field.gd.remap (OK - compressed)\n150034930 assets/scripts/cinematic/opening_checkpoint.gd.remap (OK - compressed)\n150035074 assets/scripts/cinematic/opening_director.gd.remap (OK - compressed)\n150035212 assets/scripts/domain/village_economy.gd.remap (OK - compressed)\n150035343 assets/scripts/domain/world_model.gd.remap (OK - compressed)\n150035474 assets/scripts/story/frontier_chapter.gd.remap (OK - compressed)\n150035606 assets/scripts/story/opening_story.gd.remap (OK - compressed)\n150035730 assets/scripts/story/village_life.gd.remap (OK - compressed)\n150035858 assets/scripts/strategy/atlas_data.gd.remap (OK - compressed)\n150035989 assets/scripts/strategy/atlas_screen.gd.remap (OK - compressed)\n150036114 assets/scripts/strategy/globe.gd.remap (OK - compressed)\n150036235 assets/scripts/strategy/origins.gd.remap (OK - compressed)\n150036366 assets/scripts/strategy/season_campaign.gd.remap (OK - compressed)\n150036499 assets/scripts/tactics/valley_hud.gd.remap (OK - compressed)\n150036632 assets/scripts/tactics/valley_landscape.gd.remap (OK - compressed)\n150036767 assets/scripts/tactics/valley_scene.gd.remap (OK - compressed)\n150036903 assets/scripts/ui/android_graphics_probe.gd.remap (OK - compressed)\n150037049 assets/scripts/ui/android_village_diagnostics.gd.remap (OK - compressed)\n150037186 assets/scripts/ui/figure_gallery.gd.remap (OK - compressed)\n150037304 assets/scripts/ui/game_ui.gd.remap (OK - compressed)\n150037423 assets/scripts/ui/opening_overlay.gd.remap (OK - compressed)\n150037550 assets/scripts/ui/runtime_display.gd.remap (OK - compressed)\n150037671 assets/scripts/ui/safe_area.gd.remap (OK - compressed)\n150037789 assets/scripts/ui/touch_action.gd.remap (OK - compressed)\n150037907 assets/scripts/ui/touch_pad.gd.remap (OK - compressed)\n150038031 assets/scripts/ui/village_life_panel.gd.remap (OK - compressed)\n150038164 assets/scripts/visuals/facial_motion.gd.remap (OK - compressed)\n150038293 assets/scripts/visuals/far_ranks.gd.remap (OK - compressed)\n150038414 assets/scripts/visuals/grove.gd.remap (OK - compressed)\n150038540 assets/scripts/visuals/soldier_visual.gd.remap (OK - compressed)\n150038670 assets/scripts/visuals/village_person.gd.remap (OK - compressed)\n150038811 assets/scripts/world/village/frontier_dressing.gd.remap (OK - compressed)\n150038959 assets/scripts/world/village/opening_props.gd.remap (OK - compressed)\n150039105 assets/scripts/world/village/village_layout.gd.remap (OK - compressed)\n150039249 assets/scripts/world/village/village_population.gd.remap (OK - compressed)\n150039394 assets/scripts/world/village/village_scenery.gd.remap (OK - compressed)\n150039523 assets/scripts/world/game_world.gd.remap (OK - compressed)\n150039648 assets/scripts/world/regional_terrain.gd.remap (OK - compressed)\n150039783 assets/scripts/world/regional_village.gd.remap (OK - compressed)\n150039913 assets/scripts/world/village_art.gd.remap (OK - compressed)\n150040045 assets/scripts/world/village_life_world.gd.remap (OK - compressed)\n150040155 assets/main.tscn.remap (OK - compressed)\n150040321 assets/scripts/world/world_stream_plan.gd.remap (OK - compressed)\n150040434 assets/scripts/main.gd.remap (OK - compressed)\n150040548 assets/.godot/global_script_class_cache.cfg (OK - compressed)\n150040610 assets/assets/icon.svg (OK - compressed)\n150041049 assets/.godot/uid_cache.bin (OK - compressed)\n150048883 assets/project.binary (OK - compressed)\n150049392 assets/assets.sparsepck (OK)\n150157544 assets/_cl_ (OK)\n150157688 META-INF/IMPERATH.SF (OK - compressed)\n150211827 META-INF/IMPERATH.RSA (OK - compressed)\n150213352 META-INF/MANIFEST.MF (OK - compressed)\nVerification succesful\n",
+        "stderr_tail": "",
+        "output_truncated": true
+      }
+    },
+    {
+      "id": "apk_unchanged",
+      "status": "pass",
+      "required": true,
+      "detail": "The inspected APK must retain the same size and SHA-256 throughout validation.",
+      "evidence": {}
+    }
+  ],
+  "device_tests": {
+    "status": "not_run",
+    "reason": "Static validator never installs or launches an APK or queries a connected device."
+  },
+  "installability": "not_demonstrated_on_a_device",
+  "source_snapshot": {
+    "status": "recorded",
+    "sha256": {
+      "assets/architecture/atrium_house.glb": "f87b829d633b481014c8787ebd09db46720c031ac2f6a18ab8243f72e4da831c",
+      "assets/architecture/frontier_house.glb": "2fb464187ecec393558d9ba24790ec54a6b9e3c66558413c266664650fbc6372",
+      "assets/architecture/village_well.glb": "21555082045da623d48eafa04ba69ed3d94126d8db006d638dca06912949e0a0",
+      "assets/asset_manifest.json": "1e497f5be2bcc6de7f77a681897b0746b0704ed87e810c7a7d1a97d3f8b31419",
+      "assets/characters/frontier_archer_0.glb": "b6f00b194403079db32647f2239e4d8fab90c245059e23a6c9dc6d089e461722",
+      "assets/characters/frontier_archer_1.glb": "14b2ffaab3191d75e4a624e6c7f2cbdfa8db6d470470783f302553adcb52fb6c",
+      "assets/characters/frontier_archer_2.glb": "fcc4c04e26446f3b122852a3fb9c3252f84d403b41ddcb126e4636eeb7a6e87b",
+      "assets/characters/frontier_archer_3.glb": "b148570829a68da85d5bacd69845c8158d1b59584f95092571638e3d71aa0b6b",
+      "assets/characters/frontier_civilian_man_0.glb": "477001694752dd67f6802da6c30cf246df0a97240914fc75e79315ebfe443622",
+      "assets/characters/frontier_civilian_man_1.glb": "30aabba76fa5db4b2fa8b879905611d340998d6294f3e8a1a6636de55de1ecef",
+      "assets/characters/frontier_civilian_man_2.glb": "fcae8394615557c9b4eee7f64ac683be88344295e2b8a7f07a4a536de92c0ec9",
+      "assets/characters/frontier_civilian_man_3.glb": "69a97af3b49b3c8d4b996758470b83cc818b690a3833affc4913a1d25040075a",
+      "assets/characters/frontier_civilian_woman_0.glb": "3f445fed8e5564b5b5a8338564e343d8ec9f5e92c4117eff1c2b86acd0b54ca2",
+      "assets/characters/frontier_civilian_woman_1.glb": "0060242580c098f5d94ce144cdf320a4f47b26d84026042ab136c583c81acca1",
+      "assets/characters/frontier_civilian_woman_2.glb": "c7d02261332c880df124ca75f437f5352ae9143777c61804745120706160c594",
+      "assets/characters/frontier_civilian_woman_3.glb": "c191923876021d4fec0e4fe7e343a101ac69925dc36ebe2b2f8de4ed626f3dc0",
+      "assets/characters/frontier_elder_0.glb": "b03051329d7e344fb95bb5a7e6a0eab953163f1549f103f4592ebfc1e3f4fefb",
+      "assets/characters/frontier_elder_1.glb": "5b1b3453f984f3e2c91c5535ecd5fef57f9733e4e41be33dc82111e073f5a12e",
+      "assets/characters/frontier_elder_2.glb": "80435022982a4521a963185efd005d9413746c82c17247f5b1e4071a05f2e146",
+      "assets/characters/frontier_elder_3.glb": "42f713f0b05aace710e337a468e5ccffb9a32b6238234a93cbec56b334909a3a",
+      "assets/characters/frontier_legionary_0.glb": "7937cbb3c3a510609d7a9d62b8adebf9f6a6678d997436faa2cce735146e8bda",
+      "assets/characters/frontier_legionary_1.glb": "a7b3d582f378c6cd6fadbb2d42a778a5b2b567e7c64312c054d8eae207cd6148",
+      "assets/characters/frontier_legionary_2.glb": "5e929aa27938c60fb94bad246c5ab7b6391110d0a12157df090a8eb6346eab05",
+      "assets/characters/frontier_legionary_3.glb": "05cced36031ec8f7627302dbed9235df8404617873d91e0f6ad569c9d65e47e3",
+      "assets/characters/frontier_officer_0.glb": "46152dd3fc4da12bc772ab04084947f40f3c1d391c37435402af2bab4f0f2e86",
+      "assets/characters/frontier_officer_1.glb": "2d47a6f35dc7ce73ec959384090271c88ff3e0ea0a420197403912a4ed159bfc",
+      "assets/characters/frontier_officer_2.glb": "3ae746ffe5f0380b7bf38ab8b098b387257c9a74e784f613872cde013f0ef66b",
+      "assets/characters/frontier_officer_3.glb": "39eccc496ad4f61f5ba7473ee2fec5fc08a4b77c574c477fd728100f349f43d4",
+      "assets/characters/frontier_spearman_0.glb": "46a06aff153e865667933c22b9aec4173b9be987d40d2e6c9226829061a8e2b4",
+      "assets/characters/frontier_spearman_1.glb": "534e6d54304a3ffc75ad528fcb8f76063a0e75fafb744d0de18fe232fa3040a5",
+      "assets/characters/frontier_spearman_2.glb": "fe2e7b71db6487e04bf5663996aabc770a4ae1422b205084922b3ea6602c828b",
+      "assets/characters/frontier_spearman_3.glb": "8751356259a6caa85f66e74b84da9b8613ac2702f13ed25f91b004c875530e98",
+      "assets/characters/hero_quality_0.glb": "69df0f6c2546a5dd075eee07570e071746d5c46e9fcc28e3a7bac11c3a55caeb",
+      "assets/characters/hero_quality_1.glb": "af6a9dfc26ddec361702157943f21fd756ef5ebb476aab73bdfdb0f4de30fc91",
+      "assets/characters/hero_quality_2.glb": "8f91895bb39608febf1df54ede111d39a0c709fa2a57036553e4ce3cc5e247f1",
+      "assets/characters/hero_quality_3.glb": "103845fd62f6aa73284db552cd92be776deb1ec3546bb5ec30bd391cdb5b4b12",
+      "assets/frontier_ambience.wav": "69bdcc1ef52336b462db932f7c28db5014a6109c4225307903a7881bc01b6433",
+      "assets/frontier_hut.glb": "8069c0fc868ee6cb7bdeb2ecadb1351100c8605ea6cdca5c04dcb61e7bb1a230",
+      "assets/landscape/farmer.glb": "98c8c33d6cfdcd6a7fac60895e2daf0202d779bf473b7eff599f7f174384f061",
+      "assets/landscape/han_farmer.glb": "0fd9ba3505bec96b9a987a614e8048f1f52684ca5b371c44ee89af64a3bbdb83",
+      "assets/landscape/han_house.glb": "98c3986a5d6e0cbbdc050860ee4d872dfff8120aa48d4df520afee44c996a639",
+      "assets/landscape/oak_far.glb": "64918a9763984ee3b94778dd9bf10abb3454b5792d3a7af2da305c7040436afa",
+      "assets/landscape/oak_mid.glb": "cf081de1a080a7dba933bf93cec0dafb89ea27bddc6c6f4fd546f4893baaf125",
+      "assets/landscape/oak_near.glb": "cdf59618e11ba18dabb1d247ca69b6956c29a096c8a2fd3344bf233dfe9c6606",
+      "assets/landscape/olive_far.glb": "cb1b1a214c146c00357ce02fc9fd2880c3b9c8cef25a5b74facf21f8505e009b",
+      "assets/landscape/olive_mid.glb": "fee6116413166bc140ae7bfe64a134c9afb7db8c3eef1a7e018959dd025b0b08",
+      "assets/landscape/olive_near.glb": "18bdbfa5fbe83842be9162bacd9f54e607800d5e8dfae81048bd12629dd38f39",
+      "assets/landscape/pine_far.glb": "cfa2f16c31819a942e0498cc40921120f8d3bf289394218ac9458cca0677e2cc",
+      "assets/landscape/pine_mid.glb": "087e5f0c4881e3435f2783dc589a9276424dcd7168736722ac0282dc1fa6600c",
+      "assets/landscape/pine_near.glb": "17a83f875c33a046cf708b2997f03398b8a360f925bf47bd9acf2d49507e4bb6",
+      "assets/landscape/wa_farmer.glb": "b87f8c1fd0c30d0ea91ffefa427dab45fcccd7066067d71b98f6e236255d63c1",
+      "assets/landscape/wa_house.glb": "4b60525d6ae432878b7cc45056bdea3701fefa24f8b64801a3fbe234e6b1c9bc",
+      "assets/landscape/wa_store.glb": "b0209f67fb15e6dde8c892aa509fd2863455e583920a0d72ae398c72a96149fb",
+      "assets/landscape/wood_longhouse.glb": "47ebe37b8fcd0b39206f87564d43f7e5a91e59848bd18ba82704c833e2611dad",
+      "assets/portraits/adult_italia.webp": "989874d81960b22b74361b6668919617a4420e27d2062873e5e1fadc6c74a0d1",
+      "assets/portraits/adult_marcus.webp": "2e78064e91002cb111b025d2bde54f6348322fe2725082ca653d68a4a3f55cdf",
+      "assets/portraits/aki.webp": "097c1fcf5005835b107b3aae7e17615e53577a6622bccbecf9aa16f3353b2e4a",
+      "assets/portraits/albrun.webp": "01688a228eb227e3e7180654eb530740c8b58737b750b4bf20f6e0110a45d494",
+      "assets/portraits/archer.webp": "d30593b08a3e3d297b43f88de817f4d931400e9bcfa50f8b49e21d487a25940f",
+      "assets/portraits/auxiliary_spear.webp": "634ecbb0bde18487b00d692110b4ce1c1568a209f1fe9a133818c60ad9108498",
+      "assets/portraits/centurion.webp": "3492fc0d2557a63aee320db303b2cd3059e86a54542a0f6de05fe74b25ebc263",
+      "assets/portraits/emperor.webp": "31bb1fa86ca6ecc9e6635831f627ba0a436f577fa266b110844cd40f92e12381",
+      "assets/portraits/hero_germania.webp": "2af826b6182e6a8f8be710e9dd40eb0f41fb592361534423f25abc4b3956b6ad",
+      "assets/portraits/hero_han.webp": "ebc45212f0546cbbd227b1c624259231911e206f9c2c2d75b5a7dcf9f63a66dc",
+      "assets/portraits/hero_italia.webp": "c9972762e1da97c7571e495057dedf8e12c3e389eb4bf7186792e9019f996d68",
+      "assets/portraits/hero_vistula.webp": "ca196a48a55d72d4cf4e969d4a3680326cae10192fb5afea1bed2b3f046051f3",
+      "assets/portraits/hero_wa.webp": "82a80bfdbadd2c4cfc5bfe71a06caf23def3466f76d479a89a665e4b5d4c7b89",
+      "assets/portraits/legionary.webp": "f0e5a3037d706970bce11a9b3b05edebf0be90528bbc79843ad569b478685eb6",
+      "assets/portraits/lin.webp": "2ea4d5b0a396aed88f15ec1af71b509bdfe310cc2514929caba7d939fd9c59b2",
+      "assets/portraits/marcus.webp": "9afe9cc2f3fdf30441413d81945ee8d339c9ba350cbb5ea7ea43454aaf7995c5",
+      "assets/portraits/mira.webp": "6f4f447604a1cbf2490ac3e381bf2f41a60cd5f912c57f6f1548910f353d9b67",
+      "assets/portraits/signifer.webp": "ca0d120128fa52fe5a373f9ad08f09c8539a1d611889cb6eeb457a1ed5508b71",
+      "assets/quality_profiles.json": "42a868f6bb979e2d091ae1c1d156be3e7f3f9c09b1749ec45551ae38e05fb774",
+      "assets/soldiers/archer_far.glb": "4b53630f2f26ca560fa78dbc035c21c1c20a0f81ec85880e0fdc26c1461be0a1",
+      "assets/soldiers/archer_mid.glb": "45d4c5d25b282ed1dfb1e465dba9f70d4fe01859cb91d07cc0efec4386f20252",
+      "assets/soldiers/archer_near.glb": "0253e6b85c8a24ec3cdcef295da9f6cb47c992d4f7a4926df274eeb7a4a8becf",
+      "assets/soldiers/heavy_far.glb": "48b36528c72b4416393d75fdb57aa104aea74b8717e4cadf7d76daf05ce0e10b",
+      "assets/soldiers/heavy_mid.glb": "67f147eea95f293a62e9c7706234304cf48889d7ff37dfbeffa69cd6d66827f5",
+      "assets/soldiers/heavy_near.glb": "ef880637b2915895666d97dfe3e5c7e5d320a276348d868f154d9bd2d927a658",
+      "assets/soldiers/officer_far.glb": "19b4de5c958618e11d0748c1376d8f9c4808418503710208633d296e1fc88673",
+      "assets/soldiers/officer_mid.glb": "00af3fd7b8c0e165a7cd293b91ec395e13c1b935a94be53d4506c875e68e82df",
+      "assets/soldiers/officer_near.glb": "fa6f864f468c041d3b82bda02bbb2625aa54f781bfeb321ff8957dae0f2a7aa1",
+      "assets/soldiers/spear_far.glb": "7e39502c68fd97537bebd41c310ac0dd72ee05bb30876cdd4ba3497c27142a3a",
+      "assets/soldiers/spear_mid.glb": "e0577a50f5db1bdc5cc294c9ab866eb186bc2a1753ff0d89d27d152cb73c3bf3",
+      "assets/soldiers/spear_near.glb": "790b85d0c73c9d1ff6cd9f731b7fb6c218be7ca293eedfc3bc3e2053328fce5e",
+      "assets/village/market.glb": "d02562f7d191671cd28c411a61c4f4a6c2d285d99fe63b6231f31aca1dbaedfe",
+      "assets/village/palisade_bay.glb": "9928ab252666766bab6b20481b02d6963a9c5a0fda13048b43ec879cac8e1975",
+      "assets/village/palisade_silhouette.glb": "1fc4c22df47795e2f9e3209ed9cd22c1c7253fa5bc970d62a0b57955746459ac",
+      "assets/village/storehouse.glb": "8c85a0d5c0bf416dda54c03de9ec4d5bad3ffc68b5ffd9b5605dba90b9bd423d",
+      "assets/village/timber_billet.glb": "39d81ba45c415de9652b44ef12d4db83e466a547686571c9bb31c96d03e9d536",
+      "assets/village/training_dummy.glb": "35a52c450db47733ff044ebfda9ebb4b670f9c24ade6384fb323c701534c1f10",
+      "assets/village/workshop.glb": "4f33b5dcfb6a9f7e3e8c347ad9ffd892f18ea2cd79c253fd0eac8d56b1a2712d",
+      "assets/village_characters/faces/adult_italia.webp": "ce7e90168476f95c009c8a21cf52e29a155d0d6b58b14927ba4a13e77b1f2289",
+      "assets/village_characters/faces/adult_marcus.webp": "81e88abe43666029ee04a8faa9877c2590e5571d60819dc183968185e739f456",
+      "assets/village_characters/faces/aki.webp": "a20ebcaa9246332ebf612654af8b542f2e189708af0a385d693cfa76b79f2af8",
+      "assets/village_characters/faces/albrun.webp": "81423a7b4788d301d13d3cfd15f480d975c88c09300acfc93f6d4112b2c957fe",
+      "assets/village_characters/faces/hero_germania.webp": "7afe281dc51624e9f1b9a89fe9a9c0bb4da595314a6c122d2137db6694dcda97",
+      "assets/village_characters/faces/hero_han.webp": "e7c68520778d152176108adee9c47b944128d0674922c5e85cc16d2b41e220c9",
+      "assets/village_characters/faces/hero_italia.webp": "d87561276b0e2e6ed2b8187c6292decf8783b212b8ff68a208f3680b8eed01f5",
+      "assets/village_characters/faces/hero_vistula.webp": "efb1fd79f3782aee9ee0a1371004a53a25cec00b812a9a2deb7de8cd319bf316",
+      "assets/village_characters/faces/hero_wa.webp": "4071e859e9f8327d1e4152c40f41a9ab598dc1ce81f154eafa358598f4e4d659",
+      "assets/village_characters/faces/lin.webp": "dde1840523dc91f2bc89eddf09d95e43ab85bc20494a38b5cc0ed5687f80ee50",
+      "assets/village_characters/faces/marcus.webp": "cf8c7132203c11f9adfa857c6001533ddbab6207b037db779c2bfc472c4dc85a",
+      "assets/village_characters/faces/mira.webp": "992993a8a7c8391db2e0285ccb155afaf588962097c820302bfa9556ca399796",
+      "assets/village_characters/heavy_2.glb": "21eb996a7213e2732731dea2ecdba5aaab102ca7f0db9f34d78bdcd96a623b79",
+      "assets/village_characters/heavy_3.glb": "f5b2d61646834c8bd1d536f8f12a779fcfae209cba3c205606b5c9abe484d1c9",
+      "assets/village_characters/officer_2.glb": "1f59921bfede757ec32ae7f5a0412b759f41745ccf4c82d60997b92966cb0635",
+      "assets/village_characters/officer_3.glb": "5efa499c743f1045f5a042d8ed63f193896c11bc7a8eabb425a83abfc5104d10",
+      "assets/village_characters/spear_2.glb": "a31a0fd40fb89fe1c2cc66bb9cd7ba4795077060cf59b3cdcdba24263de079e0",
+      "assets/village_characters/spear_3.glb": "bd4b28d1317b279c77991199abd6501f3a36aa1a9428daf2071d982685b73335",
+      "assets/village_characters/villager_0.glb": "3122e876fba9986f96f13991d733d29cc60b2dcb6e2610b7068a693f3ed8330f",
+      "assets/village_characters/villager_1.glb": "1e679f78c52dcf8975de18f1faafac259ce6e957b93a92e223086105e5351a0d",
+      "assets/village_characters/villager_2.glb": "8d8368ef00ffeffc1ca5be528ce0a2d8c4d18c7e967c691af52d57ab8afdd8e8",
+      "assets/village_characters/villager_3.glb": "c72d47ca66f7f49dde96ff078add05429b69842c14896e1e8c77db9275a3315e",
+      "assets/weapons/gladius_lod0.glb": "fd4d48e70cc3c560be0b35c4897ebc2c6b45423d7544a0acbe7184b6af8a5b1e",
+      "assets/weapons/scutum_lod0.glb": "ee9bbb400f35d3246312b4f111616541a9f8de2fec139f3e1110b075da1369a6",
+      "main.tscn": "a9f4f0edd8bfb7a776b7c2a0647bfb1324cf615a23065331e09baf24b5263892",
+      "project.godot": "02914329ec13ac77710c08ca0d55b2f196366001cb7943f44285d1dca4d72dfe",
+      "scripts/battle/battle_model.gd": "674fa5fa9fd6e16610d9b633f58fa91d01a4b3a8f7db9db8702f386308d19a3d",
+      "scripts/battle/formation_slots.gd": "2f3eb1513e588bdbb0fb9a5b20de3bb2f7dc2b2d12786b3a89b73169d7c5df9f",
+      "scripts/battle/valley_field.gd": "991b46c8e7113f6b1ac708af644d29df3aa601c5d49abc04f7181d8f05e252f6",
+      "scripts/cinematic/opening_checkpoint.gd": "4b5c77f402ae53230e2eadfad5a9dfe7a14ee5f050475731abe94036c2c73a9a",
+      "scripts/cinematic/opening_director.gd": "052fc95a16a82fa61a4b168b0c85050a64f1278d89f03631859532dfa9b83064",
+      "scripts/domain/village_economy.gd": "0dfb610f56d00c0dcf9f9c3a7f853fdad11a8dad18aeaac916664765871e77ea",
+      "scripts/domain/world_model.gd": "fcc0f93e16e391fec677a6d7f793e46a1d5685b92ec42c9f7e3786ff8e61fa58",
+      "scripts/main.gd": "ad4eae7ef5e5ae6d2b4104daad8a893b51250bbea60b5752ae2e66302ba34f68",
+      "scripts/story/frontier_chapter.gd": "388668f27040df8fa9849c04a9d88f86e8366aaf91ff9ab7eba8c69062f66112",
+      "scripts/story/opening_story.gd": "0aa8ee8c81ddb0617cdb7399affd61e326c9a3768bd29e152dccf1baced6d675",
+      "scripts/story/village_life.gd": "68c1d7f8066c997950efb1edf174d6b5ff20cfc01a474b265b160b44a8891bbb",
+      "scripts/strategy/atlas_data.gd": "43583ad13e9695cd2f24e07ac4f8ebddc8c3f17333fd46820d6903a35b6a055a",
+      "scripts/strategy/atlas_screen.gd": "5cf7c34421427a7f9f85aef16559f38d7f99483c08ad48457d42eb5bb11877f1",
+      "scripts/strategy/globe.gd": "19ee901590d639f4063a54f0ec514f74ff41bbe70746cf88a71c6349c51fa016",
+      "scripts/strategy/origins.gd": "9fd501a065cf7f1763384da16ba5d0741ac04bed27c4269a3e90fc8859afadf6",
+      "scripts/strategy/season_campaign.gd": "ba8571353ce4c4329cba2d926b6615c8f075da6f1964bd7dd7a16804a2ea2b96",
+      "scripts/tactics/valley_hud.gd": "298152768d11d6f4d88fa620aa03121d007484779a742ab371483596d2851b15",
+      "scripts/tactics/valley_landscape.gd": "edab7c654f19983714e48a8783fff6886bb22892fa035eead926d38c0c24fcd8",
+      "scripts/tactics/valley_scene.gd": "14f2a8d1d3c92173cfac4bb405ef1c70a51dd567cacdf88a16dbb220dc9f2008",
+      "scripts/ui/android_graphics_probe.gd": "5f518658f765e82144d20942502078d320ffd6249dd54b4efa3e5dd649e270b4",
+      "scripts/ui/android_village_diagnostics.gd": "476cb40c43385a8435cd60bdd75acf723aed2d80d4ac2c2f235b6169089686d3",
+      "scripts/ui/figure_gallery.gd": "7b12a54593499b846c163734dd79259fda2f9582f0d9240f2837d2a4531291ff",
+      "scripts/ui/game_ui.gd": "0e8a0b82f94e5cb0d23b5b7121e0cc5b9e7bec71e000090f15b240e60544728e",
+      "scripts/ui/opening_overlay.gd": "7b229a254f19660e2c2a1b1420865ab53d8e92100d27aa19233447e548c0af1b",
+      "scripts/ui/runtime_display.gd": "e0d6c335f53e32129ec94d5d3b5c9d2a74002e0724e0c6728432fa774e2f22e4",
+      "scripts/ui/safe_area.gd": "7caee67ed88278c3cb3ece2c899fc8c10a7d2bd0d26e272981ae488394e47dfb",
+      "scripts/ui/touch_action.gd": "51881f22f50fdd788b119220687013f1cf0a6719b2197941b0f2eb7c8651ca02",
+      "scripts/ui/touch_pad.gd": "d4834fd301f5cecdc7c92fee152b6febddc4205cecac66cc0ab09bbbc07336e6",
+      "scripts/ui/ui_smoke.gd": "7c6a68d38d92d53196fc13255066d99c7ffd6d9669c7f87da63c8f7a23b4cbf7",
+      "scripts/ui/village_life_panel.gd": "8abff86297c53649941e940d8e69b80af40d4fb64cdcca6e41ef95d928c80c46",
+      "scripts/visuals/facial_motion.gd": "e87c5bc3b32c43cb70c4ae5f1fff13a562148bb5faf911e6cb725095fb611a16",
+      "scripts/visuals/far_ranks.gd": "f7ec796bc1b31370a837135814e80458479f0752241515d95907bc9a3cc47b4e",
+      "scripts/visuals/grove.gd": "8a46f12798249af5ba554d1d106f7a78d7c735b01a2b698182bb9ec7ac37a024",
+      "scripts/visuals/soldier_visual.gd": "3d1bc83eb66227c1052e251bf24988953cd1fa09639c6b27d7583556df88fd38",
+      "scripts/visuals/village_person.gd": "88ebb9578bcb5dc1c5af07d183663a0a58f8e087fd63014dd3fed15d2d2861bb",
+      "scripts/world/game_world.gd": "48aa53383334eb1c0b4f566b62e5ac8cf4b9733ab1e3e69295ed237269d601b4",
+      "scripts/world/regional_terrain.gd": "f08d6b216455b98f2fbadaab1a1f65077d7de52fd36142d62d9ca4c81e9fdd9e",
+      "scripts/world/regional_village.gd": "e8139ab5a0e15b653801069f94ad122ba4580b548e4e90f3e3e62265d8f6ac00",
+      "scripts/world/village/frontier_dressing.gd": "79ae134e2095f526b3fdbf1b2b5fafb1d958fb51a278cf44a14a350eb202c78e",
+      "scripts/world/village/opening_props.gd": "09f6e37d1fb91aeba7dcc0377c79299c1ea2021e90ebfcbf7cde7c729df47b3d",
+      "scripts/world/village/village_layout.gd": "2739ba60c10de35638cf8b7cb1666db5943a82031b20b9e2fcee61cb0c711894",
+      "scripts/world/village/village_population.gd": "d6b886261c63f340ee01ab7293130f0688da002967fbbd5ec470475503f9a9ed",
+      "scripts/world/village/village_scenery.gd": "1e3d339ab1713b631063637ff6ce9adefe6d8c60b28ff9123bdcaeb956650d73",
+      "scripts/world/village_art.gd": "39a2167535dc3b5b27dae1f9f7057a8390a9fcd252d82ea66a2ccf9d31bb46f2",
+      "scripts/world/village_life_world.gd": "a8ce4677218cced714064558b071d4772b4288c445c24eb8cb3d4586f67836f8",
+      "scripts/world/world_smoke.gd": "95cb9fe83b019669530f93f70eafd080480d0f28bc9c33e4e3efb6a72b6f4a27",
+      "scripts/world/world_stream_plan.gd": "7aadf9fa2b0a258078e42119b5a2007a3fb72039ab1efd767287192302ea0a45",
+      "tests/battle_rules_test.gd": "acfae4b31b795534bdd09d21d1a122d0f63723d6b709fc810ebb254c2d09b424",
+      "tests/domain_test.gd": "499f9b2eb0a52d3177c409fc73b5e10af23d0ac64a419c550e178960ed7686df",
+      "tests/figure_gallery_test.gd": "e7e317329a460b500f5271cb8ebae4f01590aa83cf708086e601785d77661f25",
+      "tests/frontier_graphics_review.gd": "6cdc0e41f85a6e9fe81e05c3d0e0afe9ad94dd0ec928dfe04743d4642abb39eb",
+      "tests/frontier_integration_test.gd": "3f6472ad10a928084cef1b4ecc37ebb6bd6d9a4f5cd6166b3dfc71ee6fc80046",
+      "tests/frontier_people_review.gd": "5017f486cb5ebef0b83b1d6cd53d9e8e264c5ec9e632b87bfa1814606c9e26aa",
+      "tests/frontier_people_test.gd": "f9e003d9156c7aa1ff778798e5b8c44850da0583566f53b2499ac396ddf9a805",
+      "tests/frontier_population_test.gd": "539a70fa9b0dec8b067035429a4fafb9d0aa13c2ed070a590c80496ae9b6e323",
+      "tests/frontier_story_test.gd": "da68b995e2273f518f493fba123b1bc6e32ac029dbeda6d0fd9832e82821c4b7",
+      "tests/hero_face_test.gd": "4e732243d987cc8c1d6563802e4954647013db34fd46965b2171c16cf839a475",
+      "tests/hero_graphics_review.gd": "6946f2a5b0412a12f414e3b3a4d6cd69d002ceafa57b722573a540824308502d",
+      "tests/integration_test.gd": "f73e8127cf2ee4c66d78a57c6131a74ee72c4c3de557710c7fd0b10be9d51372",
+      "tests/live_graphics_review.gd": "38212999688bbaae0bf472472925227c067adff0cfefca8b1951ca5e4721e498",
+      "tests/opening_director_test.gd": "9a051b5d83de3adeee7d7529887e932dc9cc91de9da194495427237cfba8aa21",
+      "tests/opening_flow_test.gd": "cbdf773879a7a272692ca5e812dd9e351662395e4c72168f420d2b176ceedd83",
+      "tests/opening_graphics_review.gd": "7a7d4c4e8894954a6bfe451876c9ba61e09ec33e9040530c32f14d4f95a80e39",
+      "tests/opening_overlay_test.gd": "df22b3e21cd0b87ee7f6d1222c24855f069f364ea25603440a34b7444547695d",
+      "tests/opening_props_test.gd": "da61f52e065f591d8374368e388523f9a3256c015caa9152a82a313ffe5286f5",
+      "tests/opening_story_test.gd": "7ad8f3f28f1c9d9906dbea97bef8e1d6d5965345c9247f3dc9bdcff7ca36367f",
+      "tests/regional_terrain_test.gd": "1932a4a95cf2c6a6140dbfa631608ea7cf7c34e73da02f66473711b06ca211ef",
+      "tests/season_campaign_test.gd": "2e72280a43152844c5f0251416860305de6556791f0b15eeb7a1e681353a4e5f",
+      "tests/soldier_gait_test.gd": "1187f271b900c1b3df8461f60566e9577fe58291104e3a9e0b73c1540d535550",
+      "tests/soldier_visual_test.gd": "7cf0dc38849d822f79f56ee2a692ff3eefb9199c033bcae452e3c65e5ed03672",
+      "tests/village_economy_test.gd": "0fc285afe8b27a25b01644e169773f5bbc2d29c4044ce016405983779ebc7aa8",
+      "tests/village_experience_test.gd": "131be06c0e8c6c109ded4452d3ee8d7ee3a2bfa2d1eb3deb8962a5e567ab925f",
+      "tests/village_life_test.gd": "7e2cc4df7dba0c98fb744f9c8883661107aa92a79ca049d1fc3c099bd9de48ec",
+      "tests/village_model_test.gd": "5bb6f2e4ac23c649a716a605f4d3fd05c5cdde7337c9ba2d64943873e2dbe49d",
+      "tests/village_nameplates_test.gd": "236b7d9bb8320f616354453702a8ef504f300bf103373111b2e12ea288409547",
+      "tests/village_panel_test.gd": "5930da8df07ee4d01cc9ac8553a76d176f1afea5ecc143f1010517ad3feaef5e",
+      "tests/village_person_test.gd": "e40e11fc194f0afa94c10228723b0ace3bf63ff39138c9102a12eb7e4f5a79dd",
+      "tests/visual_benchmark.gd": "3dab2a1f34cf080ab1d8df917531f46d588435d52702f9562fa4089ac3c271f3",
+      "tests/world_stream_plan_test.gd": "bb3afbed0c57a5c8277a9d0106c92564b0cd0748f78985d746d55ebe595202d3"
+    },
+    "scope": "Local source snapshot only; not proof that transformed APK bytes were produced from these exact sources."
+  },
+  "available_abis": [
+    "arm64-v8a"
+  ],
+  "signature_indicators": {
+    "v1_certificate_entries": [
+      "META-INF/IMPERATH.RSA"
+    ],
+    "apk_signing_block_marker": true
+  },
+  "overall_status": "pass",
+  "passed": true,
+  "scope": "Static APK/package/signature evidence only. No graphics, touch, audio, FPS, thermal, installation, launch, or real-device success is claimed."
+}

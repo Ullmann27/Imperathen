@@ -2,6 +2,72 @@
 
 23. November 2026 · Arbeitsbranch `feature/village-life-delivery-20261123`
 
+## Abgeschlossene Android-Lieferung · 23.11.2026
+
+**[IMPERATHEN-e1b1c1fb-arm64.apk herunterladen](https://github.com/Ullmann27/Imperathen/releases/download/village-2026-11-23-e1b1c1fb/IMPERATHEN-e1b1c1fb-arm64.apk)** ·
+[Veröffentlichung und sieben Prüfdateien](https://github.com/Ullmann27/Imperathen/releases/tag/village-2026-11-23-e1b1c1fb) ·
+[Erfolgreicher Bau- und Android-Lauf 25](https://github.com/Ullmann27/Imperathen/actions/runs/45178232563)
+
+| Merkmal | Nachgewiesener Stand |
+| --- | --- |
+| Version / Paket | `0.3.0-village` (3) · `at.heinz.imperathen` |
+| Gerätefassung | ARM64 · 150.393.060 Bytes, rund 150,4 MB |
+| APK-Quellcommit | `e1b1c1fb16d63056e4eb80891d84ed75c79b4ed6` |
+| Python-Regressionsprüfungen | 55 bestanden |
+| Godot 4.7.2 | 33 Prüfgruppen bestanden; 198 Quellprüfsummen abgeglichen |
+| Android 15 / API 35 | 50 Laufzeitprüfungen bestanden; keine erkannten Laufzeitfehler |
+| ARM64-Downloadfassung | Tatsächlich installiert und unter ARM64-Übersetzung gestartet |
+| Veröffentlichung | Öffentliche Prüffassung; alle sieben Assetgrößen und SHA-256-Werte stimmen mit den geprüften Dateien überein |
+| Physisches Telefon | Noch nicht getestet |
+
+SHA-256 der herunterladbaren APK:
+
+```text
+9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015
+```
+
+Der vollständige Spielweg wurde mit der passenden x86_64-APK im Android-Emulator
+bedient. Er umfasst den Einstieg, Decimus, die Arbeitserlaubnis, das Scrollen
+zu Aelia und ihre tatsächliche Zuweisung zum Holzfällerlager. Das echte Popup
+benötigte drei Pfeil-ab-Eingaben bis zum beobachteten Eintrag 2. Die daraufhin
+gespeicherte Zuweisung, die Bekanntschaft mit Decimus und die Arbeitserlaubnis
+waren nach einem Prozessneustart erhalten. Pause, Hintergrundwechsel,
+Talgefecht, quadratische Darstellung, Weltkugel und Figurenansicht gehören
+ebenfalls zum abgeschlossenen Prüfprogramm.
+
+Die ARM64-APK wurde zusätzlich auf demselben Emulator installiert und unter
+Übersetzung bis zum laufenden Intro gestartet. Das belegt keinen vollständigen
+ARM64-Spielweg auf einem physischen Telefon und keine dortige Bildrate oder
+Temperaturentwicklung.
+
+Der unabhängige Dateiabgleich prüfte beide tatsächlichen APKs: ZIP-Integrität,
+je 1.060 eindeutige Einträge, native Architektur, 19 erforderliche Paketprüfungen
+sowie jeweils 48 Featuredateien und 48 Exportverweise. Die 568 geprüften
+Spiel-, Werkzeug- und Testdateien passen zum entfernten Git-Baum. Die Signatur
+(v2/v3) wurde im CI mit `apksigner` erfolgreich geprüft; eine erneute lokale
+`apksigner`-Ausführung wird nicht behauptet. Der lokale Hashabgleich bindet
+diesen Nachweis an die tatsächlich heruntergeladenen APK-Bytes.
+
+**Bei vorhandenen Spielständen:** Dieser Prüfbau besitzt einen neuen
+Testsignierschlüssel. Direkte Updates über beliebige frühere Prüfbauten werden
+nicht zugesagt. Eine vorhandene Installation mit wichtigem Spielstand nicht
+vorschnell deinstallieren; die [Installationsanleitung](../10_development/ANDROID_INSTALL.md)
+beschreibt die Einschränkung.
+
+### Dauerhaft gespeicherte Abschlussnachweise
+
+- [Abschließender unabhängiger Lieferabgleich](evidence/android-delivery/final-delivery-audit.json)
+- [Unabhängiger APK-Byteabgleich](evidence/android-delivery/independent-build-byte-audit.json)
+- [Unabhängiger Laufzeit- und Bildabgleich](evidence/android-delivery/independent-runtime-audit.json)
+- [APK-Prüfung](evidence/android-delivery/IMPERATHEN-e1b1c1fb-APK-Pruefung.json),
+  [Godot-Prüfungen](evidence/android-delivery/IMPERATHEN-e1b1c1fb-Godot-Pruefungen.json),
+  [Android-Laufzeitbericht](evidence/android-delivery/IMPERATHEN-e1b1c1fb-Emulatorpruefung.json)
+- [Vollständige Serie der 14 tatsächlichen Android-Aufnahmen](evidence/android-delivery/SCREENSHOTS.md)
+
+Die folgenden Abschnitte dokumentieren die Entwicklung und die bewusst
+zurückgehaltenen fehlgeschlagenen Zwischenstände. Maßgeblich für die ausgelieferte
+APK ist der erfolgreiche Lauf 25 auf `e1b1c1fb`.
+
 ## Anlass und Zusammenstellung
 
 Heinz hat die Fortsetzung des im Screenshot unterbrochenen Arbeitsstands beauftragt. Der neueste erhaltene Arbeitsstand lag noch uncommitted vor; der entfernte Frontier-Zweig stand auf `148dd69`. Diese Fortsetzung verwendet eine getrennte Arbeitskopie des tatsächlichen Dorfleben-Stands auf Basis des Opening-Commits `ea9987c08a7a98f3bca6b793a424d396b2c0dab6`. Die älteren Arbeitskopien wurden nicht überschrieben.
@@ -145,9 +211,9 @@ Die längste einzelne Meldung hatte einschließlich Kennung **565 ASCII-Bytes**.
 Das ist ein gezielter Übertragungsnachweis, kein Android-Gerätetest.
 [Maschineller Prüfbericht](evidence/log-transport/producer-probe.json).
 
-Ein APK-Download wird erst nach erfolgreichem Bau, tatsächlichem Android-Lauf
-und Prüfung der passenden Quelldateien angegeben. Frühere Hero- oder
-Opening-APKs werden nicht als neue Dorfleben-APK ausgegeben.
+Der anschließende Lauf 25 bestand alle 55 Pythonprüfungen, 33 Godot-Gruppen
+und 50 Android-Laufzeitprüfungen. Die Veröffentlichung wurde danach erfolgreich
+ausgeführt; die konkrete Lieferung und die Abschlussnachweise stehen oben.
 
 ## Konkrete Grenzen
 

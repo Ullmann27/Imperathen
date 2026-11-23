@@ -1,0 +1,146 @@
+{
+  "checked_at_utc": "2026-11-23T13:09:59.383479+00:00",
+  "passed": true,
+  "source_commit": "e1b1c1fb16d63056e4eb80891d84ed75c79b4ed6",
+  "source_run": 45178232563,
+  "runtime_report_sha256": "a7c0a77a18966c53a9f51c2b79ea237c847a4e4310904f4e3769c6e435cd1eb8",
+  "runtime_checks_passed": 50,
+  "runtime_errors": [],
+  "emulator_apk_sha256": "bb03388e5bfc5b8775f900f2010943802ee991037a892d264060d60de6b7c587",
+  "arm64_apk_sha256": "9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015",
+  "physical_device_test": false,
+  "arm64_runtime_scope": "Installed and started under ARM64 translation on the verified Android 15 x86_64 emulator.",
+  "village_popup_target_observed": {
+    "control_instance": "326534960707",
+    "popup_instance": "326585292358",
+    "focused_index": 2,
+    "text": "Holzfällerlager",
+    "down_presses": 3
+  },
+  "village_assignment": "woodcamp",
+  "village_assignment_after_restart": "woodcamp",
+  "screenshots_matched": 14,
+  "screenshots": {
+    "00_android_intro.png": {
+      "sha256": "5488aa2e5b40c8350c68b4bc9f707e328a1e54cd67b87d4791aebcadd4c10a03",
+      "size_bytes": 447239,
+      "width": 960,
+      "height": 540
+    },
+    "01_android_menu.png": {
+      "sha256": "18f469b8cfedea2cf18a5571c2ddd3909db752c81ae4ac7dd692b67ab60f3d76",
+      "size_bytes": 583006,
+      "width": 960,
+      "height": 540
+    },
+    "10_android_opening.png": {
+      "sha256": "858baf5a7c5aa5ebbf8ad6f8ac928d54760407af0b4bb251efcc5932c6841dc9",
+      "size_bytes": 542403,
+      "width": 960,
+      "height": 540
+    },
+    "11_android_opening_objective.png": {
+      "sha256": "c1447ff0d50b84087a758e1f588d39868844f3ee15fce9b029a6a575277eccc8",
+      "size_bytes": 598966,
+      "width": 960,
+      "height": 540
+    },
+    "12_android_decimus.png": {
+      "sha256": "cdb39ce33e838380df028d8b6141423b3062f76e950bcc5f415f440dc522e7da",
+      "size_bytes": 429564,
+      "width": 960,
+      "height": 540
+    },
+    "13_android_work_assignment.png": {
+      "sha256": "167857d58c1e4d0377dee9d324052ecd380d3214a8ab6a6b49fed674208aa496",
+      "size_bytes": 231556,
+      "width": 960,
+      "height": 540
+    },
+    "02_android_world.png": {
+      "sha256": "0f07cbe6cef310dbab26bd774b54a345d588b0ab8dbc559a406e7af9de66a10a",
+      "size_bytes": 602118,
+      "width": 960,
+      "height": 540
+    },
+    "03_android_pause.png": {
+      "sha256": "2dddeda5c72606a13cc5d54e64497f5ac9fa1d90ae034569302e51ea080df379",
+      "size_bytes": 293295,
+      "width": 960,
+      "height": 540
+    },
+    "04_android_valley.png": {
+      "sha256": "d101d768aeca54cd6ccde7ae72c4b95b851ee5988e3dca813f0e8299f50093a6",
+      "size_bytes": 514611,
+      "width": 960,
+      "height": 540
+    },
+    "09_android_marching.png": {
+      "sha256": "bb30b9c7cfb832802c4d73e055429186d23e6a2aaa0f2d42ff25554a01bc8c4b",
+      "size_bytes": 505380,
+      "width": 960,
+      "height": 540
+    },
+    "05_android_valley_square.png": {
+      "sha256": "8491f6fdc351f5e7bd0b5ee84c3ef4e10af53851d5ae9024326f104b7bc5aec9",
+      "size_bytes": 466705,
+      "width": 920,
+      "height": 900
+    },
+    "06_android_globe.png": {
+      "sha256": "421b579ab029151f66b7834efdf8574504068894376a7d0ef059f90c1bd476f8",
+      "size_bytes": 220111,
+      "width": 920,
+      "height": 900
+    },
+    "08_android_figuren.png": {
+      "sha256": "180326185ff03ddef37e99be85b9b4c9721802c7c46a27ddd8d311e2c22c2456",
+      "size_bytes": 976564,
+      "width": 920,
+      "height": 900
+    },
+    "07_android_arm64_translated_intro.png": {
+      "sha256": "40d35dbc49f6d4db0f4207586996aca1e4ec0cd2c7b10693a9ab9a7c2be8d3ae",
+      "size_bytes": 708452,
+      "width": 920,
+      "height": 900
+    }
+  },
+  "full_publisher_verify_and_stage_passed": true,
+  "staged_apk_proof": {
+    "apk": "IMPERATHEN-e1b1c1fb-arm64.apk",
+    "sha256": "9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015",
+    "size_bytes": 150393060
+  },
+  "staged_public_assets": {
+    "IMPERATHEN-e1b1c1fb-APK-Pruefung.json": {
+      "sha256": "ee00a4a2d287faf2984cfc6da57428ca777d8c47a6b2a0ea32ad4f2d2137ab17",
+      "size_bytes": 134607
+    },
+    "IMPERATHEN-e1b1c1fb-Buildnachweis.json": {
+      "sha256": "5206fea21c9597b48a24c4fb6a94e294515788aee08a4a1480e88db33302aaa1",
+      "size_bytes": 588
+    },
+    "IMPERATHEN-e1b1c1fb-Emulatorpruefung.json": {
+      "sha256": "a7c0a77a18966c53a9f51c2b79ea237c847a4e4310904f4e3769c6e435cd1eb8",
+      "size_bytes": 28902
+    },
+    "IMPERATHEN-e1b1c1fb-Godot-Pruefungen.json": {
+      "sha256": "e307322e8675187be3fff0d1d5909537103dbd0e94c3635723e9d2478fb9c0a3",
+      "size_bytes": 31076
+    },
+    "IMPERATHEN-e1b1c1fb-SHA256SUMS.txt": {
+      "sha256": "5485a5b286d4446639818bd291dee3bfcd69b978e03be34677d4f92119ebda6b",
+      "size_bytes": 625
+    },
+    "IMPERATHEN-e1b1c1fb-arm64.apk": {
+      "sha256": "9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015",
+      "size_bytes": 150393060
+    },
+    "IMPERATHEN-e1b1c1fb-source-commit.txt": {
+      "sha256": "e1912ab52b6030a79987d56347877d41120a2fc68b20b38161d2bce8ac14ec44",
+      "size_bytes": 41
+    }
+  },
+  "publication_verified": false
+}

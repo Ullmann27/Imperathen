@@ -4,9 +4,23 @@
 
 [Downloads und Prüffassungen](https://github.com/Ullmann27/Imperathen/releases) · [Dorfleben-Lieferbericht mit Prüfstatus und Nachweisen](../17_village_life/DELIVERY.md) · [Ausführliche Spielanleitung](../../prototype/README.md)
 
+## Geprüfter Download
+
+**[IMPERATHEN-e1b1c1fb-arm64.apk herunterladen](https://github.com/Ullmann27/Imperathen/releases/download/village-2026-11-23-e1b1c1fb/IMPERATHEN-e1b1c1fb-arm64.apk)** ·
+150,4 MB · ARM64 · `0.3.0-village` (3).
+
+[Veröffentlichung mit allen Prüfdateien](https://github.com/Ullmann27/Imperathen/releases/tag/village-2026-11-23-e1b1c1fb) ·
+[Erfolgreicher Android-Lauf 25](https://github.com/Ullmann27/Imperathen/actions/runs/45178232563).
+Die vollständige Dorfbedienung bestand 50 Prüfungen im x86_64-Emulator;
+die ARM64-Datei wurde zusätzlich unter Übersetzung installiert und gestartet.
+Ein physisches Telefon ist noch nicht geprüft.
+
+APK-Quellstand: `e1b1c1fb16d63056e4eb80891d84ed75c79b4ed6`  
+SHA-256: `9b9d6655cca0ee4d04b67cd318dbb74c11cec9523cf9d4e94306975c690d2015`
+
 ## Die passende Datei installieren
 
-1. Wähle die gewünschte **Dorfleben-Prüffassung** und lade deren **`IMPERATHEN-…-arm64.apk`** auf dein Android-Telefon. Dateiname, Quellstand und SHA-256 müssen zu derselben Lieferung gehören. Bei einem ZIP-Download entpackst du zuerst die ARM64-APK; die zusätzliche Datei mit `emulator` im Namen gehört zum x86_64-Prüfrechner.
+1. Lade die oben verlinkte **`IMPERATHEN-e1b1c1fb-arm64.apk`** auf dein Android-Telefon. Dateiname, Quellstand und SHA-256 müssen zu derselben Lieferung gehören. Bei einem ZIP-Download entpackst du zuerst die ARM64-APK; die zusätzliche Datei mit `emulator` im Namen gehört zum x86_64-Prüfrechner.
 2. Öffne die APK im Downloadbereich oder Dateimanager. Falls Android es verlangt, erlaube die Installation für diesen Browser oder Dateimanager unter **Unbekannte Apps installieren** beziehungsweise **Aus dieser Quelle zulassen**. Die genaue Bezeichnung hängt vom Gerät ab. [Android-Anleitung zur Installation aus anderen Quellen](https://developer.android.com/studio/publish#unknown-sources).
 3. Prüfe den App-Namen **IMPERATHEN**, wähle **Installieren** und anschließend **Öffnen**. Das App-Paket heißt `at.heinz.imperathen`. Bei einer bereits installierten Prüffassung beachte zuerst den Abschnitt **Spielstand und Updates** weiter unten.
 4. Halte das Gerät im **Querformat**. Für das Spielen brauchst du weder einen PC noch Godot, Blender, ein Benutzerkonto oder einen KI-API-Schlüssel. Das Spiel läuft lokal; das [Android-Exportpreset](../../prototype/export_presets.cfg) fordert keine Internetberechtigung an.
