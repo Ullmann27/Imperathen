@@ -4,6 +4,7 @@ extends SceneTree
 const Entry = preload("res://main.tscn")
 const Checkpoint = preload("res://scripts/cinematic/opening_checkpoint.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
+const LegacyCampaign = preload("res://tests/legacy_campaign_fixture.gd")
 var failures: Array[String] = []
 var checks := 0
 var game
@@ -25,7 +26,7 @@ func _run() -> void:
 	game.ui._finish_intro()
 	game.ui.action_requested.emit("new_game", {})
 	await process_frame
-	_check(game.screen == "opening" and game.opening_sequence.id == "first_day", "New Life starts the authored opening through the production UI path")
+	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_first_day", "New Life starts the family opening through the production UI path")
 	_check(FileAccess.file_exists(game.SAVE_PATH), "The campaign is saved before its introduction")
 	var campaign: String = JSON.stringify(game.model.data)
 	var player: Vector3 = game.world.get_player_position()
@@ -65,11 +66,12 @@ func _run() -> void:
 	_check(game.screen == "opening", "Even a long idle interval cannot auto-confirm the first objective")
 	game.opening_overlay._request_advance()
 	_check(game.screen == "playing" and game.world.get_node("WorldCamera").current and game.world.get("_active"), "Explicit acceptance returns the ordinary camera and movement")
-	_check(game.model.data.companion.choice == "" and game.model.data.resources.wood == 0, "Skipping does not choose help, decline or collect materials")
+	_check(game.model.data.companion.choice == "" and game.model.data.resources.wood == 12 and game.model.data.village.childhood.journal.is_empty(), "Skipping preserves the household stock and makes no childhood choice")
 	game._show_menu()
 	game._continue_game()
 	_check(game.screen == "playing", "A completed introduction is not forced again on Continue")
 	_check(Checkpoint.read("another-life").is_empty(), "The sidecar cannot attach an introduction to another save")
+	_check(LegacyCampaign.load_into(game), "An actual saved village-only campaign retains its earlier career flow")
 
 	_move(Vector3(-3, 1, 4))
 	game.world.action_requested.emit("companion_interact", {})

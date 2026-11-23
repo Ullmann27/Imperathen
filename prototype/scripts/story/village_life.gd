@@ -2,6 +2,8 @@ extends RefCounted
 ## Shared village life: original fictional encounters in a documented historical era.
 ## The WorldModel owns transactions and time. Presentation cannot award experience.
 
+const Childhood = preload("res://scripts/story/childhood_story.gd")
+
 const VERSION := 1
 const DAY_SECONDS := 120.0
 const STEP := 0.1
@@ -269,6 +271,8 @@ static func _tick(data: Dictionary) -> void:
 		raid[key] = maxf(0.0,float(raid[key])-STEP)
 	raid.stamina = minf(100.0,float(raid.stamina)+1.2)
 	if raid.status in ["quiet","aftermath"]:
+		if Childhood.enabled(data):
+			return
 		if float(data.village.social.seconds)+0.000001>=float(raid.next_at) and _has_home(data) and _met_count(data)>=3:
 			_begin_warning(data)
 		return
@@ -385,6 +389,9 @@ static func actor_position(data: Dictionary, npc_id: String) -> Vector2:
 	var raid: Dictionary = data.get("village",{}).get("raid",{})
 	if raid.get("active",false) and raid.get("rescue_available",false) and raid.get("rescue_person_id","")==npc_id:
 		return RESCUE_POINT
+	var childhood_position := Childhood.actor_position(data,npc_id)
+	if childhood_position.is_finite():
+		return childhood_position
 	var people: Array = data.get("village",{}).get("economy",{}).get("people",[])
 	for index in people.size():
 		var person: Dictionary = people[index]
@@ -396,6 +403,8 @@ static func actor_position(data: Dictionary, npc_id: String) -> Vector2:
 			for previous in index:
 				if str(people[previous].get("assignment",""))==duty:
 					rank += 1
+			if duty=="trade":
+				return WORKPLACE_POSITIONS[duty]+Vector2((rank%2)*1.4-0.7,1.3+floori(float(rank)/2.0)*2.4)
 			return WORKPLACE_POSITIONS[duty]+Vector2((rank%2)*2.4-1.2,floori(float(rank)/2.0)*2.4)
 		if NPCS.has(npc_id):
 			return Vector2(NPCS[npc_id].x,NPCS[npc_id].z)
@@ -403,6 +412,16 @@ static func actor_position(data: Dictionary, npc_id: String) -> Vector2:
 	if NPCS.has(npc_id):
 		return Vector2(NPCS[npc_id].x,NPCS[npc_id].z)
 	return Vector2(32.0,-18.0)
+
+
+static func begin_childhood_raid(data: Dictionary) -> bool:
+	if not Childhood.enabled(data) or data.village.childhood.night_raid.phase!="attack" or data.village.raid.number!=0 or data.village.raid.completed!=0:
+		return false
+	# The authored, explicit decision owns this gate. No elapsed-time shortcut.
+	_begin_warning(data)
+	data.village.raid.scouted = data.village.childhood.memories.get("patrol_east","")=="accurate"
+	_begin_raid(data)
+	return true
 
 
 static func _begin_warning(data: Dictionary) -> void:
@@ -471,6 +490,8 @@ static func _finish_raid(data: Dictionary, outcome: String) -> void:
 
 
 static func training_ready(data: Dictionary) -> bool:
+	if Childhood.enabled(data):
+		return false
 	if not data.get("village",{}).has("social"):
 		return false
 	return float(data.village.social.seconds)+0.000001>=2.0*DAY_SECONDS and _met_count(data)>=3 and int(data.village.raid.completed)>=1
@@ -502,7 +523,14 @@ static func view(data: Dictionary) -> Dictionary:
 	var history: Dictionary = data.village.history.duplicate(true)
 	history["current_year"] = int(history.start_year)+int(data.get("progress",{}).get("years_elapsed",0))
 	history["anchors"] = HISTORICAL_ANCHORS.duplicate(true) if str(data.get("origin_id","italia"))=="italia" else []
-	return {"title":"Ein Dorf wird dein Zuhause", "objective":objective, "day":floori((float(social.seconds)+0.000001)/DAY_SECONDS)+1,
+	var title := "Ein Dorf wird dein Zuhause"
+	var day := floori((float(social.seconds)+0.000001)/DAY_SECONDS)+1
+	if Childhood.enabled(data):
+		var childhood := Childhood.view(data)
+		title = childhood.title
+		objective = childhood.objective.label
+		day = int(childhood.day)
+	return {"title":title, "objective":objective, "day":day,
 		"seconds":social.seconds, "ruler":_ruler(data),
 		"player_authority":"Bewohner", "profession":PROFESSIONS[social.profession], "attributes":data.village.attributes.duplicate(true),
 		"npcs":npcs, "raid":raid.duplicate(true), "history":history, "training_ready":training_ready(data), "defenders":defense_strength(data)}
@@ -620,6 +648,8 @@ static func _ruler(data: Dictionary) -> String:
 
 
 static func _greeting(data: Dictionary, id: String) -> String:
+	if Childhood.enabled(data) and id=="decimus":
+		return "Das Dorf besteht längst, und ich trage die Verantwortung für die Arbeitsgruppen. Lerne die Menschen kennen, hilf deiner Familie und halte deine Absprachen ein."
 	if id=="decimus" and (str(data.get("origin_id","italia"))!="italia" or 100+int(data.get("progress",{}).get("years_elapsed",0))>117):
 		return "Die örtliche Verwaltung trägt hier die Verantwortung. Hilf beim Wiederaufbau und lerne die Menschen kennen. Vertrauen verdienst du dir mit Taten."
 	return NPCS[id].greeting

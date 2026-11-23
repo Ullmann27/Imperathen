@@ -6,6 +6,8 @@ const Life = preload("res://scripts/story/village_life.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
 const Art = preload("res://scripts/world/village_art.gd")
+const Neighborhood = preload("res://scripts/world/village/childhood_neighborhood.gd")
+const Childhood = preload("res://scripts/story/childhood_story.gd")
 const PLACES := {"farm":Vector2(24,-30), "woodcamp":Vector2(-43,14),
 	"quarry":Vector2(48,-12), "trade":Vector2(25,24), "watchpost":Vector2(0,-48)}
 var actors: Dictionary = {}
@@ -19,6 +21,8 @@ var _ready_scene := false
 var _wood: StandardMaterial3D
 var _stone: StandardMaterial3D
 var _linen: StandardMaterial3D
+var _escort_shape: CapsuleShape3D
+var _escort_presenting := false
 
 
 func _process(_delta: float) -> void:
@@ -44,6 +48,10 @@ func sync_state(data: Dictionary, profile: String) -> void:
 	quality = profile
 	visible = bool(data.get("village", {}).get("enabled", false))
 	if not visible:
+		# Hiding a Node3D does not disable PhysicsServer collision. A later
+		# regional/legacy game must not retain invisible childhood residents.
+		for actor: Node3D in actors.values():
+			actor.get_node("ResidentBody").collision_layer = 0
 		return
 	if not _ready_scene:
 		_create()
@@ -96,7 +104,9 @@ func _create_workplace(id: String, at: Vector2) -> void:
 	Art.roof(repaired, 4.6, 3.2, 2.2, .8, _linen)
 	var broken := Art.box(damaged, Vector3(3.7,.14,.24), Vector3(0,.4,0), _wood)
 	broken.rotation.z = -.28
-	Art.box(node, Vector3(4.5,.12,2.9), Vector3(0,.04,0), _stone)
+	# The workyard shares the existing ground collider. Keep its visible top at
+	# that height; a decorative ten-centimetre slab would bury residents' feet.
+	Art.box(node, Vector3(4.5,.12,2.9), Vector3(0,-.06,0), _stone)
 	if id == "woodcamp":
 		for index in 6:
 			var log := Art.cylinder(node, .17, 2.5, Vector3(-1.2 + (index % 3) * .4, .3 + (index / 3) * .3, .5), _wood)
@@ -119,6 +129,8 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 	if not actors.has(id):
 		var actor := Node3D.new()
 		actor.name = "Resident_" + id
+		actor.set_meta("resident_id",id)
+		actor.set_meta("identity_source","village_economy" if id != "decimus" else "village_authority")
 		add_child(actor)
 		var figure := Person.new()
 		figure.name = "Figure"
@@ -137,12 +149,29 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 		label.visibility_range_begin = 3.0
 		label.visibility_range_end = 6
 		label.hide()
+		var body := StaticBody3D.new()
+		body.name = "ResidentBody"
+		body.collision_layer = 1
+		body.collision_mask = 0
+		var collision := CollisionShape3D.new()
+		var capsule := CapsuleShape3D.new()
+		capsule.radius = .29
+		capsule.height = 1.72
+		collision.shape = capsule
+		collision.position.y = .86
+		body.add_child(collision)
+		actor.add_child(body)
 		actors[id] = actor
 	var actor: Node3D = actors[id]
 	var at: Vector2 = Life.actor_position(state, id)
-	actor.position = Vector3(at.x, 0, at.y)
+	var childhood := bool(state.get("village",{}).get("childhood",{}).get("enabled",false))
+	actor.position = Vector3(at.x,Neighborhood.resident_floor_height_at(at) if childhood else 0.0,at.y)
 	actor.visible = bool(person.get("alive", true)) and not state.village.get("militia", []).has(id)
+	actor.get_node("ResidentBody").collision_layer = 1 if actor.visible and visible and childhood else 0
 	actor.set_meta("assignment", person.get("assignment", "idle"))
+	actor.set_meta("display_name",caption)
+	var displayed_role: String = str(Neighborhood.IDENTITY_ROLES.get(id,profession)) if childhood else profession
+	actor.get_node("Nameplate").text = caption+" · "+displayed_role
 	var figure: Node3D = actor.get_node("Figure")
 	figure.profile = quality
 	figure.refresh_lod(get_viewport().get_camera_3d())
@@ -223,6 +252,13 @@ func nearest(position: Vector3, radius := 3.2) -> String:
 			continue
 		var value := Vector2(position.x, position.z).distance_to(Vector2(actor.position.x, actor.position.z))
 		if value < distance:
+			# Do not start a family conversation through the outside wall. The
+			# target's own capsule is excluded; solid doors and walls are not.
+			if is_inside_tree() and bool(state.get("village",{}).get("childhood",{}).get("enabled",false)):
+				var query := PhysicsRayQueryParameters3D.create(position+Vector3.UP*.45,actor.global_position+Vector3.UP*1.35,1)
+				query.exclude = [actor_collision_rid(str(npc.id))]
+				if not get_world_3d().direct_space_state.intersect_ray(query).is_empty():
+					continue
 			distance = value
 			best = npc.id
 	return best
@@ -230,6 +266,80 @@ func nearest(position: Vector3, radius := 3.2) -> String:
 
 func actor_position(id: String) -> Vector3:
 	return actors[id].global_position if actors.has(id) else Vector3.INF
+
+
+func actor_collision_rid(id: String) -> RID:
+	if not actors.has(id):
+		return RID()
+	var body := actors[id].get_node_or_null("ResidentBody") as StaticBody3D
+	return body.get_rid() if body != null else RID()
+
+
+func escort_progress_limit(data: Dictionary, delta: float) -> float:
+	# The domain remains the only owner of progress and the saved position. This
+	# query grants only the next clear portion of its fixed, authored escape route.
+	# Sweeps include the player and other bodies, not only static house geometry.
+	if not Childhood.enabled(data) or data.village.childhood.scene_id != "night_escort":
+		return INF
+	var progress := float(data.village.childhood.escort.progress)
+	if not is_inside_tree() or not actors.has("julia") or not is_finite(delta) or delta <= 0.0:
+		return progress
+	if not actors.julia.visible:
+		return progress
+	if _escort_shape == null:
+		_escort_shape = CapsuleShape3D.new()
+		_escort_shape.radius = .29
+		_escort_shape.height = 1.72
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = _escort_shape
+	query.collision_mask = 1 | 2 | 4
+	query.margin = .002
+	query.exclude = [actor_collision_rid("julia")]
+	var space := get_world_3d().direct_space_state
+	var limit := minf(Childhood._escort_length(),progress+Childhood.ESCORT_SPEED*delta)
+	var clear := progress
+	while clear < limit-.000001:
+		var next := minf(limit,clear+.08)
+		var from := _escort_query_position(Childhood._escort_point(clear))
+		var to := _escort_query_position(Childhood._escort_point(next))
+		query.transform.origin = from
+		query.motion = Vector3.ZERO
+		if not space.intersect_shape(query,1).is_empty():
+			return clear
+		query.motion = to-from
+		var fractions := space.cast_motion(query)
+		if fractions.size() < 2 or fractions[0] < .9999:
+			return clear
+		clear = next
+	return clear
+
+
+func sync_escort(data: Dictionary, delta: float) -> void:
+	# Called after the domain accepts the collision-limited step. This projects
+	# that exact saved position every frame; it does not simulate a second Julia.
+	var following: bool = Childhood.enabled(data) and data.village.childhood.scene_id == "night_escort"
+	if not following or not active or not actors.has("julia") or not actors.julia.visible:
+		if _escort_presenting and actors.has("julia"):
+			actors.julia.get_node("Figure").drive(0.0)
+		_escort_presenting = false
+		return
+	_escort_presenting = true
+	var actor: Node3D = actors.julia
+	var at: Vector2 = Life.actor_position(data,"julia")
+	var target := Vector3(at.x,Neighborhood.resident_floor_height_at(at),at.y)
+	var direction := target-actor.position
+	direction.y = 0.0
+	actor.position = target
+	var speed := minf(Childhood.ESCORT_SPEED,direction.length()/maxf(delta,.0001))
+	actor.get_node("Figure").drive(speed)
+	if direction.length() > .0001:
+		actor.rotation.y = atan2(-direction.x,-direction.z)
+
+
+static func _escort_query_position(point: Vector2) -> Vector3:
+	# A small query margin above the exact round-sole support prevents the floor
+	# contact itself from being mistaken for a wall or an obstructing person.
+	return Vector3(point.x,Neighborhood.resident_floor_height_at(point)+.868,point.y)
 
 
 func set_active(value: bool) -> void:
@@ -242,7 +352,7 @@ func set_active(value: bool) -> void:
 
 func focus(id: String, player: Vector3) -> void:
 	focused = id
-	if actors.has(id):
+	if actors.has(id) and actors[id].visible and Life.is_available(state,id):
 		var actor: Node3D = actors[id]
 		var direction := player - actor.global_position
 		actor.rotation.y = atan2(-direction.x, -direction.z)
@@ -264,7 +374,7 @@ func hint(position: Vector3) -> String:
 		return "Interagieren · Verletzte in Sicherheit bringen"
 	var id := nearest(position)
 	if not id.is_empty():
-		return "Interagieren · Mit %s sprechen" % Life.NPCS[id].name
+		return "Interagieren · Mit %s sprechen" % str(actors[id].get_meta("display_name",id))
 	if raid.active:
 		return "Angreifen · Blocken Q · Ausweichen R\nAusdauer %d / 100" % int(raid.stamina)
 	return ""

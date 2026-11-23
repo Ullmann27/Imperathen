@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "exit_code": 0,
+  "scope": "Python test fixtures; not an Android APK execution",
+  "source_sha256": {
+    "tools/android_runtime_smoke.py": "7e4d1b5cae151e2d2410626e2a22b8c6a0070c7d77eab32d58ac3623c1b8346e",
+    "tools/validate_android_apk.py": "4e596824c70ebf0c3db44d98e911b599a7a9d63009552a15d1afbca59d88c097",
+    "tests/android_childhood_payload_test.py": "efe39dd38c837f865679cc4474791dc622d837a6568e17f955194b473d12e8ad",
+    "tests/android_childhood_runtime_test.py": "29041b6a07d103e12a36c38fd8974800ee263d02fb09e4b8a11928140209a5a7",
+    "tests/android_frontier_payload_test.py": "3ca2f66fb4d20d9846c3bfd5a922db6bfa104dff6ed4c654420e8319f0963897",
+    "tests/android_hero_payload_test.py": "4cc64b01bc273b860d771d7f77acdbaf7352af3876894b1d408767919a8d3a3b",
+    "tests/android_runtime_smoke_test.py": "af2d41bde730305531981a8c1e2600f1dbb5c6e288d3529cb23d591fa5dee487",
+    "tests/android_village_payload_test.py": "b0e2ccf9490d64050342205994da3b18dbc324d273b00ebde6e9f75d9b257672",
+    "tests/android_village_publication_test.py": "67108c764fab7e91090fe0462a5fb21b01cbca95a3e8bff3a065897999d38824"
+  }
+}

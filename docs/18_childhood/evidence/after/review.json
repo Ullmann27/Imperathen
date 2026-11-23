@@ -1,0 +1,65 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "baseline": false,
+  "captures": [
+    {
+      "camera_position": [
+        3.0,
+        7.0,
+        36.0
+      ],
+      "file": "family-street.png",
+      "fov": 62,
+      "look_at": [
+        -5.0,
+        1.20000004768372,
+        23.0
+      ],
+      "pixels": [
+        1280,
+        720
+      ]
+    },
+    {
+      "camera_position": [
+        -5.0,
+        2.15000009536743,
+        26.5
+      ],
+      "file": "family-room.png",
+      "fov": 62,
+      "look_at": [
+        -5.0,
+        1.14999997615814,
+        22.7999992370605
+      ],
+      "pixels": [
+        1280,
+        720
+      ]
+    },
+    {
+      "camera_position": [
+        16.0,
+        22.0,
+        45.0
+      ],
+      "file": "neighbourhood.png",
+      "fov": 62,
+      "look_at": [
+        -5.0,
+        0.0,
+        20.0
+      ],
+      "pixels": [
+        1280,
+        720
+      ]
+    }
+  ],
+  "engine": "4.7.2-stable (official)",
+  "errors": [],
+  "renderer": "gl_compatibility",
+  "source_state": "new childhood"
+}

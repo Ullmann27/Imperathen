@@ -7,6 +7,7 @@ const Entry = preload("res://main.tscn")
 const Life = preload("res://scripts/story/village_life.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
 const VillageDiagnostics = preload("res://scripts/ui/android_village_diagnostics.gd")
+const LegacyCampaign = preload("res://tests/legacy_campaign_fixture.gd")
 var game
 var checks := 0
 var failures: Array[String] = []
@@ -54,6 +55,8 @@ func _run() -> void:
 	_check(game.world.village_life_world.visible,"Village projections are actually enabled in the new world")
 	_check(not game.world.get_node("TrainingGround/Mentor").visible,"The old generic trainer does not duplicate the new mentor")
 	await _capture("01-village-start")
+	_check(LegacyCampaign.load_into(game), "Existing village-only saves retain their worker and profession campaign")
+	await _frames()
 	# An invalid action must not trigger a dodge animation before its rule accepts it.
 	var before: String = _state()
 	var old_motion := float(game.world.get("_dodge_remaining"))

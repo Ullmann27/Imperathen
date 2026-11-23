@@ -1,0 +1,8 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "engine": "4.7.2-stable (official)",
+  "errors": [],
+  "renderer": "gl_compatibility",
+  "scope": "Actual Main new-life HUD and first Julia dialogue with touch-control preference"
+}

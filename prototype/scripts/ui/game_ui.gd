@@ -351,6 +351,10 @@ func update_state(state: Dictionary) -> void:
 	_hud_labels["time"].text = "TAG %d  ·  %02d:%02d" % [seconds / 86400 + 1, (seconds / 3600) % 24, (seconds / 60) % 60]
 	if state.get("village", {}).get("enabled", false):
 		_hud_labels["time"].text = "DORFTAG %d" % int(state.village_economy_view.get("day", 1))
+	var childhood: Dictionary = state.get("childhood_view", {})
+	if childhood.get("enabled", false):
+		var phase_name: String = {"morning":"Morgen", "afternoon":"Nachmittag", "evening":"Abend", "night":"Nacht"}.get(str(childhood.get("phase", "")), "Tag")
+		_hud_labels["time"].text = "TAG %d · %s" % [int(childhood.day), phase_name]
 	_hud_labels["age"].text = "%d Jahre  ·  %s" % [int(player.get("age", 12)), _career_name(String(progress.get("stage", "prologue")))]
 	var health := clampf(float(player.get("health", 100)), 0, 100)
 	_health_bar.value = health
@@ -384,6 +388,8 @@ func update_state(state: Dictionary) -> void:
 		_action_buttons["train"].disabled = _action_buttons["train"].disabled or not bool(state.get("village_view", {}).get("training_ready", false))
 	_action_buttons["recruit"].disabled = not trained or int(squad.get("recruits", 0)) >= 3 or int(resources.get("denarii", 0)) < 5 or int(resources.get("grain", 0)) < 2 or ended
 	_action_buttons["skirmish"].disabled = not trained or int(squad.get("alive", 0)) <= 0 or bool(encounter.get("active", false)) or bool(progress.get("skirmish_won", false)) or ended
+	for action in ["build", "train", "recruit", "skirmish"]:
+		_action_buttons[action].visible = not bool(childhood.get("enabled", false))
 	if bool(encounter.get("active", false)):
 		var remaining := 0
 		for enemy in encounter.get("enemies", []):
@@ -537,7 +543,14 @@ func show_frontier_dialog(dialog: Dictionary) -> void:
 		var action := "frontier_choice"
 		if entry.has("command"):
 			action = "village_command"
-			payload = {"command":entry.command, "args":entry.get("payload", {})}
+			if str(entry.command).begins_with("childhood_"):
+				action = "childhood_command"
+			elif str(entry.command).begins_with("village_trade_"):
+				action = "trade_command"
+			payload = {"command":entry.command, "args":entry.get("args", entry.get("payload", {}))}
+		elif entry.has("action"):
+			action = str(entry.action)
+			payload = entry.get("payload", {})
 		var available := bool(entry.get("enabled", true))
 		var button := _button(str(entry.get("label", "Antworten")), _emit.bind(action, payload), first_button == null and available, 16)
 		button.name = "FrontierChoice_" + choice_id
@@ -807,6 +820,11 @@ func _build_objective_card() -> void:
 		_hud_labels["objective_text"].max_lines_visible = 2 if _content_size().y < 520 else 3 if short_layout else 4
 		_hud_labels["objective_text"].text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	column.add_child(_hud_labels["objective_text"])
+	_hud_labels["childhood_navigation"] = _label("", 13, BRONZE, true)
+	_hud_labels["childhood_navigation"].name = "ChildhoodCompass"
+	_hud_labels["childhood_navigation"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_hud_labels["childhood_navigation"].visible = false
+	column.add_child(_hud_labels["childhood_navigation"])
 	_hud_labels["compact_life"] = _label("", 12, BRONZE)
 	_hud_labels["compact_life"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(_hud_labels["compact_life"])
@@ -897,7 +915,9 @@ func _build_toolbar() -> void:
 	row.add_child(atlas)
 	_action_buttons["atlas"] = atlas
 	if _state.get("village", {}).get("enabled", false):
-		row.add_child(_button("Dorfleben", _emit.bind("village_panel", {}), true, 13))
+		row.add_child(_button("Mein Dorf" if _state.has("childhood_view") else "Dorfleben", _emit.bind("village_panel", {}), true, 13))
+	if _state.get("childhood_view", {}).get("enabled", false):
+		row.add_child(_button("Mein Weg", _emit.bind("childhood_open", {}), false, 13))
 	var actions := [
 		["build", "Hütte · 8 Holz", "Bauplan öffnen. Mit Linksklick einen erlaubten Platz bestätigen."],
 		["train", "Ausbildung", "Benötigt eine fertige Hütte, eine Gefährtenentscheidung und keine offene Baustelle. Am Trainingsplatz fortsetzen."],
@@ -1160,6 +1180,9 @@ func _objective(state: Dictionary) -> Array[String]:
 	var stage := String(progress.get("stage", "prologue"))
 	if stage == "fallen":
 		return ["Dein Weg ist zu Ende", "Du bist im Kampf gefallen. Im Menü kannst du einen gespeicherten Stand laden oder ein neues Leben beginnen."]
+	var childhood: Dictionary = state.get("childhood_view", {})
+	if childhood.get("enabled", false):
+		return [str(childhood.get("title", "Dein Weg im Dorf")), str(childhood.get("text", ""))]
 	var village: Dictionary = state.get("village_view", {})
 	if state.get("village", {}).get("enabled", false):
 		var has_roof := false
@@ -1193,6 +1216,18 @@ func _objective(state: Dictionary) -> Array[String]:
 	if int(state.get("squad", {}).get("alive", 0)) == 0:
 		return ["Gemeinsam stärker", "Du hast die Grundlagen gelernt. Rekrutiere eine kleine Truppe. Jeder Rekrut braucht Sold und Nahrung."]
 	return ["Verantwortung übernehmen", "Deine Truppe ist bereit. Bereite die Verteidigung vor und kämpfe persönlich an ihrer Seite."]
+
+
+func update_childhood_navigation(navigation: Dictionary) -> void:
+	if _view_state != "game" or not _hud_labels.has("childhood_navigation"):
+		return
+	var label: Label = _hud_labels.childhood_navigation
+	label.visible = bool(navigation.get("available", false)) and _mode == "person"
+	if not label.visible:
+		return
+	var arrows := ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"]
+	var direction := posmod(roundi(float(navigation.get("angle", 0.0)) / (PI / 4.0)), 8)
+	label.text = "%s  %s · %d m" % [arrows[direction], str(navigation.get("label", "Ziel")), ceili(float(navigation.get("distance", 0.0)))]
 
 
 func _career_name(stage: String) -> String:

@@ -3,6 +3,7 @@ extends SceneTree
 const EntryScene = preload("res://main.tscn")
 const Chapter = preload("res://scripts/story/frontier_chapter.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
+const LegacyCampaign = preload("res://tests/legacy_campaign_fixture.gd")
 var checks := 0
 var failures: Array[String] = []
 var game
@@ -39,8 +40,9 @@ func _run() -> void:
 		if can_replace:
 			game.ui.action_requested.emit("confirm_new_game", {})
 			await _frames()
-	_enter_opening("first_day")
+	_enter_opening("childhood_first_day")
 	_check(game.screen == "playing" and game.model.data.player.age == 12, "Actual entry creates a saved childhood world")
+	_check(LegacyCampaign.load_into(game), "An existing village-only save retains its later frontier chapter")
 	_check(game.world.population.actors.size() >= 16, "Main world contains the enlarged populated village")
 	for npc_id: String in Chapter.NPCS:
 		var actual: Vector3 = game.world.get_frontier_npc_position(npc_id)
@@ -162,7 +164,8 @@ func _paid_alternative() -> void:
 	game.ui.action_requested.emit("new_game", {})
 	game.ui.action_requested.emit("confirm_new_game", {})
 	await _frames()
-	_enter_opening("first_day")
+	_enter_opening("childhood_first_day")
+	_check(LegacyCampaign.load_into(game), "The alternate legacy chapter starts from another real saved campaign")
 	await _complete_original_chapter()
 	if not game.model.data.progress.chapter_complete:
 		return

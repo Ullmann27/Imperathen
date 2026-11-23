@@ -15,6 +15,8 @@ const HOMES := [
 	{"id":"smith_home", "at":Vector3(38,0,-26), "yaw":-PI/2, "tint":"b4aba0"},
 	{"id":"cloth_home", "at":Vector3(38,0,-10), "yaw":-PI/2, "tint":"d8c1a9"},
 	{"id":"wagon_home", "at":Vector3(38,0,8), "yaw":-PI/2, "tint":"d3c9aa"},
+	{"id":"south_baker_home", "at":Vector3(-14,0,24), "yaw":0.0, "tint":"dfc4a9"},
+	{"id":"south_weaver_home", "at":Vector3(-5,0,24), "yaw":0.0, "tint":"c5baa4"},
 ]
 
 const VOLUNTEERS := ["marius", "marcellus", "domitius"]
@@ -33,7 +35,7 @@ const RESIDENTS := [
 	{"id":"publius", "name":"Publius", "occupation":"Bote", "appearance":"civilian_man", "age":22, "at":Vector3(2.6,0,-3), "route":[Vector3(2.6,0,-12),Vector3(0,0,-14),Vector3(0,0,-35)], "work":"idle", "greeting":"Ich bringe Briefe, keine Gewissheiten. Manchmal ist eine Nachricht schon alt, wenn ich den nächsten Ort erreiche."},
 	{"id":"lucius", "name":"Lucius", "occupation":"Straßenwache", "appearance":"legionary", "age":31, "at":Vector3(0,0,-46), "route":[Vector3(2,0,-43),Vector3(2,0,-37),Vector3(0,0,-35)], "work":"idle", "greeting":"Die Straße bleibt für Händler und Reisende offen. Verdächtiges melden wir, bevor jemand allein loszieht."},
 	{"id":"sergius", "name":"Sergius", "occupation":"Torwache", "appearance":"legionary", "age":36, "at":Vector3(42,0,26), "route":[Vector3(32,0,26),Vector3(30,0,22)], "work":"idle", "greeting":"Am Tor merkt man, wie es einem Ort geht: Wer kommt, wer fehlt und welcher Wagen leer zurückkehrt."},
-	{"id":"rufina", "name":"Rufina", "occupation":"Korbmacherin", "appearance":"civilian_woman", "age":43, "at":Vector3(-18,0,20), "route":[Vector3(-17,0,21),Vector3(-10,0,23),Vector3(-4,0,24)], "work":"work", "greeting":"Ein Korb trägt Korn, Werkzeug oder einen halben Haushalt. Die Weiden am Bach liefern uns die Ruten."},
+	{"id":"rufina", "name":"Rufina", "occupation":"Korbmacherin", "appearance":"civilian_woman", "age":43, "at":Vector3(-18,0,20), "route":[Vector3(-18,0,28.7),Vector3(-14,0,28.7),Vector3(-4,0,28.7)], "work":"work", "greeting":"Ein Korb trägt Korn, Werkzeug oder einen halben Haushalt. Die Weiden am Bach liefern uns die Ruten."},
 	{"id":"marcellus", "name":"Marcellus", "occupation":"Lagerarbeiter", "appearance":"civilian_man", "age":24, "at":Vector3(23,0,-24), "route":[Vector3(28,0,-24),Vector3(30,0,-19),Vector3(30,0,-6)], "work":"work", "greeting":"Ich zähle jedes Bündel zweimal. Eine fehlende Ladung bemerkt man sonst erst, wenn der Wagen schon fort ist."},
 	{"id":"tullia", "name":"Tullia", "occupation":"Weberin", "appearance":"civilian_woman", "age":34, "at":Vector3(32,0,5), "route":[Vector3(30,0,5),Vector3(30,0,-4),Vector3(32,0,-4)], "work":"work", "greeting":"Die Kette muss gespannt bleiben, aber nicht reißen. Das gilt hier nicht nur für den Webstuhl."},
 	{"id":"domitius", "name":"Domitius", "occupation":"Feldarbeiter", "appearance":"civilian_man", "age":26, "at":Vector3(17,0,-13), "route":[Vector3(23,0,-13),Vector3(26,0,-13)], "work":"work", "greeting":"Wenn alle fortziehen, erntet niemand das Korn. Darum zählt auch die Arbeit derer, die im Dorf bleiben."},
@@ -60,7 +62,7 @@ static func reserved(p: Vector2, margin := 0.0) -> bool:
 
 static func road(p: Vector2) -> bool:
 	# Matching branch streets are also authored into the continuous ground shader.
-	return (absf(p.x-30.0)<2.3 and p.y>-46 and p.y<28) or (absf(p.y+36.5)<2.2 and p.x>-18 and p.x<34) or (absf(p.y-24.0)<2.1 and p.x>-19 and p.x<45)
+	return (absf(p.x-30.0)<2.3 and p.y>-46 and p.y<29) or (absf(p.y+36.5)<2.2 and p.x>-18 and p.x<34) or (absf(p.y-24.0)<2.1 and p.x>1 and p.x<45) or (absf(p.y-28.7)<.9 and p.x>-19 and p.x<31)
 
 static func pose_at(item: Dictionary, seconds: float, index: int) -> Dictionary:
 	var origin: Vector3 = item.at

@@ -3,6 +3,7 @@ extends SceneTree
 
 const EntryScene = preload("res://main.tscn")
 const VillageLife = preload("res://scripts/story/village_life.gd")
+const LegacyCampaign = preload("res://tests/legacy_campaign_fixture.gd")
 var failures: Array[String] = []
 var checks := 0
 var game
@@ -73,6 +74,7 @@ func _run() -> void:
 	_check(game.screen == "paused" and game.ui.get("_view_state") == "pause", "A window Back request reaches the real UI and pauses exactly once")
 	_request_window_back()
 	_check(game.screen == "playing", "A second window Back request resumes the paused session")
+	_check(LegacyCampaign.load_into(game), "The existing village career loads through the production save gateway")
 	var before: int = game.model.data.resources.wood
 	game.world.action_requested.emit("gather", {"node_id": "timber_0"})
 	_check(game.model.data.resources.wood == before, "The shared command gateway rejects distant gathering")

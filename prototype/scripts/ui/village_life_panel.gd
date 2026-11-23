@@ -4,6 +4,7 @@ extends RefCounted
 const Economy = preload("res://scripts/domain/village_economy.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Plan = preload("res://scripts/world/world_stream_plan.gd")
+const Childhood = preload("res://scripts/story/childhood_story.gd")
 
 class RegionalMap extends Control:
 	var position_world := Vector3.ZERO
@@ -69,7 +70,7 @@ static func show(ui, data: Dictionary, tab := "overview") -> void:
 	ui._village_tab = tab
 	var economy: Dictionary = Economy.view(data)
 	var life: Dictionary = Life.view(data)
-	var column: VBoxContainer = ui._modal("DEIN LEBEN IM DORF", "Wiederaufbau unter Decimus", "Du bist Bewohner. Vertrauen, Arbeit und gemeinsame Entscheidungen bestimmen deinen Einfluss.", 880)
+	var column: VBoxContainer = ui._modal("DEIN LEBEN IM DORF", "Dein Dorf unter Decimus" if Childhood.enabled(data) else "Wiederaufbau unter Decimus", "Du bist Bewohner. Vertrauen, Arbeit und gemeinsame Entscheidungen bestimmen deinen Einfluss.", 880)
 	var tabs := HFlowContainer.new()
 	tabs.mouse_filter = Control.MOUSE_FILTER_PASS
 	column.add_child(tabs)
@@ -121,23 +122,30 @@ static func _restore_position(column: VBoxContainer, active_tab: Button, offset:
 
 static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dictionary, life: Dictionary) -> void:
 	_text(ui, column, str(life.get("objective", "Lerne Decimus und deine Nachbarn kennen.")), 18)
-	_text(ui, column, "Dorftag %d · %d Menschen im Aufbau · Vorrat: %d Holz / %d Stein / %d Getreide / %d Denare" % [economy.get("day", 1), economy.get("people", []).size(), data.resources.wood, data.resources.stone, data.resources.grain, data.resources.denarii])
-	_text(ui, column, "Ein Dorftag dauert in dieser Prüfphase zwei Spielminuten; Gespräche und Pausen halten ihn an.", 13, true)
+	var childhood := Childhood.enabled(data)
+	var day := int(data.village.childhood.day) if childhood else int(economy.get("day", 1))
+	var alive := int(economy.get("population", {}).get("alive", 0))
+	_text(ui, column, "Dorftag %d · %d lebende Einwohner · Vorrat: %d Holz / %d Stein / %d Getreide / %d Denare" % [day, alive, data.resources.wood, data.resources.stone, data.resources.grain, data.resources.denarii])
+	_text(ui, column, "Der nächste Tag beginnt, wenn du die Aufgaben dieses Tages beendet hast und dich zu Hause schlafen legst." if childhood else "Ein Dorftag dauert in dieser Prüfphase zwei Spielminuten; Gespräche und Pausen halten ihn an.", 13, true)
 	var history: Dictionary = life.get("history", {})
 	_text(ui, column, "Historischer Rahmen: %s n. Chr. · %s. Dorf und Bewohner sind eigene fiktionale Figuren." % [history.get("current_year", 100), life.get("ruler", "Historischer Rahmen")], 14, true)
 	_text(ui, column, str(economy.get("last_report", "")), 15)
 	var stats: Dictionary = data.get("village", {}).get("attributes", {})
 	_text(ui, column, "Mut %s · Kampf %s · Scharfsinn %s · Taktik %s" % [stats.get("courage", 0), stats.get("combat", 0), stats.get("insight", 0), stats.get("tactics", 0)], 17)
 	_text(ui, column, "Erfahrung entsteht durch gültige Treffer, abgewehrte Angriffe, Aufklärung, Warnung und Rettung. Ein Gespräch kann nur einmal dieselbe Vertrauenswirkung haben.", 14, true)
-	_action(ui, column, "Mit Decimus den Wiederaufbau vereinbaren", "village_request_work", {}, bool(data.village.social.npcs.get("decimus", {}).get("met", false)))
+	if childhood:
+		_text(ui, column, "Decimus und die Erwachsenen verwalten das Dorf. Du lernst seine Menschen kennen, hilfst bei deinen Aufträgen und kannst bei Cassia handeln.", 14, true)
+	else:
+		_action(ui, column, "Mit Decimus den Wiederaufbau vereinbaren", "village_request_work", {}, bool(data.village.social.npcs.get("decimus", {}).get("met", false)))
 	_text(ui, column, "Zum Kennenlernen gehst du direkt zu den Menschen. Der Dorfplan zeigt ihre Aufgaben; E beziehungsweise Interagieren beginnt das Gespräch.", 14, true)
 
 
 static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictionary) -> void:
 	var permit: bool = economy.get("authority", {}).get("work_permit", false)
+	var childhood := Childhood.enabled(data)
 	_text(ui, column, "Jede Person kann nur einen Arbeitsplatz oder Verteidigungsdienst übernehmen. Nahrung und Gesundheit entscheiden, wer tatsächlich arbeiten kann.", 15)
 	if not permit:
-		_text(ui, column, "Sprich mit Decimus und vereinbare zuerst die Mithilfe beim Wiederaufbau.", 15)
+		_text(ui, column, "Die Erwachsenen teilen ihre Arbeit selbst ein. Hier siehst du, wer an welchem Ort arbeitet." if childhood else "Sprich mit Decimus und vereinbare zuerst die Mithilfe beim Wiederaufbau.", 15)
 	for place: Dictionary in economy.get("workplaces", []):
 		var card: PanelContainer = ui._panel(false)
 		# Cards share the modal's scroll gesture; its outer boundary still blocks the world.
@@ -154,8 +162,9 @@ static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictiona
 			progress.custom_minimum_size.y = 20
 			inner.add_child(progress)
 		var cost: Dictionary = place.get("repair_cost", {})
-		_action(ui, inner, "Wiederaufbauen · %d Holz / %d Stein" % [cost.get("wood", 0), cost.get("stone", 0)], "village_repair", {"workplace_id":place.id}, permit and int(place.condition) < 100 and place.project.is_empty())
-	_text(ui, column, "Einwohner zuweisen", 20)
+		if not childhood:
+			_action(ui, inner, "Wiederaufbauen · %d Holz / %d Stein" % [cost.get("wood", 0), cost.get("stone", 0)], "village_repair", {"workplace_id":place.id}, permit and int(place.condition) < 100 and place.project.is_empty())
+	_text(ui, column, "Aufgaben der Einwohner" if childhood else "Einwohner zuweisen", 20)
 	for person: Dictionary in economy.get("people", []):
 		var row := HBoxContainer.new()
 		row.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -178,6 +187,9 @@ static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictiona
 		if in_militia:
 			ids = ["defense"]
 			labels = ["In deiner Truppe" if person.alive else "Gefallen"]
+		elif not person.alive:
+			ids = ["idle"]
+			labels = ["Verstorben"]
 		for caption in labels:
 			select.add_item(caption)
 		select.selected = maxi(0, ids.find(str(person.assignment)))
@@ -189,9 +201,12 @@ static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictiona
 			else:
 				ui._emit("village_command", {"command":"village_assign", "args":{"resident_id":id, "workplace_id":ids[index]}})
 		)
-	_action(ui, column, "Notvorrat beim Händler kaufen", "village_buy_food", {}, permit)
-	_action(ui, column, "Dorffelder neu aussäen · 4 Getreide", "village_resow", {}, permit)
-	_text(ui, column, "Saatgut und Essen getrennt einplanen: Zur Aussaat kommen die Rationen bis zur nächsten Ernte. Bei 14 lebenden Einwohnern brauchst du dafür mindestens 18 Getreide ohne weitere Verluste.", 14, true)
+	if childhood:
+		_text(ui, column, "Cassia verkauft am Markt aus ihren vorhandenen Vorräten. Sprich sie dort an, wenn du etwas kaufen oder verkaufen möchtest.", 14, true)
+	else:
+		_action(ui, column, "Notvorrat beim Händler kaufen", "village_buy_food", {}, permit)
+		_action(ui, column, "Dorffelder neu aussäen · 4 Getreide", "village_resow", {}, permit)
+		_text(ui, column, "Saatgut und Essen getrennt einplanen: Zur Aussaat kommen die Rationen bis zur nächsten Ernte. Bei 14 lebenden Einwohnern brauchst du dafür mindestens 18 Getreide ohne weitere Verluste.", 14, true)
 
 
 static func _people(ui, column: VBoxContainer, data: Dictionary, life: Dictionary) -> void:
@@ -202,7 +217,10 @@ static func _people(ui, column: VBoxContainer, data: Dictionary, life: Dictionar
 		if not Life.is_available(data, str(npc.id)):
 			_text(ui, column, "Für Gespräche nicht verfügbar", 14, true)
 			continue
-		_text(ui, column, "Noch nicht kennengelernt" if not bond.get("met", false) else "Vertrauen %+d%s" % [bond.get("trust", 0), " · verbündet" if bond.get("ally", false) else ""], 14, true)
+		if Childhood.enabled(data) and data.village.childhood.bonds.has(npc.id):
+			_text(ui, column, "Vertrautheit %d · Deine Begegnungen bleiben in deinem Weg erhalten." % int(data.village.childhood.bonds[npc.id]), 14, true)
+		else:
+			_text(ui, column, "Noch nicht kennengelernt" if not bond.get("met", false) else "Vertrauen %+d%s" % [bond.get("trust", 0), " · verbündet" if bond.get("ally", false) else ""], 14, true)
 		var position: Vector2 = Life.actor_position(data, npc.id)
 		_text(ui, column, "Ort im Dorf: %.0f / %.0f" % [position.x, position.y], 12, true)
 	_text(ui, column, "Dein Beruf: " + str(life.get("profession", "Noch keine Lehre")), 18)

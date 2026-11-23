@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "exit_code": 0,
+  "expected_marker": "CHILDHOOD_UI_REVIEW []",
+  "output": "/tmp/imperathen-chat-b-20261123/docs/18_childhood/evidence/runtime-ui",
+  "android_device_test": false
+}

@@ -99,10 +99,19 @@ VILLAGE_LIFE_RESOURCES = (
     "scripts/world/regional_terrain.gd",
     "scripts/world/world_stream_plan.gd",
 )
+CHILDHOOD_SCRIPT = "scripts/story/childhood_story.gd"
+CHILDHOOD_RESOURCES = (
+    CHILDHOOD_SCRIPT,
+    "scripts/story/childhood_opening.gd",
+    "scripts/domain/village_trade.gd",
+    "scripts/world/village/childhood_neighborhood.gd",
+    "scripts/world/childhood_raiders.gd",
+)
 FEATURE_RESOURCE_GROUPS = (
     ("living_frontier_content", FRONTIER_RESOURCES),
     ("cinematic_opening_content", OPENING_RESOURCES),
     ("village_life_content", VILLAGE_LIFE_RESOURCES),
+    ("childhood_content", CHILDHOOD_RESOURCES),
 )
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (
@@ -191,6 +200,16 @@ def command_evidence(result: dict) -> dict:
 def read_header(archive: zipfile.ZipFile, name: str, length: int) -> bytes:
     with archive.open(name) as stream:
         return stream.read(length)
+
+
+def resource_declared(names: set[str], source: str) -> bool:
+    """A broken/empty feature declaration must still require that complete feature."""
+    raw = "assets/" + source
+    path = PurePosixPath(raw)
+    suffix = ".import" if source.endswith((".glb", ".jpg", ".png", ".webp")) else ".remap"
+    converted = {".gd":(".gdc", ".gde"), ".tscn":(".scn",)}
+    return raw in names or raw + suffix in names or any(
+        str(path.with_suffix(extension)) in names for extension in converted.get(path.suffix, ()))
 
 
 def resolve_resource(archive: zipfile.ZipFile, names: set[str], source: str) -> dict:
@@ -311,7 +330,7 @@ def inspect_zip(apk: Path, report: dict, expected_abi: str, source_root: Path) -
             features = []
             for identifier, resources in FEATURE_RESOURCE_GROUPS:
                 required_by_source = any((source_root / source).is_file() for source in resources)
-                detected_in_archive = any(resolve_resource(archive, names, source)["entry"] for source in resources)
+                detected_in_archive = any(resource_declared(names, source) for source in resources)
                 if required_by_source or detected_in_archive:
                     required_resources += resources
                     features.append((identifier, resources, required_by_source, detected_in_archive))

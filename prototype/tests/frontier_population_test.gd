@@ -26,7 +26,7 @@ func _run() -> void:
 	world.set_active(true)
 	await physics_frame
 	await physics_frame
-	require(world.regional.house_count == 13,"Italian quarter contains thirteen real residential instances")
+	require(world.regional.house_count == 15,"Italian quarter contains the thirteen existing houses and two childhood homes")
 	require(world.population.actors.size() == 18,"Eighteen unique resident nodes are present")
 	var identities := {}
 	var appearances := {}
