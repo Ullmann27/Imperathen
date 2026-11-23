@@ -1,6 +1,7 @@
 extends SceneTree
 
 const Registry = preload("res://scripts/visuals/meshy_asset_registry.gd")
+const Loadouts = preload("res://scripts/visuals/meshy_loadout_registry.gd")
 var checks := 0
 var failed := 0
 
@@ -46,5 +47,21 @@ func run() -> void:
 	check(str(galena.get("status", "")) == "geometry_ready_untextured", "galena stays explicitly untextured")
 	check(str(galena.get("meshy_task_id", "")) == "", "galena cannot claim a final task")
 	check(not Registry.metadata("not_an_asset").size(), "unknown id returns empty metadata")
+	Loadouts.reset_cache_for_tests()
+	var loadouts := Loadouts.all_metadata()
+	check(loadouts.size() == 7, "seven modular Meshy loadouts registered")
+	for loadout: Dictionary in loadouts:
+		check(loadout.get("runtime_enabled", true) == false, str(loadout.get("id", "")) + " loadout is not runtime-enabled early")
+		for asset_id: String in Loadouts.component_ids(str(loadout.get("id", ""))).values():
+			check(not Registry.metadata(asset_id).is_empty(), str(loadout.get("id", "")) + " references a canonical Meshy asset")
+	var heavy := Loadouts.component_ids("roman_heavy_cavalry")
+	check(str(heavy.get("body", "")) == "unit_roman_heavy_cavalry_rider", "heavy cavalry keeps its rider source")
+	check(str(heavy.get("mount", "")) == "mount_ancient_cavalry_horse", "heavy cavalry uses the canonical horse")
+	check(str(heavy.get("saddle", "")) == "gear_roman_four_horn_saddle", "heavy cavalry uses the separate four-horn saddle")
+	check(str(heavy.get("primary", "")) == "gear_roman_cavalry_lance", "heavy cavalry primary weapon is the separate lance")
+	check(str(heavy.get("sidearm", "")) == "weap_roman_spatha", "heavy cavalry sidearm is the separate spatha")
+	check(str(heavy.get("shield", "")) == "gear_roman_cavalry_oval_shield", "heavy cavalry shield remains modular")
+	check(Loadouts.resource_asset("wood") == "resource_firewood", "wood economy key resolves to the firewood visual")
+	check(Loadouts.resource_asset("iron_ore") == "resource_iron_ore", "iron economy key resolves to the ore visual")
 	print("MESHY_ASSET_REGISTRY ", checks, " checks, ", failed, " failed")
 	quit(1 if failed else 0)
