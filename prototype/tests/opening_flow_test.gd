@@ -4,6 +4,9 @@ extends SceneTree
 const Entry = preload("res://main.tscn")
 const Checkpoint = preload("res://scripts/cinematic/opening_checkpoint.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
+const Model = preload("res://scripts/domain/world_model.gd")
+const Childhood = preload("res://scripts/story/village_childhood.gd")
+const OpeningStory = preload("res://scripts/story/opening_story.gd")
 var failures: Array[String] = []
 var checks := 0
 var game
@@ -25,7 +28,7 @@ func _run() -> void:
 	game.ui._finish_intro()
 	game.ui.action_requested.emit("new_game", {})
 	await process_frame
-	_check(game.screen == "opening" and game.opening_sequence.id == "first_day", "New Life starts the authored opening through the production UI path")
+	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_home" and Childhood.enabled(game.model.data), "New Life starts the family childhood opening through the production UI path")
 	_check(FileAccess.file_exists(game.SAVE_PATH), "The campaign is saved before its introduction")
 	var campaign: String = JSON.stringify(game.model.data)
 	var player: Vector3 = game.world.get_player_position()
@@ -70,6 +73,21 @@ func _run() -> void:
 	game._continue_game()
 	_check(game.screen == "playing", "A completed introduction is not forced again on Continue")
 	_check(Checkpoint.read("another-life").is_empty(), "The sidecar cannot attach an introduction to another save")
+
+	# Keep the previous six-year transition as a saved-campaign compatibility
+	# scenario. Fresh Roman lives now follow the separate family childhood path.
+	var legacy := Model.new()
+	legacy.new_game("italia", true, false)
+	var saved: Dictionary = legacy.save_game(game.SAVE_PATH)
+	_check(saved.get("ok", false) and not Childhood.enabled(legacy.data), "An explicit extended-village legacy fixture is saved without creating childhood completion flags")
+	game._show_menu()
+	game.ui.action_requested.emit("continue", {})
+	_check(game.screen == "playing" and game.model.data.world_id == legacy.data.world_id and game.model.data.world_id != world_id and not Childhood.enabled(game.model.data), "Continue loads the distinct legacy campaign without attaching the fresh child's checkpoint")
+	game._begin_opening(OpeningStory.sequence("italia"))
+	_check(game.screen == "opening" and game.opening_sequence.id == "first_day", "The saved legacy campaign still supports its original first-day presentation")
+	game.opening_overlay._request_skip()
+	game.opening_overlay._request_advance()
+	_check(game.screen == "playing" and game.model.data.player.age == 12, "Legacy objective acceptance begins the old chapter without an age jump")
 
 	_move(Vector3(-3, 1, 4))
 	game.world.action_requested.emit("companion_interact", {})
@@ -147,8 +165,8 @@ func _check(condition: bool, message: String) -> void:
 
 
 func _complete_village_phase() -> void:
-	# New lives require real village encounters and a resolved first raid before
-	# the legacy adulthood/persistence scenario may continue. Never inject flags.
+	# The saved legacy village still requires encounters and a resolved first
+	# raid before its adulthood/persistence scenario. Never inject completion flags.
 	for npc_id: String in ["decimus", "aelia", "varro"]:
 		var at: Vector2 = VillageLife.actor_position(game.model.data, npc_id)
 		_move(Vector3(at.x, 1.0, at.y + 1.0))
@@ -167,4 +185,4 @@ func _complete_village_phase() -> void:
 		if VillageLife.training_ready(game.model.data):
 			break
 	_check(saw_warning and saw_attack and game.model.data.village.raid.completed == 1, "The real warning and first village attack finish before adulthood")
-	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days satisfy the new training gate")
+	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days still satisfy the legacy training gate")

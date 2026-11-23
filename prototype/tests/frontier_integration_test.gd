@@ -3,6 +3,9 @@ extends SceneTree
 const EntryScene = preload("res://main.tscn")
 const Chapter = preload("res://scripts/story/frontier_chapter.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
+const Model = preload("res://scripts/domain/world_model.gd")
+const Childhood = preload("res://scripts/story/village_childhood.gd")
+const OpeningStory = preload("res://scripts/story/opening_story.gd")
 var checks := 0
 var failures: Array[String] = []
 var game
@@ -39,8 +42,10 @@ func _run() -> void:
 		if can_replace:
 			game.ui.action_requested.emit("confirm_new_game", {})
 			await _frames()
+	_enter_opening("childhood_home")
+	_check(game.screen == "playing" and game.model.data.player.age == 12 and Childhood.enabled(game.model.data), "Actual entry creates the new saved family childhood world")
+	_load_legacy_village()
 	_enter_opening("first_day")
-	_check(game.screen == "playing" and game.model.data.player.age == 12, "Actual entry creates a saved childhood world")
 	_check(game.world.population.actors.size() >= 16, "Main world contains the enlarged populated village")
 	for npc_id: String in Chapter.NPCS:
 		var actual: Vector3 = game.world.get_frontier_npc_position(npc_id)
@@ -159,8 +164,7 @@ func _run() -> void:
 
 
 func _paid_alternative() -> void:
-	game.ui.action_requested.emit("new_game", {})
-	game.ui.action_requested.emit("confirm_new_game", {})
+	_load_legacy_village()
 	await _frames()
 	_enter_opening("first_day")
 	await _complete_original_chapter()
@@ -182,6 +186,19 @@ func _paid_alternative() -> void:
 	_press_choice("pay")
 	_check(game.model.data.resources.denarii == money - 4 and game.model.data.frontier.step == 3 and game.model.data.frontier.work_seconds == 0.0, "Paid branch debits four through UI without awarding fabricated labour")
 	_close_button()
+
+
+func _load_legacy_village() -> void:
+	# The frontier chapter remains reachable for existing campaigns. Load an
+	# explicit old-mode save, rather than fast-forwarding the new family story.
+	var legacy := Model.new()
+	legacy.new_game("italia", true, false)
+	var saved: Dictionary = legacy.save_game(game.SAVE_PATH)
+	_check(saved.get("ok", false) and not Childhood.enabled(legacy.data), "The frontier compatibility fixture is a valid saved legacy village")
+	game._show_menu()
+	game.ui.action_requested.emit("continue", {})
+	_check(game.screen == "playing" and game.model.data.world_id == legacy.data.world_id and not Childhood.enabled(game.model.data), "Continue restores the explicit legacy village without inventing childhood progress")
+	game._begin_opening(OpeningStory.sequence("italia"))
 
 
 func _complete_original_chapter() -> void:
@@ -322,8 +339,8 @@ func _finish() -> void:
 
 
 func _complete_village_phase() -> void:
-	# New lives require real village encounters and a resolved first raid before
-	# the legacy adulthood/persistence scenario may continue. Never inject flags.
+	# Saved legacy villages require real encounters and a resolved first raid
+	# before their adulthood/persistence scenario. Never inject completion flags.
 	for npc_id: String in ["decimus", "aelia", "varro"]:
 		var at: Vector2 = VillageLife.actor_position(game.model.data, npc_id)
 		_move(Vector3(at.x, 1.0, at.y + 1.0))
@@ -342,4 +359,4 @@ func _complete_village_phase() -> void:
 		if VillageLife.training_ready(game.model.data):
 			break
 	_check(saw_warning and saw_attack and game.model.data.village.raid.completed == 1, "The real warning and first village attack finish before adulthood")
-	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days satisfy the new training gate")
+	_check(VillageLife.training_ready(game.model.data) and game.model.data.village.social.seconds >= 2.0 * VillageLife.DAY_SECONDS, "Three encounters and two lived village days still satisfy the legacy training gate")

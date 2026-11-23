@@ -7,6 +7,8 @@ const HAIR := {"italia":["",""],"germania":["","braid"],"han":["knot","knot"],"w
 const COMPANIONS := {"italia":"marcus","germania":"albrun","han":"lin","wa":"aki","vistula":"mira"}
 const LOOPS := ["idle","march","run","talk","work"]
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
+const NaturalMotion := preload("res://scripts/visuals/natural_motion.gd")
+const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
 const FRONTIER_PATH := "res://assets/characters/frontier_%s_%d.glb"
 const APPEARANCES := ["civilian_man", "civilian_woman", "elder", "legionary", "officer", "spearman", "archer"]
@@ -36,6 +38,8 @@ var _face := FacialMotion.new()
 var _lod_profile := ""
 var appearance_id := ""
 var appearance_variation := 0
+var _loaned_gear := false
+var _gear_nodes: Array[Node3D] = []
 
 
 func _ready() -> void:
@@ -62,6 +66,28 @@ func configure_appearance(new_appearance: String, variation: int = 0) -> void:
 	if not appearance_id.is_empty():
 		identity = "resident_%s_%d" % [appearance_id, appearance_variation]
 	_reload(maxi(0, detail))
+
+
+func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null) -> void:
+	# Resident population builders already know the complete identity. Configure
+	# it atomically so they never load an unused generic body or a near LOD first.
+	var selected := new_appearance if new_appearance in APPEARANCES else ""
+	var selected_variation := posmod(variation, 18)
+	var changed := role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation
+	role = "resident"
+	home = origin
+	age = years
+	appearance_id = selected
+	appearance_variation = selected_variation
+	identity = "resident_%s_%d" % [appearance_id, appearance_variation] if not appearance_id.is_empty() else "resident"
+	if not changed and body:
+		refresh_lod(camera)
+		return
+	var level := detail if detail >= 0 else 2
+	if is_instance_valid(camera) and is_inside_tree() and camera.is_inside_tree():
+		level = _distance_lod(global_position.distance_to(camera.global_position))
+		_lod_profile = profile
+	_reload(level)
 
 
 func _frontier_identity() -> String:
@@ -125,6 +151,7 @@ func _reload(level: int) -> void:
 	if body:
 		remove_child(body)
 		body.free()
+	_gear_nodes.clear()
 	detail = level
 	body = replacement
 	active_model_path = path
@@ -142,11 +169,14 @@ func _reload(level: int) -> void:
 	animator = body.find_child("AnimationPlayer",true,false) as AnimationPlayer
 	if animator:
 		animator.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+		var armed := role in ["mentor", "recruit", "enemy"] or _frontier_identity() in ["legionary", "officer", "spearman", "archer"]
+		NaturalMotion.install(body, animator, active_model_path, not armed)
 	for shape: MeshInstance3D in body.find_children("*","MeshInstance3D",true,false):
 		_style(shape)
 	_face.bind(body, identity)
 	_play(clip,saved_phase,0)
 	_face.pose(clip,saved_phase,detail)
+	_sync_loaned_gear()
 	# Retaining every hero PackedScene would also retain every embedded texture
 	# tier. Live instances keep their own references; inactive tiers may unload.
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
@@ -249,6 +279,26 @@ func cue(action: String) -> void:
 	_remaining = animator.current_animation_length if animator and animator.current_animation != "" else 0.8
 
 
+func cue_unarmed(action: String) -> bool:
+	if not NaturalMotion.DURATIONS.has(action) or not animator or not animator.has_animation(action):
+		return false
+	cue(action)
+	return true
+
+
+func set_loaned_gear(enabled: bool) -> void:
+	_loaned_gear = enabled
+	_sync_loaned_gear()
+
+
+func _sync_loaned_gear() -> void:
+	if not body: return
+	if _loaned_gear and _gear_nodes.is_empty():
+		_gear_nodes = PracticeGear.attach(body)
+	for node: Node3D in _gear_nodes:
+		if is_instance_valid(node): node.visible = _loaned_gear
+
+
 func reset_motion() -> void:
 	_remaining = 0
 	speed = 0
@@ -284,14 +334,21 @@ func _play(action: String, normalized: float, blend: float) -> void:
 	animator.advance(0)
 
 
-func refresh_lod(camera: Camera3D) -> void:
-	if not is_instance_valid(camera) or not body: return
-	var distance := global_position.distance_to(camera.global_position)
+func _distance_lod(distance: float) -> int:
 	var factor := float({"low":0.55,"balanced":0.86,"high":1.15,"very_high":1.5}.get(profile,1.0))
 	var distances: Array = CROWD_LOD_DISTANCES if role == "resident" else LOD_DISTANCES
 	var level := 0
 	for threshold: float in distances:
 		if distance >= threshold * factor: level += 1
+	return level
+
+
+func refresh_lod(camera: Camera3D) -> void:
+	if not is_instance_valid(camera) or not body: return
+	var distance := global_position.distance_to(camera.global_position)
+	var factor := float({"low":0.55,"balanced":0.86,"high":1.15,"very_high":1.5}.get(profile,1.0))
+	var distances: Array = CROWD_LOD_DISTANCES if role == "resident" else LOD_DISTANCES
+	var level := _distance_lod(distance)
 	var same_profile := profile == _lod_profile
 	_lod_profile = profile
 	# A narrow dead band prevents repeated asset loads when walking along a LOD

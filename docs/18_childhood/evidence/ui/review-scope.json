@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-23",
+  "renderer": "Godot OpenGL Compatibility / Mesa llvmpipe; low profile; 1280x720 main captures",
+  "physical_android_device": false,
+  "before_hint_review": {
+    "passed": true,
+    "checks": 69,
+    "failures": 0,
+    "exit_code": 0,
+    "scope": "Complete graphical UI test with four real captures before the final compact 3D hint change and initial-map assertion."
+  },
+  "final_hint_review": {
+    "passed": false,
+    "exit_code": -9,
+    "captured_images": 3,
+    "scope": "Three actual current-source captures were written and visually inspected; the process was terminated before completing the later display-resize and technique checks. This is not a passed final graphical suite."
+  },
+  "inspection": "Oversized interaction hint corrected; current family map, dialogue and controls inspected. The previous technique palette image remains a previous-source capture. Final headless regressions are recorded separately under ../engine."
+}

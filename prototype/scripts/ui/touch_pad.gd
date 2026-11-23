@@ -24,6 +24,12 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if not is_visible_in_tree():
 		return
+	# The engine may deliver a synthetic mouse copy after a long render frame.
+	# Its device identity is reliable; a short wall-clock suppression is not.
+	if event is InputEventMouse and event.device==InputEvent.DEVICE_ID_EMULATION:
+		if _contains(event.position) or touch_index!=-1:
+			get_viewport().set_input_as_handled()
+		return
 	if event is InputEventScreenTouch:
 		if event.pressed and _contains(event.position):
 			get_viewport().set_input_as_handled()

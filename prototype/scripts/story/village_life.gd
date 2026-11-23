@@ -2,6 +2,7 @@ extends RefCounted
 ## Shared village life: original fictional encounters in a documented historical era.
 ## The WorldModel owns transactions and time. Presentation cannot award experience.
 
+const Childhood = preload("res://scripts/story/village_childhood.gd")
 const VERSION := 1
 const DAY_SECONDS := 120.0
 const STEP := 0.1
@@ -13,22 +14,23 @@ const RAID_INTERVAL := 360.0
 const SCOUT_POINT := Vector2(-16.0, -19.0)
 const ALARM_POINT := Vector2(0.0, -16.0)
 const RESCUE_POINT := Vector2(5.0, -9.0)
-const WORKPLACE_POSITIONS := {"farm":Vector2(24.0,-30.0),"woodcamp":Vector2(-43.0,14.0),"quarry":Vector2(48.0,-12.0),"trade":Vector2(25.0,24.0),"watchpost":Vector2(0.0,-48.0),"defense":Vector2(0.0,-16.0)}
+const WORKPLACE_POSITIONS := Childhood.WORKPLACE_POSITIONS
 const GOODS := ["wood", "grain", "denarii", "stone"]
 const NPCS := {
 	"decimus": {"name":"Decimus", "role":"Dorfverwalter", "x":2.0, "z":9.0, "profession":"", "cost":{}, "greeting":"Trajan herrscht in Rom. Hier trage ich die Verantwortung. Die Angreifer haben uns Vorräte und Werkzeug genommen. Hilf beim Wiederaufbau; Vertrauen verdienst du dir mit Taten.", "reply":"Sprich mit den Handwerkern. Wenn du die Arbeitsgruppen koordinierst, bleibt jede Person nur an einem Ort eingeteilt."},
 	"aelia": {"name":"Aelia", "role":"Steinmetzin", "x":20.0, "z":17.0, "profession":"mason", "cost":{"wood":2}, "greeting":"Diese Mauer fällt, wenn wir nur die sichtbaren Steine ersetzen. Zuerst brauchen wir eine sichere Stütze. Bring mir zwei Holzstücke, dann zeige ich dir, worauf es ankommt.", "reply":"Du hast an die Stütze gedacht. Jetzt können wir die beschädigte Stelle wirklich sichern."},
-	"varro": {"name":"Varro", "role":"Späher und Jäger", "x":-13.0, "z":-13.0, "profession":"scout", "cost":{"grain":2}, "greeting":"Eine Spur erzählt, wie viele Menschen hier waren und wohin sie gingen. Für die nächste Runde brauche ich zwei Rationen. Bei einer Warnung sehen wir uns die Spur am nördlichen Waldrand an.", "reply":"Mit dem Proviant komme ich weit genug hinaus. Den Waldrand findest du nordwestlich vom Dorf."},
+	"varro": {"name":"Varro", "role":"Späher und Jäger", "x":-10.0, "z":-13.0, "profession":"scout", "cost":{"grain":2}, "greeting":"Eine Spur erzählt, wie viele Menschen hier waren und wohin sie gingen. Für die nächste Runde brauche ich zwei Rationen. Bei einer Warnung sehen wir uns die Spur am nördlichen Waldrand an.", "reply":"Mit dem Proviant komme ich weit genug hinaus. Den Waldrand findest du nordwestlich vom Dorf."},
 	"fabius": {"name":"Fabius", "role":"Holzfäller", "x":-12.0, "z":3.0, "profession":"woodcutter", "cost":{"grain":2}, "greeting":"Allein zwischen fallenden Stämmen zu arbeiten ist töricht. Unser Lager braucht immer zwei Leute. Zwei Rationen helfen uns, die erste gemeinsame Schicht durchzuhalten.", "reply":"Danke. Wenn einer fällt, muss der andere helfen können. Deshalb bleibt unser Lager zu zweit besetzt."},
 	"aurelia": {"name":"Aurelia", "role":"Heilerin", "x":8.0, "z":18.0, "profession":"healer", "cost":{"grain":2}, "greeting":"Ein Verband ersetzt kein Essen und keine Ruhe. Ich versorge die Verletzten. Zwei Rationen würden helfen; bei einem Angriff bring die Menschen vom nördlichen Weg zu uns.", "reply":"Diese Rationen gehen an Menschen, die gerade nicht arbeiten können. So kommen sie wieder auf die Beine."},
 	"cassia": {"name":"Cassia", "role":"Händlerin", "x":5.0, "z":0.0, "profession":"trader", "cost":{"wood":2}, "greeting":"Ohne sichere Wege kommt kein Händler. Zwei Holzstücke richten die gebrochene Wagenstrebe. Danach kann ich dir zeigen, wie man Vorrat, Fracht und Preis zusammenrechnet.", "reply":"Der Wagen hält wieder. Eine gute Zusage ist nur so viel wert wie das, was anschließend tatsächlich ankommt."},
 	"severus": {"name":"Severus", "role":"Wachausbilder", "x":0.0, "z":-7.0, "profession":"guard", "cost":{"wood":2}, "greeting":"Mut ist nicht blindes Losrennen. Für den Übungsschild fehlen zwei Holzstücke. Bei einer Warnung läutest du am Nordposten Alarm. Im Kampf zählen Abstand, Ausdauer und der richtige Augenblick.", "reply":"Der Übungsschild ist bereit. Beobachte den Ansatz eines Angriffs: Blocken und Ausweichen wirken nur im richtigen Zeitfenster."}
 }
-const PROFESSIONS := {"":"Noch offen", "mason":"Steinmetzlehre", "scout":"Späherlehre", "woodcutter":"Holzfällerlehre", "healer":"Heilkundelehre", "trader":"Handelslehre", "guard":"Wachausbildung"}
+const PROFESSIONS := {"":"Noch offen", "mason":"Steinmetzlehre", "scout":"Späherlehre", "woodcutter":"Holzfällerlehre", "healer":"Heilkundelehre", "trader":"Handelslehre", "guard":"Wachausbildung", "smith":"Beginnende Schmiedelehre"}
 const COMMAND_FIELDS := {
 	"village_talk":["npc_id","choice"], "village_learn":["npc_id"], "village_ally":["npc_id"],
 	"village_scout":[], "village_alarm":[], "village_strike":["enemy_id"],
-	"village_block":[], "village_dodge":[], "village_rescue":[], "village_recover":[]
+	"village_block":[], "village_dodge":[], "village_rescue":[], "village_recover":[],
+	"village_childhood_action":["action_id"], "village_childhood_begin_raid":[]
 }
 const HISTORICAL_ANCHORS := [
 	{"id":"trajan_reign", "year_start":98, "year_end":117, "title":"Trajan regiert das Römische Reich", "kind":"documented", "source":"https://cultura.gov.it/luogo/parco-archeologico-del-colosseo-colonna-traiana"},
@@ -59,13 +61,24 @@ static func ensure(data: Dictionary) -> void:
 		data.village.history = {"start_year":100,"mode":"historical_baseline", "player_changes":[], "events":[]}
 
 
-static func npc_catalog() -> Array[Dictionary]:
+static func npc_catalog(data: Dictionary = {}) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for id: String in NPCS:
 		var npc: Dictionary = NPCS[id].duplicate(true)
 		npc["id"] = id
 		result.append(npc)
+	result.append_array(Childhood.npc_catalog(data))
 	return result
+
+
+static func has_npc(data: Dictionary, id: String) -> bool:
+	return NPCS.has(id) or Childhood.has_npc(data, id)
+
+
+static func relationship(data: Dictionary, id: String) -> Dictionary:
+	if Childhood.has_npc(data, id):
+		return Childhood.relationship(data, id)
+	return data.get("village", {}).get("social", {}).get("npcs", {}).get(id, {}).duplicate(true)
 
 
 static func execute(data: Dictionary, command: String, args: Dictionary = {}) -> Dictionary:
@@ -92,8 +105,20 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dictionary:
 	var social: Dictionary = data.village.social
 	var raid: Dictionary = data.village.raid
+	if Childhood.COMMAND_FIELDS.has(command):
+		var result := Childhood.execute(data, command, args)
+		if result.ok and command == "village_childhood_begin_raid":
+			_begin_warning(data, true)
+			_begin_raid(data)
+		return result
+	if Childhood.enabled(data) and command in ["village_learn", "village_ally"]:
+		return _fail("Deine erste Lehre und dein Vertrauen entstehen in den gemeinsamen Kindheitsaufgaben, nicht durch einen sofortigen Karrierewechsel.")
+	if Childhood.enabled(data) and command == "village_talk" and args.choice != "meet":
+		return _fail("Im Kindheitskapitel entstehen Hilfe und Vertrauen durch eure vereinbarten Wege und Übergaben. Sprich über deinen aktuellen Auftrag.")
 	if command in ["village_talk", "village_learn", "village_ally"]:
 		var id: String = args.npc_id
+		if command == "village_talk" and Childhood.has_npc(data, id):
+			return Childhood.talk(data, id, args.choice)
 		if not NPCS.has(id):
 			return _fail("Diese Person gehört nicht zu den bekannten Dorfbewohnern.")
 		var npc: Dictionary = NPCS[id]
@@ -269,6 +294,10 @@ static func _tick(data: Dictionary) -> void:
 		raid[key] = maxf(0.0,float(raid[key])-STEP)
 	raid.stamina = minf(100.0,float(raid.stamina)+1.2)
 	if raid.status in ["quiet","aftermath"]:
+		# Childhood danger is released only after the completed family/market arc
+		# and its explicit night event. Wall-clock idling never summons another raid.
+		if Childhood.enabled(data):
+			return
 		if float(data.village.social.seconds)+0.000001>=float(raid.next_at) and _has_home(data) and _met_count(data)>=3:
 			_begin_warning(data)
 		return
@@ -385,6 +414,9 @@ static func actor_position(data: Dictionary, npc_id: String) -> Vector2:
 	var raid: Dictionary = data.get("village",{}).get("raid",{})
 	if raid.get("active",false) and raid.get("rescue_available",false) and raid.get("rescue_person_id","")==npc_id:
 		return RESCUE_POINT
+	var childhood_position: Variant = Childhood.actor_override(data, npc_id)
+	if typeof(childhood_position) == TYPE_VECTOR2:
+		return childhood_position
 	var people: Array = data.get("village",{}).get("economy",{}).get("people",[])
 	for index in people.size():
 		var person: Dictionary = people[index]
@@ -396,7 +428,7 @@ static func actor_position(data: Dictionary, npc_id: String) -> Vector2:
 			for previous in index:
 				if str(people[previous].get("assignment",""))==duty:
 					rank += 1
-			return WORKPLACE_POSITIONS[duty]+Vector2((rank%2)*2.4-1.2,floori(float(rank)/2.0)*2.4)
+			return WORKPLACE_POSITIONS[duty]+Vector2((rank%2)*2.4-1.2,2.1+floori(float(rank)/2.0)*2.0)
 		if NPCS.has(npc_id):
 			return Vector2(NPCS[npc_id].x,NPCS[npc_id].z)
 		return Vector2(32.0,-18.0+float(index)*2.0)
@@ -405,7 +437,7 @@ static func actor_position(data: Dictionary, npc_id: String) -> Vector2:
 	return Vector2(32.0,-18.0)
 
 
-static func _begin_warning(data: Dictionary) -> void:
+static func _begin_warning(data: Dictionary, childhood_night := false) -> void:
 	var raid: Dictionary = data.village.raid
 	raid.status = "warning"
 	raid.active = false
@@ -417,7 +449,7 @@ static func _begin_warning(data: Dictionary) -> void:
 	for key: String in ["participation","player_hits","blocks","dodges","stolen"]:
 		raid[key] = 0
 	raid.outcome = ""
-	_event(data,"warning", "Am Nordweg wurden bewaffnete Plünderer gesehen. Spähe die Spur aus, löse Alarm aus und teile die Verteidigung ein.")
+	_event(data,"night_alarm" if childhood_night else "warning", "In der Nacht zerreißen Hufschläge und Rufe die vertraute Ruhe. Der Angriff trifft das inzwischen kennengelernte Dorf." if childhood_night else "Am Nordweg wurden bewaffnete Plünderer gesehen. Spähe die Spur aus, löse Alarm aus und teile die Verteidigung ein.")
 
 
 static func _begin_raid(data: Dictionary) -> void:
@@ -471,6 +503,8 @@ static func _finish_raid(data: Dictionary, outcome: String) -> void:
 
 
 static func training_ready(data: Dictionary) -> bool:
+	if Childhood.enabled(data):
+		return false
 	if not data.get("village",{}).has("social"):
 		return false
 	return float(data.village.social.seconds)+0.000001>=2.0*DAY_SECONDS and _met_count(data)>=3 and int(data.village.raid.completed)>=1
@@ -482,13 +516,13 @@ static func view(data: Dictionary) -> Dictionary:
 	var social: Dictionary = data.village.social
 	var raid: Dictionary = data.village.raid
 	var npcs: Array[Dictionary] = []
-	for id: String in NPCS:
-		var row: Dictionary = NPCS[id].duplicate(true)
-		row["id"] = id
+	for specification: Dictionary in npc_catalog(data):
+		var row: Dictionary = specification.duplicate(true)
+		var id: String = row.id
 		var position := actor_position(data,id)
 		row.x = position.x
 		row.z = position.y
-		row["relationship"] = social.npcs[id].duplicate(true)
+		row["relationship"] = relationship(data, id)
 		row["available"] = is_available(data,id)
 		row["absence_reason"] = "" if row.available else _absence_reason(data,id)
 		npcs.append(row)
@@ -499,16 +533,21 @@ static func view(data: Dictionary) -> Dictionary:
 		objective = "Verteidige den Nordweg. Schütze die Vorräte und rette die gefährdete Person."
 	elif raid.completed>0:
 		objective = "Versorge das Dorf weiter. Vertiefe Beziehungen, lerne einen Beruf und bereite die nächste Wache vor."
+	var childhood := Childhood.view(data)
+	if not childhood.is_empty() and not raid.active:
+		objective = childhood.objective
 	var history: Dictionary = data.village.history.duplicate(true)
 	history["current_year"] = int(history.start_year)+int(data.get("progress",{}).get("years_elapsed",0))
 	history["anchors"] = HISTORICAL_ANCHORS.duplicate(true) if str(data.get("origin_id","italia"))=="italia" else []
-	return {"title":"Ein Dorf wird dein Zuhause", "objective":objective, "day":floori((float(social.seconds)+0.000001)/DAY_SECONDS)+1,
+	return {"title":childhood.get("title", "Ein Dorf wird dein Zuhause"), "objective":objective, "day":childhood.get("day", floori((float(social.seconds)+0.000001)/DAY_SECONDS)+1),
 		"seconds":social.seconds, "ruler":_ruler(data),
 		"player_authority":"Bewohner", "profession":PROFESSIONS[social.profession], "attributes":data.village.attributes.duplicate(true),
 		"npcs":npcs, "raid":raid.duplicate(true), "history":history, "training_ready":training_ready(data), "defenders":defense_strength(data)}
 
 
 static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
+	if Childhood.enabled(data):
+		return Childhood.dialogue(data, npc_id)
 	if not NPCS.has(npc_id) or not validate(data).is_empty():
 		return {}
 	var npc: Dictionary = NPCS[npc_id]
@@ -609,7 +648,7 @@ static func validate(data: Dictionary) -> String:
 	for item: Variant in history.events:
 		if not _keys(item,["seconds","kind","text","provenance"]) or not _number(item.seconds,0.0,1000000000.0) or typeof(item.kind)!=TYPE_STRING or item.kind.length()>40 or typeof(item.text)!=TYPE_STRING or item.text.length()>1024 or item.provenance!="fictional_playable_event":
 			return "Ungültiger Chronikbeleg."
-	return ""
+	return Childhood.validate(data)
 
 
 static func _ruler(data: Dictionary) -> String:
@@ -620,6 +659,8 @@ static func _ruler(data: Dictionary) -> String:
 
 
 static func _greeting(data: Dictionary, id: String) -> String:
+	if Childhood.enabled(data):
+		return str(Childhood.dialogue(data, id).get("text", ""))
 	if id=="decimus" and (str(data.get("origin_id","italia"))!="italia" or 100+int(data.get("progress",{}).get("years_elapsed",0))>117):
 		return "Die örtliche Verwaltung trägt hier die Verantwortung. Hilf beim Wiederaufbau und lerne die Menschen kennen. Vertrauen verdienst du dir mit Taten."
 	return NPCS[id].greeting
@@ -653,7 +694,7 @@ static func _distance(data: Dictionary, point: Vector2) -> float:
 
 
 static func is_available(data: Dictionary, npc_id: String) -> bool:
-	if not NPCS.has(npc_id):
+	if not has_npc(data, npc_id):
 		return false
 	if npc_id=="decimus":
 		return true
@@ -663,11 +704,12 @@ static func is_available(data: Dictionary, npc_id: String) -> bool:
 
 static func _absence_reason(data: Dictionary, npc_id: String) -> String:
 	var person := _person(data,npc_id)
+	var name: String = str(Childhood.EXTRA_NPCS.get(npc_id, NPCS.get(npc_id, {})).get("name", npc_id))
 	if person.is_empty():
 		return "Diese Person ist zurzeit nicht im Dorf."
 	if not person.get("alive",false):
-		return "%s ist verstorben. Eure gemeinsame Geschichte bleibt in Erinnerung." % NPCS[npc_id].name
-	return "%s ist mit deinem Wachtrupp im Dienst. Die zivile Arbeit und Ausbildung ruhen." % NPCS[npc_id].name
+		return "%s ist verstorben. Eure gemeinsame Geschichte bleibt in Erinnerung." % name
+	return "%s ist mit deinem Wachtrupp im Dienst. Die zivile Arbeit und Ausbildung ruhen." % name
 
 
 static func _person(data: Dictionary, id: String) -> Dictionary:
@@ -686,6 +728,27 @@ static func _enemy(raid: Dictionary, id: String) -> Dictionary:
 
 static func _enemy_count(number: int) -> int:
 	return mini(6,2+number)
+
+
+## Called by the measured unarmed-combat resolver after its range/facing/window checks.
+## This is not a player command and grants no free hit merely from pressing attack.
+static func apply_unarmed_hit(data: Dictionary, enemy_id: String, damage: int) -> bool:
+	if damage < 1 or damage > 45 or not data.get("village", {}).get("raid", {}).get("active", false):
+		return false
+	var raid: Dictionary = data.village.raid
+	var enemy := _enemy(raid, enemy_id)
+	if enemy.is_empty() or int(enemy.health) <= 0:
+		return false
+	enemy.health = maxi(0, int(enemy.health) - damage)
+	raid.player_hits += 1
+	raid.participation += 1
+	if not raid.joined:
+		raid.joined = true
+		_gain(data, "courage", 1)
+	_gain(data, "combat", 2 if int(enemy.health) == 0 else 1)
+	if _living_enemies(raid) == 0:
+		_finish_raid(data, "defended")
+	return true
 
 
 static func _living_enemies(raid: Dictionary) -> int:
