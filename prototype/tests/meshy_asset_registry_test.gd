@@ -46,13 +46,14 @@ func run() -> void:
 	var horse := Registry.metadata("mount_ancient_cavalry_horse")\n\tcheck(str(horse.get("status", "")) == "geometry_ready_untextured", "cavalry horse remains explicitly untextured")\n\tcheck(str(horse.get("meshy_preview_task_id", "")) == "01a20934-c44a-77ea-95a7-5e2c2c804d5e", "cavalry horse keeps the exact Meshy preview task")\n\tvar galena := Registry.metadata("resource_galena")
 	check(str(galena.get("status", "")) == "geometry_ready_untextured", "galena stays explicitly untextured")
 	check(str(galena.get("meshy_task_id", "")) == "", "galena cannot claim a final task")
-	check(not Registry.metadata("not_an_asset").size(), "unknown id returns empty metadata")
+	check(Registry.metadata("not_an_asset").is_empty(), "unknown id returns empty metadata")
 	Loadouts.reset_cache_for_tests()
 	var loadouts := Loadouts.all_metadata()
 	check(loadouts.size() == 7, "seven modular Meshy loadouts registered")
 	for loadout: Dictionary in loadouts:
 		check(loadout.get("runtime_enabled", true) == false, str(loadout.get("id", "")) + " loadout is not runtime-enabled early")
-		for asset_id: String in Loadouts.component_ids(str(loadout.get("id", ""))).values():
+		for asset_value: Variant in Loadouts.component_ids(str(loadout.get("id", ""))).values():
+			var asset_id := str(asset_value)
 			check(not Registry.metadata(asset_id).is_empty(), str(loadout.get("id", "")) + " references a canonical Meshy asset")
 	var heavy := Loadouts.component_ids("roman_heavy_cavalry")
 	check(str(heavy.get("body", "")) == "unit_roman_heavy_cavalry_rider", "heavy cavalry keeps its rider source")
