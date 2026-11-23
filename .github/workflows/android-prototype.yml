@@ -24,7 +24,9 @@ permissions:
 
 concurrency:
   group: android-prototype-${{ github.ref }}
-  cancel-in-progress: false
+  # Asset-integration branches produce many small commits; only their newest
+  # Android build is useful. Stable delivery branches keep every requested run.
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/heads/art/meshy-unit-library-') }}
 
 jobs:
   build-and-check:
