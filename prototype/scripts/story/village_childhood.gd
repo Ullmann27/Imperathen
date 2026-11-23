@@ -961,6 +961,12 @@ static func _distance(data: Dictionary, point: Vector2) -> float:
 	return Vector2(float(position[0]),float(position[2])).distance_to(point)
 
 
+static func _gain(data: Dictionary, attribute: String, amount: int) -> void:
+	if not data.get("village", {}).get("attributes", {}).has(attribute):
+		return
+	data.village.attributes[attribute] = mini(10000, int(data.village.attributes[attribute]) + amount)
+
+
 static func _gain_trust(data: Dictionary, id: String, amount: int) -> void:
 	var relation := _relation(data,id)
 	if not relation.is_empty() and relation.met:
