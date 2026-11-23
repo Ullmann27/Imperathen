@@ -118,12 +118,13 @@ static func migrate_legacy_ids(data: Dictionary) -> bool:
 	if typeof(old_relationships) != TYPE_DICTIONARY:
 		return false
 	for legacy_id: String in LEGACY_RELATION_IDS:
-		if not old_relationships.has(legacy_id):
+		if not old_relationships.has(legacy_id) or typeof(old_relationships[legacy_id]) != TYPE_DICTIONARY:
 			return false
 	var relationships := {}
 	for legacy_id: String in LEGACY_RELATION_IDS:
 		var canonical_id: String = LEGACY_RELATION_IDS[legacy_id]
-		relationships[canonical_id] = (old_relationships[legacy_id] as Dictionary).duplicate(true)
+		var legacy_relation: Dictionary = old_relationships[legacy_id]
+		relationships[canonical_id] = legacy_relation.duplicate(true)
 	child.relationships = relationships
 	child.version = VERSION
 
