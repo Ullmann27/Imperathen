@@ -106,7 +106,7 @@ static func start(data: Dictionary) -> bool:
 		var person := _person(data, id)
 		if not person.is_empty():
 			person.profession = EXTRA_NPCS[id].role
-	data.village.childhood = {"version":VERSION,"completed":[],"day":1,"carried":[],
+	# The production screenplay begins in 58 BCE. Legacy village careers keep\n	# their older Trajan-era history; only an explicitly enabled childhood\n	# campaign moves this shared village history anchor.\n	data.village.history.start_year = -58\n	data.village.history.mode = "historical_baseline"\n	data.village.childhood = {"version":VERSION,"completed":[],"day":1,"carried":[],
 		"relationships":relationships,"active_work":"","work_seconds":0.0,
 		"gear":"none","apprenticeship":"none","night_event":"none",
 		"screenplay":{"version":1,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i08":"locked","hoof_evidence":false},
