@@ -165,7 +165,8 @@ func _ensure_i00_stage() -> Node3D:
 
 func _anchor(key: String) -> Vector3:
 	if key.begins_with("i00_"):
-		return _ensure_i00_stage().call("anchor", key) as Vector3
+		var historical_anchor: Variant = _ensure_i00_stage().call("anchor", key)
+		return historical_anchor if historical_anchor is Vector3 else Vector3.ZERO
 	if is_instance_valid(_world) and _world.has_method("get_cinematic_anchor"):
 		var value: Variant = _world.call("get_cinematic_anchor", key)
 		if value is Vector3 and (value as Vector3).is_finite():
