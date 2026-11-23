@@ -129,6 +129,7 @@ func _test_fresh_opt_in_and_legacy() -> void:
 	var legacy_names: Dictionary = model.data.duplicate(true)
 	legacy_names.village.childhood.version = 1
 	legacy_names.village.childhood.erase("screenplay")
+	legacy_names.village.history.start_year = 100
 	legacy_names.village.childhood.relationships = {
 		"antonia": legacy_names.village.childhood.relationships.julia.duplicate(true),
 		"sextus": legacy_names.village.childhood.relationships.silvanus.duplicate(true),
@@ -146,6 +147,7 @@ func _test_fresh_opt_in_and_legacy() -> void:
 	var migrated_names = WorldModel.new()
 	_ok(migrated_names.load_game(_path("legacy-childhood-names")), "Load and migrate version-one childhood actor identities")
 	_check(migrated_names.data.village.childhood.version == Childhood.VERSION, "Nested childhood identity migration advances its own version")
+	_check(migrated_names.data.village.history.start_year == -58, "Legacy childhood migration moves the campaign anchor from the old Trajan-era marker to 58 BCE")
 	_check(migrated_names.data.village.childhood.relationships.has("julia") and migrated_names.data.village.childhood.relationships.has("silvanus") and migrated_names.data.village.childhood.relationships.has("sextus"), "Legacy relationships become Julia, Silvanus and Sextus")
 	_check(not migrated_names.data.village.childhood.relationships.has("antonia") and not migrated_names.data.village.childhood.relationships.has("quintus"), "Legacy family/smith aliases do not remain authoritative")
 	_check(Life.relationship(migrated_names.data, "julia").met and Life.relationship(migrated_names.data, "silvanus").met and not Life.relationship(migrated_names.data, "sextus").met, "Migration preserves known parents and not-yet-met smith state")
