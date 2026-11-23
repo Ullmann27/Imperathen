@@ -41,3 +41,17 @@ python tools/art/inspect_meshy_glb.py \\
 ```
 
 Use `--require-all` only when every final Meshy GLB is expected to be present.
+
+## Modular loadouts
+
+`loadouts.json` assembles canonical Stable-IDs without granting inventory or
+combat ownership. It currently defines seven presentation templates, including
+Roman heavy/light cavalry as separate rider + horse + saddle + weapon + shield
+components. Validate them against the asset manifest with:
+
+```sh
+python tools/art/validate_meshy_loadouts.py
+```
+
+The horse and Galena entries are intentionally allowed to remain untextured
+source geometry; neither becomes runtime-ready through the loadout contract.
