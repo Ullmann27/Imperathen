@@ -70,7 +70,7 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 		_at(model, view.point)
 		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):
 			return false
-		var screenplay_action := {
+		var screenplay_actions: Dictionary = {
 			"i02_basket":"basket_check",
 			"i02_correct":"basket_correct",
 			"i03_marcus":"marcus_friend",
@@ -80,7 +80,8 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 			"i12_father":"i12_father",
 			"i13_morning":"i13_morning",
 			"i14_oath":"i14_oath"
-		}[stage]
+		}
+		var screenplay_action: String = str(screenplay_actions.get(stage, ""))
 		if not _ok(_action(model, screenplay_action), "Complete screenplay bridge: " + stage):
 			return false
 		_check(model.data.player.age == 12 and model.data.player.role == "child", "Screenplay bridge cannot change life stage: " + stage)
