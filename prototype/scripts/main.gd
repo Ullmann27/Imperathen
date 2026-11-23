@@ -435,9 +435,15 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 				ui.notify("Wähle einen freien Bauplatz auf der markierten Fläche. Kosten: 8 Holz.")
 		"companion_help", "companion_decline":
 			_resume()
-			var companion_result := _command("choose_companion", {"choice": "help" if action == "companion_help" else "decline"})
+			var childhood_view: Dictionary = Childhood.view(model.data)
+			var in_marcus_mission := Childhood.enabled(model.data) and str(childhood_view.get("stage", "")) == "i03_marcus"
+			var companion_result: Dictionary
+			if in_marcus_mission:
+				companion_result = _command("village_childhood_action", {"action_id":"marcus_friend" if action == "companion_help" else "marcus_rival"})
+			else:
+				companion_result = _command("choose_companion", {"choice": "help" if action == "companion_help" else "decline"})
 			if companion_result.get("ok", false):
-				ui.notify(OpeningStory.companion_reply(model.data))
+				ui.notify(str(companion_result.get("message", "")) if in_marcus_mission else OpeningStory.companion_reply(model.data))
 			else:
 				_show_companion()
 		"train", "recruit": _command(action, payload)
@@ -602,6 +608,19 @@ func _choose_frontier(payload: Dictionary) -> void:
 
 func _show_companion() -> void:
 	var companion: Dictionary = model.data.get("companion", {})
+	var childhood_view: Dictionary = Childhood.view(model.data)
+	if Childhood.enabled(model.data) and str(childhood_view.get("stage", "")) == "i03_marcus":
+		screen = "dialog"
+		world.set_active(false)
+		ui.show_dialog(
+			"Marcus · Eine Münze und eine Abkürzung",
+			"Marcus kennt den schnelleren Weg zum Markt. Der alte Münzstreit zwischen euch entscheidet nicht über Sieg oder Niederlage, sondern darüber, welche Erinnerung eure Freundschaft künftig trägt.",
+			[
+				{"label":"Den Streit beilegen und gemeinsam gehen", "action":"companion_help", "choice":"friend", "enabled":true, "reason":""},
+				{"label":"Auf dem eigenen Standpunkt beharren", "action":"companion_decline", "choice":"rival", "enabled":true, "reason":""}
+			]
+		)
+		return
 	if not str(companion.get("choice", "")).is_empty():
 		ui.notify(OpeningStory.companion_reply(model.data))
 		return
