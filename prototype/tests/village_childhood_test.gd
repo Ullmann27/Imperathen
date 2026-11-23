@@ -19,6 +19,7 @@ func _initialize() -> void:
 	_test_full_journey_and_guard()
 	_test_branch_and_replay()
 	_test_screenplay_failure_and_relationship_branches()
+	_test_night_hide_consequences()
 	_test_invalid_persistence_and_read_isolation()
 	_cleanup()
 	print("VILLAGE_CHILDHOOD_RESULT checks=%d failures=%d" % [checks, failures.size()])
@@ -65,7 +66,7 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 		_check(false, "A valid next childhood action exists")
 		return false
 	var stage := str(view.get("stage", ""))
-	if stage in ["i02_basket", "i02_correct", "i03_marcus", "i08_tracks", "i08_report"]:
+	if stage in ["i02_basket", "i02_correct", "i03_marcus", "i08_tracks", "i08_report", "i11_forge", "i12_father", "i13_morning", "i14_oath"]:
 		_at(model, view.point)
 		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):
 			return false
@@ -74,7 +75,11 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 			"i02_correct":"basket_correct",
 			"i03_marcus":"marcus_friend",
 			"i08_tracks":"i08_inspect",
-			"i08_report":"i08_report"
+			"i08_report":"i08_report",
+			"i11_forge":"i11_forge",
+			"i12_father":"i12_father",
+			"i13_morning":"i13_morning",
+			"i14_oath":"i14_oath"
 		}[stage]
 		if not _ok(_action(model, screenplay_action), "Complete screenplay bridge: " + stage):
 			return false
@@ -100,7 +105,7 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 
 
 func _until(model, stage: String, trade_choice := "market_fair") -> bool:
-	for _index in Childhood.STEPS.size() + 1:
+	for _index in Childhood.STEPS.size() + 16:
 		if _current(model) == stage:
 			return true
 		if not _complete(model, trade_choice):
@@ -308,6 +313,10 @@ func _test_released_combat(model) -> void:
 	# Domain timing uses explicit geometry; actual wall/body sweeps are separate.
 	model.combat_sight_check = func(_from: Vector2, _to: Vector2) -> bool: return true
 	model.combat_motion_check = func(from: Vector2, _to: Vector2) -> Vector2: return from
+	_check(model.data.village.raid.rescue_person_id == "julia" and model.data.village.raid.rescue_available, "Canonical night raid exposes Julia as the actual rescue target")
+	_at(model, Life.RESCUE_POINT)
+	_ok(model.execute("village_rescue"), "Defend path physically rescues Julia before the raid outcome")
+	_check(model.data.village.raid.rescued and _person(model, "julia").alive, "Julia rescue is recorded on the same real resident")
 	var first: Dictionary = model.data.village.raid.enemies[0]
 	var initial_health := int(first.health)
 	var initial_experience := int(model.data.village.attributes.combat)
@@ -330,6 +339,18 @@ func _test_released_combat(model) -> void:
 	_at(model, Childhood.POINTS.family_rest)
 	model.advance(160.0)
 	_check(not model.data.village.raid.active and model.data.village.raid.completed == 1, "The released raid reaches a real bounded outcome")
+	_check(_current(model) == "i11_forge", "A completed night raid releases I-11 instead of restarting the old village loop")
+	_check(_complete(model), "Play I-11 at the forge")
+	_check(not _person(model, "sextus").alive and _person(model, "sextus").health == 0, "Sextus dies as a persistent shared resident in I-11")
+	_check(_complete(model), "Play I-12 at Silvanus")
+	_check(not _person(model, "silvanus").alive and _person(model, "julia").alive and model.data.village.childhood.screenplay.julia_outcome == "survived", "Defend/rescue path kills Silvanus but preserves the actually rescued Julia")
+	_check(_complete(model), "Play I-13 with Aurelia")
+	_check(_complete(model), "Play I-14 at the ridge")
+	_check(model.data.village.childhood.screenplay.oath and model.data.village.childhood.night_event == "resolved" and model.data.village.childhood.carried.has("memory_token"), "The oath and keepsake close I-14 without granting adulthood")
+	_ok(model.save_game(_path("oath-defend")), "Save the defended oath outcome")
+	var oath_reload = WorldModel.new()
+	_ok(oath_reload.load_game(_path("oath-defend")), "Reload the defended oath outcome")
+	_check(oath_reload.data.village.childhood.screenplay.julia_outcome == "survived" and oath_reload.data.village.childhood.screenplay.oath and _person(oath_reload, "julia").alive, "Rescue, oath and Julia survival persist across save/load")
 	model.advance(600.0)
 	_check(model.data.village.raid.status == "aftermath" and model.data.village.raid.number == 1, "An ended childhood raid cannot restart itself on the old repeating timer")
 
@@ -375,6 +396,26 @@ func _test_screenplay_failure_and_relationship_branches() -> void:
 	var reloaded = WorldModel.new()
 	_ok(reloaded.load_game(_path("screenplay-branches")), "Reload I-02/I-03 branch state")
 	_check(reloaded.data.village.childhood.screenplay.i02_outcome == "wrong" and reloaded.data.village.childhood.screenplay.i03_outcome == "rival", "Failure and relationship memories survive save/load")
+
+
+func _test_night_hide_consequences() -> void:
+	var model = _new()
+	if not _until(model, "i10_choice"):
+		return
+	_at(model, Childhood.POINTS.father)
+	_ok(_action(model, "i10_hide"), "I-10 permits hiding with the parents as a real branch")
+	_check(model.data.village.raid.status == "aftermath" and model.data.village.raid.completed == 1 and not model.data.village.raid.active, "Hiding does not erase the attack; it resolves persistent raid losses")
+	_check(model.data.village.childhood.screenplay.raid_path == "hide" and _current(model) == "i11_forge", "Hide branch stores its path and still reaches the forge aftermath")
+	_check(_complete(model), "Hide route plays I-11")
+	_check(_complete(model), "Hide route plays I-12")
+	_check(not _person(model, "sextus").alive and not _person(model, "silvanus").alive and not _person(model, "julia").alive, "Hide route leaves Sextus, Silvanus and Julia dead in the shared resident roster")
+	_check(model.data.village.childhood.screenplay.julia_outcome == "dead", "Hide route records Julia's death explicitly")
+	_check(_complete(model) and _complete(model), "Hide route reaches morning and the oath")
+	_check(model.data.village.childhood.screenplay.oath and model.data.village.childhood.carried.has("memory_token"), "Hide route can swear the same investigation oath without rewriting its losses")
+	_ok(model.save_game(_path("oath-hide")), "Save the hidden oath outcome")
+	var reloaded = WorldModel.new()
+	_ok(reloaded.load_game(_path("oath-hide")), "Reload the hidden oath outcome")
+	_check(not _person(reloaded, "julia").alive and not _person(reloaded, "silvanus").alive and not _person(reloaded, "sextus").alive, "Hide-route deaths remain real after reload")
 
 
 func _test_invalid_persistence_and_read_isolation() -> void:
