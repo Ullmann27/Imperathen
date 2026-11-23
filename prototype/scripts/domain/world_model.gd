@@ -436,6 +436,8 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			_record(state, "Du sammelst vier Holz an %s." % node.id)
 			return _ok("4 Holz gesammelt.")
 		"choose_companion":
+			if Childhood.enabled(state):
+				return _fail("Marcus gehört im Kindheitskapitel zur Drehbuchmission I-03. Sprich mit ihm am Marktweg.")
 			if state.companion.met:
 				return _fail("Diese Begegnung ist bereits entschieden.")
 			if _distance_to(state, -3.0, 4.0) > INTERACTION_RANGE:
@@ -863,7 +865,8 @@ func _validate_state(state: Variant) -> String:
 	var village_ledger := {"wood":0, "grain":0, "denarii":0, "stone":0}
 	for key in village_ledger:
 		village_ledger[key] = int(state.village.economy.ledger[key]) + int(state.village.social.ledger[key])
-	var help_cost := 4 if companion.choice == "help" else 0
+	var childhood_marcus_friend := Childhood.enabled(state) and str(state.village.childhood.screenplay.get("i03_outcome", "")) == "friend"
+	var help_cost := 0 if childhood_marcus_friend else (4 if companion.choice == "help" else 0)
 	if int(state.resources.wood) + HUT_COST * state.buildings.size() + help_cost != 48 - remaining_wood + int(village_ledger.wood):
 		return "Die Holzbilanz wurde verletzt."
 	if int(state.resources.stone) != int(village_ledger.stone):
