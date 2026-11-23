@@ -232,6 +232,7 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 		return _fail("Kindheitsauftrag vollständig verworfen: " + error)
 	data.village = candidate.village
 	data.resources = candidate.resources
+	data.companion = candidate.companion
 	return result
 
 
@@ -260,6 +261,11 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 		return _fail("Die Aufgaben dieses Kindheitskapitels sind bereits abgeschlossen.")
 	var action: String = args.action_id
 	var id: String = step.id
+	if step.get("screenplay", false):
+		var reason := _action_reason(data, step)
+		if not reason.is_empty():
+			return _fail(reason)
+		return _apply_screenplay(data, step, action)
 	var starting := action == "begin_" + id and step.has("seconds")
 	if not starting and not _matches(id, action):
 		return _fail("Diese Handlung passt noch nicht zu deinem aktuellen Auftrag.")
@@ -327,6 +333,8 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	if id == "return_gear":
 		child.gear = "returned"
 		_restore_guard(data)
+		if child.screenplay.i08 == "locked":
+			child.screenplay.i08 = "pending"
 	if id in ["patrol_inner", "patrol_road", "patrol_gate"]:
 		var attribute: String = {"patrol_inner":"insight","patrol_road":"tactics","patrol_gate":"courage"}[id]
 		data.village.attributes[attribute] = mini(10000, int(data.village.attributes[attribute]) + 1)
@@ -342,6 +350,69 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 		message = "Der vereinbarte Preis gilt. Du erhältst einmalig zwei Denare; Cassia merkt sich deine verlässliche Abrechnung."
 	elif action == "market_neighbor":
 		message = "Du nimmst einen Denar und lässt einen dem Nachbarn. Julia hört von deiner freiwilligen Hilfe."
+	_record(data, action, message)
+	return _ok(message)
+
+
+static func _apply_screenplay(data: Dictionary, step: Dictionary, action: String) -> Dictionary:
+	var child: Dictionary = data.village.childhood
+	var screenplay: Dictionary = child.screenplay
+	var id: String = step.id
+	var message := ""
+	match id:
+		"i02_basket":
+			if action == "basket_check":
+				screenplay.i02 = "complete"
+				screenplay.i02_outcome = "checked"
+				screenplay.i03 = "pending"
+				child.carried.erase("neighbor_basket")
+				message = "Du prüfst den Korb mit Aurelia. Die Lieferung stimmt; Sorgfalt wird als konkrete Erinnerung gespeichert."
+			elif action == "basket_rush":
+				screenplay.i02 = "correction"
+				screenplay.i02_outcome = "wrong"
+				message = "Du hast den falschen Korb erwischt. Die Mission scheitert nicht: Julia muss dir helfen, den Fehler zu korrigieren."
+			else:
+				return _fail("Entscheide, ob du den Korb prüfst oder ungeprüft abgibst.")
+		"i02_correct":
+			if action != "basket_correct":
+				return _fail("Korrigiere den falschen Korb gemeinsam mit Julia.")
+			screenplay.i02 = "complete"
+			screenplay.i03 = "pending"
+			child.carried.erase("neighbor_basket")
+			message = "Julia hilft dir, den Fehler zu korrigieren. Der falsche Korb bleibt als Ereignis erhalten, statt durch einen Reload zu verschwinden."
+		"i03_marcus":
+			if data.companion.met:
+				return _fail("Die Beziehung zu Marcus wurde bereits festgelegt.")
+			if action == "marcus_friend":
+				data.companion.met = true
+				data.companion.choice = "help"
+				data.companion.trust = 20
+				screenplay.i03_outcome = "friend"
+				message = "Ihr beendet den Münzstreit als Freunde. Marcus merkt sich, dass ihr gemeinsam weitergeht."
+			elif action == "marcus_rival":
+				data.companion.met = true
+				data.companion.choice = "decline"
+				data.companion.trust = -5
+				screenplay.i03_outcome = "rival"
+				message = "Der Münzstreit bleibt zwischen euch. Marcus geht mit, aber eure Beziehung beginnt angespannt."
+			else:
+				return _fail("Entscheide, wie du den Streit mit Marcus beendest.")
+			screenplay.i03 = "complete"
+		"i08_tracks":
+			if action != "i08_inspect":
+				return _fail("Untersuche zuerst die Hufspuren selbst.")
+			screenplay.i08 = "report"
+			screenplay.hoof_evidence = true
+			_gain(data, "insight", 1)
+			message = "Du sicherst mehrere frische Hufspuren als Beobachtung. Herkunft und Täter bleiben ausdrücklich offen."
+		"i08_report":
+			if action != "i08_report" or not screenplay.hoof_evidence:
+				return _fail("Du kannst nur berichten, was du zuvor tatsächlich untersucht hast.")
+			screenplay.i08 = "complete"
+			_gain(data, "tactics", 1)
+			message = "Decimus protokolliert die Spuren ohne vorschnelle Schuldzuweisung. Die Warnung bleibt im Event-Ledger."
+		_:
+			return _fail("Unbekannter Drehbuchschritt.")
 	_record(data, action, message)
 	return _ok(message)
 
@@ -432,7 +503,7 @@ static func validate(data: Dictionary) -> String:
 	if data.get("origin_id", "") != "italia" or not data.village.get("enabled", false) or not _integer(data.get("player", {}).get("age"), 12, 12) or data.get("progress", {}).get("years_elapsed", -1) != 0:
 		return "Dieses Kindheitskapitel beginnt im römischen Dorf mit zwölf Jahren und ohne übersprungene Lebensjahre."
 	var child: Variant = data.village.childhood
-	if not _keys(child,["version","completed","day","carried","relationships","active_work","work_seconds","gear","apprenticeship","night_event","guard_absence"]) or not _integer(child.version,VERSION,VERSION):
+	if not _keys(child,["version","completed","day","carried","relationships","active_work","work_seconds","gear","apprenticeship","night_event","screenplay","guard_absence"]) or not _integer(child.version,VERSION,VERSION):
 		return "Unbekannte oder unvollständige Kindheitsversion."
 	if typeof(child.completed) != TYPE_ARRAY or child.completed.size() > STEPS.size() or typeof(child.carried) != TYPE_ARRAY:
 		return "Ungültige Aufgabenfolge oder Traglast."
@@ -466,11 +537,34 @@ static func validate(data: Dictionary) -> String:
 		if step.id == "return_gear":
 			expected_gear = "returned"
 			absent = false
+	var screenplay: Variant = child.screenplay
+	if not _keys(screenplay,["version","i02","i02_outcome","i03","i03_outcome","i08","hoof_evidence"]) or not _integer(screenplay.version,1,1):
+		return "Ungültiger Drehbuch-Brückenstand."
+	if screenplay.i02 not in ["pending","correction","complete"] or screenplay.i03 not in ["locked","pending","complete"] or screenplay.i08 not in ["locked","pending","report","complete"]:
+		return "Ungültiger Status einer frühen Drehbuchmission."
+	if typeof(screenplay.i02_outcome) != TYPE_STRING or screenplay.i02_outcome not in ["","checked","wrong","legacy"]:
+		return "Ungültige Folge des Korbauftrags."
+	if typeof(screenplay.i03_outcome) != TYPE_STRING or screenplay.i03_outcome not in ["","friend","rival","legacy"]:
+		return "Ungültige Marcus-Erinnerung."
+	if typeof(screenplay.hoof_evidence) != TYPE_BOOL:
+		return "Hufspurbeleg benötigt einen Wahrheitswert."
+	if screenplay.i02 == "complete":
+		expected_items.erase("neighbor_basket")
+	if screenplay.i03 == "complete":
+		if not data.companion.met or screenplay.i03_outcome == "friend" and data.companion.choice != "help" or screenplay.i03_outcome == "rival" and data.companion.choice != "decline":
+			return "Marcus-Beziehung und I-03 widersprechen sich."
+	elif data.companion.met:
+		return "Marcus darf vor I-03 nicht stillschweigend als Gefährte entschieden sein."
+	if screenplay.i08 in ["report","complete"] and not screenplay.hoof_evidence:
+		return "Die gemeldeten Hufspuren wurden nicht tatsächlich untersucht."
+	if screenplay.i08 == "complete" and not child.completed.has("return_gear"):
+		return "I-08 darf nicht vor dem begrenzten Wachtdienst abgeschlossen sein."
 	if not _integer(child.day,1,4) or child.day != expected_day or child.carried != expected_items:
 		return "Tag oder Auftragsgegenstände sind nicht durch erledigte Handlungen belegt."
 	if typeof(child.apprenticeship) != TYPE_STRING or child.apprenticeship != expected_apprenticeship or typeof(child.gear) != TYPE_STRING or child.gear != expected_gear:
 		return "Lehre oder Leihgegenstände widersprechen der Auftragsfolge."
-	if typeof(child.night_event) != TYPE_STRING or child.night_event not in (["pending","released"] if child.completed.size() == STEPS.size() else ["none"]):
+	var bridges_complete: bool = screenplay.i02 == "complete" and screenplay.i03 == "complete" and screenplay.i08 == "complete"
+	if typeof(child.night_event) != TYPE_STRING or child.night_event not in (["pending","released"] if child.completed.size() == STEPS.size() and bridges_complete else ["none"]):
 		return "Die Nacht darf nicht vor dem vollständigen Dorfanfang beginnen."
 	var raid: Dictionary = data.village.get("raid", {})
 	if child.night_event != "released" and (raid.get("status", "") != "quiet" or raid.get("number", -1) != 0 or raid.get("completed", -1) != 0):
@@ -568,6 +662,18 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 	if step.id == "market_trade":
 		options = [{"id":"market_fair","label":"Den vereinbarten Lohn nehmen · 2 Denare"},
 			{"id":"market_neighbor","label":"Dem Nachbarn einen Denar lassen · 1 Denar Lohn"}]
+	elif step.id == "i02_basket":
+		options = [{"id":"basket_check","label":"Korb gemeinsam prüfen"},
+			{"id":"basket_rush","label":"Ohne Prüfung abgeben"}]
+	elif step.id == "i02_correct":
+		options = [{"id":"basket_correct","label":"Fehler korrigieren und richtigen Korb schicken"}]
+	elif step.id == "i03_marcus":
+		options = [{"id":"marcus_friend","label":"Den Münzstreit beilegen und gemeinsam gehen"},
+			{"id":"marcus_rival","label":"Auf dem eigenen Standpunkt beharren"}]
+	elif step.id == "i08_tracks":
+		options = [{"id":"i08_inspect","label":"Hufspuren untersuchen und nur Beobachtungen sichern"}]
+	elif step.id == "i08_report":
+		options = [{"id":"i08_report","label":"Decimus nur belegte Spuren melden"}]
 	elif step.has("seconds"):
 		if data.village.childhood.active_work == "":
 			options[0].id = "begin_" + str(step.id)
