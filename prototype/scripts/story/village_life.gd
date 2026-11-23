@@ -668,7 +668,7 @@ static func validate(data: Dictionary) -> String:
 		if not _integer(enemy.max_health,45,45) or not _integer(enemy.health,0,45) or not _number(enemy.x,-200.0,200.0) or not _number(enemy.z,-200.0,200.0) or not _number(enemy.attack_timer,0.0,3.0) or not _number(enemy.loot_timer,0.0,RAID_SECONDS+1.0):
 			return "Ungültiger Angreiferzustand."
 	var history: Dictionary = village.history
-	if not _keys(history,["start_year","mode","player_changes","events"]) or history.start_year!=100 or typeof(history.mode)!=TYPE_STRING or history.mode not in ["historical_baseline","fictional_branch"]:
+	var expected_start_year := -58 if Childhood.enabled(data) else 100\n\tif not _keys(history,["start_year","mode","player_changes","events"]) or history.start_year!=expected_start_year or typeof(history.mode)!=TYPE_STRING or history.mode not in ["historical_baseline","fictional_branch"]:
 		return "Ungültiger Geschichtsrahmen."
 	if typeof(history.player_changes)!=TYPE_ARRAY or history.player_changes.size()>128 or typeof(history.events)!=TYPE_ARRAY or history.events.size()>64:
 		return "Unbegrenztes Geschichtsprotokoll."
