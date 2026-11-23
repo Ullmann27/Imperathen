@@ -18,6 +18,7 @@ func _initialize() -> void:
 	_test_nearby_work_and_save()
 	_test_full_journey_and_guard()
 	_test_branch_and_replay()
+	_test_screenplay_failure_and_relationship_branches()
 	_test_invalid_persistence_and_read_isolation()
 	_cleanup()
 	print("VILLAGE_CHILDHOOD_RESULT checks=%d failures=%d" % [checks, failures.size()])
@@ -60,7 +61,26 @@ func _current(model) -> String:
 
 func _complete(model, trade_choice := "market_fair") -> bool:
 	var view: Dictionary = Childhood.view(model.data)
-	if view.is_empty() or int(view.completed_steps) >= Childhood.STEPS.size():
+	if view.is_empty():
+		_check(false, "A valid next childhood action exists")
+		return false
+	var stage := str(view.get("stage", ""))
+	if stage in ["i02_basket", "i02_correct", "i03_marcus", "i08_tracks", "i08_report"]:
+		_at(model, view.point)
+		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):
+			return false
+		var screenplay_action := {
+			"i02_basket":"basket_check",
+			"i02_correct":"basket_correct",
+			"i03_marcus":"marcus_friend",
+			"i08_tracks":"i08_inspect",
+			"i08_report":"i08_report"
+		}[stage]
+		if not _ok(_action(model, screenplay_action), "Complete screenplay bridge: " + stage):
+			return false
+		_check(model.data.player.age == 12 and model.data.player.role == "child", "Screenplay bridge cannot change life stage: " + stage)
+		return true
+	if int(view.completed_steps) >= Childhood.STEPS.size():
 		_check(false, "A valid next childhood action exists")
 		return false
 	var step: Dictionary = Childhood.STEPS[int(view.completed_steps)]
@@ -103,6 +123,7 @@ func _test_fresh_opt_in_and_legacy() -> void:
 	# save loader migrates it without losing progress, trust or actor continuity.
 	var legacy_names: Dictionary = model.data.duplicate(true)
 	legacy_names.village.childhood.version = 1
+	legacy_names.village.childhood.erase("screenplay")
 	legacy_names.village.childhood.relationships = {
 		"antonia": legacy_names.village.childhood.relationships.julia.duplicate(true),
 		"sextus": legacy_names.village.childhood.relationships.silvanus.duplicate(true),
@@ -332,6 +353,28 @@ func _test_branch_and_replay() -> void:
 	var saved = WorldModel.new()
 	_ok(saved.load_game(_path("branch")), "Reload the selected trade branch")
 	_check(saved.data.village.childhood.completed.has("market_neighbor") and not saved.data.village.childhood.completed.has("market_fair"), "The choice is persisted as history rather than inferred from the latest UI")
+
+
+func _test_screenplay_failure_and_relationship_branches() -> void:
+	var model = _new()
+	_until(model, "i02_basket")
+	_near(model, "aurelia")
+	_meet(model, "aurelia")
+	_ok(_action(model, "basket_rush"), "I-02 permits the wrong basket without reloading")
+	_check(_current(model) == "i02_correct" and model.data.village.childhood.screenplay.i02_outcome == "wrong", "Wrong basket creates a correction world state")
+	_near(model, "julia")
+	_ok(_action(model, "basket_correct"), "Julia helps correct the basket mistake")
+	_check(_current(model) == "i03_marcus" and not model.data.companion.met, "I-03 follows I-02 with Marcus still undecided")
+	_at(model, Childhood.POINTS.marcus)
+	_ok(_action(model, "marcus_rival"), "I-03 permits a rivalry outcome")
+	_check(model.data.companion.met and model.data.companion.choice == "decline" and model.data.companion.trust == -5, "Marcus rivalry uses the persistent companion state")
+	_check(model.data.village.childhood.screenplay.i03_outcome == "rival", "I-03 concrete memory is stored in childhood screenplay state")
+	var before := _snapshot(model.data)
+	_check(not _action(model, "marcus_friend").ok and _snapshot(model.data) == before, "I-03 cannot be collected twice or silently rewritten")
+	_ok(model.save_game(_path("screenplay-branches")), "Save I-02/I-03 branch state")
+	var reloaded = WorldModel.new()
+	_ok(reloaded.load_game(_path("screenplay-branches")), "Reload I-02/I-03 branch state")
+	_check(reloaded.data.village.childhood.screenplay.i02_outcome == "wrong" and reloaded.data.village.childhood.screenplay.i03_outcome == "rival", "Failure and relationship memories survive save/load")
 
 
 func _test_invalid_persistence_and_read_isolation() -> void:
