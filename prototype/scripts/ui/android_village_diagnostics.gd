@@ -7,15 +7,17 @@ const MAX_LOG_CHUNKS := 64
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 
 var session: Node
-var _elapsed := 0.0
+var _last_snapshot_msec := 0
 var _snapshot_sequence := 0
 
 
-func _process(delta: float) -> void:
-	_elapsed += delta
-	if _elapsed < 1.0:
+func _process(_delta: float) -> void:
+	# Observe wall time even when a software-rendered frame advances little game
+	# time. This clock never advances the model, and missed samples are not replayed.
+	var now := Time.get_ticks_msec()
+	if now - _last_snapshot_msec < 1000:
 		return
-	_elapsed = 0.0
+	_last_snapshot_msec = now
 	var value := snapshot()
 	if value.is_empty():
 		return
@@ -59,6 +61,8 @@ func snapshot() -> Dictionary:
 			value["aelia_assignment"] = person.assignment
 	value["action_mode"] = "unarmed" if village.has("unarmed") else "legacy"
 	value["action_runtime"] = _action_state()
+	value["graphics_runtime"] = {"ui_profile":session.ui.get_quality(),
+		"world_profile":session.world.get_quality_profile()}
 	if Childhood.enabled(data):
 		value["childhood_runtime"] = _childhood_state(data)
 	var collection_root: Node = session.ui
@@ -89,6 +93,7 @@ func _collect(node: Node, value: Dictionary) -> void:
 			"Interagieren": key = "interact"
 			"Dorfleben", "Dorf": key = "village"
 			"Pause": key = "pause"
+			"Einstellungen": key = "settings"
 			"Weiterspielen": key = "resume"
 			"Arbeit & Versorgung": key = "work_tab"
 			"Beim Wiederaufbau mithelfen": key = "permit"
@@ -106,6 +111,8 @@ func _collect(node: Node, value: Dictionary) -> void:
 		elif node.name == "CloseOverlay":
 			key = "techniques_close" if _under_named(node, "TechniqueMenu") else "commands_close"
 		if node is OptionButton:
+			if node.name == "QualitySetting":
+				key = "quality"
 			for sibling: Node in node.get_parent().get_children():
 				if sibling is Label and sibling.text.begins_with("Aelia ·"):
 					key = "aelia_assignment"

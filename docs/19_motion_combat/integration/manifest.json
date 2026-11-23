@@ -150,6 +150,14 @@
     {
       "path": "prototype/scripts/world/player_action_world.gd.uid",
       "sha256": "8cef75a94b1d558d394ce5c1c1d31aaa80c17a7ee965536cc7861e4c751ad390"
+    },
+    {
+      "path": "prototype/scripts/ui/android_village_diagnostics.gd",
+      "sha256": "53c3c552a4c3c859f5ae97f1f8faeb5ec70af029fc0eebadeb8f8f1b27721586"
+    },
+    {
+      "path": "prototype/scripts/ui/android_village_diagnostics.gd.uid",
+      "sha256": "93b9a4f9009e01491955a9eaa72053279e1fb78e1adb0b852a13bcd8ea45ad94"
     }
   ]
 }

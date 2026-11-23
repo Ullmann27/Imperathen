@@ -1,6 +1,7 @@
 """Synthetic log timing regressions; these are not Android device evidence."""
 
 import base64
+import copy
 import importlib.util
 import json
 import math
@@ -381,6 +382,48 @@ class VillageChunkTransportTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "bounded frame history"):
             SMOKE.village_runtime_observations("\n".join(lines))
 
+    def test_long_runtime_keeps_bounded_latest_frames_and_full_sequence_cursor(self):
+        lines = [line for sequence in range(1, SMOKE.MAX_VILLAGE_FRAMES + 12)
+                 for line in chunk_lines(snapshot(), sequence=sequence)]
+        text = "\n".join(lines)
+        records = SMOKE.village_runtime_observations(text, retain_latest=True)
+        self.assertEqual(len(records), SMOKE.MAX_VILLAGE_FRAMES)
+        self.assertEqual(records[0]["sequence"], 12)
+        self.assertEqual(records[-1]["ordinal"], SMOKE.MAX_VILLAGE_FRAMES + 11)
+        cursor = SMOKE.village_runtime_cursor(text)
+        self.assertEqual(cursor, ("chunk", "12345", SMOKE.MAX_VILLAGE_FRAMES + 11))
+        updated = snapshot(assigned="woodcamp")
+        next_log = "\n".join(lines + chunk_lines(updated, sequence=cursor[2] + 1))
+        read = Mock(side_effect=[text, next_log])
+        self.assertEqual(SMOKE.wait_for_village_snapshot(read, after=cursor, timeout=3), updated)
+        self.assertEqual(read.call_count, 2)
+
+    def test_current_window_does_not_hide_invalid_older_logs(self):
+        tail = [line for sequence in range(2, SMOKE.MAX_VILLAGE_FRAMES + 4)
+                for line in chunk_lines(snapshot(), sequence=sequence)]
+        for prefix in ([SMOKE.VILLAGE_CHUNK_MARKER + "broken envelope"],
+                       chunk_lines(snapshot(), observer="67890")):
+            with self.subTest(prefix=prefix):
+                with self.assertRaises(RuntimeError):
+                    SMOKE.village_runtime_observations("\n".join(prefix + tail), retain_latest=True)
+
+    def test_evicted_frame_cannot_be_reintroduced_as_new_evidence(self):
+        lines = [line for sequence in range(1, SMOKE.MAX_VILLAGE_FRAMES + 2)
+                 for line in chunk_lines(snapshot(), sequence=sequence)]
+        with self.assertRaisesRegex(RuntimeError, "out of sequence"):
+            SMOKE.village_runtime_observations("\n".join(lines + chunk_lines(snapshot())),
+                                               retain_latest=True)
+
+    def test_legacy_count_cursor_survives_current_window_eviction(self):
+        count = SMOKE.MAX_VILLAGE_FRAMES + 5
+        initial = snapshot()
+        updated = snapshot(assigned="woodcamp")
+        old = log(*([initial] * count))
+        read = Mock(side_effect=[old, old + "\n" + log(updated)])
+        result = SMOKE.wait_for_village_snapshot(read, after=count, timeout=3)
+        self.assertEqual(result, updated)
+        self.assertEqual(read.call_count, 2)
+
     def test_legacy_frames_keep_freshness_and_missing_diagnostics_do_not_pass(self):
         initial = snapshot(assigned="idle")
         updated = snapshot(assigned="woodcamp")
@@ -571,6 +614,200 @@ class ChildhoodRuntimeObservationTest(unittest.TestCase):
         point, distance = SMOKE.observed_walk_point(childhood_snapshot(), [2.0, 9.0])
         self.assertEqual(point, (210.0, 370.0))
         self.assertEqual(distance, 0.0)
+
+
+class NativePointerDrivingTest(unittest.TestCase):
+    """Synthetic native-command/log ordering, not an Android execution claim."""
+
+    def setUp(self):
+        self.now = 0.0
+        self.before = childhood_snapshot()
+        self.snapshots = [self.before]
+        self.pending = []
+        self.events = []
+        self.down_states = [self.before, self.held()]
+        self.move_states = [self.held(position=[2.15, 1.0, 9.0], move_axis=[0.6, 0.0])]
+        self.fail_event = None
+        self.fail_read_after_down = False
+        self.release_is_stuck = False
+        self.release_position = None
+        self.neutral_arrives_before_up = False
+        clock = patch.object(SMOKE.time, "monotonic", lambda: self.now)
+        sleeper = patch.object(SMOKE.time, "sleep", self.advance)
+        clock.start()
+        sleeper.start()
+        self.addCleanup(clock.stop)
+        self.addCleanup(sleeper.stop)
+
+    def held(self, **changes):
+        state = copy.deepcopy(self.before)
+        state["action_runtime"]["movement_touch"] = 0
+        state["action_runtime"].update(changes)
+        return state
+
+    def advance(self, seconds):
+        self.now += seconds
+        if self.pending:
+            self.snapshots.append(self.pending.pop(0))
+
+    def logs(self):
+        if self.fail_read_after_down and self.events:
+            raise RuntimeError("Actual diagnostic transport failed")
+        text = "\n".join(line for sequence, state in enumerate(self.snapshots, 1)
+                         for line in chunk_lines(state, sequence=sequence))
+        if (self.neutral_arrives_before_up and self.events and self.events[-1][0] == "MOVE"
+                and SMOKE.action_position_distance(self.before, self.snapshots[-1]) >= 0.10):
+            # A newer frame arrives after this log read, before the host sends
+            # UP. Reusing the last MOVE cursor would falsely accept that frame.
+            self.neutral_arrives_before_up = False
+            neutral = copy.deepcopy(self.snapshots[-1])
+            neutral["action_runtime"].update(movement_touch=-1, move_axis=[0.0, 0.0],
+                                             body_velocity=[0.0, 0.0, 0.0])
+            self.snapshots.append(neutral)
+        return text
+
+    def motion(self, event, point):
+        self.events.append((event, point, self.now))
+        if event == self.fail_event:
+            raise RuntimeError("Actual ADB " + event + " command failed")
+        if event == "DOWN":
+            self.pending.extend(self.down_states)
+        elif event == "MOVE":
+            self.assertGreaterEqual(self.snapshots[-1]["action_runtime"]["movement_touch"], 0)
+            if self.move_states:
+                self.pending.append(self.move_states.pop(0))
+            else:
+                self.pending.append(copy.deepcopy(self.snapshots[-1]))
+        elif event == "UP" and not self.release_is_stuck:
+            released = copy.deepcopy(self.snapshots[-1])
+            released["action_runtime"].update(movement_touch=-1, move_axis=[0.0, 0.0],
+                                              body_velocity=[0.0, 0.0, 0.0])
+            if self.release_position is not None:
+                released["action_runtime"]["position"] = self.release_position
+            self.pending = [released]
+
+    def drive(self, **kwargs):
+        return SMOKE.drive_observed_native_pointer(self.logs, self.motion, self.before, **kwargs)
+
+    def assert_released(self):
+        self.assertEqual(self.events[0][0], "DOWN")
+        self.assertEqual(self.events[-1][0], "UP")
+        self.assertEqual(sum(event == "UP" for event, _point, _time in self.events), 1)
+
+    def test_contact_handshake_precedes_move_and_position_precedes_release(self):
+        self.move_states = [self.held(move_axis=[0.6, 0.0]),
+                            self.held(position=[2.04, 1.0, 9.0], move_axis=[0.6, 0.0]),
+                            self.held(position=[2.15, 1.0, 9.0], move_axis=[0.6, 0.0])]
+        evidence = {}
+        released = self.drive(evidence=evidence)
+        self.assertEqual([event[0] for event in self.events], ["DOWN", "MOVE", "MOVE", "MOVE", "UP"])
+        self.assertGreaterEqual(self.events[1][2], 2.0)
+        self.assertEqual(self.events[0][1], (210, 370))
+        self.assertEqual(self.events[1][1], (274, 370))
+        self.assertTrue(SMOKE.action_input_is_neutral(released))
+        self.assertGreaterEqual(evidence["distance_m"], 0.10)
+        self.assertTrue(all(event["command_returned"] for event in evidence["events"]))
+
+    def test_waypoint_steering_uses_new_observed_positions(self):
+        self.move_states = [self.held(position=[2.25, 1.0, 9.0], move_axis=[0.5, 0.0]),
+                            self.held(position=[2.55, 1.0, 9.0], move_axis=[0.35, 0.0])]
+        released = self.drive(target=[2.6, 9.0], radius=0.1, minimum_distance=0.02)
+        moves = [event[1] for event in self.events if event[0] == "MOVE"]
+        self.assertLess(moves[1][0], moves[0][0])
+        self.assertLessEqual(SMOKE.observed_walk_point(released, [2.6, 9.0])[1], 0.1)
+        self.assert_released()
+
+    def test_axis_and_vertical_settling_without_walking_cannot_pass(self):
+        self.move_states = [self.held(position=[2.0, 0.7, 9.0], move_axis=[1.0, 0.0])] * 6
+        with self.assertRaises(RuntimeError):
+            self.drive(timeout=5)
+        self.assertEqual(self.now, 5)
+        self.assert_released()
+
+    def test_unobserved_down_times_out_and_still_sends_up_without_move(self):
+        self.down_states = []
+        with self.assertRaisesRegex(RuntimeError, "No matching village runtime state"):
+            self.drive(timeout=3)
+        self.assertEqual([event[0] for event in self.events], ["DOWN", "UP"])
+
+    def test_failed_down_or_move_still_attempts_native_up(self):
+        for event in ("DOWN", "MOVE"):
+            with self.subTest(event=event):
+                self.events = []
+                self.pending = []
+                self.snapshots = [self.before]
+                self.fail_event = event
+                with self.assertRaisesRegex(RuntimeError, "Actual ADB " + event):
+                    self.drive()
+                self.assert_released()
+
+    def test_diagnostic_failure_cannot_prevent_native_up(self):
+        self.fail_read_after_down = True
+        with self.assertRaisesRegex(RuntimeError, "diagnostic transport failed"):
+            self.drive()
+        self.assertEqual([event[0] for event in self.events], ["DOWN", "UP"])
+
+    def test_lost_or_replaced_contact_cannot_satisfy_distance(self):
+        for touch in (-1, 1):
+            with self.subTest(touch=touch):
+                self.events = []
+                self.pending = []
+                self.snapshots = [self.before]
+                self.move_states = [self.held(position=[2.3, 1.0, 9.0], move_axis=[0.6, 0.0],
+                                              movement_touch=touch)]
+                with self.assertRaisesRegex(RuntimeError, "pointer was lost or replaced"):
+                    self.drive()
+                self.assert_released()
+
+    def test_rebuilt_pad_aborts_and_releases_the_existing_pointer(self):
+        self.move_states[0]["controls"]["move_pad"]["instance_id"] = "replacement-pad"
+        with self.assertRaisesRegex(RuntimeError, "context changed"):
+            self.drive()
+        self.assert_released()
+
+    def test_up_must_be_observed_as_neutral_after_actual_movement(self):
+        self.release_is_stuck = True
+        with self.assertRaisesRegex(RuntimeError, "No matching village runtime state"):
+            self.drive()
+        self.assert_released()
+
+    def test_neutral_observation_created_before_up_does_not_prove_release(self):
+        self.neutral_arrives_before_up = True
+        self.release_is_stuck = True
+        with self.assertRaisesRegex(RuntimeError, "No matching village runtime state"):
+            self.drive()
+        self.assert_released()
+        self.assertTrue(SMOKE.action_input_is_neutral(self.snapshots[-1]))
+
+    def test_final_displacement_requirement_survives_release(self):
+        self.release_position = list(self.before["action_runtime"]["position"])
+        with self.assertRaisesRegex(RuntimeError, "required actual player displacement"):
+            self.drive()
+        self.assert_released()
+
+    def test_missing_pad_identity_fails_before_any_native_input(self):
+        self.before["controls"]["move_pad"].pop("instance_id")
+        with self.assertRaisesRegex(RuntimeError, "stable identity"):
+            self.drive()
+        self.assertEqual(self.events, [])
+
+
+class GraphicsRuntimeObservationTest(unittest.TestCase):
+    def test_low_profile_requires_observed_ui_and_world_values(self):
+        for profiles in ({"ui_profile": "low", "world_profile": "low"},
+                         {"ui_profile": "low", "world_profile": "balanced"}):
+            state = {"graphics_runtime": profiles}
+            self.assertEqual(SMOKE.graphics_runtime_profiles(state), profiles)
+        with self.assertRaisesRegex(RuntimeError, "observed graphics profiles"):
+            SMOKE.graphics_runtime_profiles({"graphics_runtime": {"ui_profile": "low"}})
+
+    def test_unknown_or_untyped_quality_cannot_be_used_as_observation(self):
+        for profiles in ({"ui_profile": True, "world_profile": "low"},
+                         {"ui_profile": [], "world_profile": "low"},
+                         {"ui_profile": "low", "world_profile": "automatic"}, None):
+            with self.subTest(profiles=profiles):
+                with self.assertRaises(RuntimeError):
+                    SMOKE.graphics_runtime_profiles({"graphics_runtime": profiles})
 
 
 class ObservedVillageScrollTest(unittest.TestCase):
