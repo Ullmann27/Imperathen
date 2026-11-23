@@ -2,7 +2,7 @@ name: Android prototype APK
 
 on:
   push:
-    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122', 'integration/realistic-android-23', 'feature/hero-realism-20261122', 'feature/cinematic-opening-20261123', 'feature/village-life-20261123', 'feature/village-life-delivery-20261123', 'feature/chat-a-movement-combat-20261123', 'story/canonical-bible-alignment-20261123', 'story/i00-aquileia-cold-open-20261123']
+    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122', 'integration/realistic-android-23', 'feature/hero-realism-20261122', 'feature/cinematic-opening-20261123', 'feature/village-life-20261123', 'feature/village-life-delivery-20261123', 'feature/chat-a-movement-combat-20261123', 'story/canonical-bible-alignment-20261123', 'story/i00-aquileia-cold-open-20261123', 'integration/build68-story-meshy-20261123']
     paths:
       - 'prototype/**'
       - 'tools/build_android_prototype.py'
@@ -23,7 +23,7 @@ permissions:
 
 concurrency:
   group: android-prototype-${{ github.ref }}
-  cancel-in-progress: ${{ startsWith(github.ref, 'refs/heads/story/canonical-bible-alignment-') || startsWith(github.ref, 'refs/heads/story/i00-aquileia-cold-open-') }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/heads/story/canonical-bible-alignment-') || startsWith(github.ref, 'refs/heads/story/i00-aquileia-cold-open-') || startsWith(github.ref, 'refs/heads/integration/build68-story-meshy-') }}
 
 jobs:
   build-and-check:
