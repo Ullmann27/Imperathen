@@ -83,7 +83,7 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 		for person: Dictionary in data.village.economy.people:
 			if person.id in ["fabius","drusa"]:
 				person.assignment="woodcamp"
-			elif person.id in ["cassia","silvanus"]:
+			elif person.id == "cassia":
 				person.assignment="trade"
 		data.village.economy.last_report = "Markt, Felder und Werkstätten arbeiten bereits. Decimus verwaltet das Dorf; du beginnst als Kind deiner Familie."
 		data.player.position = [-12.0, 1.35, 11.7]
