@@ -920,7 +920,7 @@ def main():
         child = childhood_runtime_state(initial)
         record("actual_family_start", child["stage"] == "mother_morning" and child["completed"] == []
                and child["carried"] == [] and child["age"] == 12 and child["day"] == 1
-               and child["target_npc"] == "antonia" and initial.get("player_is_ruler") is False, child)
+               and child["target_npc"] == "julia" and initial.get("player_is_ruler") is False, child)
         screenshot("15_android_family_home.png")
         entrance, water = child["family_entrance"], child["family_water"]
         # The continuous Main route verified these clear points inside/outside
@@ -932,7 +932,7 @@ def main():
         previous = village_runtime_cursor(checked_logs())
         tap(stable_village_control("interact", "playing")["center"])
         conversation = village_snapshot("village_dialog", required_control="childhood_mother_morning", after=previous,
-                                        predicate=lambda item: childhood_runtime_state(item)["dialog_npc"] == "antonia")
+                                        predicate=lambda item: childhood_runtime_state(item)["dialog_npc"] == "julia")
         record("native_interaction_reaches_mother", True, childhood_runtime_state(conversation))
         choice = village_control("childhood_mother_morning", "village_dialog")
         previous = village_runtime_cursor(checked_logs())
