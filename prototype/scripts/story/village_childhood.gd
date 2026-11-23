@@ -2,7 +2,7 @@ extends RefCounted
 ## Authored childhood chapters. Only explicit, nearby actions advance their order.
 ## This optional state is created for fresh games; loading a legacy save never adds it.
 
-const VERSION := 1
+const VERSION := 2\nconst LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
 const POINT_RANGE := 1.6
 const MAX_RESOURCE := 1000000
@@ -18,9 +18,9 @@ const POINTS := {
 	"sick_guard":Vector2(10.0,18.5)
 }
 const EXTRA_NPCS := {
-	"antonia":{"name":"Antonia", "role":"Deine Mutter · Töpferin", "point":"mother", "profession":""},
-	"sextus":{"name":"Sextus", "role":"Dein Vater · Zimmermann", "point":"father", "profession":""},
-	"quintus":{"name":"Quintus", "role":"Dorfschmied", "point":"smith", "profession":"smith"}
+	"julia":{"name":"Julia", "role":"Deine Mutter · Töpferin", "point":"mother", "profession":""},
+	"silvanus":{"name":"Silvanus", "role":"Dein Vater · Zimmermann", "point":"father", "profession":""},
+	"sextus":{"name":"Sextus", "role":"Dorfschmied", "point":"smith", "profession":"smith"}
 }
 const NEIGHBORS := {
 	"decimus":{"name":"Decimus", "role":"Dorfverwalter", "position":Vector2(2.0,9.0), "text":"Deine Eltern wohnen schon lange hier. Schau dir das Dorf an und halte die Zusagen, die du den Nachbarn gibst. Die Amtsgeschäfte erledigen wir Erwachsenen."},
@@ -32,25 +32,25 @@ const NEIGHBORS := {
 	"severus":{"name":"Severus", "role":"Dorfwache", "position":Vector2(-1.2,-45.9), "text":"Eine Runde mit der Wache ist kein Feldzug. Wir sehen nach Wegen und Toren, helfen den Leuten und melden, was wir tatsächlich beobachtet haben."}
 }
 const STEPS := [
-	{"id":"mother_morning", "chapter":"Ein Morgen zu Hause", "npc":"antonia", "label":"Mit Mutter den Morgen besprechen", "objective":"Sprich vor eurem Haus mit deiner Mutter Antonia.", "text":"»Du bist wach. Dein Vater arbeitet heute an einer Tür. Hol bitte zuerst Wasser im Haus, dann bringt ihr gemeinsam die Besorgungen in Ordnung. Für Cassia lege ich einen Haushaltsdenar bereit.«", "result":"Mutter vertraut dir den zweckgebundenen Haushaltsdenar an. Er ist für die Besorgung, nicht dein Taschengeld."},
+	{"id":"mother_morning", "chapter":"Ein Morgen zu Hause", "npc":"julia", "label":"Mit Mutter den Morgen besprechen", "objective":"Sprich vor eurem Haus mit deiner Mutter Julia.", "text":"»Du bist wach. Dein Vater arbeitet heute an einer Tür. Hol bitte zuerst Wasser im Haus, dann bringt ihr gemeinsam die Besorgungen in Ordnung. Für Cassia lege ich einen Haushaltsdenar bereit.«", "result":"Mutter vertraut dir den zweckgebundenen Haushaltsdenar an. Er ist für die Besorgung, nicht dein Taschengeld."},
 	{"id":"fill_water", "chapter":"Ein Morgen zu Hause", "point":"family_water", "label":"Den Wasserkrug füllen", "objective":"Gehe ins Familienhaus und fülle den Krug am Wassertisch.", "text":"", "result":"Du füllst den bereitgestellten Krug. Dein Vater wartet draußen auf dich."},
-	{"id":"father_morning", "chapter":"Ein Morgen zu Hause", "npc":"sextus", "label":"Vater den Krug bringen und zuhören", "objective":"Bring den Krug zu deinem Vater Sextus vor dem Haus.", "text":"»Danke. Eine Tür braucht gerade Angeln; ein Versprechen braucht jemanden, der es hält. Geh zu Cassia auf den Markt und frage nach unserer Bestellung. Komm anschließend zu Mutter zurück.«", "result":"Vater nimmt den Krug. Die Familie verabredet die Besorgung auf dem Markt."},
-	{"id":"market_meeting", "chapter":"Menschen auf dem Markt", "npc":"cassia", "label":"Nach der Familienbestellung fragen", "objective":"Lerne Cassia am Markt kennen und frage nach der Bestellung deiner Familie.", "text":"»Antonia hat Brot und Grütze bestellt. Das Päckchen kostet den mitgegebenen Denar. Prüfe erst, ob Name und Bestellung stimmen; dann kaufen wir es gemeinsam.«", "result":"Du hast die richtige Bestellung und ihren Preis erfragt."},
+	{"id":"father_morning", "chapter":"Ein Morgen zu Hause", "npc":"silvanus", "label":"Vater den Krug bringen und zuhören", "objective":"Bring den Krug zu deinem Vater Silvanus vor dem Haus.", "text":"»Danke. Eine Tür braucht gerade Angeln; ein Versprechen braucht jemanden, der es hält. Geh zu Cassia auf den Markt und frage nach unserer Bestellung. Komm anschließend zu Mutter zurück.«", "result":"Vater nimmt den Krug. Die Familie verabredet die Besorgung auf dem Markt."},
+	{"id":"market_meeting", "chapter":"Menschen auf dem Markt", "npc":"cassia", "label":"Nach der Familienbestellung fragen", "objective":"Lerne Cassia am Markt kennen und frage nach der Bestellung deiner Familie.", "text":"»Julia hat Brot und Grütze bestellt. Das Päckchen kostet den mitgegebenen Denar. Prüfe erst, ob Name und Bestellung stimmen; dann kaufen wir es gemeinsam.«", "result":"Du hast die richtige Bestellung und ihren Preis erfragt."},
 	{"id":"market_purchase", "chapter":"Menschen auf dem Markt", "npc":"cassia", "label":"Den Haushaltsdenar gegen die Bestellung tauschen", "objective":"Kaufe bei Cassia das Familienpäckchen mit dem reservierten Haushaltsdenar.", "text":"»Hier ist das verschnürte Päckchen für eure Küche. Trag es selbst nach Hause; die Besorgung ist erst fertig, wenn es bei deiner Mutter angekommen ist.«", "result":"Der Haushaltsdenar ist bezahlt. Du trägst das Familienpäckchen tatsächlich im Auftragsinventar."},
-	{"id":"deliver_food", "chapter":"Menschen auf dem Markt", "npc":"antonia", "label":"Mutter die Bestellung übergeben", "objective":"Kehre mit dem Familienpäckchen zu Antonia zurück.", "text":"»Du hast zugehört und die richtige Bestellung gebracht. Dein Vater hat noch eine Frage an Fabius. Danach kannst du Quintus an der Schmiede kennenlernen.«", "result":"Die Bestellung erreicht die Küche. Antonia merkt sich, dass sie sich auf dich verlassen konnte."},
-	{"id":"woodcutter_request", "chapter":"Ein Weg für die Nachbarn", "npc":"fabius", "label":"Fabius nach dem Kleinholz für die Schmiede fragen", "objective":"Suche Fabius auf und frage nach dem vorbereiteten Kleinholz.", "text":"»Für Quintus liegt ein kleines Bündel am Holzlager westlich des Dorfes bereit. Nur das markierte Kleinholz mitnehmen. Die schweren Stämme bleiben liegen.«", "result":"Fabius beschreibt dir den Lagerplatz. Jetzt weißt du, welches Bündel abgeholt werden darf."},
-	{"id":"collect_kindling", "chapter":"Ein Weg für die Nachbarn", "point":"wood_bundle", "label":"Das bereitgelegte Kleinholzbündel aufnehmen", "objective":"Gehe zum westlichen Holzlager und hole das kleine Bündel für Quintus.", "text":"", "result":"Du nimmst das vorbereitete Bündel auf. Es muss noch zur Schmiede auf der anderen Dorfseite."},
-	{"id":"deliver_kindling", "chapter":"Ein Weg für die Nachbarn", "npc":"quintus", "label":"Quintus das Kleinholz bringen", "objective":"Lerne Quintus an der Schmiede kennen und bring ihm Fabius’ Bündel.", "text":"»Du hast den Weg selbst gemacht und das richtige Holz gebracht. Beim Schmieden zählt dieselbe Sorgfalt. Wenn du einen Probemorgen versuchen möchtest, rede vorher mit deinem Vater.«", "result":"Quintus nimmt das Bündel an. Er bietet einen begleiteten Probemorgen an, keine fertige Berufsausbildung."},
-	{"id":"apprentice_permission", "chapter":"Eine erste Lehre", "npc":"sextus", "label":"Vater um Erlaubnis für den Probemorgen bitten", "objective":"Sprich zu Hause mit Sextus über Quintus’ Angebot.", "text":"»Ein Probemorgen ist in Ordnung, wenn Quintus dabeibleibt und du auf seine Anweisungen hörst. Geh heute noch zu ihm und vereinbare, was du morgen tun darfst.«", "result":"Vater stimmt dem beaufsichtigten Probemorgen zu. Du bleibst zwölf und wohnst weiter bei deiner Familie."},
-	{"id":"smith_trial", "chapter":"Eine erste Lehre", "npc":"quintus", "label":"Den begleiteten Probemorgen vereinbaren", "objective":"Bestätige bei Quintus die Erlaubnis deiner Eltern.", "text":"»Morgen zeige ich dir Blasebalg, Amboss und Kühlbottich. Heute ruhst du dich aus. Du fasst kein heißes Werkstück an, bevor ich es dir sage.«", "result":"Der Probemorgen ist verabredet. Geh nach Hause; der nächste Tag beginnt erst, wenn du dort bewusst ruhst."},
+	{"id":"deliver_food", "chapter":"Menschen auf dem Markt", "npc":"julia", "label":"Mutter die Bestellung übergeben", "objective":"Kehre mit dem Familienpäckchen zu Julia zurück.", "text":"»Du hast zugehört und die richtige Bestellung gebracht. Dein Vater hat noch eine Frage an Fabius. Danach kannst du Sextus an der Schmiede kennenlernen.«", "result":"Die Bestellung erreicht die Küche. Julia merkt sich, dass sie sich auf dich verlassen konnte."},
+	{"id":"woodcutter_request", "chapter":"Ein Weg für die Nachbarn", "npc":"fabius", "label":"Fabius nach dem Kleinholz für die Schmiede fragen", "objective":"Suche Fabius auf und frage nach dem vorbereiteten Kleinholz.", "text":"»Für Sextus liegt ein kleines Bündel am Holzlager westlich des Dorfes bereit. Nur das markierte Kleinholz mitnehmen. Die schweren Stämme bleiben liegen.«", "result":"Fabius beschreibt dir den Lagerplatz. Jetzt weißt du, welches Bündel abgeholt werden darf."},
+	{"id":"collect_kindling", "chapter":"Ein Weg für die Nachbarn", "point":"wood_bundle", "label":"Das bereitgelegte Kleinholzbündel aufnehmen", "objective":"Gehe zum westlichen Holzlager und hole das kleine Bündel für Sextus.", "text":"", "result":"Du nimmst das vorbereitete Bündel auf. Es muss noch zur Schmiede auf der anderen Dorfseite."},
+	{"id":"deliver_kindling", "chapter":"Ein Weg für die Nachbarn", "npc":"sextus", "label":"Sextus das Kleinholz bringen", "objective":"Lerne Sextus an der Schmiede kennen und bring ihm Fabius’ Bündel.", "text":"»Du hast den Weg selbst gemacht und das richtige Holz gebracht. Beim Schmieden zählt dieselbe Sorgfalt. Wenn du einen Probemorgen versuchen möchtest, rede vorher mit deinem Vater.«", "result":"Sextus nimmt das Bündel an. Er bietet einen begleiteten Probemorgen an, keine fertige Berufsausbildung."},
+	{"id":"apprentice_permission", "chapter":"Eine erste Lehre", "npc":"silvanus", "label":"Vater um Erlaubnis für den Probemorgen bitten", "objective":"Sprich zu Hause mit Silvanus über Sextus’ Angebot.", "text":"»Ein Probemorgen ist in Ordnung, wenn Sextus dabeibleibt und du auf seine Anweisungen hörst. Geh heute noch zu ihm und vereinbare, was du morgen tun darfst.«", "result":"Vater stimmt dem beaufsichtigten Probemorgen zu. Du bleibst zwölf und wohnst weiter bei deiner Familie."},
+	{"id":"smith_trial", "chapter":"Eine erste Lehre", "npc":"sextus", "label":"Den begleiteten Probemorgen vereinbaren", "objective":"Bestätige bei Sextus die Erlaubnis deiner Eltern.", "text":"»Morgen zeige ich dir Blasebalg, Amboss und Kühlbottich. Heute ruhst du dich aus. Du fasst kein heißes Werkstück an, bevor ich es dir sage.«", "result":"Der Probemorgen ist verabredet. Geh nach Hause; der nächste Tag beginnt erst, wenn du dort bewusst ruhst."},
 	{"id":"rest_first", "chapter":"Eine erste Lehre", "point":"family_rest", "label":"Zu Hause essen und bis zum nächsten Morgen ruhen", "objective":"Kehre in euer Familienhaus zurück und beende den ersten Tag bewusst.", "text":"", "result":"Nach Essen und Schlaf beginnt der zweite erzählte Dorftag. Dein Alter bleibt zwölf.", "rest":true},
-	{"id":"forge_bellows", "chapter":"Arbeit unter Anleitung", "point":"bellows", "label":"Den Blasebalg unter Quintus’ Anleitung bedienen", "objective":"Gehe zum Blasebalg der Schmiede und beginne die angeleitete Arbeit.", "text":"", "result":"Die erste angeleitete Arbeitsfolge ist beendet. Quintus legt ein vorbereitetes Werkstück auf den Amboss.", "seconds":8.0},
-	{"id":"forge_anvil", "chapter":"Arbeit unter Anleitung", "point":"anvil", "label":"Das vorbereitete Scharnier am Amboss richten", "objective":"Wechsle zum Amboss und richte das vorbereitete Scharnier mit Quintus.", "text":"", "result":"Du hast am richtigen Arbeitsplatz mitgearbeitet. Das Scharnier muss noch am Kühlbottich geprüft werden.", "seconds":10.0},
-	{"id":"forge_quench", "chapter":"Arbeit unter Anleitung", "point":"quench", "label":"Das Werkstück mit Quintus kühlen und prüfen", "objective":"Gehe zum Kühlbottich und schließe die begleitete Arbeitsfolge ab.", "text":"", "result":"Quintus prüft das fertige Scharnier und gibt es dir für Cassias Markttruhe mit.", "seconds":4.0},
+	{"id":"forge_bellows", "chapter":"Arbeit unter Anleitung", "point":"bellows", "label":"Den Blasebalg unter Sextus’ Anleitung bedienen", "objective":"Gehe zum Blasebalg der Schmiede und beginne die angeleitete Arbeit.", "text":"", "result":"Die erste angeleitete Arbeitsfolge ist beendet. Sextus legt ein vorbereitetes Werkstück auf den Amboss.", "seconds":8.0},
+	{"id":"forge_anvil", "chapter":"Arbeit unter Anleitung", "point":"anvil", "label":"Das vorbereitete Scharnier am Amboss richten", "objective":"Wechsle zum Amboss und richte das vorbereitete Scharnier mit Sextus.", "text":"", "result":"Du hast am richtigen Arbeitsplatz mitgearbeitet. Das Scharnier muss noch am Kühlbottich geprüft werden.", "seconds":10.0},
+	{"id":"forge_quench", "chapter":"Arbeit unter Anleitung", "point":"quench", "label":"Das Werkstück mit Sextus kühlen und prüfen", "objective":"Gehe zum Kühlbottich und schließe die begleitete Arbeitsfolge ab.", "text":"", "result":"Sextus prüft das fertige Scharnier und gibt es dir für Cassias Markttruhe mit.", "seconds":4.0},
 	{"id":"deliver_hinge", "chapter":"Eine ehrliche Lieferung", "npc":"cassia", "label":"Cassia das reparierte Scharnier übergeben", "objective":"Trage das geprüfte Scharnier von der Schmiede zu Cassias Marktstand.", "text":"»Das ist das Stück für meine Truhe. Du hast nicht nur davon erzählt, du hast es hergebracht. Zwei Denare sind dein vereinbarter Botenlohn. Hilfst du mir auch bei der Abrechnung einer kleinen Nachbarschaftsbestellung?«", "result":"Die Truhe erhält ihr Scharnier. Du verdienst einmalig zwei Denare für die tatsächliche Lieferung."},
 	{"id":"market_trade", "chapter":"Eine ehrliche Lieferung", "npc":"cassia", "label":"Die kleine Bestellung abrechnen", "objective":"Entscheide bei Cassia, wie du die Nachbarschaftsbestellung abrechnest.", "text":"»Du kannst den vereinbarten Lohn von zwei Denaren nehmen. Oder du lässt einen Denar beim Nachbarn, dessen Krug zerbrochen ist. Ich merke mir beides: einen eingehaltenen Preis und eine freiwillige Hilfe.«", "result":"Die Abrechnung bleibt als konkrete Entscheidung gespeichert."},
-	{"id":"smith_apprentice", "chapter":"Ein Platz an der Schmiede", "npc":"quintus", "label":"Die angefangene Schmiedelehre fortsetzen", "objective":"Berichte Quintus von der Lieferung und besprich die weitere Lehre.", "text":"»Du bist wiedergekommen, hast das Werkstück geliefert und Rechenschaft abgelegt. Du kannst bei mir weiterlernen. Ein paar Arbeitsfolgen machen dich noch nicht zum Meister; wir nehmen uns Zeit.«", "result":"Quintus nimmt dich als beginnenden Schmiedelehrling an. Deine praktische Arbeit und sein Vertrauen tragen diese Entscheidung."},
-	{"id":"family_report", "chapter":"Ein Platz an der Schmiede", "npc":"antonia", "label":"Zu Hause vom Probemorgen und dem Markt erzählen", "objective":"Kehre zu Antonia zurück und erzähle von deiner Arbeit.", "text":"»Du hast heute Menschen geholfen und selbst etwas verdient. Beides hat Zeit gekostet. Leg die Arbeit für heute beiseite; morgen kannst du Severus nach einer begleiteten Dorfrunde fragen.«", "result":"Die Familie hört von deinen tatsächlichen Lieferungen und der begonnenen Lehre."},
+	{"id":"smith_apprentice", "chapter":"Ein Platz an der Schmiede", "npc":"sextus", "label":"Die angefangene Schmiedelehre fortsetzen", "objective":"Berichte Sextus von der Lieferung und besprich die weitere Lehre.", "text":"»Du bist wiedergekommen, hast das Werkstück geliefert und Rechenschaft abgelegt. Du kannst bei mir weiterlernen. Ein paar Arbeitsfolgen machen dich noch nicht zum Meister; wir nehmen uns Zeit.«", "result":"Sextus nimmt dich als beginnenden Schmiedelehrling an. Deine praktische Arbeit und sein Vertrauen tragen diese Entscheidung."},
+	{"id":"family_report", "chapter":"Ein Platz an der Schmiede", "npc":"julia", "label":"Zu Hause vom Probemorgen und dem Markt erzählen", "objective":"Kehre zu Julia zurück und erzähle von deiner Arbeit.", "text":"»Du hast heute Menschen geholfen und selbst etwas verdient. Beides hat Zeit gekostet. Leg die Arbeit für heute beiseite; morgen kannst du Severus nach einer begleiteten Dorfrunde fragen.«", "result":"Die Familie hört von deinen tatsächlichen Lieferungen und der begonnenen Lehre."},
 	{"id":"rest_second", "chapter":"Ein Platz an der Schmiede", "point":"family_rest", "label":"Den zweiten Tag zu Hause beenden", "objective":"Beende den Arbeitstag im Familienhaus, wenn du bereit bist.", "text":"", "result":"Der dritte erzählte Tag beginnt. Du bist weiterhin ein zwölfjähriger Dorfbewohner.", "rest":true},
 	{"id":"patrol_brief", "chapter":"Mit der Dorfwache unterwegs", "npc":"severus", "label":"Um eine begleitete Dorfrunde bitten", "objective":"Sprich mit Severus am inneren Nordweg über eine begleitete Runde.", "text":"»Du gehst heute mit mir, nicht allein auf Wache. Wir prüfen den inneren Weg, die Wagenstraße und das Tor. Wir beobachten und melden; wir suchen keinen Kampf.«", "result":"Severus übernimmt die Aufsicht. Die drei Wegabschnitte müssen wirklich erreicht und geprüft werden."},
 	{"id":"patrol_inner", "chapter":"Mit der Dorfwache unterwegs", "point":"patrol_inner", "label":"Mit Severus den inneren Weg prüfen", "objective":"Prüfe mit Severus den inneren Nordweg.", "text":"", "result":"Der innere Weg ist geprüft. Gehe mit Severus weiter zur Wagenstraße."},
@@ -60,12 +60,12 @@ const STEPS := [
 	{"id":"rest_patrol", "chapter":"Wenn ein Nachbar ausfällt", "point":"family_rest", "label":"Nach dem Rundgang zu Hause schlafen", "objective":"Kehre ins Familienhaus zurück und beende den dritten Tag.", "text":"", "result":"Am vierten Morgen lässt Aurelia ausrichten, dass Severus krank ist. Seine Stelle im Wachroster bleibt tatsächlich unbesetzt.", "rest":true},
 	{"id":"healer_request", "chapter":"Wenn ein Nachbar ausfällt", "npc":"aurelia", "label":"Aurelia nach Severus fragen", "objective":"Suche Aurelia auf und frage nach dem erkrankten Severus.", "text":"»Er braucht Ruhe und soll heute nicht am Tor stehen. Bring ihm dieses vorbereitete Päckchen. Danach kann er mit deinen Eltern klären, ob du Valeria für einen kurzen Tagesdienst unterstützen darfst.«", "result":"Aurelia übergibt dir das vorbereitete Versorgungspäckchen für Severus."},
 	{"id":"deliver_medicine", "chapter":"Wenn ein Nachbar ausfällt", "npc":"severus", "label":"Severus Aurelias Päckchen bringen", "objective":"Bring Aurelias Päckchen zum erkrankten Severus bei ihrem Haus.", "text":"»Danke. Ich bleibe heute hier. Valeria führt die Wache; du könntest ihr nach der bekannten Runde eine kurze Nachricht überbringen. Frag erst deinen Vater. Die Leihsachen bleiben Eigentum der Wache.«", "result":"Das Versorgungspäckchen erreicht Severus. Er ist versorgt, bleibt aber für diesen Dienst aus dem Arbeitsroster genommen."},
-	{"id":"watch_permission", "chapter":"Ein begrenzter Tagesdienst", "npc":"sextus", "label":"Vater um Erlaubnis für die Aushilfe bitten", "objective":"Besprich den begrenzten Tagesdienst zu Hause mit Sextus.", "text":"»Du kennst den Weg und Valeria bleibt verantwortlich. Eine kurze Aushilfe am inneren Tor ist erlaubt. Du gehst nicht auf einen Feldzug und kommst mit den Leihsachen zu Severus zurück.«", "result":"Vater erlaubt eine begrenzte Aushilfe unter Valerias Verantwortung. Dein Lebensalter und deine zivile Rolle ändern sich nicht."},
+	{"id":"watch_permission", "chapter":"Ein begrenzter Tagesdienst", "npc":"silvanus", "label":"Vater um Erlaubnis für die Aushilfe bitten", "objective":"Besprich den begrenzten Tagesdienst zu Hause mit Silvanus.", "text":"»Du kennst den Weg und Valeria bleibt verantwortlich. Eine kurze Aushilfe am inneren Tor ist erlaubt. Du gehst nicht auf einen Feldzug und kommst mit den Leihsachen zu Severus zurück.«", "result":"Vater erlaubt eine begrenzte Aushilfe unter Valerias Verantwortung. Dein Lebensalter und deine zivile Rolle ändern sich nicht."},
 	{"id":"borrow_gear", "chapter":"Ein begrenzter Tagesdienst", "npc":"severus", "label":"Die Leihsachen für den Tagesdienst entgegennehmen", "objective":"Hole bei Severus den geliehenen Helm und hölzernen Schild ab.", "text":"»Helm und kleiner Holzschild gehören der Wache. Prüfe den Weg, bleib bei Valerias Abschnitt und melde Cassia, dass ihr Wagen passieren kann. Danach bringst du alles zurück.«", "result":"Du erhältst begrenzte Leihgegenstände für diesen Auftrag. Sie werden nicht zu dauerhaftem Eigentum."},
 	{"id":"watch_post", "chapter":"Ein begrenzter Tagesdienst", "point":"patrol_gate", "label":"Valeria am bekannten Torabschnitt unterstützen", "objective":"Gehe zum Nordtor und übernimm den besprochenen kurzen Tagesdienst.", "text":"", "result":"Der bekannte Torabschnitt ist geprüft. Du erhältst die Durchlassnachricht für Cassias Wagen.", "seconds":12.0},
 	{"id":"watch_message", "chapter":"Ein begrenzter Tagesdienst", "npc":"cassia", "label":"Cassia die tatsächliche Durchlassnachricht bringen", "objective":"Trage die Nachricht vom Tor zu Cassia auf den Markt.", "text":"»Gut, dann schicke ich den Wagen über den geprüften Weg. Geh jetzt zu Severus und gib die Leihsachen ab. Ein Dienst endet mit einer ordentlichen Übergabe.«", "result":"Cassia erhält die Nachricht vom tatsächlich geprüften Tor. Der Dienst muss noch an Severus übergeben werden."},
 	{"id":"return_gear", "chapter":"Ein begrenzter Tagesdienst", "npc":"severus", "label":"Den Dienst übergeben und alle Leihsachen zurückgeben", "objective":"Kehre zu Severus zurück, berichte und gib Helm und Holzschild ab.", "text":"»Du hast die Nachricht gebracht und die Sachen vollständig zurückgegeben. Zwei Denare sind dein Botenlohn. Ich erhole mich und übernehme meine bisherige Stelle wieder, sobald sie frei ist. Geh nach Hause.«", "result":"Der Dienst ist übergeben, die Leihsachen sind zurück und zwei Denare sind bezahlt. Du bist weiter zwölf, kein angeworbener Soldat."},
-	{"id":"family_evening", "chapter":"Ein Abend im vertrauten Dorf", "npc":"antonia", "label":"Den Abend mit der Familie verbringen", "objective":"Erzähle Antonia zu Hause von deinem Tag.", "text":"»Du kennst inzwischen den Markt, die Werkstätten und den Weg zum Tor. Morgen ist wieder Zeit für deine Lehre. Für heute essen wir zusammen und machen die Tür zu.«", "result":"Du verbringst den Abend bei deiner Familie. Die offenen Aufgaben dieses Tages sind wirklich erledigt."},
+	{"id":"family_evening", "chapter":"Ein Abend im vertrauten Dorf", "npc":"julia", "label":"Den Abend mit der Familie verbringen", "objective":"Erzähle Julia zu Hause von deinem Tag.", "text":"»Du kennst inzwischen den Markt, die Werkstätten und den Weg zum Tor. Morgen ist wieder Zeit für deine Lehre. Für heute essen wir zusammen und machen die Tür zu.«", "result":"Du verbringst den Abend bei deiner Familie. Die offenen Aufgaben dieses Tages sind wirklich erledigt."},
 	{"id":"night_rest", "chapter":"Ein Abend im vertrauten Dorf", "point":"family_rest", "label":"Im Familienhaus schlafen gehen", "objective":"Gehe ins Familienhaus und lege dich schlafen, wenn du den Tag beenden möchtest.", "text":"", "result":"Du legst dich im vertrauten Familienhaus schlafen. Das Dorf wird still."}
 ]
 const CARRIED_EFFECTS := {
@@ -87,7 +87,7 @@ static func start(data: Dictionary) -> bool:
 		return false
 	var relationships := {}
 	for id: String in EXTRA_NPCS:
-		var parent := id in ["antonia", "sextus"]
+		var parent := id in ["julia", "silvanus"]
 		relationships[id] = {"met":parent,"trust":4 if parent else 0,"helped":false,"declined":false,"learned":false,"ally":false}
 		var person := _person(data, id)
 		if not person.is_empty():
@@ -101,6 +101,48 @@ static func start(data: Dictionary) -> bool:
 
 static func enabled(data: Dictionary) -> bool:
 	return typeof(data.get("village")) == TYPE_DICTIONARY and data.village.has("childhood")
+
+
+static func migrate_legacy_ids(data: Dictionary) -> bool:
+	# The first playable childhood build used Antonia/Sextus/Quintus for
+	# mother/father/smith. The production screenplay fixes those roles as
+	# Julia/Silvanus/Sextus. Preserve completed steps, trust and inventory while
+	# moving only the actor identity keys.
+	if not enabled(data):
+		return false
+	var child: Variant = data.village.childhood
+	if typeof(child) != TYPE_DICTIONARY or int(child.get("version", 0)) != 1:
+		return false
+	var old_relationships: Variant = child.get("relationships", {})
+	if typeof(old_relationships) != TYPE_DICTIONARY:
+		return false
+	for legacy_id: String in LEGACY_RELATION_IDS:
+		if not old_relationships.has(legacy_id):
+			return false
+	var relationships := {}
+	for legacy_id: String in LEGACY_RELATION_IDS:
+		var canonical_id: String = LEGACY_RELATION_IDS[legacy_id]
+		relationships[canonical_id] = (old_relationships[legacy_id] as Dictionary).duplicate(true)
+	child.relationships = relationships
+	child.version = VERSION
+
+	# Restore generic villagers that no longer carry a family/story role.
+	var antonia := _person(data, "antonia")
+	if not antonia.is_empty():
+		antonia.profession = "Töpferin"
+	var quintus := _person(data, "quintus")
+	if not quintus.is_empty():
+		quintus.profession = "Steinbrecher"
+
+	# Canonical actors inherit the authored presentation roles and stay at the
+	# family/smith locations during the childhood chapter.
+	for id: String in EXTRA_NPCS:
+		var person := _person(data, id)
+		if not person.is_empty():
+			person.profession = EXTRA_NPCS[id].role
+			person.assignment = "idle"
+			person.previous_assignment = "idle"
+	return true
 
 
 static func has_npc(data: Dictionary, id: String) -> bool:
@@ -213,8 +255,8 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 			return _ok("Die angeleitete Arbeit beginnt. Nur deine tatsächliche Anwesenheit an dieser Station zählt.")
 		if child.active_work != id or float(child.work_seconds) + 0.000001 < float(step.seconds):
 			return _fail("Diese Arbeitsfolge ist noch nicht fertig. Beginne sie vor Ort und bleibe an der Station.")
-	if id == "smith_apprentice" and int(_relation(data, "quintus").trust) < 8:
-		return _fail("Quintus braucht Vertrauen aus eurer tatsächlich erledigten Arbeit.")
+	if id == "smith_apprentice" and int(_relation(data, "sextus").trust) < 8:
+		return _fail("Sextus braucht Vertrauen aus eurer tatsächlich erledigten Arbeit.")
 	if id == "rest_patrol":
 		var guard := _person(data, "severus")
 		if guard.is_empty() or not guard.alive or data.village.get("militia", []).has("severus") or guard.assignment == "defense":
@@ -246,17 +288,17 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	if step.has("npc"):
 		_gain_trust(data, step.npc, 2)
 	if id in ["forge_bellows", "forge_anvil", "forge_quench"]:
-		_gain_trust(data, "quintus", 1)
+		_gain_trust(data, "sextus", 1)
 	if action == "market_neighbor":
-		_gain_trust(data, "antonia", 2)
+		_gain_trust(data, "julia", 2)
 	if id == "deliver_kindling":
-		_relation(data, "quintus").helped = true
+		_relation(data, "sextus").helped = true
 	if id == "smith_trial":
 		child.apprenticeship = "trial"
 	if id == "smith_apprentice":
 		child.apprenticeship = "apprentice"
 		data.village.social.profession = "smith"
-		_relation(data, "quintus").learned = true
+		_relation(data, "sextus").learned = true
 	if id == "borrow_gear":
 		child.gear = "loaned"
 	if id == "deliver_medicine":
@@ -279,7 +321,7 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	if action == "market_fair":
 		message = "Der vereinbarte Preis gilt. Du erhältst einmalig zwei Denare; Cassia merkt sich deine verlässliche Abrechnung."
 	elif action == "market_neighbor":
-		message = "Du nimmst einen Denar und lässt einen dem Nachbarn. Antonia hört von deiner freiwilligen Hilfe."
+		message = "Du nimmst einen Denar und lässt einen dem Nachbarn. Julia hört von deiner freiwilligen Hilfe."
 	_record(data, action, message)
 	return _ok(message)
 
@@ -424,12 +466,12 @@ static func validate(data: Dictionary) -> String:
 				return "Beziehungsmerkmale benötigen Wahrheitswerte."
 		if (relation.helped or relation.learned or relation.ally or relation.declined) and not relation.met or relation.helped and relation.declined:
 			return "Widersprüchliche Kindheitsbeziehung."
-		if id in ["antonia","sextus"] and not relation.met:
+		if id in ["julia","silvanus"] and not relation.met:
 			return "Die eigene Familie darf nicht nachträglich unbekannt sein."
 		if _person(data,id).is_empty():
 			return "Eine Familien- oder Lehrperson fehlt im gemeinsamen Einwohnerroster."
 	if child.relationships.quintus.helped != child.completed.has("deliver_kindling") or child.relationships.quintus.learned != (expected_apprenticeship == "apprentice"):
-		return "Quintus’ Hilfe und Lehre müssen durch die gemeinsame Auftragsfolge belegt sein."
+		return "Sextus’ Hilfe und Lehre müssen durch die gemeinsame Auftragsfolge belegt sein."
 	var current := _current(data)
 	var limit := float(current.get("seconds", 0.0))
 	if typeof(child.active_work) != TYPE_STRING or not _number(child.work_seconds,0.0,limit):
@@ -487,8 +529,8 @@ static func _action_reason(data: Dictionary, step: Dictionary) -> String:
 			return "Lerne diese Person zuerst im Gespräch kennen."
 	if _distance(data, _target(data, step)) > (NPC_RANGE if step.has("npc") else POINT_RANGE):
 		return "Gehe selbst zum angegebenen Menschen oder Arbeitsplatz."
-	if step.has("seconds") and step.id.begins_with("forge_") and not _available(data,"quintus"):
-		return "Die heiße Arbeit findet nur unter Quintus’ Aufsicht statt."
+	if step.has("seconds") and step.id.begins_with("forge_") and not _available(data,"sextus"):
+		return "Die heiße Arbeit findet nur unter Sextus’ Aufsicht statt."
 	return ""
 
 
@@ -553,9 +595,9 @@ static func _restore_guard(data: Dictionary) -> void:
 static func _idle_text(id: String) -> String:
 	if NEIGHBORS.has(id):
 		return NEIGHBORS[id].text
-	return {"antonia":"»Hier ist dein Zuhause. Erzähle mir, was du heute vorhast, und komm mit deinen Fragen wieder.«",
-		"sextus":"»Du musst noch kein Soldat und kein Verwalter sein. Lerne die Menschen kennen und führe deine Zusagen selbst zu Ende.«",
-		"quintus":"»Eine Schmiede ist ein Arbeitsplatz, keine Abkürzung zum Heldentum. Erst zuhören, dann gemeinsam üben und die Arbeit ordentlich übergeben.«"}.get(id, "")
+	return {"julia":"»Hier ist dein Zuhause. Erzähle mir, was du heute vorhast, und komm mit deinen Fragen wieder.«",
+		"silvanus":"»Du musst noch kein Soldat und kein Verwalter sein. Lerne die Menschen kennen und führe deine Zusagen selbst zu Ende.«",
+		"sextus":"»Eine Schmiede ist ein Arbeitsplatz, keine Abkürzung zum Heldentum. Erst zuhören, dann gemeinsam üben und die Arbeit ordentlich übergeben.«"}.get(id, "")
 
 
 static func _record(data: Dictionary, id: String, message: String) -> void:
