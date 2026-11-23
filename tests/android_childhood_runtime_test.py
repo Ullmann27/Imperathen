@@ -48,8 +48,18 @@ class SyntheticTouchFlow:
         self.checks = []
         self.captures = []
         self.waits = []
+        self.motion_failures = set()
+        self.motion_timeouts = []
+        self.snapshot_requests = []
+        self.inputs_at_observation = []
+        self.clock = lambda: 0.0
+        self.movement_read_error = None
 
     def read_snapshot(self, screen, **kwargs):
+        self.snapshot_requests.append(dict(kwargs))
+        self.inputs_at_observation.append([item[0] for item in self.inputs])
+        if len(self.observed) == 1 and self.movement_read_error is not None:
+            raise self.movement_read_error
         state = copy.deepcopy(self.states[len(self.observed)])
         if state["screen"] != screen or (kwargs.get("predicate") and not kwargs["predicate"](state)):
             raise RuntimeError("No matching village runtime state")
@@ -70,6 +80,12 @@ class SyntheticTouchFlow:
             raise RuntimeError("The actual village control is disabled")
         return control
 
+    def motion_event(self, action, point, *, timeout):
+        self.inputs.append((action,list(point)))
+        self.motion_timeouts.append(timeout)
+        if action in self.motion_failures:
+            raise RuntimeError("Synthetic native " + action + " failure")
+
     def record(self, name, passed, detail):
         self.checks.append({"name":name, "passed":passed, "detail":detail})
         if not passed:
@@ -79,9 +95,9 @@ class SyntheticTouchFlow:
         return SMOKE.execute_childhood(
             read_snapshot=self.read_snapshot, read_logs=self.read_logs, read_control=self.read_control,
             tap=lambda point:self.inputs.append(("tap",list(point))),
-            swipe=lambda gesture:self.inputs.append(("swipe",gesture)),
+            motion_event=self.motion_event,
             press_back=lambda:self.inputs.append(("back",)),
-            screenshot=self.captures.append, record=self.record, wait=self.waits.append)
+            screenshot=self.captures.append, record=self.record, wait=self.waits.append, monotonic=self.clock)
 
 
 class ChildhoodRuntimeRouteTest(unittest.TestCase):
@@ -114,7 +130,9 @@ class ChildhoodRuntimeRouteTest(unittest.TestCase):
                 self.assertGreater(world_z, 0)
                 self.assertLess(math.hypot(x,z), state["controls"]["movement"]["radius"])
                 self.assertEqual(gesture["start"], [110.0,430.0])
-                self.assertLessEqual(gesture["duration_ms"], 500)
+                self.assertAlmostEqual(math.hypot(x,z), state["controls"]["movement"]["radius"] * 0.25)
+                self.assertEqual(gesture["max_hold_seconds"], 45.0)
+                self.assertEqual(gesture["input_mode"], "native_observed_hold")
 
     def test_unobserved_hidden_or_nonfinite_geometry_never_generates_input(self):
         for key, value in (("visible",False), ("enabled",False), ("radius",0),
@@ -131,13 +149,115 @@ class ChildhoodRuntimeRouteTest(unittest.TestCase):
         original = copy.deepcopy(flow.states)
         saved = flow.run()
         self.assertEqual(saved["childhood"]["objective"]["id"], "father_lunch")
-        self.assertEqual([item[0] for item in flow.inputs], ["swipe","tap","tap","back"])
-        self.assertEqual(flow.inputs[1][1], [890.0,450.0])
-        self.assertEqual(flow.inputs[2][1], [480.0,275.0])
+        self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP","tap","tap","back"])
+        self.assertEqual(flow.inputs_at_observation[1], ["DOWN","MOVE"])
+        self.assertEqual(flow.inputs_at_observation[2], ["DOWN","MOVE","UP"])
+        self.assertEqual(flow.inputs[0][1], [110.0,430.0])
+        self.assertEqual(flow.inputs[1][1], flow.inputs[2][1])
+        self.assertEqual(flow.inputs[3][1], [890.0,450.0])
+        self.assertEqual(flow.inputs[4][1], [480.0,275.0])
         self.assertEqual(flow.waits, [2])
         self.assertEqual(len(flow.captures), 2)
         self.assertTrue(all(check["passed"] for check in flow.checks))
         self.assertEqual(flow.states, original, "The read-only harness must never inject game state")
+
+
+    def test_native_boundary_uses_aosp_touchscreen_motion_syntax(self):
+        calls = []
+        def adb(*parts, **options):
+            calls.append((parts,options))
+        for action in ("DOWN","MOVE","UP","CANCEL"):
+            SMOKE.native_motion_event(adb, action, [53.4209947581,489.8221161193], timeout=7.0)
+            self.assertEqual(calls[-1], (
+                ("shell","input","touchscreen","-d","0","motionevent",action,"53.4210","489.8221"),
+                {"timeout":7.0}))
+
+    def test_native_boundary_rejects_unbounded_or_unobserved_input(self):
+        calls = []
+        def adb(*parts, **options):
+            calls.append(parts)
+        for action, point, timeout in (
+                ("PRESS",[1.0,2.0],15.0), ("DOWN",[True,2.0],15.0),
+                ("MOVE",[float("nan"),2.0],15.0), ("UP",[1.0,2.0],0),
+                ("DOWN",[1.0,2.0],16.0), ("DOWN",[1.0,2.0],float("inf"))):
+            with self.subTest(action=action,point=point,timeout=timeout), self.assertRaises(RuntimeError):
+                SMOKE.native_motion_event(adb,action,point,timeout=timeout)
+        self.assertEqual(calls, [])
+
+    def test_native_down_failure_still_releases_at_last_attempted_point(self):
+        flow = SyntheticTouchFlow()
+        flow.motion_failures.add("DOWN")
+        with self.assertRaisesRegex(RuntimeError, "Synthetic native DOWN failure"):
+            flow.run()
+        self.assertEqual([item[0] for item in flow.inputs], ["DOWN","UP"])
+        self.assertEqual(flow.inputs[0][1], flow.inputs[1][1])
+        self.assertEqual(len(flow.observed), 1)
+
+    def test_native_move_failure_still_releases_at_last_attempted_point(self):
+        flow = SyntheticTouchFlow()
+        flow.motion_failures.add("MOVE")
+        with self.assertRaisesRegex(RuntimeError, "Synthetic native MOVE failure"):
+            flow.run()
+        self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP"])
+        self.assertEqual(flow.inputs[1][1], flow.inputs[2][1])
+        self.assertEqual(len(flow.observed), 1)
+
+    def test_snapshot_or_log_failure_always_releases_held_pointer(self):
+        for failure in (TimeoutError("Synthetic observation timeout"), RuntimeError("Synthetic broken log")):
+            flow = SyntheticTouchFlow()
+            flow.movement_read_error = failure
+            with self.subTest(failure=str(failure)), self.assertRaises(type(failure)):
+                flow.run()
+            self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP"])
+
+    def test_native_release_failure_attempts_cancel_and_cannot_pass(self):
+        for failures in ({"UP"}, {"UP","CANCEL"}):
+            flow = SyntheticTouchFlow()
+            flow.motion_failures.update(failures)
+            with self.subTest(failures=failures), self.assertRaisesRegex(RuntimeError, "Synthetic native UP failure"):
+                flow.run()
+            self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP","CANCEL"])
+            self.assertFalse(any(check["name"] == "childhood_native_touch_moves_player" for check in flow.checks))
+
+    def test_input_and_observation_timeouts_share_one_hold_deadline(self):
+        flow = SyntheticTouchFlow()
+        times = iter((0.0,0.0,40.0,43.0))
+        flow.clock = lambda: next(times)
+        flow.run()
+        self.assertEqual(flow.motion_timeouts[:3], [15.0,5.0,15.0])
+        self.assertEqual(flow.snapshot_requests[1]["timeout"], 2.0)
+
+    def test_expired_hold_deadline_releases_without_observation_or_retry(self):
+        flow = SyntheticTouchFlow()
+        times = iter((0.0,0.0,16.0,46.0))
+        flow.clock = lambda: next(times)
+        with self.assertRaisesRegex(RuntimeError, "hold deadline"):
+            flow.run()
+        self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP"])
+        self.assertEqual(len(flow.observed), 1)
+
+    def test_identity_change_ends_held_touch_before_waiting_for_movement(self):
+        flow = SyntheticTouchFlow()
+        flow.states[1]["childhood"]["world_id"] = "another-world"
+        flow.states[1]["childhood"]["position"] = list(flow.states[0]["childhood"]["position"])
+        with self.assertRaisesRegex(RuntimeError, "identity changed while touch was held"):
+            flow.run()
+        self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP"])
+
+    def test_oversize_movement_releases_immediately_and_does_not_resume(self):
+        flow = SyntheticTouchFlow()
+        flow.states[1]["childhood"]["position"][2] += 2.0
+        with self.assertRaisesRegex(RuntimeError, "movement exceeds 1.6 m"):
+            flow.run()
+        self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP"])
+        self.assertEqual(len(flow.observed), 1)
+
+    def test_backward_world_clock_during_hold_is_not_movement_evidence(self):
+        flow = SyntheticTouchFlow()
+        flow.states[1]["world_seconds"] = 9.0
+        with self.assertRaisesRegex(RuntimeError, "world clock moved backwards"):
+            flow.run()
+        self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP"])
 
     def test_wrong_start_or_unreachable_mother_fails_before_touch(self):
         for wrong in ("age", "scene", "nearby"):
@@ -155,7 +275,7 @@ class ChildhoodRuntimeRouteTest(unittest.TestCase):
         flow.states[1]["childhood"]["position"] = list(flow.states[0]["childhood"]["position"])
         with self.assertRaisesRegex(RuntimeError, "No matching village runtime state"):
             flow.run()
-        self.assertEqual([item[0] for item in flow.inputs], ["swipe"])
+        self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP"])
 
     def test_teleport_sized_motion_is_rejected(self):
         flow = SyntheticTouchFlow()
@@ -169,12 +289,12 @@ class ChildhoodRuntimeRouteTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "childhood_native_touch_moves_player"):
             flow.run()
 
-    def test_released_swipe_must_stop_without_an_extra_input(self):
+    def test_released_touch_must_stop_without_an_extra_input(self):
         flow = SyntheticTouchFlow()
         flow.states[3]["childhood"]["position"][2] += 0.3
         with self.assertRaisesRegex(RuntimeError, "childhood_native_touch_stops_after_release"):
             flow.run()
-        self.assertEqual([item[0] for item in flow.inputs], ["swipe"])
+        self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP"])
 
     def test_deceleration_cannot_evade_the_original_travel_limit(self):
         flow = SyntheticTouchFlow()
@@ -205,7 +325,7 @@ class ChildhoodRuntimeRouteTest(unittest.TestCase):
             else: held["childhood"][changed] += 1
             with self.subTest(changed=changed), self.assertRaisesRegex(RuntimeError, "childhood_dialogue_freezes_world"):
                 flow.run()
-            self.assertEqual([item[0] for item in flow.inputs], ["swipe","tap"])
+            self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP","tap"])
 
     def test_choice_must_transfer_exactly_two_actual_grain(self):
         for grain in (17,16,14):
@@ -225,7 +345,7 @@ class ChildhoodRuntimeRouteTest(unittest.TestCase):
         flow.states[5]["controls"]["choice_promise"]["enabled"] = False
         with self.assertRaisesRegex(RuntimeError, "disabled"):
             flow.run()
-        self.assertEqual([item[0] for item in flow.inputs], ["swipe","tap"])
+        self.assertEqual([item[0] for item in flow.inputs], ["DOWN","MOVE","UP","tap"])
 
     def test_restart_compares_story_identity_but_allows_recorded_live_economy(self):
         flow = SyntheticTouchFlow()

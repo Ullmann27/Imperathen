@@ -83,7 +83,7 @@ def observed_childhood(snapshot):
 
 
 def childhood_touch_gesture(snapshot, world_direction=(0.0, 1.0)):
-    """A short real pad swipe, inverse-rotated from world X/Z into native pad X/Y."""
+    """A small real pad deflection, inverse-rotated into native screen coordinates."""
     child = observed_childhood(snapshot)
     controls = snapshot.get("controls")
     pad = controls.get("movement", {}) if isinstance(controls, dict) else {}
@@ -103,10 +103,24 @@ def childhood_touch_gesture(snapshot, world_direction=(0.0, 1.0)):
     # game_world rotates (pad.x, 0, pad.y) around UP by camera_yaw.
     local_x, local_z = cosine * dx - sine * dz, sine * dx + cosine * dz
     center = pad["center"]
-    radius = pad["radius"] * 0.65
+    radius = pad["radius"] * 0.25
     end = [center[0] + local_x * radius, center[1] + local_z * radius]
-    return {"start":list(center), "end":end, "duration_ms":450,
+    return {"start":list(center), "end":end, "deflection_fraction":0.25,
+            "max_hold_seconds":45.0, "input_mode":"native_observed_hold",
             "world_direction":[dx, dz], "camera_yaw":child["camera_yaw"]}
+
+
+def native_motion_event(adb, action, point, *, timeout=15.0):
+    """Use Android's native touchscreen input command; never a game input hook.
+
+    AOSP InputShellCommand.runMotionEvent accepts DOWN/MOVE/UP/CANCEL and
+    floating-point screen coordinates. Each command is independently bounded.
+    """
+    if (action not in {"DOWN", "MOVE", "UP", "CANCEL"} or not _vector(point, 2)
+            or not _finite_number(timeout) or not 0 < timeout <= 15.0):
+        raise RuntimeError("Invalid native touchscreen event")
+    return adb("shell", "input", "touchscreen", "-d", "0", "motionevent", action,
+               *(format(value, ".4f") for value in point), timeout=timeout)
 
 
 def _childhood_distance(before, after):
@@ -129,8 +143,8 @@ def childhood_dialog_is_paused(before, after):
             and _childhood_distance(before, after) <= 0.02)
 
 
-def execute_childhood(*, read_snapshot, read_logs, read_control, tap, swipe,
-                      press_back, screenshot, record, wait=time.sleep):
+def execute_childhood(*, read_snapshot, read_logs, read_control, tap, motion_event,
+                      press_back, screenshot, record, wait=time.sleep, monotonic=time.monotonic):
     """Exercise the actual first family scene through native input and read-only logs.
 
     Injected callbacks permit synthetic harness regressions. Only a real invocation
@@ -145,9 +159,44 @@ def execute_childhood(*, read_snapshot, read_logs, read_control, tap, swipe,
            and initial.get("player_is_ruler") is False, initial)
     gesture = childhood_touch_gesture(initial)
     previous = village_runtime_cursor(read_logs())
-    swipe(gesture)
-    moved = read_snapshot("playing", after=previous,
-                          predicate=lambda state: _childhood_distance(initial, state) >= 0.05)
+
+    def moved_enough(state):
+        if _childhood_identity(initial) != _childhood_identity(state):
+            raise RuntimeError("childhood_native_touch_moves_player: identity changed while touch was held")
+        if state["world_seconds"] < initial["world_seconds"]:
+            raise RuntimeError("childhood_native_touch_moves_player: world clock moved backwards")
+        distance = _childhood_distance(initial, state)
+        if distance > 1.6:
+            raise RuntimeError("childhood_native_touch_moves_player: movement exceeds 1.6 m")
+        return distance >= 0.05
+
+    # A short swipe can be consumed entirely between slow emulator physics
+    # frames. Keep a small real native deflection until movement is observed.
+    # Start cleanup BEFORE DOWN: a timed-out ADB call may already have injected it.
+    point = gesture["start"]
+    deadline = monotonic() + gesture["max_hold_seconds"]
+
+    def remaining_hold():
+        remaining = deadline - monotonic()
+        if remaining <= 0:
+            raise RuntimeError("Native childhood touch exceeded its hold deadline")
+        return remaining
+
+    try:
+        motion_event("DOWN", point, timeout=min(15.0, remaining_hold()))
+        point = gesture["end"]
+        motion_event("MOVE", point, timeout=min(15.0, remaining_hold()))
+        moved = read_snapshot("playing", after=previous, timeout=remaining_hold(), predicate=moved_enough)
+    finally:
+        try:
+            motion_event("UP", point, timeout=15.0)
+        except Exception:
+            # Release failure is never a PASS. CANCEL is only best-effort cleanup.
+            try:
+                motion_event("CANCEL", point, timeout=15.0)
+            except Exception:
+                pass
+            raise
     moved_child = observed_childhood(moved)
     distance = _childhood_distance(initial, moved)
     displacement = [moved_child["position"][index] - child["position"][index] for index in (0,2)]
@@ -158,8 +207,8 @@ def execute_childhood(*, read_snapshot, read_logs, read_control, tap, swipe,
            and moved["world_seconds"] > initial["world_seconds"],
            {"gesture":gesture, "distance_metres":distance, "intended_direction_metres":along, "before":child["position"],
             "after":moved_child["position"]})
-    # A completed ADB swipe does not prove that a slow rendered frame has
-    # consumed its release. Observe bounded deceleration, then a separate quiet
+    # Native UP can still be queued behind a slow rendered frame.
+    # Observe bounded deceleration, then a separate quiet
     # interval with no further input. The original travel limit remains binding.
     previous = village_runtime_cursor(read_logs())
     settled = read_snapshot("playing", after=previous,
@@ -328,7 +377,7 @@ def wait_for_village_snapshot(read_logs, screen=None, *, predicate=None,
                     and (required_control is None or required_control in latest.get("controls", {}))
                     and (predicate is None or predicate(latest))):
                 return latest
-        time.sleep(1)
+        time.sleep(min(1.0, max(0.0, deadline - time.monotonic())))
     if latest_frame is not None and latest is None:
         observed = {"incomplete_frame": [latest_frame["stream"], latest_frame["sequence"]]}
     else:
@@ -503,11 +552,11 @@ def main():
         if not passed:
             raise RuntimeError(name + ": " + str(detail))
 
-    def logs():
-        return adb("logcat", "-d", "--pid", report["pid"], timeout=20)
+    def logs(timeout=20):
+        return adb("logcat", "-d", "--pid", report["pid"], timeout=timeout)
 
-    def checked_logs():
-        text = logs()
+    def checked_logs(timeout=20):
+        text = logs(timeout=timeout)
         errors = runtime_error_lines(text)
         if errors:
             record("no_runtime_errors", False, errors)
@@ -653,7 +702,15 @@ def main():
         record("objective_hands_over_control", True, "Actual touch accepted the objective after a separate skip action")
 
     def village_snapshot(screen=None, *, predicate=None, required_control=None, after=-1, timeout=100):
-        return wait_for_village_snapshot(checked_logs, screen, predicate=predicate,
+        deadline = time.monotonic() + timeout
+
+        def bounded_logs():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise RuntimeError("Village runtime snapshot observation timed out")
+            return checked_logs(timeout=min(20.0, remaining))
+
+        return wait_for_village_snapshot(bounded_logs, screen, predicate=predicate,
                                          required_control=required_control, after=after, timeout=timeout)
 
     def village_control(name, screen, *, after=-1):
@@ -819,9 +876,7 @@ def main():
         if runtime_profile == "childhood":
             childhood_saved = execute_childhood(
                 read_snapshot=village_snapshot, read_logs=checked_logs, read_control=village_control,
-                tap=tap, swipe=lambda gesture: adb("shell", "input", "swipe",
-                    *(str(round(value)) for value in (*gesture["start"], *gesture["end"])),
-                    str(gesture["duration_ms"])),
+                tap=tap, motion_event=lambda action, point, **options: native_motion_event(adb, action, point, **options),
                 press_back=lambda: adb("shell", "input", "keyevent", "4"),
                 screenshot=screenshot, record=record)
         elif runtime_profile == "village_life":

@@ -123,15 +123,41 @@ späteren Übung bedeutet er Abstand und Kontrolle. Nach dem Überfall bedeutet
 er, zuerst Hinweise zu prüfen, bevor der Racheschwur irgendeinen Verdächtigen
 zum Feind erklärt.
 
-### 6. Eine erste Übung
+### 6. Drei Besuche, unterschiedliche Lektionen
 
-Sextus leiht ein ausdrücklich erfasstes Übungsgerät. Der Spieler erhält kein
-unsichtbares Schwert und keine automatisch angenommene Militärstellung.
-Erst wird der Stand korrigiert, danach folgt eine kurze kontrollierte Übung.
-Die tatsächlichen Bewegungen, Trefferfenster und Ausrüstungseffekte kommen
-aus Chat A. Der Erzählzustand hält fest, welche Übung angeboten, absolviert
-oder vertagt wurde und ob ein Gerät zurückgegeben oder weiterhin ausgeliehen
-ist.
+Die drei persönlichen Schmiedebesuche bauen aufeinander auf. Im vorhandenen
+Bogen arbeitet der Junge zuerst an Werkzeuggriffen. Beim zweiten Besuch kann
+er Sextus' alten Übungsstock ausleihen; im Gespräch erklärt Sextus Stand,
+Abstand und die unterschiedlichen Anforderungen von Schwert, Schild und Speer.
+Beim dritten Besuch sprechen beide über Verantwortung. Ein ausgeliehener
+Stock kann zurückgegeben oder mit verdientem Geld gekauft werden. Diese
+Gespräche vergeben weder Schwert, Schild oder Speer noch eine beherrschte
+Kampftechnik.
+
+Für den **weiteren dramaturgischen Ausbau** erhält jeder Besuch einen eigenen
+Schwerpunkt. Die folgenden Übungen sind geplante Szenen; ihre tatsächlichen
+Bewegungen, Trefferfenster und Ausrüstungseffekte müssen mit Chat A umgesetzt
+und geprüft werden.
+
+| Besuch | Beziehung und Aufgabe | Stufe der geplanten Waffenlektionen |
+| --- | --- | --- |
+| Erster Besuch: Hände und Werkzeug | Sextus nimmt Silvanus' Sohn ernst. Ein lockerer Griff lässt sich durch genaues Hinsehen erkennen; ein Fehler darf eingestanden werden. | Verschiedene Griffe, Gewichte und Reichweiten an der Werkbank vergleichen. Erst sicher halten, ablegen und den Raum um sich prüfen. |
+| Zweiter Besuch: Zeit füreinander | Sextus erzählt von Übungen mit Silvanus und leiht den alten Stock. Der Junge kann Fragen stellen, eine Übung versuchen oder für heute aufhören. | Einzelne, beaufsichtigte Aufgaben mit jeweils einem geeigneten Übungsgerät. Sextus erklärt einen Fehler und lässt einen zweiten Versuch zu. |
+| Dritter Besuch: Menschen neben mir | Silvanus kommt hinzu. Vater und Freund sprechen über Mut und Vorsicht; der Junge zeigt, was er verstanden hat. | Abstand, Deckung und Rückzug in einer kurzen gemeinsamen Aufgabe verbinden. Geschützt wird ein Begleiter; ein Gegner muss dafür nicht besiegt werden. |
+
+Die Waffen unterscheiden sich in der Aufgabe, die Sextus dem Jungen stellt:
+
+| Waffe | Erste Lektion | Zweite Lektion | Späterer Rückbezug |
+| --- | --- | --- | --- |
+| Schwert | Am Übungsgerät Griff und Gleichgewicht prüfen; Sextus lässt den Jungen eine bequeme, ruhige Haltung finden. | Eine kontrollierte Bewegung auf ein Übungsziel ausführen und wieder sicher stehen. Sextus unterbricht, wenn der Junge die Kontrolle verliert. | Im dritten Besuch rechtzeitig anhalten, wenn der Begleiter den Weg kreuzt. Sextus lobt Aufmerksamkeit und Beherrschung. |
+| Schild | Das Gewicht kennenlernen und einen Stand finden, aus dem der Junge noch nach vorn und zur Seite sehen kann. | Auf ein deutlich angekündigtes, langsames Übungssignal reagieren und mit dem Partner Abstand halten. Die Aufgabe endet mit einem sicheren Rückzug. | Bei der gemeinsamen Aufgabe Raum für einen anderen Menschen lassen und den eigenen Fluchtweg offenhalten. |
+| Speer | Den langen Schaft unter Aufsicht tragen und den freien Raum vor, neben und hinter sich beachten. | Die Reichweite an einem unbewegten Übungsziel einschätzen, eine kontrollierte Bewegung versuchen und das Gerät wieder sicher führen. | An einer engen Passage selbst erkennen, wann der Platz für diese Übung fehlt, und Sextus um eine andere Aufgabe bitten. |
+
+Eine zusätzliche Waffe wird erst dann wirklich ausgegeben, wenn ihr Gegenstand
+und ihre Bedienung im Spiel vorhanden sind. Der Erzählzustand darf eine
+besprochene Lektion nicht als bewältigte Übung verbuchen. Eine vertagte Übung
+bleibt eine persönliche Verabredung; sie löst keinen zusätzlichen Pflichtbesuch
+und keinen automatischen Zeit- oder Alterssprung aus.
 
 Der Abend endet zu Hause. Silvanus fragt nicht nach einer Punktzahl, sondern
 danach, was der Sohn getan hat, als etwas nicht gelang. Julia erinnert an den
@@ -291,16 +317,29 @@ Questmarkers über einem verschwundenen Menschen.
 Der Junge nimmt den zuvor kennengelernten Gegenstand mit. Die Szene lässt
 einen stillen Moment zu und wartet auf eine ausdrückliche Fortsetzung.
 
-Möglicher eigener Schwur:
+Im vorhandenen Dialog mit Marcus spricht der Junge den Racheschwur selbst aus:
 
-> „Ich weiß noch nicht, wer euch das angetan hat. Aber ich werde es
-> herausfinden. Ich werde lernen. Und ich werde euch nicht vergessen.“
+> „Ich werde euch rächen. Ich finde die Verantwortlichen.“
 
-Der Schwur eröffnet Ziele: Spuren sichern, Zeugen finden, weiterlernen,
-Überlebende unterstützen und den Auftraggeber erkennen. Er befördert den
-Jungen nicht augenblicklich zum Krieger. Verdächtige sind nicht allein wegen
-ihrer Herkunft schuldig. Die spätere offene Welt kann den Weg durch Handel,
-Verbündete, Ermittlungen, Ausbildung und tatsächliche Konflikte verändern.
+Der Schwur gilt Silvanus und Sextus. Er macht die Vergeltung zum persönlichen
+Grund des Aufbruchs. Im Handlungszweig, in dem auch Julia stirbt, trägt der
+Junge zusätzlich ihren Verlust mit sich. Der Schwur darf in späteren Szenen
+weder zu einer bloßen Suche nach Auskunft abgeschwächt noch als bereits
+vollzogene Rache erzählt werden.
+
+Für die weitere Inszenierung bleibt nach dem Schwur Raum für Stille. Marcus
+kann fragen, ob der Junge schon weiß, wohin er gehen will. Wenn Julia lebt,
+kann sie später auf den Entschluss reagieren und fürchten, auch ihren Sohn
+zu verlieren. Das sind geplante Fortsetzungen; sie gehören nicht als
+behauptete zusätzliche Szenen zum vorhandenen Dialog.
+
+Der nächste Weg erhält konkrete Ziele: Spuren sichern, Zeugen finden,
+weiterlernen, Überlebende unterstützen und die für den Überfall
+Verantwortlichen ermitteln, um sie für den Tod von Vater und Mentor zur
+Rechenschaft zu ziehen. Der Junge wird durch diesen Entschluss nicht
+augenblicklich zum Krieger. Verdächtige sind nicht allein wegen ihrer Herkunft
+schuldig. Die spätere offene Welt kann den Racheweg durch Handel, Verbündete,
+Ermittlungen, Ausbildung und tatsächliche Konflikte verändern.
 
 ## Umsetzungskriterien für jede Erweiterung
 

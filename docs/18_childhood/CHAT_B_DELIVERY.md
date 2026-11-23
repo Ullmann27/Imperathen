@@ -162,7 +162,7 @@ der Integrationsfälle verwenden ausdrücklich gesetzte Testpositionen; die
 separaten Haustür- und Eskortentests prüfen tatsächliche Bewegung und Kollision.
 Diese Unterscheidung steht auch in den jeweiligen Testquellen.
 
-Der zusammengeführte Gesamtlauf ist unter
+Der lokale zusammengeführte Gesamtlauf zum Quellstand `9d90a8fe` ist unter
 [evidence/merged-validation/validation_report.json](evidence/merged-validation/validation_report.json)
 einschließlich Einzelprotokollen und Quellhashes abgelegt. Er enthält 51 Gruppen,
 darunter die erhaltenen Prüfungen für Bewegung, Faustkampf, alle Häuser und den
@@ -175,9 +175,12 @@ python3 tools/check_prototype.py --report docs/18_childhood/evidence/merged-vali
 python3 -m unittest discover -s tests -p 'android_*_test.py'
 ```
 
-Die 92 Python-Prüfungen des Android-Werkzeugs und der bewachten APK-Bereitstellung verwenden ausdrücklich synthetische
-Paket- und Beobachterdaten. Das Protokoll steht unter
-[evidence/android-harness](evidence/android-harness). Sie ersetzen keinen APK-Lauf.
+Die 92 Python-Prüfungen zum Quellstand `9d90a8fe` verwenden ausdrücklich synthetische
+Paket- und Beobachterdaten. Das damalige Protokoll steht unter
+[evidence/android-harness](evidence/android-harness). Die nachfolgend ergänzte
+native Touchkontaktsteuerung erhält elf weitere synthetische Regressionen.
+Die insgesamt 103 Python-Fälle werden im abschließenden Cloudlauf geprüft; dessen Bericht trägt den tatsächlichen neuen
+Quellcommit. Synthetische Prüfungen ersetzen keinen APK-Lauf.
 
 Die folgenden Bilder stammen aus der tatsächlichen Godot-Engine, mit
 GL Compatibility und llvmpipe. Sie sind keine Konzeptbilder:
@@ -224,8 +227,29 @@ Paketprüfungen, scheiterte jedoch bei der nativen Touchbewegung: 2,389 Meter
 überschritten die unveränderte Obergrenze von 1,6 Metern. Dieser alte Stand
 verwendete noch 4,6 m/s statt des integrierten Kindheits-Gehtempos von 1,5 m/s.
 Der zusammengeführte Stand erhält außerdem den Touch-Loslassfix des Koordinators.
-Er benötigt seinen eigenen neuen Emulatorbeleg; der frühere Fehlerlauf wird
-nicht nachträglich als Erfolg gewertet.
+Auch dieser Stand hatte einen eigenen fehlgeschlagenen Emulatorlauf
+[`45196810548`](https://github.com/Ullmann27/Imperathen/actions/runs/45196810548):
+Die 450-ms-Geste erzeugte dort keine messbare Bewegung. Über mehrere weitere
+Beobachtungen blieb die Position gleich, während die Welt weiterlief. Bei etwa
+einer Sekunde Simulationszeit pro dreizehn Sekunden Echtzeit lässt sich aus einer
+so kurzen Geste kein zuverlässiger Bewegungsnachweis ableiten.
+
+Die abschließende Kindheits-Prüfroute verwendet deshalb echte native
+`touchscreen motionevent DOWN/MOVE/UP`-Ereignisse. Ein geringer Ausschlag des
+beobachteten Steuerfelds wird bis zur ersten tatsächlich beobachteten Bewegung
+gehalten. Loslassen wird auch bei Fehlern ausgeführt. Die Grenze von insgesamt
+1,6 Metern und der anschließende Stillstandsnachweis von höchstens 0,02 Metern
+bleiben bestehen. Dieser Eingabeweg verändert keinen Spielzustand über einen
+Testkanal. Nur ein erfolgreicher neuer Lauf kann die APK-Bereitstellung öffnen;
+keiner der früheren Fehlerläufe wird nachträglich als Erfolg gewertet.
+
+Die letzte Textüberarbeitung entfernt technische Speicher-/Prüfformulierungen
+aus den sichtbaren Dialogen. Die drei Werkstattbesuche sprechen Schwert, Schild
+und Speer als Lerngegenstände an; die unterschiedlichen Lektionen sind im
+Erzählbogen ausgearbeitet. Aus diesen Gesprächen entstehen keine erfundenen
+Inventargegenstände oder bereits erlernten Kampftechniken. Der Schwur nennt
+Rache nun ausdrücklich. Szenenkennungen, Wege, Belohnungen und Folgen bleiben
+dabei erhalten.
 
 Die Bereitstellung ist auf die erlaubten Aufgabenbranches begrenzt. Der
 Publisher verlangt den erfolgreichen Vorgängerjob desselben Workflowlaufs,
