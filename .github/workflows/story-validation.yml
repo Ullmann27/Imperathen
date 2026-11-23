@@ -60,7 +60,8 @@ jobs:
           chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
       - name: Import project
-        run: "$GODOT_BIN" --headless --path prototype --import
+        run: |
+          "$GODOT_BIN" --headless --path prototype --import
       - name: Run campaign and childhood contracts
         run: |
           "$GODOT_BIN" --headless --path prototype --script res://tests/campaign_bible_test.gd
