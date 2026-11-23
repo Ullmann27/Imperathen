@@ -75,3 +75,22 @@ Godot-Import, sichtbare Materialprüfung, Skalierung/Pivot, Kollisions-/Socket-
 Prüfung und ein aktueller Regressionstest bestanden sind. Figuren benötigen
 zusätzlich Rig-/Animationsprüfung; Android-Tauglichkeit benötigt einen echten
 Mobile-Renderer- bzw. Geräte-/Emulatorlauf mit dokumentierten Grenzen.
+
+## Modularer Einheitenbaukasten
+
+Die Datei `prototype/assets/meshy/loadouts.json` verbindet die kanonischen
+Stable-IDs ausschließlich auf Präsentationsebene. Sie vergibt weder Besitz noch
+Kampffreigaben. Schwere und leichte römische Kavallerie bestehen getrennt aus
+Reiter, `mount_ancient_cavalry_horse`, Vierhornsattel, Lanze, Spatha und
+Kavallerieschild. Der germanische berittene Gefolgsmann verwendet dasselbe
+Pferde-Asset mit eigener Ausrüstung.
+
+Das Pferd ist eine 28k-Smart-Topology-Quelle aus Meshy-Preview
+`01a20934-c44a-77ea-95a7-5e2c2c804d5e`. Es ist derzeit untexturiert und
+ungeriggt. Vor produktiver Nutzung sind Quadruped-Rig, Skin-Gewichte, Gangarten,
+Reiter-/Sattel-Anker, Huf-Bodenkontakt, Kollision, Mount/Dismount und ein echter
+Godot-/Android-Bildtest erforderlich.
+
+`tools/art/validate_meshy_loadouts.py` prüft Komponentenklassen und eindeutige
+Rohstoffbindungen. `meshy_loadout_registry.gd` liest dieselben Daten in Godot,
+ohne fehlende optionale GLBs zu erzwingen.
