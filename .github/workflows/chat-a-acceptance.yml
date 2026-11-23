@@ -1,0 +1,78 @@
+name: Chat A continuous family route
+
+on:
+  push:
+    branches: ['feature/chat-a-movement-combat-20261123']
+    paths:
+      - '.github/workflows/chat-a-acceptance.yml'
+      - 'tools/characters/action_route_review.gd'
+      - 'tools/characters/capture_action_route.py'
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Exact source commit to exercise
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: chat-a-family-route-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  continuous-route:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.source_ref || github.sha }}
+      - name: Install and verify the matching official Godot binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot" route-evidence
+          git rev-parse HEAD > route-evidence/source-commit.txt
+          cd "$RUNNER_TEMP/godot"
+          release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          curl --fail --location --retry 3 "$release/SHA512-SUMS.txt" --output SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$release/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip" --output godot.zip
+          python3 - <<'PY'
+          import hashlib, os, pathlib, zipfile
+          root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'godot'
+          sums = {line.split()[-1].lstrip('*'): line.split()[0] for line in (root/'SHA512-SUMS.txt').read_text().splitlines() if line.strip()}
+          with (root/'godot.zip').open('rb') as stream:
+              digest = hashlib.file_digest(stream, 'sha512').hexdigest()
+          if digest != sums['Godot_v4.7.2-stable_linux.x86_64.zip']:
+              raise SystemExit('Official engine checksum mismatch')
+          with zipfile.ZipFile(root/'godot.zip') as archive:
+              archive.extractall(root)
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          ln -s "Godot_v${GODOT_VERSION}-stable_linux.x86_64" godot
+          echo "$RUNNER_TEMP/godot" >> "$GITHUB_PATH"
+          if ! command -v xvfb-run >/dev/null; then
+            sudo apt-get update -q
+            sudo apt-get install -y xvfb xauth
+          fi
+      - name: Import the exact source snapshot
+        run: godot --headless --path prototype --import
+      - name: Complete the continuous route with actual input and physics
+        run: python3 tools/characters/capture_action_route.py --headless --quality low --output route-evidence/headless
+      - name: Render the same continuous family route in the actual game
+        run: xvfb-run -a -s '-screen 0 1280x720x24' python3 tools/characters/capture_action_route.py --use-existing-display --quality low --output route-evidence/graphical
+      - name: Upload source hashes, logs, trajectory and actual images
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-chat-a-family-route-${{ github.run_number }}
+          path: route-evidence/
+          if-no-files-found: error
+          retention-days: 30

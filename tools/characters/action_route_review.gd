@@ -103,7 +103,9 @@ func _run() -> void:
 		_finish()
 		return
 	await _frames(60)
-	if not await _travel(Vector2(-13, 12.1), false, "family_room_departure") or not await _travel(Vector2(-13, 15.2), false, "family_door_departure") or not await _travel(Vector2(-9, 16), false, "walk_from_home"):
+	# ProvisionStore occupies x=-12.57..-8.63, z=14.30..16.90.
+	# Clear its southern corner before turning east; include the .28 m capsule.
+	if not await _travel(Vector2(-13, 12.1), false, "family_room_departure") or not await _travel(Vector2(-13, 15.2), false, "family_door_departure") or not await _travel(Vector2(-13, 17.6), false, "clear_store_corner") or not await _travel(Vector2(-7, 18), false, "walk_from_home"):
 		_finish()
 		return
 	await _station("06_walk_from_home")

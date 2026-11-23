@@ -28,10 +28,13 @@ def main() -> int:
     sources.extend(str(path.relative_to(ROOT)) for path in sorted((ROOT / "prototype/scripts").rglob("*.gd")))
     source_before = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in sources}
     commit_before = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, check=True, text=True, stdout=subprocess.PIPE).stdout.strip()
+    worktree_before = subprocess.run(["git", "status", "--porcelain=v1", "--", "prototype", "tools/characters"], cwd=ROOT, check=True, text=True, stdout=subprocess.PIPE).stdout.splitlines()
+    commit_role = "base_for_worktree" if worktree_before else "clean_checkout"
     manifest = {"source_sha256": source_before, "source_commit": commit_before, "completed": False,
+                "source_commit_role": commit_role, "worktree_status": worktree_before,
                 "headless": args.headless, "quality": args.quality, "android_device_test": False}
     (output / "capture-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    with tempfile.TemporaryDirectory(prefix="imperathen-route-", dir="/dev/shm") as temporary:
+    with tempfile.TemporaryDirectory(prefix="imperathen-route-") as temporary:
         directory = Path(temporary)
         env = os.environ.copy()
         env["IMPERATHEN_ISOLATED_TEST"] = "1"
@@ -78,6 +81,8 @@ def main() -> int:
                 review["source_unchanged_during_run"] = source_before == source_after
                 review["source_changed_paths"] = [name for name in sources if source_before[name] != source_after[name]]
                 review["source_commit"] = commit_before
+                review["source_commit_role"] = commit_role
+                review["worktree_status"] = worktree_before
                 passed = passed and bool(review.get("completed")) and bool(review.get("passed")) and review["source_unchanged_during_run"]
                 review["passed"] = bool(passed)
                 review["engine_exit_code"] = result.returncode
