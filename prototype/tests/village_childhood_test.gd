@@ -99,6 +99,31 @@ func _test_fresh_opt_in_and_legacy() -> void:
 	_check(Economy.day_length(model.data) == 3600.0 and model.data.village.childhood.day == 1, "Narrative day one and the longer economic cycle are distinct")
 	var before := _snapshot(model.data)
 	_check(not Childhood.start(model.data) and _snapshot(model.data) == before, "Repeated initialization cannot erase an existing childhood")
+	# Reproduce the first playable childhood identity layout and prove that the
+	# save loader migrates it without losing progress, trust or actor continuity.
+	var legacy_names: Dictionary = model.data.duplicate(true)
+	legacy_names.village.childhood.version = 1
+	legacy_names.village.childhood.relationships = {
+		"antonia": legacy_names.village.childhood.relationships.julia.duplicate(true),
+		"sextus": legacy_names.village.childhood.relationships.silvanus.duplicate(true),
+		"quintus": legacy_names.village.childhood.relationships.sextus.duplicate(true)
+	}
+	for person: Dictionary in legacy_names.village.economy.people:
+		if person.id == "antonia": person.profession = "Deine Mutter · Töpferin"
+		if person.id == "sextus": person.profession = "Dein Vater · Zimmermann"
+		if person.id == "quintus": person.profession = "Dorfschmied"
+		if person.id == "julia":
+			person.profession = "Bäuerin"
+			person.assignment = "farm"
+		if person.id == "silvanus": person.profession = "Lastenträger"
+	_write(_path("legacy-childhood-names"), legacy_names)
+	var migrated_names = WorldModel.new()
+	_ok(migrated_names.load_game(_path("legacy-childhood-names")), "Load and migrate version-one childhood actor identities")
+	_check(migrated_names.data.village.childhood.version == Childhood.VERSION, "Nested childhood identity migration advances its own version")
+	_check(migrated_names.data.village.childhood.relationships.has("julia") and migrated_names.data.village.childhood.relationships.has("silvanus") and migrated_names.data.village.childhood.relationships.has("sextus"), "Legacy relationships become Julia, Silvanus and Sextus")
+	_check(not migrated_names.data.village.childhood.relationships.has("antonia") and not migrated_names.data.village.childhood.relationships.has("quintus"), "Legacy family/smith aliases do not remain authoritative")
+	_check(Life.relationship(migrated_names.data, "julia").met and Life.relationship(migrated_names.data, "silvanus").met and not Life.relationship(migrated_names.data, "sextus").met, "Migration preserves known parents and not-yet-met smith state")
+	_check(_person(migrated_names, "julia").profession == "Deine Mutter" and _person(migrated_names, "silvanus").profession == "Dein Vater" and _person(migrated_names, "sextus").profession.begins_with("Dorfschmied"), "Canonical actors receive screenplay roles after migration")
 	var old = WorldModel.new()
 	old.new_game("italia", true)
 	Life.ensure(old.data)
@@ -324,7 +349,7 @@ func _test_invalid_persistence_and_read_isolation() -> void:
 	apprentice.village.childhood.relationships.sextus.learned = true
 	invalids.append(apprentice)
 	var parent: Dictionary = model.data.duplicate(true)
-	parent.village.childhood.relationships.sextus.met = false
+	parent.village.childhood.relationships.silvanus.met = false
 	invalids.append(parent)
 	var early_raid: Dictionary = model.data.duplicate(true)
 	early_raid.village.raid.status = "warning"
