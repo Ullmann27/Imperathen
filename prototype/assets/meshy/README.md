@@ -55,3 +55,5 @@ python tools/art/validate_meshy_loadouts.py
 
 The horse and Galena entries are intentionally allowed to remain untextured
 source geometry; neither becomes runtime-ready through the loadout contract.
+Godot runtime note: manifest paths stay repository-relative (`prototype/...`) for staging and hashing; `meshy_asset_registry.gd` maps that prefix to `res://...` before `ResourceLoader` access.
+
