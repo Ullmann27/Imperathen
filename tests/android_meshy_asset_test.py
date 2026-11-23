@@ -7,12 +7,19 @@ import struct
 import tempfile
 import unittest
 import zlib
+import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SPEC = importlib.util.spec_from_file_location("inspect_meshy_glb", ROOT / "tools/art/inspect_meshy_glb.py")
+TOOLS_ART = ROOT / "tools/art"
+if str(TOOLS_ART) not in sys.path:
+    sys.path.insert(0, str(TOOLS_ART))
+SPEC = importlib.util.spec_from_file_location("inspect_meshy_glb", TOOLS_ART / "inspect_meshy_glb.py")
 INSPECTOR = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(INSPECTOR)
+STAGE_SPEC = importlib.util.spec_from_file_location("stage_meshy_assets", TOOLS_ART / "stage_meshy_assets.py")
+STAGER = importlib.util.module_from_spec(STAGE_SPEC)
+STAGE_SPEC.loader.exec_module(STAGER)
 
 
 def png_1x1() -> bytes:
@@ -122,6 +129,66 @@ class MeshyGlbInspectorTest(unittest.TestCase):
             self.assertEqual(report["missing"], 1)
             _, strict_ok = INSPECTOR.inspect_manifest(manifest, root, require_all=True)
             self.assertFalse(strict_ok)
+
+
+class MeshyStagingTest(unittest.TestCase):
+    def test_valid_binary_is_copied_and_locked_without_runtime_claim(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "download.glb"
+            write_glb(source)
+            manifest = root / "manifest.json"
+            manifest.write_text(json.dumps({
+                "assets": [{
+                    "stable_id": "weapon_test",
+                    "category": "weapon",
+                    "status": "ready_in_meshy",
+                    "meshy_task_id": "task-final",
+                    "meshy_preview_task_id": None,
+                    "intended_source_path": "prototype/assets/meshy/source/weapon/weapon_test.glb",
+                }]
+            }), encoding="utf-8")
+            lock = root / "prototype/assets/meshy/lock.json"
+            report = STAGER.stage(
+                manifest,
+                root,
+                {"weapon_test": source},
+                lock,
+            )
+            destination = root / "prototype/assets/meshy/source/weapon/weapon_test.glb"
+            self.assertTrue(destination.is_file())
+            self.assertEqual(report["staged"], 1)
+            record = json.loads(lock.read_text(encoding="utf-8"))["assets"]["weapon_test"]
+            self.assertTrue(record["static_binary_gate"])
+            self.assertFalse(record["runtime_ready"])
+            self.assertEqual(record["sha256"], INSPECTOR.inspect_glb(source)["sha256"])
+
+    def test_untextured_manifest_entry_requires_explicit_override(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "preview.glb"
+            write_glb(source)
+            manifest = root / "manifest.json"
+            manifest.write_text(json.dumps({
+                "assets": [{
+                    "stable_id": "preview_test",
+                    "category": "resource",
+                    "status": "geometry_ready_untextured",
+                    "meshy_task_id": None,
+                    "meshy_preview_task_id": "preview-task",
+                    "intended_source_path": "prototype/assets/meshy/source/resource/preview_test.glb",
+                }]
+            }), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                STAGER.stage(manifest, root, {"preview_test": source}, root / "lock.json")
+            report = STAGER.stage(
+                manifest,
+                root,
+                {"preview_test": source},
+                root / "lock.json",
+                allow_untextured=True,
+            )
+            self.assertEqual(report["staged"], 1)
 
 
 if __name__ == "__main__":
