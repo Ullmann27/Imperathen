@@ -31,8 +31,10 @@ static func component_ids(loadout_id: String) -> Dictionary:
 
 static func available_components(loadout_id: String) -> Dictionary:
 	var result := {}
-	for key: String in component_ids(loadout_id):
-		var asset_id: String = component_ids(loadout_id)[key]
+	var components := component_ids(loadout_id)
+	for key_value: Variant in components.keys():
+		var key := str(key_value)
+		var asset_id := str(components[key_value])
 		result[key] = AssetRegistry.has_source(asset_id)
 	return result
 
