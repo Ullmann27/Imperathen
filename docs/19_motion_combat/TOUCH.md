@@ -86,11 +86,23 @@ sichtbare, nicht zum Löschen vorgemerkte Knöpfe; ein veralteter Verweis auf de
 vorherigen Bildschirm hatte zuvor den zweiten Tap verhindert. Die Gehprüfung
 wurde erhalten und um diese Fälle erweitert.
 
-**Der vollständige gemeinsame Godot-Abschluss, aktuelle Familien-HUD-Aufnahmen
-und der echte ADB-Lauf des zusammengeführten Stands sind noch offen.** Ein
-bestandener Einzeltest wird hier nicht als abgeschlossener Gesamtprüflauf
-ausgegeben. Die historischen Nachweise im nächsten Abschnitt bleiben davon
-getrennt.
+Der Integrationscommit `db90dee785cbaef97a5d85357b7b9cda762dc9cd` bestand in
+[Android-CI 30](https://github.com/Ullmann27/Imperathen/actions/runs/45204185930)
+alle 46 Engine-Gruppen einschließlich **240 nativer Touchprüfungen** und
+94 Kindheits-Main-Prüfungen. Zusätzlich bestand der unveränderte Produktionscode
+mit dem Routenwerkzeug-Commit `62adc18e9c7be9f8318ea93aea716a499bdfced7` den
+[durchgehenden Familienweg](CONTINUOUS_ROUTE.md): 77 Headless- und 89 grafische
+Prüfungen, zwölf echte Stationsbilder. Die
+[Bildprüfung](evidence/family_route/ci1/VISUAL_REVIEW.md) dokumentiert die
+lesbaren Bedienelemente und die tatsächlichen Darstellungsfehler. Diese neuen
+Belege bleiben von den historischen Aufnahmen im nächsten Abschnitt getrennt.
+
+Android-CI 30 baute und prüfte die ARM64- und x86_64-Pakete statisch.
+Tatsächlich gestartet wurde die x86_64-Ausgabe. Sie bestand 22 Laufzeitchecks
+bis ins Familienhaus, scheiterte
+danach aber am ersten automatisierten Bewegungsversuch. Der Android-Abschluss
+steht deshalb noch aus; der Originalbericht liegt unter
+`evidence/android/ci30/runtime-report.json`.
 
 ## Schnittstelle zwischen UI und Spielwelt
 
@@ -149,7 +161,7 @@ Laufzeitausgabe. `touch-input-review.json` und `touch-input.log` belegen die
 umetikettiert. Eine neue Aufnahme muss den zusammengeführten Quellstand mit
 eigenem Rückgabecode, Prüfbericht und Quellhashes belegen.
 
-## Android: implementiert, tatsächlicher ADB-Lauf noch ausstehend
+## Android: tatsächlicher erster Lauf und begrenzte Prüfstrecke
 
 `prototype/scripts/ui/android_village_diagnostics.gd` beobachtet den aktuellen
 Modus, die Weltposition, Geschwindigkeit, Bewegungseingabe und gehaltene
@@ -161,8 +173,8 @@ Beschriftung „Dorf“ wird erkannt. Der Grundvertrag dieser Beobachtung wurde 
 den 18 historischen Main-Prüfungen mitgeprüft. Neu hinzu kommen
 `childhood_runtime` Version 1 mit Schrittfolge, stabilen Gegenstandskennungen,
 Familienziel und Haustür-/Wasserpunkt sowie der tatsächliche Kamerawinkel in
-`action_runtime`. Die neuen Familienfelder benötigen noch den aktuellen
-Engine- und Android-Nachweis.
+`action_runtime`. Android-CI 30 beobachtete diese Familienfelder tatsächlich
+in der gestarteten APK; sein vollständiger Bewegungsweg bestand noch nicht.
 
 `tools/android_runtime_smoke.py` erkennt anhand des tatsächlichen APK-Inhalts,
 ob die Familiengeschichte vorhanden ist. Nur APKs ohne Kindheitsmodul verwenden
@@ -194,9 +206,14 @@ statt wiederholt über die ganze sichtbare Fläche zu wischen. Ein Pythonfall
 verwendet die tatsächlich protokollierten Fehlerkoordinaten. Ein erfolgreicher
 Android-Nachlauf dieses Fixes ist damit noch nicht belegt.
 
-**Der neue Familien-ADB-Ablauf ist noch nicht ausgeführt.** Die 85 Python-Tests
-einschließlich der 55 Harnessfälle prüfen das Testwerkzeug und Paketregeln;
-sie ersetzen keinen Android-Emulator- oder Gerätelauf. Nächster Schritt ist
-nach dem Engine-Gate der Android-CI-Prüfbau mit dem neuen ADB-Szenario aus
+**Der erste Familien-ADB-Lauf 30 ist fehlgeschlagen.** Die 85 Python-Tests
+einschließlich der 55 Harnessfälle prüften das Testwerkzeug und Paketregeln;
+sie ersetzen keinen Android-Emulator- oder Gerätelauf. Der Lauf installierte
+und startete die x86_64-APK und bestätigte 22 Checks bis zum Familienhaus.
+Ein 900-ms-Steuerimpuls führte anschließend zu keiner beobachteten Bewegung;
+der damalige Beobachter meldete seinen Zustand nur etwa alle 13–17 realen
+Sekunden. Der notwendige Nachlauf prüft einen tatsächlich gehaltenen nativen
+Pointer und eine monotone Beobachtungszeit. Seine genauen Ergebnisse werden
+im Lieferbericht benannt. Die Ausführung verwendet weiterhin das ADB-Szenario aus
 demselben Commit.
 Physische Geräte, tatsächliches Falten und Dauerlast bleiben gesonderte Prüfungen.

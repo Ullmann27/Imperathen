@@ -1,0 +1,23 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop
+IMPERATHEN_OPENING_STARTED childhood_home
+IMPERATHEN_SESSION_STARTED: saved frontier world
+ROUTE_STATION {"frame":0,"label":"01_family_opening","phase":"start","position":[-12.0,1.35000002384186,11.6999998092651],"practice_hits":0,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"opening","simulation_seconds":0.0,"touch_axis":[0.0,0.0]}
+IMPERATHEN_OPENING_COMPLETE
+ROUTE_STATION {"frame":8,"label":"02_family_room","phase":"start","position":[-12.0,1.29257822036743,11.6999998092651],"practice_hits":0,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"playing","simulation_seconds":0.133333333333333,"touch_axis":[0.0,0.0]}
+ROUTE_STATION {"frame":245,"label":"03_family_door_outside","phase":"family_door_exit","position":[-12.9980640411377,0.890839636325836,15.1201658248901],"practice_hits":0,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"playing","simulation_seconds":4.08333333333333,"touch_axis":[0.0,0.0]}
+IMPERATHEN_VILLAGE_DIALOG: antonia
+ROUTE_STATION {"frame":254,"label":"04_mother_conversation","phase":"mother_conversation","position":[-12.9980640411377,0.890839636325836,15.1201658248901],"practice_hits":0,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"village_dialog","simulation_seconds":4.23333333333333,"touch_axis":[0.0,0.0]}
+ROUTE_STATION {"frame":513,"label":"05_family_water","phase":"family_water_table","position":[-12.071982383728,1.29214346408844,11.7330408096313],"practice_hits":0,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"playing","simulation_seconds":8.55,"touch_axis":[0.0,0.0]}
+ROUTE_STATION {"frame":1216,"label":"06_walk_from_home","phase":"walk_from_home","position":[-7.07568740844727,0.890839636325836,17.9937324523926],"practice_hits":0,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"playing","simulation_seconds":20.2666666666667,"touch_axis":[0.0,0.0]}
+ROUTE_STATION {"frame":1828,"label":"07_run_square","phase":"run_to_training_street","position":[7.00200223922729,0.890747249126434,-3.59905409812927],"practice_hits":0,"real_velocity":[0.0,0.332479447126389,-0.0945854112505913],"running":true,"screen":"playing","simulation_seconds":30.4666666666667,"touch_axis":[0.0,0.0]}
+ROUTE_STATION {"frame":2259,"label":"08_practice_arrival","phase":"practice_contact_distance","position":[0.00311135267838836,0.890839815139771,-6.22459030151367],"practice_hits":0,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"playing","simulation_seconds":37.65,"touch_axis":[0.0,0.0]}
+ROUTE_STATION {"frame":3874,"label":"09_practice_complete","phase":"practice_high_kick","position":[0.00311135267838836,0.890839815139771,-6.22459030151367],"practice_hits":21,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"playing","simulation_seconds":64.5666666666667,"touch_axis":[0.0,0.0]}
+IMPERATHEN_PAUSED
+ROUTE_STATION {"frame":3880,"label":"10_saved_pause","phase":"pause_and_save","position":[0.00311135267838836,0.890839815139771,-6.22459030151367],"practice_hits":21,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"paused","simulation_seconds":64.6666666666667,"touch_axis":[0.0,0.0]}
+IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop
+IMPERATHEN_CONTINUED
+ROUTE_STATION {"frame":3888,"label":"11_resumed","phase":"restart","position":[0.00311135267838836,0.890839815139771,-6.22459030151367],"practice_hits":21,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"playing","simulation_seconds":64.8,"touch_axis":[0.0,0.0]}
+ROUTE_STATION {"frame":3993,"label":"12_continued_walk","phase":"walk_after_restart","position":[0.000149086670717224,0.890836358070374,-4.57847547531128],"practice_hits":21,"real_velocity":[0.0,0.0,0.0],"running":false,"screen":"playing","simulation_seconds":66.55,"touch_axis":[0.0,0.0]}
+ACTION_ROUTE_REVIEW_PASS

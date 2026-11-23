@@ -32,6 +32,11 @@ Figurenansicht beenden ausstehende Kampfeingaben.
 
 ## Prüfen und zusammenführen
 
+- [DELIVERY.md](DELIVERY.md): zusammengeführter Quellstand, tatsächliche
+  Abnahmeergebnisse, APK-Status und verbleibende Fehler.
+- [CONTINUOUS_ROUTE.md](CONTINUOUS_ROUTE.md): kompletter Familienweg ohne
+  Positions- oder Questinjektion, einschließlich echter Stationsbilder und
+  Speichern/Fortsetzen.
 - [MOTION.md](MOTION.md): echte Rig-/Blenderarbeit, Vorher-/Nachher-Aufnahmen,
   zehn Techniken, vier LODs, Faustform und vergleichbare Aufwandmessung.
 - [COMBAT_CONTRACT.md](COMBAT_CONTRACT.md): verbindliche Regeln, elf gespeicherte

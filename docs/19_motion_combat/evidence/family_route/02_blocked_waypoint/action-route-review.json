@@ -1,0 +1,4386 @@
+{
+  "actions": [
+    {
+      "button": "Neues Leben",
+      "frame": 0,
+      "kind": "actual_menu_button_signal"
+    },
+    {
+      "frame": 8,
+      "from": [
+        -12.0,
+        11.6999998092651
+      ],
+      "goal": [
+        -13.0,
+        12.1000003814697
+      ],
+      "kind": "travel",
+      "label": "family_room_to_door",
+      "running": false
+    },
+    {
+      "frame": 78,
+      "from": [
+        -12.9259824752808,
+        12.0714683532715
+      ],
+      "goal": [
+        -13.0,
+        15.1999998092651
+      ],
+      "kind": "travel",
+      "label": "family_door_exit",
+      "running": false
+    },
+    {
+      "action": "interact",
+      "frame": 245,
+      "kind": "native_touch_action"
+    },
+    {
+      "button": "Mit Mutter den Morgen besprechen",
+      "frame": 248,
+      "kind": "native_dialogue_touch"
+    },
+    {
+      "button": "Gespr\u00e4ch beenden",
+      "frame": 254,
+      "kind": "actual_menu_button_signal"
+    },
+    {
+      "frame": 257,
+      "from": [
+        -12.998064994812,
+        15.120189666748
+      ],
+      "goal": [
+        -13.0,
+        12.1000003814697
+      ],
+      "kind": "travel",
+      "label": "return_through_family_door",
+      "running": false
+    },
+    {
+      "frame": 436,
+      "from": [
+        -12.9999523162842,
+        12.1782121658325
+      ],
+      "goal": [
+        -12.0,
+        11.6999998092651
+      ],
+      "kind": "travel",
+      "label": "family_water_table",
+      "running": false
+    },
+    {
+      "action": "interact",
+      "frame": 507,
+      "kind": "native_touch_action"
+    },
+    {
+      "frame": 573,
+      "from": [
+        -12.071982383728,
+        11.7330408096313
+      ],
+      "goal": [
+        -13.0,
+        12.1000003814697
+      ],
+      "kind": "travel",
+      "label": "family_room_departure",
+      "running": false
+    },
+    {
+      "frame": 654,
+      "from": [
+        -12.927698135376,
+        12.0703716278076
+      ],
+      "goal": [
+        -13.0,
+        15.1999998092651
+      ],
+      "kind": "travel",
+      "label": "family_door_departure",
+      "running": false
+    },
+    {
+      "frame": 811,
+      "from": [
+        -12.9981079101562,
+        15.1199827194214
+      ],
+      "goal": [
+        -9.0,
+        16.0
+      ],
+      "kind": "travel",
+      "label": "walk_from_home",
+      "running": false
+    }
+  ],
+  "adapter": "",
+  "android_device_test": false,
+  "automated_route": true,
+  "capture_mode": "headless",
+  "checks": [
+    {
+      "message": "New Life opens the actual family chapter",
+      "ok": true
+    },
+    {
+      "message": "The real new game contains the optional childhood contract",
+      "ok": true
+    },
+    {
+      "message": "The actual game applies the requested quality setting",
+      "ok": true
+    },
+    {
+      "message": "The family beginning hands control to the twelve-year-old",
+      "ok": true
+    },
+    {
+      "message": "The player starts on the actual raised family floor",
+      "ok": true
+    },
+    {
+      "message": "The actual furnished family home is present",
+      "ok": true
+    },
+    {
+      "message": "Reached continuous waypoint family_room_to_door",
+      "ok": true
+    },
+    {
+      "message": "Reached continuous waypoint family_door_exit",
+      "ok": true
+    },
+    {
+      "message": "Walking crosses the actual narrow family door and ramp",
+      "ok": true
+    },
+    {
+      "message": "The real mother is present within the reached conversation range",
+      "ok": true
+    },
+    {
+      "message": "Native interaction opens the actual Antonia conversation",
+      "ok": true
+    },
+    {
+      "message": "The native dialogue choice advances exactly the first family action",
+      "ok": true
+    },
+    {
+      "message": "The genuine mother conversation supplies the reserved household coin",
+      "ok": true
+    },
+    {
+      "message": "Closing the actual conversation returns to the same continuous route",
+      "ok": true
+    },
+    {
+      "message": "Reached continuous waypoint return_through_family_door",
+      "ok": true
+    },
+    {
+      "message": "Reached continuous waypoint family_water_table",
+      "ok": true
+    },
+    {
+      "message": "Returning through the door reaches the physical interior floor",
+      "ok": true
+    },
+    {
+      "message": "Only the two actual family actions have advanced the chapter",
+      "ok": true
+    },
+    {
+      "message": "Real interaction at the water point supplies the carried jug",
+      "ok": true
+    },
+    {
+      "message": "Reached continuous waypoint family_room_departure",
+      "ok": true
+    },
+    {
+      "message": "Reached continuous waypoint family_door_departure",
+      "ok": true
+    },
+    {
+      "message": "Physical obstruction on walk_from_home at (-12.85089, 15.17349)",
+      "ok": false
+    }
+  ],
+  "childhood_progress": {
+    "active_work": "",
+    "apprenticeship": "none",
+    "carried": [
+      "household_coin",
+      "water_jug"
+    ],
+    "completed": [
+      "mother_morning",
+      "fill_water"
+    ],
+    "day": 1,
+    "gear": "none",
+    "guard_absence": {
+      "active": false,
+      "previous_assignment": "idle",
+      "previous_health": 100
+    },
+    "night_event": "none",
+    "relationships": {
+      "antonia": {
+        "ally": false,
+        "declined": false,
+        "helped": false,
+        "learned": false,
+        "met": true,
+        "trust": 6
+      },
+      "quintus": {
+        "ally": false,
+        "declined": false,
+        "helped": false,
+        "learned": false,
+        "met": false,
+        "trust": 0
+      },
+      "sextus": {
+        "ally": false,
+        "declined": false,
+        "helped": false,
+        "learned": false,
+        "met": true,
+        "trust": 4
+      }
+    },
+    "version": 1,
+    "work_seconds": 0.0
+  },
+  "completed": true,
+  "continuous_render_loop": true,
+  "engine": "4.7.2-stable (official)",
+  "fixed_physics_step_seconds": 0.0166666666666667,
+  "house_scope": "Actual family home interior, narrow doorway and ramp, Antonia conversation and a real water errand. No household assignment schema is invented.",
+  "maximum_horizontal_step_m": 0.0244064386934042,
+  "passed": false,
+  "path_length_m": 12.1563016065629,
+  "quality_profile": "balanced",
+  "renderer": "gl_compatibility",
+  "resident_visit": {
+    "horizontal_distance_m": 2.32409715652466,
+    "house": "baker_home/FamilyHome",
+    "house_interior_visited": true,
+    "npc_id": "antonia",
+    "occupancy_scope": "Authored family home, actual mother and father in the shared roster; no invented household assignment field.",
+    "player_position": [
+      -12.998064994812,
+      0.890839636325836,
+      15.120189666748
+    ],
+    "position": [
+      -15.3000001907349,
+      14.8000001907349
+    ]
+  },
+  "route_version": "family_continuous_v1",
+  "simulation_seconds": 17.5166666666667,
+  "state_injection": false,
+  "stations": [
+    {
+      "frame": 0,
+      "label": "01_family_opening",
+      "phase": "start",
+      "position": [
+        -12.0,
+        1.35000002384186,
+        11.6999998092651
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "opening",
+      "simulation_seconds": 0.0,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 8,
+      "label": "02_family_room",
+      "phase": "start",
+      "position": [
+        -12.0,
+        1.29257822036743,
+        11.6999998092651
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.133333333333333,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 245,
+      "label": "03_family_door_outside",
+      "phase": "family_door_exit",
+      "position": [
+        -12.998064994812,
+        0.890839636325836,
+        15.120189666748
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 4.08333333333333,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 254,
+      "label": "04_mother_conversation",
+      "phase": "mother_conversation",
+      "position": [
+        -12.998064994812,
+        0.890839636325836,
+        15.120189666748
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "village_dialog",
+      "simulation_seconds": 4.23333333333333,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 513,
+      "label": "05_family_water",
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.55,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 1051,
+      "label": "blocked_walk_from_home",
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 17.5166666666667,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "teleport_fixtures": false,
+  "trajectory": [
+    {
+      "frame": 6,
+      "phase": "start",
+      "position": [
+        -12.0,
+        1.29257822036743,
+        11.6999998092651
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.1,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 8,
+      "phase": "start",
+      "position": [
+        -12.0,
+        1.29257822036743,
+        11.6999998092651
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.133333333333333,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 12,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.0138883590698,
+        1.29333412647247,
+        11.713888168335
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.333366364240646,
+        7.15255691829952e-06,
+        0.333366364240646
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.2,
+      "touch_axis": [
+        -0.97041642665863,
+        -0.241437524557114
+      ]
+    },
+    {
+      "frame": 18,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.0763893127441,
+        1.29333448410034,
+        11.7547588348389
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.833358705043793,
+        0.000743865908589214,
+        0.445976227521896
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.3,
+      "touch_axis": [
+        -0.966341197490692,
+        -0.257264018058777
+      ]
+    },
+    {
+      "frame": 24,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.188889503479,
+        1.29333710670471,
+        11.802529335022
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -1.33329379558563,
+        0.00019311903452035,
+        0.493526428937912
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.4,
+      "touch_axis": [
+        -0.96419483423233,
+        -0.265194416046143
+      ]
+    },
+    {
+      "frame": 30,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.3249092102051,
+        1.29332423210144,
+        11.8524150848389
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -1.36133182048798,
+        -0.000994205474853516,
+        0.499248474836349
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.5,
+      "touch_axis": [
+        -0.964173316955566,
+        -0.265273422002792
+      ]
+    },
+    {
+      "frame": 36,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.4610452651978,
+        1.29333090782166,
+        11.9023418426514
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -1.36133182048798,
+        -7.15255691829952e-06,
+        0.499248474836349
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.6,
+      "touch_axis": [
+        -0.964173316955566,
+        -0.265273004770279
+      ]
+    },
+    {
+      "frame": 42,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.5971784591675,
+        1.29333436489105,
+        11.9522676467896
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -1.36133182048798,
+        0.00036478039692156,
+        0.499248474836349
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.7,
+      "touch_axis": [
+        -0.964173316955566,
+        -0.265272587537766
+      ]
+    },
+    {
+      "frame": 48,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.728494644165,
+        1.29332768917084,
+        12.0003318786621
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -1.18165957927704,
+        -1.4305113836599e-05,
+        0.430355042219162
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.8,
+      "touch_axis": [
+        -0.830776512622833,
+        -0.22844859957695
+      ]
+    },
+    {
+      "frame": 54,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.821117401123,
+        1.29332792758942,
+        12.03431224823
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.772361695766449,
+        -0.000200271591893397,
+        0.283641815185547
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 0.9,
+      "touch_axis": [
+        -0.547164976596832,
+        -0.15029676258564
+      ]
+    },
+    {
+      "frame": 60,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.8821048736572,
+        1.29332804679871,
+        12.0567073822021
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.509033203125,
+        -0.000185966477147304,
+        0.186882004141808
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 1.0,
+      "touch_axis": [
+        -0.360615730285645,
+        -0.099056638777256
+      ]
+    },
+    {
+      "frame": 66,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.9223003387451,
+        1.29332756996155,
+        12.0714683532715
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.335483521223068,
+        -0.000207424149266444,
+        0.123138420283794
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 1.1,
+      "touch_axis": [
+        -0.237664923071861,
+        -0.065286360681057
+      ]
+    },
+    {
+      "frame": 72,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.9259824752808,
+        1.29333055019379,
+        12.0714683532715
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 1.2,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 78,
+      "phase": "family_room_to_door",
+      "position": [
+        -12.9259824752808,
+        1.29333055019379,
+        12.0714683532715
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 1.3,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 84,
+      "phase": "family_door_exit",
+      "position": [
+        -12.928373336792,
+        1.29333114624023,
+        12.1006326675415
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0269508343189955,
+        0.000200271591893397,
+        0.499992340803146
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 1.4,
+      "touch_axis": [
+        -0.599749863147736,
+        0.800187528133392
+      ]
+    },
+    {
+      "frame": 90,
+      "phase": "family_door_exit",
+      "position": [
+        -12.931360244751,
+        1.29332792758942,
+        12.1798009872437
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0315284729003906,
+        -1.4305113836599e-05,
+        1.00004196166992
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 1.5,
+      "touch_axis": [
+        -0.599416017532349,
+        0.80043762922287
+      ]
+    },
+    {
+      "frame": 96,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9346160888672,
+        1.29332506656647,
+        12.3081293106079
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327873229980469,
+        0.0,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 1.6,
+      "touch_axis": [
+        -0.599283456802368,
+        0.80053699016571
+      ]
+    },
+    {
+      "frame": 102,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9378929138184,
+        1.29332530498505,
+        12.4530935287476
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327301025390625,
+        0.0,
+        1.44968020915985
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 1.7,
+      "touch_axis": [
+        -0.599283456802368,
+        0.80053699016571
+      ]
+    },
+    {
+      "frame": 108,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9411716461182,
+        1.29332196712494,
+        12.5980577468872
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327873229980469,
+        -1.4305113836599e-05,
+        1.44968020915985
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 1.8,
+      "touch_axis": [
+        -0.599283277988434,
+        0.800537109375
+      ]
+    },
+    {
+      "frame": 114,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9444465637207,
+        1.29333162307739,
+        12.7430219650269
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327301025390625,
+        0.000786781252827495,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 1.9,
+      "touch_axis": [
+        -0.599283635616302,
+        0.800536751747131
+      ]
+    },
+    {
+      "frame": 120,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9477233886719,
+        1.29404282569885,
+        12.887487411499
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0326728820800781,
+        0.0428795777261257,
+        1.41969668865204
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 2.0,
+      "touch_axis": [
+        -0.599283635616302,
+        0.800536751747131
+      ]
+    },
+    {
+      "frame": 126,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9502182006836,
+        1.34075236320496,
+        12.9939947128296
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0295257549732924,
+        0.312945812940598,
+        1.28414142131805
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 2.1,
+      "touch_axis": [
+        -0.599252104759216,
+        0.800560414791107
+      ]
+    },
+    {
+      "frame": 132,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9534482955933,
+        1.34584009647369,
+        13.1367158889771
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327301025390625,
+        0.000536441802978516,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 2.2,
+      "touch_axis": [
+        -0.599245429039001,
+        0.800565421581268
+      ]
+    },
+    {
+      "frame": 138,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9567184448242,
+        1.34584009647369,
+        13.2816772460938
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0326728820800781,
+        0.0,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 2.3,
+      "touch_axis": [
+        -0.599245250225067,
+        0.800565540790558
+      ]
+    },
+    {
+      "frame": 144,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9599905014038,
+        1.34583413600922,
+        13.4266395568848
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327301025390625,
+        -0.00036478039692156,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 2.4,
+      "touch_axis": [
+        -0.599245071411133,
+        0.800565540790558
+      ]
+    },
+    {
+      "frame": 150,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9632625579834,
+        1.34583735466003,
+        13.5715999603271
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327301025390625,
+        -0.000164508805028163,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 2.5,
+      "touch_axis": [
+        -0.599244356155396,
+        0.800566256046295
+      ]
+    },
+    {
+      "frame": 156,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9665336608887,
+        1.34584045410156,
+        13.7165622711182
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327301025390625,
+        0.000557899475097656,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 2.6,
+      "touch_axis": [
+        -0.599243998527527,
+        0.800566375255585
+      ]
+    },
+    {
+      "frame": 162,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9698028564453,
+        1.34582471847534,
+        13.8615226745605
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327301025390625,
+        -0.00095844262978062,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 2.7,
+      "touch_axis": [
+        -0.599244654178619,
+        0.800565481185913
+      ]
+    },
+    {
+      "frame": 168,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9730749130249,
+        1.33931291103363,
+        14.0066862106323
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327301025390625,
+        -0.299999684095383,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 2.8,
+      "touch_axis": [
+        -0.599246621131897,
+        0.800564527511597
+      ]
+    },
+    {
+      "frame": 174,
+      "phase": "family_door_exit",
+      "position": [
+        -12.976354598999,
+        1.28384757041931,
+        14.1520090103149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0328445434570312,
+        -0.62334531545639,
+        1.45483005046844
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 2.9,
+      "touch_axis": [
+        -0.599246084690094,
+        0.800564706325531
+      ]
+    },
+    {
+      "frame": 180,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9796371459961,
+        1.22224140167236,
+        14.2975130081177
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327873229980469,
+        -0.623223721981049,
+        1.4542578458786
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 3.0,
+      "touch_axis": [
+        -0.599245667457581,
+        0.800565242767334
+      ]
+    },
+    {
+      "frame": 186,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9829206466675,
+        1.16062366962433,
+        14.4430723190308
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327873229980469,
+        -0.623087823390961,
+        1.45357120037079
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 3.1,
+      "touch_axis": [
+        -0.599246799945831,
+        0.800563812255859
+      ]
+    },
+    {
+      "frame": 192,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9862041473389,
+        1.09901905059814,
+        14.5885696411133
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0327873229980469,
+        -0.622966229915619,
+        1.45299899578094
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 3.2,
+      "touch_axis": [
+        -0.599246442317963,
+        0.800564587116241
+      ]
+    },
+    {
+      "frame": 198,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9894905090332,
+        1.03737902641296,
+        14.7342367172241
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0329017639160156,
+        -0.580279767513275,
+        1.45906436443329
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 3.3,
+      "touch_axis": [
+        -0.599246382713318,
+        0.800564706325531
+      ]
+    },
+    {
+      "frame": 204,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9927501678467,
+        0.975779235363007,
+        14.8786735534668
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0313568115234375,
+        -0.62267655134201,
+        1.3894270658493
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 3.4,
+      "touch_axis": [
+        -0.57356321811676,
+        0.766254246234894
+      ]
+    },
+    {
+      "frame": 210,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9952306747437,
+        0.928817808628082,
+        14.9891605377197
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0206565838307142,
+        -0.40334340929985,
+        0.912952363491058
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 3.5,
+      "touch_axis": [
+        -0.376410603523254,
+        0.502806425094604
+      ]
+    },
+    {
+      "frame": 216,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9968566894531,
+        0.898223876953125,
+        15.0613718032837
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0135612478479743,
+        -0.299792259931564,
+        0.598125398159027
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 3.6,
+      "touch_axis": [
+        -0.247450396418571,
+        0.33050525188446
+      ]
+    },
+    {
+      "frame": 222,
+      "phase": "family_door_exit",
+      "position": [
+        -12.9979267120361,
+        0.89083993434906,
+        15.1094551086426
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0089263916015625,
+        -1.4305113836599e-05,
+        0.390872925519943
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 3.7,
+      "touch_axis": [
+        -0.161675870418549,
+        0.215842753648758
+      ]
+    },
+    {
+      "frame": 228,
+      "phase": "family_door_exit",
+      "position": [
+        -12.998064994812,
+        0.890839636325836,
+        15.120189666748
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 3.8,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 234,
+      "phase": "family_door_exit",
+      "position": [
+        -12.998064994812,
+        0.890839636325836,
+        15.120189666748
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 3.9,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 240,
+      "phase": "family_door_exit",
+      "position": [
+        -12.998064994812,
+        0.890839636325836,
+        15.120189666748
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 4.0,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 246,
+      "phase": "mother_conversation",
+      "position": [
+        -12.998064994812,
+        0.890839636325836,
+        15.120189666748
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "village_dialog",
+      "simulation_seconds": 4.1,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 252,
+      "phase": "mother_conversation",
+      "position": [
+        -12.998064994812,
+        0.890839636325836,
+        15.120189666748
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "village_dialog",
+      "simulation_seconds": 4.2,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 258,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9980697631836,
+        0.890839636325836,
+        15.118800163269
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000286102265818045,
+        0.0,
+        -0.0833702012896538
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 4.3,
+      "touch_axis": [
+        -0.000640555517747998,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 264,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9980983734131,
+        0.890840172767639,
+        15.0848560333252
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000286102265818045,
+        1.07288351500756e-05,
+        -0.434989899396896
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 4.4,
+      "touch_axis": [
+        -0.000637002114672214,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 270,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9981184005737,
+        0.901145398616791,
+        15.0563230514526
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.00017166136240121,
+        0.110589258372784,
+        -0.26092529296875
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 4.5,
+      "touch_axis": [
+        -0.000636375101748854,
+        -0.999999523162842
+      ]
+    },
+    {
+      "frame": 276,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9981365203857,
+        0.912191331386566,
+        15.0302200317383
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000228881821385585,
+        0.109773866832256,
+        -0.261383056640625
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 4.6,
+      "touch_axis": [
+        -0.000636166078038514,
+        -0.999999523162842
+      ]
+    },
+    {
+      "frame": 282,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.998161315918,
+        0.925679802894592,
+        14.9984436035156
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.00034332272480242,
+        0.184063896536827,
+        -0.434246033430099
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 4.7,
+      "touch_axis": [
+        -0.000634598429314792,
+        -0.999999523162842
+      ]
+    },
+    {
+      "frame": 288,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9982070922852,
+        0.952416837215424,
+        14.935359954834
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000514984130859375,
+        0.32311674952507,
+        -0.762977540493011
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 4.8,
+      "touch_axis": [
+        -0.000632403593044728,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 294,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9982690811157,
+        0.991095662117004,
+        14.8440895080566
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000686645449604839,
+        0.425476998090744,
+        -1.00427627563477
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 4.9,
+      "touch_axis": [
+        -0.000630940427072346,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 300,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9983415603638,
+        1.03692662715912,
+        14.7359571456909
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000743865908589214,
+        0.473084419965744,
+        -1.11648559570312
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 5.0,
+      "touch_axis": [
+        -0.000629268237389624,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 306,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9984159469604,
+        1.08445036411285,
+        14.6238231658936
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000743865908589214,
+        0.475280255079269,
+        -1.12146377563477
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 5.1,
+      "touch_axis": [
+        -0.000627805071417242,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 312,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9984903335571,
+        1.13197803497314,
+        14.5116806030273
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000743865908589214,
+        0.476145714521408,
+        -1.12106323242188
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 5.2,
+      "touch_axis": [
+        -0.00062613288173452,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 318,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9985647201538,
+        1.17950427532196,
+        14.3995361328125
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000743865908589214,
+        0.476074188947678,
+        -1.12112045288086
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 5.3,
+      "touch_axis": [
+        -0.000624356151092798,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 324,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9986391067505,
+        1.22702205181122,
+        14.2873907089233
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000743865908589214,
+        0.475523442029953,
+        -1.1213493347168
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 5.4,
+      "touch_axis": [
+        -0.000622370454948395,
+        -0.999999523162842
+      ]
+    },
+    {
+      "frame": 330,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9987134933472,
+        1.27455568313599,
+        14.1752471923828
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000743865908589214,
+        0.475001305341721,
+        -1.12157821655273
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 5.5,
+      "touch_axis": [
+        -0.000620175735093653,
+        -0.999999523162842
+      ]
+    },
+    {
+      "frame": 336,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9987869262695,
+        1.32208025455475,
+        14.063102722168
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000686645449604839,
+        0.475079983472824,
+        -1.12146377563477
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 5.6,
+      "touch_axis": [
+        -0.000617771875113249,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 342,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9988689422607,
+        1.34592175483704,
+        13.9320363998413
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000915527285542339,
+        -0.0242042522877455,
+        -1.44910800457001
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 5.7,
+      "touch_axis": [
+        -0.000617458310443908,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 348,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9989595413208,
+        1.34584081172943,
+        13.787036895752
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000915527285542339,
+        1.4305113836599e-05,
+        -1.44996631145477
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 5.8,
+      "touch_axis": [
+        -0.000616831297520548,
+        -0.999999523162842
+      ]
+    },
+    {
+      "frame": 354,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9990472793579,
+        1.34583413600922,
+        13.642035484314
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000858306826557964,
+        0.00017166136240121,
+        -1.45002353191376
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 5.9,
+      "touch_axis": [
+        -0.000617353827692568,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 360,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.999137878418,
+        1.34583699703217,
+        13.4970369338989
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000915527285542339,
+        0.00019311903452035,
+        -1.44996631145477
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 6.0,
+      "touch_axis": [
+        -0.000617249286733568,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 366,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9992294311523,
+        1.34583461284637,
+        13.3520383834839
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000858306826557964,
+        0.000243186936131679,
+        -1.45002353191376
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 6.1,
+      "touch_axis": [
+        -0.000614845543168485,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 372,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9993181228638,
+        1.34583985805511,
+        13.2070379257202
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000915527285542339,
+        0.000557899475097656,
+        -1.45002353191376
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 6.2,
+      "touch_axis": [
+        -0.000616204226389527,
+        -0.999999523162842
+      ]
+    },
+    {
+      "frame": 378,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9994077682495,
+        1.34583115577698,
+        13.0620412826538
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000858306826557964,
+        -0.000164508805028163,
+        -1.44996631145477
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 6.3,
+      "touch_axis": [
+        -0.000614845543168485,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 384,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9994983673096,
+        1.31190896034241,
+        12.9165897369385
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000915527285542339,
+        -0.667834222316742,
+        -1.45780551433563
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 6.4,
+      "touch_axis": [
+        -0.000614532036706805,
+        -0.999999523162842
+      ]
+    },
+    {
+      "frame": 390,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9995889663696,
+        1.29332268238068,
+        12.7715139389038
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000915527285542339,
+        -0.000550746917724609,
+        -1.45002353191376
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 6.5,
+      "touch_axis": [
+        -0.000612650765106082,
+        -0.99999988079071
+      ]
+    },
+    {
+      "frame": 396,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9996776580811,
+        1.29334080219269,
+        12.6265144348145
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000858306826557964,
+        0.00116586673539132,
+        -1.45002353191376
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 6.6,
+      "touch_axis": [
+        -0.000611187657341361,
+        -0.999999523162842
+      ]
+    },
+    {
+      "frame": 402,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9997692108154,
+        1.29332530498505,
+        12.4815158843994
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000915527285542339,
+        0.000185966477147304,
+        -1.45002353191376
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 6.7,
+      "touch_axis": [
+        -0.000606380053795874,
+        -0.999999523162842
+      ]
+    },
+    {
+      "frame": 408,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9998474121094,
+        1.29332530498505,
+        12.3512945175171
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000629424990620464,
+        1.4305113836599e-05,
+        -1.10595703125
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 6.8,
+      "touch_axis": [
+        -0.000452949869213626,
+        -0.749240934848785
+      ]
+    },
+    {
+      "frame": 414,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9998998641968,
+        1.29332804679871,
+        12.265495300293
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000400543183786795,
+        0.000178813919774257,
+        -0.714511811733246
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 6.9,
+      "touch_axis": [
+        -0.000296649581287056,
+        -0.492787301540375
+      ]
+    },
+    {
+      "frame": 420,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9999341964722,
+        1.29332792758942,
+        12.2090702056885
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.000286102265818045,
+        0.0,
+        -0.470924347639084
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 7.0,
+      "touch_axis": [
+        -0.000195978078409098,
+        -0.324773907661438
+      ]
+    },
+    {
+      "frame": 426,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9999523162842,
+        1.29332733154297,
+        12.1782121658325
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        -7.15255691829952e-06,
+        -0.0565910302102566
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 7.1,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 432,
+      "phase": "return_through_family_door",
+      "position": [
+        -12.9999523162842,
+        1.29332733154297,
+        12.1782121658325
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 7.2,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 438,
+      "phase": "family_water_table",
+      "position": [
+        -12.9957857131958,
+        1.29332745075226,
+        12.1740455627441
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.166683182120323,
+        0.0,
+        -0.166683182120323
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 7.3,
+      "touch_axis": [
+        0.902397990226746,
+        -0.430903553962708
+      ]
+    },
+    {
+      "frame": 444,
+      "phase": "family_water_table",
+      "position": [
+        -12.9499502182007,
+        1.293328166008,
+        12.1314306259155
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.666675508022308,
+        0.0,
+        -0.534439086914062
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 7.4,
+      "touch_axis": [
+        0.909117817878723,
+        -0.416538596153259
+      ]
+    },
+    {
+      "frame": 450,
+      "phase": "family_water_table",
+      "position": [
+        -12.854115486145,
+        1.29332828521729,
+        12.0750465393066
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        1.16666781902313,
+        -0.000185966477147304,
+        -0.578041017055511
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 7.5,
+      "touch_axis": [
+        0.915193736553192,
+        -0.403014302253723
+      ]
+    },
+    {
+      "frame": 456,
+      "phase": "family_water_table",
+      "position": [
+        -12.7226305007935,
+        1.29332792758942,
+        12.0168523788452
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        1.3279150724411,
+        -2.14576703001512e-05,
+        -0.582275331020355
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 7.6,
+      "touch_axis": [
+        0.915830433368683,
+        -0.401565343141556
+      ]
+    },
+    {
+      "frame": 462,
+      "phase": "family_water_table",
+      "position": [
+        -12.5898332595825,
+        1.29332828521729,
+        11.9586267471313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        1.32797229290009,
+        -0.00017166136240121,
+        -0.582275331020355
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 7.7,
+      "touch_axis": [
+        0.915829360485077,
+        -0.401567846536636
+      ]
+    },
+    {
+      "frame": 468,
+      "phase": "family_water_table",
+      "position": [
+        -12.4570417404175,
+        1.29332518577576,
+        11.9004011154175
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        1.3279150724411,
+        -0.000336170167429373,
+        -0.582218110561371
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 7.8,
+      "touch_axis": [
+        0.915829598903656,
+        -0.401567012071609
+      ]
+    },
+    {
+      "frame": 474,
+      "phase": "family_water_table",
+      "position": [
+        -12.3242483139038,
+        1.2933315038681,
+        11.842173576355
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        1.3279150724411,
+        0.000386238069040701,
+        -0.58233255147934
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 7.9,
+      "touch_axis": [
+        0.915828943252563,
+        -0.401568681001663
+      ]
+    },
+    {
+      "frame": 480,
+      "phase": "family_water_table",
+      "position": [
+        -12.2136039733887,
+        1.29333400726318,
+        11.7937021255493
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.922279298305511,
+        0.0,
+        -0.404548615217209
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.0,
+      "touch_axis": [
+        0.636042773723602,
+        -0.279013335704803
+      ]
+    },
+    {
+      "frame": 486,
+      "phase": "family_water_table",
+      "position": [
+        -12.1407785415649,
+        1.29333388805389,
+        11.7617559432983
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.607852876186371,
+        -0.000185966477147304,
+        -0.266590118408203
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.1,
+      "touch_axis": [
+        0.419192790985107,
+        -0.18388694524765
+      ]
+    },
+    {
+      "frame": 492,
+      "phase": "family_water_table",
+      "position": [
+        -12.0927829742432,
+        1.29328107833862,
+        11.7406997680664
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.400600403547287,
+        -0.00247478461824358,
+        -0.175724014639854
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.2,
+      "touch_axis": [
+        0.276276707649231,
+        -0.121190793812275
+      ]
+    },
+    {
+      "frame": 498,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        -0.0702667236328125,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.3,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 504,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.4,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 510,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.5,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 516,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.6,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 522,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.7,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 528,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.8,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 534,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 8.9,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 540,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 9.0,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 546,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 9.1,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 552,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 9.2,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 558,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 9.3,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 564,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 9.4,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 570,
+      "phase": "family_water_table",
+      "position": [
+        -12.071982383728,
+        1.29214346408844,
+        11.7330408096313
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 9.5,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 576,
+      "phase": "family_room_departure",
+      "position": [
+        -12.0803146362305,
+        1.29332053661346,
+        11.7397403717041
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.249996170401573,
+        -0.00118017185013741,
+        0.159072861075401
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 9.6,
+      "touch_axis": [
+        -0.930761992931366,
+        0.365625649690628
+      ]
+    },
+    {
+      "frame": 582,
+      "phase": "family_room_departure",
+      "position": [
+        -12.1196279525757,
+        1.29332745075226,
+        11.7555913925171
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.405120819807053,
+        0.00019311903452035,
+        0.158500656485558
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 9.7,
+      "touch_axis": [
+        -0.93127304315567,
+        0.364322185516357
+      ]
+    },
+    {
+      "frame": 588,
+      "phase": "family_room_departure",
+      "position": [
+        -12.160138130188,
+        1.2933337688446,
+        11.7714376449585
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.405063599348068,
+        -0.000200271591893397,
+        0.158500656485558
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 9.8,
+      "touch_axis": [
+        -0.931272208690643,
+        0.364323854446411
+      ]
+    },
+    {
+      "frame": 594,
+      "phase": "family_room_departure",
+      "position": [
+        -12.2006492614746,
+        1.29333710670471,
+        11.7872838973999
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.405120819807053,
+        0.0,
+        0.158443436026573
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 9.9,
+      "touch_axis": [
+        -0.931271910667419,
+        0.364324688911438
+      ]
+    },
+    {
+      "frame": 600,
+      "phase": "family_room_departure",
+      "position": [
+        -12.2583951950073,
+        1.29333400726318,
+        11.8098764419556
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.737857758998871,
+        0.0,
+        0.288677185773849
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 10.0,
+      "touch_axis": [
+        -0.931271970272064,
+        0.364324629306793
+      ]
+    },
+    {
+      "frame": 606,
+      "phase": "family_room_departure",
+      "position": [
+        -12.3522567749023,
+        1.29332387447357,
+        11.8465976715088
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -1.06962203979492,
+        -5.00678979733493e-05,
+        0.418453186750412
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 10.1,
+      "touch_axis": [
+        -0.93127304315567,
+        0.364322185516357
+      ]
+    },
+    {
+      "frame": 612,
+      "phase": "family_room_departure",
+      "position": [
+        -12.4729671478271,
+        1.29332518577576,
+        11.89381980896
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -1.28602969646454,
+        -0.000565051974263042,
+        0.503082275390625
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 10.2,
+      "touch_axis": [
+        -0.931272685527802,
+        0.364322155714035
+      ]
+    },
+    {
+      "frame": 618,
+      "phase": "family_room_departure",
+      "position": [
+        -12.6066017150879,
+        1.29333424568176,
+        11.946099281311
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -1.35034549236298,
+        0.000386238069040701,
+        0.528316497802734
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 10.3,
+      "touch_axis": [
+        -0.931272208690643,
+        0.364323854446411
+      ]
+    },
+    {
+      "frame": 624,
+      "phase": "family_room_departure",
+      "position": [
+        -12.7355823516846,
+        1.29333102703094,
+        11.9965028762817
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -1.1458967924118,
+        -0.000200271591893397,
+        0.446891754865646
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 10.4,
+      "touch_axis": [
+        -0.787544310092926,
+        0.308182090520859
+      ]
+    },
+    {
+      "frame": 630,
+      "phase": "family_room_departure",
+      "position": [
+        -12.8257312774658,
+        1.293328166008,
+        12.0317888259888
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.752391755580902,
+        0.0,
+        0.29457089304924
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 10.5,
+      "touch_axis": [
+        -0.518912792205811,
+        0.203114151954651
+      ]
+    },
+    {
+      "frame": 636,
+      "phase": "family_room_departure",
+      "position": [
+        -12.8851461410522,
+        1.29332780838013,
+        12.0550441741943
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.495872467756271,
+        -0.000200271591893397,
+        0.194091781973839
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 10.6,
+      "touch_axis": [
+        -0.341995477676392,
+        0.133863717317581
+      ]
+    },
+    {
+      "frame": 642,
+      "phase": "family_room_departure",
+      "position": [
+        -12.9243040084839,
+        1.29332756996155,
+        12.0703716278076
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.326786011457443,
+        -0.000207424149266444,
+        0.127944946289062
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 10.7,
+      "touch_axis": [
+        -0.225395575165749,
+        0.088225468993187
+      ]
+    },
+    {
+      "frame": 648,
+      "phase": "family_room_departure",
+      "position": [
+        -12.927698135376,
+        1.29333364963531,
+        12.0703716278076
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 10.8,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 654,
+      "phase": "family_room_departure",
+      "position": [
+        -12.927698135376,
+        1.29333364963531,
+        12.0703716278076
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 10.9,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 660,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9300699234009,
+        1.29333114624023,
+        12.0995349884033
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0266075115650892,
+        2.14576703001512e-05,
+        0.499935120344162
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 11.0,
+      "touch_axis": [
+        -0.0226311832666397,
+        0.999743938446045
+      ]
+    },
+    {
+      "frame": 666,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9330081939697,
+        1.29332828521729,
+        12.1787052154541
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0308990459889174,
+        -0.000178813919774257,
+        1.00004196166992
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 11.1,
+      "touch_axis": [
+        -0.0222157500684261,
+        0.99975323677063
+      ]
+    },
+    {
+      "frame": 672,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9361896514893,
+        1.29332506656647,
+        12.3070297241211
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0319862365722656,
+        0.0,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 11.2,
+      "touch_axis": [
+        -0.0220518764108419,
+        0.999756693840027
+      ]
+    },
+    {
+      "frame": 678,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9393854141235,
+        1.29332530498505,
+        12.4519968032837
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0319290161132812,
+        1.4305113836599e-05,
+        1.44968020915985
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 11.3,
+      "touch_axis": [
+        -0.022052189335227,
+        0.999756693840027
+      ]
+    },
+    {
+      "frame": 684,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9425830841064,
+        1.29332220554352,
+        12.5969610214233
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0319862365722656,
+        0.0,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 11.4,
+      "touch_axis": [
+        -0.0220525041222572,
+        0.999756693840027
+      ]
+    },
+    {
+      "frame": 690,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9457788467407,
+        1.29334044456482,
+        12.7419261932373
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0319290161132812,
+        0.00126600253861398,
+        1.44968020915985
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 11.5,
+      "touch_axis": [
+        -0.0220528170466423,
+        0.999756693840027
+      ]
+    },
+    {
+      "frame": 696,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9489765167236,
+        1.29332292079926,
+        12.886890411377
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0319862365722656,
+        -0.000357627839548513,
+        1.44968020915985
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 11.6,
+      "touch_axis": [
+        -0.0220532342791557,
+        0.999756693840027
+      ]
+    },
+    {
+      "frame": 702,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9514026641846,
+        1.3405202627182,
+        12.9927759170532
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0287246685475111,
+        0.321643322706223,
+        1.27853381633759
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 11.7,
+      "touch_axis": [
+        -0.0220164470374584,
+        0.999757528305054
+      ]
+    },
+    {
+      "frame": 708,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9545555114746,
+        1.34584009647369,
+        13.1353998184204
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0319290161132812,
+        0.000536441802978516,
+        1.44968020915985
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 11.8,
+      "touch_axis": [
+        -0.0220062043517828,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 714,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9577445983887,
+        1.3458343744278,
+        13.2803659439087
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0318717956542969,
+        0.000379085511667654,
+        1.44968020915985
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 11.9,
+      "touch_axis": [
+        -0.0220067277550697,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 720,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9609346389771,
+        1.34582126140594,
+        13.425329208374
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0318717956542969,
+        -0.000944137515034527,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 12.0,
+      "touch_axis": [
+        -0.0220071449875832,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 726,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9641246795654,
+        1.34583413600922,
+        13.5702924728394
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0319862365722656,
+        -0.000407695741159841,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 12.1,
+      "touch_axis": [
+        -0.0220089200884104,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 732,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9673156738281,
+        1.34584057331085,
+        13.715256690979
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0319290161132812,
+        0.000522136688232422,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 12.2,
+      "touch_axis": [
+        -0.0220083985477686,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 738,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9705057144165,
+        1.34584009647369,
+        13.86021900177
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0318717956542969,
+        -5.00678979733493e-05,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 12.3,
+      "touch_axis": [
+        -0.0220086071640253,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 744,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9737024307251,
+        1.33950805664062,
+        14.0053672790527
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0319290161132812,
+        -0.299999684095383,
+        1.44962298870087
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 12.4,
+      "touch_axis": [
+        -0.0220081899315119,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 750,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9769048690796,
+        1.28475618362427,
+        14.1507844924927
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0321006774902344,
+        -0.580072343349457,
+        1.45814883708954
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 12.5,
+      "touch_axis": [
+        -0.0220066234469414,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 756,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9801082611084,
+        1.22315144538879,
+        14.2962846755981
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0321006774902344,
+        -0.579957902431488,
+        1.45757663249969
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 12.6,
+      "touch_axis": [
+        -0.0220062043517828,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 762,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9833097457886,
+        1.16082489490509,
+        14.4417314529419
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0321006774902344,
+        -0.623803079128265,
+        1.45706164836884
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 12.7,
+      "touch_axis": [
+        -0.0220064129680395,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 768,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9865121841431,
+        1.09921932220459,
+        14.5872354507446
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.03204345703125,
+        -0.623688638210297,
+        1.45654666423798
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 12.8,
+      "touch_axis": [
+        -0.0220057852566242,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 774,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9897165298462,
+        1.03760361671448,
+        14.7327880859375
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.03204345703125,
+        -0.623559892177582,
+        1.45591723918915
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 12.9,
+      "touch_axis": [
+        -0.0220050532370806,
+        0.999757468700409
+      ]
+    },
+    {
+      "frame": 780,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9928998947144,
+        0.976712703704834,
+        14.8774318695068
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0307846050709486,
+        -0.579432189464569,
+        1.3982390165329
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 13.0,
+      "touch_axis": [
+        -0.0211478732526302,
+        0.960755407810211
+      ]
+    },
+    {
+      "frame": 786,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9953269958496,
+        0.929397463798523,
+        14.9883623123169
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0202560406178236,
+        -0.381560295820236,
+        0.917015016078949
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 13.1,
+      "touch_axis": [
+        -0.013918424025178,
+        0.630336344242096
+      ]
+    },
+    {
+      "frame": 792,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9969205856323,
+        0.898362696170807,
+        15.0609531402588
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.0132751455530524,
+        -0.299752920866013,
+        0.599842011928558
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 13.2,
+      "touch_axis": [
+        -0.00916855130344629,
+        0.414011359214783
+      ]
+    },
+    {
+      "frame": 798,
+      "phase": "family_door_departure",
+      "position": [
+        -12.997971534729,
+        0.890840113162994,
+        15.1091966629028
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        -0.00875473022460938,
+        -3.57627845914976e-06,
+        0.392074555158615
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 13.3,
+      "touch_axis": [
+        -0.0060400078073144,
+        0.270382672548294
+      ]
+    },
+    {
+      "frame": 804,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9981079101562,
+        0.890842914581299,
+        15.1199827194214
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 13.4,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 810,
+      "phase": "family_door_departure",
+      "position": [
+        -12.9981079101562,
+        0.890842914581299,
+        15.1199827194214
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 13.5,
+      "touch_axis": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "frame": 816,
+      "phase": "walk_from_home",
+      "position": [
+        -12.9772758483887,
+        0.890840172767639,
+        15.1337032318115
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.416622132062912,
+        3.57627845914976e-06,
+        0.204563125967979
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 13.6,
+      "touch_axis": [
+        0.976994156837463,
+        0.213266029953957
+      ]
+    },
+    {
+      "frame": 822,
+      "phase": "walk_from_home",
+      "position": [
+        -12.9064416885376,
+        0.890840232372284,
+        15.1580219268799
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.916671693325043,
+        0.0,
+        0.267219543457031
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 13.7,
+      "touch_axis": [
+        0.977491676807404,
+        0.210974261164665
+      ]
+    },
+    {
+      "frame": 828,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 13.8,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 834,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 13.9,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 840,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 14.0,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 846,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 14.1,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 852,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 14.2,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 858,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 14.3,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 864,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 14.4,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 870,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 14.5,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 876,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 14.6,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 882,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 14.7,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 888,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 14.8,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 894,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 14.9,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 900,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 15.0,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 906,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 15.1,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 912,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 15.2,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 918,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 15.3,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 924,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 15.4,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 930,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 15.5,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 936,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 15.6,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 942,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 15.7,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 948,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 15.8,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 954,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 15.9,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 960,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 16.0,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 966,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 16.1,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 972,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 16.2,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 978,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 16.3,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 984,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 16.4,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 990,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 16.5,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 996,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 16.6,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 1002,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 16.7,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 1008,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 16.8,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 1014,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 16.9,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 1020,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 17.0,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 1026,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 17.1,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 1032,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 17.2,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 1038,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 17.3,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 1044,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 17.4,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    },
+    {
+      "frame": 1050,
+      "phase": "walk_from_home",
+      "position": [
+        -12.8508853912354,
+        0.890840649604797,
+        15.1734933853149
+      ],
+      "practice_hits": 0,
+      "real_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "running": false,
+      "screen": "playing",
+      "simulation_seconds": 17.5,
+      "touch_axis": [
+        0.977733850479126,
+        0.209848895668983
+      ]
+    }
+  ],
+  "wall_seconds": 18.598,
+  "source_sha256": {
+    "tools/characters/action_route_review.gd": "6c8b3501b700c30f00de86bfc995f091ccf3a03b2c1a29bafe2e99df2e8190da",
+    "tools/characters/capture_action_route.py": "7e43090b3547c45006a5ab696d53b8e35095802c9ecbd09b3b23c4a60e63e31f",
+    "tools/characters/capture_hero.py": "bbaac76a7671c1c6b18a75f631aa7af8798be762ec5c5744714b06c49ab0bd70",
+    "prototype/project.godot": "02914329ec13ac77710c08ca0d55b2f196366001cb7943f44285d1dca4d72dfe",
+    "prototype/main.tscn": "a9f4f0edd8bfb7a776b7c2a0647bfb1324cf615a23065331e09baf24b5263892",
+    "prototype/scripts/battle/battle_model.gd": "674fa5fa9fd6e16610d9b633f58fa91d01a4b3a8f7db9db8702f386308d19a3d",
+    "prototype/scripts/battle/formation_slots.gd": "2f3eb1513e588bdbb0fb9a5b20de3bb2f7dc2b2d12786b3a89b73169d7c5df9f",
+    "prototype/scripts/battle/valley_field.gd": "991b46c8e7113f6b1ac708af644d29df3aa601c5d49abc04f7181d8f05e252f6",
+    "prototype/scripts/cinematic/opening_checkpoint.gd": "4b5c77f402ae53230e2eadfad5a9dfe7a14ee5f050475731abe94036c2c73a9a",
+    "prototype/scripts/cinematic/opening_director.gd": "052fc95a16a82fa61a4b168b0c85050a64f1278d89f03631859532dfa9b83064",
+    "prototype/scripts/domain/combat_actions.gd": "109b20c8be47c7408454eab81e40961e9fd068eb4035fd2b7a09963a6d7ea35b",
+    "prototype/scripts/domain/unarmed_combat.gd": "b44361bc9f5738efed67b9f2347dd7aa84db4319bd849888749cdec48da59a6c",
+    "prototype/scripts/domain/village_economy.gd": "34f7ba0667aeb69a5e79f8998a66260bfc3b757f258d377df6a8ef00ccdf4a32",
+    "prototype/scripts/domain/world_model.gd": "e6b772460ac6a5489503e81079a25a71382ae5f785028669c6a5db8b33a234ea",
+    "prototype/scripts/main.gd": "8ea1191de0feb3e5d08ec96ec6c642bd2dea8764966fc81e695f2c6770b09e9b",
+    "prototype/scripts/story/frontier_chapter.gd": "388668f27040df8fa9849c04a9d88f86e8366aaf91ff9ab7eba8c69062f66112",
+    "prototype/scripts/story/opening_story.gd": "dc209808be9b132b904434f8481944a4a2556238c25baef0215f8e3070753e71",
+    "prototype/scripts/story/village_childhood.gd": "4ede7beb963f46c6481ca4e0101e669968168ac100f530596867815122182f57",
+    "prototype/scripts/story/village_life.gd": "8d2e03e97e0ccc355b506fba4b0a3ee941185064dc5aaf2d91e173f54536c4f5",
+    "prototype/scripts/strategy/atlas_data.gd": "43583ad13e9695cd2f24e07ac4f8ebddc8c3f17333fd46820d6903a35b6a055a",
+    "prototype/scripts/strategy/atlas_screen.gd": "5cf7c34421427a7f9f85aef16559f38d7f99483c08ad48457d42eb5bb11877f1",
+    "prototype/scripts/strategy/globe.gd": "19ee901590d639f4063a54f0ec514f74ff41bbe70746cf88a71c6349c51fa016",
+    "prototype/scripts/strategy/origins.gd": "9fd501a065cf7f1763384da16ba5d0741ac04bed27c4269a3e90fc8859afadf6",
+    "prototype/scripts/strategy/season_campaign.gd": "ba8571353ce4c4329cba2d926b6615c8f075da6f1964bd7dd7a16804a2ea2b96",
+    "prototype/scripts/tactics/valley_hud.gd": "298152768d11d6f4d88fa620aa03121d007484779a742ab371483596d2851b15",
+    "prototype/scripts/tactics/valley_landscape.gd": "edab7c654f19983714e48a8783fff6886bb22892fa035eead926d38c0c24fcd8",
+    "prototype/scripts/tactics/valley_scene.gd": "14f2a8d1d3c92173cfac4bb405ef1c70a51dd567cacdf88a16dbb220dc9f2008",
+    "prototype/scripts/ui/android_graphics_probe.gd": "5f518658f765e82144d20942502078d320ffd6249dd54b4efa3e5dd649e270b4",
+    "prototype/scripts/ui/android_village_diagnostics.gd": "698bdb491fd410bed5630574a187d10dabe51655db61b4d56cdc80a7dbbd10bc",
+    "prototype/scripts/ui/combat_action.gd": "7aa583fae101e4a7b1b27971d73139139f48e2494593a7317156df4085bb714e",
+    "prototype/scripts/ui/figure_gallery.gd": "7b12a54593499b846c163734dd79259fda2f9582f0d9240f2837d2a4531291ff",
+    "prototype/scripts/ui/game_ui.gd": "85188fb3c1ddc53a93505ea587123e5e02bdd3e3afe0d23e089847c04b5576f9",
+    "prototype/scripts/ui/opening_overlay.gd": "7b229a254f19660e2c2a1b1420865ab53d8e92100d27aa19233447e548c0af1b",
+    "prototype/scripts/ui/runtime_display.gd": "e0d6c335f53e32129ec94d5d3b5c9d2a74002e0724e0c6728432fa774e2f22e4",
+    "prototype/scripts/ui/safe_area.gd": "7caee67ed88278c3cb3ece2c899fc8c10a7d2bd0d26e272981ae488394e47dfb",
+    "prototype/scripts/ui/touch_action.gd": "3ece003dcdafcf27d2aa0e51df063f2e9a04bfefa1c089398411322bc4b75c73",
+    "prototype/scripts/ui/touch_look.gd": "3978ef6f09c854459fbfdd3626f3ec75fdd9538a48e7513ffb3a1c2a8a58e183",
+    "prototype/scripts/ui/touch_modal.gd": "6d92ed3d5777c60d7b2eb8ca1993e4525628ffcd811955e4f7edc6647a30cf07",
+    "prototype/scripts/ui/touch_pad.gd": "f2288c2d6e6a2b0dbecf10721260d1bf15b3ff2ebf9576d58623fc560552c628",
+    "prototype/scripts/ui/ui_smoke.gd": "7465f3fcce6eaa4513c4def4e09bd6d50c9a54cd4e7ac400e2b42058ad19d937",
+    "prototype/scripts/ui/village_life_panel.gd": "f28f54989a8d9ada87848c009e6fe9623665da57fb70109923700d79100903f2",
+    "prototype/scripts/ui/village_navigation.gd": "3500385ff20355af32731dde1ea4f9f481144f59568bf74d887efd27ebd1017f",
+    "prototype/scripts/visuals/character_motion.gd": "da1db696fc36c66ba30e1203ae0a814eac2fca19e9a9e6776a1188fb99922b6f",
+    "prototype/scripts/visuals/facial_motion.gd": "e87c5bc3b32c43cb70c4ae5f1fff13a562148bb5faf911e6cb725095fb611a16",
+    "prototype/scripts/visuals/far_ranks.gd": "f7ec796bc1b31370a837135814e80458479f0752241515d95907bc9a3cc47b4e",
+    "prototype/scripts/visuals/grove.gd": "8a46f12798249af5ba554d1d106f7a78d7c735b01a2b698182bb9ec7ac37a024",
+    "prototype/scripts/visuals/hand_pose.gd": "566f0f7d99c955465a7b710e1cfead7b1480a6e0edc3d3951de8d722cf8a88d5",
+    "prototype/scripts/visuals/natural_motion.gd": "c338a7cf704e4ec192ea586df49d3f6ff9cde2d67bec7f54452f35d2aa7d049e",
+    "prototype/scripts/visuals/practice_gear.gd": "e9f01e23ee7d702658d4b3855f4c5ab2095e8ed070651e1c47aca9e11263a2f5",
+    "prototype/scripts/visuals/soldier_visual.gd": "3d1bc83eb66227c1052e251bf24988953cd1fa09639c6b27d7583556df88fd38",
+    "prototype/scripts/visuals/village_person.gd": "88c84b771140648d21955199c00937f7aaed6318ac16be7b9d2d6341851da4c3",
+    "prototype/scripts/world/game_world.gd": "71548359f88ca20cea068b9e55b9353d5be1ece24ef5dbd1805f42c9cc6c1333",
+    "prototype/scripts/world/player_action_world.gd": "bd7d8f8894f01f812d2c9ebdb8ae41f4ed32b33a655cc134bdf49ce4f8fc2479",
+    "prototype/scripts/world/regional_terrain.gd": "f08d6b216455b98f2fbadaab1a1f65077d7de52fd36142d62d9ca4c81e9fdd9e",
+    "prototype/scripts/world/regional_village.gd": "7c663c279be2b8e26902bacc77c7a5c00a6740a09b8108bfa4073280f3bb1670",
+    "prototype/scripts/world/village/frontier_dressing.gd": "217caf0538c5b2acb55570e917298fdcf4b31fc84b939f989e0b8728e19b2deb",
+    "prototype/scripts/world/village/opening_props.gd": "09f6e37d1fb91aeba7dcc0377c79299c1ea2021e90ebfcbf7cde7c729df47b3d",
+    "prototype/scripts/world/village/settlement_dressing.gd": "2c8ef3ed71373f88a8fd3c9c786dc2abf01b2b92a0bf04c2df8d9ad2ec1c14bb",
+    "prototype/scripts/world/village/village_layout.gd": "93f6f952cbcaa628182ad327471b67feadc76fe4065efe4e45be8c76246f1550",
+    "prototype/scripts/world/village/village_population.gd": "f16cfe7dc79e995d1774335af128a5d16fab8f64564e2126ce2eb686ca163244",
+    "prototype/scripts/world/village/village_scenery.gd": "1e3d339ab1713b631063637ff6ce9adefe6d8c60b28ff9123bdcaeb956650d73",
+    "prototype/scripts/world/village_art.gd": "208107abde07ad512bbdabf2bf18aa7e30740aece7a535e9831c0fee6bfa918e",
+    "prototype/scripts/world/village_life_world.gd": "ba51dbdc8b1ee0105157805d8b5f7c1864d13666fbf0a9bef955640d19e98c45",
+    "prototype/scripts/world/world_smoke.gd": "95147208c33c5fe40fea2031cfb6f83698a5bcbd435c814b94b42698418e4b0b",
+    "prototype/scripts/world/world_stream_plan.gd": "7aadf9fa2b0a258078e42119b5a2007a3fb72039ab1efd767287192302ea0a45"
+  },
+  "source_unchanged_during_run": true,
+  "source_changed_paths": [],
+  "source_commit": "db90dee785cbaef97a5d85357b7b9cda762dc9cd",
+  "engine_exit_code": 1,
+  "engine_signal": null
+}
