@@ -10,6 +10,7 @@ var quality := "balanced"
 var frontier_details: Node3D
 var settlement_details: Node3D
 var house_count := 0
+var household_overrides: Array[String] = []
 
 func show_origin(id: String) -> void:
 	if current_origin == id:
@@ -60,6 +61,7 @@ func show_origin(id: String) -> void:
 		add_child(settlement_details)
 		settlement_details.build(self)
 		settlement_details.set_quality(quality)
+		_apply_household_overrides()
 	else:
 		# A communal timber-lined water point for the regional encounter.
 		var wood := Art.material(Color("#785538"))
@@ -86,6 +88,35 @@ func set_quality(profile: String) -> void:
 		frontier_details.set_quality(profile)
 	if settlement_details:
 		settlement_details.set_quality(profile)
+
+
+func set_household_overrides(ids: Array) -> void:
+	var selected: Array[String] = []
+	for id: Variant in ids:
+		if id is String and not selected.has(id): selected.append(id)
+	if selected == household_overrides:
+		return
+	household_overrides = selected
+	_apply_household_overrides()
+
+
+func _apply_household_overrides() -> void:
+	# An authored chapter can replace a household's floor, entrance and props.
+	# The original shell and all other households retain the improved base kit.
+	for home: Dictionary in Layout.HOMES:
+		var building := get_node_or_null(NodePath(home.id)) as Node3D
+		if building == null: continue
+		var show_base := not household_overrides.has(str(home.id))
+		for name: String in ["WalkableFloor","WalkableEntrance","TableCollision","BenchCollision","OpenDoorLeafCollision"]:
+			var part := building.get_node_or_null(NodePath(name)) as Node3D
+			if part == null: continue
+			part.visible = show_base
+			var bodies: Array = part.find_children("*","StaticBody3D",true,false)
+			if part is StaticBody3D: bodies.append(part)
+			for body: StaticBody3D in bodies:
+				body.collision_layer = 1 if show_base else 0
+	if settlement_details:
+		settlement_details.set_excluded_households(household_overrides)
 
 func _tint_house(model: Node3D, tint: Color) -> void:
 	var overrides := {}

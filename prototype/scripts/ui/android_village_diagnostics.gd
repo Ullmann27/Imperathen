@@ -35,7 +35,7 @@ func snapshot() -> Dictionary:
 	if not is_instance_valid(session) or not is_instance_valid(session.ui):
 		return {}
 	var screen := str(session.screen)
-	if screen not in ["playing", "village_panel", "village_dialog", "paused"]:
+	if screen not in ["playing", "village_panel", "village_dialog", "childhood_dialog", "childhood_journal", "trade_dialog", "paused"]:
 		return {}
 	var data: Dictionary = session.model.data
 	var village: Dictionary = data.get("village", {})
@@ -56,6 +56,15 @@ func snapshot() -> Dictionary:
 	for person: Dictionary in economy.people:
 		if person.id == "aelia":
 			value["aelia_assignment"] = person.assignment
+	var childhood: Dictionary = session.model.get_childhood_view()
+	if childhood.get("enabled", false):
+		var position: Vector3 = session.world.get_player_position()
+		value["childhood"] = {"enabled":true,"day":childhood.day,"age":data.player.age,
+			"objective":session.model.get_childhood_objective(),"position":[position.x,position.y,position.z],
+			"navigation":session.world.childhood_navigation(),"camera_yaw":session.world.get("_camera_yaw"),
+			"nearby":session.world._nearest_childhood_interaction(),"denarii":data.resources.denarii,
+			"grain":data.resources.grain,"world_id":data.world_id,
+			"night":village.childhood.night_raid.duplicate(true)}
 	_collect(session.ui, value)
 	return value
 
@@ -74,20 +83,31 @@ func _collect(node: Node, value: Dictionary) -> void:
 		var key := ""
 		match node.text:
 			"Interagieren": key = "interact"
-			"Dorfleben": key = "village"
+			"Dorfleben", "Mein Dorf": key = "village"
+			"Mein Weg": key = "childhood_journal"
 			"Arbeit & Versorgung": key = "work_tab"
 			"Beim Wiederaufbau mithelfen": key = "permit"
 			"Gespräch beenden": key = "dialog_close"
 			"Zurück ins Dorf": key = "panel_close"
+		if str(node.name).begins_with("FrontierChoice_"):
+			key = "choice_" + str(node.name).trim_prefix("FrontierChoice_")
 		if node is OptionButton:
 			for sibling: Node in node.get_parent().get_children():
 				if sibling is Label and sibling.text.begins_with("Aelia ·"):
 					key = "aelia_assignment"
 		if not key.is_empty():
 			value.controls[key] = _geometry(node)
+			value.controls[key]["text"] = node.text
 			if node is OptionButton:
 				value.controls[key]["selected"] = node.selected
 				value.controls[key]["popup"] = _popup_state(node.get_popup())
+	if node is Control and node.name == "MovementPad":
+		var rect: Rect2 = node.get_global_rect()
+		var transform := node.get_viewport().get_screen_transform()
+		var center := transform * rect.get_center()
+		var radius := maxf(24.0, minf(node.size.x,node.size.y) * .5 - 21.0)
+		var edge := transform * (rect.get_center() + Vector2(radius,0))
+		value.controls["movement"] = {"center":[center.x,center.y],"radius":center.distance_to(edge),"visible":true,"enabled":true}
 	for child: Node in node.get_children():
 		_collect(child, value)
 

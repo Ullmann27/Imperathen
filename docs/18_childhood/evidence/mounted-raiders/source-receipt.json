@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "android_device_test": false,
+  "source_sha256": {
+    "prototype/scripts/world/childhood_raiders.gd": "cc8dac0db92433e505f541c3fbdd710ed7ce8f0d8e09d1101056efcc559303af",
+    "prototype/tests/childhood_raiders_review.gd": "ff8a0d4b65a672fe92ae1a00e69c53a86aa60e9a24f3a366cd84aa570edc55af"
+  }
+}

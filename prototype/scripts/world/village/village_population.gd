@@ -11,6 +11,7 @@ var seconds := 0.0
 var profile := "balanced"
 var focused_id := ""
 var recruited := 0
+var excluded_ids: Array[String] = []
 var _player_position := Vector3.ZERO
 var _route_clocks: Dictionary = {}
 var _initialized := false
@@ -65,8 +66,18 @@ func set_recruited(count: int) -> void:
 	recruited = clampi(count,0,Layout.VOLUNTEERS.size())
 	for id: String in actors:
 		var index := Layout.VOLUNTEERS.find(id)
-		actors[id].visible = index < 0 or index >= recruited
+		actors[id].visible = (index < 0 or index >= recruited) and not excluded_ids.has(id)
 		actors[id].collision_layer = Layout.CITIZEN_LAYER if actors[id].visible else 0
+
+
+func set_excluded_ids(ids: Array) -> void:
+	# An identity rendered by the authoritative economy/childhood view is never
+	# simultaneously rendered by this older ambient layer. Clearing restores it.
+	excluded_ids.clear()
+	for id: Variant in ids:
+		if id is String and not excluded_ids.has(id):
+			excluded_ids.append(id)
+	set_recruited(recruited)
 
 func set_quality(next_profile: String) -> void:
 	if next_profile not in ["low","balanced","high","very_high"]:

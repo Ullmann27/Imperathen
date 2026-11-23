@@ -2,7 +2,9 @@ extends RefCounted
 ## Shared village life: original fictional encounters in a documented historical era.
 ## The WorldModel owns transactions and time. Presentation cannot award experience.
 
-const Childhood = preload("res://scripts/story/village_childhood.gd")
+const Childhood = preload("res://scripts/story/childhood_story.gd")
+const LegacyChildhood = preload("res://scripts/story/village_childhood.gd")
+
 const VERSION := 1
 const DAY_SECONDS := 120.0
 const STEP := 0.1
@@ -14,7 +16,7 @@ const RAID_INTERVAL := 360.0
 const SCOUT_POINT := Vector2(-16.0, -19.0)
 const ALARM_POINT := Vector2(0.0, -16.0)
 const RESCUE_POINT := Vector2(5.0, -9.0)
-const WORKPLACE_POSITIONS := Childhood.WORKPLACE_POSITIONS
+const WORKPLACE_POSITIONS := LegacyChildhood.WORKPLACE_POSITIONS
 const GOODS := ["wood", "grain", "denarii", "stone"]
 const NPCS := {
 	"decimus": {"name":"Decimus", "role":"Dorfverwalter", "x":2.0, "z":9.0, "profession":"", "cost":{}, "greeting":"Trajan herrscht in Rom. Hier trage ich die Verantwortung. Die Angreifer haben uns Vorräte und Werkzeug genommen. Hilf beim Wiederaufbau; Vertrauen verdienst du dir mit Taten.", "reply":"Sprich mit den Handwerkern. Wenn du die Arbeitsgruppen koordinierst, bleibt jede Person nur an einem Ort eingeteilt."},
@@ -67,17 +69,26 @@ static func npc_catalog(data: Dictionary = {}) -> Array[Dictionary]:
 		var npc: Dictionary = NPCS[id].duplicate(true)
 		npc["id"] = id
 		result.append(npc)
-	result.append_array(Childhood.npc_catalog(data))
+	result.append_array(LegacyChildhood.npc_catalog(data))
+	if Childhood.enabled(data):
+		for id: String in ["julia", "silvanus", "sextus"]:
+			var person := _person(data,id)
+			var point := Childhood.actor_position(data,id)
+			result.append({"id":id,"name":person.get("name",id.capitalize()),
+				"role":{"julia":"Deine Mutter · Bäuerin","silvanus":"Dein Vater · Lastenträger","sextus":"Schmied · Vaters bester Freund"}[id],
+				"profession":"","cost":{},"x":point.x,"z":point.y,"greeting":"","reply":""})
 	return result
 
 
 static func has_npc(data: Dictionary, id: String) -> bool:
-	return NPCS.has(id) or Childhood.has_npc(data, id)
+	return NPCS.has(id) or LegacyChildhood.has_npc(data, id) or (Childhood.enabled(data) and id in ["julia","silvanus","sextus"])
 
 
 static func relationship(data: Dictionary, id: String) -> Dictionary:
-	if Childhood.has_npc(data, id):
-		return Childhood.relationship(data, id)
+	if LegacyChildhood.has_npc(data, id):
+		return LegacyChildhood.relationship(data, id)
+	if Childhood.enabled(data) and id in ["julia","silvanus","sextus"]:
+		return {"met":true,"trust":int(data.village.childhood.bonds[id]),"helped":false,"declined":false,"learned":false,"ally":false}
 	return data.get("village", {}).get("social", {}).get("npcs", {}).get(id, {}).duplicate(true)
 
 
@@ -105,20 +116,20 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dictionary:
 	var social: Dictionary = data.village.social
 	var raid: Dictionary = data.village.raid
-	if Childhood.COMMAND_FIELDS.has(command):
-		var result := Childhood.execute(data, command, args)
+	if LegacyChildhood.COMMAND_FIELDS.has(command):
+		var result := LegacyChildhood.execute(data, command, args)
 		if result.ok and command == "village_childhood_begin_raid":
 			_begin_warning(data, true)
 			_begin_raid(data)
 		return result
-	if Childhood.enabled(data) and command in ["village_learn", "village_ally"]:
+	if (Childhood.enabled(data) or LegacyChildhood.enabled(data)) and command in ["village_learn", "village_ally"]:
 		return _fail("Deine erste Lehre und dein Vertrauen entstehen in den gemeinsamen Kindheitsaufgaben, nicht durch einen sofortigen Karrierewechsel.")
-	if Childhood.enabled(data) and command == "village_talk" and args.choice != "meet":
+	if (Childhood.enabled(data) or LegacyChildhood.enabled(data)) and command == "village_talk" and args.choice != "meet":
 		return _fail("Im Kindheitskapitel entstehen Hilfe und Vertrauen durch eure vereinbarten Wege und Übergaben. Sprich über deinen aktuellen Auftrag.")
 	if command in ["village_talk", "village_learn", "village_ally"]:
 		var id: String = args.npc_id
-		if command == "village_talk" and Childhood.has_npc(data, id):
-			return Childhood.talk(data, id, args.choice)
+		if command == "village_talk" and LegacyChildhood.has_npc(data, id):
+			return LegacyChildhood.talk(data, id, args.choice)
 		if not NPCS.has(id):
 			return _fail("Diese Person gehört nicht zu den bekannten Dorfbewohnern.")
 		var npc: Dictionary = NPCS[id]
@@ -294,9 +305,7 @@ static func _tick(data: Dictionary) -> void:
 		raid[key] = maxf(0.0,float(raid[key])-STEP)
 	raid.stamina = minf(100.0,float(raid.stamina)+1.2)
 	if raid.status in ["quiet","aftermath"]:
-		# Childhood danger is released only after the completed family/market arc
-		# and its explicit night event. Wall-clock idling never summons another raid.
-		if Childhood.enabled(data):
+		if Childhood.enabled(data) or LegacyChildhood.enabled(data):
 			return
 		if float(data.village.social.seconds)+0.000001>=float(raid.next_at) and _has_home(data) and _met_count(data)>=3:
 			_begin_warning(data)
@@ -414,9 +423,12 @@ static func actor_position(data: Dictionary, npc_id: String) -> Vector2:
 	var raid: Dictionary = data.get("village",{}).get("raid",{})
 	if raid.get("active",false) and raid.get("rescue_available",false) and raid.get("rescue_person_id","")==npc_id:
 		return RESCUE_POINT
-	var childhood_position: Variant = Childhood.actor_override(data, npc_id)
-	if typeof(childhood_position) == TYPE_VECTOR2:
+	var childhood_position := Childhood.actor_position(data,npc_id)
+	if childhood_position.is_finite():
 		return childhood_position
+	var legacy_position: Variant = LegacyChildhood.actor_override(data,npc_id)
+	if typeof(legacy_position) == TYPE_VECTOR2:
+		return legacy_position
 	var people: Array = data.get("village",{}).get("economy",{}).get("people",[])
 	for index in people.size():
 		var person: Dictionary = people[index]
@@ -428,6 +440,10 @@ static func actor_position(data: Dictionary, npc_id: String) -> Vector2:
 			for previous in index:
 				if str(people[previous].get("assignment",""))==duty:
 					rank += 1
+			if Childhood.enabled(data) and duty=="trade":
+				return WORKPLACE_POSITIONS[duty]+Vector2((rank%2)*1.4-0.7,1.3+floori(float(rank)/2.0)*2.4)
+			if Childhood.enabled(data):
+				return WORKPLACE_POSITIONS[duty]+Vector2((rank%2)*2.4-1.2,floori(float(rank)/2.0)*2.4)
 			return WORKPLACE_POSITIONS[duty]+Vector2((rank%2)*2.4-1.2,2.1+floori(float(rank)/2.0)*2.0)
 		if NPCS.has(npc_id):
 			return Vector2(NPCS[npc_id].x,NPCS[npc_id].z)
@@ -435,6 +451,16 @@ static func actor_position(data: Dictionary, npc_id: String) -> Vector2:
 	if NPCS.has(npc_id):
 		return Vector2(NPCS[npc_id].x,NPCS[npc_id].z)
 	return Vector2(32.0,-18.0)
+
+
+static func begin_childhood_raid(data: Dictionary) -> bool:
+	if not Childhood.enabled(data) or data.village.childhood.night_raid.phase!="attack" or data.village.raid.number!=0 or data.village.raid.completed!=0:
+		return false
+	# The authored, explicit decision owns this gate. No elapsed-time shortcut.
+	_begin_warning(data)
+	data.village.raid.scouted = data.village.childhood.memories.get("patrol_east","")=="accurate"
+	_begin_raid(data)
+	return true
 
 
 static func _begin_warning(data: Dictionary, childhood_night := false) -> void:
@@ -503,7 +529,7 @@ static func _finish_raid(data: Dictionary, outcome: String) -> void:
 
 
 static func training_ready(data: Dictionary) -> bool:
-	if Childhood.enabled(data):
+	if Childhood.enabled(data) or LegacyChildhood.enabled(data):
 		return false
 	if not data.get("village",{}).has("social"):
 		return false
@@ -533,13 +559,23 @@ static func view(data: Dictionary) -> Dictionary:
 		objective = "Verteidige den Nordweg. Schütze die Vorräte und rette die gefährdete Person."
 	elif raid.completed>0:
 		objective = "Versorge das Dorf weiter. Vertiefe Beziehungen, lerne einen Beruf und bereite die nächste Wache vor."
-	var childhood := Childhood.view(data)
-	if not childhood.is_empty() and not raid.active:
-		objective = childhood.objective
+	var legacy_childhood := LegacyChildhood.view(data)
+	if not legacy_childhood.is_empty() and not raid.active:
+		objective = str(legacy_childhood.objective)
 	var history: Dictionary = data.village.history.duplicate(true)
 	history["current_year"] = int(history.start_year)+int(data.get("progress",{}).get("years_elapsed",0))
 	history["anchors"] = HISTORICAL_ANCHORS.duplicate(true) if str(data.get("origin_id","italia"))=="italia" else []
-	return {"title":childhood.get("title", "Ein Dorf wird dein Zuhause"), "objective":objective, "day":childhood.get("day", floori((float(social.seconds)+0.000001)/DAY_SECONDS)+1),
+	var title := "Ein Dorf wird dein Zuhause"
+	var day := floori((float(social.seconds)+0.000001)/DAY_SECONDS)+1
+	if Childhood.enabled(data):
+		var childhood := Childhood.view(data)
+		title = childhood.title
+		objective = childhood.objective.label
+		day = int(childhood.day)
+	elif not legacy_childhood.is_empty():
+		title = str(legacy_childhood.title)
+		day = int(legacy_childhood.day)
+	return {"title":title, "objective":objective, "day":day,
 		"seconds":social.seconds, "ruler":_ruler(data),
 		"player_authority":"Bewohner", "profession":PROFESSIONS[social.profession], "attributes":data.village.attributes.duplicate(true),
 		"npcs":npcs, "raid":raid.duplicate(true), "history":history, "training_ready":training_ready(data), "defenders":defense_strength(data)}
@@ -548,6 +584,8 @@ static func view(data: Dictionary) -> Dictionary:
 static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
 	if Childhood.enabled(data):
 		return Childhood.dialogue(data, npc_id)
+	if LegacyChildhood.enabled(data):
+		return LegacyChildhood.dialogue(data, npc_id)
 	if not NPCS.has(npc_id) or not validate(data).is_empty():
 		return {}
 	var npc: Dictionary = NPCS[npc_id]
@@ -648,7 +686,7 @@ static func validate(data: Dictionary) -> String:
 	for item: Variant in history.events:
 		if not _keys(item,["seconds","kind","text","provenance"]) or not _number(item.seconds,0.0,1000000000.0) or typeof(item.kind)!=TYPE_STRING or item.kind.length()>40 or typeof(item.text)!=TYPE_STRING or item.text.length()>1024 or item.provenance!="fictional_playable_event":
 			return "Ungültiger Chronikbeleg."
-	return Childhood.validate(data)
+	return LegacyChildhood.validate(data)
 
 
 static func _ruler(data: Dictionary) -> String:
@@ -659,8 +697,10 @@ static func _ruler(data: Dictionary) -> String:
 
 
 static func _greeting(data: Dictionary, id: String) -> String:
-	if Childhood.enabled(data):
-		return str(Childhood.dialogue(data, id).get("text", ""))
+	if Childhood.enabled(data) and id=="decimus":
+		return "Das Dorf besteht längst, und ich trage die Verantwortung für die Arbeitsgruppen. Lerne die Menschen kennen, hilf deiner Familie und halte deine Absprachen ein."
+	if LegacyChildhood.enabled(data):
+		return str(LegacyChildhood.dialogue(data,id).get("text",""))
 	if id=="decimus" and (str(data.get("origin_id","italia"))!="italia" or 100+int(data.get("progress",{}).get("years_elapsed",0))>117):
 		return "Die örtliche Verwaltung trägt hier die Verantwortung. Hilf beim Wiederaufbau und lerne die Menschen kennen. Vertrauen verdienst du dir mit Taten."
 	return NPCS[id].greeting
@@ -704,7 +744,7 @@ static func is_available(data: Dictionary, npc_id: String) -> bool:
 
 static func _absence_reason(data: Dictionary, npc_id: String) -> String:
 	var person := _person(data,npc_id)
-	var name: String = str(Childhood.EXTRA_NPCS.get(npc_id, NPCS.get(npc_id, {})).get("name", npc_id))
+	var name: String = str(person.get("name",npc_id.capitalize()))
 	if person.is_empty():
 		return "Diese Person ist zurzeit nicht im Dorf."
 	if not person.get("alive",false):

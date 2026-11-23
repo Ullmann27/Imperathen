@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "exit_code": 0,
+  "scope": "Synthetic Android package, native-input observer and guarded publication regressions; no emulator or physical-device evidence.",
+  "source_sha256": {
+    "tests/android_childhood_payload_test.py": "efe39dd38c837f865679cc4474791dc622d837a6568e17f955194b473d12e8ad",
+    "tests/android_childhood_publish_test.py": "510268d106ff66d338c3ffcd5c78ecdf5eca07371c6414c6c2a819ae767f0e74",
+    "tests/android_childhood_runtime_test.py": "1292d57e4a7cb155a87c0c0d348e07a49e451127e8f1a9d1d7c77e0d96322dc1",
+    "tests/android_frontier_payload_test.py": "3ca2f66fb4d20d9846c3bfd5a922db6bfa104dff6ed4c654420e8319f0963897",
+    "tests/android_hero_payload_test.py": "4cc64b01bc273b860d771d7f77acdbaf7352af3876894b1d408767919a8d3a3b",
+    "tests/android_runtime_smoke_test.py": "af2d41bde730305531981a8c1e2600f1dbb5c6e288d3529cb23d591fa5dee487",
+    "tests/android_village_payload_test.py": "b0e2ccf9490d64050342205994da3b18dbc324d273b00ebde6e9f75d9b257672",
+    "tests/android_village_publication_test.py": "67108c764fab7e91090fe0462a5fb21b01cbca95a3e8bff3a065897999d38824",
+    "tools/android_graphics_benchmark.py": "3fe095b68b71ddf3f38fb49714ed5bf9f7e94e1633404fcba141a86ec81365e8",
+    "tools/android_runtime_smoke.py": "f9daf2263971d6acb46240f14146164d1de9325c7f1991bf762754af9aeab94e",
+    "tools/build_android_prototype.py": "d594469a405570d257d88563b268ddb76cc381901000f08ec3ee553b4f287ece",
+    "tools/publish_village_download.py": "927fef27df9d23eb7ffe246d01b06e99af37315198e0bd6c6017f94e56e05112",
+    "tools/validate_android_apk.py": "4e596824c70ebf0c3db44d98e911b599a7a9d63009552a15d1afbca59d88c097"
+  }
+}

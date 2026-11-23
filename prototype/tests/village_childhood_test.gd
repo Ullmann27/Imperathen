@@ -6,6 +6,7 @@ const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
+const BaseFixture = preload("res://tests/base_childhood_fixture.gd")
 var checks := 0
 var failures: Array[String] = []
 var directory := "user://village_childhood_%s" % Time.get_ticks_usec()
@@ -29,8 +30,9 @@ func _initialize() -> void:
 
 func _new():
 	var model = WorldModel.new()
-	model.new_game("italia", true, true)
-	_check(Childhood.enabled(model.data), "Explicit fresh-game opt-in creates childhood")
+	var restored := BaseFixture.restore(model)
+	_check(restored.ok, "The real schema-5 base childhood loads through normal migration: " + restored.message)
+	_check(Childhood.enabled(model.data), "An explicitly restored earlier childhood keeps its own story")
 	_check(model._validate_state(model.data).is_empty(), "Initial complete world validates: " + model._validate_state(model.data))
 	return model
 
@@ -116,7 +118,7 @@ func _test_fresh_opt_in_and_legacy() -> void:
 	v4.erase("village")
 	_write(_path("legacy-v4"), v4)
 	_ok(model.load_game(_path("legacy-v4")), "Run existing version-four migration")
-	_check(model.data.schema_version == 5 and not Childhood.enabled(model.data) and not model.data.village.enabled, "Version migration preserves legacy adulthood rules without inventing a childhood history")
+	_check(model.data.schema_version == WorldModel.SCHEMA_VERSION and not Childhood.enabled(model.data) and not model.data.village.enabled, "Version migration preserves legacy adulthood rules without inventing a childhood history")
 
 
 func _test_idle_and_bypasses() -> void:

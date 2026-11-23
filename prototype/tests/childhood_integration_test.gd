@@ -1,8 +1,13 @@
 extends SceneTree
-## Production UI/world flow. Explicit fixture travel is not a measured playthrough.
+## Compatibility UI/world flow for an actual schema-5 Base childhood save.
+## Fresh New Life is covered by childhood_experience/night_integration_test.
+## Explicit fixture travel is not a measured playthrough.
 const Entry=preload("res://main.tscn")
 const Childhood=preload("res://scripts/story/village_childhood.gd")
+const CurrentChildhood=preload("res://scripts/story/childhood_story.gd")
+const OpeningStory=preload("res://scripts/story/opening_story.gd")
 const Life=preload("res://scripts/story/village_life.gd")
+const BASE_SAVE="res://tests/fixtures/base_childhood_start_e573550.json"
 var game
 var checks:=0
 var failures: Array[String]=[]
@@ -47,10 +52,30 @@ func _run() -> void:
 	game.set_process(false)
 	game.ui._touch_enabled=true
 	game.ui._finish_intro()
-	game.ui.action_requested.emit("new_game",{})
+	# Preserve the bytes produced by the previous published WorldModel. Continue
+	# must migrate and retain them; New Life never selects this earlier story.
+	var fixture := FileAccess.get_file_as_string(BASE_SAVE)
+	check(not fixture.is_empty(),"An actual published Base childhood save fixture exists")
+	if fixture.is_empty():
+		game.queue_free()
+		quit(1)
+		return
+	var save := FileAccess.open(game.SAVE_PATH,FileAccess.WRITE)
+	check(save!=null,"The isolated legacy save destination is writable")
+	if save==null:
+		game.queue_free()
+		quit(1)
+		return
+	save.store_string(fixture)
+	save.close()
+	game._show_menu()
+	game.ui.action_requested.emit("continue",{})
 	await frames()
-	check(game.screen=="opening" and game.opening_sequence.id=="childhood_home","New Life uses the family opening")
-	check(Childhood.enabled(game.model.data),"Fresh Roman campaign contains the new chapter")
+	check(game.screen=="playing" and Childhood.enabled(game.model.data) and not CurrentChildhood.enabled(game.model.data),"Actual Continue preserves the earlier family's own saved story")
+	game._begin_opening(OpeningStory.childhood())
+	await frames()
+	check(game.screen=="opening" and game.opening_sequence.id=="childhood_home","The explicitly loaded legacy campaign retains its own family introduction")
+	check(Childhood.enabled(game.model.data),"The earlier saved childhood remains active without rewriting its format")
 	game._opening_skip()
 	game._opening_next()
 	await frames(12)
@@ -143,11 +168,11 @@ func _run() -> void:
 	await capture("04-techniques")
 	root.go_back_requested.emit()
 	check(game.screen=="playing","Android Back leaves the technique selection")
-	check(not game.model.execute("train",{}).ok,"New chapter rejects old six-year shortcut")
+	check(not game.model.execute("train",{}).ok,"The saved childhood still rejects the six-year shortcut")
 	check(not game.model.execute("village_request_work",{}).ok,"A child cannot redistribute all villagers")
 	if not capture_dir.is_empty():
 		var file:=FileAccess.open(capture_dir.path_join("integration-report.json"),FileAccess.WRITE)
-		file.store_string(JSON.stringify({"checks":checks,"failures":failures,"captures":captures,"quality":game.world.get_quality_profile(),"travel":"explicit test fixture positioning; not a timed player walkthrough"}, "\t"))
+		file.store_string(JSON.stringify({"checks":checks,"failures":failures,"captures":captures,"quality":game.world.get_quality_profile(),"scenario":"schema-5 Base childhood compatibility; not the current New Life entry","travel":"explicit test fixture positioning; not a timed player walkthrough"}, "\t"))
 		file.close()
 	game.queue_free()
 	await frames()

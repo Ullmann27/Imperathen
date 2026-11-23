@@ -1,0 +1,69 @@
+{
+  "checked_on": "2026-11-23",
+  "scope": "Chat B: fictional childhood village in a Roman Danube frontier setting around AD 100, finite local trade and an explicitly fictional mounted raid",
+  "sources": [
+    {
+      "id": "mic_trajan_chronology",
+      "publisher": "Ministero della cultura, Italia",
+      "title": "Parco archeologico del Colosseo - Colonna Traiana",
+      "url": "https://cultura.gov.it/luogo/parco-archeologico-del-colosseo-colonna-traiana",
+      "supports": ["Trajan ruled AD 98–117", "Dacian campaigns AD 101–102 and 105–106"],
+      "limits": "Does not document the fictional village, raiding party or player biography."
+    },
+    {
+      "id": "romanian_ministry_danube_submission",
+      "publisher": "Ministry of Culture, Romania; hosted by UNESCO World Heritage Centre",
+      "title": "Frontiers of the Roman Empire - The Danube Limes (Romania)",
+      "url": "https://whc.unesco.org/en/tentativelists/6446/",
+      "supports": ["Permanent military bases on the lower Danube in the first century AD", "Moesia and its later division as frontier context", "The province of Dacia was created in AD 106"],
+      "limits": "A State Party Tentative List submission, not an independent UNESCO endorsement of every statement. No invented coordinates are derived."
+    },
+    {
+      "id": "met_trajan_parthian_war",
+      "publisher": "The Metropolitan Museum of Art",
+      "title": "Bronze military diploma fragment, object 23.160.52",
+      "url": "https://www.metmuseum.org/art/collection/search/251396",
+      "supports": ["The object dates to AD 113/14", "The museum dates Trajan's Parthian War to AD 114–117 and describes the emperor's journey east"],
+      "limits": "The object's ship joining that flotilla is described as a possibility; the game does not turn that possibility into fact."
+    },
+    {
+      "id": "ans_early_imperial_denominations",
+      "publisher": "American Numismatic Society",
+      "title": "Rome: A Thousand Years of Monetary History",
+      "url": "https://numismatics.org/rome-a-thousand-years-of-monetary-history/",
+      "supports": ["1 aureus = 25 denarii = 100 sestertii = 400 asses", "A dupondius is worth two asses"],
+      "limits": "Used for denomination ratios only. No historical commodity prices or modern purchasing-power comparisons are imported."
+    },
+    {
+      "id": "segedunum_cavalry_equipment",
+      "publisher": "North East Museums / Segedunum Roman Fort",
+      "title": "The clothing and weapons used by cavalry soldiers",
+      "url": "https://www.northeastmuseums.org.uk/segedunum/learning/cavalry-soldiers",
+      "supports": ["The teaching resource covers cavalry of Hadrian's time", "Tunic and trousers as riding clothing", "A four-horn saddle used without stirrups", "Bridle and reins as horse equipment"],
+      "limits": "A nearby-period Roman comparison, not evidence identifying the fictional raiders or their uniform in AD 100."
+    },
+    {
+      "id": "connolly_van_driel_murray_saddle",
+      "publisher": "Cambridge University Press / Society for the Promotion of Roman Studies",
+      "title": "Peter Connolly and Carol van Driel-Murray, The Roman Cavalry Saddle, Britannia 22 (1991), pp. 33–50",
+      "url": "https://www.cambridge.org/core/journals/britannia/article/abs/roman-cavalry-saddle/B94F665AA39C169357EB255B87796211",
+      "doi": "10.2307/526629",
+      "supports": ["The public extract states that no Roman saddle survives complete", "Depictions and surviving leather casings and metal horn stiffeners form the reconstruction evidence"],
+      "limits": "Only the publicly accessible extract and bibliographic metadata were read; no claim to have accessed the full article."
+    }
+  ],
+  "fictional_content": [
+    "The village and the personal stories of Julia, Silvanus, Sextus, Marcus and other original villagers",
+    "The identity, number, route and actions of the thirty mounted raiders",
+    "All commodity prices, merchant starting cash and local stock quantities",
+    "Player-dependent consequences and any later alternate historical outcomes"
+  ],
+  "asset_provenance": "No third-party meshes, photographs or textures imported. New horse and rider geometry is original runtime-generated Godot geometry with source retained in the repository.",
+  "excluded_claims": [
+    "A universally greatest Roman enemy around AD 100",
+    "A documented Parthian raid on the fictional Danube village",
+    "A historically documented thirty-rider attack or twelve-year-old regular military service",
+    "Exact reconstruction of a complete surviving Roman saddle",
+    "Measured Android performance or temperature improvement from these source references"
+  ]
+}

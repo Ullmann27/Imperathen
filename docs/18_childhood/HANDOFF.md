@@ -1,5 +1,7 @@
 # Übergabe: Kindheit, bewohntes Dorf und erste Nahkampfgrundlage
 
+> Historischer Lieferstand des Koordinatorzweigs bis `e5735509622c9a94564dc5fe21257c07074f9df5`. Die aktuelle zusammengeführte Fassung und die spätere Nutzervorgabe stehen in [CHAT_B_DELIVERY.md](CHAT_B_DELIVERY.md) und [STORY_TIME_CONTRACT.md](STORY_TIME_CONTRACT.md). Neue Partien verwenden Julia, Silvanus und Sextus sowie beide endgültigen Nachtfolgen. Der hier beschriebene frühere Familienbogen bleibt für tatsächlich vorhandene Spielstände erhalten. Die folgenden Zahlen, Bild- und Androidgrenzen beziehen sich ausschließlich auf diesen früheren Stand.
+
 Stand: 23. November 2026. Arbeitszweig: `feature/childhood-village-20261123`. Ausgangspunkt des Codes: `f2900eb86b90b185627dcd490fef550fd0cbed11`. Die zwei Zusatzchat-Aufträge wurden zuerst in `2909040deeb33b99ad4180b884b38921f28233a9` gesichert. Für die Weiterarbeit den **aktuellen Remote-Stand dieses Zweigs** und dessen tatsächlichen Änderungsumfang lesen; die zuvor veröffentlichte APK enthält diesen Kindheitsumbau noch nicht.
 
 ## Was dieser Stand verändert

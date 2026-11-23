@@ -9,6 +9,7 @@ var _jar_mesh: ArrayMesh
 var _cup_mesh: ArrayMesh
 var _ember: MeshInstance3D
 var _interactive: Array[Node] = []
+var _household_groups: Dictionary = {}
 
 
 func build(houses: Node3D) -> void:
@@ -48,6 +49,19 @@ func set_quality(profile: String) -> void:
 		for mesh: GeometryInstance3D in group.find_children("*","GeometryInstance3D",true,false):
 			mesh.visibility_range_end = distance
 			mesh.visibility_range_end_margin = 2.5
+
+
+func set_excluded_households(ids: Array) -> void:
+	for id: String in _household_groups:
+		var show_base := not ids.has(id)
+		for group: Node3D in _household_groups[id]:
+			group.visible = show_base
+			for body: StaticBody3D in group.find_children("*","StaticBody3D",true,false):
+				body.collision_layer = 1 if show_base else 0
+
+
+func set_smith_active(value: bool) -> void:
+	if is_instance_valid(_ember): _ember.visible = value
 
 
 func _group(parent: Node3D, title: String, at := Vector3.ZERO) -> Node3D:
@@ -100,6 +114,7 @@ func _furnish(house: Node3D, id: String, index: int) -> void:
 		Art.cylinder(stool,.04,.41,Vector3(cos(angle)*.18,.205,sin(angle)*.18),_materials.wood)
 	Art.box_collider(stool,Vector3(.54,.47,.54),Vector3(0,.235,0))
 	var yard := _group(house,"DoorstepSupplies")
+	_household_groups[id] = [room,yard]
 	_jar(yard,Vector3(-1.90,0,2.98),.90,index%2==0)
 	_jar(yard,Vector3(-2.35,0,2.80),.65,false)
 	# Chopped wood is piled beside the door, outside the walking ramp.
@@ -132,6 +147,7 @@ func _make_forge() -> void:
 	Art.box(hearth,Vector3(1.14,.43,.16),Vector3(0,.935,-.37),_materials.stone)
 	Art.box(hearth,Vector3(.65,1.8,.44),Vector3(.24,1.6,-.27),_materials.dark_stone)
 	_ember = Art.box(hearth,Vector3(.70,.035,.48),Vector3(0,.75,0),_materials.ember)
+	_interactive.append(_ember)
 	for index in 7:
 		Art.sphere(hearth,.09,Vector3(-.28+(index%4)*.18,.80,-.12+floori(index/4)*.23),_materials.coal,Vector3(1.1,.55,.8))
 	var bellows := _group(forge,"Bellows",Vector3(-.12,0,-1.95))

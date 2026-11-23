@@ -1,0 +1,181 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "captures": [
+    {
+      "camera_fov": 53.0,
+      "camera_position": "(22.0, 21.0, -34.0)",
+      "camera_transform": "[X: (0.923592, 0.0, -0.383378), Y: (-0.124482, 0.945818, -0.299887), Z: (0.362606, 0.324697, 0.87355), O: (22.0, 21.0, -34.0)]",
+      "file": "raiders-low.png",
+      "output_pixels": [
+        1024,
+        576
+      ],
+      "purpose": "Identical saved arrival state and camera; isolated module comparison",
+      "snapshot": {
+        "clock": "saved_story_elapsed_only",
+        "colliders": 30,
+        "culled": 0,
+        "far": 30,
+        "instances": {
+          "far_body": 30,
+          "far_hoof": 120,
+          "far_kit": 30,
+          "far_limb": 240,
+          "far_rider": 30,
+          "near_body": 0,
+          "near_hoof": 0,
+          "near_kit": 0,
+          "near_limb": 0,
+          "near_rider": 0
+        },
+        "mesh_triangles": {
+          "far_body": 512,
+          "far_hoof": 12,
+          "far_kit": 468,
+          "far_limb": 72,
+          "far_rider": 704,
+          "near_body": 1344,
+          "near_hoof": 12,
+          "near_kit": 3312,
+          "near_limb": 120,
+          "near_rider": 1296
+        },
+        "multimesh_groups": 10,
+        "near": 0,
+        "profile": "low",
+        "riders": 30,
+        "sequence": {
+          "consequences_applied": false,
+          "decision": "pending",
+          "elapsed": 32.0,
+          "outcome": "",
+          "phase": "approach",
+          "seed": 1731,
+          "support_confirmed": false,
+          "support_kind": ""
+        },
+        "source": "original_runtime_geometry",
+        "visible": true
+      }
+    },
+    {
+      "camera_fov": 53.0,
+      "camera_position": "(22.0, 21.0, -34.0)",
+      "camera_transform": "[X: (0.923592, 0.0, -0.383378), Y: (-0.124482, 0.945818, -0.299887), Z: (0.362606, 0.324697, 0.87355), O: (22.0, 21.0, -34.0)]",
+      "file": "raiders-very_high.png",
+      "output_pixels": [
+        1024,
+        576
+      ],
+      "purpose": "Identical saved arrival state and camera; isolated module comparison",
+      "snapshot": {
+        "clock": "saved_story_elapsed_only",
+        "colliders": 30,
+        "culled": 0,
+        "far": 0,
+        "instances": {
+          "far_body": 0,
+          "far_hoof": 0,
+          "far_kit": 0,
+          "far_limb": 0,
+          "far_rider": 0,
+          "near_body": 30,
+          "near_hoof": 120,
+          "near_kit": 30,
+          "near_limb": 240,
+          "near_rider": 30
+        },
+        "mesh_triangles": {
+          "far_body": 512,
+          "far_hoof": 12,
+          "far_kit": 468,
+          "far_limb": 72,
+          "far_rider": 704,
+          "near_body": 1344,
+          "near_hoof": 12,
+          "near_kit": 3312,
+          "near_limb": 120,
+          "near_rider": 1296
+        },
+        "multimesh_groups": 10,
+        "near": 30,
+        "profile": "very_high",
+        "riders": 30,
+        "sequence": {
+          "consequences_applied": false,
+          "decision": "pending",
+          "elapsed": 32.0,
+          "outcome": "",
+          "phase": "approach",
+          "seed": 1731,
+          "support_confirmed": false,
+          "support_kind": ""
+        },
+        "source": "original_runtime_geometry",
+        "visible": true
+      }
+    },
+    {
+      "camera_fov": 47.0,
+      "camera_position": "(-1.03586, 3.1, -67.025)",
+      "camera_transform": "[X: (0.786318, 0.0, -0.617822), Y: (-0.177285, 0.957945, -0.225636), Z: (0.591839, 0.286952, 0.753249), O: (-1.03586, 3.1, -67.025)]",
+      "file": "rider-detail.png",
+      "output_pixels": [
+        1024,
+        576
+      ],
+      "purpose": "Saved approach at 24 seconds; original horse, seated rider and jointed legs",
+      "snapshot": {
+        "clock": "saved_story_elapsed_only",
+        "colliders": 30,
+        "culled": 0,
+        "far": 0,
+        "instances": {
+          "far_body": 0,
+          "far_hoof": 0,
+          "far_kit": 0,
+          "far_limb": 0,
+          "far_rider": 0,
+          "near_body": 30,
+          "near_hoof": 120,
+          "near_kit": 30,
+          "near_limb": 240,
+          "near_rider": 30
+        },
+        "mesh_triangles": {
+          "far_body": 512,
+          "far_hoof": 12,
+          "far_kit": 468,
+          "far_limb": 72,
+          "far_rider": 704,
+          "near_body": 1344,
+          "near_hoof": 12,
+          "near_kit": 3312,
+          "near_limb": 120,
+          "near_rider": 1296
+        },
+        "multimesh_groups": 10,
+        "near": 30,
+        "profile": "very_high",
+        "riders": 30,
+        "sequence": {
+          "consequences_applied": false,
+          "decision": "pending",
+          "elapsed": 24.0,
+          "outcome": "",
+          "phase": "approach",
+          "seed": 1731,
+          "support_confirmed": false,
+          "support_kind": ""
+        },
+        "source": "original_runtime_geometry",
+        "visible": true
+      }
+    }
+  ],
+  "context": "Isolated production rider module in an authored review stage. No full-village, Android hardware, FPS or historical event claim.",
+  "engine": "4.7.2-stable (official)",
+  "errors": [],
+  "renderer": "gl_compatibility"
+}

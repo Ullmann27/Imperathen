@@ -4,7 +4,8 @@ extends SceneTree
 const EntryScene = preload("res://main.tscn")
 const VillageLife = preload("res://scripts/story/village_life.gd")
 const Model = preload("res://scripts/domain/world_model.gd")
-const Childhood = preload("res://scripts/story/village_childhood.gd")
+const Childhood = preload("res://scripts/story/childhood_story.gd")
+const LegacyChildhood = preload("res://scripts/story/village_childhood.gd")
 var failures: Array[String] = []
 var checks := 0
 var game
@@ -64,7 +65,7 @@ func _run() -> void:
 	scene._action("leave")
 	_check(game.screen == "menu" and not FileAccess.file_exists(game.SAVE_PATH), "The scenario preview never creates a campaign save")
 	game.ui.action_requested.emit("new_game", {})
-	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_home" and Childhood.enabled(game.model.data), "New Roman game begins with the family childhood prologue")
+	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_first_day" and Childhood.enabled(game.model.data), "New Roman game begins with the family childhood prologue")
 	game._opening_skip()
 	_check(game.screen == "opening", "Skipping the prologue retains its explicit first objective")
 	game._opening_next()
@@ -76,10 +77,10 @@ func _run() -> void:
 	var legacy := Model.new()
 	legacy.new_game("italia", true, false)
 	var saved: Dictionary = legacy.save_game(game.SAVE_PATH)
-	_check(saved.get("ok", false) and not Childhood.enabled(legacy.data), "The original chapter fixture is an explicit valid legacy save")
+	_check(saved.get("ok", false) and not Childhood.enabled(legacy.data) and not LegacyChildhood.enabled(legacy.data), "The original chapter fixture is an explicit valid legacy save")
 	game._show_menu()
 	game.ui.action_requested.emit("continue", {})
-	_check(game.screen == "playing" and game.model.data.world_id == legacy.data.world_id and not Childhood.enabled(game.model.data), "Real Continue restores the legacy campaign before its original chapter actions")
+	_check(game.screen == "playing" and game.model.data.world_id == legacy.data.world_id and not Childhood.enabled(game.model.data) and not LegacyChildhood.enabled(game.model.data), "Real Continue restores the legacy campaign before its original chapter actions")
 	_request_window_back()
 	_check(game.screen == "paused" and game.ui.get("_view_state") == "pause", "A window Back request reaches the real UI and pauses exactly once")
 	_request_window_back()

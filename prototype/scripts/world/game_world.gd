@@ -8,9 +8,16 @@ const Grove = preload("res://scripts/visuals/grove.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 const VillageLifeWorld = preload("res://scripts/world/village_life_world.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
-const Childhood = preload("res://scripts/story/village_childhood.gd")
+const LegacyChildhood = preload("res://scripts/story/village_childhood.gd")
 const Combat = preload("res://scripts/domain/unarmed_combat.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
+const WorldStreamPlan = preload("res://scripts/world/world_stream_plan.gd")
+const Childhood = preload("res://scripts/story/childhood_story.gd")
+const ChildhoodNeighborhood = preload("res://scripts/world/village/childhood_neighborhood.gd")
+const ChildhoodRaiders = preload("res://scripts/world/childhood_raiders.gd")
+var childhood_neighborhood: Node3D
+var childhood_raiders: Node3D
+var _childhood_light: Dictionary = {}
 var village_life_world: Node3D
 var regional_terrain: Node3D
 var _village_focus := ""
@@ -143,16 +150,34 @@ func sync_state(state: Dictionary) -> void:
 	_build_scene()
 	_state = state
 	# Keep nearby interaction text compact; large 3D labels can cover the map.
-	_hint.font_size = 24 if Childhood.enabled(state) else 33
-	_hint.pixel_size = 0.003 if Childhood.enabled(state) else 0.005
-	_hint.outline_size = 5 if Childhood.enabled(state) else 9
+	_hint.font_size = 24 if _childhood_active() else 33
+	_hint.pixel_size = 0.003 if _childhood_active() else 0.005
+	_hint.outline_size = 5 if _childhood_active() else 9
 	var inner := get_node_or_null("FrontierVillage/InnerLegacyPalisade")
 	if inner != null:
 		inner.visible=not bool(state.get("village",{}).get("enabled",false))
 		for body in inner.find_children("*","StaticBody3D",true,false):
 			body.collision_layer=1 if inner.visible else 0
 	opening_props.sync_state(state)
+	regional.set_household_overrides(["south_weaver_home","south_baker_home","smith_home"] if Childhood.enabled(state) else [])
+	childhood_neighborhood.build(regional)
+	childhood_neighborhood.sync_state(state)
+	childhood_neighborhood.set_quality(_quality_profile)
+	if regional.settlement_details:
+		var smith_alive := true
+		if Childhood.enabled(state):
+			for person: Dictionary in state.village.economy.people:
+				if person.id == "sextus": smith_alive = bool(person.alive)
+		regional.settlement_details.set_smith_active(smith_alive)
 	village_life_world.sync_state(state, _quality_profile)
+	childhood_raiders.sync_state(state, _quality_profile)
+	var excluded: Array = []
+	if _childhood_active():
+		for person: Dictionary in state.village.economy.people:
+			excluded.append(str(person.id))
+		excluded.append("decimus")
+		excluded.append(str(state.companion.id))
+	population.set_excluded_ids(excluded)
 	var mentor := get_node_or_null("TrainingGround/Mentor")
 	if mentor != null:
 		mentor.visible = not bool(state.get("village", {}).get("enabled", false))
@@ -173,7 +198,9 @@ func sync_state(state: Dictionary) -> void:
 	var player_data: Dictionary = _state.get("player", {})
 	var age := int(player_data.get("age", 12))
 	_figure.configure("player",_state.get("origin_id","italia"),age)
-	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
+	var childhood_equipment: Dictionary = _state.get("village", {}).get("childhood", {}).get("equipment", {})
+	_figure.set_practice_staff_equipped(Childhood.enabled(_state) and str(childhood_equipment.get("practice_staff", "none")) in ["loaned", "owned"])
+	_figure.set_loaned_gear(LegacyChildhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -196,6 +223,7 @@ func sync_state(state: Dictionary) -> void:
 	if not bool(encounter.get("active", false)):
 		_resolve_requested = false
 	_update_context_hint()
+	update_childhood_presentation()
 
 
 func set_mode(mode: String) -> void:
@@ -211,7 +239,7 @@ func set_mode(mode: String) -> void:
 	if mode != "city":
 		set_build_mode(false)
 	if _plot != null:
-		_plot.visible = mode == "city" and _active
+		_plot.visible = mode == "city" and _active and not _childhood_active()
 	if _markers != null:
 		_markers.visible = mode == "map"
 	if _preview != null:
@@ -227,6 +255,8 @@ func set_active(active: bool) -> void:
 	population.set_active(active)
 	if village_life_world != null:
 		village_life_world.set_active(active)
+	if childhood_raiders != null:
+		childhood_raiders.set_active(active)
 	if active:
 		clear_frontier_focus()
 	if not active:
@@ -241,7 +271,7 @@ func set_active(active: bool) -> void:
 	if _hint != null:
 		_hint.visible = active and _mode == "person"
 	if _plot != null:
-		_plot.visible = active and _mode == "city"
+		_plot.visible = active and _mode == "city" and not _childhood_active()
 	if not active:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
@@ -258,6 +288,8 @@ func prepare_cinematic_camera() -> void:
 
 
 func get_cinematic_anchor(key: String) -> Vector3:
+	if Childhood.enabled(_state) and key == "plot":
+		return Vector3(-5, 0.4, 24)
 	match key:
 		"road": return to_global(Vector3(0, 0, 18))
 		"market": return scenery.to_global(scenery.MARKET)
@@ -430,18 +462,29 @@ func cue_unarmed(technique: String) -> void:
 
 
 func navigation_view() -> Dictionary:
-	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false}
-	if not Childhood.enabled(_state):
+	var result := {"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false}
+	if Childhood.enabled(_state):
+		var navigation := childhood_navigation()
+		if navigation.get("available",false):
+			var at: Array = navigation.target
+			result["target"] = Vector2(float(at[0]),float(at[2]))
+			result.has_target = true
 		return result
-	var chapter:=Childhood.view(_state)
-	var target: Variant=chapter.get("point",null)
-	var npc:=str(chapter.get("target_npc",""))
+	if not LegacyChildhood.enabled(_state):
+		return result
+	var chapter := LegacyChildhood.view(_state)
+	var target: Variant = chapter.get("point",null)
+	var npc := str(chapter.get("target_npc",""))
 	if not npc.is_empty() and VillageLife.has_npc(_state,npc):
-		target=VillageLife.actor_position(_state,npc)
-	if typeof(target)==TYPE_VECTOR2:
-		result["target"]=target
-		result.has_target=true
+		target = VillageLife.actor_position(_state,npc)
+	if typeof(target) == TYPE_VECTOR2:
+		result["target"] = target
+		result.has_target = true
 	return result
+
+
+func _childhood_active() -> bool:
+	return Childhood.enabled(_state) or LegacyChildhood.enabled(_state)
 
 
 func perform_interaction() -> void:
@@ -463,9 +506,13 @@ func cue_village_defense(action: String) -> void:
 
 
 func focus_village_npc(id: String) -> void:
+	var target: Vector3 = village_life_world.actor_position(id)
+	if not target.is_finite():
+		clear_frontier_focus()
+		return
 	_village_focus = id
 	village_life_world.focus(id, get_player_position())
-	var direction: Vector3 = get_player_position() - village_life_world.actor_position(id)
+	var direction: Vector3 = get_player_position() - target
 	direction.y = 0
 	_frontier_camera_direction = direction.normalized() if direction.length() > .1 else Vector3.BACK
 	_camera_initialized = false
@@ -536,6 +583,13 @@ func _build_scene() -> void:
 	regional_terrain = RegionalTerrain.new()
 	regional_terrain.name = "RegionalTerrain"
 	add_child(regional_terrain)
+	childhood_neighborhood = ChildhoodNeighborhood.new()
+	childhood_neighborhood.name = "ChildhoodNeighborhood"
+	add_child(childhood_neighborhood)
+	childhood_raiders = ChildhoodRaiders.new()
+	childhood_raiders.name = "ChildhoodRaiders"
+	add_child(childhood_raiders)
+	childhood_raiders.set_ground_sampler(func(at: Vector2) -> float: return WorldStreamPlan.terrain_height(at) - .06)
 	_update_camera(0.016)
 
 
@@ -1002,6 +1056,7 @@ func _physics_process(delta: float) -> void:
 	if not _built or _camera == null:
 		return
 	_update_camera(delta)
+	update_childhood_presentation()
 	if _state.get("village", {}).get("enabled", false):
 		regional_terrain.follow(get_player_position(), _quality_profile)
 	population.update_nearby(get_player_position(),_active and _mode == "person")
@@ -1020,7 +1075,7 @@ func _physics_process(delta: float) -> void:
 	elif _mode == "city" and not _build_mode:
 		_pan_city_camera(delta)
 	_animate_figure()
-	if Childhood.enabled(_state) and not str(_state.village.childhood.active_work).is_empty():
+	if LegacyChildhood.enabled(_state) and not str(_state.village.childhood.active_work).is_empty():
 		_figure.keep_working()
 	var frontier: Dictionary = _state.get("frontier",{})
 	var wagon_work: bool = int(frontier.get("step",0)) == 2 and frontier.get("preparation","") == "work" and float(frontier.get("work_seconds",0)) < 12.0 and _horizontal_distance(_player.position,Vector3(3,0,24)) <= 3.0
@@ -1043,10 +1098,10 @@ func _move_player(delta: float) -> void:
 	direction = direction.limit_length(1.0).rotated(Vector3.UP, _camera_yaw)
 	var speed:=PLAYER_SPEED
 	var acceleration:=22.0
-	if Childhood.enabled(_state):
+	if _childhood_active():
 		speed=CHILD_RUN_SPEED if _running or Input.is_physical_key_pressed(KEY_SHIFT) else CHILD_WALK_SPEED
 		acceleration=7.0
-		if not str(_state.village.unarmed.technique).is_empty():
+		if Combat.enabled(_state) and not str(_state.village.unarmed.technique).is_empty():
 			speed*=.15
 	_player.velocity.x = move_toward(_player.velocity.x, direction.x * speed, delta * acceleration)
 	_player.velocity.z = move_toward(_player.velocity.z, direction.z * speed, delta * acceleration)
@@ -1062,7 +1117,7 @@ func _move_player(delta: float) -> void:
 	_player.position.x = clampf(_player.position.x, -15999.0, 15999.0)
 	_player.position.z = clampf(_player.position.z, -15999.0, 15999.0)
 	if direction.length_squared() > 0.01:
-		_figure.rotation.y = lerp_angle(_figure.rotation.y, atan2(-direction.x, -direction.z), minf(1.0, delta * (6.5 if Childhood.enabled(_state) else 12.0)))
+		_figure.rotation.y = lerp_angle(_figure.rotation.y, atan2(-direction.x, -direction.z), minf(1.0, delta * (6.5 if _childhood_active() else 12.0)))
 
 
 func _pan_city_camera(delta: float) -> void:
@@ -1082,6 +1137,11 @@ func _update_camera(delta: float) -> void:
 		var right := Vector3.UP.cross(_frontier_camera_direction)
 		target = actor + Vector3.UP * 1.48 + right * .65
 		desired = actor + Vector3.UP * 1.65 + _frontier_camera_direction * 3.0
+		var query := PhysicsRayQueryParameters3D.create(actor + Vector3.UP * 1.48, desired, 1)
+		query.exclude = [_player.get_rid(), village_life_world.actor_collision_rid(_village_focus)]
+		var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+		if not hit.is_empty():
+			desired = hit.position + (actor + Vector3.UP * 1.48 - hit.position).normalized() * .28
 	elif not _frontier_focus.is_empty() and not population.info(_frontier_focus).is_empty():
 		var actor: Vector3 = population.actor_position(_frontier_focus)
 		var head := actor+Vector3.UP*1.48
@@ -1336,8 +1396,13 @@ func _interact() -> void:
 	if _mode != "person":
 		return
 	if Childhood.enabled(_state):
+		var selected := _nearest_childhood_interaction()
+		if selected.get("available", false):
+			action_requested.emit("childhood_interact", {"npc_id":str(selected.get("npc_id", ""))})
+			return
+	elif LegacyChildhood.enabled(_state):
 		var at:=Vector2(_player.position.x,_player.position.z)
-		for item: Dictionary in Childhood.interactables(_state):
+		for item: Dictionary in LegacyChildhood.interactables(_state):
 			if at.distance_to(item.point)<=float(item.radius):
 				_figure.cue("gather")
 				action_requested.emit(item.command,item.payload)
@@ -1381,7 +1446,7 @@ func _interact() -> void:
 		_figure.cue("gather")
 		action_requested.emit("gather", {"node_id": closest_id})
 	elif _horizontal_distance(_player.position, TRAINING_LOCATION) <= INTERACTION_RADIUS:
-		action_requested.emit("combat_palette" if Childhood.enabled(_state) else "train", {})
+		action_requested.emit("combat_palette" if Combat.enabled(_state) else "train", {})
 	elif _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS:
 		_companion.get_node("Figure").cue("talk")
 		action_requested.emit("companion_interact", {})
@@ -1492,8 +1557,13 @@ func _update_context_hint() -> void:
 	if not _hint.visible:
 		return
 	if Childhood.enabled(_state):
+		var selected := _nearest_childhood_interaction()
+		if selected.get("available", false):
+			_hint.text = "Interagieren · " + str(selected.get("label", "Ansehen"))
+			return
+	elif LegacyChildhood.enabled(_state):
 		var at:=Vector2(_player.position.x,_player.position.z)
-		for item: Dictionary in Childhood.interactables(_state):
+		for item: Dictionary in LegacyChildhood.interactables(_state):
 			if at.distance_to(item.point)<=float(item.radius):
 				_hint.text=str(item.label)
 				return
@@ -1503,7 +1573,7 @@ func _update_context_hint() -> void:
 	if village_life_world != null:
 		var village_hint: String = village_life_world.hint(_player.position)
 		if not village_hint.is_empty():
-			_hint.text = village_hint.trim_prefix("Interagieren · ") if Childhood.enabled(_state) else village_hint
+			_hint.text = village_hint.trim_prefix("Interagieren · ") if _childhood_active() else village_hint
 			return
 	var companion: Dictionary = _state.get("companion", {})
 	if _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS and not bool(companion.get("met", false)):
@@ -1529,6 +1599,122 @@ func _update_context_hint() -> void:
 	if not npc.is_empty():
 		var info: Dictionary = population.info(npc)
 		_hint.text = "Interagieren · %s\n%s" % [info.name,info.occupation]
+
+
+func _childhood_target(npc_id: String) -> Vector3:
+	var point: Vector2
+	if npc_id.is_empty():
+		var objective: Dictionary = Childhood.objective(_state)
+		var coordinates: Array = objective.get("position", [])
+		if coordinates.size() != 2:
+			return Vector3(INF, INF, INF)
+		point = Vector2(float(coordinates[0]), float(coordinates[1]))
+	else:
+		point = Childhood.actor_position(_state, npc_id)
+		if not point.is_finite() and VillageLife.NPCS.has(npc_id):
+			point = VillageLife.actor_position(_state, npc_id)
+	if not point.is_finite():
+		return Vector3(INF, INF, INF)
+	return Vector3(point.x, ChildhoodNeighborhood.floor_height_at(point), point.y)
+
+
+func _clear_childhood_sight(target: Vector3, npc_id := "") -> bool:
+	if not target.is_finite() or _player == null:
+		return false
+	var excluded: Array[RID] = [_player.get_rid()]
+	if village_life_world != null and village_life_world.actors.has(npc_id):
+		var body: RID = village_life_world.actor_collision_rid(npc_id)
+		if body.is_valid(): excluded.append(body)
+	var query := PhysicsRayQueryParameters3D.create(_player.global_position + Vector3.UP * .35, target + Vector3.UP * 1.2, 1)
+	query.exclude = excluded
+	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
+
+
+func can_talk_childhood(npc_id := "") -> bool:
+	if not Childhood.enabled(_state):
+		return false
+	var objective: Dictionary = Childhood.objective(_state)
+	if (npc_id.is_empty() or npc_id == str(objective.get("npc_id", ""))) and not objective.get("available", false):
+		return false
+	var permitted: Array = ["julia", "silvanus", "sextus", str(_state.companion.id), str(objective.get("npc_id", ""))]
+	if not npc_id.is_empty() and npc_id not in permitted:
+		return false
+	if village_life_world.actors.has(npc_id) and not village_life_world.actors[npc_id].visible:
+		return false
+	var target := _childhood_target(npc_id)
+	return target.is_finite() and _horizontal_distance(get_player_position(), target) <= 3.2 and _clear_childhood_sight(target, npc_id if not npc_id.is_empty() else str(objective.get("npc_id", "")))
+
+
+func _nearest_childhood_interaction() -> Dictionary:
+	var objective: Dictionary = Childhood.objective(_state)
+	var current_id := str(objective.get("npc_id", ""))
+	if not objective.is_empty() and can_talk_childhood(current_id):
+		return {"available":true,"npc_id":current_id,"label":str(objective.get("label", "Dein nächster Schritt"))}
+	var nearest: Dictionary = {"available":false}
+	var distance := 3.21
+	for id: String in ["julia", "silvanus", "sextus", str(_state.companion.id)]:
+		if not can_talk_childhood(id): continue
+		var next_distance := _horizontal_distance(get_player_position(), _childhood_target(id))
+		if next_distance < distance:
+			distance = next_distance
+			nearest = {"available":true,"npc_id":id,"label":id.capitalize()}
+	return nearest
+
+
+func childhood_navigation() -> Dictionary:
+	if not Childhood.enabled(_state) or _camera == null:
+		return {"available":false}
+	var objective: Dictionary = Childhood.objective(_state)
+	if objective.is_empty() or not objective.get("available", false) or not objective.has("position"):
+		return {"available":false}
+	var goal := _childhood_target("")
+	if not goal.is_finite(): return {"available":false}
+	var target: Vector3 = ChildhoodNeighborhood.navigation_target(get_player_position(), goal)
+	var direction := target - get_player_position()
+	direction.y = 0
+	var forward := -_camera.global_basis.z
+	forward.y = 0
+	forward = forward.normalized()
+	var right := _camera.global_basis.x
+	right.y = 0
+	right = right.normalized()
+	var label := str(objective.get("label", "Ziel"))
+	if _horizontal_distance(target, goal) > .6:
+		label = "Hauseingang · " + label
+	return {"available":true,"label":label,"distance":direction.length(),
+		"angle":atan2(direction.dot(right), direction.dot(forward)),"target":[target.x,target.y,target.z],"npc_id":objective.get("npc_id", "")}
+
+
+func can_trade() -> bool:
+	if not Childhood.enabled(_state) or not VillageLife.is_available(_state, "cassia"):
+		return false
+	var at: Vector2 = VillageLife.actor_position(_state, "cassia")
+	var target := Vector3(at.x, 0, at.y)
+	return _horizontal_distance(get_player_position(), target) <= VillageLife.RANGE and _clear_childhood_sight(target, "cassia")
+
+
+func update_childhood_presentation() -> void:
+	if childhood_neighborhood != null:
+		childhood_neighborhood.update_view(get_player_position())
+	var sequence: Dictionary = _state.get("village", {}).get("childhood", {}).get("night_raid", {})
+	var night: bool = Childhood.enabled(_state) and (str(_state.village.childhood.phase) == "night" or str(sequence.get("phase", "")) in ["approach", "attack"])
+	if night and _childhood_light.is_empty():
+		_childhood_light = {"sun":_sun.light_energy,"sun_color":_sun.light_color,"ambient":_village_environment.ambient_light_energy,
+			"ambient_color":_village_environment.ambient_light_color,"background":_village_environment.background_mode,"color":_village_environment.background_color}
+		_sun.light_energy = .30
+		_sun.light_color = Color("a7b6da")
+		_village_environment.ambient_light_energy = .48
+		_village_environment.ambient_light_color = Color("7d8ba9")
+		_village_environment.background_mode = Environment.BG_COLOR
+		_village_environment.background_color = Color("101a2c")
+	elif not night and not _childhood_light.is_empty():
+		_sun.light_energy = float(_childhood_light.sun)
+		_sun.light_color = _childhood_light.sun_color
+		_village_environment.ambient_light_energy = float(_childhood_light.ambient)
+		_village_environment.ambient_light_color = _childhood_light.ambient_color
+		_village_environment.background_mode = int(_childhood_light.background)
+		_village_environment.background_color = _childhood_light.color
+		_childhood_light.clear()
 
 
 func _ui_blocks_pointer() -> bool:

@@ -39,4 +39,3 @@ Prüfe eine vollständige neue Partie, einen übernommenen alten Spielstand und 
 Nutze Offline-Berechnung für passende statische Arbeit: vorbereitete Materialien, Texturen, Licht/AO soweit vom Renderer unterstützt, wiederverwendete Geometrie, LODs und räumlich begrenzte Aktivität. Server-Rendering wäre ein eigener kosten- und verbindungsabhängiger Ansatz und darf nicht stillschweigend eingeführt werden. Vergleiche identische Szenen; behaupte keine geringere Gerätetemperatur ohne Messung.
 
 Liefere tatsächlichen Code, verständliche Quest-/Zeit-/Identitätsverträge, Szenen und Assets samt Herkunft, reale Prüfergebnisse und Bilder, einen Draft-PR und eine präzise Übergabe. Benenne, welche Reiter-, Innenraum-, Alltags- und Storyfunktionen wirklich spielbar sind und welche offen bleiben. Übernimm keine fremden Spielinhalte. Arbeite bis zu einem zusammenhängenden überprüfbaren Ergebnis.
-

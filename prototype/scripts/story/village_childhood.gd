@@ -2,6 +2,7 @@ extends RefCounted
 ## Authored childhood chapters. Only explicit, nearby actions advance their order.
 ## This optional state is created for fresh games; loading a legacy save never adds it.
 
+const Format = preload("res://scripts/domain/childhood_format.gd")
 const VERSION := 1
 const NPC_RANGE := 3.2
 const POINT_RANGE := 1.6
@@ -100,7 +101,7 @@ static func start(data: Dictionary) -> bool:
 
 
 static func enabled(data: Dictionary) -> bool:
-	return typeof(data.get("village")) == TYPE_DICTIONARY and data.village.has("childhood")
+	return Format.kind(data) == Format.LEGACY
 
 
 static func has_npc(data: Dictionary, id: String) -> bool:
@@ -365,6 +366,8 @@ static func interactables(data: Dictionary) -> Array[Dictionary]:
 
 
 static func validate(data: Dictionary) -> String:
+	if Format.kind(data) == Format.INVALID:
+		return "Der Kindheitsstand vermischt unbekannte oder unvollständige Erzählformate."
 	if not enabled(data):
 		return ""
 	if data.get("origin_id", "") != "italia" or not data.village.get("enabled", false) or not _integer(data.get("player", {}).get("age"), 12, 12) or data.get("progress", {}).get("years_elapsed", -1) != 0:

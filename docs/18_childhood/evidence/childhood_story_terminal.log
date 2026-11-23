@@ -1,0 +1,18 @@
+Observed terminal results, 2026-11-23; recorded after completion.
+Working directory: /tmp/imperathen-chat-b-20261123
+
+Command: /usr/local/bin/godot --headless --path prototype --script res://tests/childhood_story_test.gd
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+CHILDHOOD STORY: 345 checks; 0 failures
+Process exit code: 0
+
+Command: /usr/local/bin/godot --headless --path prototype --script res://tests/domain_test.gd
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+DOMAIN_TEST_RESULT suites=12 checks=329 failures=0
+DOMAIN_TEST_PASS
+Process exit code: 0
+
+The domain run preceded the optional physical escort progress-limit parameter.
+The final 345-check childhood run includes that parameter, its blocked/NaN cases,
+the rejected outer-doorstep rescue, and the same-Julia interaction after arrival.
+These are model and persistence results, not rendered frames or Android-device measurements.

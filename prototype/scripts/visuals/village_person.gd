@@ -34,6 +34,7 @@ var _remaining := 0.0
 var _check_lod := 0.0
 var _posed := false
 var _blade: MeshInstance3D
+var _practice_staff_equipped := false
 var _face := FacialMotion.new()
 var _lod_profile := ""
 var appearance_id := ""
@@ -318,9 +319,24 @@ func sample_pose(action: String, normalized: float) -> void:
 	_face.pose(action,normalized,detail)
 
 
+func set_practice_staff_equipped(value: bool) -> void:
+	# Presentation only: the world supplies the saved loan/ownership state.
+	# The existing skinned prop follows Hand_R without changing its animation.
+	_practice_staff_equipped = value
+	_sync_equipment()
+
+
+func _sync_equipment() -> void:
+	if is_instance_valid(_blade):
+		_blade.visible = role == "player" and (
+			_practice_staff_equipped
+			or (age >= 18 and clip in ["attack","train","block"])
+		)
+
+
 func _play(action: String, normalized: float, blend: float) -> void:
 	clip = action
-	if _blade: _blade.visible = role == "player" and age >= 18 and clip in ["attack","train","block"]
+	_sync_equipment()
 	phase = clampf(normalized,0,1)
 	if not animator: return
 	var name_in_file := action

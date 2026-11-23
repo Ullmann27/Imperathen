@@ -1,0 +1,44 @@
+{
+  "source_commit": "e5735509622c9a94564dc5fe21257c07074f9df5",
+  "source_scope": "Entire unchanged prototype/scripts tree extracted with git archive into an isolated minimal Godot project. No merged game modules used for fixture creation.",
+  "engine": "Godot 4.7.2.stable.official.ed1daf0bf",
+  "creation": "WorldModel.new_game(\"italia\",true,true), valid execute/advance calls, original public save_game writer. No progress, reward, role, death, or timer fields injected.",
+  "fixtures": [
+    {
+      "file": "base_childhood_mid_work_e573550.json",
+      "sha256": "d1fa549d39659a804d39f23777c16b50ac2b73b9066a208475422cb6a0ed139a",
+      "payload_sha256": "aa4ea5878f7ddb577447e362063432a11111f7899e4ae2893547f8f3baaca86b",
+      "schema_version": 5,
+      "completed_steps": 12,
+      "work_seconds": 3.25,
+      "world_seconds": 3.2499999999999996,
+      "combat_practice_hits": 0,
+      "combat_elapsed": 0.0,
+      "combat_resolved": true
+    },
+    {
+      "file": "base_childhood_pending_unarmed_e573550.json",
+      "sha256": "bd1d00154a8629fbfc5137d932ae12c521d9805fbea5105254d965fb5088cdc4",
+      "payload_sha256": "13c9b0a2e912fa2b1aae46f43f5a416f6850f0cb591eeb0e2345a9cd86c96a64",
+      "schema_version": 5,
+      "completed_steps": 0,
+      "work_seconds": 0.0,
+      "world_seconds": 0.7999999999999999,
+      "combat_practice_hits": 1,
+      "combat_elapsed": 0.1,
+      "combat_resolved": false
+    },
+    {
+      "file": "base_childhood_start_e573550.json",
+      "sha256": "d65dd54ddd71b7ac10a0c12bac9e96e8aeb21e58f604a9466378bb8f1c9ce186",
+      "payload_sha256": "3fa02f405984c4c7668ce4d7ae0d9bdc6a979e9349eba55852f9584a85cd4863",
+      "schema_version": 5,
+      "completed_steps": 0,
+      "work_seconds": 0.0,
+      "world_seconds": 0.0,
+      "combat_practice_hits": 0,
+      "combat_elapsed": 0.0,
+      "combat_resolved": true
+    }
+  ]
+}

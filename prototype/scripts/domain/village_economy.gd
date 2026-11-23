@@ -2,13 +2,16 @@ extends RefCounted
 ## Named people are assigned once. Production, food and repair share real elapsed time.
 ## Owns data.village.economy; all spendable goods remain in data.resources.
 
+const ChildhoodFormat = preload("res://scripts/domain/childhood_format.gd")
 const DAY_SECONDS := 120.0
 const MAX_RESOURCE := 1000000
 const EPSILON := 0.000001
 
 static func day_length(data: Dictionary) -> float:
 	# Active economic time is independent from explicitly ended narrative days.
-	return 3600.0 if data.get("village",{}).has("childhood") else DAY_SECONDS
+	# The previous published childhood used an hour. Preserve that saved clock;
+	# the newer family arc and inactive contracts retain their 120-second clock.
+	return 3600.0 if ChildhoodFormat.kind(data) == ChildhoodFormat.LEGACY else DAY_SECONDS
 
 const RESOURCE_KEYS := ["wood", "grain", "denarii", "stone"]
 const COMMAND_FIELDS := {

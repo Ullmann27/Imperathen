@@ -4,7 +4,8 @@ const EntryScene = preload("res://main.tscn")
 const Chapter = preload("res://scripts/story/frontier_chapter.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
 const Model = preload("res://scripts/domain/world_model.gd")
-const Childhood = preload("res://scripts/story/village_childhood.gd")
+const Childhood = preload("res://scripts/story/childhood_story.gd")
+const LegacyChildhood = preload("res://scripts/story/village_childhood.gd")
 const OpeningStory = preload("res://scripts/story/opening_story.gd")
 var checks := 0
 var failures: Array[String] = []
@@ -42,7 +43,7 @@ func _run() -> void:
 		if can_replace:
 			game.ui.action_requested.emit("confirm_new_game", {})
 			await _frames()
-	_enter_opening("childhood_home")
+	_enter_opening("childhood_first_day")
 	_check(game.screen == "playing" and game.model.data.player.age == 12 and Childhood.enabled(game.model.data), "Actual entry creates the new saved family childhood world")
 	_load_legacy_village()
 	_enter_opening("first_day")
@@ -194,10 +195,10 @@ func _load_legacy_village() -> void:
 	var legacy := Model.new()
 	legacy.new_game("italia", true, false)
 	var saved: Dictionary = legacy.save_game(game.SAVE_PATH)
-	_check(saved.get("ok", false) and not Childhood.enabled(legacy.data), "The frontier compatibility fixture is a valid saved legacy village")
+	_check(saved.get("ok", false) and not Childhood.enabled(legacy.data) and not LegacyChildhood.enabled(legacy.data), "The frontier compatibility fixture is a valid saved legacy village")
 	game._show_menu()
 	game.ui.action_requested.emit("continue", {})
-	_check(game.screen == "playing" and game.model.data.world_id == legacy.data.world_id and not Childhood.enabled(game.model.data), "Continue restores the explicit legacy village without inventing childhood progress")
+	_check(game.screen == "playing" and game.model.data.world_id == legacy.data.world_id and not Childhood.enabled(game.model.data) and not LegacyChildhood.enabled(game.model.data), "Continue restores the explicit legacy village without inventing childhood progress")
 	game._begin_opening(OpeningStory.sequence("italia"))
 
 

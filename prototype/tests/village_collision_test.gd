@@ -7,6 +7,7 @@ const Life = preload("res://scripts/story/village_life.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
+const BaseFixture = preload("res://tests/base_childhood_fixture.gd")
 var checks := 0
 var failures: Array[String] = []
 
@@ -24,7 +25,12 @@ func _check(value: bool, message: String) -> void:
 
 func _run() -> void:
 	var model := Model.new()
-	model.new_game("italia",true,true)
+	var loaded: Dictionary = BaseFixture.restore(model)
+	_check(bool(loaded.get("ok",false)),"The previous childhood is tested from its published save format")
+	if not loaded.get("ok",false):
+		printerr(str(loaded))
+		quit(1)
+		return
 	var world := World.new()
 	root.add_child(world)
 	world.setup(model.data)

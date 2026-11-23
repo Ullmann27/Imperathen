@@ -16,7 +16,8 @@ const SafeArea = preload("res://scripts/ui/safe_area.gd")
 const TouchPadScript := preload("res://scripts/ui/touch_pad.gd")
 const TouchActionScript := preload("res://scripts/ui/touch_action.gd")
 const VillagePanel = preload("res://scripts/ui/village_life_panel.gd")
-const Childhood = preload("res://scripts/story/village_childhood.gd")
+const Childhood = preload("res://scripts/story/childhood_story.gd")
+const LegacyChildhood = preload("res://scripts/story/village_childhood.gd")
 const Combat = preload("res://scripts/domain/unarmed_combat.gd")
 const Navigation = preload("res://scripts/ui/village_navigation.gd")
 const CombatAction = preload("res://scripts/ui/combat_action.gd")
@@ -318,7 +319,7 @@ func show_game(state: Dictionary) -> void:
 	_mode_buttons.clear()
 	_build_top_bar()
 	_build_objective_card()
-	if Childhood.enabled(state):
+	if _has_childhood(state):
 		_navigation=Navigation.new()
 		_navigation.name="VillageCompass"
 		_navigation.position=Vector2(24,110)
@@ -365,8 +366,13 @@ func update_state(state: Dictionary) -> void:
 	_hud_labels["time"].text = "TAG %d  ·  %02d:%02d" % [seconds / 86400 + 1, (seconds / 3600) % 24, (seconds / 60) % 60]
 	if state.get("village", {}).get("enabled", false):
 		_hud_labels["time"].text = "DORFTAG %d" % int(state.village_economy_view.get("day", 1))
+	var childhood: Dictionary = state.get("childhood_view", {})
 	if Childhood.enabled(state):
+		var phase_name: String = {"morning":"Morgen", "afternoon":"Nachmittag", "evening":"Abend", "night":"Nacht"}.get(str(childhood.get("phase", "")), "Tag")
+		_hud_labels["time"].text = "TAG %d · %s" % [int(childhood.day), phase_name]
+	elif LegacyChildhood.enabled(state):
 		_hud_labels["time"].text="TAG %d · 12 JAHRE" % int(state.get("childhood_view",{}).get("day",1))
+	if Combat.enabled(state):
 		if is_instance_valid(_run_button):
 			_run_button.text="Gehen" if state.get("running",false) else "Laufen"
 		if is_instance_valid(_technique_button):
@@ -380,7 +386,7 @@ func update_state(state: Dictionary) -> void:
 	_hud_labels["squad"].text = "Truppe   %d / %d am Leben\nMoral   %d / 100" % [int(squad.get("alive", 0)), int(squad.get("recruits", 0)), int(squad.get("morale", 0))]
 	if _hud_labels.has("compact_life"):
 		_hud_labels["compact_life"].text = "Leben %d/100  ·  Truppe %d/%d" % [int(health), int(squad.get("alive", 0)), int(squad.get("recruits", 0))]
-		if Childhood.enabled(state):
+		if Combat.enabled(state):
 			_hud_labels["compact_life"].text="Leben %d · Ausdauer %d" % [int(health),int(state.get("combat_view",{}).get("stamina",100))]
 	var objective := _objective(state)
 	_hud_labels["objective_title"].text = objective[0]
@@ -407,9 +413,8 @@ func update_state(state: Dictionary) -> void:
 		_action_buttons["train"].disabled = _action_buttons["train"].disabled or not bool(state.get("village_view", {}).get("training_ready", false))
 	_action_buttons["recruit"].disabled = not trained or int(squad.get("recruits", 0)) >= 3 or int(resources.get("denarii", 0)) < 5 or int(resources.get("grain", 0)) < 2 or ended
 	_action_buttons["skirmish"].disabled = not trained or int(squad.get("alive", 0)) <= 0 or bool(encounter.get("active", false)) or bool(progress.get("skirmish_won", false)) or ended
-	if Childhood.enabled(state):
-		for key in ["build","train","recruit","skirmish"]:
-			_action_buttons[key].hide()
+	for action in ["build", "train", "recruit", "skirmish"]:
+		_action_buttons[action].visible = not _has_childhood(state)
 	if bool(encounter.get("active", false)):
 		var remaining := 0
 		for enemy in encounter.get("enemies", []):
@@ -563,7 +568,14 @@ func show_frontier_dialog(dialog: Dictionary) -> void:
 		var action := "frontier_choice"
 		if entry.has("command"):
 			action = "village_command"
-			payload = {"command":entry.command, "args":entry.get("payload", {})}
+			if str(entry.command).begins_with("childhood_"):
+				action = "childhood_command"
+			elif str(entry.command).begins_with("village_trade_"):
+				action = "trade_command"
+			payload = {"command":entry.command, "args":entry.get("args", entry.get("payload", {}))}
+		elif entry.has("action"):
+			action = str(entry.action)
+			payload = entry.get("payload", {})
 		var available := bool(entry.get("enabled", true))
 		var button := _button(str(entry.get("label", "Antworten")), _emit.bind(action, payload), first_button == null and available, 16)
 		button.name = "FrontierChoice_" + choice_id
@@ -746,6 +758,9 @@ func _open_screen(screen_name: String, darken: bool, menu_style := false) -> voi
 	_touch_pad = null
 	_touch_actions.clear()
 	_cancel_build_button = null
+	_navigation = null
+	_run_button = null
+	_technique_button = null
 	if _intro_tween != null and _intro_tween.is_valid():
 		_intro_tween.kill()
 	if _screen != null:
@@ -849,7 +864,7 @@ func _build_top_bar() -> void:
 func _build_objective_card() -> void:
 	var panel := _panel(true)
 	panel.position = Vector2(24, 110)
-	if Childhood.enabled(_state):
+	if _has_childhood(_state):
 		panel.position.x=196
 	panel.size = Vector2(272, 150) if _compact_layout else Vector2(300, 180)
 	_screen.add_child(panel)
@@ -867,6 +882,11 @@ func _build_objective_card() -> void:
 		_hud_labels["objective_text"].max_lines_visible = 2 if _content_size().y < 520 else 3 if short_layout else 4
 		_hud_labels["objective_text"].text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	column.add_child(_hud_labels["objective_text"])
+	_hud_labels["childhood_navigation"] = _label("", 13, BRONZE, true)
+	_hud_labels["childhood_navigation"].name = "ChildhoodCompass"
+	_hud_labels["childhood_navigation"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_hud_labels["childhood_navigation"].visible = false
+	column.add_child(_hud_labels["childhood_navigation"])
 	_hud_labels["compact_life"] = _label("", 12, BRONZE)
 	_hud_labels["compact_life"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(_hud_labels["compact_life"])
@@ -938,7 +958,7 @@ func _build_toolbar() -> void:
 	if _touch_enabled:
 		panel.offset_left = 184
 		panel.offset_right = -184
-		if Childhood.enabled(_state):
+		if Combat.enabled(_state):
 			panel.offset_left=226
 			panel.offset_right=-290
 	panel.offset_top = -143
@@ -960,7 +980,9 @@ func _build_toolbar() -> void:
 	row.add_child(atlas)
 	_action_buttons["atlas"] = atlas
 	if _state.get("village", {}).get("enabled", false):
-		row.add_child(_button("Dorfleben", _emit.bind("village_panel", {}), true, 13))
+		row.add_child(_button("Mein Dorf" if _has_childhood(_state) else "Dorfleben", _emit.bind("village_panel", {}), true, 13))
+	if Childhood.enabled(_state):
+		row.add_child(_button("Mein Weg", _emit.bind("childhood_open", {}), false, 13))
 	var actions := [
 		["build", "Hütte · 8 Holz", "Bauplan öffnen. Mit Linksklick einen erlaubten Platz bestätigen."],
 		["train", "Ausbildung", "Benötigt eine fertige Hütte, eine Gefährtenentscheidung und keine offene Baustelle. Am Trainingsplatz fortsetzen."],
@@ -987,7 +1009,7 @@ func _build_toolbar() -> void:
 
 func _build_touch_controls() -> void:
 	if _touch_enabled:
-		if Childhood.enabled(_state):
+		if Combat.enabled(_state):
 			_build_childhood_touch()
 			return
 		_touch_pad = TouchPadScript.new()
@@ -1075,6 +1097,10 @@ func _build_childhood_touch() -> void:
 		_technique_button=button
 	for entry in [["interact","Sprechen / Tun",""],["unarmed_guard","Deckung","guard"],["unarmed_dodge","Ausweichen",""]]:
 		var button:=_combat_button(entry[1],entry[2],_emit.bind(entry[0],{}))
+		if entry[0] == "interact":
+			# Stable native control identity also used by the read-only Android observer.
+			button.name = "Interagieren"
+			button.text = "Interagieren"
 		actions.add_child(button)
 	var picker:=_touch_button("Techniken wählen",_emit.bind("combat_palette",{}),false)
 	picker.name="ChooseTechnique"
@@ -1306,8 +1332,12 @@ func _objective(state: Dictionary) -> Array[String]:
 	var stage := String(progress.get("stage", "prologue"))
 	if stage == "fallen":
 		return ["Dein Weg ist zu Ende", "Du bist im Kampf gefallen. Im Menü kannst du einen gespeicherten Stand laden oder ein neues Leben beginnen."]
+	var childhood: Dictionary = state.get("childhood_view", {})
 	if Childhood.enabled(state):
-		var childhood: Dictionary=state.get("childhood_view",Childhood.view(state))
+		return [str(childhood.get("title", "Dein Weg im Dorf")), str(childhood.get("text", ""))]
+	if LegacyChildhood.enabled(state):
+		if childhood.is_empty():
+			childhood = LegacyChildhood.view(state)
 		return [str(childhood.get("title","Ein Morgen zu Hause")),str(childhood.get("objective","Sprich mit deiner Mutter vor dem Haus."))]
 	var village: Dictionary = state.get("village_view", {})
 	if state.get("village", {}).get("enabled", false):
@@ -1342,6 +1372,22 @@ func _objective(state: Dictionary) -> Array[String]:
 	if int(state.get("squad", {}).get("alive", 0)) == 0:
 		return ["Gemeinsam stärker", "Du hast die Grundlagen gelernt. Rekrutiere eine kleine Truppe. Jeder Rekrut braucht Sold und Nahrung."]
 	return ["Verantwortung übernehmen", "Deine Truppe ist bereit. Bereite die Verteidigung vor und kämpfe persönlich an ihrer Seite."]
+
+
+func _has_childhood(data: Dictionary) -> bool:
+	return Childhood.enabled(data) or LegacyChildhood.enabled(data)
+
+
+func update_childhood_navigation(navigation: Dictionary) -> void:
+	if _view_state != "game" or not _hud_labels.has("childhood_navigation"):
+		return
+	var label: Label = _hud_labels.childhood_navigation
+	label.visible = bool(navigation.get("available", false)) and _mode == "person"
+	if not label.visible:
+		return
+	var arrows := ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"]
+	var direction := posmod(roundi(float(navigation.get("angle", 0.0)) / (PI / 4.0)), 8)
+	label.text = "%s  %s · %d m" % [arrows[direction], str(navigation.get("label", "Ziel")), ceili(float(navigation.get("distance", 0.0)))]
 
 
 func _career_name(stage: String) -> String:
