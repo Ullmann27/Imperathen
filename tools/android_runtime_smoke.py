@@ -10,6 +10,7 @@ button. Screenshots and logcat remain inspectable; errors never become fake pass
 import argparse
 import hashlib
 import json
+import math
 import os
 from pathlib import Path, PurePosixPath
 import re
@@ -50,6 +51,106 @@ def wait_for_village_snapshot(read_logs, screen=None, *, predicate=None,
     raise RuntimeError("No matching village runtime state: " + str(screen)
                        + "; required control: " + str(required_control)
                        + "; last observed: " + json.dumps(observed, sort_keys=True))
+
+
+
+def wait_for_stable_village_control(read_control, *, timeout=60, tolerance=1.0,
+                                   max_observations=8):
+    """Use fresh, unchanged native geometry before tapping a scrolled control."""
+    deadline = time.monotonic() + timeout
+    previous_center = None
+    previous_instance = None
+    for _ in range(max_observations):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        control = read_control(remaining)
+        if not isinstance(control, dict) or control.get("enabled") is not True:
+            raise RuntimeError("The observed village control is absent or disabled")
+        center = control.get("center")
+        instance = control.get("instance_id")
+        if (not isinstance(center, list) or len(center) != 2
+                or not all(isinstance(value, (int, float)) and math.isfinite(value) for value in center)
+                or not isinstance(instance, str) or not instance):
+            raise RuntimeError("The observed village control has no valid native geometry or identity")
+        if control.get("visible") is True:
+            if (previous_center is not None and previous_instance == instance
+                    and max(abs(center[index] - previous_center[index]) for index in range(2)) <= tolerance):
+                return control
+            previous_center = list(center)
+            previous_instance = instance
+        else:
+            previous_center = None
+            previous_instance = None
+    raise RuntimeError("The actual village control did not remain visible at stable native coordinates")
+
+
+def activate_observed_village_popup(observe_popup, press_key, target_text, *,
+                                   timeout=120, max_moves=16, expected_control_instance=None):
+    """Navigate the actual popup using its observed focus, then confirm that row.
+
+    A touch-opened OptionButton may begin with no focused item. Never infer a
+    row from a fixed number of DOWN presses, and never mutate the game state.
+    observe_popup waits for visibility initially and changed focus after input.
+    """
+    deadline = time.monotonic() + timeout
+    previous_focus = None
+    identity = None
+    inventory = None
+    seen_focus = set()
+    moves = 0
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise RuntimeError("Timed out while observing the actual village assignment popup")
+        control = observe_popup(previous_focus, remaining)
+        popup = control.get("popup") if isinstance(control, dict) else None
+        if (not isinstance(control, dict) or control.get("enabled") is not True
+                or not isinstance(popup, dict) or popup.get("visible") is not True):
+            raise RuntimeError("The actual village assignment popup closed or became unavailable")
+        current_identity = (control.get("instance_id"), popup.get("instance_id"))
+        if not all(isinstance(value, str) and value for value in current_identity):
+            raise RuntimeError("The observed village assignment popup has no stable identity")
+        if expected_control_instance is not None and current_identity[0] != expected_control_instance:
+            raise RuntimeError("The actual village assignment control changed after the native tap")
+        if identity is None:
+            identity = current_identity
+        elif current_identity != identity:
+            raise RuntimeError("The actual village assignment popup was replaced during navigation")
+        items = popup.get("items")
+        if not isinstance(items, list) or not items:
+            raise RuntimeError("The observed village assignment popup has no item inventory")
+        normalized = []
+        for index, item in enumerate(items):
+            if (not isinstance(item, dict) or type(item.get("index")) is not int
+                    or item["index"] != index or not isinstance(item.get("text"), str)
+                    or type(item.get("enabled")) is not bool):
+                raise RuntimeError("The observed village assignment popup item inventory is invalid")
+            normalized.append((index, item["text"], item["enabled"]))
+        current_inventory = tuple(normalized)
+        if inventory is None:
+            inventory = current_inventory
+        elif current_inventory != inventory:
+            raise RuntimeError("The actual village assignment popup items changed during navigation")
+        matches = [item for item in items if item["text"] == target_text]
+        if len(matches) != 1 or not matches[0]["enabled"]:
+            raise RuntimeError("The actual assignment popup has no unique enabled target: " + target_text)
+        target_index = matches[0]["index"]
+        focused = popup.get("focused")
+        if type(focused) is not int or not -1 <= focused < len(items):
+            raise RuntimeError("The observed village assignment popup focus is invalid")
+        if focused == target_index:
+            press_key("KEYCODE_ENTER")
+            return {"control_instance": identity[0], "popup_instance": identity[1],
+                    "focused_index": focused, "text": target_text, "down_presses": moves}
+        if focused in seen_focus:
+            raise RuntimeError("The actual village assignment popup focus did not progress")
+        if moves >= min(max_moves, len(items) + 1):
+            raise RuntimeError("The actual village assignment popup exceeded bounded navigation")
+        seen_focus.add(focused)
+        press_key("KEYCODE_DPAD_DOWN")
+        previous_focus = focused
+        moves += 1
 
 
 def runtime_error_lines(text):
@@ -283,6 +384,24 @@ def main():
             state = village_snapshot(screen, required_control=name, after=previous)
         raise RuntimeError("Could not scroll the actual village control into view: " + name)
 
+    def stable_village_control(name, screen):
+        def fresh_control(timeout):
+            previous = checked_logs().count(VILLAGE_RUNTIME_MARKER)
+            state = village_snapshot(screen, required_control=name, after=previous, timeout=timeout)
+            return state["controls"][name]
+        return wait_for_stable_village_control(fresh_control)
+
+    def observe_assignment_popup(previous_focus, timeout):
+        previous = checked_logs().count(VILLAGE_RUNTIME_MARKER)
+        def changed(state):
+            popup = state.get("controls", {}).get("aelia_assignment", {}).get("popup", {})
+            if previous_focus is None:
+                return popup.get("visible") is True
+            return popup.get("visible") is not True or popup.get("focused") != previous_focus
+        state = village_snapshot("village_panel", required_control="aelia_assignment",
+                                 predicate=changed, after=previous, timeout=timeout)
+        return state["controls"]["aelia_assignment"]
+
     def exercise_village_life():
         initial = village_snapshot("playing")
         record("village_actual_population", initial.get("people") == 14 and initial.get("actors") == 15
@@ -301,15 +420,18 @@ def main():
         work_tab = village_control("work_tab", "village_panel")
         previous = checked_logs().count(VILLAGE_RUNTIME_MARKER)
         tap(work_tab["center"])
-        selector = village_control("aelia_assignment", "village_panel", after=previous)
+        village_control("aelia_assignment", "village_panel", after=previous)
+        selector = stable_village_control("aelia_assignment", "village_panel")
         record("village_unassigned_resident", selector.get("selected") == 0, selector)
+        before_assignment = checked_logs().count(VILLAGE_RUNTIME_MARKER)
         tap(selector["center"])
-        # The native OptionButton popup is opened by the real touch above. Its
-        # current item is observed; Android navigation chooses the next two rows.
-        adb("shell", "input", "keyevent", "KEYCODE_DPAD_DOWN")
-        adb("shell", "input", "keyevent", "KEYCODE_DPAD_DOWN")
-        adb("shell", "input", "keyevent", "KEYCODE_ENTER")
-        assigned = village_snapshot("village_panel", predicate=lambda state: state.get("aelia_assignment") == "woodcamp")
+        selected = activate_observed_village_popup(
+            observe_assignment_popup,
+            lambda key: adb("shell", "input", "keyevent", key),
+            "Holzfällerlager", expected_control_instance=selector["instance_id"])
+        record("village_popup_target_observed", True, selected)
+        assigned = village_snapshot("village_panel", after=before_assignment,
+                                    predicate=lambda state: state.get("aelia_assignment") == "woodcamp")
         record("village_actual_worker_assignment", assigned.get("people") == 14, assigned)
         screenshot("13_android_work_assignment.png")
         adb("shell", "input", "keyevent", "4")

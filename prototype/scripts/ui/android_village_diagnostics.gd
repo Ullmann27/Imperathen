@@ -30,11 +30,14 @@ func snapshot() -> Dictionary:
 	var world = session.world.village_life_world
 	if not is_instance_valid(world):
 		return {}
+	var ui_state: Dictionary = session.ui.get("_state")
 	var value := {"screen":screen, "world_seconds":data.world_seconds,
 		"people":economy.people.size(), "actors":world.actors.size(),
 		"workplaces":world.workplaces.size(), "work_permit":economy.authority.work_permit,
 		"player_is_ruler":economy.authority.player_is_ruler,
-		"decimus_met":village.social.npcs.decimus.met, "controls":{}}
+		"decimus_met":village.social.npcs.decimus.met,
+		"feedback":str(ui_state.get("village_feedback", "")) if screen == "village_panel" else "",
+		"controls":{}}
 	for person: Dictionary in economy.people:
 		if person.id == "aelia":
 			value["aelia_assignment"] = person.assignment
@@ -50,7 +53,8 @@ func _collect(node: Node, value: Dictionary) -> void:
 		var transform := node.get_viewport().get_screen_transform()
 		var top := transform * (rect.position + Vector2(rect.size.x * 0.82, rect.size.y * 0.25))
 		var bottom := transform * (rect.position + Vector2(rect.size.x * 0.82, rect.size.y * 0.80))
-		value["scroll"] = {"top":[top.x,top.y], "bottom":[bottom.x,bottom.y]}
+		value["scroll"] = {"top":[top.x,top.y], "bottom":[bottom.x,bottom.y],
+			"offset":node.scroll_vertical}
 	if node is Button:
 		var key := ""
 		match node.text:
@@ -68,6 +72,7 @@ func _collect(node: Node, value: Dictionary) -> void:
 			value.controls[key] = _geometry(node)
 			if node is OptionButton:
 				value.controls[key]["selected"] = node.selected
+				value.controls[key]["popup"] = _popup_state(node.get_popup())
 	for child: Node in node.get_children():
 		_collect(child, value)
 
@@ -81,4 +86,14 @@ func _geometry(control: Button) -> Dictionary:
 		if ancestor is Control and ancestor.clip_contents:
 			visible = visible and ancestor.get_global_rect().has_point(center)
 		ancestor = ancestor.get_parent()
-	return {"center":[native.x,native.y], "visible":visible, "enabled":not control.disabled}
+	return {"center":[native.x,native.y], "visible":visible, "enabled":not control.disabled,
+		"instance_id":str(control.get_instance_id())}
+
+
+func _popup_state(popup: PopupMenu) -> Dictionary:
+	var items: Array[Dictionary] = []
+	for index in popup.item_count:
+		items.append({"index":index, "text":popup.get_item_text(index),
+			"enabled":not popup.is_item_disabled(index) and not popup.is_item_separator(index)})
+	return {"visible":popup.is_visible(), "focused":popup.get_focused_item(),
+		"instance_id":str(popup.get_instance_id()), "items":items}

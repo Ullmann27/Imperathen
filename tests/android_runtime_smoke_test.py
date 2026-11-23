@@ -106,5 +106,136 @@ class VillageRuntimeWaitTest(unittest.TestCase):
         self.assertEqual(logs.call_count, 2)
 
 
+
+def assignment_control(focused=-1, *, visible=True, center=None, enabled=True,
+                       control_id="control-1", popup_id="popup-1"):
+    labels = ["Frei / Erholen", "Dorffelder", "Holzfällerlager", "Steinbruch",
+              "Handelsplatz", "Stadtposten", "Verteidigung"]
+    return {"center": [728.625, 376.5] if center is None else center,
+            "visible": visible, "enabled": enabled, "selected": 0,
+            "instance_id": control_id,
+            "popup": {"visible": True, "focused": focused, "instance_id": popup_id,
+                      "items": [{"index": index, "text": text, "enabled": True}
+                                for index, text in enumerate(labels)]}}
+
+
+class VillageStableControlTest(unittest.TestCase):
+    def test_inertial_movement_requires_two_fresh_unchanged_positions(self):
+        controls = [assignment_control(center=[728.625, value])
+                    for value in [376.5, 402.75, 402.75]]
+        read = Mock(side_effect=controls)
+        result = SMOKE.wait_for_stable_village_control(read)
+        self.assertIs(result, controls[-1])
+        self.assertEqual(read.call_count, 3)
+
+    def test_rebuilt_control_must_establish_its_own_stable_position(self):
+        controls = [assignment_control(control_id=value)
+                    for value in ["control-1", "control-2", "control-2"]]
+        read = Mock(side_effect=controls)
+        result = SMOKE.wait_for_stable_village_control(read)
+        self.assertEqual(result["instance_id"], "control-2")
+        self.assertEqual(read.call_count, 3)
+
+    def test_invisible_or_disabled_control_cannot_be_used_for_a_tap(self):
+        controls = [assignment_control(), assignment_control(visible=False),
+                    assignment_control(), assignment_control()]
+        read = Mock(side_effect=controls)
+        SMOKE.wait_for_stable_village_control(read)
+        self.assertEqual(read.call_count, 4)
+        with self.assertRaisesRegex(RuntimeError, "absent or disabled"):
+            SMOKE.wait_for_stable_village_control(Mock(return_value=assignment_control(enabled=False)))
+
+    def test_unsettled_geometry_is_a_bounded_failure(self):
+        read = Mock(side_effect=[assignment_control(center=[728.625, value])
+                                 for value in [100, 120, 150]])
+        with self.assertRaisesRegex(RuntimeError, "stable native coordinates"):
+            SMOKE.wait_for_stable_village_control(read, max_observations=3)
+        self.assertEqual(read.call_count, 3)
+
+
+class VillagePopupNavigationTest(unittest.TestCase):
+    def test_touch_keyboard_and_already_focused_popups_use_observed_rows(self):
+        for focuses, expected_downs in [([-1, 0, 1, 2], 3), ([0, 1, 2], 2), ([2], 0)]:
+            with self.subTest(focuses=focuses):
+                observe = Mock(side_effect=[assignment_control(value) for value in focuses])
+                press = Mock()
+                result = SMOKE.activate_observed_village_popup(observe, press, "Holzfällerlager")
+                self.assertEqual([call.args[0] for call in press.call_args_list],
+                                 ["KEYCODE_DPAD_DOWN"] * expected_downs + ["KEYCODE_ENTER"])
+                self.assertEqual([call.args[0] for call in observe.call_args_list],
+                                 [None] + focuses[:-1])
+                self.assertEqual(result["focused_index"], 2)
+                self.assertEqual(result["down_presses"], expected_downs)
+
+    def test_unobserved_focus_progress_cannot_confirm_the_wrong_row(self):
+        observe = Mock(side_effect=[assignment_control(0), assignment_control(0)])
+        press = Mock()
+        with self.assertRaisesRegex(RuntimeError, "focus did not progress"):
+            SMOKE.activate_observed_village_popup(observe, press, "Holzfällerlager")
+        self.assertEqual([call.args[0] for call in press.call_args_list], ["KEYCODE_DPAD_DOWN"])
+
+    def test_popup_must_belong_to_the_control_actually_tapped(self):
+        observe = Mock(return_value=assignment_control(2, control_id="replacement"))
+        press = Mock()
+        with self.assertRaisesRegex(RuntimeError, "control changed after the native tap"):
+            SMOKE.activate_observed_village_popup(
+                observe, press, "Holzfällerlager", expected_control_instance="original")
+        press.assert_not_called()
+
+    def test_closed_popup_never_receives_confirmation(self):
+        closed = assignment_control(1)
+        closed["popup"]["visible"] = False
+        observe = Mock(side_effect=[assignment_control(0), closed])
+        press = Mock()
+        with self.assertRaisesRegex(RuntimeError, "closed or became unavailable"):
+            SMOKE.activate_observed_village_popup(observe, press, "Holzfällerlager")
+        self.assertEqual([call.args[0] for call in press.call_args_list], ["KEYCODE_DPAD_DOWN"])
+
+    def test_replaced_popup_never_reuses_previous_focus_assumptions(self):
+        observe = Mock(side_effect=[assignment_control(0), assignment_control(2, popup_id="new-popup")])
+        press = Mock()
+        with self.assertRaisesRegex(RuntimeError, "replaced during navigation"):
+            SMOKE.activate_observed_village_popup(observe, press, "Holzfällerlager")
+        self.assertEqual([call.args[0] for call in press.call_args_list], ["KEYCODE_DPAD_DOWN"])
+
+    def test_missing_duplicate_or_disabled_target_stops_before_any_input(self):
+        disabled = assignment_control(2)
+        disabled["popup"]["items"][2]["enabled"] = False
+        duplicate = assignment_control(2)
+        duplicate["popup"]["items"][1]["text"] = "Holzfällerlager"
+        missing = assignment_control(2)
+        missing["popup"]["items"][2]["text"] = "Anderer Ort"
+        for control in [disabled, duplicate, missing]:
+            with self.subTest(control=control):
+                press = Mock()
+                with self.assertRaisesRegex(RuntimeError, "unique enabled target"):
+                    SMOKE.activate_observed_village_popup(Mock(return_value=control), press, "Holzfällerlager")
+                press.assert_not_called()
+
+    def test_catalog_change_before_confirmation_is_rejected(self):
+        changed = assignment_control(2)
+        changed["popup"]["items"][0]["text"] = "Anderer Auftrag"
+        observe = Mock(side_effect=[assignment_control(0), changed])
+        press = Mock()
+        with self.assertRaisesRegex(RuntimeError, "items changed"):
+            SMOKE.activate_observed_village_popup(observe, press, "Holzfällerlager")
+        self.assertEqual([call.args[0] for call in press.call_args_list], ["KEYCODE_DPAD_DOWN"])
+
+    def test_navigation_limit_still_fails_without_enter(self):
+        observe = Mock(side_effect=[assignment_control(-1), assignment_control(0)])
+        press = Mock()
+        with self.assertRaisesRegex(RuntimeError, "bounded navigation"):
+            SMOKE.activate_observed_village_popup(observe, press, "Holzfällerlager", max_moves=1)
+        self.assertEqual([call.args[0] for call in press.call_args_list], ["KEYCODE_DPAD_DOWN"])
+
+    def test_navigation_deadline_still_fails_without_enter(self):
+        observe = Mock(return_value=assignment_control(-1))
+        press = Mock()
+        with patch.object(SMOKE.time, "monotonic", side_effect=[0, 0, 121]):
+            with self.assertRaisesRegex(RuntimeError, "Timed out"):
+                SMOKE.activate_observed_village_popup(observe, press, "Holzfällerlager", timeout=120)
+        self.assertEqual([call.args[0] for call in press.call_args_list], ["KEYCODE_DPAD_DOWN"])
+
+
 if __name__ == "__main__":
     unittest.main()

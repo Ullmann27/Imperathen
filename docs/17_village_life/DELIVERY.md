@@ -94,8 +94,36 @@ Nach dieser UI-Korrektur wurde der vollständige Godot-Durchlauf erneut ausgefü
 140 Prüfungen des gesamten Dorfablaufs. Der Android-Python-Prüflauf bestand erneut
 alle 30 Tests. [Vollständiger neuer Bericht](evidence/touch-scroll/engine/validation_report.json).
 
-Der erneute Android-Bau mit dieser tatsächlichen UI-Korrektur folgt auf die
-bestandene Engineprüfung. Ein APK-Download wird erst nach erfolgreichem Bau,
+Der anschließend ausgeführte [Android-Lauf 23](https://github.com/Ullmann27/Imperathen/actions/runs/45172468045)
+bestätigte die Scrollkorrektur im Android-Emulator: Aelias aktiviertes Auswahlfeld
+wurde sichtbar erreicht. Die 22 bis dahin ausgeführten Laufzeitprüfungen bestanden.
+Die nachfolgende Arbeitszuweisung blieb jedoch aus; die Veröffentlichung wurde
+erneut korrekt übersprungen. Der
+[aus dem abgeschlossenen CI-Log extrahierte Laufzeitbericht](evidence/popup-focus/android23-runtime-report.json)
+belegt diesen fehlgeschlagenen Zwischenstand `87fec53f`.
+
+Der Prüfer hatte nach dem Öffnen des Auswahlmenüs zwei feste Pfeil-ab-Ereignisse
+gesendet. Im tatsächlich verwendeten
+[Godot-4.7.2-OptionButton](https://github.com/godotengine/godot/blob/4.7.2-stable/scene/gui/option_button.cpp)
+setzt das Öffnen per Maus beziehungsweise emulierter Berührung den Tastaturfokus
+nicht zwingend auf die aktuelle Auswahl. Der
+[PopupMenu-Code](https://github.com/godotengine/godot/blob/4.7.2-stable/scene/gui/popup_menu.cpp)
+beginnt die nächste Navigation beim beobachteten Fokus. Damit sind zwei feste
+Tastenschritte kein belastbarer Nachweis für die beabsichtigte Zeile.
+
+Die ergänzte Diagnose liest ausschließlich die tatsächliche Sichtbarkeit,
+Instanzkennung, Menüeinträge, den Fokus, die Scrollposition und die sichtbare
+Rückmeldung. Der Prüfer wartet nach dem Scrollen auf stabile Koordinaten,
+öffnet das echte Auswahlmenü, bestimmt darin den eindeutigen aktivierten Eintrag
+„Holzfällerlager“ und beobachtet den Fokus nach jedem nativen Tastenschritt.
+Er bestätigt ausschließlich diesen beobachteten Eintrag derselben Menüinstanz.
+Geschlossene oder ersetzte Menüs, veränderte Einträge, ausbleibender Fortschritt
+und Zeitüberschreitungen bleiben Fehler. Die anschließende echte Arbeitszuweisung
+und ihre Erhaltung beim Neustart bleiben zwingende Prüfungen.
+
+Diese neue Fokuskorrektur wurde nach Wegfall der lokalen Ausführungsumgebung
+statisch geprüft; die frisch angesetzten CI- und Android-Prüfungen liefern ihren
+Ausführungsnachweis. Ein APK-Download wird erst nach erfolgreichem Bau,
 tatsächlichem Android-Lauf und Prüfung der passenden Quelldateien angegeben.
 Frühere Hero- oder Opening-APKs werden nicht als neue Dorfleben-APK ausgegeben.
 
