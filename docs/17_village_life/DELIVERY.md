@@ -121,11 +121,33 @@ Geschlossene oder ersetzte Menüs, veränderte Einträge, ausbleibender Fortschr
 und Zeitüberschreitungen bleiben Fehler. Die anschließende echte Arbeitszuweisung
 und ihre Erhaltung beim Neustart bleiben zwingende Prüfungen.
 
-Diese neue Fokuskorrektur wurde nach Wegfall der lokalen Ausführungsumgebung
-statisch geprüft; die frisch angesetzten CI- und Android-Prüfungen liefern ihren
-Ausführungsnachweis. Ein APK-Download wird erst nach erfolgreichem Bau,
-tatsächlichem Android-Lauf und Prüfung der passenden Quelldateien angegeben.
-Frühere Hero- oder Opening-APKs werden nicht als neue Dorfleben-APK ausgegeben.
+Der [Android-Lauf 24](https://github.com/Ullmann27/Imperathen/actions/runs/45175493459)
+bestätigte anschließend **43 Pythonprüfungen**, **33 Godot-Prüfgruppen** sowie
+beide APK-Exporte und Paketprüfungen. Die Android-Laufzeitprüfung scheiterte
+noch vor der neuen Popupnavigation: Die vergrößerte Diagnosemeldung der
+Arbeitsübersicht wurde im Android-Protokoll abgeschnitten. Der JSON-Leser
+brach deshalb ausdrücklich ab; die Veröffentlichung blieb gesperrt.
+[Fehlgeschlagener Laufzeitbericht](evidence/log-transport/android24-runtime-report.json).
+
+Die Diagnose wird jetzt einmal als UTF-8/Base64 kodiert und in nummerierten
+Abschnitten mit höchstens 512 ASCII-Zeichen übertragen. Beobachterkennung und
+fortlaufende Bildnummer verhindern das Vermischen unterschiedlicher Zustände.
+Der Leser verlangt vollständige, zusammengehörige Abschnitte und berücksichtigt
+bei einer Bedienaktion bereits begonnene Meldungen. Ein unvollständiger neuer
+Zustand darf nicht durch einen älteren vollständigen Zustand ersetzt werden.
+Die Diagnose bleibt ausschließlich lesend; alle bisherigen Bedienungs- und
+Speicherprüfungen gelten unverändert.
+
+Die wieder verfügbare lokale Godot-4.7.2-Umgebung hat den tatsächlichen neuen
+Logger mit einer synthetischen Unicode-Meldung von **5.756 UTF-8-Bytes** ausgeführt:
+zwei fortlaufende Zustände mit je 15 Abschnitten wurden bytegenau wiederhergestellt.
+Die längste einzelne Meldung hatte einschließlich Kennung **565 ASCII-Bytes**.
+Das ist ein gezielter Übertragungsnachweis, kein Android-Gerätetest.
+[Maschineller Prüfbericht](evidence/log-transport/producer-probe.json).
+
+Ein APK-Download wird erst nach erfolgreichem Bau, tatsächlichem Android-Lauf
+und Prüfung der passenden Quelldateien angegeben. Frühere Hero- oder
+Opening-APKs werden nicht als neue Dorfleben-APK ausgegeben.
 
 ## Konkrete Grenzen
 

@@ -2,8 +2,12 @@ extends Node
 ## Read-only geometry/state observer for debug Android runtime verification.
 ## It does not accept commands, move people, change resources or write saves.
 
+const LOG_CHUNK_SIZE := 512
+const MAX_LOG_CHUNKS := 64
+
 var session: Node
 var _elapsed := 0.0
+var _snapshot_sequence := 0
 
 
 func _process(delta: float) -> void:
@@ -12,8 +16,19 @@ func _process(delta: float) -> void:
 		return
 	_elapsed = 0.0
 	var value := snapshot()
-	if not value.is_empty():
-		print("IMPERATHEN_VILLAGE_RUNTIME " + JSON.stringify(value))
+	if value.is_empty():
+		return
+	_snapshot_sequence += 1
+	# Android log messages are bounded; encode once before splitting ASCII chunks.
+	var encoded := Marshalls.utf8_to_base64(JSON.stringify(value))
+	var count := ceili(float(encoded.length()) / float(LOG_CHUNK_SIZE))
+	if count < 1 or count > MAX_LOG_CHUNKS:
+		push_error("Village runtime snapshot exceeds the diagnostic transport limit.")
+		return
+	var frame := "%s-%d" % [str(get_instance_id()), _snapshot_sequence]
+	for part in count:
+		print("IMPERATHEN_VILLAGE_RUNTIME_CHUNK %s %d %d %s" % [
+			frame, part, count, encoded.substr(part * LOG_CHUNK_SIZE, LOG_CHUNK_SIZE)])
 
 
 func snapshot() -> Dictionary:

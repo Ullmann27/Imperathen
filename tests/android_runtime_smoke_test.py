@@ -1,5 +1,6 @@
 """Synthetic log timing regressions; these are not Android device evidence."""
 
+import base64
 import importlib.util
 import json
 from pathlib import Path
@@ -235,6 +236,159 @@ class VillagePopupNavigationTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "Timed out"):
                 SMOKE.activate_observed_village_popup(observe, press, "Holzfällerlager", timeout=120)
         self.assertEqual([call.args[0] for call in press.call_args_list], ["KEYCODE_DPAD_DOWN"])
+
+
+
+def chunk_lines(state, sequence=1, observer="12345"):
+    encoded = base64.b64encode(json.dumps(state, ensure_ascii=False,
+                                          separators=(",", ":")).encode("utf-8")).decode("ascii")
+    parts = [encoded[index:index + SMOKE.VILLAGE_CHUNK_SIZE]
+             for index in range(0, len(encoded), SMOKE.VILLAGE_CHUNK_SIZE)]
+    return ["11-23 12:41:59.122 2971 3036 I godot: " + SMOKE.VILLAGE_CHUNK_MARKER
+            + f"{observer}-{sequence} {index} {len(parts)} {part}"
+            for index, part in enumerate(parts)]
+
+
+class VillageChunkTransportTest(unittest.TestCase):
+    def setUp(self):
+        self.now = 0.0
+        clock = patch.object(SMOKE.time, "monotonic", lambda: self.now)
+        sleeper = patch.object(SMOKE.time, "sleep", self.advance)
+        clock.start()
+        sleeper.start()
+        self.addCleanup(clock.stop)
+        self.addCleanup(sleeper.stop)
+
+    def advance(self, seconds):
+        self.now += seconds
+
+    def large_snapshot(self, **kwargs):
+        value = snapshot(**kwargs)
+        value["feedback"] = "Holzfällerlager · Grüße · 森林 · 🏛\n" * 50
+        return value
+
+    def test_large_unicode_snapshot_round_trips_with_short_ascii_log_lines(self):
+        value = self.large_snapshot(assigned="woodcamp")
+        lines = chunk_lines(value)
+        self.assertGreater(len(lines), 1)
+        self.assertTrue(all(len(line.encode("ascii")) < 1024 for line in lines))
+        result = SMOKE.wait_for_village_snapshot(
+            Mock(return_value="\n".join(lines)), "village_panel",
+            predicate=lambda state: state["aelia_assignment"] == "woodcamp")
+        self.assertEqual(result, value)
+
+    def test_newest_partial_frame_blocks_older_complete_matching_state(self):
+        older = chunk_lines(self.large_snapshot(assigned="woodcamp"), sequence=1)
+        newer = chunk_lines(self.large_snapshot(assigned="idle"), sequence=2)
+        logs = Mock(return_value="\n".join(older + newer[:1]))
+        with self.assertRaisesRegex(RuntimeError, "incomplete_frame"):
+            SMOKE.wait_for_village_snapshot(
+                logs, "village_panel", predicate=lambda state: state["aelia_assignment"] == "woodcamp",
+                timeout=2)
+        self.assertEqual(logs.call_count, 2)
+
+    def test_action_cursor_includes_started_partial_frame_and_requires_a_new_one(self):
+        before = chunk_lines(self.large_snapshot(assigned="idle"), sequence=9)
+        next_frame = chunk_lines(self.large_snapshot(assigned="woodcamp"), sequence=10)
+        cursor = SMOKE.village_runtime_cursor("\n".join(before[:1]))
+        self.assertEqual(cursor, ("chunk", "12345", 9))
+        logs = Mock(side_effect=["\n".join(before), "\n".join(before + next_frame)])
+        result = SMOKE.wait_for_village_snapshot(logs, "village_panel", after=cursor, timeout=3)
+        self.assertEqual(result["aelia_assignment"], "woodcamp")
+        self.assertEqual(logs.call_count, 2)
+
+    def test_partial_latest_frame_completes_without_falling_back(self):
+        first = chunk_lines(self.large_snapshot(assigned="idle"), sequence=1)
+        second = chunk_lines(self.large_snapshot(assigned="woodcamp"), sequence=2)
+        logs = Mock(side_effect=["\n".join(first + second[:1]), "\n".join(first + second)])
+        result = SMOKE.wait_for_village_snapshot(logs, "village_panel", after=("chunk", "12345", 1),
+                                                 timeout=3)
+        self.assertEqual(result["aelia_assignment"], "woodcamp")
+        self.assertEqual(logs.call_count, 2)
+
+    def test_interleaved_frames_never_mix_chunks_or_replace_the_latest_frame(self):
+        first_value = self.large_snapshot(assigned="idle")
+        second_value = self.large_snapshot(assigned="woodcamp")
+        first = chunk_lines(first_value, sequence=1)
+        second = chunk_lines(second_value, sequence=2)
+        interleaved = first[:1] + second[:1] + first[1:] + second[1:]
+        records = SMOKE.village_runtime_observations("\n".join(interleaved))
+        self.assertEqual([record["snapshot"] for record in records], [first_value, second_value])
+        self.assertEqual(SMOKE.village_runtime_cursor("\n".join(interleaved)), ("chunk", "12345", 2))
+
+    def test_missing_old_fragment_does_not_poison_a_newer_complete_frame(self):
+        old = chunk_lines(self.large_snapshot(assigned="idle"), sequence=1)
+        new = chunk_lines(self.large_snapshot(assigned="woodcamp"), sequence=2)
+        result = SMOKE.wait_for_village_snapshot(Mock(return_value="\n".join(old[:1] + new)),
+                                                 "village_panel", after=("chunk", "12345", 1))
+        self.assertEqual(result["aelia_assignment"], "woodcamp")
+
+    def test_duplicate_conflicts_and_changed_counts_are_rejected(self):
+        parts = chunk_lines(self.large_snapshot())
+        prefix, payload = parts[0].split(SMOKE.VILLAGE_CHUNK_MARKER, 1)
+        fields = payload.split(" ")
+        conflicting_data = fields.copy()
+        conflicting_data[-1] = ("A" if fields[-1][0] != "A" else "B") + fields[-1][1:]
+        conflicting_total = fields.copy()
+        conflicting_total[2] = str(int(fields[2]) + 1)
+        for replacement in [conflicting_data, conflicting_total]:
+            with self.subTest(replacement=replacement[:3]):
+                duplicate = prefix + SMOKE.VILLAGE_CHUNK_MARKER + " ".join(replacement)
+                with self.assertRaisesRegex(RuntimeError, "Conflicting"):
+                    SMOKE.village_runtime_observations("\n".join([parts[0], duplicate]))
+
+    def test_malformed_truncated_and_oversized_chunks_are_rejected(self):
+        marker = SMOKE.VILLAGE_CHUNK_MARKER
+        cases = [
+            marker + "12345-1 0 65 " + "A" * 512,
+            marker + "12345-1 1 1 e30=",
+            marker + "12345-1 0 2 " + "A" * 511,
+            marker + "12345-1 0 1 " + "A" * 513,
+            marker + "12345-1 0 1 not%base64",
+            marker + "12345-1 0",
+            marker + "12345-1 0 1 A",
+        ]
+        for text in cases:
+            with self.subTest(text=text[:80]):
+                with self.assertRaises(RuntimeError):
+                    SMOKE.village_runtime_observations(text)
+
+    def test_invalid_utf8_json_or_nonfinite_values_cannot_be_accepted(self):
+        for payload in [b"\xff", b'{"screen":', b"[]", b'{"value":NaN}']:
+            with self.subTest(payload=payload):
+                encoded = base64.b64encode(payload).decode("ascii")
+                text = SMOKE.VILLAGE_CHUNK_MARKER + "12345-1 0 1 " + encoded
+                with self.assertRaises(RuntimeError):
+                    SMOKE.village_runtime_observations(text)
+
+    def test_producer_replacement_or_sequence_reversal_fails(self):
+        one = chunk_lines(snapshot(), sequence=9)
+        other = chunk_lines(snapshot(), sequence=10, observer="67890")
+        reversed_sequence = chunk_lines(snapshot(), sequence=8)
+        for tail in [other, reversed_sequence]:
+            with self.subTest(tail=tail[0][:90]):
+                with self.assertRaises(RuntimeError):
+                    SMOKE.village_runtime_observations("\n".join(one + tail))
+        with self.assertRaisesRegex(RuntimeError, "stream changed after input"):
+            SMOKE.wait_for_village_snapshot(
+                Mock(return_value="\n".join(other)), "village_panel", after=("chunk", "12345", 9))
+
+    def test_frame_history_is_bounded(self):
+        lines = []
+        for sequence in range(1, SMOKE.MAX_VILLAGE_FRAMES + 2):
+            lines.extend(chunk_lines(snapshot(), sequence=sequence))
+        with self.assertRaisesRegex(RuntimeError, "bounded frame history"):
+            SMOKE.village_runtime_observations("\n".join(lines))
+
+    def test_legacy_frames_keep_freshness_and_missing_diagnostics_do_not_pass(self):
+        initial = snapshot(assigned="idle")
+        updated = snapshot(assigned="woodcamp")
+        cursor = SMOKE.village_runtime_cursor(log(initial))
+        self.assertEqual(cursor, ("legacy", None, 1))
+        logs = Mock(side_effect=[log(initial), log(initial, updated)])
+        result = SMOKE.wait_for_village_snapshot(logs, "village_panel", after=cursor, timeout=3)
+        self.assertEqual(result, updated)
+        self.assertEqual(SMOKE.village_runtime_cursor("unrelated log output"), -1)
 
 
 if __name__ == "__main__":
