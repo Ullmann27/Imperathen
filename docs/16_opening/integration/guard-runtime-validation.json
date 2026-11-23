@@ -1,0 +1,186 @@
+{
+  "format": "imperathen-runtime-guard-validation",
+  "version": 1,
+  "created_at_utc": "2026-11-23T04:51:19.566174+00:00",
+  "scope": "isolated file snapshot only; active Chat-1 and production sources untouched",
+  "manifest_version": 2,
+  "guard_sha256": "b2a25bf20eec7d792f9ae05dba47787a1350b456d249164521dec7fd9df75a12",
+  "manifest_sha256": "d3b5baf19dd34b891e0c1181153d937bd491cbaf02e97955c50a9d4dff509096",
+  "patch_sha256": "973b7999809a3ef50bc2d468757d1f3df37af4f2abf6ae56aba61088d428df3f",
+  "pinned_runtime_module_count": 5,
+  "pinned_uid_file_count": 5,
+  "legacy_false_acceptance": {
+    "legacy_guard_sha256": "30b05e948990842ebc1c75f9aabf8d93614424f467b93e5ebf6ecb47e5303faf",
+    "legacy_manifest_sha256": "4b6f84a239487bb39b7393b58c2ccd8782457e96afd1008d3c0ce0ee6c830ca9",
+    "records": [
+      {
+        "name": "legacy_correct_modules",
+        "exit_code": 0,
+        "stdout": "CHECK PASS: exact Chat-1 snapshot, three target files, additive modules and patch verified. No files changed.",
+        "stderr": "",
+        "mutated_by_guard": false
+      },
+      {
+        "name": "legacy_stale_module",
+        "exit_code": 0,
+        "stdout": "CHECK PASS: exact Chat-1 snapshot, three target files, additive modules and patch verified. No files changed.",
+        "stderr": "",
+        "mutated_by_guard": false
+      }
+    ],
+    "patch_sha256": "973b7999809a3ef50bc2d468757d1f3df37af4f2abf6ae56aba61088d428df3f"
+  },
+  "current_guard_cases": [
+    {
+      "name": "v2_correct_modules_and_uids",
+      "apply_requested": false,
+      "exit_code": 0,
+      "stdout": "CHECK PASS: exact Chat-1 snapshot, three target files, five runtime modules, five UID files and patch verified. No files changed.",
+      "stderr": "",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_changed_prototype__scripts__cinematic__opening_checkpoint.gd",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Opening dependency differs from the reviewed runtime; no files changed: prototype/scripts/cinematic/opening_checkpoint.gd",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_changed_prototype__scripts__cinematic__opening_checkpoint.gd.uid",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Opening dependency differs from the reviewed runtime; no files changed: prototype/scripts/cinematic/opening_checkpoint.gd.uid",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_changed_prototype__scripts__cinematic__opening_director.gd",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Opening dependency differs from the reviewed runtime; no files changed: prototype/scripts/cinematic/opening_director.gd",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_changed_prototype__scripts__cinematic__opening_director.gd.uid",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Opening dependency differs from the reviewed runtime; no files changed: prototype/scripts/cinematic/opening_director.gd.uid",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_changed_prototype__scripts__story__opening_story.gd",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Opening dependency differs from the reviewed runtime; no files changed: prototype/scripts/story/opening_story.gd",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_changed_prototype__scripts__story__opening_story.gd.uid",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Opening dependency differs from the reviewed runtime; no files changed: prototype/scripts/story/opening_story.gd.uid",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_changed_prototype__scripts__ui__opening_overlay.gd",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Opening dependency differs from the reviewed runtime; no files changed: prototype/scripts/ui/opening_overlay.gd",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_changed_prototype__scripts__ui__opening_overlay.gd.uid",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Opening dependency differs from the reviewed runtime; no files changed: prototype/scripts/ui/opening_overlay.gd.uid",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_changed_prototype__scripts__world__village__opening_props.gd",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Opening dependency differs from the reviewed runtime; no files changed: prototype/scripts/world/village/opening_props.gd",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_changed_prototype__scripts__world__village__opening_props.gd.uid",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Opening dependency differs from the reviewed runtime; no files changed: prototype/scripts/world/village/opening_props.gd.uid",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_rejects_missing_uid",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Missing or symbolic opening dependency; no files changed: prototype/scripts/story/opening_story.gd.uid",
+      "changed_paths": []
+    },
+    {
+      "name": "legacy_guard_new_manifest",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Unknown guard format; no files changed.",
+      "changed_paths": []
+    },
+    {
+      "name": "new_guard_legacy_manifest",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Unknown guard format; no files changed.",
+      "changed_paths": []
+    },
+    {
+      "name": "new_guard_missing_module_hash",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Guard must pin all five runtime modules and their five UID files; no files changed.",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_still_rejects_stale_main",
+      "apply_requested": true,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Chat-1 file changed since the reviewed snapshot; no files changed: prototype/scripts/main.gd",
+      "changed_paths": []
+    },
+    {
+      "name": "v2_guarded_apply_preserves_all_pinned_dependencies",
+      "apply_requested": true,
+      "exit_code": 0,
+      "stdout": "APPLY PASS: three resolved files, five runtime modules and five UID files match the reviewed inputs. No commit or index update was made.",
+      "stderr": "",
+      "changed_paths": [
+        "prototype/scripts/main.gd",
+        "prototype/scripts/ui/game_ui.gd",
+        "prototype/scripts/world/game_world.gd"
+      ]
+    }
+  ],
+  "all_current_cases_passed": true,
+  "production_patch_unchanged": true,
+  "production_files_modified_by_validation": false,
+  "engine_rerun": false,
+  "runtime_module_provenance": {
+    "local_source_commit": "a950c3daccfd232c2a56a991962eff4497003e16",
+    "engine_report": "../evidence/engine/validation_report.json",
+    "engine_report_sha256": "c32626d4752c73caf2b27ee183cc6d47740fd3bfad37067b6947f73449eff346",
+    "all_runtime_modules_match_executed_engine_report": true,
+    "uid_files_match_same_committed_checkout": true
+  }
+}

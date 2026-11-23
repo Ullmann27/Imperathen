@@ -9,6 +9,7 @@ const Origins = preload("res://scripts/strategy/origins.gd")
 var regional = preload("res://scripts/world/regional_village.gd").new()
 var grove = Grove.new()
 var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
+var opening_props = preload("res://scripts/world/village/opening_props.gd").new()
 var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
@@ -121,6 +122,7 @@ func setup(state: Dictionary) -> void:
 func sync_state(state: Dictionary) -> void:
 	_build_scene()
 	_state = state
+	opening_props.sync_state(state)
 	_apply_season(int(state.get("strategy",{}).get("turn",0))%4)
 	_sync_resources()
 	_sync_buildings()
@@ -195,6 +197,27 @@ func set_active(active: bool) -> void:
 
 func get_player_position() -> Vector3:
 	return _player.global_position if _player != null else Vector3(0, 1, 8)
+
+
+func prepare_cinematic_camera() -> void:
+	# Settle the ordinary camera first so the closing shot has an exact target.
+	_camera_initialized = false
+	_update_camera(0.0)
+	_camera.make_current()
+
+
+func get_cinematic_anchor(key: String) -> Vector3:
+	match key:
+		"road": return to_global(Vector3(0, 0, 18))
+		"market": return scenery.to_global(scenery.MARKET)
+		"companion": return _companion.global_position - Vector3.UP * 0.9
+		"plot":
+			var buildings: Array = _state.get("buildings", [])
+			if not buildings.is_empty():
+				return to_global(Vector3(float(buildings[0].x), 0, float(buildings[0].z)))
+			return to_global(Vector3(14.5, 0, 4.5))
+		"training": return to_global(TRAINING_LOCATION)
+		_: return get_player_position()
 
 
 func set_build_mode(enabled: bool) -> void:
@@ -313,6 +336,7 @@ func _build_scene() -> void:
 	_create_atmosphere()
 	_create_terrain()
 	_create_village()
+	add_child(opening_props)
 	_create_build_plot()
 	_buildings_root = Node3D.new()
 	_buildings_root.name = "PlayerBuildings"

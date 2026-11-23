@@ -7,6 +7,10 @@ const AtlasScreen = preload("res://scripts/strategy/atlas_screen.gd")
 const Seasons = preload("res://scripts/strategy/season_campaign.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 const ValleyScene = preload("res://scripts/tactics/valley_scene.gd")
+const OpeningStory = preload("res://scripts/story/opening_story.gd")
+const OpeningDirector = preload("res://scripts/cinematic/opening_director.gd")
+const OpeningOverlay = preload("res://scripts/ui/opening_overlay.gd")
+const OpeningCheckpoint = preload("res://scripts/cinematic/opening_checkpoint.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -25,6 +29,15 @@ var autosave_elapsed := 0.0
 var last_story_id := ""
 var command_serial := 0
 var run_id := ""
+var opening_director
+var opening_overlay
+var opening_sequence: Dictionary = {}
+var opening_index := 0
+var opening_elapsed := 0.0
+var opening_paused := false
+var opening_manual := false
+var opening_checkpoint_failed := false
+var pending_opening: Dictionary = {}
 
 
 func _ready() -> void:
@@ -51,6 +64,9 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if screen == "opening":
+		_opening_process(delta)
+		return
 	if screen == "atlas":
 		return
 	if screen == "valley":
@@ -73,6 +89,8 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if screen == "opening":
+		return
 	if event.is_action_pressed("ui_cancel"):
 		if screen == "atlas":
 			_leave_atlas()
@@ -88,7 +106,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_go_back_requested() -> void:
 	# The window signal is the single Android Back entry point. Handling the
 	# preceding node notification too would process one request twice.
-	if screen == "atlas":
+	if screen == "opening" and is_instance_valid(opening_overlay):
+		opening_overlay.handle_back()
+	elif screen == "atlas":
 		_leave_atlas()
 	elif screen == "valley":
 		_leave_valley()
@@ -97,6 +117,12 @@ func _on_go_back_requested() -> void:
 
 
 func _notification(what: int) -> void:
+	if screen == "opening" and what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
+		_opening_set_paused(true)
+		_write_opening_checkpoint(false)
+		if session_started:
+			_save(false)
+		return
 	if screen == "atlas" and is_instance_valid(atlas):
 		if what in [NOTIFICATION_APPLICATION_PAUSED,NOTIFICATION_APPLICATION_FOCUS_OUT]:
 			if not atlas.demo and session_started:
@@ -142,6 +168,7 @@ func _refresh() -> void:
 
 
 func _show_menu() -> void:
+	_release_opening()
 	screen = "menu"
 	world.set_active(false)
 	world.set_mode("city")
@@ -163,16 +190,21 @@ func _request_new_game() -> void:
 
 
 func _start_new_game() -> void:
+	_release_opening()
+	pending_opening = {}
 	model.new_game(ui.origin_id)
 	last_story_id = ""
 	world.setup(model.data)
 	session_started = true
 	autosave_elapsed = 0.0
-	_resume()
+	mode = "person"
+	world.set_active(false)
 	var saved := _save(false)
 	if saved.get("ok", false):
-		ui.notify(Origins.PEOPLES[model.data.origin_id].intro)
+		_begin_opening(OpeningStory.sequence(str(model.data.origin_id)))
 		print("IMPERATHEN_SESSION_STARTED: saved frontier world")
+	else:
+		_resume()
 
 
 func _continue_game() -> void:
@@ -181,16 +213,29 @@ func _continue_game() -> void:
 		ui.notify(str(result.get("message", "Der Spielstand konnte nicht geladen werden.")))
 		return
 	world.setup(model.data)
+	pending_opening = {}
 	session_started = true
 	last_story_id = ""
-	_resume()
-	ui.notify(str(result.get("message", "Spielstand geladen.")))
+	if not _restore_opening():
+		_resume()
+		ui.notify(str(result.get("message", "Spielstand geladen.")))
 	print("IMPERATHEN_CONTINUED")
 
 
 func _resume() -> void:
+	if screen == "opening":
+		_opening_set_paused(false)
+		return
 	if not session_started:
 		_show_menu()
+		return
+	if not pending_opening.is_empty():
+		if not _save(false).get("ok", false):
+			_pause()
+			return
+		var next_opening: Dictionary = pending_opening
+		pending_opening = {}
+		_begin_opening(next_opening)
 		return
 	screen = "playing"
 	world.set_mode(mode)
@@ -201,6 +246,9 @@ func _resume() -> void:
 
 
 func _pause() -> void:
+	if screen == "opening":
+		_opening_set_paused(true)
+		return
 	if not session_started:
 		return
 	screen = "paused"
@@ -217,6 +265,10 @@ func _save(show_feedback: bool = true) -> Dictionary:
 	if screen == "valley" and not valley_demo:
 		model.checkpoint_valley(valley.model)
 	var result: Dictionary = model.save_game(SAVE_PATH)
+	if screen == "opening":
+		_write_opening_checkpoint(false)
+	elif bool(result.get("ok", false)) and not pending_opening.is_empty():
+		OpeningCheckpoint.write(str(model.data.world_id), str(pending_opening.id), 0, false)
 	if show_feedback or not result.get("ok", false):
 		ui.notify(str(result.get("message", "Spielstand gespeichert.")))
 	return result
@@ -243,6 +295,8 @@ func _set_mode(next_mode: String) -> void:
 
 
 func _on_ui_action(action: String, payload: Dictionary) -> void:
+	if screen == "opening" and action != "quality_changed":
+		return
 	match action:
 		"atlas_demo": _open_atlas(true)
 		"atlas": _open_atlas(false)
@@ -293,7 +347,11 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 				ui.notify("Wähle einen freien Bauplatz auf der markierten Fläche. Kosten: 8 Holz.")
 		"companion_help", "companion_decline":
 			_resume()
-			_command("choose_companion", {"choice": "help" if action == "companion_help" else "decline"})
+			var companion_result := _command("choose_companion", {"choice": "help" if action == "companion_help" else "decline"})
+			if companion_result.get("ok", false):
+				ui.notify(OpeningStory.companion_reply(model.data))
+			else:
+				_show_companion()
 		"train", "recruit": _command(action, payload)
 		"skirmish": _command("start_skirmish", payload)
 		"story_choice":
@@ -328,26 +386,207 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	model.set_player_position(world.get_player_position())
 	command_serial += 1
 	var result: Dictionary = model.execute(command, payload, "%s_%d" % [run_id, command_serial])
-	if not result.get("ok", false) or command != "receive_damage":
+	if not result.get("ok", false) or command not in ["receive_damage", "train"]:
 		ui.notify(str(result.get("message", "")))
 	_refresh()
+	var persisted := true
 	if result.get("ok", false) and (command in ["choose_companion", "train", "recruit", "resolve_skirmish", "choose_story"] or model.data.progress.stage in ["aftermath", "fallen"]):
-		_save(false)
+		persisted = bool(_save(false).get("ok", false))
+	if result.get("ok", false) and command == "train":
+		if persisted:
+			_begin_opening(OpeningStory.adulthood(model.data))
+		else:
+			pending_opening = OpeningStory.adulthood(model.data)
+			_pause()
 	return result
 
 
 func _show_companion() -> void:
 	var companion: Dictionary = model.data.get("companion", {})
 	if not str(companion.get("choice", "")).is_empty():
-		ui.notify("Deine Entscheidung bleibt Teil eurer Geschichte. Vertrauen: %s" % companion.get("trust", 0))
+		ui.notify(OpeningStory.companion_reply(model.data))
 		return
 	screen = "dialog"
 	world.set_active(false)
-	ui.show_dialog("Ein Fremder am Brunnen", "%s Vier Holzstücke genügen für die Reparatur. Möchtest du teilen?" % Origins.PEOPLES[model.data.origin_id].intro, [
-		{"label": "Vier Holz teilen und helfen", "action": "companion_help", "choice": "help"},
-		{"label": "Meine Vorräte behalte ich", "action": "companion_decline", "choice": "decline"},
-		{"label": "Ich komme später wieder", "action": "resume"}
-	])
+	var dialogue: Dictionary = OpeningStory.companion_dialog(model.data)
+	ui.show_dialog(str(dialogue.title), str(dialogue.text), dialogue.choices)
+
+
+func _begin_opening(sequence: Dictionary, start_index: int = 0) -> void:
+	_release_opening()
+	if sequence.get("beats", []).is_empty():
+		screen = "playing"
+		_resume()
+		return
+	opening_sequence = sequence.duplicate(true)
+	var beats: Array = opening_sequence.beats
+	beats.append({"id": "objective_handoff", "shot_id": "player", "speaker": "", "role": "",
+		"text": str(sequence.get("objective_text", "")), "duration": 0.0,
+		"chapter": str(sequence.get("title", "")), "location": str(sequence.get("location", "")),
+		"objective": true, "final": true,
+		"objective_title": str(sequence.get("objective_title", "Dein nächster Schritt")),
+		"objective_text": str(sequence.get("objective_text", "")),
+		"advance_label": "Zur Ausbildung" if int(model.data.player.age) >= 18 else "Ins Dorf"})
+	screen = "opening"
+	mode = "person"
+	world.set_mode(mode)
+	world.set_active(false)
+	world.set_build_mode(false)
+	world.prepare_cinematic_camera()
+	ui.show_cinematic()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	var preferences: Dictionary = ui.opening_preferences()
+	opening_manual = bool(preferences.get("manual_reading", false))
+	opening_index = clampi(start_index, 0, beats.size() - 1)
+	opening_paused = false
+	opening_checkpoint_failed = false
+	opening_director = OpeningDirector.new()
+	add_child(opening_director)
+	opening_director.setup(world)
+	opening_overlay = OpeningOverlay.new()
+	add_child(opening_overlay)
+	opening_overlay.configure(preferences)
+	opening_overlay.advance_requested.connect(_opening_next)
+	opening_overlay.pause_requested.connect(func(): _opening_set_paused(not opening_paused))
+	opening_overlay.skip_requested.connect(_opening_skip)
+	opening_overlay.reading_mode_changed.connect(_opening_reading_changed)
+	_opening_present()
+	print("IMPERATHEN_OPENING_STARTED " + str(opening_sequence.id))
+
+
+func _opening_present() -> void:
+	if screen != "opening" or not is_instance_valid(opening_overlay):
+		return
+	var beat: Dictionary = opening_sequence.beats[opening_index]
+	opening_elapsed = 0.0
+	opening_overlay.present(beat, opening_index, opening_sequence.beats.size())
+	opening_overlay.set_paused(opening_paused)
+	opening_director.play(str(beat.shot_id), maxf(0.1, float(beat.duration)), bool(ui.opening_preferences().reduce_motion))
+	# One clock drives subtitle timing and camera travel. Reading mode can hold
+	# the finished composition without skipping a sentence or simulating time.
+	opening_director.set_process(false)
+	opening_director.set_paused(opening_paused)
+	if bool(beat.get("final", false)):
+		opening_director.sample(str(beat.shot_id), 1.0)
+		opening_overlay.set_progress(1.0)
+	else:
+		opening_overlay.set_progress(0.0)
+	_write_opening_checkpoint(false)
+	_log_opening_geometry.call_deferred()
+
+
+func _opening_process(delta: float) -> void:
+	if opening_paused or not is_instance_valid(opening_overlay):
+		return
+	var beat: Dictionary = opening_sequence.beats[opening_index]
+	if bool(beat.get("final", false)):
+		return
+	var duration := maxf(0.1, float(beat.duration))
+	opening_elapsed = minf(duration, opening_elapsed + maxf(0.0, delta))
+	opening_director.sample(str(beat.shot_id), opening_elapsed / duration)
+	opening_overlay.set_progress(opening_elapsed / duration)
+	if opening_elapsed >= duration and not opening_manual:
+		_opening_next()
+
+
+func _opening_next() -> void:
+	if screen != "opening" or opening_paused:
+		return
+	if opening_index >= opening_sequence.beats.size() - 1:
+		_opening_finish()
+		return
+	opening_index += 1
+	_opening_present()
+
+
+func _opening_skip() -> void:
+	if screen != "opening":
+		return
+	# Skipping cinematics still explains the objective, then waits for the player.
+	opening_index = opening_sequence.beats.size() - 1
+	opening_paused = false
+	_opening_present()
+
+
+func _opening_set_paused(value: bool) -> void:
+	if screen != "opening":
+		return
+	opening_paused = value
+	if is_instance_valid(opening_overlay):
+		opening_overlay.set_paused(value)
+	if is_instance_valid(opening_director):
+		opening_director.set_paused(value)
+	_log_opening_geometry.call_deferred()
+
+
+func _log_opening_geometry() -> void:
+	if not OS.is_debug_build() or screen != "opening":
+		return
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if screen != "opening" or not is_instance_valid(opening_overlay):
+		return
+	var buttons := {}
+	for name_key: String in ["OpeningSkip", "OpeningAdvance", "OpeningPause"]:
+		var button := opening_overlay.find_child(name_key, true, false) as Button
+		if button != null and button.is_visible_in_tree():
+			var point: Vector2 = get_viewport().get_screen_transform() * button.get_global_rect().get_center()
+			buttons[name_key] = [point.x, point.y]
+	print("IMPERATHEN_OPENING_READY " + JSON.stringify({"sequence": str(opening_sequence.id),
+		"index": opening_index, "final": opening_index == opening_sequence.beats.size() - 1,
+		"paused": opening_paused, "elapsed": opening_elapsed, "world_seconds": model.data.world_seconds,
+		"companion_choice": model.data.companion.choice, "buttons": buttons}))
+
+
+func _opening_reading_changed(value: bool) -> void:
+	opening_manual = value
+	ui.set_opening_reading(value)
+
+
+func _write_opening_checkpoint(completed: bool) -> void:
+	if opening_sequence.is_empty() or model == null:
+		return
+	var result := OpeningCheckpoint.write(str(model.data.world_id), str(opening_sequence.id), opening_index, completed)
+	opening_checkpoint_failed = result != OK
+
+
+func _restore_opening() -> bool:
+	var checkpoint: Dictionary = OpeningCheckpoint.read(str(model.data.world_id))
+	if checkpoint.is_empty() or bool(checkpoint.completed):
+		return false
+	var sequence: Dictionary = OpeningStory.sequence(str(model.data.origin_id)) if int(model.data.player.age) < 18 else OpeningStory.adulthood(model.data)
+	if sequence.is_empty() or str(sequence.id) != str(checkpoint.sequence_id):
+		return false
+	if int(checkpoint.index) > sequence.beats.size():
+		return false
+	_begin_opening(sequence, int(checkpoint.index))
+	return true
+
+
+func _opening_finish() -> void:
+	if screen != "opening":
+		return
+	_write_opening_checkpoint(true)
+	var checkpoint_failed := opening_checkpoint_failed
+	_release_opening()
+	screen = "playing"
+	_resume()
+	if checkpoint_failed:
+		ui.notify("Der Vorspann-Fortschritt konnte nicht gespeichert werden. Beim Fortsetzen kann die Szene erneut erscheinen.")
+	print("IMPERATHEN_OPENING_COMPLETE")
+
+
+func _release_opening() -> void:
+	if is_instance_valid(opening_director):
+		opening_director.finish()
+		opening_director.queue_free()
+	opening_director = null
+	if is_instance_valid(opening_overlay):
+		opening_overlay.finish()
+		opening_overlay.queue_free()
+	opening_overlay = null
+	opening_sequence = {}
+	opening_paused = false
 
 
 func _check_special_dialog() -> void:

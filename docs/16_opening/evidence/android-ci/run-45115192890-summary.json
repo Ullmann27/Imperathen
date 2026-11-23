@@ -1,0 +1,240 @@
+{
+  "repository": "Ullmann27/Imperathen",
+  "branch": "feature/cinematic-opening-20261123",
+  "source_commit": "b356a0c8e3a01285d5c55fc426299fe94d8b30d9",
+  "source_tree": "6bfae583a9b9c3497cf3642d1524afb73dd3b567",
+  "run_id": 45115192890,
+  "run_number": 20,
+  "run_attempt": 1,
+  "run_url": "https://github.com/Ullmann27/Imperathen/actions/runs/45115192890",
+  "status": "completed",
+  "conclusion": "success",
+  "started_at_utc": "2026-11-23T05:01:10Z",
+  "finished_at_observed_update_utc": "2026-11-23T05:09:15Z",
+  "job_id": 137496318335,
+  "evidence_origin": "GitHub Actions run/job/artifact APIs and timestamp-stripped JSON from the completed job stdout. Artifacts were not downloaded by this monitor.",
+  "artifacts": [
+    {
+      "id": 14792075124,
+      "name": "imperathen-android-runtime-20",
+      "size_in_bytes": 6857385,
+      "url": "https://api.github.com/repos/Ullmann27/Imperathen/actions/artifacts/14792075124",
+      "archive_download_url": "https://api.github.com/repos/Ullmann27/Imperathen/actions/artifacts/14792075124/zip",
+      "expired": false,
+      "created_at": "2026-11-23T05:09:11Z",
+      "expires_at": "2026-12-23T05:09:09Z",
+      "updated_at": "2026-11-23T05:09:11Z",
+      "digest": "sha256:4bf1d97b5a69db1ca394669e77616fc5f201ff22980f8a8df22b8cae47b96927",
+      "workflow_run": {
+        "id": 45115192890,
+        "repository_id": 1467587766,
+        "head_repository_id": 1467587766,
+        "head_branch": "feature/cinematic-opening-20261123",
+        "head_sha": "b356a0c8e3a01285d5c55fc426299fe94d8b30d9"
+      }
+    },
+    {
+      "id": 14791820766,
+      "name": "imperathen-desktop-20",
+      "size_in_bytes": 217479770,
+      "url": "https://api.github.com/repos/Ullmann27/Imperathen/actions/artifacts/14791820766",
+      "archive_download_url": "https://api.github.com/repos/Ullmann27/Imperathen/actions/artifacts/14791820766/zip",
+      "expired": false,
+      "created_at": "2026-11-23T05:03:56Z",
+      "expires_at": "2026-12-23T05:03:49Z",
+      "updated_at": "2026-11-23T05:03:56Z",
+      "digest": "sha256:41f283320f5a950e7f6cfbad7d3617a036148699ae7e897563c13df01d7a497d",
+      "workflow_run": {
+        "id": 45115192890,
+        "repository_id": 1467587766,
+        "head_repository_id": 1467587766,
+        "head_branch": "feature/cinematic-opening-20261123",
+        "head_sha": "b356a0c8e3a01285d5c55fc426299fe94d8b30d9"
+      }
+    },
+    {
+      "id": 14791816694,
+      "name": "imperathen-android-20",
+      "size_in_bytes": 215148482,
+      "url": "https://api.github.com/repos/Ullmann27/Imperathen/actions/artifacts/14791816694",
+      "archive_download_url": "https://api.github.com/repos/Ullmann27/Imperathen/actions/artifacts/14791816694/zip",
+      "expired": false,
+      "created_at": "2026-11-23T05:03:30Z",
+      "expires_at": "2026-12-23T05:03:23Z",
+      "updated_at": "2026-11-23T05:03:30Z",
+      "digest": "sha256:65f1c456d16d5051afcd2122533eab19f3ca333060b5c29de4a3a06879b993d7",
+      "workflow_run": {
+        "id": 45115192890,
+        "repository_id": 1467587766,
+        "head_repository_id": 1467587766,
+        "head_branch": "feature/cinematic-opening-20261123",
+        "head_sha": "b356a0c8e3a01285d5c55fc426299fe94d8b30d9"
+      }
+    }
+  ],
+  "apk_build_receipts": [
+    {
+      "file": "IMPERATHEN-b356a0c8-arm64.apk",
+      "abi": "arm64-v8a",
+      "sha256": "201d83f95c1d02613c52661073b92ce1aadfd81d67aa505150eaa468f0b6b1a7",
+      "export_and_static_validation": "success"
+    },
+    {
+      "file": "IMPERATHEN-b356a0c8-emulator.apk",
+      "abi": "x86_64",
+      "sha256": "6c3b112b51e2490b4b0e5b65896129373bf97879b3bd85dbc8c85653add92f8d",
+      "export_and_static_validation": "success"
+    }
+  ],
+  "runtime": {
+    "status": "passed",
+    "source_commit": "b356a0c8e3a01285d5c55fc426299fe94d8b30d9",
+    "test_harness_commit": "b356a0c8e3a01285d5c55fc426299fe94d8b30d9",
+    "android_version": "15",
+    "api_level": "35",
+    "primary_test_abi": "x86_64",
+    "checks": 41,
+    "passed_checks": 41,
+    "failed_checks": [],
+    "errors": [],
+    "physical_device_test": false,
+    "arm64_runtime_scope": "started_under_translation",
+    "opening_checks": [
+      {
+        "name": "opening_before_gameplay",
+        "passed": true,
+        "detail": {
+          "buttons": {
+            "OpeningAdvance": [
+              766.5,
+              489
+            ],
+            "OpeningPause": [
+              811.875,
+              39
+            ],
+            "OpeningSkip": [
+              892.125,
+              39
+            ]
+          },
+          "companion_choice": "",
+          "elapsed": 0.145711666666666,
+          "final": false,
+          "index": 0,
+          "paused": false,
+          "sequence": "first_day",
+          "world_seconds": 0
+        }
+      },
+      {
+        "name": "android_back_pauses_opening",
+        "passed": true,
+        "detail": {
+          "buttons": {
+            "OpeningAdvance": [
+              766.5,
+              489
+            ],
+            "OpeningPause": [
+              799.875,
+              39
+            ],
+            "OpeningSkip": [
+              892.125,
+              39
+            ]
+          },
+          "companion_choice": "",
+          "elapsed": 0.545469666666666,
+          "final": false,
+          "index": 0,
+          "paused": true,
+          "sequence": "first_day",
+          "world_seconds": 0
+        }
+      },
+      {
+        "name": "android_back_resumes_opening",
+        "passed": true,
+        "detail": {
+          "buttons": {
+            "OpeningAdvance": [
+              766.5,
+              489
+            ],
+            "OpeningPause": [
+              811.875,
+              39
+            ],
+            "OpeningSkip": [
+              892.125,
+              39
+            ]
+          },
+          "companion_choice": "",
+          "elapsed": 0.678803,
+          "final": false,
+          "index": 0,
+          "paused": false,
+          "sequence": "first_day",
+          "world_seconds": 0
+        }
+      },
+      {
+        "name": "skip_keeps_first_objective",
+        "passed": true,
+        "detail": {
+          "buttons": {
+            "OpeningAdvance": [
+              766.5,
+              489
+            ],
+            "OpeningPause": [
+              911.625,
+              39
+            ]
+          },
+          "companion_choice": "",
+          "elapsed": 0,
+          "final": true,
+          "index": 5,
+          "paused": false,
+          "sequence": "first_day",
+          "world_seconds": 0
+        }
+      },
+      {
+        "name": "objective_hands_over_control",
+        "passed": true,
+        "detail": "Actual touch accepted the objective after a separate skip action"
+      }
+    ],
+    "screenshots": [
+      "00_android_intro.png",
+      "01_android_menu.png",
+      "10_android_opening.png",
+      "11_android_opening_objective.png",
+      "02_android_world.png",
+      "03_android_pause.png",
+      "04_android_valley.png",
+      "09_android_marching.png",
+      "05_android_valley_square.png",
+      "06_android_globe.png",
+      "08_android_figuren.png",
+      "07_android_arm64_translated_intro.png"
+    ]
+  },
+  "observation_limits": [
+    "The primary full interaction route ran on the x86_64 Android emulator package.",
+    "The actual ARM64 download was additionally installed and its intro rendered through emulator translation.",
+    "No physical ARM64 handset or device-specific performance claim.",
+    "Independent artifact download, ZIP/APK hashes and visual review remain for root integration."
+  ],
+  "sources": {
+    "run": "https://api.github.com/repos/Ullmann27/Imperathen/actions/runs/45115192890",
+    "jobs": "https://api.github.com/repos/Ullmann27/Imperathen/actions/runs/45115192890/jobs",
+    "artifacts": "https://api.github.com/repos/Ullmann27/Imperathen/actions/runs/45115192890/artifacts",
+    "job_logs": "https://api.github.com/repos/Ullmann27/Imperathen/actions/jobs/137496318335/logs"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "format_version": 1,
+  "kind": "imperathen-sky-seam",
+  "created_utc": "2026-11-23T05:00:36.972976+00:00",
+  "baseline_commit": "cac84fdf4dedbde4c624975f9c1150013fdca626",
+  "target": "prototype/scripts/world/village/clouds.gdshader",
+  "expected_before_sha256": "54c25d9207c817a50727fa9c2cd938ad79e79b457b83a4b06f86690c545891e3",
+  "expected_after_sha256": "be8a689ab1f4ef3bafd02360a7c30dbde6aa6183bf4510c71b4fd529cc6eb391",
+  "patch_file": "sky-seam.patch",
+  "patch_sha256": "73709e51dbe9ce2e74a136e0c53806b9c72aa568e6ee509d16793a3d0d089163",
+  "peer_snapshot": {
+    "path": "/workspace/scratch/04c5592bf6dd/imperathen/prototype/scripts/world/village/clouds.gdshader",
+    "sha256": "54c25d9207c817a50727fa9c2cd938ad79e79b457b83a4b06f86690c545891e3",
+    "matches_baseline": true,
+    "consecutive_reads_identical": true
+  },
+  "production_evidence": {
+    "metadata": "../evidence/sky-seam/production-still.json",
+    "metadata_sha256": "db133266c75c1df8b8eb894a1a07f60b2a34f58759755dcde00f23a9e0ccba5c",
+    "log": "../evidence/sky-seam/production-still.log",
+    "log_sha256": "f840ab7b85e7563cde2e188908882b4ee7dbb011bcc438e22b53d437131428cc",
+    "image": "../evidence/sky-seam/1280x720-valley-corrected.png",
+    "image_sha256": "b7f9c8df85defa36fd6955b8fb271f3bc089ee9cf92fe25566d09af5f55bf6b0",
+    "shader_matches_metadata": true,
+    "renderer": "gl_compatibility",
+    "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+    "android_device_test": false,
+    "hardware_fps_claim": false
+  },
+  "scope": "Separate one-file shader patch; does not alter the existing three-file opening patch or its runtime manifest."
+}

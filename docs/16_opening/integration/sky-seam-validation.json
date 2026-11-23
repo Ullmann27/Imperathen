@@ -1,0 +1,99 @@
+{
+  "created_utc": "2026-11-23T05:01:21.120306+00:00",
+  "scope": "Three isolated file-integration checks for the separate one-shader patch. No additional engine or Android execution.",
+  "source_manifest": "sky-seam-guard.json",
+  "manifest_sha256": "12ab7c4f5ab7596bdd67e45bae86527baeab1153ac0a0b6e151b03b27462fab5",
+  "guard_sha256": "398295712ae5dc88fd9e4879e5849364519230709011bf96cd57123a16873a28",
+  "patch_sha256": "73709e51dbe9ce2e74a136e0c53806b9c72aa568e6ee509d16793a3d0d089163",
+  "checks": [
+    {
+      "name": "exact-peer-shader-dry-check",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/tmp/imperathen-opening-20261123/docs/16_opening/integration/apply_sky_seam.py",
+        "--repo",
+        "/tmp/imperathen-sky-seam-validation/correct"
+      ],
+      "exit_code": 0,
+      "stdout": "PASS: exact shader and patch verified; git apply --check passed; no files changed\n",
+      "stderr": "",
+      "before_sha256": {
+        "prototype/scripts/world/village/clouds.gdshader": "54c25d9207c817a50727fa9c2cd938ad79e79b457b83a4b06f86690c545891e3"
+      },
+      "after_sha256": {
+        "prototype/scripts/world/village/clouds.gdshader": "54c25d9207c817a50727fa9c2cd938ad79e79b457b83a4b06f86690c545891e3"
+      },
+      "changed_paths": [],
+      "passed": true
+    },
+    {
+      "name": "exact-peer-shader-isolated-apply",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/tmp/imperathen-opening-20261123/docs/16_opening/integration/apply_sky_seam.py",
+        "--repo",
+        "/tmp/imperathen-sky-seam-validation/correct",
+        "--apply"
+      ],
+      "exit_code": 0,
+      "stdout": "PASS: cloud shader patch applied; exact result hash verified\n",
+      "stderr": "",
+      "before_sha256": {
+        "prototype/scripts/world/village/clouds.gdshader": "54c25d9207c817a50727fa9c2cd938ad79e79b457b83a4b06f86690c545891e3"
+      },
+      "after_sha256": {
+        "prototype/scripts/world/village/clouds.gdshader": "be8a689ab1f4ef3bafd02360a7c30dbde6aa6183bf4510c71b4fd529cc6eb391"
+      },
+      "changed_paths": [
+        "prototype/scripts/world/village/clouds.gdshader"
+      ],
+      "passed": true
+    },
+    {
+      "name": "different-shader-rejected-without-mutation",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/tmp/imperathen-opening-20261123/docs/16_opening/integration/apply_sky_seam.py",
+        "--repo",
+        "/tmp/imperathen-sky-seam-validation/different-source",
+        "--apply"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "REJECTED: Shader hash mismatch; review and merge the current shader first\n",
+      "before_sha256": {
+        "prototype/scripts/world/village/clouds.gdshader": "663c8a46a6cfeaa963ee743b3a3de66308d73bfbaaec6019c86b5aaa11b8d245"
+      },
+      "after_sha256": {
+        "prototype/scripts/world/village/clouds.gdshader": "663c8a46a6cfeaa963ee743b3a3de66308d73bfbaaec6019c86b5aaa11b8d245"
+      },
+      "changed_paths": [],
+      "passed": true
+    }
+  ],
+  "checks_passed": 3,
+  "active_peer_shader_unchanged": true,
+  "active_peer_shader_before_sha256": "54c25d9207c817a50727fa9c2cd938ad79e79b457b83a4b06f86690c545891e3",
+  "active_peer_shader_after_sha256": "54c25d9207c817a50727fa9c2cd938ad79e79b457b83a4b06f86690c545891e3",
+  "protected_opening_handoff_sha256": {
+    "chat1-opening.patch": "973b7999809a3ef50bc2d468757d1f3df37af4f2abf6ae56aba61088d428df3f",
+    "chat1-opening-guard.json": "d3b5baf19dd34b891e0c1181153d937bd491cbaf02e97955c50a9d4dff509096",
+    "guard-runtime-validation.json": "15d5a07369b38158618aab505a8866c80b342bc7c58cf7b899e02e50567e6c2c",
+    "guard-validation.json": "d9e8a32fa55271d182fc9db7f1d96f55c472fc20882352eb7c3b4df32dea7d93",
+    "apply_chat1_opening.py": "b2a25bf20eec7d792f9ae05dba47787a1350b456d249164521dec7fd9df75a12"
+  },
+  "protected_opening_handoff_unchanged": true,
+  "production_evidence": {
+    "metadata": "../evidence/sky-seam/production-still.json",
+    "metadata_sha256": "db133266c75c1df8b8eb894a1a07f60b2a34f58759755dcde00f23a9e0ccba5c",
+    "log": "../evidence/sky-seam/production-still.log",
+    "log_sha256": "f840ab7b85e7563cde2e188908882b4ee7dbb011bcc438e22b53d437131428cc",
+    "image": "../evidence/sky-seam/1280x720-valley-corrected.png",
+    "image_sha256": "b7f9c8df85defa36fd6955b8fb271f3bc089ee9cf92fe25566d09af5f55bf6b0",
+    "shader_matches_metadata": true,
+    "renderer": "gl_compatibility",
+    "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+    "android_device_test": false,
+    "hardware_fps_claim": false
+  }
+}

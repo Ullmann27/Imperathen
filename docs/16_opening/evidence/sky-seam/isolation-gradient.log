@@ -1,0 +1,19 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop
+IMPERATHEN_OPENING_STARTED first_day
+IMPERATHEN_SESSION_STARTED: saved frontier world
+IMPERATHEN_OPENING_READY {"buttons":{},"companion_choice":"","elapsed":0.0,"final":false,"index":0,"paused":true,"sequence":"first_day","world_seconds":0.0}
+IMPERATHEN_OPENING_READY {"buttons":{},"companion_choice":"","elapsed":0.0,"final":false,"index":0,"paused":true,"sequence":"first_day","world_seconds":0.0}
+SKY_PROBE_CAPTURE 01-original-sky-only
+SKY_PROBE_CAPTURE 02-gradient-sky-only
+SKY_PROBE_CAPTURE 03-unwrapped-derivative-mask
+SKY_PROBE_CAPTURE 04-gradient-full-scene
+SKY_PROBE_COMPLETE
+ERROR: Texture with GL ID of 48: leaked 21844 bytes.
+   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
+ERROR: Texture with GL ID of 58: leaked 21844 bytes.
+   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)

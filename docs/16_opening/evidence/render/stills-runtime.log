@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 25.0.7-2+deb13u1 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.7, 256 bits)
+
+IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop
+IMPERATHEN_OPENING_STARTED first_day
+IMPERATHEN_SESSION_STARTED: saved frontier world
+IMPERATHEN_OPENING_READY {"buttons":{"OpeningAdvance":[1022.0,652.0],"OpeningPause":[1066.5,52.0],"OpeningSkip":[1189.5,52.0]},"companion_choice":"","elapsed":0.142902333333333,"final":false,"index":0,"paused":true,"sequence":"first_day","world_seconds":0.0}
+IMPERATHEN_OPENING_READY {"buttons":{"OpeningAdvance":[1022.0,652.0],"OpeningPause":[1066.5,52.0],"OpeningSkip":[1189.5,52.0]},"companion_choice":"","elapsed":0.142902333333333,"final":false,"index":0,"paused":true,"sequence":"first_day","world_seconds":0.0}
+OPENING_CAPTURE 1280x720-01-valley
+OPENING_CAPTURE 1280x720-03-well
+OPENING_CAPTURE 1280x720-05-player
+OPENING_CAPTURE 1280x720-06-player
+OPENING_CAPTURE 1024x1024-03-well

@@ -1,0 +1,57 @@
+{
+  "scope": "Five stills completed before a long movie capture was interrupted because the measured software render time exceeded the review budget. No overall completion claim is made for the interrupted invocation.",
+  "renderer": "Godot 4.7.2 / OpenGL Compatibility / Mesa llvmpipe",
+  "profile": "very_high",
+  "android_device_test": false,
+  "captured_files": [
+    {
+      "file": "1024x1024-03-well.png",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "sha256": "0887bcf5918350f32112149a5f0ea2c49db6e3b2bb099328126caa9a2ca25d4b"
+    },
+    {
+      "file": "1280x720-01-valley.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "sha256": "1a0753a843fa05e658b636c3a5144836c6685ad6e0acca34a24ea81f639dfdf4"
+    },
+    {
+      "file": "1280x720-03-well.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "sha256": "5bd3129f9e6e64d1c14a040a1cb46a608976e0a9ea7c8f725c3d8f268ea3332f"
+    },
+    {
+      "file": "1280x720-05-player.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "sha256": "f0ad39fb9fd58fe0534ebdf0ff5111b7141e73345156bd0a31a01c36bb08b646"
+    },
+    {
+      "file": "1280x720-06-player.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "sha256": "3ea275284aaefbec270bc67d6137bac34729f61cbef38cdd90f7a98f4cbcb198"
+    }
+  ],
+  "source_sha256": {
+    "prototype/scripts/main.gd": "55b491370bb132b1bdb657c960b52377b0b14675037ecd71db65c504d9156842",
+    "prototype/scripts/world/game_world.gd": "f5901dcdde1df523067ae235f6ecbda4ba4c49eeb37796c876965ed5af30ab48",
+    "prototype/scripts/cinematic/opening_director.gd": "052fc95a16a82fa61a4b168b0c85050a64f1278d89f03631859532dfa9b83064",
+    "prototype/scripts/ui/opening_overlay.gd": "7b229a254f19660e2c2a1b1420865ab53d8e92100d27aa19233447e548c0af1b",
+    "prototype/scripts/story/opening_story.gd": "4664b3a3d4c3af425579c297d89d1e8af6842a699ecee1250f9263a58dc7bc60",
+    "prototype/scripts/world/village/opening_props.gd": "09f6e37d1fb91aeba7dcc0377c79299c1ea2021e90ebfcbf7cde7c729df47b3d",
+    "prototype/tests/opening_graphics_review.gd": "934729626a0b3d8a34667284a80f93f003ff276cdad7ea0cdc1fa523ab207a7b"
+  }
+}

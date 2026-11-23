@@ -61,6 +61,10 @@ func _run() -> void:
 	scene._action("leave")
 	_check(game.screen == "menu" and not FileAccess.file_exists(game.SAVE_PATH), "The scenario preview never creates a campaign save")
 	game.ui.action_requested.emit("new_game", {})
+	_check(game.screen == "opening", "New game begins with the in-world prologue")
+	game._opening_skip()
+	_check(game.screen == "opening", "Skipping the prologue retains its explicit first objective")
+	game._opening_next()
 	_check(game.screen == "playing", "New game starts an active world through the UI signal")
 	_check(int(game.model.data.player.age) == 12, "A new life starts as a child")
 	_check(FileAccess.file_exists(game.SAVE_PATH), "New game creates a real save")
@@ -121,6 +125,9 @@ func _run() -> void:
 	_move_fixture(Vector3(0, 1, -7))
 	game.ui.action_requested.emit("train", {})
 	_check(game.model.data.player.age == 18 and game.model.data.companion.age == 18, "Training advances both childhood companions consistently")
+	_check(game.screen == "opening" and game.opening_sequence.id == "adulthood", "Confirmed adulthood is introduced by the six-year transition")
+	game._opening_skip()
+	game._opening_next()
 	for hit in range(3):
 		game.ui.action_requested.emit("attack", {})
 		await _wait_physics(48)
@@ -223,6 +230,8 @@ func _run() -> void:
 	for id in ["han","wa","germania","vistula"]:
 		game.ui.origin_id = id
 		game._start_new_game()
+		game._opening_skip()
+		game._opening_next()
 		_check(game.model.data.origin_id == id and game.model.data.strategy.owned == [id] and game.world.regional.current_origin == id,"Selected homeland builds and owns the matching settlement: "+id)
 		_check(game.model.data.companion.id != "marcus" and game.model.data.story.title == game.Origins.PEOPLES[id].calling,"Each origin starts its own chronicle and companion")
 	game._pause()

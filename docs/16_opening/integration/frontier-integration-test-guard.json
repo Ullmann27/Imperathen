@@ -1,0 +1,13 @@
+{
+  "format": "imperathen-test-adaptation",
+  "version": 1,
+  "path": "prototype/tests/frontier_integration_test.gd",
+  "expected_peer_sha256": "9b36f91c87a8b0bd3cb728c44045a6b99816d96b0ce1bc5fd1a2b896749b8748",
+  "adapted_sha256": "be05e6f5e70538139168a186d26b7c6a5129bf8c11eed8f53fd347743d4a0318",
+  "patch_file": "frontier-integration-test.patch",
+  "patch_sha256": "76d5c5c9e774c2341dc3965847242724d80a21077bc8e599113ec866a489d052",
+  "reason": "New Life and adult training now present an explicit cinematic/objective handoff before gameplay input is accepted.",
+  "existing_assertions_removed": false,
+  "added_assertions_per_opening": 3,
+  "production_main_patch_unchanged": true
+}

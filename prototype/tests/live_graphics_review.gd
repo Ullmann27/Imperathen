@@ -35,6 +35,8 @@ func _run() -> void:
 		"village": {}, "valley": {}, "large_battle": {}}
 	game.ui._finish_intro()
 	game._start_new_game()
+	game._opening_skip()
+	game._opening_next()
 	# Let the capsule settle onto the floor, then checkpoint through the game's normal save API.
 	for i in 12: await physics_frame
 	game._refresh()

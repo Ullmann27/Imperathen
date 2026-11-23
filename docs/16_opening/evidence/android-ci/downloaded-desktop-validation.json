@@ -1,0 +1,22 @@
+{
+  "source_commit": "b356a0c8e3a01285d5c55fc426299fe94d8b30d9",
+  "run_id": 45115192890,
+  "artifact_id": 14791820766,
+  "artifact_sha256": "41f283320f5a950e7f6cfbad7d3617a036148699ae7e897563c13df01d7a497d",
+  "windows_file": "IMPERATHEN-b356a0c8-Windows-x86_64.zip",
+  "bytes": 112285576,
+  "sha256": "f448c1229ae87c31e6bf07a09e091c08bda347136136bf0987d791dd205cd7e7",
+  "checks": {
+    "matches_uploaded_sha256": true,
+    "zip_crc": true,
+    "expected_entries": [
+      "IMPERATHEN.exe",
+      "IMPERATHEN-Vulkan.cmd"
+    ],
+    "pe_machine": "0x8664 / x86_64",
+    "embedded_godot_pack_footer": true,
+    "linux_startup_marker_observed": true
+  },
+  "windows_runtime_test": false,
+  "linux_start_log": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\nIMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop\n"
+}

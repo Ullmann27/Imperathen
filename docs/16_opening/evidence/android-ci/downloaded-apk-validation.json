@@ -1,0 +1,375 @@
+{
+  "source_commit": "b356a0c8e3a01285d5c55fc426299fe94d8b30d9",
+  "artifact_id": 14791816694,
+  "artifact_sha256": "65f1c456d16d5051afcd2122533eab19f3ca333060b5c29de4a3a06879b993d7",
+  "run_id": 45115192890,
+  "arm64-apk-validation.json": {
+    "passed": true,
+    "expected_abi": "arm64-v8a",
+    "overall_status": "pass",
+    "checks": [
+      {
+        "id": "apk_file",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "zip_structure",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "zip_crc",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "apk_core_entries",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "binary_manifest_header",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "resource_table_header",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "dex_header",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "godot_native_library",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "hero_character_content",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "godot_project_content",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "manifest_metadata",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "package_identity",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "launcher_activity",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "signature_verification",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "zip_alignment",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "apk_unchanged",
+        "status": "pass",
+        "required": true
+      }
+    ],
+    "manifest": {
+      "package": "at.heinz.imperathen",
+      "version_code": "1",
+      "version_name": "0.1.0-prototype",
+      "min_sdk": "24",
+      "target_sdk": "36",
+      "debuggable": true,
+      "launchable_activity": "com.godot.game.GodotAppLauncher",
+      "permissions": [],
+      "launcher_diagnostics": {
+        "application_present": true,
+        "application_enabled": true,
+        "components": [
+          {
+            "type": "activity",
+            "name": "com.godot.game.GodotApp",
+            "enabled": true,
+            "exported": false,
+            "exported_attribute": "false",
+            "intent_filters": [],
+            "has_launcher_filter": false,
+            "rejection_reasons": [
+              "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+              "component_exported_false"
+            ],
+            "unresolved_attributes": [],
+            "usable_launcher": false
+          },
+          {
+            "type": "activity-alias",
+            "name": "com.godot.game.GodotAppLauncher",
+            "enabled": true,
+            "exported": true,
+            "exported_attribute": "true",
+            "intent_filters": [
+              {
+                "actions": [
+                  "android.intent.action.MAIN"
+                ],
+                "categories": [
+                  "android.intent.category.DEFAULT",
+                  "android.intent.category.LAUNCHER"
+                ]
+              }
+            ],
+            "has_launcher_filter": true,
+            "target_activity": "com.godot.game.GodotApp",
+            "target_declared_before_alias": true,
+            "target_enabled": true,
+            "target_exported": false,
+            "rejection_reasons": [],
+            "unresolved_attributes": [],
+            "usable_launcher": true
+          },
+          {
+            "type": "activity",
+            "name": "org.godotengine.godot.utils.ProcessPhoenix",
+            "enabled": true,
+            "exported": false,
+            "exported_attribute": "false",
+            "intent_filters": [],
+            "has_launcher_filter": false,
+            "rejection_reasons": [
+              "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+              "component_exported_false"
+            ],
+            "unresolved_attributes": [],
+            "usable_launcher": false
+          }
+        ],
+        "unresolved_candidate": false
+      },
+      "decoded_with": "apkanalyzer"
+    },
+    "device_tests": {
+      "status": "not_run",
+      "reason": "Static validator never installs or launches an APK or queries a connected device."
+    }
+  },
+  "emulator-apk-validation.json": {
+    "passed": true,
+    "expected_abi": "x86_64",
+    "overall_status": "pass",
+    "checks": [
+      {
+        "id": "apk_file",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "zip_structure",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "zip_crc",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "apk_core_entries",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "binary_manifest_header",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "resource_table_header",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "dex_header",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "godot_native_library",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "hero_character_content",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "godot_project_content",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "manifest_metadata",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "package_identity",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "launcher_activity",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "signature_verification",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "zip_alignment",
+        "status": "pass",
+        "required": true
+      },
+      {
+        "id": "apk_unchanged",
+        "status": "pass",
+        "required": true
+      }
+    ],
+    "manifest": {
+      "package": "at.heinz.imperathen",
+      "version_code": "1",
+      "version_name": "0.1.0-prototype",
+      "min_sdk": "24",
+      "target_sdk": "36",
+      "debuggable": true,
+      "launchable_activity": "com.godot.game.GodotAppLauncher",
+      "permissions": [],
+      "launcher_diagnostics": {
+        "application_present": true,
+        "application_enabled": true,
+        "components": [
+          {
+            "type": "activity",
+            "name": "com.godot.game.GodotApp",
+            "enabled": true,
+            "exported": false,
+            "exported_attribute": "false",
+            "intent_filters": [],
+            "has_launcher_filter": false,
+            "rejection_reasons": [
+              "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+              "component_exported_false"
+            ],
+            "unresolved_attributes": [],
+            "usable_launcher": false
+          },
+          {
+            "type": "activity-alias",
+            "name": "com.godot.game.GodotAppLauncher",
+            "enabled": true,
+            "exported": true,
+            "exported_attribute": "true",
+            "intent_filters": [
+              {
+                "actions": [
+                  "android.intent.action.MAIN"
+                ],
+                "categories": [
+                  "android.intent.category.DEFAULT",
+                  "android.intent.category.LAUNCHER"
+                ]
+              }
+            ],
+            "has_launcher_filter": true,
+            "target_activity": "com.godot.game.GodotApp",
+            "target_declared_before_alias": true,
+            "target_enabled": true,
+            "target_exported": false,
+            "rejection_reasons": [],
+            "unresolved_attributes": [],
+            "usable_launcher": true
+          },
+          {
+            "type": "activity",
+            "name": "org.godotengine.godot.utils.ProcessPhoenix",
+            "enabled": true,
+            "exported": false,
+            "exported_attribute": "false",
+            "intent_filters": [],
+            "has_launcher_filter": false,
+            "rejection_reasons": [
+              "no_MAIN_and_LAUNCHER_in_same_intent_filter",
+              "component_exported_false"
+            ],
+            "unresolved_attributes": [],
+            "usable_launcher": false
+          }
+        ],
+        "unresolved_candidate": false
+      },
+      "decoded_with": "apkanalyzer"
+    },
+    "device_tests": {
+      "status": "not_run",
+      "reason": "Static validator never installs or launches an APK or queries a connected device."
+    }
+  },
+  "arm64_build": {
+    "status": "verified_debug_apk",
+    "apk_sha256": "201d83f95c1d02613c52661073b92ce1aadfd81d67aa505150eaa468f0b6b1a7",
+    "apk_size_bytes": 107859841,
+    "source_commit": "b356a0c8e3a01285d5c55fc426299fe94d8b30d9",
+    "abi": "arm64-v8a",
+    "orientation": 4,
+    "requested_renderer": "compatibility",
+    "signing": "externally_supplied_debug_key"
+  },
+  "downloaded_apk_sha256": "201d83f95c1d02613c52661073b92ce1aadfd81d67aa505150eaa468f0b6b1a7",
+  "packaged_cloud_shader_sha256": "be8a689ab1f4ef3bafd02360a7c30dbde6aa6183bf4510c71b4fd529cc6eb391",
+  "opening_resources": [
+    {
+      "entry": "assets/scripts/cinematic/opening_checkpoint.gdc",
+      "bytes": 1911,
+      "sha256": "d9ed3d453587e6e6efde0f113b0b34da1a0fdcce6009f03cde59450b4aaa5ccb"
+    },
+    {
+      "entry": "assets/scripts/cinematic/opening_director.gdc",
+      "bytes": 7030,
+      "sha256": "511728c63a184cb6d54325083217b69fc7faefc4eb7006a58464231707c7a73d"
+    },
+    {
+      "entry": "assets/scripts/story/opening_story.gdc",
+      "bytes": 7460,
+      "sha256": "82c38b6204eb5f02fd85acf7feb72436d4dfa76785d0801bd19bdc9f09406b59"
+    },
+    {
+      "entry": "assets/scripts/ui/opening_overlay.gdc",
+      "bytes": 13674,
+      "sha256": "308c9c6dc31a7419af07ba75641a7404eddb5ef32c2ab4e0bc295406fccc24df"
+    },
+    {
+      "entry": "assets/scripts/world/village/opening_props.gdc",
+      "bytes": 7131,
+      "sha256": "0a0af8a24e19c5935b545d104ad8cd0a73d84ef91e5db63577c64e53d861c612"
+    }
+  ]
+}

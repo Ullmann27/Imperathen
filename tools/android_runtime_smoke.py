@@ -198,6 +198,32 @@ def main():
         if "IMPERATHEN_MENU_READY " not in logs():
             tap(point)
 
+    def finish_first_day_opening():
+        # Older release APKs have no in-world prologue. New builds expose actual
+        # laid-out buttons; this test never substitutes guessed screen positions.
+        if "IMPERATHEN_OPENING_STARTED first_day" not in checked_logs():
+            return
+        marker = "IMPERATHEN_OPENING_READY "
+        opening = json.loads(wait_marker(marker))
+        record("opening_before_gameplay", not opening["final"] and not opening["companion_choice"], opening)
+        screenshot("10_android_opening.png")
+        previous = checked_logs().count(marker)
+        adb("shell", "input", "keyevent", "4")
+        paused = json.loads(wait_for_new_marker(marker, previous))
+        record("android_back_pauses_opening", paused["paused"] and paused["world_seconds"] == opening["world_seconds"], paused)
+        previous = checked_logs().count(marker)
+        adb("shell", "input", "keyevent", "4")
+        resumed = json.loads(wait_for_new_marker(marker, previous))
+        record("android_back_resumes_opening", not resumed["paused"], resumed)
+        previous = checked_logs().count(marker)
+        tap(resumed["buttons"]["OpeningSkip"])
+        objective = json.loads(wait_for_new_marker(marker, previous))
+        record("skip_keeps_first_objective", objective["final"] and not objective["companion_choice"], objective)
+        screenshot("11_android_opening_objective.png")
+        tap(objective["buttons"]["OpeningAdvance"])
+        wait_marker("IMPERATHEN_OPENING_COMPLETE")
+        record("objective_hands_over_control", True, "Actual touch accepted the objective after a separate skip action")
+
     def relaunch(diagnostics=False):
         previous = report["pid"]
         (args.output / ("logcat-" + previous + ".txt")).write_text(logs(), encoding="utf-8")
@@ -282,6 +308,7 @@ def main():
         tap(menu["new_game"])
         wait_marker("IMPERATHEN_SESSION_STARTED")
         record("touch_starts_saved_game", True, "New game button produced a saved village")
+        finish_first_day_opening()
         time.sleep(3)
         dismiss_fullscreen_hint("world")
         screenshot("02_android_world.png")

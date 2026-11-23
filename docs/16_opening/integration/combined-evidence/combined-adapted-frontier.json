@@ -1,0 +1,9 @@
+{
+  "check": "frontier_integration_adapted",
+  "passed": true,
+  "exit_code": 0,
+  "elapsed_seconds": 2.683,
+  "expected_marker": "FRONTIER_INTEGRATION_PASS",
+  "log": "frontier_integration_adapted.log",
+  "warnings": []
+}

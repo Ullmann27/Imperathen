@@ -1,0 +1,49 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "camera": "[X: (0.941219, 0.0, -0.337797), Y: (-0.068775, 0.979055, -0.19163), Z: (0.330722, 0.203598, 0.921505), O: (9.913625, 8.418275, 31.47675)]",
+  "captures": [
+    {
+      "file": "01-original-sky-only.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "render_scale": 1.0,
+      "result": 0
+    },
+    {
+      "file": "02-gradient-sky-only.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "render_scale": 1.0,
+      "result": 0
+    },
+    {
+      "file": "03-unwrapped-derivative-mask.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "render_scale": 1.0,
+      "result": 0
+    },
+    {
+      "file": "04-gradient-full-scene.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "render_scale": 1.0,
+      "result": 0
+    }
+  ],
+  "hidden_geometry_count": 314,
+  "renderer": "gl_compatibility",
+  "source_shader_sha256": "54c25d9207c817a50727fa9c2cd938ad79e79b457b83a4b06f86690c545891e3",
+  "source_unchanged": true,
+  "state_before": "975c968b4d14371ebef9201194bb2240054ad63c040c7c2d8e809b38979de349",
+  "state_unchanged": true,
+  "temporary_change": "Runtime cloned shader uses wrapped longitude dFdx/dFdy and textureGrad, preserving the mipmapped sampler. Diagnostic white mask is abs unwrapped derivative >= 0.5. No production file changed."
+}
