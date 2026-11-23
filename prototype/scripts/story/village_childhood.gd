@@ -82,6 +82,18 @@ const CARRIED_EFFECTS := {
 }
 const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Fabius’ Kleinholzbündel", "checked_hinge":"Geprüftes Scharnier", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
+const SOURCE_MISSION_BY_STEP := {
+	"mother_morning":"I-01","fill_water":"I-01","father_morning":"I-01",
+	"market_meeting":"I-03","market_purchase":"I-03","deliver_food":"I-03",
+	"woodcutter_request":"I-04","collect_kindling":"I-04","deliver_kindling":"I-04",
+	"apprentice_permission":"I-04","smith_trial":"I-04",
+	"rest_forge":"I-05","forge_bellows":"I-05","forge_anvil":"I-05","forge_quench":"I-05","deliver_hinge":"I-05",
+	"market_trade":"I-06","smith_apprentice":"I-06",
+	"family_report":"I-07","rest_patrol":"I-07","healer_request":"I-07","deliver_medicine":"I-07",
+	"patrol_brief":"I-07","patrol_inner":"I-07","patrol_road":"I-07","patrol_gate":"I-07","patrol_report":"I-07",
+	"watch_permission":"I-07","borrow_gear":"I-07","watch_post":"I-07","watch_message":"I-07","return_gear":"I-07",
+	"family_evening":"I-09","night_rest":"I-09"
+}
 
 
 static func start(data: Dictionary) -> bool:
@@ -443,7 +455,8 @@ static func view(data: Dictionary) -> Dictionary:
 		items.append(ITEM_NAMES[item])
 	var result := {"enabled":true,"day":child.day,"age":int(data.player.age),
 		"completed_steps":child.completed.size(),"total_steps":STEPS.size(),
-		"stage":step.get("id", "village_night"),"chapter":step.get("chapter", "Die Nacht im Dorf"),
+		"stage":step.get("id", "village_night"),"source_mission_id":step.get("mission", SOURCE_MISSION_BY_STEP.get(step.get("id", ""), "")),
+		"chapter":step.get("chapter", "Die Nacht im Dorf"),
 		"title":step.get("chapter", "Die Nacht im Dorf"),
 		"objective":step.get("objective", "Du bist bei deiner Familie. Die nächste Nacht setzt eure gemeinsame Geschichte fort."),
 		"carried":items,"relationships":child.relationships.duplicate(true),
