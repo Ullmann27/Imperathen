@@ -171,16 +171,20 @@ func show_intro() -> void:
 	_screen.add_child(_intro_node)
 	_intro_node.finished.connect(_finish_intro)
 	_intro_node.play(_always_intro or not _intro_seen, _reduce_motion)
-	var compact := _touch_enabled or _content_size().x < 900
+	var area := _content_size()
+	var compact := _touch_enabled or area.x < 900
+	# Portrait phones see the 1280-wide canvas scaled down; enlarge the button to match.
+	var k := clampf(area.x / 560.0, 1.0, 2.4) if area.y > area.x * 1.15 else 1.0
 	var skip := _button("Überspringen" if _touch_enabled else "Überspringen  ·  Enter", func(): _finish_intro(), false, 15 if compact else 14)
 	skip.name = "IntroSkip"
-	RomanStyle.style_button(skip, false, roundi((16 if compact else 15) * _ui_scale))
+	RomanStyle.style_button(skip, false, roundi((16 if compact else 15) * k * _ui_scale))
 	skip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	var skip_size := Vector2(270, 58) if compact else Vector2(250, 48)
-	skip.offset_left = -skip_size.x - 30
-	skip.offset_right = -30
-	skip.offset_top = -skip_size.y - 30
-	skip.offset_bottom = -30
+	var skip_size := (Vector2(270, 58) if compact else Vector2(250, 48)) * k
+	var inset := 30.0 * k
+	skip.offset_left = -skip_size.x - inset
+	skip.offset_right = -inset
+	skip.offset_top = -skip_size.y - inset
+	skip.offset_bottom = -inset
 	_screen.add_child(skip)
 	skip.grab_focus.call_deferred()
 	if OS.is_debug_build() and OS.has_feature("android"):

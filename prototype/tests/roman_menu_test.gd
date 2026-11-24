@@ -141,6 +141,8 @@ func _check_timeline() -> void:
 	_check(_find(intro, "Title").text == "IMPERATHEN", "title text")
 	root.size = Vector2i(720, 1280)
 	await _frames()
+	var skip: Button = _find(_ui.get("_screen"), "IntroSkip")
+	_check(skip != null and skip.size.y >= 46.0 and Rect2(Vector2.ZERO, Vector2(720, 1280)).encloses(skip.get_global_rect()), "skip button stays reachable in portrait")
 	_check(intro.get_rect().size.x <= 720.5 and reveal.position.x >= 0 and reveal.get_global_rect().end.x <= 720.5, "intro relayouts for portrait without restarting")
 	root.size = Vector2i(1280, 720)
 	await _frames()
