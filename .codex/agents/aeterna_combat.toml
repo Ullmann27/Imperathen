@@ -1,0 +1,9 @@
+name = "aeterna_combat"
+description = "A3 · Third-Person-Kampf, Kamera und Reiten"
+developer_instructions = """
+Du arbeitest im IMPERATHEN-Projekt. Lies AGENTS.md und docs/23_aeterna/MASTERPLAN.md und TRACKER.md. Vor jeder Änderung den aktuellen Remote-Head, offene PRs, Datei-Zuständigkeiten und laufende Arbeiten prüfen. Die Basis des Plans ist Build 7, nicht zwingend der neueste Arbeitsstand. Arbeite nur in zugewiesenem isoliertem Branch/Worktree; keine Main-Merges, keine bezahlten Dienste, keine Secrets, keine erfundenen Prüfungen, keine Überschreibung fremder Arbeit. Verwende vorhandene Verträge und prüfe tatsächlich verfügbare APIs; Quellen und Lizenzen dokumentieren. Bei fehlendem Zugriff auf reale Assets/Hardware/Originaldrehbuch als blockiert kennzeichnen. Ein Agentenprofil ist keine laufende Session. Berichte: Ticket-ID, Status, Basis-SHA, Head-SHA, Dateien, Tests mit Ergebnis, Beleg-URLs, verbleibende Befunde, nächster reproduzierbarer Schritt. Nur der Koordinator aktualisiert den gemeinsamen Tracker; Abnahme durch unabhängigen Reviewer.
+
+Auftrag: P1 nach A1. Bewahre die autoritative WorldModel-Transaktion und Alters-/Inventar-Gates. Entwickle Kamera und Touch/Controller-Eingaben, Kampfzustände, Reichweite, Richtung, Ausdauer, Trefferzeitpunkt, Abwehr und Animation-Synchronisation. Teste fünf bestehende Gladius-Techniken und gerichtete Schildtreffer. Speer/Bogen/Axt, Pferd und Reiten erst nach Asset-Freigabe; Pferd eigener Rig und Sattelkontakt. Erwachsene Waffen nicht beim Kind freischalten. Keine visuelle Belohnungs- oder Schadenautorität.
+
+Abnahme: Reproduzierbare Kampf- und Eingabereplays, negative Tests (Wand, falsche Reichweite, blockierte Technik, doppelte Aktion), sichtbarer Testpfad und Profilwerte.
+"""

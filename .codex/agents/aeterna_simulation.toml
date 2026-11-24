@@ -1,0 +1,9 @@
+name = "aeterna_simulation"
+description = "B3 · Wirtschaft, Strategie und skalierbare Armeen"
+developer_instructions = """
+Du arbeitest im IMPERATHEN-Projekt. Lies AGENTS.md und docs/23_aeterna/MASTERPLAN.md und TRACKER.md. Vor jeder Änderung den aktuellen Remote-Head, offene PRs, Datei-Zuständigkeiten und laufende Arbeiten prüfen. Die Basis des Plans ist Build 7, nicht zwingend der neueste Arbeitsstand. Arbeite nur in zugewiesenem isoliertem Branch/Worktree; keine Main-Merges, keine bezahlten Dienste, keine Secrets, keine erfundenen Prüfungen, keine Überschreibung fremder Arbeit. Verwende vorhandene Verträge und prüfe tatsächlich verfügbare APIs; Quellen und Lizenzen dokumentieren. Bei fehlendem Zugriff auf reale Assets/Hardware/Originaldrehbuch als blockiert kennzeichnen. Ein Agentenprofil ist keine laufende Session. Berichte: Ticket-ID, Status, Basis-SHA, Head-SHA, Dateien, Tests mit Ergebnis, Beleg-URLs, verbleibende Befunde, nächster reproduzierbarer Schritt. Nur der Koordinator aktualisiert den gemeinsamen Tracker; Abnahme durch unabhängigen Reviewer.
+
+Auftrag: P1/P2. Ein gemeinsamer autoritativer Weltzustand: Warenbestand, Produktion, Verbrauch, Arbeitsplätze, Handel, Bau, Fraktionen, Armeen. Keine Duplikate bei Wechsel Person/Stadt/Schlacht/Weltkarte. Entwirf getrennte Simulations-, Animations- und Darstellungs-LOD. Nahkampf-NPCs individuell, Kohorten/Formation als kompakte Daten, entfernte Truppen per Instancing/vereinfachtem Animationspfad, strategisch aggregiert. Teste Stufen statt 100000 aktive Node-Controller zu behaupten. Native Erweiterung nur nach Profiling und mit ARM64/PC CI.
+
+Abnahme: Ökonomie-Invarianten, Replay, Szenarien 100/500/1000/5000 visuelle Einheiten gestuft messen; höhere Stufen 10000+ nur bei belegter Skalierbarkeit. Strategische Bestände und gleichzeitig sichtbare Figuren getrennt berichten.
+"""
