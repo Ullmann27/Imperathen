@@ -112,6 +112,7 @@ def main():
             ("character_motion", ["--fixed-fps", "60", "--script", "res://tests/character_motion_test.gd"], "checks; 0 failed;"),
             ("service_gear", ["--fixed-fps", "60", "--script", "res://tests/service_gear_test.gd"], "SERVICE_GEAR_PASS"),
             ("natural_motion", ["--fixed-fps", "60", "--script", "res://tests/natural_motion_test.gd"], "checks, 0 failed"),
+            ("cc0_runtime_gestures", ["--fixed-fps", "60", "--script", "res://tests/cc0_runtime_gestures_test.gd"], "CC0_GESTURES_PASS"),
             ("village_static_art", ["--script", "res://tests/village_static_art_test.gd"], "checks, 0 failed"),
             ("hero_faces", ["--fixed-fps", "60", "--script", "res://tests/hero_face_test.gd"], "checks, 0 failed"),
             ("village_scenery", ["--script", str(ROOT / "art/village/verify.gd")], "VILLAGE_SCENERY errors []"),

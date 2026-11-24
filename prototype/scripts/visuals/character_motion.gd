@@ -12,6 +12,9 @@ const TIMING := {
 	"headbutt": Vector3(0.23, 0.14, 0.76), "front_kick": Vector3(0.34, 0.20, 1.05),
 	"side_kick": Vector3(0.40, 0.22, 1.20), "high_kick": Vector3(0.44, 0.24, 1.30),
 }
+const CC0Gestures := preload("res://scripts/visuals/cc0_gestures.gd")
+var external_gestures := false
+
 var skeleton: Skeleton3D
 var available := false
 var civilian := false
@@ -123,6 +126,11 @@ func locomotion(action: String, phase: float, metres_per_second: float, turn_rat
 	if not walking:
 		spine_basis = Basis(Vector3.RIGHT, deg_to_rad(0.7 * breath + 2.5 * gesture)) * Basis(Vector3.UP, deg_to_rad(-3.0 * weight_shift + 3.0 * gesture)) * Basis(Vector3.FORWARD, deg_to_rad(-1.6 * weight_shift)) * _global_rest[_ids.Spine].basis
 		head_basis = Basis(Vector3.UP, deg_to_rad((8.0 if talking else 4.0) * sin(personal))) * Basis(Vector3.RIGHT, deg_to_rad(1.2 * breath + 4.0 * gesture)) * Basis(Vector3.FORWARD, deg_to_rad(-2.0 * weight_shift)) * _global_rest[_ids.Head].basis
+	# Retargeted motion may add bounded local torso/head gestures. Feet,
+	# pelvis and root translation still come exclusively from this solver.
+	if external_gestures and not walking and action in ["idle","talk"]:
+		spine_basis *= Basis(CC0Gestures.delta(action,"Spine",cycle))
+		head_basis *= Basis(CC0Gestures.delta(action,"Head",cycle))
 	_orient("Spine", spine_basis)
 	_orient("Head", head_basis)
 	for side: String in ["L", "R"]:

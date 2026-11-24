@@ -146,6 +146,10 @@ SERVICE_GEAR_RESOURCES = (
     "assets/weapons/gladius_lod0.glb",
     "assets/weapons/scutum_lod0.glb",
 )
+CC0_MOTION_RESOURCES = (
+    "scripts/visuals/cc0_gestures.gd",
+    "assets/animations/hero_cc0_library.tres",
+)
 FEATURE_RESOURCE_GROUPS = (
     ("living_frontier_content", FRONTIER_RESOURCES),
     ("cinematic_opening_content", OPENING_RESOURCES),
@@ -158,6 +162,7 @@ FEATURE_RESOURCE_GROUPS = (
     ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
     ("meshy_equipment_content", MESHY_EQUIPMENT_RESOURCES),
     ("service_gear_content", SERVICE_GEAR_RESOURCES),
+    ("cc0_motion_content", CC0_MOTION_RESOURCES),
 )
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (

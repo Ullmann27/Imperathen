@@ -1,0 +1,300 @@
+{
+  "accepted_clips": 36,
+  "failures": [],
+  "records": [
+    {
+      "clip": "Action_dance",
+      "file": "Action_dance.glb",
+      "retargeted": "actiondanceactiondance",
+      "rotation_tracks": 15,
+      "sample_frames": 31,
+      "seconds": 1.0
+    },
+    {
+      "clip": "Action_interact",
+      "file": "Action_interact.glb",
+      "retargeted": "actioninteractactioninteract",
+      "rotation_tracks": 15,
+      "sample_frames": 61,
+      "seconds": 2.0
+    },
+    {
+      "clip": "Action_pick_up_from_a_table",
+      "file": "Action_pick_up_from_a_table.glb",
+      "retargeted": "actionpickupfromatableactionpickupfromatable",
+      "rotation_tracks": 15,
+      "sample_frames": 26,
+      "seconds": 0.800000011920929
+    },
+    {
+      "clip": "Action_sit_down",
+      "file": "Action_sit_down.glb",
+      "retargeted": "actionsitdownactionsitdown",
+      "rotation_tracks": 15,
+      "sample_frames": 40,
+      "seconds": 1.29999995231628
+    },
+    {
+      "clip": "Action_stand_up_from_sitting",
+      "file": "Action_stand_up_from_sitting.glb",
+      "retargeted": "actionstandupfromsittingactionstandupfromsitting",
+      "rotation_tracks": 15,
+      "sample_frames": 32,
+      "seconds": 1.03333330154419
+    },
+    {
+      "clip": "Block_with_the_sword",
+      "file": "Block_with_the_sword.glb",
+      "retargeted": "blockwiththeswordblockwiththesword",
+      "rotation_tracks": 15,
+      "sample_frames": 38,
+      "seconds": 1.20000004768372
+    },
+    {
+      "clip": "Death_fall_backwards",
+      "file": "Death_fall_backwards.glb",
+      "retargeted": "deathfallbackwardsdeathfallbackwards",
+      "rotation_tracks": 15,
+      "sample_frames": 72,
+      "seconds": 2.36666655540466
+    },
+    {
+      "clip": "Dodge_roll",
+      "file": "Dodge_roll.glb",
+      "retargeted": "dodgerolldodgeroll",
+      "rotation_tracks": 15,
+      "sample_frames": 44,
+      "seconds": 1.43333327770233
+    },
+    {
+      "clip": "Hit_knockback",
+      "file": "Hit_knockback.glb",
+      "retargeted": "hitknockbackhitknockback",
+      "rotation_tracks": 15,
+      "sample_frames": 26,
+      "seconds": 0.833333313465118
+    },
+    {
+      "clip": "Hit_to_the_chest",
+      "file": "Hit_to_the_chest.glb",
+      "retargeted": "hittothechesthittothechest",
+      "rotation_tracks": 15,
+      "sample_frames": 12,
+      "seconds": 0.333333343267441
+    },
+    {
+      "clip": "Hit_to_the_head",
+      "file": "Hit_to_the_head.glb",
+      "retargeted": "hittotheheadhittothehead",
+      "rotation_tracks": 15,
+      "sample_frames": 15,
+      "seconds": 0.433333337306976
+    },
+    {
+      "clip": "Idle_arms_folded_waiting",
+      "file": "Idle_arms_folded_waiting.glb",
+      "retargeted": "idlearmsfoldedwaitingidlearmsfoldedwaiting",
+      "rotation_tracks": 15,
+      "sample_frames": 76,
+      "seconds": 2.5
+    },
+    {
+      "clip": "Idle_crouching",
+      "file": "Idle_crouching.glb",
+      "retargeted": "idlecrouchingidlecrouching",
+      "rotation_tracks": 15,
+      "sample_frames": 90,
+      "seconds": 2.93333339691162
+    },
+    {
+      "clip": "Idle_relaxed",
+      "file": "Idle_relaxed.glb",
+      "retargeted": "idlerelaxedidlerelaxed",
+      "rotation_tracks": 15,
+      "sample_frames": 76,
+      "seconds": 2.5
+    },
+    {
+      "clip": "Idle_sitting",
+      "file": "Idle_sitting.glb",
+      "retargeted": "idlesittingidlesitting",
+      "rotation_tracks": 15,
+      "sample_frames": 51,
+      "seconds": 1.66666662693024
+    },
+    {
+      "clip": "Idle_talking",
+      "file": "Idle_talking.glb",
+      "retargeted": "idletalkingidletalking",
+      "rotation_tracks": 15,
+      "sample_frames": 90,
+      "seconds": 2.93333339691162
+    },
+    {
+      "clip": "Idle_with_a_sword",
+      "file": "Idle_with_a_sword.glb",
+      "retargeted": "idlewithaswordidlewithasword",
+      "rotation_tracks": 15,
+      "sample_frames": 51,
+      "seconds": 1.66666662693024
+    },
+    {
+      "clip": "Idle_zombie",
+      "file": "Idle_zombie.glb",
+      "retargeted": "idlezombieidlezombie",
+      "rotation_tracks": 15,
+      "sample_frames": 42,
+      "seconds": 1.33333337306976
+    },
+    {
+      "clip": "Jump_in_the_air",
+      "file": "Jump_in_the_air.glb",
+      "retargeted": "jumpintheairjumpintheair",
+      "rotation_tracks": 15,
+      "sample_frames": 76,
+      "seconds": 2.5
+    },
+    {
+      "clip": "Jump_landing",
+      "file": "Jump_landing.glb",
+      "retargeted": "jumplandingjumplanding",
+      "rotation_tracks": 15,
+      "sample_frames": 39,
+      "seconds": 1.23333334922791
+    },
+    {
+      "clip": "Jump_take_off",
+      "file": "Jump_take_off.glb",
+      "retargeted": "jumptakeoffjumptakeoff",
+      "rotation_tracks": 15,
+      "sample_frames": 39,
+      "seconds": 1.23333334922791
+    },
+    {
+      "clip": "KinemIQ_Mannequin",
+      "file": "KinemIQ_Mannequin.glb",
+      "retargeted": "kinemiqmannequinkinemiqmannequin",
+      "rotation_tracks": 15,
+      "sample_frames": 76,
+      "seconds": 2.5
+    },
+    {
+      "clip": "Move_climb_up_1_m",
+      "file": "Move_climb_up_1_m.glb",
+      "retargeted": "moveclimbup1mmoveclimbup1m",
+      "rotation_tracks": 15,
+      "sample_frames": 20,
+      "seconds": 0.633333325386047
+    },
+    {
+      "clip": "Move_get_up_from_the_ground",
+      "file": "Move_get_up_from_the_ground.glb",
+      "retargeted": "movegetupfromthegroundmovegetupfromtheground",
+      "rotation_tracks": 15,
+      "sample_frames": 46,
+      "seconds": 1.5
+    },
+    {
+      "clip": "Punch_cross_right_2",
+      "file": "Punch_cross_right_2.glb",
+      "retargeted": "punchcrossright2punchcrossright2",
+      "rotation_tracks": 15,
+      "sample_frames": 30,
+      "seconds": 0.933333337306976
+    },
+    {
+      "clip": "Punch_hook_right_2",
+      "file": "Punch_hook_right_2.glb",
+      "retargeted": "punchhookright2punchhookright2",
+      "rotation_tracks": 15,
+      "sample_frames": 15,
+      "seconds": 0.433333337306976
+    },
+    {
+      "clip": "Punch_jab_left_2",
+      "file": "Punch_jab_left_2.glb",
+      "retargeted": "punchjableft2punchjableft2",
+      "rotation_tracks": 15,
+      "sample_frames": 26,
+      "seconds": 0.800000011920929
+    },
+    {
+      "clip": "Run_jog_forwards",
+      "file": "Run_jog_forwards.glb",
+      "retargeted": "runjogforwardsrunjogforwards",
+      "rotation_tracks": 15,
+      "sample_frames": 28,
+      "seconds": 0.866666674613953
+    },
+    {
+      "clip": "Run_sprint",
+      "file": "Run_sprint.glb",
+      "retargeted": "runsprintrunsprint",
+      "rotation_tracks": 15,
+      "sample_frames": 20,
+      "seconds": 0.633333325386047
+    },
+    {
+      "clip": "Strike_zombie_scratch",
+      "file": "Strike_zombie_scratch.glb",
+      "retargeted": "strikezombiescratchstrikezombiescratch",
+      "rotation_tracks": 15,
+      "sample_frames": 55,
+      "seconds": 1.79999995231628
+    },
+    {
+      "clip": "Sword_slash",
+      "file": "Sword_slash.glb",
+      "retargeted": "swordslashswordslash",
+      "rotation_tracks": 15,
+      "sample_frames": 47,
+      "seconds": 1.53333330154419
+    },
+    {
+      "clip": "Walk_carrying",
+      "file": "Walk_carrying.glb",
+      "retargeted": "walkcarryingwalkcarrying",
+      "rotation_tracks": 15,
+      "sample_frames": 61,
+      "seconds": 2.0
+    },
+    {
+      "clip": "Walk_crouched_forwards",
+      "file": "Walk_crouched_forwards.glb",
+      "retargeted": "walkcrouchedforwardswalkcrouchedforwards",
+      "rotation_tracks": 15,
+      "sample_frames": 61,
+      "seconds": 2.0
+    },
+    {
+      "clip": "Walk_formal",
+      "file": "Walk_formal.glb",
+      "retargeted": "walkformalwalkformal",
+      "rotation_tracks": 15,
+      "sample_frames": 40,
+      "seconds": 1.29999995231628
+    },
+    {
+      "clip": "Walk_forwards",
+      "file": "Walk_forwards.glb",
+      "retargeted": "walkforwardswalkforwards",
+      "rotation_tracks": 15,
+      "sample_frames": 40,
+      "seconds": 1.29999995231628
+    },
+    {
+      "clip": "Walk_zombie_forwards",
+      "file": "Walk_zombie_forwards.glb",
+      "retargeted": "walkzombieforwardswalkzombieforwards",
+      "rotation_tracks": 15,
+      "sample_frames": 39,
+      "seconds": 1.26666665077209
+    }
+  ],
+  "rejected": 0,
+  "root_motion": false,
+  "runtime_approved": false,
+  "source": "CC0 KinemIQ v1.0",
+  "target": "res://assets/characters/hero_quality_0.glb",
+  "visual_skin_gate": "not run"
+}
