@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "errors": [],
+  "pairs": [
+    {
+      "id": "01_market_staff",
+      "matched_conditions": true,
+      "before_image": "01_market_staff.png",
+      "after_image": "01_market_staff.png"
+    },
+    {
+      "id": "02_work_panel",
+      "matched_conditions": true,
+      "before_image": "02_work_panel.png",
+      "after_image": "02_work_panel.png"
+    },
+    {
+      "id": "03_social_panel",
+      "matched_conditions": true,
+      "before_image": "03_social_panel.png",
+      "after_image": "03_social_panel.png"
+    }
+  ],
+  "baseline_commit": "7a21dca5dad83bf637cfbe9c02f4d9ab5cd97337",
+  "feature_commit": "b90d7b30830e86030b29e744452f17ba7cee25fc",
+  "scope": "Echte Desktop-Bilder mit identischen Kameras und Eingabe-Fixtures; keine Geräte-/FPS-Messung"
+}

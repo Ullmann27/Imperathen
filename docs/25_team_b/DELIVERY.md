@@ -2,7 +2,7 @@
 
 **Stand:** 24. November 2026. **Branch:** `feature/team-b-living-world-20261124`.
 **Unveränderter Ausgangsstand:** `7a21dca5dad83bf637cfbe9c02f4d9ab5cd97337`, Branch `feature/ap1-ap2-companions-20261124`, PR #53.
-**Status:** Implementiert, lokal vollständig geprüft; der gesonderte grafische Vergleich wird im zugehörigen CI-Lauf erfasst.
+**Status:** Implementiert; lokal und auf GitHub vollständig geprüft. Sechs Vergleichsbilder wurden aufgenommen, automatisch verglichen und visuell kontrolliert. **[Entwurfs-PR #55](https://github.com/Ullmann27/Imperathen/pull/55)**, geprüfter Implementierungscommit **`b90d7b30830e86030b29e744452f17ba7cee25fc`**.
 
 ## Auftrag und geliefertes Spielergebnis
 
@@ -65,7 +65,17 @@ Die Integrationsprüfung verwendet echte `CharacterBody3D`-/Weltgeometrie, tats�
 
 Die soziale Vergleichsaufnahme verwendet den dokumentierten Domain-Fallback ohne Geometrie-Callback. Sie belegt das neue Panel nach gleichen Gesprächseingaben; die echte Sichtanbindung belegt die separate Integrationsprüfung. `all_panel_text_including_scrolled_content` enthält auch außerhalb des Bildausschnitts liegende Labeltexte und ersetzt keine visuelle Kontrolle.
 
-Lokal ist die Prüfszene headless vorgeprüft. Dieser Lauf erzeugt ausdrücklich keine Bilder. Der grafische Nachweis benötigt den separaten X11-/OpenGL-Lauf; dessen Ergebnis und die visuelle Sichtung werden nach Abschluss im Evidenzverzeichnis ergänzt.
+Der [GitHub-Lauf 45445434654](https://github.com/Ullmann27/Imperathen/actions/runs/45445434654) bestand am 24. November 2026 auf dem veröffentlichten Implementierungscommit erneut **67/67 Engine-Gruppen und 167 Python-Tests**, jeweils ohne vom Prüfläufer gefundene Warnungen. Der X11-/OpenGL-Vergleich bestand für alle drei Szenen. Renderer: `gl_compatibility`, Softwareadapter `llvmpipe (LLVM 20.1.2, 256 bits)`. Das sind tatsächliche Desktop-Bilder, keine physische Android-Aufnahme.
+
+| Bildpaar | Visuell kontrolliertes Ergebnis | Bilder |
+|---|---|---|
+| Marktstand | Antonia steht zusätzlich am vorhandenen Marktstand; der identische Kamerablick zeigt beide eingeteilten Arbeitskräfte. | [Vorher](evidence/ci/before/01_market_staff.png) · [Nachher](evidence/ci/after/01_market_staff.png) |
+| Arbeit & Versorgung | Vorher eine Marktkraft mit Personalmangel, nachher zwei. Die weiterhin fehlenden vier Holz werden korrekt als Betriebsgrund angezeigt; die Aufnahme behauptet keine bereits erfolgte Lieferung. | [Vorher](evidence/ci/before/02_work_panel.png) · [Nachher](evidence/ci/after/02_work_panel.png) |
+| Menschen & Berufe | Die neuen gegenseitigen Einträge „Vertrauter Nachbar“ bei Julia und Silvanus sind sichtbar und lesbar. Sie stammen aus denselben 16 halben Gesprächssekunden. | [Vorher](evidence/ci/before/03_social_panel.png) · [Nachher](evidence/ci/after/03_social_panel.png) |
+
+[Vergleichsbericht](evidence/ci/comparison.json), [visuelle Sichtung](evidence/ci/review-receipt.json), [CI-Enginebericht](evidence/ci/engine/validation_report.json) und [CI-Pythonprotokoll](evidence/ci/python.log) sind zusammen mit den unveränderten PNG-Dateien im Repository gespeichert. Alle sechs Bilder wurden tatsächlich geöffnet und kontrolliert; der Nachweis beruht nicht allein auf ausgelesenen Paneltexten. Die bestehenden CI-Läufe „Foundation checks“ und „NPC and animated asset regressions“ bestanden ebenfalls.
+
+Während dieser Lieferung rückte der Ausgangszweig auf `6fd8978f957018bf752e6f54f98ca7781a1651a3` vor. Diese Änderungen betreffen Android-Export, Paketprüfung, Signierung und deren Dokumentation; keine GDScript-Laufzeitdatei überschneidet sich. PR #55 bleibt dagegen konfliktfrei zusammenführbar. Der unveränderte Team-B-Vergleich bezieht sich ausdrücklich weiterhin auf `7a21dca` und `b90d7b3`; ein späterer Integrationsstand braucht seine eigene Freigabe.
 
 ## Reproduktion
 
