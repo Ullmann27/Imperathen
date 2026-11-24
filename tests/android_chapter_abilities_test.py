@@ -37,6 +37,10 @@ class ChapterAbilitiesCatalogTest(unittest.TestCase):
             else:
                 self.assertIn('"%s":false' % grant["screenplay_flag"], source)
 
+    def test_catalog_is_required_in_the_apk(self):
+        validator = (ROOT / "tools/validate_android_apk.py").read_text(encoding="utf-8")
+        self.assertIn('("chapter_story_content", CHAPTER_STORY_RESOURCES)', validator)
+        self.assertIn('"assets/story/chapter1_abilities.json"', validator)
 
 if __name__ == "__main__":
     unittest.main()
