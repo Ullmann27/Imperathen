@@ -18,6 +18,10 @@ static func enabled(data: Dictionary) -> bool:
 	return Actions.enabled(data)
 
 
+static func is_armed(id: String) -> bool:
+	return Actions.is_armed(id)
+
+
 static func available(data: Dictionary, id: String) -> bool:
 	return Actions.available(data, id)
 

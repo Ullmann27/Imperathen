@@ -20,7 +20,7 @@ from validate_android_apk import (FRONTIER_RESOURCES, HERO_RESOURCES, OPENING_RE
                                  VILLAGE_LIFE_RESOURCES, CHILDHOOD_RESOURCES,
                                  CAMPAIGN_BIBLE_RESOURCES, MESHY_REGISTRY_RESOURCES,
                                  NPC_BEHAVIOR_RESOURCES, MESHY_CHARACTER_RESOURCES,
-                                 MESHY_EQUIPMENT_RESOURCES)
+                                 MESHY_EQUIPMENT_RESOURCES, SERVICE_GEAR_RESOURCES)
 
 REPO = "Ullmann27/Imperathen"
 BRANCH = "feature/village-life-delivery-20261123"
@@ -77,6 +77,8 @@ def feature_groups(profile: dict | None = None) -> tuple:
                    ("npc_behavior_content", NPC_BEHAVIOR_RESOURCES),
                    ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
                    ("meshy_equipment_content", MESHY_EQUIPMENT_RESOURCES))
+    if profile is not None and profile.get("branch") == MOTION_PROFILE["branch"]:
+        groups += (("service_gear_content", SERVICE_GEAR_RESOURCES),)
     return groups
 
 
