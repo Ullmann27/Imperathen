@@ -105,6 +105,17 @@ func _test_senses() -> void:
 	data.village.behavior.people.bassa.next_decision = 0.0
 	_step(data,0.5)
 	_check(Behavior.view(data,"flavia").activity == "socialize" and Behavior.view(data,"flavia").partner == "bassa","Nearby neighbor becomes an observed social goal")
+	var conversation_fixture: Dictionary = data.village.behavior.people.duplicate(true)
+	var speaker: Dictionary = conversation_fixture.flavia
+	var listener: Dictionary = conversation_fixture.bassa
+	listener.activity = "socialize"
+	listener.partner = "lucius"
+	_check(not Behavior._has_company("flavia",speaker,conversation_fixture,Vector2.ZERO),"A neighbor talking to someone else cannot satisfy this resident's need")
+	listener.partner = "flavia"
+	listener.position = [-16.0,0.0,7.5]
+	_check(not Behavior._has_company("flavia",speaker,conversation_fixture,Vector2.ZERO),"An approaching partner outside conversation distance does not count as company")
+	listener.position = [-16.0,0.0,6.0]
+	_check(Behavior._has_company("flavia",speaker,conversation_fixture,Vector2.ZERO),"A close and mutually selected conversation does count as company")
 	var need := float(data.village.behavior.people.flavia.social_need)
 	_step(data,0.5)
 	_check(data.village.behavior.people.flavia.social_need < need,"Mutual nearby conversation satisfies social need")
