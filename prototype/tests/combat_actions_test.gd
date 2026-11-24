@@ -11,6 +11,7 @@ func _initialize() -> void:
 	_test_window_and_frame_steps()
 	_test_practice_and_unlocks()
 	_test_every_technique()
+	_test_service_equipment()
 	_test_save_resume()
 	_test_interruptions()
 	_test_stamina_and_defense()
@@ -184,6 +185,8 @@ func _test_every_technique() -> void:
 	for id: String in Combat.TECHNIQUES:
 		var data := _fixture()
 		data.village.unarmed.practice_hits = 14
+		if Combat.is_armed(id):
+			_commission(data)
 		_check(_attack(data, id).ok, "Learned technique can start: " + id)
 		var spec: Dictionary = Combat.TECHNIQUES[id]
 		_step(data, float(spec.windup) - 0.001)
@@ -204,6 +207,39 @@ func _test_every_technique() -> void:
 	_attack(short_reach, "side_kick")
 	_step(short_reach, 1.2)
 	_check(short_reach.hit_calls.size() == 1, "Sidekick can reach its distinct longer contact distance")
+
+
+func _commission(data: Dictionary) -> void:
+	data.player.age = 18
+	data.player.role = "soldier"
+	data.progress.training_complete = true
+	data.progress.stage = "trained"
+
+
+func _test_service_equipment() -> void:
+	var data := _fixture()
+	var before := _snapshot(data)
+	_check(not Combat.available(data,"thrust"),"Child cannot receive a service sword")
+	_check(not _attack(data,"thrust").ok and _snapshot(data)==before,"Rejected child sword attack is atomic")
+	data.player.age = 18
+	data.player.role = "trainee"
+	_check(not Combat.available(data,"thrust"),"Age alone does not commission a soldier")
+	_commission(data)
+	_check(Combat.service_gear(data) and Combat.view(data).techniques.size()==15,"Completed adult training exposes five sword actions")
+	_check(_attack(data,"thrust").ok,"Issued gladius uses existing action transaction")
+	_step(data,.39)
+	_check(data.hit_calls.is_empty(),"Sword windup cannot damage")
+	_step(data,.02)
+	_check(data.hit_calls.size()==1 and data.hit_calls[0].damage==18,"Sword contact resolves in the active window only")
+	var restored: Dictionary = JSON.parse_string(JSON.stringify(data))
+	_check(Combat.validate(restored).is_empty(),"Armed action fits the existing save schema")
+	_step(restored,1.0)
+	_check(restored.hit_calls.size()==1 and not Combat.busy(restored),"Restored sword action never repeats contact")
+	var wall := _fixture()
+	_commission(wall)
+	_attack(wall,"overhead")
+	Combat.advance(wall,1.2,_blocked,_apply_hit)
+	_check(wall.hit_calls.is_empty(),"Weapon still requires actual unobstructed contact")
 
 
 func _test_save_resume() -> void:

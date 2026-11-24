@@ -33,7 +33,12 @@ func _run() -> void:
 	stage = Node3D.new()
 	root.add_child(stage)
 	_setup_studio()
-	_check(not Registry.has_complete_set("unit_roman_heavy_cavalry_rider"), "Mounted composite source cannot enter the biped route")
+	# Every unresolved source must remain outside the production biped
+	# pipeline until its individual geometry, rig and clips are validated.
+	for blocked_id: String in ["unit_roman_heavy_cavalry_rider","unit_roman_light_cavalry_rider","unit_roman_aux_archer","unit_germanic_light_spearman","unit_germanic_mounted_retainer"]:
+		_check(not Registry.has_complete_set(blocked_id), blocked_id + " unresolved source cannot enter the biped route")
+		for level in 4:
+			_check(Registry.path_for(blocked_id,32,level).is_empty(), blocked_id + " cannot bypass the blocked-source gate at tier " + str(level))
 	_check(not Registry.has_complete_set("../source/character/unit_roman_signifer"), "Unregistered source/path cannot enter runtime")
 	for id: String in IDS:
 		var person := Person.new()
@@ -92,6 +97,13 @@ func _run() -> void:
 			person.sample_pose("attack", .55)
 			rig.force_update_all_bone_transforms()
 			_check(_stretched_edges(mesh, rig) == 0, id + " attack does not stretch skin edges into long strips at tier " + str(level))
+			# Newly supported imported axe/shield actions must satisfy the
+			# same real skin-deformation gate as the original baked attack.
+			if id == "unit_germanic_axe_fighter":
+				for style: String in ["cut_inward","cut_outward","overhead","turn_cut","guard_front","guard_high","guard_low","guard_left","guard_right"]:
+					_check(person.sample_armed_pose(style,.56),id+" has actual "+style+" at tier "+str(level))
+					rig.force_update_all_bone_transforms()
+					_check(_stretched_edges(mesh,rig)==0,id+" "+style+" keeps real skin edges at tier "+str(level))
 			person.sample_pose("run", .37)
 			person._reload((level + 1) % 4)
 			_check(person.clip == "run" and absf(person.phase - .37) < .001, id + " action phase survives tier replacement")

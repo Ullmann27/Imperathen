@@ -20,7 +20,12 @@ const TECHNIQUES := {
 	"headbutt":{"label":"Kopfstoß", "short":"Kopfstoß", "duration":0.76, "windup":0.23, "active":0.14, "reach":0.85, "arc_dot":0.80, "damage":7, "cost":12.0, "practice":8, "family":"head"},
 	"front_kick":{"label":"Frontkick", "short":"Frontkick", "duration":1.05, "windup":0.34, "active":0.20, "reach":1.75, "arc_dot":0.78, "damage":11, "cost":15.0, "practice":4, "family":"kick"},
 	"side_kick":{"label":"Sidekick", "short":"Sidekick", "duration":1.2, "windup":0.40, "active":0.22, "reach":1.85, "arc_dot":0.72, "damage":12, "cost":18.0, "practice":10, "family":"kick"},
-	"high_kick":{"label":"Highkick", "short":"Highkick", "duration":1.3, "windup":0.44, "active":0.24, "reach":1.65, "arc_dot":0.60, "damage":12, "cost":21.0, "practice":14, "family":"kick"}
+	"high_kick":{"label":"Highkick", "short":"Highkick", "duration":1.3, "windup":0.44, "active":0.24, "reach":1.65, "arc_dot":0.60, "damage":12, "cost":21.0, "practice":14, "family":"kick"},
+	"cut_inward":{"label":"Gladius · Innenhieb", "short":"Innenhieb", "duration":0.90, "windup":0.43, "active":0.12, "reach":1.85, "arc_dot":0.55, "damage":16, "cost":14.0, "practice":0, "family":"sword"},
+	"cut_outward":{"label":"Gladius · Außenhieb", "short":"Außenhieb", "duration":0.94, "windup":0.45, "active":0.13, "reach":1.85, "arc_dot":0.55, "damage":16, "cost":14.0, "practice":0, "family":"sword"},
+	"thrust":{"label":"Gladius · Stoß", "short":"Stoß", "duration":0.82, "windup":0.40, "active":0.11, "reach":2.0, "arc_dot":0.85, "damage":18, "cost":15.0, "practice":0, "family":"sword"},
+	"overhead":{"label":"Gladius · Überkopfhieb", "short":"Oben", "duration":1.12, "windup":0.54, "active":0.15, "reach":1.8, "arc_dot":0.75, "damage":22, "cost":21.0, "practice":0, "family":"sword"},
+	"turn_cut":{"label":"Gladius · Drehhieb", "short":"Drehhieb", "duration":1.24, "windup":0.60, "active":0.16, "reach":1.8, "arc_dot":0.42, "damage":20, "cost":23.0, "practice":0, "family":"sword"}
 }
 const COMMAND_FIELDS := {
 	"village_unarmed_attack":["technique", "target_id", "facing_x", "facing_z"],
@@ -39,9 +44,24 @@ static func enabled(data: Dictionary) -> bool:
 	return typeof(data.get("village")) == TYPE_DICTIONARY and data.village.has("unarmed")
 
 
+static func is_armed(id: String) -> bool:
+	return TECHNIQUES.has(id) and TECHNIQUES[id].family == "sword"
+
+
+static func service_gear(data: Dictionary) -> bool:
+	# The existing adult training transaction explicitly commissions a soldier.
+	# Derive issued service equipment from that saved, validated progression;
+	# never from age alone, a cosmetic prop or a caller-supplied inventory flag.
+	var player: Dictionary = data.get("player", {})
+	var progress: Dictionary = data.get("progress", {})
+	return enabled(data) and _integer(player.get("age"),18,250018) and player.get("role","") == "soldier" and progress.get("training_complete") == true and progress.get("stage","") in ["trained","skirmish","aftermath","ended","fallen"]
+
+
 static func available(data: Dictionary, id: String) -> bool:
 	if not enabled(data) or typeof(data.village.unarmed) != TYPE_DICTIONARY or not TECHNIQUES.has(id):
 		return false
+	if is_armed(id):
+		return service_gear(data)
 	var count: Variant = data.village.unarmed.get("practice_hits")
 	return _integer(count, 0, 1000) and int(count) >= int(TECHNIQUES[id].practice)
 
@@ -52,7 +72,7 @@ static func validate_arguments(command: String, args: Dictionary) -> String:
 	if command != "village_unarmed_attack":
 		return ""
 	if typeof(args.technique) != TYPE_STRING or not TECHNIQUES.has(args.technique):
-		return "Diese unbewaffnete Technik ist unbekannt."
+		return "Diese Kampftechnik ist unbekannt."
 	if typeof(args.target_id) != TYPE_STRING or args.target_id.is_empty() or args.target_id.length() > 64:
 		return "Der Angriff benötigt eine gültige Zielkennung."
 	if not _number(args.facing_x, -1.1, 1.1) or not _number(args.facing_z, -1.1, 1.1):
@@ -88,7 +108,7 @@ static func execute(data: Dictionary, command: String, args: Dictionary) -> Dict
 		_set_defense_windows(data, 0.0 if dodge else 0.75, 0.55 if dodge else 0.0)
 		return _result(true, "Du weichst aus." if dodge else "Du gehst in Deckung.")
 	if not available(data, args.technique):
-		return _result(false, "Diese Technik lernst du durch kontrollierte Treffer am Übungspfahl.")
+		return _result(false, "Der Gladius gehört zur abgeschlossenen erwachsenen Soldatenausbildung." if is_armed(args.technique) else "Diese Technik lernst du durch kontrollierte Treffer am Übungspfahl.")
 	var spec: Dictionary = TECHNIQUES[args.technique]
 	if float(combat.stamina) + EPSILON < float(spec.cost):
 		return _result(false, "Für diese Bewegung fehlt Ausdauer. Atme kurz durch.")
@@ -203,7 +223,10 @@ static func view(data: Dictionary) -> Dictionary:
 	result["phase"] = phase(result.technique, float(result.elapsed))
 	result["progress"] = 0.0 if result.technique.is_empty() else clampf(float(result.elapsed) / float(TECHNIQUES[result.technique].duration), 0.0, 1.0)
 	result["techniques"] = []
+	result["service_gear"] = service_gear(data)
 	for id: String in TECHNIQUES:
+		if is_armed(id) and not service_gear(data):
+			continue
 		var item: Dictionary = TECHNIQUES[id].duplicate(true)
 		item["id"] = id
 		item["active_start"] = float(item.windup)

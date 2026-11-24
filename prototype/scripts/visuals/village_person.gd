@@ -10,6 +10,7 @@ const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
 const HandPose := preload("res://scripts/visuals/hand_pose.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
+const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
 const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
@@ -53,6 +54,12 @@ var appearance_variation := 0
 var _loaned_gear := false
 var _gear_nodes: Array[Node3D] = []
 var meshy_asset_id := ""
+var _conversation_focused := false
+var _armed_style := ""
+var _armed_sequence := 0
+var _service_gear := false
+var _service_nodes: Array[Node3D] = []
+var _service_external := false
 
 
 func _ready() -> void:
@@ -179,6 +186,7 @@ func _reload(level: int) -> void:
 		remove_child(body)
 		body.free()
 	_gear_nodes.clear()
+	_service_nodes.clear()
 	detail = level
 	body = replacement
 	active_model_path = path
@@ -200,13 +208,16 @@ func _reload(level: int) -> void:
 		_style(shape)
 	_hands.bind(body, active_model_path)
 	_face.bind(body, identity)
-	_motion.bind(body, role in ["player", "companion"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"]))
+	_motion.bind(body, role in ["player", "companion"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"]), identity)
+	# Reattach loaned gear before evaluating an existing shield pose on the
+	# new skeleton. LOD changes must not silently erase a valid guard.
+	_sync_loaned_gear()
+	_sync_service_gear()
 	_play(clip,saved_phase,0)
 	_face.pose("attack" if not _combat_id.is_empty() else clip,saved_phase,detail)
 	if not _combat_id.is_empty():
 		_motion.combat(_combat_id, _combat_progress)
 		_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
-	_sync_loaned_gear()
 	if active_model_path.begins_with("res://assets/meshy/characters/"):
 		MeshyEquipment.attach(body, meshy_asset_id, detail)
 	# Retaining every hero PackedScene would also retain every embedded texture
@@ -307,11 +318,12 @@ func _style(shape: MeshInstance3D) -> void:
 func drive(metres_per_second: float, turn_radians_per_second: float = 0.0) -> void:
 	speed = maxf(0.0, metres_per_second) if is_finite(metres_per_second) else 0.0
 	_turn_rate = clampf(turn_radians_per_second, -3.0, 3.0) if is_finite(turn_radians_per_second) else 0.0
-	if _combat_id.is_empty():
+	if _combat_id.is_empty() and not _service_external:
 		_posed = false
-		# A work loop is a stationary activity, not an uninterruptible action.
-		# Resume the gait as soon as the owning body actually starts travelling.
-		if clip == "work" and speed >= 0.10:
+		# Work and speech are stationary activities. An actual moving body
+		# must not glide while its previous gesture is still playing.
+		if clip in ["work", "talk"] and speed >= 0.10:
+			_conversation_focused = false
 			_remaining = 0.0
 			_play(_locomotion_clip(), 0.0, 0.13)
 
@@ -319,13 +331,56 @@ func drive(metres_per_second: float, turn_radians_per_second: float = 0.0) -> vo
 func set_equipment(sword: bool, shield: bool = false) -> void:
 	_has_sword = sword
 	_has_shield = shield
-	if _blade:
-		_blade.visible = _has_sword and role == "player" and age >= 18 and clip in ["attack", "train", "block"]
+	_update_weapon_visibility()
+
+
+func set_service_gear(enabled: bool) -> void:
+	var allowed := enabled and role == "player" and age >= 18
+	if allowed == _service_gear:
+		return
+	_service_gear = allowed
+	_has_sword = allowed
+	_has_shield = allowed
+	if not allowed:
+		_service_external = false
+	_sync_service_gear()
+	_update_weapon_visibility()
+
+
+func _sync_service_gear() -> void:
+	if not body:
+		return
+	if _service_gear and role == "player" and age >= 18 and _service_nodes.is_empty():
+		_service_nodes = ServiceGear.attach(body)
+	_update_weapon_visibility()
+
+
+func _update_weapon_visibility() -> void:
+	var authorized := role == "player" and age >= 18
+	var armed_action := clip in ["attack","train","block"]
+	if is_instance_valid(_blade):
+		_blade.visible = _has_sword and authorized and armed_action and (_service_nodes.is_empty() or not _service_gear)
+	for node: Node3D in _service_nodes:
+		if is_instance_valid(node):
+			node.visible = _service_gear and authorized and armed_action
+
+
+func sample_service_combat(style: String, normalized: float) -> bool:
+	if not _service_gear or not _can_armed_style(style):
+		return false
+	# This sampled pose is owned by the domain clock. Rendering cannot advance
+	# the attack independently, even if physics or draw rates differ.
+	var accepted := sample_armed_pose(style,normalized)
+	_service_external = accepted
+	return accepted
 
 
 func sample_combat(technique: String, normalized: float) -> void:
 	if not technique in CharacterMotion.TECHNIQUES:
 		return
+	_service_external = false
+	_armed_style = ""
+	_conversation_focused = false
 	if _combat_id.is_empty():
 		_play("idle", 0.0, 0.0)
 	_combat_id = technique
@@ -351,6 +406,8 @@ func cue_combat(technique: String, duration: float) -> void:
 
 
 func cancel_action() -> void:
+	_service_external = false
+	_conversation_focused = false
 	_combat_id = ""
 	_combat_duration = 0.0
 	_combat_progress = 0.0
@@ -360,13 +417,51 @@ func cancel_action() -> void:
 	_play("idle", 0.0, 0.12)
 
 
-func cue(action: String) -> void:
+func cue(action: String, preferred_style: String = "") -> void:
 	if action == "death" and clip == "death": return
+	_service_external = false
+	if action != "talk":
+		_conversation_focused = false
 	_combat_id = ""
 	_combat_external = false
 	_posed = false
+	_armed_style = ""
+	if action in ["attack", "train"] and _can_armed_style("cut_inward"):
+		var variants := CharacterMotion.ARMED_ATTACKS if not _has_meshy_axe() else ["cut_inward","cut_outward","overhead","turn_cut"]
+		_armed_style = preferred_style if preferred_style in variants and _can_armed_style(preferred_style) else str(variants[_armed_sequence % variants.size()])
+		_armed_sequence = (_armed_sequence + 1) % variants.size()
+	elif action == "block" and _can_armed_style("guard_front"):
+		_armed_style = preferred_style if preferred_style in CharacterMotion.SHIELD_GUARDS else "guard_front"
 	_play(action,0,0.12)
 	_remaining = animator.current_animation_length if animator and animator.current_animation != "" else 0.8
+
+
+func _has_meshy_axe() -> bool:
+	return meshy_asset_id == "unit_germanic_axe_fighter" and active_model_path.begins_with("res://assets/meshy/characters/unit_germanic_axe_fighter_")
+
+
+func _can_armed_style(style: String) -> bool:
+	if not _motion.available:
+		return false
+	if style in CharacterMotion.SHIELD_GUARDS:
+		# Only a real attached shield qualifies; a flag alone is not a prop.
+		return (_loaned_gear and not _gear_nodes.is_empty()) or (_service_gear and _service_nodes.size() == 2 and age >= 18) or _has_meshy_axe()
+	if style in CharacterMotion.ARMED_ATTACKS:
+		return age >= 18 and ((_has_sword and role == "player" and (is_instance_valid(_blade) or (_service_gear and _service_nodes.size() == 2))) or (_has_meshy_axe() and style != "thrust"))
+	return false
+
+
+func sample_armed_pose(style: String, normalized: float) -> bool:
+	if not _can_armed_style(style) or not is_finite(normalized):
+		return false
+	_conversation_focused = false
+	_combat_id = ""
+	_combat_external = false
+	_posed = true
+	_armed_style = style
+	_play("block" if style in CharacterMotion.SHIELD_GUARDS else "attack",normalized,0.0)
+	_face.pose(clip,phase,detail)
+	return true
 
 
 func cue_unarmed(action: String) -> bool:
@@ -392,6 +487,8 @@ func _sync_loaned_gear() -> void:
 
 
 func reset_motion() -> void:
+	_service_external = false
+	_conversation_focused = false
 	_combat_id = ""
 	_combat_external = false
 	_combat_progress = 0.0
@@ -400,6 +497,31 @@ func reset_motion() -> void:
 	_posed = false
 	_play("idle",0,0)
 	_face.pose("idle",0,detail)
+
+
+func set_conversation_focus(enabled: bool) -> void:
+	if enabled == _conversation_focused:
+		return
+	if enabled:
+		if clip == "death":
+			return
+		drive(0.0)
+		_conversation_focused = true
+		cue("talk")
+	else:
+		_conversation_focused = false
+		if clip == "talk":
+			cancel_action()
+
+
+func keep_talking() -> void:
+	if speed >= 0.06 or not _combat_id.is_empty() or _posed or clip == "death":
+		return
+	if _remaining > 0.0 and clip not in ["idle", "march", "run", "talk"]:
+		return
+	if clip != "talk":
+		cue("talk")
+	_remaining = maxf(_remaining, 0.30)
 
 
 func keep_working() -> void:
@@ -424,6 +546,8 @@ func sample_pose(action: String, normalized: float) -> void:
 	if action in CharacterMotion.TECHNIQUES:
 		sample_combat(action, normalized)
 		return
+	_armed_style = ""
+	_conversation_focused = false
 	_combat_id = ""
 	_combat_external = false
 	_posed = true
@@ -433,9 +557,11 @@ func sample_pose(action: String, normalized: float) -> void:
 
 
 func _play(action: String, normalized: float, blend: float) -> void:
-	_motion.capture_transition(blend if action != clip and action in ["idle", "march", "run"] else 0.0)
+	_motion.capture_transition(blend if action != clip and action in ["idle", "march", "run", "talk"] else 0.0)
 	clip = action
-	if _blade: _blade.visible = _has_sword and role == "player" and age >= 18 and clip in ["attack","train","block"]
+	if action not in ["attack","train","block"]:
+		_armed_style = ""
+	_update_weapon_visibility()
 	phase = clampf(normalized,0,1)
 	if not animator: return
 	var name_in_file := action
@@ -451,14 +577,51 @@ func _play(action: String, normalized: float, blend: float) -> void:
 
 
 func _apply_motion(review: bool = false) -> void:
-	if clip in ["idle", "march", "run"]:
+	if clip in ["attack","train","block"] and _can_armed_style(_armed_style):
+		if _has_meshy_axe() and _armed_style in CharacterMotion.ARMED_ATTACKS:
+			_apply_imported_axe_pose()
+		else:
+			_motion.armed_pose(_armed_style,phase,_can_armed_style("guard_front"))
+		_hands.set_grip(0.95)
+	elif clip in ["idle", "march", "run", "talk"]:
 		_hands.set_grip(0.18 if clip != "run" else 0.34)
-		_motion.locomotion(clip, phase, -1.0 if review and clip != "idle" else speed / maxf(body.scale.y, 0.01), _turn_rate)
+		if _motion.civilian:
+			_motion.locomotion(clip, phase, -1.0 if review and clip in ["march", "run"] else speed / maxf(body.scale.y, 0.01), _turn_rate)
+		else:
+			_motion.imported_ambient(clip, phase)
 	elif clip in ["attack", "train"] and role in ["player", "companion"] and not _has_sword:
 		_hands.set_grip(0.18 + 0.82 * sin(phase * PI))
 		_motion.combat("jab_right", phase)
 	else:
 		_hands.set_grip(0.18)
+
+
+func _apply_imported_axe_pose() -> void:
+	# Preserve the imported actor's own skin-compatible attack as the base.
+	# Its coat/arm seam has different weights than the authored hero. Apply
+	# a conservative local-space overlay instead of replacing every joint.
+	# Resample the base on each call so the overlay cannot accumulate.
+	var rig := _motion.skeleton
+	if not is_instance_valid(rig) or not animator or not animator.has_animation("attack"):
+		return
+	var animation := animator.get_animation("attack")
+	animator.seek(clampf(phase, 0.0, 1.0) * animation.length, true)
+	animator.advance(0)
+	var base_positions: Array[Vector3] = []
+	var base_rotations: Array[Quaternion] = []
+	var base_scales: Array[Vector3] = []
+	for bone in rig.get_bone_count():
+		base_positions.append(rig.get_bone_pose_position(bone))
+		base_rotations.append(rig.get_bone_pose_rotation(bone))
+		base_scales.append(rig.get_bone_pose_scale(bone))
+	if not _motion.armed_pose(_armed_style, phase, true):
+		return
+	const OVERLAY_WEIGHT := 0.15
+	for bone in rig.get_bone_count():
+		rig.set_bone_pose_position(bone, base_positions[bone].lerp(rig.get_bone_pose_position(bone), OVERLAY_WEIGHT))
+		rig.set_bone_pose_rotation(bone, base_rotations[bone].slerp(rig.get_bone_pose_rotation(bone), OVERLAY_WEIGHT))
+		rig.set_bone_pose_scale(bone, base_scales[bone])
+	rig.force_update_all_bone_transforms()
 
 
 func _distance_lod(distance: float) -> int:
@@ -504,10 +667,10 @@ func _process(delta: float) -> void:
 			if _combat_progress >= 1.0:
 				cancel_action()
 		return
-	if _posed: return
+	if _posed or _service_external: return
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)
-		if _remaining <= 0:
+		if _remaining <= 0 and not (_conversation_focused and clip == "talk"):
 			var next := _locomotion_clip()
 			if next != clip:
 				var carry_phase := phase if clip in ["march", "run"] and next in ["march", "run"] else 0.0

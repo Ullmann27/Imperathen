@@ -87,7 +87,39 @@ func _run() -> void:
 	actor.set_equipment(true)
 	actor.sample_pose("train", 0.40)
 	_check(actor.body.find_child("PracticeBlade", true, false).visible, "Explicit equipment controls the existing blade")
+	# Real adult blade authorization and borrowed shield are separate from
+	# animation selection. The visual solver must never grant either item.
+	var attack_poses := {}
+	for style: String in Motion.ARMED_ATTACKS:
+		_check(actor.sample_armed_pose(style,.56),style+" can animate the explicitly equipped adult")
+		skeleton = actor.body.find_children("*","Skeleton3D",true,false)[0]
+		var wrist := _point(skeleton,"Hand_R")
+		attack_poses[str(wrist.snapped(Vector3.ONE*.01))] = true
+		for bone in skeleton.get_bone_count():
+			var parent := skeleton.get_bone_parent(bone)
+			var pos := skeleton.get_bone_global_pose(bone).origin
+			_check(pos.is_finite(),style+" has finite skeletal coordinates")
+			if parent >= 0:
+				_check(absf(pos.distance_to(skeleton.get_bone_global_pose(parent).origin)-skeleton.get_bone_rest(bone).origin.length()) < .0002,style+" keeps segment lengths")
+	_check(attack_poses.size() == Motion.ARMED_ATTACKS.size(),"All armed moves produce distinct hand paths")
 	actor.set_equipment(false)
+	_check(not actor.sample_armed_pose("thrust",.56),"An unequipped actor cannot select a blade pose")
+	actor.set_loaned_gear(true)
+	var guard_poses := {}
+	for style: String in Motion.SHIELD_GUARDS:
+		_check(actor.sample_armed_pose(style,.5),style+" uses the actual attached shield")
+		var shield_hand := _point(skeleton,"Hand_L")
+		guard_poses[str(shield_hand.snapped(Vector3.ONE*.01))] = true
+		_check(shield_hand.z > .08,style+" keeps the shield hand in front")
+	_check(guard_poses.size() == Motion.SHIELD_GUARDS.size(),"Five shield directions have distinct positions")
+	actor.sample_armed_pose("guard_high",.5)
+	var shield_before := _point(skeleton,"Hand_L")
+	actor._reload(3)
+	skeleton = actor.body.find_children("*","Skeleton3D",true,false)[0]
+	_check(actor._armed_style == "guard_high" and _point(skeleton,"Hand_L").distance_to(shield_before)<.001,"Shield pose survives LOD replacement")
+	actor.set_loaned_gear(false)
+	_check(not actor.sample_armed_pose("guard_front",.5),"An absent shield cannot be visually equipped by a pose")
+	actor.cancel_action()
 	actor.drive(1.45)
 	actor._process(0.10)
 	_check(actor.clip == "march", "Normal movement selects walking")

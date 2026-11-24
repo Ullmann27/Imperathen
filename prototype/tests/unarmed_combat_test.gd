@@ -74,6 +74,11 @@ func _run() -> void:
 		restored.advance(.7)
 	expect(restored.data.village.unarmed.practice_hits==14,"distinct controlled repetitions unlock techniques")
 	for id: String in Combat.TECHNIQUES:
+		if Combat.is_armed(id):
+			var unchanged := JSON.stringify(restored.data)
+			expect(not Combat.available(restored.data,id),"child cannot unlock service weapon "+id)
+			expect(not attack(restored,id,"air").ok and JSON.stringify(restored.data)==unchanged,"locked weapon does not mutate childhood "+id)
+			continue
 		expect(Combat.available(restored.data,id),"unlocked "+id)
 		restored.advance(2.0)
 		var count: int=restored.data.village.unarmed.practice_hits

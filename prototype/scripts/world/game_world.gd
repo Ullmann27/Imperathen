@@ -181,6 +181,7 @@ func sync_state(state: Dictionary) -> void:
 	var age := int(player_data.get("age", 12))
 	_figure.configure("player",_state.get("origin_id","italia"),age)
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
+	_figure.set_service_gear(CombatActions.service_gear(state))
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -317,7 +318,7 @@ func clear_frontier_focus() -> void:
 	_frontier_focus = ""
 	_village_focus = ""
 	if village_life_world != null:
-		village_life_world.focused = ""
+		village_life_world.clear_focus()
 	population.clear_focus()
 	if _camera:
 		_camera.fov = 54.0
@@ -438,6 +439,8 @@ func perform_interaction() -> void:
 func perform_attack(technique := "") -> void:
 	if _active:
 		if not technique.is_empty():
+			if CombatActions.enabled(_actions.state) and not CombatActions.available(_actions.state,technique):
+				return
 			set_selected_technique(technique)
 		_attack()
 
@@ -447,7 +450,7 @@ func set_running(value: bool) -> void:
 
 
 func set_selected_technique(technique: String) -> void:
-	if CombatActions.TECHNIQUES.has(technique):
+	if CombatActions.available(_actions.state,technique):
 		_actions.selected = technique
 
 
@@ -479,9 +482,20 @@ func combat_safe_motion(from: Vector2, to: Vector2) -> Vector2:
 	return _actions.safe_actor_motion(from, to)
 
 
+func guard_visual_style() -> String:
+	# Direction selects presentation only; it never expands the existing
+	# authoritative guard window or creates a new defensive permission.
+	var axis := _movement_axis()
+	if absf(axis.x) > absf(axis.y) and absf(axis.x) > .45:
+		return "guard_right" if axis.x > 0.0 else "guard_left"
+	if absf(axis.y) > .45:
+		return "guard_low" if axis.y > 0.0 else "guard_high"
+	return "guard_front"
+
+
 func cue_village_defense(action: String) -> void:
 	if _active and _figure != null:
-		_figure.cue("block" if action == "village_block" else "march")
+		_figure.cue("block" if action == "village_block" else "march",guard_visual_style() if action == "village_block" else "")
 		if action == "village_dodge":
 			_dodge_remaining = 0.26
 			_dodge_direction = Vector3.BACK.rotated(Vector3.UP, _figure.rotation.y)

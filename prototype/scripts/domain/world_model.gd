@@ -174,7 +174,7 @@ func advance(delta: float) -> void:
 	var candidate := _world_copy()
 	var notify_ui := int(candidate.world_seconds) != int(float(candidate.world_seconds) + delta)
 	if npc_observations.is_valid():
-		NpcBehavior.observe(candidate,npc_observations.call())
+		NpcBehavior.observe(candidate,npc_observations.call(),true)
 	for key in candidate.timers:
 		candidate.timers[key] = maxf(0.0, float(candidate.timers[key]) - delta)
 	if candidate.village.enabled:
@@ -288,7 +288,7 @@ func save_game(path: String) -> Dictionary:
 	if not state_error.is_empty():
 		return _fail("Der Spielstand wurde nicht gespeichert: " + state_error)
 	if npc_observations.is_valid():
-		NpcBehavior.observe(data,npc_observations.call())
+		NpcBehavior.observe(data,npc_observations.call(),true)
 	var directory_error := DirAccess.make_dir_recursive_absolute(absolute.get_base_dir())
 	if directory_error != OK:
 		return _fail("Der Speicherordner kann nicht angelegt werden (Fehler %d)." % directory_error)

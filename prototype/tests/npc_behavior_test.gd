@@ -55,6 +55,15 @@ func _test_observations(model: RefCounted) -> void:
 	Behavior.observe(model.data,{"flavia":{"position":[-16.0,0.0,5.0],"route_distance":2.0,"route_direction":-1}})
 	_check(model.data.village.behavior.people.flavia.position == [-16.0,0.0,5.0] and model.data.village.behavior.people.flavia.route_direction == -1,"Actual world position and route direction are observed")
 	_check(model._validate_state(model.data).is_empty(),"Observed positions preserve world validity")
+	Behavior.observe(model.data,{"bassa":{"position":[-16.0,0.0,6.0],"route_distance":1.0}})
+	_check(model.data.village.behavior.people.flavia.observed and model.data.village.behavior.people.bassa.observed,"Partial observations preserve other valid resident observations")
+	var last_bassa: Array = model.data.village.behavior.people.bassa.position.duplicate()
+	Behavior.observe(model.data,{"flavia":{"position":[-16.0,0.0,5.0],"route_distance":2.0}},true)
+	_check(model.data.village.behavior.people.flavia.observed and not model.data.village.behavior.people.bassa.observed,"Complete snapshot invalidates a resident whose body is no longer visible")
+	_check(model.data.village.behavior.people.bassa.position == last_bassa,"Visibility invalidation does not erase the last valid position")
+	Behavior.observe(model.data,{"flavia":{"position":[NAN,0.0,1.0]}},true)
+	_check(not model.data.village.behavior.people.flavia.observed,"Invalid current body data cannot remain an active observation")
+	_check(model._validate_state(model.data).is_empty(),"Visibility changes preserve the existing save contract")
 
 
 func _test_needs_and_work() -> void:
@@ -96,6 +105,17 @@ func _test_senses() -> void:
 	data.village.behavior.people.bassa.next_decision = 0.0
 	_step(data,0.5)
 	_check(Behavior.view(data,"flavia").activity == "socialize" and Behavior.view(data,"flavia").partner == "bassa","Nearby neighbor becomes an observed social goal")
+	var conversation_fixture: Dictionary = data.village.behavior.people.duplicate(true)
+	var speaker: Dictionary = conversation_fixture.flavia
+	var listener: Dictionary = conversation_fixture.bassa
+	listener.activity = "socialize"
+	listener.partner = "lucius"
+	_check(not Behavior._has_company("flavia",speaker,conversation_fixture,Vector2.ZERO),"A neighbor talking to someone else cannot satisfy this resident's need")
+	listener.partner = "flavia"
+	listener.position = [-16.0,0.0,7.5]
+	_check(not Behavior._has_company("flavia",speaker,conversation_fixture,Vector2.ZERO),"An approaching partner outside conversation distance does not count as company")
+	listener.position = [-16.0,0.0,6.0]
+	_check(Behavior._has_company("flavia",speaker,conversation_fixture,Vector2.ZERO),"A close and mutually selected conversation does count as company")
 	var need := float(data.village.behavior.people.flavia.social_need)
 	_step(data,0.5)
 	_check(data.village.behavior.people.flavia.social_need < need,"Mutual nearby conversation satisfies social need")

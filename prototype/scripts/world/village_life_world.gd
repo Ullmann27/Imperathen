@@ -322,12 +322,21 @@ func set_active(value: bool) -> void:
 
 
 func focus(id: String, player: Vector3) -> void:
+	if focused != id:
+		clear_focus()
 	focused = id
 	if actors.has(id):
 		var actor: Node3D = actors[id]
 		var direction := player - actor.global_position
 		actor.rotation.y = atan2(-direction.x, -direction.z)
-		actor.get_node("Figure").cue("talk")
+		actor.get_node("Figure").set_conversation_focus(true)
+	_update_nameplates()
+
+
+func clear_focus() -> void:
+	if actors.has(focused):
+		actors[focused].get_node("Figure").set_conversation_focus(false)
+	focused = ""
 	_update_nameplates()
 
 

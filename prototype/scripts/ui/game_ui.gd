@@ -1210,7 +1210,7 @@ func _update_combat_controls() -> void:
 	if enabled and not CombatActions.available(_state, _selected_technique):
 		_selected_technique = "jab_left"
 		_emit("select_technique", {"technique": _selected_technique})
-	_touch_attack_button.text = "Schlag\n" + str(CombatActions.TECHNIQUES[_selected_technique].short) if enabled else "Angreifen"
+	_touch_attack_button.text = (("Gladius\n" if CombatActions.is_armed(_selected_technique) else "Schlag\n") + str(CombatActions.TECHNIQUES[_selected_technique].short)) if enabled else "Angreifen"
 	_touch_technique_button.disabled = not enabled
 	_touch_technique_button.tooltip_text = "Wähle eine erlernte Bewegung." if enabled else "Techniken stehen in deinem neuen Dorfleben zur Verfügung."
 	if enabled:
@@ -1281,6 +1281,10 @@ func _show_technique_menu() -> void:
 	var help := _label("Ausdauer %d/100 · %d kontrollierte Übungstreffer\nEine Technik wählen, dann im Spiel mit der Schlagtaste ausführen." % [int(combat.stamina), int(combat.practice_hits)], 13, MUTED)
 	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(help)
+	if combat.get("service_gear",false):
+		var equipment := _label("Dienstausrüstung: Gladius und Scutum · ausgebildeter Soldat. Wähle Faust- oder Waffentechnik.", 13, MUTED)
+		equipment.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		column.add_child(equipment)
 	for technique: Dictionary in combat.techniques:
 		var id := str(technique.id)
 		var available := bool(technique.available)

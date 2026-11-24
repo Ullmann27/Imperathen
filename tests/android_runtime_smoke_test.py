@@ -34,6 +34,27 @@ def log(*states):
                      + SMOKE.VILLAGE_RUNTIME_MARKER + json.dumps(state) for state in states)
 
 
+class OpeningMarkerTest(unittest.TestCase):
+    def test_new_bare_completion_marker_at_end_of_log(self):
+        marker = "IMPERATHEN_OPENING_COMPLETE"
+        self.assertEqual(SMOKE.newest_marker_payload("I godot: " + marker, marker, 0), "")
+        self.assertEqual(SMOKE.newest_marker_payload("I godot: " + marker + "\n", marker, 0), "")
+
+    def test_bare_completion_never_consumes_next_log_line(self):
+        marker = "IMPERATHEN_OPENING_COMPLETE"
+        self.assertEqual(SMOKE.newest_marker_payload(marker + "\nI godot: unrelated", marker, 0), "")
+
+    def test_existing_marker_does_not_prove_new_event(self):
+        marker = "IMPERATHEN_OPENING_COMPLETE"
+        self.assertIsNone(SMOKE.newest_marker_payload(marker, marker, 1))
+        self.assertIsNone(SMOKE.newest_marker_payload("", marker, 0))
+
+    def test_payload_and_latest_event_preserved(self):
+        marker = "IMPERATHEN_OPENING_STARTED "
+        logs = marker + "i00_aquileia\n" + marker + "childhood_home\r\nI godot: next"
+        self.assertEqual(SMOKE.newest_marker_payload(logs, marker, 1), "childhood_home")
+
+
 class VillageRuntimeWaitTest(unittest.TestCase):
     def setUp(self):
         self.now = 0.0

@@ -6,6 +6,8 @@ const World = preload("res://scripts/world/game_world.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
+const Population = preload("res://scripts/world/village/village_population.gd")
+const LocalNavigation = preload("res://scripts/world/village/village_local_navigation.gd")
 var checks := 0
 var failures: Array[String] = []
 
@@ -46,11 +48,22 @@ func _run() -> void:
 	_check(actor.position.distance_to(original) > 1.0,"Curiosity causes real collision-checked movement along a village path")
 	_check(float(population.behavior_observations().marcellus.route_distance) > 1.0,"Observed route progress follows the actual body")
 	_check(actor.get_meta("activity","") == "march" and actor.get_node("Figure").speed > 0.1,"Walking intent is visible through the production locomotion driver")
+	# A resident may become tired anywhere, not only at the workplace.
+	behavior.activity = "rest"
+	behavior.reason = "tired"
+	var offsite_rest := actor.position
+	var offsite_distance := float(population.behavior_observations().marcellus.route_distance)
+	for tick in 7:
+		await physics_frame
+		population.advance_to(population.seconds+0.1)
+	_check(actor.position.distance_to(offsite_rest) < 0.04,"Rest away from work stops actual travel at the current position")
+	_check(is_equal_approx(float(population.behavior_observations().marcellus.route_distance),offsite_distance),"Rest does not rewind the resident's route progress")
+	_check(actor.get_node("Figure").speed < 0.06,"Offsite rest stops the actual locomotion driver")
 	behavior.activity = "work"
 	behavior.reason = "daily_work"
 	for tick in 24:
 		await physics_frame
-		population.advance_to(2.0+float(tick+1)*0.1)
+		population.advance_to(population.seconds+0.1)
 	_check(actor.position.distance_to(original) < 0.15,"Work choice returns through the same safe corridor to the workplace")
 	_check(actor.get_meta("intent","") == "work" and actor.get_node("Figure").speed < 0.06,"The resident stops before working")
 	behavior.activity = "rest"
@@ -58,7 +71,7 @@ func _run() -> void:
 	var resting := actor.position
 	for tick in 7:
 		await physics_frame
-		population.advance_to(4.4+float(tick+1)*0.1)
+		population.advance_to(population.seconds+0.1)
 	_check(actor.position.distance_to(resting) < 0.04,"A break actually stops travel instead of only changing a caption")
 	_check(actor.get_node("Figure").speed < 0.06,"A resting resident does not walk in place")
 	# Human proximity uses the same physical body; a swept step cannot go through
@@ -69,7 +82,7 @@ func _run() -> void:
 	var before_yield := actor.position
 	for tick in 6:
 		await physics_frame
-		population.advance_to(5.1+float(tick+1)*0.1)
+		population.advance_to(population.seconds+0.1)
 	_check(actor.position.x > before_yield.x+0.08,"A passerby physically gives the nearby player some room")
 	_check(actor.position.distance_to(original) < .8,"Courtesy stays inside a bounded local corridor")
 	# Authoritative family/quest locations and hitboxes stay aligned.
@@ -112,12 +125,99 @@ func _run() -> void:
 	_check_raider_binding(world,model.data)
 	world.queue_free()
 	await process_frame
+	await _check_local_social_navigation()
 	if failures.is_empty():
 		print("NPC behavior world: %d checks passed" % checks)
 		quit(0)
 	else:
 		print("NPC behavior world: %d failures / %d checks" % [failures.size(),checks])
 		quit(1)
+
+
+func _check_local_social_navigation() -> void:
+	# Independent production-population fixture with exactly two real bodies.
+	# The wall is deliberately not part of the authored village route.
+	var model := Model.new()
+	model.new_game("italia",true,true)
+	var stage := Node3D.new()
+	root.add_child(stage)
+	var population := Population.new()
+	stage.add_child(population)
+	var flavia_item := Layout.resident("flavia")
+	population._add_resident(flavia_item,4)
+	population._add_resident(Layout.resident("bassa"),18)
+	var actor: CharacterBody3D = population.actors.flavia
+	var peer: CharacterBody3D = population.actors.bassa
+	var start := actor.position
+	peer.position = start+Vector3(3.0,0.0,0.0)
+	var target := start+Vector3(1.7,0.0,0.0)
+	var wall := StaticBody3D.new()
+	wall.collision_layer = 1
+	wall.position = start+Vector3(.85,1.2,0.0)
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(.25,2.4,1.0)
+	shape.shape = box
+	wall.add_child(shape)
+	stage.add_child(wall)
+	var resident: Dictionary = model.data.village.behavior.people.flavia
+	resident.activity = "socialize"
+	resident.reason = "company"
+	resident.partner = "bassa"
+	var neighbor: Dictionary = model.data.village.behavior.people.bassa
+	neighbor.activity = "rest"
+	neighbor.reason = "tired"
+	Behavior.observe(model.data,population.behavior_observations(),true)
+	population.sync_behavior(model.data)
+	population.set_active(true)
+	await physics_frame
+	await physics_frame
+	_check(not LocalNavigation.clear_leg(actor,actor.global_position,target),"A direct conversation route is physically obstructed")
+	var path := LocalNavigation.plan(actor,target)
+	_check(path.size() == 2,"The local planner finds a two-leg detour around the real obstruction")
+	var bypassed := false
+	var crossed_wall := false
+	for tick in 90:
+		await physics_frame
+		population.advance_to(population.seconds+.1)
+		Behavior.observe(model.data,population.behavior_observations(),true)
+		var p := actor.position-start
+		bypassed = bypassed or absf(p.z) > .8
+		crossed_wall = crossed_wall or (absf(p.x-.85) < .30 and absf(p.z) < .60)
+	_check(bypassed and not crossed_wall,"The production body walks around rather than through the wall")
+	_check(actor.position.distance_to(peer.position) <= 1.5 and actor.position.distance_to(peer.position) >= .95,"Social movement reaches a bounded personal-space distance off the authored route")
+	_check(actor.get_meta("social_arrived",false) and actor.get_node("Figure").speed < .06,"Arrival stops locomotion before a conversation gesture")
+	var arrived := actor.position
+	peer.visible = false
+	peer.collision_layer = 0
+	Behavior.observe(model.data,population.behavior_observations(),true)
+	for tick in 10:
+		await physics_frame
+		population.advance_to(population.seconds+.1)
+	_check(actor.position.distance_to(arrived) < .04 and not actor.get_meta("social_arrived",true),"A hidden partner ends the approach instead of sending the resident to a stale point")
+	resident.activity = "work"
+	resident.reason = "daily_work"
+	resident.partner = ""
+	for tick in 100:
+		await physics_frame
+		population.advance_to(population.seconds+.1)
+	_check(actor.position.distance_to(start) < .16,"After social travel the resident physically returns to the original workplace")
+	_check(actor.get_node("Figure").speed < .06,"Returning to work ends the walking animation")
+	# A completely blocked destination is never accepted as a traversable leg.
+	var enclosure := StaticBody3D.new()
+	enclosure.collision_layer = 1
+	enclosure.position = target+Vector3.UP*1.2
+	var enclosure_shape := CollisionShape3D.new()
+	var solid := BoxShape3D.new()
+	solid.size = Vector3(1.0,2.4,1.0)
+	enclosure_shape.shape = solid
+	enclosure.add_child(enclosure_shape)
+	stage.add_child(enclosure)
+	await physics_frame
+	await physics_frame
+	_check(LocalNavigation.plan(actor,target).is_empty(),"A target inside solid geometry yields no path")
+	stage.queue_free()
+	await process_frame
 
 
 func _check_raider_binding(world: Node3D, data: Dictionary) -> void:

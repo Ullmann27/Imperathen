@@ -20,7 +20,7 @@ from validate_android_apk import (FRONTIER_RESOURCES, HERO_RESOURCES, OPENING_RE
                                  VILLAGE_LIFE_RESOURCES, CHILDHOOD_RESOURCES,
                                  CAMPAIGN_BIBLE_RESOURCES, MESHY_REGISTRY_RESOURCES,
                                  NPC_BEHAVIOR_RESOURCES, MESHY_CHARACTER_RESOURCES,
-                                 MESHY_EQUIPMENT_RESOURCES)
+                                 MESHY_EQUIPMENT_RESOURCES, SERVICE_GEAR_RESOURCES)
 
 REPO = "Ullmann27/Imperathen"
 BRANCH = "feature/village-life-delivery-20261123"
@@ -48,6 +48,23 @@ LIVING_PROFILE = {
 }
 
 
+MOTION_PROFILE = {
+    **LIVING_PROFILE,
+    "branch": "feature/npc-perception-rest-regression-20261124",
+    "version_code": "6", "version_name": "0.6.0-motion-combat",
+    "tag_prefix": "motion-combat-2026-11-24-",
+    "title": "IMPERATHEN · Bewegung und Dorfleben 0.6.0",
+    "description": (
+        "Geprüfte Zwischenfassung mit lokaler NPC-Navigation, natürlichen Stand- und Gesprächsbewegungen, "
+        "fünf Gladius-Techniken im bereits vorhandenen erwachsenen Ausbildungsweg und fünf sichtbaren Schildhaltungen. "
+        "Gladius und Scutum sind die vorhandenen projektierten Waffen-GLBs; zwei Meshy-Körper bleiben integriert. "
+        "Der kanonische Kindheitsweg bleibt zwölfjährig. Weitere Figuren, externe Motion-Capture-Clips und "
+        "der vollständige spätere Lebensweg sind nicht Teil dieser Zwischenfassung."
+    ),
+    "engine_checks": LIVING_PROFILE["engine_checks"] | {"natural_motion", "character_motion", "combat_actions", "combat_model", "service_gear", "unarmed_combat", "action_world"},
+}
+
+
 def feature_groups(profile: dict | None = None) -> tuple:
     groups = (("hero_character_content", HERO_RESOURCES),
               ("living_frontier_content", FRONTIER_RESOURCES),
@@ -60,6 +77,8 @@ def feature_groups(profile: dict | None = None) -> tuple:
                    ("npc_behavior_content", NPC_BEHAVIOR_RESOURCES),
                    ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
                    ("meshy_equipment_content", MESHY_EQUIPMENT_RESOURCES))
+    if profile is not None and profile.get("branch") == MOTION_PROFILE["branch"]:
+        groups += (("service_gear_content", SERVICE_GEAR_RESOURCES),)
     return groups
 
 
@@ -298,7 +317,8 @@ def publish(public: Path, temporary: Path, source: str, run_id: str, proof: dict
 
 def main() -> None:
     source, run_id, number = (os.environ.get(key, "") for key in ("GITHUB_SHA", "GITHUB_RUN_ID", "GITHUB_RUN_NUMBER"))
-    profile = LIVING_PROFILE if os.environ.get("GITHUB_REF") == "refs/heads/" + LIVING_PROFILE["branch"] else None
+    profile = next((p for p in (LIVING_PROFILE, MOTION_PROFILE)
+                    if os.environ.get("GITHUB_REF") == "refs/heads/" + p["branch"]), None)
     branch = profile["branch"] if profile else BRANCH
     require(os.environ.get("GH_REPO") == REPO and bool(os.environ.get("GH_TOKEN"))
             and os.environ.get("GITHUB_REF") == "refs/heads/" + branch, "Expected repository publication context is missing")

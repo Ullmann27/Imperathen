@@ -110,16 +110,21 @@ static func start(data: Dictionary) -> void:
 	_decide_all(data, 0.0)
 
 
-static func observe(data: Dictionary, observations: Variant) -> void:
+static func observe(data: Dictionary, observations: Variant, complete_snapshot := false) -> void:
 	if not enabled(data) or typeof(observations) != TYPE_DICTIONARY:
 		return
 	for id: String in data.village.behavior.people:
+		var person: Dictionary = data.village.behavior.people[id]
+		# A full world snapshot reports currently visible bodies, not a permanent
+		# record of everybody ever seen. Keep the last valid position for saves,
+		# but do not use a hidden or invalid body for social/proximity decisions.
+		if complete_snapshot:
+			person.observed = false
 		if not observations.has(id) or typeof(observations[id]) != TYPE_DICTIONARY:
 			continue
 		var observation: Dictionary = observations[id]
 		if not _position(observation.get("position")) or not _number(observation.get("route_distance",0.0), 0.0, 1000.0):
 			continue
-		var person: Dictionary = data.village.behavior.people[id]
 		person.position = observation.position.duplicate()
 		person.route_distance = float(observation.get("route_distance",0.0))
 		var direction: Variant = observation.get("route_direction",1)
@@ -166,7 +171,7 @@ static func _decide_all(data: Dictionary, delta: float) -> void:
 			person.fatigue = minf(100.0,float(person.fatigue)+delta*(0.10 if old_activity == "work" else 0.075))
 		else:
 			person.fatigue = maxf(0.0,float(person.fatigue)-delta*(0.75 if old_activity == "rest" else 0.08))
-		person.social_need = clampf(float(person.social_need)+delta*(-0.9 if old_activity in ["socialize","greet"] and _has_company(person,previous,player_at) else 0.075),0.0,100.0)
+		person.social_need = clampf(float(person.social_need)+delta*(-0.9 if old_activity in ["socialize","greet"] and _has_company(id,person,previous,player_at) else 0.075),0.0,100.0)
 		person.stress = maxf(0.0,float(person.stress)-delta*0.45)
 		var at := Vector2(float(person.position[0]),float(person.position[2]))
 		var danger_distance := 100000.0
@@ -264,14 +269,17 @@ static func _nearby_partner(id: String, person: Dictionary, traits: Dictionary, 
 	return best
 
 
-static func _has_company(person: Dictionary, people: Dictionary, player: Vector2) -> bool:
+static func _has_company(id: String, person: Dictionary, people: Dictionary, player: Vector2) -> bool:
 	var at := Vector2(float(person.position[0]),float(person.position[2]))
 	if person.partner == "player":
 		return person.observed and at.distance_to(player) <= 3.5
 	if not people.has(person.partner):
 		return false
 	var partner: Dictionary = people[person.partner]
-	return person.observed and partner.observed and partner.activity in ["socialize","greet"] and at.distance_to(Vector2(float(partner.position[0]),float(partner.position[2]))) <= 3.5
+	# Mere proximity, or a neighbor busy talking to somebody else, does not
+	# satisfy this resident's social need. Both must choose the encounter and
+	# have arrived within the same bounded conversational distance.
+	return person.observed and partner.observed and partner.activity == "socialize" and partner.partner == id and at.distance_to(Vector2(float(partner.position[0]),float(partner.position[2]))) <= 1.5
 
 
 static func _choose(person: Dictionary, activity: String, reason: String, now: float) -> void:

@@ -25,9 +25,14 @@ func sync(data: Dictionary) -> void:
 	if not Combat.enabled(data) or not world._active:
 		return
 	var combat: Dictionary = data.village.unarmed
+	world._figure.set_service_gear(Combat.service_gear(data))
 	var technique := str(combat.technique)
 	if not technique.is_empty():
-		world._figure.sample_combat(technique, float(combat.elapsed) / float(Combat.TECHNIQUES[technique].duration))
+		var progress := float(combat.elapsed) / float(Combat.TECHNIQUES[technique].duration)
+		if Combat.is_armed(technique):
+			world._figure.sample_service_combat(technique, progress)
+		else:
+			world._figure.sample_combat(technique, progress)
 	elif not _last_technique.is_empty():
 		if world._figure.clip not in ["hit", "death"]:
 			world._figure.cancel_action()
@@ -35,15 +40,16 @@ func sync(data: Dictionary) -> void:
 	var guarding := float(combat.guard_remaining) > 0.0
 	var dodging := float(combat.dodge_remaining) > 0.0
 	if guarding and not _guarding:
-		world._figure.cue("block")
+		world._figure.cue("block",world.guard_visual_style())
+	if _guarding and not guarding and world._figure.clip == "block":
+		world._figure.cancel_action()
 	if dodging and not _dodging:
 		world.cue_village_defense("village_dodge")
 	if _dodging and not dodging:
 		world._dodge_remaining = 0.0
 	_guarding = guarding
 	_dodging = dodging
-	world._figure.set_equipment(false, false)
-	world._training_label.text = "Übungsplatz\nKontrollierte Treffer: %d" % int(combat.practice_hits)
+	world._training_label.text = ("Übungsplatz · Gladius und Schild\nKontrollierte Treffer: %d" if Combat.service_gear(data) else "Übungsplatz\nKontrollierte Treffer: %d") % int(combat.practice_hits)
 
 
 func reset() -> void:
@@ -57,7 +63,7 @@ func reset() -> void:
 
 
 func attack() -> void:
-	if not Combat.enabled(state) or not Combat.TECHNIQUES.has(selected):
+	if not Combat.enabled(state) or not Combat.available(state,selected):
 		return
 	var direction := Vector3.FORWARD.rotated(Vector3.UP, world._figure.rotation.y)
 	var facing := Vector2(direction.x, direction.z).normalized()
