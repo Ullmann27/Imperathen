@@ -20,7 +20,7 @@ from validate_android_apk import (FRONTIER_RESOURCES, HERO_RESOURCES, OPENING_RE
                                  VILLAGE_LIFE_RESOURCES, CHILDHOOD_RESOURCES,
                                  CAMPAIGN_BIBLE_RESOURCES, MESHY_REGISTRY_RESOURCES,
                                  NPC_BEHAVIOR_RESOURCES, MESHY_CHARACTER_RESOURCES,
-                                 MESHY_EQUIPMENT_RESOURCES, SERVICE_GEAR_RESOURCES)
+                                 MESHY_EQUIPMENT_RESOURCES, SERVICE_GEAR_RESOURCES, CC0_MOTION_RESOURCES)
 
 REPO = "Ullmann27/Imperathen"
 BRANCH = "feature/village-life-delivery-20261123"
@@ -65,6 +65,23 @@ MOTION_PROFILE = {
 }
 
 
+CC0_PROFILE = {
+    **MOTION_PROFILE,
+    "branch": "integration/motion-combat-cc0-20261124",
+    "version_code": "7", "version_name": "0.7.0-cc0-motion",
+    "tag_prefix": "cc0-motion-2026-11-24-",
+    "title": "IMPERATHEN · Bewegung, Dorfleben und CC0 0.7.0",
+    "description": (
+        "Geprüfte Zwischenfassung mit NPC-Navigation und fünf Gladius-Techniken im erwachsenen Ausbildungsweg. "
+        "Die vollständige übertragene CC0-Bibliothek mit 35 Bewegungsclips und Referenzanimation liegt als Spielressource vor. "
+        "Stand- und Gesprächsbewegungen nutzen begrenzte CC0-Überlagerungen am vorhandenen Hauptfiguren-Skelett; "
+        "die übrigen Clips bleiben Prüfmaterial. Zwei Meshy-Figuren sind eingebunden, weitere Figuren und der "
+        "vollständige spätere Lebensweg sind weiterhin nicht Bestandteil dieser Fassung."
+    ),
+    "engine_checks": MOTION_PROFILE["engine_checks"] | {"cc0_runtime_gestures"},
+}
+
+
 def feature_groups(profile: dict | None = None) -> tuple:
     groups = (("hero_character_content", HERO_RESOURCES),
               ("living_frontier_content", FRONTIER_RESOURCES),
@@ -77,8 +94,10 @@ def feature_groups(profile: dict | None = None) -> tuple:
                    ("npc_behavior_content", NPC_BEHAVIOR_RESOURCES),
                    ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
                    ("meshy_equipment_content", MESHY_EQUIPMENT_RESOURCES))
-    if profile is not None and profile.get("branch") == MOTION_PROFILE["branch"]:
+    if profile is not None and profile.get("branch") in {MOTION_PROFILE["branch"], CC0_PROFILE["branch"]}:
         groups += (("service_gear_content", SERVICE_GEAR_RESOURCES),)
+    if profile is not None and profile.get("branch") == CC0_PROFILE["branch"]:
+        groups += (("cc0_motion_content", CC0_MOTION_RESOURCES),)
     return groups
 
 
@@ -317,7 +336,7 @@ def publish(public: Path, temporary: Path, source: str, run_id: str, proof: dict
 
 def main() -> None:
     source, run_id, number = (os.environ.get(key, "") for key in ("GITHUB_SHA", "GITHUB_RUN_ID", "GITHUB_RUN_NUMBER"))
-    profile = next((p for p in (LIVING_PROFILE, MOTION_PROFILE)
+    profile = next((p for p in (LIVING_PROFILE, MOTION_PROFILE, CC0_PROFILE)
                     if os.environ.get("GITHUB_REF") == "refs/heads/" + p["branch"]), None)
     branch = profile["branch"] if profile else BRANCH
     require(os.environ.get("GH_REPO") == REPO and bool(os.environ.get("GH_TOKEN"))

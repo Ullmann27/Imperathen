@@ -1,0 +1,101 @@
+name: CC0 motion source and retarget review
+on:
+  push:
+    branches: ["feature/cc0-motion-import-20261124"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cc0-motion-review-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-and-retarget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify and stage actual upstream motion archive
+        run: |
+          python3 tools/characters/stage_cc0_motion.py --output "$RUNNER_TEMP/cc0-source" --report artifacts/motion/source-audit.json
+      - name: Install matching Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          curl --fail --location --retry 3 https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o godot.zip
+          curl --fail --location --retry 3 https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/SHA512-SUMS.txt -o sums.txt
+          expected="$(awk '$2 ~ /Godot_v4.7.2-stable_linux.x86_64.zip$/ { print $1; exit }' sums.txt)"
+          test -n "$expected"
+          echo "$expected  godot.zip" | sha512sum --check --strict
+          unzip -q godot.zip
+          chmod +x Godot_v4.7.2-stable_linux.x86_64
+          echo "GODOT_BIN=$RUNNER_TEMP/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Import the real hero assets
+        run: |
+          "$GODOT_BIN" --headless --editor --path prototype --import
+      - name: Retarget source rotations to the existing hero and review segment lengths
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$GODOT_BIN" --headless --path prototype --script res://tests/cc0_retarget_review.gd -- "$RUNNER_TEMP/cc0-source" "$GITHUB_WORKSPACE/artifacts/motion"
+          echo "$GITHUB_SHA" > artifacts/motion/source-commit.txt
+      - name: Exercise bounded CC0 idle and talk on all four actual hero LODs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p prototype/assets/animations
+          cp artifacts/motion/hero_cc0_review.tres prototype/assets/animations/hero_cc0_library.tres
+          "$GODOT_BIN" --headless --path prototype --script res://tests/cc0_runtime_gestures_test.gd 2>&1 | tee artifacts/motion/runtime-gesture-checks.txt
+          grep -q 'CC0_GESTURES_PASS' artifacts/motion/runtime-gesture-checks.txt
+          "$GODOT_BIN" --headless --path prototype --script res://tests/natural_motion_test.gd 2>&1 | tee artifacts/motion/natural-motion-regression.txt
+          grep -q '0 failed' artifacts/motion/natural-motion-regression.txt
+      - name: Upload only review outputs, not source meshes
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-cc0-motion-review
+          path: artifacts/motion/
+          if-no-files-found: warn
+
+  materialize-library:
+    needs: source-and-retarget
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/cc0-motion-import-20261124'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+      - name: Materialize only validated, rotation-only retargeted output
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh run download "$GITHUB_RUN_ID" --name imperathen-cc0-motion-review --dir "$RUNNER_TEMP/verified"
+          python3 - "$RUNNER_TEMP/verified" <<'PY'
+          import json, pathlib, sys
+          p = pathlib.Path(sys.argv[1])
+          report = json.loads((p / "retarget-review.json").read_text())
+          assert report["accepted_clips"] == 36 and not report["failures"] and report["rejected"] == 0
+          assert report["root_motion"] is False and report["runtime_approved"] is False
+          assert "CC0_GESTURES_PASS" in (p / "runtime-gesture-checks.txt").read_text()
+          assert "0 failed" in (p / "natural-motion-regression.txt").read_text()
+          resource = p / "hero_cc0_review.tres"
+          assert resource.stat().st_size < 3_000_000
+          assert resource.read_text().startswith('[gd_resource type="AnimationLibrary"')
+          PY
+          mkdir -p prototype/assets/animations
+          cp "$RUNNER_TEMP/verified/hero_cc0_review.tres" prototype/assets/animations/hero_cc0_library.tres
+          cp "$RUNNER_TEMP/verified/retarget-review.json" prototype/assets/animations/hero_cc0_retarget_report.json
+          git add prototype/assets/animations/hero_cc0_library.tres prototype/assets/animations/hero_cc0_retarget_report.json
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "assets: materialize verified CC0 rotation library and report"
+          # No forced update. A concurrent branch change must reject the push.
+          git push origin HEAD:refs/heads/feature/cc0-motion-import-20261124
