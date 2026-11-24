@@ -22,6 +22,9 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 
+from android_signing_identity import (SigningIdentityError, expected_certificate,
+                                      verify_signing_identity)
+
 
 REPOSITORY = Path(__file__).resolve().parents[1]
 EXPECTED_GODOT = "4.7.2.stable"
@@ -136,6 +139,11 @@ def preflight(args: argparse.Namespace) -> tuple[dict, dict[str, str]]:
     if not sys.platform.startswith("linux"):
         raise BuildError("Dieser reproduzierbare Baupfad ist für Linux eingerichtet; die APK selbst ist für Android.")
     environment = os.environ.copy()
+    try:
+        expected_signer = expected_certificate(getattr(args, "expected_signer_sha256", None),
+                                               environment.get("IMPERATHEN_EXPECTED_SIGNER_SHA256"))
+    except SigningIdentityError as error:
+        raise BuildError(str(error)) from error
     engine_name = args.godot or environment.get("IMPERATHEN_GODOT", "godot")
     engine_found = shutil.which(engine_name)
     if not engine_found:
@@ -214,6 +222,7 @@ def preflight(args: argparse.Namespace) -> tuple[dict, dict[str, str]]:
         "package": PACKAGE, "preset": PRESET, "preset_section": preset_section,
         "abi": args.abi, "orientation": orientation, "validator": str(validator),
         "source_sha256": source_fingerprint(project),
+        "expected_signer_sha256": expected_signer,
     }, environment
 
 
@@ -322,6 +331,14 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         checksum = file_sha256(apk)
         if report.get("apk", {}).get("sha256") != checksum:
             raise BuildError("Prüfbericht und tatsächlich erzeugte APK besitzen unterschiedliche Prüfsummen.")
+        try:
+            signing_identity = verify_signing_identity(
+                apk, build_tools / "apksigner", expected_sha256=toolchain.get("expected_signer_sha256"),
+                timeout=args.timeout, environment=environment)
+        except SigningIdentityError as error:
+            raise BuildError(str(error)) from error
+        if signing_identity["apk_sha256"] != checksum:
+            raise BuildError("Signaturidentität und statischer Prüfbericht beschreiben verschiedene APK-Bytes.")
         # A failed build never promotes an old or unverified APK as a new result.
         atomic_copy(apk, output)
         atomic_copy(verification, output.with_suffix(".validation.json"))
@@ -333,6 +350,7 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         build_report.update({"requested_renderer": args.renderer, "status": "verified_debug_apk", "created_utc": datetime.now(timezone.utc).isoformat(),
                              "apk": output.name, "apk_sha256": checksum, "apk_size_bytes": output.stat().st_size,
                              "signing": "externally_supplied_debug_key", "device_test": "not_run_by_build_tool",
+                             "signing_identity": signing_identity,
                              "validation_report": output.with_suffix(".validation.json").name})
         source_commit = environment.get("GITHUB_SHA", "")
         if re.fullmatch(r"[0-9a-fA-F]{40}", source_commit):
@@ -354,6 +372,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--template-dir", type=Path, help="Official templates directory including version.txt")
     parser.add_argument("--keystore", type=Path, help="Private debug key outside the repository")
     parser.add_argument("--keystore-user", help="Key alias; password is accepted only through the environment")
+    parser.add_argument("--expected-signer-sha256", help="Public expected certificate SHA-256; otherwise IMPERATHEN_EXPECTED_SIGNER_SHA256. A mismatch blocks APK promotion.")
     parser.add_argument("--abi", choices=ABIS, default="arm64-v8a")
     parser.add_argument("--renderer", choices=("compatibility", "mobile"), default="compatibility")
     parser.add_argument("--output", type=Path, help="Destination .apk; previous file remains untouched on export failure")
