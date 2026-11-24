@@ -1,0 +1,723 @@
+{
+  "platform": "Android emulator",
+  "apk_sha256": "dea561188c37f1f258eaa6e83a0f89253e8ed264d23bafd26af0a2f25fbda7f1",
+  "physical_device_test": false,
+  "arm64_runtime_test": false,
+  "status": "failed",
+  "checks": [
+    {
+      "name": "single_emulator_target",
+      "passed": true,
+      "detail": [
+        {
+          "serial": "emulator-5554",
+          "state": "offline"
+        }
+      ]
+    },
+    {
+      "name": "emulator_verified",
+      "passed": true,
+      "detail": {
+        "serial": "emulator-5554",
+        "ro.kernel.qemu": "1"
+      }
+    },
+    {
+      "name": "expected_android_emulator",
+      "passed": true,
+      "detail": {
+        "api_level": "35",
+        "abi": "x86_64",
+        "model": "sdk_gphone64_x86_64"
+      }
+    },
+    {
+      "name": "apk_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "clean_test_app_data",
+      "passed": true,
+      "detail": "Success"
+    },
+    {
+      "name": "launcher",
+      "passed": true,
+      "detail": "at.heinz.imperathen/com.godot.game.GodotAppLauncher"
+    },
+    {
+      "name": "activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 3094\nWaitTime: 3146\nComplete"
+    },
+    {
+      "name": "process_started",
+      "passed": true,
+      "detail": "3235"
+    },
+    {
+      "name": "first_launch_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "first_launch_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "real_menu",
+      "passed": true,
+      "detail": {
+        "new_game": [
+          156.75,
+          237
+        ]
+      }
+    },
+    {
+      "name": "menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "touch_starts_saved_game",
+      "passed": true,
+      "detail": "New game button produced a saved village"
+    },
+    {
+      "name": "authored_opening_is_actual_new_game",
+      "passed": true,
+      "detail": "i00_aquileia"
+    },
+    {
+      "name": "opening_before_gameplay",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            811.875,
+            39
+          ],
+          "OpeningSkip": [
+            892.125,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.15,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "i00_aquileia",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "android_back_pauses_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            799.875,
+            39
+          ],
+          "OpeningSkip": [
+            892.125,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.541155333333333,
+        "final": false,
+        "index": 0,
+        "paused": true,
+        "sequence": "i00_aquileia",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "android_back_resumes_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            811.875,
+            39
+          ],
+          "OpeningSkip": [
+            892.125,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.684459999999998,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "i00_aquileia",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "native_i00_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            811.875,
+            39
+          ],
+          "OpeningSkip": [
+            892.125,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.128291666666668,
+        "final": false,
+        "index": 1,
+        "paused": false,
+        "sequence": "i00_aquileia",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "i00_skip_reaches_handoff",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            911.625,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0,
+        "final": true,
+        "index": 5,
+        "paused": false,
+        "sequence": "i00_aquileia",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "i00_hands_to_family_opening",
+      "passed": true,
+      "detail": "childhood_home"
+    },
+    {
+      "name": "family_opening_after_i00",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            811.875,
+            39
+          ],
+          "OpeningSkip": [
+            892.125,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.129887666666666,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            811.875,
+            39
+          ],
+          "OpeningSkip": [
+            892.125,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.133333333333333,
+        "final": false,
+        "index": 1,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            811.875,
+            39
+          ],
+          "OpeningSkip": [
+            892.125,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.132589666666668,
+        "final": false,
+        "index": 2,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            911.625,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0,
+        "final": true,
+        "index": 3,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "family_intro_reaches_first_objective",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489
+          ],
+          "OpeningPause": [
+            911.625,
+            39
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0,
+        "final": true,
+        "index": 3,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0
+      }
+    },
+    {
+      "name": "objective_hands_over_control",
+      "passed": true,
+      "detail": "Actual touch accepted the objective after the opening controls"
+    },
+    {
+      "name": "native_pointer_command_available",
+      "passed": true,
+      "detail": "The verified Android input command advertises native pointer DOWN/MOVE/UP support"
+    },
+    {
+      "name": "native_back_opens_quality_pause",
+      "passed": true,
+      "detail": {
+        "ui_profile": "balanced",
+        "world_profile": "balanced"
+      }
+    },
+    {
+      "name": "native_settings_select_light_graphics",
+      "passed": true,
+      "detail": {
+        "popup": {
+          "control_instance": "329387088994",
+          "popup_instance": "329437420644",
+          "focused_index": 0,
+          "text": "Leicht · Limit 30 FPS",
+          "down_presses": 1
+        },
+        "profiles": {
+          "ui_profile": "low",
+          "world_profile": "low"
+        }
+      }
+    },
+    {
+      "name": "native_settings_resume_preserves_light_graphics",
+      "passed": true,
+      "detail": {
+        "ui_profile": "low",
+        "world_profile": "low"
+      }
+    },
+    {
+      "name": "npc_behavior_connected",
+      "passed": true,
+      "detail": {
+        "accumulator": 0.383333333333333,
+        "activity_counts": {
+          "patrol": 5,
+          "socialize": 7,
+          "work": 30
+        },
+        "behavior_version": 1,
+        "decision_due_count": 0,
+        "observed_count": 42,
+        "people_count": 42,
+        "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+        "samples": {
+          "aelia": {
+            "activity": "work",
+            "fatigue": 18,
+            "interest": "craft",
+            "last_greet": -1000,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 3,
+            "observed": true,
+            "partner": "",
+            "position": [
+              20,
+              0,
+              17
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0,
+            "since": 0,
+            "social_need": 37,
+            "stress": 0
+          },
+          "julia": {
+            "activity": "work",
+            "fatigue": 13,
+            "interest": "family",
+            "last_greet": -1000,
+            "last_trust": 4,
+            "memories": [],
+            "next_decision": 4.75,
+            "observed": true,
+            "partner": "",
+            "position": [
+              -15.3000001907349,
+              0,
+              14.8000001907349
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0,
+            "since": 0,
+            "social_need": 27,
+            "stress": 0
+          },
+          "marcus": {
+            "activity": "work",
+            "fatigue": 10,
+            "interest": "learning",
+            "last_greet": -1000,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 3.75,
+            "observed": true,
+            "partner": "",
+            "position": [
+              -3,
+              0.899999976158142,
+              4
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0,
+            "since": 0,
+            "social_need": 51,
+            "stress": 0
+          },
+          "sextus": {
+            "activity": "work",
+            "fatigue": 8,
+            "interest": "craft",
+            "last_greet": -1000,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 4.5,
+            "observed": true,
+            "partner": "",
+            "position": [
+              32.7999992370605,
+              0,
+              -25
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0,
+            "since": 0,
+            "social_need": 38,
+            "stress": 0
+          }
+        },
+        "seconds": 0,
+        "state_sha256": "a5590c36878dc186961bf9c0dc2926cfcbd88d57f34fbcc1808431c10e6c9811",
+        "version": 1,
+        "world_id": "56293636-3886846171"
+      }
+    },
+    {
+      "name": "npc_behavior_advances",
+      "passed": true,
+      "detail": {
+        "before_seconds": 0,
+        "after_seconds": 0.5,
+        "decisions": {
+          "patrol": 5,
+          "socialize": 7,
+          "work": 30
+        },
+        "samples": {
+          "aelia": {
+            "activity": "work",
+            "fatigue": 18.05,
+            "interest": "craft",
+            "last_greet": -1000,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 3,
+            "observed": true,
+            "partner": "",
+            "position": [
+              20,
+              0,
+              17
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0,
+            "since": 0,
+            "social_need": 37.0375,
+            "stress": 0
+          },
+          "julia": {
+            "activity": "work",
+            "fatigue": 13.05,
+            "interest": "family",
+            "last_greet": -1000,
+            "last_trust": 4,
+            "memories": [],
+            "next_decision": 4.75,
+            "observed": true,
+            "partner": "",
+            "position": [
+              -15.3000001907349,
+              0,
+              14.8000001907349
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0,
+            "since": 0,
+            "social_need": 27.0375,
+            "stress": 0
+          },
+          "marcus": {
+            "activity": "work",
+            "fatigue": 10.05,
+            "interest": "learning",
+            "last_greet": -1000,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 3.75,
+            "observed": true,
+            "partner": "",
+            "position": [
+              -3,
+              0.899999976158142,
+              4
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0,
+            "since": 0,
+            "social_need": 51.0375,
+            "stress": 0
+          },
+          "sextus": {
+            "activity": "work",
+            "fatigue": 8.05,
+            "interest": "craft",
+            "last_greet": -1000,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 4.5,
+            "observed": true,
+            "partner": "",
+            "position": [
+              32.7999992370605,
+              0,
+              -25
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0,
+            "since": 0,
+            "social_need": 38.0375,
+            "stress": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "meshy_severus_loaded",
+      "passed": false,
+      "detail": {
+        "packaged_models": [
+          "assets/assets/meshy/characters/unit_roman_signifer_3.glb",
+          "assets/assets/meshy/equipment/gear_roman_signum_1.glb"
+        ],
+        "loaded_count": 1,
+        "severus": {
+          "asset_id": "unit_roman_signifer",
+          "bone_count": 15,
+          "clip": "idle",
+          "equipment": [
+            {
+              "asset_id": "gear_roman_signum",
+              "bone": "Hand_R",
+              "bound": true,
+              "mesh_count": 1,
+              "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+            }
+          ],
+          "has_march": true,
+          "has_run": true,
+          "loaded": true,
+          "mesh_count": 2,
+          "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+        },
+        "version": 1
+      }
+    }
+  ],
+  "errors": [
+    "meshy_severus_loaded: {'packaged_models': ['assets/assets/meshy/characters/unit_roman_signifer_3.glb', 'assets/assets/meshy/equipment/gear_roman_signum_1.glb'], 'loaded_count': 1, 'severus': {'asset_id': 'unit_roman_signifer', 'bone_count': 15, 'clip': 'idle', 'equipment': [{'asset_id': 'gear_roman_signum', 'bone': 'Hand_R', 'bound': True, 'mesh_count': 1, 'model_path': 'res://assets/meshy/equipment/gear_roman_signum_1.glb'}], 'has_march': True, 'has_run': True, 'loaded': True, 'mesh_count': 2, 'model_path': 'res://assets/meshy/characters/unit_roman_signifer_3.glb'}, 'version': 1}"
+  ],
+  "source_commit": "1ac1afee0796601a5a68d704058f6014907aa32b",
+  "test_harness_commit": "1ac1afee0796601a5a68d704058f6014907aa32b",
+  "apk_file": "IMPERATHEN-1ac1afee-emulator.apk",
+  "action_controls_expected": true,
+  "npc_behavior_expected": true,
+  "meshy_characters_expected": true,
+  "story_route": "i00_aquileia->childhood_home",
+  "serial": "emulator-5554",
+  "android_version": "15",
+  "api_level": "35",
+  "abi": "x86_64",
+  "model": "sdk_gphone64_x86_64",
+  "pid": "3235",
+  "screenshots": {
+    "00_android_intro.png": {
+      "sha256": "4e38fe44aa014657c5e1fe33507f2f586211d4430208d565fc915ca188bc05df",
+      "width": 960,
+      "height": 540
+    },
+    "01_android_menu.png": {
+      "sha256": "8f83c7d440737f54325ba05dc7684b8674afbb1d4963c7e28b4b5309b7645088",
+      "width": 960,
+      "height": 540
+    },
+    "10_android_opening.png": {
+      "sha256": "59c171bdc349c81ea5ac957ac1e7effeada8cc9742a6ee4a84e31596c677b300",
+      "width": 960,
+      "height": 540
+    },
+    "11_android_opening_objective.png": {
+      "sha256": "2ee482e6b38f3e067a739d3042afd8079d466ed3af0dc24630e7f5ae030164fd",
+      "width": 960,
+      "height": 540
+    },
+    "18_android_light_settings.png": {
+      "sha256": "c9948d3a8e841662472ab9cc87cee136bb86c069e98c0212441affe1c9cfcada",
+      "width": 960,
+      "height": 540
+    },
+    "failure.png": {
+      "sha256": "0ac603668d7df521749508a65df20f8a342c3ea7a975aa7256fca92a65afcb0b",
+      "width": 960,
+      "height": 540
+    }
+  },
+  "focused_windows": [
+    "mCurrentFocus=Window{9dbd5e1 u0 at.heinz.imperathen/com.godot.game.GodotAppLauncher}",
+    "mFocusedApp=ActivityRecord{cf13014 u0 at.heinz.imperathen/com.godot.game.GodotAppLauncher t8}",
+    "mPreferredTopFocusableRootTask=Task{e5a6dac #8 type=standard A=10209:at.heinz.imperathen}",
+    "mLastFocusedRootTask=Task{e5a6dac #8 type=standard A=10209:at.heinz.imperathen}",
+    "mFocusedWindow=Window{9dbd5e1 u0 at.heinz.imperathen/com.godot.game.GodotAppLauncher}"
+  ],
+  "last_game_messages": [
+    "11-24 07:10:25.427  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-12 16 17 X2Rpc3RhbmNlIjowLjAsInNpbmNlIjowLjAsInNvY2lhbF9uZWVkIjozOC4wLCJzdHJlc3MiOjAuMH19LCJzZWNvbmRzIjowLjAsInN0YXRlX3NoYTI1NiI6IjY3ZTk4MzdmMDBlMGI2YThlNGM4NGI2NDM2NTY3MzNhMzNlNDAzODQ0NjFmNjlmNzZkMTU4ZGZhODQ3Yjk4NDAiLCJ2ZXJzaW9uIjoxLCJ3b3JsZF9pZCI6IjU2MjkzNjM2LTM4ODY4NDYxNzEifSwic2NyZWVuIjoicGxheWluZyIsIndvcmtfcGVybWl0IjpmYWxzZSwid29ya3BsYWNlcyI6NSwid29ybGRfc2Vjb25kcyI6MC4zODMzMzMzMzMzMzMzMzN9",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 0 17 eyJhY3Rpb25fbW9kZSI6InVuYXJtZWQiLCJhY3Rpb25fcnVudGltZSI6eyJhY3Rpb25fdG91Y2hlcyI6MCwiYm9keV92ZWxvY2l0eSI6WzAuMCwwLjAsMC4wXSwiY2FtZXJhX3RvdWNoZXMiOjAsImNhbWVyYV95YXciOjAuNjIsImZpZ3VyZV9jbGlwIjoiaWRsZSIsImZpZ3VyZV9zcGVlZCI6MC4wLCJtb2RlIjoicGVyc29uIiwibW92ZV9heGlzIjpbMC4wLDAuMF0sIm1vdmVtZW50X3RvdWNoIjotMSwib3ZlcmxheSI6Im5vbmUiLCJwb3NpdGlvbiI6Wy0xMi4wLDEuMjkyNTc4MjIwMzY3NDMsMTEuNjk5OTk5ODA5MjY1MV0sInJ1bm5pbmciOmZhbHNlLCJzZWxlY3RlZF90ZWNobmlxdWUiOiJqYWJfbGVmdCIsInRvdWNoX2NhbWVyYV9tYW5hZ2VkIjp0cnVlLCJ1aV92aWV3Ijoi",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 1 17 Z2FtZSIsInZlbG9jaXR5IjpbMC4wLDAuMCwwLjBdLCJ2ZXJzaW9uIjoxLCJ3b3JsZF9hY3RpdmUiOnRydWUsIndvcmxkX2NhbWVyYV90b3VjaGVzIjowfSwiYWN0b3JzIjoxNSwiYWVsaWFfYXNzaWdubWVudCI6ImlkbGUiLCJiZWhhdmlvcl9ydW50aW1lIjp7ImFjY3VtdWxhdG9yIjowLjI4MzMzMzMzMzMzMzMzMywiYWN0aXZpdHlfY291bnRzIjp7InBhdHJvbCI6NSwic29jaWFsaXplIjo3LCJ3b3JrIjozMH0sImJlaGF2aW9yX3ZlcnNpb24iOjEsImRlY2lzaW9uX2R1ZV9jb3VudCI6MCwib2JzZXJ2ZWRfY291bnQiOjQyLCJwZW9wbGVfY291bnQiOjQyLCJyb3N0ZXJfc2hhMjU2IjoiNGFiNzRiOTVkYzE2N2MyNDJlNmY4ZmM2MGExMzQyMzk2MmRmZGQ5NGU1YTcwNzU4M2Mx",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 2 17 Y2E3MzQ2YWYxMGIyNyIsInNhbXBsZXMiOnsiYWVsaWEiOnsiYWN0aXZpdHkiOiJ3b3JrIiwiZmF0aWd1ZSI6MTguMDUsImludGVyZXN0IjoiY3JhZnQiLCJsYXN0X2dyZWV0IjotMTAwMC4wLCJsYXN0X3RydXN0IjowLCJtZW1vcmllcyI6W10sIm5leHRfZGVjaXNpb24iOjMuMCwib2JzZXJ2ZWQiOnRydWUsInBhcnRuZXIiOiIiLCJwb3NpdGlvbiI6WzIwLjAsMC4wLDE3LjBdLCJyZWFzb24iOiJkYWlseV93b3JrIiwicm91dGVfZGlyZWN0aW9uIjoxLCJyb3V0ZV9kaXN0YW5jZSI6MC4wLCJzaW5jZSI6MC4wLCJzb2NpYWxfbmVlZCI6MzcuMDM3NSwic3RyZXNzIjowLjB9LCJqdWxpYSI6eyJhY3Rpdml0eSI6IndvcmsiLCJmYXRpZ3VlIjoxMy4wNSwiaW50ZXJlc3QiOiJmYW1p",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 3 17 bHkiLCJsYXN0X2dyZWV0IjotMTAwMC4wLCJsYXN0X3RydXN0Ijo0LCJtZW1vcmllcyI6W10sIm5leHRfZGVjaXNpb24iOjQuNzUsIm9ic2VydmVkIjp0cnVlLCJwYXJ0bmVyIjoiIiwicG9zaXRpb24iOlstMTUuMzAwMDAwMTkwNzM0OSwwLjAsMTQuODAwMDAwMTkwNzM0OV0sInJlYXNvbiI6ImRhaWx5X3dvcmsiLCJyb3V0ZV9kaXJlY3Rpb24iOjEsInJvdXRlX2Rpc3RhbmNlIjowLjAsInNpbmNlIjowLjAsInNvY2lhbF9uZWVkIjoyNy4wMzc1LCJzdHJlc3MiOjAuMH0sIm1hcmN1cyI6eyJhY3Rpdml0eSI6IndvcmsiLCJmYXRpZ3VlIjoxMC4wNSwiaW50ZXJlc3QiOiJsZWFybmluZyIsImxhc3RfZ3JlZXQiOi0xMDAwLjAsImxhc3RfdHJ1c3QiOjAsIm1lbW9yaWVzIjpbXSwi",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 4 17 bmV4dF9kZWNpc2lvbiI6My43NSwib2JzZXJ2ZWQiOnRydWUsInBhcnRuZXIiOiIiLCJwb3NpdGlvbiI6Wy0zLjAsMC44OTk5OTk5NzYxNTgxNDIsNC4wXSwicmVhc29uIjoiZGFpbHlfd29yayIsInJvdXRlX2RpcmVjdGlvbiI6MSwicm91dGVfZGlzdGFuY2UiOjAuMCwic2luY2UiOjAuMCwic29jaWFsX25lZWQiOjUxLjAzNzUsInN0cmVzcyI6MC4wfSwic2V4dHVzIjp7ImFjdGl2aXR5Ijoid29yayIsImZhdGlndWUiOjguMDUsImludGVyZXN0IjoiY3JhZnQiLCJsYXN0X2dyZWV0IjotMTAwMC4wLCJsYXN0X3RydXN0IjowLCJtZW1vcmllcyI6W10sIm5leHRfZGVjaXNpb24iOjQuNSwib2JzZXJ2ZWQiOnRydWUsInBhcnRuZXIiOiIiLCJwb3NpdGlvbiI6WzMyLjc5OTk5OTIz",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 5 17 NzA2MDUsMC4wLC0yNS4wXSwicmVhc29uIjoiZGFpbHlfd29yayIsInJvdXRlX2RpcmVjdGlvbiI6MSwicm91dGVfZGlzdGFuY2UiOjAuMCwic2luY2UiOjAuMCwic29jaWFsX25lZWQiOjM4LjAzNzUsInN0cmVzcyI6MC4wfX0sInNlY29uZHMiOjAuNSwic3RhdGVfc2hhMjU2IjoiNDdjNDE0MjU4YjU0YThmZGFlNzJlMjRmNWUwODMxMTkwZTBlOGFiNTJkODZkNjEzMjU1NzY0NTZiMDk0MDBiMCIsInZlcnNpb24iOjEsIndvcmxkX2lkIjoiNTYyOTM2MzYtMzg4Njg0NjE3MSJ9LCJjaGlsZGhvb2RfcnVudGltZSI6eyJhZ2UiOjEyLCJjYXJyaWVkIjpbXSwiY29tcGxldGVkIjpbXSwiZGF5IjoxLCJkaWFsb2dfbnBjIjoiIiwiZmFtaWx5X2VudHJhbmNlIjpbLTEzLjAsMTQuNjk5",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 6 17 OTk5ODA5MjY1MV0sImZhbWlseV93YXRlciI6Wy0xMi4wLDExLjY5OTk5OTgwOTI2NTFdLCJzdGFnZSI6Im1vdGhlcl9tb3JuaW5nIiwidGFyZ2V0X25wYyI6Imp1bGlhIiwidGFyZ2V0X3BvaW50IjoiIiwidGFyZ2V0X3Bvc2l0aW9uIjpbLTE1LjMwMDAwMDE5MDczNDksMTQuODAwMDAwMTkwNzM0OV0sInRhcmdldF9yYWRpdXMiOjMuMiwidmVyc2lvbiI6MSwid29ybGRfaWQiOiI1NjI5MzYzNi0zODg2ODQ2MTcxIn0sImNvbnRyb2xzIjp7ImF0dGFjayI6eyJjZW50ZXIiOls4OTUuNSwzNDkuNV0sImVuYWJsZWQiOnRydWUsImluc3RhbmNlX2lkIjoiMzQ4NDYyNzgxNzcxIiwicmVjdCI6Wzg0MC4wLDMyNy4wLDExMS4wLDQ1LjBdLCJ2aXNpYmxlIjp0cnVlfSwiY29tbWFuZHMi",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 7 17 OnsiY2VudGVyIjpbODUyLjM3NSw1MDcuMF0sImVuYWJsZWQiOnRydWUsImluc3RhbmNlX2lkIjoiMzQ3MTg3NzEwMTQxIiwicmVjdCI6Wzc2MS4yNSw0ODkuMCwxODIuMjUsMzYuMF0sInZpc2libGUiOnRydWV9LCJkb2RnZSI6eyJjZW50ZXIiOls4OTUuNSw0MDAuNV0sImVuYWJsZWQiOnRydWUsImluc3RhbmNlX2lkIjoiMzQ4NjMwNTU0NTEwIiwicmVjdCI6Wzg0MC4wLDM3OC4wLDExMS4wLDQ1LjBdLCJ2aXNpYmxlIjp0cnVlfSwiZ3VhcmQiOnsiY2VudGVyIjpbNzc4LjUsNDAwLjVdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjM0ODU0NjY2ODQzMiIsInJlY3QiOls3MjMuMCwzNzguMCwxMTEuMCw0NS4wXSwidmlzaWJsZSI6dHJ1ZX0sImludGVyYWN0Ijp7ImNl",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 8 17 bnRlciI6Wzc3OC41LDM0OS41XSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIzNDgzNzg4OTU4MzciLCJyZWN0IjpbNzIzLjAsMzI3LjAsMTExLjAsNDUuMF0sInZpc2libGUiOnRydWV9LCJtb3ZlX3BhZCI6eyJheGlzX3BvaW50cyI6eyJjZW50ZXIiOls5MC4wLDM5My4wXSwiZG93biI6WzkwLjAsNDQ0LjgzOTk5NjMzNzg5MV0sImxlZnQiOlszOC4xNTk5OTYwMzI3MTQ4LDM5My4wXSwicmlnaHQiOlsxNDEuODM5OTk2MzM3ODkxLDM5My4wXSwidXAiOls5MC4wLDM0MS4xNjAwMDM2NjIxMDldfSwiY2VudGVyIjpbOTAuMCwzOTMuMF0sImVuYWJsZWQiOnRydWUsImluc3RhbmNlX2lkIjoiMzQ4Mjc4MjM0MDQyIiwicmVjdCI6WzkuMCwzMTIuMCwxNjIuMCwxNjIuMF0s",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 9 17 InZpc2libGUiOnRydWV9LCJwYWNlIjp7ImNlbnRlciI6Wzg5NS41LDQ1MS41XSwiZW5hYmxlZCI6dHJ1ZSwiaW5zdGFuY2VfaWQiOiIzNDg3OTgzMjc3ODgiLCJyZWN0IjpbODQwLjAsNDI5LjAsMTExLjAsNDUuMF0sInZpc2libGUiOnRydWV9LCJwYXVzZSI6eyJjZW50ZXIiOls5MTYuODc1LDMzLjBdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjM0NTkyOTQyMzk1MiIsInJlY3QiOls4OTAuMjUsMTUuMCw1My4yNSwzNi4wXSwidmlzaWJsZSI6dHJ1ZX0sInRlY2huaXF1ZXMiOnsiY2VudGVyIjpbNzc4LjUsNDUxLjVdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjM0ODcxNDQ0MTI4NyIsInJlY3QiOls3MjMuMCw0MjkuMCwxMTEuMCw0NS4wXSwidmlzaWJs",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 10 17 ZSI6dHJ1ZX0sInZpbGxhZ2UiOnsiY2VudGVyIjpbNjY2LjAsNTA3LjBdLCJlbmFibGVkIjp0cnVlLCJpbnN0YW5jZV9pZCI6IjM0NzEwMzgyOTIxMiIsInJlY3QiOls1NzUuMjUsNDg5LjAsMTgxLjUsMzYuMF0sInZpc2libGUiOnRydWV9fSwiZGVjaW11c19tZXQiOmZhbHNlLCJmZWVkYmFjayI6IiIsImdyYXBoaWNzX3J1bnRpbWUiOnsidWlfcHJvZmlsZSI6ImxvdyIsIndvcmxkX3Byb2ZpbGUiOiJsb3cifSwibWVzaHlfcnVudGltZSI6eyJsb2FkZWRfY291bnQiOjEsInNldmVydXMiOnsiYXNzZXRfaWQiOiJ1bml0X3JvbWFuX3NpZ25pZmVyIiwiYm9uZV9jb3VudCI6MTUsImNsaXAiOiJpZGxlIiwiZXF1aXBtZW50IjpbeyJhc3NldF9pZCI6ImdlYXJfcm9tYW5fc2lnbnVt",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 11 17 IiwiYm9uZSI6IkhhbmRfUiIsImJvdW5kIjp0cnVlLCJtZXNoX2NvdW50IjoxLCJtb2RlbF9wYXRoIjoicmVzOi8vYXNzZXRzL21lc2h5L2VxdWlwbWVudC9nZWFyX3JvbWFuX3NpZ251bV8xLmdsYiJ9XSwiaGFzX21hcmNoIjp0cnVlLCJoYXNfcnVuIjp0cnVlLCJsb2FkZWQiOnRydWUsIm1lc2hfY291bnQiOjIsIm1vZGVsX3BhdGgiOiJyZXM6Ly9hc3NldHMvbWVzaHkvY2hhcmFjdGVycy91bml0X3JvbWFuX3NpZ25pZmVyXzMuZ2xiIn0sInZlcnNpb24iOjF9LCJwZW9wbGUiOjE0LCJwbGF5ZXJfaXNfcnVsZXIiOmZhbHNlLCJzYXZlZF9iZWhhdmlvcl9ydW50aW1lIjp7ImFjY3VtdWxhdG9yIjowLjAsImFjdGl2aXR5X2NvdW50cyI6eyJwYXRyb2wiOjUsInNvY2lhbGl6ZSI6",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 12 17 Nywid29yayI6MzB9LCJiZWhhdmlvcl92ZXJzaW9uIjoxLCJkZWNpc2lvbl9kdWVfY291bnQiOjAsImVudmVsb3BlX3NoYTI1NiI6IjFjZGZmYjA3NDVhNTUyNTk5ZGU2YWNiOTcxY2YzYzYyOTY5Y2U0NDk5YmFmNzQ1ZjNiYmMwMjVhY2ZkNDhlMGEiLCJvYnNlcnZlZF9jb3VudCI6NDIsInBheWxvYWRfc2hhMjU2IjoiOTA1MmEzZmU5OWQ0MjQxZGEwMjMxYTVjY2FiNTUyMzMzOWRlYjIyM2I1ZmRiZTk3MzUzNWNlYjQ4MDg0YTk4MiIsInBlb3BsZV9jb3VudCI6NDIsInJvc3Rlcl9zaGEyNTYiOiI0YWI3NGI5NWRjMTY3YzI0MmU2ZjhmYzYwYTEzNDIzOTYyZGZkZDk0ZTVhNzA3NTgzYzFjYTczNDZhZjEwYjI3Iiwic2FtcGxlcyI6eyJhZWxpYSI6eyJhY3Rpdml0eSI6Indvcmsi",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 13 17 LCJmYXRpZ3VlIjoxOC4wLCJpbnRlcmVzdCI6ImNyYWZ0IiwibGFzdF9ncmVldCI6LTEwMDAuMCwibGFzdF90cnVzdCI6MC4wLCJtZW1vcmllcyI6W10sIm5leHRfZGVjaXNpb24iOjMuMCwib2JzZXJ2ZWQiOnRydWUsInBhcnRuZXIiOiIiLCJwb3NpdGlvbiI6WzIwLjAsMC4wLDE3LjBdLCJyZWFzb24iOiJkYWlseV93b3JrIiwicm91dGVfZGlyZWN0aW9uIjoxLjAsInJvdXRlX2Rpc3RhbmNlIjowLjAsInNpbmNlIjowLjAsInNvY2lhbF9uZWVkIjozNy4wLCJzdHJlc3MiOjAuMH0sImp1bGlhIjp7ImFjdGl2aXR5Ijoid29yayIsImZhdGlndWUiOjEzLjAsImludGVyZXN0IjoiZmFtaWx5IiwibGFzdF9ncmVldCI6LTEwMDAuMCwibGFzdF90cnVzdCI6NC4wLCJtZW1vcmllcyI6",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 14 17 W10sIm5leHRfZGVjaXNpb24iOjQuNzUsIm9ic2VydmVkIjp0cnVlLCJwYXJ0bmVyIjoiIiwicG9zaXRpb24iOlstMTUuMzAwMDAwMTkwNzM0OSwwLjAsMTQuODAwMDAwMTkwNzM0OV0sInJlYXNvbiI6ImRhaWx5X3dvcmsiLCJyb3V0ZV9kaXJlY3Rpb24iOjEuMCwicm91dGVfZGlzdGFuY2UiOjAuMCwic2luY2UiOjAuMCwic29jaWFsX25lZWQiOjI3LjAsInN0cmVzcyI6MC4wfSwibWFyY3VzIjp7ImFjdGl2aXR5Ijoid29yayIsImZhdGlndWUiOjEwLjAsImludGVyZXN0IjoibGVhcm5pbmciLCJsYXN0X2dyZWV0IjotMTAwMC4wLCJsYXN0X3RydXN0IjowLjAsIm1lbW9yaWVzIjpbXSwibmV4dF9kZWNpc2lvbiI6My43NSwib2JzZXJ2ZWQiOnRydWUsInBhcnRuZXIiOiIiLCJw",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 15 17 b3NpdGlvbiI6Wy0zLjAsMC44OTk5OTk5NzYxNTgxNDIsNC4wXSwicmVhc29uIjoiZGFpbHlfd29yayIsInJvdXRlX2RpcmVjdGlvbiI6MS4wLCJyb3V0ZV9kaXN0YW5jZSI6MC4wLCJzaW5jZSI6MC4wLCJzb2NpYWxfbmVlZCI6NTEuMCwic3RyZXNzIjowLjB9LCJzZXh0dXMiOnsiYWN0aXZpdHkiOiJ3b3JrIiwiZmF0aWd1ZSI6OC4wLCJpbnRlcmVzdCI6ImNyYWZ0IiwibGFzdF9ncmVldCI6LTEwMDAuMCwibGFzdF90cnVzdCI6MC4wLCJtZW1vcmllcyI6W10sIm5leHRfZGVjaXNpb24iOjQuNSwib2JzZXJ2ZWQiOnRydWUsInBhcnRuZXIiOiIiLCJwb3NpdGlvbiI6WzMyLjc5OTk5OTIzNzA2MDUsMC4wLC0yNS4wXSwicmVhc29uIjoiZGFpbHlfd29yayIsInJvdXRlX2RpcmVj",
+    "11-24 07:10:26.940  3235  3311 I godot   : IMPERATHEN_VILLAGE_RUNTIME_CHUNK 184817817419-13 16 17 dGlvbiI6MS4wLCJyb3V0ZV9kaXN0YW5jZSI6MC4wLCJzaW5jZSI6MC4wLCJzb2NpYWxfbmVlZCI6MzguMCwic3RyZXNzIjowLjB9fSwic2Vjb25kcyI6MC4wLCJzdGF0ZV9zaGEyNTYiOiI2N2U5ODM3ZjAwZTBiNmE4ZTRjODRiNjQzNjU2NzMzYTMzZTQwMzg0NDYxZjY5Zjc2ZDE1OGRmYTg0N2I5ODQwIiwidmVyc2lvbiI6MSwid29ybGRfaWQiOiI1NjI5MzYzNi0zODg2ODQ2MTcxIn0sInNjcmVlbiI6InBsYXlpbmciLCJ3b3JrX3Blcm1pdCI6ZmFsc2UsIndvcmtwbGFjZXMiOjUsIndvcmxkX3NlY29uZHMiOjAuNzgzMzMzMzMzMzMzMzMzfQ=="
+  ]
+}

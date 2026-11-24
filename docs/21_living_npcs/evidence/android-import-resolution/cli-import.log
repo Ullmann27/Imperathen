@@ -1,0 +1,11 @@
+usage: android_runtime_smoke.py [-h] --adb ADB --apk APK --output OUTPUT
+                                [--device-apk DEVICE_APK]
+
+options:
+  -h, --help            show this help message and exit
+  --adb ADB
+  --apk APK
+  --output OUTPUT
+  --device-apk DEVICE_APK
+                        Also run the actual ARM64 download if the emulator
+                        supports translation

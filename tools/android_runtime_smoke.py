@@ -21,6 +21,8 @@ import time
 import xml.etree.ElementTree as ET
 import zipfile
 
+from validate_android_apk import record_payload_hash, resolve_resource
+
 
 VILLAGE_RUNTIME_MARKER = "IMPERATHEN_VILLAGE_RUNTIME "
 
@@ -442,6 +444,23 @@ def meshy_runtime_state(snapshot):
             or re.fullmatch(r"res://assets/meshy/equipment/gear_roman_signum_[01]\.glb", standard["model_path"]) is None):
         raise RuntimeError("The actual standard is not loaded on the Meshy signifer's hand")
     return state
+
+
+def meshy_runtime_package_check(snapshot, archive):
+    """Bind actual loaded models to nonempty exported APK payloads and hashes."""
+    state = meshy_runtime_state(snapshot)
+    paths = [state["severus"]["model_path"]] + [prop["model_path"] for prop in state["severus"]["equipment"]]
+    names = set(archive.namelist())
+    resources = []
+    for path in paths:
+        resource = resolve_resource(archive, names, path.removeprefix("res://"))
+        record_payload_hash(archive, resource)
+        resources.append(resource)
+    passed = all(resource["entry"] is not None and resource.get("size_bytes", 0) > 0 for resource in resources)
+    return passed, {"packaged_models": ["assets/" + path.removeprefix("res://") for path in paths],
+                    "packaged_resources": resources,
+                    "hash_scope": "SHA-256 of the actual exported APK payloads and import remaps, not source GLB bytes.",
+                    **state}
 
 
 def verify_native_gait(evidence):
@@ -1205,11 +1224,9 @@ def main():
         return second
 
     def verify_meshy_actor(snapshot, name):
-        state = meshy_runtime_state(snapshot)
-        paths = [state["severus"]["model_path"]] + [prop["model_path"] for prop in state["severus"]["equipment"]]
-        packaged = ["assets/" + path.removeprefix("res://") for path in paths]
-        record(name, all(path in entries or path + ".remap" in entries for path in packaged),
-               {"packaged_models": packaged, **state})
+        with zipfile.ZipFile(args.apk) as archive:
+            passed, evidence = meshy_runtime_package_check(snapshot, archive)
+        record(name, passed, evidence)
 
     def exercise_npc_behavior():
         initial = village_snapshot("playing", required_control="move_pad")

@@ -2,15 +2,20 @@
 
 import base64
 import copy
+import hashlib
 import importlib.util
+import io
 import json
 import math
 from pathlib import Path
+import sys
 import unittest
 from unittest.mock import Mock, patch
+import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
 SPEC = importlib.util.spec_from_file_location("android_runtime_smoke", ROOT / "tools/android_runtime_smoke.py")
 SMOKE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SMOKE)
@@ -1041,6 +1046,103 @@ class MeshyRuntimeObservationTest(unittest.TestCase):
             snapshot["meshy_runtime"]["severus"]["equipment"][0].update(change)
             with self.subTest(change=change), self.assertRaisesRegex(RuntimeError, "not loaded"):
                 SMOKE.meshy_runtime_state(snapshot)
+
+
+class MeshyRuntimePackageTest(unittest.TestCase):
+    # These ZIP fixtures model Godot's real .glb.import -> .scn export layout;
+    # their small payloads are synthetic and are not Android execution evidence.
+    SOURCES = ("assets/meshy/characters/unit_roman_signifer_3.glb",
+               "assets/meshy/equipment/gear_roman_signum_1.glb")
+    TARGETS = (".godot/imported/unit_roman_signifer_3.glb-3f9de47102dce13d8dac1fbd15439a0b.scn",
+               ".godot/imported/gear_roman_signum_1.glb-ed3f3f24147c65525ffd258d4e901e2e.scn")
+
+    def exported_entries(self):
+        entries = {}
+        for index, (source, target) in enumerate(zip(self.SOURCES, self.TARGETS)):
+            entries["assets/" + source + ".import"] = (
+                '[remap]\nimporter="scene"\nimporter_version=1\ntype="PackedScene"\n'
+                f'path="res://{target}"\n\n[deps]\nsource_file="res://{source}"\n'
+                f'dest_files=["res://{target}"]\n').encode()
+            entries["assets/" + target] = b"RSCC" + ("synthetic exported scene " + str(index)).encode()
+        return entries
+
+    def inspect(self, entries, snapshot=None):
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, "w") as archive:
+            for path, payload in entries.items():
+                archive.writestr(path, payload)
+        with zipfile.ZipFile(data) as archive:
+            return SMOKE.meshy_runtime_package_check(meshy_snapshot() if snapshot is None else snapshot, archive)
+
+    def test_imports_resolve_body_and_standard_and_record_exact_payload_hashes(self):
+        entries = self.exported_entries()
+        passed, evidence = self.inspect(entries)
+        self.assertTrue(passed)
+        self.assertEqual(evidence["severus"], meshy_snapshot()["meshy_runtime"]["severus"])
+        self.assertEqual(evidence["packaged_models"], ["assets/" + source for source in self.SOURCES])
+        self.assertEqual(len(evidence["packaged_resources"]), 2)
+        for source, target, resource in zip(self.SOURCES, self.TARGETS, evidence["packaged_resources"]):
+            remap = "assets/" + source + ".import"
+            entry = "assets/" + target
+            self.assertEqual(resource, {"source": source, "entry": entry, "remap": remap, "mode": "remapped",
+                                       "size_bytes": len(entries[entry]), "sha256": hashlib.sha256(entries[entry]).hexdigest(),
+                                       "remap_sha256": hashlib.sha256(entries[remap]).hexdigest()})
+
+    def test_nonempty_direct_models_remain_supported(self):
+        entries = {"assets/" + source: b"glTF" + source.encode() for source in self.SOURCES}
+        passed, evidence = self.inspect(entries)
+        self.assertTrue(passed)
+        for resource in evidence["packaged_resources"]:
+            self.assertEqual(resource["mode"], "direct")
+            self.assertEqual(resource["sha256"], hashlib.sha256(entries[resource["entry"]]).hexdigest())
+
+    def test_missing_body_or_standard_cannot_pass_the_other_model(self):
+        for missing in self.SOURCES:
+            entries = self.exported_entries()
+            del entries["assets/" + missing + ".import"]
+            with self.subTest(missing=missing):
+                passed, evidence = self.inspect(entries)
+                self.assertFalse(passed)
+                self.assertEqual([item["source"] for item in evidence["packaged_resources"] if item["entry"] is None], [missing])
+
+    def test_import_without_its_target_scene_fails(self):
+        for target in self.TARGETS:
+            entries = self.exported_entries()
+            del entries["assets/" + target]
+            with self.subTest(target=target):
+                self.assertFalse(self.inspect(entries)[0])
+
+    def test_empty_import_target_scene_fails(self):
+        for target in self.TARGETS:
+            entries = self.exported_entries()
+            entries["assets/" + target] = b""
+            with self.subTest(target=target):
+                self.assertFalse(self.inspect(entries)[0])
+
+    def test_loose_import_cannot_be_satisfied_by_an_unreferenced_scene(self):
+        for source in self.SOURCES:
+            entries = self.exported_entries()
+            entries["assets/" + source + ".import"] = b'[remap]\nimporter="scene"\ntype="PackedScene"\n'
+            with self.subTest(source=source):
+                self.assertFalse(self.inspect(entries)[0])
+
+    def test_empty_direct_model_is_not_a_payload(self):
+        for missing in self.SOURCES:
+            entries = {"assets/" + source: b"glTF" for source in self.SOURCES}
+            entries["assets/" + missing] = b""
+            with self.subTest(missing=missing):
+                self.assertFalse(self.inspect(entries)[0])
+
+    def test_valid_package_cannot_replace_actual_rig_and_hand_observation(self):
+        for field, value in (("loaded", False), ("bone_count", 0), ("has_march", False)):
+            snapshot = meshy_snapshot()
+            snapshot["meshy_runtime"]["severus"][field] = value
+            with self.subTest(field=field), self.assertRaises(RuntimeError):
+                self.inspect(self.exported_entries(), snapshot)
+        snapshot = meshy_snapshot()
+        snapshot["meshy_runtime"]["severus"]["equipment"][0]["bound"] = False
+        with self.assertRaisesRegex(RuntimeError, "not loaded"):
+            self.inspect(self.exported_entries(), snapshot)
 
 
 class NativeGaitObservationTest(unittest.TestCase):

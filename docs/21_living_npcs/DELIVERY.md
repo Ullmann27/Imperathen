@@ -75,8 +75,10 @@ Die Quelldateien werden nicht zusätzlich in die Android-App aufgenommen.
 
 Der endgültige lokale Gesamtlauf besteht **alle 55 Godot-Prüfgruppen**:
 [validation_report.json](evidence/engine/validation_report.json).
-Die Werkzeug- und Paketkontrollen bestehen **131 Python-Prüfungen**:
-[python-tooling.json](evidence/python-tooling.json).
+Die Werkzeug- und Paketkontrollen bestanden zunächst **131 Python-Prüfungen**:
+[python-tooling.json](evidence/python-tooling.json). Nach der unten beschriebenen
+Importkorrektur bestehen **139 Python-Prüfungen**:
+[python-tooling-followup.json](evidence/python-tooling-followup.json).
 Die Körperprüfung umfasst 184 Headless- und 204 Viewport-Prüfungen; die endgültige
 Ausrüstung besteht 138 Prüfungen einschließlich zehn geprüfter Ansichten.
 Der [reale Export-Pack](evidence/export-pack.json) enthält alle 14 neuen
@@ -107,6 +109,29 @@ Godot-Prozess neu und wird nicht als Android-Prozessneustart ausgewiesen.
 Der zum veröffentlichten APK gehörende CI-Bericht ist der maßgebliche Nachweis
 für die tatsächliche Android-Prüfung. Eine Prüfung auf einem physischen Fold7
 oder eine thermische Dauerprüfung ist dadurch nicht belegt.
+
+### Korrekturen aus dem ersten Android- und Storylauf
+
+Android-Lauf [72](https://github.com/Ullmann27/Imperathen/actions/runs/45344763960)
+baute und validierte beide APKs. Der Emulator bestand 31 Laufzeitprüfungen und
+zeigte Severus mit Skelett und gebundenem Feldzeichen. Die anschließende
+Paketprüfung suchte jedoch nur nach rohen GLBs oder `.remap`-Dateien. Godot hatte
+die Modelle als `.import` mit referenzierten `.scn`-Dateien exportiert.
+
+Der Harness verwendet nun dieselbe Ressourcenauflösung wie die APK-Prüfung,
+verlangt nichtleere Zielbytes für die tatsächlich beobachteten Modelle und
+protokolliert deren Paketpfade und Hashes. Acht zusätzliche Regressionen prüfen
+auch fehlende, leere und nicht korrekt verknüpfte Ressourcen. Die Anforderungen
+an tatsächliche Knochen, Gangarten, Handanbindung, Gehen und Neustart bleiben
+erhalten. [Nachweis und Grenzen](evidence/android-import-resolution/README.md).
+Der abgebrochene Lauf ist kein abgeschlossener Geh- oder Neustartnachweis.
+
+Im separaten Storyworkflow hinterließ ein Test eine gespeicherte Kampagne. Der
+folgende Eröffnungstest erhielt deshalb die korrekte Bestätigungsabfrage für
+einen vorhandenen Spielstand. Jeder Test erhält jetzt eigene temporäre
+Zustandsverzeichnisse und einen begrenzten Timeout. Die betroffene Sequenz
+bestand danach 96 und 45 Prüfungen. Die Sicherheitsabfrage für echte
+Spielstände bleibt unverändert. [Isolationsnachweis](evidence/story-isolation/README.md).
 
 ## Installation und Spielstände
 

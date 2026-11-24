@@ -1,0 +1,43 @@
+{
+  "scope": "Only the previously colliding childhood integration -> opening flow sequence; no import or broad suite",
+  "passed": true,
+  "workflow": ".github/workflows/story-validation.yml",
+  "workflow_sha256": "2f931147315790928fd00e3a8450f52a7a3c100f42a976ef5a875551d415607d",
+  "isolation_function_identical_in_both_steps": true,
+  "all_seven_existing_test_calls_preserved": true,
+  "shell_syntax_check": "bash -n run-targeted.sh: exit 0",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "environment": {
+    "RUNNER_TEMP": "/tmp/imperathen-story-isolation-hd4lq9kr",
+    "GODOT_BIN": "/usr/local/bin/godot",
+    "GODOT_SILENCE_ROOT_WARNING": "1"
+  },
+  "checks": [
+    {
+      "test": "childhood_integration",
+      "command": "bash docs/21_living_npcs/evidence/story-isolation/run-targeted.sh --fixed-fps 60 --script res://tests/childhood_integration_test.gd",
+      "exit_code": 0,
+      "elapsed_seconds": 4.411,
+      "expected_marker": "CHILDHOOD_INTEGRATION_PASS",
+      "marker_found": true,
+      "engine_errors": false,
+      "isolated_state_roots": [
+        "/tmp/imperathen-story-isolation-hd4lq9kr/story-contract.r8cAeR"
+      ],
+      "log": "childhood_integration.log"
+    },
+    {
+      "test": "opening_flow",
+      "command": "bash docs/21_living_npcs/evidence/story-isolation/run-targeted.sh --fixed-fps 60 --script res://tests/opening_flow_test.gd",
+      "exit_code": 0,
+      "elapsed_seconds": 4.557,
+      "expected_marker": "OPENING_FLOW_PASS",
+      "marker_found": true,
+      "engine_errors": false,
+      "isolated_state_roots": [
+        "/tmp/imperathen-story-isolation-hd4lq9kr/story-contract.Du1izq"
+      ],
+      "log": "opening_flow.log"
+    }
+  ]
+}
