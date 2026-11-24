@@ -209,6 +209,9 @@ func _reload(level: int) -> void:
 	_hands.bind(body, active_model_path)
 	_face.bind(body, identity)
 	_motion.bind(body, role in ["player", "companion"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"]), identity)
+	# The external tracks target this authored hero family. Never reuse them
+	# on a differently weighted Meshy or frontier character by bone name alone.
+	_motion.external_gestures = active_model_path.begins_with("res://assets/characters/hero_quality_")
 	# Reattach loaned gear before evaluating an existing shield pose on the
 	# new skeleton. LOD changes must not silently erase a valid guard.
 	_sync_loaned_gear()
