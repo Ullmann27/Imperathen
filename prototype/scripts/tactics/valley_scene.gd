@@ -147,6 +147,7 @@ func _sync_units() -> void:
 	var live := {}
 	var distant := {}
 	var far_gaits := {}
+	var far_starts := {}
 	var roster := {}
 	var ranked := []
 	var near_limit := float({"low":13, "balanced":18, "high":25, "very_high":35}[profile])
@@ -187,16 +188,16 @@ func _sync_units() -> void:
 			if id == s.officer_id and s.side == "ally" and s.kind == "infantry":
 				role = "officer"
 			counts[detail] += 1
-			_sample_motion(id, destination, float(man.facing)+PI, man.pose, s.formation)
+			_sample_motion(id, destination, float(man.facing)+PI, man.pose, s.formation, role)
 			if detail == 2:
 				if not distant.has(role):
 					distant[role] = []
 					far_gaits[role] = []
+					far_starts[role] = []
 				var track: Dictionary = motion[id]
-				var travel := Vector3(track.start).distance_to(track.end)
-				var walking := Soldier.STRIDES.has(track.pose)
-				distant[role].append(Transform3D(Basis(Vector3.UP, track.yaw), destination))
-				far_gaits[role].append(Color(track.phase0, track.phase1-track.phase0, minf(travel*0.5, 1.0), 1.0 if walking else 0.0))
+				distant[role].append(Transform3D(Basis(Vector3.UP,track.yaw),track.end))
+				far_starts[role].append(Transform3D(Basis(Vector3.UP,track.start_yaw),track.start))
+				far_gaits[role].append(far_ranks.gait_data(track.pose,track.phase0,track.phase1))
 				if actors.has(id):
 					actors[id].queue_free()
 					actors.erase(id)
@@ -217,7 +218,7 @@ func _sync_units() -> void:
 			node.set_detail(detail)
 
 			i += 1
-	far_ranks.sync(distant, far_gaits)
+	far_ranks.sync(distant, far_gaits, far_starts)
 	get_node("/root/RuntimeDisplay").set_unit_counts(counts[0],counts[1],counts[2])
 	for id in actors.keys():
 		if not live.has(id):
@@ -228,7 +229,7 @@ func _sync_units() -> void:
 			fade.tween_interval(1.25)
 			fade.tween_callback(fallen.queue_free)
 
-func _sample_motion(id: String, destination: Vector3, yaw: float, pose: String, formation: String) -> void:
+func _sample_motion(id: String, destination: Vector3, yaw: float, pose: String, formation: String, role: String = "heavy") -> void:
 	var first_sample := not motion.has(id)
 	if first_sample:
 		# Adjacent files keep the same cadence with individual placement across
@@ -237,22 +238,24 @@ func _sample_motion(id: String, destination: Vector3, yaw: float, pose: String, 
 		var heading := Vector2(sin(yaw),cos(yaw))
 		seed_phase = fposmod(seed_phase + Vector2(destination.x,destination.z).dot(heading)/float(Soldier.STRIDES.march),1.0)
 		motion[id] = {"step":-1, "start":destination, "end":destination, "start_yaw":yaw, "yaw":yaw,
-			"phase0":seed_phase, "phase1":seed_phase, "pose":"idle"}
+			"phase0":seed_phase, "phase1":seed_phase, "stride_phase":seed_phase, "pose":"idle"}
 	var track: Dictionary = motion[id]
 	if track.step == model.steps:
 		return
 	var displacement := Vector2(destination.x-track.end.x,destination.z-track.end.z)
 	var distance := displacement.length()
-	var period := maxi(1,model.steps-int(track.step))*Rules.STEP
+	var period := 0.0 if first_sample else maxi(1,model.steps-int(track.step))*Rules.STEP
 	track.start = track.end
 	track.end = destination
 	track.start_yaw = track.yaw
 	track.yaw = yaw
-	track.phase0 = fposmod(track.phase1,1.0)
+	track.phase0 = fposmod(track.phase1,1.0) if track.pose in Soldier.LOOPING else track.phase1
 	track.phase1 = track.phase0
 	if pose in ["walk","idle","retreat"] and distance > 0.018:
-		pose = "retreat" if pose == "retreat" else ("run" if distance / period > 2.65 else "march")
-		track.phase1 += distance / float(Soldier.STRIDES[pose])
+		pose = "retreat" if pose == "retreat" else ("run" if distance / maxf(.001,period) > 2.65 else "march")
+		track.phase0 = float(track.stride_phase)
+		track.phase1 = track.phase0+distance/float(Soldier.STRIDES[pose])
+		track.stride_phase = fposmod(track.phase1,1.0)
 		if hud.probe_step >= 0 and model.steps > hud.probe_step:
 			hud.report_first_stride(model.steps, id, pose, distance)
 		track.yaw = atan2(displacement.x,displacement.y)
@@ -260,6 +263,12 @@ func _sample_motion(id: String, destination: Vector3, yaw: float, pose: String, 
 		pose = ("march" if pose == "walk" else "retreat") if first_sample else "idle"
 	if pose == "idle" and formation in ["shield_wall","testudo"]:
 		pose = "wall" if formation == "shield_wall" else "testudo"
+	if not Soldier.STRIDES.has(pose):
+		if pose != track.pose:
+			track.phase0 = 0.0
+		track.phase1 = track.phase0+period/Soldier.clip_length(role,pose)
+		if pose not in Soldier.LOOPING:
+			track.phase1 = minf(1.0,track.phase1)
 	track.pose = pose
 	track.step = model.steps
 

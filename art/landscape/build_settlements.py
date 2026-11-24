@@ -427,7 +427,8 @@ def build(name,folder):
     bpy.ops.wm.save_as_mainfile(filepath=str(SOURCE/(name+".blend")),compress=True)
     path=OUTPUT/(name+".glb")
     bpy.ops.export_scene.gltf(filepath=str(path),export_format="GLB",export_animations=name.endswith("farmer"),
-                              export_animation_mode="NLA_TRACKS",export_frame_step=2)
+                              export_animation_mode="NLA_TRACKS",export_frame_step=1,
+                              export_frame_range=False)
     return {"name":name,"triangles":len(obj.data.loop_triangles),"bytes":path.stat().st_size}
 
 

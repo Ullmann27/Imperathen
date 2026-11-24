@@ -310,7 +310,7 @@ static func apply_unarmed_hit(data: Dictionary, target_id: String, damage: int) 
 	return true
 
 
-static func advance(data: Dictionary, delta: float, sight_check: Callable = Callable(), motion_check: Callable = Callable()) -> bool:
+static func advance(data: Dictionary, delta: float, sight_check: Callable = Callable(), motion_check: Callable = Callable(), observed_raiders: Dictionary = {}) -> bool:
 	if not is_finite(delta) or delta<=0.0 or delta>3600.0 or not validate(data).is_empty():
 		return false
 	var social: Dictionary = data.village.social
@@ -321,12 +321,12 @@ static func advance(data: Dictionary, delta: float, sight_check: Callable = Call
 		if social.accumulator<0.00000001:
 			social.accumulator = 0.0
 		social.seconds = snappedf(float(social.seconds)+STEP,STEP)
-		_tick(data, sight_check, motion_check)
+		_tick(data, sight_check, motion_check, observed_raiders)
 		changed = true
 	return changed
 
 
-static func _tick(data: Dictionary, sight_check: Callable = Callable(), motion_check: Callable = Callable()) -> void:
+static func _tick(data: Dictionary, sight_check: Callable = Callable(), motion_check: Callable = Callable(), observed_raiders: Dictionary = {}) -> void:
 	if data.get("encounter",{}).get("active",false):
 		return
 	var raid: Dictionary = data.village.raid
@@ -363,17 +363,19 @@ static func _tick(data: Dictionary, sight_check: Callable = Callable(), motion_c
 				enemy.attack_timer = 1.8
 		else:
 			enemy.attack_timer = 0.9
-			var target := player if point.distance_to(player)<7.0 else Vector2(5.0,5.0)
-			var next_point := point.move_toward(target,0.12)
-			if data.village.has("unarmed"):
-				# New combat never teleports a raider through the live collision world.
-				var checked: Variant = motion_check.call(point, next_point) if motion_check.is_valid() else point
-				if checked is Vector2 and checked.is_finite() and point.distance_to(checked) <= 0.120001:
-					point = checked
-			else:
-				point = next_point
-			enemy.x = point.x
-			enemy.z = point.y
+			if not observed_raiders.has(str(enemy.id)):
+				var target := player if point.distance_to(player)<7.0 else Vector2(5.0,5.0)
+				target = target.clamp(Vector2(-200,-200),Vector2(200,200))
+				var next_point := point.move_toward(target,0.12)
+				if data.village.has("unarmed"):
+					# New combat never teleports a raider through the live collision world.
+					var checked: Variant = motion_check.call(point, next_point) if motion_check.is_valid() else point
+					if checked is Vector2 and checked.is_finite() and point.distance_to(checked) <= 0.120001:
+						point = checked
+				else:
+					point = next_point
+				enemy.x = point.x
+				enemy.z = point.y
 			if point.distance_to(Vector2(5.0,5.0))<2.0:
 				enemy.loot_timer += STEP
 				if float(enemy.loot_timer)>=3.0 and int(raid.stolen)<6:

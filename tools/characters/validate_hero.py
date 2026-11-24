@@ -170,6 +170,36 @@ def animations(document: dict, inspection) -> dict:
     return records
 
 
+def belt_topology(document: dict, inspection) -> dict:
+    """Protect the fitted band from long LOD chords that cut into the tunic."""
+    meshes = [mesh for mesh in document.get("meshes", []) if mesh.get("name") == "HeroBelt"]
+    GATE.require(len(meshes) == 1, "Exactly one fitted HeroBelt mesh is required")
+    primitives = meshes[0]["primitives"]
+    GATE.require(len(primitives) == 1, "HeroBelt must keep its complete single band")
+    primitive = primitives[0]
+    points = inspection.decode(primitive["attributes"]["POSITION"])
+    indices = [row[0] for row in inspection.decode(primitive["indices"])]
+    GATE.require(len(points) >= 64 and len(indices) >= 64 * 3,
+                 "HeroBelt was over-decimated; its fitted circumference is no longer preserved")
+    cx = (min(point[0] for point in points) + max(point[0] for point in points)) * .5
+    cz = (min(point[2] for point in points) + max(point[2] for point in points)) * .5
+    rx = max(abs(point[0] - cx) for point in points)
+    rz = max(abs(point[2] - cz) for point in points)
+    GATE.require(min(rx, rz) > 0, "HeroBelt lacks a positive circumference")
+    angles = [math.atan2((point[2] - cz) / rz, (point[0] - cx) / rx) for point in points]
+    maximum_edge = 0.
+    for index in range(0, len(indices), 3):
+        triangle = indices[index:index + 3]
+        for first, last in zip(triangle, triangle[1:] + triangle[:1]):
+            difference = abs((angles[last] - angles[first] + math.pi) % math.tau - math.pi)
+            maximum_edge = max(maximum_edge, difference)
+    GATE.require(maximum_edge <= math.tau / 32 + 1e-5,
+                 "HeroBelt has a long simplified chord through the fitted waist")
+    return {"vertices": len(points), "triangles": len(indices) // 3,
+            "largest_circumferential_edge_degrees": math.degrees(maximum_edge),
+            "scope": "Rest topology only; animated garment clearance is checked separately"}
+
+
 def inspect_asset(path: Path, level: int) -> dict:
     result = {"path": display_path(path), "lod": level, "status": "failed",
               "errors": [], "warnings": []}
@@ -208,6 +238,7 @@ def inspect_asset(path: Path, level: int) -> dict:
         result["skin_weights"] = skin_weights(document, inspection, mesh_skins)
         result["body_morphs"] = body_morphs(document, inspection, mesh_skins)
         result["clips"] = animations(document, inspection)
+        result["belt_topology"] = belt_topology(document, inspection)
         result["status"] = "passed"
     except EXPECTED_EXCEPTIONS as exc:
         result["errors"].append(f"{type(exc).__name__}: {exc}")

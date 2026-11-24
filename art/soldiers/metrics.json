@@ -16,9 +16,9 @@
   {
     "role": "heavy",
     "lod": "far",
-    "triangles": 170,
+    "triangles": 210,
     "bones": 0,
-    "bytes": 23244
+    "bytes": 26048
   },
   {
     "role": "spear",
@@ -37,9 +37,9 @@
   {
     "role": "spear",
     "lod": "far",
-    "triangles": 168,
+    "triangles": 208,
     "bones": 0,
-    "bytes": 22976
+    "bytes": 25780
   },
   {
     "role": "archer",
@@ -58,9 +58,9 @@
   {
     "role": "archer",
     "lod": "far",
-    "triangles": 136,
+    "triangles": 176,
     "bones": 0,
-    "bytes": 20932
+    "bytes": 23736
   },
   {
     "role": "officer",
@@ -79,8 +79,8 @@
   {
     "role": "officer",
     "lod": "far",
-    "triangles": 198,
+    "triangles": 238,
     "bones": 0,
-    "bytes": 25148
+    "bytes": 27948
   }
 ]

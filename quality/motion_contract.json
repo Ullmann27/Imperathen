@@ -78,7 +78,221 @@
         "lod_transition",
         "military_equipment"
       ],
-      "open_requirements": []
+      "open_requirements": [],
+      "subject_scenarios": {
+        "assets/characters/frontier_archer_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_archer_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_archer_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_archer_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_civilian_man_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_man_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_man_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_man_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_woman_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_woman_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_woman_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_woman_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_elder_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_elder_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_elder_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_elder_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_legionary_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_legionary_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_legionary_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_legionary_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_officer_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_officer_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_officer_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_officer_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_spearman_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_spearman_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_spearman_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_spearman_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ]
+      }
     },
     {
       "id": "legacy_people",
@@ -205,7 +419,8 @@
         "assets/landscape/wa_farmer.glb"
       ],
       "required_checks": [
-        "landscape"
+        "landscape",
+        "regional_workers"
       ],
       "review_scope": [
         "idle_talk",

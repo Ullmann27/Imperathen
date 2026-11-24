@@ -50,6 +50,14 @@ func _run() -> void:
 		for level in 4:
 			person._reload(level)
 			_check(person.active_model_path == Registry.PATH % [id, level], id + " exact imported tier " + str(level))
+			person.reset_motion()
+			person.drive(1.30)
+			person._check_lod = 1.0
+			_check(absf(person.locomotion_stride("march") - 1.30) < .0001, id + " authored walk stride at tier " + str(level))
+			_check(absf(person.locomotion_stride("run") - 1.75) < .0001, id + " authored run stride at tier " + str(level))
+			for frame in 30:
+				person._process(1.0 / 60.0)
+			_check(person.clip == "march" and absf(person.phase - .5) < .002, id + " half stride advances half a cycle without skating")
 			var meshes: Array[MeshInstance3D] = []
 			for candidate: Node in person.body.find_children("*", "MeshInstance3D", true, false):
 				var candidate_mesh := candidate as MeshInstance3D
