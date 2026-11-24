@@ -71,6 +71,8 @@ func _ready() -> void:
 	ui.action_requested.connect(_on_ui_action)
 	world.set_quality(ui.get_quality())
 	_setup_ambient()
+	# The title sequence is opaque; the village is not drawn underneath it.
+	world.hide()
 	ui.show_intro()
 	if OS.is_debug_build() and OS.has_feature("android"):
 		var diagnostics = preload("res://scripts/ui/android_village_diagnostics.gd").new()
@@ -228,8 +230,10 @@ func _show_menu() -> void:
 	frontier_npc = ""
 	world.clear_frontier_focus()
 	screen = "menu"
+	world.show()
 	world.set_active(false)
 	world.set_mode("city")
+	world.set_menu_flight(not bool(ui.opening_preferences().get("reduce_motion", false)))
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	ui.show_menu(FileAccess.file_exists(SAVE_PATH) or FileAccess.file_exists(SAVE_PATH + ".bak"))
 	_log_menu_geometry.call_deferred()

@@ -76,6 +76,8 @@ var _shown_work := -1.0
 var _figure: VillagePerson
 var _camera: Camera3D
 var _camera_initialized := false
+var _menu_flight := false
+var _flight_time := 0.0
 var _companion: Node3D
 var _companion_label: Label3D
 var _training_label: Label3D
@@ -223,6 +225,7 @@ func set_mode(mode: String) -> void:
 		_player.velocity.z = 0.0
 	if mode != "city":
 		set_build_mode(false)
+		set_menu_flight(false)
 	if _plot != null:
 		_plot.visible = mode == "city" and _active
 	if _markers != null:
@@ -235,8 +238,21 @@ func set_mode(mode: String) -> void:
 	_update_context_hint()
 
 
+## Slow camera drift over the frontier behind the main menu (off for reduced motion).
+func set_menu_flight(enabled: bool) -> void:
+	_menu_flight = enabled and _mode == "city"
+	if not _menu_flight:
+		_flight_time = 0.0
+
+
+func is_menu_flight() -> bool:
+	return _menu_flight
+
+
 func set_active(active: bool) -> void:
 	_active = active
+	if active:
+		set_menu_flight(false)
 	population.set_active(active)
 	if village_life_world != null:
 		village_life_world.set_active(active)
@@ -268,6 +284,7 @@ func get_player_position() -> Vector3:
 
 func prepare_cinematic_camera() -> void:
 	# Settle the ordinary camera first so the closing shot has an exact target.
+	set_menu_flight(false)
 	_camera_initialized = false
 	_update_camera(0.0)
 	_camera.make_current()
@@ -1197,7 +1214,12 @@ func _update_camera(delta: float) -> void:
 		target += Vector3(0.36, 0.05, -3.6).rotated(Vector3.UP, _camera_yaw)
 	elif _mode == "city":
 		target = _city_focus
-		desired = target + Vector3(10, 38, 28)
+		var orbit := Vector3(10, 38, 28)
+		if _menu_flight and not _active:
+			_flight_time += delta
+			target += Vector3(sin(_flight_time * 0.045) * 7.0, 0, sin(_flight_time * 0.031) * 5.0)
+			orbit = orbit.rotated(Vector3.UP, sin(_flight_time * 0.02) * 0.3)
+		desired = target + orbit
 		_camera.size = _city_zoom
 	else:
 		target = _map_focus
