@@ -415,6 +415,8 @@ def make_source(kind):
         arm = soldier_identity(kind, arm)
     else:
         civilian_identity(kind, arm)
+    hero.fit_belt_clearance(bpy.data.objects["HeroBelt"],
+                            [bpy.data.objects["HeroTunic"], bpy.data.objects["HeroTunicSkirt"]])
     arm.name = "FrontierRig"
     for obj in bpy.context.scene.objects:
         if obj.type == "MESH":
@@ -424,6 +426,12 @@ def make_source(kind):
 
 
 def simplify(obj, ratio, morphs):
+    if obj.name == "HeroBelt":
+        # Its 96 triangles keep the closed fitted waist visible. A global LOD
+        # ratio turns the ring into long chords that disappear into the tunic.
+        if not morphs and obj.data.shape_keys:
+            obj.shape_key_clear()
+        return
     if ratio >= 1 or len(obj.data.vertices) < 24:
         return
     deltas = {}
@@ -466,6 +474,8 @@ def export(kind):
             if obj.type == "MESH":
                 simplify(obj, ratio, level < 2)
             obj.select_set(obj.type in ("MESH", "ARMATURE"))
+        belt_fit = hero.fit_belt_clearance(bpy.data.objects["HeroBelt"],
+                                           [bpy.data.objects["HeroTunic"], bpy.data.objects["HeroTunicSkirt"]])
         for image in bpy.data.images:
             if max(image.size) > edge:
                 factor = edge / max(image.size)
@@ -483,7 +493,7 @@ def export(kind):
                 count += len(obj.data.loop_triangles)
         records.append({"lod": level, "path": str(path.relative_to(ROOT)), "triangles": count,
                         "bytes": path.stat().st_size, "sha256": digest(path), "texture_edge": edge,
-                        "face_morphs": level < 2})
+                        "face_morphs": level < 2, "belt_fit": belt_fit})
     return records
 
 

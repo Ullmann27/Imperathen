@@ -64,6 +64,8 @@ func _ready() -> void:
 	model.combat_sight_check = world.combat_sight_clear
 	model.combat_motion_check = world.combat_safe_motion
 	model.npc_observations = world.npc_observations
+	model.raid_observations = world.raid_observations
+	world.set_raid_physics_authority(true)
 	world.set_active(false)
 	world.set_mode("city")
 	ui = UIScript.new()

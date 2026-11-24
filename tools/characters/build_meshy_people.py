@@ -435,8 +435,17 @@ def bind(body, arm, profile):
 def animate(arm):
     def pose(clip, t, role):
         if clip == "idle":
-            return {"Spine": (.35 * math.sin(t * math.tau), 0, 0),
-                    "Head": (0, 0, .8 * math.sin(t * math.tau))}, 0
+            # A complete, seam-free breathing/attention cycle remains visible
+            # at gameplay distance without sliding the planted legs. The head
+            # counters the small shoulder sway rather than moving as one block.
+            wave = math.sin(t * math.tau)
+            breath = math.sin(t * math.tau * 2)
+            return {"Spine": (1.15 * breath, .7 * wave, 0),
+                    "Head": (-.6 * breath, -.5 * wave, 2.5 * wave),
+                    "Arm_L": (.7 * breath, 0, -.6 * wave),
+                    "Arm_R": (-.7 * breath, 0, -.6 * wave),
+                    "Forearm_L": (-1.2 * wave, 0, 0),
+                    "Forearm_R": (1.2 * wave, 0, 0)}, 0
         if clip in ("march", "run"):
             running = clip == "run"
             stride, stance = (1.75, .40) if running else (1.30, .56)
@@ -451,12 +460,24 @@ def animate(arm):
                     swing = (u - stance) / (1 - stance)
                     forward = stride * (stance / 2 + (1 - stance) * swing - swing * swing * (3 - 2 * swing))
                     foot_lift = (.12 if running else .075) * math.sin(math.pi * swing) ** 2
-                upper, lower = (arm.data.bones[name + side].length for name in ("Thigh_", "Shin_"))
-                height = arm.data.bones["Thigh_" + side].head_local.z + lift - arm.data.bones["Foot_" + side].head_local.z - foot_lift
-                reach = min(math.hypot(forward, height), upper + lower - .00001)
-                hip = math.atan2(forward, height) - math.acos(clamp((upper * upper + reach * reach - lower * lower) / (2 * upper * reach), -1, 1))
+                thigh = arm.data.bones["Thigh_" + side]
+                shin = arm.data.bones["Shin_" + side]
+                foot = arm.data.bones["Foot_" + side]
+                upper, lower = thigh.length, shin.length
+                height = thigh.head_local.z + lift - foot.head_local.z - foot_lift
+                horizontal = forward + foot.head_local.y - thigh.head_local.y
+                reach = min(math.hypot(horizontal, height), upper + lower - .00001)
+                hip = math.atan2(horizontal, height) - math.acos(clamp((upper * upper + reach * reach - lower * lower) / (2 * upper * reach), -1, 1))
                 knee = math.pi - math.acos(clamp((upper * upper + lower * lower - reach * reach) / (2 * upper * lower), -1, 1))
-                a, b = math.degrees(hip), math.degrees(knee)
+                # The fitted rig's thighs/shins are not vertical at rest.
+                # Remove those authored rest inclinations before applying
+                # sagittal IK, otherwise planted ankles drift by about 3 cm.
+                upper_rest = shin.head_local - thigh.head_local
+                lower_rest = foot.head_local - shin.head_local
+                rest_a = math.atan2(upper_rest.y, -upper_rest.z)
+                rest_b = math.atan2(lower_rest.y, -lower_rest.z)
+                a = math.degrees(hip - rest_a)
+                b = math.degrees(knee - (rest_b - rest_a))
                 angles["Thigh_" + side] = (a, 0, 0)
                 angles["Shin_" + side] = (b, 0, 0)
                 angles["Foot_" + side] = (-a - b, 0, 0)

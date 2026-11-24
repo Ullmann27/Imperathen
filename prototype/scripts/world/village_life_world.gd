@@ -18,15 +18,91 @@ var state: Dictionary = {}
 var quality := "balanced"
 var active := false
 var focused := ""
+var _focus_yaw := 0.0
 var _ready_scene := false
 var _wood: StandardMaterial3D
 var _stone: StandardMaterial3D
 var _linen: StandardMaterial3D
+# Domain targets arrive every Life.STEP. Only spawn/restore places a body;
+# ordinary play sweeps towards those targets on the physics clock.
+const RAIDER_SPEED := 0.12 / Life.STEP
+const RAIDER_TURN_SPEED := 5.0
+var _raider_targets: Dictionary = {}
+var _world_id := ""
+var _world_seconds := -1.0
+var _restore_raiders := false
+var physical_raiders := false
+var raider_sight_check: Callable
+
+
+func _physics_process(delta: float) -> void:
+	_advance_raiders(delta)
+
+
+func _advance_raiders(delta: float) -> void:
+	if not active or not visible or delta <= 0.0:
+		return
+	# Bound a delayed frame without replacing the swept collision operation.
+	var elapsed := minf(delta, .1)
+	for id: String in raiders:
+		var actor: CharacterBody3D = raiders[id]
+		var figure: Node3D = actor.get_node("Figure")
+		if not actor.visible or int(actor.get_meta("health",0)) <= 0:
+			figure.drive(0.0)
+			continue
+		var target: Vector3 = _raider_targets.get(id,actor.position)
+		if physical_raiders:
+			var saved: Array = state.get("player",{}).get("position",[0.0,0.0,0.0])
+			var player := Vector2(float(saved[0]),float(saved[2]))
+			var point := Vector2(actor.global_position.x,actor.global_position.z)
+			var near := point.distance_to(player) <= 2.2
+			if state.village.has("unarmed") and near:
+				near = raider_sight_check.is_valid() and bool(raider_sight_check.call(point,player))
+			var goal := point if near else (player if point.distance_to(player) < 7.0 else Vector2(5.0,5.0))
+			goal = goal.clamp(Vector2(-200,-200),Vector2(200,200))
+			target = to_local(Vector3(goal.x,actor.global_position.y,goal.y))
+		var offset := target-actor.position
+		offset.y = 0.0
+		var before := actor.position
+		var displacement := offset.limit_length(RAIDER_SPEED*elapsed)
+		var hit: KinematicCollision3D
+		if displacement.length_squared() > .00000001:
+			hit = actor.move_and_collide(displacement)
+		var travelled := actor.position-before
+		var actual_speed := Vector2(travelled.x,travelled.z).length()/elapsed
+		figure.drive(actual_speed)
+		actor.set_meta("actual_speed",actual_speed)
+		actor.set_meta("yielding",hit != null)
+		if travelled.length_squared() > .00000001:
+			var heading := atan2(-travelled.x,-travelled.z)
+			actor.rotation.y = rotate_toward(actor.rotation.y,heading,RAIDER_TURN_SPEED*elapsed)
 
 
 func _process(delta: float) -> void:
+	if not focused.is_empty() and actors.has(focused) and delta > 0.0:
+		var actor: Node3D = actors[focused]
+		actor.rotation.y = rotate_toward(actor.rotation.y,_focus_yaw,minf(delta,.1)*3.2)
 	_update_nameplates()
 	_update_attention(delta)
+
+
+func raid_observations() -> Dictionary:
+	var positions := {}
+	if physical_raiders and visible:
+		for id: String in raiders:
+			var actor: Node3D = raiders[id]
+			if actor.visible:
+				positions[id] = Vector2(actor.global_position.x,actor.global_position.z)
+	return {"world_id":_world_id,"positions":positions}
+
+
+func sync_raid_state(data: Dictionary) -> void:
+	# Combat health, action cues and endpoints update on every physics step.
+	# The expensive settlement/UI refresh remains on its existing cadence.
+	if not _ready_scene or not data.get("village",{}).get("enabled",false):
+		return
+	state = data
+	_sync_raiders()
 
 
 func behavior_observations() -> Dictionary:
@@ -67,7 +143,7 @@ func _update_attention(delta: float) -> void:
 					target = at
 		var offset := target-actor.global_position
 		if Vector2(offset.x,offset.z).length() > .1:
-			actor.rotation.y = lerp_angle(actor.rotation.y,atan2(-offset.x,-offset.z),minf(1.0,delta*4.0))
+			actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-offset.x,-offset.z),minf(delta,.1)*3.2)
 
 
 func _update_nameplates() -> void:
@@ -85,6 +161,11 @@ func _update_nameplates() -> void:
 
 
 func sync_state(data: Dictionary, profile: String) -> void:
+	var next_world := str(data.get("world_id",""))
+	var next_seconds := float(data.get("world_seconds",0.0))
+	_restore_raiders = next_world != _world_id or next_seconds + .000001 < _world_seconds
+	_world_id = next_world
+	_world_seconds = next_seconds
 	state = data
 	quality = profile
 	visible = bool(data.get("village", {}).get("enabled", false))
@@ -109,7 +190,7 @@ func sync_state(data: Dictionary, profile: String) -> void:
 
 
 func _set_collisions(enabled: bool) -> void:
-	for body: PhysicsBody3D in find_children("*","PhysicsBody3D",true,false):
+	for body: CollisionObject3D in find_children("*","CollisionObject3D",true,false):
 		if not body.has_meta("visible_layer"):
 			body.set_meta("visible_layer",body.collision_layer)
 		body.collision_layer = int(body.get_meta("visible_layer")) if enabled else 0
@@ -242,9 +323,13 @@ func _sync_raiders() -> void:
 	for enemy: Dictionary in state.village.raid.enemies:
 		var id := str(enemy.id)
 		current[id] = true
-		if not raiders.has(id):
-			var actor := Node3D.new()
+		var spawned := not raiders.has(id)
+		if spawned:
+			var actor := CharacterBody3D.new()
 			actor.name = "Raider_" + id
+			actor.collision_layer = 1
+			actor.collision_mask = 1 | 2 | 4 | Layout.CITIZEN_LAYER
+			actor.safe_margin = .006
 			add_child(actor)
 			var figure := Person.new()
 			figure.name = "Figure"
@@ -254,33 +339,32 @@ func _sync_raiders() -> void:
 			figure.configure_appearance("spearman", raiders.size())
 			if raiders.size()%2 == 0:
 				figure.configure_meshy("unit_germanic_axe_fighter")
-			var body := StaticBody3D.new()
-			body.name = "Body"
-			body.collision_layer = 1
-			body.collision_mask = 0
 			var shape := CollisionShape3D.new()
+			shape.name = "PersonalSpace"
 			var capsule := CapsuleShape3D.new()
 			capsule.radius = .28
 			capsule.height = 1.8
 			shape.shape = capsule
 			shape.position.y = .9
-			body.add_child(shape)
-			actor.add_child(body)
+			actor.add_child(shape)
 			var label := Art.label(actor, "Angreifer", Vector3(0,2.15,0), Color("edb0a1"), 27)
 			label.name = "Health"
 			label.visibility_range_end = 20
 			raiders[id] = actor
-		var actor: Node3D = raiders[id]
+		var actor: CharacterBody3D = raiders[id]
 		var health := int(enemy.health)
 		var previous := int(actor.get_meta("health", health))
 		var position := Vector3(float(enemy.x), 0, float(enemy.z))
-		var delta := position - actor.position
-		if delta.length_squared() > .001:
-			actor.rotation.y = atan2(-delta.x, -delta.z)
-		actor.position = position
+		_raider_targets[id] = position
+		if spawned or _restore_raiders:
+			actor.position = position
+			actor.reset_physics_interpolation()
 		var figure: Node3D = actor.get_node("Figure")
 		figure.profile = quality
-		figure.drive(1.8 if active and health > 0 and delta.length_squared() > .00001 else 0.0)
+		figure.refresh_lod(get_viewport().get_camera_3d())
+		if spawned or _restore_raiders or not active or health <= 0:
+			figure.drive(0.0)
+			actor.set_meta("actual_speed",0.0)
 		var attack_clock := float(enemy.attack_timer)
 		if active and health > 0 and attack_clock > float(actor.get_meta("attack_clock", attack_clock)) + .2:
 			figure.cue("attack")
@@ -290,13 +374,15 @@ func _sync_raiders() -> void:
 		actor.set_meta("health", health)
 		actor.get_node("Health").text = "Angreifer · %d" % health if health > 0 else "Abgewehrt"
 		actor.visible = bool(state.village.raid.active)
-		actor.get_node("Body").collision_layer = 1 if actor.visible and health > 0 else 0
+		actor.collision_layer = 1 if actor.visible and health > 0 else 0
 	for id: String in raiders.keys():
 		if not current.has(id):
 			var actor: Node3D = raiders[id]
 			remove_child(actor)
 			actor.free()
 			raiders.erase(id)
+			_raider_targets.erase(id)
+	_restore_raiders = false
 
 
 func nearest(position: Vector3, radius := 3.2) -> String:
@@ -326,6 +412,10 @@ func set_active(value: bool) -> void:
 	for actor: Node3D in actors.values():
 		if not active:
 			actor.get_node("Figure").drive(0.0)
+	if not active:
+		for actor: Node3D in raiders.values():
+			actor.get_node("Figure").drive(0.0)
+			actor.set_meta("actual_speed",0.0)
 	_update_nameplates()
 
 
@@ -336,7 +426,7 @@ func focus(id: String, player: Vector3) -> void:
 	if actors.has(id):
 		var actor: Node3D = actors[id]
 		var direction := player - actor.global_position
-		actor.rotation.y = atan2(-direction.x, -direction.z)
+		_focus_yaw = atan2(-direction.x,-direction.z) if Vector2(direction.x,direction.z).length() > .1 else actor.rotation.y
 		actor.get_node("Figure").set_conversation_focus(true)
 	_update_nameplates()
 

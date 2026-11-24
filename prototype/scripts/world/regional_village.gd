@@ -5,11 +5,19 @@ const Origins = preload("res://scripts/strategy/origins.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Dressing = preload("res://scripts/world/village/frontier_dressing.gd")
 const Settlement = preload("res://scripts/world/village/settlement_dressing.gd")
+const Person = preload("res://scripts/visuals/village_person.gd")
 var current_origin := ""
 var quality := "balanced"
 var frontier_details: Node3D
 var settlement_details: Node3D
 var house_count := 0
+var worker: CharacterBody3D
+var worker_figure: Node3D
+var _worker_target := 0
+var _worker_rest := 3.0
+var _worker_blocked := false
+var active := false
+const WORKER_STATIONS := [Vector3(-4,0,7), Vector3(-2,0,7), Vector3(-2,0,9), Vector3(-4,0,9)]
 
 func show_origin(id: String) -> void:
 	if current_origin == id:
@@ -18,6 +26,11 @@ func show_origin(id: String) -> void:
 	frontier_details = null
 	settlement_details = null
 	house_count = 0
+	worker = null
+	worker_figure = null
+	_worker_target = 0
+	_worker_rest = 3.0
+	_worker_blocked = false
 	for child in get_children():
 		remove_child(child)
 		child.free()
@@ -70,18 +83,76 @@ func show_origin(id: String) -> void:
 	# recruit. Regional background figures retain their established model route.
 	if id == "italia":
 		return
-	var farmer_path := "res://assets/landscape/farmer.glb"
-	if id in ["wa","han"] and ResourceLoader.exists("res://assets/landscape/%s_farmer.glb" % id):
-		farmer_path = "res://assets/landscape/%s_farmer.glb" % id
-	var worker := _add_scene(farmer_path,Vector3(-4,0,7))
+	worker = CharacterBody3D.new()
+	worker.name = "RegionalWorker"
+	worker.collision_layer = 8
+	worker.collision_mask = 1 | 2 | 4 | 8
+	worker.safe_margin = .001
+	worker.position = WORKER_STATIONS[0]
+	add_child(worker)
+	var collision := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = .28
+	capsule.height = 1.72
+	collision.shape = capsule
+	collision.position.y = .86
+	worker.add_child(collision)
 	worker.rotation.y = 0.64
-	for player: AnimationPlayer in worker.find_children("*","AnimationPlayer",true,false):
-		if player.has_animation("idle"):
-			player.get_animation("idle").loop_mode = Animation.LOOP_LINEAR
-			player.play("idle")
+	worker_figure = Person.new()
+	worker_figure.name = "Figure"
+	worker_figure.position.y = .9
+	worker.add_child(worker_figure)
+	worker_figure.configure("regional_worker", id, 32)
+	worker_figure.profile = quality
+	worker_figure.set_process(active)
+
+
+func set_active(enabled: bool) -> void:
+	active = enabled
+	if is_instance_valid(worker_figure):
+		worker_figure.set_process(enabled)
+		if not enabled:
+			worker_figure.drive(0.0)
+
+
+func _physics_process(delta: float) -> void:
+	if not active or not is_instance_valid(worker) or not is_visible_in_tree() or delta <= 0:
+		return
+	if _worker_rest > 0.0:
+		_worker_rest = maxf(0.0, _worker_rest - delta)
+		worker_figure.drive(0.0)
+		if _worker_rest > .35 and not _worker_blocked:
+			worker_figure.keep_working()
+		elif worker_figure.clip == "work":
+			worker_figure.cancel_action()
+		if _worker_rest <= 0.0:
+			if not _worker_blocked:
+				_worker_target = (_worker_target + 1) % WORKER_STATIONS.size()
+			_worker_blocked = false
+		return
+	var offset: Vector3 = WORKER_STATIONS[_worker_target] - worker.position
+	offset.y = 0.0
+	if offset.length() < .035:
+		_worker_rest = 3.0
+		worker_figure.drive(0.0)
+		return
+	var before := worker.position
+	var step := offset.limit_length(1.05 * minf(delta, .1))
+	var hit := worker.move_and_collide(step)
+	var travel := worker.position - before
+	worker_figure.drive(Vector2(travel.x, travel.z).length() / delta)
+	if travel.length_squared() > .000001:
+		worker.rotation.y = rotate_toward(worker.rotation.y, atan2(-travel.x, -travel.z), 3.0 * delta)
+	if hit != null:
+		# A player or obstacle blocks the body and the visible stride together.
+		# Retry after a pause instead of walking through it or moving only skin.
+		_worker_rest = .5
+		_worker_blocked = true
 
 func set_quality(profile: String) -> void:
 	quality = profile
+	if is_instance_valid(worker_figure):
+		worker_figure.profile = profile
 	if frontier_details:
 		frontier_details.set_quality(profile)
 	if settlement_details:

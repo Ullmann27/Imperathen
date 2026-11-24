@@ -1,0 +1,775 @@
+{
+  "schema_version": 1,
+  "scope": "All exported 3D resources and executable presentation scripts, plus procedural motion families. New resources and scripts are unclassified until explicitly registered. Inactive means not shipped as functioning motion.",
+  "sample_hz": 60,
+  "families": [
+    {
+      "id": "hero",
+      "profile": "human",
+      "status": "active",
+      "resources": [
+        "assets/characters/hero_quality_0.glb",
+        "assets/characters/hero_quality_1.glb",
+        "assets/characters/hero_quality_2.glb",
+        "assets/characters/hero_quality_3.glb"
+      ],
+      "required_checks": [
+        "character_motion",
+        "natural_motion",
+        "cc0_runtime_gestures",
+        "locomotion_regression",
+        "action_world"
+      ],
+      "review_scope": [
+        "idle_talk",
+        "walk_run_stop",
+        "attack_guard_reaction",
+        "work_interact",
+        "lod_transition",
+        "contact_and_weight"
+      ],
+      "open_requirements": []
+    },
+    {
+      "id": "frontier_people",
+      "profile": "human",
+      "status": "active",
+      "resources": [
+        "assets/characters/frontier_archer_0.glb",
+        "assets/characters/frontier_archer_1.glb",
+        "assets/characters/frontier_archer_2.glb",
+        "assets/characters/frontier_archer_3.glb",
+        "assets/characters/frontier_civilian_man_0.glb",
+        "assets/characters/frontier_civilian_man_1.glb",
+        "assets/characters/frontier_civilian_man_2.glb",
+        "assets/characters/frontier_civilian_man_3.glb",
+        "assets/characters/frontier_civilian_woman_0.glb",
+        "assets/characters/frontier_civilian_woman_1.glb",
+        "assets/characters/frontier_civilian_woman_2.glb",
+        "assets/characters/frontier_civilian_woman_3.glb",
+        "assets/characters/frontier_elder_0.glb",
+        "assets/characters/frontier_elder_1.glb",
+        "assets/characters/frontier_elder_2.glb",
+        "assets/characters/frontier_elder_3.glb",
+        "assets/characters/frontier_legionary_0.glb",
+        "assets/characters/frontier_legionary_1.glb",
+        "assets/characters/frontier_legionary_2.glb",
+        "assets/characters/frontier_legionary_3.glb",
+        "assets/characters/frontier_officer_0.glb",
+        "assets/characters/frontier_officer_1.glb",
+        "assets/characters/frontier_officer_2.glb",
+        "assets/characters/frontier_officer_3.glb",
+        "assets/characters/frontier_spearman_0.glb",
+        "assets/characters/frontier_spearman_1.glb",
+        "assets/characters/frontier_spearman_2.glb",
+        "assets/characters/frontier_spearman_3.glb"
+      ],
+      "required_checks": [
+        "frontier_people",
+        "natural_motion",
+        "village_people",
+        "npc_behavior_world"
+      ],
+      "review_scope": [
+        "idle_talk",
+        "walk_run_stop",
+        "work_interact",
+        "contact_and_weight",
+        "lod_transition",
+        "military_equipment"
+      ],
+      "open_requirements": [],
+      "subject_scenarios": {
+        "assets/characters/frontier_archer_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_archer_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_archer_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_archer_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_civilian_man_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_man_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_man_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_man_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_woman_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_woman_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_woman_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_civilian_woman_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_elder_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_elder_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_elder_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_elder_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition"
+        ],
+        "assets/characters/frontier_legionary_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_legionary_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_legionary_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_legionary_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_officer_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_officer_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_officer_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_officer_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_spearman_0.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_spearman_1.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_spearman_2.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ],
+        "assets/characters/frontier_spearman_3.glb": [
+          "idle_talk",
+          "walk_run_stop",
+          "work_interact",
+          "contact_and_weight",
+          "lod_transition",
+          "military_equipment"
+        ]
+      }
+    },
+    {
+      "id": "legacy_people",
+      "profile": "human",
+      "status": "active",
+      "resources": [
+        "assets/village_characters/heavy_2.glb",
+        "assets/village_characters/heavy_3.glb",
+        "assets/village_characters/officer_2.glb",
+        "assets/village_characters/officer_3.glb",
+        "assets/village_characters/spear_2.glb",
+        "assets/village_characters/spear_3.glb",
+        "assets/village_characters/villager_0.glb",
+        "assets/village_characters/villager_1.glb",
+        "assets/village_characters/villager_2.glb",
+        "assets/village_characters/villager_3.glb"
+      ],
+      "required_checks": [
+        "village_people",
+        "natural_motion",
+        "locomotion_regression"
+      ],
+      "review_scope": [
+        "idle_talk",
+        "walk_run_stop",
+        "work_interact",
+        "contact_and_weight",
+        "lod_transition",
+        "combat_fallback"
+      ],
+      "open_requirements": []
+    },
+    {
+      "id": "meshy_people",
+      "profile": "human",
+      "status": "active",
+      "resources": [
+        "assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+        "assets/meshy/characters/unit_germanic_axe_fighter_1.glb",
+        "assets/meshy/characters/unit_germanic_axe_fighter_2.glb",
+        "assets/meshy/characters/unit_germanic_axe_fighter_3.glb",
+        "assets/meshy/characters/unit_roman_signifer_0.glb",
+        "assets/meshy/characters/unit_roman_signifer_1.glb",
+        "assets/meshy/characters/unit_roman_signifer_2.glb",
+        "assets/meshy/characters/unit_roman_signifer_3.glb"
+      ],
+      "required_checks": [
+        "meshy_characters",
+        "meshy_equipment",
+        "npc_behavior_world"
+      ],
+      "review_scope": [
+        "idle_talk",
+        "walk_run_stop",
+        "attack_guard_reaction",
+        "contact_and_weight",
+        "lod_transition",
+        "skin_deformation"
+      ],
+      "open_requirements": [
+        "Full world-space foot-contact and transition coverage for both Meshy rigs is missing."
+      ]
+    },
+    {
+      "id": "battle_rigs",
+      "profile": "human",
+      "status": "active",
+      "resources": [
+        "assets/soldiers/archer_mid.glb",
+        "assets/soldiers/archer_near.glb",
+        "assets/soldiers/heavy_mid.glb",
+        "assets/soldiers/heavy_near.glb",
+        "assets/soldiers/officer_mid.glb",
+        "assets/soldiers/officer_near.glb",
+        "assets/soldiers/spear_mid.glb",
+        "assets/soldiers/spear_near.glb"
+      ],
+      "required_checks": [
+        "soldier_gait",
+        "soldier_visuals",
+        "frontier_people"
+      ],
+      "review_scope": [
+        "march_run_retreat",
+        "formation",
+        "attack_guard_reaction",
+        "contact_and_weight",
+        "lod_transition"
+      ],
+      "open_requirements": []
+    },
+    {
+      "id": "distant_ranks",
+      "profile": "crowd",
+      "status": "active",
+      "resources": [
+        "assets/soldiers/archer_far.glb",
+        "assets/soldiers/heavy_far.glb",
+        "assets/soldiers/officer_far.glb",
+        "assets/soldiers/spear_far.glb"
+      ],
+      "required_checks": [
+        "soldier_visuals",
+        "soldier_gait",
+        "battle_rules"
+      ],
+      "review_scope": [
+        "stride_contact_at_visible_distance",
+        "formation",
+        "combat_reaction",
+        "near_far_transition"
+      ],
+      "open_requirements": [
+        "Shader-based distant ranks lack measured contact/phase/reaction and visible-distance acceptance."
+      ]
+    },
+    {
+      "id": "regional_workers",
+      "profile": "human",
+      "status": "active",
+      "resources": [
+        "assets/landscape/farmer.glb",
+        "assets/landscape/han_farmer.glb",
+        "assets/landscape/wa_farmer.glb"
+      ],
+      "required_checks": [
+        "landscape",
+        "regional_workers"
+      ],
+      "review_scope": [
+        "idle_talk",
+        "walk_run_stop",
+        "work_interact",
+        "contact_and_weight"
+      ],
+      "open_requirements": [
+        "Farmer playback has been checked, but complete task/contact realism is not yet measured."
+      ]
+    },
+    {
+      "id": "service_gear",
+      "profile": "attached",
+      "status": "active",
+      "resources": [
+        "assets/weapons/gladius_lod0.glb",
+        "assets/weapons/scutum_lod0.glb"
+      ],
+      "required_checks": [
+        "service_gear",
+        "character_motion",
+        "combat_actions",
+        "combat_model"
+      ],
+      "review_scope": [
+        "grip_socket",
+        "attack_guard_reaction",
+        "clearance",
+        "lod_transition"
+      ],
+      "open_requirements": []
+    },
+    {
+      "id": "meshy_gear",
+      "profile": "attached",
+      "status": "active",
+      "resources": [
+        "assets/meshy/equipment/gear_germanic_round_shield_0.glb",
+        "assets/meshy/equipment/gear_germanic_round_shield_1.glb",
+        "assets/meshy/equipment/gear_roman_signum_0.glb",
+        "assets/meshy/equipment/gear_roman_signum_1.glb",
+        "assets/meshy/equipment/weap_germanic_hand_axe_0.glb",
+        "assets/meshy/equipment/weap_germanic_hand_axe_1.glb"
+      ],
+      "required_checks": [
+        "meshy_equipment",
+        "meshy_characters"
+      ],
+      "review_scope": [
+        "grip_socket",
+        "attack_guard_reaction",
+        "clearance",
+        "lod_transition"
+      ],
+      "open_requirements": []
+    },
+    {
+      "id": "village_navigation",
+      "profile": "human_world",
+      "status": "active",
+      "resources": [],
+      "required_checks": [
+        "npc_behavior_world",
+        "locomotion_regression",
+        "village_collision",
+        "action_world"
+      ],
+      "review_scope": [
+        "world_displacement",
+        "collision",
+        "walk_run_stop",
+        "dialogue_transition",
+        "contact_and_weight"
+      ],
+      "open_requirements": []
+    },
+    {
+      "id": "raid_motion",
+      "profile": "human_world",
+      "status": "active",
+      "resources": [],
+      "required_checks": [
+        "combat_model",
+        "action_adapter",
+        "npc_behavior_world"
+      ],
+      "review_scope": [
+        "world_displacement",
+        "collision",
+        "attack_guard_reaction",
+        "walk_run_stop",
+        "contact_and_weight"
+      ],
+      "open_requirements": [
+        "Raid actor transforms are directly assigned from discrete simulation snapshots; continuous render/physics interpolation and contact proof are missing."
+      ]
+    },
+    {
+      "id": "cinematic_people",
+      "profile": "human_world",
+      "status": "active",
+      "resources": [],
+      "required_checks": [
+        "i00_stage",
+        "opening_flow",
+        "opening_director"
+      ],
+      "review_scope": [
+        "cinematic_body_motion",
+        "formation",
+        "dialogue_transition",
+        "contact_and_weight"
+      ],
+      "open_requirements": []
+    },
+    {
+      "id": "animation_support",
+      "profile": "support",
+      "status": "support",
+      "resources": [
+        "assets/animations/hero_cc0_library.tres",
+        "assets/characters/hero_hand_grip_0.res",
+        "assets/characters/hero_hand_grip_1.res",
+        "assets/characters/hero_hand_grip_2.res",
+        "assets/characters/hero_hand_grip_3.res",
+        "main.tscn"
+      ],
+      "required_checks": [
+        "cc0_runtime_gestures",
+        "character_motion"
+      ],
+      "review_scope": [],
+      "open_requirements": []
+    },
+    {
+      "id": "static_environment",
+      "profile": "static",
+      "status": "static",
+      "resources": [
+        "assets/architecture/atrium_house.glb",
+        "assets/architecture/frontier_house.glb",
+        "assets/architecture/village_well.glb",
+        "assets/frontier_hut.glb",
+        "assets/landscape/han_house.glb",
+        "assets/landscape/oak_far.glb",
+        "assets/landscape/oak_mid.glb",
+        "assets/landscape/oak_near.glb",
+        "assets/landscape/olive_far.glb",
+        "assets/landscape/olive_mid.glb",
+        "assets/landscape/olive_near.glb",
+        "assets/landscape/pine_far.glb",
+        "assets/landscape/pine_mid.glb",
+        "assets/landscape/pine_near.glb",
+        "assets/landscape/wa_house.glb",
+        "assets/landscape/wa_store.glb",
+        "assets/landscape/wood_longhouse.glb",
+        "assets/village/market.glb",
+        "assets/village/palisade_bay.glb",
+        "assets/village/palisade_silhouette.glb",
+        "assets/village/storehouse.glb",
+        "assets/village/timber_billet.glb",
+        "assets/village/training_dummy.glb",
+        "assets/village/workshop.glb"
+      ],
+      "required_checks": [],
+      "review_scope": [],
+      "open_requirements": []
+    },
+    {
+      "id": "horse_and_other_animals",
+      "profile": "animal",
+      "status": "inactive",
+      "resources": [],
+      "required_checks": [],
+      "review_scope": [
+        "species_gaits",
+        "hoof_paw_contact",
+        "turn_stop",
+        "body_head_tail",
+        "skin_deformation"
+      ],
+      "open_requirements": []
+    },
+    {
+      "id": "mounted_units",
+      "profile": "rider",
+      "status": "inactive",
+      "resources": [],
+      "required_checks": [],
+      "review_scope": [
+        "mount_dismount",
+        "seat_stability",
+        "reins_and_stirrups",
+        "horse_rider_phase",
+        "contact_and_weight"
+      ],
+      "open_requirements": []
+    },
+    {
+      "id": "rolling_machines",
+      "profile": "wheeled",
+      "status": "inactive",
+      "resources": [],
+      "required_checks": [],
+      "review_scope": [
+        "rolling_contact",
+        "push_pull",
+        "turn_stop",
+        "axle_ground",
+        "load_inertia"
+      ],
+      "open_requirements": []
+    },
+    {
+      "id": "articulated_equipment",
+      "profile": "articulated",
+      "status": "inactive",
+      "resources": [],
+      "required_checks": [],
+      "review_scope": [
+        "mechanical_joint_limits",
+        "moving_parts",
+        "clearance",
+        "inertia",
+        "synchronized_operator"
+      ],
+      "open_requirements": []
+    }
+  ],
+  "runtime_scripts": [
+    "scripts/battle/battle_model.gd",
+    "scripts/battle/formation_slots.gd",
+    "scripts/battle/valley_field.gd",
+    "scripts/cinematic/i00_stage.gd",
+    "scripts/cinematic/opening_checkpoint.gd",
+    "scripts/cinematic/opening_director.gd",
+    "scripts/domain/combat_actions.gd",
+    "scripts/domain/npc_behavior.gd",
+    "scripts/domain/unarmed_combat.gd",
+    "scripts/domain/village_economy.gd",
+    "scripts/domain/world_model.gd",
+    "scripts/main.gd",
+    "scripts/story/campaign_bible.gd",
+    "scripts/story/frontier_chapter.gd",
+    "scripts/story/opening_story.gd",
+    "scripts/story/village_childhood.gd",
+    "scripts/story/village_life.gd",
+    "scripts/strategy/atlas_data.gd",
+    "scripts/strategy/atlas_screen.gd",
+    "scripts/strategy/globe.gd",
+    "scripts/strategy/origins.gd",
+    "scripts/strategy/season_campaign.gd",
+    "scripts/tactics/valley_hud.gd",
+    "scripts/tactics/valley_landscape.gd",
+    "scripts/tactics/valley_scene.gd",
+    "scripts/ui/android_graphics_probe.gd",
+    "scripts/ui/android_village_diagnostics.gd",
+    "scripts/ui/combat_action.gd",
+    "scripts/ui/figure_gallery.gd",
+    "scripts/ui/game_ui.gd",
+    "scripts/ui/opening_overlay.gd",
+    "scripts/ui/runtime_display.gd",
+    "scripts/ui/safe_area.gd",
+    "scripts/ui/touch_action.gd",
+    "scripts/ui/touch_look.gd",
+    "scripts/ui/touch_modal.gd",
+    "scripts/ui/touch_pad.gd",
+    "scripts/ui/ui_smoke.gd",
+    "scripts/ui/village_life_panel.gd",
+    "scripts/ui/village_navigation.gd",
+    "scripts/visuals/cc0_gestures.gd",
+    "scripts/visuals/character_motion.gd",
+    "scripts/visuals/facial_motion.gd",
+    "scripts/visuals/far_ranks.gd",
+    "scripts/visuals/grove.gd",
+    "scripts/visuals/hand_pose.gd",
+    "scripts/visuals/meshy_asset_registry.gd",
+    "scripts/visuals/meshy_character_registry.gd",
+    "scripts/visuals/meshy_equipment.gd",
+    "scripts/visuals/meshy_loadout_registry.gd",
+    "scripts/visuals/natural_motion.gd",
+    "scripts/visuals/practice_gear.gd",
+    "scripts/visuals/service_gear.gd",
+    "scripts/visuals/soldier_visual.gd",
+    "scripts/visuals/village_person.gd",
+    "scripts/world/game_world.gd",
+    "scripts/world/player_action_world.gd",
+    "scripts/world/regional_terrain.gd",
+    "scripts/world/regional_village.gd",
+    "scripts/world/village/breeze.gdshader",
+    "scripts/world/village/clouds.gdshader",
+    "scripts/world/village/drizzle.gdshader",
+    "scripts/world/village/frontier_dressing.gd",
+    "scripts/world/village/ground.gdshader",
+    "scripts/world/village/opening_props.gd",
+    "scripts/world/village/settlement_dressing.gd",
+    "scripts/world/village/village_layout.gd",
+    "scripts/world/village/village_local_navigation.gd",
+    "scripts/world/village/village_population.gd",
+    "scripts/world/village/village_scenery.gd",
+    "scripts/world/village/water.gdshader",
+    "scripts/world/village_art.gd",
+    "scripts/world/village_life_world.gd",
+    "scripts/world/world_smoke.gd",
+    "scripts/world/world_stream_plan.gd",
+    "shaders/rank_stride.gdshader"
+  ],
+  "procedural_owners": {
+    "scripts/world/village_life_world.gd": [
+      "raid_motion",
+      "village_navigation"
+    ],
+    "scripts/world/village/village_population.gd": [
+      "village_navigation"
+    ],
+    "scripts/world/game_world.gd": [
+      "hero",
+      "village_navigation",
+      "raid_motion"
+    ],
+    "scripts/world/player_action_world.gd": [
+      "hero",
+      "service_gear"
+    ],
+    "scripts/world/village/frontier_dressing.gd": [
+      "static_environment",
+      "rolling_machines"
+    ],
+    "scripts/visuals/far_ranks.gd": [
+      "distant_ranks"
+    ],
+    "shaders/rank_stride.gdshader": [
+      "distant_ranks"
+    ],
+    "scripts/tactics/valley_scene.gd": [
+      "battle_rigs",
+      "distant_ranks"
+    ],
+    "scripts/cinematic/i00_stage.gd": [
+      "cinematic_people"
+    ],
+    "scripts/visuals/village_person.gd": [
+      "hero",
+      "frontier_people",
+      "legacy_people",
+      "meshy_people",
+      "service_gear",
+      "meshy_gear"
+    ]
+  }
+}

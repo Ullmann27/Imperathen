@@ -122,10 +122,11 @@ func _run() -> void:
 	var paused: Array = population.snapshot()
 	population.advance_to(15.0)
 	_check(population.snapshot() == paused,"Pausing stops autonomous movement and its animation driver")
-	_check_raider_binding(world,model.data)
+	await _check_raider_binding(world,model.data)
 	world.queue_free()
 	await process_frame
 	await _check_local_social_navigation()
+	await _check_raider_authority()
 	if failures.is_empty():
 		print("NPC behavior world: %d checks passed" % checks)
 		quit(0)
@@ -234,9 +235,23 @@ func _check_raider_binding(world: Node3D, data: Dictionary) -> void:
 	_check(raiders.has("binding_raider"),"Production village raid creates the observed attacker body")
 	if not raiders.has("binding_raider"):
 		return
-	var raider: Node3D = raiders.binding_raider
+	world.village_life_world.set_physics_process(false)
+	var raider: CharacterBody3D = raiders.binding_raider
 	var figure: Node3D = raider.get_node("Figure")
-	_check(raider.visible and raider.get_node("Body").collision_layer == 1,"Live attacker keeps its existing domain collision binding")
+	_check(raider.visible and raider.collision_layer == 1,"Live attacker owns the visible swept collision body")
+	_check(figure.speed == 0.0,"Spawning at a saved position does not invent a stride from the world origin")
+	var spawn := raider.position
+	fixture.world_seconds += .1
+	fixture.village.raid.enemies[0].x += .12
+	world.village_life_world.sync_state(fixture,"balanced")
+	_check(raider.position == spawn,"A new domain target cannot teleport the raider mesh or collision body")
+	await physics_frame
+	for frame in 6:
+		var before := raider.position
+		world.village_life_world._advance_raiders(1.0/60.0)
+		var travelled := raider.position.distance_to(before)
+		_check(travelled <= .02001 and is_equal_approx(figure.speed,travelled*60.0),"Raider stride speed follows actual swept per-frame displacement")
+	_check(raider.position.distance_to(spawn+Vector3(.12,0,0)) < .0001,"Six physics steps reach the domain endpoint without overshooting")
 	_check(figure.meshy_asset_id == "unit_germanic_axe_fighter" and figure.active_model_path.begins_with("res://assets/meshy/characters/unit_germanic_axe_fighter_"),"VillageLifeWorld selects the actual imported Meshy axe fighter")
 	figure.set_process(false)
 	figure._process(.13)
@@ -254,9 +269,105 @@ func _check_raider_binding(world: Node3D, data: Dictionary) -> void:
 		if foot >= 0:
 			rig.force_update_all_bone_transforms()
 			var before := rig.get_bone_global_pose(foot).origin
-			figure._process(.13)
+			fixture.world_seconds += .1
+			fixture.village.raid.enemies[0].x += .12
+			world.village_life_world.sync_state(fixture,"balanced")
+			world.village_life_world._advance_raiders(.1)
+			figure._process(.1)
 			rig.force_update_all_bone_transforms()
-			_check(before.distance_to(rig.get_bone_global_pose(foot).origin) > .001,"Production raid driver animates the bound foot")
+			_check(before.distance_to(rig.get_bone_global_pose(foot).origin) > .001,"Production raid driver animates the bound foot relative to its actually moving body")
 		else:
 			_check(false,"Bound raid rig exposes its animated foot")
+	# A newly inserted obstacle must also stop the interpolated body. The model's
+	# own sweep remains a separate rule check; rendering cannot bypass it.
+	var wall := StaticBody3D.new()
+	var wall_shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(.12,2.2,2.0)
+	wall_shape.shape = box
+	wall.add_child(wall_shape)
+	wall.position = spawn+Vector3(.75,1.1,0)
+	world.add_child(wall)
+	await physics_frame
+	fixture.world_seconds += .1
+	fixture.village.raid.enemies[0].x += 2.0
+	world.village_life_world.sync_state(fixture,"balanced")
+	for frame in 90:
+		world.village_life_world._advance_raiders(1.0/60.0)
+	_check(raider.position.x < wall.position.x-.33 and figure.speed < .001,"A collision blocks the real interpolated raider and stops foot cycling")
+	var paused_at := raider.position
+	world.village_life_world.set_active(false)
+	world.village_life_world._advance_raiders(.1)
+	_check(raider.position == paused_at and figure.speed == 0.0,"Pause freezes the target follower and its speed")
+	world.village_life_world.set_active(true)
+	fixture.village.raid.enemies[0].health = 0
+	world.village_life_world.sync_state(fixture,"balanced")
+	world.village_life_world._advance_raiders(.1)
+	_check(raider.position == paused_at and raider.collision_layer == 0 and figure.speed == 0.0,"A defeated raider stops and removes its collision blocker")
+	wall.free()
 	_check(JSON.stringify(data) == original,"Rendering a raid fixture cannot grant rewards or mutate the live domain")
+
+
+func _check_raider_authority() -> void:
+	var model := Model.new()
+	model.new_game("italia",true,false,true)
+	model.data.village.raid.number = 1
+	Life._begin_raid(model.data)
+	var first: String = model.data.village.raid.enemies[0].id
+	for index in model.data.village.raid.enemies.size():
+		if index > 0:
+			model.data.village.raid.enemies[index].x = -20.0-index*2
+			model.data.village.raid.enemies[index].z = -70.0
+	model.set_player_position(Vector3(-1,.91,-62))
+	_check(model._validate_state(model.data).is_empty(),"Physical raid fixture starts from a valid authoritative world")
+	var world := World.new()
+	root.add_child(world)
+	world.setup(model.data)
+	world.set_active(true)
+	world.set_physics_process(false)
+	world.village_life_world.set_physics_process(false)
+	world.set_raid_physics_authority(true)
+	model.raid_observations = world.raid_observations
+	model.combat_sight_check = world.combat_sight_clear
+	model.combat_motion_check = world.combat_safe_motion
+	var actor: CharacterBody3D = world.village_life_world.raiders[first]
+	var wall := StaticBody3D.new()
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(.12,2.2,2)
+	shape.shape = box
+	wall.add_child(shape)
+	wall.position = Vector3(-3.8,1.1,-62)
+	world.add_child(wall)
+	await physics_frame
+	await physics_frame
+	var max_error := 0.0
+	var health := int(model.data.player.health)
+	for frame in 180:
+		world.village_life_world._advance_raiders(1.0/60.0)
+		model.advance(1.0/60.0)
+		world.sync_combat_state(model.data)
+		var saved: Dictionary = model.data.village.raid.enemies[0]
+		max_error = maxf(max_error,Vector2(saved.x,saved.z).distance_to(Vector2(actor.global_position.x,actor.global_position.z)))
+	_check(max_error < .000001,"Combat coordinates exactly follow the visible swept body on every physics tick")
+	_check(actor.position.x < wall.position.x-.33,"The authoritative raid body cannot advance through a wall")
+	_check(model.data.player.health == health,"Blocked raiders cannot deal damage from an invisible position beyond the wall")
+	_check(model._validate_state(model.data).is_empty(),"Continuous observed movement preserves the complete world schema")
+	# Commands also sample the body, even between two simulation ticks.
+	wall.free()
+	await physics_frame
+	world.village_life_world._advance_raiders(1.0/60.0)
+	var guard: Dictionary = model.execute("village_unarmed_guard",{})
+	_check(guard.ok and is_equal_approx(float(model.data.village.raid.enemies[0].x),actor.position.x),"A combat command refreshes its target position before validating contact")
+	var path := "user://raid_authority_%s.json" % Time.get_ticks_usec()
+	world.village_life_world._advance_raiders(1.0/60.0)
+	_check(model.save_game(path).ok,"The actual physical raid position is saveable")
+	var restored := Model.new()
+	_check(restored.load_game(path).ok and is_equal_approx(float(restored.data.village.raid.enemies[0].x),actor.position.x),"Save/load retains the physical target rather than an ahead-of-body destination")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path+".bak"))
+	var old := float(model.data.village.raid.enemies[0].x)
+	model.raid_observations = func(): return {"world_id":"different_world","positions":{first:Vector2(99,99)}}
+	model._observe_raid_positions(model.data)
+	_check(is_equal_approx(float(model.data.village.raid.enemies[0].x),old),"A stale renderer from another world cannot replace saved raid coordinates")
+	world.free()

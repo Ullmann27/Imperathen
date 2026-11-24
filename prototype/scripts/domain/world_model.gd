@@ -43,6 +43,7 @@ var data: Dictionary = {}
 var combat_sight_check: Callable
 var combat_motion_check: Callable
 var npc_observations: Callable
+var raid_observations: Callable
 
 
 func _init() -> void:
@@ -132,6 +133,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	var candidate := _world_copy()
 	if npc_observations.is_valid():
 		NpcBehavior.observe(candidate, npc_observations.call(), true)
+	_observe_raid_positions(candidate)
 	var result := _apply_command(candidate, command, args)
 	result.message = _regional_text(candidate, result.message)
 	if not result.ok:
@@ -166,6 +168,25 @@ func set_player_position(position: Vector3) -> void:
 	# The renderer already owns this observed movement. Avoid rebuilding UI per step.
 
 
+func _observe_raid_positions(state: Dictionary) -> Dictionary:
+	# The same swept body seen on screen supplies combat and save coordinates.
+	# Call before commands/contact, not just on the slower UI refresh clock.
+	var observed := {}
+	if not raid_observations.is_valid() or not state.get("village",{}).get("raid",{}).get("active",false):
+		return observed
+	var sample: Variant = raid_observations.call()
+	if not sample is Dictionary or not sample.has("positions") or sample.get("world_id","") != state.get("world_id","") or not sample.get("positions",{}) is Dictionary:
+		return observed
+	for enemy: Dictionary in state.village.raid.enemies:
+		var point: Variant = sample.positions.get(str(enemy.id))
+		if not point is Vector2 or not point.is_finite() or absf(point.x) > 200.0 or absf(point.y) > 200.0:
+			continue
+		enemy.x = point.x
+		enemy.z = point.y
+		observed[str(enemy.id)] = true
+	return observed
+
+
 func interrupt_combat() -> void:
 	if CombatActions.interrupt(data):
 		data.revision = int(data.revision) + 1
@@ -180,6 +201,7 @@ func advance(delta: float) -> void:
 	if float(data.world_seconds) + delta > 1000000000000.0:
 		return
 	var candidate := _world_copy()
+	var observed_raiders := _observe_raid_positions(candidate)
 	var notify_ui := int(candidate.world_seconds) != int(float(candidate.world_seconds) + delta)
 	if npc_observations.is_valid():
 		NpcBehavior.observe(candidate,npc_observations.call(),true)
@@ -202,7 +224,7 @@ func advance(delta: float) -> void:
 			var previous_health := int(candidate.player.health)
 			if not VillageEconomy.advance(candidate, step):
 				return
-			VillageLife.advance(candidate, step, combat_sight_check, combat_motion_check)
+			VillageLife.advance(candidate, step, combat_sight_check, combat_motion_check, observed_raiders)
 			NpcBehavior.advance(candidate, step)
 			if int(candidate.player.health) < previous_health:
 				CombatActions.interrupt(candidate)
@@ -297,6 +319,7 @@ func save_game(path: String) -> Dictionary:
 		return _fail("Der Spielstand wurde nicht gespeichert: " + state_error)
 	if npc_observations.is_valid():
 		NpcBehavior.observe(data,npc_observations.call(),true)
+	_observe_raid_positions(data)
 	var directory_error := DirAccess.make_dir_recursive_absolute(absolute.get_base_dir())
 	if directory_error != OK:
 		return _fail("Der Speicherordner kann nicht angelegt werden (Fehler %d)." % directory_error)

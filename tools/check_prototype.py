@@ -16,6 +16,7 @@ import subprocess
 import tempfile
 import time
 
+from motion_quality_gate import source_fingerprint as motion_fingerprint, source_commit
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT / "prototype"
@@ -27,12 +28,12 @@ def run_check(engine, name, arguments, marker, environment, report):
     try:
         result = subprocess.run([engine, "--headless", "--path", str(PROJECT), *arguments],
                                 cwd=ROOT, env=environment, text=True, encoding="utf-8",
-                                errors="replace", capture_output=True, timeout=120)
+                                errors="replace", capture_output=True, timeout=2400 if name == "motion_measurement" else 120)
         combined = result.stdout + result.stderr
         success = result.returncode == 0 and FAILURE.search(combined) is None and (marker is None or marker in combined)
         code = result.returncode
     except subprocess.TimeoutExpired as exc:
-        combined = f"TIMEOUT after 120 seconds: {exc}"
+        combined = f"TIMEOUT during {name}: {exc}"
         success = False
         code = None
     report.mkdir(parents=True, exist_ok=True)
@@ -59,6 +60,12 @@ def main():
     report = args.report.resolve()
     version = subprocess.run([engine, "--version"], text=True, capture_output=True, check=True).stdout.strip()
     records = []
+    measured_fingerprint = None
+    checked_fingerprint = None
+    checked_commit = source_commit(ROOT)
+    report.mkdir(parents=True, exist_ok=True)
+    (report / "motion-measurements.json").unlink(missing_ok=True)
+    (report / "motion-gate.json").unlink(missing_ok=True)
     with tempfile.TemporaryDirectory(prefix="imperathen-check-") as temporary:
         environment = os.environ.copy()
         environment["IMPERATHEN_ISOLATED_TEST"] = "1"
@@ -127,7 +134,9 @@ def main():
             ("seasons", ["--script", "res://tests/season_campaign_test.gd"], "failures=0"),
             ("figure_gallery", ["--fixed-fps", "60", "--script", "res://tests/figure_gallery_test.gd"], "failures=0 real_textures=true"),
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
+            ("regional_workers", ["--fixed-fps", "60", "--script", "res://tests/regional_worker_test.gd"], "REGIONAL_WORKERS_PASS"),
             ("main_scene", ["--fixed-fps", "60", "--quit-after", "420"], "IMPERATHEN_READY"),
+            ("motion_measurement", ["--fixed-fps", "60", "--script", "res://tests/motion_quality_measurement.gd"], "MOTION_MEASURED"),
         ]
         for name, arguments, marker in checks:
             # Each executable scenario starts with its own account state. A
@@ -136,15 +145,27 @@ def main():
                 location = Path(temporary) / name / variable.lower()
                 location.mkdir(parents=True)
                 environment[variable] = str(location)
+            if name == "motion_measurement":
+                measured_fingerprint = motion_fingerprint(ROOT)
+                environment["IMPERATHEN_MOTION_CONTRACT"] = str(ROOT / "quality/motion_contract.json")
+                environment["IMPERATHEN_MOTION_REPORT"] = str(report / "motion-measurements.json")
+                environment["IMPERATHEN_MOTION_SOURCE"] = measured_fingerprint
             record = run_check(engine, name, arguments, marker, environment, report)
             records.append(record)
+            if name == "import":
+                # Import may create deterministic metadata on a fresh checkout.
+                # Every actual regression afterwards must inspect these same bytes.
+                checked_fingerprint = motion_fingerprint(ROOT)
             if not record["passed"] and not args.keep_going:
                 break
     source_hashes = {}
     for path in sorted(PROJECT.rglob("*")):
         if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".glb", ".res", ".wav", ".ogg", ".svg", ".ttf", ".json", ".webp", ".jpg"}:
             source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
-    result = {"engine": version, "passed": len(records) == len(checks) and all(item["passed"] for item in records),
+    final_fingerprint = motion_fingerprint(ROOT)
+    result = {"engine": version, "passed": len(records) == len(checks) and all(item["passed"] for item in records) and checked_fingerprint == measured_fingerprint == final_fingerprint and checked_commit == source_commit(ROOT),
+              "motion_source_fingerprint": final_fingerprint, "source_commit": checked_commit,
+              "source_unchanged_during_checks": checked_fingerprint == measured_fingerprint == final_fingerprint and checked_commit == source_commit(ROOT),
               "renderer": "headless/dummy; no graphical FPS or screenshot claim",
               "save_isolation": "Separate disposable XDG data/config/cache directories for every check",
               "checks": records, "source_sha256": source_hashes}

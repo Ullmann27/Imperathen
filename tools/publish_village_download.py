@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 from pathlib import Path, PurePosixPath
 import re
@@ -82,6 +83,17 @@ CC0_PROFILE = {
 }
 
 
+STRICT_MOTION_PROFILE = {
+    **CC0_PROFILE,
+    "branch": "feature/motion-quality-gate-20261124",
+    "version_code": "8", "version_name": "0.8.0-motion-quality",
+    "tag_prefix": "motion-quality-2026-11-24-",
+    "title": "IMPERATHEN · geprüfter Bewegungsstandard 0.8.0",
+    "description": "Zwischenfassung mit verpflichtender Motion Quality Gate-Freigabe; Nachweise gelten für genau diesen Quellstand.",
+    "engine_checks": CC0_PROFILE["engine_checks"] | {"motion_measurement"},
+}
+
+
 def feature_groups(profile: dict | None = None) -> tuple:
     groups = (("hero_character_content", HERO_RESOURCES),
               ("living_frontier_content", FRONTIER_RESOURCES),
@@ -94,9 +106,9 @@ def feature_groups(profile: dict | None = None) -> tuple:
                    ("npc_behavior_content", NPC_BEHAVIOR_RESOURCES),
                    ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
                    ("meshy_equipment_content", MESHY_EQUIPMENT_RESOURCES))
-    if profile is not None and profile.get("branch") in {MOTION_PROFILE["branch"], CC0_PROFILE["branch"]}:
+    if profile is not None and profile.get("branch") in {MOTION_PROFILE["branch"], CC0_PROFILE["branch"], STRICT_MOTION_PROFILE["branch"]}:
         groups += (("service_gear_content", SERVICE_GEAR_RESOURCES),)
-    if profile is not None and profile.get("branch") == CC0_PROFILE["branch"]:
+    if profile is not None and profile.get("branch") in {CC0_PROFILE["branch"], STRICT_MOTION_PROFILE["branch"]}:
         groups += (("cc0_motion_content", CC0_MOTION_RESOURCES),)
     return groups
 
@@ -126,7 +138,64 @@ def api(path: str, *, missing_ok: bool = False):
 
 def read_json(path: Path) -> dict:
     require(path.is_file() and not path.is_symlink(), "Missing evidence: " + path.name)
-    return json.loads(path.read_text(encoding="utf-8"))
+    def pairs(items):
+        value = {}
+        for key, item in items:
+            require(key not in value, "Duplicate evidence field: " + key)
+            value[key] = item
+        return value
+
+    def invalid_constant(value):
+        raise RuntimeError("Invalid evidence number: " + value)
+
+    def finite_float(value):
+        number = float(value)
+        require(math.isfinite(number), "Non-finite evidence number")
+        return number
+
+    result = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=pairs,
+                        parse_constant=invalid_constant, parse_float=finite_float)
+    require(isinstance(result, dict), "Evidence must be an object: " + path.name)
+    return result
+
+
+def verify_motion_evidence(android: Path, build: dict, engine: dict, source: str) -> dict:
+    """Recheck the gate/report chain before creating a public release directory."""
+    gate_path = android / "engine-checks/motion-gate.json"
+    measurement_path = android / "engine-checks/motion-measurements.json"
+    motion, measured = read_json(gate_path), read_json(measurement_path)
+    fingerprint = motion.get("source_fingerprint")
+    require(isinstance(fingerprint, str) and re.fullmatch(r"[0-9a-f]{64}", fingerprint) is not None,
+            "Motion quality proof has no valid source fingerprint")
+    require(re.fullmatch(r"[0-9a-f]{64}", str(build.get("source_sha256", ""))) is not None,
+            "Build proof has no exact project snapshot hash")
+    require(type(motion.get("schema_version")) is int and motion["schema_version"] == 1
+            and motion.get("passed") is True and motion.get("source_commit") == source
+            and motion.get("sample_hz") == 60 and motion.get("failures") == []
+            and fingerprint == build.get("motion_source_fingerprint")
+            and engine.get("source_commit") == source
+            and engine.get("motion_source_fingerprint") == fingerprint
+            and motion.get("engine_report_sha256") == digest(android / "engine-checks/validation_report.json")
+            and motion.get("measurement_report_sha256") == digest(measurement_path)
+            and build.get("motion_gate_sha256") == digest(gate_path)
+            and re.fullmatch(r"[0-9a-f]{64}", str(motion.get("review_report_sha256", ""))) is not None,
+            "Motion quality evidence missing, failed or does not match the APK")
+    families = motion.get("families")
+    require(isinstance(families, list) and bool(families)
+            and all(isinstance(family, dict) and isinstance(family.get("id"), str)
+                    and family.get("passed") is True and family.get("failures") == [] for family in families),
+            "A movement family did not pass")
+    require(len({family["id"] for family in families}) == len(families), "Duplicate movement family proof")
+    require(type(measured.get("schema_version")) is int and measured["schema_version"] == 1
+            and measured.get("source_fingerprint") == fingerprint and measured.get("sample_hz") == 60
+            and measured.get("fatal") == [] and measured.get("complete") is True and isinstance(measured.get("assets"), dict)
+            and type(motion.get("measured_assets")) is int and motion["measured_assets"] == len(measured["assets"])
+            and isinstance(measured.get("family_metrics"), dict),
+            "Raw movement measurement is missing, failed or differs from the gate")
+    active = {family["id"] for family in families if family.get("status") == "active"}
+    require(bool(active) and active <= measured["family_metrics"].keys(),
+            "Active movement families lack actual measurements")
+    return motion
 
 
 def find_release(tag: str) -> dict | None:
@@ -229,6 +298,11 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
             "Village gameplay, opening or people tests were not executed")
     if profile:
         require(profile["engine_checks"] <= names, "The living-village regression groups were not executed")
+    motion = None
+    if profile and profile.get("branch") == STRICT_MOTION_PROFILE["branch"]:
+        gate_path = android / "engine-checks/motion-gate.json"
+        measurement_path = android / "engine-checks/motion-measurements.json"
+        motion = verify_motion_evidence(android, build, engine, source)
     candidates = list(runtime.rglob("runtime-report.json"))
     require(len(candidates) == 1, "Expected one emulator report")
     runtime_report = read_json(candidates[0])
@@ -252,9 +326,22 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
     require(emulator_build.get("source_commit") == source and emulator_build.get("apk_sha256") == emulator_hash
             and emulator_build.get("abi") == "x86_64" and emulator_build.get("status") == "verified_debug_apk",
             "Emulator package build proof mismatch")
+    if motion is not None:
+        require(emulator_build.get("motion_gate_sha256") == build.get("motion_gate_sha256")
+                and emulator_build.get("motion_source_fingerprint") == build.get("motion_source_fingerprint")
+                and emulator_build.get("source_sha256") == build.get("source_sha256")
+                and build.get("requested_renderer") == emulator_build.get("requested_renderer") == "compatibility",
+                "Android runtime package lacks matching motion quality evidence")
     public.mkdir()
     shutil.copyfile(apk, public / apk_name)
+    if motion is not None:
+        shutil.copyfile(gate_path, public / f"{prefix}-Motion-Quality-Gate.json")
+        shutil.copyfile(measurement_path, public / f"{prefix}-Motion-Messungen.json")
     build_public = {key: build[key] for key in ("source_commit", "apk", "apk_sha256", "apk_size_bytes", "abi", "package", "status", "godot_version", "requested_renderer")}
+    if motion is not None:
+        build_public.update(motion_gate_sha256=build["motion_gate_sha256"],
+                            motion_source_fingerprint=build["motion_source_fingerprint"],
+                            source_sha256=build["source_sha256"])
     build_public.update(source_run=int(run_id), source_branch=profile["branch"] if profile else BRANCH,
                         source_run_url=f"https://github.com/{REPO}/actions/runs/{run_id}")
     for suffix, value in {"APK-Pruefung": validation, "Godot-Pruefungen": engine,
@@ -336,7 +423,7 @@ def publish(public: Path, temporary: Path, source: str, run_id: str, proof: dict
 
 def main() -> None:
     source, run_id, number = (os.environ.get(key, "") for key in ("GITHUB_SHA", "GITHUB_RUN_ID", "GITHUB_RUN_NUMBER"))
-    profile = next((p for p in (LIVING_PROFILE, MOTION_PROFILE, CC0_PROFILE)
+    profile = next((p for p in (LIVING_PROFILE, MOTION_PROFILE, CC0_PROFILE, STRICT_MOTION_PROFILE)
                     if os.environ.get("GITHUB_REF") == "refs/heads/" + p["branch"]), None)
     branch = profile["branch"] if profile else BRANCH
     require(os.environ.get("GH_REPO") == REPO and bool(os.environ.get("GH_TOKEN"))

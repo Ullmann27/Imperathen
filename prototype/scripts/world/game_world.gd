@@ -253,6 +253,7 @@ func is_menu_flight() -> bool:
 
 
 func set_active(active: bool) -> void:
+	regional.set_active(active)
 	_active = active
 	if active:
 		set_menu_flight(false)
@@ -495,6 +496,18 @@ func apply_camera_zoom(factor: float) -> void:
 
 func sync_combat_state(state: Dictionary) -> void:
 	_actions.sync(state)
+	if village_life_world != null:
+		village_life_world.sync_raid_state(state)
+
+
+func set_raid_physics_authority(enabled: bool) -> void:
+	if village_life_world != null:
+		village_life_world.physical_raiders = enabled
+		village_life_world.raider_sight_check = combat_sight_clear
+
+
+func raid_observations() -> Dictionary:
+	return village_life_world.raid_observations() if village_life_world != null else {}
 
 
 func combat_sight_clear(from: Vector2, to: Vector2) -> bool:

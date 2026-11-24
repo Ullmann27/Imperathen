@@ -460,6 +460,78 @@ def tailored_top(anatomy,arm,linen):
     return obj
 
 
+def fit_belt_clearance(belt, garments, clearance=.004):
+    """Keep the entire low-cost belt outside the actual cloth at every LOD.
+
+    Collapsing a 48-sided band to four sides puts its long chords inside the
+    tunic. Preserve its topology separately, then fit the band against the
+    clipped waist slab of both Basis and Mature garment geometry. All values
+    here are object-space metres on the common authored rest rig.
+    """
+    vertices = [v.co.copy() for v in belt.data.vertices]
+    if len(vertices) < 64:
+        raise ValueError('HeroBelt circumference has already lost its protected topology')
+    cx = (min(v.x for v in vertices) + max(v.x for v in vertices)) * .5
+    cy = (min(v.y for v in vertices) + max(v.y for v in vertices)) * .5
+    rx = max(abs(v.x-cx) for v in vertices)
+    ry = max(abs(v.y-cy) for v in vertices)
+    low, high = min(v.z for v in vertices), max(v.z for v in vertices)
+    if min(rx, ry) <= 0:
+        raise ValueError('HeroBelt has no measurable waist circumference')
+    angles = sorted({round(math.atan2((v.y-cy)/ry, (v.x-cx)/rx) % math.tau, 7) for v in vertices})
+    shapes = {}
+    if belt.data.shape_keys:
+        shapes = {key.name: [v.co.copy() for v in key.data] for key in belt.data.shape_keys.key_blocks}
+    # Frontier carriers are fitted to a different rest skeleton. Measure their
+    # actual band edges too: that fitting need not preserve a perfect ellipse.
+    gap, minimum_radius = 0., float('inf')
+    for points in [vertices, *shapes.values()]:
+        directions = [math.atan2((v.y-cy)/ry, (v.x-cx)/rx) for v in points]
+        minimum_radius = min(minimum_radius, *(math.hypot((v.x-cx)/rx, (v.y-cy)/ry) for v in points))
+        for edge in belt.data.edges:
+            first, last = edge.vertices
+            gap = max(gap, abs((directions[last]-directions[first]+math.pi) % math.tau-math.pi))
+    chord = minimum_radius*math.cos(gap*.5)
+    if chord <= 0 or gap > math.tau/32+1e-5:
+        raise ValueError('HeroBelt has an invalid closed circumference')
+    maximum = 0.
+    samples = 0
+    for garment in garments:
+        garment.data.calc_loop_triangles()
+        variants = [list(v.co.copy() for v in garment.data.vertices)]
+        if garment.data.shape_keys and garment.data.shape_keys.key_blocks.get('Mature'):
+            variants.append([v.co.copy() for v in garment.data.shape_keys.key_blocks['Mature'].data])
+        for points in variants:
+            slab = [p for p in points if low <= p.z <= high]
+            for triangle in garment.data.loop_triangles:
+                ids = list(triangle.vertices)
+                for a, b in zip(ids, ids[1:]+ids[:1]):
+                    first, last = points[a], points[b]
+                    if abs(last.z-first.z) < 1e-9:
+                        continue
+                    for height in (low, high):
+                        fraction = (height-first.z)/(last.z-first.z)
+                        if 0. <= fraction <= 1.:
+                            slab.append(first.lerp(last, fraction))
+            for point in slab:
+                maximum = max(maximum, math.hypot((point.x-cx)/rx, (point.y-cy)/ry))
+            samples += len(slab)
+    if samples == 0:
+        raise ValueError('No garment waist section was measured for HeroBelt')
+    scale = max(1., (maximum + clearance/min(rx, ry))/chord)
+    for vertex, original in zip(belt.data.vertices, vertices):
+        vertex.co = (cx+(original.x-cx)*scale, cy+(original.y-cy)*scale, original.z)
+    for name, points in shapes.items():
+        for vertex, original in zip(belt.data.shape_keys.key_blocks[name].data, points):
+            vertex.co = (cx+(original.x-cx)*scale, cy+(original.y-cy)*scale, original.z)
+    belt.data.update()
+    belt['protected_lod_topology'] = True
+    return {'garment_slab_samples': samples, 'radial_scale': scale,
+            'minimum_rest_clearance_m': clearance, 'circumference_samples': len(angles),
+            'largest_circumferential_edge_degrees': math.degrees(gap),
+            'scope': 'Actual Basis and Mature rest surfaces; animated clearance still requires runtime review'}
+
+
 def clothing(anatomy,arm,linen,leather):
     j=anatomy['joints'];neck=j['Head'][0].z;waist=j['Spine'][0].z;hip=j['Pelvis'][0].z
     shoulder=abs(j['Arm_L'][0].x);knee=j['Shin_L'][0].z;hem=knee+.11
@@ -467,8 +539,9 @@ def clothing(anatomy,arm,linen,leather):
     rings=[(0,-.025,hem,.222,.148),(0,-.025,hem+.015,.221,.149),(0,-.025,hem+.085,.211,.150),
            (0,-.026,hip-.03,.194,.146),(0,-.027,hip+.04,.180,.134),
            (0,-.026,waist-.015,.164,.127),(0,-.026,waist+.018,.170,.131)]
-    loft('HeroTunicSkirt',rings,linen,arm,j,fold=.0048)
+    skirt=loft('HeroTunicSkirt',rings,linen,arm,j,fold=.0048)
     belt=loft('HeroBelt',[(0,-.026,waist-.030,.174,.139),(0,-.026,waist+.009,.174,.139)],leather,arm,j,48,0)
+    fit_belt_clearance(belt, [tunic, skirt])
 
     # Simple practical sandals, intentionally modest for the childhood chapter.
     for side in ('L','R'):
@@ -588,7 +661,9 @@ def export_lods():
         bpy.ops.object.select_all(action='DESELECT')
         for obj in list(bpy.context.scene.objects):
             if obj.type not in ('MESH','ARMATURE'):bpy.data.objects.remove(obj,do_unlink=True);continue
-            if obj.type=='MESH' and level>0:
+            # Ninety-six belt triangles are retained at every tier. Reducing
+            # this small circumference destroys fit rather than hidden detail.
+            if obj.type=='MESH' and level>0 and obj.name not in ('PracticeBlade', 'HeroBelt'):
                 # Preserve morph deltas after decimation using the nearest source
                 # surface vertices; topology is validated in the exported bytes.
                 keys={};tree=KDTree(len(obj.data.vertices));base=[v.co.copy() for v in obj.data.vertices]
@@ -599,7 +674,7 @@ def export_lods():
                         if key.name!='Basis':keys[key.name]=[key.data[i].co-base[i] for i in range(len(base))]
                     obj.shape_key_clear()
                 bpy.context.view_layer.objects.active=obj
-                dec=obj.modifiers.new('Mobile LOD','DECIMATE');dec.ratio=1. if obj.name=='PracticeBlade' else ratio
+                dec=obj.modifiers.new('Mobile LOD','DECIMATE');dec.ratio=ratio
                 bpy.ops.object.modifier_move_to_index(modifier=dec.name,index=0);bpy.ops.object.modifier_apply(modifier=dec.name)
                 if keys:
                     obj.shape_key_add(name='Basis')
@@ -610,6 +685,8 @@ def export_lods():
                             delta=sum((deltas[i]/max(.00001,d) for _,i,d in nearest),Vector())/total
                             key.data[v.index].co=v.co+delta
             obj.select_set(True)
+        belt_fit=fit_belt_clearance(bpy.data.objects['HeroBelt'],
+                                   [bpy.data.objects['HeroTunic'],bpy.data.objects['HeroTunicSkirt']])
         for image in bpy.data.images:
             if image.size[0]>texsize or image.size[1]>texsize:
                 factor=texsize/max(image.size);image.scale(max(1,round(image.size[0]*factor)),max(1,round(image.size[1]*factor)));image.pack()
@@ -621,7 +698,7 @@ def export_lods():
         for obj in bpy.context.scene.objects:
             if obj.type=='MESH':
                 obj.data.calc_loop_triangles();n=len(obj.data.loop_triangles);triangles+=n;meshes.append({'name':obj.name,'triangles':n})
-        report.append({'lod':level,'triangles':triangles,'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'meshes':meshes,'texture_edge_max':texsize})
+        report.append({'lod':level,'triangles':triangles,'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'meshes':meshes,'texture_edge_max':texsize,'belt_fit':belt_fit})
     return report
 
 

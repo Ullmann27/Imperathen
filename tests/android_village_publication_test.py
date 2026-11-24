@@ -123,5 +123,76 @@ class DraftReleaseLookupTest(unittest.TestCase):
             self.assertFalse(release["draft"])
 
 
+class StrictMotionPublicationTest(unittest.TestCase):
+    def fixture(self, root):
+        directory = root / "engine-checks"
+        directory.mkdir()
+        engine = {"source_commit": "a" * 40, "motion_source_fingerprint": "b" * 64}
+        measured = {"schema_version": 1, "source_fingerprint": "b" * 64, "sample_hz": 60,
+                    "fatal": [], "complete": True, "assets": {}, "family_metrics": {"hero": {}}}
+        gate = {"schema_version": 1, "passed": True, "source_commit": "a" * 40,
+                "source_fingerprint": "b" * 64, "sample_hz": 60, "failures": [], "measured_assets": 0,
+                "families": [{"id": "hero", "status": "active", "passed": True, "failures": []}],
+                "review_report_sha256": "c" * 64}
+        build = {"motion_source_fingerprint": "b" * 64, "source_sha256": "d" * 64}
+
+        def save():
+            # These are only hash-chain fixtures; they are not game acceptance evidence.
+            (directory / "validation_report.json").write_text(json.dumps(engine))
+            (directory / "motion-measurements.json").write_text(json.dumps(measured))
+            gate["engine_report_sha256"] = PUBLISHER.digest(directory / "validation_report.json")
+            gate["measurement_report_sha256"] = PUBLISHER.digest(directory / "motion-measurements.json")
+            (directory / "motion-gate.json").write_text(json.dumps(gate))
+            build["motion_gate_sha256"] = PUBLISHER.digest(directory / "motion-gate.json")
+
+        save()
+        return engine, measured, gate, build, save
+
+    def test_strict_publication_checks_full_evidence_hash_chain(self):
+        with tempfile.TemporaryDirectory() as work:
+            root = Path(work)
+            engine, measured, gate, build, save = self.fixture(root)
+            self.assertTrue(PUBLISHER.verify_motion_evidence(root, build, engine, "a" * 40)["passed"])
+            (root / "engine-checks/motion-measurements.json").write_text("{}")
+            with self.assertRaisesRegex(RuntimeError, "does not match"):
+                PUBLISHER.verify_motion_evidence(root, build, engine, "a" * 40)
+
+    def test_blank_matching_hashes_and_hidden_fatal_errors_are_rejected(self):
+        with tempfile.TemporaryDirectory() as work:
+            root = Path(work)
+            engine, measured, gate, build, save = self.fixture(root)
+            measured["fatal"] = ["actual runtime was not measured"]
+            save()
+            with self.assertRaisesRegex(RuntimeError, "Raw movement"):
+                PUBLISHER.verify_motion_evidence(root, build, engine, "a" * 40)
+            measured["fatal"] = []
+            gate["source_fingerprint"] = engine["motion_source_fingerprint"] = build["motion_source_fingerprint"] = None
+            save()
+            with self.assertRaisesRegex(RuntimeError, "valid source fingerprint"):
+                PUBLISHER.verify_motion_evidence(root, build, engine, "a" * 40)
+
+    def test_failed_or_missing_family_cannot_publish_even_with_matching_hashes(self):
+        with tempfile.TemporaryDirectory() as work:
+            root = Path(work)
+            engine, measured, gate, build, save = self.fixture(root)
+            gate["families"][0]["passed"] = False
+            save()
+            with self.assertRaisesRegex(RuntimeError, "family did not pass"):
+                PUBLISHER.verify_motion_evidence(root, build, engine, "a" * 40)
+            gate["families"][0]["passed"] = True
+            measured["family_metrics"] = {}
+            save()
+            with self.assertRaisesRegex(RuntimeError, "lack actual measurements"):
+                PUBLISHER.verify_motion_evidence(root, build, engine, "a" * 40)
+
+    def test_publisher_rejects_ambiguous_evidence_json(self):
+        with tempfile.TemporaryDirectory() as work:
+            path = Path(work) / "proof.json"
+            for text in ('{"passed":false,"passed":true}', '[]', '{"metric":NaN}', '{"metric":1e999}'):
+                path.write_text(text)
+                with self.assertRaises(RuntimeError):
+                    PUBLISHER.read_json(path)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -13,6 +13,7 @@ const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 static var _scenes: Dictionary = {}
 static var _far_meshes: Dictionary = {}
 static var _materials: Dictionary = {}
+static var _clip_lengths: Dictionary = {}
 var role := "heavy"
 var variant := 0
 var detail := 0
@@ -62,28 +63,42 @@ func present(pose: String, phase: float, delta: float) -> void:
 	if not player:
 		return
 	var clip: String = ALIASES.get(pose,pose)
-	var gait := STRIDES.has(clip)
+	if not player.has_animation(clip):
+		clip = "idle"
 	player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+	var animation := player.get_animation(clip)
+	var looping := clip in LOOPING
 	if not _manual_live or state != clip or player.assigned_animation != clip:
+		var blend := .12 if _manual_live else 0.0
 		_manual_live = true
 		state = clip
-		var animation := player.get_animation(clip)
-		animation.loop_mode = Animation.LOOP_LINEAR if clip in LOOPING else Animation.LOOP_NONE
-		player.play(clip,0.12)
-		if gait or clip == "idle":
-			player.seek(fposmod(phase,1.0) * animation.length,true)
-		player.advance(0)
-	if gait:
-		var length := player.current_animation_length
-		var target := fposmod(phase,1.0)*length
-		var forward := fposmod(target-player.current_animation_position,length)
-		if forward > length * 0.5:
-			player.seek(target,true)
-		else:
-			player.advance(forward)
-	elif delta > 0.0 and player.is_playing():
-		player.advance(delta)
+		animation.loop_mode = Animation.LOOP_LINEAR if looping else Animation.LOOP_NONE
+		player.play(clip,blend)
+	# Both locomotion and actions use the timeline retained by ValleyScene.
+	# Replacing a far actor or changing its mesh cannot restart an attack.
+	var target := (fposmod(phase,1.0) if looping else clampf(phase,0.0,1.0))*animation.length
+	var forward := target-player.current_animation_position
+	if looping:
+		forward = fposmod(forward,animation.length)
+	if forward < 0.0 or forward > animation.length*.5:
+		player.seek(target,true)
+		player.advance(0.0)
+	else:
+		player.advance(forward)
 	_face.advance(delta, clip, detail)
+
+
+static func clip_length(role_name: String, clip: String) -> float:
+	if not _clip_lengths.has(role_name):
+		var template := _scene(role_name,1).instantiate() as Node3D
+		var animator := template.find_child("AnimationPlayer",true,false) as AnimationPlayer
+		var lengths := {}
+		if animator:
+			for name: StringName in animator.get_animation_list():
+				lengths[str(name)] = animator.get_animation(name).length
+		_clip_lengths[role_name] = lengths
+		template.free()
+	return maxf(.01,float(_clip_lengths[role_name].get(clip,1.0)))
 
 
 static func _scene(role_name: String, level: int) -> PackedScene:

@@ -613,8 +613,13 @@ def distant(g,role):
     g.tube([(0,0,1.635,.135,.121),(0,.01,1.713,.113,.1),(0,.015,1.78,.032,.033)],
            cloth if role=="archer" else "bronze","Head",14)
     for s in (-1,1):
-        g.rod([(.126*s,-.018,.045),(.126*s,0,.40),(.113*s,0,.77)],
-              [.063,.07,.073],"hide","Pelvis",6)
+        # The instanced sole uses the same heel/toe extent and ground height
+        # as the rigged LOD. An ankle cylinder caused a visible foot jump.
+        g.tube([(.126*s,-.055,.011,.063,.12),
+                (.126*s,-.055,.055,.063,.12),
+                (.126*s,0,.12,.05,.055)],"hide","Foot_"+("R" if s<0 else "L"),12,smooth=False)
+        g.rod([(.126*s,0,.12),(.126*s,0,.40),(.113*s,0,.77)],
+              [.05,.07,.073],"hide","Pelvis",6)
         g.rod([(.195*s,0,1.386),(.285*s,-.008,1.17),(.309*s,-.15,.947)],
               [.09,.067,.046],"skin","Spine",6)
     if role=="archer":
