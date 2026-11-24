@@ -54,131 +54,433 @@
       "main_missions": [
         {
           "id": "I-00",
-          "title": "Drei Legionen im Regen"
+          "title": "Drei Legionen im Regen",
+          "location": "Aquileia und Umland",
+          "cast": [
+            "Caesar",
+            "Labienus"
+          ],
+          "story_core": "Cold Open: Caesar mobilisiert die bei Aquileia liegenden Legionen; die große Politik wird anschließend auf das kleine Valdora und seine drei Becher heruntergebrochen.",
+          "narrative_status": "HISTORICAL CORE",
+          "source_section": "Band 1 · Abschnitt „I-00 · Drei Legionen im Regen“ · Tabelle 3"
         },
         {
           "id": "I-01",
-          "title": "Die drei Becher"
+          "title": "Die drei Becher",
+          "location": "Familienhaus Valdora",
+          "cast": [
+            "Julia",
+            "Silvanus",
+            "Spieler"
+          ],
+          "story_core": "Der erste spielbare Morgen macht Eltern, Zuhause, Essen, Arbeit und kleine Wahlmöglichkeiten vertraut, bevor Gefahr existiert.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-01 · Die drei Becher“ · Tabelle 4"
         },
         {
           "id": "I-02",
-          "title": "Der falsche Korb"
+          "title": "Der falsche Korb",
+          "location": "Nachbarhaus und Backgasse",
+          "cast": [
+            "Julia",
+            "Aurelia",
+            "Spieler"
+          ],
+          "story_core": "Ein einfacher Botengang beweist, dass Fehler neue Situationen erzeugen statt sofortige Missionsabbrüche.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-02 · Der falsche Korb“ · Tabelle 5"
         },
         {
           "id": "I-03",
-          "title": "Marcus kennt eine Abkürzung"
+          "title": "Marcus kennt eine Abkürzung",
+          "location": "Gassen, Brunnen, Markt",
+          "cast": [
+            "Marcus",
+            "Cassia",
+            "Spieler"
+          ],
+          "story_core": "Marcus wird als echter Freund oder beginnender Rivale eingeführt; ein Münzstreit und Marktweg legen Beziehung und Handel an.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-03 · Marcus kennt eine Abkürzung“ · Tabelle 6"
         },
         {
           "id": "I-04",
-          "title": "Der Freund meines Vaters"
+          "title": "Der Freund meines Vaters",
+          "location": "Schmiede des Sextus",
+          "cast": [
+            "Silvanus",
+            "Sextus",
+            "Spieler"
+          ],
+          "story_core": "Silvanus bringt den Jungen zu seinem ältesten Freund; die Erwachsenenbeziehung wird durch Arbeit, alte Scherze und konkrete Hilfe gezeigt.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-04 · Der Freund meines Vaters“ · Tabelle 7"
         },
         {
           "id": "I-05",
-          "title": "Sieh hin, bevor du Kraft brauchst"
+          "title": "Sieh hin, bevor du Kraft brauchst",
+          "location": "Schmiede",
+          "cast": [
+            "Sextus",
+            "Spieler"
+          ],
+          "story_core": "Die erste echte Lehre verbindet Beobachtung, Handwerk und spätere Kampfphilosophie; ein beschädigter Griff wird geprüft statt blind bearbeitet.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-05 · Sieh hin, bevor du Kraft brauchst“ · Tabelle 8"
         },
         {
           "id": "I-06",
-          "title": "Ein Preis ist eine Zusage"
+          "title": "Ein Preis ist eine Zusage",
+          "location": "Markt Valdora",
+          "cast": [
+            "Cassia",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Handel wird als Beziehung und echte Bestandsbewegung eingeführt: endliche Waren, Wechselgeld, Lieferzusagen und Ruf.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-06 · Ein Preis ist eine Zusage“ · Tabelle 9"
         },
         {
           "id": "I-07",
-          "title": "Der kranke Wachmann"
+          "title": "Der kranke Wachmann",
+          "location": "Wachposten und Dorfrand",
+          "cast": [
+            "Decimus",
+            "Silvanus",
+            "Spieler"
+          ],
+          "story_core": "Der Zwölfjährige hilft beaufsichtigt mit Wasser, Nachricht und kurzer Kontrollrunde, ohne als regulärer Kindersoldat dargestellt zu werden.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-07 · Der kranke Wachmann“ · Tabelle 10"
         },
         {
           "id": "I-08",
-          "title": "Hufspuren im Regen"
+          "title": "Hufspuren im Regen",
+          "location": "Nordweg, Felder, Bach",
+          "cast": [
+            "Marcus",
+            "Decimus",
+            "Spieler"
+          ],
+          "story_core": "Frische Spuren und widersprüchliche Aussagen erzeugen Unruhe, ohne einen Täter oder ein Volk vorschnell festzulegen.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-08 · Hufspuren im Regen“ · Tabelle 11"
         },
         {
           "id": "I-09",
-          "title": "Der letzte gewöhnliche Abend"
+          "title": "Der letzte gewöhnliche Abend",
+          "location": "Familienhaus und Dorf",
+          "cast": [
+            "Julia",
+            "Silvanus",
+            "Sextus",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Ein normaler Abend mit Essen, Zukunftsplänen und optionalen Besuchen baut Verlust auf, ohne Todesvorahnungen zu plakatieren.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-09 · Der letzte gewöhnliche Abend“ · Tabelle 12"
         },
         {
           "id": "I-10",
-          "title": "Die Nacht der Reiter"
+          "title": "Die Nacht der Reiter",
+          "location": "Valdora bei Nacht",
+          "cast": [
+            "Silvanus",
+            "Julia",
+            "Marcus",
+            "Decimus",
+            "Spieler"
+          ],
+          "story_core": "Etwa dreißig Reiter greifen an; Feuer, Pferde, Gedränge und bekannte Wege werden zur Krise. Der Spieler wählt ausdrücklich Verteidigung/Rettung oder Verstecken mit den Eltern.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-10 · Die Nacht der Reiter“ · Tabelle 13"
         },
         {
           "id": "I-11",
-          "title": "Die Schmiede im Feuer"
+          "title": "Die Schmiede im Feuer",
+          "location": "Schmiede",
+          "cast": [
+            "Sextus",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Sextus hält einen Fluchtweg offen; sein Tod spiegelt die Lehre über Aufmerksamkeit und Kontrolle, während die Werkstatt real ihren Arbeiter verliert.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-11 · Die Schmiede im Feuer“ · Tabelle 14"
         },
         {
           "id": "I-12",
-          "title": "Der letzte Weg des Vaters"
+          "title": "Der letzte Weg des Vaters",
+          "location": "Familiengasse und Palisade",
+          "cast": [
+            "Silvanus",
+            "Julia",
+            "Spieler"
+          ],
+          "story_core": "Silvanus schützt Menschen so, wie seine Figur aufgebaut wurde. Er stirbt in beiden Hauptwegen; Julias Überleben hängt von tatsächlich ausgeführter Hilfe ab.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-12 · Der letzte Weg des Vaters“ · Tabelle 15"
         },
         {
           "id": "I-13",
-          "title": "Morgen ohne Stimmen"
+          "title": "Morgen ohne Stimmen",
+          "location": "Valdora nach dem Angriff",
+          "cast": [
+            "Julia",
+            "Marcus",
+            "Aurelia",
+            "Decimus",
+            "Spieler"
+          ],
+          "story_core": "Am Morgen erzählen leere Arbeitsplätze, beschädigte Vorräte und fehlende Personen konkrete Folgen statt einer austauschbaren Ruinenkulisse.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-13 · Morgen ohne Stimmen“ · Tabelle 16"
         },
         {
           "id": "I-14",
-          "title": "Der Schwur"
+          "title": "Der Schwur",
+          "location": "Waldrand oberhalb Valdoras",
+          "cast": [
+            "Marcus",
+            "Julia",
+            "Spieler"
+          ],
+          "story_core": "Der Junge nimmt ein Erinnerungsstück, spricht mit Überlebenden und schwört: „Ich werde euch rächen. Ich finde die Verantwortlichen.“ Der Schwur eröffnet Ermittlung statt sofortige Soldatenkarriere.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-14 · Der Schwur“ · Tabelle 17"
         },
         {
           "id": "I-15",
-          "title": "Asche hat Namen"
+          "title": "Asche hat Namen",
+          "location": "Brandstellen, Lager, Bachfurt",
+          "cast": [
+            "Marcus",
+            "Decimus",
+            "Cassia",
+            "Spieler"
+          ],
+          "story_core": "Pferdebeschlag, Stoffrest, Liefermarke und rotes Wachssiegel werden methodisch verglichen; die Spur führt zu einer fiktiven Handelsorganisation.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-15 · Asche hat Namen“ · Tabelle 18"
         },
         {
           "id": "I-16",
-          "title": "Valdora steht wieder"
+          "title": "Valdora steht wieder",
+          "location": "Valdora",
+          "cast": [
+            "Decimus",
+            "Julia",
+            "Cassia",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Der Wiederaufbau dauert Monate: Holz, Stein, Nahrung, Arbeitskräfte und Prioritäten verändern Häuser, Markt, Schmiede, Felder und Palisade sichtbar.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-16 · Valdora steht wieder“ · Tabelle 19"
         },
         {
           "id": "I-17",
-          "title": "Der Preis des Holzes"
+          "title": "Der Preis des Holzes",
+          "location": "Wald, Holzplatz, Nachbardorf",
+          "cast": [
+            "Cassia",
+            "Marcus",
+            "Decimus",
+            "Spieler"
+          ],
+          "story_core": "Ressourcenknappheit macht Moral und Ökonomie gegeneinander spürbar; dasselbe Holz wird von Valdora und einem Nachbardorf gebraucht.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-17 · Der Preis des Holzes“ · Tabelle 20"
         },
         {
           "id": "I-18",
-          "title": "Der erste Winter ohne ihn"
+          "title": "Der erste Winter ohne ihn",
+          "location": "Valdora und Aquileia-Straße",
+          "cast": [
+            "Julia",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Wintervorräte, eine leere Schmiede und die Frage nach einem Nachfolger zeigen, dass Trauer und Wirtschaft zugleich weiterlaufen.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-18 · Der erste Winter ohne ihn“ · Tabelle 21"
         },
         {
           "id": "I-19",
-          "title": "Der Mann, den alle ansehen"
+          "title": "Der Mann, den alle ansehen",
+          "location": "Aquileia, Forum und Hafen",
+          "cast": [
+            "Caesar",
+            "Cassia",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Der Junge sieht Caesar aus der Nähe, ohne Auserwählter zu sein. Die Stadt zeigt Rangbarrieren, Handel, Wachen und die Macht des römischen Systems.",
+          "narrative_status": "HISTORICAL FRAME",
+          "source_section": "Band 1 · Abschnitt „I-19 · Der Mann, den alle ansehen“ · Tabelle 22"
         },
         {
           "id": "I-20",
-          "title": "Das rote Siegel"
+          "title": "Das rote Siegel",
+          "location": "Aquileia, Lagerhäuser",
+          "cast": [
+            "Cassia",
+            "Serranus",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Die Überfallspur führt zu einer fiktiven Handelsgesellschaft. Ein Lagervertrag nennt Gaius Varro Serranus, beweist seine Schuld aber noch nicht.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-20 · Das rote Siegel“ · Tabelle 23"
         },
         {
           "id": "I-21",
-          "title": "Marcus entscheidet sich"
+          "title": "Marcus entscheidet sich",
+          "location": "Valdora, Straßenkreuzung",
+          "cast": [
+            "Marcus",
+            "Julia",
+            "Spieler"
+          ],
+          "story_core": "Marcus bekommt eigene Zukunftswünsche und kann Handel, Wache, Ausbildung oder getrennte Wege wählen; Freundschaft wird nicht zur permanenten Begleiterpflicht.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-21 · Marcus entscheidet sich“ · Tabelle 24"
         },
         {
           "id": "I-22",
-          "title": "Die zweite Klinge"
+          "title": "Die zweite Klinge",
+          "location": "Werkstatt und Übungsplatz",
+          "cast": [
+            "Marcus",
+            "Decimus",
+            "Spieler"
+          ],
+          "story_core": "Bewaffnete Grundlagen beginnen erst nach Jahren: Schwert, Schild oder Speer werden ausgeliehen oder erworben, mit Reichweite, Ausdauer und kontrollierten Trainingsfenstern.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-22 · Die zweite Klinge“ · Tabelle 25"
         },
         {
           "id": "I-23",
-          "title": "Die Straße über die Alpen"
+          "title": "Die Straße über die Alpen",
+          "location": "Alpenroute Richtung Gallien",
+          "cast": [
+            "Cassia",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Eine große Karawane verbindet Reise, Wetter, Packtiere, Versorgung und die Spur des roten Siegels mit gallischen Regionen.",
+          "narrative_status": "FICTIONAL FRAME",
+          "source_section": "Band 1 · Abschnitt „I-23 · Die Straße über die Alpen“ · Tabelle 26"
         },
         {
           "id": "I-24",
-          "title": "Ein Dorf, das nicht deins ist"
+          "title": "Ein Dorf, das nicht deins ist",
+          "location": "Gallische Siedlung",
+          "cast": [
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Ein Konflikt um beschlagnahmte Vorräte zeigt, dass lokale Menschen keine Kulisse oder pauschalen Feinde sind.",
+          "narrative_status": "HISTORICAL FRAME",
+          "source_section": "Band 1 · Abschnitt „I-24 · Ein Dorf, das nicht deins ist“ · Tabelle 27"
         },
         {
           "id": "I-25",
-          "title": "Der Veteran am Feuer"
+          "title": "Der Veteran am Feuer",
+          "location": "Römisches Marschlager",
+          "cast": [
+            "Labienus",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Lagerbau, Wache, Marschordnung und Disziplin werden als Arbeit erklärt; militärischer Dienst wird vorbereitet statt romantisiert.",
+          "narrative_status": "HISTORICAL FRAME",
+          "source_section": "Band 1 · Abschnitt „I-25 · Der Veteran am Feuer“ · Tabelle 28"
         },
         {
           "id": "I-26",
-          "title": "Ein Name in der Liste"
+          "title": "Ein Name in der Liste",
+          "location": "Cisalpinische Rekrutierungsstelle",
+          "cast": [
+            "Decimus",
+            "Julia",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Dokumente, Status, Ausrüstung, Abschied und Verpflichtungen bestimmen, ob der Spieler Legion, Logistik, Handel oder Heimatdienst wählt.",
+          "narrative_status": "HISTORICAL FRAME",
+          "source_section": "Band 1 · Abschnitt „I-26 · Ein Name in der Liste“ · Tabelle 29"
         },
         {
           "id": "I-27",
-          "title": "Nach Norden"
+          "title": "Nach Norden",
+          "location": "Marsch durch Gallien",
+          "cast": [
+            "Caesar",
+            "Labienus",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Eine Armee wird als kilometerlange Versorgungskette erlebt: Wagen, Nahrung, Krankheit, Streit und Befehle sind genauso wichtig wie Kampf.",
+          "narrative_status": "HISTORICAL CORE",
+          "source_section": "Band 1 · Abschnitt „I-27 · Nach Norden“ · Tabelle 30"
         },
         {
           "id": "I-28",
-          "title": "Vor Alesia"
+          "title": "Vor Alesia",
+          "location": "Alesia-Umland",
+          "cast": [
+            "Caesar",
+            "Labienus",
+            "Vercingetorix",
+            "Spieler"
+          ],
+          "story_core": "Belagerung wird als Ingenieur-, Hunger- und Moralproblem aufgebaut. Der Spieler arbeitet an Befestigung, Meldungen, Aufklärung oder Versorgung.",
+          "narrative_status": "HISTORICAL CORE",
+          "source_section": "Band 1 · Abschnitt „I-28 · Vor Alesia“ · Tabelle 31"
         },
         {
           "id": "I-29",
-          "title": "Der Ring schließt sich"
+          "title": "Der Ring schließt sich",
+          "location": "Alesia, römische Linien",
+          "cast": [
+            "Caesar",
+            "Labienus",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Innen- und Entsatzangriffe treffen aufeinander. Third-Person-Kampf und taktische Übersicht greifen auf denselben Weltzustand zu.",
+          "narrative_status": "HISTORICAL CORE",
+          "source_section": "Band 1 · Abschnitt „I-29 · Der Ring schließt sich“ · Tabelle 32"
         },
         {
           "id": "I-30",
-          "title": "Der Gefangene und der Blick"
+          "title": "Der Gefangene und der Blick",
+          "location": "Nach Alesia",
+          "cast": [
+            "Caesar",
+            "Vercingetorix",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Nach dem Sieg stehen Gefangene, Verwundete und Beute im Vordergrund; Triumph wird mit menschlichen Folgen kontrastiert.",
+          "narrative_status": "HISTORICAL CORE",
+          "source_section": "Band 1 · Abschnitt „I-30 · Der Gefangene und der Blick“ · Tabelle 33"
         },
         {
           "id": "I-31",
-          "title": "Der Quartiermeister mit dem roten Wachs"
+          "title": "Der Quartiermeister mit dem roten Wachs",
+          "location": "Römisches Nachschublager",
+          "cast": [
+            "Serranus",
+            "Marcus",
+            "Spieler"
+          ],
+          "story_core": "Serranus’ Netz taucht im Nachschub wieder auf. Beweise können offiziell gemeldet, kopiert, verkauft oder für eine spätere Konfrontation zurückgehalten werden.",
+          "narrative_status": "FICTIONAL THREAD",
+          "source_section": "Band 1 · Abschnitt „I-31 · Der Quartiermeister mit dem roten Wachs“ · Tabelle 34"
         }
       ],
       "side_quests": [

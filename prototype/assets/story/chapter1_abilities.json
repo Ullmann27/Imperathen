@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "save_key": "village.abilities",
+  "rule": "Fähigkeiten entstehen nur aus tatsächlich gespeicherten Kapitel-I-Fakten (abgeschlossene Schritte oder Drehbuch-Flags). Die ID ist dauerhaft stabil; Name und Text dürfen sich ändern. Neue Einträge werden nur angehängt, nie umnummeriert. Die Spielwirkung ist jeweils eine gekennzeichnete Ergänzung, weil Band 1 keine Werte festlegt.",
+  "abilities": [
+    {
+      "id": "ch1_look_before_force",
+      "name": "Sieh hin, bevor du Kraft brauchst",
+      "mission": "I-05",
+      "teacher": "sextus",
+      "grant": {
+        "completed": "forge_anvil"
+      },
+      "source": "Band 1 · Abschnitt „I-05 · Sieh hin, bevor du Kraft brauchst“ · Tabelle 8 · Storykern: „Die erste echte Lehre verbindet Beobachtung, Handwerk und spätere Kampfphilosophie; ein beschädigter Griff wird geprüft statt blind bearbeitet.“",
+      "effect": {
+        "type": "block_window_bonus_seconds",
+        "value": 0.2
+      },
+      "effect_text": "Deckung im Nahkampf hält 0,2 s länger (0,85 → 1,05 s; Abwehrfenster 0,75 → 0,95 s).",
+      "effect_status": "Ergänzung: Band 1 nennt die Verbindung zur späteren Kampfphilosophie, aber keinen Zahlenwert."
+    },
+    {
+      "id": "ch1_price_is_promise",
+      "name": "Ein Preis ist eine Zusage",
+      "mission": "I-06",
+      "teacher": "cassia",
+      "grant": {
+        "completed": "deliver_hinge"
+      },
+      "source": "Band 1 · Abschnitt „I-06 · Ein Preis ist eine Zusage“ · Tabelle 9 · Storykern: „Handel wird als Beziehung und echte Bestandsbewegung eingeführt: endliche Waren, Wechselgeld, Lieferzusagen und Ruf.“",
+      "effect": {
+        "type": "emergency_food_discount_denarii",
+        "value": 1
+      },
+      "effect_text": "Der Notvorrat beim Händler kostet 5 statt 6 Denare (Ruf als verlässlicher Käufer).",
+      "effect_status": "Ergänzung: Band 1 nennt Ruf und Lieferzusagen, aber keinen Preisnachlass."
+    },
+    {
+      "id": "ch1_read_tracks",
+      "name": "Spuren sichern statt raten",
+      "mission": "I-08",
+      "teacher": "decimus",
+      "grant": {
+        "screenplay_flag": "hoof_evidence"
+      },
+      "source": "Band 1 · Abschnitt „I-08 · Hufspuren im Regen“ · Tabelle 11 · Primärziel: „Hinweise sichern, Widersprüche prüfen und nur belegte Schlussfolgerungen in das Event-Ledger übernehmen.“",
+      "effect": {
+        "type": "scout_insight_bonus",
+        "value": 1
+      },
+      "effect_text": "Beim Auskundschaften einer Überfallspur +1 Scharfsinn zusätzlich.",
+      "effect_status": "Ergänzung: Band 1 legt das Spurensichern fest, aber keinen Erfahrungswert."
+    }
+  ]
+}

@@ -9,6 +9,7 @@ const STAMINA_RECOVERY := 12.0
 const EPSILON := 0.000001
 const MIN_CONTACT_DISTANCE := 0.25
 const GUARD_SECONDS := 0.85
+const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const DODGE_SECONDS := 0.65
 const TECHNIQUES := {
 	"jab_left":{"label":"Linke Gerade", "short":"Gerade L", "duration":0.62, "windup":0.18, "active":0.14, "reach":1.45, "arc_dot":0.72, "damage":6, "cost":7.0, "practice":0, "family":"fist"},
@@ -104,8 +105,10 @@ static func execute(data: Dictionary, command: String, args: Dictionary) -> Dict
 			return _result(false, "Du brauchst einen Augenblick, um wieder Luft zu bekommen.")
 		combat.stamina = maxf(0.0, float(combat.stamina) - cost)
 		combat.dodge_remaining = DODGE_SECONDS if dodge else 0.0
-		combat.guard_remaining = 0.0 if dodge else GUARD_SECONDS
-		_set_defense_windows(data, 0.0 if dodge else 0.75, 0.55 if dodge else 0.0)
+		# Chapter I lesson „Sieh hin, bevor du Kraft brauchst“ (I-05) lengthens the guard.
+		var guard_bonus := guard_bonus_seconds(data)
+		combat.guard_remaining = 0.0 if dodge else GUARD_SECONDS + guard_bonus
+		_set_defense_windows(data, 0.0 if dodge else 0.75 + guard_bonus, 0.55 if dodge else 0.0)
 		return _result(true, "Du weichst aus." if dodge else "Du gehst in Deckung.")
 	if not available(data, args.technique):
 		return _result(false, "Der Gladius gehört zur abgeschlossenen erwachsenen Soldatenausbildung." if is_armed(args.technique) else "Diese Technik lernst du durch kontrollierte Treffer am Übungspfahl.")
@@ -245,7 +248,7 @@ static func validate(data: Dictionary) -> String:
 		return "Ungültiger Vertrag für unbewaffnete Bewegung."
 	if not _integer(v.version, 1, 1) or typeof(v.resolved) != TYPE_BOOL or typeof(v.technique) != TYPE_STRING or typeof(v.target_id) != TYPE_STRING:
 		return "Unbekannte Nahkampfversion oder Technik."
-	for pair: Array in [["stamina",100.0],["elapsed",1.3],["guard_remaining",GUARD_SECONDS],["dodge_remaining",DODGE_SECONDS]]:
+	for pair: Array in [["stamina",100.0],["elapsed",1.3],["guard_remaining",GUARD_SECONDS + guard_bonus_seconds(data)],["dodge_remaining",DODGE_SECONDS]]:
 		if not _number(v[pair[0]], 0.0, float(pair[1]) + EPSILON):
 			return "Ungültige Ausdauer oder Bewegungszeit."
 	if not _integer(v.practice_hits, 0, 1000) or not _integer(v.resolved_hits, 0, 1000000):
@@ -313,6 +316,10 @@ static func _target(data: Dictionary, id: String) -> Dictionary:
 
 static func _alive(data: Dictionary) -> bool:
 	return _integer(data.get("player", {}).get("health"), 1, 1000000) and not data.get("progress", {}).get("career_terminal", false)
+
+
+static func guard_bonus_seconds(data: Dictionary) -> float:
+	return Abilities.effect_value(data, "block_window_bonus_seconds")
 
 
 static func _set_defense_windows(data: Dictionary, guard: float, dodge: float) -> void:

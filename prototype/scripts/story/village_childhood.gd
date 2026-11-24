@@ -2,6 +2,9 @@ extends RefCounted
 ## Authored childhood chapters. Only explicit, nearby actions advance their order.
 ## This optional state is created for fresh games; loading a legacy save never adds it.
 
+const Bible = preload("res://scripts/story/campaign_bible.gd")
+const Abilities = preload("res://scripts/story/chapter_abilities.gd")
+const MissionData = preload("res://scripts/story/mission_data.gd")
 const VERSION := 2
 const LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
@@ -33,67 +36,15 @@ const NEIGHBORS := {
 	"cassia":{"name":"Cassia", "role":"Händlerin", "position":Vector2(5.0,0.0), "text":"Auf meinem Tisch liegen Waren, die andere brauchen. Höre erst zu, prüfe die Menge und nenne dann den Preis."},
 	"severus":{"name":"Severus", "role":"Dorfwache", "position":Vector2(-1.2,-45.9), "text":"Eine Runde mit der Wache ist kein Feldzug. Wir sehen nach Wegen und Toren, helfen den Leuten und melden, was wir tatsächlich beobachtet haben."}
 }
-const STEPS := [
-	{"id":"mother_morning", "chapter":"Ein Morgen zu Hause", "npc":"julia", "label":"Mit Mutter den Morgen besprechen", "objective":"Sprich vor eurem Haus mit deiner Mutter Julia.", "text":"»Du bist wach. Dein Vater arbeitet heute an einer Tür. Hol bitte zuerst Wasser im Haus, dann bringt ihr gemeinsam die Besorgungen in Ordnung. Für Cassia lege ich einen Haushaltsdenar bereit.«", "result":"Mutter vertraut dir den zweckgebundenen Haushaltsdenar an. Er ist für die Besorgung, nicht dein Taschengeld."},
-	{"id":"fill_water", "chapter":"Ein Morgen zu Hause", "point":"family_water", "label":"Den Wasserkrug füllen", "objective":"Gehe ins Familienhaus und fülle den Krug am Wassertisch.", "text":"", "result":"Du füllst den bereitgestellten Krug. Dein Vater wartet draußen auf dich."},
-	{"id":"father_morning", "chapter":"Ein Morgen zu Hause", "npc":"silvanus", "label":"Vater den Krug bringen und zuhören", "objective":"Bring den Krug zu deinem Vater Silvanus vor dem Haus.", "text":"»Danke. Eine Tür braucht gerade Angeln; ein Versprechen braucht jemanden, der es hält. Geh zu Cassia auf den Markt und frage nach unserer Bestellung. Komm anschließend zu Mutter zurück.«", "result":"Vater nimmt den Krug. Die Familie verabredet die Besorgung auf dem Markt."},
-	{"id":"market_meeting", "chapter":"Menschen auf dem Markt", "npc":"cassia", "label":"Nach der Familienbestellung fragen", "objective":"Lerne Cassia am Markt kennen und frage nach der Bestellung deiner Familie.", "text":"»Julia hat Brot und Grütze bestellt. Das Päckchen kostet den mitgegebenen Denar. Prüfe erst, ob Name und Bestellung stimmen; dann kaufen wir es gemeinsam.«", "result":"Du hast die richtige Bestellung und ihren Preis erfragt."},
-	{"id":"market_purchase", "chapter":"Menschen auf dem Markt", "npc":"cassia", "label":"Den Haushaltsdenar gegen die Bestellung tauschen", "objective":"Kaufe bei Cassia das Familienpäckchen mit dem reservierten Haushaltsdenar.", "text":"»Hier ist das verschnürte Päckchen für eure Küche. Trag es selbst nach Hause; die Besorgung ist erst fertig, wenn es bei deiner Mutter angekommen ist.«", "result":"Der Haushaltsdenar ist bezahlt. Du trägst das Familienpäckchen tatsächlich im Auftragsinventar."},
-	{"id":"deliver_food", "chapter":"Menschen auf dem Markt", "npc":"julia", "label":"Mutter die Bestellung übergeben", "objective":"Kehre mit dem Familienpäckchen zu Julia zurück.", "text":"»Du hast zugehört und die richtige Bestellung gebracht. Dein Vater hat noch eine Frage an Fabius. Danach kannst du Sextus an der Schmiede kennenlernen.«", "result":"Die Bestellung erreicht die Küche. Julia merkt sich, dass sie sich auf dich verlassen konnte."},
-	{"id":"woodcutter_request", "chapter":"Ein Weg für die Nachbarn", "npc":"fabius", "label":"Fabius nach dem Kleinholz für die Schmiede fragen", "objective":"Suche Fabius auf und frage nach dem vorbereiteten Kleinholz.", "text":"»Für Sextus liegt ein kleines Bündel am Holzlager westlich des Dorfes bereit. Nur das markierte Kleinholz mitnehmen. Die schweren Stämme bleiben liegen.«", "result":"Fabius beschreibt dir den Lagerplatz. Jetzt weißt du, welches Bündel abgeholt werden darf."},
-	{"id":"collect_kindling", "chapter":"Ein Weg für die Nachbarn", "point":"wood_bundle", "label":"Das bereitgelegte Kleinholzbündel aufnehmen", "objective":"Gehe zum westlichen Holzlager und hole das kleine Bündel für Sextus.", "text":"", "result":"Du nimmst das vorbereitete Bündel auf. Es muss noch zur Schmiede auf der anderen Dorfseite."},
-	{"id":"deliver_kindling", "chapter":"Ein Weg für die Nachbarn", "npc":"sextus", "label":"Sextus das Kleinholz bringen", "objective":"Lerne Sextus an der Schmiede kennen und bring ihm Fabius’ Bündel.", "text":"»Du hast den Weg selbst gemacht und das richtige Holz gebracht. Beim Schmieden zählt dieselbe Sorgfalt. Wenn du einen Probemorgen versuchen möchtest, rede vorher mit deinem Vater.«", "result":"Sextus nimmt das Bündel an. Er bietet einen begleiteten Probemorgen an, keine fertige Berufsausbildung."},
-	{"id":"apprentice_permission", "chapter":"Eine erste Lehre", "npc":"silvanus", "label":"Vater um Erlaubnis für den Probemorgen bitten", "objective":"Sprich zu Hause mit Silvanus über Sextus’ Angebot.", "text":"»Ein Probemorgen ist in Ordnung, wenn Sextus dabeibleibt und du auf seine Anweisungen hörst. Geh heute noch zu ihm und vereinbare, was du morgen tun darfst.«", "result":"Vater stimmt dem beaufsichtigten Probemorgen zu. Du bleibst zwölf und wohnst weiter bei deiner Familie."},
-	{"id":"smith_trial", "chapter":"Eine erste Lehre", "npc":"sextus", "label":"Den begleiteten Probemorgen vereinbaren", "objective":"Bestätige bei Sextus die Erlaubnis deiner Eltern.", "text":"»Morgen zeige ich dir Blasebalg, Amboss und Kühlbottich. Heute ruhst du dich aus. Du fasst kein heißes Werkstück an, bevor ich es dir sage.«", "result":"Der Probemorgen ist verabredet. Geh nach Hause; der nächste Tag beginnt erst, wenn du dort bewusst ruhst."},
-	{"id":"rest_first", "chapter":"Eine erste Lehre", "point":"family_rest", "label":"Zu Hause essen und bis zum nächsten Morgen ruhen", "objective":"Kehre in euer Familienhaus zurück und beende den ersten Tag bewusst.", "text":"", "result":"Nach Essen und Schlaf beginnt der zweite erzählte Dorftag. Dein Alter bleibt zwölf.", "rest":true},
-	{"id":"forge_bellows", "chapter":"Arbeit unter Anleitung", "point":"bellows", "label":"Den Blasebalg unter Sextus’ Anleitung bedienen", "objective":"Gehe zum Blasebalg der Schmiede und beginne die angeleitete Arbeit.", "text":"", "result":"Die erste angeleitete Arbeitsfolge ist beendet. Sextus legt ein vorbereitetes Werkstück auf den Amboss.", "seconds":8.0},
-	{"id":"forge_anvil", "chapter":"Arbeit unter Anleitung", "point":"anvil", "label":"Das vorbereitete Scharnier am Amboss richten", "objective":"Wechsle zum Amboss und richte das vorbereitete Scharnier mit Sextus.", "text":"", "result":"Du hast am richtigen Arbeitsplatz mitgearbeitet. Das Scharnier muss noch am Kühlbottich geprüft werden.", "seconds":10.0},
-	{"id":"forge_quench", "chapter":"Arbeit unter Anleitung", "point":"quench", "label":"Das Werkstück mit Sextus kühlen und prüfen", "objective":"Gehe zum Kühlbottich und schließe die begleitete Arbeitsfolge ab.", "text":"", "result":"Sextus prüft das fertige Scharnier und gibt es dir für Cassias Markttruhe mit.", "seconds":4.0},
-	{"id":"deliver_hinge", "chapter":"Eine ehrliche Lieferung", "npc":"cassia", "label":"Cassia das reparierte Scharnier übergeben", "objective":"Trage das geprüfte Scharnier von der Schmiede zu Cassias Marktstand.", "text":"»Das ist das Stück für meine Truhe. Du hast nicht nur davon erzählt, du hast es hergebracht. Zwei Denare sind dein vereinbarter Botenlohn. Hilfst du mir auch bei der Abrechnung einer kleinen Nachbarschaftsbestellung?«", "result":"Die Truhe erhält ihr Scharnier. Du verdienst einmalig zwei Denare für die tatsächliche Lieferung."},
-	{"id":"market_trade", "chapter":"Eine ehrliche Lieferung", "npc":"cassia", "label":"Die kleine Bestellung abrechnen", "objective":"Entscheide bei Cassia, wie du die Nachbarschaftsbestellung abrechnest.", "text":"»Du kannst den vereinbarten Lohn von zwei Denaren nehmen. Oder du lässt einen Denar beim Nachbarn, dessen Krug zerbrochen ist. Ich merke mir beides: einen eingehaltenen Preis und eine freiwillige Hilfe.«", "result":"Die Abrechnung bleibt als konkrete Entscheidung gespeichert."},
-	{"id":"smith_apprentice", "chapter":"Ein Platz an der Schmiede", "npc":"sextus", "label":"Die angefangene Schmiedelehre fortsetzen", "objective":"Berichte Sextus von der Lieferung und besprich die weitere Lehre.", "text":"»Du bist wiedergekommen, hast das Werkstück geliefert und Rechenschaft abgelegt. Du kannst bei mir weiterlernen. Ein paar Arbeitsfolgen machen dich noch nicht zum Meister; wir nehmen uns Zeit.«", "result":"Sextus nimmt dich als beginnenden Schmiedelehrling an. Deine praktische Arbeit und sein Vertrauen tragen diese Entscheidung."},
-	{"id":"family_report", "chapter":"Ein Platz an der Schmiede", "npc":"julia", "label":"Zu Hause vom Probemorgen und dem Markt erzählen", "objective":"Kehre zu Julia zurück und erzähle von deiner Arbeit.", "text":"»Du hast heute Menschen geholfen und selbst etwas verdient. Beides hat Zeit gekostet. Leg die Arbeit für heute beiseite; morgen kannst du Severus nach einer begleiteten Dorfrunde fragen.«", "result":"Die Familie hört von deinen tatsächlichen Lieferungen und der begonnenen Lehre."},
-	{"id":"rest_second", "chapter":"Ein Platz an der Schmiede", "point":"family_rest", "label":"Den zweiten Tag zu Hause beenden", "objective":"Beende den Arbeitstag im Familienhaus, wenn du bereit bist.", "text":"", "result":"Der dritte erzählte Tag beginnt. Du bist weiterhin ein zwölfjähriger Dorfbewohner.", "rest":true},
-	{"id":"patrol_brief", "chapter":"Mit der Dorfwache unterwegs", "npc":"severus", "label":"Um eine begleitete Dorfrunde bitten", "objective":"Sprich mit Severus am inneren Nordweg über eine begleitete Runde.", "text":"»Du gehst heute mit mir, nicht allein auf Wache. Wir prüfen den inneren Weg, die Wagenstraße und das Tor. Wir beobachten und melden; wir suchen keinen Kampf.«", "result":"Severus übernimmt die Aufsicht. Die drei Wegabschnitte müssen wirklich erreicht und geprüft werden."},
-	{"id":"patrol_inner", "chapter":"Mit der Dorfwache unterwegs", "point":"patrol_inner", "label":"Mit Severus den inneren Weg prüfen", "objective":"Prüfe mit Severus den inneren Nordweg.", "text":"", "result":"Der innere Weg ist geprüft. Gehe mit Severus weiter zur Wagenstraße."},
-	{"id":"patrol_road", "chapter":"Mit der Dorfwache unterwegs", "point":"patrol_road", "label":"Die Wagenstraße gemeinsam überblicken", "objective":"Erreiche die Wagenstraße weiter nördlich und prüfe sie mit Severus.", "text":"", "result":"Du erkennst die Sichtlinie zwischen Wagenstraße und Tor. Der äußere Abschnitt fehlt noch."},
-	{"id":"patrol_gate", "chapter":"Mit der Dorfwache unterwegs", "point":"patrol_gate", "label":"Am Tor mit Severus nach dem Rechten sehen", "objective":"Gehe bis zum Nordtor und schließe den begleiteten Rundgang ab.", "text":"", "result":"Ihr habt das Tor gemeinsam erreicht. Berichte Severus jetzt von deinen Beobachtungen."},
-	{"id":"patrol_report", "chapter":"Mit der Dorfwache unterwegs", "npc":"severus", "label":"Die tatsächlich gelaufene Runde besprechen", "objective":"Besprich am Tor die drei geprüften Wegabschnitte mit Severus.", "text":"»Du hast die ganze Runde gemacht und nur berichtet, was du gesehen hast. Darauf kann eine Wache aufbauen. Für heute reicht es; geh zu deiner Familie zurück.«", "result":"Severus bestätigt deinen ersten begleiteten Rundgang. Es ist keine Ernennung zum Soldaten."},
-	{"id":"rest_patrol", "chapter":"Wenn ein Nachbar ausfällt", "point":"family_rest", "label":"Nach dem Rundgang zu Hause schlafen", "objective":"Kehre ins Familienhaus zurück und beende den dritten Tag.", "text":"", "result":"Am vierten Morgen lässt Aurelia ausrichten, dass Severus krank ist. Seine Stelle im Wachroster bleibt tatsächlich unbesetzt.", "rest":true},
-	{"id":"healer_request", "chapter":"Wenn ein Nachbar ausfällt", "npc":"aurelia", "label":"Aurelia nach Severus fragen", "objective":"Suche Aurelia auf und frage nach dem erkrankten Severus.", "text":"»Er braucht Ruhe und soll heute nicht am Tor stehen. Bring ihm dieses vorbereitete Päckchen. Danach kann er mit deinen Eltern klären, ob du Valeria für einen kurzen Tagesdienst unterstützen darfst.«", "result":"Aurelia übergibt dir das vorbereitete Versorgungspäckchen für Severus."},
-	{"id":"deliver_medicine", "chapter":"Wenn ein Nachbar ausfällt", "npc":"severus", "label":"Severus Aurelias Päckchen bringen", "objective":"Bring Aurelias Päckchen zum erkrankten Severus bei ihrem Haus.", "text":"»Danke. Ich bleibe heute hier. Valeria führt die Wache; du könntest ihr nach der bekannten Runde eine kurze Nachricht überbringen. Frag erst deinen Vater. Die Leihsachen bleiben Eigentum der Wache.«", "result":"Das Versorgungspäckchen erreicht Severus. Er ist versorgt, bleibt aber für diesen Dienst aus dem Arbeitsroster genommen."},
-	{"id":"watch_permission", "chapter":"Ein begrenzter Tagesdienst", "npc":"silvanus", "label":"Vater um Erlaubnis für die Aushilfe bitten", "objective":"Besprich den begrenzten Tagesdienst zu Hause mit Silvanus.", "text":"»Du kennst den Weg und Valeria bleibt verantwortlich. Eine kurze Aushilfe am inneren Tor ist erlaubt. Du gehst nicht auf einen Feldzug und kommst mit den Leihsachen zu Severus zurück.«", "result":"Vater erlaubt eine begrenzte Aushilfe unter Valerias Verantwortung. Dein Lebensalter und deine zivile Rolle ändern sich nicht."},
-	{"id":"borrow_gear", "chapter":"Ein begrenzter Tagesdienst", "npc":"severus", "label":"Die Leihsachen für den Tagesdienst entgegennehmen", "objective":"Hole bei Severus den geliehenen Helm und hölzernen Schild ab.", "text":"»Helm und kleiner Holzschild gehören der Wache. Prüfe den Weg, bleib bei Valerias Abschnitt und melde Cassia, dass ihr Wagen passieren kann. Danach bringst du alles zurück.«", "result":"Du erhältst begrenzte Leihgegenstände für diesen Auftrag. Sie werden nicht zu dauerhaftem Eigentum."},
-	{"id":"watch_post", "chapter":"Ein begrenzter Tagesdienst", "point":"patrol_gate", "label":"Valeria am bekannten Torabschnitt unterstützen", "objective":"Gehe zum Nordtor und übernimm den besprochenen kurzen Tagesdienst.", "text":"", "result":"Der bekannte Torabschnitt ist geprüft. Du erhältst die Durchlassnachricht für Cassias Wagen.", "seconds":12.0},
-	{"id":"watch_message", "chapter":"Ein begrenzter Tagesdienst", "npc":"cassia", "label":"Cassia die tatsächliche Durchlassnachricht bringen", "objective":"Trage die Nachricht vom Tor zu Cassia auf den Markt.", "text":"»Gut, dann schicke ich den Wagen über den geprüften Weg. Geh jetzt zu Severus und gib die Leihsachen ab. Ein Dienst endet mit einer ordentlichen Übergabe.«", "result":"Cassia erhält die Nachricht vom tatsächlich geprüften Tor. Der Dienst muss noch an Severus übergeben werden."},
-	{"id":"return_gear", "chapter":"Ein begrenzter Tagesdienst", "npc":"severus", "label":"Den Dienst übergeben und alle Leihsachen zurückgeben", "objective":"Kehre zu Severus zurück, berichte und gib Helm und Holzschild ab.", "text":"»Du hast die Nachricht gebracht und die Sachen vollständig zurückgegeben. Zwei Denare sind dein Botenlohn. Ich erhole mich und übernehme meine bisherige Stelle wieder, sobald sie frei ist. Geh nach Hause.«", "result":"Der Dienst ist übergeben, die Leihsachen sind zurück und zwei Denare sind bezahlt. Du bist weiter zwölf, kein angeworbener Soldat."},
-	{"id":"family_evening", "chapter":"Ein Abend im vertrauten Dorf", "npc":"julia", "label":"Den Abend mit der Familie verbringen", "objective":"Erzähle Julia zu Hause von deinem Tag.", "text":"»Du kennst inzwischen den Markt, die Werkstätten und den Weg zum Tor. Morgen ist wieder Zeit für deine Lehre. Für heute essen wir zusammen und machen die Tür zu.«", "result":"Du verbringst den Abend bei deiner Familie. Die offenen Aufgaben dieses Tages sind wirklich erledigt."},
-	{"id":"night_rest", "chapter":"Ein Abend im vertrauten Dorf", "point":"family_rest", "label":"Im Familienhaus schlafen gehen", "objective":"Gehe ins Familienhaus und lege dich schlafen, wenn du den Tag beenden möchtest.", "text":"", "result":"Du legst dich im vertrauten Familienhaus schlafen. Das Dorf wird still."}
-]
-const CARRIED_EFFECTS := {
-	"mother_morning":{"add":["household_coin"]}, "fill_water":{"add":["water_jug"]},
-	"father_morning":{"remove":["water_jug"],"add":["neighbor_basket"]},
-	"market_purchase":{"remove":["household_coin"],"add":["family_parcel"]},
-	"deliver_food":{"remove":["family_parcel"]}, "collect_kindling":{"add":["kindling_bundle"]},
-	"deliver_kindling":{"remove":["kindling_bundle"]},
-	"forge_quench":{"add":["checked_hinge"]}, "deliver_hinge":{"remove":["checked_hinge"]},
-	"healer_request":{"add":["medicine_parcel"]}, "deliver_medicine":{"remove":["medicine_parcel"]},
-	"watch_post":{"add":["gate_message"]}, "watch_message":{"remove":["gate_message"]}
-}
-const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Fabius’ Kleinholzbündel", "checked_hinge":"Geprüftes Scharnier", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
+# Authored steps live in res://assets/story/missions/band1/ (one file per mission).
+static var STEPS: Array = MissionData.steps("band1")
+## Screenplay bridge state version. v3 adds I-07 water (story core „Wasser,
+## Nachricht und kurze Kontrollrunde“); older saves migrate on load.
+const SCREENPLAY_VERSION := 3
+static var CARRIED_EFFECTS: Dictionary = MissionData.carried_effects("band1")
+const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Kleinholzbündel für Sextus", "checked_hinge":"Geprüfter Truhengriff", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
-const SOURCE_MISSION_BY_STEP := {
-	"mother_morning":"I-01","fill_water":"I-01","father_morning":"I-01",
-	"market_meeting":"I-03","market_purchase":"I-03","deliver_food":"I-03",
-	"woodcutter_request":"I-04","collect_kindling":"I-04","deliver_kindling":"I-04",
-	"apprentice_permission":"I-04","smith_trial":"I-04",
-	"rest_forge":"I-05","forge_bellows":"I-05","forge_anvil":"I-05","forge_quench":"I-05","deliver_hinge":"I-05",
-	"market_trade":"I-06","smith_apprentice":"I-06",
-	"family_report":"I-07","rest_patrol":"I-07","healer_request":"I-07","deliver_medicine":"I-07",
-	"patrol_brief":"I-07","patrol_inner":"I-07","patrol_road":"I-07","patrol_gate":"I-07","patrol_report":"I-07",
-	"watch_permission":"I-07","borrow_gear":"I-07","watch_post":"I-07","watch_message":"I-07","return_gear":"I-07",
-	"family_evening":"I-09","night_rest":"I-09"
-}
+static var SOURCE_MISSION_BY_STEP: Dictionary = MissionData.source_missions("band1")
 
 
 static func start(data: Dictionary) -> bool:
@@ -116,7 +67,7 @@ static func start(data: Dictionary) -> bool:
 	data.village.childhood = {"version":VERSION,"completed":[],"day":1,"carried":[],
 		"relationships":relationships,"active_work":"","work_seconds":0.0,
 		"gear":"none","apprenticeship":"none","night_event":"none",
-		"screenplay":{"version":2,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i08":"locked","hoof_evidence":false,"i10":"locked","raid_path":"","visible_raiders":30,"i11":"locked","i12":"locked","i13":"locked","i14":"locked","julia_outcome":"undecided","oath":false},
+		"screenplay":{"version":SCREENPLAY_VERSION,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i07_water":"locked","i08":"locked","hoof_evidence":false,"i10":"locked","raid_path":"","visible_raiders":30,"i11":"locked","i12":"locked","i13":"locked","i14":"locked","julia_outcome":"undecided","oath":false},
 		"guard_absence":{"active":false,"previous_assignment":"idle","previous_health":100}}
 	return true
 
@@ -200,6 +151,32 @@ static func migrate_legacy_ids(data: Dictionary) -> bool:
 	return true
 
 
+## Adds the v3 screenplay fields to v2 childhood saves without completing
+## anything retroactively: a save already past the watch post keeps I-07 water
+## as "legacy"; a save standing exactly before it gets the new water task.
+static func migrate_screenplay(data: Dictionary) -> bool:
+	if not enabled(data):
+		return false
+	var child: Variant = data.village.childhood
+	if typeof(child) != TYPE_DICTIONARY or typeof(child.get("screenplay")) != TYPE_DICTIONARY or typeof(child.get("completed")) != TYPE_ARRAY:
+		return false
+	var screenplay: Dictionary = child.screenplay
+	if int(screenplay.get("version", 0)) != 2:
+		return false
+	var water_index := _step_index("watch_post")
+	var done: int = child.completed.size()
+	screenplay.i07_water = "locked" if done < water_index else ("pending" if done == water_index else "legacy")
+	screenplay.version = SCREENPLAY_VERSION
+	return true
+
+
+static func _step_index(step_id: String) -> int:
+	for index in STEPS.size():
+		if STEPS[index].id == step_id:
+			return index
+	return -1
+
+
 static func has_npc(data: Dictionary, id: String) -> bool:
 	return enabled(data) and EXTRA_NPCS.has(id)
 
@@ -262,6 +239,10 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 	var result := _apply(candidate, command, args)
 	if not result.ok:
 		return result
+	# Abilities are proven by the facts this action just stored; they persist
+	# at village.abilities and stay effective after the mission ends.
+	for gained: String in Abilities.sync(candidate):
+		result.message = str(result.message) + " Neue Fähigkeit: " + str(Abilities.entry(gained).name) + "."
 	error = validate(candidate)
 	if not error.is_empty():
 		return _fail("Kindheitsauftrag vollständig verworfen: " + error)
@@ -366,6 +347,7 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 		_relation(data, "sextus").learned = true
 	if id == "borrow_gear":
 		child.gear = "loaned"
+		child.screenplay.i07_water = "pending"
 	if id == "deliver_medicine":
 		var guard := _person(data, "severus")
 		guard.health = maxi(50, int(guard.health))
@@ -438,6 +420,16 @@ static func _apply_screenplay(data: Dictionary, step: Dictionary, action: String
 			else:
 				return _fail("Entscheide, wie du den Streit mit Marcus beendest.")
 			screenplay.i03 = "complete"
+		"i07_water_fetch":
+			if action != "i07_water_fetch":
+				return _fail("Schöpfe zuerst das Wasser für den Torposten.")
+			screenplay.i07_water = "carry"
+			message = "Der Krug ist gefüllt. Trag ihn zum bekannten Torabschnitt."
+		"i07_water_bring":
+			if action != "i07_water_bring":
+				return _fail("Bring das Wasser zum Torposten.")
+			screenplay.i07_water = "complete"
+			message = "Das Wasser steht am Torposten. Jetzt kannst du am bekannten Torabschnitt aushelfen."
 		"i08_tracks":
 			if action != "i08_inspect":
 				return _fail("Untersuche zuerst die Hufspuren selbst.")
@@ -552,11 +544,12 @@ static func view(data: Dictionary) -> Dictionary:
 	var items: Array[String] = []
 	for item: String in child.carried:
 		items.append(ITEM_NAMES[item])
+	var mission_id: String = step.get("mission", SOURCE_MISSION_BY_STEP.get(step.get("id", ""), ""))
+	var chapter: String = step.get("chapter", "Die Nacht im Dorf")
 	var result := {"enabled":true,"day":child.day,"age":int(data.player.age),
 		"completed_steps":child.completed.size(),"total_steps":STEPS.size(),
-		"stage":step.get("id", "village_night"),"source_mission_id":step.get("mission", SOURCE_MISSION_BY_STEP.get(step.get("id", ""), "")),
-		"chapter":step.get("chapter", "Die Nacht im Dorf"),
-		"title":step.get("chapter", "Die Nacht im Dorf"),
+		"stage":step.get("id", "village_night"),"source_mission_id":mission_id,
+		"chapter":chapter,"title":mission_heading(mission_id, chapter),
 		"objective":step.get("objective", "Du bist bei deiner Familie. Die nächste Nacht setzt eure gemeinsame Geschichte fort."),
 		"carried":items,"relationships":child.relationships.duplicate(true),
 		"apprenticeship":child.apprenticeship,"gear_loaned":child.gear == "loaned",
@@ -571,6 +564,15 @@ static func view(data: Dictionary) -> Dictionary:
 		result["target_position"] = [target.x, target.y]
 		result["point"] = target
 	return result
+
+
+## HUD heading for a childhood step: the screenplay mission ID and its authored
+## Band 1 title. Steps without a screenplay mission keep their scene chapter.
+static func mission_heading(mission_id: String, chapter: String) -> String:
+	if mission_id.is_empty():
+		return chapter
+	var title := str(Bible.mission(mission_id).get("title", ""))
+	return chapter if title.is_empty() else "%s · %s" % [mission_id, title]
 
 
 static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
@@ -589,6 +591,9 @@ static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
 		if step.get("npc", "") == npc_id:
 			text = step.text
 			choices = _choices(data, step)
+		elif typeof(step.get("visits")) == TYPE_DICTIONARY and step.visits.has(npc_id):
+			# Optional visits authored in the mission data (e.g. I-09 evening).
+			text = str(step.visits[npc_id])
 		text += "\n\nVertrauen: %d · Erzählter Dorftag %d. Du bist weiterhin Teil deiner Familie und des Dorfes." % [int(relation.get("trust",0)),int(data.village.childhood.day)]
 	return {"title":"%s · %s" % [spec.name,spec.role],"text":text,"choices":choices}
 
@@ -650,10 +655,18 @@ static func validate(data: Dictionary) -> String:
 			expected_gear = "returned"
 			absent = false
 	var screenplay: Variant = child.screenplay
-	var screenplay_keys := ["version","i02","i02_outcome","i03","i03_outcome","i08","hoof_evidence",
+	var screenplay_keys := ["version","i02","i02_outcome","i03","i03_outcome","i07_water","i08","hoof_evidence",
 		"i10","raid_path","visible_raiders","i11","i12","i13","i14","julia_outcome","oath"]
-	if not _keys(screenplay, screenplay_keys) or not _integer(screenplay.version,2,2):
+	if not _keys(screenplay, screenplay_keys) or not _integer(screenplay.version,SCREENPLAY_VERSION,SCREENPLAY_VERSION):
 		return "Ungültiger Drehbuch-Brückenstand."
+	var water_index := _step_index("watch_post")
+	var water_allowed: Array = ["locked"]
+	if child.completed.size() == water_index:
+		water_allowed = ["pending","carry","complete"]
+	elif child.completed.size() > water_index:
+		water_allowed = ["complete","legacy"]
+	if typeof(screenplay.i07_water) != TYPE_STRING or screenplay.i07_water not in water_allowed:
+		return "Der Wasserauftrag in I-07 widerspricht der Auftragsfolge."
 	if screenplay.i02 not in ["pending","correction","complete"] or screenplay.i03 not in ["locked","pending","complete"] or screenplay.i08 not in ["locked","pending","report","complete"]:
 		return "Ungültiger Status einer frühen Drehbuchmission."
 	for key: String in ["i10","i11","i12","i13","i14"]:
@@ -805,6 +818,19 @@ static func _screenplay_step(data: Dictionary) -> Dictionary:
 				"chapter":"Marcus kennt eine Abkürzung","label":"Mit Marcus über Marktweg und Münzstreit entscheiden",
 				"objective":"Triff Marcus bei der Gasse zum Markt. Entscheide, ob ihr den Streit als Freunde löst oder euch gegeneinander verhärtet.",
 				"text":"","result":"Die Beziehung zu Marcus erhält eine konkrete Erinnerung."}
+	# I-07 story core names water, a message and a short control round. Water is
+	# carried to the known gate section before the supervised watch post.
+	if child.completed.size() == _step_index("watch_post"):
+		if screenplay.i07_water == "pending":
+			return {"id":"i07_water_fetch","mission":"I-07","screenplay":true,"point":"family_water",
+				"chapter":"Der kranke Wachmann","label":"Wasser für den Torposten schöpfen",
+				"objective":"Der Torposten braucht Wasser. Schöpfe am Haus einen Krug, bevor du zum bekannten Torabschnitt gehst.",
+				"text":"","result":"Der Krug ist gefüllt."}
+		if screenplay.i07_water == "carry":
+			return {"id":"i07_water_bring","mission":"I-07","screenplay":true,"point":"patrol_gate",
+				"chapter":"Der kranke Wachmann","label":"Den Wasserkrug zum Torposten bringen",
+				"objective":"Bring das Wasser zum bekannten Torabschnitt. Du hilfst beaufsichtigt; du stehst keine Wache allein.",
+				"text":"","result":"Das Wasser steht am Torposten."}
 	# I-08 must happen after the bounded watch service and before the last normal
 	# family evening. No people or faction are identified from hoofprints alone.
 	if child.completed.has("return_gear"):
@@ -879,6 +905,10 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 	elif step.id == "i03_marcus":
 		options = [{"id":"marcus_friend","label":"Den Münzstreit beilegen und gemeinsam gehen"},
 			{"id":"marcus_rival","label":"Auf dem eigenen Standpunkt beharren"}]
+	elif step.id == "i07_water_fetch":
+		options = [{"id":"i07_water_fetch","label":"Wasserkrug füllen"}]
+	elif step.id == "i07_water_bring":
+		options = [{"id":"i07_water_bring","label":"Wasser am Torposten abstellen"}]
 	elif step.id == "i08_tracks":
 		options = [{"id":"i08_inspect","label":"Hufspuren untersuchen und nur Beobachtungen sichern"}]
 	elif step.id == "i08_report":

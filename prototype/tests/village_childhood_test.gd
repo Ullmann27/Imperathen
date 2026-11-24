@@ -66,7 +66,7 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 		_check(false, "A valid next childhood action exists")
 		return false
 	var stage := str(view.get("stage", ""))
-	if stage in ["i02_basket", "i02_correct", "i03_marcus", "i08_tracks", "i08_report", "i11_forge", "i12_father", "i13_morning", "i14_oath"]:
+	if stage in ["i02_basket", "i02_correct", "i03_marcus", "i07_water_fetch", "i07_water_bring", "i08_tracks", "i08_report", "i11_forge", "i12_father", "i13_morning", "i14_oath"]:
 		_at(model, view.point)
 		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):
 			return false
@@ -74,6 +74,8 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 			"i02_basket":"basket_check",
 			"i02_correct":"basket_correct",
 			"i03_marcus":"marcus_friend",
+			"i07_water_fetch":"i07_water_fetch",
+			"i07_water_bring":"i07_water_bring",
 			"i08_tracks":"i08_inspect",
 			"i08_report":"i08_report",
 			"i11_forge":"i11_forge",

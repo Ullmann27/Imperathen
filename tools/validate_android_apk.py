@@ -126,6 +126,13 @@ MESHY_REGISTRY_RESOURCES = (
     "assets/meshy/manifest.json",
     "assets/meshy/loadouts.json",
 )
+CHAPTER_STORY_RESOURCES = (
+    "scripts/story/chapter_abilities.gd",
+    "assets/story/chapter1_abilities.json",
+    "scripts/story/mission_data.gd",
+    "assets/story/missions/band1/index.json",
+    *(f"assets/story/missions/band1/{mission}.json" for mission in ("I-01", "I-03", "I-04", "I-05", "I-06", "I-07", "I-09")),
+)
 NPC_BEHAVIOR_RESOURCES = (
     "scripts/domain/npc_behavior.gd",
 )
@@ -157,6 +164,7 @@ FEATURE_RESOURCE_GROUPS = (
     ("action_combat_content", ACTION_COMBAT_RESOURCES),
     ("childhood_content", CHILDHOOD_RESOURCES),
     ("campaign_bible_content", CAMPAIGN_BIBLE_RESOURCES),
+    ("chapter_story_content", CHAPTER_STORY_RESOURCES),
     ("meshy_registry_content", MESHY_REGISTRY_RESOURCES),
     ("npc_behavior_content", NPC_BEHAVIOR_RESOURCES),
     ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
