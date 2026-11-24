@@ -3,6 +3,7 @@ extends RefCounted
 ## This optional state is created for fresh games; loading a legacy save never adds it.
 
 const Bible = preload("res://scripts/story/campaign_bible.gd")
+const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const VERSION := 2
 const LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
@@ -263,6 +264,10 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 	var result := _apply(candidate, command, args)
 	if not result.ok:
 		return result
+	# Abilities are proven by the facts this action just stored; they persist
+	# at village.abilities and stay effective after the mission ends.
+	for gained: String in Abilities.sync(candidate):
+		result.message = str(result.message) + " Neue Fähigkeit: " + str(Abilities.entry(gained).name) + "."
 	error = validate(candidate)
 	if not error.is_empty():
 		return _fail("Kindheitsauftrag vollständig verworfen: " + error)

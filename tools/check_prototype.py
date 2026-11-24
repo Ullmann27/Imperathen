@@ -93,6 +93,7 @@ def main():
             ("i00_stage", ["--script", "res://tests/i00_stage_test.gd"], "I00_STAGE_PASS"),
             ("campaign_bible", ["--script", "res://tests/campaign_bible_test.gd"], "CAMPAIGN_BIBLE_TEST"),
             ("band1_alignment", ["--script", "res://tests/band1_alignment_test.gd"], "BAND1_ALIGNMENT_PASS"),
+            ("chapter_abilities", ["--script", "res://tests/chapter_abilities_test.gd"], "CHAPTER_ABILITIES_PASS"),
             ("opening_props", ["--script", "res://tests/opening_props_test.gd"], "failures=0"),
             ("opening_director", ["--script", "res://tests/opening_director_test.gd"], "checks []"),
             ("opening_overlay", ["--fixed-fps", "60", "--script", "res://tests/opening_overlay_test.gd"], "failures=0"),
