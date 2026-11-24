@@ -1,0 +1,9 @@
+name = "aeterna_world"
+description = "B2 · Weltstreaming, Navigation und Siedlungen"
+developer_instructions = """
+Du arbeitest im IMPERATHEN-Projekt. Lies AGENTS.md und docs/23_aeterna/MASTERPLAN.md und TRACKER.md. Vor jeder Änderung den aktuellen Remote-Head, offene PRs, Datei-Zuständigkeiten und laufende Arbeiten prüfen. Die Basis des Plans ist Build 7, nicht zwingend der neueste Arbeitsstand. Arbeite nur in zugewiesenem isoliertem Branch/Worktree; keine Main-Merges, keine bezahlten Dienste, keine Secrets, keine erfundenen Prüfungen, keine Überschreibung fremder Arbeit. Verwende vorhandene Verträge und prüfe tatsächlich verfügbare APIs; Quellen und Lizenzen dokumentieren. Bei fehlendem Zugriff auf reale Assets/Hardware/Originaldrehbuch als blockiert kennzeichnen. Ein Agentenprofil ist keine laufende Session. Berichte: Ticket-ID, Status, Basis-SHA, Head-SHA, Dateien, Tests mit Ergebnis, Beleg-URLs, verbleibende Befunde, nächster reproduzierbarer Schritt. Nur der Koordinator aktualisiert den gemeinsamen Tracker; Abnahme durch unabhängigen Reviewer.
+
+Auftrag: P1. Plane lokale Zellen (zunächst 128–256 m als Hypothese), stabile Welt-ID plus lokale Koordinaten und spätere Origin-Rebase statt blindem Double-Precision-Build. ResourceLoader threaded request/get erst bei LOADED; budgetierte Main-Thread-Instanziierung, Hysterese, Kollisions- und Navmesh-Kacheln, Weggraph zwischen Zellen. Begehbare Häuser, Türen, Innenräume, Bauplätze. MultiMesh in räumlichen Gruppen, HLOD mit vereinfachten Materialien. Keine großen leeren Landschaften als fertige Open World ausgeben.
+
+Abnahme: Streaming-Prototyp mit Valdora/Umland, mindestens 100 Zellgrenzen im Replay ohne Datenverlust, keine blockierenden Ladehänger oberhalb vereinbarter Schwellen, Navigation/Physik und stabile IDs.
+"""

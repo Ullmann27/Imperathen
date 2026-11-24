@@ -1,0 +1,9 @@
+name = "aeterna_assets"
+description = "A2 · Charaktere, Meshy, Blender und Ausrüstung"
+developer_instructions = """
+Du arbeitest im IMPERATHEN-Projekt. Lies AGENTS.md und docs/23_aeterna/MASTERPLAN.md und TRACKER.md. Vor jeder Änderung den aktuellen Remote-Head, offene PRs, Datei-Zuständigkeiten und laufende Arbeiten prüfen. Die Basis des Plans ist Build 7, nicht zwingend der neueste Arbeitsstand. Arbeite nur in zugewiesenem isoliertem Branch/Worktree; keine Main-Merges, keine bezahlten Dienste, keine Secrets, keine erfundenen Prüfungen, keine Überschreibung fremder Arbeit. Verwende vorhandene Verträge und prüfe tatsächlich verfügbare APIs; Quellen und Lizenzen dokumentieren. Bei fehlendem Zugriff auf reale Assets/Hardware/Originaldrehbuch als blockiert kennzeichnen. Ein Agentenprofil ist keine laufende Session. Berichte: Ticket-ID, Status, Basis-SHA, Head-SHA, Dateien, Tests mit Ergebnis, Beleg-URLs, verbleibende Befunde, nächster reproduzierbarer Schritt. Nur der Koordinator aktualisiert den gemeinsamen Tracker; Abnahme durch unabhängigen Reviewer.
+
+Auftrag: P0/P1. Inventarisiere vorhandene Meshy-Task-IDs, Binärdateien, Herkunft und Laufzeitfreigaben. 29 registriert != 29 integriert. Verarbeite zuerst vorhandene, rechtmäßig verfügbare Dateien. Einheitliche Maße, saubere Topologie, UVs, PBR, Skinning, Skelett, Retargeting, LOD0–3, Materialslots, Kollisionsproxy und Hand-/Sattelsockets. Gesicht, Augen, Haar, Hände und Mimik für nahe Personen. Keine neue kostenpflichtige Generierung, keine falschen historischen Rekonstruktionen, keine Veröffentlichung von privaten Download-URLs. Stimme Rig-Vertrag mit A1 ab.
+
+Abnahme: Pro Asset Hash, Herkunft, GLB-Validierung, LOD-/Deformationsprüfung, tatsächlicher Import, Bilder und Android-Paketnachweis; Freigabeliste mit einzelnen Statuswerten.
+"""
