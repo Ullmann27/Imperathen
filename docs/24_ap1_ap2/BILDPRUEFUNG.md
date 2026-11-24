@@ -19,8 +19,10 @@ der unveränderten Handoff-Revision überein. Ergebnis dieser lokalen Reprodukti
 **294/294 belegt, keine veränderte GLB**. Die Maschinenquittung enthält
 für jede Datei ihren GLB-Ursprung, Bildindex, Pufferbereich und Hash:
 [`evidence/import_provenance_check.json`](evidence/import_provenance_check.json).
-Die zusätzlichen CI-Texturdateien selbst waren nicht im ersten Bildartefakt;
-ihre direkte Byteprüfung erfolgt erst im korrigierten CI-Lauf.
+Die zusätzlichen CI-Texturdateien selbst waren nicht im ersten Bildartefakt.
+Der anschließend erfolgreich abgeschlossene korrigierte CI-Lauf hat ihre
+direkte Byteprüfung durchgeführt; sein Basis-Manifest bestätigt alle 294
+neuen Texturen mit genauer GLB-Herkunft.
 
 Der korrigierte Helfer trennt deshalb zwei überprüfte Phasen:
 
@@ -44,6 +46,9 @@ erneute Engine-Prüfung besteht **64/64 Gruppen ohne Warnungen**.
 Nachweise: [`evidence/review_fix_python.log`](evidence/review_fix_python.log) und
 [`evidence/review_fix_engine_report.json`](evidence/review_fix_engine_report.json).
 
-Der eigentliche neue grafische Lauf und seine Sichtbewertung werden nach
-Abschluss in `DELIVERY.md` dokumentiert. Ein erfolgreicher Importnachweis allein
-belegt keine fertige Bildabnahme und keine Android-Leistung.
+Der neue [grafische Lauf 45434162620](https://github.com/Ullmann27/Imperathen/actions/runs/45434162620)
+ist abgeschlossen: neun passende Vorher-/Nachher-Paare, 18 echte Bilder,
+keine Vergleichsfehler. Alle Bilder wurden einzeln visuell geprüft.
+Ergebnisse und Grenzen stehen in [`DELIVERY.md`](DELIVERY.md), die Originale
+und Manifeste in [`evidence/visual/`](evidence/visual/). Der Importnachweis
+und die Bildabnahme liefern keine Android-Leistungsmessung.

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-24",
+  "reviewer": "Leitender ChatGPT-Agent, direkte Sichtprüfung aller 18 unveränderten PNGs",
+  "baseline_commit": "94bb7cdd76a3fe2577610eac8da6948e29b0faab",
+  "feature_commit": "0ecf49870da1e3389a47f3143dd6aa06b68c0db7",
+  "run_url": "https://github.com/Ullmann27/Imperathen/actions/runs/45434162620",
+  "result": "In den geprüften Ansichten keine neue auffällige Bodenablösung, Gebäudeüberschneidung oder abgeschnittene Dialogschrift erkannt.",
+  "limits": [
+    "Statische Bildpaare, keine vollständige Prüfung jeder Laufanimation und kein lückenloser Spieldurchlauf.",
+    "Desktop-Software-Renderer llvmpipe/Mesa mit gl_compatibility; kein Android-, FPS- oder Wärme-Nachweis.",
+    "Identische festgesetzte Beleuchtung und Präsentationszeit; I-09 bezeichnet den Auftragsschritt, keine neue Abendbeleuchtung.",
+    "Bei neuen Marcus-Dialogen zeigt die Basis kein entsprechendes Fenster; der alte Marcus steht am anderen Ort und besitzt diese Dialoge nicht.",
+    "Keine absolute Aussage über grafische Fehlerfreiheit außerhalb der geprüften Ansichten."
+  ],
+  "pairs": [
+    {
+      "id": "01_schmiede_i04",
+      "status": "visuell_geprüft",
+      "finding": "Silvanus steht vor der Schmiede. Sextus, Spieler und bestehende Umgebung bleiben sichtbar; keine neue auffällige Überschneidung erkannt."
+    },
+    {
+      "id": "02_markt_i06",
+      "status": "visuell_geprüft",
+      "finding": "Marcus steht beim Spieler am Markt. Kein sichtbares Eindringen in Stand oder Palisade erkannt."
+    },
+    {
+      "id": "02_markt_i06_dialog",
+      "status": "visuell_geprüft",
+      "finding": "Marcus · vertraut und die originale Marktzeile werden vollständig und ohne abgeschnittene Schrift dargestellt."
+    },
+    {
+      "id": "03_wachmann_i07",
+      "status": "visuell_geprüft",
+      "finding": "Titel und Schaltfläche zeigen Wachmann. Darsteller, Kamera und Dialogaufbau entsprechen dem Basisbild."
+    },
+    {
+      "id": "04_nordweg_i08",
+      "status": "visuell_geprüft",
+      "finding": "Marcus steht neben dem Spieler am Spuren-Ort. Keine neue sichtbare Überschneidung mit dem benachbarten Haus erkannt."
+    },
+    {
+      "id": "05_abend_i09",
+      "status": "visuell_geprüft",
+      "finding": "Marcus steht am Familienauftrag. Die teilweise Verdeckung des Spielers durch das Haus besteht bereits im Basisbild."
+    },
+    {
+      "id": "05_abend_i09_dialog",
+      "status": "visuell_geprüft",
+      "finding": "Die originale Abendzeile und Gespräch-beenden-Schaltfläche sind vollständig lesbar."
+    },
+    {
+      "id": "06_markt_rivale_i06",
+      "status": "visuell_geprüft",
+      "finding": "Marcus steht auch nach der Rivalenentscheidung am vorgesehenen Marktort."
+    },
+    {
+      "id": "06_markt_rivale_i06_dialog",
+      "status": "visuell_geprüft",
+      "finding": "Marcus · zurückhaltend und die andere originale Marktzeile werden vollständig dargestellt."
+    }
+  ]
+}

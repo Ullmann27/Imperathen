@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "errors": [],
+  "baseline_commit": "94bb7cdd76a3fe2577610eac8da6948e29b0faab",
+  "feature_commit": "0ecf49870da1e3389a47f3143dd6aa06b68c0db7",
+  "review_script_sha256": "5d81c56d1b34d6ee4d144173130b5b58695bb9aa448b999129ba4abfa512a279",
+  "pairs": [
+    {
+      "id": "01_schmiede_i04",
+      "matched_conditions": true,
+      "different_fields": [],
+      "before_image": "01_schmiede_i04.png",
+      "after_image": "01_schmiede_i04.png",
+      "before_actor_position": [
+        -16.2000007629395,
+        0.0,
+        16.7000007629395
+      ],
+      "after_actor_position": [
+        30.2896461486816,
+        -0.0491598173975945,
+        -23.0560512542725
+      ]
+    },
+    {
+      "id": "02_markt_i06",
+      "matched_conditions": true,
+      "different_fields": [],
+      "before_image": "02_markt_i06.png",
+      "after_image": "02_markt_i06.png",
+      "before_actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "after_actor_position": [
+        22.6353321075439,
+        -0.049159798771143,
+        26.7273006439209
+      ]
+    },
+    {
+      "id": "02_markt_i06_dialog",
+      "matched_conditions": true,
+      "different_fields": [],
+      "before_image": "02_markt_i06_dialog.png",
+      "after_image": "02_markt_i06_dialog.png",
+      "before_actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "after_actor_position": [
+        22.6353321075439,
+        -0.049159798771143,
+        26.7273006439209
+      ]
+    },
+    {
+      "id": "03_wachmann_i07",
+      "matched_conditions": true,
+      "different_fields": [],
+      "before_image": "03_wachmann_i07.png",
+      "after_image": "03_wachmann_i07.png",
+      "before_actor_position": [
+        10.0,
+        0.0,
+        18.5
+      ],
+      "after_actor_position": [
+        10.0,
+        0.0,
+        18.5
+      ]
+    },
+    {
+      "id": "04_nordweg_i08",
+      "matched_conditions": true,
+      "different_fields": [],
+      "before_image": "04_nordweg_i08.png",
+      "after_image": "04_nordweg_i08.png",
+      "before_actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "after_actor_position": [
+        -1.68640303611755,
+        -0.0491596385836601,
+        -34.0205154418945
+      ]
+    },
+    {
+      "id": "05_abend_i09",
+      "matched_conditions": true,
+      "different_fields": [],
+      "before_image": "05_abend_i09.png",
+      "after_image": "05_abend_i09.png",
+      "before_actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "after_actor_position": [
+        -13.6204433441162,
+        -0.0491598099470139,
+        17.1126403808594
+      ]
+    },
+    {
+      "id": "05_abend_i09_dialog",
+      "matched_conditions": true,
+      "different_fields": [],
+      "before_image": "05_abend_i09_dialog.png",
+      "after_image": "05_abend_i09_dialog.png",
+      "before_actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "after_actor_position": [
+        -13.6204433441162,
+        -0.0491598099470139,
+        17.1126403808594
+      ]
+    },
+    {
+      "id": "06_markt_rivale_i06",
+      "matched_conditions": true,
+      "different_fields": [],
+      "before_image": "06_markt_rivale_i06.png",
+      "after_image": "06_markt_rivale_i06.png",
+      "before_actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "after_actor_position": [
+        22.6353321075439,
+        -0.049159798771143,
+        26.7273006439209
+      ]
+    },
+    {
+      "id": "06_markt_rivale_i06_dialog",
+      "matched_conditions": true,
+      "different_fields": [],
+      "before_image": "06_markt_rivale_i06_dialog.png",
+      "after_image": "06_markt_rivale_i06_dialog.png",
+      "before_actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "after_actor_position": [
+        22.6353321075439,
+        -0.049159798771143,
+        26.7273006439209
+      ]
+    }
+  ],
+  "scope": "Identische Prüfbedingungen und echte Bilder bestätigt. Die visuelle Bewertung erfolgt anhand der Bilder; keine FPS-/Android-Leistungsmessung."
+}

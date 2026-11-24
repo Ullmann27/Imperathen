@@ -1,0 +1,1706 @@
+{
+  "adapter": "llvmpipe (LLVM 20.1.2, 256 bits)",
+  "android_device_test": false,
+  "capture_scope": "WorldModel-Aufträge und reale GameWorld/GameUI-Prüfszenen; Fixture-Anreisen, kein Spielzeit- oder FPS-Nachweis",
+  "check_only": false,
+  "checks": 107,
+  "commands": [
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -15.3000001907349,
+        1.0,
+        14.8000001907349
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "mother_morning"
+      },
+      "stage_after": "fill_water"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -12.0,
+        1.0,
+        11.6999998092651
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "fill_water"
+      },
+      "stage_after": "father_morning"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -16.2000007629395,
+        1.0,
+        16.7000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "father_morning"
+      },
+      "stage_after": "i02_basket"
+    },
+    {
+      "command": "village_talk",
+      "fixture_player_position": [
+        8.0,
+        1.0,
+        18.0
+      ],
+      "ok": true,
+      "payload": {
+        "choice": "meet",
+        "npc_id": "aurelia"
+      },
+      "stage_after": "i02_basket"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        8.0,
+        1.0,
+        18.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "basket_check"
+      },
+      "stage_after": "i03_marcus"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -3.0,
+        1.0,
+        4.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "marcus_friend"
+      },
+      "stage_after": "market_meeting"
+    },
+    {
+      "command": "village_talk",
+      "fixture_player_position": [
+        23.7999992370605,
+        1.0,
+        26.1000003814697
+      ],
+      "ok": true,
+      "payload": {
+        "choice": "meet",
+        "npc_id": "cassia"
+      },
+      "stage_after": "market_meeting"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        23.7999992370605,
+        1.0,
+        26.1000003814697
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "market_meeting"
+      },
+      "stage_after": "market_purchase"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        23.7999992370605,
+        1.0,
+        26.1000003814697
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "market_purchase"
+      },
+      "stage_after": "deliver_food"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -15.3000001907349,
+        1.0,
+        14.8000001907349
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "deliver_food"
+      },
+      "stage_after": "woodcutter_request"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -16.2000007629395,
+        1.0,
+        16.7000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "woodcutter_request"
+      },
+      "stage_after": "collect_kindling"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -43.0,
+        1.0,
+        17.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "collect_kindling"
+      },
+      "stage_after": "deliver_kindling"
+    },
+    {
+      "command": "village_talk",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -25.0
+      ],
+      "ok": true,
+      "payload": {
+        "choice": "meet",
+        "npc_id": "sextus"
+      },
+      "stage_after": "deliver_kindling"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -25.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "deliver_kindling"
+      },
+      "stage_after": "apprentice_permission"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -16.2000007629395,
+        1.0,
+        16.7000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "apprentice_permission"
+      },
+      "stage_after": "smith_trial"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -25.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "smith_trial"
+      },
+      "stage_after": "rest_first"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -12.0500001907349,
+        1.0,
+        10.5500001907349
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "rest_first"
+      },
+      "stage_after": "forge_bellows"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7000007629395,
+        1.0,
+        -28.3999996185303
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "begin_forge_bellows"
+      },
+      "stage_after": "forge_bellows"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7000007629395,
+        1.0,
+        -28.3999996185303
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "forge_bellows"
+      },
+      "stage_after": "forge_anvil"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -26.2000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "begin_forge_anvil"
+      },
+      "stage_after": "forge_anvil"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -26.2000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "forge_anvil"
+      },
+      "stage_after": "forge_quench"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7000007629395,
+        1.0,
+        -23.7999992370605
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "begin_forge_quench"
+      },
+      "stage_after": "forge_quench"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7000007629395,
+        1.0,
+        -23.7999992370605
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "forge_quench"
+      },
+      "stage_after": "deliver_hinge"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        23.7999992370605,
+        1.0,
+        26.1000003814697
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "deliver_hinge"
+      },
+      "stage_after": "market_trade"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        23.7999992370605,
+        1.0,
+        26.1000003814697
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "market_fair"
+      },
+      "stage_after": "smith_apprentice"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -25.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "smith_apprentice"
+      },
+      "stage_after": "family_report"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -15.3000001907349,
+        1.0,
+        14.8000001907349
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "family_report"
+      },
+      "stage_after": "rest_second"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -12.0500001907349,
+        1.0,
+        10.5500001907349
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "rest_second"
+      },
+      "stage_after": "patrol_brief"
+    },
+    {
+      "command": "village_talk",
+      "fixture_player_position": [
+        2.0,
+        1.0,
+        9.0
+      ],
+      "ok": true,
+      "payload": {
+        "choice": "meet",
+        "npc_id": "decimus"
+      },
+      "stage_after": "patrol_brief"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        2.0,
+        1.0,
+        9.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "patrol_brief"
+      },
+      "stage_after": "patrol_inner"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        0.0,
+        1.0,
+        -16.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "patrol_inner"
+      },
+      "stage_after": "patrol_road"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        0.0,
+        1.0,
+        -35.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "patrol_road"
+      },
+      "stage_after": "patrol_gate"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        0.0,
+        1.0,
+        -46.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "patrol_gate"
+      },
+      "stage_after": "patrol_report"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        2.0,
+        1.0,
+        9.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "patrol_report"
+      },
+      "stage_after": "rest_patrol"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -12.0500001907349,
+        1.0,
+        10.5500001907349
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "rest_patrol"
+      },
+      "stage_after": "healer_request"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        8.0,
+        1.0,
+        18.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "healer_request"
+      },
+      "stage_after": "deliver_medicine"
+    },
+    {
+      "command": "village_talk",
+      "fixture_player_position": [
+        10.0,
+        1.0,
+        18.5
+      ],
+      "ok": true,
+      "payload": {
+        "choice": "meet",
+        "npc_id": "severus"
+      },
+      "stage_after": "deliver_medicine"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        10.0,
+        1.0,
+        18.5
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "deliver_medicine"
+      },
+      "stage_after": "watch_permission"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -16.2000007629395,
+        1.0,
+        16.7000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "watch_permission"
+      },
+      "stage_after": "borrow_gear"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        10.0,
+        1.0,
+        18.5
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "borrow_gear"
+      },
+      "stage_after": "i07_water_fetch"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -12.0,
+        1.0,
+        11.6999998092651
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "i07_water_fetch"
+      },
+      "stage_after": "i07_water_bring"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        0.0,
+        1.0,
+        -46.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "i07_water_bring"
+      },
+      "stage_after": "watch_post"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        0.0,
+        1.0,
+        -46.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "begin_watch_post"
+      },
+      "stage_after": "watch_post"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        0.0,
+        1.0,
+        -46.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "watch_post"
+      },
+      "stage_after": "watch_message"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        23.7999992370605,
+        1.0,
+        26.1000003814697
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "watch_message"
+      },
+      "stage_after": "return_gear"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        10.0,
+        1.0,
+        18.5
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "return_gear"
+      },
+      "stage_after": "i08_tracks"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        0.0,
+        1.0,
+        -35.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "i08_inspect"
+      },
+      "stage_after": "i08_report"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        2.0,
+        1.0,
+        9.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "i08_report"
+      },
+      "stage_after": "family_evening"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -15.3000001907349,
+        1.0,
+        14.8000001907349
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "family_evening"
+      },
+      "stage_after": "night_rest"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -15.3000001907349,
+        1.0,
+        14.8000001907349
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "mother_morning"
+      },
+      "stage_after": "fill_water"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -12.0,
+        1.0,
+        11.6999998092651
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "fill_water"
+      },
+      "stage_after": "father_morning"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -16.2000007629395,
+        1.0,
+        16.7000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "father_morning"
+      },
+      "stage_after": "i02_basket"
+    },
+    {
+      "command": "village_talk",
+      "fixture_player_position": [
+        8.0,
+        1.0,
+        18.0
+      ],
+      "ok": true,
+      "payload": {
+        "choice": "meet",
+        "npc_id": "aurelia"
+      },
+      "stage_after": "i02_basket"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        8.0,
+        1.0,
+        18.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "basket_check"
+      },
+      "stage_after": "i03_marcus"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -3.0,
+        1.0,
+        4.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "marcus_rival"
+      },
+      "stage_after": "market_meeting"
+    },
+    {
+      "command": "village_talk",
+      "fixture_player_position": [
+        23.7999992370605,
+        1.0,
+        26.1000003814697
+      ],
+      "ok": true,
+      "payload": {
+        "choice": "meet",
+        "npc_id": "cassia"
+      },
+      "stage_after": "market_meeting"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        23.7999992370605,
+        1.0,
+        26.1000003814697
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "market_meeting"
+      },
+      "stage_after": "market_purchase"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        23.7999992370605,
+        1.0,
+        26.1000003814697
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "market_purchase"
+      },
+      "stage_after": "deliver_food"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -15.3000001907349,
+        1.0,
+        14.8000001907349
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "deliver_food"
+      },
+      "stage_after": "woodcutter_request"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -16.2000007629395,
+        1.0,
+        16.7000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "woodcutter_request"
+      },
+      "stage_after": "collect_kindling"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -43.0,
+        1.0,
+        17.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "collect_kindling"
+      },
+      "stage_after": "deliver_kindling"
+    },
+    {
+      "command": "village_talk",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -25.0
+      ],
+      "ok": true,
+      "payload": {
+        "choice": "meet",
+        "npc_id": "sextus"
+      },
+      "stage_after": "deliver_kindling"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -25.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "deliver_kindling"
+      },
+      "stage_after": "apprentice_permission"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -16.2000007629395,
+        1.0,
+        16.7000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "apprentice_permission"
+      },
+      "stage_after": "smith_trial"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -25.0
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "smith_trial"
+      },
+      "stage_after": "rest_first"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        -12.0500001907349,
+        1.0,
+        10.5500001907349
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "rest_first"
+      },
+      "stage_after": "forge_bellows"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7000007629395,
+        1.0,
+        -28.3999996185303
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "begin_forge_bellows"
+      },
+      "stage_after": "forge_bellows"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7000007629395,
+        1.0,
+        -28.3999996185303
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "forge_bellows"
+      },
+      "stage_after": "forge_anvil"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -26.2000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "begin_forge_anvil"
+      },
+      "stage_after": "forge_anvil"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7999992370605,
+        1.0,
+        -26.2000007629395
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "forge_anvil"
+      },
+      "stage_after": "forge_quench"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7000007629395,
+        1.0,
+        -23.7999992370605
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "begin_forge_quench"
+      },
+      "stage_after": "forge_quench"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        32.7000007629395,
+        1.0,
+        -23.7999992370605
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "forge_quench"
+      },
+      "stage_after": "deliver_hinge"
+    },
+    {
+      "command": "village_childhood_action",
+      "fixture_player_position": [
+        23.7999992370605,
+        1.0,
+        26.1000003814697
+      ],
+      "ok": true,
+      "payload": {
+        "action_id": "deliver_hinge"
+      },
+      "stage_after": "market_trade"
+    }
+  ],
+  "driver": "opengl3",
+  "engine": "4.7.2-stable (official)",
+  "errors": [],
+  "fixture_travel": true,
+  "measured_playthrough": false,
+  "passed": true,
+  "renderer": "gl_compatibility",
+  "review_script_sha256": "5d81c56d1b34d6ee4d144173130b5b58695bb9aa448b999129ba4abfa512a279",
+  "schema_version": 1,
+  "shots": [
+    {
+      "actor": "silvanus",
+      "actor_distance_m": 62.7178611755371,
+      "actor_position": [
+        -16.2000007629395,
+        0.0,
+        16.7000007629395
+      ],
+      "actor_screen_position": [
+        690.854797363281,
+        237.054748535156
+      ],
+      "camera": {
+        "fov": 60.0,
+        "look_at": [
+          32.0,
+          1.25,
+          -25.2000007629395
+        ],
+        "position": [
+          26.2999992370605,
+          2.59999990463257,
+          -19.5
+        ],
+        "transform": [
+          [
+            0.707106828689575,
+            0.0,
+            0.707106828689575
+          ],
+          [
+            0.116794496774673,
+            0.986264765262604,
+            -0.116794496774673
+          ],
+          [
+            -0.697394490242004,
+            0.16517236828804,
+            0.697394490242004
+          ],
+          [
+            26.2999992370605,
+            2.59999990463257,
+            -19.5
+          ]
+        ]
+      },
+      "companion_controller_present": false,
+      "dialogue": {
+        "choices": [],
+        "text": "»Du musst noch kein Soldat und kein Verwalter sein. Lerne die Menschen kennen und führe deine Zusagen selbst zu Ende.«\n\nVertrauen: 8 · Erzählter Dorftag 1. Du bist weiterhin Teil deiner Familie und des Dorfes.",
+        "title": "Silvanus · Dein Vater"
+      },
+      "dialogue_visible": false,
+      "fixture_player_position": [
+        31.0,
+        0.899999976158142,
+        -24.6000003814697
+      ],
+      "fixture_progress_sha256": "797f1ad923daa4b8d705bdd2ffd0a39ce3888e15f9f268c6c0d4bf3edeb8fb3f",
+      "follow_simulation_steps": 0,
+      "id": "01_schmiede_i04",
+      "image": "01_schmiede_i04.png",
+      "image_sha256": "aa4349c82077eda3e41b37cc8c98e0db1509163eeabb36762ff51eb0ad4c6a16",
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "player_position": [
+        31.0,
+        0.899999976158142,
+        -24.6000003814697
+      ],
+      "pose": {
+        "name": "idle",
+        "seconds": 0.25
+      },
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "relation": "friend",
+      "stage": "deliver_kindling",
+      "world_sha256": "1e0ebdf8b37808665ce1b0e0cb9f4bb9202aa9288544252a9fdb97654e0206df"
+    },
+    {
+      "actor": "marcus",
+      "actor_distance_m": 34.0383605957031,
+      "actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "actor_screen_position": [
+        619.526123046875,
+        219.463989257812
+      ],
+      "camera": {
+        "fov": 60.0,
+        "look_at": [
+          23.0,
+          1.10000002384186,
+          26.0
+        ],
+        "position": [
+          29.0,
+          3.20000004768372,
+          31.5
+        ],
+        "transform": [
+          [
+            0.675724685192108,
+            0.0,
+            -0.737154126167297
+          ],
+          [
+            -0.184158056974411,
+            0.968291521072388,
+            -0.168811574578285
+          ],
+          [
+            0.713780105113983,
+            0.249823018908501,
+            0.654298484325409
+          ],
+          [
+            29.0,
+            3.20000004768372,
+            31.5
+          ]
+        ]
+      },
+      "companion_controller_present": false,
+      "dialogue": {},
+      "dialogue_visible": false,
+      "fixture_player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "fixture_progress_sha256": "0e1f0d69902986a94efd92990aada91b5d6c4d7f94703fca852af70655798901",
+      "follow_simulation_steps": 0,
+      "id": "02_markt_i06",
+      "image": "02_markt_i06.png",
+      "image_sha256": "b9f8315fb3a6a8fc785551e575897d2836697ab3d91562523e8f409ad7c202d1",
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "pose": {
+        "name": "idle",
+        "seconds": 0.25
+      },
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "relation": "friend",
+      "stage": "market_trade",
+      "world_sha256": "f7d320206bc7707ac3d6a09f1f09702c256d5ba4d41a918dc89ff68316ca74c4"
+    },
+    {
+      "actor": "marcus",
+      "actor_distance_m": 34.0383605957031,
+      "actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "actor_screen_position": [
+        619.526123046875,
+        219.463989257812
+      ],
+      "camera": {
+        "fov": 60.0,
+        "look_at": [
+          23.0,
+          1.10000002384186,
+          26.0
+        ],
+        "position": [
+          29.0,
+          3.20000004768372,
+          31.5
+        ],
+        "transform": [
+          [
+            0.675724685192108,
+            0.0,
+            -0.737154126167297
+          ],
+          [
+            -0.184158056974411,
+            0.968291521072388,
+            -0.168811574578285
+          ],
+          [
+            0.713780105113983,
+            0.249823018908501,
+            0.654298484325409
+          ],
+          [
+            29.0,
+            3.20000004768372,
+            31.5
+          ]
+        ]
+      },
+      "companion_controller_present": false,
+      "dialogue": {},
+      "dialogue_visible": false,
+      "fixture_player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "fixture_progress_sha256": "0e1f0d69902986a94efd92990aada91b5d6c4d7f94703fca852af70655798901",
+      "follow_simulation_steps": 0,
+      "id": "02_markt_i06_dialog",
+      "image": "02_markt_i06_dialog.png",
+      "image_sha256": "b9f8315fb3a6a8fc785551e575897d2836697ab3d91562523e8f409ad7c202d1",
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "pose": {
+        "name": "idle",
+        "seconds": 0.25
+      },
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "relation": "friend",
+      "stage": "market_trade",
+      "world_sha256": "f7d320206bc7707ac3d6a09f1f09702c256d5ba4d41a918dc89ff68316ca74c4"
+    },
+    {
+      "actor": "severus",
+      "actor_distance_m": 1.97230887413025,
+      "actor_position": [
+        10.0,
+        0.0,
+        18.5
+      ],
+      "actor_screen_position": [
+        640.0,
+        373.106567382812
+      ],
+      "camera": {
+        "fov": 58.0,
+        "look_at": [
+          10.0,
+          1.14999997615814,
+          18.5
+        ],
+        "position": [
+          5.5,
+          2.59999990463257,
+          24.0
+        ],
+        "transform": [
+          [
+            0.773957312107086,
+            0.0,
+            0.633237779140472
+          ],
+          [
+            0.126599386334419,
+            0.979811429977417,
+            -0.154732584953308
+          ],
+          [
+            -0.620453655719757,
+            0.199923932552338,
+            0.758332252502441
+          ],
+          [
+            5.5,
+            2.59999990463257,
+            24.0
+          ]
+        ]
+      },
+      "companion_controller_present": false,
+      "dialogue": {
+        "choices": [
+          {
+            "command": "village_childhood_action",
+            "enabled": true,
+            "label": "Severus Aurelias Päckchen bringen",
+            "payload": {
+              "action_id": "deliver_medicine"
+            },
+            "reason": ""
+          }
+        ],
+        "text": "»Danke. Ich bleibe heute hier. Decimus teilt die Wache ein; du könntest nach der bekannten Runde eine kurze Nachricht überbringen. Frag erst deinen Vater. Die Leihsachen bleiben Eigentum der Wache.«\n\nVertrauen: 3 · Erzählter Dorftag 4. Du bist weiterhin Teil deiner Familie und des Dorfes.",
+        "title": "Severus · Dorfwache"
+      },
+      "dialogue_visible": true,
+      "fixture_player_position": [
+        9.0,
+        0.899999976158142,
+        20.2000007629395
+      ],
+      "fixture_progress_sha256": "cfafa5ac18cdc09563c228fbb74a2322d00036435135cc4e475bb3d6a932396c",
+      "follow_simulation_steps": 0,
+      "id": "03_wachmann_i07",
+      "image": "03_wachmann_i07.png",
+      "image_sha256": "5edb317b8ee61e9f001ab30f7834dff2e4cbce16e7b7661477c4a74bf907cb33",
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "player_position": [
+        9.0,
+        0.899999976158142,
+        20.2000007629395
+      ],
+      "pose": {
+        "name": "idle",
+        "seconds": 0.25
+      },
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "relation": "friend",
+      "stage": "deliver_medicine",
+      "world_sha256": "d0f4332cf628eb5f8486ee3ae116537fef5d543ea87ef04923888a8a04d1f47c"
+    },
+    {
+      "actor": "marcus",
+      "actor_distance_m": 38.3176231384277,
+      "actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "actor_screen_position": [
+        2246.63720703125,
+        141.040267944336
+      ],
+      "camera": {
+        "fov": 58.0,
+        "look_at": [
+          0.0,
+          1.10000002384186,
+          -34.2000007629395
+        ],
+        "position": [
+          6.0,
+          3.0,
+          -29.5
+        ],
+        "transform": [
+          [
+            0.61666202545166,
+            0.0,
+            -0.787227988243103
+          ],
+          [
+            -0.190419569611549,
+            0.970304667949677,
+            -0.149162024259567
+          ],
+          [
+            0.76385098695755,
+            0.241886168718338,
+            0.598350048065186
+          ],
+          [
+            6.0,
+            3.0,
+            -29.5
+          ]
+        ]
+      },
+      "companion_controller_present": false,
+      "dialogue": {},
+      "dialogue_visible": false,
+      "fixture_player_position": [
+        0.0,
+        0.899999976158142,
+        -34.2000007629395
+      ],
+      "fixture_progress_sha256": "29151a98516ba68371e75461243e1ca96827306f1711ad7f63462a1442201658",
+      "follow_simulation_steps": 0,
+      "id": "04_nordweg_i08",
+      "image": "04_nordweg_i08.png",
+      "image_sha256": "9f5803ab492358b8ac6a5ae62aaecce329c380ce9bb6aaa3cba530ffa8bb95d6",
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "player_position": [
+        0.0,
+        0.899999976158142,
+        -34.2000007629395
+      ],
+      "pose": {
+        "name": "idle",
+        "seconds": 0.25
+      },
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "relation": "friend",
+      "stage": "i08_tracks",
+      "world_sha256": "266976c45ab010385afac9d115b84ad0ded757de3a23a8e87cc4ee11bc1638c5"
+    },
+    {
+      "actor": "marcus",
+      "actor_distance_m": 14.1735668182373,
+      "actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "actor_screen_position": [
+        2007.1767578125,
+        322.368072509766
+      ],
+      "camera": {
+        "fov": 60.0,
+        "look_at": [
+          -13.3000001907349,
+          1.10000002384186,
+          15.8999996185303
+        ],
+        "position": [
+          -6.0,
+          2.90000009536743,
+          20.8999996185303
+        ],
+        "transform": [
+          [
+            0.565089046955109,
+            0.0,
+            -0.825029909610748
+          ],
+          [
+            -0.164468809962273,
+            0.979928612709045,
+            -0.112649880349636
+          ],
+          [
+            0.80847042798996,
+            0.199348911643028,
+            0.553746938705444
+          ],
+          [
+            -6.0,
+            2.90000009536743,
+            20.8999996185303
+          ]
+        ]
+      },
+      "companion_controller_present": false,
+      "dialogue": {},
+      "dialogue_visible": false,
+      "fixture_player_position": [
+        -11.0,
+        0.899999976158142,
+        15.6999998092651
+      ],
+      "fixture_progress_sha256": "676ce39cbc304825af2825ba454349b60b7dcb2e6379fe03985a5166c7ef2609",
+      "follow_simulation_steps": 0,
+      "id": "05_abend_i09",
+      "image": "05_abend_i09.png",
+      "image_sha256": "1708933cb760f81dfb0f11cfc48a2b1122cdf1dbf63da93e4f68ad569659236d",
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "player_position": [
+        -11.0,
+        0.899999976158142,
+        15.6999998092651
+      ],
+      "pose": {
+        "name": "idle",
+        "seconds": 0.25
+      },
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "relation": "friend",
+      "stage": "night_rest",
+      "world_sha256": "a09f648a8a7aa4f5d76ca0eae5d9be367edb31eaf8717a0f610cca2ff67de314"
+    },
+    {
+      "actor": "marcus",
+      "actor_distance_m": 14.1735668182373,
+      "actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "actor_screen_position": [
+        2007.1767578125,
+        322.368072509766
+      ],
+      "camera": {
+        "fov": 60.0,
+        "look_at": [
+          -13.3000001907349,
+          1.10000002384186,
+          15.8999996185303
+        ],
+        "position": [
+          -6.0,
+          2.90000009536743,
+          20.8999996185303
+        ],
+        "transform": [
+          [
+            0.565089046955109,
+            0.0,
+            -0.825029909610748
+          ],
+          [
+            -0.164468809962273,
+            0.979928612709045,
+            -0.112649880349636
+          ],
+          [
+            0.80847042798996,
+            0.199348911643028,
+            0.553746938705444
+          ],
+          [
+            -6.0,
+            2.90000009536743,
+            20.8999996185303
+          ]
+        ]
+      },
+      "companion_controller_present": false,
+      "dialogue": {},
+      "dialogue_visible": false,
+      "fixture_player_position": [
+        -11.0,
+        0.899999976158142,
+        15.6999998092651
+      ],
+      "fixture_progress_sha256": "676ce39cbc304825af2825ba454349b60b7dcb2e6379fe03985a5166c7ef2609",
+      "follow_simulation_steps": 0,
+      "id": "05_abend_i09_dialog",
+      "image": "05_abend_i09_dialog.png",
+      "image_sha256": "1708933cb760f81dfb0f11cfc48a2b1122cdf1dbf63da93e4f68ad569659236d",
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "player_position": [
+        -11.0,
+        0.899999976158142,
+        15.6999998092651
+      ],
+      "pose": {
+        "name": "idle",
+        "seconds": 0.25
+      },
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "relation": "friend",
+      "stage": "night_rest",
+      "world_sha256": "a09f648a8a7aa4f5d76ca0eae5d9be367edb31eaf8717a0f610cca2ff67de314"
+    },
+    {
+      "actor": "marcus",
+      "actor_distance_m": 34.0383605957031,
+      "actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "actor_screen_position": [
+        619.526123046875,
+        219.463989257812
+      ],
+      "camera": {
+        "fov": 60.0,
+        "look_at": [
+          23.0,
+          1.10000002384186,
+          26.0
+        ],
+        "position": [
+          29.0,
+          3.20000004768372,
+          31.5
+        ],
+        "transform": [
+          [
+            0.675724685192108,
+            0.0,
+            -0.737154126167297
+          ],
+          [
+            -0.184158056974411,
+            0.968291521072388,
+            -0.168811574578285
+          ],
+          [
+            0.713780105113983,
+            0.249823018908501,
+            0.654298484325409
+          ],
+          [
+            29.0,
+            3.20000004768372,
+            31.5
+          ]
+        ]
+      },
+      "companion_controller_present": false,
+      "dialogue": {},
+      "dialogue_visible": false,
+      "fixture_player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "fixture_progress_sha256": "4bebb23414894d2322613ee84033d3ca10bf7fe05f9832863d17a372d92d8ae3",
+      "follow_simulation_steps": 0,
+      "id": "06_markt_rivale_i06",
+      "image": "06_markt_rivale_i06.png",
+      "image_sha256": "c3f937f586ca735485d6d623e42fe9aa45c9dce10944da483256a893f6b67c47",
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "pose": {
+        "name": "idle",
+        "seconds": 0.25
+      },
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "relation": "rival",
+      "stage": "market_trade",
+      "world_sha256": "5c9be8492f84f47c2fc4716ce033237d21dd98bde0b3b1d3383671657edf760a"
+    },
+    {
+      "actor": "marcus",
+      "actor_distance_m": 34.0383605957031,
+      "actor_position": [
+        -3.0,
+        0.899999976158142,
+        4.0
+      ],
+      "actor_screen_position": [
+        619.526123046875,
+        219.463989257812
+      ],
+      "camera": {
+        "fov": 60.0,
+        "look_at": [
+          23.0,
+          1.10000002384186,
+          26.0
+        ],
+        "position": [
+          29.0,
+          3.20000004768372,
+          31.5
+        ],
+        "transform": [
+          [
+            0.675724685192108,
+            0.0,
+            -0.737154126167297
+          ],
+          [
+            -0.184158056974411,
+            0.968291521072388,
+            -0.168811574578285
+          ],
+          [
+            0.713780105113983,
+            0.249823018908501,
+            0.654298484325409
+          ],
+          [
+            29.0,
+            3.20000004768372,
+            31.5
+          ]
+        ]
+      },
+      "companion_controller_present": false,
+      "dialogue": {},
+      "dialogue_visible": false,
+      "fixture_player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "fixture_progress_sha256": "4bebb23414894d2322613ee84033d3ca10bf7fe05f9832863d17a372d92d8ae3",
+      "follow_simulation_steps": 0,
+      "id": "06_markt_rivale_i06_dialog",
+      "image": "06_markt_rivale_i06_dialog.png",
+      "image_sha256": "c3f937f586ca735485d6d623e42fe9aa45c9dce10944da483256a893f6b67c47",
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "pose": {
+        "name": "idle",
+        "seconds": 0.25
+      },
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "relation": "rival",
+      "stage": "market_trade",
+      "world_sha256": "5c9be8492f84f47c2fc4716ce033237d21dd98bde0b3b1d3383671657edf760a"
+    }
+  ]
+}
