@@ -80,7 +80,7 @@ Alle Silhouetten einer Reihe entstehen in einem Zeichenaufruf aus einem gemeinsa
 
 ### Prüfungen (Stufe 2)
 
-`roman_menu` umfasst jetzt 261 Einzelprüfungen. Neu geprüft werden:
+`roman_menu` umfasst jetzt 254 Einzelprüfungen (die Zahl hängt von der Anzahl der Banner und Fackeln je Auflösung ab). Gesamtlauf: 143/143 Unittests, 58/58 `check_prototype`. Neu geprüft werden:
 
 - Trommelschläge zünden die Ebenen; schwarzer Beginn.
 - Bewegungsunschärfe der Klinge, Shake und Zoom-Stoß beim Einschlag, Aufblitzen.
