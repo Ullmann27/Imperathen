@@ -272,6 +272,13 @@ func _test_raid_finish_and_adult_training() -> void:
 	_check(loaded.data.village.unarmed.practice_hits == prior_practice + 3, "Adult contacts still count as real practice")
 	_check(loaded.data.progress.training_complete and loaded.data.progress.training_hits == 3 and loaded.data.progress.stage == "trained", "Three real adult contacts complete mandatory training without an immediate-command bypass")
 	_ok(loaded.save_game(_path("adult-complete")), "Completed real adult training saves")
+	_check(Combat.service_gear(loaded.data),"Actual completed training authorizes issued service equipment")
+	loaded.advance(1.0)
+	_ok(_attack(loaded,"practice","thrust","adult-weapon-practice"),"Trained soldier can choose a real sword technique")
+	loaded.advance(.82)
+	_check(loaded.data.progress.training_hits==3 and loaded.data.player.age==18,"Sword practice does not duplicate training or advance age")
+	_valid(loaded,"Sword action uses existing world contract")
+	loaded.advance(1.0)
 	_exercise_legacy_damage(loaded)
 
 

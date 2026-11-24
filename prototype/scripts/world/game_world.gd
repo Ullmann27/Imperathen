@@ -181,6 +181,7 @@ func sync_state(state: Dictionary) -> void:
 	var age := int(player_data.get("age", 12))
 	_figure.configure("player",_state.get("origin_id","italia"),age)
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
+	_figure.set_service_gear(CombatActions.service_gear(state))
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -447,7 +448,7 @@ func set_running(value: bool) -> void:
 
 
 func set_selected_technique(technique: String) -> void:
-	if CombatActions.TECHNIQUES.has(technique):
+	if CombatActions.available(_actions.state,technique):
 		_actions.selected = technique
 
 

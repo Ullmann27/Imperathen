@@ -10,6 +10,7 @@ const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
 const HandPose := preload("res://scripts/visuals/hand_pose.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
+const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
 const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
@@ -56,6 +57,9 @@ var meshy_asset_id := ""
 var _conversation_focused := false
 var _armed_style := ""
 var _armed_sequence := 0
+var _service_gear := false
+var _service_nodes: Array[Node3D] = []
+var _service_external := false
 
 
 func _ready() -> void:
@@ -182,6 +186,7 @@ func _reload(level: int) -> void:
 		remove_child(body)
 		body.free()
 	_gear_nodes.clear()
+	_service_nodes.clear()
 	detail = level
 	body = replacement
 	active_model_path = path
@@ -207,6 +212,7 @@ func _reload(level: int) -> void:
 	# Reattach loaned gear before evaluating an existing shield pose on the
 	# new skeleton. LOD changes must not silently erase a valid guard.
 	_sync_loaned_gear()
+	_sync_service_gear()
 	_play(clip,saved_phase,0)
 	_face.pose("attack" if not _combat_id.is_empty() else clip,saved_phase,detail)
 	if not _combat_id.is_empty():
@@ -312,7 +318,7 @@ func _style(shape: MeshInstance3D) -> void:
 func drive(metres_per_second: float, turn_radians_per_second: float = 0.0) -> void:
 	speed = maxf(0.0, metres_per_second) if is_finite(metres_per_second) else 0.0
 	_turn_rate = clampf(turn_radians_per_second, -3.0, 3.0) if is_finite(turn_radians_per_second) else 0.0
-	if _combat_id.is_empty():
+	if _combat_id.is_empty() and not _service_external:
 		_posed = false
 		# Work and speech are stationary activities. An actual moving body
 		# must not glide while its previous gesture is still playing.
@@ -325,13 +331,54 @@ func drive(metres_per_second: float, turn_radians_per_second: float = 0.0) -> vo
 func set_equipment(sword: bool, shield: bool = false) -> void:
 	_has_sword = sword
 	_has_shield = shield
-	if _blade:
-		_blade.visible = _has_sword and role == "player" and age >= 18 and clip in ["attack", "train", "block"]
+	_update_weapon_visibility()
+
+
+func set_service_gear(enabled: bool) -> void:
+	var allowed := enabled and role == "player" and age >= 18
+	if allowed == _service_gear:
+		return
+	_service_gear = allowed
+	_has_sword = allowed
+	_has_shield = allowed
+	if not allowed:
+		_service_external = false
+	_sync_service_gear()
+	_update_weapon_visibility()
+
+
+func _sync_service_gear() -> void:
+	if not body:
+		return
+	if _service_gear and role == "player" and age >= 18 and _service_nodes.is_empty():
+		_service_nodes = ServiceGear.attach(body)
+	_update_weapon_visibility()
+
+
+func _update_weapon_visibility() -> void:
+	var authorized := role == "player" and age >= 18
+	var armed_action := clip in ["attack","train","block"]
+	if is_instance_valid(_blade):
+		_blade.visible = _has_sword and authorized and armed_action and (_service_nodes.is_empty() or not _service_gear)
+	for node: Node3D in _service_nodes:
+		if is_instance_valid(node):
+			node.visible = _service_gear and authorized and armed_action
+
+
+func sample_service_combat(style: String, normalized: float) -> bool:
+	if not _service_gear or not _can_armed_style(style):
+		return false
+	# This sampled pose is owned by the domain clock. Rendering cannot advance
+	# the attack independently, even if physics or draw rates differ.
+	var accepted := sample_armed_pose(style,normalized)
+	_service_external = accepted
+	return accepted
 
 
 func sample_combat(technique: String, normalized: float) -> void:
 	if not technique in CharacterMotion.TECHNIQUES:
 		return
+	_service_external = false
 	_armed_style = ""
 	_conversation_focused = false
 	if _combat_id.is_empty():
@@ -359,6 +406,7 @@ func cue_combat(technique: String, duration: float) -> void:
 
 
 func cancel_action() -> void:
+	_service_external = false
 	_conversation_focused = false
 	_combat_id = ""
 	_combat_duration = 0.0
@@ -371,6 +419,7 @@ func cancel_action() -> void:
 
 func cue(action: String, preferred_style: String = "") -> void:
 	if action == "death" and clip == "death": return
+	_service_external = false
 	if action != "talk":
 		_conversation_focused = false
 	_combat_id = ""
@@ -396,9 +445,9 @@ func _can_armed_style(style: String) -> bool:
 		return false
 	if style in CharacterMotion.SHIELD_GUARDS:
 		# Only a real attached shield qualifies; a flag alone is not a prop.
-		return (_loaned_gear and not _gear_nodes.is_empty()) or _has_meshy_axe()
+		return (_loaned_gear and not _gear_nodes.is_empty()) or (_service_gear and _service_nodes.size() == 2 and age >= 18) or _has_meshy_axe()
 	if style in CharacterMotion.ARMED_ATTACKS:
-		return age >= 18 and ((_has_sword and role == "player" and is_instance_valid(_blade)) or (_has_meshy_axe() and style != "thrust"))
+		return age >= 18 and ((_has_sword and role == "player" and (is_instance_valid(_blade) or (_service_gear and _service_nodes.size() == 2))) or (_has_meshy_axe() and style != "thrust"))
 	return false
 
 
@@ -438,6 +487,7 @@ func _sync_loaned_gear() -> void:
 
 
 func reset_motion() -> void:
+	_service_external = false
 	_conversation_focused = false
 	_combat_id = ""
 	_combat_external = false
@@ -511,7 +561,7 @@ func _play(action: String, normalized: float, blend: float) -> void:
 	clip = action
 	if action not in ["attack","train","block"]:
 		_armed_style = ""
-	if _blade: _blade.visible = _has_sword and role == "player" and age >= 18 and clip in ["attack","train","block"]
+	_update_weapon_visibility()
 	phase = clampf(normalized,0,1)
 	if not animator: return
 	var name_in_file := action
@@ -617,7 +667,7 @@ func _process(delta: float) -> void:
 			if _combat_progress >= 1.0:
 				cancel_action()
 		return
-	if _posed: return
+	if _posed or _service_external: return
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)
 		if _remaining <= 0 and not (_conversation_focused and clip == "talk"):
