@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "mission": "I-12",
+  "title": "Der letzte Weg des Vaters",
+  "source_section": "Band 1 · Abschnitt „I-12 · Der letzte Weg des Vaters“ · Tabelle 15",
+  "rule": "Bestehende Brückenschritte, unverändert aus handoff/sol-20261124 (94bb7cdd76a3fe2577610eac8da6948e29b0faab) ausgelagert. IDs und Auslösebedingungen bleiben erhalten; keine Einträge in childhood.completed.",
+  "authorship": "Verdichtete Spielaufgaben und verbindende Dialoge sind bestehende Ergänzungen. Die Fundstelle belegt den Missionsrahmen, nicht jede Formulierung des Runtime-Schritts.",
+  "steps": [],
+  "bridges": [
+    {
+      "id": "i12_father",
+      "mission": "I-12",
+      "screenplay": true,
+      "npc": "silvanus",
+      "chapter": "Der letzte Weg des Vaters",
+      "label": "Silvanus auf seinem letzten Weg folgen",
+      "objective": "Geh zu deinem Vater in der Familiengasse. Sein Ende ist in beiden Hauptwegen fest; Julias Schicksal hängt von tatsächlich geleisteter Hilfe ab.",
+      "text": "»Sieh nach deiner Mutter. Und wenn du später wütend bist – entscheide erst, wenn du wieder sehen kannst, was vor dir liegt.«",
+      "result": "Silvanus stirbt. Julias Zustand folgt aus deiner tatsächlichen Rettung oder dem Versteckweg."
+    }
+  ]
+}

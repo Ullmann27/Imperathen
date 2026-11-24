@@ -62,3 +62,17 @@ static func source_missions(band: String) -> Dictionary:
 		if step.has("source_mission"):
 			result[step.id] = step.source_mission
 	return result
+
+
+## Brücken besitzen einen eigenen gespeicherten Status und gehören deshalb
+## niemals in die durch childhood.completed indizierte steps-Liste.
+static func bridge_steps(band: String) -> Dictionary:
+	var result := {}
+	for mission: Dictionary in mission_files(band):
+		for step: Dictionary in mission.get("bridges", []):
+			var id := str(step.get("id", ""))
+			if id.is_empty() or result.has(id) or step.get("mission", "") != mission.mission or step.get("screenplay", false) != true:
+				push_error("Ungültiger oder doppelter Missionsbrückenschritt: " + id)
+				return {}
+			result[id] = step.duplicate(true)
+	return result

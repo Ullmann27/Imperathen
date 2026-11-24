@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "mission": "I-11",
+  "title": "Die Schmiede im Feuer",
+  "source_section": "Band 1 · Abschnitt „I-11 · Die Schmiede im Feuer“ · Tabelle 14",
+  "rule": "Bestehende Brückenschritte, unverändert aus handoff/sol-20261124 (94bb7cdd76a3fe2577610eac8da6948e29b0faab) ausgelagert. IDs und Auslösebedingungen bleiben erhalten; keine Einträge in childhood.completed.",
+  "authorship": "Verdichtete Spielaufgaben und verbindende Dialoge sind bestehende Ergänzungen. Die Fundstelle belegt den Missionsrahmen, nicht jede Formulierung des Runtime-Schritts.",
+  "steps": [],
+  "bridges": [
+    {
+      "id": "i11_forge",
+      "mission": "I-11",
+      "screenplay": true,
+      "point": "smith",
+      "chapter": "Die Schmiede im Feuer",
+      "label": "Zur brennenden Schmiede zurückkehren",
+      "objective": "Erreiche die Schmiede. Sextus hält einen Fluchtweg offen; die Werkstatt und ihr Arbeiter sind Teil derselben Welt.",
+      "text": "",
+      "result": "Sextus stirbt, während er den Fluchtweg offen hält. Die Schmiede verliert ihren realen Arbeiter."
+    }
+  ]
+}

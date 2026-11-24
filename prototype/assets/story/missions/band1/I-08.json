@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "mission": "I-08",
+  "title": "Hufspuren im Regen",
+  "source_section": "Band 1 · Abschnitt „I-08 · Hufspuren im Regen“ · Tabelle 11",
+  "rule": "Bestehende Brückenschritte, unverändert aus handoff/sol-20261124 (94bb7cdd76a3fe2577610eac8da6948e29b0faab) ausgelagert. IDs und Auslösebedingungen bleiben erhalten; keine Einträge in childhood.completed.",
+  "authorship": "Verdichtete Spielaufgaben und verbindende Dialoge sind bestehende Ergänzungen. Die Fundstelle belegt den Missionsrahmen, nicht jede Formulierung des Runtime-Schritts.",
+  "steps": [],
+  "bridges": [
+    {
+      "id": "i08_tracks",
+      "mission": "I-08",
+      "screenplay": true,
+      "point": "hoof_tracks",
+      "chapter": "Hufspuren im Regen",
+      "label": "Die frischen Hufspuren am Nordweg prüfen",
+      "objective": "Untersuche am Nordweg die frischen Hufspuren. Halte Beobachtung und Vermutung getrennt.",
+      "text": "",
+      "result": "Du sicherst die Beobachtung: mehrere frische Hufspuren, aber noch keinen belastbaren Täter."
+    },
+    {
+      "id": "i08_report",
+      "mission": "I-08",
+      "screenplay": true,
+      "npc": "decimus",
+      "chapter": "Hufspuren im Regen",
+      "label": "Decimus nur die belegten Spuren melden",
+      "objective": "Berichte Decimus, was du tatsächlich gesehen hast. Beschuldige kein Volk ohne Beleg.",
+      "text": "»Zeig mir, was du weißt. Nicht, was du vermutest.«",
+      "result": "Die Hufspuren werden als offene Warnung protokolliert; ein Täter bleibt unbekannt."
+    }
+  ]
+}

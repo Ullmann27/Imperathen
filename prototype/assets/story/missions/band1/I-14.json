@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "mission": "I-14",
+  "title": "Der Schwur",
+  "source_section": "Band 1 · Abschnitt „I-14 · Der Schwur“ · Tabelle 17",
+  "rule": "Bestehende Brückenschritte, unverändert aus handoff/sol-20261124 (94bb7cdd76a3fe2577610eac8da6948e29b0faab) ausgelagert. IDs und Auslösebedingungen bleiben erhalten; keine Einträge in childhood.completed.",
+  "authorship": "Verdichtete Spielaufgaben und verbindende Dialoge sind bestehende Ergänzungen. Die Fundstelle belegt den Missionsrahmen, nicht jede Formulierung des Runtime-Schritts.",
+  "steps": [],
+  "bridges": [
+    {
+      "id": "i14_oath",
+      "mission": "I-14",
+      "screenplay": true,
+      "point": "oath_ridge",
+      "chapter": "Der Schwur",
+      "label": "Am Waldrand das Erinnerungsstück nehmen und schwören",
+      "objective": "Geh zum Waldrand oberhalb Valdoras. Nimm ein Erinnerungsstück und entscheide dich für die Suche nach den Verantwortlichen.",
+      "text": "",
+      "result": "Du schwörst, die Verantwortlichen zu finden. Der Schwur eröffnet Ermittlung – keine sofortige Soldatenkarriere."
+    }
+  ]
+}

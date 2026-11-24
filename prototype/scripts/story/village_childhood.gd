@@ -38,6 +38,8 @@ const NEIGHBORS := {
 }
 # Authored steps live in res://assets/story/missions/band1/ (one file per mission).
 static var STEPS: Array = MissionData.steps("band1")
+## Separater Datenkatalog; die Save-relevante STEPS-Reihenfolge bleibt erhalten.
+static var BRIDGE_STEPS: Dictionary = MissionData.bridge_steps("band1")
 ## Screenplay bridge state version. v3 adds I-07 water (story core „Wasser,
 ## Nachricht und kurze Kontrollrunde“); older saves migrate on load.
 const SCREENPLAY_VERSION := 3
@@ -802,17 +804,9 @@ static func _screenplay_step(data: Dictionary) -> Dictionary:
 	# from completed[] so older 35-step saves keep their exact sequence indices.
 	if child.completed.size() >= 3:
 		if screenplay.i02 == "pending":
-			return {"id":"i02_basket","mission":"I-02","screenplay":true,"npc":"aurelia",
-				"chapter":"Der falsche Korb","label":"Julias Korb zu Aurelia bringen",
-				"objective":"Bring Julias Nachbarschaftskorb zu Aurelia. Prüfe den Korb oder handle hastig.",
-				"text":"»Zeig mir erst, welchen Korb Julia dir gegeben hat. Ein Fehler ist kein Weltende, aber wir müssen dann mit seinen Folgen weiterarbeiten.«",
-				"result":"Aurelia prüft den Korb."}
+			return BRIDGE_STEPS["i02_basket"].duplicate(true)
 		if screenplay.i02 == "correction":
-			return {"id":"i02_correct","mission":"I-02","screenplay":true,"npc":"julia",
-				"chapter":"Der falsche Korb","label":"Den falschen Korb mit Julia korrigieren",
-				"objective":"Kehre zu Julia zurück. Der falsche Korb bleibt Teil der Geschichte, bis du ihn korrigierst.",
-				"text":"»Gut, dass du zurückkommst. Fehler verschwinden nicht, weil man sie nicht mag. Wir bringen jetzt den richtigen Korb auf den Weg.«",
-				"result":"Der Fehler ist korrigiert und bleibt als Erinnerung gespeichert."}
+			return BRIDGE_STEPS["i02_correct"].duplicate(true)
 		if screenplay.i02 == "complete" and screenplay.i03 == "pending":
 			return {"id":"i03_marcus","mission":"I-03","screenplay":true,"point":"marcus",
 				"chapter":"Marcus kennt eine Abkürzung","label":"Mit Marcus über Marktweg und Münzstreit entscheiden",
@@ -835,45 +829,20 @@ static func _screenplay_step(data: Dictionary) -> Dictionary:
 	# family evening. No people or faction are identified from hoofprints alone.
 	if child.completed.has("return_gear"):
 		if screenplay.i08 == "pending":
-			return {"id":"i08_tracks","mission":"I-08","screenplay":true,"point":"hoof_tracks",
-				"chapter":"Hufspuren im Regen","label":"Die frischen Hufspuren am Nordweg prüfen",
-				"objective":"Untersuche am Nordweg die frischen Hufspuren. Halte Beobachtung und Vermutung getrennt.",
-				"text":"","result":"Du sicherst die Beobachtung: mehrere frische Hufspuren, aber noch keinen belastbaren Täter."}
+			return BRIDGE_STEPS["i08_tracks"].duplicate(true)
 		if screenplay.i08 == "report":
-			return {"id":"i08_report","mission":"I-08","screenplay":true,"npc":"decimus",
-				"chapter":"Hufspuren im Regen","label":"Decimus nur die belegten Spuren melden",
-				"objective":"Berichte Decimus, was du tatsächlich gesehen hast. Beschuldige kein Volk ohne Beleg.",
-				"text":"»Zeig mir, was du weißt. Nicht, was du vermutest.«",
-				"result":"Die Hufspuren werden als offene Warnung protokolliert; ein Täter bleibt unbekannt."}
+			return BRIDGE_STEPS["i08_report"].duplicate(true)
 	if child.completed.size() == STEPS.size():
 		if screenplay.i10 == "pending":
-			return {"id":"i10_choice","mission":"I-10","screenplay":true,"npc":"silvanus",
-				"chapter":"Die Nacht der Reiter","label":"Entscheiden, wie du auf den Angriff reagierst",
-				"objective":"Hufschläge, Feuer und Rufe reißen Valdora aus der Nacht. Entscheide: hilfst du bei Verteidigung und Rettung oder versteckst du dich bei deinen Eltern?",
-				"text":"»Bleib bei uns, wenn du dich versteckst. Wenn du hinausgehst, dann um Menschen zu helfen – nicht um ein Held zu spielen.«",
-				"result":"Deine Nachtentscheidung wird dauerhaft gespeichert."}
+			return BRIDGE_STEPS["i10_choice"].duplicate(true)
 		if screenplay.i10 == "complete" and screenplay.i11 == "pending":
-			return {"id":"i11_forge","mission":"I-11","screenplay":true,"point":"smith",
-				"chapter":"Die Schmiede im Feuer","label":"Zur brennenden Schmiede zurückkehren",
-				"objective":"Erreiche die Schmiede. Sextus hält einen Fluchtweg offen; die Werkstatt und ihr Arbeiter sind Teil derselben Welt.",
-				"text":"","result":"Sextus stirbt, während er den Fluchtweg offen hält. Die Schmiede verliert ihren realen Arbeiter."}
+			return BRIDGE_STEPS["i11_forge"].duplicate(true)
 		if screenplay.i11 == "complete" and screenplay.i12 == "pending":
-			return {"id":"i12_father","mission":"I-12","screenplay":true,"npc":"silvanus",
-				"chapter":"Der letzte Weg des Vaters","label":"Silvanus auf seinem letzten Weg folgen",
-				"objective":"Geh zu deinem Vater in der Familiengasse. Sein Ende ist in beiden Hauptwegen fest; Julias Schicksal hängt von tatsächlich geleisteter Hilfe ab.",
-				"text":"»Sieh nach deiner Mutter. Und wenn du später wütend bist – entscheide erst, wenn du wieder sehen kannst, was vor dir liegt.«",
-				"result":"Silvanus stirbt. Julias Zustand folgt aus deiner tatsächlichen Rettung oder dem Versteckweg."}
+			return BRIDGE_STEPS["i12_father"].duplicate(true)
 		if screenplay.i12 == "complete" and screenplay.i13 == "pending":
-			return {"id":"i13_morning","mission":"I-13","screenplay":true,"npc":"aurelia",
-				"chapter":"Morgen ohne Stimmen","label":"Mit Aurelia die wirklichen Verluste erfassen",
-				"objective":"Gehe am Morgen zu Aurelia. Leere Arbeitsplätze, Verletzte und Tote bleiben reale Zustände statt Kulisse.",
-				"text":"»Wir zählen keine Schatten. Wir zählen Menschen. Wer fehlt, fehlt auch morgen noch an seinem Arbeitsplatz.«",
-				"result":"Der Morgen übernimmt die tatsächlichen Personen- und Verlustzustände der Nacht."}
+			return BRIDGE_STEPS["i13_morning"].duplicate(true)
 		if screenplay.i13 == "complete" and screenplay.i14 == "pending":
-			return {"id":"i14_oath","mission":"I-14","screenplay":true,"point":"oath_ridge",
-				"chapter":"Der Schwur","label":"Am Waldrand das Erinnerungsstück nehmen und schwören",
-				"objective":"Geh zum Waldrand oberhalb Valdoras. Nimm ein Erinnerungsstück und entscheide dich für die Suche nach den Verantwortlichen.",
-				"text":"","result":"Du schwörst, die Verantwortlichen zu finden. Der Schwur eröffnet Ermittlung – keine sofortige Soldatenkarriere."}
+			return BRIDGE_STEPS["i14_oath"].duplicate(true)
 	return {}
 
 
