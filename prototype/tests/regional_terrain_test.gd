@@ -20,20 +20,44 @@ func _check(condition: bool, label: String) -> void:
 
 
 func _follow(terrain: Node3D, position: Vector3, quality: String) -> void:
+	var before_meshes := {}
+	var before_colliders := {}
+	for sector: Node3D in terrain.sectors.values():
+		before_meshes[sector.get_instance_id()] = true
+		if sector.has_node("GroundCollision"):
+			before_colliders[sector.get_node("GroundCollision").get_instance_id()] = true
 	var started := Time.get_ticks_usec()
 	terrain.follow(position,quality)
-	timings.append({"quality":quality,"elapsed_ms":float(Time.get_ticks_usec()-started)/1000.0,
+	var elapsed_ms := float(Time.get_ticks_usec()-started)/1000.0
+	var report: Dictionary = terrain.report()
+	var actual_mesh_builds := 0
+	var actual_collider_builds := 0
+	var retained_meshes := 0
+	for sector: Node3D in terrain.sectors.values():
+		actual_mesh_builds += int(not before_meshes.has(sector.get_instance_id()))
+		retained_meshes += int(before_meshes.has(sector.get_instance_id()))
+		if sector.has_node("GroundCollision"):
+			actual_collider_builds += int(not before_colliders.has(sector.get_node("GroundCollision").get_instance_id()))
+	_check(actual_mesh_builds <= Terrain.MESH_BUILD_BUDGET and actual_collider_builds <= Terrain.COLLIDER_BUILD_BUDGET, "Observed mesh and collider instances obey their separate budgets")
+	_check(before_meshes.size()-retained_meshes <= Terrain.UNLOAD_BUDGET, "Observed removed sector instances obey retirement budget")
+	if position.is_finite():
+		_check(report.last_mesh_builds == actual_mesh_builds and report.last_collider_builds == actual_collider_builds and report.last_unloads == before_meshes.size()-retained_meshes, "Diagnostics agree with actual instance changes")
+	_check(report.last_mesh_builds <= Terrain.MESH_BUILD_BUDGET, "Mesh builds stay within the per-follow budget")
+	_check(report.last_collider_builds <= Terrain.COLLIDER_BUILD_BUDGET, "Collider builds, including promotions, stay within the per-follow budget")
+	_check(report.last_unloads <= Terrain.UNLOAD_BUDGET, "Mesh retirements stay within the per-follow budget")
+	_check(report.loaded_sectors <= report.resident_limit and report.collision_sectors <= report.collision_limit, "Transitional residency and live physics remain bounded")
+	timings.append({"quality":quality,"elapsed_ms":elapsed_ms,
 		"loaded":terrain.report().loaded_sectors})
 
 
 func _drain(terrain: Node3D, position: Vector3, quality: String) -> void:
 	var count := 0
-	while terrain.report().pending_sectors > 0 and count < 100:
+	while terrain.report().pending_work > 0 and count < 100:
 		var before: int = terrain.report().loaded_sectors
 		_follow(terrain,position,quality)
 		_check(terrain.report().loaded_sectors-before <= 2,"Each continuation creates at most two sectors")
 		count += 1
-	_check(terrain.report().pending_sectors == 0,"Bounded demand finishes loading")
+	_check(terrain.report().pending_work == 0,"Bounded demand finishes loading, collider upgrades and retirement")
 
 
 func _ray(stage: Node3D, position: Vector3, down: bool = true) -> Dictionary:
@@ -111,10 +135,10 @@ func _test_shared_edge(terrain: Node3D) -> void:
 	_check(edge.size() == Terrain.GRID+1 and compared > 0 and equal,"Actual adjacent meshes share every edge height without a geometric gap")
 
 
-func _walk_boundary(stage: Node3D, terrain: Node3D) -> void:
-	var start := Vector3(248.0,0.0,14.0)
-	_follow(terrain,start,"balanced")
-	_drain(terrain,start,"balanced")
+func _walk_boundary(stage: Node3D, terrain: Node3D, quality: String, start: Vector3, direction: Vector3) -> void:
+	_follow(terrain,start,quality)
+	_drain(terrain,start,quality)
+	var initial_sector: Vector2i = Plan.sector_for_position(start)
 	var body := CharacterBody3D.new()
 	body.name = "TerrainWalkingProbe"
 	body.floor_snap_length = 0.4
@@ -132,20 +156,81 @@ func _walk_boundary(stage: Node3D, terrain: Node3D) -> void:
 	for frame in 100:
 		await physics_frame
 		var delta := 1.0/float(Engine.physics_ticks_per_second)
-		body.velocity.x = 0.0 if frame < 25 else 4.0
+		body.velocity.x = 0.0 if frame < 25 else direction.x * 4.0
+		body.velocity.z = 0.0 if frame < 25 else direction.z * 4.0
 		body.velocity.y -= 20.0*delta
-		_follow(terrain,body.global_position,"balanced")
+		_follow(terrain,body.global_position,quality)
 		body.move_and_slide()
 		if frame == 24:
 			grounded_before = body.is_on_floor()
 		if frame > 25:
 			stays_supported = stays_supported and body.is_on_floor()
-		if body.global_position.x > 251.0 and body.is_on_floor():
+		if Plan.sector_for_position(body.global_position) != initial_sector and body.is_on_floor():
 			grounded_after = true
-	_check(grounded_before,"Actual CharacterBody settles on generated terrain")
-	_check(body.global_position.x > 252.0 and grounded_after and stays_supported,"Actual CharacterBody walks across sector boundary without losing ground")
+	_check(grounded_before,"Actual CharacterBody settles on generated terrain " + quality)
+	_check((body.global_position-start).dot(direction) > 4.0 and grounded_after and stays_supported,"Actual CharacterBody walks across sector boundary without losing ground " + quality)
 	_check(body.global_position.is_finite() and body.global_position.y > Plan.terrain_height(Vector2(body.global_position.x,body.global_position.z))+0.7,"Walking body stays above streamed collision")
 	body.free()
+
+
+func _test_stream_lifecycle(stage: Node3D, terrain: Node3D) -> void:
+	var point := Vector3(2137,0,2427)
+	_follow(terrain,point,"balanced")
+	_drain(terrain,point,"balanced")
+	var center_id: String = Plan.sector_id(Plan.sector_for_position(point))
+	var center: Node3D = terrain.sectors[center_id]
+	var center_instance := center.get_instance_id()
+	var ground_instance: int = center.get_node("Ground").mesh.get_instance_id()
+	var collision_instance := center.get_node("GroundCollision").get_instance_id()
+	for _repeat in 6:
+		_follow(terrain,point,"balanced")
+		_check(terrain.report().last_mesh_builds == 0 and terrain.report().last_collider_builds == 0 and terrain.report().last_unloads == 0,"A settled stationary stream creates and retires nothing")
+	_follow(terrain,point,"unrecognized")
+	_check(terrain.report().quality == "balanced" and terrain.report().pending_work == 0,"Unknown quality resolves to the existing balanced demand")
+	_follow(terrain,point,"another_unknown")
+	_check(terrain.sectors[center_id].get_instance_id() == center_instance and center.get_node("Ground").mesh.get_instance_id() == ground_instance and center.get_node("GroundCollision").get_instance_id() == collision_instance,"Unchanged support reuses actual node, mesh and collider instances")
+	_follow(terrain,point,"low")
+	_drain(terrain,point,"low")
+	_check(terrain.report().collision_sectors == 1,"Low quality retains one ground collider away from borders")
+	_follow(terrain,point,"very_high")
+	_check(terrain.report().last_collider_builds == 2 and terrain.report().pending_collisions > 0,"A large quality increase queues collider promotions after the first budgeted pair")
+	_check(center.get_node("GroundCollision").get_instance_id() == collision_instance,"Player support is never rebuilt during quality upgrades")
+	_drain(terrain,point,"very_high")
+	_check_residency(terrain,point,"very_high")
+	_check(Terrain.MAX_RESIDENT_SECTORS == int(Plan.plan(Vector3.ZERO,"very_high").active_limit),"Transition cap matches the largest configured residency")
+	_follow(terrain,point,"low")
+	_check(terrain.report().loaded_sectors > terrain.report().active_limit and terrain.report().retiring_sectors > 0,"Profile downgrade explicitly reports the unfinished retirement instead of claiming the lower cap")
+	_check(terrain.report().collision_sectors == 1,"Old visual sectors do not retain obsolete collision during retirement")
+	_drain(terrain,point,"low")
+	_check_residency(terrain,point,"low")
+	_check(terrain.sectors[center_id].get_instance_id() == center_instance,"The resident player sector survives upgrade and downgrade")
+	_follow(terrain,Vector3(-6000,0,-6000),"very_high")
+	_follow(terrain,Vector3(6000,0,6000),"high")
+	_follow(terrain,point,"balanced")
+	_drain(terrain,point,"balanced")
+	_check_residency(terrain,point,"balanced")
+	_check(terrain.report().pending_work == 0,"Relocation during loading cancels obsolete requests and converges on the last position")
+	# Verify the physical floor ahead of the body center on the low profile.
+	var near_edge := Vector3(1249.5,0,1014)
+	_follow(terrain,near_edge,"low")
+	_drain(terrain,near_edge,"low")
+	var next_id: String = Plan.sector_id(Plan.sector_for_position(near_edge+Vector3.RIGHT))
+	var next_sector: Node3D = terrain.sectors[next_id]
+	var next_instance := next_sector.get_instance_id()
+	await physics_frame
+	await physics_frame
+	_check(terrain.report().collision_sectors == 2 and not _ray(stage,near_edge+Vector3.RIGHT).is_empty(),"Low profile has real neighboring ground before the player center crosses an edge")
+	_follow(terrain,near_edge-Vector3.RIGHT*2,"low")
+	_drain(terrain,near_edge-Vector3.RIGHT*2,"low")
+	_check(terrain.report().collision_sectors == 1 and terrain.sectors[next_id].get_instance_id() == next_instance,"Leaving the support margin releases neighbor physics without regenerating its mesh")
+	var corner := Vector3(1249.5,0,1249.5)
+	_follow(terrain,corner,"low")
+	_drain(terrain,corner,"low")
+	await physics_frame
+	await physics_frame
+	_check(terrain.report().collision_sectors == 4 and terrain.report().collision_limit == 4,"A low-profile corner has at most four physically supported cells")
+	for offset: Vector3 in [Vector3.ZERO,Vector3(1,0,0),Vector3(0,0,1),Vector3(1,0,1)]:
+		_check(not _ray(stage,corner+offset).is_empty(),"Actual collision covers each side of a sector corner")
 
 
 func _run() -> void:
@@ -174,8 +259,10 @@ func _run() -> void:
 	var stale_instance := int(terrain.sectors[stale_id].get_instance_id())
 	var far := Vector3(2137,0,2427)
 	_follow(terrain,far,"balanced")
-	_check(not terrain.sectors.has(stale_id) and not is_instance_id_valid(stale_instance),"Removed distant sector is freed rather than detached")
+	_check(terrain.report().retiring_sectors > 0, "A long relocation retires the old visual region incrementally")
+	_check(not terrain.sectors.has(stale_id) or not terrain.sectors[stale_id].has_node("GroundCollision"), "Obsolete terrain collision stops immediately")
 	_drain(terrain,far,"balanced")
+	_check(not terrain.sectors.has(stale_id) and not is_instance_id_valid(stale_instance),"Removed distant sector is freed rather than detached")
 	_check_residency(terrain,far,"balanced")
 	_test_mesh(terrain,far)
 	await physics_frame
@@ -209,7 +296,11 @@ func _run() -> void:
 	await physics_frame
 	hit = _ray(stage,Vector3(15999,0,15999))
 	_check(not hit.is_empty(),"Physics reaches the modeled world corner")
-	await _walk_boundary(stage,terrain)
+	await _test_stream_lifecycle(stage,terrain)
+	for quality: String in ["low", "balanced", "high", "very_high"]:
+		await _walk_boundary(stage,terrain,quality,Vector3(248,0,14),Vector3.RIGHT)
+	await _walk_boundary(stage,terrain,"low",Vector3(-248,0,-14),Vector3.LEFT)
+	await _walk_boundary(stage,terrain,"low",Vector3(248,0,248),Vector3(1,0,1).normalized())
 	stage.free()
 	await physics_frame
 	await process_frame

@@ -166,6 +166,7 @@ func _food_and_recovery() -> void:
 	var money: int=data.resources.denarii
 	_check(Economy.execute(data,"village_buy_food").ok,"Emergency food provides a finite recovery path")
 	_check(data.resources.grain==16 and data.resources.denarii==money-6 and data.village.economy.stocks.emergency_grain==48,"Emergency food is bought, not created without cost")
+	_check(data.village.economy.stocks.merchant_denarii==606,"Food payment reaches the same finite merchant treasury used to buy deliveries")
 	data.village.raid.active=false
 	Economy.advance(data,120.0)
 	_check(Economy.view(data).population.unfit==0,"A fed day restores work eligibility after two missed meals")
@@ -249,8 +250,14 @@ func _profession_effects() -> void:
 		_check(_place(data,id).yield_per_cycle==expected,"UI exposes current learned work yield: "+profession)
 		data.village.economy.stocks[stock]=2
 		before=data.resources[resource]
+		var cargo_before: int = data.resources.wood
+		var cycles_before: int = data.village.economy.workplaces[id].produced_cycles
 		Economy.advance(data,float(Economy.WORKPLACES[id].period))
-		_check(data.resources[resource]==before+2 and data.village.economy.stocks[stock]==0,"Last partial cargo cannot exceed remaining source: "+profession)
+		if id == "trade":
+			_check(data.resources.denarii==before and data.resources.wood==cargo_before and data.village.economy.stocks.merchant_denarii==2,"An indivisible four-wood delivery waits for its full negotiated price")
+			_check(data.village.economy.workplaces.trade.produced_cycles==cycles_before and _place(data,id).reason.contains("7 Denare"),"Unpaid delivery neither completes work nor hides its full price")
+		else:
+			_check(data.resources[resource]==before+2 and data.village.economy.stocks[stock]==0,"Last partial cargo cannot exceed remaining source: "+profession)
 	var healing:=_permitted()
 	healing.village.social.profession="healer"
 	_person(healing,"aurelia").health=60
