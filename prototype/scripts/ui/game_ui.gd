@@ -23,6 +23,8 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Navigation = preload("res://scripts/ui/village_navigation.gd")
 const RomanStyle = preload("res://scripts/ui/roman_style.gd")
 const ImperialIntro = preload("res://scripts/ui/imperial_intro.gd")
+const Fx = preload("res://scripts/ui/imperial_fx.gd")
+const MenuGradeShader = preload("res://shaders/menu_grade.gdshader")
 const MENU_MUSIC_DB := -9.0
 var _village_tab := "overview"
 var _navigation: Control
@@ -90,6 +92,7 @@ var _music_wanted := false
 var _intro_seen := false
 var _always_intro := false
 var _intro_node: Control
+var _intro_full_pending := false
 var _serif: SystemFont
 var _ui_theme: Theme
 var _hud_labels: Dictionary = {}
@@ -163,11 +166,15 @@ func _exit_tree() -> void:
 func show_intro() -> void:
 	# The complete title sequence plays on the first start, or every time when
 	# the player chooses so in the settings; later starts show a short title card.
+	# The full sequence carries its own trailer sound; the menu theme follows it.
+	_intro_full_pending = (_always_intro or not _intro_seen) and not _reduce_motion
 	_open_screen("intro", false)
 	_screen.mouse_filter = Control.MOUSE_FILTER_STOP
 	_intro_done = false
 	_intro_node = ImperialIntro.new()
 	_intro_node.name = "ImperialIntro"
+	_intro_node.set_quality(_quality)
+	_intro_node.audio_db = MENU_MUSIC_DB + 3.0 + linear_to_db(maxf(0.001, _music_volume))
 	_screen.add_child(_intro_node)
 	_intro_node.finished.connect(_finish_intro)
 	_intro_node.play(_always_intro or not _intro_seen, _reduce_motion)
@@ -205,6 +212,7 @@ func show_menu(can_continue: bool) -> void:
 	var k := clampf(area.x / 560.0, 1.0, 2.4) if portrait else 1.0
 	var px := func(value: float) -> int: return roundi(value * k * _ui_scale)
 	var button_height: int = px.call(52 if (_touch_enabled or portrait) else 48)
+	var stage := _menu_stage(area)
 	var margin := _margin(px.call(20), px.call(30), px.call(20), px.call(30))
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_screen.add_child(margin)
@@ -225,12 +233,8 @@ func show_menu(can_continue: bool) -> void:
 	panel.name = "MenuTablet"
 	panel.mouse_filter = Control.MOUSE_FILTER_PASS
 	panel.custom_minimum_size.x = panel_width
-	var frame := _flat(Color(0.035, 0.025, 0.02, 0.8))
-	frame.border_color = Color(RomanStyle.GOLD_DEEP, 0.9)
-	frame.set_border_width_all(2)
-	frame.set_corner_radius_all(2)
-	frame.shadow_color = Color(0, 0, 0, 0.45)
-	frame.shadow_size = 18
+	var frame := RomanStyle.TabletBox.new()
+	frame.frame_width = px.call(7)
 	frame.content_margin_left = px.call(26)
 	frame.content_margin_right = px.call(26)
 	frame.content_margin_top = px.call(14)
@@ -246,7 +250,7 @@ func show_menu(can_continue: bool) -> void:
 	crest.alignment = BoxContainer.ALIGNMENT_CENTER
 	crest.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layout.add_child(crest)
-	var crest_height: int = px.call(72)
+	var crest_height: int = px.call(78)
 	var laurel_left := RomanStyle.LaurelSpray.new()
 	laurel_left.custom_minimum_size = Vector2(crest_height * 1.1, crest_height)
 	crest.add_child(laurel_left)
@@ -258,6 +262,8 @@ func show_menu(can_continue: bool) -> void:
 	aquila.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	aquila.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	aquila.custom_minimum_size = Vector2(crest_height * 1.84, crest_height)
+	aquila.material = _menu_metal(0.0, 3.5)
+	aquila.resized.connect(func(): (aquila.material as ShaderMaterial).set_shader_parameter("extent", aquila.size))
 	crest.add_child(aquila)
 	var laurel_right := RomanStyle.LaurelSpray.new()
 	laurel_right.mirrored = true
@@ -268,11 +274,19 @@ func show_menu(can_continue: bool) -> void:
 	title.text = "IMPERATHEN"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var title_size: int = px.call(58)
+	var title_size: int = px.call(70)
 	var measured := RomanStyle.font(800, 4).get_string_size("IMPERATHEN", HORIZONTAL_ALIGNMENT_LEFT, -1, title_size).x
 	if measured > inner_width * 0.96:
 		title_size = maxi(26, floori(title_size * inner_width * 0.96 / measured))
 	RomanStyle.style_title(title, title_size)
+	# Polished gold lettering with a slow glint (static under reduced motion).
+	title.material = _menu_metal(1.0, 0.0)
+	title.resized.connect(func():
+		var metal := title.material as ShaderMaterial
+		metal.set_shader_parameter("extent", title.size)
+		var cap := title_size * 0.36 / maxf(1.0, title.size.y)
+		metal.set_shader_parameter("band", Vector2(0.5 - cap * 1.05, 0.5 + cap * 0.95))
+	)
 	layout.add_child(title)
 	var motto := Label.new()
 	motto.name = "MenuMotto"
@@ -337,6 +351,125 @@ func show_menu(can_continue: bool) -> void:
 	province_content.add_child(_label("Eine Heimat. Eine Entscheidung.", 17, CREAM, true))
 	province_content.add_child(_label("Grenzdorf · spielbarer Funktionsprototyp", 12, MUTED))
 	province.visible = not portrait and area.x - (panel_width + 40) > 380
+	panel.resized.connect(_place_menu_decor.bind(stage, panel, portrait))
+	_place_menu_decor.call_deferred(stage, panel, portrait)
+
+
+## Stage behind the menu tablet: colour grade and vignette over the village,
+## light shafts, low fog, embers and (placed once the tablet is laid out)
+## legion banners and torches. Density follows the graphics profile.
+func _menu_stage(area: Vector2) -> Control:
+	var level := Fx.effect_level(_quality)
+	var stage := Control.new()
+	stage.name = "MenuStage"
+	stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_screen.add_child(stage)
+	var grade := ColorRect.new()
+	grade.name = "MenuGrade"
+	grade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	grade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var grade_material := ShaderMaterial.new()
+	grade_material.shader = MenuGradeShader
+	grade_material.set_shader_parameter("aspect", area.x / maxf(1.0, area.y))
+	grade_material.set_shader_parameter("shaft", 0.0 if level == 0 else 1.0)
+	grade.material = grade_material
+	stage.add_child(grade)
+	if level >= 1:
+		var fog := Fx.fog(level, Color(0.26, 0.12, 0.08))
+		fog.name = "MenuFog"
+		fog.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+		fog.offset_top = -area.y * 0.3
+		var fog_material := fog.material as ShaderMaterial
+		fog_material.set_shader_parameter("density", 0.45)
+		fog_material.set_shader_parameter("aspect", area.x / maxf(1.0, area.y * 0.3))
+		fog_material.set_shader_parameter("top_fade", 0.7)
+		fog_material.set_shader_parameter("speed", 0.0 if _reduce_motion else 0.6)
+		stage.add_child(fog)
+	if not _reduce_motion:
+		var embers := Fx.embers([10, 26, 44][level], 7.0)
+		embers.name = "MenuEmbers"
+		embers.position = Vector2(area.x * 0.5, area.y + 10)
+		embers.emission_rect_extents = Vector2(area.x * 0.55, 8)
+		stage.add_child(embers)
+	var decor := Control.new()
+	decor.name = "MenuDecor"
+	decor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	decor.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	stage.add_child(decor)
+	return stage
+
+
+func _menu_metal(ramp: float, offset: float) -> ShaderMaterial:
+	var metal := Fx.metal_material(0.9)
+	metal.set_shader_parameter("ramp", ramp)
+	metal.set_shader_parameter("auto_period", 0.0 if _reduce_motion else 7.0)
+	metal.set_shader_parameter("auto_offset", offset)
+	return metal
+
+
+## Banners and torches go where the tablet leaves room: beside it on wide
+## screens, above and below it on portrait phones. Nothing overlaps a button.
+func _place_menu_decor(stage: Control, panel: Control, portrait: bool) -> void:
+	if not is_instance_valid(stage) or not is_instance_valid(panel):
+		return
+	var decor: Control = stage.get_node_or_null("MenuDecor")
+	if decor == null:
+		return
+	for child in decor.get_children():
+		decor.remove_child(child)
+		child.queue_free()
+	var area := stage.size
+	var inverse := stage.get_global_transform().affine_inverse()
+	var tablet := Rect2(inverse * panel.get_global_rect().position, panel.get_global_rect().size)
+	var level := Fx.effect_level(_quality)
+	var spots: Array[Dictionary] = []
+	if not portrait:
+		var free_left := tablet.end.x + 24.0
+		var free_width := area.x - free_left - 24.0
+		var count := 2 if free_width >= 460.0 else (1 if free_width >= 200.0 else 0)
+		var banner_w := clampf(free_width * (0.22 if count == 2 else 0.4), 90.0, 170.0)
+		var banner_h := minf(area.y * 0.5, banner_w * 2.6)
+		for index in range(count):
+			var cx := free_left + free_width * (float(index) + 0.5) / count
+			spots.append({"banner": Rect2(cx - banner_w * 0.5, 34.0, banner_w, banner_h),
+				"torches": [Vector2(cx - banner_w * 0.95, 34.0 + banner_h * 0.62), Vector2(cx + banner_w * 0.95, 34.0 + banner_h * 0.62)]})
+	else:
+		var above := tablet.position.y
+		var below := area.y - tablet.end.y
+		if above >= 90.0:
+			var banner_w := clampf(area.x * 0.16, 90.0, 220.0)
+			var banner_h := above + tablet.size.y * 0.2
+			for fraction in [0.14, 0.86]:
+				spots.append({"banner": Rect2(area.x * fraction - banner_w * 0.5, 8.0, banner_w, banner_h), "torches": []})
+		if below >= 110.0:
+			var torch_y := tablet.end.y + minf(below * 0.62, 190.0)
+			spots.append({"torches": [Vector2(area.x * 0.2, torch_y), Vector2(area.x * 0.8, torch_y)]})
+	var torch_w := clampf(area.x * (0.036 if portrait else 0.026), 22.0, 46.0)
+	var index := 0
+	for spot in spots:
+		if spot.has("banner"):
+			var banner := Fx.Banner.new()
+			banner.name = "MenuBanner%d" % index
+			banner.phase = index * 1.7
+			banner.wind = 0.2 if _reduce_motion else 1.0
+			var rect: Rect2 = spot.banner
+			banner.position = rect.position
+			banner.size = rect.size
+			decor.add_child(banner)
+		for point: Vector2 in spot.get("torches", []):
+			if point.x - torch_w < 0 or point.x + torch_w > area.x:
+				continue
+			var torch := Fx.Torch.new()
+			torch.name = "MenuTorch%d" % index
+			torch.level = level
+			torch.calm = _reduce_motion
+			torch.seed = index * 1.3 + point.x * 0.01
+			torch.position = point - Vector2(torch_w * 0.5, 0)
+			torch.size = Vector2(torch_w, torch_w)
+			decor.add_child(torch)
+			index += 1
+		index += 1
 
 
 func _roman_button(text: String, callback: Callable, primary: bool, font_size: int, height: int) -> Button:
@@ -2103,7 +2236,8 @@ func _music_db() -> float:
 func _update_music(screen_name: String) -> void:
 	var wanted := _music_wanted
 	match screen_name:
-		"intro", "menu": wanted = true
+		"intro": wanted = not _intro_full_pending
+		"menu": wanted = true
 		"settings": wanted = _settings_return == "menu"
 		"gallery": wanted = _gallery_from == "menu"
 		"confirm": wanted = _confirm_return == "menu"

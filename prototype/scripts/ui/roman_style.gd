@@ -202,6 +202,76 @@ class TabulaBox extends StyleBox:
 		])
 
 
+## Main-menu tablet: dark veined marble in a bevelled bronze frame with corner
+## rosettes, an inner gold line and a deep drop shadow.
+class TabletBox extends StyleBox:
+	var frame_width := 7.0
+	var _veins: Array[PackedVector2Array] = []
+	var _vein_size := Vector2.ZERO
+
+	func _draw(to_canvas_item: RID, rect: Rect2) -> void:
+		var ci := to_canvas_item
+		for step in range(6):
+			var grow := 4.0 + step * 5.0
+			RenderingServer.canvas_item_add_rect(ci, Rect2(rect.position + Vector2(-grow * 0.6, grow * 0.2), rect.size + Vector2(grow * 1.2, grow * 1.2)), Color(0, 0, 0, 0.09))
+		var top := Color(0.085, 0.066, 0.052, 0.93)
+		var bottom := Color(0.03, 0.022, 0.018, 0.95)
+		var corners := PackedVector2Array([rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)])
+		RenderingServer.canvas_item_add_polygon(ci, corners, PackedColorArray([top, top, bottom, bottom]))
+		if _vein_size != rect.size:
+			_build_veins(rect.size)
+		for vein in _veins:
+			var moved := PackedVector2Array()
+			for point in vein:
+				moved.append(point + rect.position)
+			RenderingServer.canvas_item_add_polyline(ci, moved, [Color(0.92, 0.84, 0.7, 0.045)], 1.5, true)
+		var glow_h := minf(rect.size.y * 0.35, 160.0)
+		var lit := Color(1.0, 0.8, 0.5, 0.07)
+		var clear := Color(1.0, 0.8, 0.5, 0.0)
+		RenderingServer.canvas_item_add_polygon(ci, PackedVector2Array([rect.position, Vector2(rect.end.x, rect.position.y),
+			Vector2(rect.end.x, rect.position.y + glow_h), Vector2(rect.position.x, rect.position.y + glow_h)]), PackedColorArray([lit, lit, clear, clear]))
+		# Bevelled bronze frame: light falls from the upper left.
+		var w := frame_width
+		var o := rect
+		var i := rect.grow(-w)
+		var light := Color(0.86, 0.66, 0.34)
+		var mid := Color(0.6, 0.42, 0.2)
+		var dark := Color(0.3, 0.19, 0.08)
+		RenderingServer.canvas_item_add_polygon(ci, PackedVector2Array([o.position, Vector2(o.end.x, o.position.y), Vector2(i.end.x, i.position.y), i.position]), PackedColorArray([light, light, mid, mid]))
+		RenderingServer.canvas_item_add_polygon(ci, PackedVector2Array([o.position, i.position, Vector2(i.position.x, i.end.y), Vector2(o.position.x, o.end.y)]), PackedColorArray([light, mid, mid, mid]))
+		RenderingServer.canvas_item_add_polygon(ci, PackedVector2Array([Vector2(o.end.x, o.position.y), o.end, i.end, Vector2(i.end.x, i.position.y)]), PackedColorArray([mid, dark, dark, mid]))
+		RenderingServer.canvas_item_add_polygon(ci, PackedVector2Array([Vector2(o.position.x, o.end.y), Vector2(i.position.x, i.end.y), i.end, o.end]), PackedColorArray([mid, dark, dark, dark]))
+		var outer := PackedVector2Array([o.position, Vector2(o.end.x, o.position.y), o.end, Vector2(o.position.x, o.end.y), o.position])
+		RenderingServer.canvas_item_add_polyline(ci, outer, [Color(0.12, 0.07, 0.03)], 1.5, true)
+		var cut := PackedVector2Array([i.position, Vector2(i.end.x, i.position.y), i.end, Vector2(i.position.x, i.end.y), i.position])
+		RenderingServer.canvas_item_add_polyline(ci, cut, [Color(0.05, 0.03, 0.015, 0.9)], 1.5, true)
+		var hair := i.grow(-5.0)
+		var hairline := PackedVector2Array([hair.position, Vector2(hair.end.x, hair.position.y), hair.end, Vector2(hair.position.x, hair.end.y), hair.position])
+		RenderingServer.canvas_item_add_polyline(ci, hairline, [Color(GOLD, 0.45)], 1.0, true)
+		for corner in [o.position + Vector2(w, w) * 0.5, Vector2(o.end.x, o.position.y) + Vector2(-w, w) * 0.5,
+				o.end - Vector2(w, w) * 0.5, Vector2(o.position.x, o.end.y) + Vector2(w, -w) * 0.5]:
+			RenderingServer.canvas_item_add_circle(ci, corner, w * 1.15, Color(0.2, 0.12, 0.05))
+			RenderingServer.canvas_item_add_circle(ci, corner, w * 0.95, light)
+			RenderingServer.canvas_item_add_circle(ci, corner + Vector2(w, w) * 0.12, w * 0.5, mid)
+			RenderingServer.canvas_item_add_circle(ci, corner - Vector2(w, w) * 0.18, w * 0.25, Color(1.0, 0.92, 0.7))
+
+	func _build_veins(area: Vector2) -> void:
+		_vein_size = area
+		_veins.clear()
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 1124
+		for index in range(9):
+			var vein := PackedVector2Array()
+			var point := Vector2(rng.randf() * area.x, rng.randf() * area.y)
+			var heading := rng.randf_range(-0.5, 0.5) + (PI if rng.randf() < 0.5 else 0.0)
+			for step in range(28):
+				vein.append(point)
+				heading += rng.randf_range(-0.35, 0.35)
+				point += Vector2(cos(heading), sin(heading) * 0.6) * area.x * 0.025
+				point = point.clamp(Vector2.ONE * 8.0, area - Vector2.ONE * 8.0)
+			_veins.append(vein)
+
+
 ## Running Greek-key band (meander), common on Roman mosaics and friezes.
 class MeanderBand extends Control:
 	var color := Color(GOLD_DEEP, 0.85)

@@ -233,6 +233,7 @@ func _show_menu() -> void:
 	world.show()
 	world.set_active(false)
 	world.set_mode("city")
+	world.set_menu_flight(not bool(ui.opening_preferences().get("reduce_motion", false)))
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	ui.show_menu(FileAccess.file_exists(SAVE_PATH) or FileAccess.file_exists(SAVE_PATH + ".bak"))
 	_log_menu_geometry.call_deferred()

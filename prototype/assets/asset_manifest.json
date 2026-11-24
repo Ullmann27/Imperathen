@@ -70,5 +70,30 @@
     "format": "SVG, imported by Godot as texture with mipmaps",
     "status": "provisional, self-made stylised emblem; not a historical reconstruction",
     "sha256": "3974168879bfb16204fc61fcc6baf228664b5cb29a4d648807c3cac3296afb46"
+  },
+  "intro_trailer": {
+    "file": "ui/intro_trailer.ogg",
+    "generator": "tools/ui/build_intro_trailer.py (numpy) -> WAV; encoded with ffmpeg libvorbis -q:a 5",
+    "source": "Original deterministic synthesis (seed 20261124); sound design written in the generator. No samples, recordings or third-party sound libraries.",
+    "license": "Own work for IMPERATHEN; no third-party rights.",
+    "content": "Trailer sound for the title sequence: taiko-style drum hits with sub booms, brass braams (detuned saw clusters, sweeping filter, saturation), riser, gladius swing, impact with steel ring, three hits for VENI VIDI VICI, closing cornu call over a D minor brass swell. Marks match scripts/ui/imperial_intro.gd.",
+    "seconds": 11.6,
+    "sample_rate": 44100,
+    "channels": 2,
+    "loop": "none",
+    "loudness": "approx. -14.2 LUFS integrated, -1.0 dBFS true peak, momentary range about -12 to -25 LUFS between hits (ffmpeg ebur128 on the WAV before encoding)",
+    "quality_review": "Technical checks only (level, peaks, spectrum, timing against the picture). Not reviewed by listening.",
+    "status": "provisional",
+    "sha256": "17b388345f43093e5775eac46bcc59b7eb32281aad754e656c89bc4e2b580061"
+  },
+  "legion_march": {
+    "file": "ui/legion_march.png",
+    "generator": "tools/ui/render_legion_silhouettes.py (Blender 5.2.3, Workbench, orthographic three-quarter view)",
+    "source": "Rendered from the project's own field company rigs art/soldiers/heavy.blend, spear.blend and officer.blend (original geometry and march action, see art/soldiers/README.md). No third-party models or motion data.",
+    "license": "Own work for IMPERATHEN; no third-party rights (same terms as art/soldiers).",
+    "description": "RGBA coverage atlas, 3 rows (heavy infantry, spear bearer, officer) x 12 frames of one march cycle, 192x288 px per cell; tinted and rim-lit at runtime by shaders/legion_silhouette.gdshader",
+    "format": "PNG 2304x864, imported with mipmaps (used for depth-of-field blur)",
+    "status": "provisional",
+    "sha256": "8d51b904445fb547fbb1edf0a7f3cfc8bec857a4299f1faacb2fde3211e0f712"
   }
 }

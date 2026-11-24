@@ -29,8 +29,10 @@ func _run() -> void:
 	await _check_short_card_after_first_start()
 	await _check_natural_end_and_keys()
 	await _check_timeline()
+	await _check_trailer_and_profiles()
 	await _check_menu_buttons()
 	await _check_menu_layout()
+	await _check_menu_look()
 	await _check_settings_and_music()
 	print("ROMAN_MENU checks=%d failures=%d %s" % [_checks, _failures.size(), _failures])
 	if _failures.is_empty():
@@ -127,27 +129,81 @@ func _check_timeline() -> void:
 	var blood = _find(intro, "BloodTrail")
 	var sword: Sprite2D = _find(intro, "Gladius")
 	var motto: Label = _find(intro, "Motto")
+	var camera: Control = _find(intro, "Camera")
+	var near: Node2D = _find(intro, "NearCohort")
+	_check(_find(intro, "FarCohort") != null and near != null and _find(intro, "NearStandards") != null, "legion cohorts and standards are on stage")
+	_check(_find(intro, "BannerLeft") != null and _find(intro, "BannerRight") != null, "red and gold banners frame the sequence")
+	var bar: ColorRect = _find(intro, "Letterbox0")
+	_check(bar != null and bar.size.y > 40.0, "landscape uses cinemascope bars")
+	intro.advance(0.2)
+	_check(near.modulate.a < 0.05, "black opening before the first drum hit")
 	intro.advance(0.5)
 	var low := eagle.position.y
+	_check(near.modulate.a > 0.9, "first hit reveals the marching legion")
 	_check(reveal.size.x <= 0.5 and blood.reveal <= 0.5, "title and blood are hidden before the blade passes")
 	intro.advance(Intro.SWEEP_START + 0.3 - intro.elapsed)
 	_check(sword.visible and reveal.size.x > 1.0 and reveal.size.x < _find(intro, "Title").size.x, "blade mid-sweep reveals part of the title")
 	_check(blood.reveal > 1.0 and blood.reveal < blood.length, "blood trail follows the blade")
+	_check(_find(intro, "GladiusBlur0").visible and _find(intro, "BladeStreak").strength > 0.0, "blade carries a motion-blur trail")
+	var push_before := camera.scale.x
+	intro.advance(Intro.SWEEP_END + 0.03 - intro.elapsed)
+	_check(camera.position.length() > 1.0 and camera.scale.x > push_before, "impact shakes and punches the camera")
+	_check((_find(intro, "Flash") as ColorRect).color.a > 0.05, "impact flash")
 	intro.advance(4.5 - intro.elapsed)
 	_check(eagle.position.y < low - 20.0, "eagle rises behind the title")
 	_check(not sword.visible and is_equal_approx(reveal.size.x, _find(intro, "Title").size.x), "full title after the cut, blade gone")
-	intro.advance(1.0)
-	_check(motto.text == "VENI · VIDI · VICI" and motto.modulate.a > 0.99, "motto is shown")
+	_check(blood.reveal >= blood.length - 0.5, "blood trail spans the whole cut")
+	intro.advance(Intro.MOTTO_WORDS[0] + 0.05 - intro.elapsed)
+	_check(motto.visible_characters == 4, "VENI lands on the first drum hit")
+	intro.advance(Intro.MOTTO_WORDS[1] + 0.05 - intro.elapsed)
+	_check(motto.visible_characters == 11, "VIDI lands on the second drum hit")
+	intro.advance(Intro.MOTTO_WORDS[2] + 0.2 - intro.elapsed)
+	_check(motto.text == "VENI · VIDI · VICI" and motto.modulate.a > 0.99 and motto.visible_characters == -1, "motto is shown in full")
 	_check(_find(intro, "Title").text == "IMPERATHEN", "title text")
 	root.size = Vector2i(720, 1280)
 	await _frames()
 	var skip: Button = _find(_ui.get("_screen"), "IntroSkip")
 	_check(skip != null and skip.size.y >= 46.0 and Rect2(Vector2.ZERO, Vector2(720, 1280)).encloses(skip.get_global_rect()), "skip button stays reachable in portrait")
 	_check(intro.get_rect().size.x <= 720.5 and reveal.position.x >= 0 and reveal.get_global_rect().end.x <= 720.5, "intro relayouts for portrait without restarting")
+	_check(bar.size.y < 0.5, "portrait phones use the full height (no bars)")
 	root.size = Vector2i(1280, 720)
 	await _frames()
 	_ui._finish_intro()
 	_ui.set("_always_intro", false)
+
+
+func _check_trailer_and_profiles() -> void:
+	var trailer := load(Intro.TRAILER_PATH) as AudioStreamOggVorbis
+	_check(trailer != null and not trailer.loop and trailer.get_length() >= Intro.FULL_DURATION, "trailer sound covers the complete sequence once")
+	_ui.set("_always_intro", true)
+	_ui.show_intro()
+	await _frames()
+	_check(not _ui.get("_music_wanted"), "menu theme waits while the trailer sound plays")
+	_ui._finish_intro()
+	_ui.set("_always_intro", false)
+	_ui.show_intro()
+	await _frames()
+	_check(_ui.get("_music_wanted"), "short title card goes straight into the menu theme")
+	_ui._finish_intro()
+	var amounts := {}
+	for profile in ["low", "high"]:
+		var intro: Control = Intro.new()
+		intro.set_quality(profile)
+		root.add_child(intro)
+		intro.play(true, false)
+		amounts[profile] = {"embers": (_find(intro, "Embers") as CPUParticles2D).amount, "far": _find(intro, "FarCohort") != null}
+		intro.queue_free()
+	await _frames()
+	_check(amounts.low.embers < amounts.high.embers and not amounts.low.far and amounts.high.far, "effect density follows the graphics profile")
+	var calm: Control = Intro.new()
+	root.add_child(calm)
+	calm.set_process(false)
+	calm.play(true, true)
+	calm.advance(1.5)
+	var camera: Control = _find(calm, "Camera")
+	_check(not calm.full and is_equal_approx(camera.scale.x, 1.0) and camera.position.length() < 0.01 and not (_find(calm, "Embers") as CPUParticles2D).emitting, "reduced motion: no camera moves, shake or particles")
+	calm.queue_free()
+	await _frames()
 
 
 func _check_menu_buttons() -> void:
@@ -201,9 +257,33 @@ func _check_menu_layout() -> void:
 			_check(button.size.y >= 46.0, "%s: %s is a comfortable touch target (%.0f px)" % [label, button.text, button.size.y])
 		var title: Label = _find(_ui.get("_screen"), "MenuTitle")
 		_check(title.get_global_rect().end.x <= size.x and title.get_global_rect().position.y >= 0, label + ": title visible")
+		var decor: Control = _find(_ui.get("_screen"), "MenuDecor")
+		for item: Control in decor.get_children():
+			for button in buttons:
+				_check(not item.get_global_rect().intersects(button.get_global_rect()), "%s: %s keeps clear of %s" % [label, item.name, button.text])
+		if size == Vector2i(1280, 720):
+			_check(decor.get_child_count() >= 1 and _find(decor, "MenuBanner0") is Control, label + ": a legion banner flies beside the tablet")
 	_ui.set("_touch_enabled", false)
 	root.size = Vector2i(1280, 720)
 	await _frames()
+
+
+func _check_menu_look() -> void:
+	_ui.show_menu(true)
+	await _frames()
+	var screen: Control = _ui.get("_screen")
+	var title: Label = _find(screen, "MenuTitle")
+	_check(title.material is ShaderMaterial and (title.material as ShaderMaterial).shader.resource_path.ends_with("imperial_metal.gdshader"), "menu title is polished metal")
+	_check(title.get_theme_font_size("font_size") >= 66, "menu title is larger than before (58 px)")
+	_check((_find(screen, "MenuTablet") as PanelContainer).get_theme_stylebox("panel") is RomanStyle.TabletBox, "tablet is marble in a bronze frame")
+	_check(_find(screen, "MenuGrade") is ColorRect and _find(screen, "MenuEmbers") is CPUParticles2D, "menu stage grades the village and adds embers")
+	_ui.set("_reduce_motion", true)
+	_ui.show_menu(true)
+	await _frames()
+	screen = _ui.get("_screen")
+	title = _find(screen, "MenuTitle")
+	_check(_find(screen, "MenuEmbers") == null and is_zero_approx(float((title.material as ShaderMaterial).get_shader_parameter("auto_period"))), "reduced motion: no embers, no moving glint")
+	_ui.set("_reduce_motion", false)
 
 
 func _check_settings_and_music() -> void:
