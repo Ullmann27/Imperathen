@@ -439,6 +439,8 @@ func perform_interaction() -> void:
 func perform_attack(technique := "") -> void:
 	if _active:
 		if not technique.is_empty():
+			if CombatActions.enabled(_actions.state) and not CombatActions.available(_actions.state,technique):
+				return
 			set_selected_technique(technique)
 		_attack()
 

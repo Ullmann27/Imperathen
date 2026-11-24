@@ -110,6 +110,7 @@ def main():
             ("meshy_characters", ["--fixed-fps", "60", "--script", "res://tests/meshy_character_test.gd"], "MESHY_CHARACTERS_PASS"),
             ("meshy_equipment", ["--fixed-fps", "60", "--script", "res://tests/meshy_equipment_test.gd"], "MESHY_EQUIPMENT_PASS"),
             ("character_motion", ["--fixed-fps", "60", "--script", "res://tests/character_motion_test.gd"], "checks; 0 failed;"),
+            ("service_gear", ["--fixed-fps", "60", "--script", "res://tests/service_gear_test.gd"], "SERVICE_GEAR_PASS"),
             ("natural_motion", ["--fixed-fps", "60", "--script", "res://tests/natural_motion_test.gd"], "checks, 0 failed"),
             ("village_static_art", ["--script", "res://tests/village_static_art_test.gd"], "checks, 0 failed"),
             ("hero_faces", ["--fixed-fps", "60", "--script", "res://tests/hero_face_test.gd"], "checks, 0 failed"),

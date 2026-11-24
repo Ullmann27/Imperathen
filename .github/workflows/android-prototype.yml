@@ -152,7 +152,7 @@ jobs:
           retention-days: 30
 
   publish-village:
-    if: (github.ref == 'refs/heads/feature/village-life-delivery-20261123' || github.ref == 'refs/heads/feature/living-npcs-meshy-movement-20261124') && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: (github.ref == 'refs/heads/feature/village-life-delivery-20261123' || github.ref == 'refs/heads/feature/living-npcs-meshy-movement-20261124' || github.ref == 'refs/heads/feature/npc-perception-rest-regression-20261124') && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     needs: build-and-check
     runs-on: ubuntu-24.04
     timeout-minutes: 15

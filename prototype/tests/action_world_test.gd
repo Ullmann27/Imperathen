@@ -104,6 +104,10 @@ func _run() -> void:
 		await _frames(100)
 		var before := int(game.model.data.village.unarmed.practice_hits)
 		game.ui.action_requested.emit("attack", {"technique":id})
+		if Combat.is_armed(id):
+			_check(not Combat.available(game.model.data,id) and not Combat.busy(game.model.data), "Child touch command cannot start a locked weapon or substitute a fist: " + id)
+			_check(int(game.model.data.village.unarmed.practice_hits)==before, "Rejected weapon command leaves practice unchanged: " + id)
+			continue
 		_check(game.model.data.village.unarmed.technique == id, "UI selects and starts the requested technique: " + id)
 		await _frames(ceili(float(Combat.TECHNIQUES[id].duration) * 60.0) + 2)
 		_check(int(game.model.data.village.unarmed.practice_hits) == before + 1, "Exactly one world contact for " + id)

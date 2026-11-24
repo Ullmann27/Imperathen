@@ -48,6 +48,23 @@ LIVING_PROFILE = {
 }
 
 
+MOTION_PROFILE = {
+    **LIVING_PROFILE,
+    "branch": "feature/npc-perception-rest-regression-20261124",
+    "version_code": "6", "version_name": "0.6.0-motion-combat",
+    "tag_prefix": "motion-combat-2026-11-24-",
+    "title": "IMPERATHEN · Bewegung und Dorfleben 0.6.0",
+    "description": (
+        "Geprüfte Zwischenfassung mit lokaler NPC-Navigation, natürlichen Stand- und Gesprächsbewegungen, "
+        "fünf Gladius-Techniken im bereits vorhandenen erwachsenen Ausbildungsweg und fünf sichtbaren Schildhaltungen. "
+        "Gladius und Scutum sind die vorhandenen projektierten Waffen-GLBs; zwei Meshy-Körper bleiben integriert. "
+        "Der kanonische Kindheitsweg bleibt zwölfjährig. Weitere Figuren, externe Motion-Capture-Clips und "
+        "der vollständige spätere Lebensweg sind nicht Teil dieser Zwischenfassung."
+    ),
+    "engine_checks": LIVING_PROFILE["engine_checks"] | {"natural_motion", "character_motion", "combat_actions", "combat_model", "service_gear", "unarmed_combat", "action_world"},
+}
+
+
 def feature_groups(profile: dict | None = None) -> tuple:
     groups = (("hero_character_content", HERO_RESOURCES),
               ("living_frontier_content", FRONTIER_RESOURCES),
@@ -298,7 +315,8 @@ def publish(public: Path, temporary: Path, source: str, run_id: str, proof: dict
 
 def main() -> None:
     source, run_id, number = (os.environ.get(key, "") for key in ("GITHUB_SHA", "GITHUB_RUN_ID", "GITHUB_RUN_NUMBER"))
-    profile = LIVING_PROFILE if os.environ.get("GITHUB_REF") == "refs/heads/" + LIVING_PROFILE["branch"] else None
+    profile = next((p for p in (LIVING_PROFILE, MOTION_PROFILE)
+                    if os.environ.get("GITHUB_REF") == "refs/heads/" + p["branch"]), None)
     branch = profile["branch"] if profile else BRANCH
     require(os.environ.get("GH_REPO") == REPO and bool(os.environ.get("GH_TOKEN"))
             and os.environ.get("GITHUB_REF") == "refs/heads/" + branch, "Expected repository publication context is missing")
