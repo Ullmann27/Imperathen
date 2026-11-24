@@ -231,6 +231,15 @@ func _run() -> void:
 			accepted+=1
 			records.append({"file":file,"clip":clip,"retargeted":key,"seconds":anim.length,"sample_frames":frames+1,"rotation_tracks":tracks.size()})
 		scene.free()
+	if accepted < 36 or rejected != 0:
+		failures.append("Incomplete retarget: expected 35 motion files plus the mannequin reference")
+	for key_file: String in ["Idle_relaxed.glb","Idle_talking.glb","Walk_forwards.glb","Sword_slash.glb","Block_with_the_sword.glb"]:
+		var found := false
+		for record: Dictionary in records:
+			if record.get("file","")==key_file and record.has("retargeted"):
+				found=true
+		if not found:
+			failures.append("Missing core source motion: "+key_file)
 	var report := {"source":"CC0 KinemIQ v1.0","target":TARGET,"accepted_clips":accepted,"rejected":rejected,"records":records,"failures":failures,"runtime_approved":false,"root_motion":false,"visual_skin_gate":"not run"}
 	var handle := FileAccess.open(output_dir.path_join("retarget-review.json"),FileAccess.WRITE)
 	handle.store_string(JSON.stringify(report,"  ")+"\n")

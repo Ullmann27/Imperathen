@@ -40,6 +40,96 @@ def read_glb(data: bytes) -> dict:
     return doc
 
 
+def binary_chunk(data: bytes) -> bytes:
+    length = struct.unpack_from("<I", data, 12)[0]
+    offset = 20 + length
+    if offset + 8 > len(data):
+        raise ValueError("GLB lacks BIN data")
+    size, kind = struct.unpack_from("<II", data, offset)
+    if kind != 0x004E4942 or offset + 8 + size != len(data):
+        raise ValueError("Expected one bounded GLB binary chunk")
+    return data[offset+8:]
+
+
+def encode_glb(doc: dict, binary: bytes) -> bytes:
+    text = json.dumps(doc, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    text += b" " * (-len(text) % 4)
+    binary += b"\0" * (-len(binary) % 4)
+    size = 12 + 8 + len(text) + 8 + len(binary)
+    return (struct.pack("<4sII", b"glTF", 2, size)
+            + struct.pack("<II", len(text), 0x4E4F534A) + text
+            + struct.pack("<II", len(binary), 0x004E4942) + binary)
+
+
+def attach_motion(reference: bytes, motion: bytes) -> bytes:
+    """Bind animation-only glTF node tracks to the exact shared mannequin.
+
+    Geometry, skin, inverse bind matrices and node hierarchy remain from the
+    reference. The animation-only asset contributes only validated accessors,
+    buffer views and channels whose named nodes exist on that reference.
+    """
+    import copy
+    base, clip = read_glb(reference), read_glb(motion)
+    if not base.get("skins") or not clip.get("animations") or clip.get("skins"):
+        raise ValueError("Unexpected reference/animation-only asset")
+    if len(base.get("buffers", [])) != 1 or len(clip.get("buffers", [])) != 1:
+        raise ValueError("Expected one binary buffer per GLB")
+    if any("uri" in d["buffers"][0] for d in (base, clip)):
+        raise ValueError("Expected embedded binary buffers")
+    a, b = binary_chunk(reference), binary_chunk(motion)
+    a += b"\0" * (-len(a) % 4)
+    output = copy.deepcopy(base)
+    node_lookup = {}
+    for i, node in enumerate(base.get("nodes", [])):
+        name = node.get("name")
+        if name:
+            if name in node_lookup:
+                raise ValueError("Ambiguous reference bone name: " + name)
+            node_lookup[name] = i
+    src_nodes = clip.get("nodes", [])
+    offset_view = len(output.get("bufferViews", []))
+    offset_accessor = len(output.get("accessors", []))
+    for view in clip.get("bufferViews", []):
+        value = copy.deepcopy(view)
+        start, size = value.get("byteOffset", 0), value.get("byteLength", 0)
+        if value.get("buffer", 0) != 0 or start < 0 or size < 0 or start + size > len(b):
+            raise ValueError("Invalid source buffer view")
+        value["byteOffset"] = len(a) + start
+        output.setdefault("bufferViews", []).append(value)
+    for source in clip.get("accessors", []):
+        value = copy.deepcopy(source)
+        if "bufferView" in value:
+            value["bufferView"] += offset_view
+        if "sparse" in value:
+            for kind in ("indices", "values"):
+                value["sparse"][kind]["bufferView"] += offset_view
+        output.setdefault("accessors", []).append(value)
+    output["animations"] = []
+    for animation in clip["animations"]:
+        value = copy.deepcopy(animation)
+        for sampler in value.get("samplers", []):
+            for kind in ("input", "output"):
+                index = sampler[kind]
+                if type(index) is not int or not 0 <= index < len(clip.get("accessors", [])):
+                    raise ValueError("Invalid animation sampler")
+                sampler[kind] += offset_accessor
+        for channel in value.get("channels", []):
+            target = channel["target"]
+            index = target.get("node")
+            if type(index) is not int or not 0 <= index < len(src_nodes):
+                raise ValueError("Invalid animation target")
+            name = src_nodes[index].get("name")
+            if name not in node_lookup:
+                raise ValueError("Animation targets an unknown reference node: " + str(name))
+            if target.get("path") not in ("rotation", "translation", "scale"):
+                raise ValueError("Unsupported motion channel")
+            target["node"] = node_lookup[name]
+        output["animations"].append(value)
+    binary = a + b
+    output["buffers"][0]["byteLength"] = len(binary)
+    return encode_glb(output, binary)
+
+
 def stage(archive: Path, output: Path) -> dict:
     raw = archive.read_bytes()
     if len(raw) > MAX_ARCHIVE or sha(raw) != SHA256:
@@ -84,7 +174,26 @@ def stage(archive: Path, output: Path) -> dict:
             })
     if not entries or not any(x["animations"] for x in entries):
         raise ValueError("The archive contained no animated GLB")
+    refs = [x for x in entries if x["joint_names"]]
+    if len(refs) != 1 or refs[0]["file"] != "KinemIQ_Mannequin.glb":
+        raise ValueError("Expected the single named upstream mannequin reference")
+    reference = (output / refs[0]["file"]).read_bytes()
+    reconstructed = 0
+    for entry in entries:
+        if entry["joint_names"]:
+            entry["staged_sha256"] = entry["sha256"]
+            continue
+        path = output / entry["file"]
+        derived = attach_motion(reference, path.read_bytes())
+        path.write_bytes(derived)
+        entry["staged_sha256"] = sha(derived)
+        entry["staged_bytes"] = len(derived)
+        entry["shared_reference"] = refs[0]["sha256"]
+        reconstructed += 1
+    if reconstructed != 35:
+        raise ValueError("Unexpected motion-only clip inventory")
     return {"source_url": URL, "archive_sha256": SHA256, "license": "CC0-1.0",
+            "reconstructed_motion_files": reconstructed,
             "upstream": "Quaternius Universal Animation Library; KinemIQ export v1.0",
             "glb_files": len(entries), "files": entries,
             "runtime_approved": False}
