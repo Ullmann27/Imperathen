@@ -1,0 +1,189 @@
+{
+  "generator": "tools/characters/build_meshy_people.py",
+  "blender": "4.3.2",
+  "characters": [
+    {
+      "source_sha256": "15b2afb0c22d187f45c37a84d272cb215ff39388ee4fde23c8cec668cb042370",
+      "source_bytes": 23719052,
+      "source_import_bounds": [
+        [
+          -0.16333000361919403,
+          -0.11840800195932388,
+          -0.4753420054912567
+        ],
+        [
+          0.16479499638080597,
+          0.12084999680519104,
+          0.47582998871803284
+        ]
+      ],
+      "scale_applied": 1.9449689554178973,
+      "separated_contact_vertices": 62,
+      "separated_hand_surfaces": {
+        "faces": 3489,
+        "boundary_vertices": 294
+      },
+      "bound_vertices_per_joint": {
+        "Pelvis": 3668,
+        "Spine": 8017,
+        "Head": 4626,
+        "Arm_L": 594,
+        "Forearm_L": 821,
+        "Hand_L": 1077,
+        "Arm_R": 369,
+        "Forearm_R": 854,
+        "Hand_R": 1042,
+        "Thigh_L": 1253,
+        "Shin_L": 1675,
+        "Foot_L": 817,
+        "Thigh_R": 1191,
+        "Shin_R": 1561,
+        "Foot_R": 736
+      },
+      "stable_id": "unit_roman_signifer",
+      "lods": [
+        {
+          "level": 0,
+          "path": "prototype/assets/meshy/characters/unit_roman_signifer_0.glb",
+          "triangles": 28000,
+          "texture_edge": 2048,
+          "sha256": "869803d0a79236273835a475439dc2fea27b4172a5f7d6821448910dfb4ee826",
+          "size_bytes": 4628516
+        },
+        {
+          "level": 1,
+          "path": "prototype/assets/meshy/characters/unit_roman_signifer_1.glb",
+          "triangles": 10000,
+          "texture_edge": 1024,
+          "sha256": "6af2f8fa19fc8108179bdcb39f3ccc590bf10383d2fd3433071ba8f5da33d5d6",
+          "size_bytes": 1176704
+        },
+        {
+          "level": 2,
+          "path": "prototype/assets/meshy/characters/unit_roman_signifer_2.glb",
+          "triangles": 3500,
+          "texture_edge": 512,
+          "sha256": "a7e02a3d33e93b2ee78637e3bd912bda42f006885bbfaaf56daa37e864cf3c2b",
+          "size_bytes": 547304
+        },
+        {
+          "level": 3,
+          "path": "prototype/assets/meshy/characters/unit_roman_signifer_3.glb",
+          "triangles": 1199,
+          "texture_edge": 256,
+          "sha256": "7845cb8c7ab29876c137c89fcab5af361c257fa47c4cb9e1cdb9275fe4514c0f",
+          "size_bytes": 306804
+        }
+      ],
+      "height_m": 1.85,
+      "bones": 15,
+      "clips": [
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "work",
+        "gather",
+        "train",
+        "attack",
+        "block",
+        "hit",
+        "death"
+      ],
+      "facial_morphs": false
+    },
+    {
+      "source_sha256": "9c6cb7e4f57ce3b0c4178bb269cad830183bb0796ccd419d5c74ada31ba9bffc",
+      "source_bytes": 21163904,
+      "source_import_bounds": [
+        [
+          -0.19897499680519104,
+          -0.12036100029945374,
+          -0.4753420054912567
+        ],
+        [
+          0.20239299535751343,
+          0.11791999638080597,
+          0.4753420054912567
+        ]
+      ],
+      "scale_applied": 1.872336106884142,
+      "separated_contact_vertices": 56,
+      "separated_hand_surfaces": null,
+      "bound_vertices_per_joint": {
+        "Pelvis": 4905,
+        "Spine": 8665,
+        "Head": 3532,
+        "Arm_L": 409,
+        "Forearm_L": 649,
+        "Hand_L": 537,
+        "Arm_R": 290,
+        "Forearm_R": 548,
+        "Hand_R": 647,
+        "Thigh_L": 1074,
+        "Shin_L": 3020,
+        "Foot_L": 486,
+        "Thigh_R": 1156,
+        "Shin_R": 2462,
+        "Foot_R": 487
+      },
+      "stable_id": "unit_germanic_axe_fighter",
+      "lods": [
+        {
+          "level": 0,
+          "path": "prototype/assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+          "triangles": 27999,
+          "texture_edge": 2048,
+          "sha256": "7efd37f08c5877104e922340b530d9ff0c5822dca6e51435790a9f6815c8153a",
+          "size_bytes": 4082788
+        },
+        {
+          "level": 1,
+          "path": "prototype/assets/meshy/characters/unit_germanic_axe_fighter_1.glb",
+          "triangles": 10000,
+          "texture_edge": 1024,
+          "sha256": "9962d6d8729ed90068e80b8a567623756231880f0167b510147e60b7c9d05fc9",
+          "size_bytes": 1112772
+        },
+        {
+          "level": 2,
+          "path": "prototype/assets/meshy/characters/unit_germanic_axe_fighter_2.glb",
+          "triangles": 3380,
+          "texture_edge": 512,
+          "sha256": "5de94b621ccf809bca9e9d4e2fb1bb43ca6bd36e7469c48fc73038e685e44cae",
+          "size_bytes": 492228
+        },
+        {
+          "level": 3,
+          "path": "prototype/assets/meshy/characters/unit_germanic_axe_fighter_3.glb",
+          "triangles": 1075,
+          "texture_edge": 256,
+          "sha256": "3112638eba2d9822f0a5cf33c35612b1f8698e2d7a53a8aea28b6453e4c741a7",
+          "size_bytes": 286892
+        }
+      ],
+      "height_m": 1.78,
+      "bones": 15,
+      "clips": [
+        "idle",
+        "march",
+        "run",
+        "talk",
+        "work",
+        "gather",
+        "train",
+        "attack",
+        "block",
+        "hit",
+        "death"
+      ],
+      "facial_morphs": false
+    }
+  ],
+  "limits": [
+    "Fitted project-authored biped rigs, not Meshy rigging.",
+    "No finger rig, facial morphs or simulated cloth.",
+    "Source poses with mounted composites or fixed equipment remain blocked.",
+    "Engine/Android visual checks are recorded separately."
+  ]
+}

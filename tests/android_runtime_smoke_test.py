@@ -440,7 +440,8 @@ def action_snapshot(**changes):
              "running": False, "touch_camera_managed": True, "selected_technique": "jab_left",
              "overlay": "none", "position": [2.0, 1.0, 9.0], "velocity": [0.0, 0.0, 0.0],
              "body_velocity": [0.0, 0.0, 0.0], "move_axis": [0.0, 0.0], "movement_touch": -1,
-             "camera_touches": 0, "action_touches": 0, "world_camera_touches": 0}
+             "camera_touches": 0, "action_touches": 0, "world_camera_touches": 0,
+             "figure_clip": "idle", "figure_speed": 0.0}
     state.update(changes)
     return {"screen": "playing", "action_mode": "unarmed", "action_runtime": state, "controls": {}}
 
@@ -549,7 +550,8 @@ class ChildhoodRuntimeObservationTest(unittest.TestCase):
         self.assertEqual(
             SMOKE.apk_runtime_features(entries),
             {"village_life": True, "childhood": True,
-             "historical_prologue": True, "action_controls": True})
+             "historical_prologue": True, "action_controls": True,
+             "npc_behavior": False, "meshy_characters": False})
 
     def test_pre_i00_childhood_and_legacy_village_remain_distinct_routes(self):
         childhood = SMOKE.apk_runtime_features(
@@ -856,6 +858,208 @@ class ObservedVillageScrollTest(unittest.TestCase):
         result = SMOKE.wait_for_stable_village_control(read, require_visible=False, max_observations=3)
         self.assertEqual(result, moving)
         self.assertEqual(read.call_count, 3)
+
+
+def behavior_snapshot():
+    snapshot = action_snapshot(world_active=False)
+    snapshot.update(screen="paused", world_seconds=40.25)
+    samples = {}
+    for identity, interest in SMOKE.BEHAVIOR_SAMPLE_INTERESTS.items():
+        samples[identity] = {"interest": interest, "fatigue": 23.5, "social_need": 46.5,
+                             "stress": 2.0, "activity": "work", "reason": "daily_work",
+                             "since": 32.0, "next_decision": 42.0, "last_greet": 28.5,
+                             "last_trust": 15, "partner": "", "position": [4.2, 0.9, 1.1],
+                             "route_distance": 12.0, "route_direction": 1, "observed": True,
+                             "memories": [{"kind": "trust_gained", "at": 30.5}]}
+    state = {"version": 1, "behavior_version": 1, "world_id": "real-observed-world",
+             "seconds": 40.0, "accumulator": 0.25, "people_count": 42, "observed_count": 42,
+             "decision_due_count": 2, "activity_counts": {"work": 35, "patrol": 5, "greet": 2},
+             "roster_sha256": "a" * 64, "state_sha256": "b" * 64, "samples": samples}
+    snapshot["behavior_runtime"] = state
+    snapshot["saved_behavior_runtime"] = {**copy.deepcopy(state), "envelope_sha256": "c" * 64,
+                                            "payload_sha256": "d" * 64}
+    return snapshot
+
+
+class NpcBehaviorRuntimeObservationTest(unittest.TestCase):
+    def test_missing_or_old_behavior_cannot_be_a_connected_simulation(self):
+        for value in ({}, {"behavior_runtime": {}}, {"behavior_runtime": {"version": True}},
+                      {"behavior_runtime": {"version": 1, "behavior_version": 2}}):
+            with self.subTest(value=value), self.assertRaisesRegex(RuntimeError, "unsupported"):
+                SMOKE.behavior_runtime_state(value)
+
+    def test_missing_roster_physics_or_decision_counts_are_rejected(self):
+        for change in ({"people_count": 41}, {"observed_count": True}, {"decision_due_count": -1},
+                       {"activity_counts": {"work": 41}}, {"activity_counts": {"invented": 42}}):
+            snapshot = behavior_snapshot()
+            snapshot["behavior_runtime"].update(change)
+            with self.subTest(change=change), self.assertRaises(RuntimeError):
+                SMOKE.behavior_runtime_state(snapshot)
+
+    def test_behavior_clock_must_follow_world_and_finite_numeric_types(self):
+        for change in ({"seconds": 39.0}, {"seconds": float("nan")}, {"accumulator": 0.6},
+                       {"accumulator": True}):
+            snapshot = behavior_snapshot()
+            snapshot["behavior_runtime"].update(change)
+            with self.subTest(change=change), self.assertRaisesRegex(RuntimeError, "clock"):
+                SMOKE.behavior_runtime_state(snapshot)
+
+    def test_invalid_need_memory_or_stable_interest_is_not_silently_accepted(self):
+        for change in ({"fatigue": float("inf")}, {"stress": True}, {"social_need": 101},
+                       {"interest": "security"}, {"memories": [{"kind": "greeted", "at": 99}]},
+                       {"route_direction": 0}, {"observed": 1}, {"last_trust": 2.5}):
+            snapshot = behavior_snapshot()
+            snapshot["behavior_runtime"]["samples"]["julia"].update(change)
+            with self.subTest(change=change), self.assertRaises(RuntimeError):
+                SMOKE.behavior_runtime_state(snapshot)
+
+    def test_paused_save_requires_exact_normalized_behavior_digest(self):
+        snapshot = behavior_snapshot()
+        checkpoint = SMOKE.saved_behavior_checkpoint(snapshot)
+        self.assertEqual(checkpoint["state_sha256"], "b" * 64)
+        for key in ("world_id", "roster_sha256", "state_sha256"):
+            changed = copy.deepcopy(snapshot)
+            changed["saved_behavior_runtime"][key] = "e" * 64
+            with self.subTest(key=key), self.assertRaisesRegex(RuntimeError, "does not match"):
+                SMOKE.saved_behavior_checkpoint(changed)
+
+    def test_save_evidence_cannot_be_taken_from_active_world_or_unverified_envelope(self):
+        for change in ("active", "missing_save", "missing_checksum", "false_checksum"):
+            snapshot = behavior_snapshot()
+            if change == "active":
+                snapshot["action_runtime"]["world_active"] = True
+            elif change == "missing_save":
+                snapshot.pop("saved_behavior_runtime")
+            elif change == "missing_checksum":
+                snapshot["saved_behavior_runtime"].pop("payload_sha256")
+            else:
+                snapshot["saved_behavior_runtime"]["envelope_sha256"] = True
+            with self.subTest(change=change), self.assertRaises(RuntimeError):
+                SMOKE.saved_behavior_checkpoint(snapshot)
+
+    def test_restart_accepts_elapsed_time_new_decisions_and_rate_bounded_needs(self):
+        snapshot = behavior_snapshot()
+        checkpoint = copy.deepcopy(SMOKE.saved_behavior_checkpoint(snapshot))
+        live = snapshot["behavior_runtime"]
+        live["seconds"] += 2.0
+        snapshot["world_seconds"] += 2.0
+        live["state_sha256"] = "e" * 64
+        julia = live["samples"]["julia"]
+        julia.update(fatigue=24.0, social_need=45.0, activity="greet", reason="friendly",
+                     since=41.0, next_decision=43.5, last_greet=41.0, partner="player")
+        julia["memories"].append({"kind": "danger_seen", "at": 41.0})
+        result = SMOKE.verify_behavior_restart(checkpoint, snapshot)
+        self.assertEqual(result["elapsed_simulation_seconds"], 2.0)
+        self.assertEqual(result["observed_count"], 42)
+
+    def test_restart_rejects_changed_file_world_reset_needs_and_lost_memories(self):
+        for change in ("file", "world", "time", "need", "memory", "memory_rewrite", "trust", "observed"):
+            snapshot = behavior_snapshot()
+            checkpoint = copy.deepcopy(SMOKE.saved_behavior_checkpoint(snapshot))
+            live = snapshot["behavior_runtime"]
+            if change == "file":
+                snapshot["saved_behavior_runtime"]["envelope_sha256"] = "e" * 64
+            elif change == "world":
+                live["world_id"] = "new-unrelated-world"
+            elif change == "time":
+                live["seconds"] -= 0.5
+                snapshot["world_seconds"] -= 0.5
+            elif change == "need":
+                live["samples"]["julia"]["fatigue"] = 1.0
+            elif change == "memory":
+                live["samples"]["julia"]["memories"] = []
+            elif change == "memory_rewrite":
+                live["samples"]["julia"]["memories"][0]["kind"] = "replaced"
+            elif change == "trust":
+                live["samples"]["julia"]["last_trust"] = 0
+            else:
+                live["observed_count"] = 0
+            with self.subTest(change=change), self.assertRaises(RuntimeError):
+                SMOKE.verify_behavior_restart(checkpoint, snapshot)
+
+    def test_full_memory_can_roll_forward_but_cannot_silently_drop_old_items(self):
+        snapshot = behavior_snapshot()
+        memories = [{"kind": "danger_seen" if index % 2 else "trust_gained", "at": 20.0 + index} for index in range(4)]
+        snapshot["behavior_runtime"]["samples"]["julia"]["memories"] = copy.deepcopy(memories)
+        snapshot["saved_behavior_runtime"]["samples"]["julia"]["memories"] = copy.deepcopy(memories)
+        checkpoint = copy.deepcopy(SMOKE.saved_behavior_checkpoint(snapshot))
+        snapshot["behavior_runtime"]["seconds"] = 41.0
+        snapshot["world_seconds"] = 41.25
+        current = snapshot["behavior_runtime"]["samples"]["julia"]
+        current["memories"] = memories[1:] + [{"kind": "danger_seen", "at": 40.5}]
+        SMOKE.verify_behavior_restart(checkpoint, snapshot)
+        current["memories"] = current["memories"][1:]
+        with self.assertRaisesRegex(RuntimeError, "disappeared"):
+            SMOKE.verify_behavior_restart(checkpoint, snapshot)
+
+    def test_new_apk_features_depend_on_actual_script_entries(self):
+        entries = ["assets/scripts/story/village_life.gdc", "assets/scripts/domain/npc_behavior.gd.remap",
+                   "assets/scripts/visuals/meshy_character_registry.gdc"]
+        features = SMOKE.apk_runtime_features(entries)
+        self.assertTrue(features["npc_behavior"])
+        self.assertTrue(features["meshy_characters"])
+        backups = [entry.replace("npc_behavior.", "npc_behavior_backup.")
+                   .replace("meshy_character_registry.", "meshy_character_registry_backup.") for entry in entries]
+        self.assertFalse(SMOKE.apk_runtime_features(backups)["npc_behavior"])
+        self.assertFalse(SMOKE.apk_runtime_features(backups)["meshy_characters"])
+
+
+def meshy_snapshot():
+    return {"meshy_runtime": {"version": 1, "loaded_count": 1, "severus": {
+        "asset_id": "unit_roman_signifer", "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb",
+        "loaded": True, "mesh_count": 2, "bone_count": 15, "clip": "idle", "has_march": True, "has_run": True,
+        "equipment": [{"asset_id": "gear_roman_signum", "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb",
+                        "bone": "Hand_R", "bound": True, "mesh_count": 1}]}}}
+
+
+class MeshyRuntimeObservationTest(unittest.TestCase):
+    def test_loaded_signifer_requires_actual_model_rig_and_gaits(self):
+        self.assertEqual(SMOKE.meshy_runtime_state(meshy_snapshot())["loaded_count"], 1)
+        for change in ({"model_path": "res://assets/meshy/source/unit_roman_signifer.glb"},
+                       {"model_path": "res://assets/characters/frontier_legionary_3.glb"},
+                       {"asset_id": "unit_germanic_axe_fighter"}, {"loaded": False},
+                       {"mesh_count": 0}, {"bone_count": True}, {"has_run": False}):
+            snapshot = meshy_snapshot()
+            snapshot["meshy_runtime"]["severus"].update(change)
+            with self.subTest(change=change), self.assertRaises(RuntimeError):
+                SMOKE.meshy_runtime_state(snapshot)
+
+    def test_registry_presence_alone_never_proves_loaded_model(self):
+        for value in ({}, {"meshy_runtime": {"version": 1, "loaded_count": 0, "severus": {}}},
+                      {"meshy_runtime": {"version": True}}):
+            with self.subTest(value=value), self.assertRaises(RuntimeError):
+                SMOKE.meshy_runtime_state(value)
+
+    def test_missing_or_unbound_standard_cannot_pass_body_only_observation(self):
+        snapshot = meshy_snapshot()
+        snapshot["meshy_runtime"]["severus"]["equipment"] = []
+        with self.assertRaisesRegex(RuntimeError, "lost its held standard"):
+            SMOKE.meshy_runtime_state(snapshot)
+        for change in ({"bone": "Hand_L"}, {"bound": False}, {"mesh_count": 0},
+                       {"model_path": "res://assets/meshy/source/equipment/gear_roman_signum.glb"}):
+            snapshot = meshy_snapshot()
+            snapshot["meshy_runtime"]["severus"]["equipment"][0].update(change)
+            with self.subTest(change=change), self.assertRaisesRegex(RuntimeError, "not loaded"):
+                SMOKE.meshy_runtime_state(snapshot)
+
+
+class NativeGaitObservationTest(unittest.TestCase):
+    def test_gait_requires_actual_moving_pointer_sample(self):
+        observations = [{"phase": "DOWN", "velocity": [0, 0, 0], "figure_clip": "idle"},
+                        {"phase": "MOVE", "velocity": [1.45, 0, 0], "figure_clip": "march"},
+                        {"phase": "UP", "velocity": [0, 0, 0], "figure_clip": "idle"}]
+        self.assertEqual(SMOKE.verify_native_gait({"observations": observations}),
+                         [{"clip": "march", "speed_m_s": 1.45}])
+        observations[1]["figure_clip"] = "work"
+        with self.assertRaisesRegex(RuntimeError, "locomotion clip"):
+            SMOKE.verify_native_gait({"observations": observations})
+
+    def test_selected_walk_or_gravity_without_horizontal_motion_is_insufficient(self):
+        for observations in ([], [{"phase": "MOVE", "velocity": [0, -4, 0], "figure_clip": "march"}],
+                             [{"phase": "MOVE", "figure_clip": "run"}],
+                             [{"phase": "MOVE", "velocity": [True, 0, 0], "figure_clip": "march"}]):
+            with self.subTest(observations=observations), self.assertRaises(RuntimeError):
+                SMOKE.verify_native_gait({"observations": observations})
 
 
 if __name__ == "__main__":

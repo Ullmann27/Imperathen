@@ -1,0 +1,100 @@
+{
+  "scope": "Actual Godot Linux export-pack; no installable Android or device claim",
+  "command": "godot --headless --path prototype --export-pack 'Linux x86_64' /home/agent/imperathen-living-village.zip",
+  "passed": true,
+  "size_bytes": 153082104,
+  "sha256": "fec71f2ac7d4d75617f0c88bf3c241176da13d9f19ecc4ec899075c56b24a856",
+  "entries": 1120,
+  "source_entries": [],
+  "required_json": {
+    "assets/meshy/loadouts.json": "c69deb5d8b90bfcd6ef52a992e1f184fc350d79456860fe468fd9590f4c77681",
+    "assets/meshy/manifest.json": "eab83e9ace395bbb4178eb351056b5d40b5f1f0db5d5372668f8d515bbcc8d5f",
+    "assets/story/campaign_arc.json": "71a8c67ab2c4369ad26d2c3b289c0a315493263dccccc4dce2fdbaa5169a436f"
+  },
+  "models": [
+    {
+      "import": "assets/meshy/characters/unit_roman_signifer_0.glb.import",
+      "entry": ".godot/imported/unit_roman_signifer_0.glb-72f5dd38bb9082c8a7e956ed6e72e404.scn",
+      "sha256": "14bcab0e391ae72633aac59419362d082208c36d0147407174949dba8e7f5f20",
+      "size_bytes": 964506
+    },
+    {
+      "import": "assets/meshy/characters/unit_roman_signifer_1.glb.import",
+      "entry": ".godot/imported/unit_roman_signifer_1.glb-41ebc293e5cfde48961594b15f13b8c9.scn",
+      "sha256": "c2e0651b20971333192448262a2e1a3dddec0f0c61a895cd19ad87a3dc4f7941",
+      "size_bytes": 470027
+    },
+    {
+      "import": "assets/meshy/characters/unit_roman_signifer_2.glb.import",
+      "entry": ".godot/imported/unit_roman_signifer_2.glb-ede7b5ee3143b88e47752fae9df545af.scn",
+      "sha256": "851bad69084391c3077da2f739036fff0b7365b87b7d854fd0fb0f8f6c16030c",
+      "size_bytes": 218480
+    },
+    {
+      "import": "assets/meshy/characters/unit_roman_signifer_3.glb.import",
+      "entry": ".godot/imported/unit_roman_signifer_3.glb-3f9de47102dce13d8dac1fbd15439a0b.scn",
+      "sha256": "65f2942e6ca19391645ac29346d393ae2ec444f92eecd6ac2dbb8a86b530125b",
+      "size_bytes": 106125
+    },
+    {
+      "import": "assets/meshy/characters/unit_germanic_axe_fighter_0.glb.import",
+      "entry": ".godot/imported/unit_germanic_axe_fighter_0.glb-082392ae3fb24aa3bc5ae930287cdeaf.scn",
+      "sha256": "dab8cb2725250f911899995bdab21e18e764e149c6dfb6cffd12faaba7860df9",
+      "size_bytes": 1008554
+    },
+    {
+      "import": "assets/meshy/characters/unit_germanic_axe_fighter_1.glb.import",
+      "entry": ".godot/imported/unit_germanic_axe_fighter_1.glb-73cbe83c4635ee47d23ba3068c5ec74c.scn",
+      "sha256": "753ef0c62432c5a9e89e5622232cdd4dca69391de521c5dcc5c25784e0ffc3b5",
+      "size_bytes": 484049
+    },
+    {
+      "import": "assets/meshy/characters/unit_germanic_axe_fighter_2.glb.import",
+      "entry": ".godot/imported/unit_germanic_axe_fighter_2.glb-55f9fa8669a4949e9916bf3aa7068ba0.scn",
+      "sha256": "0ae566e9a528ced4a46a29e0739e923724fe5bac2031c8d114c277c464dbec40",
+      "size_bytes": 201569
+    },
+    {
+      "import": "assets/meshy/characters/unit_germanic_axe_fighter_3.glb.import",
+      "entry": ".godot/imported/unit_germanic_axe_fighter_3.glb-0ebd520c64bea70e818269d13b75ce2c.scn",
+      "sha256": "af2990ac38342a9d9a34a69920595d7fea3dc58ee10ae4dd7218bcd38d25bdab",
+      "size_bytes": 99000
+    },
+    {
+      "import": "assets/meshy/equipment/weap_germanic_hand_axe_0.glb.import",
+      "entry": ".godot/imported/weap_germanic_hand_axe_0.glb-f1df7e51ed42b7664a1d09ace4abecc2.scn",
+      "sha256": "e3b96d935160b8da27c9a34898336b7567ed271aa87d7b41d2d7bb3d75abd61b",
+      "size_bytes": 30471
+    },
+    {
+      "import": "assets/meshy/equipment/weap_germanic_hand_axe_1.glb.import",
+      "entry": ".godot/imported/weap_germanic_hand_axe_1.glb-96713244d1a8914f9f5ae07a368311f3.scn",
+      "sha256": "4b047da2bf84151df2e31fb99d453aca6f9e27165b1f37d90412deae425724b8",
+      "size_bytes": 15050
+    },
+    {
+      "import": "assets/meshy/equipment/gear_germanic_round_shield_0.glb.import",
+      "entry": ".godot/imported/gear_germanic_round_shield_0.glb-370df4d00503e65cdb6fef088cc58b8c.scn",
+      "sha256": "8888ef9a1b112c2b46ca5094d442e791a418e08b56fe9e21af936d14e4001d70",
+      "size_bytes": 74903
+    },
+    {
+      "import": "assets/meshy/equipment/gear_germanic_round_shield_1.glb.import",
+      "entry": ".godot/imported/gear_germanic_round_shield_1.glb-fb2bb67963fb9abc2bc79434ef1993df.scn",
+      "sha256": "a3fae4dc1a16219a0c6b05dc6eae3df41827a3b4f0d698e34a6bfe7e9dab5a86",
+      "size_bytes": 23633
+    },
+    {
+      "import": "assets/meshy/equipment/gear_roman_signum_0.glb.import",
+      "entry": ".godot/imported/gear_roman_signum_0.glb-880485e0a573ba867caefd8307c0987e.scn",
+      "sha256": "b21d33e3d152c64e5a9cb287ed08ca62aaa5aeb6688a5197edff4cb7453bc076",
+      "size_bytes": 57224
+    },
+    {
+      "import": "assets/meshy/equipment/gear_roman_signum_1.glb.import",
+      "entry": ".godot/imported/gear_roman_signum_1.glb-ed3f3f24147c65525ffd258d4e901e2e.scn",
+      "sha256": "daec9a7cf2d035fb5225a8ffd25434fc5b382646496dd248203ddf778824afc7",
+      "size_bytes": 23417
+    }
+  ]
+}

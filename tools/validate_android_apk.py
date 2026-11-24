@@ -116,12 +116,42 @@ CHILDHOOD_RESOURCES = (
     "scripts/world/village/settlement_dressing.gd",
     "scripts/world/regional_village.gd",
 )
+CAMPAIGN_BIBLE_RESOURCES = (
+    "scripts/story/campaign_bible.gd",
+    "assets/story/campaign_arc.json",
+)
+MESHY_REGISTRY_RESOURCES = (
+    "scripts/visuals/meshy_asset_registry.gd",
+    "scripts/visuals/meshy_loadout_registry.gd",
+    "assets/meshy/manifest.json",
+    "assets/meshy/loadouts.json",
+)
+NPC_BEHAVIOR_RESOURCES = (
+    "scripts/domain/npc_behavior.gd",
+)
+MESHY_CHARACTER_RESOURCES = (
+    "scripts/visuals/meshy_character_registry.gd",
+    *(f"assets/meshy/characters/{character}_{level}.glb"
+      for character in ("unit_roman_signifer", "unit_germanic_axe_fighter")
+      for level in range(4)),
+)
+MESHY_EQUIPMENT_RESOURCES = (
+    "scripts/visuals/meshy_equipment.gd",
+    *(f"assets/meshy/equipment/{equipment}_{level}.glb"
+      for equipment in ("weap_germanic_hand_axe", "gear_germanic_round_shield", "gear_roman_signum")
+      for level in range(2)),
+)
 FEATURE_RESOURCE_GROUPS = (
     ("living_frontier_content", FRONTIER_RESOURCES),
     ("cinematic_opening_content", OPENING_RESOURCES),
     ("village_life_content", VILLAGE_LIFE_RESOURCES),
     ("action_combat_content", ACTION_COMBAT_RESOURCES),
     ("childhood_content", CHILDHOOD_RESOURCES),
+    ("campaign_bible_content", CAMPAIGN_BIBLE_RESOURCES),
+    ("meshy_registry_content", MESHY_REGISTRY_RESOURCES),
+    ("npc_behavior_content", NPC_BEHAVIOR_RESOURCES),
+    ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
+    ("meshy_equipment_content", MESHY_EQUIPMENT_RESOURCES),
 )
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (

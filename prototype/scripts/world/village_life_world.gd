@@ -7,6 +7,7 @@ const Economy = preload("res://scripts/domain/village_economy.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
+const Behavior = preload("res://scripts/domain/npc_behavior.gd")
 const PLACES := {"farm":Vector2(24,-30), "woodcamp":Vector2(-43,14),
 	"quarry":Vector2(48,-12), "trade":Vector2(25,24), "watchpost":Vector2(0,-48)}
 var actors: Dictionary = {}
@@ -22,8 +23,50 @@ var _stone: StandardMaterial3D
 var _linen: StandardMaterial3D
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	_update_nameplates()
+	_update_attention(delta)
+
+
+func behavior_observations() -> Dictionary:
+	var result := {}
+	for id: String in actors:
+		var actor: Node3D = actors[id]
+		if not actor.visible:
+			continue
+		var point := actor.global_position
+		result[id] = {"position":[point.x,point.y,point.z],"route_distance":0.0}
+	return result
+
+
+func _update_attention(delta: float) -> void:
+	if not active or not visible or not focused.is_empty() or not Behavior.enabled(state):
+		return
+	var saved: Array = state.get("player",{}).get("position",[0.0,0.0,0.0])
+	var player := Vector3(float(saved[0]),float(saved[1]),float(saved[2]))
+	for id: String in actors:
+		var actor: Node3D = actors[id]
+		if not actor.visible:
+			continue
+		var intent := Behavior.view(state,id)
+		if intent.is_empty() or intent.activity not in ["greet","space","socialize","alert","assist"]:
+			continue
+		var target := player
+		if state.village.behavior.people.has(intent.partner):
+			var other: Array = state.village.behavior.people[intent.partner].position
+			target = Vector3(float(other[0]),float(other[1]),float(other[2]))
+		elif intent.activity in ["alert","assist"]:
+			var distance := INF
+			for enemy: Dictionary in state.village.raid.enemies:
+				if int(enemy.health) <= 0:
+					continue
+				var at := Vector3(float(enemy.x),0,float(enemy.z))
+				if actor.position.distance_squared_to(at) < distance:
+					distance = actor.position.distance_squared_to(at)
+					target = at
+		var offset := target-actor.global_position
+		if Vector2(offset.x,offset.z).length() > .1:
+			actor.rotation.y = lerp_angle(actor.rotation.y,atan2(-offset.x,-offset.z),minf(1.0,delta*4.0))
 
 
 func _update_nameplates() -> void:
@@ -154,6 +197,8 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 		if id == "decimus":
 			appearance = "elder"
 		figure.configure_resident("italia",32+actors.size()%20,appearance,actors.size(),get_viewport().get_camera_3d())
+		if id == "severus":
+			figure.configure_meshy("unit_roman_signifer")
 		var label := Art.label(actor, caption + " · " + profession, Vector3(0,2.08,0), Color("efdbad"), 27)
 		label.name = "Nameplate"
 		label.pixel_size = .003
@@ -170,8 +215,18 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 	var figure: Node3D = actor.get_node("Figure")
 	figure.profile = quality
 	figure.refresh_lod(get_viewport().get_camera_3d())
-	if person.get("assignment", "idle") not in ["idle", "watchpost", "defense"] and active:
-		figure.keep_working()
+	if focused != id and active:
+		var intent := Behavior.view(state,id)
+		var activity := str(intent.get("activity","work"))
+		figure.drive(0.0)
+		if person.get("assignment", "idle") not in ["idle", "watchpost", "defense"] and activity == "work":
+			figure.keep_working()
+		elif actor.get_meta("intent","") != activity:
+			figure.reset_motion()
+			if activity in ["greet","socialize","space"]:
+				figure.cue("talk")
+		actor.set_meta("intent",activity)
+		actor.set_meta("activity",activity)
 
 
 func _sync_raiders() -> void:
@@ -189,6 +244,8 @@ func _sync_raiders() -> void:
 			actor.add_child(figure)
 			figure.configure("enemy", "germania", 28)
 			figure.configure_appearance("spearman", raiders.size())
+			if raiders.size()%2 == 0:
+				figure.configure_meshy("unit_germanic_axe_fighter")
 			var body := StaticBody3D.new()
 			body.name = "Body"
 			body.collision_layer = 1

@@ -4,6 +4,7 @@ extends Node3D
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
 const Art = preload("res://scripts/world/village_art.gd")
+const Behavior = preload("res://scripts/domain/npc_behavior.gd")
 var actors: Dictionary = {}
 var origin_id := ""
 var active := false
@@ -14,6 +15,32 @@ var recruited := 0
 var _player_position := Vector3.ZERO
 var _route_clocks: Dictionary = {}
 var _initialized := false
+var _behavior_state: Dictionary = {}
+var _behavior_world := ""
+var _behavior_restore := false
+var _behavior_seconds := 0.0
+var _route_distances: Dictionary = {}
+var _route_directions: Dictionary = {}
+
+
+func sync_behavior(data: Dictionary) -> void:
+	var next_world := str(data.get("world_id",""))
+	var next_time := float(data.get("world_seconds",0.0))
+	_behavior_restore = _behavior_restore or next_world != _behavior_world or next_time+0.000001 < _behavior_seconds
+	_behavior_world = next_world
+	_behavior_seconds = next_time
+	_behavior_state = data
+
+
+func behavior_observations() -> Dictionary:
+	var result := {}
+	for id: String in actors:
+		var actor: Node3D = actors[id]
+		if not actor.visible:
+			continue
+		var point := actor.global_position
+		result[id] = {"position":[point.x,point.y,point.z],"route_distance":float(_route_distances.get(id,0.0)),"route_direction":int(_route_directions.get(id,1))}
+	return result
 
 func show_origin(id: String, time: float, recruited_count: int) -> void:
 	var rebuild := origin_id != id
@@ -24,12 +51,15 @@ func show_origin(id: String, time: float, recruited_count: int) -> void:
 			actor.free()
 		actors.clear()
 		_route_clocks.clear()
+		_route_distances.clear()
+		_route_directions.clear()
 		_initialized = false
 		if id == "italia":
 			for index in Layout.RESIDENTS.size():
 				_add_resident(Layout.RESIDENTS[index],index)
 	set_recruited(recruited_count)
-	advance_to(time,rebuild or not _initialized)
+	advance_to(time,rebuild or not _initialized or _behavior_restore)
+	_behavior_restore = false
 
 func _add_resident(item: Dictionary, index: int) -> void:
 	var actor := CharacterBody3D.new()
@@ -92,12 +122,15 @@ func advance_to(time: float, force := false) -> void:
 	var elapsed := next_time-seconds
 	# Loading a saved time is an explicit placement operation. Ordinary play
 	# never teleports along the routine: each displacement is swept by physics.
-	if force or elapsed < 0.0 or elapsed > 2.0:
+	if force or elapsed < 0.0 or elapsed > 2.0 and not Behavior.enabled(_behavior_state):
 		_place_routines(next_time)
 		seconds = next_time
 		return
 	seconds = next_time
 	if elapsed <= 0.0:
+		return
+	if Behavior.enabled(_behavior_state):
+		_advance_behavior(minf(elapsed,0.25))
 		return
 	for index in Layout.RESIDENTS.size():
 		var item: Dictionary = Layout.RESIDENTS[index]
@@ -141,6 +174,165 @@ func advance_to(time: float, force := false) -> void:
 		actor.set_meta("activity","march" if actual_speed > .05 else pose.activity)
 
 
+func _advance_behavior(elapsed: float) -> void:
+	for item: Dictionary in Layout.RESIDENTS:
+		var id: String = item.id
+		if not actors.has(id):
+			continue
+		var actor: CharacterBody3D = actors[id]
+		if not actor.visible or focused_id == id:
+			continue
+		var intent := Behavior.view(_behavior_state,id)
+		if intent.is_empty():
+			continue
+		var activity: String = intent.activity
+		var route := _route_points(item)
+		var total := _route_length(route)
+		var distance := clampf(float(_route_distances.get(id,0.0)),0.0,total)
+		var goal := distance
+		if activity in ["work","rest","weather_pause"]:
+			goal = 0.0
+		elif activity in ["socialize","explore"]:
+			goal = total
+			var peer: String = intent.partner
+			if not peer.is_empty() and _behavior_state.village.behavior.people.has(peer):
+				var peer_point: Array = _behavior_state.village.behavior.people[peer].position
+				goal = _route_projection(route,Vector3(float(peer_point[0]),0,float(peer_point[2])))
+		elif activity == "patrol":
+			var direction := int(_route_directions.get(id,1))
+			if direction > 0 and distance >= total-.08:
+				direction = -1
+			elif direction < 0 and distance <= .08:
+				direction = 1
+			_route_directions[id] = direction
+			goal = total if direction > 0 else 0.0
+		elif activity == "flee":
+			goal = _flee_goal(route,total)
+		var speed := 1.8 if activity == "flee" else 0.9+float(Layout.RESIDENTS.find(item)%5)*0.06
+		var next_distance := move_toward(distance,goal,speed*elapsed)
+		var target := _route_point(route,next_distance)
+		var motion := Vector3.ZERO
+		if activity == "yield":
+			var away := actor.global_position-_player_position
+			away.y = 0.0
+			if away.length_squared() > .0001:
+				motion = away.normalized()*.65*elapsed
+				# Courtesy never pushes a resident arbitrarily far from the safe
+				# authored corridor or through a wall.
+				if (actor.position+motion-_route_point(route,distance)).length() > .72:
+					motion = Vector3.ZERO
+		elif activity not in ["greet","space","alert","assist","absent"] and total > .01:
+			motion = (target-actor.position).limit_length(speed*elapsed)
+			motion.y = 0.0
+		var before := actor.position
+		var hit: KinematicCollision3D
+		if motion.length_squared() > .00000001:
+			hit = actor.move_and_collide(motion)
+		if hit != null:
+			var blocker := hit.get_collider() as CollisionObject3D
+			if blocker != null and (blocker.collision_layer & (2 | Layout.CITIZEN_LAYER)) != 0:
+				var side := Vector3(-motion.z,0,motion.x).normalized()*.45*elapsed
+				if (actor.position+side-_route_point(route,distance)).length() < .72 and not actor.test_move(actor.global_transform,side):
+					actor.move_and_collide(side)
+		var travelled := actor.position-before
+		var actual_speed := travelled.length()/maxf(.0001,elapsed)
+		_route_distances[id] = _route_projection(route,actor.position)
+		var figure: Node3D = actor.get_node("Figure")
+		figure.drive(actual_speed)
+		if actual_speed > .05:
+			actor.rotation.y = lerp_angle(actor.rotation.y,atan2(-travelled.x,-travelled.z),minf(1.0,elapsed*7.0))
+		elif activity in ["greet","space","socialize","alert","assist"]:
+			_face_interest(actor,intent,elapsed)
+		if activity == "work" and actual_speed < .05 and distance < .15:
+			figure.keep_working()
+		elif actor.get_meta("intent","") != activity and activity in ["greet","socialize","space"]:
+			figure.cue("talk")
+		actor.set_meta("intent",activity)
+		actor.set_meta("activity","march" if actual_speed > .05 else activity)
+		actor.set_meta("yielding",hit != null or activity == "yield")
+
+
+func _face_interest(actor: Node3D, intent: Dictionary, elapsed: float) -> void:
+	var target := _player_position
+	var peer := str(intent.get("partner",""))
+	if _behavior_state.village.behavior.people.has(peer):
+		var point: Array = _behavior_state.village.behavior.people[peer].position
+		target = Vector3(float(point[0]),float(point[1]),float(point[2]))
+	elif intent.activity in ["alert","assist"]:
+		var danger := _nearest_threat(actor.position)
+		if danger != Vector3.INF:
+			target = danger
+	var offset := target-actor.global_position
+	if Vector2(offset.x,offset.z).length() > .1:
+		actor.rotation.y = lerp_angle(actor.rotation.y,atan2(-offset.x,-offset.z),minf(1.0,elapsed*4.0))
+
+
+func _nearest_threat(point: Vector3) -> Vector3:
+	var nearest := Vector3.INF
+	var best := INF
+	for enemy: Dictionary in _behavior_state.get("village",{}).get("raid",{}).get("enemies",[]):
+		if int(enemy.get("health",0)) <= 0:
+			continue
+		var at := Vector3(float(enemy.x),0,float(enemy.z))
+		if point.distance_squared_to(at) < best:
+			best = point.distance_squared_to(at)
+			nearest = at
+	return nearest
+
+
+func _flee_goal(route: Array[Vector3], total: float) -> float:
+	var start := _route_point(route,0.0)
+	var end := _route_point(route,total)
+	var start_threat := _nearest_threat(start)
+	var end_threat := _nearest_threat(end)
+	if start_threat == Vector3.INF or end_threat == Vector3.INF:
+		return 0.0
+	return total if end.distance_squared_to(end_threat) > start.distance_squared_to(start_threat) else 0.0
+
+
+func _route_points(item: Dictionary) -> Array[Vector3]:
+	var points: Array[Vector3] = [item.at]
+	for point: Vector3 in item.route:
+		points.append(point)
+	return points
+
+
+func _route_length(points: Array[Vector3]) -> float:
+	var length := 0.0
+	for index in range(1,points.size()):
+		length += points[index-1].distance_to(points[index])
+	return length
+
+
+func _route_point(points: Array[Vector3], distance: float) -> Vector3:
+	for index in range(1,points.size()):
+		var edge := points[index]-points[index-1]
+		var length := edge.length()
+		if distance <= length and length > .0001:
+			return points[index-1]+edge*(distance/length)
+		distance -= length
+	return points.back()
+
+
+func _route_projection(points: Array[Vector3], point: Vector3) -> float:
+	var best := INF
+	var chosen := 0.0
+	var accumulated := 0.0
+	for index in range(1,points.size()):
+		var edge := points[index]-points[index-1]
+		var length := edge.length()
+		if length < .0001:
+			continue
+		var along := clampf((point-points[index-1]).dot(edge)/(length*length),0.0,1.0)
+		var projected := points[index-1]+edge*along
+		var difference := point.distance_squared_to(projected)
+		if difference < best:
+			best = difference
+			chosen = accumulated+along*length
+		accumulated += length
+	return chosen
+
+
 func _place_routines(time: float) -> void:
 	_initialized = true
 	var occupied: Array[Vector3] = []
@@ -153,6 +345,15 @@ func _place_routines(time: float) -> void:
 			continue
 		var actor: CharacterBody3D = actors[item.id]
 		var pose := Layout.pose_at(item,time,index)
+		if Behavior.enabled(_behavior_state):
+			var intent := Behavior.view(_behavior_state,item.id)
+			pose.position = item.at
+			pose.activity = intent.get("activity","idle")
+			if intent.get("observed",false):
+				var saved: Array = intent.position
+				pose.position = Vector3(float(saved[0]),float(saved[1]),float(saved[2]))
+			_route_distances[item.id] = float(intent.get("route_distance",0.0))
+			_route_directions[item.id] = int(_behavior_state.village.behavior.people[item.id].get("route_direction",1))
 		actor.position = _free_start(pose.position,item.at,occupied,excluded)
 		_route_clocks[item.id] = time
 		if actor.visible:
@@ -230,7 +431,11 @@ func info(id: String) -> Dictionary:
 	var definition := Layout.resident(id)
 	if definition.is_empty() or not actors.has(id) or not actors[id].visible:
 		return {}
-	return {"id":id,"name":definition.name,"occupation":definition.occupation,"greeting":definition.greeting,"position":actor_position(id)}
+	var result := {"id":id,"name":definition.name,"occupation":definition.occupation,"greeting":definition.greeting,"position":actor_position(id)}
+	var intent := Behavior.view(_behavior_state,id)
+	if not intent.is_empty():
+		result.behavior = intent
+	return result
 
 func focus(id: String, viewer: Vector3) -> bool:
 	if not actors.has(id) or not actors[id].visible:

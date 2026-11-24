@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+IMPERATHEN_READY: Godot prototype, intro -> menu -> persistent frontier loop
+IMPERATHEN_OPENING_STARTED i00_aquileia
+IMPERATHEN_SESSION_STARTED: saved frontier world
+IMPERATHEN_OPENING_STARTED childhood_home
+IMPERATHEN_OPENING_CHAINED i00_aquileia -> childhood_home
+IMPERATHEN_OPENING_COMPLETE
+IMPERATHEN_PAUSED
+IMPERATHEN_CONTINUED
+OBSERVER_PROBE_PASS read_only=true observed=42 chunks=17

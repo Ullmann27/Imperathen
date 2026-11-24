@@ -1,0 +1,104 @@
+{
+  "android_device_test": false,
+  "captures": [
+    {
+      "body": "res://assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+      "clip": "idle",
+      "equipment": [
+        "res://assets/meshy/equipment/weap_germanic_hand_axe_0.glb",
+        "res://assets/meshy/equipment/gear_germanic_round_shield_0.glb"
+      ],
+      "file": "unit_germanic_axe_fighter-idle.png",
+      "phase": 0.55
+    },
+    {
+      "body": "res://assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+      "clip": "march",
+      "equipment": [
+        "res://assets/meshy/equipment/weap_germanic_hand_axe_0.glb",
+        "res://assets/meshy/equipment/gear_germanic_round_shield_0.glb"
+      ],
+      "file": "unit_germanic_axe_fighter-march.png",
+      "phase": 0.13
+    },
+    {
+      "body": "res://assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+      "clip": "attack",
+      "equipment": [
+        "res://assets/meshy/equipment/weap_germanic_hand_axe_0.glb",
+        "res://assets/meshy/equipment/gear_germanic_round_shield_0.glb"
+      ],
+      "file": "unit_germanic_axe_fighter-attack.png",
+      "phase": 0.55
+    },
+    {
+      "body": "res://assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+      "clip": "block",
+      "equipment": [
+        "res://assets/meshy/equipment/weap_germanic_hand_axe_0.glb",
+        "res://assets/meshy/equipment/gear_germanic_round_shield_0.glb"
+      ],
+      "file": "unit_germanic_axe_fighter-block.png",
+      "phase": 0.55
+    },
+    {
+      "body": "res://assets/meshy/characters/unit_germanic_axe_fighter_3.glb",
+      "clip": "march",
+      "equipment": [
+        "res://assets/meshy/equipment/weap_germanic_hand_axe_1.glb",
+        "res://assets/meshy/equipment/gear_germanic_round_shield_1.glb"
+      ],
+      "file": "unit_germanic_axe_fighter-distant.png",
+      "phase": 0.65
+    },
+    {
+      "body": "res://assets/meshy/characters/unit_roman_signifer_0.glb",
+      "clip": "idle",
+      "equipment": [
+        "res://assets/meshy/equipment/gear_roman_signum_0.glb"
+      ],
+      "file": "unit_roman_signifer-idle.png",
+      "phase": 0.55
+    },
+    {
+      "body": "res://assets/meshy/characters/unit_roman_signifer_0.glb",
+      "clip": "march",
+      "equipment": [
+        "res://assets/meshy/equipment/gear_roman_signum_0.glb"
+      ],
+      "file": "unit_roman_signifer-march.png",
+      "phase": 0.13
+    },
+    {
+      "body": "res://assets/meshy/characters/unit_roman_signifer_0.glb",
+      "clip": "attack",
+      "equipment": [
+        "res://assets/meshy/equipment/gear_roman_signum_0.glb"
+      ],
+      "file": "unit_roman_signifer-attack.png",
+      "phase": 0.55
+    },
+    {
+      "body": "res://assets/meshy/characters/unit_roman_signifer_0.glb",
+      "clip": "block",
+      "equipment": [
+        "res://assets/meshy/equipment/gear_roman_signum_0.glb"
+      ],
+      "file": "unit_roman_signifer-block.png",
+      "phase": 0.55
+    },
+    {
+      "body": "res://assets/meshy/characters/unit_roman_signifer_3.glb",
+      "clip": "march",
+      "equipment": [
+        "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+      ],
+      "file": "unit_roman_signifer-distant.png",
+      "phase": 0.65
+    }
+  ],
+  "checks": 138,
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "scope": "Actual imported production VillagePerson and hand attachments; no inventory or damage changes"
+}

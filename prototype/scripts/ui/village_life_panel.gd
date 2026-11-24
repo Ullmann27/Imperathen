@@ -5,6 +5,7 @@ const Economy = preload("res://scripts/domain/village_economy.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Plan = preload("res://scripts/world/world_stream_plan.gd")
+const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 
 class RegionalMap extends Control:
 	var position_world := Vector3.ZERO
@@ -221,6 +222,18 @@ static func _people(ui, column: VBoxContainer, data: Dictionary, life: Dictionar
 			_text(ui, column, "Für Gespräche nicht verfügbar", 14, true)
 			continue
 		_text(ui, column, "Noch nicht kennengelernt" if not bond.get("met", false) else "Vertrauen %+d%s" % [bond.get("trust", 0), " · verbündet" if bond.get("ally", false) else ""], 14, true)
+		var behavior: Dictionary = NpcBehavior.view(data, str(npc.id))
+		if not behavior.is_empty():
+			var activity := str(behavior.get("activity_label", ""))
+			var reason := str(behavior.get("reason", ""))
+			if not activity.is_empty():
+				_text(ui, column, "Gerade: " + activity, 15)
+			if bond.get("met", false):
+				var interest := str(behavior.get("interest_label", ""))
+				if not interest.is_empty():
+					_text(ui, column, "Interesse: " + interest, 14, true)
+				if not reason.is_empty():
+					_text(ui, column, reason, 14, true)
 		var position: Vector2 = Life.actor_position(data, npc.id)
 		_text(ui, column, "Ort im Dorf: %.0f / %.0f" % [position.x, position.y], 12, true)
 	_text(ui, column, "Dein Beruf: " + str(life.get("profession", "Noch keine Lehre")), 18)

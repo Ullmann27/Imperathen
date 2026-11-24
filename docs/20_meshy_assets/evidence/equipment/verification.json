@@ -1,0 +1,40 @@
+{
+  "scope": "Final production actor viewport with fitted existing Meshy equipment; no native Android device claim",
+  "engine": "4.7.2-stable (official)",
+  "checks": 138,
+  "failures": [],
+  "all_10_viewport_images_inspected": true,
+  "android_device_test": false,
+  "source_sha256": {
+    "prototype/assets/meshy/characters/unit_germanic_axe_fighter_0.glb": "7efd37f08c5877104e922340b530d9ff0c5822dca6e51435790a9f6815c8153a",
+    "prototype/assets/meshy/characters/unit_germanic_axe_fighter_1.glb": "9962d6d8729ed90068e80b8a567623756231880f0167b510147e60b7c9d05fc9",
+    "prototype/assets/meshy/characters/unit_germanic_axe_fighter_2.glb": "5de94b621ccf809bca9e9d4e2fb1bb43ca6bd36e7469c48fc73038e685e44cae",
+    "prototype/assets/meshy/characters/unit_germanic_axe_fighter_3.glb": "3112638eba2d9822f0a5cf33c35612b1f8698e2d7a53a8aea28b6453e4c741a7",
+    "prototype/assets/meshy/characters/unit_roman_signifer_0.glb": "869803d0a79236273835a475439dc2fea27b4172a5f7d6821448910dfb4ee826",
+    "prototype/assets/meshy/characters/unit_roman_signifer_1.glb": "6af2f8fa19fc8108179bdcb39f3ccc590bf10383d2fd3433071ba8f5da33d5d6",
+    "prototype/assets/meshy/characters/unit_roman_signifer_2.glb": "a7e02a3d33e93b2ee78637e3bd912bda42f006885bbfaaf56daa37e864cf3c2b",
+    "prototype/assets/meshy/characters/unit_roman_signifer_3.glb": "7845cb8c7ab29876c137c89fcab5af361c257fa47c4cb9e1cdb9275fe4514c0f",
+    "prototype/assets/meshy/equipment/gear_germanic_round_shield_0.glb": "0d3542a26c420ffe8070c6dff053a4a09fc52603dabfdedf5ff9ef3a9067b5a0",
+    "prototype/assets/meshy/equipment/gear_germanic_round_shield_1.glb": "705cb2b4a9441edd6884cb30d567b521d576558711e74f3a407668290ce93a5a",
+    "prototype/assets/meshy/equipment/gear_roman_signum_0.glb": "eb318275115392fccba4ca3b9a291057baeba6cdff88f7195fe9a76be3d63847",
+    "prototype/assets/meshy/equipment/gear_roman_signum_1.glb": "73a3a069c1f013d78fa1b7703e36ba539b8edb2c92c527464c90d4b206483612",
+    "prototype/assets/meshy/equipment/weap_germanic_hand_axe_0.glb": "418e8a59c858aa94f466aaee72e501aa67d39992306580a0fd4d0df22dd2d76e",
+    "prototype/assets/meshy/equipment/weap_germanic_hand_axe_1.glb": "09e98ed5c828bc7833cb4c33034f6541539b92814752ef0ca438bd618f7bb8f8",
+    "prototype/scripts/visuals/meshy_equipment.gd": "1985569ea062170d856362caf5a8d372978a0db6c60867cce518d5b0f9d99014",
+    "prototype/scripts/visuals/village_person.gd": "d3d57676e56ed2ea45bdf1aa9f4adbab513c642ab37a5e42869f89e98ff44cdf",
+    "prototype/tests/meshy_equipment_test.gd": "5a0993182295eaf4e3af68b850bb9c2c740bcf2e709405e18b2a30b2f89ba49b",
+    "tools/characters/build_meshy_equipment.py": "3a2480d1e765920d2c2b008b516377c6e15d32ed37c06648d72bc8200defcc34"
+  },
+  "captures_sha256": {
+    "unit_germanic_axe_fighter-idle.png": "7cdac5173c4de25fde8a6a3f15102274846a6a0dc9f1e4b10e5c7a480e0f7db0",
+    "unit_germanic_axe_fighter-march.png": "b85a0fd9f0d5897a9a05d98dfea1d5e6f7994141e864815281d87e59cd3fb051",
+    "unit_germanic_axe_fighter-attack.png": "84311e64955017f904461db9958592edab6590c61d7f4eb290e6d9a1cc2fda7a",
+    "unit_germanic_axe_fighter-block.png": "555c002d21dd98cc6344629fe21c2efa73bdcb024cd128f8ce01036f4fac850d",
+    "unit_germanic_axe_fighter-distant.png": "4e4e8a053ed0b8c20cdbaabe0963b0d741d5628ef1124365db562e84bb6960a4",
+    "unit_roman_signifer-idle.png": "fd24322ad831abbd75d07010bec4c76a0ba26615ed9a1ec03b746ab2ae35cdbd",
+    "unit_roman_signifer-march.png": "0eedd5296974cdf77206a445b37835766d05590c23aafa74f9ac675f7db1283f",
+    "unit_roman_signifer-attack.png": "39fb1339b96e414caa53de415e66dcd17113215ee5464cc4c04a81bc1e85c178",
+    "unit_roman_signifer-block.png": "0a92e9a38165ea5692b057ba2619b29699ec16b5b8d0e91e12ef69768f5f7bfc",
+    "unit_roman_signifer-distant.png": "1eb14a569aa882ee09425fbe5ddff4c45271a493296301d372ba2620fd10a184"
+  }
+}

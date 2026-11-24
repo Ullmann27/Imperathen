@@ -1,0 +1,1348 @@
+{
+  "actual_android_process_restart": false,
+  "engine": "4.7.2-stable (official)",
+  "maximum_transport_chunks": 17,
+  "new_childhood_start": {
+    "action_mode": "unarmed",
+    "action_runtime": {
+      "action_touches": 0,
+      "body_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "camera_touches": 0,
+      "camera_yaw": 0.62,
+      "figure_clip": "idle",
+      "figure_speed": 0.0,
+      "mode": "person",
+      "move_axis": [
+        0.0,
+        0.0
+      ],
+      "movement_touch": -1,
+      "overlay": "none",
+      "position": [
+        -12.0,
+        1.29257822036743,
+        11.6999998092651
+      ],
+      "running": false,
+      "selected_technique": "jab_left",
+      "touch_camera_managed": true,
+      "ui_view": "game",
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "version": 1,
+      "world_active": true,
+      "world_camera_touches": 0
+    },
+    "actors": 15,
+    "aelia_assignment": "idle",
+    "behavior_runtime": {
+      "accumulator": 0.0,
+      "activity_counts": {
+        "patrol": 5,
+        "socialize": 7,
+        "work": 30
+      },
+      "behavior_version": 1,
+      "decision_due_count": 0,
+      "observed_count": 42,
+      "people_count": 42,
+      "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+      "samples": {
+        "aelia": {
+          "activity": "work",
+          "fatigue": 18.15,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0,
+          "memories": [],
+          "next_decision": 3.0,
+          "observed": true,
+          "partner": "",
+          "position": [
+            20.0,
+            0.0,
+            17.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 37.1125,
+          "stress": 0.0
+        },
+        "julia": {
+          "activity": "work",
+          "fatigue": 13.15,
+          "interest": "family",
+          "last_greet": -1000.0,
+          "last_trust": 4,
+          "memories": [],
+          "next_decision": 4.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -15.3000001907349,
+            0.0,
+            14.8000001907349
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 27.1125,
+          "stress": 0.0
+        },
+        "marcus": {
+          "activity": "work",
+          "fatigue": 10.15,
+          "interest": "learning",
+          "last_greet": -1000.0,
+          "last_trust": 0,
+          "memories": [],
+          "next_decision": 3.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -3.0,
+            0.899999976158142,
+            4.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 51.1125,
+          "stress": 0.0
+        },
+        "sextus": {
+          "activity": "work",
+          "fatigue": 8.15,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0,
+          "memories": [],
+          "next_decision": 4.5,
+          "observed": true,
+          "partner": "",
+          "position": [
+            32.7999992370605,
+            0.0,
+            -25.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 38.1125,
+          "stress": 0.0
+        }
+      },
+      "seconds": 1.5,
+      "state_sha256": "3c6c3ef00862fe9ac8ff41a57412049f3ed9b94cdd85418941c889711eac41f6",
+      "version": 1,
+      "world_id": "1798433-3104668528"
+    },
+    "childhood_runtime": {
+      "age": 12,
+      "carried": [],
+      "completed": [],
+      "day": 1,
+      "dialog_npc": "",
+      "family_entrance": [
+        -13.0,
+        14.6999998092651
+      ],
+      "family_water": [
+        -12.0,
+        11.6999998092651
+      ],
+      "stage": "mother_morning",
+      "target_npc": "julia",
+      "target_point": "",
+      "target_position": [
+        -15.3000001907349,
+        14.8000001907349
+      ],
+      "target_radius": 3.2,
+      "version": 1,
+      "world_id": "1798433-3104668528"
+    },
+    "controls": {
+      "attack": {
+        "center": [
+          1194.0,
+          466.0
+        ],
+        "enabled": true,
+        "instance_id": "241810021932",
+        "rect": [
+          1120.0,
+          436.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "commands": {
+        "center": [
+          1136.5,
+          676.0
+        ],
+        "enabled": true,
+        "instance_id": "240451067360",
+        "rect": [
+          1015.0,
+          652.0,
+          243.0,
+          48.0
+        ],
+        "visible": true
+      },
+      "dodge": {
+        "center": [
+          1194.0,
+          534.0
+        ],
+        "enabled": true,
+        "instance_id": "242112011834",
+        "rect": [
+          1120.0,
+          504.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "guard": {
+        "center": [
+          1038.0,
+          534.0
+        ],
+        "enabled": true,
+        "instance_id": "241961016883",
+        "rect": [
+          964.0,
+          504.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "interact": {
+        "center": [
+          1038.0,
+          466.0
+        ],
+        "enabled": true,
+        "instance_id": "241659026983",
+        "rect": [
+          964.0,
+          436.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "move_pad": {
+        "axis_points": {
+          "center": [
+            120.0,
+            524.0
+          ],
+          "down": [
+            120.0,
+            593.119995117188
+          ],
+          "left": [
+            50.879997253418,
+            524.0
+          ],
+          "right": [
+            189.119995117188,
+            524.0
+          ],
+          "up": [
+            120.0,
+            454.880004882812
+          ]
+        },
+        "center": [
+          120.0,
+          524.0
+        ],
+        "enabled": true,
+        "instance_id": "241558363681",
+        "rect": [
+          12.0,
+          416.0,
+          216.0,
+          216.0
+        ],
+        "visible": true
+      },
+      "pace": {
+        "center": [
+          1194.0,
+          602.0
+        ],
+        "enabled": true,
+        "instance_id": "242414001736",
+        "rect": [
+          1120.0,
+          572.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "pause": {
+        "center": [
+          1222.5,
+          44.0
+        ],
+        "enabled": true,
+        "instance_id": "239175998870",
+        "rect": [
+          1187.0,
+          20.0,
+          71.0,
+          48.0
+        ],
+        "visible": true
+      },
+      "techniques": {
+        "center": [
+          1038.0,
+          602.0
+        ],
+        "enabled": true,
+        "instance_id": "242263006785",
+        "rect": [
+          964.0,
+          572.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "village": {
+        "center": [
+          888.0,
+          676.0
+        ],
+        "enabled": true,
+        "instance_id": "240367181275",
+        "rect": [
+          767.0,
+          652.0,
+          242.0,
+          48.0
+        ],
+        "visible": true
+      }
+    },
+    "decimus_met": false,
+    "feedback": "",
+    "graphics_runtime": {
+      "ui_profile": "balanced",
+      "world_profile": "balanced"
+    },
+    "meshy_runtime": {
+      "loaded_count": 1,
+      "severus": {
+        "asset_id": "unit_roman_signifer",
+        "bone_count": 15,
+        "clip": "idle",
+        "equipment": [
+          {
+            "asset_id": "gear_roman_signum",
+            "bone": "Hand_R",
+            "bound": true,
+            "mesh_count": 1,
+            "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+          }
+        ],
+        "has_march": true,
+        "has_run": true,
+        "loaded": true,
+        "mesh_count": 2,
+        "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+      },
+      "version": 1
+    },
+    "people": 14,
+    "player_is_ruler": false,
+    "saved_behavior_runtime": {
+      "accumulator": 0.0,
+      "activity_counts": {
+        "patrol": 5,
+        "socialize": 7,
+        "work": 30
+      },
+      "behavior_version": 1,
+      "decision_due_count": 0,
+      "envelope_sha256": "820f1cc8a7f9d4ddd3979a14be387038c79d6e911f66b44b8bd4e4afd9850b37",
+      "observed_count": 42,
+      "payload_sha256": "261b4bc545e078ffdf8476f19c81cbf1f376925c548d14c80d519199b1f72b55",
+      "people_count": 42,
+      "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+      "samples": {
+        "aelia": {
+          "activity": "work",
+          "fatigue": 18.0,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0.0,
+          "memories": [],
+          "next_decision": 3.0,
+          "observed": true,
+          "partner": "",
+          "position": [
+            20.0,
+            0.0,
+            17.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 37.0,
+          "stress": 0.0
+        },
+        "julia": {
+          "activity": "work",
+          "fatigue": 13.0,
+          "interest": "family",
+          "last_greet": -1000.0,
+          "last_trust": 4.0,
+          "memories": [],
+          "next_decision": 4.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -15.3000001907349,
+            0.0,
+            14.8000001907349
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 27.0,
+          "stress": 0.0
+        },
+        "marcus": {
+          "activity": "work",
+          "fatigue": 10.0,
+          "interest": "learning",
+          "last_greet": -1000.0,
+          "last_trust": 0.0,
+          "memories": [],
+          "next_decision": 3.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -3.0,
+            0.899999976158142,
+            4.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 51.0,
+          "stress": 0.0
+        },
+        "sextus": {
+          "activity": "work",
+          "fatigue": 8.0,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0.0,
+          "memories": [],
+          "next_decision": 4.5,
+          "observed": true,
+          "partner": "",
+          "position": [
+            32.7999992370605,
+            0.0,
+            -25.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 38.0,
+          "stress": 0.0
+        }
+      },
+      "seconds": 0.0,
+      "state_sha256": "67e9837f00e0b6a8e4c84b643656733a33e40384461f69f76d158dfa847b9840",
+      "version": 1,
+      "world_id": "1798433-3104668528"
+    },
+    "screen": "playing",
+    "work_permit": false,
+    "workplaces": 5,
+    "world_seconds": 1.5
+  },
+  "observer_preserves_model_and_save": true,
+  "reloaded": {
+    "action_mode": "unarmed",
+    "action_runtime": {
+      "action_touches": 0,
+      "body_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "camera_touches": 0,
+      "camera_yaw": 0.62,
+      "figure_clip": "idle",
+      "figure_speed": 0.0,
+      "mode": "person",
+      "move_axis": [
+        0.0,
+        0.0
+      ],
+      "movement_touch": -1,
+      "overlay": "none",
+      "position": [
+        -12.0,
+        1.29257822036743,
+        11.6999998092651
+      ],
+      "running": false,
+      "selected_technique": "jab_left",
+      "touch_camera_managed": true,
+      "ui_view": "game",
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "version": 1,
+      "world_active": true,
+      "world_camera_touches": 0
+    },
+    "actors": 15,
+    "aelia_assignment": "idle",
+    "behavior_runtime": {
+      "accumulator": 0.0,
+      "activity_counts": {
+        "patrol": 5,
+        "socialize": 7,
+        "work": 30
+      },
+      "behavior_version": 1,
+      "decision_due_count": 0,
+      "observed_count": 42,
+      "people_count": 42,
+      "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+      "samples": {
+        "aelia": {
+          "activity": "work",
+          "fatigue": 18.3,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0,
+          "memories": [],
+          "next_decision": 6.0,
+          "observed": true,
+          "partner": "",
+          "position": [
+            20.0,
+            0.0,
+            17.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 37.225,
+          "stress": 0.0
+        },
+        "julia": {
+          "activity": "work",
+          "fatigue": 13.3,
+          "interest": "family",
+          "last_greet": -1000.0,
+          "last_trust": 4,
+          "memories": [],
+          "next_decision": 4.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -15.3000001907349,
+            0.0,
+            14.8000001907349
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 27.225,
+          "stress": 0.0
+        },
+        "marcus": {
+          "activity": "work",
+          "fatigue": 10.3,
+          "interest": "learning",
+          "last_greet": -1000.0,
+          "last_trust": 0,
+          "memories": [],
+          "next_decision": 3.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -3.0,
+            0.899999976158142,
+            4.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 51.225,
+          "stress": 0.0
+        },
+        "sextus": {
+          "activity": "work",
+          "fatigue": 8.3,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0,
+          "memories": [],
+          "next_decision": 4.5,
+          "observed": true,
+          "partner": "",
+          "position": [
+            32.7999992370605,
+            0.0,
+            -25.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 38.225,
+          "stress": 0.0
+        }
+      },
+      "seconds": 3.0,
+      "state_sha256": "2d6be353dcc5e9e318f38ce303c5a6cb83e53eb7495756070de39af3dfb047b9",
+      "version": 1,
+      "world_id": "1798433-3104668528"
+    },
+    "childhood_runtime": {
+      "age": 12,
+      "carried": [],
+      "completed": [],
+      "day": 1,
+      "dialog_npc": "",
+      "family_entrance": [
+        -13.0,
+        14.6999998092651
+      ],
+      "family_water": [
+        -12.0,
+        11.6999998092651
+      ],
+      "stage": "mother_morning",
+      "target_npc": "julia",
+      "target_point": "",
+      "target_position": [
+        -15.3000001907349,
+        14.8000001907349
+      ],
+      "target_radius": 3.2,
+      "version": 1,
+      "world_id": "1798433-3104668528"
+    },
+    "controls": {
+      "attack": {
+        "center": [
+          1194.0,
+          466.0
+        ],
+        "enabled": true,
+        "instance_id": "283769839529",
+        "rect": [
+          1120.0,
+          436.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "commands": {
+        "center": [
+          1136.5,
+          676.0
+        ],
+        "enabled": true,
+        "instance_id": "282494771038",
+        "rect": [
+          1015.0,
+          652.0,
+          243.0,
+          48.0
+        ],
+        "visible": true
+      },
+      "dodge": {
+        "center": [
+          1194.0,
+          534.0
+        ],
+        "enabled": true,
+        "instance_id": "283937611699",
+        "rect": [
+          1120.0,
+          504.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "guard": {
+        "center": [
+          1038.0,
+          534.0
+        ],
+        "enabled": true,
+        "instance_id": "283853725614",
+        "rect": [
+          964.0,
+          504.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "interact": {
+        "center": [
+          1038.0,
+          466.0
+        ],
+        "enabled": true,
+        "instance_id": "283685953444",
+        "rect": [
+          964.0,
+          436.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "move_pad": {
+        "axis_points": {
+          "center": [
+            120.0,
+            524.0
+          ],
+          "down": [
+            120.0,
+            593.119995117188
+          ],
+          "left": [
+            50.879997253418,
+            524.0
+          ],
+          "right": [
+            189.119995117188,
+            524.0
+          ],
+          "up": [
+            120.0,
+            454.880004882812
+          ]
+        },
+        "center": [
+          120.0,
+          524.0
+        ],
+        "enabled": true,
+        "instance_id": "283585290142",
+        "rect": [
+          12.0,
+          416.0,
+          216.0,
+          216.0
+        ],
+        "visible": true
+      },
+      "pace": {
+        "center": [
+          1194.0,
+          602.0
+        ],
+        "enabled": true,
+        "instance_id": "284105383869",
+        "rect": [
+          1120.0,
+          572.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "pause": {
+        "center": [
+          1222.5,
+          44.0
+        ],
+        "enabled": true,
+        "instance_id": "281236478966",
+        "rect": [
+          1187.0,
+          20.0,
+          71.0,
+          48.0
+        ],
+        "visible": true
+      },
+      "techniques": {
+        "center": [
+          1038.0,
+          602.0
+        ],
+        "enabled": true,
+        "instance_id": "284021497784",
+        "rect": [
+          964.0,
+          572.0,
+          148.0,
+          60.0
+        ],
+        "visible": true
+      },
+      "village": {
+        "center": [
+          888.0,
+          676.0
+        ],
+        "enabled": true,
+        "instance_id": "282410884953",
+        "rect": [
+          767.0,
+          652.0,
+          242.0,
+          48.0
+        ],
+        "visible": true
+      }
+    },
+    "decimus_met": false,
+    "feedback": "",
+    "graphics_runtime": {
+      "ui_profile": "balanced",
+      "world_profile": "balanced"
+    },
+    "meshy_runtime": {
+      "loaded_count": 1,
+      "severus": {
+        "asset_id": "unit_roman_signifer",
+        "bone_count": 15,
+        "clip": "idle",
+        "equipment": [
+          {
+            "asset_id": "gear_roman_signum",
+            "bone": "Hand_R",
+            "bound": true,
+            "mesh_count": 1,
+            "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+          }
+        ],
+        "has_march": true,
+        "has_run": true,
+        "loaded": true,
+        "mesh_count": 2,
+        "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+      },
+      "version": 1
+    },
+    "people": 14,
+    "player_is_ruler": false,
+    "saved_behavior_runtime": {
+      "accumulator": 0.0,
+      "activity_counts": {
+        "patrol": 5,
+        "socialize": 7,
+        "work": 30
+      },
+      "behavior_version": 1,
+      "decision_due_count": 0,
+      "envelope_sha256": "cac9d078c9cde0785293b2b07998c790769cebd1f714ae066476f4f6daccd7e1",
+      "observed_count": 42,
+      "payload_sha256": "f929508029574a4d5fb37553c413f00bc543ab8b46280b625a9029d34abb46ae",
+      "people_count": 42,
+      "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+      "samples": {
+        "aelia": {
+          "activity": "work",
+          "fatigue": 18.15,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0.0,
+          "memories": [],
+          "next_decision": 3.0,
+          "observed": true,
+          "partner": "",
+          "position": [
+            20.0,
+            0.0,
+            17.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 37.1125,
+          "stress": 0.0
+        },
+        "julia": {
+          "activity": "work",
+          "fatigue": 13.15,
+          "interest": "family",
+          "last_greet": -1000.0,
+          "last_trust": 4.0,
+          "memories": [],
+          "next_decision": 4.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -15.3000001907349,
+            0.0,
+            14.8000001907349
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 27.1125,
+          "stress": 0.0
+        },
+        "marcus": {
+          "activity": "work",
+          "fatigue": 10.15,
+          "interest": "learning",
+          "last_greet": -1000.0,
+          "last_trust": 0.0,
+          "memories": [],
+          "next_decision": 3.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -3.0,
+            0.899999976158142,
+            4.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 51.1125,
+          "stress": 0.0
+        },
+        "sextus": {
+          "activity": "work",
+          "fatigue": 8.15,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0.0,
+          "memories": [],
+          "next_decision": 4.5,
+          "observed": true,
+          "partner": "",
+          "position": [
+            32.7999992370605,
+            0.0,
+            -25.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 38.1125,
+          "stress": 0.0
+        }
+      },
+      "seconds": 1.5,
+      "state_sha256": "bf0e972ee3c04068896f8c77d032c8ab61bc135ee1c820d0c5cca12600d86e2a",
+      "version": 1,
+      "world_id": "1798433-3104668528"
+    },
+    "screen": "playing",
+    "work_permit": false,
+    "workplaces": 5,
+    "world_seconds": 3.0
+  },
+  "saved": {
+    "action_mode": "unarmed",
+    "action_runtime": {
+      "action_touches": 0,
+      "body_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "camera_touches": 0,
+      "camera_yaw": 0.62,
+      "figure_clip": "idle",
+      "figure_speed": 0.0,
+      "mode": "person",
+      "move_axis": [
+        0.0,
+        0.0
+      ],
+      "movement_touch": -1,
+      "overlay": "none",
+      "position": [
+        -12.0,
+        1.29257822036743,
+        11.6999998092651
+      ],
+      "running": false,
+      "selected_technique": "jab_left",
+      "touch_camera_managed": true,
+      "ui_view": "pause",
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "version": 1,
+      "world_active": false,
+      "world_camera_touches": 0
+    },
+    "actors": 15,
+    "aelia_assignment": "idle",
+    "behavior_runtime": {
+      "accumulator": 0.0,
+      "activity_counts": {
+        "patrol": 5,
+        "socialize": 7,
+        "work": 30
+      },
+      "behavior_version": 1,
+      "decision_due_count": 0,
+      "observed_count": 42,
+      "people_count": 42,
+      "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+      "samples": {
+        "aelia": {
+          "activity": "work",
+          "fatigue": 18.15,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0,
+          "memories": [],
+          "next_decision": 3.0,
+          "observed": true,
+          "partner": "",
+          "position": [
+            20.0,
+            0.0,
+            17.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 37.1125,
+          "stress": 0.0
+        },
+        "julia": {
+          "activity": "work",
+          "fatigue": 13.15,
+          "interest": "family",
+          "last_greet": -1000.0,
+          "last_trust": 4,
+          "memories": [],
+          "next_decision": 4.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -15.3000001907349,
+            0.0,
+            14.8000001907349
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 27.1125,
+          "stress": 0.0
+        },
+        "marcus": {
+          "activity": "work",
+          "fatigue": 10.15,
+          "interest": "learning",
+          "last_greet": -1000.0,
+          "last_trust": 0,
+          "memories": [],
+          "next_decision": 3.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -3.0,
+            0.899999976158142,
+            4.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 51.1125,
+          "stress": 0.0
+        },
+        "sextus": {
+          "activity": "work",
+          "fatigue": 8.15,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0,
+          "memories": [],
+          "next_decision": 4.5,
+          "observed": true,
+          "partner": "",
+          "position": [
+            32.7999992370605,
+            0.0,
+            -25.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 38.1125,
+          "stress": 0.0
+        }
+      },
+      "seconds": 1.5,
+      "state_sha256": "bf0e972ee3c04068896f8c77d032c8ab61bc135ee1c820d0c5cca12600d86e2a",
+      "version": 1,
+      "world_id": "1798433-3104668528"
+    },
+    "childhood_runtime": {
+      "age": 12,
+      "carried": [],
+      "completed": [],
+      "day": 1,
+      "dialog_npc": "",
+      "family_entrance": [
+        -13.0,
+        14.6999998092651
+      ],
+      "family_water": [
+        -12.0,
+        11.6999998092651
+      ],
+      "stage": "mother_morning",
+      "target_npc": "julia",
+      "target_point": "",
+      "target_position": [
+        -15.3000001907349,
+        14.8000001907349
+      ],
+      "target_radius": 3.2,
+      "version": 1,
+      "world_id": "1798433-3104668528"
+    },
+    "controls": {
+      "resume": {
+        "center": [
+          75.0,
+          22.0
+        ],
+        "enabled": true,
+        "instance_id": "277025398018",
+        "rect": [
+          0.0,
+          0.0,
+          150.0,
+          44.0
+        ],
+        "visible": false
+      },
+      "settings": {
+        "center": [
+          73.5,
+          22.0
+        ],
+        "enabled": true,
+        "instance_id": "277562267832",
+        "rect": [
+          0.0,
+          0.0,
+          147.0,
+          44.0
+        ],
+        "visible": false
+      }
+    },
+    "decimus_met": false,
+    "feedback": "",
+    "graphics_runtime": {
+      "ui_profile": "balanced",
+      "world_profile": "balanced"
+    },
+    "meshy_runtime": {
+      "loaded_count": 1,
+      "severus": {
+        "asset_id": "unit_roman_signifer",
+        "bone_count": 15,
+        "clip": "idle",
+        "equipment": [
+          {
+            "asset_id": "gear_roman_signum",
+            "bone": "Hand_R",
+            "bound": true,
+            "mesh_count": 1,
+            "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+          }
+        ],
+        "has_march": true,
+        "has_run": true,
+        "loaded": true,
+        "mesh_count": 2,
+        "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+      },
+      "version": 1
+    },
+    "people": 14,
+    "player_is_ruler": false,
+    "saved_behavior_runtime": {
+      "accumulator": 0.0,
+      "activity_counts": {
+        "patrol": 5,
+        "socialize": 7,
+        "work": 30
+      },
+      "behavior_version": 1,
+      "decision_due_count": 0,
+      "envelope_sha256": "cac9d078c9cde0785293b2b07998c790769cebd1f714ae066476f4f6daccd7e1",
+      "observed_count": 42,
+      "payload_sha256": "f929508029574a4d5fb37553c413f00bc543ab8b46280b625a9029d34abb46ae",
+      "people_count": 42,
+      "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+      "samples": {
+        "aelia": {
+          "activity": "work",
+          "fatigue": 18.15,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0.0,
+          "memories": [],
+          "next_decision": 3.0,
+          "observed": true,
+          "partner": "",
+          "position": [
+            20.0,
+            0.0,
+            17.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 37.1125,
+          "stress": 0.0
+        },
+        "julia": {
+          "activity": "work",
+          "fatigue": 13.15,
+          "interest": "family",
+          "last_greet": -1000.0,
+          "last_trust": 4.0,
+          "memories": [],
+          "next_decision": 4.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -15.3000001907349,
+            0.0,
+            14.8000001907349
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 27.1125,
+          "stress": 0.0
+        },
+        "marcus": {
+          "activity": "work",
+          "fatigue": 10.15,
+          "interest": "learning",
+          "last_greet": -1000.0,
+          "last_trust": 0.0,
+          "memories": [],
+          "next_decision": 3.75,
+          "observed": true,
+          "partner": "",
+          "position": [
+            -3.0,
+            0.899999976158142,
+            4.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 51.1125,
+          "stress": 0.0
+        },
+        "sextus": {
+          "activity": "work",
+          "fatigue": 8.15,
+          "interest": "craft",
+          "last_greet": -1000.0,
+          "last_trust": 0.0,
+          "memories": [],
+          "next_decision": 4.5,
+          "observed": true,
+          "partner": "",
+          "position": [
+            32.7999992370605,
+            0.0,
+            -25.0
+          ],
+          "reason": "daily_work",
+          "route_direction": 1.0,
+          "route_distance": 0.0,
+          "since": 0.0,
+          "social_need": 38.1125,
+          "stress": 0.0
+        }
+      },
+      "seconds": 1.5,
+      "state_sha256": "bf0e972ee3c04068896f8c77d032c8ab61bc135ee1c820d0c5cca12600d86e2a",
+      "version": 1,
+      "world_id": "1798433-3104668528"
+    },
+    "screen": "paused",
+    "scroll": {
+      "bottom": [
+        372.279998779297,
+        0.0
+      ],
+      "offset": 0,
+      "top": [
+        372.279998779297,
+        0.0
+      ]
+    },
+    "work_permit": false,
+    "workplaces": 5,
+    "world_seconds": 1.5
+  }
+}

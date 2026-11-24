@@ -167,6 +167,7 @@ func sync_state(state: Dictionary) -> void:
 		for body: StaticBody3D in legacy_boundary.get_children():
 			body.collision_layer = 0 if state.get("village", {}).get("enabled", false) else 1
 	var legacy_recruits := 0 if state.get("village", {}).get("enabled", false) else int(state.get("squad", {}).get("recruits", 0))
+	population.sync_behavior(state)
 	population.show_origin(str(state.get("origin_id","italia")),float(state.get("world_seconds",0)),legacy_recruits)
 	if regional.frontier_details:
 		regional.frontier_details.set_wagon_progress(float(state.get("frontier",{}).get("work_seconds",0))/12.0)
@@ -187,7 +188,7 @@ func sync_state(state: Dictionary) -> void:
 		construction += 1.0 + float(hut.get("progress",0.0))
 	if health_now == 0 or (_shown_health >= 0 and health_now < _shown_health):
 		_figure.cue("death" if health_now == 0 else "hit")
-	elif _shown_work >= 0 and construction > _shown_work:
+	elif _shown_work >= 0 and construction > _shown_work and _can_show_player_work():
 		_figure.keep_working()
 	_shown_health = health_now
 	_shown_work = construction
@@ -932,6 +933,16 @@ func _add_finished_hut_collision(building: Node3D) -> void:
 	Art.box_collider(collision, Vector3(1.35, 2.25, 0.22), Vector3(1.25, 1.18, 1.8))
 
 
+func npc_observations() -> Dictionary:
+	var observations: Dictionary = population.behavior_observations()
+	if is_instance_valid(village_life_world):
+		observations.merge(village_life_world.behavior_observations(), true)
+	if is_instance_valid(_companion) and _companion.visible and str(_state.get("origin_id", "italia")) == "italia":
+		var at: Vector3 = _companion.global_position
+		observations["marcus"] = {"position": [at.x, at.y, at.z], "route_distance": 0.0}
+	return observations
+
+
 func _sync_companion() -> void:
 	var companion: Dictionary = _state.get("companion", {})
 	if not bool(companion.get("met", false)):
@@ -1053,10 +1064,10 @@ func _physics_process(delta: float) -> void:
 	elif _mode == "city" and not _build_mode:
 		_pan_city_camera(delta)
 	_animate_figure()
-	if Childhood.enabled(_state) and not str(_state.village.childhood.active_work).is_empty():
+	if _can_show_player_work() and _at_active_work_station():
 		_figure.keep_working()
 	var frontier: Dictionary = _state.get("frontier",{})
-	var wagon_work: bool = int(frontier.get("step",0)) == 2 and frontier.get("preparation","") == "work" and float(frontier.get("work_seconds",0)) < 12.0 and _horizontal_distance(_player.position,Vector3(3,0,24)) <= 3.0
+	var wagon_work: bool = _can_show_player_work() and int(frontier.get("step",0)) == 2 and frontier.get("preparation","") == "work" and float(frontier.get("work_seconds",0)) < 12.0 and _horizontal_distance(_player.position,Vector3(3,0,24)) <= 3.0
 	if wagon_work:
 		_figure.keep_working()
 	population.set_wagon_work(wagon_work)
@@ -1066,14 +1077,42 @@ func _physics_process(delta: float) -> void:
 	_update_context_hint()
 
 
+func _movement_axis() -> Vector2:
+	var axis := _touch_move
+	var focus: Control = get_viewport().gui_get_focus_owner()
+	if not (focus is LineEdit or focus is TextEdit):
+		axis.x += float(Input.is_physical_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT))
+		axis.y += float(Input.is_physical_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP))
+	return axis.limit_length(1.0)
+
+
+func _can_show_player_work() -> bool:
+	return _active and _mode == "person" and _figure.speed < 0.10 and _movement_axis().length_squared() <= 0.0001 and not CombatActions.busy(_actions.state)
+
+
+func _at_active_work_station() -> bool:
+	if not Childhood.enabled(_state):
+		return false
+	var child: Dictionary = _state.village.childhood
+	var index := int(child.completed.size())
+	if str(child.active_work).is_empty() or index >= Childhood.STEPS.size():
+		return false
+	var step: Dictionary = Childhood.STEPS[index]
+	if step.get("id", "") != child.active_work or not step.has("seconds") or not step.has("point"):
+		return false
+	if float(child.work_seconds) >= float(step.seconds) or bool(_state.village.raid.active) or bool(_state.encounter.active):
+		return false
+	if str(step.id).begins_with("forge_") and not VillageLife.is_available(_state, "sextus"):
+		return false
+	var station: Vector2 = Childhood.POINTS[step.point]
+	return Vector2(_player.position.x, _player.position.z).distance_to(station) <= Childhood.POINT_RANGE
+
+
 func _move_player(delta: float) -> void:
-	var direction := Vector3(_touch_move.x, 0, _touch_move.y)
+	var axis := _movement_axis()
+	var direction := Vector3(axis.x, 0, axis.y).rotated(Vector3.UP, _camera_yaw)
 	var focus: Control = get_viewport().gui_get_focus_owner()
 	var editing_text := focus is LineEdit or focus is TextEdit
-	if not editing_text:
-		direction.x += float(Input.is_physical_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT))
-		direction.z += float(Input.is_physical_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP))
-	direction = direction.limit_length(1.0).rotated(Vector3.UP, _camera_yaw)
 	var running := _running or (not editing_text and Input.is_physical_key_pressed(KEY_SHIFT))
 	var top_speed := (CHILD_RUN_SPEED if int(_state.get("player", {}).get("age", 12)) < 18 else PLAYER_SPEED) if running else WALK_SPEED
 	var in_action := CombatActions.busy(_actions.state)

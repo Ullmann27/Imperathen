@@ -102,8 +102,19 @@ func run() -> void:
 	state.player.age = 18
 	state.squad.alive = 1
 	state.encounter.enemies = [{"id":"rover","x":6.0,"z":7.0,"health":60}]
+	# Construction hints apply to an idle, active person. This visual fixture
+	# previously left the world inactive and the preceding training cue alive.
+	hero.reset_motion()
+	world.set_active(false)
 	world.sync_state(state)
-	check(hero.clip == "work","new paid building starts work clip")
+	check(hero.clip == "idle","new construction cannot start player work in an inactive world")
+	var without_construction := state.duplicate(true)
+	without_construction.buildings = []
+	world.sync_state(without_construction)
+	world.set_mode("person")
+	world.set_active(true)
+	world.sync_state(state)
+	check(hero.clip == "work","new construction starts work for an active stationary person")
 	hero._process(.1)
 	var time_before := hero.phase
 	state.buildings[0].progress = .12

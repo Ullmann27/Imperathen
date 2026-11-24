@@ -1,0 +1,75 @@
+{
+  "review_date": "2026-11-24",
+  "scope": "Actual Godot viewport review of the frozen body derivatives; equipment placement has its own review.",
+  "reviewed_actions": [
+    "idle at .13",
+    "march at .13",
+    "run at .13",
+    "attack at .55",
+    "LOD2 march at .65"
+  ],
+  "observations": [
+    "The previous finger-to-tunic strips are absent in the reviewed attack captures.",
+    "The previous large cape panel pulled by the axe fighter forearm is absent in the reviewed attack capture.",
+    "The previous open LOD seams are absent in the reviewed LOD2 march captures.",
+    "Both bodies retain their source textures, grounded proportions and visible joint-driven locomotion."
+  ],
+  "limits": [
+    "Review covers the listed representative views, not every frame or camera angle.",
+    "Fifteen-joint fitted project rigs; no articulated fingers, facial morphs or cloth simulation.",
+    "Desktop Mesa llvmpipe rendering; no Android device or GPU performance claim.",
+    "Body review images may precede the final equipment grip offsets; use the equipment evidence for prop placement."
+  ],
+  "body_artifact_sha256": {
+    "prototype/assets/meshy/characters/unit_roman_signifer_0.glb": "869803d0a79236273835a475439dc2fea27b4172a5f7d6821448910dfb4ee826",
+    "prototype/assets/meshy/characters/unit_roman_signifer_1.glb": "6af2f8fa19fc8108179bdcb39f3ccc590bf10383d2fd3433071ba8f5da33d5d6",
+    "prototype/assets/meshy/characters/unit_roman_signifer_2.glb": "a7e02a3d33e93b2ee78637e3bd912bda42f006885bbfaaf56daa37e864cf3c2b",
+    "prototype/assets/meshy/characters/unit_roman_signifer_3.glb": "7845cb8c7ab29876c137c89fcab5af361c257fa47c4cb9e1cdb9275fe4514c0f",
+    "prototype/assets/meshy/characters/unit_germanic_axe_fighter_0.glb": "7efd37f08c5877104e922340b530d9ff0c5822dca6e51435790a9f6815c8153a",
+    "prototype/assets/meshy/characters/unit_germanic_axe_fighter_1.glb": "9962d6d8729ed90068e80b8a567623756231880f0167b510147e60b7c9d05fc9",
+    "prototype/assets/meshy/characters/unit_germanic_axe_fighter_2.glb": "5de94b621ccf809bca9e9d4e2fb1bb43ca6bd36e7469c48fc73038e685e44cae",
+    "prototype/assets/meshy/characters/unit_germanic_axe_fighter_3.glb": "3112638eba2d9822f0a5cf33c35612b1f8698e2d7a53a8aea28b6453e4c741a7"
+  },
+  "captures": [
+    {
+      "file": "unit_roman_signifer-idle.png",
+      "sha256": "169a0c888de80373939dc4a2c4260edcdc3f697245b82b43efaf80e716ed4f35"
+    },
+    {
+      "file": "unit_roman_signifer-march.png",
+      "sha256": "b414101ce4627cda2e6f38255c4fc35a4f6806d638a9c2cbc6fafcb357169e58"
+    },
+    {
+      "file": "unit_roman_signifer-run.png",
+      "sha256": "ed573a9433e9624a03b6bee4f03c55432507a8253a92ab3ee02ac8dc4b237994"
+    },
+    {
+      "file": "unit_roman_signifer-attack.png",
+      "sha256": "456e77759b2469a4fa19452c7fa3ea1cd2828b20e9af6f927159e035421381fd"
+    },
+    {
+      "file": "unit_roman_signifer-lod2-march.png",
+      "sha256": "8b6d8f582d3dfade0ed1d482ef953438879e21e0af76ac0006af4a0060ecd08e"
+    },
+    {
+      "file": "unit_germanic_axe_fighter-idle.png",
+      "sha256": "6a79da7167404c4e9079bd506ced1fbbac21455f83cebccb627dda05caa9a548"
+    },
+    {
+      "file": "unit_germanic_axe_fighter-march.png",
+      "sha256": "faf446b5d0012daf70647e43858c9a3aa8e22ab554f0b870ff178a81bfbd2af9"
+    },
+    {
+      "file": "unit_germanic_axe_fighter-run.png",
+      "sha256": "d39d55f3a279cb17e6c979d0b8466c8ff8e3282fb102158ad66ae5e8783e06d9"
+    },
+    {
+      "file": "unit_germanic_axe_fighter-attack.png",
+      "sha256": "2dc5357ae138bfe702ed628f4ad9f286d7e96e5cde9b20776e5a4207ca5b2880"
+    },
+    {
+      "file": "unit_germanic_axe_fighter-lod2-march.png",
+      "sha256": "27b1af3f05763a370e1c0ba7d6a18cb16166553997a920ad566989cb49a99aef"
+    }
+  ]
+}
