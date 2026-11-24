@@ -40,6 +40,96 @@ def source_hashes(project: Path) -> dict[str, str]:
             and path.suffix in SOURCE_SUFFIXES}
 
 
+def changed_sources(before: dict[str, str], after: dict[str, str]) -> list[str]:
+    return sorted(name for name in before.keys() | after.keys()
+                  if before.get(name) != after.get(name))
+
+
+def embedded_glb_images(path: Path, relative: str, source_sha256: str) -> list[dict]:
+    """Belege für unverändert extrahierbare PNG/JPEG-Bytes einer GLB v2.
+
+    Godots Extract-Textures-Modus speichert eingebettete Bildbytes unverändert:
+    https://docs.godotengine.org/en/stable/classes/class_gltfstate.html
+    Andere Formate, externe Bilder oder umbenannte Derivate werden nicht erlaubt.
+    """
+    images = []
+    with path.open("rb") as stream:
+        header = stream.read(12)
+        if len(header) != 12:
+            raise ValueError("Unvollständiger GLB-Header")
+        magic, version, total = struct.unpack("<4sII", header)
+        if magic != b"glTF" or version != 2 or total != path.stat().st_size:
+            raise ValueError("Ungültiger GLB-v2-Header")
+        document = None
+        binary_start, binary_length = 0, 0
+        while stream.tell() < total:
+            chunk_header = stream.read(8)
+            if len(chunk_header) != 8:
+                raise ValueError("Unvollständiger GLB-Chunk")
+            size, kind = struct.unpack("<I4s", chunk_header)
+            end = stream.tell() + size
+            if size % 4 or end > total:
+                raise ValueError("Ungültige GLB-Chunk-Grenzen")
+            if kind == b"JSON":
+                if document is not None:
+                    raise ValueError("Mehrere GLB-JSON-Chunks")
+                document = json.loads(stream.read(size))
+            elif kind == b"BIN\x00":
+                if binary_start:
+                    raise ValueError("Mehrere GLB-BIN-Chunks")
+                binary_start, binary_length = stream.tell(), size
+            stream.seek(end)
+        if not isinstance(document, dict) or not binary_start:
+            raise ValueError("GLB-JSON oder eingebetteter Binärpuffer fehlt")
+        views = document.get("bufferViews", [])
+        for index, item in enumerate(document.get("images", [])):
+            name = item.get("name", "")
+            suffix = {"image/png": ".png", "image/jpeg": ".jpg"}.get(item.get("mimeType"))
+            view_index = item.get("bufferView")
+            if (not suffix or not isinstance(name, str) or not name or "/" in name or "\\" in name
+                    or type(view_index) is not int or not 0 <= view_index < len(views)):
+                continue
+            view = views[view_index]
+            offset, length = view.get("byteOffset", 0), view.get("byteLength", 0)
+            if (view.get("buffer", 0) != 0 or type(offset) is not int or type(length) is not int
+                    or offset < 0 or length <= 0 or offset + length > binary_length):
+                continue
+            stream.seek(binary_start + offset)
+            raw = stream.read(length)
+            target = Path(relative).with_name(path.stem + "_" + name + suffix)
+            images.append({"path": str(target), "sha256": hashlib.sha256(raw).hexdigest(),
+                           "source_glb": relative, "source_glb_sha256": source_sha256,
+                           "image_index": index, "image_name": name, "mime_type": item["mimeType"],
+                           "buffer_view": view_index, "buffer_offset": offset, "byte_length": length})
+    return images
+
+
+def check_import_sources(project: Path, before: dict[str, str], after: dict[str, str]) -> dict:
+    """Nur nachweisbare neue GLB-Extrakte zulassen; vorhandene Quellen einfrieren."""
+    existing_changes = sorted(name for name, value in before.items() if after.get(name) != value)
+    added = set(after) - set(before)
+    verified = {}
+    provenance_errors = []
+    for relative, source_sha256 in sorted(before.items()):
+        source = Path(relative)
+        candidates = {name for name in added if Path(name).parent == source.parent
+                      and Path(name).name.startswith(source.stem + "_")
+                      and Path(name).suffix in {".png", ".jpg"}}
+        if source.suffix != ".glb" or after.get(relative) != source_sha256 or not candidates:
+            continue
+        try:
+            for item in embedded_glb_images(project / source, relative, source_sha256):
+                if item["path"] in candidates and after[item["path"]] == item["sha256"]:
+                    verified[item["path"]] = item
+        except (OSError, ValueError, KeyError, TypeError, AttributeError) as error:
+            provenance_errors.append(f"{relative}: {error}")
+    unexpected = sorted(added - verified.keys())
+    return {"passed": not existing_changes and not unexpected and not provenance_errors,
+            "existing_source_changes": existing_changes, "unexpected_added_paths": unexpected,
+            "generated_import_textures": [verified[name] for name in sorted(verified)],
+            "provenance_errors": provenance_errors}
+
+
 def git_text(root: Path, *arguments: str) -> str:
     result = subprocess.run(["git", "-C", str(root), *arguments], text=True,
                             encoding="utf-8", capture_output=True, check=True)
@@ -102,7 +192,7 @@ def capture(args: argparse.Namespace) -> int:
         raise SystemExit(f"Godot 4.7.2 erforderlich, gefunden: {version}")
     output.mkdir(parents=True, exist_ok=True)
     before = source_hashes(project)
-    manifest = {"schema_version": 1, "label": args.label, "engine": version,
+    manifest = {"schema_version": 2, "label": args.label, "engine": version,
                 "source_commit": git_text(project, "rev-parse", "HEAD"),
                 "worktree_status": git_text(project, "status", "--porcelain=v1", "--", str(project)).splitlines(),
                 "source_sha256": before, "review_script_sha256": digest(script),
@@ -119,9 +209,24 @@ def capture(args: argparse.Namespace) -> int:
             environment[f"XDG_{kind}_HOME"] = str(directory)
         code, log = run_logged([engine, "--headless", "--path", str(project), "--import"],
                                environment, output / "import.log", 300, project.parent)
+        prepared = source_hashes(project)
+        import_check = check_import_sources(project, before, prepared)
+        prepared_commit = git_text(project, "rev-parse", "HEAD")
+        import_errors = []
         if code or FAILURE.search(log):
-            manifest["errors"] = ["Godot-Import fehlgeschlagen; siehe import.log"]
-            write_json(output / "capture-manifest.json", manifest)
+            import_errors.append("Godot-Import fehlgeschlagen; siehe import.log")
+        if not import_check["passed"]:
+            import_errors.append("Import änderte Quellen oder erzeugte nicht belegbare Zusatzdateien")
+        if prepared_commit != manifest["source_commit"]:
+            import_errors.append("Git-HEAD änderte sich während der Importvorbereitung")
+        manifest.update({"import_source_check": import_check, "prepared_source_sha256": prepared,
+                         "source_commit_after_import": prepared_commit, "errors": import_errors})
+        if import_errors:
+            manifest.update({"source_changed_paths": sorted(import_check["existing_source_changes"]
+                                                              + import_check["unexpected_added_paths"]),
+                             "source_unchanged_during_run": False, "engine_exit_code": code})
+        write_json(output / "capture-manifest.json", manifest)
+        if import_errors:
             return 1
         command = [engine, "--audio-driver", "Dummy", "--path", str(project),
                    "--resolution", "1280x720", "--fixed-fps", "60"]
@@ -146,7 +251,8 @@ def capture(args: argparse.Namespace) -> int:
     if not args.check_only:
         errors.extend(validate_images(output, report))
     after = source_hashes(project)
-    changed = sorted(name for name in before.keys() | after.keys() if before.get(name) != after.get(name))
+    # Ab hier gilt auch für alle belegten Importderivate wieder der strikte Guard.
+    changed = changed_sources(prepared, after)
     commit_after = git_text(project, "rev-parse", "HEAD")
     if changed:
         errors.append("Projektquellen änderten sich während der Erfassung")
