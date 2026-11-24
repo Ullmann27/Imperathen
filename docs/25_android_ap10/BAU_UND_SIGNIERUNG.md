@@ -3,6 +3,12 @@
 Stand: 24.11.2026. Entwicklungsbranch: `feature/ap1-ap2-companions-20261124`.
 Die Implementierung von AP-1/AP-2 liegt in [PR #53](https://github.com/Ullmann27/Imperathen/pull/53).
 
+**Auslieferungsstand:** Build 8 aus `b2c5970e` ist gebaut, mit dem Build-7-
+Bestandsschlüssel signiert und bereitgestellt. Der erfolgreiche CI-Lauf #85,
+die endgültige Prüfsumme und die verbleibenden Grenzen stehen im
+[Lieferbericht](DELIVERY.md). Die nachfolgenden Abschnitte dokumentieren den
+ursprünglichen Prüfplan und die tatsächlich gelösten Bauprobleme.
+
 ## Auftrag und Abnahme
 
 Dieser Schritt baut die vorhandene Implementierung für Android und prüft die
@@ -22,8 +28,9 @@ Grafik, Missions-IDs oder dem Spielstandschema v5.
 | Fold7 | Separater [Prüfplan](FOLD7_PRUEFPLAN.md); bisher kein ausgeführter Gerätetest |
 
 Die Bezeichnung AP-10 bedeutet nicht, dass der gesamte Abnahmeumfang bereits
-erfüllt ist. Der vorhandene Emulatorlauf durchspielt I-00 und die ersten zwei
-Kindheitsaktionen. Er durchspielt weder I-02 bis I-14 noch die neuen Begleitwege.
+erfüllt ist. Der vorhandene Emulatorlauf öffnet I-00, prüft Weiterschalten und
+Überspringen und erledigt die ersten zwei Kindheitsaktionen. Er durchspielt
+weder den vollständigen Vorspann noch I-02 bis I-14 oder die neuen Begleitwege.
 Diese Grenzen müssen im Lieferbericht sichtbar bleiben. Die automatisierten
 Godot-Integrationstests prüfen diese Logik zusätzlich außerhalb von Android.
 
@@ -38,8 +45,9 @@ wird daraus nicht behauptet.
 
 Belege: [Python-Ergebnis](evidence/local-python-summary.json) und
 [Godot-Ergebnis einschließlich des ersten Abbruchs](evidence/local-engine-summary.json).
-Der nachfolgende GitHub-Lauf muss diese Prüfungen erneut auf dem konkreten
-Buildcommit bestehen.
+Der anschließende GitHub-Lauf
+[#85](https://github.com/Ullmann27/Imperathen/actions/runs/45446452854) hat diese
+Prüfungen auf dem APK-Quellcommit `b2c5970e` erneut bestanden.
 
 ## Betroffene Dateien
 

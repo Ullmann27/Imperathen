@@ -1,13 +1,17 @@
 # AP-10 · Prüfplan auf dem Fold7
 
-Stand: 24.11.2026. Grundlage dieses Plans ist der Implementierungsstand
-`7a21dca` auf `feature/ap1-ap2-companions-20261124`.
+Stand: 24.11.2026. Spielgrundlage ist der AP-1/AP-2-Stand `7a21dca`.
+Der Android-Prüfbau **8 / 0.8.0-companions** stammt aus Commit
+`b2c5970e7c8ce032c1941464e7659ac6d515c854` auf
+`feature/ap1-ap2-companions-20261124`.
 
-**Status: geplanter Gerätetest.** Dieses Dokument bestätigt weder eine fertig
-bereitgestellte APK noch einen bestandenen Android-Test. Die Kennung des
-später tatsächlich installierten Prüfbaus wird unten eingetragen. Bildrate,
-Frametimes, Akkuverbrauch und Wärme auf dem Fold7 sind noch offen. Hierzu liegen
-mir keine gesicherten Daten vor.
+**Status: geplanter Fold7-Gerätetest.** Die unten bezeichnete APK ist statisch
+geprüft und wurde mit demselben verifizierten Signierzertifikat wie die
+veröffentlichte Build-7-APK signiert.
+Die automatisierten Laufzeitnachweise und ihre Grenzen stehen im
+[Lieferbericht](DELIVERY.md). Dieser Prüfplan behauptet keinen bereits
+bestandenen Test auf dem Fold7. Bildrate, Frametimes, Akkuverbrauch und Wärme
+auf diesem Gerät sind noch offen. Hierzu liegen mir keine gesicherten Daten vor.
 
 Arbeite die Abschnitte nacheinander ab. Nach einem Abschnitt kannst du über das
 Pausenmenü speichern und später fortsetzen. Zu jeder Prüfung reicht zunächst
@@ -18,9 +22,9 @@ Abschnitt 9, damit wir ihn gezielt nachstellen können.
 
 | Angabe | Eintrag vor dem Test |
 |---|---|
-| APK-Dateiname | Noch einzutragen, sobald der Prüfbau geliefert ist |
-| Versionsname und Versionscode | Aus dem zugehörigen Buildbericht übernehmen |
-| Commit des installierten Prüfbaus | Aus dem Buildbericht übernehmen; nicht aus diesem Plan ableiten |
+| APK-Dateiname | `IMPERATHEN-b2c5970e-arm64.apk` |
+| Versionsname und Versionscode | `0.8.0-companions` / **8** |
+| Commit des vorgesehenen Prüfbaus | `b2c5970e7c8ce032c1941464e7659ac6d515c854`; bei Verwendung einer anderen APK neu abgleichen |
 | Gerät und genaue Modellnummer | Fold7; genaue Modellnummer ergänzen |
 | Android-Version / One-UI-Version | Noch einzutragen |
 | Datum und Uhrzeit | Noch einzutragen |
@@ -32,6 +36,17 @@ Abschnitt 9, damit wir ihn gezielt nachstellen können.
 
 Wenn die Android-App-Info nur den Versionsnamen anzeigt, den Versionscode aus
 dem Buildbericht übernehmen und keinen Wert schätzen.
+
+Die vorgesehene Datei hat **186.142.729 Bytes** und diese SHA256:
+
+```text
+03f76c9e9a16c50f372ce63d56eb32770382256b809fcd9bd2e0a047b241972e
+```
+
+Vorhandene App-Daten für diesen Test behalten. Ein Update ist auf das Signierzertifikat
+der veröffentlichten Build-7-APK abgestimmt; die tatsächlich bisher installierte
+APK wurde hier nicht ausgelesen. Meldet Android einen Signatur- oder Paketkonflikt,
+die vorhandene App samt Daten beibehalten und den genauen Fehlertext melden.
 
 **Spielstand beachten:** „Neues Leben“ ersetzt den aktiven Spielstand. Die
 Bestätigung im Spiel weist ausdrücklich darauf hin; die automatische Sicherung
