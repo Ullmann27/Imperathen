@@ -1,0 +1,11 @@
+{
+  "python_tests": 224,
+  "python_passed": true,
+  "python_duration_seconds": 0.295,
+  "godot_engine": "4.7.2.stable.official.ed1daf0bf",
+  "godot_groups": 64,
+  "godot_passed": true,
+  "godot_warnings": 0,
+  "godot_report_sha256": "7ce5e436bc2ffce56788c8dd422e58d3dc711ef2f6651da2eb3e4c1f183781af",
+  "scope": "Complete local repeat of both required gates after the SDK pin correction; game sources unchanged."
+}

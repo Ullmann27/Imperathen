@@ -82,6 +82,25 @@ Die Übereinstimmung gilt für diese konkrete veröffentlichte Build-7-Datei.
 Welche APK tatsächlich auf dem privaten Fold7 installiert ist, wurde hier nicht
 ausgelesen. Eine andere frühere APK kann ein anderes Zertifikat besitzen.
 
+## Erste CI-Prüfung und Werkzeugkorrektur
+
+Der erste Build-8-Lauf [#84](https://github.com/Ullmann27/Imperathen/actions/runs/45444339144)
+bestand die 224 Python-Tests, den vollständigen Engine-Schritt und den
+ARM64-Export mit **30 von 30 internen APK-Prüfungen**. Die nachfolgende zweite
+Paketprüfung wählte jedoch automatisch Build-Tools 37.0.0. Deren neues
+Zertifikatslabel wurde vom auf die vorhandene Werkzeugkette ausgerichteten
+Parser nicht erkannt. Die kryptografische Prüfung bestand auch dort; der
+zusätzliche Zertifikatsnachweis blieb zu Recht unvollständig.
+
+Beide eigenständigen Workflow-Prüfungen verwenden deshalb jetzt ausdrücklich
+`aapt`, `apksigner` und `zipalign` aus **Build-Tools 35.0.1**, wie bereits der
+interne Buildvalidator. Keine APK-Prüfung wurde entfernt oder abgeschwächt.
+Der erste Lauf wurde nicht zur Auslieferung freigegeben; Emulator-Export und
+Android-Laufzeitprüfung waren dort übersprungen worden.
+
+Der [Diagnoseauszug](evidence/run84-diagnosis.json) dokumentiert die identischen
+APK-Hashes beider Prüfungen und die tatsächlich beobachteten Ausgabeformate.
+
 ## Nachweiskette für die Auslieferung
 
 1. Den vollständigen GitHub-Lauf und seinen Quellcommit festhalten.

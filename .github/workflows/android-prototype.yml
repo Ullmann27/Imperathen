@@ -86,11 +86,11 @@ jobs:
       - name: Export the installable ARM64 prototype
         run: |
           python3 tools/build_android_prototype.py --godot "$GODOT_BIN" --sdk-root "$ANDROID_HOME" --java-home "$JAVA_HOME_17_X64" --template-dir "$IMPERATHEN_TEMPLATE_DIR" --keystore "$RUNNER_TEMP/imperathen-debug.keystore" --keystore-user imperathen-debug --abi arm64-v8a --output "$GITHUB_WORKSPACE/artifacts/${IMPERATHEN_BUILD}-arm64.apk"
-          python3 tools/validate_android_apk.py --apk artifacts/${IMPERATHEN_BUILD}-arm64.apk --sdk-root "$ANDROID_HOME" --report artifacts/arm64-apk-validation.json
+          python3 tools/validate_android_apk.py --apk artifacts/${IMPERATHEN_BUILD}-arm64.apk --sdk-root "$ANDROID_HOME" --aapt "$ANDROID_HOME/build-tools/35.0.1/aapt" --apksigner "$ANDROID_HOME/build-tools/35.0.1/apksigner" --zipalign "$ANDROID_HOME/build-tools/35.0.1/zipalign" --report artifacts/arm64-apk-validation.json
       - name: Export a separate Android emulator test package
         run: |
           python3 tools/build_android_prototype.py --godot "$GODOT_BIN" --sdk-root "$ANDROID_HOME" --java-home "$JAVA_HOME_17_X64" --template-dir "$IMPERATHEN_TEMPLATE_DIR" --keystore "$RUNNER_TEMP/imperathen-debug.keystore" --keystore-user imperathen-debug --abi x86_64 --output "$GITHUB_WORKSPACE/artifacts/${IMPERATHEN_BUILD}-emulator.apk"
-          python3 tools/validate_android_apk.py --apk artifacts/${IMPERATHEN_BUILD}-emulator.apk --sdk-root "$ANDROID_HOME" --expected-abi x86_64 --report artifacts/emulator-apk-validation.json
+          python3 tools/validate_android_apk.py --apk artifacts/${IMPERATHEN_BUILD}-emulator.apk --sdk-root "$ANDROID_HOME" --aapt "$ANDROID_HOME/build-tools/35.0.1/aapt" --apksigner "$ANDROID_HOME/build-tools/35.0.1/apksigner" --zipalign "$ANDROID_HOME/build-tools/35.0.1/zipalign" --expected-abi x86_64 --report artifacts/emulator-apk-validation.json
           if [[ "$IMPERATHEN_GRAPHICS_QA" == 1 ]]; then
             for target in arm64-v8a x86_64; do
               name=arm64
