@@ -82,6 +82,17 @@ CC0_PROFILE = {
 }
 
 
+STRICT_MOTION_PROFILE = {
+    **CC0_PROFILE,
+    "branch": "feature/motion-quality-gate-20261124",
+    "version_code": "8", "version_name": "0.8.0-motion-quality",
+    "tag_prefix": "motion-quality-2026-11-24-",
+    "title": "IMPERATHEN · geprüfter Bewegungsstandard 0.8.0",
+    "description": "Zwischenfassung mit verpflichtender Motion Quality Gate-Freigabe; Nachweise gelten für genau diesen Quellstand.",
+    "engine_checks": CC0_PROFILE["engine_checks"] | {"motion_measurement"},
+}
+
+
 def feature_groups(profile: dict | None = None) -> tuple:
     groups = (("hero_character_content", HERO_RESOURCES),
               ("living_frontier_content", FRONTIER_RESOURCES),
@@ -94,9 +105,9 @@ def feature_groups(profile: dict | None = None) -> tuple:
                    ("npc_behavior_content", NPC_BEHAVIOR_RESOURCES),
                    ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
                    ("meshy_equipment_content", MESHY_EQUIPMENT_RESOURCES))
-    if profile is not None and profile.get("branch") in {MOTION_PROFILE["branch"], CC0_PROFILE["branch"]}:
+    if profile is not None and profile.get("branch") in {MOTION_PROFILE["branch"], CC0_PROFILE["branch"], STRICT_MOTION_PROFILE["branch"]}:
         groups += (("service_gear_content", SERVICE_GEAR_RESOURCES),)
-    if profile is not None and profile.get("branch") == CC0_PROFILE["branch"]:
+    if profile is not None and profile.get("branch") in {CC0_PROFILE["branch"], STRICT_MOTION_PROFILE["branch"]}:
         groups += (("cc0_motion_content", CC0_MOTION_RESOURCES),)
     return groups
 
@@ -229,6 +240,19 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
             "Village gameplay, opening or people tests were not executed")
     if profile:
         require(profile["engine_checks"] <= names, "The living-village regression groups were not executed")
+    motion = None
+    if profile and profile.get("branch") == STRICT_MOTION_PROFILE["branch"]:
+        gate_path = android / "engine-checks/motion-gate.json"
+        measurement_path = android / "engine-checks/motion-measurements.json"
+        motion = read_json(gate_path)
+        require(motion.get("schema_version") == 1 and motion.get("passed") is True
+                and motion.get("source_commit") == source and motion.get("failures") == []
+                and motion.get("source_fingerprint") == build.get("motion_source_fingerprint")
+                and engine.get("motion_source_fingerprint") == motion.get("source_fingerprint")
+                and motion.get("engine_report_sha256") == digest(android / "engine-checks/validation_report.json")
+                and motion.get("measurement_report_sha256") == digest(measurement_path)
+                and build.get("motion_gate_sha256") == digest(gate_path),
+                "Motion quality evidence missing, failed or does not match the APK")
     candidates = list(runtime.rglob("runtime-report.json"))
     require(len(candidates) == 1, "Expected one emulator report")
     runtime_report = read_json(candidates[0])
@@ -252,8 +276,15 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
     require(emulator_build.get("source_commit") == source and emulator_build.get("apk_sha256") == emulator_hash
             and emulator_build.get("abi") == "x86_64" and emulator_build.get("status") == "verified_debug_apk",
             "Emulator package build proof mismatch")
+    if motion is not None:
+        require(emulator_build.get("motion_gate_sha256") == build.get("motion_gate_sha256")
+                and emulator_build.get("motion_source_fingerprint") == build.get("motion_source_fingerprint"),
+                "Android runtime package lacks matching motion quality evidence")
     public.mkdir()
     shutil.copyfile(apk, public / apk_name)
+    if motion is not None:
+        shutil.copyfile(gate_path, public / f"{prefix}-Motion-Quality-Gate.json")
+        shutil.copyfile(measurement_path, public / f"{prefix}-Motion-Messungen.json")
     build_public = {key: build[key] for key in ("source_commit", "apk", "apk_sha256", "apk_size_bytes", "abi", "package", "status", "godot_version", "requested_renderer")}
     build_public.update(source_run=int(run_id), source_branch=profile["branch"] if profile else BRANCH,
                         source_run_url=f"https://github.com/{REPO}/actions/runs/{run_id}")
@@ -336,7 +367,7 @@ def publish(public: Path, temporary: Path, source: str, run_id: str, proof: dict
 
 def main() -> None:
     source, run_id, number = (os.environ.get(key, "") for key in ("GITHUB_SHA", "GITHUB_RUN_ID", "GITHUB_RUN_NUMBER"))
-    profile = next((p for p in (LIVING_PROFILE, MOTION_PROFILE, CC0_PROFILE)
+    profile = next((p for p in (LIVING_PROFILE, MOTION_PROFILE, CC0_PROFILE, STRICT_MOTION_PROFILE)
                     if os.environ.get("GITHUB_REF") == "refs/heads/" + p["branch"]), None)
     branch = profile["branch"] if profile else BRANCH
     require(os.environ.get("GH_REPO") == REPO and bool(os.environ.get("GH_TOKEN"))

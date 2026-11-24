@@ -22,6 +22,8 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 
+from motion_quality_gate import require_export, digest as gate_digest
+
 
 REPOSITORY = Path(__file__).resolve().parents[1]
 EXPECTED_GODOT = "4.7.2.stable"
@@ -287,6 +289,11 @@ def atomic_copy(source: Path, destination: Path) -> None:
 
 
 def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]) -> Path:
+    if Path(toolchain["project"]).resolve() != (REPOSITORY / "prototype").resolve():
+        raise BuildError("Motion Quality Gate requires the verified repository project; alternate project export refused.")
+    evidence = args.motion_evidence.expanduser().resolve()
+    proof = require_export(REPOSITORY, evidence)
+    proof_hash = gate_digest(evidence / "motion-gate.json")
     output = (args.output or REPOSITORY / "builds/android" / f"IMPERATHEN-{args.abi}-debug.apk").expanduser().resolve()
     if output.suffix.lower() != ".apk":
         raise BuildError("Die Ausgabedatei muss die Endung .apk besitzen.")
@@ -323,6 +330,8 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         if report.get("apk", {}).get("sha256") != checksum:
             raise BuildError("Prüfbericht und tatsächlich erzeugte APK besitzen unterschiedliche Prüfsummen.")
         # A failed build never promotes an old or unverified APK as a new result.
+        if require_export(REPOSITORY, evidence) != proof or gate_digest(evidence / "motion-gate.json") != proof_hash:
+            raise BuildError("Movement evidence changed during export.")
         atomic_copy(apk, output)
         atomic_copy(verification, output.with_suffix(".validation.json"))
         sha_file = temporary / "artifact.sha256"
@@ -330,7 +339,8 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         atomic_copy(sha_file, output.with_suffix(".apk.sha256"))
         build_report = {key: value for key, value in toolchain.items()
                         if key not in {"preset_section", "validator"}}
-        build_report.update({"requested_renderer": args.renderer, "status": "verified_debug_apk", "created_utc": datetime.now(timezone.utc).isoformat(),
+        build_report.update({"motion_gate_sha256": proof_hash, "motion_source_fingerprint": proof["source_fingerprint"],
+                             "requested_renderer": args.renderer, "status": "verified_debug_apk", "created_utc": datetime.now(timezone.utc).isoformat(),
                              "apk": output.name, "apk_sha256": checksum, "apk_size_bytes": output.stat().st_size,
                              "signing": "externally_supplied_debug_key", "device_test": "not_run_by_build_tool",
                              "validation_report": output.with_suffix(".validation.json").name})
@@ -357,6 +367,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--abi", choices=ABIS, default="arm64-v8a")
     parser.add_argument("--renderer", choices=("compatibility", "mobile"), default="compatibility")
     parser.add_argument("--output", type=Path, help="Destination .apk; previous file remains untouched on export failure")
+    parser.add_argument("--motion-evidence", type=Path, default=REPOSITORY / "artifacts/engine-checks",
+                        help="Source-bound passed motion gate, measurement and engine evidence; required for export")
     parser.add_argument("--check", action="store_true", help="Check local prerequisites without exporting")
     parser.add_argument("--timeout", type=int, default=300, help="Per-tool timeout in seconds")
     return parser.parse_args()
