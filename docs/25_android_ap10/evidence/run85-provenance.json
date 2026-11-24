@@ -1,0 +1,68 @@
+{
+  "run_id": 45446452854,
+  "run_number": 85,
+  "source_commit": "b2c5970e7c8ce032c1941464e7659ac6d515c854",
+  "artifact": {
+    "id": 14946406778,
+    "name": "imperathen-android-85",
+    "size_bytes": 370065805,
+    "sha256": "fb466b8e966d631829297c20cb09adf65c85aead7b79bc5a56e6bb8fad0767f0"
+  },
+  "transfer_verified": true,
+  "input_apk": {
+    "sha256": "03da2d5a927c631a5e509b6c85e80a04a43f6e283bdf1a6883512eba086cfc6d",
+    "size_bytes": 186142729
+  },
+  "final_apk": {
+    "sha256": "03f76c9e9a16c50f372ce63d56eb32770382256b809fcd9bd2e0a047b241972e",
+    "size_bytes": 186142729,
+    "signer_sha256": "a41d5810bcc3214bc4c8d29dcd1899210db37b82a03dec21b3c43552357ae215",
+    "payload_files_identical": 1278
+  },
+  "workflow_url": "https://github.com/Ullmann27/Imperathen/actions/runs/45446452854",
+  "workflow_conclusion": "success",
+  "runtime_artifact": {
+    "id": 14947705922,
+    "name": "imperathen-android-runtime-85",
+    "size_bytes": 6586668,
+    "sha256": "639ea19a0b47386dee65eeecfe24adfd8042bf6dd98d05465ffbcc5a0604359d"
+  },
+  "runtime_report": {
+    "sha256": "11f3be28437e49210bd8d3ad0bf6cc7d0697e56d4d775b0852dbcfc2de539b1f",
+    "path": "android/runtime-report.json",
+    "checks_passed": 86,
+    "checks_total": 86,
+    "distinct_check_names": 84,
+    "screenshots_recorded": 17
+  },
+  "runtime_scope": {
+    "main_apk_abi": "x86_64",
+    "main_apk_sha256": "9c3467c2bc0e267fde404b1db16e8652db0391c3c6c91c54f2235fd54a0eeca6",
+    "android_version": "15",
+    "api_level": 35,
+    "arm64": "Original CI APK installed and started under translation to rendered intro; five checks; no replay of the full x86_64 route.",
+    "completed_objectives": [
+      "mother_morning",
+      "fill_water"
+    ],
+    "next_objective_not_completed": "father_morning",
+    "physical_device_test": false,
+    "final_signed_apk_runtime_test": false,
+    "build7_to_build8_update_test": false,
+    "full_android_i00_i14_playthrough": false
+  },
+  "package_validation": {
+    "ci_arm64_passed": 30,
+    "ci_arm64_total": 30,
+    "ci_x86_64_passed": 30,
+    "ci_x86_64_total": 30,
+    "final_arm64_passed": 31,
+    "final_arm64_total": 31
+  },
+  "independent_payload_review": {
+    "performed": true,
+    "files_compared": 1278,
+    "blocking_findings": 0
+  },
+  "scope_note": "Artifact digests verify downloads. Runtime hashes remain those of the original CI APKs. Re-signing changes the final complete APK hash but preserves all 1278 game/engine payload files."
+}

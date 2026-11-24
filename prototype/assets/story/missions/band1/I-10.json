@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "mission": "I-10",
+  "title": "Die Nacht der Reiter",
+  "source_section": "Band 1 · Abschnitt „I-10 · Die Nacht der Reiter“ · Tabelle 13",
+  "rule": "Bestehende Brückenschritte, unverändert aus handoff/sol-20261124 (94bb7cdd76a3fe2577610eac8da6948e29b0faab) ausgelagert. IDs und Auslösebedingungen bleiben erhalten; keine Einträge in childhood.completed.",
+  "authorship": "Verdichtete Spielaufgaben und verbindende Dialoge sind bestehende Ergänzungen. Die Fundstelle belegt den Missionsrahmen, nicht jede Formulierung des Runtime-Schritts.",
+  "steps": [],
+  "bridges": [
+    {
+      "id": "i10_choice",
+      "mission": "I-10",
+      "screenplay": true,
+      "npc": "silvanus",
+      "chapter": "Die Nacht der Reiter",
+      "label": "Entscheiden, wie du auf den Angriff reagierst",
+      "objective": "Hufschläge, Feuer und Rufe reißen Valdora aus der Nacht. Entscheide: hilfst du bei Verteidigung und Rettung oder versteckst du dich bei deinen Eltern?",
+      "text": "»Bleib bei uns, wenn du dich versteckst. Wenn du hinausgehst, dann um Menschen zu helfen – nicht um ein Held zu spielen.«",
+      "result": "Deine Nachtentscheidung wird dauerhaft gespeichert."
+    }
+  ]
+}

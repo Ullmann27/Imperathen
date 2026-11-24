@@ -2,7 +2,7 @@ name: Android prototype APK
 
 on:
   push:
-    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122', 'integration/realistic-android-23', 'feature/hero-realism-20261122', 'feature/cinematic-opening-20261123', 'feature/village-life-20261123', 'feature/village-life-delivery-20261123', 'feature/chat-a-movement-combat-20261123', 'story/canonical-bible-alignment-20261123', 'story/i00-aquileia-cold-open-20261123', 'integration/build68-story-meshy-20261123', 'feature/living-npcs-meshy-movement-20261124', 'feature/npc-perception-rest-regression-20261124', 'integration/motion-combat-cc0-20261124']
+    branches: ['feature/prototype-foundation-20261122', 'integration/android-formation-20261122', 'integration/realistic-android-23', 'feature/hero-realism-20261122', 'feature/cinematic-opening-20261123', 'feature/village-life-20261123', 'feature/village-life-delivery-20261123', 'feature/chat-a-movement-combat-20261123', 'story/canonical-bible-alignment-20261123', 'story/i00-aquileia-cold-open-20261123', 'integration/build68-story-meshy-20261123', 'feature/living-npcs-meshy-movement-20261124', 'feature/npc-perception-rest-regression-20261124', 'integration/motion-combat-cc0-20261124', 'feature/ap1-ap2-companions-20261124']
     paths:
       - 'prototype/**'
       - 'tools/build_android_prototype.py'
@@ -86,11 +86,11 @@ jobs:
       - name: Export the installable ARM64 prototype
         run: |
           python3 tools/build_android_prototype.py --godot "$GODOT_BIN" --sdk-root "$ANDROID_HOME" --java-home "$JAVA_HOME_17_X64" --template-dir "$IMPERATHEN_TEMPLATE_DIR" --keystore "$RUNNER_TEMP/imperathen-debug.keystore" --keystore-user imperathen-debug --abi arm64-v8a --output "$GITHUB_WORKSPACE/artifacts/${IMPERATHEN_BUILD}-arm64.apk"
-          python3 tools/validate_android_apk.py --apk artifacts/${IMPERATHEN_BUILD}-arm64.apk --sdk-root "$ANDROID_HOME" --report artifacts/arm64-apk-validation.json
+          python3 tools/validate_android_apk.py --apk artifacts/${IMPERATHEN_BUILD}-arm64.apk --sdk-root "$ANDROID_HOME" --aapt "$ANDROID_HOME/build-tools/35.0.1/aapt" --apksigner "$ANDROID_HOME/build-tools/35.0.1/apksigner" --zipalign "$ANDROID_HOME/build-tools/35.0.1/zipalign" --report artifacts/arm64-apk-validation.json
       - name: Export a separate Android emulator test package
         run: |
           python3 tools/build_android_prototype.py --godot "$GODOT_BIN" --sdk-root "$ANDROID_HOME" --java-home "$JAVA_HOME_17_X64" --template-dir "$IMPERATHEN_TEMPLATE_DIR" --keystore "$RUNNER_TEMP/imperathen-debug.keystore" --keystore-user imperathen-debug --abi x86_64 --output "$GITHUB_WORKSPACE/artifacts/${IMPERATHEN_BUILD}-emulator.apk"
-          python3 tools/validate_android_apk.py --apk artifacts/${IMPERATHEN_BUILD}-emulator.apk --sdk-root "$ANDROID_HOME" --expected-abi x86_64 --report artifacts/emulator-apk-validation.json
+          python3 tools/validate_android_apk.py --apk artifacts/${IMPERATHEN_BUILD}-emulator.apk --sdk-root "$ANDROID_HOME" --aapt "$ANDROID_HOME/build-tools/35.0.1/aapt" --apksigner "$ANDROID_HOME/build-tools/35.0.1/apksigner" --zipalign "$ANDROID_HOME/build-tools/35.0.1/zipalign" --expected-abi x86_64 --report artifacts/emulator-apk-validation.json
           if [[ "$IMPERATHEN_GRAPHICS_QA" == 1 ]]; then
             for target in arm64-v8a x86_64; do
               name=arm64

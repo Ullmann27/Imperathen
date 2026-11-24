@@ -1,0 +1,10 @@
+{
+  "command": "python3 -m unittest discover -s tests -p 'android_*_test.py'",
+  "passed": true,
+  "test_count": 224,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 0.288,
+  "scope": "Complete local Python suite before the Build-8 commit; synthetic APK/signing fixtures do not assert Android runtime success."
+}

@@ -1,0 +1,4819 @@
+{
+  "platform": "Android emulator",
+  "apk_sha256": "9c3467c2bc0e267fde404b1db16e8652db0391c3c6c91c54f2235fd54a0eeca6",
+  "physical_device_test": false,
+  "arm64_runtime_test": true,
+  "status": "passed",
+  "checks": [
+    {
+      "name": "single_emulator_target",
+      "passed": true,
+      "detail": [
+        {
+          "serial": "emulator-5554",
+          "state": "offline"
+        }
+      ]
+    },
+    {
+      "name": "emulator_verified",
+      "passed": true,
+      "detail": {
+        "serial": "emulator-5554",
+        "ro.kernel.qemu": "1"
+      }
+    },
+    {
+      "name": "expected_android_emulator",
+      "passed": true,
+      "detail": {
+        "api_level": "35",
+        "abi": "x86_64",
+        "model": "sdk_gphone64_x86_64"
+      }
+    },
+    {
+      "name": "apk_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "clean_test_app_data",
+      "passed": true,
+      "detail": "Success"
+    },
+    {
+      "name": "launcher",
+      "passed": true,
+      "detail": "at.heinz.imperathen/com.godot.game.GodotAppLauncher"
+    },
+    {
+      "name": "activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 5004\nWaitTime: 5023\nComplete"
+    },
+    {
+      "name": "process_started",
+      "passed": true,
+      "detail": "3356"
+    },
+    {
+      "name": "first_launch_stock_launcher_anr",
+      "passed": true,
+      "detail": "Verified the system dialog belongs to the stock Pixel Launcher"
+    },
+    {
+      "name": "first_launch_stock_launcher_dialog_closed",
+      "passed": true,
+      "detail": "Pressed Close app on the verified launcher ANR; the game process remains under test"
+    },
+    {
+      "name": "first_launch_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "first_launch_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "real_menu",
+      "passed": true,
+      "detail": {
+        "new_game": [
+          189.375,
+          417.0
+        ]
+      }
+    },
+    {
+      "name": "menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "touch_starts_saved_game",
+      "passed": true,
+      "detail": "New game button produced a saved village"
+    },
+    {
+      "name": "authored_opening_is_actual_new_game",
+      "passed": true,
+      "detail": "i00_aquileia"
+    },
+    {
+      "name": "opening_before_gameplay",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.117346666666662,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "i00_aquileia",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "android_back_pauses_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            799.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.255984,
+        "final": false,
+        "index": 0,
+        "paused": true,
+        "sequence": "i00_aquileia",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "android_back_resumes_opening",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.401596000000004,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "i00_aquileia",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "native_i00_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.147027999999996,
+        "final": false,
+        "index": 1,
+        "paused": false,
+        "sequence": "i00_aquileia",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "i00_skip_reaches_handoff",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            911.625,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.0,
+        "final": true,
+        "index": 5,
+        "paused": false,
+        "sequence": "i00_aquileia",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "i00_hands_to_family_opening",
+      "passed": true,
+      "detail": "childhood_home"
+    },
+    {
+      "name": "family_opening_after_i00",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.133333333333333,
+        "final": false,
+        "index": 0,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.133333333333333,
+        "final": false,
+        "index": 1,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            811.875,
+            39.0
+          ],
+          "OpeningSkip": [
+            892.125,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.144853000000004,
+        "final": false,
+        "index": 2,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "native_family_intro_advance",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            911.625,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.0,
+        "final": true,
+        "index": 3,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "family_intro_reaches_first_objective",
+      "passed": true,
+      "detail": {
+        "buttons": {
+          "OpeningAdvance": [
+            766.5,
+            489.0
+          ],
+          "OpeningPause": [
+            911.625,
+            39.0
+          ]
+        },
+        "companion_choice": "",
+        "elapsed": 0.0,
+        "final": true,
+        "index": 3,
+        "paused": false,
+        "sequence": "childhood_home",
+        "world_seconds": 0.0
+      }
+    },
+    {
+      "name": "objective_hands_over_control",
+      "passed": true,
+      "detail": "Actual touch accepted the objective after the opening controls"
+    },
+    {
+      "name": "native_pointer_command_available",
+      "passed": true,
+      "detail": "The verified Android input command advertises native pointer DOWN/MOVE/UP support"
+    },
+    {
+      "name": "native_back_opens_quality_pause",
+      "passed": true,
+      "detail": {
+        "ui_profile": "balanced",
+        "world_profile": "balanced"
+      }
+    },
+    {
+      "name": "native_settings_select_light_graphics",
+      "passed": true,
+      "detail": {
+        "popup": {
+          "control_instance": "353193957007",
+          "popup_instance": "353244290296",
+          "focused_index": 0,
+          "text": "Leicht · Limit 30 FPS",
+          "down_presses": 1
+        },
+        "profiles": {
+          "ui_profile": "low",
+          "world_profile": "low"
+        }
+      }
+    },
+    {
+      "name": "native_settings_resume_preserves_light_graphics",
+      "passed": true,
+      "detail": {
+        "ui_profile": "low",
+        "world_profile": "low"
+      }
+    },
+    {
+      "name": "npc_behavior_connected",
+      "passed": true,
+      "detail": {
+        "accumulator": 0.35,
+        "activity_counts": {
+          "patrol": 5,
+          "socialize": 7,
+          "work": 30
+        },
+        "behavior_version": 1,
+        "decision_due_count": 0,
+        "observed_count": 42,
+        "people_count": 42,
+        "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+        "samples": {
+          "aelia": {
+            "activity": "work",
+            "fatigue": 18.0,
+            "interest": "craft",
+            "last_greet": -1000.0,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 3.0,
+            "observed": true,
+            "partner": "",
+            "position": [
+              20.0,
+              0.0,
+              17.0
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 37.0,
+            "stress": 0.0
+          },
+          "julia": {
+            "activity": "work",
+            "fatigue": 13.0,
+            "interest": "family",
+            "last_greet": -1000.0,
+            "last_trust": 4,
+            "memories": [],
+            "next_decision": 4.75,
+            "observed": true,
+            "partner": "",
+            "position": [
+              -15.3000001907349,
+              0.0,
+              14.8000001907349
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 27.0,
+            "stress": 0.0
+          },
+          "marcus": {
+            "activity": "work",
+            "fatigue": 10.0,
+            "interest": "learning",
+            "last_greet": -1000.0,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 3.75,
+            "observed": true,
+            "partner": "",
+            "position": [
+              -3.0,
+              0.899999976158142,
+              4.0
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 51.0,
+            "stress": 0.0
+          },
+          "sextus": {
+            "activity": "work",
+            "fatigue": 8.0,
+            "interest": "craft",
+            "last_greet": -1000.0,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 4.5,
+            "observed": true,
+            "partner": "",
+            "position": [
+              32.7999992370605,
+              0.0,
+              -25.0
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 38.0,
+            "stress": 0.0
+          }
+        },
+        "seconds": 0.0,
+        "state_sha256": "5f1869d9301a900a09739b793537e2a60d80ee9612191953eb111e5438f997b1",
+        "version": 1,
+        "world_id": "46716399-4269512624"
+      }
+    },
+    {
+      "name": "npc_behavior_advances",
+      "passed": true,
+      "detail": {
+        "before_seconds": 0.0,
+        "after_seconds": 0.5,
+        "decisions": {
+          "patrol": 5,
+          "socialize": 7,
+          "work": 30
+        },
+        "samples": {
+          "aelia": {
+            "activity": "work",
+            "fatigue": 18.05,
+            "interest": "craft",
+            "last_greet": -1000.0,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 3.0,
+            "observed": true,
+            "partner": "",
+            "position": [
+              20.0,
+              0.0,
+              17.0
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 37.0375,
+            "stress": 0.0
+          },
+          "julia": {
+            "activity": "work",
+            "fatigue": 13.05,
+            "interest": "family",
+            "last_greet": -1000.0,
+            "last_trust": 4,
+            "memories": [],
+            "next_decision": 4.75,
+            "observed": true,
+            "partner": "",
+            "position": [
+              -15.3000001907349,
+              0.0,
+              14.8000001907349
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 27.0375,
+            "stress": 0.0
+          },
+          "marcus": {
+            "activity": "work",
+            "fatigue": 10.05,
+            "interest": "learning",
+            "last_greet": -1000.0,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 3.75,
+            "observed": true,
+            "partner": "",
+            "position": [
+              -3.0,
+              0.899999976158142,
+              4.0
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 51.0375,
+            "stress": 0.0
+          },
+          "sextus": {
+            "activity": "work",
+            "fatigue": 8.05,
+            "interest": "craft",
+            "last_greet": -1000.0,
+            "last_trust": 0,
+            "memories": [],
+            "next_decision": 4.5,
+            "observed": true,
+            "partner": "",
+            "position": [
+              32.7999992370605,
+              0.0,
+              -25.0
+            ],
+            "reason": "daily_work",
+            "route_direction": 1,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 38.0375,
+            "stress": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "meshy_severus_loaded",
+      "passed": true,
+      "detail": {
+        "packaged_models": [
+          "assets/assets/meshy/characters/unit_roman_signifer_3.glb",
+          "assets/assets/meshy/equipment/gear_roman_signum_1.glb"
+        ],
+        "packaged_resources": [
+          {
+            "source": "assets/meshy/characters/unit_roman_signifer_3.glb",
+            "entry": "assets/.godot/imported/unit_roman_signifer_3.glb-3f9de47102dce13d8dac1fbd15439a0b.scn",
+            "remap": "assets/assets/meshy/characters/unit_roman_signifer_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 106125,
+            "sha256": "41b379cfba4e2296dc985289ad56f032b3802cdb194eb8ae2823cb921d857d27",
+            "remap_sha256": "2833c74f8eab4dc0a86e468f4d9899290b294552ad6dd360cb12ec3bb7148db4"
+          },
+          {
+            "source": "assets/meshy/equipment/gear_roman_signum_1.glb",
+            "entry": "assets/.godot/imported/gear_roman_signum_1.glb-ed3f3f24147c65525ffd258d4e901e2e.scn",
+            "remap": "assets/assets/meshy/equipment/gear_roman_signum_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 23417,
+            "sha256": "c51864b1b34b2817dbdc111f4248861f04fe6f391bfc482903bfe012b33eacfe",
+            "remap_sha256": "0e5c5e59d1e46898248fe8a57a0141ec9e4d67b93deafaba11ea3c5605d43d98"
+          }
+        ],
+        "hash_scope": "SHA-256 of the actual exported APK payloads and import remaps, not source GLB bytes.",
+        "loaded_count": 1,
+        "severus": {
+          "asset_id": "unit_roman_signifer",
+          "bone_count": 15,
+          "clip": "idle",
+          "equipment": [
+            {
+              "asset_id": "gear_roman_signum",
+              "bone": "Hand_R",
+              "bound": true,
+              "mesh_count": 1,
+              "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+            }
+          ],
+          "has_march": true,
+          "has_run": true,
+          "loaded": true,
+          "mesh_count": 2,
+          "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+        },
+        "version": 1
+      }
+    },
+    {
+      "name": "actual_family_start",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [],
+        "completed": [],
+        "day": 1,
+        "dialog_npc": "",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "mother_morning",
+        "target_npc": "julia",
+        "target_point": "",
+        "target_position": [
+          -15.3000001907349,
+          14.8000001907349
+        ],
+        "target_radius": 3.2,
+        "version": 1,
+        "world_id": "46716399-4269512624"
+      }
+    },
+    {
+      "name": "family_door_alignment_reached_by_native_walk",
+      "passed": true,
+      "detail": {
+        "target": [
+          -13.0,
+          12.0999998092651
+        ],
+        "distance_m": 0.04206785824638764,
+        "position": [
+          -13.0409555435181,
+          1.29333055019379,
+          12.1096096038818
+        ]
+      }
+    },
+    {
+      "name": "family_doorstep_reached_by_native_walk",
+      "passed": true,
+      "detail": {
+        "target": [
+          -13.0,
+          15.1999998092651
+        ],
+        "distance_m": 0.07121116894319043,
+        "position": [
+          -12.9976892471313,
+          0.890839815139771,
+          15.1288261413574
+        ]
+      }
+    },
+    {
+      "name": "native_interaction_reaches_mother",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [],
+        "completed": [],
+        "day": 1,
+        "dialog_npc": "julia",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "mother_morning",
+        "target_npc": "julia",
+        "target_point": "",
+        "target_position": [
+          -15.3000001907349,
+          14.8000001907349
+        ],
+        "target_radius": 3.2,
+        "version": 1,
+        "world_id": "46716399-4269512624"
+      }
+    },
+    {
+      "name": "native_mother_choice_carries_real_household_coin",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [
+          "household_coin"
+        ],
+        "completed": [
+          "mother_morning"
+        ],
+        "day": 1,
+        "dialog_npc": "julia",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "fill_water",
+        "target_npc": "",
+        "target_point": "family_water",
+        "target_position": [
+          -12.0,
+          11.6999998092651
+        ],
+        "target_radius": 1.6,
+        "version": 1,
+        "world_id": "46716399-4269512624"
+      }
+    },
+    {
+      "name": "family_goal_moves_to_real_water_station",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [
+          "household_coin"
+        ],
+        "completed": [
+          "mother_morning"
+        ],
+        "day": 1,
+        "dialog_npc": "",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "fill_water",
+        "target_npc": "",
+        "target_point": "family_water",
+        "target_position": [
+          -12.0,
+          11.6999998092651
+        ],
+        "target_radius": 1.6,
+        "version": 1,
+        "world_id": "46716399-4269512624"
+      }
+    },
+    {
+      "name": "return_inside_family_house_reached_by_native_walk",
+      "passed": true,
+      "detail": {
+        "target": [
+          -13.0,
+          12.0999998092651
+        ],
+        "distance_m": 0.09113849447367521,
+        "position": [
+          -13.0007266998291,
+          1.29332745075226,
+          12.1911354064941
+        ]
+      }
+    },
+    {
+      "name": "family_water_station_reached_by_native_walk",
+      "passed": true,
+      "detail": {
+        "target": [
+          -12.0,
+          11.6999998092651
+        ],
+        "distance_m": 1.1147502422589233,
+        "position": [
+          -13.0007266998291,
+          1.29332745075226,
+          12.1911354064941
+        ]
+      }
+    },
+    {
+      "name": "native_item_action_fills_family_jug",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [
+          "household_coin",
+          "water_jug"
+        ],
+        "completed": [
+          "mother_morning",
+          "fill_water"
+        ],
+        "day": 1,
+        "dialog_npc": "",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "father_morning",
+        "target_npc": "silvanus",
+        "target_point": "",
+        "target_position": [
+          -16.2000007629395,
+          16.7000007629395
+        ],
+        "target_radius": 3.2,
+        "version": 1,
+        "world_id": "46716399-4269512624"
+      }
+    },
+    {
+      "name": "action_hud_from_new_game",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "gather",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -13.0007266998291,
+          1.29332745075226,
+          12.1911354064941
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "native_pad_moves_actual_player",
+      "passed": true,
+      "detail": {
+        "input": "adb input motionevent",
+        "events": [
+          {
+            "event": "DOWN",
+            "point": [
+              90,
+              393
+            ],
+            "command_returned": true
+          },
+          {
+            "event": "MOVE",
+            "point": [
+              142,
+              393
+            ],
+            "command_returned": true
+          },
+          {
+            "event": "MOVE",
+            "point": [
+              142,
+              393
+            ],
+            "command_returned": true
+          },
+          {
+            "event": "UP",
+            "point": [
+              142,
+              393
+            ],
+            "command_returned": true
+          }
+        ],
+        "observations": [
+          {
+            "phase": "DOWN",
+            "position": [
+              -13.0007266998291,
+              1.29332745075226,
+              12.1911354064941
+            ],
+            "movement_touch": 0,
+            "move_axis": [
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "figure_clip": "gather",
+            "figure_speed": 0.0
+          },
+          {
+            "phase": "MOVE",
+            "position": [
+              -12.9507274627686,
+              1.293328166008,
+              12.1411361694336
+            ],
+            "movement_touch": 0,
+            "move_axis": [
+              0.942922532558441,
+              0.0
+            ],
+            "velocity": [
+              0.666618287563324,
+              1.4305113836599e-05,
+              -0.666618287563324
+            ],
+            "figure_clip": "gather",
+            "figure_speed": 0.942740619182587
+          },
+          {
+            "phase": "MOVE",
+            "position": [
+              -12.5219707489014,
+              1.29334032535553,
+              11.8248109817505
+            ],
+            "movement_touch": 0,
+            "move_axis": [
+              0.942922532558441,
+              0.0
+            ],
+            "velocity": [
+              1.11276626586914,
+              0.00036478039692156,
+              -0.794391572475433
+            ],
+            "figure_clip": "march",
+            "figure_speed": 1.36722588539124
+          },
+          {
+            "phase": "UP",
+            "position": [
+              -12.1654119491577,
+              1.29333364963531,
+              11.5842695236206
+            ],
+            "movement_touch": -1,
+            "move_axis": [
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "figure_clip": "idle",
+            "figure_speed": 0.0
+          }
+        ],
+        "before": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "figure_clip": "gather",
+          "figure_speed": 0.0,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -13.0007266998291,
+            1.29332745075226,
+            12.1911354064941
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "target": null,
+        "after": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "figure_clip": "idle",
+          "figure_speed": 0.0,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -12.1654119491577,
+            1.29333364963531,
+            11.5842695236206
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "distance_m": 1.032490645228834
+      }
+    },
+    {
+      "name": "native_walk_uses_locomotion_clip",
+      "passed": true,
+      "detail": [
+        {
+          "clip": "march",
+          "speed_m_s": 1.3672259260547763
+        }
+      ]
+    },
+    {
+      "name": "released_movement_neutral_inputs",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.1654119491577,
+          1.29333364963531,
+          11.5842695236206
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "released_movement_no_player_drift",
+      "passed": true,
+      "detail": {
+        "distance_m": 0.0,
+        "first": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "figure_clip": "idle",
+          "figure_speed": 0.0,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -12.1654119491577,
+            1.29333364963531,
+            11.5842695236206
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "second": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "figure_clip": "idle",
+          "figure_speed": 0.0,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -12.1654119491577,
+            1.29333364963531,
+            11.5842695236206
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        }
+      }
+    },
+    {
+      "name": "native_tap_selects_running",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.1654119491577,
+          1.29333364963531,
+          11.5842695236206
+        ],
+        "running": true,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "native_tap_restores_walking",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.1654119491577,
+          1.29333364963531,
+          11.5842695236206
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "native_tap_opens_techniques",
+      "passed": true,
+      "detail": {
+        "action_mode": "unarmed",
+        "action_runtime": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "figure_clip": "idle",
+          "figure_speed": 0.0,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "techniques",
+          "position": [
+            -12.1654119491577,
+            1.29333364963531,
+            11.5842695236206
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "actors": 15,
+        "aelia_assignment": "idle",
+        "behavior_runtime": {
+          "accumulator": 0.0,
+          "activity_counts": {
+            "patrol": 5,
+            "socialize": 9,
+            "work": 28
+          },
+          "behavior_version": 1,
+          "decision_due_count": 0,
+          "observed_count": 42,
+          "people_count": 42,
+          "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+          "samples": {
+            "aelia": {
+              "activity": "work",
+              "fatigue": 19.85,
+              "interest": "craft",
+              "last_greet": -1000.0,
+              "last_trust": 0,
+              "memories": [],
+              "next_decision": 21.0,
+              "observed": true,
+              "partner": "",
+              "position": [
+                20.0,
+                0.0,
+                17.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 38.3875000000001,
+              "stress": 0.0
+            },
+            "julia": {
+              "activity": "work",
+              "fatigue": 14.4,
+              "interest": "family",
+              "last_greet": 5.0,
+              "last_trust": 6,
+              "memories": [
+                {
+                  "at": 8.5,
+                  "kind": "trust_gained"
+                }
+              ],
+              "next_decision": 22.25,
+              "observed": true,
+              "partner": "",
+              "position": [
+                -15.3000001907349,
+                0.0,
+                14.8000001907349
+              ],
+              "reason": "daily_work",
+              "route_direction": 1,
+              "route_distance": 0.0,
+              "since": 7.5,
+              "social_need": 25.95,
+              "stress": 0.0
+            },
+            "marcus": {
+              "activity": "work",
+              "fatigue": 11.85,
+              "interest": "learning",
+              "last_greet": -1000.0,
+              "last_trust": 0,
+              "memories": [],
+              "next_decision": 19.75,
+              "observed": true,
+              "partner": "",
+              "position": [
+                -3.0,
+                0.899999976158142,
+                4.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 52.3875000000001,
+              "stress": 0.0
+            },
+            "sextus": {
+              "activity": "work",
+              "fatigue": 9.85000000000003,
+              "interest": "craft",
+              "last_greet": -1000.0,
+              "last_trust": 0,
+              "memories": [],
+              "next_decision": 22.5,
+              "observed": true,
+              "partner": "",
+              "position": [
+                32.7999992370605,
+                0.0,
+                -25.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 39.3875000000001,
+              "stress": 0.0
+            }
+          },
+          "seconds": 18.5,
+          "state_sha256": "9e3164100a95f193c6135ed3e5760580ef4ff459da9920168663858967da40fc",
+          "version": 1,
+          "world_id": "46716399-4269512624"
+        },
+        "childhood_runtime": {
+          "age": 12,
+          "carried": [
+            "household_coin",
+            "water_jug"
+          ],
+          "completed": [
+            "mother_morning",
+            "fill_water"
+          ],
+          "day": 1,
+          "dialog_npc": "",
+          "family_entrance": [
+            -13.0,
+            14.6999998092651
+          ],
+          "family_water": [
+            -12.0,
+            11.6999998092651
+          ],
+          "stage": "father_morning",
+          "target_npc": "silvanus",
+          "target_point": "",
+          "target_position": [
+            -16.2000007629395,
+            16.7000007629395
+          ],
+          "target_radius": 3.2,
+          "version": 1,
+          "world_id": "46716399-4269512624"
+        },
+        "controls": {
+          "technique_front_kick": {
+            "center": [
+              477.0,
+              573.0
+            ],
+            "enabled": false,
+            "instance_id": "442801064240",
+            "rect": [
+              254.25,
+              547.5,
+              445.5,
+              51.0
+            ],
+            "visible": false
+          },
+          "technique_headbutt": {
+            "center": [
+              477.0,
+              516.0
+            ],
+            "enabled": false,
+            "instance_id": "442717182959",
+            "rect": [
+              254.25,
+              490.5,
+              445.5,
+              51.0
+            ],
+            "visible": false
+          },
+          "technique_high_kick": {
+            "center": [
+              477.0,
+              687.0
+            ],
+            "enabled": false,
+            "instance_id": "442968840402",
+            "rect": [
+              254.25,
+              661.5,
+              445.5,
+              51.0
+            ],
+            "visible": false
+          },
+          "technique_hook_left": {
+            "center": [
+              477.0,
+              288.0
+            ],
+            "enabled": false,
+            "instance_id": "442381639010",
+            "rect": [
+              254.25,
+              262.5,
+              445.5,
+              51.0
+            ],
+            "visible": true
+          },
+          "technique_hook_right": {
+            "center": [
+              477.0,
+              345.0
+            ],
+            "enabled": false,
+            "instance_id": "442465524839",
+            "rect": [
+              254.25,
+              319.5,
+              445.5,
+              51.0
+            ],
+            "visible": true
+          },
+          "technique_jab_left": {
+            "center": [
+              477.0,
+              187.5
+            ],
+            "enabled": true,
+            "instance_id": "442213865061",
+            "rect": [
+              254.25,
+              166.5,
+              445.5,
+              42.0
+            ],
+            "visible": true
+          },
+          "technique_jab_right": {
+            "center": [
+              477.0,
+              235.5
+            ],
+            "enabled": true,
+            "instance_id": "442297752925",
+            "rect": [
+              254.25,
+              214.5,
+              445.5,
+              42.0
+            ],
+            "visible": true
+          },
+          "technique_side_kick": {
+            "center": [
+              477.0,
+              630.0
+            ],
+            "enabled": false,
+            "instance_id": "442884950323",
+            "rect": [
+              254.25,
+              604.5,
+              445.5,
+              51.0
+            ],
+            "visible": false
+          },
+          "technique_uppercut_left": {
+            "center": [
+              477.0,
+              402.0
+            ],
+            "enabled": false,
+            "instance_id": "442549410569",
+            "rect": [
+              254.25,
+              376.5,
+              445.5,
+              51.0
+            ],
+            "visible": true
+          },
+          "technique_uppercut_right": {
+            "center": [
+              477.0,
+              459.0
+            ],
+            "enabled": false,
+            "instance_id": "442633296659",
+            "rect": [
+              254.25,
+              433.5,
+              445.5,
+              51.0
+            ],
+            "visible": false
+          },
+          "techniques_close": {
+            "center": [
+              675.75,
+              105.75
+            ],
+            "enabled": true,
+            "instance_id": "441861545281",
+            "rect": [
+              645.75,
+              87.75,
+              60.0,
+              36.0
+            ],
+            "visible": true
+          }
+        },
+        "decimus_met": false,
+        "feedback": "",
+        "graphics_runtime": {
+          "ui_profile": "low",
+          "world_profile": "low"
+        },
+        "meshy_runtime": {
+          "loaded_count": 1,
+          "severus": {
+            "asset_id": "unit_roman_signifer",
+            "bone_count": 15,
+            "clip": "idle",
+            "equipment": [
+              {
+                "asset_id": "gear_roman_signum",
+                "bone": "Hand_R",
+                "bound": true,
+                "mesh_count": 1,
+                "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+              }
+            ],
+            "has_march": true,
+            "has_run": true,
+            "loaded": true,
+            "mesh_count": 2,
+            "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+          },
+          "version": 1
+        },
+        "people": 14,
+        "player_is_ruler": false,
+        "saved_behavior_runtime": {
+          "accumulator": 0.0,
+          "activity_counts": {
+            "patrol": 5,
+            "socialize": 8,
+            "work": 29
+          },
+          "behavior_version": 1,
+          "decision_due_count": 0,
+          "envelope_sha256": "336ad8f4ffaa86a58fcb83317ea3ed790e3bd7205d18e26f402ea089a2597fb1",
+          "observed_count": 42,
+          "payload_sha256": "dfccd97ebcebc87c4e236f54d1dcca57f87f957f0df435fdc355bd02798b7f27",
+          "people_count": 42,
+          "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+          "samples": {
+            "aelia": {
+              "activity": "work",
+              "fatigue": 19.35,
+              "interest": "craft",
+              "last_greet": -1000.0,
+              "last_trust": 0.0,
+              "memories": [],
+              "next_decision": 15.0,
+              "observed": true,
+              "partner": "",
+              "position": [
+                20.0,
+                0.0,
+                17.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1.0,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 38.0125,
+              "stress": 0.0
+            },
+            "julia": {
+              "activity": "work",
+              "fatigue": 13.9,
+              "interest": "family",
+              "last_greet": 5.0,
+              "last_trust": 6.0,
+              "memories": [
+                {
+                  "at": 8.5,
+                  "kind": "trust_gained"
+                }
+              ],
+              "next_decision": 17.25,
+              "observed": true,
+              "partner": "",
+              "position": [
+                -15.3000001907349,
+                0.0,
+                14.8000001907349
+              ],
+              "reason": "daily_work",
+              "route_direction": 1.0,
+              "route_distance": 0.0,
+              "since": 7.5,
+              "social_need": 25.575,
+              "stress": 0.0
+            },
+            "marcus": {
+              "activity": "work",
+              "fatigue": 11.35,
+              "interest": "learning",
+              "last_greet": -1000.0,
+              "last_trust": 0.0,
+              "memories": [],
+              "next_decision": 15.75,
+              "observed": true,
+              "partner": "",
+              "position": [
+                -3.0,
+                0.899999976158142,
+                4.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1.0,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 52.0125,
+              "stress": 0.0
+            },
+            "sextus": {
+              "activity": "work",
+              "fatigue": 9.35000000000002,
+              "interest": "craft",
+              "last_greet": -1000.0,
+              "last_trust": 0.0,
+              "memories": [],
+              "next_decision": 18.0,
+              "observed": true,
+              "partner": "",
+              "position": [
+                32.7999992370605,
+                0.0,
+                -25.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1.0,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 39.0125,
+              "stress": 0.0
+            }
+          },
+          "seconds": 13.5,
+          "state_sha256": "9b06d56676a0105c0c973c81172added25b278abfc9941f4a154bcfe88f4d8ff",
+          "version": 1,
+          "world_id": "46716399-4269512624"
+        },
+        "screen": "playing",
+        "scroll": {
+          "bottom": [
+            624.47998046875,
+            388.050018310547
+          ],
+          "offset": 0,
+          "top": [
+            624.47998046875,
+            211.5
+          ]
+        },
+        "work_permit": false,
+        "workplaces": 5,
+        "world_seconds": 18.5
+      }
+    },
+    {
+      "name": "native_tap_selects_right_straight",
+      "passed": true,
+      "detail": {
+        "action_mode": "unarmed",
+        "action_runtime": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "figure_clip": "idle",
+          "figure_speed": 0.0,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -12.1654119491577,
+            1.29333364963531,
+            11.5842695236206
+          ],
+          "running": false,
+          "selected_technique": "jab_right",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "actors": 15,
+        "aelia_assignment": "idle",
+        "behavior_runtime": {
+          "accumulator": 0.3,
+          "activity_counts": {
+            "patrol": 5,
+            "socialize": 9,
+            "work": 28
+          },
+          "behavior_version": 1,
+          "decision_due_count": 0,
+          "observed_count": 42,
+          "people_count": 42,
+          "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+          "samples": {
+            "aelia": {
+              "activity": "work",
+              "fatigue": 19.95,
+              "interest": "craft",
+              "last_greet": -1000.0,
+              "last_trust": 0,
+              "memories": [],
+              "next_decision": 21.0,
+              "observed": true,
+              "partner": "",
+              "position": [
+                20.0,
+                0.0,
+                17.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 38.4625000000001,
+              "stress": 0.0
+            },
+            "julia": {
+              "activity": "work",
+              "fatigue": 14.5,
+              "interest": "family",
+              "last_greet": 5.0,
+              "last_trust": 6,
+              "memories": [
+                {
+                  "at": 8.5,
+                  "kind": "trust_gained"
+                }
+              ],
+              "next_decision": 22.25,
+              "observed": true,
+              "partner": "",
+              "position": [
+                -15.3000001907349,
+                0.0,
+                14.8000001907349
+              ],
+              "reason": "daily_work",
+              "route_direction": 1,
+              "route_distance": 0.0,
+              "since": 7.5,
+              "social_need": 26.0250000000001,
+              "stress": 0.0
+            },
+            "marcus": {
+              "activity": "work",
+              "fatigue": 11.95,
+              "interest": "learning",
+              "last_greet": -1000.0,
+              "last_trust": 0,
+              "memories": [],
+              "next_decision": 19.75,
+              "observed": true,
+              "partner": "",
+              "position": [
+                -3.0,
+                0.899999976158142,
+                4.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 52.4625000000001,
+              "stress": 0.0
+            },
+            "sextus": {
+              "activity": "work",
+              "fatigue": 9.95000000000003,
+              "interest": "craft",
+              "last_greet": -1000.0,
+              "last_trust": 0,
+              "memories": [],
+              "next_decision": 22.5,
+              "observed": true,
+              "partner": "",
+              "position": [
+                32.7999992370605,
+                0.0,
+                -25.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 39.4625000000001,
+              "stress": 0.0
+            }
+          },
+          "seconds": 19.5,
+          "state_sha256": "6397d1ab2cfde66e531255d0829e2b7514303cb90eebb3ce8e0cce7059244fd9",
+          "version": 1,
+          "world_id": "46716399-4269512624"
+        },
+        "childhood_runtime": {
+          "age": 12,
+          "carried": [
+            "household_coin",
+            "water_jug"
+          ],
+          "completed": [
+            "mother_morning",
+            "fill_water"
+          ],
+          "day": 1,
+          "dialog_npc": "",
+          "family_entrance": [
+            -13.0,
+            14.6999998092651
+          ],
+          "family_water": [
+            -12.0,
+            11.6999998092651
+          ],
+          "stage": "father_morning",
+          "target_npc": "silvanus",
+          "target_point": "",
+          "target_position": [
+            -16.2000007629395,
+            16.7000007629395
+          ],
+          "target_radius": 3.2,
+          "version": 1,
+          "world_id": "46716399-4269512624"
+        },
+        "controls": {
+          "attack": {
+            "center": [
+              895.5,
+              349.5
+            ],
+            "enabled": true,
+            "instance_id": "407971568760",
+            "rect": [
+              840.0,
+              327.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "commands": {
+            "center": [
+              852.375,
+              507.0
+            ],
+            "enabled": true,
+            "instance_id": "406696499975",
+            "rect": [
+              761.25,
+              489.0,
+              182.25,
+              36.0
+            ],
+            "visible": true
+          },
+          "dodge": {
+            "center": [
+              895.5,
+              400.5
+            ],
+            "enabled": true,
+            "instance_id": "408139339338",
+            "rect": [
+              840.0,
+              378.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "guard": {
+            "center": [
+              778.5,
+              400.5
+            ],
+            "enabled": true,
+            "instance_id": "408055453358",
+            "rect": [
+              723.0,
+              378.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "interact": {
+            "center": [
+              778.5,
+              349.5
+            ],
+            "enabled": true,
+            "instance_id": "407887682128",
+            "rect": [
+              723.0,
+              327.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "move_pad": {
+            "axis_points": {
+              "center": [
+                90.0,
+                393.0
+              ],
+              "down": [
+                90.0,
+                444.839996337891
+              ],
+              "left": [
+                38.1599960327148,
+                393.0
+              ],
+              "right": [
+                141.839996337891,
+                393.0
+              ],
+              "up": [
+                90.0,
+                341.160003662109
+              ]
+            },
+            "center": [
+              90.0,
+              393.0
+            ],
+            "enabled": true,
+            "instance_id": "407787018803",
+            "rect": [
+              9.0,
+              312.0,
+              162.0,
+              162.0
+            ],
+            "visible": true
+          },
+          "pace": {
+            "center": [
+              895.5,
+              451.5
+            ],
+            "enabled": true,
+            "instance_id": "408307111980",
+            "rect": [
+              840.0,
+              429.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "pause": {
+            "center": [
+              916.875,
+              33.0
+            ],
+            "enabled": true,
+            "instance_id": "405438209346",
+            "rect": [
+              890.25,
+              15.0,
+              53.25,
+              36.0
+            ],
+            "visible": true
+          },
+          "techniques": {
+            "center": [
+              778.5,
+              451.5
+            ],
+            "enabled": true,
+            "instance_id": "408223222057",
+            "rect": [
+              723.0,
+              429.0,
+              111.0,
+              45.0
+            ],
+            "visible": true
+          },
+          "village": {
+            "center": [
+              666.0,
+              507.0
+            ],
+            "enabled": true,
+            "instance_id": "406612614061",
+            "rect": [
+              575.25,
+              489.0,
+              181.5,
+              36.0
+            ],
+            "visible": true
+          }
+        },
+        "decimus_met": false,
+        "feedback": "",
+        "graphics_runtime": {
+          "ui_profile": "low",
+          "world_profile": "low"
+        },
+        "meshy_runtime": {
+          "loaded_count": 1,
+          "severus": {
+            "asset_id": "unit_roman_signifer",
+            "bone_count": 15,
+            "clip": "idle",
+            "equipment": [
+              {
+                "asset_id": "gear_roman_signum",
+                "bone": "Hand_R",
+                "bound": true,
+                "mesh_count": 1,
+                "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+              }
+            ],
+            "has_march": true,
+            "has_run": true,
+            "loaded": true,
+            "mesh_count": 2,
+            "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+          },
+          "version": 1
+        },
+        "people": 14,
+        "player_is_ruler": false,
+        "saved_behavior_runtime": {
+          "accumulator": 0.0,
+          "activity_counts": {
+            "patrol": 5,
+            "socialize": 8,
+            "work": 29
+          },
+          "behavior_version": 1,
+          "decision_due_count": 0,
+          "envelope_sha256": "336ad8f4ffaa86a58fcb83317ea3ed790e3bd7205d18e26f402ea089a2597fb1",
+          "observed_count": 42,
+          "payload_sha256": "dfccd97ebcebc87c4e236f54d1dcca57f87f957f0df435fdc355bd02798b7f27",
+          "people_count": 42,
+          "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+          "samples": {
+            "aelia": {
+              "activity": "work",
+              "fatigue": 19.35,
+              "interest": "craft",
+              "last_greet": -1000.0,
+              "last_trust": 0.0,
+              "memories": [],
+              "next_decision": 15.0,
+              "observed": true,
+              "partner": "",
+              "position": [
+                20.0,
+                0.0,
+                17.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1.0,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 38.0125,
+              "stress": 0.0
+            },
+            "julia": {
+              "activity": "work",
+              "fatigue": 13.9,
+              "interest": "family",
+              "last_greet": 5.0,
+              "last_trust": 6.0,
+              "memories": [
+                {
+                  "at": 8.5,
+                  "kind": "trust_gained"
+                }
+              ],
+              "next_decision": 17.25,
+              "observed": true,
+              "partner": "",
+              "position": [
+                -15.3000001907349,
+                0.0,
+                14.8000001907349
+              ],
+              "reason": "daily_work",
+              "route_direction": 1.0,
+              "route_distance": 0.0,
+              "since": 7.5,
+              "social_need": 25.575,
+              "stress": 0.0
+            },
+            "marcus": {
+              "activity": "work",
+              "fatigue": 11.35,
+              "interest": "learning",
+              "last_greet": -1000.0,
+              "last_trust": 0.0,
+              "memories": [],
+              "next_decision": 15.75,
+              "observed": true,
+              "partner": "",
+              "position": [
+                -3.0,
+                0.899999976158142,
+                4.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1.0,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 52.0125,
+              "stress": 0.0
+            },
+            "sextus": {
+              "activity": "work",
+              "fatigue": 9.35000000000002,
+              "interest": "craft",
+              "last_greet": -1000.0,
+              "last_trust": 0.0,
+              "memories": [],
+              "next_decision": 18.0,
+              "observed": true,
+              "partner": "",
+              "position": [
+                32.7999992370605,
+                0.0,
+                -25.0
+              ],
+              "reason": "daily_work",
+              "route_direction": 1.0,
+              "route_distance": 0.0,
+              "since": 0.0,
+              "social_need": 39.0125,
+              "stress": 0.0
+            }
+          },
+          "seconds": 13.5,
+          "state_sha256": "9b06d56676a0105c0c973c81172added25b278abfc9941f4a154bcfe88f4d8ff",
+          "version": 1,
+          "world_id": "46716399-4269512624"
+        },
+        "screen": "playing",
+        "work_permit": false,
+        "workplaces": 5,
+        "world_seconds": 19.8
+      }
+    },
+    {
+      "name": "native_pointer_is_held_before_pause",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.666666626930237,
+          0.0,
+          -0.666666626930237
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "march",
+        "figure_speed": 0.942821502685547,
+        "mode": "person",
+        "move_axis": [
+          0.942922532558441,
+          0.0
+        ],
+        "movement_touch": 0,
+        "overlay": "none",
+        "position": [
+          -12.1154098510742,
+          1.29333400726318,
+          11.5342674255371
+        ],
+        "running": false,
+        "selected_technique": "jab_right",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.666675508022308,
+          -0.00019311903452035,
+          -0.666675508022308
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "pause_cancels_held_native_pointer",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -11.9648399353027,
+          1.29332494735718,
+          11.415843963623
+        ],
+        "running": false,
+        "selected_technique": "jab_right",
+        "touch_camera_managed": true,
+        "ui_view": "pause",
+        "velocity": [
+          1.11276626586914,
+          -0.000557899475097656,
+          -0.794448792934418
+        ],
+        "version": 1,
+        "world_active": false,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "resume_after_held_pointer_neutral_inputs",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -11.9648399353027,
+          1.29332494735718,
+          11.415843963623
+        ],
+        "running": false,
+        "selected_technique": "jab_right",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "resume_after_held_pointer_no_player_drift",
+      "passed": true,
+      "detail": {
+        "distance_m": 0.0,
+        "first": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "figure_clip": "idle",
+          "figure_speed": 0.0,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.9648399353027,
+            1.29332494735718,
+            11.415843963623
+          ],
+          "running": false,
+          "selected_technique": "jab_right",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "second": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "figure_clip": "idle",
+          "figure_speed": 0.0,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.9648399353027,
+            1.29332494735718,
+            11.415843963623
+          ],
+          "running": false,
+          "selected_technique": "jab_right",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        }
+      }
+    },
+    {
+      "name": "world_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "world_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "android_back_pauses",
+      "passed": true,
+      "detail": "Back opened a new pause without terminating the app"
+    },
+    {
+      "name": "background_resume",
+      "passed": true,
+      "detail": "Process survived Home and return"
+    },
+    {
+      "name": "npc_behavior_saved_snapshot",
+      "passed": true,
+      "detail": {
+        "accumulator": 0.3,
+        "activity_counts": {
+          "patrol": 5,
+          "socialize": 12,
+          "work": 25
+        },
+        "behavior_version": 1,
+        "decision_due_count": 0,
+        "envelope_sha256": "9f5f8a4f90989022ba64d2d435f46f2d0b00c277ef9cd3a6f978f24dddddeaef",
+        "observed_count": 42,
+        "payload_sha256": "c5828b3316b424943147b87e740e520cac3268ec925aec7c6cca8f6b1ce1b35e",
+        "people_count": 42,
+        "roster_sha256": "4ab74b95dc167c242e6f8fc60a13423962dfdd94e5a707583c1ca7346af10b27",
+        "samples": {
+          "aelia": {
+            "activity": "work",
+            "fatigue": 20.3,
+            "interest": "craft",
+            "last_greet": -1000.0,
+            "last_trust": 0.0,
+            "memories": [],
+            "next_decision": 24.0,
+            "observed": true,
+            "partner": "",
+            "position": [
+              20.0,
+              0.0,
+              17.0
+            ],
+            "reason": "daily_work",
+            "route_direction": 1.0,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 38.7250000000001,
+            "stress": 0.0
+          },
+          "julia": {
+            "activity": "work",
+            "fatigue": 14.85,
+            "interest": "family",
+            "last_greet": 5.0,
+            "last_trust": 6.0,
+            "memories": [
+              {
+                "at": 8.5,
+                "kind": "trust_gained"
+              }
+            ],
+            "next_decision": 27.25,
+            "observed": true,
+            "partner": "",
+            "position": [
+              -15.3000001907349,
+              0.0,
+              14.8000001907349
+            ],
+            "reason": "daily_work",
+            "route_direction": 1.0,
+            "route_distance": 0.0,
+            "since": 7.5,
+            "social_need": 26.2875000000001,
+            "stress": 0.0
+          },
+          "marcus": {
+            "activity": "work",
+            "fatigue": 12.3,
+            "interest": "learning",
+            "last_greet": -1000.0,
+            "last_trust": 0.0,
+            "memories": [],
+            "next_decision": 23.75,
+            "observed": true,
+            "partner": "",
+            "position": [
+              -3.0,
+              0.899999976158142,
+              4.0
+            ],
+            "reason": "daily_work",
+            "route_direction": 1.0,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 52.7250000000001,
+            "stress": 0.0
+          },
+          "sextus": {
+            "activity": "work",
+            "fatigue": 10.3,
+            "interest": "craft",
+            "last_greet": -1000.0,
+            "last_trust": 0.0,
+            "memories": [],
+            "next_decision": 27.0,
+            "observed": true,
+            "partner": "",
+            "position": [
+              32.7999992370605,
+              0.0,
+              -25.0
+            ],
+            "reason": "daily_work",
+            "route_direction": 1.0,
+            "route_distance": 0.0,
+            "since": 0.0,
+            "social_need": 39.7250000000001,
+            "stress": 0.0
+          }
+        },
+        "seconds": 23.0,
+        "state_sha256": "64eb993db371d52c4044475ee21282410e705776b1db65aefc18d031b1e7bece",
+        "version": 1,
+        "world_id": "46716399-4269512624"
+      }
+    },
+    {
+      "name": "launch_6038_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_6038_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "persistent_save_after_restart",
+      "passed": true,
+      "detail": {
+        "atlas": [
+          515.625,
+          324.75
+        ],
+        "can_continue": true,
+        "continue": [
+          189.375,
+          280.5
+        ],
+        "demo": [
+          515.625,
+          280.5
+        ],
+        "gallery": [
+          515.625,
+          369.0
+        ],
+        "gallery_visible": true
+      }
+    },
+    {
+      "name": "continue_after_process_death",
+      "passed": true,
+      "detail": "Loaded the village in a new process"
+    },
+    {
+      "name": "family_actions_and_items_survive_restart",
+      "passed": true,
+      "detail": {
+        "age": 12,
+        "carried": [
+          "household_coin",
+          "water_jug"
+        ],
+        "completed": [
+          "mother_morning",
+          "fill_water"
+        ],
+        "day": 1,
+        "dialog_npc": "",
+        "family_entrance": [
+          -13.0,
+          14.6999998092651
+        ],
+        "family_water": [
+          -12.0,
+          11.6999998092651
+        ],
+        "stage": "father_morning",
+        "target_npc": "silvanus",
+        "target_point": "",
+        "target_position": [
+          -16.2000007629395,
+          16.7000007629395
+        ],
+        "target_radius": 3.2,
+        "version": 1,
+        "world_id": "46716399-4269512624"
+      }
+    },
+    {
+      "name": "restart_action_controls_neutral_inputs",
+      "passed": true,
+      "detail": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -11.9648399353027,
+          1.29332494735718,
+          11.415843963623
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      }
+    },
+    {
+      "name": "restart_action_controls_no_player_drift",
+      "passed": true,
+      "detail": {
+        "distance_m": 0.0,
+        "first": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "figure_clip": "idle",
+          "figure_speed": 0.0,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.9648399353027,
+            1.29332494735718,
+            11.415843963623
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        },
+        "second": {
+          "action_touches": 0,
+          "body_velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "camera_touches": 0,
+          "camera_yaw": 0.62,
+          "figure_clip": "idle",
+          "figure_speed": 0.0,
+          "mode": "person",
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "movement_touch": -1,
+          "overlay": "none",
+          "position": [
+            -11.9648399353027,
+            1.29332494735718,
+            11.415843963623
+          ],
+          "running": false,
+          "selected_technique": "jab_left",
+          "touch_camera_managed": true,
+          "ui_view": "game",
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "version": 1,
+          "world_active": true,
+          "world_camera_touches": 0
+        }
+      }
+    },
+    {
+      "name": "npc_behavior_survives_restart",
+      "passed": true,
+      "detail": {
+        "elapsed_simulation_seconds": 0.5,
+        "saved_state_sha256": "64eb993db371d52c4044475ee21282410e705776b1db65aefc18d031b1e7bece",
+        "sample_ids": [
+          "aelia",
+          "julia",
+          "marcus",
+          "sextus"
+        ],
+        "observed_count": 42
+      }
+    },
+    {
+      "name": "meshy_severus_loaded_after_restart",
+      "passed": true,
+      "detail": {
+        "packaged_models": [
+          "assets/assets/meshy/characters/unit_roman_signifer_3.glb",
+          "assets/assets/meshy/equipment/gear_roman_signum_1.glb"
+        ],
+        "packaged_resources": [
+          {
+            "source": "assets/meshy/characters/unit_roman_signifer_3.glb",
+            "entry": "assets/.godot/imported/unit_roman_signifer_3.glb-3f9de47102dce13d8dac1fbd15439a0b.scn",
+            "remap": "assets/assets/meshy/characters/unit_roman_signifer_3.glb.import",
+            "mode": "remapped",
+            "size_bytes": 106125,
+            "sha256": "41b379cfba4e2296dc985289ad56f032b3802cdb194eb8ae2823cb921d857d27",
+            "remap_sha256": "2833c74f8eab4dc0a86e468f4d9899290b294552ad6dd360cb12ec3bb7148db4"
+          },
+          {
+            "source": "assets/meshy/equipment/gear_roman_signum_1.glb",
+            "entry": "assets/.godot/imported/gear_roman_signum_1.glb-ed3f3f24147c65525ffd258d4e901e2e.scn",
+            "remap": "assets/assets/meshy/equipment/gear_roman_signum_1.glb.import",
+            "mode": "remapped",
+            "size_bytes": 23417,
+            "sha256": "c51864b1b34b2817dbdc111f4248861f04fe6f391bfc482903bfe012b33eacfe",
+            "remap_sha256": "0e5c5e59d1e46898248fe8a57a0141ec9e4d67b93deafaba11ea3c5605d43d98"
+          }
+        ],
+        "hash_scope": "SHA-256 of the actual exported APK payloads and import remaps, not source GLB bytes.",
+        "loaded_count": 1,
+        "severus": {
+          "asset_id": "unit_roman_signifer",
+          "bone_count": 15,
+          "clip": "idle",
+          "equipment": [
+            {
+              "asset_id": "gear_roman_signum",
+              "bone": "Hand_R",
+              "bound": true,
+              "mesh_count": 1,
+              "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+            }
+          ],
+          "has_march": true,
+          "has_run": true,
+          "loaded": true,
+          "mesh_count": 2,
+          "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+        },
+        "version": 1
+      }
+    },
+    {
+      "name": "launch_6237_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_6237_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "formation_valley",
+      "passed": true,
+      "detail": "Actual practice menu touch opened the valley scene"
+    },
+    {
+      "name": "touch_advances_marching_soldier",
+      "passed": true,
+      "detail": {
+        "paused_step": 0,
+        "member": "ridge_guard_00",
+        "meters": 0.796524882316589,
+        "pose": "run",
+        "step": 1
+      }
+    },
+    {
+      "name": "square_display_alive",
+      "passed": true,
+      "detail": "Physical size: 1080x2400\nOverride size: 900x920"
+    },
+    {
+      "name": "measured_valley_frames",
+      "passed": true,
+      "detail": {
+        "intervals": 12,
+        "scope": "Software-rendered emulator; CPU/GPU values are latest renderer timings, frame time is an interval mean"
+      }
+    },
+    {
+      "name": "launch_6495_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "launch_6495_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "world_globe",
+      "passed": true,
+      "detail": "Opened the playable globe through the main menu on a square display"
+    },
+    {
+      "name": "gallery_menu_action",
+      "passed": true,
+      "detail": {
+        "atlas": [
+          543.140625,
+          502.476043701172
+        ],
+        "can_continue": true,
+        "continue": [
+          230.484375,
+          460.063903808594
+        ],
+        "demo": [
+          543.140625,
+          460.063903808594
+        ],
+        "gallery": [
+          543.140625,
+          544.88818359375
+        ],
+        "gallery_visible": true
+      }
+    },
+    {
+      "name": "gallery_menu_system_fullscreen_hint_absent",
+      "passed": true,
+      "detail": {
+        "xml": "gallery_menu_before_ui.xml",
+        "clicked": false
+      }
+    },
+    {
+      "name": "gallery_button_visible",
+      "passed": true,
+      "detail": [
+        543.140625,
+        544.88818359375
+      ]
+    },
+    {
+      "name": "real_portrait_loaded",
+      "passed": true,
+      "detail": "Tapped Figuren and rendered the legionary portrait from the exported game"
+    },
+    {
+      "name": "gallery_back_to_menu",
+      "passed": true,
+      "detail": "Android Back restored the menu"
+    },
+    {
+      "name": "no_runtime_errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "arm64_download_install",
+      "passed": true,
+      "detail": "Performing Streamed Install\nSuccess"
+    },
+    {
+      "name": "arm64_selected",
+      "passed": true,
+      "detail": "PackageManager primaryCpuAbi"
+    },
+    {
+      "name": "arm64_activity_launch",
+      "passed": true,
+      "detail": "Starting: Intent { cmp=at.heinz.imperathen/com.godot.game.GodotAppLauncher }\nStatus: ok\nLaunchState: COLD\nActivity: at.heinz.imperathen/com.godot.game.GodotApp\nTotalTime: 2580\nWaitTime: 2582\nComplete"
+    },
+    {
+      "name": "arm64_engine_running",
+      "passed": true,
+      "detail": "Godot rendered the new ARM64 process's intro control"
+    },
+    {
+      "name": "arm64_no_runtime_errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "source_commit": "b2c5970e7c8ce032c1941464e7659ac6d515c854",
+  "test_harness_commit": "b2c5970e7c8ce032c1941464e7659ac6d515c854",
+  "apk_file": "IMPERATHEN-b2c5970e-emulator.apk",
+  "action_controls_expected": true,
+  "npc_behavior_expected": true,
+  "meshy_characters_expected": true,
+  "story_route": "i00_aquileia->childhood_home",
+  "serial": "emulator-5554",
+  "android_version": "15",
+  "api_level": "35",
+  "abi": "x86_64",
+  "model": "sdk_gphone64_x86_64",
+  "pid": "6838",
+  "screenshots": {
+    "00_android_intro.png": {
+      "sha256": "f48fee68675aa4063f941145466a7fdb9b2d2a80d06496cb4fb59b2edc22881a",
+      "width": 960,
+      "height": 540
+    },
+    "01_android_menu.png": {
+      "sha256": "6f6ee299460dbae1173e211e572a3462bbdbdd5170e4e3c8d30d1b8a2657f349",
+      "width": 960,
+      "height": 540
+    },
+    "10_android_opening.png": {
+      "sha256": "db0499704284f3395224b2f7fa6f52bba71fea053f449cf776e01697aa216b45",
+      "width": 960,
+      "height": 540
+    },
+    "11_android_opening_objective.png": {
+      "sha256": "dbb7125293cf227bf80736d9453ed83ceeb40d929f5183e6981384ef857a81fd",
+      "width": 960,
+      "height": 540
+    },
+    "18_android_light_settings.png": {
+      "sha256": "967e8a7d0f7208e2d5996f687bea70a5f56ec339ba4b7f0b801d2673c6d77149",
+      "width": 960,
+      "height": 540
+    },
+    "15_android_family_home.png": {
+      "sha256": "e3580b34768e11aeb40673149990282eb2c5c408975f7162497d6b9b5bd151b5",
+      "width": 960,
+      "height": 540
+    },
+    "16_android_mother_conversation.png": {
+      "sha256": "335227c511485879254fe1ac7fc1b2228064170788220b251c235767ac56b947",
+      "width": 960,
+      "height": 540
+    },
+    "17_android_family_jug.png": {
+      "sha256": "b9efe47118f7a7945b6681074cb32881d05e31608485aaffa137eb4fc9b47884",
+      "width": 960,
+      "height": 540
+    },
+    "14_android_techniques.png": {
+      "sha256": "10a278153763c5fa772006d1b9b6d8d1f3f2468a24450f873b1977f786fd8a00",
+      "width": 960,
+      "height": 540
+    },
+    "02_android_world.png": {
+      "sha256": "0aa8876dd6a76ccc0a57c109b2f473a6036752ea7be4664f1ad3f2a16391e64c",
+      "width": 960,
+      "height": 540
+    },
+    "03_android_pause.png": {
+      "sha256": "ce75b2c5854bdee28671aa397488039f238203739bb3dad6c27bed0babaf69ec",
+      "width": 960,
+      "height": 540
+    },
+    "04_android_valley.png": {
+      "sha256": "541adfde3ad4397894db6caf57355f4139b90e53ba5a1ca01e26c72cd9752a06",
+      "width": 960,
+      "height": 540
+    },
+    "09_android_marching.png": {
+      "sha256": "48a51e75dba3c00a2716746cc44b138eca6a233fbe6c4137bab7cc6dcd61d915",
+      "width": 960,
+      "height": 540
+    },
+    "05_android_valley_square.png": {
+      "sha256": "b782304c0ed43db7fc104fd36de3ec1a33f655d28f5a2400ddf026d314aa347e",
+      "width": 920,
+      "height": 900
+    },
+    "06_android_globe.png": {
+      "sha256": "5f768021fd1d412315645915110778cef02f96fedff6f42c92cb469b52d1dd6f",
+      "width": 920,
+      "height": 900
+    },
+    "08_android_figuren.png": {
+      "sha256": "ef99fadda4ff4915ffae58fc786d478303075c7f93d0ec4ff42ee83c7ec7a441",
+      "width": 920,
+      "height": 900
+    },
+    "07_android_arm64_translated_intro.png": {
+      "sha256": "988b1cdbca48943a15eb27af2b3f221145776055974c1416c3bdaaefb897524f",
+      "width": 920,
+      "height": 900
+    }
+  },
+  "childhood_native_walks": [
+    {
+      "route": "family_door_alignment",
+      "attempt": 1,
+      "input": "adb input motionevent",
+      "events": [
+        {
+          "event": "DOWN",
+          "point": [
+            90,
+            393
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            45,
+            382
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            47,
+            382
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            385
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            72,
+            388
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "UP",
+          "point": [
+            72,
+            388
+          ],
+          "command_returned": true
+        }
+      ],
+      "observations": [
+        {
+          "phase": "DOWN",
+          "position": [
+            -12.0,
+            1.29257822036743,
+            11.6999998092651
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "figure_clip": "idle",
+          "figure_speed": 0.0
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.0499982833862,
+            1.29331994056702,
+            11.7352313995361
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.801533997058868,
+            -0.195930391550064
+          ],
+          "velocity": [
+            -0.666675508022308,
+            -0.000686645449604839,
+            0.356140106916428
+          ],
+          "figure_clip": "march",
+          "figure_speed": 0.755838572978973
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.3210487365723,
+            1.29332792758942,
+            11.8444871902466
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.760376989841461,
+            -0.194514915347099
+          ],
+          "velocity": [
+            -1.06121063232422,
+            0.00017166136240121,
+            0.411071747541428
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.13804566860199
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.7068748474121,
+            1.29333078861237,
+            11.9897947311401
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.49090564250946,
+            -0.130907669663429
+          ],
+          "velocity": [
+            -0.689678132534027,
+            0.00017166136240121,
+            0.25909423828125
+          ],
+          "figure_clip": "march",
+          "figure_speed": 0.736739933490753
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9456949234009,
+            1.29333102703094,
+            12.076361656189
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.242210119962692,
+            -0.0672801807522774
+          ],
+          "velocity": [
+            -0.342521637678146,
+            0.00019311903452035,
+            0.124683372676373
+          ],
+          "figure_clip": "march",
+          "figure_speed": 0.364509284496307
+        },
+        {
+          "phase": "UP",
+          "position": [
+            -13.0409555435181,
+            1.29333055019379,
+            12.1096096038818
+          ],
+          "movement_touch": -1,
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "figure_clip": "idle",
+          "figure_speed": 0.0
+        }
+      ],
+      "before": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.0,
+          1.29257822036743,
+          11.6999998092651
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "target": [
+        -13.0,
+        12.0999998092651
+      ],
+      "after": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -13.0409555435181,
+          1.29333055019379,
+          12.1096096038818
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "distance_m": 1.1186458900952523
+    },
+    {
+      "route": "family_doorstep",
+      "attempt": 1,
+      "input": "adb input motionevent",
+      "events": [
+        {
+          "event": "DOWN",
+          "point": [
+            90,
+            393
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            60,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            61,
+            436
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            63,
+            432
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            72,
+            419
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            80,
+            408
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "UP",
+          "point": [
+            80,
+            408
+          ],
+          "command_returned": true
+        }
+      ],
+      "observations": [
+        {
+          "phase": "DOWN",
+          "position": [
+            -13.0409555435181,
+            1.29333055019379,
+            12.1096096038818
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "figure_clip": "idle",
+          "figure_speed": 0.0
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0395212173462,
+            1.293328166008,
+            12.1596069335938
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ],
+          "velocity": [
+            0.0126457205042243,
+            7.15255691829952e-06,
+            0.666675508022308
+          ],
+          "figure_clip": "march",
+          "figure_speed": 0.666795432567596
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0336446762085,
+            1.29332458972931,
+            12.6665115356445
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ],
+          "velocity": [
+            0.0149345388635993,
+            -0.000221729264012538,
+            1.38015735149384
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.38023817539215
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0300254821777,
+            1.3411740064621,
+            12.9963417053223
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ],
+          "velocity": [
+            0.0135612478479743,
+            0.287232369184494,
+            1.22863757610321
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.22871243953705
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0260515213013,
+            1.34582495689392,
+            13.3622808456421
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ],
+          "velocity": [
+            0.0149917593225837,
+            -0.000743865908589214,
+            1.38015735149384
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.3802387714386
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0220603942871,
+            1.34582793712616,
+            13.7303133010864
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ],
+          "velocity": [
+            0.0149345388635993,
+            -0.00019311903452035,
+            1.38010013103485
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.38018095493317
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0180673599243,
+            1.30652785301208,
+            14.0989513397217
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.544640243053436,
+            0.7806516289711
+          ],
+          "velocity": [
+            0.0149917593225837,
+            -0.579471528530121,
+            1.3854216337204
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.38550269603729
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0083446502686,
+            1.15204691886902,
+            14.4635286331177
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.525662899017334,
+            0.779431819915771
+          ],
+          "velocity": [
+            0.0364494286477566,
+            -0.579192578792572,
+            1.36665332317352
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.36713933944702
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0035848617554,
+            1.01177561283112,
+            14.7936496734619
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.482778936624527,
+            0.697347402572632
+          ],
+          "velocity": [
+            0.017852783203125,
+            -0.5354905128479,
+            1.23424518108368
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.23437428474426
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -13.0006732940674,
+            0.91896253824234,
+            15.013876914978
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            -0.295979470014572,
+            0.427526146173477
+          ],
+          "velocity": [
+            0.0109291067346931,
+            -0.30022856593132,
+            0.75445169210434
+          ],
+          "figure_clip": "march",
+          "figure_speed": 0.754530847072601
+        },
+        {
+          "phase": "UP",
+          "position": [
+            -12.9976892471313,
+            0.890839815139771,
+            15.1288261413574
+          ],
+          "movement_touch": -1,
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "figure_clip": "idle",
+          "figure_speed": 0.0
+        }
+      ],
+      "before": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -13.0409555435181,
+          1.29333055019379,
+          12.1096096038818
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "target": [
+        -13.0,
+        15.1999998092651
+      ],
+      "after": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.9976892471313,
+          0.890839815139771,
+          15.1288261413574
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "distance_m": 3.0195265311914685
+    },
+    {
+      "route": "return_inside_family_house",
+      "attempt": 1,
+      "input": "adb input motionevent",
+      "events": [
+        {
+          "event": "DOWN",
+          "point": [
+            90,
+            393
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            120,
+            351
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            119,
+            352
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            110,
+            365
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            102,
+            376
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "MOVE",
+          "point": [
+            100,
+            378
+          ],
+          "command_returned": true
+        },
+        {
+          "event": "UP",
+          "point": [
+            100,
+            378
+          ],
+          "command_returned": true
+        }
+      ],
+      "observations": [
+        {
+          "phase": "DOWN",
+          "position": [
+            -12.9976892471313,
+            0.890839815139771,
+            15.1288261413574
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "figure_clip": "idle",
+          "figure_speed": 0.0
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9976816177368,
+            0.890840113162994,
+            15.0878257751465
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ],
+          "velocity": [
+            5.72204553463962e-05,
+            0.0,
+            -0.406665772199631
+          ],
+          "figure_clip": "march",
+          "figure_speed": 0.406665772199631
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9976663589478,
+            0.917062520980835,
+            15.0187673568726
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ],
+          "velocity": [
+            5.72204553463962e-05,
+            0.148444160819054,
+            -0.350475281476974
+          ],
+          "figure_clip": "march",
+          "figure_speed": 0.350475281476974
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9976234436035,
+            1.00178241729736,
+            14.8188753128052
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ],
+          "velocity": [
+            0.000228881821385585,
+            0.425212353467941,
+            -1.00324630737305
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.00324630737305
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9975624084473,
+            1.11920213699341,
+            14.5417985916138
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ],
+          "velocity": [
+            0.000228881821385585,
+            0.441391438245773,
+            -1.04141235351562
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.04141235351562
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.997501373291,
+            1.23690843582153,
+            14.2640781402588
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ],
+          "velocity": [
+            0.000228881821385585,
+            0.441098183393478,
+            -1.04158401489258
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.04158401489258
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9974355697632,
+            1.34509980678558,
+            13.9769878387451
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ],
+          "velocity": [
+            0.00034332272480242,
+            0.172634109854698,
+            -1.28225314617157
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.28225314617157
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9973449707031,
+            1.34583151340485,
+            13.6159219741821
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ],
+          "velocity": [
+            0.00034332272480242,
+            2.14576703001512e-05,
+            -1.35560977458954
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.35560977458954
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9972534179688,
+            1.34582805633545,
+            13.2544231414795
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.54340523481369,
+            -0.760767340660095
+          ],
+          "velocity": [
+            0.00034332272480242,
+            -0.000557899475097656,
+            -1.35560977458954
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.35560977458954
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9979791641235,
+            1.30083239078522,
+            12.8979721069336
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.523164391517639,
+            -0.739645957946777
+          ],
+          "velocity": [
+            -0.00577926589176059,
+            -0.755753457546234,
+            -1.32087695598602
+          ],
+          "figure_clip": "march",
+          "figure_speed": 1.32088959217072
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9987154006958,
+            1.29332196712494,
+            12.5921831130981
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.335850268602371,
+            -0.470190048217773
+          ],
+          "velocity": [
+            0.000228881821385585,
+            -0.000400543183786795,
+            -0.837879121303558
+          ],
+          "figure_clip": "march",
+          "figure_speed": 0.837879180908203
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9986543655396,
+            1.29332530498505,
+            12.3687572479248
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.335850268602371,
+            -0.470190048217773
+          ],
+          "velocity": [
+            0.000228881821385585,
+            0.0,
+            -0.837821900844574
+          ],
+          "figure_clip": "march",
+          "figure_speed": 0.837821960449219
+        },
+        {
+          "phase": "MOVE",
+          "position": [
+            -12.9992599487305,
+            1.29332792758942,
+            12.2410860061646
+          ],
+          "movement_touch": 0,
+          "move_axis": [
+            0.170427367091179,
+            -0.241438657045364
+          ],
+          "velocity": [
+            -0.00223159790039062,
+            0.0,
+            -0.428523987531662
+          ],
+          "figure_clip": "march",
+          "figure_speed": 0.428529798984528
+        },
+        {
+          "phase": "UP",
+          "position": [
+            -13.0007266998291,
+            1.29332745075226,
+            12.1911354064941
+          ],
+          "movement_touch": -1,
+          "move_axis": [
+            0.0,
+            0.0
+          ],
+          "velocity": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "figure_clip": "idle",
+          "figure_speed": 0.0
+        }
+      ],
+      "before": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -12.9976892471313,
+          0.890839815139771,
+          15.1288261413574
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "target": [
+        -13.0,
+        12.0999998092651
+      ],
+      "after": {
+        "action_touches": 0,
+        "body_velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "camera_touches": 0,
+        "camera_yaw": 0.62,
+        "figure_clip": "idle",
+        "figure_speed": 0.0,
+        "mode": "person",
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "movement_touch": -1,
+        "overlay": "none",
+        "position": [
+          -13.0007266998291,
+          1.29332745075226,
+          12.1911354064941
+        ],
+        "running": false,
+        "selected_technique": "jab_left",
+        "touch_camera_managed": true,
+        "ui_view": "game",
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "version": 1,
+        "world_active": true,
+        "world_camera_touches": 0
+      },
+      "distance_m": 2.9376923051641355
+    }
+  ],
+  "childhood_scope": "First two actual actions only: mother conversation and filling the family jug; no quest, item or position injection.",
+  "action_native_walk": {
+    "input": "adb input motionevent",
+    "events": [
+      {
+        "event": "DOWN",
+        "point": [
+          90,
+          393
+        ],
+        "command_returned": true
+      },
+      {
+        "event": "MOVE",
+        "point": [
+          142,
+          393
+        ],
+        "command_returned": true
+      },
+      {
+        "event": "MOVE",
+        "point": [
+          142,
+          393
+        ],
+        "command_returned": true
+      },
+      {
+        "event": "UP",
+        "point": [
+          142,
+          393
+        ],
+        "command_returned": true
+      }
+    ],
+    "observations": [
+      {
+        "phase": "DOWN",
+        "position": [
+          -13.0007266998291,
+          1.29332745075226,
+          12.1911354064941
+        ],
+        "movement_touch": 0,
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "figure_clip": "gather",
+        "figure_speed": 0.0
+      },
+      {
+        "phase": "MOVE",
+        "position": [
+          -12.9507274627686,
+          1.293328166008,
+          12.1411361694336
+        ],
+        "movement_touch": 0,
+        "move_axis": [
+          0.942922532558441,
+          0.0
+        ],
+        "velocity": [
+          0.666618287563324,
+          1.4305113836599e-05,
+          -0.666618287563324
+        ],
+        "figure_clip": "gather",
+        "figure_speed": 0.942740619182587
+      },
+      {
+        "phase": "MOVE",
+        "position": [
+          -12.5219707489014,
+          1.29334032535553,
+          11.8248109817505
+        ],
+        "movement_touch": 0,
+        "move_axis": [
+          0.942922532558441,
+          0.0
+        ],
+        "velocity": [
+          1.11276626586914,
+          0.00036478039692156,
+          -0.794391572475433
+        ],
+        "figure_clip": "march",
+        "figure_speed": 1.36722588539124
+      },
+      {
+        "phase": "UP",
+        "position": [
+          -12.1654119491577,
+          1.29333364963531,
+          11.5842695236206
+        ],
+        "movement_touch": -1,
+        "move_axis": [
+          0.0,
+          0.0
+        ],
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "figure_clip": "idle",
+        "figure_speed": 0.0
+      }
+    ],
+    "before": {
+      "action_touches": 0,
+      "body_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "camera_touches": 0,
+      "camera_yaw": 0.62,
+      "figure_clip": "gather",
+      "figure_speed": 0.0,
+      "mode": "person",
+      "move_axis": [
+        0.0,
+        0.0
+      ],
+      "movement_touch": -1,
+      "overlay": "none",
+      "position": [
+        -13.0007266998291,
+        1.29332745075226,
+        12.1911354064941
+      ],
+      "running": false,
+      "selected_technique": "jab_left",
+      "touch_camera_managed": true,
+      "ui_view": "game",
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "version": 1,
+      "world_active": true,
+      "world_camera_touches": 0
+    },
+    "target": null,
+    "after": {
+      "action_touches": 0,
+      "body_velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "camera_touches": 0,
+      "camera_yaw": 0.62,
+      "figure_clip": "idle",
+      "figure_speed": 0.0,
+      "mode": "person",
+      "move_axis": [
+        0.0,
+        0.0
+      ],
+      "movement_touch": -1,
+      "overlay": "none",
+      "position": [
+        -12.1654119491577,
+        1.29333364963531,
+        11.5842695236206
+      ],
+      "running": false,
+      "selected_technique": "jab_left",
+      "touch_camera_managed": true,
+      "ui_view": "game",
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "version": 1,
+      "world_active": true,
+      "world_camera_touches": 0
+    },
+    "distance_m": 1.032490645228834
+  },
+  "valley_render_samples": [
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.46869910220687,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 2133.565,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 2.22699999809265,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.781348889468823,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1279.838,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 77.890998840332,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 1.39191921300888,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 718.4325,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 8042.90185546875,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.8631136306357,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1158.596,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 2124.21508789062,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 1.12733026210992,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 887.0515,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 37.9749984741211,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 2.10566508133482,
+      "frames": 3,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 474.909333333333,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 914.924987792969,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 1.36530513887201,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 732.437,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 852.35302734375,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 1.07440467237104,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 930.748,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        960,
+        540
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 12.1219997406006,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 861,
+      "driver": "opengl3",
+      "fps": 0.463884073514492,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 2155.711,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 12.0909996032715,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 110050
+    },
+    {
+      "draw_calls": 843,
+      "driver": "opengl3",
+      "fps": 0.645784993635789,
+      "frames": 1,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 1548.503,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 11.7889995574951,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 111810
+    },
+    {
+      "draw_calls": 841,
+      "driver": "opengl3",
+      "fps": 2.61585627439286,
+      "frames": 3,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 382.284,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 139.884994506836,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 111810
+    },
+    {
+      "draw_calls": 841,
+      "driver": "opengl3",
+      "fps": 1.91003177337855,
+      "frames": 2,
+      "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.2.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+      "mean_frame_ms": 523.5515,
+      "near_mid_far": [
+        0,
+        30,
+        30
+      ],
+      "output": [
+        920,
+        900
+      ],
+      "quality": "balanced",
+      "render_cpu_ms": 343.071990966797,
+      "render_gpu_ms": null,
+      "renderer": "gl_compatibility",
+      "rss_kib": null,
+      "scale_3d": 1.0,
+      "visible_primitives": 111810
+    }
+  ],
+  "arm64_package": {
+    "available_abis": [
+      "x86_64",
+      "arm64-v8a"
+    ],
+    "sha256": "03da2d5a927c631a5e509b6c85e80a04a43f6e283bdf1a6883512eba086cfc6d",
+    "name": "IMPERATHEN-b2c5970e-arm64.apk",
+    "status": "started_under_translation"
+  }
+}

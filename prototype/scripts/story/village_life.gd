@@ -68,6 +68,7 @@ static func npc_catalog(data: Dictionary = {}) -> Array[Dictionary]:
 	for id: String in NPCS:
 		var npc: Dictionary = NPCS[id].duplicate(true)
 		npc["id"] = id
+		npc.name = Childhood.display_name(data, id, str(npc.name))
 		result.append(npc)
 	result.append_array(Childhood.npc_catalog(data))
 	return result

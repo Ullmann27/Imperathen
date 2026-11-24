@@ -5,6 +5,7 @@ extends RefCounted
 const Bible = preload("res://scripts/story/campaign_bible.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
+const CompanionStory = preload("res://scripts/story/companion_story.gd")
 const VERSION := 2
 const LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
@@ -34,10 +35,12 @@ const NEIGHBORS := {
 	"fabius":{"name":"Fabius", "role":"Holzfäller", "position":Vector2(-12.0,3.0), "text":"Am Lager kannst du das bereitgelegte Kleinholz holen. An die gefällten Stämme und die Axt gehst du nur mit einem Erwachsenen."},
 	"aurelia":{"name":"Aurelia", "role":"Heilerin", "position":Vector2(8.0,18.0), "text":"Im Dorf kümmern wir uns umeinander. Eine Nachricht rechtzeitig zu bringen hilft oft mehr als ein großer Auftritt."},
 	"cassia":{"name":"Cassia", "role":"Händlerin", "position":Vector2(5.0,0.0), "text":"Auf meinem Tisch liegen Waren, die andere brauchen. Höre erst zu, prüfe die Menge und nenne dann den Preis."},
-	"severus":{"name":"Severus", "role":"Dorfwache", "position":Vector2(-1.2,-45.9), "text":"Eine Runde mit der Wache ist kein Feldzug. Wir sehen nach Wegen und Toren, helfen den Leuten und melden, was wir tatsächlich beobachtet haben."}
+	"severus":{"name":"Wachmann", "role":"Dorfwache", "position":Vector2(-1.2,-45.9), "text":"Eine Runde mit der Wache ist kein Feldzug. Wir sehen nach Wegen und Toren, helfen den Leuten und melden, was wir tatsächlich beobachtet haben."}
 }
 # Authored steps live in res://assets/story/missions/band1/ (one file per mission).
 static var STEPS: Array = MissionData.steps("band1")
+## Separater Datenkatalog; die Save-relevante STEPS-Reihenfolge bleibt erhalten.
+static var BRIDGE_STEPS: Dictionary = MissionData.bridge_steps("band1")
 ## Screenplay bridge state version. v3 adds I-07 water (story core „Wasser,
 ## Nachricht und kurze Kontrollrunde“); older saves migrate on load.
 const SCREENPLAY_VERSION := 3
@@ -200,6 +203,9 @@ static func npc_catalog(data: Dictionary) -> Array[Dictionary]:
 static func actor_override(data: Dictionary, id: String) -> Variant:
 	if not enabled(data):
 		return null
+	var observed: Variant = CompanionStory.observed_position(data, id)
+	if observed != null:
+		return observed
 	var child: Dictionary = data.village.childhood
 	if id == "severus":
 		if child.guard_absence.active:
@@ -306,7 +312,7 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	if id == "rest_patrol":
 		var guard := _person(data, "severus")
 		if guard.is_empty() or not guard.alive or data.village.get("militia", []).has("severus") or guard.assignment == "defense":
-			return _fail("Severus ist für diesen Dorfabschnitt nicht verfügbar.")
+			return _fail("Der Wachmann ist für diesen Dorfabschnitt nicht verfügbar.")
 		child.guard_absence = {"active":true,"previous_assignment":guard.assignment,"previous_health":guard.health}
 		guard.assignment = "idle"
 		guard.previous_assignment = "idle"
@@ -594,6 +600,9 @@ static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
 		elif typeof(step.get("visits")) == TYPE_DICTIONARY and step.visits.has(npc_id):
 			# Optional visits authored in the mission data (e.g. I-09 evening).
 			text = str(step.visits[npc_id])
+		var companion_line := companion_dialogue(data, npc_id)
+		if step.get("npc", "") != npc_id and not companion_line.is_empty():
+			text = companion_line.text
 		text += "\n\nVertrauen: %d · Erzählter Dorftag %d. Du bist weiterhin Teil deiner Familie und des Dorfes." % [int(relation.get("trust",0)),int(data.village.childhood.day)]
 	return {"title":"%s · %s" % [spec.name,spec.role],"text":text,"choices":choices}
 
@@ -802,17 +811,9 @@ static func _screenplay_step(data: Dictionary) -> Dictionary:
 	# from completed[] so older 35-step saves keep their exact sequence indices.
 	if child.completed.size() >= 3:
 		if screenplay.i02 == "pending":
-			return {"id":"i02_basket","mission":"I-02","screenplay":true,"npc":"aurelia",
-				"chapter":"Der falsche Korb","label":"Julias Korb zu Aurelia bringen",
-				"objective":"Bring Julias Nachbarschaftskorb zu Aurelia. Prüfe den Korb oder handle hastig.",
-				"text":"»Zeig mir erst, welchen Korb Julia dir gegeben hat. Ein Fehler ist kein Weltende, aber wir müssen dann mit seinen Folgen weiterarbeiten.«",
-				"result":"Aurelia prüft den Korb."}
+			return BRIDGE_STEPS["i02_basket"].duplicate(true)
 		if screenplay.i02 == "correction":
-			return {"id":"i02_correct","mission":"I-02","screenplay":true,"npc":"julia",
-				"chapter":"Der falsche Korb","label":"Den falschen Korb mit Julia korrigieren",
-				"objective":"Kehre zu Julia zurück. Der falsche Korb bleibt Teil der Geschichte, bis du ihn korrigierst.",
-				"text":"»Gut, dass du zurückkommst. Fehler verschwinden nicht, weil man sie nicht mag. Wir bringen jetzt den richtigen Korb auf den Weg.«",
-				"result":"Der Fehler ist korrigiert und bleibt als Erinnerung gespeichert."}
+			return BRIDGE_STEPS["i02_correct"].duplicate(true)
 		if screenplay.i02 == "complete" and screenplay.i03 == "pending":
 			return {"id":"i03_marcus","mission":"I-03","screenplay":true,"point":"marcus",
 				"chapter":"Marcus kennt eine Abkürzung","label":"Mit Marcus über Marktweg und Münzstreit entscheiden",
@@ -835,46 +836,41 @@ static func _screenplay_step(data: Dictionary) -> Dictionary:
 	# family evening. No people or faction are identified from hoofprints alone.
 	if child.completed.has("return_gear"):
 		if screenplay.i08 == "pending":
-			return {"id":"i08_tracks","mission":"I-08","screenplay":true,"point":"hoof_tracks",
-				"chapter":"Hufspuren im Regen","label":"Die frischen Hufspuren am Nordweg prüfen",
-				"objective":"Untersuche am Nordweg die frischen Hufspuren. Halte Beobachtung und Vermutung getrennt.",
-				"text":"","result":"Du sicherst die Beobachtung: mehrere frische Hufspuren, aber noch keinen belastbaren Täter."}
+			return BRIDGE_STEPS["i08_tracks"].duplicate(true)
 		if screenplay.i08 == "report":
-			return {"id":"i08_report","mission":"I-08","screenplay":true,"npc":"decimus",
-				"chapter":"Hufspuren im Regen","label":"Decimus nur die belegten Spuren melden",
-				"objective":"Berichte Decimus, was du tatsächlich gesehen hast. Beschuldige kein Volk ohne Beleg.",
-				"text":"»Zeig mir, was du weißt. Nicht, was du vermutest.«",
-				"result":"Die Hufspuren werden als offene Warnung protokolliert; ein Täter bleibt unbekannt."}
+			return BRIDGE_STEPS["i08_report"].duplicate(true)
 	if child.completed.size() == STEPS.size():
 		if screenplay.i10 == "pending":
-			return {"id":"i10_choice","mission":"I-10","screenplay":true,"npc":"silvanus",
-				"chapter":"Die Nacht der Reiter","label":"Entscheiden, wie du auf den Angriff reagierst",
-				"objective":"Hufschläge, Feuer und Rufe reißen Valdora aus der Nacht. Entscheide: hilfst du bei Verteidigung und Rettung oder versteckst du dich bei deinen Eltern?",
-				"text":"»Bleib bei uns, wenn du dich versteckst. Wenn du hinausgehst, dann um Menschen zu helfen – nicht um ein Held zu spielen.«",
-				"result":"Deine Nachtentscheidung wird dauerhaft gespeichert."}
+			return BRIDGE_STEPS["i10_choice"].duplicate(true)
 		if screenplay.i10 == "complete" and screenplay.i11 == "pending":
-			return {"id":"i11_forge","mission":"I-11","screenplay":true,"point":"smith",
-				"chapter":"Die Schmiede im Feuer","label":"Zur brennenden Schmiede zurückkehren",
-				"objective":"Erreiche die Schmiede. Sextus hält einen Fluchtweg offen; die Werkstatt und ihr Arbeiter sind Teil derselben Welt.",
-				"text":"","result":"Sextus stirbt, während er den Fluchtweg offen hält. Die Schmiede verliert ihren realen Arbeiter."}
+			return BRIDGE_STEPS["i11_forge"].duplicate(true)
 		if screenplay.i11 == "complete" and screenplay.i12 == "pending":
-			return {"id":"i12_father","mission":"I-12","screenplay":true,"npc":"silvanus",
-				"chapter":"Der letzte Weg des Vaters","label":"Silvanus auf seinem letzten Weg folgen",
-				"objective":"Geh zu deinem Vater in der Familiengasse. Sein Ende ist in beiden Hauptwegen fest; Julias Schicksal hängt von tatsächlich geleisteter Hilfe ab.",
-				"text":"»Sieh nach deiner Mutter. Und wenn du später wütend bist – entscheide erst, wenn du wieder sehen kannst, was vor dir liegt.«",
-				"result":"Silvanus stirbt. Julias Zustand folgt aus deiner tatsächlichen Rettung oder dem Versteckweg."}
+			return BRIDGE_STEPS["i12_father"].duplicate(true)
 		if screenplay.i12 == "complete" and screenplay.i13 == "pending":
-			return {"id":"i13_morning","mission":"I-13","screenplay":true,"npc":"aurelia",
-				"chapter":"Morgen ohne Stimmen","label":"Mit Aurelia die wirklichen Verluste erfassen",
-				"objective":"Gehe am Morgen zu Aurelia. Leere Arbeitsplätze, Verletzte und Tote bleiben reale Zustände statt Kulisse.",
-				"text":"»Wir zählen keine Schatten. Wir zählen Menschen. Wer fehlt, fehlt auch morgen noch an seinem Arbeitsplatz.«",
-				"result":"Der Morgen übernimmt die tatsächlichen Personen- und Verlustzustände der Nacht."}
+			return BRIDGE_STEPS["i13_morning"].duplicate(true)
 		if screenplay.i13 == "complete" and screenplay.i14 == "pending":
-			return {"id":"i14_oath","mission":"I-14","screenplay":true,"point":"oath_ridge",
-				"chapter":"Der Schwur","label":"Am Waldrand das Erinnerungsstück nehmen und schwören",
-				"objective":"Geh zum Waldrand oberhalb Valdoras. Nimm ein Erinnerungsstück und entscheide dich für die Suche nach den Verantwortlichen.",
-				"text":"","result":"Du schwörst, die Verantwortlichen zu finden. Der Schwur eröffnet Ermittlung – keine sofortige Soldatenkarriere."}
+			return BRIDGE_STEPS["i14_oath"].duplicate(true)
 	return {}
+
+
+static func current_step(data: Dictionary) -> Dictionary:
+	return _current(data).duplicate(true) if enabled(data) else {}
+
+
+static func companion_specs(data: Dictionary) -> Dictionary:
+	var step := current_step(data)
+	var mission := str(step.get("mission", SOURCE_MISSION_BY_STEP.get(step.get("id", ""), "")))
+	return CompanionStory.for_step(data, mission, str(step.get("id", "")))
+
+
+static func companion_dialogue(data: Dictionary, id: String) -> Dictionary:
+	var step := current_step(data)
+	var mission := str(step.get("mission", SOURCE_MISSION_BY_STEP.get(step.get("id", ""), "")))
+	return CompanionStory.dialogue(data, id, mission, str(step.get("id", "")))
+
+
+static func display_name(data: Dictionary, id: String, fallback: String) -> String:
+	return CompanionStory.display_name(data, id, fallback)
 
 
 static func _current(data: Dictionary) -> Dictionary:

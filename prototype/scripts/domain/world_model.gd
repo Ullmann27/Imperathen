@@ -130,6 +130,8 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	if data.progress.career_terminal:
 		return _fail("Dieser Lebensbogen ist abgeschlossen. Ein neues Leben beginnt im Hauptmenü.")
 	var candidate := _world_copy()
+	if npc_observations.is_valid():
+		NpcBehavior.observe(candidate, npc_observations.call(), true)
 	var result := _apply_command(candidate, command, args)
 	result.message = _regional_text(candidate, result.message)
 	if not result.ok:
@@ -145,6 +147,11 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	data = candidate
 	changed.emit()
 	return result
+
+
+func capture_npc_observations() -> void:
+	if not data.is_empty() and npc_observations.is_valid():
+		NpcBehavior.observe(data, npc_observations.call(), true)
 
 
 func set_player_position(position: Vector3) -> void:

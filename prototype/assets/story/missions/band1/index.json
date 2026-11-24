@@ -4,12 +4,19 @@
   "chain": "childhood_steps",
   "order": [
     "I-01",
+    "I-02",
     "I-03",
     "I-04",
     "I-05",
     "I-06",
     "I-07",
-    "I-09"
+    "I-08",
+    "I-09",
+    "I-10",
+    "I-11",
+    "I-12",
+    "I-13",
+    "I-14"
   ],
-  "note": "Reihenfolge der Kindheitsstationen über alle Missionsdateien. Drehbuch-Brückenschritte (I-02, I-03, I-08, I-10 … I-14) liegen noch in village_childhood.gd (_screenplay_step)."
+  "note": "Dateien in Missionsreihenfolge. Nur steps bilden die Save-relevante Kindheitsfolge; bridges werden getrennt nach den bestehenden Drehbuchbedingungen gewählt. Die I-03- und I-07-Brücken verbleiben in village_childhood.gd."
 }

@@ -12,7 +12,7 @@
       "npc": "julia",
       "objective": "Kehre zu Julia zurück und erzähle von deiner Arbeit.",
       "result": "Die Familie hört von deinen tatsächlichen Lieferungen und der begonnenen Lehre.",
-      "text": "»Du hast heute Menschen geholfen und selbst etwas verdient. Beides hat Zeit gekostet. Leg die Arbeit für heute beiseite; morgen kannst du Severus nach einer begleiteten Dorfrunde fragen.«",
+      "text": "»Du hast heute Menschen geholfen und selbst etwas verdient. Beides hat Zeit gekostet. Leg die Arbeit für heute beiseite; morgen kannst du den Wachmann nach einer begleiteten Dorfrunde fragen.«",
       "source_mission": "I-07"
     },
     {
@@ -31,17 +31,17 @@
       "label": "Decimus um eine begleitete Dorfrunde bitten",
       "npc": "decimus",
       "objective": "Sprich mit Decimus über eine begleitete Runde mit der Dorfwache.",
-      "result": "Decimus gibt die Runde frei, Severus übernimmt die Aufsicht. Die drei Wegabschnitte müssen wirklich erreicht und geprüft werden.",
-      "text": "»Ich brauche keine Heldenmeldung. Ich brauche eine Zahl, einen Ort und jemanden, der dort wirklich steht. Du gehst mit Severus, nicht allein auf Wache: innerer Weg, Wagenstraße, Tor. Ihr beobachtet und meldet; ihr sucht keinen Kampf.«",
+      "result": "Decimus gibt die Runde frei, der Wachmann übernimmt die Aufsicht. Die drei Wegabschnitte müssen wirklich erreicht und geprüft werden.",
+      "text": "»Ich brauche keine Heldenmeldung. Ich brauche eine Zahl, einen Ort und jemanden, der dort wirklich steht. Du gehst mit dem Wachmann, nicht allein auf Wache: innerer Weg, Wagenstraße, Tor. Ihr beobachtet und meldet; ihr sucht keinen Kampf.«",
       "source_mission": "I-07"
     },
     {
       "chapter": "Mit der Dorfwache unterwegs",
       "id": "patrol_inner",
-      "label": "Mit Severus den inneren Weg prüfen",
-      "objective": "Prüfe mit Severus den inneren Nordweg.",
+      "label": "Mit dem Wachmann den inneren Weg prüfen",
+      "objective": "Prüfe mit dem Wachmann den inneren Nordweg.",
       "point": "patrol_inner",
-      "result": "Der innere Weg ist geprüft. Gehe mit Severus weiter zur Wagenstraße.",
+      "result": "Der innere Weg ist geprüft. Gehe mit dem Wachmann weiter zur Wagenstraße.",
       "text": "",
       "source_mission": "I-07"
     },
@@ -49,7 +49,7 @@
       "chapter": "Mit der Dorfwache unterwegs",
       "id": "patrol_road",
       "label": "Die Wagenstraße gemeinsam überblicken",
-      "objective": "Erreiche die Wagenstraße weiter nördlich und prüfe sie mit Severus.",
+      "objective": "Erreiche die Wagenstraße weiter nördlich und prüfe sie mit dem Wachmann.",
       "point": "patrol_road",
       "result": "Du erkennst die Sichtlinie zwischen Wagenstraße und Tor. Der äußere Abschnitt fehlt noch.",
       "text": "",
@@ -58,10 +58,10 @@
     {
       "chapter": "Mit der Dorfwache unterwegs",
       "id": "patrol_gate",
-      "label": "Am Tor mit Severus nach dem Rechten sehen",
+      "label": "Am Tor mit dem Wachmann nach dem Rechten sehen",
       "objective": "Gehe bis zum Nordtor und schließe den begleiteten Rundgang ab.",
       "point": "patrol_gate",
-      "result": "Ihr habt das Tor gemeinsam erreicht. Berichte Severus jetzt von deinen Beobachtungen.",
+      "result": "Ihr habt das Tor gemeinsam erreicht. Berichte dem Wachmann jetzt von deinen Beobachtungen.",
       "text": "",
       "source_mission": "I-07"
     },
@@ -82,17 +82,17 @@
       "objective": "Kehre ins Familienhaus zurück und beende den dritten Tag.",
       "point": "family_rest",
       "rest": true,
-      "result": "Am vierten Morgen lässt Aurelia ausrichten, dass Severus krank ist. Seine Stelle im Wachroster bleibt tatsächlich unbesetzt.",
+      "result": "Am vierten Morgen lässt Aurelia ausrichten, dass der Wachmann krank ist. Seine Stelle im Wachroster bleibt tatsächlich unbesetzt.",
       "text": "",
       "source_mission": "I-07"
     },
     {
       "chapter": "Wenn ein Nachbar ausfällt",
       "id": "healer_request",
-      "label": "Aurelia nach Severus fragen",
+      "label": "Aurelia nach dem Wachmann fragen",
       "npc": "aurelia",
-      "objective": "Suche Aurelia auf und frage nach dem erkrankten Severus.",
-      "result": "Aurelia übergibt dir das vorbereitete Versorgungspäckchen für Severus.",
+      "objective": "Suche Aurelia auf und frage nach dem erkrankten Wachmann.",
+      "result": "Aurelia übergibt dir das vorbereitete Versorgungspäckchen für den Wachmann.",
       "text": "»Er braucht Ruhe und soll heute nicht am Tor stehen. Bring ihm dieses vorbereitete Päckchen. Danach kann er mit deinen Eltern klären, ob du für einen kurzen Tagesdienst am Tor aushelfen darfst.«",
       "source_mission": "I-07",
       "carried": {
@@ -104,10 +104,10 @@
     {
       "chapter": "Wenn ein Nachbar ausfällt",
       "id": "deliver_medicine",
-      "label": "Severus Aurelias Päckchen bringen",
+      "label": "Dem Wachmann Aurelias Päckchen bringen",
       "npc": "severus",
-      "objective": "Bring Aurelias Päckchen zum erkrankten Severus bei ihrem Haus.",
-      "result": "Das Versorgungspäckchen erreicht Severus. Er ist versorgt, bleibt aber für diesen Dienst aus dem Arbeitsroster genommen.",
+      "objective": "Bring Aurelias Päckchen zum erkrankten Wachmann bei ihrem Haus.",
+      "result": "Das Versorgungspäckchen erreicht den Wachmann. Er ist versorgt, bleibt aber für diesen Dienst aus dem Arbeitsroster genommen.",
       "text": "»Danke. Ich bleibe heute hier. Decimus teilt die Wache ein; du könntest nach der bekannten Runde eine kurze Nachricht überbringen. Frag erst deinen Vater. Die Leihsachen bleiben Eigentum der Wache.«",
       "source_mission": "I-07",
       "carried": {
@@ -123,7 +123,7 @@
       "npc": "silvanus",
       "objective": "Besprich den begrenzten Tagesdienst zu Hause mit Silvanus.",
       "result": "Vater erlaubt eine begrenzte Aushilfe unter Decimus’ Verantwortung. Dein Lebensalter und deine zivile Rolle ändern sich nicht.",
-      "text": "»Du musst nicht der Stärkste sein. Du musst wissen, wann du stehenbleibst. Decimus bleibt verantwortlich; eine kurze Aushilfe am inneren Tor ist erlaubt. Du gehst nicht auf einen Feldzug und kommst mit den Leihsachen zu Severus zurück.«",
+      "text": "»Du musst nicht der Stärkste sein. Du musst wissen, wann du stehenbleibst. Decimus bleibt verantwortlich; eine kurze Aushilfe am inneren Tor ist erlaubt. Du gehst nicht auf einen Feldzug und kommst mit den Leihsachen zum Wachmann zurück.«",
       "source_mission": "I-07"
     },
     {
@@ -131,7 +131,7 @@
       "id": "borrow_gear",
       "label": "Die Leihsachen für den Tagesdienst entgegennehmen",
       "npc": "severus",
-      "objective": "Hole bei Severus den geliehenen Helm und hölzernen Schild ab.",
+      "objective": "Hole beim Wachmann den geliehenen Helm und hölzernen Schild ab.",
       "result": "Du erhältst begrenzte Leihgegenstände für diesen Auftrag. Sie werden nicht zu dauerhaftem Eigentum.",
       "text": "»Helm und kleiner Holzschild gehören der Wache. Prüfe den Weg, bleib im bekannten Torabschnitt und melde Cassia, dass ihr Wagen passieren kann. Danach bringst du alles zurück.«",
       "source_mission": "I-07"
@@ -161,8 +161,8 @@
       "label": "Cassia die tatsächliche Durchlassnachricht bringen",
       "npc": "cassia",
       "objective": "Trage die Nachricht vom Tor zu Cassia auf den Markt.",
-      "result": "Cassia erhält die Nachricht vom tatsächlich geprüften Tor. Der Dienst muss noch an Severus übergeben werden.",
-      "text": "»Gut, dann schicke ich den Wagen über den geprüften Weg. Geh jetzt zu Severus und gib die Leihsachen ab. Ein Dienst endet mit einer ordentlichen Übergabe.«",
+      "result": "Cassia erhält die Nachricht vom tatsächlich geprüften Tor. Der Dienst muss noch an den Wachmann übergeben werden.",
+      "text": "»Gut, dann schicke ich den Wagen über den geprüften Weg. Geh jetzt zum Wachmann und gib die Leihsachen ab. Ein Dienst endet mit einer ordentlichen Übergabe.«",
       "source_mission": "I-07",
       "carried": {
         "remove": [
@@ -175,10 +175,11 @@
       "id": "return_gear",
       "label": "Den Dienst übergeben und alle Leihsachen zurückgeben",
       "npc": "severus",
-      "objective": "Kehre zu Severus zurück, berichte und gib Helm und Holzschild ab.",
+      "objective": "Kehre zum Wachmann zurück, berichte und gib Helm und Holzschild ab.",
       "result": "Der Dienst ist übergeben, die Leihsachen sind zurück und zwei Denare sind bezahlt. Du bist weiter zwölf, kein angeworbener Soldat.",
       "text": "»Du hast die Nachricht gebracht und die Sachen vollständig zurückgegeben. Zwei Denare sind dein Botenlohn. Ich erhole mich und übernehme meine bisherige Stelle wieder, sobald sie frei ist. Geh nach Hause.«",
       "source_mission": "I-07"
     }
-  ]
+  ],
+  "name_note": "Ergänzung: Der unbenannte kranke Wachmann wird durch die bestehende Actor-ID severus dargestellt. Kein Eigenname im Original; Decimus wird nicht zum Kranken umgedeutet. Band 1 · I-07 · Tabelle 10."
 }

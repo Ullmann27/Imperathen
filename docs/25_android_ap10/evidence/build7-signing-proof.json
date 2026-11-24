@@ -1,0 +1,19 @@
+{
+  "baseline_commit": "7c3194db13acef2702e5e92336b94e9be41c7b58",
+  "baseline_run": 45372220049,
+  "baseline_apk": "IMPERATHEN-7c3194db-arm64.apk",
+  "baseline_apk_sha256": "a101074668a8bf4c7c2c1fde14647032c9173f4f5ff10a79f473a9ef5f8fabe3",
+  "baseline_apk_size_bytes": 184262016,
+  "apk_signer_sha256": "a41d5810bcc3214bc4c8d29dcd1899210db37b82a03dec21b3c43552357ae215",
+  "recovered_key_matches_apk_signer": true,
+  "signature_verified": true,
+  "source_artifact_id": 14909911694,
+  "source_artifact_sha256": "ad4b93ab17daf4c86b496b06e80b592164f3d820381d2b0b73d1da3b9c5e53b7",
+  "private_material_in_repository": false,
+  "verification_tool": {
+    "sdk_build_tools": "35.0.0",
+    "apksigner_version": "0.9",
+    "command": "apksigner verify --verbose --print-certs"
+  },
+  "certificate_comparison": "SHA256 of DER certificate exported from recovered keystore equals the single verified APK signer certificate SHA256."
+}

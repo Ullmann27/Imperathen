@@ -34,5 +34,31 @@
         "sextus": "»Eine Klinge verzeiht dir keinen Gedanken, den du zu spät hattest. Geh nach Hause, Junge; morgen ist die Esse wieder heiß.«"
       }
     }
+  ],
+  "companions": [
+    {
+      "id": "marcus",
+      "steps": [
+        "family_evening",
+        "night_rest"
+      ],
+      "stops": {
+        "family_evening": [
+          -13.8,
+          17.1
+        ],
+        "night_rest": [
+          -13.8,
+          17.1
+        ]
+      },
+      "dialogue": {
+        "neutral": {
+          "text": "Ich gehe mit. Aber diesmal entscheidest du nicht allein für uns beide.",
+          "source": "Band 1 · I-09 · Tabelle 12 · Dialogzeile 04"
+        }
+      },
+      "direction_note": "Ergänzung: Auswahl nach vorhandener I-03-Entscheidung, Begleitdistanz, Schrittzuordnung und Haltepunkte. Sprechertext wörtlich aus dem angegebenen Drehbuchabschnitt."
+    }
   ]
 }

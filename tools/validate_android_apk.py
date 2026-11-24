@@ -131,7 +131,12 @@ CHAPTER_STORY_RESOURCES = (
     "assets/story/chapter1_abilities.json",
     "scripts/story/mission_data.gd",
     "assets/story/missions/band1/index.json",
-    *(f"assets/story/missions/band1/{mission}.json" for mission in ("I-01", "I-03", "I-04", "I-05", "I-06", "I-07", "I-09")),
+    *(f"assets/story/missions/band1/I-{number:02d}.json" for number in range(1, 15)),
+)
+COMPANION_STORY_RESOURCES = (
+    "scripts/story/companion_story.gd",
+    "scripts/story/companion_follow.gd",
+    "scripts/world/companion_world.gd",
 )
 NPC_BEHAVIOR_RESOURCES = (
     "scripts/domain/npc_behavior.gd",
@@ -165,6 +170,7 @@ FEATURE_RESOURCE_GROUPS = (
     ("childhood_content", CHILDHOOD_RESOURCES),
     ("campaign_bible_content", CAMPAIGN_BIBLE_RESOURCES),
     ("chapter_story_content", CHAPTER_STORY_RESOURCES),
+    ("companion_story_content", COMPANION_STORY_RESOURCES),
     ("meshy_registry_content", MESHY_REGISTRY_RESOURCES),
     ("npc_behavior_content", NPC_BEHAVIOR_RESOURCES),
     ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
@@ -578,12 +584,72 @@ def inspect_manifest(apk: Path, report: dict, tools: dict, expected_package: str
               activity=metadata.get("launchable_activity"), decoded_with=metadata["decoded_with"], diagnostics=diagnostics)
 
 
-def inspect_signing(apk: Path, report: dict, tools: dict, timeout: int) -> None:
+def normalize_signer_sha256(value: str) -> str:
+    if not isinstance(value, str) or re.fullmatch(r"[0-9a-fA-F]{64}", value) is None:
+        raise argparse.ArgumentTypeError("Expected one SHA-256 certificate digest: exactly 64 hexadecimal characters, without separators.")
+    return value.lower()
+
+
+def parse_signer_certificates(output: str, schemes: dict) -> dict:
+    """Read APK certificate digests, excluding public-key and Source Stamp hashes."""
+    counts = []
+    certificates = []
+    errors = []
+    numbered = []
+    sdk_specific = False
+    labels = set()
+    for line in output.splitlines():
+        if line.startswith("Number of signers:"):
+            value = line.partition(":")[2].strip()
+            counts.append(int(value) if re.fullmatch(r"[0-9]+", value) else None)
+        match = re.fullmatch(r"(Signer .+) certificate SHA-256 digest:\s*(.*)", line)
+        if not match:
+            continue
+        label, digest = match.groups()
+        number = re.fullmatch(r"Signer #([1-9][0-9]*)", label)
+        sdk_range = re.fullmatch(r"Signer \(minSdkVersion=([0-9]+)(?: \(dev release=true\))?, maxSdkVersion=([0-9]+)\)", label)
+        if number:
+            numbered.append(int(number[1]))
+        elif sdk_range and 0 < int(sdk_range[1]) <= int(sdk_range[2]):
+            sdk_specific = True
+        else:
+            errors.append("Unsupported APK signer label: " + label)
+        if label in labels:
+            errors.append("Duplicate APK signer certificate entry: " + label)
+        labels.add(label)
+        try:
+            certificates.append({"signer": label, "sha256": normalize_signer_sha256(digest.strip())})
+        except argparse.ArgumentTypeError:
+            errors.append("Missing or malformed SHA-256 certificate digest: " + label)
+    count = counts[0] if len(counts) == 1 and counts[0] is not None and counts[0] > 0 else None
+    if count is None:
+        errors.append("Missing or ambiguous positive APK signer count.")
+    if not certificates:
+        errors.append("No APK signer certificate SHA-256 digest was reported.")
+    if sdk_specific:
+        # apksigner prints SDK-specific certificates for v3.1 rotation instead
+        # of numbered signers. Preserve every certificate; an identity pin
+        # still requires exactly one certificate and one reported signer.
+        if numbered or not schemes.get("v3.1") or count is not None and len(certificates) < count:
+            errors.append("SDK-specific certificate entries do not match the verified signing scheme/count.")
+    elif count is not None and (len(certificates) != count or sorted(numbered) != list(range(1, len(certificates) + 1))):
+        errors.append("APK signer count and numbered certificate entries do not agree.")
+    return {"reported_signer_count": count, "signer_certificates": certificates,
+            "signer_sha256": [item["sha256"] for item in certificates], "certificate_parse_errors": errors}
+
+
+def inspect_signing(apk: Path, report: dict, tools: dict, timeout: int,
+                    expected_signer_sha256: str | None = None) -> None:
+    if expected_signer_sha256 is not None:
+        expected_signer_sha256 = normalize_signer_sha256(expected_signer_sha256)
     if not tools.get("apksigner"):
         add_check(report, "signature_verification", "not_run",
                   "apksigner is unavailable. Signature-looking ZIP files or a signing-block marker do not verify a signature.")
+        if expected_signer_sha256 is not None:
+            add_check(report, "signer_identity", "not_run", "The expected signer cannot be checked without apksigner.",
+                      expected=expected_signer_sha256, actual=[])
         return
-    attempt = run_tool([tools["apksigner"], "verify", "--verbose", str(apk)], timeout)
+    attempt = run_tool([tools["apksigner"], "verify", "--verbose", "--print-certs", str(apk)], timeout)
     status = "incomplete" if attempt["error"] else "pass" if attempt["exit_code"] == 0 else "fail"
     if re.search(r"DOES NOT VERIFY|^ERROR:", attempt["stdout"] + attempt["stderr"], re.MULTILINE):
         status = "fail"
@@ -591,9 +657,20 @@ def inspect_signing(apk: Path, report: dict, tools: dict, timeout: int) -> None:
     if status == "pass" and not any(schemes.values()):
         status = "incomplete"
         attempt["error"] = "Verifier returned zero without an affirmative signature-scheme result; no signature PASS is inferred."
+    certificates = parse_signer_certificates(attempt["stdout"], schemes)
+    if status == "pass" and certificates["certificate_parse_errors"]:
+        status = "incomplete"
     add_check(report, "signature_verification", status,
-              "apksigner verify checks the supplied APK, using its declared Android compatibility range; it does not establish publisher ownership.",
-              schemes=schemes, **command_evidence(attempt))
+              "apksigner verifies this APK and reports its signing-certificate SHA-256 digests. It does not establish publisher ownership.",
+              schemes=schemes, **certificates, **command_evidence(attempt))
+    if expected_signer_sha256 is not None:
+        identity_status = "incomplete"
+        if status == "pass":
+            identity_status = "pass" if certificates["reported_signer_count"] == 1 and certificates["signer_sha256"] == [expected_signer_sha256] else "fail"
+        add_check(report, "signer_identity", identity_status,
+                  "A pinned identity requires a verified APK with exactly one reported signer and one matching certificate; multiple signers or SDK-specific rotation certificates do not satisfy this single-certificate contract.",
+                  expected=expected_signer_sha256, actual=certificates["signer_sha256"],
+                  reported_signer_count=certificates["reported_signer_count"], signature_status=status)
 
 
 def snapshot_sources(project: Path) -> dict:
@@ -609,11 +686,15 @@ def snapshot_sources(project: Path) -> dict:
 
 def validate(args: argparse.Namespace) -> dict:
     apk = args.apk.resolve()
+    expected_signer = getattr(args, "expected_signer_sha256", None)
+    if expected_signer is not None:
+        expected_signer = normalize_signer_sha256(expected_signer)
     roots = sdk_roots(args.sdk_root)
     tools = {name: find_tool(name, roots, getattr(args, name, None)) for name in TOOL_NAMES}
     report = {"schema_version": 1, "checked_at_utc": datetime.now(timezone.utc).isoformat(),
               "apk": {"path": str(apk), "size_bytes": None, "sha256": None},
               "expected_package": args.expected_package, "expected_abi": args.expected_abi,
+              "expected_signer_sha256": expected_signer,
               "tool_paths": tools, "sdk_roots": [str(root) for root in roots],
               "sdk_platforms": sorted({folder.name for sdk in roots for folder in (sdk / "platforms").glob("*") if folder.is_dir()}),
               "emulator_inventory": {"emulator_binary": tools["emulator"], "adb_binary": tools["adb"],
@@ -632,7 +713,7 @@ def validate(args: argparse.Namespace) -> dict:
               "APK file found; its extension alone is not accepted as proof of format.")
     if inspect_zip(apk, report, args.expected_abi, args.source_root):
         inspect_manifest(apk, report, tools, args.expected_package, args.tool_timeout)
-        inspect_signing(apk, report, tools, args.tool_timeout)
+        inspect_signing(apk, report, tools, args.tool_timeout, expected_signer)
         if tools.get("zipalign"):
             attempt = run_tool([tools["zipalign"], "-c", "-v", "4", str(apk)], args.tool_timeout)
             status = "incomplete" if attempt["error"] else "pass" if attempt["exit_code"] == 0 else "fail"
@@ -642,6 +723,9 @@ def validate(args: argparse.Namespace) -> dict:
     else:
         add_check(report, "manifest_metadata", "not_run", "Core APK structure failed; external inspection was not run.")
         add_check(report, "signature_verification", "not_run", "Core APK structure failed; external inspection was not run.")
+        if expected_signer is not None:
+            add_check(report, "signer_identity", "not_run", "Core APK structure failed; signer identity was not checked.",
+                      expected=expected_signer, actual=[])
     unchanged = apk.stat().st_size == report["apk"]["size_bytes"] and sha256_file(apk) == report["apk"]["sha256"]
     add_check(report, "apk_unchanged", "pass" if unchanged else "fail",
               "The inspected APK must retain the same size and SHA-256 throughout validation.")
@@ -668,12 +752,18 @@ def main() -> int:
     parser.add_argument("--sdk-root", type=Path, action="append", default=[])
     parser.add_argument("--expected-package", default="at.heinz.imperathen")
     parser.add_argument("--expected-abi", choices=sorted(ARCHITECTURES), default="arm64-v8a")
+    parser.add_argument("--expected-signer-sha256", type=normalize_signer_sha256, action="append",
+                        help="Require exactly one APK signer with this 64-character certificate SHA-256 digest; specify once.")
     parser.add_argument("--report", type=Path)
     parser.add_argument("--source-root", type=Path, default=ROOT / "prototype")
     parser.add_argument("--tool-timeout", type=int, default=45)
     for name in ("aapt", "aapt2", "apkanalyzer", "apksigner", "zipalign"):
         parser.add_argument("--" + name, help="Use an already installed tool at this executable path.")
     args = parser.parse_args()
+    expected_signers = args.expected_signer_sha256 or []
+    if len(expected_signers) > 1:
+        parser.error("--expected-signer-sha256 must be supplied exactly once when used.")
+    args.expected_signer_sha256 = expected_signers[0] if expected_signers else None
     if bool(args.apk) == bool(args.apk_positional):
         parser.error("Supply exactly one APK, either --apk FILE or positional FILE.")
     args.apk = args.apk or args.apk_positional

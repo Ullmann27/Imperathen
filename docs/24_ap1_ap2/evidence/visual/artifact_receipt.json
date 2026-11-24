@@ -1,0 +1,12 @@
+{
+  "run_id": 45434162620,
+  "job_id": 138587296375,
+  "artifact_id": 14940153702,
+  "artifact_sha256": "64ef7f6684df0e2fab9dfcf1f54a52295e1798b944fda8ebe8dbe09e19933af2",
+  "artifact_bytes": 20451217,
+  "run_url": "https://github.com/Ullmann27/Imperathen/actions/runs/45434162620",
+  "baseline_commit": "94bb7cdd76a3fe2577610eac8da6948e29b0faab",
+  "feature_commit": "0ecf49870da1e3389a47f3143dd6aa06b68c0db7",
+  "passed": true,
+  "pairs": 9
+}

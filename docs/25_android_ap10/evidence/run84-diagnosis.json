@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "scope": "Öffentlicher Diagnoseauszug aus dem abgeschlossenen CI-Lauf; keine Gesamtlogs, Passwörter, Keystore-Dateien oder privaten Schlüssel.",
+  "run": {
+    "id": 45444339144,
+    "number": 84,
+    "url": "https://github.com/Ullmann27/Imperathen/actions/runs/45444339144",
+    "source_commit": "6fd8978f957018bf752e6f54f98ca7781a1651a3",
+    "branch": "feature/ap1-ap2-companions-20261124",
+    "build_job_id": 138623834102,
+    "build_job_conclusion": "failure",
+    "publish_job_conclusion": "skipped"
+  },
+  "apk": {
+    "name": "IMPERATHEN-6fd8978f-arm64.apk",
+    "size_bytes": 186142729,
+    "sha256": "3b9232cbb53cf28cae8ebd32cc9f2336e7eb520c7c285772fe05b4fed5fb8d33"
+  },
+  "artifact": {
+    "id": 14943958569,
+    "name": "imperathen-android-84",
+    "size_bytes": 183666819,
+    "sha256": "c4f2e4050ffdf15ac97141062d206c8bc62dfed3c3ade7a47bc22397b2919fef",
+    "url": "https://github.com/Ullmann27/Imperathen/actions/runs/45444339144/artifacts/14943958569"
+  },
+  "python_tests_passed": 224,
+  "engine_regression_step": "success",
+  "validation_stages": [
+    {
+      "stage": "build_internal_validation",
+      "overall_status": "pass",
+      "checks_total": 30,
+      "checks_passed": 30,
+      "checks_incomplete": 0,
+      "apk_sha256": "3b9232cbb53cf28cae8ebd32cc9f2336e7eb520c7c285772fe05b4fed5fb8d33",
+      "apk_size_bytes": 186142729,
+      "apksigner_path_as_logged": "/usr/local/lib/[REDACTED]/sdk/build-tools/35.0.1/apksigner",
+      "apksigner_exit_code": 0,
+      "signature_check_status": "pass",
+      "reported_signer_count": 1,
+      "certificate_parse_errors": [],
+      "exact_signature_output_lines": [
+        "Verifies",
+        "Verified using v2 scheme (APK Signature Scheme v2): true",
+        "Verified using v3 scheme (APK Signature Scheme v3): true",
+        "Number of signers: 1",
+        "Signer #1 certificate SHA-256 digest: b6e4ba0ce7818f6c8af131df31f42d41038493e3ffbbd0ce0da73f466ed0d2a1"
+      ]
+    },
+    {
+      "stage": "workflow_second_validation",
+      "overall_status": "incomplete",
+      "checks_total": 30,
+      "checks_passed": 29,
+      "checks_incomplete": 1,
+      "apk_sha256": "3b9232cbb53cf28cae8ebd32cc9f2336e7eb520c7c285772fe05b4fed5fb8d33",
+      "apk_size_bytes": 186142729,
+      "apksigner_path_as_logged": "/usr/local/lib/android/sdk/build-tools/37.0.0/apksigner",
+      "apksigner_exit_code": 0,
+      "signature_check_status": "incomplete",
+      "reported_signer_count": 1,
+      "certificate_parse_errors": [
+        "No APK signer certificate SHA-256 digest was reported.",
+        "APK signer count and numbered certificate entries do not agree."
+      ],
+      "exact_signature_output_lines": [
+        "Verifies",
+        "Verified using v2 scheme (APK Signature Scheme v2): true",
+        "Verified using v3 scheme (APK Signature Scheme v3): true",
+        "Number of signers: 1",
+        "V3.0 Signer: certificate SHA-256 digest: b6e4ba0ce7818f6c8af131df31f42d41038493e3ffbbd0ce0da73f466ed0d2a1"
+      ]
+    }
+  ],
+  "exact_build_output_lines": [
+    "2026-11-24T17:04:31.0964065Z Ran 224 tests in 0.769s",
+    "2026-11-24T17:09:24.3152846Z ANDROID_BUILD_PASS /home/runner/work/Imperathen/Imperathen/artifacts/IMPERATHEN-6fd8978f-arm64.apk"
+  ],
+  "diagnosis": "Die unveränderte APK besteht den internen Validator mit Build-Tools 35.0.1. Der zweite Workflow-Aufruf wählt durch Autodiscovery Build-Tools 37.0.0. Dessen kryptografische Prüfung ist erfolgreich, aber das geänderte Zertifikatslabel V3.0 Signer: wird nicht erkannt. Daher signature_verification=incomplete und Exitcode 2.",
+  "tool_path_note": "Der erste Werkzeugpfad ist bereits im CI-Protokoll redigiert und wird unverändert wiedergegeben.",
+  "runtime": {
+    "emulator_apk_export": "skipped",
+    "android_emulator": "skipped",
+    "runtime_report_exists": false
+  },
+  "fix_review": {
+    "file": ".github/workflows/android-prototype.yml",
+    "scope": "Read-only Prüfung des uncommitteten Diffs",
+    "changes": "Beide eigenständigen APK-Validatoraufrufe erhalten explizit aapt, apksigner und zipalign aus $ANDROID_HOME/build-tools/35.0.1.",
+    "game_sources_changed": false,
+    "validation_checks_removed": false,
+    "abi_checks_preserved": true,
+    "report_paths_preserved": true,
+    "new_ci_result": "Noch nicht ausgeführt"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "mission": "I-13",
+  "title": "Morgen ohne Stimmen",
+  "source_section": "Band 1 · Abschnitt „I-13 · Morgen ohne Stimmen“ · Tabelle 16",
+  "rule": "Bestehende Brückenschritte, unverändert aus handoff/sol-20261124 (94bb7cdd76a3fe2577610eac8da6948e29b0faab) ausgelagert. IDs und Auslösebedingungen bleiben erhalten; keine Einträge in childhood.completed.",
+  "authorship": "Verdichtete Spielaufgaben und verbindende Dialoge sind bestehende Ergänzungen. Die Fundstelle belegt den Missionsrahmen, nicht jede Formulierung des Runtime-Schritts.",
+  "steps": [],
+  "bridges": [
+    {
+      "id": "i13_morning",
+      "mission": "I-13",
+      "screenplay": true,
+      "npc": "aurelia",
+      "chapter": "Morgen ohne Stimmen",
+      "label": "Mit Aurelia die wirklichen Verluste erfassen",
+      "objective": "Gehe am Morgen zu Aurelia. Leere Arbeitsplätze, Verletzte und Tote bleiben reale Zustände statt Kulisse.",
+      "text": "»Wir zählen keine Schatten. Wir zählen Menschen. Wer fehlt, fehlt auch morgen noch an seinem Arbeitsplatz.«",
+      "result": "Der Morgen übernimmt die tatsächlichen Personen- und Verlustzustände der Nacht."
+    }
+  ]
+}

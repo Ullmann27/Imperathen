@@ -1,0 +1,535 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "passed": true,
+  "groups": 64,
+  "warnings": 0,
+  "renderer": "headless/dummy; no graphical FPS or screenshot claim",
+  "save_isolation": "Separate disposable XDG data/config/cache directories for every check",
+  "full_local_report_sha256": "0317433e70945a228aba1b4f1401fe7a17dc0695992707ddad6e6019c24da09f",
+  "checks": [
+    {
+      "check": "import",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 4.954,
+      "expected_marker": null,
+      "warnings": []
+    },
+    {
+      "check": "domain",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.897,
+      "expected_marker": "DOMAIN_TEST_PASS",
+      "warnings": []
+    },
+    {
+      "check": "combat_actions",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.246,
+      "expected_marker": "COMBAT_ACTIONS_PASS",
+      "warnings": []
+    },
+    {
+      "check": "combat_model",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.02,
+      "expected_marker": "COMBAT_MODEL_PASS",
+      "warnings": []
+    },
+    {
+      "check": "village_economy",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.336,
+      "expected_marker": "VILLAGE_ECONOMY_PASS",
+      "warnings": []
+    },
+    {
+      "check": "village_life",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.438,
+      "expected_marker": "VILLAGE_LIFE_PASS",
+      "warnings": []
+    },
+    {
+      "check": "village_model",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 3.984,
+      "expected_marker": "VILLAGE_MODEL_PASS",
+      "warnings": []
+    },
+    {
+      "check": "village_childhood",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 11.513,
+      "expected_marker": "VILLAGE_CHILDHOOD_PASS",
+      "warnings": []
+    },
+    {
+      "check": "npc_behavior",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.805,
+      "expected_marker": "checks passed",
+      "warnings": []
+    },
+    {
+      "check": "npc_behavior_world",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.57,
+      "expected_marker": "checks passed",
+      "warnings": []
+    },
+    {
+      "check": "unarmed_combat",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.831,
+      "expected_marker": "UNARMED_COMBAT_PASS",
+      "warnings": []
+    },
+    {
+      "check": "childhood_integration",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 3.413,
+      "expected_marker": "CHILDHOOD_INTEGRATION_PASS",
+      "warnings": []
+    },
+    {
+      "check": "locomotion_regression",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 7.507,
+      "expected_marker": "LOCOMOTION_PASS",
+      "warnings": []
+    },
+    {
+      "check": "npc_behavior_ui",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.896,
+      "expected_marker": "NPC_BEHAVIOR_UI_PASS",
+      "warnings": []
+    },
+    {
+      "check": "world_stream_plan",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.239,
+      "expected_marker": "failures=0",
+      "warnings": []
+    },
+    {
+      "check": "regional_terrain",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.439,
+      "expected_marker": "failures=0",
+      "warnings": []
+    },
+    {
+      "check": "frontier_story",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.168,
+      "expected_marker": "FRONTIER_STORY_PASS",
+      "warnings": []
+    },
+    {
+      "check": "frontier_people",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.661,
+      "expected_marker": "FRONTIER_PEOPLE_PASS",
+      "warnings": []
+    },
+    {
+      "check": "frontier_population",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.74,
+      "expected_marker": "FRONTIER_POPULATION_OK",
+      "warnings": []
+    },
+    {
+      "check": "settlement_geometry",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.837,
+      "expected_marker": "SETTLEMENT_GEOMETRY_PASS",
+      "warnings": []
+    },
+    {
+      "check": "village_collision",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.213,
+      "expected_marker": "VILLAGE_COLLISION_PASS",
+      "warnings": []
+    },
+    {
+      "check": "frontier_integration",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 6.577,
+      "expected_marker": "FRONTIER_INTEGRATION_PASS",
+      "warnings": []
+    },
+    {
+      "check": "village_experience",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 16.622,
+      "expected_marker": "VILLAGE_EXPERIENCE_PASS",
+      "warnings": []
+    },
+    {
+      "check": "village_panels",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.71,
+      "expected_marker": "VILLAGE_PANEL_PASS",
+      "warnings": []
+    },
+    {
+      "check": "village_nameplates",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.546,
+      "expected_marker": "VILLAGE_NAMEPLATES_PASS",
+      "warnings": []
+    },
+    {
+      "check": "opening_story",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.339,
+      "expected_marker": "OPENING_STORY_PASS",
+      "warnings": []
+    },
+    {
+      "check": "i00_stage",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.238,
+      "expected_marker": "I00_STAGE_PASS",
+      "warnings": []
+    },
+    {
+      "check": "campaign_bible",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.144,
+      "expected_marker": "CAMPAIGN_BIBLE_TEST",
+      "warnings": []
+    },
+    {
+      "check": "band1_alignment",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.081,
+      "expected_marker": "BAND1_ALIGNMENT_PASS",
+      "warnings": []
+    },
+    {
+      "check": "mission_bridge_data",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.427,
+      "expected_marker": "MISSION_BRIDGE_DATA_PASS",
+      "warnings": []
+    },
+    {
+      "check": "companion_navigation",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.673,
+      "expected_marker": "COMPANION_NAVIGATION_PASS",
+      "warnings": []
+    },
+    {
+      "check": "companion_follow",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 9.425,
+      "expected_marker": "COMPANION_FOLLOW_PASS",
+      "warnings": []
+    },
+    {
+      "check": "chapter_abilities",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.709,
+      "expected_marker": "CHAPTER_ABILITIES_PASS",
+      "warnings": []
+    },
+    {
+      "check": "band1_expansion",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.805,
+      "expected_marker": "BAND1_EXPANSION_PASS",
+      "warnings": []
+    },
+    {
+      "check": "opening_props",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.433,
+      "expected_marker": "failures=0",
+      "warnings": []
+    },
+    {
+      "check": "opening_director",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.25,
+      "expected_marker": "checks []",
+      "warnings": []
+    },
+    {
+      "check": "opening_overlay",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.268,
+      "expected_marker": "failures=0",
+      "warnings": []
+    },
+    {
+      "check": "opening_flow",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 4.762,
+      "expected_marker": "OPENING_FLOW_PASS",
+      "warnings": []
+    },
+    {
+      "check": "ui",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.808,
+      "expected_marker": "UI_SMOKE_PASS",
+      "warnings": []
+    },
+    {
+      "check": "roman_menu",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.991,
+      "expected_marker": "ROMAN_MENU_PASS",
+      "warnings": []
+    },
+    {
+      "check": "touch_controls",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.824,
+      "expected_marker": "TOUCH_CONTROLS_PASS",
+      "warnings": []
+    },
+    {
+      "check": "action_adapter",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.642,
+      "expected_marker": "ACTION_ADAPTER_PASS",
+      "warnings": []
+    },
+    {
+      "check": "action_world",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 18.844,
+      "expected_marker": "ACTION_WORLD_PASS",
+      "warnings": []
+    },
+    {
+      "check": "world",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.003,
+      "expected_marker": "WORLD_SMOKE_PASS",
+      "warnings": []
+    },
+    {
+      "check": "integration",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 6.864,
+      "expected_marker": "INTEGRATION_PASS",
+      "warnings": []
+    },
+    {
+      "check": "battle_rules",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.445,
+      "expected_marker": "failures=0",
+      "warnings": []
+    },
+    {
+      "check": "soldier_visuals",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.442,
+      "expected_marker": "0 failed",
+      "warnings": []
+    },
+    {
+      "check": "soldier_gait",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.71,
+      "expected_marker": "failures=0",
+      "warnings": []
+    },
+    {
+      "check": "village_people",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 3.228,
+      "expected_marker": "checks, 0 failed",
+      "warnings": []
+    },
+    {
+      "check": "meshy_registry",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.155,
+      "expected_marker": "MESHY_ASSET_REGISTRY",
+      "warnings": []
+    },
+    {
+      "check": "meshy_characters",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.024,
+      "expected_marker": "MESHY_CHARACTERS_PASS",
+      "warnings": []
+    },
+    {
+      "check": "meshy_equipment",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.831,
+      "expected_marker": "MESHY_EQUIPMENT_PASS",
+      "warnings": []
+    },
+    {
+      "check": "character_motion",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.816,
+      "expected_marker": "checks; 0 failed;",
+      "warnings": []
+    },
+    {
+      "check": "service_gear",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.905,
+      "expected_marker": "SERVICE_GEAR_PASS",
+      "warnings": []
+    },
+    {
+      "check": "natural_motion",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.279,
+      "expected_marker": "checks, 0 failed",
+      "warnings": []
+    },
+    {
+      "check": "cc0_runtime_gestures",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.931,
+      "expected_marker": "CC0_GESTURES_PASS",
+      "warnings": []
+    },
+    {
+      "check": "village_static_art",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.248,
+      "expected_marker": "checks, 0 failed",
+      "warnings": []
+    },
+    {
+      "check": "hero_faces",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.457,
+      "expected_marker": "checks, 0 failed",
+      "warnings": []
+    },
+    {
+      "check": "village_scenery",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.342,
+      "expected_marker": "VILLAGE_SCENERY errors []",
+      "warnings": []
+    },
+    {
+      "check": "atrium",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.424,
+      "expected_marker": "ATR_VISUAL errors []",
+      "warnings": []
+    },
+    {
+      "check": "seasons",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.255,
+      "expected_marker": "failures=0",
+      "warnings": []
+    },
+    {
+      "check": "figure_gallery",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.384,
+      "expected_marker": "failures=0 real_textures=true",
+      "warnings": []
+    },
+    {
+      "check": "landscape",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.284,
+      "expected_marker": null,
+      "warnings": []
+    },
+    {
+      "check": "main_scene",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.503,
+      "expected_marker": "IMPERATHEN_READY",
+      "warnings": []
+    }
+  ],
+  "initial_attempt": {
+    "passed": false,
+    "interrupted_checks": [
+      "import",
+      "village_experience",
+      "action_world"
+    ],
+    "exit_code": -9,
+    "asserted_cause": null,
+    "follow_up": "Removed already verified temporary downloads and reran the unchanged full gate; all 64 groups passed."
+  },
+  "scope": "Local working-tree validation before the Build-8 commit; the matching GitHub run provides the complete commit-specific logs."
+}

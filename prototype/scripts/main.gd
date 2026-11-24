@@ -539,6 +539,7 @@ func _show_village_npc(npc_id: String) -> void:
 	if screen != "playing" or not VillageLife.has_npc(model.data,npc_id):
 		return
 	model.set_player_position(world.get_player_position())
+	model.capture_npc_observations()
 	var at: Vector2 = VillageLife.actor_position(model.data, npc_id)
 	var player: Vector3 = world.get_player_position()
 	if Vector2(player.x, player.z).distance_to(at) > VillageLife.RANGE:
@@ -573,6 +574,8 @@ func _village_command(command: String, args: Dictionary) -> void:
 
 
 func _npc_dialog(npc_id: String) -> Dictionary:
+	if Childhood.companion_specs(model.data).has(npc_id):
+		return VillageLife.dialogue(model.data, npc_id)
 	return _dialog_with_behavior(VillageLife.dialogue(model.data, npc_id), npc_id)
 
 
@@ -640,6 +643,20 @@ func _show_companion() -> void:
 			]
 		)
 		return
+	if Childhood.enabled(model.data) and companion.get("met", false):
+		model.capture_npc_observations()
+		var player: Vector3 = world.get_player_position()
+		var at: Vector3 = world._companion.global_position
+		if Vector2(player.x-at.x, player.z-at.z).length() > Childhood.NPC_RANGE:
+			ui.notify("Geh näher zu Marcus, um das Gespräch zu beginnen.")
+			return
+		var authored := Childhood.companion_dialogue(model.data, "marcus")
+		if not authored.is_empty():
+			screen = "dialog"
+			world.set_active(false)
+			world._companion.get_node("Figure").set_conversation_focus(true)
+			ui.show_dialog(str(authored.title), str(authored.text), [])
+			return
 	if not str(companion.get("choice", "")).is_empty():
 		ui.notify(OpeningStory.companion_reply(model.data))
 		return

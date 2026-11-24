@@ -1,0 +1,32 @@
+{
+  "source_commit": "b2c5970e7c8ce032c1941464e7659ac6d515c854",
+  "scope": "Documentation/evidence-only delivery commit after this source; no additional gameplay or tooling changes.",
+  "python": {
+    "command": "python3 -m unittest discover -s tests -p 'android_*_test.py'",
+    "tests_run": 224,
+    "failures": 0,
+    "errors": 0,
+    "passed": true,
+    "evidence": "Executed locally before the final documentation gate; the successful source CI repeats this suite."
+  },
+  "godot": {
+    "command": "python3 tools/check_prototype.py --godot /opt/godot/4.7.2/Godot_v4.7.2-stable_linux.x86_64 --keep-going --report /tmp/imperathen-ap10-20261124/engine-checks-delivery",
+    "engine": "4.7.2.stable.official.ed1daf0bf",
+    "checks_total": 64,
+    "checks_passed": 64,
+    "warnings": 0,
+    "passed": true,
+    "report": "delivery-engine-report.json",
+    "report_sha256": "64466337782351acde8785131b0f73244c0377476b23e4f57325de200c1e028e"
+  },
+  "selected_android_images_visually_reviewed": [
+    "01_android_menu.png",
+    "15_android_family_home.png",
+    "07_android_arm64_translated_intro.png"
+  ],
+  "apk_source_unchanged_by_delivery_docs": true,
+  "prototype_diff_from_visual_source_0ecf498": [
+    "prototype/export_presets.cfg"
+  ],
+  "visual_diff_scope": "Only Android version code/name in export_presets.cfg; no new graphical game changes in AP-10."
+}

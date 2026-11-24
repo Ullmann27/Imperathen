@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "mission": "I-02",
+  "title": "Der falsche Korb",
+  "source_section": "Band 1 · Abschnitt „I-02 · Der falsche Korb“ · Tabelle 5",
+  "rule": "Bestehende Brückenschritte, unverändert aus handoff/sol-20261124 (94bb7cdd76a3fe2577610eac8da6948e29b0faab) ausgelagert. IDs und Auslösebedingungen bleiben erhalten; keine Einträge in childhood.completed.",
+  "authorship": "Verdichtete Spielaufgaben und verbindende Dialoge sind bestehende Ergänzungen. Die Fundstelle belegt den Missionsrahmen, nicht jede Formulierung des Runtime-Schritts.",
+  "steps": [],
+  "bridges": [
+    {
+      "id": "i02_basket",
+      "mission": "I-02",
+      "screenplay": true,
+      "npc": "aurelia",
+      "chapter": "Der falsche Korb",
+      "label": "Julias Korb zu Aurelia bringen",
+      "objective": "Bring Julias Nachbarschaftskorb zu Aurelia. Prüfe den Korb oder handle hastig.",
+      "text": "»Zeig mir erst, welchen Korb Julia dir gegeben hat. Ein Fehler ist kein Weltende, aber wir müssen dann mit seinen Folgen weiterarbeiten.«",
+      "result": "Aurelia prüft den Korb."
+    },
+    {
+      "id": "i02_correct",
+      "mission": "I-02",
+      "screenplay": true,
+      "npc": "julia",
+      "chapter": "Der falsche Korb",
+      "label": "Den falschen Korb mit Julia korrigieren",
+      "objective": "Kehre zu Julia zurück. Der falsche Korb bleibt Teil der Geschichte, bis du ihn korrigierst.",
+      "text": "»Gut, dass du zurückkommst. Fehler verschwinden nicht, weil man sie nicht mag. Wir bringen jetzt den richtigen Korb auf den Weg.«",
+      "result": "Der Fehler ist korrigiert und bleibt als Erinnerung gespeichert."
+    }
+  ]
+}

@@ -7,6 +7,8 @@ extends SceneTree
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Bible = preload("res://scripts/story/campaign_bible.gd")
+const CompanionStory = preload("res://scripts/story/companion_story.gd")
+const Life = preload("res://scripts/story/village_life.gd")
 
 const ACTOR_NAMES := {"julia":"Julia", "silvanus":"Silvanus", "sextus":"Sextus", "marcus":"Marcus",
 	"cassia":"Cassia", "aurelia":"Aurelia", "decimus":"Decimus"}
@@ -16,10 +18,10 @@ const DOCUMENTED_CAST_DEVIATIONS := {
 	"smith_apprentice":"I-06 lists Cassia and Marcus; the apprenticeship talk is with Sextus.",
 	"family_report":"I-07 lists Decimus and Silvanus; the code uses Julia at home.",
 	"healer_request":"I-07 lists Decimus and Silvanus; the code uses Aurelia.",
-	"deliver_medicine":"I-07 lists Decimus and Silvanus; the code uses Severus.",
-	"borrow_gear":"I-07 lists Decimus and Silvanus; the code uses Severus.",
+	"deliver_medicine":"I-07 also needs the unnamed sick guard, represented by the stable actor ID severus.",
+	"borrow_gear":"I-07 also needs the unnamed sick guard, represented by the stable actor ID severus.",
 	"watch_message":"I-07 lists Decimus and Silvanus; the code uses Cassia.",
-	"return_gear":"I-07 lists Decimus and Silvanus; the code uses Severus.",
+	"return_gear":"I-07 also needs the unnamed sick guard, represented by the stable actor ID severus.",
 }
 var checks := 0
 var failures: Array[String] = []
@@ -30,6 +32,8 @@ func _initialize() -> void:
 	_test_registry()
 	_test_mapping()
 	_test_heading_and_texts()
+	_test_companion_sources_and_isolation()
+	_test_guard_identity()
 	print("BAND1_ALIGNMENT_RESULT checks=%d failures=%d" % [checks, failures.size()])
 	for failure: String in failures:
 		printerr("FAIL: " + failure)
@@ -114,6 +118,102 @@ func _test_heading_and_texts() -> void:
 	_check(not all_text.contains("Valeria") and not all_text.contains("Fabius"), "No authored step names a person absent from all four volumes")
 	var evening: Dictionary = Childhood.STEPS.filter(func(step): return step.id == "family_evening")[0]
 	_check(evening.visits.sextus.contains("Eine Klinge verzeiht dir keinen Gedanken, den du zu spät hattest."), "I-09: optional visit to Sextus carries line 03")
+
+
+func _test_companion_sources_and_isolation() -> void:
+	var first := WorldModel.new()
+	var second := WorldModel.new()
+	first.new_game("italia", true, true)
+	second.new_game("italia", true, true)
+	if not _advance_to(first, "market_trade") or not _advance_to(second, "market_trade"):
+		return
+	var sources := [
+		["I-04", "deliver_kindling", "silvanus", "neutral", "Band 1 · I-04 · Tabelle 7 · Dialogzeile 01", "Du musst nicht der Stärkste sein. Du musst wissen, wann du stehenbleibst."],
+		["I-06", "market_trade", "marcus", "friend", "Band 1 · I-06 · Tabelle 9 · Dialogzeile 05", "Sag nur, ob wir klug sein wollen oder berühmt. Beides gleichzeitig klappt bei uns selten."],
+		["I-06", "market_trade", "marcus", "rival", "Band 1 · I-06 · Tabelle 9 · Dialogzeile 08", "Ich gehe mit. Aber diesmal entscheidest du nicht allein für uns beide."],
+		["I-08", "i08_tracks", "marcus", "neutral", "Band 1 · I-08 · Tabelle 11 · Dialogzeile 01", "Sag nur, ob wir klug sein wollen oder berühmt. Beides gleichzeitig klappt bei uns selten."],
+		["I-09", "family_evening", "marcus", "neutral", "Band 1 · I-09 · Tabelle 12 · Dialogzeile 04", "Ich gehe mit. Aber diesmal entscheidest du nicht allein für uns beide."]
+	]
+	for expected: Array in sources:
+		var entries := CompanionStory.for_step(first.data, expected[0], expected[1])
+		var entry: Dictionary = entries.get(expected[2], {})
+		var line: Dictionary = entry.get("dialogue", {}).get(expected[3], {})
+		_check(line.get("source", "") == expected[4] and line.get("text", "") == expected[5], "Begleitzeile und genaue Fundstelle bleiben zusammen: " + str(expected[0]) + "/" + str(expected[3]))
+		_check(str(entry.get("direction_note", "")).begins_with("Ergänzung:"), "Auswahl und Haltepunkte sind als Ergänzung gekennzeichnet: " + str(expected[0]))
+	var first_state := JSON.stringify(first.data)
+	var second_state := JSON.stringify(second.data)
+	var companions := Childhood.companion_specs(first.data)
+	_check(companions.has("marcus"), "Die echte I-06-Aufgabe liefert Marcus als Begleiter")
+	if not companions.has("marcus"):
+		return
+	var expected_companions := JSON.stringify(companions)
+	companions.marcus.steps.clear()
+	companions.marcus.stops.market_trade[0] = 500.0
+	companions.marcus.dialogue.friend.text = "Veränderte Testansicht"
+	companions.marcus.dialogue.friend.source = "Veränderte Testfundstelle"
+	companions.erase("marcus")
+	_check(JSON.stringify(Childhood.companion_specs(first.data)) == expected_companions, "Verschachtelte Begleitdaten verändern den Katalog bei erneutem Abruf nicht")
+	_check(JSON.stringify(Childhood.companion_specs(second.data)) == expected_companions, "Eine unabhängige Partie erhält unveränderte Begleitdaten")
+	_check(JSON.stringify(first.data) == first_state and JSON.stringify(second.data) == second_state, "Veränderte Begleitansichten schreiben in keinen Weltzustand")
+	if not _advance_to(first, "family_evening") or not _advance_to(second, "family_evening"):
+		return
+	first_state = JSON.stringify(first.data)
+	second_state = JSON.stringify(second.data)
+	var step := Childhood.current_step(first.data)
+	_check(step.get("id", "") == "family_evening" and step.has("visits"), "Die echte Abendaufgabe enthält verschachtelte Besuchstexte")
+	if not step.has("visits"):
+		return
+	var expected_step := JSON.stringify(step)
+	step.visits.sextus = "Veränderte Testansicht"
+	step.id = "veränderte_testkennung"
+	_check(JSON.stringify(Childhood.current_step(first.data)) == expected_step, "Verschachtelte Schrittansicht verändert den Stammschritt bei erneutem Abruf nicht")
+	_check(JSON.stringify(Childhood.current_step(second.data)) == expected_step, "Eine unabhängige Partie erhält die ursprünglichen Besuchstexte und die stabile Schritt-ID")
+	_check(JSON.stringify(first.data) == first_state and JSON.stringify(second.data) == second_state, "Veränderte Schrittansichten schreiben in keinen Weltzustand")
+
+
+func _advance_to(model: RefCounted, goal: String) -> bool:
+	# Nur echte Fortschrittsbefehle; keine erfundenen completed- oder Save-Zustände.
+	for attempt in 90:
+		var view := Childhood.view(model.data)
+		if view.is_empty():
+			break
+		if view.stage == goal:
+			return true
+		var point: Vector2 = view.point
+		model.set_player_position(Vector3(point.x, 1.0, point.y))
+		var npc := str(view.get("target_npc", ""))
+		if not npc.is_empty() and not Life.relationship(model.data, npc).get("met", false):
+			var meeting: Dictionary = model.execute("village_talk", {"npc_id":npc, "choice":"meet"})
+			if not meeting.ok:
+				_check(false, "Gespräch auf dem Weg zu " + goal + ": " + str(meeting.message))
+				return false
+		view = Childhood.view(model.data)
+		var action := str(view.actions[0].payload.action_id)
+		var result: Dictionary = model.execute("village_childhood_action", {"action_id":action})
+		if not result.ok:
+			_check(false, "Fortschrittsbefehl " + action + ": " + str(result.message))
+			return false
+		if action.begins_with("begin_"):
+			model.advance(float(view.work_required) + 0.05)
+	_check(false, "Die echte Auftragsfolge erreicht " + goal)
+	return false
+
+
+func _test_guard_identity() -> void:
+	var model := WorldModel.new()
+	model.new_game("italia", true, true)
+	var catalog := Life.npc_catalog(model.data)
+	var matching := catalog.filter(func(npc: Dictionary): return npc.id == "severus")
+	_check(matching.size() == 1 and matching[0].name == "Wachmann", "Bewohnerverzeichnis zeigt den Wachmann unter genau einer unveränderten severus-ID")
+	_check(str(Life.dialogue(model.data, "severus").get("title", "")).begins_with("Wachmann ·"), "Der sichtbare Kindheitsdialog verwendet den belegten Rollen- statt eines erfundenen Eigennamens")
+	for step_id: String in ["deliver_medicine", "borrow_gear", "return_gear"]:
+		_check(_npc(step_id) == "severus", "Die gespeicherte Wachmann-Zuordnung bleibt erhalten: " + step_id)
+	for step: Dictionary in Childhood.STEPS:
+		if Childhood.SOURCE_MISSION_BY_STEP.get(step.id, "") == "I-07":
+			_check(not JSON.stringify(step).contains("Severus"), "I-07 zeigt keinen unbelegten Eigennamen: " + str(step.id))
+	var legacy := WorldModel.new()
+	legacy.new_game("italia", true)
+	_check(Childhood.display_name(legacy.data, "severus", "Severus") == "Severus", "Der bestehende andere Lebensweg behält seine bisherige Namensanzeige")
 
 
 func _npc(step_id: String) -> String:
