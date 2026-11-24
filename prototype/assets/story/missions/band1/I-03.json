@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "mission": "I-03",
+  "title": "Marcus kennt eine Abkürzung",
+  "source_section": "Band 1 · Abschnitt „I-03 · Marcus kennt eine Abkürzung“ · Tabelle 6",
+  "rule": "Stabile Schritt-IDs; Reihenfolge ist Save-relevant (Index in childhood.completed). Neue Schritte nur über eine neue Schema-/Save-Version einfügen, nie umsortieren.",
+  "steps": [
+    {
+      "chapter": "Menschen auf dem Markt",
+      "id": "market_meeting",
+      "label": "Nach der Familienbestellung fragen",
+      "npc": "cassia",
+      "objective": "Lerne Cassia am Markt kennen und frage nach der Bestellung deiner Familie.",
+      "result": "Du hast die richtige Bestellung und ihren Preis erfragt.",
+      "text": "»Julia hat Brot und Grütze bestellt. Das Päckchen kostet den mitgegebenen Denar. Prüfe erst, ob Name und Bestellung stimmen; dann kaufen wir es gemeinsam.«",
+      "source_mission": "I-03"
+    },
+    {
+      "chapter": "Menschen auf dem Markt",
+      "id": "market_purchase",
+      "label": "Den Haushaltsdenar gegen die Bestellung tauschen",
+      "npc": "cassia",
+      "objective": "Kaufe bei Cassia das Familienpäckchen mit dem reservierten Haushaltsdenar.",
+      "result": "Der Haushaltsdenar ist bezahlt. Du trägst das Familienpäckchen tatsächlich im Auftragsinventar.",
+      "text": "»Hier ist das verschnürte Päckchen für eure Küche. Trag es selbst nach Hause; die Besorgung ist erst fertig, wenn es bei deiner Mutter angekommen ist.«",
+      "source_mission": "I-03",
+      "carried": {
+        "add": [
+          "family_parcel"
+        ],
+        "remove": [
+          "household_coin"
+        ]
+      }
+    },
+    {
+      "chapter": "Menschen auf dem Markt",
+      "id": "deliver_food",
+      "label": "Mutter die Bestellung übergeben",
+      "npc": "julia",
+      "objective": "Kehre mit dem Familienpäckchen zu Julia zurück.",
+      "result": "Die Bestellung erreicht die Küche. Julia merkt sich, dass sie sich auf dich verlassen konnte.",
+      "text": "»Du hast zugehört und die richtige Bestellung gebracht. Dein Vater möchte, dass du heute Sextus kennenlernst, seinen ältesten Freund. Frag ihn, was du in die Schmiede mitbringen sollst; dann kommst du nicht mit leeren Händen.«",
+      "source_mission": "I-03",
+      "carried": {
+        "remove": [
+          "family_parcel"
+        ]
+      }
+    }
+  ]
+}

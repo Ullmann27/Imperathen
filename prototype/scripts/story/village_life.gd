@@ -3,6 +3,7 @@ extends RefCounted
 ## The WorldModel owns transactions and time. Presentation cannot award experience.
 
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const VERSION := 1
 const DAY_SECONDS := 120.0
 const STEP := 0.1
@@ -59,6 +60,7 @@ static func ensure(data: Dictionary) -> void:
 		data.village.attributes = {"courage":0,"combat":0,"insight":0,"tactics":0}
 	if not data.village.has("history"):
 		data.village.history = {"start_year":100,"mode":"historical_baseline", "player_changes":[], "events":[]}
+	Abilities.ensure(data)
 
 
 static func npc_catalog(data: Dictionary = {}) -> Array[Dictionary]:
@@ -209,7 +211,7 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 				return _fail("Sprich mit Varro und untersuche dann die Spur am nordwestlichen Waldrand.")
 			raid.scouted = true
 			raid.participation += 1
-			_gain(data,"insight",2)
+			_gain(data,"insight",2 + int(Abilities.effect_value(data,"scout_insight_bonus")))
 			_event(data,"scout", "Du erkennst die Zahl der Angreifer an ihrer tatsächlichen Spur.")
 			return _ok("Die Spur zeigt %d Angreifer. Du hast den nördlichen Zugang rechtzeitig ausgekundschaftet." % _enemy_count(raid.number))
 		"village_alarm":
@@ -253,7 +255,7 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 				return _fail("Für diese Abwehr fehlt Ausdauer.")
 			raid.stamina -= cost
 			raid.defense_cooldown = 1.1
-			raid.block_window = 0.9 if command == "village_block" else 0.0
+			raid.block_window = 0.9 + Abilities.effect_value(data,"block_window_bonus_seconds") if command == "village_block" else 0.0
 			raid.dodge_window = 0.55 if command == "village_dodge" else 0.0
 			return _ok("Schild oben. Erfahrung gibt es erst für einen wirklich abgewehrten Treffer." if command == "village_block" else "Du weichst aus. Das Zeitfenster schützt nur vor einem tatsächlich folgenden Angriff.")
 		"village_recover":
@@ -681,6 +683,9 @@ static func validate(data: Dictionary) -> String:
 			return "Widersprüchliche Beziehungsgeschichte."
 	if not _keys(village.attributes,["courage","combat","insight","tactics"]):
 		return "Ungültige Fähigkeiten."
+	var ability_error := Abilities.validate(data)
+	if not ability_error.is_empty():
+		return ability_error
 	for value: Variant in village.attributes.values():
 		if not _integer(value,0,10000):
 			return "Fähigkeiten müssen begrenzt und ganzzahlig sein."

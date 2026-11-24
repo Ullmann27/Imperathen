@@ -35,8 +35,16 @@ func _run() -> void:
 		"village": {}, "valley": {}, "large_battle": {}}
 	game.ui._finish_intro()
 	game._start_new_game()
-	game._opening_skip()
-	game._opening_next()
+	# New Life chains I-00 into the family opening. Leave every opening through
+	# its own skip/confirm path so the captures show the playable village camera.
+	for attempt in 4:
+		if game.screen != "opening":
+			break
+		game._opening_skip()
+		game._opening_next()
+		await process_frame
+	if game.screen != "playing":
+		errors.append("Opening did not hand over to play: " + str(game.screen))
 	# Let the capsule settle onto the floor, then checkpoint through the game's normal save API.
 	for i in 12: await physics_frame
 	game._refresh()
@@ -68,7 +76,21 @@ func _run() -> void:
 			errors.append("Village state or camera changed in " + profile)
 	game.ui.hide()
 	await _portrait("child", game.world.get_node("Player/Figure"), 1.22, play_camera)
-	await _portrait("trainer", game.world.get_node("TrainingGround/Mentor/Figure"), 1.40, play_camera)
+	var mentor: Node3D = game.world.get_node("TrainingGround/Mentor/Figure")
+	if mentor.is_visible_in_tree():
+		await _portrait("trainer", mentor, 1.40, play_camera)
+	# In the village chapter the legacy mentor is hidden; show a visible resident instead.
+	var resident: Node3D = null
+	for id in ["julia", "silvanus", "sextus", "cassia"]:
+		var candidate = game.world.get_node_or_null("VillageLife/Resident_" + id + "/Figure")
+		if candidate != null and candidate.is_visible_in_tree():
+			resident = candidate
+			report["close_resident"] = id
+			break
+	if resident != null:
+		await _portrait("resident", resident, 1.62, play_camera)
+	else:
+		errors.append("No visible village resident for a close-up")
 	game._show_menu()
 	game._open_valley(true)
 	var valley = game.valley
