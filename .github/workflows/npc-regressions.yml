@@ -13,6 +13,8 @@ on:
       - 'prototype/assets/meshy/equipment/**'
       - 'prototype/tests/npc_behavior*_test.gd'
       - 'prototype/tests/locomotion_regression_test.gd'
+      - 'prototype/tests/natural_motion_test.gd'
+      - 'prototype/scripts/visuals/character_motion.gd'
       - 'prototype/tests/meshy_*_test.gd'
       - '.github/workflows/npc-regressions.yml'
   workflow_dispatch:
@@ -75,5 +77,6 @@ jobs:
           run_check npc_behavior_world_test 'checks passed'
           run_check npc_behavior_ui_test 'NPC_BEHAVIOR_UI_PASS'
           run_check locomotion_regression_test 'LOCOMOTION_PASS'
+          run_check natural_motion_test '0 failed'
           run_check meshy_character_test 'MESHY_CHARACTERS_PASS'
           run_check meshy_equipment_test 'MESHY_EQUIPMENT_PASS'

@@ -291,8 +291,13 @@ func _advance_behavior(elapsed: float) -> void:
 			_face_interest(actor,intent,elapsed)
 		if activity == "work" and actual_speed < .05 and actor.position.distance_to(item.at) < .15:
 			figure.keep_working()
-		elif activity == "socialize" and social_arrived and actual_speed < .05 and not actor.get_meta("social_arrived",false):
-			figure.cue("talk")
+		elif activity == "socialize" and social_arrived and actual_speed < .05:
+			var peer: String = intent.partner
+			var other: Dictionary = _behavior_state.village.behavior.people.get(peer,{})
+			if other.get("activity","") == "socialize" and other.get("partner","") == id:
+				figure.keep_talking()
+			elif not actor.get_meta("social_arrived",false):
+				figure.cue("talk")
 		elif actor.get_meta("intent","") != activity and activity in ["greet","space"]:
 			figure.cue("talk")
 		actor.set_meta("social_arrived",social_arrived)
@@ -511,18 +516,19 @@ func info(id: String) -> Dictionary:
 func focus(id: String, viewer: Vector3) -> bool:
 	if not actors.has(id) or not actors[id].visible:
 		return false
+	if focused_id != id:
+		clear_focus()
 	focused_id = id
 	var actor: Node3D = actors[id]
 	var offset := viewer-actor.global_position
 	if Vector2(offset.x,offset.z).length() > .1:
 		actor.rotation.y = atan2(-offset.x,-offset.z)
-	actor.get_node("Figure").drive(0.0)
-	actor.get_node("Figure").cue("talk")
+	actor.get_node("Figure").set_conversation_focus(true)
 	return true
 
 func clear_focus() -> void:
 	if not focused_id.is_empty() and actors.has(focused_id):
-		actors[focused_id].get_node("Figure").reset_motion()
+		actors[focused_id].get_node("Figure").set_conversation_focus(false)
 	focused_id = ""
 
 func set_wagon_work(enabled: bool) -> void:

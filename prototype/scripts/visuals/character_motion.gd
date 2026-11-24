@@ -25,11 +25,14 @@ var _transition_positions: Array[Vector3] = []
 var _transition_rotations: Array[Quaternion] = []
 var _transition_remaining := 0.0
 var _transition_duration := 0.0
+var _style_phase := 0.0
 
 
-func bind(model: Node3D, is_civilian: bool) -> void:
+func bind(model: Node3D, is_civilian: bool, actor_identity: String = "") -> void:
 	available = false
 	civilian = is_civilian
+	# Stable individuality across LOD replacement and independent actors.
+	_style_phase = float(posmod(actor_identity.hash(), 997)) / 997.0
 	_ids.clear()
 	_rest.clear()
 	_global_rest.clear()
@@ -98,14 +101,28 @@ func locomotion(action: String, phase: float, metres_per_second: float, turn_rat
 	# A posed review uses the clip's full gait when no live speed is supplied.
 	if walking and metres_per_second < 0.0:
 		intensity = 1.0
-	var sway := (0.008 * wave if walking else 0.004 * wave) * scale
+	# Standing is a grounded posture, not a frozen animation frame. The pelvis
+	# shifts over the supporting legs while the head counterbalances the chest.
+	var talking := action == "talk"
+	var personal := (cycle + _style_phase) * TAU
+	var weight_shift := sin(personal)
+	var breath := sin(personal * 2.0)
+	var gesture := (0.5 - 0.5 * cos(cycle * TAU)) if talking else 0.0
+	var sway := (0.008 * wave if walking else (0.022 if talking else 0.016) * weight_shift) * scale
 	var lift := ((-0.078 if running else -0.062) + 0.005 * cos(cycle * TAU * 2.0)) * scale * intensity
 	var pelvis_basis := Basis(Vector3.UP, deg_to_rad(3.0 * wave * intensity)) * _global_rest[_ids.Pelvis].basis
+	if not walking:
+		lift = (-0.018 + 0.004 * breath) * scale
+		pelvis_basis = Basis(Vector3.FORWARD, deg_to_rad(1.8 * weight_shift)) * Basis(Vector3.UP, deg_to_rad(2.0 * weight_shift)) * _global_rest[_ids.Pelvis].basis
 	_place("Pelvis", pelvis_basis, _pelvis + Vector3(sway, lift, 0))
 	var lean := (4.0 if running else 1.0) * intensity
 	var spine_basis := Basis(Vector3.RIGHT, deg_to_rad(lean)) * Basis(Vector3.UP, deg_to_rad(-5.0 * wave * intensity)) * Basis(Vector3.FORWARD, deg_to_rad(clampf(turn_rate, -2.0, 2.0) * 3.0 + roll * 0.6 * intensity)) * _global_rest[_ids.Spine].basis
+	var head_basis := Basis(Vector3.UP, deg_to_rad(clampf(turn_rate, -2.0, 2.0) * 7.0)) * _global_rest[_ids.Head].basis
+	if not walking:
+		spine_basis = Basis(Vector3.RIGHT, deg_to_rad(0.7 * breath + 2.5 * gesture)) * Basis(Vector3.UP, deg_to_rad(-3.0 * weight_shift + 3.0 * gesture)) * Basis(Vector3.FORWARD, deg_to_rad(-1.6 * weight_shift)) * _global_rest[_ids.Spine].basis
+		head_basis = Basis(Vector3.UP, deg_to_rad((8.0 if talking else 4.0) * sin(personal))) * Basis(Vector3.RIGHT, deg_to_rad(1.2 * breath + 4.0 * gesture)) * Basis(Vector3.FORWARD, deg_to_rad(-2.0 * weight_shift)) * _global_rest[_ids.Head].basis
 	_orient("Spine", spine_basis)
-	_orient("Head", Basis(Vector3.UP, deg_to_rad(clampf(turn_rate, -2.0, 2.0) * 7.0)) * _global_rest[_ids.Head].basis)
+	_orient("Head", head_basis)
 	for side: String in ["L", "R"]:
 		var sign := 1.0 if side == "L" else -1.0
 		var u := fposmod(cycle + (0.0 if side == "R" else 0.5), 1.0)
@@ -128,6 +145,11 @@ func locomotion(action: String, phase: float, metres_per_second: float, turn_rat
 		var shoulder := _point("Arm_" + side)
 		var elbow := shoulder + Vector3(sign * 0.040, -0.201, arm_swing) * scale
 		var wrist := elbow + Vector3(sign * 0.010, -0.201 if not running else -0.165, 0.026 + (0.09 if running else 0.0)) * scale
+		if talking:
+			var primary := "L" if _style_phase < 0.5 else "R"
+			var express := gesture * (1.0 if side == primary else 0.28)
+			elbow += Vector3(sign * 0.045, 0.055, 0.085) * scale * express
+			wrist += Vector3(sign * 0.045, 0.205, 0.185) * scale * express
 		_arm(side, elbow, wrist)
 		# The hand follows the forearm, with a small anatomically relaxed angle.
 		var lower := _pose[_ids["Forearm_" + side]].basis
@@ -135,6 +157,29 @@ func locomotion(action: String, phase: float, metres_per_second: float, turn_rat
 		_orient("Hand_" + side, lower * local_rest)
 	_blend_transition()
 	skeleton.force_update_all_bone_transforms()
+
+
+func imported_ambient(action: String, phase: float) -> void:
+	# Military and imported Meshy rigs retain their authored limbs, foot
+	# contacts and attached props. Only subtle torso/head turns are supplied
+	# here, in their real rest axes, without accumulating frame-to-frame.
+	if not available or civilian or action not in ["idle", "talk"]:
+		return
+	var at := (fposmod(phase, 1.0) + _style_phase) * TAU
+	var talking := action == "talk"
+	var nod := (1.0 - cos(at * 2.0)) * 0.5
+	_rest_turn("Spine", 1.8 * sin(at), 0.7 * sin(at * 2.0), 1.2 * sin(at))
+	_rest_turn("Head", (7.0 if talking else 4.0) * sin(at), (3.5 if talking else 1.0) * nod, -1.6 * sin(at))
+	skeleton.force_update_all_bone_transforms()
+
+
+func _rest_turn(name: String, yaw: float, pitch: float, roll_angle: float) -> void:
+	var bone: int = _ids[name]
+	var global_basis := _global_rest[bone].basis.orthonormalized()
+	var turn := Basis(Vector3.UP, deg_to_rad(yaw)) * Basis(Vector3.RIGHT, deg_to_rad(pitch)) * Basis(Vector3.FORWARD, deg_to_rad(roll_angle))
+	var local_turn := global_basis.inverse() * turn * global_basis
+	var rotation := _rest[bone].basis.get_rotation_quaternion() * local_turn.get_rotation_quaternion()
+	skeleton.set_bone_pose_rotation(bone, rotation.normalized())
 
 
 func combat(technique: String, progress: float) -> void:

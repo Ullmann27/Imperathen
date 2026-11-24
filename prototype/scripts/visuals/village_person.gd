@@ -53,6 +53,7 @@ var appearance_variation := 0
 var _loaned_gear := false
 var _gear_nodes: Array[Node3D] = []
 var meshy_asset_id := ""
+var _conversation_focused := false
 
 
 func _ready() -> void:
@@ -200,7 +201,7 @@ func _reload(level: int) -> void:
 		_style(shape)
 	_hands.bind(body, active_model_path)
 	_face.bind(body, identity)
-	_motion.bind(body, role in ["player", "companion"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"]))
+	_motion.bind(body, role in ["player", "companion"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"]), identity)
 	_play(clip,saved_phase,0)
 	_face.pose("attack" if not _combat_id.is_empty() else clip,saved_phase,detail)
 	if not _combat_id.is_empty():
@@ -309,9 +310,10 @@ func drive(metres_per_second: float, turn_radians_per_second: float = 0.0) -> vo
 	_turn_rate = clampf(turn_radians_per_second, -3.0, 3.0) if is_finite(turn_radians_per_second) else 0.0
 	if _combat_id.is_empty():
 		_posed = false
-		# A work loop is a stationary activity, not an uninterruptible action.
-		# Resume the gait as soon as the owning body actually starts travelling.
-		if clip == "work" and speed >= 0.10:
+		# Work and speech are stationary activities. An actual moving body
+		# must not glide while its previous gesture is still playing.
+		if clip in ["work", "talk"] and speed >= 0.10:
+			_conversation_focused = false
 			_remaining = 0.0
 			_play(_locomotion_clip(), 0.0, 0.13)
 
@@ -326,6 +328,7 @@ func set_equipment(sword: bool, shield: bool = false) -> void:
 func sample_combat(technique: String, normalized: float) -> void:
 	if not technique in CharacterMotion.TECHNIQUES:
 		return
+	_conversation_focused = false
 	if _combat_id.is_empty():
 		_play("idle", 0.0, 0.0)
 	_combat_id = technique
@@ -351,6 +354,7 @@ func cue_combat(technique: String, duration: float) -> void:
 
 
 func cancel_action() -> void:
+	_conversation_focused = false
 	_combat_id = ""
 	_combat_duration = 0.0
 	_combat_progress = 0.0
@@ -362,6 +366,8 @@ func cancel_action() -> void:
 
 func cue(action: String) -> void:
 	if action == "death" and clip == "death": return
+	if action != "talk":
+		_conversation_focused = false
 	_combat_id = ""
 	_combat_external = false
 	_posed = false
@@ -392,6 +398,7 @@ func _sync_loaned_gear() -> void:
 
 
 func reset_motion() -> void:
+	_conversation_focused = false
 	_combat_id = ""
 	_combat_external = false
 	_combat_progress = 0.0
@@ -400,6 +407,31 @@ func reset_motion() -> void:
 	_posed = false
 	_play("idle",0,0)
 	_face.pose("idle",0,detail)
+
+
+func set_conversation_focus(enabled: bool) -> void:
+	if enabled == _conversation_focused:
+		return
+	if enabled:
+		if clip == "death":
+			return
+		drive(0.0)
+		_conversation_focused = true
+		cue("talk")
+	else:
+		_conversation_focused = false
+		if clip == "talk":
+			cancel_action()
+
+
+func keep_talking() -> void:
+	if speed >= 0.06 or not _combat_id.is_empty() or _posed or clip == "death":
+		return
+	if _remaining > 0.0 and clip not in ["idle", "march", "run", "talk"]:
+		return
+	if clip != "talk":
+		cue("talk")
+	_remaining = maxf(_remaining, 0.30)
 
 
 func keep_working() -> void:
@@ -424,6 +456,7 @@ func sample_pose(action: String, normalized: float) -> void:
 	if action in CharacterMotion.TECHNIQUES:
 		sample_combat(action, normalized)
 		return
+	_conversation_focused = false
 	_combat_id = ""
 	_combat_external = false
 	_posed = true
@@ -433,7 +466,7 @@ func sample_pose(action: String, normalized: float) -> void:
 
 
 func _play(action: String, normalized: float, blend: float) -> void:
-	_motion.capture_transition(blend if action != clip and action in ["idle", "march", "run"] else 0.0)
+	_motion.capture_transition(blend if action != clip and action in ["idle", "march", "run", "talk"] else 0.0)
 	clip = action
 	if _blade: _blade.visible = _has_sword and role == "player" and age >= 18 and clip in ["attack","train","block"]
 	phase = clampf(normalized,0,1)
@@ -451,9 +484,12 @@ func _play(action: String, normalized: float, blend: float) -> void:
 
 
 func _apply_motion(review: bool = false) -> void:
-	if clip in ["idle", "march", "run"]:
+	if clip in ["idle", "march", "run", "talk"]:
 		_hands.set_grip(0.18 if clip != "run" else 0.34)
-		_motion.locomotion(clip, phase, -1.0 if review and clip != "idle" else speed / maxf(body.scale.y, 0.01), _turn_rate)
+		if _motion.civilian:
+			_motion.locomotion(clip, phase, -1.0 if review and clip in ["march", "run"] else speed / maxf(body.scale.y, 0.01), _turn_rate)
+		else:
+			_motion.imported_ambient(clip, phase)
 	elif clip in ["attack", "train"] and role in ["player", "companion"] and not _has_sword:
 		_hands.set_grip(0.18 + 0.82 * sin(phase * PI))
 		_motion.combat("jab_right", phase)
@@ -507,7 +543,7 @@ func _process(delta: float) -> void:
 	if _posed: return
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)
-		if _remaining <= 0:
+		if _remaining <= 0 and not (_conversation_focused and clip == "talk"):
 			var next := _locomotion_clip()
 			if next != clip:
 				var carry_phase := phase if clip in ["march", "run"] and next in ["march", "run"] else 0.0

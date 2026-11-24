@@ -317,7 +317,7 @@ func clear_frontier_focus() -> void:
 	_frontier_focus = ""
 	_village_focus = ""
 	if village_life_world != null:
-		village_life_world.focused = ""
+		village_life_world.clear_focus()
 	population.clear_focus()
 	if _camera:
 		_camera.fov = 54.0
