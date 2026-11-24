@@ -20,13 +20,7 @@ const STONE_TOP := Color("3a3934")
 const STONE_BOTTOM := Color("262521")
 const SHADOW := Color(0.04, 0.02, 0.01, 0.85)
 
-static var _fonts: Dictionary = {}
-
-
 static func font(weight := 600, spacing := 0) -> Font:
-	var key := "%d:%d" % [weight, spacing]
-	if _fonts.has(key):
-		return _fonts[key]
 	var variation := FontVariation.new()
 	var base: Font = load(FONT_PATH)
 	variation.base_font = base
@@ -35,7 +29,6 @@ static func font(weight := 600, spacing := 0) -> Font:
 	var fallback := SystemFont.new()
 	fallback.font_names = PackedStringArray(["DejaVu Serif", "Noto Serif", "Liberation Serif"])
 	variation.fallbacks = [fallback]
-	_fonts[key] = variation
 	return variation
 
 
@@ -178,14 +171,14 @@ class TabulaBox extends StyleBox:
 			RenderingServer.canvas_item_add_polyline(to_canvas_item, light, [engraving], 1.0, true)
 		# Nail holes in the ansae, as on real bronze tablets.
 		var ansa := _ansa(rect)
-		var radius := clampf(rect.size.y * 0.055, 1.6, 3.2)
+		var radius := clampf(rect.size.y * 0.055, 1.6, 6.0)
 		for x in [rect.position.x + ansa * 0.42, rect.end.x - ansa * 0.42]:
 			var center := Vector2(x, rect.position.y + rect.size.y * 0.5)
 			RenderingServer.canvas_item_add_circle(to_canvas_item, center, radius + 0.8, Color(border, 0.9))
 			RenderingServer.canvas_item_add_circle(to_canvas_item, center, radius, Color(0.05, 0.03, 0.02))
 
 	func _ansa(rect: Rect2) -> float:
-		return clampf(rect.size.y * 0.42, 10.0, 24.0)
+		return clampf(rect.size.y * 0.42, 10.0, 48.0)
 
 	func _body(rect: Rect2) -> Rect2:
 		var ansa := _ansa(rect)
@@ -255,12 +248,12 @@ class LaurelSpray extends Control:
 		var h := size.y
 		if w < 8 or h < 8:
 			return
-		# Stem arcs from the lower inner corner up and outwards, like half a wreath.
+		# Stem bows outwards from the lower inner corner to the top, like half a wreath.
 		var stem := PackedVector2Array()
 		for index in range(21):
 			var t := index / 20.0
-			var angle := lerpf(PI * 0.62, PI * 1.32, t)
-			stem.append(_m(Vector2(w * 1.02 + cos(angle) * w * 0.92, h * 0.98 + sin(angle) * h * 0.82)))
+			var angle := lerpf(PI * 0.62, PI * 1.3, t)
+			stem.append(_m(Vector2(w * 1.12 + cos(angle) * w * 0.95, h * 0.5 + sin(angle) * h * 0.42)))
 		draw_polyline(stem, color.darkened(0.3), maxf(1.2, h / 48.0), true)
 		var pairs := 7
 		for index in range(pairs):
@@ -269,7 +262,7 @@ class LaurelSpray extends Control:
 			var a := stem[at]
 			var direction := (stem[at + 1] - a).normalized()
 			var normal := Vector2(-direction.y, direction.x)
-			var length := h * (0.3 - 0.11 * t)
+			var length := h * (0.24 - 0.08 * t)
 			for side in [-1.0, 1.0]:
 				var axis: Vector2 = (direction * 0.8 + normal * side * 0.62).normalized()
 				_leaf(a, axis, length, length * 0.42)
