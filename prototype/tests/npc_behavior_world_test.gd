@@ -46,11 +46,22 @@ func _run() -> void:
 	_check(actor.position.distance_to(original) > 1.0,"Curiosity causes real collision-checked movement along a village path")
 	_check(float(population.behavior_observations().marcellus.route_distance) > 1.0,"Observed route progress follows the actual body")
 	_check(actor.get_meta("activity","") == "march" and actor.get_node("Figure").speed > 0.1,"Walking intent is visible through the production locomotion driver")
+	# A resident may become tired anywhere, not only at the workplace.
+	behavior.activity = "rest"
+	behavior.reason = "tired"
+	var offsite_rest := actor.position
+	var offsite_distance := float(population.behavior_observations().marcellus.route_distance)
+	for tick in 7:
+		await physics_frame
+		population.advance_to(population.seconds+0.1)
+	_check(actor.position.distance_to(offsite_rest) < 0.04,"Rest away from work stops actual travel at the current position")
+	_check(is_equal_approx(float(population.behavior_observations().marcellus.route_distance),offsite_distance),"Rest does not rewind the resident's route progress")
+	_check(actor.get_node("Figure").speed < 0.06,"Offsite rest stops the actual locomotion driver")
 	behavior.activity = "work"
 	behavior.reason = "daily_work"
 	for tick in 24:
 		await physics_frame
-		population.advance_to(2.0+float(tick+1)*0.1)
+		population.advance_to(population.seconds+0.1)
 	_check(actor.position.distance_to(original) < 0.15,"Work choice returns through the same safe corridor to the workplace")
 	_check(actor.get_meta("intent","") == "work" and actor.get_node("Figure").speed < 0.06,"The resident stops before working")
 	behavior.activity = "rest"
@@ -58,7 +69,7 @@ func _run() -> void:
 	var resting := actor.position
 	for tick in 7:
 		await physics_frame
-		population.advance_to(4.4+float(tick+1)*0.1)
+		population.advance_to(population.seconds+0.1)
 	_check(actor.position.distance_to(resting) < 0.04,"A break actually stops travel instead of only changing a caption")
 	_check(actor.get_node("Figure").speed < 0.06,"A resting resident does not walk in place")
 	# Human proximity uses the same physical body; a swept step cannot go through
@@ -69,7 +80,7 @@ func _run() -> void:
 	var before_yield := actor.position
 	for tick in 6:
 		await physics_frame
-		population.advance_to(5.1+float(tick+1)*0.1)
+		population.advance_to(population.seconds+0.1)
 	_check(actor.position.x > before_yield.x+0.08,"A passerby physically gives the nearby player some room")
 	_check(actor.position.distance_to(original) < .8,"Courtesy stays inside a bounded local corridor")
 	# Authoritative family/quest locations and hitboxes stay aligned.
