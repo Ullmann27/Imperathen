@@ -33,7 +33,12 @@ func _run() -> void:
 	stage = Node3D.new()
 	root.add_child(stage)
 	_setup_studio()
-	_check(not Registry.has_complete_set("unit_roman_heavy_cavalry_rider"), "Mounted composite source cannot enter the biped route")
+	# Every unresolved source must remain outside the production biped
+	# pipeline until its individual geometry, rig and clips are validated.
+	for blocked_id: String in ["unit_roman_heavy_cavalry_rider","unit_roman_light_cavalry_rider","unit_roman_aux_archer","unit_germanic_light_spearman","unit_germanic_mounted_retainer"]:
+		_check(not Registry.has_complete_set(blocked_id), blocked_id + " unresolved source cannot enter the biped route")
+		for level in 4:
+			_check(Registry.path_for(blocked_id,32,level).is_empty(), blocked_id + " cannot bypass the blocked-source gate at tier " + str(level))
 	_check(not Registry.has_complete_set("../source/character/unit_roman_signifer"), "Unregistered source/path cannot enter runtime")
 	for id: String in IDS:
 		var person := Person.new()
