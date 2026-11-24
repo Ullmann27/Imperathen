@@ -1,0 +1,50 @@
+name: CC0 motion source and retarget review
+on:
+  push:
+    branches: ["feature/cc0-motion-import-20261124"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cc0-motion-review-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-and-retarget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify and stage actual upstream motion archive
+        run: |
+          python3 tools/characters/stage_cc0_motion.py --output "$RUNNER_TEMP/cc0-source" --report artifacts/motion/source-audit.json
+      - name: Install matching Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          curl --fail --location --retry 3 https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o godot.zip
+          curl --fail --location --retry 3 https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/SHA512-SUMS.txt -o sums.txt
+          expected="$(awk '$2 ~ /Godot_v4.7.2-stable_linux.x86_64.zip$/ { print $1; exit }' sums.txt)"
+          test -n "$expected"
+          echo "$expected  godot.zip" | sha512sum --check --strict
+          unzip -q godot.zip
+          chmod +x Godot_v4.7.2-stable_linux.x86_64
+          echo "GODOT_BIN=$RUNNER_TEMP/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Import the real hero assets
+        run: |
+          "$GODOT_BIN" --headless --editor --path prototype --import
+      - name: Retarget source rotations to the existing hero and review segment lengths
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$GODOT_BIN" --headless --path prototype --script res://tests/cc0_retarget_review.gd -- "$RUNNER_TEMP/cc0-source" "$GITHUB_WORKSPACE/artifacts/motion"
+          echo "$GITHUB_SHA" > artifacts/motion/source-commit.txt
+      - name: Upload only review outputs, not source meshes
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-cc0-motion-review
+          path: artifacts/motion/
+          if-no-files-found: warn
