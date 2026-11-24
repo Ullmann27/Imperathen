@@ -46,7 +46,7 @@ func _run() -> void:
 	var space := world.get_world_3d().direct_space_state
 	var positions: Array[Vector3] = []
 	for id: String in world.village_life_world.actors:
-		var actor: StaticBody3D = world.village_life_world.actors[id]
+		var actor: PhysicsBody3D = world.village_life_world.actors[id]
 		var canonical := Life.actor_position(model.data,id)
 		_check(Vector2(actor.position.x,actor.position.z).is_equal_approx(canonical),"Visible and authoritative position agree for "+id)
 		query.transform = Transform3D(Basis.IDENTITY,actor.position+Vector3.UP*1.02)

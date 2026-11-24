@@ -189,7 +189,7 @@ static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictiona
 		var row := HBoxContainer.new()
 		row.mouse_filter = Control.MOUSE_FILTER_PASS
 		column.add_child(row)
-		var label: Label = ui._label("%s · Hunger %d/3" % [person.name, person.hunger], 14, ui.CREAM)
+		var label: Label = ui._label("%s · Hunger %d/3" % [Childhood.display_name(data, str(person.id), str(person.name)), person.hunger], 14, ui.CREAM)
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(label)
 		var select := OptionButton.new()

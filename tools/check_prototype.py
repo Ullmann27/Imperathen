@@ -94,6 +94,8 @@ def main():
             ("campaign_bible", ["--script", "res://tests/campaign_bible_test.gd"], "CAMPAIGN_BIBLE_TEST"),
             ("band1_alignment", ["--script", "res://tests/band1_alignment_test.gd"], "BAND1_ALIGNMENT_PASS"),
             ("mission_bridge_data", ["--script", "res://tests/mission_bridge_data_test.gd"], "MISSION_BRIDGE_DATA_PASS"),
+            ("companion_navigation", ["--fixed-fps", "60", "--script", "res://tests/companion_navigation_test.gd"], "COMPANION_NAVIGATION_PASS"),
+            ("companion_follow", ["--fixed-fps", "60", "--script", "res://tests/companion_follow_test.gd"], "COMPANION_FOLLOW_PASS"),
             ("chapter_abilities", ["--script", "res://tests/chapter_abilities_test.gd"], "CHAPTER_ABILITIES_PASS"),
             ("band1_expansion", ["--script", "res://tests/band1_expansion_test.gd"], "BAND1_EXPANSION_PASS"),
             ("opening_props", ["--script", "res://tests/opening_props_test.gd"], "failures=0"),

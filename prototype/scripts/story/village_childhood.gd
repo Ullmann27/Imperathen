@@ -5,6 +5,7 @@ extends RefCounted
 const Bible = preload("res://scripts/story/campaign_bible.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
+const CompanionStory = preload("res://scripts/story/companion_story.gd")
 const VERSION := 2
 const LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
@@ -34,7 +35,7 @@ const NEIGHBORS := {
 	"fabius":{"name":"Fabius", "role":"Holzfäller", "position":Vector2(-12.0,3.0), "text":"Am Lager kannst du das bereitgelegte Kleinholz holen. An die gefällten Stämme und die Axt gehst du nur mit einem Erwachsenen."},
 	"aurelia":{"name":"Aurelia", "role":"Heilerin", "position":Vector2(8.0,18.0), "text":"Im Dorf kümmern wir uns umeinander. Eine Nachricht rechtzeitig zu bringen hilft oft mehr als ein großer Auftritt."},
 	"cassia":{"name":"Cassia", "role":"Händlerin", "position":Vector2(5.0,0.0), "text":"Auf meinem Tisch liegen Waren, die andere brauchen. Höre erst zu, prüfe die Menge und nenne dann den Preis."},
-	"severus":{"name":"Severus", "role":"Dorfwache", "position":Vector2(-1.2,-45.9), "text":"Eine Runde mit der Wache ist kein Feldzug. Wir sehen nach Wegen und Toren, helfen den Leuten und melden, was wir tatsächlich beobachtet haben."}
+	"severus":{"name":"Wachmann", "role":"Dorfwache", "position":Vector2(-1.2,-45.9), "text":"Eine Runde mit der Wache ist kein Feldzug. Wir sehen nach Wegen und Toren, helfen den Leuten und melden, was wir tatsächlich beobachtet haben."}
 }
 # Authored steps live in res://assets/story/missions/band1/ (one file per mission).
 static var STEPS: Array = MissionData.steps("band1")
@@ -202,6 +203,9 @@ static func npc_catalog(data: Dictionary) -> Array[Dictionary]:
 static func actor_override(data: Dictionary, id: String) -> Variant:
 	if not enabled(data):
 		return null
+	var observed: Variant = CompanionStory.observed_position(data, id)
+	if observed != null:
+		return observed
 	var child: Dictionary = data.village.childhood
 	if id == "severus":
 		if child.guard_absence.active:
@@ -308,7 +312,7 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	if id == "rest_patrol":
 		var guard := _person(data, "severus")
 		if guard.is_empty() or not guard.alive or data.village.get("militia", []).has("severus") or guard.assignment == "defense":
-			return _fail("Severus ist für diesen Dorfabschnitt nicht verfügbar.")
+			return _fail("Der Wachmann ist für diesen Dorfabschnitt nicht verfügbar.")
 		child.guard_absence = {"active":true,"previous_assignment":guard.assignment,"previous_health":guard.health}
 		guard.assignment = "idle"
 		guard.previous_assignment = "idle"
@@ -596,6 +600,9 @@ static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
 		elif typeof(step.get("visits")) == TYPE_DICTIONARY and step.visits.has(npc_id):
 			# Optional visits authored in the mission data (e.g. I-09 evening).
 			text = str(step.visits[npc_id])
+		var companion_line := companion_dialogue(data, npc_id)
+		if step.get("npc", "") != npc_id and not companion_line.is_empty():
+			text = companion_line.text
 		text += "\n\nVertrauen: %d · Erzählter Dorftag %d. Du bist weiterhin Teil deiner Familie und des Dorfes." % [int(relation.get("trust",0)),int(data.village.childhood.day)]
 	return {"title":"%s · %s" % [spec.name,spec.role],"text":text,"choices":choices}
 
@@ -844,6 +851,26 @@ static func _screenplay_step(data: Dictionary) -> Dictionary:
 		if screenplay.i13 == "complete" and screenplay.i14 == "pending":
 			return BRIDGE_STEPS["i14_oath"].duplicate(true)
 	return {}
+
+
+static func current_step(data: Dictionary) -> Dictionary:
+	return _current(data).duplicate(true) if enabled(data) else {}
+
+
+static func companion_specs(data: Dictionary) -> Dictionary:
+	var step := current_step(data)
+	var mission := str(step.get("mission", SOURCE_MISSION_BY_STEP.get(step.get("id", ""), "")))
+	return CompanionStory.for_step(data, mission, str(step.get("id", "")))
+
+
+static func companion_dialogue(data: Dictionary, id: String) -> Dictionary:
+	var step := current_step(data)
+	var mission := str(step.get("mission", SOURCE_MISSION_BY_STEP.get(step.get("id", ""), "")))
+	return CompanionStory.dialogue(data, id, mission, str(step.get("id", "")))
+
+
+static func display_name(data: Dictionary, id: String, fallback: String) -> String:
+	return CompanionStory.display_name(data, id, fallback)
 
 
 static func _current(data: Dictionary) -> Dictionary:

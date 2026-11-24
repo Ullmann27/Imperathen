@@ -1,0 +1,108 @@
+name: Begleiter im identischen Kamerablick
+
+on:
+  push:
+    branches: ['feature/ap1-ap2-companions-20261124']
+    paths:
+      - 'prototype/**'
+      - 'tools/capture_companion_comparison.py'
+      - '.github/workflows/companion-review.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: companion-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  matched-cameras:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GODOT_VERSION: '4.7.2'
+      BASELINE_COMMIT: '94bb7cdd76a3fe2577610eac8da6948e29b0faab'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Offizielles Godot prüfen und Bildumgebung vorbereiten
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot" "$RUNNER_TEMP/companion-review-tools" companion-evidence
+          cp tools/capture_companion_comparison.py prototype/tests/companion_review.gd "$RUNNER_TEMP/companion-review-tools/"
+          git rev-parse HEAD > "$RUNNER_TEMP/companion-review-tools/feature-commit.txt"
+          cd "$RUNNER_TEMP/godot"
+          release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl --fail --location --retry 3 "$release/SHA512-SUMS.txt" --output SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$release/$archive" --output "$archive"
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          root = pathlib.Path.cwd()
+          name = 'Godot_v4.7.2-stable_linux.x86_64.zip'
+          sums = {line.split()[-1].lstrip('*'): line.split()[0] for line in (root/'SHA512-SUMS.txt').read_text().splitlines() if line.strip()}
+          with (root/name).open('rb') as stream:
+              actual = hashlib.file_digest(stream, 'sha512').hexdigest()
+          if actual != sums.get(name):
+              raise SystemExit('Offizielle Godot-Prüfsumme stimmt nicht überein')
+          with zipfile.ZipFile(root/name) as archive:
+              archive.extractall(root)
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+          if ! command -v xvfb-run >/dev/null; then
+            sudo apt-get update -q
+            sudo apt-get install -y xvfb xauth
+          fi
+      - name: Basis mit exakt demselben externen Prüfszenenskript aufnehmen
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch --detach "$BASELINE_COMMIT"
+          xvfb-run -a -s '-screen 0 1280x720x24' python3 "$RUNNER_TEMP/companion-review-tools/capture_companion_comparison.py" \
+            --godot "$GODOT_BIN" --project "$GITHUB_WORKSPACE/prototype" \
+            --script "$RUNNER_TEMP/companion-review-tools/companion_review.gd" \
+            --output "$GITHUB_WORKSPACE/companion-evidence/before" --label before
+      - name: Änderung mit produktiven Begleitern aufnehmen
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib, shutil, subprocess
+          # Nur im flüchtigen CI-Checkout: Die Basis erzeugt fehlende Script-UIDs.
+          # Keine getrackte Datei und kein aufgenommenes Bild wird entfernt.
+          untracked = subprocess.check_output(['git', 'ls-files', '--others', '--exclude-standard', '-z', '--', 'prototype'])
+          for entry in untracked.decode('utf-8').split('\0'):
+              if entry.endswith('.gd.uid'):
+                  pathlib.Path(entry).unlink()
+          cache = pathlib.Path('prototype/.godot')
+          if cache.is_symlink():
+              cache.unlink()
+          elif cache.is_dir():
+              shutil.rmtree(cache)
+          PY
+          feature_commit="$(cat "$RUNNER_TEMP/companion-review-tools/feature-commit.txt")"
+          git switch --detach "$feature_commit"
+          xvfb-run -a -s '-screen 0 1280x720x24' python3 "$RUNNER_TEMP/companion-review-tools/capture_companion_comparison.py" \
+            --godot "$GODOT_BIN" --project "$GITHUB_WORKSPACE/prototype" \
+            --script "$RUNNER_TEMP/companion-review-tools/companion_review.gd" \
+            --output "$GITHUB_WORKSPACE/companion-evidence/after" --label after --expect-companions
+      - name: Kameras, Szenenstände und Bildprüfsummen vergleichen
+        shell: bash
+        run: |
+          python3 "$RUNNER_TEMP/companion-review-tools/capture_companion_comparison.py" --compare \
+            --before "$GITHUB_WORKSPACE/companion-evidence/before" \
+            --after "$GITHUB_WORKSPACE/companion-evidence/after" --output "$GITHUB_WORKSPACE/companion-evidence"
+      - name: Tatsächliche Bilder, Quellen und Protokolle bereitstellen
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-companion-review-${{ github.run_number }}
+          path: companion-evidence/
+          if-no-files-found: error
+          retention-days: 30

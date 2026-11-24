@@ -9,6 +9,7 @@ const Origins = preload("res://scripts/strategy/origins.gd")
 const VillageLifeWorld = preload("res://scripts/world/village_life_world.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const CompanionWorld = preload("res://scripts/world/companion_world.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
@@ -78,7 +79,7 @@ var _camera: Camera3D
 var _camera_initialized := false
 var _menu_flight := false
 var _flight_time := 0.0
-var _companion: Node3D
+var _companion: CharacterBody3D
 var _companion_label: Label3D
 var _training_label: Label3D
 var _hint: Label3D
@@ -99,6 +100,7 @@ var _frontier_camera_direction := Vector3.BACK
 var _turn_rate := 0.0
 var _touch_camera_managed := false
 var _actions = PlayerActionWorld.new(self)
+var _story_companions = CompanionWorld.new(self)
 
 
 func _ready() -> void:
@@ -144,6 +146,7 @@ func setup(state: Dictionary) -> void:
 					tree.kind = "oak"
 		grove.populate(placements)
 	sync_state(state)
+	_story_companions.reset(state)
 	set_mode("person")
 
 
@@ -259,6 +262,7 @@ func set_active(active: bool) -> void:
 	if active:
 		clear_frontier_focus()
 	if not active:
+		_story_companions.pause()
 		action_requested.emit("combat_interrupt", {})
 		_actions.reset()
 		_dodge_remaining = 0.0
@@ -294,7 +298,7 @@ func get_cinematic_anchor(key: String) -> Vector3:
 	match key:
 		"road": return to_global(Vector3(0, 0, 18))
 		"market": return scenery.to_global(scenery.MARKET)
-		"companion": return _companion.global_position - Vector3.UP * 0.9
+		"companion": return _companion.global_position
 		"plot":
 			var buildings: Array = _state.get("buildings", [])
 			if not buildings.is_empty():
@@ -332,6 +336,8 @@ func focus_frontier_npc(id: String) -> bool:
 
 
 func clear_frontier_focus() -> void:
+	if is_instance_valid(_companion):
+		_companion.get_node("Figure").set_conversation_focus(false)
 	_frontier_focus = ""
 	_village_focus = ""
 	if village_life_world != null:
@@ -784,12 +790,22 @@ func _create_player() -> void:
 
 
 func _create_companion_and_training() -> void:
-	_companion = Node3D.new()
+	_companion = CharacterBody3D.new()
 	_companion.name = "Marcus"
-	_companion.position = COMPANION_LOCATION + Vector3.UP * 0.9
+	_companion.position = COMPANION_LOCATION
+	_companion.collision_mask = 1 | 2 | 4 | VillageLayout.CITIZEN_LAYER
+	_companion.floor_snap_length = 0.35
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = VillageLayout.CITIZEN_RADIUS
+	capsule.height = 1.72
+	var shape := CollisionShape3D.new()
+	shape.name = "PersonalSpace"
+	shape.shape = capsule
+	shape.position.y = 0.9
+	_companion.add_child(shape)
 	add_child(_companion)
-	Art.person(_companion,"companion","italia",12)
-	_companion_label = Art.label(_companion, "Marcus · E\nGefährten kennenlernen", Vector3(0, 1.15, 0), Color(0.85, 0.92, 0.74), 36)
+	Art.person(_companion,"companion","italia",12).position.y = 0.9
+	_companion_label = Art.label(_companion, "Marcus · E\nGefährten kennenlernen", Vector3(0, 2.05, 0), Color(0.85, 0.92, 0.74), 36)
 	_companion_label.font_size = 24
 	_companion_label.pixel_size = 0.0024
 	_companion_label.visibility_range_end = 5.0
@@ -969,12 +985,13 @@ func npc_observations() -> Dictionary:
 	if is_instance_valid(village_life_world):
 		observations.merge(village_life_world.behavior_observations(), true)
 	if is_instance_valid(_companion) and _companion.visible and str(_state.get("origin_id", "italia")) == "italia":
-		var at: Vector3 = _companion.global_position
+		var at: Vector3 = _companion.global_position + Vector3.UP * 0.9
 		observations["marcus"] = {"position": [at.x, at.y, at.z], "route_distance": 0.0}
 	return observations
 
 
 func _sync_companion() -> void:
+	_companion.collision_layer = VillageLayout.CITIZEN_LAYER if Childhood.enabled(_state) else (4 if CombatActions.enabled(_state) else 0)
 	var companion: Dictionary = _state.get("companion", {})
 	if not bool(companion.get("met", false)):
 		_companion_label.text = "%s · E\nGefährten kennenlernen" % Origins.PEOPLES[_state.get("origin_id","italia")].companion
@@ -1103,6 +1120,7 @@ func _physics_process(delta: float) -> void:
 		_figure.keep_working()
 	population.set_wagon_work(wagon_work)
 	_update_followers(delta)
+	_update_story_companions(delta)
 	_update_encounter()
 	_update_preview()
 	_update_context_hint()
@@ -1238,6 +1256,10 @@ func _animate_figure() -> void:
 	var actual := _player.get_real_velocity()
 	var speed := Vector2(actual.x, actual.z).length()
 	_figure.drive(speed if _mode == "person" else 0.0, _turn_rate)
+
+
+func _update_story_companions(delta: float) -> void:
+	_story_companions.advance(delta)
 
 
 func _update_followers(delta: float) -> void:
@@ -1476,7 +1498,7 @@ func _interact() -> void:
 			action_requested.emit("village_npc", {"npc_id":villager})
 			return
 	var companion: Dictionary = _state.get("companion", {})
-	if _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS and not bool(companion.get("met", false)):
+	if _horizontal_distance(_player.position, _companion.position) <= INTERACTION_RADIUS and (not bool(companion.get("met", false)) or not Childhood.companion_dialogue(_state, "marcus").is_empty()):
 		_companion.get_node("Figure").cue("talk")
 		action_requested.emit("companion_interact", {})
 		return
@@ -1499,7 +1521,7 @@ func _interact() -> void:
 		action_requested.emit("gather", {"node_id": closest_id})
 	elif _horizontal_distance(_player.position, TRAINING_LOCATION) <= INTERACTION_RADIUS:
 		action_requested.emit("combat_palette" if Childhood.enabled(_state) else "train", {})
-	elif _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS:
+	elif _horizontal_distance(_player.position, _companion.position) <= INTERACTION_RADIUS:
 		_companion.get_node("Figure").cue("talk")
 		action_requested.emit("companion_interact", {})
 	elif not bool(_state.get("encounter",{}).get("active",false)):
@@ -1623,7 +1645,7 @@ func _update_context_hint() -> void:
 			_hint.text = village_hint.trim_prefix("Interagieren · ")
 			return
 	var companion: Dictionary = _state.get("companion", {})
-	if _horizontal_distance(_player.position, COMPANION_LOCATION) <= INTERACTION_RADIUS and not bool(companion.get("met", false)):
+	if _horizontal_distance(_player.position, _companion.position) <= INTERACTION_RADIUS and (not bool(companion.get("met", false)) or not Childhood.companion_dialogue(_state, "marcus").is_empty()):
 		_hint.text = "E · Mit %s sprechen" % Origins.PEOPLES[_state.get("origin_id","italia")].companion
 		return
 	var nodes: Array = _state.get("resource_nodes", [])

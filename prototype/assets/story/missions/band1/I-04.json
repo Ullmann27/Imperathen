@@ -50,7 +50,7 @@
       "id": "apprentice_permission",
       "label": "Vater um Erlaubnis für den Probemorgen bitten",
       "npc": "silvanus",
-      "objective": "Sprich zu Hause mit Silvanus über Sextus’ Angebot.",
+      "objective": "Sprich mit Silvanus bei der Schmiede über Sextus’ Angebot.",
       "result": "Vater stimmt dem beaufsichtigten Probemorgen zu. Du bleibst zwölf und wohnst weiter bei deiner Familie.",
       "text": "»Du musst nicht der Stärkste sein. Du musst wissen, wann du stehenbleibst. Ein Probemorgen ist in Ordnung, wenn Sextus dabeibleibt und du auf seine Anweisungen hörst. Geh heute noch zu ihm und vereinbare, was du morgen tun darfst.«",
       "source_mission": "I-04"
@@ -64,6 +64,38 @@
       "result": "Der Probemorgen ist verabredet. Geh nach Hause; der nächste Tag beginnt erst, wenn du dort bewusst ruhst.",
       "text": "»Morgen zeige ich dir Blasebalg, Amboss und Kühlbottich. Heute ruhst du dich aus. Du fasst kein heißes Werkstück an, bevor ich es dir sage. Sieh hin, bevor du Kraft brauchst.«",
       "source_mission": "I-04"
+    }
+  ],
+  "companions": [
+    {
+      "id": "silvanus",
+      "steps": [
+        "collect_kindling",
+        "deliver_kindling",
+        "apprentice_permission",
+        "smith_trial"
+      ],
+      "stops": {
+        "deliver_kindling": [
+          30.4,
+          -23.2
+        ],
+        "apprentice_permission": [
+          30.4,
+          -23.2
+        ],
+        "smith_trial": [
+          30.4,
+          -23.2
+        ]
+      },
+      "dialogue": {
+        "neutral": {
+          "text": "Du musst nicht der Stärkste sein. Du musst wissen, wann du stehenbleibst.",
+          "source": "Band 1 · I-04 · Tabelle 7 · Dialogzeile 01"
+        }
+      },
+      "direction_note": "Ergänzung: Auswahl nach vorhandener I-03-Entscheidung, Begleitdistanz, Schrittzuordnung und Haltepunkte. Sprechertext wörtlich aus dem angegebenen Drehbuchabschnitt."
     }
   ]
 }

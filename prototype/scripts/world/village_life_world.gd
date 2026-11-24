@@ -8,6 +8,7 @@ const Person = preload("res://scripts/visuals/village_person.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
+const Childhood = preload("res://scripts/story/village_childhood.gd")
 const PLACES := {"farm":Vector2(24,-30), "woodcamp":Vector2(-43,14),
 	"quarry":Vector2(48,-12), "trade":Vector2(25,24), "watchpost":Vector2(0,-48)}
 var actors: Dictionary = {}
@@ -46,7 +47,7 @@ func _update_attention(delta: float) -> void:
 	var player := Vector3(float(saved[0]),float(saved[1]),float(saved[2]))
 	for id: String in actors:
 		var actor: Node3D = actors[id]
-		if not actor.visible:
+		if not actor.visible or actor.get_meta("companion_controlled", false):
 			continue
 		var intent := Behavior.view(state,id)
 		if intent.is_empty() or intent.activity not in ["greet","space","socialize","alert","assist"]:
@@ -108,7 +109,7 @@ func sync_state(data: Dictionary, profile: String) -> void:
 
 
 func _set_collisions(enabled: bool) -> void:
-	for body: StaticBody3D in find_children("*","StaticBody3D",true,false):
+	for body: PhysicsBody3D in find_children("*","PhysicsBody3D",true,false):
 		if not body.has_meta("visible_layer"):
 			body.set_meta("visible_layer",body.collision_layer)
 		body.collision_layer = int(body.get_meta("visible_layer")) if enabled else 0
@@ -170,13 +171,16 @@ func _create_workplace(id: String, at: Vector2) -> void:
 
 
 func _sync_actor(id: String, caption: String, profession: String, person: Dictionary) -> void:
+	caption = Childhood.display_name(state, id, caption)
 	var at: Vector2 = Life.actor_position(state, id)
 	if not actors.has(id):
-		var actor := StaticBody3D.new()
+		var actor: CollisionObject3D = CharacterBody3D.new() if id == "silvanus" else StaticBody3D.new()
 		actor.name = "Resident_" + id
 		actor.position = Vector3(at.x,0,at.y)
 		actor.collision_layer = Layout.CITIZEN_LAYER
-		actor.collision_mask = 0
+		actor.collision_mask = (1 | 2 | 4 | Layout.CITIZEN_LAYER) if actor is CharacterBody3D else 0
+		if actor is CharacterBody3D:
+			actor.floor_snap_length = 0.35
 		var collision := CollisionShape3D.new()
 		collision.name = "PersonalSpace"
 		var capsule := CapsuleShape3D.new()
@@ -206,16 +210,20 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 		label.visibility_range_end = 6
 		label.hide()
 		actors[id] = actor
-	var actor: StaticBody3D = actors[id]
+	var actor: CollisionObject3D = actors[id]
 	actor.set_meta("display_name",caption)
-	actor.position = Vector3(at.x, 0, at.y)
+	actor.get_node("Nameplate").text = caption + " · " + profession
+	var controlled: bool = id == "silvanus" and Childhood.enabled(state) and person.get("assignment", "idle") == "idle"
+	actor.set_meta("companion_controlled", controlled)
+	if not controlled:
+		actor.position = Vector3(at.x, 0, at.y)
 	actor.visible = bool(person.get("alive", true)) and not state.village.get("militia", []).has(id)
 	actor.collision_layer = Layout.CITIZEN_LAYER if actor.visible and visible else 0
 	actor.set_meta("assignment", person.get("assignment", "idle"))
 	var figure: Node3D = actor.get_node("Figure")
 	figure.profile = quality
 	figure.refresh_lod(get_viewport().get_camera_3d())
-	if focused != id and active:
+	if focused != id and active and not controlled:
 		var intent := Behavior.view(state,id)
 		var activity := str(intent.get("activity","work"))
 		figure.drive(0.0)

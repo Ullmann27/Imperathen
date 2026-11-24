@@ -40,5 +40,40 @@
       "text": "»Du bist wiedergekommen, hast das Werkstück geliefert und Rechenschaft abgelegt. Du kannst bei mir weiterlernen. Ein paar Arbeitsfolgen machen dich noch nicht zum Meister; wir nehmen uns Zeit.«",
       "source_mission": "I-06"
     }
+  ],
+  "companions": [
+    {
+      "id": "marcus",
+      "steps": [
+        "deliver_hinge",
+        "market_trade",
+        "smith_apprentice"
+      ],
+      "stops": {
+        "deliver_hinge": [
+          22.8,
+          26.8
+        ],
+        "market_trade": [
+          22.8,
+          26.8
+        ]
+      },
+      "dialogue": {
+        "friend": {
+          "text": "Sag nur, ob wir klug sein wollen oder berühmt. Beides gleichzeitig klappt bei uns selten.",
+          "source": "Band 1 · I-06 · Tabelle 9 · Dialogzeile 05"
+        },
+        "neutral": {
+          "text": "Sag nur, ob wir klug sein wollen oder berühmt. Beides gleichzeitig klappt bei uns selten.",
+          "source": "Band 1 · I-06 · Tabelle 9 · Dialogzeile 05"
+        },
+        "rival": {
+          "text": "Ich gehe mit. Aber diesmal entscheidest du nicht allein für uns beide.",
+          "source": "Band 1 · I-06 · Tabelle 9 · Dialogzeile 08"
+        }
+      },
+      "direction_note": "Ergänzung: Auswahl nach vorhandener I-03-Entscheidung, Begleitdistanz, Schrittzuordnung und Haltepunkte. Sprechertext wörtlich aus dem angegebenen Drehbuchabschnitt."
+    }
   ]
 }
