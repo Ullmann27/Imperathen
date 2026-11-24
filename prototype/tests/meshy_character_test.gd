@@ -97,6 +97,13 @@ func _run() -> void:
 			person.sample_pose("attack", .55)
 			rig.force_update_all_bone_transforms()
 			_check(_stretched_edges(mesh, rig) == 0, id + " attack does not stretch skin edges into long strips at tier " + str(level))
+			# Newly supported imported axe/shield actions must satisfy the
+			# same real skin-deformation gate as the original baked attack.
+			if id == "unit_germanic_axe_fighter":
+				for style: String in ["cut_inward","cut_outward","overhead","turn_cut","guard_front","guard_high","guard_low","guard_left","guard_right"]:
+					_check(person.sample_armed_pose(style,.56),id+" has actual "+style+" at tier "+str(level))
+					rig.force_update_all_bone_transforms()
+					_check(_stretched_edges(mesh,rig)==0,id+" "+style+" keeps real skin edges at tier "+str(level))
 			person.sample_pose("run", .37)
 			person._reload((level + 1) % 4)
 			_check(person.clip == "run" and absf(person.phase - .37) < .001, id + " action phase survives tier replacement")

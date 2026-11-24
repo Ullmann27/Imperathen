@@ -35,7 +35,9 @@ func sync(data: Dictionary) -> void:
 	var guarding := float(combat.guard_remaining) > 0.0
 	var dodging := float(combat.dodge_remaining) > 0.0
 	if guarding and not _guarding:
-		world._figure.cue("block")
+		world._figure.cue("block",world.guard_visual_style())
+	if _guarding and not guarding and world._figure.clip == "block":
+		world._figure.cancel_action()
 	if dodging and not _dodging:
 		world.cue_village_defense("village_dodge")
 	if _dodging and not dodging:

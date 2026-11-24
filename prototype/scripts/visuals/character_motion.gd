@@ -3,6 +3,8 @@ extends RefCounted
 ## actual skeleton rest space; Blender bone roll is never treated as world axes.
 
 const TECHNIQUES := ["jab_left", "jab_right", "hook_left", "hook_right", "uppercut_left", "uppercut_right", "headbutt", "front_kick", "side_kick", "high_kick"]
+const ARMED_ATTACKS := ["cut_inward", "cut_outward", "thrust", "overhead", "turn_cut"]
+const SHIELD_GUARDS := ["guard_front", "guard_high", "guard_low", "guard_left", "guard_right"]
 const TIMING := {
 	"jab_left": Vector3(0.18, 0.14, 0.62), "jab_right": Vector3(0.21, 0.14, 0.68),
 	"hook_left": Vector3(0.27, 0.16, 0.82), "hook_right": Vector3(0.27, 0.16, 0.82),
@@ -251,6 +253,99 @@ func combat(technique: String, progress: float) -> void:
 			var angle := -55.0 if technique == "side_kick" else (-25.0 if technique == "front_kick" else 14.0)
 			_orient("Foot_R", Basis(Vector3.RIGHT, deg_to_rad(angle * extension)) * _global_rest[_ids.Foot_R].basis)
 	skeleton.force_update_all_bone_transforms()
+
+
+func armed_pose(action: String, progress: float, has_shield: bool) -> bool:
+	# Presentation only. Existing authoritative attack/defence clocks still
+	# determine damage, contact and stamina. Never award an item or a hit here.
+	var guarding := action in SHIELD_GUARDS
+	if not available or (not guarding and action not in ARMED_ATTACKS) or (guarding and not has_shield):
+		return false
+	if not is_finite(progress):
+		return false
+	_reset()
+	var at := clampf(progress, 0.0, 1.0)
+	var scale := _height / 1.5
+	var brace := smoothstep(0.0, 0.13, at) * (1.0 - smoothstep(0.84, 1.0, at))
+	var windup := sin(clampf(at / 0.30, 0.0, 1.0) * PI * 0.5) * (1.0 - smoothstep(0.30, 0.56, at))
+	var sweep := smoothstep(0.27, 0.56, at) * (1.0 - smoothstep(0.70, 1.0, at))
+	var turn := float({"cut_inward":28.0, "cut_outward":-25.0, "thrust":12.0, "overhead":4.0, "turn_cut":48.0,
+		"guard_front":0.0, "guard_high":0.0, "guard_low":0.0, "guard_left":12.0, "guard_right":-12.0}.get(action,0.0))
+	var twist := turn * (brace if guarding else sweep - 0.55 * windup)
+	var crouch := (0.065 if action == "guard_low" else 0.038) * brace
+	_place("Pelvis", Basis(Vector3.UP, deg_to_rad(twist * 0.30)) * _global_rest[_ids.Pelvis].basis,
+		_pelvis + Vector3(-0.012 * brace, -crouch, 0.012 * brace) * scale)
+	_orient("Spine", Basis(Vector3.UP,deg_to_rad(twist)) * Basis(Vector3.RIGHT,deg_to_rad(4.0 * brace)) * _global_rest[_ids.Spine].basis)
+	_orient("Head", Basis(Vector3.UP,deg_to_rad(twist * 0.18)) * _global_rest[_ids.Head].basis)
+	# Targets are relative to the actual rig's shoulders. The same two-bone
+	# solver clamps to each person's limb lengths and retains both support feet.
+	var right := _point("Arm_R")
+	var left := _point("Arm_L")
+	var relaxed_r := Vector3(-0.055,-0.36,0.04)
+	var ready_r := Vector3(-0.10,-0.22,0.16)
+	var right_target := relaxed_r.lerp(ready_r,brace)
+	var hand_yaw := 0.0
+	var hand_pitch := 0.0
+	if not guarding:
+		var chamber := Vector3(-0.24,-0.10,-0.07)
+		var contact := Vector3(0.17,-0.09,0.28)
+		var follow := Vector3(0.12,-0.20,0.13)
+		match action:
+			"cut_outward":
+				chamber = Vector3(0.12,-0.11,0.22)
+				contact = Vector3(-0.28,-0.09,0.22)
+				follow = Vector3(-0.20,-0.21,0.08)
+			"thrust":
+				chamber = Vector3(-0.10,-0.20,-0.04)
+				contact = Vector3(-0.01,-0.05,0.38)
+				follow = Vector3(-0.06,-0.16,0.27)
+			"overhead":
+				chamber = Vector3(-0.08,0.19,0.04)
+				contact = Vector3(-0.02,-0.08,0.33)
+				follow = Vector3(-0.07,-0.28,0.21)
+			"turn_cut":
+				chamber = Vector3(-0.26,-0.13,-0.08)
+				contact = Vector3(0.20,-0.06,0.25)
+				follow = Vector3(0.15,-0.19,0.12)
+		right_target = _armed_arc(relaxed_r,chamber,contact,follow,at)
+		hand_yaw = twist * 0.75
+		hand_pitch = (-35.0 * windup + 22.0 * sweep) if action == "overhead" else -12.0 * sweep
+	_arm("R",right + Vector3(-0.15,-0.16,0.06)*scale,right + right_target*scale)
+	_orient("Hand_R",Basis(Vector3.UP,deg_to_rad(hand_yaw))*Basis(Vector3.RIGHT,deg_to_rad(hand_pitch))*_global_rest[_ids.Hand_R].basis)
+	var relaxed_l := Vector3(0.055,-0.36,0.04)
+	var guard_l := Vector3(-0.11,-0.18,0.25) if has_shield else Vector3(0.07,-0.19,0.14)
+	var shield_yaw := 0.0
+	var shield_pitch := 0.0
+	match action:
+		"guard_high":
+			guard_l = Vector3(-0.10,0.07,0.24)
+			shield_pitch = -18.0
+		"guard_low":
+			guard_l = Vector3(-0.09,-0.34,0.20)
+			shield_pitch = 18.0
+		"guard_left":
+			guard_l = Vector3(0.17,-0.13,0.23)
+			shield_yaw = 25.0
+		"guard_right":
+			guard_l = Vector3(-0.24,-0.13,0.25)
+			shield_yaw = -25.0
+	_arm("L",left + Vector3(0.13,-0.17,0.04)*scale,left + relaxed_l.lerp(guard_l,brace)*scale)
+	_orient("Hand_L",Basis(Vector3.UP,deg_to_rad(shield_yaw*brace))*Basis(Vector3.RIGHT,deg_to_rad(shield_pitch*brace))*_global_rest[_ids.Hand_L].basis)
+	for side: String in ["L","R"]:
+		_leg(side,_feet[side],Vector3.BACK)
+	skeleton.force_update_all_bone_transforms()
+	return true
+
+
+func _armed_arc(start: Vector3, chamber: Vector3, contact: Vector3, follow: Vector3, phase: float) -> Vector3:
+	# Continuous, ease-in/ease-out key pose interpolation; no frame teleport.
+	if phase < 0.30:
+		return start.lerp(chamber,smoothstep(0.0,0.30,phase))
+	if phase < 0.56:
+		return chamber.lerp(contact,smoothstep(0.30,0.56,phase))
+	if phase < 0.72:
+		return contact.lerp(follow,smoothstep(0.56,0.72,phase))
+	return follow.lerp(start,smoothstep(0.72,1.0,phase))
 
 
 func _blend_transition() -> void:

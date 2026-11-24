@@ -479,9 +479,20 @@ func combat_safe_motion(from: Vector2, to: Vector2) -> Vector2:
 	return _actions.safe_actor_motion(from, to)
 
 
+func guard_visual_style() -> String:
+	# Direction selects presentation only; it never expands the existing
+	# authoritative guard window or creates a new defensive permission.
+	var axis := _movement_axis()
+	if absf(axis.x) > absf(axis.y) and absf(axis.x) > .45:
+		return "guard_right" if axis.x > 0.0 else "guard_left"
+	if absf(axis.y) > .45:
+		return "guard_low" if axis.y > 0.0 else "guard_high"
+	return "guard_front"
+
+
 func cue_village_defense(action: String) -> void:
 	if _active and _figure != null:
-		_figure.cue("block" if action == "village_block" else "march")
+		_figure.cue("block" if action == "village_block" else "march",guard_visual_style() if action == "village_block" else "")
 		if action == "village_dodge":
 			_dodge_remaining = 0.26
 			_dodge_direction = Vector3.BACK.rotated(Vector3.UP, _figure.rotation.y)
