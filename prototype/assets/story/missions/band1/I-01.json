@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "mission": "I-01",
+  "title": "Die drei Becher",
+  "source_section": "Band 1 · Abschnitt „I-01 · Die drei Becher“ · Tabelle 4",
+  "rule": "Stabile Schritt-IDs; Reihenfolge ist Save-relevant (Index in childhood.completed). Neue Schritte nur über eine neue Schema-/Save-Version einfügen, nie umsortieren.",
+  "steps": [
+    {
+      "chapter": "Ein Morgen zu Hause",
+      "id": "mother_morning",
+      "label": "Mit Mutter den Morgen besprechen",
+      "npc": "julia",
+      "objective": "Sprich vor eurem Haus mit deiner Mutter Julia.",
+      "result": "Mutter vertraut dir den zweckgebundenen Haushaltsdenar an. Er ist für die Besorgung, nicht dein Taschengeld.",
+      "text": "»Du bist wach. Dein Vater arbeitet heute an einer Tür. Hol bitte zuerst Wasser und füll unsere drei Becher, dann bringt ihr gemeinsam die Besorgungen in Ordnung. Für Cassia lege ich einen Haushaltsdenar bereit. Und wenn du gehst, sag mir wohin. Nicht weil ich dich halten will – weil du zurückkommen sollst.«",
+      "source_mission": "I-01",
+      "carried": {
+        "add": [
+          "household_coin"
+        ]
+      }
+    },
+    {
+      "chapter": "Ein Morgen zu Hause",
+      "id": "fill_water",
+      "label": "Wasser holen und die drei Becher füllen",
+      "objective": "Gehe ins Familienhaus und fülle am Wassertisch den Krug und die drei Becher.",
+      "point": "family_water",
+      "result": "Drei Becher stehen gefüllt auf dem Tisch: für Julia, Silvanus und dich. Den Krug bringst du deinem Vater hinaus.",
+      "text": "",
+      "source_mission": "I-01",
+      "carried": {
+        "add": [
+          "water_jug"
+        ]
+      }
+    },
+    {
+      "chapter": "Ein Morgen zu Hause",
+      "id": "father_morning",
+      "label": "Vater den Krug bringen und zuhören",
+      "npc": "silvanus",
+      "objective": "Bring den Krug zu deinem Vater Silvanus vor dem Haus.",
+      "result": "Vater nimmt den Krug. Die Familie verabredet die Besorgung auf dem Markt.",
+      "text": "»Danke. Mach erst die Arbeit. Reden können wir danach immer noch. Eine Tür braucht gerade Angeln; ein Versprechen braucht jemanden, der es hält. Geh zu Cassia auf den Markt und frage nach unserer Bestellung. Komm anschließend zu Mutter zurück.«",
+      "source_mission": "I-01",
+      "carried": {
+        "add": [
+          "neighbor_basket"
+        ],
+        "remove": [
+          "water_jug"
+        ]
+      }
+    }
+  ]
+}

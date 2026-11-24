@@ -29,11 +29,16 @@ class ChapterAbilitiesCatalogTest(unittest.TestCase):
             self.assertIn(item["effect"]["type"], {"block_window_bonus_seconds", "emergency_food_discount_denarii", "scout_insight_bonus"})
 
     def test_granting_steps_exist_in_childhood_flow(self):
+        band1 = ROOT / "prototype/assets/story/missions/band1"
+        steps = {}
+        for mission in json.loads((band1 / "index.json").read_text(encoding="utf-8"))["order"]:
+            for step in json.loads((band1 / f"{mission}.json").read_text(encoding="utf-8"))["steps"]:
+                steps[step["id"]] = step.get("source_mission")
         source = CHILDHOOD.read_text(encoding="utf-8")
         for item in self.catalog["abilities"]:
             grant = item["grant"]
             if "completed" in grant:
-                self.assertRegex(source, r'"%s":"%s"' % (re.escape(grant["completed"]), item["mission"]))
+                self.assertEqual(steps.get(grant["completed"]), item["mission"])
             else:
                 self.assertIn('"%s":false' % grant["screenplay_flag"], source)
 

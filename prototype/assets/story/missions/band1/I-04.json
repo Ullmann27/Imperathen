@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "mission": "I-04",
+  "title": "Der Freund meines Vaters",
+  "source_section": "Band 1 · Abschnitt „I-04 · Der Freund meines Vaters“ · Tabelle 7",
+  "rule": "Stabile Schritt-IDs; Reihenfolge ist Save-relevant (Index in childhood.completed). Neue Schritte nur über eine neue Schema-/Save-Version einfügen, nie umsortieren.",
+  "steps": [
+    {
+      "chapter": "Ein Weg für die Nachbarn",
+      "id": "woodcutter_request",
+      "label": "Fabius nach dem Kleinholz für die Schmiede fragen",
+      "npc": "fabius",
+      "objective": "Suche Fabius auf und frage nach dem vorbereiteten Kleinholz.",
+      "result": "Fabius beschreibt dir den Lagerplatz. Jetzt weißt du, welches Bündel abgeholt werden darf.",
+      "text": "»Für Sextus liegt ein kleines Bündel am Holzlager westlich des Dorfes bereit. Nur das markierte Kleinholz mitnehmen. Die schweren Stämme bleiben liegen.«",
+      "source_mission": "I-04"
+    },
+    {
+      "chapter": "Ein Weg für die Nachbarn",
+      "id": "collect_kindling",
+      "label": "Das bereitgelegte Kleinholzbündel aufnehmen",
+      "objective": "Gehe zum westlichen Holzlager und hole das kleine Bündel für Sextus.",
+      "point": "wood_bundle",
+      "result": "Du nimmst das vorbereitete Bündel auf. Es muss noch zur Schmiede auf der anderen Dorfseite.",
+      "text": "",
+      "source_mission": "I-04",
+      "carried": {
+        "add": [
+          "kindling_bundle"
+        ]
+      }
+    },
+    {
+      "chapter": "Ein Weg für die Nachbarn",
+      "id": "deliver_kindling",
+      "label": "Sextus das Kleinholz bringen",
+      "npc": "sextus",
+      "objective": "Lerne Sextus an der Schmiede kennen und bring ihm Fabius’ Bündel.",
+      "result": "Sextus nimmt das Bündel an. Er bietet einen begleiteten Probemorgen an, keine fertige Berufsausbildung.",
+      "text": "»Du bist also Silvanus’ Kind. Dein Vater und ich kennen uns länger, als du lebst. Du hast den Weg selbst gemacht und das richtige Holz gebracht. Wenn du etwas nicht kannst, sag es. Dann kann ich es dir zeigen. Wenn du einen Probemorgen versuchen möchtest, rede vorher mit deinem Vater.«",
+      "source_mission": "I-04",
+      "carried": {
+        "remove": [
+          "kindling_bundle"
+        ]
+      }
+    },
+    {
+      "chapter": "Eine erste Lehre",
+      "id": "apprentice_permission",
+      "label": "Vater um Erlaubnis für den Probemorgen bitten",
+      "npc": "silvanus",
+      "objective": "Sprich zu Hause mit Silvanus über Sextus’ Angebot.",
+      "result": "Vater stimmt dem beaufsichtigten Probemorgen zu. Du bleibst zwölf und wohnst weiter bei deiner Familie.",
+      "text": "»Du musst nicht der Stärkste sein. Du musst wissen, wann du stehenbleibst. Ein Probemorgen ist in Ordnung, wenn Sextus dabeibleibt und du auf seine Anweisungen hörst. Geh heute noch zu ihm und vereinbare, was du morgen tun darfst.«",
+      "source_mission": "I-04"
+    },
+    {
+      "chapter": "Eine erste Lehre",
+      "id": "smith_trial",
+      "label": "Den begleiteten Probemorgen vereinbaren",
+      "npc": "sextus",
+      "objective": "Bestätige bei Sextus die Erlaubnis deiner Eltern.",
+      "result": "Der Probemorgen ist verabredet. Geh nach Hause; der nächste Tag beginnt erst, wenn du dort bewusst ruhst.",
+      "text": "»Morgen zeige ich dir Blasebalg, Amboss und Kühlbottich. Heute ruhst du dich aus. Du fasst kein heißes Werkstück an, bevor ich es dir sage. Sieh hin, bevor du Kraft brauchst.«",
+      "source_mission": "I-04"
+    }
+  ]
+}

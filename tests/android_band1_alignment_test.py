@@ -35,15 +35,17 @@ class Band1AlignmentTest(unittest.TestCase):
                 self.assertEqual(set(mission), {"id", "title"})
 
     def test_mission_map_names_existing_steps(self) -> None:
-        steps = set(re.findall(r'^\t\{"id":"([a-z_0-9]+)"', self.source, re.MULTILINE))
-        block = re.search(r"const SOURCE_MISSION_BY_STEP := \{(.*?)\n\}", self.source, re.DOTALL)
-        self.assertIsNotNone(block)
-        mapped = dict(re.findall(r'"([a-z_0-9]+)":"(I-\d\d)"', block.group(1)))
+        band1 = ROOT / "prototype/assets/story/missions/band1"
+        order = json.loads((band1 / "index.json").read_text(encoding="utf-8"))["order"]
+        mapped = {}
+        for mission in order:
+            data = json.loads((band1 / f"{mission}.json").read_text(encoding="utf-8"))
+            for step in data["steps"]:
+                if "source_mission" in step:
+                    mapped[step["id"]] = step["source_mission"]
         self.assertTrue(mapped)
-        self.assertLessEqual(set(mapped), steps)
         self.assertEqual(mapped["rest_first"], "I-05")
         self.assertEqual(mapped["deliver_hinge"], "I-06")
-
 
 if __name__ == "__main__":
     unittest.main()

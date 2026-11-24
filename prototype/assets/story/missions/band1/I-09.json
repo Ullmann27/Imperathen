@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "mission": "I-09",
+  "title": "Der letzte gewöhnliche Abend",
+  "source_section": "Band 1 · Abschnitt „I-09 · Der letzte gewöhnliche Abend“ · Tabelle 12",
+  "rule": "Stabile Schritt-IDs; Reihenfolge ist Save-relevant (Index in childhood.completed). Neue Schritte nur über eine neue Schema-/Save-Version einfügen, nie umsortieren.",
+  "steps": [
+    {
+      "chapter": "Ein Abend im vertrauten Dorf",
+      "id": "family_evening",
+      "label": "Den Abend mit der Familie verbringen",
+      "npc": "julia",
+      "objective": "Erzähle Julia zu Hause von deinem Tag.",
+      "result": "Du verbringst den Abend bei deiner Familie. Die offenen Aufgaben dieses Tages sind wirklich erledigt.",
+      "text": "»Du kennst inzwischen den Markt, die Werkstätten und den Weg zum Tor. Morgen ist wieder Zeit für deine Lehre. Für heute essen wir zusammen und machen die Tür zu.«",
+      "source_mission": "I-09"
+    },
+    {
+      "chapter": "Ein Abend im vertrauten Dorf",
+      "id": "night_rest",
+      "label": "Im Familienhaus schlafen gehen",
+      "objective": "Gehe ins Familienhaus und lege dich schlafen, wenn du den Tag beenden möchtest.",
+      "point": "family_rest",
+      "result": "Du legst dich im vertrauten Familienhaus schlafen. Das Dorf wird still.",
+      "text": "",
+      "source_mission": "I-09"
+    }
+  ]
+}

@@ -129,6 +129,9 @@ MESHY_REGISTRY_RESOURCES = (
 CHAPTER_STORY_RESOURCES = (
     "scripts/story/chapter_abilities.gd",
     "assets/story/chapter1_abilities.json",
+    "scripts/story/mission_data.gd",
+    "assets/story/missions/band1/index.json",
+    *(f"assets/story/missions/band1/{mission}.json" for mission in ("I-01", "I-03", "I-04", "I-05", "I-06", "I-07", "I-09")),
 )
 NPC_BEHAVIOR_RESOURCES = (
     "scripts/domain/npc_behavior.gd",

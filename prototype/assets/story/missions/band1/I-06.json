@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "mission": "I-06",
+  "title": "Ein Preis ist eine Zusage",
+  "source_section": "Band 1 · Abschnitt „I-06 · Ein Preis ist eine Zusage“ · Tabelle 9",
+  "rule": "Stabile Schritt-IDs; Reihenfolge ist Save-relevant (Index in childhood.completed). Neue Schritte nur über eine neue Schema-/Save-Version einfügen, nie umsortieren.",
+  "steps": [
+    {
+      "chapter": "Eine ehrliche Lieferung",
+      "id": "deliver_hinge",
+      "label": "Cassia den geprüften Truhengriff übergeben",
+      "npc": "cassia",
+      "objective": "Trage den geprüften Griff von der Schmiede zu Cassias Marktstand.",
+      "result": "Die Truhe erhält ihren Griff. Du verdienst einmalig zwei Denare für die tatsächliche Lieferung.",
+      "text": "»Das ist der Griff für meine Truhe. Ein Versprechen wiegt genau so viel wie die Ware, die am Ende wirklich ankommt. Zwei Denare sind dein vereinbarter Botenlohn. Hilfst du mir auch bei der Abrechnung einer kleinen Nachbarschaftsbestellung?«",
+      "source_mission": "I-06",
+      "carried": {
+        "remove": [
+          "checked_hinge"
+        ]
+      }
+    },
+    {
+      "chapter": "Eine ehrliche Lieferung",
+      "id": "market_trade",
+      "label": "Die kleine Bestellung abrechnen",
+      "npc": "cassia",
+      "objective": "Entscheide bei Cassia, wie du die Nachbarschaftsbestellung abrechnest.",
+      "result": "Die Abrechnung bleibt als konkrete Entscheidung gespeichert.",
+      "text": "»Du kannst den vereinbarten Lohn von zwei Denaren nehmen. Oder du lässt einen Denar beim Nachbarn, dessen Krug zerbrochen ist. Ich merke mir beides: einen eingehaltenen Preis und eine freiwillige Hilfe.«",
+      "source_mission": "I-06"
+    },
+    {
+      "chapter": "Ein Platz an der Schmiede",
+      "id": "smith_apprentice",
+      "label": "Die angefangene Schmiedelehre fortsetzen",
+      "npc": "sextus",
+      "objective": "Berichte Sextus von der Lieferung und besprich die weitere Lehre.",
+      "result": "Sextus nimmt dich als beginnenden Schmiedelehrling an. Deine praktische Arbeit und sein Vertrauen tragen diese Entscheidung.",
+      "text": "»Du bist wiedergekommen, hast das Werkstück geliefert und Rechenschaft abgelegt. Du kannst bei mir weiterlernen. Ein paar Arbeitsfolgen machen dich noch nicht zum Meister; wir nehmen uns Zeit.«",
+      "source_mission": "I-06"
+    }
+  ]
+}
