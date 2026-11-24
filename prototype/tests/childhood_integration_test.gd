@@ -65,7 +65,7 @@ func _run() -> void:
 	check(game.screen=="playing","Family opening hands over control")
 	check(game.model.data.player.age==12 and game.model.data.buildings.is_empty(),"Child has existing family home without a mandatory built hut")
 	check(game.world.get_player_position().y>.9,"Boy is above the raised family floor")
-	check(game.ui._objective(game._ui_state())[0]=="Ein Morgen zu Hause","HUD points to mother, not rebuilding")
+	check(game.ui._objective(game._ui_state())[0]=="I-01 · Die drei Becher","HUD names the Band 1 screenplay mission I-01, not rebuilding")
 	game.ui.update_navigation(game.world.navigation_view())
 	check(game.world.navigation_view().has_target,"First map goal is ready without completing an errand")
 	var observer=Diagnostics.new()

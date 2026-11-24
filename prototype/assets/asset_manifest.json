@@ -24,5 +24,76 @@
     "seconds": 8,
     "sample_rate": 22050,
     "sha256": "69bdcc1ef52336b462db932f7c28db5014a6109c4225307903a7881bc01b6433"
+  },
+  "menu_theme": {
+    "file": "ui/menu_theme.ogg",
+    "generator": "tools/ui/build_menu_music.py (numpy) -> WAV; encoded with ffmpeg libvorbis -q:a 4",
+    "source": "Original deterministic synthesis (seed 20261124); score written in the generator. No samples, recordings or third-party music.",
+    "license": "Own work for IMPERATHEN; no third-party rights.",
+    "instruments": "Evocations of hydraulis drone, lyre (Karplus-Strong), aulos-like reed, cornu-like horn and frame drum; not a reconstruction of ancient Roman music.",
+    "seconds": 58.18,
+    "sample_rate": 44100,
+    "channels": 2,
+    "tempo_bpm": 66,
+    "loop": "seamless (note tails and reverb wrap around the loop)",
+    "loudness": "approx. -15.8 LUFS integrated, -4 dBFS true peak (ffmpeg ebur128, measured on the WAV before encoding)",
+    "quality_review": "Technical checks only (level, clipping, loop seam, spectrum). Not reviewed by listening.",
+    "status": "provisional",
+    "sha256": "6b52b494f1f70f0d367c5704bcc521dc5072bacc7a398bb72dbfa19d4b71031f"
+  },
+  "cinzel_font": {
+    "file": "ui/fonts/Cinzel-Variable.ttf",
+    "license_file": "ui/fonts/Cinzel-OFL.txt",
+    "source": "https://github.com/google/fonts/tree/main/ofl/cinzel (upstream https://github.com/NDISCOVER/Cinzel, commit 8271e162a7c6064ff1e539ba86011b16b6a6184f), downloaded 2026-11-24",
+    "designer": "Natanael Gama; Copyright 2020 The Cinzel Project Authors",
+    "license": "SIL Open Font License 1.1 (embedding and redistribution in the game allowed; font must not be sold on its own; license text shipped alongside)",
+    "version": "2.000, variable weight axis 400-900",
+    "usage": "Title lettering and main-menu buttons in the style of Roman capitalis monumentalis",
+    "sha256": "f4d83d34d1f6c741193e4acf4b3dff9531e5a67b6aa65228d00a7db72a4e0f34"
+  },
+  "aquila_emblem": {
+    "file": "ui/aquila.svg",
+    "generator": "tools/ui/build_imperial_emblems.py",
+    "source": "Original procedural vector drawing composed from geometric rules in the generator; no traced or third-party artwork.",
+    "license": "Own work for IMPERATHEN; no third-party rights.",
+    "description": "Legion eagle (aquila) on a thunderbolt, raised wings, gold gradients",
+    "format": "SVG, imported by Godot as texture with mipmaps",
+    "status": "provisional, self-made stylised emblem; not a historical reconstruction",
+    "sha256": "bc80d650d62d29d6a82880db20ae9f64fd0bbc558c5d37009b2dd32ad97dca1a"
+  },
+  "gladius_emblem": {
+    "file": "ui/gladius.svg",
+    "generator": "tools/ui/build_imperial_emblems.py",
+    "source": "Original procedural vector drawing composed from geometric rules in the generator; no traced or third-party artwork.",
+    "license": "Own work for IMPERATHEN; no third-party rights.",
+    "description": "Gladius (Mainz-type silhouette), steel blade, ivory grip, bronze guard plate",
+    "format": "SVG, imported by Godot as texture with mipmaps",
+    "status": "provisional, self-made stylised emblem; not a historical reconstruction",
+    "sha256": "3974168879bfb16204fc61fcc6baf228664b5cb29a4d648807c3cac3296afb46"
+  },
+  "intro_trailer": {
+    "file": "ui/intro_trailer.ogg",
+    "generator": "tools/ui/build_intro_trailer.py (numpy) -> WAV; encoded with ffmpeg libvorbis -q:a 5",
+    "source": "Original deterministic synthesis (seed 20261124); sound design written in the generator. No samples, recordings or third-party sound libraries.",
+    "license": "Own work for IMPERATHEN; no third-party rights.",
+    "content": "Trailer sound for the title sequence: taiko-style drum hits with sub booms, brass braams (detuned saw clusters, sweeping filter, saturation), riser, gladius swing, impact with steel ring, three hits for VENI VIDI VICI, closing cornu call over a D minor brass swell. Marks match scripts/ui/imperial_intro.gd.",
+    "seconds": 11.6,
+    "sample_rate": 44100,
+    "channels": 2,
+    "loop": "none",
+    "loudness": "approx. -14.2 LUFS integrated, -1.0 dBFS true peak, momentary range about -12 to -25 LUFS between hits (ffmpeg ebur128 on the WAV before encoding)",
+    "quality_review": "Technical checks only (level, peaks, spectrum, timing against the picture). Not reviewed by listening.",
+    "status": "provisional",
+    "sha256": "17b388345f43093e5775eac46bcc59b7eb32281aad754e656c89bc4e2b580061"
+  },
+  "legion_march": {
+    "file": "ui/legion_march.png",
+    "generator": "tools/ui/render_legion_silhouettes.py (Blender 5.2.3, Workbench, orthographic three-quarter view)",
+    "source": "Rendered from the project's own field company rigs art/soldiers/heavy.blend, spear.blend and officer.blend (original geometry and march action, see art/soldiers/README.md). No third-party models or motion data.",
+    "license": "Own work for IMPERATHEN; no third-party rights (same terms as art/soldiers).",
+    "description": "RGBA coverage atlas, 3 rows (heavy infantry, spear bearer, officer) x 12 frames of one march cycle, 192x288 px per cell; tinted and rim-lit at runtime by shaders/legion_silhouette.gdshader",
+    "format": "PNG 2304x864, imported with mipmaps (used for depth-of-field blur)",
+    "status": "provisional",
+    "sha256": "8d51b904445fb547fbb1edf0a7f3cfc8bec857a4299f1faacb2fde3211e0f712"
   }
 }

@@ -2,6 +2,7 @@ extends RefCounted
 ## Named people are assigned once. Production, food and repair share real elapsed time.
 ## Owns data.village.economy; all spendable goods remain in data.resources.
 
+const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const DAY_SECONDS := 120.0
 const MAX_RESOURCE := 1000000
 const EPSILON := 0.000001
@@ -170,12 +171,13 @@ static func _execute(data: Dictionary, command: String, args: Dictionary) -> Dic
 		"village_buy_food":
 			if int(economy.stocks.emergency_grain) < 16:
 				return _fail("Der örtliche Notvorrat ist erschöpft.")
-			if int(data.resources.denarii) < 6 or int(data.resources.grain) > MAX_RESOURCE - 16:
-				return _fail("Eine Notration braucht 6 Denare und Platz für 16 Getreide.")
+			var price := emergency_food_price(data)
+			if int(data.resources.denarii) < price or int(data.resources.grain) > MAX_RESOURCE - 16:
+				return _fail("Eine Notration braucht %d Denare und Platz für 16 Getreide." % price)
 			economy.stocks.emergency_grain -= 16
-			_transfer(data, "denarii", -6)
+			_transfer(data, "denarii", -price)
 			_transfer(data, "grain", 16)
-			return _ok("16 Getreide aus dem begrenzten Notvorrat gekauft; 6 Denare bezahlt.")
+			return _ok("16 Getreide aus dem begrenzten Notvorrat gekauft; %d Denare bezahlt." % price)
 		"village_resow":
 			var farm: Dictionary = economy.workplaces.farm
 			if int(economy.stocks.harvest) != 0 or int(farm.condition) < 100 or not farm.project.is_empty():
@@ -365,6 +367,11 @@ static func _production_reason(data: Dictionary, id: String) -> String:
 	if int(data.resources[spec.resource]) > MAX_RESOURCE - _yield_for(data,id):
 		return "Lager voll"
 	return ""
+
+
+static func emergency_food_price(data: Dictionary) -> int:
+	# Chapter I ability „Ein Preis ist eine Zusage“ (I-06) lowers the price by its catalog value.
+	return maxi(1, 6 - int(Abilities.effect_value(data, "emergency_food_discount_denarii")))
 
 
 static func _profession(data: Dictionary) -> String:

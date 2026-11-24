@@ -92,11 +92,15 @@ def main():
             ("opening_story", ["--script", "res://tests/opening_story_test.gd"], "OPENING_STORY_PASS"),
             ("i00_stage", ["--script", "res://tests/i00_stage_test.gd"], "I00_STAGE_PASS"),
             ("campaign_bible", ["--script", "res://tests/campaign_bible_test.gd"], "CAMPAIGN_BIBLE_TEST"),
+            ("band1_alignment", ["--script", "res://tests/band1_alignment_test.gd"], "BAND1_ALIGNMENT_PASS"),
+            ("chapter_abilities", ["--script", "res://tests/chapter_abilities_test.gd"], "CHAPTER_ABILITIES_PASS"),
+            ("band1_expansion", ["--script", "res://tests/band1_expansion_test.gd"], "BAND1_EXPANSION_PASS"),
             ("opening_props", ["--script", "res://tests/opening_props_test.gd"], "failures=0"),
             ("opening_director", ["--script", "res://tests/opening_director_test.gd"], "checks []"),
             ("opening_overlay", ["--fixed-fps", "60", "--script", "res://tests/opening_overlay_test.gd"], "failures=0"),
             ("opening_flow", ["--fixed-fps", "60", "--script", "res://tests/opening_flow_test.gd"], "OPENING_FLOW_PASS"),
             ("ui", ["--fixed-fps", "60", "--script", "res://scripts/ui/ui_smoke.gd"], "UI_SMOKE_PASS"),
+            ("roman_menu", ["--fixed-fps", "60", "--script", "res://tests/roman_menu_test.gd"], "ROMAN_MENU_PASS"),
             ("touch_controls", ["--fixed-fps", "60", "--script", "res://tests/touch_controls_test.gd"], "TOUCH_CONTROLS_PASS"),
             ("action_adapter", ["--fixed-fps", "60", "--script", "res://tests/action_adapter_test.gd"], "ACTION_ADAPTER_PASS"),
             ("action_world", ["--fixed-fps", "60", "--script", "res://tests/action_world_test.gd"], "ACTION_WORLD_PASS"),
@@ -135,7 +139,7 @@ def main():
                 break
     source_hashes = {}
     for path in sorted(PROJECT.rglob("*")):
-        if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".glb", ".res", ".wav", ".json", ".webp", ".jpg"}:
+        if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".glb", ".res", ".wav", ".ogg", ".svg", ".ttf", ".json", ".webp", ".jpg"}:
             source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
     result = {"engine": version, "passed": len(records) == len(checks) and all(item["passed"] for item in records),
               "renderer": "headless/dummy; no graphical FPS or screenshot claim",

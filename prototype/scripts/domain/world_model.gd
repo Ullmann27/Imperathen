@@ -14,6 +14,7 @@ const VillageLife = preload("res://scripts/story/village_life.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
+const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const SCHEMA_VERSION := 5
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
@@ -964,6 +965,11 @@ func _read_save(path: String) -> Dictionary:
 	# childhood saves before strict state validation; all other saves are untouched.
 	if typeof(state) == TYPE_DICTIONARY:
 		Childhood.migrate_legacy_ids(state)
+		# Screenplay bridge v2 -> v3 (I-07 water); nothing is completed retroactively.
+		Childhood.migrate_screenplay(state)
+		# Schema v5 saves written before chapter abilities existed gain the record
+		# derived from their already saved story facts; the schema stays v5.
+		Abilities.ensure(state)
 	var error := _validate_state(state)
 	# Only an already valid old childhood save may initialize decisions. The
 	# initializer reads family and economy data, so malformed legacy input must
@@ -1039,6 +1045,8 @@ func _restore_integer_fields(state: Dictionary) -> void:
 	for key in state.village.attributes:
 		state.village.attributes[key] = int(state.village.attributes[key])
 	state.village.history.start_year = int(state.village.history.start_year)
+	if typeof(state.village.get("abilities")) == TYPE_DICTIONARY:
+		state.village.abilities.version = int(state.village.abilities.version)
 	if Childhood.enabled(state):
 		state.village.childhood.version=int(state.village.childhood.version)
 		state.village.childhood.day=int(state.village.childhood.day)

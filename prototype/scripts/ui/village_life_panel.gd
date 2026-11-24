@@ -6,6 +6,7 @@ const Life = preload("res://scripts/story/village_life.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Plan = preload("res://scripts/world/world_stream_plan.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
+const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 
 class RegionalMap extends Control:
 	var position_world := Vector3.ZERO
@@ -130,6 +131,7 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 		if not chapter.get("carried",[]).is_empty():
 			_text(ui,column,"Bei dir: "+", ".join(chapter.carried),16)
 		_text(ui,column,"Deine Lehre: "+str(chapter.get("apprenticeship","none")).replace("none","noch offen").replace("smith","bei Sextus"),16)
+		_abilities(ui,column,data)
 		_text(ui,column,"Deine Mutter Julia und dein Vater Silvanus warten an eurem Haus. Die Karte zeigt das Ziel deines nächsten Auftrags. Zum Kennenlernen und Helfen gehst du zu den Menschen.",15,true)
 		_text(ui,column,"Ansehen wächst durch gehaltene Zusagen. Decimus führt das Dorf; deine Aufgaben gehören zu deinem eigenen Lebensweg.",15,true)
 		return
@@ -141,9 +143,17 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 	_text(ui, column, str(economy.get("last_report", "")), 15)
 	var stats: Dictionary = data.get("village", {}).get("attributes", {})
 	_text(ui, column, "Mut %s · Kampf %s · Scharfsinn %s · Taktik %s" % [stats.get("courage", 0), stats.get("combat", 0), stats.get("insight", 0), stats.get("tactics", 0)], 17)
+	_abilities(ui, column, data)
 	_text(ui, column, "Erfahrung entsteht durch gültige Treffer, abgewehrte Angriffe, Aufklärung, Warnung und Rettung. Ein Gespräch kann nur einmal dieselbe Vertrauenswirkung haben.", 14, true)
 	_action(ui, column, "Mit Decimus den Wiederaufbau vereinbaren", "village_request_work", {}, bool(data.village.social.npcs.get("decimus", {}).get("met", false)))
 	_text(ui, column, "Zum Kennenlernen gehst du direkt zu den Menschen. Der Dorfplan zeigt ihre Aufgaben; E beziehungsweise Interagieren beginnt das Gespräch.", 14, true)
+
+
+static func _abilities(ui, column: VBoxContainer, data: Dictionary) -> void:
+	var earned: Array[String] = Abilities.names(data)
+	_text(ui, column, "Erlernte Fähigkeiten: " + (", ".join(earned) if not earned.is_empty() else "noch keine"), 16)
+	for id in data.get("village", {}).get("abilities", {}).get("earned", []):
+		_text(ui, column, "· " + str(Abilities.entry(str(id)).get("effect_text", "")), 14, true)
 
 
 static func _work(ui, column: VBoxContainer, data: Dictionary, economy: Dictionary) -> void:

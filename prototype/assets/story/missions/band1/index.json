@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "band": 1,
+  "chain": "childhood_steps",
+  "order": [
+    "I-01",
+    "I-03",
+    "I-04",
+    "I-05",
+    "I-06",
+    "I-07",
+    "I-09"
+  ],
+  "note": "Reihenfolge der Kindheitsstationen über alle Missionsdateien. Drehbuch-Brückenschritte (I-02, I-03, I-08, I-10 … I-14) liegen noch in village_childhood.gd (_screenplay_step)."
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "mission": "I-05",
+  "title": "Sieh hin, bevor du Kraft brauchst",
+  "source_section": "Band 1 · Abschnitt „I-05 · Sieh hin, bevor du Kraft brauchst“ · Tabelle 8",
+  "rule": "Stabile Schritt-IDs; Reihenfolge ist Save-relevant (Index in childhood.completed). Neue Schritte nur über eine neue Schema-/Save-Version einfügen, nie umsortieren.",
+  "steps": [
+    {
+      "chapter": "Eine erste Lehre",
+      "id": "rest_first",
+      "label": "Zu Hause essen und bis zum nächsten Morgen ruhen",
+      "objective": "Kehre in euer Familienhaus zurück und beende den ersten Tag bewusst.",
+      "point": "family_rest",
+      "rest": true,
+      "result": "Nach Essen und Schlaf beginnt der zweite erzählte Dorftag. Dein Alter bleibt zwölf.",
+      "text": "",
+      "source_mission": "I-05"
+    },
+    {
+      "chapter": "Arbeit unter Anleitung",
+      "id": "forge_bellows",
+      "label": "Den Blasebalg unter Sextus’ Anleitung bedienen",
+      "objective": "Gehe zum Blasebalg der Schmiede und beginne die angeleitete Arbeit.",
+      "point": "bellows",
+      "result": "Die erste angeleitete Arbeitsfolge ist beendet. Sextus legt einen beschädigten Truhengriff auf den Amboss.",
+      "seconds": 8.0,
+      "text": "",
+      "source_mission": "I-05"
+    },
+    {
+      "chapter": "Arbeit unter Anleitung",
+      "id": "forge_anvil",
+      "label": "Den beschädigten Griff prüfen und am Amboss richten",
+      "objective": "Wechsle zum Amboss. Sieh dir den Riss im Griff mit Sextus genau an, bevor du ihn richtest.",
+      "point": "anvil",
+      "result": "Du hast zuerst den Riss gesucht und den Griff erst danach mit Sextus gerichtet. Er muss noch am Kühlbottich geprüft werden.",
+      "seconds": 10.0,
+      "text": "",
+      "source_mission": "I-05"
+    },
+    {
+      "chapter": "Arbeit unter Anleitung",
+      "id": "forge_quench",
+      "label": "Das Werkstück mit Sextus kühlen und prüfen",
+      "objective": "Gehe zum Kühlbottich und schließe die begleitete Arbeitsfolge ab.",
+      "point": "quench",
+      "result": "Sextus prüft den gerichteten Griff und gibt ihn dir für Cassias Markttruhe mit.",
+      "seconds": 4.0,
+      "text": "",
+      "source_mission": "I-05",
+      "carried": {
+        "add": [
+          "checked_hinge"
+        ]
+      }
+    }
+  ]
+}

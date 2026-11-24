@@ -13,7 +13,7 @@ Die neue Dorfmechanik mit Decimus, Arbeitszuweisung, Berufen und wiederkehrenden
 1. Godot **4.7.2** verwenden; genau diese Version wurde in diesem Entwicklungsblock ausgeführt.
 2. Dieses Repository herunterladen oder den Entwicklungsbranch auschecken.
 3. Im Godot-Projektmanager `prototype/project.godot` importieren. Der erste Import wandelt GLB und WAV automatisch in Engine-Ressourcen um.
-4. **F5** startet `main.tscn`, den Vorspann und das Hauptmenü.
+4. **F5** startet `main.tscn`, den Vorspann und das Hauptmenü. Der vollständige Vorspann läuft beim ersten Start (Tippen oder Enter überspringt); danach erscheint eine kurze Titelkarte. Einstellungen: „Vorspann bei jedem Start vollständig zeigen“, „Vorspann jetzt ansehen“ und „Musik im Hauptmenü“. Details: [Übergabe Vorspann/Menü](../docs/22_title_menu/DELIVERY.md).
 
 Alternativ im Repository: `godot --path prototype`. Für Headless-Prüfungen: `python tools/check_prototype.py`.
 
