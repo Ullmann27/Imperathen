@@ -528,7 +528,10 @@ func _play(action: String, normalized: float, blend: float) -> void:
 
 func _apply_motion(review: bool = false) -> void:
 	if clip in ["attack","train","block"] and _can_armed_style(_armed_style):
-		_motion.armed_pose(_armed_style,phase,_can_armed_style("guard_front"))
+		if _has_meshy_axe() and _armed_style in CharacterMotion.ARMED_ATTACKS:
+			_apply_imported_axe_pose()
+		else:
+			_motion.armed_pose(_armed_style,phase,_can_armed_style("guard_front"))
 		_hands.set_grip(0.95)
 	elif clip in ["idle", "march", "run", "talk"]:
 		_hands.set_grip(0.18 if clip != "run" else 0.34)
@@ -541,6 +544,34 @@ func _apply_motion(review: bool = false) -> void:
 		_motion.combat("jab_right", phase)
 	else:
 		_hands.set_grip(0.18)
+
+
+func _apply_imported_axe_pose() -> void:
+	# Preserve the imported actor's own skin-compatible attack as the base.
+	# Its coat/arm seam has different weights than the authored hero. Apply
+	# a conservative local-space overlay instead of replacing every joint.
+	# Resample the base on each call so the overlay cannot accumulate.
+	var rig := _motion.skeleton
+	if not is_instance_valid(rig) or not animator or not animator.has_animation("attack"):
+		return
+	var animation := animator.get_animation("attack")
+	animator.seek(clampf(phase, 0.0, 1.0) * animation.length, true)
+	animator.advance(0)
+	var base_positions: Array[Vector3] = []
+	var base_rotations: Array[Quaternion] = []
+	var base_scales: Array[Vector3] = []
+	for bone in rig.get_bone_count():
+		base_positions.append(rig.get_bone_pose_position(bone))
+		base_rotations.append(rig.get_bone_pose_rotation(bone))
+		base_scales.append(rig.get_bone_pose_scale(bone))
+	if not _motion.armed_pose(_armed_style, phase, true):
+		return
+	const OVERLAY_WEIGHT := 0.15
+	for bone in rig.get_bone_count():
+		rig.set_bone_pose_position(bone, base_positions[bone].lerp(rig.get_bone_pose_position(bone), OVERLAY_WEIGHT))
+		rig.set_bone_pose_rotation(bone, base_rotations[bone].slerp(rig.get_bone_pose_rotation(bone), OVERLAY_WEIGHT))
+		rig.set_bone_pose_scale(bone, base_scales[bone])
+	rig.force_update_all_bone_transforms()
 
 
 func _distance_lod(distance: float) -> int:
