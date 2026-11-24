@@ -13,6 +13,7 @@ const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const SCHEMA_VERSION := 5
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
@@ -40,6 +41,7 @@ const COMMAND_FIELDS := {
 var data: Dictionary = {}
 var combat_sight_check: Callable
 var combat_motion_check: Callable
+var npc_observations: Callable
 
 
 func _init() -> void:
@@ -94,6 +96,8 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 	# An explicit fourth argument also enables modern combat in legacy careers.
 	if data.village.enabled and (childhood_enabled or action_combat):
 		CombatActions.start(data)
+	if data.village.enabled and childhood_enabled:
+		NpcBehavior.start(data)
 	changed.emit()
 
 
@@ -169,6 +173,8 @@ func advance(delta: float) -> void:
 		return
 	var candidate := _world_copy()
 	var notify_ui := int(candidate.world_seconds) != int(float(candidate.world_seconds) + delta)
+	if npc_observations.is_valid():
+		NpcBehavior.observe(candidate,npc_observations.call())
 	for key in candidate.timers:
 		candidate.timers[key] = maxf(0.0, float(candidate.timers[key]) - delta)
 	if candidate.village.enabled:
@@ -189,6 +195,7 @@ func advance(delta: float) -> void:
 			if not VillageEconomy.advance(candidate, step):
 				return
 			VillageLife.advance(candidate, step, combat_sight_check, combat_motion_check)
+			NpcBehavior.advance(candidate, step)
 			if int(candidate.player.health) < previous_health:
 				CombatActions.interrupt(candidate)
 			var contact := CombatActions.advance(candidate, step, combat_sight_check, _apply_combat_hit)
@@ -280,6 +287,8 @@ func save_game(path: String) -> Dictionary:
 	var state_error := _validate_state(data)
 	if not state_error.is_empty():
 		return _fail("Der Spielstand wurde nicht gespeichert: " + state_error)
+	if npc_observations.is_valid():
+		NpcBehavior.observe(data,npc_observations.call())
 	var directory_error := DirAccess.make_dir_recursive_absolute(absolute.get_base_dir())
 	if directory_error != OK:
 		return _fail("Der Speicherordner kann nicht angelegt werden (Fehler %d)." % directory_error)
@@ -710,6 +719,9 @@ func _validate_state(state: Variant) -> String:
 	var life_error := VillageLife.validate(state)
 	if not life_error.is_empty():
 		return life_error
+	var behavior_error := NpcBehavior.validate(state)
+	if not behavior_error.is_empty():
+		return behavior_error
 	if float(state.village.social.accumulator) >= VillageLife.STEP + 0.00000001:
 		return "Die Dorfzeit enthält einen nicht abgearbeiteten Zeitsprung."
 	var economic_seconds := int(state.village.economy.day) * VillageEconomy.day_length(state) + float(state.village.economy.day_seconds)
@@ -953,6 +965,12 @@ func _read_save(path: String) -> Dictionary:
 	if typeof(state) == TYPE_DICTIONARY:
 		Childhood.migrate_legacy_ids(state)
 	var error := _validate_state(state)
+	# Only an already valid old childhood save may initialize decisions. The
+	# initializer reads family and economy data, so malformed legacy input must
+	# be rejected before it reaches that code. Present behavior is never replaced.
+	if error.is_empty() and Childhood.enabled(state) and not state.village.has("behavior"):
+		NpcBehavior.start(state)
+		error = _validate_state(state)
 	if error.is_empty() and not _valid_valley(state):
 		error = "Das gespeicherte Talgefecht enthält widersprüchliche Daten."
 	if not error.is_empty():
@@ -988,6 +1006,11 @@ func _restore_integer_fields(state: Dictionary) -> void:
 	for key in state.command_log:
 		state.command_log[key].result.revision = int(state.command_log[key].result.revision)
 	state.village.health_delta = int(state.village.health_delta)
+	if NpcBehavior.enabled(state):
+		state.village.behavior.version = int(state.village.behavior.version)
+		for behavior: Dictionary in state.village.behavior.people.values():
+			behavior.last_trust = int(behavior.last_trust)
+			behavior.route_direction = int(behavior.route_direction)
 	if CombatActions.enabled(state):
 		for key in ["version", "practice_hits", "resolved_hits"]:
 			state.village.unarmed[key] = int(state.village.unarmed[key])

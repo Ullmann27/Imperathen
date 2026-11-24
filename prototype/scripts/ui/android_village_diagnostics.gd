@@ -5,10 +5,15 @@ extends Node
 const LOG_CHUNK_SIZE := 512
 const MAX_LOG_CHUNKS := 64
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
+const BEHAVIOR_SAMPLES := ["julia", "sextus", "aelia", "marcus"]
+const MAX_SAVE_BYTES := 2097152
 
 var session: Node
 var _last_snapshot_msec := 0
 var _snapshot_sequence := 0
+var _saved_content_hash := ""
+var _saved_behavior: Dictionary = {}
 
 
 func _process(_delta: float) -> void:
@@ -65,6 +70,10 @@ func snapshot() -> Dictionary:
 		"world_profile":session.world.get_quality_profile()}
 	if Childhood.enabled(data):
 		value["childhood_runtime"] = _childhood_state(data)
+	if NpcBehavior.enabled(data):
+		value["behavior_runtime"] = _behavior_state(data)
+		value["saved_behavior_runtime"] = _saved_behavior_state()
+	value["meshy_runtime"] = _meshy_state(world)
 	var collection_root: Node = session.ui
 	if value.action_runtime.overlay == "techniques":
 		collection_root = session.ui.get("_technique_menu_layer")
@@ -158,6 +167,7 @@ func _action_state() -> Dictionary:
 	var position: Vector3 = game_world.get_player_position()
 	var velocity := actor.get_real_velocity() if actor != null else Vector3.ZERO
 	var body_velocity := actor.velocity if actor != null else Vector3.ZERO
+	var figure = game_world.get("_figure")
 	var axis: Vector2 = game_world.get("_touch_move")
 	var action_touches := 0
 	for button: Button in ui.get("_touch_actions"):
@@ -176,6 +186,8 @@ func _action_state() -> Dictionary:
 		"selected_technique":str(ui.get("_selected_technique")), "overlay":overlay,
 		"position":[position.x,position.y,position.z], "velocity":[velocity.x,velocity.y,velocity.z],
 		"body_velocity":[body_velocity.x,body_velocity.y,body_velocity.z], "move_axis":[axis.x,axis.y],
+		"figure_clip":str(figure.get("clip")) if is_instance_valid(figure) else "",
+		"figure_speed":float(figure.get("speed")) if is_instance_valid(figure) else 0.0,
 		"movement_touch":int(pad.get("touch_index")) if is_instance_valid(pad) else -1,
 		"camera_touches":look.get("contacts").size() if is_instance_valid(look) else 0,
 		"action_touches":action_touches, "world_camera_touches":game_world.get("_camera_contacts").size(),
@@ -196,6 +208,104 @@ func _childhood_state(data: Dictionary) -> Dictionary:
 		"target_radius":Childhood.NPC_RANGE if not str(chapter.get("target_npc", "")).is_empty() else Childhood.POINT_RANGE,
 		"family_entrance":[entrance.x,entrance.y], "family_water":[water.x,water.y],
 		"dialog_npc":str(session.village_npc) if str(session.screen) == "village_dialog" else ""}
+
+
+func _behavior_state(data: Dictionary) -> Dictionary:
+	var behavior: Dictionary = data.village.behavior
+	var people: Dictionary = behavior.people
+	var ids := people.keys()
+	ids.sort()
+	var activities := {}
+	var observed := 0
+	var due := 0
+	var samples := {}
+	for id: String in ids:
+		var person: Dictionary = people[id]
+		var activity := str(person.activity)
+		activities[activity] = int(activities.get(activity, 0)) + 1
+		observed += 1 if person.observed else 0
+		due += 1 if float(person.next_decision) <= float(behavior.seconds) else 0
+		if id in BEHAVIOR_SAMPLES:
+			samples[id] = person.duplicate(true)
+			samples[id]["interest"] = str(NpcBehavior.profile(id).get("interest", ""))
+	return {"version":1, "behavior_version":int(behavior.version), "world_id":str(data.world_id),
+		"seconds":float(behavior.seconds), "accumulator":float(behavior.accumulator),
+		"people_count":people.size(), "observed_count":observed, "decision_due_count":due,
+		"activity_counts":activities, "roster_sha256":_canonical_hash(ids),
+		"state_sha256":_canonical_hash(behavior), "samples":samples}
+
+
+func _canonical_hash(value: Variant) -> String:
+	# Save JSON parses all numbers as floats. Normalize both sources through the
+	# same full-precision round trip before hashing, without touching live state.
+	var normalized: Variant = JSON.parse_string(JSON.stringify(value, "", true, true))
+	return JSON.stringify(normalized, "", true, true).sha256_text()
+
+
+func _saved_behavior_state() -> Dictionary:
+	# Read the real save envelope; this observer never triggers a save or a load.
+	var path := str(session.SAVE_PATH)
+	if not FileAccess.file_exists(path):
+		return {}
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null or file.get_length() > MAX_SAVE_BYTES:
+		return {}
+	var content := file.get_as_text()
+	file.close()
+	var content_hash := content.sha256_text()
+	if content_hash == _saved_content_hash:
+		return _saved_behavior.duplicate(true)
+	_saved_content_hash = content_hash
+	_saved_behavior = {}
+	var envelope: Variant = JSON.parse_string(content)
+	if typeof(envelope) != TYPE_DICTIONARY or envelope.get("format", "") != "imperathen-offline-save" or envelope.get("format_version", 0) != 1:
+		return {}
+	if typeof(envelope.get("payload")) != TYPE_STRING or typeof(envelope.get("sha256")) != TYPE_STRING:
+		return {}
+	var payload: String = envelope.payload
+	if payload.sha256_text() != envelope.sha256:
+		return {}
+	var saved: Variant = JSON.parse_string(payload)
+	if typeof(saved) != TYPE_DICTIONARY or not NpcBehavior.enabled(saved) or typeof(saved.get("world_id")) != TYPE_STRING:
+		return {}
+	if not NpcBehavior.validate(saved).is_empty():
+		return {}
+	_saved_behavior = _behavior_state(saved)
+	_saved_behavior["envelope_sha256"] = content_hash
+	_saved_behavior["payload_sha256"] = str(envelope.sha256)
+	return _saved_behavior.duplicate(true)
+
+
+func _meshy_state(world: Node) -> Dictionary:
+	var loaded := 0
+	for figure: Node in get_tree().get_nodes_in_group("village_people"):
+		if str(figure.get("active_model_path")).begins_with("res://assets/meshy/characters/") and is_instance_valid(figure.get("body")):
+			loaded += 1
+	var severus: Node = world.actors.get("severus")
+	var figure: Node = severus.get_node_or_null("Figure") if is_instance_valid(severus) else null
+	var observed := {}
+	if is_instance_valid(figure):
+		var body: Node = figure.get("body")
+		var bones := 0
+		var meshes := 0
+		var equipment: Array[Dictionary] = []
+		if is_instance_valid(body):
+			meshes = body.find_children("*", "MeshInstance3D", true, false).size()
+			for skeleton: Skeleton3D in body.find_children("*", "Skeleton3D", true, false):
+				bones += skeleton.get_bone_count()
+			for attachment: BoneAttachment3D in body.find_children("*", "BoneAttachment3D", true, false):
+				if attachment.get_meta("meshy_equipment", false):
+					var skeleton := attachment.get_parent() as Skeleton3D
+					equipment.append({"asset_id":str(attachment.get_meta("asset_id", "")),
+						"model_path":str(attachment.get_meta("model_path", "")), "bone":attachment.bone_name,
+						"bound":skeleton != null and skeleton.find_bone(attachment.bone_name) >= 0 and not attachment.override_pose,
+						"mesh_count":attachment.find_children("*", "MeshInstance3D", true, false).size()})
+		var animator: AnimationPlayer = figure.get("animator")
+		observed = {"asset_id":str(figure.get("meshy_asset_id")), "model_path":str(figure.get("active_model_path")),
+			"loaded":is_instance_valid(body), "mesh_count":meshes, "bone_count":bones, "equipment":equipment,
+			"clip":str(figure.get("clip")), "has_march":is_instance_valid(animator) and animator.has_animation("march"),
+			"has_run":is_instance_valid(animator) and animator.has_animation("run")}
+	return {"version":1, "loaded_count":loaded, "severus":observed}
 
 
 func _movement_points(control: Control) -> Dictionary:

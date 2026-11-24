@@ -1,0 +1,122 @@
+{
+  "date": "2026-11-24",
+  "source_inspection": "Canonical GLB binary inspection plus provider thumbnails. Task prompt alone was not used to infer pose.",
+  "characters": [
+    {
+      "stable_id": "unit_roman_heavy_cavalry_rider",
+      "meshy_task_id": "01a20922-0cce-7353-80a4-3d06dead3be3",
+      "source_sha256": "8277efdc7b388429a3ad1900b4592c92460643a0572dfa4bb80bfecb887a9e84",
+      "source_bytes": 21468276,
+      "source_skins": 0,
+      "source_animations": 0,
+      "source_storage": "Canonical download is an ignored authoring input; use task ID and SHA-256 to reproduce.",
+      "source_preview_inspected": true,
+      "source_license_metadata": "The connected Meshy get_task response did not include a license field. User-authorized models from the connected account; no unrelated external model imported.",
+      "derivative_status": "blocked_source_pose",
+      "reason": "Source is a combined mounted horse and rider, not a separate standing humanoid. Requires separate mount/rider reconstruction and quadruped rig."
+    },
+    {
+      "stable_id": "unit_roman_light_cavalry_rider",
+      "meshy_task_id": "01a20922-1d22-777f-b822-865f6b994efe",
+      "source_sha256": "ce951f45320868ea572fdb3d24a175b9e4872049727fe40e0689c52a846ffc3e",
+      "source_bytes": 20080968,
+      "source_skins": 0,
+      "source_animations": 0,
+      "source_storage": "Canonical download is an ignored authoring input; use task ID and SHA-256 to reproduce.",
+      "source_preview_inspected": true,
+      "source_license_metadata": "The connected Meshy get_task response did not include a license field. User-authorized models from the connected account; no unrelated external model imported.",
+      "derivative_status": "blocked_source_pose",
+      "reason": "Source is a combined mounted horse and rider, not a separate standing humanoid. Requires separate mount/rider reconstruction and quadruped rig."
+    },
+    {
+      "stable_id": "unit_roman_aux_archer",
+      "meshy_task_id": "01a20922-2cd0-7548-8505-5e2a143809ac",
+      "source_sha256": "79bf1148a66f23bfa8b9dd2b7c7a315be0cdb2ece47194e087d9b96a37342018",
+      "source_bytes": 21435244,
+      "source_skins": 0,
+      "source_animations": 0,
+      "source_storage": "Canonical download is an ignored authoring input; use task ID and SHA-256 to reproduce.",
+      "source_preview_inspected": true,
+      "source_license_metadata": "The connected Meshy get_task response did not include a license field. User-authorized models from the connected account; no unrelated external model imported.",
+      "derivative_status": "blocked_source_pose",
+      "reason": "Fixed raised arm with a long prop across the shoulder. Requires prop separation and fitted asymmetric rest pose before retargeting."
+    },
+    {
+      "stable_id": "unit_germanic_axe_fighter",
+      "meshy_task_id": "01a20922-3da8-7164-b3ef-0d60b4c04729",
+      "source_sha256": "9c6cb7e4f57ce3b0c4178bb269cad830183bb0796ccd419d5c74ada31ba9bffc",
+      "source_bytes": 21163904,
+      "source_skins": 0,
+      "source_animations": 0,
+      "source_storage": "Canonical download is an ignored authoring input; use task ID and SHA-256 to reproduce.",
+      "source_preview_inspected": true,
+      "source_license_metadata": "The connected Meshy get_task response did not include a license field. User-authorized models from the connected account; no unrelated external model imported.",
+      "derivative_status": "fitted_derivatives_godot_verified",
+      "reason": "Project-authored 15-joint rig, four imported mobile tiers and eleven actions; all body checks and representative viewport review passed.",
+      "runtime_registry": "prototype/scripts/visuals/meshy_character_registry.gd",
+      "source_supplied_rig": false,
+      "build_report": "docs/20_meshy_assets/character-build.json"
+    },
+    {
+      "stable_id": "unit_germanic_light_spearman",
+      "meshy_task_id": "01a20922-4d17-70f5-89b9-7a658e7dae82",
+      "source_sha256": "377b4559e4e1746df0377f80284883b3499761ad85f4594047dce41fa9acb08e",
+      "source_bytes": 25138612,
+      "source_skins": 0,
+      "source_animations": 0,
+      "source_storage": "Canonical download is an ignored authoring input; use task ID and SHA-256 to reproduce.",
+      "source_preview_inspected": true,
+      "source_license_metadata": "The connected Meshy get_task response did not include a license field. User-authorized models from the connected account; no unrelated external model imported.",
+      "derivative_status": "blocked_source_pose",
+      "reason": "Includes a circular pedestal, held spear and shield. Requires base removal and separate equipment sockets before fitting."
+    },
+    {
+      "stable_id": "unit_roman_signifer",
+      "meshy_task_id": "01a20922-65cb-74a8-9cc1-7479aec8622b",
+      "source_sha256": "15b2afb0c22d187f45c37a84d272cb215ff39388ee4fde23c8cec668cb042370",
+      "source_bytes": 23719052,
+      "source_skins": 0,
+      "source_animations": 0,
+      "source_storage": "Canonical download is an ignored authoring input; use task ID and SHA-256 to reproduce.",
+      "source_preview_inspected": true,
+      "source_license_metadata": "The connected Meshy get_task response did not include a license field. User-authorized models from the connected account; no unrelated external model imported.",
+      "derivative_status": "fitted_derivatives_godot_verified",
+      "reason": "Project-authored 15-joint rig, four imported mobile tiers and eleven actions; all body checks and representative viewport review passed.",
+      "runtime_registry": "prototype/scripts/visuals/meshy_character_registry.gd",
+      "source_supplied_rig": false,
+      "build_report": "docs/20_meshy_assets/character-build.json"
+    },
+    {
+      "stable_id": "unit_germanic_mounted_retainer",
+      "meshy_task_id": "01a20922-790b-77dc-aa63-9cee4c47c625",
+      "source_sha256": "2a17910f5e33a49af1193b2693124bb33cb95ac6161af475f01e2e1d823902c3",
+      "source_bytes": 23457180,
+      "source_skins": 0,
+      "source_animations": 0,
+      "source_storage": "Canonical download is an ignored authoring input; use task ID and SHA-256 to reproduce.",
+      "source_preview_inspected": true,
+      "source_license_metadata": "The connected Meshy get_task response did not include a license field. User-authorized models from the connected account; no unrelated external model imported.",
+      "derivative_status": "blocked_source_pose",
+      "reason": "Crossed arms and shield in the source geometry. Requires separation and a reviewed rest pose before retargeting."
+    }
+  ],
+  "new_meshy_generation_submitted": false,
+  "derivative_validation": {
+    "build_report": "docs/20_meshy_assets/character-build.json",
+    "headless_report": "docs/20_meshy_assets/evidence/characters-headless/review.json",
+    "headless_checks": 184,
+    "headless_failures": 0,
+    "viewport_report": "docs/20_meshy_assets/evidence/characters-viewport/review.json",
+    "viewport_checks": 204,
+    "viewport_failures": 0,
+    "manual_visual_review": "docs/20_meshy_assets/evidence/characters-viewport/visual-review.json",
+    "skin_edge_gate": {
+      "pose": "attack",
+      "phase": 0.55,
+      "all_four_tiers": true,
+      "maximum_edge_length": "7 * rest_length + 0.03 m",
+      "threshold_unchanged_during_fixes": true
+    },
+    "android_device_test": false
+  }
+}

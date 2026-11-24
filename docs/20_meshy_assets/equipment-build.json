@@ -1,0 +1,219 @@
+{
+  "generator": "tools/characters/build_meshy_equipment.py",
+  "blender": "4.3.2",
+  "equipment": [
+    {
+      "stable_id": "weap_germanic_hand_axe",
+      "source_path": "prototype/assets/meshy/source/weapon/weap_germanic_hand_axe.glb",
+      "source_sha256": "6c665a3e0c5d929031c64632e2159ba60e0d75f7ccc3b1cf0856f9d4778af87c",
+      "source_bytes": 7332848,
+      "source_bounds_blender": [
+        [
+          -0.4787600040435791,
+          -0.07543899863958359,
+          -0.47241199016571045
+        ],
+        [
+          0.4787600040435791,
+          0.07592800259590149,
+          0.4680179953575134
+        ]
+      ],
+      "removed_duplicate_handle_vertices": 518,
+      "uniform_scale": 0.6592728959562606,
+      "cross_section_scale": 0.52,
+      "source_grip_origin": [
+        0.2563474774360657,
+        0.02075200155377388,
+        -0.29039329290390015
+      ],
+      "height_m": 0.62,
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/weap_germanic_hand_axe_0.glb",
+          "triangles": 828,
+          "texture_edge": 512,
+          "bounds_blender": [
+            [
+              -0.08026506006717682,
+              -0.021259073168039322,
+              -0.11999999731779099
+            ],
+            [
+              0.07624788582324982,
+              0.01891554333269596,
+              0.5
+            ]
+          ],
+          "size_bytes": 96772,
+          "sha256": "418e8a59c858aa94f466aaee72e501aa67d39992306580a0fd4d0df22dd2d76e"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/weap_germanic_hand_axe_1.glb",
+          "triangles": 350,
+          "texture_edge": 256,
+          "bounds_blender": [
+            [
+              -0.0802522525191307,
+              -0.021326234564185143,
+              -0.12018512934446335
+            ],
+            [
+              0.07647842168807983,
+              0.019232742488384247,
+              0.5000213980674744
+            ]
+          ],
+          "size_bytes": 38972,
+          "sha256": "09e98ed5c828bc7833cb4c33034f6541539b92814752ef0ca438bd618f7bb8f8"
+        }
+      ]
+    },
+    {
+      "stable_id": "gear_germanic_round_shield",
+      "source_path": "prototype/assets/meshy/source/equipment/gear_germanic_round_shield.glb",
+      "source_sha256": "e0ca7bd76079567cff1b3f91425e9534af978358dc11dd4498af18fd04c78be0",
+      "source_bytes": 23833312,
+      "source_bounds_blender": [
+        [
+          -0.5,
+          -0.06404399871826172,
+          -0.5
+        ],
+        [
+          0.5,
+          0.058031998574733734,
+          0.5
+        ]
+      ],
+      "removed_duplicate_handle_vertices": 0,
+      "uniform_scale": 0.66,
+      "cross_section_scale": 1.0,
+      "source_grip_origin": [
+        0.0,
+        0.04642559960484505,
+        0.0
+      ],
+      "height_m": 0.66,
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/gear_germanic_round_shield_0.glb",
+          "triangles": 1800,
+          "texture_edge": 512,
+          "bounds_blender": [
+            [
+              -0.3300136625766754,
+              -0.07311856746673584,
+              -0.3298889696598053
+            ],
+            [
+              0.32999157905578613,
+              0.007931591011583805,
+              0.3300485610961914
+            ]
+          ],
+          "size_bytes": 200740,
+          "sha256": "0d3542a26c420ffe8070c6dff053a4a09fc52603dabfdedf5ff9ef3a9067b5a0"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/gear_germanic_round_shield_1.glb",
+          "triangles": 450,
+          "texture_edge": 256,
+          "bounds_blender": [
+            [
+              -0.32984477281570435,
+              -0.07305184751749039,
+              -0.32916638255119324
+            ],
+            [
+              0.3297475278377533,
+              0.00875906739383936,
+              0.3303401470184326
+            ]
+          ],
+          "size_bytes": 68736,
+          "sha256": "705cb2b4a9441edd6884cb30d567b521d576558711e74f3a407668290ce93a5a"
+        }
+      ]
+    },
+    {
+      "stable_id": "gear_roman_signum",
+      "source_path": "prototype/assets/meshy/source/equipment/gear_roman_signum.glb",
+      "source_sha256": "ec927a279e63e395de29f8a8bb7bd3c1e16ed26dc3a7df0c9aa7dfe5e5bacbd7",
+      "source_bytes": 16869116,
+      "source_bounds_blender": [
+        [
+          -0.05031999945640564,
+          -0.011377999559044838,
+          -0.5
+        ],
+        [
+          0.04464999958872795,
+          0.014844999648630619,
+          0.5
+        ]
+      ],
+      "removed_duplicate_handle_vertices": 0,
+      "uniform_scale": 2.1,
+      "cross_section_scale": 1.2,
+      "source_grip_origin": [
+        -0.003696500090882182,
+        0.0008449999149888754,
+        -0.1666666716337204
+      ],
+      "height_m": 2.1,
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/gear_roman_signum_0.glb",
+          "triangles": 1400,
+          "texture_edge": 512,
+          "bounds_blender": [
+            [
+              -0.1177903413772583,
+              -0.03094593621790409,
+              -0.7003352046012878
+            ],
+            [
+              0.12270326167345047,
+              0.03565789386630058,
+              1.4057265520095825
+            ]
+          ],
+          "size_bytes": 140164,
+          "sha256": "eb318275115392fccba4ca3b9a291057baeba6cdff88f7195fe9a76be3d63847"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/gear_roman_signum_1.glb",
+          "triangles": 450,
+          "texture_edge": 256,
+          "bounds_blender": [
+            [
+              -0.11745728552341461,
+              -0.03125091269612312,
+              -0.6988396644592285
+            ],
+            [
+              0.1248166635632515,
+              0.03333209082484245,
+              1.4089583158493042
+            ]
+          ],
+          "size_bytes": 52720,
+          "sha256": "73a3a069c1f013d78fa1b7703e36ba539b8edb2c92c527464c90d4b206483612"
+        }
+      ]
+    }
+  ],
+  "new_generation_submitted": false,
+  "limits": [
+    "Cosmetic existing NPC equipment only; no inventory or combat authority.",
+    "Historical acceptance remains a separate review.",
+    "Grip and animation evidence is captured in the actual Godot actor."
+  ]
+}

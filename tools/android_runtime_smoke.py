@@ -21,6 +21,8 @@ import time
 import xml.etree.ElementTree as ET
 import zipfile
 
+from validate_android_apk import record_payload_hash, resolve_resource
+
 
 VILLAGE_RUNTIME_MARKER = "IMPERATHEN_VILLAGE_RUNTIME "
 
@@ -29,6 +31,9 @@ VILLAGE_CHUNK_MARKER = "IMPERATHEN_VILLAGE_RUNTIME_CHUNK "
 VILLAGE_CHUNK_SIZE = 512
 MAX_VILLAGE_CHUNKS = 64
 MAX_VILLAGE_FRAMES = 256
+BEHAVIOR_SAMPLE_INTERESTS = {"julia": "family", "sextus": "craft", "aelia": "craft", "marcus": "learning"}
+BEHAVIOR_ACTIVITIES = {"work", "patrol", "explore", "socialize", "rest", "weather_pause", "greet",
+                       "yield", "space", "flee", "alert", "assist", "absent"}
 
 
 def village_runtime_observations(text, *, retain_latest=False):
@@ -290,7 +295,191 @@ def apk_runtime_features(entries):
     return {"village_life": village,
             "childhood": childhood,
             "historical_prologue": childhood and contains("cinematic/i00_stage"),
-            "action_controls": village and contains("ui/touch_look") and contains("domain/combat_actions")}
+            "action_controls": village and contains("ui/touch_look") and contains("domain/combat_actions"),
+            "npc_behavior": village and contains("domain/npc_behavior"),
+            "meshy_characters": village and contains("visuals/meshy_character_registry")}
+
+
+def behavior_runtime_state(snapshot, *, saved=False):
+    """Validate compact observations of the real model or checksummed save file."""
+    key = "saved_behavior_runtime" if saved else "behavior_runtime"
+    state = snapshot.get(key) if isinstance(snapshot, dict) else None
+    if (not isinstance(state, dict) or type(state.get("version")) is not int or state["version"] != 1
+            or type(state.get("behavior_version")) is not int or state["behavior_version"] != 1):
+        raise RuntimeError("Missing or unsupported actual NPC behavior observation")
+
+    def number(value, minimum, maximum):
+        return type(value) in (int, float) and math.isfinite(value) and minimum <= value <= maximum
+
+    if not isinstance(state.get("world_id"), str) or not state["world_id"]:
+        raise RuntimeError("Missing actual NPC world identity")
+    if not number(state.get("seconds"), 0, 1e12) or not number(state.get("accumulator"), 0, 0.500001):
+        raise RuntimeError("Invalid NPC simulation clock")
+    if not saved and (not number(snapshot.get("world_seconds"), 0, 1e12)
+                      or abs(state["seconds"] + state["accumulator"] - snapshot["world_seconds"]) > 0.001):
+        raise RuntimeError("NPC simulation is disconnected from the actual world clock")
+    if type(state.get("people_count")) is not int or state["people_count"] != 42:
+        raise RuntimeError("The actual NPC behavior roster is incomplete")
+    for field in ("observed_count", "decision_due_count"):
+        if type(state.get(field)) is not int or not 0 <= state[field] <= state["people_count"]:
+            raise RuntimeError("Invalid observed NPC count: " + field)
+    for field in ("roster_sha256", "state_sha256") + (("envelope_sha256", "payload_sha256") if saved else ()):
+        if not isinstance(state.get(field), str) or re.fullmatch(r"[0-9a-f]{64}", state[field]) is None:
+            raise RuntimeError("Missing actual NPC checksum: " + field)
+    counts = state.get("activity_counts")
+    if (not isinstance(counts, dict) or not counts or not set(counts) <= BEHAVIOR_ACTIVITIES
+            or any(type(count) is not int or count <= 0 for count in counts.values())
+            or sum(counts.values()) != state["people_count"]):
+        raise RuntimeError("Invalid actual NPC decisions")
+    samples = state.get("samples")
+    if not isinstance(samples, dict) or set(samples) != set(BEHAVIOR_SAMPLE_INTERESTS):
+        raise RuntimeError("Missing persistent NPC samples")
+    for identity, person in samples.items():
+        if not isinstance(person, dict) or person.get("interest") != BEHAVIOR_SAMPLE_INTERESTS[identity]:
+            raise RuntimeError("Invalid stable NPC interest: " + identity)
+        for field in ("fatigue", "social_need", "stress"):
+            if not number(person.get(field), 0, 100):
+                raise RuntimeError("Invalid persistent NPC need: " + field)
+        if (not isinstance(person.get("activity"), str) or person["activity"] not in BEHAVIOR_ACTIVITIES or not isinstance(person.get("reason"), str)
+                or not person["reason"] or not isinstance(person.get("partner"), str)
+                or type(person.get("observed")) is not bool):
+            raise RuntimeError("Invalid persistent NPC decision: " + identity)
+        for field, minimum, maximum in (("since", 0, state["seconds"] + 0.001),
+                                        ("next_decision", 0, state["seconds"] + 10),
+                                        ("last_greet", -1000, state["seconds"] + 0.001),
+                                        ("last_trust", -100, 100), ("route_distance", 0, 1000)):
+            if not number(person.get(field), minimum, maximum):
+                raise RuntimeError("Invalid persistent NPC field: " + field)
+        if person["last_trust"] != int(person["last_trust"]) or not number(person.get("route_direction"), -1, 1) or person["route_direction"] not in (-1, 1):
+            raise RuntimeError("Invalid persistent NPC integral field")
+        position = person.get("position")
+        if not isinstance(position, list) or len(position) != 3 or any(not number(value, -1e6, 1e6) for value in position):
+            raise RuntimeError("Invalid observed NPC position")
+        memories = person.get("memories")
+        if not isinstance(memories, list) or len(memories) > 4:
+            raise RuntimeError("Invalid persistent NPC memories")
+        previous = -1.0
+        for memory in memories:
+            if (not isinstance(memory, dict) or set(memory) != {"kind", "at"}
+                    or not isinstance(memory["kind"], str) or memory["kind"] not in {"danger_seen", "trust_gained", "trust_lost"}
+                    or not number(memory["at"], previous, state["seconds"] + 0.001)):
+                raise RuntimeError("Invalid persistent NPC memory")
+            previous = memory["at"]
+    return state
+
+
+def saved_behavior_checkpoint(snapshot):
+    live = behavior_runtime_state(snapshot)
+    saved = behavior_runtime_state(snapshot, saved=True)
+    if snapshot.get("screen") != "paused" or action_runtime_state(snapshot)["world_active"]:
+        raise RuntimeError("NPC save comparison requires the actual paused world")
+    if any(live[field] != saved[field] for field in ("world_id", "roster_sha256", "state_sha256")):
+        raise RuntimeError("The saved NPC state does not match the paused live state")
+    return saved
+
+
+def verify_behavior_restart(checkpoint, snapshot):
+    """Allow simulation to continue while rejecting reset needs or lost memories."""
+    live = behavior_runtime_state(snapshot)
+    saved = behavior_runtime_state(snapshot, saved=True)
+    for field in ("world_id", "roster_sha256", "state_sha256", "envelope_sha256", "payload_sha256"):
+        if saved[field] != checkpoint[field]:
+            raise RuntimeError("The persisted NPC checkpoint changed across process restart: " + field)
+    if any(live[field] != checkpoint[field] for field in ("world_id", "roster_sha256", "people_count")):
+        raise RuntimeError("The restarted NPC world or roster changed")
+    elapsed = live["seconds"] - checkpoint["seconds"]
+    if elapsed < -0.00001 or live["seconds"] + live["accumulator"] + 0.00001 < checkpoint["seconds"] + checkpoint["accumulator"]:
+        raise RuntimeError("NPC simulation time regressed after restart")
+    if live["observed_count"] < checkpoint["observed_count"]:
+        raise RuntimeError("Saved NPC physics observations were lost after restart")
+    for identity, before in checkpoint["samples"].items():
+        after = live["samples"][identity]
+        # These are upper bounds from the actual needs rules, not a demand that
+        # an actively rendered Android process retain an identical live JSON.
+        for field, rate in (("fatigue", 0.75), ("social_need", 0.9), ("stress", 5.0)):
+            if abs(after[field] - before[field]) > rate * max(0, elapsed) + 0.00001:
+                raise RuntimeError("Saved NPC need reset after restart: " + identity + "." + field)
+        if after["last_trust"] != before["last_trust"] or after["last_greet"] < before["last_greet"]:
+            raise RuntimeError("Saved NPC relationship memory changed without an interaction: " + identity)
+        original = before["memories"]
+        current = after["memories"]
+        # A bounded memory may drop its oldest entries only when new memories
+        # fill the four slots. Any retained old entries must preserve order.
+        retained = [memory for memory in current if memory["at"] <= checkpoint["seconds"]]
+        if retained != (original[-len(retained):] if retained else []):
+            raise RuntimeError("Saved NPC memories were rewritten: " + identity)
+        if len(retained) < len(original) and len(current) < 4:
+            raise RuntimeError("Saved NPC memories disappeared: " + identity)
+        if elapsed <= 0.00001:
+            for field in ("activity", "reason", "since", "next_decision", "last_greet", "partner", "memories"):
+                if after[field] != before[field]:
+                    raise RuntimeError("Paused NPC decision changed before simulation advanced: " + identity)
+    return {"elapsed_simulation_seconds": max(0, elapsed), "saved_state_sha256": saved["state_sha256"],
+            "sample_ids": sorted(live["samples"]), "observed_count": live["observed_count"]}
+
+
+def meshy_runtime_state(snapshot):
+    state = snapshot.get("meshy_runtime") if isinstance(snapshot, dict) else None
+    if not isinstance(state, dict) or type(state.get("version")) is not int or state["version"] != 1:
+        raise RuntimeError("Missing or unsupported actual Meshy model observation")
+    person = state.get("severus")
+    if (type(state.get("loaded_count")) is not int or state["loaded_count"] < 1
+            or not isinstance(person, dict) or person.get("loaded") is not True
+            or person.get("asset_id") != "unit_roman_signifer"
+            or not isinstance(person.get("model_path"), str)
+            or re.fullmatch(r"res://assets/meshy/characters/unit_roman_signifer_[0-3]\.glb", person["model_path"]) is None):
+        raise RuntimeError("Severus did not load the actual fitted Meshy signifer model")
+    if (type(person.get("mesh_count")) is not int or person["mesh_count"] < 1
+            or type(person.get("bone_count")) is not int or person["bone_count"] < 15
+            or person.get("has_march") is not True or person.get("has_run") is not True
+            or not isinstance(person.get("clip"), str) or not person["clip"]):
+        raise RuntimeError("The loaded Meshy signifer lacks its actual mesh, rig or gait clips")
+    equipment = person.get("equipment")
+    if not isinstance(equipment, list) or len(equipment) != 1 or not isinstance(equipment[0], dict):
+        raise RuntimeError("The actual Meshy signifer lost its held standard")
+    standard = equipment[0]
+    if (standard.get("asset_id") != "gear_roman_signum" or standard.get("bone") != "Hand_R"
+            or standard.get("bound") is not True or type(standard.get("mesh_count")) is not int or standard["mesh_count"] < 1
+            or not isinstance(standard.get("model_path"), str)
+            or re.fullmatch(r"res://assets/meshy/equipment/gear_roman_signum_[01]\.glb", standard["model_path"]) is None):
+        raise RuntimeError("The actual standard is not loaded on the Meshy signifer's hand")
+    return state
+
+
+def meshy_runtime_package_check(snapshot, archive):
+    """Bind actual loaded models to nonempty exported APK payloads and hashes."""
+    state = meshy_runtime_state(snapshot)
+    paths = [state["severus"]["model_path"]] + [prop["model_path"] for prop in state["severus"]["equipment"]]
+    names = set(archive.namelist())
+    resources = []
+    for path in paths:
+        resource = resolve_resource(archive, names, path.removeprefix("res://"))
+        record_payload_hash(archive, resource)
+        resources.append(resource)
+    passed = all(resource["entry"] is not None and resource.get("size_bytes", 0) > 0 for resource in resources)
+    return passed, {"packaged_models": ["assets/" + path.removeprefix("res://") for path in paths],
+                    "packaged_resources": resources,
+                    "hash_scope": "SHA-256 of the actual exported APK payloads and import remaps, not source GLB bytes.",
+                    **state}
+
+
+def verify_native_gait(evidence):
+    """Require a real moving touch sample, not only a selected pace or axis."""
+    moving = []
+    for item in evidence.get("observations", []):
+        velocity = item.get("velocity")
+        if (not isinstance(velocity, list) or len(velocity) != 3
+                or any(type(value) not in (int, float) or not math.isfinite(value) for value in velocity)):
+            raise RuntimeError("Native gait lacks actual movement velocity")
+        speed = math.hypot(velocity[0], velocity[2])
+        if item.get("phase") == "MOVE" and speed > 0.10:
+            if item.get("figure_clip") == "work":
+                raise RuntimeError("Actual native movement did not use a locomotion clip")
+            if item.get("figure_clip") in {"march", "run"}:
+                moving.append({"clip": item["figure_clip"], "speed_m_s": speed})
+    if not moving:
+        raise RuntimeError("No actual moving native pointer sample proves the gait")
+    return moving
 
 def childhood_runtime_state(snapshot):
     state = snapshot.get("childhood_runtime") if isinstance(snapshot, dict) else None
@@ -373,6 +562,11 @@ def action_runtime_state(snapshot):
         raise RuntimeError("Invalid observed action overlay")
     if not isinstance(state.get("selected_technique"), str):
         raise RuntimeError("Missing observed technique selection")
+    if "figure_clip" in state and (not isinstance(state["figure_clip"], str) or not state["figure_clip"]):
+        raise RuntimeError("Invalid observed figure clip")
+    if "figure_speed" in state and (type(state["figure_speed"]) not in (int, float)
+                                     or not math.isfinite(state["figure_speed"]) or state["figure_speed"] < 0):
+        raise RuntimeError("Invalid observed figure speed")
     return state
 
 
@@ -486,7 +680,9 @@ def drive_observed_native_pointer(read_logs, send_motion, before, *, target=None
         actual = context(state)
         evidence["observations"].append({"phase": phase, "position": actual["position"],
                                          "movement_touch": actual["movement_touch"],
-                                         "move_axis": actual["move_axis"]})
+                                         "move_axis": actual["move_axis"], "velocity": actual["velocity"],
+                                         "figure_clip": actual.get("figure_clip"),
+                                         "figure_speed": actual.get("figure_speed")})
         return actual
 
     context(before)
@@ -578,6 +774,8 @@ def main():
         has_childhood = features["childhood"]
         has_historical_prologue = features["historical_prologue"]
         has_action_controls = features["action_controls"]
+        has_npc_behavior = features["npc_behavior"]
+        has_meshy_characters = features["meshy_characters"]
     package = "at.heinz.imperathen"
     report = {"platform": "Android emulator", "apk_sha256": hashlib.sha256(args.apk.read_bytes()).hexdigest(), "physical_device_test": False,
               "arm64_runtime_test": False, "status": "failed", "checks": [], "errors": []}
@@ -585,6 +783,8 @@ def main():
     report["test_harness_commit"] = os.environ.get("GITHUB_SHA")
     report["apk_file"] = args.apk.name
     report["action_controls_expected"] = has_action_controls
+    report["npc_behavior_expected"] = has_npc_behavior
+    report["meshy_characters_expected"] = has_meshy_characters
     report["story_route"] = ("i00_aquileia->childhood_home" if has_historical_prologue
                              else "childhood_home" if has_childhood else "legacy_village")
     serial = ""
@@ -1023,6 +1223,28 @@ def main():
                {"distance_m": distance, "first": first["action_runtime"], "second": second["action_runtime"]})
         return second
 
+    def verify_meshy_actor(snapshot, name):
+        with zipfile.ZipFile(args.apk) as archive:
+            passed, evidence = meshy_runtime_package_check(snapshot, archive)
+        record(name, passed, evidence)
+
+    def exercise_npc_behavior():
+        initial = village_snapshot("playing", required_control="move_pad")
+        first = behavior_runtime_state(initial)
+        record("npc_behavior_connected", first["observed_count"] == first["people_count"]
+               and len(first["activity_counts"]) > 1, first)
+        cursor = village_runtime_cursor(checked_logs())
+        later = village_snapshot("playing", after=cursor, timeout=60,
+                                 predicate=lambda item: behavior_runtime_state(item)["seconds"] > first["seconds"])
+        second = behavior_runtime_state(later)
+        record("npc_behavior_advances", second["world_id"] == first["world_id"]
+               and second["roster_sha256"] == first["roster_sha256"]
+               and second["state_sha256"] != first["state_sha256"],
+               {"before_seconds": first["seconds"], "after_seconds": second["seconds"],
+                "decisions": second["activity_counts"], "samples": second["samples"]})
+        if has_meshy_characters:
+            verify_meshy_actor(later, "meshy_severus_loaded")
+
     def exercise_action_controls():
         initial = village_snapshot("playing", required_control="move_pad")
         state = action_runtime_state(initial)
@@ -1036,6 +1258,8 @@ def main():
                                                minimum_distance=0.10, evidence=evidence)
         distance = action_position_distance(before, moved)
         record("native_pad_moves_actual_player", distance >= 0.10, evidence)
+        if has_npc_behavior:
+            record("native_walk_uses_locomotion_clip", True, verify_native_gait(evidence))
         verify_action_rest("playing", "released_movement")
         for running in (True, False):
             pace = stable_village_control("pace", "playing")
@@ -1176,6 +1400,10 @@ def main():
                    "The verified Android input command advertises native pointer DOWN/MOVE/UP support")
         if has_childhood:
             select_light_graphics_via_settings()
+        if has_npc_behavior:
+            exercise_npc_behavior()
+        elif has_meshy_characters:
+            verify_meshy_actor(village_snapshot("playing"), "meshy_severus_loaded")
         childhood_checkpoint = exercise_childhood_start() if has_childhood else None
         if has_village_life and not has_childhood:
             exercise_village_life()
@@ -1198,6 +1426,11 @@ def main():
         adb("shell", "am", "start", "-W", "-n", component)
         time.sleep(2)
         record("background_resume", adb("shell", "pidof", package) == pid, "Process survived Home and return")
+        behavior_checkpoint = None
+        if has_npc_behavior:
+            paused = village_snapshot("paused", after=village_runtime_cursor(checked_logs()))
+            behavior_checkpoint = saved_behavior_checkpoint(paused)
+            record("npc_behavior_saved_snapshot", True, behavior_checkpoint)
         resumed_menu = relaunch()
         record("persistent_save_after_restart", resumed_menu["can_continue"], resumed_menu)
         tap(resumed_menu["continue"])
@@ -1215,6 +1448,11 @@ def main():
                    and restored.get("people") == 14 and restored.get("player_is_ruler") is False, restored)
         if has_action_controls:
             verify_action_rest("playing", "restart_action_controls")
+        if has_npc_behavior:
+            restored = village_snapshot("playing")
+            record("npc_behavior_survives_restart", True, verify_behavior_restart(behavior_checkpoint, restored))
+        if has_meshy_characters:
+            verify_meshy_actor(village_snapshot("playing"), "meshy_severus_loaded_after_restart")
         practice_menu = relaunch(diagnostics=True)
         tap(practice_menu["demo"])
         valley_ready = wait_marker("IMPERATHEN_VALLEY_READY")

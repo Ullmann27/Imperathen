@@ -1,0 +1,121 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "captures": [
+    {
+      "action": "idle",
+      "asset": "res://assets/meshy/characters/unit_roman_signifer_0.glb",
+      "file": "unit_roman_signifer-idle.png",
+      "level": 0,
+      "phase": 0.13,
+      "pixels": [
+        960,
+        720
+      ]
+    },
+    {
+      "action": "march",
+      "asset": "res://assets/meshy/characters/unit_roman_signifer_0.glb",
+      "file": "unit_roman_signifer-march.png",
+      "level": 0,
+      "phase": 0.13,
+      "pixels": [
+        960,
+        720
+      ]
+    },
+    {
+      "action": "run",
+      "asset": "res://assets/meshy/characters/unit_roman_signifer_0.glb",
+      "file": "unit_roman_signifer-run.png",
+      "level": 0,
+      "phase": 0.13,
+      "pixels": [
+        960,
+        720
+      ]
+    },
+    {
+      "action": "attack",
+      "asset": "res://assets/meshy/characters/unit_roman_signifer_0.glb",
+      "file": "unit_roman_signifer-attack.png",
+      "level": 0,
+      "phase": 0.55,
+      "pixels": [
+        960,
+        720
+      ]
+    },
+    {
+      "action": "march",
+      "asset": "res://assets/meshy/characters/unit_roman_signifer_2.glb",
+      "file": "unit_roman_signifer-lod2-march.png",
+      "level": 2,
+      "phase": 0.65,
+      "pixels": [
+        960,
+        720
+      ]
+    },
+    {
+      "action": "idle",
+      "asset": "res://assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+      "file": "unit_germanic_axe_fighter-idle.png",
+      "level": 0,
+      "phase": 0.13,
+      "pixels": [
+        960,
+        720
+      ]
+    },
+    {
+      "action": "march",
+      "asset": "res://assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+      "file": "unit_germanic_axe_fighter-march.png",
+      "level": 0,
+      "phase": 0.13,
+      "pixels": [
+        960,
+        720
+      ]
+    },
+    {
+      "action": "run",
+      "asset": "res://assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+      "file": "unit_germanic_axe_fighter-run.png",
+      "level": 0,
+      "phase": 0.13,
+      "pixels": [
+        960,
+        720
+      ]
+    },
+    {
+      "action": "attack",
+      "asset": "res://assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+      "file": "unit_germanic_axe_fighter-attack.png",
+      "level": 0,
+      "phase": 0.55,
+      "pixels": [
+        960,
+        720
+      ]
+    },
+    {
+      "action": "march",
+      "asset": "res://assets/meshy/characters/unit_germanic_axe_fighter_2.glb",
+      "file": "unit_germanic_axe_fighter-lod2-march.png",
+      "level": 2,
+      "phase": 0.65,
+      "pixels": [
+        960,
+        720
+      ]
+    }
+  ],
+  "checks": 204,
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "renderer": "gl_compatibility",
+  "scope": "Imported derivative and production VillagePerson studio test"
+}

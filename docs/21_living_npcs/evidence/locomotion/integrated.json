@@ -1,0 +1,19 @@
+{
+  "android_device_test": false,
+  "checks": 24,
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "fixture_note": "Actual scene and native touch events; controlled placements isolate stations and terrain. Not a continuous manual playthrough.",
+  "held_walk_distance_m": 2.70169448852539,
+  "run_speed_m_s": 3.80001044273376,
+  "walk_speed_m_s": 1.45019519329071,
+  "work_exit_after_45_frames": {
+    "axis": "(-1.0, 0.0)",
+    "clip": "march",
+    "finger": 5,
+    "position": "(31.41314, 0.89084, -28.4)",
+    "speed": 1.44996631145477
+  },
+  "work_exit_position": "(28.89153, -28.4)",
+  "work_seconds_after_leaving": 2.58333333333333
+}

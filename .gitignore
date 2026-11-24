@@ -23,6 +23,20 @@ __pycache__/
 # Godot extracts these textures from the tracked, self-contained Frontier GLBs.
 prototype/assets/characters/frontier_*.png
 prototype/assets/characters/frontier_*.png.import
+# Canonical Meshy downloads are reproducible authoring inputs; hashes and task
+# provenance are tracked, and only budgeted runtime derivatives are committed.
+prototype/assets/meshy/source/**/*.glb
+prototype/assets/meshy/source/**/*.glb.import
+prototype/assets/meshy/source/**/*.png
+prototype/assets/meshy/source/**/*.png.import
+prototype/assets/meshy/characters/*.png
+prototype/assets/meshy/characters/*.png.import
+prototype/assets/meshy/characters/*.jpg
+prototype/assets/meshy/characters/*.jpg.import
+prototype/assets/meshy/equipment/*.png
+prototype/assets/meshy/equipment/*.png.import
+prototype/assets/meshy/equipment/*.jpg
+prototype/assets/meshy/equipment/*.jpg.import
 exports/
 *.blend1
 
@@ -35,6 +49,9 @@ android-runtime/
 *.keystore
 *.jks
 # Reproduzierbare lokale Entwicklungsartefakte
+prototype/assets/meshy/source/*
+!prototype/assets/meshy/source/.gdignore
+!prototype/assets/meshy/source/README.md
 node_modules/
 artifacts/
 dist/

@@ -1,0 +1,95 @@
+{
+  "passed": true,
+  "scope": "CI72 observation replay against an in-memory ZIP of existing local Godot imports; not a new Android runtime pass.",
+  "ci72": {
+    "run_id": 45344763960,
+    "job_id": 138276543995,
+    "runtime_artifact_id": 14898111555,
+    "source_commit": "1ac1afee0796601a5a68d704058f6014907aa32b",
+    "apk_sha256": "dea561188c37f1f258eaa6e83a0f89253e8ed264d23bafd26af0a2f25fbda7f1",
+    "runtime_report_sha256": "f91748f5b1be415bd6e2fad2e80a729eb8cbe644774e654921cad509c68359bc",
+    "original_status": "failed",
+    "first_failed_check": "meshy_severus_loaded"
+  },
+  "old_literal_path_gate_passed": false,
+  "resolved_payload_gate_passed": true,
+  "local_import_evidence": {
+    "packaged_models": [
+      "assets/assets/meshy/characters/unit_roman_signifer_3.glb",
+      "assets/assets/meshy/equipment/gear_roman_signum_1.glb"
+    ],
+    "packaged_resources": [
+      {
+        "source": "assets/meshy/characters/unit_roman_signifer_3.glb",
+        "entry": "assets/.godot/imported/unit_roman_signifer_3.glb-3f9de47102dce13d8dac1fbd15439a0b.scn",
+        "remap": "assets/assets/meshy/characters/unit_roman_signifer_3.glb.import",
+        "mode": "remapped",
+        "size_bytes": 106125,
+        "sha256": "65f2942e6ca19391645ac29346d393ae2ec444f92eecd6ac2dbb8a86b530125b",
+        "remap_sha256": "0fc31d40aa9f43c2ea6b3ef9aa5f47960257662a2634f89500e3aeadece44df1"
+      },
+      {
+        "source": "assets/meshy/equipment/gear_roman_signum_1.glb",
+        "entry": "assets/.godot/imported/gear_roman_signum_1.glb-ed3f3f24147c65525ffd258d4e901e2e.scn",
+        "remap": "assets/assets/meshy/equipment/gear_roman_signum_1.glb.import",
+        "mode": "remapped",
+        "size_bytes": 23417,
+        "sha256": "daec9a7cf2d035fb5225a8ffd25434fc5b382646496dd248203ddf778824afc7",
+        "remap_sha256": "539e0ae8c33f3250c5981409509ce4b34e90fccfc7d23216159602d2afbf1ca5"
+      }
+    ],
+    "hash_scope": "SHA-256 of the actual exported APK payloads and import remaps, not source GLB bytes.",
+    "loaded_count": 1,
+    "severus": {
+      "asset_id": "unit_roman_signifer",
+      "bone_count": 15,
+      "clip": "idle",
+      "equipment": [
+        {
+          "asset_id": "gear_roman_signum",
+          "bone": "Hand_R",
+          "bound": true,
+          "mesh_count": 1,
+          "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+        }
+      ],
+      "has_march": true,
+      "has_run": true,
+      "loaded": true,
+      "mesh_count": 2,
+      "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+    },
+    "version": 1
+  },
+  "checks": [
+    {
+      "name": "unit-tests",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-m",
+        "unittest",
+        "tests.android_runtime_smoke_test"
+      ],
+      "exit_code": 0,
+      "passed": true,
+      "log": "unit-tests.log",
+      "test_count": 96
+    },
+    {
+      "name": "cli-import",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "tools/android_runtime_smoke.py",
+        "--help"
+      ],
+      "exit_code": 0,
+      "passed": true,
+      "log": "cli-import.log"
+    }
+  ],
+  "checked_source_sha256": {
+    "tools/android_runtime_smoke.py": "8c215185de0ec9ef0b2135c37cc30b961bf1b0f17faf4e1cac761406f7389fd5",
+    "tools/validate_android_apk.py": "88fee262b49818eb0df7b6aaf8db988c6d5e61b14e8f8b050e5778b5fe093d9f",
+    "tests/android_runtime_smoke_test.py": "5d3c0e21a32205ce26e5a0db95fb87536460dc4a6057803634c0672baf1ff0fa"
+  }
+}

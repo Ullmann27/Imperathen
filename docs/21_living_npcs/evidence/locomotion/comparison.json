@@ -1,0 +1,34 @@
+{
+  "base_commit": "d7e3a7306f84ee61d74609e127b87d6b34a96efd",
+  "test": "prototype/tests/locomotion_regression_test.gd",
+  "test_sha256": "7c44022ad1971c01f9e19d37fde5d35261b6fafb4b22d5efecd18f82412d7f4f",
+  "method": "Identical native-touch scene test on isolated source snapshots. Baseline is the git commit; fixed snapshot changes only work/gait handling in game_world.gd and village_person.gd. Assets and import data are shared read-only.",
+  "runs": {
+    "baseline": {
+      "exit_code": 1,
+      "checks": 24,
+      "failures": [
+        "Walking away interrupts the work loop promptly while the domain task remains saved",
+        "Saved unfinished work does not make an idle character work at a remote location",
+        "Completed station time waits for deliberate handover without an endless work pose",
+        "Work hints preserve a current hit reaction",
+        "Work hints never resurrect a dead visual actor"
+      ],
+      "script_error_count": 0,
+      "sources": {
+        "prototype/scripts/world/game_world.gd": "71548359f88ca20cea068b9e55b9353d5be1ece24ef5dbd1805f42c9cc6c1333",
+        "prototype/scripts/visuals/village_person.gd": "88c84b771140648d21955199c00937f7aaed6318ac16be7b9d2d6341851da4c3"
+      }
+    },
+    "fixed": {
+      "exit_code": 0,
+      "checks": 24,
+      "failures": [],
+      "script_error_count": 0,
+      "sources": {
+        "prototype/scripts/world/game_world.gd": "39fdb1753b248ebf4d8231ba1bb8cce6a36b2c90dd8fe275ddf4a87c0b59a0f1",
+        "prototype/scripts/visuals/village_person.gd": "9a79ef5e9adda3f2c4197c59442a63084e9951b80ba02dbde5b9d125599251a2"
+      }
+    }
+  }
+}

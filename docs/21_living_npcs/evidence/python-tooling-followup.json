@@ -1,0 +1,16 @@
+{
+  "scope": "Local Android Python tooling suite after imported-model harness correction and story workflow isolation",
+  "date": "2026-11-24",
+  "base_commit": "1ac1afee0796601a5a68d704058f6014907aa32b",
+  "source_state": "Follow-up working tree; runtime game code unchanged from base_commit",
+  "command": "python3 -m unittest discover -s tests -p 'android_*_test.py'",
+  "exit_code": 0,
+  "tests_run": 139,
+  "reported_duration_seconds": 0.195,
+  "result": "OK",
+  "new_regressions": 8,
+  "previous_suite_evidence": "python-tooling.json",
+  "import_resolution_evidence": "android-import-resolution/validation.json",
+  "story_isolation_evidence": "story-isolation/verification.json",
+  "limitation": "This local tooling run is not an Android emulator, physical-device, native walking, or process-restart result. Those gates must pass on the follow-up build."
+}

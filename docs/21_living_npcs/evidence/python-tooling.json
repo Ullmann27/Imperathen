@@ -1,0 +1,16 @@
+{
+  "kind": "Python tooling regression tests; synthetic APK/diagnostic fixtures, no physical Android claim",
+  "command": "python3 -m unittest discover -s tests -p 'android_*_test.py'",
+  "tests": 131,
+  "passed": true,
+  "exit_code": 0,
+  "observed_output": "Ran 131 tests in 0.260s; OK",
+  "source_sha256": {
+    "tests/android_runtime_smoke_test.py": "12066833e4ed9b1ac968a3bc202ae54121d9b9691087e1dc98b0a5f414bc78be",
+    "tests/android_living_village_payload_test.py": "40d75b6c469dc15ef4a1f03247dd9aeecbcfea8b89badccef4ed7d9d1b094c25",
+    "tests/android_village_publication_test.py": "67108c764fab7e91090fe0462a5fb21b01cbca95a3e8bff3a065897999d38824",
+    "tools/android_runtime_smoke.py": "9be98033266d86ea83ded4e7e893ac5266b6ff578e9461494d68b69423691136",
+    "tools/validate_android_apk.py": "88fee262b49818eb0df7b6aaf8db988c6d5e61b14e8f8b050e5778b5fe093d9f",
+    "tools/publish_village_download.py": "b580143f4d38e91b4d44ec08e0a406defd3ec3fb4a52641fe68fd3f394f5c115"
+  }
+}

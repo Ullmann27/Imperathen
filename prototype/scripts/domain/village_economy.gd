@@ -312,7 +312,7 @@ static func view(data: Dictionary) -> Dictionary:
 			reason = "Reparatur läuft" if crew_reason.is_empty() else "Reparatur wartet: " + crew_reason
 			if place.project.kind == "sow":
 				reason = "Aussaat wächst" if crew_reason.is_empty() else "Aussaat wartet: " + crew_reason
-		places.append({"id":id, "name":spec.name, "required":spec.required, "assigned":people.size(), "available":_available(economy, id), "people":people, "condition":place.condition, "working":reason.is_empty(), "reason":reason, "project_progress":project_progress, "project":place.project.duplicate(true), "cycle_progress":float(place.cycle_seconds) / float(spec.period), "repair_cost":repair_cost(economy,id), "yield_per_cycle":_yield_for(data,id), "resource":spec.resource})
+		places.append({"id":id, "name":spec.name, "required":spec.required, "assigned":people.size(), "available":_available(data, id), "people":people, "condition":place.condition, "working":reason.is_empty(), "reason":reason, "project_progress":project_progress, "project":place.project.duplicate(true), "cycle_progress":float(place.cycle_seconds) / float(spec.period), "repair_cost":repair_cost(economy,id), "yield_per_cycle":_yield_for(data,id), "resource":spec.resource})
 	var population := {"alive":0, "idle":0, "working":0, "defense":0, "unfit":0}
 	for person in economy.people:
 		if not person.alive:
@@ -339,7 +339,7 @@ static func repair_cost(economy: Dictionary, id: String) -> Dictionary:
 static func _crew_reason(data: Dictionary, id: String) -> String:
 	if _raid_active(data):
 		return "Überfall: Zivilisten suchen Deckung"
-	var available := _available(data.village.economy, id)
+	var available := _available(data, id)
 	if available < int(WORKPLACES[id].required):
 		return "%d von %d arbeitsfähigen Personen" % [available, WORKPLACES[id].required]
 	return ""
@@ -394,12 +394,27 @@ static func _fit(person: Dictionary) -> bool:
 	return person.alive and int(person.health) > 30 and int(person.hunger) < 2
 
 
-static func _available(economy: Dictionary, id: String) -> int:
+static func _available(data: Dictionary, id: String) -> int:
 	var count := 0
-	for person in economy.people:
-		if person.assignment == id and _fit(person):
+	for person in data.village.economy.people:
+		if person.assignment == id and _fit(person) and _attending(data,person.id):
 			count += 1
 	return count
+
+
+static func _attending(data: Dictionary, id: String) -> bool:
+	# A break or reaction is an actual absence from production. Assignment and
+	# ownership remain unchanged, so returning never creates a second worker.
+	var behavior: Variant = data.village.get("behavior",{})
+	if typeof(behavior) != TYPE_DICTIONARY:
+		return false
+	var people: Variant = behavior.get("people",{})
+	if typeof(people) != TYPE_DICTIONARY:
+		return false
+	if not people.has(id):
+		return true
+	var person: Variant = people[id]
+	return typeof(person) == TYPE_DICTIONARY and person.get("activity","") in ["work","patrol","alert"]
 
 
 static func _assigned(economy: Dictionary, id: String) -> int:

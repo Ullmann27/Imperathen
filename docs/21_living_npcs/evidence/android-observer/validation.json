@@ -1,0 +1,48 @@
+{
+  "initial_observed_count": 42,
+  "activity_counts": {
+    "patrol": 5,
+    "socialize": 7,
+    "work": 30
+  },
+  "new_game_seconds": 1.5,
+  "paused_state_equals_saved": true,
+  "restart_validation": {
+    "elapsed_simulation_seconds": 1.5,
+    "saved_state_sha256": "bf0e972ee3c04068896f8c77d032c8ab61bc135ee1c820d0c5cca12600d86e2a",
+    "sample_ids": [
+      "aelia",
+      "julia",
+      "marcus",
+      "sextus"
+    ],
+    "observed_count": 42
+  },
+  "meshy": {
+    "loaded_count": 1,
+    "severus": {
+      "asset_id": "unit_roman_signifer",
+      "bone_count": 15,
+      "clip": "idle",
+      "equipment": [
+        {
+          "asset_id": "gear_roman_signum",
+          "bone": "Hand_R",
+          "bound": true,
+          "mesh_count": 1,
+          "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+        }
+      ],
+      "has_march": true,
+      "has_run": true,
+      "loaded": true,
+      "mesh_count": 2,
+      "model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+    },
+    "version": 1
+  },
+  "observer_read_only": true,
+  "transport_chunks": 17,
+  "android_device_test": false,
+  "scope": "Actual Godot main scene, original new-game/opening/save/continue routes; no model injection. Restart here reloads in one process; native Android process restart remains a separate release gate."
+}

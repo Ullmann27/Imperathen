@@ -15,6 +15,7 @@ const VillageLife = preload("res://scripts/story/village_life.gd")
 const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -62,6 +63,7 @@ func _ready() -> void:
 	world.action_requested.connect(_on_world_action)
 	model.combat_sight_check = world.combat_sight_clear
 	model.combat_motion_check = world.combat_safe_motion
+	model.npc_observations = world.npc_observations
 	world.set_active(false)
 	world.set_mode("city")
 	ui = UIScript.new()
@@ -546,7 +548,7 @@ func _show_village_npc(npc_id: String) -> void:
 	screen = "village_dialog"
 	world.set_active(false)
 	world.focus_village_npc(npc_id)
-	ui.show_village_dialog(VillageLife.dialogue(model.data, npc_id))
+	ui.show_village_dialog(_npc_dialog(npc_id))
 	print("IMPERATHEN_VILLAGE_DIALOG: " + npc_id)
 
 
@@ -561,9 +563,22 @@ func _village_command(command: String, args: Dictionary) -> void:
 		ui.show_village_panel(state, village_tab)
 	elif previous_screen == "village_dialog" and not village_npc.is_empty():
 		world.focus_village_npc(village_npc)
-		var dialog := VillageLife.dialogue(model.data, village_npc)
+		var dialog := _npc_dialog(village_npc)
 		dialog["feedback"] = str(result.get("message", ""))
 		ui.show_village_dialog(dialog)
+
+
+func _npc_dialog(npc_id: String) -> Dictionary:
+	return _dialog_with_behavior(VillageLife.dialogue(model.data, npc_id), npc_id)
+
+
+func _dialog_with_behavior(original: Dictionary, npc_id: String) -> Dictionary:
+	var dialog: Dictionary = original.duplicate(true)
+	var behavior: Dictionary = NpcBehavior.view(model.data, npc_id)
+	var greeting := str(behavior.get("greeting", ""))
+	if not greeting.is_empty() and not dialog.is_empty():
+		dialog["text"] = greeting + "\n\n" + str(dialog.get("text", ""))
+	return dialog
 
 
 func _show_frontier(npc_id: String) -> void:
@@ -588,7 +603,7 @@ func _show_frontier(npc_id: String) -> void:
 	screen = "frontier_dialog"
 	world.set_active(false)
 	world.focus_frontier_npc(npc_id)
-	ui.show_frontier_dialog(dialog)
+	ui.show_frontier_dialog(_dialog_with_behavior(dialog, npc_id))
 	print("IMPERATHEN_FRONTIER_DIALOG: " + npc_id)
 
 
@@ -603,7 +618,7 @@ func _choose_frontier(payload: Dictionary) -> void:
 	if dialog.is_empty():
 		_resume()
 	else:
-		ui.show_frontier_dialog(dialog)
+		ui.show_frontier_dialog(_dialog_with_behavior(dialog, frontier_npc))
 
 
 func _show_companion() -> void:

@@ -10,6 +10,8 @@ const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
 const HandPose := preload("res://scripts/visuals/hand_pose.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
+const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
+const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
 const FRONTIER_PATH := "res://assets/characters/frontier_%s_%d.glb"
 const APPEARANCES := ["civilian_man", "civilian_woman", "elder", "legionary", "officer", "spearman", "archer"]
@@ -50,6 +52,7 @@ var appearance_id := ""
 var appearance_variation := 0
 var _loaned_gear := false
 var _gear_nodes: Array[Node3D] = []
+var meshy_asset_id := ""
 
 
 func _ready() -> void:
@@ -76,6 +79,16 @@ func configure_appearance(new_appearance: String, variation: int = 0) -> void:
 	if not appearance_id.is_empty():
 		identity = "resident_%s_%d" % [appearance_id, appearance_variation]
 	_reload(maxi(0, detail))
+
+
+func configure_meshy(stable_id: String) -> bool:
+	# Keep authored child/player identity and retain the current live fallback
+	# until a complete imported derivative set exists.
+	var selected := stable_id if age >= 18 and role not in ["player", "companion"] and MeshyCharacters.has_complete_set(stable_id) and MeshyEquipment.has_complete_set(stable_id) else ""
+	if selected != meshy_asset_id:
+		meshy_asset_id = selected
+		_reload(maxi(0, detail))
+	return not selected.is_empty()
 
 
 func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null) -> void:
@@ -113,6 +126,10 @@ func _frontier_identity() -> String:
 
 
 func _path(level: int) -> String:
+	if role not in ["player", "companion"] and not meshy_asset_id.is_empty():
+		var meshy_path := MeshyCharacters.path_for(meshy_asset_id, age, level)
+		if not meshy_path.is_empty():
+			return meshy_path
 	# This asset has an authored Italia identity. Other origins and companions
 	# keep their own appearances until their replacement models are available.
 	if role == "player" and home == "italia":
@@ -190,6 +207,8 @@ func _reload(level: int) -> void:
 		_motion.combat(_combat_id, _combat_progress)
 		_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
 	_sync_loaned_gear()
+	if active_model_path.begins_with("res://assets/meshy/characters/"):
+		MeshyEquipment.attach(body, meshy_asset_id, detail)
 	# Retaining every hero PackedScene would also retain every embedded texture
 	# tier. Live instances keep their own references; inactive tiers may unload.
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
@@ -198,6 +217,11 @@ func _reload(level: int) -> void:
 				scenes.erase(cached_path)
 	elif path.begins_with("res://assets/characters/frontier_"):
 		var family := "res://assets/characters/frontier_" + _frontier_identity() + "_"
+		for cached_path: String in scenes.keys():
+			if cached_path.begins_with(family) and cached_path != path:
+				scenes.erase(cached_path)
+	elif path.begins_with("res://assets/meshy/characters/"):
+		var family := MeshyCharacters.family_prefix(meshy_asset_id)
 		for cached_path: String in scenes.keys():
 			if cached_path.begins_with(family) and cached_path != path:
 				scenes.erase(cached_path)
@@ -268,7 +292,7 @@ func _style(shape: MeshInstance3D) -> void:
 				# material. A cache must not retain all four texture tiers forever.
 				materials[key] = weakref(mat)
 			shape.set_surface_override_material(i, mat)
-		elif source.resource_name in ["Civilian_Linen","Overgarment"] or (role == "enemy" and not active_model_path.begins_with("res://assets/characters/frontier_")):
+		elif source.resource_name in ["Civilian_Linen","Overgarment"] or (role == "enemy" and not active_model_path.begins_with("res://assets/characters/frontier_") and not active_model_path.begins_with("res://assets/meshy/characters/")):
 			var key := "%d/%s/%s" % [source.get_instance_id(),home,role]
 			if not materials.has(key):
 				var mat := source.duplicate() as StandardMaterial3D
@@ -285,6 +309,11 @@ func drive(metres_per_second: float, turn_radians_per_second: float = 0.0) -> vo
 	_turn_rate = clampf(turn_radians_per_second, -3.0, 3.0) if is_finite(turn_radians_per_second) else 0.0
 	if _combat_id.is_empty():
 		_posed = false
+		# A work loop is a stationary activity, not an uninterruptible action.
+		# Resume the gait as soon as the owning body actually starts travelling.
+		if clip == "work" and speed >= 0.10:
+			_remaining = 0.0
+			_play(_locomotion_clip(), 0.0, 0.13)
 
 
 func set_equipment(sword: bool, shield: bool = false) -> void:
@@ -374,8 +403,21 @@ func reset_motion() -> void:
 
 
 func keep_working() -> void:
-	if clip != "work": cue("work")
-	_remaining = maxf(_remaining,0.3)
+	# Work hints can arrive from state refreshes as well as the physics clock.
+	# They must never overwrite locomotion, a sampled combat pose, or a reaction.
+	if speed >= 0.10 or not _combat_id.is_empty() or _posed or clip == "death":
+		return
+	if _remaining > 0.0 and clip not in ["idle", "march", "run", "work"]:
+		return
+	if clip != "work":
+		cue("work")
+	_remaining = 0.3
+
+
+func _locomotion_clip() -> String:
+	var stop_threshold := 0.06 if clip in ["march", "run"] else 0.10
+	var run_threshold := 2.25 if clip == "run" else 2.55
+	return "idle" if speed < stop_threshold else ("march" if speed < run_threshold else "run")
 
 
 func sample_pose(action: String, normalized: float) -> void:
@@ -466,9 +508,7 @@ func _process(delta: float) -> void:
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)
 		if _remaining <= 0:
-			var stop_threshold := 0.06 if clip in ["march", "run"] else 0.10
-			var run_threshold := 2.25 if clip == "run" else 2.55
-			var next := "idle" if speed < stop_threshold else ("march" if speed < run_threshold else "run")
+			var next := _locomotion_clip()
 			if next != clip:
 				var carry_phase := phase if clip in ["march", "run"] and next in ["march", "run"] else 0.0
 				_play(next, carry_phase, 0.13)

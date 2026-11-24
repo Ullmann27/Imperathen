@@ -1,0 +1,108 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+MESHY_ASSET_REGISTRY 170 checks, 0 failed
+WARNING: 'res://assets/meshy/source/character/unit_germanic_axe_fighter.glb': In external resource #0, invalid UID: 'uid://sxtlko2biukd' - using text path instead: 'res://assets/meshy/source/character/unit_germanic_axe_fighter_0.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_germanic_axe_fighter.glb': In external resource #1, invalid UID: 'uid://bc7djmw4brhj5' - using text path instead: 'res://assets/meshy/source/character/unit_germanic_axe_fighter_1.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_germanic_axe_fighter.glb': In external resource #2, invalid UID: 'uid://bia1ygpxvqupx' - using text path instead: 'res://assets/meshy/source/character/unit_germanic_axe_fighter_2.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_germanic_light_spearman.glb': In external resource #0, invalid UID: 'uid://tnfny87o63wb' - using text path instead: 'res://assets/meshy/source/character/unit_germanic_light_spearman_0.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_germanic_light_spearman.glb': In external resource #1, invalid UID: 'uid://btm3fpeqn87ja' - using text path instead: 'res://assets/meshy/source/character/unit_germanic_light_spearman_1.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_germanic_light_spearman.glb': In external resource #2, invalid UID: 'uid://ba5e8rd481f4a' - using text path instead: 'res://assets/meshy/source/character/unit_germanic_light_spearman_2.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_germanic_mounted_retainer.glb': In external resource #0, invalid UID: 'uid://b4voyv5k38jhs' - using text path instead: 'res://assets/meshy/source/character/unit_germanic_mounted_retainer_0.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_germanic_mounted_retainer.glb': In external resource #1, invalid UID: 'uid://jjgsgl0k7y83' - using text path instead: 'res://assets/meshy/source/character/unit_germanic_mounted_retainer_1.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_germanic_mounted_retainer.glb': In external resource #2, invalid UID: 'uid://y886w5up7vhb' - using text path instead: 'res://assets/meshy/source/character/unit_germanic_mounted_retainer_2.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_aux_archer.glb': In external resource #0, invalid UID: 'uid://d4f01jkkh6oxu' - using text path instead: 'res://assets/meshy/source/character/unit_roman_aux_archer_0.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_aux_archer.glb': In external resource #1, invalid UID: 'uid://xd0di24x28vs' - using text path instead: 'res://assets/meshy/source/character/unit_roman_aux_archer_1.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_aux_archer.glb': In external resource #2, invalid UID: 'uid://dugtgow2iytlj' - using text path instead: 'res://assets/meshy/source/character/unit_roman_aux_archer_2.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_heavy_cavalry_rider.glb': In external resource #0, invalid UID: 'uid://m8xkvf7rm44j' - using text path instead: 'res://assets/meshy/source/character/unit_roman_heavy_cavalry_rider_0.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_heavy_cavalry_rider.glb': In external resource #1, invalid UID: 'uid://bowhjr0bjwlyl' - using text path instead: 'res://assets/meshy/source/character/unit_roman_heavy_cavalry_rider_1.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_heavy_cavalry_rider.glb': In external resource #2, invalid UID: 'uid://b15ogkshthe7g' - using text path instead: 'res://assets/meshy/source/character/unit_roman_heavy_cavalry_rider_2.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_light_cavalry_rider.glb': In external resource #0, invalid UID: 'uid://cosg2g175ehy4' - using text path instead: 'res://assets/meshy/source/character/unit_roman_light_cavalry_rider_0.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_light_cavalry_rider.glb': In external resource #1, invalid UID: 'uid://oabrkh8gr17w' - using text path instead: 'res://assets/meshy/source/character/unit_roman_light_cavalry_rider_1.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_light_cavalry_rider.glb': In external resource #2, invalid UID: 'uid://esn677e81g1g' - using text path instead: 'res://assets/meshy/source/character/unit_roman_light_cavalry_rider_2.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_signifer.glb': In external resource #0, invalid UID: 'uid://pd7j7bf2n4ou' - using text path instead: 'res://assets/meshy/source/character/unit_roman_signifer_0.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_signifer.glb': In external resource #1, invalid UID: 'uid://c2lhnhppsa5jr' - using text path instead: 'res://assets/meshy/source/character/unit_roman_signifer_1.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)
+WARNING: 'res://assets/meshy/source/character/unit_roman_signifer.glb': In external resource #2, invalid UID: 'uid://8flkdodimk2' - using text path instead: 'res://assets/meshy/source/character/unit_roman_signifer_2.jpg'.
+     at: open (core/io/resource_format_binary.cpp:1025)
+     GDScript backtrace (most recent call first):
+         [0] instantiate (res://scripts/visuals/meshy_asset_registry.gd:40)
+         [1] run (res://tests/meshy_asset_registry_test.gd:36)

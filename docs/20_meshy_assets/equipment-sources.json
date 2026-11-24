@@ -1,0 +1,29 @@
+{
+  "existing_meshy_tasks": [
+    {
+      "stable_id": "weap_germanic_hand_axe",
+      "meshy_task_id": "01a2091d-a272-7367-a22f-848695eccb27",
+      "glb_bytes": 7332848,
+      "glb_sha256": "6c665a3e0c5d929031c64632e2159ba60e0d75f7ccc3b1cf0856f9d4778af87c",
+      "png_bytes": 86323,
+      "png_sha256": "47cedeb3bf3918c1cc6ec5d02c86200b6f405e06b9da63fd1b78c773fdfc51c2"
+    },
+    {
+      "stable_id": "gear_germanic_round_shield",
+      "meshy_task_id": "01a20922-ab81-74fa-9139-87adebe3a5d9",
+      "glb_bytes": 23833312,
+      "glb_sha256": "e0ca7bd76079567cff1b3f91425e9534af978358dc11dd4498af18fd04c78be0",
+      "png_bytes": 226240,
+      "png_sha256": "7c1b54ecea1d40d40e42e43c98055f678ab1bcae1b4948736685f8ec54b75932"
+    },
+    {
+      "stable_id": "gear_roman_signum",
+      "meshy_task_id": "01a20924-b3e4-7055-bc44-a7d05160d252",
+      "glb_bytes": 16869116,
+      "glb_sha256": "ec927a279e63e395de29f8a8bb7bd3c1e16ed26dc3a7df0c9aa7dfe5e5bacbd7",
+      "png_bytes": 14613,
+      "png_sha256": "47880f25db7621093a256818256e5cd5fabe8e33df2fd17e7fba0b113f9c6631"
+    }
+  ],
+  "new_generation_submitted": false
+}
