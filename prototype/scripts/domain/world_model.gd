@@ -43,6 +43,7 @@ var data: Dictionary = {}
 var combat_sight_check: Callable
 var combat_motion_check: Callable
 var npc_observations: Callable
+var npc_sight_check: Callable
 
 
 func _init() -> void:
@@ -86,7 +87,9 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 		for person: Dictionary in data.village.economy.people:
 			if person.id in ["fabius","drusa"]:
 				person.assignment="woodcamp"
-			elif person.id == "cassia":
+			elif person.id in ["cassia", "antonia"]:
+				# The existing potter helps Cassia at the market in new childhood
+				# games. Two actual residents meet the unchanged staffing contract.
 				person.assignment="trade"
 		data.village.economy.last_report = "Markt, Felder und Werkstätten arbeiten bereits. Decimus verwaltet das Dorf; du beginnst als Kind deiner Familie."
 		data.player.position = [-12.0, 1.35, 11.7]
@@ -203,7 +206,7 @@ func advance(delta: float) -> void:
 			if not VillageEconomy.advance(candidate, step):
 				return
 			VillageLife.advance(candidate, step, combat_sight_check, combat_motion_check)
-			NpcBehavior.advance(candidate, step)
+			NpcBehavior.advance(candidate, step, npc_sight_check)
 			if int(candidate.player.health) < previous_health:
 				CombatActions.interrupt(candidate)
 			var contact := CombatActions.advance(candidate, step, combat_sight_check, _apply_combat_hit)
@@ -984,6 +987,11 @@ func _read_save(path: String) -> Dictionary:
 	if error.is_empty() and Childhood.enabled(state) and not state.village.has("behavior"):
 		NpcBehavior.start(state)
 		error = _validate_state(state)
+	if error.is_empty() and NpcBehavior.enabled(state):
+		# Old valid saves gain an empty social history. Existing malformed
+		# relationships must fail validation before any migration is attempted.
+		NpcBehavior.ensure_social(state)
+		error = _validate_state(state)
 	if error.is_empty() and not _valid_valley(state):
 		error = "Das gespeicherte Talgefecht enthält widersprüchliche Daten."
 	if not error.is_empty():
@@ -1024,6 +1032,10 @@ func _restore_integer_fields(state: Dictionary) -> void:
 		for behavior: Dictionary in state.village.behavior.people.values():
 			behavior.last_trust = int(behavior.last_trust)
 			behavior.route_direction = int(behavior.route_direction)
+		if state.village.behavior.has("social"):
+			state.village.behavior.social.version = int(state.village.behavior.social.version)
+			for relation: Dictionary in state.village.behavior.social.pairs.values():
+				relation.encounters = int(relation.encounters)
 	if CombatActions.enabled(state):
 		for key in ["version", "practice_hits", "resolved_hits"]:
 			state.village.unarmed[key] = int(state.village.unarmed[key])

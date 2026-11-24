@@ -1,0 +1,92 @@
+{
+  "adapter": "llvmpipe (LLVM 20.1.2, 256 bits)",
+  "android_device_test": false,
+  "engine": "4.7.2-stable (official)",
+  "errors": [],
+  "passed": true,
+  "renderer": "gl_compatibility",
+  "review_script_sha256": "67416110148eac3a202e265d0da7dea1dfce46ce580cdbe48350dd4f5409d6bd",
+  "shots": [
+    {
+      "all_panel_text_including_scrolled_content": "",
+      "antonia_position": "(32.0, 0.0, 6.0)",
+      "camera": "[X: (0.886807, 0.0, -0.462139), Y: (-0.12245, 0.964258, -0.234972), Z: (0.445621, 0.264964, 0.855111), O: (28.5, 3.2, 32.5)]",
+      "fixture_player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "fov": 58.0,
+      "id": "01_market_staff",
+      "image": "01_market_staff.png",
+      "image_sha256": "b89dc0d9faaf47c446febbf31904ad2d2f9a09faf0ce38f3df9f583f8b93f4db",
+      "market_staff": [
+        "cassia"
+      ],
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "pose": "idle@0.25",
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "scenario": "new_childhood_market",
+      "social_history": {},
+      "state_sha256": "9c70226e87e6828b4d1a0123b507c775bb30af52b7b3ebbf97dd08204d60d25e"
+    },
+    {
+      "all_panel_text_including_scrolled_content": "DEIN LEBEN IM DORF\nDeine Familie und die Nachbarn\nDu bist Bewohner. Vertrauen, Arbeit und gemeinsame Entscheidungen bestimmen deinen Einfluss.\nDas Dorf arbeitet bereits. Du kannst bei den Menschen Aufgaben übernehmen; die Arbeitsplätze verteilen die Erwachsenen.\nDorffelder · 1 Menschen arbeiten hier\n1 von 2 arbeitsfähigen Personen\nHolzfällerlager · 2 Menschen arbeiten hier\nIn Betrieb\nSteinbruch · 0 Menschen arbeiten hier\n0 von 4 arbeitsfähigen Personen\nHandelsplatz · 1 Menschen arbeiten hier\n1 von 2 arbeitsfähigen Personen\nStadtposten · 2 Menschen arbeiten hier\nIn Betrieb",
+      "antonia_position": "(32.0, 0.0, 6.0)",
+      "camera": "[X: (0.886807, 0.0, -0.462139), Y: (-0.12245, 0.964258, -0.234972), Z: (0.445621, 0.264964, 0.855111), O: (28.5, 3.2, 32.5)]",
+      "fixture_player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "fov": 58.0,
+      "id": "02_work_panel",
+      "image": "02_work_panel.png",
+      "image_sha256": "f55ac4a2668cf631fc9fce3921e222ae4aab8c481073a4e11ae1aff438ee7c8b",
+      "market_staff": [
+        "cassia"
+      ],
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "pose": "idle@0.25",
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "scenario": "new_childhood_work_panel",
+      "social_history": {},
+      "state_sha256": "9c70226e87e6828b4d1a0123b507c775bb30af52b7b3ebbf97dd08204d60d25e"
+    },
+    {
+      "all_panel_text_including_scrolled_content": "DEIN LEBEN IM DORF\nDeine Familie und die Nachbarn\nDu bist Bewohner. Vertrauen, Arbeit und gemeinsame Entscheidungen bestimmen deinen Einfluss.\nBerufe lernst du bei Menschen, die dich kennen. Ihre Sorgen, dein Verhalten und deine Hilfe bestimmen die Beziehung.\nDecimus · Dorfverwalter\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: 2 / 9\nAelia · Steinmetzin\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: 20 / 17\nVarro · Späher und Jäger\nNoch nicht kennengelernt\nGerade: Sucht Gesellschaft\nOrt im Dorf: -10 / -13\nFabius · Holzfäller\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: -44 / 16\nAurelia · Heilerin\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: 8 / 18\nCassia · Händlerin\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: 24 / 26\nWachmann · Wachausbilder\nNoch nicht kennengelernt\nGerade: Hält auf dem Weg Wache\nOrt im Dorf: -1 / -46\nJulia · Deine Mutter\nVertrauen +4\nGerade: Sucht Gesellschaft\nInteresse: Familie und Haushalt\nNach der Arbeit fehlt Gesellschaft.\nOrt im Dorf: -15 / 15\nSilvanus · Dein Vater\nVertrauen +4\nGerade: Sucht Gesellschaft\nInteresse: Handwerk und gute Werkzeuge\nNach der Arbeit fehlt Gesellschaft.\nOrt im Dorf: -11 / 12\nSextus · Dorfschmied · Freund deines Vaters\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: 33 / -25\nDein Beruf: Noch offen",
+      "antonia_position": "(32.0, 0.0, 6.0)",
+      "camera": "[X: (0.886807, 0.0, -0.462139), Y: (-0.12245, 0.964258, -0.234972), Z: (0.445621, 0.264964, 0.855111), O: (28.5, 3.2, 32.5)]",
+      "fixture_player_position": [
+        70.0,
+        0.899999976158142,
+        70.0
+      ],
+      "fov": 58.0,
+      "id": "03_social_panel",
+      "image": "03_social_panel.png",
+      "image_sha256": "f09f17d6418d9c17f36c9fd8117bf645621880f7ec08c0b0d01c2b60fadbee86",
+      "market_staff": [
+        "cassia"
+      ],
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "pose": "idle@0.25",
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "scenario": "sixteen_mutual_half_second_inputs",
+      "social_history": {},
+      "state_sha256": "7c52919129a60a019b68b9af6fffcf5d680c4a1f95e1ee7b09f37ace59519ffa"
+    }
+  ]
+}
