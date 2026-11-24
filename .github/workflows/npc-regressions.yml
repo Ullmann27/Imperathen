@@ -1,0 +1,79 @@
+name: NPC and animated asset regressions
+
+on:
+  pull_request:
+    paths:
+      - 'prototype/scripts/domain/npc_behavior.gd'
+      - 'prototype/scripts/domain/world_model.gd'
+      - 'prototype/scripts/world/village/**'
+      - 'prototype/scripts/world/village_life_world.gd'
+      - 'prototype/scripts/visuals/meshy_*.gd'
+      - 'prototype/scripts/visuals/village_person.gd'
+      - 'prototype/assets/meshy/characters/**'
+      - 'prototype/assets/meshy/equipment/**'
+      - 'prototype/tests/npc_behavior*_test.gd'
+      - 'prototype/tests/locomotion_regression_test.gd'
+      - 'prototype/tests/meshy_*_test.gd'
+      - '.github/workflows/npc-regressions.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npc-regressions-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  headless-regressions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install and verify official Godot editor
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          filename="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl --fail --location --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$base/$filename" -o "$filename"
+          expected="$(awk -v name="$filename" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          actual="$(sha512sum "$filename" | awk '{print $1}')"
+          test -n "$expected" && test "$expected" = "$actual"
+          unzip -q "$filename"
+          bin="$PWD/${filename%.zip}"
+          chmod +x "$bin"
+          echo "GODOT_BIN=$bin" >> "$GITHUB_ENV"
+      - name: Import actual project assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --kill-after=10s 300s "$GODOT_BIN" --headless --path prototype --import
+      - name: Run isolated gameplay and imported mesh checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_check() {
+            local script="$1" marker="$2" state log
+            state="$(mktemp -d "$RUNNER_TEMP/npc-test.XXXXXX")"
+            log="$state/output.log"
+            mkdir -p "$state/data" "$state/config" "$state/cache"
+            XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" \
+              timeout --kill-after=10s 180s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script "res://tests/$script.gd" 2>&1 | tee "$log"
+            grep -Fq "$marker" "$log"
+          }
+          run_check npc_behavior_test 'checks passed'
+          run_check npc_behavior_world_test 'checks passed'
+          run_check npc_behavior_ui_test 'NPC_BEHAVIOR_UI_PASS'
+          run_check locomotion_regression_test 'LOCOMOTION_PASS'
+          run_check meshy_character_test 'MESHY_CHARACTERS_PASS'
+          run_check meshy_equipment_test 'MESHY_EQUIPMENT_PASS'
