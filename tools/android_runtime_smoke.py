@@ -36,6 +36,16 @@ BEHAVIOR_ACTIVITIES = {"work", "patrol", "explore", "socialize", "rest", "weathe
                        "yield", "space", "flee", "alert", "assist", "absent"}
 
 
+def newest_marker_payload(text, marker, previous_count):
+    """Return None until a new marker exists; a bare marker has an empty payload."""
+    if text.count(marker) <= previous_count:
+        return None
+    suffix = text.rsplit(marker, 1)[1]
+    # splitlines()[0] crashes on a bare terminal marker. Only the current
+    # line belongs to this event, never a following unrelated log record.
+    return suffix.partition("\n")[0].strip()
+
+
 def village_runtime_observations(text, *, retain_latest=False):
     """Validate the whole log, retaining a bounded current window when requested."""
     observations = []
@@ -889,9 +899,9 @@ def main():
     def wait_for_new_marker(marker, previous, timeout=60):
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
-            text = checked_logs()
-            if text.count(marker) > previous:
-                return text.rsplit(marker, 1)[1].splitlines()[0].strip()
+            payload = newest_marker_payload(checked_logs(), marker, previous)
+            if payload is not None:
+                return payload
             time.sleep(1)
         raise RuntimeError("No new Android runtime marker " + marker)
 
