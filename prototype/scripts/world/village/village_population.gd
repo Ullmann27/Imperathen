@@ -5,6 +5,9 @@ const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
+const LocalNavigation = preload("res://scripts/world/village/village_local_navigation.gd")
+const SOCIAL_DISTANCE := 1.3
+const SOCIAL_RANGE := 5.0
 var actors: Dictionary = {}
 var origin_id := ""
 var active := false
@@ -21,6 +24,8 @@ var _behavior_restore := false
 var _behavior_seconds := 0.0
 var _route_distances: Dictionary = {}
 var _route_directions: Dictionary = {}
+# Runtime-only path cache; the existing saved physical position is authoritative.
+var _local_paths: Dictionary = {}
 
 
 func sync_behavior(data: Dictionary) -> void:
@@ -53,6 +58,7 @@ func show_origin(id: String, time: float, recruited_count: int) -> void:
 		_route_clocks.clear()
 		_route_distances.clear()
 		_route_directions.clear()
+		_local_paths.clear()
 		_initialized = false
 		if id == "italia":
 			for index in Layout.RESIDENTS.size():
@@ -190,14 +196,29 @@ func _advance_behavior(elapsed: float) -> void:
 		var total := _route_length(route)
 		var distance := clampf(float(_route_distances.get(id,0.0)),0.0,total)
 		var goal := distance
+		var local_target := Vector3.INF
+		var local_mode := ""
+		var social_arrived := false
 		if activity in ["work","weather_pause"]:
 			goal = 0.0
 		elif activity in ["socialize","explore"]:
 			goal = total
 			var peer: String = intent.partner
-			if not peer.is_empty() and _behavior_state.village.behavior.people.has(peer) and bool(_behavior_state.village.behavior.people[peer].observed):
-				var peer_point: Array = _behavior_state.village.behavior.people[peer].position
-				goal = _route_projection(route,Vector3(float(peer_point[0]),0,float(peer_point[2])))
+			if activity == "socialize" and not peer.is_empty():
+				# A selected partner is a real destination, not a projection
+				# onto an unrelated personal route. Fixed service actors stay put.
+				goal = distance
+				local_mode = "peer"
+				if total > .01 and _behavior_state.village.behavior.people.has(peer):
+					var other: Dictionary = _behavior_state.village.behavior.people[peer]
+					if other.observed and other.activity not in ["absent","flee","alert","assist"]:
+						var point: Array = other.position
+						var peer_at := Vector3(float(point[0]),actor.global_position.y,float(point[2]))
+						var offset := peer_at-actor.global_position
+						if offset.length() <= SOCIAL_RANGE:
+							social_arrived = offset.length() <= SOCIAL_DISTANCE+.12
+							if not social_arrived:
+								local_target = peer_at-offset.normalized()*SOCIAL_DISTANCE
 		elif activity == "patrol":
 			var direction := int(_route_directions.get(id,1))
 			if direction > 0 and distance >= total-.08:
@@ -212,7 +233,24 @@ func _advance_behavior(elapsed: float) -> void:
 		var next_distance := move_toward(distance,goal,speed*elapsed)
 		var target := _route_point(route,next_distance)
 		var motion := Vector3.ZERO
-		if activity == "yield":
+		# After a social detour, safely rejoin the original corridor before
+		# resuming work, exploration or patrol. Never snap to the route.
+		if local_mode.is_empty() and total > .01 and activity in ["work","weather_pause","explore","socialize","patrol","flee"]:
+			var rejoin := to_global(_route_point(route,distance))
+			var cached: Dictionary = _local_paths.get(id,{})
+			if cached.get("mode","") == "rejoin":
+				rejoin = cached.target
+			var gap := actor.global_position.distance_to(rejoin)
+			if gap > .72 or cached.get("mode","") == "rejoin" and gap > LocalNavigation.ARRIVAL:
+				local_mode = "rejoin"
+				local_target = rejoin
+		if not local_mode.is_empty():
+			if local_target != Vector3.INF:
+				motion = _local_motion(id,actor,local_target,local_mode,speed,elapsed)
+			else:
+				_local_paths.erase(id)
+		elif activity == "yield":
+			_local_paths.erase(id)
 			var away := actor.global_position-_player_position
 			away.y = 0.0
 			if away.length_squared() > .0001:
@@ -222,15 +260,23 @@ func _advance_behavior(elapsed: float) -> void:
 				if (actor.position+motion-_route_point(route,distance)).length() > .72:
 					motion = Vector3.ZERO
 		elif activity not in ["rest","greet","space","alert","assist","absent"] and total > .01:
+			_local_paths.erase(id)
 			motion = (target-actor.position).limit_length(speed*elapsed)
 			motion.y = 0.0
+		else:
+			_local_paths.erase(id)
 		var before := actor.position
 		var hit: KinematicCollision3D
 		if motion.length_squared() > .00000001:
 			hit = actor.move_and_collide(motion)
 		if hit != null:
+			if not local_mode.is_empty() and _local_paths.has(id):
+				# A new obstacle may invalidate a cached path. Wait briefly
+				# rather than spending the entire frame budget replanning.
+				_local_paths[id].waypoints = []
+				_local_paths[id].retry = seconds+.6
 			var blocker := hit.get_collider() as CollisionObject3D
-			if blocker != null and (blocker.collision_layer & (2 | Layout.CITIZEN_LAYER)) != 0:
+			if local_mode.is_empty() and blocker != null and (blocker.collision_layer & (2 | Layout.CITIZEN_LAYER)) != 0:
 				var side := Vector3(-motion.z,0,motion.x).normalized()*.45*elapsed
 				if (actor.position+side-_route_point(route,distance)).length() < .72 and not actor.test_move(actor.global_transform,side):
 					actor.move_and_collide(side)
@@ -243,13 +289,37 @@ func _advance_behavior(elapsed: float) -> void:
 			actor.rotation.y = lerp_angle(actor.rotation.y,atan2(-travelled.x,-travelled.z),minf(1.0,elapsed*7.0))
 		elif activity in ["greet","space","socialize","alert","assist"]:
 			_face_interest(actor,intent,elapsed)
-		if activity == "work" and actual_speed < .05 and distance < .15:
+		if activity == "work" and actual_speed < .05 and actor.position.distance_to(item.at) < .15:
 			figure.keep_working()
-		elif actor.get_meta("intent","") != activity and activity in ["greet","socialize","space"]:
+		elif activity == "socialize" and social_arrived and actual_speed < .05 and not actor.get_meta("social_arrived",false):
 			figure.cue("talk")
+		elif actor.get_meta("intent","") != activity and activity in ["greet","space"]:
+			figure.cue("talk")
+		actor.set_meta("social_arrived",social_arrived)
 		actor.set_meta("intent",activity)
 		actor.set_meta("activity","march" if actual_speed > .05 else activity)
-		actor.set_meta("yielding",hit != null or activity == "yield")
+		actor.set_meta("yielding",hit != null or activity == "yield" or local_target != Vector3.INF and motion.length_squared() < .00000001)
+
+
+func _local_motion(id: String, actor: CharacterBody3D, target: Vector3, mode: String, speed: float, elapsed: float) -> Vector3:
+	var entry: Dictionary = _local_paths.get(id,{})
+	if entry.is_empty() or entry.get("mode","") != mode:
+		entry = {"mode":mode,"target":target,"waypoints":[],"retry":seconds}
+		_local_paths[id] = entry
+	var goal_changed: bool = target.distance_to(entry.target) > .45
+	if seconds >= float(entry.retry) and (goal_changed or entry.waypoints.is_empty()):
+		entry.target = target
+		entry.waypoints = LocalNavigation.plan(actor,target)
+		entry.retry = seconds+.6
+	var waypoints: Array = entry.waypoints
+	while not waypoints.is_empty() and actor.global_position.distance_to(waypoints.front()) <= LocalNavigation.ARRIVAL:
+		waypoints.pop_front()
+	if waypoints.is_empty():
+		return Vector3.ZERO
+	var next: Vector3 = waypoints.front()
+	var motion := (next-actor.global_position).limit_length(speed*elapsed)
+	motion.y = 0.0
+	return motion
 
 
 func _face_interest(actor: Node3D, intent: Dictionary, elapsed: float) -> void:
@@ -335,6 +405,7 @@ func _route_projection(points: Array[Vector3], point: Vector3) -> float:
 
 func _place_routines(time: float) -> void:
 	_initialized = true
+	_local_paths.clear()
 	var occupied: Array[Vector3] = []
 	var excluded: Array[RID] = []
 	for actor: CharacterBody3D in actors.values():
