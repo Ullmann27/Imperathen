@@ -38,6 +38,9 @@ const NEIGHBORS := {
 }
 # Authored steps live in res://assets/story/missions/band1/ (one file per mission).
 static var STEPS: Array = MissionData.steps("band1")
+## Screenplay bridge state version. v3 adds I-07 water (story core „Wasser,
+## Nachricht und kurze Kontrollrunde“); older saves migrate on load.
+const SCREENPLAY_VERSION := 3
 static var CARRIED_EFFECTS: Dictionary = MissionData.carried_effects("band1")
 const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Kleinholzbündel für Sextus", "checked_hinge":"Geprüfter Truhengriff", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
@@ -64,7 +67,7 @@ static func start(data: Dictionary) -> bool:
 	data.village.childhood = {"version":VERSION,"completed":[],"day":1,"carried":[],
 		"relationships":relationships,"active_work":"","work_seconds":0.0,
 		"gear":"none","apprenticeship":"none","night_event":"none",
-		"screenplay":{"version":2,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i08":"locked","hoof_evidence":false,"i10":"locked","raid_path":"","visible_raiders":30,"i11":"locked","i12":"locked","i13":"locked","i14":"locked","julia_outcome":"undecided","oath":false},
+		"screenplay":{"version":SCREENPLAY_VERSION,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i07_water":"locked","i08":"locked","hoof_evidence":false,"i10":"locked","raid_path":"","visible_raiders":30,"i11":"locked","i12":"locked","i13":"locked","i14":"locked","julia_outcome":"undecided","oath":false},
 		"guard_absence":{"active":false,"previous_assignment":"idle","previous_health":100}}
 	return true
 
@@ -146,6 +149,32 @@ static func migrate_legacy_ids(data: Dictionary) -> bool:
 			person.assignment = "idle"
 			person.previous_assignment = "idle"
 	return true
+
+
+## Adds the v3 screenplay fields to v2 childhood saves without completing
+## anything retroactively: a save already past the watch post keeps I-07 water
+## as "legacy"; a save standing exactly before it gets the new water task.
+static func migrate_screenplay(data: Dictionary) -> bool:
+	if not enabled(data):
+		return false
+	var child: Variant = data.village.childhood
+	if typeof(child) != TYPE_DICTIONARY or typeof(child.get("screenplay")) != TYPE_DICTIONARY or typeof(child.get("completed")) != TYPE_ARRAY:
+		return false
+	var screenplay: Dictionary = child.screenplay
+	if int(screenplay.get("version", 0)) != 2:
+		return false
+	var water_index := _step_index("watch_post")
+	var done: int = child.completed.size()
+	screenplay.i07_water = "locked" if done < water_index else ("pending" if done == water_index else "legacy")
+	screenplay.version = SCREENPLAY_VERSION
+	return true
+
+
+static func _step_index(step_id: String) -> int:
+	for index in STEPS.size():
+		if STEPS[index].id == step_id:
+			return index
+	return -1
 
 
 static func has_npc(data: Dictionary, id: String) -> bool:
@@ -318,6 +347,7 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 		_relation(data, "sextus").learned = true
 	if id == "borrow_gear":
 		child.gear = "loaned"
+		child.screenplay.i07_water = "pending"
 	if id == "deliver_medicine":
 		var guard := _person(data, "severus")
 		guard.health = maxi(50, int(guard.health))
@@ -390,6 +420,16 @@ static func _apply_screenplay(data: Dictionary, step: Dictionary, action: String
 			else:
 				return _fail("Entscheide, wie du den Streit mit Marcus beendest.")
 			screenplay.i03 = "complete"
+		"i07_water_fetch":
+			if action != "i07_water_fetch":
+				return _fail("Schöpfe zuerst das Wasser für den Torposten.")
+			screenplay.i07_water = "carry"
+			message = "Der Krug ist gefüllt. Trag ihn zum bekannten Torabschnitt."
+		"i07_water_bring":
+			if action != "i07_water_bring":
+				return _fail("Bring das Wasser zum Torposten.")
+			screenplay.i07_water = "complete"
+			message = "Das Wasser steht am Torposten. Jetzt kannst du am bekannten Torabschnitt aushelfen."
 		"i08_tracks":
 			if action != "i08_inspect":
 				return _fail("Untersuche zuerst die Hufspuren selbst.")
@@ -615,10 +655,18 @@ static func validate(data: Dictionary) -> String:
 			expected_gear = "returned"
 			absent = false
 	var screenplay: Variant = child.screenplay
-	var screenplay_keys := ["version","i02","i02_outcome","i03","i03_outcome","i08","hoof_evidence",
+	var screenplay_keys := ["version","i02","i02_outcome","i03","i03_outcome","i07_water","i08","hoof_evidence",
 		"i10","raid_path","visible_raiders","i11","i12","i13","i14","julia_outcome","oath"]
-	if not _keys(screenplay, screenplay_keys) or not _integer(screenplay.version,2,2):
+	if not _keys(screenplay, screenplay_keys) or not _integer(screenplay.version,SCREENPLAY_VERSION,SCREENPLAY_VERSION):
 		return "Ungültiger Drehbuch-Brückenstand."
+	var water_index := _step_index("watch_post")
+	var water_allowed: Array = ["locked"]
+	if child.completed.size() == water_index:
+		water_allowed = ["pending","carry","complete"]
+	elif child.completed.size() > water_index:
+		water_allowed = ["complete","legacy"]
+	if typeof(screenplay.i07_water) != TYPE_STRING or screenplay.i07_water not in water_allowed:
+		return "Der Wasserauftrag in I-07 widerspricht der Auftragsfolge."
 	if screenplay.i02 not in ["pending","correction","complete"] or screenplay.i03 not in ["locked","pending","complete"] or screenplay.i08 not in ["locked","pending","report","complete"]:
 		return "Ungültiger Status einer frühen Drehbuchmission."
 	for key: String in ["i10","i11","i12","i13","i14"]:
@@ -770,6 +818,19 @@ static func _screenplay_step(data: Dictionary) -> Dictionary:
 				"chapter":"Marcus kennt eine Abkürzung","label":"Mit Marcus über Marktweg und Münzstreit entscheiden",
 				"objective":"Triff Marcus bei der Gasse zum Markt. Entscheide, ob ihr den Streit als Freunde löst oder euch gegeneinander verhärtet.",
 				"text":"","result":"Die Beziehung zu Marcus erhält eine konkrete Erinnerung."}
+	# I-07 story core names water, a message and a short control round. Water is
+	# carried to the known gate section before the supervised watch post.
+	if child.completed.size() == _step_index("watch_post"):
+		if screenplay.i07_water == "pending":
+			return {"id":"i07_water_fetch","mission":"I-07","screenplay":true,"point":"family_water",
+				"chapter":"Der kranke Wachmann","label":"Wasser für den Torposten schöpfen",
+				"objective":"Der Torposten braucht Wasser. Schöpfe am Haus einen Krug, bevor du zum bekannten Torabschnitt gehst.",
+				"text":"","result":"Der Krug ist gefüllt."}
+		if screenplay.i07_water == "carry":
+			return {"id":"i07_water_bring","mission":"I-07","screenplay":true,"point":"patrol_gate",
+				"chapter":"Der kranke Wachmann","label":"Den Wasserkrug zum Torposten bringen",
+				"objective":"Bring das Wasser zum bekannten Torabschnitt. Du hilfst beaufsichtigt; du stehst keine Wache allein.",
+				"text":"","result":"Das Wasser steht am Torposten."}
 	# I-08 must happen after the bounded watch service and before the last normal
 	# family evening. No people or faction are identified from hoofprints alone.
 	if child.completed.has("return_gear"):
@@ -844,6 +905,10 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 	elif step.id == "i03_marcus":
 		options = [{"id":"marcus_friend","label":"Den Münzstreit beilegen und gemeinsam gehen"},
 			{"id":"marcus_rival","label":"Auf dem eigenen Standpunkt beharren"}]
+	elif step.id == "i07_water_fetch":
+		options = [{"id":"i07_water_fetch","label":"Wasserkrug füllen"}]
+	elif step.id == "i07_water_bring":
+		options = [{"id":"i07_water_bring","label":"Wasser am Torposten abstellen"}]
 	elif step.id == "i08_tracks":
 		options = [{"id":"i08_inspect","label":"Hufspuren untersuchen und nur Beobachtungen sichern"}]
 	elif step.id == "i08_report":

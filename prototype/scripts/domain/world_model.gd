@@ -965,6 +965,8 @@ func _read_save(path: String) -> Dictionary:
 	# childhood saves before strict state validation; all other saves are untouched.
 	if typeof(state) == TYPE_DICTIONARY:
 		Childhood.migrate_legacy_ids(state)
+		# Screenplay bridge v2 -> v3 (I-07 water); nothing is completed retroactively.
+		Childhood.migrate_screenplay(state)
 		# Schema v5 saves written before chapter abilities existed gain the record
 		# derived from their already saved story facts; the schema stays v5.
 		Abilities.ensure(state)

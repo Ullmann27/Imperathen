@@ -47,3 +47,16 @@ Weiterhin abweichend:
 - I-07: Severus als „kranker Wachmann“ trägt einen Namen, der in Band 1 nicht vorkommt (der Missionstitel setzt einen Wachmann voraus). Aurelia (Heilerin) und die Nachricht an Cassia sind Ergänzungen im Rahmen von „Wasser, Nachricht und kurzer Kontrollrunde“.
 - I-04: Silvanus begleitet nicht körperlich (kein Begleitsystem).
 - `smith_apprentice` (Sextus) bleibt I-06 zugeordnet; `deliver_food` (Julia) bleibt I-03 zugeordnet.
+
+## Runde 3: I-07 vertieft (Wasser)
+
+- **Wasser:** Der Storykern von I-07 nennt „Wasser, Nachricht und kurze Kontrollrunde“ (`band1.md`, Abschnitt „I-07 · Der kranke Wachmann“, Tabelle 10). Bisher gab es nur Nachricht und Kontrollrunde. Neu ist eine Wasseraufgabe zwischen `borrow_gear` und `watch_post`:
+  1. Krug am Haus füllen (`i07_water_fetch`).
+  2. Wasser zum bekannten Torabschnitt bringen (`i07_water_bring`).
+  - *Ergänzung:* Schöpfstelle am Haus und Zielort Torabschnitt; das Drehbuch nennt nur „Wasser“.
+- **Dialog:** Silvanus' Zeile 08 „Mut ist leicht, wenn nichts auf dem Spiel steht.“ ist als optionaler Besuch während `watch_post` eingebunden (Feld `visits`).
+- **Spielstände:** Der Stand liegt im Drehbuch-Brückenstand v3 (`screenplay.i07_water`). v2-Spielstände werden beim Laden migriert, ohne etwas rückwirkend zu erledigen:
+  - vor der Leihausrüstung: `locked`
+  - genau vor dem Torposten: `pending`, die Aufgabe kommt also noch
+  - danach: `legacy`
+  - Test: `prototype/tests/band1_expansion_test.gd`

@@ -111,6 +111,7 @@ func _complete(model) -> bool:
 	var view: Dictionary = Childhood.view(model.data)
 	var stage := str(view.get("stage", ""))
 	var screenplay_actions := {"i02_basket":"basket_check", "i02_correct":"basket_correct", "i03_marcus":"marcus_friend",
+		"i07_water_fetch":"i07_water_fetch", "i07_water_bring":"i07_water_bring",
 		"i08_tracks":"i08_inspect", "i08_report":"i08_report"}
 	if screenplay_actions.has(stage):
 		_at(model, view.point)
