@@ -63,8 +63,8 @@ void fragment() {
 	float a1 = noise(vec2(angle * 7.0 + 31.0, t * 0.12));
 	float a2 = noise(vec2(angle * 19.0 - 7.0, t * 0.2 + 4.0));
 	float band = pow(a1, 3.0) * 0.9 + pow(a2, 6.0) * 0.6;
-	float shaft = band * smoothstep(1.1, 0.06, r) * (0.45 + 1.0 * smoke);
-	color += vec3(1.0, 0.6, 0.25) * shaft * 0.55 * rays;
+	float shaft = band * smoothstep(1.1, 0.06, r) * smoothstep(0.25, 0.75, smoke + 0.15) * 1.4;
+	color += vec3(1.0, 0.6, 0.25) * shaft * 0.42 * rays;
 	color += vec3(1.0, 0.72, 0.38) * exp(-r * r * 7.0) * 0.36 * rays;
 	color = mix(color, vec3(1.0, 0.9, 0.75), flash * 0.75);
 	color *= 1.0 - smoothstep(0.5, 1.3, length((uv - vec2(0.5, 0.46)) * vec2(aspect * 0.78, 1.18)));

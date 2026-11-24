@@ -430,10 +430,17 @@ func _place_menu_decor(stage: Control, panel: Control, portrait: bool) -> void:
 		var count := 2 if free_width >= 460.0 else (1 if free_width >= 200.0 else 0)
 		var banner_w := clampf(free_width * (0.22 if count == 2 else 0.4), 90.0, 170.0)
 		var banner_h := minf(area.y * 0.5, banner_w * 2.6)
+		var torch_y := 34.0 + banner_h * 0.62
+		var centres: Array[float] = []
 		for index in range(count):
-			var cx := free_left + free_width * (float(index) + 0.5) / count
-			spots.append({"banner": Rect2(cx - banner_w * 0.5, 34.0, banner_w, banner_h),
-				"torches": [Vector2(cx - banner_w * 0.95, 34.0 + banner_h * 0.62), Vector2(cx + banner_w * 0.95, 34.0 + banner_h * 0.62)]})
+			centres.append(free_left + free_width * (float(index) + 0.5) / count)
+			spots.append({"banner": Rect2(centres[index] - banner_w * 0.5, 34.0, banner_w, banner_h)})
+		if count > 0:
+			# Torches flank the banners; two banners share the middle torch.
+			var torches: Array[Vector2] = [Vector2(centres[0] - banner_w * 0.95, torch_y), Vector2(centres[-1] + banner_w * 0.95, torch_y)]
+			if count == 2:
+				torches.append(Vector2((centres[0] + centres[1]) * 0.5, torch_y))
+			spots.append({"torches": torches})
 	else:
 		var above := tablet.position.y
 		var below := area.y - tablet.end.y

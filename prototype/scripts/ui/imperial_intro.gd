@@ -566,8 +566,8 @@ func _apply() -> void:
 		for mark in MOTTO_WORDS:
 			hit_flash = maxf(hit_flash, _kick(t, mark, 0.07) * 0.18)
 	hit_flash = maxf(hit_flash, impact)
-	material.set_shader_parameter("glow", 0.15 + 0.55 * legion_on + 0.3 * eagle_on)
-	material.set_shader_parameter("rays", 0.25 * legion_on + 0.95 * eagle_on + impact * 0.8)
+	material.set_shader_parameter("glow", 0.04 + 0.66 * legion_on + 0.3 * eagle_on)
+	material.set_shader_parameter("rays", 0.3 * legion_on + 0.9 * eagle_on + impact * 0.7)
 	material.set_shader_parameter("flash", hit_flash * 0.22)
 	_flash.color.a = hit_flash * (0.12 if calm else 0.24)
 	# Cohorts march through the haze; light from the eagle rims them.
