@@ -110,16 +110,21 @@ static func start(data: Dictionary) -> void:
 	_decide_all(data, 0.0)
 
 
-static func observe(data: Dictionary, observations: Variant) -> void:
+static func observe(data: Dictionary, observations: Variant, complete_snapshot := false) -> void:
 	if not enabled(data) or typeof(observations) != TYPE_DICTIONARY:
 		return
 	for id: String in data.village.behavior.people:
+		var person: Dictionary = data.village.behavior.people[id]
+		# A full world snapshot reports currently visible bodies, not a permanent
+		# record of everybody ever seen. Keep the last valid position for saves,
+		# but do not use a hidden or invalid body for social/proximity decisions.
+		if complete_snapshot:
+			person.observed = false
 		if not observations.has(id) or typeof(observations[id]) != TYPE_DICTIONARY:
 			continue
 		var observation: Dictionary = observations[id]
 		if not _position(observation.get("position")) or not _number(observation.get("route_distance",0.0), 0.0, 1000.0):
 			continue
-		var person: Dictionary = data.village.behavior.people[id]
 		person.position = observation.position.duplicate()
 		person.route_distance = float(observation.get("route_distance",0.0))
 		var direction: Variant = observation.get("route_direction",1)
