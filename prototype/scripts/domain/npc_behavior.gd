@@ -171,7 +171,7 @@ static func _decide_all(data: Dictionary, delta: float) -> void:
 			person.fatigue = minf(100.0,float(person.fatigue)+delta*(0.10 if old_activity == "work" else 0.075))
 		else:
 			person.fatigue = maxf(0.0,float(person.fatigue)-delta*(0.75 if old_activity == "rest" else 0.08))
-		person.social_need = clampf(float(person.social_need)+delta*(-0.9 if old_activity in ["socialize","greet"] and _has_company(person,previous,player_at) else 0.075),0.0,100.0)
+		person.social_need = clampf(float(person.social_need)+delta*(-0.9 if old_activity in ["socialize","greet"] and _has_company(id,person,previous,player_at) else 0.075),0.0,100.0)
 		person.stress = maxf(0.0,float(person.stress)-delta*0.45)
 		var at := Vector2(float(person.position[0]),float(person.position[2]))
 		var danger_distance := 100000.0
@@ -269,14 +269,17 @@ static func _nearby_partner(id: String, person: Dictionary, traits: Dictionary, 
 	return best
 
 
-static func _has_company(person: Dictionary, people: Dictionary, player: Vector2) -> bool:
+static func _has_company(id: String, person: Dictionary, people: Dictionary, player: Vector2) -> bool:
 	var at := Vector2(float(person.position[0]),float(person.position[2]))
 	if person.partner == "player":
 		return person.observed and at.distance_to(player) <= 3.5
 	if not people.has(person.partner):
 		return false
 	var partner: Dictionary = people[person.partner]
-	return person.observed and partner.observed and partner.activity in ["socialize","greet"] and at.distance_to(Vector2(float(partner.position[0]),float(partner.position[2]))) <= 3.5
+	# Mere proximity, or a neighbor busy talking to somebody else, does not
+	# satisfy this resident's social need. Both must choose the encounter and
+	# have arrived within the same bounded conversational distance.
+	return person.observed and partner.observed and partner.activity == "socialize" and partner.partner == id and at.distance_to(Vector2(float(partner.position[0]),float(partner.position[2]))) <= 1.5
 
 
 static func _choose(person: Dictionary, activity: String, reason: String, now: float) -> void:
