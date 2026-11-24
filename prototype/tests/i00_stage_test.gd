@@ -11,12 +11,19 @@ func _initialize() -> void:
 	var stage := Stage.new()
 	root.add_child(stage)
 	stage.ensure_built()
-	_check(stage.get_node_or_null("LegionBlocks") is MultiMeshInstance3D, "I-00 has a batched legion body layer")
-	_check(stage.get_node_or_null("LegionSpears") is MultiMeshInstance3D, "I-00 has a batched spear layer")
-	_check(stage.get_node_or_null("LegionShields") is MultiMeshInstance3D, "I-00 has a batched shield layer")
-	var bodies := stage.get_node("LegionBlocks") as MultiMeshInstance3D
-	var shields := stage.get_node("LegionShields") as MultiMeshInstance3D
-	_check(bodies.multimesh.instance_count == 54 and shields.multimesh.instance_count == 54, "Three distant formation blocks keep identical body/shield instance counts")
+	var ranks: Node3D = stage.get_node_or_null("LegionBlocks")
+	_check(ranks != null and ranks._batches.has("spear"),"I-00 uses the shared animated soldier silhouette batch")
+	var bodies: MultiMeshInstance3D = ranks._batches.spear
+	_check(bodies.multimesh.visible_instance_count == 54,"Three distant formations contain54 actual soldier silhouettes")
+	_check(bodies.multimesh.mesh == ranks.SoldierVisual.far_mesh("spear"),"Cinematic bodies include the authored attached spear and shield")
+	var before: float = ranks._last_fraction
+	stage._process(1.0/60.0)
+	_check(ranks._last_fraction > before,"Cinematic formation advances its measured idle phase")
+	stage.hide()
+	before = ranks._last_fraction
+	stage._process(1.0/60.0)
+	_check(ranks._last_fraction == before,"Hidden cinematic formations stop their presentation clock")
+	stage.show()
 	var rain := stage.get_node_or_null("Rain") as GPUParticles3D
 	_check(rain != null and rain.amount >= 700 and rain.lifetime > 1.0, "The Aquileia cold open owns a real rain layer")
 	var caesar := stage.speaker("caesar")

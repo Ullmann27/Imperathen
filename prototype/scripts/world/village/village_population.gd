@@ -14,6 +14,7 @@ var active := false
 var seconds := 0.0
 var profile := "balanced"
 var focused_id := ""
+var _focus_yaw := 0.0
 var recruited := 0
 var _player_position := Vector3.ZERO
 var _route_clocks: Dictionary = {}
@@ -26,6 +27,14 @@ var _route_distances: Dictionary = {}
 var _route_directions: Dictionary = {}
 # Runtime-only path cache; the existing saved physical position is authoritative.
 var _local_paths: Dictionary = {}
+
+
+func _process(delta: float) -> void:
+	if focused_id.is_empty() or not actors.has(focused_id) or delta <= 0.0:
+		return
+	var actor: Node3D = actors[focused_id]
+	if actor.visible:
+		actor.rotation.y = rotate_toward(actor.rotation.y,_focus_yaw,minf(delta,.1)*3.2)
 
 
 func sync_behavior(data: Dictionary) -> void:
@@ -172,7 +181,7 @@ func advance_to(time: float, force := false) -> void:
 		var travelled := actor.position-before
 		var actual_speed := travelled.length()/maxf(.0001,elapsed)
 		if travelled.length_squared() > .00000001:
-			actor.rotation.y = lerp_angle(actor.rotation.y,atan2(-travelled.x,-travelled.z),minf(1.0,elapsed*8.0))
+			actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-travelled.x,-travelled.z),minf(elapsed,.1)*3.5)
 		var figure: Node3D = actor.get_node("Figure")
 		figure.drive(actual_speed)
 		if pose.activity == "work" and actual_speed < .05:
@@ -286,7 +295,7 @@ func _advance_behavior(elapsed: float) -> void:
 		var figure: Node3D = actor.get_node("Figure")
 		figure.drive(actual_speed)
 		if actual_speed > .05:
-			actor.rotation.y = lerp_angle(actor.rotation.y,atan2(-travelled.x,-travelled.z),minf(1.0,elapsed*7.0))
+			actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-travelled.x,-travelled.z),minf(elapsed,.1)*3.5)
 		elif activity in ["greet","space","socialize","alert","assist"]:
 			_face_interest(actor,intent,elapsed)
 		if activity == "work" and actual_speed < .05 and actor.position.distance_to(item.at) < .15:
@@ -339,7 +348,7 @@ func _face_interest(actor: Node3D, intent: Dictionary, elapsed: float) -> void:
 			target = danger
 	var offset := target-actor.global_position
 	if Vector2(offset.x,offset.z).length() > .1:
-		actor.rotation.y = lerp_angle(actor.rotation.y,atan2(-offset.x,-offset.z),minf(1.0,elapsed*4.0))
+		actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-offset.x,-offset.z),minf(elapsed,.1)*3.2)
 
 
 func _nearest_threat(point: Vector3) -> Vector3:
@@ -521,8 +530,9 @@ func focus(id: String, viewer: Vector3) -> bool:
 	focused_id = id
 	var actor: Node3D = actors[id]
 	var offset := viewer-actor.global_position
+	_focus_yaw = actor.rotation.y
 	if Vector2(offset.x,offset.z).length() > .1:
-		actor.rotation.y = atan2(-offset.x,-offset.z)
+		_focus_yaw = atan2(-offset.x,-offset.z)
 	actor.get_node("Figure").set_conversation_focus(true)
 	return true
 

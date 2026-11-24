@@ -31,6 +31,14 @@ var _transition_rotations: Array[Quaternion] = []
 var _transition_remaining := 0.0
 var _transition_duration := 0.0
 var _style_phase := 0.0
+var _world_contacts := {}
+var _world_supported := {}
+var _world_previous := Transform3D.IDENTITY
+var _world_initialized := false
+var _world_action := ""
+var _turn_step_side := ""
+var _turn_step_time := 0.0
+var _turn_step_from := Transform3D.IDENTITY
 
 
 func bind(model: Node3D, is_civilian: bool, actor_identity: String = "") -> void:
@@ -45,6 +53,7 @@ func bind(model: Node3D, is_civilian: bool, actor_identity: String = "") -> void
 	_parent.clear()
 	_feet.clear()
 	_transition_remaining = 0.0
+	reset_world_contacts()
 	var found := model.find_children("*", "Skeleton3D", true, false)
 	if found.is_empty():
 		return
@@ -80,6 +89,116 @@ func capture_transition(seconds: float) -> void:
 
 func advance(delta: float) -> void:
 	_transition_remaining = maxf(0.0, _transition_remaining - maxf(0.0, delta))
+
+
+func reset_world_contacts() -> void:
+	_world_contacts.clear()
+	_world_supported.clear()
+	_world_initialized = false
+	_world_action = ""
+	_turn_step_side = ""
+	_turn_step_time = 0.0
+
+
+func world_foot_supported(side: String) -> bool:
+	return bool(_world_supported.get(side, false))
+
+
+func plant_world_feet(action: String, phase: float, delta: float, stance: float) -> void:
+	# Root translation and turning are owned by the collision body. A local
+	# animation alone cannot keep a planted sole at its world contact while the
+	# body turns or changes speed. Solve those same, unstretched leg lengths to
+	# the saved contact after every authored pose and crossfade has been applied.
+	if not available or not skeleton.is_inside_tree():
+		return
+	var walking := action in ["march", "run", "retreat"]
+	var standing := action in ["idle", "talk", "work", "block"]
+	if not walking and not standing:
+		reset_world_contacts()
+		return
+	var current := skeleton.global_transform
+	if _world_initialized and current.origin.distance_to(_world_previous.origin) > 0.75:
+		reset_world_contacts()
+	if action != _world_action:
+		_world_contacts.clear()
+		_turn_step_side = ""
+		_turn_step_time = 0.0
+	_world_action = action
+	_world_previous = current
+	_world_initialized = true
+	skeleton.force_update_all_bone_transforms()
+	for bone in skeleton.get_bone_count():
+		_pose[bone] = skeleton.get_bone_global_pose(bone)
+	var desired := {}
+	var targets := {}
+	var local_from_world := current.affine_inverse()
+	for side: String in ["L", "R"]:
+		var u := fposmod(phase + (0.5 if side == "L" else 0.0), 1.0)
+		var supported := standing or u <= stance
+		var foot: Transform3D = current * _pose[_ids["Foot_" + side]]
+		desired[side] = foot
+		var contact: Dictionary = _world_contacts.get(side, {})
+		if supported:
+			if contact.is_empty() or (walking and u + 0.00001 < float(contact.phase)):
+				contact = {"transform": foot, "phase": u}
+			contact.phase = u
+			_world_contacts[side] = contact
+			targets[side] = contact.transform
+		else:
+			_world_contacts.erase(side)
+		_world_supported[side] = supported
+	# A stationary actor turns with short alternating steps. Keeping both feet
+	# glued through an arbitrarily large turn would cross the legs. These are
+	# real lifted swing arcs, while the other foot remains at its saved contact.
+	if standing:
+		if _turn_step_side.is_empty():
+			var largest := 0.0
+			for side: String in ["L", "R"]:
+				var anchor: Transform3D = targets[side]
+				var wanted: Transform3D = desired[side]
+				var horizontal := Vector2(wanted.origin.x-anchor.origin.x, wanted.origin.z-anchor.origin.z).length()
+				var turn := anchor.basis.orthonormalized().get_rotation_quaternion().angle_to(wanted.basis.orthonormalized().get_rotation_quaternion())
+				var demand := maxf(horizontal / 0.09, turn / 0.32)
+				if demand > 1.0 and demand > largest:
+					largest = demand
+					_turn_step_side = side
+			if not _turn_step_side.is_empty():
+				_turn_step_time = 0.0
+				_turn_step_from = targets[_turn_step_side]
+		if not _turn_step_side.is_empty():
+			_turn_step_time += maxf(0.0, delta)
+			var t := minf(1.0, _turn_step_time / 0.24)
+			var wanted: Transform3D = desired[_turn_step_side]
+			var step := _turn_step_from.interpolate_with(wanted, smoothstep(0.0, 1.0, t))
+			step.origin.y += sin(t * PI) * 0.065 * current.basis.get_scale().y
+			targets[_turn_step_side] = step
+			_world_supported[_turn_step_side] = t >= 1.0
+			if t >= 1.0:
+				_world_contacts[_turn_step_side] = {"transform": wanted, "phase": phase}
+				_turn_step_side = ""
+	# Lower the pelvis only as far as a saved contact requires. This keeps both
+	# the upper and lower leg at their actual rest lengths during a hard stop.
+	var lower_pelvis := 0.0
+	for side: String in targets:
+		var target: Vector3 = local_from_world * Transform3D(targets[side]).origin
+		var hip := _point("Thigh_" + side)
+		var reach := _rest[_ids["Shin_" + side]].origin.length() + _rest[_ids["Foot_" + side]].origin.length() - 0.001
+		var horizontal := Vector2(target.x-hip.x, target.z-hip.z).length()
+		var vertical := sqrt(maxf(0.0001, reach*reach-horizontal*horizontal))
+		lower_pelvis = maxf(lower_pelvis, hip.y-target.y-vertical)
+	if lower_pelvis > 0.0:
+		var pelvis_pose: Transform3D = _pose[_ids.Pelvis]
+		_place("Pelvis", pelvis_pose.basis, pelvis_pose.origin-Vector3.UP*minf(lower_pelvis,0.16))
+		# Preserve the authored local upper body after its parent has moved.
+		skeleton.force_update_all_bone_transforms()
+		for bone in skeleton.get_bone_count():
+			_pose[bone] = skeleton.get_bone_global_pose(bone)
+	for side: String in targets:
+		var world_target: Transform3D = targets[side]
+		var local_target := local_from_world * world_target
+		_leg(side, local_target.origin, Vector3.BACK)
+		_orient("Foot_" + side, local_target.basis)
+	skeleton.force_update_all_bone_transforms()
 
 
 func gait_stride(action: String, metres_per_second: float) -> float:
@@ -165,7 +284,6 @@ func locomotion(action: String, phase: float, metres_per_second: float, turn_rat
 		var lower := _pose[_ids["Forearm_" + side]].basis
 		var local_rest: Basis = _rest[_ids["Hand_" + side]].basis
 		_orient("Hand_" + side, lower * local_rest)
-	_blend_transition()
 	skeleton.force_update_all_bone_transforms()
 
 
@@ -180,6 +298,22 @@ func imported_ambient(action: String, phase: float) -> void:
 	var nod := (1.0 - cos(at * 2.0)) * 0.5
 	_rest_turn("Spine", 1.8 * sin(at), 0.7 * sin(at * 2.0), 1.2 * sin(at))
 	_rest_turn("Head", (7.0 if talking else 4.0) * sin(at), (3.5 if talking else 1.0) * nod, -1.6 * sin(at))
+	skeleton.force_update_all_bone_transforms()
+
+
+func imported_work(phase: float) -> void:
+	# Legacy military rigs have idle/march/combat clips but no authored work
+	# track. A real, bounded upper-body working cycle replaces the former
+	# motionless idle fallback; legs and planted equipment feet are untouched.
+	if not available:
+		return
+	var effort := sin(clampf(phase, 0.0, 1.0) * PI)
+	effort *= effort
+	_rest_turn("Spine", 0.0, 4.0 * effort, 0.0)
+	_rest_turn("Head", 0.0, 5.0 * effort, 0.0)
+	_rest_turn("Arm_R", 0.0, -18.0 * effort, -3.0 * effort)
+	_rest_turn("Forearm_R", 0.0, -24.0 * effort, 0.0)
+	_rest_turn("Hand_R", 0.0, 8.0 * effort, 0.0)
 	skeleton.force_update_all_bone_transforms()
 
 
@@ -201,7 +335,11 @@ func combat(technique: String, progress: float) -> void:
 	var at := clampf(progress, 0.0, 1.0)
 	var extension := smoothstep(0.0, peak, at) if at <= peak else 1.0 - smoothstep(peak, 1.0, at)
 	var prepare := sin(clampf(at / peak, 0.0, 1.0) * PI) if at < peak else 0.0
-	var guard := smoothstep(0.0, 0.12, at) * (1.0 - smoothstep(0.80, 1.0, at))
+	# Raising relaxed hands into guard needs time of its own. The former
+	# 12%-of-clip ramp snapped the forearms through >60 degrees in one frame
+	# during short jabs. Guard is established before the contact window and
+	# settles over the recovery; authoritative hit timings stay unchanged.
+	var guard := smoothstep(0.0, 0.28, at) * (1.0 - smoothstep(0.72, 1.0, at))
 	var scale := _height / 1.5
 	var sign := 1.0 if technique.ends_with("left") else -1.0
 	var twist := 0.0
@@ -363,6 +501,15 @@ func _blend_transition() -> void:
 	for bone in skeleton.get_bone_count():
 		skeleton.set_bone_pose_position(bone, _transition_positions[bone].lerp(skeleton.get_bone_pose_position(bone), weight))
 		skeleton.set_bone_pose_rotation(bone, _transition_rotations[bone].slerp(skeleton.get_bone_pose_rotation(bone), weight))
+	skeleton.force_update_all_bone_transforms()
+
+
+func blend_transition() -> void:
+	# The actor calls this after its final pose owner (imported work/attack,
+	# military idle or procedural locomotion). Otherwise entering a raw work
+	# clip bypasses the captured transition and visibly teleports the limbs.
+	if available:
+		_blend_transition()
 
 
 func _reset() -> void:

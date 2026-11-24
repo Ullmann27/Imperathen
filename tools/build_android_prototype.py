@@ -22,6 +22,8 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 
+from motion_quality_gate import require_export, digest as gate_digest
+
 
 REPOSITORY = Path(__file__).resolve().parents[1]
 EXPECTED_GODOT = "4.7.2.stable"
@@ -130,6 +132,20 @@ def source_fingerprint(project: Path) -> str:
         digest.update(relative.as_posix().encode("utf-8") + b"\0")
         digest.update(bytes.fromhex(file_sha256(path)))
     return digest.hexdigest()
+
+
+def verify_build_source(toolchain: dict, proof: dict, environment: dict[str, str], renderer: str) -> None:
+    """The approved source snapshot, renderer and revision must reach export intact."""
+    if renderer != "compatibility":
+        raise BuildError("The motion review covers the source project's Compatibility renderer; "
+                         "a modified renderer requires its own measured and visual approval.")
+    revision = proof.get("source_commit")
+    if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise BuildError("The motion proof has no exact source revision.")
+    if environment.get("GITHUB_SHA") and environment["GITHUB_SHA"].lower() != revision:
+        raise BuildError("GITHUB_SHA differs from the actual approved source revision.")
+    if source_fingerprint(Path(toolchain["project"])) != toolchain.get("source_sha256"):
+        raise BuildError("Project source changed after Android preflight.")
 
 
 def preflight(args: argparse.Namespace) -> tuple[dict, dict[str, str]]:
@@ -287,6 +303,12 @@ def atomic_copy(source: Path, destination: Path) -> None:
 
 
 def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]) -> Path:
+    if Path(toolchain["project"]).resolve() != (REPOSITORY / "prototype").resolve():
+        raise BuildError("Motion Quality Gate requires the verified repository project; alternate project export refused.")
+    evidence = args.motion_evidence.expanduser().resolve()
+    proof = require_export(REPOSITORY, evidence)
+    proof_hash = gate_digest(evidence / "motion-gate.json")
+    verify_build_source(toolchain, proof, environment, args.renderer)
     output = (args.output or REPOSITORY / "builds/android" / f"IMPERATHEN-{args.abi}-debug.apk").expanduser().resolve()
     if output.suffix.lower() != ".apk":
         raise BuildError("Die Ausgabedatei muss die Endung .apk besitzen.")
@@ -297,6 +319,8 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         project = temporary / "project"
         shutil.copytree(toolchain["project"], project,
                         ignore=shutil.ignore_patterns(".godot", ".git", "android", "*.tmp", "*.bak"))
+        if source_fingerprint(project) != toolchain["source_sha256"]:
+            raise BuildError("The isolated export copy differs from the approved project snapshot.")
         configure_copy(project, toolchain, args.renderer)
         write_isolated_settings(temporary, toolchain, environment)
         apk = temporary / "IMPERATHEN.apk"
@@ -323,6 +347,9 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         if report.get("apk", {}).get("sha256") != checksum:
             raise BuildError("Prüfbericht und tatsächlich erzeugte APK besitzen unterschiedliche Prüfsummen.")
         # A failed build never promotes an old or unverified APK as a new result.
+        if require_export(REPOSITORY, evidence) != proof or gate_digest(evidence / "motion-gate.json") != proof_hash:
+            raise BuildError("Movement evidence changed during export.")
+        verify_build_source(toolchain, proof, environment, args.renderer)
         atomic_copy(apk, output)
         atomic_copy(verification, output.with_suffix(".validation.json"))
         sha_file = temporary / "artifact.sha256"
@@ -330,13 +357,12 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         atomic_copy(sha_file, output.with_suffix(".apk.sha256"))
         build_report = {key: value for key, value in toolchain.items()
                         if key not in {"preset_section", "validator"}}
-        build_report.update({"requested_renderer": args.renderer, "status": "verified_debug_apk", "created_utc": datetime.now(timezone.utc).isoformat(),
+        build_report.update({"motion_gate_sha256": proof_hash, "motion_source_fingerprint": proof["source_fingerprint"],
+                             "source_commit": proof["source_commit"],
+                             "requested_renderer": args.renderer, "status": "verified_debug_apk", "created_utc": datetime.now(timezone.utc).isoformat(),
                              "apk": output.name, "apk_sha256": checksum, "apk_size_bytes": output.stat().st_size,
                              "signing": "externally_supplied_debug_key", "device_test": "not_run_by_build_tool",
                              "validation_report": output.with_suffix(".validation.json").name})
-        source_commit = environment.get("GITHUB_SHA", "")
-        if re.fullmatch(r"[0-9a-fA-F]{40}", source_commit):
-            build_report["source_commit"] = source_commit
         manifest = temporary / "build.json"
         manifest.write_text(json.dumps(build_report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         atomic_copy(manifest, output.with_suffix(".build.json"))
@@ -357,6 +383,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--abi", choices=ABIS, default="arm64-v8a")
     parser.add_argument("--renderer", choices=("compatibility", "mobile"), default="compatibility")
     parser.add_argument("--output", type=Path, help="Destination .apk; previous file remains untouched on export failure")
+    parser.add_argument("--motion-evidence", type=Path, default=REPOSITORY / "artifacts/engine-checks",
+                        help="Source-bound passed motion gate, measurement and engine evidence; required for export")
     parser.add_argument("--check", action="store_true", help="Check local prerequisites without exporting")
     parser.add_argument("--timeout", type=int, default=300, help="Per-tool timeout in seconds")
     return parser.parse_args()

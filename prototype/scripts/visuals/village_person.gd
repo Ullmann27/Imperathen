@@ -133,6 +133,9 @@ func _frontier_identity() -> String:
 
 
 func _path(level: int) -> String:
+	if role == "regional_worker":
+		var worker_name := home + "_farmer" if home in ["han", "wa"] else "farmer"
+		return "res://assets/landscape/" + worker_name + ".glb"
 	if role not in ["player", "companion"] and not meshy_asset_id.is_empty():
 		var meshy_path := MeshyCharacters.path_for(meshy_asset_id, age, level)
 		if not meshy_path.is_empty():
@@ -208,7 +211,7 @@ func _reload(level: int) -> void:
 		_style(shape)
 	_hands.bind(body, active_model_path)
 	_face.bind(body, identity)
-	_motion.bind(body, role in ["player", "companion"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"]), identity)
+	_motion.bind(body, role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"]), identity)
 	# The external tracks target this authored hero family. Never reuse them
 	# on a differently weighted Meshy or frontier character by bone name alone.
 	_motion.external_gestures = active_model_path.begins_with("res://assets/characters/hero_quality_")
@@ -490,6 +493,7 @@ func _sync_loaned_gear() -> void:
 
 
 func reset_motion() -> void:
+	_motion.reset_world_contacts()
 	_service_external = false
 	_conversation_focused = false
 	_combat_id = ""
@@ -545,6 +549,21 @@ func _locomotion_clip() -> String:
 	return "idle" if speed < stop_threshold else ("march" if speed < run_threshold else "run")
 
 
+func locomotion_stride(action: String) -> float:
+	# One complete cycle advances this distance in world metres. It must match
+	# the actual imported family, including attached Meshy and legacy soldiers;
+	# using the old villager stride for these rigs made their planted feet slide.
+	var model_scale := maxf(body.scale.y, 0.01) if body else 1.0
+	if _motion.available and _motion.civilian:
+		return maxf(0.01, _motion.gait_stride(action, speed / model_scale) * model_scale)
+	var soldier_gait := active_model_path.begins_with("res://assets/soldiers/") or active_model_path.begins_with("res://assets/meshy/characters/")
+	soldier_gait = soldier_gait or (active_model_path.begins_with("res://assets/characters/frontier_") and _frontier_identity() in ["legionary", "officer", "spearman", "archer"])
+	for family: String in ["heavy", "officer", "spear"]:
+		soldier_gait = soldier_gait or active_model_path.begins_with("res://assets/village_characters/" + family + "_")
+	var stride := (1.30 if action == "march" else 1.75) if soldier_gait else (1.10 if action == "march" else 1.49)
+	return stride * model_scale
+
+
 func sample_pose(action: String, normalized: float) -> void:
 	if action in CharacterMotion.TECHNIQUES:
 		sample_combat(action, normalized)
@@ -560,7 +579,7 @@ func sample_pose(action: String, normalized: float) -> void:
 
 
 func _play(action: String, normalized: float, blend: float) -> void:
-	_motion.capture_transition(blend if action != clip and action in ["idle", "march", "run", "talk"] else 0.0)
+	_motion.capture_transition(blend if action != clip else 0.0)
 	clip = action
 	if action not in ["attack","train","block"]:
 		_armed_style = ""
@@ -595,8 +614,12 @@ func _apply_motion(review: bool = false) -> void:
 	elif clip in ["attack", "train"] and role in ["player", "companion"] and not _has_sword:
 		_hands.set_grip(0.18 + 0.82 * sin(phase * PI))
 		_motion.combat("jab_right", phase)
+	elif clip in ["work", "gather"] and animator and not animator.has_animation(clip):
+		_hands.set_grip(0.34)
+		_motion.imported_work(phase)
 	else:
 		_hands.set_grip(0.18)
+	_motion.blend_transition()
 
 
 func _apply_imported_axe_pose() -> void:
@@ -681,16 +704,20 @@ func _process(delta: float) -> void:
 	if animator and animator.is_playing():
 		var advance := delta
 		if clip in ["march","run"]:
-			var stride := 1.10 if clip == "march" else 1.49
-			if _motion.available and _motion.civilian:
-				stride = maxf(0.01, _motion.gait_stride(clip, speed / body.scale.y) * body.scale.y)
-			elif _frontier_identity() in ["legionary", "officer", "spearman", "archer"] and active_model_path.begins_with("res://assets/characters/frontier_"):
-				stride = 1.30 if clip == "march" else 1.75
-			else:
-				stride *= body.scale.y
+			var stride := locomotion_stride(clip)
 			advance *= speed * animator.current_animation_length / stride
 		animator.advance(advance)
 		if animator.current_animation != "":
 			phase = animator.current_animation_position / animator.current_animation_length
 	_apply_motion()
+	var stance := 0.40 if clip == "run" else 0.58
+	if _motion.civilian:
+		stance = 0.32 if clip == "run" else 0.53
+	elif active_model_path.contains("meshy/"):
+		stance = 0.40 if clip == "run" else 0.56
+	_motion.plant_world_feet(clip, phase, delta, stance)
 	_face.advance(delta,clip,detail)
+
+
+func world_foot_supported(side: String) -> bool:
+	return _motion.world_foot_supported(side)

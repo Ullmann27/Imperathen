@@ -1,6 +1,7 @@
 extends SceneTree
 ## Sample the imported mesh-space bones, then drive the live scene at 50 Hz.
 const Actor := preload("res://scripts/visuals/soldier_visual.gd")
+const Ranks := preload("res://scripts/visuals/far_ranks.gd")
 const Valley := preload("res://scripts/tactics/valley_scene.gd")
 const Stance := {"march":0.58,"run":0.40,"retreat":0.51}
 var checks := 0
@@ -77,6 +78,7 @@ func _run() -> void:
 		a.free()
 	_check(lowest_sole >= -0.01, "Heel and forefoot probes stay above the terrain plane")
 	_test_scene()
+	_test_far_motion()
 	print("SOLDIER_GAIT_RESULT checks=%d failures=%d max_stance_slip_m=%.4f max_stance_height_error_m=%.4f lowest_sole_m=%.4f" % [checks,failures,max_slip,max_vertical,lowest_sole])
 	quit(1 if failures else 0)
 
@@ -136,3 +138,50 @@ func _test_scene() -> void:
 	_check(restored.actors[id].position == hold and restored.model.snapshot() == v.model.snapshot(),"Paused re-entry keeps saved position and rule state")
 	restored.free()
 	v.free()
+
+
+func _test_far_motion() -> void:
+	var max_slip := 0.0
+	for gait: String in Ranks.STANCE:
+		var stride: float = Actor.STRIDES[gait]
+		var stance: float = Ranks.STANCE[gait]
+		for side: float in [-1.0,1.0]:
+			var phase_offset := 0.0 if side < 0 else .5
+			var vertex := Vector3(side*.126,.011,.06)
+			var first := Vector3.ZERO
+			for i in 61:
+				var phase := stance*float(i)/60.0
+				var data := Ranks.gait_data(gait,phase-phase_offset,phase-phase_offset)
+				var foot := Ranks.deformed_vertex(vertex,data,1.0)+Vector3.BACK*phase*stride
+				if i == 0:
+					first = foot
+				max_slip = maxf(max_slip,foot.distance_to(first))
+			_check(max_slip < .00001,"Far stance cancels actual root distance for "+gait)
+		_check(Ranks.foot_offset(.999999,gait).distance_to(Ranks.foot_offset(0,gait)) < .00001,"Far stride wraps without a positional seam: "+gait)
+		var left_velocity := (Ranks.foot_offset(stance,gait)-Ranks.foot_offset(stance-.0001,gait))/.0001
+		var right_velocity := (Ranks.foot_offset(stance+.0001,gait)-Ranks.foot_offset(stance,gait))/.0001
+		_check(left_velocity.distance_to(right_velocity) < .02,"Far support-to-swing velocity is continuous: "+gait)
+	var start := Transform3D(Basis(Vector3.UP,deg_to_rad(170)),Vector3(-1,.2,3))
+	var finish := Transform3D(Basis(Vector3.UP,deg_to_rad(-165)),Vector3(-.7,.3,3.1))
+	var previous := Ranks.root_data(start,finish)
+	_check(Ranks.interpolated_root(finish,previous,0).is_equal_approx(start),"Far transform starts at the actual previous root even through a wrapped turn")
+	_check(Ranks.interpolated_root(finish,previous,1).is_equal_approx(finish),"Far transform reaches the exact next simulation root")
+	var middle := Ranks.interpolated_root(finish,previous,.5)
+	_check(middle.origin.distance_to(start.origin.lerp(finish.origin,.5)) < .000001,"Far diagonal/height interpolation follows the same root path as nearby skeletons")
+	_check(middle.basis.get_rotation_quaternion().angle_to(start.basis.get_rotation_quaternion()) < deg_to_rad(13),"Far yaw interpolates by the short arc instead of snapping to the next heading")
+	var ranks := Ranks.new()
+	root.add_child(ranks)
+	ranks.sync({"heavy":[finish]},{"heavy":[Ranks.gait_data("march",.1,.2)]},{"heavy":[start]})
+	var batch: MultiMeshInstance3D = ranks._batches.heavy
+	_check(batch.multimesh.use_colors and batch.multimesh.use_custom_data,"Production MultiMesh enables the previous-root and gait instance channels")
+	if DisplayServer.get_name() != "headless":
+		# The dummy renderer does not retain per-instance color data. Verify GPU
+		# storage only with a real rendering backend; never claim it headless.
+		var stored := batch.multimesh.get_instance_color(0)
+		_check(Vector4(stored.r,stored.g,stored.b,stored.a).distance_to(Vector4(previous.r,previous.g,previous.b,previous.a)) < .001,"Rendering backend retains the uploaded previous-root transform")
+	var upper := Vector3(0,1.55,0)
+	var idle := Ranks.deformed_vertex(upper,Ranks.gait_data("idle",0,0),1)
+	var hit := Ranks.deformed_vertex(upper,Ranks.gait_data("hit",.5,.5),1)
+	_check(idle.distance_to(hit) > .1,"Distant hit reaction visibly differs from a frozen idle silhouette")
+	ranks.free()
+	print("FAR_MOTION_RESULT max_support_slip_m=",max_slip)

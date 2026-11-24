@@ -6,6 +6,7 @@ extends Node3D
 ## The legion blocks have no collision, AI, inventory, morale or combat authority.
 
 const Person = preload("res://scripts/visuals/village_person.gd")
+const Ranks = preload("res://scripts/visuals/far_ranks.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 
 const OFFSET := Vector3(180.0, 0.0, 160.0)
@@ -24,6 +25,8 @@ var _cloth: StandardMaterial3D
 var _shield: StandardMaterial3D
 var _mud: StandardMaterial3D
 var _wood: StandardMaterial3D
+var _legions: Node3D
+var _legion_clock := 0.0
 
 
 func ensure_built() -> void:
@@ -85,63 +88,30 @@ func _standard(at: Vector3) -> void:
 
 
 func _build_legions() -> void:
-	# Three symbolic formation blocks keep the cold open Android-safe. They are
-	# distant cinematic silhouettes, not the eventual full legion simulation.
-	var body_mesh := CapsuleMesh.new()
-	body_mesh.radius = 0.20
-	body_mesh.height = 1.58
-	body_mesh.radial_segments = 8
-	body_mesh.rings = 4
-	var bodies := MultiMesh.new()
-	bodies.transform_format = MultiMesh.TRANSFORM_3D
-	bodies.mesh = body_mesh
-	bodies.instance_count = 54
-	var spear_mesh := CylinderMesh.new()
-	spear_mesh.bottom_radius = 0.018
-	spear_mesh.top_radius = 0.012
-	spear_mesh.height = 2.45
-	spear_mesh.radial_segments = 5
-	var spears := MultiMesh.new()
-	spears.transform_format = MultiMesh.TRANSFORM_3D
-	spears.mesh = spear_mesh
-	spears.instance_count = 54
-	var shield_mesh := BoxMesh.new()
-	shield_mesh.size = Vector3(0.52, 0.88, 0.08)
-	var shields := MultiMesh.new()
-	shields.transform_format = MultiMesh.TRANSFORM_3D
-	shields.mesh = shield_mesh
-	shields.instance_count = 54
-	var index := 0
+	# Three presentation-only formations share the actual low-detail soldier
+	# mesh and phase-driven idle. No static capsules stand in for living people.
+	_legions = Ranks.new()
+	_legions.name = "LegionBlocks"
+	add_child(_legions)
+	var transforms: Array = []
+	var phases: Array = []
 	for block in 3:
-		var center_x := -9.0 + float(block) * 9.0
+		var center_x := -9.0+float(block)*9.0
 		for row in 6:
 			for column in 3:
-				var at := Vector3(center_x + float(column - 1) * 0.92, 0.82, -8.0 - float(row) * 1.28)
-				bodies.set_instance_transform(index, Transform3D(Basis.IDENTITY, at))
-				spears.set_instance_transform(index, Transform3D(Basis.IDENTITY, at + Vector3(0.36, 0.72, 0.0)))
-				var shield_basis := Basis(Vector3.UP, deg_to_rad(-7.0 + float(column) * 7.0))
-				shields.set_instance_transform(index, Transform3D(shield_basis, at + Vector3(-0.27, 0.03, 0.18)))
-				index += 1
-	var body_node := MultiMeshInstance3D.new()
-	body_node.name = "LegionBlocks"
-	body_node.multimesh = bodies
-	body_node.material_override = _iron
-	body_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	body_node.visibility_range_end = 120.0
-	add_child(body_node)
-	var spear_node := MultiMeshInstance3D.new()
-	spear_node.name = "LegionSpears"
-	spear_node.multimesh = spears
-	spear_node.material_override = _wood
-	spear_node.visibility_range_end = 100.0
-	add_child(spear_node)
-	var shield_node := MultiMeshInstance3D.new()
-	shield_node.name = "LegionShields"
-	shield_node.multimesh = shields
-	shield_node.material_override = _shield
-	shield_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	shield_node.visibility_range_end = 105.0
-	add_child(shield_node)
+				var at := Vector3(center_x+float(column-1)*.92,0,-8.0-float(row)*1.28)
+				transforms.append(Transform3D(Basis.IDENTITY,at))
+				var phase := fposmod(float(transforms.size())*.381966,1.0)
+				phases.append(Ranks.gait_data("idle",phase,phase+1.0))
+	_legions.sync({"spear":transforms},{"spear":phases})
+	_legions.set_step_fraction(0.0)
+
+
+func _process(delta: float) -> void:
+	if not _built or not is_visible_in_tree() or delta <= 0.0:
+		return
+	_legion_clock = fposmod(_legion_clock+delta,2.0)
+	_legions.set_step_fraction(_legion_clock/2.0)
 
 
 func _build_commanders() -> void:
