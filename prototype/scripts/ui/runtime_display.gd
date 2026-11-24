@@ -2,6 +2,7 @@ extends CanvasLayer
 ## Opt-in frame measurements for the same viewport used by the village and valley.
 
 const SafeArea = preload("res://scripts/ui/safe_area.gd")
+const BACKGROUND_FPS := 15
 
 var _profiles: Dictionary
 var _quality := "balanced"
@@ -13,6 +14,9 @@ var _sample_frames := 0
 var _adapter_line := ""
 var _previous_frame_usec := 0
 var _recent_times: Array[float] = []
+var _foreground_fps := 60
+var _application_focused := true
+var _application_paused := false
 
 
 func _ready() -> void:
@@ -40,12 +44,10 @@ func _ready() -> void:
 func apply_quality(profile: String) -> void:
 	if not _profiles.has(profile):
 		return
-	if profile != _quality:
-		_previous_frame_usec = 0
-		_recent_times.clear()
 	_quality = profile
 	var settings: Dictionary = _profiles[profile]
-	Engine.max_fps = 30 if profile in ["low", "very_high"] else 60
+	_foreground_fps = 30 if profile in ["low", "very_high"] else 60
+	_apply_frame_limit()
 	var viewport := get_viewport()
 	viewport.mesh_lod_threshold = float(settings.mesh_lod_threshold)
 	viewport.msaa_3d = Viewport.MSAA_4X if settings.msaa_samples == 4 else (Viewport.MSAA_2X if settings.msaa_samples == 2 else Viewport.MSAA_DISABLED)
@@ -57,6 +59,8 @@ func _on_size_changed() -> void:
 	# The window size is in output pixels. The canvas visible rectangle uses UI units.
 	var output := get_window().size
 	get_viewport().scaling_3d_scale = render_scale_for(output, _profiles[_quality], OS.has_feature("pc"))
+	# A fold/resize or profile change starts a new, comparable measurement window.
+	_reset_measurements()
 	_place_overlay()
 
 
@@ -74,16 +78,27 @@ func set_unit_counts(near_count: int, middle_count: int, far_count: int) -> void
 
 func set_diagnostics(enabled: bool) -> void:
 	_panel.visible = enabled
+	_update_diagnostics_processing()
+	_reset_measurements()
+	if enabled:
+		_adapter_line = "%s · %s" % [RenderingServer.get_current_rendering_method(), RenderingServer.get_video_adapter_name()]
+		_place_overlay()
+
+
+func _application_active() -> bool:
+	return _application_focused and not _application_paused
+
+
+func _apply_frame_limit() -> void:
+	# This is a render limit, not a change to the simulation clock or selected profile.
+	Engine.max_fps = _foreground_fps if _application_active() else mini(_foreground_fps, BACKGROUND_FPS)
+
+
+func _update_diagnostics_processing() -> void:
+	var enabled := _panel.visible and _application_active()
 	set_process(enabled)
 	if DisplayServer.get_name() != "headless":
 		RenderingServer.viewport_set_measure_render_time(get_viewport().get_viewport_rid(), enabled)
-	if enabled:
-		_adapter_line = "%s · %s" % [RenderingServer.get_current_rendering_method(), RenderingServer.get_video_adapter_name()]
-		_previous_frame_usec = 0
-		_recent_times.clear()
-		_label.text = "Bildzeiten werden erfasst …"
-		_place_overlay()
-		_restart_sample()
 
 
 func _place_overlay() -> void:
@@ -96,15 +111,39 @@ func _restart_sample() -> void:
 	_sample_frames = 0
 
 
+func _reset_measurements() -> void:
+	_previous_frame_usec = 0
+	_recent_times.clear()
+	_restart_sample()
+	if is_instance_valid(_panel) and _panel.visible:
+		_label.text = "Bildzeiten werden erfasst …" if _application_active() else "Bildzeitmessung pausiert."
+
+
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_RESUMED and is_instance_valid(_panel) and _panel.visible:
-		_previous_frame_usec = 0
-		_recent_times.clear()
-		_restart_sample()
-		_place_overlay.call_deferred()
+	match what:
+		NOTIFICATION_APPLICATION_PAUSED:
+			_application_paused = true
+		NOTIFICATION_APPLICATION_RESUMED:
+			_application_paused = false
+		NOTIFICATION_APPLICATION_FOCUS_OUT:
+			_application_focused = false
+		NOTIFICATION_APPLICATION_FOCUS_IN:
+			_application_focused = true
+		_:
+			return
+	# Android may deliver focus and lifecycle events in either order. Both must
+	# allow foreground rendering before the selected limit and sampling resume.
+	_apply_frame_limit()
+	if is_instance_valid(_panel):
+		_update_diagnostics_processing()
+		_reset_measurements()
+		if _application_active() and _panel.visible:
+			_place_overlay.call_deferred()
 
 
 func _process(_delta: float) -> void:
+	if not _application_active() or not _panel.visible:
+		return
 	var now := Time.get_ticks_usec()
 	if _previous_frame_usec > 0:
 		_recent_times.append((now - _previous_frame_usec) * 0.001)
@@ -143,7 +182,8 @@ func _process(_delta: float) -> void:
 		print("IMPERATHEN_DISPLAY_SAMPLE " + JSON.stringify({
 			"gpu": RenderingServer.get_video_adapter_name(), "quality": _quality,
 			"renderer": RenderingServer.get_current_rendering_method(), "driver": RenderingServer.get_current_rendering_driver_name(),
-			"fps": 1000.0 / frame_ms, "mean_frame_ms": frame_ms, "frames": _sample_frames,
+			"fps": 1000.0 / frame_ms, "frame_rate_limit": Engine.max_fps,
+			"mean_frame_ms": frame_ms, "frames": _sample_frames,
 			"render_cpu_ms": cpu_ms if cpu_ms > 0 else null,
 			"render_gpu_ms": gpu_ms if gpu_ms > 0 else null,
 			"rss_kib": ram if ram > 0 else null, "visible_primitives": primitives,

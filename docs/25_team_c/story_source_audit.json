@@ -1,0 +1,5148 @@
+{
+  "schema_version": 1,
+  "auditor_version": 1,
+  "campaign_sha256": "7def599de08526df6c5f9a9d09bfcee7721fcdd18a849447e3b06447464790d2",
+  "source_coverage": {
+    "audited_bands": [
+      2,
+      3,
+      4
+    ],
+    "not_audited_bands": [
+      1
+    ],
+    "require_all_volumes": false
+  },
+  "scope": {
+    "text": "word/document.xml paragraphs, including table cells; notes, comments and layout excluded",
+    "dialogue": "numbered main-mission dialogue only; side-quest and unnumbered dialogue excluded",
+    "repetition": "identical normalized speaker/text within one mission; editorial review, not an automatic defect",
+    "age": "calendar-year comparison to campaign start; exact birthdays and open-ended dates are not inferred",
+    "privacy": "no dialogue/full-text export; only hashes, IDs, markers and paragraph locations",
+    "historical_accuracy": "not automatically verified"
+  },
+  "summary": {
+    "main_missions": 81,
+    "side_quests": 72,
+    "main_dialogue_lines": 810,
+    "distinct_speaker_lines": 65,
+    "scenes_with_repeated_lines": 77,
+    "within_scene_repeated_line_instances": 250,
+    "spoken_production_language_lines": 96,
+    "blocking_findings": 96,
+    "findings_by_code": {
+      "age_calendar_review": 1,
+      "repeated_line_within_scene": 210,
+      "spoken_production_language": 96
+    }
+  },
+  "automated_status": "needs_revision",
+  "production_clearance": "not_assessed",
+  "sources": [
+    {
+      "band": 2,
+      "file_name": "02-IMPERATHEN_Drehbuch_Band_2_DER_ADLER_UND_DER_RUBIKON-1-.docx",
+      "registry_source_file": "IMPERATHEN_Drehbuch_Band_2_DER_ADLER_UND_DER_RUBIKON(1).docx",
+      "sha256": "6b55e0ca2e0b74354323524408e5188152e1bc8c3ed260d3b3690bb07e1c699f",
+      "paragraphs": 2898,
+      "words": 50414,
+      "main_missions": [
+        {
+          "id": "II-00",
+          "paragraph": 241,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 5,
+          "repeated_line_instances": 5
+        },
+        {
+          "id": "II-01",
+          "paragraph": 330,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "II-02",
+          "paragraph": 416,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "II-03",
+          "paragraph": 507,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 8,
+          "repeated_line_instances": 2
+        },
+        {
+          "id": "II-04",
+          "paragraph": 597,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "II-05",
+          "paragraph": 687,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 10,
+          "repeated_line_instances": 0
+        },
+        {
+          "id": "II-06",
+          "paragraph": 776,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "II-07",
+          "paragraph": 865,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "II-08",
+          "paragraph": 954,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "II-09",
+          "paragraph": 1043,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "II-10",
+          "paragraph": 1133,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "II-11",
+          "paragraph": 1222,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "II-12",
+          "paragraph": 1311,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 5,
+          "repeated_line_instances": 5
+        },
+        {
+          "id": "II-13",
+          "paragraph": 1402,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "II-14",
+          "paragraph": 1491,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "II-15",
+          "paragraph": 1580,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "II-16",
+          "paragraph": 1669,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "II-17",
+          "paragraph": 1758,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 8,
+          "repeated_line_instances": 2
+        },
+        {
+          "id": "II-18",
+          "paragraph": 1847,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "II-19",
+          "paragraph": 1936,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "II-20",
+          "paragraph": 2025,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "II-21",
+          "paragraph": 2114,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "II-22",
+          "paragraph": 2204,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "II-23",
+          "paragraph": 2294,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "II-24",
+          "paragraph": 2383,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        }
+      ],
+      "side_quests": [
+        {
+          "id": "NQ-2-01",
+          "paragraph": 2475
+        },
+        {
+          "id": "NQ-2-02",
+          "paragraph": 2492
+        },
+        {
+          "id": "NQ-2-03",
+          "paragraph": 2509
+        },
+        {
+          "id": "NQ-2-04",
+          "paragraph": 2526
+        },
+        {
+          "id": "NQ-2-05",
+          "paragraph": 2543
+        },
+        {
+          "id": "NQ-2-06",
+          "paragraph": 2560
+        },
+        {
+          "id": "NQ-2-07",
+          "paragraph": 2577
+        },
+        {
+          "id": "NQ-2-08",
+          "paragraph": 2594
+        },
+        {
+          "id": "NQ-2-09",
+          "paragraph": 2611
+        },
+        {
+          "id": "NQ-2-10",
+          "paragraph": 2628
+        },
+        {
+          "id": "NQ-2-11",
+          "paragraph": 2645
+        },
+        {
+          "id": "NQ-2-12",
+          "paragraph": 2662
+        },
+        {
+          "id": "NQ-2-13",
+          "paragraph": 2679
+        },
+        {
+          "id": "NQ-2-14",
+          "paragraph": 2696
+        },
+        {
+          "id": "NQ-2-15",
+          "paragraph": 2713
+        },
+        {
+          "id": "NQ-2-16",
+          "paragraph": 2730
+        },
+        {
+          "id": "NQ-2-17",
+          "paragraph": 2747
+        },
+        {
+          "id": "NQ-2-18",
+          "paragraph": 2764
+        },
+        {
+          "id": "NQ-2-19",
+          "paragraph": 2781
+        },
+        {
+          "id": "NQ-2-20",
+          "paragraph": 2798
+        },
+        {
+          "id": "NQ-2-21",
+          "paragraph": 2815
+        },
+        {
+          "id": "NQ-2-22",
+          "paragraph": 2832
+        },
+        {
+          "id": "NQ-2-23",
+          "paragraph": 2849
+        },
+        {
+          "id": "NQ-2-24",
+          "paragraph": 2866
+        }
+      ],
+      "findings": [
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-00",
+          "paragraph": 292,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-00",
+          "paragraph": 300,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-00",
+          "speaker": "MARCUS",
+          "text_sha256": "58618f1ca1db63615435a31ebf1bb49b64b070646f152b67560ed3da32ab134c",
+          "paragraphs": [
+            290,
+            298,
+            306
+          ],
+          "line_numbers": [
+            1,
+            5,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-00",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            292,
+            300
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-00",
+          "speaker": "MARCUS",
+          "text_sha256": "dd64f4e1b3c452263944532ead5c21534f9f86d2b81974014f413e2eb5294224",
+          "paragraphs": [
+            294,
+            302
+          ],
+          "line_numbers": [
+            3,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-00",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            296,
+            304
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-01",
+          "speaker": "MARCUS",
+          "text_sha256": "58618f1ca1db63615435a31ebf1bb49b64b070646f152b67560ed3da32ab134c",
+          "paragraphs": [
+            382,
+            392
+          ],
+          "line_numbers": [
+            4,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-02",
+          "speaker": "CASSIA",
+          "text_sha256": "568832137d21d2a895bfe3ef236c74d7d88a1bd82c095a380d03104bf3a0be87",
+          "paragraphs": [
+            467,
+            485
+          ],
+          "line_numbers": [
+            1,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-02",
+          "speaker": "CASSIA",
+          "text_sha256": "a1baa5fd26477d20459a14e48b1fc7ff4b93f445b35361f974e05c539c610002",
+          "paragraphs": [
+            473,
+            479
+          ],
+          "line_numbers": [
+            4,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-02",
+          "speaker": "SPIELER",
+          "text_sha256": "782265f2b67d2d527d2acbd0e794aa073c8e5ab05f890a20ca698858d3402191",
+          "paragraphs": [
+            477,
+            483
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-03",
+          "speaker": "POMPEIUS",
+          "text_sha256": "28f117fe92debdbff32206b24e82231ff1263ebc30168f7edbfd6bcf96483cc3",
+          "paragraphs": [
+            559,
+            567
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-03",
+          "speaker": "CICERO",
+          "text_sha256": "1905792d6999a3ffa8273151fd4e049d7f1cfc59fadf97f55e84110687e0f496",
+          "paragraphs": [
+            561,
+            569
+          ],
+          "line_numbers": [
+            3,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-04",
+          "speaker": "CAESAR",
+          "text_sha256": "5ca43b150c150310f5229fb4c4767c49b3dc2e7ae2299b3e35a2801b71c20bc4",
+          "paragraphs": [
+            649,
+            657
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-05",
+          "paragraph": 752,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-06",
+          "paragraph": 835,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-06",
+          "paragraph": 841,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-06",
+          "speaker": "CAESAR",
+          "text_sha256": "e88329899f94fb517b75395c4abc1b57fcb5c9d8392650ccea1e9c4da4bd76aa",
+          "paragraphs": [
+            825,
+            843
+          ],
+          "line_numbers": [
+            1,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-06",
+          "speaker": "ANTONIUS",
+          "text_sha256": "47cc91fb624d92c266ea2fcc4c8950e797bcd0327cb69e75b50db8a252d4ef67",
+          "paragraphs": [
+            827,
+            839
+          ],
+          "line_numbers": [
+            2,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-06",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            835,
+            841
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-07",
+          "paragraph": 916,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-07",
+          "paragraph": 924,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-07",
+          "paragraph": 930,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-07",
+          "speaker": "CAESAR",
+          "text_sha256": "e88329899f94fb517b75395c4abc1b57fcb5c9d8392650ccea1e9c4da4bd76aa",
+          "paragraphs": [
+            914,
+            926
+          ],
+          "line_numbers": [
+            1,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-07",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            916,
+            924
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-07",
+          "speaker": "CAESAR",
+          "text_sha256": "95782b1e519f31fdf4130c7db5fe04a869e8cfd99c96c5d3eb79be74fb5dc833",
+          "paragraphs": [
+            918,
+            922
+          ],
+          "line_numbers": [
+            3,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-07",
+          "speaker": "SPIELER",
+          "text_sha256": "6a315696c0c2cd0d6042cec75cb1dcb03bf731df53d0f7fd758f96d551652180",
+          "paragraphs": [
+            920,
+            928
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-08",
+          "paragraph": 1019,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-08",
+          "speaker": "CICERO",
+          "text_sha256": "1f7d9675b6e0e89afe9daa8626a87e3673c06c3854c4cbebbe8d66c965840c3b",
+          "paragraphs": [
+            1005,
+            1013
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-09",
+          "speaker": "SERRANUS",
+          "text_sha256": "e38fcc1465f0c4b4d57080983ac2b6e5c94a7474622e465b533edda389218302",
+          "paragraphs": [
+            1093,
+            1099
+          ],
+          "line_numbers": [
+            1,
+            4
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-09",
+          "speaker": "SPIELER",
+          "text_sha256": "450b5eb4839e861a02e0f05eac671d4fd0c97ca81108e6bed22fc46bafba37d0",
+          "paragraphs": [
+            1103,
+            1109
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-09",
+          "speaker": "SERRANUS",
+          "text_sha256": "ca258bf68f84e29d453f55484398f771250743c6dbecac6929b8830e41252205",
+          "paragraphs": [
+            1105,
+            1111
+          ],
+          "line_numbers": [
+            7,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-10",
+          "paragraph": 1184,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-10",
+          "paragraph": 1192,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-10",
+          "paragraph": 1198,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-10",
+          "speaker": "CAESAR",
+          "text_sha256": "95782b1e519f31fdf4130c7db5fe04a869e8cfd99c96c5d3eb79be74fb5dc833",
+          "paragraphs": [
+            1182,
+            1190
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-10",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1184,
+            1192
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-10",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            1188,
+            1200
+          ],
+          "line_numbers": [
+            4,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-11",
+          "paragraph": 1281,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-11",
+          "paragraph": 1287,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-11",
+          "speaker": "CAESAR",
+          "text_sha256": "e88329899f94fb517b75395c4abc1b57fcb5c9d8392650ccea1e9c4da4bd76aa",
+          "paragraphs": [
+            1271,
+            1277
+          ],
+          "line_numbers": [
+            1,
+            4
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-11",
+          "speaker": "MARCUS",
+          "text_sha256": "58618f1ca1db63615435a31ebf1bb49b64b070646f152b67560ed3da32ab134c",
+          "paragraphs": [
+            1273,
+            1285
+          ],
+          "line_numbers": [
+            2,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-11",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1281,
+            1287
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-11",
+          "speaker": "CAESAR",
+          "text_sha256": "35f789ddd4ae45a31a0b99eff59e7fb109b81e3e87f2de3f164277802bd90f89",
+          "paragraphs": [
+            1283,
+            1289
+          ],
+          "line_numbers": [
+            7,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-12",
+          "paragraph": 1364,
+          "line_number": 2,
+          "markers": [
+            "relationship_meter"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-12",
+          "paragraph": 1372,
+          "line_number": 6,
+          "markers": [
+            "relationship_meter"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-12",
+          "speaker": "MARCUS",
+          "text_sha256": "4df5db7b2801e9cd947f9be862fd76d6c4e1164a4663062843985ce755ccfc73",
+          "paragraphs": [
+            1362,
+            1366,
+            1374,
+            1378
+          ],
+          "line_numbers": [
+            1,
+            3,
+            7,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-12",
+          "speaker": "SPIELER",
+          "text_sha256": "83a7c446fa7a232f5f110d0808a574cf9247f4310022e91fccf3e64fd34c8750",
+          "paragraphs": [
+            1364,
+            1372
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-12",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            1368,
+            1376
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-13",
+          "speaker": "CAESAR",
+          "text_sha256": "e88329899f94fb517b75395c4abc1b57fcb5c9d8392650ccea1e9c4da4bd76aa",
+          "paragraphs": [
+            1451,
+            1463,
+            1469
+          ],
+          "line_numbers": [
+            1,
+            7,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-13",
+          "speaker": "ANTONIUS",
+          "text_sha256": "359499cc0de766311829d97327fc2cd393d48c4a38a58055ddece8f447a5e1f9",
+          "paragraphs": [
+            1453,
+            1465
+          ],
+          "line_numbers": [
+            2,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-13",
+          "speaker": "SPIELER",
+          "text_sha256": "2c9334c64000016a488221e774b99c1edb76f3d458286b7cc8292f833de5ae75",
+          "paragraphs": [
+            1461,
+            1467
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-14",
+          "paragraph": 1556,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-14",
+          "speaker": "POMPEIUS",
+          "text_sha256": "999c96a948f4b4f78d7f1de664742075a8b441fbf1e9a42932efc07226869a67",
+          "paragraphs": [
+            1542,
+            1550
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-15",
+          "paragraph": 1639,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-15",
+          "paragraph": 1645,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-15",
+          "speaker": "CAESAR",
+          "text_sha256": "e88329899f94fb517b75395c4abc1b57fcb5c9d8392650ccea1e9c4da4bd76aa",
+          "paragraphs": [
+            1629,
+            1647
+          ],
+          "line_numbers": [
+            1,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-15",
+          "speaker": "MARCUS",
+          "text_sha256": "dd64f4e1b3c452263944532ead5c21534f9f86d2b81974014f413e2eb5294224",
+          "paragraphs": [
+            1631,
+            1637,
+            1643
+          ],
+          "line_numbers": [
+            2,
+            5,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-15",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1639,
+            1645
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-16",
+          "speaker": "MARCUS",
+          "text_sha256": "58618f1ca1db63615435a31ebf1bb49b64b070646f152b67560ed3da32ab134c",
+          "paragraphs": [
+            1724,
+            1734
+          ],
+          "line_numbers": [
+            4,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-17",
+          "paragraph": 1809,
+          "line_number": 2,
+          "markers": [
+            "event_ledger"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-17",
+          "paragraph": 1817,
+          "line_number": 6,
+          "markers": [
+            "event_ledger"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-17",
+          "paragraph": 1823,
+          "line_number": 9,
+          "markers": [
+            "event_ledger"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-17",
+          "speaker": "POMPEIUS",
+          "text_sha256": "28f117fe92debdbff32206b24e82231ff1263ebc30168f7edbfd6bcf96483cc3",
+          "paragraphs": [
+            1813,
+            1819
+          ],
+          "line_numbers": [
+            4,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-17",
+          "speaker": "SPIELER",
+          "text_sha256": "b25955b23b344648a3106e34ed40f2467a0be43ea91ea99f1f713f536754ed69",
+          "paragraphs": [
+            1817,
+            1823
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-18",
+          "paragraph": 1898,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-18",
+          "paragraph": 1906,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-18",
+          "speaker": "POMPEIUS",
+          "text_sha256": "0317b5d72cad42d019a3b64478b35b1f01c230a2e730b7d991eca4d1b4d90c4d",
+          "paragraphs": [
+            1896,
+            1904
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-18",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1898,
+            1906
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-18",
+          "speaker": "POMPEIUS",
+          "text_sha256": "999c96a948f4b4f78d7f1de664742075a8b441fbf1e9a42932efc07226869a67",
+          "paragraphs": [
+            1900,
+            1912
+          ],
+          "line_numbers": [
+            3,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-19",
+          "paragraph": 1987,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-19",
+          "paragraph": 1995,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-19",
+          "speaker": "POMPEIUS",
+          "text_sha256": "28f117fe92debdbff32206b24e82231ff1263ebc30168f7edbfd6bcf96483cc3",
+          "paragraphs": [
+            1985,
+            1993
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-19",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1987,
+            1995
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-19",
+          "speaker": "POMPEIUS",
+          "text_sha256": "999c96a948f4b4f78d7f1de664742075a8b441fbf1e9a42932efc07226869a67",
+          "paragraphs": [
+            1997,
+            2001
+          ],
+          "line_numbers": [
+            7,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-19",
+          "speaker": "SPIELER",
+          "text_sha256": "6a315696c0c2cd0d6042cec75cb1dcb03bf731df53d0f7fd758f96d551652180",
+          "paragraphs": [
+            1999,
+            2003
+          ],
+          "line_numbers": [
+            8,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-20",
+          "paragraph": 2084,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-20",
+          "paragraph": 2090,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-20",
+          "speaker": "CAESAR",
+          "text_sha256": "95782b1e519f31fdf4130c7db5fe04a869e8cfd99c96c5d3eb79be74fb5dc833",
+          "paragraphs": [
+            2074,
+            2080
+          ],
+          "line_numbers": [
+            1,
+            4
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-20",
+          "speaker": "KLEOPATRA",
+          "text_sha256": "cfe81f3e009c7d303fe8cff076587c193ce68e7bf0437abd22af000b43c6a1fc",
+          "paragraphs": [
+            2076,
+            2088
+          ],
+          "line_numbers": [
+            2,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-20",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            2084,
+            2090
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-20",
+          "speaker": "CAESAR",
+          "text_sha256": "e88329899f94fb517b75395c4abc1b57fcb5c9d8392650ccea1e9c4da4bd76aa",
+          "paragraphs": [
+            2086,
+            2092
+          ],
+          "line_numbers": [
+            7,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-21",
+          "speaker": "KLEOPATRA",
+          "text_sha256": "e3cb801701532a22f739c3eb5d83902478943a99a77bd367dfd8b3ca939b1866",
+          "paragraphs": [
+            2164,
+            2170
+          ],
+          "line_numbers": [
+            1,
+            4
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-21",
+          "speaker": "CAESAR",
+          "text_sha256": "e88329899f94fb517b75395c4abc1b57fcb5c9d8392650ccea1e9c4da4bd76aa",
+          "paragraphs": [
+            2172,
+            2178
+          ],
+          "line_numbers": [
+            5,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-21",
+          "speaker": "SPIELER",
+          "text_sha256": "9f0b84d6a1ddb33ded0268004f073216f7b17e7fc730507799ec53a1a15189e9",
+          "paragraphs": [
+            2174,
+            2180
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-21",
+          "speaker": "KLEOPATRA",
+          "text_sha256": "cfe81f3e009c7d303fe8cff076587c193ce68e7bf0437abd22af000b43c6a1fc",
+          "paragraphs": [
+            2176,
+            2182
+          ],
+          "line_numbers": [
+            7,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-22",
+          "paragraph": 2264,
+          "line_number": 6,
+          "markers": [
+            "event_ledger"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-22",
+          "paragraph": 2270,
+          "line_number": 9,
+          "markers": [
+            "event_ledger"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-22",
+          "speaker": "SERRANUS",
+          "text_sha256": "e38fcc1465f0c4b4d57080983ac2b6e5c94a7474622e465b533edda389218302",
+          "paragraphs": [
+            2254,
+            2266,
+            2272
+          ],
+          "line_numbers": [
+            1,
+            7,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-22",
+          "speaker": "SPIELER",
+          "text_sha256": "b25955b23b344648a3106e34ed40f2467a0be43ea91ea99f1f713f536754ed69",
+          "paragraphs": [
+            2264,
+            2270
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-23",
+          "paragraph": 2359,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-23",
+          "speaker": "KLEOPATRA",
+          "text_sha256": "e3cb801701532a22f739c3eb5d83902478943a99a77bd367dfd8b3ca939b1866",
+          "paragraphs": [
+            2345,
+            2353
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-24",
+          "paragraph": 2442,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "II-24",
+          "paragraph": 2448,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-24",
+          "speaker": "CAESAR",
+          "text_sha256": "95782b1e519f31fdf4130c7db5fe04a869e8cfd99c96c5d3eb79be74fb5dc833",
+          "paragraphs": [
+            2432,
+            2444
+          ],
+          "line_numbers": [
+            1,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-24",
+          "speaker": "KLEOPATRA",
+          "text_sha256": "d2ab756d6a8975d42542bf52576567d5841a164014c1510106641b1da27f82fe",
+          "paragraphs": [
+            2434,
+            2440
+          ],
+          "line_numbers": [
+            2,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "II-24",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            2442,
+            2448
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "band": 3,
+      "file_name": "04-IMPERATHEN_Drehbuch_Band_3_DIE_IDEN-1-.docx",
+      "registry_source_file": "IMPERATHEN_Drehbuch_Band_3_DIE_IDEN(1).docx",
+      "sha256": "ed597fcb569083e1bc130194003d9ec2a55d8e4f22b28c11fa65d05920ffe3d2",
+      "paragraphs": 2905,
+      "words": 50024,
+      "main_missions": [
+        {
+          "id": "III-00",
+          "paragraph": 246,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 8,
+          "repeated_line_instances": 2
+        },
+        {
+          "id": "III-01",
+          "paragraph": 335,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "III-02",
+          "paragraph": 425,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 5,
+          "repeated_line_instances": 5
+        },
+        {
+          "id": "III-03",
+          "paragraph": 514,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "III-04",
+          "paragraph": 603,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-05",
+          "paragraph": 692,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-06",
+          "paragraph": 781,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-07",
+          "paragraph": 870,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "III-08",
+          "paragraph": 959,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 8,
+          "repeated_line_instances": 2
+        },
+        {
+          "id": "III-09",
+          "paragraph": 1048,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-10",
+          "paragraph": 1137,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-11",
+          "paragraph": 1226,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-12",
+          "paragraph": 1315,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "III-13",
+          "paragraph": 1405,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 8,
+          "repeated_line_instances": 2
+        },
+        {
+          "id": "III-14",
+          "paragraph": 1494,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-15",
+          "paragraph": 1585,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-16",
+          "paragraph": 1676,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 4,
+          "repeated_line_instances": 6
+        },
+        {
+          "id": "III-17",
+          "paragraph": 1766,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "III-18",
+          "paragraph": 1855,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 5,
+          "repeated_line_instances": 5
+        },
+        {
+          "id": "III-19",
+          "paragraph": 1944,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-20",
+          "paragraph": 2033,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-21",
+          "paragraph": 2122,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "III-22",
+          "paragraph": 2211,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 8,
+          "repeated_line_instances": 2
+        },
+        {
+          "id": "III-23",
+          "paragraph": 2300,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "III-24",
+          "paragraph": 2389,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        }
+      ],
+      "side_quests": [
+        {
+          "id": "NQ-3-01",
+          "paragraph": 2482
+        },
+        {
+          "id": "NQ-3-02",
+          "paragraph": 2499
+        },
+        {
+          "id": "NQ-3-03",
+          "paragraph": 2516
+        },
+        {
+          "id": "NQ-3-04",
+          "paragraph": 2533
+        },
+        {
+          "id": "NQ-3-05",
+          "paragraph": 2550
+        },
+        {
+          "id": "NQ-3-06",
+          "paragraph": 2567
+        },
+        {
+          "id": "NQ-3-07",
+          "paragraph": 2584
+        },
+        {
+          "id": "NQ-3-08",
+          "paragraph": 2601
+        },
+        {
+          "id": "NQ-3-09",
+          "paragraph": 2618
+        },
+        {
+          "id": "NQ-3-10",
+          "paragraph": 2635
+        },
+        {
+          "id": "NQ-3-11",
+          "paragraph": 2652
+        },
+        {
+          "id": "NQ-3-12",
+          "paragraph": 2669
+        },
+        {
+          "id": "NQ-3-13",
+          "paragraph": 2686
+        },
+        {
+          "id": "NQ-3-14",
+          "paragraph": 2703
+        },
+        {
+          "id": "NQ-3-15",
+          "paragraph": 2720
+        },
+        {
+          "id": "NQ-3-16",
+          "paragraph": 2737
+        },
+        {
+          "id": "NQ-3-17",
+          "paragraph": 2754
+        },
+        {
+          "id": "NQ-3-18",
+          "paragraph": 2771
+        },
+        {
+          "id": "NQ-3-19",
+          "paragraph": 2788
+        },
+        {
+          "id": "NQ-3-20",
+          "paragraph": 2805
+        },
+        {
+          "id": "NQ-3-21",
+          "paragraph": 2822
+        },
+        {
+          "id": "NQ-3-22",
+          "paragraph": 2839
+        },
+        {
+          "id": "NQ-3-23",
+          "paragraph": 2856
+        },
+        {
+          "id": "NQ-3-24",
+          "paragraph": 2873
+        }
+      ],
+      "findings": [
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-00",
+          "speaker": "SPIELER",
+          "text_sha256": "daf6fedd0639252170fc0b0231f61a86fcce2f9c0cc7acf5b27a709b8f2eaf5f",
+          "paragraphs": [
+            297,
+            305
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-00",
+          "speaker": "CAESAR",
+          "text_sha256": "95782b1e519f31fdf4130c7db5fe04a869e8cfd99c96c5d3eb79be74fb5dc833",
+          "paragraphs": [
+            299,
+            303
+          ],
+          "line_numbers": [
+            3,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-01",
+          "speaker": "ANTONIUS",
+          "text_sha256": "2287d46b123bdb65cd87344624b84d9f849d936ca355168273e794e672b59ca7",
+          "paragraphs": [
+            387,
+            403
+          ],
+          "line_numbers": [
+            2,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-02",
+          "paragraph": 476,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-02",
+          "paragraph": 484,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-02",
+          "paragraph": 490,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-02",
+          "speaker": "CAESAR",
+          "text_sha256": "35f789ddd4ae45a31a0b99eff59e7fb109b81e3e87f2de3f164277802bd90f89",
+          "paragraphs": [
+            474,
+            478
+          ],
+          "line_numbers": [
+            1,
+            3
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-02",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            476,
+            484
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-02",
+          "speaker": "SPIELER",
+          "text_sha256": "5a9ec277e94cde70d67e5356cfaa30ef432b07d728ac061e165da3156d7e90a5",
+          "paragraphs": [
+            480,
+            488,
+            492
+          ],
+          "line_numbers": [
+            4,
+            8,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-02",
+          "speaker": "CAESAR",
+          "text_sha256": "e88329899f94fb517b75395c4abc1b57fcb5c9d8392650ccea1e9c4da4bd76aa",
+          "paragraphs": [
+            482,
+            486
+          ],
+          "line_numbers": [
+            5,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-03",
+          "speaker": "SPIELER",
+          "text_sha256": "daf6fedd0639252170fc0b0231f61a86fcce2f9c0cc7acf5b27a709b8f2eaf5f",
+          "paragraphs": [
+            565,
+            573
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-03",
+          "speaker": "CAESAR",
+          "text_sha256": "35f789ddd4ae45a31a0b99eff59e7fb109b81e3e87f2de3f164277802bd90f89",
+          "paragraphs": [
+            567,
+            575
+          ],
+          "line_numbers": [
+            3,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-03",
+          "speaker": "SPIELER",
+          "text_sha256": "6a315696c0c2cd0d6042cec75cb1dcb03bf731df53d0f7fd758f96d551652180",
+          "paragraphs": [
+            569,
+            581
+          ],
+          "line_numbers": [
+            4,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-04",
+          "paragraph": 654,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-04",
+          "paragraph": 662,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-04",
+          "speaker": "CICERO",
+          "text_sha256": "1905792d6999a3ffa8273151fd4e049d7f1cfc59fadf97f55e84110687e0f496",
+          "paragraphs": [
+            652,
+            664,
+            668
+          ],
+          "line_numbers": [
+            1,
+            7,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-04",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            654,
+            662
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-04",
+          "speaker": "CICERO",
+          "text_sha256": "b66a7cf8b843ec71ad85c819ece90039115505faaed555ea0634745137554011",
+          "paragraphs": [
+            656,
+            660
+          ],
+          "line_numbers": [
+            3,
+            5
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-05",
+          "paragraph": 743,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-05",
+          "paragraph": 751,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-05",
+          "paragraph": 757,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-05",
+          "speaker": "CAESAR",
+          "text_sha256": "95782b1e519f31fdf4130c7db5fe04a869e8cfd99c96c5d3eb79be74fb5dc833",
+          "paragraphs": [
+            741,
+            753,
+            759
+          ],
+          "line_numbers": [
+            1,
+            7,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-05",
+          "speaker": "LABIENUS",
+          "text_sha256": "dfe8e244f59306d431e63996af4ace829a0861d1be570287f861ac26e5478884",
+          "paragraphs": [
+            749,
+            755
+          ],
+          "line_numbers": [
+            5,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-05",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            751,
+            757
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-06",
+          "speaker": "CAESAR",
+          "text_sha256": "35f789ddd4ae45a31a0b99eff59e7fb109b81e3e87f2de3f164277802bd90f89",
+          "paragraphs": [
+            830,
+            838
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-06",
+          "speaker": "LABIENUS",
+          "text_sha256": "8a935500d7e19034731eefea4c14f5e0e169265866a136f050f844d1557528ad",
+          "paragraphs": [
+            832,
+            840
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-06",
+          "speaker": "MARCUS",
+          "text_sha256": "58618f1ca1db63615435a31ebf1bb49b64b070646f152b67560ed3da32ab134c",
+          "paragraphs": [
+            834,
+            842
+          ],
+          "line_numbers": [
+            3,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-06",
+          "speaker": "SPIELER",
+          "text_sha256": "6a315696c0c2cd0d6042cec75cb1dcb03bf731df53d0f7fd758f96d551652180",
+          "paragraphs": [
+            836,
+            844
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-07",
+          "speaker": "CASSIA",
+          "text_sha256": "92e76514f88874ce5ccf2a4e05952fb6c7cdfb3d0170999a6403284db70ce20b",
+          "paragraphs": [
+            921,
+            929
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-08",
+          "paragraph": 1018,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-08",
+          "paragraph": 1024,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-08",
+          "speaker": "SERRANUS",
+          "text_sha256": "e38fcc1465f0c4b4d57080983ac2b6e5c94a7474622e465b533edda389218302",
+          "paragraphs": [
+            1008,
+            1026
+          ],
+          "line_numbers": [
+            1,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-08",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1018,
+            1024
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-09",
+          "paragraph": 1099,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-09",
+          "paragraph": 1107,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-09",
+          "speaker": "SERRANUS",
+          "text_sha256": "e38fcc1465f0c4b4d57080983ac2b6e5c94a7474622e465b533edda389218302",
+          "paragraphs": [
+            1097,
+            1101
+          ],
+          "line_numbers": [
+            1,
+            3
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-09",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1099,
+            1107
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-09",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            1103,
+            1115
+          ],
+          "line_numbers": [
+            4,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-09",
+          "speaker": "SERRANUS",
+          "text_sha256": "ca258bf68f84e29d453f55484398f771250743c6dbecac6929b8830e41252205",
+          "paragraphs": [
+            1105,
+            1109
+          ],
+          "line_numbers": [
+            5,
+            7
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-10",
+          "paragraph": 1196,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-10",
+          "paragraph": 1202,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-10",
+          "speaker": "SERRANUS",
+          "text_sha256": "ca258bf68f84e29d453f55484398f771250743c6dbecac6929b8830e41252205",
+          "paragraphs": [
+            1186,
+            1192,
+            1204
+          ],
+          "line_numbers": [
+            1,
+            4,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-10",
+          "speaker": "CASSIA",
+          "text_sha256": "92e76514f88874ce5ccf2a4e05952fb6c7cdfb3d0170999a6403284db70ce20b",
+          "paragraphs": [
+            1194,
+            1200
+          ],
+          "line_numbers": [
+            5,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-10",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1196,
+            1202
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-11",
+          "paragraph": 1285,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-11",
+          "paragraph": 1291,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-11",
+          "speaker": "JULIA",
+          "text_sha256": "09ec764a6d8d46fd7470bb1a71e4767882df8655d9a777bef6fd8a7a1949b766",
+          "paragraphs": [
+            1275,
+            1281,
+            1287
+          ],
+          "line_numbers": [
+            1,
+            4,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-11",
+          "speaker": "MARCUS",
+          "text_sha256": "58618f1ca1db63615435a31ebf1bb49b64b070646f152b67560ed3da32ab134c",
+          "paragraphs": [
+            1283,
+            1289
+          ],
+          "line_numbers": [
+            5,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-11",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1285,
+            1291
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-12",
+          "speaker": "CAESAR",
+          "text_sha256": "95782b1e519f31fdf4130c7db5fe04a869e8cfd99c96c5d3eb79be74fb5dc833",
+          "paragraphs": [
+            1365,
+            1373
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-12",
+          "speaker": "ANTONIUS",
+          "text_sha256": "359499cc0de766311829d97327fc2cd393d48c4a38a58055ddece8f447a5e1f9",
+          "paragraphs": [
+            1367,
+            1375,
+            1383
+          ],
+          "line_numbers": [
+            2,
+            6,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-13",
+          "paragraph": 1456,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-13",
+          "paragraph": 1464,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-13",
+          "paragraph": 1470,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-13",
+          "speaker": "CAESAR",
+          "text_sha256": "35f789ddd4ae45a31a0b99eff59e7fb109b81e3e87f2de3f164277802bd90f89",
+          "paragraphs": [
+            1454,
+            1462
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-13",
+          "speaker": "DECIMUS",
+          "text_sha256": "fba9334a53075a3cd869558e727dfc98e11c0f107921a926fb49c2e814c87e15",
+          "paragraphs": [
+            1456,
+            1464
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-14",
+          "paragraph": 1547,
+          "line_number": 2,
+          "markers": [
+            "relationship_meter"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-14",
+          "paragraph": 1555,
+          "line_number": 6,
+          "markers": [
+            "relationship_meter"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-14",
+          "speaker": "MARCUS",
+          "text_sha256": "dd64f4e1b3c452263944532ead5c21534f9f86d2b81974014f413e2eb5294224",
+          "paragraphs": [
+            1545,
+            1553,
+            1561
+          ],
+          "line_numbers": [
+            1,
+            5,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-14",
+          "speaker": "SPIELER",
+          "text_sha256": "83a7c446fa7a232f5f110d0808a574cf9247f4310022e91fccf3e64fd34c8750",
+          "paragraphs": [
+            1547,
+            1555
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-14",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            1559,
+            1563
+          ],
+          "line_numbers": [
+            8,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-15",
+          "paragraph": 1638,
+          "line_number": 2,
+          "markers": [
+            "relationship_meter"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-15",
+          "paragraph": 1646,
+          "line_number": 6,
+          "markers": [
+            "relationship_meter"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-15",
+          "speaker": "JULIA",
+          "text_sha256": "1d974e1ff308b3bec2e7ec462e65c645bb5421bc76f63c57faced48731952f40",
+          "paragraphs": [
+            1636,
+            1644
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-15",
+          "speaker": "SPIELER",
+          "text_sha256": "83a7c446fa7a232f5f110d0808a574cf9247f4310022e91fccf3e64fd34c8750",
+          "paragraphs": [
+            1638,
+            1646
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-15",
+          "speaker": "SPIELER",
+          "text_sha256": "6a315696c0c2cd0d6042cec75cb1dcb03bf731df53d0f7fd758f96d551652180",
+          "paragraphs": [
+            1642,
+            1650
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-15",
+          "speaker": "JULIA",
+          "text_sha256": "41c249a4bd29fbff8e82c7decfdc626c25f7aac8b784e765d37ceb4c6705064d",
+          "paragraphs": [
+            1648,
+            1652
+          ],
+          "line_numbers": [
+            7,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-16",
+          "speaker": "ANTONIUS",
+          "text_sha256": "2287d46b123bdb65cd87344624b84d9f849d936ca355168273e794e672b59ca7",
+          "paragraphs": [
+            1726,
+            1732,
+            1738,
+            1744
+          ],
+          "line_numbers": [
+            1,
+            4,
+            7,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-16",
+          "speaker": "CICERO",
+          "text_sha256": "1905792d6999a3ffa8273151fd4e049d7f1cfc59fadf97f55e84110687e0f496",
+          "paragraphs": [
+            1728,
+            1734,
+            1740
+          ],
+          "line_numbers": [
+            2,
+            5,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-16",
+          "speaker": "SPIELER",
+          "text_sha256": "9f0b84d6a1ddb33ded0268004f073216f7b17e7fc730507799ec53a1a15189e9",
+          "paragraphs": [
+            1736,
+            1742
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-17",
+          "paragraph": 1825,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-17",
+          "paragraph": 1831,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-17",
+          "speaker": "BRUTUS",
+          "text_sha256": "b515d7986c23904176b92e86116797ae75f2ec62e0653487c2a1bf52165fbc3e",
+          "paragraphs": [
+            1815,
+            1833
+          ],
+          "line_numbers": [
+            1,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-17",
+          "speaker": "BRUTUS",
+          "text_sha256": "ca7175879bbb24297ae08a491ce2ba70fb1ed041ad5bc0bc3b1897d2e2b2f910",
+          "paragraphs": [
+            1821,
+            1827
+          ],
+          "line_numbers": [
+            4,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-17",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1825,
+            1831
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-18",
+          "paragraph": 1906,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-18",
+          "paragraph": 1914,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-18",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1906,
+            1914
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-18",
+          "speaker": "BRUTUS",
+          "text_sha256": "ca7175879bbb24297ae08a491ce2ba70fb1ed041ad5bc0bc3b1897d2e2b2f910",
+          "paragraphs": [
+            1908,
+            1912,
+            1916,
+            1920
+          ],
+          "line_numbers": [
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-18",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            1918,
+            1922
+          ],
+          "line_numbers": [
+            8,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-19",
+          "paragraph": 1995,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-19",
+          "paragraph": 2003,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-19",
+          "speaker": "CASSIUS",
+          "text_sha256": "26475d5649d6fa4acb8ee6fd758bb021025ea7955c8ed4d87a6862b364cf3523",
+          "paragraphs": [
+            1993,
+            2001,
+            2009
+          ],
+          "line_numbers": [
+            1,
+            5,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-19",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1995,
+            2003
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-19",
+          "speaker": "CASSIUS",
+          "text_sha256": "3c27e9866d4e70cde012fa7dfb8835cd4026fb1c953e1032fc5d950910e14e79",
+          "paragraphs": [
+            1997,
+            2005
+          ],
+          "line_numbers": [
+            3,
+            7
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-20",
+          "paragraph": 2084,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-20",
+          "paragraph": 2092,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-20",
+          "paragraph": 2098,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-20",
+          "speaker": "ANTONIUS",
+          "text_sha256": "2287d46b123bdb65cd87344624b84d9f849d936ca355168273e794e672b59ca7",
+          "paragraphs": [
+            2082,
+            2088
+          ],
+          "line_numbers": [
+            1,
+            4
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-20",
+          "speaker": "CAESAR",
+          "text_sha256": "35f789ddd4ae45a31a0b99eff59e7fb109b81e3e87f2de3f164277802bd90f89",
+          "paragraphs": [
+            2090,
+            2096
+          ],
+          "line_numbers": [
+            5,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-20",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            2092,
+            2098
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-20",
+          "speaker": "ANTONIUS",
+          "text_sha256": "359499cc0de766311829d97327fc2cd393d48c4a38a58055ddece8f447a5e1f9",
+          "paragraphs": [
+            2094,
+            2100
+          ],
+          "line_numbers": [
+            7,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-21",
+          "paragraph": 2181,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-21",
+          "paragraph": 2187,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-21",
+          "speaker": "CAESAR",
+          "text_sha256": "e88329899f94fb517b75395c4abc1b57fcb5c9d8392650ccea1e9c4da4bd76aa",
+          "paragraphs": [
+            2171,
+            2177
+          ],
+          "line_numbers": [
+            1,
+            4
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-21",
+          "speaker": "MARCUS",
+          "text_sha256": "58618f1ca1db63615435a31ebf1bb49b64b070646f152b67560ed3da32ab134c",
+          "paragraphs": [
+            2179,
+            2185
+          ],
+          "line_numbers": [
+            5,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-21",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            2181,
+            2187
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-21",
+          "speaker": "CAESAR",
+          "text_sha256": "35f789ddd4ae45a31a0b99eff59e7fb109b81e3e87f2de3f164277802bd90f89",
+          "paragraphs": [
+            2183,
+            2189
+          ],
+          "line_numbers": [
+            7,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-22",
+          "paragraph": 2270,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-22",
+          "speaker": "CAESAR",
+          "text_sha256": "e88329899f94fb517b75395c4abc1b57fcb5c9d8392650ccea1e9c4da4bd76aa",
+          "paragraphs": [
+            2260,
+            2272
+          ],
+          "line_numbers": [
+            1,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-22",
+          "speaker": "CALPURNIA",
+          "text_sha256": "bf18962c15dcc372e01382eed4ad41635b91c45d3a95ef8a7f37f958040ca071",
+          "paragraphs": [
+            2262,
+            2274
+          ],
+          "line_numbers": [
+            2,
+            8
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "III-23",
+          "paragraph": 2365,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-23",
+          "speaker": "CAESAR",
+          "text_sha256": "35f789ddd4ae45a31a0b99eff59e7fb109b81e3e87f2de3f164277802bd90f89",
+          "paragraphs": [
+            2349,
+            2357
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-23",
+          "speaker": "BRUTUS",
+          "text_sha256": "497419b5379a738e50b94308b5da0e92dccdc681aab24763c7ce9cd6049e2a10",
+          "paragraphs": [
+            2351,
+            2359,
+            2367
+          ],
+          "line_numbers": [
+            2,
+            6,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "III-24",
+          "speaker": "ANTONIUS",
+          "text_sha256": "359499cc0de766311829d97327fc2cd393d48c4a38a58055ddece8f447a5e1f9",
+          "paragraphs": [
+            2439,
+            2449
+          ],
+          "line_numbers": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "band": 4,
+      "file_name": "05-IMPERATHEN_Drehbuch_Band_4_DAS_REICH_DANACH-1-.docx",
+      "registry_source_file": "IMPERATHEN_Drehbuch_Band_4_DAS_REICH_DANACH(1).docx",
+      "sha256": "608ff71e62c70926227a0544582d2ed2cbe415e2630b35df948b9df5a1bf768a",
+      "paragraphs": 3458,
+      "words": 59368,
+      "main_missions": [
+        {
+          "id": "IV-00",
+          "paragraph": 271,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 10,
+          "repeated_line_instances": 0
+        },
+        {
+          "id": "IV-01",
+          "paragraph": 361,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "IV-02",
+          "paragraph": 450,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 4,
+          "repeated_line_instances": 6
+        },
+        {
+          "id": "IV-03",
+          "paragraph": 539,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "IV-04",
+          "paragraph": 628,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 8,
+          "repeated_line_instances": 2
+        },
+        {
+          "id": "IV-05",
+          "paragraph": 717,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "IV-06",
+          "paragraph": 806,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "IV-07",
+          "paragraph": 895,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "IV-08",
+          "paragraph": 984,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 8,
+          "repeated_line_instances": 2
+        },
+        {
+          "id": "IV-09",
+          "paragraph": 1073,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 10,
+          "repeated_line_instances": 0
+        },
+        {
+          "id": "IV-10",
+          "paragraph": 1162,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "IV-11",
+          "paragraph": 1251,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 8,
+          "repeated_line_instances": 2
+        },
+        {
+          "id": "IV-12",
+          "paragraph": 1340,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "IV-13",
+          "paragraph": 1429,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 3,
+          "repeated_line_instances": 7
+        },
+        {
+          "id": "IV-14",
+          "paragraph": 1518,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "IV-15",
+          "paragraph": 1609,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 5,
+          "repeated_line_instances": 5
+        },
+        {
+          "id": "IV-16",
+          "paragraph": 1698,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 5,
+          "repeated_line_instances": 5
+        },
+        {
+          "id": "IV-17",
+          "paragraph": 1787,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "IV-18",
+          "paragraph": 1876,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "IV-19",
+          "paragraph": 1965,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 10,
+          "repeated_line_instances": 0
+        },
+        {
+          "id": "IV-20",
+          "paragraph": 2054,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "IV-21",
+          "paragraph": 2143,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "IV-22",
+          "paragraph": 2232,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 4,
+          "repeated_line_instances": 6
+        },
+        {
+          "id": "IV-23",
+          "paragraph": 2321,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "IV-24",
+          "paragraph": 2410,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 4,
+          "repeated_line_instances": 6
+        },
+        {
+          "id": "IV-25",
+          "paragraph": 2499,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "IV-26",
+          "paragraph": 2585,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "IV-27",
+          "paragraph": 2676,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 6,
+          "repeated_line_instances": 4
+        },
+        {
+          "id": "IV-28",
+          "paragraph": 2765,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 9,
+          "repeated_line_instances": 1
+        },
+        {
+          "id": "IV-29",
+          "paragraph": 2854,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 7,
+          "repeated_line_instances": 3
+        },
+        {
+          "id": "IV-30",
+          "paragraph": 2943,
+          "dialogue_lines": 10,
+          "distinct_speaker_lines": 4,
+          "repeated_line_instances": 6
+        }
+      ],
+      "side_quests": [
+        {
+          "id": "NQ-4-01",
+          "paragraph": 3035
+        },
+        {
+          "id": "NQ-4-02",
+          "paragraph": 3052
+        },
+        {
+          "id": "NQ-4-03",
+          "paragraph": 3069
+        },
+        {
+          "id": "NQ-4-04",
+          "paragraph": 3086
+        },
+        {
+          "id": "NQ-4-05",
+          "paragraph": 3103
+        },
+        {
+          "id": "NQ-4-06",
+          "paragraph": 3120
+        },
+        {
+          "id": "NQ-4-07",
+          "paragraph": 3137
+        },
+        {
+          "id": "NQ-4-08",
+          "paragraph": 3154
+        },
+        {
+          "id": "NQ-4-09",
+          "paragraph": 3171
+        },
+        {
+          "id": "NQ-4-10",
+          "paragraph": 3188
+        },
+        {
+          "id": "NQ-4-11",
+          "paragraph": 3205
+        },
+        {
+          "id": "NQ-4-12",
+          "paragraph": 3222
+        },
+        {
+          "id": "NQ-4-13",
+          "paragraph": 3239
+        },
+        {
+          "id": "NQ-4-14",
+          "paragraph": 3256
+        },
+        {
+          "id": "NQ-4-15",
+          "paragraph": 3273
+        },
+        {
+          "id": "NQ-4-16",
+          "paragraph": 3290
+        },
+        {
+          "id": "NQ-4-17",
+          "paragraph": 3307
+        },
+        {
+          "id": "NQ-4-18",
+          "paragraph": 3324
+        },
+        {
+          "id": "NQ-4-19",
+          "paragraph": 3341
+        },
+        {
+          "id": "NQ-4-20",
+          "paragraph": 3358
+        },
+        {
+          "id": "NQ-4-21",
+          "paragraph": 3375
+        },
+        {
+          "id": "NQ-4-22",
+          "paragraph": 3392
+        },
+        {
+          "id": "NQ-4-23",
+          "paragraph": 3409
+        },
+        {
+          "id": "NQ-4-24",
+          "paragraph": 3426
+        }
+      ],
+      "findings": [
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-01",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "2c7c1055c8228a378a7d532bb506849218e682e91be48f31f8afbb31c4a919e1",
+          "paragraphs": [
+            410,
+            426
+          ],
+          "line_numbers": [
+            1,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-01",
+          "speaker": "ANTONIUS",
+          "text_sha256": "359499cc0de766311829d97327fc2cd393d48c4a38a58055ddece8f447a5e1f9",
+          "paragraphs": [
+            412,
+            420
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-01",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            416,
+            424
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-02",
+          "paragraph": 501,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-02",
+          "paragraph": 509,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-02",
+          "speaker": "ANTONIUS",
+          "text_sha256": "359499cc0de766311829d97327fc2cd393d48c4a38a58055ddece8f447a5e1f9",
+          "paragraphs": [
+            499,
+            507,
+            511,
+            515
+          ],
+          "line_numbers": [
+            1,
+            5,
+            7,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-02",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            501,
+            509
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-02",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            505,
+            513,
+            517
+          ],
+          "line_numbers": [
+            4,
+            8,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-03",
+          "paragraph": 590,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-03",
+          "paragraph": 598,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-03",
+          "speaker": "CICERO",
+          "text_sha256": "1f7d9675b6e0e89afe9daa8626a87e3673c06c3854c4cbebbe8d66c965840c3b",
+          "paragraphs": [
+            588,
+            600
+          ],
+          "line_numbers": [
+            1,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-03",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            590,
+            598
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-03",
+          "speaker": "CICERO",
+          "text_sha256": "1905792d6999a3ffa8273151fd4e049d7f1cfc59fadf97f55e84110687e0f496",
+          "paragraphs": [
+            596,
+            604
+          ],
+          "line_numbers": [
+            5,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-04",
+          "speaker": "ANTONIUS",
+          "text_sha256": "47cc91fb624d92c266ea2fcc4c8950e797bcd0327cb69e75b50db8a252d4ef67",
+          "paragraphs": [
+            677,
+            689
+          ],
+          "line_numbers": [
+            1,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-04",
+          "speaker": "SPIELER",
+          "text_sha256": "daf6fedd0639252170fc0b0231f61a86fcce2f9c0cc7acf5b27a709b8f2eaf5f",
+          "paragraphs": [
+            687,
+            693
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-05",
+          "paragraph": 776,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-05",
+          "paragraph": 782,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-05",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "a78419ec9f3948815892c4d234178b0267a96cc3da7ec6d6587a75040b82b98a",
+          "paragraphs": [
+            766,
+            772,
+            778
+          ],
+          "line_numbers": [
+            1,
+            4,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-05",
+          "speaker": "ANTONIUS",
+          "text_sha256": "2287d46b123bdb65cd87344624b84d9f849d936ca355168273e794e672b59ca7",
+          "paragraphs": [
+            768,
+            774
+          ],
+          "line_numbers": [
+            2,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-05",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            776,
+            782
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-06",
+          "speaker": "CICERO",
+          "text_sha256": "1f7d9675b6e0e89afe9daa8626a87e3673c06c3854c4cbebbe8d66c965840c3b",
+          "paragraphs": [
+            855,
+            865
+          ],
+          "line_numbers": [
+            1,
+            6
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-07",
+          "paragraph": 946,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-07",
+          "paragraph": 954,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-07",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            946,
+            954
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-07",
+          "speaker": "CICERO",
+          "text_sha256": "1905792d6999a3ffa8273151fd4e049d7f1cfc59fadf97f55e84110687e0f496",
+          "paragraphs": [
+            948,
+            960
+          ],
+          "line_numbers": [
+            3,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-07",
+          "speaker": "CICERO",
+          "text_sha256": "b66a7cf8b843ec71ad85c819ece90039115505faaed555ea0634745137554011",
+          "paragraphs": [
+            952,
+            956
+          ],
+          "line_numbers": [
+            5,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-08",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "b320333c0fb52b2932f6ceecee83dddefd33ff93074b22bc9ed9d28850094909",
+          "paragraphs": [
+            1039,
+            1049
+          ],
+          "line_numbers": [
+            4,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-08",
+          "speaker": "SPIELER",
+          "text_sha256": "5a9ec277e94cde70d67e5356cfaa30ef432b07d728ac061e165da3156d7e90a5",
+          "paragraphs": [
+            1041,
+            1051
+          ],
+          "line_numbers": [
+            5,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-10",
+          "speaker": "ANTONIUS",
+          "text_sha256": "2287d46b123bdb65cd87344624b84d9f849d936ca355168273e794e672b59ca7",
+          "paragraphs": [
+            1213,
+            1229
+          ],
+          "line_numbers": [
+            2,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-10",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            1217,
+            1225
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-10",
+          "speaker": "BRUTUS",
+          "text_sha256": "ca7175879bbb24297ae08a491ce2ba70fb1ed041ad5bc0bc3b1897d2e2b2f910",
+          "paragraphs": [
+            1219,
+            1227
+          ],
+          "line_numbers": [
+            5,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-11",
+          "speaker": "DECIMUS",
+          "text_sha256": "70f700f9806dee236cf4c82caa4ce6a9cb6ba746c24e065588a3e676184a926b",
+          "paragraphs": [
+            1304,
+            1312
+          ],
+          "line_numbers": [
+            3,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-11",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "a78419ec9f3948815892c4d234178b0267a96cc3da7ec6d6587a75040b82b98a",
+          "paragraphs": [
+            1308,
+            1316
+          ],
+          "line_numbers": [
+            5,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-12",
+          "paragraph": 1399,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-12",
+          "paragraph": 1405,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-12",
+          "speaker": "ANTONIUS",
+          "text_sha256": "47cc91fb624d92c266ea2fcc4c8950e797bcd0327cb69e75b50db8a252d4ef67",
+          "paragraphs": [
+            1389,
+            1401
+          ],
+          "line_numbers": [
+            1,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-12",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "a78419ec9f3948815892c4d234178b0267a96cc3da7ec6d6587a75040b82b98a",
+          "paragraphs": [
+            1391,
+            1397
+          ],
+          "line_numbers": [
+            2,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-12",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1399,
+            1405
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-13",
+          "speaker": "SPIELER",
+          "text_sha256": "6a315696c0c2cd0d6042cec75cb1dcb03bf731df53d0f7fd758f96d551652180",
+          "paragraphs": [
+            1478,
+            1486,
+            1496
+          ],
+          "line_numbers": [
+            1,
+            5,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-13",
+          "speaker": "SPIELER",
+          "text_sha256": "2c9334c64000016a488221e774b99c1edb76f3d458286b7cc8292f833de5ae75",
+          "paragraphs": [
+            1480,
+            1488,
+            1494
+          ],
+          "line_numbers": [
+            2,
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-13",
+          "speaker": "SPIELER",
+          "text_sha256": "5a9ec277e94cde70d67e5356cfaa30ef432b07d728ac061e165da3156d7e90a5",
+          "paragraphs": [
+            1482,
+            1484,
+            1490,
+            1492
+          ],
+          "line_numbers": [
+            3,
+            4,
+            7,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-14",
+          "speaker": "CASSIA",
+          "text_sha256": "568832137d21d2a895bfe3ef236c74d7d88a1bd82c095a380d03104bf3a0be87",
+          "paragraphs": [
+            1569,
+            1577,
+            1585
+          ],
+          "line_numbers": [
+            1,
+            5,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-14",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "b320333c0fb52b2932f6ceecee83dddefd33ff93074b22bc9ed9d28850094909",
+          "paragraphs": [
+            1571,
+            1579
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-14",
+          "speaker": "SPIELER",
+          "text_sha256": "5a9ec277e94cde70d67e5356cfaa30ef432b07d728ac061e165da3156d7e90a5",
+          "paragraphs": [
+            1575,
+            1583
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-15",
+          "paragraph": 1668,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-15",
+          "paragraph": 1674,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-15",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "2c7c1055c8228a378a7d532bb506849218e682e91be48f31f8afbb31c4a919e1",
+          "paragraphs": [
+            1658,
+            1670,
+            1676
+          ],
+          "line_numbers": [
+            1,
+            7,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-15",
+          "speaker": "ANTONIUS",
+          "text_sha256": "359499cc0de766311829d97327fc2cd393d48c4a38a58055ddece8f447a5e1f9",
+          "paragraphs": [
+            1660,
+            1666,
+            1672
+          ],
+          "line_numbers": [
+            2,
+            5,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-15",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1668,
+            1674
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-16",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "2c7c1055c8228a378a7d532bb506849218e682e91be48f31f8afbb31c4a919e1",
+          "paragraphs": [
+            1747,
+            1763
+          ],
+          "line_numbers": [
+            1,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-16",
+          "speaker": "SPIELER",
+          "text_sha256": "daf6fedd0639252170fc0b0231f61a86fcce2f9c0cc7acf5b27a709b8f2eaf5f",
+          "paragraphs": [
+            1749,
+            1757
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-16",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "a78419ec9f3948815892c4d234178b0267a96cc3da7ec6d6587a75040b82b98a",
+          "paragraphs": [
+            1751,
+            1755,
+            1759
+          ],
+          "line_numbers": [
+            3,
+            5,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-16",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            1761,
+            1765
+          ],
+          "line_numbers": [
+            8,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-17",
+          "paragraph": 1846,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-17",
+          "paragraph": 1852,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-17",
+          "speaker": "ANTONIUS",
+          "text_sha256": "2287d46b123bdb65cd87344624b84d9f849d936ca355168273e794e672b59ca7",
+          "paragraphs": [
+            1836,
+            1848
+          ],
+          "line_numbers": [
+            1,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-17",
+          "speaker": "KLEOPATRA",
+          "text_sha256": "cfe81f3e009c7d303fe8cff076587c193ce68e7bf0437abd22af000b43c6a1fc",
+          "paragraphs": [
+            1838,
+            1844
+          ],
+          "line_numbers": [
+            2,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-17",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            1846,
+            1852
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-18",
+          "speaker": "ANTONIUS",
+          "text_sha256": "359499cc0de766311829d97327fc2cd393d48c4a38a58055ddece8f447a5e1f9",
+          "paragraphs": [
+            1933,
+            1941
+          ],
+          "line_numbers": [
+            5,
+            9
+          ]
+        },
+        {
+          "code": "age_calendar_review",
+          "severity": "review",
+          "mission_id": "IV-18",
+          "paragraph": 1878,
+          "year_bce_range": [
+            34,
+            32
+          ],
+          "declared_age_range": [
+            34,
+            36
+          ],
+          "campaign_age_range": [
+            36,
+            38
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-20",
+          "speaker": "SPIELER",
+          "text_sha256": "5a9ec277e94cde70d67e5356cfaa30ef432b07d728ac061e165da3156d7e90a5",
+          "paragraphs": [
+            2109,
+            2117
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-21",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "a78419ec9f3948815892c4d234178b0267a96cc3da7ec6d6587a75040b82b98a",
+          "paragraphs": [
+            2192,
+            2208
+          ],
+          "line_numbers": [
+            1,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-21",
+          "speaker": "KLEOPATRA",
+          "text_sha256": "e3cb801701532a22f739c3eb5d83902478943a99a77bd367dfd8b3ca939b1866",
+          "paragraphs": [
+            2196,
+            2204
+          ],
+          "line_numbers": [
+            3,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-21",
+          "speaker": "ANTONIUS",
+          "text_sha256": "2287d46b123bdb65cd87344624b84d9f849d936ca355168273e794e672b59ca7",
+          "paragraphs": [
+            2202,
+            2210
+          ],
+          "line_numbers": [
+            6,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-22",
+          "paragraph": 2283,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-22",
+          "paragraph": 2291,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-22",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "2c7c1055c8228a378a7d532bb506849218e682e91be48f31f8afbb31c4a919e1",
+          "paragraphs": [
+            2281,
+            2289
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-22",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            2283,
+            2291
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-22",
+          "speaker": "OCTAVIAN",
+          "text_sha256": "b320333c0fb52b2932f6ceecee83dddefd33ff93074b22bc9ed9d28850094909",
+          "paragraphs": [
+            2285,
+            2293,
+            2297
+          ],
+          "line_numbers": [
+            3,
+            7,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-22",
+          "speaker": "SPIELER",
+          "text_sha256": "5a9ec277e94cde70d67e5356cfaa30ef432b07d728ac061e165da3156d7e90a5",
+          "paragraphs": [
+            2287,
+            2295,
+            2299
+          ],
+          "line_numbers": [
+            4,
+            8,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-23",
+          "speaker": "JULIA",
+          "text_sha256": "09ec764a6d8d46fd7470bb1a71e4767882df8655d9a777bef6fd8a7a1949b766",
+          "paragraphs": [
+            2370,
+            2378
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-23",
+          "speaker": "MARCUS",
+          "text_sha256": "dd64f4e1b3c452263944532ead5c21534f9f86d2b81974014f413e2eb5294224",
+          "paragraphs": [
+            2372,
+            2388
+          ],
+          "line_numbers": [
+            2,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-23",
+          "speaker": "SPIELER",
+          "text_sha256": "5a9ec277e94cde70d67e5356cfaa30ef432b07d728ac061e165da3156d7e90a5",
+          "paragraphs": [
+            2376,
+            2384
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-24",
+          "paragraph": 2461,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-24",
+          "paragraph": 2469,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-24",
+          "paragraph": 2475,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-24",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            2459,
+            2463,
+            2471,
+            2477
+          ],
+          "line_numbers": [
+            1,
+            3,
+            7,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-24",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            2461,
+            2469,
+            2475
+          ],
+          "line_numbers": [
+            2,
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-24",
+          "speaker": "SPIELER",
+          "text_sha256": "5a9ec277e94cde70d67e5356cfaa30ef432b07d728ac061e165da3156d7e90a5",
+          "paragraphs": [
+            2465,
+            2467
+          ],
+          "line_numbers": [
+            4,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-25",
+          "speaker": "SPIELER",
+          "text_sha256": "831627238cdc9479e64ffab557358f32faf31d44064c578194a3177f7c13d257",
+          "paragraphs": [
+            2547,
+            2555
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-25",
+          "speaker": "DECIMUS",
+          "text_sha256": "0e53fe9e704e210c83c2dfe7ffdfc6328c957d999f3b837734583d923ef8681b",
+          "paragraphs": [
+            2549,
+            2553,
+            2557
+          ],
+          "line_numbers": [
+            3,
+            5,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-25",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            2559,
+            2563
+          ],
+          "line_numbers": [
+            8,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-26",
+          "speaker": "CASSIA",
+          "text_sha256": "568832137d21d2a895bfe3ef236c74d7d88a1bd82c095a380d03104bf3a0be87",
+          "paragraphs": [
+            2636,
+            2648
+          ],
+          "line_numbers": [
+            1,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-26",
+          "speaker": "SPIELER",
+          "text_sha256": "782265f2b67d2d527d2acbd0e794aa073c8e5ab05f890a20ca698858d3402191",
+          "paragraphs": [
+            2638,
+            2646
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-26",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            2642,
+            2650
+          ],
+          "line_numbers": [
+            4,
+            8
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-26",
+          "speaker": "CASSIA",
+          "text_sha256": "a1baa5fd26477d20459a14e48b1fc7ff4b93f445b35361f974e05c539c610002",
+          "paragraphs": [
+            2644,
+            2652
+          ],
+          "line_numbers": [
+            5,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-27",
+          "paragraph": 2727,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-27",
+          "paragraph": 2735,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-27",
+          "speaker": "MARCUS",
+          "text_sha256": "4df5db7b2801e9cd947f9be862fd76d6c4e1164a4663062843985ce755ccfc73",
+          "paragraphs": [
+            2725,
+            2733
+          ],
+          "line_numbers": [
+            1,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-27",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            2727,
+            2735
+          ],
+          "line_numbers": [
+            2,
+            6
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-27",
+          "speaker": "MARCUS",
+          "text_sha256": "dd64f4e1b3c452263944532ead5c21534f9f86d2b81974014f413e2eb5294224",
+          "paragraphs": [
+            2729,
+            2741
+          ],
+          "line_numbers": [
+            3,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-27",
+          "speaker": "SPIELER",
+          "text_sha256": "5a9ec277e94cde70d67e5356cfaa30ef432b07d728ac061e165da3156d7e90a5",
+          "paragraphs": [
+            2739,
+            2743
+          ],
+          "line_numbers": [
+            8,
+            10
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-28",
+          "paragraph": 2824,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-28",
+          "speaker": "CAESAR",
+          "text_sha256": "95782b1e519f31fdf4130c7db5fe04a869e8cfd99c96c5d3eb79be74fb5dc833",
+          "paragraphs": [
+            2814,
+            2826
+          ],
+          "line_numbers": [
+            1,
+            7
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-29",
+          "paragraph": 2913,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-29",
+          "paragraph": 2919,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-29",
+          "speaker": "MARCUS",
+          "text_sha256": "dd64f4e1b3c452263944532ead5c21534f9f86d2b81974014f413e2eb5294224",
+          "paragraphs": [
+            2903,
+            2921
+          ],
+          "line_numbers": [
+            1,
+            10
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-29",
+          "speaker": "JULIA",
+          "text_sha256": "41c249a4bd29fbff8e82c7decfdc626c25f7aac8b784e765d37ceb4c6705064d",
+          "paragraphs": [
+            2905,
+            2911
+          ],
+          "line_numbers": [
+            2,
+            5
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-29",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            2913,
+            2919
+          ],
+          "line_numbers": [
+            6,
+            9
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-30",
+          "paragraph": 2994,
+          "line_number": 2,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-30",
+          "paragraph": 3002,
+          "line_number": 6,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "spoken_production_language",
+          "severity": "error",
+          "mission_id": "IV-30",
+          "paragraph": 3008,
+          "line_number": 9,
+          "markers": [
+            "world_state"
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-30",
+          "speaker": "SPIELER",
+          "text_sha256": "5a9ec277e94cde70d67e5356cfaa30ef432b07d728ac061e165da3156d7e90a5",
+          "paragraphs": [
+            2992,
+            2996,
+            2998
+          ],
+          "line_numbers": [
+            1,
+            3,
+            4
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-30",
+          "speaker": "SPIELER",
+          "text_sha256": "2edb0d614e6860e7bf6ed1d6b42937fbb703f4abb4b4064bd8d6503ef4aac146",
+          "paragraphs": [
+            2994,
+            3002,
+            3008
+          ],
+          "line_numbers": [
+            2,
+            6,
+            9
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-30",
+          "speaker": "SPIELER",
+          "text_sha256": "6a315696c0c2cd0d6042cec75cb1dcb03bf731df53d0f7fd758f96d551652180",
+          "paragraphs": [
+            3000,
+            3004
+          ],
+          "line_numbers": [
+            5,
+            7
+          ]
+        },
+        {
+          "code": "repeated_line_within_scene",
+          "severity": "review",
+          "mission_id": "IV-30",
+          "speaker": "SPIELER",
+          "text_sha256": "a53fed17e4cfa3146d67905c355329ada164ab94612dee69326fe8f8b4bb53df",
+          "paragraphs": [
+            3006,
+            3010
+          ],
+          "line_numbers": [
+            8,
+            10
+          ]
+        }
+      ]
+    }
+  ]
+}

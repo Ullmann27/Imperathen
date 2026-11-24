@@ -104,6 +104,7 @@ def main():
             ("opening_flow", ["--fixed-fps", "60", "--script", "res://tests/opening_flow_test.gd"], "OPENING_FLOW_PASS"),
             ("ui", ["--fixed-fps", "60", "--script", "res://scripts/ui/ui_smoke.gd"], "UI_SMOKE_PASS"),
             ("roman_menu", ["--fixed-fps", "60", "--script", "res://tests/roman_menu_test.gd"], "ROMAN_MENU_PASS"),
+            ("runtime_display_lifecycle", ["--fixed-fps", "60", "--script", "res://tests/runtime_display_lifecycle_test.gd"], "RUNTIME_DISPLAY_LIFECYCLE_PASS"),
             ("touch_controls", ["--fixed-fps", "60", "--script", "res://tests/touch_controls_test.gd"], "TOUCH_CONTROLS_PASS"),
             ("action_adapter", ["--fixed-fps", "60", "--script", "res://tests/action_adapter_test.gd"], "ACTION_ADAPTER_PASS"),
             ("action_world", ["--fixed-fps", "60", "--script", "res://tests/action_world_test.gd"], "ACTION_WORLD_PASS"),
