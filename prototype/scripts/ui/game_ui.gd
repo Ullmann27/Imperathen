@@ -21,6 +21,9 @@ const CombatActions := preload("res://scripts/domain/combat_actions.gd")
 const VillagePanel = preload("res://scripts/ui/village_life_panel.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Navigation = preload("res://scripts/ui/village_navigation.gd")
+const RomanStyle = preload("res://scripts/ui/roman_style.gd")
+const ImperialIntro = preload("res://scripts/ui/imperial_intro.gd")
+const MENU_MUSIC_DB := -9.0
 var _village_tab := "overview"
 var _navigation: Control
 
@@ -34,31 +37,32 @@ class Atmosphere extends Control:
 
 	func _draw() -> void:
 		if menu_style:
-			for index in range(48):
-				var fraction := float(index) / 48.0
-				var opacity := lerpf(0.94, 0.14, smoothstep(0.30, 0.96, fraction))
-				draw_rect(Rect2(fraction * size.x, 0, size.x / 48.0 + 1, size.y), Color(0.025, 0.043, 0.043, opacity))
-		else:
-			draw_rect(Rect2(Vector2.ZERO, size), Color(0.025, 0.039, 0.043, 0.86))
+			# One smooth horizontal gradient (no banding) plus a soft vignette.
+			var stops := [0.0, 0.3, 0.62, 1.0]
+			var alphas := [0.9, 0.82, 0.38, 0.16]
+			for index in range(stops.size() - 1):
+				var x0: float = stops[index] * size.x
+				var x1: float = stops[index + 1] * size.x
+				var a0 := Color(0.035, 0.022, 0.016, alphas[index])
+				var a1 := Color(0.035, 0.022, 0.016, alphas[index + 1])
+				draw_polygon(PackedVector2Array([Vector2(x0, 0), Vector2(x1, 0), Vector2(x1, size.y), Vector2(x0, size.y)]),
+					PackedColorArray([a0, a1, a1, a0]))
+			var edge := Color(0.02, 0.012, 0.01, 0.55)
+			var clear := Color(0.02, 0.012, 0.01, 0.0)
+			var band := size.y * 0.16
+			draw_polygon(PackedVector2Array([Vector2(0, 0), Vector2(size.x, 0), Vector2(size.x, band), Vector2(0, band)]),
+				PackedColorArray([edge, edge, clear, clear]))
+			draw_polygon(PackedVector2Array([Vector2(0, size.y - band), Vector2(size.x, size.y - band), Vector2(size.x, size.y), Vector2(0, size.y)]),
+				PackedColorArray([clear, clear, edge, edge]))
+			var gold := Color(0.85, 0.68, 0.38, 0.55)
+			draw_line(Vector2(24, 21), Vector2(size.x - 24, 21), gold, 1, true)
+			draw_line(Vector2(24, 25), Vector2(size.x - 24, 25), Color(gold, 0.3), 1, true)
+			draw_line(Vector2(24, size.y - 25), Vector2(size.x - 24, size.y - 25), Color(gold, 0.3), 1, true)
+			draw_line(Vector2(24, size.y - 21), Vector2(size.x - 24, size.y - 21), gold, 1, true)
+			return
+		draw_rect(Rect2(Vector2.ZERO, size), Color(0.025, 0.039, 0.043, 0.86))
 		draw_line(Vector2(24, 23), Vector2(size.x - 24, 23), Color(0.72, 0.57, 0.36, 0.52), 1)
 		draw_line(Vector2(24, size.y - 23), Vector2(size.x - 24, size.y - 23), Color(0.72, 0.57, 0.36, 0.36), 1)
-
-class ImperialMark extends Control:
-
-	func _ready() -> void:
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	func _draw() -> void:
-		var center := size * 0.5
-		var radius := minf(size.x, size.y) * 0.38
-		var color := Color("b99563")
-		draw_arc(center, radius, 0.0, TAU, 72, Color(color, 0.42), 1.0, true)
-		for column in range(3):
-			var x := center.x + (column - 1) * radius * 0.45
-			draw_line(Vector2(x, center.y - radius * 0.35), Vector2(x, center.y + radius * 0.45), color, 2.0, true)
-		draw_line(center + Vector2(-radius * 0.75, radius * 0.53), center + Vector2(radius * 0.75, radius * 0.53), color, 2.0, true)
-		draw_line(center + Vector2(-radius * 0.75, -radius * 0.45), center + Vector2(radius * 0.75, -radius * 0.45), color, 2.0, true)
-		draw_polyline(PackedVector2Array([center + Vector2(-radius * 0.8, -radius * 0.55), center + Vector2(0, -radius * 0.91), center + Vector2(radius * 0.8, -radius * 0.55)]), color, 1.5, true)
 
 var origin_id := "italia"
 var _root: Control
@@ -66,7 +70,6 @@ var _screen: Control
 var _toast_panel: PanelContainer
 var _toast_label: Label
 var _toast_tween: Tween
-var _intro_tween: Tween
 var _intro_done := false
 var _view_state := ""
 var _gallery_from := "menu"
@@ -80,6 +83,13 @@ var _reduce_motion := false
 var _opening_reading := false
 var _volume := 0.55
 var _sound_player: AudioStreamPlayer
+var _music_player: AudioStreamPlayer
+var _music_tween: Tween
+var _music_volume := 0.7
+var _music_wanted := false
+var _intro_seen := false
+var _always_intro := false
+var _intro_node: Control
 var _serif: SystemFont
 var _ui_theme: Theme
 var _hud_labels: Dictionary = {}
@@ -124,6 +134,7 @@ func _ready() -> void:
 	add_child(_root)
 	_update_safe_area()
 	_setup_sound()
+	_setup_music()
 	_setup_toast()
 	get_viewport().size_changed.connect(_viewport_changed)
 
@@ -137,141 +148,228 @@ func _notification(what: int) -> void:
 
 func _exit_tree() -> void:
 	_reset_touch()
-	if _intro_tween != null and _intro_tween.is_valid():
-		_intro_tween.kill()
 	if _toast_tween != null and _toast_tween.is_valid():
 		_toast_tween.kill()
 	if is_instance_valid(_sound_player):
 		_sound_player.stop()
 		_sound_player.stream = null
+	if _music_tween != null and _music_tween.is_valid():
+		_music_tween.kill()
+	if is_instance_valid(_music_player):
+		_music_player.stop()
+		_music_player.stream = null
 
 
 func show_intro() -> void:
-	_open_screen("intro", true)
+	# The complete title sequence plays on the first start, or every time when
+	# the player chooses so in the settings; later starts show a short title card.
+	_open_screen("intro", false)
+	_screen.mouse_filter = Control.MOUSE_FILTER_STOP
 	_intro_done = false
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_screen.add_child(center)
-	var column := _column(15)
-	column.custom_minimum_size.x = minf(760, _content_size().x - 48)
-	center.add_child(column)
-	var mark := ImperialMark.new()
-	mark.custom_minimum_size = Vector2(88, 88)
-	mark.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	column.add_child(mark)
-	var kicker := _label("EIN LEBEN. EIN REICH.", 15, BRONZE)
-	kicker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(kicker)
-	var title := _label("IMPERATHEN", _title_font_size("IMPERATHEN", 76, _content_size().x - 64), CREAM, true)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(title)
-	var subtitle := _label("Nicht jeder Aufstieg führt auf einen Thron.\nJede Entscheidung hinterlässt eine Spur.", 21, MUTED)
-	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	column.add_child(subtitle)
-	var skip := _button("Überspringen" if _touch_enabled else "Überspringen  ·  Enter", func(): _finish_intro(), false, 14)
+	_intro_node = ImperialIntro.new()
+	_intro_node.name = "ImperialIntro"
+	_screen.add_child(_intro_node)
+	_intro_node.finished.connect(_finish_intro)
+	_intro_node.play(_always_intro or not _intro_seen, _reduce_motion)
+	var compact := _touch_enabled or _content_size().x < 900
+	var skip := _button("Überspringen" if _touch_enabled else "Überspringen  ·  Enter", func(): _finish_intro(), false, 15 if compact else 14)
+	skip.name = "IntroSkip"
+	RomanStyle.style_button(skip, false, roundi((16 if compact else 15) * _ui_scale))
 	skip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	skip.offset_left = -260
-	skip.offset_right = -34
-	skip.offset_top = -78
-	skip.offset_bottom = -34
+	var skip_size := Vector2(270, 58) if compact else Vector2(250, 48)
+	skip.offset_left = -skip_size.x - 30
+	skip.offset_right = -30
+	skip.offset_top = -skip_size.y - 30
+	skip.offset_bottom = -30
 	_screen.add_child(skip)
 	skip.grab_focus.call_deferred()
 	if OS.is_debug_build() and OS.has_feature("android"):
 		_log_intro_skip.call_deferred(skip)
-	_intro_tween = create_tween()
-	if _reduce_motion:
-		_intro_tween.tween_interval(3.0)
-	else:
-		column.modulate.a = 0.0
-		subtitle.modulate.a = 0.0
-		_intro_tween.tween_property(column, "modulate:a", 1.0, 1.2).set_trans(Tween.TRANS_SINE)
-		_intro_tween.tween_property(subtitle, "modulate:a", 1.0, 0.9)
-		_intro_tween.tween_interval(3.0)
-		_intro_tween.tween_property(column, "modulate:a", 0.0, 0.7)
-	_intro_tween.tween_callback(_finish_intro)
+
+
+func intro_is_full() -> bool:
+	return is_instance_valid(_intro_node) and _intro_node.full
 
 
 func show_menu(can_continue: bool) -> void:
 	_can_continue = can_continue
 	_open_screen("menu", true, true)
-	var margin := _margin(34 if _compact_layout else 58, 32 if _compact_layout else 44, 30, 28)
+	var area := _content_size()
+	var portrait := area.y > area.x * 1.15
+	# Portrait phones get a single large column; landscape gets a framed tablet
+	# with the title above two columns, so nothing needs scrolling at 1280 x 720.
+	var k := clampf(area.x / 560.0, 1.0, 2.4) if portrait else 1.0
+	var px := func(value: float) -> int: return roundi(value * k * _ui_scale)
+	var button_height: int = px.call(52 if (_touch_enabled or portrait) else 48)
+	var margin := _margin(px.call(20), px.call(30), px.call(20), px.call(30))
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_screen.add_child(margin)
 	var scroll := ScrollContainer.new()
+	scroll.name = "MenuScroll"
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
-	scroll.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	scroll.custom_minimum_size.x = minf(620, _content_size().x - 76)
 	margin.add_child(scroll)
-	var layout := _column(8)
+	var panel_width: float = (area.x - px.call(40)) if portrait else minf(900.0, area.x - 72.0)
+	scroll.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if portrait else Control.SIZE_SHRINK_BEGIN
+	scroll.custom_minimum_size.x = panel_width
+	var holder := _column(0)
+	holder.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	holder.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	holder.alignment = BoxContainer.ALIGNMENT_CENTER
+	scroll.add_child(holder)
+	var panel := PanelContainer.new()
+	panel.name = "MenuTablet"
+	panel.mouse_filter = Control.MOUSE_FILTER_PASS
+	panel.custom_minimum_size.x = panel_width
+	var frame := _flat(Color(0.035, 0.025, 0.02, 0.8))
+	frame.border_color = Color(RomanStyle.GOLD_DEEP, 0.9)
+	frame.set_border_width_all(2)
+	frame.set_corner_radius_all(2)
+	frame.shadow_color = Color(0, 0, 0, 0.45)
+	frame.shadow_size = 18
+	frame.content_margin_left = px.call(26)
+	frame.content_margin_right = px.call(26)
+	frame.content_margin_top = px.call(14)
+	frame.content_margin_bottom = px.call(18)
+	panel.add_theme_stylebox_override("panel", frame)
+	holder.add_child(panel)
+	var layout := _column(px.call(6))
 	layout.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	layout.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.add_child(layout)
-	var mark := ImperialMark.new()
-	mark.custom_minimum_size = Vector2(44, 44)
-	layout.add_child(mark)
-	mark.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	layout.add_child(_label("DIE CHRONIK EINES AUFSTIEGS", 13, BRONZE))
-	layout.add_child(_label("IMPERATHEN", _title_font_size("IMPERATHEN", 57, scroll.custom_minimum_size.x - 20), CREAM, true))
-	var pitch := _label("Dein Anfang ist klein.\nWas daraus wird, entscheidest du.", 18, MUTED)
+	panel.add_child(layout)
+	var inner_width: float = panel_width - px.call(52)
+	# Emblem: legion eagle between two laurel sprays.
+	var crest := _row(px.call(4))
+	crest.alignment = BoxContainer.ALIGNMENT_CENTER
+	crest.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layout.add_child(crest)
+	var crest_height: int = px.call(72)
+	var laurel_left := RomanStyle.LaurelSpray.new()
+	laurel_left.custom_minimum_size = Vector2(crest_height * 1.1, crest_height)
+	crest.add_child(laurel_left)
+	var aquila := TextureRect.new()
+	aquila.name = "MenuAquila"
+	aquila.texture = load(RomanStyle.AQUILA_PATH)
+	aquila.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	aquila.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	aquila.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	aquila.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	aquila.custom_minimum_size = Vector2(crest_height * 1.84, crest_height)
+	crest.add_child(aquila)
+	var laurel_right := RomanStyle.LaurelSpray.new()
+	laurel_right.mirrored = true
+	laurel_right.custom_minimum_size = laurel_left.custom_minimum_size
+	crest.add_child(laurel_right)
+	var title := Label.new()
+	title.name = "MenuTitle"
+	title.text = "IMPERATHEN"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var title_size: int = px.call(58)
+	var measured := RomanStyle.font(800, 4).get_string_size("IMPERATHEN", HORIZONTAL_ALIGNMENT_LEFT, -1, title_size).x
+	if measured > inner_width * 0.96:
+		title_size = maxi(26, floori(title_size * inner_width * 0.96 / measured))
+	RomanStyle.style_title(title, title_size)
+	layout.add_child(title)
+	var motto := Label.new()
+	motto.name = "MenuMotto"
+	motto.text = "VENI · VIDI · VICI"
+	motto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	motto.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	RomanStyle.style_caps(motto, px.call(14), RomanStyle.PARCHMENT, px.call(5))
+	layout.add_child(motto)
+	var meander := RomanStyle.MeanderBand.new()
+	meander.custom_minimum_size = Vector2(0, px.call(13))
+	layout.add_child(meander)
+	var pitch := _label("Dein Anfang ist klein. Was daraus wird, entscheidest du.", 15, MUTED)
+	pitch.add_theme_font_size_override("font_size", px.call(15))
+	pitch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pitch.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	layout.add_child(pitch)
-	_spacer(layout, 16)
-	var buttons := _column(10)
-	buttons.custom_minimum_size.x = 350
-	buttons.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	layout.add_child(buttons)
-	var continue_button := _button("Fortsetzen", func(): _emit("continue"), true)
+	_spacer(layout, px.call(4))
+	var columns: BoxContainer = VBoxContainer.new() if portrait else HBoxContainer.new()
+	columns.add_theme_constant_override("separation", px.call(10 if portrait else 22))
+	layout.add_child(columns)
+	var life := _column(px.call(7))
+	life.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	columns.add_child(life)
+	var more := _column(px.call(7))
+	more.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	columns.add_child(more)
+	var font_size: int = px.call(17)
+	var continue_button := _roman_button("Fortsetzen", func(): _emit("continue"), true, font_size, button_height)
 	continue_button.disabled = not can_continue
 	continue_button.tooltip_text = "Deinen gespeicherten Lebensweg fortsetzen." if can_continue else "Es wurde noch kein Spielstand gefunden."
-	buttons.add_child(continue_button)
-	_add_origin_picker(buttons)
-	var new_button := _button("Neues Leben", _request_new_game, not can_continue)
-	buttons.add_child(new_button)
-	var demo_button := _button("Talgefecht erproben", func(): _emit("valley_demo"))
-	buttons.add_child(demo_button)
-	var atlas_button := _button("Weltkugel erkunden", func(): _emit("atlas_demo"))
-	buttons.add_child(atlas_button)
-	var gallery_button := _button("Figuren", func(): _show_gallery("menu"))
-	buttons.add_child(gallery_button)
+	life.add_child(continue_button)
+	_add_origin_picker(life, k)
+	var new_button := _roman_button("Neues Leben", _request_new_game, not can_continue, font_size, button_height)
+	life.add_child(new_button)
+	var demo_button := _roman_button("Talgefecht erproben", func(): _emit("valley_demo"), false, font_size, button_height)
+	more.add_child(demo_button)
+	var atlas_button := _roman_button("Weltkugel erkunden", func(): _emit("atlas_demo"), false, font_size, button_height)
+	more.add_child(atlas_button)
+	var gallery_button := _roman_button("Figuren", func(): _show_gallery("menu"), false, font_size, button_height)
+	more.add_child(gallery_button)
 	if OS.is_debug_build() and OS.has_feature("android"):
 		_log_menu_buttons.call_deferred(demo_button, atlas_button, continue_button, gallery_button, scroll)
 		scroll.get_v_scroll_bar().value_changed.connect(func(_value: float):
 			_log_gallery_button.call_deferred(gallery_button,scroll)
 		)
-	buttons.add_child(_button("Einstellungen", func(): _show_settings("menu")))
-	buttons.add_child(_button("Spiel beenden", func(): _confirm("Spiel beenden?", "Ein laufender Lebensweg wird vor dem Beenden gespeichert.", "quit", {})))
-	var filler := Control.new()
-	filler.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	filler.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layout.add_child(filler)
-	layout.add_child(_label("GRENZDORF  /  SPIELBARER FUNKTIONSPROTOTYP", 12, BRONZE))
-	layout.add_child(_label("Vom ersten Holz bis zur gemeinsamen Verteidigung.\nEin erster Abschnitt der größeren Spielidee.", 14, MUTED))
+	more.add_child(_roman_button("Einstellungen", func(): _show_settings("menu"), false, font_size, button_height))
+	more.add_child(_roman_button("Spiel beenden", func(): _confirm("Spiel beenden?", "Ein laufender Lebensweg wird vor dem Beenden gespeichert.", "quit", {}), false, font_size, button_height))
 	(continue_button if can_continue else new_button).grab_focus.call_deferred()
 	var province := _panel(false)
+	province.name = "ProvinceNote"
 	province.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	province.offset_left = -337
+	province.offset_left = -357
 	province.offset_right = -52
-	province.offset_top = -136
+	province.offset_top = -150
 	province.offset_bottom = -56
 	_screen.add_child(province)
 	var province_content := _column(5)
 	province.add_child(province_content)
-	province_content.add_child(_label("AN DER GRENZE DES REICHES", 12, BRONZE))
+	var province_kicker := _label("AN DER GRENZE DES REICHES", 12, BRONZE)
+	RomanStyle.style_caps(province_kicker, roundi(12 * _ui_scale), RomanStyle.GOLD, 2)
+	province_content.add_child(province_kicker)
 	province_content.add_child(_label("Eine Heimat. Eine Entscheidung.", 17, CREAM, true))
-	province.visible = not _compact_layout
+	province_content.add_child(_label("Grenzdorf · spielbarer Funktionsprototyp", 12, MUTED))
+	province.visible = not portrait and area.x - (panel_width + 40) > 380
 
 
-func _add_origin_picker(parent: VBoxContainer) -> void:
-	parent.add_child(_label("Herkunft für ein neues Leben", 13, BRONZE))
+func _roman_button(text: String, callback: Callable, primary: bool, font_size: int, height: int) -> Button:
+	var button := _button(text, callback, primary, font_size)
+	RomanStyle.style_button(button, primary, font_size)
+	button.remove_meta("base_font_size")
+	button.custom_minimum_size.y = height
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return button
+
+
+func _add_origin_picker(parent: VBoxContainer, k := 1.0) -> void:
+	var caption := _label("Herkunft für ein neues Leben", 13, BRONZE)
+	RomanStyle.style_caps(caption, roundi(12 * k * _ui_scale), RomanStyle.GOLD, 2)
+	caption.remove_meta("base_font_size")
+	parent.add_child(caption)
 	var picker := OptionButton.new()
 	picker.name = "OriginPicker"
-	picker.custom_minimum_size.y = 46
+	picker.custom_minimum_size.y = roundi(46 * k * _ui_scale)
+	picker.add_theme_font_size_override("font_size", roundi(16 * k * _ui_scale))
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var box := _flat(Color("2a2017") if state != "hover" else Color("3a2c1f"))
+		box.border_color = RomanStyle.GOLD if state in ["hover", "focus"] else RomanStyle.GOLD_DEEP
+		box.set_border_width_all(1 if state != "focus" else 2)
+		box.set_corner_radius_all(2)
+		box.content_margin_left = 14
+		box.content_margin_right = 14
+		if state == "focus":
+			box.bg_color = Color(0, 0, 0, 0)
+		picker.add_theme_stylebox_override(state, box)
 	for id in ORIGIN_IDS:
 		picker.add_item(String(Origins.PEOPLES[id].name))
 	picker.selected = ORIGIN_IDS.find(origin_id)
 	parent.add_child(picker)
-	var description := _label(String(Origins.PEOPLES[origin_id].intro), 14, MUTED)
+	var description := _label(String(Origins.PEOPLES[origin_id].intro), 13, MUTED)
+	description.add_theme_font_size_override("font_size", roundi(13 * k * _ui_scale))
+	description.remove_meta("base_font_size")
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	parent.add_child(description)
 	picker.item_selected.connect(func(index: int):
@@ -749,12 +847,11 @@ func _open_screen(screen_name: String, darken: bool, menu_style := false) -> voi
 	_pace_button = null
 	_touch_actions.clear()
 	_cancel_build_button = null
-	if _intro_tween != null and _intro_tween.is_valid():
-		_intro_tween.kill()
 	if _screen != null:
 		_screen.hide()
 		_screen.queue_free()
 	_view_state = screen_name
+	_update_music(screen_name)
 	var viewport_size := _content_size()
 	_compact_layout = _touch_enabled or viewport_size.x < 1120 or viewport_size.y < 640
 	_screen = Control.new()
@@ -774,6 +871,9 @@ func _finish_intro() -> void:
 	if _intro_done or _view_state != "intro":
 		return
 	_intro_done = true
+	if not _intro_seen:
+		_intro_seen = true
+		_save_settings()
 	_emit("intro_finished")
 
 
@@ -1482,7 +1582,10 @@ func _rebuild_layout() -> void:
 	_layout_queued = false
 	_update_safe_area()
 	match _view_state:
-		"intro": show_intro()
+		"intro":
+			# The sequence lays itself out again; restarting it would replay it.
+			if not is_instance_valid(_intro_node):
+				show_intro()
 		"game": show_game(_state)
 		"menu": show_menu(_can_continue)
 		"settings": _show_settings(_settings_return)
@@ -1664,7 +1767,39 @@ func _show_settings(return_screen: String) -> void:
 		_save_settings()
 	)
 	volume_slider.drag_ended.connect(func(_changed: bool): _play_click())
-	var note := _label("Der Prototyp enthält dezente Bedienklänge. Musik und vertonte Gespräche sind noch nicht enthalten.\n\nDie Grundfunktionen sind ohne Mikrofon bedienbar.", 13, MUTED)
+	var music_caption := _label("Musik im Hauptmenü  ·  %d %%" % roundi(_music_volume * 100), 16, CREAM)
+	column.add_child(music_caption)
+	var music_slider := HSlider.new()
+	music_slider.name = "MusicVolumeSetting"
+	music_slider.min_value = 0
+	music_slider.max_value = 1
+	music_slider.step = 0.05
+	music_slider.value = _music_volume
+	music_slider.custom_minimum_size.y = 32
+	music_slider.tooltip_text = "Lautstärke des Menüthemas; ganz links schaltet die Musik stumm."
+	column.add_child(music_slider)
+	music_slider.value_changed.connect(func(value: float):
+		_music_volume = value
+		music_caption.text = "Musik im Hauptmenü  ·  %d %%" % roundi(value * 100)
+		_apply_music_volume()
+		_save_settings()
+	)
+	var intro_toggle := CheckButton.new()
+	intro_toggle.name = "AlwaysIntroSetting"
+	intro_toggle.text = "Vorspann bei jedem Start vollständig zeigen"
+	intro_toggle.button_pressed = _always_intro
+	intro_toggle.custom_minimum_size.y = 48
+	intro_toggle.tooltip_text = "Sonst erscheint der vollständige Vorspann nur beim ersten Start und danach eine kurze Titelkarte."
+	column.add_child(intro_toggle)
+	intro_toggle.toggled.connect(func(value: bool):
+		_always_intro = value
+		_save_settings()
+	)
+	if return_screen == "menu":
+		var replay := _button("Vorspann jetzt ansehen", _replay_intro)
+		replay.name = "ReplayIntro"
+		column.add_child(replay)
+	var note := _label("Das Menüthema ist eine eigene, synthetisch erzeugte Komposition. Vertonte Gespräche sind noch nicht enthalten.\n\nDie Grundfunktionen sind ohne Mikrofon bedienbar.", 13, MUTED)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(note)
 	_spacer(column, 6)
@@ -1880,6 +2015,9 @@ func _load_settings() -> void:
 		_reduce_motion = bool(config.get_value("interface", "reduce_motion", false))
 		_opening_reading = bool(config.get_value("interface", "opening_reading", false))
 		_volume = clampf(float(config.get_value("audio", "volume", 0.55)), 0.0, 1.0)
+		_music_volume = clampf(float(config.get_value("audio", "music", 0.7)), 0.0, 1.0)
+		_intro_seen = bool(config.get_value("interface", "intro_seen", false))
+		_always_intro = bool(config.get_value("interface", "always_intro", false))
 		_touch_enabled = bool(config.get_value("input", "touch_controls", _touch_enabled))
 		_diagnostics = bool(config.get_value("graphics", "diagnostics", false))
 		_quality = String(config.get_value("graphics", "quality", "balanced"))
@@ -1901,6 +2039,9 @@ func _save_settings() -> void:
 	config.set_value("interface", "reduce_motion", _reduce_motion)
 	config.set_value("interface", "opening_reading", _opening_reading)
 	config.set_value("audio", "volume", _volume)
+	config.set_value("audio", "music", _music_volume)
+	config.set_value("interface", "intro_seen", _intro_seen)
+	config.set_value("interface", "always_intro", _always_intro)
 	config.set_value("input", "touch_controls", _touch_enabled)
 	config.set_value("graphics", "quality", _quality)
 	config.set_value("graphics", "diagnostics", _diagnostics)
@@ -1934,6 +2075,62 @@ func _setup_sound() -> void:
 		samples.encode_s16(index * 2, int(wave * envelope * 14000.0))
 	stream.data = samples
 	_sound_player.stream = stream
+
+
+func _setup_music() -> void:
+	_music_player = AudioStreamPlayer.new()
+	_music_player.name = "MenuMusic"
+	var stream: AudioStreamOggVorbis = load(RomanStyle.MUSIC_PATH)
+	stream.loop = true
+	_music_player.stream = stream
+	add_child(_music_player)
+	_apply_music_volume()
+
+
+func _apply_music_volume() -> void:
+	if is_instance_valid(_music_player) and _music_wanted:
+		_music_player.volume_db = _music_db()
+
+
+func _music_db() -> float:
+	return MENU_MUSIC_DB + linear_to_db(maxf(0.001, _music_volume))
+
+
+func _update_music(screen_name: String) -> void:
+	var wanted := _music_wanted
+	match screen_name:
+		"intro", "menu": wanted = true
+		"settings": wanted = _settings_return == "menu"
+		"gallery": wanted = _gallery_from == "menu"
+		"confirm": wanted = _confirm_return == "menu"
+		"dialog": pass
+		_: wanted = false
+	if wanted == _music_wanted:
+		return
+	_music_wanted = wanted
+	if not is_instance_valid(_music_player):
+		return
+	if _music_tween != null and _music_tween.is_valid():
+		_music_tween.kill()
+	if not RomanStyle.audio_available():
+		return
+	if wanted:
+		_music_player.volume_db = -60.0
+		if not _music_player.playing:
+			_music_player.play()
+		_music_tween = create_tween()
+		_music_tween.tween_property(_music_player, "volume_db", _music_db(), 1.5)
+	else:
+		_music_tween = create_tween()
+		_music_tween.tween_property(_music_player, "volume_db", -60.0, 1.2)
+		_music_tween.tween_callback(_music_player.stop)
+
+
+func _replay_intro() -> void:
+	var always := _always_intro
+	_always_intro = true
+	show_intro()
+	_always_intro = always
 
 
 func _play_click() -> void:
