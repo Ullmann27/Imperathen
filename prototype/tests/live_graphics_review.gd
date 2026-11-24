@@ -35,8 +35,16 @@ func _run() -> void:
 		"village": {}, "valley": {}, "large_battle": {}}
 	game.ui._finish_intro()
 	game._start_new_game()
-	game._opening_skip()
-	game._opening_next()
+	# New Life chains I-00 into the family opening. Leave every opening through
+	# its own skip/confirm path so the captures show the playable village camera.
+	for attempt in 4:
+		if game.screen != "opening":
+			break
+		game._opening_skip()
+		game._opening_next()
+		await process_frame
+	if game.screen != "playing":
+		errors.append("Opening did not hand over to play: " + str(game.screen))
 	# Let the capsule settle onto the floor, then checkpoint through the game's normal save API.
 	for i in 12: await physics_frame
 	game._refresh()
