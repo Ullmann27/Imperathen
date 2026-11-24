@@ -190,12 +190,12 @@ func _advance_behavior(elapsed: float) -> void:
 		var total := _route_length(route)
 		var distance := clampf(float(_route_distances.get(id,0.0)),0.0,total)
 		var goal := distance
-		if activity in ["work","rest","weather_pause"]:
+		if activity in ["work","weather_pause"]:
 			goal = 0.0
 		elif activity in ["socialize","explore"]:
 			goal = total
 			var peer: String = intent.partner
-			if not peer.is_empty() and _behavior_state.village.behavior.people.has(peer):
+			if not peer.is_empty() and _behavior_state.village.behavior.people.has(peer) and bool(_behavior_state.village.behavior.people[peer].observed):
 				var peer_point: Array = _behavior_state.village.behavior.people[peer].position
 				goal = _route_projection(route,Vector3(float(peer_point[0]),0,float(peer_point[2])))
 		elif activity == "patrol":
@@ -221,7 +221,7 @@ func _advance_behavior(elapsed: float) -> void:
 				# authored corridor or through a wall.
 				if (actor.position+motion-_route_point(route,distance)).length() > .72:
 					motion = Vector3.ZERO
-		elif activity not in ["greet","space","alert","assist","absent"] and total > .01:
+		elif activity not in ["rest","greet","space","alert","assist","absent"] and total > .01:
 			motion = (target-actor.position).limit_length(speed*elapsed)
 			motion.y = 0.0
 		var before := actor.position
@@ -255,7 +255,7 @@ func _advance_behavior(elapsed: float) -> void:
 func _face_interest(actor: Node3D, intent: Dictionary, elapsed: float) -> void:
 	var target := _player_position
 	var peer := str(intent.get("partner",""))
-	if _behavior_state.village.behavior.people.has(peer):
+	if _behavior_state.village.behavior.people.has(peer) and bool(_behavior_state.village.behavior.people[peer].observed):
 		var point: Array = _behavior_state.village.behavior.people[peer].position
 		target = Vector3(float(point[0]),float(point[1]),float(point[2]))
 	elif intent.activity in ["alert","assist"]:
