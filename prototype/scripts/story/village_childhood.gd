@@ -39,7 +39,7 @@ const NEIGHBORS := {
 # Authored steps live in res://assets/story/missions/band1/ (one file per mission).
 static var STEPS: Array = MissionData.steps("band1")
 static var CARRIED_EFFECTS: Dictionary = MissionData.carried_effects("band1")
-const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Fabius’ Kleinholzbündel", "checked_hinge":"Geprüfter Truhengriff", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
+const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Kleinholzbündel für Sextus", "checked_hinge":"Geprüfter Truhengriff", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
 static var SOURCE_MISSION_BY_STEP: Dictionary = MissionData.source_missions("band1")
 
@@ -551,6 +551,9 @@ static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
 		if step.get("npc", "") == npc_id:
 			text = step.text
 			choices = _choices(data, step)
+		elif typeof(step.get("visits")) == TYPE_DICTIONARY and step.visits.has(npc_id):
+			# Optional visits authored in the mission data (e.g. I-09 evening).
+			text = str(step.visits[npc_id])
 		text += "\n\nVertrauen: %d · Erzählter Dorftag %d. Du bist weiterhin Teil deiner Familie und des Dorfes." % [int(relation.get("trust",0)),int(data.village.childhood.day)]
 	return {"title":"%s · %s" % [spec.name,spec.role],"text":text,"choices":choices}
 

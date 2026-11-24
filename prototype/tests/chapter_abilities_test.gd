@@ -73,7 +73,11 @@ func _test_journey_persistence_and_effects() -> void:
 	if not _until(resumed, "i08_report"):
 		return
 	_check(Abilities.has(resumed.data, "ch1_read_tracks") and Abilities.effect_value(resumed.data, "scout_insight_bonus") == 1.0, "Securing hoof prints (I-08) teaches track reading")
-	if not _until(resumed, "night_rest") or not _complete(resumed):
+	if not _until(resumed, "night_rest"):
+		return
+	# I-09 optional visit authored in mission data reaches the real dialogue path.
+	_check(str(Childhood.dialogue(resumed.data, "sextus").get("text", "")).contains("Eine Klinge verzeiht dir keinen Gedanken"), "I-09 evening visit to Sextus shows his Band 1 line")
+	if not _complete(resumed):
 		return
 	_ok(resumed.execute("village_childhood_begin_raid"), "Release the night raid after the chapter beginning")
 	_check(resumed.data.village.raid.active, "The raid is the real free village combat system")

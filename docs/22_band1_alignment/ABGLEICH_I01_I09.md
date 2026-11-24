@@ -28,3 +28,22 @@ Alle 113 Hauptmissionen und 96 Nebenquests in `prototype/assets/story/campaign_a
 ## Hinweis zu den Dialogzeilen des Drehbuchs
 
 Die Dialogabschnitte der Missionen wiederholen Zeilen aus einem gemeinsamen Pool. Mehrere Spielerzeilen passen nicht zu einem friedlichen Morgen eines Zwölfjährigen, zum Beispiel I-01 Zeile 03 „Ich will wissen, wer dahintersteht …“ oder I-05 Zeile 04 „Ich habe zu viele Menschen verloren …“. Übernommen wurden nur Zeilen, die zur jeweiligen Handlung passen; die übrigen bleiben als Widerspruch dokumentiert und sind nicht eingebaut.
+
+## Runde 2: Angleichung I-04, I-06 bis I-09 (ohne neue Assets)
+
+Die Schritte liegen jetzt in `prototype/assets/story/missions/band1/I-xx.json`. Die Änderungen betreffen nur Texte und Gesprächspartner; Schritt-IDs, Reihenfolge und Item-IDs sind unverändert, damit Saves kompatibel bleiben.
+
+| Mission | Änderung | Fundstelle |
+|---|---|---|
+| I-04 | `woodcutter_request`: Silvanus statt Fabius schickt zum Kleinholz für Sextus; Item heißt „Kleinholzbündel für Sextus“. | Tab. 7 Besetzung Silvanus/Sextus; Zeile 04 (Silvanus „Mach erst die Arbeit …“) |
+| I-06 | `market_trade`: Cassias Zeile 01 „… fünf Säcke aus drei …“ | I-06 Zeile 01 |
+| I-07 | `patrol_brief`/`patrol_report`: Decimus statt Severus (Zeilen 07 und 01); `watch_permission`: Silvanus Zeile 02; Valeria entfernt (Decimus ist verantwortlich). | Tab. 10 Besetzung Decimus/Silvanus; I-07 Zeilen 01, 02, 07 |
+| I-09 | `family_evening`: Julia Zeile 01; optionale Besuche am Abend (Daten-Feld `visits`): Silvanus Zeile 02, Sextus Zeile 03, vor dem Schlafen Julia Zeile 06 und Silvanus Zeile 07. | Tab. 12 Besetzung, Storykern „optionale Besuche“; I-09 Zeilen 01, 02, 03, 06, 07 |
+
+*Ergänzungen* (nicht wörtlich im Drehbuch): verbindende Sätze in diesen Texten, z. B. „Sextus kennt mich länger, als du lebst“ und Sextus' „Geh nach Hause, Junge; morgen ist die Esse wieder heiß“.
+
+Weiterhin abweichend:
+- Marcus fehlt in I-06, I-08 und I-09. Marcus ist im Dorf eine feste Figur ohne Mitlauf- oder Gesprächssystem in der Kindheit; Text in seinen Mund zu legen, ohne dass er anwesend ist, wäre Vortäuschung. Blockiert, bis Marcus Begleiter-/Dialogfähigkeit im Kindheitsdorf hat.
+- I-07: Severus als „kranker Wachmann“ trägt einen Namen, der in Band 1 nicht vorkommt (der Missionstitel setzt einen Wachmann voraus). Aurelia (Heilerin) und die Nachricht an Cassia sind Ergänzungen im Rahmen von „Wasser, Nachricht und kurzer Kontrollrunde“.
+- I-04: Silvanus begleitet nicht körperlich (kein Begleitsystem).
+- `smith_apprentice` (Sextus) bleibt I-06 zugeordnet; `deliver_food` (Julia) bleibt I-03 zugeordnet.

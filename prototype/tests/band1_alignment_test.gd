@@ -13,13 +13,10 @@ const ACTOR_NAMES := {"julia":"Julia", "silvanus":"Silvanus", "sextus":"Sextus",
 ## step id -> reason. These steps use people the Band 1 cast table does not name.
 const DOCUMENTED_CAST_DEVIATIONS := {
 	"deliver_food":"I-03 lists Marcus and Cassia; the returning delivery goes to Julia.",
-	"woodcutter_request":"I-04 lists Silvanus and Sextus; Fabius is a pre-existing village NPC.",
 	"smith_apprentice":"I-06 lists Cassia and Marcus; the apprenticeship talk is with Sextus.",
 	"family_report":"I-07 lists Decimus and Silvanus; the code uses Julia at home.",
 	"healer_request":"I-07 lists Decimus and Silvanus; the code uses Aurelia.",
 	"deliver_medicine":"I-07 lists Decimus and Silvanus; the code uses Severus.",
-	"patrol_brief":"I-07 lists Decimus and Silvanus; the code uses Severus.",
-	"patrol_report":"I-07 lists Decimus and Silvanus; the code uses Severus.",
 	"borrow_gear":"I-07 lists Decimus and Silvanus; the code uses Severus.",
 	"watch_message":"I-07 lists Decimus and Silvanus; the code uses Cassia.",
 	"return_gear":"I-07 lists Decimus and Silvanus; the code uses Severus.",
@@ -104,3 +101,23 @@ func _test_heading_and_texts() -> void:
 	_check(texts.forge_anvil.contains("Griff") and texts.forge_anvil.contains("Riss"), "I-05 inspects a damaged grip before working it")
 	_check(texts.deliver_hinge.contains("Ein Versprechen wiegt genau so viel wie die Ware, die am Ende wirklich ankommt."), "Cassia carries her Band 1 I-06 line")
 	_check(Childhood.ITEM_NAMES.checked_hinge == "Geprüfter Truhengriff", "Carried I-05 item is the checked grip")
+	# Round 2 alignment (I-04, I-06, I-07, I-09): Band 1 cast and lines, no Fabius/Valeria.
+	_check(_npc("woodcutter_request") == "silvanus" and texts.woodcutter_request.contains("Mach erst die Arbeit"), "I-04: Silvanus, not Fabius, sends the player to Sextus")
+	_check(texts.market_trade.contains("fünf Säcke aus drei"), "Cassia carries her Band 1 I-06 line 01")
+	_check(_npc("patrol_brief") == "decimus" and texts.patrol_brief.contains("Ich brauche eine Zahl, einen Ort und jemanden, der dort wirklich steht."), "I-07: Decimus briefs the patrol with line 07")
+	_check(_npc("patrol_report") == "decimus" and texts.patrol_report.contains("Zeig mir, was du weißt. Nicht, was du vermutest."), "I-07: Decimus receives the report with line 01")
+	_check(texts.watch_permission.contains("Du musst wissen, wann du stehenbleibst."), "I-07: Silvanus carries line 02")
+	_check(texts.family_evening.contains("die wissen, wo du deinen Becher abstellst"), "I-09: Julia carries line 01")
+	var all_text := ""
+	for step: Dictionary in Childhood.STEPS:
+		all_text += JSON.stringify(step)
+	_check(not all_text.contains("Valeria") and not all_text.contains("Fabius"), "No authored step names a person absent from all four volumes")
+	var evening: Dictionary = Childhood.STEPS.filter(func(step): return step.id == "family_evening")[0]
+	_check(evening.visits.sextus.contains("Eine Klinge verzeiht dir keinen Gedanken, den du zu spät hattest."), "I-09: optional visit to Sextus carries line 03")
+
+
+func _npc(step_id: String) -> String:
+	for step: Dictionary in Childhood.STEPS:
+		if step.id == step_id:
+			return str(step.get("npc", ""))
+	return ""

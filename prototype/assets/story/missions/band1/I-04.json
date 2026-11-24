@@ -8,11 +8,11 @@
     {
       "chapter": "Ein Weg für die Nachbarn",
       "id": "woodcutter_request",
-      "label": "Fabius nach dem Kleinholz für die Schmiede fragen",
-      "npc": "fabius",
-      "objective": "Suche Fabius auf und frage nach dem vorbereiteten Kleinholz.",
-      "result": "Fabius beschreibt dir den Lagerplatz. Jetzt weißt du, welches Bündel abgeholt werden darf.",
-      "text": "»Für Sextus liegt ein kleines Bündel am Holzlager westlich des Dorfes bereit. Nur das markierte Kleinholz mitnehmen. Die schweren Stämme bleiben liegen.«",
+      "label": "Vater nach dem Kleinholz für Sextus fragen",
+      "npc": "silvanus",
+      "objective": "Frag deinen Vater Silvanus, was du zu seinem ältesten Freund mitbringen sollst.",
+      "result": "Dein Vater beschreibt dir den Lagerplatz. Jetzt weißt du, welches Bündel für Sextus bestimmt ist.",
+      "text": "»Sextus kennt mich länger, als du lebst. Am Holzlager westlich des Dorfes liegt ein markiertes Bündel Kleinholz für seine Esse. Nimm nur das kleine Bündel; die schweren Stämme bleiben liegen. Mach erst die Arbeit – reden können wir danach immer noch.«",
       "source_mission": "I-04"
     },
     {
@@ -35,7 +35,7 @@
       "id": "deliver_kindling",
       "label": "Sextus das Kleinholz bringen",
       "npc": "sextus",
-      "objective": "Lerne Sextus an der Schmiede kennen und bring ihm Fabius’ Bündel.",
+      "objective": "Lerne Sextus an der Schmiede kennen und bring ihm das Bündel aus dem Holzlager.",
       "result": "Sextus nimmt das Bündel an. Er bietet einen begleiteten Probemorgen an, keine fertige Berufsausbildung.",
       "text": "»Du bist also Silvanus’ Kind. Dein Vater und ich kennen uns länger, als du lebst. Du hast den Weg selbst gemacht und das richtige Holz gebracht. Wenn du etwas nicht kannst, sag es. Dann kann ich es dir zeigen. Wenn du einen Probemorgen versuchen möchtest, rede vorher mit deinem Vater.«",
       "source_mission": "I-04",

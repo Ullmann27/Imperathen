@@ -40,7 +40,7 @@
       "npc": "julia",
       "objective": "Kehre mit dem Familienpäckchen zu Julia zurück.",
       "result": "Die Bestellung erreicht die Küche. Julia merkt sich, dass sie sich auf dich verlassen konnte.",
-      "text": "»Du hast zugehört und die richtige Bestellung gebracht. Dein Vater möchte, dass du heute Sextus kennenlernst, seinen ältesten Freund. Fabius hat Kleinholz für die Schmiede bereitgelegt; bring es mit, dann kommst du nicht mit leeren Händen.«",
+      "text": "»Du hast zugehört und die richtige Bestellung gebracht. Dein Vater möchte, dass du heute Sextus kennenlernst, seinen ältesten Freund. Frag ihn, was du in die Schmiede mitbringen sollst; dann kommst du nicht mit leeren Händen.«",
       "source_mission": "I-03",
       "carried": {
         "remove": [

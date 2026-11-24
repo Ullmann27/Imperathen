@@ -28,11 +28,11 @@
     {
       "chapter": "Mit der Dorfwache unterwegs",
       "id": "patrol_brief",
-      "label": "Um eine begleitete Dorfrunde bitten",
-      "npc": "severus",
-      "objective": "Sprich mit Severus am inneren Nordweg über eine begleitete Runde.",
-      "result": "Severus übernimmt die Aufsicht. Die drei Wegabschnitte müssen wirklich erreicht und geprüft werden.",
-      "text": "»Du gehst heute mit mir, nicht allein auf Wache. Wir prüfen den inneren Weg, die Wagenstraße und das Tor. Wir beobachten und melden; wir suchen keinen Kampf.«",
+      "label": "Decimus um eine begleitete Dorfrunde bitten",
+      "npc": "decimus",
+      "objective": "Sprich mit Decimus über eine begleitete Runde mit der Dorfwache.",
+      "result": "Decimus gibt die Runde frei, Severus übernimmt die Aufsicht. Die drei Wegabschnitte müssen wirklich erreicht und geprüft werden.",
+      "text": "»Ich brauche keine Heldenmeldung. Ich brauche eine Zahl, einen Ort und jemanden, der dort wirklich steht. Du gehst mit Severus, nicht allein auf Wache: innerer Weg, Wagenstraße, Tor. Ihr beobachtet und meldet; ihr sucht keinen Kampf.«",
       "source_mission": "I-07"
     },
     {
@@ -68,11 +68,11 @@
     {
       "chapter": "Mit der Dorfwache unterwegs",
       "id": "patrol_report",
-      "label": "Die tatsächlich gelaufene Runde besprechen",
-      "npc": "severus",
-      "objective": "Besprich am Tor die drei geprüften Wegabschnitte mit Severus.",
-      "result": "Severus bestätigt deinen ersten begleiteten Rundgang. Es ist keine Ernennung zum Soldaten.",
-      "text": "»Du hast die ganze Runde gemacht und nur berichtet, was du gesehen hast. Darauf kann eine Wache aufbauen. Für heute reicht es; geh zu deiner Familie zurück.«",
+      "label": "Decimus die tatsächlich gelaufene Runde melden",
+      "npc": "decimus",
+      "objective": "Melde Decimus, was du auf den drei geprüften Wegabschnitten gesehen hast.",
+      "result": "Decimus bestätigt deinen ersten begleiteten Rundgang. Es ist keine Ernennung zum Soldaten.",
+      "text": "»Zeig mir, was du weißt. Nicht, was du vermutest. – Gut. Du hast die ganze Runde gemacht und nur berichtet, was du gesehen hast. Für heute reicht es; geh zu deiner Familie zurück.«",
       "source_mission": "I-07"
     },
     {
@@ -93,7 +93,7 @@
       "npc": "aurelia",
       "objective": "Suche Aurelia auf und frage nach dem erkrankten Severus.",
       "result": "Aurelia übergibt dir das vorbereitete Versorgungspäckchen für Severus.",
-      "text": "»Er braucht Ruhe und soll heute nicht am Tor stehen. Bring ihm dieses vorbereitete Päckchen. Danach kann er mit deinen Eltern klären, ob du Valeria für einen kurzen Tagesdienst unterstützen darfst.«",
+      "text": "»Er braucht Ruhe und soll heute nicht am Tor stehen. Bring ihm dieses vorbereitete Päckchen. Danach kann er mit deinen Eltern klären, ob du für einen kurzen Tagesdienst am Tor aushelfen darfst.«",
       "source_mission": "I-07",
       "carried": {
         "add": [
@@ -108,7 +108,7 @@
       "npc": "severus",
       "objective": "Bring Aurelias Päckchen zum erkrankten Severus bei ihrem Haus.",
       "result": "Das Versorgungspäckchen erreicht Severus. Er ist versorgt, bleibt aber für diesen Dienst aus dem Arbeitsroster genommen.",
-      "text": "»Danke. Ich bleibe heute hier. Valeria führt die Wache; du könntest ihr nach der bekannten Runde eine kurze Nachricht überbringen. Frag erst deinen Vater. Die Leihsachen bleiben Eigentum der Wache.«",
+      "text": "»Danke. Ich bleibe heute hier. Decimus teilt die Wache ein; du könntest nach der bekannten Runde eine kurze Nachricht überbringen. Frag erst deinen Vater. Die Leihsachen bleiben Eigentum der Wache.«",
       "source_mission": "I-07",
       "carried": {
         "remove": [
@@ -122,8 +122,8 @@
       "label": "Vater um Erlaubnis für die Aushilfe bitten",
       "npc": "silvanus",
       "objective": "Besprich den begrenzten Tagesdienst zu Hause mit Silvanus.",
-      "result": "Vater erlaubt eine begrenzte Aushilfe unter Valerias Verantwortung. Dein Lebensalter und deine zivile Rolle ändern sich nicht.",
-      "text": "»Du kennst den Weg und Valeria bleibt verantwortlich. Eine kurze Aushilfe am inneren Tor ist erlaubt. Du gehst nicht auf einen Feldzug und kommst mit den Leihsachen zu Severus zurück.«",
+      "result": "Vater erlaubt eine begrenzte Aushilfe unter Decimus’ Verantwortung. Dein Lebensalter und deine zivile Rolle ändern sich nicht.",
+      "text": "»Du musst nicht der Stärkste sein. Du musst wissen, wann du stehenbleibst. Decimus bleibt verantwortlich; eine kurze Aushilfe am inneren Tor ist erlaubt. Du gehst nicht auf einen Feldzug und kommst mit den Leihsachen zu Severus zurück.«",
       "source_mission": "I-07"
     },
     {
@@ -133,13 +133,13 @@
       "npc": "severus",
       "objective": "Hole bei Severus den geliehenen Helm und hölzernen Schild ab.",
       "result": "Du erhältst begrenzte Leihgegenstände für diesen Auftrag. Sie werden nicht zu dauerhaftem Eigentum.",
-      "text": "»Helm und kleiner Holzschild gehören der Wache. Prüfe den Weg, bleib bei Valerias Abschnitt und melde Cassia, dass ihr Wagen passieren kann. Danach bringst du alles zurück.«",
+      "text": "»Helm und kleiner Holzschild gehören der Wache. Prüfe den Weg, bleib im bekannten Torabschnitt und melde Cassia, dass ihr Wagen passieren kann. Danach bringst du alles zurück.«",
       "source_mission": "I-07"
     },
     {
       "chapter": "Ein begrenzter Tagesdienst",
       "id": "watch_post",
-      "label": "Valeria am bekannten Torabschnitt unterstützen",
+      "label": "Am bekannten Torabschnitt aushelfen",
       "objective": "Gehe zum Nordtor und übernimm den besprochenen kurzen Tagesdienst.",
       "point": "patrol_gate",
       "result": "Der bekannte Torabschnitt ist geprüft. Du erhältst die Durchlassnachricht für Cassias Wagen.",
