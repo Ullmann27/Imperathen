@@ -60,6 +60,7 @@ var _armed_sequence := 0
 var _service_gear := false
 var _service_nodes: Array[Node3D] = []
 var _service_external := false
+var _motion_identity := ""
 
 
 func _ready() -> void:
@@ -174,6 +175,7 @@ func _reload(level: int) -> void:
 	level = clampi(level, 0, 3)
 	var saved_phase := phase
 	var previous_path := active_model_path
+	var contacts := _motion.capture_world_contacts() if body and _motion_identity==identity else {}
 	var path := _path(level)
 	var replacement := _instantiate(path)
 	if not replacement and path != _legacy_path(level):
@@ -212,6 +214,8 @@ func _reload(level: int) -> void:
 	_hands.bind(body, active_model_path)
 	_face.bind(body, identity)
 	_motion.bind(body, role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"]), identity)
+	_motion_identity = identity
+	_motion.restore_world_contacts(contacts)
 	# The external tracks target this authored hero family. Never reuse them
 	# on a differently weighted Meshy or frontier character by bone name alone.
 	_motion.external_gestures = active_model_path.begins_with("res://assets/characters/hero_quality_")
@@ -226,6 +230,8 @@ func _reload(level: int) -> void:
 		_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
 	if active_model_path.begins_with("res://assets/meshy/characters/"):
 		MeshyEquipment.attach(body, meshy_asset_id, detail)
+	if not contacts.is_empty():
+		_plant_contacts(0.0)
 	# Retaining every hero PackedScene would also retain every embedded texture
 	# tier. Live instances keep their own references; inactive tiers may unload.
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
@@ -710,13 +716,17 @@ func _process(delta: float) -> void:
 		if animator.current_animation != "":
 			phase = animator.current_animation_position / animator.current_animation_length
 	_apply_motion()
+	_plant_contacts(delta)
+	_face.advance(delta,clip,detail)
+
+
+func _plant_contacts(delta: float) -> void:
 	var stance := 0.40 if clip == "run" else 0.58
 	if _motion.civilian:
 		stance = 0.32 if clip == "run" else 0.53
 	elif active_model_path.contains("meshy/"):
 		stance = 0.40 if clip == "run" else 0.56
 	_motion.plant_world_feet(clip, phase, delta, stance)
-	_face.advance(delta,clip,detail)
 
 
 func world_foot_supported(side: String) -> bool:

@@ -33,6 +33,7 @@ var _transition_duration := 0.0
 var _style_phase := 0.0
 var _world_contacts := {}
 var _world_supported := {}
+var _world_swings := {}
 var _world_previous := Transform3D.IDENTITY
 var _world_initialized := false
 var _world_action := ""
@@ -94,6 +95,7 @@ func advance(delta: float) -> void:
 func reset_world_contacts() -> void:
 	_world_contacts.clear()
 	_world_supported.clear()
+	_world_swings.clear()
 	_world_initialized = false
 	_world_action = ""
 	_turn_step_side = ""
@@ -104,6 +106,30 @@ func world_foot_supported(side: String) -> bool:
 	return bool(_world_supported.get(side, false))
 
 
+func capture_world_contacts() -> Dictionary:
+	if not available or not _world_initialized:
+		return {}
+	return {"contacts":_world_contacts.duplicate(true),"supported":_world_supported.duplicate(),
+		"swings":_world_swings.duplicate(true),"previous":_world_previous,"action":_world_action,
+		"turn_side":_turn_step_side,"turn_time":_turn_step_time,"turn_from":_turn_step_from}
+
+
+func restore_world_contacts(state: Dictionary) -> void:
+	# Transient presentation continuity across an LOD swap, never saved game
+	# state. Bone names/rest lengths are rebound to the actual replacement.
+	if not available or state.is_empty():
+		return
+	_world_contacts = state.contacts.duplicate(true)
+	_world_supported = state.supported.duplicate()
+	_world_swings = state.swings.duplicate(true)
+	_world_previous = state.previous
+	_world_action = state.action
+	_turn_step_side = state.turn_side
+	_turn_step_time = state.turn_time
+	_turn_step_from = state.turn_from
+	_world_initialized = true
+
+
 func plant_world_feet(action: String, phase: float, delta: float, stance: float) -> void:
 	# Root translation and turning are owned by the collision body. A local
 	# animation alone cannot keep a planted sole at its world contact while the
@@ -112,7 +138,7 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 	if not available or not skeleton.is_inside_tree():
 		return
 	var walking := action in ["march", "run", "retreat"]
-	var standing := action in ["idle", "talk", "work", "block"]
+	var standing := action in ["idle", "talk", "work", "block", "attack", "train", "shoot", "wall", "testudo", "hit"]
 	if not walking and not standing:
 		reset_world_contacts()
 		return
@@ -121,6 +147,7 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 		reset_world_contacts()
 	if action != _world_action:
 		_world_contacts.clear()
+		_world_swings.clear()
 		_turn_step_side = ""
 		_turn_step_time = 0.0
 	_world_action = action
@@ -139,12 +166,26 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 		desired[side] = foot
 		var contact: Dictionary = _world_contacts.get(side, {})
 		if supported:
+			_world_swings.erase(side)
 			if contact.is_empty() or (walking and u + 0.00001 < float(contact.phase)):
 				contact = {"transform": foot, "phase": u}
 			contact.phase = u
 			_world_contacts[side] = contact
 			targets[side] = contact.transform
 		else:
+			# Releasing a planted foot must not snap its world-locked rotation
+			# to the now-turned body. Retain the real release transform and
+			# dissipate its positional correction over the lifted swing arc.
+			var swing: Dictionary = _world_swings.get(side,{})
+			if swing.is_empty():
+				var release: Transform3D = contact.get("transform",foot)
+				swing = {"from":release,"offset":release.origin-foot.origin,"phase":u}
+				_world_swings[side] = swing
+			var progress := clampf((u-float(swing.phase))/maxf(.0001,1.0-float(swing.phase)),0.0,1.0)
+			var released: Transform3D = swing.from
+			var stepping := released.interpolate_with(foot,smoothstep(0.0,1.0,progress))
+			stepping.origin = foot.origin+Vector3(swing.offset)*(1.0-smoothstep(0.0,.65,progress))
+			targets[side] = stepping
 			_world_contacts.erase(side)
 		_world_supported[side] = supported
 	# A stationary actor turns with short alternating steps. Keeping both feet
@@ -196,7 +237,15 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 	for side: String in targets:
 		var world_target: Transform3D = targets[side]
 		var local_target := local_from_world * world_target
-		_leg(side, local_target.origin, Vector3.BACK)
+		# Keep the authored knee's bend plane. Forcing every imported rig to
+		# the same model-space pole can flip a knee while its sole is already
+		# at the correct contact, especially during a fast turning stride.
+		var hip := _point("Thigh_"+side)
+		var axis := (_pose[_ids["Foot_"+side]].origin-hip).normalized()
+		var bend := _pose[_ids["Shin_"+side]].origin-hip
+		bend -= axis*bend.dot(axis)
+		bend = bend.normalized() if bend.length_squared()>.00000001 else Vector3.BACK
+		_leg(side, local_target.origin, bend)
 		_orient("Foot_" + side, local_target.basis)
 	skeleton.force_update_all_bone_transforms()
 
@@ -384,7 +433,9 @@ func combat(technique: String, progress: float) -> void:
 		_arm(side, elbow, wrist)
 		_aim("Hand_" + side, _pose[_ids["Forearm_" + side]].basis.y)
 		var foot: Vector3 = _feet[side]
-		foot.z += (0.07 if side == "L" else -0.07) * scale * guard
+		# Weight transfer comes from pelvis/knee flexion. Sliding both soles
+		# seven centimetres along the floor to enter guard was not a step.
+		# The support feet remain fixed; only the authored kicking leg lifts.
 		var bend := Vector3.BACK
 		if technique.ends_with("kick") and side == "R":
 			if technique == "front_kick":

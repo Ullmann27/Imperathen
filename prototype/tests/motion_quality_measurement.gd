@@ -4,6 +4,7 @@ extends SceneTree
 ## fail-closed release gate decides acceptance and never treats this as a pass.
 
 const Person = preload("res://scripts/visuals/village_person.gd")
+const Soldier = preload("res://scripts/visuals/soldier_visual.gd")
 const Motion = preload("res://scripts/visuals/character_motion.gd")
 const SkinMeasurement = preload("res://tests/motion_skin_measurement.gd")
 const EquipmentMeasurement = preload("res://tests/motion_equipment_measurement.gd")
@@ -24,6 +25,14 @@ class SourcePerson extends Person:
 	var exact_source := ""
 	func _path(_level: int) -> String:
 		return exact_source
+
+
+class SourceSoldier extends Soldier:
+	# Exercise each exported fallback with the actual Soldier driver rather
+	# than accidentally measuring its preferred Frontier replacement twice.
+	var exact_source := ""
+	func _body_scene() -> PackedScene:
+		return load(exact_source) as PackedScene
 
 
 func _initialize() -> void:
@@ -64,6 +73,7 @@ func _sample(rig: Skeleton3D, sampler: Callable, name: String, seconds: float, l
 	var worst := {}
 	var surface_metrics := {}
 	var anchors := {}
+	var contact_counts := {"L":0,"R":0}
 	if skin != null:
 		surface_metrics = {"max_sole_penetration_m":0.0,"skin_edge_violations":0}
 	if not contact.is_empty():
@@ -114,13 +124,21 @@ func _sample(rig: Skeleton3D, sampler: Callable, name: String, seconds: float, l
 					worst["sole"] = observed.lowest_sole_vertex.duplicate()
 					worst.sole["phase"] = float(frame)/float(count)
 				surface_metrics.max_sole_penetration_m = maxf(float(surface_metrics.max_sole_penetration_m),float(observed.max_sole_penetration_m))
+			var edge: Dictionary = observed.get("worst_skin_edge",{})
+			if not edge.is_empty() and float(edge.get("excess_m",0.0))>float(worst.get("skin",{}).get("excess_m",0.0)):
+				worst["skin"] = edge.duplicate(true)
+				worst.skin["phase"] = float(frame)/float(count)
 			surface_metrics.skin_edge_violations += int(observed.skin_edge_violations)
 			if not contact.is_empty():
 				var next_anchors := {}
 				for key: int in observed.contact_points:
 					var phase := float(frame)/float(count)
 					var u := fposmod(phase+(0.0 if key%2==1 else .5),1.0)
-					if bool(contact.get("gait",false)) and u>=float(contact.stance): continue
+					if contact.has("supported"):
+						var supported: Callable = contact.supported
+						if not supported.call("R" if key%2==1 else "L"): continue
+					elif bool(contact.get("gait",false)) and u>=float(contact.stance): continue
+					contact_counts["R" if key%2==1 else "L"] += 1
 					var at: Vector3 = observed.contact_points[key]
 					var anchor: Vector3 = anchors.get(key,at)
 					surface_metrics.max_support_slip_m=maxf(float(surface_metrics.max_support_slip_m),Vector2(at.x-anchor.x,at.z-anchor.z).length())
@@ -137,6 +155,7 @@ func _sample(rig: Skeleton3D, sampler: Callable, name: String, seconds: float, l
 				var supported := not bool(contact.get("gait",false)) or u < float(contact.stance)
 				var at := rig.global_transform*pose[bone].origin
 				if supported:
+					contact_counts[side] += 1
 					if anchors.has(side):
 						var anchor: Vector3 = anchors[side]
 						surface_metrics.max_support_slip_m = maxf(float(surface_metrics.max_support_slip_m),Vector2(at.x-anchor.x,at.z-anchor.z).length())
@@ -150,8 +169,14 @@ func _sample(rig: Skeleton3D, sampler: Callable, name: String, seconds: float, l
 			m.max_loop_seam_deg = maxf(m.max_loop_seam_deg,rad_to_deg(last[i].basis.orthonormalized().get_rotation_quaternion().angle_to(first[i].basis.orthonormalized().get_rotation_quaternion())))
 	if must_move and changed < .003 and angle_changed < 1.0:
 		m.frozen_required_clips = 1
+	var errors: Array[String] = []
+	if bool(contact.get("require_both_feet",false)):
+		for side: String in ["L","R"]:
+			if int(contact_counts[side])==0:
+				errors.append("No actual support-surface samples for foot "+side)
 	return {"name":name,"sample_hz":60,"sample_count":count+1,"duration_s":seconds,
-		"finite":finite,"metrics":m,"surface_metrics":surface_metrics,"worst":worst}
+		"finite":finite,"metrics":m,"surface_metrics":surface_metrics,"worst":worst,
+		"contact_samples":contact_counts,"errors":errors}
 
 
 func _raw_asset(path: String) -> void:
@@ -297,6 +322,7 @@ func _runtime_transitions(actor: Person, measured: Dictionary, subject: String) 
 		measured.transition_boundaries.append({"subject":subject,"from":source_clip,"to":command,"metrics":boundary})
 		_merge(metrics,boundary)
 		for frame in 30:
+			actor.position.z -= actor.speed/HZ
 			actor._process(1.0/HZ)
 			for pose: Transform3D in _pose(rig): finite = finite and pose.is_finite()
 			samples += 1
@@ -304,6 +330,51 @@ func _runtime_transitions(actor: Person, measured: Dictionary, subject: String) 
 	_observe(measured,subject,"idle_talk",samples,finite,metrics)
 	_observe(measured,subject,"work_interact",samples,finite,metrics)
 	actor.reset_motion()
+
+
+func _live_person_clip(actor: Person, action: String, skin: RefCounted) -> Dictionary:
+	# The exported raw clips are sampled separately by _raw_asset. Runtime
+	# contact must observe the production driver, including its transition and
+	# world-foot solver, instead of the sample_pose preview shortcut.
+	actor.position = Vector3(0,.9,0)
+	actor.reset_motion()
+	var walking := action in ["march","run"]
+	var speed := 1.45 if action == "march" else (3.6 if action == "run" else 0.0)
+	actor.drive(speed)
+	if action in ["idle","march","run"]:
+		actor._play(action,0.0,0.0)
+	else:
+		actor.cue(action)
+		# Start the single-cycle observation at its actual first pose. The
+		# independent transition fixture checks the incoming crossfade.
+		actor._motion.capture_transition(0.0)
+		actor._play(action,0.0,0.0)
+	var source_clip := action if actor.animator.has_animation(action) else "idle"
+	var seconds: float = actor.animator.get_animation(source_clip).length
+	if walking:
+		seconds = actor.locomotion_stride(action)/speed
+	var elapsed := {"seconds":0.0}
+	var sampler := func(phase: float) -> void:
+		var target := phase*seconds
+		var delta := maxf(0.0,target-float(elapsed.seconds))
+		if walking:
+			actor.position.z -= speed*delta
+		elif action == "talk":
+			actor.keep_talking()
+		elif action == "work":
+			actor.keep_working()
+		actor._process(delta)
+		elapsed.seconds = target
+	var contact := {"gait":walking,"stance":0.32 if action=="run" else 0.53}
+	if action in ["idle","talk","work","march","run"]:
+		contact["supported"] = Callable(actor,"world_foot_supported")
+		contact["require_both_feet"] = true
+	var result := _sample(actor._motion.skeleton,sampler,action,seconds,action in LOOPS,
+		action in MOTION_REQUIRED,skin,contact)
+	result["base_animation"] = source_clip
+	result["playback"] = "Production VillagePerson._process at live speed, with world-foot solver and actual imported skin"
+	result["speed_m_s"] = speed
+	return result
 
 
 func _person_family(family: Dictionary) -> void:
@@ -334,29 +405,14 @@ func _person_family(family: Dictionary) -> void:
 		if "work" not in actions and "work_interact" in family.review_scope:
 			actions.append("work")
 		for action: String in actions:
-			var source_clip := action if actor.animator.has_animation(action) else "idle"
-			var seconds: float = actor.animator.get_animation(source_clip).length
 			var walking := action in ["march","run"]
-			actor.drive(1.45 if action=="march" else (3.6 if action=="run" else 0.0))
-			var stride := actor.locomotion_stride(action) if walking else 0.0
-			# sample_pose selects the full civilian gait for reviews. Use the
-			# production live-speed solver explicitly for measured live contact.
-			var sampler := func(phase: float) -> void:
-				actor.sample_pose(action,phase)
-				if walking and actor._motion.civilian:
-					actor._motion.locomotion(action,phase,actor.speed/actor.body.scale.y)
-				actor.position.z = -phase*stride if walking else 0.0
-			var stance := (.53 if action=="march" else .32) if actor._motion.civilian else (.56 if action=="march" and path.contains("/meshy/") else (.58 if action=="march" else .40))
-			var contact := {"gait":walking,"stance":stance}
-			var clip := _sample(rig,sampler,action,seconds,action in LOOPS,action in MOTION_REQUIRED,skin,contact)
-			clip["base_animation"] = source_clip
+			var clip := _live_person_clip(actor,action,skin)
 			_record_clip(measured,path,clip)
 			var metrics: Dictionary = clip.surface_metrics.duplicate()
 			var combat_scenario := "combat_fallback" if family.id=="legacy_people" else "attack_guard_reaction"
 			var scenario := "idle_talk" if action in ["idle","talk"] else ("walk_run_stop" if walking else ("work_interact" if action in ["work","gather"] else combat_scenario))
 			_observe(measured,path,scenario,int(clip.sample_count),bool(clip.finite),metrics)
-			if not contact.is_empty():
-				_observe(measured,path,"contact_and_weight",int(clip.sample_count),bool(clip.finite),metrics)
+			_observe(measured,path,"contact_and_weight",int(clip.sample_count),bool(clip.finite),metrics)
 			if family.id=="meshy_people":
 				_observe(measured,path,"skin_deformation",int(clip.sample_count),bool(clip.finite),{"skin_edge_violations":metrics.skin_edge_violations})
 			if "military_equipment" in applicable and kit!=null and kit.skin!=null:
@@ -393,6 +449,109 @@ func _person_family(family: Dictionary) -> void:
 				comparison=other
 				break
 		if comparison.is_empty(): continue
+		var metrics := {"max_transition_position_jump_m":0.0,"max_transition_rotation_jump_deg":0.0}
+		var finite := int(lod_poses[path].bones)==int(lod_poses[comparison].bones)
+		for frame in lod_poses[path].poses.size():
+			_merge(metrics,_discontinuity(lod_poses[path].poses[frame],lod_poses[comparison].poses[frame]))
+		_observe(measured,path,"lod_transition",lod_poses[path].poses.size(),finite,metrics)
+	_refresh_family(measured)
+
+
+func _battle_family(family: Dictionary) -> void:
+	var measured := _new_family()
+	family_metrics[family.id] = measured
+	measured["fixture_notes"] = "Exact exported legacy fallback meshes through production Soldier.present. Formation samples are actual idle/wall/testudo poses; battle_rules and soldier_gait separately exercise the real formation model."
+	var lod_poses := {}
+	for path: String in family.resources:
+		var actor := SourceSoldier.new()
+		actor.exact_source = "res://"+path
+		actor.role = path.get_file().split("_")[0]
+		actor.detail = 0 if path.ends_with("_near.glb") else 1
+		root.add_child(actor)
+		actor.set_process(false)
+		await process_frame
+		var rigs := actor.find_children("*","Skeleton3D",true,false)
+		if rigs.size()!=1 or actor.player==null:
+			fatal.append("Production soldier fallback rig missing: "+path)
+			actor.free()
+			continue
+		var rig := rigs[0] as Skeleton3D
+		var skin := SkinMeasurement.new()
+		skin.bind(actor._body)
+		for error: String in skin.errors:
+			measured.errors.append(path+": "+error)
+		for action: String in actor.player.get_animation_list():
+			if action=="RESET": continue
+			actor.position = Vector3.ZERO
+			actor.player.stop()
+			actor._manual_live = false
+			var gait := Soldier.STRIDES.has(action)
+			var speed := 3.8 if action=="run" else (1.8 if action=="retreat" else 1.45)
+			var stride: float = Soldier.STRIDES.get(action,0.0)
+			var seconds: float = stride/speed if gait else actor.player.get_animation(action).length
+			var elapsed := {"seconds":0.0}
+			var sampler := func(phase: float) -> void:
+				var target := phase*seconds
+				actor.position.z = phase*stride
+				actor.present(action,phase,maxf(0.0,target-float(elapsed.seconds)))
+				elapsed.seconds = target
+			var stance: float = {"march":.58,"run":.40,"retreat":.51}.get(action,1.0)
+			var clip := _sample(rig,sampler,action,seconds,action in Soldier.LOOPING,
+				action in MOTION_REQUIRED,skin,{"gait":gait,"stance":stance,"require_both_feet":gait or action in ["idle","wall","testudo"]})
+			clip["playback"] = "Production Soldier.present with explicitly selected exported fallback and actual root distance"
+			clip["speed_m_s"] = speed if gait else 0.0
+			_record_clip(measured,path,clip)
+			var scenario := "march_run_retreat" if gait else ("formation" if action in ["idle","wall","testudo"] else "attack_guard_reaction")
+			_observe(measured,path,scenario,int(clip.sample_count),bool(clip.finite),clip.surface_metrics)
+			_observe(measured,path,"contact_and_weight",int(clip.sample_count),bool(clip.finite),clip.surface_metrics)
+		# Measure transition boundaries without conflating legitimate per-frame
+		# motion with an instantaneous mesh/clip replacement.
+		actor.position = Vector3.ZERO
+		actor.player.stop()
+		actor._manual_live = false
+		actor.present("idle",0.0,0.0)
+		var transitions := {"max_transition_position_jump_m":0.0,"max_transition_rotation_jump_deg":0.0}
+		var count := 0
+		var finite := true
+		for action: String in ["idle","march","run","block","attack","idle"]:
+			var source_clip: String = actor.state
+			var before := _world_pose(rig)
+			actor.present(action,0.0,0.0)
+			var boundary := _discontinuity(before,_world_pose(rig))
+			if not measured.has("transition_boundaries"): measured["transition_boundaries"] = []
+			measured.transition_boundaries.append({"subject":path,"from":source_clip,"to":action,"metrics":boundary})
+			_merge(transitions,boundary)
+			var stride: float = Soldier.STRIDES.get(action,0.0)
+			var speed := 3.8 if action=="run" else (1.8 if action=="retreat" else 1.45)
+			var duration: float = stride/speed if stride>0.0 else actor.player.get_animation(action).length
+			for frame in range(1,31):
+				actor.position.z += speed/HZ if stride>0.0 else 0.0
+				actor.present(action,float(frame)/HZ/duration,1.0/HZ)
+				for pose: Transform3D in _pose(rig): finite = finite and pose.is_finite()
+				count += 1
+		_observe(measured,path,"march_run_retreat",count,finite,transitions)
+		_observe(measured,path,"formation",count,finite,transitions)
+		_observe(measured,path,"attack_guard_reaction",count,finite,transitions)
+		var poses: Array = []
+		for action: String in ["idle","march","run","attack"]:
+			actor.position = Vector3.ZERO
+			actor.player.stop()
+			actor._manual_live = false
+			var stride: float = Soldier.STRIDES.get(action,0.0)
+			var speed := 3.8 if action=="run" else 1.45
+			var duration: float = stride/speed if stride>0.0 else actor.player.get_animation(action).length
+			for frame in range(61):
+				actor.position.z = float(frame)/60.0*stride
+				actor.present(action,float(frame)/60.0,0.0 if frame==0 else duration/60.0)
+				poses.append(_world_pose(rig))
+		lod_poses[path] = {"poses":poses,"bones":rig.get_bone_count()}
+		actor.free()
+		print("MOTION_RUNTIME_SOLDIER ",path)
+		_refresh_family(measured)
+		_checkpoint()
+	for path: String in lod_poses:
+		var comparison := path.replace("_near.glb","_mid.glb") if path.ends_with("_near.glb") else path.replace("_mid.glb","_near.glb")
+		if not lod_poses.has(comparison): continue
 		var metrics := {"max_transition_position_jump_m":0.0,"max_transition_rotation_jump_deg":0.0}
 		var finite := int(lod_poses[path].bones)==int(lod_poses[comparison].bones)
 		for frame in lod_poses[path].poses.size():
@@ -449,6 +608,8 @@ func _run() -> void:
 				_raw_asset(path)
 		if family.id in ["hero","frontier_people","legacy_people","meshy_people","regional_workers"]:
 			await _person_family(family)
+		elif family.id=="battle_rigs":
+			await _battle_family(family)
 		_checkpoint()
 	var equipment: Dictionary = await EquipmentMeasurement.new().measure(self,contract,only_subject)
 	family_metrics.merge(equipment)

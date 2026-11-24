@@ -71,6 +71,20 @@ func _run() -> void:
 			_check(_point(skeleton, "Foot_R").z > 0.45, technique + " extends toward the authoritative forward target")
 		else:
 			_check(absf(_point(skeleton, "Foot_L").y - skeleton.get_bone_global_rest(skeleton.find_bone("Foot_L")).origin.y) < 0.008, technique + " support foot stays planted")
+	# Entering guard must not drag a supporting sole across the floor.
+	# Observe the complete real solver cycle, including guard rise/recovery.
+	for technique: String in Motion.TECHNIQUES:
+		var drift := 0.0
+		for frame in 81:
+			actor.sample_combat(technique,float(frame)/80.0)
+			for side: String in ["L","R"]:
+				if side=="R" and technique.ends_with("kick"):
+					continue
+				var foot := skeleton.find_bone("Foot_"+side)
+				var actual := skeleton.get_bone_global_pose(foot).origin
+				var anchor := skeleton.get_bone_global_rest(foot).origin
+				drift = maxf(drift,Vector2(actual.x-anchor.x,actual.z-anchor.z).length())
+		_check(drift<.001,technique+" support soles remain fixed throughout guard and recovery: "+str(drift))
 	actor.sample_combat("uppercut_left", 0.42)
 	var reference := _point(skeleton, "Hand_L")
 	for level in 4:
@@ -130,10 +144,59 @@ func _run() -> void:
 	actor._process(0.20)
 	_check(actor.clip == "idle", "Zero actual displacement settles into idle")
 	actor.free()
+	_test_live_contact_transitions()
 	print("CHARACTER_MOTION_TEST ", checks, " checks; ", failures.size(), " failed; stance_error_m=", max_stance_error)
 	for failure: String in failures:
 		push_error(failure)
 	quit(0 if failures.is_empty() else 1)
+
+
+func _test_live_contact_transitions() -> void:
+	for identity: String in ["hero","companion","resident"]:
+		var person := Person.new()
+		root.add_child(person)
+		person.position.y = .9
+		person.set_process(false)
+		if identity=="hero": person.configure("player","italia",12)
+		elif identity=="companion": person.configure("companion","italia",12)
+		else: person.configure_resident("italia",32,"civilian_man",0)
+		person._check_lod = 10000.0
+		person.reset_motion()
+		var previous := {}
+		var release_angle := 0.0
+		var lod_shift := 0.0
+		var release_count := 0
+		var finite := true
+		for frame in 360:
+			var pace := 1.45 if frame<60 else (3.6 if frame<300 else 0.0)
+			var turn := 1.6 if frame<180 else -1.6
+			person.rotation.y += turn/60.0
+			person.position -= person.basis.z*pace/60.0
+			person.drive(pace,turn)
+			person._process(1.0/60.0)
+			var rig: Skeleton3D = person._motion.skeleton
+			for side: String in ["L","R"]:
+				var foot := rig.global_transform*rig.get_bone_global_pose(rig.find_bone("Foot_"+side))
+				var supported: bool = person.world_foot_supported(side)
+				finite = finite and foot.is_finite()
+				if previous.has(side) and previous[side].supported and not supported:
+					var prior: Transform3D = previous[side].foot
+					release_angle = maxf(release_angle,rad_to_deg(foot.basis.orthonormalized().get_rotation_quaternion().angle_to(prior.basis.orthonormalized().get_rotation_quaternion())))
+					release_count += 1
+				previous[side] = {"foot":foot,"supported":supported}
+			if frame in [150,260]:
+				person._reload(1 if frame==150 else 2)
+				person._check_lod = 10000.0
+				rig = person._motion.skeleton
+				for side: String in ["L","R"]:
+					var foot := rig.global_transform*rig.get_bone_global_pose(rig.find_bone("Foot_"+side))
+					var before: Transform3D = previous[side].foot
+					lod_shift = maxf(lod_shift,foot.origin.distance_to(before.origin))
+		_check(finite and release_count>6,identity+" has real finite support-to-swing observations")
+		_check(release_angle<=20.0,identity+" releases its planted foot without an orientation snap: "+str(release_angle))
+		_check(lod_shift<=.015,identity+" retains world foot contacts through LOD changes: "+str(lod_shift))
+		print("LIVE_CONTACT_RESULT ",identity," releases=",release_count," release_angle_deg=",release_angle," lod_shift_m=",lod_shift)
+		person.free()
 
 
 func _point(skeleton: Skeleton3D, name: String) -> Vector3:

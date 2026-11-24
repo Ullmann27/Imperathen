@@ -46,8 +46,8 @@
     {
       "lod": 0,
       "triangles": 32820,
-      "bytes": 13644588,
-      "sha256": "69df0f6c2546a5dd075eee07570e071746d5c46e9fcc28e3a7bac11c3a55caeb",
+      "bytes": 9254508,
+      "sha256": "f0600db20ea4957fc50411439fa8b1591ec4fe4389326a27bde89aab6bb63f51",
       "meshes": [
         {
           "name": "HeroBody",
@@ -106,13 +106,42 @@
           "triangles": 16
         }
       ],
-      "texture_edge_max": 2048
+      "texture_edge_max": 2048,
+      "belt_fit": {
+        "garment_slab_samples": 1852,
+        "radial_scale": 1.0216778991847766,
+        "minimum_rest_clearance_m": 0.004,
+        "circumference_samples": 48,
+        "largest_circumferential_edge_degrees": 7.5000019856123155,
+        "scope": "Actual Basis and Mature rest surfaces; animated clearance still requires runtime review"
+      },
+      "grounded_death_translation_keys": 73,
+      "death_export_clearance": {
+        "maximum_m": 0.003,
+        "curve": "sin(pi * normalized_time)^2",
+        "channel": "death/Pelvis/translation/Y",
+        "endpoint_position_delta_m": 0,
+        "interpolation": "LINEAR"
+      },
+      "lossless_delivery": {
+        "method": "Move one original PNG to a tracked image URI; preserve all other view bytes",
+        "before_bytes": 13646260,
+        "after_bytes": 9254508,
+        "before_sha256": "fd1f9fc3f63d961187baae6c2e24c463e22b1bc5626d341e5dcfb36c220d0cfb",
+        "after_sha256": "f0600db20ea4957fc50411439fa8b1591ec4fe4389326a27bde89aab6bb63f51",
+        "external_image_uri": "hero_quality_0_young_lightskinned_female_diffuse.png",
+        "external_image_bytes": 4391156,
+        "external_image_sha256": "b2a6ac8cd4f9febdb447368e29c76cd68410bb66e46d9dcfa2d5f75126eea8fc",
+        "external_image_byte_identical": true,
+        "preserved_buffer_views": 654,
+        "other_buffer_view_payloads_byte_identical": true
+      }
     },
     {
       "lod": 1,
-      "triangles": 16417,
-      "bytes": 6030876,
-      "sha256": "af6a9dfc26ddec361702157943f21fd756ef5ebb476aab73bdfdb0f4de30fc91",
+      "triangles": 16465,
+      "bytes": 6035452,
+      "sha256": "e6705a4a2eeae2f18c2c7fa761b442c4cf07382a294ac389939a630230e5ac0b",
       "meshes": [
         {
           "name": "HeroBody",
@@ -140,7 +169,7 @@
         },
         {
           "name": "HeroBelt",
-          "triangles": 48
+          "triangles": 96
         },
         {
           "name": "HeroSandal_L",
@@ -171,13 +200,29 @@
           "triangles": 16
         }
       ],
-      "texture_edge_max": 1024
+      "texture_edge_max": 1024,
+      "belt_fit": {
+        "garment_slab_samples": 1290,
+        "radial_scale": 1.0204897457547928,
+        "minimum_rest_clearance_m": 0.004,
+        "circumference_samples": 48,
+        "largest_circumferential_edge_degrees": 7.5000019856123155,
+        "scope": "Actual Basis and Mature rest surfaces; animated clearance still requires runtime review"
+      },
+      "grounded_death_translation_keys": 73,
+      "death_export_clearance": {
+        "maximum_m": 0.003,
+        "curve": "sin(pi * normalized_time)^2",
+        "channel": "death/Pelvis/translation/Y",
+        "endpoint_position_delta_m": 0,
+        "interpolation": "LINEAR"
+      }
     },
     {
       "lod": 2,
-      "triangles": 7222,
-      "bytes": 3026828,
-      "sha256": "8f91895bb39608febf1df54ede111d39a0c709fa2a57036553e4ce3cc5e247f1",
+      "triangles": 7297,
+      "bytes": 3032928,
+      "sha256": "b61797af321454919d8ab0e7fd6fa6f5c1fcf0443acbc39ae0a96db38f8e4281",
       "meshes": [
         {
           "name": "HeroBody",
@@ -205,7 +250,7 @@
         },
         {
           "name": "HeroBelt",
-          "triangles": 21
+          "triangles": 96
         },
         {
           "name": "HeroSandal_L",
@@ -236,13 +281,29 @@
           "triangles": 16
         }
       ],
-      "texture_edge_max": 512
+      "texture_edge_max": 512,
+      "belt_fit": {
+        "garment_slab_samples": 814,
+        "radial_scale": 1.0210116024544418,
+        "minimum_rest_clearance_m": 0.004,
+        "circumference_samples": 48,
+        "largest_circumferential_edge_degrees": 7.5000019856123155,
+        "scope": "Actual Basis and Mature rest surfaces; animated clearance still requires runtime review"
+      },
+      "grounded_death_translation_keys": 73,
+      "death_export_clearance": {
+        "maximum_m": 0.003,
+        "curve": "sin(pi * normalized_time)^2",
+        "channel": "death/Pelvis/translation/Y",
+        "endpoint_position_delta_m": 0,
+        "interpolation": "LINEAR"
+      }
     },
     {
       "lod": 3,
-      "triangles": 2820,
-      "bytes": 966952,
-      "sha256": "103845fd62f6aa73284db552cd92be776deb1ec3546bb5ec30bd391cdb5b4b12",
+      "triangles": 2908,
+      "bytes": 974108,
+      "sha256": "c125c6a7dd65d29dabfe309f1e21494dc62349cb04a5c9db959068e874bd6475",
       "meshes": [
         {
           "name": "HeroBody",
@@ -270,7 +331,7 @@
         },
         {
           "name": "HeroBelt",
-          "triangles": 8
+          "triangles": 96
         },
         {
           "name": "HeroSandal_L",
@@ -301,7 +362,23 @@
           "triangles": 16
         }
       ],
-      "texture_edge_max": 256
+      "texture_edge_max": 256,
+      "belt_fit": {
+        "garment_slab_samples": 424,
+        "radial_scale": 1.0513423830948774,
+        "minimum_rest_clearance_m": 0.004,
+        "circumference_samples": 48,
+        "largest_circumferential_edge_degrees": 7.5000019856123155,
+        "scope": "Actual Basis and Mature rest surfaces; animated clearance still requires runtime review"
+      },
+      "grounded_death_translation_keys": 73,
+      "death_export_clearance": {
+        "maximum_m": 0.003,
+        "curve": "sin(pi * normalized_time)^2",
+        "channel": "death/Pelvis/translation/Y",
+        "endpoint_position_delta_m": 0,
+        "interpolation": "LINEAR"
+      }
     }
   ],
   "source": "MakeHuman CC0 graphical data; see source/provenance.json",
@@ -310,5 +387,43 @@
     "Age target fitted to one rest rig; separate adult rig remains a production task.",
     "Micro normal is original procedural relief, not scanned skin.",
     "Facial motion requires visual deformation acceptance."
-  ]
+  ],
+  "skirt_weight_fit": {
+    "vertices": 448,
+    "maximum_total_thigh_weight": 0.45,
+    "centre_blend_width_m": 0.24,
+    "waist_pelvis_weight": 1.0
+  },
+  "death_contact_fit": {
+    "samples": 73,
+    "sample_hz": 60,
+    "maximum_floor_correction_m": 8.467819156976475e-08,
+    "heel_mesh": "HeroSandal_L",
+    "heel_vertex": 10,
+    "method": "Actual deformed visible meshes; fixed initial heel in the ground plane; grounded lowest surface"
+  },
+  "anatomical_geometry_and_morphs_preserved": true,
+  "tunic_weight_fit": {
+    "already_fitted": true,
+    "anatomical_body_weights_changed": false
+  },
+  "death_contact_original_fit": {
+    "samples": 73,
+    "sample_hz": 60,
+    "maximum_floor_correction_m": 0.18544483184814453,
+    "heel_mesh": "HeroSandal_L",
+    "heel_vertex": 10,
+    "method": "Actual deformed visible meshes; fixed initial heel in the ground plane; grounded lowest surface"
+  },
+  "death_contact_original_evidence": "docs/25_team_a/evidence/assets/hero-refit-initial.log",
+  "lossless_source_packaging": {
+    "method": "zstd -19 -T2",
+    "before_bytes": 12726321,
+    "after_bytes": 12346050,
+    "before_sha256": "3bd323f24b6728524db1e59aad9a8b28e447f5a765fc267dee165d8635a6e541",
+    "after_sha256": "28076301cb241d4de450946c08e47c83329a88eae1f50235b9ed4971b9ec4db1",
+    "decompressed_bytes": 16829496,
+    "decompressed_sha256": "922116b67edbcb9686be4f0baf177c344e955174e137a6f4d26c7eee89c55179",
+    "decompressed_stream_byte_identical": true
+  }
 }

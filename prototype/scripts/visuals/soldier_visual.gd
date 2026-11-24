@@ -123,6 +123,11 @@ static func far_mesh(role_name: String) -> Mesh:
 		template.free()
 	return _far_meshes[role_name]
 
+func _body_scene() -> PackedScene:
+	# Keep asset selection separate from the production player/skin binding.
+	# Verification can exercise an exported fallback through this same driver.
+	return _scene(role, detail)
+
 func _replace_body() -> void:
 	if _body:
 		remove_child(_body)
@@ -134,7 +139,7 @@ func _replace_body() -> void:
 		_body = instance
 		_apply_tint(instance)
 	else:
-		_body = _scene(role, detail).instantiate() as Node3D
+		_body = _body_scene().instantiate() as Node3D
 		player = _body.find_child("AnimationPlayer", true, false) as AnimationPlayer
 		for instance in _body.find_children("*", "MeshInstance3D", true, false):
 			_apply_tint(instance as MeshInstance3D)

@@ -4,6 +4,7 @@ const Person = preload("res://scripts/visuals/village_person.gd")
 const Motion = preload("res://scripts/visuals/character_motion.gd")
 const SkinMeasurement = preload("res://tests/motion_skin_measurement.gd")
 const Clearance = preload("res://tests/motion_mesh_clearance.gd")
+const MeshyEquipment = preload("res://scripts/visuals/meshy_equipment.gd")
 const HZ := 60.0
 
 
@@ -37,17 +38,34 @@ func _attachments(actor: Person) -> Array[BoneAttachment3D]:
 
 func _socket(attachment: BoneAttachment3D, rig: Skeleton3D) -> Dictionary:
 	var bone := rig.find_bone(attachment.bone_name)
-	if bone<0: return {"finite":false}
+	if bone<0: return {"finite":false,"error":"Missing actual hand bone"}
 	var expected := rig.global_transform*rig.get_bone_global_pose(bone)
 	var actual := attachment.global_transform
 	var point_error := actual.origin.distance_to(expected.origin)
 	var socket_name := "SOCKET_RIGHT_HAND" if attachment.bone_name=="Hand_R" else "SOCKET_LEFT_HAND"
 	var marker := attachment.find_child(socket_name,true,false) as Node3D
-	if marker!=null:
-		point_error=maxf(point_error,marker.global_position.distance_to(expected.origin))
-	return {"finite":actual.is_finite() and expected.is_finite(),
+	if marker==null: return {"finite":false,"error":"Missing actual model grip marker"}
+	# A BoneAttachment follows its bone even when a child prop is displaced
+	# or rotated. Compare the actual exported marker against the declared
+	# equipment grip frame, not only that automatically-following wrapper.
+	var rest:=rig.get_bone_global_rest(bone).basis
+	var grip_basis:=rest.orthonormalized().inverse()
+	var grip_offset:=Vector3.ZERO
+	if attachment.get_meta("meshy_equipment",false):
+		var definition:=MeshyEquipment.definition_for(str(attachment.get_meta("asset_id","")))
+		if definition.is_empty() or definition.bone!=attachment.bone_name or definition.socket!=socket_name:
+			return {"finite":false,"error":"No declared grip frame for this Meshy model"}
+		grip_basis=rest.inverse()*Basis(Vector3.UP,float(definition.yaw))
+		grip_offset=rest.inverse()*Vector3(definition.offset)
+	var expected_marker:=expected*Transform3D(grip_basis,grip_offset)
+	var marker_transform:=marker.global_transform
+	point_error=maxf(point_error,marker_transform.origin.distance_to(expected_marker.origin))
+	var wrapper_angle:=actual.basis.orthonormalized().get_rotation_quaternion().angle_to(expected.basis.orthonormalized().get_rotation_quaternion())
+	var marker_angle:=marker_transform.basis.orthonormalized().get_rotation_quaternion().angle_to(expected_marker.basis.orthonormalized().get_rotation_quaternion())
+	return {"finite":actual.is_finite() and expected.is_finite() and marker_transform.is_finite() and expected_marker.is_finite(),
 		"max_socket_drift_m":point_error,
-		"max_socket_orientation_error_deg":rad_to_deg(actual.basis.orthonormalized().get_rotation_quaternion().angle_to(expected.basis.orthonormalized().get_rotation_quaternion()))}
+		"max_socket_orientation_error_deg":rad_to_deg(maxf(wrapper_angle,marker_angle)),
+		"grip_position":marker_transform.origin}
 
 
 func _record_actor(tree: SceneTree, actor: Person, family: Dictionary, identity: String, only_subject: String) -> void:
@@ -87,14 +105,16 @@ func _record_actor(tree: SceneTree, actor: Person, family: Dictionary, identity:
 					var socket:=_socket(attachment,rig)
 					var valid:=bool(socket.finite) and bool(actual_skin.finite)
 					if not socket.finite:
-						family.errors.append(subject+": socket has no finite production hand binding")
+						family.errors.append(subject+": "+str(socket.get("error","Socket has no finite production hand binding")))
 						continue
 					var socket_metrics: Dictionary=socket.duplicate()
 					socket_metrics.erase("finite")
+					socket_metrics.erase("grip_position")
 					_observe(family,subject,"grip_socket",valid,socket_metrics)
 					_observe(family,subject,"attack_guard_reaction",valid,socket_metrics)
-					var bone:=rig.find_bone(attachment.bone_name)
-					var grip: Array[Dictionary]=[{"position":rig.global_transform*rig.get_bone_global_pose(bone).origin,"radius":.08}]
+					# The same 8 cm region follows the actual authored physical
+					# grip. The wrist root is not the palm/shaft contact point.
+					var grip: Array[Dictionary]=[{"position":socket.grip_position,"radius":.08}]
 					var prop:=Clearance.geometry(Clearance.rigid_surfaces(attachment))
 					var observed:=Clearance.compare(body,prop,grip)
 					if bool(observed.finite):

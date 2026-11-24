@@ -87,8 +87,8 @@ func advance(delta: float) -> void:
 		controllers[id].move(body, target, delta, speed, distance)
 		var travelled := body.global_position-before
 		var actual_speed := Vector2(travelled.x, travelled.z).length()/maxf(delta, 0.0001)
-		if Vector2(travelled.x, travelled.z).length_squared() > 0.000001:
-			body.rotation.y = lerp_angle(body.rotation.y, atan2(-travelled.x, -travelled.z), minf(1.0, delta*8.0))
+		# Follow.move already turns this exact body at its bounded angular rate.
+		# The visual adapter must not rotate it a second time in the same tick.
 		body.get_node("Figure").drive(actual_speed)
 		body.set_meta("companion_mode", mode)
 		body.set_meta("activity", "march" if actual_speed > 0.05 else "rest")

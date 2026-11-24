@@ -3,6 +3,7 @@ extends SceneTree
 ## This script records frames. It never grants quality approval or gameplay progress.
 
 const Person = preload("res://scripts/visuals/village_person.gd")
+const Soldier = preload("res://scripts/visuals/soldier_visual.gd")
 const Motion = preload("res://scripts/visuals/character_motion.gd")
 const Model = preload("res://scripts/domain/world_model.gd")
 const World = preload("res://scripts/world/game_world.gd")
@@ -16,6 +17,11 @@ class SourcePerson extends Person:
 	var exact_source := ""
 	func _path(_level: int) -> String:
 		return exact_source
+
+class SourceSoldier extends Soldier:
+	var exact_source := ""
+	func _body_scene() -> PackedScene:
+		return load(exact_source) as PackedScene
 
 var plan: Dictionary = {}
 var slots: Array[Dictionary] = []
@@ -159,7 +165,7 @@ func _new_view(title: String, count: int) -> Dictionary:
 	stage.add_child(ground)
 	var grid := Node3D.new()
 	stage.add_child(grid)
-	for index in range(-12, 48):
+	for index in range(-64, 65):
 		var line := MeshInstance3D.new()
 		var mesh := BoxMesh.new()
 		mesh.size = Vector3(6, .003, .012)
@@ -200,6 +206,19 @@ func _build_people() -> void:
 			slot["actor"] = raw
 			slot["player"] = player
 			slot["raw"] = true
+		elif str(plan.family)=="battle_rigs":
+			var actor := SourceSoldier.new()
+			actor.exact_source = "res://"+path
+			actor.role = path.get_file().split("_")[0]
+			actor.detail = 0 if path.ends_with("_near.glb") else 1
+			stage.add_child(actor)
+			actor.set_process(false)
+			slot["actor"] = actor
+			slot["raw"] = false
+			slot["soldier"] = true
+			slot["paths"] = paths
+			slot["index"] = index
+			slot["last_clip"] = ""
 		else:
 			var actor := SourcePerson.new()
 			actor.exact_source = "res://" + path
@@ -259,6 +278,22 @@ func _build_segments() -> void:
 		_append("world_stop", 3.0, "Anhalten und Richtungswechsel")
 		_append("world_interact", 5.0, "Begegnung / Reaktion / Formationsansicht")
 		return
+	if str(plan.family)=="battle_rigs":
+		_append("idle",2.0,"Produktiver Soldatenstand")
+		_append("march",3.0,"Marsch mit tatsächlichem Weg und Schrittphase")
+		_append("run",2.0,"Laufender Soldat")
+		_append("retreat",2.0,"Rückzugsbewegung")
+		_append("stop",2.0,"Abbremsen in den Stand")
+		_append("wall",2.0,"Schildwallhaltung")
+		_append("testudo",2.0,"Formationshaltung")
+		_append("attack",2.0,"Angriff mit vorhandener Ausrüstung")
+		_append("block",1.5,"Abwehr")
+		if str(plan.actor_paths[0]).contains("archer_"):
+			_append("shoot",2.0,"Bogenschuss")
+		_append("hit",1.2,"Trefferreaktion")
+		_append("lod",3.2,"Produktiver Nah-Mittel-Wechsel")
+		_append("death",2.0,"Fallbewegung")
+		return
 	_append("idle", 2.0, "Stand, Atmung und Blick")
 	_append("talk", 2.0, "Gespräch und Gewichtsverlagerung")
 	_append("march", 3.0, "Anlaufen und Gehen über sichtbares Bodengitter")
@@ -285,6 +320,8 @@ func _enter_segment(segment: Dictionary) -> void:
 	for slot: Dictionary in slots:
 		var actor: Variant = slot.actor
 		slot.lod_choice = -1
+		if bool(slot.get("soldier",false)):
+			continue
 		if bool(slot.raw):
 			var player: AnimationPlayer = slot.player
 			var action := str(segment.action)
@@ -310,8 +347,11 @@ func _tick_person(slot: Dictionary, segment: Dictionary, t: float, delta: float)
 	var actor: Variant = slot.actor
 	var action := str(segment.action)
 	var desired := 1.45 if action in ["march", "lod"] else (3.8 if action == "run" else 0.0)
+	if action=="retreat": desired = 1.8
 	slot.speed = move_toward(float(slot.speed), desired, delta * 3.0)
-	if bool(slot.raw):
+	if bool(slot.get("soldier",false)):
+		_tick_soldier(slot,action,t,delta)
+	elif bool(slot.raw):
 		var player: AnimationPlayer = slot.player
 		player.advance(delta)
 		if action in ["march", "run", "stop", "lod"]:
@@ -319,7 +359,9 @@ func _tick_person(slot: Dictionary, segment: Dictionary, t: float, delta: float)
 	else:
 		if action in ["march", "run", "stop", "lod"]:
 			actor.drive(float(slot.speed))
-			actor.position.z += float(slot.speed) * delta
+			# VillagePerson turns its imported +Z-facing mesh by PI. The live
+			# player advances along -Z; +Z here filmed a backwards walk.
+			actor.position.z -= float(slot.speed) * delta
 		elif action == "talk": actor.keep_talking()
 		elif action == "work": actor.keep_working()
 		if action == "lod":
@@ -332,11 +374,42 @@ func _tick_person(slot: Dictionary, segment: Dictionary, t: float, delta: float)
 				actor._check_lod = 100000.0
 				_observe_resources(actor, str(paths[choice]))
 		actor._process(delta)
-	var target: Vector3 = actor.position + Vector3(0, -.05 if not bool(slot.raw) else .85, 0)
+	var target: Vector3 = actor.position + Vector3(0, .85 if bool(slot.raw) or bool(slot.get("soldier",false)) else -.05, 0)
 	var camera: Camera3D = slot.camera
 	var angle := .5 if action != "lod" else .5 + .2 * sin(t * 2.0)
+	if bool(slot.raw) or bool(slot.get("soldier",false)):
+		angle += PI
 	camera.position = target + Vector3(0, .35, -4.8).rotated(Vector3.UP, angle)
 	camera.look_at(target)
+
+
+func _tick_soldier(slot: Dictionary, action: String, t: float, delta: float) -> void:
+	var actor: SourceSoldier = slot.actor
+	var clip := "march" if action=="lod" else action
+	if action=="stop": clip = "march" if float(slot.speed)>.06 else "idle"
+	var gait := Soldier.STRIDES.has(clip)
+	if str(slot.last_clip)!=clip:
+		if not (gait and Soldier.STRIDES.has(str(slot.last_clip))):
+			slot.phase = 0.0
+		slot.last_clip = clip
+	if gait:
+		var travel := float(slot.speed)*delta
+		actor.position.z += travel
+		slot.phase = fposmod(float(slot.phase)+travel/float(Soldier.STRIDES[clip]),1.0)
+	else:
+		var seconds := actor.player.get_animation(clip).length if actor.player.has_animation(clip) else 1.0
+		slot.phase = float(slot.phase)+delta/seconds
+		if clip in Soldier.LOOPING: slot.phase = fposmod(float(slot.phase),1.0)
+		else: slot.phase = minf(1.0,float(slot.phase))
+	if action=="lod":
+		var paths: Array = slot.paths
+		var choice := (int(t/.8)+int(slot.index))%paths.size()
+		if choice!=int(slot.lod_choice):
+			slot.lod_choice = choice
+			actor.exact_source = "res://"+str(paths[choice])
+			actor.set_detail(0 if str(paths[choice]).ends_with("_near.glb") else 1)
+			_observe_resources(actor,str(paths[choice]))
+	actor.present(clip,float(slot.phase),delta)
 
 
 func _observe_resources(actor: Node, initial: String) -> void:

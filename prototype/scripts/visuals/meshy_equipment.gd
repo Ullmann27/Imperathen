@@ -5,12 +5,20 @@ extends RefCounted
 const PATH := "res://assets/meshy/equipment/%s_%d.glb"
 const LOADOUTS := {
 	"unit_germanic_axe_fighter":[
-		{"asset":"weap_germanic_hand_axe", "bone":"Hand_R", "offset":Vector3(0.02,-0.055,0.095), "yaw":PI/2},
-		{"asset":"gear_germanic_round_shield", "bone":"Hand_L", "offset":Vector3(-0.02,-0.055,0.095), "yaw":0.0}],
+		{"asset":"weap_germanic_hand_axe", "bone":"Hand_R", "socket":"SOCKET_RIGHT_HAND", "offset":Vector3(0.02,-0.055,0.095), "yaw":PI/2},
+		{"asset":"gear_germanic_round_shield", "bone":"Hand_L", "socket":"SOCKET_LEFT_HAND", "offset":Vector3(-0.02,-0.055,0.095), "yaw":0.0}],
 	"unit_roman_signifer":[
-		{"asset":"gear_roman_signum", "bone":"Hand_R", "offset":Vector3(0.02,-0.055,0.095), "yaw":0.0}]
+		{"asset":"gear_roman_signum", "bone":"Hand_R", "socket":"SOCKET_RIGHT_HAND", "offset":Vector3(0.02,-0.055,0.095), "yaw":0.0}]
 }
 static var _scenes: Dictionary = {}
+
+
+static func definition_for(asset_id: String) -> Dictionary:
+	for items: Array in LOADOUTS.values():
+		for item: Dictionary in items:
+			if item.asset == asset_id:
+				return item.duplicate()
+	return {}
 
 
 static func has_complete_set(identity: String) -> bool:
@@ -34,18 +42,30 @@ static func attach(model: Node3D, identity: String, detail: int) -> Array[Node3D
 	var tier := 0 if detail <= 1 else 1
 	# Resolve the whole loadout before attaching anything. Partial equipment is
 	# not a successful replacement for the original armed frontier character.
-	var prepared: Array[PackedScene] = []
+	var prepared: Array[Node3D] = []
 	for item: Dictionary in LOADOUTS[identity]:
 		if skeleton.find_bone(item.bone) < 0:
+			_release(prepared)
 			return result
 		var path := PATH % [item.asset, tier]
 		if not _scenes.has(path):
 			if not ResourceLoader.exists(path, "PackedScene"):
+				_release(prepared)
 				return result
 			_scenes[path] = load(path) as PackedScene
 		if not _scenes[path] is PackedScene:
+			_release(prepared)
 			return result
-		prepared.append(_scenes[path])
+		var prop := (_scenes[path] as PackedScene).instantiate() as Node3D
+		if prop == null:
+			_release(prepared)
+			return result
+		var socket := prop.find_child(str(item.socket), true, false) as Node3D
+		if socket == null:
+			prop.free()
+			_release(prepared)
+			return result
+		prepared.append(prop)
 	# Reload normally frees the previous Model and all its attachments. This
 	# guard also makes an explicit second attach idempotent on one live rig.
 	for child: Node in skeleton.get_children():
@@ -69,8 +89,13 @@ static func attach(model: Node3D, identity: String, detail: int) -> Array[Node3D
 		grip.basis = inverse * Basis(Vector3.UP, float(item.yaw))
 		grip.position = inverse * Vector3(item.offset)
 		attachment.add_child(grip)
-		var prop := prepared[index].instantiate() as Node3D
+		var prop := prepared[index]
 		prop.name = "Prop"
 		grip.add_child(prop)
 		result.append(attachment)
 	return result
+
+
+static func _release(nodes: Array[Node3D]) -> void:
+	for node: Node3D in nodes:
+		node.free()

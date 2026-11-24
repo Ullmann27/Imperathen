@@ -20,12 +20,15 @@ OUT = ROOT / "prototype/assets/meshy/equipment"
 REPORT = ROOT / "docs/20_meshy_assets/equipment-build.json"
 PROFILES = {
     "weap_germanic_hand_axe": {"category": "weapon", "height": .62, "grip_height": .12,
+        "socket": "SOCKET_RIGHT_HAND",
         "cross_scale": .52, "triangles": (1200, 350),
         "source_sha256": "6c665a3e0c5d929031c64632e2159ba60e0d75f7ccc3b1cf0856f9d4778af87c"},
     "gear_germanic_round_shield": {"category": "equipment", "height": .66,
+        "socket": "SOCKET_LEFT_HAND",
         "cross_scale": 1.0, "triangles": (1800, 450),
         "source_sha256": "e0ca7bd76079567cff1b3f91425e9534af978358dc11dd4498af18fd04c78be0"},
     "gear_roman_signum": {"category": "equipment", "height": 2.10, "grip_height": .70,
+        "socket": "SOCKET_RIGHT_HAND",
         "cross_scale": 1.20, "triangles": (1400, 450),
         "source_sha256": "ec927a279e63e395de29f8a8bb7bd3c1e16ed26dc3a7df0c9aa7dfe5e5bacbd7"},
 }
@@ -132,6 +135,13 @@ def source_object(identity, profile):
 
 def export_tiers(identity, obj, profile):
     original = obj.data.copy()
+    # source_object already makes the reviewed physical grip the mesh origin.
+    # Preserve that frame as an actual exported node, so runtime QA observes
+    # the prop itself rather than merely its BoneAttachment wrapper.
+    socket = bpy.data.objects.new(profile["socket"], None)
+    bpy.context.collection.objects.link(socket)
+    socket.parent = obj
+    socket.matrix_local = Matrix.Identity(4)
     result = []
     for tier, texture_edge in ((0, 512), (1, 256)):
         obj.data = original.copy()
@@ -152,6 +162,7 @@ def export_tiers(identity, obj, profile):
                 image.pack()
         bpy.ops.object.select_all(action="DESELECT")
         obj.select_set(True)
+        socket.select_set(True)
         path = OUT / (identity + "_%d.glb" % tier)
         bpy.ops.export_scene.gltf(filepath=str(path), export_format="GLB", use_selection=True,
                                   export_animations=False, export_skins=False, export_morph=False,
@@ -159,6 +170,7 @@ def export_tiers(identity, obj, profile):
         obj.data.calc_loop_triangles()
         low, high = bounds([vertex.co for vertex in obj.data.vertices])
         result.append({"tier": tier, "path": str(path.relative_to(ROOT)),
+                       "socket": profile["socket"], "socket_local_origin": [0, 0, 0],
                        "triangles": len(obj.data.loop_triangles), "texture_edge": texture_edge,
                        "bounds_blender": [list(low), list(high)], "size_bytes": path.stat().st_size,
                        "sha256": digest(path)})

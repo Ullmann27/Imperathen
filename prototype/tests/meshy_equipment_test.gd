@@ -3,6 +3,7 @@ extends SceneTree
 
 const Person := preload("res://scripts/visuals/village_person.gd")
 const Equipment := preload("res://scripts/visuals/meshy_equipment.gd")
+const SocketMeasurement := preload("res://tests/motion_equipment_measurement.gd")
 const EXPECTED := {
 	"unit_germanic_axe_fighter":{"weap_germanic_hand_axe":"Hand_R", "gear_germanic_round_shield":"Hand_L"},
 	"unit_roman_signifer":{"gear_roman_signum":"Hand_R"}}
@@ -12,6 +13,29 @@ var failures: Array[String] = []
 var stage: Node3D
 var output := ""
 var captures: Array[Dictionary] = []
+
+
+func _check_physical_socket(attachment: BoneAttachment3D, label: String) -> void:
+	var rig:=attachment.get_parent() as Skeleton3D
+	var fixture:=SocketMeasurement.new()
+	var baseline:=fixture._socket(attachment,rig)
+	_check(baseline.finite and float(baseline.get("max_socket_drift_m",INF))<.002 and float(baseline.get("max_socket_orientation_error_deg",INF))<2.0,label+" actual exported grip frame matches the declared hand attachment")
+	var grip:=attachment.get_node("Grip") as Node3D
+	var original:=grip.transform
+	grip.position+=Vector3(.012,0,0)
+	var displaced:=fixture._socket(attachment,rig)
+	_check(displaced.finite and float(displaced.max_socket_drift_m)>.011,label+" catches displaced child prop even while BoneAttachment stays correct")
+	grip.transform=original
+	grip.rotate_object_local(Vector3.UP,deg_to_rad(10.0))
+	var rotated:=fixture._socket(attachment,rig)
+	_check(rotated.finite and float(rotated.max_socket_orientation_error_deg)>9.0,label+" catches rotated child prop")
+	grip.transform=original
+	var socket_name:="SOCKET_RIGHT_HAND" if attachment.bone_name=="Hand_R" else "SOCKET_LEFT_HAND"
+	var socket:=attachment.find_child(socket_name,true,false) as Node3D
+	if socket!=null:
+		socket.name="MissingGripDuringNegativeCheck"
+		_check(not fixture._socket(attachment,rig).finite,label+" rejects missing model grip marker")
+		socket.name=socket_name
 
 
 func _initialize() -> void:
@@ -84,6 +108,7 @@ func _run() -> void:
 				var expected := rig.global_transform * rig.get_bone_global_pose(rig.find_bone(attachment.bone_name))
 				_check(attachment.global_transform.is_equal_approx(expected), "Equipment follows actual posed hand transform")
 				_check(attachment.global_position.distance_to((before[attachment.get_meta("asset_id")] as Transform3D).origin) > .025, "Held equipment moves with a walking hand")
+				_check_physical_socket(attachment,identity+" "+str(attachment.get_meta("asset_id"))+" LOD"+str(level))
 			prior.clear()
 			for attachment: BoneAttachment3D in attachments:
 				prior.append(attachment.get_instance_id())
@@ -112,6 +137,16 @@ func _run() -> void:
 	child.configure("player", "italia", 12)
 	_check(not child.configure_meshy("unit_germanic_axe_fighter") and _attachments(child).is_empty(), "Cosmetic NPC props cannot arm the child player")
 	child.free()
+	var adult:=Person.new()
+	stage.add_child(adult)
+	adult.set_process(false)
+	adult.configure("player","italia",18)
+	adult.set_service_gear(true)
+	_check(adult.sample_service_combat("thrust",.56),"Physical socket fixture uses a real adult service combat pose")
+	await process_frame
+	for attachment: BoneAttachment3D in adult._service_nodes:
+		_check_physical_socket(attachment,str(attachment.name))
+	adult.free()
 	var report := {"engine":Engine.get_version_info().string, "checks":checks, "failures":failures,
 		"scope":"Actual imported production VillagePerson and hand attachments; no inventory or damage changes",
 		"android_device_test":false, "captures":captures}

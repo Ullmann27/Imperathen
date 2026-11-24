@@ -13,6 +13,7 @@ const CompanionWorld = preload("res://scripts/world/companion_world.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
+const CameraObstruction = preload("res://scripts/world/camera_obstruction.gd")
 var village_life_world: Node3D
 var regional_terrain: Node3D
 var _village_focus := ""
@@ -77,6 +78,7 @@ var _shown_work := -1.0
 var _figure: VillagePerson
 var _camera: Camera3D
 var _camera_initialized := false
+var _camera_obstruction = CameraObstruction.new()
 var _menu_flight := false
 var _flight_time := 0.0
 var _companion: CharacterBody3D
@@ -135,6 +137,7 @@ func setup(state: Dictionary) -> void:
 	_camera_pitch = START_PITCH
 	_figure.rotation.y = START_YAW
 	_camera_initialized = false
+	_camera_obstruction.reset()
 	if regional.current_origin != state.get("origin_id","italia"):
 		var id: String = state.get("origin_id","italia")
 		regional.show_origin(id)
@@ -1214,10 +1217,12 @@ func _pan_city_camera(delta: float) -> void:
 func _update_camera(delta: float) -> void:
 	var target: Vector3
 	var desired: Vector3
+	var collision_anchor := Vector3.INF
 	if not _village_focus.is_empty() and village_life_world != null and village_life_world.actors.has(_village_focus):
 		var actor: Vector3 = village_life_world.actor_position(_village_focus)
 		var right := Vector3.UP.cross(_frontier_camera_direction)
-		target = actor + Vector3.UP * 1.48 + right * .65
+		collision_anchor = actor + Vector3.UP * 1.48
+		target = collision_anchor + right * .65
 		desired = actor + Vector3.UP * 1.65 + _frontier_camera_direction * 3.0
 	elif not _frontier_focus.is_empty() and not population.info(_frontier_focus).is_empty():
 		var actor: Vector3 = population.actor_position(_frontier_focus)
@@ -1225,22 +1230,12 @@ func _update_camera(delta: float) -> void:
 		var right := Vector3.UP.cross(_frontier_camera_direction)
 		target = head+right*.64
 		desired = actor+Vector3.UP*1.60+_frontier_camera_direction*3.0
-		if is_inside_tree():
-			var query := PhysicsRayQueryParameters3D.create(head,desired,1)
-			var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
-			if not hit.is_empty():
-				desired = hit.position+(head-hit.position).normalized()*.28
+		collision_anchor = head
 	elif _mode == "person":
 		target = _player.global_position + Vector3(0, 0.40, 0)
+		collision_anchor = target
 		var offset := Vector3(0.36, sin(_camera_pitch) * _person_zoom + 0.22, cos(_camera_pitch) * _person_zoom)
 		desired = target + offset.rotated(Vector3.UP, _camera_yaw)
-		if is_inside_tree():
-			var query := PhysicsRayQueryParameters3D.create(target, desired, 1)
-			query.exclude = [_player.get_rid()]
-			var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
-			if not hit.is_empty():
-				var hit_position: Vector3 = hit["position"]
-				desired = hit_position + (target - hit_position).normalized() * 0.4
 		# Look beyond the shoulder so the horizon and the path remain visible.
 		target += Vector3(0.36, 0.05, -3.6).rotated(Vector3.UP, _camera_yaw)
 	elif _mode == "city":
@@ -1256,7 +1251,12 @@ func _update_camera(delta: float) -> void:
 		target = _map_focus
 		desired = target + Vector3(0, 104, 18)
 		_camera.size = 100.0
-	if not _camera_initialized:
+	if collision_anchor.is_finite() and is_inside_tree():
+		var previous := _camera.global_position if _camera_initialized else Vector3.INF
+		_camera.global_position = _camera_obstruction.place(get_world_3d().direct_space_state,
+			collision_anchor,desired,previous,1.0-exp(-maxf(delta,0.0)*12.0),[_player.get_rid()])
+		_camera_initialized = true
+	elif not _camera_initialized:
 		_camera.global_position = desired
 		_camera_initialized = true
 	else:

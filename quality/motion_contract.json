@@ -18,7 +18,10 @@
         "natural_motion",
         "cc0_runtime_gestures",
         "locomotion_regression",
-        "action_world"
+        "action_world",
+        "camera_collision",
+        "motion_skin_measurement",
+        "hero_cloth_grounding"
       ],
       "review_scope": [
         "idle_talk",
@@ -353,7 +356,7 @@
         "skin_deformation"
       ],
       "open_requirements": [
-        "Full world-space foot-contact and transition coverage for both Meshy rigs is missing."
+        "Complete world-space foot-contact and transition acceptance for both Meshy rigs remains open."
       ]
     },
     {
@@ -406,7 +409,7 @@
         "near_far_transition"
       ],
       "open_requirements": [
-        "Shader-based distant ranks lack measured contact/phase/reaction and visible-distance acceptance."
+        "Measured contact/phase/reaction and visible-distance acceptance of the distant-rank shader remains open."
       ]
     },
     {
@@ -429,7 +432,7 @@
         "contact_and_weight"
       ],
       "open_requirements": [
-        "Farmer playback has been checked, but complete task/contact realism is not yet measured."
+        "Complete task/contact acceptance of every exported regional worker remains open."
       ]
     },
     {
@@ -444,7 +447,8 @@
         "service_gear",
         "character_motion",
         "combat_actions",
-        "combat_model"
+        "combat_model",
+        "motion_mesh_clearance"
       ],
       "review_scope": [
         "grip_socket",
@@ -468,7 +472,8 @@
       ],
       "required_checks": [
         "meshy_equipment",
-        "meshy_characters"
+        "meshy_characters",
+        "motion_mesh_clearance"
       ],
       "review_scope": [
         "grip_socket",
@@ -487,7 +492,10 @@
         "npc_behavior_world",
         "locomotion_regression",
         "village_collision",
-        "action_world"
+        "action_world",
+        "companion_navigation",
+        "companion_follow",
+        "camera_collision"
       ],
       "review_scope": [
         "world_displacement",
@@ -516,7 +524,7 @@
         "contact_and_weight"
       ],
       "open_requirements": [
-        "Raid actor transforms are directly assigned from discrete simulation snapshots; continuous render/physics interpolation and contact proof are missing."
+        "Continuous raid physics is implemented; full contact, collision, transition and visual acceptance remains open."
       ]
     },
     {
@@ -665,7 +673,11 @@
     "scripts/domain/world_model.gd",
     "scripts/main.gd",
     "scripts/story/campaign_bible.gd",
+    "scripts/story/chapter_abilities.gd",
+    "scripts/story/companion_follow.gd",
+    "scripts/story/companion_story.gd",
     "scripts/story/frontier_chapter.gd",
+    "scripts/story/mission_data.gd",
     "scripts/story/opening_story.gd",
     "scripts/story/village_childhood.gd",
     "scripts/story/village_life.gd",
@@ -682,7 +694,10 @@
     "scripts/ui/combat_action.gd",
     "scripts/ui/figure_gallery.gd",
     "scripts/ui/game_ui.gd",
+    "scripts/ui/imperial_fx.gd",
+    "scripts/ui/imperial_intro.gd",
     "scripts/ui/opening_overlay.gd",
+    "scripts/ui/roman_style.gd",
     "scripts/ui/runtime_display.gd",
     "scripts/ui/safe_area.gd",
     "scripts/ui/touch_action.gd",
@@ -707,6 +722,8 @@
     "scripts/visuals/service_gear.gd",
     "scripts/visuals/soldier_visual.gd",
     "scripts/visuals/village_person.gd",
+    "scripts/world/camera_obstruction.gd",
+    "scripts/world/companion_world.gd",
     "scripts/world/game_world.gd",
     "scripts/world/player_action_world.gd",
     "scripts/world/regional_terrain.gd",
@@ -727,7 +744,14 @@
     "scripts/world/village_life_world.gd",
     "scripts/world/world_smoke.gd",
     "scripts/world/world_stream_plan.gd",
-    "shaders/rank_stride.gdshader"
+    "shaders/drifting_fog.gdshader",
+    "shaders/imperial_metal.gdshader",
+    "shaders/intro_backdrop.gdshader",
+    "shaders/legion_silhouette.gdshader",
+    "shaders/menu_grade.gdshader",
+    "shaders/rank_stride.gdshader",
+    "shaders/roman_banner.gdshader",
+    "shaders/torch_flame.gdshader"
   ],
   "procedural_owners": {
     "scripts/world/village_life_world.gd": [
@@ -770,6 +794,16 @@
       "meshy_people",
       "service_gear",
       "meshy_gear"
+    ],
+    "scripts/world/companion_world.gd": [
+      "village_navigation"
+    ],
+    "scripts/story/companion_follow.gd": [
+      "village_navigation"
+    ],
+    "scripts/world/camera_obstruction.gd": [
+      "hero",
+      "village_navigation"
     ]
   }
 }

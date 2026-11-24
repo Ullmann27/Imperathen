@@ -7,6 +7,8 @@ const Model = preload("res://scripts/domain/world_model.gd")
 const Stage = preload("res://scripts/cinematic/i00_stage.gd")
 const Ranks = preload("res://scripts/visuals/far_ranks.gd")
 const Soldier = preload("res://scripts/visuals/soldier_visual.gd")
+const Childhood = preload("res://scripts/story/village_childhood.gd")
+const Life = preload("res://scripts/story/village_life.gd")
 const DT := 1.0/60.0
 var _tree: SceneTree
 
@@ -35,7 +37,7 @@ func _add(family: Dictionary, subject: String, scenario: String, sample: Diction
 
 
 func _observer() -> Dictionary:
-	return {"count":0,"finite":true,"metrics":_world_metrics(),"actors":{},"worst":{},"contact_samples":0}
+	return {"count":0,"finite":true,"metrics":_world_metrics(),"actors":{},"worst":{},"contact_samples":0,"max_root_turn_deg":0.0}
 
 
 func _maximum(sample: Dictionary, key: String, value: float, context: Dictionary) -> void:
@@ -70,6 +72,13 @@ func _observe_person(sample: Dictionary, actor: Node3D, figure: Node3D) -> void:
 	var previous: Dictionary = sample.actors.get(id,{})
 	var at := actor.global_position
 	var context := {"actor":actor.name,"clip":figure.clip,"frame":int(previous.get("frame",0))+1,"model":figure.active_model_path}
+	var root_rotation := actor.global_basis.orthonormalized().get_rotation_quaternion()
+	if not previous.is_empty():
+		context["root_turn_deg"] = rad_to_deg(root_rotation.angle_to(previous.root_rotation))
+		sample.max_root_turn_deg = maxf(float(sample.max_root_turn_deg),float(context.root_turn_deg))
+		context["previous_model"] = previous.model
+		context["previous_clip"] = previous.clip
+		context["lod_changed"] = previous.model != figure.active_model_path
 	var m: Dictionary = sample.metrics
 	var pose: Array[Transform3D] = []
 	var rigs: Array[Node] = figure.find_children("*","Skeleton3D",true,false)
@@ -121,7 +130,8 @@ func _observe_person(sample: Dictionary, actor: Node3D, figure: Node3D) -> void:
 			contacts[side] = contact
 		else:
 			contacts.erase(side)
-	sample.actors[id] = {"root":at,"pose":pose,"contacts":contacts,"frame":context.frame}
+	sample.actors[id] = {"root":at,"root_rotation":root_rotation,"pose":pose,"contacts":contacts,
+		"frame":context.frame,"model":figure.active_model_path,"clip":figure.clip}
 	sample.count += 1
 
 
@@ -147,6 +157,7 @@ func measure(tree: SceneTree, _contract: Dictionary) -> Dictionary:
 	await tree.physics_frame
 	result.village_navigation = _navigation(world,model.data)
 	result.raid_motion = await _raid(world,model.data)
+	await _companions(world,result.village_navigation)
 	world.free()
 	return result
 
@@ -199,6 +210,144 @@ func _navigation(world: Node3D, data: Dictionary) -> Dictionary:
 		_observe_person(dialogue,resident,figure)
 	_add(family,subject,"dialogue_transition",dialogue)
 	return family
+
+
+func _reach_companion_stage(model: RefCounted, stage: String, family: Dictionary) -> bool:
+	# Normal validated commands establish the mission; only the player's travel
+	# to each conversation/work point is fixture placement, never quest editing.
+	for attempt in 100:
+		var view: Dictionary = Childhood.view(model.data)
+		if view.is_empty():
+			family.errors.append("Companion fixture has no mission view before "+stage)
+			return false
+		if str(view.stage) == stage:
+			return true
+		var point: Vector2 = view.point
+		model.set_player_position(Vector3(point.x,1.0,point.y))
+		var npc := str(view.get("target_npc",""))
+		if not npc.is_empty() and not Life.relationship(model.data,npc).get("met",false):
+			var greeting: Dictionary = model.execute("village_talk",{"npc_id":npc,"choice":"meet"})
+			if not greeting.ok:
+				family.errors.append("Companion fixture could not meet "+npc+": "+str(greeting.message))
+				return false
+		view = Childhood.view(model.data)
+		var action := str(view.actions[0].payload.action_id)
+		if str(view.stage) == "i03_marcus":
+			action = "marcus_friend"
+		var result: Dictionary = model.execute("village_childhood_action",{"action_id":action})
+		if not result.ok:
+			family.errors.append("Companion fixture command "+action+": "+str(result.message))
+			return false
+		if action.begins_with("begin_"):
+			model.advance(float(view.work_required)+0.05)
+	family.errors.append("Companion fixture did not reach "+stage)
+	return false
+
+
+func _companion_sample(family: Dictionary, stage: String, id: String, scenario: String,
+		sample: Dictionary, segment: String) -> void:
+	_add(family,"family:village_navigation",scenario,sample)
+	family.scenario_samples.back()["fixture"] = {"mission_step":stage,"actor_id":id,"segment":segment}
+
+
+func _companions(world: Node3D, family: Dictionary) -> void:
+	var model := Model.new()
+	model.new_game("italia",true,true)
+	var cases := {
+		"deliver_kindling":{"id":"silvanus","player":Vector3(31.4,.94,-21.9),"stop":Vector2(30.4,-23.2),"limit":2100},
+		"market_trade":{"id":"marcus","player":Vector3(24.4,.94,28.0),"stop":Vector2(22.8,26.8),"limit":1200}}
+	var snapshots := {}
+	for stage: String in cases:
+		if not _reach_companion_stage(model,stage,family):
+			return
+		snapshots[stage] = model.data.duplicate(true)
+	family["companion_routes"] = []
+	for stage: String in cases:
+		var spec: Dictionary = cases[stage]
+		var id := str(spec.id)
+		model.data = snapshots[stage].duplicate(true)
+		model.set_player_position(spec.player)
+		world.setup(model.data)
+		world.set_active(true)
+		world.set_physics_process(false)
+		world.village_life_world.set_physics_process(false)
+		_manual_people(world)
+		var actor: CharacterBody3D = world._story_companions.actor(id)
+		if actor == null or not Childhood.companion_specs(model.data).has(id):
+			family.errors.append("Missing actual mission companion: "+stage+"/"+id)
+			continue
+		var figure: Node3D = actor.get_node("Figure")
+		var actor_identity := actor.get_instance_id()
+		var people_count: int = world.population.actors.size()+world.village_life_world.actors.size()
+		await _tree.physics_frame
+		await _tree.physics_frame
+		var start := actor.global_position
+		var travel := 0.0
+		var walking := _observer()
+		_observe_person(walking,actor,figure)
+		# Pause after real travel, not after an assumed amount of wall-clock time.
+		for frame in int(spec.limit):
+			await _tree.physics_frame
+			var before := actor.global_position
+			world._update_story_companions(DT)
+			figure._process(DT)
+			travel += Vector2(actor.global_position.x-before.x,actor.global_position.z-before.z).length()
+			_observe_person(walking,actor,figure)
+			if travel >= 2.0:
+				break
+		var paused_at := actor.global_position
+		var paused := _observer()
+		_observe_person(paused,actor,figure)
+		world.set_active(false)
+		var pause_displacement := 0.0
+		for frame in 60:
+			await _tree.physics_frame
+			world._update_story_companions(DT)
+			figure._process(DT)
+			pause_displacement = maxf(pause_displacement,actor.global_position.distance_to(paused_at))
+			_observe_person(paused,actor,figure)
+			_observe_person(walking,actor,figure)
+		world.set_active(true)
+		var resumed_distance := 0.0
+		for frame in int(spec.limit):
+			await _tree.physics_frame
+			var before := actor.global_position
+			world._update_story_companions(DT)
+			figure._process(DT)
+			var step := Vector2(actor.global_position.x-before.x,actor.global_position.z-before.z).length()
+			resumed_distance += step
+			travel += step
+			_observe_person(walking,actor,figure)
+			if Vector2(actor.global_position.x,actor.global_position.z).distance_to(spec.stop) < 0.35:
+				break
+		var stopped := _observer()
+		for frame in 120:
+			await _tree.physics_frame
+			var before := actor.global_position
+			world._update_story_companions(DT)
+			figure._process(DT)
+			travel += Vector2(actor.global_position.x-before.x,actor.global_position.z-before.z).length()
+			_observe_person(stopped,actor,figure)
+			_observe_person(walking,actor,figure)
+		var gap := Vector2(actor.global_position.x,actor.global_position.z).distance_to(spec.stop)
+		var final_speed := float(figure.speed)
+		if travel <= 1.0 or resumed_distance <= 0.1 or gap >= 0.6 or final_speed >= 0.05:
+			family.errors.append("Companion route not completed by actual walking and stopping: "+stage+"/"+id)
+		if pause_displacement > 0.001:
+			family.errors.append("Companion moved while the world was paused: "+stage+"/"+id)
+		if world._story_companions.actor(id).get_instance_id() != actor_identity or world.population.actors.size()+world.village_life_world.actors.size() != people_count:
+			family.errors.append("Companion fixture replaced or duplicated its production actor: "+stage+"/"+id)
+		for scenario: String in ["world_displacement","contact_and_weight","collision","walk_run_stop"]:
+			_companion_sample(family,stage,id,scenario,walking,"travel_pause_resume_stop")
+		_companion_sample(family,stage,id,"dialogue_transition",paused,"world_pause")
+		_companion_sample(family,stage,id,"walk_run_stop",stopped,"arrival_hold")
+		family.companion_routes.append({"mission_step":stage,"actor_id":id,"model":figure.active_model_path,
+			"distance_m":travel,"displacement_m":start.distance_to(actor.global_position),
+			"resumed_distance_m":resumed_distance,"pause_displacement_m":pause_displacement,
+			"arrival_gap_m":gap,"final_speed_m_s":final_speed,"sample_count":int(walking.count),
+			"max_root_turn_deg":float(walking.max_root_turn_deg),
+			"same_actor":world._story_companions.actor(id).get_instance_id()==actor_identity})
+	family["companion_fixture_notes"] = "Validated mission commands reach deliver_kindling and market_trade. Player arrivals are fixture placements; the existing Silvanus/Marcus bodies then walk via production companion navigation and 60-Hz physics, including pause, resume and their authored stop. No quest editing or duplicate actors."
 
 
 func _raid(world: Node3D, data: Dictionary) -> Dictionary:

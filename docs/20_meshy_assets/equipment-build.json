@@ -46,8 +46,14 @@
               0.5
             ]
           ],
-          "size_bytes": 96772,
-          "sha256": "418e8a59c858aa94f466aaee72e501aa67d39992306580a0fd4d0df22dd2d76e"
+          "size_bytes": 96816,
+          "sha256": "e72574d2f373a925eec3e0e0066e2736aa2c41a5a6725ab1c1f9e796da578470",
+          "socket": "SOCKET_RIGHT_HAND",
+          "socket_local_origin": [
+            0,
+            0,
+            0
+          ]
         },
         {
           "tier": 1,
@@ -66,8 +72,14 @@
               0.5000213980674744
             ]
           ],
-          "size_bytes": 38972,
-          "sha256": "09e98ed5c828bc7833cb4c33034f6541539b92814752ef0ca438bd618f7bb8f8"
+          "size_bytes": 39016,
+          "sha256": "5932afe53e74a4526bbef2bf36b4457484582e72110b4bc9bed78a77771b43c1",
+          "socket": "SOCKET_RIGHT_HAND",
+          "socket_local_origin": [
+            0,
+            0,
+            0
+          ]
         }
       ]
     },
@@ -115,8 +127,14 @@
               0.3300485610961914
             ]
           ],
-          "size_bytes": 200740,
-          "sha256": "0d3542a26c420ffe8070c6dff053a4a09fc52603dabfdedf5ff9ef3a9067b5a0"
+          "size_bytes": 200784,
+          "sha256": "70646f5e96e943270cb63792206fb24542285f32067e3649e8d2b0a29f2821bc",
+          "socket": "SOCKET_LEFT_HAND",
+          "socket_local_origin": [
+            0,
+            0,
+            0
+          ]
         },
         {
           "tier": 1,
@@ -135,8 +153,14 @@
               0.3303401470184326
             ]
           ],
-          "size_bytes": 68736,
-          "sha256": "705cb2b4a9441edd6884cb30d567b521d576558711e74f3a407668290ce93a5a"
+          "size_bytes": 68776,
+          "sha256": "8ad63e39d9505527649003e657bb175cad1d641495af8bf2de5f308f59fb47cf",
+          "socket": "SOCKET_LEFT_HAND",
+          "socket_local_origin": [
+            0,
+            0,
+            0
+          ]
         }
       ]
     },
@@ -184,8 +208,14 @@
               1.4057265520095825
             ]
           ],
-          "size_bytes": 140164,
-          "sha256": "eb318275115392fccba4ca3b9a291057baeba6cdff88f7195fe9a76be3d63847"
+          "size_bytes": 140208,
+          "sha256": "12b56a4a313bb4b670cfef3dcdbcca95940736f3a953d4ec8c8cd5489a784571",
+          "socket": "SOCKET_RIGHT_HAND",
+          "socket_local_origin": [
+            0,
+            0,
+            0
+          ]
         },
         {
           "tier": 1,
@@ -204,8 +234,14 @@
               1.4089583158493042
             ]
           ],
-          "size_bytes": 52720,
-          "sha256": "73a3a069c1f013d78fa1b7703e36ba539b8edb2c92c527464c90d4b206483612"
+          "size_bytes": 52764,
+          "sha256": "dc830f1a969f4cb63319aac473924cb3699b9bf4832d652a550fda2a2d35dd03",
+          "socket": "SOCKET_RIGHT_HAND",
+          "socket_local_origin": [
+            0,
+            0,
+            0
+          ]
         }
       ]
     }

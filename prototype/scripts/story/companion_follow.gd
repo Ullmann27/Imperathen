@@ -19,6 +19,7 @@ const WAYPOINT_DISTANCE := 0.12
 const ARRIVAL_EPSILON := 0.004
 const RETARGET_DISTANCE := 4.0
 const RETARGET_INTERVAL := 0.4
+const MAX_TURN_RATE := 4.5
 const DIRECTIONS := [Vector2i(1,0),Vector2i(0,1),Vector2i(-1,0),Vector2i(0,-1),
 	Vector2i(1,1),Vector2i(-1,1),Vector2i(-1,-1),Vector2i(1,-1)]
 
@@ -136,7 +137,9 @@ func move(body: CharacterBody3D, target: Vector3, delta: float, speed := 3.8, st
 	elif actual_speed >= 0.10:
 		_blocked_seconds = 0.0
 	if actual_speed > 0.04:
-		body.rotation.y = lerp_angle(body.rotation.y,atan2(-travelled.x,-travelled.z),minf(1.0,delta*8.0))
+		# This controller owns the physical body's heading. A constant angular
+		# rate avoids the old frame-dependent second turn in CompanionWorld.
+		body.rotation.y = rotate_toward(body.rotation.y,atan2(-travelled.x,-travelled.z),minf(delta,0.1)*MAX_TURN_RATE)
 	_publish(body)
 
 

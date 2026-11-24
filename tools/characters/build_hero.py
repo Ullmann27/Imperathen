@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import json
 import math
+import struct
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -21,6 +22,9 @@ from mathutils import Vector, Matrix, Quaternion
 from mathutils.kdtree import KDTree
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pack_hero_delivery import pack_blend_lossless, pack_hero_glb
+
 ART = ROOT / 'art/hero_quality'
 SRC = ART / 'source'
 OUT = ROOT / 'prototype/assets/characters'
@@ -28,6 +32,12 @@ REVIEW = ART / 'review'
 MORPHS = ('Mature', 'Companion', 'Blink_L', 'Blink_R', 'JawOpen', 'Smile', 'BrowDown')
 CLIPS = {'idle':2., 'march':1., 'run':.72, 'gather':1.15, 'talk':1.35,
          'train':.86, 'work':1.6, 'block':1.2, 'attack':.8, 'hit':.48, 'death':1.2}
+# Imported LOD0/1 sandal vertex 20 still crossed the floor by 10.31 mm
+# (11.75 mm at the runtime adult scale) during the middle of the fall.
+# A 3 mm smooth transient in this clip absorbs the export interpolation error.
+# Endpoint positions stay unchanged; the envelope has zero endpoint slope.
+# The exported linear keys introduce no position jump or rest-pose offset.
+DEATH_EXPORT_CLEARANCE_M = .003
 
 
 def obj_data(path):
@@ -242,6 +252,72 @@ def simple_weights(point,joints):
         return {'Forearm'+side:1-t,'Arm'+side:t}
     t=max(0,min(1,(z-joints['Spine'][0].z+.09)/.20))
     return {'Pelvis':1-t,'Spine':t}
+
+
+def fit_skirt_weights(skirt, joints):
+    """Keep continuous cloth continuous across the left/right leg centreline.
+
+    The previous generic point classifier attached neighbouring hem vertices
+    entirely to opposite thighs. A high kick consequently pulled a 2 cm edge
+    apart by more than 45 cm. The waistband stays on the pelvis; only the lower
+    cloth gradually follows the two thighs, with a smooth shared centre seam.
+    """
+    waist = joints['Spine'][0].z
+    hem = joints['Shin_L'][0].z + .11
+    skirt.vertex_groups.clear()
+    groups = {name: skirt.vertex_groups.new(name=name) for name in ('Pelvis', 'Thigh_L', 'Thigh_R')}
+    for vertex in skirt.data.vertices:
+        x, _, z = vertex.co
+        lower = max(0., min(1., (waist - z) / max(.01, waist - hem)))
+        lower = lower * lower * (3. - 2. * lower)
+        left = max(0., min(1., (x + .12) / .24))
+        left = left * left * (3. - 2. * left)
+        leg = .45 * lower
+        values = {'Pelvis': 1. - leg, 'Thigh_L': leg * left, 'Thigh_R': leg * (1. - left)}
+        for name, amount in values.items():
+            if amount > 0.:
+                groups[name].add([vertex.index], amount, 'REPLACE')
+    return {'vertices': len(skirt.data.vertices), 'maximum_total_thigh_weight': .45,
+            'centre_blend_width_m': .24, 'waist_pelvis_weight': 1.0}
+
+
+def fit_tunic_joint_weights(tunic):
+    """Blend abrupt sleeve/torso assignments only along real cloth edges."""
+    if tunic.get('hero_tunic_weight_fit_version', 0) == 1:
+        return {'already_fitted': True, 'anatomical_body_weights_changed': False}
+    names = [group.name for group in tunic.vertex_groups]
+    count = len(tunic.data.vertices)
+    values = np.zeros((count, len(names)))
+    for vertex in tunic.data.vertices:
+        for group in vertex.groups:
+            values[vertex.index, group.group] = group.weight
+    positions = np.array([tuple(vertex.co) for vertex in tunic.data.vertices])
+    edges = np.array([tuple(edge.vertices) for edge in tunic.data.edges], dtype=np.int32)
+    first, last = edges[:, 0], edges[:, 1]
+    influence = 1. / np.maximum(.003, np.linalg.norm(positions[first] - positions[last], axis=1))
+    totals = np.zeros(count)
+    np.add.at(totals, first, influence)
+    np.add.at(totals, last, influence)
+    for _ in range(2):
+        neighbours = np.zeros_like(values)
+        np.add.at(neighbours, first, values[last] * influence[:, None])
+        np.add.at(neighbours, last, values[first] * influence[:, None])
+        active = totals > 0.
+        values[active] = .65 * values[active] + .35 * neighbours[active] / totals[active, None]
+    tunic.vertex_groups.clear()
+    groups = {name: tunic.vertex_groups.new(name=name) for name in names}
+    for index, row in enumerate(values):
+        chosen = np.argsort(row)[-4:]
+        total = row[chosen].sum()
+        if total <= 0.:
+            raise ValueError('Unbound tunic vertex after local seam smoothing')
+        for group_index in chosen:
+            weight = float(row[group_index] / total)
+            if weight > 0.:
+                groups[names[group_index]].add([index], weight, 'REPLACE')
+    tunic['hero_tunic_weight_fit_version'] = 1
+    return {'vertices': count, 'topology_local_passes': 2, 'blend_per_pass': .35,
+            'maximum_influences': 4, 'anatomical_body_weights_changed': False}
 
 
 def body(anatomy,arm,skin):
@@ -536,10 +612,12 @@ def clothing(anatomy,arm,linen,leather):
     j=anatomy['joints'];neck=j['Head'][0].z;waist=j['Spine'][0].z;hip=j['Pelvis'][0].z
     shoulder=abs(j['Arm_L'][0].x);knee=j['Shin_L'][0].z;hem=knee+.11
     tunic=tailored_top(anatomy,arm,linen)
+    fit_tunic_joint_weights(tunic)
     rings=[(0,-.025,hem,.222,.148),(0,-.025,hem+.015,.221,.149),(0,-.025,hem+.085,.211,.150),
            (0,-.026,hip-.03,.194,.146),(0,-.027,hip+.04,.180,.134),
            (0,-.026,waist-.015,.164,.127),(0,-.026,waist+.018,.170,.131)]
     skirt=loft('HeroTunicSkirt',rings,linen,arm,j,fold=.0048)
+    fit_skirt_weights(skirt, j)
     belt=loft('HeroBelt',[(0,-.026,waist-.030,.174,.139),(0,-.026,waist+.009,.174,.139)],leather,arm,j,48,0)
     fit_belt_clearance(belt, [tunic, skirt])
 
@@ -592,6 +670,85 @@ def animate(arm):
         return original(clip,t,role)
     soldier.pose=pose;soldier.LENGTHS=CLIPS
     soldier.animate(arm,'civilian')
+
+
+def fit_death_ground_contact(arm):
+    """Bake the actual skinned fall around its heel with a grounded lower hull.
+
+    Geometry is sampled before changing any animation key. The previous fixed
+    pelvis drop came from a different soldier rig and drove this smaller
+    character's sandals through the floor. This is an authored clip correction,
+    not a relaxed test or an invisible runtime teleport.
+    """
+    action = bpy.data.actions.get('death')
+    if action is None or arm.pose.bones.get('Pelvis') is None:
+        raise ValueError('The authored death action and pelvis are required')
+    scene = bpy.context.scene
+    arm.animation_data.action = action
+    for track in arm.animation_data.nla_tracks:
+        track.mute = True
+    meshes = [obj for obj in scene.objects if obj.type == 'MESH' and not obj.hide_render and obj.find_armature() == arm]
+    heel_mesh = bpy.data.objects.get('HeroSandal_L')
+    if heel_mesh not in meshes:
+        raise ValueError('The authored sandal is required for the fall pivot')
+    first, last = action.frame_range
+    samples = max(2, math.ceil((last - first) / scene.render.fps * 60))
+    pelvis = arm.pose.bones['Pelvis']
+    records = []
+    anchor = None
+    heel_index = None
+    floor = None
+    maximum_raise = 0.
+    for index in range(samples + 1):
+        frame = first + (last - first) * index / samples
+        scene.frame_set(math.floor(frame), subframe=frame % 1.)
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        low = float('inf')
+        heel_points = None
+        for obj in meshes:
+            evaluated = obj.evaluated_get(depsgraph)
+            mesh = evaluated.to_mesh()
+            try:
+                coords = np.empty(len(mesh.vertices) * 3, dtype=np.float64)
+                mesh.vertices.foreach_get('co', coords)
+                matrix = np.array(evaluated.matrix_world)
+                points = coords.reshape((-1, 3)) @ matrix[:3, :3].T + matrix[:3, 3]
+                low = min(low, float(points[:, 2].min()))
+                if obj == heel_mesh:
+                    heel_points = points
+            finally:
+                evaluated.to_mesh_clear()
+        if not math.isfinite(low) or heel_points is None:
+            raise ValueError('Cannot measure the actual posed fall geometry')
+        if anchor is None:
+            floor = low
+            sole = np.flatnonzero(heel_points[:, 2] <= heel_points[:, 2].min() + .002)
+            heel_index = int(sole[np.argmax(heel_points[sole, 1])])
+            anchor = heel_points[heel_index].copy()
+        heel = heel_points[heel_index]
+        correction = Vector((anchor[0] - heel[0], anchor[1] - heel[1], floor - low))
+        maximum_raise = max(maximum_raise, correction.z)
+        local = pelvis.bone.matrix_local.to_3x3().inverted() @ (arm.matrix_world.to_3x3().inverted() @ correction)
+        records.append((frame, pelvis.location.copy() + local))
+    path = 'pose.bones["Pelvis"].location'
+    for curve in action.fcurves:
+        if curve.data_path == path:
+            curve.keyframe_points.clear()
+    for frame, location in records:
+        pelvis.location = location
+        pelvis.keyframe_insert('location', frame=frame)
+    for curve in action.fcurves:
+        if curve.data_path == path:
+            for key in curve.keyframe_points:
+                key.interpolation = 'LINEAR'
+    arm.animation_data.action = None
+    for bone in arm.pose.bones:
+        bone.rotation_quaternion = (1, 0, 0, 0)
+        bone.location = (0, 0, 0)
+    scene.frame_set(0)
+    return {'samples': len(records), 'sample_hz': 60, 'maximum_floor_correction_m': maximum_raise,
+            'heel_mesh': heel_mesh.name, 'heel_vertex': heel_index,
+            'method': 'Actual deformed visible meshes; fixed initial heel in the ground plane; grounded lowest surface'}
 
 
 def setup_scene():
@@ -694,18 +851,119 @@ def export_lods():
         bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,
             export_animation_mode='NLA_TRACKS',export_force_sampling=True,export_frame_step=1,
             export_animations=True,export_morph=True,export_morph_animation=False,export_def_bones=False)
+        death_keys=preserve_grounded_death_keys(path,bpy.data.objects['HeroRig'])
+        delivery=pack_hero_glb(path) if level==0 else None
         triangles=0;meshes=[]
         for obj in bpy.context.scene.objects:
             if obj.type=='MESH':
                 obj.data.calc_loop_triangles();n=len(obj.data.loop_triangles);triangles+=n;meshes.append({'name':obj.name,'triangles':n})
-        report.append({'lod':level,'triangles':triangles,'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'meshes':meshes,'texture_edge_max':texsize,'belt_fit':belt_fit})
+        report.append({'lod':level,'triangles':triangles,'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'meshes':meshes,'texture_edge_max':texsize,'belt_fit':belt_fit,'grounded_death_translation_keys':death_keys,'lossless_delivery':delivery,
+                       'death_export_clearance':{'maximum_m':DEATH_EXPORT_CLEARANCE_M,'curve':'sin(pi * normalized_time)^2','channel':'death/Pelvis/translation/Y','endpoint_position_delta_m':0,'interpolation':'LINEAR'}})
     return report
+
+
+def preserve_grounded_death_keys(path, arm):
+    """Keep authored 60 Hz translation keys after Blender's 25 fps NLA bake.
+
+    Only the death pelvis translation sampler is replaced. Mesh, materials,
+    morphs, other channels and every other animation's duration are preserved.
+    glTF uses the armature-local Y-up coordinates corresponding to Blender Z-up.
+    """
+    action=bpy.data.actions.get('death')
+    curves={curve.array_index:curve for curve in action.fcurves if curve.data_path=='pose.bones["Pelvis"].location'}
+    if set(curves)!={0,1,2} or arm.data.bones['Pelvis'].parent is not None:
+        raise ValueError('Expected the authored root pelvis translation')
+    frames=sorted({float(key.co.x) for curve in curves.values() for key in curve.keyframe_points})
+    if len(frames)<60:
+        raise ValueError('Grounded fall must be authored at 60 Hz before export')
+    rest=arm.data.bones['Pelvis'].matrix_local
+    positions=[]
+    for frame in frames:
+        point=rest.translation+rest.to_3x3() @ Vector(tuple(curves[axis].evaluate(frame) for axis in range(3)))
+        phase=(frame-frames[0])/(frames[-1]-frames[0])
+        clearance=DEATH_EXPORT_CLEARANCE_M*math.sin(math.pi*phase)**2
+        positions.append([point.x,point.z+clearance,-point.y])
+    times=[(frame-frames[0])/bpy.context.scene.render.fps for frame in frames]
+    data=path.read_bytes()
+    json_size,json_kind=struct.unpack_from('<II',data,12)
+    if json_kind!=0x4E4F534A:
+        raise ValueError('Exported glTF JSON chunk is missing')
+    document=json.loads(data[20:20+json_size])
+    bin_at=20+json_size
+    bin_size,bin_kind=struct.unpack_from('<II',data,bin_at)
+    if bin_kind!=0x004E4942 or len(document['buffers'])!=1 or document['buffers'][0].get('uri'):
+        raise ValueError('Expected the embedded single-buffer hero GLB')
+    binary=bytearray(data[bin_at+8:bin_at+8+bin_size])
+    original_binary=bytes(binary)
+    def append_accessor(values,kind):
+        binary.extend(b'\0'*(-len(binary)%4))
+        offset=len(binary)
+        flattened=[float(value) for row in values for value in row]
+        binary.extend(struct.pack('<'+'f'*len(flattened),*flattened))
+        view=len(document['bufferViews'])
+        document['bufferViews'].append({'buffer':0,'byteOffset':offset,'byteLength':len(flattened)*4})
+        accessor=len(document['accessors'])
+        document['accessors'].append({'bufferView':view,'componentType':5126,'count':len(values),'type':kind,
+            'min':[min(row[axis] for row in values) for axis in range(len(values[0]))],
+            'max':[max(row[axis] for row in values) for axis in range(len(values[0]))]})
+        return accessor
+    input_accessor=append_accessor([[time] for time in times],'SCALAR')
+    output_accessor=append_accessor(positions,'VEC3')
+    matches=[]
+    for animation in document['animations']:
+        if animation['name']!='death':continue
+        for channel in animation['channels']:
+            target=channel['target']
+            if document['nodes'][target['node']].get('name')=='Pelvis' and target['path']=='translation':
+                channel['sampler']=len(animation['samplers'])
+                animation['samplers'].append({'input':input_accessor,'output':output_accessor,'interpolation':'LINEAR'})
+                matches.append(channel)
+    if len(matches)!=1:
+        raise ValueError('Expected exactly one exported death pelvis channel')
+    if bytes(binary[:len(original_binary)])!=original_binary:
+        raise AssertionError('Original glTF mesh/morph/animation bytes changed')
+    document['buffers'][0]['byteLength']=len(binary)
+    encoded=json.dumps(document,separators=(',',':'),ensure_ascii=False).encode('utf-8')
+    encoded+=b' '*(-len(encoded)%4)
+    binary.extend(b'\0'*(-len(binary)%4))
+    total=12+8+len(encoded)+8+len(binary)
+    path.write_bytes(struct.pack('<4sIIII',b'glTF',2,total,len(encoded),0x4E4F534A)+encoded+struct.pack('<II',len(binary),0x004E4942)+binary)
+    return len(frames)
 
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--preview-only',action='store_true');parser.add_argument('--export',action='store_true');parser.add_argument('--no-render',action='store_true');parser.add_argument('--clay',action='store_true')
+    parser.add_argument('--refit-existing', action='store_true', help='Preserve the authored hero geometry/materials and correct its skirt weights and fall')
     args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
     for d in (ART,OUT,REVIEW):d.mkdir(parents=True,exist_ok=True)
+    if args.refit_existing:
+        bpy.ops.wm.open_mainfile(filepath=str(ART/'hero.blend'))
+        arm=bpy.data.objects.get('HeroRig')
+        if arm is None:
+            raise ValueError('Expected the existing authored HeroRig')
+        joints={bone.name:(bone.head_local.copy(),bone.tail_local.copy(),bone.parent.name if bone.parent else None) for bone in arm.data.bones}
+        meshes=[obj for obj in bpy.context.scene.objects if obj.type=='MESH']
+        preserved={obj.name:([[tuple(v.co) for v in obj.data.vertices]],
+                   [(key.name,[tuple(v.co) for v in key.data]) for key in obj.data.shape_keys.key_blocks] if obj.data.shape_keys else []) for obj in meshes}
+        skirt_fit=fit_skirt_weights(bpy.data.objects['HeroTunicSkirt'],joints)
+        tunic_fit=fit_tunic_joint_weights(bpy.data.objects['HeroTunic'])
+        death_contact=fit_death_ground_contact(arm)
+        for obj in meshes:
+            current=([[tuple(v.co) for v in obj.data.vertices]],
+                     [(key.name,[tuple(v.co) for v in key.data]) for key in obj.data.shape_keys.key_blocks] if obj.data.shape_keys else [])
+            if current!=preserved[obj.name]:
+                raise ValueError('Refit unexpectedly changed anatomical geometry or morphs: '+obj.name)
+        bpy.context.preferences.filepaths.save_version=0
+        bpy.ops.wm.save_as_mainfile(filepath=str(ART/'hero.blend'),compress=True)
+        source_packaging=pack_blend_lossless(ART/'hero.blend')
+        levels=export_lods()
+        report_path=ART/'build_report.json'
+        report=json.loads(report_path.read_text())
+        report.update(lods=levels,skirt_weight_fit=skirt_fit,tunic_weight_fit=tunic_fit,death_contact_fit=death_contact,lossless_source_packaging=source_packaging,
+                      anatomical_geometry_and_morphs_preserved=True)
+        report_path.write_text(json.dumps(report,indent=2)+'\n')
+        print('HERO_MOTION_REFIT_COMPLETE',json.dumps({'skirt':skirt_fit,'tunic':tunic_fit,'death':death_contact,'lods':len(levels)}))
+        return
     bpy.ops.wm.read_factory_settings(use_empty=True)
     anatomy=load_anatomy();arm=make_rig(anatomy['joints'])
     maps=generated_maps()
@@ -724,16 +982,18 @@ def main():
         accessory('HeroHair',hairpath/'short02.obj',hairpath/'short02.mhclo',anatomy,arm,hairmat)
     clothing(anatomy,arm,linen,leather)
     animate(arm)
+    death_contact = fit_death_ground_contact(arm)
     camera=setup_scene()
     bpy.context.preferences.filepaths.save_version=0
     bpy.ops.wm.save_as_mainfile(filepath=str(ART/'hero.blend'),compress=True)
+    source_packaging=pack_blend_lossless(ART/'hero.blend')
     if not args.no_render:
         render_review(arm,camera)
         render_deformations(arm,camera)
     levels=export_lods() if args.export else []
     report={'generator':str(Path(__file__).relative_to(ROOT)),'blender':bpy.app.version_string,'height_m':1.50,
             'runtime_adult_scale':1.14,'bones':list(anatomy['joints']),'animations':list(CLIPS),'morphs':list(MORPHS),'lods':levels,
-            'source':'MakeHuman CC0 graphical data; see source/provenance.json',
+            'source':'MakeHuman CC0 graphical data; see source/provenance.json','death_contact_fit':death_contact,'lossless_source_packaging':source_packaging,
             'limits':['No claim of AAA finished quality or Android GPU performance.','Age target fitted to one rest rig; separate adult rig remains a production task.','Micro normal is original procedural relief, not scanned skin.','Facial motion requires visual deformation acceptance.']}
     (ART/'build_report.json').write_text(json.dumps(report,indent=2)+'\n')
     print('HERO_BUILD_COMPLETE',json.dumps(report))

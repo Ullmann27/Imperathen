@@ -162,6 +162,7 @@ func sample(force_cpu: bool=false) -> Dictionary:
 	var lowest_info: Dictionary = {}
 	var contacts := {}
 	var packed_surfaces := 0
+	var worst_edge: Dictionary = {}
 	for surface: Dictionary in surfaces:
 		var mesh := surface.mesh as MeshInstance3D
 		var rig := surface.rig as Skeleton3D
@@ -247,12 +248,30 @@ func sample(force_cpu: bool=false) -> Dictionary:
 		for edge in edge_limits.size():
 			var a := edge_indices[edge*2]
 			var b := edge_indices[edge*2+1]
-			if posed[a].distance_to(posed[b])>edge_limits[edge]: violations += 1
+			var posed_length:=posed[a].distance_to(posed[b])
+			if posed_length>edge_limits[edge]:
+				violations+=1
+				var excess:=posed_length-edge_limits[edge]
+				if excess>float(worst_edge.get("excess_m",-1.0)):
+					var bindings: Array[Dictionary]=[]
+					for vertex: int in [a,b]:
+						var weights_by_bone: Dictionary={}
+						for slot in influences:
+							var offset:=vertex*influences+slot
+							if weights[offset]>0.0:
+								weights_by_bone[rig.get_bone_name(int(surface.bones[joints[offset]]))]=weights[offset]
+						bindings.append(weights_by_bone)
+					worst_edge={"mesh":str(mesh.name),"surface":int(surface.surface),"a":a,"b":b,
+						"rest_length_m":original[a].distance_to(original[b]),"posed_length_m":posed_length,
+						"limit_m":edge_limits[edge],"excess_m":excess,"bindings":bindings,
+						"rest_a":str(original[a]),"rest_b":str(original[b]),
+						"posed_a":str(posed[a]),"posed_b":str(posed[b])}
 		surface["last_posed"] = posed
 	return {"finite":finite and is_finite(lowest),"skin_edge_violations":violations,
 		"max_sole_penetration_m":maxf(0.0,-lowest) if is_finite(lowest) else null,
 		"lowest_sole_m":lowest if is_finite(lowest) else null,"contact_points":contacts,
-		"lowest_sole_vertex":lowest_info,"packed_surfaces":packed_surfaces,"packed_validation_error_m":packed_validation_error_m}
+		"lowest_sole_vertex":lowest_info,"worst_skin_edge":worst_edge,
+		"packed_surfaces":packed_surfaces,"packed_validation_error_m":packed_validation_error_m}
 
 
 func world_surfaces() -> Array[Dictionary]:
