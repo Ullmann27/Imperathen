@@ -240,7 +240,7 @@ func _refresh_status() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if view_mode == 3:
 		return
-	if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+	if event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		_yaw -= event.relative.x * 0.25
 		_pitch = clampf(_pitch + event.relative.y * 0.18, 4.0, 84.0)
 		_update_camera()

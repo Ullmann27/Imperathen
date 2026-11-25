@@ -69,6 +69,8 @@ func _groups(spatial: bool) -> Dictionary:
 func _make_batch(group: Dictionary, origin: Vector3, label: String) -> Dictionary:
 	var node := MultiMeshInstance3D.new()
 	node.name = label
+	# Every replacement begins hidden; only the selected representation is enabled.
+	node.visible = false
 	node.position = origin
 	node.multimesh = MultiMesh.new()
 	node.multimesh.transform_format = MultiMesh.TRANSFORM_3D

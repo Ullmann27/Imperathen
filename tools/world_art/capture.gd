@@ -23,13 +23,16 @@ func _run() -> void:
     workshop = Preview.new()
     root.add_child(workshop)
     await process_frame
+    if not _require(workshop.load_error.is_empty(), "Workshop assets failed to load: " + workshop.load_error):
+        return
     workshop.set_controls_visible(false)
     workshop.set_quality("high")
     workshop.controller.motion_paused = true
     workshop.controller.set_wind_time(0.0)
     workshop.controller.set_wind(0.55)
     workshop.controller.set_time_of_day(13.0)
-    workshop.select_settlement("village")
+    if not _require(workshop.select_settlement("village"), "Village selection failed"):
+        return
     workshop.set_view_mode(0)
     await _capture("01_village_midday")
     workshop.controller.set_time_of_day(18.0)
@@ -38,7 +41,8 @@ func _run() -> void:
     await _capture("03_village_night")
     workshop.controller.set_time_of_day(13.0)
     workshop.set_view_mode(2)
-    workshop.focus_on_asset("field_elm")
+    if not _require(workshop.focus_on_asset("field_elm"), "Elm focus failed"):
+        return
     workshop.controller.set_wind_time(0.0)
     await _capture("04_vegetation_wind_t0")
     workshop.controller.set_wind_time(2.0)
@@ -48,8 +52,12 @@ func _run() -> void:
     await _capture("06_vegetation_calm_t0")
     workshop.controller.set_wind_time(2.0)
     await _capture("07_vegetation_calm_t2")
-    workshop.select_settlement("capital")
+    if not _require(workshop.select_settlement("capital"), "Capital selection failed"):
+        return
     workshop.set_view_mode(1)
+    var capital: Dictionary = workshop.diagnostics().settlement
+    if not _require(int(capital.placed_buildings) == 4000 and int(capital.distance_enabled_buildings) == 4000, "Capital overview does not contain 4000 active placements"):
+        return
     await _capture("08_capital_4000")
     workshop.set_view_mode(3)
     workshop.set_controls_visible(true)
@@ -83,5 +91,14 @@ func _capture(label: String) -> void:
         push_error("PNG write failed: " + label)
         quit(1)
         return
-    frames.append({"label":label,"file":label+".png","diagnostics":workshop.diagnostics()})
+    var hasher := HashingContext.new()
+    hasher.start(HashingContext.HASH_SHA256)
+    hasher.update(picture.get_data())
+    frames.append({"label":label,"file":label+".png","pixel_sha256":hasher.finish().hex_encode(),"diagnostics":workshop.diagnostics()})
     print("WORLD_CAPTURE " + label)
+
+func _require(condition: bool, message: String) -> bool:
+    if not condition:
+        push_error(message)
+        quit(1)
+    return condition

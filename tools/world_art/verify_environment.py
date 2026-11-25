@@ -10,6 +10,8 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import uuid
+import struct
 
 ROOT=Path(__file__).resolve().parents[2]
 SCRIPT_DIRS=("assets/world_expansion","scripts/world_expansion","shaders/world_expansion","scenes/world_expansion")
@@ -88,19 +90,53 @@ def main():
             report["runtime"]=json.loads(lines[0])
             if report["runtime"].get("passed") is not True:
                 raise RuntimeError("Runtime receipt does not confirm success")
+            imports=report["runtime"].get("asset_import", {})
+            if imports.get("checked") is not True or imports.get("passed") is not True or imports.get("asset_count") != 7:
+                raise RuntimeError("Real seven-asset/21-LOD import is required; logic fixtures alone are insufficient")
             if args.render:
-                capture=output/"captures";capture.mkdir(exist_ok=True)
-                command=[args.godot,"--path",str(stage),"--rendering-method","gl_compatibility","--display-driver","x11","--script","res://tests/world_expansion_capture.gd","--",str(capture)]
+                capture=output/"captures"/uuid.uuid4().hex[:12];capture.mkdir(parents=True,exist_ok=False)
+                prefix=[]
                 if not env.get("DISPLAY"):
                     xvfb=shutil.which("xvfb-run")
                     if not xvfb:
                         raise RuntimeError("Actual graphical capture needs DISPLAY or xvfb-run; no blank headless substitutes")
-                    command=[xvfb,"-a","-s","-screen 0 1280x720x24",*command]
+                    prefix=[xvfb,"-a","-s","-screen 0 1280x720x24"]
+                graphical_base=[*prefix,args.godot,"--path",str(stage),"--rendering-method","gl_compatibility","--display-driver","x11"]
+                gpu_log=run("graphics_runtime",[*graphical_base,"--script","res://tests/world_expansion_environment_test.gd"],120)
+                gpu_rows=[line.partition("WORLD_EXPANSION_TESTS ")[2] for line in gpu_log.splitlines() if line.startswith("WORLD_EXPANSION_TESTS ")]
+                if len(gpu_rows)!=1:
+                    raise RuntimeError("Missing graphical runtime receipt")
+                report["graphics_runtime"]=json.loads(gpu_rows[0])
+                if report["graphics_runtime"].get("passed") is not True or report["graphics_runtime"].get("multimesh_transform_readback") is not True:
+                    raise RuntimeError("Actual MultiMesh renderer readback did not pass")
+                command=[*graphical_base,"--script","res://tests/world_expansion_capture.gd","--",str(capture)]
                 run("graphics",command,360)
                 capture_report=capture/"capture.json"
                 if not capture_report.is_file():
                     raise RuntimeError("Missing graphical receipt")
                 report["capture"]=json.loads(capture_report.read_text())
+                report["capture"]["directory"]=str(capture.relative_to(output))
+                expected=["01_village_midday","02_village_sunset","03_village_night","04_vegetation_wind_t0","05_vegetation_wind_t2","06_vegetation_calm_t0","07_vegetation_calm_t2","08_capital_4000","09_regional_routes"]
+                frames=report["capture"].get("frames",[])
+                if [row.get("label") for row in frames] != expected:
+                    raise RuntimeError("Graphical receipt does not contain exactly nine expected frames")
+                for row in frames:
+                    if row.get("file")!=row["label"]+".png" or row.get("diagnostics",{}).get("load_error")!="":
+                        raise RuntimeError("Capture has wrong filename or unresolved asset failure")
+                    picture=capture/row["file"]
+                    data=picture.read_bytes()
+                    if len(data)<1000 or data[:8]!=b"\x89PNG\r\n\x1a\n" or struct.unpack_from(">II",data,16)!=(1280,720):
+                        raise RuntimeError("Missing or invalid 1280x720 PNG")
+                    row["png_sha256"]=hashlib.sha256(data).hexdigest()
+                    if not row.get("pixel_sha256"):
+                        raise RuntimeError("Missing actual viewport-pixel fingerprint")
+                if frames[3]["pixel_sha256"]==frames[4]["pixel_sha256"]:
+                    raise RuntimeError("Wind time changed but actual vegetation pixels did not")
+                if frames[5]["pixel_sha256"]!=frames[6]["pixel_sha256"]:
+                    raise RuntimeError("Calm control changed despite zero wind and paused daylight")
+                capital=frames[7]["diagnostics"].get("settlement",{})
+                if capital.get("placed_buildings")!=4000 or capital.get("distance_enabled_buildings")!=4000:
+                    raise RuntimeError("Capital capture does not prove 4000 actual placements")
             current={}
             for relative in report["source_hashes"]:
                 current[relative]=hashlib.sha256((ROOT/relative).read_bytes()).hexdigest()

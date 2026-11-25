@@ -200,6 +200,14 @@ func _test_batches(plan: Dictionary) -> void:
 	_check(overview_report.batch_count == library.assets.size(), "Overview uses one far mesh batch per asset instead of thousands of street batches")
 	var same_plan: Dictionary = view.layout
 	_check(view.populate(same_plan, library).ok and same_plan.buildings.size() == 4000, "Repopulating the same layout never erases the caller-owned dictionary")
+	var inactive_hidden := true
+	for batch: Dictionary in view.batches:
+		inactive_hidden = inactive_hidden and not batch.node.visible
+	var actual_visible_children := 0
+	for child: Node in view.get_children():
+		if child is MultiMeshInstance3D and child.visible:
+			actual_visible_children += 1
+	_check(inactive_hidden and actual_visible_children == view.report().distance_enabled_batches, "All real child visibility agrees with the report after an overview replacement; no duplicate street meshes remain active")
 	var broken: Dictionary = plan.duplicate(true)
 	broken.buildings[0].asset = "missing_model"
 	var before_count: int = view.batches.size()
