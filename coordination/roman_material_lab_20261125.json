@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "team_id": "roman_material_lab_20261125",
+  "base": "1c0575096bd51c7da9e1ab83bcb2abf61306d0b9",
+  "related_prs": [
+    57,
+    58
+  ],
+  "status": "generator_verified_engine_pending",
+  "execution": "three work packages by one assistant, no independent agents",
+  "ownership": [
+    "prototype/assets/roman_material_lab",
+    "tools/roman_material_lab",
+    "prototype/scripts/roman_material_lab",
+    "prototype/scenes/roman_material_lab",
+    "docs/26_roman_material_lab"
+  ],
+  "main_merge": false
+}
