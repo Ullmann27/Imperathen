@@ -291,16 +291,26 @@ func _changed_destination() -> void:
 		var changed_at := actor.position
 		var new_target := Vector3(-8,0,-8)
 		var maximum_step := 0.0
+		var continued_old_direction := 0.0
+		var aligned_progress := 0.0
 		var after_second := actor.position
 		for tick in 300:
 			await physics_frame
 			var before := actor.position
 			nav.move(actor,new_target,DT)
 			maximum_step = maxf(maximum_step,Vector2(actor.position.x-before.x,actor.position.z-before.z).length())
+			continued_old_direction = maxf(continued_old_direction,actor.position.z-before.z)
+			var toward := Vector3(new_target.x-before.x,0.0,new_target.z-before.z).normalized()
+			if Vector3.FORWARD.rotated(Vector3.UP,actor.rotation.y).dot(toward) > 0.99:
+				aligned_progress += maxf(0.0,(actor.position-before).dot(toward))
 			if tick == 59:
 				after_second = actor.position
-		_check(after_second.z < changed_at.z-2.3,"Zielwechsel während "+label+" verwirft die alte Richtung sofort")
+		# The old assertion measured 2.3 m of first-second speed, not whether
+		# the superseded route was abandoned. A bounded turn may spend part
+		# of that second facing the new path before actual forward travel.
+		_check(continued_old_direction <= 0.0001,"Zielwechsel während "+label+" führt keinen weiteren Schritt entlang der alten Umgehung aus")
+		_check(aligned_progress > 1.0,"Nach der begrenzten Ausrichtung macht die Figur Fortschritt zum neuen Ziel während "+label)
 		_check(Vector2(actor.position.x-new_target.x,actor.position.z-new_target.z).length() <= 1.76 and nav.status == "arrived","Nach Zielwechsel während "+label+" wird das neue Ziel erreicht")
 		_check(maximum_step <= 3.8*DT+0.012,"Zielwechsel während "+label+" enthält keinen Positionssprung")
-		metrics["retarget_search" if during_search else "retarget_path"] = {"changed_at":str(changed_at),"after_second":str(after_second),"maximum_step":maximum_step,"final":str(actor.position)}
+		metrics["retarget_search" if during_search else "retarget_path"] = {"changed_at":str(changed_at),"after_second":str(after_second),"maximum_step":maximum_step,"continued_old_direction":continued_old_direction,"aligned_progress":aligned_progress,"final":str(actor.position)}
 		await _clear_stage()

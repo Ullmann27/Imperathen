@@ -57,6 +57,21 @@ func _bridged_cube(topology_key: String="") -> Dictionary:
 	return Clearance.geometry([surface])
 
 
+func _separating_cubes(offset: float, topology_key: String="") -> Dictionary:
+	# Each cube is a closed component even when their coincident face moves away.
+	var mesh := BoxMesh.new()
+	mesh.size=Vector3.ONE*2.0
+	var faces := mesh.get_faces()
+	var vertices := faces.duplicate()
+	for point: Vector3 in faces: vertices.append(point+Vector3(offset,0,0))
+	var indices := PackedInt32Array()
+	indices.resize(vertices.size())
+	for index in indices.size(): indices[index]=index
+	var surface := {"vertices":vertices,"indices":indices}
+	if not topology_key.is_empty(): surface.topology_key=topology_key
+	return Clearance.geometry([surface])
+
+
 func _initialize() -> void:
 	_run.call_deferred()
 
@@ -95,6 +110,14 @@ func _run() -> void:
 	var bridge_key := "clearance-cached-midpoint-regression"
 	var bridge_initial := _seamed_cube(Transform3D.IDENTITY,0.0,false,bridge_key)
 	_check(bridge_initial.closed and not _bridged_cube(bridge_key).closed,"Cache rechecks every cluster pair when opposite seam copies move apart")
+	var component_key := "clearance-separating-closed-components-regression"
+	var touching := _separating_cubes(2.0,component_key)
+	_check(touching.closed,"Touching independently closed components begin with verified closure")
+	var separated_cached := _separating_cubes(3.0,component_key)
+	var separated_fresh := _separating_cubes(3.0)
+	_check(separated_cached.closed and separated_fresh.closed,"Cached closure agrees with fresh closure after closed components separate")
+	var separated_contained := Clearance.compare(separated_cached,_cube(Vector3(3,0,0),.2),[])
+	_check(separated_contained.finite and separated_contained.intersection and separated_contained.contained,"Rebuilt closed components still detect actual solid containment")
 	var open_cube := _seamed_cube(Transform3D.IDENTITY,0.0,true)
 	var unknown := Clearance.compare(open_cube,_cube(Vector3.ZERO,.2),[])
 	_check(not open_cube.closed and not unknown.finite,"Missing face still blocks unproven solid containment")

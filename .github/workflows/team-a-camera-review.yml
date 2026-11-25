@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - feature/team-a-character-gameplay-20261124
+      - fix/aeterna-camera-overlap-20261125
     paths:
       - prototype/**
       - tools/**

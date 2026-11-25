@@ -1,0 +1,125 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ERROR: 30 Hz, turn -1: a rearward destination turns on the spot before forward travel
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:110)
+ERROR: 30 Hz, turn -1: the actual pose driver leaves running for the grounded turn
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:111)
+ERROR: 30 Hz, turn -1: a start or retarget uses the existing player running acceleration
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:113)
+ERROR: 30 Hz, turn -1: turning and starting retain the strict planted-foot limit
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:118)
+ERROR: 30 Hz, turn +1: a rearward destination turns on the spot before forward travel
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:110)
+ERROR: 30 Hz, turn +1: the actual pose driver leaves running for the grounded turn
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:111)
+ERROR: 30 Hz, turn +1: a start or retarget uses the existing player running acceleration
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:113)
+ERROR: 30 Hz, turn +1: turning and starting retain the strict planted-foot limit
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:118)
+ERROR: 60 Hz, turn -1: a rearward destination turns on the spot before forward travel
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:110)
+ERROR: 60 Hz, turn -1: the actual pose driver leaves running for the grounded turn
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:111)
+ERROR: 60 Hz, turn -1: a start or retarget uses the existing player running acceleration
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:113)
+ERROR: 60 Hz, turn -1: turning and starting retain the strict planted-foot limit
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:118)
+ERROR: 60 Hz, turn +1: a rearward destination turns on the spot before forward travel
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:110)
+ERROR: 60 Hz, turn +1: the actual pose driver leaves running for the grounded turn
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:111)
+ERROR: 60 Hz, turn +1: a start or retarget uses the existing player running acceleration
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:113)
+ERROR: 60 Hz, turn +1: turning and starting retain the strict planted-foot limit
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:118)
+ERROR: 120 Hz, turn -1: a rearward destination turns on the spot before forward travel
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:110)
+ERROR: 120 Hz, turn -1: the actual pose driver leaves running for the grounded turn
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:111)
+ERROR: 120 Hz, turn -1: a start or retarget uses the existing player running acceleration
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:113)
+ERROR: 120 Hz, turn -1: turning and starting retain the strict planted-foot limit
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:118)
+ERROR: 120 Hz, turn +1: a rearward destination turns on the spot before forward travel
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:110)
+ERROR: 120 Hz, turn +1: the actual pose driver leaves running for the grounded turn
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:111)
+ERROR: 120 Hz, turn +1: a start or retarget uses the existing player running acceleration
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:113)
+ERROR: 120 Hz, turn +1: turning and starting retain the strict planted-foot limit
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/companion_turn_motion_test.gd:21)
+       [1] _turn_and_retarget (res://tests/companion_turn_motion_test.gd:118)
+COMPANION_TURN_MOTION_METRICS [{"aligned_speed_m_s":4.10000771284103,"backward_speed_m_s":4.10000637173653,"backwards_running_frames":13,"hz":30,"maximum_acceleration_m_s2":123.000030219555,"maximum_root_turn_deg":8.59437239111368,"turn":-1.0,"world_motion":{"max_collision_overlap_m":0.0105389952659607,"max_root_step_m":0.137768015265465,"max_support_slip_m":0.0373791866004467,"max_transition_position_jump_m":0.314733654260635,"max_transition_rotation_jump_deg":40.262872326958},"world_worst":{"max_collision_overlap_m":{"actor":"Marcus","clip":"run","frame":49,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":0.0395646811852521},"max_root_step_m":{"actor":"Marcus","clip":"run","frame":2,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":8.59436556092451},"max_support_slip_m":{"actor":"Marcus","bone":"Foot_L","clip":"run","frame":67,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","phase":0.266942718968712,"previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":8.59427420714437},"max_transition_position_jump_m":{"actor":"Marcus","bone":"Shin_R","clip":"run","frame":78,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":8.59418285336422},"max_transition_rotation_jump_deg":{"actor":"Marcus","bone":"Thigh_L","clip":"run","frame":77,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":8.59427420714437}}},{"aligned_speed_m_s":4.10001710057259,"backward_speed_m_s":4.10000637173653,"backwards_running_frames":13,"hz":30,"maximum_acceleration_m_s2":123.000030219555,"maximum_root_turn_deg":8.59437239111368,"turn":1.0,"world_motion":{"max_collision_overlap_m":0.0105167627334595,"max_root_step_m":0.137768015265465,"max_support_slip_m":0.0649466589093208,"max_transition_position_jump_m":0.331274509429932,"max_transition_rotation_jump_deg":42.8978056294926},"world_worst":{"max_collision_overlap_m":{"actor":"Marcus","clip":"run","frame":45,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":0.0},"max_root_step_m":{"actor":"Marcus","clip":"run","frame":2,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":8.59436556092451},"max_support_slip_m":{"actor":"Marcus","bone":"Foot_L","clip":"run","frame":67,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","phase":0.266943735203153,"previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":8.59436556092451},"max_transition_position_jump_m":{"actor":"Marcus","bone":"Shin_R","clip":"run","frame":78,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":8.59427420714437},"max_transition_rotation_jump_deg":{"actor":"Marcus","bone":"Thigh_L","clip":"run","frame":77,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":8.59427420714437}}},{"aligned_speed_m_s":4.1000372171402,"backward_speed_m_s":4.10002782940865,"backwards_running_frames":27,"hz":60,"maximum_acceleration_m_s2":246.00000679493,"maximum_root_turn_deg":4.29719302574601,"turn":-1.0,"world_motion":{"max_collision_overlap_m":0.00479447841644287,"max_root_step_m":0.0702582523226738,"max_support_slip_m":0.186916530132294,"max_transition_position_jump_m":0.20072428882122,"max_transition_rotation_jump_deg":38.9228199476527},"world_worst":{"max_collision_overlap_m":{"actor":"Marcus","clip":"run","frame":61,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":0.0},"max_root_step_m":{"actor":"Marcus","clip":"run","frame":3,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":4.29719217197237},"max_support_slip_m":{"actor":"Marcus","bone":"Foot_L","clip":"run","frame":135,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","phase":0.302517518297775,"previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":4.29719217197237},"max_transition_position_jump_m":{"actor":"Marcus","bone":"Shin_L","clip":"run","frame":143,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":4.29700989129889},"max_transition_rotation_jump_deg":{"actor":"Marcus","bone":"Thigh_R","clip":"run","frame":142,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":4.29719217197237}}},{"aligned_speed_m_s":4.10001888871193,"backward_speed_m_s":4.10004660487175,"backwards_running_frames":27,"hz":60,"maximum_acceleration_m_s2":246.00000679493,"maximum_root_turn_deg":4.29719302574601,"turn":1.0,"world_motion":{"max_collision_overlap_m":0.00479406118392944,"max_root_step_m":0.0702582523226738,"max_support_slip_m":0.23148387670517,"max_transition_position_jump_m":0.21633668243885,"max_transition_rotation_jump_deg":31.4081399548726},"world_worst":{"max_collision_overlap_m":{"actor":"Marcus","clip":"run","frame":81,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":0.0395646811852521},"max_root_step_m":{"actor":"Marcus","clip":"run","frame":3,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":4.29719217197237},"max_support_slip_m":{"actor":"Marcus","bone":"Foot_L","clip":"run","frame":135,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","phase":0.302515761220668,"previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":4.29700989129889},"max_transition_position_jump_m":{"actor":"Marcus","bone":"Shin_R","clip":"run","frame":156,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":4.29719217197237},"max_transition_rotation_jump_deg":{"actor":"Marcus","bone":"Thigh_L","clip":"run","frame":155,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":4.29700989129889}}},{"aligned_speed_m_s":4.10007745027542,"backward_speed_m_s":4.10003006458282,"backwards_running_frames":55,"hz":120,"maximum_acceleration_m_s2":492.000013589859,"maximum_root_turn_deg":2.14859651287301,"turn":-1.0,"world_motion":{"max_collision_overlap_m":0.00192224979400635,"max_root_step_m":0.0354702658951283,"max_support_slip_m":0.239177465438843,"max_transition_position_jump_m":0.106614746153355,"max_transition_rotation_jump_deg":20.2696125979356},"world_worst":{"max_collision_overlap_m":{"actor":"Marcus","clip":"run","frame":114,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":0.0395646811852521},"max_root_step_m":{"actor":"Marcus","clip":"run","frame":7,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":2.14849171215793},"max_support_slip_m":{"actor":"Marcus","bone":"Foot_L","clip":"run","frame":270,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","phase":0.30251312754439,"previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":2.14849171215793},"max_transition_position_jump_m":{"actor":"Marcus","bone":"Shin_L","clip":"run","frame":285,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":2.14849171215793},"max_transition_rotation_jump_deg":{"actor":"Marcus","bone":"Thigh_R","clip":"run","frame":284,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":2.14849171215793}}},{"aligned_speed_m_s":4.10004660487175,"backward_speed_m_s":4.10003006458282,"backwards_running_frames":55,"hz":120,"maximum_acceleration_m_s2":492.000013589859,"maximum_root_turn_deg":2.14859651287301,"turn":1.0,"world_motion":{"max_collision_overlap_m":0.00192224979400635,"max_root_step_m":0.0354702658951283,"max_support_slip_m":0.288626611232758,"max_transition_position_jump_m":0.119286403059959,"max_transition_rotation_jump_deg":19.611086739298},"world_worst":{"max_collision_overlap_m":{"actor":"Marcus","clip":"run","frame":118,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":0.0395646811852521},"max_root_step_m":{"actor":"Marcus","clip":"run","frame":7,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":2.14849171215793},"max_support_slip_m":{"actor":"Marcus","bone":"Foot_L","clip":"run","frame":270,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","phase":0.302510433747369,"previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":2.14849171215793},"max_transition_position_jump_m":{"actor":"Marcus","bone":"Shin_R","clip":"run","frame":311,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":2.14849171215793},"max_transition_rotation_jump_deg":{"actor":"Marcus","bone":"Thigh_R","clip":"run","frame":284,"lod_changed":false,"model":"res://assets/village_characters/villager_0.glb","previous_clip":"run","previous_model":"res://assets/village_characters/villager_0.glb","root_turn_deg":2.14849171215793}}}]
+Companion turn motion: 66 checks, 24 failures
+COMPANION_TURN_MOTION_FAIL

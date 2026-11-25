@@ -1,0 +1,2009 @@
+{
+  "schema_version": 2,
+  "complete": false,
+  "base_commit": "261639105dcaa72f8dd92e73f4db1d9ab7d90a23",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "sample_hz": 60,
+  "scope": "Actual companion mission routes, pause/resume/arrival; unchanged MotionWorldMeasurement calculations and limits, with animation_phase added to final worst-frame diagnostic contexts. World support slip measures the foot-bone origin, not CPU-skinned sole vertices.",
+  "production_sha256": {
+    "prototype/scripts/story/companion_follow.gd": "25f282ad25063586ab3a4a28c78cfd066b895ceb33c390975dbe09238041fd69",
+    "prototype/scripts/visuals/village_person.gd": "2c69b0041ba64f17e37f113280ff3f7c412081e9182e09a3d2e3ed9ae1cf3f7a"
+  },
+  "strict_world_rotation_limit_deg": 20.0,
+  "strict_world_support_slip_limit_m": 0.015,
+  "strict_gate_passed": false,
+  "local_comparison": {
+    "baseline": {
+      "metrics": {
+        "max_collision_overlap_m": 0.00479358434677124,
+        "max_root_step_m": 0.0843394994735718,
+        "max_support_slip_m": 0.0138336969539523,
+        "max_transition_position_jump_m": 0.193958267569542,
+        "max_transition_rotation_jump_deg": 31.651014651569
+      },
+      "errors": [],
+      "routes": [
+        {
+          "actor_id": "silvanus",
+          "arrival_gap_m": 0.179999992251396,
+          "displacement_m": 61.1718826293945,
+          "distance_m": 64.661323428154,
+          "final_speed_m_s": 0.0,
+          "max_root_turn_deg": 4.29737445264584,
+          "mission_step": "deliver_kindling",
+          "model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "pause_displacement_m": 0.0,
+          "resumed_distance_m": 62.4649786241353,
+          "same_actor": true,
+          "sample_count": 1307
+        },
+        {
+          "actor_id": "marcus",
+          "arrival_gap_m": 0.179997637867928,
+          "displacement_m": 34.2593460083008,
+          "distance_m": 35.9309760294855,
+          "final_speed_m_s": 0.0,
+          "max_root_turn_deg": 4.29737445264584,
+          "mission_step": "market_trade",
+          "model": "res://assets/village_characters/villager_2.glb",
+          "pause_displacement_m": 0.0,
+          "resumed_distance_m": 33.7363516315818,
+          "same_actor": true,
+          "sample_count": 820
+        }
+      ],
+      "actors": {
+        "silvanus": {
+          "metrics": {
+            "max_collision_overlap_m": 0.00479358434677124,
+            "max_root_step_m": 0.0685636699199677,
+            "max_support_slip_m": 0.00841294415295124,
+            "max_transition_position_jump_m": 0.18477238714695,
+            "max_transition_rotation_jump_deg": 23.563749655383
+          },
+          "diagnostics": {
+            "max_collision_overlap_m": {
+              "actor": "Resident_silvanus",
+              "clip": "run",
+              "frame": 684,
+              "lod_changed": false,
+              "model": "res://assets/characters/frontier_civilian_man_1.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/characters/frontier_civilian_man_1.glb",
+              "root_turn_deg": 0.0
+            },
+            "max_root_step_m": {
+              "actor": "Resident_silvanus",
+              "clip": "run",
+              "frame": 791,
+              "lod_changed": false,
+              "model": "res://assets/characters/frontier_civilian_man_2.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+              "root_turn_deg": 0.0
+            },
+            "max_support_slip_m": {
+              "actor": "Resident_silvanus",
+              "bone": "Foot_R",
+              "clip": "run",
+              "frame": 228,
+              "lod_changed": false,
+              "model": "res://assets/characters/frontier_civilian_man_2.glb",
+              "phase": 0.315934206991616,
+              "previous_clip": "run",
+              "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+              "root_turn_deg": 0.0
+            },
+            "max_transition_position_jump_m": {
+              "actor": "Resident_silvanus",
+              "bone": "Shin_L",
+              "clip": "run",
+              "frame": 977,
+              "lod_changed": false,
+              "model": "res://assets/characters/frontier_civilian_man_3.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/characters/frontier_civilian_man_3.glb",
+              "root_turn_deg": 0.0
+            },
+            "max_transition_rotation_jump_deg": {
+              "actor": "Resident_silvanus",
+              "bone": "Arm_L",
+              "clip": "run",
+              "frame": 845,
+              "lod_changed": false,
+              "model": "res://assets/characters/frontier_civilian_man_2.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+              "root_turn_deg": 4.29719217197237
+            }
+          },
+          "sample_count": 1307
+        },
+        "marcus": {
+          "metrics": {
+            "max_collision_overlap_m": 0.0,
+            "max_root_step_m": 0.0843394994735718,
+            "max_support_slip_m": 0.0138336969539523,
+            "max_transition_position_jump_m": 0.193958267569542,
+            "max_transition_rotation_jump_deg": 31.651014651569
+          },
+          "diagnostics": {
+            "max_root_step_m": {
+              "actor": "Marcus",
+              "clip": "run",
+              "frame": 2,
+              "lod_changed": false,
+              "model": "res://assets/village_characters/villager_0.glb",
+              "previous_clip": "idle",
+              "previous_model": "res://assets/village_characters/villager_0.glb",
+              "root_turn_deg": 4.29719217197237
+            },
+            "max_support_slip_m": {
+              "actor": "Marcus",
+              "bone": "Foot_L",
+              "clip": "run",
+              "frame": 24,
+              "lod_changed": false,
+              "model": "res://assets/village_characters/villager_0.glb",
+              "phase": 0.318205703471712,
+              "previous_clip": "run",
+              "previous_model": "res://assets/village_characters/villager_0.glb",
+              "root_turn_deg": 4.29737445264584
+            },
+            "max_transition_position_jump_m": {
+              "actor": "Marcus",
+              "bone": "Shin_L",
+              "clip": "run",
+              "frame": 30,
+              "lod_changed": false,
+              "model": "res://assets/village_characters/villager_0.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/village_characters/villager_0.glb",
+              "root_turn_deg": 4.29737445264584
+            },
+            "max_transition_rotation_jump_deg": {
+              "actor": "Marcus",
+              "bone": "Thigh_R",
+              "clip": "run",
+              "frame": 29,
+              "lod_changed": false,
+              "model": "res://assets/village_characters/villager_0.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/village_characters/villager_0.glb",
+              "root_turn_deg": 4.29737445264584
+            }
+          },
+          "sample_count": 820
+        }
+      }
+    },
+    "fixed": {
+      "metrics": {
+        "max_collision_overlap_m": 0.00479286909103394,
+        "max_root_step_m": 0.0685650557279587,
+        "max_support_slip_m": 6.8770432335441e-06,
+        "max_transition_position_jump_m": 0.187171772122383,
+        "max_transition_rotation_jump_deg": 22.2775191667374
+      },
+      "errors": [],
+      "routes": [
+        {
+          "actor_id": "silvanus",
+          "arrival_gap_m": 0.179998934268951,
+          "displacement_m": 61.1718330383301,
+          "distance_m": 64.6354730189778,
+          "final_speed_m_s": 0.0,
+          "max_root_turn_deg": 4.29737445264584,
+          "mission_step": "deliver_kindling",
+          "model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "pause_displacement_m": 0.0,
+          "resumed_distance_m": 62.4371852343902,
+          "same_actor": true,
+          "sample_count": 1351
+        },
+        {
+          "actor_id": "marcus",
+          "arrival_gap_m": 0.180123403668404,
+          "displacement_m": 34.2590751647949,
+          "distance_m": 35.9528083788464,
+          "final_speed_m_s": 0.0,
+          "max_root_turn_deg": 4.29737445264584,
+          "mission_step": "market_trade",
+          "model": "res://assets/village_characters/villager_2.glb",
+          "pause_displacement_m": 0.0,
+          "resumed_distance_m": 33.7539995415136,
+          "same_actor": true,
+          "sample_count": 884
+        }
+      ],
+      "actors": {
+        "silvanus": {
+          "metrics": {
+            "max_collision_overlap_m": 0.00479286909103394,
+            "max_root_step_m": 0.0685650557279587,
+            "max_support_slip_m": 6.8770432335441e-06,
+            "max_transition_position_jump_m": 0.187171772122383,
+            "max_transition_rotation_jump_deg": 22.2775191667374
+          },
+          "diagnostics": {
+            "max_collision_overlap_m": {
+              "actor": "Resident_silvanus",
+              "animation_phase": 0.748436939927866,
+              "clip": "run",
+              "frame": 717,
+              "lod_changed": false,
+              "model": "res://assets/characters/frontier_civilian_man_1.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/characters/frontier_civilian_man_1.glb",
+              "root_turn_deg": 0.0559529096807445
+            },
+            "max_root_step_m": {
+              "actor": "Resident_silvanus",
+              "animation_phase": 0.780030478954066,
+              "clip": "run",
+              "frame": 718,
+              "lod_changed": false,
+              "model": "res://assets/characters/frontier_civilian_man_1.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/characters/frontier_civilian_man_1.glb",
+              "root_turn_deg": 0.0
+            },
+            "max_support_slip_m": {
+              "actor": "Resident_silvanus",
+              "animation_phase": 0.673750129571352,
+              "bone": "Foot_L",
+              "clip": "run",
+              "frame": 1220,
+              "lod_changed": false,
+              "model": "res://assets/characters/frontier_civilian_man_3.glb",
+              "phase": 0.173750129571352,
+              "previous_clip": "run",
+              "previous_model": "res://assets/characters/frontier_civilian_man_3.glb",
+              "root_turn_deg": 0.0
+            },
+            "max_transition_position_jump_m": {
+              "actor": "Resident_silvanus",
+              "animation_phase": 0.469541738727419,
+              "bone": "Shin_R",
+              "clip": "run",
+              "frame": 360,
+              "lod_changed": false,
+              "model": "res://assets/characters/frontier_civilian_man_2.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+              "root_turn_deg": 0.0
+            },
+            "max_transition_rotation_jump_deg": {
+              "actor": "Resident_silvanus",
+              "animation_phase": 0.807462638014024,
+              "bone": "Arm_L",
+              "clip": "run",
+              "frame": 434,
+              "lod_changed": false,
+              "model": "res://assets/characters/frontier_civilian_man_1.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/characters/frontier_civilian_man_1.glb",
+              "root_turn_deg": 0.0
+            }
+          },
+          "sample_count": 1351
+        },
+        "marcus": {
+          "metrics": {
+            "max_collision_overlap_m": 0.0,
+            "max_root_step_m": 0.06833516061306,
+            "max_support_slip_m": 5.39479651706642e-06,
+            "max_transition_position_jump_m": 0.161454394459724,
+            "max_transition_rotation_jump_deg": 21.8832311289728
+          },
+          "diagnostics": {
+            "max_root_step_m": {
+              "actor": "Marcus",
+              "animation_phase": 0.661871196613093,
+              "clip": "run",
+              "frame": 653,
+              "lod_changed": false,
+              "model": "res://assets/village_characters/villager_1.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/village_characters/villager_1.glb",
+              "root_turn_deg": 3.19475652436317
+            },
+            "max_support_slip_m": {
+              "actor": "Marcus",
+              "animation_phase": 0.590777358971475,
+              "bone": "Foot_L",
+              "clip": "run",
+              "frame": 651,
+              "lod_changed": false,
+              "model": "res://assets/village_characters/villager_1.glb",
+              "phase": 0.0907773589714753,
+              "previous_clip": "run",
+              "previous_model": "res://assets/village_characters/villager_1.glb",
+              "root_turn_deg": 4.29737445264584
+            },
+            "max_transition_position_jump_m": {
+              "actor": "Marcus",
+              "animation_phase": 0.666704907167976,
+              "bone": "Foot_R",
+              "clip": "run",
+              "frame": 251,
+              "lod_changed": false,
+              "model": "res://assets/village_characters/villager_0.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/village_characters/villager_0.glb",
+              "root_turn_deg": 0.0
+            },
+            "max_transition_rotation_jump_deg": {
+              "actor": "Marcus",
+              "animation_phase": 0.816951871837808,
+              "bone": "Thigh_L",
+              "clip": "run",
+              "frame": 427,
+              "lod_changed": false,
+              "model": "res://assets/village_characters/villager_0.glb",
+              "previous_clip": "run",
+              "previous_model": "res://assets/village_characters/villager_0.glb",
+              "root_turn_deg": 0.0
+            }
+          },
+          "sample_count": 884
+        }
+      }
+    }
+  },
+  "stress_comparison": {
+    "baseline": [
+      {
+        "aligned_speed_m_s": 4.10000771284103,
+        "backward_speed_m_s": 4.10000637173653,
+        "backwards_running_frames": 13,
+        "hz": 30,
+        "maximum_acceleration_m_s2": 123.000030219555,
+        "maximum_root_turn_deg": 8.59437239111368,
+        "turn": -1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.0105389952659607,
+          "max_root_step_m": 0.137768015265465,
+          "max_support_slip_m": 0.0373791866004467,
+          "max_transition_position_jump_m": 0.314733654260635,
+          "max_transition_rotation_jump_deg": 40.262872326958
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 49,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 2,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59436556092451
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "bone": "Foot_L",
+            "clip": "run",
+            "frame": 67,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.266942718968712,
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59427420714437
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "bone": "Shin_R",
+            "clip": "run",
+            "frame": 78,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59418285336422
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "bone": "Thigh_L",
+            "clip": "run",
+            "frame": 77,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59427420714437
+          }
+        }
+      },
+      {
+        "aligned_speed_m_s": 4.10001710057259,
+        "backward_speed_m_s": 4.10000637173653,
+        "backwards_running_frames": 13,
+        "hz": 30,
+        "maximum_acceleration_m_s2": 123.000030219555,
+        "maximum_root_turn_deg": 8.59437239111368,
+        "turn": 1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.0105167627334595,
+          "max_root_step_m": 0.137768015265465,
+          "max_support_slip_m": 0.0649466589093208,
+          "max_transition_position_jump_m": 0.331274509429932,
+          "max_transition_rotation_jump_deg": 42.8978056294926
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 45,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 2,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59436556092451
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "bone": "Foot_L",
+            "clip": "run",
+            "frame": 67,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.266943735203153,
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59436556092451
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "bone": "Shin_R",
+            "clip": "run",
+            "frame": 78,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59427420714437
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "bone": "Thigh_L",
+            "clip": "run",
+            "frame": 77,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59427420714437
+          }
+        }
+      },
+      {
+        "aligned_speed_m_s": 4.1000372171402,
+        "backward_speed_m_s": 4.10002782940865,
+        "backwards_running_frames": 27,
+        "hz": 60,
+        "maximum_acceleration_m_s2": 246.00000679493,
+        "maximum_root_turn_deg": 4.29719302574601,
+        "turn": -1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.00479447841644287,
+          "max_root_step_m": 0.0702582523226738,
+          "max_support_slip_m": 0.186916530132294,
+          "max_transition_position_jump_m": 0.20072428882122,
+          "max_transition_rotation_jump_deg": 38.9228199476527
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 61,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 3,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 4.29719217197237
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "bone": "Foot_L",
+            "clip": "run",
+            "frame": 135,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.302517518297775,
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 4.29719217197237
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "bone": "Shin_L",
+            "clip": "run",
+            "frame": 143,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 4.29700989129889
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "bone": "Thigh_R",
+            "clip": "run",
+            "frame": 142,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 4.29719217197237
+          }
+        }
+      },
+      {
+        "aligned_speed_m_s": 4.10001888871193,
+        "backward_speed_m_s": 4.10004660487175,
+        "backwards_running_frames": 27,
+        "hz": 60,
+        "maximum_acceleration_m_s2": 246.00000679493,
+        "maximum_root_turn_deg": 4.29719302574601,
+        "turn": 1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.00479406118392944,
+          "max_root_step_m": 0.0702582523226738,
+          "max_support_slip_m": 0.23148387670517,
+          "max_transition_position_jump_m": 0.21633668243885,
+          "max_transition_rotation_jump_deg": 31.4081399548726
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 81,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 3,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 4.29719217197237
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "bone": "Foot_L",
+            "clip": "run",
+            "frame": 135,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.302515761220668,
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 4.29700989129889
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "bone": "Shin_R",
+            "clip": "run",
+            "frame": 156,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 4.29719217197237
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "bone": "Thigh_L",
+            "clip": "run",
+            "frame": 155,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 4.29700989129889
+          }
+        }
+      },
+      {
+        "aligned_speed_m_s": 4.10007745027542,
+        "backward_speed_m_s": 4.10003006458282,
+        "backwards_running_frames": 55,
+        "hz": 120,
+        "maximum_acceleration_m_s2": 492.000013589859,
+        "maximum_root_turn_deg": 2.14859651287301,
+        "turn": -1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.00192224979400635,
+          "max_root_step_m": 0.0354702658951283,
+          "max_support_slip_m": 0.239177465438843,
+          "max_transition_position_jump_m": 0.106614746153355,
+          "max_transition_rotation_jump_deg": 20.2696125979356
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 114,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 7,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 2.14849171215793
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "bone": "Foot_L",
+            "clip": "run",
+            "frame": 270,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.30251312754439,
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 2.14849171215793
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "bone": "Shin_L",
+            "clip": "run",
+            "frame": 285,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 2.14849171215793
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "bone": "Thigh_R",
+            "clip": "run",
+            "frame": 284,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 2.14849171215793
+          }
+        }
+      },
+      {
+        "aligned_speed_m_s": 4.10004660487175,
+        "backward_speed_m_s": 4.10003006458282,
+        "backwards_running_frames": 55,
+        "hz": 120,
+        "maximum_acceleration_m_s2": 492.000013589859,
+        "maximum_root_turn_deg": 2.14859651287301,
+        "turn": 1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.00192224979400635,
+          "max_root_step_m": 0.0354702658951283,
+          "max_support_slip_m": 0.288626611232758,
+          "max_transition_position_jump_m": 0.119286403059959,
+          "max_transition_rotation_jump_deg": 19.611086739298
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 118,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "clip": "run",
+            "frame": 7,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 2.14849171215793
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "bone": "Foot_L",
+            "clip": "run",
+            "frame": 270,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.302510433747369,
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 2.14849171215793
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "bone": "Shin_R",
+            "clip": "run",
+            "frame": 311,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 2.14849171215793
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "bone": "Thigh_R",
+            "clip": "run",
+            "frame": 284,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 2.14849171215793
+          }
+        }
+      }
+    ],
+    "fixed": [
+      {
+        "aligned_speed_m_s": 4.10000771284103,
+        "backward_speed_m_s": 0.0,
+        "backwards_running_frames": 0,
+        "hz": 30,
+        "maximum_acceleration_m_s2": 8.00019465386868,
+        "maximum_root_turn_deg": 8.59437239111368,
+        "turn": -1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.0105389356613159,
+          "max_root_step_m": 0.137131482362747,
+          "max_support_slip_m": 1.19209289550781e-06,
+          "max_transition_position_jump_m": 0.326882898807526,
+          "max_transition_rotation_jump_deg": 39.0143205768688
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.224710420416072,
+            "clip": "march",
+            "frame": 75,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "march",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59436556092451
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.638129580397598,
+            "clip": "run",
+            "frame": 59,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.67138584716997,
+            "bone": "Foot_L",
+            "clip": "run",
+            "frame": 82,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.17138584716997,
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.659389987483444,
+            "bone": "Foot_R",
+            "clip": "run",
+            "frame": 17,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "animation_phase": 0.659389987483444,
+            "bone": "Thigh_R",
+            "clip": "run",
+            "frame": 17,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          }
+        }
+      },
+      {
+        "aligned_speed_m_s": 4.10000771284103,
+        "backward_speed_m_s": 0.0,
+        "backwards_running_frames": 0,
+        "hz": 30,
+        "maximum_acceleration_m_s2": 8.00019465386868,
+        "maximum_root_turn_deg": 8.59437239111368,
+        "turn": 1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.0105389952659607,
+          "max_root_step_m": 0.137137115001678,
+          "max_support_slip_m": 1.06624031559477e-06,
+          "max_transition_position_jump_m": 0.340409070253372,
+          "max_transition_rotation_jump_deg": 40.6252582586567
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.287004036428166,
+            "clip": "march",
+            "frame": 76,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "march",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59436556092451
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.638129431835208,
+            "clip": "run",
+            "frame": 59,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.171315815150236,
+            "bone": "Foot_R",
+            "clip": "march",
+            "frame": 74,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.171315815150236,
+            "previous_clip": "march",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 8.59436556092451
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.671385620380703,
+            "bone": "Foot_R",
+            "clip": "run",
+            "frame": 82,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "animation_phase": 0.671385620380703,
+            "bone": "Thigh_R",
+            "clip": "run",
+            "frame": 82,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          }
+        }
+      },
+      {
+        "aligned_speed_m_s": 4.10001888871193,
+        "backward_speed_m_s": 0.0,
+        "backwards_running_frames": 0,
+        "hz": 60,
+        "maximum_acceleration_m_s2": 8.00202190876007,
+        "maximum_root_turn_deg": 4.29719302574601,
+        "turn": -1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.00479447841644287,
+          "max_root_step_m": 0.0685636773705482,
+          "max_support_slip_m": 1.06624031559477e-06,
+          "max_transition_position_jump_m": 0.174600705504417,
+          "max_transition_rotation_jump_deg": 22.0060498830807
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.253580860449365,
+            "clip": "run",
+            "frame": 108,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.648819399290848,
+            "clip": "run",
+            "frame": 91,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.0401358346271742,
+            "bone": "Foot_R",
+            "clip": "run",
+            "frame": 102,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.0401358346271742,
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.666705109413482,
+            "bone": "Foot_R",
+            "clip": "run",
+            "frame": 35,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "animation_phase": 0.318134691373462,
+            "bone": "Thigh_R",
+            "clip": "run",
+            "frame": 324,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          }
+        }
+      },
+      {
+        "aligned_speed_m_s": 4.10002559423447,
+        "backward_speed_m_s": 0.0,
+        "backwards_running_frames": 0,
+        "hz": 60,
+        "maximum_acceleration_m_s2": 8.00214931368828,
+        "maximum_root_turn_deg": 4.29719302574601,
+        "turn": 1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.00840109586715698,
+          "max_root_step_m": 0.0685622096061707,
+          "max_support_slip_m": 1.06624031559477e-06,
+          "max_transition_position_jump_m": 0.171077609062195,
+          "max_transition_rotation_jump_deg": 22.0339597435766
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.158333333333333,
+            "clip": "idle",
+            "frame": 139,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "idle",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 4.29719217197237
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.970236701319361,
+            "clip": "run",
+            "frame": 258,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.141666666666667,
+            "bone": "Foot_R",
+            "clip": "idle",
+            "frame": 137,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.141666666666667,
+            "previous_clip": "idle",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 4.29719217197237
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.640344793634511,
+            "bone": "Foot_R",
+            "clip": "run",
+            "frame": 164,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "animation_phase": 0.318133882075836,
+            "bone": "Thigh_R",
+            "clip": "run",
+            "frame": 324,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          }
+        }
+      },
+      {
+        "aligned_speed_m_s": 4.10005912184715,
+        "backward_speed_m_s": 0.0,
+        "backwards_running_frames": 0,
+        "hz": 120,
+        "maximum_acceleration_m_s2": 8.00599157810211,
+        "maximum_root_turn_deg": 2.14859651287301,
+        "turn": -1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.00192219018936157,
+          "max_root_step_m": 0.0342723466455936,
+          "max_support_slip_m": 1.34869912926661e-06,
+          "max_transition_position_jump_m": 0.0828908234834671,
+          "max_transition_rotation_jump_deg": 14.2768951201729
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.634235649611836,
+            "clip": "run",
+            "frame": 182,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.132274723918875,
+            "clip": "run",
+            "frame": 210,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.0125,
+            "bone": "Foot_R",
+            "clip": "idle",
+            "frame": 243,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.0125,
+            "previous_clip": "idle",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 2.14812736425439
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.622373566278388,
+            "bone": "Foot_R",
+            "clip": "run",
+            "frame": 68,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "animation_phase": 0.317990266746931,
+            "bone": "Thigh_R",
+            "clip": "run",
+            "frame": 108,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          }
+        }
+      },
+      {
+        "aligned_speed_m_s": 4.10005912184715,
+        "backward_speed_m_s": 0.0,
+        "backwards_running_frames": 0,
+        "hz": 120,
+        "maximum_acceleration_m_s2": 8.00600331276655,
+        "maximum_root_turn_deg": 2.14859651287301,
+        "turn": 1.0,
+        "world_motion": {
+          "max_collision_overlap_m": 0.00192219018936157,
+          "max_root_step_m": 0.0342749431729317,
+          "max_support_slip_m": 1.06624031559477e-06,
+          "max_transition_position_jump_m": 0.0777288749814034,
+          "max_transition_rotation_jump_deg": 14.1073194523281
+        },
+        "world_worst": {
+          "max_collision_overlap_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.727094289043315,
+            "clip": "run",
+            "frame": 131,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_root_step_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.584797558616765,
+            "clip": "run",
+            "frame": 123,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          },
+          "max_support_slip_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.256780392309688,
+            "bone": "Foot_R",
+            "clip": "run",
+            "frame": 217,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "phase": 0.256780392309688,
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_transition_position_jump_m": {
+            "actor": "Marcus",
+            "animation_phase": 0.626865830718429,
+            "bone": "Foot_R",
+            "clip": "run",
+            "frame": 328,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0
+          },
+          "max_transition_rotation_jump_deg": {
+            "actor": "Marcus",
+            "animation_phase": 0.819952264092107,
+            "bone": "Thigh_L",
+            "clip": "run",
+            "frame": 80,
+            "lod_changed": false,
+            "model": "res://assets/village_characters/villager_0.glb",
+            "previous_clip": "run",
+            "previous_model": "res://assets/village_characters/villager_0.glb",
+            "root_turn_deg": 0.0395646811852521
+          }
+        }
+      }
+    ]
+  },
+  "lod_control_comparison": {
+    "baseline": [
+      {
+        "action": "march",
+        "history_change_m": 0.0483333319425583,
+        "hz": 30.0,
+        "kind": "player",
+        "pose_difference_deg": 10.3582030036987,
+        "pose_difference_m": 0.064632274210453,
+        "release_error_m": 0.0483333319425583,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0241666734218597,
+        "hz": 60.0,
+        "kind": "player",
+        "pose_difference_deg": 5.2705756640824,
+        "pose_difference_m": 0.0329212360084057,
+        "release_error_m": 0.0241666734218597,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0120833367109299,
+        "hz": 120.0,
+        "kind": "player",
+        "pose_difference_deg": 2.65357929208191,
+        "pose_difference_m": 0.0165784191340208,
+        "release_error_m": 0.0120833367109299,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0483333319425583,
+        "hz": 30.0,
+        "kind": "player",
+        "pose_difference_deg": 10.3582030036987,
+        "pose_difference_m": 0.0646321773529053,
+        "release_error_m": 0.0483333319425583,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0241666734218597,
+        "hz": 60.0,
+        "kind": "player",
+        "pose_difference_deg": 5.27072422069685,
+        "pose_difference_m": 0.0329212434589863,
+        "release_error_m": 0.0241666734218597,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0120833367109299,
+        "hz": 120.0,
+        "kind": "player",
+        "pose_difference_deg": 2.65357929208191,
+        "pose_difference_m": 0.0165784265846014,
+        "release_error_m": 0.0120833367109299,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.136666655540466,
+        "hz": 30.0,
+        "kind": "player",
+        "pose_difference_deg": 27.1820082172514,
+        "pose_difference_m": 0.159040898084641,
+        "release_error_m": 0.136666655540466,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0683333277702332,
+        "hz": 60.0,
+        "kind": "player",
+        "pose_difference_deg": 17.9001653333448,
+        "pose_difference_m": 0.109138995409012,
+        "release_error_m": 0.0683333277702332,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0341666638851166,
+        "hz": 120.0,
+        "kind": "player",
+        "pose_difference_deg": 9.27773196379981,
+        "pose_difference_m": 0.0579068586230278,
+        "release_error_m": 0.0341666638851166,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.136666655540466,
+        "hz": 30.0,
+        "kind": "player",
+        "pose_difference_deg": 27.1818886889409,
+        "pose_difference_m": 0.15904039144516,
+        "release_error_m": 0.136666655540466,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0683333277702332,
+        "hz": 60.0,
+        "kind": "player",
+        "pose_difference_deg": 17.9001209371152,
+        "pose_difference_m": 0.109138943254948,
+        "release_error_m": 0.0683333277702332,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0341666638851166,
+        "hz": 120.0,
+        "kind": "player",
+        "pose_difference_deg": 9.27773196379981,
+        "pose_difference_m": 0.0579068101942539,
+        "release_error_m": 0.0341666638851166,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0483333319425583,
+        "hz": 30.0,
+        "kind": "companion",
+        "pose_difference_deg": 13.7613712246406,
+        "pose_difference_m": 0.0661093443632126,
+        "release_error_m": 0.0483333319425583,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0241666734218597,
+        "hz": 60.0,
+        "kind": "companion",
+        "pose_difference_deg": 6.89244463675012,
+        "pose_difference_m": 0.0327832847833633,
+        "release_error_m": 0.0241666734218597,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0120833367109299,
+        "hz": 120.0,
+        "kind": "companion",
+        "pose_difference_deg": 2.42026451234591,
+        "pose_difference_m": 0.0120834708213806,
+        "release_error_m": 0.0120833367109299,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0483333319425583,
+        "hz": 30.0,
+        "kind": "companion",
+        "pose_difference_deg": 13.7613712246406,
+        "pose_difference_m": 0.0661093443632126,
+        "release_error_m": 0.0483333319425583,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0241666734218597,
+        "hz": 60.0,
+        "kind": "companion",
+        "pose_difference_deg": 6.89244463675012,
+        "pose_difference_m": 0.0327832847833633,
+        "release_error_m": 0.0241666734218597,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0120833367109299,
+        "hz": 120.0,
+        "kind": "companion",
+        "pose_difference_deg": 2.42026451234591,
+        "pose_difference_m": 0.0120834112167358,
+        "release_error_m": 0.0120833367109299,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.136666655540466,
+        "hz": 30.0,
+        "kind": "companion",
+        "pose_difference_deg": 27.2732663747519,
+        "pose_difference_m": 0.136666744947433,
+        "release_error_m": 0.136666655540466,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0683333277702332,
+        "hz": 60.0,
+        "kind": "companion",
+        "pose_difference_deg": 14.0923476776674,
+        "pose_difference_m": 0.0683333277702332,
+        "release_error_m": 0.0683333277702332,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0341666638851166,
+        "hz": 120.0,
+        "kind": "companion",
+        "pose_difference_deg": 6.60360788958133,
+        "pose_difference_m": 0.0341666042804718,
+        "release_error_m": 0.0341666638851166,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.136666655540466,
+        "hz": 30.0,
+        "kind": "companion",
+        "pose_difference_deg": 27.2732663747519,
+        "pose_difference_m": 0.136666774749756,
+        "release_error_m": 0.136666655540466,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0683333277702332,
+        "hz": 60.0,
+        "kind": "companion",
+        "pose_difference_deg": 14.0923476776674,
+        "pose_difference_m": 0.0683333575725555,
+        "release_error_m": 0.0683333277702332,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0341666638851166,
+        "hz": 120.0,
+        "kind": "companion",
+        "pose_difference_deg": 6.60360788958133,
+        "pose_difference_m": 0.0341666042804718,
+        "release_error_m": 0.0341666638851166,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0483333319425583,
+        "hz": 30.0,
+        "kind": "resident",
+        "pose_difference_deg": 8.68597803448825,
+        "pose_difference_m": 0.0599565021693707,
+        "release_error_m": 0.0483333319425583,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0241666734218597,
+        "hz": 60.0,
+        "kind": "resident",
+        "pose_difference_deg": 4.42394554192899,
+        "pose_difference_m": 0.0305593479424715,
+        "release_error_m": 0.0241666734218597,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0120833367109299,
+        "hz": 120.0,
+        "kind": "resident",
+        "pose_difference_deg": 2.22861922263229,
+        "pose_difference_m": 0.015398976393044,
+        "release_error_m": 0.0120833367109299,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0483333319425583,
+        "hz": 30.0,
+        "kind": "resident",
+        "pose_difference_deg": 8.68597803448825,
+        "pose_difference_m": 0.0599565021693707,
+        "release_error_m": 0.0483333319425583,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0241666734218597,
+        "hz": 60.0,
+        "kind": "resident",
+        "pose_difference_deg": 4.42394554192899,
+        "pose_difference_m": 0.0305593498051167,
+        "release_error_m": 0.0241666734218597,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0120833367109299,
+        "hz": 120.0,
+        "kind": "resident",
+        "pose_difference_deg": 2.22861922263229,
+        "pose_difference_m": 0.0153989689424634,
+        "release_error_m": 0.0120833367109299,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.136666655540466,
+        "hz": 30.0,
+        "kind": "resident",
+        "pose_difference_deg": 25.6148640008743,
+        "pose_difference_m": 0.167361631989479,
+        "release_error_m": 0.136666655540466,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0683333277702332,
+        "hz": 60.0,
+        "kind": "resident",
+        "pose_difference_deg": 17.262893315857,
+        "pose_difference_m": 0.117624543607235,
+        "release_error_m": 0.0683333277702332,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0341666638851166,
+        "hz": 120.0,
+        "kind": "resident",
+        "pose_difference_deg": 7.948186976759,
+        "pose_difference_m": 0.0548727065324783,
+        "release_error_m": 0.0341666638851166,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.136666655540466,
+        "hz": 30.0,
+        "kind": "resident",
+        "pose_difference_deg": 25.6148008216244,
+        "pose_difference_m": 0.167361587285995,
+        "release_error_m": 0.136666655540466,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0683333277702332,
+        "hz": 60.0,
+        "kind": "resident",
+        "pose_difference_deg": 17.262893315857,
+        "pose_difference_m": 0.117624506354332,
+        "release_error_m": 0.0683333277702332,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0341666638851166,
+        "hz": 120.0,
+        "kind": "resident",
+        "pose_difference_deg": 7.948186976759,
+        "pose_difference_m": 0.0548726953566074,
+        "release_error_m": 0.0341666638851166,
+        "side": "R"
+      }
+    ],
+    "fixed": [
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "player",
+        "pose_difference_deg": 0.0,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0559529096807445,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0559529096807445,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0559529096807445,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0559529096807445,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "companion",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0559529096807445,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "march",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "L"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 30.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0559529096807445,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 60.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      },
+      {
+        "action": "run",
+        "history_change_m": 0.0,
+        "hz": 120.0,
+        "kind": "resident",
+        "pose_difference_deg": 0.0395646811852521,
+        "pose_difference_m": 0.0,
+        "release_error_m": 0.0,
+        "side": "R"
+      }
+    ]
+  },
+  "tests": {
+    "navigation": {
+      "checks": 32,
+      "failures": 0
+    },
+    "follow": {
+      "checks": 269,
+      "failures": 0
+    },
+    "turn_motion": {
+      "checks": 66,
+      "failures": 0,
+      "baseline_failures": 24
+    },
+    "lod_contact_history": {
+      "checks": 216,
+      "failures": 0,
+      "baseline_failures": 108
+    },
+    "character_motion": {
+      "checks": 560,
+      "failures": 0
+    }
+  },
+  "ci_baseline_artifact": {
+    "run_id": 45564458686,
+    "artifact_id": 14999657350,
+    "sha256": "fa3440215ffedfe8412534fb0556bfb14e71dec07e66f3e3a327363af46a000b"
+  }
+}

@@ -1,0 +1,855 @@
+{
+  "companion_fixture_notes": "Validated mission commands reach deliver_kindling and market_trade. Player arrivals are fixture placements; the existing Silvanus/Marcus bodies then walk via production companion navigation and 60-Hz physics, including pause, resume and their authored stop. No quest editing or duplicate actors.",
+  "companion_routes": [
+    {
+      "actor_id": "silvanus",
+      "arrival_gap_m": 0.179999992251396,
+      "displacement_m": 61.1718826293945,
+      "distance_m": 64.661323428154,
+      "final_speed_m_s": 0.0,
+      "max_root_turn_deg": 4.29737445264584,
+      "mission_step": "deliver_kindling",
+      "model": "res://assets/characters/frontier_civilian_man_3.glb",
+      "pause_displacement_m": 0.0,
+      "resumed_distance_m": 62.4649786241353,
+      "same_actor": true,
+      "sample_count": 1307
+    },
+    {
+      "actor_id": "marcus",
+      "arrival_gap_m": 0.179997637867928,
+      "displacement_m": 34.2593460083008,
+      "distance_m": 35.9309760294855,
+      "final_speed_m_s": 0.0,
+      "max_root_turn_deg": 4.29737445264584,
+      "mission_step": "market_trade",
+      "model": "res://assets/village_characters/villager_2.glb",
+      "pause_displacement_m": 0.0,
+      "resumed_distance_m": 33.7363516315818,
+      "same_actor": true,
+      "sample_count": 820
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "max_collision_overlap_m": 0.00479358434677124,
+    "max_root_step_m": 0.0843394994735718,
+    "max_support_slip_m": 0.0138336969539523,
+    "max_transition_position_jump_m": 0.193958267569542,
+    "max_transition_rotation_jump_deg": 31.651014651569
+  },
+  "sample_count": 8870,
+  "sample_hz": 60,
+  "scenario_samples": [
+    {
+      "contact_samples": 1224,
+      "diagnostics": {
+        "max_collision_overlap_m": {
+          "actor": "Resident_silvanus",
+          "clip": "run",
+          "frame": 684,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_1.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_1.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_root_step_m": {
+          "actor": "Resident_silvanus",
+          "clip": "run",
+          "frame": 791,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_support_slip_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Foot_R",
+          "clip": "run",
+          "frame": 228,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "phase": 0.315934206991616,
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Shin_L",
+          "clip": "run",
+          "frame": 977,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Resident_silvanus",
+          "bone": "Arm_L",
+          "clip": "run",
+          "frame": 845,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 4.29719217197237
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "silvanus",
+        "mission_step": "deliver_kindling",
+        "segment": "travel_pause_resume_stop"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.00479358434677124,
+        "max_root_step_m": 0.0685636699199677,
+        "max_support_slip_m": 0.00841294415295124,
+        "max_transition_position_jump_m": 0.18477238714695,
+        "max_transition_rotation_jump_deg": 23.563749655383
+      },
+      "sample_count": 1307,
+      "sample_hz": 60,
+      "scenario": "world_displacement",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 1224,
+      "diagnostics": {
+        "max_collision_overlap_m": {
+          "actor": "Resident_silvanus",
+          "clip": "run",
+          "frame": 684,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_1.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_1.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_root_step_m": {
+          "actor": "Resident_silvanus",
+          "clip": "run",
+          "frame": 791,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_support_slip_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Foot_R",
+          "clip": "run",
+          "frame": 228,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "phase": 0.315934206991616,
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Shin_L",
+          "clip": "run",
+          "frame": 977,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Resident_silvanus",
+          "bone": "Arm_L",
+          "clip": "run",
+          "frame": 845,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 4.29719217197237
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "silvanus",
+        "mission_step": "deliver_kindling",
+        "segment": "travel_pause_resume_stop"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.00479358434677124,
+        "max_root_step_m": 0.0685636699199677,
+        "max_support_slip_m": 0.00841294415295124,
+        "max_transition_position_jump_m": 0.18477238714695,
+        "max_transition_rotation_jump_deg": 23.563749655383
+      },
+      "sample_count": 1307,
+      "sample_hz": 60,
+      "scenario": "contact_and_weight",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 1224,
+      "diagnostics": {
+        "max_collision_overlap_m": {
+          "actor": "Resident_silvanus",
+          "clip": "run",
+          "frame": 684,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_1.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_1.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_root_step_m": {
+          "actor": "Resident_silvanus",
+          "clip": "run",
+          "frame": 791,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_support_slip_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Foot_R",
+          "clip": "run",
+          "frame": 228,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "phase": 0.315934206991616,
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Shin_L",
+          "clip": "run",
+          "frame": 977,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Resident_silvanus",
+          "bone": "Arm_L",
+          "clip": "run",
+          "frame": 845,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 4.29719217197237
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "silvanus",
+        "mission_step": "deliver_kindling",
+        "segment": "travel_pause_resume_stop"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.00479358434677124,
+        "max_root_step_m": 0.0685636699199677,
+        "max_support_slip_m": 0.00841294415295124,
+        "max_transition_position_jump_m": 0.18477238714695,
+        "max_transition_rotation_jump_deg": 23.563749655383
+      },
+      "sample_count": 1307,
+      "sample_hz": 60,
+      "scenario": "collision",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 1224,
+      "diagnostics": {
+        "max_collision_overlap_m": {
+          "actor": "Resident_silvanus",
+          "clip": "run",
+          "frame": 684,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_1.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_1.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_root_step_m": {
+          "actor": "Resident_silvanus",
+          "clip": "run",
+          "frame": 791,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_support_slip_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Foot_R",
+          "clip": "run",
+          "frame": 228,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "phase": 0.315934206991616,
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Shin_L",
+          "clip": "run",
+          "frame": 977,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Resident_silvanus",
+          "bone": "Arm_L",
+          "clip": "run",
+          "frame": 845,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 4.29719217197237
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "silvanus",
+        "mission_step": "deliver_kindling",
+        "segment": "travel_pause_resume_stop"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.00479358434677124,
+        "max_root_step_m": 0.0685636699199677,
+        "max_support_slip_m": 0.00841294415295124,
+        "max_transition_position_jump_m": 0.18477238714695,
+        "max_transition_rotation_jump_deg": 23.563749655383
+      },
+      "sample_count": 1307,
+      "sample_hz": 60,
+      "scenario": "walk_run_stop",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 92,
+      "diagnostics": {
+        "max_transition_position_jump_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Hand_L",
+          "clip": "idle",
+          "frame": 7,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "previous_clip": "idle",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Resident_silvanus",
+          "bone": "Arm_L",
+          "clip": "idle",
+          "frame": 6,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "previous_clip": "idle",
+          "previous_model": "res://assets/characters/frontier_civilian_man_2.glb",
+          "root_turn_deg": 0.0
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "silvanus",
+        "mission_step": "deliver_kindling",
+        "segment": "world_pause"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.0,
+        "max_root_step_m": 0.0,
+        "max_support_slip_m": 0.0,
+        "max_transition_position_jump_m": 0.0584991835057735,
+        "max_transition_rotation_jump_deg": 9.70640317384628
+      },
+      "sample_count": 61,
+      "sample_hz": 60,
+      "scenario": "dialogue_transition",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 236,
+      "diagnostics": {
+        "max_root_step_m": {
+          "actor": "Resident_silvanus",
+          "clip": "run",
+          "frame": 2,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_support_slip_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Foot_L",
+          "clip": "run",
+          "frame": 2,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "phase": 0.170175688569462,
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Resident_silvanus",
+          "bone": "Foot_R",
+          "clip": "run",
+          "frame": 2,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Resident_silvanus",
+          "bone": "Arm_R",
+          "clip": "run",
+          "frame": 3,
+          "lod_changed": false,
+          "model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/characters/frontier_civilian_man_3.glb",
+          "root_turn_deg": 0.0
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "silvanus",
+        "mission_step": "deliver_kindling",
+        "segment": "arrival_hold"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.0,
+        "max_root_step_m": 0.0383352600038052,
+        "max_support_slip_m": 0.00000426496126237907,
+        "max_transition_position_jump_m": 0.0653902962803841,
+        "max_transition_rotation_jump_deg": 14.5158697788534
+      },
+      "sample_count": 120,
+      "sample_hz": 60,
+      "scenario": "walk_run_stop",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 825,
+      "diagnostics": {
+        "max_root_step_m": {
+          "actor": "Marcus",
+          "clip": "run",
+          "frame": 2,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "idle",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29719217197237
+        },
+        "max_support_slip_m": {
+          "actor": "Marcus",
+          "bone": "Foot_L",
+          "clip": "run",
+          "frame": 24,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "phase": 0.318205703471712,
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Marcus",
+          "bone": "Shin_L",
+          "clip": "run",
+          "frame": 30,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Marcus",
+          "bone": "Thigh_R",
+          "clip": "run",
+          "frame": 29,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "marcus",
+        "mission_step": "market_trade",
+        "segment": "travel_pause_resume_stop"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.0,
+        "max_root_step_m": 0.0843394994735718,
+        "max_support_slip_m": 0.0138336969539523,
+        "max_transition_position_jump_m": 0.193958267569542,
+        "max_transition_rotation_jump_deg": 31.651014651569
+      },
+      "sample_count": 820,
+      "sample_hz": 60,
+      "scenario": "world_displacement",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 825,
+      "diagnostics": {
+        "max_root_step_m": {
+          "actor": "Marcus",
+          "clip": "run",
+          "frame": 2,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "idle",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29719217197237
+        },
+        "max_support_slip_m": {
+          "actor": "Marcus",
+          "bone": "Foot_L",
+          "clip": "run",
+          "frame": 24,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "phase": 0.318205703471712,
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Marcus",
+          "bone": "Shin_L",
+          "clip": "run",
+          "frame": 30,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Marcus",
+          "bone": "Thigh_R",
+          "clip": "run",
+          "frame": 29,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "marcus",
+        "mission_step": "market_trade",
+        "segment": "travel_pause_resume_stop"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.0,
+        "max_root_step_m": 0.0843394994735718,
+        "max_support_slip_m": 0.0138336969539523,
+        "max_transition_position_jump_m": 0.193958267569542,
+        "max_transition_rotation_jump_deg": 31.651014651569
+      },
+      "sample_count": 820,
+      "sample_hz": 60,
+      "scenario": "contact_and_weight",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 825,
+      "diagnostics": {
+        "max_root_step_m": {
+          "actor": "Marcus",
+          "clip": "run",
+          "frame": 2,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "idle",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29719217197237
+        },
+        "max_support_slip_m": {
+          "actor": "Marcus",
+          "bone": "Foot_L",
+          "clip": "run",
+          "frame": 24,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "phase": 0.318205703471712,
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Marcus",
+          "bone": "Shin_L",
+          "clip": "run",
+          "frame": 30,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Marcus",
+          "bone": "Thigh_R",
+          "clip": "run",
+          "frame": 29,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "marcus",
+        "mission_step": "market_trade",
+        "segment": "travel_pause_resume_stop"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.0,
+        "max_root_step_m": 0.0843394994735718,
+        "max_support_slip_m": 0.0138336969539523,
+        "max_transition_position_jump_m": 0.193958267569542,
+        "max_transition_rotation_jump_deg": 31.651014651569
+      },
+      "sample_count": 820,
+      "sample_hz": 60,
+      "scenario": "collision",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 825,
+      "diagnostics": {
+        "max_root_step_m": {
+          "actor": "Marcus",
+          "clip": "run",
+          "frame": 2,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "idle",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29719217197237
+        },
+        "max_support_slip_m": {
+          "actor": "Marcus",
+          "bone": "Foot_L",
+          "clip": "run",
+          "frame": 24,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "phase": 0.318205703471712,
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Marcus",
+          "bone": "Shin_L",
+          "clip": "run",
+          "frame": 30,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Marcus",
+          "bone": "Thigh_R",
+          "clip": "run",
+          "frame": 29,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 4.29737445264584
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "marcus",
+        "mission_step": "market_trade",
+        "segment": "travel_pause_resume_stop"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.0,
+        "max_root_step_m": 0.0843394994735718,
+        "max_support_slip_m": 0.0138336969539523,
+        "max_transition_position_jump_m": 0.193958267569542,
+        "max_transition_rotation_jump_deg": 31.651014651569
+      },
+      "sample_count": 820,
+      "sample_hz": 60,
+      "scenario": "walk_run_stop",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 93,
+      "diagnostics": {
+        "max_support_slip_m": {
+          "actor": "Marcus",
+          "bone": "Foot_R",
+          "clip": "idle",
+          "frame": 10,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "phase": 0.075,
+          "previous_clip": "idle",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 0.0395646811852521
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Marcus",
+          "bone": "Shin_R",
+          "clip": "idle",
+          "frame": 22,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "idle",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 0.0395646811852521
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Marcus",
+          "bone": "Thigh_R",
+          "clip": "idle",
+          "frame": 22,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_0.glb",
+          "previous_clip": "idle",
+          "previous_model": "res://assets/village_characters/villager_0.glb",
+          "root_turn_deg": 0.0395646811852521
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "marcus",
+        "mission_step": "market_trade",
+        "segment": "world_pause"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.0,
+        "max_root_step_m": 0.0,
+        "max_support_slip_m": 0.000000119209289550781,
+        "max_transition_position_jump_m": 0.0508392490446568,
+        "max_transition_rotation_jump_deg": 10.2033224878532
+      },
+      "sample_count": 61,
+      "sample_hz": 60,
+      "scenario": "dialogue_transition",
+      "subject": "family:village_navigation"
+    },
+    {
+      "contact_samples": 236,
+      "diagnostics": {
+        "max_root_step_m": {
+          "actor": "Marcus",
+          "clip": "run",
+          "frame": 3,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_2.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_support_slip_m": {
+          "actor": "Marcus",
+          "bone": "Foot_L",
+          "clip": "run",
+          "frame": 2,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_2.glb",
+          "phase": 0.124053531592708,
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_position_jump_m": {
+          "actor": "Marcus",
+          "bone": "Foot_R",
+          "clip": "run",
+          "frame": 3,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_2.glb",
+          "previous_clip": "run",
+          "previous_model": "res://assets/village_characters/villager_2.glb",
+          "root_turn_deg": 0.0
+        },
+        "max_transition_rotation_jump_deg": {
+          "actor": "Marcus",
+          "bone": "Arm_R",
+          "clip": "idle",
+          "frame": 9,
+          "lod_changed": false,
+          "model": "res://assets/village_characters/villager_2.glb",
+          "previous_clip": "idle",
+          "previous_model": "res://assets/village_characters/villager_2.glb",
+          "root_turn_deg": 0.0
+        }
+      },
+      "finite": true,
+      "fixture": {
+        "actor_id": "marcus",
+        "mission_step": "market_trade",
+        "segment": "arrival_hold"
+      },
+      "metrics": {
+        "max_collision_overlap_m": 0.0,
+        "max_root_step_m": 0.0383337400853634,
+        "max_support_slip_m": 0.00000269739825853321,
+        "max_transition_position_jump_m": 0.0652689039707184,
+        "max_transition_rotation_jump_deg": 5.31824526184721
+      },
+      "sample_count": 120,
+      "sample_hz": 60,
+      "scenario": "walk_run_stop",
+      "subject": "family:village_navigation"
+    }
+  ],
+  "scenarios": [
+    "world_displacement",
+    "contact_and_weight",
+    "collision",
+    "walk_run_stop",
+    "dialogue_transition"
+  ],
+  "subjects": [
+    "family:village_navigation"
+  ]
+}
