@@ -49,24 +49,7 @@
       "blocked": 4
     }
   ],
-  "unresolved_conflicts": [
-    {
-      "path": "tools/check_prototype.py",
-      "stage": "commerce_inventory",
-      "base": "2af6446d8103005b7d2134113aeed99a039a12c5",
-      "retained": "9c4631a00cd334275a89e33a0542ed8dbaff7242",
-      "incoming": "e2b8678d35e71140e654a43353716e022b25b063",
-      "reason": "three_way_resolution_required"
-    },
-    {
-      "path": "tools/check_prototype.py",
-      "stage": "presentation_delivery",
-      "base": "2af6446d8103005b7d2134113aeed99a039a12c5",
-      "retained": "9c4631a00cd334275a89e33a0542ed8dbaff7242",
-      "incoming": "b970a2ba29906b7e7dd19825bdd4258bdf6773fe",
-      "reason": "three_way_resolution_required"
-    }
-  ],
+  "unresolved_conflicts": [],
   "missing_required_files": [
     "prototype/assets/world/roman_city_test.glb",
     "prototype/assets/world/roman_city_collision.glb",
@@ -168,6 +151,24 @@
       "incoming": "f15cdb9ceab891a126529ec5d0a1ee9c212dadc0",
       "reason": "three_way_resolution_required",
       "resolution": "independent source changes combined; runtime checks pending"
+    },
+    {
+      "path": "tools/check_prototype.py",
+      "stage": "commerce_inventory",
+      "base": "2af6446d8103005b7d2134113aeed99a039a12c5",
+      "retained": "9c4631a00cd334275a89e33a0542ed8dbaff7242",
+      "incoming": "e2b8678d35e71140e654a43353716e022b25b063",
+      "reason": "three_way_resolution_required",
+      "resolution": "preserve all independent test entries and source fingerprint/report scope fields"
+    },
+    {
+      "path": "tools/check_prototype.py",
+      "stage": "presentation_delivery",
+      "base": "2af6446d8103005b7d2134113aeed99a039a12c5",
+      "retained": "9c4631a00cd334275a89e33a0542ed8dbaff7242",
+      "incoming": "b970a2ba29906b7e7dd19825bdd4258bdf6773fe",
+      "reason": "three_way_resolution_required",
+      "resolution": "preserve all independent test entries and source fingerprint/report scope fields"
     }
   ]
 }
