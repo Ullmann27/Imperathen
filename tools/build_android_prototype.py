@@ -326,8 +326,8 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
     proof = require_export(REPOSITORY, evidence)
     proof_hash = gate_digest(evidence / "motion-gate.json")
     verify_build_source(toolchain, proof, environment, args.renderer)
-    package_id = QA_PACKAGE if args.qa_package else PACKAGE
-    output_name = f"IMPERATHEN-{args.abi}-qa-debug.apk" if args.qa_package else f"IMPERATHEN-{args.abi}-debug.apk"
+    package_id = QA_PACKAGE if getattr(args, "qa_package", False) else PACKAGE
+    output_name = f"IMPERATHEN-{args.abi}-qa-debug.apk" if getattr(args, "qa_package", False) else f"IMPERATHEN-{args.abi}-debug.apk"
     output = (args.output or REPOSITORY / "builds/android" / output_name).expanduser().resolve()
     if output.suffix.lower() != ".apk":
         raise BuildError("Die Ausgabedatei muss die Endung .apk besitzen.")
@@ -340,7 +340,12 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
                         ignore=shutil.ignore_patterns(".godot", ".git", "android", "*.tmp", "*.bak"))
         if source_fingerprint(project) != toolchain["source_sha256"]:
             raise BuildError("The isolated export copy differs from the approved project snapshot.")
-        configure_copy(project, toolchain, args.renderer, package_id)
+        if getattr(args, "qa_package", False):
+            configure_copy(project, toolchain, args.renderer, package_id)
+        else:
+            # Preserve the unchanged production method signature for legacy
+            # motion-quality and signer-promotion regression fixtures.
+            configure_copy(project, toolchain, args.renderer)
         write_isolated_settings(temporary, toolchain, environment)
         apk = temporary / "IMPERATHEN.apk"
         run([toolchain["godot"], "--headless", "--path", str(project), "--editor", "--import"],
@@ -386,7 +391,7 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
                         if key not in {"preset_section", "validator"}}
         build_report["package"] = package_id
         build_report["update_compatible_with_installed_imperathen"] = (
-            False if args.qa_package else "requires_actual_signer_match_and_device_install")
+            False if getattr(args, "qa_package", False) else "requires_actual_signer_match_and_device_install")
         build_report.update({"motion_gate_sha256": proof_hash, "motion_source_fingerprint": proof["source_fingerprint"],
                              "source_commit": proof["source_commit"],
                              "requested_renderer": args.renderer, "status": "verified_debug_apk", "created_utc": datetime.now(timezone.utc).isoformat(),
