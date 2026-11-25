@@ -6,6 +6,7 @@ on:
     paths:
       - 'prototype/**'
       - 'tools/build_android_prototype.py'
+      - 'tools/android_signing_identity.py'
       - 'tools/validate_android_apk.py'
       - 'tools/android_runtime_smoke.py'
       - 'tools/android_graphics_benchmark.py'

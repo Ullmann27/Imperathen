@@ -51,27 +51,11 @@
   ],
   "unresolved_conflicts": [
     {
-      "path": "prototype/scripts/domain/world_model.gd",
-      "stage": "commerce_inventory",
-      "base": "8743215188688a0de13bff951e00858b1e59e0db",
-      "retained": "a426ee9dfe2685b1027927d971958c99a9506dfa",
-      "incoming": "76c28b468119a8ceff74a002c76011bb768ba05c",
-      "reason": "three_way_resolution_required"
-    },
-    {
       "path": "tools/check_prototype.py",
       "stage": "commerce_inventory",
       "base": "2af6446d8103005b7d2134113aeed99a039a12c5",
       "retained": "9c4631a00cd334275a89e33a0542ed8dbaff7242",
       "incoming": "e2b8678d35e71140e654a43353716e022b25b063",
-      "reason": "three_way_resolution_required"
-    },
-    {
-      "path": ".github/workflows/android-prototype.yml",
-      "stage": "presentation_delivery",
-      "base": "4320b763021064517b7071d217446af04aa8c146",
-      "retained": "e97fba196f723b6958081695081e962815b7480c",
-      "incoming": "2e1d85bf988d362346c7ebb26f328073c08ad6a9",
       "reason": "three_way_resolution_required"
     },
     {
@@ -164,6 +148,24 @@
       "incoming": "16366d416f272fde3bbc149ce30bbe920e5b27eb",
       "reason": "three_way_resolution_required",
       "resolution": "three-way disjoint edits; runtime tests pending"
+    },
+    {
+      "path": "prototype/scripts/domain/world_model.gd",
+      "stage": "commerce_inventory",
+      "base": "8743215188688a0de13bff951e00858b1e59e0db",
+      "retained": "a426ee9dfe2685b1027927d971958c99a9506dfa",
+      "incoming": "76c28b468119a8ceff74a002c76011bb768ba05c",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way source reconciliation; separate Callable declarations retained; tests pending"
+    },
+    {
+      "path": ".github/workflows/android-prototype.yml",
+      "stage": "presentation_delivery",
+      "base": "4320b763021064517b7071d217446af04aa8c146",
+      "retained": "e97fba196f723b6958081695081e962815b7480c",
+      "incoming": "2e1d85bf988d362346c7ebb26f328073c08ad6a9",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way source reconciliation; separate Callable declarations retained; tests pending"
     }
   ]
 }
