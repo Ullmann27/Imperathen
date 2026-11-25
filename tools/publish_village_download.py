@@ -236,6 +236,48 @@ def verify_run(source: str, run_id: str, number: str, profile: dict | None = Non
             and build_jobs[0].get("conclusion") == "success", "The build/emulator job has not passed")
 
 
+def verify_signing_pair(build: dict, emulator_build: dict) -> dict:
+    """Bind signer evidence to both packages without asserting update compatibility.
+
+    Older artifacts without identity evidence are not retroactively certified.
+    Their existing releases remain unchanged; a new publication requires a new
+    build proof containing the measured public certificate identities.
+    """
+    identities = []
+    for label, proof in (("ARM64", build), ("emulator", emulator_build)):
+        identity = proof.get("signing_identity")
+        require(isinstance(identity, dict), label + " signing identity evidence is missing")
+        certificates = identity.get("signer_certificates_sha256")
+        require(type(identity.get("schema_version")) is int and identity["schema_version"] == 1
+                and identity.get("status") == "verified"
+                and isinstance(identity.get("apk_sha256"), str)
+                and re.fullmatch(r"[0-9a-f]{64}", identity["apk_sha256"]) is not None
+                and identity["apk_sha256"] == proof.get("apk_sha256"),
+                label + " signing evidence describes another or unverified APK")
+        require(isinstance(certificates, list) and 0 < len(certificates) <= 32
+                and all(isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value)
+                        for value in certificates)
+                and certificates == sorted(set(certificates)),
+                label + " signing certificate fingerprints are incomplete or invalid")
+        expected = identity.get("expected_certificate_sha256")
+        comparison = identity.get("comparison")
+        if expected is None:
+            require(comparison == "not_checked", label + " signing comparison claims an unprovided certificate")
+        else:
+            require(isinstance(expected, str) and re.fullmatch(r"[0-9a-f]{64}", expected) is not None
+                    and certificates == [expected] and comparison == "matched_expected_certificate",
+                    label + " signing certificate differs from its expected identity")
+        require(proof.get("expected_signer_sha256") == expected,
+                label + " configured signing certificate differs from its comparison evidence")
+        identities.append(identity)
+    require(identities[0]["signer_certificates_sha256"] == identities[1]["signer_certificates_sha256"],
+            "ARM64 and emulator APKs use different signing certificates")
+    require(identities[0].get("expected_certificate_sha256") == identities[1].get("expected_certificate_sha256")
+            and identities[0]["comparison"] == identities[1]["comparison"],
+            "ARM64 and emulator builds used different expected certificate contracts")
+    return identities[0]
+
+
 def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, run_id: str,
                      profile: dict | None = None) -> dict:
     prefix = "IMPERATHEN-" + source[:8]
@@ -332,6 +374,7 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
                 and emulator_build.get("source_sha256") == build.get("source_sha256")
                 and build.get("requested_renderer") == emulator_build.get("requested_renderer") == "compatibility",
                 "Android runtime package lacks matching motion quality evidence")
+    signing_identity = verify_signing_pair(build, emulator_build)
     public.mkdir()
     shutil.copyfile(apk, public / apk_name)
     if motion is not None:
@@ -343,7 +386,8 @@ def verify_and_stage(android: Path, runtime: Path, public: Path, source: str, ru
                             motion_source_fingerprint=build["motion_source_fingerprint"],
                             source_sha256=build["source_sha256"])
     build_public.update(source_run=int(run_id), source_branch=profile["branch"] if profile else BRANCH,
-                        source_run_url=f"https://github.com/{REPO}/actions/runs/{run_id}")
+                        source_run_url=f"https://github.com/{REPO}/actions/runs/{run_id}",
+                        signing_identity=signing_identity)
     for suffix, value in {"APK-Pruefung": validation, "Godot-Pruefungen": engine,
                           "Emulatorpruefung": runtime_report, "Buildnachweis": build_public}.items():
         (public / f"{prefix}-{suffix}.json").write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

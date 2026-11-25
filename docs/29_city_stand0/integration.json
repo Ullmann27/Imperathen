@@ -59,27 +59,11 @@
       "reason": "three_way_resolution_required"
     },
     {
-      "path": "tools/build_android_prototype.py",
-      "stage": "presentation_delivery",
-      "base": "b90e6afc5c9ec91f81f8485081cea91858fd768f",
-      "retained": "11c700e86ef242320bfbc72abe377917e3e26d5e",
-      "incoming": "5d369e9519ae8d45d48a474bae0af7c62f2c5c84",
-      "reason": "three_way_resolution_required"
-    },
-    {
       "path": "tools/check_prototype.py",
       "stage": "presentation_delivery",
       "base": "2af6446d8103005b7d2134113aeed99a039a12c5",
       "retained": "9c4631a00cd334275a89e33a0542ed8dbaff7242",
       "incoming": "b970a2ba29906b7e7dd19825bdd4258bdf6773fe",
-      "reason": "three_way_resolution_required"
-    },
-    {
-      "path": "tools/publish_village_download.py",
-      "stage": "presentation_delivery",
-      "base": "e9fa9c95e1671a535595bf42f224993f4c49bcab",
-      "retained": "e93f32f527f0f0e70b6bf814845a30404e1d3ef3",
-      "incoming": "f15cdb9ceab891a126529ec5d0a1ee9c212dadc0",
       "reason": "three_way_resolution_required"
     }
   ],
@@ -166,6 +150,24 @@
       "incoming": "2e1d85bf988d362346c7ebb26f328073c08ad6a9",
       "reason": "three_way_resolution_required",
       "resolution": "three-way source reconciliation; separate Callable declarations retained; tests pending"
+    },
+    {
+      "path": "tools/build_android_prototype.py",
+      "stage": "presentation_delivery",
+      "base": "b90e6afc5c9ec91f81f8485081cea91858fd768f",
+      "retained": "11c700e86ef242320bfbc72abe377917e3e26d5e",
+      "incoming": "5d369e9519ae8d45d48a474bae0af7c62f2c5c84",
+      "reason": "three_way_resolution_required",
+      "resolution": "independent source changes combined; runtime checks pending"
+    },
+    {
+      "path": "tools/publish_village_download.py",
+      "stage": "presentation_delivery",
+      "base": "e9fa9c95e1671a535595bf42f224993f4c49bcab",
+      "retained": "e93f32f527f0f0e70b6bf814845a30404e1d3ef3",
+      "incoming": "f15cdb9ceab891a126529ec5d0a1ee9c212dadc0",
+      "reason": "three_way_resolution_required",
+      "resolution": "independent source changes combined; runtime checks pending"
     }
   ]
 }
