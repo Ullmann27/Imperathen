@@ -193,6 +193,8 @@ func sync_state(state: Dictionary) -> void:
 	var player_data: Dictionary = _state.get("player", {})
 	var age := int(player_data.get("age", 12))
 	_figure.configure("player",_state.get("origin_id","italia"),age)
+	# The actual original youth is selected in the campaign as well as free city.
+	_figure.configure_meshy_youth(true)
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_figure.set_service_gear(CombatActions.service_gear(state))
 	_update_people_profile()
@@ -315,6 +317,18 @@ func get_cinematic_anchor(key: String) -> Vector3:
 			return to_global(Vector3(14.5, 0, 4.5))
 		"training": return to_global(TRAINING_LOCATION)
 		_: return get_player_position()
+
+
+func get_cinematic_figure(actor_id: String) -> Node3D:
+	if actor_id == "player":
+		return _figure if is_instance_valid(_figure) else null
+	if actor_id == "marcus":
+		return _companion.get_node_or_null("Figure") as Node3D if is_instance_valid(_companion) and _companion.visible else null
+	if is_instance_valid(village_life_world):
+		var actor: Variant = village_life_world.actors.get(actor_id)
+		if is_instance_valid(actor) and actor.visible:
+			return actor.get_node_or_null("Figure") as Node3D
+	return null
 
 
 func set_frontier_time(seconds: float) -> void:

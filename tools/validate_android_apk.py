@@ -158,6 +158,7 @@ CC0_MOTION_RESOURCES = (
     "assets/animations/hero_cc0_library.tres",
 )
 FEATURE_RESOURCE_GROUPS = (
+    ("original_meshy_youth_content", tuple(f"assets/characters/hero_meshy_italia_{level}.glb" for level in range(4))),
     ("living_frontier_content", FRONTIER_RESOURCES),
     ("cinematic_opening_content", OPENING_RESOURCES),
     ("village_life_content", VILLAGE_LIFE_RESOURCES),

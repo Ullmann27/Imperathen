@@ -8,6 +8,7 @@ const Seasons = preload("res://scripts/strategy/season_campaign.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 const ValleyScene = preload("res://scripts/tactics/valley_scene.gd")
 const OpeningStory = preload("res://scripts/story/opening_story.gd")
+const MissionCinematics = preload("res://scripts/story/mission_cinematics.gd")
 const OpeningDirector = preload("res://scripts/cinematic/opening_director.gd")
 const OpeningOverlay = preload("res://scripts/ui/opening_overlay.gd")
 const OpeningCheckpoint = preload("res://scripts/cinematic/opening_checkpoint.gd")
@@ -530,6 +531,7 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	# Real-time button presses are guarded by the active movement, not stored
 	# as thousands of permanent economic orders. Their consequences are saved.
 	var command_id := "" if realtime_combat else "%s_%d" % [run_id, command_serial]
+	var previous_childhood_step: Dictionary = Childhood.current_step(model.data) if command == "village_childhood_action" and Childhood.enabled(model.data) else {}
 	var result: Dictionary = model.execute(command, payload, command_id)
 	if not result.get("ok", false) or (not realtime_combat and command not in ["receive_damage", "train"]):
 		ui.notify(str(result.get("message", "")))
@@ -543,6 +545,14 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 		else:
 			pending_opening = OpeningStory.adulthood(model.data)
 			_pause()
+	elif result.get("ok",false) and not previous_childhood_step.is_empty():
+		var transition := MissionCinematics.sequence_for(model.data,previous_childhood_step,Childhood.current_step(model.data))
+		if not transition.is_empty():
+			if persisted:
+				_begin_opening(transition)
+			else:
+				pending_opening = transition
+				_pause()
 	return result
 
 
@@ -585,6 +595,8 @@ func _village_command(command: String, args: Dictionary) -> void:
 		return
 	var previous_screen := screen
 	var result := _command(command, args)
+	if screen == "opening" or screen == "paused":
+		return
 	if previous_screen == "village_panel":
 		var state := _ui_state()
 		state["village_feedback"] = str(result.get("message", ""))
@@ -705,7 +717,7 @@ func _begin_opening(sequence: Dictionary, start_index: int = 0) -> void:
 		"objective": true, "final": true,
 		"objective_title": str(sequence.get("objective_title", "Dein nächster Schritt")),
 		"objective_text": str(sequence.get("objective_text", "")),
-		"advance_label": "Zur Ausbildung" if int(model.data.player.age) >= 18 else "Ins Dorf"})
+		"advance_label": str(sequence.get("handoff_label","Zur Ausbildung" if int(model.data.player.age) >= 18 else "Ins Dorf"))})
 	screen = "opening"
 	mode = "person"
 	world.set_mode(mode)
@@ -740,6 +752,7 @@ func _opening_present() -> void:
 	opening_elapsed = 0.0
 	opening_overlay.present(beat, opening_index, opening_sequence.beats.size())
 	opening_overlay.set_paused(opening_paused)
+	opening_director.mission_actor_id = str(beat.get("actor_id",""))
 	opening_director.play(str(beat.shot_id), maxf(0.1, float(beat.duration)), bool(ui.opening_preferences().reduce_motion))
 	# One clock drives subtitle timing and camera travel. Reading mode can hold
 	# the finished composition without skipping a sentence or simulating time.
@@ -840,6 +853,8 @@ func _restore_opening() -> bool:
 			sequence = OpeningStory.historical_prologue()
 		elif sequence_id == "childhood_home":
 			sequence = OpeningStory.childhood()
+		elif sequence_id.begins_with(MissionCinematics.PREFIX):
+			sequence = MissionCinematics.restore(model.data,sequence_id)
 	else:
 		sequence = OpeningStory.sequence(str(model.data.origin_id)) if int(model.data.player.age) < 18 else OpeningStory.adulthood(model.data)
 	if sequence.is_empty() or str(sequence.id) != sequence_id:

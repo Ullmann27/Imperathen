@@ -172,7 +172,8 @@ def bind_refit(body,sword,old,arm,rotation,center):
 def animate(arm):
     shared=module('youth_shared_motion',ROOT/'tools/characters/build_meshy_people.py')
     for bone in arm.pose.bones:bone.rotation_mode='QUATERNION'
-    shared.animate(arm)
+    from extend_youth_rig import auxiliary_pose
+    shared.animate(arm, pose_modifier=auxiliary_pose)
 
 def export_assets(body,sword,arm):
     mesh=body.data.copy();weapon=sword.data.copy();outputs=[]
@@ -202,8 +203,11 @@ def export_assets(body,sword,arm):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--source',required=True);parser.add_argument('--inspection-blend');args=parser.parse_args(sys.argv[sys.argv.index('--')+1:])
     for path in (OUT,ART,DOC):path.mkdir(parents=True,exist_ok=True)
-    body=prepare(args);sword,repair=split_sword(body);old,arm,rotation,center=create_rig();rig=bind_refit(body,sword,old,arm,rotation,center);animate(arm)
-    report={'task_id':TASK,'source_sha256':digest(args.source),'source_bytes':Path(args.source).stat().st_size,'source_license':'private user-owned Meshy output','sword_mesh_name':'PracticeBlade','sword_hidden_until_adult_equipment_authorization':True,'blender':bpy.app.version_string,'repair':repair,'rig':rig,'clips':list(CLIPS),'lods':export_assets(body,sword,arm),'limits':['Fitted authored biped, no individual finger bones or facial blend shapes.','Source depicts an adolescent in armor; height is a design reference, not measured age anatomy.','Visual acceptance and Android frame/heat measurements are separate.']}
+    body=prepare(args);sword,repair=split_sword(body);old,arm,rotation,center=create_rig();rig=bind_refit(body,sword,old,arm,rotation,center)
+    sys.path.insert(0,str(Path(__file__).resolve().parent))
+    from extend_youth_rig import fit_auxiliary_rig
+    rig.update(fit_auxiliary_rig(arm,body));animate(arm)
+    report={'task_id':TASK,'source_sha256':digest(args.source),'source_bytes':Path(args.source).stat().st_size,'source_license':'private user-owned Meshy output','sword_mesh_name':'PracticeBlade','sword_hidden_until_adult_equipment_authorization':True,'blender':bpy.app.version_string,'repair':repair,'rig':rig,'clips':list(CLIPS),'lods':export_assets(body,sword,arm),'limits':['Expanded weighted biped; grouped fingers and thumbs, modest jaw and brow controls. No independent five-finger articulation or facial blend shapes.','Source depicts an adolescent in armor; height is a design reference, not measured age anatomy.','Visual acceptance and Android frame/heat measurements are separate.']}
     (DOC/'youth-build.json').write_text(json.dumps(report,indent=2)+'\n');print('YOUTH_BUILT',json.dumps(report),flush=True)
 
 if __name__=='__main__':main()

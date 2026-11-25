@@ -432,7 +432,7 @@ def bind(body, arm, profile):
     return influence_counts
 
 
-def animate(arm):
+def animate(arm, pose_modifier=None):
     def pose(clip, t, role):
         if clip == "idle":
             # A complete, seam-free breathing/attention cycle remains visible
@@ -510,7 +510,10 @@ def animate(arm):
                     "Forearm_R": (-18 * movement, 0, 0), "Head": (4 * movement, 0, 0)}, 0
         return original_pose("attack" if clip == "train" else clip, t, role)
 
-    soldier.pose = pose
+    def extended_pose(clip,t,role):
+        angles,lift=pose(clip,t,role)
+        return (pose_modifier(clip,t,angles) if pose_modifier else angles),lift
+    soldier.pose = extended_pose
     soldier.LENGTHS = CLIPS
     soldier.animate(arm, "civilian")
 

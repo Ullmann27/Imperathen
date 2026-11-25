@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "task_id": "b6856033-bc9f-44fe-af12-e9843f161aed",
+  "source_sha256": "778daa5b777a6487668fcf684dd5e2f1db168bada9f060bbe3e544c84937861a",
+  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JBiq3Q9vttoZVrKhdbYLuTHXre/27c27e24-1c91-47fd-93d2-1b2b4e750e66.zip",
+  "sha256": "d70e0ba665c16f520d8c859c5c6285a61cbc3375682e21625c3ec70bc1fb47e1",
+  "bytes": 4563165,
+  "bones": 35,
+  "clips": [
+    "idle",
+    "march",
+    "run",
+    "talk",
+    "work",
+    "gather",
+    "train",
+    "attack",
+    "block",
+    "hit",
+    "death"
+  ],
+  "raw_meshy_source_included": false,
+  "lod_sha256": [
+    "448eef8e689d74723d7533cdd7f4a8d4f4fb42021595f311e3a420cbfa1b4960",
+    "c157e088e7f121f69ecab5988ee98d6f6bfc95722ae1e1543a14dbf3cf396762",
+    "7e60f1d3fe5c655174bca5ef566412f91fe175ced962de713076375838a437ac",
+    "20fb8ab73c6f941a0ab937d1b4fc00dadb9c68593a4925c32f59f71d51dcb34c"
+  ],
+  "scope": "Optimized runtime derivatives authorized for the game; original private Meshy source and signed source URL are not included."
+}
