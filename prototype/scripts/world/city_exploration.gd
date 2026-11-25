@@ -5,6 +5,7 @@ const Person := preload("res://scripts/visuals/village_person.gd")
 const State := preload("res://scripts/world/city_exploration_state.gd")
 const CameraObstruction := preload("res://scripts/world/camera_obstruction.gd")
 const CityDetailAdapter := preload("res://scripts/rendering/city_exploration_detail_adapter.gd")
+const CityCharacterFinish := preload("res://scripts/rendering/city_character_detail.gd")
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
 const CityMarketBridge := preload("res://scripts/world/city_market_bridge.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
@@ -160,6 +161,8 @@ func _build_player() -> void:
 	youth_available = figure.configure_meshy_youth()
 	figure._reload(2 if profile=="low" else (1 if profile=="balanced" else 0))
 	figure._check_lod = 10000.0
+	if is_instance_valid(figure.body):
+		CityCharacterFinish.apply_to(figure.body, profile, figure.detail)
 
 func _build_camera() -> void:
 	add_child(camera)

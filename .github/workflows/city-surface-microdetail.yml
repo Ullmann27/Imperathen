@@ -1,0 +1,86 @@
+name: Roman facade and paving microdetail gate
+
+on:
+  push:
+    branches: ['feature/city-facade-street-microdetail-20261125']
+  pull_request:
+    paths:
+      - 'prototype/scripts/rendering/city_surface_microdetail.gd'
+      - 'prototype/scripts/world/city_exploration.gd'
+      - 'prototype/tests/city_surface_microdetail_test.gd'
+      - '.github/workflows/city-surface-microdetail.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: city-surface-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  microdetail-geometry:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify official Godot build
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$archive" -o "$archive"
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          folder=pathlib.Path.cwd()
+          name='Godot_v4.7.2-stable_linux.x86_64.zip'
+          known=dict((line.split()[-1].lstrip('*'),line.split()[0]) for line in (folder/'SHA512-SUMS.txt').read_text().splitlines() if line.strip())
+          with (folder/name).open('rb') as inp:
+              actual=hashlib.file_digest(inp,'sha512').hexdigest()
+          if actual!=known.get(name):
+              raise SystemExit('Godot official SHA512 mismatch')
+          with zipfile.ZipFile(folder/name) as archive:
+              archive.extractall(folder)
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Import, build 3D microdetail, verify preserved source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p city-surface-evidence
+          python3 tools/city_detail/check_market_anchors.py | tee city-surface-evidence/anchors.log
+          "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee city-surface-evidence/import.log
+          if ! command -v xvfb-run >/dev/null; then
+            sudo apt-get update -q
+            sudo apt-get install -y xvfb xauth
+          fi
+          IMPERATHEN_ISOLATED_TEST=1 xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype \
+            --audio-driver Dummy --rendering-method gl_compatibility --fixed-fps 60 \
+            --script res://tests/city_surface_microdetail_test.gd 2>&1 | tee city-surface-evidence/microdetail.log
+          grep -q 'CITY_SURFACE_MICRODETAIL_PASS' city-surface-evidence/microdetail.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' city-surface-evidence/microdetail.log; then exit 1; fi
+          IMPERATHEN_ISOLATED_TEST=1 "$GODOT_BIN" --headless --path prototype \
+            --fixed-fps 60 --script res://tests/city_market_signage_test.gd 2>&1 | tee city-surface-evidence/signage.log
+          grep -q 'CITY_MARKET_SIGNAGE_PASS' city-surface-evidence/signage.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' city-surface-evidence/signage.log; then exit 1; fi
+          IMPERATHEN_ISOLATED_TEST=1 "$GODOT_BIN" --headless --path prototype \
+            --fixed-fps 60 --script res://tests/city_exploration_detail_adapter_test.gd 2>&1 | tee city-surface-evidence/paving.log
+          grep -q 'CITY_EXPLORATION_DETAIL_PASS' city-surface-evidence/paving.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' city-surface-evidence/paving.log; then exit 1; fi
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-city-facades-${{ github.run_number }}
+          path: city-surface-evidence/
+          if-no-files-found: warn
+          retention-days: 14
