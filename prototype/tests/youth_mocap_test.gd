@@ -67,8 +67,13 @@ func _run() -> void:
 			var moved: float = 0.0
 			for index in range(samples+1):
 				var phase: float = float(index)/float(samples)
+				# Advance the same blend clock as production; a manually sampled
+				# headless actor does not receive its ordinary _process callback.
+				actor._motion.advance(1.0/60.0)
 				if action in FISTS:
 					actor.sample_combat(action,phase)
+					if index==int(samples/2):
+						_check(actor.animator.current_animation==action,"Domain selects actual captured action: "+action)
 				else:
 					actor.sample_pose(action,phase)
 				var current: Array[Transform3D] = _sample(rig)
@@ -80,7 +85,6 @@ func _run() -> void:
 				last=current
 			_check(moved>0.025,"Real non-frozen motion: "+action)
 			if action in FISTS:
-				_check(actor.animator.current_animation==action,"Domain selects actual captured action: "+action)
 				actor.cancel_action()
 			if action in ["march","run"]:
 				_check(absf(actor.locomotion_stride(action)-float(proof.gaits[action].stride_m))<0.001,"Measured stride synchronized")
