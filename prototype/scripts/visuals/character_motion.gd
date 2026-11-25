@@ -595,12 +595,21 @@ func _orient(name: String, basis: Basis) -> void:
 	_place(name, basis, _point(name))
 
 
-func _aim(name: String, toward: Vector3) -> void:
+func _aim(name: String, toward: Vector3, child: String = "") -> void:
 	var source: Basis = _global_rest[_ids[name]].basis
 	var direction := toward.normalized()
 	if direction.length_squared() < 0.5:
 		return
-	_orient(name, Basis(Quaternion(source.y.normalized(), direction)) * source)
+	# Imported rigs need not place their next joint on local +Y.
+	# Align the actual rest segment, not an assumed bone axis. End
+	# effectors with no anatomical child retain their authored Y convention.
+	var rest_axis := source.y.normalized()
+	if not child.is_empty():
+		var child_rest: Transform3D = _rest[_ids[child]]
+		var segment := source * child_rest.origin
+		if segment.length_squared() > 0.00000001:
+			rest_axis = segment.normalized()
+	_orient(name, Basis(Quaternion(rest_axis, direction)) * source)
 
 
 func _arm(side: String, elbow: Vector3, wrist: Vector3) -> void:
@@ -609,8 +618,8 @@ func _arm(side: String, elbow: Vector3, wrist: Vector3) -> void:
 	var upper := _rest[_ids["Forearm_" + side]].origin.length()
 	var lower := _rest[_ids["Hand_" + side]].origin.length()
 	var solved := _joint(shoulder, wrist, upper, lower, elbow - shoulder)
-	_aim("Arm_" + side, solved - shoulder)
-	_aim("Forearm_" + side, wrist - _point("Forearm_" + side))
+	_aim("Arm_" + side, solved - shoulder, "Forearm_" + side)
+	_aim("Forearm_" + side, wrist - _point("Forearm_" + side), "Hand_" + side)
 
 
 func _leg(side: String, foot: Vector3, bend: Vector3) -> void:
@@ -618,17 +627,25 @@ func _leg(side: String, foot: Vector3, bend: Vector3) -> void:
 	var upper := _rest[_ids["Shin_" + side]].origin.length()
 	var lower := _rest[_ids["Foot_" + side]].origin.length()
 	var knee := _joint(hip, foot, upper, lower, bend)
-	_aim("Thigh_" + side, knee - hip)
-	_aim("Shin_" + side, foot - _point("Shin_" + side))
+	_aim("Thigh_" + side, knee - hip, "Shin_" + side)
+	_aim("Shin_" + side, foot - _point("Shin_" + side), "Foot_" + side)
 	_orient("Foot_" + side, _global_rest[_ids["Foot_" + side]].basis)
 
 
 func _joint(start: Vector3, finish: Vector3, upper: float, lower: float, bend: Vector3) -> Vector3:
 	var delta := finish - start
 	var distance := clampf(delta.length(), absf(upper - lower) + 0.0001, upper + lower - 0.0001)
-	var direction := delta.normalized()
+	# Coincident endpoints still need a finite, nonzero solve axis.
+	var direction := delta.normalized() if delta.length_squared() > 0.000000000001 else Vector3.BACK
 	var along := (upper * upper - lower * lower + distance * distance) / (2.0 * distance)
 	var normal := bend - direction * bend.dot(direction)
 	if normal.length_squared() < 0.0001:
-		normal = Vector3.RIGHT - direction * direction.x
+		# Choose the least-aligned cardinal axis; a fixed RIGHT fallback
+		# degenerates for a horizontal +X/-X limb with a parallel pole.
+		var axis := Vector3.RIGHT
+		if absf(direction.y) < absf(direction.x):
+			axis = Vector3.UP
+		if absf(direction.z) < absf(direction.dot(axis)):
+			axis = Vector3.BACK
+		normal = axis - direction * direction.dot(axis)
 	return start + direction * along + normal.normalized() * sqrt(maxf(0.0, upper * upper - along * along))
