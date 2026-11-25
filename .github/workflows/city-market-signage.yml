@@ -1,0 +1,93 @@
+name: Roman city market placement
+
+on:
+  push:
+    branches: ['feature/city-market-wayfinding-20261125']
+    paths:
+      - 'prototype/scripts/world/city_exploration.gd'
+      - 'prototype/scripts/world/city_market_signage.gd'
+      - 'prototype/tests/city_market_signage_test.gd'
+      - 'prototype/assets/city_detail/shops/city_market_anchors.json'
+      - 'tools/city_detail/check_market_anchors.py'
+      - '.github/workflows/city-market-signage.yml'
+  pull_request:
+    paths:
+      - 'prototype/scripts/world/city_exploration.gd'
+      - 'prototype/scripts/world/city_market_signage.gd'
+      - 'prototype/tests/city_market_signage_test.gd'
+      - 'prototype/assets/city_detail/shops/city_market_anchors.json'
+      - 'tools/city_detail/check_market_anchors.py'
+      - '.github/workflows/city-market-signage.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: city-market-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  market-layout:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check the exact city generator and six shop anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p city-market-evidence
+          python3 tools/city_detail/check_market_anchors.py 2>&1 | tee city-market-evidence/anchors.log
+      - name: Get official Godot binary, verify SHA-512
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl --fail --location --retry 3 "$release/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$release/$archive" -o "$archive"
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          directory = pathlib.Path.cwd()
+          file = directory / 'Godot_v4.7.2-stable_linux.x86_64.zip'
+          expected = {
+              line.split()[-1].lstrip('*'):line.split()[0]
+              for line in (directory/'SHA512-SUMS.txt').read_text().splitlines() if line.strip()
+          }
+          with file.open('rb') as opened:
+              actual = hashlib.file_digest(opened, 'sha512').hexdigest()
+          if actual != expected.get(file.name):
+              raise SystemExit('Official Godot checksum mismatch')
+          with zipfile.ZipFile(file) as archive:
+              archive.extractall(directory)
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Import and test the shop signage on real Godot nodes
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee city-market-evidence/import.log
+          IMPERATHEN_ISOLATED_TEST=1 "$GODOT_BIN" --headless --path prototype \
+            --fixed-fps 60 --script res://tests/city_market_signage_test.gd 2>&1 | tee city-market-evidence/fixture.log
+          grep -q 'CITY_MARKET_SIGNAGE_PASS' city-market-evidence/fixture.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' city-market-evidence/fixture.log; then exit 1; fi
+          IMPERATHEN_ISOLATED_TEST=1 "$GODOT_BIN" --headless --path prototype \
+            --fixed-fps 60 --script res://tests/city_exploration_detail_adapter_test.gd 2>&1 | tee city-market-evidence/existing-overlay.log
+          grep -q 'CITY_EXPLORATION_DETAIL_PASS' city-market-evidence/existing-overlay.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' city-market-evidence/existing-overlay.log; then exit 1; fi
+      - name: Upload checks
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-city-market-${{ github.run_number }}
+          path: city-market-evidence/
+          if-no-files-found: warn
+          retention-days: 14
