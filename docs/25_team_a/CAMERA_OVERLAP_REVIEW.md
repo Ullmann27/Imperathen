@@ -90,6 +90,24 @@ Physikframe weiterhin mindestens einen Angreifer bewegt, innerhalb der
 bestehenden Geschwindigkeitsgrenze von 1,2 m/s. Die produktive Überfalllogik
 wird dabei nicht geändert.
 
+## Vollständigkeit der Ausrüstungsmessung
+
+Der vollständige Lauf auf `b553b637477f87305044ada66ed69b0aec24642e`
+hat außerdem einen echten GDScript-Laufzeitfehler im Ausrüstungsmessskript
+gemeldet: Ein bedingter Ausdruck lieferte eine untypisierte Liste, die nicht
+direkt einer Variablen vom Typ `Array[String]` zugewiesen werden konnte.
+Der Godot-Prozess beendete sich zwar mit Exitcode null; der bestehende Prüfer
+erkannte die Skriptfehlermeldung und bewertete die Messgruppe zutreffend als
+fehlgeschlagen.
+
+Die Liste wird nun ausdrücklich als typisierte Liste aufgebaut. Die drei
+Identitäten `service`, `unit_roman_signifer` und
+`unit_germanic_axe_fighter` sowie ihre Reihenfolge bleiben erhalten.
+Messszenarien, Grenzwerte und Freigabebedingungen werden nicht geändert.
+Erst ein neuer vollständiger Messlauf kann die tatsächlichen
+Ausrüstungsmetriken nachweisen; die zuvor abgebrochene Messung gilt nicht als
+Abnahme.
+
 ## Fachliche Grundlage
 
 - [Godot PhysicsDirectSpaceState3D](https://docs.godotengine.org/en/stable/classes/class_physicsdirectspacestate3d.html):

@@ -161,7 +161,12 @@ func measure(tree: SceneTree, contract: Dictionary, only_subject: String="") -> 
 		if not only_subject.is_empty() and only_subject not in definition.resources: continue
 		var family:=_family()
 		result[definition.id]=family
-		var identities: Array[String]=["service"] if definition.id=="service_gear" else ["unit_roman_signifer","unit_germanic_axe_fighter"]
+		var identities: Array[String] = []
+		if definition.id == "service_gear":
+			identities.append("service")
+		else:
+			identities.append("unit_roman_signifer")
+			identities.append("unit_germanic_axe_fighter")
 		for identity: String in identities:
 			var actor:=Person.new()
 			tree.root.add_child(actor)
