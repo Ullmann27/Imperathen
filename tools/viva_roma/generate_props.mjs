@@ -21,7 +21,7 @@ function createAsset(kind,lod) {
   function point(g,v,n,uv,tint=1) {
     const i=g.p.length/3; g.p.push(...v);g.n.push(...n);g.uv.push(...uv);
     const variation=1+.035*Math.sin(v[0]*131+v[1]*239+v[2]*181)*Math.sin(v[0]*61-v[1]*89+v[2]*137);
-    g.c.push(tint*variation,tint*variation,tint*variation,1);return i;
+    const value=Math.max(0,Math.min(1,tint*variation));g.c.push(value,value,value,1);return i;
   }
   function tri(m,a,b,c,tint=1){
     const n=unit(cross(sub(b,a),sub(c,a))),g=group[m];
