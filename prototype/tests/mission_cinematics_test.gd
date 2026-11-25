@@ -16,7 +16,7 @@ func _initialize() -> void:
 			following=step
 	var before := JSON.stringify(model.data)
 	var scene := Cinematics.sequence_for(model.data,previous,following)
-	var checks := not scene.is_empty() and scene.get("id","")=="mission_transition_deliver_kindling"
+	var checks: bool = not scene.is_empty() and str(scene.get("id",""))=="mission_transition_deliver_kindling"
 	if checks:
 		checks = scene.beats.size()>=2 and scene.beats[0].actor_id=="sextus" and scene.beats[0].shot_id=="mission_dialogue"
 		checks = checks and scene.objective_text==following.objective
