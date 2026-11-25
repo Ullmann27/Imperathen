@@ -9,6 +9,7 @@ const Atlas = preload("res://scripts/world_expansion/atlas.gd")
 const MANIFEST_PATH := "res://assets/world_expansion/manifest.json"
 const GROUND_SHADER = preload("res://shaders/world_expansion/ground_detail.gdshader")
 const MAX_MARKET_LIGHTS := 8
+const GROUND_DETAIL_BY_PROFILE := {"low": 0.0, "balanced": 0.58, "high": 0.82, "very_high": 1.0}
 const PROFILE_IDS := ["low", "balanced", "high", "very_high"]
 var manifest: Dictionary = {}
 var load_error := ""
@@ -34,6 +35,7 @@ var _status: Label
 var _panel: PanelContainer
 var _ui_time := 0.0
 var _hud: CanvasLayer
+var _selected_quality := "balanced"
 var _market_lights: Array[OmniLight3D] = []
 var _overview_fog_disabled := false
 var _fog_enabled_before_overview := true
@@ -192,9 +194,17 @@ func focus_on_asset(asset_id: String) -> bool:
 
 
 func set_quality(profile: String) -> void:
-	settlement.set_quality(profile)
-	controller.set_quality(profile)
+	_selected_quality = profile if GROUND_DETAIL_BY_PROFILE.has(profile) else "balanced"
+	settlement.set_quality(_selected_quality)
+	controller.set_quality(_selected_quality)
+	_apply_ground_quality()
 	_sync_controls()
+
+
+func _apply_ground_quality() -> void:
+	if _ground != null and _ground.material_override is ShaderMaterial:
+		var ground_shader: ShaderMaterial = _ground.material_override
+		ground_shader.set_shader_parameter("detail_strength", float(GROUND_DETAIL_BY_PROFILE[_selected_quality]))
 
 
 func _set_overview_fog(enabled: bool) -> void:
@@ -272,6 +282,7 @@ func _make_ground(extent: Vector2) -> void:
 	_ground.mesh = surface.commit()
 	_ground.material_override = material
 	add_child(_ground)
+	_apply_ground_quality()
 
 
 func _rebuild_market_lights(plan: Dictionary) -> void:

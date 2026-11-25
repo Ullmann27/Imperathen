@@ -356,6 +356,12 @@ func _test_preview_presentation() -> void:
 		var ember_count := preview._market_lights.size()
 		_check(ember_count > 0 and ember_count <= Preview.MAX_MARKET_LIGHTS, "A village has a bounded number of real shop-front fire lights")
 		_check(preview._ground.material_override is ShaderMaterial and (preview._ground.material_override as ShaderMaterial).shader == Preview.GROUND_SHADER, "The actual landscape uses the authored world-coordinate soil material")
+		preview.set_quality("low")
+		var ground_material: ShaderMaterial = preview._ground.material_override
+		_check(is_zero_approx(float(ground_material.get_shader_parameter("detail_strength"))), "Low profile disables expensive soil-noise computation")
+		preview.set_quality("very_high")
+		_check(is_equal_approx(float(ground_material.get_shader_parameter("detail_strength")), 1.0), "Very high profile restores full authored ground detail")
+		preview.set_quality("high")
 		preview.controller.set_time_of_day(0.0)
 		var after_dark := true
 		for lamp: OmniLight3D in preview._market_lights:
