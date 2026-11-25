@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: unreleased-city-qa-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.head_ref != 'integration/imperathen-unified-20261125' }}
 
 jobs:
   signed-independent-arm64-city:
@@ -41,9 +41,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Bound repository/network hangs; do not hold newer builds for 80 minutes.
-          timeout 180s sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update -q
-          timeout 240s sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install -y --no-install-recommends blender python3-numpy python3-scipy
+          # Bound network hangs without killing a healthy but slow package download.
+          timeout 300s sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update -q
+          timeout 900s sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends blender python3-numpy python3-scipy
           blender -b --python-expr "import numpy;print('NUMPY_BLENDER_AVAILABLE',numpy.__version__)"
           if [[ ! -x "$ANDROID_HOME/build-tools/35.0.1/apksigner" || ! -f "$ANDROID_HOME/platforms/android-35/android.jar" ]]; then
             "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;35.0.1' 'platforms;android-35'

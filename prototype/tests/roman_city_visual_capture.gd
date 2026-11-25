@@ -98,7 +98,7 @@ func _run() -> void:
 	for frame in 2:
 		await process_frame
 		await RenderingServer.frame_post_draw
-	var scene_ref := weakref(scene)
+	var scene_ref: WeakRef = weakref(scene)
 	scene.queue_free()
 	await process_frame
 	if scene_ref.get_ref() != null:
