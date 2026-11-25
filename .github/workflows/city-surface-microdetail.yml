@@ -64,7 +64,7 @@ jobs:
             sudo apt-get install -y xvfb xauth
           fi
           IMPERATHEN_ISOLATED_TEST=1 xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype \
-            --rendering-method gl_compatibility --fixed-fps 60 \
+            --audio-driver Dummy --rendering-method gl_compatibility --fixed-fps 60 \
             --script res://tests/city_surface_microdetail_test.gd 2>&1 | tee city-surface-evidence/microdetail.log
           grep -q 'CITY_SURFACE_MICRODETAIL_PASS' city-surface-evidence/microdetail.log
           if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' city-surface-evidence/microdetail.log; then exit 1; fi
