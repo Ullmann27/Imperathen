@@ -19,6 +19,4 @@ void fragment() {
 	ROUGHNESS=0.91;
 	SPECULAR=0.20;
 	if (!FRONT_FACING) { NORMAL=-NORMAL; }
-	// Gentle two-sided light response, not an emissive grass glow.
-	BACKLIGHT=ALBEDO*0.14;
 }
