@@ -180,8 +180,8 @@ func _physics_process(delta: float) -> void:
 		var displacement := destination-character.position
 		var horizontal := Vector3(displacement.x,0,displacement.z)
 		var should_walk := (moving_to_counter or leaving) and horizontal.length() > 0.20
-		var planned_speed := WALK_SPEED[index] if should_walk else 0.0
-		var wanted := horizontal.normalized()*planned_speed if should_walk else Vector3.ZERO
+		var planned_speed: float = float(WALK_SPEED[index]) if should_walk else 0.0
+		var wanted: Vector3 = horizontal.normalized()*planned_speed if should_walk else Vector3.ZERO
 		character.velocity.x = move_toward(character.velocity.x,wanted.x,delta*WALK_ACCELERATION)
 		character.velocity.z = move_toward(character.velocity.z,wanted.z,delta*WALK_ACCELERATION)
 		character.velocity.y = -0.25 if character.is_on_floor() else character.velocity.y-19.6*delta
@@ -229,8 +229,8 @@ func _clear_speech_line(first: Vector3, second: Vector3) -> bool:
 		return false
 	# Buildings are on scenery collision layer 1. Citizen bodies have their
 	# own layer and cannot accidentally mask a real wall.
-	for height in [0.85,1.45]:
-		var offset := Vector3.UP*height
+	for height: float in [0.85,1.45]:
+		var offset: Vector3 = Vector3.UP*height
 		var query := PhysicsRayQueryParameters3D.create(first+offset,second+offset,1)
 		query.hit_from_inside = true
 		if not get_world_3d().direct_space_state.intersect_ray(query).is_empty():

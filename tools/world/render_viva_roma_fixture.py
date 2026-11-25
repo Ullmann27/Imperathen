@@ -44,7 +44,8 @@ for style in ("legacy","viva"):
     data,_=m.finish()
     obj=bpy.data.objects.new("Roman_review_geometry",data);city.CITY.objects.link(obj)
     camera=city.preview_setup()
-    scene.cycles.samples=48;scene.cycles.use_denoising=True
+    # Keep both comparison renders identical even on distribution builds without OIDN.
+    scene.cycles.samples=64;scene.cycles.use_denoising=False
     scene.render.resolution_x=1280;scene.render.resolution_y=880
     city.set_camera(camera,(6.8,-8.7,2.25),(0,2.0,1.75),33)
     scene.render.filepath=str(out/(style+".png"))
@@ -56,4 +57,4 @@ for style in ("legacy","viva"):
         bpy.ops.wm.save_as_mainfile(filepath=str(out/"viva_fixture.blend"),compress=True)
 assert records[0]["geometry_sha256"]==records[1]["geometry_sha256"], records
 assert records[0]["render_sha256"]!=records[1]["render_sha256"], records
-(out/"comparison.json").write_text(json.dumps({"blender":bpy.app.version_string,"renders":records,"visual_review":"required"},indent=2))
+(out/"comparison.json").write_text(json.dumps({"blender":bpy.app.version_string,"samples":64,"denoising":False,"renders":records,"visual_review":"required"},indent=2))

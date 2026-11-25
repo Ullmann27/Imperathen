@@ -123,8 +123,10 @@ for kind in ('helmet','portal'):
     camera.location=pos(1.45,-2.6,.72)
     target(camera,center)
     scene.render.engine='CYCLES'
-    scene.cycles.samples=48
-    scene.cycles.use_denoising=True
+    scene.cycles.samples=64
+    # Distribution Blender may be compiled without OpenImageDenoiser.
+    # Preserve actual unfiltered render evidence and the visual review requirement.
+    scene.cycles.use_denoising=False
     scene.render.resolution_x=1440
     scene.render.resolution_y=1200
     scene.render.resolution_percentage=100
