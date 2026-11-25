@@ -1082,8 +1082,15 @@ func _open_city_exploration() -> void:
 	city_exploration = CityExploration.new()
 	city_exploration.profile = ui.get_quality()
 	city_exploration.leave_requested.connect(_leave_city_exploration)
+	city_exploration.story_requested.connect(_start_story_from_city)
 	screen = "city_exploration"
 	add_child(city_exploration)
+
+func _start_story_from_city() -> void:
+	# The city tour has its own save. Starting the campaign must go through
+	# the normal confirmation and must never delete an existing life silently.
+	_leave_city_exploration()
+	_request_new_game()
 
 func _leave_city_exploration() -> void:
 	if not is_instance_valid(city_exploration):
