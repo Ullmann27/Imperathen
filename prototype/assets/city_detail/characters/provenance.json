@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "authoring": "Original deterministic mathematical surface data, authored for IMPERATHEN",
+  "seed": 25112026,
+  "verified_source_models": [
+    {
+      "path": "prototype/assets/characters/hero_quality_0.glb",
+      "sha256": "69df0f6c2546a5dd075eee07570e071746d5c46e9fcc28e3a7bac11c3a55caeb"
+    },
+    {
+      "path": "prototype/assets/characters/hero_quality_1.glb",
+      "sha256": "af6a9dfc26ddec361702157943f21fd756ef5ebb476aab73bdfdb0f4de30fc91"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_archer_0.glb",
+      "sha256": "b6f00b194403079db32647f2239e4d8fab90c245059e23a6c9dc6d089e461722"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_archer_1.glb",
+      "sha256": "14b2ffaab3191d75e4a624e6c7f2cbdfa8db6d470470783f302553adcb52fb6c"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_man_0.glb",
+      "sha256": "477001694752dd67f6802da6c30cf246df0a97240914fc75e79315ebfe443622"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_man_1.glb",
+      "sha256": "30aabba76fa5db4b2fa8b879905611d340998d6294f3e8a1a6636de55de1ecef"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_woman_0.glb",
+      "sha256": "3f445fed8e5564b5b5a8338564e343d8ec9f5e92c4117eff1c2b86acd0b54ca2"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_civilian_woman_1.glb",
+      "sha256": "0060242580c098f5d94ce144cdf320a4f47b26d84026042ab136c583c81acca1"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_elder_0.glb",
+      "sha256": "b03051329d7e344fb95bb5a7e6a0eab953163f1549f103f4592ebfc1e3f4fefb"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_elder_1.glb",
+      "sha256": "5b1b3453f984f3e2c91c5535ecd5fef57f9733e4e41be33dc82111e073f5a12e"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_legionary_0.glb",
+      "sha256": "7937cbb3c3a510609d7a9d62b8adebf9f6a6678d997436faa2cce735146e8bda"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_legionary_1.glb",
+      "sha256": "a7b3d582f378c6cd6fadbb2d42a778a5b2b567e7c64312c054d8eae207cd6148"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_officer_0.glb",
+      "sha256": "46152dd3fc4da12bc772ab04084947f40f3c1d391c37435402af2bab4f0f2e86"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_officer_1.glb",
+      "sha256": "2d47a6f35dc7ce73ec959384090271c88ff3e0ea0a420197403912a4ed159bfc"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_spearman_0.glb",
+      "sha256": "46a06aff153e865667933c22b9aec4173b9be987d40d2e6c9226829061a8e2b4"
+    },
+    {
+      "path": "prototype/assets/characters/frontier_spearman_1.glb",
+      "sha256": "534e6d54304a3ffc75ad528fcb8f76063a0e75fafb744d0de18fe232fa3040a5"
+    }
+  ],
+  "detail_strengths_baked": {
+    "skin": 0.16,
+    "linen": 0.32,
+    "leather": 0.35
+  },
+  "normal_convention": "tangent space X+, Y+, Z+; image Y increases downwards",
+  "source_colour_images_modified": false,
+  "source_glb_sha256": "69df0f6c2546a5dd075eee07570e071746d5c46e9fcc28e3a7bac11c3a55caeb",
+  "source_material_maps": {
+    "skin": {
+      "normal_pixels_sha256": "59e22d2105e6bc0ad0c2110e1dd3e9bca12c32bcf6f45f1f691ad673212a6941",
+      "normal_strength": 0.25,
+      "size": [
+        512,
+        512
+      ]
+    },
+    "linen": {
+      "normal_pixels_sha256": "c65e71a7b17fc639c30730a031fb9f320af0b572f7875fcb6a80b4a88c62e5e9",
+      "normal_strength": 0.25,
+      "size": [
+        512,
+        512
+      ]
+    }
+  },
+  "normal_combination": "Reoriented Normal Mapping of original authored normal and added surface detail; normal scale baked into the combined map",
+  "roughness_combination": "Original roughness plus bounded authored variation; no source map discarded",
+  "original_mesh_rig_animation_modified": false,
+  "normal_and_roughness_colour_space": "linear/non-colour",
+  "runtime_scope": "known Hero/Frontier materials; high and very_high, LOD 0/1 only",
+  "android_device_validation": false,
+  "files": [
+    {
+      "path": "prototype/assets/city_detail/characters/skin_detail_normal.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 1002848,
+      "sha256": "c68c0b5b9fec99dd5acbe16bf622075be86ee9f246c02fd33979f9ea79fa0095"
+    },
+    {
+      "path": "prototype/assets/city_detail/characters/skin_detail_roughness.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 408037,
+      "sha256": "3417a895c07349cfc758f2aad654a96183ca7e1a1673d7e8a5626b266b6d1a04"
+    },
+    {
+      "path": "prototype/assets/city_detail/characters/linen_detail_normal.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 1055430,
+      "sha256": "53b2bf4ba4b5ff201ccebb6cfd26db7a7926dfb5441391675b3f945a8300829e"
+    },
+    {
+      "path": "prototype/assets/city_detail/characters/leather_detail_normal.png",
+      "width": 256,
+      "height": 256,
+      "bytes": 99215,
+      "sha256": "4b3c552d992f061a5b4664cc7bf2c90436b070e209b68fbb2cc1cb5b58fa5713"
+    }
+  ]
+}

@@ -37,6 +37,7 @@ var raider_sight_check: Callable
 
 func _physics_process(delta: float) -> void:
 	_advance_raiders(delta)
+	_update_attention(delta)
 
 
 func _advance_raiders(delta: float) -> void:
@@ -83,7 +84,6 @@ func _process(delta: float) -> void:
 		var actor: Node3D = actors[focused]
 		actor.rotation.y = rotate_toward(actor.rotation.y,_focus_yaw,minf(delta,.1)*3.2)
 	_update_nameplates()
-	_update_attention(delta)
 
 
 func raid_observations() -> Dictionary:
@@ -121,29 +121,132 @@ func _update_attention(delta: float) -> void:
 		return
 	var saved: Array = state.get("player",{}).get("position",[0.0,0.0,0.0])
 	var player := Vector3(float(saved[0]),float(saved[1]),float(saved[2]))
+	var parent := get_parent()
+	if parent != null and parent.has_method("get_player_position"):
+		player = parent.get_player_position()
 	for id: String in actors:
 		var actor: Node3D = actors[id]
-		if not actor.visible or actor.get_meta("companion_controlled", false):
+		if not actor.visible or actor.get_meta("companion_controlled",false):
+			_set_social_pose(actor,false)
 			continue
 		var intent := Behavior.view(state,id)
-		if intent.is_empty() or intent.activity not in ["greet","space","socialize","alert","assist"]:
+		if intent.is_empty():
+			_set_social_pose(actor,false)
 			continue
+		var activity: String = str(intent.activity)
+		var contact := _physical_social_contact(id,actor,intent,player)
+		_set_social_pose(actor,not contact.is_empty())
 		var target := player
-		if state.village.behavior.people.has(intent.partner):
-			var other: Array = state.village.behavior.people[intent.partner].position
-			target = Vector3(float(other[0]),float(other[1]),float(other[2]))
-		elif intent.activity in ["alert","assist"]:
+		if activity in ["greet","socialize"]:
+			# A social decision is not a conversation until the two *visible*
+			# real bodies meet. This also prevents a face turn through a house.
+			if contact.is_empty():
+				continue
+			target = contact.target
+		elif activity == "space":
+			if not _social_line_clear(actor.global_position,player):
+				continue
+		elif activity in ["alert","assist"]:
 			var distance := INF
 			for enemy: Dictionary in state.village.raid.enemies:
 				if int(enemy.health) <= 0:
 					continue
 				var at := Vector3(float(enemy.x),0,float(enemy.z))
-				if actor.position.distance_squared_to(at) < distance:
+				if actor.position.distance_squared_to(at) < distance and _social_line_clear(actor.global_position,at):
 					distance = actor.position.distance_squared_to(at)
 					target = at
+			if distance == INF:
+				continue
+		else:
+			continue
 		var offset := target-actor.global_position
 		if Vector2(offset.x,offset.z).length() > .1:
 			actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-offset.x,-offset.z),minf(delta,.1)*3.2)
+
+
+func _physical_social_contact(id: String, actor: Node3D, intent: Dictionary, player: Vector3) -> Dictionary:
+	# Presentation-only gate. Do not credit social memory, change decisions,
+	# modify animation rigs or rewrite the authoritative village state here.
+	if not active or not is_instance_valid(actor) or not actor.visible:
+		return {}
+	var partner_id := str(intent.get("partner",""))
+	var activity := str(intent.get("activity",""))
+	if activity not in ["greet","socialize"] or partner_id.is_empty():
+		return {}
+	var target: Vector3
+	var permitted_distance := 1.5
+	if partner_id == "player":
+		if activity != "greet":
+			return {}
+		target = Vector3(player.x,actor.global_position.y,player.z)
+		permitted_distance = 3.0
+	else:
+		if activity != "socialize":
+			return {}
+		var counterpart := _physical_partner(partner_id)
+		if not is_instance_valid(counterpart) or not counterpart.visible:
+			return {}
+		# Both residents must independently choose each other, not merely
+		# receive an unverified animation cue from one person's intention.
+		var other_intent := Behavior.view(state,partner_id)
+		if other_intent.is_empty() or other_intent.get("activity","") != "socialize" or str(other_intent.get("partner","")) != id:
+			return {}
+		target = counterpart.global_position
+	var origin := actor.global_position
+	var ground_distance := Vector2(origin.x,origin.z).distance_to(Vector2(target.x,target.z))
+	if ground_distance > permitted_distance or absf(origin.y-target.y) > 1.2:
+		return {}
+	if not _social_line_clear(origin,target):
+		return {}
+	return {"target":target}
+
+
+func _physical_partner(partner_id: String) -> Node3D:
+	if actors.has(partner_id):
+		return actors[partner_id] as Node3D
+	var parent := get_parent()
+	if parent != null:
+		var population: Variant = parent.get("population")
+		if population is Node:
+			var bodies: Variant = (population as Node).get("actors")
+			if bodies is Dictionary and bodies.has(partner_id):
+				return bodies[partner_id] as Node3D
+	return null
+
+
+func _social_line_clear(first: Vector3, second: Vector3) -> bool:
+	if not first.is_finite() or not second.is_finite() or not is_inside_tree():
+		return false
+	var parent := get_parent()
+	if parent != null and parent.has_method("npc_sight_clear"):
+		return bool(parent.call("npc_sight_clear",first,second))
+	# The isolated visual fixture uses the same two-height occlusion contract
+	# as GameWorld; never treat an unavailable geometry test as clear.
+	for height: float in [0.85,1.45]:
+		var offset := Vector3.UP*height
+		var query := PhysicsRayQueryParameters3D.create(first+offset,second+offset,1)
+		query.hit_from_inside = true
+		if not get_world_3d().direct_space_state.intersect_ray(query).is_empty():
+			return false
+	return true
+
+
+func _set_social_pose(actor: Node3D, allowed: bool) -> void:
+	if not is_instance_valid(actor):
+		return
+	var previously := bool(actor.get_meta("physical_social_pose",false))
+	if previously == allowed:
+		return
+	actor.set_meta("physical_social_pose",allowed)
+	var figure := actor.get_node_or_null("Figure")
+	if not is_instance_valid(figure):
+		return
+	if allowed:
+		figure.cue("talk")
+	else:
+		# Stop a social pose if the conversation partner moved, turned a
+		# corner, died or became hidden. Animation does not play through walls.
+		figure.reset_motion()
 
 
 func _update_nameplates() -> void:
@@ -311,9 +414,10 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 		if person.get("assignment", "idle") not in ["idle", "watchpost", "defense"] and activity == "work":
 			figure.keep_working()
 		elif actor.get_meta("intent","") != activity:
+			# The physical contact gate in _update_attention owns all speech
+			# animations. An intention alone may point through a solid building.
 			figure.reset_motion()
-			if activity in ["greet","socialize","space"]:
-				figure.cue("talk")
+			actor.set_meta("physical_social_pose",false)
 		actor.set_meta("intent",activity)
 		actor.set_meta("activity",activity)
 
@@ -416,6 +520,7 @@ func set_active(value: bool) -> void:
 	active = value
 	for actor: Node3D in actors.values():
 		if not active:
+			_set_social_pose(actor,false)
 			actor.get_node("Figure").drive(0.0)
 	if not active:
 		for actor: Node3D in raiders.values():

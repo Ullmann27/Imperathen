@@ -1,0 +1,2799 @@
+{
+  "status": "passed",
+  "reports": [
+    {
+      "schema_version": 1,
+      "category": "architecture",
+      "status": "passed",
+      "generated_at_utc": "2026-11-25T11:17:21+00:00",
+      "assets_checked": 12,
+      "errors": [],
+      "assets": [
+        {
+          "path": "prototype/assets/world_expansion/architecture/taberna_lod0.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 6430540,
+          "sha256": "a01d0b28e0a07272c2393302cbf6928f965be4e48eeeda77e3395f7e8e773fa6",
+          "triangles_unique_meshes": 35384,
+          "primitives": 8,
+          "meshes": 1,
+          "materials": 8,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Terracotta",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Terracotta_Light",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 2,
+              "name": "WX_Terracotta_Dark",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 3,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 4,
+              "name": "WX_Lime_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 5,
+              "name": "WX_Oak",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 6,
+              "name": "WX_Ochre_Painted_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 7,
+              "name": "WX_Linen",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 8,
+          "accessors": 40,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 324447,
+              "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+              "index": 0,
+              "name": "terracotta_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 139322,
+              "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+              "index": 1,
+              "name": "terracotta_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 144587,
+              "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+              "index": 2,
+              "name": "terracotta_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 3,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 4,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 5,
+              "name": "limestone_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 308124,
+              "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+              "index": 6,
+              "name": "plaster_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 161720,
+              "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+              "index": 7,
+              "name": "plaster_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 141555,
+              "sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+              "index": 8,
+              "name": "plaster_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 364306,
+              "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+              "index": 9,
+              "name": "oak_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 115206,
+              "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+              "index": 10,
+              "name": "oak_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 146455,
+              "sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+              "index": 11,
+              "name": "oak_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 330013,
+              "sha256": "d62f8e8870d0a15c6df4c96c2f513c205d28666f18ecff2769db9836ebd7d162",
+              "index": 12,
+              "name": "linen_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 172622,
+              "sha256": "7c2713a515d1fb427e4615a61259ba42728ce5289fd221d26b3ca0ef8d6192d9",
+              "index": 13,
+              "name": "linen_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 140915,
+              "sha256": "3b125719a8184838dbcfb0f33f41fc4a4e1e28fd8ed94f4dbda2b439afbd661a",
+              "index": 14,
+              "name": "linen_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 15,
+          "rgba8_top_level_texture_bytes_estimate": 15728640,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 35384,
+          "primitive_instances_before_renderer_batching": 8,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -3.8917319774627686,
+              0.0,
+              -4.118000030517578
+            ],
+            "max": [
+              3.8917319774627686,
+              5.045000076293945,
+              5.769999980926514
+            ]
+          },
+          "dimensions_m_xyz": [
+            7.783463954925537,
+            5.045000076293945,
+            9.888000011444092
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "taberna",
+          "lod": 0
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/taberna_lod1.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 3294140,
+          "sha256": "16c71e69e41cead3a13e49a27fa9a0dc647deb2431237f9f0b0a918a57e87e61",
+          "triangles_unique_meshes": 1968,
+          "primitives": 8,
+          "meshes": 1,
+          "materials": 8,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Lime_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 2,
+              "name": "WX_Oak",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 3,
+              "name": "WX_Ochre_Painted_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 4,
+              "name": "WX_Terracotta_Dark",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 5,
+              "name": "WX_Terracotta",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 6,
+              "name": "WX_Terracotta_Light",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 7,
+              "name": "WX_Linen",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 8,
+          "accessors": 40,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 0,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 1,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 2,
+              "name": "limestone_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 308124,
+              "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+              "index": 3,
+              "name": "plaster_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 161720,
+              "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+              "index": 4,
+              "name": "plaster_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 141555,
+              "sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+              "index": 5,
+              "name": "plaster_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 364306,
+              "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+              "index": 6,
+              "name": "oak_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 115206,
+              "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+              "index": 7,
+              "name": "oak_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 146455,
+              "sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+              "index": 8,
+              "name": "oak_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 324447,
+              "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+              "index": 9,
+              "name": "terracotta_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 139322,
+              "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+              "index": 10,
+              "name": "terracotta_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 144587,
+              "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+              "index": 11,
+              "name": "terracotta_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 330013,
+              "sha256": "d62f8e8870d0a15c6df4c96c2f513c205d28666f18ecff2769db9836ebd7d162",
+              "index": 12,
+              "name": "linen_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 172622,
+              "sha256": "7c2713a515d1fb427e4615a61259ba42728ce5289fd221d26b3ca0ef8d6192d9",
+              "index": 13,
+              "name": "linen_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 140915,
+              "sha256": "3b125719a8184838dbcfb0f33f41fc4a4e1e28fd8ed94f4dbda2b439afbd661a",
+              "index": 14,
+              "name": "linen_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 15,
+          "rgba8_top_level_texture_bytes_estimate": 15728640,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 1968,
+          "primitive_instances_before_renderer_batching": 8,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -3.8684654235839844,
+              0.0,
+              -4.082500457763672
+            ],
+            "max": [
+              3.8684654235839844,
+              4.989999771118164,
+              5.769999980926514
+            ]
+          },
+          "dimensions_m_xyz": [
+            7.736930847167969,
+            4.989999771118164,
+            9.852500438690186
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "taberna",
+          "lod": 1
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/taberna_lod2.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 2526532,
+          "sha256": "7b5bc4ce05727a3114ce06b8790cf58810dc08148f7ac308993cca5c697daed0",
+          "triangles_unique_meshes": 652,
+          "primitives": 4,
+          "meshes": 1,
+          "materials": 4,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Lime_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 2,
+              "name": "WX_Terracotta",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 3,
+              "name": "WX_Linen",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 4,
+          "accessors": 20,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 0,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 1,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 2,
+              "name": "limestone_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 308124,
+              "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+              "index": 3,
+              "name": "plaster_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 161720,
+              "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+              "index": 4,
+              "name": "plaster_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 141555,
+              "sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+              "index": 5,
+              "name": "plaster_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 324447,
+              "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+              "index": 6,
+              "name": "terracotta_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 139322,
+              "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+              "index": 7,
+              "name": "terracotta_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 144587,
+              "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+              "index": 8,
+              "name": "terracotta_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 330013,
+              "sha256": "d62f8e8870d0a15c6df4c96c2f513c205d28666f18ecff2769db9836ebd7d162",
+              "index": 9,
+              "name": "linen_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 172622,
+              "sha256": "7c2713a515d1fb427e4615a61259ba42728ce5289fd221d26b3ca0ef8d6192d9",
+              "index": 10,
+              "name": "linen_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 140915,
+              "sha256": "3b125719a8184838dbcfb0f33f41fc4a4e1e28fd8ed94f4dbda2b439afbd661a",
+              "index": 11,
+              "name": "linen_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 12,
+          "rgba8_top_level_texture_bytes_estimate": 12582912,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 652,
+          "primitive_instances_before_renderer_batching": 4,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -3.8684654235839844,
+              0.0,
+              -4.050000190734863
+            ],
+            "max": [
+              3.8684654235839844,
+              4.960000038146973,
+              5.767647743225098
+            ]
+          },
+          "dimensions_m_xyz": [
+            7.736930847167969,
+            4.960000038146973,
+            9.817647933959961
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "taberna",
+          "lod": 2
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/insula_lod0.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 8103972,
+          "sha256": "e42a4fc7574422bf4635db435d7d82d5b64daa68017d3369194fa91d6aa634c0",
+          "triangles_unique_meshes": 56664,
+          "primitives": 7,
+          "meshes": 1,
+          "materials": 7,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Terracotta",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Terracotta_Light",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 2,
+              "name": "WX_Terracotta_Dark",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 3,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 4,
+              "name": "WX_Lime_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 5,
+              "name": "WX_Oak",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 6,
+              "name": "WX_Ochre_Painted_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 7,
+          "accessors": 35,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 324447,
+              "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+              "index": 0,
+              "name": "terracotta_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 139322,
+              "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+              "index": 1,
+              "name": "terracotta_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 144587,
+              "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+              "index": 2,
+              "name": "terracotta_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 3,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 4,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 5,
+              "name": "limestone_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 308124,
+              "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+              "index": 6,
+              "name": "plaster_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 161720,
+              "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+              "index": 7,
+              "name": "plaster_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 141555,
+              "sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+              "index": 8,
+              "name": "plaster_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 364306,
+              "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+              "index": 9,
+              "name": "oak_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 115206,
+              "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+              "index": 10,
+              "name": "oak_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 146455,
+              "sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+              "index": 11,
+              "name": "oak_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 12,
+          "rgba8_top_level_texture_bytes_estimate": 12582912,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 56664,
+          "primitive_instances_before_renderer_batching": 7,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -5.434294700622559,
+              0.0,
+              -4.9679999351501465
+            ],
+            "max": [
+              5.434294700622559,
+              10.625,
+              5.744999885559082
+            ]
+          },
+          "dimensions_m_xyz": [
+            10.868589401245117,
+            10.625,
+            10.712999820709229
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "insula",
+          "lod": 0
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/insula_lod1.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 2983824,
+          "sha256": "b5137ab09b0e9ffdabdfd7d1ab90bdb73d2223b412d7891fe45fce79cce226ea",
+          "triangles_unique_meshes": 5284,
+          "primitives": 6,
+          "meshes": 1,
+          "materials": 6,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Lime_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 2,
+              "name": "WX_Ochre_Painted_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 3,
+              "name": "WX_Oak",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 4,
+              "name": "WX_Terracotta_Dark",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 5,
+              "name": "WX_Terracotta",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 6,
+          "accessors": 30,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 0,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 1,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 2,
+              "name": "limestone_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 308124,
+              "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+              "index": 3,
+              "name": "plaster_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 161720,
+              "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+              "index": 4,
+              "name": "plaster_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 141555,
+              "sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+              "index": 5,
+              "name": "plaster_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 364306,
+              "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+              "index": 6,
+              "name": "oak_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 115206,
+              "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+              "index": 7,
+              "name": "oak_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 146455,
+              "sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+              "index": 8,
+              "name": "oak_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 324447,
+              "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+              "index": 9,
+              "name": "terracotta_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 139322,
+              "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+              "index": 10,
+              "name": "terracotta_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 144587,
+              "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+              "index": 11,
+              "name": "terracotta_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 12,
+          "rgba8_top_level_texture_bytes_estimate": 12582912,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 5284,
+          "primitive_instances_before_renderer_batching": 6,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -5.415174961090088,
+              0.0,
+              -4.93250036239624
+            ],
+            "max": [
+              5.415174961090088,
+              10.569999694824219,
+              5.744999885559082
+            ]
+          },
+          "dimensions_m_xyz": [
+            10.830349922180176,
+            10.569999694824219,
+            10.677500247955322
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "insula",
+          "lod": 1
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/insula_lod2.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 2910336,
+          "sha256": "f89e979ce325bd5477224a34941047fe4d30514cb28ab421b54ee13d25e211f0",
+          "triangles_unique_meshes": 4588,
+          "primitives": 4,
+          "meshes": 1,
+          "materials": 4,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Lime_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 2,
+              "name": "WX_Oak",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 3,
+              "name": "WX_Terracotta",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 4,
+          "accessors": 20,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 0,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 1,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 2,
+              "name": "limestone_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 308124,
+              "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+              "index": 3,
+              "name": "plaster_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 161720,
+              "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+              "index": 4,
+              "name": "plaster_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 141555,
+              "sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+              "index": 5,
+              "name": "plaster_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 364306,
+              "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+              "index": 6,
+              "name": "oak_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 115206,
+              "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+              "index": 7,
+              "name": "oak_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 146455,
+              "sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+              "index": 8,
+              "name": "oak_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 324447,
+              "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+              "index": 9,
+              "name": "terracotta_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 139322,
+              "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+              "index": 10,
+              "name": "terracotta_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 144587,
+              "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+              "index": 11,
+              "name": "terracotta_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 12,
+          "rgba8_top_level_texture_bytes_estimate": 12582912,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 4588,
+          "primitive_instances_before_renderer_batching": 4,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -5.415174961090088,
+              0.0,
+              -4.900000095367432
+            ],
+            "max": [
+              5.415174961090088,
+              10.539999961853027,
+              5.744999885559082
+            ]
+          },
+          "dimensions_m_xyz": [
+            10.830349922180176,
+            10.539999961853027,
+            10.644999980926514
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "insula",
+          "lod": 2
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/basilica_lod0.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 10565572,
+          "sha256": "49a0c2e8afa5b50f4713cff57500b1bdf85539406dbc8d7eda11a395a1dee56e",
+          "triangles_unique_meshes": 115644,
+          "primitives": 7,
+          "meshes": 1,
+          "materials": 7,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Terracotta",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 2,
+              "name": "WX_Terracotta_Light",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 3,
+              "name": "WX_Terracotta_Dark",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 4,
+              "name": "WX_Lime_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 5,
+              "name": "WX_Ochre_Painted_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 6,
+              "name": "WX_Oak",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 7,
+          "accessors": 28,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 0,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 1,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 2,
+              "name": "limestone_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 324447,
+              "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+              "index": 3,
+              "name": "terracotta_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 139322,
+              "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+              "index": 4,
+              "name": "terracotta_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 144587,
+              "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+              "index": 5,
+              "name": "terracotta_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 308124,
+              "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+              "index": 6,
+              "name": "plaster_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 161720,
+              "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+              "index": 7,
+              "name": "plaster_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 141555,
+              "sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+              "index": 8,
+              "name": "plaster_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 364306,
+              "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+              "index": 9,
+              "name": "oak_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 115206,
+              "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+              "index": 10,
+              "name": "oak_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 146455,
+              "sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+              "index": 11,
+              "name": "oak_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 12,
+          "rgba8_top_level_texture_bytes_estimate": 12582912,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 115644,
+          "primitive_instances_before_renderer_batching": 7,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -6.541967391967773,
+              0.0,
+              -8.567999839782715
+            ],
+            "max": [
+              6.541967391967773,
+              10.324999809265137,
+              11.230000495910645
+            ]
+          },
+          "dimensions_m_xyz": [
+            13.083934783935547,
+            10.324999809265137,
+            19.79800033569336
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "basilica",
+          "lod": 0
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/basilica_lod1.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 2780628,
+          "sha256": "8078b5996a0628f295998761151514a023a15864e5ddddf60a66b65923b8a8e1",
+          "triangles_unique_meshes": 3308,
+          "primitives": 6,
+          "meshes": 1,
+          "materials": 6,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Terracotta_Dark",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Terracotta",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 2,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 3,
+              "name": "WX_Lime_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 4,
+              "name": "WX_Ochre_Painted_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 5,
+              "name": "WX_Oak",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 6,
+          "accessors": 30,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 324447,
+              "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+              "index": 0,
+              "name": "terracotta_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 139322,
+              "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+              "index": 1,
+              "name": "terracotta_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 144587,
+              "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+              "index": 2,
+              "name": "terracotta_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 3,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 4,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 5,
+              "name": "limestone_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 308124,
+              "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+              "index": 6,
+              "name": "plaster_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 161720,
+              "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+              "index": 7,
+              "name": "plaster_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 141555,
+              "sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+              "index": 8,
+              "name": "plaster_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 364306,
+              "sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+              "index": 9,
+              "name": "oak_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 115206,
+              "sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+              "index": 10,
+              "name": "oak_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 146455,
+              "sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+              "index": 11,
+              "name": "oak_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 12,
+          "rgba8_top_level_texture_bytes_estimate": 12582912,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 3308,
+          "primitive_instances_before_renderer_batching": 6,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -6.518569469451904,
+              0.0,
+              -8.532500267028809
+            ],
+            "max": [
+              6.518569469451904,
+              10.269999504089355,
+              11.230000495910645
+            ]
+          },
+          "dimensions_m_xyz": [
+            13.037138938903809,
+            10.269999504089355,
+            19.762500762939453
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "basilica",
+          "lod": 1
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/basilica_lod2.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 2047092,
+          "sha256": "4f5dbba34f09608473e588ba2d3253462a04e23f392857cf9f50526c8bd1a1e7",
+          "triangles_unique_meshes": 2252,
+          "primitives": 3,
+          "meshes": 1,
+          "materials": 3,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Terracotta",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 2,
+              "name": "WX_Lime_Plaster",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 3,
+          "accessors": 15,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 324447,
+              "sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+              "index": 0,
+              "name": "terracotta_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 139322,
+              "sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+              "index": 1,
+              "name": "terracotta_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 144587,
+              "sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+              "index": 2,
+              "name": "terracotta_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 3,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 4,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 5,
+              "name": "limestone_roughness",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 308124,
+              "sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+              "index": 6,
+              "name": "plaster_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 161720,
+              "sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+              "index": 7,
+              "name": "plaster_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 141555,
+              "sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+              "index": 8,
+              "name": "plaster_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 9,
+          "rgba8_top_level_texture_bytes_estimate": 9437184,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 2252,
+          "primitive_instances_before_renderer_batching": 3,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -6.518569469451904,
+              0.0,
+              -8.500000953674316
+            ],
+            "max": [
+              6.518569469451904,
+              10.239999771118164,
+              11.230000495910645
+            ]
+          },
+          "dimensions_m_xyz": [
+            13.037138938903809,
+            10.239999771118164,
+            19.73000144958496
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "basilica",
+          "lod": 2
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/basalt_road_lod0.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 1703736,
+          "sha256": "bb430b7e1926681f0129baa469aadeec34db93872865719888a3fcf338ef1e0c",
+          "triangles_unique_meshes": 9856,
+          "primitives": 2,
+          "meshes": 1,
+          "materials": 2,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Basalt",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 2,
+          "accessors": 10,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 0,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 1,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 2,
+              "name": "limestone_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 3,
+          "rgba8_top_level_texture_bytes_estimate": 3145728,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 9856,
+          "primitive_instances_before_renderer_batching": 2,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -4.0,
+              0.0,
+              -4.0
+            ],
+            "max": [
+              4.0,
+              0.1599999964237213,
+              4.0
+            ]
+          },
+          "dimensions_m_xyz": [
+            8.0,
+            0.1599999964237213,
+            8.0
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "basalt_road",
+          "lod": 0
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/basalt_road_lod1.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 679664,
+          "sha256": "ac14dd2ce8ce3601d3cd751753d5eafbe034c33937d69b3e87008f1d217cb7ee",
+          "triangles_unique_meshes": 852,
+          "primitives": 2,
+          "meshes": 1,
+          "materials": 2,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Basalt",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 2,
+          "accessors": 10,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 0,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 1,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 2,
+              "name": "limestone_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 3,
+          "rgba8_top_level_texture_bytes_estimate": 3145728,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 852,
+          "primitive_instances_before_renderer_batching": 2,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -4.0,
+              0.0,
+              -4.0
+            ],
+            "max": [
+              4.0,
+              0.1599999964237213,
+              4.0
+            ]
+          },
+          "dimensions_m_xyz": [
+            8.0,
+            0.1599999964237213,
+            8.0
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "basalt_road",
+          "lod": 1
+        },
+        {
+          "path": "prototype/assets/world_expansion/architecture/basalt_road_lod2.glb",
+          "status": "passed",
+          "errors": [],
+          "warnings": [],
+          "bytes": 620900,
+          "sha256": "da757975518c40bca9caf37b7bd11355535c694c9adcc2eb57a6ae9b99a10d01",
+          "triangles_unique_meshes": 276,
+          "primitives": 2,
+          "meshes": 1,
+          "materials": 2,
+          "material_details": [
+            {
+              "index": 0,
+              "name": "WX_Basalt",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            },
+            {
+              "index": 1,
+              "name": "WX_Limestone",
+              "texture_slots": [
+                "baseColorTexture",
+                "metallicRoughnessTexture",
+                "normalTexture"
+              ],
+              "required_uv_channels": [
+                0
+              ],
+              "has_basecolor_texture": true,
+              "has_normal_texture": true,
+              "has_metallic_roughness_texture": true,
+              "metallic_factor": 0,
+              "roughness_factor": 1
+            }
+          ],
+          "textured_materials": 2,
+          "accessors": 10,
+          "images": [
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 309224,
+              "sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+              "index": 0,
+              "name": "limestone_normal",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 137714,
+              "sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+              "index": 1,
+              "name": "limestone_basecolor",
+              "embedded": true
+            },
+            {
+              "mime_type": "image/png",
+              "width": 512,
+              "height": 512,
+              "bytes": 142722,
+              "sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+              "index": 2,
+              "name": "limestone_roughness",
+              "embedded": true
+            }
+          ],
+          "unique_embedded_image_count": 3,
+          "rgba8_top_level_texture_bytes_estimate": 3145728,
+          "texture_memory_note": "Unique source images at 4 bytes/pixel, without mipmaps; not measured Android VRAM or compressed GPU allocation",
+          "skins": 0,
+          "animations": 0,
+          "default_scene": 0,
+          "mesh_instances": 1,
+          "triangles_with_scene_instances": 276,
+          "primitive_instances_before_renderer_batching": 2,
+          "submission_note": "Primitive instances are a planning count, not measured draw calls; batching and render passes change submissions",
+          "bounds_m": {
+            "min": [
+              -4.0,
+              0.0,
+              -4.0
+            ],
+            "max": [
+              4.0,
+              0.1599999964237213,
+              4.0
+            ]
+          },
+          "dimensions_m_xyz": [
+            8.0,
+            0.1599999964237213,
+            8.0
+          ],
+          "coordinate_system": "glTF right-handed, Y up; project front +Z",
+          "id": "basalt_road",
+          "lod": 2
+        }
+      ],
+      "not_verified": [
+        "visual acceptance",
+        "collisions",
+        "Android FPS / thermal behaviour"
+      ]
+    }
+  ]
+}

@@ -244,6 +244,10 @@ static func _people(ui, column: VBoxContainer, data: Dictionary, life: Dictionar
 					_text(ui, column, "Interesse: " + interest, 14, true)
 				if not reason.is_empty():
 					_text(ui, column, reason, 14, true)
+				var neighbors: Array = NpcBehavior.social_neighbors(data, str(npc.id))
+				for index in mini(3, neighbors.size()):
+					var neighbor: Dictionary = neighbors[index]
+					_text(ui, column, "%s · %s" % [neighbor.name, neighbor.label], 14, true)
 		var position: Vector2 = Life.actor_position(data, npc.id)
 		_text(ui, column, "Ort im Dorf: %.0f / %.0f" % [position.x, position.y], 12, true)
 	_text(ui, column, "Dein Beruf: " + str(life.get("profession", "Noch keine Lehre")), 18)

@@ -15,6 +15,7 @@ const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
+const CityTrade = preload("res://scripts/city_trade.gd")
 const SCHEMA_VERSION := 5
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
@@ -44,6 +45,9 @@ var combat_sight_check: Callable
 var combat_motion_check: Callable
 var npc_observations: Callable
 var raid_observations: Callable
+var npc_sight_check: Callable
+# A city session owns this verified runtime map; ordinary campaign/test worlds keep it empty.
+var city_trade_sites: Dictionary = {}
 
 
 func _init() -> void:
@@ -87,7 +91,9 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 		for person: Dictionary in data.village.economy.people:
 			if person.id in ["fabius","drusa"]:
 				person.assignment="woodcamp"
-			elif person.id == "cassia":
+			elif person.id in ["cassia", "antonia"]:
+				# The existing potter helps Cassia at the market in new childhood
+				# games. Two actual residents meet the unchanged staffing contract.
 				person.assignment="trade"
 		data.village.economy.last_report = "Markt, Felder und Werkstätten arbeiten bereits. Decimus verwaltet das Dorf; du beginnst als Kind deiner Familie."
 		data.player.position = [-12.0, 1.35, 11.7]
@@ -108,6 +114,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	command_fields.merge(VillageEconomy.COMMAND_FIELDS)
 	command_fields.merge(VillageLife.COMMAND_FIELDS)
 	command_fields.merge(CombatActions.COMMAND_FIELDS)
+	command_fields.merge(CityTrade.COMMAND_FIELDS)
 	if not command_fields.has(command):
 		return _fail("Unbekannter Spielbefehl: %s" % command)
 	if not _exact_keys(args, command_fields[command]):
@@ -225,7 +232,7 @@ func advance(delta: float) -> void:
 			if not VillageEconomy.advance(candidate, step):
 				return
 			VillageLife.advance(candidate, step, combat_sight_check, combat_motion_check, observed_raiders)
-			NpcBehavior.advance(candidate, step)
+			NpcBehavior.advance(candidate, step, npc_sight_check)
 			if int(candidate.player.health) < previous_health:
 				CombatActions.interrupt(candidate)
 			var contact := CombatActions.advance(candidate, step, combat_sight_check, _apply_combat_hit)
@@ -430,6 +437,12 @@ func _apply_training_contact(state: Dictionary) -> Dictionary:
 
 
 func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dictionary:
+	if CityTrade.COMMAND_FIELDS.has(command):
+		var trade_result := CityTrade.apply(state, command, args, city_trade_sites)
+		if trade_result.ok:
+			_update_morale(state)
+			_record(state, str(trade_result.message))
+		return trade_result
 	if CombatActions.COMMAND_FIELDS.has(command):
 		if not state.village.enabled:
 			return _fail("Diese Partie verwendet den bisherigen regionalen Dorfabschnitt.")
@@ -686,6 +699,8 @@ func _resolve_skirmish(state: Dictionary) -> Dictionary:
 
 
 func _validate_arguments(command: String, args: Dictionary) -> String:
+	if CityTrade.COMMAND_FIELDS.has(command):
+		return CityTrade.validate_arguments(command, args)
 	if CombatActions.COMMAND_FIELDS.has(command):
 		return CombatActions.validate_arguments(command, args)
 	if command.begins_with("village_"):
@@ -753,6 +768,9 @@ func _validate_state(state: Variant) -> String:
 	var behavior_error := NpcBehavior.validate(state)
 	if not behavior_error.is_empty():
 		return behavior_error
+	var trade_error := CityTrade.validate(state)
+	if not trade_error.is_empty():
+		return trade_error
 	if float(state.village.social.accumulator) >= VillageLife.STEP + 0.00000001:
 		return "Die Dorfzeit enthält einen nicht abgearbeiteten Zeitsprung."
 	var economic_seconds := int(state.village.economy.day) * VillageEconomy.day_length(state) + float(state.village.economy.day_seconds)
@@ -886,7 +904,7 @@ func _validate_state(state: Variant) -> String:
 		return "Der Sieg ist nicht durch tatsächliche Gegnerzustände belegt."
 	if int(encounter.damage_taken) != 100 + int(state.village.health_delta) - int(state.player.health) or dead != mini(int(state.squad.recruits), int(encounter.damage_taken) / 32):
 		return "Schaden, Gesundheit und Verluste widersprechen sich."
-	var expected_morale := mini(100, 60 + 5 * int(state.squad.recruits) - 15 * dead + (10 if progress.skirmish_won else 0))
+	var expected_morale := mini(100, 60 + 5 * int(state.squad.recruits) - 15 * dead + (10 if progress.skirmish_won else 0) + CityTrade.command_bonus(state))
 	if int(state.squad.morale) != expected_morale:
 		return "Die Moral passt nicht zu den bestätigten Ereignissen."
 	if not _exact_keys(state.timers, ["training", "strike", "damage"]) or not _number(state.timers.training, 0.0, ATTACK_COOLDOWN) or not _number(state.timers.strike, 0.0, ATTACK_COOLDOWN) or not _number(state.timers.damage, 0.0, DAMAGE_COOLDOWN):
@@ -920,6 +938,7 @@ func _validate_state(state: Variant) -> String:
 	expected_money += int(frontier_effects.denarii)
 	expected_grain += int(village_ledger.grain)
 	expected_money += int(village_ledger.denarii)
+	expected_money += CityTrade.money_effect(state)
 	if state.resources.grain != expected_grain or state.resources.denarii != expected_money:
 		return "Die Versorgungs- oder Geldbilanz wurde verletzt."
 	var expected_trust := (20 if companion.choice == "help" else (-5 if companion.choice == "decline" else 0)) + (5 if state.story.choice == "protect" else (-5 if state.story.choice == "pursue" else 0))
@@ -1007,6 +1026,11 @@ func _read_save(path: String) -> Dictionary:
 	if error.is_empty() and Childhood.enabled(state) and not state.village.has("behavior"):
 		NpcBehavior.start(state)
 		error = _validate_state(state)
+	if error.is_empty() and NpcBehavior.enabled(state):
+		# Old valid saves gain an empty social history. Existing malformed
+		# relationships must fail validation before any migration is attempted.
+		NpcBehavior.ensure_social(state)
+		error = _validate_state(state)
 	if error.is_empty() and not _valid_valley(state):
 		error = "Das gespeicherte Talgefecht enthält widersprüchliche Daten."
 	if not error.is_empty():
@@ -1018,6 +1042,7 @@ func _read_save(path: String) -> Dictionary:
 
 
 func _restore_integer_fields(state: Dictionary) -> void:
+	CityTrade.restore_integer_fields(state)
 	for key in ["schema_version", "revision"]:
 		state[key] = int(state[key])
 	state.frontier.schema = int(state.frontier.schema)
@@ -1047,6 +1072,10 @@ func _restore_integer_fields(state: Dictionary) -> void:
 		for behavior: Dictionary in state.village.behavior.people.values():
 			behavior.last_trust = int(behavior.last_trust)
 			behavior.route_direction = int(behavior.route_direction)
+		if state.village.behavior.has("social"):
+			state.village.behavior.social.version = int(state.village.behavior.social.version)
+			for relation: Dictionary in state.village.behavior.social.pairs.values():
+				relation.encounters = int(relation.encounters)
 	if CombatActions.enabled(state):
 		for key in ["version", "practice_hits", "resolved_hits"]:
 			state.village.unarmed[key] = int(state.village.unarmed[key])
@@ -1212,7 +1241,7 @@ func _all_enemies_defeated(state: Dictionary) -> bool:
 
 
 func _update_morale(state: Dictionary) -> void:
-	state.squad.morale = mini(100, 60 + 5 * int(state.squad.recruits) - 15 * int(state.population.dead) + (10 if state.progress.skirmish_won else 0))
+	state.squad.morale = mini(100, 60 + 5 * int(state.squad.recruits) - 15 * int(state.population.dead) + (10 if state.progress.skirmish_won else 0) + CityTrade.command_bonus(state))
 
 
 func _regional_text(state: Dictionary, text: String) -> String:

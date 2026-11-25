@@ -1,0 +1,35 @@
+{
+  "scope": "Same final navigation, before/after VillagePerson snapshot restore; selected actual route event.",
+  "before": {
+    "actor": "Resident_silvanus",
+    "frame": 482,
+    "previous_model": "res://assets/characters/frontier_civilian_man_1.glb",
+    "model": "res://assets/characters/frontier_civilian_man_0.glb",
+    "clip": "run",
+    "previous_phase": 0.292357794142629,
+    "phase": 0.32395116782088,
+    "previous_transition_remaining": 0.0,
+    "transition_remaining": 0.0,
+    "old_right_offset": "(-0.000003, -0.0, -0.000001)",
+    "new_right_swing_offset": "(-0.048321, -0.0, 0.048319)",
+    "offset_change_m": 0.0683330222964287,
+    "root_step_m": 0.0683325156569481
+  },
+  "after": {
+    "actor": "Resident_silvanus",
+    "clip": "run",
+    "frame": 482,
+    "model": "res://assets/characters/frontier_civilian_man_0.glb",
+    "new_right_swing_offset": "(-0.000003, -0.0, -0.000001)",
+    "offset_change_m": 0.0,
+    "old_right_offset": "(-0.000003, -0.0, -0.000001)",
+    "phase": 0.32395116782088,
+    "previous_clip": "run",
+    "previous_model": "res://assets/characters/frontier_civilian_man_1.glb",
+    "previous_phase": 0.292357794142629,
+    "previous_transition_remaining": 0.0,
+    "root_step_m": 0.0683325156569481,
+    "speed": 4.09995093941689,
+    "transition_remaining": 0.0
+  }
+}

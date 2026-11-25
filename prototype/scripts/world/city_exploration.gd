@@ -5,20 +5,32 @@ const Person := preload("res://scripts/visuals/village_person.gd")
 const State := preload("res://scripts/world/city_exploration_state.gd")
 const CameraObstruction := preload("res://scripts/world/camera_obstruction.gd")
 const CityDetailAdapter := preload("res://scripts/rendering/city_exploration_detail_adapter.gd")
+const CityCharacterFinish := preload("res://scripts/rendering/city_character_detail.gd")
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
+const CityMarketBridge := preload("res://scripts/world/city_market_bridge.gd")
+const CitySurfaceMicrodetail := preload("res://scripts/rendering/city_surface_microdetail.gd")
+const CityAmbientPeople := preload("res://scripts/world/city_ambient_people.gd")
+const Crowd := preload("res://scripts/world/city_exploration_crowd.gd")
+const VivaAtmosphere := preload("res://scripts/rendering/viva_roma_atmosphere.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
 const TouchAction := preload("res://scripts/ui/touch_action.gd")
 const SafeArea := preload("res://scripts/ui/safe_area.gd")
 const CITY_PATH := "res://assets/world/roman_city_test.glb"
 const CITY_COLLISION := "res://assets/world/roman_city_collision.glb"
-const TEMPLE_PATH := "res://assets/world/meshy_roman_temple.glb"
+const TEMPLE_PATH := "res://assets/world/roman_meshy_temple_%d.glb"
+const FORUM_DETAIL := "res://assets/world/roman_forum_paving_detail.glb"
+const FORUM_COLLISION := "res://assets/world/roman_forum_paving_collision.glb"
+const MAX_STEP := 0.25
+const SOLE_OFFSET := 0.9
 const CATALOG_PATH := "res://assets/world/city_catalog.json"
 const CATALOG_ORIGIN := Vector3(475,0,90)
 const WALK_SPEED := 1.45
 const RUN_SPEED := 3.8
 var profile := "balanced"
 var persist := true
+# Review toggle: keep an exact legacy light/ground path for comparison.
+var viva_visuals := true
 var save_path := State.PATH
 var paused := false
 var player := CharacterBody3D.new()
@@ -26,6 +38,9 @@ var figure := Person.new()
 var camera := Camera3D.new()
 var city_available := false
 var youth_available := false
+var ambient_people: CityAmbientPeople
+var crowd := Crowd.new()
+var _crowd_elapsed := 0.0
 var catalog: Array[Dictionary] = []
 var _catalog_nodes: Dictionary = {}
 var _catalog_pending := ""
@@ -49,6 +64,10 @@ var _pause_panel := PanelContainer.new()
 var _pad: Control
 var _look: Control
 var _toolbar: HBoxContainer
+var _trade_bar: HBoxContainer
+var _trade_button: Button
+var _bag_button: Button
+var market := CityMarketBridge.new()
 var _actions: HBoxContainer
 
 func _ready() -> void:
@@ -57,9 +76,21 @@ func _ready() -> void:
 	_load_city()
 	_build_player()
 	_build_camera()
+	_build_ambient_people()
+	crowd.profile = profile
+	if is_instance_valid(ambient_people):
+		for record: Dictionary in ambient_people.citizens:
+			crowd.exclude_market_shop(str(record.get("shop", "")))
+	add_child(crowd)
 	_read_catalog()
 	_build_ui()
 	_restore(State.read(save_path) if persist else State.defaults())
+	add_child(market)
+	market.message.connect(_market_message)
+	market.closed.connect(_close_market)
+	market.setup(get_node_or_null("RomanCity") as Node3D, player, persist)
+	_bag_button.disabled = not market.available
+	_refresh_market_buttons()
 	get_viewport().size_changed.connect(_layout_ui)
 	_layout_ui()
 	_update_status()
@@ -74,7 +105,7 @@ func _build_ground() -> void:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = Color("777d55")
 	material.roughness = 0.96
-	ground.material_override = material
+	ground.material_override = VivaAtmosphere.ground_material(profile) if viva_visuals else material
 	ground.position.y = -0.025
 	add_child(ground)
 	_box_collision(self,Vector3(1400,0.2,1400),Vector3(0,-0.125,0))
@@ -84,6 +115,8 @@ func _build_ground() -> void:
 	sun.light_energy = 1.05
 	sun.shadow_enabled = profile!="low"
 	sun.directional_shadow_max_distance = 90.0
+	if viva_visuals:
+		VivaAtmosphere.configure_sun(sun, profile)
 	add_child(sun)
 
 func _scene(path: String) -> Node3D:
@@ -104,28 +137,77 @@ func _load_city() -> void:
 	var collision := _scene(CITY_COLLISION)
 	if collision!=null:
 		add_child(collision)
-		for mesh: MeshInstance3D in collision.find_children("*","MeshInstance3D",true,false):
-			if mesh.mesh==null:
-				continue
-			var body := StaticBody3D.new()
-			body.name = "CityCollision_"+str(mesh.name)
-			body.collision_layer = 1
-			body.collision_mask = 0
-			var shape := CollisionShape3D.new()
-			shape.shape = mesh.mesh.create_trimesh_shape()
-			body.add_child(shape)
-			add_child(body)
-			body.global_transform = mesh.global_transform
+		_add_static_colliders(collision,"CityCollision_")
 		collision.queue_free()
-	var temple := _scene(TEMPLE_PATH)
+	var temple_level := 2 if profile=="low" else (1 if profile=="balanced" else 0)
+	var temple := _scene(TEMPLE_PATH % temple_level)
 	if temple!=null:
 		temple.name = "MeshyTemple"
-		temple.position = Vector3(0,0,-55)
+		temple.position = Vector3(0,0.09,-55)
 		add_child(temple)
+		var temple_collision := _scene(TEMPLE_PATH % 2)
+		if temple_collision!=null:
+			temple_collision.position = temple.position
+			add_child(temple_collision)
+			_add_static_colliders(temple_collision,"TempleCollision_")
+			temple_collision.queue_free()
+	var forum_detail := _scene(FORUM_DETAIL)
+	if forum_detail!=null:
+		forum_detail.name = "ForumPavingDetail"
+		add_child(forum_detail)
+	var forum_collision := _scene(FORUM_COLLISION)
+	if forum_collision!=null:
+		add_child(forum_collision)
+		_add_static_colliders(forum_collision,"ForumPavingCollision_")
+		forum_collision.queue_free()
 	print("IMPERATHEN_CITY_DETAIL " + JSON.stringify(CityDetailAdapter.install(city, profile)))
 	# Read-only signboards are attached only to the six matching existing stalls.
-	# Transactions require a separate future WorldModel integration.
+	# The market bridge independently verifies the same authored stands before enabling transactions.
 	print("IMPERATHEN_CITY_MARKET " + JSON.stringify(CityMarketSignage.install(city, profile)))
+	# Optional GPU-instanced masonry and worn street microgeometry. This never
+	# replaces the authored RomanCity walls, collision, NPCs, camera or save.
+	print("IMPERATHEN_FACADE_DETAIL " + JSON.stringify(CitySurfaceMicrodetail.install(city, profile)))
+
+func _add_static_colliders(source: Node3D,prefix: String) -> void:
+	# Godot's -colonly importer may already have generated the physics body.
+	var imported_bodies: Array[Node] = source.find_children("*","StaticBody3D",true,false)
+	if source is StaticBody3D:
+		imported_bodies.push_front(source)
+	if not imported_bodies.is_empty():
+		for original: StaticBody3D in imported_bodies:
+			var copy := original.duplicate() as StaticBody3D
+			copy.name = prefix+str(original.name)
+			copy.collision_layer = 1
+			copy.collision_mask = 0
+			add_child(copy)
+			copy.global_transform = original.global_transform
+		return
+	for mesh: MeshInstance3D in source.find_children("*","MeshInstance3D",true,false):
+		if mesh.mesh==null:
+			continue
+		var body := StaticBody3D.new()
+		body.name = prefix+str(mesh.name)
+		body.collision_layer = 1
+		body.collision_mask = 0
+		var shape := CollisionShape3D.new()
+		shape.shape = mesh.mesh.create_trimesh_shape()
+		body.add_child(shape)
+		add_child(body)
+		body.global_transform = mesh.global_transform
+
+func _build_ambient_people() -> void:
+	# Uses the existing city meshes, actual camera and the existing
+	# village_person.gd appearance and animation library. Never duplicates
+	# the independent player's save state, campaign or trade authority.
+	var city := get_node_or_null("RomanCity") as Node3D
+	if not is_instance_valid(city):
+		return
+	ambient_people = CityAmbientPeople.new()
+	ambient_people.name = "CityAmbientLife"
+	add_child(ambient_people)
+	var status: Dictionary = ambient_people.setup(city,camera,profile)
+	print("IMPERATHEN_CITY_PEOPLE " + JSON.stringify(status))
+
 
 func _build_player() -> void:
 	player.name = "ExplorationPlayer"
@@ -144,11 +226,13 @@ func _build_player() -> void:
 	add_child(player)
 	figure.name = "Youth"
 	figure.profile = profile
+	figure.detail = 2 if profile=="low" else (1 if profile=="balanced" else 0)
 	player.add_child(figure)
-	figure.configure("player","italia",12)
 	youth_available = figure.configure_meshy_youth()
-	figure._reload(2 if profile=="low" else (1 if profile=="balanced" else 0))
+	figure.configure("player","italia",12)
 	figure._check_lod = 10000.0
+	if is_instance_valid(figure.body):
+		CityCharacterFinish.apply_to(figure.body, profile, figure.detail)
 
 func _build_camera() -> void:
 	add_child(camera)
@@ -175,7 +259,7 @@ func _build_camera() -> void:
 	environment.fog_enabled = true
 	environment.fog_density = 0.0013
 	environment.fog_light_color = Color("c3c9bf")
-	camera.environment = environment
+	camera.environment = VivaAtmosphere.environment(profile) if viva_visuals else environment
 
 func _read_catalog() -> void:
 	if not FileAccess.file_exists(CATALOG_PATH):
@@ -218,6 +302,7 @@ func _stream_catalog() -> void:
 				_add_catalog_model(_catalog_pending_index,packed)
 			_catalog_pending = ""
 		elif status in [ResourceLoader.THREAD_LOAD_FAILED,ResourceLoader.THREAD_LOAD_INVALID_RESOURCE]:
+			ResourceLoader.load_threaded_get(_catalog_pending)
 			_catalog_status = "Ein Sammlungsmodell konnte nicht geladen werden."
 			_catalog_pending = ""
 			_update_status()
@@ -255,14 +340,21 @@ func _add_catalog_model(index: int,packed: PackedScene) -> void:
 	var bounds := _bounds(model)
 	model.position.y = -bounds.position.y
 	if catalog[index].category=="equipment":
-		model.position.y += 1.0
+		model.position.y += 0.805
 		_box_visual(station,Vector3(2,0.8,2),Vector3(0,0.4,0),Color("ad9d7d"))
 		_box_collision(station,Vector3(2,0.8,2),Vector3(0,0.4,0))
+	elif str(catalog[index].get("scale_status",""))=="unverified_source_units":
+		var plinth_size := Vector3(maxf(2,bounds.size.x+0.6),0.7,maxf(2,bounds.size.z+0.6))
+		model.position.y += 0.7
+		_box_visual(station,plinth_size,Vector3(0,0.35,0),Color("827365"))
+		_box_collision(station,plinth_size,Vector3(0,0.35,0))
 	var label := Label3D.new()
 	label.text = str(catalog[index].name)
+	if str(catalog[index].get("scale_status",""))=="unverified_source_units":
+		label.text += "\nMaßstab ungeprüft"
 	label.font_size = 34
 	label.pixel_size = 0.008
-	label.position = Vector3(0,maxf(2,bounds.size.y+0.4),0)
+	label.position = Vector3(0,maxf(2,bounds.size.y+model.position.y+0.4),0)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.visibility_range_end = 38
 	station.add_child(label)
@@ -300,6 +392,15 @@ func _build_ui() -> void:
 	_toolbar.add_child(_button("Modelle",func(): teleport(CATALOG_ORIGIN+Vector3(0,0.92,12))))
 	_toolbar.add_child(_button("Pause",func(): set_paused(not paused)))
 	_safe.add_child(_toolbar)
+	_trade_bar = HBoxContainer.new()
+	_trade_bar.add_theme_constant_override("separation",8)
+	_trade_button = _button("Handel",func(): _open_market(false))
+	_bag_button = _button("Beutel",func(): _open_market(true))
+	_trade_button.disabled = true
+	_bag_button.disabled = true
+	_trade_bar.add_child(_trade_button)
+	_trade_bar.add_child(_bag_button)
+	_safe.add_child(_trade_bar)
 	_pad = TouchPad.new()
 	_pad.axis_changed.connect(func(axis: Vector2): _touch_move=axis)
 	_safe.add_child(_pad)
@@ -348,6 +449,7 @@ func _layout_ui() -> void:
 	_status.size = Vector2(_safe.size.x-8,54)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_toolbar.position = Vector2(0,90 if portrait else 71)
+	_trade_bar.position = Vector2(0,152 if portrait else 133)
 	_pad.size = Vector2(178,178)
 	_pad.position = Vector2(0,_safe.size.y-182)
 	_actions.position = Vector2(maxf(0,_safe.size.x-328),_safe.size.y-(250 if portrait else 82))
@@ -355,8 +457,12 @@ func _layout_ui() -> void:
 	_pause_panel.position = (_safe.size-_pause_panel.size)*0.5
 
 func _physics_process(delta: float) -> void:
-	if paused:
+	if paused or market.is_open():
 		return
+	_crowd_elapsed += delta
+	if _crowd_elapsed >= 0.2:
+		_crowd_elapsed = 0.0
+		crowd.tick(player.position)
 	_action_left = maxf(0,_action_left-delta)
 	var axis := _touch_move
 	axis.x += float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))-float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT))
@@ -375,21 +481,57 @@ func _physics_process(delta: float) -> void:
 	player.velocity.x = move_toward(player.velocity.x,desired.x,delta*acceleration)
 	player.velocity.z = move_toward(player.velocity.z,desired.z,delta*acceleration)
 	player.velocity.y = -0.3 if player.is_on_floor() else player.velocity.y-19.6*delta
-	player.move_and_slide()
+	var previous_position := player.position
+	var horizontal_motion := Vector3(player.velocity.x,0,player.velocity.z)*delta
+	if not _step_up(horizontal_motion):
+		player.move_and_slide()
 	player.position.x = clampf(player.position.x,-State.LIMIT+1,State.LIMIT-1)
 	player.position.z = clampf(player.position.z,-State.LIMIT+1,State.LIMIT-1)
 	if player.position.y < -8:
 		teleport(State.SPAWN)
-	var actual := player.get_real_velocity()
+	var actual := (player.position-previous_position)/maxf(delta,0.000001)
 	figure.drive(Vector2(actual.x,actual.z).length(),angle_difference(previous_yaw,figure.rotation.y)/maxf(delta,0.000001))
 	_place_camera(delta)
+
+func _step_up(motion: Vector3) -> bool:
+	if not player.is_on_floor() or motion.length_squared()<0.0000001:
+		return false
+	var start := player.global_transform
+	if not player.test_move(start,motion):
+		return false
+	if player.test_move(start,Vector3.UP*MAX_STEP):
+		return false
+	var elevated := start
+	elevated.origin += Vector3.UP*MAX_STEP
+	if player.test_move(elevated,motion):
+		return false
+	elevated.origin += motion
+	var landing := KinematicCollision3D.new()
+	if not player.test_move(elevated,Vector3.DOWN*(MAX_STEP+0.03),landing,player.safe_margin):
+		return false
+	var destination := elevated.origin+landing.get_travel()
+	var rise := destination.y-start.origin.y
+	if rise<0.003 or rise>MAX_STEP or landing.get_normal().y<=0.01:
+		return false
+	var probe := landing.get_position()+motion.normalized()*0.04+Vector3.UP*0.06
+	var query := PhysicsRayQueryParameters3D.create(probe,probe+Vector3.DOWN*0.12,1,[player.get_rid()])
+	var floor := get_world_3d().direct_space_state.intersect_ray(query)
+	if floor.is_empty() or (floor.normal as Vector3).dot(Vector3.UP)<cos(player.floor_max_angle):
+		return false
+	var tread_rise := float(floor.position.y)-(start.origin.y-SOLE_OFFSET)
+	if tread_rise>MAX_STEP+player.safe_margin:
+		return false
+	player.global_position = destination
+	player.velocity.y = 0
+	return true
 
 func _process(delta: float) -> void:
 	_catalog_elapsed += delta
 	if _catalog_elapsed>=0.15:
 		_catalog_elapsed = 0
 		_stream_catalog()
-	if paused:
+		_refresh_market_buttons()
+	if paused or market.is_open():
 		return
 	_save_elapsed += delta
 	if _save_elapsed>=30:
@@ -407,6 +549,11 @@ func _place_camera(delta: float) -> void:
 			camera.look_at(anchor,Vector3.UP)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if market.is_open():
+		if event.is_action_pressed("ui_cancel"):
+			market.close()
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("ui_cancel"):
 		set_paused(not paused)
 		get_viewport().set_input_as_handled()
@@ -417,7 +564,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_look_by(event.relative)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventKey and event.pressed and not event.echo:
-		if event.physical_keycode==KEY_SPACE:
+		if event.physical_keycode==KEY_E:
+			_open_market(false)
+			get_viewport().set_input_as_handled()
+		elif event.physical_keycode==KEY_I:
+			_open_market(true)
+			get_viewport().set_input_as_handled()
+		elif event.physical_keycode==KEY_SPACE:
 			perform_action("attack")
 			get_viewport().set_input_as_handled()
 		elif event.physical_keycode==KEY_Q:
@@ -429,17 +582,57 @@ func _look_by(delta: Vector2) -> void:
 		_yaw = wrapf(_yaw-delta.x*0.004,-PI,PI)
 		_pitch = clampf(_pitch-delta.y*0.003,-0.75,0.65)
 
+func _market_message(value: String) -> void:
+	_catalog_status = value
+	_update_status()
+
+func _refresh_market_buttons() -> void:
+	if not is_instance_valid(_trade_button) or not market.available:
+		return
+	var target := market.nearest()
+	_trade_button.disabled = not bool(target.reachable)
+	_trade_button.text = "Handel" if not target.reachable else "Kaufen"
+	_trade_button.tooltip_text = str(target.label) if target.reachable else "Gehe zu einem Marktstand"
+
+func _open_market(inventory: bool) -> void:
+	if paused or _action_left > 0 or market.is_open():
+		return
+	var opened: bool = market.open_inventory() if inventory else market.open_shop()
+	if not opened:
+		return
+	_touch_move = Vector2.ZERO
+	_pad.reset()
+	_look.reset()
+	player.velocity = Vector3.ZERO
+	figure.drive(0)
+	crowd.set_paused(true)
+	if is_instance_valid(ambient_people):
+		ambient_people.set_active(false)
+	_hud.hide()
+
+func _close_market() -> void:
+	_hud.show()
+	crowd.set_paused(paused)
+	if is_instance_valid(ambient_people):
+		ambient_people.set_active(not paused)
+
 func _toggle_pace() -> void:
 	_running = not _running
 	_pace.text = "Rennen" if _running else "Gehen"
 
 func perform_action(action: String) -> void:
-	if paused or _action_left>0 or action not in ["attack","block"]:
+	if paused or market.is_open() or _action_left>0 or action not in ["attack","block"]:
 		return
-	_action_left = 0.8
+	player.velocity.x = 0.0
+	player.velocity.z = 0.0
+	figure.drive(0)
 	figure.cue(action)
+	_action_left = maxf(0.01,figure._remaining)
 
 func set_paused(value: bool) -> void:
+	if market.is_open():
+		market.close()
+		return
 	paused = value
 	_touch_move = Vector2.ZERO
 	_pad.reset()
@@ -447,10 +640,15 @@ func set_paused(value: bool) -> void:
 	player.velocity = Vector3.ZERO
 	figure.drive(0)
 	figure.set_process(not paused)
+	crowd.set_paused(paused)
+	if is_instance_valid(ambient_people):
+		ambient_people.set_active(not paused)
 	_pause_panel.visible = paused
 	_pad.visible = not paused
+	_look.visible = not paused
 	_actions.visible = not paused
 	_toolbar.visible = not paused
+	_trade_bar.visible = not paused
 	if paused:
 		save_state()
 
@@ -498,6 +696,12 @@ func _update_status() -> void:
 	if not _catalog_status.is_empty():
 		description += "\n"+_catalog_status
 	_status.text = description
+
+func _exit_tree() -> void:
+	if not _catalog_pending.is_empty():
+		var path := _catalog_pending
+		_catalog_pending = ""
+		ResourceLoader.load_threaded_get(path)
 
 static func _box_collision(parent: Node3D,size: Vector3,at: Vector3) -> StaticBody3D:
 	var body := StaticBody3D.new()

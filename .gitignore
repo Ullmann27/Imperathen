@@ -66,3 +66,7 @@ game/**/Saved/
 # Godot extracts these images from the self-contained city detail GLB.
 prototype/assets/city_detail/architecture/city_architecture_library_*.png
 prototype/assets/city_detail/architecture/city_architecture_library_*.png.import
+
+# Godot extracts these images from the self-contained city detail GLB.
+prototype/assets/city_detail/architecture/city_architecture_library_*.png
+prototype/assets/city_detail/architecture/city_architecture_library_*.png.import

@@ -451,6 +451,7 @@ def animate(arm):
             stride, stance = (1.75, .40) if running else (1.30, .56)
             lift = -.035 - .012 * math.cos(4 * math.pi * t)
             angles = {}
+            targets = {}
             for offset, side in ((0, "R"), (.5, "L")):
                 u = (t + offset) % 1
                 foot_lift = 0
@@ -463,17 +464,31 @@ def animate(arm):
                 thigh = arm.data.bones["Thigh_" + side]
                 shin = arm.data.bones["Shin_" + side]
                 foot = arm.data.bones["Foot_" + side]
-                upper, lower = thigh.length, shin.length
-                height = thigh.head_local.z + lift - foot.head_local.z - foot_lift
+                upper_rest = shin.head_local - thigh.head_local
+                lower_rest = foot.head_local - shin.head_local
+                # Rotations are sagittal: their link lengths are the YZ
+                # projections, while the lateral offsets remain unchanged.
+                upper = math.hypot(upper_rest.y, upper_rest.z)
+                lower = math.hypot(lower_rest.y, lower_rest.z)
                 horizontal = forward + foot.head_local.y - thigh.head_local.y
+                maximum_height = math.sqrt(max(0.0, (upper + lower - .003) ** 2 - horizontal ** 2))
+                # Both feet share one pelvis. Lower it before solving either
+                # leg, so the authored ground target remains reachable. Merely
+                # clamping reach lifted the stance foot by about 2 cm and the
+                # runtime contact solver then anchored that airborne pose.
+                lift = min(lift, foot.head_local.z + foot_lift + maximum_height - thigh.head_local.z)
+                targets[side] = (u, foot_lift, horizontal, upper, lower, upper_rest, lower_rest)
+            for side, target in targets.items():
+                u, foot_lift, horizontal, upper, lower, upper_rest, lower_rest = target
+                thigh = arm.data.bones["Thigh_" + side]
+                foot = arm.data.bones["Foot_" + side]
+                height = thigh.head_local.z + lift - foot.head_local.z - foot_lift
                 reach = min(math.hypot(horizontal, height), upper + lower - .00001)
                 hip = math.atan2(horizontal, height) - math.acos(clamp((upper * upper + reach * reach - lower * lower) / (2 * upper * reach), -1, 1))
                 knee = math.pi - math.acos(clamp((upper * upper + lower * lower - reach * reach) / (2 * upper * lower), -1, 1))
                 # The fitted rig's thighs/shins are not vertical at rest.
                 # Remove those authored rest inclinations before applying
                 # sagittal IK, otherwise planted ankles drift by about 3 cm.
-                upper_rest = shin.head_local - thigh.head_local
-                lower_rest = foot.head_local - shin.head_local
                 rest_a = math.atan2(upper_rest.y, -upper_rest.z)
                 rest_b = math.atan2(lower_rest.y, -lower_rest.z)
                 a = math.degrees(hip - rest_a)
@@ -505,14 +520,22 @@ def smooth_reduced_weights(body):
 
     A collapsed skinny wrist triangle can otherwise interpolate quite different
     source weights onto almost coincident vertices. Two mild topology-local
-    passes keep that transition continuous, without crossing separated cloth
-    contacts or moving a uniformly bound hand surface away from its bone.
+    passes keep that transition continuous without crossing separated cloth
+    contacts. Preserve existing rigid foot bindings: smoothing a planted sole
+    into its shin makes the visible foot move even when its ankle is locked.
     """
     count = len(body.data.vertices)
     values = np.zeros((count, len(body.vertex_groups)), dtype=np.float64)
     for vertex in body.data.vertices:
         for group in vertex.groups:
             values[vertex.index, group.group] = group.weight
+    rigid_feet = np.zeros(count, dtype=bool)
+    for name in ("Foot_L", "Foot_R"):
+        group = body.vertex_groups.get(name)
+        if group is not None:
+            rigid_feet |= values[:, group.index] > 0.0
+    rigid_feet &= np.count_nonzero(values, axis=1) == 1
+    original_foot_weights = values[rigid_feet].copy()
     pairs = np.array([edge.vertices[:] for edge in body.data.edges], dtype=np.int32)
     points = np.array([vertex.co[:] for vertex in body.data.vertices])
     a, b = pairs[:, 0], pairs[:, 1]
@@ -526,6 +549,9 @@ def smooth_reduced_weights(body):
         np.add.at(neighbors, b, values[a] * factors[:, None])
         active = total > 0
         values[active] = .65 * values[active] + .35 * neighbors[active] / total[active, None]
+    # Restore only assignments that were already rigid after decimation.
+    # No position-based rebinding or changes to other smoothed vertices.
+    values[rigid_feet] = original_foot_weights
     for vertex in body.data.vertices:
         chosen = sorted(enumerate(values[vertex.index]), key=lambda pair: pair[1], reverse=True)[:4]
         weight_total = sum(value for _, value in chosen)
@@ -534,6 +560,7 @@ def smooth_reduced_weights(body):
         for group, value in chosen:
             if value > 1e-8:
                 body.vertex_groups[group].add([vertex.index], value / weight_total, "REPLACE")
+    return int(np.count_nonzero(rigid_feet))
 
 
 def export_tiers(asset_id, body, arm):
@@ -555,7 +582,7 @@ def export_tiers(asset_id, body, arm):
             bpy.ops.object.modifier_apply(modifier=decimate.name)
             skin.show_viewport = True
         body.data.validate(clean_customdata=True)
-        smooth_reduced_weights(body)
+        rigid_foot_vertices = smooth_reduced_weights(body)
         # Decimation interpolates source groups; enforce the same four-weight
         # normalized contract on the resulting vertices before glTF export.
         for vertex in body.data.vertices:
@@ -582,6 +609,7 @@ def export_tiers(asset_id, body, arm):
         body.data.calc_loop_triangles()
         outputs.append({"level": level, "path": str(path.relative_to(ROOT)),
                         "triangles": len(body.data.loop_triangles), "texture_edge": texture_edge,
+                        "rigid_foot_vertices_preserved": rigid_foot_vertices,
                         "sha256": digest(path), "size_bytes": path.stat().st_size})
     return outputs
 

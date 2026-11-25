@@ -1,0 +1,3 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+RUNTIME_DISPLAY_LIFECYCLE_PASS checks=30; headless lifecycle and resize contracts, no device-performance claim

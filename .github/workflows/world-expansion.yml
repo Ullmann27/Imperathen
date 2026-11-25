@@ -1,0 +1,77 @@
+name: World expansion - Blender and Godot
+on:
+  push:
+    branches: ['feature/world-expansion-blender-20261125']
+    paths:
+      - 'tools/world_art/**'
+      - 'prototype/assets/world_expansion/**'
+      - 'prototype/scripts/world_expansion/**'
+      - 'prototype/shaders/world_expansion/**'
+      - 'prototype/scenes/world_expansion/**'
+      - 'prototype/tests/world_expansion_environment_test.gd'
+      - '.github/workflows/world-expansion.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: world-expansion-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify-and-render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Official Godot and graphical display
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/world-tools"
+          cd "$RUNNER_TEMP/world-tools"
+          release="https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable"
+          archive="Godot_v4.7.2-stable_linux.x86_64.zip"
+          curl --fail --location --retry 3 "$release/SHA512-SUMS.txt" --output godot-SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$release/$archive" --output "$archive"
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          root=pathlib.Path.cwd()
+          name='Godot_v4.7.2-stable_linux.x86_64.zip'
+          sums={line.split()[-1].lstrip('*'):line.split()[0] for line in (root/'godot-SHA512-SUMS.txt').read_text().splitlines() if line.strip()}
+          actual=hashlib.sha512((root/name).read_bytes()).hexdigest()
+          if actual!=sums.get(name): raise SystemExit('Godot checksum mismatch')
+          with zipfile.ZipFile(root/name) as z: z.extractall(root)
+          PY
+          chmod +x Godot_v4.7.2-stable_linux.x86_64
+          echo "GODOT_BIN=$RUNNER_TEMP/world-tools/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+          if ! command -v xvfb-run >/dev/null; then
+            sudo apt-get update -q
+            sudo apt-get install -y xvfb xauth
+          fi
+      - name: Actual committed model bytes and route graph
+        run: |
+          set -euo pipefail
+          mkdir -p world-evidence
+          git rev-parse HEAD > world-evidence/commit.txt
+          python3 tools/world_art/validate.py --output world-evidence/assets.json
+          python3 -m unittest discover -s tools/world_art -p 'test_*.py' 2>&1 | tee world-evidence/python.log
+          python3 tools/world_art/regional_routes.py --output world-evidence/routes.json
+      - name: Godot import, runtime and actual screenshots
+        run: |
+          python3 tools/world_art/verify_environment.py --godot "$GODOT_BIN" --output world-evidence/engine --render
+      - name: Evidence and editable sources
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-world-workshop-${{ github.run_number }}
+          path: |
+            world-evidence/
+            art/world_expansion/
+            prototype/assets/world_expansion/
+          if-no-files-found: error
+          retention-days: 30

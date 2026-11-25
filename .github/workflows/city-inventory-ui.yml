@@ -1,0 +1,77 @@
+name: City inventory interaction regression
+
+on:
+  push:
+    branches: ['fix/city-inventory-interaction-20261125']
+    paths:
+      - 'prototype/scripts/city_support_panel.gd'
+      - 'prototype/tests/city_inventory_ui_test.gd'
+      - 'tools/check_prototype.py'
+      - '.github/workflows/city-inventory-ui.yml'
+  pull_request:
+    paths:
+      - 'prototype/scripts/city_support_panel.gd'
+      - 'prototype/tests/city_inventory_ui_test.gd'
+      - 'tools/check_prototype.py'
+      - '.github/workflows/city-inventory-ui.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: city-inventory-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  equipment-ui:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify and install the official Godot engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl --fail --location --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$base/$archive" -o "$archive"
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          folder=pathlib.Path.cwd()
+          archive=folder/'Godot_v4.7.2-stable_linux.x86_64.zip'
+          expected=dict(
+              (line.split()[-1].lstrip('*'), line.split()[0])
+              for line in (folder/'SHA512-SUMS.txt').read_text().splitlines()
+              if line.strip())
+          with archive.open('rb') as stream:
+              digest=hashlib.file_digest(stream,'sha512').hexdigest()
+          if digest != expected.get(archive.name):
+              raise SystemExit('Godot SHA-512 verification failed')
+          with zipfile.ZipFile(archive) as package:
+              package.extractall(folder)
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Reproduce real city market and inventory interactions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" \
+            --keep-going --only import city_trade city_inventory_ui city_support city_market_bridge \
+            --report city-ui-evidence
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-city-inventory-${{ github.run_number }}
+          path: city-ui-evidence/
+          if-no-files-found: warn
+          retention-days: 14

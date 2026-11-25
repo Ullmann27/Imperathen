@@ -1,0 +1,179 @@
+{
+  "format": "imperathen-city-stand0-integration-v1",
+  "status": "BLOCKED_NOT_RELEASED",
+  "base": "8515544599827fad5585fb085a7e24820d4821a1",
+  "stages": [
+    {
+      "stage": "camera",
+      "head": "7240463b9803d747d6d5648c988d3def528e3c5e",
+      "base": "261639105dcaa72f8dd92e73f4db1d9ab7d90a23",
+      "changed": 74,
+      "applied": 73,
+      "identical": 0,
+      "blocked": 1
+    },
+    {
+      "stage": "commerce_inventory",
+      "head": "95752213861fa014343be7817d3607957b9676e2",
+      "base": "7a21dca5dad83bf637cfbe9c02f4d9ab5cd97337",
+      "changed": 290,
+      "applied": 276,
+      "identical": 9,
+      "blocked": 5
+    },
+    {
+      "stage": "world_expansion",
+      "head": "4d07b325ab5f2d7799cfe171f27a5f21e377ff6d",
+      "base": "7af39f35b1947595f95e365eb7762592feabf234",
+      "changed": 70,
+      "applied": 70,
+      "identical": 0,
+      "blocked": 0
+    },
+    {
+      "stage": "interiors_materials",
+      "head": "391331e01efcd929a9becd219f6d6e233fce310f",
+      "base": "7af39f35b1947595f95e365eb7762592feabf234",
+      "changed": 31,
+      "applied": 31,
+      "identical": 0,
+      "blocked": 0
+    },
+    {
+      "stage": "presentation_delivery",
+      "head": "6c94e1e8fd0a3a5d309a4690e2ca200663e87816",
+      "base": "7a21dca5dad83bf637cfbe9c02f4d9ab5cd97337",
+      "changed": 86,
+      "applied": 82,
+      "identical": 0,
+      "blocked": 4
+    }
+  ],
+  "unresolved_conflicts": [],
+  "missing_required_files": [
+    "prototype/assets/world/roman_city_test.glb",
+    "prototype/assets/world/roman_city_collision.glb",
+    "prototype/assets/world/roman_forum_paving_detail.glb",
+    "prototype/assets/world/roman_forum_paving_collision.glb",
+    "prototype/assets/world/city_manifest.json",
+    "prototype/scripts/world/city_exploration_crowd.gd",
+    "prototype/tests/city_exploration_test.gd",
+    "prototype/assets/world/roman_meshy_temple_0.glb",
+    "prototype/assets/world/roman_meshy_temple_1.glb",
+    "prototype/assets/world/roman_meshy_temple_2.glb",
+    "prototype/assets/world/roman_meshy_temple_3.glb",
+    "prototype/assets/characters/hero_meshy_italia_0.glb",
+    "prototype/assets/characters/hero_meshy_italia_1.glb",
+    "prototype/assets/characters/hero_meshy_italia_2.glb",
+    "prototype/assets/characters/hero_meshy_italia_3.glb"
+  ],
+  "source_changes_staged": 532,
+  "release_gates": {
+    "private_city_package_reconciled": false,
+    "live_city_trade_connected": false,
+    "shop_interiors_connected": false,
+    "npc_routes_and_dialogues_connected": false,
+    "camera_motion_regression_passed": false,
+    "full_city_test_passed_on_combined_source": false,
+    "android_signed_build_verified": false,
+    "fold7_runtime_verified": false
+  },
+  "notes": "Staging snapshot of already published GitHub blobs only. No private model files uploaded. No integration parent claimed for unresolved work. Existing branches unchanged. No main merge. No release.",
+  "resolved_conflicts": [
+    {
+      "path": "prototype/scripts/visuals/village_person.gd",
+      "stage": "camera",
+      "base": "19425821d73ade539e6aa55f9e2dd6e28658056d",
+      "retained": "f5e004f61af070b43cb033cb48fd215a48030bf6",
+      "incoming": "b424b05bafa71ac9295336c6ce74090d3c2a4127",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way disjoint edits; runtime tests pending"
+    },
+    {
+      "path": ".gitignore",
+      "stage": "commerce_inventory",
+      "base": "2d6e986cb4cec62aa3752ec930a080cbaa5c6803",
+      "retained": "7a5a9268284f7d202c0cb31c54a76f6c1813ec48",
+      "incoming": "fce2f1e810268e991b6e58fe5aa478533f9eb3a1",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way disjoint edits; runtime tests pending"
+    },
+    {
+      "path": "prototype/scripts/main.gd",
+      "stage": "commerce_inventory",
+      "base": "34d2cb29828812b214bd7d74b19cb8d52211ef6b",
+      "retained": "efdd750bddcc43513d78af900eb27df5fc093b76",
+      "incoming": "59c1a69da50bf2f3064ad994cf00b2029a007596",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way disjoint edits; runtime tests pending"
+    },
+    {
+      "path": "prototype/scripts/world/game_world.gd",
+      "stage": "commerce_inventory",
+      "base": "1f08a5bd46e831d2c544021927212468e862ab27",
+      "retained": "e3b0ac833dd2baca15ecd520c0c38ace0221d036",
+      "incoming": "16366d416f272fde3bbc149ce30bbe920e5b27eb",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way disjoint edits; runtime tests pending"
+    },
+    {
+      "path": "prototype/scripts/domain/world_model.gd",
+      "stage": "commerce_inventory",
+      "base": "8743215188688a0de13bff951e00858b1e59e0db",
+      "retained": "a426ee9dfe2685b1027927d971958c99a9506dfa",
+      "incoming": "76c28b468119a8ceff74a002c76011bb768ba05c",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way source reconciliation; separate Callable declarations retained; tests pending"
+    },
+    {
+      "path": ".github/workflows/android-prototype.yml",
+      "stage": "presentation_delivery",
+      "base": "4320b763021064517b7071d217446af04aa8c146",
+      "retained": "e97fba196f723b6958081695081e962815b7480c",
+      "incoming": "2e1d85bf988d362346c7ebb26f328073c08ad6a9",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way source reconciliation; separate Callable declarations retained; tests pending"
+    },
+    {
+      "path": "tools/build_android_prototype.py",
+      "stage": "presentation_delivery",
+      "base": "b90e6afc5c9ec91f81f8485081cea91858fd768f",
+      "retained": "11c700e86ef242320bfbc72abe377917e3e26d5e",
+      "incoming": "5d369e9519ae8d45d48a474bae0af7c62f2c5c84",
+      "reason": "three_way_resolution_required",
+      "resolution": "independent source changes combined; runtime checks pending"
+    },
+    {
+      "path": "tools/publish_village_download.py",
+      "stage": "presentation_delivery",
+      "base": "e9fa9c95e1671a535595bf42f224993f4c49bcab",
+      "retained": "e93f32f527f0f0e70b6bf814845a30404e1d3ef3",
+      "incoming": "f15cdb9ceab891a126529ec5d0a1ee9c212dadc0",
+      "reason": "three_way_resolution_required",
+      "resolution": "independent source changes combined; runtime checks pending"
+    },
+    {
+      "path": "tools/check_prototype.py",
+      "stage": "commerce_inventory",
+      "base": "2af6446d8103005b7d2134113aeed99a039a12c5",
+      "retained": "9c4631a00cd334275a89e33a0542ed8dbaff7242",
+      "incoming": "e2b8678d35e71140e654a43353716e022b25b063",
+      "reason": "three_way_resolution_required",
+      "resolution": "preserve all independent test entries and source fingerprint/report scope fields"
+    },
+    {
+      "path": "tools/check_prototype.py",
+      "stage": "presentation_delivery",
+      "base": "2af6446d8103005b7d2134113aeed99a039a12c5",
+      "retained": "9c4631a00cd334275a89e33a0542ed8dbaff7242",
+      "incoming": "b970a2ba29906b7e7dd19825bdd4258bdf6773fe",
+      "reason": "three_way_resolution_required",
+      "resolution": "preserve all independent test entries and source fingerprint/report scope fields"
+    }
+  ],
+  "market_bridge": {
+    "status": "implemented_in_public_source_not_engine_validated",
+    "fixture": "prototype/tests/city_market_bridge_test.gd",
+    "authority": "WorldModel city session, exact authored anchors, separate save; final private runtime reconciliation and visual walkthrough pending"
+  }
+}

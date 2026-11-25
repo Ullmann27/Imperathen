@@ -1,0 +1,72 @@
+[
+  {
+    "path": "art/world_expansion/architecture/taberna.blend",
+    "sha256": "50be59b051a7452f7282754e7c4819e7d525ee8ae3eb1abc8583c6785bcd9dba",
+    "size": 4145145,
+    "review_path": "art/world_expansion/architecture/taberna_review.png",
+    "review_sha256": "a08e96fede29b003bdffc6947906c3d505eaa3000ea3e057cca1611b4e9bea39",
+    "review_size": 1733461,
+    "resolution": [
+      1280,
+      960
+    ],
+    "samples": 24,
+    "render_engine": "Cycles CPU",
+    "threads": 2,
+    "visually_opened": true,
+    "scope": "single LOD0 exterior view; no runtime, interior/navigation or all-angle acceptance"
+  },
+  {
+    "path": "art/world_expansion/architecture/insula.blend",
+    "sha256": "403d41bf0d46f26e25eaeee483061d8ae0161765005151d27731b30b6152c215",
+    "size": 4604078,
+    "review_path": "art/world_expansion/architecture/insula_review.png",
+    "review_sha256": "015ae2787ac1257b8e5b1a48c74bf830b2decf60eb0bbaa2fe21dcaeff4110bf",
+    "review_size": 1893899,
+    "resolution": [
+      1280,
+      960
+    ],
+    "samples": 24,
+    "render_engine": "Cycles CPU",
+    "threads": 2,
+    "visually_opened": true,
+    "scope": "single LOD0 exterior view; no runtime, interior/navigation or all-angle acceptance"
+  },
+  {
+    "path": "art/world_expansion/architecture/basilica.blend",
+    "sha256": "789db0d0ca1c5438611b4fe4f8ae0fc15471629def1f76742e3d6a6dd83f6e0a",
+    "size": 6060027,
+    "review_path": "art/world_expansion/architecture/basilica_review.png",
+    "review_sha256": "aee50088e3a7ee269069fe32683f9bc5a063ba7dc0aa209c37f9b7ffa5936bb5",
+    "review_size": 1849219,
+    "resolution": [
+      1280,
+      960
+    ],
+    "samples": 24,
+    "render_engine": "Cycles CPU",
+    "threads": 2,
+    "visually_opened": true,
+    "scope": "single LOD0 exterior view; no runtime, interior/navigation or all-angle acceptance",
+    "runtime_lod0_sha256": "49a0c2e8afa5b50f4713cff57500b1bdf85539406dbc8d7eda11a395a1dee56e",
+    "runtime_storage_note": "Source and image regenerated after isolating48 thin column ribs from excessive bevel. Transport packing then removes only explicit tangents; positions, normals, UVs, indices, materials and image bytes are unchanged within that pack step. Imported tangent bit identity is not asserted."
+  },
+  {
+    "path": "art/world_expansion/architecture/basalt_road.blend",
+    "sha256": "e7fb140b15bc5456003ce693c04ec53eb60ce7e49dcfb052ca3dc9371418737f",
+    "size": 3606182,
+    "review_path": "art/world_expansion/architecture/basalt_road_review.png",
+    "review_sha256": "30574a1b223b7beb32522cb50a820c1f1a9a59ed02cc23859e333c458bd33a18",
+    "review_size": 1094140,
+    "resolution": [
+      1024,
+      768
+    ],
+    "samples": 20,
+    "render_engine": "Cycles CPU",
+    "threads": 2,
+    "visually_opened": true,
+    "scope": "single LOD0 exterior view; no runtime, interior/navigation or all-angle acceptance"
+  }
+]

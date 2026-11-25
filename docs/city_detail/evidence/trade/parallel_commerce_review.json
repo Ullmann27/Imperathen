@@ -1,0 +1,42 @@
+{
+  "pr": 57,
+  "url": "https://github.com/Ullmann27/Imperathen/pull/57",
+  "inspected_head": "1c0575096bd51c7da9e1ab83bcb2abf61306d0b9",
+  "branch": "art/roman-life-shops-interiors-20261125",
+  "base": "7af39f35b1947595f95e365eb7762592feabf234",
+  "changed_files": [
+    "coordination/roman_life_20261125.json"
+  ],
+  "published_code_status": "At this inspected head, the PR publishes only the coordination contract. No alternative commerce implementation or wallet is present in the PR diff.",
+  "declared_future_paths": [
+    "prototype/scripts/domain/roman_commerce.gd",
+    "prototype/assets/roman_life/commerce_catalog.json",
+    "prototype/tests/roman_commerce_test.gd"
+  ],
+  "declared_anchors": {
+    "armorer_point": [
+      14,
+      36.4
+    ],
+    "inn_point": [
+      -10,
+      35.8
+    ]
+  },
+  "this_branch_anchors": {
+    "armorer": [
+      10,
+      4
+    ],
+    "thermopolium": [
+      4,
+      -8
+    ]
+  },
+  "unverified": [
+    "The future roman_commerce state path, money wallet and transaction ownership are not specified by the published contract.",
+    "No claim is made that two live wallets already exist."
+  ],
+  "integration_action": "Before combining gameplay from both branches, inspect the implemented roman_commerce contract, unify catalogs/anchors with one WorldModel transaction authority and the existing resources.denarii wallet, and retain one inventory/receipt ledger for overlapping items and service grants.",
+  "mutations": "No change made to the peer branch."
+}

@@ -1,0 +1,25 @@
+{
+  "run_id": 45445434654,
+  "run_url": "https://github.com/Ullmann27/Imperathen/actions/runs/45445434654",
+  "artifact_id": 14944619290,
+  "artifact_name": "imperathen-team-b-1",
+  "artifact_zip_sha256": "211ad40524990c4c12d83272441d3abbabe55e6f26fbede1b5c4e6e2dbc88b4e",
+  "source_commit": "b90d7b30830e86030b29e744452f17ba7cee25fc",
+  "baseline_commit": "7a21dca5dad83bf637cfbe9c02f4d9ab5cd97337",
+  "local_source_tree_matches_published": true,
+  "engine_groups_passed": 67,
+  "python_tests_passed": 167,
+  "visual_comparison_passed": true,
+  "images_visually_reviewed": 6,
+  "android_device_test": false,
+  "review": {
+    "01_market_staff": "Antonia steht im Nachher-Bild zusätzlich vor dem vorhandenen Marktstand. Gleiche Kamera, bestehende Geometrie und weitere Figuren.",
+    "02_work_panel": "Handelsplatz: vorher eine Arbeitskraft und Personalmangel; nachher zwei Arbeitskräfte. Fehlender Holzvorrat wird weiterhin sichtbar korrekt gemeldet.",
+    "03_social_panel": "Julia und Silvanus zeigen nach identischen Gesprächseingaben gegenseitig den Eintrag Vertrauter Nachbar. Zeilen sind im sichtbaren Ausschnitt lesbar."
+  },
+  "limits": [
+    "Feste Posen und dokumentierte Gesprächseingaben, kein freier Langzeitspielablauf.",
+    "Soziale Bildszene ohne Sichtcallback; echter Wandanschluss separat in team_b_integration geprüft.",
+    "Desktop OpenGL mit llvmpipe, kein physisches Android und keine FPS-Behauptung."
+  ]
+}

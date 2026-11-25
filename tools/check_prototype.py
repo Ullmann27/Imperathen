@@ -52,6 +52,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--godot", default="godot")
     parser.add_argument("--keep-going", action="store_true", help="Collect every check result; any failed check still fails the run.")
+    parser.add_argument("--only", nargs="+", help="Run only these named check groups; omitted means the complete suite.")
     parser.add_argument("--report", type=Path, default=ROOT / "docs/10_development/evidence")
     args = parser.parse_args()
     engine = shutil.which(args.godot)
@@ -76,10 +77,20 @@ def main():
             ("combat_actions", ["--script", "res://tests/combat_actions_test.gd"], "COMBAT_ACTIONS_PASS"),
             ("combat_model", ["--script", "res://tests/combat_model_integration_test.gd"], "COMBAT_MODEL_PASS"),
             ("village_economy", ["--script", "res://tests/village_economy_test.gd"], "VILLAGE_ECONOMY_PASS"),
+            ("commerce_transaction", ["--script", "res://tests/commerce_transaction_test.gd"], "COMMERCE_TRANSACTION_PASS"),
+            ("city_trade", ["--script", "res://tests/city_trade_test.gd"], "CITY_TRADE_PASS"),
+            ("city_market_bridge", ["--fixed-fps", "60", "--script", "res://tests/city_market_bridge_test.gd"], "CITY_MARKET_BRIDGE_PASS"),
+            ("city_inventory_ui", ["--fixed-fps", "60", "--script", "res://tests/city_inventory_ui_test.gd"], "CITY_INVENTORY_UI_PASS"),
+            ("city_character_detail", ["--fixed-fps", "60", "--script", "res://tests/city_character_detail_test.gd"], "0 failures"),
+            ("city_support", ["--fixed-fps", "60", "--script", "res://tests/city_support_integration_test.gd"], "CITY_SUPPORT_PASS"),
+            ("city_exploration_detail", ["--fixed-fps", "60", "--script", "res://tests/city_exploration_detail_adapter_test.gd"], "CITY_EXPLORATION_DETAIL_PASS"),
             ("village_life", ["--script", "res://tests/village_life_test.gd"], "VILLAGE_LIFE_PASS"),
             ("village_model", ["--script", "res://tests/village_model_test.gd"], "VILLAGE_MODEL_PASS"),
             ("village_childhood", ["--script", "res://tests/village_childhood_test.gd"], "VILLAGE_CHILDHOOD_PASS"),
             ("npc_behavior", ["--script", "res://tests/npc_behavior_test.gd"], "checks passed"),
+            ("npc_social_memory", ["--script", "res://tests/npc_social_memory_test.gd"], "checks passed"),
+            ("npc_physical_conversation", ["--fixed-fps", "60", "--script", "res://tests/npc_physical_conversation_test.gd"], "NPC_PHYSICAL_CONVERSATION_PASS"),
+            ("team_b_integration", ["--fixed-fps", "60", "--script", "res://tests/team_b_integration_test.gd"], "TEAM_B_INTEGRATION_PASS"),
             ("npc_behavior_world", ["--fixed-fps", "60", "--script", "res://tests/npc_behavior_world_test.gd"], "checks passed"),
             ("unarmed_combat", ["--script", "res://tests/unarmed_combat_test.gd"], "UNARMED_COMBAT_PASS"),
             ("childhood_integration", ["--fixed-fps", "60", "--script", "res://tests/childhood_integration_test.gd"], "CHILDHOOD_INTEGRATION_PASS"),
@@ -102,6 +113,7 @@ def main():
             ("band1_alignment", ["--script", "res://tests/band1_alignment_test.gd"], "BAND1_ALIGNMENT_PASS"),
             ("mission_bridge_data", ["--script", "res://tests/mission_bridge_data_test.gd"], "MISSION_BRIDGE_DATA_PASS"),
             ("companion_navigation", ["--fixed-fps", "60", "--script", "res://tests/companion_navigation_test.gd"], "COMPANION_NAVIGATION_PASS"),
+            ("companion_turn_motion", ["--fixed-fps", "60", "--script", "res://tests/companion_turn_motion_test.gd"], "COMPANION_TURN_MOTION_PASS"),
             ("companion_follow", ["--fixed-fps", "60", "--script", "res://tests/companion_follow_test.gd"], "COMPANION_FOLLOW_PASS"),
             ("chapter_abilities", ["--script", "res://tests/chapter_abilities_test.gd"], "CHAPTER_ABILITIES_PASS"),
             ("band1_expansion", ["--script", "res://tests/band1_expansion_test.gd"], "BAND1_EXPANSION_PASS"),
@@ -112,6 +124,7 @@ def main():
             ("ui", ["--fixed-fps", "60", "--script", "res://scripts/ui/ui_smoke.gd"], "UI_SMOKE_PASS"),
             ("roman_menu", ["--fixed-fps", "60", "--script", "res://tests/roman_menu_test.gd"], "ROMAN_MENU_PASS"),
             ("camera_collision", ["--fixed-fps", "60", "--script", "res://tests/camera_collision_test.gd"], "CAMERA_COLLISION_PASS"),
+            ("runtime_display_lifecycle", ["--fixed-fps", "60", "--script", "res://tests/runtime_display_lifecycle_test.gd"], "RUNTIME_DISPLAY_LIFECYCLE_PASS"),
             ("touch_controls", ["--fixed-fps", "60", "--script", "res://tests/touch_controls_test.gd"], "TOUCH_CONTROLS_PASS"),
             ("action_adapter", ["--fixed-fps", "60", "--script", "res://tests/action_adapter_test.gd"], "ACTION_ADAPTER_PASS"),
             ("action_world", ["--fixed-fps", "60", "--script", "res://tests/action_world_test.gd"], "ACTION_WORLD_PASS"),
@@ -125,6 +138,7 @@ def main():
             ("meshy_characters", ["--fixed-fps", "60", "--script", "res://tests/meshy_character_test.gd"], "MESHY_CHARACTERS_PASS"),
             ("meshy_equipment", ["--fixed-fps", "60", "--script", "res://tests/meshy_equipment_test.gd"], "MESHY_EQUIPMENT_PASS"),
             ("character_motion", ["--fixed-fps", "60", "--script", "res://tests/character_motion_test.gd"], "checks; 0 failed;"),
+            ("lod_contact_history", ["--fixed-fps", "60", "--script", "res://tests/lod_contact_history_test.gd"], "LOD_CONTACT_HISTORY_PASS"),
             ("service_gear", ["--fixed-fps", "60", "--script", "res://tests/service_gear_test.gd"], "SERVICE_GEAR_PASS"),
             ("natural_motion", ["--fixed-fps", "60", "--script", "res://tests/natural_motion_test.gd"], "checks, 0 failed"),
             ("cc0_runtime_gestures", ["--fixed-fps", "60", "--script", "res://tests/cc0_runtime_gestures_test.gd"], "CC0_GESTURES_PASS"),
@@ -142,6 +156,11 @@ def main():
             ("main_scene", ["--fixed-fps", "60", "--quit-after", "420"], "IMPERATHEN_READY"),
             ("motion_measurement", ["--fixed-fps", "60", "--script", "res://tests/motion_quality_measurement.gd"], "MOTION_MEASURED"),
         ]
+        if args.only:
+            unknown = set(args.only) - {entry[0] for entry in checks}
+            if unknown:
+                parser.error("Unknown check groups: " + ", ".join(sorted(unknown)))
+            checks = [entry for entry in checks if entry[0] in args.only]
         for name, arguments, marker in checks:
             # Each executable scenario starts with its own account state. A
             # completed opening test must not become another test's Continue.
@@ -164,12 +183,13 @@ def main():
                 break
     source_hashes = {}
     for path in sorted(PROJECT.rglob("*")):
-        if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".glb", ".res", ".wav", ".ogg", ".svg", ".ttf", ".json", ".webp", ".jpg"}:
+        if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".glb", ".res", ".wav", ".ogg", ".svg", ".ttf", ".json", ".webp", ".jpg", ".png", ".import"}:
             source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
     final_fingerprint = motion_fingerprint(ROOT)
     result = {"engine": version, "passed": len(records) == len(checks) and all(item["passed"] for item in records) and checked_fingerprint == measured_fingerprint == final_fingerprint and checked_commit == source_commit(ROOT),
               "motion_source_fingerprint": final_fingerprint, "source_commit": checked_commit,
               "source_unchanged_during_checks": checked_fingerprint == measured_fingerprint == final_fingerprint and checked_commit == source_commit(ROOT),
+              "scope": "selected check groups" if args.only else "complete suite", "selected_checks": [entry[0] for entry in checks],
               "renderer": "headless/dummy; no graphical FPS or screenshot claim",
               "save_isolation": "Separate disposable XDG data/config/cache directories for every check",
               "checks": records, "source_sha256": source_hashes}

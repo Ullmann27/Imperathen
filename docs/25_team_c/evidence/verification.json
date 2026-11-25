@@ -1,0 +1,43 @@
+{
+  "base_commit": "7a21dca5dad83bf637cfbe9c02f4d9ab5cd97337",
+  "branch": "feature/team-c-presentation-delivery-20261124",
+  "python": "3.12.14",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "engine_groups": 65,
+  "engine_passed": true,
+  "engine_warnings": 0,
+  "python_tests": 201,
+  "python_passed": true,
+  "headless_only": true,
+  "android_build": "not_run",
+  "physical_fold7": "not_run",
+  "story_status": "needs_revision",
+  "story_summary": {
+    "main_missions": 81,
+    "side_quests": 72,
+    "main_dialogue_lines": 810,
+    "distinct_speaker_lines": 65,
+    "scenes_with_repeated_lines": 77,
+    "within_scene_repeated_line_instances": 250,
+    "spoken_production_language_lines": 96,
+    "blocking_findings": 96,
+    "findings_by_code": {
+      "age_calendar_review": 1,
+      "repeated_line_within_scene": 210,
+      "spoken_production_language": 96
+    }
+  },
+  "changed_code_sha256": {
+    "prototype/scripts/ui/runtime_display.gd": "717f7122bc85bfefe68c9bb489c36ea461efcedcebf860c5a86290336408c555",
+    "prototype/tests/runtime_display_lifecycle_test.gd": "ab67721a0632304b64d85ad44e13dab4ece985ab1ff8d5407120ab1ec9c1e7bf",
+    "tools/android_signing_identity.py": "006b2fc6ff636fba459d86103cea1206acbbb49dba442a083b3e11d807907091",
+    "tools/build_android_prototype.py": "7cd7fa7933b58a1fc7fd8f0f13ad6929f20c9a5957aa76b9062cb7beb122d977",
+    "tools/publish_village_download.py": "0e4d7d427baa6f605705319f429ae5c9e7c17a6e15668f3535f3545f56e09fd0",
+    "tools/story/audit_screenplays.py": "c7c3c041216a9dd16a1dce5d1388d3a1d542574ec5fff59e514fde6662023907",
+    "tools/check_prototype.py": "59785e295f2d4413e79c4acc0c464c270706aada9ec1106858deba73bfda5241",
+    "tests/android_signing_identity_test.py": "5e5b33a1373beea90eab6a3c61ba5ef1350a3e6b0d9745f5df2e4489d3bc818b",
+    "tests/android_story_source_audit_test.py": "72b20da5c9fc0ee44e9f859045db90230a8fbc7e0e25711ca9ca4cadb49c51ee",
+    ".github/workflows/presentation-delivery.yml": "2707d3fa3462488909aa07bb287e05470324b29c4347e76a773772dbb18ee918",
+    ".github/workflows/android-prototype.yml": "5e95f15a78aef8ce3524e7550275d138c853e615e5f27231619048c673159172"
+  }
+}

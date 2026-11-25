@@ -64,6 +64,7 @@ func _ready() -> void:
 	world.setup(model.data)
 	world.action_requested.connect(_on_world_action)
 	model.combat_sight_check = world.combat_sight_clear
+	model.npc_sight_check = world.npc_sight_clear
 	model.combat_motion_check = world.combat_safe_motion
 	model.npc_observations = world.npc_observations
 	model.raid_observations = world.raid_observations

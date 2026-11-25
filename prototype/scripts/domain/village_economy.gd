@@ -6,6 +6,7 @@ const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const DAY_SECONDS := 120.0
 const MAX_RESOURCE := 1000000
 const EPSILON := 0.000001
+const TRADE_CARGO_WOOD := 4
 
 static func day_length(data: Dictionary) -> float:
 	# Active economic time is independent from explicitly ended narrative days.
@@ -174,7 +175,10 @@ static func _execute(data: Dictionary, command: String, args: Dictionary) -> Dic
 			var price := emergency_food_price(data)
 			if int(data.resources.denarii) < price or int(data.resources.grain) > MAX_RESOURCE - 16:
 				return _fail("Eine Notration braucht %d Denare und Platz für 16 Getreide." % price)
+			if int(economy.stocks.merchant_denarii) > MAX_RESOURCE - price:
+				return _fail("Die Händlerkasse kann diese Zahlung nicht mehr aufnehmen.")
 			economy.stocks.emergency_grain -= 16
+			economy.stocks.merchant_denarii += price
 			_transfer(data, "denarii", -price)
 			_transfer(data, "grain", 16)
 			return _ok("16 Getreide aus dem begrenzten Notvorrat gekauft; %d Denare bezahlt." % price)
@@ -263,10 +267,12 @@ static func _produce(data: Dictionary, id: String) -> void:
 		economy.patrols_completed += 1
 		return
 	if id == "trade":
-		_transfer(data, "wood", -4)
+		_transfer(data, "wood", -TRADE_CARGO_WOOD)
 	var amount := _yield_for(data, id)
 	economy.stocks[spec.stock] -= amount
 	_transfer(data, spec.resource, amount)
+	if id == "trade":
+		economy.last_report = "Holzlieferung abgeschlossen: %d Holz verkauft, %d Denare aus der Händlerkasse erhalten." % [TRADE_CARGO_WOOD, amount]
 
 
 static func _meal(data: Dictionary) -> void:
@@ -360,10 +366,14 @@ static func _production_reason(data: Dictionary, id: String) -> String:
 		return "Betrieb beschädigt: Reparatur erforderlich"
 	if id == "watchpost":
 		return ""
+	if id == "trade":
+		var price := trade_price(data)
+		if int(economy.stocks.merchant_denarii) < price:
+			return "Händlergeld reicht nicht: %d Denare für eine Lieferung von %d Holz erforderlich" % [price, TRADE_CARGO_WOOD]
+		if int(data.resources.wood) < TRADE_CARGO_WOOD:
+			return "Handel benötigt %d Holz je Lieferung" % TRADE_CARGO_WOOD
 	if int(economy.stocks[spec.stock]) <= 0:
 		return "Ernte erschöpft: nachsäen" if id == "farm" else "Örtlicher Vorrat erschöpft"
-	if id == "trade" and int(data.resources.wood) < 4:
-		return "Handel benötigt 4 Holz je Lieferung"
 	if int(data.resources[spec.resource]) > MAX_RESOURCE - _yield_for(data,id):
 		return "Lager voll"
 	return ""
@@ -372,6 +382,12 @@ static func _production_reason(data: Dictionary, id: String) -> String:
 static func emergency_food_price(data: Dictionary) -> int:
 	# Chapter I ability „Ein Preis ist eine Zusage“ (I-06) lowers the price by its catalog value.
 	return maxi(1, 6 - int(Abilities.effect_value(data, "emergency_food_discount_denarii")))
+
+
+static func trade_price(data: Dictionary) -> int:
+	# A delivery is indivisible: four wood are exchanged only for the full price.
+	# These prototype prices are game balance, not historical coin values.
+	return int(WORKPLACES.trade["yield"]) + (1 if _profession(data) == "trader" else 0)
 
 
 static func _profession(data: Dictionary) -> String:
@@ -384,10 +400,12 @@ static func _profession(data: Dictionary) -> String:
 static func _yield_for(data: Dictionary, id: String) -> int:
 	if id == "watchpost":
 		return 0
+	if id == "trade":
+		return trade_price(data)
 	var spec: Dictionary = WORKPLACES[id]
 	var amount: int = spec["yield"]
 	var learned := _profession(data)
-	if (id == "woodcamp" and learned == "woodcutter") or (id == "quarry" and learned == "mason") or (id == "trade" and learned == "trader"):
+	if (id == "woodcamp" and learned == "woodcutter") or (id == "quarry" and learned == "mason"):
 		amount += 1
 	return mini(amount, int(data.village.economy.stocks[spec.stock]))
 
@@ -404,12 +422,12 @@ static func _fit(person: Dictionary) -> bool:
 static func _available(data: Dictionary, id: String) -> int:
 	var count := 0
 	for person in data.village.economy.people:
-		if person.assignment == id and _fit(person) and _attending(data,person.id):
+		if person.assignment == id and _fit(person) and _attending(data, person.id, id):
 			count += 1
 	return count
 
 
-static func _attending(data: Dictionary, id: String) -> bool:
+static func _attending(data: Dictionary, id: String, workplace_id: String) -> bool:
 	# A break or reaction is an actual absence from production. Assignment and
 	# ownership remain unchanged, so returning never creates a second worker.
 	var behavior: Variant = data.village.get("behavior",{})
@@ -421,7 +439,12 @@ static func _attending(data: Dictionary, id: String) -> bool:
 	if not people.has(id):
 		return true
 	var person: Variant = people[id]
-	return typeof(person) == TYPE_DICTIONARY and person.get("activity","") in ["work","patrol","alert"]
+	if typeof(person) != TYPE_DICTIONARY:
+		return false
+	var activity: Variant = person.get("activity", "")
+	# Alarmed civilians are not working. Patrol and alert are useful labour only
+	# at the watchpost actually assigned to this same person.
+	return activity == "work" or (workplace_id == "watchpost" and activity in ["patrol", "alert"])
 
 
 static func _assigned(economy: Dictionary, id: String) -> int:
