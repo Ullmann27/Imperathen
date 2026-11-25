@@ -1,0 +1,13 @@
+{
+  "engine": "Blender Cycles CPU",
+  "blender": "4.3.2",
+  "samples": 24,
+  "threads": 2,
+  "source": "reimported LOD0 GLBs",
+  "wind": "static pose; COLOR_0 excluded from albedo exactly as runtime wind shader",
+  "images": [
+    "vegetation_overview.png",
+    "elm_bark_closeup.png",
+    "laurel_leaf_closeup.png"
+  ]
+}
