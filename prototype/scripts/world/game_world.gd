@@ -78,6 +78,8 @@ var _shown_work := -1.0
 var _figure: VillagePerson
 var _camera: Camera3D
 var _camera_initialized := false
+# Preserve this camera's layer selection while no collision-free view exists.
+var _camera_obstructed_mask := -1
 var _camera_obstruction = CameraObstruction.new()
 var _menu_flight := false
 var _flight_time := 0.0
@@ -1253,14 +1255,26 @@ func _update_camera(delta: float) -> void:
 		_camera.size = 100.0
 	if collision_anchor.is_finite() and is_inside_tree():
 		var previous := _camera.global_position if _camera_initialized else Vector3.INF
-		_camera.global_position = _camera_obstruction.place(get_world_3d().direct_space_state,
+		var placement: Vector3 = _camera_obstruction.place(get_world_3d().direct_space_state,
 			collision_anchor,desired,previous,1.0-exp(-maxf(delta,0.0)*12.0),[_player.get_rid()])
+		if not placement.is_finite():
+			# A sealed volume has no verified local view. Never assign INF or
+			# show clipped geometry; keep UI and camera ownership unchanged.
+			if _camera_obstructed_mask < 0:
+				_camera_obstructed_mask = _camera.cull_mask
+			_camera.cull_mask = 0
+			_camera_initialized = false
+			return
+		_camera.global_position = placement
 		_camera_initialized = true
 	elif not _camera_initialized:
 		_camera.global_position = desired
 		_camera_initialized = true
 	else:
 		_camera.global_position = _camera.global_position.lerp(desired, 1.0 - exp(-delta * 12.0))
+	if _camera_obstructed_mask >= 0:
+		_camera.cull_mask = _camera_obstructed_mask
+		_camera_obstructed_mask = -1
 	if _camera.global_position.distance_squared_to(target) > 0.01:
 		_camera.look_at(target, Vector3.UP)
 
