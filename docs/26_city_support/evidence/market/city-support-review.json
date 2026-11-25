@@ -1,0 +1,67 @@
+{
+  "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "android_device_test": false,
+  "checks": 13,
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "passed": true,
+  "pictures": [
+    {
+      "camera": "[X: (0.743294, 0.0, -0.668965), Y: (-0.257072, 0.923215, -0.285636), Z: (0.617598, 0.384283, 0.68622), O: (18.0, 12.0, 18.0)]",
+      "fov": 55.0,
+      "id": "01_market_district",
+      "image": "01_market_district.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "quality": "very_high",
+      "scenario": "overview",
+      "sha256": "56511c92d47cd0560c8e37756130ea0953f2bb6228a03653da653d8c0b80ec59"
+    },
+    {
+      "camera": "[X: (0.671176, 0.0, 0.741298), Y: (0.092106, 0.992251, -0.083393), Z: (-0.735554, 0.124249, 0.665975), O: (-5.0, 2.4, -2.1)]",
+      "fov": 55.0,
+      "id": "02_shopfront_materials",
+      "image": "02_shopfront_materials.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "quality": "very_high",
+      "scenario": "eye_level",
+      "sha256": "cf8a5e508e54d732df29042be01ad34cc26dcc2241b86fc36e173269c301626c"
+    },
+    {
+      "camera": "[X: (0.845193, 0.0, -0.534461), Y: (-0.175669, 0.94444, -0.277802), Z: (0.504766, 0.328685, 0.798234), O: (-5.7, 3.8, -2.0)]",
+      "fov": 55.0,
+      "id": "03_real_trade_panel",
+      "image": "03_real_trade_panel.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "quality": "very_high",
+      "scenario": "purchased_bread",
+      "sha256": "3b72e1938ef4e5ddf84801f93d59098175985e8a231dd0989fcb130f192116c2"
+    },
+    {
+      "camera": "[X: (0.38964, 0.0, -0.920967), Y: (-0.265516, 0.95754, -0.112334), Z: (0.881863, 0.288301, 0.373096), O: (8.8, 1.5, -6.9)]",
+      "fov": 55.0,
+      "id": "04_dolia_and_paving",
+      "image": "04_dolia_and_paving.png",
+      "pixels": [
+        1280,
+        720
+      ],
+      "quality": "very_high",
+      "scenario": "material_closeup",
+      "sha256": "7dd488c23a2970c7f1a1f276caaa1e9248bd3512b8f69cd8d986e5c499526796"
+    }
+  ],
+  "renderer": "gl_compatibility",
+  "scene_sha256": "0c7513cb534a1f2c44d1bb7b8394db0eb96500a3e3a671a9552e16f9b5d4c3bd",
+  "scope": "Fresh graphical scene and actual touch purchase. Full behavior and quality transitions are verified in the separate integration test.",
+  "source_note": "Camera and shop positions are explicit review fixtures. Images come from the actual Godot viewport.",
+  "test_script_sha256": "0218640cc4213e6a6a7cf747a8a6726ac7696587e45ebc5ece794a83d8d2eef1"
+}

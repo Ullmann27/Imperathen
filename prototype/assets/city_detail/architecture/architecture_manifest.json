@@ -1,0 +1,662 @@
+{
+  "version": 1,
+  "unit": "metre",
+  "front_godot": "+Z",
+  "up_godot": "+Y",
+  "library": "res://assets/city_detail/architecture/city_architecture_library.glb",
+  "source": "tools/city_detail/architecture_generate.py",
+  "blender": "4.3.2",
+  "historical_status": "Original, historically inspired review kit; not a surveyed reconstruction of Aquileia in 58 BC.",
+  "material_source": "Original existing project maps: tools/art/generate_materials.py; 512px maps repeat per metre.",
+  "normal_maps": "glTF tangent normals, +Y",
+  "sha256": "f9fb217e5770dacb198e6ca569b0b0fa5351fc70ec52add93dab07f97a72a638",
+  "bytes": 12561824,
+  "modules": {
+    "basoli_4m": {
+      "lods": [
+        {
+          "node": "basoli_4m_lod0",
+          "triangles": 5268,
+          "vertices": 2708,
+          "surfaces": 2,
+          "bounds_blender_z_up": [
+            [
+              -2.0,
+              -2.0,
+              -0.10999999940395355
+            ],
+            [
+              2.0,
+              2.0,
+              0.0
+            ]
+          ]
+        },
+        {
+          "node": "basoli_4m_lod1",
+          "triangles": 2738,
+          "vertices": 1443,
+          "surfaces": 2,
+          "bounds_blender_z_up": [
+            [
+              -2.0,
+              -2.0,
+              -0.10999999940395355
+            ],
+            [
+              2.0,
+              2.0,
+              0.000338031881256029
+            ]
+          ]
+        },
+        {
+          "node": "basoli_4m_lod2",
+          "triangles": 1158,
+          "vertices": 653,
+          "surfaces": 2,
+          "bounds_blender_z_up": [
+            [
+              -2.0,
+              -2.0,
+              -0.10999999940395355
+            ],
+            [
+              2.0,
+              2.0,
+              0.0004490644496399909
+            ]
+          ]
+        }
+      ],
+      "collision_boxes_godot": [
+        {
+          "center": [
+            0,
+            -0.06,
+            0
+          ],
+          "size": [
+            4,
+            0.12,
+            4
+          ]
+        }
+      ],
+      "origin": "ground centre; front +Z in Godot"
+    },
+    "curb_4m": {
+      "lods": [
+        {
+          "node": "curb_4m_lod0",
+          "triangles": 1836,
+          "vertices": 952,
+          "surfaces": 2,
+          "bounds_blender_z_up": [
+            [
+              -2.0,
+              -0.4399999976158142,
+              -0.05500000715255737
+            ],
+            [
+              2.0,
+              0.8450000286102295,
+              0.20000000298023224
+            ]
+          ]
+        },
+        {
+          "node": "curb_4m_lod1",
+          "triangles": 954,
+          "vertices": 511,
+          "surfaces": 2,
+          "bounds_blender_z_up": [
+            [
+              -1.9984084367752075,
+              -0.4383555054664612,
+              -0.05335548520088196
+            ],
+            [
+              1.9984084367752075,
+              0.8450000286102295,
+              0.20000000298023224
+            ]
+          ]
+        },
+        {
+          "node": "curb_4m_lod2",
+          "triangles": 402,
+          "vertices": 235,
+          "surfaces": 2,
+          "bounds_blender_z_up": [
+            [
+              -1.9984084367752075,
+              -0.4383555054664612,
+              -0.05335548520088196
+            ],
+            [
+              1.9984084367752075,
+              0.8414713144302368,
+              0.1961718499660492
+            ]
+          ]
+        }
+      ],
+      "collision_boxes_godot": [
+        {
+          "center": [
+            0,
+            0.08,
+            0
+          ],
+          "size": [
+            4,
+            0.16,
+            0.55
+          ]
+        },
+        {
+          "center": [
+            0,
+            0.1,
+            -0.57
+          ],
+          "size": [
+            4,
+            0.2,
+            0.55
+          ]
+        }
+      ],
+      "origin": "ground centre; front +Z in Godot"
+    },
+    "taberna_4m": {
+      "lods": [
+        {
+          "node": "taberna_4m_lod0",
+          "triangles": 25856,
+          "vertices": 13472,
+          "surfaces": 6,
+          "bounds_blender_z_up": [
+            [
+              -2.2300000190734863,
+              -1.6749999523162842,
+              -0.07000000029802322
+            ],
+            [
+              2.2797694206237793,
+              1.6100000143051147,
+              3.570000171661377
+            ]
+          ]
+        },
+        {
+          "node": "taberna_4m_lod1",
+          "triangles": 13444,
+          "vertices": 7266,
+          "surfaces": 6,
+          "bounds_blender_z_up": [
+            [
+              -2.2300000190734863,
+              -1.6749999523162842,
+              -0.07000000029802322
+            ],
+            [
+              2.2797694206237793,
+              1.6100000143051147,
+              3.570000171661377
+            ]
+          ]
+        },
+        {
+          "node": "taberna_4m_lod2",
+          "triangles": 5688,
+          "vertices": 3388,
+          "surfaces": 6,
+          "bounds_blender_z_up": [
+            [
+              -2.2274537086486816,
+              -1.6723687648773193,
+              -0.06752536445856094
+            ],
+            [
+              2.2797694206237793,
+              1.6081318855285645,
+              3.5690581798553467
+            ]
+          ]
+        }
+      ],
+      "collision_boxes_godot": [
+        {
+          "center": [
+            -1.9,
+            1.5,
+            0
+          ],
+          "size": [
+            0.2,
+            3.0,
+            2.8
+          ]
+        },
+        {
+          "center": [
+            1.9,
+            1.5,
+            0
+          ],
+          "size": [
+            0.2,
+            3.0,
+            2.8
+          ]
+        },
+        {
+          "center": [
+            0,
+            1.5,
+            -1.3
+          ],
+          "size": [
+            3.8,
+            3.0,
+            0.2
+          ]
+        },
+        {
+          "center": [
+            -1.625,
+            1.5,
+            1.3
+          ],
+          "size": [
+            0.55,
+            3.0,
+            0.2
+          ]
+        },
+        {
+          "center": [
+            1.625,
+            1.5,
+            1.3
+          ],
+          "size": [
+            0.55,
+            3.0,
+            0.2
+          ]
+        },
+        {
+          "center": [
+            0,
+            2.79,
+            1.3
+          ],
+          "size": [
+            2.7,
+            0.42,
+            0.2
+          ]
+        },
+        {
+          "center": [
+            0,
+            -0.035,
+            0
+          ],
+          "size": [
+            4,
+            0.07,
+            2.8
+          ]
+        },
+        {
+          "center": [
+            0,
+            0.018,
+            1.34
+          ],
+          "size": [
+            2.54,
+            0.036,
+            0.38
+          ]
+        }
+      ],
+      "origin": "ground centre; front +Z in Godot"
+    },
+    "dolia_counter": {
+      "lods": [
+        {
+          "node": "dolia_counter_lod0",
+          "triangles": 4968,
+          "vertices": 2608,
+          "surfaces": 4,
+          "bounds_blender_z_up": [
+            [
+              -1.2999999523162842,
+              -0.4449999928474426,
+              0.0
+            ],
+            [
+              1.2999999523162842,
+              0.4449999928474426,
+              1.0149999856948853
+            ]
+          ]
+        },
+        {
+          "node": "dolia_counter_lod1",
+          "triangles": 2582,
+          "vertices": 1373,
+          "surfaces": 4,
+          "bounds_blender_z_up": [
+            [
+              -1.2999999523162842,
+              -0.4449999928474426,
+              0.0
+            ],
+            [
+              1.2999999523162842,
+              0.4449999928474426,
+              1.0150001049041748
+            ]
+          ]
+        },
+        {
+          "node": "dolia_counter_lod2",
+          "triangles": 1092,
+          "vertices": 628,
+          "surfaces": 4,
+          "bounds_blender_z_up": [
+            [
+              -1.2945890426635742,
+              -0.4394086003303528,
+              0.0046046883799135685
+            ],
+            [
+              1.2945890426635742,
+              0.4394086003303528,
+              1.0150001049041748
+            ]
+          ]
+        }
+      ],
+      "collision_boxes_godot": [
+        {
+          "center": [
+            0,
+            0.5,
+            0
+          ],
+          "size": [
+            2.6,
+            1.0,
+            0.89
+          ]
+        }
+      ],
+      "origin": "ground centre; front +Z in Godot"
+    },
+    "market_canopy": {
+      "lods": [
+        {
+          "node": "market_canopy_lod0",
+          "triangles": 1627,
+          "vertices": 889,
+          "surfaces": 3,
+          "bounds_blender_z_up": [
+            [
+              -1.524999976158142,
+              -1.1012223958969116,
+              0.0
+            ],
+            [
+              1.524999976158142,
+              1.1012296676635742,
+              2.7479329109191895
+            ]
+          ]
+        },
+        {
+          "node": "market_canopy_lod1",
+          "triangles": 845,
+          "vertices": 498,
+          "surfaces": 3,
+          "bounds_blender_z_up": [
+            [
+              -1.5230979919433594,
+              -1.1012223958969116,
+              0.0014100981643423438
+            ],
+            [
+              1.5233393907546997,
+              1.1012296676635742,
+              2.7450058460235596
+            ]
+          ]
+        },
+        {
+          "node": "market_canopy_lod2",
+          "triangles": 357,
+          "vertices": 247,
+          "surfaces": 3,
+          "bounds_blender_z_up": [
+            [
+              -1.5224535465240479,
+              -1.1007006168365479,
+              0.0026312717236578465
+            ],
+            [
+              1.5224535465240479,
+              1.1009769439697266,
+              2.746335029602051
+            ]
+          ]
+        }
+      ],
+      "collision_boxes_godot": [
+        {
+          "center": [
+            -1.4,
+            1.32,
+            0.95
+          ],
+          "size": [
+            0.095,
+            2.64,
+            0.095
+          ]
+        },
+        {
+          "center": [
+            -1.4,
+            1.32,
+            -0.95
+          ],
+          "size": [
+            0.095,
+            2.64,
+            0.095
+          ]
+        },
+        {
+          "center": [
+            1.4,
+            1.32,
+            0.95
+          ],
+          "size": [
+            0.095,
+            2.64,
+            0.095
+          ]
+        },
+        {
+          "center": [
+            1.4,
+            1.32,
+            -0.95
+          ],
+          "size": [
+            0.095,
+            2.64,
+            0.095
+          ]
+        }
+      ],
+      "origin": "ground centre; front +Z in Godot"
+    },
+    "amphora_pair": {
+      "lods": [
+        {
+          "node": "amphora_pair_lod0",
+          "triangles": 2600,
+          "vertices": 1312,
+          "surfaces": 1,
+          "bounds_blender_z_up": [
+            [
+              -0.5867024660110474,
+              -0.24639999866485596,
+              0.0
+            ],
+            [
+              0.5212381482124329,
+              0.29919999837875366,
+              0.9855999946594238
+            ]
+          ]
+        },
+        {
+          "node": "amphora_pair_lod1",
+          "triangles": 1352,
+          "vertices": 688,
+          "surfaces": 1,
+          "bounds_blender_z_up": [
+            [
+              -0.5867024660110474,
+              -0.24639999866485596,
+              -3.681881571537815e-05
+            ],
+            [
+              0.5212381482124329,
+              0.29904115200042725,
+              0.9855999946594238
+            ]
+          ]
+        },
+        {
+          "node": "amphora_pair_lod2",
+          "triangles": 572,
+          "vertices": 298,
+          "surfaces": 1,
+          "bounds_blender_z_up": [
+            [
+              -0.5818203091621399,
+              -0.24327968060970306,
+              0.00036765128606930375
+            ],
+            [
+              0.5176874995231628,
+              0.29754558205604553,
+              0.9855999946594238
+            ]
+          ]
+        }
+      ],
+      "collision_boxes_godot": [
+        {
+          "center": [
+            -0.31,
+            0.49,
+            0
+          ],
+          "size": [
+            0.57,
+            0.98,
+            0.57
+          ]
+        },
+        {
+          "center": [
+            0.32,
+            0.36,
+            -0.12
+          ],
+          "size": [
+            0.43,
+            0.72,
+            0.43
+          ]
+        }
+      ],
+      "origin": "ground centre; front +Z in Godot"
+    },
+    "bread_display": {
+      "lods": [
+        {
+          "node": "bread_display_lod0",
+          "triangles": 2980,
+          "vertices": 1496,
+          "surfaces": 2,
+          "bounds_blender_z_up": [
+            [
+              -0.5249999761581421,
+              -0.32499998807907104,
+              0.0
+            ],
+            [
+              0.5249999761581421,
+              0.32499998807907104,
+              0.2749418318271637
+            ]
+          ]
+        },
+        {
+          "node": "bread_display_lod1",
+          "triangles": 1548,
+          "vertices": 780,
+          "surfaces": 2,
+          "bounds_blender_z_up": [
+            [
+              -0.5249999761581421,
+              -0.32499998807907104,
+              0.0
+            ],
+            [
+              0.5249999761581421,
+              0.32499998807907104,
+              0.2749634385108948
+            ]
+          ]
+        },
+        {
+          "node": "bread_display_lod2",
+          "triangles": 654,
+          "vertices": 333,
+          "surfaces": 2,
+          "bounds_blender_z_up": [
+            [
+              -0.5202894806861877,
+              -0.32167887687683105,
+              0.0036029755137860775
+            ],
+            [
+              0.5202894806861877,
+              0.32167887687683105,
+              0.2748744487762451
+            ]
+          ]
+        }
+      ],
+      "collision_boxes_godot": [],
+      "origin": "ground centre; front +Z in Godot"
+    }
+  },
+  "sources": [
+    "https://www.parcoarcheologicoappiaantica.it/luoghi/via-appia-antica/via-latina-parco-degli-acquedotti/",
+    "https://pompeiisites.org/en/press-releases/from-the-12th-august-the-thermopolium-of-regio-v-is-opening-to-the-public/"
+  ]
+}

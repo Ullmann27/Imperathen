@@ -1,0 +1,29 @@
+{
+  "source_glb_unchanged": true,
+  "normal_maps": [
+    {
+      "file": "leather_detail_normal.png",
+      "width": 256,
+      "height": 256,
+      "max_quantized_unit_error": 0.004547054499755121
+    },
+    {
+      "file": "linen_detail_normal.png",
+      "width": 1024,
+      "height": 1024,
+      "max_quantized_unit_error": 0.004740780952421142
+    },
+    {
+      "file": "skin_detail_normal.png",
+      "width": 1024,
+      "height": 1024,
+      "max_quantized_unit_error": 0.004312117661084525
+    }
+  ],
+  "source_variants_verified": 16,
+  "roughness_range": [
+    0.5568627450980392,
+    0.7137254901960784
+  ],
+  "all_generated_map_hashes_match": true
+}

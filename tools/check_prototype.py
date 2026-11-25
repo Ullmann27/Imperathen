@@ -51,6 +51,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--godot", default="godot")
     parser.add_argument("--keep-going", action="store_true", help="Collect every check result; any failed check still fails the run.")
+    parser.add_argument("--only", nargs="+", help="Run only these named check groups; omitted means the complete suite.")
     parser.add_argument("--report", type=Path, default=ROOT / "docs/10_development/evidence")
     args = parser.parse_args()
     engine = shutil.which(args.godot)
@@ -70,6 +71,10 @@ def main():
             ("combat_model", ["--script", "res://tests/combat_model_integration_test.gd"], "COMBAT_MODEL_PASS"),
             ("village_economy", ["--script", "res://tests/village_economy_test.gd"], "VILLAGE_ECONOMY_PASS"),
             ("commerce_transaction", ["--script", "res://tests/commerce_transaction_test.gd"], "COMMERCE_TRANSACTION_PASS"),
+            ("city_trade", ["--script", "res://tests/city_trade_test.gd"], "CITY_TRADE_PASS"),
+            ("city_character_detail", ["--fixed-fps", "60", "--script", "res://tests/city_character_detail_test.gd"], "0 failures"),
+            ("city_support", ["--fixed-fps", "60", "--script", "res://tests/city_support_integration_test.gd"], "CITY_SUPPORT_PASS"),
+            ("city_exploration_detail", ["--fixed-fps", "60", "--script", "res://tests/city_exploration_detail_adapter_test.gd"], "CITY_EXPLORATION_DETAIL_PASS"),
             ("village_life", ["--script", "res://tests/village_life_test.gd"], "VILLAGE_LIFE_PASS"),
             ("village_model", ["--script", "res://tests/village_model_test.gd"], "VILLAGE_MODEL_PASS"),
             ("village_childhood", ["--script", "res://tests/village_childhood_test.gd"], "VILLAGE_CHILDHOOD_PASS"),
@@ -132,6 +137,11 @@ def main():
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
             ("main_scene", ["--fixed-fps", "60", "--quit-after", "420"], "IMPERATHEN_READY"),
         ]
+        if args.only:
+            unknown = set(args.only) - {entry[0] for entry in checks}
+            if unknown:
+                parser.error("Unknown check groups: " + ", ".join(sorted(unknown)))
+            checks = [entry for entry in checks if entry[0] in args.only]
         for name, arguments, marker in checks:
             # Each executable scenario starts with its own account state. A
             # completed opening test must not become another test's Continue.
@@ -145,9 +155,10 @@ def main():
                 break
     source_hashes = {}
     for path in sorted(PROJECT.rglob("*")):
-        if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".glb", ".res", ".wav", ".ogg", ".svg", ".ttf", ".json", ".webp", ".jpg"}:
+        if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".glb", ".res", ".wav", ".ogg", ".svg", ".ttf", ".json", ".webp", ".jpg", ".png", ".import"}:
             source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
     result = {"engine": version, "passed": len(records) == len(checks) and all(item["passed"] for item in records),
+              "scope": "selected check groups" if args.only else "complete suite", "selected_checks": [entry[0] for entry in checks],
               "renderer": "headless/dummy; no graphical FPS or screenshot claim",
               "save_isolation": "Separate disposable XDG data/config/cache directories for every check",
               "checks": records, "source_sha256": source_hashes}
