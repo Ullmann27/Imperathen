@@ -479,7 +479,7 @@ def render(asset_id):
     scene.render.engine="CYCLES"
     scene.cycles.device="CPU"
     scene.cycles.samples=24
-    scene.cycles.use_denoising=True
+    scene.cycles.use_denoising=False
     scene.render.threads_mode="FIXED"; scene.render.threads=2
     scene.render.resolution_x=1280; scene.render.resolution_y=960
     scene.render.resolution_percentage=100

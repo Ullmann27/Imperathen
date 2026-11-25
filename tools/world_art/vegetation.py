@@ -67,10 +67,12 @@ def generate_textures(kind: str, out: Path) -> dict[str, dict[str, Path]]:
     fine = image_noise(rng, size, 180)
     grain = rng.random((size, size), dtype=np.float32)
     warp = 0.21 * np.sin(TAU * (y * 2 + 0.2 * np.sin(x * TAU)))
-    warp += 0.085 * np.sin(TAU * y * 7 + x * 12)
-    groove = np.abs(np.sin(TAU * (x * 19 + warp))) ** 0.4
+    warp += 0.085 * np.sin(TAU * y * 7 + x * 12) + (broad - .5) * .65
+    groove = np.abs(np.sin(TAU * (x * 57 + warp))) ** 0.32
     plates = np.clip((middle - 0.33) * 2.4, 0.0, 1.0)
     height = groove * 0.48 + plates * 0.18 + broad * 0.2 + fine * 0.1 + grain * 0.04
+    cross_cracks = np.exp(-(np.sin(TAU * (y * 13 + x * .4 + broad * .8)) / .09) ** 2)
+    height -= cross_cracks * np.clip((middle - .46) * 3.0, 0, 1) * .13
     # Shallow oval knots interrupt the longitudinal bark instead of painting
     # uninterrupted stripes. Width is expressed relative to trunk circumference.
     for i in range(8):
@@ -128,6 +130,28 @@ def generate_textures(kind: str, out: Path) -> dict[str, dict[str, Path]]:
     write_texture(result["foliage"]["albedo"], leaf_rgb)
     write_texture(result["foliage"]["normal"], normal_pixels(leaf_height, 6.0))
     write_texture(result["foliage"]["roughness"], leaf_rough)
+    return result
+
+
+def texture_lod(maps: dict[str, dict[str, Path]], lod: int) -> dict[str, dict[str, Path]]:
+    """Near 1K, mid 512, far 256. Renormalize reduced tangent-space normals."""
+    if lod == 0:
+        return maps
+    size = 1024 >> lod
+    result = {}
+    for category, channels in maps.items():
+        result[category] = {}
+        for channel, source in channels.items():
+            target = source.with_name(source.stem + f"_lod{lod}.png")
+            with Image.open(source) as image:
+                reduced = image.convert("RGB").resize((size, size), Image.Resampling.LANCZOS)
+                pixels = np.asarray(reduced, dtype=np.float32)
+            if channel == "normal":
+                normal = pixels / 127.5 - 1.0
+                normal /= np.maximum(np.linalg.norm(normal, axis=-1, keepdims=True), 1e-6)
+                pixels = (normal + 1.0) * 127.5
+            write_texture(target, pixels)
+            result[category][channel] = target
     return result
 
 
@@ -201,7 +225,10 @@ class PlantMesh:
         for row, reverse in ((rows[0], True), (rows[-1], False)):
             ordered = list(reversed(row)) if reverse else row
             uv = [(.5+.45*math.cos(i*TAU/sides), .5+.45*math.sin(i*TAU/sides)) for i in range(sides)]
-            self.face(ordered, list(reversed(uv)) if reverse else uv, 0)
+            ordered_uv = list(reversed(uv)) if reverse else uv
+            for i in range(1, len(ordered)-1):
+                self.face((ordered[0], ordered[i], ordered[i+1]),
+                          (ordered_uv[0], ordered_uv[i], ordered_uv[i+1]), 0)
         self.wood_segments += 1
 
     def branch(self, start, end, radius: float, rng: random.Random,
@@ -236,7 +263,7 @@ class PlantMesh:
         bend = 0.23 + 0.65 * smoothstep(0.05, self.height, base.z)
         def point(t: float, lateral: float, ridge: bool = False):
             p = base + direction * (length * t) + side * (width * lateral)
-            p += normal * length * (0.065 * math.sin(t * math.pi) + (0.065 if ridge else 0.0))
+            p += normal * length * (0.018 * math.sin(t * math.pi) + (0.023 if ridge else 0.0))
             # One stable phase per leaf. G rises from fixed petiole to loose tip.
             return self.vertex(p, (bend, t * t, phase, 1.0))
         def uv(u: float, v: float):
@@ -304,21 +331,21 @@ class PlantMesh:
             end = start + ray*reach
             end.z = 4.9 + rank*2.45 + sub.uniform(-.24,.24)
             mid, shoulder = self.branch(start, end, .192*(1-.62*rank), sub, phase, major=True)
-            for j in range(4):
-                t = .3 + .21*j
+            for j in range(5):
+                t = .1 + .21*j
                 origin = mid.lerp(end, t)
                 heading = angle + (1 if j%2 else -1)*sub.uniform(.44,1.06)
                 secondary = origin + self.radial(heading)*sub.uniform(.65,1.2)
-                secondary.z += sub.uniform(.35,.87)
+                secondary.z += sub.uniform(-.08,.7)
                 self.branch(origin, secondary, .039*(1-.08*j), sub, phase)
-                for k in range(3):
+                for k in range(4):
                     terminal_rng = random.Random(SEEDS[self.kind] + i*10000 + j*100 + k)
-                    node = origin.lerp(secondary, .42+.24*k)
+                    node = origin.lerp(secondary, .18+.25*k)
                     a = heading + (1 if k%2 else -1)*terminal_rng.uniform(.6,1.18)
                     tip = node + self.radial(a)*terminal_rng.uniform(.5,.86)
-                    tip.z += terminal_rng.uniform(.18,.51)
-                    self.leafy_twig(node, tip, terminal_rng, phase, .245, count=15)
-        self.leafy_twig(trunk[-2], trunk[-1]+up*.62, random.Random(7181), .53, .235, count=19)
+                    tip.z += terminal_rng.uniform(-.22,.35)
+                    self.leafy_twig(node, tip, terminal_rng, phase, .18, count=20)
+        self.leafy_twig(trunk[-2], trunk[-1]+up*.62, random.Random(7181), .53, .18, count=24)
 
     def grow_cypress(self) -> None:
         V, up = self.Vector, self.up
@@ -546,7 +573,7 @@ def export_plant(kind: str, lod: int, root: Path, maps: dict) -> dict:
         settings["export_all_vertex_colors"] = True
     bpy.ops.export_scene.gltf(**settings)
     report = inspect_glb(destination)
-    report.update({"kind": kind, "lod": lod, "wood_segments": plant.wood_segments,
+    report.update({"kind": kind, "lod": lod, "texture_size": 1024 >> lod, "wood_segments": plant.wood_segments,
                    "leaf_meshes": plant.visible_leaves, "logical_leaves": plant.logical_leaves})
     print("VEGETATION_EXPORTED " + json.dumps(report), flush=True)
     return report
@@ -589,7 +616,7 @@ def render_review(root: Path, samples: int = 24) -> None:
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
     scene.cycles.samples = samples
-    scene.cycles.use_denoising = True
+    scene.cycles.use_denoising = False
     scene.cycles.max_bounces = 6
     scene.render.threads_mode = "FIXED"
     scene.render.threads = 2
@@ -598,6 +625,7 @@ def render_review(root: Path, samples: int = 24) -> None:
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGB"
     scene.view_settings.view_transform = "AgX"
+    scene.view_settings.exposure = .5
     world = bpy.data.worlds.new("Mediterranean daylight")
     world.use_nodes = True
     world.node_tree.nodes["Background"].inputs["Color"].default_value = (.50,.63,.78,1)
@@ -621,7 +649,7 @@ def render_review(root: Path, samples: int = 24) -> None:
     light.data.energy = 3.1
     light.data.angle = math.radians(2.5)
     light.data.color = (1.0,.89,.72)
-    setup_camera((13,-23,11),(.7,0,4.1),16.0)
+    setup_camera((13,-23,11),(.2,0,4.1),20.0)
     out = root/ART_REL/"review"
     out.mkdir(exist_ok=True)
     scene.render.filepath = str(out/"vegetation_overview.png")
@@ -635,10 +663,16 @@ def render_review(root: Path, samples: int = 24) -> None:
     camera.data.ortho_scale = 2.7
     scene.render.filepath = str(out/"elm_bark_closeup.png")
     bpy.ops.render.render(write_still=True)
+    camera.location = Vector((8.1,-5.0,2.0))
+    target = Vector((5.5,-1.8,1.12))
+    camera.rotation_euler = (target-camera.location).to_track_quat("-Z", "Y").to_euler()
+    camera.data.ortho_scale = 1.45
+    scene.render.filepath = str(out/"laurel_leaf_closeup.png")
+    bpy.ops.render.render(write_still=True)
     report = {"engine": "Blender Cycles CPU", "blender": bpy.app.version_string,
               "samples": samples, "threads": 2, "source": "reimported LOD0 GLBs",
               "wind": "static pose; COLOR_0 excluded from albedo exactly as runtime wind shader",
-              "images": ["vegetation_overview.png", "elm_bark_closeup.png"]}
+              "images": ["vegetation_overview.png", "elm_bark_closeup.png", "laurel_leaf_closeup.png"]}
     (out/"render_report.json").write_text(json.dumps(report, indent=2)+"\n")
 
 
@@ -658,14 +692,14 @@ def main() -> None:
         records = []
         for kind in args.kinds:
             maps = generate_textures(kind, root/ART_REL/"textures")
-            per_kind = [export_plant(kind, lod, root, maps) for lod in range(3)]
+            per_kind = [export_plant(kind, lod, root, texture_lod(maps, lod)) for lod in range(3)]
             if not per_kind[0]["triangles"] > per_kind[1]["triangles"] > per_kind[2]["triangles"]:
                 raise RuntimeError(f"LOD triangle count must strictly decrease: {kind}")
             records.extend(per_kind)
         report = {"generator": "tools/world_art/vegetation.py", "original_art": True,
                   "not_a_scan": True, "units": "metres, Y-up glTF",
                   "wind_contract": {"R": "bend weight", "G": "leaf flutter", "B": "stable branch phase", "A": "1"},
-                  "texture_size": [1024,1024], "records": records}
+                  "texture_sizes_by_lod": [1024,512,256], "records": records}
         (root/ART_REL/"build_report.json").write_text(json.dumps(report, indent=2)+"\n")
     if args.render or args.render_only:
         render_review(root, args.samples)

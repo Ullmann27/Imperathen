@@ -1,0 +1,102 @@
+{
+  "format": "GLB2",
+  "checks": "real GLB header/length, one mesh, triangle indices, UV and normal attributes, finite bounds, embedded images, manifest hash and triangle count",
+  "assets": [
+    {
+      "path": "prototype/assets/world_expansion/architecture/basalt_road_lod0.glb",
+      "triangles": 9856,
+      "surfaces": 2,
+      "embedded_images": 3,
+      "bytes": 1703736,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/basalt_road_lod1.glb",
+      "triangles": 852,
+      "surfaces": 2,
+      "embedded_images": 3,
+      "bytes": 679664,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/basalt_road_lod2.glb",
+      "triangles": 276,
+      "surfaces": 2,
+      "embedded_images": 3,
+      "bytes": 620900,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/basilica_lod0.glb",
+      "triangles": 97024,
+      "surfaces": 7,
+      "embedded_images": 12,
+      "bytes": 12264336,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/basilica_lod1.glb",
+      "triangles": 3104,
+      "surfaces": 6,
+      "embedded_images": 12,
+      "bytes": 2759768,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/basilica_lod2.glb",
+      "triangles": 2216,
+      "surfaces": 3,
+      "embedded_images": 9,
+      "bytes": 2043364,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/insula_lod0.glb",
+      "triangles": 56460,
+      "surfaces": 7,
+      "embedded_images": 12,
+      "bytes": 8082968,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/insula_lod1.glb",
+      "triangles": 5080,
+      "surfaces": 6,
+      "embedded_images": 12,
+      "bytes": 2963016,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/insula_lod2.glb",
+      "triangles": 4384,
+      "surfaces": 4,
+      "embedded_images": 12,
+      "bytes": 2889528,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/taberna_lod0.glb",
+      "triangles": 35384,
+      "surfaces": 8,
+      "embedded_images": 15,
+      "bytes": 6430540,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/taberna_lod1.glb",
+      "triangles": 1968,
+      "surfaces": 8,
+      "embedded_images": 15,
+      "bytes": 3294140,
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/taberna_lod2.glb",
+      "triangles": 652,
+      "surfaces": 4,
+      "embedded_images": 12,
+      "bytes": 2526532,
+      "valid_structure": true
+    }
+  ]
+}
