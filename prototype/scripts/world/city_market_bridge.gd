@@ -6,7 +6,7 @@ signal closed
 signal message(text: String)
 const Model = preload("res://scripts/domain/world_model.gd")
 const Trade = preload("res://scripts/city_trade.gd")
-const Panel = preload("res://scripts/city_support_panel.gd")
+const MarketPanel = preload("res://scripts/city_support_panel.gd")
 const MANIFEST := "res://assets/city_detail/shops/city_market_anchors.json"
 const SAVE_PATH := "user://imperathen_city_trade.json"
 const FRONT_OFFSET := Vector3(0.0, 0.92, 2.3)
@@ -74,7 +74,7 @@ func setup(city: Node3D, body: CharacterBody3D, persistent: bool) -> bool:
 	if not enabled.get("ok", false):
 		message.emit(str(enabled.get("message", "Handel konnte nicht geöffnet werden.")))
 		return false
-	panel = Panel.new()
+	panel = MarketPanel.new()
 	panel.layer = 21
 	panel.embedded_city = true
 	panel.shop_sites = sites.duplicate(true)
