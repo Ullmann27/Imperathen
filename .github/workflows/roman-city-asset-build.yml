@@ -8,7 +8,7 @@ on:
       - 'prototype/scripts/rendering/city_viva_closeup_props.gd'
       - '.github/workflows/roman-city-asset-build.yml'
   push:
-    branches: ['feature/roman-city-asset-build-20261125']
+    branches: ['feature/roman-city-asset-build-20261125', 'integration/verified-city-blender-20261125']
 
 permissions:
   contents: read
