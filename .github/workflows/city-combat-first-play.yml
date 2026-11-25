@@ -1,0 +1,75 @@
+name: FIRST PLAY - genuine unarmed training and movement checks
+on:
+  pull_request:
+    paths:
+      - 'prototype/scripts/world/city_training.gd'
+      - 'prototype/scripts/world/city_exploration.gd'
+      - 'prototype/scripts/world/game_world.gd'
+      - 'prototype/tests/city_training_test.gd'
+      - 'prototype/tests/roman_city_real_walk_test.gd'
+      - '.github/workflows/city-combat-first-play.yml'
+  push:
+    branches: ['fix/hero-identity-city-motion-20261125']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: city-first-play-training-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actual-godot-practice:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Obtain matching official Godot binary and verify SHA512
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          name="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl --fail --location --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$base/$name" -o "$name"
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,os
+          root=Path(os.environ["RUNNER_TEMP"])/"godot"
+          file=f"Godot_v{os.environ['GODOT_VERSION']}-stable_linux.x86_64.zip"
+          table={line.split()[-1].lstrip('*'):line.split()[0] for line in (root/'SHA512-SUMS.txt').read_text().splitlines() if line.strip()}
+          with (root/file).open('rb') as stream:
+              actual=hashlib.file_digest(stream,'sha512').hexdigest()
+          if actual != table.get(file):
+              raise SystemExit("Godot official package checksum mismatch")
+          PY
+          unzip -q "$name"
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Import authentic project files and run unarmed practice engine test
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/first-play
+          "$GODOT_BIN" --headless --path prototype --editor --import \
+            2>&1 | tee artifacts/first-play/import.log
+          "$GODOT_BIN" --headless --path prototype --script res://tests/city_training_test.gd \
+            2>&1 | tee artifacts/first-play/training.log
+          grep -q CITY_TRAINING_PASS artifacts/first-play/training.log
+          git rev-parse HEAD > artifacts/first-play/source-commit.txt
+      - name: Preserve exact source-bound evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-first-play-practice-${{ github.run_number }}
+          path: artifacts/first-play/
+          if-no-files-found: warn
+          retention-days: 14
