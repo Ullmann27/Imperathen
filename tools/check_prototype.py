@@ -85,6 +85,7 @@ def main():
             ("city_character_detail", ["--fixed-fps", "60", "--script", "res://tests/city_character_detail_test.gd"], "0 failures"),
             ("city_support", ["--fixed-fps", "60", "--script", "res://tests/city_support_integration_test.gd"], "CITY_SUPPORT_PASS"),
             ("city_exploration_detail", ["--fixed-fps", "60", "--script", "res://tests/city_exploration_detail_adapter_test.gd"], "CITY_EXPLORATION_DETAIL_PASS"),
+            ("city_viva_props", ["--fixed-fps", "60", "--script", "res://tests/city_viva_props_test.gd"], "CITY_VIVA_PROPS_PASS"),
             ("village_life", ["--script", "res://tests/village_life_test.gd"], "VILLAGE_LIFE_PASS"),
             ("village_model", ["--script", "res://tests/village_model_test.gd"], "VILLAGE_MODEL_PASS"),
             ("village_childhood", ["--script", "res://tests/village_childhood_test.gd"], "VILLAGE_CHILDHOOD_PASS"),
@@ -198,7 +199,11 @@ def main():
         source_unchanged = (checked_fingerprint == measured_fingerprint == final_fingerprint
                             and checked_commit == source_commit(ROOT))
     else:
-        source_unchanged = (start_fingerprint == final_fingerprint
+        # A fresh --import may generate deterministic .uid/.import sidecars.
+        # Compare the post-import source fingerprint when import was selected.
+        # In a subset without import, compare against the original checkout.
+        baseline = checked_fingerprint if "import" in [entry["check"] for entry in records] else start_fingerprint
+        source_unchanged = (baseline == final_fingerprint
                             and checked_commit == source_commit(ROOT))
     result = {"engine": version,
               "passed": len(records) == len(checks) and all(item["passed"] for item in records) and source_unchanged,

@@ -208,7 +208,7 @@ func _check_trailer_and_profiles() -> void:
 
 func _check_menu_buttons() -> void:
 	var expected := {
-		"Fortsetzen": "continue", "Neues Leben": "new_game", "Talgefecht erproben": "valley_demo",
+		"Fortsetzen": "continue", "Neues Leben": "new_game", "Stadt frei erkunden": "city_exploration", "Talgefecht erproben": "valley_demo",
 		"Weltkugel erkunden": "atlas_demo", "Figuren": "@gallery", "Einstellungen": "@settings", "Spiel beenden": "@confirm",
 	}
 	_ui.show_menu(true)
@@ -216,6 +216,8 @@ func _check_menu_buttons() -> void:
 	var buttons: Array[Button] = []
 	_collect_buttons(_ui.get("_screen"), buttons)
 	_check(buttons.size() == expected.size(), "menu has exactly the functional buttons: %s" % [buttons.map(func(b): return b.text)])
+	var city: Button = _find(_ui.get("_screen"), "FreeCityExploration") as Button
+	_check(city != null and city.text == "Stadt frei erkunden" and not city.disabled, "free city test entry is visible, correctly named and usable")
 	for caption: String in expected.keys():
 		_ui.show_menu(true)
 		await _frames()

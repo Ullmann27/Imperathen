@@ -26,8 +26,14 @@ jobs:
       - name: Rebuild and compare all six actual GLBs
         run: |
           set -euo pipefail
+          node tools/viva_roma/verify_props.mjs --self-test
           node tools/viva_roma/generate_props.mjs "$RUNNER_TEMP/viva-props"
-          for f in prototype/assets/viva_roma/props/*.glb; do cmp "$f" "$RUNNER_TEMP/viva-props/$(basename "$f")"; done
+          # Preserve exact topology and material contracts. A few native Math
+          # Float32 ULPs may differ between JavaScript runtimes; anything larger
+          # than micrometre-scale vertex drift still fails the build.
+          for f in prototype/assets/viva_roma/props/*.glb; do
+            node tools/viva_roma/verify_props.mjs "$f" "$RUNNER_TEMP/viva-props/$(basename "$f")"
+          done
   renderers:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -90,8 +96,11 @@ jobs:
       - name: Install Blender from signed distribution repository
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y blender
+          sudo apt-get install -y blender python3-numpy
           blender --version
+          # The bundled glTF importer requires NumPy. Verify in Blender's
+          # actual Python process, not only /usr/bin/python3.
+          blender -b --python-expr "import numpy; print('BLENDER_NUMPY_AVAILABLE', numpy.__version__)"
       - name: Render actual GLBs and save editable packed Blender projects
         run: |
           set -euo pipefail
