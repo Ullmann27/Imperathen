@@ -145,6 +145,8 @@ func _run() -> void:
 	_check(actor.clip == "idle", "Zero actual displacement settles into idle")
 	actor.free()
 	_test_live_contact_transitions()
+	_test_first_gait_cycle()
+	_test_noncanonical_rest_axes()
 	print("CHARACTER_MOTION_TEST ", checks, " checks; ", failures.size(), " failed; stance_error_m=", max_stance_error)
 	for failure: String in failures:
 		push_error(failure)
@@ -197,6 +199,113 @@ func _test_live_contact_transitions() -> void:
 		_check(lod_shift<=.015,identity+" retains world foot contacts through LOD changes: "+str(lod_shift))
 		print("LIVE_CONTACT_RESULT ",identity," releases=",release_count," release_angle_deg=",release_angle," lod_shift_m=",lod_shift)
 		person.free()
+
+
+func _test_first_gait_cycle() -> void:
+	# Start at the actual first frame, without a warm-up cycle. A release
+	# correction must not invent a one-frame delay in the first swing.
+	for action: String in ["march", "run"]:
+		for hz: float in [30.0, 60.0, 120.0]:
+			var person := Person.new()
+			root.add_child(person)
+			person.position.y = .9
+			person.configure("player", "italia", 12)
+			person.set_process(false)
+			person._check_lod = 10000.0
+			person.reset_motion()
+			var speed := 1.45 if action == "march" else 3.6
+			person.drive(speed)
+			person._play(action, 0.0, 0.0)
+			var seconds: float = person.locomotion_stride(action) / speed
+			var count := ceili(seconds * hz)
+			var delta := seconds / float(count)
+			var first: Array[Transform3D] = []
+			var seam := 0.0
+			var support_slip := 0.0
+			var anchors := {}
+			for frame in range(count * 3 + 1):
+				if frame > 0:
+					person.position.z -= speed * delta
+				person._process(0.0 if frame == 0 else delta)
+				var rig: Skeleton3D = person._motion.skeleton
+				rig.force_update_all_bone_transforms()
+				for bone in rig.get_bone_count():
+					var pose := rig.get_bone_global_pose(bone)
+					if frame == 0:
+						first.append(pose)
+					elif frame % count == 0:
+						seam = maxf(seam, pose.origin.distance_to(first[bone].origin))
+				for side: String in ["L", "R"]:
+					if person.world_foot_supported(side):
+						var foot := rig.global_transform * _point(rig, "Foot_" + side)
+						var anchor: Vector3 = anchors.get(side, foot)
+						support_slip = maxf(support_slip, foot.distance_to(anchor))
+						anchors[side] = anchor
+					else:
+						anchors.erase(side)
+			_check(seam < .001, action + " repeats its first pose at " + str(hz) + " Hz: " + str(seam))
+			_check(support_slip < .015, action + " retains planted feet at " + str(hz) + " Hz: " + str(support_slip))
+			print("FIRST_GAIT_CYCLE ", action, " hz=", hz, " seam_m=", seam, " support_slip_m=", support_slip)
+			person.free()
+
+
+# A synthetic Skeleton3D deliberately uses off-axis and negative-axis
+# child offsets. The production solver must not rely on bone +Y alignment.
+func _test_noncanonical_rest_axes() -> void:
+	var model := Node3D.new()
+	root.add_child(model)
+	var rig := Skeleton3D.new()
+	model.add_child(rig)
+	var definitions := [
+		["Pelvis", "", Vector3(0,1,0)],
+		["Spine", "Pelvis", Vector3(0,.3,0)],
+		["Head", "Spine", Vector3(0,.3,0)],
+		["Arm_L", "Spine", Vector3(.2,.1,0)],
+		["Forearm_L", "Arm_L", Vector3(.24,-.11,.04)],
+		["Hand_L", "Forearm_L", Vector3(.15,-.12,.08)],
+		["Arm_R", "Spine", Vector3(-.2,.1,0)],
+		["Forearm_R", "Arm_R", Vector3(-.24,-.11,.04)],
+		["Hand_R", "Forearm_R", Vector3(-.15,-.12,.08)],
+		["Thigh_L", "Pelvis", Vector3(.12,0,0)],
+		["Shin_L", "Thigh_L", Vector3(.07,-.42,.05)],
+		["Foot_L", "Shin_L", Vector3(-.04,-.39,.08)],
+		["Thigh_R", "Pelvis", Vector3(-.12,0,0)],
+		["Shin_R", "Thigh_R", Vector3(-.07,-.42,.05)],
+		["Foot_R", "Shin_R", Vector3(.04,-.39,.08)]
+	]
+	for definition: Array in definitions:
+		var index := rig.get_bone_count()
+		rig.add_bone(str(definition[0]))
+		if not str(definition[1]).is_empty():
+			rig.set_bone_parent(index,rig.find_bone(str(definition[1])))
+		rig.set_bone_rest(index,Transform3D(Basis.IDENTITY,Vector3(definition[2])))
+	var solver := Motion.new()
+	solver.bind(model,true,"off-axis-fixture")
+	_check(solver.available,"Off-axis fixture binds to the production solver")
+	if not solver.available:
+		model.free()
+		return
+	for side: String in ["L","R"]:
+		solver._reset()
+		var sign_x := 1.0 if side == "L" else -1.0
+		var target := solver._origin("Thigh_"+side)+Vector3(.08*sign_x,-.64,.16)
+		solver._leg(side,target,Vector3.BACK)
+		var wrist := solver._origin("Arm_"+side)+Vector3(.16*sign_x,-.28,.15)
+		solver._arm(side,solver._origin("Arm_"+side)+Vector3(0,-.1,.15),wrist)
+		rig.force_update_all_bone_transforms()
+		_check(_point(rig,"Foot_"+side).distance_to(target)<.001,"Off-axis foot reaches its requested contact "+side)
+		_check(_point(rig,"Hand_"+side).distance_to(wrist)<.001,"Off-axis hand reaches its requested grip "+side)
+		for name: String in ["Shin_","Foot_","Forearm_","Hand_"]:
+			var bone := rig.find_bone(name+side)
+			var segment := rig.get_bone_global_pose(bone).origin.distance_to(rig.get_bone_global_pose(rig.get_bone_parent(bone)).origin)
+			_check(absf(segment-rig.get_bone_rest(bone).origin.length())<.0001,"Off-axis segment retains its authored length "+name+side)
+	for direction: Vector3 in [Vector3.RIGHT,Vector3.LEFT,Vector3.UP,Vector3.DOWN,Vector3.FORWARD,Vector3.BACK]:
+		var end := direction*.5
+		var joint := solver._joint(Vector3.ZERO,end,.4,.4,direction)
+		_check(joint.is_finite() and absf(joint.length()-.4)<.0001 and absf(joint.distance_to(end)-.4)<.0001,"Parallel pole preserves both lengths "+str(direction))
+	var coincident := solver._joint(Vector3.ZERO,Vector3.ZERO,.4,.4,Vector3.BACK)
+	_check(coincident.is_finite() and absf(coincident.length()-.4)<.0001,"Coincident target retains a finite upper segment")
+	model.free()
 
 
 func _point(skeleton: Skeleton3D, name: String) -> Vector3:

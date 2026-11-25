@@ -30,6 +30,7 @@ var profile := "balanced"
 var detail := -1
 var body: Node3D
 var animator: AnimationPlayer
+var _animation_sources: Dictionary = {}
 var active_model_path := ""
 var clip := "idle"
 var phase := 0.0
@@ -207,8 +208,17 @@ func _reload(level: int) -> void:
 	add_child(body)
 	body.position.y = -0.9
 	animator = body.find_child("AnimationPlayer",true,false) as AnimationPlayer
+	_animation_sources.clear()
 	if animator:
 		animator.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+		for animation_name: StringName in animator.get_animation_list():
+			_animation_sources[str(animation_name)] = animator.get_animation(animation_name)
+		# Imported scenes share libraries and animations. Own the small name
+		# maps; copy an animation only if this actor needs another loop mode.
+		for library_name: StringName in animator.get_animation_library_list():
+			var library := animator.get_animation_library(library_name).duplicate() as AnimationLibrary
+			animator.remove_animation_library(library_name)
+			animator.add_animation_library(library_name, library)
 	for shape: MeshInstance3D in body.find_children("*","MeshInstance3D",true,false):
 		_style(shape)
 	_hands.bind(body, active_model_path)
@@ -596,12 +606,29 @@ func _play(action: String, normalized: float, blend: float) -> void:
 	if not animator.has_animation(name_in_file):
 		name_in_file = "attack" if action == "train" else "idle"
 	if not animator.has_animation(name_in_file): return
-	var animation := animator.get_animation(name_in_file)
-	animation.loop_mode = Animation.LOOP_LINEAR if action in LOOPS else Animation.LOOP_NONE
+	var animation := _playback_animation(name_in_file, action in LOOPS)
 	animator.play(name_in_file,blend)
 	animator.seek(phase*animation.length,true)
 	animator.advance(0)
 	_apply_motion()
+
+
+func _playback_animation(name_in_file: String, looping: bool) -> Animation:
+	var mode := Animation.LOOP_LINEAR if looping else Animation.LOOP_NONE
+	var animation := animator.get_animation(name_in_file)
+	if animation.loop_mode == mode:
+		return animation
+	# Always resolve from the imported source, even after this clip has used
+	# another variant. Returning to idle must recover the shared idle resource.
+	animation = CharacterMotion.playback_animation(_animation_sources[name_in_file], mode)
+	if animator.get_animation(name_in_file) != animation:
+		var slash := name_in_file.find("/")
+		var library_name := name_in_file.substr(0, slash) if slash >= 0 else ""
+		var animation_name := name_in_file.substr(slash + 1)
+		var library := animator.get_animation_library(library_name)
+		library.remove_animation(animation_name)
+		library.add_animation(animation_name, animation)
+	return animation
 
 
 func _apply_motion(review: bool = false) -> void:

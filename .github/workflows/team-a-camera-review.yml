@@ -1,0 +1,239 @@
+name: Team A camera review
+
+on:
+  pull_request:
+    branches:
+      - feature/team-a-character-gameplay-20261124
+    paths:
+      - prototype/**
+      - tools/**
+      - tests/**
+      - quality/**
+      - .github/workflows/team-a-camera-review.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: team-a-camera-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: '4.7.2'
+  GODOT_SILENCE_ROOT_WARNING: '1'
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  python:
+    name: Complete Python regression suite
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Install video tools required by the real-frame gate regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            sudo apt-get update -q
+            sudo apt-get install -y ffmpeg
+          fi
+      - name: Run every Python test file
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/python
+          git rev-parse HEAD > evidence/python/source-commit.txt
+          python3 --version > evidence/python/python-version.txt
+          python3 -m unittest discover -s tests -p '*_test.py' -v 2>&1 | tee evidence/python/unittest.log
+      - name: Keep Python results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: team-a-python-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/python/
+          if-no-files-found: error
+          retention-days: 30
+
+  engine:
+    name: Complete Godot regression suite
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    outputs:
+      motion_gate_exit: ${{ steps.motion_gate.outputs.exit_code }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Install and verify official Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl --silent --show-error --fail --location --retry 3 "$release/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --silent --show-error --fail --location --retry 3 "$release/$archive" -o "$archive"
+          expected="$(awk -v name="$archive" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          actual="$(sha512sum "$archive" | awk '{print $1}')"
+          test -n "$expected"
+          test "$actual" = "$expected"
+          unzip -q "$archive"
+          binary="$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          chmod +x "$binary"
+          "$binary" --version
+          printf 'GODOT_BIN=%s\n' "$binary" >> "$GITHUB_ENV"
+          if ! command -v ffprobe >/dev/null; then
+            sudo apt-get update -q
+            sudo apt-get install -y ffmpeg
+          fi
+      - name: Verify the controlled raid clock before the complete suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import sys
+          import tempfile
+          sys.path.insert(0, str(Path("tools").resolve()))
+          from check_prototype import run_check
+          with tempfile.TemporaryDirectory(prefix="imperathen-raid-preflight-") as temporary:
+              environment = os.environ.copy()
+              environment["IMPERATHEN_ISOLATED_TEST"] = "1"
+              for kind in ("DATA", "CONFIG", "CACHE"):
+                  location = Path(temporary) / kind.lower()
+                  location.mkdir()
+                  environment[f"XDG_{kind}_HOME"] = str(location)
+              checks = [
+                  ("import", ["--import"], None),
+                  ("village_experience", ["--fixed-fps", "60", "--script",
+                   "res://tests/village_experience_test.gd"], "VILLAGE_EXPERIENCE_PASS"),
+              ]
+              for name, arguments, marker in checks:
+                  result = run_check(os.environ["GODOT_BIN"], name, arguments, marker,
+                                     environment, Path("evidence/engine/preflight"))
+                  if not result["passed"]:
+                      raise SystemExit(1)
+          PY
+      - name: Run all actual Godot check groups
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/engine
+          git rev-parse HEAD > evidence/engine/source-commit.txt
+          python3 tools/check_prototype.py \
+            --godot "$GODOT_BIN" \
+            --keep-going \
+            --report evidence/engine 2>&1 | tee evidence/engine/suite.log
+      - name: Evaluate strict Motion Gate and preserve its actual exit
+        id: motion_gate
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p evidence/engine
+          set +e
+          python3 tools/motion_quality_gate.py \
+            --evidence evidence/engine > evidence/engine/motion-gate.log 2>&1
+          gate_exit=$?
+          printf 'exit_code=%s\n' "$gate_exit" >> "$GITHUB_OUTPUT"
+          cat evidence/engine/motion-gate.log
+          exit "$gate_exit"
+      - name: Keep engine results and strict Motion Gate evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: team-a-engine-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/engine/
+          if-no-files-found: error
+          retention-days: 30
+
+  motion-gate:
+    name: Strict Motion Gate
+    needs: engine
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GATE_EXIT: ${{ needs.engine.outputs.motion_gate_exit }}
+      ENGINE_RESULT: ${{ needs.engine.result }}
+    steps:
+      - name: Fail closed unless the actual gate passed
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'Godot regression job: %s\n' "$ENGINE_RESULT"
+          printf 'Motion Gate exit: %s\n' "${GATE_EXIT:-missing}"
+          if [[ "$ENGINE_RESULT" != success || "$GATE_EXIT" != 0 ]]; then
+            echo "::error::Motion acceptance is blocked. Inspect the engine artifact for the actual checks and motion-gate.json."
+            exit 1
+          fi
+
+  camera-comparison:
+    name: Actual graphical camera comparison
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      BASELINE_SHA: fba220ba635e942a66642da9208b8c4b156aa221
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      LIBGL_ALWAYS_SOFTWARE: '1'
+      LP_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: head
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: fba220ba635e942a66642da9208b8c4b156aa221
+          path: before
+          persist-credentials: false
+      - name: Install verified Godot and graphical dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl --silent --show-error --fail --location --retry 3 "$release/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --silent --show-error --fail --location --retry 3 "$release/$archive" -o "$archive"
+          expected="$(awk -v name="$archive" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          actual="$(sha512sum "$archive" | awk '{print $1}')"
+          test -n "$expected"
+          test "$actual" = "$expected"
+          unzip -q "$archive"
+          binary="$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          chmod +x "$binary"
+          "$binary" --version
+          printf 'GODOT_BIN=%s\n' "$binary" >> "$GITHUB_ENV"
+          sudo apt-get update -q
+          sudo apt-get install -y xvfb xauth libgl1-mesa-dri
+      - name: Reproduce the old failure and verify the same test against the fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 960x540x24' \
+            python3 head/tools/ci/review_camera_overlap.py \
+              --godot "$GODOT_BIN" \
+              --baseline "$GITHUB_WORKSPACE/before" \
+              --head "$GITHUB_WORKSPACE/head" \
+              --baseline-sha "$BASELINE_SHA" \
+              --head-sha "$HEAD_SHA" \
+              --output "$GITHUB_WORKSPACE/evidence/camera"
+      - name: Keep actual camera images, source receipts and engine logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: team-a-camera-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/camera/
+          if-no-files-found: error
+          retention-days: 30

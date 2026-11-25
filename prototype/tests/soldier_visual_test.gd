@@ -2,6 +2,7 @@ extends SceneTree
 ## Run after import with --headless --script res://tests/soldier_visual_test.gd.
 
 const Actor = preload("res://scripts/visuals/soldier_visual.gd")
+const Person = preload("res://scripts/visuals/village_person.gd")
 const Ranks = preload("res://scripts/visuals/far_ranks.gd")
 const CLIPS := ["idle", "march", "run", "attack", "shoot", "block", "wall", "testudo", "hit", "retreat", "death"]
 
@@ -18,6 +19,7 @@ func _check(value: bool, message: String) -> void:
 		printerr("FAIL ", message)
 
 func _run() -> void:
+	_test_animation_isolation()
 	for role: String in Actor.ROLES:
 		var actor := Actor.new()
 		actor.configure(role, 1)
@@ -66,6 +68,58 @@ func _run() -> void:
 	await _test_batches()
 	print("Soldier visuals: ", checked, " checks, ", failures, " failed")
 	quit(1 if failures else 0)
+
+
+func _test_animation_isolation() -> void:
+	for level in [0, 1]:
+		var source := load("res://assets/characters/frontier_legionary_%d.glb" % level) as PackedScene
+		var template := source.instantiate()
+		var original := template.find_child("AnimationPlayer", true, false) as AnimationPlayer
+		var original_loops := {}
+		for clip: String in original.get_animation_list():
+			original_loops[clip] = original.get_animation(clip).loop_mode
+		var person := Person.new()
+		var neighbour := Person.new()
+		for resident: Person in [person, neighbour]:
+			root.add_child(resident)
+			resident.detail = level
+			resident.configure_resident("italia", 32, "legionary")
+			resident.set_process(false)
+			resident._check_lod = 10000.0
+		var soldier := Actor.new()
+		soldier.detail = level
+		root.add_child(soldier)
+		soldier.set_process(false)
+		soldier.play_state("block", .7)
+		person.cue("block")
+		var soldier_block := soldier.player.get_animation("block")
+		_check(soldier_block.loop_mode == Animation.LOOP_LINEAR, "Person block leaves soldier loop independent at LOD " + str(level))
+		soldier.player.advance(soldier_block.length * 1.5)
+		_check(soldier.player.is_playing() and soldier.player.current_animation == "block", "Soldier keeps blocking beyond one cycle at LOD " + str(level))
+		soldier.present("block", .2, .1)
+		_check(person.animator.get_animation("block").loop_mode == Animation.LOOP_NONE, "Soldier block leaves person one-shot independent at LOD " + str(level))
+		person.animator.advance(person.animator.current_animation_length * 1.5)
+		_check(not person.animator.is_playing(), "Person one-shot still ends while soldier loops at LOD " + str(level))
+		# An unsupported one-shot uses idle as its visual fallback. It must not
+		# stop the shared idle animation of a different, live resident.
+		neighbour.reset_motion()
+		person.cue("unavailable_one_shot")
+		var idle_length := neighbour.animator.current_animation_length
+		neighbour._process(idle_length * 2.5)
+		_check(neighbour.clip == "idle" and neighbour.animator.is_playing(), "Fallback cue leaves neighbour idle running at LOD " + str(level))
+		person.reset_motion()
+		_check(person.animator.get_animation("idle") == neighbour.animator.get_animation("idle"), "Returning from one-shot shares the same resident idle resource at LOD " + str(level))
+		soldier.present("idle", .2, .1)
+		_check(person.animator.get_animation("idle") == soldier.player.get_animation("idle"), "Both drivers share the same immutable idle variant at LOD " + str(level))
+		_check(person.animator.get_animation_list() == original.get_animation_list() and soldier.player.get_animation_list() == original.get_animation_list(), "Private playback preserves every imported clip at LOD " + str(level))
+		var unchanged := true
+		for clip: String in original_loops:
+			unchanged = unchanged and original.get_animation(clip).loop_mode == original_loops[clip]
+		_check(unchanged, "Playback leaves the imported source animation modes unchanged at LOD " + str(level))
+		person.free()
+		neighbour.free()
+		soldier.free()
+		template.free()
 
 
 func _test_batches() -> void:

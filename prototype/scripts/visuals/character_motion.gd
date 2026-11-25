@@ -13,6 +13,7 @@ const TIMING := {
 	"side_kick": Vector3(0.40, 0.22, 1.20), "high_kick": Vector3(0.44, 0.24, 1.30),
 }
 const CC0Gestures := preload("res://scripts/visuals/cc0_gestures.gd")
+static var _playback_variants: Dictionary = {}
 var external_gestures := false
 
 var skeleton: Skeleton3D
@@ -40,6 +41,29 @@ var _world_action := ""
 var _turn_step_side := ""
 var _turn_step_time := 0.0
 var _turn_step_from := Transform3D.IDENTITY
+
+
+static func playback_animation(source: Animation, mode: Animation.LoopMode) -> Animation:
+	# One immutable variant per live source/mode, shared by both actor drivers.
+	# Weak references let unused LOD tracks unload; IDs alone are not enough
+	# to identify a source after its resource has been freed and replaced.
+	if source.loop_mode == mode:
+		return source
+	var key := str(source.get_instance_id()) + "/" + str(mode)
+	var cached: Dictionary = _playback_variants.get(key, {})
+	if not cached.is_empty() and (cached.source as WeakRef).get_ref() == source:
+		var animation := (cached.animation as WeakRef).get_ref() as Animation
+		if animation and animation.loop_mode == mode:
+			return animation
+	# Sweep only on a cache miss, never per-frame on the normal shared path.
+	for prior_key: String in _playback_variants.keys():
+		var prior: Dictionary = _playback_variants[prior_key]
+		if (prior.source as WeakRef).get_ref() == null or (prior.animation as WeakRef).get_ref() == null:
+			_playback_variants.erase(prior_key)
+	var variant := source.duplicate() as Animation
+	variant.loop_mode = mode
+	_playback_variants[key] = {"source":weakref(source), "animation":weakref(variant)}
+	return variant
 
 
 func bind(model: Node3D, is_civilian: bool, actor_identity: String = "") -> void:
@@ -170,6 +194,10 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 			if contact.is_empty() or (walking and u + 0.00001 < float(contact.phase)):
 				contact = {"transform": foot, "phase": u}
 			contact.phase = u
+			# Preserve only the correction made while this foot was planted.
+			# Measuring it after lift-off would also cancel the first authored
+			# swing displacement, introducing a frame-rate-dependent delay.
+			contact.offset = Transform3D(contact.transform).origin - foot.origin
 			_world_contacts[side] = contact
 			targets[side] = contact.transform
 		else:
@@ -179,7 +207,7 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 			var swing: Dictionary = _world_swings.get(side,{})
 			if swing.is_empty():
 				var release: Transform3D = contact.get("transform",foot)
-				swing = {"from":release,"offset":release.origin-foot.origin,"phase":u}
+				swing = {"from":release,"offset":contact.get("offset",Vector3.ZERO),"phase":u}
 				_world_swings[side] = swing
 			var progress := clampf((u-float(swing.phase))/maxf(.0001,1.0-float(swing.phase)),0.0,1.0)
 			var released: Transform3D = swing.from
@@ -595,12 +623,21 @@ func _orient(name: String, basis: Basis) -> void:
 	_place(name, basis, _point(name))
 
 
-func _aim(name: String, toward: Vector3) -> void:
+func _aim(name: String, toward: Vector3, child: String = "") -> void:
 	var source: Basis = _global_rest[_ids[name]].basis
 	var direction := toward.normalized()
 	if direction.length_squared() < 0.5:
 		return
-	_orient(name, Basis(Quaternion(source.y.normalized(), direction)) * source)
+	# Imported rigs need not place their next joint on local +Y.
+	# Align the actual rest segment, not an assumed bone axis. End
+	# effectors with no anatomical child retain their authored Y convention.
+	var rest_axis := source.y.normalized()
+	if not child.is_empty():
+		var child_rest: Transform3D = _rest[_ids[child]]
+		var segment := source * child_rest.origin
+		if segment.length_squared() > 0.00000001:
+			rest_axis = segment.normalized()
+	_orient(name, Basis(Quaternion(rest_axis, direction)) * source)
 
 
 func _arm(side: String, elbow: Vector3, wrist: Vector3) -> void:
@@ -609,8 +646,8 @@ func _arm(side: String, elbow: Vector3, wrist: Vector3) -> void:
 	var upper := _rest[_ids["Forearm_" + side]].origin.length()
 	var lower := _rest[_ids["Hand_" + side]].origin.length()
 	var solved := _joint(shoulder, wrist, upper, lower, elbow - shoulder)
-	_aim("Arm_" + side, solved - shoulder)
-	_aim("Forearm_" + side, wrist - _point("Forearm_" + side))
+	_aim("Arm_" + side, solved - shoulder, "Forearm_" + side)
+	_aim("Forearm_" + side, wrist - _point("Forearm_" + side), "Hand_" + side)
 
 
 func _leg(side: String, foot: Vector3, bend: Vector3) -> void:
@@ -618,17 +655,25 @@ func _leg(side: String, foot: Vector3, bend: Vector3) -> void:
 	var upper := _rest[_ids["Shin_" + side]].origin.length()
 	var lower := _rest[_ids["Foot_" + side]].origin.length()
 	var knee := _joint(hip, foot, upper, lower, bend)
-	_aim("Thigh_" + side, knee - hip)
-	_aim("Shin_" + side, foot - _point("Shin_" + side))
+	_aim("Thigh_" + side, knee - hip, "Shin_" + side)
+	_aim("Shin_" + side, foot - _point("Shin_" + side), "Foot_" + side)
 	_orient("Foot_" + side, _global_rest[_ids["Foot_" + side]].basis)
 
 
 func _joint(start: Vector3, finish: Vector3, upper: float, lower: float, bend: Vector3) -> Vector3:
 	var delta := finish - start
 	var distance := clampf(delta.length(), absf(upper - lower) + 0.0001, upper + lower - 0.0001)
-	var direction := delta.normalized()
+	# Coincident endpoints still need a finite, nonzero solve axis.
+	var direction := delta.normalized() if delta.length_squared() > 0.000000000001 else Vector3.BACK
 	var along := (upper * upper - lower * lower + distance * distance) / (2.0 * distance)
 	var normal := bend - direction * bend.dot(direction)
 	if normal.length_squared() < 0.0001:
-		normal = Vector3.RIGHT - direction * direction.x
+		# Choose the least-aligned cardinal axis; a fixed RIGHT fallback
+		# degenerates for a horizontal +X/-X limb with a parallel pole.
+		var axis := Vector3.RIGHT
+		if absf(direction.y) < absf(direction.x):
+			axis = Vector3.UP
+		if absf(direction.z) < absf(direction.dot(axis)):
+			axis = Vector3.BACK
+		normal = axis - direction * direction.dot(axis)
 	return start + direction * along + normal.normalized() * sqrt(maxf(0.0, upper * upper - along * along))

@@ -1,0 +1,27 @@
+{
+  "base_commit": "f3ad20404f1d870162b62d71c46fb2a04b553927",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "scope": "Local regression evidence. Code hashes identify the submitted source; the complete revision-bound suite and strict gate are provided by the PR workflow. Hero-only diagnostic has complete=false and is not full gate evidence.",
+  "changed_source_sha256": {
+    "prototype/scripts/visuals/character_motion.gd": "b8e1e698620b0a7c170a8b46b88cd4b7d77413f052fbf06b5e8b1fb99d1a55ec",
+    "prototype/scripts/visuals/soldier_visual.gd": "d816cfbcbd9636a6fd7e797fb1c70c8702a258680da03aaea231cd236d7bfd11",
+    "prototype/scripts/visuals/village_person.gd": "c6f6ab9925d91fb268f8493d46ad7a2077c344303b9124f4bea00dd7b87ce4ca",
+    "prototype/scripts/world/village_life_world.gd": "159ae64e436af910d5836c9f5989d0b0686cfc86c9fe1dba3d77f65f2665289e",
+    "prototype/tests/character_motion_test.gd": "f7c9dc8c716d43f91545fc32bd6b0c1cd537282896a8533ec396df7617c46ffc",
+    "prototype/tests/motion_mesh_clearance.gd": "aabf9582f44142ce4112d7cf1b79932d6a91a9c21c43108fbd83a587c73c9357",
+    "prototype/tests/motion_mesh_clearance_test.gd": "589979576a6cc7d85ce0e1f23ec47156b4ca6caee77f97c1decdab5991abe1bc",
+    "prototype/tests/soldier_visual_test.gd": "405941adeedbee8d0e25f9bcab234b1c8377d5bd2b52b304ff2896931e11b07a",
+    "prototype/tests/village_experience_test.gd": "716df89a15cb5709b5b2f238860fb2ed19591307c163028a43f5413f987cfb79"
+  },
+  "evidence_sha256": {
+    "animation-isolation-after.log": "f94661ccb823f05984ebab38a75ccaafa8094031754e2363ddc9234d2db96693",
+    "animation-isolation-before.log": "7e056dca93ae730c72d9dedda779685fa4f9e66a12782611c99b8c661eadba95",
+    "character-motion-after.log": "5d7790882739b06c14c992b8fe3cff2dc4ade7b94c795e57f8f9cc0e4433572e",
+    "clearance-after.log": "24be96989628827ec438e527727f68aa4dbe65f12b498cad70f81e5d00dfbcde",
+    "first-gait-before.log": "805be7ef274d38091e3820cba9ce09bb9fb272934be9380dc521c9b8af4a7c62",
+    "hero0-comparison.json": "f74a75c617138d62722f06c5617fe8c11cc5444336c2c0031d0dbaee07713e7b",
+    "natural-motion-after.log": "e7fb459f37528d18da05e47b1864a204ad2c1c81887f22be5656546502397ace",
+    "python.log": "7121b0f9c85effa1c70fd756e92c2cf650a13391d0020865db2b1c95198c9c95",
+    "raid-save-continue-after.log": "7b5b7ea8a2befb1ba755e85a7e4b40ec094bdd8980cad769d9f55b753116e0a2"
+  }
+}
