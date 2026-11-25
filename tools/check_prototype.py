@@ -51,6 +51,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--godot", default="godot")
     parser.add_argument("--keep-going", action="store_true", help="Collect every check result; any failed check still fails the run.")
+    parser.add_argument("--only", nargs="+", help="Run only selected named groups without weakening their checks.")
     parser.add_argument("--report", type=Path, default=ROOT / "docs/10_development/evidence")
     args = parser.parse_args()
     engine = shutil.which(args.godot)
@@ -75,6 +76,7 @@ def main():
             ("village_childhood", ["--script", "res://tests/village_childhood_test.gd"], "VILLAGE_CHILDHOOD_PASS"),
             ("npc_behavior", ["--script", "res://tests/npc_behavior_test.gd"], "checks passed"),
             ("npc_social_memory", ["--script", "res://tests/npc_social_memory_test.gd"], "checks passed"),
+            ("npc_physical_conversation", ["--fixed-fps", "60", "--script", "res://tests/npc_physical_conversation_test.gd"], "NPC_PHYSICAL_CONVERSATION_PASS"),
             ("team_b_integration", ["--fixed-fps", "60", "--script", "res://tests/team_b_integration_test.gd"], "TEAM_B_INTEGRATION_PASS"),
             ("npc_behavior_world", ["--fixed-fps", "60", "--script", "res://tests/npc_behavior_world_test.gd"], "checks passed"),
             ("unarmed_combat", ["--script", "res://tests/unarmed_combat_test.gd"], "UNARMED_COMBAT_PASS"),
@@ -132,6 +134,11 @@ def main():
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
             ("main_scene", ["--fixed-fps", "60", "--quit-after", "420"], "IMPERATHEN_READY"),
         ]
+        if args.only:
+            unknown = set(args.only) - {entry[0] for entry in checks}
+            if unknown:
+                parser.error("Unknown checks: " + ", ".join(sorted(unknown)))
+            checks = [entry for entry in checks if entry[0] in args.only]
         for name, arguments, marker in checks:
             # Each executable scenario starts with its own account state. A
             # completed opening test must not become another test's Continue.
