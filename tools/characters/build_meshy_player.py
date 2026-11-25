@@ -72,7 +72,7 @@ def split_sword(body):
     selection|=(distance<.04)&(c[:,2]<.60)&(c[:,1]<.10)&(c[:,0]<-.035)
     ids={mesh.loop_triangles[i].polygon_index for i in np.flatnonzero(selection)}
     if not 500<len(ids)<len(mesh.polygons)*.18:raise ValueError('Sword selection outside reviewed limits: '+str(len(ids)))
-    sword=body.copy();sword.data=body.data.copy();sword.name='MeshyYouthSword';bpy.context.collection.objects.link(sword)
+    sword=body.copy();sword.data=body.data.copy();sword.name='PracticeBlade';bpy.context.collection.objects.link(sword)
     def retain(obj,wanted):
         bm=bmesh.new();bm.from_mesh(obj.data);bm.faces.ensure_lookup_table()
         remove=[face for face in bm.faces if (face.index in ids)!=wanted]
@@ -203,7 +203,7 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('--source',required=True);parser.add_argument('--inspection-blend');args=parser.parse_args(sys.argv[sys.argv.index('--')+1:])
     for path in (OUT,ART,DOC):path.mkdir(parents=True,exist_ok=True)
     body=prepare(args);sword,repair=split_sword(body);old,arm,rotation,center=create_rig();rig=bind_refit(body,sword,old,arm,rotation,center);animate(arm)
-    report={'task_id':TASK,'source_sha256':digest(args.source),'source_bytes':Path(args.source).stat().st_size,'source_license':'private user-owned Meshy output','blender':bpy.app.version_string,'repair':repair,'rig':rig,'clips':list(CLIPS),'lods':export_assets(body,sword,arm),'limits':['Fitted authored biped, no individual finger bones or facial blend shapes.','Source depicts an adolescent in armor; height is a design reference, not measured age anatomy.','Visual acceptance and Android frame/heat measurements are separate.']}
+    report={'task_id':TASK,'source_sha256':digest(args.source),'source_bytes':Path(args.source).stat().st_size,'source_license':'private user-owned Meshy output','sword_mesh_name':'PracticeBlade','sword_hidden_until_adult_equipment_authorization':True,'blender':bpy.app.version_string,'repair':repair,'rig':rig,'clips':list(CLIPS),'lods':export_assets(body,sword,arm),'limits':['Fitted authored biped, no individual finger bones or facial blend shapes.','Source depicts an adolescent in armor; height is a design reference, not measured age anatomy.','Visual acceptance and Android frame/heat measurements are separate.']}
     (DOC/'youth-build.json').write_text(json.dumps(report,indent=2)+'\n');print('YOUTH_BUILT',json.dumps(report),flush=True)
 
 if __name__=='__main__':main()
