@@ -6,7 +6,7 @@ extends RefCounted
 const ROOT := "res://assets/city_detail/characters/"
 const SOURCE_META := &"city_detail_original_material"
 const TIER_META := &"city_detail_profile"
-const KNOWN := ["HeroSkin", "FrontierSkin", "HeroLinen", "FrontierCloth", "HeroLeather"]
+const KNOWN := ["HeroSkin", "FrontierSkin", "HeroLinen", "FrontierCloth", "HeroLeather", "HeroHair", "FrontierGreyHair", "HeroEye", "FrontierEye", "FrontierGreyBeard"]
 static var _materials: Dictionary = {}
 
 
@@ -81,26 +81,34 @@ static func has_normal_basis(arrays: Array) -> bool:
 static func _make_material(original: StandardMaterial3D, tier: String) -> StandardMaterial3D:
 	var name := original.resource_name
 	var category := "skin" if name in ["HeroSkin", "FrontierSkin"] else ("linen" if name in ["HeroLinen", "FrontierCloth"] else "leather")
-	var normal := load(ROOT + category + "_detail_normal.png") as Texture2D
-	if normal == null:
-		return null
 	var material := original.duplicate() as StandardMaterial3D
 	material.set_meta(SOURCE_META, original)
 	material.set_meta(TIER_META, tier)
 	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
-	material.normal_enabled = true
-	material.normal_texture = normal
 	var full := tier == "very_high"
-	if category == "skin":
+	# Never discard authored face normals, hair textures, opacity or roughness.
+	if name in ["HeroHair", "FrontierGreyHair", "FrontierGreyBeard"]:
+		if original.roughness_texture == null:
+			material.roughness = clampf(original.roughness, 0.58, 0.86)
+		material.metallic_specular = 0.28
+		return material
+	if name in ["HeroEye", "FrontierEye"]:
+		if original.roughness_texture == null:
+			material.roughness = clampf(original.roughness, 0.22, 0.34)
+		material.metallic_specular = 0.45
+		return material
+	if not original.normal_enabled or original.normal_texture == null:
+		var normal := load(ROOT + category + "_detail_normal.png") as Texture2D
+		if normal == null:
+			return null
+		material.normal_enabled = true
+		material.normal_texture = normal
 		material.normal_scale = 1.0 if full else 0.8
+	if category == "skin" and original.roughness_texture == null:
 		var roughness := load(ROOT + "skin_detail_roughness.png") as Texture2D
 		if roughness == null:
 			return null
 		material.roughness_texture = roughness
 		material.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
 		material.roughness = 1.0
-	elif category == "linen":
-		material.normal_scale = 1.0 if full else 0.8
-	else:
-		material.normal_scale = 1.0 if full else 0.8
 	return material
