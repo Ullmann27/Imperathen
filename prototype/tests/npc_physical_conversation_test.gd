@@ -47,7 +47,7 @@ func _run() -> void:
 	world.set_physics_process(false)
 	await physics_frame
 	await physics_frame
-	var residents := world.village_life_world.actors
+	var residents: Dictionary = world.village_life_world.actors
 	_check(residents.has("julia") and residents.has("antonia"), "The real village creates both story market residents")
 	if not residents.has("julia") or not residents.has("antonia"):
 		quit(1)
@@ -70,7 +70,7 @@ func _run() -> void:
 	await physics_frame
 	_check(world.npc_sight_clear(speaker.global_position,listener.global_position),
 		"Two residents on a clear walkway see one another")
-	var open_contact := world.village_life_world._physical_social_contact("julia",speaker,intent,Vector3.ZERO)
+	var open_contact: Dictionary = world.village_life_world._physical_social_contact("julia",speaker,intent,Vector3.ZERO)
 	_check(not open_contact.is_empty(),"At 1.2 metres, mutually chosen neighbors may speak without obstacles")
 	var wall := _wall(world,Vector3(110.60,0,110.0),2.3)
 	await physics_frame
