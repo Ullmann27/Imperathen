@@ -154,7 +154,7 @@ func restore_world_contacts(state: Dictionary) -> void:
 	_world_initialized = true
 
 
-func plant_world_feet(action: String, phase: float, delta: float, stance: float) -> void:
+func plant_world_feet(action: String, phase: float, delta: float, stance: float, preserve_authored_roll: bool = false) -> void:
 	# Root translation and turning are owned by the collision body. A local
 	# animation alone cannot keep a planted sole at its world contact while the
 	# body turns or changes speed. Solve those same, unstretched leg lengths to
@@ -189,6 +189,27 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 		var foot: Transform3D = current * _pose[_ids["Foot_" + side]]
 		desired[side] = foot
 		var contact: Dictionary = _world_contacts.get(side, {})
+		if walking and preserve_authored_roll:
+			# Capture only central stance. The recorded heel strike, toe-off,
+			# vertical arc and ankle roll are part of the human gait; freezing
+			# them would turn the captured walk back into a mechanical march.
+			var central_stance := u >= 0.08 and u <= stance - 0.05
+			var corrected := foot
+			if central_stance:
+				if contact.is_empty() or u + 0.00001 < float(contact.phase):
+					contact = {"transform":foot,"phase":u}
+				contact.phase = u
+				var correction := Transform3D(contact.transform).origin - foot.origin
+				correction.y = 0.0
+				var envelope := smoothstep(0.08,0.17,u) * (1.0-smoothstep(stance-0.13,stance-0.05,u))
+				corrected.origin += correction.limit_length(0.075*current.basis.get_scale().y)*envelope
+				_world_contacts[side] = contact
+			else:
+				_world_contacts.erase(side)
+			_world_swings.erase(side)
+			targets[side] = corrected
+			_world_supported[side] = central_stance
+			continue
 		if supported:
 			_world_swings.erase(side)
 			if contact.is_empty() or (walking and u + 0.00001 < float(contact.phase)):
@@ -249,6 +270,8 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 	# the upper and lower leg at their actual rest lengths during a hard stop.
 	var lower_pelvis := 0.0
 	for side: String in targets:
+		if walking and preserve_authored_roll and Transform3D(targets[side]).origin.distance_to(Transform3D(desired[side]).origin)<0.001:
+			continue
 		var target: Vector3 = local_from_world * Transform3D(targets[side]).origin
 		var hip := _point("Thigh_" + side)
 		var reach := _rest[_ids["Shin_" + side]].origin.length() + _rest[_ids["Foot_" + side]].origin.length() - 0.001
@@ -264,6 +287,8 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 			_pose[bone] = skeleton.get_bone_global_pose(bone)
 	for side: String in targets:
 		var world_target: Transform3D = targets[side]
+		if walking and preserve_authored_roll and world_target.origin.distance_to(Transform3D(desired[side]).origin)<0.001 and lower_pelvis<=0.0:
+			continue
 		var local_target := local_from_world * world_target
 		# Keep the authored knee's bend plane. Forcing every imported rig to
 		# the same model-space pole can flip a knee while its sole is already

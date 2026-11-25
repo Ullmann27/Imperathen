@@ -15,6 +15,9 @@ const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
 const MESHY_YOUTH_PATH := "res://assets/characters/hero_meshy_italia_%d.glb"
+# ACCAD measured cycle distance, retargeted to the original 1.50 m youth.
+# The retarget report and the source-specific test verify these values.
+const YOUTH_MOCAP_STRIDES := {"march":1.36795,"run":2.38253}
 const FRONTIER_PATH := "res://assets/characters/frontier_%s_%d.glb"
 const APPEARANCES := ["civilian_man", "civilian_woman", "elder", "legionary", "officer", "spearman", "archer"]
 const CLOTH_TINTS := [Color(1.0, 1.0, 1.0), Color(0.72, 0.90, 1.10), Color(1.10, 0.75, 0.60), Color(0.75, 1.05, 0.79), Color(1.15, 1.06, 0.76), Color(0.76, 0.73, 0.84)]
@@ -259,7 +262,7 @@ func _reload(level: int) -> void:
 	_play(clip,saved_phase,0)
 	_face.pose("attack" if not _combat_id.is_empty() else clip,saved_phase,detail)
 	if not _combat_id.is_empty():
-		_motion.combat(_combat_id, _combat_progress)
+		_sample_combat_pose(_combat_id, _combat_progress)
 		_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
 	if active_model_path.begins_with("res://assets/meshy/characters/"):
 		MeshyEquipment.attach(body, meshy_asset_id, detail)
@@ -435,7 +438,11 @@ func sample_combat(technique: String, normalized: float) -> void:
 	_armed_style = ""
 	_conversation_focused = false
 	if _combat_id.is_empty():
-		_play("idle", 0.0, 0.0)
+		if _uses_youth_mocap() and animator.has_animation(technique):
+			_motion.capture_transition(0.10)
+			_motion.reset_world_contacts()
+		else:
+			_play("idle", 0.0, 0.0)
 	_combat_id = technique
 	_combat_progress = clampf(normalized, 0.0, 1.0)
 	_combat_external = true
@@ -444,7 +451,7 @@ func sample_combat(technique: String, normalized: float) -> void:
 	phase = _combat_progress
 	if _blade:
 		_blade.visible = false
-	_motion.combat(technique, _combat_progress)
+	_sample_combat_pose(technique, _combat_progress)
 	_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
 	_face.pose("attack", _combat_progress, detail)
 
@@ -596,11 +603,32 @@ func _locomotion_clip() -> String:
 	return "idle" if speed < stop_threshold else ("march" if speed < run_threshold else "run")
 
 
+func _uses_youth_mocap() -> bool:
+	# Never attach these source-specific tracks to another skin or adult rig.
+	return active_model_path.begins_with("res://assets/characters/hero_meshy_italia_") and is_instance_valid(animator) and animator.has_animation("jab_right")
+
+
+func _sample_combat_pose(technique: String, progress: float) -> void:
+	if _uses_youth_mocap() and animator.has_animation(technique):
+		# The domain owns elapsed time and contact windows. Use that exact
+		# phase, not an independently advancing cosmetic attack timer.
+		var animation := _playback_animation(technique,false)
+		if animator.current_animation != technique:
+			animator.play(technique,0.0)
+		animator.seek(clampf(progress,0.0,1.0)*animation.length,true)
+		animator.advance(0.0)
+		_motion.blend_transition()
+	else:
+		_motion.combat(technique,progress)
+
+
 func locomotion_stride(action: String) -> float:
 	# One complete cycle advances this distance in world metres. It must match
 	# the actual imported family, including attached Meshy and legacy soldiers;
 	# using the old villager stride for these rigs made their planted feet slide.
 	var model_scale := maxf(body.scale.y, 0.01) if body else 1.0
+	if _uses_youth_mocap() and YOUTH_MOCAP_STRIDES.has(action):
+		return float(YOUTH_MOCAP_STRIDES[action])*model_scale
 	if _motion.available and _motion.civilian:
 		return maxf(0.01, _motion.gait_stride(action, speed / model_scale) * model_scale)
 	var soldier_gait := active_model_path.begins_with("res://assets/soldiers/") or active_model_path.begins_with("res://assets/meshy/characters/") or active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
@@ -638,7 +666,9 @@ func _play(action: String, normalized: float, blend: float) -> void:
 		name_in_file = "attack" if action == "train" else "idle"
 	if not animator.has_animation(name_in_file): return
 	var animation := _playback_animation(name_in_file, action in LOOPS)
-	animator.play(name_in_file,blend)
+	# One transition owner on the motion-capture rig; avoid blending the
+	# AnimationPlayer and manual pose transition a second time.
+	animator.play(name_in_file,0.0 if _uses_youth_mocap() else blend)
 	animator.seek(phase*animation.length,true)
 	animator.advance(0)
 	_apply_motion()
@@ -755,7 +785,7 @@ func _process(delta: float) -> void:
 		if not _combat_external and _combat_duration > 0.0:
 			_combat_progress = minf(1.0, _combat_progress + delta / _combat_duration)
 			phase = _combat_progress
-			_motion.combat(_combat_id, _combat_progress)
+			_sample_combat_pose(_combat_id, _combat_progress)
 			_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
 			_face.advance(delta, "attack", detail)
 			if _combat_progress >= 1.0:
@@ -768,7 +798,7 @@ func _process(delta: float) -> void:
 			var next := _locomotion_clip()
 			if next != clip:
 				var carry_phase := phase if clip in ["march", "run"] and next in ["march", "run"] else 0.0
-				_play(next, carry_phase, 0.13)
+				_play(next, carry_phase, 0.20 if _uses_youth_mocap() else 0.13)
 	if animator and animator.is_playing():
 		var advance := delta
 		if clip in ["march","run"]:
@@ -788,7 +818,10 @@ func _plant_contacts(delta: float) -> void:
 		stance = 0.32 if clip == "run" else 0.53
 	elif active_model_path.contains("meshy/") or active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"):
 		stance = 0.40 if clip == "run" else 0.56
-	_motion.plant_world_feet(clip, phase, delta, stance)
+	var preserve_roll := _uses_youth_mocap() and clip in ["march","run"]
+	if preserve_roll:
+		stance = 0.35 if clip == "run" else 0.56
+	_motion.plant_world_feet(clip, phase, delta, stance,preserve_roll)
 
 
 func world_foot_supported(side: String) -> bool:

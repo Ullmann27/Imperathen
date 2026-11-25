@@ -1,6 +1,7 @@
 extends Node3D
 ## Independent free walk: no mission, economy or campaign simulation is started.
 signal leave_requested
+signal story_requested
 const Person := preload("res://scripts/visuals/village_person.gd")
 const State := preload("res://scripts/world/city_exploration_state.gd")
 const CameraObstruction := preload("res://scripts/world/camera_obstruction.gd")
@@ -12,6 +13,8 @@ const CitySurfaceMicrodetail := preload("res://scripts/rendering/city_surface_mi
 const VivaCloseupProps := preload("res://scripts/rendering/city_viva_closeup_props.gd")
 const CityAmbientPeople := preload("res://scripts/world/city_ambient_people.gd")
 const Crowd := preload("res://scripts/world/city_exploration_crowd.gd")
+const CityTraining := preload("res://scripts/world/city_training.gd")
+const CombatActions := preload("res://scripts/domain/combat_actions.gd")
 const VivaAtmosphere := preload("res://scripts/rendering/viva_roma_atmosphere.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
@@ -28,6 +31,9 @@ const CATALOG_PATH := "res://assets/world/city_catalog.json"
 const CATALOG_ORIGIN := Vector3(475,0,90)
 const WALK_SPEED := 1.45
 const RUN_SPEED := 3.8
+const WALK_ACCELERATION := 4.5
+const RUN_ACCELERATION := 6.0
+const BRAKING_DECELERATION := 8.0
 var profile := "balanced"
 var persist := true
 # Review toggle: keep an exact legacy light/ground path for comparison.
@@ -41,6 +47,7 @@ var city_available := false
 var youth_available := false
 var ambient_people: CityAmbientPeople
 var crowd := Crowd.new()
+var training := CityTraining.new()
 var _crowd_elapsed := 0.0
 var catalog: Array[Dictionary] = []
 var _catalog_nodes: Dictionary = {}
@@ -77,6 +84,7 @@ func _ready() -> void:
 	_load_city()
 	_build_player()
 	_build_camera()
+	add_child(training)
 	_build_ambient_people()
 	crowd.profile = profile
 	if is_instance_valid(ambient_people):
@@ -98,7 +106,7 @@ func _ready() -> void:
 	var renderer := get_node_or_null("/root/RuntimeDisplay")
 	if is_instance_valid(renderer):
 		renderer.set_sustained_scene(true)
-	print("IMPERATHEN_CITY_READY "+JSON.stringify({"city":city_available,"meshy_youth":youth_available,"catalog_families":catalog.size(),"campaign_started":false}))
+	print("IMPERATHEN_CITY_READY "+JSON.stringify({"city":city_available,"meshy_youth":youth_available,"selected_player_model":figure.active_model_path,"original_youth_active":youth_available and figure.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"),"catalog_families":catalog.size(),"campaign_started":false,"combat_mode":"authoritative_unarmed_training","mocap_active":figure._uses_youth_mocap()}))
 
 func _build_ground() -> void:
 	var ground := MeshInstance3D.new()
@@ -406,6 +414,7 @@ func _build_ui() -> void:
 	_toolbar.add_theme_constant_override("separation",8)
 	_toolbar.add_child(_button("Stadt",func(): teleport(State.SPAWN)))
 	_toolbar.add_child(_button("Modelle",func(): teleport(CATALOG_ORIGIN+Vector3(0,0.92,12))))
+	_toolbar.add_child(_button("Übung",func(): teleport(Vector3(0,0.92,-5.8))))
 	_toolbar.add_child(_button("Pause",func(): set_paused(not paused)))
 	_safe.add_child(_toolbar)
 	_trade_bar = HBoxContainer.new()
@@ -424,8 +433,8 @@ func _build_ui() -> void:
 	_actions.add_theme_constant_override("separation",8)
 	_pace = _button("Gehen",_toggle_pace)
 	_actions.add_child(_pace)
-	_actions.add_child(_button("Hieb",func(): perform_action("attack")))
-	_actions.add_child(_button("Abwehr",func(): perform_action("block")))
+	_actions.add_child(_button("Übungshieb",func(): perform_action("attack")))
+	_actions.add_child(_button("Deckung",func(): perform_action("block")))
 	_safe.add_child(_actions)
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.06,0.08,0.08,0.96)
@@ -440,6 +449,7 @@ func _build_ui() -> void:
 	description.add_theme_font_size_override("font_size",17)
 	column.add_child(description)
 	column.add_child(_button("Weiter erkunden",func(): set_paused(false)))
+	column.add_child(_button("Neues Leben · Geschichte beginnen",_request_story))
 	column.add_child(_button("Zum Hauptmenü",_request_leave))
 	_pause_panel.add_child(column)
 	_safe.add_child(_pause_panel)
@@ -469,7 +479,7 @@ func _layout_ui() -> void:
 	_pad.size = Vector2(178,178)
 	_pad.position = Vector2(0,_safe.size.y-182)
 	_actions.position = Vector2(maxf(0,_safe.size.x-328),_safe.size.y-(250 if portrait else 82))
-	_pause_panel.size = Vector2(minf(430,_safe.size.x),350)
+	_pause_panel.size = Vector2(minf(460,_safe.size.x),minf(430,_safe.size.y-16))
 	_pause_panel.position = (_safe.size-_pause_panel.size)*0.5
 
 func _physics_process(delta: float) -> void:
@@ -480,6 +490,15 @@ func _physics_process(delta: float) -> void:
 		_crowd_elapsed = 0.0
 		crowd.tick(player.position)
 	_action_left = maxf(0,_action_left-delta)
+	var combat_event: Dictionary = training.tick(delta)
+	var combat_state: Dictionary = training.state()
+	if bool(combat_event.get("practice",false)):
+		_catalog_status = "Kontrollierter Treffer am Übungspfahl: %d" % int(combat_state.get("practice_hits",0))
+		_update_status()
+	if not str(combat_state.get("technique","")).is_empty():
+		figure.sample_combat(str(combat_state.technique),float(combat_state.progress))
+	elif figure.clip == "jab_right":
+		figure.cancel_action()
 	var axis := _touch_move
 	axis.x += float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))-float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT))
 	axis.y += float(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN))-float(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP))
@@ -493,9 +512,15 @@ func _physics_process(delta: float) -> void:
 		var alignment := maxf(0,Vector3.FORWARD.rotated(Vector3.UP,figure.rotation.y).dot(direction))
 		speed *= lerpf(0.3,1,alignment)
 	var desired := direction*speed if _action_left<=0 else Vector3.ZERO
-	var acceleration := 8.0 if running else 5.0
-	player.velocity.x = move_toward(player.velocity.x,desired.x,delta*acceleration)
-	player.velocity.z = move_toward(player.velocity.z,desired.z,delta*acceleration)
+	# Constant-magnitude horizontal acceleration avoids faster diagonal starts.
+	# Combat input decelerates through the same physics path instead of hard
+	# resetting both axes, which used to cause an abrupt foot-plant snap.
+	var planar := Vector3(player.velocity.x,0.0,player.velocity.z)
+	var accelerating := desired.length_squared() > 0.0001 and planar.dot(desired) >= 0.0
+	var acceleration := (RUN_ACCELERATION if running else WALK_ACCELERATION) if accelerating else BRAKING_DECELERATION
+	planar = planar.move_toward(desired,maxf(delta,0.0)*acceleration)
+	player.velocity.x = planar.x
+	player.velocity.z = planar.z
 	player.velocity.y = -0.3 if player.is_on_floor() else player.velocity.y-19.6*delta
 	var previous_position := player.position
 	var horizontal_motion := Vector3(player.velocity.x,0,player.velocity.z)*delta
@@ -645,11 +670,22 @@ func _toggle_pace() -> void:
 func perform_action(action: String) -> void:
 	if paused or market.is_open() or _action_left>0 or action not in ["attack","block"]:
 		return
-	player.velocity.x = 0.0
-	player.velocity.z = 0.0
-	figure.drive(0)
-	figure.cue(action)
-	_action_left = maxf(0.01,figure._remaining)
+	var response: Dictionary = training.execute_attack(player.position,figure.rotation.y) if action == "attack" else training.execute_block()
+	if not bool(response.get("ok",false)):
+		_catalog_status = str(response.get("message","Kampfübung nicht verfügbar."))
+		_update_status()
+		return
+	# Authoritative action, stamina and hit windows are evaluated inside
+	# CityTraining, not from a cosmetic button or frame-rate-based timer.
+	# Preserve measured velocity: the physics solver brakes over time.
+	if action == "attack":
+		figure.sample_combat("jab_right",0.0)
+		_action_left = float(CombatActions.TECHNIQUES["jab_right"].duration)
+	else:
+		figure.cue("block")
+		_action_left = float(training.state().get("guard_remaining",0.85))
+	_catalog_status = str(response.get("message",""))
+	_update_status()
 
 func set_paused(value: bool) -> void:
 	if market.is_open():
@@ -712,12 +748,20 @@ func _request_leave() -> void:
 	if save_state()==OK:
 		leave_requested.emit()
 
+func _request_story() -> void:
+	# Return through the menu's existing new-game confirmation. Never
+	# overwrite a campaign save just because a sandbox button was pressed.
+	if save_state()==OK:
+		story_requested.emit()
+
 func _update_status() -> void:
-	var description := "Stadt · Modellpark · Gehen · Rennen · Kampfübungen"
+	var description := "Stadt · Modellpark · Gehen · Rennen · unbewaffnetes Übungstraining"
+	if not training.available:
+		description += " · Trainingspfahl nicht verfügbar"
 	if not city_available:
 		description = "Stadtmodell ist noch nicht importiert."
 	elif not youth_available:
-		description += " · Bisherige Figur als Rückfallmodell"
+		description += " · ORIGINAL-MESHY-JUNGE FEHLT: Ersatzmodell aktiv"
 	if not _catalog_status.is_empty():
 		description += "\n"+_catalog_status
 	_status.text = description

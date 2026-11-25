@@ -1,7 +1,7 @@
 name: IMPERATHEN isolated installable ARM64 QA – NOT a release
 on:
   push:
-    branches: ['feature/fold7-qa-installable-not-release-20261125']
+    branches: ['feature/fold7-qa-installable-not-release-20261125', 'fix/hero-identity-city-motion-20261125']
   pull_request:
     paths:
       - 'tools/build_unreleased_city_qa.py'
@@ -9,11 +9,11 @@ on:
       - 'prototype/**'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: unreleased-city-qa-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   signed-independent-arm64-city:
@@ -41,8 +41,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends blender python3-numpy
+          # Bound repository/network hangs; do not hold newer builds for 80 minutes.
+          timeout 180s sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update -q
+          timeout 240s sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install -y --no-install-recommends blender python3-numpy python3-scipy
           blender -b --python-expr "import numpy;print('NUMPY_BLENDER_AVAILABLE',numpy.__version__)"
           if [[ ! -x "$ANDROID_HOME/build-tools/35.0.1/apksigner" || ! -f "$ANDROID_HOME/platforms/android-35/android.jar" ]]; then
             "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;35.0.1' 'platforms;android-35'
@@ -60,6 +61,25 @@ jobs:
           cp "$RUNNER_TEMP/city/city_manifest.json" prototype/assets/world/roman_city_manifest.json
           python3 tools/world/check_city_release_assets.py --prototype prototype \
             --output artifacts/qa/asset-audit.json
+      - name: Import the user's already rigged original boy without new secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/characters/stage_original_youth.py \
+            --archive "$RUNNER_TEMP/imperathen-original-youth-runtime.zip" \
+            --report artifacts/qa/original-youth-status.json
+          test -s prototype/assets/characters/hero_meshy_italia_0.glb
+      - name: Retarget recorded human walk run and unarmed combat onto the exact original youth
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/youth-mocap"
+          curl -fLsS --retry 3 --connect-timeout 15 --max-time 90 'https://accad.ohio-state.edu/sites/accad.osu.edu/files/Male2_bvh.zip' -o "$RUNNER_TEMP/accad-male2.zip"
+          OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 /usr/bin/python3 tools/characters/retarget_accad_youth.py \
+            --archive "$RUNNER_TEMP/accad-male2.zip" --input prototype/assets/characters \
+            --output "$RUNNER_TEMP/youth-mocap" --report artifacts/qa/youth-mocap-report.json
+          cp "$RUNNER_TEMP"/youth-mocap/hero_meshy_italia_*.glb prototype/assets/characters/
+          cp artifacts/qa/youth-mocap-report.json prototype/assets/animations/accad_youth_motion.json
       - name: Download matching Godot and Android templates with SHA512 verification
         shell: bash
         run: |
@@ -99,13 +119,21 @@ jobs:
           "$GODOT_BIN" --headless --path prototype --script res://tests/roman_city_real_asset_test.gd \
             2>&1 | tee artifacts/qa/real-city-import.log
           grep -q ROMAN_CITY_REAL_ASSET_PASS artifacts/qa/real-city-import.log
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+          IMPERATHEN_REQUIRE_ORIGINAL_YOUTH=1 "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
             --script res://tests/roman_city_real_walk_test.gd \
             2>&1 | tee artifacts/qa/real-city-walk.log
           grep -q ROMAN_CITY_REAL_WALK_PASS artifacts/qa/real-city-walk.log
+          grep -Eq '"original_youth_active":true' artifacts/qa/real-city-walk.log
+          echo "IMPERATHEN_FIRST_PLAY_ORIGINAL_BOY_LOADED: matching Meshy youth used in a real Godot city session"
           "$GODOT_BIN" --headless --path prototype --script res://tests/city_crowd_layout_test.gd \
             2>&1 | tee artifacts/qa/crowd-layout.log
           grep -q CITY_CROWD_LAYOUT_PASS artifacts/qa/crowd-layout.log
+          "$GODOT_BIN" --headless --path prototype --script res://tests/city_training_test.gd 2>&1 | tee artifacts/qa/city-training.log
+          grep -q CITY_TRAINING_PASS artifacts/qa/city-training.log
+          "$GODOT_BIN" --headless --path prototype --script res://tests/mission_cinematics_test.gd 2>&1 | tee artifacts/qa/mission-cinematics.log
+          grep -q MISSION_CINEMATICS_PASS artifacts/qa/mission-cinematics.log
+          "$GODOT_BIN" --headless --path prototype --script res://tests/youth_mocap_test.gd 2>&1 | tee artifacts/qa/youth-mocap-runtime.log
+          grep -q YOUTH_MOCAP_RUNTIME_PASS artifacts/qa/youth-mocap-runtime.log
       - name: Create separate ephemeral QA signing key (NOT existing app certificate)
         shell: bash
         run: |
@@ -133,6 +161,27 @@ jobs:
             "artifacts/qa/$APK" > artifacts/qa/qa-signing-certificate.txt
           printf '%s\n' "APK is at.heinz.imperathen.qa; this does NOT update the original app." \
             > artifacts/qa/INSTALLATION-NOTE.txt
+      - name: Publish validated installable FIRST PLAY APK as an ordinary direct download
+        if: github.event_name == 'push' && github.ref == 'refs/heads/fix/hero-identity-city-motion-20261125'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          APK="artifacts/qa/IMPERATHEN-UNRELEASED-QA-${GITHUB_SHA:0:8}-arm64.apk"
+          TAG="first-play-qa-${GITHUB_SHA:0:8}"
+          test -s "$APK"
+          grep -q STAGED_VERIFIED_RUNTIME artifacts/qa/original-youth-status.json
+          grep -q YOUTH_MOCAP_RUNTIME_PASS artifacts/qa/youth-mocap-runtime.log
+          grep -Eq '"original_youth_active":true' artifacts/qa/real-city-walk.log
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" artifacts/qa/QA_SHA256SUMS.txt artifacts/qa/original-youth-status.json artifacts/qa/youth-mocap-report.json --clobber
+          else
+            gh release create "$TAG" --target "$GITHUB_SHA" --prerelease \
+              --title "IMPERATHEN FIRST PLAY – Originalfigur · Android QA" \
+              --notes "Separately signed ARM64 QA with the original 35-joint Meshy youth and 11 retargeted human motion clips (walk, run, six punches, two kicks and guard). Open Motion Project by ACCAD/The Ohio State University, CC BY 3.0; adapted by IMPERATHEN. https://accad.ohio-state.edu/research/motion-lab/mocap-system-and-data ; https://creativecommons.org/licenses/by/3.0/ . Not a production-signature update; full visual motion and physical Fold7 acceptance remain open." \
+              "$APK" artifacts/qa/QA_SHA256SUMS.txt artifacts/qa/original-youth-status.json artifacts/qa/youth-mocap-report.json
+          fi
       - name: Preserve generated test package, proof and error logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

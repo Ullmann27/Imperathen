@@ -6,7 +6,7 @@ signal shot_started(shot_id: String)
 signal shot_finished(shot_id: String)
 
 const HistoricalStage = preload("res://scripts/cinematic/i00_stage.gd")
-const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player"]
+const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player", "mission_dialogue", "mission_reaction"]
 const DEFAULT_ANCHORS := {
 	"road": Vector3(0, 0, 18),
 	"market": Vector3(-14, 0, 4),
@@ -29,6 +29,8 @@ var _labels: Array[Dictionary] = []
 var _original_camera_current := false
 var _completed := false
 var _speaker: Node3D
+var mission_actor_id := ""
+var _mission_rotations: Array[Dictionary] = []
 var _sun: DirectionalLight3D
 var _environment: Environment
 var _lighting: Dictionary = {}
@@ -269,6 +271,31 @@ func _apply_sample(normalized_time: float) -> void:
 			target_end = anchor + Vector3(0.8, 0.35, -1.4)
 			fov_start = 54.0
 			fov_end = 52.0
+		"mission_dialogue", "mission_reaction":
+			var focus_id := mission_actor_id if shot_id == "mission_dialogue" else "player"
+			var figure := _mission_figure(focus_id)
+			var partner := _mission_figure("player" if shot_id == "mission_dialogue" else mission_actor_id)
+			if not is_instance_valid(figure):
+				figure = _mission_figure("player")
+			var anchor := figure.global_position if is_instance_valid(figure) else _anchor("player")
+			var forward := -figure.global_basis.z if is_instance_valid(figure) else Vector3.FORWARD
+			forward.y = 0.0
+			if is_instance_valid(partner) and partner != figure:
+				var between := partner.global_position-anchor
+				between.y = 0.0
+				if between.length() > 0.2 and between.length() < 5.5:
+					forward = between.normalized()
+			if forward.length_squared() < 0.001:
+				forward = Vector3.FORWARD
+			forward = forward.normalized()
+			var lateral := Vector3.UP.cross(forward).normalized()
+			var face := anchor + Vector3.UP * 0.39
+			start = face + forward * 2.35 + lateral * 0.9 + Vector3.UP * 0.16
+			end = face + forward * 1.80 + lateral * 0.52 + Vector3.UP * 0.10
+			target_start = face
+			target_end = face + Vector3.UP * 0.02
+			fov_start = 43.0
+			fov_end = 38.0
 		"player":
 			var ground := _anchor("player") - Vector3.UP * 0.9
 			start = ground + Vector3(-1.5, 1.55, -2.4)
@@ -288,6 +315,17 @@ func _apply_sample(normalized_time: float) -> void:
 		var handle_b := ground + Vector3(-3.0, 1.9, 3.3)
 		camera.global_position = start.bezier_interpolate(handle_a, handle_b, end, eased)
 	var target := target_start.lerp(target_end, eased)
+	if shot_id in ["mission_dialogue","mission_reaction"]:
+		# Avoid placing a cutscene camera beyond a wall; only presentation moves.
+		var desired := camera.global_position
+		var query := PhysicsRayQueryParameters3D.create(target,desired,1)
+		var collision := get_world_3d().direct_space_state.intersect_ray(query)
+		if not collision.is_empty():
+			var hit: Vector3 = collision.position
+			var direction := (desired-target).normalized()
+			var shortened := hit-direction*0.16
+			if shortened.distance_to(target)>0.26:
+				camera.global_position = shortened
 	if camera.global_position.distance_squared_to(target) > 0.001:
 		camera.look_at(target, Vector3.UP)
 	camera.fov = lerpf(fov_start, fov_end, eased)
@@ -300,8 +338,32 @@ func _apply_sample(normalized_time: float) -> void:
 		camera.fov = _game_camera.fov
 
 
+func _mission_figure(actor_id: String) -> Node3D:
+	if not actor_id.is_empty() and is_instance_valid(_world) and _world.has_method("get_cinematic_figure"):
+		return _world.call("get_cinematic_figure",actor_id) as Node3D
+	return null
+
+
+func _face_mission_pair() -> void:
+	var npc := _mission_figure(mission_actor_id)
+	var player := _mission_figure("player")
+	if not is_instance_valid(npc) or not is_instance_valid(player) or npc == player:
+		return
+	var direction := npc.global_position-player.global_position
+	direction.y=0.0
+	if direction.length()<0.25 or direction.length()>5.5:
+		return
+	for pair: Array in [[player,direction],[npc,-direction]]:
+		var figure: Node3D = pair[0]
+		var look: Vector3 = pair[1]
+		_mission_rotations.append({"node":figure,"rotation":figure.global_rotation})
+		var angle := figure.global_rotation
+		angle.y=atan2(-look.x,-look.z)
+		figure.global_rotation=angle
+
+
 func _change_speaker(next_shot: String) -> void:
-	if next_shot == shot_id and is_instance_valid(_speaker):
+	if next_shot == shot_id and (is_instance_valid(_speaker) or next_shot in ["mission_dialogue","mission_reaction"]):
 		return
 	_release_speaker()
 	if next_shot in ["caesar_orders", "labienus_orders"]:
@@ -309,6 +371,12 @@ func _change_speaker(next_shot: String) -> void:
 		var figure := _ensure_i00_stage().call("speaker", historical_id) as Node3D
 		if figure and figure.has_method("sample_pose") and figure.has_method("reset_motion"):
 			_speaker = figure
+	elif next_shot in ["mission_dialogue","mission_reaction"]:
+		_face_mission_pair()
+		if next_shot == "mission_dialogue":
+			var figure := _mission_figure(mission_actor_id)
+			if is_instance_valid(figure) and figure.has_method("sample_pose") and figure.has_method("reset_motion"):
+				_speaker = figure
 	elif next_shot == "well":
 		var figure := _world.get_node_or_null("Marcus/Figure") as Node3D
 		if figure and figure.has_method("sample_pose") and figure.has_method("reset_motion"):
@@ -319,6 +387,10 @@ func _release_speaker() -> void:
 	if is_instance_valid(_speaker):
 		_speaker.reset_motion()
 	_speaker = null
+	for entry: Dictionary in _mission_rotations:
+		if is_instance_valid(entry.node):
+			entry.node.global_rotation = entry.rotation
+	_mission_rotations.clear()
 
 
 func _apply_grade(amount: float) -> void:

@@ -31,6 +31,9 @@ var season_index := -1
 const PLAYER_SPEED := 4.6
 const WALK_SPEED := 1.45
 const CHILD_RUN_SPEED := 3.8
+const PLAYER_WALK_ACCELERATION := 4.5
+const PLAYER_RUN_ACCELERATION := 6.0
+const PLAYER_BRAKING := 8.0
 const START_YAW := 0.62
 const START_PITCH := 0.18
 const PERSON_ZOOM_MIN := 1.25
@@ -190,6 +193,8 @@ func sync_state(state: Dictionary) -> void:
 	var player_data: Dictionary = _state.get("player", {})
 	var age := int(player_data.get("age", 12))
 	_figure.configure("player",_state.get("origin_id","italia"),age)
+	# The actual original youth is selected in the campaign as well as free city.
+	_figure.configure_meshy_youth(true)
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_figure.set_service_gear(CombatActions.service_gear(state))
 	_update_people_profile()
@@ -312,6 +317,18 @@ func get_cinematic_anchor(key: String) -> Vector3:
 			return to_global(Vector3(14.5, 0, 4.5))
 		"training": return to_global(TRAINING_LOCATION)
 		_: return get_player_position()
+
+
+func get_cinematic_figure(actor_id: String) -> Node3D:
+	if actor_id == "player":
+		return _figure if is_instance_valid(_figure) else null
+	if actor_id == "marcus":
+		return _companion.get_node_or_null("Figure") as Node3D if is_instance_valid(_companion) and _companion.visible else null
+	if is_instance_valid(village_life_world):
+		var actor: Variant = village_life_world.actors.get(actor_id)
+		if is_instance_valid(actor) and actor.visible:
+			return actor.get_node_or_null("Figure") as Node3D
+	return null
 
 
 func set_frontier_time(seconds: float) -> void:
@@ -1211,9 +1228,14 @@ func _move_player(delta: float) -> void:
 		top_speed *= lerpf(0.3, 1.0, alignment)
 	_turn_rate = angle_difference(previous_yaw, _figure.rotation.y) / maxf(delta, 0.000001)
 	var desired := direction * top_speed if not in_action else Vector3.ZERO
-	var acceleration := 9.0 if desired.length_squared() < 0.01 else (8.0 if running else 5.0)
-	_player.velocity.x = move_toward(_player.velocity.x, desired.x, delta * acceleration)
-	_player.velocity.z = move_toward(_player.velocity.z, desired.z, delta * acceleration)
+	# Match the CityExploration speed response. A single planar movement vector
+	# yields direction-independent acceleration; no diagonal velocity snap.
+	var planar := Vector3(_player.velocity.x, 0.0, _player.velocity.z)
+	var accelerating := desired.length_squared() > 0.0001 and planar.dot(desired) >= 0.0
+	var acceleration := (PLAYER_RUN_ACCELERATION if running else PLAYER_WALK_ACCELERATION) if accelerating else PLAYER_BRAKING
+	planar = planar.move_toward(desired,maxf(0.0,delta) * acceleration)
+	_player.velocity.x = planar.x
+	_player.velocity.z = planar.z
 	if _dodge_remaining > 0:
 		_dodge_remaining = maxf(0.0, _dodge_remaining - delta)
 		_player.velocity.x = _dodge_direction.x * 3.4
