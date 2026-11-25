@@ -1,0 +1,153 @@
+{
+  "format": "imperathen-city-idle-crowd",
+  "version": 1,
+  "description": "Twelve authored non-speaking street occupants on the existing main RomanCity street; animated idle if source GLBs contain idle clips; separate from physics-driven ambient trader/visitor pairs.",
+  "source": "tools/world/build_roman_test_city.py; Main_Streets 14 m wide on Blender y=-65 -> Godot z=65",
+  "authority": "presentation-only; no duplicate social decisions, commerce, or new player",
+  "entries": [
+    {
+      "id": "CityGuest01",
+      "path": "res://assets/characters/frontier_civilian_man_%d.glb",
+      "position": [
+        -64,
+        0.92,
+        61
+      ],
+      "heading": 1.1,
+      "role": "frontier_civilian_man",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest02",
+      "path": "res://assets/characters/frontier_civilian_woman_%d.glb",
+      "position": [
+        -53,
+        0.92,
+        67
+      ],
+      "heading": -0.8,
+      "role": "frontier_civilian_woman",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest03",
+      "path": "res://assets/characters/frontier_elder_%d.glb",
+      "position": [
+        -41,
+        0.92,
+        61
+      ],
+      "heading": 2.2,
+      "role": "frontier_elder",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest04",
+      "path": "res://assets/characters/frontier_legionary_%d.glb",
+      "position": [
+        -30,
+        0.92,
+        67
+      ],
+      "heading": -1.7,
+      "role": "frontier_legionary",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest05",
+      "path": "res://assets/characters/frontier_civilian_woman_%d.glb",
+      "position": [
+        -19,
+        0.92,
+        61
+      ],
+      "heading": 0.5,
+      "role": "frontier_civilian_woman",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest06",
+      "path": "res://assets/characters/frontier_civilian_man_%d.glb",
+      "position": [
+        -8,
+        0.92,
+        67
+      ],
+      "heading": 1.3,
+      "role": "frontier_civilian_man",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest07",
+      "path": "res://assets/characters/frontier_officer_%d.glb",
+      "position": [
+        4,
+        0.92,
+        61
+      ],
+      "heading": -2.4,
+      "role": "frontier_officer",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest08",
+      "path": "res://assets/characters/frontier_elder_%d.glb",
+      "position": [
+        16,
+        0.92,
+        67
+      ],
+      "heading": 0.9,
+      "role": "frontier_elder",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest09",
+      "path": "res://assets/characters/frontier_civilian_man_%d.glb",
+      "position": [
+        29,
+        0.92,
+        61
+      ],
+      "heading": -0.6,
+      "role": "frontier_civilian_man",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest10",
+      "path": "res://assets/characters/frontier_civilian_woman_%d.glb",
+      "position": [
+        40,
+        0.92,
+        67
+      ],
+      "heading": 1.8,
+      "role": "frontier_civilian_woman",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest11",
+      "path": "res://assets/characters/frontier_legionary_%d.glb",
+      "position": [
+        52,
+        0.92,
+        61
+      ],
+      "heading": -1.5,
+      "role": "frontier_legionary",
+      "behavior": "idle, no cross-wall conversation"
+    },
+    {
+      "id": "CityGuest12",
+      "path": "res://assets/characters/frontier_elder_%d.glb",
+      "position": [
+        64,
+        0.92,
+        67
+      ],
+      "heading": 2,
+      "role": "frontier_elder",
+      "behavior": "idle, no cross-wall conversation"
+    }
+  ]
+}

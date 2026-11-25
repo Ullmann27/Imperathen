@@ -62,6 +62,13 @@ func _check_city() -> void:
 	_check(residences.size()==240,"Runtime contains all 240 actual residential meshes")
 	_check(stalls.size()==63,"Runtime contains 63 individually accessible original market stalls")
 	_check(city.find_child("Main_Streets",true,false) is MeshInstance3D,"Real stone street is part of the GLB")
+	# Forum_Piazza and the worn paved stonework are already exported into the
+	# authoritative city GLB. Duplicating them in another optional GLB causes
+	# z-fighting and doubles the material/triangle budget.
+	_check(city.find_child("Forum_Piazza",true,false) is MeshInstance3D,
+		"The actual forum plaza is already present in the full RomanCity model")
+	_check(city.find_child("Forum_Worn_Stonework",true,false) is MeshInstance3D,
+		"Detailed worn forum paving is already present; no missing duplicate is required")
 	_check(city.find_child("Pistrinum_Bakery",true,false) is MeshInstance3D and
 		city.find_child("Fabrica_Blacksmith",true,false) is MeshInstance3D and
 		city.find_child("Mercator_Store",true,false) is MeshInstance3D,

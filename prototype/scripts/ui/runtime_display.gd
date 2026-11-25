@@ -247,6 +247,7 @@ func _process(_delta: float) -> void:
 			frame_p95 = frame_values[ceili(amount*0.95)-1]
 			frame_p99 = frame_values[ceili(amount*0.99)-1]
 		print("IMPERATHEN_DISPLAY_SAMPLE " + JSON.stringify({
+			"device_monotonic_ms": Time.get_ticks_msec(),
 			"gpu": RenderingServer.get_video_adapter_name(), "quality": _quality,
 			"renderer": RenderingServer.get_current_rendering_method(), "driver": RenderingServer.get_current_rendering_driver_name(),
 			"fps": 1000.0 / frame_ms, "frame_rate_limit": Engine.max_fps,

@@ -155,15 +155,25 @@ func _load_city() -> void:
 			add_child(temple_collision)
 			_add_static_colliders(temple_collision,"TempleCollision_")
 			temple_collision.queue_free()
-	var forum_detail := _scene(FORUM_DETAIL)
-	if forum_detail!=null:
-		forum_detail.name = "ForumPavingDetail"
-		add_child(forum_detail)
-	var forum_collision := _scene(FORUM_COLLISION)
-	if forum_collision!=null:
-		add_child(forum_collision)
-		_add_static_colliders(forum_collision,"ForumPavingCollision_")
-		forum_collision.queue_free()
+	# The actual 50 MB RomanCity GLB already contains Forum_Piazza and
+	# Forum_Worn_Stonework. Never place an obsolete external duplicate over
+	# those stones (z-fighting, redundant triangles and duplicated collision).
+	var embedded_forum := is_instance_valid(city) and (
+		is_instance_valid(city.find_child("Forum_Piazza",true,false))
+		and is_instance_valid(city.find_child("Forum_Worn_Stonework",true,false)))
+	if embedded_forum:
+		print("IMPERATHEN_FORUM_SOURCE " + JSON.stringify({
+			"source":"original_roman_city_glb","duplicate_external_loaded":false}))
+	else:
+		var forum_detail := _scene(FORUM_DETAIL)
+		if forum_detail!=null:
+			forum_detail.name = "ForumPavingDetail"
+			add_child(forum_detail)
+		var forum_collision := _scene(FORUM_COLLISION)
+		if forum_collision!=null:
+			add_child(forum_collision)
+			_add_static_colliders(forum_collision,"ForumPavingCollision_")
+			forum_collision.queue_free()
 	print("IMPERATHEN_CITY_DETAIL " + JSON.stringify(CityDetailAdapter.install(city, profile)))
 	# Read-only signboards are attached only to the six matching existing stalls.
 	# The market bridge independently verifies the same authored stands before enabling transactions.

@@ -1,0 +1,293 @@
+name: IMPERATHEN Fold7 candidate – real city, genuine APK, image checks
+
+on:
+  push:
+    branches: ['integration/fold7-release-candidate-20261125']
+  pull_request:
+    paths:
+      - 'prototype/**'
+      - 'tools/world/**'
+      - 'tools/build_android_prototype.py'
+      - 'tools/check_prototype.py'
+      - 'tests/android_package_isolation_test.py'
+      - '.github/workflows/fold7-city-apk.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fold7-city-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  real-city-arm64-qa-apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+      PRIVATE_MESHY_TEMPLE_URL: ${{ secrets.IMPERATHEN_PRIVATE_MESHY_TEMPLE_URL }}
+      UPDATE_KEYSTORE_B64: ${{ secrets.IMPERATHEN_UPDATE_KEYSTORE_B64 }}
+      UPDATE_SIGNER_SHA256: ${{ secrets.IMPERATHEN_UPDATE_SIGNER_SHA256 }}
+      UPDATE_KEY_ALIAS: ${{ secrets.IMPERATHEN_UPDATE_KEY_ALIAS }}
+      UPDATE_KEY_PASSWORD: ${{ secrets.IMPERATHEN_UPDATE_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Document immutable source and run isolated QA package tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/city artifacts/mobile
+          git rev-parse HEAD > artifacts/source-commit.txt
+          python3 -m unittest discover -s tests -p 'android_package_isolation_test.py' -v
+          python3 -m unittest discover -s tests -p 'android_*_test.py' -v
+      - name: Install Blender and verified glTF dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends blender python3-numpy ffmpeg
+          blender -b --python-expr "import numpy; print('BLENDER_NUMPY_OK',numpy.__version__)"
+      - name: Build original city, forum geometry and grounded NPC layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/city-export" prototype/assets/world
+          blender -b -t 2 --python-exit-code 1 --python tools/world/build_roman_test_city.py -- \
+            --output "$RUNNER_TEMP/city-export" --surface-style viva --texture-size 1024 \
+            > artifacts/city/blender.log 2>&1
+          grep -q CITY_BUILD_COMPLETE artifacts/city/blender.log
+          cp "$RUNNER_TEMP/city-export/imperathen_roman_test_city.glb" prototype/assets/world/roman_city_test.glb
+          cp "$RUNNER_TEMP/city-export/roman_city_collision.glb" prototype/assets/world/roman_city_collision.glb
+          cp "$RUNNER_TEMP/city-export/city_manifest.json" prototype/assets/world/roman_city_manifest.json
+          sha256sum prototype/assets/world/roman_city_test.glb prototype/assets/world/roman_city_collision.glb > artifacts/city/city-sha256.txt
+      - name: Import the original private Meshy temple if secure URL is available
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$PRIVATE_MESHY_TEMPLE_URL" ]]; then
+            echo "PRIVATE_TEMPLE_NOT_PRESENT: optional QA continues; full release stays blocked."
+            exit 0
+          fi
+          # The signed download link is never recorded in git, stdout, or artifacts.
+          umask 077
+          curl --fail --silent --show-error --location --retry 2 "$PRIVATE_MESHY_TEMPLE_URL" \
+            -o "$RUNNER_TEMP/original-private-temple.glb"
+          blender -b -t 2 --python-exit-code 1 --python tools/world/prepare_private_temple.py -- \
+            --input "$RUNNER_TEMP/original-private-temple.glb" \
+            --output "$RUNNER_TEMP/private-temple" \
+            > artifacts/city/temple-preparation.log 2>&1
+          cp "$RUNNER_TEMP"/private-temple/roman_meshy_temple_*.glb prototype/assets/world/
+          cp "$RUNNER_TEMP/private-temple/temple_review.json" prototype/assets/world/roman_temple_review.json
+          echo "PRIVATE_TEMPLE_LODS_PRESENT: actual privately supplied model; measured bounds in temple_review.json"
+      - name: Static audit of exact Roman city asset bytes and private blockers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/world/check_city_release_assets.py \
+            --prototype prototype --output artifacts/city/city-asset-audit.json
+      - name: Install official checksum-verified Godot engine and Android templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot" "$RUNNER_TEMP/templates/4.7.2.stable"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          curl --fail --location --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip" -o godot.zip
+          curl --fail --location --retry 3 "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz" -o templates.tpz
+          python3 - <<'PY'
+          import hashlib,os,pathlib,zipfile
+          root=pathlib.Path(os.environ["RUNNER_TEMP"])/"godot"
+          sums={line.split()[-1].lstrip("*"):line.split()[0] for line in (root/"SHA512-SUMS.txt").read_text().splitlines() if line.strip()}
+          for local,remote in (("godot.zip","Godot_v4.7.2-stable_linux.x86_64.zip"),("templates.tpz","Godot_v4.7.2-stable_export_templates.tpz")):
+              with (root/local).open("rb") as f: actual=hashlib.file_digest(f,"sha512").hexdigest()
+              if actual!=sums.get(remote): raise SystemExit("Official Godot SHA512 mismatch: "+remote)
+          with zipfile.ZipFile(root/"godot.zip") as z:z.extractall(root)
+          target=pathlib.Path(os.environ["RUNNER_TEMP"])/"templates/4.7.2.stable"
+          with zipfile.ZipFile(root/"templates.tpz") as z:
+              for name in ("android_debug.apk","android_release.apk","version.txt"):
+                  (target/name).write_bytes(z.read("templates/"+name))
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+          echo "TEMPLATE_DIR=$RUNNER_TEMP/templates/4.7.2.stable" >> "$GITHUB_ENV"
+      - name: Real Godot world, full movement regressions and built assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --report artifacts/engine-checks
+          python3 tools/motion_quality_gate.py --evidence artifacts/engine-checks
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+            --script res://tests/roman_city_real_asset_test.gd \
+            2>&1 | tee artifacts/city/real-assets.log
+          grep -q ROMAN_CITY_REAL_ASSET_PASS artifacts/city/real-assets.log
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+            --script res://tests/roman_city_real_walk_test.gd \
+            2>&1 | tee artifacts/city/real-walk.log
+          grep -q ROMAN_CITY_REAL_WALK_PASS artifacts/city/real-walk.log
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+            --script res://tests/city_crowd_layout_test.gd \
+            2>&1 | tee artifacts/city/crowd.log
+          grep -q CITY_CROWD_LAYOUT_PASS artifacts/city/crowd.log
+      - name: Pin Android SDK, JDK17 and prepare isolated signing identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -x "$ANDROID_HOME/build-tools/35.0.1/apksigner" || ! -f "$ANDROID_HOME/platforms/android-35/android.jar" ]]; then
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;35.0.1' 'platforms;android-35'
+          fi
+          test -x "$JAVA_HOME_17_X64/bin/keytool"
+          if [[ -n "$UPDATE_KEYSTORE_B64" && -n "$UPDATE_SIGNER_SHA256" &&
+                -n "$UPDATE_KEY_ALIAS" && -n "$UPDATE_KEY_PASSWORD" ]]; then
+            umask 077
+            printf '%s' "$UPDATE_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/original-update-keystore.jks"
+            echo "KEYSTORE_PATH=$RUNNER_TEMP/original-update-keystore.jks" >> "$GITHUB_ENV"
+            echo "KEYSTORE_ALIAS=$UPDATE_KEY_ALIAS" >> "$GITHUB_ENV"
+            echo "IMPERATHEN_EXPECTED_SIGNER_SHA256=$UPDATE_SIGNER_SHA256" >> "$GITHUB_ENV"
+            echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=$UPDATE_KEY_PASSWORD" >> "$GITHUB_ENV"
+            echo "SIGNING_MODE=original_certificate_pin_present" >> "$GITHUB_ENV"
+            echo "APK_PACKAGE=at.heinz.imperathen" >> "$GITHUB_ENV"
+            echo "QA_PACKAGE_FLAG=" >> "$GITHUB_ENV"
+          elif [[ -z "$UPDATE_KEYSTORE_B64" && -z "$UPDATE_SIGNER_SHA256" &&
+                  -z "$UPDATE_KEY_ALIAS" && -z "$UPDATE_KEY_PASSWORD" ]]; then
+            # A distinct QA application never overwrites the owner's existing
+            # IMPERATHEN installation, even with an ephemeral debug certificate.
+            export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android
+            "$JAVA_HOME_17_X64/bin/keytool" -genkeypair -noprompt -keystore "$RUNNER_TEMP/qa-debug.jks" \
+              -storepass:env GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD \
+              -keypass:env GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD -alias imperathen-qa \
+              -keyalg RSA -keysize 3072 -validity 365 \
+              -dname 'CN=IMPERATHEN QA Prototype, O=IMPERATHEN, C=AT'
+            echo "KEYSTORE_PATH=$RUNNER_TEMP/qa-debug.jks" >> "$GITHUB_ENV"
+            echo "KEYSTORE_ALIAS=imperathen-qa" >> "$GITHUB_ENV"
+            echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
+            echo "SIGNING_MODE=isolated_ephemeral_QA_not_update_compatible" >> "$GITHUB_ENV"
+            echo "APK_PACKAGE=at.heinz.imperathen.qa" >> "$GITHUB_ENV"
+            echo "QA_PACKAGE_FLAG=--qa-package" >> "$GITHUB_ENV"
+            echo "ORIGINAL_SIGNING_KEY_MISSING: QA APK only, original IMPERATHEN stays installed."
+          else
+            echo "Incomplete signing secrets: refusing to build an ambiguous update." >&2
+            exit 1
+          fi
+      - name: Build validated ARM64 Android APK without replacing installed app
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/mobile
+          if [[ "$APK_PACKAGE" == "at.heinz.imperathen" ]]; then
+            APK="IMPERATHEN-Fold7-update-${GITHUB_SHA:0:8}.apk"
+            args=()
+          else
+            APK="IMPERATHEN-Fold7-QA-${GITHUB_SHA:0:8}.apk"
+            args=(--qa-package)
+          fi
+          python3 tools/build_android_prototype.py \
+            --godot "$GODOT_BIN" --sdk-root "$ANDROID_HOME" \
+            --java-home "$JAVA_HOME_17_X64" --template-dir "$TEMPLATE_DIR" \
+            --keystore "$KEYSTORE_PATH" --keystore-user "$KEYSTORE_ALIAS" \
+            --motion-evidence artifacts/engine-checks \
+            --abi arm64-v8a --renderer compatibility \
+            --output "artifacts/mobile/$APK" --timeout 900 "${args[@]}"
+          "$ANDROID_HOME/build-tools/35.0.1/apksigner" verify --print-certs \
+            "artifacts/mobile/$APK" > artifacts/mobile/certificate-proof.txt
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path("artifacts/mobile")
+          name=next(x for x in p.glob("IMPERATHEN-*.apk") if x.is_file())
+          manifest={"apk":name.name,"package":os.environ["APK_PACKAGE"],
+            "signing_mode":os.environ["SIGNING_MODE"],
+            "installed_original_app_not_modified":True,
+            "original_update_install_verified_on_fold7":False,
+            "physical_fold7_20min_qa":"not_run",
+            "temple_private_model_required_for_full_release":
+              not pathlib.Path("prototype/assets/world/roman_temple_review.json").exists()}
+          (p/"DELIVERY_STATUS.json").write_text(json.dumps(manifest,indent=2)+"\n")
+          print("ANDROID_ARTIFACT_PREVIEW "+json.dumps(manifest))
+          PY
+          sha256sum artifacts/mobile/*.apk > artifacts/mobile/SHA256SUMS.txt
+      - name: Upload real APK and exact source-and-engine evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-fold7-qa-apk-${{ github.run_number }}
+          path: |
+            artifacts/source-commit.txt
+            artifacts/mobile/
+            artifacts/city/
+            artifacts/engine-checks/
+          if-no-files-found: warn
+          retention-days: 30
+
+  actual-city-visual-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Real framebuffer rendering setup
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends blender python3-numpy xvfb xauth libgl1-mesa-dri mesa-utils
+          mkdir -p "$RUNNER_TEMP/godot" artifacts/visual prototype/assets/world
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,zipfile
+          name='Godot_v4.7.2-stable_linux.x86_64.zip'
+          expected={x.split()[-1].lstrip('*'):x.split()[0] for x in Path('SHA512-SUMS.txt').read_text().splitlines() if x.strip()}
+          with open(name,'rb') as f: actual=hashlib.file_digest(f,'sha512').hexdigest()
+          if actual!=expected.get(name):raise SystemExit('Godot checksum mismatch')
+          with zipfile.ZipFile(name) as z:z.extractall()
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Build exact original city and import visual scene
+        shell: bash
+        run: |
+          set -euo pipefail
+          blender -b -t 2 --python-exit-code 1 --python tools/world/build_roman_test_city.py -- \
+            --output "$RUNNER_TEMP/roman-visual" --surface-style viva --texture-size 1024 \
+            > artifacts/visual/blender.log 2>&1
+          cp "$RUNNER_TEMP/roman-visual/imperathen_roman_test_city.glb" prototype/assets/world/roman_city_test.glb
+          cp "$RUNNER_TEMP/roman-visual/roman_city_collision.glb" prototype/assets/world/roman_city_collision.glb
+          cp "$RUNNER_TEMP/roman-visual/city_manifest.json" prototype/assets/world/roman_city_manifest.json
+          "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee artifacts/visual/godot-import.log
+      - name: Capture High and Very High actual Godot city at same three viewpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          for preset in high very_high; do
+            export IMPERATHEN_CITY_RENDER_PROFILE="$preset"
+            export IMPERATHEN_CITY_RENDER_OUTPUT="$GITHUB_WORKSPACE/artifacts/visual"
+            xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" \
+              --path prototype --audio-driver Dummy --rendering-method gl_compatibility \
+              --fixed-fps 60 --script res://tests/roman_city_visual_capture.gd \
+              2>&1 | tee "artifacts/visual/$preset.log"
+            grep -q ROMAN_CITY_VISUAL_PASS "artifacts/visual/$preset.log"
+            if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' "artifacts/visual/$preset.log"; then exit 1; fi
+          done
+      - name: Save unedited city framebuffers and actual renderer reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-city-original-framebuffers-${{ github.run_number }}
+          path: artifacts/visual/
+          if-no-files-found: warn
+          retention-days: 30

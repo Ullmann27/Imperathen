@@ -37,6 +37,10 @@ func _run() -> void:
 	root.add_child(scene)
 	await _physics_frames(8)
 	_check(scene.city_available,"Actual 50MB authored RomanCity is loaded into production CityExploration")
+	_check(scene.get_node("RomanCity").find_child("Forum_Worn_Stonework",true,false) is MeshInstance3D
+		and scene.find_children("ForumPavingDetail","Node3D",true,false).is_empty(),
+		"Actual forum paving uses the original city once, without duplicate overlay")
+	_check(scene.crowd.entries.size()==12,"Twelve distinct Roman boulevard occupants have an authored street placement")
 	_check(is_instance_valid(scene.player) and is_instance_valid(scene.figure.body),
 		"Existing young player has a real visual and physical body, not a synthetic replacement")
 	_check(is_instance_valid(scene.camera) and scene.camera.current,
