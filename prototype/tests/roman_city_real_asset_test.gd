@@ -51,7 +51,13 @@ func _check_city() -> void:
 	root.add_child(city)
 	city.name = "RomanCity"
 	root.add_child(colliders)
-	var residences := city.find_children("Residential_*","MeshInstance3D",true,false)
+	var residences: Array[Node] = []
+	# Residential_Roads is a single road mesh, not house no. 241.
+	# Authoritative house objects use Residential_###_<archetype>.
+	for candidate: Node in city.find_children("Residential_*","MeshInstance3D",true,false):
+		var sections := str(candidate.name).split("_")
+		if sections.size()==3 and sections[0]=="Residential" and sections[1].length()==3 and sections[1].is_valid_int():
+			residences.append(candidate)
 	var stalls := city.find_children("Market_*","MeshInstance3D",true,false)
 	_check(residences.size()==240,"Runtime contains all 240 actual residential meshes")
 	_check(stalls.size()==63,"Runtime contains 63 individually accessible original market stalls")
