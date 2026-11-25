@@ -201,6 +201,9 @@ func _reload(level: int) -> void:
 	var saved_phase := phase
 	var previous_path := active_model_path
 	var contacts := _motion.capture_world_contacts() if body and _motion_identity==identity else {}
+	var transition := _motion.capture_lod_transition() if body and _motion_identity==identity and level!=detail else {}
+	var previous_scale := body.scale if body else Vector3.ONE
+	var previous_detail := detail
 	var path := _path(level)
 	var replacement := _instantiate(path)
 	if not replacement and path != _legacy_path(level):
@@ -272,6 +275,11 @@ func _reload(level: int) -> void:
 		# already have moved while phase still names the previous stance.
 		# Keep the rendered contact, but preserve its real release history.
 		_motion.restore_world_contacts(contacts)
+	# Restore the exact displayed crossfade pose only between tiers of the
+	# same character family, after sampling and contact reconstruction.
+	# Keep the original transition clock; never restart it on each LOD swap.
+	if previous_path.ends_with("_%d.glb" % previous_detail) and path.ends_with("_%d.glb" % level) and previous_path.trim_suffix("_%d.glb" % previous_detail)==path.trim_suffix("_%d.glb" % level) and previous_scale.is_equal_approx(body.scale):
+		_motion.restore_lod_transition(transition)
 	# Retaining every hero PackedScene would also retain every embedded texture
 	# tier. Live instances keep their own references; inactive tiers may unload.
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
