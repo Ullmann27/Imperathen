@@ -159,7 +159,7 @@ class SigningIdentityFileTest(unittest.TestCase):
 
 class BuildPromotionSigningTest(unittest.TestCase):
     def run_build(self, directory: Path, actual_certificate: str, expected: str | None):
-        project = directory / "project"
+        project = directory / "prototype"
         project.mkdir()
         (project / "project.godot").write_text("synthetic test project")
         output = directory / "out" / "candidate.apk"
@@ -167,10 +167,15 @@ class BuildPromotionSigningTest(unittest.TestCase):
         output.write_bytes(b"previous successful APK")
         previous_proof = output.with_suffix(".build.json")
         previous_proof.write_text('{"source_commit":"previous","apk_sha256":"old"}')
-        args = argparse.Namespace(output=output, abi="arm64-v8a", renderer="compatibility", timeout=5)
+        args = argparse.Namespace(output=output, abi="arm64-v8a", renderer="compatibility", timeout=5,
+                                  motion_evidence=directory / "motion-evidence")
         toolchain = {"project": str(project), "sdk_root": str(directory / "sdk"), "validator": "validator.py",
                      "godot": "godot", "godot_version": "test-fixture", "abi": "arm64-v8a",
                      "package": "at.heinz.imperathen", "expected_signer_sha256": expected}
+
+        toolchain["source_sha256"] = BUILDER.source_fingerprint(project)
+        # This fixture tests signing and artifact promotion, not motion measurement.
+        motion_proof = {"source_fingerprint": "b" * 64, "source_commit": "a" * 40}
 
         def run(command, environment, label, **kwargs):
             if "--export-debug" in command:
@@ -181,7 +186,11 @@ class BuildPromotionSigningTest(unittest.TestCase):
                 report.write_text(json.dumps({"overall_status": "pass", "apk": {"sha256": BUILDER.file_sha256(apk)}}))
             return ""
 
-        with mock.patch.object(BUILDER, "configure_copy"), mock.patch.object(BUILDER, "write_isolated_settings"), \
+        with mock.patch.object(BUILDER, "REPOSITORY", directory), \
+                mock.patch.object(BUILDER, "require_export", return_value=motion_proof), \
+                mock.patch.object(BUILDER, "gate_digest", return_value="c" * 64), \
+                mock.patch.object(BUILDER, "verify_build_source"), \
+                mock.patch.object(BUILDER, "configure_copy"), mock.patch.object(BUILDER, "write_isolated_settings"), \
                 mock.patch.object(BUILDER, "run", side_effect=run), \
                 mock.patch.object(IDENTITY.subprocess, "run", return_value=completed(verifier_output(actual_certificate))):
             return BUILDER.build(args, toolchain, {"GITHUB_SHA": "a" * 40})
