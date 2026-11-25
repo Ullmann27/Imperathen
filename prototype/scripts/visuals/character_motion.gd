@@ -116,6 +116,55 @@ func advance(delta: float) -> void:
 	_transition_remaining = maxf(0.0, _transition_remaining - maxf(0.0, delta))
 
 
+func capture_lod_transition() -> Dictionary:
+	# An LOD change is not an animation event. Keep an active crossfade and
+	# its displayed local pose, not merely the destination clip and phase.
+	if not available or _transition_remaining <= 0.0:
+		return {}
+	var joints: Array[Dictionary] = []
+	for bone in skeleton.get_bone_count():
+		joints.append({
+			"name":skeleton.get_bone_name(bone),
+			"parent":skeleton.get_bone_parent(bone),
+			"rest":skeleton.get_bone_rest(bone),
+			"position":skeleton.get_bone_pose_position(bone),
+			"rotation":skeleton.get_bone_pose_rotation(bone),
+			"scale":skeleton.get_bone_pose_scale(bone)
+		})
+	return {"joints":joints,"positions":_transition_positions.duplicate(),
+		"rotations":_transition_rotations.duplicate(),
+		"remaining":_transition_remaining,"duration":_transition_duration}
+
+
+func restore_lod_transition(state: Dictionary) -> bool:
+	if not available or state.is_empty():
+		return false
+	var joints: Array = state.joints
+	var count := skeleton.get_bone_count()
+	if joints.size()!=count or state.positions.size()!=count or state.rotations.size()!=count:
+		return false
+	# Do not transfer local poses onto a different rig or anatomical rest
+	# shape. A failed compatibility check leaves its own sampled pose intact.
+	for bone in count:
+		var joint: Dictionary = joints[bone]
+		var rest: Transform3D = joint.rest
+		if joint.name!=skeleton.get_bone_name(bone) or int(joint.parent)!=skeleton.get_bone_parent(bone) or not rest.is_equal_approx(skeleton.get_bone_rest(bone)):
+			return false
+	_transition_positions.clear()
+	_transition_rotations.clear()
+	for bone in count:
+		var joint: Dictionary = joints[bone]
+		_transition_positions.append(state.positions[bone])
+		_transition_rotations.append(state.rotations[bone])
+		skeleton.set_bone_pose_position(bone,joint.position)
+		skeleton.set_bone_pose_rotation(bone,joint.rotation)
+		skeleton.set_bone_pose_scale(bone,joint.scale)
+	_transition_duration = float(state.duration)
+	_transition_remaining = float(state.remaining)
+	skeleton.force_update_all_bone_transforms()
+	return true
+
+
 func reset_world_contacts() -> void:
 	_world_contacts.clear()
 	_world_supported.clear()

@@ -145,6 +145,7 @@ func _run() -> void:
 	_check(actor.clip == "idle", "Zero actual displacement settles into idle")
 	actor.free()
 	_test_live_contact_transitions()
+	_test_lod_crossfade_continuity()
 	_test_first_gait_cycle()
 	_test_noncanonical_rest_axes()
 	print("CHARACTER_MOTION_TEST ", checks, " checks; ", failures.size(), " failed; stance_error_m=", max_stance_error)
@@ -199,6 +200,43 @@ func _test_live_contact_transitions() -> void:
 		_check(lod_shift<=.015,identity+" retains world foot contacts through LOD changes: "+str(lod_shift))
 		print("LIVE_CONTACT_RESULT ",identity," releases=",release_count," release_angle_deg=",release_angle," lod_shift_m=",lod_shift)
 		person.free()
+
+
+func _test_lod_crossfade_continuity() -> void:
+	# Real imported same-family rigs, not a synthetic animation stub.
+	var actor := Person.new()
+	root.add_child(actor)
+	actor.configure("player","italia",12)
+	actor.set_process(false)
+	actor._check_lod=10000.0
+	actor.sample_pose("idle",0.25)
+	actor.drive(0.0)
+	actor.set_conversation_focus(true)
+	actor._process(0.04)
+	var rig: Skeleton3D = actor._motion.skeleton
+	var before: Array[Transform3D] = []
+	rig.force_update_all_bone_transforms()
+	for bone in rig.get_bone_count():
+		before.append(rig.get_bone_global_pose(bone))
+	var remaining: float = actor._motion._transition_remaining
+	_check(remaining>0.0,"LOD crossfade fixture is partway through a real conversation transition")
+	actor._reload(1)
+	rig=actor._motion.skeleton
+	rig.force_update_all_bone_transforms()
+	var max_shift := 0.0
+	var max_angle := 0.0
+	_check(rig.get_bone_count()==before.size(),"Compatible LOD retains skeleton topology")
+	for bone in mini(rig.get_bone_count(),before.size()):
+		var pose := rig.get_bone_global_pose(bone)
+		max_shift=maxf(max_shift,pose.origin.distance_to(before[bone].origin))
+		max_angle=maxf(max_angle,rad_to_deg(pose.basis.orthonormalized().get_rotation_quaternion().angle_to(before[bone].basis.orthonormalized().get_rotation_quaternion())))
+	_check(max_shift<0.001 and max_angle<0.1,"LOD swap preserves displayed transition pose: "+str(max_shift)+" m, "+str(max_angle)+" deg")
+	_check(is_equal_approx(actor._motion._transition_remaining,remaining),"LOD swap does not restart or terminate crossfade")
+	actor._process(0.01)
+	_check(is_equal_approx(actor._motion._transition_remaining,remaining-0.01),"Crossfade clock continues after replacement")
+	actor._process(remaining)
+	_check(actor._motion._transition_remaining==0.0,"Crossfade still reaches its normal end")
+	actor.free()
 
 
 func _test_first_gait_cycle() -> void:
