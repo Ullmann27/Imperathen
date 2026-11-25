@@ -23,48 +23,132 @@ def plane_frame(forward, normal):
     x=unit(np.cross(y,z))
     return np.column_stack((x,y,z))
 
-def calibrate_soles(target, read_access):
-    """Use the sole's actual rest geometry, not the direction of a toe bone."""
+# The original Meshy youth is bound with both sandals rolled about 80 deg
+# inward (soles facing each other). Its lowest bind-pose vertices are therefore
+# the lateral foot wall, not the sole, and a "lowest points" plane fit is
+# ambiguous (it flipped across LODs and failed on LOD 3). The actual sandal
+# sole is the dominant connected flat slab of the Foot/Toe-skinned surface;
+# it is identical across all four LODs and mirror-symmetric left/right.
+SOLE_PATCH_DEGREES = 12.0        # coplanarity tolerance for region growing
+SOLE_MIN_AREA_M2 = 0.004         # 40 cm2: real sandal slab, not a strap
+SOLE_MIN_DOMINANCE = 1.5         # measured minimum 1.93 (LOD 1 right), LOD 0 >= 3.6
+SOLE_MAX_RESIDUAL_M = 0.004      # slab vertices within 4 mm of their plane
+SOLE_MAX_MIRROR_DEGREES = 12.0   # left/right slabs must mirror each other
+SOLE_CONTACT_BAND_M = 0.004      # vertices sampled as sole contact points
+
+
+def _foot_faces(target, read_access, side):
     d,b=target.d,target.b
     node=next(n for n in target.nodes if n.get("name")=="MeshyYouthBody")
-    points={"L":[],"R":[]}
-    for primitive in d["meshes"][node["mesh"]]["primitives"]:
+    ids=[target.joints.index(target.ids[n+"_"+side]) for n in ("Foot","Toe")]
+    for index,primitive in enumerate(d["meshes"][node["mesh"]]["primitives"]):
         a=primitive["attributes"]
-        if not {"POSITION","JOINTS_0","WEIGHTS_0"}.issubset(a):continue
-        v=read_access(d,b,a["POSITION"])
+        if not {"POSITION","JOINTS_0","WEIGHTS_0"}.issubset(a) or "indices" not in primitive:continue
+        v=read_access(d,b,a["POSITION"]).astype(float)
         j=read_access(d,b,a["JOINTS_0"]).astype(int)
         w=read_access(d,b,a["WEIGHTS_0"])
-        for side in points:
-            ids=[target.joints.index(target.ids[n+"_"+side]) for n in ("Foot","Toe")]
-            mask=((w*np.isin(j,ids)).sum(1)>.55)&(v[:,1]<.14)
-            points[side].extend(v[mask])
+        weight=(w*np.isin(j,ids)).sum(1)
+        faces=read_access(d,b,primitive["indices"]).reshape(-1,3).astype(int)
+        keep=(weight[faces].mean(1)>.5)&(v[faces][:,:,1].mean(1)<.14)
+        yield index,v,weight,faces[keep]
+
+
+def sole_patch(target, read_access, side):
+    """Largest connected coplanar Foot/Toe surface: the real sandal sole."""
+    best=[]
+    for index,v,weight,faces in _foot_faces(target,read_access,side):
+        if not len(faces):continue
+        p0,p1,p2=v[faces[:,0]],v[faces[:,1]],v[faces[:,2]]
+        cross=np.cross(p1-p0,p2-p0)
+        area=np.linalg.norm(cross,axis=1)/2
+        normal=cross/np.maximum(2*area[:,None],1e-12)
+        # Weld UV/normal seams so the slab is one connected component.
+        weld={}
+        welded=np.array([weld.setdefault(tuple(k),len(weld)) for k in np.round(v,5)])
+        edges={}
+        for f,(x,y,z) in enumerate(welded[faces]):
+            for e in ((x,y),(y,z),(z,x)):edges.setdefault((min(e),max(e)),[]).append(f)
+        neighbours=[[] for _ in faces]
+        for shared in edges.values():
+            for f in shared:neighbours[f].extend(g for g in shared if g!=f)
+        seen=np.zeros(len(faces),bool)
+        limit=math.cos(math.radians(SOLE_PATCH_DEGREES))
+        for seed in np.argsort(-area,kind="stable"):
+            if seen[seed]:continue
+            component=[seed];seen[seed]=True;queue=[seed]
+            while queue:
+                current=queue.pop()
+                for other in neighbours[current]:
+                    if not seen[other] and normal[other]@normal[seed]>limit:
+                        seen[other]=True;component.append(other);queue.append(other)
+            best.append((float(area[component].sum()),index,v,weight,faces[component],normal[component],area[component]))
+    if not best:raise ValueError("No skinned sandal surface "+side)
+    best.sort(key=lambda item:-item[0])
+    _,index,v,weight,faces,normals,areas=best[0]
+    outward=unit((normals*areas[:,None]).sum(0))
+    centre=v[np.unique(faces)].mean(0)
+    # Decimated LODs split the slab into non-adjacent fragments. A fragment
+    # belongs to the sole only if it has the same orientation and every one
+    # of its vertices lies on the slab plane. Only a flat surface with a
+    # different orientation (beyond the coplanarity tolerance) competes, since
+    # the calibrated quantity is the sole orientation.
+    limit=math.cos(math.radians(SOLE_PATCH_DEGREES))
+    second=0.
+    for total_,index_,v_,_,faces_,normals_,areas_ in best[1:]:
+        direction=unit((normals_*areas_[:,None]).sum(0))
+        distance=np.abs((v_[np.unique(faces_)]-centre)@outward).max()
+        if direction@outward<=limit:second=max(second,total_)
+        elif index_==index and distance<=SOLE_MAX_RESIDUAL_M:
+            faces=np.concatenate([faces,faces_]);normals=np.concatenate([normals,normals_]);areas=np.concatenate([areas,areas_])
+    total=float(areas.sum())
+    outward=unit((normals*areas[:,None]).sum(0))
+    corners=v[np.unique(faces)]
+    centre=corners.mean(0)
+    residual=float(np.abs((corners-centre)@outward).max())
+    if total<SOLE_MIN_AREA_M2:
+        raise ValueError(f"Original sandal sole too small {side}: {total:.5f} m2")
+    if second>0 and total/second<SOLE_MIN_DOMINANCE:
+        raise ValueError(f"Original sandal sole ambiguous {side}: dominance {total/second:.2f}")
+    if residual>SOLE_MAX_RESIDUAL_M:
+        raise ValueError(f"Original sandal sole not planar {side}: {residual:.4f} m")
+    return {"primitive":index,"normal":-outward,"offset":float(outward@centre),
+            "area_m2":total,"dominance":(total/second if second>0 else None),
+            "faces":len(faces),"residual_m":residual,"centre":centre}
+
+
+def calibrate_soles(target, read_access):
+    """Use the actual sandal sole slab, not the lowest bind-pose vertices."""
     forward=unit(np.cross(target.pelvis_frame[:,0],UP))
     result={}
     for side,sign in (("L",1),("R",-1)):
-        p=np.unique(np.round(np.asarray(points[side]),5),axis=0)
-        if len(p)<12:raise ValueError("Too few real sandal vertices "+side)
-        # Fit the lower surface, retaining the forefoot as well as the heel.
+        patch=sole_patch(target,read_access,side)
+        normal=patch["normal"]
+        # The slab belongs to this foot and faces away from its interior.
+        ankle=target.pos("Foot_"+side)
+        if float((patch["centre"]-ankle)@-normal)<=0:
+            raise ValueError("Sandal sole faces into the foot "+side)
         direction=target.pos("Toe_"+side)-target.pos("Foot_"+side)
-        longitudinal=unit(np.array([direction[0],0.,direction[2]]))
-        if np.linalg.norm(longitudinal)<.5:longitudinal=forward
-        projection=p@longitudinal
-        pieces=[]
-        for segment in np.array_split(p[np.argsort(projection)],6):
-            if len(segment):
-                count=max(3,math.ceil(len(segment)*.28))
-                pieces.extend(segment[np.argsort(segment[:,1])[:count]])
-        low=np.asarray(pieces)
-        _,_,vh=np.linalg.svd(low-low.mean(0),full_matrices=False)
-        normal=vh[-1]
-        if normal[1]<0:normal=-normal
-        if normal[1]<.35:
-            raise ValueError("Original sandal plane is too ambiguous to flatten "+side)
         rest=plane_frame(direction,normal)
         # Slight outward toe angle, anatomically consistent on both sides.
         neutral=plane_frame(R.from_rotvec(UP*(sign*.075)).apply(forward),UP)
-        result[side]={"rest":rest,"neutral":neutral,"samples":len(low),
-                      "rest_normal":normal.tolist()}
+        result[side]={"rest":rest,"neutral":neutral,"samples":patch["faces"],
+                      "rest_normal":normal.tolist(),"plane_offset":patch["offset"],
+                      "area_m2":patch["area_m2"],"dominance":patch["dominance"],
+                      "residual_m":patch["residual_m"],"primitive":patch["primitive"]}
+    mirrored=np.array(result["R"]["rest_normal"])*np.array([-1.,1.,1.])
+    mirror=math.degrees(math.acos(float(np.clip(np.dot(result["L"]["rest_normal"],mirrored),-1,1))))
+    if mirror>SOLE_MAX_MIRROR_DEGREES:
+        raise ValueError(f"Left/right sandal soles are not mirrored: {mirror:.1f} deg")
+    for side in result:result[side]["mirror_deg"]=mirror
     return result
+
+def sole_contact_mask(info,positions):
+    """Vertices on, or protruding beyond, the calibrated sandal sole plane.
+
+    Curved heel/toe ends of the sandal protrude up to ~2 cm past the flat
+    slab; they touch the floor first when the foot pitches."""
+    normal=np.asarray(info["rest_normal"],float)
+    return positions@normal+info["plane_offset"]<=SOLE_CONTACT_BAND_M
 
 def pitch_of(v):
     return math.atan2(float(v[1]),float(np.linalg.norm(v[[0,2]])))
