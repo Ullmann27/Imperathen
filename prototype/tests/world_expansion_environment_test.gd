@@ -158,6 +158,44 @@ func _test_layouts() -> Dictionary:
 		only_small_buildings = only_small_buildings and building.asset == "shop"
 	_check(village.building_count == 48 and village.unique_building_modules == 1 and only_small_buildings, "Village allowlist excludes multi-storey urban and civic modules")
 	_check(not Layout.generate({"count": 4, "allowed_building_ids": ["unavailable"]}, BUILDINGS, PLANTS).ok, "Unknown asset restrictions cannot silently select another building")
+	var planned_services := [
+		{"id": "grain", "building": "shop"},
+		{"id": "tavern", "building": "shop"},
+		{"id": "smith", "building": "shop"}
+	]
+	var zone_config := {"id": "zoning", "count": 1024, "spacing": 26.0, "seed": 1926}
+	var zoned: Dictionary = Layout.generate(zone_config, BUILDINGS, PLANTS, ROADS, planned_services)
+	var used_assets := {}
+	var orientations := {}
+	var buildings_by_id := {}
+	var parcels_clear := true
+	for building: Dictionary in zoned.buildings:
+		used_assets[str(building.asset)] = true
+		buildings_by_id[str(building.id)] = building
+		orientations[roundi(float(building.yaw) / (PI * 0.5)) % 4] = true
+		parcels_clear = parcels_clear and float(building.footprint[0]) + 2.0 <= zoned.spacing
+		parcels_clear = parcels_clear and float(building.footprint[1]) + 2.0 <= zoned.spacing
+		parcels_clear = parcels_clear and float(building.scale) > 0.0 and float(building.scale) <= 1.04
+	_check(used_assets.size() == 3 and orientations.size() == 4, "City districts contain civic, residential and shop meshes facing four streets")
+	_check(parcels_clear, "Rotated and scaled asymmetric buildings keep a strict two-metre parcel clearance")
+	_check(int(zoned.district_totals.forum) > 0 and int(zoned.district_totals.market) > 0 and int(zoned.district_totals.residential) > 0, "Forum, market and residential districts are each represented")
+	var sum_districts := 0
+	for amount in zoned.district_totals.values():
+		sum_districts += int(amount)
+	_check(sum_districts == 1024, "Every city building belongs to exactly one district")
+	var roles := {}
+	var valid_services := true
+	for site: Dictionary in zoned.service_sites:
+		roles[str(site.service_id)] = true
+		valid_services = valid_services and buildings_by_id.has(str(site.building_id))
+		if buildings_by_id.has(str(site.building_id)):
+			var linked: Dictionary = buildings_by_id[str(site.building_id)]
+			valid_services = valid_services and linked.asset == "shop" and linked.position == site.position
+			valid_services = valid_services and linked.service_id == site.service_id
+	_check(valid_services and zoned.service_sites.size() > 12 and zoned.service_sites.size() < 300, "Service anchors attach to actual shop buildings without inventing inventory")
+	_check(roles.size() == 3, "Every supplied merchant category receives at least one actual building anchor")
+	_check(zoned == Layout.generate(zone_config, BUILDINGS, PLANTS, ROADS, planned_services), "Districts, shop anchors, rotated facades and proportions are deterministic")
+	evidence["districts"] = {"counts": zoned.district_totals, "merchant_anchors": zoned.service_sites.size(), "facade_directions": orientations.size()}
 	evidence["layouts"] = reports
 	completed_stages.append("layout")
 	return output
@@ -315,6 +353,25 @@ func _test_preview_presentation() -> void:
 		preview.set_quality("high")
 		preview.controller.set_time_of_day(13.25)
 		preview.controller.set_wind(0.0)
+		var ember_count := preview._market_lights.size()
+		_check(ember_count > 0 and ember_count <= Preview.MAX_MARKET_LIGHTS, "A village has a bounded number of real shop-front fire lights")
+		_check(preview._ground.material_override is ShaderMaterial and (preview._ground.material_override as ShaderMaterial).shader == Preview.GROUND_SHADER, "The actual landscape uses the authored world-coordinate soil material")
+		preview.set_quality("low")
+		var ground_material: ShaderMaterial = preview._ground.material_override
+		_check(is_zero_approx(float(ground_material.get_shader_parameter("detail_strength"))), "Low profile disables expensive soil-noise computation")
+		preview.set_quality("very_high")
+		_check(is_equal_approx(float(ground_material.get_shader_parameter("detail_strength")), 1.0), "Very high profile restores full authored ground detail")
+		preview.set_quality("high")
+		preview.controller.set_time_of_day(0.0)
+		var after_dark := true
+		for lamp: OmniLight3D in preview._market_lights:
+			after_dark = after_dark and lamp.visible and lamp.light_energy > 1.0
+		_check(after_dark, "Night immediately activates warm local market illumination")
+		preview.controller.set_time_of_day(13.25)
+		var daylight_off := true
+		for lamp: OmniLight3D in preview._market_lights:
+			daylight_off = daylight_off and not lamp.visible and is_zero_approx(lamp.light_energy)
+		_check(daylight_off, "Daylight immediately disables market fire lights and their renderable sources")
 		var controls: Dictionary = preview.diagnostics().controls
 		_check(controls.quality == "high", "The quality selector immediately reflects set_quality(high)")
 		_check(is_equal_approx(controls.time_of_day, 13.25), "The time slider immediately reflects an API clock change")

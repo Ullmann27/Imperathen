@@ -188,3 +188,13 @@ Innenraumwege, alle Geschosstreppen, Kollisionen, Einwohner und wirtschaftliche
 Abläufe sind nicht durch diese Assetkontrolle abgenommen. Mobile Leistung muss
 mit der integrierten Welt auf dem Zielgerät gemessen werden. Die Storydateien
 wurden für dieses Weltbaupaket nicht ausgewertet.
+
+## Nachtrag 25.11.2026 – Stadtbezirke, Nachtlicht und mobile Bodenprofile
+
+Der jüngste erfolgreiche Quellcommit ist `2452d9f5034041b7ee99e48a7824161f3e20a365` mit [CI 45634331129](https://github.com/Ullmann27/Imperathen/actions/runs/45634331129) (133/133 Assertions in beiden Godot-Varianten). Seit dem ersten Export enthält jeder Gebäude-Datensatz die beschreibende Bezirkskennung `district`, eine um die Fassade rotierte, skaliert-korrekte `footprint` und optional die `service_id`. `service_sites` sind echte Weltkoordinaten mit Gebäudereferenz im Layoutmanifest – noch keine Kaufsteuerung. Das Dorf verwendet weiterhin nur das Taberna-Grundmodell und benötigt echte verschiedene Wohnhäuser.
+
+`prototype/shaders/world_expansion/ground_detail.gdshader` mischt den vorhandenen Bodenton mit prozeduralem Erd-/Grasrauschen. Der Weltcontroller setzt `detail_strength=0` im Profil `low`; `balanced/high/very_high` verwenden abgestufte Werte. In der Vorschau können höchstens acht Händler-Lichtquellen gleichzeitig existieren; Schatten sind abgeschaltet, Licht wird tagsüber deaktiviert. Diese vereinfachten Leuchtquellen sind Platzhalter und sollen später mit historischen 3D-Lichtobjekten verbunden werden.
+
+Der parallel gestartete [VIVA-ROMA-PR #71](https://github.com/Ullmann27/Imperathen/pull/71) berührt ebenfalls `prototype/shaders/world_expansion/vegetation_wind.gdshader`; seine erweiterte Böenformel muss beim späteren Übernehmen gezielt mit den importierten Windgewichten abgestimmt werden. Es gibt **keinen** automatischen Merge in die Stadtmissionen und noch keine mobilen Leistungsdaten.
+
+Mehr Details: [DELIVERY.md](DELIVERY.md), [VISUAL_REVIEW.md](VISUAL_REVIEW.md).

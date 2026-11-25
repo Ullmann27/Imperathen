@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Retarget measured ACCAD human motion to the unchanged 35-joint Meshy youth.
 
-Only new animation accessors/channels are appended; mesh, material, skin,
-inverse bind matrices and node rest transforms are untouched. No source mesh
-or root travel is imported. The CharacterBody owns horizontal translation.
+Append motion and, only when actual sampled edge deformation improves,
+corrected garment weight accessors. Positions, topology, materials, inverse
+bind matrices and node rest transforms remain unchanged. CharacterBody owns travel.
 """
 from __future__ import annotations
 import argparse, hashlib, json, math, struct, urllib.request, zipfile
@@ -11,6 +11,8 @@ from pathlib import Path
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 from accad_bvh import load_bvh, unit
+from youth_skin_polish import repair
+from youth_anatomy import calibrate_soles,source_foot_angles,foot_global,toe_global,neutral_idle,original_structure,remove_start_weapon
 
 SOURCE_URL="https://accad.ohio-state.edu/sites/accad.osu.edu/files/Male2_bvh.zip"
 SOURCE_SHA="f30dc56f8557d4b9f1bd6b8b0c4218c076471de0a9c1a20f3bc4a8b776cc14b1"
@@ -36,6 +38,15 @@ def digest(b):return hashlib.sha256(b).hexdigest()
 def frame(left,up):
     x=unit(left);y=unit(up-x*np.dot(x,up));z=unit(np.cross(x,y))
     return np.stack([x,y,z],axis=1)
+def foot_frame(forward,across):
+    # Resolve twist around the toe direction using the measured lateral
+    # orientation instead of an arbitrary minimal-swing ankle rotation.
+    z=unit(forward);x=across-z*np.dot(across,z)
+    if np.linalg.norm(x)<1e-6:
+        axis=np.eye(3)[np.argmin(abs(z))];x=axis-z*np.dot(axis,z)
+    x=unit(x);y=unit(np.cross(z,x))
+    return np.stack([x,y,z],axis=1)
+
 def swing(a,b):
     a,b=unit(a),unit(b);dot=np.clip(np.dot(a,b),-1,1)
     cross=np.cross(a,b);s=np.linalg.norm(cross)
@@ -88,6 +99,11 @@ class Target:
         self.spine_frame=frame(self.pos("Arm_L")-self.pos("Arm_R"),self.pos("Head")-self.pos("Pelvis"))
         self.leg_length=sum(np.linalg.norm(self.t[self.ids[x]]) for x in ("Shin_R","Foot_R"))
         self.foot_points={}
+        self.review_poses={}
+        self.foot_frames={}
+        for side in ("L","R"):
+            self.foot_frames["Foot_"+side]=foot_frame(self.pos("Toe_"+side)-self.pos("Foot_"+side),self.pelvis_frame[:,0])
+            self.foot_frames["Toe_"+side]=foot_frame(self.rest_r[self.ids["Toe_"+side]]@UP,self.pelvis_frame[:,0])
         inv=read_access(d,b,d["skins"][0]["inverseBindMatrices"]).reshape(-1,4,4).transpose(0,2,1)
         # Real lower sole vertices from original textured skin, not a capsule
         # approximation. Exclude the sword mesh from grounding.
@@ -109,6 +125,7 @@ class Target:
                 local=np.einsum("nkij,nj->nki",inv[j[ii]],pts)
                 self.foot_points.setdefault(side,[]).append((j[ii],w[ii],local))
         if set(self.foot_points)!={"L","R"}:raise ValueError("Both actual soles must be sampled")
+        self.sole_frames=calibrate_soles(self,read_access)
     def pos(self,n):return self.rest_p[self.ids[n]]
     def fk(self,rot,shift=None):
         g={};p={}
@@ -124,7 +141,7 @@ class Target:
             point=np.einsum("nkij,nkj->nki",matrices[j],local)
             out.append((point*w[...,None]).sum(1)[:,1].min())
         return float(min(out))
-    def pose(self,src,names,A):
+    def pose(self,src,names,A,foot_angles):
         idx={n:i for i,n in enumerate(names)}
         v=lambda a,b:A@(src[idx[b]]-src[idx[a]])
         desired={}
@@ -151,15 +168,20 @@ class Target:
             elif name in axes:
                 a,b,axis=axes[name]
                 if name=="Head":axis=UP
-                g=swing(base@axis,v(a,b))@base
+                direction=v(a,b)
+                if name.startswith("Foot_"):
+                    g=foot_global(self,name[-1],foot_angles[name[-1]][0])
+                elif name.startswith("Toe_"):
+                    g=toe_global(self,name[-1],pr,foot_angles[name[-1]][1])
+                else:g=swing(base@axis,direction)@base
             else:g=base
             local[i]=pr.T@g;glob[i]=g
         return local
-    def append(self,array,kind):
-        array=np.asarray(array,dtype="<f4").reshape(-1,TYPE_N[kind]);raw=array.tobytes()
+    def append(self,array,kind,component_type=5126):
+        array=np.asarray(array,dtype=np.dtype(DTYPE[component_type]).newbyteorder("<")).reshape(-1,TYPE_N[kind]);raw=array.tobytes()
         self.b+=b"\0"*(-len(self.b)%4);start=len(self.b);self.b+=raw
         self.d["bufferViews"].append({"buffer":0,"byteOffset":start,"byteLength":len(raw)})
-        a={"bufferView":len(self.d["bufferViews"])-1,"componentType":5126,"count":len(array),"type":kind}
+        a={"bufferView":len(self.d["bufferViews"])-1,"componentType":component_type,"count":len(array),"type":kind}
         if kind=="SCALAR":a.update(min=[float(array.min())],max=[float(array.max())])
         self.d["accessors"].append(a);return len(self.d["accessors"])-1
     def animation(self,name,seconds,rotations,shifts):
@@ -184,7 +206,7 @@ def interpolate(p,frames):
     return p[base]*(1-f)+p[end]*f
 
 def adapt(target,z,name,spec):
-    file=spec[0];names,p,_,dt=load_bvh(z.read(file));idx={n:i for i,n in enumerate(names)}
+    file=spec[0];names,p,source_rotation,dt=load_bvh(z.read(file));idx={n:i for i,n in enumerate(names)}
     gait=name in GAITS
     hips=p[:,idx["Hips"]];source_length=np.linalg.norm(p[0,idx["RightLeg"]]-p[0,idx["RightUpLeg"]])+np.linalg.norm(p[0,idx["RightFoot"]]-p[0,idx["RightLeg"]])
     scale=target.leg_length/source_length
@@ -220,7 +242,8 @@ def adapt(target,z,name,spec):
     # against actual skin soles while retaining the recorded airborne run.
     source_toes=np.stack([samples[:,idx[x],1] for x in ("LeftToeBase","RightToeBase","LeftFoot","RightFoot")],axis=1)
     floor=float(np.percentile(source_toes,2));flight=np.maximum(0.,source_toes.min(axis=1)-floor)*scale if name=="run" else np.zeros(len(root))
-    rotations=[target.pose(s,names,A) for s in samples]
+    angles=source_foot_angles(samples,idx,A,start,end,p,gait,name)
+    rotations=[target.pose(s,names,A,{side:values[i] for side,values in angles.items()}) for i,s in enumerate(samples)]
     if gait:
         # Close the cycle at identical local rotations, correcting drift
         # progressively; no hard discontinuity at the 60 Hz loop boundary.
@@ -252,9 +275,11 @@ def adapt(target,z,name,spec):
     if gait:
         shifts[-1]=shifts[0].copy()
     target.animation(name,seconds,rotations,shifts)
+    target.review_poses[name]=(rotations,shifts)
     result={"file":file,"source_sha256":digest(z.read(file)),"source_frames":[int(start),int(end)],"source_hz":round(1/dt,3),"seconds":round(float(seconds),6),"frames":len(shifts),"max_segment_error_m":max_segment_error,"min_sampled_sole_m":float(min(ground)),"max_sampled_sole_m":float(max(ground))}
     if gait:
         result["stride_m"]=round(float(np.dot(hips[end]-hips[start],A[2])*scale),5);result["stance_fraction"]=stance
+        result["sole_clearance_curve_m"]=[round(float(max(0.,x)),5) for x in ground]
     else:result["source_impact_frame"]=peak;result["domain_impact_seconds"]=impact
     return result
 
@@ -274,13 +299,18 @@ def main():
         for i in range(4):
             path=a.input/f"hero_meshy_italia_{i}.glb";d,b=decode(path);t=Target(d,b)
             original_buffer_size=len(b);original_buffer_sha=digest(b)
-            immutable=digest(json.dumps({k:d.get(k) for k in ("meshes","nodes","skins","materials","textures","images")},sort_keys=True,separators=(",",":")).encode())
+            immutable=digest(json.dumps(original_structure(d),sort_keys=True,separators=(",",":")).encode())
             records={name:adapt(t,z,name,spec) for name,spec in {**GAITS,**FIGHT}.items()}
+            records["idle"]=neutral_idle(t,read_access)
+            surface_review=repair(t,read_access)
+            weapon_review=remove_start_weapon(t,read_access)
+            print("YOUTH_WEAPON_REVIEW",i,json.dumps(weapon_review),flush=True)
             assert digest(b[:original_buffer_size])==original_buffer_sha
-            assert immutable==digest(json.dumps({k:d.get(k) for k in ("meshes","nodes","skins","materials","textures","images")},sort_keys=True,separators=(",",":")).encode())
+            assert immutable==digest(json.dumps(original_structure(d),sort_keys=True,separators=(",",":")).encode())
+            print("YOUTH_SURFACE_REVIEW",i,json.dumps(surface_review),flush=True)
             d["asset"].setdefault("extras",{})["motion_credit"]=SOURCE_CREDIT
             out=a.output/path.name;out.write_bytes(encode(d,b))
-            report["lods"].append({"level":i,"sha256":digest(out.read_bytes()),"original_sha256":digest(path.read_bytes()),"clips":records,"original_mesh_skin_materials_and_binary_preserved":True})
+            report["lods"].append({"level":i,"sha256":digest(out.read_bytes()),"original_sha256":digest(path.read_bytes()),"clips":records,"original_mesh_skin_materials_and_binary_preserved":False,"original_positions_materials_bind_matrices_preserved":True,"original_binary_prefix_preserved":True,"surface_review":surface_review,"weapon_review":weapon_review})
             print("ACCAD_RETARGET_LOD",i,"clips",len(records),flush=True)
     report["gaits"]={k:report["lods"][0]["clips"][k] for k in GAITS}
     a.report.parent.mkdir(parents=True,exist_ok=True);a.report.write_text(json.dumps(report,indent=2)+"\n")

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "base": "7daa4c28cf762fd2ed55697ef0bdb9a2dd679221",
+  "user_evidence": "Screenshot 73446: inclined sandals, tunic pulled by arm and visible metal fragment in right hand",
+  "previous_measured_failure": {
+    "lod0_edges": 2925,
+    "lod1_edges": 1710,
+    "lod2_edges": 737,
+    "lod3_edges": 236,
+    "weight_changes": 0
+  },
+  "actions": [
+    "Neutral idle rebuilt from original upper-body animation with sole-plane calibration from original sandal geometry",
+    "Captured ankle pitch relative to stance and toe flexion about transverse anatomical axis",
+    "Texture-assisted coherent garment weight transfer, evaluated against same real poses; report unresolved and new edge violations",
+    "Remove separate PracticeBlade mesh completely and conservatively trim non-flesh right-hand remnants close to original weapon geometry"
+  ],
+  "verification": "CI and Fold7 visual acceptance required. Fused hilt removal and full garment correction not claimed before evidence."
+}

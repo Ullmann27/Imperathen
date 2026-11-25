@@ -8,6 +8,7 @@ const COMPANIONS := {"italia":"marcus","germania":"albrun","han":"lin","wa":"aki
 const LOOPS := ["idle","march","run","talk","work"]
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
+const YouthSoleContact := preload("res://scripts/visuals/youth_sole_contact.gd")
 const HandPose := preload("res://scripts/visuals/hand_pose.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
@@ -67,6 +68,8 @@ var _service_gear := false
 var _service_nodes: Array[Node3D] = []
 var _service_external := false
 var _motion_identity := ""
+var youth_ground_floor_y := INF
+var _youth_soles := YouthSoleContact.new()
 
 
 func _ready() -> void:
@@ -201,6 +204,9 @@ func _reload(level: int) -> void:
 	var saved_phase := phase
 	var previous_path := active_model_path
 	var contacts := _motion.capture_world_contacts() if body and _motion_identity==identity else {}
+	var transition := _motion.capture_lod_transition() if body and _motion_identity==identity and level!=detail else {}
+	var previous_scale := body.scale if body else Vector3.ONE
+	var previous_detail := detail
 	var path := _path(level)
 	var replacement := _instantiate(path)
 	if not replacement and path != _legacy_path(level):
@@ -250,6 +256,7 @@ func _reload(level: int) -> void:
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
 	_motion.bind(body, civilian_motion and not imported_youth, identity)
+	_youth_soles.bind(body if imported_youth else null,detail)
 	_motion_identity = identity
 	_motion.restore_world_contacts(contacts)
 	# The external tracks target this authored hero family. Never reuse them
@@ -272,6 +279,11 @@ func _reload(level: int) -> void:
 		# already have moved while phase still names the previous stance.
 		# Keep the rendered contact, but preserve its real release history.
 		_motion.restore_world_contacts(contacts)
+	# Restore the exact displayed crossfade pose only between tiers of the
+	# same character family, after sampling and contact reconstruction.
+	# Keep the original transition clock; never restart it on each LOD swap.
+	if previous_path.ends_with("_%d.glb" % previous_detail) and path.ends_with("_%d.glb" % level) and previous_path.trim_suffix("_%d.glb" % previous_detail)==path.trim_suffix("_%d.glb" % level) and previous_scale.is_equal_approx(body.scale):
+		_motion.restore_lod_transition(transition)
 	# Retaining every hero PackedScene would also retain every embedded texture
 	# tier. Live instances keep their own references; inactive tiers may unload.
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
@@ -454,6 +466,7 @@ func sample_combat(technique: String, normalized: float) -> void:
 	_sample_combat_pose(technique, _combat_progress)
 	_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
 	_face.pose("attack", _combat_progress, detail)
+	_ground_youth()
 
 
 func cue_combat(technique: String, duration: float) -> void:
@@ -790,8 +803,11 @@ func _process(delta: float) -> void:
 			_face.advance(delta, "attack", detail)
 			if _combat_progress >= 1.0:
 				cancel_action()
+		_ground_youth()
 		return
-	if _posed or _service_external: return
+	if _posed or _service_external:
+		_ground_youth()
+		return
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)
 		if _remaining <= 0 and not (_conversation_focused and clip == "talk"):
@@ -809,10 +825,21 @@ func _process(delta: float) -> void:
 			phase = animator.current_animation_position / animator.current_animation_length
 	_apply_motion()
 	_plant_contacts(delta)
+	_ground_youth()
 	_face.advance(delta,clip,detail)
 
 
+func _ground_youth() -> void:
+	if _uses_youth_mocap() and is_finite(youth_ground_floor_y):
+		_youth_soles.apply_to_floor(youth_ground_floor_y,clip,phase)
+
+
 func _plant_contacts(delta: float) -> void:
+	# The recorded defensive step already includes its own foot placement.
+	# Do not lock both ankles through a captured guard or flatten toe roll.
+	if _uses_youth_mocap() and clip in ["idle","block"]:
+		_motion.reset_world_contacts()
+		return
 	var stance := 0.40 if clip == "run" else 0.58
 	if _motion.civilian:
 		stance = 0.32 if clip == "run" else 0.53

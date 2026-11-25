@@ -1,0 +1,142 @@
+extends RefCounted
+## Bounded CPU sample of the original skinned sandals. The physics body keeps
+## ownership of movement, collision and actual ground level.
+
+var rig: Skeleton3D
+var samples: Array[Dictionary] = []
+var run_clearance: Array = []
+var last_lowest_world_y := INF
+var last_correction_m := 0.0
+var last_target_y := INF
+
+
+func bind(model: Node3D, level: int) -> void:
+	samples.clear()
+	run_clearance.clear()
+	rig = null
+	if not is_instance_valid(model):
+		return
+	var mesh := model.find_child("MeshyYouthBody",true,false) as MeshInstance3D
+	if not is_instance_valid(mesh) or mesh.mesh == null or mesh.skin == null:
+		return
+	rig = mesh.get_node_or_null(mesh.skeleton) as Skeleton3D
+	if not is_instance_valid(rig):
+		return
+	var bone_ids := PackedInt32Array()
+	var foot_sides := PackedInt32Array()
+	var binds: Array[Transform3D] = []
+	for i in mesh.skin.get_bind_count():
+		var bone_name := String(mesh.skin.get_bind_name(i))
+		var bone := rig.find_bone(bone_name) if not bone_name.is_empty() else mesh.skin.get_bind_bone(i)
+		if bone < 0 or bone >= rig.get_bone_count():
+			samples.clear()
+			return
+		bone_ids.append(bone)
+		binds.append(mesh.skin.get_bind_pose(i))
+		var name := rig.get_bone_name(bone)
+		foot_sides.append(1 if name in ["Foot_L","Toe_L"] else (2 if name in ["Foot_R","Toe_R"] else 0))
+	var candidates: Array = [[],[]]
+	for surface in mesh.mesh.get_surface_count():
+		var arrays := mesh.mesh.surface_get_arrays(surface)
+		var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var joints: PackedInt32Array = arrays[Mesh.ARRAY_BONES]
+		var weights: PackedFloat32Array = arrays[Mesh.ARRAY_WEIGHTS]
+		if vertices.is_empty() or joints.size()!=weights.size() or joints.size()!=vertices.size()*4:
+			continue
+		for v in vertices.size():
+			# Same metric sole band as the offline source retargeter.
+			if vertices[v].y > .065:
+				continue
+			var side_weights := Vector2.ZERO
+			var ids := PackedInt32Array()
+			var local := PackedVector3Array()
+			var amounts := PackedFloat32Array()
+			for slot in 4:
+				var k := v*4+slot
+				var index := joints[k]
+				var w := weights[k]
+				if index<0 or index>=bone_ids.size() or w<=0.0:
+					continue
+				if foot_sides[index]==1: side_weights.x+=w
+				if foot_sides[index]==2: side_weights.y+=w
+				ids.append(bone_ids[index])
+				local.append(binds[index]*vertices[v])
+				amounts.append(w)
+			var side := 0 if side_weights.x>=.6 else (1 if side_weights.y>=.6 else -1)
+			if side>=0 and ids.size()>0:
+				candidates[side].append({"y":vertices[v].y,"z":vertices[v].z,
+					"bones":ids,"local":local,"weights":amounts})
+	for side in 2:
+		var foot: Array = candidates[side]
+		if foot.is_empty():
+			samples.clear()
+			return
+		foot.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return float(a.y)<float(b.y))
+		# Include the lowest heel/forefoot samples independently; a dense
+		# heel patch must not hide the toe contact at push-off.
+		var minimum_z := INF
+		var maximum_z := -INF
+		for value: Dictionary in foot:
+			minimum_z=minf(minimum_z,float(value.z))
+			maximum_z=maxf(maximum_z,float(value.z))
+		var mid := (minimum_z+maximum_z)*.5
+		var counts := [0,0]
+		for value: Dictionary in foot:
+			var region := 0 if float(value.z)<mid else 1
+			if counts[region]<24:
+				samples.append(value)
+				counts[region]+=1
+	var report: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://assets/animations/accad_youth_motion.json"))
+	if report is Dictionary:
+		var lods: Array = report.get("lods",[])
+		if level>=0 and level<lods.size():
+			run_clearance=lods[level].get("clips",{}).get("run",{}).get("sole_clearance_curve_m",[])
+
+
+func clearance(action: String, phase: float) -> float:
+	if action!="run" or run_clearance.size()<2:
+		return 0.0
+	var at := clampf(phase,0.0,1.0)*float(run_clearance.size()-1)
+	var i := floori(at)
+	return lerpf(float(run_clearance[i]),float(run_clearance[mini(i+1,run_clearance.size()-1)]),at-float(i))
+
+
+func measure_lowest() -> float:
+	if not is_instance_valid(rig) or samples.is_empty():
+		return INF
+	rig.force_update_all_bone_transforms()
+	var poses: Array[Transform3D] = []
+	for bone in rig.get_bone_count():
+		poses.append(rig.global_transform*rig.get_bone_global_pose(bone))
+	var lowest := INF
+	for sample: Dictionary in samples:
+		var point := Vector3.ZERO
+		for i in sample.bones.size():
+			point+=(poses[int(sample.bones[i])]*Vector3(sample.local[i]))*float(sample.weights[i])
+		lowest=minf(lowest,point.y)
+	return lowest
+
+
+func apply_to_floor(floor_y: float, action: String, phase: float) -> void:
+	last_lowest_world_y=measure_lowest()
+	last_correction_m=0.0
+	last_target_y=INF
+	if not is_finite(last_lowest_world_y) or not is_finite(floor_y) or action=="death":
+		return
+	last_target_y=floor_y+.003+clearance(action,phase)
+	# Keep the recorded flight phase of a run. Only translate the visual
+	# pelvis, never stretch a limb, alter the capsule or move the player.
+	var correction := clampf(last_target_y-last_lowest_world_y,-.16,.16)
+	if absf(correction)<.001:
+		return
+	var pelvis := rig.find_bone("Pelvis")
+	if pelvis<0:
+		return
+	var local_up := rig.global_basis.inverse()*Vector3.UP
+	var parent := rig.get_bone_parent(pelvis)
+	if parent>=0:
+		local_up=rig.get_bone_global_pose(parent).basis.inverse()*local_up
+	rig.set_bone_pose_position(pelvis,rig.get_bone_pose_position(pelvis)+local_up*correction)
+	rig.force_update_all_bone_transforms()
+	last_correction_m=correction
+	last_lowest_world_y=measure_lowest()
