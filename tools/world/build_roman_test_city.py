@@ -717,6 +717,12 @@ def ground():
     for y in (-72.4,-57.6):m.box((0,y,.16),(815,.65,.32),STONE)
     install('streets',m);put('streets','Main_Streets',0,0,category='road')
     m=Mesh('Worn_Cobbles',False)
+    # The 23x32 individually modeled basalt slabs need a physical-looking
+    # mortar bed. Previously a bright marble plaza showed through every open
+    # seam, producing implausible white stripes in actual Godot screenshots.
+    # A single dark, slightly recessed non-colliding box occupies the authored
+    # patch under the slabs; the original plaza/road collider stays unchanged.
+    m.box((-.40,-25.9,.101),(28.2,18.8,.012),STONE)
     for row in range(23):
         for col in range(32):
             x=-13.8+col*.85+(row%2)*.425;y=-34.5+row*.78
@@ -849,7 +855,7 @@ def main():
     ROOF=material('Terracotta_Tiles',(.49,.22,.105),'roof',out)
     WOOD=material('Oak_Timber',(.23,.13,.065),'wood',out)
     PAVING=material('Basalt_Paving',(.30,.31,.29),'paving',out,3)
-    MARBLE=material('Warm_Marble',(.79,.75,.64),'marble',out,3,.70)
+    MARBLE=material('Warm_Marble',(.70,.64,.55),'marble',out,3,.83)
     DARK=material('Window_Recess',(.035,.027,.02),None,out)
     BRONZE=material('Aged_Bronze',(.23,.24,.12),None,out,rough=.5,metal=.65)
     WATER=material('Water_Surface',(.035,.3,.3),None,out,rough=.2,metal=.1)
