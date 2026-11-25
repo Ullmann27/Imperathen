@@ -51,43 +51,11 @@
   ],
   "unresolved_conflicts": [
     {
-      "path": "prototype/scripts/visuals/village_person.gd",
-      "stage": "camera",
-      "base": "19425821d73ade539e6aa55f9e2dd6e28658056d",
-      "retained": "f5e004f61af070b43cb033cb48fd215a48030bf6",
-      "incoming": "b424b05bafa71ac9295336c6ce74090d3c2a4127",
-      "reason": "three_way_resolution_required"
-    },
-    {
-      "path": ".gitignore",
-      "stage": "commerce_inventory",
-      "base": "2d6e986cb4cec62aa3752ec930a080cbaa5c6803",
-      "retained": "7a5a9268284f7d202c0cb31c54a76f6c1813ec48",
-      "incoming": "fce2f1e810268e991b6e58fe5aa478533f9eb3a1",
-      "reason": "three_way_resolution_required"
-    },
-    {
       "path": "prototype/scripts/domain/world_model.gd",
       "stage": "commerce_inventory",
       "base": "8743215188688a0de13bff951e00858b1e59e0db",
       "retained": "a426ee9dfe2685b1027927d971958c99a9506dfa",
       "incoming": "76c28b468119a8ceff74a002c76011bb768ba05c",
-      "reason": "three_way_resolution_required"
-    },
-    {
-      "path": "prototype/scripts/main.gd",
-      "stage": "commerce_inventory",
-      "base": "34d2cb29828812b214bd7d74b19cb8d52211ef6b",
-      "retained": "efdd750bddcc43513d78af900eb27df5fc093b76",
-      "incoming": "59c1a69da50bf2f3064ad994cf00b2029a007596",
-      "reason": "three_way_resolution_required"
-    },
-    {
-      "path": "prototype/scripts/world/game_world.gd",
-      "stage": "commerce_inventory",
-      "base": "1f08a5bd46e831d2c544021927212468e862ab27",
-      "retained": "e3b0ac833dd2baca15ecd520c0c38ace0221d036",
-      "incoming": "16366d416f272fde3bbc149ce30bbe920e5b27eb",
       "reason": "three_way_resolution_required"
     },
     {
@@ -159,5 +127,43 @@
     "android_signed_build_verified": false,
     "fold7_runtime_verified": false
   },
-  "notes": "Staging snapshot of already published GitHub blobs only. No private model files uploaded. No integration parent claimed for unresolved work. Existing branches unchanged. No main merge. No release."
+  "notes": "Staging snapshot of already published GitHub blobs only. No private model files uploaded. No integration parent claimed for unresolved work. Existing branches unchanged. No main merge. No release.",
+  "resolved_conflicts": [
+    {
+      "path": "prototype/scripts/visuals/village_person.gd",
+      "stage": "camera",
+      "base": "19425821d73ade539e6aa55f9e2dd6e28658056d",
+      "retained": "f5e004f61af070b43cb033cb48fd215a48030bf6",
+      "incoming": "b424b05bafa71ac9295336c6ce74090d3c2a4127",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way disjoint edits; runtime tests pending"
+    },
+    {
+      "path": ".gitignore",
+      "stage": "commerce_inventory",
+      "base": "2d6e986cb4cec62aa3752ec930a080cbaa5c6803",
+      "retained": "7a5a9268284f7d202c0cb31c54a76f6c1813ec48",
+      "incoming": "fce2f1e810268e991b6e58fe5aa478533f9eb3a1",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way disjoint edits; runtime tests pending"
+    },
+    {
+      "path": "prototype/scripts/main.gd",
+      "stage": "commerce_inventory",
+      "base": "34d2cb29828812b214bd7d74b19cb8d52211ef6b",
+      "retained": "efdd750bddcc43513d78af900eb27df5fc093b76",
+      "incoming": "59c1a69da50bf2f3064ad994cf00b2029a007596",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way disjoint edits; runtime tests pending"
+    },
+    {
+      "path": "prototype/scripts/world/game_world.gd",
+      "stage": "commerce_inventory",
+      "base": "1f08a5bd46e831d2c544021927212468e862ab27",
+      "retained": "e3b0ac833dd2baca15ecd520c0c38ace0221d036",
+      "incoming": "16366d416f272fde3bbc149ce30bbe920e5b27eb",
+      "reason": "three_way_resolution_required",
+      "resolution": "three-way disjoint edits; runtime tests pending"
+    }
+  ]
 }
