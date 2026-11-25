@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 from accad_bvh import load_bvh, unit
-from youth_skin_polish import repair
+from youth_skin_polish import repair, separate_hand_islands
 from youth_anatomy import calibrate_soles,sole_contact_mask,source_foot_angles,foot_global,toe_global,neutral_idle,original_structure,remove_start_weapon
 SOLE_LOD_MAX_DEGREES=12.0  # every LOD must find the same original sandal sole
 
@@ -320,12 +320,15 @@ def main():
             surface_review=repair(t,read_access)
             weapon_review=remove_start_weapon(t,read_access)
             print("YOUTH_WEAPON_REVIEW",i,json.dumps(weapon_review),flush=True)
+            # After the weapon cut, which identifies the fused hilt by hand weight.
+            hand_island_review=separate_hand_islands(t,read_access)
+            print("YOUTH_HAND_ISLAND_REVIEW",i,json.dumps(hand_island_review),flush=True)
             assert digest(b[:original_buffer_size])==original_buffer_sha
             assert immutable==digest(json.dumps(original_structure(d),sort_keys=True,separators=(",",":")).encode())
             print("YOUTH_SURFACE_REVIEW",i,json.dumps(surface_review),flush=True)
             d["asset"].setdefault("extras",{})["motion_credit"]=SOURCE_CREDIT
             out=a.output/path.name;out.write_bytes(encode(d,b))
-            report["lods"].append({"level":i,"sole_planes":soles,"sha256":digest(out.read_bytes()),"original_sha256":digest(path.read_bytes()),"clips":records,"original_mesh_skin_materials_and_binary_preserved":False,"original_positions_materials_bind_matrices_preserved":True,"original_binary_prefix_preserved":True,"surface_review":surface_review,"weapon_review":weapon_review})
+            report["lods"].append({"level":i,"sole_planes":soles,"sha256":digest(out.read_bytes()),"original_sha256":digest(path.read_bytes()),"clips":records,"original_mesh_skin_materials_and_binary_preserved":False,"original_positions_materials_bind_matrices_preserved":True,"original_binary_prefix_preserved":True,"surface_review":surface_review,"weapon_review":weapon_review,"hand_island_review":hand_island_review})
             print("ACCAD_RETARGET_LOD",i,"clips",len(records),flush=True)
     report["gaits"]={k:report["lods"][0]["clips"][k] for k in GAITS}
     a.report.parent.mkdir(parents=True,exist_ok=True);a.report.write_text(json.dumps(report,indent=2)+"\n")
