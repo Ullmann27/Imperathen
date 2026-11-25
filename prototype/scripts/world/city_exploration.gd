@@ -13,6 +13,7 @@ const VivaCloseupProps := preload("res://scripts/rendering/city_viva_closeup_pro
 const CityAmbientPeople := preload("res://scripts/world/city_ambient_people.gd")
 const Crowd := preload("res://scripts/world/city_exploration_crowd.gd")
 const CityTraining := preload("res://scripts/world/city_training.gd")
+const CombatActions := preload("res://scripts/domain/combat_actions.gd")
 const VivaAtmosphere := preload("res://scripts/rendering/viva_roma_atmosphere.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
@@ -677,7 +678,7 @@ func perform_action(action: String) -> void:
 	# Preserve measured velocity: the physics solver brakes over time.
 	if action == "attack":
 		figure.sample_combat("jab_right",0.0)
-		_action_left = float(training.Combat.TECHNIQUES["jab_right"].duration)
+		_action_left = float(CombatActions.TECHNIQUES["jab_right"].duration)
 	else:
 		figure.cue("block")
 		_action_left = float(training.state().get("guard_remaining",0.85))
