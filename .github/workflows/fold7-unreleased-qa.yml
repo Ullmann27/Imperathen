@@ -171,7 +171,7 @@ jobs:
           "$GODOT_BIN" --headless --path prototype --script res://tests/roman_city_real_asset_test.gd \
             2>&1 | tee artifacts/qa/real-city-import.log
           grep -q ROMAN_CITY_REAL_ASSET_PASS artifacts/qa/real-city-import.log
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+          IMPERATHEN_REQUIRE_ORIGINAL_YOUTH=1 "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
             --script res://tests/roman_city_real_walk_test.gd \
             2>&1 | tee artifacts/qa/real-city-walk.log
           grep -q ROMAN_CITY_REAL_WALK_PASS artifacts/qa/real-city-walk.log
