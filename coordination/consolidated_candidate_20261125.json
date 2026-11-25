@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "base": "6787a63c46f3fec61bd639ed8431cf795aa94658",
+  "scope": "Consolidated source candidate; not full release or completed campaign",
+  "inputs": {
+    "52": "fc84e29f81138d7ac406c71b470397a60d645353",
+    "54": "6c94e1e8fd0a3a5d309a4690e2ca200663e87816",
+    "57": "1c0575096bd51c7da9e1ab83bcb2abf61306d0b9",
+    "58": "3070fdedf2abc019207bcaf4b46b3671e3c2429a",
+    "59": "391331e01efcd929a9becd219f6d6e233fce310f",
+    "61": "7240463b9803d747d6d5648c988d3def528e3c5e",
+    "71": "b846c67db7f6a167d4092eb33f520644550ee5aa",
+    "76": "21c3a8bf142465448b09573d98509389650c9918",
+    "79": "5bde307a49ded13a1555e7ca8d94b540e474889b",
+    "83": "6787a63c46f3fec61bd639ed8431cf795aa94658",
+    "84": "5fe8f96cfc81993ec5c65db470db323a7f56820e",
+    "85": "94235b92ed16afd8c89ccc39464d633fbd21e066"
+  },
+  "decisions": {
+    "fully_transferred_latest_fixes": [
+      84,
+      85
+    ],
+    "world_expansion": "Take newer district planning, preview, ground detail and added tests from #58; retain spatially coherent wind from later VIVA integration.",
+    "forum": "Take actual forum geometry and shop anchor updates from #79; keep strict #83 capture/export workflow, not duplicate fallback-hero workflow.",
+    "country": "Add #76 authored assets, standalone scene, tools and tests. Not yet linked into seamless campaign travel.",
+    "existing": "Most files on #57, #59, #71, #54, #61 and #58 already identical to consolidated base; divergent older core files retained at newer base rather than blindly overwritten."
+  },
+  "unresolved_divergent_paths": [
+    "prototype/scripts/domain/world_model.gd",
+    "prototype/scripts/main.gd",
+    "prototype/scripts/world/game_world.gd",
+    "tools/check_prototype.py",
+    ".github/workflows/viva-roma-closeup.yml",
+    "tools/viva_roma/blender_prop_review.py",
+    ".github/workflows/android-prototype.yml",
+    "prototype/scripts/ui/runtime_display.gd",
+    "tests/android_signing_identity_test.py",
+    "tools/build_android_prototype.py",
+    "tools/publish_village_download.py",
+    "prototype/scripts/visuals/village_person.gd",
+    "tools/characters/build_meshy_people.py",
+    "prototype/scripts/world/city_exploration.gd"
+  ],
+  "release_blockers": [
+    "Motion and equipment collision quality gate",
+    "Physical Fold7 acceptance and original signing proof",
+    "Exact-source visual acceptance incl. GL teardown",
+    "Verify new combined code and standalone scene/menu reachability"
+  ],
+  "ci_verified": false
+}

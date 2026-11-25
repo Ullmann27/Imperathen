@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "operation": "VIVA ROMA III",
+  "base": "31b4cf88789b690e582dc472b9b21d1940cacf9b",
+  "branch": "art/viva-roma-country-road-20261125",
+  "agent_profiles": [
+    {
+      "id": "viva_country_surface",
+      "status": "profile_defined_not_running",
+      "owns": [
+        "tools/viva_country/generate.mjs",
+        "prototype/assets/viva_country/**",
+        "prototype/shaders/viva_country/soil.gdshader"
+      ]
+    },
+    {
+      "id": "viva_country_vegetation_light",
+      "status": "profile_defined_not_running",
+      "owns": [
+        "prototype/shaders/viva_country/blades.gdshader",
+        "prototype/scripts/viva_country/country_sun.gd"
+      ]
+    }
+  ],
+  "integrator": {
+    "owns": [
+      "prototype/scripts/viva_country/country_field.gd",
+      "prototype/scripts/viva_country/country_walk.gd",
+      "prototype/scenes/viva_country/**",
+      "prototype/tests/viva_country_test.gd",
+      "tools/viva_country/prepare_fixture.py",
+      ".github/workflows/viva-country-road.yml"
+    ],
+    "status": "implemented_review_pending"
+  },
+  "execution": "two work packages implemented by one assistant; no independent live sessions",
+  "main_merge": false
+}
