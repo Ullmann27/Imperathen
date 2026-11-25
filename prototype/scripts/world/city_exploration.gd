@@ -5,6 +5,7 @@ const Person := preload("res://scripts/visuals/village_person.gd")
 const State := preload("res://scripts/world/city_exploration_state.gd")
 const CameraObstruction := preload("res://scripts/world/camera_obstruction.gd")
 const CityDetailAdapter := preload("res://scripts/rendering/city_exploration_detail_adapter.gd")
+const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
 const TouchAction := preload("res://scripts/ui/touch_action.gd")
@@ -122,6 +123,9 @@ func _load_city() -> void:
 		temple.position = Vector3(0,0,-55)
 		add_child(temple)
 	print("IMPERATHEN_CITY_DETAIL " + JSON.stringify(CityDetailAdapter.install(city, profile)))
+	# Read-only signboards are attached only to the six matching existing stalls.
+	# Transactions require a separate future WorldModel integration.
+	print("IMPERATHEN_CITY_MARKET " + JSON.stringify(CityMarketSignage.install(city, profile)))
 
 func _build_player() -> void:
 	player.name = "ExplorationPlayer"
