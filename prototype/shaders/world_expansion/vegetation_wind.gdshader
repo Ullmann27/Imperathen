@@ -26,11 +26,16 @@ void vertex() {
 	vec3 anchor = MODEL_MATRIX[3].xyz;
 	float phase = dot(anchor.xz, vec2(0.173, 0.219));
 	float leaf_phase = phase + COLOR.b * 6.28318530718;
-	float gust = sin(wind_time * 1.15 + phase) * 0.72
-		+ sin(wind_time * 0.47 + phase * 0.73) * 0.28;
+	// A coherent travelling gust reaches adjacent trees at related times.
+	float travel = dot(anchor.xz, direction) * 0.095;
+	float gust = sin(wind_time * 1.15 - travel) * 0.64
+		+ sin(wind_time * 0.43 - travel * 0.39) * 0.26
+		+ sin(wind_time * 1.81 + phase * 0.51) * 0.10;
 	float bend = clamp(COLOR.r, 0.0, 1.0) * gust * wind_strength * 0.20;
 	float flutter = clamp(COLOR.g, 0.0, 1.0)
-		* sin(wind_time * 5.3 + leaf_phase * 1.71) * wind_strength * 0.024;
+		* (sin(wind_time * 5.3 + leaf_phase * 1.71) * 0.72
+		+ sin(wind_time * 8.1 + leaf_phase * 2.37) * 0.28)
+		* wind_strength * 0.024;
 	// Both terms are exactly zero at an authored R=G=0 root.
 	VERTEX.xz += direction * bend + vec2(-direction.y, direction.x) * flutter;
 	VERTEX.y += flutter * 0.35;
@@ -42,7 +47,9 @@ void fragment() {
 	if (has_albedo_texture) {
 		color_sample *= texture(albedo_texture, sample_uv);
 	}
-	ALBEDO = color_sample.rgb;
+	// Stable, small per-leaf tint. Bark (G=0) retains its exact texture.
+	float leaf = clamp(COLOR.g * 2.0, 0.0, 1.0);
+	ALBEDO = color_sample.rgb * mix(1.0, 0.94 + 0.12 * clamp(COLOR.b, 0.0, 1.0), leaf);
 	ROUGHNESS = roughness_factor;
 	if (has_roughness_texture) {
 		ROUGHNESS *= dot(texture(roughness_texture, sample_uv), roughness_channel);
