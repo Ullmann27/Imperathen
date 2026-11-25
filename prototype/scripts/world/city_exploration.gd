@@ -1,6 +1,7 @@
 extends Node3D
 ## Independent free walk: no mission, economy or campaign simulation is started.
 signal leave_requested
+signal story_requested
 const Person := preload("res://scripts/visuals/village_person.gd")
 const State := preload("res://scripts/world/city_exploration_state.gd")
 const CameraObstruction := preload("res://scripts/world/camera_obstruction.gd")
@@ -448,6 +449,7 @@ func _build_ui() -> void:
 	description.add_theme_font_size_override("font_size",17)
 	column.add_child(description)
 	column.add_child(_button("Weiter erkunden",func(): set_paused(false)))
+	column.add_child(_button("Neues Leben · Geschichte beginnen",_request_story))
 	column.add_child(_button("Zum Hauptmenü",_request_leave))
 	_pause_panel.add_child(column)
 	_safe.add_child(_pause_panel)
@@ -745,6 +747,12 @@ func save_state() -> Error:
 func _request_leave() -> void:
 	if save_state()==OK:
 		leave_requested.emit()
+
+func _request_story() -> void:
+	# Return through the menu's existing new-game confirmation. Never
+	# overwrite a campaign save just because a sandbox button was pressed.
+	if save_state()==OK:
+		story_requested.emit()
 
 func _update_status() -> void:
 	var description := "Stadt · Modellpark · Gehen · Rennen · unbewaffnetes Übungstraining"
