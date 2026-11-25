@@ -140,7 +140,11 @@ for kind in ('helmet','portal'):
     target(camera,center)
     scene.render.filepath=str(out/(kind+'_alternate.png'))
     bpy.ops.render.render(write_still=True)
-    bpy.ops.wm.pack_all()
+    # Blender 4.x exposes Pack All under bpy.ops.file, not bpy.ops.wm.
+    # The imported PBR maps are also packed individually above.
+    if not bpy.ops.file.pack_all.poll():
+        raise RuntimeError("Blender cannot pack linked image data into the review project")
+    bpy.ops.file.pack_all()
     bpy.ops.wm.save_as_mainfile(filepath=str(out/(kind+'_review.blend')),compress=True)
     reports.append({'kind':kind,'source_sha256':sha(path),'mesh_objects':len(objects),
         'triangles':sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in objects),
