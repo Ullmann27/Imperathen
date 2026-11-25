@@ -25,6 +25,10 @@ func _run() -> void:
     await process_frame
     if not _require(workshop.load_error.is_empty(), "Workshop assets failed to load: " + workshop.load_error):
         return
+    # Complete each changed sky's radiance in one frame. Incremental radiance
+    # can otherwise keep altering reflections after the presentation clock stops.
+    # This only makes evidence capture deterministic; runtime quality is unchanged.
+    workshop.controller.environment.sky.process_mode = Sky.PROCESS_MODE_QUALITY
     workshop.set_controls_visible(false)
     workshop.set_quality("high")
     workshop.controller.motion_paused = true

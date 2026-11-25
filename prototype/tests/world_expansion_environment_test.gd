@@ -41,7 +41,7 @@ func _run() -> void:
 	var layouts := _test_layouts()
 	_test_batches(layouts[4000])
 	_test_atlas()
-	_test_real_assets()
+	await _test_real_assets()
 	# Give renderer-owned release commands a real frame before shutdown.
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
@@ -300,8 +300,98 @@ func _test_real_assets() -> void:
 	evidence["asset_import"] = {"checked": true, "passed": loaded and basilica_receipt.passed,
 		"asset_count": library.assets.size(), "models": imports, "wind_material_count": library.wind_materials.size(),
 		"basilica_lod0_tangents": basilica_receipt}
+	await _test_preview_presentation()
 
 	completed_stages.append("assets")
+
+
+func _test_preview_presentation() -> void:
+	var preview := Preview.new()
+	root.add_child(preview)
+	preview.controller.motion_paused = true
+	_check(preview.load_error.is_empty(), "The actual workshop opens with its authored assets for camera and UI regression checks")
+	var receipt := {}
+	if preview.load_error.is_empty():
+		preview.set_quality("high")
+		preview.controller.set_time_of_day(13.25)
+		preview.controller.set_wind(0.0)
+		var controls: Dictionary = preview.diagnostics().controls
+		_check(controls.quality == "high", "The quality selector immediately reflects set_quality(high)")
+		_check(is_equal_approx(controls.time_of_day, 13.25), "The time slider immediately reflects an API clock change")
+		_check(is_zero_approx(controls.wind_strength), "The wind slider immediately reflects an API change to calm")
+		receipt["controls_after_api_changes"] = controls
+		var capital_selected: bool = preview.select_settlement("capital")
+		_check(capital_selected, "The real capital is available for overview framing checks")
+		if capital_selected:
+			var fog_before: bool = preview.controller.environment.fog_enabled
+			var density_before: float = preview.controller.environment.fog_density
+			preview.set_view_mode(1)
+			_check(not preview.controller.environment.fog_enabled and preview.controller.environment.fog_density == density_before, "Overview disables distance fog without altering its street density")
+			var overview_points := PackedVector3Array()
+			# Inspect actual visible instance bounds, independently of the framing helper.
+			for child: Node in preview.settlement.get_children():
+				if child is MultiMeshInstance3D and child.visible:
+					for corner in 8:
+						overview_points.append(child.global_transform * child.multimesh.custom_aabb.get_endpoint(corner))
+			for corner in 8:
+				overview_points.append(preview._ground.global_transform * preview._ground.mesh.get_aabb().get_endpoint(corner))
+			var overview_frame := _projected_frame(preview.camera, overview_points)
+			_check(overview_frame.inside_margin, "The entire actual capital and landscape fit in the viewport with at least four percent border")
+			receipt["capital_frame"] = overview_frame
+			preview.set_view_mode(0)
+			_check(preview.controller.environment.fog_enabled == fog_before and preview.controller.environment.fog_density == density_before, "Leaving overview restores the previous street fog settings")
+			var focused: bool = preview.focus_on_asset("basilica")
+			_check(focused, "The actual basilica can be selected for its material review")
+			if focused:
+				var closest := INF
+				var chosen := {}
+				var bounds := AABB()
+				for entry: Dictionary in preview.settlement.layout.buildings:
+					if entry.asset != "basilica":
+						continue
+					var basis := Basis(Vector3.UP, float(entry.yaw)).scaled(Vector3.ONE * float(entry.scale))
+					var pose := Transform3D(basis, entry.position)
+					var mesh: Mesh = preview.library.assets.basilica.meshes[0]
+					var candidate: AABB = pose * mesh.get_aabb()
+					var distance: float = candidate.get_center().distance_squared_to(preview._target)
+					if distance < closest:
+						closest = distance
+						chosen = entry
+						bounds = candidate
+				var direction: Vector3 = preview.camera.position - bounds.get_center()
+				direction.y = 0.0
+				var front: Vector3 = Basis(Vector3.UP, float(chosen.yaw)) * Vector3.BACK
+				var front_alignment := direction.normalized().dot(front)
+				_check(front_alignment > 0.85, "Building focus looks toward the placed local +Z facade instead of its rear wall")
+				var building_points := PackedVector3Array()
+				for corner in 8:
+					building_points.append(preview.global_transform * bounds.get_endpoint(corner))
+				var building_frame := _projected_frame(preview.camera, building_points)
+				_check(building_frame.inside_margin, "The basilica's actual asymmetric mesh bounds fit with a visible frame border")
+				receipt["basilica_focus"] = {"front_alignment": front_alignment, "placement_yaw": chosen.yaw, "frame": building_frame}
+	evidence["preview_presentation"] = receipt
+	# Hide geometry, but let the newly created sky initialize before release.
+	preview.set_view_mode(3)
+	preview.set_controls_visible(false)
+	if DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
+	root.remove_child(preview)
+	preview.free()
+
+
+func _projected_frame(camera: Camera3D, points: PackedVector3Array) -> Dictionary:
+	var size: Vector2 = camera.get_viewport().get_visible_rect().size
+	var safe_frame := Rect2(size * 0.04, size * 0.92)
+	var inside := not points.is_empty()
+	var projected := Rect2()
+	var first := true
+	for point in points:
+		var pixel := camera.unproject_position(point)
+		inside = inside and not camera.is_position_behind(point) and pixel.is_finite() and safe_frame.has_point(pixel)
+		projected = Rect2(pixel, Vector2.ZERO) if first else projected.expand(pixel)
+		first = false
+	return {"inside_margin": inside, "viewport": [size.x, size.y], "checked_corners": points.size(),
+		"pixel_bounds": [projected.position.x, projected.position.y, projected.size.x, projected.size.y]}
 
 
 func _test_basilica_tangents(mesh: Mesh) -> Dictionary:

@@ -86,13 +86,22 @@ sind markiert, ohne neue Kaiserfigur, Palastmission oder Storychronologie festzu
 - Maße in Metern. Blender: Z nach oben, Front −Y. GLB/Godot: Y nach oben, Front +Z.
 - Pro Typ drei separate GLBs für LOD0/1/2; Texturen sind eingebettet. Die sieben
   `.blend`-Dateien enthalten gepackte Bilder und bleiben weiter bearbeitbar.
-- Der Bodenursprung und die konservativen Grundflächen stehen in
-  `prototype/assets/world_expansion/manifest.json`. Exakte gemessene Grenzen und
-  Dreiecke stehen in den beiden Assetberichten.
+- Die Architekturunterkante liegt bei GLB-Y = 0, der innere Gebäudeboden bei
+  Y = 0,12 m. `prototype/assets/world_expansion/manifest.json` reserviert für
+  Gebäude konservative Rechtecke symmetrisch um diesen Ursprung. Sie umfassen
+  auch asymmetrische Vorhallen und Markisen. Exakte Minima/Maxima und Dreiecke
+  stehen in den Assetberichten; eine spätere Kollision übernimmt die wirklichen
+  Meshgrenzen statt nur die Breite und Tiefe.
 - Architektur-GLBs haben ein Mesh mit mehreren Materialoberflächen. Das ist noch
   keine automatische Einzel-Draw-Call-Zusage. Strukturboxen aus dem Export sind
   Kollisionshinweise; begehbare Räume benötigen eine eigene Kollisions- und
   Navigationsabnahme.
+- Nur `basilica_lod0.glb` spart die expliziten Tangentendaten aus. Beim
+  Godot-Import muss `meshes/ensure_tangents` aktiviert bleiben. Die Engine erzeugt
+  daraus ihre Tangentenbasis; deren Gültigkeit und die gebundenen Normalmaps
+  werden auf allen sieben Oberflächen geprüft. Bitgleiche Tangenten gegenüber
+  Blender werden nicht zugesagt. Texturen, Positionen, Normalen und UVs bleiben
+  beim Packschritt unverändert.
 - Hohe Detailstufen sind für nahe Ansichten gedacht. Die Stadtübersicht verwendet
   die fernsten Modelle, nach Typ zusammengefasst. Straßenansichten verwenden
   räumliche Gruppen von 64 Metern und entfernungsabhängige Detailstufen.
@@ -146,13 +155,17 @@ Der letzte Befehl benötigt Godot und einen echten Grafikzugang oder `xvfb-run`.
 Er importiert alle 21 GLBs in ein temporäres, isoliertes Projekt. Anschließend
 prüft er Laufzeitverhalten und die vom Renderer zurückgelesenen Instanztransformationen.
 Zehn 1280 × 720 Pixel große Enginebilder dokumentieren Mittag, Abend, Nacht,
-zwei Windzeitpunkte, zwei Kontrollbilder bei Windstille, die 4.000er-Übersicht
+zwei Windzeitpunkte, zwei Kontrollbilder bei Windstille, die 4.000er-Übersicht,
 den Routenatlas und eine Nahaufnahme der Basilika mit ihren Normalmaps.
 Jeder Lauf erhält ein neues Bildverzeichnis. Dateihashes,
 Bildpixel-Fingerprints, Auswahlzustand und Gebäudezahlen stehen in den Belegen.
 
 Die Kontrolle verlangt verschiedene Pixel bei verändertem Windzeitpunkt und
 identische Pixel bei Windstille, fixierter Beleuchtung und gleicher Kamera.
+Für diese Aufnahmen wird die Himmelsreflexion im Modus `Sky.PROCESS_MODE_QUALITY`
+vollständig pro Aktualisierung berechnet. Damit laufen nach einem Tageszeitwechsel
+keine inkrementellen Reflexionsstufen in den Ruhevergleich hinein. Der Modus der
+normalen interaktiven Vorschau wird dafür nicht geändert.
 Scriptfehler, fehlende Assets, falsche Gebäudezahlen oder leere Bilder lassen den
 Lauf scheitern. Ein bestandener Zahlencheck ersetzt die anschließende Sichtprüfung
 der tatsächlichen Bilder nicht. Der Workflow ist
@@ -165,6 +178,9 @@ GLBs und Blenderquellen. Abschließende Befunde und der geprüfte Commit stehen 
 Die Modelle sind originale, prozedural erzeugte Spielmodule. Die Feldulme besitzt
 eine noch recht offene Krone; die Makroansicht zeigt polygonale Blattkonturen.
 Für eine fotorealistische Endfassung sind weitere Form- und Materialarbeit nötig.
+Die Windaufnahmen zeigen mehrere Pflanzen gemeinsam. Vordergrundblätter verdecken
+einen Teil des rechten Ulmenkronenrands; zwei Einzelbilder bewerten außerdem noch
+nicht den natürlichen Bewegungsverlauf über eine längere Zeit.
 Der Wind verformt die Geometrie; die Tangentenbasis der Blattbeleuchtung wird
 noch nicht mitgedreht. Besonders bei stärkerem Wind ist das eine sichtbare
 Vereinfachung gegenüber natürlicher Blattbewegung.

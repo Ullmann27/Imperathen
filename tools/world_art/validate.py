@@ -104,6 +104,15 @@ def validate(category, manifest):
                     limits = asset["footprint"]
                     if bounds[0] > limits[0] + .01 or bounds[2] > limits[1] + .01:
                         errors.append(f"{identity} LOD{level}: actual bounds exceed reserved footprint")
+                    if category == "architecture" and asset.get("category") != "road":
+                        # Layout clearance uses a rectangle centred on the asset
+                        # origin. Width/depth alone miss asymmetric front porches.
+                        actual = result["bounds_m"]
+                        centered = [2 * max(abs(actual["min"][axis]), abs(actual["max"][axis]))
+                                    for axis in (0, 2)]
+                        result["origin_centered_footprint_m_xz"] = centered
+                        if any(value > limit + .01 for value, limit in zip(centered, limits)):
+                            errors.append(f"{identity} LOD{level}: geometry escapes origin-centred building clearance")
                     if bounds[1] > asset["height"] + .01:
                         errors.append(f"{identity}: actual height exceeds manifest")
                     if category == "vegetation":

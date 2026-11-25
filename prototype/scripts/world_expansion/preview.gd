@@ -27,10 +27,13 @@ var _time_slider: HSlider
 var _wind_slider: HSlider
 var _settlement_choice: OptionButton
 var _view_choice: OptionButton
+var _quality_choice: OptionButton
 var _status: Label
 var _panel: PanelContainer
 var _ui_time := 0.0
 var _hud: CanvasLayer
+var _overview_fog_disabled := false
+var _fog_enabled_before_overview := true
 
 
 func _ready() -> void:
@@ -38,6 +41,7 @@ func _ready() -> void:
 	controller = Controller.new()
 	controller.name = "Atmosphere"
 	add_child(controller)
+	controller.presentation_settings_changed.connect(_sync_controls)
 	camera = Camera3D.new()
 	camera.name = "WorkshopCamera"
 	camera.current = true
@@ -118,6 +122,7 @@ func select_settlement(id: String, region_id: String = "") -> bool:
 
 func set_view_mode(mode: int) -> void:
 	view_mode = clampi(mode, 0, 3)
+	_set_overview_fog(view_mode == 1)
 	if _view_choice != null:
 		_view_choice.select(view_mode)
 	atlas.visible = view_mode == 3
@@ -128,10 +133,9 @@ func set_view_mode(mode: int) -> void:
 		return
 	var extent: Vector2 = settlement.layout.extent
 	if view_mode == 1:
-		_target = Vector3(0, 0, 0)
 		_pitch = 58.0
 		_yaw = 22.0
-		_distance = maxf(extent.x, extent.y) * 1.3 + 70.0
+		_fit_camera_to_bounds(_overview_bounds())
 		settlement.set_overview(true, _distance + extent.length())
 	elif view_mode == 2:
 		settlement.set_overview(false)
@@ -150,6 +154,7 @@ func focus_on_asset(asset_id: String) -> bool:
 	if settlement.layout.is_empty():
 		return false
 	var chosen := {}
+	var chosen_kind := ""
 	var closest := INF
 	for key in ["buildings", "vegetation"]:
 		for entry: Dictionary in settlement.layout.get(key, []):
@@ -159,14 +164,24 @@ func focus_on_asset(asset_id: String) -> bool:
 			if distance < closest:
 				closest = distance
 				chosen = entry
+				chosen_kind = key
 	if chosen.is_empty():
 		return false
-	var height := float(library.assets[asset_id].definition.get("height", 8.0))
-	_target = chosen.position + Vector3(0, height * 0.40, 0)
-	_distance = maxf(8.0, height * 1.9)
 	_pitch = 12.0
 	_yaw = 25.0
-	_update_camera()
+	if chosen_kind == "buildings":
+		# Architecture faces local +Z; follow the actual placed orientation.
+		var yaw := float(chosen.get("yaw", 0.0))
+		_yaw += rad_to_deg(yaw)
+		var basis := Basis(Vector3.UP, yaw).scaled(Vector3.ONE * float(chosen.get("scale", 1.0)))
+		var pose := Transform3D(basis, chosen.position)
+		var mesh: Mesh = library.assets[asset_id].meshes[0]
+		_fit_camera_to_bounds(pose * mesh.get_aabb())
+	else:
+		var height := float(library.assets[asset_id].definition.get("height", 8.0))
+		_target = chosen.position + Vector3(0, height * 0.40, 0)
+		_distance = maxf(8.0, height * 1.9)
+		_update_camera()
 	settlement.refresh_all(camera.global_position)
 	return true
 
@@ -174,6 +189,52 @@ func focus_on_asset(asset_id: String) -> bool:
 func set_quality(profile: String) -> void:
 	settlement.set_quality(profile)
 	controller.set_quality(profile)
+	_sync_controls()
+
+
+func _set_overview_fog(enabled: bool) -> void:
+	if controller == null or controller.environment == null:
+		return
+	if enabled:
+		if not _overview_fog_disabled:
+			_fog_enabled_before_overview = controller.environment.fog_enabled
+			_overview_fog_disabled = true
+		controller.environment.fog_enabled = false
+	elif _overview_fog_disabled:
+		controller.environment.fog_enabled = _fog_enabled_before_overview
+		_overview_fog_disabled = false
+
+
+func _overview_bounds() -> AABB:
+	var extent: Vector2 = settlement.layout.extent
+	var bounds := AABB(Vector3(-extent.x * 0.5, 0, -extent.y * 0.5), Vector3(extent.x, 1, extent.y))
+	if _ground != null:
+		bounds = _ground.transform * _ground.mesh.get_aabb()
+	for batch: Dictionary in settlement.batches:
+		bounds = bounds.merge(batch.bounds)
+	return bounds
+
+
+func _fit_camera_to_bounds(bounds: AABB) -> void:
+	_target = bounds.get_center()
+	_update_camera()
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	var aspect := maxf(1.0, viewport_size.x) / maxf(1.0, viewport_size.y)
+	var vertical_tangent := tan(deg_to_rad(camera.fov) * 0.5)
+	var horizontal_tangent := vertical_tangent * aspect
+	if camera.keep_aspect == Camera3D.KEEP_WIDTH:
+		horizontal_tangent = vertical_tangent
+		vertical_tangent /= aspect
+	# Occupy at most 88% of each dimension, leaving a visible border.
+	var inverse_basis := camera.transform.basis.inverse()
+	var required_distance := camera.near + 1.0
+	for corner_index in 8:
+		var corner: Vector3 = inverse_basis * (bounds.get_endpoint(corner_index) - _target)
+		required_distance = maxf(required_distance, corner.z + camera.near + 1.0)
+		required_distance = maxf(required_distance, corner.z + absf(corner.x) / (horizontal_tangent * 0.88))
+		required_distance = maxf(required_distance, corner.z + absf(corner.y) / (vertical_tangent * 0.88))
+	_distance = maxf(8.0, required_distance)
+	_update_camera()
 
 
 func _make_ground(extent: Vector2) -> void:
@@ -223,8 +284,18 @@ func _process(delta: float) -> void:
 	if _ui_time < 0.5:
 		return
 	_ui_time = 0.0
+	_sync_controls()
+
+
+func _sync_controls() -> void:
+	if controller == null:
+		return
 	if _time_slider != null:
 		_time_slider.set_value_no_signal(controller.time_of_day)
+	if _wind_slider != null:
+		_wind_slider.set_value_no_signal(controller.wind_strength)
+	if _quality_choice != null and settlement != null:
+		_quality_choice.select(PROFILE_IDS.find(settlement.profile))
 	_refresh_status()
 
 
@@ -298,13 +369,13 @@ func _build_controls() -> void:
 	_view_choice.custom_minimum_size.y = 40
 	controls.add_child(_view_choice)
 	_view_choice.item_selected.connect(set_view_mode)
-	var quality := OptionButton.new()
+	_quality_choice = OptionButton.new()
 	for label in ["Leicht", "Ausgewogen", "Hoch", "Sehr hoch"]:
-		quality.add_item(label)
-	quality.select(1)
-	quality.custom_minimum_size.y = 38
-	controls.add_child(quality)
-	quality.item_selected.connect(func(index: int) -> void: set_quality(PROFILE_IDS[index]))
+		_quality_choice.add_item(label)
+	_quality_choice.select(1)
+	_quality_choice.custom_minimum_size.y = 38
+	controls.add_child(_quality_choice)
+	_quality_choice.item_selected.connect(func(index: int) -> void: set_quality(PROFILE_IDS[index]))
 	_label(controls, "Tageszeit")
 	_time_slider = _slider(controls, 0, 23.99, 0.05, 14.0)
 	_time_slider.value_changed.connect(func(value: float) -> void: controller.set_time_of_day(value))
@@ -374,10 +445,14 @@ func _return() -> void:
 
 func set_controls_visible(enabled: bool) -> void:
 	_hud.visible = enabled
+	if enabled:
+		_sync_controls()
 
 
 func diagnostics() -> Dictionary:
 	return {"load_error": load_error, "selected_settlement": selected_settlement,
 		"selected_region": selected_region, "view_mode": view_mode,
 		"environment": controller.snapshot(), "settlement": settlement.report(),
-		"atlas": atlas.route_report(), "camera_position": [camera.position.x, camera.position.y, camera.position.z]}
+		"atlas": atlas.route_report(), "camera_position": [camera.position.x, camera.position.y, camera.position.z],
+		"controls": {"quality": PROFILE_IDS[_quality_choice.selected], "time_of_day": _time_slider.value,
+			"wind_strength": _wind_slider.value}}

@@ -1,6 +1,7 @@
 extends Node3D
 ## Independent presentation clock. It never mutates the story or saved world time.
 ## The 24-hour path is art direction for the workshop, not an astronomical model.
+signal presentation_settings_changed
 
 const WIND_SHADER = preload("res://shaders/world_expansion/vegetation_wind.gdshader")
 const LIGHT_UPDATE_SECONDS := 0.10
@@ -81,6 +82,7 @@ func set_time_of_day(hours: float) -> bool:
 		return false
 	time_of_day = fposmod(hours, 24.0)
 	_update_light()
+	presentation_settings_changed.emit()
 	return true
 
 
@@ -98,6 +100,7 @@ func set_wind(strength: float, direction: Vector2 = Vector2(2.0, 1.0)) -> bool:
 	if not direction.is_zero_approx():
 		wind_direction = direction.normalized()
 	_update_wind_materials()
+	presentation_settings_changed.emit()
 	return true
 
 
