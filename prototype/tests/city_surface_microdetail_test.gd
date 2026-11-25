@@ -94,6 +94,7 @@ func _run() -> void:
 			var t := visual.multimesh.get_instance_transform(index)
 			_check(t.origin.is_finite(), "Every detail instance has a finite transform")
 			different_colors[str(visual.multimesh.get_instance_color(index))] = true
+	print("CITY_SURFACE_COLOR_DIAGNOSTIC count=%d values=%s" % [different_colors.size(),JSON.stringify(different_colors.keys())])
 	_check(different_colors.size()>6, "Multiple masonry, plaster and wood color variations are generated")
 	_check(_snapshot(city)==original,"Existing building mesh identities and transforms remain unchanged")
 	_check(world.find_children("*","CharacterBody3D",true,false).size()==1 and world.find_children("*","Camera3D",true,false).size()==1,
