@@ -64,6 +64,7 @@ def main():
     measured_fingerprint = None
     checked_fingerprint = None
     checked_commit = source_commit(ROOT)
+    start_fingerprint = motion_fingerprint(ROOT)
     report.mkdir(parents=True, exist_ok=True)
     (report / "motion-measurements.json").unlink(missing_ok=True)
     (report / "motion-gate.json").unlink(missing_ok=True)
@@ -125,6 +126,7 @@ def main():
             ("roman_menu", ["--fixed-fps", "60", "--script", "res://tests/roman_menu_test.gd"], "ROMAN_MENU_PASS"),
             ("camera_collision", ["--fixed-fps", "60", "--script", "res://tests/camera_collision_test.gd"], "CAMERA_COLLISION_PASS"),
             ("runtime_display_lifecycle", ["--fixed-fps", "60", "--script", "res://tests/runtime_display_lifecycle_test.gd"], "RUNTIME_DISPLAY_LIFECYCLE_PASS"),
+            ("fold7_graphics_policy", ["--fixed-fps", "60", "--script", "res://tests/fold7_graphics_policy_test.gd"], "FOLD7_GRAPHICS_POLICY_PASS"),
             ("touch_controls", ["--fixed-fps", "60", "--script", "res://tests/touch_controls_test.gd"], "TOUCH_CONTROLS_PASS"),
             ("action_adapter", ["--fixed-fps", "60", "--script", "res://tests/action_adapter_test.gd"], "ACTION_ADAPTER_PASS"),
             ("action_world", ["--fixed-fps", "60", "--script", "res://tests/action_world_test.gd"], "ACTION_WORLD_PASS"),
@@ -186,9 +188,23 @@ def main():
         if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".glb", ".res", ".wav", ".ogg", ".svg", ".ttf", ".json", ".webp", ".jpg", ".png", ".import"}:
             source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
     final_fingerprint = motion_fingerprint(ROOT)
-    result = {"engine": version, "passed": len(records) == len(checks) and all(item["passed"] for item in records) and checked_fingerprint == measured_fingerprint == final_fingerprint and checked_commit == source_commit(ROOT),
+    # The complete suite ALWAYS requires the measured Motion Quality Gate
+    # with identical import, measurement and final source fingerprints.
+    # A deliberately selected graphics-only subset does not run motion;
+    # it must still verify that source/commit did not change and must clearly
+    # report that the independent motion approval was NOT performed.
+    selected_motion = not args.only or "motion_measurement" in args.only
+    if selected_motion:
+        source_unchanged = (checked_fingerprint == measured_fingerprint == final_fingerprint
+                            and checked_commit == source_commit(ROOT))
+    else:
+        source_unchanged = (start_fingerprint == final_fingerprint
+                            and checked_commit == source_commit(ROOT))
+    result = {"engine": version,
+              "passed": len(records) == len(checks) and all(item["passed"] for item in records) and source_unchanged,
+              "motion_quality_measurement": "required_same_source" if selected_motion else "not_run_selected_subset",
               "motion_source_fingerprint": final_fingerprint, "source_commit": checked_commit,
-              "source_unchanged_during_checks": checked_fingerprint == measured_fingerprint == final_fingerprint and checked_commit == source_commit(ROOT),
+              "source_unchanged_during_checks": source_unchanged,
               "scope": "selected check groups" if args.only else "complete suite", "selected_checks": [entry[0] for entry in checks],
               "renderer": "headless/dummy; no graphical FPS or screenshot claim",
               "save_isolation": "Separate disposable XDG data/config/cache directories for every check",

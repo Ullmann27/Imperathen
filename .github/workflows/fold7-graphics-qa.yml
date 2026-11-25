@@ -1,0 +1,76 @@
+name: Fold7 High / Very High sustained graphics QA
+
+on:
+  push:
+    branches: ['feature/fold7-high-sustained-graphics-20261125']
+  pull_request:
+    paths:
+      - 'prototype/scripts/rendering/fold7_quality_policy.gd'
+      - 'prototype/scripts/ui/runtime_display.gd'
+      - 'prototype/scripts/ui/game_ui.gd'
+      - 'prototype/scripts/world/city_exploration.gd'
+      - 'prototype/tests/fold7_graphics_policy_test.gd'
+      - 'prototype/tests/runtime_display_lifecycle_test.gd'
+      - 'prototype/assets/quality_profiles.json'
+      - 'tools/check_prototype.py'
+      - '.github/workflows/fold7-graphics-qa.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fold7-high-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tested-policy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Download and verify official Godot editor SHA-512
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$release/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$release/$archive" -o "$archive"
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          directory=pathlib.Path.cwd()
+          archive=directory/'Godot_v4.7.2-stable_linux.x86_64.zip'
+          expected={line.split()[-1].lstrip('*'):line.split()[0]
+                    for line in (directory/'SHA512-SUMS.txt').read_text().splitlines() if line.strip()}
+          with archive.open('rb') as stream:
+              measured=hashlib.file_digest(stream,'sha512').hexdigest()
+          if measured != expected.get(archive.name):
+              raise SystemExit('Godot SHA-512 verification failed')
+          with zipfile.ZipFile(archive) as package:
+              package.extractall(directory)
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Verify actual autoload lifecycle and deterministic adaptive 3D settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" \
+            --keep-going --only runtime_display_lifecycle fold7_graphics_policy \
+            --report fold7-evidence
+      - name: Retain exact engine logs and source hashes
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-fold7-graphics-${{ github.run_number }}
+          path: fold7-evidence/
+          if-no-files-found: warn
+          retention-days: 30

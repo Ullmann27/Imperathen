@@ -13,6 +13,7 @@ const Origins = preload("res://scripts/strategy/origins.gd")
 const ORIGIN_IDS := ["italia", "germania", "han", "wa", "vistula"]
 const FigureGallery = preload("res://scripts/ui/figure_gallery.gd")
 const SafeArea = preload("res://scripts/ui/safe_area.gd")
+const GraphicsPolicy = preload("res://scripts/rendering/fold7_quality_policy.gd")
 const TouchPadScript := preload("res://scripts/ui/touch_pad.gd")
 const TouchActionScript := preload("res://scripts/ui/touch_action.gd")
 const TouchLookScript := preload("res://scripts/ui/touch_look.gd")
@@ -1888,6 +1889,9 @@ func _show_settings(return_screen: String) -> void:
 	quality_select.item_selected.connect(func(index: int):
 		set_quality(profiles[index])
 	)
+	var sustained_note := _label("Fold7-Grafikziel: Hoch · 60 FPS, Sehr hoch · 30 FPS.\nBei dauerhaft langen Bildzeiten wird nur die 3D-Auflösung reduziert; Menü und Touch bleiben scharf. Kein gemessener Temperaturwert.", 14, MUTED)
+	sustained_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	column.add_child(sustained_note)
 	var diagnostics := CheckButton.new()
 	diagnostics.name = "DiagnosticsSetting"
 	diagnostics.text = "Leistungsdiagnose anzeigen"
@@ -2157,6 +2161,9 @@ func _apply_scale(node: Node) -> void:
 
 func _load_settings() -> void:
 	_touch_enabled = OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()
+	# Only first launch on the identified high-end GPU family gets the HIGH
+	# recommendation. Existing saved preferences are never overwritten.
+	_quality = GraphicsPolicy.recommended_profile(OS.has_feature("android"), RenderingServer.get_video_adapter_name())
 	var config := ConfigFile.new()
 	if config.load(SETTINGS_PATH) == OK:
 		_ui_scale = clampf(float(config.get_value("interface", "scale", 1.0)), 0.85, 1.25)
@@ -2168,7 +2175,7 @@ func _load_settings() -> void:
 		_always_intro = bool(config.get_value("interface", "always_intro", false))
 		_touch_enabled = bool(config.get_value("input", "touch_controls", _touch_enabled))
 		_diagnostics = bool(config.get_value("graphics", "diagnostics", false))
-		_quality = String(config.get_value("graphics", "quality", "balanced"))
+		_quality = String(config.get_value("graphics", "quality", _quality))
 		if _quality not in ["low", "balanced", "high", "very_high"]:
 			_quality = "balanced"
 	_apply_volume()

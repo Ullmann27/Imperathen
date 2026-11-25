@@ -2,6 +2,7 @@ extends CanvasLayer
 ## Opt-in frame measurements for the same viewport used by the village and valley.
 
 const SafeArea = preload("res://scripts/ui/safe_area.gd")
+const SustainedQuality = preload("res://scripts/rendering/fold7_quality_policy.gd")
 const BACKGROUND_FPS := 15
 
 var _profiles: Dictionary
@@ -17,6 +18,9 @@ var _recent_times: Array[float] = []
 var _foreground_fps := 60
 var _application_focused := true
 var _application_paused := false
+var _sustained_scene := false
+var _sustained_paused := false
+var _governor: Dictionary = SustainedQuality.initial("balanced")
 
 
 func _ready() -> void:
@@ -45,6 +49,7 @@ func apply_quality(profile: String) -> void:
 	if not _profiles.has(profile):
 		return
 	_quality = profile
+	_governor = SustainedQuality.initial(profile)
 	var settings: Dictionary = _profiles[profile]
 	_foreground_fps = 30 if profile in ["low", "very_high"] else 60
 	_apply_frame_limit()
@@ -58,7 +63,7 @@ func apply_quality(profile: String) -> void:
 func _on_size_changed() -> void:
 	# The window size is in output pixels. The canvas visible rectangle uses UI units.
 	var output := get_window().size
-	get_viewport().scaling_3d_scale = render_scale_for(output, _profiles[_quality], OS.has_feature("pc"))
+	get_viewport().scaling_3d_scale = SustainedQuality.effective_render_scale(render_scale_for(output, _profiles[_quality], OS.has_feature("pc")), _governor)
 	# A fold/resize or profile change starts a new, comparable measurement window.
 	_reset_measurements()
 	_place_overlay()
@@ -70,6 +75,38 @@ static func render_scale_for(output: Vector2i, settings: Dictionary, desktop: bo
 		budget = settings.get("desktop_max_3d_pixels", budget)
 	var pixels := maxf(float(output.x) * float(output.y), 1.0)
 	return clampf(sqrt(budget / pixels), 0.25, 1.0)
+
+
+func set_sustained_scene(enabled: bool) -> void:
+	# Gameplay keeps sampling even when the optional debug panel is hidden.
+	# Exiting a world resets the dynamic scaling, but never the user's choice.
+	if enabled == _sustained_scene:
+		return
+	_sustained_scene = enabled
+	_sustained_paused = false
+	if not enabled:
+		_governor = SustainedQuality.initial(_quality)
+		_on_size_changed()
+	_update_diagnostics_processing()
+	_reset_measurements()
+
+
+func set_sustained_paused(value: bool) -> void:
+	if _sustained_paused == value:
+		return
+	_sustained_paused = value
+	_update_diagnostics_processing()
+	_reset_measurements()
+
+
+func quality_report() -> Dictionary:
+	return {"selected":_quality,"foreground_cap":_foreground_fps,
+		"sustained":_sustained_scene,"scene_paused":_sustained_paused,
+		"dynamic_3d_ratio":float(_governor.get("ratio",1.0)),
+		"effective_3d_scale":get_viewport().scaling_3d_scale,
+		"renderer":RenderingServer.get_current_rendering_method(),
+		"gpu_timing_available":RenderingServer.viewport_get_measured_render_time_gpu(get_viewport().get_viewport_rid())>0.0,
+		"thermal_measured":false}
 
 
 func set_unit_counts(near_count: int, middle_count: int, far_count: int) -> void:
@@ -95,7 +132,7 @@ func _apply_frame_limit() -> void:
 
 
 func _update_diagnostics_processing() -> void:
-	var enabled := _panel.visible and _application_active()
+	var enabled := (_panel.visible or (_sustained_scene and not _sustained_paused)) and _application_active()
 	set_process(enabled)
 	if DisplayServer.get_name() != "headless":
 		RenderingServer.viewport_set_measure_render_time(get_viewport().get_viewport_rid(), enabled)
@@ -142,7 +179,7 @@ func _notification(what: int) -> void:
 
 
 func _process(_delta: float) -> void:
-	if not _application_active() or not _panel.visible:
+	if not _application_active() or not (_panel.visible or (_sustained_scene and not _sustained_paused)):
 		return
 	var now := Time.get_ticks_usec()
 	if _previous_frame_usec > 0:
@@ -173,17 +210,50 @@ func _process(_delta: float) -> void:
 			sorted[ceili(n * 0.50)-1], sorted[ceili(n * 0.95)-1], sorted[ceili(n * 0.99)-1]]
 		if n == 180 and sorted[ceili(n * 0.95)-1] > 1000.0 / 30.0:
 			_label.text += "\nÜber 33 ms: Grafikstufe bei Bedarf senken."
+
+	# Only measured frame intervals may change the 3D buffer. The HUD remains
+	# at native output resolution, and timing absence is never invented as 0 ms.
+	if _sustained_scene and not _sustained_paused and _recent_times.size() >= SustainedQuality.MIN_SAMPLES:
+		var measured := _recent_times.duplicate()
+		measured.sort()
+		var p95: float = measured[ceili(float(measured.size())*0.95)-1]
+		var before_ratio := float(_governor.ratio)
+		_governor = SustainedQuality.step(_quality,_governor,p95,gpu_ms,
+			_recent_times.size(),_application_active())
+		if absf(float(_governor.ratio)-before_ratio)>0.0001:
+			_on_size_changed()
+			if OS.is_debug_build():
+				print("IMPERATHEN_ADAPTIVE_QUALITY " + JSON.stringify({
+					"quality":_quality,"ratio":_governor.ratio,"reason":_governor.reason,
+					"p95_ms":p95,"gpu_ms":gpu_ms if gpu_ms>0 else null,
+					"thermal_measured":false}))
+			return
+	if _panel.visible and _sustained_scene:
+		_label.text += "\n3D-Adaption: %d %% · Profil %s" % [roundi(float(_governor.ratio)*100.0),_quality]
 	var output := get_window().size
 	var internal := Vector2i((Vector2(output) * viewport.scaling_3d_scale).round())
 	_label.text += "\n%s\n3D %d × %d · Ausgabe %d × %d" % [_adapter_line, internal.x, internal.y, output.x, output.y]
 	if _units.x >= 0:
 		_label.text += "\nSoldaten nah / mittel / fern: %d / %d / %d" % [_units.x, _units.y, _units.z]
 	if OS.is_debug_build() and OS.has_feature("android"):
+		var frame_p50: Variant = null
+		var frame_p95: Variant = null
+		var frame_p99: Variant = null
+		if _recent_times.size() >= 10:
+			var frame_values := _recent_times.duplicate()
+			frame_values.sort()
+			var amount := frame_values.size()
+			frame_p50 = frame_values[ceili(amount*0.50)-1]
+			frame_p95 = frame_values[ceili(amount*0.95)-1]
+			frame_p99 = frame_values[ceili(amount*0.99)-1]
 		print("IMPERATHEN_DISPLAY_SAMPLE " + JSON.stringify({
 			"gpu": RenderingServer.get_video_adapter_name(), "quality": _quality,
 			"renderer": RenderingServer.get_current_rendering_method(), "driver": RenderingServer.get_current_rendering_driver_name(),
 			"fps": 1000.0 / frame_ms, "frame_rate_limit": Engine.max_fps,
 			"mean_frame_ms": frame_ms, "frames": _sample_frames,
+			"frame_p50_ms": frame_p50, "frame_p95_ms": frame_p95, "frame_p99_ms": frame_p99,
+			"dynamic_3d_ratio": _governor.ratio,
+			"thermal_measured":false,
 			"render_cpu_ms": cpu_ms if cpu_ms > 0 else null,
 			"render_gpu_ms": gpu_ms if gpu_ms > 0 else null,
 			"rss_kib": ram if ram > 0 else null, "visible_primitives": primitives,
