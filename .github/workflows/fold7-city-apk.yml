@@ -7,6 +7,9 @@ on:
     paths:
       - 'prototype/**'
       - 'tools/world/**'
+      - 'tools/characters/stage_original_youth.py'
+      - 'tools/characters/retarget_accad_youth.py'
+      - 'docs/28_city_sandbox/original-youth-runtime.json'
       - 'tools/build_android_prototype.py'
       - 'tools/check_prototype.py'
       - 'tests/android_package_isolation_test.py'
@@ -50,7 +53,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends blender python3-numpy ffmpeg
+          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy ffmpeg
           blender -b --python-expr "import numpy; print('BLENDER_NUMPY_OK',numpy.__version__)"
       - name: Build original city, forum geometry and grounded NPC layout
         shell: bash
@@ -84,6 +87,25 @@ jobs:
           cp "$RUNNER_TEMP"/private-temple/roman_meshy_temple_*.glb prototype/assets/world/
           cp "$RUNNER_TEMP/private-temple/temple_review.json" prototype/assets/world/roman_temple_review.json
           echo "PRIVATE_TEMPLE_LODS_PRESENT: actual privately supplied model; measured bounds in temple_review.json"
+      - name: Import the user's already rigged original boy without new secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/characters/stage_original_youth.py \
+            --archive "$RUNNER_TEMP/imperathen-original-youth-runtime.zip" \
+            --report artifacts/city/original-youth-status.json
+          test -s prototype/assets/characters/hero_meshy_italia_0.glb
+      - name: Retarget recorded human walk run and unarmed combat onto the exact original youth
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/youth-mocap"
+          curl -fLsS --retry 3 --connect-timeout 15 --max-time 90 'https://accad.ohio-state.edu/sites/accad.osu.edu/files/Male2_bvh.zip' -o "$RUNNER_TEMP/accad-male2.zip"
+          OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 /usr/bin/python3 tools/characters/retarget_accad_youth.py \
+            --archive "$RUNNER_TEMP/accad-male2.zip" --input prototype/assets/characters \
+            --output "$RUNNER_TEMP/youth-mocap" --report artifacts/city/youth-mocap-report.json
+          cp "$RUNNER_TEMP"/youth-mocap/hero_meshy_italia_*.glb prototype/assets/characters/
+          cp artifacts/city/youth-mocap-report.json prototype/assets/animations/accad_youth_motion.json
       - name: Static audit of exact Roman city asset bytes and private blockers
         shell: bash
         run: |
@@ -121,19 +143,27 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --report artifacts/engine-checks
-          python3 tools/motion_quality_gate.py --evidence artifacts/engine-checks
           "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
             --script res://tests/roman_city_real_asset_test.gd \
             2>&1 | tee artifacts/city/real-assets.log
           grep -q ROMAN_CITY_REAL_ASSET_PASS artifacts/city/real-assets.log
-          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+          IMPERATHEN_REQUIRE_ORIGINAL_YOUTH=1 "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
             --script res://tests/roman_city_real_walk_test.gd \
             2>&1 | tee artifacts/city/real-walk.log
           grep -q ROMAN_CITY_REAL_WALK_PASS artifacts/city/real-walk.log
+          grep -Eq '"original_youth_active":true' artifacts/city/real-walk.log
+          grep -Eq '"mocap_active":true' artifacts/city/real-walk.log
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+            --script res://tests/youth_mocap_test.gd \
+            2>&1 | tee artifacts/city/youth-mocap-runtime.log
+          grep -q YOUTH_MOCAP_RUNTIME_PASS artifacts/city/youth-mocap-runtime.log
           "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
             --script res://tests/city_crowd_layout_test.gd \
             2>&1 | tee artifacts/city/crowd.log
           grep -q CITY_CROWD_LAYOUT_PASS artifacts/city/crowd.log
+          # Release acceptance remains mandatory; source-specific proofs above are
+          # collected first so a known global motion failure cannot hide them.
+          python3 tools/motion_quality_gate.py --evidence artifacts/engine-checks
       - name: Pin Android SDK, JDK17 and prepare isolated signing identity
         shell: bash
         run: |
@@ -240,7 +270,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends blender python3-numpy xvfb xauth libgl1-mesa-dri mesa-utils
+          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy xvfb xauth libgl1-mesa-dri mesa-utils
           mkdir -p "$RUNNER_TEMP/godot" artifacts/visual prototype/assets/world
           cd "$RUNNER_TEMP/godot"
           base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
@@ -258,6 +288,25 @@ jobs:
           PY
           chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Import the user's already rigged original boy without new secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/characters/stage_original_youth.py \
+            --archive "$RUNNER_TEMP/imperathen-original-youth-runtime.zip" \
+            --report artifacts/visual/original-youth-status.json
+          test -s prototype/assets/characters/hero_meshy_italia_0.glb
+      - name: Retarget recorded human walk run and unarmed combat onto the exact original youth
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/youth-mocap"
+          curl -fLsS --retry 3 --connect-timeout 15 --max-time 90 'https://accad.ohio-state.edu/sites/accad.osu.edu/files/Male2_bvh.zip' -o "$RUNNER_TEMP/accad-male2.zip"
+          OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 /usr/bin/python3 tools/characters/retarget_accad_youth.py \
+            --archive "$RUNNER_TEMP/accad-male2.zip" --input prototype/assets/characters \
+            --output "$RUNNER_TEMP/youth-mocap" --report artifacts/visual/youth-mocap-report.json
+          cp "$RUNNER_TEMP"/youth-mocap/hero_meshy_italia_*.glb prototype/assets/characters/
+          cp artifacts/visual/youth-mocap-report.json prototype/assets/animations/accad_youth_motion.json
       - name: Build exact original city and import visual scene
         shell: bash
         run: |
@@ -273,16 +322,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          failed=0
           for preset in high very_high; do
             export IMPERATHEN_CITY_RENDER_PROFILE="$preset"
             export IMPERATHEN_CITY_RENDER_OUTPUT="$GITHUB_WORKSPACE/artifacts/visual"
-            xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" \
+            log="artifacts/visual/$preset.log"
+            # Capture both profiles even if one fails; retain a failing job status.
+            if ! xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" \
               --path prototype --audio-driver Dummy --rendering-method gl_compatibility \
               --fixed-fps 60 --script res://tests/roman_city_visual_capture.gd \
-              2>&1 | tee "artifacts/visual/$preset.log"
-            grep -q ROMAN_CITY_VISUAL_PASS "artifacts/visual/$preset.log"
-            if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' "artifacts/visual/$preset.log"; then exit 1; fi
+              2>&1 | tee "$log"; then failed=1; fi
+            if ! grep -q ROMAN_CITY_VISUAL_PASS "$log"; then failed=1; fi
+            if ! grep -Eq '"original_youth_active":true' "$log"; then failed=1; fi
+            if ! grep -Eq '"mocap_active":true' "$log"; then failed=1; fi
+            if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' "$log"; then failed=1; fi
           done
+          exit "$failed"
       - name: Save unedited city framebuffers and actual renderer reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
