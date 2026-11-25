@@ -1,0 +1,115 @@
+{
+  "format": "GLB2",
+  "checks": "real GLB header/length, one mesh, triangle indices, UV and normal attributes, finite bounds, embedded images, manifest hash and triangle count",
+  "assets": [
+    {
+      "path": "prototype/assets/world_expansion/architecture/basalt_road_lod0.glb",
+      "triangles": 9856,
+      "surfaces": 2,
+      "embedded_images": 3,
+      "bytes": 1703736,
+      "sha256": "bb430b7e1926681f0129baa469aadeec34db93872865719888a3fcf338ef1e0c",
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/basalt_road_lod1.glb",
+      "triangles": 852,
+      "surfaces": 2,
+      "embedded_images": 3,
+      "bytes": 679664,
+      "sha256": "ac14dd2ce8ce3601d3cd751753d5eafbe034c33937d69b3e87008f1d217cb7ee",
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/basalt_road_lod2.glb",
+      "triangles": 276,
+      "surfaces": 2,
+      "embedded_images": 3,
+      "bytes": 620900,
+      "sha256": "da757975518c40bca9caf37b7bd11355535c694c9adcc2eb57a6ae9b99a10d01",
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/basilica_lod0.glb",
+      "triangles": 115644,
+      "surfaces": 7,
+      "embedded_images": 12,
+      "bytes": 10565572,
+      "sha256": "49a0c2e8afa5b50f4713cff57500b1bdf85539406dbc8d7eda11a395a1dee56e",
+      "valid_structure": true,
+      "tangent_storage": "Godot import regenerates tangents; other accessor payloads and images preserved"
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/basilica_lod1.glb",
+      "triangles": 3308,
+      "surfaces": 6,
+      "embedded_images": 12,
+      "bytes": 2780628,
+      "sha256": "8078b5996a0628f295998761151514a023a15864e5ddddf60a66b65923b8a8e1",
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/basilica_lod2.glb",
+      "triangles": 2252,
+      "surfaces": 3,
+      "embedded_images": 9,
+      "bytes": 2047092,
+      "sha256": "4f5dbba34f09608473e588ba2d3253462a04e23f392857cf9f50526c8bd1a1e7",
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/insula_lod0.glb",
+      "triangles": 56664,
+      "surfaces": 7,
+      "embedded_images": 12,
+      "bytes": 8103972,
+      "sha256": "e42a4fc7574422bf4635db435d7d82d5b64daa68017d3369194fa91d6aa634c0",
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/insula_lod1.glb",
+      "triangles": 5284,
+      "surfaces": 6,
+      "embedded_images": 12,
+      "bytes": 2983824,
+      "sha256": "b5137ab09b0e9ffdabdfd7d1ab90bdb73d2223b412d7891fe45fce79cce226ea",
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/insula_lod2.glb",
+      "triangles": 4588,
+      "surfaces": 4,
+      "embedded_images": 12,
+      "bytes": 2910336,
+      "sha256": "f89e979ce325bd5477224a34941047fe4d30514cb28ab421b54ee13d25e211f0",
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/taberna_lod0.glb",
+      "triangles": 35384,
+      "surfaces": 8,
+      "embedded_images": 15,
+      "bytes": 6430540,
+      "sha256": "a01d0b28e0a07272c2393302cbf6928f965be4e48eeeda77e3395f7e8e773fa6",
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/taberna_lod1.glb",
+      "triangles": 1968,
+      "surfaces": 8,
+      "embedded_images": 15,
+      "bytes": 3294140,
+      "sha256": "16c71e69e41cead3a13e49a27fa9a0dc647deb2431237f9f0b0a918a57e87e61",
+      "valid_structure": true
+    },
+    {
+      "path": "prototype/assets/world_expansion/architecture/taberna_lod2.glb",
+      "triangles": 652,
+      "surfaces": 4,
+      "embedded_images": 12,
+      "bytes": 2526532,
+      "sha256": "7b5bc4ce05727a3114ce06b8790cf58810dc08148f7ac308993cca5c697daed0",
+      "valid_structure": true
+    }
+  ]
+}

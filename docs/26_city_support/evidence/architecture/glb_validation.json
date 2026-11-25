@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "module_count": 7,
+  "lod_meshes": 21,
+  "bytes": 12561824,
+  "embedded_images": 21,
+  "triangles_by_lod": {
+    "basoli_4m": [
+      5268,
+      2738,
+      1158
+    ],
+    "curb_4m": [
+      1836,
+      954,
+      402
+    ],
+    "taberna_4m": [
+      25856,
+      13444,
+      5688
+    ],
+    "dolia_counter": [
+      4968,
+      2582,
+      1092
+    ],
+    "market_canopy": [
+      1627,
+      845,
+      357
+    ],
+    "amphora_pair": [
+      2600,
+      1352,
+      572
+    ],
+    "bread_display": [
+      2980,
+      1548,
+      654
+    ]
+  },
+  "scope": "GLB structure, actual geometry counts, embedded PBR maps, coarse collision contract; not Android FPS or visual acceptance."
+}

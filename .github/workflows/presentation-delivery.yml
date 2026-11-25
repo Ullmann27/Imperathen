@@ -1,0 +1,72 @@
+name: Presentation and delivery regression
+
+on:
+  pull_request:
+    paths:
+      - 'prototype/scripts/ui/runtime_display.gd'
+      - 'prototype/tests/runtime_display_lifecycle_test.gd'
+      - 'tools/android_signing_identity.py'
+      - 'tools/build_android_prototype.py'
+      - 'tools/publish_village_download.py'
+      - 'tools/check_prototype.py'
+      - 'tools/story/**'
+      - 'tests/android_*_test.py'
+      - '.github/workflows/presentation-delivery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: presentation-delivery-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Record the exact tested source
+        run: |
+          mkdir -p artifacts/team-c
+          git rev-parse HEAD > artifacts/team-c/tested-commit.txt
+      - name: Test Android build and publication contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p 'android_*_test.py' 2>&1 | tee artifacts/team-c/python-tests.log
+      - name: Install and verify official Godot editor
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/team-c-godot"
+          cd "$RUNNER_TEMP/team-c-godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          filename="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl --fail --location --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$base/$filename" -o "$filename"
+          expected="$(awk -v name="$filename" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          actual="$(sha512sum "$filename" | awk '{print $1}')"
+          test -n "$expected" && test "$expected" = "$actual"
+          unzip -q "$filename"
+          bin="$PWD/${filename%.zip}"
+          chmod +x "$bin"
+          echo "GODOT_BIN=$bin" >> "$GITHUB_ENV"
+      - name: Run the complete isolated engine regression
+        run: python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --report artifacts/team-c/engine
+      - name: Keep test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-team-c-${{ github.run_id }}
+          path: artifacts/team-c/
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,125 @@
+{
+  "source": "prototype/assets/characters/hero_quality_0.glb",
+  "sha256": "f0600db20ea4957fc50411439fa8b1591ec4fe4389326a27bde89aab6bb63f51",
+  "scope": "Original authored POSITION and index accessors before skinning, animation, or morphs; same complete-link EPS closure criterion",
+  "epsilon_m": 1e-05,
+  "meshes": [
+    {
+      "mesh": "HeroBelt",
+      "vertices": 96,
+      "triangles": 96,
+      "closed": false,
+      "boundary_edges": 96,
+      "unbalanced_edges": 96,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroBody",
+      "vertices": 12109,
+      "triangles": 21984,
+      "closed": false,
+      "boundary_edges": 134,
+      "unbalanced_edges": 134,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroCollarSeam",
+      "vertices": 390,
+      "triangles": 768,
+      "closed": false,
+      "boundary_edges": 12,
+      "unbalanced_edges": 12,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroEyes",
+      "vertices": 1076,
+      "triangles": 2040,
+      "closed": false,
+      "boundary_edges": 80,
+      "unbalanced_edges": 80,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroHair",
+      "vertices": 1794,
+      "triangles": 3344,
+      "closed": false,
+      "boundary_edges": 164,
+      "unbalanced_edges": 164,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroSandal_L",
+      "vertices": 80,
+      "triangles": 80,
+      "closed": false,
+      "boundary_edges": 80,
+      "unbalanced_edges": 80,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroSandal_R",
+      "vertices": 80,
+      "triangles": 80,
+      "closed": false,
+      "boundary_edges": 80,
+      "unbalanced_edges": 80,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroSandalStrap_L",
+      "vertices": 30,
+      "triangles": 48,
+      "closed": false,
+      "boundary_edges": 12,
+      "unbalanced_edges": 12,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroSandalStrap_L.001",
+      "vertices": 30,
+      "triangles": 48,
+      "closed": false,
+      "boundary_edges": 12,
+      "unbalanced_edges": 12,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroSandalStrap_R",
+      "vertices": 30,
+      "triangles": 48,
+      "closed": false,
+      "boundary_edges": 12,
+      "unbalanced_edges": 12,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroSandalStrap_R.001",
+      "vertices": 30,
+      "triangles": 48,
+      "closed": false,
+      "boundary_edges": 12,
+      "unbalanced_edges": 12,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroTunic",
+      "vertices": 1798,
+      "triangles": 3452,
+      "closed": false,
+      "boundary_edges": 148,
+      "unbalanced_edges": 148,
+      "nonmanifold_edges": 0
+    },
+    {
+      "mesh": "HeroTunicSkirt",
+      "vertices": 448,
+      "triangles": 768,
+      "closed": false,
+      "boundary_edges": 128,
+      "unbalanced_edges": 128,
+      "nonmanifold_edges": 0
+    }
+  ]
+}

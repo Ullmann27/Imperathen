@@ -95,6 +95,12 @@ static func geometry(surfaces: Array) -> Dictionary:
 	var pairs: PackedInt32Array=topology.weld_pairs
 	for pair in range(0,pairs.size(),2):
 		closed=closed and vertices[pairs[pair]].distance_squared_to(vertices[pairs[pair+1]])<=EPSILON*EPSILON
+	if cacheable and bool(topology.closed) and not closed:
+		# Separate closed components may have touched in the cached pose.
+		# Rebuild from current triangles when those welds separate; a real
+		# opened seam must still pass the same complete-link closure check.
+		_topology_cache.erase(key)
+		return geometry(surfaces)
 	var faces := PackedVector3Array()
 	faces.resize(indices.size())
 	for index in indices.size(): faces[index]=vertices[indices[index]]

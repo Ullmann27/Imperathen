@@ -63,7 +63,7 @@ def main() -> int:
             log_path = output / "viewport.log"
             source_paths = sorted(path for path in (ROOT / "prototype").rglob("*")
                                   if path.is_file() and ".godot" not in path.parts
-                                  and path.suffix in (".gd", ".gdshader", ".json", ".godot"))
+                                  and path.suffix in (".gd", ".gdshader", ".json", ".godot", ".tscn", ".glb", ".png", ".jpg", ".webp", ".import"))
             source_hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
                              for path in source_paths}
             started_ns = time.time_ns()
@@ -76,7 +76,10 @@ def main() -> int:
                 return 1
             captured = log_path.read_text(encoding="utf-8")
             images = sorted(path for path in output.glob("*.png") if path.stat().st_mtime_ns >= started_ns)
-            passed = result.returncode == 0 and "OpenGL API" in captured and FAILURE.search(captured) is None and bool(images)
+            changed_sources = [str(path.relative_to(ROOT)) for path in source_paths
+                               if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest()
+                               != source_hashes[str(path.relative_to(ROOT))]]
+            passed = result.returncode == 0 and "OpenGL API" in captured and FAILURE.search(captured) is None and bool(images) and not changed_sources
             receipt = {
                 "passed": passed, "exit_code": result.returncode, "script": args.script,
                 "requested_resolution": args.resolution, "requested_quality": args.quality,
@@ -84,9 +87,7 @@ def main() -> int:
                 "android_device_test": False,
                 "images": {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in images},
                 "source_sha256_before_capture": source_hashes,
-                "sources_changed_during_capture": [str(path.relative_to(ROOT)) for path in source_paths
-                                                   if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest()
-                                                   != source_hashes[str(path.relative_to(ROOT))]],
+                "sources_changed_during_capture": changed_sources,
             }
             (output / "capture-receipt.json").write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             print(json.dumps(receipt, ensure_ascii=False))

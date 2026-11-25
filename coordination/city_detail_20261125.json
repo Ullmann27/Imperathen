@@ -1,0 +1,110 @@
+{
+  "project": "IMPERATHEN",
+  "task": "Drei Agenten: Stadtobjekte, Figurenmaterialien und Handel",
+  "date": "2026-11-25",
+  "status": "implemented_on_support_branch",
+  "direct_city_pr": 60,
+  "direct_city_commit": "de2aeaad19ded95ca055261b2a5b9cc3f668aa1e",
+  "branch": "feature/city-detail-commerce-support-20261125",
+  "base": {
+    "branch": "feature/team-b-living-world-20261124",
+    "commit": "7af39f35b1947595f95e365eb7762592feabf234"
+  },
+  "observed_city": {
+    "branch": "feature/meshy-player-city-exploration-20261125",
+    "commit": "5b5eecad31e395e3ead48b3e631d9f48690480a6",
+    "entry": "prototype/scripts/world/city_exploration.gd::_load_city",
+    "support_branch": "feature/city-detail-overlay-20261125",
+    "scope": "Architecture-only adapter; existing Meshy youth, temple, camera, collision, free exploration and save retained."
+  },
+  "agents": [
+    {
+      "role": "architecture_detail",
+      "outputs": [
+        "tools/city_detail/architecture_source.blend",
+        "prototype/assets/city_detail/architecture",
+        "prototype/scripts/rendering/city_architecture_detail.gd",
+        "prototype/scripts/rendering/city_exploration_detail_adapter.gd"
+      ]
+    },
+    {
+      "role": "character_detail",
+      "outputs": [
+        "tools/city_detail/characters_review/hero_city_detail.blend",
+        "prototype/assets/city_detail/characters",
+        "prototype/scripts/rendering/city_character_detail.gd"
+      ]
+    },
+    {
+      "role": "trade_progression",
+      "outputs": [
+        "prototype/scripts/city_trade.gd",
+        "prototype/scripts/city_trade_catalog.gd",
+        "prototype/tests/city_trade_test.gd"
+      ]
+    }
+  ],
+  "integration": {
+    "optional_scene": "res://scenes/city_support_district.tscn",
+    "hud": "prototype/scripts/city_support_panel.gd",
+    "domain_changes": [
+      "prototype/scripts/domain/world_model.gd",
+      "prototype/scripts/domain/combat_actions.gd"
+    ],
+    "save": "user://imperathen_city_support.json",
+    "money_authority": "resources.denarii",
+    "merchant_float": "village.economy.stocks.merchant_denarii",
+    "trade_inventory": "village.city_trade.inventory",
+    "city_adapter": "CityExplorationDetailAdapter.install(city, profile)",
+    "city_trade_automatic_activation": false
+  },
+  "shop_anchors": {
+    "bakery": [
+      -10,
+      -8
+    ],
+    "foodstall": [
+      -4,
+      -8
+    ],
+    "thermopolium": [
+      4,
+      -8
+    ],
+    "pottery": [
+      10,
+      -8
+    ],
+    "clothier": [
+      -10,
+      4
+    ],
+    "armorer": [
+      10,
+      4
+    ]
+  },
+  "parallel_work": {
+    "pr": 57,
+    "branch": "art/roman-life-shops-interiors-20261125",
+    "observed_commit": "1c0575096bd51c7da9e1ab83bcb2abf61306d0b9",
+    "published_implementation": false,
+    "published_contract": "coordination/roman_life_20261125.json",
+    "integration_requirement": "Reconcile shop anchors, inventory authority and one-time issues/rewards before enabling both commerce workstreams."
+  },
+  "evidence": [
+    "docs/26_city_support/DELIVERY.md",
+    "docs/26_city_support/evidence/checks/validation_report.json",
+    "docs/26_city_support/evidence/market/city-support-review.json",
+    "docs/26_city_support/evidence/architecture/godot_validation.json",
+    "docs/city_detail/evidence/trade/report.json",
+    "tools/city_detail/characters_review/character_detail_review.json"
+  ],
+  "limits": {
+    "android_device_benchmark": false,
+    "new_apk": false,
+    "main_merge": false,
+    "complete_city_walkthrough": false,
+    "meshy_youth_atlas_modified": false
+  }
+}

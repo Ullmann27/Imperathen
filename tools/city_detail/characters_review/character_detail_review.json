@@ -1,0 +1,1072 @@
+{
+  "blender": "4.3.2",
+  "source": "prototype/assets/characters/hero_quality_0.glb",
+  "source_sha256": "69df0f6c2546a5dd075eee07570e071746d5c46e9fcc28e3a7bac11c3a55caeb",
+  "original_glb_unchanged": true,
+  "geometry_weights_uv_morphs_rig_unchanged": true,
+  "animation_curves_unchanged": true,
+  "comparison": "Same source, camera, lights and exposure; material maps only",
+  "studio_pose": "Rest; existing animation data retained, not a motion proof",
+  "android_device_test": false,
+  "renders_executed": true,
+  "objects": {
+    "HeroBelt": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 96,
+      "polygons": 96,
+      "shape_keys": [
+        "Basis",
+        "Mature"
+      ],
+      "geometry_weights_uv_sha256": "379348f5c47dee9b40a1a6eca8d90197ae5b51657453304c8ea89f1f71eed5f4"
+    },
+    "HeroBody": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 12109,
+      "polygons": 21984,
+      "shape_keys": [
+        "Basis",
+        "Mature",
+        "Companion",
+        "Blink_L",
+        "Blink_R",
+        "JawOpen",
+        "Smile",
+        "BrowDown"
+      ],
+      "geometry_weights_uv_sha256": "e57819cf26caa896b2d6a9a5e3cff2204423f1455c11a707ba2dc43db7942361"
+    },
+    "HeroCollarSeam": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 390,
+      "polygons": 768,
+      "shape_keys": [],
+      "geometry_weights_uv_sha256": "65f7fa60873e153fecfaec96ad64c3381e28c2fbfdd8e35ebcae19e4a09630e4"
+    },
+    "HeroEyes": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 1076,
+      "polygons": 2040,
+      "shape_keys": [
+        "Basis",
+        "Mature"
+      ],
+      "geometry_weights_uv_sha256": "1389cb4f371d1fa037ccb8151c1c71bd190825d4b49b01e48f4f6e7b00077c73"
+    },
+    "HeroHair": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 1794,
+      "polygons": 3344,
+      "shape_keys": [
+        "Basis",
+        "Mature"
+      ],
+      "geometry_weights_uv_sha256": "b84a0d7fabc44dde21e383767726438c32d5d261fa3d7fcdadeed8c28514dc8b"
+    },
+    "HeroRig": {
+      "type": "ARMATURE",
+      "parent": null,
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "bones": [
+        {
+          "name": "Pelvis",
+          "parent": null,
+          "matrix": [
+            1.0,
+            4.440892098500626e-16,
+            -4.470348358154297e-08,
+            5.421010862427522e-20,
+            -4.4250185737837455e-08,
+            0.1420472115278244,
+            -0.9898598790168762,
+            -0.006511743646115065,
+            6.350004966293454e-09,
+            0.9898598790168762,
+            0.14204716682434082,
+            0.7808706164360046,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Spine",
+          "parent": "Pelvis",
+          "matrix": [
+            1.0,
+            -8.881784197001252e-16,
+            7.450584149637507e-09,
+            -5.564265309631906e-18,
+            7.429509452094862e-09,
+            -0.07515904307365417,
+            -0.9971715807914734,
+            0.013885986059904099,
+            5.599813945877941e-10,
+            0.9971715807914734,
+            -0.07515908777713776,
+            0.9230128526687622,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Head",
+          "parent": "Spine",
+          "matrix": [
+            1.0,
+            2.3314683517128287e-15,
+            -1.6049038720211684e-07,
+            -2.695235015361542e-16,
+            -1.576505184175403e-07,
+            -0.1872883141040802,
+            -0.9823049902915955,
+            -0.012120511382818222,
+            -3.0057982769449154e-08,
+            0.9823049902915955,
+            -0.18728837370872498,
+            1.2680538892745972,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Arm_L",
+          "parent": "Spine",
+          "matrix": [
+            0.8425599932670593,
+            0.396630197763443,
+            0.3643852472305298,
+            0.1589948683977127,
+            -0.39662978053092957,
+            -0.0007897540926933289,
+            0.9179783463478088,
+            -0.015730969607830048,
+            0.3643853962421417,
+            -0.9179781079292297,
+            0.15664997696876526,
+            1.1721141338348389,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Forearm_L",
+          "parent": "Arm_L",
+          "matrix": [
+            0.6120401620864868,
+            0.33261197805404663,
+            0.7174786329269409,
+            0.24174541234970093,
+            -0.3326115310192108,
+            -0.7148399353027344,
+            0.6151208877563477,
+            -0.015895722433924675,
+            0.7174786329269409,
+            -0.6151206493377686,
+            -0.3268802762031555,
+            0.9805928468704224,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Hand_L",
+          "parent": "Forearm_L",
+          "matrix": [
+            0.839655876159668,
+            0.20153720676898956,
+            0.5043413639068604,
+            0.3122740089893341,
+            -0.20153653621673584,
+            -0.7466872930526733,
+            0.6339095830917358,
+            -0.16747382283210754,
+            0.5043412446975708,
+            -0.6339094042778015,
+            -0.5863432884216309,
+            0.850159764289856,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Arm_R",
+          "parent": "Spine",
+          "matrix": [
+            0.8425599932670593,
+            -0.396630197763443,
+            -0.3643852472305298,
+            -0.1589948683977127,
+            0.39662981033325195,
+            -0.0007897540926933289,
+            0.9179783463478088,
+            -0.015730969607830048,
+            -0.3643853962421417,
+            -0.9179781079292297,
+            0.15664997696876526,
+            1.1721141338348389,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Forearm_R",
+          "parent": "Arm_R",
+          "matrix": [
+            0.6120401620864868,
+            -0.33261197805404663,
+            -0.7174786329269409,
+            -0.24174541234970093,
+            0.3326115608215332,
+            -0.7148399353027344,
+            0.6151208281517029,
+            -0.015895722433924675,
+            -0.7174786329269409,
+            -0.6151206493377686,
+            -0.3268802762031555,
+            0.9805928468704224,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Hand_R",
+          "parent": "Forearm_R",
+          "matrix": [
+            0.839655876159668,
+            -0.20153720676898956,
+            -0.5043413639068604,
+            -0.3122740089893341,
+            0.20153655111789703,
+            -0.7466872930526733,
+            0.6339095234870911,
+            -0.16747382283210754,
+            -0.5043412446975708,
+            -0.6339093446731567,
+            -0.5863433480262756,
+            0.850159764289856,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Thigh_L",
+          "parent": "Pelvis",
+          "matrix": [
+            0.9891946315765381,
+            0.09749895334243774,
+            0.10968618094921112,
+            0.09348238259553909,
+            -0.09751355648040771,
+            -0.1219872310757637,
+            0.98773193359375,
+            0.001691239420324564,
+            0.10968896746635437,
+            -0.9877312779426575,
+            -0.11116062849760056,
+            0.7832527756690979,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Shin_L",
+          "parent": "Thigh_L",
+          "matrix": [
+            0.987170934677124,
+            0.11746492236852646,
+            0.10834529250860214,
+            0.12838700413703918,
+            -0.11747870594263077,
+            0.07372622936964035,
+            0.9903370141983032,
+            -0.04198021441698074,
+            0.10834785550832748,
+            -0.9903367161750793,
+            0.08657645434141159,
+            0.42964476346969604,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Foot_L",
+          "parent": "Shin_L",
+          "matrix": [
+            0.7789830565452576,
+            0.09595102816820145,
+            0.6196951270103455,
+            0.17215757071971893,
+            -0.09597637504339218,
+            -0.9583452343940735,
+            0.26901161670684814,
+            -0.014507858082652092,
+            0.6196861863136292,
+            -0.2690223455429077,
+            -0.7373044490814209,
+            0.06061893701553345,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Thigh_R",
+          "parent": "Pelvis",
+          "matrix": [
+            0.9891947507858276,
+            -0.09749893099069595,
+            -0.10968618094921112,
+            -0.09348238259553909,
+            0.0975135862827301,
+            -0.1219872310757637,
+            0.98773193359375,
+            0.001691239420324564,
+            -0.10968899726867676,
+            -0.9877311587333679,
+            -0.11116063594818115,
+            0.7832527756690979,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Shin_R",
+          "parent": "Thigh_R",
+          "matrix": [
+            0.9871709942817688,
+            -0.11746492981910706,
+            -0.10834530740976334,
+            -0.12838700413703918,
+            0.11747873574495316,
+            0.07372620701789856,
+            0.9903370141983032,
+            -0.04198021441698074,
+            -0.10834790021181107,
+            -0.9903366565704346,
+            0.0865764170885086,
+            0.42964479327201843,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Foot_R",
+          "parent": "Shin_R",
+          "matrix": [
+            0.7789831161499023,
+            -0.09595103561878204,
+            -0.6196950674057007,
+            -0.17215757071971893,
+            0.09597636014223099,
+            -0.9583452343940735,
+            0.26901158690452576,
+            -0.01450786367058754,
+            -0.6196860074996948,
+            -0.2690223455429077,
+            -0.7373043894767761,
+            0.06061893701553345,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        }
+      ]
+    },
+    "HeroSandalStrap_L": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 30,
+      "polygons": 48,
+      "shape_keys": [],
+      "geometry_weights_uv_sha256": "d35d3317eb133c1515a3c19e9b514efe87d0b7d62eb528116990bfe4a8d911af"
+    },
+    "HeroSandalStrap_L.001": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 30,
+      "polygons": 48,
+      "shape_keys": [],
+      "geometry_weights_uv_sha256": "93e425d36ee2a7d1c2ef65251644dbfb5337f01ed0f6307e42add85f01c74165"
+    },
+    "HeroSandalStrap_R": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 30,
+      "polygons": 48,
+      "shape_keys": [],
+      "geometry_weights_uv_sha256": "c3c75b108e70449e7ebf90c40d34956d1d715431de5cfb1dac933d91c2087d86"
+    },
+    "HeroSandalStrap_R.001": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 30,
+      "polygons": 48,
+      "shape_keys": [],
+      "geometry_weights_uv_sha256": "4e1e8626e6c624d4eb8b7f18775c7636452470c5cb95f08d812f48a5f8a35170"
+    },
+    "HeroSandal_L": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 80,
+      "polygons": 80,
+      "shape_keys": [
+        "Basis",
+        "Mature"
+      ],
+      "geometry_weights_uv_sha256": "f70e38ef0a0f185b06addd7f4c619e3dd59bfbe285e653e7417fe1543425b3f4"
+    },
+    "HeroSandal_R": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 80,
+      "polygons": 80,
+      "shape_keys": [
+        "Basis",
+        "Mature"
+      ],
+      "geometry_weights_uv_sha256": "6d76ad021ce3a746ce94740940c79582cbc34f2dd4f293d6092d3f2c5f6b19ab"
+    },
+    "HeroTunic": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 1798,
+      "polygons": 3452,
+      "shape_keys": [
+        "Basis",
+        "Mature"
+      ],
+      "geometry_weights_uv_sha256": "2d447870db0b51fb692a90aa963926d3a8d6730af0316e0445eeb228e78c4fcf"
+    },
+    "HeroTunicSkirt": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 448,
+      "polygons": 768,
+      "shape_keys": [
+        "Basis",
+        "Mature"
+      ],
+      "geometry_weights_uv_sha256": "f26d8c1302f8d6028bc172ce14cfd664fdf7aac665f781b701c98dc39ccbdeda"
+    },
+    "Icosphere": {
+      "type": "MESH",
+      "parent": null,
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 42,
+      "polygons": 80,
+      "shape_keys": [],
+      "geometry_weights_uv_sha256": "5554d0cd6f5eda64edf938f2f8e0a46d58ded659a18817dead839950a02cf5a0"
+    },
+    "PracticeBlade": {
+      "type": "MESH",
+      "parent": "HeroRig",
+      "matrix_local": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "vertices": 16,
+      "polygons": 16,
+      "shape_keys": [],
+      "geometry_weights_uv_sha256": "34bdcee231f7854251cc1294abf480cc0181a119adb75d8238a6f06aaea60e10"
+    }
+  },
+  "animations": [
+    {
+      "name": "attack_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "07f0b11cac9ea1f9411ae6eeb8810d5606aa00a2bed2403807db3c91ef764897"
+    },
+    {
+      "name": "block_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "5753db710136edf62ceaa657192680d2b8a8ebbe0dbb462a69dc78fbe8cf4e3b"
+    },
+    {
+      "name": "death_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "3a93b022d778cc6089dd22122763439495b02a6099f7bd7d8df13e7486351e88"
+    },
+    {
+      "name": "gather_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "a5feab13cf2ad19b6e2eab4e6eb6cdc5fbc482a6c63b6a5b91155719c7ebf9ed"
+    },
+    {
+      "name": "hit_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "286c66924b955be3054706889aeec360e29126363b005d5f03fa1069f66be93e"
+    },
+    {
+      "name": "idle_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "418a4a35e4ecef697a6c5813a62241f3002fa8cf28b9e30ffa0dc00e2f495804"
+    },
+    {
+      "name": "march_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "3642d8701952b1f8b703d819532b23bed678999374dc7365c5333401e8fbfbe7"
+    },
+    {
+      "name": "run_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "18cbd3137ca17923b4013db8fa63627c70fd8f1251705a7e53f9b355ea9d5e71"
+    },
+    {
+      "name": "talk_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "45ee76acacc8a06e6f7e908ef044aaf46a18156199b9f644dd087a9b245f6fe6"
+    },
+    {
+      "name": "train_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "2d20cdaf78e3bd89413a3e25da481eb35966b003d9074afedc2e0afae216a1a9"
+    },
+    {
+      "name": "work_HeroRig",
+      "channels": 150,
+      "keyframes_sha256": "1c0a973f700f02bf66a7d80f5bf98e6626f0007ef4c25315fb30b9d49c9ad7c8"
+    }
+  ],
+  "captures": [
+    {
+      "view": "face",
+      "variant": "before",
+      "file": "face_before.png",
+      "sha256": "63df2c372bf921410939a07f6162d67a266c31aa67cb4615cd0cd0bc41284d43",
+      "camera": [
+        0.36,
+        -1.55,
+        1.46
+      ],
+      "target": [
+        0,
+        -0.01,
+        1.34
+      ],
+      "lens_mm": 100
+    },
+    {
+      "view": "cloth",
+      "variant": "before",
+      "file": "cloth_before.png",
+      "sha256": "3e6e2af471098aee04f12b4a64744e758a95b7121612b730525732f529a24ec3",
+      "camera": [
+        0.38,
+        -1.4,
+        0.98
+      ],
+      "target": [
+        0,
+        -0.01,
+        0.89
+      ],
+      "lens_mm": 100
+    },
+    {
+      "view": "face",
+      "variant": "after",
+      "file": "face_after.png",
+      "sha256": "c0c64c409bd28925e27bfae5b673734a55e1f26c664e81d906e1df89488d133a",
+      "camera": [
+        0.36,
+        -1.55,
+        1.46
+      ],
+      "target": [
+        0,
+        -0.01,
+        1.34
+      ],
+      "lens_mm": 100
+    },
+    {
+      "view": "cloth",
+      "variant": "after",
+      "file": "cloth_after.png",
+      "sha256": "a22d6db119ea100220d5b7773bd55e3e9386037ce61e85cda960174bbf710c17",
+      "camera": [
+        0.38,
+        -1.4,
+        0.98
+      ],
+      "target": [
+        0,
+        -0.01,
+        0.89
+      ],
+      "lens_mm": 100
+    }
+  ],
+  "blend_file": "hero_city_detail.blend",
+  "blend_sha256": "caed7618b9cbeee201f54d95bc2b67285c62f69085eeeaff31da50ae28b703a6",
+  "blend_packaging": "Editable Blender file with complete original encoded images under relative //textures/ paths",
+  "textures": [
+    {
+      "image": "brown_eye",
+      "relative_path": "textures/brown_eye_4659691c7295.png",
+      "bytes": 610817,
+      "sha256": "4659691c7295ad6206c78b003e5fd0e5f91dcd53032fa914a229bb48cabe424b",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "color_space": "sRGB"
+    },
+    {
+      "image": "HeroLinen_roughness",
+      "relative_path": "textures/HeroLinen_roughness_ddf78f07fe47.png",
+      "bytes": 268651,
+      "sha256": "ddf78f07fe4773416f0c8983fe45d77594996e7eb8fb55804b016426a2650415",
+      "dimensions": [
+        512,
+        512
+      ],
+      "color_space": "Non-Color"
+    },
+    {
+      "image": "HeroLinen_weave_normal",
+      "relative_path": "textures/HeroLinen_weave_normal_0c12c174c08d.png",
+      "bytes": 5740,
+      "sha256": "0c12c174c08d9eaae4d79338bda138473722ad42842e22545dab53b2c7dcf014",
+      "dimensions": [
+        512,
+        512
+      ],
+      "color_space": "Non-Color"
+    },
+    {
+      "image": "HeroLinen_woven_base",
+      "relative_path": "textures/HeroLinen_woven_base_9c929b72fae0.png",
+      "bytes": 349711,
+      "sha256": "9c929b72fae0a6e33d1e0e91bba4f575a8060021fd904db3c9cbc4559dc0c466",
+      "dimensions": [
+        512,
+        512
+      ],
+      "color_space": "sRGB"
+    },
+    {
+      "image": "HeroSkin_micro_normal",
+      "relative_path": "textures/HeroSkin_micro_normal_88c18151a4f4.png",
+      "bytes": 423373,
+      "sha256": "88c18151a4f4757f612ca8acf4ee5e8e6fb6b980f7142c40cfff9d77dca28685",
+      "dimensions": [
+        512,
+        512
+      ],
+      "color_space": "Non-Color"
+    },
+    {
+      "image": "HeroSkin_roughness",
+      "relative_path": "textures/HeroSkin_roughness_e26c5e4898af.png",
+      "bytes": 266342,
+      "sha256": "e26c5e4898af9e20811f453cc1e1c071fb129bf6da4712f38a634361fdd5094d",
+      "dimensions": [
+        512,
+        512
+      ],
+      "color_space": "Non-Color"
+    },
+    {
+      "image": "leather_detail_normal.png",
+      "relative_path": "textures/leather_detail_normal_4b3c552d992f.png",
+      "bytes": 99215,
+      "sha256": "4b3c552d992f061a5b4664cc7bf2c90436b070e209b68fbb2cc1cb5b58fa5713",
+      "dimensions": [
+        256,
+        256
+      ],
+      "color_space": "Non-Color"
+    },
+    {
+      "image": "linen_detail_normal.png",
+      "relative_path": "textures/linen_detail_normal_53b2bf4ba4b5.png",
+      "bytes": 1055430,
+      "sha256": "53b2bf4ba4b5ff201ccebb6cfd26db7a7926dfb5441391675b3f945a8300829e",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "color_space": "Non-Color"
+    },
+    {
+      "image": "short02_diffuse",
+      "relative_path": "textures/short02_diffuse_47fe33831a39.png",
+      "bytes": 3553543,
+      "sha256": "47fe33831a3929567c733356dd66243116e05df2ace1f884ddca0080b728229f",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "color_space": "sRGB"
+    },
+    {
+      "image": "short02_normal",
+      "relative_path": "textures/short02_normal_2cfac7619f8e.png",
+      "bytes": 1626745,
+      "sha256": "2cfac7619f8eec77dd90df979d912415058f4f0fc16940cba40a8eb1ae6d74b5",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "color_space": "Non-Color"
+    },
+    {
+      "image": "skin_detail_normal.png",
+      "relative_path": "textures/skin_detail_normal_c68c0b5b9fec.png",
+      "bytes": 1002848,
+      "sha256": "c68c0b5b9fec99dd5acbe16bf622075be86ee9f246c02fd33979f9ea79fa0095",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "color_space": "Non-Color"
+    },
+    {
+      "image": "skin_detail_roughness.png",
+      "relative_path": "textures/skin_detail_roughness_3417a895c073.png",
+      "bytes": 408037,
+      "sha256": "3417a895c07349cfc758f2aad654a96183ca7e1a1673d7e8a5626b266b6d1a04",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "color_space": "Non-Color"
+    },
+    {
+      "image": "young_lightskinned_female_diffuse",
+      "relative_path": "textures/young_lightskinned_female_diffuse_b2a6ac8cd4f9.png",
+      "bytes": 4391156,
+      "sha256": "b2a6ac8cd4f9febdb447368e29c76cd68410bb66e46d9dcfa2d5f75126eea8fc",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "color_space": "sRGB"
+    }
+  ],
+  "packaging_validation": {
+    "opened_in_blender": "4.3.2",
+    "original_blend_sha256": "1708a5c0eecd10431072e633fe0f92d720efff39290e2779b89b0f47d15e109e",
+    "geometry_weights_uv_morphs_rig_unchanged": true,
+    "animation_curves_unchanged": true,
+    "material_graphs_and_assignments_unchanged": true,
+    "original_encoded_image_bytes_preserved": true,
+    "original_source_glb_unchanged": true
+  }
+}

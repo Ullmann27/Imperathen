@@ -1,0 +1,66 @@
+{
+  "base_commit": "261639105dcaa72f8dd92e73f4db1d9ab7d90a23",
+  "source_fingerprint": "e6fe4a34bd3f0cfb75de6f86ed6dd507fabaf44d7e6ddd8b9999b456a0699800",
+  "files": [
+    {
+      "path": "docs/20_meshy_assets/character-build.json",
+      "sha256": "b139958a033901493d5043700d2152227804a7d63995004b125bd079749087a6",
+      "bytes": 5827
+    },
+    {
+      "path": "prototype/assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+      "sha256": "df13d9600341bd04186248be605ea65c2ba8e1fbdbd17df9150eb1e68f80aae5",
+      "bytes": 4085944
+    },
+    {
+      "path": "prototype/assets/meshy/characters/unit_germanic_axe_fighter_1.glb",
+      "sha256": "2df91c2d4c11ed0b1cfe942e2d577d096cfd539879ddaceef164c52eed467611",
+      "bytes": 1115936
+    },
+    {
+      "path": "prototype/assets/meshy/characters/unit_germanic_axe_fighter_2.glb",
+      "sha256": "a6cb21a43b8e57a9a38a3c77849eda921d17eecb0e1fa216c22883dc32140dbd",
+      "bytes": 495384
+    },
+    {
+      "path": "prototype/assets/meshy/characters/unit_germanic_axe_fighter_3.glb",
+      "sha256": "473c7a741dd1a8cc6290e375d4f4e9a77eb3e0e6db9569bf4258b6c4628fcda5",
+      "bytes": 290048
+    },
+    {
+      "path": "prototype/assets/meshy/characters/unit_roman_signifer_0.glb",
+      "sha256": "c7c7057f6f4c19b7d73e0a28f27e0c14d154ea2614394d7def5a8a0ddc3e9ee9",
+      "bytes": 4631672
+    },
+    {
+      "path": "prototype/assets/meshy/characters/unit_roman_signifer_1.glb",
+      "sha256": "cc6e880d775f0739638d9121ccaa1b3693c0899acd283a9ccbeb41c553482cee",
+      "bytes": 1179860
+    },
+    {
+      "path": "prototype/assets/meshy/characters/unit_roman_signifer_2.glb",
+      "sha256": "eca91d261ae664ba0c9ab5e3a9386f08cf9d8d5c07cf73a27fed0ee84318d5dd",
+      "bytes": 550460
+    },
+    {
+      "path": "prototype/assets/meshy/characters/unit_roman_signifer_3.glb",
+      "sha256": "da3797d9472505ca5f4f439e50acf01ad43f2616b861aca9c801792ab7a59087",
+      "bytes": 309960
+    },
+    {
+      "path": "prototype/tests/motion_skin_measurement_test.gd",
+      "sha256": "734268cb352d7d173c0364eabd3d19fd3b3b02871829335b595a31801e6e886c",
+      "bytes": 5385
+    },
+    {
+      "path": "tests/meshy_gait_reach_test.py",
+      "sha256": "4bd3c783cb62a92d0f7d4dac143d930fe8634a04a74f581f744a8299015e1d91",
+      "bytes": 10570
+    },
+    {
+      "path": "tools/characters/build_meshy_people.py",
+      "sha256": "9eaa5b95b76615c7b812caadf07b4f4e276fdbec5cf63cbb11f43adb7ffc4985",
+      "bytes": 33253
+    }
+  ]
+}

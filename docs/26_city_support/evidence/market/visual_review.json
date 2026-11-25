@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-25",
+  "reviewer": "root",
+  "actual_engine_images_opened": [
+    "01_market_district.png",
+    "02_shopfront_materials.png",
+    "03_real_trade_panel.png",
+    "04_dolia_and_paving.png"
+  ],
+  "image_sha256": {
+    "01_market_district.png": "56511c92d47cd0560c8e37756130ea0953f2bb6228a03653da653d8c0b80ec59",
+    "02_shopfront_materials.png": "cf8a5e508e54d732df29042be01ad34cc26dcc2241b86fc36e173269c301626c",
+    "03_real_trade_panel.png": "3b72e1938ef4e5ddf84801f93d59098175985e8a231dd0989fcb130f192116c2",
+    "04_dolia_and_paving.png": "7dd488c23a2970c7f1a1f276caaa1e9248bd3512b8f69cd8d986e5c499526796"
+  },
+  "geometry_review": [
+    "Bread boards rest on visible tables with legs and cross braces.",
+    "Central entrances remain visually clear; physical entrance ray is separately tested.",
+    "Curbs run continuously along both sides.",
+    "Counter vessels have visible openings."
+  ],
+  "ui_review": "Actual purchase panel shows 28 denarii, bread stock 39 and owned quantity 1, with bakery proximity rather than the previous stale armorer label.",
+  "limitations": [
+    "Small market review district, not a screenshot of the full city.",
+    "Existing figures and early art direction; not a completed AAA art pass.",
+    "Software OpenGL capture; no Android device benchmark."
+  ],
+  "source_sha256": {
+    "scene": "0c7513cb534a1f2c44d1bb7b8394db0eb96500a3e3a671a9552e16f9b5d4c3bd",
+    "graphics_test": "0218640cc4213e6a6a7cf747a8a6726ac7696587e45ebc5ece794a83d8d2eef1",
+    "capture_driver": "22dfce6c8cb67546e1cead5ed99240680fa031bd151912ef70dd2da09b94dbe2"
+  }
+}

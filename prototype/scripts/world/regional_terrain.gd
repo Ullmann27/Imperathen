@@ -4,13 +4,28 @@ extends Node3D
 
 const Plan = preload("res://scripts/world/world_stream_plan.gd")
 const GRID := 12
+const MESH_BUILD_BUDGET := 2
+const COLLIDER_BUILD_BUDGET := 2
+const UNLOAD_BUDGET := 8
+## A walking capsule can overlap an edge before its center changes sector.
+## Keep the adjacent ground ready within one meter, including low quality.
+const SUPPORT_MARGIN_M := 1.0
+const MAX_RESIDENT_SECTORS := 145
 var sectors: Dictionary = {}
 var demand: Dictionary = {}
 var _last_cell := ""
 var _last_quality := ""
+var _last_support_key := ""
 var _pending: Array = []
+var _retiring: Array[String] = []
+var _support_ids: Array[String] = []
+var _collision_targets: Dictionary = {}
+var _collision_order: Array[String] = []
 var _ground: StandardMaterial3D
 var loaded_triangles := 0
+var _last_mesh_builds := 0
+var _last_collider_builds := 0
+var _last_unloads := 0
 
 
 func _ready() -> void:
@@ -24,31 +39,107 @@ func follow(position: Vector3, quality: String) -> void:
 	var cell: Vector2i = Plan.sector_for_position(position)
 	if not Plan.sector_valid(cell):
 		return
-	var key := "%s:%s" % [cell.x, cell.y]
-	if key != _last_cell or quality != _last_quality:
+	_last_mesh_builds = 0
+	_last_collider_builds = 0
+	_last_unloads = 0
+	var profile := quality if Plan.PROFILES.has(quality) else "balanced"
+	var key := Plan.sector_id(cell)
+	var next_support := _support_sectors(position, cell)
+	var support_key := ",".join(next_support)
+	var demand_changed := key != _last_cell or profile != _last_quality
+	if demand_changed:
 		_last_cell = key
-		_last_quality = quality
-		demand = Plan.plan(position, quality)
+		_last_quality = profile
+		demand = Plan.plan(position, profile)
 		var wanted: Dictionary = {}
 		_pending.clear()
+		_retiring.clear()
 		for entry: Dictionary in demand.get("sectors", []):
 			wanted[entry.id] = true
-			if sectors.has(entry.id):
-				_set_collision(sectors[entry.id], bool(entry.collision))
-			else:
+			if not sectors.has(entry.id):
 				_pending.append(entry)
 		for id: String in sectors.keys():
 			if not wanted.has(id):
-				var node: Node3D = sectors[id]
-				remove_child(node)
-				node.free()
-				sectors.erase(id)
-	for _index in mini(2, _pending.size()):
-		var entry: Dictionary = _pending.pop_front()
+				_retiring.append(id)
+		_retiring.sort_custom(func(a: String, b: String) -> bool:
+			var distance_a: float = sectors[a].position.distance_squared_to(position)
+			var distance_b: float = sectors[b].position.distance_squared_to(position)
+			return distance_a > distance_b if distance_a != distance_b else a < b)
+	if demand_changed or support_key != _last_support_key:
+		_last_support_key = support_key
+		_support_ids = next_support
+		_refresh_collision_targets()
+		_prioritize_support_meshes()
+	# Retire old geometry incrementally. During a profile reduction the report
+	# exposes the remaining old sectors instead of claiming the new cap is met.
+	for _index in mini(UNLOAD_BUDGET, _retiring.size()):
+		var id: String = _retiring.pop_front()
+		var node: Node3D = sectors[id]
+		remove_child(node)
+		node.free()
+		sectors.erase(id)
+		_last_unloads += 1
+	while _last_mesh_builds < MESH_BUILD_BUDGET and not _pending.is_empty():
+		var entry: Dictionary = _pending.front()
+		# Immediate ground support has priority over the cosmetic residency cap.
+		# Each call retires more meshes than it can create, so even teleports and
+		# profile reductions remain under the largest existing profile's cap.
+		if sectors.size() >= int(demand.active_limit) and not _support_ids.has(str(entry.id)):
+			break
+		_pending.pop_front()
 		var sector := _make_sector(entry)
 		add_child(sector)
 		sectors[entry.id] = sector
+		_last_mesh_builds += 1
+	# Mesh creation and expensive trimesh construction have separate budgets.
+	# Promotion of a resident mesh is no longer an unbounded special case.
+	for id: String in _collision_order:
+		if _last_collider_builds >= COLLIDER_BUILD_BUDGET:
+			break
+		if sectors.has(id) and not sectors[id].has_node("GroundCollision"):
+			_set_collision(sectors[id], true)
+			_last_collider_builds += 1
 	loaded_triangles = sectors.size() * GRID * GRID * 2
+
+
+func _support_sectors(position: Vector3, cell: Vector2i) -> Array[String]:
+	var result: Array[String] = [Plan.sector_id(cell)]
+	for x_offset: float in [-SUPPORT_MARGIN_M, SUPPORT_MARGIN_M]:
+		for z_offset: float in [-SUPPORT_MARGIN_M, SUPPORT_MARGIN_M]:
+			var neighbor: Vector2i = Plan.sector_for_position(position + Vector3(x_offset, 0, z_offset))
+			var id: String = Plan.sector_id(neighbor)
+			if not id.is_empty() and not result.has(id):
+				result.append(id)
+	return result
+
+
+func _refresh_collision_targets() -> void:
+	_collision_targets.clear()
+	_collision_order.clear()
+	for id: String in _support_ids:
+		_collision_targets[id] = true
+		_collision_order.append(id)
+	for entry: Dictionary in demand.get("sectors", []):
+		if bool(entry.collision) and not _collision_targets.has(entry.id):
+			_collision_targets[entry.id] = true
+			_collision_order.append(str(entry.id))
+	# Collision removal is cheap and immediate; obsolete physics never remains
+	# active solely because an old visual sector is awaiting retirement.
+	for id: String in sectors:
+		if not _collision_targets.has(id):
+			_set_collision(sectors[id], false)
+
+
+func _prioritize_support_meshes() -> void:
+	var ordered: Array = []
+	for id: String in _support_ids:
+		for entry: Dictionary in _pending:
+			if str(entry.id) == id:
+				ordered.append(entry)
+	for entry: Dictionary in _pending:
+		if not _support_ids.has(str(entry.id)):
+			ordered.append(entry)
+	_pending = ordered
 
 
 func _make_sector(entry: Dictionary) -> Node3D:
@@ -81,7 +172,6 @@ func _make_sector(entry: Dictionary) -> Node3D:
 	mesh.mesh = surface.commit()
 	mesh.material_override = _ground
 	node.add_child(mesh)
-	_set_collision(node, bool(entry.collision))
 	return node
 
 
@@ -109,7 +199,17 @@ func report() -> Dictionary:
 	for node: Node3D in sectors.values():
 		if node.has_node("GroundCollision"):
 			collisions += 1
+	var pending_collisions := 0
+	for id: String in _collision_order:
+		if not sectors.has(id) or not sectors[id].has_node("GroundCollision"):
+			pending_collisions += 1
 	return {"loaded_sectors":sectors.size(), "pending_sectors":_pending.size(),
-		"collision_sectors":collisions, "triangles":loaded_triangles,
-		"active_limit":demand.get("active_limit", 0), "world_size_m":Plan.WORLD_SIZE_M,
+		"retiring_sectors":_retiring.size(), "pending_collisions":pending_collisions,
+		"pending_work":_pending.size() + _retiring.size() + pending_collisions,
+		"collision_sectors":collisions, "collision_limit":_collision_targets.size(),
+		"support_sectors":_support_ids.size(), "triangles":loaded_triangles,
+		"active_limit":demand.get("active_limit", 0), "resident_limit":MAX_RESIDENT_SECTORS,
+		"last_mesh_builds":_last_mesh_builds, "last_collider_builds":_last_collider_builds,
+		"last_unloads":_last_unloads, "quality":_last_quality,
+		"world_size_m":Plan.WORLD_SIZE_M,
 		"inhabited_content":"authored village; distant settlements remain planned"}

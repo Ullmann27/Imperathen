@@ -1,0 +1,26 @@
+{
+  "repair": "Move exactly48 existing18mm front-column fluting beams into an unbeveled detail mesh sharing the same Limestone material; all other stone keeps12mm bevel",
+  "before": {
+    "invalid_authored_tangent_vertices": 573,
+    "geometry_zero_area_triangles": 550,
+    "uv_zero_area_triangles": 453
+  },
+  "after": {
+    "vertices": 22990,
+    "triangles": 10336,
+    "geometry_zero_area_triangles": 0,
+    "uv_zero_area_triangles": 0,
+    "source_tangent_quality": {
+      "material": "WX_Limestone",
+      "vertices": 22990,
+      "invalid_frames": 0,
+      "minimum_tangent_length_squared": 0.9998708268808936,
+      "minimum_normal_tangent_cross_squared": 0.9998708698838721
+    }
+  },
+  "packed_glb_sha256": "49a0c2e8afa5b50f4713cff57500b1bdf85539406dbc8d7eda11a395a1dee56e",
+  "geometry_area_threshold_cross_squared": 1e-16,
+  "uv_area_threshold_absolute_determinant": 1e-12,
+  "retained_column_ribs": 48,
+  "scope": "Basilica LOD0 only; LOD1/LOD2 and other asset types are byte-identical"
+}

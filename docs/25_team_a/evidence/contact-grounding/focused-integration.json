@@ -1,0 +1,90 @@
+{
+  "complete": false,
+  "scope": "Nine focused integration groups; full regression and strict gate are separate",
+  "source_fingerprint": "a36c7e490e09617bde1bc143ee622584b8f98034158d72db96cb9a6ec573ff0f",
+  "source_unchanged_during_checks": true,
+  "checks": [
+    {
+      "check": "import",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 14.106,
+      "expected_marker": null,
+      "log": "import.log",
+      "warnings": []
+    },
+    {
+      "check": "companion_navigation",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.585,
+      "expected_marker": "COMPANION_NAVIGATION_PASS",
+      "log": "companion_navigation.log",
+      "warnings": []
+    },
+    {
+      "check": "companion_turn_motion",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.382,
+      "expected_marker": "COMPANION_TURN_MOTION_PASS",
+      "log": "companion_turn_motion.log",
+      "warnings": []
+    },
+    {
+      "check": "lod_contact_history",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 8.718,
+      "expected_marker": "LOD_CONTACT_HISTORY_PASS",
+      "log": "lod_contact_history.log",
+      "warnings": []
+    },
+    {
+      "check": "companion_follow",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 14.011,
+      "expected_marker": "COMPANION_FOLLOW_PASS",
+      "log": "companion_follow.log",
+      "warnings": []
+    },
+    {
+      "check": "character_motion",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.833,
+      "expected_marker": "checks; 0 failed;",
+      "log": "character_motion.log",
+      "warnings": []
+    },
+    {
+      "check": "meshy_characters",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 1.933,
+      "expected_marker": "MESHY_CHARACTERS_PASS",
+      "log": "meshy_characters.log",
+      "warnings": []
+    },
+    {
+      "check": "motion_skin_measurement",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 2.866,
+      "expected_marker": "checks; 0 failed",
+      "log": "motion_skin_measurement.log",
+      "warnings": []
+    },
+    {
+      "check": "motion_mesh_clearance",
+      "passed": true,
+      "exit_code": 0,
+      "elapsed_seconds": 0.342,
+      "expected_marker": "checks; 0 failed",
+      "log": "motion_mesh_clearance.log",
+      "warnings": []
+    }
+  ],
+  "passed": true
+}

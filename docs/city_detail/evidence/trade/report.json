@@ -1,0 +1,141 @@
+{
+  "scope": "Focused WorldModel city commerce, persistence and combat regression; no physical Android or visual proof.",
+  "created_utc": "2026-11-25T10:35:42.156619+00:00",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "tests": [
+    {
+      "name": "city_trade",
+      "command": [
+        "godot",
+        "--headless",
+        "--path",
+        "prototype",
+        "--script",
+        "res://tests/city_trade_test.gd"
+      ],
+      "exit_code": 0,
+      "checks": 169,
+      "failures": 0,
+      "success_marker": true,
+      "warnings": false,
+      "seconds": 2.756
+    },
+    {
+      "name": "domain",
+      "command": [
+        "godot",
+        "--headless",
+        "--path",
+        "prototype",
+        "--script",
+        "res://tests/domain_test.gd"
+      ],
+      "exit_code": 0,
+      "checks": 329,
+      "failures": 0,
+      "success_marker": true,
+      "warnings": false,
+      "seconds": 1.786
+    },
+    {
+      "name": "combat_actions",
+      "command": [
+        "godot",
+        "--headless",
+        "--path",
+        "prototype",
+        "--script",
+        "res://tests/combat_actions_test.gd"
+      ],
+      "exit_code": 0,
+      "checks": 201,
+      "failures": 0,
+      "success_marker": true,
+      "warnings": false,
+      "seconds": 0.61
+    },
+    {
+      "name": "combat_model_integration",
+      "command": [
+        "godot",
+        "--headless",
+        "--path",
+        "prototype",
+        "--script",
+        "res://tests/combat_model_integration_test.gd"
+      ],
+      "exit_code": 0,
+      "checks": 230,
+      "failures": 0,
+      "success_marker": true,
+      "warnings": false,
+      "seconds": 5.976
+    }
+  ],
+  "sources": {
+    "prototype/scripts/city_trade.gd": "38579d20b99ebe3fa8815d77a8a4f2e5d12f2982a285b52373606b49138e99ff",
+    "prototype/scripts/city_trade_catalog.gd": "cff4af803ad712909ee3519e0c94e66b74104160da685c5b85b4f6a9816c5148",
+    "prototype/scripts/domain/world_model.gd": "5a2c21785fad0e3e4673419a4f3edbe084be7345e506619f2e093aa9cef2f46c",
+    "prototype/scripts/domain/combat_actions.gd": "c811b434d4e82508cccc8ad583fd1055f5bdaa921587fab8931198745c473d0f",
+    "prototype/tests/city_trade_test.gd": "ebeb2b795043372bb6f9cfd7d11689f457d47962663546b7422fbfdcb405cb47"
+  },
+  "economic_regression_followup": {
+    "created_utc": "2026-11-25T10:48:03.980530+00:00",
+    "engine": "4.7.2.stable.official.ed1daf0bf",
+    "tests": [
+      {
+        "name": "village_economy",
+        "command": [
+          "godot",
+          "--headless",
+          "--path",
+          "prototype",
+          "--script",
+          "res://tests/village_economy_test.gd"
+        ],
+        "exit_code": 0,
+        "checks": 191,
+        "failures": 0,
+        "success_marker": true,
+        "warnings": false,
+        "seconds": 0.551,
+        "isolation": "Independent temporary XDG_DATA_HOME, XDG_CONFIG_HOME and XDG_CACHE_HOME for this test; removed after completion.",
+        "environment": {
+          "GODOT_SILENCE_ROOT_WARNING": "1",
+          "IMPERATHEN_ISOLATED_TEST": "1"
+        }
+      },
+      {
+        "name": "commerce_transaction",
+        "command": [
+          "godot",
+          "--headless",
+          "--path",
+          "prototype",
+          "--script",
+          "res://tests/commerce_transaction_test.gd"
+        ],
+        "exit_code": 0,
+        "checks": 245,
+        "failures": 0,
+        "success_marker": true,
+        "warnings": false,
+        "seconds": 1.549,
+        "isolation": "Independent temporary XDG_DATA_HOME, XDG_CONFIG_HOME and XDG_CACHE_HOME for this test; removed after completion.",
+        "environment": {
+          "GODOT_SILENCE_ROOT_WARNING": "1",
+          "IMPERATHEN_ISOLATED_TEST": "1"
+        }
+      }
+    ],
+    "sources": {
+      "prototype/scripts/city_trade.gd": "38579d20b99ebe3fa8815d77a8a4f2e5d12f2982a285b52373606b49138e99ff",
+      "prototype/scripts/city_trade_catalog.gd": "cff4af803ad712909ee3519e0c94e66b74104160da685c5b85b4f6a9816c5148",
+      "prototype/scripts/domain/world_model.gd": "5a2c21785fad0e3e4673419a4f3edbe084be7345e506619f2e093aa9cef2f46c",
+      "prototype/scripts/domain/combat_actions.gd": "c811b434d4e82508cccc8ad583fd1055f5bdaa921587fab8931198745c473d0f",
+      "prototype/scripts/domain/village_economy.gd": "0e7f0682965e05f7fb2c1fb95247849eb862e312e6d642a179b8e5fc2ec432cd",
+      "prototype/tests/village_economy_test.gd": "b39df5f6e623d0b74b92223bda026e631f3cc18eb7f6dd0d4806d39141e09aa7",
+      "prototype/tests/commerce_transaction_test.gd": "808d135d637359ac3fe845402c61c55a34f9fa22b7cfb3a839296ff63366b1bc"
+    }
+  }
+}

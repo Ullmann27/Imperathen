@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "team_id": "roman_life_20261125",
+  "project": "IMPERATHEN",
+  "status": "in_progress",
+  "base": {
+    "branch": "feature/team-b-living-world-20261124",
+    "commit": "7af39f35b1947595f95e365eb7762592feabf234"
+  },
+  "branch": "art/roman-life-shops-interiors-20261125",
+  "scope": "Rüstungs-Props, drei begehbare Innenräume, Händler- und Gasthausfunktionen",
+  "observed_parallel_work": [
+    {
+      "pr": 56,
+      "area": "Charakter/Kamera/Bewegung"
+    },
+    {
+      "pr": 55,
+      "area": "NPCs/Wirtschaft/Welt"
+    },
+    {
+      "pr": 54,
+      "area": "Präsentation/Lieferung"
+    },
+    {
+      "pr": 53,
+      "area": "Begleiter/Android"
+    }
+  ],
+  "unpublished_city_teams": "Die heutigen Stadt-/Landschaftsarbeiten wurden über Kontextberichte gefunden; bei Branchprüfung noch kein neuer veröffentlichter Stand. Keine Live-Verbindung behauptet.",
+  "agents": [
+    {
+      "id": "armor_assets",
+      "paths": [
+        "tools/roman_life/armor_assets.py",
+        "prototype/assets/roman_life/armor/**"
+      ],
+      "status": "in_progress"
+    },
+    {
+      "id": "interiors",
+      "paths": [
+        "tools/roman_life/interiors.py",
+        "prototype/assets/roman_life/interiors/**"
+      ],
+      "status": "in_progress"
+    },
+    {
+      "id": "shop_gameplay",
+      "paths": [
+        "prototype/scripts/domain/roman_commerce.gd",
+        "prototype/assets/roman_life/commerce_catalog.json",
+        "prototype/tests/roman_commerce_test.gd"
+      ],
+      "status": "in_progress"
+    }
+  ],
+  "integrator": {
+    "id": "root",
+    "owns": [
+      "tools/roman_life/build_pack.py",
+      "prototype/scripts/world/roman_life_world.gd",
+      "prototype/scripts/world/game_world.gd",
+      "docs/26_roman_life/**"
+    ]
+  },
+  "contracts": {
+    "units": "metres",
+    "blender_up": "+Z",
+    "gltf_up": "+Y",
+    "armor_families": [
+      "helmet",
+      "mail",
+      "shield",
+      "greaves",
+      "belt"
+    ],
+    "qualities": [
+      "worn",
+      "service",
+      "veteran",
+      "honor"
+    ],
+    "filename_pattern": "roman_{family}_{quality}.glb",
+    "interiors": [
+      "caupona",
+      "humble_home",
+      "merchant_domus"
+    ],
+    "armorer_point": [
+      14,
+      36.4
+    ],
+    "inn_point": [
+      -10,
+      35.8
+    ],
+    "main_merge": false
+  }
+}

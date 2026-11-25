@@ -1,0 +1,653 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ERROR: player march L 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march L 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march L 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march L 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march L 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march L 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march L 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march L 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march L 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march R 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march R 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march R 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march R 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march R 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march R 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march R 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march R 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player march R 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run L 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run L 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run L 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run L 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run L 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run L 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run L 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run L 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run L 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run R 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run R 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run R 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run R 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run R 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run R 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run R 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run R 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: player run R 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march L 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march L 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march L 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march L 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march L 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march L 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march L 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march L 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march L 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march R 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march R 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march R 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march R 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march R 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march R 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march R 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march R 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion march R 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run L 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run L 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run L 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run L 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run L 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run L 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run L 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run L 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run L 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run R 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run R 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run R 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run R 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run R 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run R 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run R 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run R 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: companion run R 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march L 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march L 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march L 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march L 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march L 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march L 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march L 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march L 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march L 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march R 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march R 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march R 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march R 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march R 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march R 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march R 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march R 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident march R 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run L 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run L 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run L 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run L 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run L 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run L 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run L 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run L 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run L 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run R 30 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run R 30 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run R 30 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run R 60 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run R 60 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run R 60 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run R 120 Hz: a zero-time LOD solve preserves the last stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:84)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run R 120 Hz: the first swing retains exactly the last real stance correction
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:95)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+ERROR: resident run R 120 Hz: the actual first-swing pose matches the continuously simulated control
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/lod_contact_history_test.gd:19)
+       [1] _lift_boundary (res://tests/lod_contact_history_test.gd:107)
+       [2] _run (res://tests/lod_contact_history_test.gd:42)
+LOD_CONTACT_HISTORY_METRICS [{"action":"march","history_change_m":0.0483333319425583,"hz":30.0,"kind":"player","pose_difference_deg":10.3582030036987,"pose_difference_m":0.064632274210453,"release_error_m":0.0483333319425583,"side":"L"},{"action":"march","history_change_m":0.0241666734218597,"hz":60.0,"kind":"player","pose_difference_deg":5.2705756640824,"pose_difference_m":0.0329212360084057,"release_error_m":0.0241666734218597,"side":"L"},{"action":"march","history_change_m":0.0120833367109299,"hz":120.0,"kind":"player","pose_difference_deg":2.65357929208191,"pose_difference_m":0.0165784191340208,"release_error_m":0.0120833367109299,"side":"L"},{"action":"march","history_change_m":0.0483333319425583,"hz":30.0,"kind":"player","pose_difference_deg":10.3582030036987,"pose_difference_m":0.0646321773529053,"release_error_m":0.0483333319425583,"side":"R"},{"action":"march","history_change_m":0.0241666734218597,"hz":60.0,"kind":"player","pose_difference_deg":5.27072422069685,"pose_difference_m":0.0329212434589863,"release_error_m":0.0241666734218597,"side":"R"},{"action":"march","history_change_m":0.0120833367109299,"hz":120.0,"kind":"player","pose_difference_deg":2.65357929208191,"pose_difference_m":0.0165784265846014,"release_error_m":0.0120833367109299,"side":"R"},{"action":"run","history_change_m":0.136666655540466,"hz":30.0,"kind":"player","pose_difference_deg":27.1820082172514,"pose_difference_m":0.159040898084641,"release_error_m":0.136666655540466,"side":"L"},{"action":"run","history_change_m":0.0683333277702332,"hz":60.0,"kind":"player","pose_difference_deg":17.9001653333448,"pose_difference_m":0.109138995409012,"release_error_m":0.0683333277702332,"side":"L"},{"action":"run","history_change_m":0.0341666638851166,"hz":120.0,"kind":"player","pose_difference_deg":9.27773196379981,"pose_difference_m":0.0579068586230278,"release_error_m":0.0341666638851166,"side":"L"},{"action":"run","history_change_m":0.136666655540466,"hz":30.0,"kind":"player","pose_difference_deg":27.1818886889409,"pose_difference_m":0.15904039144516,"release_error_m":0.136666655540466,"side":"R"},{"action":"run","history_change_m":0.0683333277702332,"hz":60.0,"kind":"player","pose_difference_deg":17.9001209371152,"pose_difference_m":0.109138943254948,"release_error_m":0.0683333277702332,"side":"R"},{"action":"run","history_change_m":0.0341666638851166,"hz":120.0,"kind":"player","pose_difference_deg":9.27773196379981,"pose_difference_m":0.0579068101942539,"release_error_m":0.0341666638851166,"side":"R"},{"action":"march","history_change_m":0.0483333319425583,"hz":30.0,"kind":"companion","pose_difference_deg":13.7613712246406,"pose_difference_m":0.0661093443632126,"release_error_m":0.0483333319425583,"side":"L"},{"action":"march","history_change_m":0.0241666734218597,"hz":60.0,"kind":"companion","pose_difference_deg":6.89244463675012,"pose_difference_m":0.0327832847833633,"release_error_m":0.0241666734218597,"side":"L"},{"action":"march","history_change_m":0.0120833367109299,"hz":120.0,"kind":"companion","pose_difference_deg":2.42026451234591,"pose_difference_m":0.0120834708213806,"release_error_m":0.0120833367109299,"side":"L"},{"action":"march","history_change_m":0.0483333319425583,"hz":30.0,"kind":"companion","pose_difference_deg":13.7613712246406,"pose_difference_m":0.0661093443632126,"release_error_m":0.0483333319425583,"side":"R"},{"action":"march","history_change_m":0.0241666734218597,"hz":60.0,"kind":"companion","pose_difference_deg":6.89244463675012,"pose_difference_m":0.0327832847833633,"release_error_m":0.0241666734218597,"side":"R"},{"action":"march","history_change_m":0.0120833367109299,"hz":120.0,"kind":"companion","pose_difference_deg":2.42026451234591,"pose_difference_m":0.0120834112167358,"release_error_m":0.0120833367109299,"side":"R"},{"action":"run","history_change_m":0.136666655540466,"hz":30.0,"kind":"companion","pose_difference_deg":27.2732663747519,"pose_difference_m":0.136666744947433,"release_error_m":0.136666655540466,"side":"L"},{"action":"run","history_change_m":0.0683333277702332,"hz":60.0,"kind":"companion","pose_difference_deg":14.0923476776674,"pose_difference_m":0.0683333277702332,"release_error_m":0.0683333277702332,"side":"L"},{"action":"run","history_change_m":0.0341666638851166,"hz":120.0,"kind":"companion","pose_difference_deg":6.60360788958133,"pose_difference_m":0.0341666042804718,"release_error_m":0.0341666638851166,"side":"L"},{"action":"run","history_change_m":0.136666655540466,"hz":30.0,"kind":"companion","pose_difference_deg":27.2732663747519,"pose_difference_m":0.136666774749756,"release_error_m":0.136666655540466,"side":"R"},{"action":"run","history_change_m":0.0683333277702332,"hz":60.0,"kind":"companion","pose_difference_deg":14.0923476776674,"pose_difference_m":0.0683333575725555,"release_error_m":0.0683333277702332,"side":"R"},{"action":"run","history_change_m":0.0341666638851166,"hz":120.0,"kind":"companion","pose_difference_deg":6.60360788958133,"pose_difference_m":0.0341666042804718,"release_error_m":0.0341666638851166,"side":"R"},{"action":"march","history_change_m":0.0483333319425583,"hz":30.0,"kind":"resident","pose_difference_deg":8.68597803448825,"pose_difference_m":0.0599565021693707,"release_error_m":0.0483333319425583,"side":"L"},{"action":"march","history_change_m":0.0241666734218597,"hz":60.0,"kind":"resident","pose_difference_deg":4.42394554192899,"pose_difference_m":0.0305593479424715,"release_error_m":0.0241666734218597,"side":"L"},{"action":"march","history_change_m":0.0120833367109299,"hz":120.0,"kind":"resident","pose_difference_deg":2.22861922263229,"pose_difference_m":0.015398976393044,"release_error_m":0.0120833367109299,"side":"L"},{"action":"march","history_change_m":0.0483333319425583,"hz":30.0,"kind":"resident","pose_difference_deg":8.68597803448825,"pose_difference_m":0.0599565021693707,"release_error_m":0.0483333319425583,"side":"R"},{"action":"march","history_change_m":0.0241666734218597,"hz":60.0,"kind":"resident","pose_difference_deg":4.42394554192899,"pose_difference_m":0.0305593498051167,"release_error_m":0.0241666734218597,"side":"R"},{"action":"march","history_change_m":0.0120833367109299,"hz":120.0,"kind":"resident","pose_difference_deg":2.22861922263229,"pose_difference_m":0.0153989689424634,"release_error_m":0.0120833367109299,"side":"R"},{"action":"run","history_change_m":0.136666655540466,"hz":30.0,"kind":"resident","pose_difference_deg":25.6148640008743,"pose_difference_m":0.167361631989479,"release_error_m":0.136666655540466,"side":"L"},{"action":"run","history_change_m":0.0683333277702332,"hz":60.0,"kind":"resident","pose_difference_deg":17.262893315857,"pose_difference_m":0.117624543607235,"release_error_m":0.0683333277702332,"side":"L"},{"action":"run","history_change_m":0.0341666638851166,"hz":120.0,"kind":"resident","pose_difference_deg":7.948186976759,"pose_difference_m":0.0548727065324783,"release_error_m":0.0341666638851166,"side":"L"},{"action":"run","history_change_m":0.136666655540466,"hz":30.0,"kind":"resident","pose_difference_deg":25.6148008216244,"pose_difference_m":0.167361587285995,"release_error_m":0.136666655540466,"side":"R"},{"action":"run","history_change_m":0.0683333277702332,"hz":60.0,"kind":"resident","pose_difference_deg":17.262893315857,"pose_difference_m":0.117624506354332,"release_error_m":0.0683333277702332,"side":"R"},{"action":"run","history_change_m":0.0341666638851166,"hz":120.0,"kind":"resident","pose_difference_deg":7.948186976759,"pose_difference_m":0.0548726953566074,"release_error_m":0.0341666638851166,"side":"R"}]
+LOD contact history: 216 checks, 108 failures
+LOD_CONTACT_HISTORY_FAIL

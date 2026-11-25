@@ -1,0 +1,113 @@
+{
+  "adapter": "llvmpipe (LLVM 20.1.2, 256 bits)",
+  "android_device_test": false,
+  "engine": "4.7.2-stable (official)",
+  "errors": [],
+  "passed": true,
+  "renderer": "gl_compatibility",
+  "review_script_sha256": "67416110148eac3a202e265d0da7dea1dfce46ce580cdbe48350dd4f5409d6bd",
+  "shots": [
+    {
+      "all_panel_text_including_scrolled_content": "",
+      "antonia_position": "(26.2, 0.0, 26.1)",
+      "camera": "[X: (0.886807, 0.0, -0.462139), Y: (-0.12245, 0.964258, -0.234972), Z: (0.445621, 0.264964, 0.855111), O: (28.5, 3.2, 32.5)]",
+      "fixture_player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "fov": 58.0,
+      "id": "01_market_staff",
+      "image": "01_market_staff.png",
+      "image_sha256": "c40cd0b7da1b48370094efed217dc4467c3cc2d576fdee27313d9220ea296433",
+      "market_staff": [
+        "cassia",
+        "antonia"
+      ],
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "pose": "idle@0.25",
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "scenario": "new_childhood_market",
+      "social_history": {
+        "pairs": {},
+        "version": 1
+      },
+      "state_sha256": "f5d4d09d40ea700114c668f502f51e59c7c6bb966f57940f622822f7c868d497"
+    },
+    {
+      "all_panel_text_including_scrolled_content": "DEIN LEBEN IM DORF\nDeine Familie und die Nachbarn\nDu bist Bewohner. Vertrauen, Arbeit und gemeinsame Entscheidungen bestimmen deinen Einfluss.\nDas Dorf arbeitet bereits. Du kannst bei den Menschen Aufgaben übernehmen; die Arbeitsplätze verteilen die Erwachsenen.\nDorffelder · 1 Menschen arbeiten hier\n1 von 2 arbeitsfähigen Personen\nHolzfällerlager · 2 Menschen arbeiten hier\nIn Betrieb\nSteinbruch · 0 Menschen arbeiten hier\n0 von 4 arbeitsfähigen Personen\nHandelsplatz · 2 Menschen arbeiten hier\nHandel benötigt 4 Holz je Lieferung\nStadtposten · 2 Menschen arbeiten hier\nIn Betrieb",
+      "antonia_position": "(26.2, 0.0, 26.1)",
+      "camera": "[X: (0.886807, 0.0, -0.462139), Y: (-0.12245, 0.964258, -0.234972), Z: (0.445621, 0.264964, 0.855111), O: (28.5, 3.2, 32.5)]",
+      "fixture_player_position": [
+        22.0,
+        0.899999976158142,
+        27.1000003814697
+      ],
+      "fov": 58.0,
+      "id": "02_work_panel",
+      "image": "02_work_panel.png",
+      "image_sha256": "db54f50601ac4b4f6eb5ed6b472099025f97e0500b75532fa4051745d238efb8",
+      "market_staff": [
+        "cassia",
+        "antonia"
+      ],
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "pose": "idle@0.25",
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "scenario": "new_childhood_work_panel",
+      "social_history": {
+        "pairs": {},
+        "version": 1
+      },
+      "state_sha256": "f5d4d09d40ea700114c668f502f51e59c7c6bb966f57940f622822f7c868d497"
+    },
+    {
+      "all_panel_text_including_scrolled_content": "DEIN LEBEN IM DORF\nDeine Familie und die Nachbarn\nDu bist Bewohner. Vertrauen, Arbeit und gemeinsame Entscheidungen bestimmen deinen Einfluss.\nBerufe lernst du bei Menschen, die dich kennen. Ihre Sorgen, dein Verhalten und deine Hilfe bestimmen die Beziehung.\nDecimus · Dorfverwalter\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: 2 / 9\nAelia · Steinmetzin\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: 20 / 17\nVarro · Späher und Jäger\nNoch nicht kennengelernt\nGerade: Sucht Gesellschaft\nOrt im Dorf: -10 / -13\nFabius · Holzfäller\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: -44 / 16\nAurelia · Heilerin\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: 8 / 18\nCassia · Händlerin\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: 24 / 26\nWachmann · Wachausbilder\nNoch nicht kennengelernt\nGerade: Hält auf dem Weg Wache\nOrt im Dorf: -1 / -46\nJulia · Deine Mutter\nVertrauen +4\nGerade: Sucht Gesellschaft\nInteresse: Familie und Haushalt\nNach der Arbeit fehlt Gesellschaft.\nSilvanus · Vertrauter Nachbar\nOrt im Dorf: -15 / 15\nSilvanus · Dein Vater\nVertrauen +4\nGerade: Sucht Gesellschaft\nInteresse: Handwerk und gute Werkzeuge\nNach der Arbeit fehlt Gesellschaft.\nJulia · Vertrauter Nachbar\nOrt im Dorf: -11 / 12\nSextus · Dorfschmied · Freund deines Vaters\nNoch nicht kennengelernt\nGerade: Arbeitet\nOrt im Dorf: 33 / -25\nDein Beruf: Noch offen",
+      "antonia_position": "(26.2, 0.0, 26.1)",
+      "camera": "[X: (0.886807, 0.0, -0.462139), Y: (-0.12245, 0.964258, -0.234972), Z: (0.445621, 0.264964, 0.855111), O: (28.5, 3.2, 32.5)]",
+      "fixture_player_position": [
+        70.0,
+        0.899999976158142,
+        70.0
+      ],
+      "fov": 58.0,
+      "id": "03_social_panel",
+      "image": "03_social_panel.png",
+      "image_sha256": "dd1276a5cd814bbe58e0d71d7b0e56d4d222d82add3ca4bc6a7c0372a92c2569",
+      "market_staff": [
+        "cassia",
+        "antonia"
+      ],
+      "output_pixels": [
+        1280,
+        720
+      ],
+      "pose": "idle@0.25",
+      "presentation_time": 4.0,
+      "quality": "balanced",
+      "scenario": "sixteen_mutual_half_second_inputs",
+      "social_history": {
+        "pairs": {
+          "julia:silvanus": {
+            "encounters": 1,
+            "last_contact": 8.0,
+            "last_encounter": 8.0,
+            "session_counted": true,
+            "session_seconds": 8.0,
+            "shared_seconds": 8.0
+          }
+        },
+        "version": 1
+      },
+      "state_sha256": "332b7c0c332594ae415840f1e3bbfaa7f58facf36995948478a3521584804ec5"
+    }
+  ]
+}

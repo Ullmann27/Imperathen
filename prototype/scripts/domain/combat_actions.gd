@@ -10,6 +10,7 @@ const EPSILON := 0.000001
 const MIN_CONTACT_DISTANCE := 0.25
 const GUARD_SECONDS := 0.85
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
+const CityTrade = preload("res://scripts/city_trade.gd")
 const DODGE_SECONDS := 0.65
 const TECHNIQUES := {
 	"jab_left":{"label":"Linke Gerade", "short":"Gerade L", "duration":0.62, "windup":0.18, "active":0.14, "reach":1.45, "arc_dot":0.72, "damage":6, "cost":7.0, "practice":0, "family":"fist"},
@@ -55,7 +56,7 @@ static func service_gear(data: Dictionary) -> bool:
 	# never from age alone, a cosmetic prop or a caller-supplied inventory flag.
 	var player: Dictionary = data.get("player", {})
 	var progress: Dictionary = data.get("progress", {})
-	return enabled(data) and _integer(player.get("age"),18,250018) and player.get("role","") == "soldier" and progress.get("training_complete") == true and progress.get("stage","") in ["trained","skirmish","aftermath","ended","fallen"]
+	return enabled(data) and _integer(player.get("age"),18,250018) and player.get("role","") == "soldier" and progress.get("training_complete") == true and progress.get("stage","") in ["trained","skirmish","aftermath","ended","fallen"] and CityTrade.service_gear(data)
 
 
 static func available(data: Dictionary, id: String) -> bool:
@@ -175,7 +176,7 @@ static func advance(data: Dictionary, delta: float, sight_check: Callable = Call
 				event.practice = true
 			elif apply_hit.is_valid():
 				combat.resolved = true
-				var accepted: Variant = apply_hit.call(data, combat.target_id, int(spec.damage))
+				var accepted: Variant = apply_hit.call(data, combat.target_id, int(spec.damage) + CityTrade.damage_bonus(data, is_armed(str(combat.technique))))
 				if typeof(accepted) == TYPE_BOOL and accepted:
 					combat.resolved_hits = mini(1000000, int(combat.resolved_hits) + 1)
 					event.hit = true
@@ -319,7 +320,7 @@ static func _alive(data: Dictionary) -> bool:
 
 
 static func guard_bonus_seconds(data: Dictionary) -> float:
-	return Abilities.effect_value(data, "block_window_bonus_seconds")
+	return Abilities.effect_value(data, "block_window_bonus_seconds") + CityTrade.guard_bonus_seconds(data)
 
 
 static func _set_defense_windows(data: Dictionary, guard: float, dodge: float) -> void:
