@@ -75,29 +75,31 @@ function generate(){
   for(let j=0;j<nz;j++)for(let i=0;i<nu-1;i++){let a=j*nu+i,b=a+1,c=a+nu,d=c+1;g.i.push(a,c,d,a,d,b)}
   grounds.push(g);
  }
- const grassSpecs=[["grass_short",.095,5,.080],["grass_medium",.19,7,.12],["grass_tall",.34,7,.16],["grass_dry",.25,5,.115]];
+ const grassSpecs=[["grass_short",.095,6,.115],["grass_medium",.19,7,.15],["grass_tall",.34,7,.20],["grass_dry",.25,5,.14]];
  const grasses=[];
  for(let k=0;k<grassSpecs.length;k++){
    const [name,H,count,span]=grassSpecs[k],g=mesh(name,1);
    for(let b=0;b<count;b++){
-    const a=b*2.399963+.8*hash(b,k,40),h=H*(.64+.51*hash(b,k,41)),bend=(.14+.37*hash(b,k,43))*h,w=(.0055+.006*hash(b,k,44))*(k===0?.77:1),r=span*.31*Math.sqrt(hash(b,k,45)),bx=r*Math.cos(a+1.2),bz=r*Math.sin(a+1.2);
-    const colors=t=>{let base=k===3?[.27,.25,.109]:k===0?[.12,.23,.057]:[.095,.216,.047];return [base[0]*(.77+.48*t),base[1]*(.74+.53*t),base[2]*(.78+.33*t),1]};
+    const a=b*2.399963+.8*hash(b,k,40),h=H*(.64+.51*hash(b,k,41)),bend=(.14+.37*hash(b,k,43))*h,w=(.0025+.0036*hash(b,k,44))*(k===0?.80:1),r=span*.31*Math.sqrt(hash(b,k,45)),bx=r*Math.cos(a+1.2),bz=r*Math.sin(a+1.2);
+    const colors=t=>{let base=k===3?[.34,.29,.115]:k===0?[.145,.245,.070]:[.112,.245,.053];const light=.78+.43*t+.14*hash(b,k,81),dry=k===3?.7:smooth(.68,1,t)*(.12+.38*hash(b,k,82));return [mix(base[0]*light,.39,dry),mix(base[1]*light,.32,dry),mix(base[2]*light,.10,dry),1]};
     const rings=[];
-    for(let j=0;j<4;j++){let t=j/4,wide=w*Math.pow(1-t,.72);const x=bx+bend*t*t*Math.cos(a),z=bz+bend*t*t*Math.sin(a);rings.push([[-Math.sin(a)*wide,0,-Math.cos(a)*-wide],[Math.sin(a)*wide,0,-Math.cos(a)*wide],[Math.cos(a)*wide*.18,0,Math.sin(a)*wide*.18]].map(v=>[x+v[0],h*t,z+v[2]]))}
+    const segments=k===2?4:3;
+    for(let j=0;j<segments;j++){let t=j/segments,wide=w*Math.pow(1-t,.72);const x=bx+bend*t*t*Math.cos(a),z=bz+bend*t*t*Math.sin(a);rings.push([[-Math.sin(a)*wide,0,-Math.cos(a)*-wide],[Math.sin(a)*wide,0,-Math.cos(a)*wide],[Math.cos(a)*wide*.18,0,Math.sin(a)*wide*.18]].map(v=>[x+v[0],h*t,z+v[2]]))}
     // Full triangular cross section, not a camera-facing billboard.
-    for(let j=0;j<3;j++)for(let q=0;q<3;q++){let n=(q+1)%3;tri(g,rings[j][q],rings[j+1][q],rings[j+1][n],colors(j/4),colors((j+1)/4),colors((j+1)/4));tri(g,rings[j][q],rings[j+1][n],rings[j][n],colors(j/4),colors((j+1)/4),colors(j/4))}
-    let tip=[bx+bend*Math.cos(a),h,bz+bend*Math.sin(a)];for(let q=0;q<3;q++)tri(g,rings[3][q],tip,rings[3][(q+1)%3],colors(.75),colors(1),colors(.75));
+    for(let j=0;j<segments-1;j++)for(let q=0;q<3;q++){let n=(q+1)%3;tri(g,rings[j][q],rings[j+1][q],rings[j+1][n],colors(j/segments),colors((j+1)/segments),colors((j+1)/segments));tri(g,rings[j][q],rings[j+1][n],rings[j][n],colors(j/segments),colors((j+1)/segments),colors(j/segments))}
+    let tip=[bx+bend*Math.cos(a),h,bz+bend*Math.sin(a)];for(let q=0;q<3;q++)tri(g,rings[segments-1][q],tip,rings[segments-1][(q+1)%3],colors((segments-1)/segments),colors(1),colors((segments-1)/segments));
    }
    grasses.push(g);
  }
  const rocks=[];
  for(let k=0;k<4;k++){
-   let g=mesh("stone_"+k,2),rings=[],sides=7+k,rows=4;
+   let g=mesh("stone_"+k,2),rings=[],sides=10+k,rows=5;
    for(let j=1;j<rows;j++){let phi=j*Math.PI/rows,ring=[];for(let i=0;i<sides;i++){let a=i*2*Math.PI/sides,rr=.76+.24*hash(i,j,k+80);ring.push([Math.sin(phi)*Math.cos(a)*rr,Math.cos(phi)*(.40+.11*k)*rr,Math.sin(phi)*Math.sin(a)*rr*(.78+.08*k)])}rings.push(ring)}
    const top=[.05,.43+.08*k,-.02],bot=[-.05,-.36-.07*k,.015];
    const color=p=>{let v=.29+.065*k+.075*Math.sin(p[0]*3+p[1]*4+p[2]*5);return [v,v*.94,v*.83,1]};
    function outward(a,b,c){let n=cross(sub(b,a),sub(c,a)),v=a.map((q,i)=>(q+b[i]+c[i])/3);if(n.reduce((s,q,i)=>s+q*v[i],0)<0)[b,c]=[c,b];tri(g,a,b,c,color(a),color(b),color(c))}
    for(let i=0;i<sides;i++){const n=(i+1)%sides;outward(top,rings[0][i],rings[0][n]);for(let j=0;j<rings.length-1;j++){outward(rings[j][i],rings[j+1][i],rings[j+1][n]);outward(rings[j][i],rings[j+1][n],rings[j][n])}outward(bot,rings.at(-1)[n],rings.at(-1)[i])}
+   for(let i=0;i<g.p.length;i+=3){const p=g.p.slice(i,i+3),n=g.n.slice(i,i+3),estimate=unit([p[0],p[1]/Math.pow(.43+.08*k,2),p[2]/Math.pow(.78+.08*k,2)]);const q=unit(n.map((v,j)=>.38*v+.62*estimate[j]));g.n.splice(i,3,...q)}
    rocks.push(g);
  }
  const scatter=[],stats={grass:0,stone:0,grassMin:Infinity,grassMax:0,stoneMin:Infinity,stoneMax:0,roadGrass:0,edgeGrass:0,grassTriangles:0,stoneTriangles:0,classes:{fine:0,medium:0,coarse:0},chunks:[]};
@@ -105,13 +107,13 @@ function generate(){
  for(let k=0;k<3;k++){
    const groups=Array.from({length:8},()=>[]);let grass=0,stone=0;
    // Stratified jittered meadow; density follows organic patches, wheel tracks and edge.
-   for(let i=0;i<80;i++)for(let j=0;j<48;j++){
-      const u=-10+(i+hash(i,j,k+100))*.25,z=k*12+(j+hash(i,j,k+200))*.25;
+   for(let i=0;i<112;i++)for(let j=0;j<67;j++){
+      const u=-10+(i+hash(i,j,k+100))*20/112,z=k*12+(j+hash(i,j,k+200))*12/67;
       const m=road(u,z),cover=.42+.55*noise((u+center(z))*.51,z*.43,110),near=Math.abs(u)<3.15;
       const stripe=Math.exp(-Math.pow(u/.22,2))*.45;
-      const chance=m>.76?(.015+.30*stripe)*(1-.86*lane(u,z)):(near?.64:.37)*cover*(1-.57*m);
+      const chance=m>.76?(.015+.30*stripe)*(1-.86*lane(u,z)):(near?.76:.62)*cover*(1-.57*m);
       if(hash(i,j,k+300)>chance)continue;
-      let a=hash(i,j,k+310),id=m>.55?0:a<.28?0:a<.67?1:a<.86?2:3;
+      let a=hash(i,j,k+310),id=m>.55?0:a<.43?0:a<.76?1:a<.91?2:3;
       const sy=(.65+1.0*hash(i,j,k+320))*(m>.5?.62+.30*(1-m):1),sx=.65+.68*hash(i,j,k+330),sz=.75+.62*hash(i,j,k+340);
       const pos=gridAt(k,u,z),h=grassSpecs[id][1]*sy;
       // Grass root is just within the shared continuous terrain.
@@ -171,8 +173,68 @@ function generate(){
  let maxGrade=0;for(let j=1;j<360;j++){let z=j*.1;maxGrade=Math.max(maxGrade,Math.abs(height(0,z+.1)-height(0,z))/.1)}
  stats.path={length_m:36,nominal_meadow_width_m:20,grid_columns:nu,grid_rows_per_chunk:nz+1,half_width_min:Math.min(...Array.from({length:361},(_,j)=>half(j*.1))),half_width_max:Math.max(...Array.from({length:361},(_,j)=>half(j*.1))),curve_span:Math.max(...Array.from({length:361},(_,j)=>center(j*.1)))-Math.min(...Array.from({length:361},(_,j)=>center(j*.1))),hoof_count:prints.length,hoof_depth_min:Math.min(...sampleDepths),hoof_depth_max:Math.max(...sampleDepths),mesh_hoof_depth_min:Math.min(...meshDepths),mesh_hoof_depth_max:Math.max(...meshDepths),max_centerline_grade:maxGrade};
  stats.prototypeTriangles=Object.fromEntries([...grasses,...rocks].map(g=>[g.name,g.i.length/3]));stats.terrainTriangles=grounds.reduce((s,g)=>s+g.i.length/3,0);
+ // Non-colliding continuous 3D hills around the exact playable core.
+ function outerHeight(u,z){
+   const distance=Math.hypot(Math.max(0,Math.abs(u)-10),Math.max(0,-z,z-36)),t=smooth(0,14,distance),x=center(z)+u;
+   const broad=1.7*Math.sin(x*.041+z*.038)+2.3*Math.sin(z*.049+.55)+1.1*Math.sin(x*.078-z*.063)+.65*(noise(x*.11,z*.11,67)-.5);
+   const ridge=6.2*Math.exp(-Math.pow((z-102)/35,2))*(.65+.35*Math.sin(x*.058+.7))+3.4*Math.exp(-Math.pow((x-40)/19,2)-Math.pow((z-54)/34,2));
+   return mix(height(u,z),broad+ridge,t);
+ }
+ function outerColor(u,z){
+   const distance=Math.hypot(Math.max(0,Math.abs(u)-10),Math.max(0,-z,z-36)),t=smooth(0,18,distance),x=center(z)+u;
+   const a=noise(x*.16,z*.15,81),b=noise(x*.45,z*.39,82),field=[mix(.12,.22,a),mix(.16,.27,a),mix(.052,.10,a)].map(c=>c*(.89+.22*b));
+   const m=road(u,z)*(1-smooth(107,150,z)),far=field.map((v,i)=>mix(v,[.32,.253,.17][i]*(.86+.29*b),m)),near=shade(u,z);
+   return [...far.map((v,i)=>mix(near[i],v,t)),mix(near[3],m,t)];
+ }
+ const west=[-78,-68,-58,-48,-40,-32,-25,-20,-16,-13,-11.5,-10.5,-10],east=west.map(x=>-x).reverse();
+ const innerZ=Array.from({length:361},(_,i)=>i*.1),allU=[...west.slice(0,-1),...us,...east.slice(1)];
+ const back=[-65,-55,-45,-35,-26,-18,-12,-8,-5,-3,-2,-1,-.5,0],front=[36,36.5,37,38,39,41,43,46,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,130,140,150,165];
+ const hinterland=[];
+ function outerMesh(name,uu,zz){
+   const g=mesh(name,0),e=.012;
+   for(const z of zz)for(const u of uu){
+     const x=center(z)+u,n=unit([-(outerHeight(u+e,z)-outerHeight(u-e,z))/(2*e),1,-(outerHeight(x-center(z+e),z+e)-outerHeight(x-center(z-e),z-e))/(2*e)]);
+     vert(g,[x,outerHeight(u,z),z],n,outerColor(u,z),[x,z]);
+   }
+   for(let j=0;j<zz.length-1;j++)for(let i=0;i<uu.length-1;i++){const a=j*uu.length+i,b=a+1,c=a+uu.length,d=c+1;g.i.push(a,c,d,a,d,b)}
+   hinterland.push(g);return g;
+ }
+ const left=outerMesh("CountryFarWest",west,innerZ),right=outerMesh("CountryFarEast",east,innerZ),south=outerMesh("CountryFarSouth",allU,back),north=outerMesh("CountryFarNorth",allU,front);
+ // Weld the authored near border exactly: positions must agree before copying
+ // existing normals and vertex colors. Adjacent exterior meshes share those values.
+ function weld(a,ai,b,bi){
+   for(let c=0;c<3;c++){if(Math.abs(a.p[ai*3+c]-b.p[bi*3+c])>1e-6)throw Error("extension position seam "+a.name+" "+b.name);a.p[ai*3+c]=b.p[bi*3+c];a.n[ai*3+c]=b.n[bi*3+c]}
+   for(let c=0;c<4;c++)a.c[ai*4+c]=b.c[bi*4+c];
+ }
+ for(let j=0;j<innerZ.length;j++){
+   const k=Math.min(2,Math.floor(j/120)),row=j-k*120;
+   weld(left,j*west.length+west.length-1,grounds[k],row*nu);
+   weld(right,j*east.length,grounds[k],row*nu+nu-1);
+ }
+ const shift=west.length-1,sw=(back.length-1)*allU.length;
+ for(let i=0;i<us.length;i++){weld(south,sw+shift+i,grounds[0],i);weld(north,shift+i,grounds[2],nz*nu+i)}
+ for(let i=0;i<west.length;i++){weld(south,sw+i,left,i);weld(north,i,left,(innerZ.length-1)*west.length+i)}
+ for(let i=0;i<east.length;i++){let q=shift+us.length-1+i;weld(south,sw+q,right,i);weld(north,q,right,(innerZ.length-1)*east.length+i)}
+ for(const g of hinterland){
+   if(g.p.length!==g.n.length||g.c.length!==g.p.length/3*4||g.i.length%3)throw Error("outer attributes");
+   for(let i=0;i<g.p.length;i+=3)if(!g.p.slice(i,i+3).every(Number.isFinite)||Math.abs(Math.hypot(...g.n.slice(i,i+3))-1)>1e-6)throw Error("outer normal");
+   for(let i=0;i<g.i.length;i+=3){const a=g.p.slice(g.i[i]*3,g.i[i]*3+3),b=g.p.slice(g.i[i+1]*3,g.i[i+1]*3+3),c=g.p.slice(g.i[i+2]*3,g.i[i+2]*3+3);if(Math.hypot(...cross(sub(b,a),sub(c,a)))<1e-10)throw Error("outer degenerate");}
+ }
+ const trees=[];
+ for(let zi=0;zi<20;zi++)for(let xi=0;xi<19;xi++){
+   const z=-34+(zi+hash(xi,zi,182))*8.2,u=-66+(xi+hash(xi,zi,183))*7;
+   if((z>=-2&&z<=38&&Math.abs(u)<12.7)||Math.abs(u)<4.6||hash(xi,zi,184)>.24+.16*noise(u*.12,z*.10,186))continue;
+   const species=hash(xi,zi,187)<.55?"field_elm":hash(xi,zi,188)<.76?"cypress":"laurel",scale=(species==="laurel"?.70:.62)+.64*hash(xi,zi,189);
+   let g,uu,zz;if(z<0){g=south;uu=allU;zz=back}else if(z>36){g=north;uu=allU;zz=front}else if(u< -10){g=left;uu=west;zz=innerZ}else if(u>10){g=right;uu=east;zz=innerZ}else continue;
+   let i=0,j=0;while(i<uu.length-2&&uu[i+1]<u)i++;while(j<zz.length-2&&zz[j+1]<z)j++;
+   if(u<uu[0]||u>uu.at(-1)||z<zz[0]||z>zz.at(-1))continue;
+   const q=(u-uu[i])/(uu[i+1]-uu[i]),t=(z-zz[j])/(zz[j+1]-zz[j]),a=j*uu.length+i,b=a+1,c=a+uu.length,d=c+1;
+   const h=q>=t?g.p[a*3+1]+(g.p[b*3+1]-g.p[a*3+1])*q+(g.p[d*3+1]-g.p[b*3+1])*t:g.p[a*3+1]+(g.p[c*3+1]-g.p[a*3+1])*t+(g.p[d*3+1]-g.p[c*3+1])*q;
+   trees.push({species,x:round(mix(center(zz[j]),center(zz[j+1]),t)+u),y:round(h-.04),z:round(z),yaw:round(hash(xi,zi,190)*TAU),scale:round(scale)});
+ }
+ stats.hinterland={width_m:156,z_min:-65,z_max:165,triangles:hinterland.reduce((a,g)=>a+g.i.length/3,0),trees:trees.length,inner_edges_verified:true,scope:"visual continuation, no additional collision"};
  const probes=[2,6,10,12,16,22,24,28,34].map(z=>{let k=Math.min(2,Math.floor(z/12));return gridAt(k,0,z).map(round)});
- return {grounds,library:[...grasses,...rocks],scatter,stats,probes,prints};
+ return {grounds,library:[...grasses,...rocks],scatter,stats,probes,prints,hinterland,trees};
 }
 function glb(meshes){
  const chunks=[],views=[],accessors=[],meshDefs=[],nodes=[];let offset=0;
@@ -189,4 +251,4 @@ function glb(meshes){
  const out=new Uint8Array(28+json.length+offset),d=new DataView(out.buffer);d.setUint32(0,0x46546c67,true);d.setUint32(4,2,true);d.setUint32(8,out.length,true);d.setUint32(12,json.length,true);d.setUint32(16,0x4e4f534a,true);out.set(json,20);let pos=20+json.length;d.setUint32(pos,offset,true);d.setUint32(pos+4,0x004e4942,true);pos+=8;for(const c of chunks){out.set(c,pos);pos+=c.length}return out;
 }
 // END GENERATOR CORE
-const out=resolve(process.argv[2]||"prototype/assets/viva_country");mkdirSync(out,{recursive:true});const a=generate();for(let i=0;i<3;i++){writeFileSync(resolve(out,"terrain_"+i+".glb"),glb([a.grounds[i]]));writeFileSync(resolve(out,"scatter_"+i+".json"),JSON.stringify(a.scatter[i])+"\n");}writeFileSync(resolve(out,"scatter_library.glb"),glb(a.library));writeFileSync(resolve(out,"manifest.json"),JSON.stringify({schema:1,stats:a.stats,probes:a.probes,hoofprints:a.prints,scope:"3D country road reference, not integrated into campaign"},null,2)+"\n");console.log(JSON.stringify(a.stats,null,2));
+const out=resolve(process.argv[2]||"prototype/assets/viva_country");mkdirSync(out,{recursive:true});const a=generate();for(let i=0;i<3;i++){writeFileSync(resolve(out,"terrain_"+i+".glb"),glb([a.grounds[i]]));writeFileSync(resolve(out,"scatter_"+i+".json"),JSON.stringify(a.scatter[i])+"\n");}writeFileSync(resolve(out,"scatter_library.glb"),glb(a.library));writeFileSync(resolve(out,"hinterland.glb"),glb(a.hinterland));writeFileSync(resolve(out,"hinterland_trees.json"),JSON.stringify({schema:1,trees:a.trees},null,2)+"\n");writeFileSync(resolve(out,"manifest.json"),JSON.stringify({schema:1,stats:a.stats,probes:a.probes,hoofprints:a.prints,scope:"3D country road reference, not integrated into campaign"},null,2)+"\n");console.log(JSON.stringify(a.stats,null,2));

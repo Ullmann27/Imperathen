@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "stats": {
-    "grass": 7276,
+    "grass": 12820,
     "stone": 2852,
-    "grassMin": 0.038764356630653925,
-    "grassMax": 0.5596557370281442,
+    "grassMin": 0.03843331135676902,
+    "grassMax": 0.5604299118405743,
     "stoneMin": 0.009002166521735994,
     "stoneMax": 0.08577093274886044,
-    "roadGrass": 361,
-    "edgeGrass": 933,
-    "grassTriangles": 935046,
-    "stoneTriangles": 145650,
+    "roadGrass": 399,
+    "edgeGrass": 1087,
+    "grassTriangles": 1310010,
+    "stoneTriangles": 262648,
     "classes": {
       "fine": 2037,
       "medium": 651,
@@ -19,19 +19,19 @@
     "chunks": [
       {
         "chunk": 0,
-        "grass": 2401,
+        "grass": 4169,
         "stone": 985,
         "triangles": 38400
       },
       {
         "chunk": 1,
-        "grass": 2354,
+        "grass": 4307,
         "stone": 969,
         "triangles": 38400
       },
       {
         "chunk": 2,
-        "grass": 2521,
+        "grass": 4344,
         "stone": 898,
         "triangles": 38400
       }
@@ -52,16 +52,25 @@
       "max_centerline_grade": 0.12466900922696283
     },
     "prototypeTriangles": {
-      "grass_short": 105,
-      "grass_medium": 147,
+      "grass_short": 90,
+      "grass_medium": 105,
       "grass_tall": 147,
-      "grass_dry": 105,
-      "stone_0": 42,
-      "stone_1": 48,
-      "stone_2": 54,
-      "stone_3": 60
+      "grass_dry": 75,
+      "stone_0": 80,
+      "stone_1": 88,
+      "stone_2": 96,
+      "stone_3": 104
     },
-    "terrainTriangles": 115200
+    "terrainTriangles": 115200,
+    "hinterland": {
+      "width_m": 156,
+      "z_min": -65,
+      "z_max": 165,
+      "triangles": 31632,
+      "trees": 110,
+      "inner_edges_verified": true,
+      "scope": "visual continuation, no additional collision"
+    }
   },
   "probes": [
     [
