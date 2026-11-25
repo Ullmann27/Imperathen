@@ -591,7 +591,7 @@ def amphitheatre():
             x1,y1=39+q1*45,24+q1*44
             z0,z1=2+j*.92,2+(j+1)*.92
             for i in range(12):
-                a=(sector+i/12)*TAU/8+.012;b=(sector+(i+1)/12)*TAU/8-.012
+                a=(sector+i/12)*TAU/8+(.010 if i==0 else 0);b=(sector+(i+1)/12)*TAU/8-(.010 if i==11 else 0)
                 p0=(x0*math.cos(a),y0*math.sin(a),z0);p1=(x0*math.cos(b),y0*math.sin(b),z0)
                 p2=(x1*math.cos(b),y1*math.sin(b),z0);p3=(x1*math.cos(a),y1*math.sin(a),z0)
                 m.face([p0,p1,p2,p3],MARBLE)
