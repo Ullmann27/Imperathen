@@ -83,7 +83,9 @@ func _run() -> void:
 		display._governor.ratio = 0.76
 		root.size = Vector2i(2160,2160)
 		display._on_size_changed()
-		var cap: float = sqrt(float(display._profiles.high.max_3d_pixels) / float(root.size.x*root.size.y))
+		var quality_settings: Dictionary = display._profiles["high"]
+		var pixel_budget: float = float(quality_settings.get("desktop_max_3d_pixels",quality_settings.max_3d_pixels)) if OS.has_feature("pc") else float(quality_settings.max_3d_pixels)
+		var cap: float = minf(1.0,sqrt(pixel_budget / float(root.size.x*root.size.y)))
 		_check(is_equal_approx(root.scaling_3d_scale,cap*0.76),
 			"Square unfolded viewport preserves aspect and scales only the 3D buffer")
 		display.set_sustained_paused(true)
