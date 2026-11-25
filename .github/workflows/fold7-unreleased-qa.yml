@@ -1,0 +1,143 @@
+name: IMPERATHEN isolated installable ARM64 QA – NOT a release
+on:
+  push:
+    branches: ['feature/fold7-qa-installable-not-release-20261125']
+  pull_request:
+    paths:
+      - 'tools/build_unreleased_city_qa.py'
+      - '.github/workflows/fold7-unreleased-qa.yml'
+      - 'prototype/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unreleased-city-qa-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  signed-independent-arm64-city:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Record exact source commit and intentionally withheld release status
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/qa artifacts/qa/engine prototype/assets/world
+          git rev-parse HEAD > artifacts/qa/SOURCE_COMMIT.txt
+          printf '%s\n' "UNRELEASED QA. Original motion quality gate remains blocked." > artifacts/qa/RELEASE_BLOCKED.txt
+          python3 -m unittest discover -s tests -p 'android_package_isolation_test.py' -v
+          python3 -m unittest discover -s tests -p 'android_*_test.py' -v
+      - name: Install official Blender, Python and SDK build requirements
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends blender python3-numpy
+          blender -b --python-expr "import numpy;print('NUMPY_BLENDER_AVAILABLE',numpy.__version__)"
+          if [[ ! -x "$ANDROID_HOME/build-tools/35.0.1/apksigner" || ! -f "$ANDROID_HOME/platforms/android-35/android.jar" ]]; then
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;35.0.1' 'platforms;android-35'
+          fi
+      - name: Produce actual original city and separate physical collision GLBs
+        shell: bash
+        run: |
+          set -euo pipefail
+          blender -b -t 2 --python-exit-code 1 --python tools/world/build_roman_test_city.py -- \
+            --output "$RUNNER_TEMP/city" --surface-style viva --texture-size 1024 \
+            > artifacts/qa/roman-city-blender.log 2>&1
+          grep -q CITY_BUILD_COMPLETE artifacts/qa/roman-city-blender.log
+          cp "$RUNNER_TEMP/city/imperathen_roman_test_city.glb" prototype/assets/world/roman_city_test.glb
+          cp "$RUNNER_TEMP/city/roman_city_collision.glb" prototype/assets/world/roman_city_collision.glb
+          cp "$RUNNER_TEMP/city/city_manifest.json" prototype/assets/world/roman_city_manifest.json
+          python3 tools/world/check_city_release_assets.py --prototype prototype \
+            --output artifacts/qa/asset-audit.json
+      - name: Download matching Godot and Android templates with SHA512 verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot" "$RUNNER_TEMP/templates/4.7.2.stable"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          curl --fail --location --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip" -o godot.zip
+          curl --fail --location --retry 3 "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz" -o templates.tpz
+          python3 - <<'PY'
+          import hashlib,os,pathlib,zipfile
+          home=pathlib.Path(os.environ["RUNNER_TEMP"])/"godot"
+          known={s.split()[-1].lstrip('*'):s.split()[0] for s in (home/"SHA512-SUMS.txt").read_text().splitlines() if s.strip()}
+          for local,remote in [('godot.zip','Godot_v4.7.2-stable_linux.x86_64.zip'),
+                               ('templates.tpz','Godot_v4.7.2-stable_export_templates.tpz')]:
+              with (home/local).open('rb') as f: actual=hashlib.file_digest(f,'sha512').hexdigest()
+              if actual!=known.get(remote):raise SystemExit('Official template SHA512 mismatch: '+remote)
+          with zipfile.ZipFile(home/'godot.zip') as z:z.extractall(home)
+          target=pathlib.Path(os.environ['RUNNER_TEMP'])/'templates/4.7.2.stable'
+          with zipfile.ZipFile(home/'templates.tpz') as z:
+              for name in ('android_debug.apk','android_release.apk','version.txt'):
+                  (target/name).write_bytes(z.read('templates/'+name))
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+          echo "TEMPLATE_DIR=$RUNNER_TEMP/templates/4.7.2.stable" >> "$GITHUB_ENV"
+      - name: Reject broken app functionality but keep separate release-motion finding
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going \
+            --only import roman_menu city_trade city_market_bridge city_inventory_ui \
+              city_support city_viva_props city_exploration_detail npc_physical_conversation \
+              touch_controls fold7_graphics_policy main_scene \
+            --report artifacts/qa/engine
+          "$GODOT_BIN" --headless --path prototype --script res://tests/roman_city_real_asset_test.gd \
+            2>&1 | tee artifacts/qa/real-city-import.log
+          grep -q ROMAN_CITY_REAL_ASSET_PASS artifacts/qa/real-city-import.log
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+            --script res://tests/roman_city_real_walk_test.gd \
+            2>&1 | tee artifacts/qa/real-city-walk.log
+          grep -q ROMAN_CITY_REAL_WALK_PASS artifacts/qa/real-city-walk.log
+          "$GODOT_BIN" --headless --path prototype --script res://tests/city_crowd_layout_test.gd \
+            2>&1 | tee artifacts/qa/crowd-layout.log
+          grep -q CITY_CROWD_LAYOUT_PASS artifacts/qa/crowd-layout.log
+      - name: Create separate ephemeral QA signing key (NOT existing app certificate)
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$JAVA_HOME_17_X64/bin/keytool" -genkeypair -noprompt \
+            -keystore "$RUNNER_TEMP/imperathen-qa-ephemeral.jks" \
+            -storepass:env GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD \
+            -keypass:env GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD \
+            -alias imperathen-qa -keyalg RSA -keysize 3072 -validity 365 \
+            -dname 'CN=IMPERATHEN separate QA app, O=IMPERATHEN, C=AT'
+      - name: Export, sign and independently validate safe ARM64 QA package
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="IMPERATHEN-UNRELEASED-QA-${GITHUB_SHA:0:8}-arm64.apk"
+          python3 tools/build_unreleased_city_qa.py \
+            --godot "$GODOT_BIN" --sdk-root "$ANDROID_HOME" \
+            --java-home "$JAVA_HOME_17_X64" --template-dir "$TEMPLATE_DIR" \
+            --keystore "$RUNNER_TEMP/imperathen-qa-ephemeral.jks" \
+            --keystore-user imperathen-qa --timeout 900 \
+            --output "artifacts/qa/$APK"
+          test -s "artifacts/qa/$APK"
+          sha256sum "artifacts/qa/$APK" > artifacts/qa/QA_SHA256SUMS.txt
+          "$ANDROID_HOME/build-tools/35.0.1/apksigner" verify --print-certs \
+            "artifacts/qa/$APK" > artifacts/qa/qa-signing-certificate.txt
+          printf '%s\n' "APK is at.heinz.imperathen.qa; this does NOT update the original app." \
+            > artifacts/qa/INSTALLATION-NOTE.txt
+      - name: Preserve generated test package, proof and error logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-unreleased-qa-arm64-${{ github.run_number }}
+          path: artifacts/qa/
+          if-no-files-found: warn
+          retention-days: 30
