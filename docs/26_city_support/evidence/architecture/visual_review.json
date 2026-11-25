@@ -1,0 +1,19 @@
+{
+  "reviewed": true,
+  "review_date": "2026-11-25",
+  "scope": "Blender source-asset visual review, not Android or gameplay acceptance",
+  "images": {
+    "architecture_counter_close.png": "21ecb17854aadfa3056d6a0fa0ac7ed7a45517e8bd7e0e07a9ed3cd8ba98fb33",
+    "architecture_eye_level.png": "384e7a12a0b75db1f06fc676c142bb51517f28216ab65b10d2b482dc99b2b805",
+    "architecture_overview.png": "28645fcf25ba037fec93504e4c63073ae5b01caa3258087ec36a0c75d468ae49"
+  },
+  "source_blend_sha256": "0a122e56cffd117c1d141406aa94363158044b7d13276536a88d7e9a63de5071",
+  "runtime_glb_sha256": "f9fb217e5770dacb198e6ca569b0b0fa5351fc70ec52add93dab07f97a72a638",
+  "renderer": "Blender 4.3.2 Cycles CPU, 64 samples, 4 threads, denoising disabled because unavailable in this build",
+  "observations": [
+    "All three images opened and inspected. Roof tiles, stone arrises, timber shutters, cloth edge and true vessel mouths are legible.",
+    "The 1.50 m view uses a measuring pole, not an asserted finished character.",
+    "The display counter in the Blender composition occupies the entrance; gameplay placement must preserve a separate entry path.",
+    "Original repeating project material maps give a consistent modular look; no final AAA or physical-device performance claim."
+  ]
+}

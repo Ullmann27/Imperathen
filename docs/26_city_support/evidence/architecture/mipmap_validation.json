@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-11-25T11:06:29+00:00",
+  "status": "pass",
+  "scope": "Read-only examination of existing architecture GLB, extracted image import metadata, and already-generated Godot texture cache. Only this evidence report was written.",
+  "glb_path": "prototype/assets/city_detail/architecture/city_architecture_library.glb",
+  "glb_sha256": "f9fb217e5770dacb198e6ca569b0b0fa5351fc70ec52add93dab07f97a72a638",
+  "glb_embedded_image_count": 21,
+  "gltf_samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "textures_checked": 21,
+  "all_import_metadata_enable_mipmaps": true,
+  "all_cached_mipmap_levels_decoded": true,
+  "dimensions_per_level_for_every_texture": [
+    [
+      512,
+      512
+    ],
+    [
+      256,
+      256
+    ],
+    [
+      128,
+      128
+    ],
+    [
+      64,
+      64
+    ],
+    [
+      32,
+      32
+    ],
+    [
+      16,
+      16
+    ],
+    [
+      8,
+      8
+    ],
+    [
+      4,
+      4
+    ],
+    [
+      2,
+      2
+    ],
+    [
+      1,
+      1
+    ]
+  ],
+  "method": {
+    "execution": "Inline Python 3 checker using pathlib, struct, hashlib, json, re, io and Pillow; no Godot import or renderer invoked.",
+    "format_reference": "https://github.com/godotengine/godot/blob/master/scene/resources/compressed_texture.cpp",
+    "format_reference_file_sha": "5db54a3f335f809b1584d10d5c92c7ab1831d654",
+    "checks": [
+      "Read each extracted PNG .import metadata file and require mipmaps/generate=true.",
+      "Resolve the referenced res:// .ctex file and require GST2 format version 1.",
+      "Read header dimensions and PNG/WebP image header at byte 36; require 512 by 512 base dimensions and nine additional mipmaps.",
+      "Starting at byte 52, read each length-prefixed encoded image and fully decode it with Pillow; require the exact halved dimensions at every level through 1 by 1.",
+      "Require all ten image blocks to be complete and the final byte offset to equal the file size.",
+      "Hash each extracted source PNG, .import metadata file, cached .ctex file, and the source GLB with SHA-256."
+    ]
+  },
+  "limitations": [
+    "This proves the existing desktop import cache contains complete mipmap chains for all 21 architecture textures.",
+    "The GLB embeds base images; the mipmap chains checked here are generated Godot texture-cache data.",
+    "No Android device, exported Android texture format, frame rate, thermal behavior, or visual-quality performance claim is made.",
+    "No assets, importer settings, existing Godot tests, or render outputs were changed by this check."
+  ],
+  "textures": [
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_bronze_basecolor.png",
+      "source_sha256": "ecbfa3242436275c538f96f055877c3ad82f7e34e214068bcb270678d60bac14",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_bronze_basecolor.png.import",
+      "import_metadata_sha256": "92e591f1a23f4d442e65d91886f6adb41286751d12b2b7e40acb226abc995bae",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_bronze_basecolor.png-5d0531b66d62a1c31e717cfbcba71f1e.ctex",
+      "ctex_sha256": "1b0012adffd6dd7a6e143b6b7bc73aa0567bcb8670e237e5a488122311797852",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_bronze_normal.png",
+      "source_sha256": "234b5d74731a6c4c8a61a4e00980f94b4c3cf6bc230480246f934ad85e4dfcf4",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_bronze_normal.png.import",
+      "import_metadata_sha256": "1eba8b7b5bfdde04723f7a1b45798eae563797e0e676fd2d19ea1c1efc1a09cd",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_bronze_normal.png-07c0c94d1dc90955924d68c20ba56c1e.ctex",
+      "ctex_sha256": "909e6f5532a10de9c102e7235a5dee24d1530bdd03e13ac5394843ec71e15c42",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_bronze_roughness.png",
+      "source_sha256": "f11fd653301d7487891c715587ac11234326cf0871deba758b06d978667fdd26",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_bronze_roughness.png.import",
+      "import_metadata_sha256": "bdac4a81241f1761dbb72383fd418d7048557857912aee3c099983095f1603c2",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_bronze_roughness.png-f433e969e0ce068df32b22d99e0a08d7.ctex",
+      "ctex_sha256": "d07bb6319316274016a7da8719cb74a05cde4ca21ba472fb6991c464ad6dc9d8",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_earth_basecolor.png",
+      "source_sha256": "fe36eac8927bdd8d7c1371732ca408669b355fb1df308db802c30af7787cdab9",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_earth_basecolor.png.import",
+      "import_metadata_sha256": "9a7cddadd67d29b67131a97f92b572a1281373dd1bee3f922d0dfe6e8cfbb8d9",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_earth_basecolor.png-38f37d436acbd38dc4a0b526c830667d.ctex",
+      "ctex_sha256": "eee1f97df41e6446f5f18984d3a31994f369fcdec79f48f89dd42ea3bd28afaf",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_earth_normal.png",
+      "source_sha256": "0d3e0f14cccde761d988a45b48157c58e7399a9e9e9cad74067a425e9080e009",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_earth_normal.png.import",
+      "import_metadata_sha256": "b6d26151d263c3956824071523e43d31cdfb8c93b2780b7ee5bced347011c54f",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_earth_normal.png-cfee60378b3eab0fa3651f2db5104fcc.ctex",
+      "ctex_sha256": "89d00c1ad98a9e2123c7a0e2ecb1529a8acabc59b5992efa92b2610476453966",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_earth_roughness.png",
+      "source_sha256": "66a4c2685bffca650256788cda83324231665395a00407a7b616cb25cf04cc20",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_earth_roughness.png.import",
+      "import_metadata_sha256": "3563640f33f8536cdeceae8a407191af80fee89e7fdf44838eebe96a319eddd0",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_earth_roughness.png-514523340529d286594d5e997642a2f5.ctex",
+      "ctex_sha256": "e9fcd65541ba5475555d98a2491d6a2868d9d7613cdae4f82b5a35a51a7778c7",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_limestone_basecolor.png",
+      "source_sha256": "4a51345827ea47957811c926d0de059d3a3b937d41fbabf4d212db3b88f7eabb",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_limestone_basecolor.png.import",
+      "import_metadata_sha256": "1934bfb901bc187fda7dd1318de0f1f2e9330117cff37d16953dff1ad3bdc733",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_limestone_basecolor.png-ffe153ff59e7873c9146510121e43507.ctex",
+      "ctex_sha256": "54c6fdc603abfebea8a454a479fe9e0fc6b5d7fcba8382a68ad50423130cecbf",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_limestone_normal.png",
+      "source_sha256": "deea365f6f37a79ba14934e2fe1dd085408e03c3571a41d36a1e7abf6a30aa8f",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_limestone_normal.png.import",
+      "import_metadata_sha256": "04db661a5e7cdb0ce402322a752898ab8b4dcf55c131235f32baac1ebbb27586",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_limestone_normal.png-a293e8ca79f4335557afbfd91d9e795c.ctex",
+      "ctex_sha256": "bd5d012a0cfbb4e97323127990de94cbe49ea1b349838d63ac20c4371d693120",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_limestone_roughness.png",
+      "source_sha256": "2450d0efbb7d833b17d3cfc8c1f3062c4c340cdc47d8304c21e48d6d57e53820",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_limestone_roughness.png.import",
+      "import_metadata_sha256": "e88c49018b379ef533ab6f6f2a18fd10ff6ad7d7af49cab7e1e71c6b876083e0",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_limestone_roughness.png-0dad9c0c209015dd019f877cfb52de91.ctex",
+      "ctex_sha256": "d37452a99a5faf39ce0ed3f12ba6bcdbdf9ddb2460972d0ce9e0753f958757cd",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_linen_basecolor.png",
+      "source_sha256": "7c2713a515d1fb427e4615a61259ba42728ce5289fd221d26b3ca0ef8d6192d9",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_linen_basecolor.png.import",
+      "import_metadata_sha256": "4d9e09dca0384aec1d9af97f90c9f3463d11dfc7377e001212482eb6eb06fa23",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_linen_basecolor.png-3d0b89086842c50a8580e4fc794fa09f.ctex",
+      "ctex_sha256": "101c1075e8e4b0441fc06bdebfbc125641744689faaf5da31853908bc734c38f",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_linen_normal.png",
+      "source_sha256": "d62f8e8870d0a15c6df4c96c2f513c205d28666f18ecff2769db9836ebd7d162",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_linen_normal.png.import",
+      "import_metadata_sha256": "e870a9281609a3cfd05a4943bcd2f2a8a22e05aaccb8eaf74febc83ee5cc9cff",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_linen_normal.png-ba752069444c89b415be490daa147cd1.ctex",
+      "ctex_sha256": "3da2825e0c923234a6a506167ac9ab375552b674af443fb1e7cf8fb651753623",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_linen_roughness.png",
+      "source_sha256": "3b125719a8184838dbcfb0f33f41fc4a4e1e28fd8ed94f4dbda2b439afbd661a",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_linen_roughness.png.import",
+      "import_metadata_sha256": "361f175f3a1bf1d9ca3062dde6b7210e0f7017a1e2d90de40a7374ee16ff8dc7",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_linen_roughness.png-02ae7e230a93be679344404f35d01bc4.ctex",
+      "ctex_sha256": "6782e56e9a7a6fe8547e2599024c787078bcffa4bb3af419d68d64903170ca37",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_oak_basecolor.png",
+      "source_sha256": "1e9663cc3281731afdbc412c12dd76e27d2fad9d7f2bf1b724bb233643698d8d",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_oak_basecolor.png.import",
+      "import_metadata_sha256": "c326124ab89324bc627c3eb1e3f6b4154e32645f63cc1fc517af0d910898b8a4",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_oak_basecolor.png-272a2cbeb28ab944adc99aa7ab36160d.ctex",
+      "ctex_sha256": "35eb72884871b0ab85b7b57ff9cbdd58a310ab6c441e01023d59affde59d0c6d",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_oak_normal.png",
+      "source_sha256": "95490774efffb1e6950d670e3add0d676685fe89bd0f91d7412add5dcd68527a",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_oak_normal.png.import",
+      "import_metadata_sha256": "8dd6113a9619038384d5b20eba38b6bcedf1c8cfa1fe01998c62acb36eeb5074",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_oak_normal.png-c9d277d6683226baeb2aab951ffda52e.ctex",
+      "ctex_sha256": "8f20648271fd1b4fa36554ca6e49c87ab074505818f977bc3acdb1b0d3c4033b",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_oak_roughness.png",
+      "source_sha256": "39fe9197bdc7f35ac2bf06f2db685f8a35e9d105cab7f3718dfd961d86db5e64",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_oak_roughness.png.import",
+      "import_metadata_sha256": "3224ba83d5c174e5f59d56adbc83e19fbef258366bcfba727b0d1349af40bb5b",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_oak_roughness.png-6bb17280f47207ea13d5270ab396d79a.ctex",
+      "ctex_sha256": "e63abc1ecde722b30557aa30dd6ed79c152323e575d3b5639207ecdf3fa30803",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_plaster_basecolor.png",
+      "source_sha256": "bc69abfb51f1dd36229eac207367f5f86c3388d5c1d3390870ac4b6f2bf81d15",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_plaster_basecolor.png.import",
+      "import_metadata_sha256": "85bb1042a9b92f87e7a083cb7a06b363be463a77f2ea61a59bb551fb7fd6778e",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_plaster_basecolor.png-3f4f834389354a060d6deea23f8c242a.ctex",
+      "ctex_sha256": "80e0cada9acb5a54e82db190b50fae7cb12902752ae1acb41bcdf0f7d895def1",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_plaster_normal.png",
+      "source_sha256": "80796a6385e16bdb8815b3da0af5574e20ebb08cde6d017dec275443ec10f6eb",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_plaster_normal.png.import",
+      "import_metadata_sha256": "1b69b12633f7fa7227f78f52e258928ba7af66683f34cfcbc8e76ab4bf2a2e83",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_plaster_normal.png-406b41e8ece127f5a96a8d87e5292e7e.ctex",
+      "ctex_sha256": "3f711b8f1e50f2a8ee2839b3693a0a8107af7f496f55b0a78be40263ce71a961",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_plaster_roughness.png",
+      "source_sha256": "e667fee85aa0c2ac7b542228c4e7339e8b03df1bccd6620a015bdafd542b9c0c",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_plaster_roughness.png.import",
+      "import_metadata_sha256": "bbe492a4ec52f96855bf8fb3a51424b34edeabf07e537b49ffbd91e023fd1e4d",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_plaster_roughness.png-091d66e9ece9be5d909a8d8c8e122139.ctex",
+      "ctex_sha256": "b6450fff418d6501e4f8af382396eebd86700cdbb150b392a8a161118a212629",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_terracotta_basecolor.png",
+      "source_sha256": "a4b1161284ce00dbb56b0e4a42999385ba9b22ae024c62d11612e08557dc8c7e",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_terracotta_basecolor.png.import",
+      "import_metadata_sha256": "5343c08dae4bde502e587695aeedea84afe17920fca73e57bcfd2242585a5e60",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_terracotta_basecolor.png-77baed4029bf3337b1b5f1cd75244bcb.ctex",
+      "ctex_sha256": "48da0bc61b85565d39c3e308b79cacf247635f51e40941e10816402118f15630",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_terracotta_normal.png",
+      "source_sha256": "23a417898c6ab2b0734a6697da3812ff0fd445ed5bbabcb99b4d96009353756e",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_terracotta_normal.png.import",
+      "import_metadata_sha256": "a202e5c38f4c973b1306248d925316a32b43a7a605f5bb696af36583e7818378",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_terracotta_normal.png-4ca62596ff297c794e38e98af4191a7e.ctex",
+      "ctex_sha256": "86e2d2dcee6193ff4fdee4db152b4e0a904109819cef3cf18e2aab2a355e9d91",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    },
+    {
+      "source_path": "prototype/assets/city_detail/architecture/city_architecture_library_terracotta_roughness.png",
+      "source_sha256": "66111a67e23ebdcdd3f23eb8e814c8edfe68cd37e8ca386f2f5a22fb3dc519b5",
+      "import_metadata_path": "prototype/assets/city_detail/architecture/city_architecture_library_terracotta_roughness.png.import",
+      "import_metadata_sha256": "b04b44655951e702d287b0ba3004ff6adc60911d16cd2c34518d2810a516eacb",
+      "ctex_path": "prototype/.godot/imported/city_architecture_library_terracotta_roughness.png-d06d670f0b1ec751dda5b2303bb7a54e.ctex",
+      "ctex_sha256": "310e10e3c861f81be9add0bff47fd767a6c91db83fed7451f5c4b3c8ce6ba07b",
+      "mipmaps_generate": true,
+      "decoded_levels_including_base": 10
+    }
+  ]
+}

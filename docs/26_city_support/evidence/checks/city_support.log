@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CITY_SUPPORT_READY
+CITY_SUPPORT_CHECKPOINT ready
+CITY_SUPPORT_CHECKPOINT movement
+CITY_SUPPORT_CHECKPOINT purchase
+CITY_SUPPORT_CHECKPOINT saved_inventory
+CITY_SUPPORT_CHECKPOINT profile=low
+CITY_SUPPORT_CHECKPOINT profile=balanced
+CITY_SUPPORT_CHECKPOINT profile=high
+CITY_SUPPORT_CHECKPOINT profile=very_high
+CITY_SUPPORT_RESULT checks=36 failures=0
+CITY_SUPPORT_PASS

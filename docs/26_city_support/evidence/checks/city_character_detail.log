@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CITY_TEXTURE_RESOURCE {"class":"CompressedTexture2D","height":1024,"import_settings_sha256":"da68ad4085a114cfe7005e3369d4df4e765317cb8f2843445df9f25628da4e0b","mipmap_count_excluding_base":10,"path":"res://assets/city_detail/characters/skin_detail_normal.png","source_sha256":"c68c0b5b9fec99dd5acbe16bf622075be86ee9f246c02fd33979f9ea79fa0095","width":1024}
+CITY_TEXTURE_RESOURCE {"class":"CompressedTexture2D","height":1024,"import_settings_sha256":"52844aeb0889bbb518e10bf591fc73a1c12ac9b0fbf32a533a2dc6e707a27dc9","mipmap_count_excluding_base":10,"path":"res://assets/city_detail/characters/skin_detail_roughness.png","source_sha256":"3417a895c07349cfc758f2aad654a96183ca7e1a1673d7e8a5626b266b6d1a04","width":1024}
+CITY_TEXTURE_RESOURCE {"class":"CompressedTexture2D","height":1024,"import_settings_sha256":"e57527e7637c14272e1385b6d273b551ab1607ffc7b0c2f3e723f20135eb267a","mipmap_count_excluding_base":10,"path":"res://assets/city_detail/characters/linen_detail_normal.png","source_sha256":"53b2bf4ba4b5ff201ccebb6cfd26db7a7926dfb5441391675b3f945a8300829e","width":1024}
+CITY_TEXTURE_RESOURCE {"class":"CompressedTexture2D","height":256,"import_settings_sha256":"dbde0248682908f9365fd9e56792129913c208517feae321a9e4cac811c87afe","mipmap_count_excluding_base":8,"path":"res://assets/city_detail/characters/leather_detail_normal.png","source_sha256":"4b3c552d992f061a5b4664cc7bf2c90436b070e209b68fbb2cc1cb5b58fa5713","width":256}
+CITY_CHARACTER_DETAIL: 79 checks, 0 failures

@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "exit_code": 0,
+  "checks": 94,
+  "failures": 0,
+  "renderer": "OpenGL Compatibility, software Mesa via authenticated Xorg",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "android_device_test": false,
+  "source_sha256": {
+    "prototype/scripts/rendering/city_architecture_detail.gd": "babbaa93e73036f4d03f47077c4ff0852df45e6661f6bf9bdb6d8792ed8649da",
+    "prototype/scripts/tests/city_architecture_detail_test.gd": "949c5a2ec175c1852fea820befeec920183d17154ad1bbdb93f4e11686f48e87",
+    "prototype/assets/city_detail/architecture/city_architecture_library.glb": "f9fb217e5770dacb198e6ca569b0b0fa5351fc70ec52add93dab07f97a72a638",
+    "prototype/assets/city_detail/architecture/architecture_manifest.json": "4eabaeba9e508e1cf639ec6f8ca88c136fd0021ca0f9301e5813d6b44566eb91"
+  },
+  "changed_during_run": []
+}
