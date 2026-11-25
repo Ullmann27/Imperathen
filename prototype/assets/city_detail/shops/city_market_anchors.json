@@ -3,7 +3,7 @@
   "version": 1,
   "authority": "read-only city signage and site survey; NOT active commerce",
   "source": "tools/world/build_roman_test_city.py",
-  "source_blob_sha": "5c3337882daecb42641e422da1e61f0c1cf61d71",
+  "source_blob_sha": "c0018c4abba022f70fd411c3993aeedf6bef553b",
   "city_generator_formula": "market n=0..62; x=-385+n*770/62; Blender y=-47 maps to Godot z=47; n%7 kind, (n//7)%3 construction, n//21 size",
   "trading_contract": "prototype/scripts/city_trade_catalog.gd on feature/city-detail-commerce-support-20261125",
   "authoritative_commerce_enabled": false,
