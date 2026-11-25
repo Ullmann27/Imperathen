@@ -322,6 +322,10 @@ func show_menu(can_continue: bool) -> void:
 	var new_button := _roman_button("Neues Leben", _request_new_game, not can_continue, font_size, button_height)
 	life.add_child(new_button)
 	var demo_button := _roman_button("Talgefecht erproben", func(): _emit("valley_demo"), false, font_size, button_height)
+	var city_button := _roman_button("Stadt frei erkunden", func(): _emit("city_exploration"), true, font_size, button_height)
+	city_button.name = "FreeCityExploration"
+	city_button.tooltip_text = "Eine freie Testrunde durch die Stadt und vorhandene Modelle beginnen."
+	more.add_child(city_button)
 	more.add_child(demo_button)
 	var atlas_button := _roman_button("Weltkugel erkunden", func(): _emit("atlas_demo"), false, font_size, button_height)
 	more.add_child(atlas_button)

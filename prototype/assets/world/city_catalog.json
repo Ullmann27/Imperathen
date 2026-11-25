@@ -1,0 +1,705 @@
+{
+  "format": "imperathen-city-catalog",
+  "version": 1,
+  "source": "Existing runtime GLBs; one station per model family.",
+  "family_count": 44,
+  "binary_count": 97,
+  "families": [
+    {
+      "id": "architecture/atrium_house",
+      "name": "Römisches Atriumhaus",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/architecture/atrium_house.glb"
+        }
+      ]
+    },
+    {
+      "id": "architecture/frontier_house",
+      "name": "Wohnhaus",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/architecture/frontier_house.glb"
+        }
+      ]
+    },
+    {
+      "id": "architecture/village_well",
+      "name": "Dorfbrunnen",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/architecture/village_well.glb"
+        }
+      ]
+    },
+    {
+      "id": "frontier_hut",
+      "name": "Grenzhütte",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/frontier_hut.glb"
+        }
+      ]
+    },
+    {
+      "id": "landscape/han_house",
+      "name": "Han-Haus",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/landscape/han_house.glb"
+        }
+      ]
+    },
+    {
+      "id": "landscape/wa_house",
+      "name": "Wa-Haus",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/landscape/wa_house.glb"
+        }
+      ]
+    },
+    {
+      "id": "landscape/wood_longhouse",
+      "name": "Langhaus",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/landscape/wood_longhouse.glb"
+        }
+      ]
+    },
+    {
+      "id": "village/market",
+      "name": "Marktstand",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/village/market.glb"
+        }
+      ]
+    },
+    {
+      "id": "village/palisade_bay",
+      "name": "Palisadensegment",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/village/palisade_bay.glb"
+        }
+      ]
+    },
+    {
+      "id": "village/palisade_silhouette",
+      "name": "Palisadenreihe",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/village/palisade_silhouette.glb"
+        }
+      ]
+    },
+    {
+      "id": "village/storehouse",
+      "name": "Speicher",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/village/storehouse.glb"
+        }
+      ]
+    },
+    {
+      "id": "village/timber_billet",
+      "name": "Holzbündel",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/village/timber_billet.glb"
+        }
+      ]
+    },
+    {
+      "id": "village/training_dummy",
+      "name": "Übungspfahl",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/village/training_dummy.glb"
+        }
+      ]
+    },
+    {
+      "id": "village/workshop",
+      "name": "Werkstatt",
+      "category": "buildings",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/village/workshop.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/gear_germanic_round_shield",
+      "name": "Rundschild",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/gear_germanic_round_shield_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/gear_germanic_round_shield_1.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/gear_roman_signum",
+      "name": "Signum",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/gear_roman_signum_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/equipment/weap_germanic_hand_axe",
+      "name": "Handaxt",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/equipment/weap_germanic_hand_axe_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/equipment/weap_germanic_hand_axe_1.glb"
+        }
+      ]
+    },
+    {
+      "id": "weapons/gladius",
+      "name": "Gladius",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/weapons/gladius_lod0.glb"
+        }
+      ]
+    },
+    {
+      "id": "weapons/scutum",
+      "name": "Scutum",
+      "category": "equipment",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/weapons/scutum_lod0.glb"
+        }
+      ]
+    },
+    {
+      "id": "characters/frontier_archer",
+      "name": "Bogenschütze",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/characters/frontier_archer_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/characters/frontier_archer_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/characters/frontier_archer_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/characters/frontier_archer_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "characters/frontier_civilian_man",
+      "name": "Dorfbewohner",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/characters/frontier_civilian_man_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/characters/frontier_civilian_man_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/characters/frontier_civilian_man_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/characters/frontier_civilian_man_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "characters/frontier_civilian_woman",
+      "name": "Dorfbewohnerin",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/characters/frontier_civilian_woman_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/characters/frontier_civilian_woman_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/characters/frontier_civilian_woman_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/characters/frontier_civilian_woman_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "characters/frontier_elder",
+      "name": "Ältester",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/characters/frontier_elder_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/characters/frontier_elder_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/characters/frontier_elder_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/characters/frontier_elder_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "characters/frontier_legionary",
+      "name": "Legionär",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/characters/frontier_legionary_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/characters/frontier_legionary_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/characters/frontier_legionary_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/characters/frontier_legionary_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "characters/frontier_officer",
+      "name": "Offizier",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/characters/frontier_officer_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/characters/frontier_officer_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/characters/frontier_officer_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/characters/frontier_officer_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "characters/frontier_spearman",
+      "name": "Speerträger",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/characters/frontier_spearman_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/characters/frontier_spearman_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/characters/frontier_spearman_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/characters/frontier_spearman_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "characters/hero_quality",
+      "name": "Bisherige Hauptfigur",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/characters/hero_quality_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/characters/hero_quality_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/characters/hero_quality_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/characters/hero_quality_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "landscape/farmer",
+      "name": "Feldarbeiter",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/landscape/farmer.glb"
+        }
+      ]
+    },
+    {
+      "id": "landscape/han_farmer",
+      "name": "Han-Feldarbeiter",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/landscape/han_farmer.glb"
+        }
+      ]
+    },
+    {
+      "id": "landscape/wa_farmer",
+      "name": "Wa-Feldarbeiter",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/landscape/wa_farmer.glb"
+        }
+      ]
+    },
+    {
+      "id": "landscape/wa_store",
+      "name": "Wa-Speicher",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/landscape/wa_store.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/characters/unit_germanic_axe_fighter",
+      "name": "Germanischer Axtkämpfer",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/characters/unit_germanic_axe_fighter_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/characters/unit_germanic_axe_fighter_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/characters/unit_germanic_axe_fighter_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/meshy/characters/unit_germanic_axe_fighter_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "meshy/characters/unit_roman_signifer",
+      "name": "Römischer Signifer",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/meshy/characters/unit_roman_signifer_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/meshy/characters/unit_roman_signifer_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/meshy/characters/unit_roman_signifer_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/meshy/characters/unit_roman_signifer_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "soldiers/archer",
+      "name": "Bogenschütze",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/soldiers/archer_near.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/soldiers/archer_mid.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/soldiers/archer_far.glb"
+        }
+      ]
+    },
+    {
+      "id": "soldiers/heavy",
+      "name": "Schwerer Soldat",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/soldiers/heavy_near.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/soldiers/heavy_mid.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/soldiers/heavy_far.glb"
+        }
+      ]
+    },
+    {
+      "id": "soldiers/officer",
+      "name": "Offizier",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/soldiers/officer_near.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/soldiers/officer_mid.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/soldiers/officer_far.glb"
+        }
+      ]
+    },
+    {
+      "id": "soldiers/spear",
+      "name": "Speerträger",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/soldiers/spear_near.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/soldiers/spear_mid.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/soldiers/spear_far.glb"
+        }
+      ]
+    },
+    {
+      "id": "village_characters/heavy",
+      "name": "Schwerer Soldat",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 2,
+          "path": "res://assets/village_characters/heavy_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/village_characters/heavy_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "village_characters/officer",
+      "name": "Offizier",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 2,
+          "path": "res://assets/village_characters/officer_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/village_characters/officer_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "village_characters/spear",
+      "name": "Speerträger",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 2,
+          "path": "res://assets/village_characters/spear_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/village_characters/spear_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "village_characters/villager",
+      "name": "Frühe Dorffigur",
+      "category": "models",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/village_characters/villager_0.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/village_characters/villager_1.glb"
+        },
+        {
+          "level": 2,
+          "path": "res://assets/village_characters/villager_2.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/village_characters/villager_3.glb"
+        }
+      ]
+    },
+    {
+      "id": "landscape/oak",
+      "name": "Eiche",
+      "category": "nature",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/landscape/oak_near.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/landscape/oak_mid.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/landscape/oak_far.glb"
+        }
+      ]
+    },
+    {
+      "id": "landscape/olive",
+      "name": "Olivenbaum",
+      "category": "nature",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/landscape/olive_near.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/landscape/olive_mid.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/landscape/olive_far.glb"
+        }
+      ]
+    },
+    {
+      "id": "landscape/pine",
+      "name": "Kiefer",
+      "category": "nature",
+      "tiers": [
+        {
+          "level": 0,
+          "path": "res://assets/landscape/pine_near.glb"
+        },
+        {
+          "level": 1,
+          "path": "res://assets/landscape/pine_mid.glb"
+        },
+        {
+          "level": 3,
+          "path": "res://assets/landscape/pine_far.glb"
+        }
+      ]
+    }
+  ]
+}

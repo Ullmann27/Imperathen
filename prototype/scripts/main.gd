@@ -16,6 +16,7 @@ const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
+const CityExploration = preload("res://scripts/world/city_exploration.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -47,6 +48,7 @@ var frontier_npc := ""
 var village_npc := ""
 var village_tab := "overview"
 var simulation_elapsed := 0.0
+var city_exploration
 
 
 func _ready() -> void:
@@ -75,6 +77,10 @@ func _ready() -> void:
 	_setup_ambient()
 	# The title sequence is opaque; the village is not drawn underneath it.
 	world.hide()
+	if "--city-test" in OS.get_cmdline_user_args():
+		screen = "menu"
+		_open_city_exploration()
+		return
 	ui.show_intro()
 	if OS.is_debug_build() and OS.has_feature("android"):
 		var diagnostics = preload("res://scripts/ui/android_village_diagnostics.gd").new()
@@ -84,6 +90,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if screen == "city_exploration":
+		return
 	if screen == "opening":
 		_opening_process(delta)
 		return
@@ -136,6 +144,8 @@ func _flush_simulation() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if screen == "city_exploration":
+		return
 	if screen == "opening":
 		return
 	if event.is_action_pressed("ui_cancel"):
@@ -153,7 +163,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_go_back_requested() -> void:
 	# The window signal is the single Android Back entry point. Handling the
 	# preceding node notification too would process one request twice.
-	if screen == "opening" and is_instance_valid(opening_overlay):
+	if screen == "city_exploration" and is_instance_valid(city_exploration):
+		city_exploration.set_paused(not city_exploration.paused)
+	elif screen == "opening" and is_instance_valid(opening_overlay):
 		opening_overlay.handle_back()
 	elif screen == "atlas":
 		_leave_atlas()
@@ -164,6 +176,13 @@ func _on_go_back_requested() -> void:
 
 
 func _notification(what: int) -> void:
+	if screen == "city_exploration" and is_instance_valid(city_exploration):
+		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
+			city_exploration.set_paused(true)
+		elif what == NOTIFICATION_WM_CLOSE_REQUEST:
+			if city_exploration.save_state() == OK:
+				get_tree().quit()
+		return
 	if screen == "opening" and what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
 		_opening_set_paused(true)
 		_write_opening_checkpoint(false)
@@ -395,6 +414,7 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 				if defense_result.get("ok", false):
 					world.cue_village_defense(action)
 		"atlas_demo": _open_atlas(true)
+		"city_exploration": _open_city_exploration()
 		"atlas": _open_atlas(false)
 		"valley_demo": _open_valley(true)
 		"valley": _open_valley(false)
@@ -896,6 +916,8 @@ func _setup_ambient() -> void:
 
 
 func _exit_tree() -> void:
+	if is_instance_valid(world) and world.get_parent() == null:
+		world.free()
 	var ambience := get_node_or_null("FrontierAmbience") as AudioStreamPlayer
 	if ambience != null:
 		ambience.stop()
@@ -1045,3 +1067,31 @@ func _leave_atlas() -> void:
 		_pause()
 	else:
 		_resume()
+
+
+func _open_city_exploration() -> void:
+	if screen!="menu" or is_instance_valid(city_exploration):
+		return
+	world.set_active(false)
+	world.hide()
+	# Hidden village bodies would otherwise obstruct the separate test city.
+	remove_child(world)
+	ui.hide()
+	ui.process_mode = Node.PROCESS_MODE_DISABLED
+	city_exploration = CityExploration.new()
+	city_exploration.profile = ui.get_quality()
+	city_exploration.leave_requested.connect(_leave_city_exploration)
+	screen = "city_exploration"
+	add_child(city_exploration)
+
+func _leave_city_exploration() -> void:
+	if not is_instance_valid(city_exploration):
+		return
+	remove_child(city_exploration)
+	city_exploration.queue_free()
+	city_exploration = null
+	add_child(world)
+	ui.process_mode = Node.PROCESS_MODE_INHERIT
+	ui.show()
+	world.get_node("WorldCamera").current = true
+	_show_menu()

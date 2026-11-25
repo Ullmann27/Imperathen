@@ -14,6 +14,7 @@ const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
 const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
+const MESHY_YOUTH_PATH := "res://assets/characters/hero_meshy_italia_%d.glb"
 const FRONTIER_PATH := "res://assets/characters/frontier_%s_%d.glb"
 const APPEARANCES := ["civilian_man", "civilian_woman", "elder", "legionary", "officer", "spearman", "archer"]
 const CLOTH_TINTS := [Color(1.0, 1.0, 1.0), Color(0.72, 0.90, 1.10), Color(1.10, 0.75, 0.60), Color(0.75, 1.05, 0.79), Color(1.15, 1.06, 0.76), Color(0.76, 0.73, 0.84)]
@@ -55,6 +56,7 @@ var appearance_variation := 0
 var _loaned_gear := false
 var _gear_nodes: Array[Node3D] = []
 var meshy_asset_id := ""
+var _meshy_youth := false
 var _conversation_focused := false
 var _armed_style := ""
 var _armed_sequence := 0
@@ -98,6 +100,18 @@ func configure_meshy(stable_id: String) -> bool:
 		meshy_asset_id = selected
 		_reload(maxi(0, detail))
 	return not selected.is_empty()
+
+
+func configure_meshy_youth(enabled: bool = true) -> bool:
+	# Exact adolescent identity; this is not an adult or companion morph.
+	var selected := enabled and role=="player" and home=="italia" and age>=12 and age<18
+	if selected:
+		for level in 4:
+			selected = selected and ResourceLoader.exists(MESHY_YOUTH_PATH % level,"PackedScene")
+	if selected!=_meshy_youth:
+		_meshy_youth = selected
+		_reload(maxi(0,detail))
+	return selected
 
 
 func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null) -> void:
@@ -145,6 +159,12 @@ func _path(level: int) -> String:
 	# This asset has an authored Italia identity. Other origins and companions
 	# keep their own appearances until their replacement models are available.
 	if role == "player" and home == "italia":
+		if _meshy_youth and age>=12 and age<18:
+			var youth_complete := true
+			for candidate in 4:
+				youth_complete = youth_complete and ResourceLoader.exists(MESHY_YOUTH_PATH % candidate,"PackedScene")
+			if youth_complete:
+				return MESHY_YOUTH_PATH % level
 		var complete_set := true
 		for candidate in 4:
 			if not ResourceLoader.exists(HERO_PATH % candidate, "PackedScene"):
@@ -247,6 +267,10 @@ func _reload(level: int) -> void:
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
 		for cached_path: String in scenes.keys():
 			if cached_path.begins_with("res://assets/characters/hero_quality_") and cached_path != path:
+				scenes.erase(cached_path)
+	if path.begins_with("res://assets/characters/hero_meshy_italia_") or previous_path.begins_with("res://assets/characters/hero_meshy_italia_"):
+		for cached_path: String in scenes.keys():
+			if cached_path.begins_with("res://assets/characters/hero_meshy_italia_") and cached_path!=path:
 				scenes.erase(cached_path)
 	elif path.begins_with("res://assets/characters/frontier_"):
 		var family := "res://assets/characters/frontier_" + _frontier_identity() + "_"
