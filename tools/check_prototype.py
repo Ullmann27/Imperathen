@@ -198,7 +198,11 @@ def main():
         source_unchanged = (checked_fingerprint == measured_fingerprint == final_fingerprint
                             and checked_commit == source_commit(ROOT))
     else:
-        source_unchanged = (start_fingerprint == final_fingerprint
+        # A fresh --import may generate deterministic .uid/.import sidecars.
+        # Compare the post-import source fingerprint when import was selected.
+        # In a subset without import, compare against the original checkout.
+        baseline = checked_fingerprint if "import" in [entry["check"] for entry in records] else start_fingerprint
+        source_unchanged = (baseline == final_fingerprint
                             and checked_commit == source_commit(ROOT))
     result = {"engine": version,
               "passed": len(records) == len(checks) and all(item["passed"] for item in records) and source_unchanged,
