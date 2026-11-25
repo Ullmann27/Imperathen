@@ -9,6 +9,7 @@ const LOOPS := ["idle","march","run","talk","work"]
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
 const YouthSoleContact := preload("res://scripts/visuals/youth_sole_contact.gd")
+const AuthoredGround := preload("res://scripts/visuals/authored_ground.gd")
 const HandPose := preload("res://scripts/visuals/hand_pose.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
@@ -237,6 +238,11 @@ func _reload(level: int) -> void:
 	body.scale = Vector3.ONE * size_factor
 	add_child(body)
 	body.position.y = -0.9
+	# Military frontier exports stand on soles above their origin (see
+	# authored_ground.gd). Procedural civilians use the world-foot solver and
+	# the original youth its own sole contact; neither is shifted here.
+	if active_model_path.begins_with("res://assets/characters/frontier_") and _frontier_identity() in ["legionary", "officer", "spearman", "archer"]:
+		body.position.y -= AuthoredGround.sole_lift(active_model_path, body) * body.scale.y
 	animator = body.find_child("AnimationPlayer",true,false) as AnimationPlayer
 	_animation_sources.clear()
 	if animator:
