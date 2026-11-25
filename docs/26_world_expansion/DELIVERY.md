@@ -1,7 +1,13 @@
 # IMPERATHEN – Weltwerkstatt: verifizierte Übergabe
 
 **Stand:** 25. November 2026  
-**Quellcommit des erfolgreichen Gesamtlaufs:** `4d07b325ab5f2d7799cfe171f27a5f21e377ff6d`  
+**Jüngster geprüfter Engine-/Weltbau-Commit:** `2452d9f5034041b7ee99e48a7824161f3e20a365`  
+**Erfolgreicher vollständiger Godot-/Renderlauf:** https://github.com/Ullmann27/Imperathen/actions/runs/45634331129  
+**Erfolgreicher Foundation-Lauf:** https://github.com/Ullmann27/Imperathen/actions/runs/45634347131  
+**Bild- und Modell-Artefakt:** https://github.com/Ullmann27/Imperathen/actions/runs/45634331129/artifacts/15033035227  
+**Archiv-Digest:** `sha256:e07fde27440a00c2e822ad9a2c05617a0e4dfaa9c55212913a306f81f10d622d` (GitHub-Angabe; Ablauf 25.12.2026).
+**Vorheriger vollständig geprüfter Ausgangsstand:** `4d07b325ab5f2d7799cfe171f27a5f21e377ff6d` (CI 45606606311).
+
 **Arbeitszweig:** `feature/world-expansion-blender-20261125`  
 **PR:** https://github.com/Ullmann27/Imperathen/pull/58  
 **Unveränderter erfolgreicher CI-Lauf:** https://github.com/Ullmann27/Imperathen/actions/runs/45606606311  
@@ -59,3 +65,25 @@ Pfade werden über `coordination/world_expansion.json` reserviert; externe Teamz
 5. Die Produktionsorte sind fiktive Layoutanker. „Hafenstadt“ und „Fluss-Marktstadt“ behaupten keinen bereits eingebauten Hafen oder Wasserlauf.
 
 **Integrationsregel:** Erst Daten-/API-Abgleich mit den parallel laufenden Stadt- und Handelsteams, dann Engine- und visueller Regressionstest des zusammengeführten Branches. Kein Main-Merge ohne ausdrückliche Freigabe.
+
+## Zweite, grafisch überprüfte Fortsetzung – Commit `2452d9f5`
+
+Die ursprünglichen Blenderdateien und 21 GLBs wurden **nicht** durch generierte Platzhalter ersetzt. Drei neue Quellcommits ergänzten ausschließlich die Weltwerkstatt:
+
+1. `eb8b5df8`: reproduzierbare Bezirkstypen (Forum/Markt/Wohnen/Rand), Fassaden in vier Richtungen, konservativ skaliert und innerhalb der Grundstücksmaße, Shop-Metadaten an konkreten Gebäudepositionen. Bei 1.024 Gebäudeplatzierungen dokumentieren die Enginebelege 36 Forums-, 241 Markt-, 507 Wohn- und 240 Randbereichszuordnungen, 129 Händleranschlusspunkte und vier Fassadenrichtungen. **Kein** neues Händlerinventar oder Kaufabschluss.
+2. `a6c159f4`: eigenständig erzeugter, reproduzierbarer Bodenshader mit kleinskaliger Farbstruktur und maximal **acht** lokalen, schattenlosen, warmen Markt-Lichtquellen statt einer Lampe pro Haus. Direkter Wechsel zwischen Nacht- und Tageslicht schaltet sie ohne Verzögerung. Die Lampen haben ein einfaches Leuchtkugel-Proxy und ersetzen noch keine modellierten Öl- oder Feuerschalen.
+3. `2452d9f5`: Boden-Schattierung an die vier Profile gekoppelt; **low** unterdrückt die aufwendigeren Noise-Abfragen, `balanced`, `high` und `very_high` steuern die Stärke. Die konkrete Bildrate auf Android muss weiterhin gemessen werden.
+
+### Tatsächlich verifiziert
+
+- **CI `45634331129`: success**, Quellcommit `2452d9f5`. Godot 4.7.2; **133/133 Runtime-Assertions** in der isolierten Headless-Szene und **133/133 grafische Runtime-Assertions**. Das sind zwei Betriebsarten desselben Prüfsatzes, nicht 266 unabhängige Tests.
+- 21/21 tatsächliche GLB-Dateien in vier Architektur-/drei Vegetationsgruppen strukturell validiert, sieben regionale Python-Routentests erfolgreich. Wind bei t=0/t=2 verändert Pixel; bei Windstärke 0 bleibt die Darstellung pixelgleich.
+- **Zehn neue 1280×720-Bilder** als echte Godot-GL-Compatibility-Aufnahmen, `llvmpipe (LLVM 20.1.2, 256 bits)`, einschließlich Dorf bei drei Tageszeiten, Baumwind und Windstille, 4.000er-Übersicht, Atlas, Basilika. Alle Aufnahmen sind im verknüpften CI-Artefakt; die Datei `capture.json` dokumentiert Pixel-Hashes, `report.json` die Tests und Quellhashes.
+- **Foundation `45634347131`: success**.
+- Die tatsächlichen Bilder wurden zusätzlich visuell gesichtet. Die Dorfkulisse zeigt organischere Bodenvariation und warme Lichtinseln bei Nacht. Sie besitzt weiter zu viele identische Taberna-Hauskörper und großflächig freie Parzellen; die Hauptstadtübersicht wirkt im Fernmaßstab noch schematisch. Das wird nicht als fotorealistisches AAA-Endergebnis bezeichnet.
+
+Ausführlicher Bildbefund: [VISUAL_REVIEW.md](VISUAL_REVIEW.md). Die zwei vorhandenen VIVA-ROMA-Bauzweige nutzen teilweise denselben Vegetationsshader; siehe [Koordinationskommentar zu PR #71](https://github.com/Ullmann27/Imperathen/pull/71#issuecomment-7165087462). Der neue Bodenshader wurde in eigenem `world_expansion`-Pfad angelegt und greift nicht in fremde Stadt-Szenen ein.
+
+### Freigabe weiterhin ausgeschlossen
+
+Die Modellqualität der Bäume, eine stärker variierte dörfliche Architektur, glaubwürdige Zwischenräume/Gärten/Höfe, begehbare Kaufhäuser, NPCs, Karawanen, die vorhandenen aktiven Handelslogiken und die physische Fold7-Messung sind weiterhin separate Arbeit. Keine neue APK, kein Merge nach `main`.
