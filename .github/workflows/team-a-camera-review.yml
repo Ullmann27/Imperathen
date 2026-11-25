@@ -92,6 +92,35 @@ jobs:
             sudo apt-get update -q
             sudo apt-get install -y ffmpeg
           fi
+      - name: Verify the controlled raid clock before the complete suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import sys
+          import tempfile
+          sys.path.insert(0, str(Path("tools").resolve()))
+          from check_prototype import run_check
+          with tempfile.TemporaryDirectory(prefix="imperathen-raid-preflight-") as temporary:
+              environment = os.environ.copy()
+              environment["IMPERATHEN_ISOLATED_TEST"] = "1"
+              for kind in ("DATA", "CONFIG", "CACHE"):
+                  location = Path(temporary) / kind.lower()
+                  location.mkdir()
+                  environment[f"XDG_{kind}_HOME"] = str(location)
+              checks = [
+                  ("import", ["--import"], None),
+                  ("village_experience", ["--fixed-fps", "60", "--script",
+                   "res://tests/village_experience_test.gd"], "VILLAGE_EXPERIENCE_PASS"),
+              ]
+              for name, arguments, marker in checks:
+                  result = run_check(os.environ["GODOT_BIN"], name, arguments, marker,
+                                     environment, Path("evidence/engine/preflight"))
+                  if not result["passed"]:
+                      raise SystemExit(1)
+          PY
       - name: Run all actual Godot check groups
         shell: bash
         run: |

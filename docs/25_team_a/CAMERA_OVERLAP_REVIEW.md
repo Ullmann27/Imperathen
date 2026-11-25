@@ -69,6 +69,27 @@ Prüfergebnisse sind erst durch die jeweiligen ausgeführten Actions-Läufe
 belegt. Dieses Dokument enthält keine vorweggenommene Bestehensbehauptung.
 Es wird keine APK exportiert oder veröffentlicht.
 
+## Nachgezogene Zeitsteuerung des Überfall-Integrationstests
+
+Der erste vollständige Prüflauf hat drei Positionsabweichungen im bestehenden
+`village_experience_test.gd` sichtbar gemacht. Der Test deaktiviert die
+automatischen Uhren von `Main` und `GameWorld`, ließ jedoch den inzwischen
+eigenständig laufenden Physik-Callback des untergeordneten Überfallcontrollers
+aktiv. Während gewarteter UI-Frames bewegten sich dadurch die Angreifer weiter,
+obwohl der Test den maßgeblichen Modellzustand bewusst anhielt.
+
+Der Test steuert nun auch diesen Callback ausdrücklich in derselben
+Eltern-/Kind-Reihenfolge. Nach einem vollständigen Schritt werden die realen
+Körperpositionen über die vorhandene Produktionsfunktion beobachtet, die auch
+Befehle und Speichern verwenden. Die ursprüngliche genaue Gleichheitsprüfung
+zwischen sichtbarer Gegnerposition und Modellzustand bleibt erhalten.
+
+Zusätzliche Prüfungen belegen, dass reine UI-Warteframes weder Überfallzustand
+noch Körperpositionen verändern und dass ein ausdrücklich ausgeführter echter
+Physikframe weiterhin mindestens einen Angreifer bewegt, innerhalb der
+bestehenden Geschwindigkeitsgrenze von 1,2 m/s. Die produktive Überfalllogik
+wird dabei nicht geändert.
+
 ## Fachliche Grundlage
 
 - [Godot PhysicsDirectSpaceState3D](https://docs.godotengine.org/en/stable/classes/class_physicsdirectspacestate3d.html):

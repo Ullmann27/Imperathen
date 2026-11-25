@@ -41,6 +41,9 @@ func _run() -> void:
 	game.set_process(false)
 	game.set_physics_process(false)
 	game.world.set_physics_process(false)
+	# The raid controller owns a separate child callback. UI waits must not
+	# advance its bodies while this harness holds the authoritative model clock.
+	game.world.village_life_world.set_physics_process(false)
 	game.ui._finish_intro()
 	await _frames()
 	_check(game.screen=="menu","Actual main menu is available")
@@ -218,7 +221,25 @@ func _run() -> void:
 	root.size = Vector2i(1280,720)
 	await _frames(5)
 	_advance(float(game.model.data.village.raid.remaining)+0.2)
+	var frozen_raid := JSON.stringify(game.model.data.village.raid)
+	var frozen_positions := {}
+	for id: String in game.world.village_life_world.raiders:
+		frozen_positions[id] = game.world.village_life_world.raiders[id].global_position
 	await _frames()
+	_check(JSON.stringify(game.model.data.village.raid)==frozen_raid,"UI-only waits do not advance the authoritative raid clock")
+	for id: String in frozen_positions:
+		var actor: Node3D = game.world.village_life_world.raiders[id]
+		_check(actor.global_position.is_equal_approx(frozen_positions[id]),"UI-only waits do not advance raid bodies independently")
+	# The controlled clock must still move real actors: disabling an unmanaged
+	# callback is not permission to remove motion from this integration journey.
+	await _advance_real_motion(1.0/60.0)
+	var moved_raider := false
+	for id: String in frozen_positions:
+		var actor: Node3D = game.world.village_life_world.raiders[id]
+		var distance := actor.global_position.distance_to(frozen_positions[id])
+		moved_raider = moved_raider or distance > 0.0001
+		_check(distance <= 0.0201,"A controlled raid frame respects the 1.2 m/s movement bound")
+	_check(moved_raider,"An explicit real physics frame advances at least one visible raid actor")
 	_check(game.model.data.village.raid.active and game.world.village_life_world.raiders.size()==3,"The warning produces three real world enemy actors")
 	for enemy: Dictionary in game.model.data.village.raid.enemies:
 		var actor: Node3D = game.world.village_life_world.raiders[enemy.id]
@@ -354,7 +375,11 @@ func _advance(seconds: float) -> void:
 		var step := minf(0.1,remaining)
 		_advance_game(step)
 		game.world._physics_process(step)
+		game.world.village_life_world._physics_process(step)
 		remaining -= step
+	# Observe the completed body step at the same boundary used by commands
+	# and saving, without advancing the model clock or weakening position checks.
+	game.model._observe_raid_positions(game.model.data)
 	game._refresh()
 
 
@@ -368,7 +393,11 @@ func _advance_real_motion(seconds: float) -> void:
 		var step := minf(1.0 / 60.0, remaining)
 		_advance_game(step)
 		game.world._physics_process(step)
+		game.world.village_life_world._physics_process(step)
 		remaining -= step
+	# Observe the completed body step at the same boundary used by commands
+	# and saving, without advancing the model clock or weakening position checks.
+	game.model._observe_raid_positions(game.model.data)
 	game._refresh()
 
 
