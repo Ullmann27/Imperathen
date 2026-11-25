@@ -7,6 +7,8 @@ const Layout = preload("res://scripts/world_expansion/settlement_layout.gd")
 const View = preload("res://scripts/world_expansion/settlement_view.gd")
 const Atlas = preload("res://scripts/world_expansion/atlas.gd")
 const MANIFEST_PATH := "res://assets/world_expansion/manifest.json"
+const GROUND_SHADER = preload("res://shaders/world_expansion/ground_detail.gdshader")
+const MAX_MARKET_LIGHTS := 8
 const PROFILE_IDS := ["low", "balanced", "high", "very_high"]
 var manifest: Dictionary = {}
 var load_error := ""
@@ -32,6 +34,7 @@ var _status: Label
 var _panel: PanelContainer
 var _ui_time := 0.0
 var _hud: CanvasLayer
+var _market_lights: Array[OmniLight3D] = []
 var _overview_fog_disabled := false
 var _fog_enabled_before_overview := true
 
@@ -42,6 +45,7 @@ func _ready() -> void:
 	controller.name = "Atmosphere"
 	add_child(controller)
 	controller.presentation_settings_changed.connect(_sync_controls)
+	controller.presentation_settings_changed.connect(_update_market_lights)
 	camera = Camera3D.new()
 	camera.name = "WorkshopCamera"
 	camera.current = true
@@ -114,6 +118,7 @@ func select_settlement(id: String, region_id: String = "") -> bool:
 	selected_region = region_id
 	_settlement_choice.select(selection_index)
 	_make_ground(plan.extent)
+	_rebuild_market_lights(plan)
 	load_error = ""
 	set_view_mode(0)
 	_refresh_status()
@@ -260,14 +265,72 @@ func _make_ground(extent: Vector2) -> void:
 				surface.add_vertex(Vector3(position.x, height, position.y))
 	surface.generate_normals()
 	surface.index()
-	var material := StandardMaterial3D.new()
-	material.vertex_color_use_as_albedo = true
-	material.roughness = 0.96
+	var material := ShaderMaterial.new()
+	material.shader = GROUND_SHADER
 	_ground = MeshInstance3D.new()
 	_ground.name = "WorkshopLandscape"
 	_ground.mesh = surface.commit()
 	_ground.material_override = material
 	add_child(_ground)
+
+
+func _rebuild_market_lights(plan: Dictionary) -> void:
+	# Night lighting is a deliberately bounded visual study, not 4,000 lights.
+	for old_light in _market_lights:
+		remove_child(old_light)
+		old_light.free()
+	_market_lights.clear()
+	var sites: Array = plan.get("service_sites", [])
+	var consumed := {}
+	var ember_material := StandardMaterial3D.new()
+	ember_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	ember_material.albedo_color = Color("#ffb05c")
+	ember_material.emission_enabled = true
+	ember_material.emission = Color("#ff8b35")
+	ember_material.emission_energy_multiplier = 2.0
+	for _slot in mini(MAX_MARKET_LIGHTS, sites.size()):
+		var closest := INF
+		var closest_index := -1
+		for index in sites.size():
+			if consumed.has(index):
+				continue
+			var candidate: Dictionary = sites[index]
+			var distance: float = candidate.position.length_squared()
+			if distance < closest:
+				closest = distance
+				closest_index = index
+		if closest_index < 0:
+			break
+		consumed[closest_index] = true
+		var site: Dictionary = sites[closest_index]
+		var front := Basis(Vector3.UP, float(site.yaw)) * Vector3(0.0, 2.25, 6.2)
+		var glow := OmniLight3D.new()
+		glow.name = "MarketFire_%02d" % _market_lights.size()
+		glow.position = site.position + front
+		glow.light_color = Color("#ffc084")
+		glow.omni_range = 13.0
+		glow.shadow_enabled = false
+		glow.light_energy = 0.0
+		var flame := MeshInstance3D.new()
+		flame.name = "FireSource"
+		var flame_shape := SphereMesh.new()
+		flame_shape.radius = 0.095
+		flame_shape.height = 0.22
+		flame.mesh = flame_shape
+		flame.material_override = ember_material
+		glow.add_child(flame)
+		add_child(glow)
+		_market_lights.append(glow)
+	_update_market_lights()
+
+
+func _update_market_lights() -> void:
+	if controller == null or controller.sun == null:
+		return
+	var darkness := 1.0 - smoothstep(0.0, 0.55, controller.sun.light_energy)
+	for lamp in _market_lights:
+		lamp.light_energy = darkness * 1.25
+		lamp.visible = darkness > 0.03
 
 
 func _update_camera() -> void:
@@ -455,5 +518,6 @@ func diagnostics() -> Dictionary:
 		"selected_region": selected_region, "view_mode": view_mode,
 		"environment": controller.snapshot(), "settlement": settlement.report(),
 		"atlas": atlas.route_report(), "camera_position": [camera.position.x, camera.position.y, camera.position.z],
+		"market_light_count": _market_lights.size(),
 		"controls": {"quality": PROFILE_IDS[_quality_choice.selected], "time_of_day": _time_slider.value,
 			"wind_strength": _wind_slider.value}}

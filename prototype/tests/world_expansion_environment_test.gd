@@ -353,6 +353,19 @@ func _test_preview_presentation() -> void:
 		preview.set_quality("high")
 		preview.controller.set_time_of_day(13.25)
 		preview.controller.set_wind(0.0)
+		var ember_count := preview._market_lights.size()
+		_check(ember_count > 0 and ember_count <= Preview.MAX_MARKET_LIGHTS, "A village has a bounded number of real shop-front fire lights")
+		_check(preview._ground.material_override is ShaderMaterial and (preview._ground.material_override as ShaderMaterial).shader == Preview.GROUND_SHADER, "The actual landscape uses the authored world-coordinate soil material")
+		preview.controller.set_time_of_day(0.0)
+		var after_dark := true
+		for lamp: OmniLight3D in preview._market_lights:
+			after_dark = after_dark and lamp.visible and lamp.light_energy > 1.0
+		_check(after_dark, "Night immediately activates warm local market illumination")
+		preview.controller.set_time_of_day(13.25)
+		var daylight_off := true
+		for lamp: OmniLight3D in preview._market_lights:
+			daylight_off = daylight_off and not lamp.visible and is_zero_approx(lamp.light_energy)
+		_check(daylight_off, "Daylight immediately disables market fire lights and their renderable sources")
 		var controls: Dictionary = preview.diagnostics().controls
 		_check(controls.quality == "high", "The quality selector immediately reflects set_quality(high)")
 		_check(is_equal_approx(controls.time_of_day, 13.25), "The time slider immediately reflects an API clock change")
