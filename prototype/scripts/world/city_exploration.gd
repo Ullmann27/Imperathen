@@ -6,6 +6,7 @@ const State := preload("res://scripts/world/city_exploration_state.gd")
 const CameraObstruction := preload("res://scripts/world/camera_obstruction.gd")
 const CityDetailAdapter := preload("res://scripts/rendering/city_exploration_detail_adapter.gd")
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
+const CityAmbientPeople := preload("res://scripts/world/city_ambient_people.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
 const TouchAction := preload("res://scripts/ui/touch_action.gd")
@@ -26,6 +27,7 @@ var figure := Person.new()
 var camera := Camera3D.new()
 var city_available := false
 var youth_available := false
+var ambient_people: CityAmbientPeople
 var catalog: Array[Dictionary] = []
 var _catalog_nodes: Dictionary = {}
 var _catalog_pending := ""
@@ -57,6 +59,7 @@ func _ready() -> void:
 	_load_city()
 	_build_player()
 	_build_camera()
+	_build_ambient_people()
 	_read_catalog()
 	_build_ui()
 	_restore(State.read(save_path) if persist else State.defaults())
@@ -126,6 +129,20 @@ func _load_city() -> void:
 	# Read-only signboards are attached only to the six matching existing stalls.
 	# Transactions require a separate future WorldModel integration.
 	print("IMPERATHEN_CITY_MARKET " + JSON.stringify(CityMarketSignage.install(city, profile)))
+
+
+func _build_ambient_people() -> void:
+	# A tiny review population attaches to the actual authored six shop sites.
+	# It owns no economy state, story mission, replacement player or camera.
+	var city := get_node_or_null("RomanCity") as Node3D
+	if not is_instance_valid(city):
+		return
+	ambient_people = CityAmbientPeople.new()
+	ambient_people.name = "CityAmbientLife"
+	add_child(ambient_people)
+	var report: Dictionary = ambient_people.setup(city,camera,profile)
+	print("IMPERATHEN_CITY_PEOPLE " + JSON.stringify(report))
+
 
 func _build_player() -> void:
 	player.name = "ExplorationPlayer"
@@ -447,6 +464,8 @@ func set_paused(value: bool) -> void:
 	player.velocity = Vector3.ZERO
 	figure.drive(0)
 	figure.set_process(not paused)
+	if is_instance_valid(ambient_people):
+		ambient_people.set_active(not paused)
 	_pause_panel.visible = paused
 	_pad.visible = not paused
 	_actions.visible = not paused
