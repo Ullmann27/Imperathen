@@ -94,6 +94,9 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_layout_ui)
 	_layout_ui()
 	_update_status()
+	var renderer := get_node_or_null("/root/RuntimeDisplay")
+	if is_instance_valid(renderer):
+		renderer.set_sustained_scene(true)
 	print("IMPERATHEN_CITY_READY "+JSON.stringify({"city":city_available,"meshy_youth":youth_available,"catalog_families":catalog.size(),"campaign_started":false}))
 
 func _build_ground() -> void:
@@ -608,10 +611,16 @@ func _open_market(inventory: bool) -> void:
 	crowd.set_paused(true)
 	if is_instance_valid(ambient_people):
 		ambient_people.set_active(false)
+	var display := get_node_or_null("/root/RuntimeDisplay")
+	if is_instance_valid(display):
+		display.set_sustained_paused(true)
 	_hud.hide()
 
 func _close_market() -> void:
 	_hud.show()
+	var display := get_node_or_null("/root/RuntimeDisplay")
+	if is_instance_valid(display):
+		display.set_sustained_paused(paused)
 	crowd.set_paused(paused)
 	if is_instance_valid(ambient_people):
 		ambient_people.set_active(not paused)
@@ -634,6 +643,9 @@ func set_paused(value: bool) -> void:
 		market.close()
 		return
 	paused = value
+	var quality_monitor := get_node_or_null("/root/RuntimeDisplay")
+	if is_instance_valid(quality_monitor):
+		quality_monitor.set_sustained_paused(paused)
 	_touch_move = Vector2.ZERO
 	_pad.reset()
 	_look.reset()
@@ -698,6 +710,9 @@ func _update_status() -> void:
 	_status.text = description
 
 func _exit_tree() -> void:
+	var renderer := get_node_or_null("/root/RuntimeDisplay")
+	if is_instance_valid(renderer):
+		renderer.set_sustained_scene(false)
 	if not _catalog_pending.is_empty():
 		var path := _catalog_pending
 		_catalog_pending = ""
