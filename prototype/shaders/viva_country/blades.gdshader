@@ -15,8 +15,11 @@ void vertex() {
 	VERTEX.xz += local_direction * h*h * (gust*1.8+leaf*0.28) * wind_strength;
 }
 void fragment() {
-	ALBEDO=COLOR.rgb;
+	ALBEDO=clamp(COLOR.rgb*vec3(1.05,1.18,1.04),vec3(0.0),vec3(1.0));
 	ROUGHNESS=0.91;
 	SPECULAR=0.20;
 	if (!FRONT_FACING) { NORMAL=-NORMAL; }
+	// Foliage normal bias preserves form but avoids unnaturally black blade sides.
+	vec3 upward=normalize((VIEW_MATRIX*vec4(0.0,1.0,0.0,0.0)).xyz);
+	NORMAL=normalize(mix(NORMAL,upward,0.22));
 }

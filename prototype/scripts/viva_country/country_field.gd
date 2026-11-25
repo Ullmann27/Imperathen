@@ -3,16 +3,18 @@ extends Node3D
 const ROOT := "res://assets/viva_country/"
 const Soil := preload("res://shaders/viva_country/soil.gdshader")
 const Blades := preload("res://shaders/viva_country/blades.gdshader")
+const Scenery := preload("res://scripts/viva_country/country_scenery.gd")
 const PROFILE := {
-	"low": [0.12,0.025,0.22,0.05,0.20],
-	"balanced": [0.32,0.07,0.48,0.12,0.65],
-	"high": [0.65,0.13,0.80,0.25,1.0],
-	"very_high": [1.0,0.20,1.0,0.35,1.0]
+	"low": [0.10,0.035,0.20,0.055,0.20],
+	"balanced": [0.28,0.10,0.42,0.13,0.65],
+	"high": [0.56,0.20,0.72,0.24,1.0],
+	"very_high": [0.88,0.32,1.0,0.40,1.0]
 }
 var manifest: Dictionary = {}
 var groups: Array[Dictionary] = []
 var terrain: Array[MeshInstance3D] = []
 var errors: Array[String] = []
+var scenery: Node3D
 var soil_mat: ShaderMaterial
 var blade_mat: ShaderMaterial
 var stone_mat: StandardMaterial3D
@@ -147,6 +149,12 @@ func build() -> bool:
 			batch.extra_cull_margin=0.35 if is_grass else 0.1
 			add_child(batch)
 			groups.append({"node":batch,"chunk":k,"grass":is_grass,"total":rows.size(),"triangles":int(manifest.stats.prototypeTriangles[id])})
+	scenery=Scenery.new()
+	scenery.name="CountryHinterland"
+	add_child(scenery)
+	if not scenery.build(soil_mat):
+		errors.append_array(scenery.errors)
+		return false
 	set_detail("high",Vector3(0,0,2),true)
 	return true
 
@@ -180,13 +188,20 @@ func set_detail(value: String, camera_position: Vector3, force: bool=false) -> v
 			sc+=n
 	if soil_mat!=null:
 		soil_mat.set_shader_parameter("quality",float(settings[4]))
-	counts={"grass":gc,"stones":sc,"triangles":triangles}
+	var trees:=0
+	if is_instance_valid(scenery):
+		scenery.set_detail(profile,camera_position)
+		trees=int(scenery.visible_trees)
+		triangles+=int(scenery.triangles)+int(manifest.stats.hinterland.triangles)
+	counts={"grass":gc,"stones":sc,"trees":trees,"triangles":triangles}
 
 func set_wind_time(value: float) -> void:
 	if is_finite(value) and value>=0.0:
 		wind_time=value
 		if blade_mat!=null:
 			blade_mat.set_shader_parameter("wind_time",wind_time)
+		if is_instance_valid(scenery):
+			scenery.set_wind_time(wind_time)
 
 func _process(delta: float) -> void:
 	if not wind_paused:

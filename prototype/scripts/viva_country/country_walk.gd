@@ -47,7 +47,7 @@ func _ready() -> void:
 	camera.position=Vector3(0,1.63,0)
 	camera.fov=65.0
 	camera.near=0.045
-	camera.far=100.0
+	camera.far=185.0
 	player.add_child(camera)
 	camera.current=true
 	_update_look()

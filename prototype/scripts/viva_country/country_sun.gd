@@ -21,8 +21,9 @@ func _ready() -> void:
 	add_child(sun)
 	environment=Environment.new()
 	sky_material=ProceduralSkyMaterial.new()
-	sky_material.sky_top_color=Color("4775a5")
-	sky_material.sky_horizon_color=Color("c0ccd0")
+	sky_material.sky_top_color=Color("315e98")
+	sky_material.sky_horizon_color=Color("c4d4e0")
+	sky_material.sky_curve=0.27
 	sky_material.ground_bottom_color=Color("554d3a")
 	sky_material.ground_horizon_color=Color("b7bba6")
 	sky_material.sun_angle_max=7.5
@@ -36,7 +37,8 @@ func _ready() -> void:
 	environment.ambient_light_sky_contribution=0.0
 	environment.reflected_light_source=Environment.REFLECTION_SOURCE_SKY
 	environment.fog_enabled=true
-	environment.fog_density=0.005
+	environment.fog_density=0.0038
+	environment.fog_sky_affect=0.10
 	environment.fog_light_color=Color("bdc8c6")
 	var world:=WorldEnvironment.new()
 	world.environment=environment
