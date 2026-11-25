@@ -110,7 +110,8 @@ func configure_meshy_youth(enabled: bool = true) -> bool:
 			selected = selected and ResourceLoader.exists(MESHY_YOUTH_PATH % level,"PackedScene")
 	if selected!=_meshy_youth:
 		_meshy_youth = selected
-		_reload(maxi(0,detail))
+		if body:
+			_reload(maxi(0,detail))
 	return selected
 
 
@@ -243,7 +244,9 @@ func _reload(level: int) -> void:
 		_style(shape)
 	_hands.bind(body, active_model_path)
 	_face.bind(body, identity)
-	_motion.bind(body, role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"]), identity)
+	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
+	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
+	_motion.bind(body, civilian_motion and not imported_youth, identity)
 	_motion_identity = identity
 	_motion.restore_world_contacts(contacts)
 	# The external tracks target this authored hero family. Never reuse them
@@ -600,7 +603,7 @@ func locomotion_stride(action: String) -> float:
 	var model_scale := maxf(body.scale.y, 0.01) if body else 1.0
 	if _motion.available and _motion.civilian:
 		return maxf(0.01, _motion.gait_stride(action, speed / model_scale) * model_scale)
-	var soldier_gait := active_model_path.begins_with("res://assets/soldiers/") or active_model_path.begins_with("res://assets/meshy/characters/")
+	var soldier_gait := active_model_path.begins_with("res://assets/soldiers/") or active_model_path.begins_with("res://assets/meshy/characters/") or active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	soldier_gait = soldier_gait or (active_model_path.begins_with("res://assets/characters/frontier_") and _frontier_identity() in ["legionary", "officer", "spearman", "archer"])
 	for family: String in ["heavy", "officer", "spear"]:
 		soldier_gait = soldier_gait or active_model_path.begins_with("res://assets/village_characters/" + family + "_")
@@ -660,6 +663,10 @@ func _playback_animation(name_in_file: String, looping: bool) -> Animation:
 
 
 func _apply_motion(review: bool = false) -> void:
+	if active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"):
+		# Preserve the fitted adolescent rig's authored limb and sword clips.
+		_motion.blend_transition()
+		return
 	if clip in ["attack","train","block"] and _can_armed_style(_armed_style):
 		if _has_meshy_axe() and _armed_style in CharacterMotion.ARMED_ATTACKS:
 			_apply_imported_axe_pose()
@@ -779,7 +786,7 @@ func _plant_contacts(delta: float) -> void:
 	var stance := 0.40 if clip == "run" else 0.58
 	if _motion.civilian:
 		stance = 0.32 if clip == "run" else 0.53
-	elif active_model_path.contains("meshy/"):
+	elif active_model_path.contains("meshy/") or active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"):
 		stance = 0.40 if clip == "run" else 0.56
 	_motion.plant_world_feet(clip, phase, delta, stance)
 

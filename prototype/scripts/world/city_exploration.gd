@@ -17,7 +17,11 @@ const TouchAction := preload("res://scripts/ui/touch_action.gd")
 const SafeArea := preload("res://scripts/ui/safe_area.gd")
 const CITY_PATH := "res://assets/world/roman_city_test.glb"
 const CITY_COLLISION := "res://assets/world/roman_city_collision.glb"
-const TEMPLE_PATH := "res://assets/world/meshy_roman_temple.glb"
+const TEMPLE_PATH := "res://assets/world/roman_meshy_temple_%d.glb"
+const FORUM_DETAIL := "res://assets/world/roman_forum_paving_detail.glb"
+const FORUM_COLLISION := "res://assets/world/roman_forum_paving_collision.glb"
+const MAX_STEP := 0.25
+const SOLE_OFFSET := 0.9
 const CATALOG_PATH := "res://assets/world/city_catalog.json"
 const CATALOG_ORIGIN := Vector3(475,0,90)
 const WALK_SPEED := 1.45
@@ -125,24 +129,29 @@ func _load_city() -> void:
 	var collision := _scene(CITY_COLLISION)
 	if collision!=null:
 		add_child(collision)
-		for mesh: MeshInstance3D in collision.find_children("*","MeshInstance3D",true,false):
-			if mesh.mesh==null:
-				continue
-			var body := StaticBody3D.new()
-			body.name = "CityCollision_"+str(mesh.name)
-			body.collision_layer = 1
-			body.collision_mask = 0
-			var shape := CollisionShape3D.new()
-			shape.shape = mesh.mesh.create_trimesh_shape()
-			body.add_child(shape)
-			add_child(body)
-			body.global_transform = mesh.global_transform
+		_add_static_colliders(collision,"CityCollision_")
 		collision.queue_free()
-	var temple := _scene(TEMPLE_PATH)
+	var temple_level := 2 if profile=="low" else (1 if profile=="balanced" else 0)
+	var temple := _scene(TEMPLE_PATH % temple_level)
 	if temple!=null:
 		temple.name = "MeshyTemple"
-		temple.position = Vector3(0,0,-55)
+		temple.position = Vector3(0,0.09,-55)
 		add_child(temple)
+		var temple_collision := _scene(TEMPLE_PATH % 2)
+		if temple_collision!=null:
+			temple_collision.position = temple.position
+			add_child(temple_collision)
+			_add_static_colliders(temple_collision,"TempleCollision_")
+			temple_collision.queue_free()
+	var forum_detail := _scene(FORUM_DETAIL)
+	if forum_detail!=null:
+		forum_detail.name = "ForumPavingDetail"
+		add_child(forum_detail)
+	var forum_collision := _scene(FORUM_COLLISION)
+	if forum_collision!=null:
+		add_child(forum_collision)
+		_add_static_colliders(forum_collision,"ForumPavingCollision_")
+		forum_collision.queue_free()
 	print("IMPERATHEN_CITY_DETAIL " + JSON.stringify(CityDetailAdapter.install(city, profile)))
 	# Read-only signboards are attached only to the six matching existing stalls.
 	# The market bridge independently verifies the same authored stands before enabling transactions.
@@ -150,6 +159,33 @@ func _load_city() -> void:
 	# Optional GPU-instanced masonry and worn street microgeometry. This never
 	# replaces the authored RomanCity walls, collision, NPCs, camera or save.
 	print("IMPERATHEN_FACADE_DETAIL " + JSON.stringify(CitySurfaceMicrodetail.install(city, profile)))
+
+func _add_static_colliders(source: Node3D,prefix: String) -> void:
+	# Godot's -colonly importer may already have generated the physics body.
+	var imported_bodies: Array[Node] = source.find_children("*","StaticBody3D",true,false)
+	if source is StaticBody3D:
+		imported_bodies.push_front(source)
+	if not imported_bodies.is_empty():
+		for original: StaticBody3D in imported_bodies:
+			var copy := original.duplicate() as StaticBody3D
+			copy.name = prefix+str(original.name)
+			copy.collision_layer = 1
+			copy.collision_mask = 0
+			add_child(copy)
+			copy.global_transform = original.global_transform
+		return
+	for mesh: MeshInstance3D in source.find_children("*","MeshInstance3D",true,false):
+		if mesh.mesh==null:
+			continue
+		var body := StaticBody3D.new()
+		body.name = prefix+str(mesh.name)
+		body.collision_layer = 1
+		body.collision_mask = 0
+		var shape := CollisionShape3D.new()
+		shape.shape = mesh.mesh.create_trimesh_shape()
+		body.add_child(shape)
+		add_child(body)
+		body.global_transform = mesh.global_transform
 
 func _build_ambient_people() -> void:
 	# Uses the existing city meshes, actual camera and the existing
@@ -182,10 +218,10 @@ func _build_player() -> void:
 	add_child(player)
 	figure.name = "Youth"
 	figure.profile = profile
+	figure.detail = 2 if profile=="low" else (1 if profile=="balanced" else 0)
 	player.add_child(figure)
-	figure.configure("player","italia",12)
 	youth_available = figure.configure_meshy_youth()
-	figure._reload(2 if profile=="low" else (1 if profile=="balanced" else 0))
+	figure.configure("player","italia",12)
 	figure._check_lod = 10000.0
 	if is_instance_valid(figure.body):
 		CityCharacterFinish.apply_to(figure.body, profile, figure.detail)
@@ -258,6 +294,7 @@ func _stream_catalog() -> void:
 				_add_catalog_model(_catalog_pending_index,packed)
 			_catalog_pending = ""
 		elif status in [ResourceLoader.THREAD_LOAD_FAILED,ResourceLoader.THREAD_LOAD_INVALID_RESOURCE]:
+			ResourceLoader.load_threaded_get(_catalog_pending)
 			_catalog_status = "Ein Sammlungsmodell konnte nicht geladen werden."
 			_catalog_pending = ""
 			_update_status()
@@ -295,14 +332,21 @@ func _add_catalog_model(index: int,packed: PackedScene) -> void:
 	var bounds := _bounds(model)
 	model.position.y = -bounds.position.y
 	if catalog[index].category=="equipment":
-		model.position.y += 1.0
+		model.position.y += 0.805
 		_box_visual(station,Vector3(2,0.8,2),Vector3(0,0.4,0),Color("ad9d7d"))
 		_box_collision(station,Vector3(2,0.8,2),Vector3(0,0.4,0))
+	elif str(catalog[index].get("scale_status",""))=="unverified_source_units":
+		var plinth_size := Vector3(maxf(2,bounds.size.x+0.6),0.7,maxf(2,bounds.size.z+0.6))
+		model.position.y += 0.7
+		_box_visual(station,plinth_size,Vector3(0,0.35,0),Color("827365"))
+		_box_collision(station,plinth_size,Vector3(0,0.35,0))
 	var label := Label3D.new()
 	label.text = str(catalog[index].name)
+	if str(catalog[index].get("scale_status",""))=="unverified_source_units":
+		label.text += "\nMaßstab ungeprüft"
 	label.font_size = 34
 	label.pixel_size = 0.008
-	label.position = Vector3(0,maxf(2,bounds.size.y+0.4),0)
+	label.position = Vector3(0,maxf(2,bounds.size.y+model.position.y+0.4),0)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.visibility_range_end = 38
 	station.add_child(label)
@@ -425,14 +469,49 @@ func _physics_process(delta: float) -> void:
 	player.velocity.x = move_toward(player.velocity.x,desired.x,delta*acceleration)
 	player.velocity.z = move_toward(player.velocity.z,desired.z,delta*acceleration)
 	player.velocity.y = -0.3 if player.is_on_floor() else player.velocity.y-19.6*delta
-	player.move_and_slide()
+	var previous_position := player.position
+	var horizontal_motion := Vector3(player.velocity.x,0,player.velocity.z)*delta
+	if not _step_up(horizontal_motion):
+		player.move_and_slide()
 	player.position.x = clampf(player.position.x,-State.LIMIT+1,State.LIMIT-1)
 	player.position.z = clampf(player.position.z,-State.LIMIT+1,State.LIMIT-1)
 	if player.position.y < -8:
 		teleport(State.SPAWN)
-	var actual := player.get_real_velocity()
+	var actual := (player.position-previous_position)/maxf(delta,0.000001)
 	figure.drive(Vector2(actual.x,actual.z).length(),angle_difference(previous_yaw,figure.rotation.y)/maxf(delta,0.000001))
 	_place_camera(delta)
+
+func _step_up(motion: Vector3) -> bool:
+	if not player.is_on_floor() or motion.length_squared()<0.0000001:
+		return false
+	var start := player.global_transform
+	if not player.test_move(start,motion):
+		return false
+	if player.test_move(start,Vector3.UP*MAX_STEP):
+		return false
+	var elevated := start
+	elevated.origin += Vector3.UP*MAX_STEP
+	if player.test_move(elevated,motion):
+		return false
+	elevated.origin += motion
+	var landing := KinematicCollision3D.new()
+	if not player.test_move(elevated,Vector3.DOWN*(MAX_STEP+0.03),landing,player.safe_margin):
+		return false
+	var destination := elevated.origin+landing.get_travel()
+	var rise := destination.y-start.origin.y
+	if rise<0.003 or rise>MAX_STEP or landing.get_normal().y<=0.01:
+		return false
+	var probe := landing.get_position()+motion.normalized()*0.04+Vector3.UP*0.06
+	var query := PhysicsRayQueryParameters3D.create(probe,probe+Vector3.DOWN*0.12,1,[player.get_rid()])
+	var floor := get_world_3d().direct_space_state.intersect_ray(query)
+	if floor.is_empty() or (floor.normal as Vector3).dot(Vector3.UP)<cos(player.floor_max_angle):
+		return false
+	var tread_rise := float(floor.position.y)-(start.origin.y-SOLE_OFFSET)
+	if tread_rise>MAX_STEP+player.safe_margin:
+		return false
+	player.global_position = destination
+	player.velocity.y = 0
+	return true
 
 func _process(delta: float) -> void:
 	_catalog_elapsed += delta
@@ -523,8 +602,11 @@ func _toggle_pace() -> void:
 func perform_action(action: String) -> void:
 	if paused or market.is_open() or _action_left>0 or action not in ["attack","block"]:
 		return
-	_action_left = 0.8
+	player.velocity.x = 0.0
+	player.velocity.z = 0.0
+	figure.drive(0)
 	figure.cue(action)
+	_action_left = maxf(0.01,figure._remaining)
 
 func set_paused(value: bool) -> void:
 	if market.is_open():
@@ -541,6 +623,7 @@ func set_paused(value: bool) -> void:
 		ambient_people.set_active(not paused)
 	_pause_panel.visible = paused
 	_pad.visible = not paused
+	_look.visible = not paused
 	_actions.visible = not paused
 	_toolbar.visible = not paused
 	_trade_bar.visible = not paused
@@ -591,6 +674,12 @@ func _update_status() -> void:
 	if not _catalog_status.is_empty():
 		description += "\n"+_catalog_status
 	_status.text = description
+
+func _exit_tree() -> void:
+	if not _catalog_pending.is_empty():
+		var path := _catalog_pending
+		_catalog_pending = ""
+		ResourceLoader.load_threaded_get(path)
 
 static func _box_collision(parent: Node3D,size: Vector3,at: Vector3) -> StaticBody3D:
 	var body := StaticBody3D.new()
