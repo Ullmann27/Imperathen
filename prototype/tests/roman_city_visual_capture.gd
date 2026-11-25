@@ -2,6 +2,8 @@ extends SceneTree
 ## Produces genuine OpenGL framebuffer screenshots of the exact exported city.
 ## CPU Mesa/Xvfb images are visual QA references, NOT screenshots from Fold7.
 const City = preload("res://scripts/world/city_exploration.gd")
+const Person = preload("res://scripts/visuals/village_person.gd")
+const Architecture = preload("res://scripts/rendering/city_architecture_detail.gd")
 const SCENES := {
 	"market":Vector3(-12.0,0.92,68.0),
 	"forum":Vector3(-8.0,0.92,24.0),
@@ -88,7 +90,32 @@ func _run() -> void:
 			failures.append(title+": PNG unexpectedly too small")
 		screenshots.append({"scene":title,"file":path.get_file(),"bytes":length,
 			"min_sampled_luma":min_luma,"max_sampled_luma":max_luma})
-	scene.free()
+	# Complete the actual scene and graphics-resource lifecycle while the
+	# rendering server is still alive. Never hide or reclassify GL errors.
+	# This runner owns the only city instance and its scene caches.
+	scene.process_mode = Node.PROCESS_MODE_DISABLED
+	scene.camera.environment = null
+	for frame in 2:
+		await process_frame
+		await RenderingServer.frame_post_draw
+	var scene_ref := weakref(scene)
+	scene.queue_free()
+	await process_frame
+	if scene_ref.get_ref() != null:
+		await process_frame
+	if scene_ref.get_ref() != null:
+		failures.append("City node was not freed during graphical teardown")
+	else:
+		# Release strong references to imported resources held by static
+		# caches before the graphics backend shuts down. Isolated runner only:
+		# gameplay keeps the existing shared caches and streaming behavior.
+		Person.scenes.clear()
+		Person.materials.clear()
+		Architecture._meshes.clear()
+	for frame in 3:
+		await process_frame
+		await RenderingServer.frame_post_draw
+	print("ROMAN_CITY_VISUAL_TEARDOWN "+JSON.stringify({"scene_freed":scene_ref.get_ref()==null,"render_frames_drained":5}))
 	var output={"status":"pass" if failures.is_empty() and screenshots.size()==3 else "fail",
 		"quality_profile":profile,"renderer":RenderingServer.get_current_rendering_method(),
 		"real_rendered_frames":screenshots,
