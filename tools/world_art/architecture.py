@@ -135,10 +135,12 @@ class Builder:
                 dim=(.38,.07,hi-lo) if axis=="X" else (.07,.38,hi-lo)
                 self.box("wood",pos,dim)
 
-    def finish(self):
+    def finish(self, bevel_override=None):
         for name,geo in self.geo.items():
             # Small bevels catch grazing light without softening every silhouette.
             bevel = .012 if self.lod == 0 and name in ("stone","wood","dark_stone") else 0
+            if bevel_override is not None:
+                bevel = bevel_override
             geo.finish(bevel=bevel)
 
 
@@ -282,8 +284,13 @@ def insula(lod):
             hi=z0+2.15 if floor else 2.53
             width=1.15 if floor else 2.1
             openings.append((x-width/2,x+width/2,lo,hi))
+        front_openings=list(openings)
+        if floor==2:
+            # The balcony walking surface is at 5.875 m: a 35 mm threshold
+            # above the interior floor. Keep the rear facade a normal window.
+            front_openings[1]=(-.675,.675,5.875,z0+2.15)
         for y in (-d/2,d/2):
-            ops=openings if y<0 or floor else [(-.65,.65,1.1,2.4)]
+            ops=front_openings if y<0 else (openings if floor else [(-.65,.65,1.1,2.4)])
             b.wall("X",-w/2,w/2,y,z0,z1,ops)
             for l,r,lo,hi in ops:
                 b.frame("X",(l+r)/2,y+math.copysign(.18,y),lo,hi,r-l,lod<2 and floor>0)
@@ -296,7 +303,7 @@ def insula(lod):
             b.box("wood",(0,0,z0-.08),(9.6,8.6,.16),structural=True)
         for y in (-d/2-.19,d/2+.19):
             b.wall("X",-w/2,w/2,y,z0+.125,z0+.375,
-                   openings if floor==0 and y<0 else [],.08,"red",False)
+                   front_openings if y<0 else [],.08,"red",False)
             b.box("stone",(0,y,z1-.05),(w+.42,.34,.17))
         for x in (-w/2-.19,w/2+.19):
             b.box("stone",(x,0,z1-.05),(.34,d+.1,.17))
@@ -319,6 +326,8 @@ def insula(lod):
     b.finish()
     return b,{"category":"residential","role":"insula",
               "storeys":3,"door_clearance":[2.1,2.41],
+              "balcony_door_clearance":[1.35,2.115],"balcony_threshold_height":5.875,
+              "balcony_step_from_interior":.035,
               "interior_review":"upper levels have floors; no stair/navigation acceptance",
               "floor_height":FLOOR}
 
@@ -336,6 +345,9 @@ def basilica(lod):
     b.wall("X",-w/2,w/2,-d/2,FLOOR,walltop,[(-1.8,1.8,FLOOR,4.4)],.42)
     b.wall("X",-w/2,w/2,d/2,FLOOR,walltop,[(-1.2,1.2,4.6,6.5)],.42)
     b.frame("X",0,-8.25,FLOOR,4.4,3.6)
+    # The 18 mm fluting ribs need their own un-beveled group: a 12 mm stone
+    # bevel exceeds their 9 mm half-width and collapses faces and inherited UVs.
+    fluting = Builder("basilica_fluting", lod) if lod == 0 else None
     # Portico, four tapered columns, visible torus/abacus silhouettes.
     for x in (-4.85,-1.65,1.65,4.85):
         y=-10.10
@@ -349,8 +361,10 @@ def basilica(lod):
             # genuine base/capital profiles remain at every level.
             for i in range(12):
                 ang=i*math.tau/12
-                b.beam("stone",(x+.323*math.cos(ang),y+.323*math.sin(ang),.83),
-                       (x+.275*math.cos(ang),y+.275*math.sin(ang),5.86),.018)
+                fluting.beam("stone",(x+.323*math.cos(ang),y+.323*math.sin(ang),.83),
+                            (x+.275*math.cos(ang),y+.275*math.sin(ang),5.86),.018)
+    if fluting is not None:
+        fluting.finish(bevel_override=0.0)
     for i in range(3):
         b.box("stone",(0,-9.55-i*.44,.04+i*.035),
               (12.6,2.9-i*.65,.08+i*.07),structural=True)
@@ -368,6 +382,16 @@ def basilica(lod):
     pediment.add(v,[(0,1,2),(3,5,4),(0,3,4,1),(1,4,5,2),(2,5,3,0)])
     for side in (-1,1):
         b.beam("stone",(side*6.3,-10.59,7.04),(0,-10.59,8.55),.19,.28)
+    # A complete roof spans the formerly open portico. The back reaches inside
+    # the front wall; the front overhang covers the pediment. Every LOD retains
+    # continuous roof undersides; LOD0 additionally has individual tegulae.
+    before=set(bpy.context.scene.objects.keys())
+    porch=Builder("basilica_portico",lod)
+    roof(porch,13.0,3.0,7.10,8.60)
+    porch.finish()
+    for obj in bpy.context.scene.objects:
+        if obj.name not in before:
+            obj.location.y-=9.20
     if lod<2:
         b.box("red",(0,-10.60,7.41),(2.70,.04,.30))
         # Interior bench and central dais are artwork; no emperor/quest is invented.
@@ -379,6 +403,7 @@ def basilica(lod):
     b.finish()
     return b,{"category":"civic","role":"administration_basilica",
               "door_clearance":[3.6,4.28],"interior_review":"art geometry only",
+              "portico_roof_plan_bounds_blender":[[-6.5,-10.7],[6.5,-7.7]],
               "floor_height":FLOOR,"historical_status":"fictional Roman-inspired civic module"}
 
 
@@ -422,6 +447,190 @@ def basalt_road(lod):
               "road_width":6.7,"gutter_width":.16,"surface_review":"road art, collision simplified"}
 
 
+def compact_tangent_storage(path):
+    """Remove explicit tangents without re-exporting or changing other GLB data.
+
+    Godot's default meshes/ensure_tangents import setting regenerates tangents.
+    This deliberately supports only this package's static, uncompressed GLBs.
+    Every retained accessor and embedded image is byte-checked before writing.
+    """
+    import copy
+    import struct
+
+    raw = path.read_bytes()
+    if struct.unpack_from("<III", raw) != (0x46546C67, 2, len(raw)):
+        raise ValueError("Invalid GLB header")
+    json_size, json_kind = struct.unpack_from("<II", raw, 12)
+    if json_kind != 0x4E4F534A:
+        raise ValueError("Expected GLB JSON chunk")
+    source = json.loads(raw[20:20 + json_size])
+    binary_size, binary_kind = struct.unpack_from("<II", raw, 20 + json_size)
+    binary = raw[28 + json_size:]
+    if binary_kind != 0x004E4942 or binary_size != len(binary):
+        raise ValueError("Expected one GLB binary chunk")
+    if (len(source.get("buffers", [])) != 1 or "uri" in source["buffers"][0]
+            or source.get("skins") or source.get("animations")):
+        raise ValueError("Only self-contained static GLBs are supported")
+
+    tangent_ids, other_ids = set(), set()
+    for model in source["meshes"]:
+        for primitive in model["primitives"]:
+            if primitive.get("mode", 4) != 4 or primitive.get("targets") or primitive.get("extensions"):
+                raise ValueError("Only plain triangle primitives are supported")
+            attrs = primitive["attributes"]
+            if not {"NORMAL", "TEXCOORD_0"} <= set(attrs):
+                raise ValueError("Normal and UV data are required for imported tangents")
+            tangent_ids.update([attrs["TANGENT"]] if "TANGENT" in attrs else [])
+            other_ids.update(value for key, value in attrs.items() if key != "TANGENT")
+            other_ids.add(primitive["indices"])
+    if not tangent_ids or tangent_ids & other_ids:
+        raise ValueError("Expected exclusively referenced explicit tangent accessors")
+
+    def float_rows(index, width):
+        accessor = source["accessors"][index]
+        if accessor["componentType"] != 5126 or accessor["type"] != "VEC" + str(width):
+            raise ValueError("Expected floating-point normal/tangent vectors")
+        view = source["bufferViews"][accessor["bufferView"]]
+        start = view.get("byteOffset", 0) + accessor.get("byteOffset", 0)
+        stride = view.get("byteStride", width * 4)
+        return (struct.unpack_from("<" + "f" * width, binary, start + i * stride)
+                for i in range(accessor["count"]))
+
+    # Reject bad authored tangent frames before removing their storage. Keeping
+    # this check makes the thin-column-rib repair reproducible and prevents the
+    # transport step from concealing a geometry/UV regression.
+    source_tangent_checks = []
+    for model in source["meshes"]:
+        for primitive in model["primitives"]:
+            attrs = primitive["attributes"]
+            if "TANGENT" not in attrs:
+                continue
+            count = source["accessors"][attrs["NORMAL"]]["count"]
+            if source["accessors"][attrs["TANGENT"]]["count"] != count:
+                raise ValueError("Incomplete source tangent frames")
+            minimum_length, minimum_cross, bad = float("inf"), float("inf"), 0
+            for normal, tangent in zip(float_rows(attrs["NORMAL"], 3), float_rows(attrs["TANGENT"], 4)):
+                nx, ny, nz = normal
+                tx, ty, tz, handedness = tangent
+                length_squared = tx * tx + ty * ty + tz * tz
+                cx, cy, cz = ny * tz - nz * ty, nz * tx - nx * tz, nx * ty - ny * tx
+                cross_squared = cx * cx + cy * cy + cz * cz
+                minimum_length = min(minimum_length, length_squared)
+                minimum_cross = min(minimum_cross, cross_squared)
+                if (not all(math.isfinite(value) for value in normal + tangent)
+                        or length_squared <= 1e-8 or cross_squared <= 1e-8
+                        or abs(abs(handedness) - 1.0) >= 1e-4):
+                    bad += 1
+            source_tangent_checks.append({
+                "material": source["materials"][primitive["material"]].get("name", ""),
+                "vertices": count, "invalid_frames": bad,
+                "minimum_tangent_length_squared": minimum_length,
+                "minimum_normal_tangent_cross_squared": minimum_cross})
+    if any(row["invalid_frames"] for row in source_tangent_checks):
+        raise ValueError("Invalid source tangents before packing: " + json.dumps(source_tangent_checks))
+
+    def accessor_digest(document, payload, index):
+        accessor = document["accessors"][index]
+        if accessor.get("sparse") or "bufferView" not in accessor:
+            raise ValueError("Sparse or unbuffered accessors are unsupported")
+        view = document["bufferViews"][accessor["bufferView"]]
+        components = {"SCALAR": 1, "VEC2": 2, "VEC3": 3, "VEC4": 4}[accessor["type"]]
+        size = {5120: 1, 5121: 1, 5122: 2, 5123: 2, 5125: 4, 5126: 4}[accessor["componentType"]]
+        width = components * size
+        stride = view.get("byteStride", width)
+        start = view.get("byteOffset", 0) + accessor.get("byteOffset", 0)
+        end = start + max(0, accessor["count"] - 1) * stride + width
+        if (view.get("buffer", 0) != 0 or stride < width or accessor["count"] < 1
+                or end > view.get("byteOffset", 0) + view["byteLength"] or end > len(payload)):
+            raise ValueError("Accessor exceeds its buffer view")
+        canonical = {key: accessor[key] for key in ("componentType", "count", "type")}
+        canonical["normalized"] = accessor.get("normalized", False)
+        digest = hashlib.sha256(json.dumps(canonical, sort_keys=True).encode())
+        for index in range(accessor["count"]):
+            offset = start + index * stride
+            digest.update(payload[offset:offset + width])
+        return digest.hexdigest()
+
+    def view_bytes(document, payload, index):
+        view = document["bufferViews"][index]
+        start = view.get("byteOffset", 0)
+        result = payload[start:start + view["byteLength"]]
+        if view.get("buffer", 0) != 0 or len(result) != view["byteLength"]:
+            raise ValueError("Invalid embedded buffer view")
+        return result
+
+    packed = copy.deepcopy(source)
+    keep_accessors = [i for i in range(len(source["accessors"])) if i not in tangent_ids]
+    accessor_map = {old: new for new, old in enumerate(keep_accessors)}
+    tangent_views = {source["accessors"][i]["bufferView"] for i in tangent_ids}
+    keep_views = {source["accessors"][i]["bufferView"] for i in keep_accessors}
+    keep_views.update(image["bufferView"] for image in source.get("images", []))
+    remove_views = tangent_views - keep_views
+    if remove_views != tangent_views:
+        raise ValueError("Tangent buffer views are interleaved with retained data")
+    view_ids = [i for i in range(len(source["bufferViews"])) if i not in remove_views]
+    view_map = {old: new for new, old in enumerate(view_ids)}
+    packed_binary = bytearray()
+    packed_views = []
+    for old in view_ids:
+        packed_binary.extend(b"\0" * (-len(packed_binary) % 4))
+        view = copy.deepcopy(source["bufferViews"][old])
+        view["byteOffset"] = len(packed_binary)
+        packed_binary.extend(view_bytes(source, binary, old))
+        packed_views.append(view)
+    packed_binary.extend(b"\0" * (-len(packed_binary) % 4))
+    packed["bufferViews"] = packed_views
+    packed["buffers"][0]["byteLength"] = len(packed_binary)
+    packed["accessors"] = [copy.deepcopy(source["accessors"][i]) for i in keep_accessors]
+    for accessor in packed["accessors"]:
+        accessor["bufferView"] = view_map[accessor["bufferView"]]
+    for model in packed["meshes"]:
+        for primitive in model["primitives"]:
+            primitive["attributes"].pop("TANGENT", None)
+            primitive["attributes"] = {key: accessor_map[value] for key, value in primitive["attributes"].items()}
+            primitive["indices"] = accessor_map[primitive["indices"]]
+    for embedded in packed.get("images", []):
+        embedded["bufferView"] = view_map[embedded["bufferView"]]
+
+    accessor_checks = []
+    for old, new in accessor_map.items():
+        before = accessor_digest(source, binary, old)
+        after = accessor_digest(packed, packed_binary, new)
+        if before != after:
+            raise ValueError("Retained accessor data changed")
+        accessor_checks.append({"source_accessor": old, "packed_accessor": new,
+                                "sha256_before": before, "sha256_after": after})
+    image_checks = []
+    for index, embedded in enumerate(source.get("images", [])):
+        before = hashlib.sha256(view_bytes(source, binary, embedded["bufferView"])).hexdigest()
+        after = hashlib.sha256(view_bytes(packed, packed_binary, packed["images"][index]["bufferView"])).hexdigest()
+        if before != after:
+            raise ValueError("Embedded image bytes changed")
+        image_checks.append({"image": index, "sha256_before": before, "sha256_after": after})
+    for field in ("materials", "textures", "samplers", "nodes", "scenes", "scene", "extensions", "extensionsUsed", "extensionsRequired"):
+        if source.get(field) != packed.get(field):
+            raise ValueError("Non-buffer declarations changed: " + field)
+    json_bytes = json.dumps(packed, separators=(",", ":"), ensure_ascii=False).encode()
+    json_bytes += b" " * (-len(json_bytes) % 4)
+    output_size = 12 + 8 + len(json_bytes) + 8 + len(packed_binary)
+    output = (struct.pack("<III", 0x46546C67, 2, output_size)
+              + struct.pack("<II", len(json_bytes), 0x4E4F534A) + json_bytes
+              + struct.pack("<II", len(packed_binary), 0x004E4942) + packed_binary)
+    if len(output) >= len(raw):
+        raise ValueError("Tangent packing did not reduce file size")
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_bytes(output)
+    temporary.replace(path)
+    return {"operation": "remove explicit TANGENT attributes and exclusively referenced buffers",
+            "runtime_tangents": "regenerated by Godot import with meshes/ensure_tangents enabled (default)",
+            "tangent_bit_identity": "not asserted", "bytes_before": len(raw), "bytes_after": len(output),
+            "sha256_before": hashlib.sha256(raw).hexdigest(), "sha256_after": hashlib.sha256(output).hexdigest(),
+            "removed_tangent_accessors": len(tangent_ids), "removed_buffer_views": len(remove_views),
+            "source_tangent_checks": source_tangent_checks,
+            "retained_accessor_checks": accessor_checks, "embedded_image_checks": image_checks,
+            "unchanged_material_texture_scene_declarations": True}
+
+
 def finalize(asset_id,lod,builder,metadata):
     objects=[o for o in bpy.context.scene.objects if o.type=="MESH"]
     if not objects:
@@ -462,6 +671,9 @@ def finalize(asset_id,lod,builder,metadata):
         use_selection=True,export_yup=True,export_apply=True,export_texcoords=True,
         export_normals=True,export_tangents=True,export_animations=False,
         export_draco_mesh_compression_enable=False)
+    if asset_id == "basilica" and lod == 0:
+        storage_report = compact_tangent_storage(path)
+        (ART / "basilica_tangent_pack.json").write_text(json.dumps(storage_report, indent=2) + "\n")
     return {
         "asset_id":asset_id,"lod":lod,"path":str(path.relative_to(ROOT)),
         "res_path":"res://"+str(path.relative_to(ROOT/"prototype")),
@@ -485,7 +697,7 @@ def render(asset_id):
     scene.render.resolution_percentage=100
     scene.world.use_nodes=True
     scene.world.node_tree.nodes["Background"].inputs[0].default_value=(.47,.56,.68,1)
-    scene.world.node_tree.nodes["Background"].inputs[1].default_value=.40
+    scene.world.node_tree.nodes["Background"].inputs[1].default_value=.65
     ground=material("WX_Review_Ground",(.17,.15,.115),.98)
     bpy.ops.mesh.primitive_plane_add(size=180,location=(0,0,-.035))
     bpy.context.object.data.materials.append(ground)
@@ -550,4 +762,5 @@ def main():
 
 if __name__=="__main__":
     main()
+
 

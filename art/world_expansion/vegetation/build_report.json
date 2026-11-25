@@ -6,7 +6,7 @@
   "wind_contract": {
     "R": "bend weight",
     "G": "leaf flutter",
-    "B": "stable branch phase",
+    "B": "stable leaf flutter phase",
     "A": "1"
   },
   "texture_sizes_by_lod": [

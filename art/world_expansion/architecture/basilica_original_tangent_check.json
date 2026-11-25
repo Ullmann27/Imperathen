@@ -1,0 +1,301 @@
+{
+  "source_gzip": "/tmp/imperathen-basilica-lod0-lossless.glb.gz",
+  "source_glb_bytes": 14378600,
+  "source_glb_sha256": "97eb22cc25ae61fb0e4ef134c8933e6237f0b4b9516feb25cf30919d0897ee63",
+  "criteria": "finite; tangent length squared >1e-8; normal x tangent length squared >1e-8; handedness abs(abs(w)-1)<1e-4; float32 arithmetic",
+  "surfaces": [
+    {
+      "surface": 0,
+      "material": "WX_Terracotta",
+      "vertices": 93497,
+      "bad_tangent_vertices": 0,
+      "min_tangent_length_squared": 0.9998923540115356,
+      "min_normal_tangent_cross_squared": 0.9998922944068909,
+      "triangles": 48108,
+      "uv_zero_area_triangles": 0,
+      "geometry_zero_area_triangles": 0,
+      "bad_vertex_incident_triangles": 0,
+      "bad_vertex_uv_zero_area_triangles": 0,
+      "bad_examples": []
+    },
+    {
+      "surface": 1,
+      "material": "WX_Terracotta_Light",
+      "vertices": 51511,
+      "bad_tangent_vertices": 0,
+      "min_tangent_length_squared": 0.9998923540115356,
+      "min_normal_tangent_cross_squared": 0.9998922944068909,
+      "triangles": 27408,
+      "uv_zero_area_triangles": 0,
+      "geometry_zero_area_triangles": 0,
+      "bad_vertex_incident_triangles": 0,
+      "bad_vertex_uv_zero_area_triangles": 0,
+      "bad_examples": []
+    },
+    {
+      "surface": 2,
+      "material": "WX_Terracotta_Dark",
+      "vertices": 53096,
+      "bad_tangent_vertices": 0,
+      "min_tangent_length_squared": 0.9998923540115356,
+      "min_normal_tangent_cross_squared": 0.9998922944068909,
+      "triangles": 28816,
+      "uv_zero_area_triangles": 0,
+      "geometry_zero_area_triangles": 0,
+      "bad_vertex_incident_triangles": 0,
+      "bad_vertex_uv_zero_area_triangles": 0,
+      "bad_examples": []
+    },
+    {
+      "surface": 3,
+      "material": "WX_Limestone",
+      "vertices": 27858,
+      "bad_tangent_vertices": 573,
+      "min_tangent_length_squared": 0.0,
+      "min_normal_tangent_cross_squared": 0.0,
+      "triangles": 11872,
+      "uv_zero_area_triangles": 453,
+      "geometry_zero_area_triangles": 550,
+      "bad_vertex_incident_triangles": 568,
+      "bad_vertex_uv_zero_area_triangles": 12,
+      "bad_examples": [
+        {
+          "vertex": 16021,
+          "position": [
+            -4.5269999504089355,
+            0.8299999237060547,
+            10.099987030029297
+          ],
+          "normal": [
+            0.0,
+            -0.7567307949066162,
+            -0.6537265777587891
+          ],
+          "tangent": [
+            0.0,
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "uv": [
+            -4.5269999504089355,
+            11.099987030029297
+          ],
+          "cross2": 0.0
+        },
+        {
+          "vertex": 16045,
+          "position": [
+            -4.527085304260254,
+            0.8389992117881775,
+            10.108986854553223
+          ],
+          "normal": [
+            0.0,
+            -0.7555670142173767,
+            0.6550713777542114
+          ],
+          "tangent": [
+            0.0,
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "uv": [
+            -4.526999473571777,
+            11.108986854553223
+          ],
+          "cross2": 0.0
+        },
+        {
+          "vertex": 16050,
+          "position": [
+            -4.527085304260254,
+            0.8389992117881775,
+            10.090987205505371
+          ],
+          "normal": [
+            0.0,
+            -0.7567307949066162,
+            -0.6537265777587891
+          ],
+          "tangent": [
+            0.0,
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "uv": [
+            -4.526999473571777,
+            11.090987205505371
+          ],
+          "cross2": 0.0
+        },
+        {
+          "vertex": 16078,
+          "position": [
+            -4.57491397857666,
+            5.851000785827637,
+            10.109013557434082
+          ],
+          "normal": [
+            0.0,
+            0.7549628019332886,
+            0.6557676792144775
+          ],
+          "tangent": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "uv": [
+            -4.574999809265137,
+            11.109013557434082
+          ],
+          "cross2": 0.0
+        },
+        {
+          "vertex": 16088,
+          "position": [
+            -4.5749993324279785,
+            5.860000133514404,
+            10.100013732910156
+          ],
+          "normal": [
+            0.0,
+            0.7549628019332886,
+            0.6557676792144775
+          ],
+          "tangent": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "uv": [
+            -4.57499885559082,
+            11.100013732910156
+          ],
+          "cross2": 0.0
+        },
+        {
+          "vertex": 16120,
+          "position": [
+            -4.574860095977783,
+            0.8389992117881775,
+            9.930743217468262
+          ],
+          "normal": [
+            -0.7124030590057373,
+            -0.6277026534080505,
+            -0.3138013482093811
+          ],
+          "tangent": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "uv": [
+            -4.574786186218262,
+            10.93070125579834
+          ],
+          "cross2": 0.0
+        }
+      ]
+    },
+    {
+      "surface": 4,
+      "material": "WX_Lime_Plaster",
+      "vertices": 1710,
+      "bad_tangent_vertices": 0,
+      "min_tangent_length_squared": 1.0,
+      "min_normal_tangent_cross_squared": 1.0,
+      "triangles": 852,
+      "uv_zero_area_triangles": 0,
+      "geometry_zero_area_triangles": 0,
+      "bad_vertex_incident_triangles": 0,
+      "bad_vertex_uv_zero_area_triangles": 0,
+      "bad_examples": []
+    },
+    {
+      "surface": 5,
+      "material": "WX_Ochre_Painted_Plaster",
+      "vertices": 72,
+      "bad_tangent_vertices": 0,
+      "min_tangent_length_squared": 1.0,
+      "min_normal_tangent_cross_squared": 1.0,
+      "triangles": 36,
+      "uv_zero_area_triangles": 0,
+      "geometry_zero_area_triangles": 0,
+      "bad_vertex_incident_triangles": 0,
+      "bad_vertex_uv_zero_area_triangles": 0,
+      "bad_examples": []
+    },
+    {
+      "surface": 6,
+      "material": "WX_Oak",
+      "vertices": 192,
+      "bad_tangent_vertices": 0,
+      "min_tangent_length_squared": 0.9999807476997375,
+      "min_normal_tangent_cross_squared": 0.9999805092811584,
+      "triangles": 88,
+      "uv_zero_area_triangles": 0,
+      "geometry_zero_area_triangles": 0,
+      "bad_vertex_incident_triangles": 0,
+      "bad_vertex_uv_zero_area_triangles": 0,
+      "bad_examples": []
+    }
+  ],
+  "limestone_localization": {
+    "bad_vertex_bounds_y_up": [
+      [
+        -5.172999858856201,
+        0.8299999237060547,
+        9.768099784851074
+      ],
+      [
+        5.172999858856201,
+        5.860000133514404,
+        10.431927680969238
+      ]
+    ],
+    "bad_vertices_per_front_column": {
+      "-4.85": 136,
+      "-1.65": 157,
+      "1.65": 144,
+      "4.85": 136
+    },
+    "radial_distance_from_front_column_axis_m": [
+      0.2660722753447252,
+      0.33192729444560803
+    ],
+    "bad_vertices_referenced_only_by_degenerate_geometry": 83,
+    "bad_vertices_referenced_by_nondegenerate_geometry": 490,
+    "bad_incident_triangles_geometry_degenerate": 78,
+    "bad_incident_triangles_geometry_nondegenerate": 490,
+    "uv_degenerate_and_geometry_degenerate_triangles": 395,
+    "uv_degenerate_but_geometry_nondegenerate_triangles": 58,
+    "root_cause_assessment": "All invalid original tangent vertices belong to the fine front-column rib region. Those ribs are 0.018m wide; the common LOD0 stone bevel is 0.012m, larger than their half-width. UVs are box-projected before bevel and inherited during modifier baking. The measured collapsed geometry and UV triangles make a valid derivative tangent frame unavailable on affected details; bevel overlap/clamping is the strongly supported source-level explanation, not yet re-export-tested.",
+    "zero_geometry_triangles_total": 550,
+    "zero_geometry_triangles_within_fluting_region": 550,
+    "zero_uv_triangles_total": 453,
+    "zero_uv_triangles_within_fluting_region": 453,
+    "bad_incident_area2_quantiles": [
+      0.0,
+      1.5673513537861334e-16,
+      2.4676684967742417e-16,
+      2.4231602835378396e-11,
+      9.15187925443206e-11
+    ],
+    "bad_incident_abs_uv_determinant_quantiles": [
+      0.0,
+      8.008186114238924e-09,
+      1.5437649381055962e-08,
+      3.5840126884068013e-06,
+      1.9140541553497314e-05
+    ],
+    "fluting_construction": "48 beams of width0.018m, common stone bevel0.012m, overlap clamping larger than halfwidth0.009m"
+  }
+}

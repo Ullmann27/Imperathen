@@ -42,6 +42,7 @@ def stage_project(target):
                 source_hashes[path.relative_to(ROOT).as_posix()]=hashlib.sha256(path.read_bytes()).hexdigest()
     (target/"assets/quality_profiles.json").parent.mkdir(parents=True,exist_ok=True)
     shutil.copy2(ROOT/"prototype/assets/quality_profiles.json",target/"assets/quality_profiles.json")
+    source_hashes["prototype/assets/quality_profiles.json"]=hashlib.sha256((ROOT/"prototype/assets/quality_profiles.json").read_bytes()).hexdigest()
     (target/"tests").mkdir(exist_ok=True)
     for source,relative in [
         (ROOT/"prototype/tests/world_expansion_environment_test.gd","tests/world_expansion_environment_test.gd"),
@@ -79,6 +80,7 @@ def main():
                 step={"name":label,"exit_code":result.returncode,"errors":errors}
                 report["steps"].append(step)
                 if result.returncode!=0 or errors:
+                    print(log[-12000:])
                     raise RuntimeError(label+" failed; see log")
                 return log
             report["engine_version"]=subprocess.check_output([args.godot,"--version"],text=True).strip()
@@ -101,7 +103,7 @@ def main():
                     if not xvfb:
                         raise RuntimeError("Actual graphical capture needs DISPLAY or xvfb-run; no blank headless substitutes")
                     prefix=[xvfb,"-a","-s","-screen 0 1280x720x24"]
-                graphical_base=[*prefix,args.godot,"--path",str(stage),"--rendering-method","gl_compatibility","--display-driver","x11"]
+                graphical_base=[*prefix,args.godot,"--path",str(stage),"--rendering-method","gl_compatibility","--display-driver","x11","--audio-driver","Dummy"]
                 gpu_log=run("graphics_runtime",[*graphical_base,"--script","res://tests/world_expansion_environment_test.gd"],120)
                 gpu_rows=[line.partition("WORLD_EXPANSION_TESTS ")[2] for line in gpu_log.splitlines() if line.startswith("WORLD_EXPANSION_TESTS ")]
                 if len(gpu_rows)!=1:
@@ -116,10 +118,10 @@ def main():
                     raise RuntimeError("Missing graphical receipt")
                 report["capture"]=json.loads(capture_report.read_text())
                 report["capture"]["directory"]=str(capture.relative_to(output))
-                expected=["01_village_midday","02_village_sunset","03_village_night","04_vegetation_wind_t0","05_vegetation_wind_t2","06_vegetation_calm_t0","07_vegetation_calm_t2","08_capital_4000","09_regional_routes"]
+                expected=["01_village_midday","02_village_sunset","03_village_night","04_vegetation_wind_t0","05_vegetation_wind_t2","06_vegetation_calm_t0","07_vegetation_calm_t2","08_capital_4000","09_regional_routes","10_basilica_normalmap"]
                 frames=report["capture"].get("frames",[])
                 if [row.get("label") for row in frames] != expected:
-                    raise RuntimeError("Graphical receipt does not contain exactly nine expected frames")
+                    raise RuntimeError("Graphical receipt does not contain exactly ten expected frames")
                 for row in frames:
                     if row.get("file")!=row["label"]+".png" or row.get("diagnostics",{}).get("load_error")!="":
                         raise RuntimeError("Capture has wrong filename or unresolved asset failure")
@@ -130,6 +132,18 @@ def main():
                     row["png_sha256"]=hashlib.sha256(data).hexdigest()
                     if not row.get("pixel_sha256"):
                         raise RuntimeError("Missing actual viewport-pixel fingerprint")
+                reference=frames[3]["diagnostics"]
+                for index,expected_wind,expected_time in [(3,0.55,0.0),(4,0.55,2.0),(5,0.0,0.0),(6,0.0,2.0)]:
+                    diagnostic=frames[index]["diagnostics"]
+                    environment=diagnostic.get("environment",{})
+                    if any(diagnostic.get(key)!=reference.get(key) for key in ("camera_position","selected_settlement","selected_region","view_mode")):
+                        raise RuntimeError("Wind comparison changed camera, settlement or view")
+                    if diagnostic.get("view_mode")!=2 or diagnostic.get("selected_settlement")!="village":
+                        raise RuntimeError("Wind comparison did not focus the village vegetation view")
+                    if environment.get("motion_paused") is not True or environment.get("time_of_day")!=13.0:
+                        raise RuntimeError("Wind comparison changed the paused daylight")
+                    if abs(environment.get("wind_strength",-1)-expected_wind)>0.00001 or abs(environment.get("wind_time",-1)-expected_time)>0.00001:
+                        raise RuntimeError("Wind comparison used unexpected wind parameters")
                 if frames[3]["pixel_sha256"]==frames[4]["pixel_sha256"]:
                     raise RuntimeError("Wind time changed but actual vegetation pixels did not")
                 if frames[5]["pixel_sha256"]!=frames[6]["pixel_sha256"]:

@@ -62,6 +62,11 @@ func _run() -> void:
     workshop.set_view_mode(3)
     workshop.set_controls_visible(true)
     await _capture("09_regional_routes")
+    workshop.set_view_mode(0)
+    workshop.set_controls_visible(false)
+    if not _require(workshop.focus_on_asset("basilica"), "Basilica material review focus failed"):
+        return
+    await _capture("10_basilica_normalmap")
     var file := FileAccess.open(output_path.path_join("capture.json"), FileAccess.WRITE)
     file.store_string(JSON.stringify({
         "renderer": RenderingServer.get_video_adapter_name(),
@@ -74,6 +79,7 @@ func _run() -> void:
     file.close()
     workshop.queue_free()
     await process_frame
+    await RenderingServer.frame_post_draw
     quit(0)
 
 func _capture(label: String) -> void:

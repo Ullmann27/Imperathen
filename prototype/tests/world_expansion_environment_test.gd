@@ -37,11 +37,17 @@ func _check(condition: bool, label: String) -> void:
 
 
 func _run() -> void:
-	_test_clock()
+	await _test_clock()
 	var layouts := _test_layouts()
 	_test_batches(layouts[4000])
 	_test_atlas()
 	_test_real_assets()
+	# Give renderer-owned release commands a real frame before shutdown.
+	if DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
+		evidence["post_release_render_frame"] = true
+	else:
+		evidence["post_release_render_frame"] = false
 	_check(completed_stages == ["clock", "layout", "batches", "atlas", "assets"], "Every runtime test stage completed without an aborted function")
 	evidence["passed"] = failures.is_empty()
 	evidence["checks"] = checks
@@ -95,8 +101,18 @@ func _test_clock() -> void:
 	_check(clock.sun.directional_shadow_max_distance == 110.0, "High-detail profile applies its shadow range")
 	evidence["clock_noon"] = noon
 	evidence["clock_night"] = night
+	# GLES3 4.7.2 keeps newly dirtied skies on a render-update list.
+	# A same-frame create/free test must first complete that real GPU update;
+	# otherwise the later update can allocate radiance textures after sky release.
+	var sky_watch: WeakRef = weakref(clock.environment.sky)
+	if DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
+		evidence["clock_rendered_before_release"] = true
+	else:
+		evidence["clock_rendered_before_release"] = false
 	root.remove_child(clock)
 	clock.free()
+	_check(not is_instance_valid(clock) and sky_watch.get_ref() == null, "Clock and its owned sky are released after the applicable initialization frame")
 	completed_stages.append("clock")
 
 
@@ -277,6 +293,63 @@ func _test_real_assets() -> void:
 			_check(wind_values_valid and anchored and flexible, "Imported wind data contains valid roots and flexible parts: " + id)
 		imports.append({"id": id, "triangles": asset.triangles, "surface_count_lod0": asset.meshes[0].get_surface_count(),
 			"bounds_size": [bound.size.x, bound.size.y, bound.size.z], "wind": asset.wind})
-	evidence["asset_import"] = {"checked": true, "passed": loaded, "asset_count": library.assets.size(), "models": imports, "wind_material_count": library.wind_materials.size()}
+	var basilica_receipt := {"checked": false, "passed": false}
+	_check(library.assets.has("basilica"), "The actual asset set includes the basilica tangent-regeneration regression model")
+	if library.assets.has("basilica"):
+		basilica_receipt = _test_basilica_tangents(library.assets["basilica"].meshes[0])
+	evidence["asset_import"] = {"checked": true, "passed": loaded and basilica_receipt.passed,
+		"asset_count": library.assets.size(), "models": imports, "wind_material_count": library.wind_materials.size(),
+		"basilica_lod0_tangents": basilica_receipt}
 
 	completed_stages.append("assets")
+
+
+func _test_basilica_tangents(mesh: Mesh) -> Dictionary:
+	# This GLB omits its derivable TANGENT payload for transport. Inspect the
+	# real imported arrays and materials used by MultiMesh, not source metadata.
+	var surfaces: Array[Dictionary] = []
+	var passed := mesh.get_surface_count() == 7
+	_check(passed, "Basilica LOD0 retains all seven imported material surfaces")
+	for surface in mesh.get_surface_count():
+		var arrays: Array = mesh.surface_get_arrays(surface)
+		var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL] if arrays[Mesh.ARRAY_NORMAL] != null else PackedVector3Array()
+		var tangents: PackedFloat32Array = arrays[Mesh.ARRAY_TANGENT] if arrays[Mesh.ARRAY_TANGENT] != null else PackedFloat32Array()
+		var complete := not vertices.is_empty() and normals.size() == vertices.size() and tangents.size() == vertices.size() * 4
+		var finite := complete
+		var non_degenerate := complete
+		var min_tangent_length_squared := INF
+		var min_frame_cross_squared := INF
+		if complete:
+			for index in vertices.size():
+				var offset := index * 4
+				var tangent := Vector3(tangents[offset], tangents[offset + 1], tangents[offset + 2])
+				var handedness := tangents[offset + 3]
+				var normal := normals[index]
+				if not tangent.is_finite() or not normal.is_finite() or not is_finite(handedness):
+					finite = false
+					non_degenerate = false
+					continue
+				var length_squared := tangent.length_squared()
+				var cross_squared := normal.cross(tangent).length_squared()
+				min_tangent_length_squared = minf(min_tangent_length_squared, length_squared)
+				min_frame_cross_squared = minf(min_frame_cross_squared, cross_squared)
+				non_degenerate = non_degenerate and length_squared > 0.00000001 and cross_squared > 0.00000001 and absf(absf(handedness) - 1.0) < 0.0001
+		var material := mesh.surface_get_material(surface) as BaseMaterial3D
+		var normal_bound := material != null and material.normal_enabled and material.normal_texture != null
+		var texture_size := Vector2.ZERO
+		if normal_bound:
+			texture_size = material.normal_texture.get_size()
+			normal_bound = texture_size.x > 0 and texture_size.y > 0 and is_finite(material.normal_scale) and material.normal_scale > 0
+		var label := "Basilica LOD0 surface %d" % surface
+		_check(complete, label + " has one complete tangent frame per imported vertex")
+		_check(finite and non_degenerate, label + " has finite nonzero tangents, a usable normal/tangent basis and valid handedness")
+		_check(normal_bound, label + " retains an enabled, bound normal map")
+		passed = passed and complete and finite and non_degenerate and normal_bound
+		surfaces.append({"surface": surface, "material": material.resource_name if material != null else "",
+			"vertex_count": vertices.size(), "tangent_float_count": tangents.size(), "complete": complete,
+			"finite": finite, "non_degenerate": non_degenerate, "normal_map_bound": normal_bound,
+			"normal_texture_size": [texture_size.x, texture_size.y],
+			"min_tangent_length_squared": min_tangent_length_squared if is_finite(min_tangent_length_squared) else null,
+			"min_frame_cross_squared": min_frame_cross_squared if is_finite(min_frame_cross_squared) else null})
+	return {"checked": true, "passed": passed, "lod": 0, "surface_count": mesh.get_surface_count(), "surfaces": surfaces}

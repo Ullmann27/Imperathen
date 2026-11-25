@@ -442,7 +442,7 @@ class PlantMesh:
                 uv_layer.data[loop_index].uv = coordinate
         obj = bpy.data.objects.new(name, mesh)
         bpy.context.collection.objects.link(obj)
-        obj["wind_contract"] = "COLOR_0: R=bend, G=leaf flutter, B=branch phase, A=1; never albedo"
+        obj["wind_contract"] = "COLOR_0: R=bend, G=leaf flutter, B=stable leaf flutter phase, A=1; never albedo"
         obj["units"] = "metres"
         obj["kind"] = self.kind
         obj["lod"] = self.lod
@@ -717,7 +717,7 @@ def main() -> None:
             records.extend(per_kind)
         report = {"generator": "tools/world_art/vegetation.py", "original_art": True,
                   "not_a_scan": True, "units": "metres, Y-up glTF",
-                  "wind_contract": {"R": "bend weight", "G": "leaf flutter", "B": "stable branch phase", "A": "1"},
+                  "wind_contract": {"R": "bend weight", "G": "leaf flutter", "B": "stable leaf flutter phase", "A": "1"},
                   "texture_sizes_by_lod": [1024,512,256], "records": records}
         (root/ART_REL/"build_report.json").write_text(json.dumps(report, indent=2)+"\n")
     if args.render or args.render_only:

@@ -2,7 +2,7 @@ shader_type spatial;
 render_mode world_vertex_coords, cull_disabled, diffuse_burley;
 
 // COLOR is an authored deformation payload: R branch flexibility,
-// G leaf-tip flutter, B stable branch phase. It is never albedo.
+// G leaf-tip flutter, B stable leaf phase. It is never albedo.
 uniform float wind_time = 0.0;
 uniform float wind_strength : hint_range(0.0, 2.0) = 0.6;
 uniform vec2 wind_direction = vec2(0.8944272, 0.4472136);

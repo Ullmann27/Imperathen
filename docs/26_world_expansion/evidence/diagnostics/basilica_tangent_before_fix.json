@@ -1,0 +1,730 @@
+{
+  "engine": "Godot 4.7.2.stable.official.ed1daf0bf",
+  "scope": "Direct imported Mesh arrays before AssetLibrary flattening; normalized normals and tangent XYZ",
+  "failure_threshold_cross_squared": 1e-08,
+  "repository_sources_modified": false,
+  "variants": [
+    {
+      "variant": "original",
+      "source_glb_bytes": 14378600,
+      "source_glb_sha256": "97eb22cc25ae61fb0e4ef134c8933e6237f0b4b9516feb25cf30919d0897ee63",
+      "surfaces": [
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Terracotta",
+          "max_abs_normal_dot_tangent": 2.95991412713192e-07,
+          "min_cross_squared": 0.99999988079071,
+          "samples": [],
+          "surface": 0,
+          "tangent_float_count": 373988,
+          "vertex_count": 93497
+        },
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Terracotta_Light",
+          "max_abs_normal_dot_tangent": 2.95991412713192e-07,
+          "min_cross_squared": 0.99999988079071,
+          "samples": [],
+          "surface": 1,
+          "tangent_float_count": 206044,
+          "vertex_count": 51511
+        },
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Terracotta_Dark",
+          "max_abs_normal_dot_tangent": 2.95991412713192e-07,
+          "min_cross_squared": 0.99999988079071,
+          "samples": [],
+          "surface": 2,
+          "tangent_float_count": 212384,
+          "vertex_count": 53096
+        },
+        {
+          "degenerate_count": 11,
+          "format": 34359742487,
+          "material": "WX_Limestone",
+          "max_abs_normal_dot_tangent": 1.0,
+          "min_cross_squared": 0.0,
+          "samples": [
+            {
+              "cross_squared": 2.32844854508585e-09,
+              "handedness": 1.0,
+              "index": 3910,
+              "normal": [
+                -1.52592547237873e-05,
+                -1.52592547237873e-05,
+                1.0
+              ],
+              "position": [
+                -1.37491464614868,
+                5.85100078582764,
+                10.1090135574341
+              ],
+              "tangent": [
+                -3.05185094475746e-05,
+                0.0,
+                -1.0
+              ],
+              "uv": [
+                -1.37491464614868,
+                -4.85100078582764
+              ]
+            },
+            {
+              "cross_squared": 2.32844854508585e-09,
+              "handedness": 1.0,
+              "index": 4303,
+              "normal": [
+                -1.52592547237873e-05,
+                -1.52592547237873e-05,
+                1.0
+              ],
+              "position": [
+                1.37491381168365,
+                5.85100078582764,
+                10.1090135574341
+              ],
+              "tangent": [
+                -3.05185094475746e-05,
+                0.0,
+                -1.0
+              ],
+              "uv": [
+                1.37491369247437,
+                -4.85100078582764
+              ]
+            },
+            {
+              "cross_squared": 9.31379418034339e-10,
+              "handedness": 1.0,
+              "index": 8142,
+              "normal": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position": [
+                1.8881688117981,
+                5.8600001335144,
+                9.96250629425049
+              ],
+              "tangent": [
+                -3.05185094475746e-05,
+                0.0,
+                -1.0
+              ],
+              "uv": [
+                1.88816833496094,
+                10.9625053405762
+              ]
+            },
+            {
+              "cross_squared": 0.0,
+              "handedness": 1.0,
+              "index": 13481,
+              "normal": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "position": [
+                -4.57026338577271,
+                0.829999923706055,
+                10.2614936828613
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "uv": [
+                -4.57026338577271,
+                11.2614936828613
+              ]
+            },
+            {
+              "cross_squared": 9.31549948290922e-10,
+              "handedness": -1.0,
+              "index": 13482,
+              "normal": [
+                1.0,
+                0.0,
+                -7.62997660785913e-05
+              ],
+              "position": [
+                -4.5781307220459,
+                0.838913381099701,
+                10.2569513320923
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -4.57784626632929e-05
+              ],
+              "uv": [
+                -4.57805633544922,
+                11.2569942474365
+              ]
+            },
+            {
+              "cross_squared": 1.16449427878251e-09,
+              "handedness": -1.0,
+              "index": 13487,
+              "normal": [
+                -1.0,
+                -1.52601860463619e-05,
+                7.63009302318096e-05
+              ],
+              "position": [
+                -4.6039867401123,
+                5.85108661651611,
+                10.2420492172241
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -4.57784626632929e-05
+              ],
+              "uv": [
+                -4.60406017303467,
+                11.2420043945312
+              ]
+            },
+            {
+              "cross_squared": 9.31350996324909e-10,
+              "handedness": 1.0,
+              "index": 13488,
+              "normal": [
+                -1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "position": [
+                -4.6118540763855,
+                5.8600001335144,
+                10.2375068664551
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "uv": [
+                -4.61185455322266,
+                11.2375068664551
+              ]
+            },
+            {
+              "cross_squared": 0.0,
+              "handedness": 1.0,
+              "index": 15178,
+              "normal": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "position": [
+                5.12973737716675,
+                0.829999923706055,
+                10.2614936828613
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "uv": [
+                5.12973737716675,
+                11.2614936828613
+              ]
+            },
+            {
+              "cross_squared": 9.31549948290922e-10,
+              "handedness": -1.0,
+              "index": 15179,
+              "normal": [
+                1.0,
+                0.0,
+                -7.62997660785913e-05
+              ],
+              "position": [
+                5.12187004089355,
+                0.838913381099701,
+                10.2569513320923
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -4.57784626632929e-05
+              ],
+              "uv": [
+                5.12194442749023,
+                11.2569942474365
+              ]
+            },
+            {
+              "cross_squared": 1.16449427878251e-09,
+              "handedness": -1.0,
+              "index": 15184,
+              "normal": [
+                -1.0,
+                -1.52601860463619e-05,
+                7.63009302318096e-05
+              ],
+              "position": [
+                5.09601402282715,
+                5.85108661651611,
+                10.2420492172241
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -4.57784626632929e-05
+              ],
+              "uv": [
+                5.09593963623047,
+                11.2420063018799
+              ]
+            },
+            {
+              "cross_squared": 9.31350996324909e-10,
+              "handedness": 1.0,
+              "index": 15185,
+              "normal": [
+                -1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "position": [
+                5.08814668655396,
+                5.8600001335144,
+                10.2375068664551
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "uv": [
+                5.08814716339111,
+                11.2375078201294
+              ]
+            }
+          ],
+          "surface": 3,
+          "tangent_float_count": 111432,
+          "vertex_count": 27858
+        },
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Lime_Plaster",
+          "max_abs_normal_dot_tangent": 1.44649217048709e-08,
+          "min_cross_squared": 1.0,
+          "samples": [],
+          "surface": 4,
+          "tangent_float_count": 6840,
+          "vertex_count": 1710
+        },
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Ochre_Painted_Plaster",
+          "max_abs_normal_dot_tangent": 9.31322574615479e-10,
+          "min_cross_squared": 1.0,
+          "samples": [],
+          "surface": 5,
+          "tangent_float_count": 288,
+          "vertex_count": 72
+        },
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Oak",
+          "max_abs_normal_dot_tangent": 1.78813934326172e-07,
+          "min_cross_squared": 0.999999940395355,
+          "samples": [],
+          "surface": 6,
+          "tangent_float_count": 768,
+          "vertex_count": 192
+        }
+      ]
+    },
+    {
+      "variant": "stripped",
+      "source_glb_bytes": 10730572,
+      "source_glb_sha256": "cb99801a0c50ea3d09195383cead3d7675469be985c995474826c28a532b43cd",
+      "surfaces": [
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Terracotta",
+          "max_abs_normal_dot_tangent": 2.95991412713192e-07,
+          "min_cross_squared": 0.99999988079071,
+          "samples": [],
+          "surface": 0,
+          "tangent_float_count": 373988,
+          "vertex_count": 93497
+        },
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Terracotta_Light",
+          "max_abs_normal_dot_tangent": 2.95991412713192e-07,
+          "min_cross_squared": 0.99999988079071,
+          "samples": [],
+          "surface": 1,
+          "tangent_float_count": 206044,
+          "vertex_count": 51511
+        },
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Terracotta_Dark",
+          "max_abs_normal_dot_tangent": 2.95991412713192e-07,
+          "min_cross_squared": 0.99999988079071,
+          "samples": [],
+          "surface": 2,
+          "tangent_float_count": 212384,
+          "vertex_count": 53096
+        },
+        {
+          "degenerate_count": 12,
+          "format": 34359742487,
+          "material": "WX_Limestone",
+          "max_abs_normal_dot_tangent": 1.0,
+          "min_cross_squared": 9.31379418034339e-10,
+          "samples": [
+            {
+              "cross_squared": 2.32844854508585e-09,
+              "handedness": 1.0,
+              "index": 3914,
+              "normal": [
+                -1.52592547237873e-05,
+                -1.52592547237873e-05,
+                1.0
+              ],
+              "position": [
+                -1.37491464614868,
+                5.85100078582764,
+                10.1090135574341
+              ],
+              "tangent": [
+                -3.05185094475746e-05,
+                0.0,
+                -1.0
+              ],
+              "uv": [
+                -1.37491464614868,
+                -4.85100078582764
+              ]
+            },
+            {
+              "cross_squared": 2.32844854508585e-09,
+              "handedness": 1.0,
+              "index": 4304,
+              "normal": [
+                -1.52592547237873e-05,
+                -1.52592547237873e-05,
+                1.0
+              ],
+              "position": [
+                1.37491381168365,
+                5.85100078582764,
+                10.1090135574341
+              ],
+              "tangent": [
+                -3.05185094475746e-05,
+                0.0,
+                -1.0
+              ],
+              "uv": [
+                1.37491369247437,
+                -4.85100078582764
+              ]
+            },
+            {
+              "cross_squared": 9.31379418034339e-10,
+              "handedness": 1.0,
+              "index": 8152,
+              "normal": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position": [
+                1.8881688117981,
+                5.8600001335144,
+                9.96250629425049
+              ],
+              "tangent": [
+                -3.05185094475746e-05,
+                0.0,
+                -1.0
+              ],
+              "uv": [
+                1.88816833496094,
+                10.9625053405762
+              ]
+            },
+            {
+              "cross_squared": 8.38301161820709e-09,
+              "handedness": 1.0,
+              "index": 13364,
+              "normal": [
+                -1.0,
+                0.0,
+                -7.62997660785913e-05
+              ],
+              "position": [
+                -5.12187004089355,
+                0.838913381099701,
+                10.2569513320923
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "uv": [
+                -5.12194442749023,
+                11.2569942474365
+              ]
+            },
+            {
+              "cross_squared": 8.38301161820709e-09,
+              "handedness": 1.0,
+              "index": 13365,
+              "normal": [
+                -1.0,
+                0.0,
+                -7.62997660785913e-05
+              ],
+              "position": [
+                -5.12973737716675,
+                0.829999923706055,
+                10.2614936828613
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "uv": [
+                -5.12973737716675,
+                11.2614936828613
+              ]
+            },
+            {
+              "cross_squared": 3.72597241948824e-09,
+              "handedness": 1.0,
+              "index": 13411,
+              "normal": [
+                1.0,
+                0.0,
+                -7.62997660785913e-05
+              ],
+              "position": [
+                -4.5781307220459,
+                0.838913381099701,
+                10.2569513320923
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "uv": [
+                -4.57805633544922,
+                11.2569942474365
+              ]
+            },
+            {
+              "cross_squared": 1.16449427878251e-09,
+              "handedness": -1.0,
+              "index": 13416,
+              "normal": [
+                -1.0,
+                -1.52601860463619e-05,
+                7.63009302318096e-05
+              ],
+              "position": [
+                -4.6039867401123,
+                5.85108661651611,
+                10.2420492172241
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -4.57784626632929e-05
+              ],
+              "uv": [
+                -4.60406017303467,
+                11.2420043945312
+              ]
+            },
+            {
+              "cross_squared": 9.31379418034339e-10,
+              "handedness": 1.0,
+              "index": 14425,
+              "normal": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position": [
+                1.8881688117981,
+                5.8600001335144,
+                9.96250629425049
+              ],
+              "tangent": [
+                -3.05185094475746e-05,
+                0.0,
+                -1.0
+              ],
+              "uv": [
+                1.88816833496094,
+                10.9625053405762
+              ]
+            },
+            {
+              "cross_squared": 8.38301161820709e-09,
+              "handedness": 1.0,
+              "index": 15073,
+              "normal": [
+                -1.0,
+                0.0,
+                -7.62997660785913e-05
+              ],
+              "position": [
+                4.5781307220459,
+                0.838913381099701,
+                10.2569513320923
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "uv": [
+                4.57805633544922,
+                11.2569942474365
+              ]
+            },
+            {
+              "cross_squared": 8.38301161820709e-09,
+              "handedness": 1.0,
+              "index": 15074,
+              "normal": [
+                -1.0,
+                0.0,
+                -7.62997660785913e-05
+              ],
+              "position": [
+                4.57026338577271,
+                0.829999923706055,
+                10.2614936828613
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "uv": [
+                4.57026386260986,
+                11.2614936828613
+              ]
+            },
+            {
+              "cross_squared": 3.72597241948824e-09,
+              "handedness": 1.0,
+              "index": 15117,
+              "normal": [
+                1.0,
+                0.0,
+                -7.62997660785913e-05
+              ],
+              "position": [
+                5.12187004089355,
+                0.838913381099701,
+                10.2569513320923
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -1.52590218931437e-05
+              ],
+              "uv": [
+                5.12194442749023,
+                11.2569942474365
+              ]
+            },
+            {
+              "cross_squared": 1.16449427878251e-09,
+              "handedness": -1.0,
+              "index": 15122,
+              "normal": [
+                -1.0,
+                -1.52601860463619e-05,
+                7.63009302318096e-05
+              ],
+              "position": [
+                5.09601402282715,
+                5.85108661651611,
+                10.2420492172241
+              ],
+              "tangent": [
+                1.0,
+                0.0,
+                -4.57784626632929e-05
+              ],
+              "uv": [
+                5.09593963623047,
+                11.2420063018799
+              ]
+            }
+          ],
+          "surface": 3,
+          "tangent_float_count": 111432,
+          "vertex_count": 27858
+        },
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Lime_Plaster",
+          "max_abs_normal_dot_tangent": 1.44649217048709e-08,
+          "min_cross_squared": 1.0,
+          "samples": [],
+          "surface": 4,
+          "tangent_float_count": 6840,
+          "vertex_count": 1710
+        },
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Ochre_Painted_Plaster",
+          "max_abs_normal_dot_tangent": 9.31322574615479e-10,
+          "min_cross_squared": 1.0,
+          "samples": [],
+          "surface": 5,
+          "tangent_float_count": 288,
+          "vertex_count": 72
+        },
+        {
+          "degenerate_count": 0,
+          "format": 34896613399,
+          "material": "WX_Oak",
+          "max_abs_normal_dot_tangent": 1.78813934326172e-07,
+          "min_cross_squared": 0.999999940395355,
+          "samples": [],
+          "surface": 6,
+          "tangent_float_count": 768,
+          "vertex_count": 192
+        }
+      ]
+    }
+  ]
+}
