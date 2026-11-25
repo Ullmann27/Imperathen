@@ -182,6 +182,26 @@ def append_hair_template():
     return hair
 
 
+def prepare_textured_hair(template):
+    """Retain the source strand alpha and normal map on the hair-card styles."""
+    base=template.data.materials[0]
+    shader=base.node_tree.nodes.get("Principled BSDF")
+    source_node=next(link.from_node for link in base.node_tree.links if link.to_socket==shader.inputs["Base Color"])
+    source=source_node.image
+    source.scale(1024,1024);source.pack()
+    pixels=np.asarray(source.pixels[:]).reshape(1024,1024,4)
+    luminance=pixels[:,:,:3].mean(axis=2)
+    result={}
+    for name,colour in HAIR.items():
+        material=base.copy();material.name="SoldierStrands_"+name
+        tinted=pixels.copy()
+        tinted[:,:,:3]=np.clip((.4+1.6*luminance)[:,:,None]*np.asarray(colour),0,1)
+        image=set_image("SoldierStrands_"+name+"_albedo",tinted)
+        material.node_tree.nodes.get(source_node.name).image=image
+        result[name]=material
+    return result
+
+
 def patch_from_body(name, body, rig, material, predicate, offset, chin_drop=0.):
     """A fitted surface patch retaining every source face-expression delta."""
     chosen=[]
@@ -282,7 +302,7 @@ def make_beard(profile,body,rig,material):
     return [obj] if obj else []
 
 
-def clone_soldier(source_objects,source_arm,index,profile,skins,hairs,hair_template):
+def clone_soldier(source_objects,source_arm,index,profile,skins,hairs,hair_template,hair_cards):
     collection=bpy.data.collections.new(f"{index:02d}_{profile['name']}")
     bpy.context.scene.collection.children.link(collection)
     rig=source_arm.copy();rig.data=source_arm.data.copy();rig.name=f"Soldier_{index:02d}_Rig"
@@ -299,7 +319,8 @@ def clone_soldier(source_objects,source_arm,index,profile,skins,hairs,hair_templ
         if obj.name=="HeroBody":
             body=clone;clone.data.materials.clear();clone.data.materials.append(skins[profile["skin"]])
         meshes.append(clone)
-    additions=make_hair(profile,body,rig,hair_template,hairs[profile["hair_colour"]],index*1987)
+    hair_material=hair_cards[profile["hair_colour"]] if profile["hair"] in ("part","sweep","wave") else hairs[profile["hair_colour"]]
+    additions=make_hair(profile,body,rig,hair_template,hair_material,index*1987)
     additions+=make_beard(profile,body,rig,hairs[profile["hair_colour"]])
     for obj in additions:
         for parent in list(obj.users_collection):parent.objects.unlink(obj)
@@ -335,9 +356,26 @@ def export(member,path):
     bpy.ops.object.select_all(action="DESELECT")
     for obj in [member["rig"],*member["meshes"]]:obj.select_set(True)
     bpy.context.view_layer.objects.active=member["rig"]
-    bpy.ops.export_scene.gltf(filepath=str(path),export_format="GLB",use_selection=True,
-        export_animation_mode="NLA_TRACKS",export_force_sampling=True,export_frame_step=1,
-        export_animations=True,export_morph=True,export_morph_animation=False,export_def_bones=False)
+    # Keep the editable scene and portraits at 1024 px. Runtime variants use
+    # 512 px image copies, so twenty independent GLBs fit the delivery budget.
+    changed=[]
+    for material in {m for obj in member["meshes"] for m in obj.data.materials if m}:
+        if not material.use_nodes:continue
+        for node in material.node_tree.nodes:
+            if node.type!="TEX_IMAGE" or not node.image or max(node.image.size)<=512:continue
+            original=node.image
+            cached=bpy.data.images.get(original.name+"_runtime512")
+            if cached is None:
+                cached=original.copy();cached.name=original.name+"_runtime512"
+                factor=512/max(cached.size)
+                cached.scale(round(cached.size[0]*factor),round(cached.size[1]*factor));cached.pack()
+            changed.append((node,original));node.image=cached
+    try:
+        bpy.ops.export_scene.gltf(filepath=str(path),export_format="GLB",use_selection=True,
+            export_animation_mode="NLA_TRACKS",export_force_sampling=True,export_frame_step=1,
+            export_animations=True,export_morph=True,export_morph_animation=False,export_def_bones=False)
+    finally:
+        for node,original in changed:node.image=original
 
 
 def main():
@@ -357,13 +395,15 @@ def main():
     source=list(bpy.context.scene.objects)
     delete_kit_head_parts(bpy.data.objects["FrontierRomanKit"])
     skins,hairs=prepare_materials();hair_template=append_hair_template()
+    hair_cards=prepare_textured_hair(hair_template)
     cast=[]
     for index in args.ids:
         profile=dict(zip(FIELDS,PROFILES[index-1]))
-        cast.append(clone_soldier(source,source_arm,index,profile,skins,hairs,hair_template))
+        cast.append(clone_soldier(source,source_arm,index,profile,skins,hairs,hair_template,hair_cards))
         print("SOLDIER_AUTHORED",index,profile["name"],flush=True)
     for obj in source:bpy.data.objects.remove(obj,do_unlink=True)
     bpy.data.objects.remove(hair_template,do_unlink=True)
+    bpy.ops.outliner.orphans_purge(do_recursive=True)
     bpy.context.scene.frame_set(0)
     camera=scene_setup()
     records=[]
