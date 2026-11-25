@@ -249,8 +249,9 @@ func _refresh_contents() -> void:
 			if item.get("can_consume", false):
 				row.add_child(_button("Verbrauchen", func(): command_requested.emit("city_consume", {"item_id":item.item_id})))
 			if item.get("can_equip", false):
-				var b := _button("Angelegt" if item.get("equipped", false) else "Anlegen", func(): command_requested.emit("city_equip", {"item_id":item.item_id}))
-				b.disabled = item.get("equipped", false)
+				var b := _button("Ablegen" if item.get("equipped", false) else "Anlegen", func(): command_requested.emit("city_equip", {"item_id":item.item_id}))
+				# The domain command toggles the equipped item; disabling this button
+				# would prevent players from unequipping (and then selling) their gear.
 				row.add_child(b)
 			contents.add_child(row)
 		if item_count == 0:
