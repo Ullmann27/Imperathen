@@ -18,6 +18,7 @@ from pathlib import Path
 from statistics import median
 
 PACKAGE = "at.heinz.imperathen"
+QA_PACKAGE = "at.heinz.imperathen.qa"
 MIN_SECONDS = 1200
 SAMPLE_MARKER = "IMPERATHEN_DISPLAY_SAMPLE "
 WANTED_PROFILES = ("high", "very_high")
@@ -42,10 +43,10 @@ def percentile(values: list[float], p: int):
     return usable[math.ceil(len(usable)*p/100)-1] if usable else None
 
 
-def collect_device(adb: str, serial: str):
+def collect_device(adb: str, serial: str, package: str):
     battery = shell(adb, serial, "shell", "dumpsys", "battery")
     thermal = shell(adb, serial, "shell", "dumpsys", "thermalservice")
-    memory = shell(adb, serial, "shell", "dumpsys", "meminfo", PACKAGE)
+    memory = shell(adb, serial, "shell", "dumpsys", "meminfo", package)
     return {
         "time_monotonic_s": time.monotonic(),
         "battery_tenths_c": number(r"^\s*temperature:\s*(-?\d+)", battery),
@@ -79,6 +80,8 @@ def main() -> int:
     parser.add_argument("--adb",default="adb")
     parser.add_argument("--serial",required=True,help="Explicitly chosen physical Fold7 ADB serial")
     parser.add_argument("--profile",choices=WANTED_PROFILES,required=True)
+    parser.add_argument("--package",choices=(PACKAGE,QA_PACKAGE),default=QA_PACKAGE,
+                        help="The isolated QA app is the safe default, not the original installed app")
     parser.add_argument("--output",type=Path,required=True)
     parser.add_argument("--seconds",type=int,default=MIN_SECONDS)
     args = parser.parse_args()
@@ -86,7 +89,7 @@ def main() -> int:
         parser.error("A physical Fold7 acceptance requires at least 1200 real seconds.")
     args.output.mkdir(parents=True,exist_ok=True)
     report = {"status":"not_completed","physical_device":False,"required_duration_s":args.seconds,
-              "expected_model":"SM-F966B","game_package":PACKAGE,"requested_profile":args.profile,
+              "expected_model":"SM-F966B","game_package":args.package,"requested_profile":args.profile,
               "gpu_temp_claimed":False}
     (args.output/"README.txt").write_text(
         "Start IMPERATHEN, choose the requested graphics profile and walk through "
@@ -107,23 +110,23 @@ def main() -> int:
             raise RuntimeError("Android model is not the expected Fold7 model; received " + repr(model))
         report.update(physical_device=True,actual_model=model,
                       android_release=shell(args.adb,args.serial,"shell","getprop","ro.build.version.release"))
-        initial_pid = shell(args.adb,args.serial,"shell","pidof",PACKAGE)
+        initial_pid = shell(args.adb,args.serial,"shell","pidof",args.package)
         if not initial_pid or " " in initial_pid:
             raise RuntimeError("Run exactly one foreground IMPERATHEN application process.")
         foreground = shell(args.adb,args.serial,"shell","dumpsys","window","windows")
-        if PACKAGE not in foreground:
+        if args.package not in foreground:
             raise RuntimeError("IMPERATHEN is not visible in the current Android windows.")
         # Do not clear the logcat history: this utility is strictly read-only
         # apart from its own local output files.
         deadline = started + args.seconds
         next_checkpoint = started
         while time.monotonic() < deadline:
-            pid = shell(args.adb,args.serial,"shell","pidof",PACKAGE)
+            pid = shell(args.adb,args.serial,"shell","pidof",args.package)
             if pid != initial_pid:
                 raise RuntimeError("Game exited or changed process; duration is not continuous.")
             now = time.monotonic()
             if now >= next_checkpoint:
-                sample = collect_device(args.adb,args.serial)
+                sample = collect_device(args.adb,args.serial,args.package)
                 physical.append(sample)
                 (args.output/"android_system.json").write_text(json.dumps(physical,indent=2,ensure_ascii=False)+"\n")
                 next_checkpoint = now + 12
