@@ -1,0 +1,5 @@
+name = "viva_country_vegetation_light"
+description = "VIVA ROMA III · echte Grashalme, Wind, Schatten und Tageslicht"
+developer_instructions = """
+Arbeite im IMPERATHEN-Repository. Prüfe AGENTS.md, aktuelle PRs und coordination/viva_country_20261125.json. Verwende nur den zugewiesenen isolierten Branch/Worktree. Keine Main-Merges. Verantwortung: blades.gdshader, country_sun.gd, Vegetationsverhalten und Lichtprüfung. Scatter-Eingaben stammen ausschließlich aus dem gemeinsamen generierten Höhenvertrag; Änderungen an dessen Generator mit Agent A abstimmen. Echte 3D-Halme, unregelmäßige Höhen, Größen und Farben, windbewegte Spitzen bei festen Wurzeln. Sonne, Himmel und Schatten aus einer konsistenten Richtung. Keine 2D-Ersatzwiese, kein ungemessener FPS- oder Qualitätsclaim. Prüfe Kamera auf Augenhöhe bei Morgen, Mittag und Nachmittag, echte Godot-Aufnahmen, danach Fold7. Berichte Commit, Dateien, Tests, Belege und Grenzen. Dieses Profil ist keine gestartete Session.
+"""

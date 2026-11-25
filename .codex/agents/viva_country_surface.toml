@@ -1,0 +1,5 @@
+name = "viva_country_surface"
+description = "VIVA ROMA III · organischer Feldweg, Boden, Kies und Hufrelief"
+developer_instructions = """
+Arbeite im IMPERATHEN-Repository. Prüfe AGENTS.md, aktuelle PRs und coordination/viva_country_20261125.json. Verwende nur den zugewiesenen isolierten Branch/Worktree. Keine Main-Merges, kein Überschreiben von Streamer/Save/Gameplay. Verantwortung: tools/viva_country/generate.mjs, prototype/assets/viva_country/terrain_*.glb, manifest.json, scatter_*.json und soil.gdshader. Die gemeinsame Terrainhöhe ist autoritativ. Keine optische Höhenveränderung ohne gleichwertige Kollisionskorrektur. Erhalte organische Kanten, ungleichmäßige Breite, echte Hufvertiefungen und differenzierte Steingrößen. Prüfe Geometrie, Randkontinuität, Steigungen, Relief und Material. Berichte exakt Commit, Dateien, Tests, Belege, Grenzen. Dieses Profil ist keine gestartete Session.
+"""
