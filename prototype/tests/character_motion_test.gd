@@ -145,6 +145,7 @@ func _run() -> void:
 	_check(actor.clip == "idle", "Zero actual displacement settles into idle")
 	actor.free()
 	_test_live_contact_transitions()
+	_test_first_gait_cycle()
 	_test_noncanonical_rest_axes()
 	print("CHARACTER_MOTION_TEST ", checks, " checks; ", failures.size(), " failed; stance_error_m=", max_stance_error)
 	for failure: String in failures:
@@ -198,6 +199,54 @@ func _test_live_contact_transitions() -> void:
 		_check(lod_shift<=.015,identity+" retains world foot contacts through LOD changes: "+str(lod_shift))
 		print("LIVE_CONTACT_RESULT ",identity," releases=",release_count," release_angle_deg=",release_angle," lod_shift_m=",lod_shift)
 		person.free()
+
+
+func _test_first_gait_cycle() -> void:
+	# Start at the actual first frame, without a warm-up cycle. A release
+	# correction must not invent a one-frame delay in the first swing.
+	for action: String in ["march", "run"]:
+		for hz: float in [30.0, 60.0, 120.0]:
+			var person := Person.new()
+			root.add_child(person)
+			person.position.y = .9
+			person.configure("player", "italia", 12)
+			person.set_process(false)
+			person._check_lod = 10000.0
+			person.reset_motion()
+			var speed := 1.45 if action == "march" else 3.6
+			person.drive(speed)
+			person._play(action, 0.0, 0.0)
+			var seconds: float = person.locomotion_stride(action) / speed
+			var count := ceili(seconds * hz)
+			var delta := seconds / float(count)
+			var first: Array[Transform3D] = []
+			var seam := 0.0
+			var support_slip := 0.0
+			var anchors := {}
+			for frame in range(count * 3 + 1):
+				if frame > 0:
+					person.position.z -= speed * delta
+				person._process(0.0 if frame == 0 else delta)
+				var rig: Skeleton3D = person._motion.skeleton
+				rig.force_update_all_bone_transforms()
+				for bone in rig.get_bone_count():
+					var pose := rig.get_bone_global_pose(bone)
+					if frame == 0:
+						first.append(pose)
+					elif frame % count == 0:
+						seam = maxf(seam, pose.origin.distance_to(first[bone].origin))
+				for side: String in ["L", "R"]:
+					if person.world_foot_supported(side):
+						var foot := rig.global_transform * _point(rig, "Foot_" + side)
+						var anchor: Vector3 = anchors.get(side, foot)
+						support_slip = maxf(support_slip, foot.distance_to(anchor))
+						anchors[side] = anchor
+					else:
+						anchors.erase(side)
+			_check(seam < .001, action + " repeats its first pose at " + str(hz) + " Hz: " + str(seam))
+			_check(support_slip < .015, action + " retains planted feet at " + str(hz) + " Hz: " + str(support_slip))
+			print("FIRST_GAIT_CYCLE ", action, " hz=", hz, " seam_m=", seam, " support_slip_m=", support_slip)
+			person.free()
 
 
 # A synthetic Skeleton3D deliberately uses off-axis and negative-axis

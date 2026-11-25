@@ -369,8 +369,13 @@ func _sync_raiders() -> void:
 		if active and health > 0 and attack_clock > float(actor.get_meta("attack_clock", attack_clock)) + .2:
 			figure.cue("attack")
 		actor.set_meta("attack_clock", attack_clock)
-		if health < previous:
-			figure.cue("death" if health <= 0 else "hit")
+		# A loaded casualty has no new health delta. Reassert the saved
+		# terminal pose after spawn or GameWorld.setup resets the figure.
+		# cue("death") is idempotent, so normal sync never restarts the fall.
+		if health <= 0:
+			figure.cue("death")
+		elif health < previous:
+			figure.cue("hit")
 		actor.set_meta("health", health)
 		actor.get_node("Health").text = "Angreifer · %d" % health if health > 0 else "Abgewehrt"
 		actor.visible = bool(state.village.raid.active)

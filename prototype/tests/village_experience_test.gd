@@ -10,6 +10,7 @@ const VillageDiagnostics = preload("res://scripts/ui/android_village_diagnostics
 const Model = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const OpeningStory = preload("res://scripts/story/opening_story.gd")
+const VillageWorld = preload("res://scripts/world/village_life_world.gd")
 var game
 var checks := 0
 var failures: Array[String] = []
@@ -302,6 +303,8 @@ func _run() -> void:
 			_move(Vector3(35,1,20))
 			_advance(1.0)
 			attempts += 1
+		if index == 0 and int(game.model.data.village.raid.enemies[index].health) == 0:
+			await _check_defeated_raider_restore(str(game.model.data.village.raid.enemies[index].id))
 	_check(game.model.data.village.raid.won==1 and not game.model.data.village.raid.active,"The actual player wins after all enemies are genuinely defeated")
 	_check(game.model.data.village.attributes.combat>=9 and game.model.data.village.attributes.courage>=3,"Real fighting and rescue develop the actual saved abilities")
 	var hidden := true
@@ -367,6 +370,48 @@ func _run() -> void:
 	game.queue_free()
 	await _frames()
 	_finish()
+
+
+func _check_defeated_raider_restore(defeated_id: String) -> void:
+	# The combat loop really defeated this actor; keep the remaining living
+	# enemies and resume the same raid through the production save/menu path.
+	var before: Dictionary = game.model.data.village.raid.duplicate(true)
+	game.ui.action_requested.emit("pause",{})
+	await _frames()
+	_click("Spiel speichern")
+	await _frames()
+	_click("Zum Hauptmenü")
+	await _frames()
+	_click("Speichern und Hauptmenü")
+	await _frames()
+	_click("Fortsetzen")
+	await _frames()
+	_check(game.screen == "playing" and _equivalent(game.model.data.village.raid,before),"Continue preserves a partly defeated raid and its actual health values")
+	var village: Node3D = game.world.village_life_world
+	var fallen: Node3D = village.raiders[defeated_id].get_node("Figure")
+	_check(fallen.clip == "death" and village.raiders[defeated_id].collision_layer == 0,"Continue restores the defeated raider's death pose without an invisible collider")
+	var live_controls := 0
+	for enemy: Dictionary in game.model.data.village.raid.enemies:
+		if int(enemy.health) > 0:
+			var actor: Node3D = village.raiders[str(enemy.id)]
+			_check(actor.get_node("Figure").clip != "death" and actor.collision_layer != 0,"Continue keeps the surviving raid actor alive and collidable: "+str(enemy.id))
+			live_controls += 1
+	_check(live_controls > 0,"The death-restore regression includes a real surviving opponent")
+	fallen._process(0.2)
+	var death_position: float = fallen.animator.current_animation_position
+	village.sync_raid_state(game.model.data)
+	_check(fallen.clip == "death" and is_equal_approx(fallen.animator.current_animation_position,death_position),"Repeated health sync never restarts an ongoing death animation")
+	# A fresh projection has no previous health metadata, as after a process
+	# restart. Exercise the same production raider builder with the saved state.
+	var rebuilt := VillageWorld.new()
+	root.add_child(rebuilt)
+	rebuilt.set_process(false)
+	rebuilt.set_physics_process(false)
+	rebuilt.state = game.model.data.duplicate(true)
+	rebuilt._sync_raiders()
+	var rebuilt_fallen: Node3D = rebuilt.raiders[defeated_id].get_node("Figure")
+	_check(rebuilt_fallen.clip == "death" and rebuilt.raiders[defeated_id].collision_layer == 0,"A freshly created projection also restores an already defeated raider")
+	rebuilt.free()
 
 
 func _advance(seconds: float) -> void:

@@ -1,0 +1,144 @@
+{
+  "scope": "Actual imported hero LOD0, production VillagePerson playback at 60 Hz; selected diagnostic, not a full gate or visual approval",
+  "baseline_commit": "f3ad20404f1d870162b62d71c46fb2a04b553927",
+  "baseline_run": 45560064886,
+  "baseline_artifact": 14998141570,
+  "baseline_artifact_sha256": "f065947af033b8415138ad7597c31e8e785312e77fb1315f5f2fd6a1f5d869c2",
+  "before_fingerprint": "fe5b83f0560fdb3658184d2eb6444cf877d52ba752b5ea3674139198ee4c2b86",
+  "after_fingerprint": "b821ea839fe10f9d9769f02d5dd3146475757b9fd48bafdca36016b64f07c41c",
+  "after_complete": false,
+  "clips": {
+    "death": {
+      "before": {
+        "sample_count": 74,
+        "sample_hz": 60,
+        "duration_s": 1.20000004768372,
+        "speed_m_s": 0.0,
+        "metrics": {
+          "frozen_required_clips": 0,
+          "max_angular_speed_deg_s": 127.342940422327,
+          "max_linear_speed_m_s": 2.31837586600578,
+          "max_loop_seam_deg": 0.0,
+          "max_loop_seam_m": 0.0,
+          "max_segment_error_m": 1.78813934326172e-07
+        },
+        "surface_metrics": {
+          "max_sole_penetration_m": 0.00742532312870026,
+          "max_support_slip_m": 0.0212584305554628,
+          "skin_edge_violations": 0
+        },
+        "finite": true,
+        "errors": []
+      },
+      "after": {
+        "sample_count": 74,
+        "sample_hz": 60,
+        "duration_s": 1.20000004768372,
+        "speed_m_s": 0.0,
+        "metrics": {
+          "frozen_required_clips": 0,
+          "max_angular_speed_deg_s": 127.342940422327,
+          "max_linear_speed_m_s": 2.31837586600578,
+          "max_loop_seam_deg": 0.0,
+          "max_loop_seam_m": 0.0,
+          "max_segment_error_m": 1.78813934326172e-07
+        },
+        "surface_metrics": {
+          "max_sole_penetration_m": 0.00742532312870026,
+          "max_support_slip_m": 0.0212584305554628,
+          "skin_edge_violations": 0
+        },
+        "finite": true,
+        "errors": []
+      }
+    },
+    "march": {
+      "before": {
+        "sample_count": 45,
+        "sample_hz": 60,
+        "duration_s": 0.717554674224449,
+        "speed_m_s": 1.45,
+        "metrics": {
+          "frozen_required_clips": 0,
+          "max_angular_speed_deg_s": 631.240176815767,
+          "max_linear_speed_m_s": 2.68536669148154,
+          "max_loop_seam_deg": 0.0395646811852521,
+          "max_loop_seam_m": 6.71506199978467e-07,
+          "max_segment_error_m": 2.23517417907715e-07
+        },
+        "surface_metrics": {
+          "max_sole_penetration_m": 3.11400299324305e-07,
+          "max_support_slip_m": 0.00208815932273865,
+          "skin_edge_violations": 0
+        },
+        "finite": true,
+        "errors": []
+      },
+      "after": {
+        "sample_count": 45,
+        "sample_hz": 60,
+        "duration_s": 0.717554674224449,
+        "speed_m_s": 1.45,
+        "metrics": {
+          "frozen_required_clips": 0,
+          "max_angular_speed_deg_s": 631.240176815767,
+          "max_linear_speed_m_s": 2.68536669148154,
+          "max_loop_seam_deg": 0.0395646811852521,
+          "max_loop_seam_m": 6.71506199978467e-07,
+          "max_segment_error_m": 2.23517417907715e-07
+        },
+        "surface_metrics": {
+          "max_sole_penetration_m": 3.11400299324305e-07,
+          "max_support_slip_m": 0.00208815932273865,
+          "skin_edge_violations": 0
+        },
+        "finite": true,
+        "errors": []
+      }
+    },
+    "run": {
+      "before": {
+        "sample_count": 34,
+        "sample_hz": 60,
+        "duration_s": 0.540974267749941,
+        "speed_m_s": 3.6,
+        "metrics": {
+          "frozen_required_clips": 0,
+          "max_angular_speed_deg_s": 1123.20696353737,
+          "max_linear_speed_m_s": 5.49732779748277,
+          "max_loop_seam_deg": 6.96480451459089,
+          "max_loop_seam_m": 0.0434919781982899,
+          "max_segment_error_m": 2.08616256713867e-07
+        },
+        "surface_metrics": {
+          "max_sole_penetration_m": 5.53293375560315e-08,
+          "max_support_slip_m": 0.00199973583221436,
+          "skin_edge_violations": 0
+        },
+        "finite": true,
+        "errors": []
+      },
+      "after": {
+        "sample_count": 34,
+        "sample_hz": 60,
+        "duration_s": 0.540974267749941,
+        "speed_m_s": 3.6,
+        "metrics": {
+          "frozen_required_clips": 0,
+          "max_angular_speed_deg_s": 1123.20696353737,
+          "max_linear_speed_m_s": 4.23804649974386,
+          "max_loop_seam_deg": 0.0,
+          "max_loop_seam_m": 1.40577270713038e-07,
+          "max_segment_error_m": 2.08616256713867e-07
+        },
+        "surface_metrics": {
+          "max_sole_penetration_m": 5.53293375560315e-08,
+          "max_support_slip_m": 0.00196671485900879,
+          "skin_edge_violations": 0
+        },
+        "finite": true,
+        "errors": []
+      }
+    }
+  }
+}

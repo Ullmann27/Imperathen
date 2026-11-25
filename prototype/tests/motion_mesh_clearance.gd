@@ -35,25 +35,50 @@ static func geometry(surfaces: Array) -> Dictionary:
 		var seen := {}
 		var boundary_edges := {}
 		var welded := {}
+		var weld_members := {}
 		var weld_pairs := PackedInt32Array()
-		var weld_names: Array[String] = []
+		var weld_ids := PackedInt32Array()
 		for index in vertices.size():
 			var point := vertices[index]
-			var name := str(Vector3i(roundi(point.x/EPSILON),roundi(point.y/EPSILON),roundi(point.z/EPSILON)))
-			weld_names.append(name)
-			if welded.has(name):
-				weld_pairs.append(int(welded[name]))
-				weld_pairs.append(index)
-			else: welded[name]=index
+			var cell := Vector3i(floori(point.x/EPSILON),floori(point.y/EPSILON),floori(point.z/EPSILON))
+			var representative := -1
+			# A grid cell is only a search bucket. Material/UV seam copies can
+			# straddle its boundary while remaining within the same tolerance.
+			# Every pair in a cluster must remain within EPS. Matching only
+			# its representative would let a midpoint bridge a wider opening.
+			for x in range(-1,2):
+				for y in range(-1,2):
+					for z in range(-1,2):
+						for candidate: int in welded.get(cell+Vector3i(x,y,z),[]):
+							if point.distance_squared_to(vertices[candidate])<=EPSILON*EPSILON:
+								var fits := true
+								for member: int in weld_members[candidate]:
+									if point.distance_squared_to(vertices[member])>EPSILON*EPSILON:
+										fits=false
+										break
+								if fits and (representative<0 or candidate<representative): representative=candidate
+			if representative>=0:
+				# Cache every checked pair, so deformation cannot open a seam
+				# that a representative-only recheck would still accept.
+				for member: int in weld_members[representative]:
+					weld_pairs.append(member)
+					weld_pairs.append(index)
+			else:
+				representative=index
+				if not welded.has(cell): welded[cell]=[]
+				welded[cell].append(index)
+				weld_members[representative]=[]
+			weld_members[representative].append(index)
+			weld_ids.append(representative)
 		for triangle in range(0,indices.size(),3):
 			for edge in 3:
 				var a := indices[triangle+edge]
 				var b := indices[triangle+(edge+1)%3]
 				if a<0 or b<0 or a>=vertices.size() or b>=vertices.size(): return {"error":"Invalid triangle index"}
-				var pa := weld_names[a]
-				var pb := weld_names[b]
+				var pa := weld_ids[a]
+				var pb := weld_ids[b]
 				if pa!=pb:
-					var boundary_key := pa+"/"+pb if pa<pb else pb+"/"+pa
+					var boundary_key := Vector2i(mini(pa,pb),maxi(pa,pb))
 					boundary_edges[boundary_key]=int(boundary_edges.get(boundary_key,0))+(1 if pa<pb else -1)
 				var pair := Vector2i(mini(a,b),maxi(a,b))
 				if seen.has(pair): continue
@@ -69,7 +94,7 @@ static func geometry(surfaces: Array) -> Dictionary:
 	var closed: bool=topology.closed
 	var pairs: PackedInt32Array=topology.weld_pairs
 	for pair in range(0,pairs.size(),2):
-		closed=closed and vertices[pairs[pair]].distance_to(vertices[pairs[pair+1]])<=EPSILON*1.75
+		closed=closed and vertices[pairs[pair]].distance_squared_to(vertices[pairs[pair+1]])<=EPSILON*EPSILON
 	var faces := PackedVector3Array()
 	faces.resize(indices.size())
 	for index in indices.size(): faces[index]=vertices[indices[index]]

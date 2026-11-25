@@ -13,6 +13,7 @@ const TIMING := {
 	"side_kick": Vector3(0.40, 0.22, 1.20), "high_kick": Vector3(0.44, 0.24, 1.30),
 }
 const CC0Gestures := preload("res://scripts/visuals/cc0_gestures.gd")
+static var _playback_variants: Dictionary = {}
 var external_gestures := false
 
 var skeleton: Skeleton3D
@@ -40,6 +41,29 @@ var _world_action := ""
 var _turn_step_side := ""
 var _turn_step_time := 0.0
 var _turn_step_from := Transform3D.IDENTITY
+
+
+static func playback_animation(source: Animation, mode: Animation.LoopMode) -> Animation:
+	# One immutable variant per live source/mode, shared by both actor drivers.
+	# Weak references let unused LOD tracks unload; IDs alone are not enough
+	# to identify a source after its resource has been freed and replaced.
+	if source.loop_mode == mode:
+		return source
+	var key := str(source.get_instance_id()) + "/" + str(mode)
+	var cached: Dictionary = _playback_variants.get(key, {})
+	if not cached.is_empty() and (cached.source as WeakRef).get_ref() == source:
+		var animation := (cached.animation as WeakRef).get_ref() as Animation
+		if animation and animation.loop_mode == mode:
+			return animation
+	# Sweep only on a cache miss, never per-frame on the normal shared path.
+	for prior_key: String in _playback_variants.keys():
+		var prior: Dictionary = _playback_variants[prior_key]
+		if (prior.source as WeakRef).get_ref() == null or (prior.animation as WeakRef).get_ref() == null:
+			_playback_variants.erase(prior_key)
+	var variant := source.duplicate() as Animation
+	variant.loop_mode = mode
+	_playback_variants[key] = {"source":weakref(source), "animation":weakref(variant)}
+	return variant
 
 
 func bind(model: Node3D, is_civilian: bool, actor_identity: String = "") -> void:
@@ -170,6 +194,10 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 			if contact.is_empty() or (walking and u + 0.00001 < float(contact.phase)):
 				contact = {"transform": foot, "phase": u}
 			contact.phase = u
+			# Preserve only the correction made while this foot was planted.
+			# Measuring it after lift-off would also cancel the first authored
+			# swing displacement, introducing a frame-rate-dependent delay.
+			contact.offset = Transform3D(contact.transform).origin - foot.origin
 			_world_contacts[side] = contact
 			targets[side] = contact.transform
 		else:
@@ -179,7 +207,7 @@ func plant_world_feet(action: String, phase: float, delta: float, stance: float)
 			var swing: Dictionary = _world_swings.get(side,{})
 			if swing.is_empty():
 				var release: Transform3D = contact.get("transform",foot)
-				swing = {"from":release,"offset":release.origin-foot.origin,"phase":u}
+				swing = {"from":release,"offset":contact.get("offset",Vector3.ZERO),"phase":u}
 				_world_swings[side] = swing
 			var progress := clampf((u-float(swing.phase))/maxf(.0001,1.0-float(swing.phase)),0.0,1.0)
 			var released: Transform3D = swing.from

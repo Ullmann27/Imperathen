@@ -9,6 +9,7 @@ const STRIDES := {"march":1.30, "run":1.75, "retreat":1.48}
 const TINTS := [Color.WHITE, Color(0.96, 0.88, 0.77), Color(0.83, 0.91, 0.97)]
 const FRONTIER_ROLES := {"heavy": "legionary", "spear": "spearman", "archer": "archer", "officer": "officer"}
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
+const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
 
 static var _scenes: Dictionary = {}
 static var _far_meshes: Dictionary = {}
@@ -19,6 +20,7 @@ var variant := 0
 var detail := 0
 var state := "idle"
 var player: AnimationPlayer
+var _animation_sources: Dictionary = {}
 var _body: Node3D
 var _phase := 0.0
 var _manual_live := false
@@ -66,13 +68,12 @@ func present(pose: String, phase: float, delta: float) -> void:
 	if not player.has_animation(clip):
 		clip = "idle"
 	player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
-	var animation := player.get_animation(clip)
 	var looping := clip in LOOPING
+	var animation := _playback_animation(clip, looping)
 	if not _manual_live or state != clip or player.assigned_animation != clip:
 		var blend := .12 if _manual_live else 0.0
 		_manual_live = true
 		state = clip
-		animation.loop_mode = Animation.LOOP_LINEAR if looping else Animation.LOOP_NONE
 		player.play(clip,blend)
 	# Both locomotion and actions use the timeline retained by ValleyScene.
 	# Replacing a far actor or changing its mesh cannot restart an attack.
@@ -133,6 +134,7 @@ func _replace_body() -> void:
 		remove_child(_body)
 		_body.free()
 	player = null
+	_animation_sources.clear()
 	if detail == 2:
 		var instance := MeshInstance3D.new()
 		instance.mesh = far_mesh(role)
@@ -141,6 +143,15 @@ func _replace_body() -> void:
 	else:
 		_body = _body_scene().instantiate() as Node3D
 		player = _body.find_child("AnimationPlayer", true, false) as AnimationPlayer
+		if player:
+			for animation_name: StringName in player.get_animation_list():
+				_animation_sources[str(animation_name)] = player.get_animation(animation_name)
+			# Keep clip maps private without duplicating every animation track
+			# for every soldier. Changed loop modes are copied on first use.
+			for library_name: StringName in player.get_animation_library_list():
+				var library := player.get_animation_library(library_name).duplicate() as AnimationLibrary
+				player.remove_animation_library(library_name)
+				player.add_animation_library(library_name, library)
 		for instance in _body.find_children("*", "MeshInstance3D", true, false):
 			_apply_tint(instance as MeshInstance3D)
 	add_child(_body)
@@ -164,8 +175,23 @@ func _play_clip() -> void:
 	if player == null:
 		return
 	var clip := state if player.has_animation(state) else "idle"
-	var animation := player.get_animation(clip)
-	animation.loop_mode = Animation.LOOP_LINEAR if clip in LOOPING else Animation.LOOP_NONE
+	var animation := _playback_animation(clip, clip in LOOPING)
 	player.play(clip)
 	player.seek(_phase * animation.length, true)
 	_face.pose(clip, _phase, detail)
+
+
+func _playback_animation(clip: String, looping: bool) -> Animation:
+	var mode := Animation.LOOP_LINEAR if looping else Animation.LOOP_NONE
+	var animation := player.get_animation(clip)
+	if animation.loop_mode == mode:
+		return animation
+	animation = CharacterMotion.playback_animation(_animation_sources[clip], mode)
+	if player.get_animation(clip) != animation:
+		var slash := clip.find("/")
+		var library_name := clip.substr(0, slash) if slash >= 0 else ""
+		var animation_name := clip.substr(slash + 1)
+		var library := player.get_animation_library(library_name)
+		library.remove_animation(animation_name)
+		library.add_animation(animation_name, animation)
+	return animation
