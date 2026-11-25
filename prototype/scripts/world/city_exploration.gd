@@ -106,7 +106,7 @@ func _ready() -> void:
 	var renderer := get_node_or_null("/root/RuntimeDisplay")
 	if is_instance_valid(renderer):
 		renderer.set_sustained_scene(true)
-	print("IMPERATHEN_CITY_READY "+JSON.stringify({"city":city_available,"meshy_youth":youth_available,"selected_player_model":figure.active_model_path,"original_youth_active":youth_available and figure.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"),"catalog_families":catalog.size(),"campaign_started":false,"combat_mode":"animation_preview_only"}))
+	print("IMPERATHEN_CITY_READY "+JSON.stringify({"city":city_available,"meshy_youth":youth_available,"selected_player_model":figure.active_model_path,"original_youth_active":youth_available and figure.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"),"catalog_families":catalog.size(),"campaign_started":false,"combat_mode":"authoritative_unarmed_training","mocap_active":figure._uses_youth_mocap()}))
 
 func _build_ground() -> void:
 	var ground := MeshInstance3D.new()

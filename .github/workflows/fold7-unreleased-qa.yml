@@ -42,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends blender python3-numpy
+          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy
           blender -b --python-expr "import numpy;print('NUMPY_BLENDER_AVAILABLE',numpy.__version__)"
           if [[ ! -x "$ANDROID_HOME/build-tools/35.0.1/apksigner" || ! -f "$ANDROID_HOME/platforms/android-35/android.jar" ]]; then
             "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;35.0.1' 'platforms;android-35'
@@ -68,6 +68,17 @@ jobs:
             --archive "$RUNNER_TEMP/imperathen-original-youth-runtime.zip" \
             --report artifacts/qa/original-youth-status.json
           test -s prototype/assets/characters/hero_meshy_italia_0.glb
+      - name: Retarget recorded human walk run and unarmed combat onto the exact original youth
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/youth-mocap"
+          curl -fLsS --retry 3 --connect-timeout 15 --max-time 90 'https://accad.ohio-state.edu/sites/accad.osu.edu/files/Male2_bvh.zip' -o "$RUNNER_TEMP/accad-male2.zip"
+          OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 /usr/bin/python3 tools/characters/retarget_accad_youth.py \
+            --archive "$RUNNER_TEMP/accad-male2.zip" --input prototype/assets/characters \
+            --output "$RUNNER_TEMP/youth-mocap" --report artifacts/qa/youth-mocap-report.json
+          cp "$RUNNER_TEMP"/youth-mocap/hero_meshy_italia_*.glb prototype/assets/characters/
+          cp artifacts/qa/youth-mocap-report.json prototype/assets/animations/accad_youth_motion.json
       - name: Download matching Godot and Android templates with SHA512 verification
         shell: bash
         run: |
@@ -120,6 +131,8 @@ jobs:
           grep -q CITY_TRAINING_PASS artifacts/qa/city-training.log
           "$GODOT_BIN" --headless --path prototype --script res://tests/mission_cinematics_test.gd 2>&1 | tee artifacts/qa/mission-cinematics.log
           grep -q MISSION_CINEMATICS_PASS artifacts/qa/mission-cinematics.log
+          "$GODOT_BIN" --headless --path prototype --script res://tests/youth_mocap_test.gd 2>&1 | tee artifacts/qa/youth-mocap-runtime.log
+          grep -q YOUTH_MOCAP_RUNTIME_PASS artifacts/qa/youth-mocap-runtime.log
       - name: Create separate ephemeral QA signing key (NOT existing app certificate)
         shell: bash
         run: |
@@ -158,14 +171,15 @@ jobs:
           TAG="first-play-qa-${GITHUB_SHA:0:8}"
           test -s "$APK"
           grep -q STAGED_VERIFIED_RUNTIME artifacts/qa/original-youth-status.json
+          grep -q YOUTH_MOCAP_RUNTIME_PASS artifacts/qa/youth-mocap-runtime.log
           grep -Eq '"original_youth_active":true' artifacts/qa/real-city-walk.log
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$APK" artifacts/qa/QA_SHA256SUMS.txt artifacts/qa/original-youth-status.json --clobber
+            gh release upload "$TAG" "$APK" artifacts/qa/QA_SHA256SUMS.txt artifacts/qa/original-youth-status.json artifacts/qa/youth-mocap-report.json --clobber
           else
             gh release create "$TAG" --target "$GITHUB_SHA" --prerelease \
               --title "IMPERATHEN FIRST PLAY – Originalfigur · Android QA" \
-              --notes "Separately signed ARM64 test app with the actual original Meshy boy, 35 joints and 11 clips. Not a production-signature update. Motion and physical Fold7 acceptance remain open." \
-              "$APK" artifacts/qa/QA_SHA256SUMS.txt artifacts/qa/original-youth-status.json
+              --notes "Separately signed ARM64 QA with the original 35-joint Meshy youth and 11 retargeted human motion clips (walk, run, six punches, two kicks and guard). Open Motion Project by ACCAD/The Ohio State University, CC BY 3.0; adapted by IMPERATHEN. https://accad.ohio-state.edu/research/motion-lab/mocap-system-and-data ; https://creativecommons.org/licenses/by/3.0/ . Not a production-signature update; full visual motion and physical Fold7 acceptance remain open." \
+              "$APK" artifacts/qa/QA_SHA256SUMS.txt artifacts/qa/original-youth-status.json artifacts/qa/youth-mocap-report.json
           fi
       - name: Preserve generated test package, proof and error logs
         if: always()
