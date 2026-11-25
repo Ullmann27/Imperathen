@@ -82,7 +82,7 @@ jobs:
       - name: Capture five actual 3D Godot viewport images
         run: |
           set -euo pipefail
-          timeout 360 xvfb-run -a -s "-screen 0 1440x900x24" "$GODOT_BIN" --path "$RUNNER_TEMP/country-fixture" --rendering-method gl_compatibility --rendering-driver opengl3 --resolution 1280x720 --script res://tests/viva_country_test.gd -- --capture="$PWD/country-evidence" 2>&1 | tee country-evidence/render.log
+          timeout 360 xvfb-run -a -s "-screen 0 1440x900x24" "$GODOT_BIN" --path "$RUNNER_TEMP/country-fixture" --audio-driver Dummy --rendering-method gl_compatibility --rendering-driver opengl3 --resolution 1280x720 --script res://tests/viva_country_test.gd -- --capture="$PWD/country-evidence" 2>&1 | tee country-evidence/render.log
           grep -q 'VIVA_COUNTRY_PASS' country-evidence/render.log
           if grep -E 'SCRIPT ERROR:|Parse Error:|Shader compilation failed|^ERROR:' country-evidence/render.log; then exit 1; fi
           python3 - <<'PY'
