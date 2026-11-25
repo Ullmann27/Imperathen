@@ -74,7 +74,7 @@ static func validate_arguments(command: String, args: Dictionary) -> String:
 
 
 ## Called only on WorldModel's private candidate, after complete state validation.
-static func apply(data: Dictionary, command: String, args: Dictionary) -> Dictionary:
+static func apply(data: Dictionary, command: String, args: Dictionary, sites: Dictionary = {}) -> Dictionary:
 	var error := validate_arguments(command,args)
 	if not error.is_empty():
 		return _result(false,error)
@@ -91,7 +91,7 @@ static func apply(data: Dictionary, command: String, args: Dictionary) -> Dictio
 	if not error.is_empty():
 		return _result(false,error)
 	if args.has("shop_id"):
-		error = _shop_reason(data,str(args.shop_id))
+		error = _shop_reason(data,str(args.shop_id),sites)
 		if not error.is_empty():
 			return _result(false,error)
 	var trade: Dictionary = data.village.city_trade
@@ -203,7 +203,7 @@ static func apply(data: Dictionary, command: String, args: Dictionary) -> Dictio
 	return _result(false,"Unbekannter Handelsauftrag.")
 
 
-static func view(data: Dictionary, shop_id := "") -> Dictionary:
+static func view(data: Dictionary, shop_id := "", sites: Dictionary = {}) -> Dictionary:
 	var result := {"enabled":enabled(data),"money":int(data.get("resources",{}).get("denarii",0)),
 		"shops":shop_catalog(),"offers":[],"inventory":[],"skills":skills(data),
 		"equipment_bonuses":equipment_bonuses(data),"service":{},"rewards":[]}
@@ -226,7 +226,7 @@ static func view(data: Dictionary, shop_id := "") -> Dictionary:
 		result.inventory.append({"item_id":id,"name":item.name,"quantity":count,
 			"can_consume":can_consume,"can_equip":can_equip,"equipped":trade.equipment.values().has(id)})
 	if Catalog.SHOPS.has(shop_id):
-		var reason := _shop_reason(data,shop_id)
+		var reason := _shop_reason(data,shop_id,sites)
 		if reason.is_empty():
 			reason = _ready_reason(data)
 		for id: String in Catalog.SHOPS[shop_id].items:
@@ -244,8 +244,8 @@ static func view(data: Dictionary, shop_id := "") -> Dictionary:
 		service_reason = "Bereits einmal ausgegeben."
 	elif not _trained_soldier(data):
 		service_reason = "Abgeschlossene erwachsene Ausbildung erforderlich."
-	elif not _shop_reason(data,"armorer").is_empty():
-		service_reason = _shop_reason(data,"armorer")
+	elif not _shop_reason(data,"armorer",sites).is_empty():
+		service_reason = _shop_reason(data,"armorer",sites)
 	elif not _ready_reason(data).is_empty():
 		service_reason = _ready_reason(data)
 	result.service = {"issued":trade.service_issued,"eligible":service_reason.is_empty(),"reason":service_reason}
@@ -257,8 +257,8 @@ static func view(data: Dictionary, shop_id := "") -> Dictionary:
 			reason = "Bereits erhalten."
 		elif not _reward_available(data,id):
 			reason = "Der zugehörige Auftrag ist noch nicht bestätigt."
-		elif not _shop_reason(data,"armorer").is_empty():
-			reason = _shop_reason(data,"armorer")
+		elif not _shop_reason(data,"armorer",sites).is_empty():
+			reason = _shop_reason(data,"armorer",sites)
 		elif not _ready_reason(data).is_empty():
 			reason = _ready_reason(data)
 		else:
@@ -469,10 +469,19 @@ static func _ready_reason(data: Dictionary) -> String:
 	return ""
 
 
-static func _shop_reason(data: Dictionary, shop_id: String) -> String:
-	var point: Array=Catalog.SHOPS[shop_id].position
+static func _shop_reason(data: Dictionary, shop_id: String, sites: Dictionary = {}) -> String:
+	var point: Array = Catalog.SHOPS[shop_id].position
+	var target := Vector3(float(point[0]),1.0,float(point[1]))
+	# Existing isolated market tests keep their original catalog positions.
+	# The real city must supply all six independently verified scene anchors.
+	if not sites.is_empty():
+		if not sites.has(shop_id) or typeof(sites[shop_id]) != TYPE_VECTOR3:
+			return "Diese Verkaufsstelle ist nicht an die Stadt angeschlossen."
+		target = sites[shop_id]
+		if not target.is_finite():
+			return "Der Standort dieser Verkaufsstelle ist ungültig."
 	var at: Array=data.get("player",{}).get("position",[])
-	if at.size()!=3 or Vector3(float(at[0]),float(at[1]),float(at[2])).distance_to(Vector3(float(point[0]),1.0,float(point[1])))>RANGE:
+	if at.size()!=3 or Vector3(float(at[0]),float(at[1]),float(at[2])).distance_to(target)>RANGE:
 		return "Gehe näher zur Verkaufsstelle: %s." % Catalog.SHOPS[shop_id].name
 	return ""
 

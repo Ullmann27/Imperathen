@@ -22,6 +22,8 @@ var modal_title: Label
 var quality: OptionButton
 var shop_id := ""
 var inventory_open := false
+var embedded_city := false
+var shop_sites: Dictionary = {}
 var _state: Dictionary = {}
 var _overlay: ColorRect
 var _root: Control
@@ -115,6 +117,13 @@ func _ready() -> void:
 	contents.add_theme_constant_override("separation", 10)
 	scroll.add_child(contents)
 	_overlay.hide()
+	if embedded_city:
+		top.hide()
+		bottom.hide()
+		pad.hide()
+		status.reparent(box)
+		status.text = ""
+		status.custom_minimum_size.y = 28
 	_apply_theme()
 
 
@@ -212,7 +221,8 @@ func open_inventory() -> void:
 func close() -> void:
 	_overlay.hide()
 	pad.reset()
-	pad.show()
+	if not embedded_city:
+		pad.show()
 	shop_id = ""
 	inventory_open = false
 	closed.emit()
@@ -226,7 +236,7 @@ func _clear_contents() -> void:
 
 func _refresh_contents() -> void:
 	_clear_contents()
-	var view: Dictionary = Trade.view(_state, shop_id)
+	var view: Dictionary = Trade.view(_state, shop_id, shop_sites)
 	if inventory_open:
 		modal_title.text = "Dein Beutel"
 		var skills: Dictionary = view.get("skills", {})

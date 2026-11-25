@@ -170,5 +170,10 @@
       "reason": "three_way_resolution_required",
       "resolution": "preserve all independent test entries and source fingerprint/report scope fields"
     }
-  ]
+  ],
+  "market_bridge": {
+    "status": "implemented_in_public_source_not_engine_validated",
+    "fixture": "prototype/tests/city_market_bridge_test.gd",
+    "authority": "WorldModel city session, exact authored anchors, separate save; final private runtime reconciliation and visual walkthrough pending"
+  }
 }

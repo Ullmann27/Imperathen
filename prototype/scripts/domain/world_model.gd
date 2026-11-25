@@ -46,6 +46,8 @@ var combat_motion_check: Callable
 var npc_observations: Callable
 var raid_observations: Callable
 var npc_sight_check: Callable
+# A city session owns this verified runtime map; ordinary campaign/test worlds keep it empty.
+var city_trade_sites: Dictionary = {}
 
 
 func _init() -> void:
@@ -436,7 +438,7 @@ func _apply_training_contact(state: Dictionary) -> Dictionary:
 
 func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dictionary:
 	if CityTrade.COMMAND_FIELDS.has(command):
-		var trade_result := CityTrade.apply(state, command, args)
+		var trade_result := CityTrade.apply(state, command, args, city_trade_sites)
 		if trade_result.ok:
 			_update_morale(state)
 			_record(state, str(trade_result.message))

@@ -6,6 +6,7 @@ const State := preload("res://scripts/world/city_exploration_state.gd")
 const CameraObstruction := preload("res://scripts/world/camera_obstruction.gd")
 const CityDetailAdapter := preload("res://scripts/rendering/city_exploration_detail_adapter.gd")
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
+const CityMarketBridge := preload("res://scripts/world/city_market_bridge.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
 const TouchAction := preload("res://scripts/ui/touch_action.gd")
@@ -49,6 +50,10 @@ var _pause_panel := PanelContainer.new()
 var _pad: Control
 var _look: Control
 var _toolbar: HBoxContainer
+var _trade_bar: HBoxContainer
+var _trade_button: Button
+var _bag_button: Button
+var market := CityMarketBridge.new()
 var _actions: HBoxContainer
 
 func _ready() -> void:
@@ -60,6 +65,12 @@ func _ready() -> void:
 	_read_catalog()
 	_build_ui()
 	_restore(State.read(save_path) if persist else State.defaults())
+	add_child(market)
+	market.message.connect(_market_message)
+	market.closed.connect(func(): _hud.show())
+	market.setup(get_node_or_null("RomanCity") as Node3D, player, persist)
+	_bag_button.disabled = not market.available
+	_refresh_market_buttons()
 	get_viewport().size_changed.connect(_layout_ui)
 	_layout_ui()
 	_update_status()
@@ -124,7 +135,7 @@ func _load_city() -> void:
 		add_child(temple)
 	print("IMPERATHEN_CITY_DETAIL " + JSON.stringify(CityDetailAdapter.install(city, profile)))
 	# Read-only signboards are attached only to the six matching existing stalls.
-	# Transactions require a separate future WorldModel integration.
+	# The market bridge independently verifies the same authored stands before enabling transactions.
 	print("IMPERATHEN_CITY_MARKET " + JSON.stringify(CityMarketSignage.install(city, profile)))
 
 func _build_player() -> void:
@@ -300,6 +311,15 @@ func _build_ui() -> void:
 	_toolbar.add_child(_button("Modelle",func(): teleport(CATALOG_ORIGIN+Vector3(0,0.92,12))))
 	_toolbar.add_child(_button("Pause",func(): set_paused(not paused)))
 	_safe.add_child(_toolbar)
+	_trade_bar = HBoxContainer.new()
+	_trade_bar.add_theme_constant_override("separation",8)
+	_trade_button = _button("Handel",func(): _open_market(false))
+	_bag_button = _button("Beutel",func(): _open_market(true))
+	_trade_button.disabled = true
+	_bag_button.disabled = true
+	_trade_bar.add_child(_trade_button)
+	_trade_bar.add_child(_bag_button)
+	_safe.add_child(_trade_bar)
 	_pad = TouchPad.new()
 	_pad.axis_changed.connect(func(axis: Vector2): _touch_move=axis)
 	_safe.add_child(_pad)
@@ -348,6 +368,7 @@ func _layout_ui() -> void:
 	_status.size = Vector2(_safe.size.x-8,54)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_toolbar.position = Vector2(0,90 if portrait else 71)
+	_trade_bar.position = Vector2(0,152 if portrait else 133)
 	_pad.size = Vector2(178,178)
 	_pad.position = Vector2(0,_safe.size.y-182)
 	_actions.position = Vector2(maxf(0,_safe.size.x-328),_safe.size.y-(250 if portrait else 82))
@@ -355,7 +376,7 @@ func _layout_ui() -> void:
 	_pause_panel.position = (_safe.size-_pause_panel.size)*0.5
 
 func _physics_process(delta: float) -> void:
-	if paused:
+	if paused or market.is_open():
 		return
 	_action_left = maxf(0,_action_left-delta)
 	var axis := _touch_move
@@ -389,7 +410,8 @@ func _process(delta: float) -> void:
 	if _catalog_elapsed>=0.15:
 		_catalog_elapsed = 0
 		_stream_catalog()
-	if paused:
+		_refresh_market_buttons()
+	if paused or market.is_open():
 		return
 	_save_elapsed += delta
 	if _save_elapsed>=30:
@@ -407,6 +429,11 @@ func _place_camera(delta: float) -> void:
 			camera.look_at(anchor,Vector3.UP)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if market.is_open():
+		if event.is_action_pressed("ui_cancel"):
+			market.close()
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("ui_cancel"):
 		set_paused(not paused)
 		get_viewport().set_input_as_handled()
@@ -417,7 +444,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_look_by(event.relative)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventKey and event.pressed and not event.echo:
-		if event.physical_keycode==KEY_SPACE:
+		if event.physical_keycode==KEY_E:
+			_open_market(false)
+			get_viewport().set_input_as_handled()
+		elif event.physical_keycode==KEY_I:
+			_open_market(true)
+			get_viewport().set_input_as_handled()
+		elif event.physical_keycode==KEY_SPACE:
 			perform_action("attack")
 			get_viewport().set_input_as_handled()
 		elif event.physical_keycode==KEY_Q:
@@ -429,17 +462,45 @@ func _look_by(delta: Vector2) -> void:
 		_yaw = wrapf(_yaw-delta.x*0.004,-PI,PI)
 		_pitch = clampf(_pitch-delta.y*0.003,-0.75,0.65)
 
+func _market_message(value: String) -> void:
+	_catalog_status = value
+	_update_status()
+
+func _refresh_market_buttons() -> void:
+	if not is_instance_valid(_trade_button) or not market.available:
+		return
+	var target := market.nearest()
+	_trade_button.disabled = not bool(target.reachable)
+	_trade_button.text = "Handel" if not target.reachable else "Kaufen"
+	_trade_button.tooltip_text = str(target.label) if target.reachable else "Gehe zu einem Marktstand"
+
+func _open_market(inventory: bool) -> void:
+	if paused or _action_left > 0 or market.is_open():
+		return
+	var opened: bool = market.open_inventory() if inventory else market.open_shop()
+	if not opened:
+		return
+	_touch_move = Vector2.ZERO
+	_pad.reset()
+	_look.reset()
+	player.velocity = Vector3.ZERO
+	figure.drive(0)
+	_hud.hide()
+
 func _toggle_pace() -> void:
 	_running = not _running
 	_pace.text = "Rennen" if _running else "Gehen"
 
 func perform_action(action: String) -> void:
-	if paused or _action_left>0 or action not in ["attack","block"]:
+	if paused or market.is_open() or _action_left>0 or action not in ["attack","block"]:
 		return
 	_action_left = 0.8
 	figure.cue(action)
 
 func set_paused(value: bool) -> void:
+	if market.is_open():
+		market.close()
+		return
 	paused = value
 	_touch_move = Vector2.ZERO
 	_pad.reset()
@@ -451,6 +512,7 @@ func set_paused(value: bool) -> void:
 	_pad.visible = not paused
 	_actions.visible = not paused
 	_toolbar.visible = not paused
+	_trade_bar.visible = not paused
 	if paused:
 		save_state()
 
