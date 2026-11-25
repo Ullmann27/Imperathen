@@ -22,7 +22,9 @@ def glb_info(path: Path):
     json_length, chunk_type=struct.unpack_from("<II",header,12)
     if (magic,version,length)!=(0x46546c67,2,path.stat().st_size) or chunk_type!=0x4e4f534a or json_length<=0:
         raise ValueError(f"Not a valid complete GLB v2: {path}")
-    return {"bytes":length,"sha256":hashlib.file_digest(path.open("rb"),"sha256").hexdigest()}
+    with path.open("rb") as source:
+        digest = hashlib.file_digest(source,"sha256").hexdigest()
+    return {"bytes":length,"sha256":digest}
 
 
 def main():
