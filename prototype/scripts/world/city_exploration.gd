@@ -10,6 +10,7 @@ const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
 const CityMarketBridge := preload("res://scripts/world/city_market_bridge.gd")
 const CitySurfaceMicrodetail := preload("res://scripts/rendering/city_surface_microdetail.gd")
 const CityAmbientPeople := preload("res://scripts/world/city_ambient_people.gd")
+const Crowd := preload("res://scripts/world/city_exploration_crowd.gd")
 const VivaAtmosphere := preload("res://scripts/rendering/viva_roma_atmosphere.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
@@ -38,6 +39,8 @@ var camera := Camera3D.new()
 var city_available := false
 var youth_available := false
 var ambient_people: CityAmbientPeople
+var crowd := Crowd.new()
+var _crowd_elapsed := 0.0
 var catalog: Array[Dictionary] = []
 var _catalog_nodes: Dictionary = {}
 var _catalog_pending := ""
@@ -74,12 +77,17 @@ func _ready() -> void:
 	_build_player()
 	_build_camera()
 	_build_ambient_people()
+	crowd.profile = profile
+	if is_instance_valid(ambient_people):
+		for record: Dictionary in ambient_people.citizens:
+			crowd.exclude_market_shop(str(record.get("shop", "")))
+	add_child(crowd)
 	_read_catalog()
 	_build_ui()
 	_restore(State.read(save_path) if persist else State.defaults())
 	add_child(market)
 	market.message.connect(_market_message)
-	market.closed.connect(func(): _hud.show())
+	market.closed.connect(_close_market)
 	market.setup(get_node_or_null("RomanCity") as Node3D, player, persist)
 	_bag_button.disabled = not market.available
 	_refresh_market_buttons()
@@ -451,6 +459,10 @@ func _layout_ui() -> void:
 func _physics_process(delta: float) -> void:
 	if paused or market.is_open():
 		return
+	_crowd_elapsed += delta
+	if _crowd_elapsed >= 0.2:
+		_crowd_elapsed = 0.0
+		crowd.tick(player.position)
 	_action_left = maxf(0,_action_left-delta)
 	var axis := _touch_move
 	axis.x += float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))-float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT))
@@ -593,7 +605,16 @@ func _open_market(inventory: bool) -> void:
 	_look.reset()
 	player.velocity = Vector3.ZERO
 	figure.drive(0)
+	crowd.set_paused(true)
+	if is_instance_valid(ambient_people):
+		ambient_people.set_active(false)
 	_hud.hide()
+
+func _close_market() -> void:
+	_hud.show()
+	crowd.set_paused(paused)
+	if is_instance_valid(ambient_people):
+		ambient_people.set_active(not paused)
 
 func _toggle_pace() -> void:
 	_running = not _running
@@ -619,6 +640,7 @@ func set_paused(value: bool) -> void:
 	player.velocity = Vector3.ZERO
 	figure.drive(0)
 	figure.set_process(not paused)
+	crowd.set_paused(paused)
 	if is_instance_valid(ambient_people):
 		ambient_people.set_active(not paused)
 	_pause_panel.visible = paused
