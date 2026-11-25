@@ -13,8 +13,8 @@
         "res://assets/world_expansion/architecture/taberna_lod2.glb"
       ],
       "footprint": [
-        8,
-        10
+        8.2,
+        10.2
       ],
       "height": 5.5,
       "category": "commerce"
@@ -28,8 +28,8 @@
         "res://assets/world_expansion/architecture/insula_lod2.glb"
       ],
       "footprint": [
-        11,
-        10
+        12,
+        12
       ],
       "height": 11.5,
       "category": "residential"
