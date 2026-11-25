@@ -65,7 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/check_prototype.py --godot "$GODOT_BIN" \
-            --keep-going --only import city_trade city_inventory_ui city_support \
+            --keep-going --only import city_trade city_inventory_ui city_support city_market_bridge \
             --report city-ui-evidence
       - name: Upload evidence
         if: always()
