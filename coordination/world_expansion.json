@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "project": "IMPERATHEN – Weltbau, Blender und Environment",
+  "coordination_issue": "https://github.com/Ullmann27/Imperathen/issues/16",
+  "base_commit": "7af39f35b1947595f95e365eb7762592feabf234",
+  "integration": {
+    "agent": "root",
+    "reserved_paths": [
+      "prototype/assets/world_expansion/manifest.json",
+      "coordination/world_expansion.json",
+      "tools/world_art/pipeline.py",
+      "tools/world_art/validate.py",
+      "tools/world_art/verify_environment.py",
+      "tools/world_art/regional_routes.py",
+      "tools/world_art/test_regional_routes.py",
+      "tools/world_art/capture.gd",
+      "docs/26_world_expansion/**",
+      ".github/workflows/world-expansion.yml"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "architecture",
+      "agent": "architecture",
+      "title": "Detaillierte Stadtmodule, Straße und Blender-Quelle",
+      "allowed_paths": [
+        "tools/world_art/architecture.py",
+        "art/world_expansion/architecture/**",
+        "prototype/assets/world_expansion/architecture/**"
+      ],
+      "depends_on": [],
+      "checks": [
+        "architecture-export"
+      ],
+      "status": "open",
+      "handoff": null
+    },
+    {
+      "id": "vegetation",
+      "agent": "vegetation",
+      "title": "Stämme, Äste, Blätter und Winddaten",
+      "allowed_paths": [
+        "tools/world_art/vegetation.py",
+        "art/world_expansion/vegetation/**",
+        "prototype/assets/world_expansion/vegetation/**"
+      ],
+      "depends_on": [],
+      "checks": [
+        "vegetation-export"
+      ],
+      "status": "open",
+      "handoff": null
+    },
+    {
+      "id": "environment",
+      "agent": "environment",
+      "title": "Weltwerkstatt, instanzierte Siedlungen, Sonne und Wind",
+      "allowed_paths": [
+        "prototype/scripts/world_expansion/**",
+        "prototype/shaders/world_expansion/**",
+        "prototype/scenes/world_expansion/**",
+        "prototype/tests/world_expansion_environment_test.gd"
+      ],
+      "depends_on": [
+        "architecture",
+        "vegetation"
+      ],
+      "checks": [
+        "environment-runtime"
+      ],
+      "status": "open",
+      "handoff": null
+    }
+  ]
+}

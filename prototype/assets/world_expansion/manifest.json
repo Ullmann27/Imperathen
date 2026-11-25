@@ -1,0 +1,420 @@
+{
+  "schema_version": 1,
+  "label": "IMPERATHEN Weltwerkstatt",
+  "coordinate_system": "metres; +Y up; +Z building front",
+  "scope": "Modularer Asset- und Darstellungsnachweis; keine fertig belebte Stadt und keine Änderung der laufenden Kampagne.",
+  "building_assets": [
+    {
+      "id": "taberna",
+      "label": "Taberna / Ladenhaus",
+      "lods": [
+        "res://assets/world_expansion/architecture/taberna_lod0.glb",
+        "res://assets/world_expansion/architecture/taberna_lod1.glb",
+        "res://assets/world_expansion/architecture/taberna_lod2.glb"
+      ],
+      "footprint": [
+        8,
+        10
+      ],
+      "height": 5.5,
+      "category": "commerce"
+    },
+    {
+      "id": "insula",
+      "label": "Insula / Stadthaus",
+      "lods": [
+        "res://assets/world_expansion/architecture/insula_lod0.glb",
+        "res://assets/world_expansion/architecture/insula_lod1.glb",
+        "res://assets/world_expansion/architecture/insula_lod2.glb"
+      ],
+      "footprint": [
+        11,
+        10
+      ],
+      "height": 11.5,
+      "category": "residential"
+    },
+    {
+      "id": "basilica",
+      "label": "Basilika / Verwaltung",
+      "lods": [
+        "res://assets/world_expansion/architecture/basilica_lod0.glb",
+        "res://assets/world_expansion/architecture/basilica_lod1.glb",
+        "res://assets/world_expansion/architecture/basilica_lod2.glb"
+      ],
+      "footprint": [
+        14,
+        20
+      ],
+      "height": 12,
+      "category": "civic"
+    }
+  ],
+  "road_assets": [
+    {
+      "id": "basalt_road",
+      "label": "Steinpflaster mit Gehwegen",
+      "lods": [
+        "res://assets/world_expansion/architecture/basalt_road_lod0.glb",
+        "res://assets/world_expansion/architecture/basalt_road_lod1.glb",
+        "res://assets/world_expansion/architecture/basalt_road_lod2.glb"
+      ],
+      "footprint": [
+        8,
+        8
+      ],
+      "height": 0.35,
+      "category": "road"
+    }
+  ],
+  "vegetation_assets": [
+    {
+      "id": "field_elm",
+      "label": "Feldulme",
+      "lods": [
+        "res://assets/world_expansion/vegetation/field_elm_lod0.glb",
+        "res://assets/world_expansion/vegetation/field_elm_lod1.glb",
+        "res://assets/world_expansion/vegetation/field_elm_lod2.glb"
+      ],
+      "footprint": [
+        9,
+        9
+      ],
+      "height": 10,
+      "category": "tree"
+    },
+    {
+      "id": "cypress",
+      "label": "Zypresse",
+      "lods": [
+        "res://assets/world_expansion/vegetation/cypress_lod0.glb",
+        "res://assets/world_expansion/vegetation/cypress_lod1.glb",
+        "res://assets/world_expansion/vegetation/cypress_lod2.glb"
+      ],
+      "footprint": [
+        4,
+        4
+      ],
+      "height": 10,
+      "category": "tree"
+    },
+    {
+      "id": "laurel",
+      "label": "Lorbeergebüsch",
+      "lods": [
+        "res://assets/world_expansion/vegetation/laurel_lod0.glb",
+        "res://assets/world_expansion/vegetation/laurel_lod1.glb",
+        "res://assets/world_expansion/vegetation/laurel_lod2.glb"
+      ],
+      "footprint": [
+        3,
+        3
+      ],
+      "height": 2,
+      "category": "shrub"
+    }
+  ],
+  "settlements": [
+    {
+      "id": "village",
+      "label": "Dorf · 48 Gebäude",
+      "count": 48,
+      "spacing": 26,
+      "seed": 1901
+    },
+    {
+      "id": "town",
+      "label": "Marktstadt · 256 Gebäude",
+      "count": 256,
+      "spacing": 26,
+      "seed": 1902
+    },
+    {
+      "id": "city",
+      "label": "Großstadt · 1.024 Gebäude",
+      "count": 1024,
+      "spacing": 26,
+      "seed": 1903
+    },
+    {
+      "id": "capital",
+      "label": "Residenzstadt · 4.000 Gebäude",
+      "count": 4000,
+      "spacing": 26,
+      "seed": 1904
+    }
+  ],
+  "services": [
+    {
+      "id": "bakery",
+      "label": "Bäckerei",
+      "building": "taberna",
+      "goods": [
+        "bread",
+        "grain"
+      ]
+    },
+    {
+      "id": "tavern",
+      "label": "Schenke",
+      "building": "taberna",
+      "goods": [
+        "water",
+        "food"
+      ]
+    },
+    {
+      "id": "smith",
+      "label": "Schmiede",
+      "building": "taberna",
+      "goods": [
+        "tools",
+        "equipment"
+      ]
+    },
+    {
+      "id": "potter",
+      "label": "Töpferei",
+      "building": "taberna",
+      "goods": [
+        "pottery",
+        "amphorae"
+      ]
+    },
+    {
+      "id": "weaver",
+      "label": "Weberei",
+      "building": "taberna",
+      "goods": [
+        "cloth",
+        "clothing"
+      ]
+    },
+    {
+      "id": "grain",
+      "label": "Getreidehandel",
+      "building": "taberna",
+      "goods": [
+        "grain"
+      ]
+    },
+    {
+      "id": "stables",
+      "label": "Pferdehandel / Stall",
+      "building": "taberna",
+      "goods": [
+        "horses"
+      ]
+    },
+    {
+      "id": "warehouse",
+      "label": "Warenlager",
+      "building": "taberna",
+      "goods": [
+        "wood",
+        "stone",
+        "grain"
+      ]
+    }
+  ],
+  "service_scope": "Anschlussdaten für die vorhandene Handelsarbeit; keine neuen Käufe oder Missionen in diesem Assetpaket.",
+  "regions": [
+    {
+      "id": "valley_village",
+      "label": "Tal-Dorf",
+      "settlement": "village",
+      "position": [
+        0,
+        0
+      ],
+      "government_seat": false
+    },
+    {
+      "id": "river_town",
+      "label": "Fluss-Marktstadt",
+      "settlement": "town",
+      "position": [
+        1800,
+        600
+      ],
+      "government_seat": false
+    },
+    {
+      "id": "coast_city",
+      "label": "Hafenstadt",
+      "settlement": "city",
+      "position": [
+        4200,
+        -1000
+      ],
+      "government_seat": false
+    },
+    {
+      "id": "capital_west",
+      "label": "Westliche Residenz",
+      "settlement": "capital",
+      "position": [
+        -2800,
+        1400
+      ],
+      "government_seat": true
+    },
+    {
+      "id": "capital_east",
+      "label": "Östliche Residenz",
+      "settlement": "capital",
+      "position": [
+        5600,
+        3300
+      ],
+      "government_seat": true
+    }
+  ],
+  "trade_routes": [
+    {
+      "id": "valley_river",
+      "from": "valley_village",
+      "to": "river_town",
+      "waypoints": [
+        [
+          0,
+          0
+        ],
+        [
+          550,
+          220
+        ],
+        [
+          1100,
+          250
+        ],
+        [
+          1800,
+          600
+        ]
+      ],
+      "goods": [
+        "grain",
+        "pottery"
+      ]
+    },
+    {
+      "id": "river_coast",
+      "from": "river_town",
+      "to": "coast_city",
+      "waypoints": [
+        [
+          1800,
+          600
+        ],
+        [
+          2700,
+          300
+        ],
+        [
+          3400,
+          -400
+        ],
+        [
+          4200,
+          -1000
+        ]
+      ],
+      "goods": [
+        "grain",
+        "cloth",
+        "tools"
+      ]
+    },
+    {
+      "id": "western_road",
+      "from": "capital_west",
+      "to": "valley_village",
+      "waypoints": [
+        [
+          -2800,
+          1400
+        ],
+        [
+          -1800,
+          1100
+        ],
+        [
+          -800,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "goods": [
+        "wood",
+        "stone",
+        "equipment"
+      ]
+    },
+    {
+      "id": "eastern_road",
+      "from": "river_town",
+      "to": "capital_east",
+      "waypoints": [
+        [
+          1800,
+          600
+        ],
+        [
+          2900,
+          1300
+        ],
+        [
+          4000,
+          2300
+        ],
+        [
+          5600,
+          3300
+        ]
+      ],
+      "goods": [
+        "food",
+        "horses",
+        "cloth"
+      ]
+    },
+    {
+      "id": "coastal_road",
+      "from": "coast_city",
+      "to": "capital_east",
+      "waypoints": [
+        [
+          4200,
+          -1000
+        ],
+        [
+          4500,
+          400
+        ],
+        [
+          5000,
+          1900
+        ],
+        [
+          5600,
+          3300
+        ]
+      ],
+      "goods": [
+        "pottery",
+        "grain"
+      ]
+    }
+  ],
+  "region_scope": "Fiktiver Produktionsatlas, keine historische Ortsrekonstruktion; Regierungssitze ohne zusätzliche Story-/Kaiserfestlegung.",
+  "wind_vertex_colors": {
+    "R": "branch bend weight; rooted vertices zero",
+    "G": "leaf flutter weight; bark zero",
+    "B": "stable phase per leaf",
+    "A": "1.0"
+  }
+}
