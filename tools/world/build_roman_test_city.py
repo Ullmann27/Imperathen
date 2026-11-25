@@ -435,6 +435,7 @@ def dome(m,cx,cy,base,radius,h,mat,segments=32,rings=8):
 def basilica():
     m=Mesh('basilica');w,d=62,32
     m.box((0,0,.3),(65,35,.6),STONE)
+    for step in range(4):m.box((0,-19.4+step*.55,(step+1)*.075),(65,.60,(step+1)*.15),STONE)
     for y in (-16,16):
         for i in range(9):m.arch(-28+i*7,y,.6,4.6,7.2,1,pier=1.1)
     for x in (-31,31):
@@ -453,7 +454,8 @@ def basilica():
 
 def baths():
     m=Mesh('thermae')
-    m.box((0,0,.25),(78,68,.5),PAVING)
+    m.box((0,-2,.25),(78,80,.5),PAVING)
+    for step in range(3):m.box((0,39.6-step*.6,(step+1)/12),(76,.65,(step+1)/6),STONE)
     for y in (-12,12):
         for x in (-18,-6,6,18):m.arch(x,y,.5,8,14.5,1.5,pier=2,mat=BRICK)
     for x in (-24,24):
@@ -522,6 +524,47 @@ def craft_shop(kind):
     return m
 
 
+def canopy(m,cx,cy,cz,rx,ry,rz,phase=0):
+    saved=m.physical;m.physical=False
+    rings=6;segments=12
+    def point(j,i):
+        phi=-math.pi*.5+j*math.pi/rings;theta=i*TAU/segments
+        ripple=1+.09*math.sin(theta*3+phi*5+phase)+.055*math.sin(theta*7-phi*3)
+        return (cx+rx*max(.001,math.cos(phi))*math.cos(theta)*ripple,
+                cy+ry*max(.001,math.cos(phi))*math.sin(theta)*ripple,
+                cz+rz*math.sin(phi)*ripple)
+    for j in range(rings):
+        for i in range(segments):
+            m.face([point(j,i),point(j,i+1),point(j+1,i+1),point(j+1,i)],LEAF,True)
+    m.physical=saved
+
+
+def clutter(kind):
+    m=Mesh('street_clutter_'+str(kind),False)
+    if kind==0:
+        for i in range(3):
+            x=-1.0+i*.65
+            m.cylinder((x,0,.44),.25,.72,CLAY,10,r_top=.15)
+            m.cylinder((x,0,.87),.09,.16,CLAY,10)
+            m.beam((x+.12,0,.8),(x+.29,0,.58),.035,CLAY)
+        m.box((.85,.2,.35),(.8,.7,.7),WOOD)
+        for z in (.12,.55):m.box((.85,-.16,z),(.9,.08,.08),BRONZE)
+    elif kind==1:
+        m.cylinder((0,0,.4),.65,.8,CLAY,12,r_top=.78)
+        m.cylinder((0,0,.83),.69,.08,GARDEN,12)
+        m.beam((0,0,.8),(.1,0,2.5),.10,WOOD,7)
+        canopy(m,.1,0,2.6,1.0,.8,1.15,.4)
+        for x in (-1.4,1.35):
+            m.cylinder((x,.1,.48),.35,.9,WOOD,12,r_top=.32)
+            for z in (.15,.78):m.cylinder((x,.1,z),.36,.055,BRONZE,12)
+    else:
+        for x in (-1,1):m.box((x,0,.35),(.25,.55,.7),STONE)
+        m.box((0,0,.77),(2.7,.7,.2),MARBLE)
+        m.box((1.8,.1,.38),(.6,.6,.75),WOOD)
+        for i in range(4):m.cylinder((1.8,.1,.86+i*.14),.28,.12,OCHRE,10,r_top=.24)
+    return m
+
+
 def tree(pine=False):
     m=Mesh('pine' if pine else 'cypress',False)
     if not pine:
@@ -533,8 +576,8 @@ def tree(pine=False):
         for i in range(7):
             a=i*TAU/7;end=(math.cos(a)*3.5,math.sin(a)*3.5,9+(i%2)*.8)
             m.beam((.3,0,5.2),end,.17,WOOD)
-            m.cylinder((end[0],end[1],end[2]+.1),2.8,2.5,LEAF,10,r_top=1.8)
-        m.cylinder((0,0,10),3.6,2.3,LEAF,12,r_top=1.6)
+            canopy(m,end[0],end[1],end[2]+.1,2.8,2.6,1.45,i*.7)
+        canopy(m,0,0,10,3.6,3.4,1.5,.3)
     return m
 
 
@@ -596,10 +639,11 @@ def amphitheatre():
                 p2=(x1*math.cos(b),y1*math.sin(b),z0);p3=(x1*math.cos(a),y1*math.sin(a),z0)
                 m.face([p0,p1,p2,p3],MARBLE)
                 m.face([p3,p2,(p2[0],p2[1],z1),(p3[0],p3[1],z1)],STONE)
-        a=(sector+.015)*TAU/8
-        for j in range(72):
-            q=j/72
-            m.box(((39+q*45)*math.cos(a),(24+q*44)*math.sin(a),1.75+j*.46),(1.35,1.2,.46),STONE,a)
+        a=sector*TAU/8
+        rise=35.12/170
+        for j in range(170):
+            q=(j-10)/160
+            m.box(((39+q*45)*math.cos(a),(24+q*44)*math.sin(a),(j+.5)*rise),(.65,.95,rise),STONE,a)
         key='cavea_'+str(sector);install(key,m);put(key,m.name,181,42,category='amphitheatre',era=80)
     m=Mesh('Colosseum_Arena')
     m.face([(38*math.cos(i*TAU/96),23*math.sin(i*TAU/96),.08) for i in range(96)],SAND)
@@ -678,7 +722,9 @@ def populate():
         for build in range(3):install('stall%d%d'%(kind,build),stall(kind,build))
     for key,fn in [('basilica',basilica),('baths',baths),('portico',portico),('fountain',fountain),
                    ('cypress',lambda:tree(False)),('pine',lambda:tree(True))]:install(key,fn())
-    for kind in range(3):install('craft'+str(kind),craft_shop(kind))
+    for kind in range(3):
+        install('craft'+str(kind),craft_shop(kind))
+        install('clutter'+str(kind),clutter(kind))
     excluded=[(-91,-52,72,145),(75,-47,288,132),(-260,80,-165,171),(-20,196,327,225),(-420,-80,420,-50),(-113,-330,-88,330)]
     candidates=[]
     for row in range(16):
@@ -692,9 +738,19 @@ def populate():
     kinds=['insula','domus','artisan','atrium','villa']
     for index,(x,y,row,col) in enumerate(candidates[:240]):
         kind=kinds[(index*3+row)%5];key=kind+str((row*7+col)%3)
-        put(key,'Residential_%03d_%s'%(index+1,kind),x+RNG.uniform(-.65,.65),y+RNG.uniform(-.45,.45),
+        front_extent={'insula':12,'domus':15.5,'artisan':10,'atrium':14,'villa':15.5}[kind]
+        sign=1 if row%2 else -1
+        offset=sign*(16.5-front_extent)
+        put(key,'Residential_%03d_%s'%(index+1,kind),x+RNG.uniform(-.35,.35),y+offset+RNG.uniform(-.15,.15),
             angle=math.pi if row%2 else 0,category='residential')
         m.box((x,y,.035),(34,39,.07),PAVING)
+        m.physical=False
+        m.box((x,y,.079),(29.8,32.8,.028),GROUND)
+        m.physical=True
+        for side in (-1,1):m.box((x+side*14.8,y,.43),(.3,31.8,.75),STONE)
+        m.box((x,y-sign*15.9,.43),(29.9,.3,.75),STONE)
+        m.physical=True
+        if index%2==0:put('clutter'+str(index%3),'Street_Detail_%03d'%index,x+9,y+sign*15.2,angle=math.pi if row%2 else 0,category='street_detail')
         if index%11==0:put('cypress','Courtyard_Tree_'+str(index),x+14.5,y+12,scale=.55,category='vegetation')
     install('residential_roads',m);put('residential_roads','Residential_Roads',0,0,category='road')
     for n in range(63):
@@ -726,7 +782,7 @@ def set_camera(camera,position,target,lens=40):
 
 def preview_setup():
     scene=bpy.context.scene
-    scene.render.engine='CYCLES';scene.cycles.samples=20;scene.cycles.use_denoising=True
+    scene.render.engine='CYCLES';scene.cycles.samples=20;scene.cycles.use_denoising=False
     scene.render.threads_mode='FIXED';scene.render.threads=2
     scene.render.resolution_x=1600;scene.render.resolution_y=1100
     scene.render.resolution_percentage=100;scene.render.image_settings.file_format='PNG'
@@ -811,12 +867,14 @@ def main():
     bpy.ops.wm.save_as_mainfile(filepath=str(out/'imperathen_roman_test_city.blend'),compress=True)
     selected_export(CITY,out/'imperathen_roman_test_city.glb')
     selected_export(COLLISION,out/'roman_city_collision.glb',False)
+    COLLISION.hide_viewport=True
+    bpy.ops.wm.save_as_mainfile(filepath=str(out/'imperathen_roman_test_city.blend'),compress=True)
     manifest['verification']['gltf_export']='completed'
     if args.render:
         views=[('city_overview',(700,-900,650),(0,15,0),43),
                ('forum_street',(0,-24,1.45),(0,55,7),24),
                ('colosseum_close',(330,-113,65),(181,42,21),38),
-               ('residential_street',(-340,-116,1.45),(-280,-116,4),25)]
+               ('residential_street',(-340,-155.5,1.45),(-280,-155.5,3),28)]
         for name,pos,target,lens in views:
             set_camera(camera,pos,target,lens);scene.render.filepath=str(out/(name+'.png'))
             bpy.ops.render.render(write_still=True)
