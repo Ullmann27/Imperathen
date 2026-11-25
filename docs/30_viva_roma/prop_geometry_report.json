@@ -1,0 +1,138 @@
+{
+  "status": "generated_and_numeric_geometry_checks_passed",
+  "models": [
+    {
+      "kind": "helmet",
+      "lod": 0,
+      "triangles": 21524,
+      "vertices": 12612,
+      "bounds": [
+        [
+          -0.12263129995511533,
+          -0.125,
+          -0.12618285714285715
+        ],
+        [
+          0.12263129995511533,
+          0.22599999925977968,
+          0.177
+        ]
+      ],
+      "bytes": 868628,
+      "materials": 4
+    },
+    {
+      "kind": "helmet",
+      "lod": 1,
+      "triangles": 9908,
+      "vertices": 6062,
+      "bounds": [
+        [
+          -0.12263129995511533,
+          -0.125,
+          -0.12618285714285715
+        ],
+        [
+          0.12263129995511533,
+          0.22599999925977968,
+          0.177
+        ]
+      ],
+      "bytes": 414832,
+      "materials": 4
+    },
+    {
+      "kind": "helmet",
+      "lod": 2,
+      "triangles": 4652,
+      "vertices": 3066,
+      "bounds": [
+        [
+          -0.12263129995511533,
+          -0.125,
+          -0.12618285714285715
+        ],
+        [
+          0.12263129995511533,
+          0.22599999925977968,
+          0.177
+        ]
+      ],
+      "bytes": 207932,
+      "materials": 4
+    },
+    {
+      "kind": "portal",
+      "lod": 0,
+      "triangles": 7984,
+      "vertices": 11178,
+      "bounds": [
+        [
+          -1.16,
+          0,
+          -0.22200000000000003
+        ],
+        [
+          1.16,
+          3.01,
+          0.318
+        ]
+      ],
+      "bytes": 638184,
+      "materials": 5
+    },
+    {
+      "kind": "portal",
+      "lod": 1,
+      "triangles": 4320,
+      "vertices": 6546,
+      "bounds": [
+        [
+          -1.16,
+          0,
+          -0.22200000000000003
+        ],
+        [
+          1.16,
+          3.01,
+          0.318
+        ]
+      ],
+      "bytes": 371868,
+      "materials": 5
+    },
+    {
+      "kind": "portal",
+      "lod": 2,
+      "triangles": 2976,
+      "vertices": 4746,
+      "bounds": [
+        [
+          -1.16,
+          0,
+          -0.22200000000000003
+        ],
+        [
+          1.16,
+          3.01,
+          0.318
+        ]
+      ],
+      "bytes": 269328,
+      "materials": 5
+    }
+  ],
+  "checks": [
+    "finite positions",
+    "unit normals",
+    "attribute counts",
+    "nondegenerate indexed triangles",
+    "descending LOD triangle counts"
+  ],
+  "not_run": [
+    "Blender import and render",
+    "Godot import",
+    "historical review",
+    "fit to animated actor"
+  ]
+}
