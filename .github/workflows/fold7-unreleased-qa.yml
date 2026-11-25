@@ -60,6 +60,48 @@ jobs:
           cp "$RUNNER_TEMP/city/city_manifest.json" prototype/assets/world/roman_city_manifest.json
           python3 tools/world/check_city_release_assets.py --prototype prototype \
             --output artifacts/qa/asset-audit.json
+      - name: Stage the user's original Meshy boy only from a private verified source
+        shell: bash
+        env:
+          PRIVATE_MESHY_YOUTH_GLB_URL: ${{ secrets.IMPERATHEN_PRIVATE_MESHY_YOUTH_GLB_URL }}
+        run: |
+          set -euo pipefail
+          # Never write the short-lived signed URL, its query, or the unmodified
+          # user-owned Meshy source file to public git history or QA artifacts.
+          if [[ -z "${PRIVATE_MESHY_YOUTH_GLB_URL:-}" ]]; then
+            printf '%s\n' '{"status":"NOT_STAGED","task_id":"b6856033-bc9f-44fe-af12-e9843f161aed","original_youth_active":false,"reason":"Private Meshy source URL secret not supplied"}' \
+              > artifacts/qa/original-youth-status.json
+            echo "IMPERATHEN_ORIGINAL_YOUTH_NOT_STAGED: QA will display an explicit fallback warning"
+          else
+            SOURCE="$RUNNER_TEMP/imperathen-original-meshy-youth.glb"
+            curl --fail --location --silent --show-error --retry 3 \
+              --output "$SOURCE" "$PRIVATE_MESHY_YOUTH_GLB_URL"
+            test -s "$SOURCE"
+            # The Blender script is specifically authored for this exact
+            # texturised Meshy task and fails closed on unexpected sword/skin
+            # topology. Never substitute a generic or concept-board child.
+            blender -b -t 2 --python-exit-code 1 \
+              --python tools/characters/build_meshy_player.py -- \
+              --source "$SOURCE" > artifacts/qa/mesh-original-youth-build.log 2>&1
+            grep -q YOUTH_BUILT artifacts/qa/mesh-original-youth-build.log
+            PYTHONPATH=tools/art python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from inspect_meshy_glb import inspect_glb
+          paths = [Path(f'prototype/assets/characters/hero_meshy_italia_{i}.glb') for i in range(4)]
+          reports = [inspect_glb(p) for p in paths]
+          for i, report in enumerate(reports):
+              if not report.get('character_rig_gate'):
+                  raise SystemExit(f'Hero LOD {i} failed rig+skin+animation gate')
+          receipt = json.loads(Path('docs/28_city_sandbox/youth-build.json').read_text())
+          if receipt.get('task_id') != 'b6856033-bc9f-44fe-af12-e9843f161aed':
+              raise SystemExit('Original Meshy youth task does not match the confirmed user identity')
+          output = {'status':'STAGED_QA_ONLY','task_id':receipt['task_id'],
+                    'original_youth_active_in_source':True,'source_sha256':receipt['source_sha256'],
+                    'lods':receipt['lods'],'limits':receipt.get('limits',[])}
+          Path('artifacts/qa/original-youth-status.json').write_text(json.dumps(output,indent=2))
+          PY
+          fi
       - name: Download matching Godot and Android templates with SHA512 verification
         shell: bash
         run: |
