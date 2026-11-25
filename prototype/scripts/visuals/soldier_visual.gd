@@ -2,6 +2,7 @@ extends Node3D
 ## A presentation-only soldier. The simulation owns movement, timing and casualties.
 
 const ROLES := ["heavy", "spear", "archer", "officer"]
+const AuthoredGround := preload("res://scripts/visuals/authored_ground.gd")
 const LODS := ["near", "mid", "far"]
 const LOOPING := ["idle", "march", "run", "block", "wall", "testudo", "retreat"]
 const ALIASES := {"walk": "march", "fall": "death", "shield_wall": "wall", "bow": "shoot"}
@@ -141,7 +142,12 @@ func _replace_body() -> void:
 		_body = instance
 		_apply_tint(instance)
 	else:
-		_body = _body_scene().instantiate() as Node3D
+		var scene := _body_scene()
+		_body = scene.instantiate() as Node3D
+		# Frontier replacements stand on soles above their origin; lower the
+		# whole model by the authored lift (bones and clips are unchanged).
+		if scene.resource_path.begins_with("res://assets/characters/frontier_"):
+			_body.position.y = -AuthoredGround.sole_lift(scene.resource_path, _body) * _body.scale.y
 		player = _body.find_child("AnimationPlayer", true, false) as AnimationPlayer
 		if player:
 			for animation_name: StringName in player.get_animation_list():
