@@ -537,6 +537,17 @@ func _physics_process(delta: float) -> void:
 		teleport(State.SPAWN)
 	var actual := (player.position-previous_position)/maxf(delta,0.000001)
 	figure.drive(Vector2(actual.x,actual.z).length(),angle_difference(previous_yaw,figure.rotation.y)/maxf(delta,0.000001))
+	# The collider bottom is the nominal walking plane. Check the actual
+	# authored ground below the player, but never pull a falling actor down.
+	figure.youth_ground_floor_y=INF
+	if player.is_on_floor() or absf(player.velocity.y)<.001:
+		var nominal := player.global_position.y-SOLE_OFFSET
+		var query := PhysicsRayQueryParameters3D.create(player.global_position,player.global_position+Vector3.DOWN*1.2,1,[player.get_rid()])
+		var floor_hit := get_world_3d().direct_space_state.intersect_ray(query)
+		if not floor_hit.is_empty() and (floor_hit.normal as Vector3).y>=cos(player.floor_max_angle) and absf(float(floor_hit.position.y)-nominal)<.15:
+			figure.youth_ground_floor_y=float(floor_hit.position.y)
+		else:
+			figure.youth_ground_floor_y=nominal
 	_place_camera(delta)
 
 func _step_up(motion: Vector3) -> bool:
@@ -723,6 +734,7 @@ func teleport(point: Vector3) -> void:
 		return
 	player.position = point
 	player.velocity = Vector3.ZERO
+	figure.youth_ground_floor_y=INF
 	figure.reset_motion()
 	_action_left = 0
 	_camera_previous = Vector3.INF

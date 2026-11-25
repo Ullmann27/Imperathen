@@ -9,6 +9,7 @@ on:
       - 'tools/world/**'
       - 'tools/characters/stage_original_youth.py'
       - 'tools/characters/retarget_accad_youth.py'
+      - 'tools/characters/youth_skin_polish.py'
       - 'docs/28_city_sandbox/original-youth-runtime.json'
       - 'tools/build_android_prototype.py'
       - 'tools/check_prototype.py'

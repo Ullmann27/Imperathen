@@ -92,6 +92,28 @@ func _run() -> void:
 				for joint in first.size():
 					seam=maxf(seam,first[joint].origin.distance_to(last[joint].origin))
 				_check(seam<0.03,"Closed gait cycle "+action)
+		# Evaluate the actual skinned sandals after a known floor correction.
+		# The renderer must not change the CharacterBody or erase run flight.
+		var skin_review: Dictionary = proof.lods[level].get("surface_review",{})
+		_check(int(skin_review.get("pose_samples",0))>0,"Actual surface-edge audit present at LOD %d"%level)
+		_check(not actor._youth_soles.samples.is_empty(),"Real skinned sole samples at LOD %d"%level)
+		for action: String in ["idle","march","run","block"]:
+			for f in [0.0,.25,.5,.75]:
+				actor.sample_pose(action,f)
+				var lowest: float=actor._youth_soles.measure_lowest()
+				_check(is_finite(lowest),"Finite rendered sole "+action)
+				if not is_finite(lowest):
+					continue
+				var airborne: float=actor._youth_soles.clearance(action,f)
+				var root_position := actor.global_position
+				# Deliberately offset the support plane by 3 cm to exercise
+				# the corrective path independently of the clip's baseline.
+				var ground := lowest-.03-airborne
+				actor._youth_soles.apply_to_floor(ground,action,f)
+				_check(absf(actor._youth_soles.measure_lowest()-(ground+.003+airborne))<.002,"Sole target including recorded flight "+action)
+				_check(actor.global_position.is_equal_approx(root_position),"Sole correction does not move actor root")
+				actor._motion.skeleton.force_update_all_bone_transforms()
+				_sample(actor._motion.skeleton)
 	_check(max_segment_error<=0.005,"Unchanged anatomical joint lengths")
 	actor.free()
 	print("YOUTH_MOCAP_RUNTIME_RESULT "+JSON.stringify({"checks":checks,"failures":failures,"max_segment_error_m":max_segment_error,"visual_quality_approved":false,"physical_fold7":false}))

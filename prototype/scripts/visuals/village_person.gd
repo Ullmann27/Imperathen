@@ -8,6 +8,7 @@ const COMPANIONS := {"italia":"marcus","germania":"albrun","han":"lin","wa":"aki
 const LOOPS := ["idle","march","run","talk","work"]
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
+const YouthSoleContact := preload("res://scripts/visuals/youth_sole_contact.gd")
 const HandPose := preload("res://scripts/visuals/hand_pose.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
@@ -67,6 +68,8 @@ var _service_gear := false
 var _service_nodes: Array[Node3D] = []
 var _service_external := false
 var _motion_identity := ""
+var youth_ground_floor_y := INF
+var _youth_soles := YouthSoleContact.new()
 
 
 func _ready() -> void:
@@ -253,6 +256,7 @@ func _reload(level: int) -> void:
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
 	_motion.bind(body, civilian_motion and not imported_youth, identity)
+	_youth_soles.bind(body if imported_youth else null,detail)
 	_motion_identity = identity
 	_motion.restore_world_contacts(contacts)
 	# The external tracks target this authored hero family. Never reuse them
@@ -462,6 +466,7 @@ func sample_combat(technique: String, normalized: float) -> void:
 	_sample_combat_pose(technique, _combat_progress)
 	_hands.set_grip(0.18 + 0.82 * smoothstep(0.0, 0.15, _combat_progress) * (1.0 - smoothstep(0.82, 1.0, _combat_progress)))
 	_face.pose("attack", _combat_progress, detail)
+	_ground_youth()
 
 
 func cue_combat(technique: String, duration: float) -> void:
@@ -798,8 +803,11 @@ func _process(delta: float) -> void:
 			_face.advance(delta, "attack", detail)
 			if _combat_progress >= 1.0:
 				cancel_action()
+		_ground_youth()
 		return
-	if _posed or _service_external: return
+	if _posed or _service_external:
+		_ground_youth()
+		return
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)
 		if _remaining <= 0 and not (_conversation_focused and clip == "talk"):
@@ -817,10 +825,21 @@ func _process(delta: float) -> void:
 			phase = animator.current_animation_position / animator.current_animation_length
 	_apply_motion()
 	_plant_contacts(delta)
+	_ground_youth()
 	_face.advance(delta,clip,detail)
 
 
+func _ground_youth() -> void:
+	if _uses_youth_mocap() and is_finite(youth_ground_floor_y):
+		_youth_soles.apply_to_floor(youth_ground_floor_y,clip,phase)
+
+
 func _plant_contacts(delta: float) -> void:
+	# The recorded defensive step already includes its own foot placement.
+	# Do not lock both ankles through a captured guard or flatten toe roll.
+	if _uses_youth_mocap() and clip=="block":
+		_motion.reset_world_contacts()
+		return
 	var stance := 0.40 if clip == "run" else 0.58
 	if _motion.civilian:
 		stance = 0.32 if clip == "run" else 0.53

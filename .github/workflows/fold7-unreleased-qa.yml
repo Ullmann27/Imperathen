@@ -5,6 +5,8 @@ on:
   pull_request:
     paths:
       - 'tools/build_unreleased_city_qa.py'
+      - 'tools/characters/youth_skin_polish.py'
+      - 'tools/characters/retarget_accad_youth.py'
       - '.github/workflows/fold7-unreleased-qa.yml'
       - 'prototype/**'
 

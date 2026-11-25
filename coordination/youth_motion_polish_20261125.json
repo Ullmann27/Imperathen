@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "source": "User screenshots 73391, 73397, 73399, 73401: floating sandal soles and extreme garment deformation during guard",
+  "base": "ff7df9bc4ca00fc129f6c564217152abbfa15467",
+  "changes": [
+    "Retarget ankle/toe roll with captured lateral orientation",
+    "Sample actual visible sole vertices and align visual pelvis to physical floor, preserving recorded run clearance",
+    "Audit real deformed edges in each captured action; repair only evidenced central lower garment arm weight contamination and reject worsened deformation",
+    "Retain all source positions, triangle topology, textures and inverse bind matrices"
+  ],
+  "limits": [
+    "No raw private Meshy archive or local Godot/Blender access in chat runtime",
+    "Real model export, regression and on-device visual review pending",
+    "Surface repair is conditional on measured improvement; unresolved deformation is reported, not waived",
+    "No new cloth physics simulation or verified independent finger articulation"
+  ]
+}
