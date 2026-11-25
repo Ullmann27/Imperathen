@@ -6,6 +6,7 @@ const State := preload("res://scripts/world/city_exploration_state.gd")
 const CameraObstruction := preload("res://scripts/world/camera_obstruction.gd")
 const CityDetailAdapter := preload("res://scripts/rendering/city_exploration_detail_adapter.gd")
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
+const VivaAtmosphere := preload("res://scripts/rendering/viva_roma_atmosphere.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
 const TouchAction := preload("res://scripts/ui/touch_action.gd")
@@ -19,6 +20,8 @@ const WALK_SPEED := 1.45
 const RUN_SPEED := 3.8
 var profile := "balanced"
 var persist := true
+# Review toggle: keep an exact legacy light/ground path for comparison.
+var viva_visuals := true
 var save_path := State.PATH
 var paused := false
 var player := CharacterBody3D.new()
@@ -74,7 +77,7 @@ func _build_ground() -> void:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = Color("777d55")
 	material.roughness = 0.96
-	ground.material_override = material
+	ground.material_override = VivaAtmosphere.ground_material(profile) if viva_visuals else material
 	ground.position.y = -0.025
 	add_child(ground)
 	_box_collision(self,Vector3(1400,0.2,1400),Vector3(0,-0.125,0))
@@ -84,6 +87,8 @@ func _build_ground() -> void:
 	sun.light_energy = 1.05
 	sun.shadow_enabled = profile!="low"
 	sun.directional_shadow_max_distance = 90.0
+	if viva_visuals:
+		VivaAtmosphere.configure_sun(sun, profile)
 	add_child(sun)
 
 func _scene(path: String) -> Node3D:
@@ -175,7 +180,7 @@ func _build_camera() -> void:
 	environment.fog_enabled = true
 	environment.fog_density = 0.0013
 	environment.fog_light_color = Color("c3c9bf")
-	camera.environment = environment
+	camera.environment = VivaAtmosphere.environment(profile) if viva_visuals else environment
 
 func _read_catalog() -> void:
 	if not FileAccess.file_exists(CATALOG_PATH):
