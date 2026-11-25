@@ -1,0 +1,97 @@
+{
+  "format": "imperathen-city-market-anchors",
+  "version": 1,
+  "authority": "read-only city signage and site survey; NOT active commerce",
+  "source": "tools/world/build_roman_test_city.py",
+  "source_blob_sha": "5c3337882daecb42641e422da1e61f0c1cf61d71",
+  "city_generator_formula": "market n=0..62; x=-385+n*770/62; Blender y=-47 maps to Godot z=47; n%7 kind, (n//7)%3 construction, n//21 size",
+  "trading_contract": "prototype/scripts/city_trade_catalog.gd on feature/city-detail-commerce-support-20261125",
+  "authoritative_commerce_enabled": false,
+  "interact_range_m": 3,
+  "shops": [
+    {
+      "shop_id": "foodstall",
+      "display_label": "Lebensmittel",
+      "catalog_name": "Lebensmittelstand",
+      "stall_index_zero": 28,
+      "stand_node": "Market_29_Type0_Build1_Size1",
+      "authored_kind": 0,
+      "center_godot_m": [
+        -37.258064516,
+        0,
+        47
+      ],
+      "access_note": "Standfront Godot +Z; actual merchant collider and 3-m authority not yet connected"
+    },
+    {
+      "shop_id": "bakery",
+      "display_label": "Bäckerei",
+      "catalog_name": "Bäckerei",
+      "stall_index_zero": 30,
+      "stand_node": "Market_31_Type2_Build1_Size1",
+      "authored_kind": 2,
+      "center_godot_m": [
+        -12.419354839,
+        0,
+        47
+      ],
+      "access_note": "Standfront Godot +Z; actual merchant collider and 3-m authority not yet connected"
+    },
+    {
+      "shop_id": "pottery",
+      "display_label": "Töpferei",
+      "catalog_name": "Töpferei",
+      "stall_index_zero": 31,
+      "stand_node": "Market_32_Type3_Build1_Size1",
+      "authored_kind": 3,
+      "center_godot_m": [
+        0,
+        0,
+        47
+      ],
+      "access_note": "Standfront Godot +Z; actual merchant collider and 3-m authority not yet connected"
+    },
+    {
+      "shop_id": "clothier",
+      "display_label": "Tuchwaren",
+      "catalog_name": "Tuch- und Lederwaren",
+      "stall_index_zero": 32,
+      "stand_node": "Market_33_Type4_Build1_Size1",
+      "authored_kind": 4,
+      "center_godot_m": [
+        12.419354839,
+        0,
+        47
+      ],
+      "access_note": "Standfront Godot +Z; actual merchant collider and 3-m authority not yet connected"
+    },
+    {
+      "shop_id": "armorer",
+      "display_label": "Ausrüster",
+      "catalog_name": "Waffen- und Ausrüstungsschmiede",
+      "stall_index_zero": 33,
+      "stand_node": "Market_34_Type5_Build1_Size1",
+      "authored_kind": 5,
+      "center_godot_m": [
+        24.838709677,
+        0,
+        47
+      ],
+      "access_note": "Standfront Godot +Z; actual merchant collider and 3-m authority not yet connected"
+    },
+    {
+      "shop_id": "thermopolium",
+      "display_label": "Garküche",
+      "catalog_name": "Garküche und Trinkwasser",
+      "stall_index_zero": 34,
+      "stand_node": "Market_35_Type6_Build1_Size1",
+      "authored_kind": 6,
+      "center_godot_m": [
+        37.258064516,
+        0,
+        47
+      ],
+      "access_note": "Standfront Godot +Z; actual merchant collider and 3-m authority not yet connected"
+    }
+  ]
+}
