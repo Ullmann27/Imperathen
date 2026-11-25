@@ -19,7 +19,8 @@ static func install(city: Node3D, profile: String = "balanced") -> Dictionary:
 		return report
 	var requested: Array[String] = []
 	if profile != "low":
-		requested = SHOP_FRONTS.duplicate()
+		for shop: String in SHOP_FRONTS:
+			requested.append(shop)
 		requested.append(ARMORER)
 	var originals: Dictionary = {}
 	for node_name: String in requested:
@@ -45,8 +46,12 @@ static func install(city: Node3D, profile: String = "balanced") -> Dictionary:
 	var level: int = 1 if profile == "balanced" else 0
 	var portal_path := PREFIX + "portal_lod%d.glb" % level
 	var helmet_path := PREFIX + "helmet_lod%d.glb" % level
-	var portal_resource := load(portal_path) as PackedScene if ResourceLoader.exists(portal_path,"PackedScene") else null
-	var helmet_resource := load(helmet_path) as PackedScene if ResourceLoader.exists(helmet_path,"PackedScene") else null
+	var portal_resource: PackedScene = null
+	var helmet_resource: PackedScene = null
+	if ResourceLoader.exists(portal_path,"PackedScene"):
+		portal_resource = load(portal_path) as PackedScene
+	if ResourceLoader.exists(helmet_path,"PackedScene"):
+		helmet_resource = load(helmet_path) as PackedScene
 	if not is_instance_valid(portal_resource) or not is_instance_valid(helmet_resource):
 		report.status = "missing_packed_gltf"
 		return report
