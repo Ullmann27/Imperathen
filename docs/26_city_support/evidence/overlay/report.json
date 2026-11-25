@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "base_commit": "5b5eecad31e395e3ead48b3e631d9f48690480a6",
+  "scope": "Actual modified city script parsed; adapter fixture executed with real GLB and physics. Large city not loaded.",
+  "setup_note": "This sparse checkout contains only required target resources. Initial editor import imported the detail GLB but reported unrelated main-scene dependencies absent; raw setup log retained as import.log. It is not a full-project import success. The required quality_profiles.json was restored before these final isolated tests.",
+  "android_device": false,
+  "results": [
+    {
+      "name": "city_script_parse",
+      "passed": true,
+      "exit_code": 0,
+      "log": "city_script_parse.log"
+    },
+    {
+      "name": "adapter_fixture",
+      "passed": true,
+      "exit_code": 0,
+      "log": "adapter_fixture.log"
+    }
+  ],
+  "sha256": {
+    "prototype/scripts/world/city_exploration.gd": "d395cf60ba2e6acf90ac555385f3fc1df43e84f196550ff2d8e55b6dc57ef2ad",
+    "prototype/scripts/rendering/city_exploration_detail_adapter.gd": "718958bd865fcb442634626231c768034aa98929603914ca7106230ae4818451",
+    "prototype/scripts/rendering/city_architecture_detail.gd": "babbaa93e73036f4d03f47077c4ff0852df45e6661f6bf9bdb6d8792ed8649da",
+    "prototype/tests/city_exploration_detail_adapter_test.gd": "75fe2266511d93175be1af6d8986df19c9e6d84a4b31387d7c8f87f5cfb1039c",
+    "prototype/assets/city_detail/architecture/architecture_manifest.json": "4eabaeba9e508e1cf639ec6f8ca88c136fd0021ca0f9301e5813d6b44566eb91",
+    "prototype/assets/city_detail/architecture/city_architecture_library.glb": "f9fb217e5770dacb198e6ca569b0b0fa5351fc70ec52add93dab07f97a72a638"
+  }
+}
