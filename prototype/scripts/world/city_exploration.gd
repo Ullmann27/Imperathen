@@ -265,6 +265,11 @@ func _build_camera() -> void:
 	camera.fov = 62.0
 	camera.near = 0.08
 	camera.far = 1200.0
+	# Create only the environment actually assigned to this camera. An unused
+	# procedural sky must not allocate renderer resources during VIVA startup.
+	if viva_visuals:
+		camera.environment = VivaAtmosphere.environment(profile)
+		return
 	var environment := Environment.new()
 	var sky := Sky.new()
 	var atmosphere := ProceduralSkyMaterial.new()
@@ -283,7 +288,7 @@ func _build_camera() -> void:
 	environment.fog_enabled = true
 	environment.fog_density = 0.0013
 	environment.fog_light_color = Color("c3c9bf")
-	camera.environment = VivaAtmosphere.environment(profile) if viva_visuals else environment
+	camera.environment = environment
 
 func _read_catalog() -> void:
 	if not FileAccess.file_exists(CATALOG_PATH):
