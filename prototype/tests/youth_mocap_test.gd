@@ -96,6 +96,13 @@ func _run() -> void:
 		# The renderer must not change the CharacterBody or erase run flight.
 		var skin_review: Dictionary = proof.lods[level].get("surface_review",{})
 		_check(int(skin_review.get("pose_samples",0))>0,"Actual surface-edge audit present at LOD %d"%level)
+		var weapon_review: Dictionary=proof.lods[level].get("weapon_review",{})
+		_check(bool(weapon_review.get("separate_weapon_geometry_removed",false)),"Unarmed source has no separate blade geometry")
+		var blade: Node=actor.body.find_child("PracticeBlade",true,false)
+		_check(blade==null or not blade is MeshInstance3D,"No rendered original weapon mesh at LOD %d"%level)
+		_check(actor.animator.has_animation("idle"),"Mesh-calibrated idle is present")
+		var idle_review: Dictionary=proof.lods[level].get("clips",{}).get("idle",{})
+		_check(int(idle_review.get("frames",0))>0 and is_finite(float(idle_review.get("max_two_sole_height_difference_m",INF))),"Actual neutral sole heights are measured")
 		_check(not actor._youth_soles.samples.is_empty(),"Real skinned sole samples at LOD %d"%level)
 		for action: String in ["idle","march","run","block"]:
 			for f in [0.0,.25,.5,.75]:

@@ -48,7 +48,7 @@ func _run() -> void:
 		_check(scene.youth_available and scene.figure.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"),
 			"Exactly the confirmed original Meshy youth rig is loaded as the playable player")
 		var sword: Node = scene.figure.body.find_child("PracticeBlade",true,false)
-		_check(is_instance_valid(sword) and not (sword as Node3D).visible,
+		_check(sword==null or not sword is MeshInstance3D,
 			"Twelve-year-old boy's source sword is removed from visibility until adult equipment authorization")
 	_check(is_instance_valid(scene.camera) and scene.camera.current,
 		"Production third-person camera remains the active world camera")

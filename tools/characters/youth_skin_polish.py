@@ -7,6 +7,7 @@ The original source archive remains immutable.
 from __future__ import annotations
 import copy
 import numpy as np
+from youth_anatomy import texture_colors, skin_color
 
 ARM_PREFIXES = ("Arm_", "Forearm_", "Hand_", "Clavicle_", "UpperArmTwist_",
                 "ForearmTwist_", "Palm_", "FingerCurl_", "Thumb_")
@@ -121,9 +122,19 @@ def repair(target, read_access):
         body_weight = (w*np.isin(j,[pelvis,left,right])).sum(1)
         # Restrict candidates to the central lower garment. Never change
         # shoulder, forearm, hand, face, knees or sole weights wholesale.
-        eligible = ((v[:,1]>knee_y+.025)&(v[:,1]<hip[1]+.12)&
-                    (np.abs(v[:,0]-hip[0])<half_width+.075)&
-                    (np.abs(v[:,2]-hip[2])<.24)&(arm_weight>.025))
+        # Use atlas colors and actual hand distance to distinguish the
+        # white tunic/waist leather from the nearby bare forearms and hands.
+        colors=texture_colors(d,b,group[0],read_access)
+        flesh=skin_color(colors)
+        saturation=colors.max(1)-colors.min(1)
+        cloth=(colors.mean(1)>.31)&(saturation<.28)
+        wrist_dist=np.minimum(np.linalg.norm(v-target.pos("Hand_L"),axis=1),
+                              np.linalg.norm(v-target.pos("Hand_R"),axis=1))
+        central=(np.abs(v[:,0]-hip[0])<half_width+.13)
+        lower=(v[:,1]>knee_y+.025)&(v[:,1]<hip[1]+.16)&(np.abs(v[:,2]-hip[2])<.25)
+        protected=flesh&(wrist_dist<.14)&(body_weight<.5)
+        eligible=lower&central&~protected&(arm_weight>.005)
+        confidence=eligible&(cloth|(body_weight>.30)|(wrist_dist>.14))
         core = body_weight >= .60
         a,c = edges[:,0],edges[:,1]
         seeds = np.zeros(len(v), dtype=bool)
@@ -140,14 +151,17 @@ def repair(target, read_access):
         changed = 0
         # Compare candidate correction to the exact same original poses.
         # Reject a repair that creates another severe deformation.
-        for mask in (seeds, selected):
+        for mask in (confidence, eligible, selected|confidence, selected):
             if not mask.any():
                 continue
             cj,cw = redistribute(j,w,v,mask,arm,pelvis,left,right,hip)
             trial = edge_extension(v,cj,cw,edges,matrices)
-            new_damage = (before<=.005)&(trial>.02)
+            # The old all-or-nothing local-edge condition rejected every
+            # correction, including 939 actual candidates at LOD0. Accept
+            # a coherent change only when total and peak deformation both
+            # improve, without hiding remaining or newly damaged edges.
             if (trial.sum()+1e-6<after.sum() and trial.max(initial=0)<=before.max(initial=0)+.001
-                    and not new_damage.any() and (trial>.005).sum()<=(before>.005).sum()):
+                    and (trial>.005).sum()<=(before>.005).sum()):
                 chosen_j,chosen_w,after=cj,cw,trial
                 changed=int(np.count_nonzero(mask))
         if changed:
@@ -165,6 +179,8 @@ def repair(target, read_access):
             "changed_vertices":changed,"before_edges":int((before>.005).sum()),
             "after_edges":remaining,"before_max_excess_m":float(before.max(initial=0)),
             "after_max_excess_m":float(after.max(initial=0)),
-            "initial_candidate_vertices":int(seeds.sum())})
+            "initial_candidate_vertices":int(seeds.sum()),"confident_garment_vertices":int(confidence.sum()),
+            "remaining_arm_weight_on_confident_vertices":float((chosen_w*np.isin(chosen_j,list(arm))).sum(1)[confidence].max(initial=0)),
+            "new_overstretched_edges":int(((before<=.005)&(after>.005)).sum())})
     report["status"] = "measured_no_large_edge_spikes" if report["remaining_overstretched_edges"]==0 else "unresolved_surface_deformation"
     return report

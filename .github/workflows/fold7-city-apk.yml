@@ -10,6 +10,7 @@ on:
       - 'tools/characters/stage_original_youth.py'
       - 'tools/characters/retarget_accad_youth.py'
       - 'tools/characters/youth_skin_polish.py'
+      - 'tools/characters/youth_anatomy.py'
       - 'docs/28_city_sandbox/original-youth-runtime.json'
       - 'tools/build_android_prototype.py'
       - 'tools/check_prototype.py'
@@ -54,7 +55,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy ffmpeg
+          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy python3-pil ffmpeg
           blender -b --python-expr "import numpy; print('BLENDER_NUMPY_OK',numpy.__version__)"
       - name: Build original city, forum geometry and grounded NPC layout
         shell: bash
@@ -271,7 +272,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy xvfb xauth libgl1-mesa-dri mesa-utils
+          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy python3-pil xvfb xauth libgl1-mesa-dri mesa-utils
           mkdir -p "$RUNNER_TEMP/godot" artifacts/visual prototype/assets/world
           cd "$RUNNER_TEMP/godot"
           base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"

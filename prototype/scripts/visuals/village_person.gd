@@ -837,7 +837,7 @@ func _ground_youth() -> void:
 func _plant_contacts(delta: float) -> void:
 	# The recorded defensive step already includes its own foot placement.
 	# Do not lock both ankles through a captured guard or flatten toe roll.
-	if _uses_youth_mocap() and clip=="block":
+	if _uses_youth_mocap() and clip in ["idle","block"]:
 		_motion.reset_world_contacts()
 		return
 	var stance := 0.40 if clip == "run" else 0.58
