@@ -1,0 +1,79 @@
+name: VIVA ROMA 3D close-up and renderer review
+on:
+  pull_request:
+    paths:
+      - 'tools/viva_roma/**'
+      - 'prototype/assets/viva_roma/**'
+      - 'prototype/scripts/viva_roma/**'
+      - 'prototype/scenes/viva_roma/**'
+      - 'prototype/tests/viva_character_finish_test.gd'
+      - 'prototype/scripts/rendering/city_character_detail.gd'
+      - 'prototype/shaders/world_expansion/vegetation_wind.gdshader'
+      - '.github/workflows/viva-roma-closeup.yml'
+permissions:
+  contents: read
+jobs:
+  asset-bytes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Rebuild and compare all six actual GLBs
+        run: |
+          set -euo pipefail
+          node tools/viva_roma/generate_props.mjs "$RUNNER_TEMP/viva-props"
+          for f in prototype/assets/viva_roma/props/*.glb; do cmp "$f" "$RUNNER_TEMP/viva-props/$(basename "$f")"; done
+  renderers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Official engine and software rendering environment
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y xvfb xauth mesa-vulkan-drivers libvulkan1
+          mkdir -p "$RUNNER_TEMP/godot"; cd "$RUNNER_TEMP/godot"
+          release="https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable"
+          archive="Godot_v4.7.2-stable_linux.x86_64.zip"
+          curl --fail --location --retry 3 "$release/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$release/$archive" -o "$archive"
+          python3 - <<'PY'
+          import hashlib,pathlib,zipfile
+          p=pathlib.Path("Godot_v4.7.2-stable_linux.x86_64.zip")
+          sums={s.split()[-1].lstrip("*"):s.split()[0] for s in pathlib.Path("SHA512-SUMS.txt").read_text().splitlines() if s.strip()}
+          with p.open("rb") as f: assert hashlib.file_digest(f,"sha512").hexdigest()==sums[p.name]
+          with zipfile.ZipFile(p) as z:z.extractall()
+          PY
+          chmod +x Godot_v4.7.2-stable_linux.x86_64
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Isolated real asset import and character material regression
+        run: |
+          set -euo pipefail
+          mkdir -p viva-closeup-evidence
+          git rev-parse HEAD > viva-closeup-evidence/commit.txt
+          python3 tools/viva_roma/prepare_fixture.py "$RUNNER_TEMP/viva-fixture"
+          "$GODOT_BIN" --headless --path "$RUNNER_TEMP/viva-fixture" --import --quit 2>&1 | tee viva-closeup-evidence/import.log
+          "$GODOT_BIN" --headless --path "$RUNNER_TEMP/viva-fixture" --quit-after 180 --script res://tests/viva_character_finish_test.gd 2>&1 | tee viva-closeup-evidence/character.log
+          grep -q 'VIVA_CHARACTER_FINISH_PASS' viva-closeup-evidence/character.log
+          "$GODOT_BIN" --headless --path "$RUNNER_TEMP/viva-fixture" --quit-after 180 --script res://tests/city_character_detail_test.gd 2>&1 | tee viva-closeup-evidence/character-existing.log
+          grep -q '0 failures' viva-closeup-evidence/character-existing.log
+      - name: Same 3D scenes on OpenGL and Vulkan Mobile
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s "-screen 0 1440x900x24" python3 tools/viva_roma/compare_renderers.py --godot "$GODOT_BIN" --fixture "$RUNNER_TEMP/viva-fixture" --output viva-closeup-evidence --seconds 4
+      - name: Upload unedited renderer evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: viva-closeup-renderers-${{ github.run_number }}
+          path: viva-closeup-evidence/
+          if-no-files-found: warn
+          retention-days: 14
