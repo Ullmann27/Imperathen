@@ -12,6 +12,7 @@ const CitySurfaceMicrodetail := preload("res://scripts/rendering/city_surface_mi
 const VivaCloseupProps := preload("res://scripts/rendering/city_viva_closeup_props.gd")
 const CityAmbientPeople := preload("res://scripts/world/city_ambient_people.gd")
 const Crowd := preload("res://scripts/world/city_exploration_crowd.gd")
+const CityTraining := preload("res://scripts/world/city_training.gd")
 const VivaAtmosphere := preload("res://scripts/rendering/viva_roma_atmosphere.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
@@ -44,6 +45,7 @@ var city_available := false
 var youth_available := false
 var ambient_people: CityAmbientPeople
 var crowd := Crowd.new()
+var training := CityTraining.new()
 var _crowd_elapsed := 0.0
 var catalog: Array[Dictionary] = []
 var _catalog_nodes: Dictionary = {}
@@ -80,6 +82,7 @@ func _ready() -> void:
 	_load_city()
 	_build_player()
 	_build_camera()
+	add_child(training)
 	_build_ambient_people()
 	crowd.profile = profile
 	if is_instance_valid(ambient_people):
@@ -409,6 +412,7 @@ func _build_ui() -> void:
 	_toolbar.add_theme_constant_override("separation",8)
 	_toolbar.add_child(_button("Stadt",func(): teleport(State.SPAWN)))
 	_toolbar.add_child(_button("Modelle",func(): teleport(CATALOG_ORIGIN+Vector3(0,0.92,12))))
+	_toolbar.add_child(_button("Übung",func(): teleport(Vector3(0,0.92,-5.8))))
 	_toolbar.add_child(_button("Pause",func(): set_paused(not paused)))
 	_safe.add_child(_toolbar)
 	_trade_bar = HBoxContainer.new()
@@ -483,6 +487,15 @@ func _physics_process(delta: float) -> void:
 		_crowd_elapsed = 0.0
 		crowd.tick(player.position)
 	_action_left = maxf(0,_action_left-delta)
+	var combat_event: Dictionary = training.tick(delta)
+	var combat_state: Dictionary = training.state()
+	if bool(combat_event.get("practice",false)):
+		_catalog_status = "Kontrollierter Treffer am Übungspfahl: %d" % int(combat_state.get("practice_hits",0))
+		_update_status()
+	if not str(combat_state.get("technique","")).is_empty():
+		figure.sample_combat(str(combat_state.technique),float(combat_state.progress))
+	elif figure.clip == "jab_right":
+		figure.cancel_action()
 	var axis := _touch_move
 	axis.x += float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))-float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT))
 	axis.y += float(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN))-float(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP))
@@ -654,10 +667,22 @@ func _toggle_pace() -> void:
 func perform_action(action: String) -> void:
 	if paused or market.is_open() or _action_left>0 or action not in ["attack","block"]:
 		return
-	# Preserve measured horizontal momentum until the physics tick brakes.
-	# The visual action starts immediately; gameplay still blocks new inputs.
-	figure.cue(action)
-	_action_left = maxf(0.01,figure._remaining)
+	var response: Dictionary = training.execute_attack(player.position,figure.rotation.y) if action == "attack" else training.execute_block()
+	if not bool(response.get("ok",false)):
+		_catalog_status = str(response.get("message","Kampfübung nicht verfügbar."))
+		_update_status()
+		return
+	# Authoritative action, stamina and hit windows are evaluated inside
+	# CityTraining, not from a cosmetic button or frame-rate-based timer.
+	# Preserve measured velocity: the physics solver brakes over time.
+	if action == "attack":
+		figure.sample_combat("jab_right",0.0)
+		_action_left = float(training.Combat.TECHNIQUES["jab_right"].duration)
+	else:
+		figure.cue("block")
+		_action_left = float(training.state().get("guard_remaining",0.85))
+	_catalog_status = str(response.get("message",""))
+	_update_status()
 
 func set_paused(value: bool) -> void:
 	if market.is_open():
@@ -721,7 +746,9 @@ func _request_leave() -> void:
 		leave_requested.emit()
 
 func _update_status() -> void:
-	var description := "Stadt · Modellpark · Gehen · Rennen · Kampfübungen"
+	var description := "Stadt · Modellpark · Gehen · Rennen · unbewaffnetes Übungstraining"
+	if not training.available:
+		description += " · Trainingspfahl nicht verfügbar"
 	if not city_available:
 		description = "Stadtmodell ist noch nicht importiert."
 	elif not youth_available:
