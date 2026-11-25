@@ -1,0 +1,94 @@
+{
+  "status": "generator_numeric_checks_passed",
+  "resolution": 256,
+  "generated_maps": 21,
+  "materials": [
+    {
+      "id": "iron_worn",
+      "mean_roughness": 0.75,
+      "mean_metallic": 0.841,
+      "max_normal_length_error": 0.00443,
+      "red_range": [
+        99,
+        195
+      ]
+    },
+    {
+      "id": "iron_service",
+      "mean_roughness": 0.4913,
+      "mean_metallic": 0.9157,
+      "max_normal_length_error": 0.00424,
+      "red_range": [
+        118,
+        185
+      ]
+    },
+    {
+      "id": "iron_veteran",
+      "mean_roughness": 0.399,
+      "mean_metallic": 0.8986,
+      "max_normal_length_error": 0.0043,
+      "red_range": [
+        134,
+        212
+      ]
+    },
+    {
+      "id": "iron_honor",
+      "mean_roughness": 0.2723,
+      "mean_metallic": 0.9637,
+      "max_normal_length_error": 0.00413,
+      "red_range": [
+        156,
+        211
+      ]
+    },
+    {
+      "id": "leather_oiled",
+      "mean_roughness": 0.6247,
+      "mean_metallic": 0,
+      "max_normal_length_error": 0.0048,
+      "red_range": [
+        59,
+        113
+      ]
+    },
+    {
+      "id": "oak_worked",
+      "mean_roughness": 0.7936,
+      "mean_metallic": 0,
+      "max_normal_length_error": 0.0045,
+      "red_range": [
+        73,
+        163
+      ]
+    },
+    {
+      "id": "lime_plaster",
+      "mean_roughness": 0.8806,
+      "mean_metallic": 0,
+      "max_normal_length_error": 0.00462,
+      "red_range": [
+        171,
+        237
+      ]
+    }
+  ],
+  "high_resolution_test": {
+    "id": "iron_worn",
+    "resolution": 1024,
+    "mean_roughness": 0.75,
+    "mean_metallic": 0.841,
+    "max_normal_length_error": 0.00517,
+    "red_range": [
+      99,
+      198
+    ]
+  },
+  "not_run": [
+    "Blender",
+    "Godot",
+    "visual inspection",
+    "APK"
+  ]
+}

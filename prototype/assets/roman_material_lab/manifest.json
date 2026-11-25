@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "status": "procedural_review_swatches",
+  "resolution": 256,
+  "production_generator_max": 2048,
+  "maps": {
+    "basecolor": "sRGB",
+    "normal": "linear tangent-space +Y, RGB",
+    "orm": "linear R=AO G=roughness B=metallic"
+  },
+  "tile_metres": 1,
+  "materials": [
+    {
+      "id": "iron_worn",
+      "family": "iron",
+      "files": {
+        "basecolor": "iron_worn_basecolor.png",
+        "normal": "iron_worn_normal.png",
+        "orm": "iron_worn_orm.png"
+      }
+    },
+    {
+      "id": "iron_service",
+      "family": "iron",
+      "files": {
+        "basecolor": "iron_service_basecolor.png",
+        "normal": "iron_service_normal.png",
+        "orm": "iron_service_orm.png"
+      }
+    },
+    {
+      "id": "iron_veteran",
+      "family": "iron",
+      "files": {
+        "basecolor": "iron_veteran_basecolor.png",
+        "normal": "iron_veteran_normal.png",
+        "orm": "iron_veteran_orm.png"
+      }
+    },
+    {
+      "id": "iron_honor",
+      "family": "iron",
+      "files": {
+        "basecolor": "iron_honor_basecolor.png",
+        "normal": "iron_honor_normal.png",
+        "orm": "iron_honor_orm.png"
+      }
+    },
+    {
+      "id": "leather_oiled",
+      "family": "leather",
+      "files": {
+        "basecolor": "leather_oiled_basecolor.png",
+        "normal": "leather_oiled_normal.png",
+        "orm": "leather_oiled_orm.png"
+      }
+    },
+    {
+      "id": "oak_worked",
+      "family": "wood",
+      "files": {
+        "basecolor": "oak_worked_basecolor.png",
+        "normal": "oak_worked_normal.png",
+        "orm": "oak_worked_orm.png"
+      }
+    },
+    {
+      "id": "lime_plaster",
+      "family": "plaster",
+      "files": {
+        "basecolor": "lime_plaster_basecolor.png",
+        "normal": "lime_plaster_normal.png",
+        "orm": "lime_plaster_orm.png"
+      }
+    }
+  ],
+  "source": "tools/roman_material_lab/generate.mjs",
+  "provenance": "Original procedural generation, historical surface studies, not archaeological reconstructions."
+}
