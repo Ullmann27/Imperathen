@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "date": "2026-11-25",
+  "branch": "feature/city-detail-overlay-20261125",
+  "base_branch": "feature/meshy-player-city-exploration-20261125",
+  "base_commit": "5b5eecad31e395e3ead48b3e631d9f48690480a6",
+  "status": "implemented",
+  "entrypoint": "prototype/scripts/world/city_exploration.gd::_load_city",
+  "adapter": "prototype/scripts/rendering/city_exploration_detail_adapter.gd",
+  "scope": "Optional local architecture only; no campaign/trade activation.",
+  "support_branch": "feature/city-detail-commerce-support-20261125",
+  "preserved": [
+    "ExplorationPlayer",
+    "configure_meshy_youth()",
+    "MeshyTemple",
+    "CityCollision_*",
+    "city_exploration_state.gd",
+    "camera_obstruction.gd"
+  ],
+  "assets": [
+    "prototype/assets/city_detail/architecture/city_architecture_library.glb",
+    "prototype/assets/city_detail/architecture/architecture_manifest.json"
+  ],
+  "quality": {
+    "low": "disabled",
+    "balanced": "LOD1, 75 m",
+    "high": "LOD0, 100 m",
+    "very_high": "LOD0, 130 m"
+  },
+  "validation": {
+    "city_script_parser": "docs/26_city_support/evidence/overlay/city_script_parse.log",
+    "fixture_test": "prototype/tests/city_exploration_detail_adapter_test.gd",
+    "full_city_walkthrough": false,
+    "android_device": false
+  },
+  "main_merge": false
+}
