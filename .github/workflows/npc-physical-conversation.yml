@@ -1,0 +1,74 @@
+name: NPC physical conversation quality gate
+
+on:
+  push:
+    branches: ['fix/npc-physical-conversation-detail-20261125']
+  pull_request:
+    paths:
+      - 'prototype/scripts/world/village_life_world.gd'
+      - 'prototype/scripts/world/game_world.gd'
+      - 'prototype/tests/npc_physical_conversation_test.gd'
+      - 'tools/check_prototype.py'
+      - '.github/workflows/npc-physical-conversation.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npc-contact-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  physics-contacts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl --fail --location --retry 3 "$release/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl --fail --location --retry 3 "$release/$archive" -o "$archive"
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          base=pathlib.Path.cwd()
+          archive=base/'Godot_v4.7.2-stable_linux.x86_64.zip'
+          sums={
+              line.split()[-1].lstrip('*'):line.split()[0]
+              for line in (base/'SHA512-SUMS.txt').read_text().splitlines()
+              if line.strip()
+          }
+          with archive.open('rb') as source:
+              digest=hashlib.file_digest(source,'sha512').hexdigest()
+          if digest!=sums.get(archive.name):
+              raise SystemExit('Official Godot engine checksum mismatch')
+          with zipfile.ZipFile(archive) as source:
+              source.extractall(base)
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Real walls, real NPCs and existing domain regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going \
+            --only import npc_social_memory npc_behavior npc_physical_conversation npc_behavior_world \
+            --report npc-physical-evidence
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-npc-physical-${{ github.run_number }}
+          path: npc-physical-evidence/
+          if-no-files-found: warn
+          retention-days: 14
