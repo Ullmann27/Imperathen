@@ -1,0 +1,146 @@
+{
+  "base_commit": "261639105dcaa72f8dd92e73f4db1d9ab7d90a23",
+  "changes": "final Meshy sagittal gait reach plus preservation of originally rigid Foot weights; canonical source paths swapped and imported for each comparison",
+  "captures": [
+    {
+      "file": "unit_germanic_axe_fighter-before.png",
+      "sha256": "7587390d759b1de14ccbf3f01c504d6ba6d3ab42d719f00b9a922403995b1ded",
+      "source_glb": "res://assets/meshy/characters/unit_germanic_axe_fighter_3.glb",
+      "source_sha256": "2f5a80cb56d813ec18a5acfe154c8495f14d3c1dd637b97221fc55b631538348",
+      "sole_heights_m": {
+        "L": 0.0122186848893762,
+        "R": 0.0208404958248138
+      },
+      "renderer": "gl_compatibility",
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "runtime": {
+        "active_model_path": "res://assets/meshy/characters/unit_germanic_axe_fighter_3.glb",
+        "age": 32,
+        "appearance": "spearman",
+        "clip": "march",
+        "detail": 3,
+        "equipment": [
+          {
+            "asset_id": "weap_germanic_hand_axe",
+            "model_path": "res://assets/meshy/equipment/weap_germanic_hand_axe_1.glb"
+          },
+          {
+            "asset_id": "gear_germanic_round_shield",
+            "model_path": "res://assets/meshy/equipment/gear_germanic_round_shield_1.glb"
+          }
+        ],
+        "home": "germania",
+        "identity": "resident_spearman_0",
+        "meshy_asset_id": "unit_germanic_axe_fighter",
+        "phase": 0.0,
+        "role": "resident",
+        "scale": "(1.0, 1.0, 1.0)",
+        "speed": 1.45,
+        "variation": 0
+      }
+    },
+    {
+      "file": "unit_roman_signifer-before.png",
+      "sha256": "4503047cbe1573b54f63485e278eb98fc133ffc8ac9d983b5d2c34949c27999c",
+      "source_glb": "res://assets/meshy/characters/unit_roman_signifer_3.glb",
+      "source_sha256": "74b2af233a83d998e7ae0a38ad54e114653d639a52affb62ec6b651431fb8627",
+      "sole_heights_m": {
+        "L": 0.0158150214701891,
+        "R": 0.0377327054738998
+      },
+      "renderer": "gl_compatibility",
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "runtime": {
+        "active_model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb",
+        "age": 32,
+        "appearance": "legionary",
+        "clip": "march",
+        "detail": 3,
+        "equipment": [
+          {
+            "asset_id": "gear_roman_signum",
+            "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+          }
+        ],
+        "home": "italia",
+        "identity": "resident_legionary_0",
+        "meshy_asset_id": "unit_roman_signifer",
+        "phase": 0.0,
+        "role": "resident",
+        "scale": "(1.0, 1.0, 1.0)",
+        "speed": 1.45,
+        "variation": 0
+      }
+    },
+    {
+      "file": "unit_germanic_axe_fighter-after.png",
+      "sha256": "72f27dc5ffdde1b6a49cfeef724379d1bd3a75131c455ad023ff942eba59ab11",
+      "source_glb": "res://assets/meshy/characters/unit_germanic_axe_fighter_3.glb",
+      "source_sha256": "473c7a741dd1a8cc6290e375d4f4e9a77eb3e0e6db9569bf4258b6c4628fcda5",
+      "sole_heights_m": {
+        "L": 0.00131900166161358,
+        "R": 0.00144140410702676
+      },
+      "renderer": "gl_compatibility",
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "runtime": {
+        "active_model_path": "res://assets/meshy/characters/unit_germanic_axe_fighter_3.glb",
+        "age": 32,
+        "appearance": "spearman",
+        "clip": "march",
+        "detail": 3,
+        "equipment": [
+          {
+            "asset_id": "weap_germanic_hand_axe",
+            "model_path": "res://assets/meshy/equipment/weap_germanic_hand_axe_1.glb"
+          },
+          {
+            "asset_id": "gear_germanic_round_shield",
+            "model_path": "res://assets/meshy/equipment/gear_germanic_round_shield_1.glb"
+          }
+        ],
+        "home": "germania",
+        "identity": "resident_spearman_0",
+        "meshy_asset_id": "unit_germanic_axe_fighter",
+        "phase": 0.0,
+        "role": "resident",
+        "scale": "(1.0, 1.0, 1.0)",
+        "speed": 1.45,
+        "variation": 0
+      }
+    },
+    {
+      "file": "unit_roman_signifer-after.png",
+      "sha256": "87f111effc26988a18e726bbe33a45dc56aceaf50d02c263a9694a9dc74019c9",
+      "source_glb": "res://assets/meshy/characters/unit_roman_signifer_3.glb",
+      "source_sha256": "da3797d9472505ca5f4f439e50acf01ad43f2616b861aca9c801792ab7a59087",
+      "sole_heights_m": {
+        "L": 0.00520174345001578,
+        "R": 0.0171971805393696
+      },
+      "renderer": "gl_compatibility",
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "runtime": {
+        "active_model_path": "res://assets/meshy/characters/unit_roman_signifer_3.glb",
+        "age": 32,
+        "appearance": "legionary",
+        "clip": "march",
+        "detail": 3,
+        "equipment": [
+          {
+            "asset_id": "gear_roman_signum",
+            "model_path": "res://assets/meshy/equipment/gear_roman_signum_1.glb"
+          }
+        ],
+        "home": "italia",
+        "identity": "resident_legionary_0",
+        "meshy_asset_id": "unit_roman_signifer",
+        "phase": 0.0,
+        "role": "resident",
+        "scale": "(1.0, 1.0, 1.0)",
+        "speed": 1.45,
+        "variation": 0
+      }
+    }
+  ]
+}

@@ -242,6 +242,10 @@ func _reload(level: int) -> void:
 		MeshyEquipment.attach(body, meshy_asset_id, detail)
 	if not contacts.is_empty():
 		_plant_contacts(0.0)
+		# A replacement pose is not another simulation tick. The root may
+		# already have moved while phase still names the previous stance.
+		# Keep the rendered contact, but preserve its real release history.
+		_motion.restore_world_contacts(contacts)
 	# Retaining every hero PackedScene would also retain every embedded texture
 	# tier. Live instances keep their own references; inactive tiers may unload.
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):

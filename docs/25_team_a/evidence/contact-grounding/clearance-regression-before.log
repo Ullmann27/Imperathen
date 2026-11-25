@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+MOTION_CLEARANCE_TEST 19 checks; 2 failed
+ERROR: Cached closure agrees with fresh closure after closed components separate
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/motion_mesh_clearance_test.gd:11)
+       [1] _run (res://tests/motion_mesh_clearance_test.gd:118)
+ERROR: Rebuilt closed components still detect actual solid containment
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _check (res://tests/motion_mesh_clearance_test.gd:11)
+       [1] _run (res://tests/motion_mesh_clearance_test.gd:120)

@@ -1,0 +1,12 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+LIVE_CONTACT_RESULT hero releases=22 release_angle_deg=1.52879921421154 lod_shift_m=0.0
+LIVE_CONTACT_RESULT companion releases=23 release_angle_deg=1.52777489927945 lod_shift_m=0.0
+LIVE_CONTACT_RESULT resident releases=22 release_angle_deg=1.52777489927945 lod_shift_m=0.0
+FIRST_GAIT_CYCLE march hz=30.0 seam_m=0.00000060289887 support_slip_m=0.00000033085948
+FIRST_GAIT_CYCLE march hz=60.0 seam_m=0.00000195860389 support_slip_m=0.00000035793818
+FIRST_GAIT_CYCLE march hz=120.0 seam_m=0.0000033629633 support_slip_m=0.00000054972969
+FIRST_GAIT_CYCLE run hz=30.0 seam_m=0.00000033453023 support_slip_m=0.00000026987152
+FIRST_GAIT_CYCLE run hz=60.0 seam_m=0.00000059679104 support_slip_m=0.00000046361532
+FIRST_GAIT_CYCLE run hz=120.0 seam_m=0.00000090308907 support_slip_m=0.00000039452917
+CHARACTER_MOTION_TEST 560 checks; 0 failed; stance_error_m=0.00000023841858

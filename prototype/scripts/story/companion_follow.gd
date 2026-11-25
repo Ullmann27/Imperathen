@@ -20,10 +20,12 @@ const ARRIVAL_EPSILON := 0.004
 const RETARGET_DISTANCE := 4.0
 const RETARGET_INTERVAL := 0.4
 const MAX_TURN_RATE := 4.5
+const START_ACCELERATION := 8.0
 const DIRECTIONS := [Vector2i(1,0),Vector2i(0,1),Vector2i(-1,0),Vector2i(0,-1),
 	Vector2i(1,1),Vector2i(-1,1),Vector2i(-1,-1),Vector2i(1,-1)]
 
 var actual_speed := 0.0
+var _requested_speed := 0.0
 var status := "idle"
 var expanded_nodes := 0
 var path: Array[Vector3] = []
@@ -49,6 +51,7 @@ var _foot_bottom := 0.04
 
 func reset() -> void:
 	actual_speed = 0.0
+	_requested_speed = 0.0
 	status = "idle"
 	path.clear()
 	_searching = false
@@ -61,6 +64,7 @@ func reset() -> void:
 
 func pause(body: CharacterBody3D) -> void:
 	actual_speed = 0.0
+	_requested_speed = 0.0
 	status = "paused"
 	if is_instance_valid(body):
 		body.velocity = Vector3.ZERO
@@ -126,6 +130,19 @@ func move(body: CharacterBody3D, target: Vector3, delta: float, speed := 3.8, st
 	motion.y = 0.0
 	var requested := minf(speed,motion.length()/delta)
 	var direction := motion.normalized() if motion.length_squared() > 0.000001 else Vector3.ZERO
+	if not direction.is_zero_approx():
+		# Face the next path segment before committing to its full pace. Moving
+		# at running speed while still facing backwards stretches the planted
+		# stride beyond the legs' reach and makes the contact solve snap back.
+		body.rotation.y = rotate_toward(body.rotation.y,atan2(-direction.x,-direction.z),minf(delta,0.1)*MAX_TURN_RATE)
+		var forward := Vector3.FORWARD.rotated(Vector3.UP,body.rotation.y)
+		requested *= maxf(0.0,forward.dot(direction))
+	# Match the player's running start: a resumed actor must not cover an
+	# entire planted stride while its standing pose is still blending out.
+	# Keep command acceleration separate from collision-limited displacement;
+	# feeding a short slide back into the next command can stall at a ramp edge.
+	_requested_speed = minf(requested,_requested_speed+START_ACCELERATION*delta)
+	requested = _requested_speed
 	body.velocity.x = direction.x*requested
 	body.velocity.z = direction.z*requested
 	body.velocity.y = -0.3 if body.is_on_floor() else maxf(-30.0,body.velocity.y-GRAVITY*delta)
@@ -136,10 +153,6 @@ func move(body: CharacterBody3D, target: Vector3, delta: float, speed := 3.8, st
 		_blocked_seconds += delta
 	elif actual_speed >= 0.10:
 		_blocked_seconds = 0.0
-	if actual_speed > 0.04:
-		# This controller owns the physical body's heading. A constant angular
-		# rate avoids the old frame-dependent second turn in CompanionWorld.
-		body.rotation.y = rotate_toward(body.rotation.y,atan2(-travelled.x,-travelled.z),minf(delta,0.1)*MAX_TURN_RATE)
 	_publish(body)
 
 
@@ -153,6 +166,7 @@ func _bind_body(body: CharacterBody3D) -> void:
 	if _body_id == body.get_instance_id():
 		return
 	_body_id = body.get_instance_id()
+	_requested_speed = 0.0
 	_foot_bottom = 0.04
 	for node: Node in body.get_children():
 		if node is CollisionShape3D and node.shape is CapsuleShape3D:
