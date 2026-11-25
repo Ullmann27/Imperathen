@@ -8,6 +8,9 @@ const CityDetailAdapter := preload("res://scripts/rendering/city_exploration_det
 const CityCharacterFinish := preload("res://scripts/rendering/city_character_detail.gd")
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
 const CityMarketBridge := preload("res://scripts/world/city_market_bridge.gd")
+const CitySurfaceMicrodetail := preload("res://scripts/rendering/city_surface_microdetail.gd")
+const CityAmbientPeople := preload("res://scripts/world/city_ambient_people.gd")
+const VivaAtmosphere := preload("res://scripts/rendering/viva_roma_atmosphere.gd")
 const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
 const TouchAction := preload("res://scripts/ui/touch_action.gd")
@@ -21,6 +24,8 @@ const WALK_SPEED := 1.45
 const RUN_SPEED := 3.8
 var profile := "balanced"
 var persist := true
+# Review toggle: keep an exact legacy light/ground path for comparison.
+var viva_visuals := true
 var save_path := State.PATH
 var paused := false
 var player := CharacterBody3D.new()
@@ -28,6 +33,7 @@ var figure := Person.new()
 var camera := Camera3D.new()
 var city_available := false
 var youth_available := false
+var ambient_people: CityAmbientPeople
 var catalog: Array[Dictionary] = []
 var _catalog_nodes: Dictionary = {}
 var _catalog_pending := ""
@@ -63,6 +69,7 @@ func _ready() -> void:
 	_load_city()
 	_build_player()
 	_build_camera()
+	_build_ambient_people()
 	_read_catalog()
 	_build_ui()
 	_restore(State.read(save_path) if persist else State.defaults())
@@ -86,7 +93,7 @@ func _build_ground() -> void:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = Color("777d55")
 	material.roughness = 0.96
-	ground.material_override = material
+	ground.material_override = VivaAtmosphere.ground_material(profile) if viva_visuals else material
 	ground.position.y = -0.025
 	add_child(ground)
 	_box_collision(self,Vector3(1400,0.2,1400),Vector3(0,-0.125,0))
@@ -96,6 +103,8 @@ func _build_ground() -> void:
 	sun.light_energy = 1.05
 	sun.shadow_enabled = profile!="low"
 	sun.directional_shadow_max_distance = 90.0
+	if viva_visuals:
+		VivaAtmosphere.configure_sun(sun, profile)
 	add_child(sun)
 
 func _scene(path: String) -> Node3D:
@@ -138,6 +147,23 @@ func _load_city() -> void:
 	# Read-only signboards are attached only to the six matching existing stalls.
 	# The market bridge independently verifies the same authored stands before enabling transactions.
 	print("IMPERATHEN_CITY_MARKET " + JSON.stringify(CityMarketSignage.install(city, profile)))
+	# Optional GPU-instanced masonry and worn street microgeometry. This never
+	# replaces the authored RomanCity walls, collision, NPCs, camera or save.
+	print("IMPERATHEN_FACADE_DETAIL " + JSON.stringify(CitySurfaceMicrodetail.install(city, profile)))
+
+func _build_ambient_people() -> void:
+	# Uses the existing city meshes, actual camera and the existing
+	# village_person.gd appearance and animation library. Never duplicates
+	# the independent player's save state, campaign or trade authority.
+	var city := get_node_or_null("RomanCity") as Node3D
+	if not is_instance_valid(city):
+		return
+	ambient_people = CityAmbientPeople.new()
+	ambient_people.name = "CityAmbientLife"
+	add_child(ambient_people)
+	var status: Dictionary = ambient_people.setup(city,camera,profile)
+	print("IMPERATHEN_CITY_PEOPLE " + JSON.stringify(status))
+
 
 func _build_player() -> void:
 	player.name = "ExplorationPlayer"
@@ -189,7 +215,7 @@ func _build_camera() -> void:
 	environment.fog_enabled = true
 	environment.fog_density = 0.0013
 	environment.fog_light_color = Color("c3c9bf")
-	camera.environment = environment
+	camera.environment = VivaAtmosphere.environment(profile) if viva_visuals else environment
 
 func _read_catalog() -> void:
 	if not FileAccess.file_exists(CATALOG_PATH):
@@ -511,6 +537,8 @@ func set_paused(value: bool) -> void:
 	player.velocity = Vector3.ZERO
 	figure.drive(0)
 	figure.set_process(not paused)
+	if is_instance_valid(ambient_people):
+		ambient_people.set_active(not paused)
 	_pause_panel.visible = paused
 	_pad.visible = not paused
 	_actions.visible = not paused

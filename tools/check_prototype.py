@@ -89,6 +89,7 @@ def main():
             ("village_childhood", ["--script", "res://tests/village_childhood_test.gd"], "VILLAGE_CHILDHOOD_PASS"),
             ("npc_behavior", ["--script", "res://tests/npc_behavior_test.gd"], "checks passed"),
             ("npc_social_memory", ["--script", "res://tests/npc_social_memory_test.gd"], "checks passed"),
+            ("npc_physical_conversation", ["--fixed-fps", "60", "--script", "res://tests/npc_physical_conversation_test.gd"], "NPC_PHYSICAL_CONVERSATION_PASS"),
             ("team_b_integration", ["--fixed-fps", "60", "--script", "res://tests/team_b_integration_test.gd"], "TEAM_B_INTEGRATION_PASS"),
             ("npc_behavior_world", ["--fixed-fps", "60", "--script", "res://tests/npc_behavior_world_test.gd"], "checks passed"),
             ("unarmed_combat", ["--script", "res://tests/unarmed_combat_test.gd"], "UNARMED_COMBAT_PASS"),

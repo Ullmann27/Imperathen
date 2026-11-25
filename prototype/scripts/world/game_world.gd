@@ -520,22 +520,24 @@ func combat_sight_clear(from: Vector2, to: Vector2) -> bool:
 
 
 func npc_sight_clear(from: Vector3, to: Vector3) -> bool:
-	# NPC observations use floor origins. A ray between their own eye-level
-	# offsets tests static world geometry, independent of the player's altitude.
+	# Both the chest/waist and eye-level corridor must be open. A clear high
+	# ray over a low garden wall alone is not a usable face-to-face encounter.
+	# Positions supplied by the behavior system are real observed foot points.
 	if not is_inside_tree() or not from.is_finite() or not to.is_finite():
 		return false
-	var eye_offset := Vector3(0.0, 1.45, 0.0)
-	var query := PhysicsRayQueryParameters3D.create(from + eye_offset, to + eye_offset, 1)
-	# Some existing raider bodies share the scenery layer. Exempt only the
-	# identified endpoint actors, using the established participant lookup.
 	var excluded: Array[RID] = _actions._bodies_at(Vector2(from.x, from.z))
 	for rid: RID in _actions._bodies_at(Vector2(to.x, to.z)):
 		if not excluded.has(rid):
 			excluded.append(rid)
-	query.exclude = excluded
-	query.hit_from_inside = true
-	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
-
+	var space := get_world_3d().direct_space_state
+	for height: float in [0.85,1.45]:
+		var offset := Vector3.UP*height
+		var query := PhysicsRayQueryParameters3D.create(from+offset,to+offset,1)
+		query.exclude = excluded
+		query.hit_from_inside = true
+		if not space.intersect_ray(query).is_empty():
+			return false
+	return true
 
 func combat_safe_motion(from: Vector2, to: Vector2) -> Vector2:
 	return _actions.safe_actor_motion(from, to)

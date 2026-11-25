@@ -1,5 +1,5 @@
 {
-  "status": "WORK_IN_PROGRESS",
+  "status": "SOURCE_INTEGRATED_TESTS_PENDING",
   "base": "09e597e271addd48b33e182e20ae3b0667edc5e9",
   "stages": [
     {
@@ -31,43 +31,49 @@
       "blocked": 0
     }
   ],
-  "unresolved_conflicts": [
+  "unresolved_conflicts": [],
+  "private_assets_in_public_repo": false,
+  "release_verified": false,
+  "resolved_conflicts": [
     {
       "path": "prototype/scripts/world/game_world.gd",
       "stage": "npc",
       "base": "16366d416f272fde3bbc149ce30bbe920e5b27eb",
       "retained": "c8393a6509607af6459f476ce0f0a7f1c3d0dd17",
-      "incoming": "0e6b2318df7b69bdd0337c986c92423c6f93367b"
+      "incoming": "0e6b2318df7b69bdd0337c986c92423c6f93367b",
+      "resolution": "preserved both independent workstreams; engine checks pending"
     },
     {
       "path": "prototype/scripts/world/village_life_world.gd",
       "stage": "npc",
       "base": "569cd821bdc801a356e34cc1cea51e8fdddd7f31",
       "retained": "94c8d54fd5036de21a8793fd8c8e88f3f224f3a6",
-      "incoming": "51b8e952f44d4df237f6c3d1acde9b76f0ccf6f8"
+      "incoming": "51b8e952f44d4df237f6c3d1acde9b76f0ccf6f8",
+      "resolution": "preserved both independent workstreams; engine checks pending"
     },
     {
       "path": "tools/check_prototype.py",
       "stage": "npc",
       "base": "f627a53a09bc28b33567733a736e023fafcee902",
       "retained": "e4605d14f1bca5658b327cb37d0b941fd3f7ca0b",
-      "incoming": "015fe0d49b8131c973c9c928c6fe4130b4941cca"
+      "incoming": "015fe0d49b8131c973c9c928c6fe4130b4941cca",
+      "resolution": "preserved both independent workstreams; engine checks pending"
     },
     {
       "path": "prototype/scripts/world/city_exploration.gd",
       "stage": "city_detail",
       "base": "a126558d90352426381105ef88edfeac76dddbba",
       "retained": "bc71f20ef74d6a8e00bb5b076dee3be1a581a2f6",
-      "incoming": "9fbd4d30e7ed047f8891b7269818ddc386042608"
+      "incoming": "9fbd4d30e7ed047f8891b7269818ddc386042608",
+      "resolution": "preserved both independent workstreams; engine checks pending"
     },
     {
       "path": "prototype/scripts/world/city_exploration.gd",
       "stage": "viva1",
       "base": "a126558d90352426381105ef88edfeac76dddbba",
       "retained": "bc71f20ef74d6a8e00bb5b076dee3be1a581a2f6",
-      "incoming": "d1accf4ea4bdd39c5acf59169e01dc1bd7dc2c12"
+      "incoming": "d1accf4ea4bdd39c5acf59169e01dc1bd7dc2c12",
+      "resolution": "preserved both independent workstreams; engine checks pending"
     }
-  ],
-  "private_assets_in_public_repo": false,
-  "release_verified": false
+  ]
 }
