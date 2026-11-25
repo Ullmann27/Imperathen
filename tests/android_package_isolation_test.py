@@ -5,8 +5,10 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import sys
 
-from tools import build_android_prototype as export
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"tools"))
+import build_android_prototype as export
 
 
 class TestQAIdentifierIsolation(unittest.TestCase):
