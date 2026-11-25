@@ -46,7 +46,9 @@ def main():
     if paths.get("format")!="imperathen-city-idle-crowd" or len(paths.get("entries",[]))!=12:
         raise RuntimeError("No reproducible twelve-person authored crowd layout.")
     for person in paths["entries"]:
-        asset=root/person["path"].removeprefix("res://")
+        # Crowd paths are Godot LOD patterns; verify the real LOD1 asset,
+        # never look for a literal filename containing the placeholder "%d".
+        asset=root/person["path"].replace("%d","1").removeprefix("res://")
         if not asset.is_file():
             raise RuntimeError("Missing source body for actual crowd: "+str(asset))
     status="not_supplied"
