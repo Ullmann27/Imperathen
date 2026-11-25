@@ -80,7 +80,30 @@ jobs:
             # The Blender script is specifically authored for this exact
             # texturised Meshy task and fails closed on unexpected sword/skin
             # topology. Never substitute a generic or concept-board child.
-            blender -b -t 2 --python-exit-code 1 \
+            # The city generator works with distro Blender, but the reviewed
+            # source-specific character rigger requires Blender 4.3.2+.
+            BLENDER_BASE="https://download.blender.org/release/Blender4.3"
+            BLENDER_NAME="blender-4.3.2-linux-x64.tar.xz"
+            curl --fail --location --retry 3 --silent --show-error \
+              "$BLENDER_BASE/$BLENDER_NAME" -o "$RUNNER_TEMP/$BLENDER_NAME"
+            curl --fail --location --retry 3 --silent --show-error \
+              "$BLENDER_BASE/blender-4.3.2.sha256" -o "$RUNNER_TEMP/blender-4.3.2.sha256"
+            python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,os,re
+          root=Path(os.environ['RUNNER_TEMP'])
+          name='blender-4.3.2-linux-x64.tar.xz'
+          lines=[line for line in (root/'blender-4.3.2.sha256').read_text().splitlines() if name in line]
+          if len(lines)!=1:raise SystemExit('Pinned Blender checksum entry missing/ambiguous')
+          matches=re.findall(r'(?i)\b[a-f0-9]{64}\b',lines[0])
+          if len(matches)!=1:raise SystemExit('Pinned Blender SHA-256 malformed')
+          actual=hashlib.sha256((root/name).read_bytes()).hexdigest()
+          if actual.lower()!=matches[0].lower():raise SystemExit('Official Blender SHA-256 mismatch')
+          PY
+            tar -xJf "$RUNNER_TEMP/$BLENDER_NAME" -C "$RUNNER_TEMP"
+            BLENDER_432="$RUNNER_TEMP/blender-4.3.2-linux-x64/blender"
+            "$BLENDER_432" -b --python-expr "import bpy;assert bpy.app.version >= (4,3,2)"
+            "$BLENDER_432" -b -t 2 --python-exit-code 1 \
               --python tools/characters/build_meshy_player.py -- \
               --source "$SOURCE" > artifacts/qa/mesh-original-youth-build.log 2>&1
             grep -q YOUTH_BUILT artifacts/qa/mesh-original-youth-build.log
