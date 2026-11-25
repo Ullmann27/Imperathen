@@ -1,0 +1,115 @@
+name: Real RomanCity Blender asset build and Godot integration
+
+on:
+  pull_request:
+    paths:
+      - 'tools/world/build_roman_test_city.py'
+      - 'prototype/tests/roman_city_real_asset_test.gd'
+      - 'prototype/scripts/rendering/city_viva_closeup_props.gd'
+      - '.github/workflows/roman-city-asset-build.yml'
+  push:
+    branches: ['feature/roman-city-asset-build-20261125']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: real-roman-city-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  original-city-and-collision:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 48
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Blender glTF dependencies and source provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y blender python3-numpy
+          blender --version
+          blender -b --python-expr "import numpy; print('ROMAN_CITY_BLENDER_NUMPY_OK',numpy.__version__)"
+          git rev-parse HEAD > "$RUNNER_TEMP/roman-city-source-sha"
+      - name: Build full original fictional city and collision assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/roman-export"
+          blender -b -t 2 --python-exit-code 1 --python tools/world/build_roman_test_city.py -- \
+            --output "$RUNNER_TEMP/roman-export" --surface-style viva --texture-size 1024 \
+            2>&1 | tee "$RUNNER_TEMP/roman-city-blender.log"
+          grep -q CITY_BUILD_COMPLETE "$RUNNER_TEMP/roman-city-blender.log"
+          python3 - <<'PY'
+          import json,os,pathlib
+          base=pathlib.Path(os.environ['RUNNER_TEMP'])/'roman-export'
+          m=json.loads((base/'city_manifest.json').read_text())
+          assert m['residential_count']==240 and m['market_stall_count']==63
+          assert m['verification']['gltf_export']=='completed'
+          assert m['surface_pipeline']['style']=='viva' and m['surface_pipeline']['texture_size']==1024
+          for name in ['imperathen_roman_test_city.glb','roman_city_collision.glb','imperathen_roman_test_city.blend']:
+              path=base/name
+              assert path.exists() and path.stat().st_size>10000,(name,'missing or empty')
+              print('ORIGINAL_ROMAN_CITY_FILE',name,path.stat().st_size)
+          PY
+      - name: Install checksum-verified official Godot engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,zipfile
+          name='Godot_v4.7.2-stable_linux.x86_64.zip'
+          sums={line.split()[-1].lstrip('*'):line.split()[0] for line in Path('SHA512-SUMS.txt').read_text().splitlines() if line.strip()}
+          with open(name,'rb') as stream: actual=hashlib.file_digest(stream,'sha512').hexdigest()
+          if actual!=sums.get(name): raise SystemExit('Official Godot editor checksum mismatch')
+          with zipfile.ZipFile(name) as z:z.extractall()
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Load the generated city in the actual Godot application
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/roman-city prototype/assets/world
+          cp "$RUNNER_TEMP/roman-export/imperathen_roman_test_city.glb" prototype/assets/world/roman_city_test.glb
+          cp "$RUNNER_TEMP/roman-export/roman_city_collision.glb" prototype/assets/world/roman_city_collision.glb
+          cp "$RUNNER_TEMP/roman-export/city_manifest.json" prototype/assets/world/roman_city_manifest.json
+          cp "$RUNNER_TEMP/roman-city-source-sha" artifacts/roman-city/source-commit.txt
+          sha256sum prototype/assets/world/roman_city_test.glb prototype/assets/world/roman_city_collision.glb \
+            > artifacts/roman-city/asset-sha256.txt
+          "$GODOT_BIN" --headless --path prototype --import --quit \
+            2>&1 | tee artifacts/roman-city/godot-import.log
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+            --script res://tests/roman_city_real_asset_test.gd \
+            2>&1 | tee artifacts/roman-city/real-runtime.log
+          grep -q ROMAN_CITY_REAL_ASSET_PASS artifacts/roman-city/real-runtime.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' artifacts/roman-city/real-runtime.log; then exit 1; fi
+      - name: Provide actual GLBs, edit-ready Blender project and import evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-real-roman-city-${{ github.run_number }}
+          path: |
+            ${{ runner.temp }}/roman-export/imperathen_roman_test_city.glb
+            ${{ runner.temp }}/roman-export/roman_city_collision.glb
+            ${{ runner.temp }}/roman-export/imperathen_roman_test_city.blend
+            ${{ runner.temp }}/roman-export/city_manifest.json
+            ${{ runner.temp }}/roman-city-blender.log
+            artifacts/roman-city/
+          if-no-files-found: warn
+          retention-days: 30
