@@ -71,8 +71,13 @@ jobs:
           if [[ -z "${PRIVATE_MESHY_YOUTH_GLB_URL:-}" ]]; then
             printf '%s\n' '{"status":"NOT_STAGED","task_id":"b6856033-bc9f-44fe-af12-e9843f161aed","original_youth_active":false,"reason":"Private Meshy source URL secret not supplied"}' \
               > artifacts/qa/original-youth-status.json
-            echo "IMPERATHEN_ORIGINAL_YOUTH_NOT_STAGED: QA will display an explicit fallback warning"
+            echo "::error::Original Meshy youth missing. This user-requested FIRST PLAY APK must not ship with a replacement boy."
+            exit 1
           else
+            if [[ "$PRIVATE_MESHY_YOUTH_GLB_URL" != *"b6856033-bc9f-44fe-af12-e9843f161aed"* ]]; then
+              echo "::error::Private Meshy model URL does not name the user-confirmed source task."
+              exit 1
+            fi
             SOURCE="$RUNNER_TEMP/imperathen-original-meshy-youth.glb"
             curl --fail --location --silent --show-error --retry 3 \
               --output "$SOURCE" "$PRIVATE_MESHY_YOUTH_GLB_URL"
@@ -119,6 +124,8 @@ jobs:
           receipt = json.loads(Path('docs/28_city_sandbox/youth-build.json').read_text())
           if receipt.get('task_id') != 'b6856033-bc9f-44fe-af12-e9843f161aed':
               raise SystemExit('Original Meshy youth task does not match the confirmed user identity')
+          if receipt.get('sword_mesh_name') != 'PracticeBlade' or not receipt.get('sword_hidden_until_adult_equipment_authorization'):
+              raise SystemExit('Child weapon visibility contract failed: source sword must be an authorized removable prop')
           output = {'status':'STAGED_QA_ONLY','task_id':receipt['task_id'],
                     'original_youth_active_in_source':True,'source_sha256':receipt['source_sha256'],
                     'lods':receipt['lods'],'limits':receipt.get('limits',[])}
@@ -168,6 +175,8 @@ jobs:
             --script res://tests/roman_city_real_walk_test.gd \
             2>&1 | tee artifacts/qa/real-city-walk.log
           grep -q ROMAN_CITY_REAL_WALK_PASS artifacts/qa/real-city-walk.log
+          grep -Eq '"original_youth_active":true' artifacts/qa/real-city-walk.log
+          echo "IMPERATHEN_FIRST_PLAY_ORIGINAL_BOY_LOADED: matching Meshy youth used in a real Godot city session"
           "$GODOT_BIN" --headless --path prototype --script res://tests/city_crowd_layout_test.gd \
             2>&1 | tee artifacts/qa/crowd-layout.log
           grep -q CITY_CROWD_LAYOUT_PASS artifacts/qa/crowd-layout.log
