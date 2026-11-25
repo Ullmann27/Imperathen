@@ -479,7 +479,7 @@ func _layout_ui() -> void:
 	_pad.size = Vector2(178,178)
 	_pad.position = Vector2(0,_safe.size.y-182)
 	_actions.position = Vector2(maxf(0,_safe.size.x-328),_safe.size.y-(250 if portrait else 82))
-	_pause_panel.size = Vector2(minf(430,_safe.size.x),350)
+	_pause_panel.size = Vector2(minf(460,_safe.size.x),minf(430,_safe.size.y-16))
 	_pause_panel.position = (_safe.size-_pause_panel.size)*0.5
 
 func _physics_process(delta: float) -> void:
