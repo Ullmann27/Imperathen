@@ -32,6 +32,7 @@ EXPECTED_GODOT = "4.7.2.stable"
 BUILD_TOOLS = "35.0.1"
 PLATFORM = "android-35"
 PACKAGE = "at.heinz.imperathen"
+QA_PACKAGE = "at.heinz.imperathen.qa"
 PRESET = "Android ARM64"
 PASSWORD_ENV = "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD"
 ABIS = ("arm64-v8a", "x86_64")
@@ -274,7 +275,8 @@ def write_isolated_settings(directory: Path, toolchain: dict, environment: dict[
         environment.pop("GODOT_ANDROID_KEYSTORE_RELEASE_" + suffix, None)
 
 
-def configure_copy(project: Path, toolchain: dict, renderer: str = "compatibility") -> None:
+def configure_copy(project: Path, toolchain: dict, renderer: str = "compatibility",
+                   package_id: str = PACKAGE) -> None:
     if renderer == "mobile":
         settings = project / "project.godot"
         source = settings.read_text()
@@ -286,6 +288,13 @@ def configure_copy(project: Path, toolchain: dict, renderer: str = "compatibilit
         settings.write_text(source)
     config = read_config(project / "export_presets.cfg")
     options = toolchain["preset_section"] + ".options"
+    if package_id not in (PACKAGE, QA_PACKAGE):
+        raise BuildError("Only the preserved original package and isolated QA package are allowed.")
+    if package_id == QA_PACKAGE:
+        # This change is confined to the isolated export copy, and the QA
+        # app can coexist with an existing signed installation.
+        config.set(options, "package/unique_name", json.dumps(QA_PACKAGE))
+        config.set(options, "package/name", json.dumps("IMPERATHEN QA"))
     config.set(options, "custom_template/debug", json.dumps(str(Path(toolchain["template_dir"]) / "android_debug.apk")))
     release = Path(toolchain["template_dir"]) / "android_release.apk"
     if release.is_file():
@@ -317,7 +326,9 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
     proof = require_export(REPOSITORY, evidence)
     proof_hash = gate_digest(evidence / "motion-gate.json")
     verify_build_source(toolchain, proof, environment, args.renderer)
-    output = (args.output or REPOSITORY / "builds/android" / f"IMPERATHEN-{args.abi}-debug.apk").expanduser().resolve()
+    package_id = QA_PACKAGE if args.qa_package else PACKAGE
+    output_name = f"IMPERATHEN-{args.abi}-qa-debug.apk" if args.qa_package else f"IMPERATHEN-{args.abi}-debug.apk"
+    output = (args.output or REPOSITORY / "builds/android" / output_name).expanduser().resolve()
     if output.suffix.lower() != ".apk":
         raise BuildError("Die Ausgabedatei muss die Endung .apk besitzen.")
     if inside(output, Path(toolchain["project"])):
@@ -329,7 +340,7 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
                         ignore=shutil.ignore_patterns(".godot", ".git", "android", "*.tmp", "*.bak"))
         if source_fingerprint(project) != toolchain["source_sha256"]:
             raise BuildError("The isolated export copy differs from the approved project snapshot.")
-        configure_copy(project, toolchain, args.renderer)
+        configure_copy(project, toolchain, args.renderer, package_id)
         write_isolated_settings(temporary, toolchain, environment)
         apk = temporary / "IMPERATHEN.apk"
         run([toolchain["godot"], "--headless", "--path", str(project), "--editor", "--import"],
@@ -341,7 +352,7 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         verification = temporary / "validation.json"
         build_tools = Path(toolchain["sdk_root"]) / "build-tools" / BUILD_TOOLS
         run([sys.executable, toolchain["validator"], "--apk", str(apk),
-             "--sdk-root", toolchain["sdk_root"], "--source-root", toolchain["project"], "--expected-package", PACKAGE,
+             "--sdk-root", toolchain["sdk_root"], "--source-root", toolchain["project"], "--expected-package", package_id,
              "--expected-abi", args.abi, "--report", str(verification),
              "--aapt", str(build_tools / "aapt"), "--apksigner", str(build_tools / "apksigner"),
              "--zipalign", str(build_tools / "zipalign")],
@@ -373,6 +384,9 @@ def build(args: argparse.Namespace, toolchain: dict, environment: dict[str, str]
         atomic_copy(sha_file, output.with_suffix(".apk.sha256"))
         build_report = {key: value for key, value in toolchain.items()
                         if key not in {"preset_section", "validator"}}
+        build_report["package"] = package_id
+        build_report["update_compatible_with_installed_imperathen"] = (
+            False if args.qa_package else "requires_actual_signer_match_and_device_install")
         build_report.update({"motion_gate_sha256": proof_hash, "motion_source_fingerprint": proof["source_fingerprint"],
                              "source_commit": proof["source_commit"],
                              "requested_renderer": args.renderer, "status": "verified_debug_apk", "created_utc": datetime.now(timezone.utc).isoformat(),
@@ -398,6 +412,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--keystore", type=Path, help="Private debug key outside the repository")
     parser.add_argument("--keystore-user", help="Key alias; password is accepted only through the environment")
     parser.add_argument("--expected-signer-sha256", help="Public expected certificate SHA-256; otherwise IMPERATHEN_EXPECTED_SIGNER_SHA256. A mismatch blocks APK promotion.")
+    parser.add_argument("--qa-package", action="store_true",
+                        help="Export only to at.heinz.imperathen.qa, a separate install that never replaces the original package.")
     parser.add_argument("--abi", choices=ABIS, default="arm64-v8a")
     parser.add_argument("--renderer", choices=("compatibility", "mobile"), default="compatibility")
     parser.add_argument("--output", type=Path, help="Destination .apk; previous file remains untouched on export failure")
