@@ -68,11 +68,25 @@ def generate_textures(kind: str, out: Path) -> dict[str, dict[str, Path]]:
     grain = rng.random((size, size), dtype=np.float32)
     warp = 0.21 * np.sin(TAU * (y * 2 + 0.2 * np.sin(x * TAU)))
     warp += 0.085 * np.sin(TAU * y * 7 + x * 12) + (broad - .5) * .65
-    groove = np.abs(np.sin(TAU * (x * 57 + warp))) ** 0.32
-    plates = np.clip((middle - 0.33) * 2.4, 0.0, 1.0)
-    height = groove * 0.48 + plates * 0.18 + broad * 0.2 + fine * 0.1 + grain * 0.04
-    cross_cracks = np.exp(-(np.sin(TAU * (y * 13 + x * .4 + broad * .8)) / .09) ** 2)
-    height -= cross_cracks * np.clip((middle - .46) * 3.0, 0, 1) * .13
+    # Elongated, irregular bark plates. Distances to neighbouring jittered
+    # feature points yield cracks without a regular striped/weave pattern.
+    grid_x, grid_y = 43, 17
+    gx, gy = x * grid_x + warp, y * grid_y + (middle - .5) * .24
+    ix, iy = np.floor(gx).astype(np.int32), np.floor(gy).astype(np.int32)
+    features = rng.random((grid_y, grid_x, 2), dtype=np.float32)
+    nearest = np.full_like(x, 1e6)
+    second = np.full_like(x, 1e6)
+    for oy in (-1, 0, 1):
+        for ox in (-1, 0, 1):
+            feature = features[(iy + oy) % grid_y, (ix + ox) % grid_x]
+            dx = ix + ox + .1 + feature[..., 0] * .8 - gx
+            dy = iy + oy + .1 + feature[..., 1] * .8 - gy
+            distance = dx * dx + dy * dy
+            second = np.minimum(second, np.maximum(nearest, distance))
+            nearest = np.minimum(nearest, distance)
+    fissures = np.exp(-((second - nearest) / .065) ** 2)
+    height = .54 - fissures * .4 + broad * .16 + fine * .11 + grain * .025
+    height += np.abs(np.sin(TAU * (x * 83 + warp))) * .035
     # Shallow oval knots interrupt the longitudinal bark instead of painting
     # uninterrupted stripes. Width is expressed relative to trunk circumference.
     for i in range(8):
@@ -193,6 +207,8 @@ class PlantMesh:
         # Far representation drops only tiny twig meshes. Their leaves remain.
         if terminal and self.lod == 2:
             return
+        if terminal and self.lod == 1:
+            points, radii = [points[0], points[-1]], [radii[0], radii[-1]]
         sides = (16, 10, 6)[self.lod] if major else (7, 5, 4)[self.lod]
         rows = []
         distance = [0.0]
@@ -236,8 +252,10 @@ class PlantMesh:
         delta = end - start
         lateral = self.Vector((-delta.y, delta.x, 0)).normalized()
         bend = rng.uniform(-0.09, 0.09) * delta.length
-        mid = start.lerp(end, 0.46) + lateral * bend - self.up * delta.length * 0.035
-        shoulder = start.lerp(end, 0.77) + lateral * bend * 0.5
+        mid = start.lerp(end, .38 if major else .46) + lateral * bend * (2.2 if major else 1)
+        mid -= self.up * delta.length * (.12 if major else .035)
+        shoulder = start.lerp(end, .72 if major else .77) + lateral * bend * (.9 if major else .5)
+        shoulder -= self.up * delta.length * (.035 if major else 0)
         self.wood([start, mid, shoulder, end], [radius, radius*.73, radius*.4, radius*.12],
                   phase, major=major, terminal=terminal)
         return mid, shoulder
@@ -246,11 +264,11 @@ class PlantMesh:
              twist: float, variant: int, phase: float) -> None:
         identifier = self.logical_leaves
         self.logical_leaves += 1
-        stride = (1, 3, 12)[self.lod]
+        stride = (1, 5, 12)[self.lod]
         if identifier % stride:
             return
         self.visible_leaves += 1
-        scale = (1.0, 1.52, 2.75)[self.lod]
+        scale = (1.0, 1.98, 2.75)[self.lod]
         length, width = length * scale, width * scale
         direction = heading.normalized()
         side = direction.cross(self.up)
@@ -278,7 +296,8 @@ class PlantMesh:
             return
         # Six-edge folded blade: pointed base/tip, broad shoulders, raised midrib.
         stations = ((0.0, 0.0), (.27, -.86), (.64, -1.0), (1.0, 0.0),
-                    (.64, 1.0), (.27, .86))
+                    (.64, 1.0), (.27, .86)) if self.lod == 0 else (
+                    (0.0,0.0),(.48,-1.0),(1.0,0.0),(.48,1.0))
         ids = [point(t, w) for t, w in stations]
         coords = [uv(.5 + .5*w, t) for t, w in stations]
         center = point(.48, 0, True)
@@ -315,10 +334,10 @@ class PlantMesh:
                                 (.3,.01,3.3),(.19,.15,4.65),(.16,.22,5.9),(.35,.2,7.22))]
         self.wood(trunk, [.53,.39,.35,.285,.22,.146,.077,.022], .32, major=True)
         for i in range(8):
-            angle = i * TAU / 8 + .23
+            angle = i * TAU / 8 + .23 + rng.uniform(-.14,.14)
             ray = self.radial(angle)
-            root = [ray * rng.uniform(.83, 1.15), ray*.43+up*.16, ray*.15+up*.5]
-            self.wood(root, [.016,.115,.235], .32, major=True)
+            root = [ray * rng.uniform(.54, .91), ray*.32+up*.12, ray*.13+up*.4]
+            self.wood(root, [.012,.09,.19], .32, major=True)
         for i in range(10):
             sub = random.Random(SEEDS[self.kind] + i * 619)
             rank = i / 9
@@ -330,21 +349,21 @@ class PlantMesh:
             reach = 3.2 * (1 - .48 * rank) * sub.uniform(.91,1.13)
             end = start + ray*reach
             end.z = 4.9 + rank*2.45 + sub.uniform(-.24,.24)
-            mid, shoulder = self.branch(start, end, .192*(1-.62*rank), sub, phase, major=True)
-            for j in range(5):
-                t = .1 + .21*j
+            mid, shoulder = self.branch(start, end, .139*(1-.62*rank), sub, phase, major=True)
+            for j in range(6):
+                t = .15 + .15*j
                 origin = mid.lerp(end, t)
-                heading = angle + (1 if j%2 else -1)*sub.uniform(.44,1.06)
-                secondary = origin + self.radial(heading)*sub.uniform(.65,1.2)
-                secondary.z += sub.uniform(-.08,.7)
+                heading = angle + j * 2.39996 + sub.uniform(-.3,.3)
+                secondary = end + self.radial(heading)*sub.uniform(.42,1.04)
+                secondary.z += sub.uniform(-.72,.86)
                 self.branch(origin, secondary, .039*(1-.08*j), sub, phase)
                 for k in range(4):
                     terminal_rng = random.Random(SEEDS[self.kind] + i*10000 + j*100 + k)
-                    node = origin.lerp(secondary, .18+.25*k)
-                    a = heading + (1 if k%2 else -1)*terminal_rng.uniform(.6,1.18)
-                    tip = node + self.radial(a)*terminal_rng.uniform(.5,.86)
-                    tip.z += terminal_rng.uniform(-.22,.35)
-                    self.leafy_twig(node, tip, terminal_rng, phase, .18, count=20)
+                    node = origin.lerp(secondary, .42+.16*k)
+                    a = heading + k * TAU / 4 + terminal_rng.uniform(-.28,.28)
+                    tip = secondary + self.radial(a)*terminal_rng.uniform(.28,.68)
+                    tip.z += terminal_rng.uniform(-.38,.54)
+                    self.leafy_twig(node, tip, terminal_rng, phase, .2, count=14)
         self.leafy_twig(trunk[-2], trunk[-1]+up*.62, random.Random(7181), .53, .18, count=24)
 
     def grow_cypress(self) -> None:
@@ -356,11 +375,11 @@ class PlantMesh:
             ray = self.radial(i*TAU/5)
             self.wood([ray*.53,ray*.25+up*.14,up*.3], [.015,.071,.16], .45, major=True)
         # Upright spiralling boughs produce an irregular column rather than a cone.
-        for i in range(42):
+        for i in range(56):
             sub = random.Random(SEEDS[self.kind] + i*173)
-            rank = i / 41
+            rank = i / 55
             z = .68 + rank*7.12
-            width = .82 * math.sin((.22 + rank*.72)*math.pi)**.65
+            width = .57 * math.sin((.22 + rank*.72)*math.pi)**.65
             angle = i*2.39996
             phase = sub.random()
             base = V((.04,0,z))
@@ -371,7 +390,7 @@ class PlantMesh:
                 t = .24 + .18*j
                 origin = base.lerp(end, t)
                 a = angle + (1 if j%2 else -1)*sub.uniform(.48,1.18)
-                tip = origin + self.radial(a)*sub.uniform(.17,.33) + up*sub.uniform(.36,.64)
+                tip = origin + self.radial(a)*sub.uniform(.13,.28) + up*sub.uniform(.36,.64)
                 self.leafy_twig(origin, tip, sub, phase, .22, count=9, narrow=True)
 
     def grow_laurel(self) -> None:

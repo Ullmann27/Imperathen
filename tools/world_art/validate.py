@@ -39,6 +39,17 @@ def check_wind(path):
             if colors is None:
                 raise ValueError("Missing COLOR_0 wind payload")
             values = inspection.decode(colors)
+            accessor = document["accessors"][colors]
+            component_type = accessor["componentType"]
+            # The existing structural inspector intentionally returns raw
+            # integer components. glTF COLOR_0 is commonly normalized uint16.
+            if component_type in (5121, 5123):
+                if accessor.get("normalized") is not True:
+                    raise ValueError("Integer wind colors must be normalized")
+                scale = 255.0 if component_type == 5121 else 65535.0
+                values = [tuple(value / scale for value in row) for row in values]
+            elif component_type != 5126:
+                raise ValueError("Unsupported wind color component type")
             if len(values) != document["accessors"][primitive["attributes"]["POSITION"]]["count"]:
                 raise ValueError("Wind payload/vertex count mismatch")
             material = document["materials"][primitive["material"]].get("name", "").lower()

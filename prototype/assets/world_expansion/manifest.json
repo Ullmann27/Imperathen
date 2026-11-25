@@ -120,28 +120,45 @@
       "label": "Dorf · 48 Gebäude",
       "count": 48,
       "spacing": 26,
-      "seed": 1901
+      "seed": 1901,
+      "allowed_building_ids": [
+        "taberna"
+      ]
     },
     {
       "id": "town",
       "label": "Marktstadt · 256 Gebäude",
       "count": 256,
       "spacing": 26,
-      "seed": 1902
+      "seed": 1902,
+      "allowed_building_ids": [
+        "taberna",
+        "insula"
+      ]
     },
     {
       "id": "city",
       "label": "Großstadt · 1.024 Gebäude",
       "count": 1024,
       "spacing": 26,
-      "seed": 1903
+      "seed": 1903,
+      "allowed_building_ids": [
+        "taberna",
+        "insula",
+        "basilica"
+      ]
     },
     {
       "id": "capital",
       "label": "Residenzstadt · 4.000 Gebäude",
       "count": 4000,
       "spacing": 26,
-      "seed": 1904
+      "seed": 1904,
+      "allowed_building_ids": [
+        "taberna",
+        "insula",
+        "basilica"
+      ]
     }
   ],
   "services": [
