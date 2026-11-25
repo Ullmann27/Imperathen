@@ -102,7 +102,7 @@ func select_settlement(id: String, region_id: String = "") -> bool:
 				config.label = str(region.get("label", config.get("label", "")))
 				break
 	var plan: Dictionary = Layout.generate(config, manifest.get("building_assets", []),
-		manifest.get("vegetation_assets", []), manifest.get("road_assets", []))
+		manifest.get("vegetation_assets", []), manifest.get("road_assets", []), manifest.get("services", []))
 	if not bool(plan.get("ok", false)):
 		_fail(str(plan.get("message", "Siedlung konnte nicht angeordnet werden.")))
 		return false
@@ -303,9 +303,10 @@ func _refresh_status() -> void:
 	if _status == null or not load_error.is_empty() or settlement.layout.is_empty():
 		return
 	var report: Dictionary = settlement.report()
-	_status.text = "%s\n%d Gebäude · %d Grundmodelle\n%d Gebäude im Distanzbereich\n%02d:%02d Uhr · Wind %.1f" % [
+	_status.text = "%s\n%d Gebäude · %d Grundmodelle\n%d im Sichtbereich · %d Shop-Anker\n%02d:%02d Uhr · Wind %.1f" % [
 		str(settlement.layout.get("label", "Siedlung")), report.placed_buildings, report.unique_building_modules,
-		report.distance_enabled_buildings, int(controller.time_of_day), int(fmod(controller.time_of_day, 1.0) * 60.0), controller.wind_strength]
+		report.distance_enabled_buildings, settlement.layout.get("service_sites", []).size(),
+		int(controller.time_of_day), int(fmod(controller.time_of_day, 1.0) * 60.0), controller.wind_strength]
 
 
 func _unhandled_input(event: InputEvent) -> void:
