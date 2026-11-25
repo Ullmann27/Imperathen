@@ -3,6 +3,7 @@ extends SceneTree
 ## This is NOT an FPS measurement or an Android/physical Fold7 playthrough.
 const City = preload("res://scripts/world/city_exploration.gd")
 const SiteManifest := "res://assets/city_detail/shops/city_market_anchors.json"
+const WALK_SPEED_MAX := 1.46
 var checks := 0
 var failures: Array[String] = []
 
@@ -43,6 +44,12 @@ func _run() -> void:
 	_check(scene.crowd.entries.size()==12,"Twelve distinct Roman boulevard occupants have an authored street placement")
 	_check(is_instance_valid(scene.player) and is_instance_valid(scene.figure.body),
 		"Existing young player has a real visual and physical body, not a synthetic replacement")
+	if OS.get_environment("IMPERATHEN_REQUIRE_ORIGINAL_YOUTH") == "1":
+		_check(scene.youth_available and scene.figure.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"),
+			"Exactly the confirmed original Meshy youth rig is loaded as the playable player")
+		var sword: Node = scene.figure.body.find_child("PracticeBlade",true,false)
+		_check(is_instance_valid(sword) and not (sword as Node3D).visible,
+			"Twelve-year-old boy's source sword is removed from visibility until adult equipment authorization")
 	_check(is_instance_valid(scene.camera) and scene.camera.current,
 		"Production third-person camera remains the active world camera")
 	var scenery := scene.find_children("CityCollision_*","StaticBody3D",true,false)
@@ -63,6 +70,24 @@ func _run() -> void:
 	_check(moved>0.15,"The real player walks on the actual imported city collision, not an independent market test ground")
 	_check(scene.player.global_position.is_finite() and scene.player.global_position.y>-4.0,
 		"The player remains finite and on/in range of the authored city physical ground")
+	# Real deceleration should be continuous, not an immediate horizontal stop.
+	var velocity_after_three: float = Vector2(scene.player.velocity.x,scene.player.velocity.z).length()
+	_check(velocity_after_three>0.02 and velocity_after_three<WALK_SPEED_MAX,
+		"Walking input release uses gradual deceleration instead of velocity snapping to zero")
+	await _physics_frames(32)
+	_check(Vector2(scene.player.velocity.x,scene.player.velocity.z).length()<0.05,
+		"Walking motion settles to stationary without residual drift")
+	# Starting a training swing must preserve momentum until the physics solver
+	# decelerates; the input may not erase the walking velocity instantly.
+	scene._touch_move = Vector2(0,1)
+	await _physics_frames(20)
+	var before_attack_velocity := Vector2(scene.player.velocity.x,scene.player.velocity.z).length()
+	scene.perform_action("attack")
+	var immediate_attack_velocity := Vector2(scene.player.velocity.x,scene.player.velocity.z).length()
+	_check(before_attack_velocity>0.05 and absf(before_attack_velocity-immediate_attack_velocity)<0.0001,
+		"Triggering the training strike does not abruptly zero horizontal physics velocity")
+	scene._touch_move = Vector2.ZERO
+	await _physics_frames(30)
 	scene.set_paused(true)
 	var paused_at: Vector3=scene.player.position
 	await _physics_frames(6)
