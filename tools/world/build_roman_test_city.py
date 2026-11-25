@@ -14,6 +14,8 @@ from pathlib import Path
 import bpy
 import numpy as np
 from mathutils import Vector
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from viva_roma_surfaces import build_blender_material
 
 SEED=20261125
 RNG=random.Random(SEED)
@@ -22,6 +24,9 @@ MATS=[]
 SCALES=[]
 PROTO={}
 ENTRIES=[]
+SURFACE_STYLE='viva'
+TEXTURE_SIZE=1024
+RENDER_SAMPLES=48
 SOURCES=[
     {"url":"https://turismoroma.it/en/node/1155","publisher":"Roma Capitale tourism",
      "used_for":"Colosseum 189 x 156 m envelope, over 48 m high, completed 80 CE; arena 76 x 46 m"},
@@ -29,7 +34,7 @@ SOURCES=[
      "used_for":"Caracalla baths 212-216 CE. Our smaller fictional baths are not a measured reconstruction"}]
 
 
-def material(name,color,kind,out,scale=2,rough=.86,metal=0):
+def legacy_material(name,color,kind,out,scale=2,rough=.86,metal=0):
     mat=bpy.data.materials.new(name)
     mat.use_nodes=True
     mat.diffuse_color=(*color,1)
@@ -90,6 +95,15 @@ def material(name,color,kind,out,scale=2,rough=.86,metal=0):
         nm.inputs['Strength'].default_value=.50
         mat.node_tree.links.new(tex.outputs['Color'],nm.inputs['Color'])
         mat.node_tree.links.new(nm.outputs['Normal'],shader.inputs['Normal'])
+    MATS.append(mat); SCALES.append(scale)
+    return len(MATS)-1
+
+
+def material(name,color,kind,out,scale=2,rough=.86,metal=0):
+    if SURFACE_STYLE=='legacy':
+        return legacy_material(name,color,kind,out,scale,rough,metal)
+    family={'Amphora_Clay':'clay','Linen_Canopy':'linen'}.get(name,kind)
+    mat=build_blender_material(name,color,family,out,scale,rough,metal,TEXTURE_SIZE,SEED+sum(map(ord,name)))
     MATS.append(mat); SCALES.append(scale)
     return len(MATS)-1
 
@@ -782,7 +796,7 @@ def set_camera(camera,position,target,lens=40):
 
 def preview_setup():
     scene=bpy.context.scene
-    scene.render.engine='CYCLES';scene.cycles.samples=20;scene.cycles.use_denoising=False
+    scene.render.engine='CYCLES';scene.cycles.samples=20 if SURFACE_STYLE=='legacy' else RENDER_SAMPLES;scene.cycles.use_denoising=SURFACE_STYLE!='legacy'
     scene.render.threads_mode='FIXED';scene.render.threads=2
     scene.render.resolution_x=1600;scene.render.resolution_y=1100
     scene.render.resolution_percentage=100;scene.render.image_settings.file_format='PNG'
@@ -810,7 +824,12 @@ def selected_export(collection,path,with_materials=True):
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--output',required=True);parser.add_argument('--render',action='store_true')
+    parser.add_argument('--surface-style',choices=['legacy','viva'],default='viva')
+    parser.add_argument('--texture-size',type=int,choices=[512,1024,2048],default=1024)
+    parser.add_argument('--render-samples',type=int,choices=[32,48,64,96],default=48)
     args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+    global SURFACE_STYLE,TEXTURE_SIZE,RENDER_SAMPLES
+    SURFACE_STYLE=args.surface_style;TEXTURE_SIZE=args.texture_size;RENDER_SAMPLES=args.render_samples
     out=Path(args.output).resolve();out.mkdir(parents=True,exist_ok=True);(out/'textures').mkdir(exist_ok=True)
     bpy.ops.wm.read_factory_settings(use_empty=True)
     global CITY,COLLISION,PREVIEW
@@ -862,7 +881,7 @@ def main():
         'mesh_objects':sum(o.type=='MESH' for o in CITY.objects),
         'unique_meshes':len({o.data for o in CITY.objects if o.type=='MESH'}),
         'triangles_instanced':triangles(CITY),'collision_triangles_instanced':triangles(COLLISION),
-        'entries':ENTRIES,'verification':{'gltf_export':'pending','real_blender_renders':'pending','android_device':'not run','runtime_walkthrough':'not run'}}
+        'entries':ENTRIES,'surface_pipeline':{'style':SURFACE_STYLE,'texture_size':512 if SURFACE_STYLE=='legacy' else TEXTURE_SIZE,'render_samples':20 if SURFACE_STYLE=='legacy' else RENDER_SAMPLES,'review_required':True},'verification':{'gltf_export':'pending','real_blender_renders':'pending','android_device':'not run','runtime_walkthrough':'not run'}}
     (out/'city_manifest.json').write_text(json.dumps(manifest,indent=2,ensure_ascii=False))
     bpy.ops.wm.save_as_mainfile(filepath=str(out/'imperathen_roman_test_city.blend'),compress=True)
     selected_export(CITY,out/'imperathen_roman_test_city.glb')
