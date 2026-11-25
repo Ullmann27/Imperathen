@@ -24,8 +24,13 @@ var _stone: StandardMaterial3D
 var _linen: StandardMaterial3D
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	_update_nameplates()
+
+
+func _physics_process(delta: float) -> void:
+	# Visibility and collision rays must run on the physics clock. The
+	# presentation-only gaze and speech gate changes no saved NPC decisions.
 	_update_attention(delta)
 
 
