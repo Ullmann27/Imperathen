@@ -28,6 +28,9 @@ const CATALOG_PATH := "res://assets/world/city_catalog.json"
 const CATALOG_ORIGIN := Vector3(475,0,90)
 const WALK_SPEED := 1.45
 const RUN_SPEED := 3.8
+const WALK_ACCELERATION := 4.5
+const RUN_ACCELERATION := 6.0
+const BRAKING_DECELERATION := 8.0
 var profile := "balanced"
 var persist := true
 # Review toggle: keep an exact legacy light/ground path for comparison.
@@ -98,7 +101,7 @@ func _ready() -> void:
 	var renderer := get_node_or_null("/root/RuntimeDisplay")
 	if is_instance_valid(renderer):
 		renderer.set_sustained_scene(true)
-	print("IMPERATHEN_CITY_READY "+JSON.stringify({"city":city_available,"meshy_youth":youth_available,"catalog_families":catalog.size(),"campaign_started":false}))
+	print("IMPERATHEN_CITY_READY "+JSON.stringify({"city":city_available,"meshy_youth":youth_available,"selected_player_model":figure.active_model_path,"original_youth_active":youth_available and figure.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"),"catalog_families":catalog.size(),"campaign_started":false,"combat_mode":"animation_preview_only"}))
 
 func _build_ground() -> void:
 	var ground := MeshInstance3D.new()
@@ -424,8 +427,8 @@ func _build_ui() -> void:
 	_actions.add_theme_constant_override("separation",8)
 	_pace = _button("Gehen",_toggle_pace)
 	_actions.add_child(_pace)
-	_actions.add_child(_button("Hieb",func(): perform_action("attack")))
-	_actions.add_child(_button("Abwehr",func(): perform_action("block")))
+	_actions.add_child(_button("Übungshieb",func(): perform_action("attack")))
+	_actions.add_child(_button("Deckung",func(): perform_action("block")))
 	_safe.add_child(_actions)
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.06,0.08,0.08,0.96)
@@ -493,9 +496,15 @@ func _physics_process(delta: float) -> void:
 		var alignment := maxf(0,Vector3.FORWARD.rotated(Vector3.UP,figure.rotation.y).dot(direction))
 		speed *= lerpf(0.3,1,alignment)
 	var desired := direction*speed if _action_left<=0 else Vector3.ZERO
-	var acceleration := 8.0 if running else 5.0
-	player.velocity.x = move_toward(player.velocity.x,desired.x,delta*acceleration)
-	player.velocity.z = move_toward(player.velocity.z,desired.z,delta*acceleration)
+	# Constant-magnitude horizontal acceleration avoids faster diagonal starts.
+	# Combat input decelerates through the same physics path instead of hard
+	# resetting both axes, which used to cause an abrupt foot-plant snap.
+	var planar := Vector3(player.velocity.x,0.0,player.velocity.z)
+	var accelerating := desired.length_squared() > 0.0001 and planar.dot(desired) >= 0.0
+	var acceleration := (RUN_ACCELERATION if running else WALK_ACCELERATION) if accelerating else BRAKING_DECELERATION
+	planar = planar.move_toward(desired,maxf(delta,0.0)*acceleration)
+	player.velocity.x = planar.x
+	player.velocity.z = planar.z
 	player.velocity.y = -0.3 if player.is_on_floor() else player.velocity.y-19.6*delta
 	var previous_position := player.position
 	var horizontal_motion := Vector3(player.velocity.x,0,player.velocity.z)*delta
@@ -645,9 +654,8 @@ func _toggle_pace() -> void:
 func perform_action(action: String) -> void:
 	if paused or market.is_open() or _action_left>0 or action not in ["attack","block"]:
 		return
-	player.velocity.x = 0.0
-	player.velocity.z = 0.0
-	figure.drive(0)
+	# Preserve measured horizontal momentum until the physics tick brakes.
+	# The visual action starts immediately; gameplay still blocks new inputs.
 	figure.cue(action)
 	_action_left = maxf(0.01,figure._remaining)
 
@@ -717,7 +725,7 @@ func _update_status() -> void:
 	if not city_available:
 		description = "Stadtmodell ist noch nicht importiert."
 	elif not youth_available:
-		description += " · Bisherige Figur als Rückfallmodell"
+		description += " · ORIGINAL-MESHY-JUNGE FEHLT: Ersatzmodell aktiv"
 	if not _catalog_status.is_empty():
 		description += "\n"+_catalog_status
 	_status.text = description
