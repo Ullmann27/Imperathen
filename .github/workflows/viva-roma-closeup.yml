@@ -12,6 +12,9 @@ on:
       - '.github/workflows/viva-roma-closeup.yml'
 permissions:
   contents: read
+concurrency:
+  group: viva-closeup-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   asset-bytes:
     runs-on: ubuntu-24.04
@@ -75,5 +78,31 @@ jobs:
         with:
           name: viva-closeup-renderers-${{ github.run_number }}
           path: viva-closeup-evidence/
+          if-no-files-found: warn
+          retention-days: 14
+  blender-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install Blender from signed distribution repository
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y blender
+          blender --version
+      - name: Render actual GLBs and save editable packed Blender projects
+        run: |
+          set -euo pipefail
+          mkdir -p viva-blender-evidence
+          git rev-parse HEAD > viva-blender-evidence/commit.txt
+          blender -b -t 2 --python-exit-code 1 --python tools/viva_roma/blender_prop_review.py -- --output "$PWD/viva-blender-evidence"
+      - name: Upload unedited images and Blender files
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: viva-blender-props-${{ github.run_number }}
+          path: viva-blender-evidence/
           if-no-files-found: warn
           retention-days: 14
