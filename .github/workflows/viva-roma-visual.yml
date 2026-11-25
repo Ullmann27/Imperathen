@@ -66,7 +66,7 @@ jobs:
           cp prototype/tests/viva_roma_atmosphere_test.gd "$RUNNER_TEMP/viva_fixture/tests/"
           printf '[application]\nconfig/name="VIVA Fixture"\n[rendering]\nrenderer/rendering_method="gl_compatibility"\n' > "$RUNNER_TEMP/viva_fixture/project.godot"
           "$GODOT_BIN" --headless --path "$RUNNER_TEMP/viva_fixture" --import --quit
-          "$GODOT_BIN" --headless --path "$RUNNER_TEMP/viva_fixture" --script res://tests/viva_roma_atmosphere_test.gd 2>&1 | tee "$RUNNER_TEMP/viva.log"
+          "$GODOT_BIN" --headless --path "$RUNNER_TEMP/viva_fixture" --quit-after 180 --script res://tests/viva_roma_atmosphere_test.gd 2>&1 | tee "$RUNNER_TEMP/viva.log"
           grep -q VIVA_ROMA_ATMOSPHERE_PASS "$RUNNER_TEMP/viva.log"
           if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' "$RUNNER_TEMP/viva.log"; then exit 1; fi
   blender-export:
@@ -81,8 +81,9 @@ jobs:
       - name: Blender from signed Ubuntu repository
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y blender
+          sudo apt-get install -y blender python3-numpy
           blender --version
+          blender -b --python-exit-code 1 --python-expr 'import numpy; print(numpy.__version__)'
       - name: Render real 3D comparison under identical conditions
         run: |
           set -euo pipefail

@@ -24,7 +24,10 @@ void fragment() {
     float patch = noise2(p*0.30 + vec2(23.0,11.0));
     float soil = noise2(p*2.2);
     float distance_fade = 1.0-smoothstep(12.0,65.0,length(VERTEX));
-    float micro = noise2(p*18.0);
+    float micro = 0.5;
+    if (distance_fade > 0.0 && detail_strength > 0.5) {
+        micro = noise2(p*18.0);
+    }
     float scrub = smoothstep(0.36,0.76,macro*0.62+patch*0.38);
     vec3 dust = mix(vec3(0.23,0.17,0.105),vec3(0.40,0.31,0.195),patch);
     vec3 vegetation = mix(vec3(0.12,0.14,0.065),vec3(0.26,0.28,0.12),soil);

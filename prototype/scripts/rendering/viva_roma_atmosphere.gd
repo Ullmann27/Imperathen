@@ -36,7 +36,7 @@ static func environment(profile: String) -> Environment:
 	env.ambient_light_color = Color("c1cce0")
 	env.ambient_light_energy = 0.40
 	env.ambient_light_sky_contribution = 0.0
-	env.reflected_light_source = Environment.REFLECTED_SOURCE_SKY
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	env.fog_enabled = true
 	env.fog_density = 0.0016
 	env.fog_light_color = Color("c5c6b9")
