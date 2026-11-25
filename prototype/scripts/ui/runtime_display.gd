@@ -236,11 +236,24 @@ func _process(_delta: float) -> void:
 	if _units.x >= 0:
 		_label.text += "\nSoldaten nah / mittel / fern: %d / %d / %d" % [_units.x, _units.y, _units.z]
 	if OS.is_debug_build() and OS.has_feature("android"):
+		var frame_p50: Variant = null
+		var frame_p95: Variant = null
+		var frame_p99: Variant = null
+		if _recent_times.size() >= 10:
+			var frame_values := _recent_times.duplicate()
+			frame_values.sort()
+			var amount := frame_values.size()
+			frame_p50 = frame_values[ceili(amount*0.50)-1]
+			frame_p95 = frame_values[ceili(amount*0.95)-1]
+			frame_p99 = frame_values[ceili(amount*0.99)-1]
 		print("IMPERATHEN_DISPLAY_SAMPLE " + JSON.stringify({
 			"gpu": RenderingServer.get_video_adapter_name(), "quality": _quality,
 			"renderer": RenderingServer.get_current_rendering_method(), "driver": RenderingServer.get_current_rendering_driver_name(),
 			"fps": 1000.0 / frame_ms, "frame_rate_limit": Engine.max_fps,
 			"mean_frame_ms": frame_ms, "frames": _sample_frames,
+			"frame_p50_ms": frame_p50, "frame_p95_ms": frame_p95, "frame_p99_ms": frame_p99,
+			"dynamic_3d_ratio": _governor.ratio,
+			"thermal_measured":false,
 			"render_cpu_ms": cpu_ms if cpu_ms > 0 else null,
 			"render_gpu_ms": gpu_ms if gpu_ms > 0 else null,
 			"rss_kib": ram if ram > 0 else null, "visible_primitives": primitives,
