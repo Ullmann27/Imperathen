@@ -118,6 +118,20 @@ function generate(){
       groups[id].push([pos[0],pos[1]-.006,z,TAU*hash(i,j,k+350),sx,sy,sz,.87+.13*hash(i,j,k+360),.88+.12*hash(i,j,k+370),.83+.17*hash(i,j,k+380),hash(i,j,k+390)].map(round));
       grass++;stats.grass++;stats.grassMin=Math.min(stats.grassMin,h);stats.grassMax=Math.max(stats.grassMax,h);if(m>.76)stats.roadGrass++;if(m>.2&&m<=.76)stats.edgeGrass++;stats.grassTriangles+=grasses[id].i.length/3;
    }
+   // Dense irregular roadside bands with individual 3D blades, not a flat grass sheet.
+   for(let j=0;j<96;j++)for(let i=0;i<28;i++){
+     const side=i<14?-1:1,step=i%14;
+     const z=k*12+(j+hash(i,j,k+610))*.125;
+     const u=side*(half(z)-.34+(step+hash(i,j,k+620))*.125);
+     const m=road(u,z),cover=noise((u+center(z))*.83,z*.72,145);
+     const chance=(.38+.57*cover)*(1-.76*smooth(.52,.95,m))*(1-.85*lane(u,z)*m);
+     if(hash(i,j,k+630)>chance)continue;
+     const a=hash(i,j,k+640),id=m>.55?0:a<.22?0:a<.65?1:a<.86?2:3;
+     const sy=(.72+.88*hash(i,j,k+650))*(m>.5?.60+.32*(1-m):1);
+     const sx=1.04+.76*hash(i,j,k+660),sz=.95+.8*hash(i,j,k+670),pos=gridAt(k,u,z),h=grassSpecs[id][1]*sy;
+     groups[id].push([pos[0],pos[1]-.006,z,TAU*hash(i,j,k+680),sx,sy,sz,.84+.16*hash(i,j,k+690),.87+.13*hash(i,j,k+700),.80+.20*hash(i,j,k+710),hash(i,j,k+720)].map(round));
+     grass++;stats.grass++;stats.grassMin=Math.min(stats.grassMin,h);stats.grassMax=Math.max(stats.grassMax,h);if(m>.76)stats.roadGrass++;if(m>.2&&m<=.76)stats.edgeGrass++;stats.grassTriangles+=grasses[id].i.length/3;
+   }
    // Fine gravel is also handled by the terrain shader; these are visible 3D stones.
    for(let j=0;j<120;j++)for(let i=0;i<44;i++){
      const u=-3.3+(i+hash(i,j,k+410))*.15,z=k*12+(j+hash(i,j,k+420))*.10,m=road(u,z);
@@ -144,9 +158,18 @@ function generate(){
    for(let i=0;i<g.p.length;i+=3){if(!g.p.slice(i,i+3).every(Number.isFinite)||Math.abs(Math.hypot(...g.n.slice(i,i+3))-1)>1e-6)throw Error("normal or vertex");}
    for(let i=0;i<g.i.length;i+=3){const a=g.p.slice(g.i[i]*3,g.i[i]*3+3),b=g.p.slice(g.i[i+1]*3,g.i[i+1]*3+3),c=g.p.slice(g.i[i+2]*3,g.i[i+2]*3+3);if(Math.hypot(...cross(sub(b,a),sub(c,a)))<1e-10)throw Error("degenerate triangle");}
  }
+ // Confirm the actual triangulated grid samples—not merely the analytic depression.
+ const meshDepths=prints.map(h=>{
+   const z=h.z,k=Math.min(2,Math.floor(z/12)),row=Math.floor((z-k*12)/dz),t=(z-k*12)/dz-row;
+   let col=0;while(col<us.length-2&&us[col+1]<h.u)col++;let q=(h.u-us[col])/(us[col+1]-us[col]);
+   const za=k*12+row*dz,zb=za+dz;
+   const a=hoof(us[col],za).d,b=hoof(us[col+1],za).d,c=hoof(us[col],zb).d,d=hoof(us[col+1],zb).d;
+   return q>=t?a+(b-a)*q+(d-b)*t:a+(c-a)*t+(d-c)*q;
+ });
+ if(Math.min(...meshDepths)<.008)throw Error("hoof geometry underresolved");
  const sampleDepths=prints.map(h=>hoof(h.u,h.z).d);if(Math.min(...sampleDepths)<.023||stats.roadGrass<1||stats.grassMax<.4||stats.stoneMax<.07)throw Error("detail requirement");
  let maxGrade=0;for(let j=1;j<360;j++){let z=j*.1;maxGrade=Math.max(maxGrade,Math.abs(height(0,z+.1)-height(0,z))/.1)}
- stats.path={length_m:36,nominal_meadow_width_m:20,grid_columns:nu,grid_rows_per_chunk:nz+1,half_width_min:Math.min(...Array.from({length:361},(_,j)=>half(j*.1))),half_width_max:Math.max(...Array.from({length:361},(_,j)=>half(j*.1))),curve_span:Math.max(...Array.from({length:361},(_,j)=>center(j*.1)))-Math.min(...Array.from({length:361},(_,j)=>center(j*.1))),hoof_count:prints.length,hoof_depth_min:Math.min(...sampleDepths),hoof_depth_max:Math.max(...sampleDepths),max_centerline_grade:maxGrade};
+ stats.path={length_m:36,nominal_meadow_width_m:20,grid_columns:nu,grid_rows_per_chunk:nz+1,half_width_min:Math.min(...Array.from({length:361},(_,j)=>half(j*.1))),half_width_max:Math.max(...Array.from({length:361},(_,j)=>half(j*.1))),curve_span:Math.max(...Array.from({length:361},(_,j)=>center(j*.1)))-Math.min(...Array.from({length:361},(_,j)=>center(j*.1))),hoof_count:prints.length,hoof_depth_min:Math.min(...sampleDepths),hoof_depth_max:Math.max(...sampleDepths),mesh_hoof_depth_min:Math.min(...meshDepths),mesh_hoof_depth_max:Math.max(...meshDepths),max_centerline_grade:maxGrade};
  stats.prototypeTriangles=Object.fromEntries([...grasses,...rocks].map(g=>[g.name,g.i.length/3]));stats.terrainTriangles=grounds.reduce((s,g)=>s+g.i.length/3,0);
  const probes=[2,6,10,12,16,22,24,28,34].map(z=>{let k=Math.min(2,Math.floor(z/12));return gridAt(k,0,z).map(round)});
  return {grounds,library:[...grasses,...rocks],scatter,stats,probes,prints};

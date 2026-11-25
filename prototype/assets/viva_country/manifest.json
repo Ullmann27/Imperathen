@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "stats": {
-    "grass": 2778,
+    "grass": 7276,
     "stone": 2852,
     "grassMin": 0.038764356630653925,
     "grassMax": 0.5596557370281442,
     "stoneMin": 0.009002166521735994,
     "stoneMax": 0.08577093274886044,
-    "roadGrass": 43,
-    "edgeGrass": 96,
-    "grassTriangles": 358302,
+    "roadGrass": 361,
+    "edgeGrass": 933,
+    "grassTriangles": 935046,
     "stoneTriangles": 145650,
     "classes": {
       "fine": 2037,
@@ -19,19 +19,19 @@
     "chunks": [
       {
         "chunk": 0,
-        "grass": 902,
+        "grass": 2401,
         "stone": 985,
         "triangles": 38400
       },
       {
         "chunk": 1,
-        "grass": 920,
+        "grass": 2354,
         "stone": 969,
         "triangles": 38400
       },
       {
         "chunk": 2,
-        "grass": 956,
+        "grass": 2521,
         "stone": 898,
         "triangles": 38400
       }
@@ -47,6 +47,8 @@
       "hoof_count": 40,
       "hoof_depth_min": 0.024500080612604527,
       "hoof_depth_max": 0.03547137422940493,
+      "mesh_hoof_depth_min": 0.02192239944433336,
+      "mesh_hoof_depth_max": 0.03547086594416671,
       "max_centerline_grade": 0.12466900922696283
     },
     "prototypeTriangles": {
