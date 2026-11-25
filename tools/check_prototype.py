@@ -72,6 +72,7 @@ def main():
             ("village_economy", ["--script", "res://tests/village_economy_test.gd"], "VILLAGE_ECONOMY_PASS"),
             ("commerce_transaction", ["--script", "res://tests/commerce_transaction_test.gd"], "COMMERCE_TRANSACTION_PASS"),
             ("city_trade", ["--script", "res://tests/city_trade_test.gd"], "CITY_TRADE_PASS"),
+            ("city_inventory_ui", ["--fixed-fps", "60", "--script", "res://tests/city_inventory_ui_test.gd"], "CITY_INVENTORY_UI_PASS"),
             ("city_character_detail", ["--fixed-fps", "60", "--script", "res://tests/city_character_detail_test.gd"], "0 failures"),
             ("city_support", ["--fixed-fps", "60", "--script", "res://tests/city_support_integration_test.gd"], "CITY_SUPPORT_PASS"),
             ("city_exploration_detail", ["--fixed-fps", "60", "--script", "res://tests/city_exploration_detail_adapter_test.gd"], "CITY_EXPLORATION_DETAIL_PASS"),
