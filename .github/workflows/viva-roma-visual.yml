@@ -9,6 +9,8 @@ on:
       - 'prototype/shaders/viva_roma_ground.gdshader'
       - 'prototype/scripts/world/city_exploration.gd'
       - 'prototype/tests/viva_roma_atmosphere_test.gd'
+      - 'tools/world/render_viva_roma_fixture.py'
+      - 'tools/world/verify_viva_roma_export.py'
       - '.github/workflows/viva-roma-visual.yml'
 permissions:
   contents: read
@@ -67,3 +69,45 @@ jobs:
           "$GODOT_BIN" --headless --path "$RUNNER_TEMP/viva_fixture" --script res://tests/viva_roma_atmosphere_test.gd 2>&1 | tee "$RUNNER_TEMP/viva.log"
           grep -q VIVA_ROMA_ATMOSPHERE_PASS "$RUNNER_TEMP/viva.log"
           if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' "$RUNNER_TEMP/viva.log"; then exit 1; fi
+  blender-export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Blender from signed Ubuntu repository
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y blender
+          blender --version
+      - name: Render real 3D comparison under identical conditions
+        run: |
+          set -euo pipefail
+          mkdir -p viva-evidence/fixture
+          git rev-parse HEAD > viva-evidence/commit.txt
+          blender -b -t 2 --python-exit-code 1 --python tools/world/render_viva_roma_fixture.py -- --output "$PWD/viva-evidence/fixture"
+      - name: Export the real city, without claiming complete render review
+        run: |
+          set -euo pipefail
+          blender -b -t 2 --python-exit-code 1 --python tools/world/build_roman_test_city.py -- --output "$PWD/viva-evidence/city" --surface-style viva --texture-size 1024
+          python3 tools/world/verify_viva_roma_export.py viva-evidence/city
+      - name: Publish render and GLB evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: viva-roma-3d-${{ github.run_number }}
+          path: |
+            viva-evidence/commit.txt
+            viva-evidence/fixture/legacy.png
+            viva-evidence/fixture/viva.png
+            viva-evidence/fixture/comparison.json
+            viva-evidence/fixture/viva_fixture.blend
+            viva-evidence/city/imperathen_roman_test_city.glb
+            viva-evidence/city/roman_city_collision.glb
+            viva-evidence/city/city_manifest.json
+            viva-evidence/city/export_validation.json
+          if-no-files-found: warn
+          retention-days: 14
