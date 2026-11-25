@@ -1,0 +1,75 @@
+name: Roman city living pedestrian detail
+
+on:
+  push:
+    branches: ['feature/city-ambient-people-detail-20261125']
+  pull_request:
+    paths:
+      - 'prototype/scripts/world/city_ambient_people.gd'
+      - 'prototype/scripts/world/city_exploration.gd'
+      - 'prototype/tests/city_ambient_people_test.gd'
+      - '.github/workflows/city-ambient-people.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: city-ambient-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  citizen-motion-and-visibility:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Get checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$release/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$release/$archive" -o "$archive"
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          folder=pathlib.Path.cwd()
+          file=folder/'Godot_v4.7.2-stable_linux.x86_64.zip'
+          sums={x.split()[-1].lstrip('*'):x.split()[0] for x in (folder/'SHA512-SUMS.txt').read_text().splitlines() if x.strip()}
+          with file.open('rb') as inp:
+              if hashlib.file_digest(inp,'sha512').hexdigest()!=sums.get(file.name):
+                  raise SystemExit('Official Godot SHA512 mismatch')
+          with zipfile.ZipFile(file) as zipf:
+              zipf.extractall(folder)
+          PY
+          chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Import, real NPC movement, walls and existing city regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p city-ambient-evidence
+          "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee city-ambient-evidence/import.log
+          IMPERATHEN_ISOLATED_TEST=1 "$GODOT_BIN" --headless --path prototype \
+            --fixed-fps 60 --script res://tests/city_ambient_people_test.gd 2>&1 | tee city-ambient-evidence/people.log
+          grep -q 'CITY_AMBIENT_PEOPLE_PASS' city-ambient-evidence/people.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' city-ambient-evidence/people.log; then exit 1; fi
+          IMPERATHEN_ISOLATED_TEST=1 "$GODOT_BIN" --headless --path prototype \
+            --fixed-fps 60 --script res://tests/city_market_signage_test.gd 2>&1 | tee city-ambient-evidence/stalls.log
+          grep -q 'CITY_MARKET_SIGNAGE_PASS' city-ambient-evidence/stalls.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' city-ambient-evidence/stalls.log; then exit 1; fi
+      - name: Upload measured source-bound logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-ambient-${{ github.run_number }}
+          path: city-ambient-evidence/
+          if-no-files-found: warn
+          retention-days: 14
