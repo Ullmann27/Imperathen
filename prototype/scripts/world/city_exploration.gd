@@ -9,6 +9,7 @@ const CityCharacterFinish := preload("res://scripts/rendering/city_character_det
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
 const CityMarketBridge := preload("res://scripts/world/city_market_bridge.gd")
 const CitySurfaceMicrodetail := preload("res://scripts/rendering/city_surface_microdetail.gd")
+const VivaCloseupProps := preload("res://scripts/rendering/city_viva_closeup_props.gd")
 const CityAmbientPeople := preload("res://scripts/world/city_ambient_people.gd")
 const Crowd := preload("res://scripts/world/city_exploration_crowd.gd")
 const VivaAtmosphere := preload("res://scripts/rendering/viva_roma_atmosphere.gd")
@@ -170,6 +171,8 @@ func _load_city() -> void:
 	# Optional GPU-instanced masonry and worn street microgeometry. This never
 	# replaces the authored RomanCity walls, collision, NPCs, camera or save.
 	print("IMPERATHEN_FACADE_DETAIL " + JSON.stringify(CitySurfaceMicrodetail.install(city, profile)))
+	# Use real already-exported close-up GLBs. No extra collision bodies or economy.
+	print("IMPERATHEN_VIVA_PROPS " + JSON.stringify(VivaCloseupProps.install(city, profile)))
 
 func _add_static_colliders(source: Node3D,prefix: String) -> void:
 	# Godot's -colonly importer may already have generated the physics body.
