@@ -97,6 +97,7 @@ def main():
             ("raid_route_world_a", ["--fixed-fps", "60", "--script", "res://tests/raid_route_world_test.gd", "--", "part=a"], "checks, 0 failed"),
             ("raid_route_world_b", ["--fixed-fps", "60", "--script", "res://tests/raid_route_world_test.gd", "--", "part=b"], "checks, 0 failed"),
             ("raid_route_world_c", ["--fixed-fps", "60", "--script", "res://tests/raid_route_world_test.gd", "--", "part=c"], "checks, 0 failed"),
+            ("raid_route_world_d", ["--fixed-fps", "60", "--script", "res://tests/raid_route_world_test.gd", "--", "part=d"], "checks, 0 failed"),
             ("raid_strike_timing", ["--fixed-fps", "60", "--script", "res://tests/raid_strike_timing_test.gd"], "checks, 0 failed"),
             ("unarmed_combat", ["--script", "res://tests/unarmed_combat_test.gd"], "UNARMED_COMBAT_PASS"),
             ("childhood_integration", ["--fixed-fps", "60", "--script", "res://tests/childhood_integration_test.gd"], "CHILDHOOD_INTEGRATION_PASS"),

@@ -8,6 +8,8 @@ extends SceneTree
 ##   part b: physical raids 3 and 4 (five and six raiders).
 ##   part c: childhood night raid played through its real chapter commands,
 ##           pursuit through the gate when the player stands behind the palisade.
+##   part d: raid 4 moved by the rule tick itself (world not observed): the
+##           rules' swept motion check with slide against the real colliders.
 
 const Model = preload("res://scripts/domain/world_model.gd")
 const World = preload("res://scripts/world/game_world.gd")
@@ -47,6 +49,8 @@ func _run() -> void:
 		_check_rules_route()
 		_check_guard_sight()
 		report["physical_raids"] = [await _physical_raid(1,false), await _physical_raid(2,false)]
+	elif part == "d":
+		report["physical_raids"] = [await _rules_moved_raid(4)]
 	elif part == "b":
 		report["physical_raids"] = [await _physical_raid(3,false), await _physical_raid(4,false)]
 	else:
@@ -268,6 +272,61 @@ func raiders_still(world: Node3D, id: String) -> bool:
 	return world.village_life_world.raiders.has(id) and (world.village_life_world.raiders[id] as Node3D).visible
 
 
+func _rules_moved_raid(number: int) -> Dictionary:
+	# No observation callback: VillageLife moves the raiders with the world's
+	# swept motion check (cast + slide); the bodies follow the rule positions.
+	var model := _raid_model(number,false)
+	var world := World.new()
+	root.add_child(world)
+	world.setup(model.data)
+	world.set_active(true)
+	world.set_mode("person")
+	model.combat_sight_check = world.combat_sight_clear
+	model.combat_motion_check = world.combat_safe_motion
+	await physics_frame
+	for figure: Node in get_nodes_in_group("village_people"):
+		figure.set_process(false)
+	var arrival := {}
+	var gate := {}
+	var before := {}
+	var inside := 0
+	var refresh := 0.0
+	for frame in int((Life.RAID_SECONDS+1.0)/DT):
+		await physics_frame
+		model.set_player_position(world.get_player_position())
+		model.advance(DT)
+		world.sync_combat_state(model.data)
+		world.set_frontier_time(float(model.data.world_seconds))
+		refresh += DT
+		if refresh >= .12:
+			refresh = 0.0
+			world.sync_state(model.data)
+		if not model.data.village.raid.active:
+			break
+		for enemy: Dictionary in model.data.village.raid.enemies:
+			var at := Vector2(enemy.x,enemy.z)
+			if not arrival.has(enemy.id) and at.distance_to(Route.LOOT) < Route.LOOT_RADIUS:
+				arrival[enemy.id] = snappedf(float(frame+1)*DT,.01)
+			if before.has(enemy.id) and (before[enemy.id] as Vector2).y < -49.0 and at.y >= -49.0:
+				gate[enemy.id] = at.x
+			before[enemy.id] = at
+			if Route._house_index(at) >= 0:
+				inside += 1
+		if arrival.size() == model.data.village.raid.enemies.size():
+			break
+	var arrivals := []
+	for enemy: Dictionary in model.data.village.raid.enemies:
+		arrivals.append(arrival.get(enemy.id,-1.0))
+		_check(arrival.has(enemy.id),"Rule-moved raid %d: %s reaches the loot radius within 150 s" % [number,enemy.id])
+		_check(gate.has(enemy.id) and absf(float(gate[enemy.id])) < 1.75,"Rule-moved raid %d: %s enters through the north gate" % [number,enemy.id])
+	_check(inside == 0,"Rule-moved raid %d: no rule position inside a house footprint" % number)
+	_check(model._validate_state(model.data).is_empty(),"Rule-moved raid %d keeps the complete save schema" % number)
+	world.queue_free()
+	await process_frame
+	return {"number":number,"mode":"rules_moved","raiders":arrivals.size(),"arrival_s":arrivals,"gate_crossing_x":gate.values(),
+		"defeated_by_guards":[],"house_inside_samples":inside,"max_static_penetration_m":0.0,"min_player_distance_m":-1.0}
+
+
 func _check_obstacle_model() -> void:
 	# Drift guard: the stateless route plans with a static village plan. Every
 	# real static collider at body height inside the village and on the north
@@ -324,6 +383,12 @@ func _check_obstacle_model() -> void:
 			if fraction.size() != 2 or float(fraction[0]) < 1.0:
 				blocked.append("%d-%d" % [a,b])
 	_check(edges >= 60 and blocked.is_empty(),"All %d street edges are swept free of static geometry (blocked: %s)" % [edges,",".join(blocked)])
+	# Rule-side motion check: a step diagonally into the palisade slides along
+	# it; a step straight into it stops at the wall.
+	var diagonal: Vector2 = world.combat_safe_motion(Vector2(10.0,-49.6),Vector2(10.085,-49.515))
+	var straight: Vector2 = world.combat_safe_motion(Vector2(10.0,-49.6),Vector2(10.0,-49.48))
+	_check(diagonal.x > 10.06 and diagonal.y < -49.52,"The rule-side swept check slides along the palisade (%s)" % str(diagonal))
+	_check(is_equal_approx(straight.x,10.0) and straight.y < -49.52,"The rule-side swept check stops a step straight into the palisade (%s)" % str(straight))
 	report["street_edges"] = edges
 	world.queue_free()
 	await process_frame
