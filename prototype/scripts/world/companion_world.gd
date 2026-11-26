@@ -24,7 +24,7 @@ func actor(id: String) -> CharacterBody3D:
 func home(id: String) -> Vector3:
 	# During the open I-01 morning Silvanus sits at the breakfast table on the
 	# raised house floor; afterwards he walks out to his door work.
-	if id == "silvanus" and I01.active(world._state):
+	if id == "silvanus" and bool(I01.presentation(world._state).get("silvanus_at_table", false)):
 		var seat: Vector2 = I01.POINTS.silvanus_table
 		return Vector3(seat.x, Layout.HOUSE_FLOOR, seat.y)
 	var point: Vector2 = Childhood.POINTS.marcus if id == "marcus" else Childhood.POINTS.father

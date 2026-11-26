@@ -143,6 +143,9 @@ func _test_fresh_opt_in_and_legacy() -> void:
 	_check(Life.actor_position(model.data, "julia") == I01.POINTS.julia_table and Life.actor_position(model.data, "silvanus") == I01.POINTS.silvanus_table, "Parents are at the breakfast table during the I-01 morning")
 	var after_morning = _new()
 	_check(_morning(after_morning), "The I-01 morning can be played through its commands")
+	_check(Life.actor_position(after_morning.data, "julia") == I01.POINTS.julia_table and Life.actor_position(after_morning.data, "silvanus") == Childhood.POINTS.father, "After breakfast Julia stays at the table for her errand and Silvanus goes to his door work")
+	for _index in 3:
+		_complete(after_morning)
 	_check(Life.actor_position(after_morning.data, "julia") == Childhood.POINTS.mother and Life.actor_position(after_morning.data, "silvanus") == Childhood.POINTS.father and Life.actor_position(after_morning.data, "sextus") == Childhood.POINTS.smith, "Canonical family and smith render at the same authored points used by childhood interactions")
 	for place: Dictionary in model.data.village.economy.workplaces.values():
 		_check(place.condition == 100, "The fresh existing village is not a ruin awaiting reconstruction")

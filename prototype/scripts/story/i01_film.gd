@@ -90,7 +90,7 @@ static func vid_c_beats(data: Dictionary, chapter: String, location: String) -> 
 	if str(data.get("village", {}).get("childhood", {}).get("screenplay", {}).get("i01", "")) != "complete":
 		return beats
 	var helped := bool(data.village.childhood.relationships.julia.get("helped", false))
-	var parents := _beat("i01_c_parents", "mission_dialogue", "I01_C_HELPED" if helped else "I01_C_FAREWELL", 5.0, "julia")
+	var parents := _beat("i01_c_parents", "mission_dialogue", "I01_C_HELPED" if helped else "I01_C_FAREWELL", 5.0, "silvanus")
 	parents.chapter = chapter
 	parents.location = location
 	beats.append(parents)

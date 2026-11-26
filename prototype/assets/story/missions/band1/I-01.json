@@ -10,7 +10,7 @@
       "id": "mother_morning",
       "label": "Mit Mutter den Morgen besprechen",
       "npc": "julia",
-      "objective": "Julia steht nach dem Frühstück vor eurem Haus. Sprich mit ihr über den Tag.",
+      "objective": "Julia räumt nach dem Frühstück den Tisch im Familienhaus ab. Sprich mit ihr über den Tag.",
       "result": "Mutter vertraut dir den zweckgebundenen Haushaltsdenar an. Er ist für die Besorgung, nicht dein Taschengeld.",
       "text": "»Dein Vater arbeitet heute an einer Tür. Für Cassia lege ich einen Haushaltsdenar bereit; er gehört der Bestellung, nicht dir. Nimm deinem Vater den Krug vom Tisch mit hinaus. Und wenn du gehst, sag mir wohin. Nicht weil ich dich halten will – weil du zurückkommen sollst.«",
       "source_mission": "I-01",
@@ -364,11 +364,11 @@
         "text": "»Aelia redet nicht viel. Wenn sie dir etwas an der Mauer erklärt hat, hör gut zu.«"
       },
       "I01_C_HELPED": {
-        "speaker_id": "julia",
-        "text": "»Wer am Morgen die Becher deckt, vergisst auch den Korb nicht. Erst zu Aurelia, dann zu Cassia – und sag mir, wann du zurück bist.«"
+        "speaker_id": "silvanus",
+        "text": "»Wer am Morgen die Becher deckt, vergisst auch den Korb nicht. Erst zu Aurelia, dann zu Cassia – und sag deiner Mutter, wann du zurück bist.«"
       },
       "I01_C_FAREWELL": {
-        "speaker_id": "julia",
+        "speaker_id": "silvanus",
         "text": "»Geh nur. Erst zu Aurelia mit dem Korb, dann zu Cassia. Und komm zum Abend heim.«"
       },
       "I01_C_MARCUS": {

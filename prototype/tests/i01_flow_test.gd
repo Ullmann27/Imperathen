@@ -345,6 +345,41 @@ func _test_vid_a_skip_and_resume() -> void:
 	await frames(2)
 	var labels: Array = _beat().choices.map(func(c): return c.label)
 	check(labels.has("Von Marcus erzählen"), "Table talk offers the actual encounter: " + str(labels))
+	await _press_choice("i01_topic_contact")
+	check(str(_beat().text).contains("Marcus"), "Julia answers about the actual encounter")
+	game._opening_skip()
+	game._opening_next()
+	await frames(4)
+	# Delayed hooks of the encounter: VID-C offer line and the I-03 memory.
+	for step in ["mother_morning", "fill_water", "father_morning"]:
+		var target: Vector2 = Childhood.view(game.model.data).point
+		_place(target + Vector2(0.5, 0.5) if step != "fill_water" else I01.POINTS.player_table)
+		check(game._command("village_childhood_action", {"action_id":step}).ok, "Family step after the yard morning: " + step)
+	await frames(3)
+	var ids: Array = game.opening_sequence.beats.map(func(b): return str(b.id)) if game.screen == "opening" else []
+	check(ids.has("i01_c_marcus") and ids.has("i01_c_parents"), "VID-C names the place Marcus mentioned, only after the real encounter: " + str(ids))
+	check(ids.has("i01_c_parents") and str(game.opening_sequence.beats[ids.find("i01_c_parents")].text).begins_with("»Geh nur"), "VID-C bids a friendly farewell when the boy did not help")
+	game._opening_skip()
+	game._opening_next()
+	await frames(4)
+	var aurelia: Vector2 = Life.actor_position(game.model.data, "aurelia")
+	_place(aurelia + Vector2(0.6, 0.0))
+	if not Life.relationship(game.model.data, "aurelia").get("met", false):
+		game.model.execute("village_talk", {"npc_id":"aurelia", "choice":"meet"})
+	check(game._command("village_childhood_action", {"action_id":"basket_check"}).ok, "I-02 basket checked")
+	await frames(3)
+	if game.screen == "opening":
+		game._opening_skip()
+		game._opening_next()
+		await frames(4)
+	check(Childhood.view(game.model.data).stage == "i03_marcus", "I-03 follows")
+	var at: Vector3 = game.world._companion.global_position
+	_place(Vector2(at.x + 0.8, at.z))
+	game._show_companion()
+	await frames(3)
+	check(_all_text(game.ui._screen).contains("Heute Morgen am Brunnen"), "I-03 recalls the shared morning at the well (memory, not a loyalty value)")
+	game._resume()
+	await frames(2)
 
 
 func _test_film_aborted_equivalence() -> void:

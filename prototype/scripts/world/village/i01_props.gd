@@ -11,7 +11,8 @@ const FLOOR := 0.3925
 const ROOM := Vector3(-13.0, FLOOR, 11.0)
 const SHELF_SLOTS := {"julia":Vector3(-2.32, 1.08, -0.27), "silvanus":Vector3(-2.32, 1.08, 0.03), "player":Vector3(-2.32, 1.08, 0.33)}
 const SHELF_ORIGIN := Vector3(0.0, 0.0, 1.05)
-const TABLE_SLOTS := {"julia":Vector3(-1.35, 0.865, -0.98), "silvanus":Vector3(-1.70, 0.865, -0.30), "player":Vector3(-0.70, 0.865, -0.30)}
+## Silvanus stands at the table's east end so his way to the door stays open.
+const TABLE_SLOTS := {"julia":Vector3(-1.35, 0.865, -0.98), "silvanus":Vector3(-0.50, 0.865, -0.50), "player":Vector3(-0.85, 0.865, -0.15)}
 const JUG_TABLE := Vector3(-0.55, 0.865, -0.85)
 const JUG_BENCH := Vector3(1.93, 0.515, 0.18)
 const HAND_CUPS := {"julia":Vector3(0.0, -0.02, 0.05), "silvanus":Vector3(0.0, 0.10, 0.05), "player":Vector3(0.0, 0.22, 0.05)}

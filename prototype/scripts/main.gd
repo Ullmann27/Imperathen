@@ -678,9 +678,13 @@ func _show_companion() -> void:
 	if Childhood.enabled(model.data) and str(childhood_view.get("stage", "")) == "i03_marcus":
 		screen = "dialog"
 		world.set_active(false)
+		var i03_text := "Marcus kennt den schnelleren Weg zum Markt. Der alte Münzstreit zwischen euch entscheidet nicht über Sieg oder Niederlage, sondern darüber, welche Erinnerung eure Freundschaft künftig trägt."
+		if I01.has_event(model.data, "I-01.contact.marcus"):
+			# Delayed hook of the I-01 encounter: a shared memory, not a loyalty value.
+			i03_text = "»Heute Morgen am Brunnen hast du mir zugehört, als der Eimer leckte. Jetzt zeig ich dir die Abkürzung.«\n\n" + i03_text
 		ui.show_dialog(
 			"Marcus · Eine Münze und eine Abkürzung",
-			"Marcus kennt den schnelleren Weg zum Markt. Der alte Münzstreit zwischen euch entscheidet nicht über Sieg oder Niederlage, sondern darüber, welche Erinnerung eure Freundschaft künftig trägt.",
+			i03_text,
 			[
 				{"label":"Den Streit beilegen und gemeinsam gehen", "action":"companion_help", "choice":"friend", "enabled":true, "reason":""},
 				{"label":"Auf dem eigenen Standpunkt beharren", "action":"companion_decline", "choice":"rival", "enabled":true, "reason":""}

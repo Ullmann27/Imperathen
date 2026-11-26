@@ -17,7 +17,7 @@ const HOME_ORIGIN := Vector3(-13.0, 0.3925, 11.0)
 const POINTS := {
 	"home_shelf":Vector2(-15.32, 12.05), "home_table":Vector2(-14.1, 10.39),
 	"home_bed":Vector2(-12.05, 10.55), "well":Vector2(-7.0, 6.0),
-	"julia_table":Vector2(-14.15, 9.28), "silvanus_table":Vector2(-15.3, 10.4),
+	"julia_table":Vector2(-14.15, 9.28), "silvanus_table":Vector2(-12.95, 10.95),
 	"player_table":Vector2(-14.0, 11.55)
 }
 const KEYS := ["i01", "i01_path", "i01_cups", "i01_table_by", "i01_water", "i01_contacts", "i01_meal", "i01_topic", "i01_events"]
@@ -95,9 +95,12 @@ static func presentation(data: Dictionary) -> Dictionary:
 		jug = "hand"
 	elif water in ["poured", "silvanus"] or status == "legacy" or completed >= 2:
 		jug = "table"
-	var family_at_table := status == "pending" and completed == 0
+	# Julia stays at the breakfast table until the father has the jug (no
+	# visible jump while the boy is in the house); Silvanus leaves after the
+	# table talk and walks to his door work himself.
 	return {"status":status, "cups":cup_state, "jug":jug, "water":water,
-		"julia_at_table":family_at_table, "silvanus_at_table":family_at_table}
+		"julia_at_table":status in ["pending", "complete"] and completed < 3,
+		"silvanus_at_table":status == "pending" and completed == 0}
 
 
 static func event_ids(data: Dictionary) -> Array:

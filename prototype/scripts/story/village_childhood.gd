@@ -225,7 +225,7 @@ static func actor_override(data: Dictionary, id: String) -> Variant:
 			return POINTS.patrol_road + Vector2(1.8, 0)
 		if current.get("id", "") in ["patrol_gate","patrol_report"]:
 			return POINTS.patrol_gate + Vector2(1.8, 0)
-	if id in ["julia", "silvanus"] and I01.active(data) and str(_person(data, id).get("assignment", "idle")) == "idle":
+	if id in ["julia", "silvanus"] and bool(I01.presentation(data).get(id + "_at_table", false)) and str(_person(data, id).get("assignment", "idle")) == "idle":
 		return I01.POINTS[id + "_table"]
 	if EXTRA_NPCS.has(id) and str(_person(data, id).get("assignment", "idle")) == "idle":
 		return POINTS[EXTRA_NPCS[id].point]
