@@ -34,6 +34,7 @@ JSON_PATHS = (
     "assets/city/activity_anchors/forum.json",
     "assets/city/activity_anchors/market_street.json",
     "assets/city/activity_anchors/residential.json",
+    "assets/city/activity_anchors/roman_quarter.json",
     "assets/city/barks/city_barks.json",
     "assets/city/economy/city_economy.json",
     "assets/world/political_offices.json",
