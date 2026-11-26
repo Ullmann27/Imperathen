@@ -198,3 +198,43 @@ Von den 30 Vorschauen wurden nur die drei geladen, die selbst kanonisch oder Kan
 | `1fbbb763-0aba-54bf-bb4f-de80ca4d6134` | Roman centurion cuirass (untextured twin) | 11-25 10:18 | 11-28 10:18 | 3576992 | keine | `armor_roman_muscle_cuirass` |
 | `daf2d776-1be5-4960-bdec-bbab84523699` | Julius Caesar (textured) | 11-25 10:30 | 11-28 10:32 | 2245620 | 4096×4096 PBR | `historical_caesar_image` |
 | `33983306-05ce-5a50-a5e9-eace192c0c2a` | Julius Caesar (untextured twin) | 11-25 10:32 | 11-28 10:32 | 2245620 | keine | `historical_caesar_image` |
+
+## Laufzeit-Ableitungen und Ladeneinbau vom 26. November 2026
+
+Erzeugt mit `tools/art/build_meshy_gear.py` (Blender 4.3.2) aus den in `lock.json` gesperrten Quellen; Profile in `prototype/assets/meshy/gear_profiles.json`, Messwerte in `gear-build.json`. Der Prüfstand steht in `docs/43_shops_base/STATUS.md`.
+
+### Abgeleitet
+
+| Stable ID | Ladenartikel | Dreiecke LOD 0/1/2 | Basisfarbe px | Texeldichte LOD 0 | Bytes gesamt | Eingriff an der Quelle |
+| --- | --- | --- | --- | ---: | ---: | --- |
+| `weap_roman_gladius_pompeii` | `gladius` | 1859 / 950 / 380 | 1024 / 512 / 256 | 1943 px/m | 472.084 | Parierstück von 12,5 cm Kreuzform auf kompakten Block gestaucht; zwei Nietknöpfe auf der Klinge entfernt |
+| `weap_roman_pugio` | `pugio` | 1532 / 849 / 340 | 1024 / 512 / 256 | 4330 px/m | 488.888 | Klinge auf 4,4 cm verbreitert; zweite Querstange und zwei Tüllenformen in der Klingenmitte entfernt |
+| `weap_roman_spatha` | `spatha` | 2154 / 949 / 380 | 1024 / 512 / 256 | 2362 px/m | 498.680 | Griff von 20 auf 11 cm gekürzt, Parierstück und Klinge verschmälert |
+| `weap_roman_pilum` | `pilum` | 1390 / 700 / 300 | 1024 / 512 / 256 | 1930 px/m | 492.748 | Schaft von 5,4 auf 3 cm verjüngt; kurze Kegelspitze durch dünnes Eisen mit Pyramidenkopf ersetzt |
+| `weap_germanic_spear` | `spear` | 1400 / 699 / 299 | 1024 / 512 / 256 | 1696 px/m | 401.828 | Schaft gerundet, Blatt verschmälert |
+| `gear_roman_cavalry_lance` | `cavalry_lance` | 2600 / 999 / 319 | 1024 / 512 / 256 | 471 px/m | 439.660 | Quelle enthält zwei gekreuzte Lanzen; eine herausgelöst und aufgerichtet |
+| `gear_sling` | `sling` | 4200 / 1499 / 448 | 1024 / 512 / 256 | 1643 px/m | 599.068 | nur Maßstab und Aufhängepunkt |
+| `gear_roman_scutum` | `scutum` | 8455 / 1900 / 479 | 2048 / 512 / 256 | 972 px/m | 867.876 | nur Maßstab und Griffpunkt |
+| `gear_roman_cavalry_oval_shield` | `cavalry_shield` | 8901 | 2048 | 1212 px/m | 1.001.724 | Quelle ist kreisrund; Brett auf 1,10 × 0,72 m oval gestaucht, Buckel und Nieten bleiben rund |
+| `mount_legacy_bay_horse` | `riding_horse` | 13971 / 5163 / 1430 | 2048 / 1024 / 512 | 473 px/m | 3.790.540 | nur Maßstab, Bodenkontakt, Anker; statisch ohne Skelett |
+| `resource_firewood` | Requisit | 5997 / 2193 / 478 | 1024 / 512 / 256 | 99 px/m | 915.508 | nur Maßstab, Bodenkontakt und Kollisionshülle |
+| `resource_iron_ore` | Requisit | 2524 / 1200 / 400 | 1024 / 512 / 256 | 286 px/m | 389.592 | nur Maßstab, Bodenkontakt und Kollisionshülle |
+| `resource_clay` | Requisit | 6000 / 2185 / 541 | 1024 / 512 / 256 | 134 px/m | 607.032 | nur Maßstab, Bodenkontakt und Kollisionshülle |
+| `resource_limestone` | Requisit | 5999 / 2200 / 599 | 1024 / 512 / 256 | 131 px/m | 645.064 | nur Maßstab, Bodenkontakt und Kollisionshülle |
+| `resource_copper_ore` | Requisit | 6000 / 2200 / 600 | 1024 / 512 / 256 | 223 px/m | 539.532 | nur Maßstab, Bodenkontakt und Kollisionshülle |
+
+Neu hinzugekommen: **12.149.824 Bytes** in 43 GLB-Dateien (ohne die sechs bereits vorhandenen Ausrüstungsdateien). Die Rohquellen (892 MB) bleiben unversioniert.
+
+### Zurückgehalten
+
+| Stable ID | Grund |
+| --- | --- |
+| `weap_roman_aux_bow` | Die Quelle ist ein unbespannter, S-förmig asymmetrischer Stab mit einer lose herabhängenden Sehnenschlaufe. Eine gespannte Sehne zwischen den Enden würde den Bogenkörper kreuzen; ein lesbarer Bogen entsteht nur durch Neugenerierung oder Handmodellierung. |
+| `weap_crossbow_concept` | Die Quelle ist ein gewehrschaftartiger Holzkörper mit Abzugsmechanik, aber ohne Bogenarme. Zusätzlich epochengesperrt. |
+| `gear_roman_four_horn_saddle` | Die vier Hörner sind als spitze Tierhörner ausgeführt, darunter liegt eine orangefarbene Halbtonne als Pferderumpf-Ersatz. Ein gepolsterter Hörnchensattel ist daraus nicht ohne Neumodellierung zu gewinnen. |
+| `resource_galena` | Nur untexturierte Geometrie; ein texturiertes Final kostet einen Meshy-Refine. |
+| `mount_ancient_cavalry_horse` | Nur untexturierte Geometrie; durch das texturierte Braune (mount_legacy_bay_horse) ersetzt. |
+| `armor_roman_muscle_cuirass` | 3,58 Mio. Dreiecke; epochengesperrt. Ableitung und Passform am Körper stehen aus; Herkunft aus dem privaten Bild-zu-3D-Stapel vom 25.11. braucht eine Entscheidung zur Veröffentlichung. |
+| `historical_caesar_image_textured` | 2,25 Mio. Dreiecke, statische Figur ohne Rig; gehört in die Figurenstrecke. Herkunft aus dem privaten Bild-zu-3D-Stapel vom 25.11. |
+| `building_roman_imperial_temple` | 4,67 Mio. Dreiecke; epochengesperrt; eigene Strecke tools/world/build_meshy_temple.py im Stadtpaket. |
+| `unit_legacy_*` (fünf Figuren), sieben `unit_*`-Finals | Statische Figuren ohne Skelett; Figurenstrecke (`build_meshy_people.py`), nicht Teil der Ladenausrüstung. |

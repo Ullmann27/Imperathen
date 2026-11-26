@@ -676,25 +676,13 @@
       "special": "oval_board",
       "width": 0.72,
       "triangles": [
-        9000,
-        3200,
-        900
+        9000
       ],
       "textures": [
         [
           2048,
           1024,
           512
-        ],
-        [
-          512,
-          256,
-          256
-        ],
-        [
-          256,
-          128,
-          128
         ]
       ],
       "sockets": {
@@ -702,12 +690,7 @@
         "SOCKET_BACK": "origin"
       },
       "accents": [],
-      "planar_angles": [
-        0,
-        8,
-        20
-      ],
-      "lod_note": "The board, straps and iron ring are separate flat layers; they are reduced by dissolving coplanar faces, and the near tier keeps the full source mesh.",
+      "lod_note": "Board, straps and iron ring are separate flat layers with their own UV islands. Edge collapse and planar dissolve both tear them (reviewed 26.11.2026), so only the full near tier is shipped. Far tiers need a single-shell rebake.",
       "texture_note": "A metre-high shield at 1024 px lies below 512 px/m; the near tier keeps 2048 px base colour."
     },
     "mount_legacy_bay_horse": {
@@ -749,9 +732,9 @@
       "front": "-y",
       "max_dimension": 1.6,
       "triangles": [
-        6000,
-        2200,
-        600
+        9300,
+        4200,
+        2000
       ],
       "textures": [
         [
@@ -771,7 +754,8 @@
         ]
       ],
       "collision": "hull",
-      "accents": []
+      "accents": [],
+      "lod_note": "191 separate logs: below about ten triangles per log an edge collapse turns the stack into spikes, so the far tier keeps 2000 triangles."
     },
     "resource_iron_ore": {
       "kind": "prop",

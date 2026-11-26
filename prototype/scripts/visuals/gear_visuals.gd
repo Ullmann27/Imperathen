@@ -115,7 +115,7 @@ static func _wear_mask(wear: float) -> ImageTexture:
 	var key := roundi(wear * 100.0)
 	if _wear_masks.has(key):
 		return _wear_masks[key]
-	var image := Image.create(WEAR_EDGE, WEAR_EDGE, true, Image.FORMAT_RGBA8)
+	var image := Image.create(WEAR_EDGE, WEAR_EDGE, false, Image.FORMAT_RGBA8)
 	for y in WEAR_EDGE:
 		for x in WEAR_EDGE:
 			var blotch := 0.55 * _noise(x, y, 32, 11) + 0.3 * _noise(x, y, 16, 23) + 0.15 * _noise(x, y, 4, 37)
@@ -129,7 +129,7 @@ static func _wear_mask(wear: float) -> ImageTexture:
 
 static func _rust_texture() -> ImageTexture:
 	if _rust == null:
-		var image := Image.create(WEAR_EDGE, WEAR_EDGE, true, Image.FORMAT_RGBA8)
+		var image := Image.create(WEAR_EDGE, WEAR_EDGE, false, Image.FORMAT_RGBA8)
 		for y in WEAR_EDGE:
 			for x in WEAR_EDGE:
 				var grain := 0.6 * _noise(x, y, 8, 53) + 0.4 * _noise(x, y, 2, 71)
