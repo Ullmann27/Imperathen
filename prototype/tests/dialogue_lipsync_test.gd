@@ -8,6 +8,7 @@ extends SceneTree
 ##     Jaw bone + blend shapes) is within +-1 frame (1/60 s) of the audio onset;
 ##   * the subtitle ends within 1 frame of the audio end.
 
+const MixerTeardown := preload("res://tests/audio_mixer_teardown.gd")
 const Opening = preload("res://scripts/story/opening_story.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
 const VoiceLines = preload("res://scripts/audio/voice_lines.gd")
@@ -173,18 +174,7 @@ func _run() -> void:
 	dialogue.stop()
 	world.queue_free()
 	await process_frame
-	# AudioServer releases stopped Ogg playback from its mixer thread. The
-	# fixed-step test can finish several minutes of story in one mixer tick.
-	var periods := 0
-	var since_mix := AudioServer.get_time_since_last_mix()
-	var deadline := Time.get_ticks_msec() + 500
-	while periods < 4 and Time.get_ticks_msec() < deadline:
-		OS.delay_msec(2)
-		await process_frame
-		var elapsed := AudioServer.get_time_since_last_mix()
-		if elapsed < since_mix:
-			periods += 1
-		since_mix = elapsed
+	await MixerTeardown.drain(self)
 	print("DIALOGUE_LIPSYNC_REPORT " + JSON.stringify(_report))
 	print("DIALOGUE_LIPSYNC_RESULT checks=%d failures=%d" % [checks, failures.size()])
 	for failure in failures:
