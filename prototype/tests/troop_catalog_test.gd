@@ -19,6 +19,7 @@ func _initialize() -> void:
 	_test_upgrades(catalog)
 	_test_calendar()
 	_test_tiers_and_variants(catalog)
+	_test_military_options(catalog)
 	_finish(catalog)
 
 
@@ -190,3 +191,52 @@ func _test_tiers_and_variants(catalog: Dictionary) -> void:
 	_rejects("overlapping experience tiers", "xp-Spanne", func(_f, t, _p): t.tiers.experience[2].xp_min = 50)
 	_rejects("equipment tier above Q4", "Q0–Q4", func(_f, t, _p): t.tiers.equipment[4].quality = 5)
 	_rejects("empty external id list", "external_ids", func(_f, t, _p): _troop(t, "germanic_skirmisher").external_ids.tribal_world = [])
+
+
+func _test_military_options(catalog: Dictionary) -> void:
+	# Profiles as the tribal world would fill them (stocks of bc58_rhine as orientation).
+	var poor := {"system": "tribal_world", "culture": "germanic_rhine", "year": -58, "wealth": 6, "trade": 0.2, "trade_partners": 0,
+		"population": 90, "materials": {"wood": 40, "iron": 2}, "development": {}}
+	var rich := {"system": "tribal_world", "culture": "germanic_rhine", "year": -58, "wealth": 120, "trade": 0.85, "trade_partners": 2,
+		"population": 520, "materials": {"wood": 220, "iron": 45, "horse": 8}, "development": {"smithy": 1, "hall": 1}}
+	var a := Catalog.military_options(catalog, poor)
+	var b := Catalog.military_options(catalog, rich)
+	check(a.ok and b.ok and a.culture == "germanic" and a != b, "Two Germanic communities do not get identical military options")
+	check(a.equipment_cap == "einfach" and a.training_cap == "geuebt" and b.equipment_cap == "gut" and b.training_cap == "gedrillt",
+		"Wealth, trade, iron and buildings set the equipment and training caps (%s/%s, %s/%s)" % [a.equipment_cap, a.training_cap, b.equipment_cap, b.training_cap])
+	check(a.troops.germanic_skirmisher.available and a.troops.germanic_levy.available and a.troops.germanic_civil_levy.available,
+		"A poor community still raises levy, spearmen and spear-throwers")
+	check(not a.troops.germanic_retainer.available and not a.troops.germanic_rider.available and not a.troops.germanic_warrior.available and not a.troops.germanic_bow_skirmisher.available,
+		"Without wealth, horses, a smithy or trade there are no retainers, riders, armed warriors or archers")
+	check(b.troops.germanic_retainer.available and b.troops.germanic_rider.available and b.troops.germanic_noble.available and b.troops.germanic_bow_skirmisher.available,
+		"The rich trading community can field them")
+	check(b.troops.germanic_bow_skirmisher.rarity == "rare" and b.troops.germanic_bow_skirmisher.max_share <= 0.05 and b.troops.germanic_skirmisher.max_share >= 0.3 and b.troops.germanic_skirmisher.rarity == "common",
+		"Archers stay a small share even where available; spear-throwers are regular")
+	check(a.troops.germanic_retainer.missing.size() == 3 and a.next.equipment == ["materials.iron 2/10", "development.smithy 0/1"],
+		"Missing requirements are named (%s; next equipment tier: %s)" % [str(a.troops.germanic_retainer.missing), str(a.next.equipment)])
+	check(not a.troops.has("roman_miles") and not a.troops.has("germanic_eques_auxiliaris"), "Only the community's own troops are offered, none in Roman service")
+	check(a.troops.germanic_skirmisher.external_ids.tribal_world == ["plaenkler"], "Options carry the tribal-world ids")
+	var step := rich.duplicate(true)
+	step.wealth = 79
+	check(Catalog.military_options(catalog, step).equipment_cap == "solide", "One input below its threshold lowers the cap")
+	step = rich.duplicate(true)
+	step.materials.horse = 0
+	check(not Catalog.military_options(catalog, step).troops.germanic_rider.available and Catalog.military_options(catalog, step).troops.germanic_retainer.available, "Raw materials gate single troops")
+	check(Catalog.military_options(catalog, rich) == b and rich.materials.iron == 45, "Options are a pure function of the profile")
+	check(Catalog.capped_tiers(catalog, a, "germanic_levy", {"equipment": "meisterlich", "training": "gedrillt"}) == {"experience": "ausgebildet", "equipment": "einfach", "training": "geuebt"},
+		"A company's tiers never exceed the community's caps")
+	check(Catalog.capped_tiers(catalog, b, "germanic_levy", {"equipment": "solide"}).equipment == "solide" and Catalog.capped_tiers(catalog, b, "germanic_levy", {}).equipment == "", "Choices below the cap stay")
+	var bare := {"culture": "germanic", "year": -58}
+	var none := Catalog.military_options(catalog, bare)
+	check(none.ok and none.equipment_cap == "aermlich" and none.training_cap == "ungeuebt" and none.troops.germanic_civil_levy.available and not none.troops.germanic_levy.available,
+		"With nothing a community has only its unarmed levy")
+	check(Catalog.capped_tiers(catalog, none, "germanic_skirmisher", {}).equipment == "aermlich", "A troop whose minimum kit is out of reach is fielded at the cap")
+	for bad: Variant in [null, {"culture": "germanic"}, {"culture": "germanic", "year": 0}, {"culture": "germanic", "year": -58, "wealth": -1},
+			{"culture": "germanic", "year": -58, "gold": 5}, {"culture": "germanic", "year": -58, "materials": {"iron": NAN}},
+			{"system": "tribal_world", "culture": "unknown", "year": -58}, {"culture": "germanic", "year": 1500}]:
+		check(not Catalog.military_options(catalog, bad).ok, "Refuses profile %s" % str(bad))
+	_rejects("unknown requirement", "unbekannte Voraussetzung", func(_f, t, _p): _troop(t, "germanic_rider").requires.gold = 3)
+	_rejects("share above one", "max_share", func(_f, t, _p): _troop(t, "germanic_rider").max_share = 1.5)
+	_rejects("caps out of tier order", "Reihenfolge", func(_f, t, _p): t.military_options.equipment_caps.reverse())
+	_rejects("lowest cap with requirements", "unterste Stufe", func(_f, t, _p): t.military_options.training_caps[0].needs = {"wealth": 1})
+	_rejects("missing options", "military_options fehlt", func(_f, t, _p): t.erase("military_options"))

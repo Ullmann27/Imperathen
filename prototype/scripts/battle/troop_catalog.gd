@@ -20,6 +20,10 @@ const COMMAND_SCOPES := ["army", "company", "deputy", "none"]
 const KIND_WEAPONS := {"infantry": ["gladius", "sword_long", "axe"], "spear": ["spear"], "archer": ["bow", "sling"], "skirmisher": ["javelin"]}
 const KIND_SLOT := {"infantry": "main_hand", "spear": "main_hand", "archer": "main_hand", "skirmisher": "missile"}
 const TIER_KINDS := ["experience", "equipment", "training"]
+## Inputs of the military options (D-041): scalar minimums and per-id minimums.
+const NEED_SCALARS := ["wealth", "trade", "trade_partners", "population"]
+const NEED_MAPS := ["materials", "development"]
+const CAP_KINDS := {"equipment_caps": "equipment", "training_caps": "training"}
 
 static var _default := {}
 
@@ -59,6 +63,7 @@ static func build(families_doc: Variant, troops_doc: Variant, people_doc: Varian
 		catalog.tiers[kind] = {}
 		for tier: Dictionary in troops_doc.tiers[kind]:
 			catalog.tiers[kind][tier.id] = _integers(tier.duplicate(true))
+	catalog.military_options = troops_doc.military_options.duplicate(true)
 	return catalog
 
 
@@ -182,6 +187,7 @@ static func validate(families_doc: Variant, troops_doc: Variant, people_doc: Var
 	var drills: Dictionary = troops_doc.drills
 	var authorities: Dictionary = troops_doc.authorities
 	_validate_tiers(troops_doc.get("tiers"), errors)
+	_validate_options(troops_doc.get("military_options"), troops_doc.get("tiers"), errors)
 	var appointments := {}
 	for a: Variant in troops_doc.appointments:
 		if typeof(a) != TYPE_DICTIONARY or not _identifier(a.get("appointment_id")):
@@ -281,6 +287,12 @@ static func _validate_troop(t: Dictionary, families: Dictionary, troops: Diction
 		var slot: String = KIND_SLOT[kind]
 		if not loadout.has(slot) or typeof(loadout[slot]) != TYPE_DICTIONARY or not loadout[slot].get("family_id") in KIND_WEAPONS[kind]:
 			errors.append(owner + ": battle_kind %s braucht passende Hauptwaffe (%s)" % [kind, slot])
+	if t.has("requires") or t.has("max_share"):
+		_check_needs(owner + ": requires", t.get("requires"), errors)
+		if typeof(t.get("max_share")) not in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(t.max_share)) or t.max_share <= 0 or t.max_share > 1:
+			errors.append(owner + ": max_share muss über 0 und höchstens 1 sein")
+	if t.has("rarity") and not t.rarity in ["common", "rare"]:
+		errors.append(owner + ": rarity ist common oder rare")
 	if t.has("external_ids"):
 		var ext: Variant = t.external_ids
 		if typeof(ext) != TYPE_DICTIONARY:
@@ -374,6 +386,154 @@ static func _validate_tiers(tiers: Variant, errors: Array[String]) -> void:
 				"training":
 					if not is_integer(tier.get("drill_offset"), -3, 3):
 						errors.append("tiers.training.%s: drill_offset -3..3" % tier.id)
+
+
+static func _check_needs(owner: String, needs: Variant, errors: Array[String]) -> void:
+	if typeof(needs) != TYPE_DICTIONARY:
+		errors.append(owner + " fehlt")
+		return
+	for key in needs:
+		var value: Variant = needs[key]
+		if key in NEED_SCALARS:
+			if typeof(value) not in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(value)) or value < 0 or (key == "trade" and value > 1):
+				errors.append("%s.%s ist kein gültiger Mindestwert" % [owner, key])
+		elif key in NEED_MAPS:
+			if typeof(value) != TYPE_DICTIONARY or value.is_empty():
+				errors.append("%s.%s braucht Einträge" % [owner, key])
+				continue
+			for id in value:
+				if not _identifier(id) or not is_integer(value[id], 1, 1000000):
+					errors.append("%s.%s.%s ist kein gültiger Mindestwert" % [owner, key, str(id)])
+		else:
+			errors.append("%s: unbekannte Voraussetzung %s" % [owner, str(key)])
+
+
+static func _validate_options(options: Variant, tiers: Variant, errors: Array[String]) -> void:
+	if typeof(options) != TYPE_DICTIONARY or not _text(options.get("rule")):
+		errors.append("troops: military_options fehlt")
+		return
+	var cultures: Variant = options.get("cultures")
+	if typeof(cultures) != TYPE_DICTIONARY:
+		errors.append("military_options.cultures fehlt")
+	else:
+		for system in cultures:
+			if typeof(cultures[system]) != TYPE_DICTIONARY:
+				errors.append("military_options.cultures.%s muss ein Wörterbuch sein" % str(system))
+				continue
+			for external in cultures[system]:
+				if not _identifier(external) or not _identifier(cultures[system][external]):
+					errors.append("military_options.cultures.%s enthält eine ungültige Kennung" % str(system))
+	for key: String in CAP_KINDS:
+		var known := []
+		if typeof(tiers) == TYPE_DICTIONARY and typeof(tiers.get(CAP_KINDS[key])) == TYPE_ARRAY:
+			for tier: Variant in tiers[CAP_KINDS[key]]:
+				if typeof(tier) == TYPE_DICTIONARY:
+					known.append(tier.get("id"))
+		var caps: Variant = options.get(key)
+		if typeof(caps) != TYPE_ARRAY or caps.size() != known.size():
+			errors.append("military_options.%s braucht je Stufe genau einen Eintrag" % key)
+			continue
+		for i in range(caps.size()):
+			var cap: Variant = caps[i]
+			# Same order as the tiers, so "highest fulfilled" is well defined.
+			if typeof(cap) != TYPE_DICTIONARY or cap.get("tier") != known[i]:
+				errors.append("military_options.%s folgt nicht der Reihenfolge der Stufen" % key)
+				continue
+			_check_needs("military_options.%s.%s" % [key, str(cap.tier)], cap.get("needs"), errors)
+			if i == 0 and typeof(cap.get("needs")) == TYPE_DICTIONARY and not cap.needs.is_empty():
+				errors.append("military_options.%s: die unterste Stufe hat keine Voraussetzungen" % key)
+
+
+static func _plain(v: Variant) -> String:
+	return str(int(v)) if float(v) == floorf(float(v)) else str(v)
+
+
+## What a profile lacks for the given needs, as readable German lines ([] = fulfilled).
+static func unmet_needs(needs: Dictionary, profile: Dictionary) -> Array[String]:
+	var missing: Array[String] = []
+	for key in NEED_SCALARS:
+		if needs.has(key) and float(profile.get(key, 0)) < float(needs[key]):
+			missing.append("%s %s/%s" % [key, _plain(profile.get(key, 0)), _plain(needs[key])])
+	for key in NEED_MAPS:
+		var have: Dictionary = profile.get(key, {})
+		for id in needs.get(key, {}):
+			if float(have.get(id, 0)) < float(needs[key][id]):
+				missing.append("%s.%s %s/%s" % [key, id, _plain(have.get(id, 0)), _plain(needs[key][id])])
+	return missing
+
+
+static func valid_profile(profile: Variant) -> bool:
+	if typeof(profile) != TYPE_DICTIONARY or typeof(profile.get("culture")) != TYPE_STRING or not valid_year(profile.get("year")):
+		return false
+	for key in profile:
+		if key in NEED_SCALARS:
+			if typeof(profile[key]) not in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(profile[key])) or profile[key] < 0:
+				return false
+		elif key in NEED_MAPS:
+			if typeof(profile[key]) != TYPE_DICTIONARY:
+				return false
+			for id in profile[key]:
+				if typeof(id) != TYPE_STRING or typeof(profile[key][id]) not in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(profile[key][id])) or profile[key][id] < 0:
+					return false
+		elif not key in ["culture", "year", "system"]:
+			return false
+	return true
+
+
+## Military options of one community (D-041). Pure function of the catalog and the
+## profile {culture, year, wealth, trade (0-1), trade_partners, population,
+## materials{id: n}, development{id: n}, system}. With "system" the culture is an id of
+## that external system (e.g. "tribal_world": "germanic_rhine"). Missing inputs count
+## as 0. Returns {ok, culture, year, equipment_cap, training_cap, next{equipment,
+## training}, troops{troop_id: {available, missing[], max_share, rarity, external_ids}}}.
+static func military_options(catalog: Dictionary, profile: Variant) -> Dictionary:
+	if not catalog.get("ok", false) or not valid_profile(profile):
+		return {"ok": false, "error": "Ungültiges Profil", "troops": {}}
+	var culture: String = profile.culture
+	if profile.has("system"):
+		culture = str(catalog.military_options.cultures.get(profile.system, {}).get(culture, ""))
+	var year := int(profile.year)
+	var ids := available(catalog, year, culture, "own")
+	if culture == "" or ids.is_empty():
+		return {"ok": false, "error": "Keine Truppen für Kultur und Jahr", "troops": {}}
+	var result := {"ok": true, "culture": culture, "year": year, "next": {}, "troops": {}}
+	for key: String in CAP_KINDS:
+		var kind: String = CAP_KINDS[key]
+		result[kind + "_cap"] = catalog.military_options[key][0].tier
+		result.next[kind] = []
+		for cap: Dictionary in catalog.military_options[key]:
+			var missing := unmet_needs(cap.needs, profile)
+			if not missing.is_empty():
+				# The first unreached tier tells the player what to build or trade for.
+				result.next[kind] = missing
+				break
+			result[kind + "_cap"] = cap.tier
+	for id in ids:
+		var entry: Dictionary = catalog.troops[id]
+		var missing := unmet_needs(entry.get("requires", {}), profile)
+		result.troops[id] = {"available": missing.is_empty(), "missing": missing, "max_share": float(entry.get("max_share", 1.0)),
+			"rarity": str(entry.get("rarity", "common")), "external_ids": entry.get("external_ids", {}).duplicate(true)}
+	return result
+
+
+## Company tiers limited by a community's options: equipment and training never exceed
+## the caps. Returns {} for unknown tiers, like company_tiers().
+static func capped_tiers(catalog: Dictionary, options: Dictionary, troop_id: String, choice: Dictionary) -> Dictionary:
+	var tiers := company_tiers(catalog, troop_id, choice)
+	if tiers.is_empty() or not options.get("ok", false):
+		return {}
+	for kind in ["equipment", "training"]:
+		var order: Array = catalog.tiers[kind].keys()
+		if tiers[kind] != "" and order.find(tiers[kind]) > order.find(options[kind + "_cap"]):
+			tiers[kind] = options[kind + "_cap"]
+	if tiers.equipment == "":
+		# No chosen tier means the troop's minimum kit. A community that cannot make
+		# that quality fields the troop at its own cap instead.
+		var cap_quality := int(catalog.tiers.equipment[options.equipment_cap].quality)
+		for item: Dictionary in catalog.troops[troop_id].loadout.values():
+			if int(item.q_min) > cap_quality:
+				tiers.equipment = options.equipment_cap
+	return tiers
 
 
 ## The three tiers of a company: explicit choices, else the troop's defaults (experience

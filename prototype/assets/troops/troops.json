@@ -32,6 +32,22 @@
       {"id": "gedrillt", "label": "Gedrillt", "drill_offset": 1}
     ]
   },
+  "military_options": {
+    "rule": "Militärische Möglichkeiten einer Gemeinschaft folgen aus Wohlstand, Handel, Rohstoffen und kultureller Entwicklung (D-041), nicht aus einer festen Liste je Volk. Eingabe ist ein Profil {culture, year, wealth, trade, trade_partners, population, materials{}, development{}}; die Stammeswelt füllt es aus ihrem Zustand (Vertrag: docs/19_motion_combat/TROOPS_COMBAT_INTERFACES.md). needs nennt Mindestwerte; alle müssen erfüllt sein. Die höchste erfüllte Stufe begrenzt Ausrüstung und Ausbildung neuer Verbände. Schwellen sind Designwerte, an den Beständen der Stammeswelt (bc58_rhine) ausgerichtet.",
+    "cultures": {"tribal_world": {"germanic_rhine": "germanic"}},
+    "equipment_caps": [
+      {"tier": "aermlich", "needs": {}},
+      {"tier": "einfach", "needs": {"materials": {"wood": 20}}},
+      {"tier": "solide", "needs": {"materials": {"iron": 10}, "development": {"smithy": 1}}},
+      {"tier": "gut", "needs": {"wealth": 80, "trade": 0.5, "materials": {"iron": 30}, "development": {"smithy": 1}}},
+      {"tier": "meisterlich", "needs": {"wealth": 200, "trade_partners": 2, "materials": {"iron": 60}, "development": {"smithy": 2}}}
+    ],
+    "training_caps": [
+      {"tier": "ungeuebt", "needs": {}},
+      {"tier": "geuebt", "needs": {"population": 60}},
+      {"tier": "gedrillt", "needs": {"wealth": 100, "population": 300, "development": {"hall": 1}}}
+    ]
+  },
   "authorities": {
     "depot": "Römisches Depot gibt berechtigte Gegenstände gegen Soldabzug aus (Handbuch S. 43/68; Designregel).",
     "evocatio": "Wiedereinberufung eines entlassenen Veteranen.",
@@ -332,6 +348,8 @@
       "tier": 1,
       "role": "skirmisher",
       "battle_kind": "skirmisher",
+      "requires": {"materials": {"wood": 5}},
+      "max_share": 0.2,
       "loadout": {
         "shield": {"family_id": "shield_round", "q_min": 0, "q_max": 1},
         "missile": {"family_id": "javelin", "q_min": 0, "q_max": 1, "count": 3}
@@ -359,6 +377,8 @@
       "tier": 1,
       "role": "levy",
       "battle_kind": "spear",
+      "requires": {},
+      "max_share": 1.0,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 0, "q_max": 1},
         "missile": {"family_id": "javelin", "q_min": 0, "q_max": 1, "count": 1}
@@ -387,6 +407,8 @@
       "tier": 2,
       "role": "spear_infantry",
       "battle_kind": "spear",
+      "requires": {"materials": {"wood": 10}},
+      "max_share": 1.0,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 1, "q_max": 2},
         "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 2},
@@ -418,6 +440,8 @@
       "tier": 2,
       "role": "axe_infantry",
       "battle_kind": "infantry",
+      "requires": {"materials": {"iron": 5}},
+      "max_share": 0.03,
       "variant_of": "germanic_levy",
       "rarity": "rare",
       "reconstruction": "artistic",
@@ -445,6 +469,8 @@
       "tier": 3,
       "role": "spear_infantry",
       "battle_kind": "spear",
+      "requires": {"materials": {"iron": 10}, "development": {"smithy": 1}},
+      "max_share": 0.5,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 2, "q_max": 3},
         "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
@@ -475,6 +501,8 @@
       "tier": 3,
       "role": "mixed_foot",
       "battle_kind": "",
+      "requires": {"materials": {"horse": 4}},
+      "max_share": 0.15,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 1, "q_max": 2},
         "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 2},
@@ -499,6 +527,8 @@
       "tier": 4,
       "role": "sword_infantry",
       "battle_kind": "infantry",
+      "requires": {"wealth": 40, "materials": {"iron": 10}, "development": {"hall": 1}},
+      "max_share": 0.1,
       "loadout": {
         "main_hand": {"family_id": "sword_long", "q_min": 2, "q_max": 3},
         "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
@@ -529,6 +559,8 @@
       "tier": 4,
       "role": "cavalry",
       "battle_kind": "",
+      "requires": {"materials": {"horse": 4}},
+      "max_share": 0.2,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 2, "q_max": 3},
         "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
@@ -556,6 +588,8 @@
       "tier": 5,
       "role": "elite_infantry",
       "battle_kind": "infantry",
+      "requires": {"wealth": 100, "materials": {"iron": 20, "horse": 2}, "development": {"hall": 1}},
+      "max_share": 0.02,
       "loadout": {
         "main_hand": {"family_id": "sword_long", "q_min": 3, "q_max": 4},
         "shield": {"family_id": "shield_round", "q_min": 3, "q_max": 4},
@@ -608,6 +642,8 @@
       "tier": 2,
       "role": "archer",
       "battle_kind": "archer",
+      "requires": {"trade_partners": 1, "materials": {"wood": 20}},
+      "max_share": 0.05,
       "rarity": "rare",
       "loadout": {
         "main_hand": {"family_id": "bow", "q_min": 1, "q_max": 2}
@@ -632,6 +668,8 @@
       "tier": 2,
       "role": "skirmisher",
       "battle_kind": "skirmisher",
+      "requires": {"materials": {"wood": 10}},
+      "max_share": 0.35,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 0, "q_max": 2},
         "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 2},
