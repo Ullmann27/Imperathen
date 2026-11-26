@@ -217,7 +217,10 @@ def main():
             render(args.evidence,bpy.data.objects["HeroRig"],"marcus-walk",action="march",frame=10)
         hero.ART = scratch
         hero.OUT = scratch
-        levels = hero.export_lods()
+        # The connector-specific original hero PNG packaging is inappropriate
+        # for an independent character. Build artifacts and APKs can embed
+        # the complete new textures without external URI dependencies.
+        levels = hero.export_lods(connector_delivery=False)
         for level, row in enumerate(levels):
             src = scratch/f"hero_quality_{level}.glb"
             dest = args.output/f"marcus_quality_{level}.glb"

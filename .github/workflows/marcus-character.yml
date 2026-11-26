@@ -24,7 +24,7 @@ jobs:
       - name: Create actual editable character, renders and four mobile GLBs
         run: |
           set -euo pipefail
-          "$RUNNER_TEMP/marcus-blender/blender" -b -t 4 --python-exit-code 1 -P tools/characters/build_marcus.py -- --evidence artifacts/marcus --render 2>&1 | tee artifacts/marcus/blender.log
+          "$RUNNER_TEMP/marcus-blender/blender" -b -t 4 --python-exit-code 1 -P tools/characters/build_marcus.py -- --evidence artifacts/marcus 2>&1 | tee artifacts/marcus/blender.log
           python3 tools/characters/validate_hero.py prototype/assets/characters/marcus_quality_{0,1,2,3}.glb --report artifacts/marcus/validation.json
           mkdir -p artifacts/marcus/runtime
           cp prototype/assets/characters/marcus_quality_*.glb artifacts/marcus/runtime/
@@ -48,6 +48,10 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import marcus_character village_people --report artifacts/marcus/engine
+      - name: Render verified Blender character for review
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/marcus-blender/blender" -b -t 4 --python-exit-code 1 -P tools/characters/build_marcus.py -- --output "$RUNNER_TEMP/marcus-studio" --evidence artifacts/marcus/studio --render 2>&1 | tee artifacts/marcus/studio.log
       - name: Capture actual Godot village character
         run: |
           set -euo pipefail

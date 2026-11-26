@@ -1,0 +1,48 @@
+name: Reconcile measured kick tracks – source correction evidence
+on:
+  push:
+    branches: ['feat/marcus-authored-character-20261126']
+    paths:
+      - 'tools/rebake_melee_kicks.py'
+      - 'prototype/tests/melee_strike_bake.gd'
+      - '.github/workflows/melee-kick-rebake.yml'
+permissions:
+  contents: read
+jobs:
+  measured:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install checksum-verified Godot
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable"
+          file="Godot_v4.7.2-stable_linux.x86_64.zip"
+          curl -fLsS --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fLsS --retry 3 "$base/$file" -o "$file"
+          awk -v n="$file" '$2 == n || $2 == "*" n {print $1 "  " n}' SHA512-SUMS.txt > selected.sha512
+          test "$(wc -l < selected.sha512)" -eq 1
+          sha512sum -c selected.sha512
+          unzip -q "$file"
+          chmod +x Godot_v4.7.2-stable_linux.x86_64
+          echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Measure and independently recheck the three corrected tracks
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/kick-rebake
+          git rev-parse HEAD > artifacts/kick-rebake/SOURCE_COMMIT.txt
+          python3 tools/rebake_melee_kicks.py --godot "$GODOT_BIN" --report artifacts/kick-rebake
+          git diff --exit-code -- prototype/scripts/domain/combat_actions.gd prototype/scripts/domain/melee/melee_track_data.gd
+      - name: Preserve measured source candidates and full checks
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-measured-kick-correction-${{ github.run_id }}
+          path: artifacts/kick-rebake/
+          if-no-files-found: error
+          retention-days: 30

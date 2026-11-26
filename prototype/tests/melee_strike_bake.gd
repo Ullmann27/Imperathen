@@ -29,6 +29,7 @@ const GUARD_FRAMES := 12
 
 var _done := false
 var _write := false
+var _write_path := OUT
 var _kits := {}
 var _moves := {}
 var _guards := {}
@@ -38,6 +39,9 @@ var _log: Array[String] = []
 
 func _initialize() -> void:
 	_write = "--write" in OS.get_cmdline_user_args()
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with("--output="):
+			_write_path = arg.trim_prefix("--output=")
 
 
 func _process(_delta: float) -> bool:
@@ -52,7 +56,11 @@ func _process(_delta: float) -> bool:
 	_legacy_findings()
 	var text := _render()
 	if _write:
-		var file := FileAccess.open(OUT, FileAccess.WRITE)
+		var file := FileAccess.open(_write_path, FileAccess.WRITE)
+		if file == null:
+			printerr("Cannot write measured strike table: " + _write_path)
+			quit(1)
+			return true
 		file.store_string(text)
 		file.close()
 		for line in _log:
