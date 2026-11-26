@@ -22,6 +22,7 @@ const TouchAction := preload("res://scripts/ui/touch_action.gd")
 const SafeArea := preload("res://scripts/ui/safe_area.gd")
 const Calendar := preload("res://scripts/domain/world_calendar.gd")
 const EraRegistry := preload("res://scripts/domain/era_registry.gd")
+const RomanQuarter := preload("res://scripts/world/roman_quarter.gd")
 const CITY_PATH := "res://assets/world/roman_city_test.glb"
 const CITY_COLLISION := "res://assets/world/roman_city_collision.glb"
 const TEMPLE_PATH := "res://assets/world/roman_meshy_temple_%d.glb"
@@ -54,6 +55,7 @@ var camera := Camera3D.new()
 var city_available := false
 var youth_available := false
 var ambient_people: CityAmbientPeople
+var quarter: RomanQuarter
 var crowd := Crowd.new()
 var training := CityTraining.new()
 var _crowd_elapsed := 0.0
@@ -85,11 +87,18 @@ var _trade_button: Button
 var _bag_button: Button
 var market := CityMarketBridge.new()
 var _actions: HBoxContainer
+var _tablet_dialog := AcceptDialog.new()
 
 func _ready() -> void:
 	name = "CityExploration"
 	_build_ground()
 	_load_city()
+	if city_available:
+		quarter = RomanQuarter.new()
+		quarter.name = "RomanQuarter"
+		quarter.position = RomanQuarter.ORIGIN
+		add_child(quarter)
+		quarter.install(profile, _add_static_colliders)
 	_build_player()
 	_build_camera()
 	add_child(training)
@@ -468,7 +477,7 @@ func _build_ui() -> void:
 	_safe.add_child(_toolbar)
 	_trade_bar = HBoxContainer.new()
 	_trade_bar.add_theme_constant_override("separation",8)
-	_trade_button = _button("Handel",func(): _open_market(false))
+	_trade_button = _button("Handel",_interact)
 	_bag_button = _button("Beutel",func(): _open_market(true))
 	_trade_button.disabled = true
 	_bag_button.disabled = true
@@ -503,6 +512,11 @@ func _build_ui() -> void:
 	_pause_panel.add_child(column)
 	_safe.add_child(_pause_panel)
 	_pause_panel.hide()
+	_tablet_dialog.title = "Wachstafel am Tresen"
+	_tablet_dialog.dialog_autowrap = true
+	_tablet_dialog.dialog_text = "Heute bei Sonnenaufgang geliefert\n\nDrei Krüge Öl. Zwei Säcke Mehl.\nDer kleinere Krug hat einen Sprung. Stell ihn beiseite, bis Livia ihn gesehen hat."
+	_tablet_dialog.ok_button_text = "Schließen"
+	add_child(_tablet_dialog)
 
 func _button(caption: String,callback: Callable) -> Button:
 	var button := TouchAction.new()
@@ -532,7 +546,7 @@ func _layout_ui() -> void:
 	_pause_panel.position = (_safe.size-_pause_panel.size)*0.5
 
 func _physics_process(delta: float) -> void:
-	if paused or market.is_open():
+	if paused or market.is_open() or _tablet_dialog.visible:
 		return
 	_crowd_elapsed += delta
 	if _crowd_elapsed >= 0.2:
@@ -666,7 +680,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode==KEY_E:
-			_open_market(false)
+			_interact()
 			get_viewport().set_input_as_handled()
 		elif event.physical_keycode==KEY_I:
 			_open_market(true)
@@ -688,12 +702,34 @@ func _market_message(value: String) -> void:
 	_update_status()
 
 func _refresh_market_buttons() -> void:
-	if not is_instance_valid(_trade_button) or not market.available:
+	if not is_instance_valid(_trade_button):
+		return
+	if _tablet_is_near():
+		_trade_button.disabled = false
+		_trade_button.text = "Tafel lesen"
+		_trade_button.tooltip_text = "Wachstafel am Tresen"
 		return
 	var target := market.nearest()
-	_trade_button.disabled = not bool(target.reachable)
+	_trade_button.disabled = not market.available or not bool(target.reachable)
 	_trade_button.text = "Handel" if not target.reachable else "Kaufen"
 	_trade_button.tooltip_text = str(target.label) if target.reachable else "Gehe zu einem Marktstand"
+
+func _tablet_is_near() -> bool:
+	return is_instance_valid(quarter) and quarter.tablet_reachable(player)
+
+func _interact() -> void:
+	if paused or market.is_open() or _tablet_dialog.visible:
+		return
+	if _tablet_is_near():
+		_touch_move = Vector2.ZERO
+		_pad.reset()
+		_look.reset()
+		player.velocity = Vector3.ZERO
+		figure.drive(0)
+		var width := mini(420, int(get_viewport().get_visible_rect().size.x) - 36)
+		_tablet_dialog.popup_centered(Vector2i(width, 210))
+	else:
+		_open_market(false)
 
 func _open_market(inventory: bool) -> void:
 	if paused or _action_left > 0 or market.is_open():
