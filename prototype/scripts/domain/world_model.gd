@@ -1525,6 +1525,7 @@ func _restore_integer_fields(state: Dictionary) -> void:
 	if Childhood.enabled(state):
 		state.village.childhood.version=int(state.village.childhood.version)
 		state.village.childhood.screenplay.version=int(state.village.childhood.screenplay.version)
+		state.village.childhood.screenplay.i04_sticks = int(state.village.childhood.screenplay.i04_sticks)
 		state.village.childhood.day=int(state.village.childhood.day)
 		state.village.childhood.guard_absence.previous_health=int(state.village.childhood.guard_absence.previous_health)
 		for relation:Dictionary in state.village.childhood.relationships.values():
