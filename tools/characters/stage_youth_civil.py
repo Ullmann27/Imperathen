@@ -5,7 +5,7 @@ Runs, in order, the committed steps
   1. build_youth_civil_outfit.py on the staged ORIGINAL youth LODs,
   2. the unchanged retarget_accad_youth.py on its output,
   3. clear_youth_civil_arms.py, which keeps hands and forearms out of the wool
-     in the retargeted clips (Arm_L/Arm_R rotation keys only),
+     in the retargeted clips (shoulder rotation and the returning guard elbow),
 and installs the untracked runtime derivatives:
   prototype/assets/characters/hero_meshy_italia_civil_{0..3}.glb
   prototype/assets/animations/accad_youth_civil_motion.json
