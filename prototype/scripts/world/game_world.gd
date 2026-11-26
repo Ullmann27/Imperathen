@@ -14,6 +14,8 @@ const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
 const CameraObstruction = preload("res://scripts/world/camera_obstruction.gd")
+const Vegetation = preload("res://scripts/vegetation/vegetation_field.gd")
+const VegetationGround = preload("res://scripts/vegetation/vegetation_ground.gd")
 var village_life_world: Node3D
 var regional_terrain: Node3D
 var _village_focus := ""
@@ -26,6 +28,8 @@ var grove = Grove.new()
 var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
 var opening_props = preload("res://scripts/world/village/opening_props.gd").new()
 var tree_sites := []
+## Valdora trees, shrubs, herbs and crops (scripts/vegetation); built with the terrain.
+var vegetation: Node3D
 var crops := Node3D.new()
 var season_index := -1
 const PLAYER_SPEED := 4.6
@@ -152,7 +156,11 @@ func setup(state: Dictionary) -> void:
 			for tree in placements:
 				if tree.kind == "olive":
 					tree.kind = "oak"
-		grove.populate(placements)
+		# Valdora (italia) draws the same tree sites with the regional species
+		# of the vegetation layer; other origins keep the generic grove.
+		grove.populate(placements if id != "italia" or vegetation == null else [])
+		if vegetation:
+			vegetation.visible = id == "italia"
 	sync_state(state)
 	_story_companions.reset(state)
 	set_mode("person")
@@ -397,6 +405,8 @@ func set_quality(profile: String) -> void:
 	_update_people_profile()
 	grove.set_quality(profile)
 	scenery.set_quality(profile)
+	if vegetation:
+		vegetation.set_quality(profile)
 	regional.set_quality(profile)
 	population.set_quality(profile)
 	_apply_quality()
@@ -411,6 +421,8 @@ func _update_people_profile() -> void:
 
 func set_presentation_time(seconds: float) -> void:
 	scenery.set_presentation_time(seconds)
+	if vegetation:
+		vegetation.set_wind_time(seconds)
 
 
 func get_quality_profile() -> String:
@@ -720,6 +732,7 @@ func _create_terrain() -> void:
 	for at in [Vector3(-18,0,8),Vector3(6,0,-12),Vector3(-19,0,15),Vector3(26,0,16)]:
 		tree_sites.append({"kind":Grove.KINDS[tree_sites.size()%3],"position":at,"scale":0.92,"yaw":random.randf_range(-PI,PI)})
 		Art.box_collider(ground, Vector3(0.42,2.6,0.42),at+Vector3.UP*1.3)
+	_create_vegetation(ground)
 	for index in range(26):
 		var location := Vector3(random.randf_range(-58, 48), -0.05, random.randf_range(-45, 31))
 		if location.x > -20 and location.x < 29 and location.z > -22 and location.z < 19:
@@ -735,6 +748,22 @@ func _create_terrain() -> void:
 		Art.box_collider(boundary, Vector3(1, 15, 105), Vector3(x, 7, -8))
 	for z: float in [-58, 40]:
 		Art.box_collider(boundary, Vector3(125, 15, 1), Vector3(-3, 7, z))
+
+
+func _create_vegetation(ground: Node3D) -> void:
+	# Planted on the visible surface (plane, regional terrain, backdrop hills).
+	# The tree sites above keep their colliders; the layer adds its own only
+	# outside the village and its raid approach.
+	var surface := VegetationGround.new()
+	surface.add_mesh(scenery.get_node_or_null("Foothills") as MeshInstance3D)
+	vegetation = Vegetation.new()
+	vegetation.name = "Vegetation"
+	ground.add_child(vegetation)
+	var source = scenery.get("brook_source_z")
+	vegetation.build(surface.height, tree_sites, float(source) if source != null else -95.0)
+	vegetation.set_quality(_quality_profile)
+	if season_index >= 0:
+		vegetation.apply_season(season_index)
 
 
 func _create_village() -> void:
@@ -1152,6 +1181,8 @@ func _physics_process(delta: float) -> void:
 	if _state.get("village", {}).get("enabled", false):
 		regional_terrain.follow(get_player_position(), _quality_profile)
 	population.update_nearby(get_player_position(),_active and _mode == "person")
+	if vegetation and vegetation.visible:
+		vegetation.set_player_position(get_player_position())
 	if not _active:
 		return
 	_animation_time += delta
@@ -1765,4 +1796,6 @@ func _apply_season(index: int) -> void:
 	_materials.earth.albedo_color = soil[index]
 	_materials.wheat.albedo_color = grain[index]
 	scenery.apply_season(index,_sun,_village_environment)
+	if vegetation:
+		vegetation.apply_season(index)
 	crops.visible = index != 3

@@ -1,0 +1,236 @@
+{
+  "assets": {
+    "acer_campestre": {
+      "bark": "maple",
+      "crown_radius_m": 5.008,
+      "height_m": 9.718,
+      "kind": "tree",
+      "leaf": "maple",
+      "triangles": [
+        14112,
+        3014,
+        572,
+        240
+      ]
+    },
+    "acer_campestre_arbustum": {
+      "bark": "maple",
+      "crown_radius_m": 2.299,
+      "height_m": 5.805,
+      "kind": "tree",
+      "leaf": "maple",
+      "triangles": [
+        3728,
+        1768,
+        564,
+        68
+      ]
+    },
+    "alnus_glutinosa": {
+      "bark": "alder",
+      "crown_radius_m": 3.78,
+      "height_m": 14.251,
+      "kind": "tree",
+      "leaf": "alder",
+      "triangles": [
+        12280,
+        3022,
+        622,
+        306
+      ]
+    },
+    "carpinus_betulus": {
+      "bark": "hornbeam",
+      "crown_radius_m": 5.403,
+      "height_m": 12.379,
+      "kind": "tree",
+      "leaf": "hornbeam",
+      "triangles": [
+        18136,
+        3504,
+        678,
+        300
+      ]
+    },
+    "corylus_avellana": {
+      "bark": "hazel",
+      "crown_radius_m": 3.27,
+      "height_m": 5.228,
+      "kind": "shrub",
+      "leaf": "hazel",
+      "triangles": [
+        9112,
+        2284,
+        648,
+        316
+      ]
+    },
+    "crataegus_monogyna": {
+      "bark": "thorn",
+      "crown_radius_m": 2.476,
+      "height_m": 4.506,
+      "kind": "shrub",
+      "leaf": "hawthorn",
+      "triangles": [
+        5816,
+        1274,
+        250,
+        108
+      ]
+    },
+    "fraxinus_angustifolia": {
+      "bark": "ash",
+      "crown_radius_m": 5.73,
+      "height_m": 16.516,
+      "kind": "tree",
+      "leaf": "ash",
+      "triangles": [
+        8412,
+        2144,
+        532,
+        238
+      ]
+    },
+    "herb_cards": {
+      "kind": "cards",
+      "triangles": [
+        18,
+        4,
+        154,
+        27
+      ]
+    },
+    "populus_nigra": {
+      "bark": "poplar",
+      "crown_radius_m": 7.371,
+      "height_m": 21.775,
+      "kind": "tree",
+      "leaf": "poplar",
+      "triangles": [
+        15664,
+        3318,
+        798,
+        344
+      ]
+    },
+    "prunus_spinosa": {
+      "bark": "thorn",
+      "crown_radius_m": 2.178,
+      "height_m": 2.927,
+      "kind": "shrub",
+      "leaf": "blackthorn",
+      "triangles": [
+        7904,
+        2174,
+        582,
+        328
+      ]
+    },
+    "quercus_cerris": {
+      "bark": "cerris",
+      "crown_radius_m": 5.926,
+      "height_m": 17.198,
+      "kind": "tree",
+      "leaf": "cerris",
+      "triangles": [
+        12844,
+        2756,
+        588,
+        282
+      ]
+    },
+    "quercus_robur": {
+      "bark": "oak",
+      "crown_radius_m": 8.039,
+      "height_m": 16.407,
+      "kind": "tree",
+      "leaf": "oak",
+      "triangles": [
+        15012,
+        3192,
+        754,
+        346
+      ]
+    },
+    "salix_alba": {
+      "bark": "willow",
+      "crown_radius_m": 6.238,
+      "height_m": 14.319,
+      "kind": "tree",
+      "leaf": "willow",
+      "triangles": [
+        17468,
+        3350,
+        660,
+        146
+      ]
+    },
+    "salix_alba_pollard": {
+      "bark": "willow",
+      "crown_radius_m": 2.549,
+      "height_m": 6.969,
+      "kind": "tree",
+      "leaf": "willow",
+      "triangles": [
+        8552,
+        3784,
+        958,
+        76
+      ]
+    },
+    "sambucus_nigra": {
+      "bark": "elder",
+      "crown_radius_m": 3.368,
+      "height_m": 4.689,
+      "kind": "shrub",
+      "leaf": "elder",
+      "triangles": [
+        5908,
+        1614,
+        476,
+        218
+      ]
+    },
+    "ulmus_minor": {
+      "bark": "elm",
+      "crown_radius_m": 6.234,
+      "height_m": 16.005,
+      "kind": "tree",
+      "leaf": "elm",
+      "triangles": [
+        14488,
+        2872,
+        592,
+        240
+      ]
+    },
+    "vitis_arbustum": {
+      "bark": "vine",
+      "crown_radius_m": 2.991,
+      "height_m": 3.776,
+      "kind": "vine",
+      "leaf": "vine",
+      "triangles": [
+        1228,
+        740,
+        114,
+        66
+      ]
+    },
+    "vitis_stake": {
+      "bark": "vine",
+      "crown_radius_m": 1.638,
+      "height_m": 2.671,
+      "kind": "vine",
+      "leaf": "vine",
+      "triangles": [
+        720,
+        460,
+        62,
+        48
+      ]
+    }
+  },
+  "generator": "art/vegetation/build.py",
+  "schema_version": 1
+}

@@ -153,6 +153,7 @@ def main():
             ("seasons", ["--script", "res://tests/season_campaign_test.gd"], "failures=0"),
             ("figure_gallery", ["--fixed-fps", "60", "--script", "res://tests/figure_gallery_test.gd"], "failures=0 real_textures=true"),
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
+            ("vegetation", ["--fixed-fps", "60", "--script", "res://tests/vegetation_test.gd"], "VEGETATION_PASS"),
             ("regional_workers", ["--fixed-fps", "60", "--script", "res://tests/regional_worker_test.gd"], "REGIONAL_WORKERS_PASS"),
             ("motion_skin_measurement", ["--fixed-fps", "60", "--script", "res://tests/motion_skin_measurement_test.gd"], "checks; 0 failed"),
             ("motion_mesh_clearance", ["--script", "res://tests/motion_mesh_clearance_test.gd"], "checks; 0 failed"),
