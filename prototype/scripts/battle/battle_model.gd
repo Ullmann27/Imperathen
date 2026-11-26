@@ -212,7 +212,7 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 		"wounded": 0, "dead": 0, "cohesion": 100.0, "reaction_seconds": 0.4, "ready_at": 0,
 		"troop_id": troop.troop_id, "loadout": _kit(troop), "drills": troop.drills.duplicate(true),
 		"uids": [], "people": {}, "memories": [],
-		"signifer_id": _soldier_id(id, 1) if count >= 5 else "", "rally_from": 0,
+		"signifer_id": _soldier_id(id, count - 2) if count >= 5 else "", "rally_from": 0,
 		"commandable_by": _rights(id), "pila": 0, "shields_fouled_until": 0, "charge_bonus": false}
 	if s.loadout.has("missile") and s.loadout.missile.family_id == "pilum":
 		s.pila = s.loadout.missile.count

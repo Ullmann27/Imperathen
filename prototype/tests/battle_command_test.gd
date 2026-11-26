@@ -441,7 +441,7 @@ func _test_rear_and_banner() -> void:
 	var mixed := _source(m, GUARD, front) + _source(m, GUARD, rear)
 	check(is_equal_approx(m.casualty_morale(g, 1, mixed), one * 1.25), "Mixed attacks weigh by their damage share")
 	var banner: String = g.signifer_id
-	check(banner == "valley_guard_01" and Slots.ranks(g.formation, g.strength, g.width)[g.uids.find(banner)] == 1, "The standard bearer stands in the second rank")
+	check(banner == "valley_guard_10" and Slots.ranks(g.formation, g.strength, g.width)[g.uids.find(banner)] == 1, "The standard bearer stands in the second rank")
 	var morale: float = g.morale
 	m._take_losses(g, [banner], _source(m, GUARD, front))
 	check(is_equal_approx(g.morale, morale - one - Battle.BANNER_SHOCK) and g.signifer_id == "" and g.memories.back().event == "banner_lost",
