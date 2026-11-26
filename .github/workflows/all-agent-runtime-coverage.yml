@@ -1,0 +1,39 @@
+name: IMPERATHEN all-agent exact source and runtime coverage
+on:
+  push:
+    branches: [audit/all-agent-runtime-coverage-20261126]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: imperathen-all-agent-runtime-coverage
+  cancel-in-progress: false
+jobs:
+  audit:
+    if: github.repository == 'Ullmann27/Imperathen' && github.ref_name == 'audit/all-agent-runtime-coverage-20261126'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          filter: blob:none
+      - name: Verify audit logic
+        run: |
+          set -euo pipefail
+          python3 -m py_compile tools/integration/audit_agent_runtime_coverage.py
+          python3 tools/integration/audit_agent_runtime_coverage.py --self-test
+      - name: Fetch every branch and compare exact tree objects
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --prune --filter=blob:none origin '+refs/heads/*:refs/remotes/origin/*'
+          python3 tools/integration/audit_agent_runtime_coverage.py --target "$GITHUB_SHA" --since 2026-11-25 --until 2026-11-27 --report "$RUNNER_TEMP/all-agent-runtime-coverage.json"
+      - name: Upload branch and file evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-all-agent-runtime-coverage-${{ github.run_id }}
+          path: ${{ runner.temp }}/all-agent-runtime-coverage.json
+          if-no-files-found: error
+          retention-days: 30
