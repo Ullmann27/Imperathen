@@ -10,6 +10,7 @@ const Field := preload("res://scripts/battle/valley_field.gd")
 const Slots := preload("res://scripts/battle/formation_slots.gd")
 const Catalog := preload("res://scripts/battle/troop_catalog.gd")
 const Roster := preload("res://scripts/battle/soldier_roster.gd")
+const Life := preload("res://scripts/battle/soldier_life.gd")
 const Formula := preload("res://scripts/battle/combat_formula.gd")
 ## Formations that can be drawn along a front. SHAPES adds the all-round orbis.
 const FORMATIONS := Slots.NAMES
@@ -308,7 +309,9 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 	if catalog.ok and _plans.get(id, {}).has("experience"):
 		experience = catalog.tiers.experience.get(tiers.experience, {})
 	for i in range(count):
-		var person := Roster.identity(battle_seed, id, i, count, troop, pool, group, entry_xp, s.discipline, year, experience)
+		var uid := _soldier_id(id, i)
+		var rank := "commander" if uid == s.commander_id else ("deputy" if uid == s.deputy_id else ("signifer" if uid == s.signifer_id else "miles"))
+		var person := Roster.identity(battle_seed, id, i, count, troop, pool, group, entry_xp, s.discipline, year, experience, rank)
 		s.people[person.uid] = person
 	var order := _arrangement(shape, count, [s.commander_id, s.deputy_id, s.signifer_id], id)
 	var slots := Slots.world_slots(shape, count, 0.0, at, facing)
@@ -389,6 +392,7 @@ func soldiers(id: String) -> Array:
 	var s: Dictionary = squads[id]
 	var ranks := Slots.ranks(s.formation, s.strength, s.width)
 	var ring: Array = Slots.world_slots(s.formation, s.strength, s.width, _pos(s), s.facing) if s.formation == "orbis" else []
+	var file := 0
 	for i in range(s.members.size()):
 		var m: Array = s.members[i]
 		var pose := "idle"
@@ -409,8 +413,15 @@ func soldiers(id: String) -> Array:
 			# In the orbis every soldier faces outwards from the centre.
 			var out: Vector2 = ring[i] - _pos(s)
 			facing = atan2(-out.x, -out.y)
+		if i > 0 and ranks[i] != ranks[i - 1]:
+			file = 0
+		# slot: the soldier's place in the formation. index is the position in the layout
+		# of Slots.layout() (and in uids/members), rank counts from the front (0), file
+		# from the left of that rank as the company faces. "rank" repeats slot.rank.
 		result.append({"id": uid, "x": m[0], "z": m[1], "facing": facing, "pose": pose, "rank": ranks[i],
-			"appearance_seed": s.people[uid].appearance_seed})
+			"slot": {"index": i, "rank": ranks[i], "file": file},
+			"appearance_seed": s.people[uid].appearance_seed, "military_rank": s.people[uid].rank})
+		file += 1
 	return result
 
 
@@ -420,6 +431,21 @@ func soldier_record(uid: String) -> Dictionary:
 		if s.people.has(uid):
 			return s.people[uid].duplicate(true)
 	return {}
+
+
+## What this battle means for the settlements (D-043): one event per soldier whose
+## state changed since muster (wounded, died), or with p_muster the recruitment itself.
+## Pure view of the records; see SoldierLife.settlement_events for the event format.
+func settlement_events(p_muster: bool = false) -> Array:
+	var before := []
+	var after := []
+	var pristine = get_script().new(battle_seed, scenario)
+	for id in squads:
+		for uid in squads[id].people:
+			after.append(squads[id].people[uid])
+			if not p_muster:
+				before.append(pristine.squads[id].people[uid])
+	return Life.settlement_events(before, after, {"year": year, "stamp": "%s-%d-%d" % [str(scenario.id), battle_seed, 0 if p_muster else steps]})
 
 
 ## Read-only records of everyone who ever served in a company, including the fallen.
@@ -848,6 +874,8 @@ func _check_rout(s: Dictionary, cause: String) -> bool:
 		s.status = "routed"
 		s.rally_from = 0
 		_remember(s, "routed", cause)
+		for uid in s.uids:
+			Roster.shift_trust(s.people[uid], Roster.TRUST.routed)
 		return true
 	return false
 
@@ -1005,9 +1033,14 @@ func _fall(s: Dictionary, uid: String) -> void:
 	person.status = fate.status
 	person.wound = fate.wound
 	Roster.note(person, "killed" if fate.status == "dead" else "wounded", "", year, steps)
+	if fate.status == "wounded":
+		var helper := Roster.rescuer(battle_seed, person, s.uids, steps)
+		if helper != "":
+			Roster.rescue(person, s.people[helper], year, steps)
 	for comrade in s.uids:
 		if int(s.people[comrade].relations.get(uid, 0)) >= Roster.COMRADE_BOND:
 			Roster.note(s.people[comrade], "lost_comrade", uid, year, steps)
+			Roster.shift_trust(s.people[comrade], Roster.TRUST.lost_comrade)
 
 
 func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
@@ -1420,6 +1453,25 @@ func _migrate_v3(s: Dictionary, original: Dictionary) -> Variant:
 		return null
 	s.wear = {"weapon": 0.0, "shield": 0.0, "armor": 0.0}
 	s.tiers = original.tiers.duplicate()
+	# Records up to schema 3 had no rank, trust, family or campaigns: they take the
+	# values the same soldier is mustered with. Naming only some of them is invalid.
+	if typeof(s.get("people")) != TYPE_DICTIONARY:
+		return null
+	var added := ["rank", "trust", "family", "campaigns"]
+	for uid in s.people:
+		var person: Variant = s.people[uid]
+		if typeof(person) != TYPE_DICTIONARY or not original.people.has(uid):
+			return null
+		var named := 0
+		for key in added:
+			named += int(person.has(key))
+		if named == added.size():
+			continue
+		if named > 0:
+			return null
+		for key in added:
+			var value: Variant = original.people[uid][key]
+			person[key] = value.duplicate(true) if typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY] else value
 	return s
 
 

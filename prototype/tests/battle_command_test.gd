@@ -7,6 +7,7 @@ const Slots := preload("res://scripts/battle/formation_slots.gd")
 const Catalog := preload("res://scripts/battle/troop_catalog.gd")
 const Roster := preload("res://scripts/battle/soldier_roster.gd")
 const Formula := preload("res://scripts/battle/combat_formula.gd")
+const Life := preload("res://scripts/battle/soldier_life.gd")
 const LEGACY := "res://tests/fixtures/valley_schema2_60s.json"
 const GUARD := "valley_guard"
 const ENEMY := "ridge_guard"
@@ -42,6 +43,8 @@ func _initialize() -> void:
 	_test_wounds_and_recovery()
 	_test_formula_battle()
 	_test_javelins_and_tiers()
+	_test_soldier_lives()
+	_test_slots_and_looks()
 	print("BATTLE_COMMAND_RESULT checks=%d failures=%d metrics=%s" % [checks, failures, JSON.stringify(metrics)])
 	quit(1 if failures else 0)
 
@@ -119,7 +122,10 @@ func _test_identity() -> void:
 	for s: Dictionary in m.squads.values():
 		for person: Dictionary in s.people.values():
 			if person.status != "active":
-				records_ok = records_ok and not person.wound.is_empty() and person.service.back().event in ["killed", "wounded", "lost_comrade", "took_command"]
+				var entered := false
+				for entry: Dictionary in person.service:
+					entered = entered or entry.event == ("killed" if person.status == "dead" else "wounded")
+				records_ok = records_ok and not person.wound.is_empty() and entered
 	check(records_ok, "Every casualty keeps a wound or death record and a service entry")
 	var persisted := Battle.new()
 	check(persisted.restore(JSON.parse_string(JSON.stringify(m.snapshot()))) and persisted.roster(GUARD) == m.roster(GUARD) and persisted.roster(ENEMY) == m.roster(ENEMY),
@@ -908,3 +914,203 @@ func _test_javelins_and_tiers() -> void:
 	check(mean >= 55.0 and mean <= 69.0 and guard.people[guard.uids[0]].xp >= 900, "The veteran tier raises skill (mean %.1f) and experience" % mean)
 	check(tiered.squads.valley_spears.loadout.shield.quality == 4, "Quality of real items (kit_quality) overrides the tier")
 	check(Battle.new(58, tiered.scenario).restore(tiered.snapshot()), "Tiered companies save validly")
+
+
+func _all_people(m: Battle) -> Array:
+	var people := []
+	for s: Dictionary in m.squads.values():
+		people.append_array(s.people.values())
+	return people
+
+
+func _test_soldier_lives() -> void:
+	var m := Battle.new()
+	var muster := m.settlement_events(true)
+	var first: Dictionary = m.squads[GUARD].people[GUARD + "_00"]
+	check(muster.size() == 60 and muster[0].type == "recruited" and muster[0].effects == {"workers": -1, "away": 1} and muster[0].household == first.family.household and muster[0].place == first.origin.place,
+		"Mustering reports every recruit to his home settlement (%d events)" % muster.size())
+	check(first.family.household.begins_with("gallia_cisalpina/") and first.family.standing in Roster.STANDINGS and first.family.craft in Roster.CRAFTS and first.family.dependants >= 0 and first.rank == "deputy"
+		and m.squads[GUARD].people[m.squads[GUARD].commander_id].rank == "commander" and m.squads[GUARD].people[m.squads[GUARD].signifer_id].rank == "signifer",
+		"Soldiers carry household, standing, craft and military rank")
+	check(m.settlement_events().is_empty(), "No change, no event")
+	_run_default(m)
+	var rescues := 0
+	var rescued_days_ok := true
+	var bonds_ok := true
+	var wounded := 0
+	var dead := 0
+	var lowered := 0
+	for person: Dictionary in _all_people(m):
+		wounded += int(person.status == "wounded")
+		dead += int(person.status == "dead")
+		for entry: Dictionary in person.service:
+			if entry.event == "rescued":
+				rescues += 1
+				var helper := m.soldier_record(entry.ref)
+				var fate := Roster.casualty(m.battle_seed, person.uid, int(entry.step))
+				rescued_days_ok = rescued_days_ok and person.status == "wounded" and person.wound.recovery_days == maxi(1, floori(fate.wound.recovery_days * Roster.RESCUE_CARE))
+				bonds_ok = bonds_ok and int(person.relations[helper.uid]) >= Roster.COMRADE_BOND + Roster.RESCUE_BOND and int(helper.relations[person.uid]) >= Roster.RESCUE_BOND
+				var noted := false
+				for other: Dictionary in helper.service:
+					noted = noted or (other.event == "rescued_comrade" and other.ref == person.uid and other.step == entry.step)
+				bonds_ok = bonds_ok and noted
+		var fresh: Dictionary = Battle.new().soldier_record(person.uid)
+		lowered += int(person.trust < fresh.trust)
+	metrics["lives_default_battle"] = {"wounded": wounded, "dead": dead, "rescues": rescues, "trust_lowered": lowered}
+	check(rescues > 0 and rescues <= wounded and rescued_days_ok and bonds_ok, "Friends carry wounded comrades out: %d of %d wounded rescued, bond and care booked on both records" % [rescues, wounded])
+	check(lowered > 0, "Lost comrades and routs cost trust in the command (%d soldiers)" % lowered)
+	var events := m.settlement_events()
+	var by_type := {}
+	var ids := {}
+	for e: Dictionary in events:
+		by_type[e.type] = int(by_type.get(e.type, 0)) + 1
+		ids[e.id] = true
+	check(by_type.get("wounded", 0) == wounded and by_type.get("died", 0) == dead and events.size() == wounded + dead and ids.size() == events.size(),
+		"The battle reports each wound and death once to the settlements (%s)" % str(by_type))
+	check(m.settlement_events() == events and Battle.new().settlement_events().is_empty(), "Events are a reproducible view; asking again books nothing twice")
+	var died: Dictionary = {}
+	for e: Dictionary in events:
+		if e.type == "died":
+			died = e
+	check(not died.is_empty() and died.effects.population == -1 and died.effects.dependants_without_provider == died.dependants and died.group_id != "" and died.household.contains(died.place),
+		"A death names household, place and dependants left behind")
+	var copy := Battle.new()
+	check(copy.restore(JSON.parse_string(JSON.stringify(m.snapshot()))) and copy.settlement_events() == events, "Lives survive saving: the restored battle reports the same events")
+	var forged := m.snapshot()
+	forged.squads[GUARD].people[GUARD + "_00"].rank = "commander"
+	var forged_family := m.snapshot()
+	forged_family.squads[GUARD].people[GUARD + "_00"].family.dependants = 0 if first.family.dependants > 0 else 3
+	var forged_trust := m.snapshot()
+	forged_trust.squads[GUARD].people[GUARD + "_00"].trust = 101
+	check(not Battle.new().restore(forged) and not Battle.new().restore(forged_family) and not Battle.new().restore(forged_trust), "A save cannot promote a soldier, rewrite his family or invent trust")
+	# Schema 3 saves (published with the first troop core) had none of the new fields.
+	var old := Battle.new(Battle.DEFAULT_SEED, Battle.VALLEY_SCENARIO_V1)
+	_run_default(old)
+	var v3: Dictionary = JSON.parse_string(JSON.stringify(old.snapshot()))
+	v3.schema = 3
+	v3.erase("scenario")
+	for id in v3.squads:
+		v3.squads[id].erase("wear")
+		v3.squads[id].erase("tiers")
+		for uid in v3.squads[id].people:
+			for key in ["rank", "trust", "family", "campaigns"]:
+				v3.squads[id].people[uid].erase(key)
+			var service: Array = v3.squads[id].people[uid].service
+			for k in range(service.size() - 1, -1, -1):
+				if service[k].event in ["rescued", "rescued_comrade"]:
+					service.remove_at(k)
+	var migrated := Battle.new()
+	var partial: Dictionary = v3.duplicate(true)
+	partial.squads[GUARD].people[GUARD + "_00"].trust = 50
+	check(migrated.restore(v3) and migrated.squads[GUARD].people[GUARD + "_00"].family == Battle.new(Battle.DEFAULT_SEED, Battle.VALLEY_SCENARIO_V1).squads[GUARD].people[GUARD + "_00"].family
+		and migrated.snapshot().schema == Battle.SCHEMA and not Battle.new().restore(partial), "Schema-3 soldiers gain rank, trust and family on loading; half-migrated records are refused")
+
+	# Campaign life after the battle, on copies.
+	var company: Array = m.roster(GUARD)
+	var closed := Life.close_campaign(company, {"id": "valley_58bc", "year": -58, "outcome": m.outcome})
+	var survivors := []
+	for i in range(company.size()):
+		if company[i].status == "dead":
+			check(closed[i] == company[i], "The dead take no part in what follows")
+		else:
+			survivors.append(closed[i])
+	var a: Dictionary = survivors[0]
+	var b: Dictionary = survivors[1]
+	check(survivors.size() >= 2 and a.campaigns == ["valley_58bc"] and Life.shared_campaigns(a, b) == ["valley_58bc"] and a.service.back().event == "campaign"
+		and int(a.relations[b.uid]) == int(b.relations[a.uid]) and company[0].campaigns.is_empty(),
+		"Survivors remember the shared campaign and grow closer (works on copies)")
+	check(Life.close_campaign(closed, {"id": "valley_58bc", "year": -58, "outcome": m.outcome}) == closed, "Closing the same campaign twice changes nothing")
+	var bonded := a.duplicate(true)
+	bonded.relations[b.uid] = Life.FRIEND_BOND
+	check(Life.friends(bonded).has(b.uid) and not Life.friends({"relations": {b.uid: Life.FRIEND_BOND - 1}}).has(b.uid), "Friendship is a bond of %d or more" % Life.FRIEND_BOND)
+	var loyal: Dictionary = Battle.new().roster(GUARD)[4]
+	var bitter := loyal.duplicate(true)
+	for k in 4:
+		bitter = Life.close_campaign([bitter], {"id": "defeat_%d" % k, "year": -58 + k, "outcome": "defeat"})[0]
+	bitter.trust = Life.LEAVE_TRUST - 1
+	var gone := Life.leave(bitter, -54)
+	check(Life.leave_reason(loyal) == "" and Life.leave(loyal, -58) == loyal and gone.status == "left" and gone.service.back() == {"event": "left", "ref": "lost_trust", "year": -54, "step": -1} and bitter.status == "active",
+		"A soldier who lost trust leaves the army; a loyal one stays")
+	var left_events := Life.settlement_events([bitter], [gone], {"year": -54, "stamp": "d100"})
+	check(left_events.size() == 1 and left_events[0].type == "left" and left_events[0].effects == {"workers": 1, "away": -1} and left_events[0].id == loyal.uid + ":left:d100", "Leaving returns a worker to his settlement")
+	check(Roster.recover(gone, 100, -53) == gone and not Life.promote(gone, "signifer", -53).ok, "Who left neither recovers nor is promoted")
+	var able := loyal.duplicate(true)
+	able.xp = 350
+	able.trust = 60
+	able.skills.discipline = 70
+	var up := Life.promote(able, "signifer", -57)
+	check(up.ok and up.record.rank == "signifer" and up.record.service.back() == {"event": "promoted", "ref": "signifer", "year": -57, "step": -1} and able.rank == "miles", "Promotion to the next rank on a copy")
+	check(not Life.promote(able, "commander", -57).ok and not Life.promote(loyal.merged({"xp": 10}, true), "signifer", -57).ok and not Life.promote(able.merged({"trust": 30}, true), "signifer", -57).ok,
+		"No rank is skipped; experience and trust are required")
+	var promoted_events := Life.settlement_events([able], [up.record], {"year": -57, "stamp": "d7"})
+	check(promoted_events.size() == 1 and promoted_events[0].type == "promoted" and promoted_events[0].rank == "signifer", "A promotion is reported home")
+	# Wound, recovery and retirement over world time.
+	var hurt := loyal.duplicate(true)
+	hurt.status = "wounded"
+	hurt.wound = {"severity": "crippling", "recovery_days": 60, "impairment": "Hinken", "outcome": "retire", "step": 5}
+	var healing := Roster.recover(hurt, 30, -58)
+	var out := Roster.recover(hurt, 60, -58)
+	var chain := Life.settlement_events([loyal], [hurt], {"year": -58, "stamp": "b"}) + Life.settlement_events([hurt], [healing], {"year": -58, "stamp": "d30"}) + Life.settlement_events([hurt], [out], {"year": -58, "stamp": "d60"})
+	check(chain.size() == 2 and chain[0].type == "wounded" and chain[1].type == "retired" and chain[1].effects == {"workers": 1, "away": -1, "impaired": 1, "wounded": -1} and chain[1].detail == "Hinken",
+		"Wound and retirement reach the settlement; days without a change report nothing")
+	hurt.wound = {"severity": "light", "recovery_days": 10, "impairment": "", "outcome": "return", "step": 5}
+	var back := Life.settlement_events([hurt], [Roster.recover(hurt, 10, -58)], {"year": -58, "stamp": "d10"})
+	check(back.size() == 1 and back[0].type == "recovered" and back[0].effects == {"wounded": -1}, "Recovery is reported")
+	var net := {"workers": 0, "away": 0, "wounded": 0}
+	for e: Dictionary in Life.settlement_events([], [loyal], {"year": -58, "stamp": "m"}) + chain:
+		for key in net:
+			net[key] += int(e.effects.get(key, 0))
+	check(net == {"workers": 0, "away": 0, "wounded": 0}, "Recruited, wounded and retired sums to a man back home: no worker is lost or doubled")
+
+
+func _run_default(m: Battle) -> void:
+	m.order([GUARD, SPEARS], "attack", ENEMY)
+	for i in 400:
+		if m.outcome != "ongoing":
+			break
+		m.tick(Battle.STEP)
+
+
+func _test_slots_and_looks() -> void:
+	var m := Battle.new()
+	_run_default(m)
+	var consistent := true
+	var seen := 0
+	for id in m.squads:
+		var s: Dictionary = m.squads[id]
+		var men := m.soldiers(id)
+		var ranks := Slots.ranks(s.formation, s.strength, s.width)
+		var offsets := Slots.offsets(s.formation, s.strength, s.width)
+		var files := {}
+		for i in range(men.size()):
+			var man: Dictionary = men[i]
+			seen += 1
+			consistent = consistent and man.slot.index == i and man.slot.rank == ranks[i] and man.rank == ranks[i] and man.id == s.uids[i]
+			consistent = consistent and not files.has([man.slot.rank, man.slot.file])
+			files[[man.slot.rank, man.slot.file]] = true
+			# Within a rank the file counts along the layout from the left.
+			if i > 0 and ranks[i] == ranks[i - 1] and s.formation != "orbis":
+				consistent = consistent and man.slot.file == men[i - 1].slot.file + 1 and offsets[i].x > offsets[i - 1].x
+			consistent = consistent and man.military_rank == s.people[man.id].rank
+	check(seen > 20 and consistent, "soldiers() names each man's slot: layout index, rank from the front and file from the left (%d men)" % seen)
+	var fresh := Battle.new()
+	var looks := {}
+	var per_company_ok := true
+	for id in fresh.squads:
+		var company := {}
+		for man: Dictionary in fresh.soldiers(id):
+			var v := Roster.visual_variant(int(man.appearance_seed), str(man.military_rank), 3)
+			looks[v] = int(looks.get(v, 0)) + 1
+			company[v] = true
+			if man.military_rank != "miles":
+				per_company_ok = per_company_ok and v == 0
+		per_company_ok = per_company_ok and company.size() >= 2
+	metrics["look_variants_60"] = looks
+	check(per_company_ok and looks.size() == 3 and looks.values().min() >= 10, "Looks follow appearance seed and rank: ranked men take variant 0, the men draw from all three (%s)" % str(looks))
+	var man0: Dictionary = fresh.soldiers(GUARD)[0]
+	_run_default(fresh)
+	var same := true
+	for man: Dictionary in fresh.soldiers(GUARD):
+		if man.id == man0.id:
+			same = man.appearance_seed == man0.appearance_seed
+	check(same and Roster.visual_variant(12345, "miles", 1) == 0 and Roster.visual_variant(12345, "miles", 3) == Roster.visual_variant(12345, "miles", 3), "A soldier keeps his look when the ranks close up")
