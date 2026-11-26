@@ -52,6 +52,7 @@ func _check(value: bool, message: String) -> void:
 
 func _run() -> void:
 	await _measure_clips()
+	await _blow_continuity()
 	await _setup()
 	await _scenario_standing()
 	await _scenario_block()
@@ -174,6 +175,70 @@ func _measure_clips() -> void:
 		report["clip_%d" % variant] = {"model":path,"contact_s":best_at,"forward_reach_m":best}
 		holder.queue_free()
 		await process_frame
+
+
+func _blow_continuity() -> void:
+	# A telegraphed blow has to be readable frame by frame. Every blow variant
+	# of both raider kits, a flinch and a guard are played on the real rigs at
+	# 60 Hz; no joint may move or turn further within one frame than the
+	# motion contract allows a person in the world (0.06 m, 20 degrees).
+	var rows := []
+	for variant in [0,1]:
+		for sequence: Array in [["strike","strike","strike","strike"],["strike","hit"],["block"]]:
+			var holder := Node3D.new()
+			root.add_child(holder)
+			var person := Person.new()
+			person.position.y = .9
+			holder.add_child(person)
+			person.configure("enemy","germania",28)
+			person.configure_appearance("spearman",variant)
+			if variant == 0:
+				person.configure_meshy("unit_germanic_axe_fighter")
+			await process_frame
+			person.set_process(false)
+			for k in 30:
+				person._process(DT)
+			var rig: Skeleton3D = person.find_children("*","Skeleton3D",true,false)[0]
+			var previous: Array[Transform3D] = []
+			for action: String in sequence:
+				var frames := 110
+				if action == "strike":
+					person.cue_strike(Strike.windup_seconds())
+				elif action == "hit":
+					# Interrupt the following blow inside its wind-up.
+					person.cue_strike(Strike.windup_seconds())
+					for k in 12:
+						previous = _pose_step(person,rig,previous,{})
+					person.cue("hit")
+				else:
+					person.cue(action)
+				var worst := {"action":action,"style":person._armed_style,"model":person.active_model_path,"position_m":0.0,"rotation_deg":0.0}
+				for k in frames:
+					previous = _pose_step(person,rig,previous,worst)
+				rows.append(worst)
+				_check(float(worst.position_m) <= .06 and float(worst.rotation_deg) <= 20.0,"%s %s on %s stays readable frame by frame (max %.4f m at %s, %.2f deg at %s per 60-Hz frame)" % [action,str(worst.style),str(worst.model).get_file(),worst.position_m,str(worst.get("position_bone","")),worst.rotation_deg,str(worst.get("rotation_bone",""))])
+			holder.free()
+	report["blow_continuity"] = rows
+
+
+func _pose_step(person: Node3D, rig: Skeleton3D, previous: Array[Transform3D], worst: Dictionary) -> Array[Transform3D]:
+	person._process(DT)
+	rig.force_update_all_bone_transforms()
+	var pose: Array[Transform3D] = []
+	for bone in rig.get_bone_count():
+		var transform := rig.global_transform*rig.get_bone_global_pose(bone)
+		pose.append(transform)
+		if previous.size() != rig.get_bone_count() or worst.is_empty():
+			continue
+		var moved := transform.origin.distance_to(previous[bone].origin)
+		if moved > float(worst.position_m):
+			worst.position_m = moved
+			worst["position_bone"] = rig.get_bone_name(bone)
+		var turned := rad_to_deg(transform.basis.orthonormalized().get_rotation_quaternion().angle_to(previous[bone].basis.orthonormalized().get_rotation_quaternion()))
+		if turned > float(worst.rotation_deg):
+			worst.rotation_deg = turned
+			worst["rotation_bone"] = rig.get_bone_name(bone)
+	return pose
 
 
 func _spear_forward(kit: MeshInstance3D, rig: Skeleton3D, arrays: Array, shaft: Array[int], holder: Node3D) -> float:

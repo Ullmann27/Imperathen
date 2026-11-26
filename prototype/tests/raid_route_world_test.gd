@@ -181,6 +181,11 @@ func _physical_raid(number: int, childhood: bool) -> Dictionary:
 	query.margin = 0.0
 	var refresh := 0.0
 	var all_arrived_at := INF
+	var still_frames := {}
+	var rest_frame := {}
+	var quickest_start := INF
+	var max_speed := 0.0
+	var sideways := 0
 	var frames := int((Life.RAID_SECONDS+1.0)/DT)
 	for frame in frames:
 		await physics_frame
@@ -211,6 +216,20 @@ func _physical_raid(number: int, childhood: bool) -> Dictionary:
 				arrival[id] = snappedf(float(frame+1)*DT,.01)
 			if previous.has(id) and (previous[id] as Vector2).y < -49.0 and at.y >= -49.0:
 				gate[id] = snappedf(at.x,.01)
+			if previous.has(id):
+				# A body gathers pace over several frames and does not travel
+				# across its own heading unless a contact deflects it.
+				var step: Vector2 = at-(previous[id] as Vector2)
+				var speed := step.length()/DT
+				max_speed = maxf(max_speed,speed)
+				still_frames[id] = int(still_frames.get(id,0))+1 if speed < .05 else 0
+				if int(still_frames[id]) >= 2:
+					rest_frame[id] = frame
+				elif speed >= 1.1 and rest_frame.has(id):
+					quickest_start = minf(quickest_start,float(frame-int(rest_frame[id]))*DT)
+					rest_frame.erase(id)
+				if speed > .4 and not bool(actor.get_meta("yielding",false)) and absf(angle_difference(actor.rotation.y,atan2(-step.x,-step.y))) > deg_to_rad(80.0):
+					sideways += 1
 			previous[id] = at
 			if Route._house_index(at) >= 0:
 				house_inside += 1
@@ -255,17 +274,66 @@ func _physical_raid(number: int, childhood: bool) -> Dictionary:
 			_check(Vector2(actor.global_position.x,actor.global_position.z).distance_to(Route.LOOT) < Route.LOOT_RADIUS,"Raid %d (%s): raider %s stays at the granary after arriving" % [number,mode,id])
 	_check(min_player_distance > Life.RAIDER_CHASE_RADIUS,"Raid %d (%s): the player stays farther than 7 m from every raider (%.2f m)" % [number,mode,min_player_distance])
 	_check(house_inside == 0,"Raid %d (%s): no raider centre is ever inside a house footprint (%d samples)" % [number,mode,house_inside])
+	_check(quickest_start >= .3 and max_speed <= 1.2+.01,"Raid %d (%s): from rest no raider is at walking pace (1.1 m/s) in under 0.3 s, and none exceeds the 1.2 m/s raid pace (quickest start %.2f s, max %.3f m/s)" % [number,mode,quickest_start,max_speed])
+	_check(sideways == 0,"Raid %d (%s): no raider travels across its own heading without a contact (%d samples)" % [number,mode,sideways])
 	_check(max_penetration < .005,"Raid %d (%s): no raider capsule overlaps static geometry (max %.4f m %s)" % [number,mode,max_penetration,penetration_where])
 	_check(model._validate_state(model.data).is_empty(),"Raid %d (%s): the observed raid keeps the complete save schema" % [number,mode])
 	for enemy: Dictionary in model.data.village.raid.enemies:
 		_check(enemy.keys().size() == 7,"Raid %d (%s): saved raider entries keep exactly their seven v1 fields" % [number,mode])
+	if childhood:
+		_check_open_origin(model,world,ids)
 	var result := {"number":number,"mode":mode,"raiders":ids.size(),"spawns":spawns,"arrival_s":arrivals,"gate_crossing_x":gates,"defeated_by_guards":defeated,
-		"house_inside_samples":house_inside,"max_static_penetration_m":max_penetration,"penetration_where":penetration_where,
+		"house_inside_samples":house_inside,"quickest_start_to_walking_pace_s":quickest_start if is_finite(quickest_start) else -1.0,"max_speed_m_s":max_speed,"sideways_samples":sideways,"max_static_penetration_m":max_penetration,"penetration_where":penetration_where,
 		"min_player_distance_m":min_player_distance,"tracks_1hz":tracks,"wall_seconds":float(Time.get_ticks_msec()-started)/1000.0}
 	world.queue_free()
 	await process_frame
 	await process_frame
 	return result
+
+
+func _check_open_origin(model: Model, world: Node3D, ids: Array[String]) -> void:
+	# Owner decision D-040: the riders of the night raid (I-10, about thirty)
+	# are of unknown origin. Nothing the raid writes, saves or shows may
+	# attribute them to a tribe or people by itself.
+	var raid: Dictionary = model.data.village.raid
+	var attributing := ["tribe","faction","origin","people","culture","stamm","volk","herkunft","allegiance"]
+	var keys: Array = raid.keys()
+	for enemy: Dictionary in raid.enemies:
+		keys.append_array(enemy.keys())
+	var named_keys := []
+	for key: String in keys:
+		for word: String in attributing:
+			if key.to_lower().contains(word) and key not in named_keys:
+				named_keys.append(key)
+	_check(named_keys.is_empty(),"I-10: the saved raid and its raiders carry no tribe, people or origin field (%s)" % str(named_keys))
+	var ethnonyms := ["german","sueb","sweb","markoman","marcoman","kimber","cimbr","teuton","kelt","gall","boier","boii","norik","noric","taurisk","karn","carn","japod","iapod","istr","venet","raeter","räter","helvet","daker","dak ","dacian","sarmat","skyth","illyr","pannon","barbar"]
+	var raid_events := 0
+	var named_events := []
+	for event: Dictionary in model.data.village.history.events:
+		var kind := str(event.kind)
+		if kind != "night_alarm" and not kind.begins_with("raid"):
+			continue
+		raid_events += 1
+		var text := str(event.text).to_lower()
+		for name: String in ethnonyms:
+			if text.contains(name):
+				named_events.append([kind,name])
+	_check(raid_events >= 2 and named_events.is_empty(),"I-10: no raid event text names a tribe or people (%d raid events, named: %s)" % [raid_events,str(named_events)])
+	_check(int(model.data.village.childhood.screenplay.visible_raiders) == 30,"I-10: the screenplay keeps about thirty riders")
+	var labels := []
+	for id in ids:
+		if not raiders_still(world,id):
+			continue
+		var label: Label3D = (world.village_life_world.raiders[id] as Node).get_node("Health")
+		if label.text not in labels:
+			labels.append(label.text)
+	var named_labels := []
+	for text: String in labels:
+		for name: String in ethnonyms:
+			if text.to_lower().contains(name):
+				named_labels.append(text)
+	_check(not labels.is_empty() and named_labels.is_empty(),"I-10: the raiders' world labels name no tribe or people (%s)" % str(labels))
+	report["i10_open_origin"] = {"raid_events":raid_events,"labels":labels,"visible_raiders":int(model.data.village.childhood.screenplay.visible_raiders)}
 
 
 func raiders_still(world: Node3D, id: String) -> bool:

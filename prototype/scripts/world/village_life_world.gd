@@ -28,6 +28,10 @@ var _linen: StandardMaterial3D
 # ordinary play sweeps towards those targets on the physics clock.
 const RAIDER_SPEED := 0.12 / Life.STEP
 const RAIDER_TURN_SPEED := 5.0
+const RAIDER_ACCELERATION := 2.4
+const RAIDER_BRAKING := 6.0
+const RAIDER_ALIGN_FROM := deg_to_rad(20.0)
+const RAIDER_ALIGN_TO := deg_to_rad(75.0)
 ## Turning towards the player while standing: 180 degrees in under 0.5 s.
 const RAIDER_FACE_SPEED := 6.5
 var _raider_targets: Dictionary = {}
@@ -85,7 +89,22 @@ func _advance_raiders(delta: float) -> void:
 		var offset := target-actor.position
 		offset.y = 0.0
 		var before := actor.position
-		var displacement := offset.limit_length(RAIDER_SPEED*elapsed)
+		var pace := RAIDER_SPEED
+		var wanted_heading := actor.rotation.y
+		if offset.length_squared() > .0001:
+			wanted_heading = atan2(-offset.x,-offset.z)
+		if physical_raiders:
+			# A body does not reach walking speed within one frame and does not
+			# walk sideways while it turns. It turns towards its next waypoint,
+			# steps off as it comes to face it and gathers pace over half a
+			# second; it slows into a sharp corner instead of pivoting at full
+			# pace. Sliding along a contact is not held back by its heading.
+			var limit := RAIDER_SPEED
+			if not bool(actor.get_meta("yielding",false)):
+				limit *= 1.0-smoothstep(RAIDER_ALIGN_FROM,RAIDER_ALIGN_TO,absf(angle_difference(actor.rotation.y,wanted_heading)))
+			var held := float(actor.get_meta("pace",0.0))
+			pace = move_toward(held,limit,(RAIDER_ACCELERATION if limit > held else RAIDER_BRAKING)*elapsed)
+		var displacement := offset.limit_length(pace*elapsed)
 		var hit: KinematicCollision3D
 		if displacement.length_squared() > .00000001:
 			hit = actor.move_and_collide(displacement)
@@ -95,15 +114,21 @@ func _advance_raiders(delta: float) -> void:
 		var actual_speed := Vector2(travelled.x,travelled.z).length()/elapsed
 		figure.drive(actual_speed)
 		actor.set_meta("actual_speed",actual_speed)
+		# The pace is the walker's own effort, not the distance a contact left
+		# him: clamping it to a deflected step would leave him creeping round
+		# every person in his way (measured: 0.05 m/s past the watch post).
+		actor.set_meta("pace",0.0 if offset.length_squared() <= .0001 else pace)
 		actor.set_meta("yielding",hit != null)
-		if travelled.length_squared() > .00000001 and not swinging:
-			var heading := atan2(-travelled.x,-travelled.z)
-			actor.rotation.y = rotate_toward(actor.rotation.y,heading,RAIDER_TURN_SPEED*elapsed)
-		elif swinging or point.distance_to(player) <= Strike.reach()+.5:
+		if swinging or (offset.length_squared() <= .0001 and point.distance_to(player) <= Strike.reach()+.5):
 			# A standing fighter keeps the player in front of him.
 			var towards := player-point
 			if towards.length() > .05:
 				actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-towards.x,-towards.y),RAIDER_FACE_SPEED*elapsed)
+		elif hit != null and travelled.length_squared() > .00000001:
+			# Along a contact the body faces where it actually goes.
+			actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-travelled.x,-travelled.z),RAIDER_TURN_SPEED*elapsed)
+		elif offset.length_squared() > .0001:
+			actor.rotation.y = rotate_toward(actor.rotation.y,wanted_heading,RAIDER_TURN_SPEED*elapsed)
 
 
 func _slide_raider(actor: CharacterBody3D, hit: KinematicCollision3D, displacement: Vector3) -> void:
@@ -490,6 +515,10 @@ func _sync_raiders() -> void:
 			figure.name = "Figure"
 			figure.position.y = .9
 			actor.add_child(figure)
+			# Owner decision D-040: the night riders are of unknown origin. The
+			# second argument only selects the shared northern kit and hair of
+			# the two available attacker models; no tribe, people or faction
+			# is saved, shown or derived for a raider (label "Angreifer").
 			figure.configure("enemy", "germania", 28)
 			figure.configure_appearance("spearman", raiders.size())
 			if raiders.size()%2 == 0:
