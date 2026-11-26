@@ -10,6 +10,10 @@ extends SceneTree
 
 const EntryScene = preload("res://main.tscn")
 const Life = preload("res://scripts/story/village_life.gd")
+const UI = preload("res://scripts/ui/game_ui.gd")
+const Model = preload("res://scripts/domain/world_model.gd")
+const Economy = preload("res://scripts/domain/village_economy.gd")
+const MarketPanel = preload("res://scripts/city_support_panel.gd")
 const SIZES := [Vector2i(1280, 720), Vector2i(1384, 1536)]
 const CALM_SECONDS := 14.0
 const DRY_CALM_SECONDS := 2.0
@@ -76,11 +80,13 @@ func _run() -> void:
 		"captures": captures, "hud_area": measurements, "notes": notes,
 		"performance_note": "Software rendering under xvfb (llvmpipe); frame times are relative only and say nothing about the Fold7.",
 	}
+	game.queue_free()
+	await _frames(3)
+	game = null
+	await _fixtures()
 	var file := FileAccess.open(output.path_join("roman-hud-review-%s.json" % label), FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "  ") + "\n")
 	file.close()
-	game.queue_free()
-	await process_frame
 	print("ROMAN_HUD_REVIEW_FAIL" if failed else "ROMAN_HUD_REVIEW_PASS")
 	quit(1 if failed else 0)
 
@@ -142,6 +148,26 @@ func _sequence() -> void:
 		await _capture("inventory-%dx%d" % [extent.x, extent.y])
 	game.ui.action_requested.emit("resume", {})
 	await _frames(6)
+	# 3b. Character and abilities, then the child's view of village life.
+	if game.ui.get_method_argument_count("_show_journal") >= 2:
+		game.ui._show_journal(true, "abilities")
+		for extent: Vector2i in SIZES:
+			await _resize(extent)
+			await _settle(0.8)
+			await _capture("abilities-%dx%d" % [extent.x, extent.y])
+		game.ui.action_requested.emit("resume", {})
+		await _frames(6)
+	game.ui.action_requested.emit("village_panel", {"tab": "overview"})
+	await _frames(6)
+	if game.screen == "village_panel":
+		for extent: Vector2i in SIZES:
+			await _resize(extent)
+			await _settle(0.8)
+			await _capture("village-%dx%d" % [extent.x, extent.y])
+	else:
+		notes.append("village panel did not open (screen %s)" % game.screen)
+	game.ui.action_requested.emit("resume", {})
+	await _frames(6)
 	# 4. The pause menu over the live world.
 	game.ui.action_requested.emit("pause", {})
 	for extent: Vector2i in SIZES:
@@ -150,6 +176,85 @@ func _sequence() -> void:
 		await _capture("menu-%dx%d" % [extent.x, extent.y])
 	game.ui.action_requested.emit("resume", {})
 	await _frames(6)
+
+
+## Screens the twelve-year-old does not reach yet: administration with work
+## assignment, the adult character sheet and the market. The real UI classes
+## show real model state on a plain backdrop (no world behind them); the
+## captures are marked "fixture" and are not in-world frames.
+func _fixtures() -> void:
+	var backdrop := ColorRect.new()
+	backdrop.color = Color(0.2, 0.22, 0.2)
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root.add_child(backdrop)
+	var model = Model.new()
+	model.new_game("italia", true)
+	model.set_player_position(Vector3(2, 1, 9))
+	model.execute("village_talk", {"npc_id": "decimus", "choice": "meet"})
+	model.execute("village_request_work")
+	var ui = UI.new()
+	root.add_child(ui)
+	await _frames(4)
+	ui.set("_touch_enabled", true)
+	for tab in ["overview", "work", "people", "map"]:
+		for extent: Vector2i in SIZES:
+			await _resize(extent)
+			ui.show_village_panel(model.data, tab)
+			await _settle(0.6)
+			await _plain("admin-%s-%dx%d" % [tab, extent.x, extent.y], "village panel, tab " + tab)
+	var state: Dictionary = model.data.duplicate(true)
+	state["village_view"] = Life.view(model.data)
+	state["village_economy_view"] = Economy.view(model.data)
+	if ui.get_method_argument_count("_show_journal") >= 2:
+		for tab in ["abilities", "equipment"]:
+			for extent: Vector2i in SIZES:
+				await _resize(extent)
+				ui.show_game(state)
+				ui._show_journal(false, tab)
+				await _settle(0.6)
+				await _plain("character-%s-%dx%d" % [tab, extent.x, extent.y], "adult codex, tab " + tab)
+	else:
+		for extent: Vector2i in SIZES:
+			await _resize(extent)
+			ui.show_game(state)
+			ui._show_journal(false)
+			await _settle(0.6)
+			await _plain("character-journal-%dx%d" % [extent.x, extent.y], "adult journal")
+	ui.queue_free()
+	await _frames(3)
+	# Market and bag of the city district (adult fixture, as in city_inventory_ui_test).
+	var trader = Model.new()
+	trader.new_game("italia", true, true)
+	trader.execute("city_trade_enable", {})
+	var market_state: Dictionary = trader.data.duplicate(true)
+	market_state.player.age = 18
+	market_state.village.city_trade.inventory.linen_tunic = 1
+	market_state.village.city_trade.purchases.clothier.linen_tunic = 1
+	market_state.village.city_trade.equipment.body = "linen_tunic"
+	var panel := MarketPanel.new()
+	root.add_child(panel)
+	await _frames(3)
+	panel.update_state(market_state)
+	for extent: Vector2i in SIZES:
+		await _resize(extent)
+		panel.open_shop("clothier")
+		await _settle(0.6)
+		await _plain("trade-shop-%dx%d" % [extent.x, extent.y], "market, clothier")
+		panel.open_inventory()
+		await _settle(0.6)
+		await _plain("trade-bag-%dx%d" % [extent.x, extent.y], "market, bag")
+	panel.queue_free()
+	backdrop.queue_free()
+	await _frames(3)
+	root.size = SIZES[0]
+
+
+func _plain(name: String, what: String) -> void:
+	await _frames(1)
+	var picture := root.get_texture().get_image() if not dry_run else Image.create(root.size.x, root.size.y, false, Image.FORMAT_RGB8)
+	var saved := dry_run or (picture != null and not picture.is_empty() and picture.save_png(output.path_join(name + ".png")) == OK)
+	_expect(saved, "Rendered capture " + name)
+	captures.append({"file": name + ".png", "pixels": [picture.get_width(), picture.get_height()], "screen": what, "fixture": true})
 
 
 func _resize(extent: Vector2i) -> void:
