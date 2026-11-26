@@ -12,8 +12,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_man_0.glb",
           "triangles": 19719,
-          "bytes": 5016660,
-          "sha256": "ae5d4eab78cedf837e886df32288a2b28924a23adbcda23d4932b85423977e3b",
+          "bytes": 5021840,
+          "sha256": "827afa1f90f8a295f29cc197ca833214a86d4d00c2e9e47fdfeac16e902219be",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -40,14 +40,28 @@
               "tearing": 0,
               "body_through_skirt_m": 0.0822702424435103
             }
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378706938368338,
+              "max_sole_slip_m": 0.00969328950254483,
+              "max_hull_penetration_m": 0.006378706938368338,
+              "max_contact_slip_m": 0.00969328950254483
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0005302357286903957,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0005302357286903957
+            }
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_civilian_man_1.glb",
           "triangles": 7628,
-          "bytes": 2550172,
-          "sha256": "56458ad17f4f6e84729cd696414e1f7c26c776c44c93b6b24cc214281aadb55d",
+          "bytes": 2555352,
+          "sha256": "eec584b058e896756793403844d28971dfdc3c5b72ff3878f8f1c50e7425d781",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -71,14 +85,28 @@
               "body_through_skirt_m": 0.07850376270136564
             },
             "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006385000691636493,
+              "max_sole_slip_m": 0.009693287624099878,
+              "max_hull_penetration_m": 0.006385000691636493,
+              "max_contact_slip_m": 0.009693287624099878
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.00037978332168634094,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.00037978332168634094
+            }
           }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_civilian_man_2.glb",
           "triangles": 2406,
-          "bytes": 768624,
-          "sha256": "d31c64fe417f039b8d0bdb10211e31ae9c441a681e940871de0a1e4b789ee105",
+          "bytes": 773804,
+          "sha256": "cdde48942cd1d960b2d09de343b482d941379080f0f77a7fed4eeeafbc0676e3",
           "texture_edge": 256,
           "face_morphs": false,
           "death_ground_contact": {
@@ -102,14 +130,28 @@
               "body_through_skirt_m": 0.08449843766181969
             },
             "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378971802102338,
+              "max_sole_slip_m": 0.00969329143040031,
+              "max_hull_penetration_m": 0.006378971802102338,
+              "max_contact_slip_m": 0.00969329143040031
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0001758551946953379,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0001758551946953379
+            }
           }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_civilian_man_3.glb",
           "triangles": 846,
-          "bytes": 339512,
-          "sha256": "b0de0a35e3dcc2763f0ad888108f0009e09e41b6f310ef9665cde74bca03465a",
+          "bytes": 344688,
+          "sha256": "8f55435e5e13be045f01b627c497b935e01b52ca54bec36203b56ff27ddcd228",
           "texture_edge": 128,
           "face_morphs": false,
           "death_ground_contact": {
@@ -133,6 +175,20 @@
               "body_through_skirt_m": 0.0933410291845978
             },
             "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006416374334533781,
+              "max_sole_slip_m": 0.009675435030420763,
+              "max_hull_penetration_m": 0.006416374334533781,
+              "max_contact_slip_m": 0.009675435030420763
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 9.771759047675533e-05,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 9.771759047675533e-05
+            }
           }
         }
       ]
@@ -169,6 +225,21 @@
               "body_through_skirt_m": 0.2333323255469783
             },
             "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006383719065319269,
+              "max_sole_slip_m": 0.009696406632573784,
+              "max_hull_penetration_m": 0.006383719065319269,
+              "max_contact_slip_m": 0.009696406632573784
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.019686661464057963,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.019686661464057963
+            },
+            "unchanged": "grounding would not improve this clip"
           }
         },
         {
@@ -200,6 +271,21 @@
               "body_through_skirt_m": 0.23154538062506233
             },
             "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006390046856647853,
+              "max_sole_slip_m": 0.009696413060750968,
+              "max_hull_penetration_m": 0.006390046856647853,
+              "max_contact_slip_m": 0.009696413060750968
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.019595637167324795,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.019595637167324795
+            },
+            "unchanged": "grounding would not improve this clip"
           }
         },
         {
@@ -231,6 +317,21 @@
               "body_through_skirt_m": 0.19100078067425957
             },
             "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006383983209280833,
+              "max_sole_slip_m": 0.009696468229032685,
+              "max_hull_penetration_m": 0.006383983209280833,
+              "max_contact_slip_m": 0.009696468229032685
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.019760174253499012,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.019760174253499012
+            },
+            "unchanged": "grounding would not improve this clip"
           }
         },
         {
@@ -262,6 +363,21 @@
               "body_through_skirt_m": 0.08997666187457762
             },
             "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.0064214346272957815,
+              "max_sole_slip_m": 0.009678656016884016,
+              "max_hull_penetration_m": 0.0064214346272957815,
+              "max_contact_slip_m": 0.009678656016884016
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.01933673945752967,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.01933673945752967
+            },
+            "unchanged": "grounding would not improve this clip"
           }
         }
       ]
@@ -273,8 +389,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_elder_0.glb",
           "triangles": 19817,
-          "bytes": 4461808,
-          "sha256": "0297c8c921eace6387486a819490d573c606688327a38a6486cf7558bdd00993",
+          "bytes": 4466988,
+          "sha256": "8f4fcfa52b4a025980f1dece21e87d9d4e581d924d84c495cca83cc11243f824",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -301,14 +417,28 @@
               "tearing": 0,
               "body_through_skirt_m": 0.0822702424435103
             }
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378706938368338,
+              "max_sole_slip_m": 0.00969328950254483,
+              "max_hull_penetration_m": 0.006378706938368338,
+              "max_contact_slip_m": 0.00969328950254483
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0005302357286903957,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0005302357286903957
+            }
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_elder_1.glb",
           "triangles": 7666,
-          "bytes": 2401276,
-          "sha256": "c91d6950250d8866daa63c52f2794b7a3d2fe7aef8b91cecdc49b7f919425d36",
+          "bytes": 2406456,
+          "sha256": "be24675cdb558c93c2d681e5453d3ebc567feba841fdf352112c1b73a6a96cdf",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -332,14 +462,28 @@
               "body_through_skirt_m": 0.07850376270136564
             },
             "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006385000691636493,
+              "max_sole_slip_m": 0.009693287624099878,
+              "max_hull_penetration_m": 0.006385000691636493,
+              "max_contact_slip_m": 0.009693287624099878
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.00037978332168634094,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.00037978332168634094
+            }
           }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_elder_2.glb",
           "triangles": 2417,
-          "bytes": 730828,
-          "sha256": "3f999d0d125d0a81655d3c08ad52aff97713a7848121e7586ebb2275c7198ebc",
+          "bytes": 736008,
+          "sha256": "7368e4567ef50fb8e033e44ad52a00684d67c5370f61338447a1e5cef8714418",
           "texture_edge": 256,
           "face_morphs": false,
           "death_ground_contact": {
@@ -363,14 +507,28 @@
               "body_through_skirt_m": 0.08449843766181969
             },
             "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378971802102338,
+              "max_sole_slip_m": 0.00969329143040031,
+              "max_hull_penetration_m": 0.006378971802102338,
+              "max_contact_slip_m": 0.00969329143040031
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0001758551946953379,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0001758551946953379
+            }
           }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_elder_3.glb",
           "triangles": 850,
-          "bytes": 329608,
-          "sha256": "2b1206f4a6c770581e44c7efa05ceb28cdf95a787f19788e9910139a0b7679b4",
+          "bytes": 334784,
+          "sha256": "2e6373d4876ccc6064dd7081b7f50faaab83a80a8dbf09784a6d72fec6e5fdce",
           "texture_edge": 128,
           "face_morphs": false,
           "death_ground_contact": {
@@ -394,6 +552,20 @@
               "body_through_skirt_m": 0.0933410291845978
             },
             "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006416374334533781,
+              "max_sole_slip_m": 0.009675435030420763,
+              "max_hull_penetration_m": 0.006416374334533781,
+              "max_contact_slip_m": 0.009675435030420763
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 9.771759047675533e-05,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 9.771759047675533e-05
+            }
           }
         }
       ]

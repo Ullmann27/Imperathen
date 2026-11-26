@@ -83,6 +83,23 @@ class GroundedDeathJsonTest(unittest.TestCase):
                 self.assertIn('"PATH:AnimationPlayer": {\n"optimizer/enabled": false', settings)
                 self.assertIn("animation/fps=30", settings)
 
+    def test_gather_is_grounded_only_where_it_sank(self):
+        grounded = sorted([*ASSETS.glob("village_characters/villager_*.glb"),
+                           *ASSETS.glob("characters/frontier_civilian_man_*.glb"),
+                           *ASSETS.glob("characters/frontier_elder_*.glb")])
+        kept = sorted([*ASSETS.glob("characters/frontier_civilian_woman_*.glb"),
+                       *ASSETS.glob("meshy/characters/unit_*.glb")])
+        self.assertEqual((len(grounded), len(kept)), (12, 12))
+        for path in grounded + kept:
+            with self.subTest(glb=str(path.relative_to(ASSETS))):
+                animation = next(a for a in document(path)["animations"] if a["name"] == "gather")
+                marker = animation.get("extras", {}).get(MARKER)
+                if path in grounded:
+                    self.assertEqual(list(marker["replaced_sampler_output_accessors"]), ["Pelvis/translation"])
+                    self.assertEqual(marker["max_sole_penetration_m"], 0.0)
+                else:
+                    self.assertIsNone(marker)
+
     def test_hero_keeps_its_own_blender_grounding(self):
         for path in sorted(ASSETS.glob("characters/hero_quality_*.glb")):
             with self.subTest(glb=path.name):
@@ -112,6 +129,12 @@ class GroundedDeathMeasurementTest(unittest.TestCase):
                 bound = GATE_SLIP_M if relative.startswith(GATE_SLIP_FAMILIES) else RESIDUAL_SLIP_M
                 self.assertLessEqual(result["max_sole_slip_m"], bound)
                 self.assertLessEqual(result["max_contact_slip_m"], bound)
+
+    def test_village_gather_stays_on_the_floor(self):
+        rig = self.tool.Rig(self.tool.Glb(ASSETS / "village_characters/villager_3.glb"))
+        result = self.tool.measure(rig, rig.animation("gather"))
+        self.assertLessEqual(result["max_sole_penetration_m"], .001)
+        self.assertLessEqual(result["max_sole_slip_m"], GATE_SLIP_M)
 
     def test_grounding_is_idempotent(self):
         report = self.tool.ground(ASSETS / "soldiers/heavy_mid.glb", False)

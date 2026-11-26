@@ -488,6 +488,7 @@ def export(kind):
             export_frame_step=1, export_animations=True, export_morph=True,
             export_morph_animation=False, export_def_bones=False)
         death_ground = soldier.death_ground.ground(path)
+        gather_ground = soldier.death_ground.ground(path, None, "gather")
         seam = skirt_seam.smooth(path)
         count = 0
         for obj in bpy.context.scene.objects:
@@ -498,7 +499,8 @@ def export(kind):
                         "bytes": path.stat().st_size, "sha256": digest(path), "texture_edge": edge,
                         "face_morphs": level < 2, "belt_fit": belt_fit,
                         "death_ground_contact": {key: death_ground[key] for key in ("before", "after", "maximum_floor_correction_m")},
-                        "skirt_seam": {key: seam[key] for key in ("before", "after", "unchanged") if key in seam}})
+                        "skirt_seam": {key: seam[key] for key in ("before", "after", "unchanged") if key in seam},
+                        "gather_ground_contact": {key: gather_ground[key] for key in ("before", "after", "unchanged") if key in gather_ground}})
     return records
 
 
