@@ -8,6 +8,7 @@ const Grove = preload("res://scripts/visuals/grove.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 const VillageLifeWorld = preload("res://scripts/world/village_life_world.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
+const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const CompanionWorld = preload("res://scripts/world/companion_world.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
@@ -200,7 +201,7 @@ func sync_state(state: Dictionary) -> void:
 	var interiors := regional.get_node_or_null("HouseInteriors")
 	if interiors:
 		interiors.set_forge_work(str(state.get("village",{}).get("childhood",{}).get("active_work","")))
-	_apply_season(int(state.get("strategy",{}).get("turn",0))%4)
+	_sync_world_light(state)
 	_sync_resources()
 	_sync_buildings()
 	_sync_companion()
@@ -1769,6 +1770,23 @@ func _ui_blocks_pointer() -> bool:
 
 func _horizontal_distance(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
+
+func _sync_world_light(state: Dictionary) -> void:
+	var clock: Variant = state.get("calendar", {}).get("clock")
+	if not WorldCalendar.validate_clock(clock):
+		_apply_season(posmod(int(state.get("strategy", {}).get("turn", 0)), 4))
+		if look.time_of_day >= 0.0:
+			look.set_time_of_day(-1.0)
+		return
+	_apply_season(WorldCalendar.season_index(int(clock.jdn)))
+	# Lighting is sampled every five world minutes to avoid rebuilding
+	# interior sunbeams on successive frames of the accelerated legacy day.
+	@warning_ignore("integer_division")
+	var sample := int(clock.second) / 300
+	var solar_hours := sample / 12.0
+	if not is_equal_approx(look.time_of_day, solar_hours):
+		look.set_time_of_day(solar_hours)
+
 
 func _apply_season(index: int) -> void:
 	if index == season_index:

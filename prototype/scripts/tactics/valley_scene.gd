@@ -6,6 +6,7 @@ const Rules = preload("res://scripts/battle/battle_model.gd")
 const Landscape = preload("res://scripts/tactics/valley_landscape.gd")
 const HUD = preload("res://scripts/tactics/valley_hud.gd")
 const Soldier = preload("res://scripts/visuals/soldier_visual.gd")
+const Roster = preload("res://scripts/battle/soldier_roster.gd")
 const SIDES := {"ally":Color("#67d7c4"),"enemy":Color("#e58663")}
 ## Orders that need a tapped company or a tapped ground point after choosing them.
 const ENEMY_PICK := ["attack","flank","focus_fire","charge","pila"]
@@ -187,7 +188,7 @@ func _sync_units() -> void:
 			var destination := _surface(Vector2(man.x,man.z))
 			var dist := camera.position.distance_to(destination)
 			var detail := (0 if dist < near_limit else 1) if rigged.has(id) else 2
-			var role := "spear" if s.kind == "spear" else ("archer" if s.kind == "archer" else "heavy")
+			var role := "spear" if s.kind in ["spear", "skirmisher"] else ("archer" if s.kind == "archer" else "heavy")
 			if id == s.officer_id and s.side == "ally" and s.kind == "infantry":
 				role = "officer"
 			counts[detail] += 1
@@ -209,7 +210,7 @@ func _sync_units() -> void:
 			if not actors.has(id):
 				var actor = Soldier.new()
 				actor.role = role
-				actor.variant = i % 3
+				actor.variant = Roster.visual_variant(int(man.appearance_seed), str(man.military_rank), Soldier.TINTS.size())
 				actor.detail = detail
 				actors[id] = actor
 				actor.position = destination

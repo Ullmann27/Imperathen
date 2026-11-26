@@ -1,6 +1,6 @@
 # Weltkalender und Zeitarchitektur
 
-Status: **Module, Daten und Tests implementiert; noch nicht in Weltzustand, Story oder Oberfläche eingebunden.** Grundlage sind die Vorgaben D-015 (Start 58 v. Chr., Valdora, zwölf Jahre) und D-028 (Bänder I–IV, Zeitsprünge, kein Jahr null) aus [GAME_DIRECTION_2026-11-26](../00_governance/GAME_DIRECTION_2026-11-26.md) und [GAME_DIRECTION_2026-11-26_B](../00_governance/GAME_DIRECTION_2026-11-26_B.md) sowie das Zeitmodell des Masterhandbuchs 3.0 (PDF S. 64: historischen Tag, Weltzeit, Spielzeit, Alter und Jahreszeit getrennt führen; kein stiller Sprung). Das Dynastiesystem (D-029) ist nicht gebaut; Datenmodell und Tests reichen bis 9 n. Chr. und darüber hinaus.
+Status: **Module, Daten und Tests implementiert. Die Einbindung in Weltzustand, Speichervertrag und Anzeigen steht in [WORLD_STATE.md](WORLD_STATE.md) (D-045); der Integrationsplan unten ist der Stand vor dieser Einbindung.** Grundlage sind die Vorgaben D-015 (Start 58 v. Chr., Valdora, zwölf Jahre) und D-028 (Bänder I–IV, Zeitsprünge, kein Jahr null) aus [GAME_DIRECTION_2026-11-26](../00_governance/GAME_DIRECTION_2026-11-26.md) und [GAME_DIRECTION_2026-11-26_B](../00_governance/GAME_DIRECTION_2026-11-26_B.md) sowie das Zeitmodell des Masterhandbuchs 3.0 (PDF S. 64: historischen Tag, Weltzeit, Spielzeit, Alter und Jahreszeit getrennt führen; kein stiller Sprung). Das Dynastiesystem (D-029) ist nicht gebaut; Datenmodell und Tests reichen bis 9 n. Chr. und darüber hinaus.
 
 ## Konventionen
 
@@ -61,7 +61,7 @@ Ein Sprung braucht einen sichtbaren Grund und wird in Jahreszeit- oder Jahressch
 
 ## Integrationsplan für den Lead
 
-Diese Datei ändert keine bestehende Logik. Basis der Zeilenangaben: `ffbe3ad`.
+Umsetzungsstand je Punkt: [WORLD_STATE.md](WORLD_STATE.md), Abschnitt 7 (Punkte 1–8 und 10 umgesetzt, Punkt 9 offen). Basis der Zeilenangaben: `ffbe3ad`.
 
 1. **Speicherschema v6** (`world_model.gd`): `SCHEMA_VERSION` (Z. 19) auf 6; in `new_game` (Z. 57–107) `"calendar": WorldCalendar.new_world_time(WorldCalendar.campaign_start_jdn(), 21600, -58, {"player": {"year": -70}, <companion_id>: {"year": -70}})` für neue Kindheitsspiele; `"calendar"` in die exakte Schlüsselliste von `_validate_state` (Z. 737) aufnehmen und dort `validate_world_time` plus `EraRegistry.validate_overrides(state.calendar.divergences)` prüfen; in `_restore_integer_fields` (Z. 1044) `state.calendar = WorldCalendar.normalize_world_time(state.calendar)`.
 2. **Migration v5 → v6** in `_read_save` nach Z. 1011, ohne Inhalte zu verändern: Kindheitssaves (`village.childhood` vorhanden) erhalten `jdn = campaign_start_jdn() + childhood.day - 1`, `origin_year = -58`. Ältere reguläre Saves mit `history.start_year == 100` behalten ihre Zeitlinie (Entscheidung offen, siehe unten): `origin_year = 100`, `jdn = season_start(add_years(100, progress.years_elapsed), strategy.turn % 4)` (Frühling 100 n. Chr. für Kinder, Frühling 106 n. Chr. nach dem Sechsjahressprung). Das Alter bleibt der gespeicherte Wert; Geburtsjahr `birth_year_for_age(player.age, year_of(jdn))`. `world_seconds` bleibt technische Uhr (wird von `npc_behavior.gd:419` geprüft) und ist nicht das historische Datum.
@@ -77,7 +77,7 @@ Diese Datei ändert keine bestehende Logik. Basis der Zeilenangaben: `ffbe3ad`.
 ## Offene Entscheidungen des Auftraggebers
 
 1. Starttag der Kampagne (vorläufig 1. Mai 58 v. Chr.) und Geburtstag des Protagonisten (Jahr 70 v. Chr. abgeleitet; Tag frei, bei wörtlichem „ca. 26“ an den Iden bis 15. März).
-2. Alte reguläre Saves mit Trajan-Zeitlinie (100 n. Chr.) behalten oder auf 58 v. Chr. umstellen (Vorschlag: behalten, eigene Legacy-Anker).
+2. Entschieden (D-044): Alte reguläre Saves mit Trajan-Zeitlinie (100 n. Chr.) bleiben getrennte Spielstände mit eigenen Ankern.
 3. I-26 mit 17 Jahren: Termin 52 v. Chr. (dann 18) oder ziviler Pfad bei 17 (R1); III-02 auf 47 v. Chr. prüfen lassen (R2); Schreibweise der Doppeljahre (II-13).
 4. Vorjulianischen Kalender später simulieren oder bei nominalen Daten bleiben; a.u.c. oder Konsulnamen als römische Jahresanzeige.
 5. Fachliche Prüfung der Registry-Einträge mit Status `provisional` und `literature_unverified` (u. a. Schienenpanzer erst ab 9 n. Chr., Montefortino-Enddatum).

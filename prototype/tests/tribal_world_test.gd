@@ -27,6 +27,9 @@ func _run() -> void:
 	_test_player_and_knowledge()
 	_test_visit_materialisation()
 	_test_stability()
+	_test_sliced_work()
+	_test_conflict_causes()
+	_test_governments()
 	if failures.is_empty():
 		print("TRIBAL_WORLD_PASS %d checks" % checks)
 		quit(0)
@@ -182,17 +185,17 @@ func _test_non_monolithic() -> void:
 	# Controlled experiment: identical world, only one group's character differs.
 	var bold := Tribes.new_state(555)
 	var calm := Tribes.new_state(555)
-	calm.groups.sugambri_sieg.traits = {"boldness": 0.15, "caution": 0.85, "pride": 0.25, "trade": 0.8, "faith": 0.85}
+	calm.groups.suebi_gau.traits = {"boldness": 0.15, "caution": 0.85, "pride": 0.25, "trade": 0.8, "faith": 0.85}
 	for pid: String in calm.persons:
-		if calm.persons[pid].group == "sugambri_sieg":
+		if calm.persons[pid].group == "suebi_gau":
 			calm.persons[pid].traits = {"ambition": 0.2, "boldness": 0.15, "caution": 0.85, "pride": 0.25, "trade": 0.8}
 	Tribes.advance_ticks(bold, 300)
 	Tribes.advance_ticks(calm, 300)
-	var launched_bold := int(bold.groups.sugambri_sieg.history.get("raids_launched", 0))
-	var launched_calm := int(calm.groups.sugambri_sieg.history.get("raids_launched", 0))
+	var launched_bold := int(bold.groups.suebi_gau.history.get("raids_launched", 0))
+	var launched_calm := int(calm.groups.suebi_gau.history.get("raids_launched", 0))
 	_check(launched_bold > launched_calm, "Same seed, different character: bold %d raids vs calm %d" % [launched_bold, launched_calm])
-	var actions_bold := _action_mix(bold, "sugambri_sieg")
-	var actions_calm := _action_mix(calm, "sugambri_sieg")
+	var actions_bold := _action_mix(bold, "suebi_gau")
+	var actions_calm := _action_mix(calm, "suebi_gau")
 	_check(actions_bold != actions_calm, "Their chronicles differ: %s / %s" % [JSON.stringify(actions_bold), JSON.stringify(actions_calm)])
 
 
@@ -210,8 +213,10 @@ func _test_directed_relations() -> void:
 	var before_victim := Relations.value(state.relations, "ravensteg", "suebi_gau", "grievance")
 	var before_raider := Relations.value(state.relations, "suebi_gau", "ravensteg", "grievance")
 	var force := Tribes._raid_force(state, scn, "suebi_gau", 0.2)
+	_check(Tribes._launch_raid(state, scn, "suebi_gau", "ravensteg", force, "test", "Testfall", int(state.tick), false, "raid").is_empty(), "Without a recorded cause no war band leaves (D-048)")
+	_check(not Tribes.open_dispute(state, "suebi_gau", "ravensteg", "quest_dispute", "quest:test_ford", "Streit aus einer Testquest").is_empty(), "The quest layer records a dispute")
 	var e := Tribes._launch_raid(state, scn, "suebi_gau", "ravensteg", force, "test", "Testfall", int(state.tick), false, "raid")
-	_check(not e.is_empty(), "A real war band leaves")
+	_check(not e.is_empty() and e.cause.cause == "quest_dispute", "A real war band leaves for the recorded cause")
 	while state.expeditions.has(e) and e.status == "outbound":
 		Tribes.tick(state)
 	var raid := {}
@@ -263,6 +268,7 @@ func _test_agreements() -> void:
 	var war := Tribes.new_state(5)
 	var scn := Tribes.scenario("bc58_rhine")
 	var pact := Tribes._make_agreement(war, "truce", "suebi_gau", "eichenhang", 0, 26, {}, 0, "test")
+	Tribes.open_dispute(war, "suebi_gau", "eichenhang", "quest_dispute", "quest:test_cattle", "Viehstreit aus einer Testquest")
 	var e := Tribes._launch_raid(war, scn, "suebi_gau", "eichenhang", Tribes._raid_force(war, scn, "suebi_gau", 0.2), "test", "Testfall", 0, false, "raid")
 	while war.expeditions.has(e) and e.status == "outbound":
 		Tribes.tick(war)
@@ -288,6 +294,10 @@ func _test_raid_intents() -> void:
 	Relations.introduce(near.relations, "suebi_gau", "valdora", "fixture", 0, "fixture")
 	Relations.apply(near.relations, "suebi_gau", "valdora", "fixture", 0, "fixture", {"grievance": 70.0})
 	Tribes.report_target_state(near, "valdora", 4, true)
+	Tribes._tx(near, "suebi_gau", "food", 20000, "produce", "test_good_harvest")
+	var uncaused := _intent(near, "suebi_gau")
+	_check(uncaused.status == "blocked" and uncaused.reason == "no_cause", "Resentment and a weak target alone are no cause (D-048): %s" % uncaused.reason)
+	Tribes.open_dispute(near, "suebi_gau", "valdora", "quest_dispute", "quest:test_fixture", "Testquest")
 	var entry := _intent(near, "suebi_gau")
 	_check(entry.status == "planned", "A known, weakly defended, resented target in reach is planned: %s %s %.2f" % [entry.status, entry.reason, float(entry.utility)])
 	var home := 0
@@ -343,6 +353,8 @@ func _test_story_raid() -> void:
 	var state := Tribes.new_state(10)
 	var info := Tribes.story_raid(state, "I-10")
 	_check(info.attacker == "red_seal_riders" and int(info.riders_total) == 30 and info.consistent, "I-10 attackers are the 30 riders of this state")
+	var before_story := JSON.stringify(Tribes.planned_raids(state, "valdora"))
+	_check(not before_story.contains("commission") and not before_story.contains("red_seal_house"), "Raid intents show no sponsor")
 	var start := Tribes.commit_story_raid(state, "I-10")
 	_check(start.ok and int(start.riders_total) == 30, "The protected story raid takes the band's real riders")
 	_check(not Tribes.commit_story_raid(state, "I-10").ok, "The story raid cannot be started twice")
@@ -358,6 +370,21 @@ func _test_story_raid() -> void:
 	_check(int(state.groups.red_seal_riders.troops.band_rider.count) == 26 and int(state.groups.red_seal_riders.stock.wealth) >= wealth + 60 - 1, "Band returns with 26 riders and the commission")
 	_check(Tribes.story_raid(state, "I-10").status == "resolved", "The story raid is resolved")
 	_check(not Relations.knows(state.relations, "valdora", "red_seal_house"), "Valdora does not know the commissioner without evidence")
+	var seen_by_valdora := Tribes.observed_facts(state, "valdora")
+	var leaks := 0
+	var raid_seen := false
+	for ev: Dictionary in seen_by_valdora:
+		raid_seen = raid_seen or ev.kind == "raid_external"
+		leaks += int("red_seal_house" in ev.actors or str(ev.text).contains("Auftrag") or str(ev.text).contains("Handelshaus"))
+	_check(raid_seen and leaks == 0, "Valdora observes the raid but nothing about who paid for it (D-040)")
+	var player_view := "\n".join(Tribes.chronicle(state, 200, "player"))
+	_check(not player_view.contains("Handelshaus") and not player_view.contains("Auftraggeber"), "The player's chronicle holds only observed facts")
+	var full_view := "\n".join(Tribes.chronicle(state, 200))
+	_check(full_view.contains("Auftraggeber"), "The hidden truth stays in the state")
+	for raid: Dictionary in state.expeditions:
+		_check(raid.cause.cause == "quest_dispute" and str(raid.cause.source) == "mission:I-10", "I-10 is a mission-driven conflict")
+	var band: Dictionary = state.groups.red_seal_riders
+	_check(str(band.people) == "" and str(band.culture) == "mounted_band" and not Relations.knows(state.relations, "red_seal_riders", "ubii_rhine"), "The riders are attributed to no people or tribe")
 	_check(Tribes.reveal(state, "player", "red_seal_house", "rotes Wachssiegel (I-15)") and Relations.knows(state.relations, "player", "red_seal_house"), "Evidence introduces the commissioner")
 	var window := Tribes.raid_allowed(state, "valdora")
 	_check(not window.allowed and int(window.until) >= 26, "Valdora has a rebuild window of half a year")
@@ -502,3 +529,170 @@ func _test_stability() -> void:
 			var per_tick := tick_time / 400.0
 			print("TRIBAL_COST %.0f us per weekly tick, %d us per full validation (this machine, relative only)" % [per_tick, validation])
 			_check(error == "" and per_tick < 40000.0, "Weekly tick cost stays bounded on this machine")
+
+
+func _test_sliced_work() -> void:
+	# A week done as copy + slices + sliced validation equals the monolithic week.
+	var whole := Tribes.new_state(9)
+	var sliced := Tribes.new_state(9)
+	Tribes.advance_ticks(whole, 40)
+	var max_units := 0
+	var week_units := []
+	var bad_cost := 0
+	for week in 40:
+		var units := 0
+		var copy := Tribes.copy_begin(sliced)
+		while not copy.done:
+			var expected := Tribes.next_units(copy)
+			var spent := Tribes.step(copy)
+			bad_cost += int(spent != expected)
+			units += spent
+			max_units = maxi(max_units, spent)
+		var work: Dictionary = copy.target
+		var runner := Tribes.week_begin(work)
+		while not runner.done:
+			var expected := Tribes.next_units(runner)
+			var spent := Tribes.step(runner)
+			bad_cost += int(spent != expected)
+			units += spent
+			max_units = maxi(max_units, spent)
+		var check := Tribes.check_begin(work)
+		while not check.done:
+			var expected := Tribes.next_units(check)
+			var spent := Tribes.step(check)
+			bad_cost += int(spent != expected)
+			units += spent
+			max_units = maxi(max_units, spent)
+		if str(check.error) != "":
+			_check(false, "Sliced validation found: " + str(check.error))
+			return
+		sliced = work
+		week_units.append(units)
+	_check(_canonical(whole) == _canonical(sliced), "Forty sliced weeks equal forty monolithic weeks bit for bit")
+	_check(bad_cost == 0, "Every slice costs exactly the units it announced")
+	_check(max_units <= Tribes.MAX_SLICE_UNITS and max_units <= 8, "No single slice exceeds the per-frame budget (%d units)" % max_units)
+	week_units.sort()
+	print("TRIBAL_WEEK_UNITS min %d median %d max %d" % [week_units[0], week_units[week_units.size() / 2], week_units.back()])
+	var source := Tribes.new_state(9)
+	Tribes.advance_ticks(source, 60)
+	var copy := Tribes.copy_state(source)
+	_check(_canonical(copy) == _canonical(source), "The sliced copy is complete")
+	var edge_key: String = copy.relations.edges.keys()[0]
+	copy.relations.edges[edge_key].trust = 99.0
+	copy.groups.ubii_rhine.stock.food = int(copy.groups.ubii_rhine.stock.food) + 1
+	copy.events.append({"tick": 0})
+	_check(float(source.relations.edges[edge_key].trust) != 99.0, "Copied relations are independent")
+	_check(int(source.groups.ubii_rhine.stock.food) == int(copy.groups.ubii_rhine.stock.food) - 1 and source.events.size() == copy.events.size() - 1, "Copied groups and records are independent")
+	var check := Tribes.check_begin(source)
+	while not check.done:
+		Tribes.step(check)
+	var groups := 0
+	var edges := 0
+	for step: String in check.steps:
+		groups += int(step.begins_with("check_group:"))
+		edges += int(step.begins_with("check_edges:"))
+	_check(str(check.error) == "" and groups == source.groups.size() and edges == ceili(source.relations.edges.size() / float(Tribes.CHECK_EDGE_SLICE)), "Sliced validation covers every group and every relation (%d groups, %d edge slices)" % [groups, edges])
+	var tampered: Dictionary = source.duplicate(true)
+	tampered.relations.edges[edge_key].trust = 500.0
+	_check(Tribes.validate(tampered).contains("außerhalb der Grenzen"), "A broken relation in any slice still fails validation")
+	tampered = source.duplicate(true)
+	tampered.groups.sugambri_sieg.held.horse = int(tampered.groups.sugambri_sieg.held.horse) + 1
+	_check(Tribes.validate(tampered) != "", "Broken gear in a later group slice still fails validation")
+	var shallow := Tribes.with_extra_days(source, 7)
+	_check(int(shallow.extra_days) == int(source.extra_days) + 7 and Tribes.validate(shallow) == "" and int(source.extra_days) == 0, "A calendar offset is a shallow, still valid copy")
+
+
+func _test_conflict_causes() -> void:
+	var counted := 0
+	for seed: int in [1, 2026, 58]:
+		var state := Tribes.new_state(seed)
+		var seen := {}
+		var bad := []
+		for i in 400:
+			Tribes.tick(state)
+			for ev: Dictionary in state.events:
+				if seen.has(ev.id):
+					continue
+				seen[ev.id] = true
+				if ev.kind in Tribes.CONFLICT_EVENTS:
+					counted += 1
+					var cause: String = str(ev.get("conflict", {}).get("cause", ""))
+					if not (cause in Tribes.CONFLICT_CAUSES):
+						bad.append(str(ev.id))
+			for e: Dictionary in state.expeditions:
+				if not (str(e.cause.cause) in Tribes.CONFLICT_CAUSES):
+					bad.append(str(e.id))
+		_check(bad.is_empty(), "Seed %d: every conflict event and war band carries an allowed cause %s" % [seed, str(bad.slice(0, 5))])
+	print("TRIBAL_CONFLICTS %d conflict events over 3 x 400 weeks" % counted)
+	# A favourable power ratio alone starts no war (D-048): a well-fed world
+	# without disputes stays at peace for a year.
+	var calm := Tribes.new_state(3)
+	calm.disputes = []
+	for gid: String in Tribes._active_tribes(calm):
+		Tribes._tx(calm, gid, "food", 20000, "produce", "test_good_harvest")
+	var peaceful := 0
+	for i in 26:
+		Tribes.tick(calm)
+	for ev: Dictionary in calm.events:
+		peaceful += int(ev.kind in Tribes.CONFLICT_EVENTS)
+	_check(peaceful == 0 and Tribes.validate(calm) == "", "Without dispute or need no war band leaves, however strong a group is")
+	# Need is a cause of its own (D-049), recorded with its occasion.
+	var famine := Tribes.new_state(3)
+	famine.disputes = []
+	Tribes._tx(famine, "usipetes_tencteri", "food", int(famine.groups.usipetes_tencteri.stock.food), "destroy", "test_famine")
+	var answers := {}
+	var need_ok := true
+	var need_raids := 0
+	for i in 52:
+		Tribes.tick(famine)
+	for ev: Dictionary in famine.events:
+		if not ev.actors.is_empty() and str(ev.actors[0]) == "usipetes_tencteri":
+			answers[ev.kind] = true
+			if ev.kind == "war_band_departs":
+				need_raids += 1
+				need_ok = need_ok and ev.conflict.cause == "need" and str(ev.conflict.source).contains("Hunger") and str(ev.conflict.source).contains("fehlt")
+	_check(need_ok and Tribes.validate(famine) == "", "A hunger raid records need with hunger level, missing goods, character and relation (%d raids)" % need_raids)
+	_check(answers.size() >= 2, "Need is answered by the situation, not by one reflex: %s" % str(answers.keys()))
+	var state := Tribes.new_state(4)
+	var natural := 0
+	for item: Dictionary in state.disputes:
+		natural += int(item.cause == "natural_enemy" and str(item.source).begins_with("roster:"))
+	_check(natural == 3, "Natural enmities come from the roster with a source or design marker (%d)" % natural)
+
+
+func _test_governments() -> void:
+	var scn := Tribes.scenario("bc58_rhine")
+	var forms := {}
+	var state := Tribes.new_state(12)
+	for gid: String in state.groups:
+		forms[state.groups[gid].government] = true
+	_check(forms.has("assembly") and forms.has("hereditary") and forms.has("elders") and forms.has("war_leader"), "Four forms of government are in play")
+	_check(state.persons.has("p_rav_swanahild") and state.persons.p_rav_swanahild.role == "heir", "The Ravensteg heiress stays")
+	# The same people choose differently under different rules.
+	var hereditary := Tribes.new_state(12)
+	var assembly := Tribes.new_state(12)
+	hereditary.groups.ubii_rhine.government = "hereditary"
+	assembly.groups.ubii_rhine.government = "assembly"
+	for world: Dictionary in [hereditary, assembly]:
+		world.persons.p_ubii_adalgar.status = "dead"
+		Tribes._succession(world, scn, "ubii_rhine", 1, "Test")
+	_check(hereditary.groups.ubii_rhine.leader == "p_ubii_wigmund", "Hereditary rule passes to the heir")
+	_check(assembly.groups.ubii_rhine.leader == "p_ubii_hrodwin", "The assembly prefers the renowned rival")
+	# Caesar BG 6,23: a war leader for the war, then back to peace.
+	var war := Tribes.new_state(12)
+	Tribes.open_dispute(war, "suebi_gau", "eichenhang", "quest_dispute", "quest:test_war", "Testkrieg")
+	var e := Tribes._launch_raid(war, scn, "suebi_gau", "eichenhang", Tribes._raid_force(war, scn, "suebi_gau", 0.2), "test", "Testfall", 0, false, "raid")
+	var leader := str(war.groups.suebi_gau.war_leader)
+	_check(not e.is_empty() and leader != "" and war.persons[leader].status == "alive", "The Suebi elect a war leader for the campaign")
+	_check(Tribes.traits(war, "suebi_gau").boldness != Tribes.traits(Tribes.new_state(12), "suebi_gau").boldness or leader == str(war.groups.suebi_gau.leader), "During the war the war leader's character weighs in")
+	var steps := 0
+	while str(war.groups.suebi_gau.war_leader) != "" and steps < 200:
+		Tribes.tick(war)
+		steps += 1
+	_check(str(war.groups.suebi_gau.war_leader) == "" and steps > 26, "The war leader steps back after weeks without fighting (%d weeks)" % steps)
+	_check(Tribes.validate(war) == "", "Government changes keep the state valid: " + Tribes.validate(war))
+	var view := Tribes.atlas_view(Tribes.new_state(12))
+	var named := 0
+	for item: Dictionary in view:
+		named += int(str(item.government_name) != "")
+	_check(named >= 6, "The atlas names each group's form of government")

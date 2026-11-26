@@ -10,6 +10,9 @@ const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const Style = preload("res://scripts/ui/roman_hud/hud_style.gd")
 const Kit = preload("res://scripts/ui/roman_hud/menu_kit.gd")
 const Icons = preload("res://scripts/ui/roman_hud/hud_icons.gd")
+const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
+const WorldClock = preload("res://scripts/domain/world_clock.gd")
+const AGE_WORDS := {12: "zwölf", 13: "dreizehn", 14: "vierzehn", 15: "fünfzehn", 16: "sechzehn", 17: "siebzehn"}
 
 const TAB_GLYPHS := {"overview": "village", "work": "projects", "people": "family", "map": "map"}
 
@@ -84,6 +87,16 @@ class RegionalMap extends Control:
 		draw_line(base + Vector2(0, -4), base + Vector2(0, 4), Style.CHARTA_MUTED, 1.2)
 		draw_line(base + Vector2(bar, -4), base + Vector2(bar, 4), Style.CHARTA_MUTED, 1.2)
 		draw_string(font, base + Vector2(6, -6), "8 km", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Style.CHARTA_MUTED)
+
+
+## The world date of the save (one clock for HUD, atlas and this panel).
+static func _date(data: Dictionary) -> String:
+	var time := WorldClock.view(data)
+	return str(time.date_label) if not time.is_empty() else WorldCalendar.format_year(int(data.get("village", {}).get("history", {}).get("start_year", 100)))
+
+
+static func _age_word(age: int) -> String:
+	return str(AGE_WORDS.get(age, "%d Jahre alt" % age))
 
 
 ## Thin bronze meter for a condition or a running project.
@@ -259,7 +272,7 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 	if Childhood.enabled(data):
 		var chapter := Childhood.view(data)
 		var today := _card(column, true)
-		today.add_child(Style.kicker("DORFTAG %d  ·  DU BIST ZWÖLF" % int(chapter.get("day", 1))))
+		today.add_child(Style.kicker("%s  ·  DORFTAG %d  ·  DU BIST %s" % [_date(data), int(chapter.get("day", 1)), _age_word(int(data.player.age))]))
 		_text(ui, today, str(chapter.get("title", "Ein Morgen zu Hause")), 22)
 		_text(ui, today, str(chapter.get("objective", "")), 18)
 		_text(ui, today, "Der nächste Tag beginnt, wenn du zu Hause bewusst schlafen gehst.", 14, true)
@@ -284,6 +297,8 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 	for entry: Array in [["wood", "wood", "Holz"], ["stone", "stone", "Stein"], ["grain", "grain", "Getreide"], ["denarii", "coin", "Denare"]]:
 		_chip(ui, stock, entry[1], str(int(data.resources.get(entry[0], 0))), entry[2])
 	_text(ui, column, "Ein Dorftag dauert in dieser Prüfphase zwei Spielminuten; Gespräche und Pausen halten ihn an.", 13, true)
+	var history: Dictionary = life.get("history", {})
+	_text(ui, column, "Historischer Rahmen: %s · %s. Dorf und Bewohner sind eigene fiktionale Figuren." % [history.get("year_label", WorldCalendar.format_year(int(history.get("current_year", 100)))), life.get("ruler", "Historischer Rahmen")], 14, true)
 	column.add_child(Kit.heading("Anlagen"))
 	var stats: Dictionary = data.get("village", {}).get("attributes", {})
 	var row := _flow(column, 10)
