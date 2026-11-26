@@ -133,7 +133,8 @@
         "natural_motion",
         "village_people",
         "npc_behavior_world",
-        "resident_footwear"
+        "resident_footwear",
+        "resident_catalog_bridge"
       ],
       "review_scope": [
         "idle_talk",
@@ -996,7 +997,13 @@
     "scripts/visuals/melee_impact_audio.gd",
     "scripts/visuals/melee_impact_fx.gd",
     "scripts/visuals/melee_pose.gd",
-    "scripts/visuals/melee_presenter.gd"
+    "scripts/visuals/melee_presenter.gd",
+    "scripts/visuals/resident_identity.gd",
+    "scripts/visuals/resident_look.gd",
+    "shaders/resident_eye.gdshader",
+    "shaders/resident_hair.gdshader",
+    "shaders/resident_hair_cards.gdshader",
+    "shaders/resident_skin.gdshader"
   ],
   "procedural_owners": {
     "scripts/world/village_life_world.gd": [
