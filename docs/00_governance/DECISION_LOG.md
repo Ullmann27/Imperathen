@@ -34,6 +34,15 @@
 | D-028 | Vorgabe (26.11.2026) | Vier Originaldrehbücher verbindlich: Band I 58–52, II 51–47, III 47–44, IV 44–27 v. Chr. und Sandbox; Jahres- und Altersangaben aus den Missionsübersichten; Zeitsprünge schreiben Veränderungen fort; Zeitarchitektur ohne Jahr null. | Kalendermodul und Missionsjahresdaten. |
 | D-029 | Vorgabe (26.11.2026) | Dynastiesystem als spätere Erweiterung (Altern, Familie, Besitz, Stellung, Vermächtnis, Nachfolger; Ausbau bis 9 n. Chr. und weiter); darf P0/P1 nicht verzögern. | Nur Datenmodell vorbereiten. |
 | D-030 | Vorgabe (26.11.2026) | Produktionsstandard bestätigt: drei Ebenen vorausdenken, Originaljunge und Qualitätsverbesserungen erhalten, Blender/Meshy/Rendering/Motion Capture, keine künstliche Obergrenze, skalierbare Architektur, reale Engine-Aufnahmen, kein Main-Merge, Fable nach Zwischenabnahme. | Wie D-022. |
+| D-031 | Vorgabe (26.11.2026) | AAA Visual Quality Directive als zusätzliche Qualitätsvorgabe; ersetzt weder Masterhandbuch noch frühere Anweisungen; alle laufenden Agents arbeiten unverändert weiter. | [GAME_DIRECTION_2026-11-26_C.md](GAME_DIRECTION_2026-11-26_C.md). |
+| D-032 | Vorgabe (26.11.2026) | Originaljunge: Identität und MoCap-Verbesserungen bleiben; zivile Kleidungsvariante ohne Rüstung und Waffen für den Kampagnenbeginn. Klärt die offene Frage nach der Kleidung des Zwölfjährigen. | Eigenes Arbeitspaket; Laufzeitdateien bleiben außerhalb des Repositorys. |
+| D-033 | Vorgabe (26.11.2026) | Rendererwechsel (Compatibility → Mobile/Forward+) erst nach reproduzierbaren Vergleichstests. | Vergleichsharness; Gerätemessung bleibt Voraussetzung. |
+| D-034 | Vorgabe (26.11.2026) | Vier tatsächlich unterscheidbare Grafikprofile Leicht, Ausgewogen (Fold7), Hoch, Sehr hoch; Hoch und Sehr hoch dürfen deutlich mehr Hardware verlangen; keine Begrenzung der Installationsgröße; Streaming, LOD, Instancing, Culling, Texturkompression, getrennte Grafikpakete. | Profilmatrix und Messung. |
+| D-035 | Vorgabe (26.11.2026) | Erwachsene, Soldaten und Bewohner auf den Standard des Originaljungen: Anatomie, individuelle Gesichter, Finger, Gesichtsanimation, phonembasierte Mundsynchronisation, Blick, Blinzeln, Atmung, Bodenkontakt, Greifen, Kleidung ohne Durchdringung. Ein Modell ohne funktionierende Animationen gilt nicht als fertig. | Figurenpipeline. |
+| D-036 | Vorgabe (26.11.2026) | Lebendige Stadtbevölkerung mit Lebenszusammenhang; sichtbare Dichte skaliert mit Entfernung und Profil, die Weltpopulation bleibt konsistent. | Nach Akteurkern (D-016) und Bewohnermodell (D-018). |
+| D-037 | Vorgabe (26.11.2026) | Eigenständiges HUD mit römischer Identität, dezent, kontextabhängig, Fold7-Touch, verschiedene Bildschirmformate; in ruhiger Erkundung möglichst viel Welt sichtbar. | Eigenes Arbeitspaket. |
+| D-038 | Vorgabe (26.11.2026) | Grafische Abnahme je Produktionsabschnitt mit Blender- und Godot-Rendern, identischen Kameras und vollständigem Nachweisschema; Konzeptbilder nie als Ingame-Grafik. | Nachweisschema in GAME_DIRECTION_2026-11-26_C.md. |
+| D-039 | Vorgabe (26.11.2026) | Technische Beanstandungen: JSON-Parserfehler, Motion-Gate-Befunde systematisch, Kalender in den gemeinsamen Weltzustand, kontrollierte Zusammenführung aller Arbeitsbranches ohne Verlust älterer Reparaturen, Fold7-Leistung nur auf dem Gerät gemessen; keine Abschwächung von Grenzwerten. | Integrationsbranch, Motion-Gate-Paket. |
 
 ## Änderungen an Entscheidungen
 
@@ -58,3 +67,6 @@ Der Auftraggeber hat acht Präzisierungen zum Masterhandbuch 3.0 vorgegeben (D-0
 
 Weitere Vorgaben des Auftraggebers (D-023 bis D-030), Wortlaut und Folgen: [GAME_DIRECTION_2026-11-26_B.md](GAME_DIRECTION_2026-11-26_B.md).
 
+## 26.11.2026 – AAA Visual Quality Directive
+
+Zusätzliche Qualitätsvorgabe des Auftraggebers nach Prüfung der Godot-Renderbilder aus PR #98 (D-031 bis D-039). Wortlaut, Zuordnung und Grenzen der Prüfbarkeit: [GAME_DIRECTION_2026-11-26_C.md](GAME_DIRECTION_2026-11-26_C.md). D-032 entscheidet die Kleidung des Zwölfjährigen zum Kampagnenbeginn.
