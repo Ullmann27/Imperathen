@@ -6,21 +6,34 @@ extends RefCounted
 ## from a saved state without hidden generator state.
 ## Percentages and ranges below are balancing design values, not historical claims.
 
-const STATUSES := ["active", "wounded", "dead", "retired"]
+const STATUSES := ["active", "wounded", "dead", "retired", "left"]
 const BATTLE_STATUSES := ["active", "wounded", "dead"]
 const SEVERITIES := ["light", "serious", "crippling", "fatal", "unrecorded"]
 const OUTCOMES := ["return", "return_impaired", "retire", "dead", "pending"]
 const IMPAIRMENTS := ["Hinken", "steife Schulter", "geschwächte Schildhand", "Verlust eines Auges", "Kurzatmigkeit nach Rippenbruch"]
-const SERVICE_EVENTS := ["mustered", "wounded", "killed", "took_command", "lost_comrade", "promoted", "legacy_casualty", "recovered", "retired"]
+const SERVICE_EVENTS := ["mustered", "wounded", "killed", "took_command", "lost_comrade", "promoted", "legacy_casualty", "recovered", "retired",
+	"rescued", "rescued_comrade", "campaign", "left"]
 const SKILLS := ["melee", "missile", "discipline"]
 const MAX_SERVICE := 12
-const RECORD_KEYS := ["uid", "name", "origin", "age", "troop_id", "skills", "xp", "relations", "service", "status", "wound", "impairments", "appearance_seed"]
+const RECORD_KEYS := ["uid", "name", "origin", "age", "troop_id", "skills", "xp", "relations", "service", "status", "wound", "impairments", "appearance_seed",
+	"rank", "trust", "family", "campaigns"]
 const AGES := [[17, 21], [19, 28], [24, 34], [30, 42], [26, 45]]
 const SKILL_BASE := [25, 40, 52, 62, 70]
 ## Tent group (contubernium) or kin group (Tac. Germ. 7) that starts with mutual bonds.
 const GROUP_SIZE := {"roman": 8}
 const KILLED_SHARE := 0.30
 const COMRADE_BOND := 50
+## Military rank inside a company, lowest first (D-043). Culture-specific titles
+## (optio, signifer, princeps ...) come from the catalog's appointments.
+const RANKS := ["miles", "signifer", "deputy", "commander"]
+## Design values of the soldiers' personal lives (D-043).
+const RESCUE_CHANCE := 0.6
+const RESCUE_BOND := 15
+const RESCUE_CARE := 0.8
+const TRUST := {"rescued": 5, "rescuer": 2, "lost_comrade": -2, "routed": -8}
+const STANDINGS := ["landlos", "paechter", "kleinbauer", "hofbesitzer"]
+const CRAFTS := ["Bauer", "Hirte", "Tagelöhner", "Zimmermann", "Schmied", "Töpfer", "Fuhrmann", "Jäger"]
+const HOUSEHOLDS := 60
 
 
 static func _mul32(a: int, b: int) -> int:
@@ -62,8 +75,10 @@ static func _pick(list: Array, value: float) -> Variant:
 
 ## Creates the identity of soldier `index` of a company. troop is the catalog entry,
 ## pool the name list and group the population group the recruit comes from.
+## experience: an experience tier of the catalog ({skill, xp_min, xp_max}); empty keeps the
+## troop-tier defaults.
 static func identity(world_seed: int, squad_id: String, index: int, count: int, troop: Dictionary, pool: Dictionary,
-		group: Dictionary, entry_xp: int, discipline: int, year: int) -> Dictionary:
+		group: Dictionary, entry_xp: int, discipline: int, year: int, experience: Dictionary = {}, rank: String = "miles") -> Dictionary:
 	var id := uid(squad_id, index)
 	var salt := text_salt(id)
 	var tier := clampi(int(troop.get("tier", 1)), 1, 5)
@@ -75,7 +90,7 @@ static func identity(world_seed: int, squad_id: String, index: int, count: int, 
 		name += " " + str(_pick(family, roll(world_seed, salt, 2)))
 	var age_span: Array = AGES[tier - 1]
 	var age: int = age_span[0] + floori(roll(world_seed, salt, 3) * (age_span[1] - age_span[0] + 1))
-	var base: int = SKILL_BASE[tier - 1]
+	var base: int = int(experience.skill) if not experience.is_empty() else SKILL_BASE[tier - 1]
 	var ranged := false
 	for item: Dictionary in troop.get("loadout", {}).values():
 		ranged = ranged or item.family_id in ["bow", "sling", "javelin", "pilum"]
@@ -92,17 +107,31 @@ static func identity(world_seed: int, squad_id: String, index: int, count: int, 
 			# The same value from both sides: the pair is salted by its ordered indices.
 			relations[uid(squad_id, other)] = 35 + floori(roll(world_seed, text_salt(squad_id), mini(index, other), maxi(index, other)) * 31)
 	var places: Array = group.get("places", ["?"])
+	var place := str(_pick(places, roll(world_seed, salt, 7)))
+	# Family and livelihood stay part of the world (D-043): the household is where the
+	# soldier's absence, wound or death is felt. Two soldiers can share a household (kin).
+	var home := {
+		"household": "%s/%s/h%02d" % [str(group.get("group_id", "")), place, floori(roll(world_seed, salt, 16) * HOUSEHOLDS)],
+		"dependants": clampi(floori(roll(world_seed, salt, 17) * (age - 14) / 4.0), 0, 6),
+		"standing": STANDINGS[clampi(floori(roll(world_seed, salt, 18) * 2.0) + (tier - 1) / 2, 0, STANDINGS.size() - 1)],
+		"craft": str(_pick(CRAFTS, roll(world_seed, salt, 19))),
+	}
 	return {
 		"uid": id, "name": name,
-		"origin": {"group_id": str(group.get("group_id", "")), "place": str(_pick(places, roll(world_seed, salt, 7)))},
+		"origin": {"group_id": str(group.get("group_id", "")), "place": place},
 		"age": age, "troop_id": str(troop.get("troop_id", "")), "skills": skills,
-		"xp": entry_xp + floori(roll(world_seed, salt, 8) * 80),
+		"xp": (int(experience.xp_min) + floori(roll(world_seed, salt, 8) * (int(experience.xp_max) - int(experience.xp_min) + 1))) if not experience.is_empty() else entry_xp + floori(roll(world_seed, salt, 8) * 80),
 		"relations": relations,
 		"service": [{"event": "mustered", "ref": str(troop.get("troop_id", "")), "year": year, "step": 0}],
 		"status": "active", "wound": {}, "impairments": [],
 		# Unique within the company by construction (low bits hold the index), so a
 		# replacement can never look identical to the fallen soldier.
 		"appearance_seed": (mix(world_seed ^ salt) & 0x7ffff000) | (index & 0xfff),
+		"rank": rank if rank in RANKS else "miles",
+		# Trust in the command (0-100): moved by rescues, lost comrades, routs and the
+		# outcome of campaigns; below SoldierLife.LEAVE_TRUST a soldier leaves.
+		"trust": clampi(skills.discipline - 15 + floori(roll(world_seed, salt, 20) * 21), 20, 90),
+		"family": home, "campaigns": [],
 	}
 
 
@@ -121,6 +150,47 @@ static func casualty(world_seed: int, id: String, step: int) -> Dictionary:
 		impairment = str(_pick(IMPAIRMENTS, roll(world_seed, salt, step, 15)))
 		outcome = "retire" if severity == "crippling" else "return_impaired"
 	return {"status": "wounded", "wound": {"severity": severity, "recovery_days": days, "impairment": impairment, "outcome": outcome, "step": step}}
+
+
+## Look variant of a soldier among `variants` available looks (D-043): a pure function
+## of the person, not of his place in the ranks, so he keeps his look when the company
+## reforms. Ranked soldiers (standard bearer, deputy, commander) take variant 0, the
+## cleanest kit; the men draw from all variants by their appearance seed.
+static func visual_variant(appearance_seed: int, rank: String, variants: int) -> int:
+	if variants <= 1 or (rank in RANKS and rank != "miles"):
+		return 0
+	return mix(appearance_seed) % variants
+
+
+## Whether a comrade carries the wounded soldier out. The rescuer is the closest friend
+## still in the ranks (bond >= COMRADE_BOND; ties go to the first in rank order).
+## Deterministic for (world_seed, uid, step). Returns the rescuer's uid or "".
+static func rescuer(world_seed: int, wounded: Dictionary, in_ranks: Array, step: int) -> String:
+	var best := ""
+	var bond := COMRADE_BOND - 1
+	for other in in_ranks:
+		if int(wounded.relations.get(other, 0)) > bond:
+			bond = int(wounded.relations[other])
+			best = other
+	if best == "" or roll(world_seed, text_salt(wounded.uid), step, 21) >= RESCUE_CHANCE:
+		return ""
+	return best
+
+
+## Books a rescue on both records: the bond grows on both sides, the wounded soldier
+## trusts more and reaches care sooner (shorter recovery).
+static func rescue(wounded: Dictionary, helper: Dictionary, year: int, step: int) -> void:
+	for pair in [[wounded, helper], [helper, wounded]]:
+		pair[0].relations[pair[1].uid] = mini(100, int(pair[0].relations.get(pair[1].uid, 0)) + RESCUE_BOND)
+	wounded.wound.recovery_days = maxi(1, floori(int(wounded.wound.recovery_days) * RESCUE_CARE))
+	shift_trust(wounded, TRUST.rescued)
+	shift_trust(helper, TRUST.rescuer)
+	note(wounded, "rescued", helper.uid, year, step)
+	note(helper, "rescued_comrade", wounded.uid, year, step)
+
+
+static func shift_trust(record: Dictionary, delta: int) -> void:
+	record.trust = clampi(int(record.trust) + delta, 0, 100)
 
 
 static func note(record: Dictionary, event: String, ref: String, year: int, step: int) -> void:
@@ -186,10 +256,12 @@ static func _valid_wound(w: Variant, status: String, steps: int) -> bool:
 static func valid_record(r: Variant, original: Dictionary, company: Array, steps: int) -> bool:
 	if typeof(r) != TYPE_DICTIONARY or r.size() != RECORD_KEYS.size() or not r.has_all(RECORD_KEYS):
 		return false
-	for key in ["uid", "name", "origin", "age", "troop_id", "skills", "appearance_seed"]:
+	for key in ["uid", "name", "origin", "age", "troop_id", "skills", "appearance_seed", "rank", "family", "campaigns"]:
 		if r[key] != original[key]:
 			return false
 	if not _int(r.xp, original.xp, original.xp + 100000) or not r.status in BATTLE_STATUSES or not _valid_wound(r.wound, r.status, steps):
+		return false
+	if not _int(r.trust, 0, 100):
 		return false
 	if typeof(r.impairments) != TYPE_ARRAY or r.impairments != original.impairments:
 		return false
