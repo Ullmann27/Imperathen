@@ -12,6 +12,7 @@ const Entry = preload("res://main.tscn")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const I01Film = preload("res://scripts/story/i01_film.gd")
+const VoiceLines = preload("res://scripts/audio/voice_lines.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Checkpoint = preload("res://scripts/cinematic/opening_checkpoint.gd")
 var game
@@ -114,6 +115,7 @@ func _run() -> void:
 	game.set_physics_process(false)
 	game.ui._touch_enabled = true
 	game.ui._finish_intro()
+	_check_i01_voice_catalog()
 	await _test_vid_a_normal()
 	await _test_hud_and_props()
 	await _test_vid_b_interrupted()
@@ -144,9 +146,34 @@ func _prop_at_hand(prop: Node3D, hand: String, offset: Vector3) -> bool:
 	return prop.global_position.distance_to(expected) < 0.002
 
 
+## Cover every authored branch, not just the one dialogue path the player
+## selects during the integration playthrough.
+func _check_i01_voice_catalog() -> void:
+	var mission: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(I01.SOURCE))
+	for id: String in mission.slice.lines:
+		var authored: Dictionary = mission.slice.lines[id]
+		_check_exact_voice(str(authored.text), str(authored.speaker_id), id)
+	for step: Dictionary in mission.steps:
+		if not str(step.get("text", "")).is_empty():
+			_check_exact_voice(str(step.text), str(step.npc), str(step.id))
+		if not str(step.get("result", "")).is_empty():
+			_check_exact_voice(str(step.result), "narrator", str(step.id) + ".result")
+
+
+func _check_exact_voice(text: String, speaker: String, id: String) -> void:
+	var line := VoiceLines.find(text)
+	if not check(not line.is_empty() and str(line.get("text", "")) == text and str(line.get("speaker_id", "")) == VoiceLines.speaker_id(speaker), "Exact authored I-01 recording and speaker: " + id):
+		return
+	var audio := VoiceLines.stream_for(line)
+	var track := VoiceLines.viseme_track(line)
+	check(audio != null and audio.get_length() > 0.0, "Imported I-01 audio stream is playable: " + id)
+	check(str(track.get("line_id", "")) == str(line.line_id) and str(track.get("text_key", "")) == VoiceLines.text_key(text) and not track.get("segments", []).is_empty(), "Aligned I-01 mouth track belongs to this recording: " + id)
+
+
 func _test_vid_a_normal() -> void:
 	# T19: normal film start, AwaitChoice, commit, exact handoff to play.
 	await _start()
+	check(game.opening_voice.is_active() and str(game.opening_voice.current.get("line_id", "")) == "I01_A_TABLE" and game.opening_voice_duration > 0.0, "Production VID-A actually starts its restored original voice")
 	var before := JSON.stringify(game.model.data)
 	var shots: Array[String] = []
 	var played := 0.0
