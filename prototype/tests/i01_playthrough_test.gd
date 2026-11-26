@@ -1,11 +1,11 @@
 extends SceneTree
 ## Scripted I-01 playthrough with the real game loop (fixed 60 Hz): films run
-## on Main's own clock, the boy walks by the regular move_axis input through
+## on Main's own clock at accelerated test speed, the boy walks by the regular move_axis input through
 ## the house door to the well and back, and every action uses the regular
 ## interact/dialogue controls. It reports simulated seconds per phase. This is
 ## a reproducible engine measurement of one scripted route, not a human
 ## playtest: reading pauses, exploration and decision time are not included.
-## Manual run (about 90-120 s wall time, therefore not in check_prototype):
+## Manual run (the full simulation can take several minutes):
 ## godot --headless --path prototype --fixed-fps 60 --script res://tests/i01_playthrough_test.gd
 
 const Entry = preload("res://main.tscn")
@@ -48,8 +48,8 @@ func _capture(label: String) -> void:
 		return
 	# Keep QA movement at 60 Hz without drawing every intermediate frame.
 	RenderingServer.render_loop_enabled = true
-	for i in 3:
-		await RenderingServer.frame_post_draw
+	await process_frame
+	RenderingServer.force_draw()
 	var image := root.get_texture().get_image()
 	check(image != null and not image.is_empty() and image.save_png(capture_dir.path_join(label + ".png")) == OK, "Engine-Aufnahme: " + label)
 	RenderingServer.render_loop_enabled = false
