@@ -120,8 +120,16 @@ func _test_v5_migration() -> void:
 	if not result.ok:
 		return
 	_check(model.data.schema_version == 6 and model.data.tribes.scenario == "bc58_rhine" and int(model.data.tribes.tick) == 0, "v5 childhood save gains the opening Rhine roster")
+	# Ignore only newly added screenplay fields and its version. Every
+	# original story field must retain its value across the clock migration.
+	var before: Dictionary = payload.village.childhood
+	var after: Dictionary = model.data.village.childhood.duplicate(true)
+	for key: String in after.screenplay.keys():
+		if not before.screenplay.has(key):
+			after.screenplay.erase(key)
+	after.screenplay.version = before.screenplay.version
 	# The loader restores schema integers that JSON.parse reads as floats.
-	_check(_json(JSON.parse_string(_json(model.data.village.childhood))) == _json(JSON.parse_string(_json(payload.village.childhood))), "Migration leaves the childhood story untouched")
+	_check(_json(JSON.parse_string(_json(after))) == _json(JSON.parse_string(_json(before))), "Migration leaves the childhood story untouched")
 	var target := floori(Tribes.world_calendar_day(model.data) / float(Tribes.TICK_DAYS))
 	model.finish_tribes()
 	_check(int(model.data.tribes.tick) == target, "Elapsed calendar weeks are caught up after load (%d of %d)" % [int(model.data.tribes.tick), target])
