@@ -10,6 +10,7 @@ const VillageLifeWorld = preload("res://scripts/world/village_life_world.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
 const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const YouthOutfit = preload("res://scripts/visuals/youth_outfit.gd")
 const CompanionWorld = preload("res://scripts/world/companion_world.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
@@ -210,8 +211,9 @@ func sync_state(state: Dictionary) -> void:
 	var player_data: Dictionary = _state.get("player", {})
 	var age := int(player_data.get("age", 12))
 	_figure.configure("player",_state.get("origin_id","italia"),age)
-	# The actual original youth is selected in the campaign as well as free city.
-	_figure.configure_meshy_youth(true)
+	# The actual original youth is selected in the campaign as well as free city;
+	# the childhood campaign (Band I) shows him in his civilian wool tunic.
+	_figure.configure_meshy_youth(true, YouthOutfit.for_state(state))
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_figure.set_service_gear(CombatActions.service_gear(state))
 	if is_instance_valid(i01_props):

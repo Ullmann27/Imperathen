@@ -2,6 +2,7 @@ extends SceneTree
 ## Source-specific integration: actual imported original model and runtime
 ## playback route, not a substitute skin or a synthetic Skeleton3D.
 const Person = preload("res://scripts/visuals/village_person.gd")
+const YouthSoleContact = preload("res://scripts/visuals/youth_sole_contact.gd")
 const CLIPS := ["march","run","jab_left","jab_right","hook_left","hook_right","uppercut_left","uppercut_right","front_kick","side_kick","block"]
 const FISTS := ["jab_left","jab_right","hook_left","hook_right","uppercut_left","uppercut_right","front_kick","side_kick"]
 var failures: Array[String] = []
@@ -36,20 +37,36 @@ func _sample(rig: Skeleton3D) -> Array[Transform3D]:
 
 
 func _run() -> void:
-	var proof: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://assets/animations/accad_youth_motion.json"))
-	_check(proof is Dictionary and int(proof.get("rig_joints",0))==35,"Actual motion source manifest")
+	# Every installed outfit of the original youth carries the same rig and
+	# MoCap clips; the armoured original is required, the civilian variant
+	# (D-032) is checked whenever it is installed.
+	var outfits: Array[String] = ["armoured"]
+	if Person.youth_outfit_installed("civil"):
+		outfits.append("civil")
+	for outfit: String in outfits:
+		_run_outfit(outfit)
+	_check(max_segment_error<=0.005,"Unchanged anatomical joint lengths")
+	print("YOUTH_MOCAP_RUNTIME_RESULT "+JSON.stringify({"checks":checks,"failures":failures,"outfits":outfits,"max_segment_error_m":max_segment_error,"visual_quality_approved":false,"physical_fold7":false}))
+	print("YOUTH_MOCAP_RUNTIME_PASS" if failures.is_empty() else "YOUTH_MOCAP_RUNTIME_FAIL")
+	quit(0 if failures.is_empty() else 1)
+
+
+func _run_outfit(outfit: String) -> void:
+	var report_path: String = Person.MESHY_YOUTH_OUTFITS[outfit].motion
+	var proof: Variant = JSON.parse_string(FileAccess.get_file_as_string(report_path))
+	_check(proof is Dictionary and int(proof.get("rig_joints",0))==35,"Actual motion source manifest "+outfit)
 	if not proof is Dictionary:
-		quit(1)
 		return
 	var actor := Person.new()
 	root.add_child(actor)
 	actor.set_process(false)
 	actor.configure("player","italia",12)
-	_check(actor.configure_meshy_youth(true),"Original youth complete")
+	_check(actor.configure_meshy_youth(true,outfit),"Original youth complete "+outfit)
+	_check(actor.youth_outfit==outfit,"Requested outfit shown "+outfit)
 	for level in 4:
 		actor._reload(level)
 		actor.set_process(false)
-		_check(actor.active_model_path=="res://assets/characters/hero_meshy_italia_%d.glb"%level,"Exact LOD %d"%level)
+		_check(actor.active_model_path==String(Person.MESHY_YOUTH_OUTFITS[outfit].path)%level,"Exact %s LOD %d"%[outfit,level])
 		_check(actor._uses_youth_mocap(),"Original mocap route active")
 		var rig: Skeleton3D = actor._motion.skeleton
 		if not is_instance_valid(rig) or not is_instance_valid(actor.animator):
@@ -124,8 +141,16 @@ func _run() -> void:
 				_check(actor.global_position.is_equal_approx(root_position),"Sole correction does not move actor root")
 				actor._motion.skeleton.force_update_all_bone_transforms()
 				_sample(actor._motion.skeleton)
-	_check(max_segment_error<=0.005,"Unchanged anatomical joint lengths")
+		if outfit=="civil":
+			# The civilian build keeps no armour or weapon and ships the wool tunic.
+			var body := actor.body.find_child("MeshyYouthBody",true,false) as MeshInstance3D
+			var wool := false
+			for i in body.mesh.get_surface_count():
+				var material := body.mesh.surface_get_material(i)
+				wool = wool or (material != null and material.resource_name == "YouthCivilWool")
+			_check(wool,"Civilian wool tunic surface at LOD %d"%level)
+			var sole_civil: Dictionary = proof.lods[level].get("sole_planes",{})
+			var armoured_report: Dictionary = YouthSoleContact.motion_report(Person.MESHY_YOUTH_OUTFITS.armoured.motion)
+			if armoured_report.has("lods"):
+				_check(JSON.stringify(sole_civil)==JSON.stringify(armoured_report.lods[level].get("sole_planes",{})),"Civil sole planes equal the armoured calibration at LOD %d"%level)
 	actor.free()
-	print("YOUTH_MOCAP_RUNTIME_RESULT "+JSON.stringify({"checks":checks,"failures":failures,"max_segment_error_m":max_segment_error,"visual_quality_approved":false,"physical_fold7":false}))
-	print("YOUTH_MOCAP_RUNTIME_PASS" if failures.is_empty() else "YOUTH_MOCAP_RUNTIME_FAIL")
-	quit(0 if failures.is_empty() else 1)
