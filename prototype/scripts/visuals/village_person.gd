@@ -18,6 +18,7 @@ const PartyGear := preload("res://scripts/visuals/party_gear.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const ResidentFootwear := preload("res://scripts/visuals/resident_footwear.gd")
 const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
+const GearVisuals := preload("res://scripts/visuals/gear_visuals.gd")
 const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
 const RaiderStrike := preload("res://scripts/domain/raider_strike.gd")
@@ -98,6 +99,8 @@ var _strike_elapsed := 0.0
 var _armed_sequence := 0
 var _service_gear := false
 var _service_nodes: Array[Node3D] = []
+var _market_gear: Array = []
+var _market_nodes: Array[Node3D] = []
 var _service_external := false
 var _motion_identity := ""
 var youth_ground_floor_y := INF
@@ -273,6 +276,7 @@ func _reload(level: int) -> void:
 		body.free()
 	_gear_nodes.clear()
 	_service_nodes.clear()
+	_market_nodes.clear()
 	detail = level
 	body = replacement
 	active_model_path = path
@@ -325,6 +329,7 @@ func _reload(level: int) -> void:
 	# new skeleton. LOD changes must not silently erase a valid guard.
 	_sync_loaned_gear()
 	_sync_service_gear()
+	_sync_market_gear()
 	PartyGear.sync(self, get_meta("party_equipment", {}))
 	_play(clip,saved_phase,0)
 	_face.pose("attack" if not _combat_id.is_empty() else clip,saved_phase,detail)
@@ -473,6 +478,20 @@ func set_service_gear(enabled: bool) -> void:
 		_service_external = false
 	_sync_service_gear()
 	_update_weapon_visibility()
+
+
+func set_market_gear(pieces: Array) -> void:
+	var allowed: Array = pieces.duplicate(true) if role == "player" and age >= 18 else []
+	if allowed == _market_gear:
+		return
+	_market_gear = allowed
+	_sync_market_gear()
+
+
+func _sync_market_gear() -> void:
+	if not body or (_market_gear.is_empty() and _market_nodes.is_empty()):
+		return
+	_market_nodes = GearVisuals.attach(body, _market_gear if role == "player" and age >= 18 else [], detail)
 
 
 func _sync_service_gear() -> void:

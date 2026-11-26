@@ -224,7 +224,14 @@ func _run() -> void:
 	for squad in game.valley.model.squads.values():
 		if squad.side == "ally":
 			retreat.append(squad.id)
-	game.valley.model.order(retreat,"retreat")
+	# The player's earned local appointment is not a command over the army.
+	# Prove rejection is atomic, then simulate a retreat ordered by the
+	# scenario's actual senior commander to exercise campaign loss persistence.
+	var before_retreat: Dictionary = game.valley.model.snapshot().duplicate(true)
+	var refused: Dictionary = game.valley.model.order(retreat, "retreat")
+	_check(not refused.ok and game.valley.model.snapshot() == before_retreat, "Local appointment cannot order a whole-army retreat")
+	var ordered: Dictionary = game.valley.model.order(retreat, "retreat", null, "legatus_valdora")
+	_check(ordered.ok, "The appointed regional legate can order the retreat")
 	for i in 605:
 		game.valley.model.tick(0.2)
 	game._valley_finished()

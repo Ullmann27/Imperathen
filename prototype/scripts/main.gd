@@ -5,6 +5,7 @@ const DialoguePlayer = preload("res://scripts/audio/dialogue_player.gd")
 const VoiceLines = preload("res://scripts/audio/voice_lines.gd")
 const FaceDriver = preload("res://scripts/audio/face_driver.gd")
 const ModelScript = preload("res://scripts/domain/world_model.gd")
+const GearMarket = preload("res://scripts/domain/gear_market.gd")
 const WorldScript = preload("res://scripts/world/game_world.gd")
 const Allegiance = preload("res://scripts/domain/campaign_allegiance.gd")
 const TravelParty = preload("res://scripts/domain/travel_party.gd")
@@ -61,6 +62,7 @@ var pending_opening: Dictionary = {}
 var frontier_npc := ""
 var village_npc := ""
 var village_tab := "overview"
+var gear_shop := "market"
 var simulation_elapsed := 0.0
 var city_exploration
 var _campaign_market_visit := false
@@ -436,6 +438,8 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 			if screen == "playing":
 				ui.show_combat_palette(_ui_state())
 
+		"gear_panel": _show_gear_panel(str(payload.get("shop_id", "market")))
+		"gear_command": _gear_command(str(payload.get("command", "")), payload.get("args", {}))
 		"party_folio", "party_wheel": _show_party(action)
 		"party_command": _party_command(str(payload.get("command", "")), payload.get("args", {}))
 		"village_panel": _show_village_panel(str(payload.get("tab", "overview")))
@@ -569,7 +573,8 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	var political_choice := screen == "village_dialog" and village_npc == "decimus" and command in ["politics_help", "politics_audience"]
 	var party_choice := screen in ["party_wheel","party_folio","village_dialog","dialog"] and (command == "choose_adult_path" or TravelParty.COMMAND_FIELDS.has(command) or Allegiance.COMMAND_FIELDS.has(command))
 	var village_choice := screen in ["village_panel", "village_dialog"] and command.begins_with("village_")
-	if screen != "playing" and not chapter_choice and not village_choice and not political_choice and not party_choice and not _film_committing:
+	var gear_choice := screen == "gear_panel" and GearMarket.COMMAND_FIELDS.has(command)
+	if screen != "playing" and not chapter_choice and not village_choice and not political_choice and not party_choice and not gear_choice and not _film_committing:
 		return {"ok": false, "message": "Die Welt ist pausiert."}
 	_flush_simulation()
 	model.set_player_position(world.get_player_position())
@@ -579,7 +584,7 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	# as thousands of permanent economic orders. Their consequences are saved.
 	var command_id := "" if realtime_combat else "%s_%d" % [run_id, command_serial]
 	var political_command := command.begins_with("politics_")
-	var durable_change := command in ["choose_adult_path","village_dispatch_grain"] or political_command or TravelParty.COMMAND_FIELDS.has(command) or Allegiance.COMMAND_FIELDS.has(command)
+	var durable_change := command in ["choose_adult_path","village_dispatch_grain"] or political_command or TravelParty.COMMAND_FIELDS.has(command) or Allegiance.COMMAND_FIELDS.has(command) or gear_choice
 	var previous_data: Dictionary = model.data.duplicate(true) if durable_change else {}
 	if command == "village_childhood_action" or party_choice:
 		# Presence checks (Marcus at the lane or the stall) use the bodies as
@@ -597,6 +602,8 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 			model.data = previous_data
 			_refresh()
 			var save_feedback := "Decimus' Eintrag konnte nicht gespeichert werden. Die Änderung wurde zurückgenommen." if political_command else "Der Gefährtenauftrag konnte nicht gespeichert werden. Die Änderung wurde zurückgenommen."
+			if gear_choice:
+				save_feedback = "Die Ausrüstungsbuchung konnte nicht gespeichert werden. Sie wurde zurückgenommen."
 			if command == "village_dispatch_grain":
 				save_feedback = "Der Ladeschein konnte nicht gespeichert werden. Getreide und Denare bleiben am Ausgangsort."
 			ui.notify(save_feedback)
@@ -616,6 +623,55 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 				pending_opening = transition
 				_pause()
 	return result
+
+
+func _refresh_gear_sites() -> void:
+	model.gear_sites = {}
+	var here: Vector3 = world.get_player_position()
+	var residents: Node3D = world.village_life_world
+	if is_instance_valid(residents):
+		for shop_id: String in ["market", "smith", "outfitter"]:
+			var npc_id: String = {"market": "cassia", "smith": "sextus", "outfitter": "severus"}[shop_id]
+			var actor: Variant = residents.actors.get(npc_id)
+			if is_instance_valid(actor) and actor.visible and VillageLife.is_available(model.data, npc_id):
+				var at: Vector3 = residents.actor_position(npc_id)
+				if at.is_finite() and (here.distance_to(at) > GearMarket.RANGE or world.npc_sight_clear(here, at)):
+					model.gear_sites[shop_id] = at
+	if Childhood.enabled(model.data):
+		var point: Vector2 = Childhood.POINTS["family_rest"]
+		model.gear_sites["home"] = Vector3(point.x, 1.2925, point.y)
+
+
+func _show_gear_panel(shop_id: String = "market", feedback: String = "") -> void:
+	if not session_started or screen not in ["paused", "gear_panel"]:
+		return
+	if int(model.data.player.get("age", 0)) < 18 or not model.data.village.get("enabled", false):
+		return
+	var catalog := GearMarket.catalog()
+	if not catalog.get("errors", []).is_empty() or not catalog.shops.has(shop_id):
+		ui.notify("Der Ausrüstungskatalog ist nicht verfügbar.")
+		return
+	_flush_simulation()
+	world.set_active(false)
+	screen = "gear_panel"
+	gear_shop = shop_id
+	model.set_player_position(world.get_player_position())
+	_refresh_gear_sites()
+	if not GearMarket.enabled(model.data):
+		var result := _command("gear_enable", {})
+		if not result.get("ok", false):
+			_pause()
+			ui.notify(str(result.get("message", "")))
+			return
+	ui.show_gear_panel(GearMarket.view(model.data, gear_shop, model.gear_sites), feedback)
+
+
+func _gear_command(command: String, args: Dictionary) -> void:
+	if screen != "gear_panel" or not GearMarket.COMMAND_FIELDS.has(command) or command == "gear_enable":
+		return
+	_refresh_gear_sites()
+	var result := _command(command, args)
+	_show_gear_panel(gear_shop, str(result.get("message", "")))
 
 
 func _show_party(page: String, feedback := "") -> void:

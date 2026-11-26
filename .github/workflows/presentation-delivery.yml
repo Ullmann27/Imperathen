@@ -24,7 +24,7 @@ concurrency:
 jobs:
   regression:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 60
     env:
       GODOT_VERSION: '4.7.2'
       GODOT_SILENCE_ROOT_WARNING: '1'
@@ -60,6 +60,19 @@ jobs:
           bin="$PWD/${filename%.zip}"
           chmod +x "$bin"
           echo "GODOT_BIN=$bin" >> "$GITHUB_ENV"
+      - name: Bake the actual public city and physical collision before full integration regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy python3-pil
+          city="$RUNNER_TEMP/regression-city"
+          mkdir -p "$city" prototype/assets/world
+          blender -b -t 2 --python-exit-code 1 --python tools/world/build_roman_test_city.py -- \
+            --output "$city" --surface-style viva --texture-size 512 > artifacts/team-c/city-build.log 2>&1
+          cp "$city/imperathen_roman_test_city.glb" prototype/assets/world/roman_city_test.glb
+          cp "$city/roman_city_collision.glb" prototype/assets/world/roman_city_collision.glb
+          cp "$city/city_manifest.json" prototype/assets/world/roman_city_manifest.json
       - name: Run the complete isolated engine regression
         run: python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --report artifacts/team-c/engine
       - name: Keep test evidence

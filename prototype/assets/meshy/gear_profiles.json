@@ -1,0 +1,895 @@
+{
+  "schema_version": 1,
+  "note": "Build profiles for tools/art/build_meshy_gear.py. Lengths are metres in the runtime file, t values are fractions of the source length measured from the butt (0) to the tip (1). Sizes are design decisions for this game, not new measurements of finds. 'up' and 'front' name the source axis (Blender space after glTF import) that becomes runtime up (+Y in Godot) and runtime front (+Z in Godot).",
+  "materials": {
+    "brass": {
+      "base_color": [
+        0.78,
+        0.57,
+        0.24
+      ],
+      "metallic": 1.0,
+      "roughness": 0.34
+    },
+    "iron": {
+      "base_color": [
+        0.19,
+        0.19,
+        0.2
+      ],
+      "metallic": 1.0,
+      "roughness": 0.48
+    },
+    "thong": {
+      "base_color": [
+        0.23,
+        0.14,
+        0.08
+      ],
+      "metallic": 0.0,
+      "roughness": 0.86
+    }
+  },
+  "assets": {
+    "weap_roman_gladius_pompeii": {
+      "kind": "blade",
+      "out": "equipment",
+      "up": "-x",
+      "front": "-y",
+      "length": 0.68,
+      "grip_z": 0.092,
+      "radial_scale": [
+        {
+          "t": [
+            0.222,
+            0.268
+          ],
+          "x": 0.6,
+          "y": 1.5,
+          "why": "The source guard is a 12.5 cm wide thin cross-guard; a gladius guard is a compact oval block."
+        }
+      ],
+      "triangles": [
+        2100,
+        950,
+        380
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "sockets": {
+        "SOCKET_TIP": "tip",
+        "SOCKET_BLADE_BASE": 0.197,
+        "SOCKET_HIP": 0.16,
+        "SOCKET_BACK": 0.3
+      },
+      "accents": [
+        {
+          "node": "Q_GE3_GuardPlate",
+          "kind": "plate",
+          "z": 0.1778,
+          "rx": 0.0365,
+          "ry": 0.0135,
+          "h": 0.004,
+          "material": "brass"
+        },
+        {
+          "node": "Q_GE3_PeenBlock",
+          "kind": "plate",
+          "z": -0.0015,
+          "rx": 0.0085,
+          "ry": 0.0085,
+          "h": 0.007,
+          "material": "brass"
+        },
+        {
+          "node": "Q_GE4_GripFerruleUpper",
+          "kind": "plate",
+          "z": 0.148,
+          "rx": 0.0115,
+          "ry": 0.0115,
+          "h": 0.006,
+          "material": "brass"
+        },
+        {
+          "node": "Q_GE4_GripFerruleLower",
+          "kind": "plate",
+          "z": 0.038,
+          "rx": 0.011,
+          "ry": 0.011,
+          "h": 0.006,
+          "material": "brass"
+        },
+        {
+          "node": "Q_LE0_RepairThong",
+          "kind": "wrap",
+          "z": 0.136,
+          "rx": 0.0098,
+          "ry": 0.0098,
+          "h": 0.02,
+          "turns": 5,
+          "material": "thong"
+        }
+      ],
+      "remove_components_within": [
+        [
+          0.27,
+          0.36
+        ]
+      ],
+      "remove_note": "Two disconnected studs on the blade faces near the guard; a gladius blade carries none."
+    },
+    "weap_roman_pugio": {
+      "kind": "blade",
+      "out": "equipment",
+      "up": "+z",
+      "front": "-y",
+      "length": 0.33,
+      "grip_z": 0.05,
+      "radial_scale": [
+        {
+          "t": [
+            0.0,
+            1.0
+          ],
+          "x": 1.8,
+          "y": 1.25,
+          "why": "The source is a slender dagger; a pugio has a broad waisted blade of about 4.5 cm."
+        }
+      ],
+      "triangles": [
+        1900,
+        850,
+        340
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "sockets": {
+        "SOCKET_TIP": "tip",
+        "SOCKET_BLADE_BASE": 0.099,
+        "SOCKET_HIP": 0.08,
+        "SOCKET_BACK": 0.15
+      },
+      "accents": [
+        {
+          "node": "Q_GE3_GuardPlate",
+          "kind": "plate",
+          "z": 0.093,
+          "rx": 0.033,
+          "ry": 0.008,
+          "h": 0.003,
+          "material": "brass"
+        },
+        {
+          "node": "Q_GE4_PommelRivet",
+          "kind": "plate",
+          "z": -0.001,
+          "rx": 0.005,
+          "ry": 0.005,
+          "h": 0.005,
+          "material": "brass"
+        },
+        {
+          "node": "Q_LE0_RepairThong",
+          "kind": "wrap",
+          "z": 0.05,
+          "rx": 0.0105,
+          "ry": 0.0078,
+          "h": 0.014,
+          "turns": 4,
+          "material": "thong"
+        }
+      ],
+      "remove_components_within": [
+        [
+          0.6,
+          0.68
+        ]
+      ],
+      "remove_note": "A second cross-bar and two raised socket shapes in the middle of the blade (generation artefact)."
+    },
+    "weap_roman_spatha": {
+      "kind": "blade",
+      "out": "equipment",
+      "up": "+z",
+      "front": "-y",
+      "length": 0.9,
+      "grip_z": 0.136,
+      "axial_remap": [
+        [
+          0.0,
+          0.08,
+          0.0,
+          0.0899
+        ],
+        [
+          0.08,
+          0.3,
+          0.0899,
+          0.2135
+        ],
+        [
+          0.3,
+          1.0,
+          0.2135,
+          1.0
+        ]
+      ],
+      "radial_scale": [
+        {
+          "t": [
+            0.081,
+            0.294
+          ],
+          "x": 0.7,
+          "y": 1.15,
+          "why": "Source grip is 20 cm long and 5 cm wide; reduced to a one-hand grip."
+        },
+        {
+          "t": [
+            0.295,
+            0.345
+          ],
+          "x": 0.6,
+          "y": 1.3,
+          "why": "Source guard is 13 cm wide."
+        },
+        {
+          "t": [
+            0.346,
+            1.0
+          ],
+          "x": 0.85,
+          "y": 1.0,
+          "why": "Blade narrowed from 6.7 to 5.7 cm."
+        }
+      ],
+      "triangles": [
+        2200,
+        950,
+        380
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "sockets": {
+        "SOCKET_TIP": "tip",
+        "SOCKET_BLADE_BASE": 0.24,
+        "SOCKET_HIP": 0.2,
+        "SOCKET_BACK": 0.4
+      },
+      "accents": [
+        {
+          "node": "Q_GE3_GuardPlate",
+          "kind": "plate",
+          "z": 0.2345,
+          "rx": 0.0457,
+          "ry": 0.016,
+          "h": 0.004,
+          "material": "brass"
+        },
+        {
+          "node": "Q_LE0_RepairThong",
+          "kind": "wrap",
+          "z": 0.136,
+          "rx": 0.0185,
+          "ry": 0.0135,
+          "h": 0.03,
+          "turns": 5,
+          "material": "thong"
+        }
+      ],
+      "lateral_ref": 0.89
+    },
+    "weap_roman_pilum": {
+      "kind": "polearm",
+      "out": "equipment",
+      "up": "-x",
+      "front": "-y",
+      "length": 2.0,
+      "grip_z": 1.0,
+      "axial_remap": [
+        [
+          0.0,
+          0.1,
+          0.0,
+          0.06
+        ],
+        [
+          0.1,
+          0.15,
+          0.06,
+          0.09
+        ],
+        [
+          0.15,
+          0.775,
+          0.09,
+          0.63
+        ],
+        [
+          0.775,
+          0.8,
+          0.63,
+          0.665
+        ],
+        [
+          0.8,
+          0.925,
+          0.665,
+          0.685
+        ],
+        [
+          0.925,
+          0.95,
+          0.685,
+          0.715
+        ],
+        [
+          0.95,
+          1.0,
+          0.715,
+          0.74
+        ]
+      ],
+      "radial_scale": [
+        {
+          "t": [
+            0.0,
+            0.774
+          ],
+          "x": 0.55,
+          "y": 0.55,
+          "why": "Source shaft is 5.4 cm thick at two metres."
+        },
+        {
+          "t": [
+            0.774,
+            0.801
+          ],
+          "x": 0.8,
+          "y": 0.8,
+          "why": "The binding becomes the junction block."
+        },
+        {
+          "t": [
+            0.801,
+            0.924
+          ],
+          "x": 0.6,
+          "y": 0.6
+        },
+        {
+          "t": [
+            0.924,
+            1.0
+          ],
+          "x": 0.34,
+          "y": 0.34,
+          "why": "The source point becomes the socket taper below the iron shank."
+        }
+      ],
+      "triangles": [
+        1400,
+        700,
+        300
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "sockets": {
+        "SOCKET_TIP": "tip",
+        "SOCKET_BUTT": 0.0,
+        "SOCKET_LEFT_HAND_SUPPORT": 0.62,
+        "SOCKET_BACK": 1.0
+      },
+      "accents": [
+        {
+          "node": "Shank",
+          "kind": "rod",
+          "z": 1.7,
+          "rx": 0.0048,
+          "ry": 0.0048,
+          "h": 0.51,
+          "material": "iron",
+          "why": "The source has a short conical point; a pilum carries a long thin iron shank with a small pyramidal head."
+        },
+        {
+          "node": "ShankHead",
+          "kind": "pyramid",
+          "z": 1.948,
+          "rx": 0.0075,
+          "ry": 0.0075,
+          "h": 0.052,
+          "material": "iron"
+        },
+        {
+          "node": "Q_GE3_JunctionCollar",
+          "kind": "plate",
+          "z": 1.266,
+          "rx": 0.0238,
+          "ry": 0.0238,
+          "h": 0.012,
+          "material": "iron"
+        },
+        {
+          "node": "Q_LE0_RepairThong",
+          "kind": "wrap",
+          "z": 0.86,
+          "rx": 0.0168,
+          "ry": 0.0168,
+          "h": 0.05,
+          "turns": 7,
+          "material": "thong"
+        }
+      ],
+      "lateral_ref": 1.0
+    },
+    "weap_germanic_spear": {
+      "kind": "polearm",
+      "out": "equipment",
+      "up": "+x",
+      "front": "-y",
+      "length": 2.0,
+      "grip_z": 0.88,
+      "radial_scale": [
+        {
+          "t": [
+            0.0,
+            0.879
+          ],
+          "x": 1.0,
+          "y": 1.4,
+          "why": "Round the 2.5 x 1.8 cm source shaft to 2.5 cm."
+        },
+        {
+          "t": [
+            0.879,
+            1.0
+          ],
+          "x": 0.8,
+          "y": 1.4,
+          "why": "Narrower head for the short narrow iron that Tacitus describes."
+        }
+      ],
+      "triangles": [
+        1400,
+        700,
+        300
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "sockets": {
+        "SOCKET_TIP": "tip",
+        "SOCKET_BUTT": 0.0,
+        "SOCKET_LEFT_HAND_SUPPORT": 0.5,
+        "SOCKET_BACK": 0.95
+      },
+      "accents": [
+        {
+          "node": "Q_GE3_SocketBand",
+          "kind": "plate",
+          "z": 1.758,
+          "rx": 0.0138,
+          "ry": 0.0138,
+          "h": 0.012,
+          "material": "brass"
+        },
+        {
+          "node": "Q_LE0_RepairThong",
+          "kind": "wrap",
+          "z": 1.1,
+          "rx": 0.014,
+          "ry": 0.014,
+          "h": 0.05,
+          "turns": 7,
+          "material": "thong"
+        }
+      ]
+    },
+    "gear_roman_cavalry_lance": {
+      "kind": "polearm",
+      "out": "equipment",
+      "special": "extract_crossed_lance",
+      "front": "-y",
+      "length": 2.3,
+      "grip_z": 0.98,
+      "triangles": [
+        2600,
+        1000,
+        320
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "sockets": {
+        "SOCKET_TIP": "tip",
+        "SOCKET_BUTT": 0.0,
+        "SOCKET_LEFT_HAND_SUPPORT": 0.6,
+        "SOCKET_BACK": 1.1
+      },
+      "accents": []
+    },
+    "gear_sling": {
+      "kind": "soft",
+      "out": "equipment",
+      "up": "+z",
+      "front": "-y",
+      "max_dimension": 0.62,
+      "grip": "top",
+      "triangles": [
+        4200,
+        1500,
+        450
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "sockets": {
+        "SOCKET_HIP": "origin"
+      },
+      "accents": []
+    },
+    "gear_roman_scutum": {
+      "kind": "shield",
+      "out": "equipment",
+      "up": "+z",
+      "front": "-y",
+      "length": 1.06,
+      "grip_depth": 0.0,
+      "triangles": [
+        9000,
+        1900,
+        480
+      ],
+      "textures": [
+        [
+          2048,
+          1024,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "sockets": {
+        "SOCKET_BLOCK_CENTER": "front",
+        "SOCKET_BACK": "origin"
+      },
+      "accents": [],
+      "texture_note": "A metre-high shield at 1024 px lies below 512 px/m; the near tier keeps 2048 px base colour."
+    },
+    "gear_roman_cavalry_oval_shield": {
+      "kind": "shield",
+      "out": "equipment",
+      "up": "+z",
+      "front": "-y",
+      "length": 1.1,
+      "grip_depth": 0.045,
+      "special": "oval_board",
+      "width": 0.72,
+      "triangles": [
+        9000
+      ],
+      "textures": [
+        [
+          2048,
+          1024,
+          512
+        ]
+      ],
+      "sockets": {
+        "SOCKET_BLOCK_CENTER": "front",
+        "SOCKET_BACK": "origin"
+      },
+      "accents": [],
+      "lod_note": "Board, straps and iron ring are separate flat layers with their own UV islands. Edge collapse and planar dissolve both tear them (reviewed 26.11.2026), so only the full near tier is shipped. Far tiers need a single-shell rebake.",
+      "texture_note": "A metre-high shield at 1024 px lies below 512 px/m; the near tier keeps 2048 px base colour."
+    },
+    "mount_legacy_bay_horse": {
+      "kind": "mount",
+      "out": "mounts",
+      "up": "+z",
+      "front": "-y",
+      "length": 1.7,
+      "smooth_angle": 180,
+      "triangles": [
+        14000,
+        5200,
+        1500
+      ],
+      "textures": [
+        [
+          2048,
+          1024,
+          1024
+        ],
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ]
+      ],
+      "collision": "hull",
+      "accents": []
+    },
+    "resource_firewood": {
+      "kind": "prop",
+      "out": "props",
+      "up": "+z",
+      "front": "-y",
+      "max_dimension": 1.6,
+      "triangles": [
+        9300,
+        4200,
+        2000
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "collision": "hull",
+      "accents": [],
+      "lod_note": "191 separate logs: below about ten triangles per log an edge collapse turns the stack into spikes, so the far tier keeps 2000 triangles."
+    },
+    "resource_iron_ore": {
+      "kind": "prop",
+      "out": "props",
+      "up": "+z",
+      "front": "-y",
+      "max_dimension": 2.2,
+      "triangles": [
+        2524,
+        1200,
+        400
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "collision": "hull",
+      "accents": []
+    },
+    "resource_clay": {
+      "kind": "prop",
+      "out": "props",
+      "up": "+z",
+      "front": "-y",
+      "max_dimension": 2.4,
+      "triangles": [
+        6000,
+        2200,
+        600
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "collision": "hull",
+      "accents": []
+    },
+    "resource_limestone": {
+      "kind": "prop",
+      "out": "props",
+      "up": "+z",
+      "front": "-y",
+      "max_dimension": 2.2,
+      "triangles": [
+        6000,
+        2200,
+        600
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "collision": "hull",
+      "accents": []
+    },
+    "resource_copper_ore": {
+      "kind": "prop",
+      "out": "props",
+      "up": "+z",
+      "front": "-y",
+      "max_dimension": 2.0,
+      "triangles": [
+        6000,
+        2200,
+        600
+      ],
+      "textures": [
+        [
+          1024,
+          512,
+          512
+        ],
+        [
+          512,
+          256,
+          256
+        ],
+        [
+          256,
+          128,
+          128
+        ]
+      ],
+      "collision": "hull",
+      "accents": []
+    }
+  },
+  "held_back": {
+    "weap_roman_aux_bow": "Die Quelle ist ein unbespannter, S-förmig asymmetrischer Stab mit einer lose herabhängenden Sehnenschlaufe. Eine gespannte Sehne zwischen den Enden würde den Bogenkörper kreuzen; ein lesbarer Bogen entsteht nur durch Neugenerierung oder Handmodellierung.",
+    "weap_crossbow_concept": "Die Quelle ist ein gewehrschaftartiger Holzkörper mit Abzugsmechanik, aber ohne Bogenarme. Zusätzlich epochengesperrt.",
+    "gear_roman_four_horn_saddle": "Die vier Hörner sind als spitze Tierhörner ausgeführt, darunter liegt eine orangefarbene Halbtonne als Pferderumpf-Ersatz. Ein gepolsterter Hörnchensattel ist daraus nicht ohne Neumodellierung zu gewinnen.",
+    "resource_galena": "Nur untexturierte Geometrie; ein texturiertes Final kostet einen Meshy-Refine.",
+    "mount_ancient_cavalry_horse": "Nur untexturierte Geometrie; durch das texturierte Braune (mount_legacy_bay_horse) ersetzt.",
+    "armor_roman_muscle_cuirass": "3,58 Mio. Dreiecke; epochengesperrt. Ableitung und Passform am Körper stehen aus; Herkunft aus dem privaten Bild-zu-3D-Stapel vom 25.11. braucht eine Entscheidung zur Veröffentlichung.",
+    "historical_caesar_image_textured": "2,25 Mio. Dreiecke, statische Figur ohne Rig; gehört in die Figurenstrecke. Herkunft aus dem privaten Bild-zu-3D-Stapel vom 25.11.",
+    "building_roman_imperial_temple": "4,67 Mio. Dreiecke; epochengesperrt; eigene Strecke tools/world/build_meshy_temple.py im Stadtpaket."
+  }
+}

@@ -42,7 +42,7 @@ const DialogueStage = preload("res://scripts/ui/roman_hud/dialogue_stage.gd")
 const Codex = preload("res://scripts/ui/roman_hud/codex.gd")
 ## Screens built with the Roman HUD kit carry the text scale in their own
 ## scale; the remaining screens scale their fonts individually.
-const HUD_SCREENS := ["game", "dialog", "frontier_dialog", "pause", "journal"]
+const HUD_SCREENS := ["game", "dialog", "frontier_dialog", "pause", "journal", "gear"]
 const MENU_MUSIC_DB := -9.0
 var party_target := "all"
 var _party_data := {}
@@ -96,6 +96,8 @@ var _toast_label: Label
 var _toast_tween: Tween
 var _intro_done := false
 var _view_state := ""
+var _gear_view: Dictionary = {}
+var _gear_feedback := ""
 var _gallery_from := "menu"
 var _settings_return := "menu"
 var _confirm_return := "menu"
@@ -373,7 +375,7 @@ func show_menu(can_continue: bool) -> void:
 	var imperial_button := _roman_button("Rom 100 n. Chr. · Kolosseum", func(): _emit("imperial_city_exploration"), false, font_size, button_height)
 	imperial_button.name = "ImperialCityExploration"
 	imperial_button.tooltip_text = "Historisch späterer freier Stadtbesuch mit begehbarem Amphitheater; verändert deinen Kampagnenspielstand nicht."
-	more.add_child(imperial_button)
+	life.add_child(imperial_button)
 	more.add_child(demo_button)
 	var atlas_button := _roman_button("Weltkugel erkunden", func(): _emit("atlas_demo"), false, font_size, button_height)
 	more.add_child(atlas_button)
@@ -876,6 +878,8 @@ func show_pause() -> void:
 	column.add_child(_tablet_button("Chronik", func(): _show_journal(false)))
 	if _state.get("village", {}).get("enabled", false):
 		column.add_child(_tablet_button("Dorfleben und Wiederaufbau", _emit.bind("village_panel", {})))
+		if int(_state.get("player", {}).get("age", 0)) >= 18:
+			column.add_child(_tablet_button("Ausrüstung und Truhe", _emit.bind("gear_panel", {})))
 	if _state.get("can_visit_market", false):
 		column.add_child(_tablet_button("Stadtmarkt besuchen", func(): _emit("campaign_market")))
 	column.add_child(_tablet_button("Weltkugel", func(): _emit("atlas")))
@@ -1062,6 +1066,73 @@ func show_village_dialog(dialog: Dictionary) -> void:
 	content.kicker = "MENSCHEN DEINES DORFES"
 	content.close_action = "village_close"
 	show_frontier_dialog(content)
+
+
+func _gear_label(column: VBoxContainer, value: String, prominent: bool = false) -> void:
+	var label := HudStyle.label(value, HudStyle.TYPE_BODY, HudStyle.AURUM_LIGHT if prominent else HudStyle.CHARTA_MUTED)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	column.add_child(label)
+
+
+func _gear_button(column: VBoxContainer, title: String, command: String, args: Dictionary, allowed: bool) -> void:
+	var button := _tablet_button(title, _emit.bind("gear_command", {"command":command, "args":args}))
+	button.disabled = not allowed
+	column.add_child(button)
+
+
+func show_gear_panel(data: Dictionary, feedback: String = "") -> void:
+	_gear_view = data.duplicate(true)
+	_gear_feedback = feedback
+	_open_screen("gear", true)
+	var area := _area()
+	var tablet := PanelContainer.new()
+	tablet.name = "GearTablet"
+	tablet.add_theme_stylebox_override("panel", HudStyle.plaque(true, Vector4(20, 16, 20, 16), 0.96))
+	_screen.add_child(tablet)
+	var width := minf(area.x - 24.0, 760.0)
+	tablet.position = Vector2((area.x - width) * 0.5, 12.0)
+	tablet.size = Vector2(width, maxf(100.0, area.y - 24.0))
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	tablet.add_child(scroll)
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 8)
+	scroll.add_child(column)
+	column.add_child(HudStyle.kicker("ARMAMENTA", HudStyle.TYPE_CAPTION))
+	_gear_label(column, "Ausrüstung · %d Denare" % int(data.get("money", 0)), true)
+	column.add_child(_tablet_button("Zurück ins Spiel", _emit.bind("resume", {}), true))
+	if not feedback.is_empty():
+		_gear_label(column, feedback, true)
+	for id: String in ["market", "smith", "outfitter", "stable"]:
+		var title: String = {"market":"Markt", "smith":"Schmied", "outfitter":"Legionsausstatter", "stable":"Pferdehändler"}[id]
+		var tab := _tablet_button(title, _emit.bind("gear_panel", {"shop_id":id}))
+		tab.disabled = id == str(data.get("shop_id", ""))
+		column.add_child(tab)
+	column.add_child(MenuKit.Rule.new())
+	_gear_label(column, str(data.get("shop_name", "")), true)
+	var reason := str(data.get("shop_reason", ""))
+	if not reason.is_empty():
+		_gear_label(column, reason)
+	for offer: Dictionary in data.get("offers", []):
+		var title := "%s · %s · %d D. · Bestand %d" % [offer.name, offer.quality_name, int(offer.price), int(offer.stock)]
+		_gear_button(column, title, "gear_buy", {"shop_id":str(data.shop_id), "item_id":str(offer.item_id), "quality":int(offer.quality)}, bool(offer.can_buy))
+		if not str(offer.reason).is_empty():
+			_gear_label(column, str(offer.reason))
+	column.add_child(MenuKit.Rule.new())
+	_gear_label(column, "Besitz und Truhe", true)
+	var home: Dictionary = data.get("home", {})
+	_gear_label(column, "%d / %d Lagerplätze · %s" % [int(home.get("stored", 0)), int(home.get("slots", 0)), str(home.get("reason", ""))])
+	for piece: Dictionary in data.get("inventory", []):
+		_gear_label(column, "%s · %s · %s" % [piece.name, piece.quality_name, "angelegt" if piece.equipped else ("in der Truhe" if piece.at == "home" else "im Gepäck")], true)
+		var uid := int(piece.uid)
+		_gear_button(column, "Ablegen" if piece.equipped else "Anlegen", "gear_equip", {"uid":uid}, bool(piece.can_equip) or bool(piece.equipped))
+		_gear_button(column, "Einlagern", "gear_store", {"uid":uid}, bool(piece.can_store))
+		_gear_button(column, "Entnehmen", "gear_take", {"uid":uid}, bool(piece.can_take))
+		_gear_button(column, "Verkaufen · %d D." % int(piece.sell_price), "gear_sell", {"shop_id":str(data.shop_id), "uid":uid}, reason.is_empty() and piece.at == "carried" and not bool(piece.equipped))
+	if data.get("inventory", []).is_empty():
+		_gear_label(column, "Du besitzt noch keine gekaufte Ausrüstung.")
 
 
 func show_party(page: String, data: Dictionary, figures: Dictionary, feedback: String) -> void:
@@ -1265,7 +1336,7 @@ func handle_back() -> bool:
 				_close_touch_overlays()
 			else:
 				_emit("cancel_build" if _build_active else "pause")
-		"pause", "journal", "village", "party_folio", "party_wheel": _emit("resume")
+		"pause", "journal", "village", "party_folio", "party_wheel", "gear": _emit("resume")
 		"gallery": _close_gallery()
 		"settings": _return_to(_settings_return)
 		"confirm": _return_to(_confirm_return)
@@ -2500,6 +2571,7 @@ func _rebuild_layout() -> void:
 				show_intro()
 		"game": show_game(_state)
 		"party_folio", "party_wheel": show_party(_view_state, _party_data, _party_figures, _party_feedback)
+		"gear": show_gear_panel(_gear_view, _gear_feedback)
 		"menu": show_menu(_can_continue)
 		"settings": _show_settings(_settings_return)
 		"pause": show_pause()

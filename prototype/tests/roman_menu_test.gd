@@ -208,7 +208,7 @@ func _check_trailer_and_profiles() -> void:
 
 func _check_menu_buttons() -> void:
 	var expected := {
-		"Fortsetzen": "continue", "Neues Leben": "new_game", "Stadt frei erkunden": "city_exploration", "Talgefecht erproben": "valley_demo",
+		"Fortsetzen": "continue", "Neues Leben": "new_game", "Stadt frei erkunden": "city_exploration", "Rom 100 n. Chr. · Kolosseum": "imperial_city_exploration", "Talgefecht erproben": "valley_demo",
 		"Weltkugel erkunden": "atlas_demo", "Figuren": "@gallery", "Einstellungen": "@settings", "Spiel beenden": "@confirm",
 	}
 	_ui.show_menu(true)

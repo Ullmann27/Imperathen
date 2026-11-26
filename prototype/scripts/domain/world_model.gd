@@ -20,6 +20,7 @@ const CityWatch = preload("res://scripts/domain/city_watch.gd")
 const CityCheckpoint = preload("res://scripts/domain/city_checkpoint.gd")
 const CityCatalog = preload("res://scripts/city_trade_catalog.gd")
 const CityTrade = preload("res://scripts/city_trade.gd")
+const GearMarket = preload("res://scripts/domain/gear_market.gd")
 const TribalWorld = preload("res://scripts/domain/tribal_world.gd")
 const WorldClock = preload("res://scripts/domain/world_clock.gd")
 const WorldState = preload("res://scripts/domain/world_state.gd")
@@ -72,6 +73,7 @@ var raid_observations: Callable
 var npc_sight_check: Callable
 # A city session owns this verified runtime map; ordinary campaign/test worlds keep it empty.
 var city_trade_sites: Dictionary = {}
+var gear_sites: Dictionary = {}
 var city_watch_observation: Callable
 ## The week in progress; never saved. Only its finished, validated result is
 ## committed, so a rejected candidate or a save mid-week cannot leak it.
@@ -180,6 +182,7 @@ func _run_command(command: String, args: Dictionary, command_id: String, session
 	command_fields.merge(VillageLife.COMMAND_FIELDS)
 	command_fields.merge(CombatActions.COMMAND_FIELDS)
 	command_fields.merge(CityTrade.COMMAND_FIELDS)
+	command_fields.merge(GearMarket.COMMAND_FIELDS)
 	command_fields.merge(Politics.COMMAND_FIELDS)
 	command_fields.merge(Party.COMMAND_FIELDS)
 	command_fields.merge(Allegiance.COMMAND_FIELDS)
@@ -940,6 +943,11 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary, sites:
 			_update_morale(state)
 			_record(state, str(trade_result.message))
 		return trade_result
+	if GearMarket.COMMAND_FIELDS.has(command):
+		var gear_result := GearMarket.apply(state, command, args, gear_sites)
+		if gear_result.ok:
+			_record(state, str(gear_result.message))
+		return gear_result
 	if CombatActions.COMMAND_FIELDS.has(command):
 		if not state.village.enabled:
 			return _fail("Diese Partie verwendet den bisherigen regionalen Dorfabschnitt.")
@@ -1218,6 +1226,8 @@ func _validate_arguments(command: String, args: Dictionary) -> String:
 		return Politics.validate_arguments(command, args)
 	if CityTrade.COMMAND_FIELDS.has(command):
 		return CityTrade.validate_arguments(command, args)
+	if GearMarket.COMMAND_FIELDS.has(command):
+		return GearMarket.validate_arguments(command, args)
 	if CombatActions.COMMAND_FIELDS.has(command):
 		return CombatActions.validate_arguments(command, args)
 	if command.begins_with("village_"):
@@ -1335,6 +1345,9 @@ func _validate_state(state: Variant) -> String:
 	var trade_error := CityTrade.validate(state)
 	if not trade_error.is_empty():
 		return trade_error
+	var gear_error := GearMarket.validate(state)
+	if not gear_error.is_empty():
+		return gear_error
 	var jumps := int(state.world_state.time.counts.jump)
 	if adult != (jumps == 1) or (adult and int(state.player.age) < 18):
 		return "Alterssprung und Weltphase widersprechen sich."
@@ -1480,7 +1493,7 @@ func _validate_state(state: Variant) -> String:
 	expected_money += int(frontier_effects.denarii)
 	expected_grain += int(village_ledger.grain) - Party.grain_issued(state.world_state.party) - Allegiance.donated_grain(state)
 	expected_money += int(village_ledger.denarii)
-	expected_money += CityTrade.money_effect(state) - Party.wages_paid(state.world_state.party)
+	expected_money += CityTrade.money_effect(state) + GearMarket.money_effect(state) - Party.wages_paid(state.world_state.party)
 	if state.resources.grain != expected_grain or state.resources.denarii != expected_money:
 		return "Die Versorgungs- oder Geldbilanz wurde verletzt."
 	var expected_trust := (20 if companion.choice == "help" else (-5 if companion.choice == "decline" else 0)) + (5 if state.story.choice == "protect" else (-5 if state.story.choice == "pursue" else 0))
@@ -1695,6 +1708,7 @@ func _migrate_world_state(state: Dictionary) -> void:
 
 func _restore_integer_fields(state: Dictionary) -> void:
 	CityTrade.restore_integer_fields(state)
+	GearMarket.restore_integer_fields(state)
 	TribalWorld.normalize(state.tribes)
 	WorldState.normalize(state)
 	Party.normalize(state)

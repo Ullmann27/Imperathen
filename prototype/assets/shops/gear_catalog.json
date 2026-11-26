@@ -1,0 +1,790 @@
+{
+  "format": "imperathen-gear-catalog",
+  "schema": 1,
+  "rule": "Ausrüstungskatalog der Läden (Entscheidung D-058, Handbuch 3.0 S. 82 und S. 113–124). Preise sind Balancing-Startwerte in Spielmünzen und werden im Prototyp 1:1 in Denaren abgerechnet; sie sind keine belegten römischen Preise. Ein Gegenstand trägt Familie (family) und Qualität 0–4; daraus liest die zentrale Kampfformel (scripts/battle/combat_formula.gd, D-042) Waffenbasis, Qualitäts- und Schutzfaktor. Dieser Katalog enthält keine eigene Schadensrechnung. Epoche und Qualität sind getrennt: was es wann gibt, bestimmen assets/troops/item_families.json und assets/world/era_registry.json; 'era' überschreibt die Familienspanne nur für eine spätere Modellvariante.",
+  "currency": {
+    "unit": "Denare",
+    "handbook_unit": "SM",
+    "rate": 1,
+    "note": "Die älteren Marktwaren in city_trade_catalog.gd verwenden eine frühere, niedrigere Preisskala."
+  },
+  "price_ratio_for_supplements": [
+    0.32,
+    0.65,
+    1.0,
+    1.8,
+    3.0
+  ],
+  "sell_ratio": 0.4,
+  "max_owned": 48,
+  "quality": [
+    {
+      "q": 0,
+      "name": "beschädigt/alt",
+      "look": {
+        "tint": [
+          0.7,
+          0.62,
+          0.55
+        ],
+        "roughness": 1.4,
+        "metallic": 0.7,
+        "wear": 0.6
+      },
+      "visible": "Rostfilm und stumpfe Oberfläche; Reparaturbindung aus Lederriemen am Griff oder Schaft."
+    },
+    {
+      "q": 1,
+      "name": "gebraucht",
+      "look": {
+        "tint": [
+          0.86,
+          0.82,
+          0.78
+        ],
+        "roughness": 1.18,
+        "metallic": 0.9,
+        "wear": 0.25
+      },
+      "visible": "Leichte Flugrost- und Gebrauchsspuren, matter als neu."
+    },
+    {
+      "q": 2,
+      "name": "solide",
+      "look": {
+        "tint": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "roughness": 1.0,
+        "metallic": 1.0,
+        "wear": 0.0
+      },
+      "visible": "Unverändertes Modell und Material."
+    },
+    {
+      "q": 3,
+      "name": "hochwertig",
+      "look": {
+        "tint": [
+          1.05,
+          1.04,
+          1.02
+        ],
+        "roughness": 0.8,
+        "metallic": 1.1,
+        "wear": 0.0
+      },
+      "visible": "Sauber polierte Flächen; Messingbeschläge (Stichblatt, Vernietknauf, Tüllenband)."
+    },
+    {
+      "q": 4,
+      "name": "Meisterarbeit",
+      "look": {
+        "tint": [
+          1.1,
+          1.08,
+          1.04
+        ],
+        "roughness": 0.62,
+        "metallic": 1.2,
+        "wear": 0.0
+      },
+      "visible": "Hochglanzpolitur; zusätzlich Griffzwingen beziehungsweise Knaufniet aus Messing."
+    }
+  ],
+  "tier_rules": {
+    "note": "Handbuch S. 113 ff.: Q3 verlangt Können ≥ 45 oder geprüften Fachzugang; Q4 verlangt Können ≥ 65, einen passenden Erfolg und legitimen Zugang.",
+    "q3_skill": 45,
+    "q4_skill": 65,
+    "achievements": {
+      "combat": [
+        "village_defense",
+        "valley_victory"
+      ],
+      "defense": [
+        "village_defense",
+        "watch_duty"
+      ],
+      "riding": [
+        "frontier_delivery"
+      ]
+    },
+    "specialist_access": {
+      "smith": {
+        "profession": "smith",
+        "contact": {
+          "npc": "severus",
+          "ally": true
+        }
+      },
+      "outfitter": {
+        "contact": {
+          "npc": "severus",
+          "ally": true
+        }
+      },
+      "stable": {
+        "contact": {
+          "npc": "varro",
+          "ally": true
+        }
+      },
+      "market": {
+        "contact": {
+          "npc": "cassia",
+          "ally": true
+        }
+      }
+    }
+  },
+  "items": {
+    "gladius": {
+      "name": "Gladius",
+      "handbook_ref": "IT-011",
+      "family": "gladius",
+      "combat_family": "gladius",
+      "era_id": "equipment.gladius_family",
+      "slot": "main_hand",
+      "class": "military",
+      "skill": "combat",
+      "model": "weap_roman_gladius_pompeii",
+      "model_dir": "equipment",
+      "lods": 3,
+      "attach": "hand_right",
+      "prices": [
+        27,
+        55,
+        85,
+        153,
+        255
+      ],
+      "weight_kg": 0.9,
+      "access": {
+        "age_min": 18,
+        "training": true
+      },
+      "design_stats": {
+        "damage": 24,
+        "handling": 70
+      },
+      "model_note": "Das Modell zeigt den Typ Pompeji (1. Jh. n. Chr.). 58 v. Chr. wurde der längere Gladius Hispaniensis geführt; item_families.json führt beide als Modellvarianten derselben Familie."
+    },
+    "pugio": {
+      "name": "Pugio (Dolch)",
+      "handbook_ref": "Ergänzung",
+      "family": "pugio",
+      "combat_family": "",
+      "era_id": "",
+      "slot": "sidearm",
+      "class": "military",
+      "skill": "combat",
+      "model": "weap_roman_pugio",
+      "model_dir": "equipment",
+      "lods": 3,
+      "attach": "hip_right",
+      "q2_price": 30,
+      "weight_kg": 0.35,
+      "access": {
+        "age_min": 18,
+        "training": true
+      },
+      "design_stats": {},
+      "model_note": "combat_balance.json kennt noch keine Dolch-Waffenbasis; bis dahin ist der Pugio Seitenwaffe ohne Kampfwert."
+    },
+    "pilum": {
+      "name": "Pilum",
+      "handbook_ref": "IT-012",
+      "family": "pilum",
+      "combat_family": "pilum",
+      "era_id": "equipment.pilum_family",
+      "slot": "missile",
+      "class": "military",
+      "skill": "combat",
+      "model": "weap_roman_pilum",
+      "model_dir": "equipment",
+      "lods": 3,
+      "attach": "hand_right",
+      "prices": [
+        10,
+        21,
+        32,
+        58,
+        96
+      ],
+      "weight_kg": 1.9,
+      "access": {
+        "age_min": 18,
+        "training": true,
+        "service": true
+      },
+      "design_stats": {
+        "throw": 18,
+        "stock": 1
+      }
+    },
+    "spear": {
+      "name": "Stoßspeer",
+      "handbook_ref": "IT-013",
+      "family": "spear",
+      "combat_family": "spear",
+      "era_id": "equipment.germanic_spear_shield",
+      "slot": "main_hand",
+      "class": "military",
+      "skill": "combat",
+      "model": "weap_germanic_spear",
+      "model_dir": "equipment",
+      "lods": 3,
+      "attach": "hand_right",
+      "prices": [
+        18,
+        36,
+        55,
+        99,
+        165
+      ],
+      "weight_kg": 1.4,
+      "access": {
+        "age_min": 18,
+        "training": true
+      },
+      "design_stats": {
+        "reach": 30,
+        "handling": 55
+      }
+    },
+    "hand_axe": {
+      "name": "Handaxt",
+      "handbook_ref": "IT-014",
+      "family": "axe",
+      "combat_family": "axe",
+      "era_id": "equipment.germanic_axe_shield",
+      "slot": "main_hand",
+      "class": "military",
+      "skill": "combat",
+      "model": "weap_germanic_hand_axe",
+      "model_dir": "equipment",
+      "lods": 2,
+      "attach": "hand_right",
+      "prices": [
+        14,
+        29,
+        44,
+        79,
+        132
+      ],
+      "weight_kg": 0.8,
+      "access": {
+        "age_min": 18,
+        "training": true
+      },
+      "design_stats": {
+        "damage": 26,
+        "handling": 48
+      }
+    },
+    "sling": {
+      "name": "Schleuder",
+      "handbook_ref": "Ergänzung",
+      "family": "sling",
+      "combat_family": "sling",
+      "era_id": "",
+      "slot": "missile",
+      "class": "military",
+      "skill": "combat",
+      "model": "gear_sling",
+      "model_dir": "equipment",
+      "lods": 3,
+      "attach": "hip_left",
+      "q2_price": 8,
+      "weight_kg": 0.15,
+      "access": {
+        "age_min": 18
+      },
+      "design_stats": {}
+    },
+    "scutum": {
+      "name": "Scutum",
+      "handbook_ref": "IT-016",
+      "family": "scutum",
+      "combat_family": "scutum",
+      "era_id": "equipment.scutum_family",
+      "slot": "shield",
+      "class": "military",
+      "skill": "defense",
+      "model": "gear_roman_scutum",
+      "model_dir": "equipment",
+      "lods": 3,
+      "attach": "hand_left",
+      "prices": [
+        17,
+        34,
+        52,
+        94,
+        156
+      ],
+      "weight_kg": 5.0,
+      "access": {
+        "age_min": 18,
+        "training": true,
+        "service": true
+      },
+      "design_stats": {
+        "block": 30,
+        "weight": 5
+      },
+      "model_note": "Das Modell zeigt die rechteckige kaiserzeitliche Form. In der Caesarzeit war das Scutum oval; item_families.json führt die Rechteckform als Modellvariante, nicht als eigene Familie."
+    },
+    "round_shield": {
+      "name": "Rundschild",
+      "handbook_ref": "IT-017",
+      "family": "shield_round",
+      "combat_family": "shield_round",
+      "era_id": "equipment.germanic_spear_shield",
+      "slot": "shield",
+      "class": "military",
+      "skill": "defense",
+      "model": "gear_germanic_round_shield",
+      "model_dir": "equipment",
+      "lods": 2,
+      "attach": "hand_left",
+      "prices": [
+        12,
+        24,
+        37,
+        67,
+        111
+      ],
+      "weight_kg": 3.5,
+      "access": {
+        "age_min": 18,
+        "training": true
+      },
+      "design_stats": {
+        "block": 20,
+        "handling": 75
+      }
+    },
+    "cavalry_shield": {
+      "name": "Ovaler Reiterschild",
+      "handbook_ref": "IT-017",
+      "family": "shield_round",
+      "combat_family": "shield_round",
+      "era_id": "",
+      "slot": "shield",
+      "class": "military",
+      "skill": "defense",
+      "model": "gear_roman_cavalry_oval_shield",
+      "model_dir": "equipment",
+      "lods": 1,
+      "attach": "hand_left",
+      "prices": [
+        12,
+        24,
+        37,
+        67,
+        111
+      ],
+      "weight_kg": 4.0,
+      "access": {
+        "age_min": 18,
+        "training": true,
+        "service": true
+      },
+      "design_stats": {
+        "block": 20,
+        "handling": 75
+      },
+      "model_note": "Die Quelle ist kreisrund und wurde zum Oval gestaucht. Nur die Nahstufe ist ausgeliefert; die Fernstufen zerreißen bei der Reduktion."
+    },
+    "cavalry_lance": {
+      "name": "Reiterlanze",
+      "handbook_ref": "IT-013",
+      "family": "spear",
+      "combat_family": "spear",
+      "era_id": "",
+      "slot": "main_hand",
+      "class": "military",
+      "skill": "riding",
+      "model": "gear_roman_cavalry_lance",
+      "model_dir": "equipment",
+      "lods": 3,
+      "attach": "hand_right",
+      "prices": [
+        18,
+        36,
+        55,
+        99,
+        165
+      ],
+      "weight_kg": 1.8,
+      "access": {
+        "age_min": 18,
+        "training": true,
+        "service": true,
+        "mount": true
+      },
+      "design_stats": {
+        "reach": 30,
+        "handling": 55
+      }
+    },
+    "riding_horse": {
+      "name": "Reisepferd (Brauner)",
+      "handbook_ref": "IT-030",
+      "family": "horse_service",
+      "combat_family": "",
+      "era_id": "",
+      "slot": "mount",
+      "class": "mount",
+      "skill": "riding",
+      "model": "mount_legacy_bay_horse",
+      "model_dir": "mounts",
+      "lods": 3,
+      "attach": "stable",
+      "fixed_price": 220,
+      "fixed_quality": 2,
+      "weight_kg": 0,
+      "access": {
+        "age_min": 18
+      },
+      "design_stats": {
+        "endurance": 65,
+        "handling": 60
+      },
+      "model_note": "Statisches Modell ohne Skelett: Das Pferd kann gekauft, verkauft und im Stall gezeigt werden. Reiten setzt Rig, Gangarten und Auf-/Absitzen voraus. Das Handbuch kennt für Tiere keine Q0–Q4-Stufen, sondern Zustand und Eignung."
+    },
+    "spatha": {
+      "name": "Spatha",
+      "handbook_ref": "Ergänzung",
+      "family": "sword_long",
+      "combat_family": "sword_long",
+      "era_id": "",
+      "era": {
+        "valid_from": 14,
+        "valid_to": 400,
+        "attestation": "plausible",
+        "note": "Römische Reiterspatha der frühen Kaiserzeit; Tac. Ann. 12,35 nennt spathae der Auxilien für 50 n. Chr. (nicht am Text geprüft). Das keltisch-germanische Langschwert derselben Familie braucht ein eigenes Modell."
+      },
+      "slot": "main_hand",
+      "class": "military",
+      "skill": "combat",
+      "model": "weap_roman_spatha",
+      "model_dir": "equipment",
+      "lods": 3,
+      "attach": "hand_right",
+      "q2_price": 110,
+      "weight_kg": 1.1,
+      "access": {
+        "age_min": 18,
+        "training": true,
+        "service": true
+      },
+      "design_stats": {}
+    },
+    "muscle_cuirass": {
+      "name": "Muskelpanzer (Paradeausführung)",
+      "handbook_ref": "Ergänzung",
+      "family": "lorica_musculata",
+      "combat_family": "",
+      "era_id": "",
+      "era": {
+        "valid_from": -27,
+        "valid_to": 300,
+        "attestation": "design_assumption",
+        "note": "Vergoldete Prunkausführung mit Feldherrnbinde; als Rangstück des Prinzipats geführt. Schlichte Muskelpanzer höherer Offiziere sind auch für die späte Republik belegt und bräuchten ein eigenes Modell."
+      },
+      "slot": "torso",
+      "class": "military",
+      "skill": "defense",
+      "model": "",
+      "model_dir": "",
+      "lods": 0,
+      "attach": "torso",
+      "q2_price": 400,
+      "weight_kg": 6.0,
+      "access": {
+        "age_min": 18,
+        "training": true,
+        "service": true,
+        "appointment": [
+          "centurio",
+          "praefectus",
+          "legatus"
+        ]
+      },
+      "design_stats": {},
+      "listed": false,
+      "unlisted_reason": "Noch keine Laufzeit-Ableitung (Quelle armor_roman_muscle_cuirass, 3,58 Mio. Dreiecke) und keine Passform am Körper."
+    },
+    "crossbow": {
+      "name": "Armbrust (Spielkonzept)",
+      "handbook_ref": "Ergänzung",
+      "family": "crossbow_concept",
+      "combat_family": "",
+      "era_id": "",
+      "era": {
+        "valid_from": 100,
+        "valid_to": 500,
+        "attestation": "design_assumption",
+        "note": "Forschungs-/Spielkonzept ohne Anspruch auf eine archäologische Replik; römische Handarmbrüste sind erst kaiserzeitlich abgebildet."
+      },
+      "slot": "main_hand",
+      "class": "military",
+      "skill": "combat",
+      "model": "",
+      "model_dir": "",
+      "lods": 0,
+      "attach": "hand_right",
+      "q2_price": 120,
+      "weight_kg": 3.0,
+      "access": {
+        "age_min": 18,
+        "training": true,
+        "service": true
+      },
+      "design_stats": {},
+      "listed": false,
+      "unlisted_reason": "Quelle weap_crossbow_concept hat keine Bogenarme und ist nicht als Armbrust lesbar."
+    },
+    "horned_saddle": {
+      "name": "Hörnchensattel",
+      "handbook_ref": "IT-027",
+      "family": "saddle_four_horn",
+      "combat_family": "",
+      "era_id": "",
+      "slot": "mount_gear",
+      "class": "mount",
+      "skill": "riding",
+      "model": "",
+      "model_dir": "",
+      "lods": 0,
+      "attach": "saddle",
+      "prices": [
+        19,
+        38,
+        58,
+        104,
+        174
+      ],
+      "weight_kg": 6.0,
+      "access": {
+        "age_min": 18,
+        "mount": true
+      },
+      "design_stats": {
+        "riding_comfort": 8
+      },
+      "listed": false,
+      "unlisted_reason": "Quelle gear_roman_four_horn_saddle zeigt spitze Tierhörner und eine Tonne als Pferdeersatz."
+    },
+    "bow": {
+      "name": "Kompositbogen",
+      "handbook_ref": "IT-015",
+      "family": "bow",
+      "combat_family": "bow",
+      "era_id": "",
+      "slot": "main_hand",
+      "class": "military",
+      "skill": "combat",
+      "model": "",
+      "model_dir": "",
+      "lods": 0,
+      "attach": "hand_left",
+      "prices": [
+        22,
+        46,
+        70,
+        126,
+        210
+      ],
+      "weight_kg": 0.8,
+      "access": {
+        "age_min": 18,
+        "training": true
+      },
+      "design_stats": {
+        "range": 25,
+        "precision": 55
+      },
+      "listed": false,
+      "unlisted_reason": "Quelle weap_roman_aux_bow ist ein unbespannter asymmetrischer Stab mit lose hängender Sehne."
+    }
+  },
+  "shops": {
+    "smith": {
+      "name": "Schmied und Waffenhändler",
+      "kind": "smith",
+      "city_site": "armorer",
+      "access": {},
+      "stock": {
+        "gladius": [
+          1,
+          2,
+          2,
+          1,
+          0
+        ],
+        "pugio": [
+          1,
+          2,
+          2,
+          1,
+          1
+        ],
+        "spear": [
+          1,
+          2,
+          3,
+          1,
+          0
+        ],
+        "hand_axe": [
+          2,
+          3,
+          3,
+          1,
+          1
+        ],
+        "round_shield": [
+          1,
+          2,
+          2,
+          1,
+          0
+        ],
+        "crossbow": [
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "bow": [
+          1,
+          1,
+          2,
+          1,
+          0
+        ]
+      }
+    },
+    "outfitter": {
+      "name": "Legionsausstatter (Depot)",
+      "kind": "outfitter",
+      "city_site": "",
+      "access": {
+        "service": true
+      },
+      "locked_reason": "Der Ausstatter gibt nur an Soldaten mit abgeschlossener Ausbildung im Dienst aus.",
+      "stock": {
+        "gladius": [
+          0,
+          2,
+          4,
+          2,
+          1
+        ],
+        "pilum": [
+          0,
+          4,
+          8,
+          2,
+          1
+        ],
+        "scutum": [
+          0,
+          2,
+          4,
+          2,
+          1
+        ],
+        "cavalry_shield": [
+          0,
+          1,
+          2,
+          1,
+          0
+        ],
+        "cavalry_lance": [
+          0,
+          1,
+          2,
+          1,
+          0
+        ],
+        "spatha": [
+          0,
+          1,
+          2,
+          1,
+          1
+        ],
+        "muscle_cuirass": [
+          0,
+          0,
+          1,
+          0,
+          1
+        ]
+      }
+    },
+    "stable": {
+      "name": "Stall und Pferdehändler",
+      "kind": "stable",
+      "city_site": "",
+      "access": {},
+      "stock": {
+        "riding_horse": [
+          0,
+          0,
+          2,
+          0,
+          0
+        ],
+        "horned_saddle": [
+          0,
+          1,
+          2,
+          1,
+          0
+        ]
+      }
+    },
+    "market": {
+      "name": "Markt (Gebrauchtes und Hirtenbedarf)",
+      "kind": "market",
+      "city_site": "clothier",
+      "access": {},
+      "stock": {
+        "sling": [
+          1,
+          2,
+          3,
+          1,
+          1
+        ],
+        "hand_axe": [
+          1,
+          1,
+          0,
+          0,
+          0
+        ],
+        "round_shield": [
+          1,
+          1,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "home": {
+    "name": "Haus der Familie in Valdora",
+    "storage_slots": 24,
+    "note": "Truhe im Elternhaus: Ablage für Ausrüstung, die man nicht trägt. Reichweite wie an den Läden."
+  }
+}

@@ -14,6 +14,7 @@ const YouthOutfit = preload("res://scripts/visuals/youth_outfit.gd")
 const CompanionWorld = preload("res://scripts/world/companion_world.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
+const GearMarket = preload("res://scripts/domain/gear_market.gd")
 const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
 const CameraObstruction = preload("res://scripts/world/camera_obstruction.gd")
 var village_life_world: Node3D
@@ -222,6 +223,7 @@ func sync_state(state: Dictionary) -> void:
 	_figure.configure_meshy_youth(true, YouthOutfit.for_state(state))
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_figure.set_service_gear(CombatActions.service_gear(state))
+	_figure.set_market_gear(GearMarket.equipped_models(state))
 	if is_instance_valid(i01_props):
 		i01_props.sync_state(state, _figure)
 	if is_instance_valid(i03_props):
@@ -498,7 +500,7 @@ func select_route(id: String) -> void:
 
 func _near_freight(point: Vector2) -> bool:
 	var here := get_player_position()
-	return _state.village.enabled and Vector2(here.x,here.z).distance_to(point) <= 2.4
+	return bool(_state.get("village", {}).get("enabled", false)) and Vector2(here.x,here.z).distance_to(point) <= 2.4
 
 func at_waystation() -> bool:
 	return Waystation.at_counter(get_player_position())
@@ -1607,7 +1609,7 @@ func _interact() -> void:
 	if _near_freight(Freight.DEPOT):
 		action_requested.emit("freight_receipt",{})
 		return
-	if at_waystation() and _state.village.enabled:
+	if at_waystation() and bool(_state.get("village", {}).get("enabled", false)):
 		action_requested.emit("waystation_market",{})
 		return
 	if Childhood.enabled(_state):
@@ -1793,7 +1795,7 @@ func _update_context_hint() -> void:
 	if _near_freight(Freight.DEPOT):
 		_hint.text = "Empfangsbuch am Osttor lesen"
 		return
-	if at_waystation() and _state.village.enabled:
+	if at_waystation() and bool(_state.get("village", {}).get("enabled", false)):
 		_hint.text = "Weidenhof · zum Stadtmarkt weiterreisen"
 		return
 	if Childhood.enabled(_state):
