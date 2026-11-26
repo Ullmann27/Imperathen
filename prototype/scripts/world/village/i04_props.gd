@@ -78,7 +78,7 @@ func _armful_node(label: String, seed_value: int) -> Node3D:
 	random.seed = seed_value
 	for index in 7:
 		var row := index / 4
-		var column := index % 4 if row == 0 else index % 4 + 0.5
+		var column := float(index % 4) + (0.0 if row == 0 else 0.5)
 		_stick(node, random.randf_range(0.36, 0.46), random.randf_range(0.017, 0.026),
 			Vector3((column - 1.5) * 0.052, 0.026 + row * 0.047, random.randf_range(-0.02, 0.02)),
 			random.randf_range(-0.10, 0.10), random.randf_range(-0.03, 0.03))
