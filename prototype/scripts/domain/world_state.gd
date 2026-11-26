@@ -23,6 +23,7 @@ const Calendar = preload("res://scripts/domain/world_calendar.gd")
 const Tribes = preload("res://scripts/domain/tribal_world.gd")
 const Roster = preload("res://scripts/battle/soldier_roster.gd")
 const Relations = preload("res://scripts/domain/actor_relations.gd")
+const Life = preload("res://scripts/battle/soldier_life.gd")
 const VERSION := 1
 const KEYS := ["version", "time", "raids", "military"]
 const RAID_STATUS := ["committed", "booked", "no_band"]
@@ -161,6 +162,80 @@ static func soldiers(world: Dictionary) -> Array:
 	for uid: String in ids:
 		result.append(soldier(world, uid))
 	return result
+
+
+# --- soldiers and their settlements (D-043) ---------------------------------------------
+
+## Every event of the soldiers' lives up to a world date, from #100's pure
+## event function: muster, wounds and deaths of the battle (dated on the
+## muster and the end of the battle) and what world time did afterwards
+## (recovered, retired). Derived from the battle record and the clock, never
+## stored: the ids are stable, and the same world always gives the same list.
+static func settlement_events(world: Dictionary, at_jdn: int = -1) -> Array:
+	var military: Dictionary = world.world_state.military
+	var start := int(military.battle_start_jdn)
+	if start < 0:
+		return []
+	var day := Clock.jdn(world) if at_jdn < 0 else at_jdn
+	var records: Array = []
+	var ids: Array = battle_records(world).keys()
+	ids.sort()
+	for uid: String in ids:
+		records.append(battle_records(world)[uid])
+	var blank := []
+	for record: Dictionary in records:
+		var fresh: Dictionary = record.duplicate(true)
+		fresh.status = "active"
+		blank.append(fresh)
+	# Muster: everyone joins; then the battle changes some of them.
+	var events := Life.settlement_events([], blank, {"year": Calendar.year_of(start), "stamp": "muster-%d" % start})
+	var end := int(military.battle_end_jdn)
+	if end < 0 or day < end:
+		return events
+	events.append_array(Life.settlement_events(blank, records, {"year": Calendar.year_of(end), "stamp": "battle-%d" % end}))
+	var today := []
+	for uid: String in ids:
+		today.append(soldier(world, uid, day))
+	for event: Dictionary in Life.settlement_events(records, today, {"year": Calendar.year_of(day), "stamp": "aftercare-%d" % end}):
+		if event.type != "promoted":
+			events.append(event)
+	return events
+
+
+## What those events mean for each home settlement: counts of people per
+## place ("group_id/place"), summed from the events' proposed effects.
+static func settlement_effects(world: Dictionary, at_jdn: int = -1) -> Dictionary:
+	var places := {}
+	for event: Dictionary in settlement_events(world, at_jdn):
+		var key := "%s/%s" % [str(event.group_id), str(event.place)]
+		if not places.has(key):
+			places[key] = {"group_id": str(event.group_id), "place": str(event.place), "events": 0, "totals": {}}
+		var entry: Dictionary = places[key]
+		entry.events = int(entry.events) + 1
+		for effect: String in event.effects:
+			entry.totals[effect] = int(entry.totals.get(effect, 0)) + int(event.effects[effect])
+	return places
+
+
+## One line per settlement for the chronicle and the panels.
+static func settlement_report(world: Dictionary, at_jdn: int = -1) -> Array:
+	var lines := []
+	var places := settlement_effects(world, at_jdn)
+	var keys := places.keys()
+	keys.sort()
+	for key: String in keys:
+		var totals: Dictionary = places[key].totals
+		var parts := ["%d im Dienst" % int(totals.get("away", 0))]
+		if int(totals.get("wounded", 0)) > 0:
+			parts.append("%d verwundet" % int(totals.wounded))
+		if int(totals.get("population", 0)) < 0:
+			parts.append("%d gefallen" % -int(totals.population))
+		if int(totals.get("impaired", 0)) > 0:
+			parts.append("%d versehrt heimgekehrt" % int(totals.impaired))
+		if int(totals.get("dependants_without_provider", 0)) > 0:
+			parts.append("%d Angehörige ohne Versorger" % int(totals.dependants_without_provider))
+		lines.append("%s: %s" % [str(places[key].place), ", ".join(parts)])
+	return lines
 
 
 ## Gate on world time: active (recovered, not dead or retired) after the

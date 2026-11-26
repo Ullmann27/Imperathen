@@ -424,6 +424,18 @@ func soldiers() -> Array:
 	return [] if data.is_empty() else WorldState.soldiers(data)
 
 
+## Recruitment, wounds, recovery, death and retirement of the soldiers as
+## events for their home settlements, and the summed effect per settlement
+## on today's world date (D-043). Each event exists once: the list is derived
+## from the battle record and the clock.
+func settlement_events() -> Array:
+	return [] if data.is_empty() else WorldState.settlement_events(data)
+
+
+func settlement_effects() -> Dictionary:
+	return {} if data.is_empty() else WorldState.settlement_effects(data)
+
+
 ## Promotion on world time: only after the battle, only for a recovered,
 ## living soldier still in service, and through the catalog's upgrade path.
 ## `inventory` and `authorities` are those of TroopCatalog.plan_upgrade; the
@@ -529,6 +541,10 @@ func checkpoint_valley(battle) -> bool:
 	if battle.outcome != "ongoing":
 		var result: String = {"victory":"Die Grenzlegion hält die Talstraße.", "defeat":"Der Höhenbund kontrolliert die Talstraße.", "draw":"Die Talstraße bleibt umkämpft."}[battle.outcome]
 		_record(data, "%s Ausfälle: Legion %d, Höhenbund %d." % [result,summary.ally.losses,summary.enemy.losses])
+		# What the battle means at home (D-043), from the same soldier records.
+		var home := WorldState.settlement_report(data)
+		if not home.is_empty():
+			_record(data, "Nachricht in die Heimatorte (%s) · %s" % [WorldClock.view(data).date_label, " · ".join(home)])
 	data.revision += 1
 	changed.emit()
 	return true

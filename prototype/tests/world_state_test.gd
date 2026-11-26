@@ -484,6 +484,34 @@ func _test_soldiers_on_world_time() -> void:
 		for person: Dictionary in squad.people.values():
 			snapshot_status += int(person.status == "wounded")
 	_check(snapshot_status == wounded.size(), "The battle record keeps its %d wounded; no second copy can contradict it" % wounded.size())
+	# The settlements hear of every change exactly once (D-043).
+	var end_day := int(model.data.world_state.military.battle_end_jdn)
+	var at_end: Array = WorldState.settlement_events(model.data, end_day)
+	var now_events: Array = model.settlement_events()
+	var counts := {}
+	var seen := {}
+	var duplicates := 0
+	for event: Dictionary in now_events:
+		counts[event.type] = int(counts.get(event.type, 0)) + 1
+		duplicates += int(seen.has(event.id))
+		seen[event.id] = true
+	var total: int = model.soldiers().size()
+	_check(int(counts.get("recruited", 0)) == total and int(counts.get("died", 0)) == dead.size() and int(counts.get("wounded", 0)) == wounded.size(), "Muster, wounds and deaths reach the settlements: " + str(counts))
+	_check(int(counts.get("recovered", 0)) + int(counts.get("retired", 0)) == wounded.size() and int(counts.get("retired", 0)) == retired and duplicates == 0, "Every wounded soldier later recovers or retires exactly once; no event id occurs twice")
+	_check(at_end.size() == total + dead.size() + wounded.size() and WorldState.settlement_events(model.data, muster_day).size() >= total, "On the day of the battle only muster, wounds and deaths have happened")
+	_check(_json(model.settlement_events()) == _json(now_events), "Asking again books nothing twice: the same world gives the same events")
+	var away := 0
+	var people_lost := 0
+	var still_hurt := 0
+	for place: Dictionary in model.settlement_effects().values():
+		away += int(place.totals.get("away", 0))
+		people_lost -= int(place.totals.get("population", 0))
+		still_hurt += int(place.totals.get("wounded", 0))
+	_check(away == total - dead.size() - retired and people_lost == dead.size() and still_hurt == 0, "Per settlement the counts add up: %d still serving, %d fallen, nobody still wounded" % [away, people_lost])
+	var told := false
+	for entry: Dictionary in model.data.chronicle:
+		told = told or str(entry.text).begins_with("Nachricht in die Heimatorte")
+	_check(told, "The chronicle of the walkable world tells what the battle meant at home")
 	# One soldier, one age: the muster age counts from the muster date.
 	var sample: Dictionary = active[0]
 	var years := WorldCalendar.years_between(WorldCalendar.year_of(muster_day), WorldClock.year(model.data))
