@@ -30,19 +30,10 @@ print("VEGETATION_IMPOSTORS_PRESENT")
 PY
 }
 if verify; then exit 0; fi
-work="$(mktemp -d)"
-trap 'rm -rf "$work"' EXIT
-if command -v blender >/dev/null && [[ "$(blender --version | head -1)" == "Blender 4.3.2" ]]; then
-    engine="$(command -v blender)"
-else
-    name=blender-4.3.2-linux-x64.tar.xz
-    url=https://download.blender.org/release/Blender4.3
-    curl --fail --location --retry 3 "$url/$name" -o "$work/$name"
-    curl --fail --location --retry 3 "$url/blender-4.3.2.sha256" -o "$work/checksums"
-    (cd "$work"; awk -v file="$name" '$2 == file || $2 == "*" file {print}' checksums > selected; test -s selected; sha256sum -c selected)
-    tar -xf "$work/$name" -C "$work"
-    engine="$work/blender-4.3.2-linux-x64/blender"
-fi
-"$engine" -b -t 3 --python-exit-code 1 -P art/vegetation/build.py
+# CI already installs Blender through the trusted Ubuntu package repository.
+# Bake from the exact checked-in GLBs instead of re-exporting the geometry or
+# downloading a second Blender build from an unreliable external endpoint.
+command -v blender >/dev/null
+blender -b -t 3 --python-exit-code 1 -P art/vegetation/bake_existing_impostors.py
 python3 art/vegetation/import_settings.py
 verify
