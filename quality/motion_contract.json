@@ -752,11 +752,14 @@
     "scripts/city_support_panel.gd",
     "scripts/city_trade.gd",
     "scripts/city_trade_catalog.gd",
+    "scripts/domain/calendar_ageing_participant.gd",
     "scripts/domain/combat_actions.gd",
     "scripts/domain/npc_behavior.gd",
     "scripts/domain/npc_social_memory.gd",
     "scripts/domain/raid_route.gd",
     "scripts/domain/raider_strike.gd",
+    "scripts/domain/time_jump_contract.gd",
+    "scripts/domain/tribal_world.gd",
     "scripts/domain/unarmed_combat.gd",
     "scripts/domain/village_economy.gd",
     "scripts/domain/world_model.gd",
@@ -767,13 +770,20 @@
     "scripts/rendering/city_surface_microdetail.gd",
     "scripts/rendering/city_viva_closeup_props.gd",
     "scripts/rendering/fold7_quality_policy.gd",
+    "scripts/rendering/render_profile.gd",
+    "scripts/rendering/sun_shaft.gdshader",
+    "scripts/rendering/village_look.gd",
+    "scripts/rendering/village_surfaces.gd",
     "scripts/rendering/viva_roma_atmosphere.gd",
+    "scripts/rendering/window_glow.gdshader",
     "scripts/roman_material_lab/material_preview.gd",
     "scripts/story/campaign_bible.gd",
     "scripts/story/chapter_abilities.gd",
     "scripts/story/companion_follow.gd",
     "scripts/story/companion_story.gd",
     "scripts/story/frontier_chapter.gd",
+    "scripts/story/i01_film.gd",
+    "scripts/story/i01_three_cups.gd",
     "scripts/story/life_path_policy.gd",
     "scripts/story/mission_cinematics.gd",
     "scripts/story/mission_data.gd",
@@ -797,6 +807,14 @@
     "scripts/ui/imperial_fx.gd",
     "scripts/ui/imperial_intro.gd",
     "scripts/ui/opening_overlay.gd",
+    "scripts/ui/roman_hud/codex.gd",
+    "scripts/ui/roman_hud/compass_ribbon.gd",
+    "scripts/ui/roman_hud/dialogue_stage.gd",
+    "scripts/ui/roman_hud/hud_director.gd",
+    "scripts/ui/roman_hud/hud_style.gd",
+    "scripts/ui/roman_hud/medallion_button.gd",
+    "scripts/ui/roman_hud/menu_kit.gd",
+    "scripts/ui/roman_hud/vitals.gd",
     "scripts/ui/roman_style.gd",
     "scripts/ui/runtime_display.gd",
     "scripts/ui/safe_area.gd",
@@ -808,6 +826,7 @@
     "scripts/ui/village_life_panel.gd",
     "scripts/ui/village_navigation.gd",
     "scripts/visuals/authored_ground.gd",
+    "scripts/visuals/canopy_wind.gdshader",
     "scripts/visuals/cc0_gestures.gd",
     "scripts/visuals/character_motion.gd",
     "scripts/visuals/facial_motion.gd",
@@ -848,8 +867,11 @@
     "scripts/world/village/drizzle.gdshader",
     "scripts/world/village/frontier_dressing.gd",
     "scripts/world/village/ground.gdshader",
+    "scripts/world/village/lime_plaster.gdshader",
     "scripts/world/village/opening_props.gd",
     "scripts/world/village/settlement_dressing.gd",
+    "scripts/world/village/valdora_land.gd",
+    "scripts/world/village/valdora_land.gdshaderinc",
     "scripts/world/village/village_layout.gd",
     "scripts/world/village/village_local_navigation.gd",
     "scripts/world/village/village_population.gd",
@@ -871,6 +893,7 @@
     "shaders/legion_silhouette.gdshader",
     "shaders/menu_grade.gdshader",
     "shaders/rank_stride.gdshader",
+    "shaders/roman_backdrop.gdshader",
     "shaders/roman_banner.gdshader",
     "shaders/torch_flame.gdshader",
     "shaders/viva_country/blades.gdshader",
@@ -889,11 +912,13 @@
     ],
     "scripts/world/game_world.gd": [
       "hero",
+      "original_youth",
       "village_navigation",
       "raid_motion"
     ],
     "scripts/world/player_action_world.gd": [
       "hero",
+      "original_youth",
       "service_gear"
     ],
     "scripts/world/village/frontier_dressing.gd": [
@@ -915,6 +940,7 @@
     ],
     "scripts/visuals/village_person.gd": [
       "hero",
+      "original_youth",
       "frontier_people",
       "legacy_people",
       "meshy_people",
@@ -946,7 +972,8 @@
       "village_navigation"
     ],
     "scripts/visuals/youth_sole_contact.gd": [
-      "hero"
+      "hero",
+      "original_youth"
     ]
   }
 }
