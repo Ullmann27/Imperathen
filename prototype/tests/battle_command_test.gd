@@ -8,6 +8,8 @@ const Catalog := preload("res://scripts/battle/troop_catalog.gd")
 const LEGACY := "res://tests/fixtures/valley_schema2_60s.json"
 const GUARD := "valley_guard"
 const ENEMY := "ridge_guard"
+const SPEARS := "valley_spears"
+const BOWS := "valley_bows"
 
 var checks := 0
 var failures := 0
@@ -26,6 +28,15 @@ func _initialize() -> void:
 	_test_rally_conditions()
 	_test_contagion()
 	_test_rear_and_banner()
+	_test_rights()
+	_test_fall_back()
+	_test_advance()
+	_test_charge()
+	_test_face_and_fire()
+	_test_pila()
+	_test_orbis_and_testudo()
+	_test_invalid_orders()
+	_test_order_determinism()
 	print("BATTLE_COMMAND_RESULT checks=%d failures=%d metrics=%s" % [checks, failures, JSON.stringify(metrics)])
 	quit(1 if failures else 0)
 
@@ -441,3 +452,292 @@ func _test_rear_and_banner() -> void:
 	revived.squads[GUARD].signifer_id = banner
 	check(not Battle.new().restore(revived), "A save cannot raise a fallen standard bearer")
 	check(Battle.new().restore(m.snapshot()), "A company without its standard saves validly")
+
+
+func _test_rights() -> void:
+	var m := Battle.new()
+	var catalog := Catalog.load_default()
+	for s: Dictionary in m.squads.values():
+		var valid: bool = not s.commandable_by.is_empty()
+		for post in s.commandable_by:
+			var kind: String = m.scenario.appointments[post].type
+			valid = valid and Catalog.valid_at(catalog.appointments[kind], -58) and m.scenario.appointments[post].side == s.side
+		check(valid, "Command rights name appointments valid in 58 BC: " + s.id)
+	check(m.commander == "legatus_valdora" and m.order([GUARD, SPEARS, BOWS], "hold").ok, "The bench legate commands every allied company")
+	var before := m.snapshot()
+	check(m.set_commander("centurio_valley_guard") and m.order([GUARD], "hold").ok, "A centurion commands his own company")
+	before = m.snapshot()
+	check(not m.order([BOWS], "hold").ok and not m.order([GUARD, BOWS], "hold").ok and m.snapshot() == before, "A centurion cannot command another company; mixed selections fail atomically")
+	check(not m.set_commander("imperator") and m.commander == "centurio_valley_guard", "Unknown appointments are refused")
+	check(m.set_commander("") and not m.order([GUARD], "hold").ok and m.snapshot() == before, "Without an appointment (the twelve-year-old) nothing can be commanded")
+	check(not m.order([GUARD], "hold", null, "dux_hoehenbund").ok and not m.order([GUARD], "hold", null, "praefectus_valley_bows").ok and m.snapshot() == before,
+		"Foreign or unrelated appointments are refused")
+	check(m.order([BOWS], "cease_fire", null, "praefectus_valley_bows").ok and not m.squads[BOWS].fire, "An explicit appointment can be named per order")
+
+
+func _test_fall_back() -> void:
+	var m := Battle.new()
+	var g: Dictionary = m.squads[GUARD]
+	var start := Vector2(g.x, g.z)
+	var facing: float = g.facing
+	check(m.order([GUARD], "fall_back").ok, "Fall back accepted")
+	var anchor_step := 0.0
+	var worst := 0.0
+	for i in 100:
+		var at := Vector2(g.x, g.z)
+		var last := []
+		for k in range(g.uids.size()):
+			last.append(Vector2(g.members[k][0], g.members[k][1]))
+		m.tick(Battle.STEP)
+		anchor_step = maxf(anchor_step, at.distance_to(Vector2(g.x, g.z)))
+		for k in range(mini(last.size(), g.uids.size())):
+			worst = maxf(worst, last[k].distance_to(Vector2(g.members[k][0], g.members[k][1])))
+		if g.command == "hold":
+			break
+	var moved := start.distance_to(Vector2(g.x, g.z))
+	var turned := absf(angle_difference(facing, g.facing))
+	metrics["fall_back"] = {"meters": snappedf(moved, 0.001), "facing_error_rad": snappedf(turned, 0.0001), "anchor_step_m": snappedf(anchor_step, 0.0001)}
+	check(g.command == "hold" and absf(moved - 10.0) <= 0.3 and turned <= 0.1, "Fall back covers 10 +- 0.3 m and keeps the facing within 0.1 rad (%.3f m, %.4f rad)" % [moved, turned])
+	check(anchor_step <= Battle.FALL_BACK_SPEED * Battle.STEP + 0.0001 and worst <= Battle.MEMBER_STEP + 0.00001, "Fall back moves at 1 m/s; no soldier exceeds 0.53 m per step")
+	check(Vector2(g.x, g.z).distance_to(start + Vector2(0, 10)) < 0.31, "The company backs away from where it faces")
+	var blocked := Battle.new()
+	check(_place(blocked, {GUARD: Vector2(-12, -6)}), "Blocked fall-back fixture loads")
+	var before := blocked.snapshot()
+	check(not blocked.order([GUARD], "fall_back").ok and blocked.snapshot() == before, "A rock behind the company rejects the fall back atomically")
+	var edge := Battle.new()
+	check(_place(edge, {GUARD: Vector2(-7, 18)}), "Edge fixture loads")
+	before = edge.snapshot()
+	check(not edge.order([GUARD], "fall_back").ok and edge.snapshot() == before, "No falling back off the valley")
+
+
+func _test_advance() -> void:
+	var m := Battle.new()
+	check(_place(m, {GUARD: Vector2(6, 9), BOWS: Vector2(14, 16)}), "Advance fixture loads")
+	var g: Dictionary = m.squads[GUARD]
+	check(m.order([GUARD], "advance").ok and g.target == "ridge_spears", "Advance without a target picks the nearest enemy")
+	var halted := -1.0
+	var crept := false
+	for i in 150:
+		var foe: Dictionary = m.squads[g.target] if g.target != "" else {}
+		if foe.is_empty() or g.command != "advance" or g.status in ["routed", "rallying"]:
+			break
+		var before := Vector2(g.x, g.z)
+		var gap := before.distance_to(Vector2(foe.x, foe.z))
+		m.tick(Battle.STEP)
+		var still := before.distance_to(Vector2(g.x, g.z)) < 0.0001
+		if gap <= Battle.ADVANCE_STANDOFF + 0.3 and not still and g.status in ["ready", "moving"]:
+			crept = true
+		if still and g.status == "ready" and halted < 0 and m.steps > g.ready_at:
+			halted = Vector2(g.x, g.z).distance_to(Vector2(foe.x, foe.z))
+	metrics["advance_halt_m"] = snappedf(halted, 0.001)
+	check(halted >= 5.6 and halted <= 6.35 and not crept, "Advance stops about 6 m short and never creeps closer on its own (%.2f m)" % halted)
+	var archers := Battle.new()
+	check(_place(archers, {BOWS: Vector2(0, 2)}), "Archer advance fixture loads")
+	check(archers.order([BOWS], "advance", "ridge_bows").ok, "Archers advance on a named enemy")
+	var shot_at := -1.0
+	for i in 100:
+		archers.tick(Battle.STEP)
+		var b: Dictionary = archers.squads[BOWS]
+		if b.ammo < 18:
+			shot_at = Vector2(b.x, b.z).distance_to(Vector2(archers.squads.ridge_bows.x, archers.squads.ridge_bows.z))
+			break
+	check(shot_at > Battle.ADVANCE_STANDOFF and shot_at <= 11.5, "Advancing archers open fire at bow range before the standoff (%.2f m)" % shot_at)
+
+
+func _strike(m, cmd: String) -> Dictionary:
+	var g: Dictionary = m.squads[GUARD]
+	var foe: Dictionary = m.squads[ENEMY]
+	m.order([GUARD], cmd, ENEMY)
+	var cohesion := 0.0
+	for i in 20:
+		cohesion = g.cohesion
+		var dealt: float = foe.initial_strength - foe.strength + foe.damage
+		m.tick(Battle.STEP)
+		if g.action_step == m.steps:
+			return {"damage": foe.initial_strength - foe.strength + foe.damage - dealt, "cohesion": cohesion, "step": m.steps}
+	return {}
+
+
+func _test_charge() -> void:
+	var a := Battle.new()
+	var b := Battle.new()
+	for m in [a, b]:
+		check(_place(m, {GUARD: Vector2(-7, 8), ENEMY: Vector2(-7, 5.2)}), "Charge contact fixture loads")
+		m.order([BOWS], "cease_fire")
+	var charged := _strike(a, "charge")
+	var plain := _strike(b, "attack")
+	var expected: float = Battle.CHARGE_BONUS * (0.88 + 0.0012 * charged.get("cohesion", 0.0)) / (0.88 + 0.0012 * plain.get("cohesion", 0.0))
+	check(not charged.is_empty() and not plain.is_empty() and charged.step == plain.step and absf(charged.damage / plain.damage - expected) < 0.000001,
+		"The first charge strike hits 1.25x harder, less what the loosened ranks cost")
+	var g: Dictionary = a.squads[GUARD]
+	var impacts := 0
+	for memory: Dictionary in g.memories:
+		impacts += int(memory.event == "charge_impact")
+	check(impacts == 1 and g.command == "attack" and not g.charge_bonus, "The charge bonus applies once; then the melee continues")
+	var run := Battle.new()
+	var r: Dictionary = run.squads[GUARD]
+	check(run.order([GUARD], "charge", ENEMY).ok and r.charge_bonus, "Charge accepted")
+	var fastest := 0.0
+	var loosest := 100.0
+	for i in 40:
+		var at := Vector2(r.x, r.z)
+		run.tick(Battle.STEP)
+		fastest = maxf(fastest, at.distance_to(Vector2(r.x, r.z)))
+		if r.command == "charge" and r.status == "moving":
+			loosest = minf(loosest, r.cohesion)
+		if r.command != "charge":
+			break
+	metrics["charge"] = {"anchor_step_m": snappedf(fastest, 0.0001), "lowest_cohesion": snappedf(loosest, 0.01)}
+	check(is_equal_approx(fastest, Battle.CHARGE_SPEED * Battle.STEP) and loosest <= 85.0, "A charge runs at 2.65 m/s with loosened ranks (cohesion %.1f)" % loosest)
+
+
+func _test_face_and_fire() -> void:
+	var m := Battle.new()
+	var g: Dictionary = m.squads[GUARD]
+	var start := Vector2(g.x, g.z)
+	check(m.order([GUARD], "face", start + Vector2(10, 0)).ok, "Face accepted")
+	for i in 20:
+		m.tick(Battle.STEP)
+		if g.command == "hold":
+			break
+	check(g.command == "hold" and is_equal_approx(g.facing, -PI / 2) and start.distance_to(Vector2(g.x, g.z)) < 0.0001, "Face turns in place to the given point")
+	var bows: Dictionary = m.squads[BOWS]
+	check(m.order([BOWS], "cease_fire").ok and not bows.fire, "Cease fire")
+	check(m.order([BOWS], "focus_fire", ENEMY).ok and m.order([BOWS], "fire_at_will").ok and bows.fire and bows.command == "hold" and bows.target == "",
+		"Fire at will drops the focus target and keeps shooting freely")
+	var free := Battle.new()
+	check(_place(free, {ENEMY: Vector2(1, 4)}), "Fire-at-will fixture loads")
+	free.order([BOWS], "cease_fire")
+	free.tick(2.0)
+	check(free.squads[BOWS].ammo == 18, "No volleys while fire is ceased")
+	free.order([BOWS], "fire_at_will")
+	free.tick(2.0)
+	check(free.squads[BOWS].ammo < 18, "Fire at will resumes volleys on the nearest enemy in range")
+
+
+func _test_pila() -> void:
+	var m := Battle.new()
+	check(_place(m, {GUARD: Vector2(-5, 8), ENEMY: Vector2(-5, -2)}, {ENEMY: "shield_wall"}), "Pila fixture loads")
+	var g: Dictionary = m.squads[GUARD]
+	var foe: Dictionary = m.squads[ENEMY]
+	foe.facing = m._bearing(foe, Vector2(g.x, g.z))
+	var guarded := m._shield_factor(g, foe, true)
+	check(g.pila == 2 and m.order([GUARD], "pila", ENEMY).ok, "A legionary company carries two pila and may throw")
+	var thrown := -1
+	for i in 40:
+		m.tick(Battle.STEP)
+		if g.pila < 2:
+			thrown = m.steps
+			break
+	check(thrown > 0 and g.pila == 1 and g.last_action == "throw" and g.command == "hold", "One pila order throws exactly one volley")
+	check(foe.shields_fouled_until == thrown + Battle.PILA_FOUL_STEPS and guarded < 1.0 and m._shield_factor(g, foe, true) == 1.0, "Pila foul the target's shields for 10 s")
+	for i in 25:
+		m.tick(Battle.STEP)
+	check(g.pila == 1, "No further throw without a new order")
+	m.steps = foe.shields_fouled_until
+	check(m._shield_factor(g, foe, true) == guarded, "Shields work again after 10 s")
+	var far := Battle.new()
+	check(_place(far, {GUARD: Vector2(-7, 8), ENEMY: Vector2(-7, -14)}), "Distant pila fixture loads")
+	var fg: Dictionary = far.squads[GUARD]
+	far.order([GUARD], "pila", ENEMY)
+	var range_at := -1.0
+	for i in 120:
+		far.tick(Battle.STEP)
+		if fg.pila < 2:
+			range_at = Vector2(fg.x, fg.z).distance_to(Vector2(far.squads[ENEMY].x, far.squads[ENEMY].z))
+			break
+	check(range_at > 0.0 and range_at <= Battle.PILA_RANGE, "Out of range the company closes to 12 m before throwing (%.2f m)" % range_at)
+	far.order([GUARD], "pila", ENEMY)
+	for i in 60:
+		far.tick(Battle.STEP)
+		if fg.pila == 0:
+			break
+	var spent := far.snapshot()
+	check(fg.pila == 0 and not far.order([GUARD], "pila", ENEMY).ok and far.snapshot() == spent, "With no pila left the order is refused atomically")
+	check(Battle.new().restore(JSON.parse_string(JSON.stringify(spent))), "Spent pila save validly")
+
+
+func _test_orbis_and_testudo() -> void:
+	var m := Battle.new()
+	var g: Dictionary = m.squads[GUARD]
+	check(m.order([GUARD], "form", "orbis").ok, "A drilled legionary company forms the orbis")
+	var mid := m.snapshot()
+	check(not m.order([GUARD], "move", Vector2(-7, 2)).ok and not m.order([GUARD], "charge", ENEMY).ok and not m.order([GUARD], "fall_back").ok and m.snapshot() == mid,
+		"No marching out of the circle; refusals are atomic")
+	m.tick(1.4)
+	check(g.formation == "orbis" and m.preview(GUARD, Vector2(-10, 12), Vector2(-4, 12)).is_empty(), "The orbis is formed in place, not drawn along a front")
+	m.tick(2.0)
+	var outward := true
+	for man: Dictionary in m.soldiers(GUARD):
+		var out := Vector2(man.x, man.z) - Vector2(g.x, g.z)
+		outward = outward and Vector2(-sin(man.facing), -cos(man.facing)).dot(out.normalized()) > 0.95
+	check(outward, "Every soldier of the orbis faces outwards")
+	var behind := Vector2(g.x, g.z) - m._front(g) * 3.0
+	check(not m._from_rear(g, behind) and m._shield_factor(m.squads[ENEMY], g, false) == 0.87, "The orbis has no rear and its shields cover every side")
+	check(Battle.new().restore(JSON.parse_string(JSON.stringify(m.snapshot()))), "The orbis saves")
+	check(m.order([GUARD], "form", "line").ok, "The orbis can be left by re-forming")
+	check(not m.order([SPEARS], "form", "orbis").ok and not m.order([BOWS], "form", "orbis").ok, "Undrilled militia and archers cannot form the orbis")
+	check(m.order([GUARD], "form", "testudo").ok and m._form_problem(m.squads[ENEMY], "testudo") != "" and not m.order([SPEARS], "form", "testudo").ok,
+		"Testudo needs scuta and drill: legionaries yes, Germanic round shields and militia no")
+	var recruits := VALLEY_WITH("roman_tiro")
+	var tiro := Battle.new(58, recruits)
+	check(tiro.squads[GUARD].troop_id == "roman_tiro" and not tiro.order([GUARD], "form", "testudo").ok and tiro.order([GUARD], "form", "shield_wall").ok,
+		"Recruits (drill 1) cannot yet form the testudo")
+	var veterans := Battle.new(58, VALLEY_WITH("roman_veteranus"))
+	check(veterans.order([GUARD], "form", "testudo").ok, "Veterans form the testudo")
+
+
+func VALLEY_WITH(troop: String) -> Dictionary:
+	var scenario: Dictionary = Battle.VALLEY_SCENARIO.duplicate(true)
+	scenario.companies[0].troop_id = troop
+	return scenario
+
+
+func _test_invalid_orders() -> void:
+	var m := Battle.new()
+	var g: Dictionary = m.squads[GUARD]
+	var before := m.snapshot()
+	for attempt in [[[GUARD], "follow", GUARD], [[GUARD], "follow", ENEMY], [[GUARD], "follow", "nobody"], [[GUARD, SPEARS], "follow", SPEARS],
+			[[GUARD], "advance", BOWS], [[GUARD], "charge", null], [[BOWS], "charge", ENEMY], [[BOWS], "pila", ENEMY], [[SPEARS], "pila", ENEMY],
+			[[GUARD, BOWS], "pila", ENEMY], [[GUARD], "face", null], [[GUARD], "face", Vector2(INF, 0)], [[GUARD], "face", Vector2(g.x, g.z)],
+			[[GUARD], "fire_at_will", null], [[GUARD, BOWS], "fire_at_will", null], [[SPEARS], "form", "orbis"], [[GUARD], "advance", "nobody"]]:
+		var reply := m.order(attempt[0], attempt[1], attempt[2])
+		check(not reply.ok and reply.message != "" and m.snapshot() == before, "Invalid order rejected atomically: %s %s" % [attempt[1], str(attempt[2])])
+	check(m.order([SPEARS], "follow", GUARD).ok, "A company may follow another")
+	var following := m.snapshot()
+	check(not m.order([GUARD], "follow", SPEARS).ok and m.snapshot() == following, "Following in a circle is refused")
+	m.tick(12)
+	var lead: Dictionary = m.squads[GUARD]
+	var spears: Dictionary = m.squads[SPEARS]
+	var spot: Vector2 = m._follow_spot(spears, lead)
+	check(spears.command == "follow" and Vector2(spears.x, spears.z).distance_to(spot) <= 0.6, "The follower takes its place behind the leading company")
+	for change in [["pila", 5], ["charge_bonus", true], ["shields_fouled_until", 999], ["command", "fire_at_will"], ["commandable_by", ["dux_hoehenbund"]]]:
+		var bad := Battle.new().snapshot()
+		bad.squads[GUARD][change[0]] = change[1]
+		check(not Battle.new().restore(bad), "Reject invalid snapshot field " + change[0])
+	var wrong := Battle.new().snapshot()
+	wrong.squads[GUARD].command = "follow"
+	wrong.squads[GUARD].target = ENEMY
+	check(not Battle.new().restore(wrong), "Reject following an enemy in a save")
+	var throwing := Battle.new().snapshot()
+	throwing.squads[BOWS].last_action = "throw"
+	throwing.squads[BOWS].action_step = 1
+	throwing.steps = 2
+	check(not Battle.new().restore(throwing), "Reject a pila throw by archers in a save")
+
+
+func _test_order_determinism() -> void:
+	var runs := []
+	for k in 2:
+		var m := Battle.new(11)
+		m.order([GUARD], "pila", ENEMY)
+		m.order([SPEARS], "follow", GUARD)
+		m.order([BOWS], "advance")
+		m.tick(12)
+		m.order([GUARD], "charge", ENEMY)
+		m.tick(10)
+		m.order([GUARD], "fall_back")
+		m.tick(10)
+		runs.append(m.snapshot())
+	check(runs[0] == runs[1], "New orders keep the battle deterministic")
+	check(Battle.new().restore(runs[0]), "The resulting state validates")

@@ -5,6 +5,10 @@ const NAMES := {
 	"testudo": "Schilddach / Testudo", "wedge": "Keil", "loose": "Lockere Ordnung",
 	"phalanx": "Speerformation / Phalanx",
 }
+## Formed in place and facing every way; not drawn along a front (Caes. Gall. 4,37; 5,33).
+const ALL_ROUND := {"orbis": "Kreis / Orbis"}
+const ORBIS_SPACING := 0.9
+const ORBIS_DEPTH := 1.0
 
 
 static func natural_columns(shape: String, count: int) -> int:
@@ -38,6 +42,8 @@ static func layout(shape: String, count: int, width: float) -> Dictionary:
 	var rank_of: Array[int] = []
 	if count == 0:
 		return {"offsets": result, "ranks": rank_of}
+	if shape == "orbis":
+		return _orbis(count)
 	var spacing := 0.95
 	var depth := 1.05
 	match shape:
@@ -88,3 +94,31 @@ static func world_slots(shape: String, count: int, width: float, center: Vector2
 	for i in range(points.size()):
 		points[i] = center + points[i].rotated(-facing)
 	return points
+
+
+## Concentric rings, outer ring first (rank 0), about ORBIS_SPACING apart along each ring.
+## Slot 0 of every ring points to the local front (-Y).
+static func _orbis(count: int) -> Dictionary:
+	var result: Array[Vector2] = []
+	var rank_of: Array[int] = []
+	var rings := maxi(1, ceili(count / 40.0))
+	var outer := maxf(1.2 + (rings - 1) * ORBIS_DEPTH, (count * ORBIS_SPACING / TAU + rings * (rings - 1) * 0.5 * ORBIS_DEPTH) / rings)
+	var radii := []
+	var total := 0.0
+	for k in range(rings):
+		radii.append(outer - k * ORBIS_DEPTH)
+		total += radii[k]
+	var left := count
+	for k in range(rings):
+		var n := left if k == rings - 1 else clampi(roundi(count * radii[k] / total), 1, left - (rings - 1 - k))
+		for j in range(n):
+			var angle := TAU * j / n
+			result.append(Vector2(sin(angle), -cos(angle)) * radii[k])
+			rank_of.append(k)
+		left -= n
+	return {"offsets": result, "ranks": rank_of}
+
+
+static func ring_radius(count: int) -> float:
+	var points: Array = _orbis(count).offsets
+	return 0.0 if points.is_empty() else points[0].length()

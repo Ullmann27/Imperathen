@@ -10,7 +10,11 @@ const Field := preload("res://scripts/battle/valley_field.gd")
 const Slots := preload("res://scripts/battle/formation_slots.gd")
 const Catalog := preload("res://scripts/battle/troop_catalog.gd")
 const Roster := preload("res://scripts/battle/soldier_roster.gd")
+## Formations that can be drawn along a front. SHAPES adds the all-round orbis.
 const FORMATIONS := Slots.NAMES
+const SHAPES := {"line": "Linie", "column": "Marschkolonne", "shield_wall": "Schildwall",
+	"testudo": "Schilddach / Testudo", "wedge": "Keil", "loose": "Lockere Ordnung",
+	"phalanx": "Speerformation / Phalanx", "orbis": "Kreis / Orbis"}
 const OBSTACLES := Field.ROCKS
 const ARMIES := {
 	"talwache": {"name":"Heer der Talwache", "side":"ally"},
@@ -24,9 +28,27 @@ const CAPTURE_SECONDS := 8
 const VOLLEY_STEPS := 9
 const STRIKE_STEPS := 6
 const EQUIPPED_FORMATIONS := {"shield_wall": ["infantry", "spear"], "testudo": ["infantry"],
-	"phalanx": ["spear"], "wedge": ["infantry", "spear"]}
+	"phalanx": ["spear"], "wedge": ["infantry", "spear"], "orbis": ["infantry", "spear"]}
 const COMMANDS := ["move", "hold", "form", "deploy", "attack", "attack_move", "defend",
-	"flank", "retreat", "rally", "reserve", "focus_fire", "cease_fire"]
+	"flank", "retreat", "rally", "reserve", "focus_fire", "cease_fire",
+	"follow", "advance", "fall_back", "charge", "face", "pila", "fire_at_will"]
+## Orders that only change a modifier and are never stored as the company's command.
+const MODIFIERS := ["form", "cease_fire", "fire_at_will"]
+const ENEMY_TARGETED := ["attack", "flank", "focus_fire", "charge", "pila", "advance"]
+## Orders that move the company; a company standing in the orbis must re-form first.
+const MOVING_COMMANDS := ["move", "attack_move", "deploy", "attack", "flank", "retreat", "follow", "advance", "fall_back", "charge"]
+## Orders (design values, P4).
+const TURN_RATE := 3.6
+const ADVANCE_STANDOFF := 6.0
+const FALL_BACK_DISTANCE := 10.0
+const FALL_BACK_SPEED := 1.0
+const CHARGE_SPEED := 2.65
+const CHARGE_BONUS := 1.25
+const CHARGE_COHESION := 15.0
+const PILA_RANGE := 12.0
+const PILA_FOUL_STEPS := 50
+const PILA_BANDS := [0.60, 0.30]
+const ORBIS_POWER := 0.85
 const SCHEMA := 3
 const DEFAULT_SEED := 58
 ## Per-soldier speed cap. No member, and therefore no company anchor, moves faster.
@@ -38,7 +60,7 @@ const RETREAT_SPEED := MEMBER_SPEED
 ## falls deeper. Melee strikes hit the front; missiles reach further back (design values).
 const MELEE_BANDS := [0.80, 0.15]
 const MISSILE_BANDS := [0.40, 0.25]
-const MEMORY_EVENTS := ["first_contact", "officer_fallen", "banner_lost", "routed", "rallied"]
+const MEMORY_EVENTS := ["first_contact", "officer_fallen", "banner_lost", "routed", "rallied", "pila_volley", "charge_impact"]
 const MAX_MEMORIES := 24
 ## Morale and rally (design values, P3). A routed company only becomes ready again when
 ## it has rallied: morale at least RALLY_MORALE, RALLY_STEPS since the rally order took
@@ -53,25 +75,38 @@ const CONTAGION_SHOCK := 8.0
 const REAR_FACTOR := 1.5
 const BANNER_SHOCK := 15.0
 ## Squad keys added by schema 3. A legacy save carries none of them (or all of them).
-const SCHEMA3_KEYS := ["troop_id", "loadout", "drills", "uids", "people", "memories", "signifer_id", "rally_from"]
+const SCHEMA3_KEYS := ["troop_id", "loadout", "drills", "uids", "people", "memories", "signifer_id", "rally_from",
+	"commandable_by", "pila", "shields_fouled_until", "charge_bonus"]
 ## Data hook for later scenarios (outnumbered, defence, reinforcement, retreat,
 ## negotiation, capture). Only this test bench exists so far; build none of them here.
+## Command rights follow appointments (D-023, D-025): order() acts for an appointment,
+## and only companies that list it in commandable_by obey. Without an appointment (the
+## twelve-year-old in the campaign) nothing can be commanded.
 const VALLEY_SCENARIO := {
 	"id": "valley_58bc",
 	"year": -58,
+	"player_appointment": "legatus_valdora",
+	"appointments": {
+		"legatus_valdora": {"type": "legatus", "side": "ally"},
+		"centurio_valley_guard": {"type": "centurio", "side": "ally"},
+		"praefectus_valley_spears": {"type": "praefectus", "side": "ally"},
+		"praefectus_valley_bows": {"type": "praefectus", "side": "ally"},
+		"dux_hoehenbund": {"type": "dux", "side": "enemy"},
+		"princeps_ridge_guard": {"type": "princeps", "side": "enemy"},
+	},
 	"companies": [
 		{"id": "valley_guard", "title": "Talwache", "side": "ally", "kind": "infantry", "shape": "shield_wall", "at": Vector2(-7, 8), "count": 12,
-			"troop_id": "roman_miles", "origin": "gallia_cisalpina"},
+			"troop_id": "roman_miles", "origin": "gallia_cisalpina", "commandable_by": ["legatus_valdora", "centurio_valley_guard"]},
 		{"id": "valley_spears", "title": "Passwache", "side": "ally", "kind": "spear", "shape": "phalanx", "at": Vector2(5, 8), "count": 10,
-			"troop_id": "cisalpine_militia_spear", "origin": "valdora_district"},
+			"troop_id": "cisalpine_militia_spear", "origin": "valdora_district", "commandable_by": ["legatus_valdora", "praefectus_valley_spears"]},
 		{"id": "valley_bows", "title": "Talbogner", "side": "ally", "kind": "archer", "shape": "loose", "at": Vector2(1, 13), "count": 8,
-			"troop_id": "aux_sagittarius_creticus", "origin": "creta"},
+			"troop_id": "aux_sagittarius_creticus", "origin": "creta", "commandable_by": ["legatus_valdora", "praefectus_valley_bows"]},
 		{"id": "ridge_guard", "title": "Höhenbund", "side": "enemy", "kind": "infantry", "shape": "wedge", "at": Vector2(-8, -14), "count": 12,
-			"troop_id": "germanic_retainer", "origin": "hoehenbund"},
+			"troop_id": "germanic_retainer", "origin": "hoehenbund", "commandable_by": ["dux_hoehenbund", "princeps_ridge_guard"]},
 		{"id": "ridge_spears", "title": "Felsbanner", "side": "enemy", "kind": "spear", "shape": "line", "at": Vector2(6, -13), "count": 10,
-			"troop_id": "germanic_levy", "origin": "hoehenbund"},
+			"troop_id": "germanic_levy", "origin": "hoehenbund", "commandable_by": ["dux_hoehenbund"]},
 		{"id": "ridge_bows", "title": "Hangbogner", "side": "enemy", "kind": "archer", "shape": "loose", "at": Vector2(0, -18), "count": 8,
-			"troop_id": "germanic_bow_skirmisher", "origin": "hoehenbund"},
+			"troop_id": "germanic_bow_skirmisher", "origin": "hoehenbund", "commandable_by": ["dux_hoehenbund"]},
 	],
 }
 
@@ -83,6 +118,9 @@ var capture := 0
 var battle_seed := DEFAULT_SEED
 var year := -58
 var scenario: Dictionary = VALLEY_SCENARIO
+## Appointment the player currently holds; order() acts for it unless told otherwise.
+## Not saved: it belongs to the campaign's career state, not to the battle.
+var commander := ""
 ## Runtime measurement only (not saved): one entry per soldier taken out of the ranks.
 var casualty_log: Array = []
 var _remainder := 0.0
@@ -94,6 +132,7 @@ func _init(p_seed: int = DEFAULT_SEED, p_scenario: Dictionary = VALLEY_SCENARIO)
 	battle_seed = p_seed
 	scenario = p_scenario
 	year = int(scenario.year)
+	commander = str(scenario.get("player_appointment", ""))
 	for company: Dictionary in scenario.companies:
 		_plans[company.id] = company
 	for company: Dictionary in scenario.companies:
@@ -129,6 +168,30 @@ func _kit(troop: Dictionary) -> Dictionary:
 	return kit
 
 
+## Appointments that may command a company; each must exist in the scenario and be an
+## appointment type of the catalog valid in the scenario year.
+func _rights(id: String) -> Array:
+	var rights := []
+	var catalog := Catalog.load_default()
+	var appointments: Dictionary = scenario.get("appointments", {})
+	for appointment: String in _plans.get(id, {}).get("commandable_by", []):
+		var post: Dictionary = appointments.get(appointment, {})
+		var kind: Dictionary = catalog.appointments.get(post.get("type", ""), {}) if catalog.ok else {}
+		if kind.is_empty() or not Catalog.valid_at(kind, year):
+			push_error("Appointment %s of %s is not valid for %s." % [appointment, id, Catalog.year_label(year)])
+			continue
+		rights.append(appointment)
+	return rights
+
+
+## Sets the appointment the player holds ("" for none). Unknown appointments are refused.
+func set_commander(appointment: String) -> bool:
+	if appointment != "" and not scenario.get("appointments", {}).has(appointment):
+		return false
+	commander = appointment
+	return true
+
+
 func _add_squad(id: String, title: String, side: String, kind: String, shape: String, at: Vector2, count: int) -> void:
 	var facing := 0.0 if side == "ally" else PI
 	var troop := _troop_for(id, kind)
@@ -149,7 +212,10 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 		"wounded": 0, "dead": 0, "cohesion": 100.0, "reaction_seconds": 0.4, "ready_at": 0,
 		"troop_id": troop.troop_id, "loadout": _kit(troop), "drills": troop.drills.duplicate(true),
 		"uids": [], "people": {}, "memories": [],
-		"signifer_id": _soldier_id(id, 1) if count >= 5 else "", "rally_from": 0}
+		"signifer_id": _soldier_id(id, 1) if count >= 5 else "", "rally_from": 0,
+		"commandable_by": _rights(id), "pila": 0, "shields_fouled_until": 0, "charge_bonus": false}
+	if s.loadout.has("missile") and s.loadout.missile.family_id == "pilum":
+		s.pila = s.loadout.missile.count
 	var catalog := Catalog.load_default()
 	var plan: Dictionary = _plans.get(id, {})
 	var group: Dictionary = catalog.groups.get(plan.get("origin", ""), {}) if catalog.ok else {}
@@ -236,6 +302,7 @@ func soldiers(id: String) -> Array:
 		return result
 	var s: Dictionary = squads[id]
 	var ranks := Slots.ranks(s.formation, s.strength, s.width)
+	var ring: Array = Slots.world_slots(s.formation, s.strength, s.width, _pos(s), s.facing) if s.formation == "orbis" else []
 	for i in range(s.members.size()):
 		var m: Array = s.members[i]
 		var pose := "idle"
@@ -246,11 +313,17 @@ func soldiers(id: String) -> Array:
 		elif s.block_step >= 0 and steps - s.block_step < 3 and i % 2 == 0:
 			pose = "block"
 		elif s.action_step >= 0 and steps - s.action_step < (5 if s.last_action == "shoot" else 3):
-			pose = s.last_action
+			# No dedicated throwing clip exists yet; the pila throw uses the attack pose.
+			pose = "attack" if s.last_action == "throw" else s.last_action
 		elif s.status == "moving":
 			pose = "walk"
 		var uid: String = s.uids[i]
-		result.append({"id": uid, "x": m[0], "z": m[1], "facing": s.facing, "pose": pose, "rank": ranks[i],
+		var facing: float = s.facing
+		if not ring.is_empty():
+			# In the orbis every soldier faces outwards from the centre.
+			var out: Vector2 = ring[i] - _pos(s)
+			facing = atan2(-out.x, -out.y)
+		result.append({"id": uid, "x": m[0], "z": m[1], "facing": facing, "pose": pose, "rank": ranks[i],
 			"appearance_seed": s.people[uid].appearance_seed})
 	return result
 
@@ -279,7 +352,9 @@ func preview(id: String, start: Vector2, end: Vector2) -> Array:
 	if span.length() < 0.75 or not Field.clear_segment(start, end):
 		return []
 	var s: Dictionary = squads[id]
-	var shape: String = s.formation if s.pending_formation == "" else s.pending_formation
+	var shape := _shape(s)
+	if shape == "orbis":
+		return []
 	var points := Slots.world_slots(shape, s.strength, span.length(), (start + end) * 0.5, -span.angle())
 	for point in points:
 		if not Field.clear_segment(point, point):
@@ -303,7 +378,25 @@ func preview_group(ids: Array, start: Vector2, end: Vector2) -> Array:
 
 
 static func can_form(kind: String, shape: String) -> bool:
-	return FORMATIONS.has(shape) and (not EQUIPPED_FORMATIONS.has(shape) or kind in EQUIPPED_FORMATIONS[shape])
+	return SHAPES.has(shape) and (not EQUIPPED_FORMATIONS.has(shape) or kind in EQUIPPED_FORMATIONS[shape])
+
+
+## Company-level gate: troop kind, then shield and drill from the issued kit.
+func _form_problem(s: Dictionary, shape: String) -> String:
+	if not can_form(s.kind, shape):
+		return "Die Ausrüstung passt nicht zu dieser Formation."
+	var shield: String = s.loadout.get("shield", {}).get("family_id", "")
+	if shape in ["shield_wall", "testudo", "orbis"] and shield == "":
+		return "Ohne Schilde ist diese Formation nicht möglich."
+	if shape == "testudo" and (shield != "scutum" or int(s.drills.get("testudo", 0)) < 2):
+		return "Das Schilddach verlangt Scuta und eingeübten Drill (Stufe 2)."
+	if shape == "orbis" and int(s.drills.get("orbis", 0)) < 1:
+		return "Der Kreis ist für diesen Verband nicht eingeübt."
+	return ""
+
+
+func _shape(s: Dictionary) -> String:
+	return s.formation if s.pending_formation == "" else s.pending_formation
 
 
 func _queue_formation(s: Dictionary, shape: String) -> void:
@@ -322,31 +415,76 @@ func _reply(ok: bool, message: String) -> Dictionary:
 	return {"ok": ok, "message": message}
 
 
-func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
+## Issues an order for the appointment `by` (default: the player's appointment).
+## Every check runs before anything changes, so a rejected order leaves no trace.
+func order(ids: Array, command: String, target: Variant = null, by: String = "") -> Dictionary:
 	if outcome != "ongoing" or ids.is_empty() or not COMMANDS.has(command):
 		return _reply(false, "Kein gültiger Befehl für diesen Gefechtsstand.")
+	var issuer := by if by != "" else commander
+	if issuer == "":
+		return _reply(false, "Ohne Ernennung gibt es kein Befehlsrecht.")
 	var destinations := {}
 	var group_center := Vector2.ZERO
 	for id in ids:
 		if typeof(id) != TYPE_STRING or not squads.has(id) or destinations.has(id):
 			return _reply(false, "Ungültige Verbandsauswahl.")
 		var s: Dictionary = squads[id]
-		if s.side != "ally" or s.strength < 1 or s.status == "withdrawn":
+		if s.side != "ally" or s.strength < 1 or s.status == "withdrawn" or not issuer in s.commandable_by:
 			return _reply(false, "Dieser Verband untersteht dem Befehl nicht.")
 		if s.status in ["routed", "rallying"] and command != "rally":
 			return _reply(false, "Der Verband flieht. Sammeln ist noch möglich.")
-		if command == "form" and (typeof(target) != TYPE_STRING or not can_form(s.kind, target)):
-			return _reply(false, "Die Ausrüstung passt nicht zu dieser Formation.")
+		if command == "form":
+			if typeof(target) != TYPE_STRING:
+				return _reply(false, "Die Ausrüstung passt nicht zu dieser Formation.")
+			var problem := _form_problem(s, target)
+			if problem != "":
+				return _reply(false, problem)
 		if command == "focus_fire" and s.kind == "archer" and s.ammo == 0:
 			return _reply(false, "Keine Salven mehr verfügbar.")
-		if command in ["focus_fire", "cease_fire"] and s.kind != "archer":
+		if command in ["focus_fire", "cease_fire", "fire_at_will"] and s.kind != "archer":
 			return _reply(false, "Dieser Befehl benötigt einen Schützenverband.")
+		if command in ["charge", "pila"] and s.kind == "archer":
+			return _reply(false, "Schützenverbände führen diesen Befehl nicht aus.")
+		if command == "pila" and s.pila < 1:
+			return _reply(false, "Keine Pila mehr vorhanden.")
+		if command in MOVING_COMMANDS and _shape(s) == "orbis":
+			return _reply(false, "Aus dem Kreis kann der Verband nicht marschieren. Zuerst eine andere Formation befehlen.")
 		destinations[id] = _pos(s)
+		if command == "fall_back":
+			var back := _pos(s) - _front(s) * FALL_BACK_DISTANCE
+			if not Field.clear_segment(_pos(s), back):
+				return _reply(false, "Hinter dem Verband fehlt Platz zum Zurückfallen.")
+			destinations[id] = back
 		group_center += _pos(s)
 	group_center /= float(ids.size())
-	if command in ["attack", "flank", "focus_fire"]:
+	if command == "advance" and target == null:
+		var closest := INF
+		for enemy: Dictionary in squads.values():
+			if enemy.side == "enemy" and _active(enemy) and group_center.distance_to(_pos(enemy)) < closest:
+				closest = group_center.distance_to(_pos(enemy))
+				target = enemy.id
+		if target == null:
+			return _reply(false, "Kein gegnerischer Verband in Sicht.")
+	if command in ENEMY_TARGETED:
 		if typeof(target) != TYPE_STRING or not squads.has(target) or squads[target].side != "enemy" or not _active(squads[target]):
 			return _reply(false, "Ein aktiver gegnerischer Verband wird benötigt.")
+	if command == "follow":
+		if typeof(target) != TYPE_STRING or not squads.has(target) or target in ids or squads[target].side != "ally" or not _active(squads[target]):
+			return _reply(false, "Ein anderer aktiver eigener Verband wird als Führung benötigt.")
+		var link: String = target
+		for i in squads.size():
+			var leader: Dictionary = squads[link]
+			if leader.command != "follow" or leader.target == "":
+				break
+			link = leader.target
+			if link in ids:
+				return _reply(false, "Verbände können einander nicht im Kreis folgen.")
+	if command == "face":
+		if typeof(target) != TYPE_VECTOR2 or not target.is_finite():
+			return _reply(false, "Eine Blickrichtung auf dem Gelände wird benötigt.")
+		for id in ids:
+			if _pos(squads[id]).distance_to(target) < 0.5:
+				return _reply(false, "Die Blickrichtung liegt zu nah am Verband.")
 	if command in ["move", "attack_move", "defend"]:
 		if command == "defend" and target == null:
 			target = group_center
@@ -356,6 +494,8 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 			var dest: Vector2 = target + (_pos(squads[id]) - group_center)
 			if not Field.clear_segment(dest, dest):
 				return _reply(false, "Für die Gruppe fehlt Platz am Ziel.")
+			if command == "defend" and _shape(squads[id]) == "orbis" and dest.distance_to(_pos(squads[id])) > 0.01:
+				return _reply(false, "Aus dem Kreis kann der Verband nicht marschieren. Zuerst eine andere Formation befehlen.")
 			destinations[id] = dest
 	if command == "deploy":
 		if typeof(target) != TYPE_DICTIONARY or typeof(target.get("start")) != TYPE_VECTOR2 or typeof(target.get("end")) != TYPE_VECTOR2:
@@ -367,6 +507,12 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 		var s: Dictionary = squads[id]
 		if command == "form":
 			_queue_formation(s, target)
+			if target == "orbis":
+				# Forming the circle halts the company where it stands.
+				s.command = "hold"
+				s.target = ""
+				s.charge_bonus = false
+				_set_goal(s, _pos(s))
 			continue
 		if command == "rally" and s.status == "rallying":
 			continue
@@ -374,8 +520,16 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 		if command == "cease_fire":
 			s.fire = false
 			continue
+		if command == "fire_at_will":
+			s.fire = true
+			if s.command == "focus_fire":
+				s.command = "hold"
+				s.target = ""
+				_set_goal(s, _pos(s))
+			continue
 		s.command = command
 		s.target = ""
+		s.charge_bonus = false
 		match command:
 			"deploy":
 				var line := _segment(ids, i, target.start, target.end)
@@ -386,6 +540,17 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 			"attack", "flank", "focus_fire":
 				s.target = target
 				s.fire = true
+			"charge":
+				s.target = target
+				s.charge_bonus = true
+			"pila", "advance", "follow":
+				s.target = target
+			"face":
+				s.goal_facing = _bearing(s, target)
+				_set_goal(s, _pos(s))
+			"fall_back":
+				s.goal_facing = s.facing
+				_set_goal(s, destinations[id])
 			"retreat": _set_goal(s, Vector2(s.x, 20))
 			"move", "attack_move", "defend": _set_goal(s, destinations[id])
 			"rally":
@@ -399,6 +564,11 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 				_set_goal(s, _pos(s))
 			_: _set_goal(s, _pos(s))
 	return _reply(true, "Befehl bestätigt.")
+
+
+func _bearing(s: Dictionary, p: Vector2) -> float:
+	var direction := _pos(s).direction_to(p)
+	return atan2(-direction.x, -direction.y)
 
 
 func tick(delta: float) -> void:
@@ -486,7 +656,7 @@ func _ai(s: Dictionary, enemy: Dictionary) -> void:
 			s.command = "attack"
 			s.ai_reason = "Gegner am Talweg"
 		s.target = enemy.id
-		if enemy.kind == "archer" and enemy.ammo > 0 and s.kind == "infantry":
+		if enemy.kind == "archer" and enemy.ammo > 0 and s.kind == "infantry" and _form_problem(s, "shield_wall") == "":
 			_queue_formation(s, "shield_wall")
 			s.ai_reason = "Schließt die Schilde unter Beschuss"
 	else:
@@ -579,7 +749,7 @@ func casualty_morale(s: Dictionary, lost: int, sources: Array) -> float:
 
 
 func _from_rear(s: Dictionary, at: Vector2) -> bool:
-	return _front(s).dot(_pos(s).direction_to(at)) < -0.5
+	return s.formation != "orbis" and _front(s).dot(_pos(s).direction_to(at)) < -0.5
 
 
 func _check_rout(s: Dictionary, cause: String) -> bool:
@@ -710,7 +880,7 @@ func _choose_casualties(s: Dictionary, lost: int, sources: Array) -> Array[Strin
 		for i in alive:
 			exposure[i] = (Vector2(s.members[i][0], s.members[i][1]) - _pos(s)).dot(dir)
 			highest = maxf(highest, exposure[i])
-		var weights: Array = MELEE_BANDS if source.mode == "melee" else MISSILE_BANDS
+		var weights: Array = MELEE_BANDS if source.mode == "melee" else (PILA_BANDS if source.mode == "pila" else MISSILE_BANDS)
 		var r := Roster.roll(battle_seed, salt, steps, k * 4 + 1)
 		var band := 0 if r < weights[0] else (1 if r < weights[0] + weights[1] else 2)
 		var candidates := []
@@ -760,31 +930,43 @@ func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
 		return
 	var dest := Vector2(s.goal_x, s.goal_z)
 	var enemy := nearest
+	var leader := {}
 	if s.target != "":
 		var designated: Dictionary = squads[s.target]
-		if _active(designated):
-			enemy = designated
-		else:
+		if not _active(designated):
 			s.target = ""
 			s.command = "hold"
+			s.charge_bonus = false
 			_set_goal(s, _pos(s))
 			dest = _pos(s)
+		elif s.command == "follow":
+			leader = designated
+		else:
+			enemy = designated
 	var ranged: bool = s.kind == "archer" and s.ammo > 0
 	var reach := 11.5 if ranged else 3.5
 	var dist := INF if enemy.is_empty() else _pos(s).distance_to(_pos(enemy))
 	var contact := not enemy.is_empty() and dist <= reach and Field.clear_segment(_pos(s), _pos(enemy))
-	var pursue: bool = s.command in ["attack", "flank", "focus_fire"] or (s.command == "attack_move" and dist < 7.0)
+	var pursue: bool = s.command in ["attack", "flank", "focus_fire", "charge", "pila", "advance"] or (s.command == "attack_move" and dist < 7.0)
 	if pursue and not enemy.is_empty():
 		dest = _pos(enemy)
 		if s.command == "flank" and dist > 7:
 			dest = Field.project(dest + Vector2(5 if s.x > enemy.x else -5, 1))
-	var engaged: bool = contact and s.command not in ["move", "deploy", "retreat", "rally"] and (not ranged or s.fire)
 	s.status = "ready"
+	if s.command == "pila" and not enemy.is_empty() and dist <= PILA_RANGE and Field.clear_segment(_pos(s), _pos(enemy)):
+		_throw_pila(s, enemy, hits)
+		return
+	if s.command == "advance" and not enemy.is_empty() and not contact:
+		if dist <= ADVANCE_STANDOFF + 0.3:
+			# Stop short and keep the enemy in front.
+			s.facing = rotate_toward(s.facing, _bearing(s, _pos(enemy)), STEP * TURN_RATE)
+			return
+		dest = Field.project(_pos(enemy) + _pos(enemy).direction_to(_pos(s)) * ADVANCE_STANDOFF)
+	var engaged: bool = contact and s.command not in ["move", "deploy", "retreat", "rally", "fall_back"] and (not ranged or s.fire)
 	if engaged:
 		s.status = "engaged"
-		var direction := _pos(s).direction_to(_pos(enemy))
-		var bearing := atan2(-direction.x, -direction.y)
-		s.facing = rotate_toward(s.facing, bearing, STEP * 3.6)
+		var bearing := _bearing(s, _pos(enemy))
+		s.facing = rotate_toward(s.facing, bearing, STEP * TURN_RATE)
 		var aligned := absf(angle_difference(s.facing, bearing)) <= 0.3
 		var interval := VOLLEY_STEPS if ranged else STRIKE_STEPS
 		var recovered: bool = s.action_step < 0 or steps - s.action_step >= interval
@@ -797,6 +979,12 @@ func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
 			if _shield_factor(s, enemy, ranged) < 1.0:
 				enemy.block_step = steps
 			var damage := _attack_power(s, enemy, ranged) * STEP * interval
+			if s.command == "charge" and s.charge_bonus and not ranged:
+				# The impact of the charge counts once; then it is an ordinary melee.
+				damage *= CHARGE_BONUS
+				s.charge_bonus = false
+				s.command = "attack"
+				_remember(s, "charge_impact", enemy.id)
 			_add_hit(hits, s, enemy, damage, "missile" if ranged else "melee")
 			_credit(s, ranged)
 		s.fatigue = minf(100, s.fatigue + STEP)
@@ -804,20 +992,70 @@ func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
 		s.fatigue = maxf(0, s.fatigue - 2 * STEP)
 		if s.command == "rally" and s.morale < 78.0:
 			s.morale = minf(78.0, s.morale + RALLY_RATE * STEP * _bond_factor(s))
+	elif s.command == "face":
+		s.facing = rotate_toward(s.facing, s.goal_facing, STEP * TURN_RATE)
+		if absf(angle_difference(s.facing, s.goal_facing)) < 0.0001:
+			s.facing = s.goal_facing
+			s.command = "hold"
 	elif pursue and contact:
 		pass
+	elif s.command == "follow" and not leader.is_empty():
+		var spot := _follow_spot(s, leader)
+		if _pos(s).distance_to(spot) <= 0.5:
+			s.facing = rotate_toward(s.facing, leader.facing, STEP * TURN_RATE)
+		else:
+			_walk(s, spot, 2.3 if s.formation == "column" else 1.85)
 	else:
 		var speed := 2.3 if s.formation == "column" else 1.85
 		if s.command == "retreat":
 			speed = RETREAT_SPEED
-		if _walk(s, dest, speed):
+		elif s.command == "charge":
+			speed = CHARGE_SPEED
+		elif s.command == "fall_back":
+			speed = FALL_BACK_SPEED
+		if _walk(s, dest, speed, s.command == "fall_back"):
 			if s.command == "deploy":
 				s.facing = s.goal_facing
 			if s.command == "retreat":
 				s.status = "withdrawn"
-			elif s.command in ["deploy", "move"]:
+			elif s.command in ["deploy", "move", "fall_back"]:
 				s.command = "hold"
 				_set_goal(s, _pos(s))
+
+
+## One volley of pila (Caes. Gall. 1,25): consumes exactly one pilum per man, fouls the
+## target's shields for PILA_FOUL_STEPS and returns the company to hold.
+func _throw_pila(s: Dictionary, enemy: Dictionary, hits: Dictionary) -> void:
+	var bearing := _bearing(s, _pos(enemy))
+	s.facing = rotate_toward(s.facing, bearing, STEP * TURN_RATE)
+	var recovered: bool = s.action_step < 0 or steps - s.action_step >= STRIKE_STEPS
+	if absf(angle_difference(s.facing, bearing)) > 0.3 or not recovered:
+		return
+	s.pila -= 1
+	s.action_step = steps
+	s.last_action = "throw"
+	if _shield_factor(s, enemy, true) < 1.0:
+		enemy.block_step = steps
+	_add_hit(hits, s, enemy, _attack_power(s, enemy, true) * STEP * VOLLEY_STEPS, "pila")
+	enemy.shields_fouled_until = steps + PILA_FOUL_STEPS
+	_credit(s, true)
+	_remember(s, "pila_volley", enemy.id)
+	s.command = "hold"
+	s.target = ""
+	_set_goal(s, _pos(s))
+
+
+func _depth(s: Dictionary) -> float:
+	if s.formation == "orbis":
+		return 2.0 * Slots.ring_radius(s.strength)
+	var ranks := Slots.ranks(s.formation, s.strength, s.width)
+	return (ranks.max() + 1 if not ranks.is_empty() else 1) * Slots.rank_depth(s.formation)
+
+
+## The place behind the leading company, keeping a 2 m gap between the formations.
+func _follow_spot(s: Dictionary, leader: Dictionary) -> Vector2:
+	var gap := (_depth(s) + _depth(leader)) * 0.5 + 2.0
+	return Field.project(_pos(leader) - _front(leader) * gap)
 
 
 func _attack_power(s: Dictionary, enemy: Dictionary, ranged: bool) -> float:
@@ -829,24 +1067,31 @@ func _attack_power(s: Dictionary, enemy: Dictionary, ranged: bool) -> float:
 	guard *= _shield_factor(s, enemy, ranged)
 	if s.formation == "phalanx" and s.kind == "spear":
 		power *= 1.12
+	if s.formation == "orbis":
+		power *= ORBIS_POWER
 	return power * guard * (0.043 if ranged else 0.075)
 
 
 func _shield_factor(s: Dictionary, enemy: Dictionary, ranged: bool) -> float:
+	if enemy.shields_fouled_until > steps:
+		return 1.0
 	if ranged and enemy.formation == "testudo":
 		return 0.62
+	if enemy.formation == "orbis":
+		return 0.72 if ranged else 0.87
 	var front := Vector2(-sin(enemy.facing), -cos(enemy.facing))
 	if enemy.formation == "shield_wall" and front.dot(_pos(enemy).direction_to(_pos(s))) > 0.25:
 		return 0.72 if ranged else 0.87
 	return 1.0
 
 
-func _walk(s: Dictionary, dest: Vector2, speed: float) -> bool:
+func _walk(s: Dictionary, dest: Vector2, speed: float, keep_facing: bool = false) -> bool:
 	var at := _pos(s)
 	var next := _field.next_position(at, dest, speed * STEP)
 	if next != at:
 		var dir := at.direction_to(next)
-		s.facing = atan2(-dir.x, -dir.y)
+		if not keep_facing:
+			s.facing = atan2(-dir.x, -dir.y)
 		s.x = next.x
 		s.z = next.y
 		s.fatigue = minf(100, s.fatigue + 0.22 * STEP)
@@ -870,6 +1115,9 @@ func _align_members(s: Dictionary) -> void:
 		s.members[i] = [next.x, next.y]
 		deviation += next.distance_to(goals[i])
 	s.cohesion = clampf(100.0 - 12.0 * deviation / maxi(1, slots.size()), 0, 100)
+	if s.command == "charge":
+		# Running at the enemy loosens the ranks.
+		s.cohesion = maxf(0.0, s.cohesion - CHARGE_COHESION)
 
 
 func _assign_slots(s: Dictionary, goals: Array[Vector2]) -> void:
@@ -990,6 +1238,16 @@ func _migrate_v2(s: Dictionary, original: Dictionary) -> Variant:
 	for i in range(int(s.strength)):
 		s.uids.append(_soldier_id(original.id, i))
 	s.signifer_id = original.signifer_id if original.signifer_id in s.uids else ""
+	s.commandable_by = original.commandable_by.duplicate()
+	s.pila = original.pila
+	s.shields_fouled_until = 0
+	s.charge_bonus = false
+	# Older rules gated formations by kind only; the kit and drill now decide.
+	if typeof(s.get("formation")) == TYPE_STRING and _form_problem(original, s.formation) != "":
+		s.formation = "line"
+	if typeof(s.get("pending_formation")) == TYPE_STRING and s.pending_formation != "" and _form_problem(original, s.pending_formation) != "":
+		s.pending_formation = ""
+		s.formation_at = 0
 	s.people = original.people.duplicate(true)
 	var k := 0
 	for index in range(original.initial_strength - 1, int(s.strength) - 1, -1):
@@ -1073,7 +1331,7 @@ func restore(save: Dictionary) -> bool:
 			if not Roster.integral(s[key]):
 				return false
 			s[key] = Roster.integers(s[key])
-		for key in ["id", "army_id", "side", "name", "kind", "initial_strength", "equipment", "experience", "discipline", "commander_id", "deputy_id", "troop_id", "loadout", "drills"]:
+		for key in ["id", "army_id", "side", "name", "kind", "initial_strength", "equipment", "experience", "discipline", "commander_id", "deputy_id", "troop_id", "loadout", "drills", "commandable_by"]:
 			if s.get(key) != original[key]:
 				return false
 		if not _number(s.get("strength"), 0, original.initial_strength, true) or typeof(s.get("members")) != TYPE_ARRAY or s.members.size() != s.strength:
@@ -1101,9 +1359,15 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if (s.pending_formation == "") != (s.formation_at == 0):
 			return false
-		if s.pending_formation != "" and (not can_form(s.kind, s.pending_formation) or (s.formation_at <= save.steps and s.status not in ["destroyed","withdrawn"])):
+		if s.pending_formation != "" and (_form_problem(original, s.pending_formation) != "" or (s.formation_at <= save.steps and s.status not in ["destroyed","withdrawn"])):
 			return false
-		if s.last_action not in ["","attack","shoot"] or s.last_action == "shoot" and s.kind != "archer":
+		if s.last_action not in ["","attack","shoot","throw"] or s.last_action == "shoot" and s.kind != "archer":
+			return false
+		if not _number(s.get("pila"), 0, original.pila, true) or not _number(s.get("shields_fouled_until"), 0, save.steps + PILA_FOUL_STEPS, true) or typeof(s.get("charge_bonus")) != TYPE_BOOL:
+			return false
+		if s.last_action == "throw" and (s.kind == "archer" or s.pila >= original.pila):
+			return false
+		if s.charge_bonus and s.get("command") != "charge":
 			return false
 		for key in ["action_step", "hit_step", "block_step"]:
 			if not _number(s[key], -1, save.steps, true) or s[key] == 0:
@@ -1118,15 +1382,17 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if s.reaction_seconds < 2 * STEP or s.reaction_seconds > 7 * STEP + 0.00001:
 			return false
-		if typeof(s.formation) != TYPE_STRING or not can_form(s.kind, s.formation) or not COMMANDS.has(s.get("command")) or not s.get("status") in ["ready","engaged","moving","routed","rallying","withdrawn","destroyed"]:
+		if typeof(s.formation) != TYPE_STRING or _form_problem(original, s.formation) != "" or not COMMANDS.has(s.get("command")) or not s.get("status") in ["ready","engaged","moving","routed","rallying","withdrawn","destroyed"]:
 			return false
 		if typeof(s.get("fire")) != TYPE_BOOL or typeof(s.get("ai_reason")) != TYPE_STRING or typeof(s.get("target")) != TYPE_STRING:
 			return false
-		if s.command in ["form", "cease_fire"] or (s.command == "focus_fire" and s.kind != "archer"):
+		if s.command in MODIFIERS or (s.command == "focus_fire" and s.kind != "archer") or (s.command in ["charge", "pila"] and s.kind == "archer"):
 			return false
-		if s.command in ["attack","flank","focus_fire"] and s.target == "":
+		if (s.command in ENEMY_TARGETED or s.command == "follow") and s.target == "":
 			return false
-		if s.target != "" and (not reference.squads.has(s.target) or reference.squads[s.target].side == original.side):
+		if s.target != "" and (not reference.squads.has(s.target) or s.target == id or (reference.squads[s.target].side == original.side) != (s.command == "follow")):
+			return false
+		if (s.command == "pila" and s.pila < 1) or (_shape(s) == "orbis" and s.command in MOVING_COMMANDS):
 			return false
 		if not _number(s.get("morale"), 0, 100) or not _number(s.get("fatigue"), 0, 100) or not _number(s.get("damage"), 0, 1) or not _number(s.get("width"), 0, 80):
 			return false
@@ -1145,7 +1411,7 @@ func restore(save: Dictionary) -> bool:
 			if not Field.clear_segment(Vector2(m[0], m[1]), Vector2(m[0], m[1])):
 				return false
 		restored[id] = s.duplicate(true)
-		for key in ["strength", "initial_strength", "action_step", "hit_step", "block_step", "formation_at", "ready_at", "next_volley", "ammo", "experience", "discipline", "wounded", "dead", "rally_from"]:
+		for key in ["strength", "initial_strength", "action_step", "hit_step", "block_step", "formation_at", "ready_at", "next_volley", "ammo", "experience", "discipline", "wounded", "dead", "rally_from", "pila", "shields_fouled_until"]:
 			restored[id][key] = int(s[key])
 	if _result(restored, int(save.steps), int(save.capture)) != [save.outcome, save.reason]:
 		return false

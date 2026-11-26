@@ -7,6 +7,9 @@ const Landscape = preload("res://scripts/tactics/valley_landscape.gd")
 const HUD = preload("res://scripts/tactics/valley_hud.gd")
 const Soldier = preload("res://scripts/visuals/soldier_visual.gd")
 const SIDES := {"ally":Color("#67d7c4"),"enemy":Color("#e58663")}
+## Orders that need a tapped company or a tapped ground point after choosing them.
+const ENEMY_PICK := ["attack","flank","focus_fire","charge","pila"]
+const GROUND_PICK := ["move","attack_move","face"]
 var model = Rules.new()
 var hud = HUD.new()
 var land = Landscape.new()
@@ -299,9 +302,14 @@ func _action(action: String,arg: String = "") -> void:
 		"select": _select(arg,hud.group_button.button_pressed)
 		"form": _issue("form",arg)
 		"command":
-			if arg in ["move","attack_move","attack","flank","focus_fire"]:
+			if arg in ENEMY_PICK or arg in GROUND_PICK or arg == "follow":
 				pending = arg
-				message = "Gegnerischen Verband wählen." if arg in ["attack","flank","focus_fire"] else "Ziel auf dem Gelände wählen."
+				if arg in ENEMY_PICK:
+					message = "Gegnerischen Verband wählen."
+				elif arg == "follow":
+					message = "Eigenen Verband wählen, dem gefolgt wird."
+				else:
+					message = "Blickrichtung auf dem Gelände wählen." if arg == "face" else "Ziel auf dem Gelände wählen."
 			else:
 				_issue(arg)
 	_refresh()
@@ -318,7 +326,11 @@ func _select(id: String, add: bool) -> void:
 			selected.append(id)
 	pending = ""
 	var s: Dictionary = model.squads[id]
-	message = "%s · %s · Moral %d · Erschöpfung %d" % [s.name,model.FORMATIONS[s.formation],s.morale,s.fatigue]
+	message = "%s · %s · Moral %d · Erschöpfung %d" % [s.name,model.SHAPES[s.formation],s.morale,s.fatigue]
+	if s.pila > 0:
+		message += " · Pila %d" % s.pila
+	if s.status == "rallying":
+		message += " · sammelt sich"
 	_refresh()
 
 func _issue(command: String, arg: Variant = null) -> void:
@@ -362,7 +374,7 @@ func _pick(pixel: Vector2) -> String:
 func _tap(pixel: Vector2, command_click: bool, add: bool) -> void:
 	var id := _pick(pixel)
 	if not pending.is_empty():
-		if pending in ["attack","flank","focus_fire"]:
+		if pending in ENEMY_PICK or pending == "follow":
 			_issue(pending,id)
 		else:
 			_issue(pending,_ground(pixel))
