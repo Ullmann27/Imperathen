@@ -43,6 +43,7 @@ const PHASE_LOCK := 0.012
 const STEP_OFFSET := 0.04
 const DEATH_SECONDS := 1.25
 const GAIT_HOLD_TICKS := 12
+const ACTION_SPEED_M_S := 0.08
 const ACTIONS := ["attack", "shoot", "block", "hit"]
 
 
@@ -649,8 +650,8 @@ func _decide(a: Agent) -> void:
 	elif slot_velocity.length() < 0.05:
 		a.settled = true
 		desired = Vector2.ZERO
-	if a.model_pose in ACTIONS and u.lead < 0.05 and dist < 1.0:
-		# A striking, shooting or bracing man plants his feet.
+	if a.model_pose in ACTIONS and (a.contact or (u.lead < 0.05 and dist < 1.0)):
+		# A striking, shooting or bracing man plants his feet, also in the press.
 		desired = Vector2.ZERO
 	if desired.length() > cap:
 		desired = desired.normalized() * cap
@@ -859,7 +860,8 @@ func _animate(a: Agent) -> void:
 		a.gait_tick = tick
 	a.gait = gait
 	var pose := gait
-	if a.model_pose in ACTIONS and absf(s) < 0.5:
+	if a.model_pose in ACTIONS and absf(s) < ACTION_SPEED_M_S:
+		# Action clips have no locomotion; they start once the man has stopped.
 		pose = a.model_pose
 	elif gait == "idle":
 		pose = "wall" if u.formation == "shield_wall" else ("testudo" if u.formation == "testudo" else "idle")

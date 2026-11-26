@@ -60,7 +60,7 @@ func _blank() -> Dictionary:
 		"max_turn_deg_s": 0.0, "turns": [], "max_slip_speed_m_s": 0.0, "max_slip_0_5s_m": 0.0,
 		"slip_windows_over_0_04_m": 0, "slip_windows_over_0_015_m": 0, "slip_windows": 0,
 		"max_translation_slip_0_5s_m": 0.0, "translation_windows_over_0_04_m": 0, "translation_windows_over_0_015_m": 0,
-		"max_rotation_slip_0_5s_m": 0.0, "worst": {},
+		"max_rotation_slip_0_5s_m": 0.0, "worst": {}, "translation_over_0_04_by_pose": {},
 		"same_unit_overlap_max_m": 0.0, "same_unit_overlap_pairs": 0, "same_unit_spacing_violations": 0,
 		"cross_unit_overlap_max_m": 0.0, "cross_unit_overlap_pairs": 0, "rock_overlap_max_m": 0.0,
 		"pair_samples": 0, "min_same_unit_distance_m": 1e9, "same_unit_closer_0_62_m": 0,
@@ -380,6 +380,10 @@ func _observe(t: float) -> void:
 					sample.slip_windows_over_0_015_m += 1
 				if moved.x > 0.04:
 					sample.translation_windows_over_0_04_m += 1
+					var kind := "gait" if pose in GAITS else ("action" if pose in ["attack", "hit", "shoot", "block"] else "stance")
+					if pose != str(track.pose):
+						kind += "_change"
+					sample.translation_over_0_04_by_pose[kind] = int(sample.translation_over_0_04_by_pose.get(kind, 0)) + 1
 				if moved.x > 0.015:
 					sample.translation_windows_over_0_015_m += 1
 		# Level-of-detail switches at the same instant: rig pose versus far mirror.
