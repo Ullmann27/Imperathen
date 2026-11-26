@@ -93,6 +93,16 @@ class Agent:
 	var crowded := true
 	var correction := Vector2.ZERO
 	var gait_tick := -1000
+	# Hot-loop copies of the troop limits and of the company (no lookups).
+	var unit: Object = null
+	var l_walk := 0.0
+	var l_run := 0.0
+	var l_charge := 0.0
+	var l_accel := 0.0
+	var l_brake := 0.0
+	var l_turn := 0.0
+	var l_lateral := 0.0
+	var l_back := 0.0
 	var serial := 0
 	var foe_distance := INF
 	var asleep := false
@@ -314,6 +324,15 @@ func _create(uid: String, s: Dictionary, man: Dictionary, u: Unit, index: int) -
 	a.kind = s.kind
 	a.role = _role(s, str(man.id))
 	a.limits = Troop.limits(s.kind)
+	a.unit = u
+	a.l_walk = float(a.limits.walk)
+	a.l_run = float(a.limits.run)
+	a.l_charge = float(a.limits.charge)
+	a.l_accel = float(a.limits.accel)
+	a.l_brake = float(a.limits.brake)
+	a.l_turn = deg_to_rad(float(a.limits.turn))
+	a.l_lateral = float(a.limits.lateral_accel)
+	a.l_back = float(a.limits.back)
 	a.pos = Vector2(man.x, man.z)
 	a.prev_pos = a.pos
 	a.yaw = float(s.facing) + PI
@@ -624,8 +643,7 @@ func _lap(phase: String, since: int) -> int:
 ## arrival braking, spacing, contact, rocks). Level C decides at a third of
 ## the rate (staggered by uid) and keeps integrating the last decision.
 func _decide(a: Agent) -> void:
-	var u: Unit = units[a.squad]
-	var lim := a.limits
+	var u: Unit = a.unit
 	if a.slot >= u.slot_world.size():
 		a.desired = Vector2.ZERO
 		return
@@ -649,13 +667,13 @@ func _decide(a: Agent) -> void:
 	var slot_velocity: Vector2 = u.slot_vel[a.slot]
 	var to := target - a.pos
 	var dist := to.length()
-	var cap := float(lim.walk)
+	var cap := a.l_walk
 	if u.status == "routed" or a.model_pose == "retreat" or a.leaving:
-		cap = float(lim.run)
+		cap = a.l_run
 	if u.charging or dist > 2.5:
-		cap = float(lim.charge)
+		cap = a.l_charge
 	elif dist > 1.2:
-		cap = maxf(cap, float(lim.run))
+		cap = maxf(cap, a.l_run)
 	var desired := slot_velocity
 	# The press holds a man only near his own place in a company that still
 	# stands; a man cut off from it, routing or leaving disengages.
@@ -667,7 +685,7 @@ func _decide(a: Agent) -> void:
 	var settle := CONTACT_SETTLE_M if held else (RESUME_M if a.settled else SETTLE_M)
 	if dist > settle:
 		a.settled = false
-		var approach := minf(sqrt(2.0 * float(lim.brake) * 0.6 * dist), 1.8 * dist)
+		var approach := minf(sqrt(2.0 * a.l_brake * 0.6 * dist), 1.8 * dist)
 		desired += to / dist * approach
 	elif slot_velocity.length() < 0.05:
 		a.settled = true
@@ -685,7 +703,7 @@ func _decide(a: Agent) -> void:
 	if desired_speed > 0.04:
 		var direction := desired / desired_speed
 		var front := Vector2(sin(face_yaw), cos(face_yaw))
-		if direction.dot(front) < -0.5 and (held or (desired_speed <= float(lim.back) * 1.5 and dist < 1.0 \
+		if direction.dot(front) < -0.5 and (held or (desired_speed <= a.l_back * 1.5 and dist < 1.0 \
 				and slot_velocity.length() < 0.3 and not u.charging)):
 			# Step back facing the front; in contact never turn away.
 			a.reverse = true
@@ -707,21 +725,20 @@ func _decide(a: Agent) -> void:
 ## while walking), speed along the heading only (no sideways gliding),
 ## acceleration and braking limits.
 func _integrate(a: Agent) -> void:
-	var lim := a.limits
-	var omega := deg_to_rad(float(lim.turn))
+	var omega := a.l_turn
 	if absf(a.speed) > 0.5:
-		omega = minf(omega, float(lim.lateral_accel) / absf(a.speed))
+		omega = minf(omega, a.l_lateral / absf(a.speed))
 	a.yaw = rotate_toward(a.yaw, a.heading, omega * DT)
 	var forward := Vector2(sin(a.yaw), cos(a.yaw))
 	var along := a.desired.dot(forward)
 	var wanted := 0.0
 	if a.reverse:
-		wanted = clampf(along, -float(lim.back), 0.0)
+		wanted = clampf(along, -a.l_back, 0.0)
 	else:
 		wanted = clampf(along, 0.0, a.cap)
 		if absf(angle_difference(a.yaw, a.heading)) > deg_to_rad(70.0):
 			wanted = 0.0
-	var rate := float(lim.accel) if absf(wanted) > absf(a.speed) and wanted * a.speed >= 0.0 else float(lim.brake)
+	var rate := a.l_accel if absf(wanted) > absf(a.speed) and wanted * a.speed >= 0.0 else a.l_brake
 	a.speed = move_toward(a.speed, wanted, rate * DT)
 	a.vel = forward * a.speed
 	a.pos += a.vel * DT
@@ -731,10 +748,10 @@ func _avoid(a: Agent, desired: Vector2) -> Vector2:
 	var push := Vector2.ZERO
 	var contact := false
 	var crowded := false
-	var brake := float(a.limits.brake)
+	var brake := a.l_brake
 	var clamps := []
 	var nearest_foe := INF
-	if units[a.squad].enemy_near:
+	if a.unit.enemy_near:
 		# Near an enemy company the opponent search widens to ~3-4 m so a
 		# charge can brake before contact.
 		_gather(a.side, false, a.pos, 3, _foes)
@@ -872,7 +889,7 @@ func _resolve_contacts() -> void:
 
 
 func _animate(a: Agent) -> void:
-	var u: Unit = units[a.squad]
+	var u: Unit = a.unit
 	var forward := Vector2(sin(a.yaw), cos(a.yaw))
 	var travelled := (a.pos - a.prev_pos).dot(forward)
 	var s := a.speed
