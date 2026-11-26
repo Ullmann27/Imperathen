@@ -9,7 +9,8 @@
     "art/soldiers/build.py": "2611a30e85118026e9d10fe515c5b56096b484f2ea9bc4756e372dc1119fb340",
     "art/hero_quality/source/provenance.json": "ebd73edb0b1896178911e8485a3d2c3b696865fc66b9908f2b7f258caf735d6e",
     "art/hero_quality/source/system_assets/provenance.json": "2335e4963086965c9f7da5d71b8af25892b5125f09a65dbf2f55705a2fe001ad",
-    "tools/characters/build_frontier_people.py": "d730a890f64b410ff181a040d96ae0856d310f009305012d418faa4d2bdb1c70"
+    "tools/characters/build_frontier_people.py": "9990340f4eb074b94d2d2f71daedd7f0221bd9e6dbaaca4337d58b7687095cf2",
+    "tools/characters/sculpt_roman_faces.py": "0c7bdae9539b57074ad0cd76f1b0e2c9274b075f9eae4fcbe58a93de531db30e"
   },
   "blend_sources": {
     "archer.blend": "e96a8e58d65ba7042b5c6aae013b10f3419e0118ccd15b14b716c13b0a3f069b",
@@ -27,6 +28,7 @@
     "Distinct civilian silhouette, long dress, bound hair, grey hair and chin beard",
     "Opaque original iris atlas; transparent corneal shell removed",
     "Original linen and kit surface pigments; additional rivets",
-    "Four mobile-oriented export tiers; five face morphs on near/mid"
+    "Four mobile-oriented export tiers; five face morphs on near/mid",
+    "Three UID-driven anatomical identity morphs and civilian hair sweep on both close levels"
   ]
 }

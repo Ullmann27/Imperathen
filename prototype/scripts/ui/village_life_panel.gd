@@ -9,6 +9,8 @@ const Footpath = preload("res://scripts/world/regional_footpath.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const Style = preload("res://scripts/ui/roman_hud/hud_style.gd")
+const Documents = preload("res://scripts/story/mission_documents.gd")
+const Reader = preload("res://scripts/ui/document_reader.gd")
 const Kit = preload("res://scripts/ui/roman_hud/menu_kit.gd")
 const Icons = preload("res://scripts/ui/roman_hud/hud_icons.gd")
 const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
@@ -62,7 +64,7 @@ class RegionalMap extends Control:
 		draw_polyline(surveyed, Style.AERUGO.lightened(0.25), 2.2, true)
 		for place: Dictionary in places:
 			var at := point(place.position)
-			var inhabited: bool = place.id == "home_village"
+			var inhabited: bool = place.id == "home_village" or place.kind == "hamlet"
 			var workplace: bool = place.get("content_status", "") == "visible_workplace"
 			if inhabited:
 				draw_circle(at, 10.0, Color(Style.AURUM, 0.18))
@@ -80,6 +82,8 @@ class RegionalMap extends Control:
 				var origin := at + Vector2(9, -6)
 				if workplace:
 					origin.y -= 7.0
+				if place.kind == "hamlet":
+					origin.y += 17.0
 				if origin.x + width > size.x - 8.0:
 					origin.x = at.x - 9.0 - width
 				draw_string_outline(font, origin, caption, HORIZONTAL_ALIGNMENT_LEFT, -1, caption_size, 3, Color(0.03, 0.02, 0.01, 0.9))
@@ -291,6 +295,10 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 		if not chapter.get("carried", []).is_empty():
 			column.add_child(Kit.heading("Bei dir"))
 			_text(ui, column, ", ".join(chapter.carried), 16)
+			for id: String in Documents.held(data):
+				var reader := Reader.new()
+				column.add_child(reader)
+				reader.build(id)
 		column.add_child(Kit.heading("Lehre und Fähigkeiten"))
 		_text(ui, column, "Deine Lehre: " + str(chapter.get("apprenticeship", "none")).replace("none", "noch offen").replace("smith", "bei Sextus"), 16)
 		_abilities(ui, column, data)
@@ -477,6 +485,13 @@ static func _map(ui, column: VBoxContainer, data: Dictionary) -> void:
 	map.places = Plan.points_of_interest()
 	map.roads = Plan.roads()
 	column.add_child(map)
+	if Childhood.enabled(data):
+		var goals := HFlowContainer.new()
+		column.add_child(goals)
+		for id: String in Footpath.DESTINATIONS:
+			var name: String = Footpath.DESTINATIONS[id]
+			var button: Button = ui._button("Route · "+name, ui._emit.bind("regional_goal",{"id":id}), false, 14)
+			goals.add_child(button)
 	_text(ui, column, "32 × 32 km · neun Regionen · Gelände wird in Sektoren geladen", 18)
 	_text(ui, column, "Aktueller Ort: %s · %.0f / %.0f m" % [Plan.region_label(map.position_world), position[0], position[2]], 14)
 	var distance := String.num(Footpath.length_m() / 1000.0, 2).replace(".", ",")

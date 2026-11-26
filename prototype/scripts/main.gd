@@ -6,6 +6,7 @@ const VoiceLines = preload("res://scripts/audio/voice_lines.gd")
 const FaceDriver = preload("res://scripts/audio/face_driver.gd")
 const ModelScript = preload("res://scripts/domain/world_model.gd")
 const WorldScript = preload("res://scripts/world/game_world.gd")
+const Allegiance = preload("res://scripts/domain/campaign_allegiance.gd")
 const TravelParty = preload("res://scripts/domain/travel_party.gd")
 const UIScript = preload("res://scripts/ui/game_ui.gd")
 const AtlasScreen = preload("res://scripts/strategy/atlas_screen.gd")
@@ -448,6 +449,10 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 		"atlas_demo": _open_atlas(true)
 		"city_exploration": _open_city_exploration()
 		"campaign_market": _open_city_exploration(true)
+		"regional_goal":
+			if screen == "village_panel":
+				world.select_route(str(payload.get("id","mission")))
+				_resume()
 		"atlas": _open_atlas(false)
 		"valley_demo": _open_valley(true)
 		"valley": _open_valley(false)
@@ -542,6 +547,11 @@ func _on_world_action(action: String, payload: Dictionary) -> void:
 		"companion_interact": _show_companion()
 		"village_npc": _show_village_npc(str(payload.get("npc_id", "")))
 		"village_panel": _show_village_panel("overview")
+		"waystation_market":
+			if world.at_waystation() and _can_visit_market():
+				_open_city_exploration(true,true)
+			else:
+				ui.notify("Die Reise zum Stadtmarkt ist während dieser Aufgabe unterbrochen.")
 		"politics_records": _show_council_records()
 		"combat_palette": _on_ui_action(action,payload)
 		"village_block", "village_dodge": _on_ui_action(action, payload)
@@ -555,7 +565,7 @@ func _on_world_action(action: String, payload: Dictionary) -> void:
 func _command(command: String, payload: Dictionary) -> Dictionary:
 	var chapter_choice := screen == "frontier_dialog" and command == "frontier_choice"
 	var political_choice := screen == "village_dialog" and village_npc == "decimus" and command in ["politics_help", "politics_audience"]
-	var party_choice := screen in ["party_wheel","party_folio","village_dialog","dialog"] and TravelParty.COMMAND_FIELDS.has(command)
+	var party_choice := screen in ["party_wheel","party_folio","village_dialog","dialog"] and (TravelParty.COMMAND_FIELDS.has(command) or Allegiance.COMMAND_FIELDS.has(command))
 	var village_choice := screen in ["village_panel", "village_dialog"] and command.begins_with("village_")
 	if screen != "playing" and not chapter_choice and not village_choice and not political_choice and not party_choice and not _film_committing:
 		return {"ok": false, "message": "Die Welt ist pausiert."}
@@ -567,7 +577,7 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	# as thousands of permanent economic orders. Their consequences are saved.
 	var command_id := "" if realtime_combat else "%s_%d" % [run_id, command_serial]
 	var political_command := command.begins_with("politics_")
-	var durable_change := political_command or TravelParty.COMMAND_FIELDS.has(command)
+	var durable_change := political_command or TravelParty.COMMAND_FIELDS.has(command) or Allegiance.COMMAND_FIELDS.has(command)
 	var previous_data: Dictionary = model.data.duplicate(true) if durable_change else {}
 	if command == "village_childhood_action" or party_choice:
 		# Presence checks (Marcus at the lane or the stall) use the bodies as
@@ -615,17 +625,18 @@ func _show_party(page: String, feedback := "") -> void:
 	if page == "party_folio":
 		for member: Dictionary in data.members:
 			var uid := str(member.actor_uid)
-			figures[uid] = world.get_cinematic_figure(TravelParty.local_id(model.data, uid))
+			var figure_id := "marcus" if uid == TravelParty.FRIEND else TravelParty.local_id(model.data, uid)
+			figures[uid] = world.get_cinematic_figure(figure_id)
 	ui.show_party(page, data, figures, feedback)
 
 
 func _party_command(command: String, args: Dictionary) -> void:
-	if not TravelParty.COMMAND_FIELDS.has(command):
+	if not TravelParty.COMMAND_FIELDS.has(command) and not Allegiance.COMMAND_FIELDS.has(command):
 		return
 	var uid := str(args.get("actor_uid", ""))
 	var invite := command in ["party_invite","party_hire"]
 	if invite:
-		if (screen != "village_dialog" or uid != "vil:" + village_npc) and (screen != "dialog" or village_npc != "marcus" or uid != TravelParty.FRIEND):
+		if (screen != "village_dialog" or uid != "vil:" + village_npc) and (screen != "dialog" or village_npc != model.data.companion.id or uid != TravelParty.FRIEND):
 			return
 	elif screen not in ["party_wheel","party_folio"]:
 		return
@@ -707,12 +718,12 @@ func _npc_dialog(npc_id: String) -> Dictionary:
 		dialog = _dialog_with_behavior(dialog, npc_id)
 	if npc_id == "decimus" and VillageLife.relationship(model.data, npc_id).get("met", false):
 		_append_political_choices(dialog, model.politics_view())
-	if npc_id in ["silvanus","aurelia","varro"] and not TravelParty.protected(model.data):
+	if VillageLife.has_npc(model.data,npc_id) and not TravelParty.protected(model.data):
 		var uid := "vil:" + npc_id
 		var invite := _invite_choice(uid)
 		if not invite.is_empty():
 			var bond := VillageLife.relationship(model.data, npc_id)
-			if (npc_id == "silvanus" and Childhood.enabled(model.data)) or bond.get("ally", false):
+			if (npc_id == "silvanus" and Childhood.enabled(model.data)) or TravelParty.willing_resident(model.data,uid):
 				dialog.choices.append(invite)
 			if npc_id in ["aurelia","varro"] and bond.get("met", false):
 				var role := "Heilerin" if npc_id == "aurelia" else "Ortskundigen"
@@ -852,14 +863,14 @@ func _show_companion() -> void:
 		greeting_choices.append({"label":"Weitergehen", "action":"resume", "enabled":true, "reason":""})
 		ui.show_dialog("Marcus · am Brunnen", greeting, greeting_choices)
 		return
-	if Childhood.enabled(model.data) and companion.get("met", false):
+	if companion.get("met", false) and (Childhood.enabled(model.data) or companion.get("choice") == "help"):
 		model.capture_npc_observations()
 		var player: Vector3 = world.get_player_position()
 		var at: Vector3 = world._companion.global_position
-		if Vector2(player.x-at.x, player.z-at.z).length() > Childhood.NPC_RANGE:
-			ui.notify("Geh näher zu Marcus, um das Gespräch zu beginnen.")
+		if Vector2(player.x-at.x, player.z-at.z).length() > Childhood.NPC_RANGE or not world._companion.visible:
+			ui.notify("Geh näher, um das Gespräch zu beginnen.")
 			return
-		var authored := Childhood.companion_dialogue(model.data, "marcus")
+		var authored := Childhood.companion_dialogue(model.data, "marcus") if Childhood.enabled(model.data) else {"title":Origins.PEOPLES[model.data.origin_id].companion,"text":OpeningStory.companion_reply(model.data)}
 		if authored.is_empty():
 			authored = {"title":"Marcus · Valdora", "text":"»Was hast du heute vor?«"}
 		var options := []
@@ -868,7 +879,7 @@ func _show_companion() -> void:
 			options.append({"label":invite.label,"action":"party_command","payload":{"command":invite.command,"args":invite.payload}})
 			options.append({"label":"Gespräch beenden","action":"resume"})
 		screen = "dialog"
-		village_npc = "marcus"
+		village_npc = str(companion.id)
 		world.set_active(false)
 		world._companion.get_node("Figure").set_conversation_focus(true)
 		ui.show_dialog(str(authored.title), str(authored.text), options)
@@ -1434,14 +1445,17 @@ func _can_visit_market() -> bool:
 	return not Childhood.enabled(data) or str(data.village.childhood.screenplay.get("i01", "")) in ["complete", "legacy"]
 
 
-func _open_city_exploration(campaign_visit := false) -> void:
+func _open_city_exploration(campaign_visit := false, from_road := false) -> void:
+	var passengers: Array[CharacterBody3D] = []
 	if is_instance_valid(city_exploration):
 		return
 	if campaign_visit:
-		if screen != "paused" or not session_started or not _can_visit_market():
+		if (screen != ("playing" if from_road else "paused")) or (from_road and not world.at_waystation()) or not session_started or not _can_visit_market():
 			return
 		if not _save(false).ok:
 			return
+		passengers = world._story_companions.departing_for_market(model.data, world.get_player_position())
+		model.npc_observations = Callable()
 	elif screen != "menu":
 		return
 	_campaign_market_visit = campaign_visit
@@ -1455,6 +1469,7 @@ func _open_city_exploration(campaign_visit := false) -> void:
 	city_exploration.profile = ui.get_quality()
 	if campaign_visit:
 		city_exploration.campaign = model
+		city_exploration.party_visit.passengers = passengers
 		city_exploration.campaign_path = SAVE_PATH
 		city_exploration.world_jdn = int(model.data.calendar.clock.jdn)
 	elif "--horse-test" in OS.get_cmdline_user_args():
@@ -1476,6 +1491,7 @@ func _start_story_from_city() -> void:
 func _leave_city_exploration() -> void:
 	if not is_instance_valid(city_exploration):
 		return
+	city_exploration.party_visit.return_to_village()
 	remove_child(city_exploration)
 	city_exploration.queue_free()
 	city_exploration = null
@@ -1484,6 +1500,7 @@ func _leave_city_exploration() -> void:
 	ui.show()
 	world.get_node("WorldCamera").current = true
 	if _campaign_market_visit:
+		model.npc_observations = world.npc_observations
 		_campaign_market_visit = false
 		world.show()
 		_resume()

@@ -19,7 +19,7 @@ static func _entries() -> Dictionary:
 
 
 static func actor_uid(data: Dictionary, id: String) -> String:
-	return "pc:companion" if id == str(data.get("companion", {}).get("id", "marcus")) else "vil:" + id
+	return "pc:companion" if id in ["marcus", str(data.get("companion", {}).get("id", ""))] else "vil:" + id
 
 
 static func member(data: Dictionary, id: String) -> Dictionary:
@@ -27,11 +27,9 @@ static func member(data: Dictionary, id: String) -> Dictionary:
 
 
 static func available(data: Dictionary, id: String) -> bool:
-	if not data.get("village", {}).get("enabled", false):
+	if not data.get("village", {}).has("childhood") and member(data, id).is_empty():
 		return false
-	if not data.village.has("childhood") and member(data, id).is_empty():
-		return false
-	if id == "marcus":
+	if actor_uid(data, id) == "pc:companion":
 		return bool(data.get("companion", {}).get("met", false))
 	if id not in ACTORS and member(data, id).is_empty():
 		return false
@@ -113,23 +111,27 @@ static func dialogue(data: Dictionary, id: String, mission: String, step: String
 		"source":str(line.source), "companion_dialogue":true}
 
 
-static func observed_position(data: Dictionary, id: String) -> Variant:
+static func _coordinates(data: Dictionary, id: String) -> Array:
 	if not available(data, id):
-		return null
+		return []
 	var observed: Dictionary = data.village.get("behavior", {}).get("people", {}).get(id, {})
-	var coordinates: Variant = observed.get("position")
-	if not observed.get("observed", false) or typeof(coordinates) != TYPE_ARRAY or coordinates.size() != 3:
-		return null
-	return Vector2(float(coordinates[0]), float(coordinates[2]))
+	if observed.get("observed", false):
+		return observed.position
+	return member(data, id).get("travel_position", [])
+
+
+static func observed_position(data: Dictionary, id: String) -> Variant:
+	var coordinates := _coordinates(data, id)
+	return Vector2(coordinates[0], coordinates[2]) if coordinates.size() == 3 else null
 
 
 static func restored_position(data: Dictionary, id: String, fallback: Vector3) -> Vector3:
-	if observed_position(data, id) == null:
+	var coordinates := _coordinates(data, id)
+	if coordinates.size() != 3:
 		return fallback
-	var coordinates: Array = data.village.behavior.people[id].position
-	# Marcus' vorhandene Beobachtungen speichern seit Build 7 den Figurenmittelpunkt.
-	# Diese Konvention bleibt erhalten; nur der bewegliche Körper hat einen Fußursprung.
-	return Vector3(float(coordinates[0]), float(coordinates[1]) - (0.9 if id == "marcus" else 0.0), float(coordinates[2]))
+	# Observations measure the common friend's centre, the other residents' feet.
+	var centre_height := 0.9 if actor_uid(data, id) == "pc:companion" else 0.0
+	return Vector3(coordinates[0], coordinates[1] - centre_height, coordinates[2])
 
 
 static func display_name(data: Dictionary, id: String, fallback: String) -> String:

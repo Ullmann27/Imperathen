@@ -1059,6 +1059,7 @@ func show_village_dialog(dialog: Dictionary) -> void:
 
 
 func show_party(page: String, data: Dictionary, figures: Dictionary, feedback: String) -> void:
+	clear_notification()
 	_party_data = data
 	_party_figures = figures
 	_party_feedback = feedback
@@ -1584,7 +1585,7 @@ func _build_navigation() -> void:
 	_navigation.map_requested.connect(_toggle_local_map)
 
 
-## The local map opens from the compass and closes again by itself.
+## Leave an explicitly selected travel destination open until the next tap.
 func _toggle_local_map() -> void:
 	if not is_instance_valid(_local_map):
 		return
@@ -1593,7 +1594,8 @@ func _toggle_local_map() -> void:
 		_local_map.update_view(_navigation.view)
 		_play_click()
 		HudStyle.reveal(_local_map, _reduce_motion, 0.0, Vector2(0, -8))
-		get_tree().create_timer(8.0).timeout.connect(_hide_later.bind(_local_map))
+		if not _navigation.view.has("destination_name"):
+			get_tree().create_timer(8.0).timeout.connect(_hide_later.bind(_local_map))
 
 
 ## Subtle mission line (top left): occasion and place in Roman capitals over a
@@ -1789,7 +1791,7 @@ func _build_toolbar() -> void:
 	_action_buttons["atlas"] = atlas
 	if _state.get("village", {}).get("enabled", false):
 		modes_row.add_child(_hud_button("Dorfleben", _emit.bind("village_panel", {}), "village", true))
-	if _state.get("village", {}).get("enabled", false):
+	if _state.get("village", {}).get("enabled", false) or _state.get("companion", {}).get("met", false):
 		var party := _hud_button("Gefolge", _emit.bind("party_wheel", {}), "family")
 		party.name = "PartyQuickOrders"
 		modes_row.add_child(party)
@@ -1835,7 +1837,7 @@ func _build_touch_toolbar() -> void:
 		row.add_child(button)
 	if _state.get("village", {}).get("enabled", false):
 		row.add_child(_hud_button("Dorf", _emit.bind("village_panel", {}), "village"))
-	if _state.get("village", {}).get("enabled", false):
+	if _state.get("village", {}).get("enabled", false) or _state.get("companion", {}).get("met", false):
 		var party := _hud_button("Gefolge", _emit.bind("party_wheel", {}), "family")
 		party.name = "PartyQuickOrders"
 		row.add_child(party)
@@ -2780,9 +2782,12 @@ func _modal(kicker: String, title: String, body: String, width: float, portrait_
 		speaker_row.add_child(image)
 		description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		speaker_row.add_child(description)
+	elif body.is_empty():
+		description.free()
 	else:
 		column.add_child(description)
-	_spacer(column, 6)
+	if not body.is_empty():
+		_spacer(column, 6)
 	# Fit long story text and large type while keeping the choices reachable by scroll.
 	column.minimum_size_changed.connect(_fit_modal_scroll.bind(scroll, column))
 	HudStyle.reveal(panel, _reduce_motion, 0.0, Vector2.ZERO)

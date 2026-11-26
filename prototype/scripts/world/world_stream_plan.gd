@@ -28,9 +28,16 @@ const REGION_BIOMES := [
 	["farmland", "valley", "quarry"],
 	["wetland", "river", "coast"]
 ]
+## A shallow spring in the willow hollow. Heights are shared by road, render
+## mesh and terrain collision; the water surface is drawn by the waystation.
+const SPRING := Vector2(208.33333,166.66667)
+const SPRING_RADII := Vector2(30.0,23.0)
+const WATER_LEVEL := 4.1
+
 ## Place names describe the fictional playable region, not an archaeological map.
 const POIS := [
 	{"id":"home_village", "name":"Unser Grenzdorf", "kind":"village", "position":[0.0,0.0,0.0], "content_status":"existing_village"},
+	{"id":"willow_station", "name":"Weidenhof", "kind":"hamlet", "position":[241.0,0.0,119.0], "content_status":"inhabited_waystation"},
 	{"id":"western_farm", "name":"Westliche Höfe", "kind":"farm", "position":[-1250.0,0.0,250.0], "content_status":"planned"},
 	{"id":"forest_camp", "name":"Waldarbeiterlager", "kind":"woodcamp", "position":[-750.0,0.0,-1500.0], "content_status":"planned"},
 	{"id":"stone_quarry", "name":"Alter Steinbruch", "kind":"quarry", "position":[1500.0,0.0,-750.0], "content_status":"visible_workplace"},
@@ -46,7 +53,7 @@ const POIS := [
 	{"id":"coastal_port", "name":"Küstenhafen", "kind":"port", "position":[11000.0,0.0,11000.0], "content_status":"planned"}
 ]
 const ROAD_LINKS := [
-	["home_village","western_farm"], ["home_village","forest_camp"],
+	["home_village","willow_station"], ["home_village","western_farm"], ["home_village","forest_camp"],
 	["home_village","stone_quarry"], ["home_village","river_bridge"],
 	["stone_quarry","watch_fort"], ["western_farm","market_town"],
 	["forest_camp","forest_settlement"], ["forest_settlement","western_pass"],
@@ -124,7 +131,12 @@ static func terrain_height(position: Vector2) -> float:
 	var rolling := 60.0*sin(position.x*0.0006)*cos(position.y*0.00045)
 	rolling += 24.0*sin((position.x+position.y)*0.0011)
 	var ridge := maxf(0.0,sin(position.x*0.00016)*cos(position.y*0.00018))
-	return blend * clampf(rolling+260.0*ridge*ridge,-35.0,320.0)
+	var elevation := blend * clampf(rolling+260.0*ridge*ridge,-35.0,320.0)
+	var d := ((position - SPRING) / SPRING_RADII).length()
+	if d >= 1.8:
+		return elevation
+	var basin := WATER_LEVEL - 0.72 + 2.0 * d * d
+	return lerpf(basin,elevation,smoothstep(1.0,1.8,d))
 
 
 static func points_of_interest() -> Array:
@@ -143,7 +155,7 @@ static func roads() -> Array:
 		var finish := Vector3(last.position[0],0.0,last.position[2])
 		result.append({"id":"%s__%s" % [first.id,last.id],"from":first.id,"to":last.id,
 			"start":first.position.duplicate(),"end":last.position.duplicate(),
-			"distance_m":start.distance_to(finish),"content_status":"planned"})
+			"distance_m":start.distance_to(finish),"content_status":"walkable_track" if first.id == "home_village" and last.id in ["willow_station","stone_quarry"] else "planned"})
 	return result
 
 
@@ -226,5 +238,5 @@ static func overview(position: Vector3 = Vector3.ZERO, quality: String = "balanc
 		"area_km2":1024,"region":result.region.name,"sector_count":WORLD_SECTOR_COUNT,
 		"requested_sectors":result.sectors.size(),"active_limit":result.active_limit,
 		"detailed_people_limit":result.detailed_people_limit,"places":points_of_interest(),
-		"roads":roads(),"playable_place_ids":["home_village"],
-		"status":"Gestreamtes Gelände mit Grenzdorf und sichtbarem Steinbruch; übrige Fernorte und deren Bevölkerung sind geplant."}
+		"roads":roads(),"playable_place_ids":["home_village","willow_station"],
+		"status":"Gestreamtes Gelände mit Grenzdorf, bewohntem Weidenhof und sichtbarem Steinbruch; übrige Fernorte und deren Bevölkerung sind geplant."}

@@ -15,6 +15,7 @@ extends RefCounted
 ## ("vil:marcus" -> "pc:companion") and the tribal target "player" ("pc:player").
 ## Ages are never stored here: they derive from the world clock (world_clock.gd).
 
+const CityWatch = preload("res://scripts/domain/city_watch.gd")
 const Clock = preload("res://scripts/domain/world_clock.gd")
 const Calendar = preload("res://scripts/domain/world_calendar.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
@@ -84,6 +85,10 @@ static func collect(world: Dictionary) -> Dictionary:
 	for record: Dictionary in WorldState.soldiers(world) if world.has("world_state") else []:
 		people[global_id("sol", str(record.uid))] = {"name": str(record.name), "source": "soldier", "local_id": str(record.uid),
 			"alive": str(record.status) != "dead", "status": str(record.status), "troop_id": str(record.troop_id), "age": soldier_age(world, record)}
+	if world.get("world_state",{}).has("city") or world.get("world_state",{}).get("politics",{}).has("street_watch"):
+		for record: Dictionary in CityWatch.roster(world):
+			people[global_id("sol",record.uid)] = {"name":record.name,"source":"market_detachment","local_id":record.uid,
+				"alive":true,"status":record.status,"troop_id":record.troop_id,"age":record.age}
 	return {"people": people, "aliases": aliases}
 
 

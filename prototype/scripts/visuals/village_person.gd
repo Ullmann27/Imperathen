@@ -76,6 +76,7 @@ var _combat_external := false
 var _has_sword := false
 var _has_shield := false
 var _lod_profile := ""
+var face_seed := 0
 var appearance_id := ""
 var appearance_variation := 0
 var _loaned_gear := false
@@ -123,9 +124,10 @@ func configure(kind: String, origin: String, years: int) -> void:
 func configure_appearance(new_appearance: String, variation: int = 0) -> void:
 	var selected := new_appearance if new_appearance in APPEARANCES else ""
 	var selected_variation := posmod(variation, 18)
-	if selected == appearance_id and selected_variation == appearance_variation and body:
+	if selected == appearance_id and selected_variation == appearance_variation and face_seed == variation and body:
 		return
 	appearance_id = selected
+	face_seed = variation
 	appearance_variation = selected_variation
 	if not appearance_id.is_empty():
 		identity = "resident_%s_%d" % [appearance_id, appearance_variation]
@@ -170,13 +172,15 @@ func youth_path(level: int) -> String:
 	return String(MESHY_YOUTH_OUTFITS[youth_outfit].path) % level
 
 
-func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null) -> void:
+func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null, actor_uid: String = "") -> void:
 	# Resident population builders already know the complete identity. Configure
 	# it atomically so they never load an unused generic body or a near LOD first.
 	var selected := new_appearance if new_appearance in APPEARANCES else ""
 	var selected_variation := posmod(variation, 18)
-	var changed := role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation
+	var seed_value := variation if actor_uid.is_empty() else actor_uid.hash()
+	var changed := face_seed != seed_value or role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation
 	role = "resident"
+	face_seed = seed_value
 	home = origin
 	age = years
 	appearance_id = selected
@@ -302,6 +306,8 @@ func _reload(level: int) -> void:
 	for shape: MeshInstance3D in body.find_children("*","MeshInstance3D",true,false):
 		_style(shape)
 	_hands.bind(body, active_model_path)
+	if level < 2 and active_model_path.begins_with("res://assets/characters/frontier_"):
+		preload("res://scripts/visuals/roman_faces.gd").apply(body, face_seed)
 	_face.bind(body, identity)
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])

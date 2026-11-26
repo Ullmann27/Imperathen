@@ -6,6 +6,7 @@ const Calendar = preload("res://scripts/domain/world_calendar.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 
+const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const FRIEND := "pc:companion"
 const FATHER := "vil:silvanus"
 ## Authored local biographies. Ages for Silvanus and the two specialists are
@@ -28,7 +29,7 @@ const COMMAND_FIELDS := {
 	"party_invite":["actor_uid"], "party_hire":["actor_uid"], "party_dismiss":["actor_uid"],
 	"party_order":["actor_uid","order"], "party_assign":["actor_uid","assignment"],
 	"party_supply":["actor_uid","quantity"], "party_equip":["actor_uid","item_id"],
-	"party_train":["actor_uid","skill"]
+	"party_train":["actor_uid","skill"], "party_delegate":["actor_uid","leader_uid"]
 }
 
 static func initial() -> Dictionary:
@@ -67,6 +68,9 @@ static func position(world: Dictionary, uid: String) -> Vector2:
 	var observation: Dictionary = world.village.get("behavior",{}).get("people",{}).get(id,{})
 	if observation.get("observed",false):
 		return Vector2(observation.position[0], observation.position[2])
+	var saved: Array = world.world_state.party.members.get(uid,{}).get("travel_position", [])
+	if not saved.is_empty():
+		return Vector2(saved[0], saved[2])
 	if uid == FRIEND:
 		return Childhood.POINTS.marcus if Childhood.enabled(world) else Vector2(-3, 4)
 	return Life.actor_position(world,id)
@@ -86,7 +90,9 @@ static func validate_arguments(command: String, args: Dictionary) -> String:
 				return "Übergib zwischen einer und 99 ganzen Rationen."
 		elif typeof(args[key]) != TYPE_STRING or args[key].is_empty() or args[key].length() > 64:
 			return "Für diese Bitte fehlt eine gültige Kennung."
-	if args.actor_uid != FRIEND and not PROFILES.has(args.actor_uid) and not (command == "party_order" and args.actor_uid == "all"):
+	var uid: String = args.actor_uid
+	var group := command == "party_order" and (uid == "all" or uid.begins_with("group:"))
+	if not group and uid != FRIEND and not uid.begins_with("vil:"):
 		return "Diese Person kann hier keine Begleitung zusagen."
 	if command == "party_order" and args.order not in REQUESTS:
 		return "Eine zivile Reisegruppe kann nur freiwillige Begleitaufgaben übernehmen."
@@ -105,12 +111,16 @@ static func _invite(world: Dictionary, uid: String, hired: bool) -> Dictionary:
 	var members: Dictionary = world.world_state.party.members
 	if members.has(uid) and members[uid].status == "active":
 		return _result(false,"Diese Person gehört bereits zum Gefolge.")
+	if uid != FRIEND and (not world.village.enabled or not Life.has_npc(world,local_id(world,uid))):
+		return _result(false,"Diese Person kann aktuell keine Begleitung vereinbaren.")
 	if not healthy(world,uid) or position(world,uid).distance_to(player_position(world)) > REACH:
 		return _result(false,"Sprich mit der verfügbaren Person vor Ort.")
 	if uid == FATHER and not Childhood.enabled(world):
 		return _result(false,"Dieser Lebensweg kennt Silvanus nicht als Vater.")
 	if uid == FRIEND and (not world.companion.met or world.companion.choice != "help"):
 		return _result(false,"Dein Gegenüber ist noch nicht bereit, mit dir zu reisen.")
+	if uid != FRIEND and uid != FATHER and uid not in SPECIALISTS and not willing_resident(world,uid):
+		return _result(false,"Diese Person möchte sich erst besser kennenlernen oder hat noch Verpflichtungen.")
 	if hired and uid not in SPECIALISTS:
 		return _result(false,"Diese Person bietet hier keinen bezahlten Dienst an.")
 	if uid in SPECIALISTS:
@@ -141,6 +151,10 @@ static func _invite(world: Dictionary, uid: String, hired: bool) -> Dictionary:
 	remember(member,"Die persönliche Einladung angenommen.")
 	return _result(true,"»Ich komme mit.«")
 
+static func willing_resident(world: Dictionary, uid: String) -> bool:
+	var relation := Life.relationship(world,local_id(world,uid))
+	return relation.get("met",false) and (relation.get("ally",false) or int(relation.get("trust",0)) >= 8) and healthy(world,uid)
+
 static func apply(world: Dictionary, command: String, args: Dictionary) -> Dictionary:
 	var uid: String = args.actor_uid
 	var members: Dictionary = world.world_state.party.members
@@ -150,6 +164,14 @@ static func apply(world: Dictionary, command: String, args: Dictionary) -> Dicti
 		return _invite(world,uid,command == "party_hire")
 	if command == "party_order":
 		var targets: Array = members.keys() if uid == "all" else [uid]
+		if uid.begins_with("group:"):
+			var leader := uid.trim_prefix("group:")
+			if members.get(leader,{}).get("status","") != "active":
+				return _result(false,"Diese Reisegruppe hat keine verfügbare Leitung.")
+			targets = [leader]
+			for other: String in members:
+				if members[other].get("deputy","") == leader:
+					targets.append(other)
 		var willing := []
 		for target: String in targets:
 			var person: Dictionary = members.get(target,{})
@@ -172,6 +194,19 @@ static func apply(world: Dictionary, command: String, args: Dictionary) -> Dicti
 		return _result(true,"Ihr verabschiedet euch. Persönlicher Besitz bleibt bei seinem Eigentümer.")
 	if not healthy(world,uid):
 		return _result(false,"Diese Person muss sich erholen oder hat andere Verpflichtungen.")
+	if command == "party_delegate":
+		var leader: String = args.leader_uid
+		if leader == "player":
+			member.erase("deputy")
+			return _result(true,"Die Person reist wieder unmittelbar mit dir.")
+		var chief: Dictionary = members.get(leader,{})
+		if leader == uid or chief.get("status","") != "active" or chief.has("deputy") or not healthy(world,leader) or chief.order == "home":
+			return _result(false,"Die gewählte Person kann diese Reisegruppe nicht übernehmen.")
+		for other: Dictionary in members.values():
+			if other.get("deputy","") == uid:
+				return _result(false,"Übergib zuerst die bereits betreuten Mitreisenden.")
+		member.deputy = leader
+		return _result(true,"Die beiden stimmen der gemeinsamen Reisegruppe zu.")
 	if command == "party_assign":
 		if args.assignment == "aid" and uid == FRIEND and int(member.skills.get("healing",0)) == 0:
 			return _result(false,"»Verletzte versorgen kann ich noch nicht. Lass mich nach dem Weg sehen.«")
@@ -295,11 +330,19 @@ static func settle_days(world: Dictionary, days: int) -> void:
 			_order(member,"home")
 			remember(member,"Wegen fehlender Rationen nach Hause zurückgekehrt.")
 
+	clear_vacant_roles(world)
+
 static func wages_paid(party: Dictionary) -> int:
 	var total := 0
 	for member: Dictionary in party.members.values():
 		total += int(member.paid)
 	return total
+
+static func clear_vacant_roles(world: Dictionary) -> void:
+	var members: Dictionary = world.world_state.party.members
+	for member: Dictionary in members.values():
+		if member.has("deputy") and (member.status != "active" or members[member.deputy].status != "active"):
+			member.erase("deputy")
 
 static func grain_issued(party: Dictionary) -> int:
 	var total := 0
@@ -317,7 +360,7 @@ static func view(world: Dictionary) -> Dictionary:
 		row.actor_uid = uid
 		row.name = person.get("name",id.capitalize())
 		row.health = person.get("health",100)
-		var profile: Dictionary = PROFILES.get(uid,{"age":12,"personality":"Neugierig, kennt die Wege","interest":"Lernen","goal":"Eigenständig Aufträge erledigen","family":""})
+		var profile: Dictionary = PROFILES.get(uid,{"age":12 if uid == FRIEND else 30,"personality":"Neugierig, kennt die Wege" if uid == FRIEND else str(person.get("profession","Dorfbewohner")),"interest":"Lernen" if uid == FRIEND else str(person.get("profession","Dorfleben")),"goal":"Eigenständig Aufträge erledigen","family":""})
 		row.birth_year = int(world.calendar.births.companion.year) if uid == FRIEND else Calendar.add_years(int(world.calendar.origin_year),-int(profile.age))
 		row.age = Calendar.age_in_year(row.birth_year,Clock.year(world))
 		row.personality = profile.personality
@@ -342,10 +385,15 @@ static func validate(world: Dictionary) -> String:
 		return "Ungültiges Gefolgebuch."
 	var staffs := int(party.staff_stock)
 	for uid: Variant in party.members:
-		if (uid != FRIEND and not PROFILES.has(uid)) or (uid == FATHER and not Childhood.enabled(world)) or (uid == FRIEND and not world.companion.met):
+		if typeof(uid) != TYPE_STRING or (uid != FRIEND and (not uid.begins_with("vil:") or not world.village.enabled or not Life.has_npc(world,local_id(world,uid)) or resident(world,uid).is_empty())) or (uid == FATHER and not Childhood.enabled(world)) or (uid == FRIEND and not world.companion.met):
 			return "Unbekannte oder noch nicht getroffene Person im Gefolge."
 		var member: Variant = party.members[uid]
-		if not _keys(member,new_member().keys()) or member.status not in ["active","dismissed"] or member.order not in REQUESTS + ["train"] or member.assignment not in ROLES + [""]:
+		var fields := new_member().keys()
+		if member is Dictionary and member.has("travel_position"):
+			if NpcBehavior.enabled(world) or not NpcBehavior._position(member.travel_position):
+				return "Ungültiger beobachteter Reiseort."
+			fields.append("travel_position")
+		if not _keys(member,fields) or member.status not in ["active","dismissed"] or member.order not in REQUESTS + ["train"] or member.assignment not in ROLES + [""]:
 			return "Ungültige Gefolgschaft oder Aufgabe."
 		if uid in SPECIALISTS and not Life.relationship(world,local_id(world,uid)).get("met",false):
 			return "Fachkraft ohne persönliche Bekanntschaft."
@@ -402,6 +450,7 @@ static func reconcile(world: Dictionary) -> void:
 			member.assignment = ""
 			_order(member,"home")
 			remember(member,"Im Dorf verstorben.")
+	clear_vacant_roles(world)
 
 static func village_reserve_size() -> int:
 	var count := 0
@@ -437,3 +486,17 @@ static func normalize(world: Dictionary) -> void:
 			member[field] = int(member[field])
 		for skill: String in member.skills:
 			member.skills[skill] = int(member.skills[skill])
+
+
+## Older regional careers have no village.behavior record. Only those worlds
+## store an observed body position with the member. The established convention
+## measures the common friend's body centre, and a named villager's feet.
+static func observe_travellers(world: Dictionary, observations: Variant) -> void:
+	if typeof(observations) != TYPE_DICTIONARY:
+		return
+	var members: Dictionary = world.world_state.party.members
+	for uid: String in members:
+		var id := local_id(world, uid)
+		var sample: Variant = observations.get(id)
+		if sample is Dictionary and NpcBehavior._position(sample.get("position")):
+			members[uid].travel_position = sample.position.duplicate()

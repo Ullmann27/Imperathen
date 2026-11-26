@@ -58,7 +58,7 @@
       "places": ["Umland von Bibracte", "Haeduisches Gehöft"],
       "attestation": "design_assumption",
       "note": "Fiktive Herkunftsorte einzelner Reiter im überlieferten haeduischen Kontingent.",
-      "sources": [{"ref": "Caes. Gall. 1,15; 1,18", "note": "Haeduische Reiterei", "verified": false}]
+      "sources": [{"ref": "Caes. Gall. 1,15; 1,18", "note": "Haeduische Reiterei", "verified": true}]
     },
     {
       "group_id": "creta",

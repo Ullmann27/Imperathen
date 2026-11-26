@@ -18,6 +18,8 @@ const COMBAT_ORDERS := {"attack":"Angriff","charge":"Sturmangriff","flank":"Flan
 	"focus_fire":"Feuer bündeln","fire_at_will":"Feuer frei","cease_fire":"Feuer einstellen"}
 ## Menu rows at least as tall as the 44 px base buttons, so orders stay tappable.
 const MENU_ROW_SPACING := 22
+var rolls := AcceptDialog.new()
+var roll_text := RichTextLabel.new()
 var muster_button: MenuButton
 var quality_picker := OptionButton.new()
 var pause_button: Button
@@ -60,6 +62,13 @@ func _ready() -> void:
 	_scroll_row(body,command_row)
 	group_button = _button(cards,"Gruppe +","multi")
 	group_button.toggle_mode = true
+	rolls.title = "Musterrolle"
+	rolls.ok_button_text = "Schließen"
+	roll_text.fit_content = false
+	roll_text.scroll_active = true
+	roll_text.add_theme_font_size_override("normal_font_size", 16)
+	rolls.add_child(roll_text)
+	add_child(rolls)
 	add_child(marquee)
 	marquee.visible = false
 	marquee.color = Color(0.8,0.68,0.38,0.28)
@@ -78,6 +87,7 @@ func populate(model) -> void:
 			offers[id] = "%s · %d Personen · %d Denare" % [offer.title, offer.count, offer.cost.denarii]
 		muster_button = _menu(command_row, "Aufgebot", offers, "muster")
 	_menu(command_row,"Verband",{"talwache_front":"Linienverband","talwache_support":"Unterstützung","talwache":"Gesamtes Aufgebot"},"group")
+	_button(command_row, "Musterrolle", "rolls")
 	_menu(command_row,"Formation",model.SHAPES,"form")
 	_menu(command_row,"Bewegung",MOVEMENT_ORDERS,"command")
 	_menu(command_row,"Kampf",COMBAT_ORDERS,"command")
@@ -97,6 +107,25 @@ func add_company(s: Dictionary) -> void:
 	var card := _button(cards, s.name, "select", s.id)
 	card.toggle_mode = true
 	card_by_id[s.id] = card
+
+
+func show_rolls(model) -> void:
+	var lines := PackedStringArray()
+	var catalog: Dictionary = model.Catalog.load_default()
+	var army: Dictionary = model.hierarchy().talwache
+	lines.append("%s · %s" % [army.name, model.Catalog.year_label(model.year)])
+	for group: Dictionary in army.groups:
+		for company: Dictionary in group.companies:
+			lines.append("\n%s · %s" % [company.name, catalog.troops[company.troop_id].name])
+			lines.append("Soll %d · Anwesend %d · Einsatzbereit %d · Verwundet %d · Gefallen %d" % [
+				company.target_strength, company.strength + company.wounded, company.available, company.wounded, company.dead])
+			var officer: Dictionary = model.soldier_record(company.officer)
+			lines.append("Führung: %s · Ausbildung: %s" % [officer.get("name", "unbesetzt"), company.tiers.training.capitalize()])
+	lines.append("\nOrganisationsformen der Epoche")
+	for entry: Dictionary in model.Catalog.organization_options(catalog, "roman", model.year):
+		lines.append("%s · %s" % [entry.name, entry.function])
+	roll_text.text = "\n".join(lines)
+	rolls.popup_centered_ratio(0.82)
 
 
 func report_ready(step: int) -> void:
@@ -132,7 +161,7 @@ func refresh(model, selected: Array, paused: bool, rate: float, message: String)
 			for key in model.Muster.OFFERS[id].cost:
 				available = available and depot[key] >= model.Muster.OFFERS[id].cost[key]
 			popup.set_item_disabled(index, not available)
-	heading.text = "TALWACHT   ·   %d:%02d   ·   Legion %d   /   Stämme %d" % [floori((model.DEFENCE_SECONDS-model.steps*model.STEP)/60.0),int(model.DEFENCE_SECONDS-model.steps*model.STEP)%60,counts.ally,counts.enemy]
+	heading.text = "TALWACHT   ·   %d:%02d   ·   Talwache %d   /   Höhenbund %d" % [floori((model.DEFENCE_SECONDS-model.steps*model.STEP)/60.0),int(model.DEFENCE_SECONDS-model.steps*model.STEP)%60,counts.ally,counts.enemy]
 	pause_button.text = "Fortsetzen" if paused else "Pause"
 	var outcome_labels := {"victory":"Sieg der Grenzlegion","defeat":"Die Talstraße ist verloren","draw":"Unentschieden"}
 	if model.outcome != "ongoing":

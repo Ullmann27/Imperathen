@@ -179,6 +179,8 @@ func _init(p_seed: int = DEFAULT_SEED, p_scenario: Dictionary = VALLEY_SCENARIO)
 ## The campaign delegates only the local guard after actual adult service.
 ## The independent practice scenario supplies its own preappointed commander.
 static func campaign_authority(world: Dictionary) -> String:
+	if not preload("res://scripts/domain/campaign_allegiance.gd").roman_command(world):
+		return ""
 	var player: Dictionary = world.get("player", {})
 	var progress: Dictionary = world.get("progress", {})
 	if int(player.get("age", 0)) < 18 or player.get("role") != "soldier":
@@ -406,7 +408,11 @@ func hierarchy() -> Dictionary:
 				var members: Array[String] = []
 				members.assign(s.uids)
 				group.companies.append({"id":id, "name":s.name, "status":s.status,
-					"initial_strength":s.initial_strength, "strength":s.strength, "soldier_ids":members})
+					"target_strength":_plans.get(id, {}).get("count", s.initial_strength),
+					"initial_strength":s.initial_strength, "strength":s.strength, "soldier_ids":members,
+					"available":s.strength if _active(s) else 0, "dead":s.dead, "wounded":s.wounded,
+					"officer":s.officer_id, "deputy":s.deputy_id if s.deputy_id in s.uids else "",
+					"standard":s.signifer_id, "troop_id":s.troop_id, "tiers":s.tiers.duplicate()})
 				group.initial_strength += s.initial_strength
 				group.strength += s.strength
 			army.groups.append(group)
@@ -542,8 +548,12 @@ func _form_problem(s: Dictionary, shape: String) -> String:
 	var shield: String = s.loadout.get("shield", {}).get("family_id", "")
 	if shape in ["shield_wall", "testudo", "orbis"] and shield == "":
 		return "Ohne Schilde ist diese Formation nicht möglich."
-	if shape == "testudo" and (shield != "scutum" or int(s.drills.get("testudo", 0)) < 2):
-		return "Das Schilddach verlangt Scuta und eingeübten Drill (Stufe 2)."
+	if shape == "testudo":
+		var troop := Catalog.troop(Catalog.load_default(), str(s.troop_id))
+		if troop.is_empty() or troop.service != "roman" or not Catalog.valid_at(troop, year):
+			return "Für diesen Verband ist das Schilddach in dieser Epoche nicht verfügbar."
+		if shield != "scutum" or int(s.drills.get("testudo", 0)) < 2:
+			return "Das Schilddach verlangt Scuta und eingeübten Drill (Stufe 2)."
 	if shape == "orbis" and int(s.drills.get("orbis", 0)) < 1:
 		return "Der Kreis ist für diesen Verband nicht eingeübt."
 	return ""
@@ -589,7 +599,7 @@ func order(ids: Array, command: String, target: Variant = null, by: String = "")
 			return _reply(false, "Der Verband flieht. Sammeln ist noch möglich.")
 		if command in ["mount", "dismount"]:
 			if s.kind != "cavalry" or int(s.drills.get("dismount", 0)) < 1 or bool(s.mounted) == (command == "mount"):
-				return _reply(false, "Pferd, Reiter oder Ausbildung passen nicht zu dieser Bitte.")
+				return _reply(false, "Dieser Reitbefehl setzt den passenden Zustand und eingeübtes Absitzen voraus.")
 			if s.command != "hold" or s.status != "ready" or steps < s.ready_at:
 				return _reply(false, "Der Verband muss zuerst halten und zur Ruhe kommen.")
 		if command == "form":

@@ -47,7 +47,7 @@ func home(id: String) -> Vector3:
 func sync(data: Dictionary) -> void:
 	var members: Dictionary = data.get("world_state", {}).get("party", {}).get("members", {})
 	for uid: String in members:
-		var id := str(data.companion.id) if uid == "pc:companion" else uid.trim_prefix("vil:")
+		var id := "marcus" if uid == "pc:companion" else uid.trim_prefix("vil:")
 		if not controllers.has(id) and actor(id) != null:
 			controllers[id] = Follow.new()
 	for id: String in controllers:
@@ -66,6 +66,8 @@ func reset(data: Dictionary) -> void:
 		if body == null:
 			continue
 		body.velocity = Vector3.ZERO
+		if body.has_meta("waiting_anchor"):
+			body.remove_meta("waiting_anchor")
 		body.set_meta("companion_controlled", Story.available(data, id))
 		if not Childhood.enabled(data) and Story.member(data, id).is_empty():
 			if id == "marcus":
@@ -97,6 +99,8 @@ func advance(delta: float) -> void:
 	var step := Childhood.current_step(data)
 	var specs := Childhood.companion_specs(data)
 	var player: Vector3 = world.get_player_position()
+	if not _trail.is_empty() and player.distance_to(_trail.back()) > 6.0:
+		_trail.clear()
 	if _trail.is_empty() or player.distance_to(_trail.back()) >= 0.6:
 		_trail.append(player)
 		if _trail.size() > 4 + controllers.size() * 3:
@@ -115,17 +119,23 @@ func advance(delta: float) -> void:
 		var speed := 1.45
 		var mode := "return"
 		var membership := Story.member(data, id)
+		if membership.get("order", "") != "wait" and body.has_meta("waiting_anchor"):
+			body.remove_meta("waiting_anchor")
 		if membership.get("status", "") == "active":
 			mode = str(membership.order)
 			var slot := follower
 			follower += 1
 			match mode:
 				"wait":
-					controllers[id].pause(body)
-					body.set_meta("companion_mode", mode)
-					body.set_meta("activity", "rest")
-					body.get_node("Figure").drive(0.0)
-					continue
+					if not body.has_meta("waiting_anchor"):
+						body.set_meta("waiting_anchor", _waiting_anchor(body, slot))
+					target = body.get_meta("waiting_anchor")
+					if Vector2(target.x - body.global_position.x, target.z - body.global_position.z).length() < 0.2:
+						controllers[id].pause(body)
+						body.set_meta("companion_mode", mode)
+						body.set_meta("activity", "rest")
+						body.get_node("Figure").drive(0.0)
+						continue
 				"home":
 					pass
 				"train":
@@ -193,3 +203,33 @@ func advance(delta: float) -> void:
 				activity = "work"
 				body.get_node("Figure").keep_working()
 		body.set_meta("activity", activity)
+
+
+## Freeze only the village return anchors. The market receives the existing
+## bodies, never a re-created resident, and only people actually travelling
+## together can depart with the player.
+func departing_for_market(data: Dictionary, at: Vector3) -> Array[CharacterBody3D]:
+	var people: Array[CharacterBody3D] = []
+	for id: String in controllers:
+		var membership := Story.member(data, id)
+		if membership.get("status", "") != "active" or membership.order not in ["follow", "assist"] or not Story.available(data, id):
+			continue
+		var body := actor(id)
+		if is_instance_valid(body) and body.is_visible_in_tree() and body.global_position.distance_to(at) <= 8.0:
+			people.append(body)
+	return people
+
+## The oak entry ramp and threshold are the single-file section of a furnished
+## house. A request here means waiting beside the entrance. All displacement
+## towards the free lane still uses the ordinary collision-checked controller.
+func _waiting_anchor(body: CharacterBody3D, slot: int) -> Vector3:
+	var here := body.global_position
+	if not Childhood.enabled(world._state):
+		return here
+	for dwelling: Dictionary in Layout.HOMES:
+		var local: Vector3 = (world.to_local(here) - dwelling.at).rotated(Vector3.UP, -float(dwelling.yaw))
+		if absf(local.x) <= 0.95 and local.z >= 1.7 and local.z <= 4.35:
+			var side := -1.0 if slot % 2 == 0 else 1.0
+			var verge := Vector3(1.55 * side, 0, 4.55).rotated(Vector3.UP, float(dwelling.yaw))
+			return world.to_global(dwelling.at + verge)
+	return here

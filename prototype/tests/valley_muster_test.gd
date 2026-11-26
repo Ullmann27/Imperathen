@@ -2,6 +2,7 @@ extends SceneTree
 
 const Battle := preload("res://scripts/battle/battle_model.gd")
 const Valley := preload("res://scripts/tactics/valley_scene.gd")
+const World := preload("res://scripts/domain/world_model.gd")
 const CAV := "aux_eques_gallicus"
 const LEVY := "cisalpine_militia_spear"
 const BOWS := "aux_sagittarius_creticus"
@@ -32,7 +33,16 @@ func _run() -> void:
 	check(campaign.set_commander(Battle.campaign_authority(world)) and campaign.order(["valley_spears"], "hold").ok, "Delegated adult patrol accepts orders")
 	check(not campaign.order(["valley_guard"], "hold").ok and not campaign.muster(CAV).ok, "Patrol cannot command a legion or draw on the practice depot")
 	var bench := Battle.Muster.scenario(Battle.VALLEY_SCENARIO, [])
+	var catalog := Battle.Catalog.load_default()
+	var forms := Battle.Catalog.organization_options(catalog, "roman", -58).map(func(form): return form.id)
+	check("republic_legion" in forms and not "principate_aux_cohort" in forms, "Republican and imperial organizations are time restricted")
+	check(not Battle.Catalog.available(catalog, -58, "germanic", "roman").has("germanic_eques_auxiliaris") and Battle.Catalog.available(catalog, -52, "germanic", "roman").has("germanic_eques_auxiliaris"), "Germanic mounted auxiliary service dated from its catalog record")
 	var adult := Battle.new(58, bench)
+	var ledger := World.new()
+	ledger.new_game("italia", true)
+	ledger.data.progress.skirmish_won = true # Would otherwise fail the pre-existing checkpoint gate.
+	var untouched := ledger.data.duplicate(true)
+	check(not ledger.checkpoint_valley(adult) and untouched == ledger.data, "Direct practice checkpoint cannot move campaign clock or treasury")
 	var original: Array = adult.squads.valley_guard.uids.duplicate()
 	adult.set_commander("")
 	check(not adult.muster(LEVY).ok, "Refuse muster without a commission")
@@ -45,6 +55,10 @@ func _run() -> void:
 	check(adult.squads.valley_guard.uids == original and riders.strength == 4 and riders.loadout.mount.family_id == "horse_service", "Existing identities and issued mounts")
 	for person: Dictionary in riders.people.values():
 		check(person.age >= 18 and person.origin.group_id == "aeduian_allies" and person.troop_id == CAV, "Adult named mounted candidate from the contracted origin")
+	var historical_year := adult.year
+	adult.year = 100
+	check(not adult.order(["valley_guard"], "form", "testudo").ok, "Troop's era is checked alongside scutum and drill")
+	adult.year = historical_year
 	check(not adult.order([UNIT], "form", "testudo").ok and adult.order([UNIT], "form", "wedge").ok, "Kit restricts formation choices")
 	adult.tick(2.0)
 	check(riders.formation == "wedge", "Wedge physically formed after reaction time")
@@ -85,6 +99,7 @@ func _ui(bench: Dictionary) -> void:
 	var scene := Valley.new()
 	scene.model = Battle.new(58, bench)
 	scene.distance = 12.0
+	scene.azimuth = 1.4
 	scene.focus = Vector2(-15, 13)
 	root.add_child(scene)
 	await process_frame
@@ -95,11 +110,57 @@ func _ui(bench: Dictionary) -> void:
 	var first: String = scene.model.squads[UNIT].uids[0]
 	var rider: Node3D = scene.actors.get(first)
 	check(rider != null and rider._pose.available and rider._pose.pelvis_world().distance_to(rider._seat.global_position) < 0.03, "Visible mounted soldier sits on moving skeletal socket")
-	if not OS.get_cmdline_user_args().is_empty() and DisplayServer.get_name() != "headless":
-		scene.message = "Haeduische Reiter · 4 übernommene Dienstpferde"
-		scene._refresh()
-		await RenderingServer.frame_post_draw
-		var path := OS.get_cmdline_user_args()[0]
-		check(root.get_texture().get_image().save_png(path) == OK, "Mounted formation engine capture")
+	await _capture("reiteraufgebot")
+	scene._action("rolls")
+	check(scene.hud.rolls.visible and scene.hud.roll_text.text.contains("Haeduische Reiter") and scene.hud.roll_text.text.contains("Contubernium"), "Army report resolves officers and actual offers")
+	scene.hud.rolls.hide()
+	var identity_count: int = scene.agents.counters.created
+	scene.distance = 175.0
+	scene._place_camera()
+	scene._sync_units()
+	check(scene.agents.agents[first].level == scene.Levels.LEVEL_C and not scene.actors.has(first), "Far camera aggregates riders with their original UIDs")
+	scene.distance = 15.0
+	scene._place_camera()
+	scene._sync_units()
+	check(scene.actors.has(first) and scene.agents.counters.created == identity_count, "Near rig resumes the same agent after the aggregate level")
+	scene._action("select", "valley_guard")
+	scene._issue("charge", "ridge_guard")
+	scene._action("select", UNIT)
+	scene._issue("charge", "ridge_guard")
+	scene._action("pause")
+	scene.set_process(false)
+	var struck := false
+	var cavalry: Dictionary = scene.model.squads[UNIT]
+	for i in 900:
+		scene._process(1.0 / 30.0)
+		var guard: Dictionary = scene.model.squads.valley_guard
+		if cavalry.last_action == "attack" and guard.last_action == "attack":
+			struck = true
+			break
+	check(struck and cavalry.wear.weapon > 0, "Mounted and foot companies execute their orders against the same game target")
+	check(scene.agents.counters.rejected_resurrections == 0, "No dismissed battle agents returned after casualties")
+	if struck:
+		var enemy: Dictionary = scene.model.squads.ridge_guard
+		scene.focus = Vector2(cavalry.x + enemy.x, cavalry.z + enemy.z) * 0.5
+		scene.distance = 14.5
+		scene.azimuth = 0.72
+		scene._place_camera()
+		scene._sync_units()
+		scene._process(0.0)
+		var saw_highland := false
+		for uid: String in scene.model.squads.ridge_guard.uids:
+			var figure = scene.actors.get(uid)
+			if figure is Valley.TribalFigure and figure.family == "forest_swordsman" and figure._body.scene_file_path.contains("germanic_warriors"):
+				saw_highland = true
+		check(saw_highland, "Höhenbund uses the authored Germanic swordsman with distinct clothing, weapon and shield")
+		await _capture("gemeinsames-gefecht")
 	scene.queue_free()
 	await process_frame
+
+
+func _capture(name: String) -> void:
+	if OS.get_cmdline_user_args().is_empty() or DisplayServer.get_name() == "headless":
+		return
+	await RenderingServer.frame_post_draw
+	var directory := OS.get_cmdline_user_args()[0]
+	check(root.get_texture().get_image().save_webp(directory.path_join(name + ".webp"), false, 0.88) == OK, "Engine capture " + name)

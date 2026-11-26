@@ -3253,6 +3253,13 @@ static func record_player_action(state: Dictionary, gid: String, kind: String, n
 	return {"ok": true, "event": event, "stance": Relations.stance(state.relations, gid, "player")}
 
 
+## Campaign grain and tribal food use the existing external-goods conversion.
+static func receive_delegation(state: Dictionary, gid: String, grain: int) -> void:
+	var amount := floori(grain * float(EXTERNAL_GOODS.grain.food))
+	_tx(state,gid,"food",amount,"external_in","Gesandtschaft aus Valdora","player")
+	record_player_action(state,gid,"gift","Eine bestätigte Getreidelieferung aus Valdora.")
+
+
 static func player_mediate(state: Dictionary, a: String, b: String) -> Dictionary:
 	if not state.groups.has(a) or not state.groups.has(b) or a == b:
 		return {"ok": false, "message": "Unbekannte Gruppen."}

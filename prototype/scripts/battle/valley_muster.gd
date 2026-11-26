@@ -31,7 +31,7 @@ static func scenario(base: Dictionary, contracts: Array) -> Dictionary:
 		if not contracts.has(troop_id):
 			continue
 		var troop := Catalog.troop(catalog, troop_id)
-		if not Catalog.valid_at(troop, int(base.year)) or troop.get("battle_kind", "").is_empty():
+		if troop.is_empty() or not Catalog.valid_at(troop, int(base.year)) or troop.get("battle_kind", "").is_empty():
 			return {}
 		var offer: Dictionary = OFFERS[troop_id]
 		var company := {"id": "muster_" + troop_id, "title": offer.title, "side": "ally",

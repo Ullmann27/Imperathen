@@ -15,7 +15,13 @@ func _run() -> void:
 	var model := Model.new()
 	model.new_game("italia", true, true, false, true)
 	if _reach(model, "collect_kindling"):
+		# Reproducible daylight for the reviewer. These six hours of prior
+		# market time use the ordinary calendar operation of a campaign visit.
+		if not OS.get_environment("LEGIO_CAPTURE_DIR").is_empty():
+			_check(model.advance_city_visit(6 * 3600).ok, "Book the daylight fixture on the authoritative clock")
 		await _wood_run(model)
+	if failures.is_empty():
+		await _regional_friend()
 	if is_instance_valid(party_world):
 		party_world.queue_free()
 		await process_frame
@@ -98,6 +104,82 @@ func _wood_run(model: Model) -> void:
 	_check(int(members[Party.FRIEND].skills.navigation) == 2 and int(members[Party.FATHER].skills.endurance) == 1, "The task finishes when the carrier leaves; only its remaining guide gains the delivery memory")
 	_check(not loaded.data.village.childhood.carried.has("kindling_bundle") and Childhood.current_step(loaded.data).id == "i04_work", "Sextus receives the bundle and opens the existing workshop visit")
 
+	await _family_threshold(loaded, marcus)
+
+
+func _family_threshold(model: Model, guide: CharacterBody3D) -> void:
+	var house: Node3D = party_world.regional.get_node("baker_home")
+	var walker = party_world._story_companions
+	# Position fixture at the start of the actual household ramp. The rest of
+	# the trial uses orders, capsule motion and the unmodified room geometry.
+	guide.position = house.to_global(Vector3(0, 0.04, 5.4))
+	guide.velocity = Vector3.ZERO
+	walker.controllers["marcus"].reset()
+	_place(model, house.to_global(Vector3(0.4, 1.4, -0.85)))
+	if not _command(model, "party_order", {"actor_uid":Party.FRIEND, "order":"follow"}):
+		return
+	for tick in 900:
+		await physics_frame
+		walker.advance(DT)
+		if house.to_local(guide.position).z < 3.8:
+			break
+	if not _check(house.to_local(guide.position).z < 3.8, "Marcus reaches the family's real entry ramp"):
+		return
+	if not _command(model, "party_order", {"actor_uid":Party.FRIEND, "order":"wait"}):
+		return
+	for tick in 450:
+		await physics_frame
+		walker.advance(DT)
+		if house.to_local(guide.position).z > 4.35 and absf(house.to_local(guide.position).x) > 1.1:
+			break
+	_check(house.to_local(guide.position).z > 4.35 and absf(house.to_local(guide.position).x) > 1.1, "Waiting on the ramp physically clears the threshold for other walkers")
+	if not _command(model, "party_order", {"actor_uid":Party.FRIEND, "order":"follow"}):
+		return
+	for tick in 1200:
+		await physics_frame
+		walker.advance(DT)
+		if house.to_local(guide.position).z < 1.25:
+			break
+	var here := house.to_local(guide.position)
+	journey.family_threshold = {"x":here.x, "foot_y":here.y, "z":here.z}
+	_check(here.z < 1.25 and absf(here.y - Layout.HOUSE_FLOOR) < 0.09, "A returning guide walks through the real furnished doorway onto the raised family floor: " + str(here))
+
+
+func _regional_friend() -> void:
+	var model := Model.new()
+	model.new_game("wa")
+	party_world.setup(model.data)
+	party_world.set_active(true)
+	model.npc_observations = party_world.npc_observations
+	_place(model, Vector3(-8.0, 1.0, 2.0))
+	if not _command(model, "gather", {"node_id":"timber_0"}):
+		return
+	_place(model, Vector3(-3.0, 1.0, 4.0))
+	if not _command(model,"choose_companion",{"choice":"help"}) or not _command(model, "party_invite", {"actor_uid":Party.FRIEND}):
+		return
+	var body: CharacterBody3D = party_world._companion
+	var start := body.global_position
+	_place(model, Vector3(2.0, 1.0, 7.0))
+	var walker = party_world._story_companions
+	for tick in 1200:
+		await physics_frame
+		walker.advance(DT)
+		if _flat_gap(body.global_position, party_world.get_player_position()) < 1.8:
+			break
+	_check(body.get_meta("actor_uid") == Party.FRIEND and _flat_gap(start, body.position) > 3.0, "The existing non-Italian friend walks under the same canonical identity")
+	if not _command(model, "party_supply", {"actor_uid":Party.FRIEND,"quantity":1}):
+		return
+	_check(not model.data.village.has("behavior") and model.data.world_state.party.members[Party.FRIEND].has("travel_position"), "A legacy career stores its body observation without a second village simulation")
+	var path := "user://regional_friend_%d.json" % Time.get_ticks_usec()
+	var saved := body.global_position
+	var loaded := Model.new()
+	var written := model.save_game(path)
+	var restored := loaded.load_game(path) if written.ok else written
+	if _check(written.ok and restored.ok, "Load the regional career with its moving friend: " + str(restored.message)):
+		party_world.setup(loaded.data)
+		_check(body.global_position.distance_to(saved) < 0.002, "The same regional friend is restored to its observed place")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
 
 func _command(model: Model, command: String, args: Dictionary) -> bool:
 	var result: Dictionary = model.execute(command, args)
@@ -148,7 +230,7 @@ func _capture_group(site: Vector3, filename: String) -> void:
 	DirAccess.make_dir_recursive_absolute(folder)
 	var camera := Camera3D.new()
 	party_world.add_child(camera)
-	camera.global_position = site + Vector3(3.0, 3.7, 6.5)
+	camera.global_position = site + Vector3(2.3, 2.5, 5.0)
 	camera.look_at(site + Vector3(0, 1.05, 0))
 	camera.make_current()
 	RenderingServer.render_loop_enabled = true

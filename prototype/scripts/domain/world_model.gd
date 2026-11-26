@@ -16,12 +16,14 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const CitySession = preload("res://scripts/world/city_life_session.gd")
+const CityWatch = preload("res://scripts/domain/city_watch.gd")
 const CityCheckpoint = preload("res://scripts/domain/city_checkpoint.gd")
 const CityCatalog = preload("res://scripts/city_trade_catalog.gd")
 const CityTrade = preload("res://scripts/city_trade.gd")
 const TribalWorld = preload("res://scripts/domain/tribal_world.gd")
 const WorldClock = preload("res://scripts/domain/world_clock.gd")
 const WorldState = preload("res://scripts/domain/world_state.gd")
+const Allegiance = preload("res://scripts/domain/campaign_allegiance.gd")
 const Party = preload("res://scripts/domain/travel_party.gd")
 const Politics = preload("res://scripts/domain/valdora_politics.gd")
 const PersonRegistry = preload("res://scripts/domain/person_registry.gd")
@@ -70,6 +72,7 @@ var raid_observations: Callable
 var npc_sight_check: Callable
 # A city session owns this verified runtime map; ordinary campaign/test worlds keep it empty.
 var city_trade_sites: Dictionary = {}
+var city_watch_observation: Callable
 ## The week in progress; never saved. Only its finished, validated result is
 ## committed, so a rejected candidate or a save mid-week cannot leak it.
 var _tribe_job: Dictionary = {}
@@ -179,6 +182,8 @@ func _run_command(command: String, args: Dictionary, command_id: String, session
 	command_fields.merge(CityTrade.COMMAND_FIELDS)
 	command_fields.merge(Politics.COMMAND_FIELDS)
 	command_fields.merge(Party.COMMAND_FIELDS)
+	command_fields.merge(Allegiance.COMMAND_FIELDS)
+	command_fields.merge(CityWatch.COMMAND_FIELDS)
 	if not command_fields.has(command):
 		return _fail("Unbekannter Spielbefehl: %s" % command)
 	if not _exact_keys(args, command_fields[command]):
@@ -204,7 +209,7 @@ func _run_command(command: String, args: Dictionary, command_id: String, session
 	var candidate := _world_copy()
 	if session == null:
 		if npc_observations.is_valid():
-			NpcBehavior.observe(candidate, npc_observations.call(), true)
+			_capture_people(candidate)
 		_observe_raid_positions(candidate)
 	var quote := {}
 	var staged_city := {}
@@ -258,9 +263,17 @@ func _run_command(command: String, args: Dictionary, command_id: String, session
 	return result
 
 
+func _capture_people(state: Dictionary) -> void:
+	var observations: Variant = npc_observations.call()
+	if NpcBehavior.enabled(state):
+		NpcBehavior.observe(state, observations, true)
+	else:
+		Party.observe_travellers(state, observations)
+
+
 func capture_npc_observations() -> void:
 	if not data.is_empty() and npc_observations.is_valid():
-		NpcBehavior.observe(data, npc_observations.call(), true)
+		_capture_people(data)
 
 
 func set_player_position(position: Vector3) -> void:
@@ -311,7 +324,7 @@ func advance(delta: float) -> void:
 	var observed_raiders := _observe_raid_positions(candidate)
 	var notify_ui := int(candidate.world_seconds) != int(float(candidate.world_seconds) + delta)
 	if npc_observations.is_valid():
-		NpcBehavior.observe(candidate,npc_observations.call(),true)
+		_capture_people(candidate)
 	for key in candidate.timers:
 		candidate.timers[key] = maxf(0.0, float(candidate.timers[key]) - delta)
 	if candidate.village.enabled:
@@ -632,6 +645,9 @@ func _advance_construction(candidate: Dictionary, delta: float) -> bool:
 ## Regional troops are a separate contingent from the village recruits.
 ## Only the live rules object publishes a checkpoint. Counters derive from its roster.
 func checkpoint_valley(battle) -> bool:
+	# Practice depots and formations have no claim on campaign time or people.
+	if not battle is BattleModel or not BattleModel.SCENARIOS.has(battle.scenario.get("id")):
+		return false
 	if not data.progress.skirmish_won or data.progress.career_terminal:
 		return false
 	var previous: Dictionary = data.valley
@@ -694,7 +710,7 @@ func _save_candidate(path: String, candidate: Dictionary, capture_observations :
 		return _fail("Der Speicherplatz ist durch ein Verzeichnis belegt.")
 	if capture_observations:
 		if npc_observations.is_valid():
-			NpcBehavior.observe(candidate, npc_observations.call(), true)
+			_capture_people(candidate)
 		_observe_raid_positions(candidate)
 	var directory_error := DirAccess.make_dir_recursive_absolute(absolute.get_base_dir())
 	if directory_error != OK:
@@ -864,7 +880,9 @@ func _apply_training_contact(state: Dictionary) -> Dictionary:
 
 ## Read-only options for the local steward and the inspection point.
 func party_view() -> Dictionary:
-	return Party.view(data)
+	var view := Party.view(data)
+	view.allegiance = Allegiance.view(data)
+	return view
 
 
 func politics_view() -> Dictionary:
@@ -872,6 +890,13 @@ func politics_view() -> Dictionary:
 
 
 func _apply_command(state: Dictionary, command: String, args: Dictionary, sites: Dictionary, quote: Dictionary) -> Dictionary:
+	if Allegiance.COMMAND_FIELDS.has(command):
+		return Allegiance.apply(state,command,args)
+	if command in ["recruit","start_skirmish"] and not Allegiance.roman_command(state):
+		return _fail("Dieses militärische Kommando erfordert eine römische Ernennung.")
+	if CityWatch.COMMAND_FIELDS.has(command):
+		var observation: Dictionary = city_watch_observation.call() if city_watch_observation.is_valid() else {}
+		return CityWatch.apply(state, command, args, observation)
 	if Party.COMMAND_FIELDS.has(command):
 		return Party.apply(state, command, args)
 	if Politics.COMMAND_FIELDS.has(command):
@@ -1149,6 +1174,10 @@ func _resolve_skirmish(state: Dictionary) -> Dictionary:
 
 
 func _validate_arguments(command: String, args: Dictionary) -> String:
+	if Allegiance.COMMAND_FIELDS.has(command):
+		return Allegiance.validate_arguments(command,args)
+	if CityWatch.COMMAND_FIELDS.has(command):
+		return CityWatch.validate_arguments(command,args)
 	if Party.COMMAND_FIELDS.has(command):
 		return Party.validate_arguments(command, args)
 	if Politics.COMMAND_FIELDS.has(command):
@@ -1406,7 +1435,7 @@ func _validate_state(state: Variant) -> String:
 	var expected_money := int(state.player.get("start_funds", DEVELOPMENT_START_DENARII)) - 5 * int(state.squad.recruits) + (15 if progress.skirmish_won else 0) + (12 if state.story.choice == "pursue" else 0)
 	expected_grain += int(frontier_effects.grain)
 	expected_money += int(frontier_effects.denarii)
-	expected_grain += int(village_ledger.grain) - Party.grain_issued(state.world_state.party)
+	expected_grain += int(village_ledger.grain) - Party.grain_issued(state.world_state.party) - Allegiance.donated_grain(state)
 	expected_money += int(village_ledger.denarii)
 	expected_money += CityTrade.money_effect(state) - Party.wages_paid(state.world_state.party)
 	if state.resources.grain != expected_grain or state.resources.denarii != expected_money:

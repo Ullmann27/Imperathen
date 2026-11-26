@@ -42,6 +42,7 @@ def module(name, path):
 hero = module("frontier_hero_source", ROOT / "tools/characters/build_hero.py")
 soldier = module("frontier_soldier_source", ROOT / "art/soldiers/build.py")
 skirt_seam = module("frontier_skirt_seam", ROOT / "tools/characters/smooth_frontier_skirt_seam.py")
+identity_shapes = module("frontier_identity_shapes", ROOT / "tools/characters/sculpt_roman_faces.py")
 kit_rivets = module("frontier_kit_rivets", ROOT / "tools/characters/rebind_frontier_kit_rivets.py")
 
 
@@ -494,6 +495,8 @@ def export(kind):
         # Civilian tunics whose local smoothing would expose the body stay as exported.
         tunic = skirt_seam.smooth(path, cloth="HeroTunic", strict=False)
         rivets = kit_rivets.rebind(path)
+        if level < 2:
+            identity_shapes.bake(path)
         count = 0
         for obj in bpy.context.scene.objects:
             if obj.type == "MESH":
@@ -501,7 +504,7 @@ def export(kind):
                 count += len(obj.data.loop_triangles)
         records.append({"lod": level, "path": str(path.relative_to(ROOT)), "triangles": count,
                         "bytes": path.stat().st_size, "sha256": digest(path), "texture_edge": edge,
-                        "face_morphs": level < 2, "belt_fit": belt_fit,
+                        "face_morphs": level < 2, **({"identity_shapes": True} if level < 2 else {}), "belt_fit": belt_fit,
                         "death_ground_contact": {key: death_ground[key] for key in ("before", "after", "maximum_floor_correction_m")},
                         "skirt_seam": {key: seam[key] for key in ("before", "after", "unchanged") if key in seam},
                         "tunic_seam": {key: tunic[key] for key in ("before", "after", "unchanged") if key in tunic},

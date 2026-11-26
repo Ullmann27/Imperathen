@@ -25,6 +25,7 @@ const Roster = preload("res://scripts/battle/soldier_roster.gd")
 const Relations = preload("res://scripts/domain/actor_relations.gd")
 const Life = preload("res://scripts/battle/soldier_life.gd")
 const Politics = preload("res://scripts/domain/valdora_politics.gd")
+const Allegiance = preload("res://scripts/domain/campaign_allegiance.gd")
 const Party = preload("res://scripts/domain/travel_party.gd")
 const CityCheckpoint = preload("res://scripts/domain/city_checkpoint.gd")
 const VERSION := 3
@@ -325,11 +326,19 @@ static func validate(world: Dictionary) -> String:
 	var has_city: bool = state is Dictionary and state.has("city")
 	if has_city and not CityCheckpoint.valid_header(state.city):
 		return "Der Stadtstand ist beschädigt."
-	if not _keys(state, KEYS + ["city"] if has_city else KEYS) or not _int(state.version, VERSION, VERSION) or typeof(state.raids) != TYPE_DICTIONARY or state.raids.size() > MAX_RAIDS:
+	var keys := KEYS.duplicate()
+	if has_city:
+		keys.append("city")
+	if state is Dictionary and state.has("allegiance"):
+		keys.append("allegiance")
+	if not _keys(state, keys) or not _int(state.version, VERSION, VERSION) or typeof(state.raids) != TYPE_DICTIONARY or state.raids.size() > MAX_RAIDS:
 		return "Der gemeinsame Weltzustand fehlt oder ist ungültig."
 	var clock_error := Clock.validate(world)
 	if not clock_error.is_empty():
 		return clock_error
+	var allegiance_error := Allegiance.validate(world)
+	if not allegiance_error.is_empty():
+		return allegiance_error
 	var political_error := Politics.validate(world)
 	if not political_error.is_empty():
 		return political_error

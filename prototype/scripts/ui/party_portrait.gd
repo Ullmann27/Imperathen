@@ -9,11 +9,11 @@ var dragging := false
 
 func build(source: Node3D) -> void:
 	stretch = true
-	custom_minimum_size = Vector2(146, 168)
+	custom_minimum_size = Vector2(164, 202)
 	tooltip_text = "Figur zum Drehen ziehen"
 	stage.own_world_3d = true
 	stage.render_target_update_mode = SubViewport.UPDATE_ONCE
-	stage.size = Vector2i(146, 168)
+	stage.size = Vector2i(164, 202)
 	add_child(stage)
 	stage.add_child(pivot)
 	var figure: Node3D = source.get_node_or_null("Model") if is_instance_valid(source) else null
@@ -22,25 +22,25 @@ func build(source: Node3D) -> void:
 	var replica := figure.duplicate(0) as Node3D
 	pivot.add_child(replica)
 	replica.position = Vector3.ZERO
-	pivot.rotation.y = 0.17
+	pivot.rotation.y = PI + 0.18
 	var environment := WorldEnvironment.new()
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Color("272923")
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("f2dfbe")
-	env.ambient_light_energy = 0.83
+	env.ambient_light_energy = 0.96
 	environment.environment = env
 	stage.add_child(environment)
 	var sunlight := DirectionalLight3D.new()
-	sunlight.rotation_degrees = Vector3(-48, -24, 0)
+	sunlight.rotation_degrees = Vector3(-28, -24, 0)
 	sunlight.light_energy = 1.5
 	stage.add_child(sunlight)
 	var camera := Camera3D.new()
 	stage.add_child(camera)
-	camera.position = Vector3(0, 1.05, 2.75)
-	camera.look_at(Vector3(0, 0.86, 0))
-	camera.fov = 41
+	camera.position = Vector3(0, 0.96, 2.55)
+	camera.look_at(Vector3(0, 0.80, 0))
+	camera.fov = 35
 	camera.current = true
 	resized.connect(_redraw)
 

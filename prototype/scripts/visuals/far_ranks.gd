@@ -2,6 +2,7 @@ extends Node3D
 ## Batched silhouettes. Transforms supplied to sync() are local to this node.
 ## Instance color carries the previous root transform, never a pigment tint.
 
+const TribalFigure := preload("res://scripts/visuals/valley_tribal_soldier.gd")
 const SoldierVisual = preload("res://scripts/visuals/soldier_visual.gd")
 const STANCE := {"march":.58,"run":.40,"retreat":.51}
 const CLEARANCE := {"march":.106,"run":.19,"retreat":.134}
@@ -96,7 +97,7 @@ func set_step_fraction(fraction: float) -> void:
 
 
 func sync(by_role: Dictionary, gait_by_role: Dictionary = {}, starts_by_role: Dictionary = {}) -> void:
-	for role: String in SoldierVisual.ROLES:
+	for role: String in SoldierVisual.ROLES + TribalFigure.FAMILIES.values():
 		var transforms: Array = by_role.get(role,[])
 		var batch: MultiMeshInstance3D = _batches.get(role)
 		if transforms.is_empty():
@@ -113,7 +114,7 @@ func sync(by_role: Dictionary, gait_by_role: Dictionary = {}, starts_by_role: Di
 			batch.multimesh.transform_format = MultiMesh.TRANSFORM_3D
 			batch.multimesh.use_custom_data = true
 			batch.multimesh.use_colors = true
-			batch.multimesh.mesh = SoldierVisual.far_mesh(role)
+			batch.multimesh.mesh = SoldierVisual.far_mesh(role) if role in SoldierVisual.ROLES else TribalFigure.silhouette(role)
 			var painted := batch.multimesh.mesh.surface_get_material(0) as StandardMaterial3D
 			var stride := ShaderMaterial.new()
 			stride.shader = preload("res://shaders/rank_stride.gdshader")

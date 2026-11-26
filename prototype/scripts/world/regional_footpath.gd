@@ -1,7 +1,7 @@
 extends RefCounted
 ## The eastern way out of Valdora. The visible entrance uses the existing
 ## village floor; the surveyed extension follows the streamed terrain to the
-## planned quarry position. The quarry itself has no constructed location.
+## old quarry and the spur to Weidenhof.
 
 const WAYPOINTS: Array[Vector2] = [
 	Vector2(46, -13), Vector2(90, -13), Vector2(250, 100),
@@ -74,3 +74,99 @@ void fragment() {
 	material.shader = shader
 	entrance.material_override = material
 	sector.add_child(entrance)
+
+
+## Fictional wayside settlement on a spur at the third surveyed waypoint.
+const HAMLET := Vector2(241,119)
+const HAMLET_ID := "willow_station"
+const DESTINATIONS := {"mission":"Missionsziel","willow_station":"Weidenhof","stone_quarry":"Alter Steinbruch","home_village":"Valdora"}
+
+static func destination(id: String) -> Vector2:
+	if id == HAMLET_ID:
+		return HAMLET
+	if id == "stone_quarry":
+		return WAYPOINTS[-1]
+	return WAYPOINTS[0]
+
+static func _road_offset(point: Vector2) -> float:
+	var best_distance := INF
+	var best_offset := 0.0
+	var offset := 0.0
+	for i in range(1,WAYPOINTS.size()):
+		var a := WAYPOINTS[i-1]
+		var b := WAYPOINTS[i]
+		var closest := Geometry2D.get_closest_point_to_segment(point,a,b)
+		var distance := point.distance_squared_to(closest)
+		if distance < best_distance:
+			best_distance = distance
+			best_offset = offset + a.distance_to(closest)
+		offset += a.distance_to(b)
+	return best_offset
+
+static func route_between(start: Vector2, goal: Vector2) -> PackedVector2Array:
+	var a := _road_offset(start)
+	var b := _road_offset(goal)
+	if a > b:
+		var reversed := route_between(goal,start)
+		reversed.reverse()
+		return reversed
+	var line := PackedVector2Array([start])
+	var offset := 0.0
+	for i in range(1,WAYPOINTS.size()):
+		var prev := WAYPOINTS[i-1]
+		var next := WAYPOINTS[i]
+		var length := prev.distance_to(next)
+		if a >= offset and a < offset + length:
+			line.append(prev.lerp(next,(a-offset)/length))
+		if offset+length > a and offset+length <= b:
+			line.append(next)
+		if b >= offset and b < offset+length:
+			line.append(prev.lerp(next,(b-offset)/length))
+		offset += length
+	line.append(goal)
+	return line
+
+## Extend the dirt strip across the actual streamed collision terrain. Only
+## segments whose midpoint belongs to this sector are built, including the spur.
+static func add_tracks(sector: Node3D, size_m: float, height: Callable) -> void:
+	var area := Rect2(Vector2(sector.position.x,sector.position.z),Vector2.ONE*size_m)
+	var triangles := SurfaceTool.new()
+	triangles.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var count := 0
+	var links: Array = []
+	for i in range(2, WAYPOINTS.size()):
+		links.append([WAYPOINTS[i-1],WAYPOINTS[i]])
+	links.append([WAYPOINTS[2],HAMLET])
+	for link: Array in links:
+		var a: Vector2 = link[0]
+		var b: Vector2 = link[1]
+		if not Rect2(a,Vector2.ZERO).expand(b).grow(2.0).intersects(area):
+			continue
+		var side := a.direction_to(b).orthogonal()
+		var parts := ceili(a.distance_to(b)/3.0)
+		for i in parts:
+			var p := a.lerp(b,float(i)/parts)
+			var q := a.lerp(b,float(i+1)/parts)
+			if not area.has_point((p+q)*0.5):
+				continue
+			var edges := [-1.5,-1.14,-.61,.61,1.14,1.5]
+			for j in range(edges.size()-1):
+				var tone := Color("595239") if j in [0,4] else (Color("81684a") if j in [1,3] else Color("77664c"))
+				for corner: Vector2 in [p+side*edges[j],q+side*edges[j],q+side*edges[j+1],p+side*edges[j],q+side*edges[j+1],p+side*edges[j+1]]:
+					var ground := float(height.call(corner))
+					triangles.set_color(tone)
+					triangles.set_normal(Vector3.UP)
+					triangles.add_vertex(Vector3(corner.x, ground + .044,corner.y)-sector.position)
+				count += 1
+	if not count:
+		return
+	var strip := MeshInstance3D.new()
+	strip.name = "CartTrack"
+	strip.mesh = triangles.commit()
+	var earth := StandardMaterial3D.new()
+	earth.vertex_color_use_as_albedo = true
+	earth.cull_mode = BaseMaterial3D.CULL_DISABLED
+	earth.roughness = .98
+	strip.material_override = earth
+	strip.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	sector.add_child(strip)

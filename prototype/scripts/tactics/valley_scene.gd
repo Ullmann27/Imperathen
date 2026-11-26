@@ -6,6 +6,9 @@ const Rules = preload("res://scripts/battle/battle_model.gd")
 const Landscape = preload("res://scripts/tactics/valley_landscape.gd")
 const HUD = preload("res://scripts/tactics/valley_hud.gd")
 const Soldier = preload("res://scripts/visuals/soldier_visual.gd")
+const Agents = preload("res://scripts/formation/formation_agents.gd")
+const Levels = preload("res://scripts/formation/formation_levels.gd")
+const TribalFigure := preload("res://scripts/visuals/valley_tribal_soldier.gd")
 const Rider = preload("res://scripts/visuals/valley_rider.gd")
 const Roster = preload("res://scripts/battle/soldier_roster.gd")
 const SIDES := {"ally":Color("#67d7c4"),"enemy":Color("#e58663")}
@@ -38,6 +41,9 @@ var origin := Vector2.ZERO
 var cursor := Vector2.ZERO
 var pressed_at := 0
 var ghost := MultiMeshInstance3D.new()
+var agents: Agents
+var levels: Levels
+var _detail_clock := 0
 var sampled_step := -1
 var lod_due := 0.0
 
@@ -52,6 +58,9 @@ func set_quality(new_profile: String) -> void:
 
 func _ready() -> void:
 	frame_remainder = float(model.snapshot().remainder)
+	if model.scenario.has("contracts"):
+		agents = Agents.new()
+		levels = Levels.new()
 	add_child(land)
 	add_child(far_ranks)
 	land.apply_quality(profile)
@@ -129,6 +138,7 @@ func _process(delta: float) -> void:
 	var direction := Vector2(float(Input.is_key_pressed(KEY_D))-float(Input.is_key_pressed(KEY_A)),float(Input.is_key_pressed(KEY_S))-float(Input.is_key_pressed(KEY_W)))
 	if direction != Vector2.ZERO:
 		_pan(direction.normalized().rotated(-azimuth)*delta*distance*0.55)
+	var agent_steps := agents.advance(model) if agents != null else 0
 	lod_due -= delta
 	if sampled_step != model.steps or lod_due <= 0:
 		lod_due = 0.28
@@ -136,10 +146,18 @@ func _process(delta: float) -> void:
 		_sync_units()
 		_refresh()
 	var fraction := clampf(frame_remainder / Rules.STEP,0.0,1.0)
-	far_ranks.set_step_fraction(fraction)
+	if agents != null and agent_steps > 0:
+		_sync_formation_instances()
+	far_ranks.set_step_fraction(agents.render_fraction(model) if agents != null else fraction)
 	for id in actors:
 		var track: Dictionary = motion[id]
 		var actor = actors[id]
+		if agents != null and agents.agents.has(id):
+			var pose := agents.present_state(agents.agents[id], agents.render_fraction(model))
+			actor.position = pose.position
+			actor.rotation.y = pose.yaw
+			actor.present(pose.pose, pose.phase, elapsed)
+			continue
 		actor.position = track.start.lerp(track.end,fraction)
 		actor.rotation.y = lerp_angle(track.start_yaw, track.yaw, fraction)
 		actor.present(track.pose,lerpf(track.phase0,track.phase1,fraction),elapsed)
@@ -154,6 +172,13 @@ func _sync_units() -> void:
 	var far_gaits := {}
 	var far_starts := {}
 	var roster := {}
+	if agents != null:
+		agents.sync_model(model)
+		levels.profile = profile
+		var now := Time.get_ticks_msec()
+		levels.assign(agents.agents, camera.global_position, camera.is_position_in_frustum,
+			func(_uid: String) -> bool: return false, (now - _detail_clock) / 1000.0)
+		_detail_clock = now
 	var ranked := []
 	var near_limit := float({"low":13, "balanced":18, "high":25, "very_high":35}[profile])
 	var mid_limit := near_limit + float({"low":30, "balanced":30, "high":42, "very_high":55}[profile])
@@ -161,6 +186,8 @@ func _sync_units() -> void:
 		if s.strength <= 0 or s.status == "withdrawn":
 			continue
 		roster[s.id] = model.soldiers(s.id)
+		if agents != null:
+			continue
 		for man: Dictionary in roster[s.id]:
 			var at := _surface(Vector2(man.x, man.z)) + Vector3.UP
 			var distance := camera.global_position.distance_to(at)
@@ -189,12 +216,14 @@ func _sync_units() -> void:
 			var destination := _surface(Vector2(man.x,man.z))
 			var dist := camera.position.distance_to(destination)
 			var detail := (0 if dist < near_limit else 1) if rigged.has(id) else 2
+			if agents != null:
+				detail = agents.agents[id].detail
 			var role := "spear" if s.kind in ["spear", "skirmisher"] else ("archer" if s.kind == "archer" else "heavy")
 			if s.kind == "cavalry":
 				role = "cavalry"
 			if id == s.officer_id and s.side == "ally" and s.kind == "infantry":
 				role = "officer"
-			if role == "cavalry" and detail == 2:
+			if detail == Levels.DETAIL_AGGREGATE or (role == "cavalry" and detail == Levels.DETAIL_FAR):
 				# Beyond the rig budget riders stay aggregated under the company flag.
 				# Keep the same UID and re-sample it when it re-enters the budget.
 				if actors.has(id):
@@ -205,22 +234,32 @@ func _sync_units() -> void:
 			counts[detail] += 1
 			_sample_motion(id, destination, float(man.facing)+PI, man.pose, s.formation, role)
 			if detail == 2:
-				if not distant.has(role):
-					distant[role] = []
-					far_gaits[role] = []
-					far_starts[role] = []
-				var track: Dictionary = motion[id]
-				distant[role].append(Transform3D(Basis(Vector3.UP,track.yaw),track.end))
-				far_starts[role].append(Transform3D(Basis(Vector3.UP,track.start_yaw),track.start))
-				far_gaits[role].append(far_ranks.gait_data(track.pose,track.phase0,track.phase1))
+				if agents == null:
+					var family: String = TribalFigure.FAMILIES.get(s.troop_id, role)
+					if not distant.has(family):
+						distant[family] = []
+						far_gaits[family] = []
+						far_starts[family] = []
+					var track: Dictionary = motion[id]
+					distant[family].append(Transform3D(Basis(Vector3.UP, track.yaw), track.end))
+					far_starts[family].append(Transform3D(Basis(Vector3.UP, track.start_yaw), track.start))
+					far_gaits[family].append(far_ranks.gait_data(track.pose, track.phase0, track.phase1))
 				if actors.has(id):
 					actors[id].queue_free()
 					actors.erase(id)
 				i += 1
 				continue
 			if not actors.has(id):
-				var actor = Rider.new() if role == "cavalry" else Soldier.new()
+				var actor
+				if role == "cavalry":
+					actor = Rider.new()
+				elif TribalFigure.FAMILIES.has(s.troop_id):
+					actor = TribalFigure.new()
+					actor.family = TribalFigure.FAMILIES[s.troop_id]
+				else:
+					actor = Soldier.new()
 				actor.role = role
+				actor.face_seed = int(man.appearance_seed)
 				actor.variant = Roster.visual_variant(int(man.appearance_seed), str(man.military_rank), Soldier.TINTS.size())
 				actor.detail = detail
 				actors[id] = actor
@@ -235,7 +274,10 @@ func _sync_units() -> void:
 				node.set_mounted(s.mounted)
 
 			i += 1
-	far_ranks.sync(distant, far_gaits, far_starts)
+	if agents == null:
+		far_ranks.sync(distant, far_gaits, far_starts)
+	else:
+		_sync_formation_instances()
 	get_node("/root/RuntimeDisplay").set_unit_counts(counts[0],counts[1],counts[2])
 	for id in actors.keys():
 		if not live.has(id):
@@ -245,6 +287,25 @@ func _sync_units() -> void:
 			var fade := create_tween()
 			fade.tween_interval(1.25)
 			fade.tween_callback(fallen.queue_free)
+
+## Far instances and full rigs sample the same agent tick during a detail change.
+func _sync_formation_instances() -> void:
+	var ends := {}
+	var starts := {}
+	var gaits := {}
+	for a: Agents.Agent in agents.agents.values():
+		if a.detail != Levels.DETAIL_FAR or model.squads[a.squad].kind == "cavalry":
+			continue
+		var family: String = TribalFigure.FAMILIES.get(model.squads[a.squad].troop_id, a.role)
+		if not ends.has(family):
+			ends[family] = []
+			starts[family] = []
+			gaits[family] = []
+		starts[family].append(Transform3D(Basis(Vector3.UP, a.prev_yaw), _surface(a.prev_pos)))
+		ends[family].append(Transform3D(Basis(Vector3.UP, a.yaw), _surface(a.pos)))
+		gaits[family].append(far_ranks.gait_data(a.pose, a.prev_phase if Agents.continuous(a) else a.phase, a.phase))
+	far_ranks.sync(ends, gaits, starts)
+
 
 func _sample_motion(id: String, destination: Vector3, yaw: float, pose: String, formation: String, role: String = "heavy") -> void:
 	var first_sample := not motion.has(id)
@@ -302,6 +363,9 @@ func _action(action: String,arg: String = "") -> void:
 			if model.outcome == "ongoing":
 				paused = not paused
 				message = "Zeit angehalten. Befehle können erteilt werden." if paused else "Talzeichen halten · Formation durch Ziehen ausrichten."
+		"rolls":
+			paused = true
+			hud.show_rolls(model)
 		"muster":
 			if paused:
 				var result: Dictionary = model.muster(arg)

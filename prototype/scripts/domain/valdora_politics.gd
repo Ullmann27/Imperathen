@@ -2,6 +2,7 @@ extends RefCounted
 ## One local civic relationship with the existing fictional steward Decimus.
 ## WorldModel alone applies and commits these commands. The view is read-only.
 
+const CityWatch = preload("res://scripts/domain/city_watch.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Calendar = preload("res://scripts/domain/world_calendar.gd")
@@ -173,8 +174,12 @@ static func _event_date(events: Array, id: String) -> String:
 
 static func validate(world: Dictionary) -> String:
 	var state: Variant = world.world_state.politics
-	if not state is Dictionary or state.size() != 2 or not Calendar.is_integral(state.get("version")) or int(state.version) != VERSION or not state.get("events") is Array:
+	if not state is Dictionary or state.size() != (3 if state.has("street_watch") else 2) or not Calendar.is_integral(state.get("version")) or int(state.version) != VERSION or not state.get("events") is Array:
 		return "Der politische Ortszustand ist ungültig."
+	if state.has("street_watch"):
+		var error := CityWatch.validate(world,state.street_watch)
+		if not enabled(world) or not error.is_empty():
+			return error if not error.is_empty() else "Das Wachbuch gehört nicht zu dieser Welt."
 	var events: Array = state.events
 	if events.size() > 3 or (not events.is_empty() and not enabled(world)):
 		return "Das Dorfgeschehen gehört nicht zu dieser Welt."
@@ -213,6 +218,9 @@ static func validate(world: Dictionary) -> String:
 static func normalize(world: Dictionary) -> void:
 	var state: Dictionary = world.world_state.politics
 	state.version = int(state.version)
+	if state.has("street_watch"):
+		for field: String in ["day","disputes","scuffles"]:
+			state.street_watch[field] = int(state.street_watch[field])
 	for event: Dictionary in state.events:
 		event.jdn = int(event.jdn)
 		event.second = int(event.second)

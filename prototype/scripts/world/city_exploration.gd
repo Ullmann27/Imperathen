@@ -17,6 +17,7 @@ const CitySurfaceMicrodetail := preload("res://scripts/rendering/city_surface_mi
 const VivaCloseupProps := preload("res://scripts/rendering/city_viva_closeup_props.gd")
 const CityAmbientPeople := preload("res://scripts/world/city_ambient_people.gd")
 const Crowd := preload("res://scripts/world/city_exploration_crowd.gd")
+const WatchPatrol = preload("res://scripts/world/city_watch_patrol.gd")
 const CityTraining := preload("res://scripts/world/city_training.gd")
 const CombatActions := preload("res://scripts/domain/combat_actions.gd")
 const VivaAtmosphere := preload("res://scripts/rendering/viva_roma_atmosphere.gd")
@@ -51,9 +52,11 @@ var persist := true
 var enable_riding_trial := false
 var campaign
 var campaign_path := ""
+var party_visit := preload("res://scripts/world/city_party_visit.gd").new()
 var resident_view: ResidentView
 var _bakery: BakeryDisplay
 var _bakery_business := -1
+var street_watch: WatchPatrol
 var _visit_elapsed := 0.0
 var _market_sun: DirectionalLight3D
 var _solar_minute := -1
@@ -151,6 +154,12 @@ func _ready() -> void:
 			resident_view = ResidentView.new()
 			add_child(resident_view)
 			resident_view.setup(living_city.life, player, camera, profile)
+			street_watch = WatchPatrol.new()
+			street_watch.name = "StreetWatch"
+			add_child(street_watch)
+			if not street_watch.setup(self,living_city.life.streets,_safe):
+				street_watch.queue_free()
+				street_watch = null
 			_bakery_business = living_city.life.business_for_shop("bakery")
 			if _bakery_business >= 0:
 				var display := BakeryDisplay.new()
@@ -667,6 +676,10 @@ func _physics_process(delta: float) -> void:
 	player.position.z = clampf(player.position.z,-State.LIMIT+1,State.LIMIT-1)
 	if player.position.y < -8:
 		teleport(State.SPAWN)
+	if campaign != null and market.available:
+		party_visit.advance(self, player, campaign.data.world_state.party.members, delta)
+	if is_instance_valid(street_watch):
+		street_watch.tick(delta)
 	var actual := (player.position-previous_position)/maxf(delta,0.000001)
 	figure.drive(Vector2(actual.x,actual.z).length(),angle_difference(previous_yaw,figure.rotation.y)/maxf(delta,0.000001))
 	# The collider bottom is the nominal walking plane. Check the actual
@@ -886,6 +899,7 @@ func _interact() -> void:
 		_open_market(false)
 
 func _open_market(inventory: bool) -> void:
+	party_visit.pause()
 	if paused or _action_left > 0 or market.is_open() or _horse_mounted():
 		return
 	var opened: bool = market.open_inventory() if inventory else market.open_shop()
@@ -966,6 +980,10 @@ func perform_action(action: String) -> void:
 	_update_status()
 
 func set_paused(value: bool) -> void:
+	if value and is_instance_valid(street_watch):
+		street_watch.suspend()
+	if value:
+		party_visit.pause()
 	if market.is_open():
 		market.close()
 		if not value:
@@ -1056,6 +1074,10 @@ func _update_status() -> void:
 		description = "Marktviertel · Gehe an einen Stand, um zu handeln."
 	if not _street_caption.is_empty():
 		description = _street_caption
+	if street_watch != null and campaign != null:
+		var standing := WatchPatrol.Watch.reputation(campaign.data)
+		if standing != 0:
+			description += " · Ansehen bei der Marktwache %d" % standing
 	if not training.available:
 		description += " · Trainingspfahl nicht verfügbar"
 	if not city_available:

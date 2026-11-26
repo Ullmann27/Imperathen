@@ -75,7 +75,7 @@ func _test_budgets() -> void:
 			_check(plan == World.plan(point,quality),"Deterministic demand " + quality)
 	_check(World.plan(Vector3.ZERO,"invalid").quality == "balanced","Unknown quality falls back consistently")
 	var overview: Dictionary = World.overview()
-	_check(overview.playable_place_ids == ["home_village"] and overview.status.contains("Fernorte") and overview.status.contains("geplant"),"Regional plan does not claim complete playable world")
+	_check(overview.playable_place_ids == ["home_village","willow_station"] and overview.status.contains("Fernorte") and overview.status.contains("geplant"),"Regional plan does not claim complete playable world")
 	var serialized: Dictionary = JSON.parse_string(JSON.stringify(overview))
 	_check(serialized.places.size() == overview.places.size() and serialized.area_km2 == 1024,"Overview persists as plain JSON")
 
@@ -111,7 +111,7 @@ func _test_routes() -> void:
 		if place.content_status == "visible_workplace":
 			workplaces.append(place.id)
 		_check(absf(place.position[0]) < 16000 and absf(place.position[2]) < 16000,"Place lies inside world " + place.id)
-	_check(workplaces == ["stone_quarry"] and planned == places.size()-2,"Only the quarry is declared as a visible workplace alongside the inhabited village")
+	_check(workplaces == ["stone_quarry"] and planned == places.size()-3 and ids.has("willow_station"),"The inhabited village and waystation and the visible quarry are distinct from planned locations")
 	var reachable := {"home_village":true}
 	var links: Array = World.roads()
 	for road in links:

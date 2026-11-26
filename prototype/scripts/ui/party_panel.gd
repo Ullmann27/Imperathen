@@ -4,9 +4,10 @@ extends RefCounted
 const Style = preload("res://scripts/ui/roman_hud/hud_style.gd")
 const Kit = preload("res://scripts/ui/roman_hud/menu_kit.gd")
 const Portrait = preload("res://scripts/ui/party_portrait.gd")
-const ORDERS := {"follow":"Folgen", "wait":"Warten", "assist":"Helfen", "home":"Heimkehren"}
+const ORDERS := {"follow":"Folgen", "wait":"Warten", "assist":"Helfen", "home":"Heimweg"}
 const TASKS := {"guide":"Weg zeigen", "carry":"Last tragen", "watch":"Ausblick halten", "aid":"Beistehen"}
-const SKILLS := {"perception":"Wahrnehmung", "endurance":"Ausdauer"}
+const LESSONS := {"perception":"Wahrnehmung", "endurance":"Ausdauer"}
+const SPECIALITIES := {"healing":"Heilkunde", "navigation":"Ortskenntnis"}
 const ITEMS := {"walking_staff":"Wanderstab", "wool_cloak":"Wollumhang", "leather_belt":"Ledergürtel", "linen_tunic":"Leinentunika", "bronze_brooch":"Bronzefibel"}
 
 
@@ -25,6 +26,8 @@ class BronzeWheel extends Control:
 static func _button(ui, parent: Control, title: String, callback: Callable, primary := false) -> Button:
 	var button: Button = ui._list_button(title, callback, primary)
 	button.custom_minimum_size.y = Style.TOUCH_MIN
+	button.autowrap_mode = TextServer.AUTOWRAP_OFF
+	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.name = title.validate_node_name()
 	parent.add_child(button)
 	return button
@@ -45,6 +48,18 @@ static func _picker(parent: Control, members: Array, selected: String, all: bool
 		picker.set_item_metadata(index, person.actor_uid)
 		if str(person.actor_uid) == selected:
 			picker.select(index)
+	if all:
+		var leaders := {}
+		for person: Dictionary in members:
+			if person.has("deputy"):
+				leaders[person.deputy] = true
+		for person: Dictionary in members:
+			if leaders.has(person.actor_uid):
+				var index := picker.item_count
+				picker.add_item("Gruppe um " + str(person.name))
+				picker.set_item_metadata(index,"group:" + str(person.actor_uid))
+				if selected == picker.get_item_metadata(index):
+					picker.select(index)
 	picker.item_selected.connect(func(index: int): callback.call(str(picker.get_item_metadata(index))))
 	parent.add_child(picker)
 	return picker
@@ -86,8 +101,10 @@ static func show_wheel(ui, data: Dictionary) -> void:
 			button.offset_right = 58
 			button.offset_top = -24
 			button.offset_bottom = 24
-		_button(ui, column, "Gefährten ansehen", ui._emit.bind("party_folio", {}), true)
-	_button(ui, column, "Zurück ins Spiel", ui._emit.bind("resume", {}))
+	var controls := _flow(column)
+	if not members.is_empty() or not data.get("allegiance",{}).is_empty():
+		_button(ui, controls, "Gefährten ansehen", ui._emit.bind("party_folio", {}), true)
+	_button(ui, controls, "Zurück ins Spiel", ui._emit.bind("resume", {}))
 
 
 static func show_folio(ui, data: Dictionary, figures: Dictionary, feedback: String) -> void:
@@ -97,6 +114,7 @@ static func show_folio(ui, data: Dictionary, figures: Dictionary, feedback: Stri
 	if not feedback.is_empty():
 		_text(column, feedback)
 	if members.is_empty():
+		_show_allegiance(ui,column,data)
 		_text(column, "Zurzeit reist niemand mit dir.")
 		_button(ui, column, "Zurück ins Spiel", ui._emit.bind("resume", {}))
 		return
@@ -106,7 +124,8 @@ static func show_folio(ui, data: Dictionary, figures: Dictionary, feedback: Stri
 	var uid := str(picker.get_item_metadata(picker.selected))
 	ui.party_target = uid
 	var person: Dictionary = members[picker.selected]
-	var row := HBoxContainer.new()
+	var row := BoxContainer.new()
+	row.vertical = ui._area().x < 520.0
 	row.add_theme_constant_override("separation", 16)
 	column.add_child(row)
 	if is_instance_valid(figures.get(uid)):
@@ -127,12 +146,20 @@ static func show_folio(ui, data: Dictionary, figures: Dictionary, feedback: Stri
 	_text(details, "Proviant für %d Tage  ·  %d Denare pro Tag" % [int(person.rations), int(person.wage)])
 	var order := str(person.get("order", ""))
 	var task := str(person.get("assignment", ""))
-	_text(details, "%s · %s" % [ORDERS.get(order, order), TASKS.get(task, "Ohne Aufgabe")])
+	_text(details, "%s · %s" % [ORDERS.get(order, "Übt am Platz" if order == "train" else order), TASKS.get(task, "Ohne Aufgabe")])
 	column.add_child(Kit.heading("Aufgaben"))
 	var tasks := _flow(column)
 	for id: String in TASKS:
 		var give := _action(ui, tasks, TASKS[id], "party_assign", {"actor_uid":uid,"assignment":id})
 		give.disabled = id == task
+	if members.size() > 1:
+		var teams := _flow(column)
+		for other: Dictionary in members:
+			if other.actor_uid != uid and not other.has("deputy") and other.order != "home":
+				var delegate := _action(ui,teams,"Mit " + str(other.name) + " reisen","party_delegate",{"actor_uid":uid,"leader_uid":other.actor_uid})
+				delegate.disabled = person.get("deputy","") == other.actor_uid
+		if person.has("deputy"):
+			_action(ui,teams,"Direkt mit mir reisen","party_delegate",{"actor_uid":uid,"leader_uid":"player"})
 	column.add_child(Kit.heading("Gepäck und Proviant"))
 	var gear := _flow(column)
 	_action(ui, gear, "Eine Ration geben", "party_supply", {"actor_uid":uid,"quantity":1})
@@ -151,12 +178,12 @@ static func show_folio(ui, data: Dictionary, figures: Dictionary, feedback: Stri
 	var skill_lines := PackedStringArray()
 	for id: String in skills:
 		if int(skills[id]) > 0:
-			skill_lines.append("%s %d" % [SKILLS.get(id, id.capitalize()), int(skills[id])])
+			skill_lines.append("%s %d" % [LESSONS.get(id, SPECIALITIES.get(id, id.capitalize())), int(skills[id])])
 	if not skill_lines.is_empty():
 		_text(column, " · ".join(skill_lines))
 	var training := _flow(column)
-	for skill: String in SKILLS:
-		_action(ui, training, str(SKILLS[skill]) + " üben", "party_train", {"actor_uid":uid,"skill":skill})
+	for skill: String in LESSONS:
+		_action(ui, training, str(LESSONS[skill]) + " üben", "party_train", {"actor_uid":uid,"skill":skill})
 	var memories: Array = person.get("memories", [])
 	if not memories.is_empty():
 		column.add_child(Kit.heading("Gemeinsame Erinnerungen"))
@@ -165,10 +192,36 @@ static func show_folio(ui, data: Dictionary, figures: Dictionary, feedback: Stri
 				_text(column, memory)
 			elif memory is Dictionary:
 				_text(column, str(memory.get("text", memory.get("label", ""))))
+	_show_allegiance(ui,column,data)
 	var controls := _flow(column)
 	_button(ui, controls, "Befehlsrad", ui._emit.bind("party_wheel", {}))
 	_action(ui, controls, "Getrennte Wege vereinbaren", "party_dismiss", {"actor_uid":uid})
 	_button(ui, controls, "Zurück ins Spiel", ui._emit.bind("resume", {}), true)
+
+
+static func _show_allegiance(ui, column: Control, data: Dictionary) -> void:
+	var view: Dictionary = data.get("allegiance",{})
+	if view.is_empty():
+		return
+	column.add_child(Kit.heading("Öffentliche Zugehörigkeit · " + str(view.label)))
+	var picker := OptionButton.new()
+	picker.custom_minimum_size.y = Style.TOUCH_MIN
+	Style.style_plaque_button(picker,false,17)
+	for choice: Dictionary in view.options:
+		picker.add_item(str(choice.label))
+	column.add_child(picker)
+	var reason := Style.label("",16,Style.CHARTA)
+	reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	column.add_child(reason)
+	var submit := _button(ui,column,"Entscheidung bestätigen",func():
+		var choice: Dictionary = view.options[picker.selected]
+		ui._emit("party_command",{"command":choice.cmd,"args":{"target":choice.target}}))
+	var select := func(i: int):
+		var why: String = view.options[i].reason
+		reason.text = why
+		submit.disabled = not why.is_empty()
+	picker.item_selected.connect(select)
+	select.call(picker.selected)
 
 
 static func _action(ui, parent: Control, title: String, command: String, args: Dictionary) -> Button:

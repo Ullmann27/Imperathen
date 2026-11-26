@@ -135,6 +135,8 @@ func _ready() -> void:
 
 
 func setup(state: Dictionary) -> void:
+	if state.get("world_id","") != _state.get("world_id",""):
+		_route_destination = "mission"
 	clear_frontier_focus()
 	_shown_health = -1
 	_shown_work = -1.0
@@ -483,6 +485,18 @@ func cue_unarmed(technique: String) -> void:
 	_figure.cue_unarmed(technique)
 
 
+var _mission_route := preload("res://scripts/world/village/mission_route.gd").new()
+var _route_destination := "mission"
+const TravelPath = preload("res://scripts/world/regional_footpath.gd")
+const Waystation = preload("res://scripts/world/regional_waystation.gd")
+
+func select_route(id: String) -> void:
+	if TravelPath.DESTINATIONS.has(id):
+		_route_destination = id
+
+func at_waystation() -> bool:
+	return Waystation.at_counter(get_player_position())
+
 func navigation_view() -> Dictionary:
 	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false,
 		"camera_yaw":snappedf(_camera_yaw,.01),"context":_hint.text if _hint != null and _active and _mode == "person" else ""}
@@ -493,7 +507,11 @@ func navigation_view() -> Dictionary:
 	var npc:=str(chapter.get("target_npc",""))
 	if not npc.is_empty() and VillageLife.has_npc(_state,npc):
 		target=VillageLife.actor_position(_state,npc)
+	if _route_destination != "mission":
+		target = TravelPath.destination(_route_destination)
+		result["destination_name"] = TravelPath.DESTINATIONS[_route_destination]
 	if typeof(target)==TYPE_VECTOR2:
+		result["route"] = _mission_route.route(result.player,target)
 		result["target"]=target
 		result.has_target=true
 	return result
@@ -1043,14 +1061,14 @@ func npc_observations() -> Dictionary:
 	var observations: Dictionary = population.behavior_observations()
 	if is_instance_valid(village_life_world):
 		observations.merge(village_life_world.behavior_observations(), true)
-	if is_instance_valid(_companion) and _companion.visible and str(_state.get("origin_id", "italia")) == "italia":
+	if is_instance_valid(_companion) and _companion.is_visible_in_tree():
 		var at: Vector3 = _companion.global_position + Vector3.UP * 0.9
-		observations["marcus"] = {"position": [at.x, at.y, at.z], "route_distance": 0.0}
+		observations[str(_state.get("companion", {}).get("id", "marcus"))] = {"position": [at.x, at.y, at.z], "route_distance": 0.0}
 	return observations
 
 
 func _sync_companion() -> void:
-	_companion.collision_layer = VillageLayout.CITIZEN_LAYER if Childhood.enabled(_state) else (4 if CombatActions.enabled(_state) else 0)
+	_companion.collision_layer = VillageLayout.CITIZEN_LAYER if Childhood.enabled(_state) or not Childhood.CompanionStory.member(_state, "marcus").is_empty() else (4 if CombatActions.enabled(_state) else 0)
 	var companion: Dictionary = _state.get("companion", {})
 	if not bool(companion.get("met", false)):
 		_companion_label.text = "%s · E\nGefährten kennenlernen" % Origins.PEOPLES[_state.get("origin_id","italia")].companion
@@ -1167,6 +1185,7 @@ func _physics_process(delta: float) -> void:
 	_update_camera(delta)
 	if _state.get("village", {}).get("enabled", false):
 		regional_terrain.follow(get_player_position(), _quality_profile)
+		regional_terrain.waystation.update_nearby(get_player_position(),float(_state.world_seconds),delta)
 	population.update_nearby(get_player_position(),_active and _mode == "person")
 	if not _active:
 		return
@@ -1574,6 +1593,9 @@ func _at_council_records() -> bool:
 func _interact() -> void:
 	if _mode != "person":
 		return
+	if at_waystation() and _state.village.enabled:
+		action_requested.emit("waystation_market",{})
+		return
 	if Childhood.enabled(_state):
 		var at:=Vector2(_player.position.x,_player.position.z)
 		for item: Dictionary in Childhood.interactables(_state):
@@ -1749,6 +1771,9 @@ func _update_context_hint() -> void:
 	_hint.visible = showing and not hud_prompts
 	_hint.text = ""
 	if not showing:
+		return
+	if at_waystation() and _state.village.enabled:
+		_hint.text = "Weidenhof · zum Stadtmarkt weiterreisen"
 		return
 	if Childhood.enabled(_state):
 		var at:=Vector2(_player.position.x,_player.position.z)

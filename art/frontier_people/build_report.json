@@ -12,8 +12,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_man_0.glb",
           "triangles": 19719,
-          "bytes": 5050156,
-          "sha256": "0a6fc92ebf07e410c3fcd0de0f9ef3f2a1224ae7ca500d24330560425002d328",
+          "bytes": 5234416,
+          "sha256": "6e5c1f3372741fb1613ba5a484e1c014a04b1726a33df61f2dd8bce8b84b29f2",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -75,14 +75,15 @@
             "smoothed_welded_vertices": 22,
             "rings": 1,
             "passes": 1
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_civilian_man_1.glb",
           "triangles": 7628,
-          "bytes": 2567324,
-          "sha256": "8099a2dcfb2b2d83133c3211b71d0eacf420240998f42dc0fbebd0e14127dd9b",
+          "bytes": 2635532,
+          "sha256": "4a6f6db0290beeb3944e6a55f6a4da5edd36b65a6e93afff6167e8b29dd0b0e5",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -139,7 +140,8 @@
             "body_through_tunic_before_m": 0.0499,
             "body_through_tunic_m": 0.0499,
             "smoothed_welded_vertices": 30
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 2,
@@ -270,8 +272,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_woman_0.glb",
           "triangles": 20395,
-          "bytes": 5342164,
-          "sha256": "e682c57438d68580a05027ca8b05e10adf9910fd5a8fa2fc5aea250fdce55ac7",
+          "bytes": 5527724,
+          "sha256": "a3c673fc0ebeeabda862b0ac277c7b2afab82c432f3c6eb200523836390f588e",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -331,14 +333,15 @@
             "smoothed_welded_vertices": 23,
             "rings": 1,
             "passes": 1
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_civilian_woman_1.glb",
           "triangles": 7889,
-          "bytes": 2643112,
-          "sha256": "fd419a3468dfaeeb02f16017d19803a3e3d4224eb42d53930954361deffd3f12",
+          "bytes": 2709960,
+          "sha256": "1e7370804af1ab74af19676a7e1ac2e10a2ba1eda9b85585da45bf9db77675e7",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -392,7 +395,8 @@
           },
           "tunic_seam": {
             "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 2,
@@ -525,8 +529,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_elder_0.glb",
           "triangles": 19817,
-          "bytes": 4495308,
-          "sha256": "03659c484a84c70b595e4803b9308b809f8e8f2b0506e93211f8429dca961c3e",
+          "bytes": 4680492,
+          "sha256": "50fdd03555d834a9aab45d98730c8451ef4d6cf722e4f71d484b0c67a0edb8a4",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -588,14 +592,15 @@
             "smoothed_welded_vertices": 22,
             "rings": 1,
             "passes": 1
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_elder_1.glb",
           "triangles": 7666,
-          "bytes": 2418428,
-          "sha256": "a913ee9fb3dc5d87e6dc514fb1eff9f4fb447fddf2b29d506bf6a27b355730d5",
+          "bytes": 2487576,
+          "sha256": "ad27a629126548d88a08210356fd05f7a2facc5f1f739d1b3ab6743e2be2728c",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -654,7 +659,8 @@
             "smoothed_welded_vertices": 7,
             "rings": 0,
             "passes": 1
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 2,
@@ -785,8 +791,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_legionary_0.glb",
           "triangles": 19060,
-          "bytes": 3717316,
-          "sha256": "3defd4ea4f3000505c1014ceebb4498acda20e7ebd65189cd1ef42168aba2af5",
+          "bytes": 3884464,
+          "sha256": "03d36a8b00838c43017aaafd31c9ff5d73955e95f3125da33968f513b47c4d31",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -832,14 +838,15 @@
             "body_through_tunic_before_m": 0.0306,
             "body_through_tunic_m": 0.0306,
             "smoothed_welded_vertices": 51
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_legionary_1.glb",
           "triangles": 7345,
-          "bytes": 2313176,
-          "sha256": "10be255ac1cff3885e36ebd728235292e38b490f80fd65753be4ec20274e7d4f",
+          "bytes": 2372756,
+          "sha256": "e643c8d95b32873e4833e7865891d3ffd0e2f1e37a2aa72c544ed6f0ea938850",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -885,7 +892,8 @@
             "body_through_tunic_before_m": 0.031,
             "body_through_tunic_m": 0.031,
             "smoothed_welded_vertices": 38
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 2,
@@ -992,8 +1000,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_officer_0.glb",
           "triangles": 19264,
-          "bytes": 3765440,
-          "sha256": "071ebcfeaa9d6cbfc118023317e38b96694b744234138298005fad0264c8dea5",
+          "bytes": 3932588,
+          "sha256": "248e901d928c707f5d0984915fd26a4314028a4f8c25aa14a35c7e4c11030213",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -1039,14 +1047,15 @@
             "body_through_tunic_before_m": 0.0306,
             "body_through_tunic_m": 0.0306,
             "smoothed_welded_vertices": 51
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_officer_1.glb",
           "triangles": 7418,
-          "bytes": 2349428,
-          "sha256": "ad5efe328a3b63ad36ef35e74a0eb78bf03994f237cfbe1a5dd9dae1ee611412",
+          "bytes": 2409008,
+          "sha256": "729a5b3a6093d5de2b2f58031a23a747d4ba9e0a803e1949be83007e51f4fb1f",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -1092,7 +1101,8 @@
             "body_through_tunic_before_m": 0.031,
             "body_through_tunic_m": 0.031,
             "smoothed_welded_vertices": 38
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 2,
@@ -1199,8 +1209,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_spearman_0.glb",
           "triangles": 18978,
-          "bytes": 3737092,
-          "sha256": "a61e31a80c537158b560c4730e4d686c731eac4c376fdcb2fdd3983908e6ab4e",
+          "bytes": 3904240,
+          "sha256": "04c01c56386599fa19868e08415227069118ece6213cdb77bcdd262e35c21321",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -1246,14 +1256,15 @@
             "body_through_tunic_before_m": 0.0306,
             "body_through_tunic_m": 0.0306,
             "smoothed_welded_vertices": 51
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_spearman_1.glb",
           "triangles": 7319,
-          "bytes": 2337596,
-          "sha256": "aa15cecf61de4f3132de6ff6b0f05efdd6727ba376f9bd13393bd50c3bb7713e",
+          "bytes": 2397172,
+          "sha256": "d6e6d641d2bd3fd0ef7b60b391a4eb5210b78d436307d72e63df9dbaeb0e51e8",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -1299,7 +1310,8 @@
             "body_through_tunic_before_m": 0.031,
             "body_through_tunic_m": 0.031,
             "smoothed_welded_vertices": 38
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 2,
@@ -1406,8 +1418,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_archer_0.glb",
           "triangles": 18308,
-          "bytes": 3661484,
-          "sha256": "75237719a81410d5e1d96941b91974f37243a24816d893a9b4348e35c7698fba",
+          "bytes": 3828632,
+          "sha256": "0efe780fd5d3bf57642ea921863f7e46ed63f97e647235a285c269053136803c",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -1453,14 +1465,15 @@
             "body_through_tunic_before_m": 0.0507,
             "body_through_tunic_m": 0.0507,
             "smoothed_welded_vertices": 71
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_archer_1.glb",
           "triangles": 7064,
-          "bytes": 2314268,
-          "sha256": "521648fbfe4888e62a10d6a8e64712a8e5238a8a4c3b320a8480ee1d6835b7f5",
+          "bytes": 2373844,
+          "sha256": "743aa9128a8363ebe7328e1c8414d153c2efc401f45c4fbc115692ef2f62884c",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -1506,7 +1519,8 @@
             "body_through_tunic_before_m": 0.031,
             "body_through_tunic_m": 0.031,
             "smoothed_welded_vertices": 50
-          }
+          },
+          "identity_shapes": true
         },
         {
           "lod": 2,
