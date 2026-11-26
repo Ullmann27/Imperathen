@@ -4,6 +4,7 @@ extends SceneTree
 const Core = preload("res://scripts/domain/melee/melee_core.gd")
 const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
 const Geo = preload("res://scripts/domain/melee/melee_geometry.gd")
+const AI = preload("res://scripts/domain/melee/melee_ai.gd")
 const DT := 1.0 / 60.0
 var checks := 0
 var failures: Array[String] = []
@@ -25,6 +26,8 @@ func _initialize() -> void:
 	_test_shield_integrity()
 	_test_measured_motion_limits()
 	_test_shield_coverage()
+	_test_ai_guard_choice()
+	_test_ai_duel()
 	for line in table:
 		print(line)
 	for failure in failures:
@@ -475,3 +478,55 @@ func _test_shield_coverage() -> void:
 		var vertical := float(spec.radius) if spec.shape == "disc" else float(spec.half[1])
 		table.append("Schild %s: Breite ±%.2f m, Höhe ±%.2f m, Mitte %.2f m vor der Körperachse auf %.2f m Höhe → Deckungswinkel ±%.0f°" % [kit, half, vertical, distance, c.y, result[kit]])
 	_check(result.legionary > result.axe_fighter, "The wide scutum covers a wider angle than the round shield")
+
+
+func _test_ai_guard_choice() -> void:
+	var spot := _peak_spot("axe_fighter", "axe_overhead", float(Tracks.kit("legionary").radius), 0.02)
+	var state := _duel("axe_fighter", "legionary", spot)
+	Core.command(state, "a", "attack", {"move":"axe_overhead"})
+	_run(state, 22)
+	var decision := AI.decide(state, "d", "a", 1.0)
+	_check(decision.action == "guard" and decision.args.style == "guard_high", "AI raises a high guard against a descending axe (%s)" % JSON.stringify(decision))
+	AI.apply(state, "d", "a", decision, DT)
+	var log := _run(state, 40, ["block", "parry", "hit"])
+	_check(not _first(log, "block").is_empty() or not _first(log, "parry").is_empty(), "The chosen guard actually stops the axe")
+
+
+func _ai_duel(seed: int, rome_shield := true) -> Dictionary:
+	var state := Core.new_state(seed)
+	Core.add_fighter(state, "rome", "legionary", {"team":"rome", "x":0.0, "z":0.0})
+	Core.add_fighter(state, "tribe", "axe_fighter", {"team":"tribe", "x":0.3, "z":-4.0})
+	state.fighters.rome.has_shield = rome_shield
+	var counts := {}
+	var min_gap := INF
+	var finite := true
+	for frame in 60 * 25:
+		for pair: Array in [["rome", "tribe"], ["tribe", "rome"]]:
+			AI.apply(state, pair[0], pair[1], AI.decide(state, pair[0], pair[1]), DT)
+		for e: Dictionary in Core.step(state, DT):
+			counts[e.type] = int(counts.get(e.type, 0)) + 1
+		var a: Dictionary = state.fighters.rome
+		var b: Dictionary = state.fighters.tribe
+		for f: Dictionary in [a, b]:
+			finite = finite and is_finite(float(f.x)) and is_finite(float(f.z)) and is_finite(float(f.health)) and is_finite(float(f.stamina))
+		if bool(a.alive) and bool(b.alive):
+			min_gap = minf(min_gap, Vector2(float(a.x) - float(b.x), float(a.z) - float(b.z)).length() - float(a.radius) - float(b.radius))
+		if not bool(a.alive) or not bool(b.alive):
+			break
+	return {"counts":counts, "gap":min_gap, "finite":finite, "state":JSON.stringify(state.fighters)}
+
+
+func _test_ai_duel() -> void:
+	var first := _ai_duel(8)
+	var again := _ai_duel(8)
+	var c: Dictionary = first.counts
+	_check(first.state == again.state, "An AI duel replays identically for one seed")
+	_check(first.finite, "AI duel state stays finite")
+	_check(int(c.get("block", 0)) + int(c.get("parry", 0)) >= 3, "Two shield-bearers close to the measured reach and catch frontal strikes (%s)" % JSON.stringify(c))
+	var open := _ai_duel(8, false)
+	var o: Dictionary = open.counts
+	_check(int(o.get("hit", 0)) >= 1, "Without a shield the fallible defence lets real hits through (%s)" % JSON.stringify(o))
+	_check(float(open.gap) >= -0.01, "No interpenetration in the open duel (%.3f m)" % float(open.gap))
+	table.append("KI-Duell ohne Scutum (Seed 8): " + JSON.stringify(o))
+	_check(float(first.gap) >= -0.01, "Fighters never interpenetrate (min gap %.3f m)" % float(first.gap))
+	table.append("KI-Duell Legionär gegen Axtkämpfer (Seed 8, bis 25 s): " + JSON.stringify(c) + (", kleinster Körperabstand %.3f m" % float(first.gap)))

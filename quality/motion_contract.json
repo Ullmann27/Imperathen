@@ -675,6 +675,7 @@
     "scripts/cinematic/opening_checkpoint.gd",
     "scripts/cinematic/opening_director.gd",
     "scripts/domain/combat_actions.gd",
+    "scripts/domain/melee/melee_ai.gd",
     "scripts/domain/melee/melee_core.gd",
     "scripts/domain/melee/melee_feedback.gd",
     "scripts/domain/melee/melee_geometry.gd",
