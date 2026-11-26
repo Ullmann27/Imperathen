@@ -1,0 +1,598 @@
+{
+  "schema_version": 1,
+  "rule": "Truppenkatalog. troop_id ist dauerhaft stabil; Einträge werden angehängt, nie umnummeriert. Zeitspannen statt Epochenflag: valid_from/valid_to sind Jahre, negativ = v. Chr., kein Jahr 0. culture beschreibt Herkunft und Kampfweise, service den Dienstherrn; beides ist keine Feindschaftsangabe (germanische Gruppen können mit Rom verbündet sein). loadout nennt je Platz eine Gegenstandsfamilie mit Qualitätsspanne Q0–Q4; ein Aufstieg verlangt Erfahrung, eine Befugnis und tatsächlich vorhandene Gegenstände. Ränge wie Centurio, Optio und Signifer sind Ernennungen (appointments), keine Erfahrungsstufe (Handbuch S. 68). Kampfwerte sollen künftig aus Gegenstand × Qualität × Ausbildung entstehen (Handbuch S. 79); battle_model.gd verwendet derzeit Schild, Pila-Anzahl und Drill als Freigaben.",
+  "drills": {
+    "testudo": "Schilddach; ab Stufe 2 befehlbar (Scutum erforderlich).",
+    "orbis": "Kreisformation; ab Stufe 1 befehlbar.",
+    "shield_wall": "Geschlossene Schildreihe.",
+    "wedge": "Keil (cuneus).",
+    "pila_volley": "Geordnete Pilensalve.",
+    "skirmish": "Lockeres Plänkeln.",
+    "dismount": "Absitzen und zu Fuß kämpfen."
+  },
+  "authorities": {
+    "depot": "Römisches Depot gibt berechtigte Gegenstände gegen Soldabzug aus (Handbuch S. 43/68; Designregel).",
+    "evocatio": "Wiedereinberufung eines entlassenen Veteranen.",
+    "kin": "Vater, Verwandter oder Anführer stattet den jungen Mann in der Versammlung aus (Tac. Germ. 13).",
+    "leader_gift": "Gabe des Gefolgsherrn aus Beute oder Handel (Tac. Germ. 14).",
+    "leader_selection": "Auswahl durch einen Reiter oder Anführer (Caes. Gall. 1,48).",
+    "own_means": "Erwerb aus eigenem Wohlstand, Handel oder Handwerk.",
+    "kin_status": "Stellung der Familie (Designannahme)."
+  },
+  "appointments": [
+    {"appointment_id": "legatus", "name": "Legat", "culture": "roman", "valid_from": -200, "valid_to": 300, "command_scope": "army",
+     "attestation": "attested", "sources": [{"ref": "Caes. Gall. 1,10", "note": "T. Labienus legatus", "verified": false}]},
+    {"appointment_id": "centurio", "name": "Centurio", "culture": "roman", "valid_from": -400, "valid_to": 400, "command_scope": "company",
+     "attestation": "attested", "sources": [{"ref": "Caes. Gall. 2,25", "note": "Verluste unter den Centurionen", "verified": false}]},
+    {"appointment_id": "optio", "name": "Optio", "culture": "roman", "valid_from": -200, "valid_to": 400, "command_scope": "deputy",
+     "attestation": "attested", "sources": [{"ref": "Polybios 6,24", "note": "Stellvertreter (ouragos)", "verified": false}]},
+    {"appointment_id": "signifer", "name": "Signifer", "culture": "roman", "valid_from": -200, "valid_to": 400, "command_scope": "none",
+     "attestation": "attested", "sources": [{"ref": "Caes. Gall. 2,25", "note": "signifero interfecto", "verified": false}]},
+    {"appointment_id": "praefectus", "name": "Präfekt einer Hilfs- oder Ortstruppe", "culture": "roman", "valid_from": -200, "valid_to": 300, "command_scope": "company",
+     "attestation": "plausible", "sources": [{"ref": "Caes. Gall. 3,26", "note": "praefecti equitum", "verified": false}]},
+    {"appointment_id": "dux", "name": "Kriegsführer (dux)", "culture": "germanic", "valid_from": -120, "valid_to": 400, "command_scope": "army",
+     "attestation": "plausible", "sources": [{"ref": "Tac. Germ. 7", "note": "duces ex virtute sumunt", "verified": false}, {"ref": "Caes. Gall. 6,23", "note": "im Krieg gewählte Anführer", "verified": false}]},
+    {"appointment_id": "princeps", "name": "Anführer einer Gefolgschaft (princeps)", "culture": "germanic", "valid_from": -120, "valid_to": 400, "command_scope": "company",
+     "attestation": "plausible", "sources": [{"ref": "Caes. Gall. 6,23", "note": "principes regionum atque pagorum", "verified": false}, {"ref": "Tac. Germ. 13", "note": "comitatus", "verified": false}]}
+  ],
+  "troops": [
+    {
+      "troop_id": "roman_tiro",
+      "name": "Tiro (Rekrut)",
+      "culture": "roman",
+      "service": "roman",
+      "valid_from": -105,
+      "valid_to": -31,
+      "tier": 1,
+      "role": "line_infantry",
+      "battle_kind": "infantry",
+      "loadout": {
+        "head": {"family_id": "helmet_montefortino", "q_min": 1, "q_max": 2},
+        "shield": {"family_id": "scutum", "q_min": 1, "q_max": 2},
+        "main_hand": {"family_id": "gladius", "q_min": 1, "q_max": 1, "ownership": "loan"},
+        "missile": {"family_id": "pilum", "q_min": 1, "q_max": 2, "count": 1}
+      },
+      "drills": {"testudo": 1, "orbis": 1, "pila_volley": 1, "shield_wall": 1},
+      "upgrades": [
+        {"to": "roman_miles", "xp": 120, "authority": "depot",
+         "items": [{"family_id": "lorica_hamata", "q_min": 1, "n": 1}, {"family_id": "pilum", "q_min": 1, "n": 1}]}
+      ],
+      "visual": {"battle_role": "heavy", "meshy_loadout": ""},
+      "attestation": "plausible",
+      "notes": "Rekruten und neu ausgehobene Legionen sind belegt; die Ausstattung mit Leihschwert und nur einem Pilum ist eine begründete Spielstufe (Dienstwaffen als Leihbestand: Handbuch S. 68, Designregel).",
+      "sources": [
+        {"ref": "Caes. Gall. 1,24", "note": "zwei kürzlich ausgehobene Legionen neben den Veteranen", "verified": false},
+        {"ref": "Caes. Civ. 3,28", "note": "tirones", "verified": false},
+        {"ref": "Handbuch 3.0 S. 68", "note": "Erstausrüstung als Leihbestand", "verified": true}
+      ]
+    },
+    {
+      "troop_id": "roman_miles",
+      "name": "Miles (Legionär)",
+      "culture": "roman",
+      "service": "roman",
+      "valid_from": -105,
+      "valid_to": -31,
+      "tier": 2,
+      "role": "line_infantry",
+      "battle_kind": "infantry",
+      "loadout": {
+        "head": {"family_id": "helmet_montefortino", "q_min": 1, "q_max": 2},
+        "torso": {"family_id": "lorica_hamata", "q_min": 1, "q_max": 2},
+        "shield": {"family_id": "scutum", "q_min": 1, "q_max": 3},
+        "main_hand": {"family_id": "gladius", "q_min": 1, "q_max": 2},
+        "missile": {"family_id": "pilum", "q_min": 1, "q_max": 2, "count": 2}
+      },
+      "drills": {"testudo": 2, "orbis": 2, "pila_volley": 2, "shield_wall": 2},
+      "upgrades": [
+        {"to": "roman_veteranus", "xp": 400, "authority": "depot",
+         "items": [{"family_id": "gladius", "q_min": 2, "n": 1}]}
+      ],
+      "visual": {"battle_role": "heavy", "meshy_loadout": ""},
+      "attestation": "attested",
+      "notes": "Ausstattung mit Helm, Kettenpanzer, Scutum, Gladius und zwei Pila für die Caesarzeit; Zahl der Pila je Mann folgt Polybios und ist für 58 v. Chr. übertragen.",
+      "sources": [
+        {"ref": "Polybios 6,23", "note": "Ausrüstung der Hastati", "verified": false},
+        {"ref": "Caes. Gall. 1,25", "note": "Pilenwurf, dann Schwertkampf", "verified": false},
+        {"ref": "Caes. Gall. 5,9", "note": "testudine facta (7. Legion)", "verified": false},
+        {"ref": "Caes. Gall. 4,37", "note": "orbe facto", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "roman_veteranus",
+      "name": "Veteranus (erfahrener Legionär)",
+      "culture": "roman",
+      "service": "roman",
+      "valid_from": -105,
+      "valid_to": -31,
+      "tier": 3,
+      "role": "line_infantry",
+      "battle_kind": "infantry",
+      "loadout": {
+        "head": {"family_id": "helmet_coolus", "q_min": 2, "q_max": 3},
+        "torso": {"family_id": "lorica_hamata", "q_min": 2, "q_max": 3},
+        "shield": {"family_id": "scutum", "q_min": 2, "q_max": 3},
+        "main_hand": {"family_id": "gladius", "q_min": 2, "q_max": 3, "ownership": "own"},
+        "missile": {"family_id": "pilum", "q_min": 2, "q_max": 3, "count": 2}
+      },
+      "drills": {"testudo": 3, "orbis": 3, "pila_volley": 3, "shield_wall": 3},
+      "upgrades": [
+        {"to": "roman_evocatus", "xp": 900, "authority": "evocatio",
+         "items": [{"family_id": "lorica_hamata", "q_min": 3, "n": 1}]}
+      ],
+      "visual": {"battle_role": "heavy", "meshy_loadout": ""},
+      "attestation": "plausible",
+      "notes": "Veteranenlegionen sind belegt; die Stufe als Einzelaufstieg mit eigenem Schwert ist Spielsystem.",
+      "sources": [
+        {"ref": "Caes. Gall. 1,24", "note": "legiones veteranae in dreifacher Schlachtreihe", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "roman_evocatus",
+      "name": "Evocatus (wiedereinberufener Veteran)",
+      "culture": "roman",
+      "service": "roman",
+      "valid_from": -105,
+      "valid_to": -31,
+      "tier": 4,
+      "role": "line_infantry",
+      "battle_kind": "infantry",
+      "loadout": {
+        "head": {"family_id": "helmet_coolus", "q_min": 3, "q_max": 4},
+        "torso": {"family_id": "lorica_hamata", "q_min": 3, "q_max": 4},
+        "shield": {"family_id": "scutum", "q_min": 3, "q_max": 4},
+        "main_hand": {"family_id": "gladius", "q_min": 3, "q_max": 4, "ownership": "own"},
+        "missile": {"family_id": "pilum", "q_min": 2, "q_max": 3, "count": 2}
+      },
+      "drills": {"testudo": 3, "orbis": 3, "pila_volley": 3, "shield_wall": 3},
+      "upgrades": [],
+      "visual": {"battle_role": "heavy", "meshy_loadout": ""},
+      "attestation": "attested",
+      "notes": "Evocati als eigene Gruppe in spätrepublikanischen Heeren belegt; Ausrüstungsqualität ist Spielannahme.",
+      "sources": [
+        {"ref": "Caes. Civ. 3,88", "note": "evocatorum circiter duo milia im Heer des Pompeius", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "roman_legionarius_principate",
+      "name": "Legionär der frühen Kaiserzeit",
+      "culture": "roman",
+      "service": "roman",
+      "valid_from": 9,
+      "valid_to": 200,
+      "tier": 2,
+      "role": "line_infantry",
+      "battle_kind": "infantry",
+      "loadout": {
+        "head": {"family_id": "helmet_imperial_gallic", "q_min": 1, "q_max": 3},
+        "torso": {"family_id": "lorica_segmentata", "q_min": 1, "q_max": 3},
+        "shield": {"family_id": "scutum", "q_min": 1, "q_max": 3},
+        "main_hand": {"family_id": "gladius", "q_min": 1, "q_max": 3},
+        "missile": {"family_id": "pilum", "q_min": 1, "q_max": 3, "count": 2}
+      },
+      "drills": {"testudo": 2, "orbis": 2, "pila_volley": 2, "shield_wall": 2},
+      "upgrades": [],
+      "visual": {"battle_role": "heavy", "meshy_loadout": ""},
+      "attestation": "attested",
+      "notes": "Spätere Variante für Zeitsprünge. Beginn 9 n. Chr. folgt dem frühesten gesicherten Schienenpanzer-Fund (Kalkriese); kein Einsatz in der Caesar-Phase.",
+      "sources": [
+        {"ref": "Fundplatz Kalkriese (9 n. Chr.)", "note": "lorica segmentata Typ Kalkriese", "verified": false},
+        {"ref": "Trajanssäule (113 n. Chr.)", "note": "Darstellung", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "cisalpine_militia_spear",
+      "name": "Passwache (Ortsaufgebot mit Speer)",
+      "culture": "cisalpine",
+      "service": "roman",
+      "valid_from": -181,
+      "valid_to": -31,
+      "tier": 2,
+      "role": "spear_infantry",
+      "battle_kind": "spear",
+      "loadout": {
+        "head": {"family_id": "helmet_montefortino", "q_min": 0, "q_max": 1},
+        "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 2},
+        "main_hand": {"family_id": "spear", "q_min": 1, "q_max": 2}
+      },
+      "drills": {"shield_wall": 1},
+      "upgrades": [],
+      "visual": {"battle_role": "spear", "meshy_loadout": ""},
+      "attestation": "design_assumption",
+      "notes": "Fiktive Ortswehr des Prüfstands bei Aquileia (Kolonie seit 181 v. Chr.). Die Legion der Caesarzeit führte keine Speerträger in der Linie; deshalb ist die Speerkompanie ein örtliches Aufgebot unter römischem Befehl. Bewaffnung mit Speer, Brettschild und einfachem Helm ist für die Region plausibel, die Einheit selbst ist Spielerfindung.",
+      "sources": [
+        {"ref": "Liv. 40,34", "note": "Gründung der Kolonie Aquileia 181 v. Chr.", "verified": false},
+        {"ref": "Caes. Gall. 8,24", "note": "Einfälle bei Tergeste, Schutz der Region", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "aux_sagittarius_creticus",
+      "name": "Kretischer Bogenschütze",
+      "culture": "cretan",
+      "service": "roman",
+      "valid_from": -200,
+      "valid_to": -31,
+      "tier": 2,
+      "role": "archer",
+      "battle_kind": "archer",
+      "loadout": {
+        "main_hand": {"family_id": "bow", "q_min": 1, "q_max": 3}
+      },
+      "drills": {"skirmish": 2},
+      "upgrades": [],
+      "visual": {"battle_role": "archer", "meshy_loadout": "roman_aux_archer"},
+      "attestation": "attested",
+      "notes": "Kretische Bogenschützen im Heer Caesars 57 v. Chr.; republikanische Bundesgenossenkontingente, keine festen Kohorten.",
+      "sources": [
+        {"ref": "Caes. Gall. 2,7", "note": "Numidas et Cretas sagittarios et funditores Baleares", "verified": false},
+        {"ref": "Caes. Gall. 2,10", "note": "funditores sagittariosque", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "aux_funditor_balearicus",
+      "name": "Balearischer Schleuderer",
+      "culture": "balearic",
+      "service": "roman",
+      "valid_from": -120,
+      "valid_to": -31,
+      "tier": 2,
+      "role": "slinger",
+      "battle_kind": "archer",
+      "loadout": {
+        "main_hand": {"family_id": "sling", "q_min": 1, "q_max": 3}
+      },
+      "drills": {"skirmish": 2},
+      "upgrades": [],
+      "visual": {"battle_role": "archer", "meshy_loadout": ""},
+      "attestation": "attested",
+      "notes": "battle_kind archer bedeutet hier Fernkampfverband; ein eigenes Schleudermodell fehlt noch (P5).",
+      "sources": [
+        {"ref": "Caes. Gall. 2,7", "note": "funditores Baleares", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "aux_numida",
+      "name": "Numidischer Leichtbewaffneter",
+      "culture": "numidian",
+      "service": "roman",
+      "valid_from": -200,
+      "valid_to": -31,
+      "tier": 2,
+      "role": "skirmisher",
+      "battle_kind": "",
+      "loadout": {
+        "shield": {"family_id": "shield_round", "q_min": 0, "q_max": 2},
+        "missile": {"family_id": "javelin", "q_min": 1, "q_max": 2, "count": 3}
+      },
+      "drills": {"skirmish": 3},
+      "upgrades": [],
+      "visual": {"battle_role": "", "meshy_loadout": ""},
+      "attestation": "attested",
+      "notes": "Speerwerfer sind in der Gefechtssimulation noch nicht als eigene Art umgesetzt (battle_kind leer).",
+      "sources": [
+        {"ref": "Caes. Gall. 2,10", "note": "levis armaturae Numidas", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "aux_eques_gallicus",
+      "name": "Gallischer Bundesreiter",
+      "culture": "gallic",
+      "service": "roman",
+      "valid_from": -58,
+      "valid_to": -31,
+      "tier": 3,
+      "role": "cavalry",
+      "battle_kind": "",
+      "loadout": {
+        "main_hand": {"family_id": "spear", "q_min": 1, "q_max": 3},
+        "sidearm": {"family_id": "sword_long", "q_min": 1, "q_max": 3},
+        "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 3},
+        "mount": {"family_id": "horse_service", "q_min": 1, "q_max": 3},
+        "mount_gear": {"family_id": "saddle_four_horn", "q_min": 1, "q_max": 3}
+      },
+      "drills": {"dismount": 1},
+      "upgrades": [],
+      "visual": {"battle_role": "", "meshy_loadout": ""},
+      "attestation": "attested",
+      "notes": "Belegt ab dem Feldzug 58 v. Chr.; frühere Dienste sind plausibel, aber nicht übernommen. Reiter sind in der Gefechtssimulation noch nicht aktiv.",
+      "sources": [
+        {"ref": "Caes. Gall. 1,15", "note": "equitatus aus der Provinz und von den Haeduern", "verified": false},
+        {"ref": "Caes. Gall. 1,18", "note": "Dumnorix führt die haeduische Reiterei", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "germanic_youth_javelin",
+      "name": "Jungkrieger mit Wurfspeeren",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 200,
+      "tier": 1,
+      "role": "skirmisher",
+      "battle_kind": "",
+      "loadout": {
+        "shield": {"family_id": "shield_round", "q_min": 0, "q_max": 1},
+        "missile": {"family_id": "javelin", "q_min": 0, "q_max": 1, "count": 3}
+      },
+      "drills": {"skirmish": 1},
+      "upgrades": [
+        {"to": "germanic_levy", "xp": 100, "authority": "kin",
+         "items": [{"family_id": "spear", "q_min": 1, "n": 1}, {"family_id": "shield_round", "q_min": 1, "n": 1}]}
+      ],
+      "visual": {"battle_role": "", "meshy_loadout": ""},
+      "attestation": "plausible",
+      "notes": "Tacitus (um 98 n. Chr.) beschreibt Wurfwaffen und die Waffenübergabe an junge Männer; Rückprojektion auf 58 v. Chr.",
+      "sources": [
+        {"ref": "Tac. Germ. 6", "note": "missilia spargunt", "verified": false},
+        {"ref": "Tac. Germ. 13", "note": "scuto frameaque iuvenem ornant", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "germanic_civil_levy",
+      "name": "Ziviles Aufgebot",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 400,
+      "tier": 1,
+      "role": "levy",
+      "battle_kind": "spear",
+      "loadout": {
+        "main_hand": {"family_id": "spear", "q_min": 0, "q_max": 1},
+        "missile": {"family_id": "javelin", "q_min": 0, "q_max": 1, "count": 1}
+      },
+      "drills": {},
+      "upgrades": [
+        {"to": "germanic_levy", "xp": 100, "authority": "kin",
+         "items": [{"family_id": "shield_round", "q_min": 1, "n": 1}, {"family_id": "spear", "q_min": 1, "n": 1}]}
+      ],
+      "visual": {"battle_role": "spear", "meshy_loadout": "germanic_light_spearman"},
+      "attestation": "plausible",
+      "notes": "Unterschiedlich ausgerüstete Bauern und Handwerker; Ausrüstung hängt vom Haushalt ab (Q0–Q1). Ganze Gemeinschaften mit Familien und Wagen begleiteten das Heer (Caes. Gall. 1,51); Familien sind Nichtkombattanten.",
+      "sources": [
+        {"ref": "Caes. Gall. 1,51", "note": "Wagenburg, Frauen und Kinder am Schlachtfeld", "verified": false},
+        {"ref": "Tac. Germ. 6", "note": "Hauptbewaffnung Speer", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "germanic_levy",
+      "name": "Heerbann (Speer- und Schildträger)",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 400,
+      "tier": 2,
+      "role": "spear_infantry",
+      "battle_kind": "spear",
+      "loadout": {
+        "main_hand": {"family_id": "spear", "q_min": 1, "q_max": 2},
+        "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 2},
+        "missile": {"family_id": "javelin", "q_min": 1, "q_max": 2, "count": 2}
+      },
+      "drills": {"wedge": 1, "shield_wall": 1},
+      "upgrades": [
+        {"to": "germanic_warrior", "xp": 300, "authority": "own_means",
+         "items": [{"family_id": "spear", "q_min": 2, "n": 1}, {"family_id": "shield_round", "q_min": 2, "n": 1}]},
+        {"to": "germanic_foot_runner", "xp": 250, "authority": "leader_selection",
+         "items": [{"family_id": "javelin", "q_min": 2, "n": 3}]}
+      ],
+      "visual": {"battle_role": "spear", "meshy_loadout": "germanic_light_spearman"},
+      "attestation": "plausible",
+      "notes": "Framea und Schild als Grundbewaffnung nach Tacitus (um 98 n. Chr.); für 58 v. Chr. übertragen. Die geschlossene Kampfordnung gegen Caesar ist für 58 v. Chr. belegt.",
+      "sources": [
+        {"ref": "Tac. Germ. 6", "note": "framea, scuta", "verified": false},
+        {"ref": "Caes. Gall. 1,52", "note": "phalange facta (Ariovist)", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "germanic_axe_shield",
+      "name": "Axtkämpfer mit Schild (seltene Variante)",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 400,
+      "tier": 2,
+      "role": "axe_infantry",
+      "battle_kind": "infantry",
+      "variant_of": "germanic_levy",
+      "rarity": "rare",
+      "reconstruction": "artistic",
+      "loadout": {
+        "main_hand": {"family_id": "axe", "q_min": 1, "q_max": 2},
+        "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 2}
+      },
+      "drills": {"shield_wall": 1},
+      "upgrades": [],
+      "visual": {"battle_role": "heavy", "meshy_loadout": "germanic_axe_fighter"},
+      "attestation": "design_assumption",
+      "notes": "Künstlerisch rekonstruierte, seltenere Ausrüstungsvariante für das vorhandene Meshy-Modell (Entscheidung D-024). Kein historischer Standard germanischer Gruppen und nie Vorgabe für ganze Verbände.",
+      "sources": [
+        {"ref": "Game Direction 26.11.2026 B, D-024", "note": "Axt und Schild als seltenere rekonstruierte Variante", "verified": true}
+      ]
+    },
+    {
+      "troop_id": "germanic_warrior",
+      "name": "Krieger",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 400,
+      "tier": 3,
+      "role": "spear_infantry",
+      "battle_kind": "spear",
+      "loadout": {
+        "main_hand": {"family_id": "spear", "q_min": 2, "q_max": 3},
+        "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
+        "missile": {"family_id": "javelin", "q_min": 1, "q_max": 2, "count": 2}
+      },
+      "drills": {"wedge": 2, "shield_wall": 1},
+      "upgrades": [
+        {"to": "germanic_retainer", "xp": 700, "authority": "leader_gift",
+         "items": [{"family_id": "sword_long", "q_min": 2, "n": 1}]},
+        {"to": "germanic_rider", "xp": 600, "authority": "own_means",
+         "items": [{"family_id": "horse_service", "q_min": 1, "n": 1}, {"family_id": "bridle", "q_min": 1, "n": 1}]}
+      ],
+      "visual": {"battle_role": "spear", "meshy_loadout": "germanic_light_spearman"},
+      "attestation": "plausible",
+      "notes": "Erfahrene Freie mit besserer Ausrüstung; Keil nach Sippen.",
+      "sources": [
+        {"ref": "Tac. Germ. 6", "note": "acies per cuneos componitur", "verified": false},
+        {"ref": "Tac. Germ. 7", "note": "familiae et propinquitates bilden den Keil", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "germanic_foot_runner",
+      "name": "Läufer der gemischten Reiterei",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 100,
+      "tier": 3,
+      "role": "mixed_foot",
+      "battle_kind": "",
+      "loadout": {
+        "main_hand": {"family_id": "spear", "q_min": 1, "q_max": 2},
+        "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 2},
+        "missile": {"family_id": "javelin", "q_min": 2, "q_max": 3, "count": 3}
+      },
+      "drills": {"skirmish": 2},
+      "upgrades": [],
+      "visual": {"battle_role": "", "meshy_loadout": ""},
+      "attestation": "attested",
+      "notes": "Schnelle Fußkämpfer, je einer von einem Reiter ausgewählt, kämpfen gemeinsam mit der Reiterei. Gemischte Verbände sind in der Simulation noch nicht aktiv.",
+      "sources": [
+        {"ref": "Caes. Gall. 1,48", "note": "pedites velocissimi ac fortissimi, ex omni copia singuli singulos", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "germanic_retainer",
+      "name": "Gefolgsmann (erfahrener Schwertkämpfer)",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 400,
+      "tier": 4,
+      "role": "sword_infantry",
+      "battle_kind": "infantry",
+      "loadout": {
+        "main_hand": {"family_id": "sword_long", "q_min": 2, "q_max": 3},
+        "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
+        "missile": {"family_id": "javelin", "q_min": 2, "q_max": 2, "count": 2}
+      },
+      "drills": {"wedge": 3, "shield_wall": 2},
+      "upgrades": [
+        {"to": "germanic_noble", "xp": 1200, "authority": "kin_status",
+         "items": [{"family_id": "lorica_hamata", "q_min": 2, "n": 1}, {"family_id": "horse_service", "q_min": 2, "n": 1}]}
+      ],
+      "visual": {"battle_role": "heavy", "meshy_loadout": ""},
+      "attestation": "plausible",
+      "notes": "Persönliche Gefolgschaft eines Anführers; Schwerter selten und deshalb Gabe oder Rangzeichen. Tacitus (um 98 n. Chr.) auf 58 v. Chr. übertragen.",
+      "sources": [
+        {"ref": "Tac. Germ. 13", "note": "comitatus", "verified": false},
+        {"ref": "Tac. Germ. 14", "note": "Gaben des princeps an die Gefolgschaft", "verified": false},
+        {"ref": "Tac. Germ. 6", "note": "rari gladiis", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "germanic_rider",
+      "name": "Reiter",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 400,
+      "tier": 4,
+      "role": "cavalry",
+      "battle_kind": "",
+      "loadout": {
+        "main_hand": {"family_id": "spear", "q_min": 2, "q_max": 3},
+        "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
+        "mount": {"family_id": "horse_service", "q_min": 1, "q_max": 2},
+        "mount_gear": {"family_id": "bridle", "q_min": 1, "q_max": 2}
+      },
+      "drills": {"dismount": 2},
+      "upgrades": [],
+      "visual": {"battle_role": "", "meshy_loadout": "germanic_mounted_retainer"},
+      "attestation": "attested",
+      "notes": "Ohne Sattel (Caes. Gall. 4,2); sitzen ab und kämpfen zu Fuß. Reiter sind in der Simulation noch nicht aktiv.",
+      "sources": [
+        {"ref": "Caes. Gall. 1,48", "note": "Reiterei des Ariovist", "verified": false},
+        {"ref": "Caes. Gall. 4,2", "note": "ex equis desiliunt; ephippiis uti turpe", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "germanic_noble",
+      "name": "Edler",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 400,
+      "tier": 5,
+      "role": "elite_infantry",
+      "battle_kind": "infantry",
+      "loadout": {
+        "main_hand": {"family_id": "sword_long", "q_min": 3, "q_max": 4},
+        "shield": {"family_id": "shield_round", "q_min": 3, "q_max": 4},
+        "torso": {"family_id": "lorica_hamata", "q_min": 2, "q_max": 3},
+        "mount": {"family_id": "horse_service", "q_min": 2, "q_max": 3},
+        "mount_gear": {"family_id": "bridle", "q_min": 2, "q_max": 3}
+      },
+      "drills": {"wedge": 3, "shield_wall": 2, "dismount": 3},
+      "upgrades": [],
+      "visual": {"battle_role": "heavy", "meshy_loadout": ""},
+      "attestation": "plausible",
+      "notes": "Kettenpanzer und Helm nur bei wenigen (Tac. Germ. 6); ein Helm ist deshalb nicht Teil der Standardausrüstung.",
+      "sources": [
+        {"ref": "Tac. Germ. 6", "note": "paucis loricae, vix uni alterive cassis aut galea", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "germanic_eques_auxiliaris",
+      "name": "Germanischer Reiter in römischem Dienst",
+      "culture": "germanic",
+      "service": "roman",
+      "valid_from": -52,
+      "valid_to": -31,
+      "tier": 4,
+      "role": "cavalry",
+      "battle_kind": "",
+      "loadout": {
+        "main_hand": {"family_id": "spear", "q_min": 2, "q_max": 3},
+        "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
+        "mount": {"family_id": "horse_service", "q_min": 1, "q_max": 3},
+        "mount_gear": {"family_id": "bridle", "q_min": 1, "q_max": 3}
+      },
+      "drills": {"dismount": 2},
+      "upgrades": [],
+      "visual": {"battle_role": "", "meshy_loadout": "germanic_mounted_retainer"},
+      "attestation": "attested",
+      "notes": "Germanische Gruppen als Verbündete Roms: Caesar holt 52 v. Chr. Reiter und Leichtbewaffnete von rechtsrheinischen Gemeinwesen.",
+      "sources": [
+        {"ref": "Caes. Gall. 7,65", "note": "equites et levis armaturae pedites aus Germanien", "verified": false},
+        {"ref": "Caes. Gall. 7,80", "note": "Entscheidung durch germanische Reiter", "verified": false}
+      ]
+    },
+    {
+      "troop_id": "germanic_bow_skirmisher",
+      "name": "Hangschützen (Bogen)",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 400,
+      "tier": 2,
+      "role": "archer",
+      "battle_kind": "archer",
+      "loadout": {
+        "main_hand": {"family_id": "bow", "q_min": 1, "q_max": 2}
+      },
+      "drills": {"skirmish": 1},
+      "upgrades": [],
+      "visual": {"battle_role": "archer", "meshy_loadout": ""},
+      "attestation": "design_assumption",
+      "notes": "Hält die vorhandene Schützenrolle des Prüfstands. Bogenschützen sind für germanische Gruppen um 58 v. Chr. literarisch nicht belegt (Tacitus nennt Speer, Wurfspeer und Schild); Bögen sind erst in späteren Moorfunden gut fassbar. Umstellung auf Speerwerfer (germanic_youth_javelin) ist eine offene Entscheidung und braucht eigene Wurfspeer-Regeln und Modelle.",
+      "sources": [
+        {"ref": "Tac. Germ. 6", "note": "keine Bögen genannt", "verified": false},
+        {"ref": "Moorfunde Nydam/Illerup (3.–4. Jh. n. Chr.)", "note": "spätere Bogenfunde", "verified": false}
+      ]
+    }
+  ]
+}
