@@ -76,6 +76,10 @@ static func boot_village(root: Window, errors: Array) -> Node:
 		if game.screen != "opening":
 			break
 		game._opening_skip()
+		# I-01 VID-A waits for the morning choice; skip stops there and decides
+		# nothing, so the bench takes the yard path through the regular command.
+		game._opening_choose("i01_yard")
+		game._opening_skip()
 		game._opening_next()
 		await root.get_tree().process_frame
 	if game.screen != "playing":

@@ -71,6 +71,9 @@ func _process(_delta: float) -> void:
 		if mode == "views" and game.screen == "opening":
 			# A fresh QA install has no save; the bench needs the village, not the story.
 			game._opening_skip()
+			# I-01 VID-A waits for the morning choice (no-op on any other beat).
+			game._opening_choose("i01_yard")
+			game._opening_skip()
 			game._opening_next()
 			return
 		if game.screen != "playing":

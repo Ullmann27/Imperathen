@@ -91,6 +91,9 @@ func _run() -> void:
 		if game.screen != "opening":
 			break
 		game._opening_skip()
+		# I-01 VID-A waits for the morning choice (no-op on any other beat).
+		game._opening_choose("i01_yard")
+		game._opening_skip()
 		game._opening_next()
 		await process_frame
 	if game.screen != "playing":

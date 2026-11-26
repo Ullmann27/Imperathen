@@ -34,6 +34,9 @@ func _run() -> void:
 	game._opening_skip()
 	game._opening_next()
 	game._opening_skip()
+	# I-01 VID-A waits for the player's morning choice (screenplay v4).
+	game.opening_overlay.choice_requested.emit("i01_yard")
+	game._opening_skip()
 	game._opening_next()
 	await _frames(5)
 	_check(game.screen == "playing" and Childhood.enabled(game.model.data), "Production openings hand a new child to the actual game")
