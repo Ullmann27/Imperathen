@@ -43,6 +43,22 @@ class MotionGateTests(unittest.TestCase):
                 file.write_bytes(b"x")
             self.assertEqual(GATE.inventory(p), ({"assets/new_horse.glb"}, {"scripts/new_motion.gd"}))
 
+    def test_support_scene_cannot_hide_clips_rigs_or_instances(self):
+        with tempfile.TemporaryDirectory() as directory:
+            scene = Path(directory) / "mode.tscn"
+            scene.write_text('[gd_scene format=3]\n[ext_resource type="Script" path="res://m.gd" id="1"]\n'
+                             '[node name="Mode" type="Node3D"]\nscript = ExtResource("1")\n')
+            self.assertEqual(GATE.support_scene_errors(scene), [])
+            for hidden in ('[sub_resource type="Animation" id="a"]\n', '[node name="P" type="AnimationPlayer" parent="."]\n',
+                           '[node name="R" type="Skeleton3D" parent="."]\n', '[ext_resource type="PackedScene" path="res://x.glb" id="2"]\n',
+                           '[node name="X" parent="." instance=ExtResource("2")]\n'):
+                with self.subTest(hidden=hidden):
+                    scene.write_text('[gd_scene format=3]\n' + hidden)
+                    self.assertTrue(GATE.support_scene_errors(scene))
+        for path in ("main.tscn", "scenes/city_support_district.tscn"):
+            self.assertIn(path, GATE.SUPPORT)
+            self.assertEqual(GATE.support_scene_errors(Path(__file__).resolve().parents[1] / "prototype" / path), [])
+
     def test_missing_or_stale_or_failed_proof_stops_export(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)

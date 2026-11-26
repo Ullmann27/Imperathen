@@ -69,7 +69,15 @@ REQUIRED_PROFILES = {
 REQUIRED_PLANNED = {"horse_and_other_animals": "animal", "mounted_units": "rider",
                     "rolling_machines": "wheeled", "articulated_equipment": "articulated"}
 SUPPORT = {"assets/animations/hero_cc0_library.tres", "main.tscn",
-           *(f"assets/characters/hero_hand_grip_{i}.res" for i in range(4))}
+           *(f"assets/characters/hero_hand_grip_{i}.res" for i in range(4)),
+           # Mode entry scenes: one root node with its classified script, no motion data.
+           "scenes/city_support_district.tscn", "scenes/roman_material_lab/material_preview.tscn",
+           "scenes/viva_country/country_walk.tscn", "scenes/viva_roma/closeup_lab.tscn",
+           "scenes/world_expansion/preview.tscn"}
+# A support scene may only reference scripts and static presentation settings.
+# Embedded clips, rigs, attachments or instanced scenes need a motion family.
+SCENE_MOTION_RE = re.compile(r'type="(?:Animation\w*|Skeleton3D|BoneAttachment3D|PackedScene|MultiMesh\w*|GPUParticles3D|CPUParticles3D)"'
+                             r'|\binstance\s*=|\binstance_placeholder\s*=')
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -295,6 +303,16 @@ def safe_relative(name: str) -> bool:
             and name == PurePosixPath(name).as_posix() and name != ".")
 
 
+def support_scene_errors(path: Path) -> list[str]:
+    """Reject a text scene that would hide motion behind a support classification."""
+    if path.suffix.lower() != ".tscn":
+        return []
+    text = path.read_text(encoding="utf-8")
+    if SCENE_MOTION_RE.search(text):
+        return [f"{path.name}: support scene embeds animation, a rig, an attachment or an instanced scene"]
+    return []
+
+
 def inspect_static_glb(path: Path) -> bool:
     with path.open("rb") as f:
         header = f.read(20)
@@ -374,6 +392,8 @@ def validate_inventory(root: Path, contract: dict) -> tuple[dict, list[str]]:
                     failures.append(f"{path}: static inspection failed: {e}")
             if status == "support" and path not in SUPPORT:
                 failures.append(f"{path}: new support resource needs an explicit motion classification")
+            elif status == "support" and path in models:
+                failures.extend(support_scene_errors(project / path))
     for key in sorted(REQUIRED_ACTIVE):
         if families.get(key, {}).get("status") != "active":
             failures.append(f"{key}: existing live movement family was removed/disabled without a new contract review")
