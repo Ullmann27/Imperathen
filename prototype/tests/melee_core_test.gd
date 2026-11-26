@@ -6,6 +6,7 @@ const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
 const Geo = preload("res://scripts/domain/melee/melee_geometry.gd")
 const AI = preload("res://scripts/domain/melee/melee_ai.gd")
 const Damage = preload("res://scripts/domain/melee/melee_damage.gd")
+const Formula = preload("res://scripts/battle/combat_formula.gd")
 const DT := 1.0 / 60.0
 var checks := 0
 var failures: Array[String] = []
@@ -32,6 +33,7 @@ func _initialize() -> void:
 	_test_simulate_strike()
 	_test_fighting_styles()
 	_test_damage_formula()
+	_test_hitstop_scales_with_impact()
 	for line in table:
 		print(line)
 	for failure in failures:
@@ -576,27 +578,41 @@ func _test_fighting_styles() -> void:
 
 
 func _test_damage_formula() -> void:
-	# D-042: base x quality x competence x zone x protection (+ stamina,
-	# injuries, wear, contact), every factor reported, reproducible.
-	var hit := {"family":"gladius", "quality":1.1, "competence":1.2, "zone":"torso", "armor":"wool_leather", "strike_kind":"cut",
-		"attacker_stamina":0.9, "injuries":[], "weapon_wear":0.0, "contact_drive":1.0, "contact_frame":27, "roll":0.5}
+	# D-042: level A has no formula or balance value of its own; every hit is
+	# resolved by the shared combat_formula.gd with combat_balance.json.
+	var b: Dictionary = Formula.balance()
+	var hit := {"weapon_id":"gladius", "strike_kind":"cut", "weapon_quality":2, "weapon_wear":0.0, "skill":65.0, "stamina":90.0,
+		"injuries":[], "zone":"torso", "defender_skill":40.0, "armor_pieces":{}, "impact":1.0, "contact_frame":27}
 	var r := Damage.compute(hit)
 	var t: Dictionary = r.terms
-	var product := float(t.weapon_base) * float(t.quality) * float(t.competence) * float(t.zone) * float(t.protection) * float(t.stamina) * float(t.injury) * float(t.wear) * float(t.contact) * float(t.variance)
-	_check(r.damage == int(roundf(product)) and int(t.contact_frame) == 27, "Damage is exactly the reported product of the formula terms (%d)" % r.damage)
+	var shared := Formula.resolve_hit({"weapon":{"family":"gladius", "quality":2, "wear":0.0, "strike":"cut"},
+		"attacker":{"skill":65.0, "stamina":90.0, "injuries":[]}, "defender":{"skill":40.0, "armor":{}}, "zone":"torso",
+		"shield_cover":0.0, "impact":1.0})
+	_check(bool(shared.hit) and is_equal_approx(float(t.raw), float(shared.damage)) and r.damage == int(roundf(float(shared.damage))), "Level A books exactly the shared formula's damage (%d)" % r.damage)
+	var product := 1.0
+	for name: String in Formula.FACTORS:
+		product *= float(t[name])
+	_check(is_equal_approx(product, float(t.raw)) and int(t.contact_frame) == 27, "Damage is the product of the six reported factors, nothing else")
+	_check(is_equal_approx(float(t.weapon_base), float(b.weapons.gladius.base)), "The weapon base is the balance file's value (%.0f)" % float(t.weapon_base))
 	_check(JSON.stringify(Damage.compute(hit)) == JSON.stringify(r), "The formula is a pure, reproducible function")
-	var veteran: int = Damage.compute(hit.merged({"competence":1.4, "quality":1.0}, true)).damage
-	var recruit: int = Damage.compute(hit.merged({"competence":0.6, "quality":5.0}, true)).damage
+	var script := FileAccess.get_file_as_string("res://scripts/domain/melee/melee_damage.gd") + FileAccess.get_file_as_string("res://scripts/domain/melee/melee_core.gd")
+	_check(not script.contains("BALANCE") and not script.contains("ZONE_DAMAGE") and not script.contains("BASE_DAMAGE"), "No second balance table remains in the level-A core")
+	var veteran: int = Damage.compute(hit.merged({"skill":80.0, "weapon_quality":1}, true)).damage
+	var recruit: int = Damage.compute(hit.merged({"skill":25.0, "weapon_quality":4}, true)).damage
 	_check(veteran > recruit, "A trained fighter with ordinary gear outdamages a recruit with the best gear (%d vs %d)" % [veteran, recruit])
-	_check(float(Damage.compute(hit.merged({"quality":5.0}, true)).terms.quality) == 1.25, "Equipment quality is clamped (no uncontrolled multiplier)")
-	var head: int = Damage.compute(hit.merged({"zone":"head", "armor":"none"}, true)).damage
-	var mail: int = Damage.compute(hit.merged({"armor":"mail"}, true)).damage
-	_check(head > r.damage and mail < r.damage, "Hit zone and protection act in the expected direction (%d / %d / %d)" % [head, r.damage, mail])
-	var tired: int = Damage.compute(hit.merged({"attacker_stamina":0.02}, true)).damage
+	var best: int = Damage.compute(hit.merged({"weapon_quality":4}, true)).damage
+	_check(best > r.damage and float(Damage.compute(hit.merged({"weapon_quality":99}, true)).terms.quality) <= float(b.clamps.quality[1]), "Better equipment helps noticeably and stays clamped (%d > %d)" % [best, r.damage])
+	var head: int = Damage.compute(hit.merged({"zone":"head"}, true)).damage
+	var mail: int = Damage.compute(hit.merged({"armor_pieces":Damage.kit_armor("mail")}, true)).damage
+	var helmet: int = Damage.compute(hit.merged({"zone":"head", "armor_pieces":{"head":{"family":"helmet_montefortino", "quality":2, "wear":0.0}}}, true)).damage
+	_check(head > r.damage and mail < r.damage and helmet < head, "Hit zone and protection act in the expected direction (torso %d, head %d, helmet %d, mail %d)" % [r.damage, head, helmet, mail])
+	var tired: int = Damage.compute(hit.merged({"stamina":2.0}, true)).damage
 	var worn: int = Damage.compute(hit.merged({"weapon_wear":1.0}, true)).damage
 	var wounded: int = Damage.compute(hit.merged({"injuries":[{"kind":"arm_wound"}]}, true)).damage
-	var jammed: int = Damage.compute(hit.merged({"contact_drive":0.2}, true)).damage
-	_check(tired < r.damage and worn < r.damage and wounded < r.damage and jammed < r.damage, "Exhaustion, weapon wear, a weapon-arm wound and an early jammed contact each weaken the blow (%d %d %d %d)" % [tired, worn, wounded, jammed])
+	var jammed: int = Damage.compute(hit.merged({"impact":0.2}, true)).damage
+	var parried: int = Damage.compute(hit.merged({"defender_skill":95.0}, true)).damage
+	_check(tired < r.damage and worn < r.damage and wounded < r.damage and jammed < r.damage and parried < r.damage, "Exhaustion, weapon wear, a weapon-arm wound, an early jammed contact and a skilled defender each weaken the blow (%d %d %d %d %d)" % [tired, worn, wounded, jammed, parried])
+	_check(Damage.compute(hit.merged({"weapon_id":"unknown"}, true)).damage == 0, "An unknown weapon deals no damage")
 	# The core books exactly the formula's result at the contact frame.
 	var spot := _peak_spot("legionary", "cut_inward", float(Tracks.kit("axe_fighter").radius), 0.02)
 	var state := _duel("legionary", "axe_fighter", spot)
@@ -605,5 +621,41 @@ func _test_damage_formula() -> void:
 	var event := _first(_run(state, 60, ["hit"]), "hit")
 	_check(not event.is_empty() and event.has("damage_terms") and int(event.damage_terms.contact_frame) == int(event.clip_frame), "Each hit reports its formula terms with the measured contact frame")
 	_check(not event.is_empty() and 100.0 - float(state.fighters.d.health) == float(event.damage), "Health changes by exactly the formula's damage")
-	_check(float(state.fighters.a.weapon_wear) == 0.0 or str(state.fighters.d.armor) == "mail", "Weapon wear only grows on hard contacts")
-	table.append("Schadensformel D-042 (Gladius-Hieb, Rumpf, Wolle/Leder): %d; Veteran/gewöhnlich %d gegen Rekrut/beste Ausrüstung %d; Kopf %d, Kettenhemd %d; erschöpft %d, verschlissen %d, Armwunde %d, gestaucht %d" % [r.damage, veteran, recruit, head, mail, tired, worn, wounded, jammed])
+	var flesh := float(b.wear.weapon_per_hit.flesh)
+	_check(is_equal_approx(float(state.fighters.a.weapon_wear), flesh), "Weapon wear is booked from the formula's wear output (%.3f)" % float(state.fighters.a.weapon_wear))
+	# Trained beats equipped in the simulated strike itself, not only on paper.
+	var reach := Core.nominal_reach("legionary", "thrust", float(Tracks.kit("axe_fighter").radius)) - 0.02
+	var ordinary: Dictionary = Core.simulate_strike("legionary", "thrust", "axe_fighter", reach, 90.0, "guard_front", 3, {}, {"skill":80.0, "weapon_quality":1})
+	var fine: Dictionary = Core.simulate_strike("legionary", "thrust", "axe_fighter", reach, 90.0, "guard_front", 3, {}, {"skill":25.0, "weapon_quality":4})
+	_check(ordinary.get("type", "") == "hit" and fine.get("type", "") == "hit" and int(ordinary.damage) > int(fine.damage), "In the core, the veteran's ordinary blade wounds deeper than the recruit's master blade (%s vs %s)" % [ordinary.get("damage"), fine.get("damage")])
+	table.append("Schadensformel D-042 (gemeinsames Modul; Gladius-Hieb, Rumpf, ungerüstet, Fertigkeit 65 gegen 40): %d; Veteran (80)/Q1 %d gegen Rekrut (25)/Q4 %d; Kopf %d, Helm %d, Kettenhemd %d; erschöpft %d, verschlissen %d, Armwunde %d, gestaucht %d, geübter Verteidiger %d" % [r.damage, veteran, recruit, head, helmet, mail, tired, worn, wounded, jammed, parried])
+
+
+func _test_hitstop_scales_with_impact() -> void:
+	# The striker's impact pause follows the energy of the contact and holds
+	# the clip exactly that many frames before the weapon rebounds.
+	var pauses := {}
+	for entry: Array in [["youth_unarmed", "jab_left"], ["legionary", "thrust"], ["axe_fighter", "axe_overhead"]]:
+		var spot := _peak_spot(entry[0], entry[1], float(Tracks.kit("raider").radius), 0.02)
+		var state := _duel(entry[0], "raider", spot)
+		state.fighters.d.has_shield = false
+		Core.command(state, "a", "attack", {"move":entry[1]})
+		var hit := _first(_run(state, 90, ["hit"]), "hit")
+		_check(not hit.is_empty() and int(hit.get("hitstop_frames", 0)) == Core.hitstop_frames(float(hit.energy_j), false), "%s: the hit reports its impact pause" % entry[1])
+		if hit.is_empty():
+			continue
+		var held := 0
+		var t := float(state.fighters.a.t)
+		var rebound := -1
+		for i in 12:
+			var events := Core.step(state, DT)
+			if state.fighters.a.action == "attack" and is_equal_approx(float(state.fighters.a.t), t):
+				held += 1
+			for e: Dictionary in events:
+				if e.type == "reaction" and e.fighter == "a" and e.kind == "recoil" and rebound < 0:
+					rebound = i + 1
+		_check(rebound == int(hit.hitstop_frames) and held == rebound - 1, "%s: the clip is held for the pause and rebounds on its last frame (%d frames, %.0f J)" % [entry[1], int(hit.hitstop_frames), float(hit.energy_j)])
+		pauses[entry[1]] = [int(hit.hitstop_frames), float(hit.energy_j)]
+	_check(pauses.size() == 3 and pauses.jab_left[0] < pauses.axe_overhead[0] and pauses.jab_left[0] >= int(Core.HITSTOP_RANGE[0]) and pauses.axe_overhead[0] <= int(Core.HITSTOP_RANGE[1]), "A child's jab checks shorter than a full axe blow (%s)" % JSON.stringify(pauses))
+	_check(Core.hitstop_frames(200.0, true) == Core.hitstop_frames(200.0, false) + 1, "A shield holds the weapon one frame longer than a body")
+	table.append("Trefferpause nach Aufprallenergie [Frames, J]: %s" % JSON.stringify(pauses))

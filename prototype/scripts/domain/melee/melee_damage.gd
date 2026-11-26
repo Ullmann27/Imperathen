@@ -1,62 +1,75 @@
 extends RefCounted
-## The single per-hit damage entry point of level A (D-042, handbook p. 79):
-##   Damage = weapon base x quality x competence x hit zone x protection
-## modulated by attacker stamina, injuries, weapon wear and the actual
-## contact (drive of the strike at its measured contact frame), clamped, with
-## a reproducible roll supplied by the caller. Pure function, no side effects.
+## Level A's only door to damage (D-042, handbook p. 79). Every hit of the
+## melee core - blade, fist or missile - is resolved by the shared module
+## scripts/battle/combat_formula.gd with assets/balance/combat_balance.json:
+##   damage = weapon base x quality x competence x zone x protection x contact
+## This file holds no balance value and no arithmetic of its own; it only
+## translates a core fighter into the formula's inputs.
 ##
 ## Shield position enters through geometry: a strike that meets the shield
-## box is resolved as a block before this function is called (no damage), so
-## only strikes that reach the body arrive here.
-##
-## Interim home of the balance parameters. When the shared module
-## prototype/scripts/battle/combat_formula.gd with
-## prototype/assets/balance/combat_balance.json (troops branch) lands,
-## compute() delegates to it with the same inputs (one-line switch) and this
-## BALANCE table is removed, so no second formula remains.
+## box is a block before this is called, so shield_cover is 0 here. The
+## contact factor is the physical impact at the measured contact frame
+## (sqrt of the energy relative to the stroke's free-air energy).
 
-const BALANCE := {
-	"weapon_base":{"fist":6.0, "foot":11.0, "head":7.0, "gladius":16.0, "axe":20.0, "spear":18.0},
-	"zone":{"head":1.5, "torso":1.0, "arm_weapon":0.7, "arm_shield":0.7, "leg":0.8, "neutral":1.0},
-	## Fraction of damage passing the armour, by strike kind.
-	"protection":{"mail":{"cut":0.45, "thrust":0.70, "blunt":0.80}, "wool_leather":{"cut":0.75, "thrust":0.85, "blunt":0.90},
-		"linen":{"cut":0.90, "thrust":0.95, "blunt":1.0}, "none":{"cut":1.0, "thrust":1.0, "blunt":1.0}},
-	## Equipment helps noticeably but can never replace training: its range is
-	## narrower than competence's, and the two come from separate sources.
-	"quality_range":[0.85, 1.25],
-	"competence_range":[0.5, 1.5],
-	"stamina_floor":0.75,
-	"wear_floor":0.70,
-	"contact_range":[0.3, 1.3],
-	"injury":{"arm_wound":0.75},
-	"variance":0.08,
-	"damage_range":[1.0, 250.0],
-}
+const Formula = preload("res://scripts/battle/combat_formula.gd")
+const Weapons = preload("res://scripts/domain/melee/weapon_catalog.gd")
+
+## Armour a kit's clothing stands for, as pieces of the balance file. Wool,
+## leather and linen have no entry there and therefore stop nothing.
+const KIT_ARMOR := {"mail":{"torso":{"family":"lorica_hamata", "quality":2, "wear":0.0}}}
+## Material an armour piece presents to a blow (impact sound, particles).
+const PIECE_MATERIAL := {"lorica_hamata":"iron", "lorica_segmentata":"iron", "helmet_montefortino":"bronze",
+	"helmet_coolus":"bronze", "helmet_imperial_gallic":"iron"}
+const CLOTHING_MATERIAL := {"mail":"iron", "wool_leather":"leather", "linen":"cloth", "none":"flesh"}
+## Core injury kinds as the balance file names them.
+const INJURY := {"concussion":"head_wound"}
 
 
-## hit: weapon_base (or family), quality, competence, zone, armor,
-## strike_kind, attacker_stamina (0..1), injuries (Array of {kind}),
-## weapon_wear (0..1), contact_drive (sqrt(E/E_ref) at the contact frame),
-## contact_frame, roll (0..1, seeded by the caller).
-## Returns {"damage": int, "terms": {...}} - every factor is reported.
+static func kit_armor(clothing: String) -> Dictionary:
+	return (KIT_ARMOR.get(clothing, {}) as Dictionary).duplicate(true)
+
+
+## What a blow to `zone` lands on: the armour piece there, else the clothing
+## on the trunk and limbs, else skin.
+static func surface_material(pieces: Dictionary, clothing: String, zone: String) -> String:
+	var piece: Dictionary = pieces.get(zone, {})
+	if PIECE_MATERIAL.has(piece.get("family", "")):
+		return PIECE_MATERIAL[piece.family]
+	if zone == "head":
+		return "flesh"
+	return str(CLOTHING_MATERIAL.get(clothing, "flesh"))
+
+
+static func injury_kinds(injuries: Array) -> Array:
+	var kinds: Array = []
+	for entry: Variant in injuries:
+		var kind := str(entry.get("kind", "")) if typeof(entry) == TYPE_DICTIONARY else str(entry)
+		kinds.append(INJURY.get(kind, kind))
+	return kinds
+
+
+## hit: weapon_id (weapon_catalog), strike_kind, weapon_quality (0-4),
+## weapon_wear (0-1), skill (0-100), stamina (0-100), injuries (core
+## entries or kinds), zone, defender_skill, armor_pieces {zone:{family,
+## quality, wear}}, impact (0.3-1.3 from the contact), ranged, contact_frame.
+## Returns {"damage": int, "terms": the formula's factors + raw,
+## contact_frame, strike}, "wear": {weapon, shield, armor}} - pure.
 static func compute(hit: Dictionary) -> Dictionary:
-	var b := BALANCE
-	var base := float(hit.get("weapon_base", b.weapon_base.get(str(hit.get("family", "")), 0.0)))
-	var quality := clampf(float(hit.get("quality", 1.0)), b.quality_range[0], b.quality_range[1])
-	var competence := clampf(float(hit.get("competence", 1.0)), b.competence_range[0], b.competence_range[1])
-	var zone := float(b.zone.get(str(hit.get("zone", "neutral")), 1.0))
-	var armor: Dictionary = b.protection.get(str(hit.get("armor", "none")), b.protection.none)
-	var protection := float(armor.get(str(hit.get("strike_kind", "blunt")), 1.0))
-	var stamina := lerpf(b.stamina_floor, 1.0, smoothstep(0.0, 0.3, clampf(float(hit.get("attacker_stamina", 1.0)), 0.0, 1.0)))
-	var injury := 1.0
-	for entry: Variant in hit.get("injuries", []):
-		if typeof(entry) == TYPE_DICTIONARY:
-			injury *= float(b.injury.get(str(entry.get("kind", "")), 1.0))
-	var wear := lerpf(1.0, b.wear_floor, clampf(float(hit.get("weapon_wear", 0.0)), 0.0, 1.0))
-	var contact := clampf(float(hit.get("contact_drive", 1.0)), b.contact_range[0], b.contact_range[1])
-	var variance := lerpf(1.0 - b.variance, 1.0 + b.variance, clampf(float(hit.get("roll", 0.5)), 0.0, 1.0))
-	var raw := base * quality * competence * zone * protection * stamina * injury * wear * contact * variance
-	var damage := int(clampf(roundf(raw), b.damage_range[0], b.damage_range[1])) if base > 0.0 else 0
-	return {"damage":damage, "terms":{"weapon_base":base, "quality":quality, "competence":competence, "zone":zone,
-		"protection":protection, "stamina":stamina, "injury":injury, "wear":wear, "contact":contact,
-		"variance":variance, "contact_frame":int(hit.get("contact_frame", -1)), "raw":raw}}
+	var weapon := {"family":Weapons.balance_family(str(hit.get("weapon_id", ""))), "quality":int(hit.get("weapon_quality", 2)),
+		"wear":float(hit.get("weapon_wear", 0.0))}
+	var kind := str(hit.get("strike_kind", ""))
+	# Missiles keep the balance file's own strike kind (arrow).
+	if not bool(hit.get("ranged", false)) and not kind.is_empty():
+		weapon.strike = kind
+	var result := Formula.resolve_hit({"weapon":weapon,
+		"attacker":{"skill":float(hit.get("skill", 55.0)), "stamina":float(hit.get("stamina", 100.0)), "injuries":injury_kinds(hit.get("injuries", []))},
+		"defender":{"skill":float(hit.get("defender_skill", 55.0)), "armor":hit.get("armor_pieces", {})},
+		"zone":str(hit.get("zone", "torso")), "shield_cover":0.0, "ranged":bool(hit.get("ranged", false)),
+		"impact":float(hit.get("impact", 1.0))})
+	if not bool(result.get("hit", false)):
+		return {"damage":0, "terms":{"error":str(result.get("error", result.get("reason", "")))}, "wear":{"weapon":0.0, "shield":0.0, "armor":0.0}}
+	var terms: Dictionary = (result.factors as Dictionary).duplicate()
+	terms.raw = float(result.damage)
+	terms.strike = str(result.strike)
+	terms.contact_frame = int(hit.get("contact_frame", -1))
+	return {"damage":int(roundf(float(result.damage))), "terms":terms, "wear":result.wear}

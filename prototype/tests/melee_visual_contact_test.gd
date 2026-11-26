@@ -291,7 +291,7 @@ func _scenario(label: String, attacker_kit: String, move: String, defender_kit: 
 				elif event.type in ["block", "parry"]:
 					_check(shield_entry >= 0.0, "%s: on the block frame the rendered weapon touches the rendered shield" % label)
 				print("%s -> %s on clip frame %d (rendered gap %.4f m, shield entry %.3f)" % [label, event.type, int(event.get("clip_frame", -1)), gap, shield_entry])
-			elif frame - held <= (Core.HITSTOP_BODY if event.type == "hit" else Core.HITSTOP_BLOCK) - 1 and not previous.is_empty():
+			elif frame - held <= int(event.hitstop_frames) - 1 and not previous.is_empty():
 				var still := maxf(rendered[0].distance_to(previous[0]), rendered[1].distance_to(previous[1]))
 				_check(still < 0.002, "%s: hit-stop holds the rendered weapon on frame %d (moved %.4f m)" % [label, frame - held, still])
 		previous = rendered

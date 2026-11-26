@@ -20,7 +20,6 @@ const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const CityTrade = preload("res://scripts/city_trade.gd")
 const DODGE_SECONDS := 0.65
 const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
-const Damage = preload("res://scripts/domain/melee/melee_damage.gd")
 ## TrainingGround post collision cylinder (game_world.gd): radius 0.16, 2 m.
 const PRACTICE_RADIUS := 0.16
 const PRACTICE_HEIGHT := 2.0
@@ -242,16 +241,18 @@ static func phase(id: String, elapsed: float) -> String:
 	return "recovery"
 
 
-## Damage through the single D-042 formula (melee_damage.gd). The legacy
-## raid/encounter targets carry no armour or hit-zone model yet, so those
-## terms stay neutral here; learned combat skill is competence and issued
-## equipment is quality (separate sources, no double bonus).
-static func hit_damage(data: Dictionary, technique: String, contact_frame: int) -> int:
+## Damage of the village's saved player path. NOT yet on the shared D-042
+## balance file: this authority keeps its own per-technique values
+## (TECHNIQUES.damage) and the city-trade bonuses, because the raid and
+## encounter targets it strikes (health 45-60, no armour, zone or skill
+## model) are tuned to them and are owned by other branches. Learned skill
+## (as competence) and issued equipment (as quality) are separate, bounded
+## multipliers. Level A proper (melee_core.gd) uses combat_formula.gd only.
+static func hit_damage(data: Dictionary, technique: String, _contact_frame: int) -> int:
 	var base := float(TECHNIQUES[technique].damage)
 	var learned := float(CityTrade.damage_bonus(data, false))
 	var equipped := float(CityTrade.damage_bonus(data, is_armed(technique))) - learned
-	return int(Damage.compute({"weapon_base":base, "competence":1.0 + learned / base, "quality":1.0 + equipped / base,
-		"zone":"neutral", "armor":"none", "contact_frame":contact_frame, "roll":0.5}).damage)
+	return int(clampf(roundf(base * clampf(1.0 + learned / base, 0.5, 1.5) * clampf(1.0 + equipped / base, 0.85, 1.25)), 1.0, 250.0))
 
 
 ## Measured phase boundaries (clip frames at 60 Hz) of a technique.

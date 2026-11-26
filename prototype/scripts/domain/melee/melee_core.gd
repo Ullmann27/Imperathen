@@ -16,24 +16,27 @@ const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
 const Geo = preload("res://scripts/domain/melee/melee_geometry.gd")
 const Actions = preload("res://scripts/domain/combat_actions.gd")
 const Damage = preload("res://scripts/domain/melee/melee_damage.gd")
+const Weapons = preload("res://scripts/domain/melee/weapon_catalog.gd")
+const Ranged = preload("res://scripts/domain/melee/melee_ranged.gd")
+const Impacts = preload("res://scripts/domain/melee/combat_impacts.gd")
 
 const VERSION := 1
 const FPS := 60
 const DT := 1.0 / 60.0
-## Engineering estimates (not measured): effective striking mass including
-## the driving arm/leg segment, kg.
-const EFFECTIVE_MASS := {"fist":1.2, "foot":3.0, "head":4.0, "gladius":1.8, "axe":2.4, "spear":2.2}
-const FAMILY_COST := {"fist":8.0, "foot":15.0, "head":12.0, "gladius":15.0, "axe":19.0, "spear":16.0}
-const WEAPON_MATERIAL := {"fist":"flesh", "foot":"leather", "head":"flesh", "gladius":"iron", "axe":"iron", "spear":"iron"}
-const ARMOR_MATERIAL := {"mail":"iron", "wool_leather":"leather", "linen":"cloth", "none":"flesh"}
+## Weapon physics and materials: weapon_catalog.gd (assets/combat/weapons.json).
+## Damage base and stamina cost: the shared balance file (melee_damage.gd).
 const PARRY_WINDOW := 0.20
 const GUARD_MIN_STAMINA := 5.0
 const DODGE_COST := 16.0
 const STAMINA_LIMIT := 100.0
 const STAMINA_RECOVERY := 12.0
 const POISE_PER_KG := 1.6
-const HITSTOP_BODY := 4
-const HITSTOP_BLOCK := 6
+## Impact pause of the striker in frames, growing with the impact energy
+## (log scale, as loudness and particles do): a child's jab barely checks,
+## a full axe blow sticks. A hard surface (shield) holds one frame longer.
+const HITSTOP_RANGE := [2, 6]
+const HITSTOP_BLOCK_EXTRA := 1
+const HITSTOP_FULL_J := 300.0
 const SUBSTEP_METRES := 0.03
 const REACTIONS := {
 	"flinch":{"duration":0.25, "step":0.0, "strength":0.35},
@@ -53,11 +56,15 @@ const MORALE_BREAKING := 15.0
 
 
 static func new_state(seed: int) -> Dictionary:
-	return {"version":VERSION, "seed":seed, "frame":0, "accumulator":0.0, "rng":0, "fighters":{}}
+	return {"version":VERSION, "seed":seed, "frame":0, "accumulator":0.0, "rng":0, "fighters":{},
+		"projectiles":[], "next_projectile":0, "silent":false}
 
 
-## options: team, x, z, yaw, scale, health, armor, morale, stamina,
-## quality (equipment) and competence (training) for the D-042 formula.
+## options: team, x, z, yaw, scale, health, armor (kit clothing), morale,
+## stamina; for the D-042 formula skill (0-100 training), weapon_quality
+## (grade 0-4) and armor_pieces {zone:{family, quality, wear}} (default: what
+## the kit's clothing stands for); ranged (weapon ids carried) with ammo
+## {id: count} (default: the catalogue's load).
 static func add_fighter(state: Dictionary, id: String, kit_id: String, options: Dictionary = {}) -> String:
 	var kit := Tracks.kit(kit_id)
 	if kit.is_empty():
@@ -72,7 +79,9 @@ static func add_fighter(state: Dictionary, id: String, kit_id: String, options: 
 		"scale":scale, "radius":float(kit.radius) * scale, "height":float(kit.height) * scale,
 		"mass":float(kit.mass_kg) * pow(scale, 3.0), "armor":str(options.get("armor", kit.armor)),
 		"has_shield":typeof(shield) == TYPE_DICTIONARY, "shield_integrity":1.0,
-		"quality":float(options.get("quality", 1.0)), "competence":float(options.get("competence", 1.0)), "weapon_wear":0.0,
+		"skill":clampf(float(options.get("skill", 55.0)), 0.0, 100.0), "weapon_quality":clampi(int(options.get("weapon_quality", 2)), 0, 4), "weapon_wear":0.0,
+		"armor_pieces":(options.get("armor_pieces", Damage.kit_armor(str(options.get("armor", kit.armor)))) as Dictionary).duplicate(true),
+		"shield_fouled":0, "ammo":_ammo(options), "ranged":{},
 		"health":float(options.get("health", 100.0)), "max_health":float(options.get("health", 100.0)),
 		"stamina":float(options.get("stamina", STAMINA_LIMIT)), "fatigue":0.0,
 		"morale":float(options.get("morale", 70.0)), "morale_state":"steady",
@@ -81,6 +90,15 @@ static func add_fighter(state: Dictionary, id: String, kit_id: String, options: 
 		"react":{}, "recoil":[], "injuries":[], "bleed":0.0, "concussion":0.0, "alive":true,
 		"stats":{"hits":0, "blocks":0, "parries":0, "whiffs":0, "taken":0, "interrupted":0}}
 	return ""
+
+
+static func _ammo(options: Dictionary) -> Dictionary:
+	var ammo := {}
+	var given: Dictionary = options.get("ammo", {})
+	for weapon_id: Variant in options.get("ranged", []):
+		if Weapons.is_ranged(str(weapon_id)):
+			ammo[str(weapon_id)] = maxi(0, int(given.get(weapon_id, Weapons.weapon(str(weapon_id)).ammo)))
+	return ammo
 
 
 static func fighter(state: Dictionary, id: String) -> Dictionary:
@@ -114,17 +132,23 @@ static func face(state: Dictionary, id: String, target_id: String) -> bool:
 static func move_cost(kit_id: String, move_id: String) -> float:
 	if kit_id in [Tracks.PLAYER_UNARMED, Tracks.PLAYER_ARMED] and Actions.TECHNIQUES.has(move_id):
 		return float(Actions.TECHNIQUES[move_id].cost)
-	return float(FAMILY_COST.get(str(Tracks.move(kit_id, move_id).get("family", "")), 15.0))
+	return Weapons.stamina_cost(str(Tracks.move(kit_id, move_id).get("family", "")))
 
 
-## Commands: attack {move}, guard {style}, release {}, dodge {style}.
+## Commands: attack {move}, guard {style}, release {}, dodge {style};
+## missiles: draw {weapon, target?|yaw?,pitch?} (with an aim the shot follows
+## as soon as the draw is complete), loose {target|yaw,pitch}, lower {}.
 static func command(state: Dictionary, id: String, action: String, args: Dictionary = {}) -> Dictionary:
 	var f := fighter(state, id)
 	if f.is_empty() or not bool(f.alive):
 		return {"ok":false, "message":"Kein handlungsfähiger Kämpfer."}
-	if f.action in ["react", "down", "dodge"] or (f.action == "attack"):
+	if action in ["loose", "lower"]:
+		return _ranged_command(state, f, action, args)
+	if f.action in ["react", "down", "dodge", "attack", "ranged"]:
 		return {"ok":false, "message":"Die laufende Bewegung ist noch nicht beendet."}
 	match action:
+		"draw":
+			return _ranged_command(state, f, action, args)
 		"attack":
 			var move_id := str(args.get("move", ""))
 			if not Tracks.has_move(str(f.kit), move_id):
@@ -193,6 +217,8 @@ static func step(state: Dictionary, delta: float, world_clear: Callable = Callab
 		state.accumulator = float(state.accumulator) - DT
 		state.frame = int(state.frame) + 1
 		_frame(state, events, world_clear)
+	if not bool(state.get("silent", false)):
+		Impacts.publish(events)
 	return events
 
 
@@ -232,6 +258,8 @@ static func _frame(state: Dictionary, events: Array, world_clear: Callable) -> v
 				break
 			if g < int(timing.start) or g > int(timing.end):
 				continue
+			if g == int(timing.start):
+				events.append(_swing_event(state, f, g))
 			var contact := _sweep(state, f, g, world_clear)
 			if not contact.is_empty():
 				contacts.append(contact)
@@ -252,6 +280,19 @@ static func _frame(state: Dictionary, events: Array, world_clear: Callable) -> v
 			events.append({"type":"recovered", "frame":state.frame, "fighter":id})
 	for contact: Dictionary in contacts:
 		_resolve(state, contact, events)
+	# 3. Missiles in flight.
+	_fly(state, events, world_clear)
+
+
+## The weapon starts cutting the air: first frame of the measured live window.
+static func _swing_event(state: Dictionary, f: Dictionary, g: int) -> Dictionary:
+	var m := Tracks.move(str(f.kit), str(f.move))
+	var family := str(m.family)
+	var speed := float(m.window_top_speed) * float(f.scale)
+	return {"type":"swing", "frame":state.frame, "clip_frame":g, "attacker":f.id, "move":f.move, "family":family,
+		"weapon_material":Weapons.material(family), "strike_kind":Weapons.strike_kind(family, str(f.move)),
+		"speed_m_s":snappedf(speed, 0.001), "energy_j":snappedf(0.5 * Weapons.effective_mass(family) * pow(float(f.scale), 3.0) * speed * speed, 0.01),
+		"point":strike_world(f, g)[1]}
 
 
 static func _tick(state: Dictionary, f: Dictionary, events: Array) -> void:
@@ -259,6 +300,8 @@ static func _tick(state: Dictionary, f: Dictionary, events: Array) -> void:
 		return
 	var resting: bool = f.action == "idle"
 	match str(f.action):
+		"ranged":
+			_ranged_tick(state, f, events)
 		"guard":
 			f.guard_t = float(f.guard_t) + DT
 			if float(f.stamina) <= 0.0:
@@ -477,7 +520,7 @@ static func _resolve(state: Dictionary, c: Dictionary, events: Array) -> void:
 	# extension; a target met there still receives the stroke's momentum,
 	# while a strike jammed early only carries what it has built up so far.
 	var drive_speed := maxf(speed, Tracks.drive_speed(str(f.kit), str(f.move), int(c.clip_frame), float(c.along)) * float(f.scale))
-	var energy := 0.5 * float(EFFECTIVE_MASS[family]) * pow(float(f.scale), 3.0) * drive_speed * drive_speed
+	var energy := 0.5 * Weapons.effective_mass(family) * pow(float(f.scale), 3.0) * drive_speed * drive_speed
 	# A strike caught early in its window (jammed) has not developed its drive.
 	var progress := clampf(float(int(c.clip_frame) - int(m.start)) / maxf(1.0, float(int(m.peak) - int(m.start))), 0.0, 1.0)
 	energy *= lerpf(0.5, 1.0, smoothstep(0.0, 0.6, progress))
@@ -487,7 +530,8 @@ static func _resolve(state: Dictionary, c: Dictionary, events: Array) -> void:
 	push = push.normalized()
 	var base_event := {"frame":state.frame, "clip_frame":int(c.clip_frame), "attacker":f.id, "defender":d.id,
 		"move":f.move, "family":family, "energy_j":snappedf(energy, 0.01), "speed_m_s":snappedf(speed, 0.001), "drive_speed_m_s":snappedf(drive_speed, 0.001),
-		"point":c.point, "direction":Geo.side_of(float(d.yaw), -push), "weapon_material":WEAPON_MATERIAL[family]}
+		"point":c.point, "direction":Geo.side_of(float(d.yaw), -push), "direction_vector":push,
+		"weapon_material":Weapons.material(family), "strike_kind":Weapons.strike_kind(family, str(f.move))}
 	if c.kind == "shield":
 		_resolve_block(state, f, d, energy, push, c, base_event, events)
 		return
@@ -498,9 +542,7 @@ static func _resolve_block(state: Dictionary, f: Dictionary, d: Dictionary, ener
 	var braced: bool = d.action == "guard"
 	var parry: bool = braced and float(d.guard_t) <= PARRY_WINDOW
 	var cost := clampf(energy * 0.10, 3.0, 40.0)
-	for injury: Dictionary in d.injuries:
-		if injury.kind == "shield_arm_wound":
-			cost *= 1.4
+	cost *= _shield_burden(d)
 	if not braced:
 		cost *= 1.5
 	if parry:
@@ -514,9 +556,10 @@ static func _resolve_block(state: Dictionary, f: Dictionary, d: Dictionary, ener
 	event.braced = braced
 	event.surface_material = "bronze" if boss and str(shield_spec.material).contains("bronze") else ("iron" if boss else "wood")
 	event.stamina_cost = snappedf(cost, 0.01)
-	f.hitstop = HITSTOP_BLOCK
+	f.hitstop = hitstop_frames(energy, true)
+	event.hitstop_frames = int(f.hitstop)
 	f.recoil = [-push.x, -push.z]
-	f.weapon_wear = minf(1.0, float(f.weapon_wear) + energy / 6000.0)
+	f.weapon_wear = minf(1.0, float(f.weapon_wear) + float(Damage.Formula.balance().wear.weapon_per_hit.shield))
 	d.shield_integrity = maxf(0.0, float(d.shield_integrity) - energy / 1500.0)
 	event.shield_integrity = snappedf(float(d.shield_integrity), 0.0001)
 	if float(d.stamina) + 0.000001 < cost:
@@ -542,72 +585,105 @@ static func _resolve_block(state: Dictionary, f: Dictionary, d: Dictionary, ener
 			_set_reaction(state, d, "flinch", push, events)
 
 
-static func _resolve_hit(state: Dictionary, f: Dictionary, d: Dictionary, m: Dictionary, energy: float, push: Vector3, c: Dictionary, base: Dictionary, events: Array) -> void:
-	var family := str(m.family)
+static func hitstop_frames(energy: float, on_shield: bool) -> int:
+	var level := clampf(log(1.0 + maxf(0.0, energy)) / log(1.0 + HITSTOP_FULL_J), 0.0, 1.0)
+	return roundi(lerpf(float(HITSTOP_RANGE[0]), float(HITSTOP_RANGE[1]), level)) + (HITSTOP_BLOCK_EXTRA if on_shield else 0)
+
+
+static func _zone(d: Dictionary, point: Vector3) -> String:
 	var kit := Tracks.kit(str(d.kit))
-	var height := float((c.point as Vector3).y)
 	var s := float(d.scale)
-	var local := Geo.to_local(_origin(d), float(d.yaw), c.point)
-	var zone := "torso"
-	if height >= float(kit.head_low) * s:
-		zone = "head"
-	elif height < float(kit.hip) * s:
-		zone = "leg"
-	elif absf(local.x) > float(d.radius) * 0.6 and height <= float(kit.shoulder_y) * s + 0.05:
-		zone = "arm_weapon" if local.x > 0.0 else "arm_shield"
-	var kind := "thrust" if family == "spear" or str(f.move) == "thrust" else ("cut" if family in ["gladius", "axe"] else "blunt")
-	var reference := 0.5 * float(EFFECTIVE_MASS[family]) * pow(float(m.window_top_speed), 2.0)
-	var armor := "none" if zone == "head" else str(d.armor)
-	# The one per-hit formula (D-042); this frame is the measured contact.
-	var result := Damage.compute({"family":family, "quality":float(f.quality), "competence":float(f.competence),
-		"zone":zone, "armor":armor, "strike_kind":kind, "attacker_stamina":float(f.stamina) / STAMINA_LIMIT,
-		"injuries":f.injuries, "weapon_wear":float(f.weapon_wear), "contact_drive":sqrt(energy / maxf(0.01, reference)),
-		"contact_frame":int(c.clip_frame), "roll":_roll(state, "damage:%s:%s" % [f.id, d.id])})
-	var damage := float(result.damage)
-	if armor == "mail":
-		f.weapon_wear = minf(1.0, float(f.weapon_wear) + energy / 12000.0)
-	d.health = maxf(0.0, float(d.health) - damage)
-	f.hitstop = HITSTOP_BODY
-	f.recoil = [-push.x, -push.z]
-	f.stats.hits = int(f.stats.hits) + 1
-	d.stats.taken = int(d.stats.taken) + 1
-	var event := base.duplicate()
-	event.type = "hit"
-	event.zone = zone
-	event.strike_kind = kind
-	event.damage = int(damage)
-	event.damage_terms = result.terms
-	event.surface_material = ARMOR_MATERIAL[armor]
-	event.health_after = snappedf(float(d.health), 0.01)
-	# Reaction from impulse versus the defender's poise (mass, stance, state).
+	var local := Geo.to_local(_origin(d), float(d.yaw), point)
+	if point.y >= float(kit.head_low) * s:
+		return "head"
+	if point.y < float(kit.hip) * s:
+		return "leg"
+	if absf(local.x) > float(d.radius) * 0.6 and point.y <= float(kit.shoulder_y) * s + 0.05:
+		return "arm_weapon" if local.x > 0.0 else "arm_shield"
+	return "torso"
+
+
+## Heavier shield arm work: a wounded shield arm, missiles stuck in the board.
+static func _shield_burden(d: Dictionary) -> float:
+	var burden := 1.0 + 0.5 * float(d.get("shield_fouled", 0))
+	for injury: Dictionary in d.injuries:
+		if injury.kind == "shield_arm_wound":
+			burden *= 1.4
+	return burden
+
+
+## Poise of a defender against an impact (mass, stance, state), J.
+static func _poise(d: Dictionary) -> float:
 	var poise := float(d.mass) * POISE_PER_KG
 	if d.action == "attack":
 		poise *= 0.8
-		if Tracks.move(str(d.kit), str(d.move)).get("family", "") == "foot":
+		if Weapons.one_legged(str(Tracks.move(str(d.kit), str(d.move)).get("family", ""))):
 			poise *= 0.6
 	elif d.action == "guard":
 		poise *= 1.2
 	poise *= 1.0 - 0.3 * float(d.fatigue)
 	if _leg_factor(d) < 1.0:
 		poise *= 0.7
-	var ratio := energy / maxf(1.0, poise)
-	event.impulse_ratio = snappedf(ratio, 0.001)
-	var reaction := "absorbed"
+	return poise
+
+
+static func _reaction_of(d: Dictionary, ratio: float) -> String:
 	if float(d.health) <= 0.0 or ratio >= 2.2:
-		reaction = "down"
-	elif ratio >= 1.2:
-		reaction = "stumble"
-	elif ratio >= 0.5:
-		reaction = "stagger"
-	elif ratio >= 0.15:
-		reaction = "flinch"
-	event.reaction = reaction
+		return "down"
+	if ratio >= 1.2:
+		return "stumble"
+	if ratio >= 0.5:
+		return "stagger"
+	if ratio >= 0.15:
+		return "flinch"
+	return "absorbed"
+
+
+## Book a body hit: the shared D-042 formula at this contact, health, wear,
+## reaction, morale and injury. `source` describes the striker at the moment
+## that counts (the attacker now, or the shooter at release).
+static func _book_hit(state: Dictionary, d: Dictionary, source: Dictionary, zone: String, energy: float, reference: float, push: Vector3, event: Dictionary, events: Array) -> Dictionary:
+	var result := Damage.compute({"weapon_id":source.weapon_id, "strike_kind":source.strike_kind, "weapon_quality":source.weapon_quality,
+		"weapon_wear":source.weapon_wear, "skill":source.skill, "stamina":source.stamina, "injuries":source.injuries,
+		"zone":zone, "defender_skill":float(d.skill), "armor_pieces":d.armor_pieces, "ranged":bool(source.get("ranged", false)),
+		"impact":sqrt(energy / maxf(0.01, reference)), "contact_frame":int(event.get("clip_frame", -1))})
+	var damage := float(result.damage)
+	if (d.armor_pieces as Dictionary).has(zone):
+		d.armor_pieces[zone].wear = minf(1.0, float(d.armor_pieces[zone].get("wear", 0.0)) + float(result.wear.armor))
+	d.health = maxf(0.0, float(d.health) - damage)
+	d.stats.taken = int(d.stats.taken) + 1
+	event.zone = zone
+	event.strike_kind = str(result.terms.get("strike", source.strike_kind))
+	event.damage = int(damage)
+	event.damage_terms = result.terms
+	event.surface_material = Damage.surface_material(d.armor_pieces, str(d.armor), zone)
+	event.health_after = snappedf(float(d.health), 0.01)
+	var ratio := energy / maxf(1.0, _poise(d))
+	event.impulse_ratio = snappedf(ratio, 0.001)
+	event.reaction = _reaction_of(d, ratio)
 	events.append(event)
-	_morale(state, f, 3.0, "landed_hit", events)
 	_morale(state, d, -(damage * 0.5 + 2.0), "took_hit", events)
 	_injury(state, d, zone, damage, events)
-	if reaction != "absorbed":
-		_set_reaction(state, d, reaction, push, events, zone)
+	if event.reaction != "absorbed":
+		_set_reaction(state, d, str(event.reaction), push, events, zone)
+	return result
+
+
+static func _resolve_hit(state: Dictionary, f: Dictionary, d: Dictionary, m: Dictionary, energy: float, push: Vector3, c: Dictionary, base: Dictionary, events: Array) -> void:
+	var family := str(m.family)
+	var reference := 0.5 * Weapons.effective_mass(family) * pow(float(f.scale), 3.0) * pow(float(m.window_top_speed) * float(f.scale), 2.0)
+	var event := base.duplicate()
+	event.type = "hit"
+	f.hitstop = hitstop_frames(energy, false)
+	event.hitstop_frames = int(f.hitstop)
+	f.recoil = [-push.x, -push.z]
+	f.stats.hits = int(f.stats.hits) + 1
+	# This frame is the measured contact; the one per-hit formula (D-042).
+	var result := _book_hit(state, d, {"weapon_id":family, "strike_kind":str(base.strike_kind), "weapon_quality":int(f.weapon_quality),
+		"weapon_wear":float(f.weapon_wear), "skill":float(f.skill), "stamina":float(f.stamina), "injuries":f.injuries},
+		_zone(d, c.point), energy, reference, push, event, events)
+	f.weapon_wear = minf(1.0, float(f.weapon_wear) + float(result.wear.weapon))
+	_morale(state, f, 3.0, "landed_hit", events)
 
 
 static func _injury(state: Dictionary, d: Dictionary, zone: String, damage: float, events: Array) -> void:
@@ -642,6 +718,9 @@ static func _set_reaction(state: Dictionary, d: Dictionary, kind: String, push: 
 	d.recoil = []
 	d.guard_style = ""
 	d.dodge = ""
+	if not (d.get("ranged", {}) as Dictionary).is_empty():
+		events.append({"type":"interrupted", "frame":state.frame, "fighter":d.id, "weapon":d.ranged.weapon, "phase":d.ranged.phase})
+		d.ranged = {}
 	d.react = {"kind":kind, "t":0.0, "duration":float(spec.duration), "strength":float(spec.strength),
 		"step":[step.x, step.z], "push":[push.x, push.z], "direction":Geo.side_of(float(d.yaw), -push), "zone":zone}
 	events.append({"type":"reaction", "frame":state.frame, "fighter":d.id, "kind":kind, "direction":d.react.direction,
@@ -692,12 +771,13 @@ static func nominal_reach(kit_id: String, move_id: String, defender_radius: floa
 ## first contact or whiff event (with clip frame, outcome, damage, reaction).
 ## `bearing_deg` is where the attacker stands relative to the defender's
 ## facing (0 = in front, +90 = on its weapon/right side). Deterministic.
-static func simulate_strike(attacker_kit: String, move: String, defender_kit: String, distance: float, bearing_deg: float = 0.0, guard: String = "", seed: int = 1, defender_options: Dictionary = {}) -> Dictionary:
+static func simulate_strike(attacker_kit: String, move: String, defender_kit: String, distance: float, bearing_deg: float = 0.0, guard: String = "", seed: int = 1, defender_options: Dictionary = {}, attacker_options: Dictionary = {}) -> Dictionary:
 	var state := new_state(seed)
+	state.silent = true
 	var bearing := deg_to_rad(bearing_deg)
 	if not add_fighter(state, "defender", defender_kit, defender_options.merged({"team":"defender"}, true)).is_empty():
 		return {}
-	if not add_fighter(state, "attacker", attacker_kit, {"team":"attacker", "x":sin(bearing) * distance, "z":-cos(bearing) * distance}).is_empty():
+	if not add_fighter(state, "attacker", attacker_kit, attacker_options.merged({"team":"attacker", "x":sin(bearing) * distance, "z":-cos(bearing) * distance}, true)).is_empty():
 		return {}
 	face(state, "attacker", "defender")
 	# Aim the strike's own bearing (measured at its peak) at the defender.
@@ -716,3 +796,262 @@ static func simulate_strike(attacker_kit: String, move: String, defender_kit: St
 			if e.type in ["hit", "block", "parry", "guard_broken", "whiff"] and e.get("attacker", "attacker") == "attacker":
 				return e
 	return {}
+
+
+# --- Missiles (thrown, bow, crossbow, sling) --------------------------------
+
+static func _aim_args(state: Dictionary, args: Dictionary) -> Dictionary:
+	if args.has("target"):
+		return {"target":str(args.target)} if state.fighters.has(str(args.target)) else {}
+	if args.has("yaw") and is_finite(float(args.yaw)) and is_finite(float(args.get("pitch", 0.0))):
+		return {"yaw":float(args.yaw), "pitch":clampf(float(args.get("pitch", 0.0)), -1.4, 1.4)}
+	return {}
+
+
+static func _ranged_command(state: Dictionary, f: Dictionary, action: String, args: Dictionary) -> Dictionary:
+	var r: Dictionary = f.get("ranged", {})
+	match action:
+		"draw":
+			var weapon_id := str(args.get("weapon", ""))
+			if not Weapons.is_ranged(weapon_id) or not (f.ammo as Dictionary).has(weapon_id):
+				return {"ok":false, "message":"Diese Fernwaffe wird nicht geführt."}
+			if int(f.ammo[weapon_id]) <= 0:
+				return {"ok":false, "message":"Keine Geschosse mehr."}
+			var cost := Weapons.stamina_cost(weapon_id)
+			if float(f.stamina) + 0.000001 < cost:
+				return {"ok":false, "message":"Zu erschöpft für diesen Schuss."}
+			_spend(f, cost)
+			f.action = "ranged"
+			f.guard_style = ""
+			f.ranged = {"weapon":weapon_id, "phase":"draw", "frame":0, "held":0, "aim":_aim_args(state, args), "event":"draw"}
+			return {"ok":true, "message":weapon_id}
+		"loose":
+			if f.action != "ranged" or not str(r.get("phase", "")) in ["draw", "hold"]:
+				return {"ok":false, "message":"Keine gespannte Fernwaffe."}
+			var aim := _aim_args(state, args)
+			if aim.is_empty():
+				return {"ok":false, "message":"Kein gültiges Ziel."}
+			r.aim = aim
+			if r.phase == "hold":
+				r.phase = "release"
+				r.frame = 0
+			return {"ok":true, "message":"loose"}
+		"lower":
+			if f.action == "ranged" and str(r.get("phase", "")) in ["draw", "hold"]:
+				f.action = "idle"
+				f.ranged = {}
+			return {"ok":true, "message":"idle"}
+	return {"ok":false, "message":"Unbekannter Kampfbefehl."}
+
+
+## World point the missile leaves from (the weapon's release point).
+static func release_point(f: Dictionary, weapon_id: String) -> Vector3:
+	var p: Array = Weapons.weapon(weapon_id).release_point
+	return Geo.to_world(_origin(f), float(f.yaw), float(f.scale), Vector3(float(p[0]), float(p[1]), float(p[2])))
+
+
+static func _ranged_tick(state: Dictionary, f: Dictionary, events: Array) -> void:
+	var r: Dictionary = f.ranged
+	var weapon_id := str(r.weapon)
+	var w := Weapons.weapon(weapon_id)
+	var timing := Weapons.ranged_timing(weapon_id)
+	if r.get("event", "") == "draw":
+		# First frame of the draw: string, arm or sling starts to load.
+		r.erase("event")
+		events.append({"type":"draw", "frame":state.frame, "attacker":f.id, "weapon":weapon_id, "weapon_class":str(w.class),
+			"energy_j":snappedf(Ranged.launch_energy(weapon_id), 0.01), "point":release_point(f, weapon_id)})
+	match str(r.phase):
+		"draw":
+			r.frame = int(r.frame) + 1
+			if int(r.frame) >= int(timing.draw):
+				r.phase = "hold" if (r.aim as Dictionary).is_empty() else "release"
+				r.frame = 0
+		"hold":
+			r.held = int(r.held) + 1
+			f.stamina = maxf(0.0, float(f.stamina) - float(w.hold_stamina_per_s) * DT)
+			if int(r.held) > int(timing.hold_max) or float(f.stamina) <= 0.0:
+				events.append({"type":"lowered", "frame":state.frame, "fighter":f.id, "weapon":weapon_id})
+				f.action = "idle"
+				f.ranged = {}
+		"release":
+			r.frame = int(r.frame) + 1
+			if int(r.frame) >= int(timing.release):
+				_release(state, f, events)
+				r.phase = "recover"
+				r.frame = 0
+		"recover":
+			r.frame = int(r.frame) + 1
+			if int(r.frame) >= int(timing.recover):
+				f.action = "idle"
+				f.ranged = {}
+				events.append({"type":"recovered", "frame":state.frame, "fighter":f.id})
+
+
+## The missile leaves the hand or string on exactly this frame.
+static func _release(state: Dictionary, f: Dictionary, events: Array) -> void:
+	var r: Dictionary = f.ranged
+	var weapon_id := str(r.weapon)
+	var aim: Dictionary = r.aim
+	var target := fighter(state, str(aim.get("target", "")))
+	if not target.is_empty():
+		# Turn to the target, then aim from the actual release point.
+		face(state, str(f.id), str(target.id))
+		aim = Ranged.aim(weapon_id, release_point(f, weapon_id), _origin(target) + Vector3(0.0, float(target.height) * 0.62, 0.0))
+	var error := Ranged.spread(weapon_id, float(f.skill), float(f.fatigue), float(r.held) * DT)
+	var yaw := float(aim.yaw) + (_roll(state, "aim_yaw:" + str(f.id)) * 2.0 - 1.0) * error
+	var pitch := float(aim.pitch) + (_roll(state, "aim_pitch:" + str(f.id)) * 2.0 - 1.0) * error
+	f.yaw = wrapf(float(aim.yaw), -PI, PI)
+	var origin := release_point(f, weapon_id)
+	var speed := Ranged.launch_speed(weapon_id)
+	var velocity := Ranged.direction(yaw, pitch) * speed
+	f.ammo[weapon_id] = int(f.ammo[weapon_id]) - 1
+	state.next_projectile = int(state.get("next_projectile", 0)) + 1
+	if not state.has("projectiles"):
+		state.projectiles = []
+	state.projectiles.append({"id":int(state.next_projectile), "weapon":weapon_id, "owner":f.id, "team":f.team, "age":0, "born":int(state.frame),
+		"p":[origin.x, origin.y, origin.z], "v":[velocity.x, velocity.y, velocity.z],
+		"skill":float(f.skill), "stamina":float(f.stamina), "injuries":Damage.injury_kinds(f.injuries),
+		"weapon_quality":int(f.weapon_quality)})
+	events.append({"type":"release", "frame":state.frame, "attacker":f.id, "weapon":weapon_id, "weapon_class":Weapons.weapon_class(weapon_id),
+		"projectile":int(state.next_projectile), "energy_j":snappedf(Ranged.launch_energy(weapon_id), 0.01), "speed_m_s":speed,
+		"point":origin, "direction_vector":velocity.normalized(), "ammo_left":int(f.ammo[weapon_id]),
+		"target":str(target.get("id", ""))})
+
+
+static func _vec(a: Array) -> Vector3:
+	return Vector3(float(a[0]), float(a[1]), float(a[2]))
+
+
+## Advance every missile one frame and sweep its path (<= 3 cm substeps)
+## against shields, bodies, the world and the ground. Nothing is booked
+## before the missile's path actually reaches the surface.
+static func _fly(state: Dictionary, events: Array, world_clear: Callable) -> void:
+	var flying: Array = []
+	for p: Dictionary in state.get("projectiles", []):
+		if int(p.born) == int(state.frame):
+			# Released this frame: it is at the release point now and flies from the next frame.
+			flying.append(p)
+			continue
+		p.age = int(p.age) + 1
+		var weapon_id := str(p.weapon)
+		var prev := _vec(p.p)
+		var next := Ranged.advance(weapon_id, prev, _vec(p.v), DT)
+		var cur: Vector3 = next[0]
+		var velocity: Vector3 = next[1]
+		if _missile_contact(state, p, prev, cur, velocity, events, world_clear) or int(p.age) >= Ranged.MAX_FLIGHT_FRAMES:
+			continue
+		p.p = [cur.x, cur.y, cur.z]
+		p.v = [velocity.x, velocity.y, velocity.z]
+		flying.append(p)
+	state.projectiles = flying
+
+
+static func _missile_event(state: Dictionary, p: Dictionary, type: String, point: Vector3, velocity: Vector3) -> Dictionary:
+	var weapon_id := str(p.weapon)
+	return {"type":type, "frame":state.frame, "clip_frame":-1, "attacker":p.owner, "weapon":weapon_id, "projectile":int(p.id),
+		"weapon_class":Weapons.weapon_class(weapon_id), "weapon_material":Weapons.impact_material(weapon_id),
+		"energy_j":snappedf(Ranged.energy(weapon_id, velocity), 0.01), "speed_m_s":snappedf(velocity.length(), 0.001),
+		"point":point, "direction_vector":velocity.normalized(), "flight_frames":int(p.age)}
+
+
+static func _missile_contact(state: Dictionary, p: Dictionary, prev: Vector3, cur: Vector3, velocity: Vector3, events: Array, world_clear: Callable) -> bool:
+	var weapon_id := str(p.weapon)
+	var spec: Dictionary = Weapons.weapon(weapon_id).projectile
+	var radius := float(spec.radius_m)
+	var steps := clampi(int(ceil((cur - prev).length() / SUBSTEP_METRES)), 1, 64)
+	var targets: Array = []
+	for id: String in _ids(state):
+		var d: Dictionary = state.fighters[id]
+		if d.id == p.owner or not bool(d.alive) or d.action == "down":
+			continue
+		# Only fighters the path can reach this frame.
+		var reach := (cur - prev).length() + float(d.radius) + 1.2 * float(d.scale)
+		if Vector2(float(d.x) - prev.x, float(d.z) - prev.z).length() > reach:
+			continue
+		var shield := shield_world(d)
+		targets.append([d, Geo.body_axis(_origin(d), float(d.radius), float(d.height)), shield, shield_half(d) if not shield.is_empty() else Vector3.ZERO])
+	for k in range(1, steps + 1):
+		var a := prev.lerp(cur, float(k - 1) / float(steps))
+		var b := prev.lerp(cur, float(k) / float(steps))
+		for entry: Array in targets:
+			var d: Dictionary = entry[0]
+			var shield: Array = entry[2]
+			if not shield.is_empty():
+				var along := Geo.segment_box(a, b, shield[0], shield[1], shield[2], entry[3], radius)
+				if along >= 0.0:
+					_missile_block(state, p, d, a.lerp(b, along), velocity, events)
+					return true
+			var closest := Geo.segment_segment(a, b, entry[1][0], entry[1][1])
+			if float(closest[2]) <= radius + float(d.radius):
+				var on_path: Vector3 = a.lerp(b, float(closest[0]))
+				var on_axis: Vector3 = (entry[1][0] as Vector3).lerp(entry[1][1], float(closest[1]))
+				var outward := on_path - on_axis
+				var point := on_axis + (outward.normalized() if outward.length() > 0.0001 else -velocity.normalized()) * float(d.radius)
+				_missile_hit(state, p, d, point, velocity, events)
+				return true
+		if b.y <= 0.0:
+			var t := clampf(a.y / maxf(0.000001, a.y - b.y), 0.0, 1.0)
+			var miss := _missile_event(state, p, "projectile_miss", a.lerp(b, t), velocity)
+			miss.surface_material = "soil"
+			events.append(miss)
+			return true
+	if world_clear.is_valid():
+		var clear: Variant = world_clear.call(prev, cur)
+		if not (typeof(clear) == TYPE_BOOL and clear):
+			var stopped := _missile_event(state, p, "projectile_miss", prev, velocity)
+			stopped.surface_material = "world"
+			events.append(stopped)
+			return true
+	return false
+
+
+static func _missile_block(state: Dictionary, p: Dictionary, d: Dictionary, point: Vector3, velocity: Vector3, events: Array) -> void:
+	var weapon_id := str(p.weapon)
+	var spec: Dictionary = Weapons.weapon(weapon_id).projectile
+	var energy := Ranged.energy(weapon_id, velocity)
+	var braced: bool = d.action == "guard"
+	var cost := clampf(energy * 0.10, 3.0, 40.0) * _shield_burden(d) * (1.0 if braced else 1.5)
+	var shield_spec: Dictionary = Tracks.kit(str(d.kit)).shield
+	var frame := shield_world(d)
+	var local := Geo.to_local(frame[0], 0.0, point)
+	var boss := Vector2(local.dot(frame[1]), local.dot(frame[2])).length() <= 0.09 * float(d.scale)
+	var event := _missile_event(state, p, "projectile_block", point, velocity)
+	event.defender = d.id
+	event.braced = braced
+	event.surface_material = "bronze" if boss and str(shield_spec.material).contains("bronze") else ("iron" if boss else "wood")
+	# A missile sticks in the board, not in the metal boss; a sling bullet never does.
+	event.lodged = bool(spec.lodges_in_shield) and not boss
+	event.stamina_cost = snappedf(minf(cost, float(d.stamina)), 0.01)
+	_spend(d, minf(cost, float(d.stamina)))
+	d.shield_integrity = maxf(0.0, float(d.shield_integrity) - energy / 1500.0)
+	event.shield_integrity = snappedf(float(d.shield_integrity), 0.0001)
+	if bool(event.lodged) and bool(spec.bends):
+		# A bent shank cannot be pulled out in the fight; it drags on the shield.
+		d.shield_fouled = int(d.get("shield_fouled", 0)) + 1
+	event.shield_fouled = int(d.get("shield_fouled", 0))
+	d.stats.blocks = int(d.stats.blocks) + 1
+	events.append(event)
+	if float(d.shield_integrity) <= 0.0:
+		events.append({"type":"shield_broken", "frame":state.frame, "fighter":d.id, "point":point})
+	_morale(state, d, 1.0, "block", events)
+	if not braced:
+		_set_reaction(state, d, "flinch", Vector3(velocity.x, 0.0, velocity.z).normalized(), events)
+
+
+static func _missile_hit(state: Dictionary, p: Dictionary, d: Dictionary, point: Vector3, velocity: Vector3, events: Array) -> void:
+	var weapon_id := str(p.weapon)
+	var energy := Ranged.energy(weapon_id, velocity)
+	var push := Vector3(velocity.x, 0.0, velocity.z).normalized()
+	var event := _missile_event(state, p, "projectile_hit", point, velocity)
+	event.defender = d.id
+	event.direction = Geo.side_of(float(d.yaw), -push)
+	var owner := fighter(state, str(p.owner))
+	if not owner.is_empty():
+		owner.stats.hits = int(owner.stats.hits) + 1
+	# The shooter's condition at release counts; the missile's remaining
+	# energy relative to its launch energy is the contact factor.
+	_book_hit(state, d, {"weapon_id":weapon_id, "strike_kind":"", "weapon_quality":int(p.weapon_quality), "weapon_wear":0.0,
+		"skill":float(p.skill), "stamina":float(p.stamina), "injuries":p.injuries, "ranged":true},
+		_zone(d, point), energy, Ranged.launch_energy(weapon_id), push, event, events)
+	if not owner.is_empty():
+		_morale(state, owner, 3.0, "landed_hit", events)

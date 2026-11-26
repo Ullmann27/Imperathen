@@ -82,6 +82,7 @@ def main():
             ("melee_visual_contact", ["--fixed-fps", "60", "--script", "res://tests/melee_visual_contact_test.gd"], "MELEE_VISUAL_CONTACT_PASS"),
             ("melee_feedback", ["--fixed-fps", "60", "--script", "res://tests/melee_feedback_test.gd"], "MELEE_FEEDBACK_PASS"),
             ("melee_camera", ["--script", "res://tests/melee_camera_test.gd"], "MELEE_CAMERA_PASS"),
+            ("melee_weapons", ["--script", "res://tests/melee_weapons_test.gd"], "MELEE_WEAPONS_PASS"),
             ("village_economy", ["--script", "res://tests/village_economy_test.gd"], "VILLAGE_ECONOMY_PASS"),
             ("commerce_transaction", ["--script", "res://tests/commerce_transaction_test.gd"], "COMMERCE_TRANSACTION_PASS"),
             ("city_trade", ["--script", "res://tests/city_trade_test.gd"], "CITY_TRADE_PASS"),
