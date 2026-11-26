@@ -132,6 +132,18 @@ func _run() -> void:
 	quit(0 if failures.is_empty() else 1)
 
 
+func _prop_at_hand(prop: Node3D, hand: String, offset: Vector3) -> bool:
+	var rig: Skeleton3D = game.world._figure._motion.skeleton
+	if not is_instance_valid(prop) or not prop.visible or not is_instance_valid(rig):
+		return false
+	var bone := rig.find_bone(hand)
+	if bone < 0:
+		return false
+	var reference := rig.get_bone_global_rest(bone).basis.inverse() * offset
+	var expected := rig.to_global(rig.get_bone_global_pose(bone) * reference)
+	return prop.global_position.distance_to(expected) < 0.002
+
+
 func _test_vid_a_normal() -> void:
 	# T19: normal film start, AwaitChoice, commit, exact handoff to play.
 	await _start()
@@ -207,6 +219,17 @@ func _test_hud_and_props() -> void:
 	check(I01.cups(game.model.data).values() == ["hand", "hand", "hand"], "Interaction at the shelf takes the three cups")
 	for owner in I01.CUPS:
 		check(props.cup_location(owner) == "hand", "Cup follows the boy's hand: " + owner)
+	var carried_cup: Node3D = props.cup_node("silvanus")
+	var actor = game.world._figure
+	var previous_body: Node3D = actor.body
+	actor._reload((actor.detail + 1) % 4)
+	await frames(3)
+	check(not is_instance_valid(previous_body), "The carried-cup test really replaced the character body")
+	check(is_instance_valid(carried_cup) and props.cup_node("silvanus") == carried_cup
+		and carried_cup.get_parent() == props and props.cup_location("silvanus") == "hand",
+		"Carried cup survives model replacement as the same visible node")
+	check(_prop_at_hand(carried_cup, "Hand_R", props.HAND_CUPS.silvanus),
+		"The same cup follows the new model's right hand within 2 mm")
 	await capture("cups-in-hand")
 	check(game.ui._hud_labels.compact_life.text.contains("Drei Becher"), "Carried cups appear contextually on the objective card")
 	_place(I01.POINTS.player_table)
@@ -228,6 +251,14 @@ func _test_hud_and_props() -> void:
 	_place(I01.POINTS.well + Vector2(1.5, 0.3))
 	await _interact()
 	check(_childhood().screenplay.i01_water == "jug", "Real well action fills the jug")
+	var carried_jug: Node3D = props.jug_node()
+	actor._reload((actor.detail + 1) % 4)
+	# The fixed fixture positions the capsule above the floor. Inspect the
+	# next stable hand pose after it lands and the replacement enters the rig.
+	await frames(30)
+	check(is_instance_valid(carried_jug) and props.jug_node() == carried_jug
+		and carried_jug.get_parent() == props and _prop_at_hand(carried_jug, "Hand_L", props.JUG_HAND),
+		"The filled jug survives a second model replacement and follows its left hand")
 	_place(I01.POINTS.player_table)
 	await _interact()
 	check(_childhood().screenplay.i01_water == "poured" and game.world.i01_props._water.julia.visible, "Poured water is visible in the cups")
@@ -346,7 +377,9 @@ func _test_marcus_and_vid_c() -> void:
 	check(game._command("village_childhood_action", {"action_id":"mother_morning"}).ok, "Julia's errand after breakfast")
 	_place(I01.POINTS.player_table)
 	check(game._command("village_childhood_action", {"action_id":"fill_water"}).ok, "Jug taken from the breakfast table")
-	check(game.world.i01_props.jug_node().get_parent() != game.world.i01_props, "The jug is carried in the boy's hand")
+	var props = game.world.i01_props
+	var jug: Node3D = props.jug_node()
+	check(_prop_at_hand(jug, "Hand_L", props.JUG_HAND), "The jug is carried in the boy's hand")
 	var father: Vector2 = Life.actor_position(game.model.data, "silvanus")
 	_place(father + Vector2(0.6, 0.6))
 	check(game._command("village_childhood_action", {"action_id":"father_morning"}).ok, "Jug handed to Silvanus")
