@@ -12,7 +12,8 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 from accad_bvh import load_bvh, unit
 from youth_skin_polish import repair
-from youth_anatomy import calibrate_soles,source_foot_angles,foot_global,toe_global,neutral_idle,original_structure,remove_start_weapon
+from youth_anatomy import calibrate_soles,sole_contact_mask,source_foot_angles,foot_global,toe_global,neutral_idle,original_structure,remove_start_weapon
+SOLE_LOD_MAX_DEGREES=12.0  # every LOD must find the same original sandal sole
 
 SOURCE_URL="https://accad.ohio-state.edu/sites/accad.osu.edu/files/Male2_bvh.zip"
 SOURCE_SHA="f30dc56f8557d4b9f1bd6b8b0c4218c076471de0a9c1a20f3bc4a8b776cc14b1"
@@ -105,6 +106,9 @@ class Target:
             self.foot_frames["Foot_"+side]=foot_frame(self.pos("Toe_"+side)-self.pos("Foot_"+side),self.pelvis_frame[:,0])
             self.foot_frames["Toe_"+side]=foot_frame(self.rest_r[self.ids["Toe_"+side]]@UP,self.pelvis_frame[:,0])
         inv=read_access(d,b,d["skins"][0]["inverseBindMatrices"]).reshape(-1,4,4).transpose(0,2,1)
+        # The calibrated sandal slab is the actual contact surface once the
+        # feet are flattened; the lowest bind-pose band is kept as well.
+        self.sole_frames=calibrate_soles(self,read_access)
         # Real lower sole vertices from original textured skin, not a capsule
         # approximation. Exclude the sword mesh from grounding.
         body=next(n for n in self.nodes if n.get("name")=="MeshyYouthBody")
@@ -117,15 +121,18 @@ class Target:
             for side,sign in (("L",1),("R",-1)):
                 ids={self.ids["Foot_"+side],self.ids["Toe_"+side]}
                 match=np.isin(j,[self.joints.index(i) for i in ids])
-                mask=(v[:,1]<.065)&(v[:,0]*sign>0)&((w*match).sum(1)>.6)
-                if not mask.any():continue
-                # Sample bounded points, retaining lowest real sole vertices.
-                ii=np.flatnonzero(mask);ii=ii[np.argsort(v[ii,1])[:384]]
+                skinned=(v[:,0]*sign>0)&((w*match).sum(1)>.6)
+                band=skinned&(v[:,1]<.065)
+                slab=skinned&sole_contact_mask(self.sole_frames[side],v.astype(float))
+                if not (band|slab).any():continue
+                # Sample bounded points, retaining lowest real sole vertices
+                # and every vertex of the calibrated sandal slab.
+                ii=np.flatnonzero(band);ii=ii[np.argsort(v[ii,1])[:384]]
+                ii=np.union1d(ii,np.flatnonzero(slab))
                 pts=np.concatenate([v[ii],np.ones((len(ii),1))],axis=1)
                 local=np.einsum("nkij,nj->nki",inv[j[ii]],pts)
                 self.foot_points.setdefault(side,[]).append((j[ii],w[ii],local))
         if set(self.foot_points)!={"L","R"}:raise ValueError("Both actual soles must be sampled")
-        self.sole_frames=calibrate_soles(self,read_access)
     def pos(self,n):return self.rest_p[self.ids[n]]
     def fk(self,rot,shift=None):
         g={};p={}
@@ -296,8 +303,16 @@ def main():
     a.output.mkdir(parents=True,exist_ok=True)
     report={"schema":1,"source":SOURCE_URL,"source_sha256":SOURCE_SHA,"credit":SOURCE_CREDIT,"rig_joints":35,"method":"direction-based 60 Hz skeletal retarget, real skin sole grounding; in-place root with measured stride; no gameplay mutation","lods":[]}
     with zipfile.ZipFile(a.archive) as z:
+        family={}
         for i in range(4):
             path=a.input/f"hero_meshy_italia_{i}.glb";d,b=decode(path);t=Target(d,b)
+            soles={side:{k:t.sole_frames[side][k] for k in ("rest_normal","plane_offset","area_m2","dominance","residual_m","samples","mirror_deg","primitive")} for side in ("L","R")}
+            for side,info in soles.items():
+                reference=family.setdefault(side,np.array(info["rest_normal"]))
+                angle=math.degrees(math.acos(float(np.clip(np.dot(reference,info["rest_normal"]),-1,1))))
+                info["lod0_angle_deg"]=angle
+                if angle>SOLE_LOD_MAX_DEGREES:raise ValueError(f"LOD {i} sandal sole {side} deviates {angle:.1f} deg from LOD 0")
+            print("YOUTH_SOLE_CALIBRATION",i,json.dumps(soles),flush=True)
             original_buffer_size=len(b);original_buffer_sha=digest(b)
             immutable=digest(json.dumps(original_structure(d),sort_keys=True,separators=(",",":")).encode())
             records={name:adapt(t,z,name,spec) for name,spec in {**GAITS,**FIGHT}.items()}
@@ -310,7 +325,7 @@ def main():
             print("YOUTH_SURFACE_REVIEW",i,json.dumps(surface_review),flush=True)
             d["asset"].setdefault("extras",{})["motion_credit"]=SOURCE_CREDIT
             out=a.output/path.name;out.write_bytes(encode(d,b))
-            report["lods"].append({"level":i,"sha256":digest(out.read_bytes()),"original_sha256":digest(path.read_bytes()),"clips":records,"original_mesh_skin_materials_and_binary_preserved":False,"original_positions_materials_bind_matrices_preserved":True,"original_binary_prefix_preserved":True,"surface_review":surface_review,"weapon_review":weapon_review})
+            report["lods"].append({"level":i,"sole_planes":soles,"sha256":digest(out.read_bytes()),"original_sha256":digest(path.read_bytes()),"clips":records,"original_mesh_skin_materials_and_binary_preserved":False,"original_positions_materials_bind_matrices_preserved":True,"original_binary_prefix_preserved":True,"surface_review":surface_review,"weapon_review":weapon_review})
             print("ACCAD_RETARGET_LOD",i,"clips",len(records),flush=True)
     report["gaits"]={k:report["lods"][0]["clips"][k] for k in GAITS}
     a.report.parent.mkdir(parents=True,exist_ok=True);a.report.write_text(json.dumps(report,indent=2)+"\n")

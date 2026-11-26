@@ -104,6 +104,9 @@ func _run() -> void:
 		var idle_review: Dictionary=proof.lods[level].get("clips",{}).get("idle",{})
 		_check(int(idle_review.get("frames",0))>0 and is_finite(float(idle_review.get("max_two_sole_height_difference_m",INF))),"Actual neutral sole heights are measured")
 		_check(not actor._youth_soles.samples.is_empty(),"Real skinned sole samples at LOD %d"%level)
+		var planes: Dictionary=proof.lods[level].get("sole_planes",{})
+		_check(planes.has("L") and planes.has("R"),"Calibrated sandal sole planes reported at LOD %d"%level)
+		_check(actor._youth_soles.sole_planes.size()==2 and actor._youth_soles.slab_sample_count>0,"Actual sandal slab sampled for grounding at LOD %d"%level)
 		for action: String in ["idle","march","run","block"]:
 			for f in [0.0,.25,.5,.75]:
 				actor.sample_pose(action,f)
