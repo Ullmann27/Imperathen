@@ -128,8 +128,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going \
-            --only import vegetation valdora_house_family roman_menu city_trade city_market_bridge city_inventory_ui \
+          IMPERATHEN_FULL_ASSET_ACCEPTANCE=1 python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going \
+            --only import vegetation valdora_house_family village_landscape opening_flow roman_menu city_trade city_market_bridge city_inventory_ui \
               city_support city_viva_props city_exploration_detail npc_physical_conversation \
               touch_controls fold7_graphics_policy main_scene \
             --report artifacts/qa/engine
