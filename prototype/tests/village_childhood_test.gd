@@ -80,7 +80,8 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 		_check(false, "A valid next childhood action exists")
 		return false
 	var stage := str(view.get("stage", ""))
-	if stage.begins_with("i01_"):
+	# I-01 morning and I-04 workshop visit: first authored option at each real place.
+	if stage.begins_with("i01_") or stage.begins_with("i04_"):
 		_at(model, view.point)
 		return _ok(_action(model, str(view.actions[0].payload.action_id)), "Play the I-01 morning: " + stage)
 	if stage.begins_with("i03_"):

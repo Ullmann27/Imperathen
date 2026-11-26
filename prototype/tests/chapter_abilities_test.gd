@@ -116,7 +116,8 @@ func _complete(model) -> bool:
 		"i08_tracks":"i08_inspect", "i08_report":"i08_report"}
 	if stage.begins_with("i03_"):
 		return _ok(I03Support.play_stage(model), "I-03 errand " + stage)
-	if stage.begins_with("i01_"):
+	# I-01 morning and I-04 workshop visit: first authored option at each real place.
+	if stage.begins_with("i01_") or stage.begins_with("i04_"):
 		# Screenplay v4 I-01 morning: first authored option at each real point.
 		_at(model, view.point)
 		return _ok(_action(model, str(view.actions[0].payload.action_id)), "I-01 morning " + stage)
