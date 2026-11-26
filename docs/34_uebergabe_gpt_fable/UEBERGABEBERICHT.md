@@ -1126,3 +1126,14 @@ Kopf, Uhrzeit (UTC) und Betreff des letzten Commits.
 | `integ/world-state-20261126` | `9f14a11` | 08:14 | feat(world): soldiers' settlement events on the world clock (D-043) |
 
 Die Entscheidungen D-015 bis D-061 und der Seitenindex des Masterhandbuchs liegen in `docs/00_governance/` auf `docs/game-direction-20261126` (PR #97).
+
+### 20.7 Nachtrag 08:35 UTC: Abschluss der Cloud-Sitzungen
+
+Angaben aus den Abschlussmeldungen der Sitzungen, vom Lead nicht nachgeprüft.
+
+| Paket | PR, Kopf | Geprüft laut Sitzung | Offen |
+|---|---|---|---|
+| Kolosseum, Vorplatz, Straßenschmuck | #120, `ca8100b` | Blender-Bausatz, `colosseum_walkthrough`, `colosseum_era_gate`, `era_registry` | Straßenschmuck (51 Objekte), Vorplatz-Layout und 639 Aktivitätsanker sind ungetestet; Navigation, NPC-Belebung und Nachher-Bilder fehlen. Das alte Kolosseum im Stadt-GLB bleibt 58 v. Chr. sichtbar, bis `era_gate.gd` in `city_exploration.gd` eingehängt ist. |
+| Lebendige Stadt | #121, `c2d4ab3` | Gruppe `city_life`, 88 Prüfungen: 2095 Bewohner, 480 Haushalte, 120 Betriebe, deterministische Lebenssimulation, Save/Load zur Tagesmitte, Hauptbuch, 591 Anker | Die gesamte sichtbare und hörbare Ebene fehlt (Crowd-LOD, Einbindung in die Stadt, Positionsaudio, Render). Spitzen bis etwa 6 ms bei 0,5 ms Budget. Einstieg: `docs/29_living_city/RESEARCH.md`. |
+| Stimmen, Lippensynchronisation, Geräusche | #122, `82eb3b7` | `combat_sfx` 183/183; Geräuschprüfung 131/131; 15 Stimmen mit F0 im Ziel; 21 Sätze (I-00, I-01 vollständig, I-02, Teil I-03), Whisper-WER 0–10 %, −20 LUFS | Lippensynchron-Test abgebrochen (ungeprüft); Bus-Lautheit nicht gemessen; restliche Sätze; Helden-Altersfamilie und NPC-Stimmenvorrat sind nur als Code vorhanden. Grenzbewohner haben nur `JawOpen` (D-054 verlangt Lippenformen). Nächster Schritt: `tools/audio/run_pipeline.sh`. |
+| Laufzeit-Optimierung | `perf/runtime-optimization-20261126` | – | War um 08:35 UTC noch nicht auf origin; die Sitzung wurde angewiesen, sofort zu pushen und einen Entwurfs-PR zu öffnen. |
