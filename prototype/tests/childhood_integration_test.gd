@@ -4,6 +4,7 @@ const Entry=preload("res://main.tscn")
 const Childhood=preload("res://scripts/story/village_childhood.gd")
 const Life=preload("res://scripts/story/village_life.gd")
 const Diagnostics=preload("res://scripts/ui/android_village_diagnostics.gd")
+const I01=preload("res://scripts/story/i01_three_cups.gd")
 var game
 var checks:=0
 var failures: Array[String]=[]
@@ -60,12 +61,17 @@ func _run() -> void:
 	check(game.screen=="opening" and game.opening_sequence.id=="childhood_home","I-00 chains into the family opening")
 	check(JSON.parse_string(JSON.stringify(game.model.data))==before_i00,"Historical cold open cannot mutate the childhood campaign")
 	game._opening_skip()
+	# Screenplay v4: VID-A stops at its open choice; skipping never chooses.
+	check(game.screen=="opening" and str(game.opening_sequence.beats[game.opening_index].get("id",""))=="i01_a_choice","Skip stops at the I-01 choice beat")
+	game.opening_overlay.choice_requested.emit("i01_help")
+	await frames(4)
+	game._opening_skip()
 	game._opening_next()
 	await frames(12)
 	check(game.screen=="playing","Family opening hands over control")
 	check(game.model.data.player.age==12 and game.model.data.buildings.is_empty(),"Child has existing family home without a mandatory built hut")
 	check(game.world.get_player_position().y>.9,"Boy is above the raised family floor")
-	check(game.ui._objective(game._ui_state())[0]=="I-01 · Die drei Becher","HUD names the Band 1 screenplay mission I-01, not rebuilding")
+	check(game.ui._objective(game._ui_state())[0]=="Die drei Becher · Familienhaus","HUD names occasion and place of I-01 (HB 3.0 S. 44), not a mission ID or rebuilding")
 	game.ui.update_navigation(game.world.navigation_view())
 	check(game.world.navigation_view().has_target,"First map goal is ready without completing an errand")
 	var observer=Diagnostics.new()
@@ -74,7 +80,7 @@ func _run() -> void:
 	observer.set_process(false)
 	var observed_before:=var_to_bytes(game.model.data)
 	var observed:Dictionary=observer.snapshot()
-	check(observed.has("childhood_runtime") and observed.childhood_runtime.stage=="mother_morning","Android observer exposes the actual family start")
+	check(observed.has("childhood_runtime") and observed.childhood_runtime.stage=="i01_take_cups","Android observer exposes the actual family start")
 	check(var_to_bytes(game.model.data)==observed_before,"Android family observer cannot mutate authoritative state")
 	check(observed.action_runtime.touch_camera_managed,"Family controls retain managed camera ownership")
 	await capture("01-family-home")
@@ -85,6 +91,21 @@ func _run() -> void:
 	check(JSON.stringify(game.model.data)==life_state,"Pause does not consume childhood or work time")
 	game._resume()
 	await frames()
+	# Play the I-01 morning through the real interaction path (fixture travel).
+	for point:Vector2 in [I01.POINTS.home_shelf+Vector2(.75,-.1),I01.POINTS.player_table,I01.POINTS.player_table,I01.POINTS.player_table,I01.POINTS.well+Vector2(1.5,.3),I01.POINTS.player_table,I01.POINTS.player_table]:
+		game.world.get_node("Player").position=Vector3(point.x,1.35,point.y)
+		game.model.set_player_position(game.world.get_player_position())
+		game.world.sync_state(game.model.data)
+		game.ui.action_requested.emit("interact",{})
+		await frames(3)
+	check(game.screen=="opening" and game.opening_sequence.id=="i01_vid_b","The family breakfast opens the table talk")
+	game._opening_skip()
+	game.opening_overlay.choice_requested.emit("i01_topic_workshop")
+	await frames(4)
+	game._opening_skip()
+	game._opening_next()
+	await frames(8)
+	check(game.screen=="playing" and game.model.data.village.childhood.screenplay.i01=="complete","The played morning completes I-01's first part")
 	var mother:=Life.actor_position(game.model.data,"julia")
 	game.world.get_node("Player").position=Vector3(mother.x+.8,1,mother.y+1.1)
 	game.model.set_player_position(game.world.get_player_position())
@@ -107,11 +128,11 @@ func _run() -> void:
 	game.ui.update_navigation(game.world.navigation_view())
 	check(game.world.navigation_view().has_target,"Minimap has an authoritative next destination")
 	var target:Vector2=game.world.navigation_view().target
-	check(target.distance_to(Childhood.POINTS.family_water)<.01,"Map goal follows next quest station")
+	check(target.distance_to(Childhood.POINTS.home_table)<.01,"Map goal follows next quest station (the jug on the breakfast table)")
 	await capture("03-village-controls")
 	# Explicit fixture placement checks the production item action; ADB uses
 	# the actual joystick route instead and never writes the player position.
-	var water:Vector2=Childhood.POINTS.family_water
+	var water:Vector2=I01.POINTS.player_table
 	game.world.get_node("Player").position=Vector3(water.x,1.35,water.y)
 	game.model.set_player_position(game.world.get_player_position())
 	game.world.sync_state(game.model.data)
@@ -134,6 +155,18 @@ func _run() -> void:
 	check(game.model.data.world_id==saved_id and game.model.data.village.childhood.completed==["mother_morning","fill_water"],"Continue retains both completed family actions without another reward")
 	check(game.model.data.player.age==12,"Continue does not age the boy")
 	check(game.model.data.village.childhood.carried.has("household_coin") and game.model.data.village.childhood.carried.has("water_jug"),"Continue retains the actual household coin and filled jug")
+	# HB 3.0 S. 13: no weapon and no military controls while I-01 runs. The
+	# practice controls below are checked after the father's step ends I-01.
+	check(find_action(game.ui,"attack")==null and find_action(game.ui,"techniques")==null,"I-01 HUD shows no combat controls for the child")
+	var father:=Life.actor_position(game.model.data,"silvanus")
+	game.world.get_node("Player").position=Vector3(father.x+.6,1,father.y+.6)
+	game.model.set_player_position(game.world.get_player_position())
+	check(game._command("village_childhood_action",{"action_id":"father_morning"}).ok,"Silvanus receives the jug; I-01 hands over to I-02")
+	await frames(4)
+	game._opening_skip()
+	game._opening_next()
+	await frames(8)
+	check(game.screen=="playing","VID-C hands back to play")
 	for resolution in [Vector2i(960,540),Vector2i(1280,720),Vector2i(1384,1536)]:
 		root.size=resolution
 		await frames(12)

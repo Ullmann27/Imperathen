@@ -25,6 +25,10 @@ var regional = preload("res://scripts/world/regional_village.gd").new()
 var grove = Grove.new()
 var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
 var opening_props = preload("res://scripts/world/village/opening_props.gd").new()
+## I-01 cups and jug follow the saved morning state (presentation only).
+## Created with the scene so worlds that never build it own no orphan node.
+const I01Props = preload("res://scripts/world/village/i01_props.gd")
+var i01_props: Node3D
 var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
@@ -47,6 +51,9 @@ const PLOT_MAX := Vector2(24, 13)
 var _state: Dictionary = {}
 var _materials: Dictionary = {}
 var _active := false
+## The Roman HUD names the context action itself (touch medallion caption or
+## desktop key prompt); the label above the boy then stays hidden.
+var hud_prompts := false
 var _running := false
 var _built := false
 var _mode := "person"
@@ -197,6 +204,8 @@ func sync_state(state: Dictionary) -> void:
 	_figure.configure_meshy_youth(true)
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_figure.set_service_gear(CombatActions.service_gear(state))
+	if is_instance_valid(i01_props):
+		i01_props.sync_state(state, _figure)
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -286,7 +295,7 @@ func set_active(active: bool) -> void:
 	if _preview != null:
 		_preview.visible = active and _build_mode and _mode == "city"
 	if _hint != null:
-		_hint.visible = active and _mode == "person"
+		_hint.visible = active and _mode == "person" and not hud_prompts
 	if _plot != null:
 		_plot.visible = active and _mode == "city"
 	if not active:
@@ -316,7 +325,10 @@ func get_cinematic_anchor(key: String) -> Vector3:
 				return to_global(Vector3(float(buildings[0].x), 0, float(buildings[0].z)))
 			return to_global(Vector3(14.5, 0, 4.5))
 		"training": return to_global(TRAINING_LOCATION)
-		_: return get_player_position()
+		_:
+			if key.begins_with("i01_"):
+				return I01Props.anchor(key)
+			return get_player_position()
 
 
 func get_cinematic_figure(actor_id: String) -> Node3D:
@@ -463,7 +475,8 @@ func cue_unarmed(technique: String) -> void:
 
 
 func navigation_view() -> Dictionary:
-	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false}
+	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false,
+		"camera_yaw":snappedf(_camera_yaw,.01),"context":_hint.text if _hint != null and _active and _mode == "person" else ""}
 	if not Childhood.enabled(_state):
 		return result
 	var chapter:=Childhood.view(_state)
@@ -621,6 +634,8 @@ func _build_scene() -> void:
 	_create_terrain()
 	_create_village()
 	add_child(opening_props)
+	i01_props = I01Props.new()
+	add_child(i01_props)
 	_create_build_plot()
 	_buildings_root = Node3D.new()
 	_buildings_root.name = "PlayerBuildings"
@@ -1562,7 +1577,9 @@ func _interact() -> void:
 		if raid.active and raid.rescue_available and not raid.rescued and point.distance_to(VillageLife.RESCUE_POINT) <= VillageLife.RANGE:
 			action_requested.emit("village_rescue", {})
 			return
-		var villager: String = village_life_world.nearest(_player.position)
+		var villager: String = _objective_villager()
+		if villager.is_empty():
+			villager = village_life_world.nearest(_player.position)
 		if not villager.is_empty():
 			action_requested.emit("village_npc", {"npc_id":villager})
 			return
@@ -1692,12 +1709,24 @@ func _place_building() -> void:
 	action_requested.emit("build", {"x": _preview_position.x, "z": _preview_position.z})
 
 
+## The person the current childhood objective names wins over a nearer
+## bystander when both are in reach (HB 3.0 S. 44: no accidental action).
+func _objective_villager() -> String:
+	if not Childhood.enabled(_state) or village_life_world == null:
+		return ""
+	var id := str(Childhood.current_step(_state).get("npc", ""))
+	if id.is_empty() or not village_life_world.actors.has(id) or not village_life_world.actors[id].visible:
+		return ""
+	return id if _horizontal_distance(_player.position, village_life_world.actor_position(id)) <= VillageLife.RANGE else ""
+
+
 func _update_context_hint() -> void:
 	if _hint == null or _player == null:
 		return
-	_hint.visible = _active and _mode == "person"
+	var showing := _active and _mode == "person"
+	_hint.visible = showing and not hud_prompts
 	_hint.text = ""
-	if not _hint.visible:
+	if not showing:
 		return
 	if Childhood.enabled(_state):
 		var at:=Vector2(_player.position.x,_player.position.z)
@@ -1708,6 +1737,10 @@ func _update_context_hint() -> void:
 		if at.distance_to(CombatActions.PRACTICE_POINT)<2.4:
 			_hint.text="Am Pfahl üben\nTechniken wählen"
 			return
+	var objective_villager := _objective_villager()
+	if not objective_villager.is_empty():
+		_hint.text = "Mit %s sprechen" % str(village_life_world.actors[objective_villager].get_meta("display_name", objective_villager))
+		return
 	if village_life_world != null:
 		var village_hint: String = village_life_world.hint(_player.position)
 		if not village_hint.is_empty():
