@@ -175,11 +175,12 @@ func blink_weight() -> float:
 
 
 func _apply() -> void:
-	if _jaw != -1:
+	if is_instance_valid(_skeleton) and _jaw != -1:
 		var q := Quaternion(jaw_axis.normalized(), jaw_max_angle * float(params.jaw_open))
 		_skeleton.set_bone_pose_rotation(_jaw, _jaw_rest * q)
 	for mesh in _meshes:
-		_apply_mesh(mesh)
+		if is_instance_valid(mesh):
+			_apply_mesh(mesh)
 
 
 func _apply_mesh(mesh: MeshInstance3D) -> void:

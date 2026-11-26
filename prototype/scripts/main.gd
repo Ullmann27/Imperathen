@@ -1,6 +1,9 @@
 extends Node
 
 const AudioBuses = preload("res://scripts/audio/audio_buses.gd")
+const DialoguePlayer = preload("res://scripts/audio/dialogue_player.gd")
+const VoiceLines = preload("res://scripts/audio/voice_lines.gd")
+const FaceDriver = preload("res://scripts/audio/face_driver.gd")
 const ModelScript = preload("res://scripts/domain/world_model.gd")
 const WorldScript = preload("res://scripts/world/game_world.gd")
 const UIScript = preload("res://scripts/ui/game_ui.gd")
@@ -43,6 +46,8 @@ var last_story_id := ""
 var command_serial := 0
 var run_id := ""
 var opening_director
+var opening_voice := DialoguePlayer.new()
+var opening_voice_duration := 0.0
 var opening_overlay
 var opening_sequence: Dictionary = {}
 var opening_index := 0
@@ -86,6 +91,7 @@ func _ready() -> void:
 	world.hud_prompts = true
 	world.set_quality(ui.get_quality())
 	_setup_ambient()
+	add_child(opening_voice)
 	# The title sequence is opaque; the village is not drawn underneath it.
 	world.hide()
 	if "--city-test" in OS.get_cmdline_user_args():
@@ -809,11 +815,12 @@ func _opening_present() -> void:
 	shown["choice_open"] = _film_choice_open(beat)
 	opening_overlay.present(shown, opening_index, opening_sequence.beats.size())
 	opening_overlay.set_paused(opening_paused)
+	_update_opening_voice(beat)
 	var cut := _beat_cut(beat, 0.0)
 	opening_director.mission_actor_id = str(cut.actor_id)
 	opening_director.focus_key = str(beat.get("anchor", ""))
 	opening_director.speaking = not bool(beat.get("silent", false))
-	opening_director.play(str(cut.shot_id), maxf(0.1, float(beat.duration) * float(cut.span)), bool(ui.opening_preferences().reduce_motion))
+	opening_director.play(str(cut.shot_id), maxf(0.1, maxf(float(beat.duration), opening_voice_duration) * float(cut.span)), bool(ui.opening_preferences().reduce_motion))
 	# One clock drives subtitle timing and camera travel. Reading mode can hold
 	# the finished composition without skipping a sentence or simulating time.
 	opening_director.set_process(false)
@@ -827,13 +834,46 @@ func _opening_present() -> void:
 	_log_opening_geometry.call_deferred()
 
 
+func _update_opening_voice(beat: Dictionary) -> void:
+	_stop_opening_voice()
+	if bool(beat.get("silent", false)) or bool(beat.get("final", false)):
+		return
+	var phrase := str(beat.get("text", ""))
+	var speaker := str(beat.get("speaker", ""))
+	var line := VoiceLines.find(phrase)
+	if line.is_empty() or str(line.speaker_id) != VoiceLines.speaker_id(speaker):
+		return
+	var stream := VoiceLines.stream_for(line)
+	if stream == null:
+		return
+	var speaker_figure: Node3D = world.get_cinematic_figure(str(line.speaker_id))
+	if speaker_figure != null:
+		var face := FaceDriver.new()
+		face.blink_enabled = false
+		face.process_priority = 20
+		opening_voice.add_child(face)
+		face.bind(speaker_figure)
+		opening_voice.face = face
+	opening_voice.play(phrase, speaker)
+	opening_voice.set_paused(opening_paused)
+	opening_voice_duration = stream.get_length()
+
+
+func _stop_opening_voice() -> void:
+	opening_voice.stop()
+	if is_instance_valid(opening_voice.face):
+		opening_voice.face.queue_free()
+		opening_voice.face = null
+	opening_voice_duration = 0.0
+
+
 func _opening_process(delta: float) -> void:
 	if opening_paused or not is_instance_valid(opening_overlay):
 		return
 	var beat: Dictionary = opening_sequence.beats[opening_index]
 	if bool(beat.get("final", false)):
 		return
-	var duration := maxf(0.1, float(beat.duration))
+	var duration := maxf(0.1, maxf(float(beat.duration), opening_voice_duration))
 	opening_elapsed = minf(duration, opening_elapsed + maxf(0.0, delta))
 	var cut := _beat_cut(beat, opening_elapsed / duration)
 	if str(cut.shot_id) != opening_director.shot_id or str(cut.actor_id) != opening_director.mission_actor_id:
@@ -953,6 +993,7 @@ func _opening_set_paused(value: bool) -> void:
 	if screen != "opening":
 		return
 	opening_paused = value
+	opening_voice.set_paused(value)
 	if is_instance_valid(opening_overlay):
 		opening_overlay.set_paused(value)
 	if is_instance_valid(opening_director):
@@ -1042,6 +1083,7 @@ func _opening_finish() -> void:
 
 
 func _release_opening() -> void:
+	_stop_opening_voice()
 	if is_instance_valid(opening_director):
 		opening_director.finish()
 		opening_director.queue_free()

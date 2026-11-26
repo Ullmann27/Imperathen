@@ -93,7 +93,7 @@ func _start(entry: Dictionary, text: String, speaker_label: String, emitter: Nod
 		_player.stream = stream
 		_player.bus = AudioBuses.VOICE
 		_player.play()
-		if face != null:
+		if is_instance_valid(face):
 			face.set_track(VoiceLines.viseme_track(entry), clock)
 	else:
 		# Reading time ~15 characters per second, at least 2.5 s.
@@ -106,12 +106,20 @@ func stop() -> void:
 		_player.stop()
 		_player.queue_free()
 	_player = null
-	if face != null:
+	if is_instance_valid(face):
 		face.clear()
 	if not current.is_empty() and _started:
 		line_finished.emit(current)
 	current = {}
 	_started = false
+
+
+func set_paused(paused: bool) -> void:
+	set_process(not paused)
+	if is_instance_valid(_player):
+		_player.stream_paused = paused
+	if is_instance_valid(face):
+		face.set_process(not paused)
 
 
 func is_active() -> bool:
