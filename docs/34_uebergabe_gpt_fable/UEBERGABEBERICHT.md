@@ -915,3 +915,32 @@ Die Rekonstruktion des Builders `tools/world/build_roman_test_city.py` ohne Blen
 | `fix/village-raid-approach-20261126` | Wegführung der Angreifer durchs Tor mit Abgleiten; Schlagansatz vor dem Schaden; Ausrichtung zum Spieler | Headless-Test: jeder Angreifer erreicht in 150 s das Ziel, Überlappung 0; Schlag W s vor dem Treffer; ein Block bis 0,2 s nach dem Ansatz greift |
 | `fix/village-backdrop-terrain-20261126` | Hügelkulisse geschlossen und mit Kollision; sRGB-Farbe des Geländes | Engine-Lauftest am Hang; 807 → 0 Durchstoßpunkte; Spawnpunkte und Korridor der Angreifer bleiben frei |
 | `fix/city-ground-walls-20261126` | Boden und Straßen in Kacheln; Mauern geschlossen; Requisiten versetzt; Portikus-Stufen | 152 → 0 Häuser ohne sichtbaren Boden in `balanced`; 0 m Bresche; 0 Schnitte zwischen Requisiten und Gebäuden; Gehtest auf die Plattform |
+
+## 17. Zielbilder und Qualitätsmaßstab des Auftraggebers (26.11.2026)
+
+**Konzeptbilder des Auftraggebers** (`zielbilder/01–10_*.jpg`) dienen nur der visuellen Orientierung. Sie sind kein Ingame- und kein Render-Nachweis. Ausdrückliche Vorgabe dazu: „Bitte wie bisher weiterarbeiten.“
+
+**Maßstab nach Angabe des Auftraggebers:**
+- Für die römische Seite gilt die Detailtreue von *Ryse: Son of Rome*: Rüstung, Figuren, Architektur, filmisches Licht.
+- Für die germanische Seite und die Landschaft gilt *Assassin's Creed Valhalla*: Vegetation, Licht, bewohnte Dörfer.
+- Beide sind Qualitätsmaßstäbe und keine Vorlagen. Grafikstil, HUD, Figuren und Assets bleiben eigenständig. Screenshots dieser Spiele liegen bewusst nicht im Repository.
+
+**Ehrlicher Ausgangsstand (Godot 4.7.2, echtes Spiel, `live_graphics_review.gd`):**
+- Wände im Familienhaus ohne Struktur, gleichmäßiges Licht, linearer Tonemapper (`game_world.gd:674`).
+- Profile `low` und `very_high` im Innenraum nahezu gleich.
+- Das HUD nimmt rund 40 % des Bildes ein.
+- Figuren aus der Nähe: Der Junge ist gut, Erwachsene und Soldaten sind grob.
+- Renderer überall `gl_compatibility` (`project.godot:29-30`); der Vergleich mit Vulkan/Forward+ ist geplant (`docs/23_aeterna/MASTERPLAN.md:12`).
+
+| Zielbild | PDF-Bezug | Stand am 26.11.2026 |
+|---|---|---|
+| 01 Große Römerstadt | P0/P2, E | Reparatur läuft: Boden und Straßen sichtbar, Mauern, Requisiten, Stufen (§16.1). Belebung und Innenräume offen |
+| 02 Gebäude und Innenräume | P2 | Look-Development läuft: Materialien und Licht im Familienhaus. Begehbare Innenräume als eigenes Paket offen |
+| 03 Anfang des Jungen | P1, I-01–I-04 | I-01-Abschnitt läuft: Becher, Brunnen, Wahl, VID-A/B/C, kein Militärmenü für das Kind |
+| 04 Kampf im Nahbereich | D, P1 | Schlagansatz, Timing und Ausrichtung beim Überfall in Arbeit (§16.3) |
+| 05 Filmische Gesprächsszene | C | Tischgespräch VID-B im I-01-Abschnitt. Stimmen BLOCKED (keine Aufnahmen, keine lizenzierte lokale Sprachsynthese) |
+| 06 Schleichmodus bei Nacht | P1 Stealth-Greybox, T16 | nicht begonnen; nächstes Paket |
+| 07 Markt, Handel, Ausrüstung | Fassung 2.0 V | Handel mit 16 Waren und 6 Läden vorhanden; Qualitätsstufen Anfänger bis Elite offen |
+| 08 Riesige Open World | E, P2 | Hügelkulisse und Geländefarbe in Arbeit; Region, Wege und Ortschaften offen |
+| 09 Legionen und Großschlacht | E, P3 | Talgefecht vorhanden; Massenschlacht nach gemessenen Gates (P3) |
+| 10 Macht, Intrigen, Aufstieg | Systembibel 10, B | Beziehungs- und Fraktionskern in Arbeit, zuerst als KI der germanischen Gruppen: Aufbau, Angriffe, Bündnisse, gerichtete Beziehungen, Vereinbarungen mit Fristen |
