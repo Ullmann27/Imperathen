@@ -247,6 +247,8 @@ def main():
             ("motion_measurement", ["--fixed-fps", "60", "--script", "res://tests/motion_quality_measurement.gd"], "MOTION_MEASURED"),
         ]
         original_motion_manifest = PROJECT / "assets/animations/accad_youth_motion.json"
+        if (PROJECT / "assets/characters/marcus_quality_0.glb").is_file() or (args.only and "marcus_character" in args.only):
+            checks.append(("marcus_character", ["--fixed-fps", "60", "--script", "res://tests/marcus_character_test.gd"], "MARCUS_CHARACTER_PASS"))
         if original_motion_manifest.is_file() or (args.only and "youth_mocap" in args.only):
             checks.insert(-1, ("youth_mocap", ["--fixed-fps", "60", "--script",
                                              "res://tests/youth_mocap_test.gd"], "YOUTH_MOCAP_RUNTIME_PASS"))

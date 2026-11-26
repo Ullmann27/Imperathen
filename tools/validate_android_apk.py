@@ -409,6 +409,7 @@ FEATURE_RESOURCE_GROUPS = (
         "assets/monuments/colosseum/colosseum_layout.json",
         *(f"assets/monuments/colosseum/colosseum_{part}.glb" for part in ("arena", "collision", "far", "modules", "structure")),
     )),
+    ("marcus_character_content", ("scripts/visuals/marcus_model.gd", *(f"assets/characters/marcus_quality_{level}.glb" for level in range(4)))),
     ("living_frontier_content", FRONTIER_RESOURCES),
     ("cinematic_opening_content", OPENING_RESOURCES),
     ("village_life_content", VILLAGE_LIFE_RESOURCES),

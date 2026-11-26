@@ -812,7 +812,7 @@ def render_deformations(arm,camera):
     scene.frame_set(0)
 
 
-def export_lods():
+def export_lods(*, connector_delivery=True):
     report=[]
     for level,ratio,texsize in ((0,1.,2048),(1,.50,1024),(2,.22,512),(3,.085,256)):
         bpy.ops.wm.open_mainfile(filepath=str(ART/'hero.blend'))
@@ -853,7 +853,7 @@ def export_lods():
             export_animation_mode='NLA_TRACKS',export_force_sampling=True,export_frame_step=1,
             export_animations=True,export_morph=True,export_morph_animation=False,export_def_bones=False)
         death_keys=preserve_grounded_death_keys(path,bpy.data.objects['HeroRig'])
-        delivery=pack_hero_glb(path) if level==0 else None
+        delivery=pack_hero_glb(path) if level==0 and connector_delivery else None
         # The Blender fall above pins the heel; the shared post-export step then
         # rolls the contacts with the least slip and grounds the crouch.
         death_ground=ground_death_clip.ground(path)
