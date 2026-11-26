@@ -27,6 +27,7 @@ import json
 import math
 import sys
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import numpy as np
 from scipy.spatial import cKDTree
@@ -43,6 +44,13 @@ STEP = math.radians(1.5)
 SMOOTH_S = 0.07          # temporal smoothing of the correction
 PASSES = 8
 LIMB_PREFIX = ("Forearm", "ForearmTwist", "Hand", "Palm", "FingerCurl", "Thumb")
+# In the left hook the guarding right forearm clips the LOD 1 tunic near
+# 0.65 s. The torso-only solver misses that contact's nearest triangles.
+# These values are calibrated on the full garment and shared across LODs.
+GUARD_CONTACT_S = 0.65
+GUARD_BLEND_S = 0.083
+GUARD_ANGLE_DEG = 9.0
+GUARD_AXIS_WORLD = np.array([0.9929523466319224, -0.008856929691450539, 0.11818287572486717])
 
 
 def digest(path: Path) -> str:
@@ -308,6 +316,23 @@ def apply(path: Path, output: Path, corrections: dict) -> None:
     model_glb.write(output)
 
 
+def guard_clearance(model: Model) -> dict:
+    clip = model.rig.animation("hook_left")
+    joint = model.arm["R"]
+    track = clip["tracks"].get((joint, "rotation"))
+    if track is None:
+        raise ValueError("The left hook must animate the right guard arm")
+    times = track[0]
+    angles = math.radians(GUARD_ANGLE_DEG) * np.exp(-((times - GUARD_CONTACT_S) / GUARD_BLEND_S) ** 4)
+    parent = model.rig.parent[joint]
+    guarding = []
+    for time_s, angle in zip(times, angles):
+        world = model.rig.globals(clip, float(time_s))
+        axis = pure_rotation(world[parent]).T @ GUARD_AXIS_WORLD
+        guarding.append(axis * angle)
+    return {"hook_left": {"R": {"local": np.asarray(guarding)}}}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--input", type=Path, required=True, help="directory with the retargeted civilian LODs")
@@ -324,11 +349,18 @@ def main() -> int:
         report["clips"][name] = {side: {k: v for k, v in entry.items() if k != "local"}
                                  for side, entry in corrections[name].items()}
         print("YOUTH_CIVIL_ARMS", name, json.dumps(report["clips"][name]), flush=True)
+    guard = guard_clearance(model)
+    report["guard_clearance"] = {"clip": "hook_left", "joint": "Arm_R",
+                                 "contact_s": GUARD_CONTACT_S, "blend_s": GUARD_BLEND_S,
+                                 "angle_deg": GUARD_ANGLE_DEG, "world_axis": GUARD_AXIS_WORLD.tolist()}
     report["outputs"] = []
-    for path in paths:
-        target = args.output / path.name
-        apply(path, target, corrections)
-        report["outputs"].append({"path": target.name, "sha256": digest(target)})
+    with TemporaryDirectory(prefix="imperathen-youth-arm-clear-") as temporary:
+        for path in paths:
+            target = args.output / path.name
+            initial = Path(temporary) / path.name
+            apply(path, initial, corrections)
+            apply(initial, target, guard)
+            report["outputs"].append({"path": target.name, "sha256": digest(target)})
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print("YOUTH_CIVIL_ARMS_CLEARED", flush=True)
