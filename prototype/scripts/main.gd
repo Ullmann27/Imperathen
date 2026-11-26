@@ -244,6 +244,7 @@ func _refresh() -> void:
 	refresh_pending = false
 	refresh_elapsed = 0.0
 	world.sync_state(model.data)
+	world.set_political_context(model.politics_view())
 	ui.update_state(_ui_state())
 	ui.set_build_active(world.is_build_active())
 	if screen == "playing":
@@ -528,6 +529,7 @@ func _on_world_action(action: String, payload: Dictionary) -> void:
 		"companion_interact": _show_companion()
 		"village_npc": _show_village_npc(str(payload.get("npc_id", "")))
 		"village_panel": _show_village_panel("overview")
+		"politics_records": _show_council_records()
 		"combat_palette": _on_ui_action(action,payload)
 		"village_block", "village_dodge": _on_ui_action(action, payload)
 		"frontier_talk": _show_frontier(str(payload.get("npc_id", "")))
@@ -539,8 +541,9 @@ func _on_world_action(action: String, payload: Dictionary) -> void:
 
 func _command(command: String, payload: Dictionary) -> Dictionary:
 	var chapter_choice := screen == "frontier_dialog" and command == "frontier_choice"
+	var political_choice := screen == "village_dialog" and village_npc == "decimus" and command in ["politics_help", "politics_audience"]
 	var village_choice := screen in ["village_panel", "village_dialog"] and command.begins_with("village_")
-	if screen != "playing" and not chapter_choice and not village_choice and not _film_committing:
+	if screen != "playing" and not chapter_choice and not village_choice and not political_choice and not _film_committing:
 		return {"ok": false, "message": "Die Welt ist pausiert."}
 	_flush_simulation()
 	model.set_player_position(world.get_player_position())
@@ -549,6 +552,8 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	# Real-time button presses are guarded by the active movement, not stored
 	# as thousands of permanent economic orders. Their consequences are saved.
 	var command_id := "" if realtime_combat else "%s_%d" % [run_id, command_serial]
+	var political_command := command.begins_with("politics_")
+	var previous_politics: Dictionary = model.data.duplicate(true) if political_command else {}
 	if command == "village_childhood_action":
 		# Presence checks (Marcus at the lane or the stall) use the bodies as
 		# they stand now, not an older observation.
@@ -559,8 +564,12 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 		ui.notify(str(result.get("message", "")))
 	_refresh()
 	var persisted := true
-	if result.get("ok", false) and (command in ["choose_companion", "train", "recruit", "resolve_skirmish", "choose_story", "frontier_talk", "frontier_choice"] or (command.begins_with("village_") and not realtime_combat and command not in ["village_strike", "village_block", "village_dodge"]) or model.data.progress.stage in ["aftermath", "fallen"]):
+	if result.get("ok", false) and (command in ["choose_companion", "train", "recruit", "resolve_skirmish", "choose_story", "frontier_talk", "frontier_choice"] or (command.begins_with("village_") and not realtime_combat and command not in ["village_strike", "village_block", "village_dodge"]) or political_command or model.data.progress.stage in ["aftermath", "fallen"]):
 		persisted = bool(_save(false).get("ok", false))
+		if political_command and not persisted:
+			model.data = previous_politics
+			_refresh()
+			return {"ok": false, "message": "Decimus' Eintrag konnte nicht gespeichert werden. Die Änderung wurde zurückgenommen."}
 	if result.get("ok", false) and command == "train":
 		if persisted:
 			_begin_opening(OpeningStory.adulthood(model.data))
@@ -613,7 +622,8 @@ func _show_village_npc(npc_id: String) -> void:
 
 
 func _village_command(command: String, args: Dictionary) -> void:
-	if not command.begins_with("village_") or screen not in ["playing", "village_panel", "village_dialog"]:
+	var political_choice := screen == "village_dialog" and village_npc == "decimus" and command in ["politics_help", "politics_audience"]
+	if not political_choice and (not command.begins_with("village_") or screen not in ["playing", "village_panel", "village_dialog"]):
 		return
 	var previous_screen := screen
 	var result := _command(command, args)
@@ -633,7 +643,44 @@ func _village_command(command: String, args: Dictionary) -> void:
 func _npc_dialog(npc_id: String) -> Dictionary:
 	if Childhood.companion_specs(model.data).has(npc_id):
 		return VillageLife.dialogue(model.data, npc_id)
-	return _dialog_with_behavior(VillageLife.dialogue(model.data, npc_id), npc_id)
+	var dialog := _dialog_with_behavior(VillageLife.dialogue(model.data, npc_id), npc_id)
+	if npc_id == "decimus":
+		_append_political_choices(dialog, model.politics_view())
+	return dialog
+
+
+func _append_political_choices(dialog: Dictionary, politics: Dictionary) -> void:
+	if not bool(politics.get("available", false)) or dialog.is_empty():
+		return
+	var choices: Array = dialog.get("choices", [])
+	for option: Dictionary in politics.get("options", []):
+		if option.command not in ["politics_help", "politics_audience"]:
+			continue
+		var args: Dictionary = option.get("args", {})
+		choices.append({"id": str(option.command) + "_" + str(args.get("route", "")),
+			"command": option.command, "payload": args, "label": option.label,
+			"enabled": option.enabled, "reason": option.get("reason", "")})
+	dialog["choices"] = choices
+	var recommendation: Dictionary = politics.get("recommendation", {})
+	if recommendation.is_empty():
+		dialog["text"] += "\n\nAm Südweg ist eine Bohle locker. Ich brauche Holz für die Reparatur. Wenn du keins hast, schau vom festen Rand aus nach, wo die Auflage fehlt."
+	else:
+		dialog["text"] += "\n\nDeine Hilfe steht auf meiner Tafel. Meine Empfehlung bleibt. Wenn du erwachsen bist, nehme ich mir Zeit für dein Anliegen."
+
+
+func _show_council_records() -> void:
+	var politics: Dictionary = model.politics_view()
+	var recommendation: Dictionary = politics.get("recommendation", {})
+	var text := "Südweg · Prüfen, ob die Bohlen am Ablauf fest aufliegen."
+	if not recommendation.is_empty():
+		var note := "Vier Holzstücke zur Ausbesserung übernommen." if recommendation.route == "wood" else "Meldung über die ausgespülte Auflage angenommen."
+		text = "%s\n\nSüdweg · %s\nPersönliche Empfehlung von Decimus vermerkt." % [recommendation.date, note]
+		if not str(politics.get("learning", "")).is_empty():
+			text += "\nAus der Dorfhilfe gelernt · " + str(politics.learning)
+	village_npc = ""
+	screen = "village_dialog"
+	world.set_active(false)
+	ui.show_village_dialog({"title": "Amtstafel · Ratstube von Valdora", "text": text, "choices": []})
 
 
 func _dialog_with_behavior(original: Dictionary, npc_id: String) -> Dictionary:

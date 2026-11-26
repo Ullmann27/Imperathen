@@ -22,3 +22,19 @@ godot --headless --path prototype --script res://tests/valdora_politics_test.gd
 ```
 
 Der Test führt beide Wege durch die normalen Befehle des Weltmodells. Er deckt Alter, falsche Orte, fehlenden Vorrat, Wiederholung, Ereignisreihenfolge, Chronikdatum und das Laden einer aufgezeichneten Kampagnenpartie ab. Die räumliche Bedienung im Spiel wird in einer eigenen Engine-Route geprüft.
+
+## Einbau in Valdora
+
+Decimus behält seine vorhandene Identität und seinen Platz im Dorf. Der Spieler erreicht ihn über die normale Weltinteraktion. Die Beobachtung am Südweg hat einen sichtbaren Ort mit abgesackter Bohle und ausgespülter Auflage. Ein Holzzuschuss macht bereitgelegte Ersatzbohlen sichtbar. Ein Bericht dokumentiert die Schadstelle, ohne Holz auszugeben. Der Fall vermittelt je nach Weg Grundwissen über Versorgung oder schriftliche Beobachtungen und hält Decimus’ Vertrauen und Respekt getrennt fest.
+
+Die Ratstube steht am Dorfplatz. Ihre Tür, Fenster, Möbel und Laufwege stammen aus dem Blender-Modell und seinen separaten Kollisionshüllen. Am Amtstisch liest der Spieler den datierten Ortsvermerk und nach der Hilfe auch seine Empfehlung. Die Tafel zeigt den autoritativen Spielstand. Sie bucht weder Ressourcen noch politische Rechte. Das Schließen der Tafel gibt die Steuerung in derselben Szene zurück. Bei einem fehlgeschlagenen automatischen Speichern nimmt die Anwendung den politischen Befehl zurück.
+
+Die End-to-End-Prüfung lädt den vorhandenen Kampagnenspielstand am Übergang zu I‑02. Beide Varianten nutzen tatsächlich die Bewegungssteuerung, Decimus’ sichtbare Dialogantworten, die gemeinsame Speicherroutine und den realen Weg durch die Tür der Ratstube.
+
+```sh
+IMPERATHEN_ISOLATED_TEST=1 godot --headless --path prototype --fixed-fps 60 \
+  --script res://tests/political_reference_playthrough.gd
+godot --headless --path prototype --script res://tests/political_offices_test.gd
+```
+
+Der historisch recherchierte Ämterkatalog ist ein eigener zeitgebundener Datenvertrag. Der örtliche Bürgermeistertitel wird Decimus nicht verliehen. Er bleibt Valdoras fiktiver Verwalter. Eine tatsächlich gewählte Magistratur, institutionelle Senatsabstimmungen und Caesar als animierter Gesprächspartner sind weitere Produktionsschritte. [Historische Ämter und Nachweise](../00_governance/POLITICAL_OFFICES.md)

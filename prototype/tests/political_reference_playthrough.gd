@@ -74,6 +74,7 @@ func _load_start() -> bool:
 	var room := village.get_node_or_null("ValdoraCouncilRoom") as Node3D
 	check(room != null and room.is_visible_in_tree() and not room.find_children("*", "StaticBody3D", true, false).is_empty(),
 		"The playable village has the visible council room and its imported collision")
+	check(village.get_node_or_null("LooseSouthRoadBoards") != null, "Broken boards exist at the actual south road")
 	var actor: Node3D = village.actors.get("decimus")
 	return check(actor != null and actor.is_visible_in_tree(), "Decimus has a visible actor in the playable village")
 
@@ -142,6 +143,19 @@ func _play(route: String) -> void:
 	check(game.screen == "playing" and JSON.stringify(JSON.parse_string(JSON.stringify(_events()))) == signature and _events().size() == event_count + 1,
 		"The unique local recommendation survives a real save and Continue")
 	cases[route] = {"walked_m": snappedf(float(context.walked_m), 0.01), "recommendation": recommendation, "events": _events().duplicate(true)}
+	var planks := game.world.village_life_world.get_node_or_null("SuppliedSouthRoadBoards") as Node3D
+	check(planks != null and planks.is_visible_in_tree() == (route == "wood"),
+		"Only the committed materials route places replacement wood beside the road after reload")
+	if not await _walk([Vector2(7, 11), Vector2(13.9, 9.5), Vector2(17.2, 9.5), Vector2(19.1, 9.5), Vector2(19.45, 11.44)], context):
+		return
+	await _interact()
+	var text := str(game.ui.get("_frontier_dialog_data").get("text", ""))
+	check(game.screen == "village_dialog" and game.village_npc.is_empty() and
+		text.contains(str(recommendation.date)) and text.contains("Empfehlung von Decimus") and
+		text.contains(str(game.model.politics_view().learning)),
+		"The player's actual world interaction reads the dated authoritative entry at the council desk")
+	await _capture(route + "-05-amtstafel")
+	await _close_dialog()
 
 
 func _open_decimus() -> bool:

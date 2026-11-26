@@ -42,13 +42,16 @@ static func view(world: Dictionary) -> Dictionary:
 		"available": enabled(world),
 		"official_id": OFFICIAL_ID,
 		"report_point": SURVEY_POINT,
+		"report_radius": RANGE,
 		"survey_pending": _shared_reason(world).is_empty() and route.is_empty() and not ids.has(SURVEY),
 		"relationship": {"actor_id": "vil:decimus", "trust": int(relation.get("trust", 0)), "respect": 0},
 		"recommendation": {},
+		"learning": "",
 		"events": events.duplicate(true),
 		"options": [],
 	}
 	if route != "":
+		result.learning = "Versorgung organisieren" if route == "wood" else "Beobachtungen für die Verwaltung festhalten"
 		result.relationship.trust += (4 if route == "wood" else 2) + int(audience)
 		result.relationship.respect = 2 if route == "wood" else 4
 		result.recommendation = {
@@ -87,6 +90,7 @@ static func apply(candidate: Dictionary, command: String, args: Dictionary) -> D
 			else:
 				message = "Decimus hält deinen Bericht über die lose Bohle am Südweg fest."
 			message += " Er spricht dir persönlich seine Empfehlung aus."
+			message += " Du hast gelernt, Versorgung zu organisieren." if args.route == "wood" else " Du hast gelernt, Beobachtungen für die Verwaltung festzuhalten."
 		"politics_audience":
 			id = AUDIENCE
 			message = "Decimus empfängt dich und hört sich deine Einschätzung zum Südweg an. Deine Empfehlung bleibt vermerkt."
