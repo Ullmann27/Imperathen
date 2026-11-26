@@ -6,6 +6,7 @@ const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Dressing = preload("res://scripts/world/village/frontier_dressing.gd")
 const Settlement = preload("res://scripts/world/village/settlement_dressing.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
+const Surfaces = preload("res://scripts/rendering/village_surfaces.gd")
 var current_origin := ""
 var quality := "balanced"
 var frontier_details: Node3D
@@ -167,10 +168,9 @@ func _tint_house(model: Node3D, tint: Color) -> void:
 			var original := shape.mesh.surface_get_material(surface) as StandardMaterial3D
 			if not original or original.resource_name != "ARCH_Lime_Plaster":
 				continue
+			# Lime plaster with damp, cracks and trowel relief (rendering/village_surfaces.gd).
 			if not overrides.has(original.get_instance_id()):
-				var material := original.duplicate() as StandardMaterial3D
-				material.albedo_color = tint
-				overrides[original.get_instance_id()] = material
+				overrides[original.get_instance_id()] = Surfaces.plaster(tint)
 			shape.set_surface_override_material(surface,overrides[original.get_instance_id()])
 
 func _add_scene(path: String,where: Vector3) -> Node3D:

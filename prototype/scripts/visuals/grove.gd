@@ -11,7 +11,9 @@ const CANOPY_BOUNDS := {
 	"oak": AABB(Vector3(-4.95,-0.10,-5.90), Vector3(9.58,7.75,10.41)),
 	"olive": AABB(Vector3(-3.20,-0.35,-3.10), Vector3(7.32,5.30,7.03)),
 }
+const CANOPY_WIND := preload("res://scripts/visuals/canopy_wind.gdshader")
 static var _meshes: Dictionary = {}
+static var _canopies: Array[ShaderMaterial] = []
 var _placements: Array = []
 var _batches: Dictionary = {}
 var _profile := "balanced"
@@ -98,6 +100,8 @@ func _rebuild() -> void:
 			batch.multimesh = MultiMesh.new()
 			batch.multimesh.transform_format = MultiMesh.TRANSFORM_3D
 			batch.multimesh.mesh = _mesh(key)
+			# Canopy wind moves leaves up to ~0.15 m beyond the static bounds.
+			batch.extra_cull_margin = .3
 			_batches[key] = batch
 			add_child(batch)
 		batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if key.ends_with("_far") or _profile == "low" else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
@@ -128,6 +132,31 @@ static func _mesh(key: String) -> Mesh:
 		var mesh_node := node as MeshInstance3D
 		if mesh_node == null:
 			mesh_node = node.find_children("*", "MeshInstance3D", true, false)[0]
-		_meshes[key] = mesh_node.mesh
+		_meshes[key] = _windy(mesh_node.mesh)
 		node.free()
 	return _meshes[key]
+
+
+## A copy of the tree whose alpha-scissor foliage surfaces move in the wind.
+## Geometry, bounds and bark stay identical to the imported asset.
+static func _windy(source: Mesh) -> Mesh:
+	var result := source.duplicate() as Mesh
+	var height := maxf(source.get_aabb().end.y, 1.0)
+	for surface in result.get_surface_count():
+		var original := result.surface_get_material(surface) as BaseMaterial3D
+		if original == null or original.transparency != BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR or original.albedo_texture == null:
+			continue
+		var canopy := ShaderMaterial.new()
+		canopy.shader = CANOPY_WIND
+		canopy.set_shader_parameter("foliage", original.albedo_texture)
+		canopy.set_shader_parameter("alpha_cut", original.alpha_scissor_threshold)
+		canopy.set_shader_parameter("canopy_height", height)
+		result.surface_set_material(surface, canopy)
+		_canopies.append(canopy)
+	return result
+
+
+## Fixed wind phase for reproducible captures; a negative value restores real time.
+static func set_wind_time(seconds: float) -> void:
+	for canopy in _canopies:
+		canopy.set_shader_parameter("fixed_time", seconds)

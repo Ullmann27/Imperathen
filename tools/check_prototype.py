@@ -161,6 +161,7 @@ def main():
             ("hero_faces", ["--fixed-fps", "60", "--script", "res://tests/hero_face_test.gd"], "checks, 0 failed"),
             ("hero_cloth_grounding", ["--fixed-fps", "60", "--script", "res://tests/hero_cloth_grounding_test.gd"], "checks; 0 failed"),
             ("village_scenery", ["--script", str(ROOT / "art/village/verify.gd")], "VILLAGE_SCENERY errors []"),
+            ("village_look", ["--script", "res://tests/village_look_test.gd"], "VILLAGE_LOOK_PASS"),
             ("atrium", ["--script", str(ROOT / "art/architecture/verify_atrium.gd")], "ATR_VISUAL errors []"),
             ("seasons", ["--script", "res://tests/season_campaign_test.gd"], "failures=0"),
             ("world_calendar", ["--script", "res://tests/world_calendar_test.gd"], "WORLD_CALENDAR_PASS"),

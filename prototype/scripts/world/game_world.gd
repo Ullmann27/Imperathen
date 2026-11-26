@@ -24,6 +24,7 @@ var population = preload("res://scripts/world/village/village_population.gd").ne
 var regional = preload("res://scripts/world/regional_village.gd").new()
 var grove = Grove.new()
 var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
+var look = preload("res://scripts/rendering/village_look.gd").new()
 var opening_props = preload("res://scripts/world/village/opening_props.gd").new()
 ## I-01 cups and jug follow the saved morning state (presentation only).
 ## Created with the scene so worlds that never build it own no orphan node.
@@ -432,26 +433,9 @@ func get_quality_profile() -> String:
 func _apply_quality() -> void:
 	if _sun == null or not is_inside_tree():
 		return
-	var viewport := get_viewport()
 	# These are real Compatibility-renderer settings; simulation is untouched.
-	_sun.shadow_enabled = true
-	match _quality_profile:
-		"low":
-			viewport.msaa_3d = Viewport.MSAA_DISABLED
-			_sun.directional_shadow_max_distance = 24.0
-			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
-		"balanced":
-			viewport.msaa_3d = Viewport.MSAA_2X
-			_sun.directional_shadow_max_distance = 48.0
-			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
-		"high":
-			viewport.msaa_3d = Viewport.MSAA_4X
-			_sun.directional_shadow_max_distance = 85.0
-			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
-		"very_high":
-			viewport.msaa_3d = Viewport.MSAA_4X
-			_sun.directional_shadow_max_distance = 110.0
-			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
+	get_viewport().msaa_3d = {"low":Viewport.MSAA_DISABLED, "balanced":Viewport.MSAA_2X}.get(_quality_profile, Viewport.MSAA_4X)
+	look.apply_quality(_quality_profile)
 
 
 func set_touch_move(axis: Vector2) -> void:
@@ -675,34 +659,10 @@ func _build_scene() -> void:
 
 
 func _create_atmosphere() -> void:
-	var world_environment := WorldEnvironment.new()
-	var environment := _village_environment
-	environment.background_mode = Environment.BG_SKY
-	var sky := Sky.new()
-	sky.radiance_size = Sky.RADIANCE_SIZE_64
-	sky.sky_material = scenery.sky_material
-	environment.sky = sky
-	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color(0.69, 0.77, 0.85)
-	environment.ambient_light_energy = 0.58
-	environment.ambient_light_sky_contribution = 0.0
-	environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
-	environment.fog_enabled = true
-	environment.fog_sky_affect = 0.06
-	environment.fog_sun_scatter = 0.04
-	environment.fog_density = 0.0015
-	environment.fog_light_color = Color(0.63, 0.69, 0.66)
-	world_environment.environment = environment
-	add_child(world_environment)
-	var sun := DirectionalLight3D.new()
-	sun.name = "AfternoonSun"
-	sun.rotation_degrees = Vector3(-42, -28, 0)
-	sun.light_color = Color(1.0, 0.88, 0.69)
-	sun.light_energy = 0.46
-	sun.shadow_enabled = true
-	sun.directional_shadow_max_distance = 95.0
-	add_child(sun)
-	_sun = sun
+	# Sun, sky, haze, grade and interior light live in rendering/village_look.gd.
+	look.name = "VillageLook"
+	add_child(look)
+	_sun = look.setup(self, _village_environment, scenery.sky_material)
 
 
 func _create_terrain() -> void:
@@ -1798,4 +1758,5 @@ func _apply_season(index: int) -> void:
 	_materials.earth.albedo_color = soil[index]
 	_materials.wheat.albedo_color = grain[index]
 	scenery.apply_season(index,_sun,_village_environment)
+	look.apply_season(index)
 	crops.visible = index != 3

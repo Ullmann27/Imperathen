@@ -2,6 +2,7 @@ extends RefCounted
 ## Original primitive art for the frontier prototype. All dimensions are metres.
 
 const MAX_CACHED_PRIMITIVES := 128
+const Surfaces = preload("res://scripts/rendering/village_surfaces.gd")
 static var _boxes: Dictionary = {}
 static var _cylinders: Dictionary = {}
 static var _spheres: Dictionary = {}
@@ -36,15 +37,17 @@ static func _sphere_mesh(radius: float) -> SphereMesh:
 	if _spheres.size() < MAX_CACHED_PRIMITIVES: _spheres[radius] = result
 	return result
 
-static func material(color: Color, roughness: float = 0.88) -> StandardMaterial3D:
+static func material(color: Color, roughness: float = 0.88, worn: bool = true) -> StandardMaterial3D:
 	var result := StandardMaterial3D.new()
 	result.albedo_color = color
 	result.roughness = roughness
+	if worn:
+		Surfaces.add_wear(result)
 	return result
 
 
 static func transparent_material(color: Color) -> StandardMaterial3D:
-	var result := material(color)
+	var result := material(color, 0.88, false)
 	result.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	result.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	result.cull_mode = BaseMaterial3D.CULL_DISABLED
