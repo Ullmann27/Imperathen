@@ -61,7 +61,7 @@ func _run() -> void:
 	_clear_walls()
 	# The minimal harness deliberately skips the full world builder; release the
 	# builder-owned nodes that consequently never acquired a scene-tree parent.
-	for node: Node in [world.population,world.regional,world.grove,world.scenery,world.opening_props,world.crops]:
+	for node: Node in [world.population,world.regional,world.grove,world.scenery,world.look,world.opening_props,world.crops]:
 		if is_instance_valid(node) and node.get_parent() == null:
 			node.free()
 	world.free()
