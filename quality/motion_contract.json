@@ -34,6 +34,33 @@
       "open_requirements": []
     },
     {
+      "id": "original_youth",
+      "profile": "human",
+      "status": "active",
+      "resources": [
+        "assets/characters/hero_meshy_italia_0.glb",
+        "assets/characters/hero_meshy_italia_1.glb",
+        "assets/characters/hero_meshy_italia_2.glb",
+        "assets/characters/hero_meshy_italia_3.glb"
+      ],
+      "required_checks": [
+        "youth_mocap",
+        "village_people",
+        "locomotion_regression",
+        "action_world",
+        "motion_skin_measurement"
+      ],
+      "review_scope": [
+        "idle_talk",
+        "walk_run_stop",
+        "attack_guard_reaction",
+        "work_interact",
+        "lod_transition",
+        "contact_and_weight"
+      ],
+      "open_requirements": []
+    },
+    {
       "id": "frontier_people",
       "profile": "human",
       "status": "active",

@@ -57,15 +57,16 @@ FAMILY_LIMITS = {
                     "max_uncommanded_speed_jump_m_s": .2},
 }
 RIG_PROFILES = {"human", "animal"}
-REQUIRED_ACTIVE = {"hero", "frontier_people", "legacy_people", "meshy_people", "battle_rigs",
+REQUIRED_ACTIVE = {"hero", "original_youth", "frontier_people", "legacy_people", "meshy_people", "battle_rigs",
                    "distant_ranks", "regional_workers", "service_gear", "meshy_gear",
                    "village_navigation", "raid_motion", "cinematic_people"}
 REQUIRED_PROFILES = {
-    **dict.fromkeys(("hero", "frontier_people", "legacy_people", "meshy_people",
+    **dict.fromkeys(("hero", "original_youth", "frontier_people", "legacy_people", "meshy_people",
                      "battle_rigs", "regional_workers"), "human"),
     **dict.fromkeys(("village_navigation", "raid_motion", "cinematic_people"), "human_world"),
     "service_gear": "attached", "meshy_gear": "attached", "distant_ranks": "crowd",
 }
+REQUIRED_ORIGINAL_YOUTH = {f"assets/characters/hero_meshy_italia_{lod}.glb" for lod in range(4)}
 REQUIRED_PLANNED = {"horse_and_other_animals": "animal", "mounted_units": "rider",
                     "rolling_machines": "wheeled", "articulated_equipment": "articulated"}
 SUPPORT = {"assets/animations/hero_cc0_library.tres", "main.tscn",
@@ -471,6 +472,9 @@ def validate_inventory(root: Path, contract: dict) -> tuple[dict, list[str]]:
             failures.append(f"{key}: existing live movement family was removed/disabled without a new contract review")
         if families.get(key, {}).get("profile") != REQUIRED_PROFILES[key]:
             failures.append(f"{key}: existing motion profile was changed without a new contract review")
+    youth = families.get("original_youth", {})
+    if set(youth.get("resources", [])) != REQUIRED_ORIGINAL_YOUTH or "youth_mocap" not in youth.get("required_checks", []):
+        failures.append("original_youth: the four original LODs and mocap scenario are mandatory")
     for key, profile in REQUIRED_PLANNED.items():
         if (families.get(key, {}).get("profile") != profile
                 or families.get(key, {}).get("status") not in {"active", "inactive"}):

@@ -181,6 +181,10 @@ def main():
             ("main_scene", ["--fixed-fps", "60", "--quit-after", "420"], "IMPERATHEN_READY"),
             ("motion_measurement", ["--fixed-fps", "60", "--script", "res://tests/motion_quality_measurement.gd"], "MOTION_MEASURED"),
         ]
+        original_motion_manifest = PROJECT / "assets/animations/accad_youth_motion.json"
+        if original_motion_manifest.is_file() or (args.only and "youth_mocap" in args.only):
+            checks.insert(-1, ("youth_mocap", ["--fixed-fps", "60", "--script",
+                                             "res://tests/youth_mocap_test.gd"], "YOUTH_MOCAP_RUNTIME_PASS"))
         if args.only:
             unknown = set(args.only) - {entry[0] for entry in checks}
             if unknown:
