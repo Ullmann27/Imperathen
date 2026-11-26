@@ -17,9 +17,9 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "prototype/assets/vegetation"
-SHOTS = ["path", "overview", "stream", "west_edge", "north_hills", "south_fields"]
+SHOTS = ["path", "overview", "stream", "west_edge", "north_hills", "south_fields", "meadow"]
 PROFILES = ["low", "balanced", "high", "very_high"]
-LABELS = {"low": "Leicht", "balanced": "Ausgewogen", "high": "Hoch", "very_high": "Sehr hoch"}
+LABELS = {"low": "Leicht", "balanced": "Ausgewogen", "high": "Hoch", "very_high": "Ultra"}
 
 
 def sha(path):
@@ -48,6 +48,25 @@ def sheet(before_dir, after_dir, profile, out, width=640):
     return out
 
 
+def merged(folder, label):
+    """One report from the per-profile capture runs (<label>-vegetation-<profiles>.json)."""
+    result = None
+    for path in sorted(folder.glob(f"{label}-vegetation-*.json")):
+        part = json.loads(path.read_text())
+        if result is None:
+            result = part
+            result["load_ms"] = [part.get("load_ms")]
+            continue
+        for shot, by_profile in part["shots"].items():
+            result["shots"].setdefault(shot, {}).update(by_profile)
+        result["errors"] = result["errors"] + part["errors"]
+        result["load_ms"].append(part.get("load_ms"))
+        result["memory"]["static_mib"] = max(result["memory"]["static_mib"], part["memory"]["static_mib"])
+    if result is None:
+        raise SystemExit(f"No {label}-vegetation-*.json in {folder}")
+    return result
+
+
 def fmt(value):
     if isinstance(value, float):
         return f"{value:.1f}"
@@ -63,8 +82,8 @@ def main():
     parser.add_argument("--after-commit", default="working tree")
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
-    before = json.loads((args.before / "before-vegetation.json").read_text())
-    after = json.loads((args.after / "after-vegetation.json").read_text())
+    before = merged(args.before, "before")
+    after = merged(args.after, "after")
     checksums = {str(p.relative_to(ROOT)): sha(p) for p in sorted(ASSETS.rglob("*")) if p.is_file() and p.suffix in (".glb", ".png", ".json")}
     (args.out / "assets_sha256.json").write_text(json.dumps(checksums, indent=1) + "\n")
     lines = ["# Vegetation Valdora: Rendernachweis (D-038)", "",
@@ -78,8 +97,8 @@ def main():
              "- Kameras: identisch vorher/nachher (feste Augpunkte und Ziele in `tests/vegetation_review.gd`; `path` über das Spielkamera-Rig)", "",
              "Zeitwerte stammen aus llvmpipe/Software-Rendering und sind nur relative Hinweise zwischen den Aufnahmen, keine Fold7-Leistung.", "",
              "## Zähler je Aufnahme und Profil (vorher -> nachher)", "",
-             "| Aufnahme | Profil | Draw Calls | Primitive | Objekte | Schatten-Primitive | Textur MiB | GPU ms | Baum-Instanzen sichtbar (LOD0/1/2/3/Impostor) | Baum-Dreiecke | Kraut/Feld-Instanzen | Kraut/Feld-Dreiecke |",
-             "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+             "| Aufnahme | Profil | Draw Calls | Primitive | Objekte | Schatten-Primitive | Textur MiB | Bildzeit ms (llvmpipe) | Baum-Instanzen sichtbar (LOD0/1/2/3/Impostor) | Baum-Dreiecke | Kraut/Feld-Instanzen | Kraut/Feld-Dreiecke | Halmbüschel | Halm-Dreiecke |",
+             "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for shot in SHOTS:
         for profile in PROFILES:
             sb = before["shots"].get(shot, {}).get(profile)
@@ -91,8 +110,9 @@ def main():
             lods = "/".join(str(levels.get(k, 0)) for k in ("lod0", "lod1", "lod2", "lod3", "impostor"))
             lines.append(f"| {shot} | {LABELS[profile]} | {fmt(sb['draw_calls'])} -> {fmt(sa['draw_calls'])} | {fmt(sb['primitives'])} -> {fmt(sa['primitives'])} | "
                          f"{fmt(sb['objects'])} -> {fmt(sa['objects'])} | {fmt(sb['shadow_primitives'])} -> {fmt(sa['shadow_primitives'])} | "
-                         f"{sb['texture_mib']:.0f} -> {sa['texture_mib']:.0f} | {sb['viewport_gpu_ms_p50']:.1f} -> {sa['viewport_gpu_ms_p50']:.1f} | {lods} | "
-                         f"{veg.get('tree_triangles_submitted', '-')} | {veg.get('card_instances_visible', '-')} | {veg.get('card_triangles_submitted', '-')} |")
+                         f"{sb['texture_mib']:.0f} -> {sa['texture_mib']:.0f} | {sb['wall_ms_p50']:.0f} -> {sa['wall_ms_p50']:.0f} | {lods} | "
+                         f"{veg.get('tree_triangles_submitted', '-')} | {veg.get('card_instances_visible', '-')} | {veg.get('card_triangles_submitted', '-')} | "
+                         f"{veg.get('grass_tufts_visible', '-')} | {veg.get('grass_triangles_submitted', '-')} |")
     any_veg = next(iter(next(iter(after["shots"].values())).values())).get("vegetation", {})
     lines += ["", "## Platzierte Pflanzen (alle Profile gleich)", "", "```json", json.dumps(any_veg.get("placed", {}), indent=1, sort_keys=True), "```", "",
               "## Kontaktbögen", ""]
