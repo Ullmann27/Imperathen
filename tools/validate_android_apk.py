@@ -197,7 +197,52 @@ WORLD_STATE_RESOURCES = WORLD_STATE_SCRIPTS + (
     "assets/world/tribes/bc58_rhine.json",
     "assets/story/mission_timeline.json",
 )
+VILLAGE_LOOK_RESOURCES = (
+    "scripts/rendering/village_look.gd",
+    "scripts/rendering/village_surfaces.gd",
+    "scripts/rendering/sun_shaft.gdshader",
+    "scripts/rendering/window_glow.gdshader",
+    "scripts/rendering/fire_flame.gdshader",
+    "scripts/world/village/lime_plaster.gdshader",
+    "assets/village/look/look_values.json",
+    "assets/village/look/lime_plaster_albedo.png",
+    "assets/village/look/lime_plaster_normal.png",
+    "assets/village/look/lime_plaster_mask.png",
+    "assets/village/look/wear_detail_albedo.png",
+    "assets/village/look/wear_detail_normal.png",
+    "assets/village/look/trodden_earth_color.png",
+    "assets/village/look/trodden_earth_relief.png",
+    "assets/village/look/meadow_sod_color.png",
+    "assets/village/look/meadow_sod_relief.png",
+)
+CITY_ARCHITECTURE_RESOURCES = (
+    "scripts/rendering/city_architecture_detail.gd",
+    "assets/city_detail/architecture/architecture_manifest.json",
+    "assets/city_detail/architecture/city_architecture_library.glb",
+)
+CITY_MARKET_DATA_RESOURCES = (
+    "scripts/world/city_market_bridge.gd",
+    "assets/city_detail/shops/city_market_anchors.json",
+)
+CITY_CROWD_DATA_RESOURCES = (
+    "scripts/world/city_exploration_crowd.gd",
+    "assets/world/city_crowd_layout.json",
+)
+CITY_CATALOG_RESOURCES = (
+    "scripts/world/city_exploration.gd",
+    "assets/world/city_catalog.json",
+)
+WEAPON_CATALOG_RESOURCES = (
+    "scripts/domain/weapon_rules.gd",
+    "data/weapons/weapon_catalog.v1.json",
+)
 FEATURE_RESOURCE_GROUPS = (
+    ("village_look_content", VILLAGE_LOOK_RESOURCES),
+    ("city_architecture_content", CITY_ARCHITECTURE_RESOURCES),
+    ("city_market_data_content", CITY_MARKET_DATA_RESOURCES),
+    ("city_crowd_data_content", CITY_CROWD_DATA_RESOURCES),
+    ("city_catalog_content", CITY_CATALOG_RESOURCES),
+    ("weapon_catalog_content", WEAPON_CATALOG_RESOURCES),
     ("original_meshy_youth_content", tuple(f"assets/characters/hero_meshy_italia_{level}.glb" for level in range(4))),
     ("original_meshy_youth_civil_content", (
         *(f"assets/characters/hero_meshy_italia_civil_{level}.glb" for level in range(4)),
@@ -228,6 +273,12 @@ FEATURE_RESOURCE_GROUPS = (
     ("world_state_content", WORLD_STATE_RESOURCES),
 )
 FEATURE_ACTIVATION_RESOURCES = {
+    "village_look_content": ("scripts/rendering/village_look.gd",),
+    "city_architecture_content": ("scripts/rendering/city_architecture_detail.gd",),
+    "city_market_data_content": ("scripts/world/city_market_bridge.gd",),
+    "city_crowd_data_content": ("scripts/world/city_exploration_crowd.gd",),
+    "city_catalog_content": ("scripts/world/city_exploration.gd",),
+    "weapon_catalog_content": ("scripts/domain/weapon_rules.gd",),
     "world_state_content": WORLD_STATE_SCRIPTS,
 }
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
