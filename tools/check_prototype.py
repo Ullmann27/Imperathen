@@ -25,15 +25,18 @@ FAILURE = re.compile(r"SCRIPT ERROR:|Parse Error:|^ERROR:|^USER ERROR:", re.MULT
 
 def run_check(engine, name, arguments, marker, environment, report):
     started = time.monotonic()
+    timeout = {"import": 600, "motion_measurement": 2400}.get(name, 120)
     try:
         result = subprocess.run([engine, "--headless", "--path", str(PROJECT), *arguments],
                                 cwd=ROOT, env=environment, text=True, encoding="utf-8",
-                                errors="replace", capture_output=True, timeout=2400 if name == "motion_measurement" else 120)
+                                errors="replace", capture_output=True, timeout=timeout)
         combined = result.stdout + result.stderr
         success = result.returncode == 0 and FAILURE.search(combined) is None and (marker is None or marker in combined)
         code = result.returncode
     except subprocess.TimeoutExpired as exc:
-        combined = f"TIMEOUT during {name}: {exc}"
+        stdout = (exc.stdout or b"").decode("utf-8", errors="replace")
+        stderr = (exc.stderr or b"").decode("utf-8", errors="replace")
+        combined = f"TIMEOUT during {name}: {exc}\n{stdout}{stderr}"
         success = False
         code = None
     report.mkdir(parents=True, exist_ok=True)

@@ -133,6 +133,22 @@ CHAPTER_STORY_RESOURCES = (
     "assets/story/missions/band1/index.json",
     *(f"assets/story/missions/band1/{mission}.json" for mission in ("I-01", "I-03", "I-04", "I-05", "I-06", "I-07", "I-09")),
 )
+FIRST_MORNING_RESOURCES = (
+    "scripts/story/i01_three_cups.gd",
+    "scripts/story/i01_film.gd",
+    "scripts/world/village/i01_props.gd",
+)
+WORLD_HISTORY_RESOURCES = (
+    "scripts/domain/world_calendar.gd",
+    "scripts/domain/campaign_timeline.gd",
+    "scripts/domain/era_registry.gd",
+    "assets/story/mission_timeline.json",
+    "assets/world/era_registry.json",
+)
+TRIBAL_WORLD_RESOURCES = (
+    "scripts/domain/tribal_world.gd",
+    "assets/world/tribes/bc58_rhine.json",
+)
 NPC_BEHAVIOR_RESOURCES = (
     "scripts/domain/npc_behavior.gd",
 )
@@ -188,6 +204,9 @@ FEATURE_RESOURCE_GROUPS = (
     ("childhood_content", CHILDHOOD_RESOURCES),
     ("campaign_bible_content", CAMPAIGN_BIBLE_RESOURCES),
     ("chapter_story_content", CHAPTER_STORY_RESOURCES),
+    ("first_morning_content", FIRST_MORNING_RESOURCES),
+    ("world_history_content", WORLD_HISTORY_RESOURCES),
+    ("tribal_world_content", TRIBAL_WORLD_RESOURCES),
     ("meshy_registry_content", MESHY_REGISTRY_RESOURCES),
     ("npc_behavior_content", NPC_BEHAVIOR_RESOURCES),
     ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
