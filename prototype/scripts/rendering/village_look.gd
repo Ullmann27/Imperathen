@@ -9,6 +9,7 @@ const Surfaces = preload("res://scripts/rendering/village_surfaces.gd")
 const SUN_NAME := "AfternoonSun"
 const SHAFT_SHADER := preload("res://scripts/rendering/sun_shaft.gdshader")
 const GLOW_SHADER := preload("res://scripts/rendering/window_glow.gdshader")
+const FLAME_SHADER := preload("res://scripts/rendering/fire_flame.gdshader")
 ## All colours, energies and the camera set live in one data file shared with
 ## the render-profile study (assets/village/look/look_values.json).
 const VALUES_FILE := preload("res://assets/village/look/look_values.json")
@@ -60,6 +61,8 @@ var weather := "clear"
 var night := 0.0
 var _fires: Array[Dictionary] = []
 var _clock := 0.0
+var _fire_budget := 3
+var _flames: MultiMeshInstance3D
 
 
 ## Typed copy of look_values.json: "#rrggbb" strings become Colors, the named
@@ -113,7 +116,7 @@ func setup(world: Node3D, target: Environment, sky: ShaderMaterial) -> Direction
 	_window.name = "WindowSkylight"
 	_window.light_color = VALUES.interior.window_colour
 	_window.spot_range = float(VALUES.interior.window_range)
-	_window.spot_angle = 64.0
+	_window.spot_angle = float(VALUES.interior.window_angle)
 	_window.spot_angle_attenuation = 2.0
 	_window.spot_attenuation = 1.2
 	_window.shadow_enabled = false
@@ -129,6 +132,7 @@ func setup(world: Node3D, target: Environment, sky: ShaderMaterial) -> Direction
 	_shafts.visible = false
 	add_child(_shafts)
 	_build_window_glow()
+	_build_village_fires()
 	apply_season_light(season, sun, environment, sky_material)
 	return sun
 
@@ -311,6 +315,106 @@ func _build_window_glow() -> void:
 func _update_window_glow() -> void:
 	_glow.visible = night > .25
 	_glow.material_override.set_shader_parameter("strength", float(VALUES.interior.window_glow_strength) * smoothstep(.25, 1.0, night))
+	var lit := _torches_lit()
+	_flames.visible = lit > 0.0
+	_flames.material_override.set_shader_parameter("lit", lit)
+
+
+## 0 by day, 1 once dusk has fallen: door torches burn from dusk to dawn.
+func _torches_lit() -> float:
+	var from := float(VALUES.village_fires.lit_from)
+	return smoothstep(from, from + .25, night)
+
+
+## The village's own fire sources: the smith's hearth (glows all day) and a
+## torch in an iron bracket beside the door of the listed homes, lit at dusk.
+## Brackets and flames are two batches; the lights are unshadowed and capped
+## per profile to the nearest ones (see _process).
+func _build_village_fires() -> void:
+	var data: Dictionary = VALUES.village_fires
+	var forge: Array = data.forge.at
+	var hearth := add_fire_light(self, Vector3(forge[0], forge[1], forge[2]), str(data.forge.kind))
+	hearth.name = "ForgeHearthLight"
+	_fires[-1].merge({"day": float(data.forge.day_share), "managed": true})
+	var local: Array = data.sconce_local
+	var offset: Array = data.sconce_light_offset
+	var size: Array = data.flame_size
+	var spots: Array[Transform3D] = []
+	for home: Dictionary in Layout.HOMES:
+		if home.id in data.sconce_homes:
+			spots.append(Transform3D(Basis(Vector3.UP, float(home.yaw)), home.at) * Transform3D(Basis.IDENTITY, Vector3(local[0], local[1], local[2])))
+	var brackets := MultiMesh.new()
+	brackets.transform_format = MultiMesh.TRANSFORM_3D
+	brackets.mesh = _sconce_mesh()
+	brackets.instance_count = spots.size()
+	var card := QuadMesh.new()
+	card.size = Vector2.ONE
+	var flames := MultiMesh.new()
+	flames.transform_format = MultiMesh.TRANSFORM_3D
+	flames.mesh = card
+	flames.instance_count = spots.size()
+	for index in spots.size():
+		brackets.set_instance_transform(index, spots[index])
+		var head := spots[index] * Vector3(offset[0], offset[1], offset[2])
+		flames.set_instance_transform(index, Transform3D(Basis.from_scale(Vector3(size[0], size[1], 1.0)), head + Vector3(0, float(size[1]) * .42, 0)))
+		var light := add_fire_light(self, head + Vector3(0, .1, 0) + spots[index].basis.z * .12, "torch")
+		light.name = "DoorTorchLight%d" % index
+		_fires[-1].merge({"day": 0.0, "managed": true})
+	var holder := MultiMeshInstance3D.new()
+	holder.name = "DoorTorches"
+	holder.multimesh = brackets
+	holder.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(holder)
+	_flames = MultiMeshInstance3D.new()
+	_flames.name = "DoorTorchFlames"
+	_flames.multimesh = flames
+	_flames.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_flames.material_override = ShaderMaterial.new()
+	_flames.material_override.shader = FLAME_SHADER
+	_flames.visible = false
+	add_child(_flames)
+
+
+## Iron wall bracket with ring and a pitch-wrapped wooden torch leaning out
+## from the wall (+z). Surface 0 iron, surface 1 wood, surface 2 charred head.
+static func _sconce_mesh() -> ArrayMesh:
+	var mesh := ArrayMesh.new()
+	var lean := Basis(Vector3.RIGHT, deg_to_rad(22.0))
+	var parts := [
+		[Color("2b2a29"), .55, [[_box(Vector3(.035, .035, .17)), Transform3D(Basis.IDENTITY, Vector3(0, 0, .085))],
+			[_box(Vector3(.085, .03, .085)), Transform3D(lean, Vector3(0, .02, .17))],
+			[_box(Vector3(.05, .12, .012)), Transform3D(Basis.IDENTITY, Vector3(0, 0, .006))]]],
+		[Color("5a3c24"), .85, [[_rod(.021, .44), Transform3D(lean, Vector3(0, .09, .198))]]],
+		[Color("1c1512"), .95, [[_rod(.038, .12), Transform3D(lean, Vector3(0, .31, .287))]]],
+	]
+	for part in parts:
+		var tool := SurfaceTool.new()
+		tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+		for piece in part[2]:
+			tool.append_from(piece[0], 0, piece[1])
+		var material := StandardMaterial3D.new()
+		material.albedo_color = part[0]
+		material.roughness = part[1]
+		material.metallic = .7 if part[1] < .6 else 0.0
+		tool.set_material(material)
+		tool.commit(mesh)
+	return mesh
+
+
+static func _box(size: Vector3) -> BoxMesh:
+	var box := BoxMesh.new()
+	box.size = size
+	return box
+
+
+static func _rod(radius: float, height: float) -> CylinderMesh:
+	var rod := CylinderMesh.new()
+	rod.top_radius = radius
+	rod.bottom_radius = radius
+	rod.height = height
+	rod.radial_segments = 8
+	rod.rings = 1
+	return rod
 
 
 ## Weather-dependent light: "clear", "overcast", "rain" or "mist".
@@ -371,6 +475,7 @@ func apply_quality(next_profile: String) -> void:
 	environment.sky.radiance_size = Sky.RADIANCE_SIZE_128 if int(look.get("sky_radiance", 64)) >= 128 else Sky.RADIANCE_SIZE_64
 	environment.fog_aerial_perspective = float(look.get("aerial_perspective", .62))
 	environment.ssao_enabled = bool(look.get("ssao", false))
+	_fire_budget = int(look.get("fire_lights", 3))
 	_bounce_allowed = bool(look.get("interior_bounce", true))
 	_shafts_allowed = bool(look.get("light_shafts", false))
 	Surfaces.set_profile(profile)
@@ -396,12 +501,38 @@ func _process(delta: float) -> void:
 	_clock += delta
 	if night > .01 and _bounce.visible:
 		_bounce.light_energy = _fire_energy(bounce_energy * interior, .18, 0.0)
+	_update_fires(camera.global_position)
+
+
+## Flicker for every fire light. Village fires ("managed") additionally follow
+## dusk/dawn, fade with distance and only the nearest `fire_lights` of the
+## profile burn as real lights, so a lane of torches stays affordable.
+func _update_fires(eye: Vector3) -> void:
+	var data: Dictionary = VALUES.village_fires
+	var lit := _torches_lit()
 	var alive: Array[Dictionary] = []
+	var ranked: Array[Dictionary] = []
 	for fire in _fires:
-		if is_instance_valid(fire.light):
+		if not is_instance_valid(fire.light):
+			continue
+		alive.append(fire)
+		if not fire.get("managed", false):
 			fire.light.light_energy = _fire_energy(fire.energy, fire.depth, fire.phase)
-			alive.append(fire)
+			continue
+		var distance: float = eye.distance_to(fire.light.global_position)
+		var share: float = maxf(lit, float(fire.day)) * (1.0 - smoothstep(float(data.fade_start), float(data.fade_end), distance))
+		fire["share"] = share
+		fire["distance"] = distance
+		if share > .01:
+			ranked.append(fire)
+		else:
+			fire.light.visible = false
 	_fires = alive
+	ranked.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.distance < b.distance)
+	for index in ranked.size():
+		var fire: Dictionary = ranked[index]
+		fire.light.visible = index < _fire_budget
+		fire.light.light_energy = _fire_energy(fire.energy * fire.share, fire.depth, fire.phase)
 
 
 func _fire_energy(base: float, depth: float, phase: float) -> float:

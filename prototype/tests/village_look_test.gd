@@ -79,6 +79,31 @@ func _run() -> void:
 	var first := torch.light_energy
 	look._process(.05)
 	_check(not torch.shadow_enabled and torch.light_energy > 0.0 and not is_equal_approx(first, torch.light_energy), "Fire light flickers, unshadowed")
+	# Village fires: the forge hearth glows by day, door torches burn from dusk,
+	# and only the profile's nearest few are real lights.
+	var forge: OmniLight3D = look.get_node("ForgeHearthLight")
+	var torches: Array = look.find_children("DoorTorchLight*", "OmniLight3D", false, false)
+	var lit := func() -> int: return torches.filter(func(item: OmniLight3D) -> bool: return item.visible).size()
+	_check(torches.size() == Look.VALUES.village_fires.sconce_homes.size() and look.get_node("DoorTorches").multimesh.instance_count == torches.size(), "One bracket and light per listed home")
+	camera.global_position = forge.global_position + Vector3(-3, .5, 4)
+	look._process(.05)
+	_check(forge.visible and forge.light_energy > .5 and lit.call() == 0 and not look._flames.visible, "Day: forge glows, door torches are out")
+	look.set_time_of_day(22.5)
+	camera.global_position = Vector3(0, 1.7, -30)
+	for profile in ["low", "balanced", "high", "very_high"]:
+		look.apply_quality(profile)
+		look._process(.05)
+		var budget := int(Look.PROFILE_DATA.data.profiles[profile].look.fire_lights)
+		var burning: int = lit.call() + (1 if forge.visible else 0)
+		_check(burning == budget and look._flames.visible, "%s: %d nearest fire lights at night (got %d)" % [profile, budget, burning])
+	camera.global_position = Vector3(400, 1.7, 400)
+	look._process(.05)
+	_check(lit.call() == 0 and not forge.visible, "Far away no village fire light is active")
+	for item: OmniLight3D in torches:
+		_check(not item.shadow_enabled, "Door torch is unshadowed")
+		break
+	look.apply_quality("balanced")
+	look.set_time_of_day(-1.0)
 	world.free()
 	print("VILLAGE_LOOK_TEST %d checks, %d failed %s" % [checks, failures.size(), failures])
 	if failures.is_empty():
