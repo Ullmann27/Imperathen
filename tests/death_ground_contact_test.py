@@ -100,10 +100,18 @@ class GroundedDeathJsonTest(unittest.TestCase):
                 else:
                     self.assertIsNone(marker)
 
-    def test_hero_keeps_its_own_blender_grounding(self):
-        for path in sorted(ASSETS.glob("characters/hero_quality_*.glb")):
+    def test_hero_death_and_gather_are_grounded(self):
+        heroes = sorted(ASSETS.glob("characters/hero_quality_*.glb"))
+        self.assertEqual(len(heroes), 4)
+        for path in heroes:
             with self.subTest(glb=path.name):
-                self.assertNotIn(MARKER, death(path).get("extras", {}))
+                for clip in ("death", "gather"):
+                    animation = next(a for a in document(path)["animations"] if a["name"] == clip)
+                    marker = animation.get("extras", {}).get(MARKER)
+                    self.assertEqual(list(marker["replaced_sampler_output_accessors"]), ["Pelvis/translation"])
+                    self.assertEqual(marker["max_sole_penetration_m"], 0.0)
+                settings = path.with_name(path.name + ".import").read_text(encoding="utf-8")
+                self.assertIn('"PATH:AnimationPlayer": {\n"optimizer/enabled": false', settings)
 
 
 @unittest.skipUnless(importlib.util.find_spec("numpy"), "NumPy is required to pose the exported skin")
