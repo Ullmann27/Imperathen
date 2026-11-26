@@ -311,8 +311,6 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 	_abilities(ui, column, data)
 	_text(ui, column, "Erfahrung entsteht durch gültige Treffer, abgewehrte Angriffe, Aufklärung, Warnung und Rettung. Ein Gespräch kann nur einmal dieselbe Vertrauenswirkung haben.", 14, true)
 	_action(ui, column, "Mit Decimus den Wiederaufbau vereinbaren", "village_request_work", {}, bool(data.village.social.npcs.get("decimus", {}).get("met", false)))
-	var history: Dictionary = life.get("history", {})
-	_text(ui, column, "Historischer Rahmen: %s n. Chr. · %s. Dorf und Bewohner sind eigene fiktionale Figuren." % [history.get("current_year", 100), life.get("ruler", "Historischer Rahmen")], 14, true)
 	_text(ui, column, "Zum Kennenlernen gehst du direkt zu den Menschen. Der Dorfplan zeigt ihre Aufgaben; E beziehungsweise Interagieren beginnt das Gespräch.", 14, true)
 
 
