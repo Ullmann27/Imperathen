@@ -98,7 +98,8 @@
         "frontier_people",
         "natural_motion",
         "village_people",
-        "npc_behavior_world"
+        "npc_behavior_world",
+        "resident_footwear"
       ],
       "review_scope": [
         "idle_talk",
@@ -921,7 +922,8 @@
     "shaders/world_expansion/vegetation_wind.gdshader",
     "scripts/domain/city_checkpoint.gd",
     "scripts/world/city_bakery_display.gd",
-    "scripts/world/city_resident_view.gd"
+    "scripts/world/city_resident_view.gd",
+    "scripts/visuals/resident_footwear.gd"
   ],
   "procedural_owners": {
     "scripts/world/village_life_world.gd": [
@@ -1009,6 +1011,9 @@
     ],
     "scripts/world/city_resident_view.gd": [
       "village_navigation"
+    ],
+    "scripts/visuals/resident_footwear.gd": [
+      "frontier_people"
     ]
   }
 }
