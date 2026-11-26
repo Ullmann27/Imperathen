@@ -9,6 +9,7 @@ const BRONZE := Color("b99563")
 const CRIMSON := Color("722b32")
 const INK := Color("111a1b")
 const SETTINGS_PATH := "user://imperathen_ui.cfg"
+const AudioBuses = preload("res://scripts/audio/audio_buses.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 const ORIGIN_IDS := ["italia", "germania", "han", "wa", "vistula"]
 const FigureGallery = preload("res://scripts/ui/figure_gallery.gd")
@@ -2974,6 +2975,8 @@ func _setup_sound() -> void:
 func _setup_music() -> void:
 	_music_player = AudioStreamPlayer.new()
 	_music_player.name = "MenuMusic"
+	AudioBuses.ensure_layout()
+	_music_player.bus = AudioBuses.MUSIC
 	var stream: AudioStreamOggVorbis = load(RomanStyle.MUSIC_PATH)
 	stream.loop = true
 	_music_player.stream = stream

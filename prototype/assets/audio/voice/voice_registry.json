@@ -1,0 +1,370 @@
+{
+ "schema_version": 1,
+ "note": "speaker_id -> fixed voice profile. Named characters, hero age stages (derived from hero_base) and NPC pool voices.",
+ "speakers": {
+  "marcus": {
+   "name": "Marcus",
+   "age": 12,
+   "class": "child",
+   "instruct": "Kinderstimme eines lebhaften Jungen von etwa zwölf Jahren vor dem Stimmbruch, hoch und hell, etwas frech und schnell, deutlich ein Kind, keine erwachsene Frau, natürlich.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    215,
+    340
+   ],
+   "reference_seed": 2202,
+   "reference_sha256": "e5c34d233854c896fd3b8b5f3981569d4c105cec3760c385a154619864e98747",
+   "reference_f0_median_hz": 274.0,
+   "reference_formants_hz": [
+    512.7,
+    2048.6,
+    3364.2
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "julia": {
+   "name": "Julia",
+   "age": 34,
+   "class": "adult_female",
+   "instruct": "Frau Mitte dreißig, Mutter, warme mittelhohe Stimme, liebevoll aber bestimmt, ruhige natürliche Alltagssprache.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    165,
+    245
+   ],
+   "reference_seed": 3401,
+   "reference_sha256": "0ab7bde1cad204fb7637180ff57bd136b5faf352ea47ef3117fb7fc3015c61a3",
+   "reference_f0_median_hz": 171.3,
+   "reference_formants_hz": [
+    390.5,
+    1783.2,
+    2934.8
+   ],
+   "lines": 3,
+   "lines_f0_median_hz": 163.3,
+   "tempo": 1.0,
+   "post": null
+  },
+  "silvanus": {
+   "name": "Silvanus",
+   "age": 39,
+   "class": "adult_male",
+   "instruct": "Mann um die vierzig, Zimmermann und Vater, ruhige, leicht raue Baritonstimme, wortkarg, freundlich und geerdet.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    85,
+    145
+   ],
+   "reference_seed": 4902,
+   "reference_sha256": "4cd0b2b8ef25a67af5507a90789e05233abe69a1c676abc37b08ada6f1fa51e9",
+   "reference_f0_median_hz": 135.9,
+   "reference_formants_hz": [
+    364.0,
+    1470.8,
+    2381.9
+   ],
+   "lines": 1,
+   "lines_f0_median_hz": 115.3,
+   "tempo": 1.0,
+   "post": null
+  },
+  "sextus": {
+   "name": "Sextus",
+   "age": 46,
+   "class": "adult_male",
+   "instruct": "Dorfschmied Mitte vierzig, kräftige tiefe Bassstimme mit leichter Rauheit, geduldig, väterlich streng, langsam und deutlich.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    75,
+    135
+   ],
+   "reference_seed": 4603,
+   "reference_sha256": "7cfb485ccc77c69329545daf688c81d81af710eae6d89cf615bb5a8d2dc0e2fe",
+   "reference_f0_median_hz": 103.5,
+   "reference_formants_hz": [
+    362.2,
+    1510.4,
+    2362.5
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "cassia": {
+   "name": "Cassia",
+   "age": 40,
+   "class": "adult_female",
+   "instruct": "Marktfrau um die vierzig, klare lebhafte Stimme, geschäftig und freundlich, deutliche Artikulation.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    160,
+    245
+   ],
+   "reference_seed": 5004,
+   "reference_sha256": "7df71e1fabe6442814edd5aaec01700e61da31fe76999bd05c417103507d20fc",
+   "reference_f0_median_hz": 209.7,
+   "reference_formants_hz": [
+    466.2,
+    1862.4,
+    3097.8
+   ],
+   "lines": 2,
+   "lines_f0_median_hz": 206.4,
+   "tempo": 1.0,
+   "post": null
+  },
+  "aelia": {
+   "name": "Aelia",
+   "age": 31,
+   "class": "adult_female",
+   "instruct": "Steinmetzin um die dreißig, feste, sachliche Frauenstimme, eher tief, ruhig und bedacht.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    150,
+    230
+   ],
+   "reference_seed": 3105,
+   "reference_sha256": "3145dd2972eac404790903525f43c6acc246a9f9d7deac65cdfc6ea9dbb5086a",
+   "reference_f0_median_hz": 219.0,
+   "reference_formants_hz": [
+    431.4,
+    1711.3,
+    2980.7
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "varro": {
+   "name": "Varro",
+   "age": 35,
+   "class": "adult_male",
+   "instruct": "Jäger und Späher Mitte dreißig, gedämpfte aufmerksame Männerstimme, knapp, ruhig und leise.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    90,
+    150
+   ],
+   "reference_seed": 3506,
+   "reference_sha256": "c73e296b40d2d7d416de344087b286f1b1797ef8c7baf9f005390a00a74848cf",
+   "reference_f0_median_hz": 113.8,
+   "reference_formants_hz": [
+    380.9,
+    1386.0,
+    2298.9
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "fabius": {
+   "name": "Fabius",
+   "age": 52,
+   "class": "adult_male",
+   "instruct": "Holzfäller um die fünfzig, tiefe, behäbige, gutmütige Männerstimme, etwas langsam.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    75,
+    135
+   ],
+   "reference_seed": 5207,
+   "reference_sha256": "f8bcb37aa137f896f5f866eeb48663a960afbf39f803a6e975c6a3fed3f83b7c",
+   "reference_f0_median_hz": 115.6,
+   "reference_formants_hz": [
+    367.7,
+    1377.0,
+    2423.0
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "severus": {
+   "name": "Wachmann",
+   "age": 28,
+   "class": "adult_male",
+   "instruct": "Junger Dorfwächter Ende zwanzig, klare Männerstimme, sachlich und pflichtbewusst.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    95,
+    160
+   ],
+   "reference_seed": 2808,
+   "reference_sha256": "c6e091ef961d3b223a60a67a0fa021e4268b0bc2eed1d447c684c3b47bc8dc46",
+   "reference_f0_median_hz": 105.1,
+   "reference_formants_hz": [
+    314.4,
+    1571.8,
+    2598.9
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "decimus": {
+   "name": "Decimus",
+   "age": 63,
+   "class": "elder_male",
+   "instruct": "Alter Dorfverwalter über sechzig, ältere Männerstimme, würdevoll, leicht heiser und etwas zittrig, bedächtig.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    90,
+    160
+   ],
+   "reference_seed": 6309,
+   "reference_sha256": "abf9459c6408b8320b2d0a22a8bbe15a6007a725a33dcf5ab67535e0e056ecb7",
+   "reference_f0_median_hz": 136.3,
+   "reference_formants_hz": [
+    350.2,
+    1507.6,
+    2606.1
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "aurelia": {
+   "name": "Aurelia",
+   "age": 66,
+   "class": "elder_female",
+   "instruct": "Alte Heilerin über sechzig, ältere Frauenstimme, sanft und leicht brüchig, ruhig und fürsorglich.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    140,
+    225
+   ],
+   "reference_seed": 6610,
+   "reference_sha256": "05bc97ce016106b6248364e4067624fd59650dfae86af8b080f8fb682a107661",
+   "reference_f0_median_hz": 195.5,
+   "reference_formants_hz": [
+    429.9,
+    1800.8,
+    3160.7
+   ],
+   "lines": 1,
+   "lines_f0_median_hz": 183.2,
+   "tempo": 1.0,
+   "post": null
+  },
+  "narrator": {
+   "name": "Chronik",
+   "age": 55,
+   "class": "adult_male",
+   "instruct": "Ruhiger männlicher Erzähler um die fünfzig, warme tiefe Stimme, gemessenes Tempo, sehr deutliche Aussprache, unaufgeregt.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    80,
+    140
+   ],
+   "reference_seed": 5511,
+   "reference_sha256": "d4dec5cd1dcbafa6cabe710aa57723b1b3ab305909a08afdd85d9f3d723b76ee",
+   "reference_f0_median_hz": 137.4,
+   "reference_formants_hz": [
+    538.6,
+    1744.8,
+    2841.3
+   ],
+   "lines": 11,
+   "lines_f0_median_hz": 140.1,
+   "tempo": 1.0,
+   "post": null
+  },
+  "caesar": {
+   "name": "Caesar",
+   "age": 42,
+   "class": "adult_male",
+   "instruct": "Römischer Feldherr Anfang vierzig, kraftvolle, volle Männerstimme mit natürlicher Autorität, beherrscht und klar, trägt über ein Heerlager, aber menschlich, nicht übertrieben, nicht theatralisch.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    85,
+    155
+   ],
+   "reference_seed": 6212,
+   "reference_sha256": "cde7c7112c781399f7a9affd013b93b92b9ad5254797e0cd9d60a543c97919d8",
+   "reference_f0_median_hz": 112.4,
+   "reference_formants_hz": [
+    476.2,
+    1476.6,
+    2562.0
+   ],
+   "lines": 2,
+   "lines_f0_median_hz": 119.7,
+   "tempo": 1.0,
+   "post": null
+  },
+  "labienus": {
+   "name": "Labienus",
+   "age": 42,
+   "class": "adult_male",
+   "instruct": "Erfahrener römischer Offizier Anfang vierzig, knappe, harte, etwas raue Kommandostimme, nüchtern und direkt.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    85,
+    150
+   ],
+   "reference_seed": 4213,
+   "reference_sha256": "ed5123a4ee3988dc3fc774e8d5284d53c1220b6c40e92aa6d0ecb0d1214874dd",
+   "reference_f0_median_hz": 122.4,
+   "reference_formants_hz": [
+    358.5,
+    1501.2,
+    2458.2
+   ],
+   "lines": 1,
+   "lines_f0_median_hz": 124.8,
+   "tempo": 1.0,
+   "post": null
+  }
+ }
+}

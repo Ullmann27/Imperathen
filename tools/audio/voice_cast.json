@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "note": "Alle Sprecher sind synthetisch per Textbeschreibung entworfen (Qwen3-TTS VoiceDesign). Keine Referenzaufnahme realer Personen, keine Schauspieler-Imitation. Zielbereiche: Lee/Potamianos/Narayanan 1999 (Kinder), Titze 1994 und Torre/Barlow 2009 (Erwachsene/Alter). Die Spielfigur (hero, hero_youth, hero_adult, hero_old) ist in voice_pool.json als Altersfamilie definiert.",
+  "reference_text": "Am Morgen öffnen die Werkstätten, und auf dem Markt wird schon gehandelt. Wer gut zuhört, erfährt hier viel über die Menschen und ihre Arbeit.",
+  "speakers": {
+    "marcus": {
+      "name": "Marcus",
+      "age": 12,
+      "class": "child",
+      "seed": 1202,
+      "f0_target": [
+        215,
+        340
+      ],
+      "instruct": "Kinderstimme eines lebhaften Jungen von etwa zwölf Jahren vor dem Stimmbruch, hoch und hell, etwas frech und schnell, deutlich ein Kind, keine erwachsene Frau, natürlich."
+    },
+    "julia": {
+      "name": "Julia",
+      "age": 34,
+      "class": "adult_female",
+      "seed": 3401,
+      "f0_target": [
+        165,
+        245
+      ],
+      "instruct": "Frau Mitte dreißig, Mutter, warme mittelhohe Stimme, liebevoll aber bestimmt, ruhige natürliche Alltagssprache."
+    },
+    "silvanus": {
+      "name": "Silvanus",
+      "age": 39,
+      "class": "adult_male",
+      "seed": 3902,
+      "f0_target": [
+        85,
+        145
+      ],
+      "instruct": "Mann um die vierzig, Zimmermann und Vater, ruhige, leicht raue Baritonstimme, wortkarg, freundlich und geerdet."
+    },
+    "sextus": {
+      "name": "Sextus",
+      "age": 46,
+      "class": "adult_male",
+      "seed": 4603,
+      "f0_target": [
+        75,
+        135
+      ],
+      "instruct": "Dorfschmied Mitte vierzig, kräftige tiefe Bassstimme mit leichter Rauheit, geduldig, väterlich streng, langsam und deutlich."
+    },
+    "cassia": {
+      "name": "Cassia",
+      "age": 40,
+      "class": "adult_female",
+      "seed": 4004,
+      "f0_target": [
+        160,
+        245
+      ],
+      "instruct": "Marktfrau um die vierzig, klare lebhafte Stimme, geschäftig und freundlich, deutliche Artikulation."
+    },
+    "aelia": {
+      "name": "Aelia",
+      "age": 31,
+      "class": "adult_female",
+      "seed": 3105,
+      "f0_target": [
+        150,
+        230
+      ],
+      "instruct": "Steinmetzin um die dreißig, feste, sachliche Frauenstimme, eher tief, ruhig und bedacht."
+    },
+    "varro": {
+      "name": "Varro",
+      "age": 35,
+      "class": "adult_male",
+      "seed": 3506,
+      "f0_target": [
+        90,
+        150
+      ],
+      "instruct": "Jäger und Späher Mitte dreißig, gedämpfte aufmerksame Männerstimme, knapp, ruhig und leise."
+    },
+    "fabius": {
+      "name": "Fabius",
+      "age": 52,
+      "class": "adult_male",
+      "seed": 5207,
+      "f0_target": [
+        75,
+        135
+      ],
+      "instruct": "Holzfäller um die fünfzig, tiefe, behäbige, gutmütige Männerstimme, etwas langsam."
+    },
+    "severus": {
+      "name": "Wachmann",
+      "age": 28,
+      "class": "adult_male",
+      "seed": 2808,
+      "f0_target": [
+        95,
+        160
+      ],
+      "instruct": "Junger Dorfwächter Ende zwanzig, klare Männerstimme, sachlich und pflichtbewusst."
+    },
+    "decimus": {
+      "name": "Decimus",
+      "age": 63,
+      "class": "elder_male",
+      "seed": 6309,
+      "f0_target": [
+        90,
+        160
+      ],
+      "instruct": "Alter Dorfverwalter über sechzig, ältere Männerstimme, würdevoll, leicht heiser und etwas zittrig, bedächtig."
+    },
+    "aurelia": {
+      "name": "Aurelia",
+      "age": 66,
+      "class": "elder_female",
+      "seed": 6610,
+      "f0_target": [
+        140,
+        225
+      ],
+      "instruct": "Alte Heilerin über sechzig, ältere Frauenstimme, sanft und leicht brüchig, ruhig und fürsorglich."
+    },
+    "narrator": {
+      "name": "Chronik",
+      "age": 55,
+      "class": "adult_male",
+      "seed": 5511,
+      "f0_target": [
+        80,
+        140
+      ],
+      "instruct": "Ruhiger männlicher Erzähler um die fünfzig, warme tiefe Stimme, gemessenes Tempo, sehr deutliche Aussprache, unaufgeregt."
+    },
+    "caesar": {
+      "name": "Caesar",
+      "age": 42,
+      "class": "adult_male",
+      "seed": 4212,
+      "f0_target": [
+        85,
+        155
+      ],
+      "instruct": "Römischer Feldherr Anfang vierzig, kraftvolle, volle Männerstimme mit natürlicher Autorität, beherrscht und klar, trägt über ein Heerlager, aber menschlich, nicht übertrieben, nicht theatralisch."
+    },
+    "labienus": {
+      "name": "Labienus",
+      "age": 42,
+      "class": "adult_male",
+      "seed": 4213,
+      "f0_target": [
+        85,
+        150
+      ],
+      "instruct": "Erfahrener römischer Offizier Anfang vierzig, knappe, harte, etwas raue Kommandostimme, nüchtern und direkt."
+    }
+  }
+}

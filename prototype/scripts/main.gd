@@ -1,5 +1,6 @@
 extends Node
 
+const AudioBuses = preload("res://scripts/audio/audio_buses.gd")
 const ModelScript = preload("res://scripts/domain/world_model.gd")
 const WorldScript = preload("res://scripts/world/game_world.gd")
 const UIScript = preload("res://scripts/ui/game_ui.gd")
@@ -1080,6 +1081,8 @@ func _setup_ambient() -> void:
 	ambience.name = "FrontierAmbience"
 	ambience.stream = load("res://assets/frontier_ambience.wav")
 	ambience.volume_db = -15.0
+	AudioBuses.ensure_layout()
+	ambience.bus = AudioBuses.AMBIENCE
 	add_child(ambience)
 	ambience.finished.connect(ambience.play)
 	ambience.play()
