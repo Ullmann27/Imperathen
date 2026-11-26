@@ -315,7 +315,7 @@ func _test_migration_v4_to_v5() -> void:
 	for key: String in I03.KEYS:
 		early.data.village.childhood.screenplay.erase(key)
 	early.data.village.childhood.screenplay.version = 4
-	_check(Childhood.migrate_screenplay(early.data) and _sp(early).i03s == "pending" and _sp(early).version == 5 and Childhood.validate(early.data).is_empty(), "An undecided v4 save gets the errand")
+	_check(Childhood.migrate_screenplay(early.data) and _sp(early).i03s == "pending" and _sp(early).version == Childhood.SCREENPLAY_VERSION and Childhood.validate(early.data).is_empty(), "An undecided v4 save gets the errand")
 	_check(_stage(early) == "i03_marcus", "It continues at the lane")
 	# A v4 save with the former decision keeps it untouched.
 	var decided = _at_lane()

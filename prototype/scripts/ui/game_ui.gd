@@ -714,7 +714,8 @@ func update_state(state: Dictionary) -> void:
 	var world_date := world_date_text(state)
 	if not world_date.is_empty():
 		var village_on: bool = state.get("village", {}).get("enabled", false)
-		_hud_labels["time"].text = "%s  ·  %s" % [world_date, _hud_labels["time"].text] if village_on else world_date
+		_hud_labels["time"].tooltip_text = _hud_labels["time"].text
+		_hud_labels["time"].text = world_date
 	_hud_labels["age"].text = "%d Jahre  ·  %s" % [int(player.get("age", 12)), _career_name(String(progress.get("stage", "prologue")))]
 	var health := clampf(float(player.get("health", 100)), 0, 100)
 	_health_bar.value = health
@@ -1424,7 +1425,7 @@ func _build_top_bar() -> void:
 	stock.minimum_size_changed.connect(_anchor_top_right.bind(stock, Vector2(area.x - float(_hud.gutter), float(_hud.top) + 54.0), 0.0))
 	_anchor_top_right(stock, Vector2(area.x - float(_hud.gutter), float(_hud.top) + 54.0), 0.0)
 	# Widest day caption, so the corner is measured before the state fills it.
-	var time := HudStyle.kicker("TAG 00  ·  00:00", HudStyle.TYPE_MICRO + 1, HudStyle.CHARTA_MUTED)
+	var time := HudStyle.kicker("28. SEPTEMBER 100 V. CHR.", HudStyle.TYPE_MICRO + 1, HudStyle.CHARTA_MUTED)
 	time.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	time.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(time)

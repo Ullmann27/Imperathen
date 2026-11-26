@@ -269,7 +269,8 @@ static func validate(screenplay: Dictionary, completed: int, index: int, carried
 	if s.i04s == "legacy":
 		var untouched := legacy_state()
 		for key: String in KEYS:
-			if JSON.stringify(s[key]) != JSON.stringify(untouched[key]):
+			var same: bool = int(s[key]) == int(untouched[key]) if key == "i04_sticks" else s[key] == untouched[key]
+			if not same:
 				return "Ein übernommener alter Spielstand darf keine erfundene I-04-Handlung enthalten."
 		return "Ein alter Spielstand trägt keine Nachricht von Sextus." if note else ""
 	if completed < index and (s.i04s != "pending" or s.i04_work != ""):
