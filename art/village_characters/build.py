@@ -219,6 +219,7 @@ def export():
         bpy.ops.export_scene.gltf(filepath=str(OUT/f"villager_{lod}.glb"),export_format="GLB",
                                   export_animation_mode="NLA_TRACKS", export_force_sampling=True,
                                   export_frame_step=1,export_animations=True,export_morph_animation=False,export_all_vertex_colors=True)
+        company.death_ground.ground(OUT/f"villager_{lod}.glb")
 
 
 if __name__=="__main__":
