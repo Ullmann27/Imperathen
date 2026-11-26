@@ -50,8 +50,9 @@ func _ready() -> void:
 
 
 ## Starts a line. emitter: a Node3D for positional speech, null for 2D (narrator).
+## mouth_height: emitter-local height of the mouth (adult ~1.55 m, 12-year-old ~1.30 m).
 ## Returns the line record (voiced or unvoiced).
-func play(text: String, speaker_label: String, emitter: Node3D = null) -> Dictionary:
+func play(text: String, speaker_label: String, emitter: Node3D = null, mouth_height := 1.55) -> Dictionary:
 	stop()
 	var entry := VoiceLines.find(text)
 	current = {"text": text, "speaker": speaker_label, "voiced": not entry.is_empty(),
@@ -73,7 +74,7 @@ func play(text: String, speaker_label: String, emitter: Node3D = null) -> Dictio
 			p3.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
 			p3.attenuation_filter_cutoff_hz = 9000.0
 			p3.attenuation_filter_db = -6.0
-			p3.position = Vector3(0.0, 1.55, 0.0)  # mouth height of an adult
+			p3.position = Vector3(0.0, mouth_height, 0.0)
 			emitter.add_child(p3)
 			_player = p3
 		else:
