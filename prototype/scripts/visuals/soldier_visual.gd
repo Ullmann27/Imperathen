@@ -124,7 +124,9 @@ func prepare_reuse(new_variant: int, new_seed: int) -> void:
 	var meshes: Array = [_body] if _body is MeshInstance3D else _body.find_children("*", "MeshInstance3D", true, false)
 	for instance: MeshInstance3D in meshes:
 		if instance.has_meta("formation_authored_material_known"):
-			instance.material_override = instance.get_meta("formation_authored_material", null)
+			# Godot reports a missing meta when its default is null. A mesh
+			# with no original override must explicitly return to its surfaces.
+			instance.material_override = instance.get_meta("formation_authored_material") as Material if instance.has_meta("formation_authored_material") else null
 		_apply_tint(instance)
 	if detail < 2:
 		preload("res://scripts/visuals/roman_faces.gd").apply(_body, face_seed)
