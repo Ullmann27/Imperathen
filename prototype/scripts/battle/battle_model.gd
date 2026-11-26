@@ -76,13 +76,18 @@ const BANNER_SHOCK := 15.0
 ## Squad keys added by schema 3 and 4. A legacy save carries none of them (or all of them).
 const SCHEMA3_KEYS := ["troop_id", "loadout", "drills", "uids", "people", "memories", "signifer_id", "rally_from",
 	"commandable_by", "pila", "shields_fouled_until", "charge_bonus"]
-const SCHEMA4_KEYS := ["wear"]
+const SCHEMA4_KEYS := ["wear", "tiers"]
+## Companies that fight at range while their missiles last.
+const RANGED_KINDS := ["archer", "skirmisher"]
+const ARROWS := 18
 ## Data hook for later scenarios (outnumbered, defence, reinforcement, retreat,
 ## negotiation, capture). Only this test bench exists so far; build none of them here.
 ## Command rights follow appointments (D-023, D-025): order() acts for an appointment,
 ## and only companies that list it in commandable_by obey. Without an appointment (the
 ## twelve-year-old in the campaign) nothing can be commanded.
-const VALLEY_SCENARIO := {
+## The bench as published first (bow skirmishers on the hill). Saves written before the
+## spear-throwers became the regular Germanic ranged troop (D-041) keep this composition.
+const VALLEY_SCENARIO_V1 := {
 	"id": "valley_58bc",
 	"year": -58,
 	"player_appointment": "legatus_valdora",
@@ -110,6 +115,37 @@ const VALLEY_SCENARIO := {
 	],
 }
 
+## Current bench: the Germanic ranged company throws javelins (D-041). Its id stays
+## ridge_bows so orders, saves and tests keep addressing the same company.
+const VALLEY_SCENARIO := {
+	"id": "valley_58bc_v2",
+	"year": -58,
+	"player_appointment": "legatus_valdora",
+	"appointments": {
+		"legatus_valdora": {"type": "legatus", "side": "ally"},
+		"centurio_valley_guard": {"type": "centurio", "side": "ally"},
+		"praefectus_valley_spears": {"type": "praefectus", "side": "ally"},
+		"praefectus_valley_bows": {"type": "praefectus", "side": "ally"},
+		"dux_hoehenbund": {"type": "dux", "side": "enemy"},
+		"princeps_ridge_guard": {"type": "princeps", "side": "enemy"},
+	},
+	"companies": [
+		{"id": "valley_guard", "title": "Talwache", "side": "ally", "kind": "infantry", "shape": "shield_wall", "at": Vector2(-7, 8), "count": 12,
+			"troop_id": "roman_miles", "origin": "gallia_cisalpina", "commandable_by": ["legatus_valdora", "centurio_valley_guard"]},
+		{"id": "valley_spears", "title": "Passwache", "side": "ally", "kind": "spear", "shape": "phalanx", "at": Vector2(5, 8), "count": 10,
+			"troop_id": "cisalpine_militia_spear", "origin": "valdora_district", "commandable_by": ["legatus_valdora", "praefectus_valley_spears"]},
+		{"id": "valley_bows", "title": "Talbogner", "side": "ally", "kind": "archer", "shape": "loose", "at": Vector2(1, 13), "count": 8,
+			"troop_id": "aux_sagittarius_creticus", "origin": "creta", "commandable_by": ["legatus_valdora", "praefectus_valley_bows"]},
+		{"id": "ridge_guard", "title": "Höhenbund", "side": "enemy", "kind": "infantry", "shape": "wedge", "at": Vector2(-8, -14), "count": 12,
+			"troop_id": "germanic_retainer", "origin": "hoehenbund", "commandable_by": ["dux_hoehenbund", "princeps_ridge_guard"]},
+		{"id": "ridge_spears", "title": "Felsbanner", "side": "enemy", "kind": "spear", "shape": "line", "at": Vector2(6, -13), "count": 10,
+			"troop_id": "germanic_levy", "origin": "hoehenbund", "commandable_by": ["dux_hoehenbund"]},
+		{"id": "ridge_bows", "title": "Hangspeerwerfer", "side": "enemy", "kind": "skirmisher", "shape": "loose", "at": Vector2(0, -18), "count": 8,
+			"troop_id": "germanic_skirmisher", "origin": "hoehenbund", "commandable_by": ["dux_hoehenbund"]},
+	],
+}
+const SCENARIOS := {"valley_58bc": VALLEY_SCENARIO_V1, "valley_58bc_v2": VALLEY_SCENARIO}
+
 var squads: Dictionary = {}
 var outcome := "ongoing"
 var reason := ""
@@ -130,13 +166,18 @@ var _plans := {}
 
 func _init(p_seed: int = DEFAULT_SEED, p_scenario: Dictionary = VALLEY_SCENARIO) -> void:
 	battle_seed = p_seed
-	scenario = p_scenario
-	year = int(scenario.year)
+	_use_scenario(p_scenario)
 	commander = str(scenario.get("player_appointment", ""))
 	for company: Dictionary in scenario.companies:
-		_plans[company.id] = company
-	for company: Dictionary in scenario.companies:
 		_add_squad(company.id, company.title, company.side, company.kind, company.shape, company.at, company.count)
+
+
+func _use_scenario(source: Dictionary) -> void:
+	scenario = source
+	year = int(scenario.year)
+	_plans.clear()
+	for company: Dictionary in scenario.companies:
+		_plans[company.id] = company
 
 
 static func ground_height(x: float, z: float) -> float:
@@ -153,22 +194,30 @@ func _troop_for(id: String, kind: String) -> Dictionary:
 		return troop
 	if not plan.is_empty():
 		push_error("Company %s has no valid %s troop for %s." % [id, kind, Catalog.year_label(year)])
-	var weapon: String = {"infantry": "gladius", "spear": "spear", "archer": "bow"}[kind]
+	var weapon: String = {"infantry": "gladius", "spear": "spear", "archer": "bow", "skirmisher": "spear"}[kind]
 	var loadout := {"main_hand": {"family_id": weapon, "q_min": 1, "q_max": 1}}
 	if kind != "archer":
 		loadout.shield = {"family_id": "shield_round", "q_min": 1, "q_max": 1}
+	if kind == "skirmisher":
+		loadout.missile = {"family_id": "javelin", "q_min": 1, "q_max": 1, "count": 3}
 	return {"troop_id": "", "tier": 2, "culture": "", "battle_kind": kind, "loadout": loadout, "drills": {}}
 
 
 ## Issued kit of a company: each slot at the troop's minimum quality, unless the scenario
 ## names the quality of the actual items (kit_quality 0-4; the hook for shops, crafting
 ## and inventory: the world-state integration passes the quality of real item instances).
-func _kit(troop: Dictionary, id: String = "") -> Dictionary:
+## The equipment tier sets every slot's quality; an explicit kit_quality (real items)
+## takes precedence over the tier.
+func _kit(troop: Dictionary, id: String = "", tiers: Dictionary = {}) -> Dictionary:
 	var kit := {}
 	var plan: Dictionary = _plans.get(id, {})
+	var catalog := Catalog.load_default()
+	var tier: Dictionary = catalog.tiers.equipment.get(tiers.get("equipment", ""), {}) if catalog.ok else {}
 	for slot in troop.loadout:
 		var item: Dictionary = troop.loadout[slot]
 		var quality := int(item.q_min)
+		if not tier.is_empty():
+			quality = int(tier.quality)
 		if plan.has("kit_quality"):
 			quality = clampi(int(plan.kit_quality), 0, 4)
 		kit[slot] = {"family_id": item.family_id, "quality": quality, "count": int(item.get("count", 1))}
@@ -199,9 +248,31 @@ func set_commander(appointment: String) -> bool:
 	return true
 
 
+## Training shifts every drill of the troop by the tier's offset (0-3).
+func _drills(troop: Dictionary, tiers: Dictionary) -> Dictionary:
+	var catalog := Catalog.load_default()
+	var offset := int(catalog.tiers.training.get(tiers.get("training", ""), {}).get("drill_offset", 0)) if catalog.ok else 0
+	var drills := {}
+	for drill in troop.drills:
+		drills[drill] = clampi(int(troop.drills[drill]) + offset, 0, 3)
+	return drills
+
+
+func _tiers_for(id: String, troop: Dictionary) -> Dictionary:
+	var catalog := Catalog.load_default()
+	if not catalog.ok or troop.troop_id == "":
+		return {"experience": "", "equipment": "", "training": ""}
+	var tiers := Catalog.company_tiers(catalog, troop.troop_id, _plans.get(id, {}))
+	if tiers.is_empty():
+		push_error("Company %s names an unknown tier; troop defaults apply." % id)
+		tiers = Catalog.company_tiers(catalog, troop.troop_id, {})
+	return tiers
+
+
 func _add_squad(id: String, title: String, side: String, kind: String, shape: String, at: Vector2, count: int) -> void:
 	var facing := 0.0 if side == "ally" else PI
 	var troop := _troop_for(id, kind)
+	var tiers := _tiers_for(id, troop)
 	var s := {"id": id, "army_id": "talwache" if side == "ally" else "hoehenbund",
 		"name": title, "side": side, "kind": kind, "formation": shape,
 		"strength": count, "initial_strength": count, "morale": 90.0, "fatigue": 0.0,
@@ -211,26 +282,33 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 		"damage": 0.0, "members": [], "ai_reason": "",
 		"commander_id": "%s_%02d" % [id, count - 3], "deputy_id": id + "_00",
 		"officer_id": "%s_%02d" % [id, count - 3],
-		"equipment": {"infantry":"Schwert und Schild", "spear":"Speer und Schild", "archer":"Bogen"}[kind],
-		"ammo": 18 if kind == "archer" else 0, "next_volley": 0,
+		"equipment": {"infantry":"Schwert und Schild", "spear":"Speer und Schild", "archer":"Bogen", "skirmisher":"Wurfspeere und Schild"}[kind],
+		"ammo": ARROWS if kind == "archer" else 0, "next_volley": 0,
 		"experience": 52 if side == "ally" else 45, "discipline": 72 if side == "ally" else 62,
 		"pending_formation": "", "formation_at": 0,
 		"last_action": "", "action_step": -1, "hit_step": -1, "block_step": -1,
 		"wounded": 0, "dead": 0, "cohesion": 100.0, "reaction_seconds": 0.4, "ready_at": 0,
-		"troop_id": troop.troop_id, "loadout": _kit(troop, id), "drills": troop.drills.duplicate(true),
+		"troop_id": troop.troop_id, "loadout": _kit(troop, id, tiers), "drills": _drills(troop, tiers), "tiers": tiers,
 		"uids": [], "people": {}, "memories": [],
 		"signifer_id": _soldier_id(id, count - 2) if count >= 5 else "", "rally_from": 0,
 		"commandable_by": _rights(id), "pila": 0, "shields_fouled_until": 0, "charge_bonus": false,
 		"wear": {"weapon": 0.0, "shield": 0.0, "armor": 0.0}}
 	if s.loadout.has("missile") and s.loadout.missile.family_id == "pilum":
 		s.pila = s.loadout.missile.count
+	if kind == "skirmisher":
+		s.ammo = s.loadout.missile.count
 	var catalog := Catalog.load_default()
 	var plan: Dictionary = _plans.get(id, {})
 	var group: Dictionary = catalog.groups.get(plan.get("origin", ""), {}) if catalog.ok else {}
 	var pool: Dictionary = catalog.name_pools.get(group.get("names", ""), {}) if catalog.ok else {}
 	var entry_xp := Catalog.entry_xp(catalog, troop.troop_id) if catalog.ok else 0
+	# A chosen experience tier sets skill and XP of new soldiers; the troop's own default
+	# tier keeps the original generation, so earlier saves regenerate identically.
+	var experience: Dictionary = {}
+	if catalog.ok and _plans.get(id, {}).has("experience"):
+		experience = catalog.tiers.experience.get(tiers.experience, {})
 	for i in range(count):
-		var person := Roster.identity(battle_seed, id, i, count, troop, pool, group, entry_xp, s.discipline, year)
+		var person := Roster.identity(battle_seed, id, i, count, troop, pool, group, entry_xp, s.discipline, year, experience)
 		s.people[person.uid] = person
 	var order := _arrangement(shape, count, [s.commander_id, s.deputy_id, s.signifer_id], id)
 	var slots := Slots.world_slots(shape, count, 0.0, at, facing)
@@ -275,7 +353,7 @@ static func _soldier_id(company_id: String, index: int) -> String:
 func company_ids(formation_group_id: String, active_only: bool = true) -> Array[String]:
 	var ids: Array[String] = []
 	for s: Dictionary in squads.values():
-		var group_id: String = s.army_id + ("_support" if s.kind == "archer" else "_front")
+		var group_id: String = s.army_id + ("_support" if s.kind in RANGED_KINDS else "_front")
 		if group_id == formation_group_id and (not active_only or _active(s)):
 			ids.append(s.id)
 	return ids
@@ -447,9 +525,9 @@ func order(ids: Array, command: String, target: Variant = null, by: String = "")
 			var problem := _form_problem(s, target)
 			if problem != "":
 				return _reply(false, problem)
-		if command == "focus_fire" and s.kind == "archer" and s.ammo == 0:
+		if command == "focus_fire" and s.kind in RANGED_KINDS and s.ammo == 0:
 			return _reply(false, "Keine Salven mehr verfügbar.")
-		if command in ["focus_fire", "cease_fire", "fire_at_will"] and s.kind != "archer":
+		if command in ["focus_fire", "cease_fire", "fire_at_will"] and not s.kind in RANGED_KINDS:
 			return _reply(false, "Dieser Befehl benötigt einen Schützenverband.")
 		if command in ["charge", "pila"] and s.kind == "archer":
 			return _reply(false, "Schützenverbände führen diesen Befehl nicht aus.")
@@ -648,12 +726,12 @@ func _ai(s: Dictionary, enemy: Dictionary) -> void:
 	elif s.id == "ridge_spears" and steps < 45 and (enemy.is_empty() or _pos(s).distance_to(_pos(enemy)) > 10):
 		s.command = "reserve"
 		s.ai_reason = "Wartet als Reserve am Felsbanner"
-	elif s.kind == "archer" and steps < 20:
+	elif s.kind in RANGED_KINDS and steps < 20:
 		s.command = "move"
 		_set_goal(s, Vector2(6, -16))
 		s.ai_reason = "Bezieht den erhöhten Hangplatz"
 	elif not enemy.is_empty() and _pos(s).distance_to(_pos(enemy)) < 15:
-		if s.kind == "archer" and s.ammo > 0:
+		if s.kind in RANGED_KINDS and s.ammo > 0:
 			enemy = _archer_target(s, enemy)
 			s.command = "focus_fire"
 			s.ai_reason = "Priorisiert sichtbare Schützen" if enemy.kind == "archer" else "Bündelt Feuer am Talweg"
@@ -664,7 +742,7 @@ func _ai(s: Dictionary, enemy: Dictionary) -> void:
 			s.command = "attack"
 			s.ai_reason = "Gegner am Talweg"
 		s.target = enemy.id
-		if enemy.kind == "archer" and enemy.ammo > 0 and s.kind == "infantry" and _form_problem(s, "shield_wall") == "":
+		if enemy.kind in RANGED_KINDS and enemy.ammo > 0 and s.kind == "infantry" and _form_problem(s, "shield_wall") == "":
 			_queue_formation(s, "shield_wall")
 			s.ai_reason = "Schließt die Schilde unter Beschuss"
 	else:
@@ -951,8 +1029,8 @@ func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
 			leader = designated
 		else:
 			enemy = designated
-	var ranged: bool = s.kind == "archer" and s.ammo > 0
-	var reach := 11.5 if ranged else 3.5
+	var ranged: bool = s.kind in RANGED_KINDS and s.ammo > 0
+	var reach: float = _range_of(s) if ranged else 3.5
 	var dist := INF if enemy.is_empty() else _pos(s).distance_to(_pos(enemy))
 	var contact := not enemy.is_empty() and dist <= reach and Field.clear_segment(_pos(s), _pos(enemy))
 	var pursue: bool = s.command in ["attack", "flank", "focus_fire", "charge", "pila", "advance"] or (s.command == "attack_move" and dist < 7.0)
@@ -976,14 +1054,14 @@ func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
 		var bearing := _bearing(s, _pos(enemy))
 		s.facing = rotate_toward(s.facing, bearing, STEP * TURN_RATE)
 		var aligned := absf(angle_difference(s.facing, bearing)) <= 0.3
-		var interval := VOLLEY_STEPS if ranged else STRIKE_STEPS
+		var interval: int = _cadence(s) if ranged else STRIKE_STEPS
 		var recovered: bool = s.action_step < 0 or steps - s.action_step >= interval
 		if aligned and recovered and (not ranged or steps >= s.next_volley):
 			s.action_step = steps
-			s.last_action = "shoot" if ranged else "attack"
+			s.last_action = ("shoot" if s.kind == "archer" else "throw") if ranged else "attack"
 			if ranged:
 				s.ammo -= 1
-				s.next_volley = steps + VOLLEY_STEPS
+				s.next_volley = steps + interval
 			if _shield_factor(s, enemy, ranged) < 1.0:
 				enemy.block_step = steps
 			var damage := _strike(s, enemy, "ranged" if ranged else "melee")
@@ -1050,6 +1128,15 @@ func _throw_pila(s: Dictionary, enemy: Dictionary, hits: Dictionary) -> void:
 	s.command = "hold"
 	s.target = ""
 	_set_goal(s, _pos(s))
+
+
+## Missile range and volley cadence from the balance file (bow, sling or thrown javelin).
+func _range_of(s: Dictionary) -> float:
+	return float(Formula.ranged_spec(_weapon(s, "ranged").family).get("range", 11.5))
+
+
+func _cadence(s: Dictionary) -> int:
+	return int(Formula.ranged_spec(_weapon(s, "ranged").family).get("cadence_steps", VOLLEY_STEPS))
 
 
 func _depth(s: Dictionary) -> float:
@@ -1257,7 +1344,7 @@ func summary() -> Dictionary:
 
 
 func snapshot() -> Dictionary:
-	return {"schema": SCHEMA, "seed": battle_seed, "steps": steps, "capture": capture, "remainder": _remainder,
+	return {"schema": SCHEMA, "seed": battle_seed, "scenario": str(scenario.id), "steps": steps, "capture": capture, "remainder": _remainder,
 		"outcome": outcome, "reason": reason, "squads": squads.duplicate(true)}
 
 
@@ -1321,8 +1408,9 @@ func _migrate_v2(s: Dictionary, original: Dictionary) -> Variant:
 	return s
 
 
-## Schema 3 had no wear: kits start the migrated battle unworn.
-func _migrate_v3(s: Dictionary) -> Variant:
+## Schema 3 had no wear and no tiers: kits start the migrated battle unworn and the
+## company keeps its troop's default tiers.
+func _migrate_v3(s: Dictionary, original: Dictionary) -> Variant:
 	var present := 0
 	for key in SCHEMA4_KEYS:
 		present += int(s.has(key))
@@ -1331,6 +1419,7 @@ func _migrate_v3(s: Dictionary) -> Variant:
 	if present > 0:
 		return null
 	s.wear = {"weapon": 0.0, "shield": 0.0, "armor": 0.0}
+	s.tiers = original.tiers.duplicate()
 	return s
 
 
@@ -1367,7 +1456,12 @@ func restore(save: Dictionary) -> bool:
 	if not _number(save.get("schema"), 1, SCHEMA, true) or typeof(save.get("squads")) != TYPE_DICTIONARY:
 		return false
 	# Schema 3 adds the seed. Older saves ran on the default seed.
-	if save.size() != (8 if save.has("seed") else 7) or (save.schema >= 3 and not save.has("seed")):
+	# Schema 3 adds the seed, schema 4 the scenario id; older saves ran the first bench.
+	if save.size() != 7 + int(save.has("seed")) + int(save.has("scenario")) or (save.schema >= 3 and not save.has("seed")) or (save.schema >= 4 and not save.has("scenario")):
+		return false
+	var scenario_id := str(save.get("scenario", "valley_58bc"))
+	var source: Dictionary = scenario if scenario_id == str(scenario.id) else SCENARIOS.get(scenario_id, {})
+	if source.is_empty():
 		return false
 	if save.has("seed") and not _number(save.seed, 0, 2147483647, true):
 		return false
@@ -1380,7 +1474,7 @@ func restore(save: Dictionary) -> bool:
 	var save_seed := int(save.get("seed", DEFAULT_SEED))
 	# Validate against a pristine company list of the same seed and scenario: identities
 	# are regenerated, so a save can never invent, rename or revive a soldier.
-	var reference = get_script().new(save_seed, scenario)
+	var reference = get_script().new(save_seed, source)
 	if save.squads.size() != reference.squads.size():
 		return false
 	var restored := {}
@@ -1399,7 +1493,7 @@ func restore(save: Dictionary) -> bool:
 			if s == null:
 				return false
 		if save.schema <= 3:
-			s = _migrate_v3(s)
+			s = _migrate_v3(s, original)
 			if s == null:
 				return false
 		if s.size() != original.size() or not s.has_all(original.keys()):
@@ -1409,7 +1503,7 @@ func restore(save: Dictionary) -> bool:
 			if not Roster.integral(s[key]):
 				return false
 			s[key] = Roster.integers(s[key])
-		for key in ["id", "army_id", "side", "name", "kind", "initial_strength", "equipment", "experience", "discipline", "commander_id", "deputy_id", "troop_id", "loadout", "drills", "commandable_by"]:
+		for key in ["id", "army_id", "side", "name", "kind", "initial_strength", "equipment", "experience", "discipline", "commander_id", "deputy_id", "troop_id", "loadout", "drills", "commandable_by", "tiers"]:
 			if s.get(key) != original[key]:
 				return false
 		if not _number(s.get("strength"), 0, original.initial_strength, true) or typeof(s.get("members")) != TYPE_ARRAY or s.members.size() != s.strength:
@@ -1431,7 +1525,7 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if not _number(s.get("cohesion"), 0, 100) or not _number(s.get("reaction_seconds"), 0, 2) or not _number(s.get("ready_at"), 0, save.steps + 8, true):
 			return false
-		if not _number(s.get("ammo"), 0, 18 if original.kind == "archer" else 0, true) or not _number(s.get("next_volley"), 0, save.steps + 9, true):
+		if not _number(s.get("ammo"), 0, original.ammo, true) or not _number(s.get("next_volley"), 0, save.steps + 9, true):
 			return false
 		if typeof(s.pending_formation) != TYPE_STRING or not _number(s.formation_at, 0, save.steps + 11, true):
 			return false
@@ -1443,7 +1537,7 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if not _number(s.get("pila"), 0, original.pila, true) or not _number(s.get("shields_fouled_until"), 0, save.steps + PILA_FOUL_STEPS, true) or typeof(s.get("charge_bonus")) != TYPE_BOOL:
 			return false
-		if s.last_action == "throw" and (s.kind == "archer" or s.pila >= original.pila):
+		if s.last_action == "throw" and (s.kind == "archer" or (s.kind == "skirmisher" and s.ammo >= original.ammo) or (s.kind != "skirmisher" and s.pila >= original.pila)):
 			return false
 		if s.charge_bonus and s.get("command") != "charge":
 			return false
@@ -1456,11 +1550,11 @@ func restore(save: Dictionary) -> bool:
 		for key in ["action_step", "hit_step", "block_step"]:
 			if not _number(s[key], -1, save.steps, true) or s[key] == 0:
 				return false
-		if (s.action_step < 0) != (s.last_action == "") or (s.kind != "archer" and (s.next_volley != 0 or not s.fire)):
+		if (s.action_step < 0) != (s.last_action == "") or (not s.kind in RANGED_KINDS and (s.next_volley != 0 or not s.fire)):
 			return false
-		if s.kind == "archer" and ((s.ammo == 18) != (s.next_volley == 0)):
+		if s.kind in RANGED_KINDS and ((s.ammo == original.ammo) != (s.next_volley == 0)):
 			return false
-		if s.last_action == "shoot" and s.next_volley != s.action_step + VOLLEY_STEPS:
+		if s.kind in RANGED_KINDS and s.last_action in ["shoot", "throw"] and s.next_volley != s.action_step + _cadence(original):
 			return false
 		if not is_equal_approx(s.reaction_seconds / STEP, roundf(s.reaction_seconds / STEP)) or s.ready_at > save.steps + roundi(s.reaction_seconds / STEP):
 			return false
@@ -1470,7 +1564,7 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if typeof(s.get("fire")) != TYPE_BOOL or typeof(s.get("ai_reason")) != TYPE_STRING or typeof(s.get("target")) != TYPE_STRING:
 			return false
-		if s.command in MODIFIERS or (s.command == "focus_fire" and s.kind != "archer") or (s.command in ["charge", "pila"] and s.kind == "archer"):
+		if s.command in MODIFIERS or (s.command == "focus_fire" and not s.kind in RANGED_KINDS) or (s.command in ["charge", "pila"] and s.kind == "archer"):
 			return false
 		if (s.command in ENEMY_TARGETED or s.command == "follow") and s.target == "":
 			return false
@@ -1500,6 +1594,8 @@ func restore(save: Dictionary) -> bool:
 	if _result(restored, int(save.steps), int(save.capture)) != [save.outcome, save.reason]:
 		return false
 	squads = restored
+	if source != scenario:
+		_use_scenario(source)
 	battle_seed = save_seed
 	steps = int(save.steps)
 	capture = int(save.capture)

@@ -11,13 +11,15 @@ const MAX_YEAR := 2000
 const MAX_QUALITY := 4
 const ATTESTATIONS := ["attested", "plausible", "design_assumption"]
 const LOADOUT_SLOTS := ["head", "torso", "shield", "main_hand", "sidearm", "missile", "mount", "mount_gear", "standard"]
-const BATTLE_KINDS := ["infantry", "spear", "archer", ""]
+const BATTLE_KINDS := ["infantry", "spear", "archer", "skirmisher", ""]
 const BATTLE_ROLES := ["heavy", "spear", "archer", "officer", ""]
 const SERVICES := ["roman", "own"]
 const OWNERSHIP := ["loan", "own", "issued"]
 const COMMAND_SCOPES := ["army", "company", "deputy", "none"]
-## A battle kind needs a matching main weapon, otherwise data and simulation disagree.
-const KIND_WEAPONS := {"infantry": ["gladius", "sword_long", "axe"], "spear": ["spear"], "archer": ["bow", "sling"]}
+## A battle kind needs a matching weapon in the named slot, otherwise data and simulation disagree.
+const KIND_WEAPONS := {"infantry": ["gladius", "sword_long", "axe"], "spear": ["spear"], "archer": ["bow", "sling"], "skirmisher": ["javelin"]}
+const KIND_SLOT := {"infantry": "main_hand", "spear": "main_hand", "archer": "main_hand", "skirmisher": "missile"}
+const TIER_KINDS := ["experience", "equipment", "training"]
 
 static var _default := {}
 
@@ -52,6 +54,11 @@ static func build(families_doc: Variant, troops_doc: Variant, people_doc: Varian
 		catalog.groups[g.group_id] = g.duplicate(true)
 	catalog.drills = troops_doc.drills.duplicate(true)
 	catalog.authorities = troops_doc.authorities.duplicate(true)
+	catalog.tiers = {}
+	for kind in TIER_KINDS:
+		catalog.tiers[kind] = {}
+		for tier: Dictionary in troops_doc.tiers[kind]:
+			catalog.tiers[kind][tier.id] = _integers(tier.duplicate(true))
 	return catalog
 
 
@@ -174,6 +181,7 @@ static func validate(families_doc: Variant, troops_doc: Variant, people_doc: Var
 		_check_sources(owner, f, errors, true)
 	var drills: Dictionary = troops_doc.drills
 	var authorities: Dictionary = troops_doc.authorities
+	_validate_tiers(troops_doc.get("tiers"), errors)
 	var appointments := {}
 	for a: Variant in troops_doc.appointments:
 		if typeof(a) != TYPE_DICTIONARY or not _identifier(a.get("appointment_id")):
@@ -269,8 +277,22 @@ static func _validate_troop(t: Dictionary, families: Dictionary, troops: Diction
 		if valid_span(family) and (family.valid_from > t.valid_from or family.valid_to < t.valid_to):
 			errors.append("%s: Familie %s gilt nicht für die gesamte Zeitspanne %s–%s" % [where, item.family_id, year_label(int(t.valid_from)), year_label(int(t.valid_to))])
 	var kind: String = t.get("battle_kind", "")
-	if KIND_WEAPONS.has(kind) and (not loadout.has("main_hand") or typeof(loadout.main_hand) != TYPE_DICTIONARY or not loadout.main_hand.get("family_id") in KIND_WEAPONS[kind]):
-		errors.append(owner + ": battle_kind %s braucht passende Hauptwaffe" % kind)
+	if KIND_WEAPONS.has(kind):
+		var slot: String = KIND_SLOT[kind]
+		if not loadout.has(slot) or typeof(loadout[slot]) != TYPE_DICTIONARY or not loadout[slot].get("family_id") in KIND_WEAPONS[kind]:
+			errors.append(owner + ": battle_kind %s braucht passende Hauptwaffe (%s)" % [kind, slot])
+	if t.has("external_ids"):
+		var ext: Variant = t.external_ids
+		if typeof(ext) != TYPE_DICTIONARY:
+			errors.append(owner + ": external_ids muss ein Wörterbuch sein")
+		else:
+			for system in ext:
+				if typeof(ext[system]) != TYPE_ARRAY or ext[system].is_empty():
+					errors.append(owner + ": external_ids.%s braucht Kennungen" % str(system))
+				else:
+					for ref: Variant in ext[system]:
+						if not _identifier(ref):
+							errors.append(owner + ": external_ids.%s enthält eine ungültige Kennung" % str(system))
 	var trained: Variant = t.get("drills")
 	if typeof(trained) != TYPE_DICTIONARY:
 		errors.append(owner + ": drills fehlt")
@@ -322,6 +344,51 @@ static func _validate_troop(t: Dictionary, families: Dictionary, troops: Diction
 				errors.append(where + ": Gegenstand %s ungültig" % str(need.family_id))
 			elif valid_span(family) and (family.valid_from > overlap_from or family.valid_to < overlap_to):
 				errors.append(where + ": Familie %s gilt nicht in der gemeinsamen Zeitspanne" % need.family_id)
+
+
+static func _validate_tiers(tiers: Variant, errors: Array[String]) -> void:
+	if typeof(tiers) != TYPE_DICTIONARY:
+		errors.append("troops: tiers fehlt")
+		return
+	for kind in TIER_KINDS:
+		var list: Variant = tiers.get(kind)
+		if typeof(list) != TYPE_ARRAY or list.is_empty():
+			errors.append("tiers.%s fehlt" % kind)
+			continue
+		var seen := {}
+		var last := -1
+		for tier: Variant in list:
+			if typeof(tier) != TYPE_DICTIONARY or not _identifier(tier.get("id")) or not _text(tier.get("label")) or seen.has(tier.get("id")):
+				errors.append("tiers.%s: Eintrag braucht eindeutige id und label" % kind)
+				continue
+			seen[tier.id] = true
+			match kind:
+				"experience":
+					if not is_integer(tier.get("skill"), 0, 100) or not is_integer(tier.get("xp_min"), 0, 100000) or not is_integer(tier.get("xp_max"), 0, 100000) or tier.xp_min > tier.xp_max or tier.xp_min <= last:
+						errors.append("tiers.experience.%s: skill oder xp-Spanne ungültig" % tier.id)
+					else:
+						last = int(tier.xp_max)
+				"equipment":
+					if not is_integer(tier.get("quality"), 0, MAX_QUALITY):
+						errors.append("tiers.equipment.%s: quality Q0–Q4" % tier.id)
+				"training":
+					if not is_integer(tier.get("drill_offset"), -3, 3):
+						errors.append("tiers.training.%s: drill_offset -3..3" % tier.id)
+
+
+## The three tiers of a company: explicit choices, else the troop's defaults (experience
+## by troop tier, equipment at the issued minimum quality, ordinary training).
+## Returns {} when a named tier does not exist.
+static func company_tiers(catalog: Dictionary, troop_id: String, choice: Dictionary) -> Dictionary:
+	var entry: Dictionary = catalog.troops.get(troop_id, {})
+	var tier := clampi(int(entry.get("tier", 2)), 1, 5)
+	var experience_ids: Array = catalog.tiers.experience.keys()
+	var result := {"experience": str(choice.get("experience", experience_ids[mini(tier - 1, experience_ids.size() - 1)])),
+		"equipment": str(choice.get("equipment", "")), "training": str(choice.get("training", "geuebt"))}
+	for kind in TIER_KINDS:
+		if result[kind] != "" and not catalog.tiers[kind].has(result[kind]):
+			return {}
+	return result
 
 
 static func troop(catalog: Dictionary, troop_id: String) -> Dictionary:

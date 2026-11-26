@@ -18,6 +18,7 @@ func _initialize() -> void:
 	_test_rejections()
 	_test_upgrades(catalog)
 	_test_calendar()
+	_test_tiers_and_variants(catalog)
 	_finish(catalog)
 
 
@@ -165,3 +166,27 @@ func _test_calendar() -> void:
 	check(Catalog.years_between(-58, 9) == 66 and Catalog.years_between(-1, 1) == 1 and Catalog.years_between(-58, -52) == 6 and Catalog.years_between(9, -58) == -66, "Elapsed years skip the missing year zero")
 	check(Catalog.year_label(-58) == "58 v. Chr." and Catalog.year_label(9) == "9 n. Chr.", "Year labels")
 	check(not Catalog.valid_year(0) and Catalog.valid_year(-58) and not Catalog.valid_year(-58.5), "Year validation")
+
+
+func _test_tiers_and_variants(catalog: Dictionary) -> void:
+	var javelins := Catalog.troop(catalog, "germanic_skirmisher")
+	check(javelins.battle_kind == "skirmisher" and javelins.loadout.missile.family_id == "javelin" and javelins.loadout.missile.count == 3
+		and javelins.get("rarity", "common") == "common" and javelins.attestation != "design_assumption", "Spear-throwers are the regular Germanic ranged troop (D-041)")
+	var bows := Catalog.troop(catalog, "germanic_bow_skirmisher")
+	check(bows.rarity == "rare" and bows.attestation == "design_assumption" and bows.notes.contains("quellenkritisch"), "Germanic archers stay a rare, source-critically flagged design variant")
+	check(Catalog.troop(catalog, "cisalpine_militia_spear").notes.contains("Fiktives regionales Aufgebot"), "The Passwache stays a fictional regional levy")
+	check(Catalog.available(catalog, -58, "germanic").has("germanic_skirmisher") and Catalog.troop(catalog, "germanic_youth_javelin").battle_kind == "skirmisher", "Youths and Numidians fight as skirmishers")
+	var mapped := {}
+	for t: Dictionary in catalog.troops.values():
+		for ref in t.get("external_ids", {}).get("tribal_world", []):
+			mapped[ref] = t.troop_id
+	for tribal in ["aufgebot", "plaenkler", "speerkrieger", "axtkrieger", "schwertkaempfer", "gefolgsmann", "reiter"]:
+		check(mapped.has(tribal), "Tribal-world troop type %s maps to a catalog troop" % tribal)
+	check(Catalog.company_tiers(catalog, "roman_miles", {}) == {"experience": "ausgebildet", "equipment": "", "training": "geuebt"}, "Default tiers follow the troop")
+	check(Catalog.company_tiers(catalog, "germanic_levy", {"experience": "veteran", "equipment": "gut", "training": "gedrillt"}).experience == "veteran", "Tiers can be chosen independently")
+	check(Catalog.company_tiers(catalog, "germanic_levy", {"equipment": "golden"}).is_empty(), "Unknown tiers are refused")
+	check(catalog.tiers.experience.veteran.skill > catalog.tiers.experience.rekrut.skill and catalog.tiers.equipment.meisterlich.quality == 4 and catalog.tiers.training.ungeuebt.drill_offset == -1, "Experience, equipment and training tiers carry their values")
+	_rejects("skirmisher without javelins", "Hauptwaffe", func(_f, t, _p): _troop(t, "germanic_skirmisher").loadout.missile.family_id = "pilum")
+	_rejects("overlapping experience tiers", "xp-Spanne", func(_f, t, _p): t.tiers.experience[2].xp_min = 50)
+	_rejects("equipment tier above Q4", "Q0–Q4", func(_f, t, _p): t.tiers.equipment[4].quality = 5)
+	_rejects("empty external id list", "external_ids", func(_f, t, _p): _troop(t, "germanic_skirmisher").external_ids.tribal_world = [])

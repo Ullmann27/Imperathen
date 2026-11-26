@@ -62,8 +62,10 @@ static func _pick(list: Array, value: float) -> Variant:
 
 ## Creates the identity of soldier `index` of a company. troop is the catalog entry,
 ## pool the name list and group the population group the recruit comes from.
+## experience: an experience tier of the catalog ({skill, xp_min, xp_max}); empty keeps the
+## troop-tier defaults.
 static func identity(world_seed: int, squad_id: String, index: int, count: int, troop: Dictionary, pool: Dictionary,
-		group: Dictionary, entry_xp: int, discipline: int, year: int) -> Dictionary:
+		group: Dictionary, entry_xp: int, discipline: int, year: int, experience: Dictionary = {}) -> Dictionary:
 	var id := uid(squad_id, index)
 	var salt := text_salt(id)
 	var tier := clampi(int(troop.get("tier", 1)), 1, 5)
@@ -75,7 +77,7 @@ static func identity(world_seed: int, squad_id: String, index: int, count: int, 
 		name += " " + str(_pick(family, roll(world_seed, salt, 2)))
 	var age_span: Array = AGES[tier - 1]
 	var age: int = age_span[0] + floori(roll(world_seed, salt, 3) * (age_span[1] - age_span[0] + 1))
-	var base: int = SKILL_BASE[tier - 1]
+	var base: int = int(experience.skill) if not experience.is_empty() else SKILL_BASE[tier - 1]
 	var ranged := false
 	for item: Dictionary in troop.get("loadout", {}).values():
 		ranged = ranged or item.family_id in ["bow", "sling", "javelin", "pilum"]
@@ -96,7 +98,7 @@ static func identity(world_seed: int, squad_id: String, index: int, count: int, 
 		"uid": id, "name": name,
 		"origin": {"group_id": str(group.get("group_id", "")), "place": str(_pick(places, roll(world_seed, salt, 7)))},
 		"age": age, "troop_id": str(troop.get("troop_id", "")), "skills": skills,
-		"xp": entry_xp + floori(roll(world_seed, salt, 8) * 80),
+		"xp": (int(experience.xp_min) + floori(roll(world_seed, salt, 8) * (int(experience.xp_max) - int(experience.xp_min) + 1))) if not experience.is_empty() else entry_xp + floori(roll(world_seed, salt, 8) * 80),
 		"relations": relations,
 		"service": [{"event": "mustered", "ref": str(troop.get("troop_id", "")), "year": year, "step": 0}],
 		"status": "active", "wound": {}, "impairments": [],

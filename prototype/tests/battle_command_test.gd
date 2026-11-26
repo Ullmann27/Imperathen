@@ -41,6 +41,7 @@ func _initialize() -> void:
 	_test_order_determinism()
 	_test_wounds_and_recovery()
 	_test_formula_battle()
+	_test_javelins_and_tiers()
 	print("BATTLE_COMMAND_RESULT checks=%d failures=%d metrics=%s" % [checks, failures, JSON.stringify(metrics)])
 	quit(1 if failures else 0)
 
@@ -836,3 +837,74 @@ func _test_formula_battle() -> void:
 		gear = gear and _fight({"troop": "roman_tiro", "q": 1}, {"troop": "roman_tiro", "q": 4}, seed_value).outcome == "defeat"
 	check(gear, "Between equally trained companies the better kit wins")
 	check(_fight({"troop": "roman_veteranus", "q": 1}, {"troop": "roman_tiro", "q": 4}, 3) == duels.seed_3[0], "Company duels are reproducible")
+
+
+func _bench_with(changes: Dictionary) -> Dictionary:
+	var scenario: Dictionary = Battle.VALLEY_SCENARIO.duplicate(true)
+	scenario.id = "tier_bench"
+	for company: Dictionary in scenario.companies:
+		if changes.has(company.id):
+			company.merge(changes[company.id], true)
+	return scenario
+
+
+func _test_javelins_and_tiers() -> void:
+	var m := Battle.new()
+	var hill: Dictionary = m.squads.ridge_bows
+	check(m.scenario.id == "valley_58bc_v2" and hill.kind == "skirmisher" and hill.troop_id == "germanic_skirmisher" and hill.ammo == 3 and hill.name == "Hangspeerwerfer",
+		"The bench's Germanic ranged company throws javelins (three per man)")
+	check(m.company_ids("hoehenbund_support") == ["ridge_bows"], "Skirmishers belong to the support group")
+	var skirmish := Battle.new(58, _bench_with({BOWS: {"title": "Speerwerfer", "kind": "skirmisher", "troop_id": "germanic_skirmisher", "origin": "valdora_district"}}))
+	check(_place(skirmish, {BOWS: Vector2(-7, 15.0), ENEMY: Vector2(-7, 4.0)}), "Javelin fixture loads")
+	var jav: Dictionary = skirmish.squads[BOWS]
+	skirmish.squads[ENEMY].command = "hold"
+	check(skirmish.order([BOWS], "focus_fire", ENEMY).ok, "Skirmishers take fire orders")
+	var volleys := []
+	var first_range := -1.0
+	var melee_after := false
+	for i in 200:
+		var had: int = jav.ammo
+		skirmish.tick(Battle.STEP)
+		if jav.ammo < had:
+			volleys.append(skirmish.steps)
+			if first_range < 0.0:
+				first_range = Vector2(jav.x, jav.z).distance_to(Vector2(skirmish.squads[ENEMY].x, skirmish.squads[ENEMY].z))
+		if jav.ammo == 0 and jav.last_action == "attack":
+			melee_after = true
+			break
+		if skirmish.outcome != "ongoing" or jav.status in ["routed", "rallying"]:
+			break
+	var gaps := []
+	for k in range(1, volleys.size()):
+		gaps.append(volleys[k] - volleys[k - 1])
+	metrics["javelins"] = {"volleys": volleys.size(), "first_range_m": snappedf(first_range, 0.01), "gaps_steps": gaps}
+	check(volleys.size() == 3 and first_range > 0.0 and first_range <= 9.0 + 0.01, "Three javelin volleys, the first from at most 9 m (%.2f m)" % first_range)
+	check(gaps.min() >= 7 if not gaps.is_empty() else false, "Volleys follow the 7-step cadence or slower (%s)" % str(gaps))
+	check(melee_after and jav.ammo == 0, "With the javelins spent the company closes and fights with spear and shield")
+	check(Battle.new(58, skirmish.scenario).restore(JSON.parse_string(JSON.stringify(skirmish.snapshot()))) and not Battle.new().restore(skirmish.snapshot()),
+		"Skirmisher state saves; a save of an unknown scenario is refused by another bench")
+	var bad := Battle.new().snapshot()
+	bad.squads.ridge_bows.ammo = 5
+	check(not Battle.new().restore(bad), "No more javelins than the men carry")
+	var wrong := Battle.new().snapshot()
+	wrong.squads.ridge_bows.last_action = "shoot"
+	wrong.squads.ridge_bows.action_step = 1
+	wrong.steps = 2
+	check(not Battle.new().restore(wrong), "Skirmishers throw, they do not shoot")
+	var legacy: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(LEGACY))
+	var old := Battle.new()
+	check(old.restore(legacy) and old.scenario.id == "valley_58bc" and old.squads.ridge_bows.kind == "archer" and old.snapshot().scenario == "valley_58bc",
+		"Saves of the first bench keep their bow skirmishers")
+	var tiered := Battle.new(58, _bench_with({GUARD: {"equipment": "gut", "training": "ungeuebt", "experience": "veteran"},
+		"valley_spears": {"equipment": "aermlich", "kit_quality": 4}}))
+	var guard: Dictionary = tiered.squads[GUARD]
+	var mean := 0.0
+	for uid in guard.uids:
+		mean += guard.people[uid].skills.melee
+	mean /= guard.uids.size()
+	metrics["veteran_tier_mean_skill"] = snappedf(mean, 0.1)
+	check(guard.loadout.shield.quality == 3 and guard.loadout.main_hand.quality == 3 and guard.tiers.equipment == "gut", "The equipment tier sets the kit quality")
+	check(guard.drills.testudo == 1 and not tiered.order([GUARD], "form", "testudo").ok, "Untrained legionaries lose a drill step and the testudo")
+	check(mean >= 55.0 and mean <= 69.0 and guard.people[guard.uids[0]].xp >= 900, "The veteran tier raises skill (mean %.1f) and experience" % mean)
+	check(tiered.squads.valley_spears.loadout.shield.quality == 4, "Quality of real items (kit_quality) overrides the tier")
+	check(Battle.new(58, tiered.scenario).restore(tiered.snapshot()), "Tiered companies save validly")
