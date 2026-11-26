@@ -222,6 +222,8 @@ func _v3_save(model, completed: Array) -> Dictionary:
 	var state: Dictionary = model.data.duplicate(true)
 	for key: String in I01.KEYS:
 		state.village.childhood.screenplay.erase(key)
+	# Reconstruct the real historical schema, without fields added in v7.
+	state.village.childhood.screenplay.erase("investigation")
 	state.village.childhood.screenplay.version = 3
 	state.village.childhood.completed = completed
 	return state
