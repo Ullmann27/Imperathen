@@ -277,7 +277,9 @@ func _request_new_game() -> void:
 func _start_new_game() -> void:
 	_release_opening()
 	pending_opening = {}
-	model.new_game(ui.origin_id, true, true)
+	# The player-facing entry is the only regular start: no own money (Game
+	# Direction 26.11.2026); development/test worlds keep their named fund.
+	model.new_game(ui.origin_id, true, true, false, true)
 	simulation_elapsed = 0.0
 	last_story_id = ""
 	world.setup(model.data)

@@ -97,7 +97,9 @@ func _test_heading_and_texts() -> void:
 	for step: Dictionary in Childhood.STEPS:
 		texts[step.id] = "%s %s %s %s" % [step.label, step.objective, step.text, step.result]
 	_check(texts.mother_morning.contains("sag mir wohin. Nicht weil ich dich halten will – weil du zurückkommen sollst."), "Julia carries her Band 1 I-01 line")
-	_check(texts.fill_water.contains("drei Becher"), "I-01 water task fills the three cups")
+	# The former result claimed three filled cups the world never showed. The
+	# cups are now real props of the I-01 morning; the jug step only reports them.
+	_check(texts.fill_water.contains("drei Becher") and not texts.fill_water.contains("stehen gefüllt"), "I-01 jug step names the three cups without inventing their filling")
 	_check(texts.father_morning.contains("Mach erst die Arbeit. Reden können wir danach immer noch."), "Silvanus carries his Band 1 I-01 line")
 	_check(texts.deliver_food.contains("seinen ältesten Freund"), "I-04 introduces Sextus as Silvanus' oldest friend")
 	_check(texts.deliver_kindling.contains("Wenn du etwas nicht kannst, sag es. Dann kann ich es dir zeigen."), "Sextus carries his Band 1 I-04 line")

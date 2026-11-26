@@ -10,9 +10,9 @@
       "id": "mother_morning",
       "label": "Mit Mutter den Morgen besprechen",
       "npc": "julia",
-      "objective": "Sprich vor eurem Haus mit deiner Mutter Julia.",
+      "objective": "Julia steht nach dem Frühstück vor eurem Haus. Sprich mit ihr über den Tag.",
       "result": "Mutter vertraut dir den zweckgebundenen Haushaltsdenar an. Er ist für die Besorgung, nicht dein Taschengeld.",
-      "text": "»Du bist wach. Dein Vater arbeitet heute an einer Tür. Hol bitte zuerst Wasser und füll unsere drei Becher, dann bringt ihr gemeinsam die Besorgungen in Ordnung. Für Cassia lege ich einen Haushaltsdenar bereit. Und wenn du gehst, sag mir wohin. Nicht weil ich dich halten will – weil du zurückkommen sollst.«",
+      "text": "»Dein Vater arbeitet heute an einer Tür. Für Cassia lege ich einen Haushaltsdenar bereit; er gehört der Bestellung, nicht dir. Nimm deinem Vater den Krug vom Tisch mit hinaus. Und wenn du gehst, sag mir wohin. Nicht weil ich dich halten will – weil du zurückkommen sollst.«",
       "source_mission": "I-01",
       "carried": {
         "add": [
@@ -23,10 +23,10 @@
     {
       "chapter": "Ein Morgen zu Hause",
       "id": "fill_water",
-      "label": "Wasser holen und die drei Becher füllen",
-      "objective": "Gehe ins Familienhaus und fülle am Wassertisch den Krug und die drei Becher.",
-      "point": "family_water",
-      "result": "Drei Becher stehen gefüllt auf dem Tisch: für Julia, Silvanus und dich. Den Krug bringst du deinem Vater hinaus.",
+      "label": "Den Wasserkrug vom Tisch für Vater mitnehmen",
+      "objective": "Nimm im Familienhaus den Wasserkrug vom Tisch. Dein Vater arbeitet vor dem Haus an einer Tür.",
+      "point": "home_table",
+      "result": "Du nimmst den Krug mit dem Wasser vom Frühstückstisch. Die drei Becher bleiben dort stehen, wo ihr gegessen habt.",
       "text": "",
       "source_mission": "I-01",
       "carried": {
@@ -53,5 +53,337 @@
         ]
       }
     }
-  ]
+  ],
+  "slice": {
+    "version": 1,
+    "source": "Masterhandbuch 3.0 S. 13 (I-01 Vertiefungsentwurf) und S. 126 (Originalblatt). Dialogzeilen sind eigene Produktionsentwürfe, kein Wortlaut des Originaldrehbuchs.",
+    "cups": [
+      "julia",
+      "silvanus",
+      "player"
+    ],
+    "cup_names": {
+      "julia": "Julias Becher",
+      "silvanus": "Silvanus’ Becher",
+      "player": "dein schiefer Becher"
+    },
+    "contacts": {
+      "marcus": "Marcus",
+      "cassia": "Cassia",
+      "aelia": "Aelia"
+    },
+    "steps": {
+      "i01_choice": {
+        "npc": "julia",
+        "chapter": "Ein Morgen zu Hause",
+        "label": "Was tust du zuerst?",
+        "objective": "Julia steht am Frühstückstisch im Familienhaus. Entscheide, ob du mit ihr redest, beim Tischdecken hilfst oder zuerst in den Hof gehst.",
+        "text": "»Du bist wach. Das Brot ist geschnitten, die drei Becher stehen noch oben im Regal. Willst du mir helfen, mit mir reden – oder erst hinaus in den Hof?«",
+        "options": [
+          {
+            "id": "i01_talk",
+            "label": "Mit Julia reden"
+          },
+          {
+            "id": "i01_help",
+            "label": "Beim Tischdecken helfen"
+          },
+          {
+            "id": "i01_yard",
+            "label": "Erst in den Hof gehen"
+          }
+        ]
+      },
+      "i01_take_cups": {
+        "point": "home_shelf",
+        "chapter": "Ein Morgen zu Hause",
+        "label": "Die drei Becher vom Regal nehmen",
+        "objective": "Nimm im Familienhaus die drei Becher vom oberen Regalbrett. Der schiefe ist deiner."
+      },
+      "i01_set_table": {
+        "point": "home_table",
+        "chapter": "Ein Morgen zu Hause",
+        "label": "Becher auf den Tisch stellen",
+        "objective": "Stell die drei Becher an den Frühstückstisch: für Julia, für Silvanus und für dich."
+      },
+      "i01_well": {
+        "point": "well",
+        "chapter": "Ein Morgen zu Hause",
+        "label": "Am Brunnen Wasser schöpfen",
+        "objective": "Hol am Brunnen im Hof frisches Wasser für das Frühstück."
+      },
+      "i01_pour": {
+        "point": "home_table",
+        "chapter": "Ein Morgen zu Hause",
+        "label": "Die Becher am Tisch füllen",
+        "objective": "Bring das Wasser zum Frühstückstisch im Familienhaus und fülle die drei Becher."
+      },
+      "i01_meal": {
+        "point": "home_table",
+        "chapter": "Ein Morgen zu Hause",
+        "label": "Zum Frühstück an den Tisch",
+        "objective": "Komm zum Frühstück an den Tisch im Familienhaus. Julia und Silvanus warten mit dem Brot."
+      },
+      "i01_topic": {
+        "npc": "silvanus",
+        "chapter": "Am Frühstückstisch",
+        "label": "Worüber sprichst du am Tisch?",
+        "objective": "Am Frühstückstisch: Frag Silvanus nach der Werkstatt, nach der Feldarbeit oder erzähle von einer Begegnung.",
+        "text": "»Sextus hat mir einmal geholfen, ohne dass ich fragen musste. Und du – worüber willst du reden?«",
+        "options": [
+          {
+            "id": "i01_topic_workshop",
+            "label": "Nach der Werkstatt fragen"
+          },
+          {
+            "id": "i01_topic_fields",
+            "label": "Nach der Feldarbeit fragen"
+          },
+          {
+            "id": "i01_topic_contact",
+            "label": "Von %s erzählen"
+          }
+        ]
+      }
+    },
+    "consequences": {
+      "I-01.choice.talk": {
+        "speaker_id": "julia",
+        "line_id": "I01_A_REACT_TALK",
+        "immediate_effect": "Julia deckt den Tisch selbst und bittet dich um frisches Wasser vom Brunnen.",
+        "delayed_hook": "VID-B: Julia erinnert sich, ob du die Bitte erfüllt hast.",
+        "long_term_effect": "Julias Beziehung speichert erfüllte oder offen gelassene Bitte (helped/declined).",
+        "relationship": {}
+      },
+      "I-01.choice.help": {
+        "speaker_id": "julia",
+        "line_id": "I01_A_REACT_HELP",
+        "immediate_effect": "Du nimmst die Becher selbst vom Regal; die Requisiten folgen deiner Hand.",
+        "delayed_hook": "VID-B: Julia nennt deine tatsächliche Hilfe am Tisch.",
+        "long_term_effect": "Vertrauen nur nach tatsächlich gedecktem Tisch, nicht für die Wahl allein.",
+        "relationship": {}
+      },
+      "I-01.choice.yard": {
+        "speaker_id": "julia",
+        "line_id": "I01_A_REACT_YARD",
+        "immediate_effect": "Julia deckt den Tisch selbst; du gehst hinaus.",
+        "delayed_hook": "VID-B: Julia reagiert auf deine Abwesenheit oder eine später erfüllte Hilfe.",
+        "long_term_effect": "Kein Vertrauensgewinn ohne Hilfe; das Frühstück findet trotzdem statt.",
+        "relationship": {}
+      },
+      "I-01.cups.table": {
+        "speaker_id": "julia",
+        "line_id": "I01_B_JULIA_CUPS",
+        "immediate_effect": "Drei Becher stehen an ihren Plätzen am Tisch.",
+        "delayed_hook": "VID-B: Julia erwähnt den gedeckten Tisch.",
+        "long_term_effect": "Julia +1 Vertrauen, Hilfe gespeichert.",
+        "relationship": {
+          "julia": {
+            "trust": 1,
+            "helped": true
+          }
+        }
+      },
+      "I-01.water.poured": {
+        "speaker_id": "silvanus",
+        "line_id": "I01_B_JULIA_WATER",
+        "immediate_effect": "Frisches Brunnenwasser steht in den drei Bechern.",
+        "delayed_hook": "VID-B: Julia und Silvanus nennen das geholte Wasser.",
+        "long_term_effect": "Julia +1 und Silvanus +1 Vertrauen, Hilfe gespeichert.",
+        "relationship": {
+          "julia": {
+            "trust": 1,
+            "helped": true
+          },
+          "silvanus": {
+            "trust": 1,
+            "helped": true
+          }
+        }
+      },
+      "I-01.water.silvanus": {
+        "speaker_id": "silvanus",
+        "line_id": "I01_B_FATHER_WATER",
+        "immediate_effect": "Silvanus hat das Wasser selbst geholt.",
+        "delayed_hook": "VID-B: Julia nennt, wer das Wasser geholt hat.",
+        "long_term_effect": "Kein Vertrauensgewinn.",
+        "relationship": {}
+      },
+      "I-01.request.open": {
+        "speaker_id": "julia",
+        "line_id": "I01_B_JULIA_DECLINED",
+        "immediate_effect": "Julias Bitte um Wasser blieb offen.",
+        "delayed_hook": "VID-B: Julia spricht die offene Bitte ruhig an.",
+        "long_term_effect": "Julia speichert die offen gelassene Bitte (declined); kein Vertrauensverlust.",
+        "relationship": {
+          "julia": {
+            "declined": true
+          }
+        }
+      },
+      "I-01.contact.marcus": {
+        "speaker_id": "marcus",
+        "line_id": "I01_CONTACT_MARCUS",
+        "immediate_effect": "Du sprichst am Brunnen kurz mit Marcus.",
+        "delayed_hook": "VID-B Thema »Begegnung«; VID-C nennt den Treffpunkt an der Gasse; I-03 erinnert an den Morgen am Brunnen.",
+        "long_term_effect": "Gemeinsame Erinnerung als Ereignis, keine Freund-/Rivalenmarke.",
+        "relationship": {}
+      },
+      "I-01.contact.cassia": {
+        "speaker_id": "cassia",
+        "line_id": "I01_CONTACT_CASSIA",
+        "immediate_effect": "Du hörst Cassia beim Ordnen ihrer Waren zu.",
+        "delayed_hook": "VID-B Thema »Begegnung«; VID-C nennt Cassia.",
+        "long_term_effect": "Gemeinsame Erinnerung als Ereignis.",
+        "relationship": {}
+      },
+      "I-01.contact.aelia": {
+        "speaker_id": "aelia",
+        "line_id": "I01_CONTACT_AELIA",
+        "immediate_effect": "Aelia zeigt dir einen Stein an der Mauer.",
+        "delayed_hook": "VID-B Thema »Begegnung«.",
+        "long_term_effect": "Gemeinsame Erinnerung als Ereignis.",
+        "relationship": {}
+      },
+      "I-01.meal": {
+        "speaker_id": "julia",
+        "line_id": "I01_B_MEAL",
+        "immediate_effect": "Die Familie frühstückt am Tisch, auch ohne deine Hilfe.",
+        "delayed_hook": "VID-B beginnt am Tisch.",
+        "long_term_effect": "Familienmahlzeit als Ereignis.",
+        "relationship": {}
+      },
+      "I-01.topic.workshop": {
+        "speaker_id": "silvanus",
+        "line_id": "I01_B_TOPIC_WORKSHOP",
+        "immediate_effect": "Silvanus erzählt von der Tür und den Angeln.",
+        "delayed_hook": "I-04: Silvanus erinnert an die Frage nach der Werkstatt.",
+        "long_term_effect": "Gesprächsthema als Erinnerung; kein Beruf festgelegt.",
+        "relationship": {}
+      },
+      "I-01.topic.fields": {
+        "speaker_id": "julia",
+        "line_id": "I01_B_TOPIC_FIELDS",
+        "immediate_effect": "Julia erzählt von der Feldarbeit vor der Ernte.",
+        "delayed_hook": "I-04: Silvanus erinnert an die Frage nach der Feldarbeit.",
+        "long_term_effect": "Gesprächsthema als Erinnerung; kein Beruf festgelegt.",
+        "relationship": {}
+      },
+      "I-01.topic.contact": {
+        "speaker_id": "julia",
+        "line_id": "I01_B_TOPIC_CONTACT",
+        "immediate_effect": "Du erzählst von deiner Begegnung.",
+        "delayed_hook": "VID-C nimmt die Begegnung auf.",
+        "long_term_effect": "Erzählte Begegnung als Erinnerung.",
+        "relationship": {}
+      }
+    },
+    "hooks": [
+      {
+        "event_id": "I-01.topic.workshop",
+        "step": "woodcutter_request",
+        "line": "»Heute Morgen hast du nach der Werkstatt gefragt. Sextus kann dir mehr darüber erzählen als ich.«"
+      },
+      {
+        "event_id": "I-01.topic.fields",
+        "step": "woodcutter_request",
+        "line": "»Am Frühstückstisch wolltest du von der Feldarbeit hören. Holz für eine Esse ist auch Arbeit für viele Hände.«"
+      }
+    ],
+    "lines": {
+      "I01_A_TABLE": {
+        "speaker_id": "chronik",
+        "text": "Valdora bei Aquileia, ein Frühjahrsmorgen 58 v. Chr. Julia schneidet das Brot. Oben im Regal warten drei Becher."
+      },
+      "I01_A_JOKE": {
+        "speaker_id": "silvanus",
+        "text": "»Der schiefe Becher ist deiner. Der Töpfer meinte, er sei mit Absicht so. Ich glaube, er wollte nur sehen, wer trotzdem daraus trinkt.«"
+      },
+      "I01_A_BED": {
+        "speaker_id": "julia",
+        "text": "»Du bist wach. Das Brot ist geschnitten, die drei Becher stehen noch oben im Regal. Willst du mir helfen, mit mir reden – oder erst hinaus in den Hof?«"
+      },
+      "I01_A_REACT_TALK": {
+        "speaker_id": "julia",
+        "text": "»Dann rede mit mir, während ich decke. Wenn du etwas tun willst: Wir haben kein frisches Wasser. Der Brunnen ist gleich draußen im Hof.«"
+      },
+      "I01_A_REACT_HELP": {
+        "speaker_id": "julia",
+        "text": "»Dann nimm die Becher vom oberen Brett. Vorsichtig – der schiefe kippt gern. Und danach brauchen wir Wasser vom Brunnen.«"
+      },
+      "I01_A_REACT_YARD": {
+        "speaker_id": "julia",
+        "text": "»Geh nur. Ich decke selbst. Aber zum Brot bist du wieder hier.«"
+      },
+      "I01_B_TABLE": {
+        "speaker_id": "chronik",
+        "text": "Am Frühstückstisch: Brot, ein Krug und drei Becher an ihren Plätzen."
+      },
+      "I01_B_SEXTUS": {
+        "speaker_id": "silvanus",
+        "text": "»Als du noch nicht laufen konntest, brach mir im Winter die Achse vom Karren, mitten auf dem Weg nach Aquileia. Sextus kam mit seinem Werkzeug hinaus, ohne dass ich ihn gefragt hatte. Er sagte nur: ›Ein Rad, das steht, hilft niemandem.‹ Seitdem bringe ich ihm Holz, wenn er welches braucht.«"
+      },
+      "I01_B_JULIA_FULL": {
+        "speaker_id": "julia",
+        "text": "»Die Becher hast du selbst gedeckt, und das Wasser ist frisch vom Brunnen. So fängt ein Tag gut an.«"
+      },
+      "I01_B_JULIA_CUPS": {
+        "speaker_id": "julia",
+        "text": "»Den Tisch hast du gedeckt. Das Wasser hat dein Vater geholt – das nächste Mal teilt ihr euch den Weg.«"
+      },
+      "I01_B_JULIA_WATER": {
+        "speaker_id": "julia",
+        "text": "»Du hast das Wasser vom Brunnen geholt. Danke. Gedeckt habe ich heute selbst.«"
+      },
+      "I01_B_JULIA_DECLINED": {
+        "speaker_id": "julia",
+        "text": "»Ich hatte dich um Wasser gebeten. Dein Vater ist selbst gegangen. Sag mir das nächste Mal, wenn du zuerst etwas anderes vorhast.«"
+      },
+      "I01_B_JULIA_ABSENT": {
+        "speaker_id": "julia",
+        "text": "»Du warst draußen. Wir warten nicht mit dem Brot – aber wir warten auf dich.«"
+      },
+      "I01_B_TOPIC_WORKSHOP": {
+        "speaker_id": "silvanus",
+        "text": "»Die Werkstatt? Heute ist es eine Tür, die schief in den Angeln hängt. Man sieht es zuerst am Spalt unten, nicht am Holz. Komm vorbei, wenn du magst – zusehen kostet nichts.«"
+      },
+      "I01_B_TOPIC_FIELDS": {
+        "speaker_id": "julia",
+        "text": "»Die Felder hinter dem Dorf gehören nicht uns, aber bei der Ernte helfen alle. Das ist auch Arbeit, die man lernen kann – mit dem Rücken und mit dem Kopf.«"
+      },
+      "I01_B_TOPIC_CONTACT_MARCUS": {
+        "speaker_id": "julia",
+        "text": "»Marcus? Der kennt jeden Stein am Brunnen. Wenn er dir etwas zeigen will, sag mir vorher, wohin ihr geht.«"
+      },
+      "I01_B_TOPIC_CONTACT_CASSIA": {
+        "speaker_id": "julia",
+        "text": "»Cassia hat dich gesehen? Dann weiß sie schon, wer heute unsere Bestellung abholt.«"
+      },
+      "I01_B_TOPIC_CONTACT_AELIA": {
+        "speaker_id": "silvanus",
+        "text": "»Aelia redet nicht viel. Wenn sie dir etwas an der Mauer erklärt hat, hör gut zu.«"
+      },
+      "I01_C_HELPED": {
+        "speaker_id": "julia",
+        "text": "»Wer am Morgen die Becher deckt, vergisst auch den Korb nicht. Erst zu Aurelia, dann zu Cassia – und sag mir, wann du zurück bist.«"
+      },
+      "I01_C_FAREWELL": {
+        "speaker_id": "julia",
+        "text": "»Geh nur. Erst zu Aurelia mit dem Korb, dann zu Cassia. Und komm zum Abend heim.«"
+      },
+      "I01_C_MARCUS": {
+        "speaker_id": "silvanus",
+        "text": "»Marcus hat am Brunnen nach dir gefragt? Dann steht er vielleicht nachher an der Gasse zum Markt.«"
+      },
+      "I01_C_CASSIA": {
+        "speaker_id": "silvanus",
+        "text": "»Cassia kennt dich jetzt schon vom Morgen. Gib ihr den Denar und nimm die Bestellung, nicht mehr.«"
+      }
+    },
+    "contact_lines": {
+      "marcus": "»Du auch schon wach? Ich soll Wasser holen, aber der Eimer am Brunnen hat ein Loch. Wenn du nachher zum Markt gehst – ich kenne eine Abkürzung an der Gasse.«",
+      "cassia": "»Früh unterwegs? Ich lege gerade die Waren aus. Sag deiner Mutter, ihre Bestellung liegt bereit, sobald jemand mit dem Denar kommt.«",
+      "aelia": "»Siehst du diesen Stein? Er trägt drei andere. Wenn er fehlt, fällt die Ecke. So ist das mit vielen Dingen im Dorf.«"
+    }
+  }
 }
