@@ -45,7 +45,7 @@ def committed(commit, relative):
     return subprocess.check_output(["git", "show", f"{commit}:prototype/{relative}"], cwd=ROOT)
 
 
-def run(apk, output, engine):
+def run(apk, output, engine, capture_market=False):
     manifest = json.loads(apk.with_suffix(".build.json").read_text(encoding="utf-8"))
     digest = file_sha256(apk)
     if (not manifest["signature_verified"] or manifest["apk_sha256"] != digest
@@ -54,8 +54,9 @@ def run(apk, output, engine):
     commit = manifest["source_commit"]
     if not re.fullmatch(r"[a-f0-9]{40}", commit):
         raise ValueError("Der Baubericht enthält keinen vollständigen Quellcommit.")
+    output = output.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    report = {"source_commit": commit, "apk_sha256": digest, "platform": "Desktop, headless",
+    report = {"source_commit": commit, "apk_sha256": digest, "platform": "Godot Desktop",
               "engine": subprocess.check_output([engine, "--version"], text=True).strip(),
               "checks": {}, "packaged_data_sha256": {}}
     with tempfile.TemporaryDirectory(prefix="imperathen-city-qa-payload-") as name:
@@ -84,13 +85,18 @@ def run(apk, output, engine):
             environment["IMPERATHEN_ISOLATED_TEST"] = "1"
             for variable in ("XDG_DATA_HOME", "XDG_CONFIG_HOME", "XDG_CACHE_HOME"):
                 environment[variable] = str(folder / script / variable)
-            result = subprocess.run([engine, "--headless", "--main-pack", str(pack), "--fixed-fps", "60",
-                                     "--script", str(probe)], cwd=folder, env=environment, text=True,
+            capture = capture_market and script == "campaign_market_visit_test"
+            display = ["--rendering-method", "gl_compatibility"] if capture else ["--headless"]
+            command = [engine, *display, "--main-pack", str(pack), "--fixed-fps", "60", "--script", str(probe)]
+            if capture:
+                command.extend(["--", "--capture-dir=" + str(output / "markt")])
+            result = subprocess.run(command, cwd=folder, env=environment, text=True,
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=240)
             (output / (script + ".log")).write_text(result.stdout, encoding="utf-8")
             passed = (result.returncode == 0 and re.search(rf"^{marker}\b", result.stdout, re.M) is not None
                       and re.search(r"SCRIPT ERROR:|^ERROR:|^USER ERROR:", result.stdout, re.M) is None)
             report["checks"][script] = {"passed": passed, "exit_code": result.returncode,
+                                       "graphics": "gl_compatibility" if capture else "headless",
                                        "external_script_sha256": hashlib.sha256(probe.read_bytes()).hexdigest()}
             print(f"{script}: {'PASS' if passed else 'FAIL'}", flush=True)
     report["passed"] = all(check["passed"] for check in report["checks"].values())
@@ -103,5 +109,7 @@ if __name__ == "__main__":
     parser.add_argument("apk", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--godot", default="godot")
+    parser.add_argument("--capture-market", action="store_true",
+                        help="Den Marktbesuch auf dem aktiven Desktop-Display aufnehmen")
     args = parser.parse_args()
-    raise SystemExit(0 if run(args.apk, args.output, args.godot) else 1)
+    raise SystemExit(0 if run(args.apk, args.output, args.godot, args.capture_market) else 1)
