@@ -3,10 +3,11 @@ extends RefCounted
 ## state: every rebuild after a choice, suspend or reload yields the same beats.
 ## A film never commits anything by itself; choice beats name the childhood
 ## action they await (AwaitChoice), and skipping stops at an open choice.
-## Voices are not produced: there are no recordings and no licensed local or
-## paid speech synthesis available. Subtitles carry speaker and line ids.
+## Exact recordings are resolved by the production dialogue player. The
+## subtitle and line id remain authoritative even before voice acceptance.
 
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
+const VoiceLines = preload("res://scripts/audio/voice_lines.gd")
 const VID_A := "childhood_home"
 const VID_B := "i01_vid_b"
 const CHAPTER := "Kapitel I · Die drei Becher"
@@ -19,10 +20,12 @@ static func _beat(id: String, shot_id: String, line_id: String, minimum: float, 
 	var speaker_id := str(override.get("speaker_id", line.get("speaker_id", "chronik")))
 	var text := str(override.get("text", line.get("text", "")))
 	var names: Array = SPEAKERS.get(speaker_id, [speaker_id.capitalize(), ""])
+	var recorded := VoiceLines.find(text)
+	var has_recording := not recorded.is_empty() and recorded.get("speaker_id", "") == VoiceLines.speaker_id(speaker_id)
 	return {"id":id, "shot_id":shot_id, "line_id":line_id, "speaker_id":speaker_id,
 		"speaker":names[0], "role":names[1], "text":text, "actor_id":actor_id,
 		"duration":maxf(minimum, 2.0 + text.length() / 17.0), "chapter":CHAPTER, "location":LOCATION,
-		"voice":"blocked_no_recording"}
+		"voice":"recorded" if has_recording else "blocked_no_recording"}
 
 
 ## A dramatic pause or silent reaction: a shot without a line. It has no

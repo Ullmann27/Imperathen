@@ -1,0 +1,88 @@
+name: Repair missing I-01 synthetic voices
+
+on:
+  push:
+    branches: ['integration/imperathen-gear-qa-20261126']
+    paths:
+      - 'tools/audio/complete_i01_voices.py'
+      - '.github/workflows/complete-i01-voices.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: complete-i01-voices-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  synthesize:
+    if: github.repository == 'Ullmann27/Imperathen' && github.ref_name == 'integration/imperathen-gear-qa-20261126'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install open-source CPU speech and alignment tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng libsndfile1 sox
+          python3 -m venv "$RUNNER_TEMP/audio-venv"
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install --upgrade pip
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install qwen-tts==0.1.1 praat-parselmouth==0.4.7 pyloudnorm==0.2.0 soundfile librosa scipy
+      - name: Generate missing authored German lines without overwriting existing audio
+        run: |
+          "$RUNNER_TEMP/audio-venv/bin/python" tools/audio/complete_i01_voices.py --work "$RUNNER_TEMP/i01-voice-work"
+      - name: Verify official Godot engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot-voice"
+          cd "$RUNNER_TEMP/godot-voice"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Exact speech and runtime lip sync acceptance
+        run: |
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --only import opening_voice dialogue_lipsync --keep-going --report "$RUNNER_TEMP/audio-validation"
+      - name: Preserve accepted recordings and proof
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: i01-voice-repair-${{ github.run_id }}
+          path: |
+            prototype/assets/audio/voice/
+            ${{ runner.temp }}/audio-validation/
+            ${{ runner.temp }}/i01-voice-work/lines_meta.json
+          retention-days: 30
+      - name: Commit only accepted speech to the integration branch (no release)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch=integration/imperathen-gear-qa-20261126
+          test "$GITHUB_REF" = "refs/heads/$branch"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git ls-remote origin "refs/heads/$branch" | cut -f1)" = "$GITHUB_SHA"
+          git add prototype/assets/audio/voice/manifest.json prototype/assets/audio/voice/lines prototype/assets/audio/voice/visemes
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='imperathen-voice-ci' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "Add exact accepted I-01 story recordings and visemes"
+          gh auth setup-git
+          git push origin "HEAD:refs/heads/$branch"

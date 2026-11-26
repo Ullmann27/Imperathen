@@ -115,6 +115,7 @@ def main():
     ap.add_argument("--work", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--only", nargs="*", help="speaker ids")
+    ap.add_argument("--strict", action="store_true", help="Reject output above the existing MAX_WER threshold")
     a = ap.parse_args()
     from qwen_tts import Qwen3TTSModel
     from transformers import pipeline
@@ -197,7 +198,7 @@ def main():
         if line["line_id"] in meta and meta[line["line_id"]]["text_key"] == line["text_key"]:
             continue
         if sid not in prompts:
-            prompts[sid] = base.create_voice_clone_prompt(ref_audio=refs_meta[sid]["file"], ref_text=ref_text)
+            prompts[sid] = base.create_voice_clone_prompt(ref_audio=refs_meta[sid]["file"], ref_text=refs_meta[sid].get("ref_text", ref_text))
         text = speakable(line["text"])
         best = None
         base_seed = int(hashlib.sha256(line["line_id"].encode()).hexdigest()[:6], 16)
@@ -216,6 +217,8 @@ def main():
             if err <= MAX_WER:
                 break
         err, seed, p, sr, hyp = best
+        if a.strict and err > MAX_WER:
+            raise SystemExit(f"Unaccepted transcription for {line['line_id']}: WER {err:.3f}")
         wave, _ = sf.read(p)
         post = speakers[sid].get("post")
         if post:
@@ -229,7 +232,8 @@ def main():
         meta[line["line_id"]] = {
             "line_id": line["line_id"], "speaker_id": sid, "text": line["text"], "text_key": line["text_key"],
             "kind": line.get("kind", "story"), "spoken_text": text, "model": BASE[0] + "@" + BASE[1][:12], "voice_design_model": DESIGN[0] + "@" + DESIGN[1][:12],
-            "reference_seed": refs_meta[sid]["seed"], "seed": seed, "asr_wer": round(err, 3), "asr_text": hyp.strip(),
+            "reference_seed": refs_meta[sid]["seed"], "reference_audio_sha256": refs_meta[sid]["sha256"],
+            "reference_line_id": refs_meta[sid].get("line_id"), "seed": seed, "asr_wer": round(err, 3), "asr_text": hyp.strip(),
             "lufs_integrated": round(lufs, 2), "duration_s": round(len(mastered) / sr, 3), "sample_rate": sr,
             "master_wav_sha256": sha256(master_wav), "file": f"lines/{ogg.name}", "sha256": sha256(ogg),
             "metrics": measure(str(master_wav)), "post": post or None,

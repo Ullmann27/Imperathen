@@ -10,6 +10,7 @@ extends SceneTree
 
 const Opening = preload("res://scripts/story/opening_story.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
+const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const VoiceLines = preload("res://scripts/audio/voice_lines.gd")
 const Dialogue = preload("res://scripts/audio/dialogue_player.gd")
 const Face = preload("res://scripts/audio/face_driver.gd")
@@ -86,6 +87,18 @@ func _audio_onset(stream: AudioStream) -> Dictionary:
 
 
 func _run() -> void:
+	# The current film includes alternate family reactions and topic branches,
+	# not only the default VID-A path. Every authored spoken line must have
+	# its own exact text, correct speaker, imported audio and matching track.
+	for line_id: String in I01.slice().get("lines", {}):
+		var authored: Dictionary = I01.line(line_id)
+		var entry := VoiceLines.find(str(authored.text))
+		_check(not entry.is_empty(), "I-01 branch recording: " + line_id)
+		if not entry.is_empty():
+			var expected := VoiceLines.speaker_id(str(authored.speaker_id))
+			_check(entry.speaker_id == expected, "I-01 branch cast: " + line_id)
+			var track := VoiceLines.viseme_track(entry)
+			_check(VoiceLines.stream_for(entry) != null and track.get("text_key", "") == entry.text_key and track.get("speaker_id", "") == expected, "I-01 branch audio/visemes: " + line_id)
 	var lines := _i01_lines()
 	_check(lines.size() >= 6, "I-01 has at least six spoken lines (found %d)" % lines.size())
 	var world := Node3D.new()

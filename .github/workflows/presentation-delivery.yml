@@ -24,7 +24,7 @@ concurrency:
 jobs:
   regression:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 60
     env:
       GODOT_VERSION: '4.7.2'
       GODOT_SILENCE_ROOT_WARNING: '1'
