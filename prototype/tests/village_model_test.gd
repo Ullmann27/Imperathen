@@ -295,7 +295,7 @@ func _test_migration_and_corrupt_transactions() -> void:
 	var bytes:=FileAccess.get_file_as_string(old_path)
 	var loaded=WorldModel.new()
 	_ok(loaded.load_game(old_path),"Real schema4 shape migrates to schema5")
-	_check(loaded.data.schema_version==5 and not loaded.data.village.enabled,"Migrated career is preserved without imposing new youth requirements")
+	_check(loaded.data.schema_version==WorldModel.SCHEMA_VERSION and not loaded.data.village.enabled,"Migrated career is preserved without imposing new youth requirements")
 	_check(loaded.data.resources.wood==4 and loaded.data.resources.stone==0,"Migration grants no resources")
 	_check(FileAccess.get_file_as_string(old_path)==bytes,"Loading migration does not overwrite original file")
 	var before:=JSON.stringify(loaded.data)

@@ -61,7 +61,7 @@ func _test_journey_persistence_and_effects() -> void:
 	_write(_path("before-abilities"), legacy)
 	var migrated = WorldModel.new()
 	_ok(migrated.load_game(_path("before-abilities")), "Load a v5 save that predates the ability record")
-	_check(migrated.data.schema_version == 5 and migrated.data.village.abilities.earned == ["ch1_look_before_force", "ch1_price_is_promise"], "Migration stays on schema v5 and restores proven abilities")
+	_check(migrated.data.schema_version == WorldModel.SCHEMA_VERSION and migrated.data.village.abilities.earned == ["ch1_look_before_force", "ch1_price_is_promise"], "Migration reaches the current schema and restores proven abilities")
 	var forged: Dictionary = resumed.data.duplicate(true)
 	forged.village.abilities.earned.append("ch1_unknown")
 	_write(_path("forged"), forged)

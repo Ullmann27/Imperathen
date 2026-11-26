@@ -16,7 +16,12 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const CityTrade = preload("res://scripts/city_trade.gd")
-const SCHEMA_VERSION := 5
+const TribalWorld = preload("res://scripts/domain/tribal_world.gd")
+const SCHEMA_VERSION := 6
+## Weekly ticks of the aggregated tribal world per frame; long time jumps
+## catch up over several frames instead of stalling one.
+const TRIBE_TICKS_PER_ADVANCE := 2
+const TRIBE_TICKS_PER_SEASON := 13
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
 const MAX_COMMAND_IDS := 1024
@@ -106,6 +111,9 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 		CombatActions.start(data)
 	if data.village.enabled and childhood_enabled:
 		NpcBehavior.start(data)
+	# The tribal world follows the campaign era: 58 BC childhood games get the
+	# Rhine roster; the Trajan-era careers have no roster yet (empty world).
+	data.tribes = TribalWorld.new_state(TribalWorld.seed_from_text(str(data.world_id)), TribalWorld.scenario_for_world(data))
 	changed.emit()
 
 
@@ -247,12 +255,45 @@ func advance(delta: float) -> void:
 		var frontier_event := Frontier.advance(candidate, delta)
 		if not frontier_event.is_empty():
 			_record(candidate, frontier_event)
+	notify_ui = _sync_tribes(candidate, TRIBE_TICKS_PER_ADVANCE) or notify_ui
 	candidate.revision = int(data.revision) + 1
 	if not _validate_state(candidate).is_empty():
 		return
 	data = candidate
 	if notify_ui:
 		changed.emit()
+
+
+## Runs the weeks of the tribal world that the shared calendar has passed.
+## The tribal state is replaced, never edited in place, so a rejected
+## candidate cannot leak into the accepted world.
+func _sync_tribes(state: Dictionary, max_ticks: int) -> bool:
+	var target_day := TribalWorld.world_calendar_day(state)
+	if (int(state.tribes.tick) + 1) * TribalWorld.TICK_DAYS > target_day:
+		return false
+	var next: Dictionary = state.tribes.duplicate(true)
+	TribalWorld.advance_to_day(next, target_day, max_ticks)
+	state.tribes = next
+	return true
+
+
+## Travel, sleep or waiting outside the village clocks report the days they
+## take; the tribal world then lives through them like any other time.
+func pass_calendar_days(days: int, reason: String = "") -> Dictionary:
+	if days < 1 or days > 3650 or data.is_empty() or data.progress.career_terminal:
+		return _fail("Ungültige Zeitspanne.")
+	var next: Dictionary = data.tribes.duplicate(true)
+	next.extra_days = int(next.extra_days) + days
+	var candidate := _world_copy()
+	candidate.tribes = next
+	_sync_tribes(candidate, TRIBE_TICKS_PER_SEASON)
+	candidate.revision = int(data.revision) + 1
+	var error := _validate_state(candidate)
+	if not error.is_empty():
+		return _fail("Zeitspanne verworfen: " + error)
+	data = candidate
+	changed.emit()
+	return _ok("%d Tage vergehen%s." % [days, (" (" + reason + ")") if not reason.is_empty() else ""])
 
 
 func _advance_construction(candidate: Dictionary, delta: float) -> bool:
@@ -734,10 +775,15 @@ func _validate_arguments(command: String, args: Dictionary) -> String:
 
 
 func _validate_state(state: Variant) -> String:
-	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley", "origin_id", "strategy", "frontier", "village"]):
+	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley", "origin_id", "strategy", "frontier", "village", "tribes"]):
 		return "Unvollständiger oder unbekannter Datenvertrag."
 	if not _integer(state.schema_version, SCHEMA_VERSION, SCHEMA_VERSION):
 		return "Diese Schemaversion wird nicht unterstützt; es wurde keine Migration ausgeführt."
+	var tribal_error := TribalWorld.validate_cached(state.tribes)
+	if not tribal_error.is_empty():
+		return "Stammeswelt: " + tribal_error
+	if TribalWorld.day(state.tribes) > TribalWorld.world_calendar_day(state):
+		return "Die Stammeswelt läuft der gemeinsamen Weltzeit voraus."
 	if typeof(state.origin_id) != TYPE_STRING or not Origins.PEOPLES.has(state.origin_id) or typeof(state.strategy) != TYPE_DICTIONARY or not Seasons.validate(state.strategy) or state.strategy.home != state.origin_id:
 		return "Unbekannte Herkunft oder ungültige Regionalkampagne."
 	if state.strategy.turn > 0 and (typeof(state.progress) != TYPE_DICTIONARY or not state.progress.get("skirmish_won",false)):
@@ -1008,6 +1054,13 @@ func _read_save(path: String) -> Dictionary:
 		state.village.enabled = false
 		state.village.health_delta = 0
 		state.village.militia = []
+		state.schema_version = 5
+	if typeof(state) == TYPE_DICTIONARY and state.get("schema_version") == 5 and typeof(state.get("village")) == TYPE_DICTIONARY:
+		# v5 -> v6: the aggregated tribal world starts at its scenario's opening
+		# week and lives through the save's elapsed calendar on the next frames.
+		# No v5 build wrote this key; any value present is validated strictly.
+		if not state.has("tribes"):
+			state.tribes = TribalWorld.new_state(TribalWorld.seed_from_text(str(state.get("world_id", ""))), TribalWorld.scenario_for_world(state))
 		state.schema_version = SCHEMA_VERSION
 	# Nested childhood actor IDs changed when the production screenplay fixed
 	# Julia/Silvanus/Sextus as mother/father/smith. Migrate only version-1
@@ -1043,6 +1096,7 @@ func _read_save(path: String) -> Dictionary:
 
 func _restore_integer_fields(state: Dictionary) -> void:
 	CityTrade.restore_integer_fields(state)
+	TribalWorld.normalize(state.tribes)
 	for key in ["schema_version", "revision"]:
 		state[key] = int(state[key])
 	state.frontier.schema = int(state.frontier.schema)
@@ -1272,7 +1326,7 @@ func _world_copy() -> Dictionary:
 	var candidate := {}
 	for key in data:
 		var value: Variant = data[key]
-		if key not in ["strategy","valley"] and typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY]:
+		if key not in ["strategy","valley","tribes"] and typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY]:
 			candidate[key] = value.duplicate(true)
 		else:
 			candidate[key] = value
@@ -1292,6 +1346,8 @@ func act_region(command: String,target: String) -> Dictionary:
 			data.progress.years_elapsed = 6 + floori(data.strategy.turn/4.0)
 			data.player.age = 12 + data.progress.years_elapsed
 			data.companion.age = data.player.age
+			# A season is thirteen tribal weeks; the atlas shows them at once.
+			_sync_tribes(data, TRIBE_TICKS_PER_SEASON)
 		_record(data,result.message)
 		data.revision += 1
 		changed.emit()
