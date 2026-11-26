@@ -14,6 +14,24 @@ var sole_planes: Array[Vector4] = []
 var slab_sample_count := 0
 const SOLE_CONTACT_BAND_M := .004
 const SAMPLES_PER_REGION := 24
+## Offline retarget report. It is produced by the youth build and is absent in
+## checkouts and builds without the original youth, where only the legacy
+## bind-pose band applies.
+const MOTION_REPORT := "res://assets/animations/accad_youth_motion.json"
+static var _report_read := false
+static var _report: Dictionary = {}
+
+
+## Reads the report once per process instead of on every LOD reload, and never
+## asks the JSON parser for a file that does not exist.
+static func motion_report() -> Dictionary:
+	if not _report_read:
+		_report_read = true
+		if FileAccess.file_exists(MOTION_REPORT):
+			var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(MOTION_REPORT))
+			if parsed is Dictionary:
+				_report = parsed
+	return _report
 
 
 func bind(model: Node3D, level: int) -> void:
@@ -22,12 +40,12 @@ func bind(model: Node3D, level: int) -> void:
 	sole_planes.clear()
 	slab_sample_count=0
 	rig = null
-	var report: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://assets/animations/accad_youth_motion.json"))
+	if not is_instance_valid(model):
+		return
 	var lod_report: Dictionary = {}
-	if report is Dictionary:
-		var lods: Array = report.get("lods",[])
-		if level>=0 and level<lods.size() and lods[level] is Dictionary:
-			lod_report=lods[level]
+	var lods: Array = motion_report().get("lods",[])
+	if level>=0 and level<lods.size() and lods[level] is Dictionary:
+		lod_report=lods[level]
 	var planes: Dictionary = lod_report.get("sole_planes",{})
 	for side_name in ["L","R"]:
 		var plane: Dictionary = planes.get(side_name,{})
@@ -36,8 +54,6 @@ func bind(model: Node3D, level: int) -> void:
 			sole_planes.append(Vector4(float(n[0]),float(n[1]),float(n[2]),float(plane.plane_offset)))
 	if sole_planes.size()!=2:
 		sole_planes.clear()
-	if not is_instance_valid(model):
-		return
 	var mesh := model.find_child("MeshyYouthBody",true,false) as MeshInstance3D
 	if not is_instance_valid(mesh) or mesh.mesh == null or mesh.skin == null:
 		return
