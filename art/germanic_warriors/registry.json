@@ -1,0 +1,1817 @@
+{
+  "schema_version": 1,
+  "name": "Germanic warrior families",
+  "valid_from_year": -58,
+  "valid_to_year": -50,
+  "decision": "D-024 (docs/00_governance/GAME_DIRECTION_2026-11-26_B.md on docs/game-direction-20261126): the Meshy axe fighter stays; axe and shield is a rarer, artistically reconstructed variant, never the standard.",
+  "attestation_levels": {
+    "attested": "Named in a source written in or close to the period (Caesar, De bello Gallico, 58-50 BC) or shown by a dated find of the period in the Germanic area.",
+    "plausible": "Supported by later or neighbouring evidence (Tacitus c. AD 98, later bog finds, Roman monuments, earlier Northern finds); compatible with the period, not proven for 58 BC.",
+    "design": "Design assumption for game readability or variety; no claim of evidence."
+  },
+  "sources": {
+    "caesar_bg": {
+      "title": "Caesar, De bello Gallico",
+      "date": "58-50 BC",
+      "status": "[Q] passages cited from knowledge; verify wording before quoting",
+      "passages": {
+        "1.48": "Ariovistus' horsemen fight together with an equal number of picked fast foot soldiers",
+        "1.51": "Ariovistus' host by peoples (Harudes, Marcomanni, Triboci, Vangiones, Nemetes, Sedusii, Suebi), wagons and families behind the line",
+        "1.52": "the Germans form a phalanx",
+        "4.1": "Suebi: little clothing, skins",
+        "4.2": "horsemen often dismount and fight on foot; small native horses",
+        "6.21": "skins or small hide cloaks (renones), a large part of the body bare",
+        "6.23": "raiding bands are volunteers who follow a leader"
+      }
+    },
+    "tacitus_germania": {
+      "title": "Tacitus, Germania",
+      "date": "c. AD 98 (about 150 years after 58 BC)",
+      "status": "[Q] later source; verify passages",
+      "passages": {
+        "6": "framea with a narrow short iron head, used thrown or in close fight; swords rare, larger lances rare; several javelins each; shields painted in chosen colours; few mail shirts, scarcely one or two helmets; horsemen carry shield and framea",
+        "7": "images and standards brought from the groves into battle; families fight together",
+        "13-14": "the retinue (comitatus) of a leader; the leader gives warhorse and framea",
+        "17": "cloak fastened with a brooch or a thorn; the wealthy wear close-fitting clothing; skins",
+        "38": "the Suebi comb their hair back and tie it in a knot",
+        "43": "the Harii: black shields and painted bodies (one people, much later)"
+      }
+    },
+    "tacitus_annals": {
+      "title": "Tacitus, Annals 2.14",
+      "date": "events of AD 16, written c. AD 115",
+      "status": "[Q] verify",
+      "passages": {
+        "2.14": "the Germans' lack of armour; fire-hardened or short spears in the rear ranks"
+      }
+    },
+    "hjortspring": {
+      "title": "Hjortspring boat deposit (Als, Denmark)",
+      "date": "c. 350 BC",
+      "status": "[Q] earlier than 58 BC; verify catalogue",
+      "content": "wooden shields (oblong and rounded rectangular boards, wooden bosses, central rib), spears, a few mail shirts and single-edged swords"
+    },
+    "przeworsk_jastorf": {
+      "title": "Jastorf and Przeworsk weapon graves",
+      "date": "2nd-1st c. BC",
+      "status": "[Q] typologies (bosses, swords, spurs) to be verified with the literature",
+      "content": "spearheads, iron shield bosses with spike or knob, single- and double-edged swords, prick spurs in rich graves"
+    },
+    "bog_textiles": {
+      "title": "Thorsberg and Damendorf garments",
+      "date": "3rd-4th c. AD",
+      "status": "[Q] much later; used only for cut and weave",
+      "content": "long trousers, long-sleeved tunics, twill and diamond twill wool, tablet-woven borders, large rectangular cloaks"
+    },
+    "osterby": {
+      "title": "Osterby head (Schleswig-Holstein)",
+      "date": "1st-3rd c. AD",
+      "status": "[Q] later; verify dating",
+      "content": "hair tied in a knot on the right side of the head"
+    },
+    "roman_monuments": {
+      "title": "Adamklissi metopes (AD 109), Column of Marcus Aurelius (c. AD 180)",
+      "date": "2nd c. AD",
+      "status": "[Q] later Roman depictions; verify",
+      "content": "barbarian warriors with trousers, bare torso or cloak, side knots, oval and hexagonal shields"
+    }
+  },
+  "quality_tiers": {
+    "Q0": "improvised: fire-hardened stake, club, unpainted board",
+    "Q1": "home smithing: small plain iron head, wooden boss, little paint",
+    "Q2": "good local smith: framea with midrib, iron boss, painted board",
+    "Q3": "fine or traded: bronze fittings, bright iron, studded boss, fine dyes",
+    "Q4": "prestige gift or import (not used by any family yet)"
+  },
+  "status_axes": {
+    "description": "0-3 each; equipment quality follows wealth, trade, craft and experience (D-024).",
+    "derived_quality": "max over equipment = min(3, round((wealth + max(trade, craft)) / 2 + experience / 3))"
+  },
+  "tiers": [
+    {
+      "tier": 1,
+      "id": "skirmisher",
+      "label_de": "Jungkrieger-Speerwerfer",
+      "role": "spear",
+      "note": "youngest men; several javelins (Tac. Germ. 6 [Q]); little clothing (Caesar BG 6.21 [Q])",
+      "troop_ids": [
+        "germanic_youth_javelin"
+      ]
+    },
+    {
+      "tier": 2,
+      "id": "levy",
+      "label_de": "Ziviles Aufgebot / Heerbann",
+      "role": "spear",
+      "note": "farmers called up with what they own: thrusting spear or stake, plank shield; alternative axe or club",
+      "troop_ids": [
+        "germanic_civil_levy",
+        "germanic_levy"
+      ]
+    },
+    {
+      "tier": 3,
+      "id": "spear_shield",
+      "label_de": "Speer- und Schildträger",
+      "role": "spear",
+      "note": "main fighting men: framea and painted shield (Tac. Germ. 6 [Q])",
+      "troop_ids": [
+        "germanic_levy",
+        "germanic_warrior"
+      ]
+    },
+    {
+      "tier": 4,
+      "id": "swordsman",
+      "label_de": "Erfahrener Schwertkämpfer",
+      "role": "heavy",
+      "note": "swords are rare (Tac. Germ. 6 [Q]); experienced, wealthier men",
+      "troop_ids": [
+        "germanic_retainer"
+      ]
+    },
+    {
+      "tier": 5,
+      "id": "retinue",
+      "label_de": "Gefolgschaft eines Anführers",
+      "role": "heavy",
+      "note": "the leader's sworn companions (Tac. Germ. 13-14 [Q], later source); best equipment, rare mail",
+      "troop_ids": [
+        "germanic_noble",
+        "germanic_retainer"
+      ]
+    },
+    {
+      "tier": 5,
+      "id": "mounted",
+      "label_de": "Berittene (mit Fußkämpfern)",
+      "role": "rider",
+      "note": "horse and fast foot fighters together (Caesar BG 1.48 [Q]); not built: horse asset untextured, mounted_units motion family inactive",
+      "troop_ids": [
+        "germanic_rider",
+        "germanic_foot_runner",
+        "germanic_eques_auxiliaris"
+      ]
+    },
+    {
+      "tier": 0,
+      "id": "axe_fighter",
+      "label_de": "Axtkämpfer (seltene Rekonstruktion)",
+      "role": "heavy",
+      "note": "existing Meshy unit_germanic_axe_fighter stays (D-024); axe and shield is a rarer reconstructed variant (design assumption), never the standard",
+      "troop_ids": [
+        "germanic_axe_shield"
+      ]
+    },
+    {
+      "tier": 2,
+      "id": "bow_skirmisher",
+      "label_de": "Hangschützen mit Bogen (seltene Designvariante)",
+      "role": "archer",
+      "note": "not built; D-041: archers stay a rarer, source-critically flagged design variant; spear-throwers (javelins) are the regular ranged troops",
+      "troop_ids": [
+        "germanic_bow_skirmisher"
+      ]
+    }
+  ],
+  "groups": {
+    "river_kin": {
+      "label_de": "Flussleute vom Rhein",
+      "label_en": "River kin of the Rhine terraces",
+      "fiction": "Fictional, historically plausible group (D-023); no claim to be a named people of 58 BC.",
+      "identity": "Trade with Gaulish neighbours: madder-red and woad-blue dyed wool, woven checks, bronze fittings, tall oval shields painted red with light motifs, hair tied back or cropped, trimmed beards and moustaches.",
+      "palette": {
+        "red": "8a3324",
+        "blue": "2f4a6e",
+        "ochre": "a77d34",
+        "undyed": "c4b89a",
+        "brown": "5b4632"
+      },
+      "shield_shape": "oval",
+      "shield_paint": "8c2f22",
+      "shield_accent": "e6dcc2",
+      "shield_motif": "crescents",
+      "attestation": {
+        "dyed_checks": [
+          "plausible",
+          "checks and dyes are known from Hallstatt/La Tene textiles and later Germanic bog finds; not from a 58 BC Germanic find"
+        ],
+        "oval_shield": [
+          "plausible",
+          "oval shields in Roman depictions of Germans (later) and La Tene neighbours"
+        ],
+        "bronze_fittings": [
+          "plausible",
+          "imports and bronze-working in rich graves of the period [Q]"
+        ],
+        "motif": [
+          "design",
+          "crescent pair is a game emblem for recognition at distance"
+        ]
+      }
+    },
+    "forest_kin": {
+      "label_de": "Waldsippen der Höhen",
+      "label_en": "Forest kin of the uplands",
+      "fiction": "Fictional, historically plausible group (D-023); no claim to be a named people of 58 BC.",
+      "identity": "Poorer in metal, rich in pelts: undyed brown, grey and dark green wool, herringbone weave, fur capes, side knots and full beards, round plank shields painted dark with light rings or bands.",
+      "palette": {
+        "brown": "6b5a45",
+        "green": "3a4a33",
+        "grey": "6c6a62",
+        "dark": "2e2620",
+        "natural": "a39477"
+      },
+      "shield_shape": "round",
+      "shield_paint": "2a2c28",
+      "shield_accent": "d8d0bc",
+      "shield_motif": "rings",
+      "attestation": {
+        "pelts": [
+          "attested",
+          "skins and small hide cloaks (Caesar BG 4.1, 6.21 [Q])"
+        ],
+        "side_knot": [
+          "plausible",
+          "Suebian knot (Tac. Germ. 38, c. AD 98 [Q]; Osterby head, later [Q]); used for the forest kin only"
+        ],
+        "round_shield": [
+          "plausible",
+          "round boards implied by central bosses in weapon graves [Q]"
+        ],
+        "dark_paint": [
+          "design",
+          "dark field with light rings; Tac. Germ. 43 on black shields concerns one later people and is not claimed"
+        ],
+        "herringbone": [
+          "plausible",
+          "twill variants in later bog textiles [Q]"
+        ]
+      }
+    }
+  },
+  "figures": [
+    {
+      "id": "river_skirmisher",
+      "group": "river_kin",
+      "family": "skirmisher",
+      "seed": 101,
+      "status": {
+        "wealth": 0,
+        "trade": 1,
+        "craft": 0,
+        "experience": 0
+      },
+      "body": "lean_young",
+      "face": {
+        "jaw_width": -0.03,
+        "chin_forward": 0.002,
+        "nose_length": 0.002,
+        "cheekbones": 0.002,
+        "face_length": -0.002
+      },
+      "skin": {
+        "tone": [
+          1.02,
+          0.97,
+          0.93
+        ],
+        "weather": 0.2,
+        "freckles": 0.5
+      },
+      "eyes": [
+        0.35,
+        0.4,
+        0.45
+      ],
+      "hair": {
+        "style": "tied",
+        "colour": "8a6236",
+        "length": 0.15
+      },
+      "beard": {
+        "style": "none",
+        "stubble": true
+      },
+      "clothing": {
+        "trousers": {
+          "colour": "c4b89a",
+          "weave": "twill",
+          "threads": 72,
+          "ease": 0.01
+        },
+        "shoes": {
+          "colour": "6a4a30"
+        },
+        "tunic": {
+          "colour": "a77d34",
+          "weave": "twill",
+          "threads": 80,
+          "sleeve": 0.3,
+          "hem": 0.76,
+          "skirt_ease": 0.024
+        },
+        "belt": {
+          "colour": "3d2818"
+        }
+      },
+      "loadout": {
+        "R": "javelin_r_q1",
+        "L": "javelins_l_q1"
+      },
+      "alt_loadouts": [
+        {
+          "R": "javelin_r_q1",
+          "L": "river_buckler_q1"
+        }
+      ],
+      "choices": {
+        "javelins": [
+          "plausible",
+          "several javelins per man (Tac. Germ. 6 [Q], later)"
+        ],
+        "short_sleeved_tunic": [
+          "design",
+          "light, cheap clothing of the youngest"
+        ],
+        "trousers": [
+          "plausible",
+          "later bog trousers and Roman depictions [Q]"
+        ],
+        "no_shield": [
+          "design",
+          "the buckler is an alternative loadout"
+        ]
+      },
+      "troop_ids": [
+        "germanic_youth_javelin"
+      ]
+    },
+    {
+      "id": "forest_skirmisher",
+      "group": "forest_kin",
+      "family": "skirmisher",
+      "seed": 102,
+      "status": {
+        "wealth": 0,
+        "trade": 0,
+        "craft": 1,
+        "experience": 0
+      },
+      "body": "lean_young",
+      "face": {
+        "jaw_width": 0.02,
+        "brow_ridge": 0.003,
+        "nose_bridge": 0.003,
+        "chin_length": 0.003
+      },
+      "skin": {
+        "tone": [
+          1.0,
+          0.95,
+          0.9
+        ],
+        "weather": 0.5,
+        "freckles": 0.1
+      },
+      "eyes": [
+        0.3,
+        0.38,
+        0.3
+      ],
+      "hair": {
+        "style": "braids",
+        "colour": "5a3e26",
+        "length": 0.24
+      },
+      "beard": {
+        "style": "none",
+        "stubble": true
+      },
+      "clothing": {
+        "trousers": {
+          "colour": "6c6a62",
+          "weave": "herringbone",
+          "threads": 70,
+          "ease": 0.01
+        },
+        "shoes": {
+          "colour": "4a3220"
+        },
+        "leg_wraps": {
+          "colour": "8a7a60",
+          "weave": "tabby",
+          "threads": 50,
+          "top": 0.4
+        },
+        "pelt": {
+          "colour": "5a4a3a",
+          "tip": "b8a690",
+          "hem": 1.16
+        },
+        "belt": {
+          "colour": "2e2014"
+        }
+      },
+      "loadout": {
+        "R": "forest_javelin_r_q0",
+        "L": "forest_javelins_l_q0"
+      },
+      "alt_loadouts": [
+        {
+          "R": "javelin_r_q1",
+          "L": "javelins_l_q1"
+        }
+      ],
+      "choices": {
+        "bare_torso_and_pelt": [
+          "attested",
+          "skins, a large part of the body bare (Caesar BG 6.21 [Q])"
+        ],
+        "braids": [
+          "design",
+          "variety for the youngest men"
+        ],
+        "leg_wraps": [
+          "plausible",
+          "leg bindings in later finds [Q]"
+        ],
+        "fire_hardened_javelins": [
+          "plausible",
+          "fire-hardened points of poorly armed men (Tac. Ann. 2.14 [Q], AD 16); no iron for the poorest group"
+        ]
+      },
+      "troop_ids": [
+        "germanic_youth_javelin"
+      ]
+    },
+    {
+      "id": "river_levy",
+      "group": "river_kin",
+      "family": "levy",
+      "seed": 103,
+      "status": {
+        "wealth": 1,
+        "trade": 1,
+        "craft": 1,
+        "experience": 1
+      },
+      "body": "stocky",
+      "face": {
+        "jaw_width": 0.07,
+        "chin_forward": -0.002,
+        "nose_length": 0.004,
+        "nose_width": 0.002,
+        "face_length": 0.003,
+        "lips": 0.001
+      },
+      "skin": {
+        "tone": [
+          1.03,
+          0.95,
+          0.88
+        ],
+        "weather": 0.8,
+        "freckles": 0.0,
+        "scars": []
+      },
+      "eyes": [
+        0.42,
+        0.32,
+        0.22
+      ],
+      "hair": {
+        "style": "cropped",
+        "colour": "6a4a2e",
+        "grey": 0.25,
+        "recede": 0.025,
+        "thickness": 0.004
+      },
+      "beard": {
+        "style": "short",
+        "colour": "6a4a2e",
+        "grey": 0.3
+      },
+      "clothing": {
+        "trousers": {
+          "colour": "5b4632",
+          "weave": "twill",
+          "threads": 64,
+          "ease": 0.012
+        },
+        "shoes": {
+          "colour": "5a3c26"
+        },
+        "tunic": {
+          "colour": "c4b89a",
+          "weave": "twill",
+          "threads": 70,
+          "sleeve": 1.0,
+          "hem": 0.58,
+          "skirt_ease": 0.03
+        },
+        "belt": {
+          "colour": "3d2818"
+        },
+        "cloak": {
+          "colour": "5b4632",
+          "weave": "twill",
+          "threads": 60,
+          "hem": 0.92,
+          "brooch": "iron"
+        }
+      },
+      "loadout": {
+        "R": "river_spear_q1",
+        "L": "river_board_q1"
+      },
+      "alt_loadouts": [
+        {
+          "R": "levy_club_q0",
+          "L": "river_board_q1"
+        }
+      ],
+      "choices": {
+        "rect_board_with_spine": [
+          "plausible",
+          "rounded rectangular boards with a central rib (Hjortspring c. 350 BC [Q], earlier)"
+        ],
+        "undyed_tunic": [
+          "plausible",
+          "undyed wool for working people"
+        ],
+        "simple_spear": [
+          "attested",
+          "spears are the common weapon (Tac. Germ. 6 [Q])"
+        ]
+      },
+      "troop_ids": [
+        "germanic_civil_levy",
+        "germanic_levy"
+      ]
+    },
+    {
+      "id": "forest_levy",
+      "group": "forest_kin",
+      "family": "levy",
+      "seed": 104,
+      "status": {
+        "wealth": 0,
+        "trade": 0,
+        "craft": 1,
+        "experience": 1
+      },
+      "body": "wiry",
+      "face": {
+        "jaw_width": 0.03,
+        "cheekbones": 0.004,
+        "eye_depth": 0.003,
+        "nose_bridge": 0.005,
+        "chin_length": 0.004
+      },
+      "skin": {
+        "tone": [
+          0.98,
+          0.93,
+          0.87
+        ],
+        "weather": 1.0
+      },
+      "eyes": [
+        0.4,
+        0.42,
+        0.4
+      ],
+      "hair": {
+        "style": "long",
+        "colour": "4a3828",
+        "grey": 0.35,
+        "hem": 1.4
+      },
+      "beard": {
+        "style": "full",
+        "colour": "4a3828",
+        "grey": 0.4,
+        "moustache": true
+      },
+      "clothing": {
+        "trousers": {
+          "colour": "6b5a45",
+          "weave": "herringbone",
+          "threads": 64,
+          "ease": 0.012
+        },
+        "shoes": {
+          "colour": "4a3220"
+        },
+        "leg_wraps": {
+          "colour": "a39477",
+          "weave": "tabby",
+          "threads": 50,
+          "top": 0.42
+        },
+        "tunic": {
+          "colour": "6c6a62",
+          "weave": "herringbone",
+          "threads": 70,
+          "sleeve": 1.0,
+          "hem": 0.6,
+          "skirt_ease": 0.03
+        },
+        "belt": {
+          "colour": "2e2014"
+        }
+      },
+      "loadout": {
+        "R": "forest_stake_q0",
+        "L": "forest_board_q1"
+      },
+      "alt_loadouts": [
+        {
+          "R": "levy_axe_q1",
+          "L": "forest_board_q1"
+        },
+        {
+          "R": "levy_club_q0"
+        }
+      ],
+      "choices": {
+        "fire_hardened_stake": [
+          "plausible",
+          "fire-hardened spears of poorly armed men (Tac. Ann. 2.14 [Q], AD 16)"
+        ],
+        "wooden_boss": [
+          "plausible",
+          "wooden bosses (Hjortspring [Q], earlier)"
+        ],
+        "axe_alternative": [
+          "design",
+          "a work axe as a levy weapon; rare, never the standard (D-024)"
+        ]
+      },
+      "troop_ids": [
+        "germanic_civil_levy",
+        "germanic_levy"
+      ]
+    },
+    {
+      "id": "river_spear",
+      "group": "river_kin",
+      "family": "spear_shield",
+      "seed": 105,
+      "status": {
+        "wealth": 1,
+        "trade": 2,
+        "craft": 1,
+        "experience": 2
+      },
+      "body": "athletic",
+      "face": {
+        "jaw_width": 0.05,
+        "chin_forward": 0.004,
+        "brow_ridge": 0.003,
+        "nose_bridge": 0.004,
+        "cheekbones": 0.003
+      },
+      "skin": {
+        "tone": [
+          1.0,
+          0.95,
+          0.9
+        ],
+        "weather": 0.5,
+        "freckles": 0.25,
+        "scars": [
+          {
+            "from": [
+              0.035,
+              -0.008,
+              -0.02
+            ],
+            "to": [
+              0.05,
+              0.0,
+              -0.055
+            ]
+          }
+        ]
+      },
+      "eyes": [
+        0.25,
+        0.38,
+        0.5
+      ],
+      "hair": {
+        "style": "tied",
+        "colour": "7a5230",
+        "length": 0.18
+      },
+      "beard": {
+        "style": "short",
+        "colour": "7a5230",
+        "moustache": true
+      },
+      "clothing": {
+        "trousers": {
+          "colour": "2f4a6e",
+          "weave": "twill",
+          "threads": 80
+        },
+        "shoes": {
+          "colour": "4a3020"
+        },
+        "leg_wraps": {
+          "colour": "b8a888",
+          "weave": "tabby",
+          "threads": 60
+        },
+        "tunic": {
+          "colour": "8a3324",
+          "weave": "twill",
+          "threads": 90,
+          "sleeve": 1.0,
+          "hem": 0.7,
+          "trim": "c9a85a",
+          "trim_accent": "5a2418"
+        },
+        "belt": {
+          "colour": "3d2818",
+          "buckle": "bronze"
+        },
+        "cloak": {
+          "colour": "2f4a3a",
+          "weave": "twill",
+          "threads": 70,
+          "check": {
+            "colour": "6e3a26",
+            "band": 3,
+            "period": 14
+          },
+          "hem": 0.95,
+          "brooch": "bronze"
+        }
+      },
+      "loadout": {
+        "R": "river_framea_q2",
+        "L": "river_oval_q2",
+        "L2": "javelins_l_pair_q1"
+      },
+      "alt_loadouts": [],
+      "choices": {
+        "framea": [
+          "plausible",
+          "narrow short-headed spear (Tac. Germ. 6 [Q])"
+        ],
+        "javelins_behind_shield": [
+          "design",
+          "spare javelins carried in the shield hand"
+        ],
+        "cloak_with_brooch": [
+          "plausible",
+          "cloak fastened with a brooch (Tac. Germ. 17 [Q]); brooches are common finds of the period"
+        ],
+        "tablet_border": [
+          "plausible",
+          "woven borders in later finds [Q]"
+        ]
+      },
+      "troop_ids": [
+        "germanic_levy",
+        "germanic_warrior"
+      ]
+    },
+    {
+      "id": "forest_spear",
+      "group": "forest_kin",
+      "family": "spear_shield",
+      "seed": 106,
+      "status": {
+        "wealth": 1,
+        "trade": 0,
+        "craft": 2,
+        "experience": 2
+      },
+      "body": "broad",
+      "face": {
+        "jaw_width": 0.09,
+        "brow_ridge": 0.005,
+        "nose_length": 0.003,
+        "nose_width": 0.003,
+        "cranium": 0.004
+      },
+      "skin": {
+        "tone": [
+          1.0,
+          0.94,
+          0.88
+        ],
+        "weather": 0.7
+      },
+      "eyes": [
+        0.28,
+        0.34,
+        0.4
+      ],
+      "hair": {
+        "style": "knot",
+        "colour": "6a4a2c"
+      },
+      "beard": {
+        "style": "full",
+        "colour": "6a4a2c",
+        "moustache": true
+      },
+      "clothing": {
+        "trousers": {
+          "colour": "3a4a33",
+          "weave": "twill",
+          "threads": 72
+        },
+        "shoes": {
+          "colour": "4a3220"
+        },
+        "leg_wraps": {
+          "colour": "6b5a45",
+          "weave": "herringbone",
+          "threads": 50
+        },
+        "tunic": {
+          "colour": "6b5a45",
+          "weave": "herringbone",
+          "threads": 80,
+          "sleeve": 1.0,
+          "hem": 0.68
+        },
+        "belt": {
+          "colour": "2e2014",
+          "buckle": "iron"
+        },
+        "pelt": {
+          "colour": "4b4038",
+          "tip": "9a8a74",
+          "hem": 1.2
+        }
+      },
+      "loadout": {
+        "R": "forest_framea_q2",
+        "L": "forest_round_q2"
+      },
+      "alt_loadouts": [],
+      "choices": {
+        "side_knot": [
+          "plausible",
+          "Tac. Germ. 38 [Q], c. AD 98"
+        ],
+        "pelt_over_tunic": [
+          "attested",
+          "skins worn (Caesar BG 6.21 [Q])"
+        ],
+        "round_shield_iron_boss": [
+          "plausible",
+          "iron bosses in weapon graves of the period [Q]"
+        ]
+      },
+      "troop_ids": [
+        "germanic_levy",
+        "germanic_warrior"
+      ]
+    },
+    {
+      "id": "river_swordsman",
+      "group": "river_kin",
+      "family": "swordsman",
+      "seed": 107,
+      "status": {
+        "wealth": 2,
+        "trade": 2,
+        "craft": 1,
+        "experience": 3
+      },
+      "body": "veteran",
+      "face": {
+        "jaw_width": 0.08,
+        "chin_forward": 0.005,
+        "chin_length": 0.003,
+        "nose_bridge": 0.006,
+        "nose_length": 0.002,
+        "eye_depth": 0.002
+      },
+      "skin": {
+        "tone": [
+          1.02,
+          0.94,
+          0.86
+        ],
+        "weather": 0.9,
+        "scars": [
+          {
+            "from": [
+              -0.05,
+              0.01,
+              0.02
+            ],
+            "to": [
+              -0.03,
+              -0.004,
+              -0.04
+            ]
+          }
+        ]
+      },
+      "eyes": [
+        0.38,
+        0.4,
+        0.44
+      ],
+      "hair": {
+        "style": "cropped",
+        "colour": "5a3c24",
+        "grey": 0.2,
+        "thickness": 0.005
+      },
+      "beard": {
+        "style": "moustache",
+        "colour": "5a3c24",
+        "grey": 0.2,
+        "droop": 0.03,
+        "stubble": true
+      },
+      "clothing": {
+        "trousers": {
+          "colour": "5b4632",
+          "weave": "twill",
+          "threads": 80
+        },
+        "shoes": {
+          "colour": "3e2818"
+        },
+        "leg_wraps": {
+          "colour": "2f4a6e",
+          "weave": "tabby",
+          "threads": 60
+        },
+        "tunic": {
+          "colour": "2f4a6e",
+          "weave": "twill",
+          "threads": 90,
+          "sleeve": 1.0,
+          "hem": 0.68,
+          "trim": "a77d34",
+          "trim_accent": "8a3324"
+        },
+        "belt": {
+          "colour": "3d2818",
+          "buckle": "bronze"
+        },
+        "cloak": {
+          "colour": "a77d34",
+          "weave": "twill",
+          "threads": 70,
+          "check": {
+            "colour": "5b4632",
+            "band": 2,
+            "period": 10
+          },
+          "hem": 0.98,
+          "brooch": "bronze"
+        }
+      },
+      "loadout": {
+        "R": "river_sword_q2",
+        "L": "river_oval_q2b",
+        "belt": "river_scabbard_q2"
+      },
+      "alt_loadouts": [],
+      "choices": {
+        "long_double_edged_sword": [
+          "plausible",
+          "La Tene-type swords among Germanic groups near Gaul [Q]; swords rare (Tac. Germ. 6 [Q])"
+        ],
+        "moustache": [
+          "design",
+          "individual style"
+        ],
+        "scabbard": [
+          "plausible",
+          "wooden/leather scabbards with metal chape [Q]"
+        ]
+      },
+      "troop_ids": [
+        "germanic_retainer"
+      ]
+    },
+    {
+      "id": "forest_swordsman",
+      "group": "forest_kin",
+      "family": "swordsman",
+      "seed": 108,
+      "status": {
+        "wealth": 1,
+        "trade": 0,
+        "craft": 2,
+        "experience": 3
+      },
+      "body": "veteran",
+      "face": {
+        "jaw_width": 0.1,
+        "brow_ridge": 0.006,
+        "cheekbones": 0.003,
+        "nose_width": 0.004,
+        "nose_bridge": -0.002,
+        "chin_length": 0.004
+      },
+      "skin": {
+        "tone": [
+          0.99,
+          0.93,
+          0.86
+        ],
+        "weather": 1.0,
+        "scars": [
+          {
+            "from": [
+              0.02,
+              0.04,
+              0.045
+            ],
+            "to": [
+              0.055,
+              0.0,
+              0.005
+            ]
+          }
+        ]
+      },
+      "eyes": [
+        0.3,
+        0.36,
+        0.42
+      ],
+      "hair": {
+        "style": "knot",
+        "colour": "5a4634",
+        "grey": 0.35
+      },
+      "beard": {
+        "style": "long",
+        "colour": "5a4634",
+        "grey": 0.4,
+        "moustache": true
+      },
+      "clothing": {
+        "trousers": {
+          "colour": "2e2620",
+          "weave": "herringbone",
+          "threads": 72
+        },
+        "shoes": {
+          "colour": "3a2618"
+        },
+        "leg_wraps": {
+          "colour": "6c6a62",
+          "weave": "herringbone",
+          "threads": 50
+        },
+        "tunic": {
+          "colour": "3a4a33",
+          "weave": "herringbone",
+          "threads": 80,
+          "sleeve": 1.0,
+          "hem": 0.66,
+          "trim": "a39477",
+          "trim_accent": "2e2620"
+        },
+        "belt": {
+          "colour": "2e2014",
+          "buckle": "iron"
+        },
+        "pelt": {
+          "colour": "5e5850",
+          "tip": "c8c0b0",
+          "hem": 1.14
+        }
+      },
+      "loadout": {
+        "R": "forest_sword_q2",
+        "L": "forest_round_q2b",
+        "belt": "forest_scabbard_q2"
+      },
+      "alt_loadouts": [],
+      "choices": {
+        "single_edged_sword": [
+          "plausible",
+          "single-edged swords in Przeworsk graves [Q]"
+        ],
+        "wolf_grey_pelt": [
+          "attested",
+          "skins (Caesar BG 6.21 [Q])"
+        ],
+        "long_beard": [
+          "design",
+          "age and status"
+        ]
+      },
+      "troop_ids": [
+        "germanic_retainer"
+      ]
+    },
+    {
+      "id": "river_retinue",
+      "group": "river_kin",
+      "family": "retinue",
+      "seed": 109,
+      "status": {
+        "wealth": 3,
+        "trade": 3,
+        "craft": 2,
+        "experience": 3
+      },
+      "body": "broad",
+      "face": {
+        "jaw_width": 0.06,
+        "chin_forward": 0.006,
+        "brow_ridge": 0.002,
+        "nose_bridge": 0.007,
+        "nose_length": 0.003,
+        "cheekbones": 0.004,
+        "lips": 0.001
+      },
+      "skin": {
+        "tone": [
+          1.02,
+          0.97,
+          0.92
+        ],
+        "weather": 0.3,
+        "freckles": 0.15
+      },
+      "eyes": [
+        0.22,
+        0.36,
+        0.52
+      ],
+      "hair": {
+        "style": "long",
+        "colour": "b08a52",
+        "hem": 1.42
+      },
+      "beard": {
+        "style": "short",
+        "colour": "a07a46",
+        "moustache": true
+      },
+      "clothing": {
+        "trousers": {
+          "colour": "8a3324",
+          "weave": "twill",
+          "threads": 90,
+          "check": {
+            "colour": "2f4a6e",
+            "band": 2,
+            "period": 12
+          }
+        },
+        "shoes": {
+          "colour": "3e2818"
+        },
+        "tunic": {
+          "colour": "c4b89a",
+          "weave": "twill",
+          "threads": 100,
+          "sleeve": 1.0,
+          "hem": 0.7,
+          "trim": "8a3324",
+          "trim_accent": "a77d34"
+        },
+        "mail": {
+          "hem": 0.84
+        },
+        "belt": {
+          "colour": "3d2818",
+          "buckle": "bronze"
+        },
+        "cloak": {
+          "colour": "8a3324",
+          "weave": "twill",
+          "threads": 80,
+          "check": {
+            "colour": "a77d34",
+            "band": 2,
+            "period": 16
+          },
+          "hem": 0.88,
+          "brooch": "bronze"
+        },
+        "arm_rings": {
+          "metal": "bronze",
+          "sides": [
+            "R"
+          ]
+        }
+      },
+      "loadout": {
+        "R": "river_sword_q3",
+        "L": "river_oval_q3",
+        "belt": "river_scabbard_q3"
+      },
+      "alt_loadouts": [
+        {
+          "R": "river_framea_q3",
+          "L": "river_oval_q3",
+          "belt": "river_scabbard_q3"
+        }
+      ],
+      "choices": {
+        "mail_shirt": [
+          "plausible",
+          "mail is rare (Tac. Germ. 6 [Q]); a few mail shirts in earlier and later finds [Q]; shown only on one retinue figure"
+        ],
+        "arm_ring": [
+          "plausible",
+          "rings as gifts of a leader (Tac. Germ. 13-15 [Q], later)"
+        ],
+        "checked_trousers": [
+          "design",
+          "wealth shown in dyed checks"
+        ],
+        "no_helmet": [
+          "attested",
+          "helmets almost absent (Tac. Germ. 6 [Q])"
+        ]
+      },
+      "troop_ids": [
+        "germanic_noble",
+        "germanic_retainer"
+      ]
+    },
+    {
+      "id": "forest_retinue",
+      "group": "forest_kin",
+      "family": "retinue",
+      "seed": 110,
+      "status": {
+        "wealth": 2,
+        "trade": 1,
+        "craft": 3,
+        "experience": 3
+      },
+      "body": "athletic",
+      "face": {
+        "jaw_width": 0.07,
+        "chin_forward": 0.003,
+        "brow_ridge": 0.004,
+        "nose_bridge": 0.003,
+        "cheekbones": 0.005,
+        "eye_depth": 0.002,
+        "cranium": -0.003
+      },
+      "skin": {
+        "tone": [
+          1.0,
+          0.95,
+          0.9
+        ],
+        "weather": 0.6
+      },
+      "eyes": [
+        0.3,
+        0.44,
+        0.48
+      ],
+      "hair": {
+        "style": "knot",
+        "colour": "3e2c1e"
+      },
+      "beard": {
+        "style": "full",
+        "colour": "3e2c1e",
+        "moustache": true
+      },
+      "clothing": {
+        "trousers": {
+          "colour": "2e2620",
+          "weave": "twill",
+          "threads": 80
+        },
+        "shoes": {
+          "colour": "2e1e12"
+        },
+        "leg_wraps": {
+          "colour": "3a4a33",
+          "weave": "herringbone",
+          "threads": 60
+        },
+        "tunic": {
+          "colour": "3a4a33",
+          "weave": "twill",
+          "threads": 96,
+          "sleeve": 1.0,
+          "hem": 0.7,
+          "trim": "c9a85a",
+          "trim_accent": "2e2620"
+        },
+        "belt": {
+          "colour": "2e1e12",
+          "buckle": "bronze"
+        },
+        "cloak": {
+          "colour": "2e2620",
+          "weave": "herringbone",
+          "threads": 80,
+          "hem": 0.9,
+          "brooch": "bronze"
+        },
+        "pelt": {
+          "colour": "6a5030",
+          "tip": "c09a64",
+          "hem": 1.3,
+          "thickness": 0.014
+        },
+        "arm_rings": {
+          "metal": "bronze",
+          "sides": [
+            "R",
+            "L"
+          ]
+        }
+      },
+      "loadout": {
+        "R": "forest_framea_q3",
+        "L": "forest_round_q3",
+        "belt": "forest_scabbard_q3"
+      },
+      "alt_loadouts": [
+        {
+          "R": "forest_sword_q3",
+          "L": "forest_round_q3",
+          "belt": "forest_scabbard_q3"
+        }
+      ],
+      "choices": {
+        "framea_as_gift": [
+          "plausible",
+          "the leader gives the framea (Tac. Germ. 14 [Q], later)"
+        ],
+        "fur_collar_over_cloak": [
+          "design",
+          "status layering"
+        ],
+        "studded_boss": [
+          "plausible",
+          "decorated bosses in rich graves [Q]"
+        ]
+      },
+      "troop_ids": [
+        "germanic_noble",
+        "germanic_retainer"
+      ]
+    }
+  ],
+  "equipment": [
+    {
+      "id": "javelin_r_q1",
+      "kind": "javelins",
+      "quality": 1,
+      "hand": "R",
+      "length": 1.55,
+      "grip": 0.62
+    },
+    {
+      "id": "javelins_l_q1",
+      "kind": "javelins",
+      "quality": 1,
+      "hand": "L",
+      "length": 1.55,
+      "grip": 0.66,
+      "offsets": [
+        [
+          0,
+          0.0,
+          0
+        ],
+        [
+          0,
+          0.022,
+          0.015
+        ],
+        [
+          0.018,
+          0.012,
+          -0.01
+        ]
+      ]
+    },
+    {
+      "id": "javelins_l_pair_q1",
+      "kind": "javelins",
+      "quality": 1,
+      "hand": "L",
+      "length": 1.5,
+      "grip": 0.6,
+      "offsets": [
+        [
+          0.0,
+          0.012,
+          0
+        ],
+        [
+          0.016,
+          0.02,
+          0.012
+        ]
+      ]
+    },
+    {
+      "id": "forest_javelin_r_q0",
+      "kind": "javelins",
+      "quality": 0,
+      "hand": "R",
+      "length": 1.62,
+      "grip": 0.64
+    },
+    {
+      "id": "forest_javelins_l_q0",
+      "kind": "javelins",
+      "quality": 0,
+      "hand": "L",
+      "length": 1.62,
+      "grip": 0.68,
+      "offsets": [
+        [
+          0,
+          0.0,
+          0
+        ],
+        [
+          0,
+          0.022,
+          0.015
+        ],
+        [
+          0.018,
+          0.012,
+          -0.01
+        ]
+      ]
+    },
+    {
+      "id": "river_buckler_q1",
+      "kind": "shield",
+      "quality": 1,
+      "hand": "L",
+      "shape": "round",
+      "width": 0.5,
+      "height": 0.5,
+      "boss": "wood",
+      "rim": "rawhide",
+      "group": "river_kin",
+      "paint": "a77d34",
+      "accent": "5b4632",
+      "motif": "halves",
+      "wear": 0.55,
+      "planks": 4,
+      "seed": 911
+    },
+    {
+      "id": "river_spear_q1",
+      "kind": "spear",
+      "quality": 1,
+      "hand": "R",
+      "length": 2.1,
+      "grip": 0.9,
+      "head": 0.16,
+      "width": 0.028
+    },
+    {
+      "id": "river_board_q1",
+      "kind": "shield",
+      "quality": 1,
+      "hand": "L",
+      "shape": "rect",
+      "width": 0.5,
+      "height": 0.82,
+      "boss": "wood",
+      "rim": "rawhide",
+      "spine": true,
+      "group": "river_kin",
+      "paint": "c9bea4",
+      "accent": "8c2f22",
+      "motif": "bands",
+      "wear": 0.6,
+      "planks": 4,
+      "seed": 912
+    },
+    {
+      "id": "levy_club_q0",
+      "kind": "club",
+      "quality": 0,
+      "hand": "R"
+    },
+    {
+      "id": "forest_stake_q0",
+      "kind": "spear",
+      "quality": 0,
+      "hand": "R",
+      "length": 2.0,
+      "grip": 0.86,
+      "stake": true
+    },
+    {
+      "id": "forest_board_q1",
+      "kind": "shield",
+      "quality": 1,
+      "hand": "L",
+      "shape": "round",
+      "width": 0.58,
+      "height": 0.58,
+      "boss": "wood",
+      "rim": "rawhide",
+      "group": "forest_kin",
+      "paint": null,
+      "accent": "d8d0bc",
+      "motif": "plain",
+      "wear": 0.5,
+      "planks": 5,
+      "seed": 913
+    },
+    {
+      "id": "levy_axe_q1",
+      "kind": "axe",
+      "quality": 1,
+      "hand": "R",
+      "haft": 0.62
+    },
+    {
+      "id": "river_framea_q2",
+      "kind": "spear",
+      "quality": 2,
+      "hand": "R",
+      "length": 2.3,
+      "grip": 0.92,
+      "head": 0.19,
+      "width": 0.026
+    },
+    {
+      "id": "river_oval_q2",
+      "kind": "shield",
+      "quality": 2,
+      "hand": "L",
+      "shape": "oval",
+      "width": 0.56,
+      "height": 0.86,
+      "boss": "iron",
+      "rim": "rawhide",
+      "group": "river_kin",
+      "wear": 0.35,
+      "planks": 5,
+      "seed": 914
+    },
+    {
+      "id": "forest_framea_q2",
+      "kind": "spear",
+      "quality": 2,
+      "hand": "R",
+      "length": 2.3,
+      "grip": 0.92,
+      "head": 0.18,
+      "width": 0.024
+    },
+    {
+      "id": "forest_round_q2",
+      "kind": "shield",
+      "quality": 2,
+      "hand": "L",
+      "shape": "round",
+      "width": 0.66,
+      "height": 0.66,
+      "boss": "iron",
+      "rim": "rawhide",
+      "group": "forest_kin",
+      "wear": 0.4,
+      "planks": 5,
+      "seed": 915
+    },
+    {
+      "id": "river_sword_q2",
+      "kind": "sword",
+      "quality": 2,
+      "hand": "R",
+      "blade": 0.74,
+      "width": 0.046
+    },
+    {
+      "id": "river_scabbard_q2",
+      "kind": "scabbard",
+      "quality": 2,
+      "hand": "belt",
+      "blade": 0.74
+    },
+    {
+      "id": "river_oval_q2b",
+      "kind": "shield",
+      "quality": 2,
+      "hand": "L",
+      "shape": "oval",
+      "width": 0.56,
+      "height": 0.86,
+      "boss": "iron",
+      "rim": "rawhide",
+      "group": "river_kin",
+      "paint": "2f4a6e",
+      "accent": "e6dcc2",
+      "motif": "triskele",
+      "wear": 0.3,
+      "planks": 5,
+      "seed": 916
+    },
+    {
+      "id": "forest_sword_q2",
+      "kind": "sword",
+      "quality": 2,
+      "hand": "R",
+      "blade": 0.62,
+      "width": 0.042,
+      "single_edged": true,
+      "hilt": "bone"
+    },
+    {
+      "id": "forest_scabbard_q2",
+      "kind": "scabbard",
+      "quality": 2,
+      "hand": "belt",
+      "blade": 0.62
+    },
+    {
+      "id": "forest_round_q2b",
+      "kind": "shield",
+      "quality": 2,
+      "hand": "L",
+      "shape": "round",
+      "width": 0.64,
+      "height": 0.64,
+      "boss": "iron",
+      "rim": "rawhide",
+      "group": "forest_kin",
+      "motif": "bands",
+      "wear": 0.45,
+      "planks": 6,
+      "seed": 917
+    },
+    {
+      "id": "river_sword_q3",
+      "kind": "sword",
+      "quality": 3,
+      "hand": "R",
+      "blade": 0.76,
+      "width": 0.048,
+      "hilt": "bone"
+    },
+    {
+      "id": "river_scabbard_q3",
+      "kind": "scabbard",
+      "quality": 3,
+      "hand": "belt",
+      "blade": 0.76
+    },
+    {
+      "id": "river_oval_q3",
+      "kind": "shield",
+      "quality": 3,
+      "hand": "L",
+      "shape": "oval",
+      "width": 0.6,
+      "height": 0.92,
+      "boss": "iron",
+      "rim": "iron",
+      "group": "river_kin",
+      "paint": "8c2f22",
+      "accent": "d9b25a",
+      "motif": "wheel",
+      "wear": 0.2,
+      "planks": 6,
+      "seed": 918
+    },
+    {
+      "id": "river_framea_q3",
+      "kind": "spear",
+      "quality": 3,
+      "hand": "R",
+      "length": 2.4,
+      "grip": 0.95,
+      "head": 0.22,
+      "width": 0.028
+    },
+    {
+      "id": "forest_framea_q3",
+      "kind": "spear",
+      "quality": 3,
+      "hand": "R",
+      "length": 2.4,
+      "grip": 0.95,
+      "head": 0.21,
+      "width": 0.026
+    },
+    {
+      "id": "forest_round_q3",
+      "kind": "shield",
+      "quality": 3,
+      "hand": "L",
+      "shape": "round",
+      "width": 0.7,
+      "height": 0.7,
+      "boss": "iron",
+      "rim": "rawhide",
+      "group": "forest_kin",
+      "paint": "2a2c28",
+      "accent": "c9a85a",
+      "motif": "dots",
+      "wear": 0.25,
+      "planks": 6,
+      "seed": 919
+    },
+    {
+      "id": "forest_sword_q3",
+      "kind": "sword",
+      "quality": 3,
+      "hand": "R",
+      "blade": 0.66,
+      "width": 0.044,
+      "single_edged": true,
+      "hilt": "bone"
+    },
+    {
+      "id": "forest_scabbard_q3",
+      "kind": "scabbard",
+      "quality": 3,
+      "hand": "belt",
+      "blade": 0.66
+    }
+  ],
+  "lod": {
+    "levels": [
+      {
+        "lod": 0,
+        "max_triangles": 22000,
+        "texture_edge": 1024,
+        "face_morphs": true
+      },
+      {
+        "lod": 1,
+        "max_triangles": 7600,
+        "texture_edge": 512,
+        "face_morphs": true
+      },
+      {
+        "lod": 2,
+        "max_triangles": 2400,
+        "texture_edge": 256,
+        "face_morphs": false
+      },
+      {
+        "lod": 3,
+        "max_triangles": 900,
+        "texture_edge": 128,
+        "face_morphs": false
+      }
+    ],
+    "profiles": {
+      "low": {
+        "animated_actors": 24,
+        "lod0_max_actors": 2,
+        "lod1_max_actors": 4,
+        "lod2_max_actors": 14,
+        "visible_primitives": 160000
+      },
+      "balanced": {
+        "animated_actors": 40,
+        "lod0_max_actors": 4,
+        "lod1_max_actors": 12,
+        "lod2_max_actors": 24,
+        "visible_primitives": 320000
+      },
+      "high": {
+        "animated_actors": 64,
+        "lod0_max_actors": 8,
+        "lod1_max_actors": 20,
+        "lod2_max_actors": 36,
+        "visible_primitives": 700000
+      },
+      "very_high": {
+        "animated_actors": 90,
+        "lod0_max_actors": 12,
+        "lod1_max_actors": 30,
+        "lod2_max_actors": 48,
+        "visible_primitives": 1100000
+      }
+    },
+    "note": "Tiers match the existing frontier exports (19-20k / 7.6k / 2.4k / 0.85k). Animated actor counts per profile follow prototype/assets/quality_profiles.json; actors beyond the LOD 0-2 counts use LOD 3. Shares are review targets, not measured Fold7 results.",
+    "rules": {
+      "lod0_share_max": 0.3,
+      "all_actors_share_max": 0.75
+    }
+  },
+  "troop_catalog": {
+    "source": "prototype/assets/troops/troops.json on feat/troops-command-core-20261126 (PR #100)",
+    "note": "troop_ids name the catalogue entries a figure can present; equipment quality stays within the catalogue's q_min..q_max where both define it."
+  }
+}
