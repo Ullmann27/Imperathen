@@ -82,9 +82,12 @@ func update(eye: Vector3, forward: Vector2, half_fov_deg: float, complete := fal
 		var cell: Dictionary = _cells[key]
 		if not cell.has("node"):
 			continue
-		var node: MultiMeshInstance3D = cell.node
+		var node: GeometryInstance3D = cell.node
 		if not wanted.has(key):
 			node.visible = false
+			if Safe.active() and absi(key.x-centre.x)+absi(key.y-centre.y) > reach+2:
+				(node as MeshInstance3D).mesh = null
+				cell.render_count = 0
 			continue
 		var d: float = wanted[key]
 		var middle := (Vector2(key) + Vector2(.5, .5)) * CELL
@@ -95,14 +98,32 @@ func update(eye: Vector3, forward: Vector2, half_fov_deg: float, complete := fal
 			if absf(rad_to_deg(forward.angle_to(offset))) > half_fov_deg + spread:
 				node.visible = false
 				continue
-		node.visible = true
 		var lod := "near" if d < near_m else "far"
-		if cell.lod != lod:
-			node.multimesh.mesh = Library.grass_mesh("grass_tuft_" + lod)
-			cell.lod = lod
 		var share := lerpf(1.0, far_share, smoothstep(end_m * .45, end_m * .9, d))
+		# Quantize only the CPU path so small camera movements cannot rebuild
+		# a whole grass cell every frame. Geometry, positions and density stay.
+		if Safe.active():
+			share = clampf(roundf(share * 8.0) / 8.0, far_share, 1.0)
 		var count := ceili(int(cell.count) * share)
-		node.multimesh.visible_instance_count = count
+		if Safe.active():
+			var baked := node as MeshInstance3D
+			if count <= 0:
+				node.hide()
+				continue
+			if cell.lod != lod or int(cell.render_count) != count or baked.mesh == null:
+				baked.mesh = Safe.merge_cards(Library.grass_mesh("grass_tuft_" + lod),cell.buffer,count,cell.centre,false)
+				cell.render_count = count if baked.mesh != null else 0
+				cell.lod = lod
+			if baked.mesh == null:
+				node.hide()
+				continue
+		else:
+			var batch := node as MultiMeshInstance3D
+			if cell.lod != lod:
+				batch.multimesh.mesh = Library.grass_mesh("grass_tuft_" + lod)
+				cell.lod = lod
+			batch.multimesh.visible_instance_count = count
+		node.show()
 		_visible.cells += 1
 		_visible.instances += count
 		_visible.triangles += count * int(_triangles[lod])
@@ -208,17 +229,23 @@ func _build(key: Vector2i) -> Dictionary:
 	var bounds := AABB(Vector3(origin.x-1.0,low-.3,origin.y-1.0),Vector3(CELL+2.0,high-low+1.8,CELL+2.0))
 	var multimesh: MultiMesh
 	if Safe.active():
-		multimesh = Safe.new_multimesh(Library.grass_mesh("grass_tuft_far"),count,bounds)
-		if not Safe.upload(multimesh,shuffled,count):
-			return {}
-	else:
-		multimesh = MultiMesh.new()
-		multimesh.transform_format = MultiMesh.TRANSFORM_3D
-		multimesh.use_custom_data = true
-		multimesh.mesh = Library.grass_mesh("grass_tuft_far")
-		multimesh.instance_count = count
-		multimesh.buffer = shuffled
-		multimesh.custom_aabb = bounds
+		# The physical Fold7 still drew detached tufts after the transform-only
+		# MultiMesh fix. Bypass GPU instancing for grass entirely.
+		var centre := Vector3(origin.x+CELL*.5,(low+high)*.5,origin.y+CELL*.5)
+		var baked := MeshInstance3D.new()
+		baked.name = "GrassCPU_%d_%d" % [key.x,key.y]
+		baked.position = centre
+		baked.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		baked.hide()
+		add_child(baked)
+		return {"node":baked,"count":count,"lod":"","render_count":0,"buffer":shuffled,"centre":centre}
+	multimesh = MultiMesh.new()
+	multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	multimesh.use_custom_data = true
+	multimesh.mesh = Library.grass_mesh("grass_tuft_far")
+	multimesh.instance_count = count
+	multimesh.buffer = shuffled
+	multimesh.custom_aabb = bounds
 	var node := MultiMeshInstance3D.new()
 	node.name = "Grass_%d_%d" % [key.x, key.y]
 	node.multimesh = multimesh

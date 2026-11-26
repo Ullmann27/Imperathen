@@ -71,6 +71,7 @@ var _posed := false
 var _blade: MeshInstance3D
 var _face := FacialMotion.new()
 var _motion := CharacterMotion.new()
+var _carrying_jug := false
 var _hands := HandPose.new()
 var _turn_rate := 0.0
 var _combat_id := ""
@@ -876,10 +877,30 @@ func _playback_animation(name_in_file: String, looping: bool) -> Animation:
 	return animation
 
 
+func set_jug_carry(enabled: bool) -> void:
+	if _carrying_jug == enabled:
+		return
+	_carrying_jug = enabled
+	if not _combat_id.is_empty() or _service_external:
+		return
+	# Resample once so release also removes the last held arm pose.
+	if animator and animator.has_animation(clip):
+		animator.seek(clampf(phase,0.0,1.0)*animator.current_animation_length,true)
+		animator.advance(0.0)
+	_apply_motion()
+
+
+func _apply_jug_carry() -> void:
+	if _carrying_jug and role == "player" and clip in ["idle","march","run","talk"] and _combat_id.is_empty() and not _service_external:
+		_motion.carry_left()
+		_hands.set_grip(.65)
+
+
 func _apply_motion(review: bool = false) -> void:
 	if active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"):
 		# Preserve the fitted adolescent rig's authored limb and sword clips.
 		_motion.blend_transition()
+		_apply_jug_carry()
 		return
 	if clip in ["attack","train","block"] and _can_armed_style(_armed_style):
 		if _has_meshy_axe() and _armed_style in CharacterMotion.ARMED_ATTACKS:
@@ -902,6 +923,7 @@ func _apply_motion(review: bool = false) -> void:
 	else:
 		_hands.set_grip(0.18)
 	_motion.blend_transition()
+	_apply_jug_carry()
 
 
 func _apply_imported_axe_pose() -> void:

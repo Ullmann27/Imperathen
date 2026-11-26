@@ -92,7 +92,7 @@ static func copy_uncompressed(source: Mesh) -> ArrayMesh:
 	return mesh
 
 
-static func merge_cards(source: Mesh, data: PackedFloat32Array, count: int, centre: Vector3) -> ArrayMesh:
+static func merge_cards(source: Mesh, data: PackedFloat32Array, count: int, centre: Vector3, atlas := true) -> ArrayMesh:
 	# The herb atlas requires per-clump tile and colour. Bake these into UV2
 	# and geometry on the CPU, rather than using INSTANCE_CUSTOM.
 	# Each chunk has only one material/draw submission and local coordinates.
@@ -107,10 +107,10 @@ static func merge_cards(source: Mesh, data: PackedFloat32Array, count: int, cent
 	var points: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
 	var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
 	var colors: PackedColorArray = arrays[Mesh.ARRAY_COLOR]
-	var uvs: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV]
+	var uvs: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV] if arrays[Mesh.ARRAY_TEX_UV] != null else PackedVector2Array()
 	var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
 	var n := points.size()
-	if n == 0 or normals.size() != n or colors.size() != n or uvs.size() != n:
+	if n == 0 or normals.size() != n or colors.size() != n or (atlas and uvs.size() != n):
 		push_error("VEGETATION_SAFE_INVALID_CARDS: incomplete mesh attributes")
 		return null
 	if indices.is_empty():
@@ -134,7 +134,7 @@ static func merge_cards(source: Mesh, data: PackedFloat32Array, count: int, cent
 		var normal_basis := t.basis.inverse().transposed()
 		var tile := records[i*STRIDE+12]
 		var variation := records[i*STRIDE+14]
-		if not is_finite(tile) or not is_finite(variation) or tile < 0.0 or tile > .9375:
+		if atlas and (not is_finite(tile) or not is_finite(variation) or tile < 0.0 or tile > .9375):
 			push_error("VEGETATION_SAFE_INVALID_CARDS: atlas data outside bounds")
 			return null
 		for j in n:
@@ -144,8 +144,8 @@ static func merge_cards(source: Mesh, data: PackedFloat32Array, count: int, cent
 			# UV2 carries exact atlas indices independently of any vertex
 			# colour quantization or gamma conversion in the renderer.
 			cs[dst] = colors[j]
-			tex[dst] = uvs[j]
-			atlas_data[dst] = Vector2(tile,clampf(variation,0.0,1.0))
+			tex[dst] = uvs[j] if uvs.size() == n else Vector2.ZERO
+			atlas_data[dst] = Vector2(tile,clampf(variation,0.0,1.0)) if atlas else Vector2.ZERO
 		for j in indices.size():
 			ids[i*indices.size()+j] = i*n+indices[j]
 	var result_arrays := []
@@ -154,7 +154,8 @@ static func merge_cards(source: Mesh, data: PackedFloat32Array, count: int, cent
 	result_arrays[Mesh.ARRAY_NORMAL] = ns
 	result_arrays[Mesh.ARRAY_COLOR] = cs
 	result_arrays[Mesh.ARRAY_TEX_UV] = tex
-	result_arrays[Mesh.ARRAY_TEX_UV2] = atlas_data
+	if atlas:
+		result_arrays[Mesh.ARRAY_TEX_UV2] = atlas_data
 	result_arrays[Mesh.ARRAY_INDEX] = ids
 	var result := ArrayMesh.new()
 	result.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,result_arrays,[],{},0)

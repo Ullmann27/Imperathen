@@ -4,6 +4,7 @@ extends SceneTree
 
 const Follow := preload("res://scripts/story/companion_follow.gd")
 const Person := preload("res://scripts/visuals/village_person.gd")
+const MarcusModel := preload("res://scripts/visuals/marcus_model.gd")
 const Measurement := preload("res://tests/motion_world_measurement.gd")
 var checks := 0
 var failures: Array[String] = []
@@ -108,7 +109,8 @@ func _turn_and_retarget(hz: int, sign: float) -> void:
 		if alignment > 0.999:
 			aligned_speed = maxf(aligned_speed, speed)
 	var label := "%d Hz, turn %+.0f: " % [hz, sign]
-	_check(figure.active_model_path == "res://assets/village_characters/villager_0.glb", label + "uses the actual Marcus model")
+	var expected := MarcusModel.PATH % 0 if MarcusModel.installed() else "res://assets/village_characters/villager_0.glb"
+	_check(figure.active_model_path == expected and figure.identity == "marcus", label + "uses the actual installed Marcus model, not the player rig")
 	_check(backwards_samples > 0, label + "observes a destination behind the body")
 	_check(backward_speed <= 0.001, label + "a rearward destination turns on the spot before forward travel")
 	_check(backwards_running == 0, label + "the actual pose driver leaves running for the grounded turn")

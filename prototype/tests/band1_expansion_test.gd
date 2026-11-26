@@ -6,6 +6,10 @@ extends SceneTree
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const I03Support = preload("res://tests/i03_support.gd")
+const I01 = preload("res://scripts/story/i01_three_cups.gd")
+const I03 = preload("res://scripts/story/i03_shortcut.gd")
+const I04 = preload("res://scripts/story/i04_workshop.gd")
+const Investigation = preload("res://scripts/story/raid_investigation.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 var checks := 0
 var failures: Array[String] = []
@@ -65,9 +69,9 @@ func _test_i07_water_and_migration() -> void:
 		return
 	_check(not documents.held(resumed.data).has("watch_shield") and not documents.held(resumed.data).has("watch_helmet"),"Both loaned objects leave on return")
 	# Screenplay v2 saves (written before this round) migrate without retroactive completion.
-	_check(_migrated(before_water).i07_water == "locked", "v2 save before the gear: water locked")
-	_check(_migrated(at_water).i07_water == "pending", "v2 save standing at the watch post gets the water task")
-	_check(_migrated(past_post).i07_water == "legacy", "v2 save past the watch post keeps water as legacy, not as done work")
+	_check(_migrated(before_water).get("i07_water","") == "locked", "v2 save before the gear: water locked")
+	_check(_migrated(at_water).get("i07_water","") == "pending", "v2 save standing at the watch post gets the water task")
+	_check(_migrated(past_post).get("i07_water","") == "legacy", "v2 save past the watch post keeps water as legacy, not as done work")
 	var migrated_now := _load(_as_v2(at_water))
 	_check(migrated_now.ok and _current_data(migrated_now.state) == "i07_water_fetch", "Migrated v2 save continues with the water task")
 	var forged: Dictionary = before_water.duplicate(true)
@@ -82,7 +86,12 @@ func _test_i07_water_and_migration() -> void:
 func _as_v2(state: Dictionary) -> Dictionary:
 	var old: Dictionary = state.duplicate(true)
 	var screenplay: Dictionary = old.village.childhood.screenplay
-	for key: String in ["i07_water"]:
+	# A real v2 envelope predates every one of these additions, not just I-07.
+	var new_keys: Array = ["i07_water","investigation"]
+	new_keys.append_array(I01.KEYS)
+	new_keys.append_array(I03.KEYS)
+	new_keys.append_array(I04.KEYS)
+	for key: String in new_keys:
 		screenplay.erase(key)
 	screenplay.version = 2
 	return old
@@ -91,7 +100,10 @@ func _as_v2(state: Dictionary) -> Dictionary:
 func _migrated(state: Dictionary) -> Dictionary:
 	var result := _load(_as_v2(state))
 	_check(result.ok, "v2 save loads: " + str(result.get("message", "")))
-	return result.get("state", {}).get("village", {}).get("childhood", {}).get("screenplay", {})
+	var script: Dictionary = result.get("state", {}).get("village", {}).get("childhood", {}).get("screenplay", {})
+	if result.ok:
+		_check(script.get("investigation",{}) == Investigation.fresh_state(),"Migration does not fabricate investigation progress")
+	return script
 
 
 func _load(state: Dictionary) -> Dictionary:

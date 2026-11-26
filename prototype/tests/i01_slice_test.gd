@@ -20,6 +20,7 @@ func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(directory))
 	_test_fresh_start_t01()
 	_test_help_path()
+	_test_early_water_recovery()
 	_test_refused_help()
 	_test_yard_contact_and_absent_marcus()
 	_test_save_at_table()
@@ -133,6 +134,36 @@ func _test_help_path() -> void:
 	var hook := I01.hook_lines(model.data, "woodcutter_request")
 	_check(hook.size() == 1 and hook[0].contains("Werkstatt"), "Workshop topic creates the authored I-04 hook")
 	_check(model._validate_state(model.data).is_empty(), "Completed help path validates")
+
+
+func _test_early_water_recovery() -> void:
+	var model = _new()
+	_check(_act(model,"i01_help").ok,"Help choice opens the shelf objective")
+	_at(model,I01.POINTS.well)
+	var before := JSON.stringify(model.data)
+	_check(not _act(model,"i01_well").ok and JSON.stringify(model.data)==before,"Fetching before the cups are placed cannot create a new deadlock")
+	# Exact valid state permitted by the previous build. No reward or story
+	# completion is invented by the migration/recovery fixture.
+	_sp(model).i01_water = "jug"
+	_sp(model).i01_events.append("I-01.water.well")
+	_check(model._validate_state(model.data).is_empty(),"The previously stranded save remains loadable")
+	_check(_stage(model)=="i01_park_jug","Stranded save exposes a reachable jug placement objective")
+	_check(not _act(model,"i01_park_jug").ok,"The jug cannot be set on a distant table")
+	_at(model,I01.POINTS.player_table)
+	_check(_act(model,"i01_park_jug").ok and I01.presentation(model.data).jug=="table","Filled jug is placed on the table, hands released")
+	_check(not _act(model,"i01_park_jug").ok,"Placement cannot be repeated")
+	_at(model,I01.POINTS.home_shelf)
+	_check(_act(model,"i01_take_cups").ok,"Both hands are now available for the cups")
+	_at(model,I01.POINTS.player_table)
+	for owner: String in I01.CUPS:
+		_check(_act(model,"i01_place_"+owner).ok,"Recovered save places cup "+owner)
+	_check(_stage(model)=="i01_pour" and _act(model,"i01_pour").ok,"Water from the parked jug can fill the actual cups")
+	_check(_sp(model).i01_water=="poured" and I01.presentation(model.data).jug=="table","Filled cups leave the jug on the table")
+	_check(model._validate_state(model.data).is_empty(),"Recovered ledger remains valid after pouring")
+	var save_path := _path("recovered_early_water")
+	_check(model.save_game(save_path).ok,"Recovered state is saved")
+	var restored = WorldModel.new()
+	_check(restored.load_game(save_path).ok and I01.presentation(restored.data).jug=="table","Reload never reattaches the released jug")
 
 
 func _test_refused_help() -> void:

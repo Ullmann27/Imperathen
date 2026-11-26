@@ -1,8 +1,8 @@
 extends Node3D
 ## I-01 props: the three named family cups and the family jug. Presentation
 ## only – every position is derived from the saved I-01 state (shelf, hand,
-## table) and never changes it. Carrying is a greybox: the cups and the jug
-## follow the boy's Hand_R/Hand_L bones; there is no authored carry clip yet.
+## table) and never changes it. The jug follows the live wrist with a
+## bounded procedural pickup/pour/setdown transition; saves settle directly.
 
 const Objects := preload("res://scripts/story/mission_documents.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
@@ -32,6 +32,24 @@ var _bench_jug: Node3D
 var _carrier: Node3D
 var _held_cups: Array[String] = []
 var _holding_jug := false
+var _jug_mode := ""
+var _jug_pending := ""
+var _jug_action := ""
+var _jug_clock := 0.0
+var _jug_duration := .32
+var _jug_from := Transform3D.IDENTITY
+var _jug_goal := Transform3D.IDENTITY
+
+func begin_jug_action(action: String) -> void:
+	if action in ["i01_well","i01_park_jug","i01_pour","fill_water","father_morning","i07_water_fetch","i07_water_bring"]:
+		_jug_pending = action
+
+func jug_in_hand() -> bool:
+	return visible and _holding_jug
+
+func jug_animating() -> bool:
+	return not _jug_action.is_empty()
+
 
 
 func _init() -> void:
@@ -88,6 +106,8 @@ func _build() -> void:
 ## Called from GameWorld.sync_state with the authoritative state.
 func sync_state(state: Dictionary, figure: Node3D) -> void:
 	_build()
+	var prior := _jug.global_transform
+	var prior_visible := _jug.visible
 	var enabled: bool = state.get("village", {}).has("childhood")
 	visible = enabled
 	_find_bench_jug()
@@ -95,6 +115,10 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 	_held_cups.clear()
 	_holding_jug = false
 	if not enabled:
+		_jug_action = ""
+		_jug_pending = ""
+		_jug_mode = ""
+		_jug.hide()
 		set_process(false)
 		if is_instance_valid(_bench_jug):
 			_bench_jug.visible = true
@@ -112,16 +136,57 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 		else:
 			_place(cup, world_point(SHELF_ORIGIN + SHELF_SLOTS[owner]), Basis.IDENTITY)
 		_water[owner].visible = filled and where == "table"
-	match str(view.jug):
-		"hand":
-			_holding_jug = true
-		"table":
-			_place(_jug, world_point(JUG_TABLE), Basis.IDENTITY)
-		"away":
-			_jug.visible = false
-		_:
-			_place(_jug, world_point(JUG_BENCH), Basis.IDENTITY)
-	var carrying := not _held_cups.is_empty() or _holding_jug
+	var next_mode := str(view.jug)
+	# The same family vessel also supplies the later supervised gate watch.
+	# Do not inject a second inventory item or keep the I-01 carry flag alive.
+	var child: Dictionary = state.village.childhood
+	var watch_water := str(child.screenplay.get("i07_water","locked"))
+	if watch_water == "carry":
+		next_mode = "hand"
+	elif watch_water == "complete" and child.get("gear","") == "loaned":
+		next_mode = "gate"
+	if next_mode != _jug_mode and _jug_pending.is_empty():
+		_jug_action = ""
+	_jug_mode = next_mode
+	_holding_jug = next_mode == "hand"
+	if _holding_jug:
+		_ensure_hands()
+		if _left_bone >= 0:
+			_jug_goal = _hand_transform(_left_bone,_left_rest,JUG_HAND,1.0)
+	elif next_mode == "away":
+		_jug_goal = prior
+		if _jug_pending == "father_morning" and is_instance_valid(_carrier):
+			_jug_goal.origin += -_carrier.global_basis.z.normalized()*.15
+	elif next_mode == "gate":
+		# Next to, rather than in the middle of, the authored gate route.
+		_jug_goal = global_transform*Transform3D(Basis.IDENTITY,Vector3(1.0,.04,-46.0))
+	else:
+		var destination := JUG_TABLE if next_mode == "table" else JUG_BENCH
+		_jug_goal = global_transform*Transform3D(Basis.IDENTITY,world_point(destination))
+	if not _jug_pending.is_empty():
+		_jug_action = _jug_pending
+		_jug_pending = ""
+		_jug_clock = 0.0
+		_jug_duration = .50 if _jug_action == "i01_pour" else .32
+		_jug_from = prior
+		if _holding_jug and (_jug_action in ["i01_well","i07_water_fetch"] or not prior_visible or prior.origin.distance_to(_jug_goal.origin) > .85):
+			# The well action starts locally, never flies from the family bench.
+			_jug_from = _jug_goal
+			_jug_from.origin.y -= .24
+		if not _holding_jug and next_mode in ["table","gate"] and prior.origin.distance_to(_jug_goal.origin) > .85:
+			# Interaction range exceeds arm reach: use a local tabletop
+			# approach rather than stretching the model or flying a prop.
+			_jug_from = _jug_goal
+			_jug_from.origin.y += .18
+		_jug.global_transform = _jug_from
+		_jug.show()
+	elif _jug_action.is_empty():
+		_jug.global_transform = _jug_goal
+		_jug.visible = next_mode != "away" and (not _holding_jug or _left_bone >= 0)
+	else:
+		_jug.global_transform = prior
+		_jug.visible = prior_visible
+	var carrying := not _held_cups.is_empty() or _holding_jug or jug_animating()
 	set_process(carrying)
 	if carrying:
 		_sync_hands()
@@ -157,8 +222,22 @@ func _place(item: Node3D, at: Vector3, basis: Basis) -> void:
 	item.visible = true
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	_sync_hands()
+	if jug_animating():
+		_jug_clock += maxf(delta,0.0)
+		var t := clampf(_jug_clock/_jug_duration,0.0,1.0)
+		var eased := t*t*(3.0-2.0*t)
+		var pose := _jug_from.interpolate_with(_jug_goal,eased)
+		if _jug_action == "i01_pour":
+			pose.basis = pose.basis*Basis(Vector3.RIGHT,.68*sin(PI*t))
+			pose.origin.y += .10*sin(PI*t)
+		_jug.global_transform = pose
+		if t >= 1.0:
+			_jug_action = ""
+			_jug.global_transform = _jug_goal
+			_jug.visible = _jug_mode != "away"
+			set_process(_holding_jug or not _held_cups.is_empty())
 
 
 func _sync_hands() -> void:
@@ -169,8 +248,17 @@ func _sync_hands() -> void:
 func _move_held_props() -> void:
 	for owner in _held_cups:
 		_follow_hand(_cups[owner], _right_bone, _right_rest, HAND_CUPS[owner], 1.0)
-	if _holding_jug:
-		_follow_hand(_jug, _left_bone, _left_rest, JUG_HAND, 1.0)
+	if _holding_jug and is_instance_valid(_skeleton) and _left_bone >= 0:
+		_jug_goal = _hand_transform(_left_bone,_left_rest,JUG_HAND,1.0)
+		if not jug_animating():
+			_jug.global_transform = _jug_goal
+			_jug.show()
+
+
+func _hand_transform(bone: int,correction: Basis,at: Vector3,size: float) -> Transform3D:
+	var pose := _skeleton.global_transform*_skeleton.get_bone_global_pose(bone)
+	var orientation := (pose.basis*correction).orthonormalized().scaled(Vector3.ONE*size)
+	return Transform3D(orientation,pose*(correction*at))
 
 
 func _follow_hand(item: Node3D, bone: int, correction: Basis, at: Vector3, size: float) -> void:

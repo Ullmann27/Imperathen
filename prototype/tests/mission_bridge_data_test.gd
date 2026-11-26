@@ -8,6 +8,7 @@ const MissionData = preload("res://scripts/story/mission_data.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const I03 = preload("res://scripts/story/i03_shortcut.gd")
 const I04 = preload("res://scripts/story/i04_workshop.gd")
+const Investigation = preload("res://scripts/story/raid_investigation.gd")
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const FIXTURES := "res://tests/fixtures/mission_bridge_data/"
@@ -101,6 +102,7 @@ func _test_recorded_saves() -> void:
 		# "legacy"; the one standing before I-03 gets the playable errand.
 		_check(model.data.village.childhood.screenplay.i03s == ("pending" if stage == "i02_correct" else "legacy") and model.data.village.childhood.screenplay.i03_events.is_empty(), "I-03-Felder ohne erfundene Handlung ergänzt: " + stage)
 		_check(model.data.village.childhood.screenplay.i04s == ("pending" if stage == "i02_correct" else "legacy") and model.data.village.childhood.screenplay.i04_events.is_empty(), "I-04 ergänzt keine erfundene Handlung: " + stage)
+		_check(model.data.village.childhood.screenplay.investigation == Investigation.fresh_state(),"V7 ergänzt keine erfundenen Ermittlungen: " + stage)
 		_check(_save_json(_before_new_screenplay_fields(model.data.village.childhood)) == _save_json(_before_new_screenplay_fields(state.village.childhood)), "Kindheitsfortschritt bleibt vollständig erhalten: " + stage)
 		_check(_save_json(model.data.companion) == _save_json(state.companion), "Gespeicherte Marcus-Wahl bleibt erhalten: " + stage)
 		var view: Dictionary = Childhood.view(model.data)
@@ -139,6 +141,7 @@ func _before_new_screenplay_fields(childhood: Dictionary) -> Dictionary:
 		copy.screenplay.erase(key)
 	for key: String in I04.KEYS:
 		copy.screenplay.erase(key)
+	copy.screenplay.erase("investigation")
 	copy.screenplay.erase("version")
 	return copy
 

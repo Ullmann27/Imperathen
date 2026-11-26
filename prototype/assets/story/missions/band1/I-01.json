@@ -144,6 +144,12 @@
             "label": "Von %s erzählen"
           }
         ]
+      },
+      "i01_park_jug": {
+        "point": "home_table",
+        "chapter": "Ein Morgen zu Hause",
+        "label": "Gefüllten Krug abstellen",
+        "objective": "Stell den gefüllten Krug auf den Frühstückstisch, bevor du die Becher vom Regal holst."
       }
     },
     "consequences": {
@@ -276,7 +282,8 @@
         "delayed_hook": "VID-C nimmt die Begegnung auf.",
         "long_term_effect": "Erzählte Begegnung als Erinnerung.",
         "relationship": {}
-      }
+      },
+      "I-01.water.parked": {}
     },
     "hooks": [
       {

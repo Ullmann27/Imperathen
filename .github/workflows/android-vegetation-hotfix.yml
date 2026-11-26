@@ -1,7 +1,7 @@
 name: Android vegetation regression – actual static plant geometry and game frames
 on:
   push:
-    branches: ['fix/android-vegetation-render-20261126']
+    branches: ['fix/android-vegetation-render-20261126', 'fix/fold7-device-visual-gameplay-recovery-20261126']
 permissions:
   contents: read
 concurrency:

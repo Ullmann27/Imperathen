@@ -593,6 +593,8 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 		model.capture_npc_observations()
 	var previous_childhood_step: Dictionary = Childhood.current_step(model.data) if command == "village_childhood_action" and Childhood.enabled(model.data) else {}
 	var result: Dictionary = model.execute(command, payload, command_id)
+	if result.get("ok",false) and command == "village_childhood_action" and is_instance_valid(world.i01_props):
+		world.i01_props.begin_jug_action(str(payload.get("action_id","")))
 	if not _film_committing and (not result.get("ok", false) or (not realtime_combat and command not in ["receive_damage", "train"])):
 		ui.notify(str(result.get("message", "")))
 	_refresh()

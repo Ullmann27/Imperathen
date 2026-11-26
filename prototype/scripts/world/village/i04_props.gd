@@ -26,12 +26,17 @@ var _note: Node3D
 var _hand_right: Node3D
 var _hand_left: Node3D
 var _figure_body: Node3D
+var _carrier: Node3D
+var _holding_wood := false
+var _holding_note := false
 var _wood: Material
 var _wood_cut: Material
 
 
 func _init() -> void:
 	name = "I04ForgeProps"
+	process_priority = 10
+	set_process(false)
 
 
 ## Cinematic anchors in this node's space (the world root).
@@ -216,7 +221,11 @@ func _make_carried() -> void:
 func sync_state(state: Dictionary, figure: Node3D, index: int, trial_index: int) -> void:
 	var enabled: bool = state.get("village", {}).has("childhood")
 	visible = enabled
+	_carrier = figure
 	if not enabled:
+		_holding_wood = false
+		_holding_note = false
+		set_process(false)
 		return
 	_build()
 	if not is_instance_valid(_armful) or not is_instance_valid(_note):
@@ -246,10 +255,17 @@ func sync_state(state: Dictionary, figure: Node3D, index: int, trial_index: int)
 		var scene := load(Documents.ENTRIES[held[0]].model) as PackedScene
 		_note.add_child(scene.instantiate())
 		_note.set_meta("document_id", held[0])
-	if in_hand or noted:
-		_ensure_hands(figure)
-	_carry(_armful, _hand_left, in_hand, Vector3(0.0, -0.20, 0.10))
-	_carry(_note, _hand_right, noted, Vector3(0.0, -0.10, 0.05))
+	_holding_wood = in_hand
+	_holding_note = noted
+	set_process(in_hand or noted)
+	_process(0.0)
+
+
+func _process(_delta: float) -> void:
+	if _holding_wood or _holding_note:
+		_ensure_hands(_carrier)
+	_carry(_armful, _hand_left, _holding_wood, Vector3(0.0,-0.20,0.10))
+	_carry(_note, _hand_right, _holding_note, Vector3(0.0,-0.10,0.05))
 
 
 static func _talk_open(s: Dictionary) -> bool:
@@ -276,7 +292,7 @@ func stack_armfuls() -> int:
 
 func carrying(what: String) -> bool:
 	var item: Node3D = _armful if what == "kindling" else _note
-	return _built and is_instance_valid(item) and item.visible and item.get_parent() != self
+	return _built and visible and is_instance_valid(item) and item.visible and (_holding_wood if what == "kindling" else _holding_note)
 
 
 func shows(what: String) -> bool:
@@ -285,19 +301,15 @@ func shows(what: String) -> bool:
 
 
 func _carry(item: Node3D, hand: Node3D, held: bool, offset: Vector3) -> void:
-	if held and is_instance_valid(hand):
-		if item.get_parent() != hand:
-			item.get_parent().remove_child(item)
-			hand.add_child(item)
-		var world_scale := hand.global_basis.get_scale() if hand.is_inside_tree() else Vector3.ONE
-		item.position = offset
-		item.basis = Basis.IDENTITY.scaled(Vector3(1.0 / maxf(world_scale.x, 0.001), 1.0 / maxf(world_scale.y, 0.001), 1.0 / maxf(world_scale.z, 0.001)))
-		item.visible = true
+	if not is_instance_valid(item):
 		return
-	if item.get_parent() != self:
-		item.get_parent().remove_child(item)
-		add_child(item)
-	item.visible = false
+	# Keep all quest objects under the world-owned prop container. A LOD
+	# deletion may destroy its attachment, but never the object itself.
+	if held and is_instance_valid(hand):
+		item.global_transform = Transform3D(hand.global_basis.orthonormalized(),hand.to_global(offset))
+		item.show()
+	else:
+		item.hide()
 
 
 func _ensure_hands(figure: Node3D) -> void:
@@ -307,6 +319,8 @@ func _ensure_hands(figure: Node3D) -> void:
 	if not body is Node3D or body == _figure_body and is_instance_valid(_hand_left) and is_instance_valid(_hand_right):
 		return
 	_figure_body = body
+	_hand_left = null
+	_hand_right = null
 	var skeletons: Array[Node] = (body as Node3D).find_children("*", "Skeleton3D", true, false)
 	if skeletons.is_empty():
 		return

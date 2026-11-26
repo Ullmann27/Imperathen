@@ -19,13 +19,19 @@ var _pot: MeshInstance3D
 var _salt: MeshInstance3D
 var _notch: MeshInstance3D
 var _jug: Node3D
-var _hand_left: Node3D
+var _carrier: Node3D
+var _skeleton: Skeleton3D
+var _left_bone := -1
+var _left_rest := Basis.IDENTITY
 var _figure_body: Node3D
+var _carrying := false
 var _stall: Node3D
 
 
 func _init() -> void:
 	name = "I03MarketProps"
+	process_priority = 10
+	set_process(false)
 
 
 ## Cinematic anchors in this node's space (the world root).
@@ -117,7 +123,12 @@ func _make_jug() -> Node3D:
 func sync_state(state: Dictionary, figure: Node3D) -> void:
 	var enabled: bool = state.get("village", {}).has("childhood")
 	visible = enabled
+	_carrier = figure
 	if not enabled:
+		_carrying = false
+		set_process(false)
+		if is_instance_valid(_jug):
+			_jug.hide()
 		return
 	_build()
 	var s: Dictionary = state.village.childhood.screenplay
@@ -132,19 +143,13 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 	_salt.position = Vector3(0.0, 0.085 if salt == "small" else 0.165, 0.0)
 	_salt.scale = Vector3.ONE * (0.92 if salt == "small" else 1.0)
 	_notch.visible = salt == "debt" and open
-	if not is_instance_valid(_jug):
-		# The jug hung on a hand of a figure body that has since been replaced.
-		_jug = _make_jug()
-		add_child(_jug)
-	var carrying: bool = state.village.childhood.get("carried", []).has("stall_water")
-	if carrying:
-		_ensure_hand(figure)
-	if carrying and is_instance_valid(_hand_left):
+	_carrying = state.village.childhood.get("carried", []).has("stall_water")
+	set_process(_carrying)
+	if _carrying:
+		_ensure_hand()
 		_place_in_hand()
-	elif _jug.get_parent() != self:
-		_jug.get_parent().remove_child(_jug)
-		add_child(_jug)
-	_jug.visible = carrying and _jug.get_parent() != self
+	else:
+		_jug.hide()
 
 
 func coins_visible() -> bool:
@@ -160,46 +165,44 @@ func pot_fill() -> String:
 
 
 func jug_in_hand() -> bool:
-	return _built and _jug.visible and _jug.get_parent() != self
+	return _built and _carrying and is_instance_valid(_jug) and _jug.visible
+
+
+func _process(_delta: float) -> void:
+	_ensure_hand()
+	_place_in_hand()
 
 
 func _place_in_hand() -> void:
-	if _jug.get_parent() != _hand_left:
-		_jug.get_parent().remove_child(_jug)
-		_hand_left.add_child(_jug)
-	var world_scale := _hand_left.global_basis.get_scale() if _hand_left.is_inside_tree() else Vector3.ONE
-	_jug.position = Vector3(0.0, -0.34, 0.06)
-	_jug.basis = Basis.IDENTITY.scaled(Vector3(1.0 / maxf(world_scale.x, 0.001), 1.0 / maxf(world_scale.y, 0.001), 1.0 / maxf(world_scale.z, 0.001)))
-
-
-func _ensure_hand(figure: Node3D) -> void:
-	if not is_instance_valid(figure):
+	# The actual jug remains owned by the market props, not a disposable LOD.
+	if not _carrying or not is_instance_valid(_skeleton) or _left_bone < 0:
+		_jug.hide()
 		return
-	var body: Variant = figure.get("body")
-	if not body is Node3D or body == _figure_body and is_instance_valid(_hand_left):
+	var pose := _skeleton.global_transform*_skeleton.get_bone_global_pose(_left_bone)
+	_jug.global_transform = Transform3D((pose.basis*_left_rest).orthonormalized(),pose*(_left_rest*Vector3(0,-.34,.06)))
+	_jug.show()
+
+
+func _ensure_hand() -> void:
+	var body: Variant = _carrier.get("body") if is_instance_valid(_carrier) else null
+	if is_instance_valid(_figure_body) and body == _figure_body:
+		return
+	if is_instance_valid(_skeleton) and _skeleton.skeleton_updated.is_connected(_place_in_hand):
+		_skeleton.skeleton_updated.disconnect(_place_in_hand)
+	_skeleton = null
+	_figure_body = null
+	_left_bone = -1
+	if not is_instance_valid(body) or not body is Node3D:
 		return
 	_figure_body = body
-	var skeletons: Array[Node] = (body as Node3D).find_children("*", "Skeleton3D", true, false)
+	var skeletons := (body as Node3D).find_children("*","Skeleton3D",true,false)
 	if skeletons.is_empty():
 		return
-	var skeleton := skeletons[0] as Skeleton3D
-	var index := skeleton.find_bone("Hand_L")
-	if index < 0:
-		return
-	var existing := skeleton.get_node_or_null("I03CarryLeft")
-	if existing != null:
-		_hand_left = existing.get_node("Props") as Node3D
-		return
-	var attachment := BoneAttachment3D.new()
-	attachment.name = "I03CarryLeft"
-	attachment.bone_name = "Hand_L"
-	attachment.override_pose = false
-	skeleton.add_child(attachment)
-	var props := Node3D.new()
-	props.name = "Props"
-	props.basis = skeleton.get_bone_global_rest(index).basis.inverse()
-	attachment.add_child(props)
-	_hand_left = props
+	_skeleton = skeletons[0] as Skeleton3D
+	_left_bone = _skeleton.find_bone("Hand_L")
+	if _left_bone >= 0:
+		_left_rest = _skeleton.get_bone_global_rest(_left_bone).basis.inverse()
+		_skeleton.skeleton_updated.connect(_place_in_hand)
 
 
 ## Smooth lathe: shared vertices per ring, so normals interpolate around the

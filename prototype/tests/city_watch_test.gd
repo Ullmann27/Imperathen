@@ -59,10 +59,23 @@ func _walk_and_reply(visit: City, world: World) -> void:
 	var sample_started := Time.get_ticks_usec()
 	var max_step := 0.0
 	var previous := start
+	var forward_samples := 0
+	var backward_samples := 0
 	for i in 75:
 		await physics_frame
 		max_step = maxf(max_step,leader.position.distance_to(previous))
+		var movement := leader.position-previous
+		movement.y = 0.0
+		if movement.length() > .003:
+			var figure := leader.get_node("Soldier") as Node3D
+			# The authored physical front of the company mesh is +Z.
+			var forward := figure.global_basis.z.normalized()
+			if forward.dot(movement.normalized()) > .75:
+				forward_samples += 1
+			if forward.dot(movement.normalized()) < -.75:
+				backward_samples += 1
 		previous = leader.position
+	check(forward_samples > 20 and backward_samples == 0,"The visible company front, not just the collision body, faces the direction of travel")
 	check(start.distance_to(leader.position)>1.2 and max_step < .15,"The unit advances in physical steps on the road")
 	var travel := start.distance_to(leader.position)
 	var sample_msec := (Time.get_ticks_usec()-sample_started)/1000.0

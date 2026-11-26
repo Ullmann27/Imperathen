@@ -278,17 +278,22 @@ func _test_hud_and_props() -> void:
 	_place(I01.POINTS.well + Vector2(1.5, 0.3))
 	await _interact()
 	check(_childhood().screenplay.i01_water == "jug", "Real well action fills the jug")
+	check(props.jug_animating(), "Well action starts a visible pickup, not just a fixed hand prop")
 	var carried_jug: Node3D = props.jug_node()
 	actor._reload((actor.detail + 1) % 4)
 	# The fixed fixture positions the capsule above the floor. Inspect the
 	# next stable hand pose after it lands and the replacement enters the rig.
-	await frames(30)
+	await frames(40)
+	check(not props.jug_animating(),"Pickup has completed")
 	check(is_instance_valid(carried_jug) and props.jug_node() == carried_jug
 		and carried_jug.get_parent() == props and _prop_at_hand(carried_jug, "Hand_L", props.JUG_HAND),
 		"The filled jug survives a second model replacement and follows its left hand")
 	_place(I01.POINTS.player_table)
 	await _interact()
 	check(_childhood().screenplay.i01_water == "poured" and game.world.i01_props._water.julia.visible, "Poured water is visible in the cups")
+	check(not props.jug_in_hand() and props.jug_animating(),"Pour releases the saved carry state and plays the setdown transition")
+	await frames(40)
+	check(not props.jug_animating() and carried_jug.global_position.distance_to(props.world_point(props.JUG_TABLE)) < .025,"The same jug settles at the real table")
 	await _interact()
 	check(game.screen == "opening" and game.opening_sequence.id == I01Film.VID_B, "Breakfast at the table opens VID-B")
 
@@ -406,6 +411,7 @@ func _test_marcus_and_vid_c() -> void:
 	check(game._command("village_childhood_action", {"action_id":"fill_water"}).ok, "Jug taken from the breakfast table")
 	var props = game.world.i01_props
 	var jug: Node3D = props.jug_node()
+	await frames(40)
 	check(_prop_at_hand(jug, "Hand_L", props.JUG_HAND), "The jug is carried in the boy's hand")
 	var father: Vector2 = Life.actor_position(game.model.data, "silvanus")
 	_place(father + Vector2(0.6, 0.6))
@@ -420,6 +426,8 @@ func _test_marcus_and_vid_c() -> void:
 	game._opening_next()
 	await frames(4)
 	check(game.screen == "playing", "VID-C hands back to play")
+	await frames(40)
+	check(not props.jug_in_hand() and not jug.visible,"Father handoff never leaves a jug stuck to the player")
 	# HUD after I-01: combat controls return in ordinary village life.
 	game.ui.show_game(game._ui_state())
 	await frames(3)
