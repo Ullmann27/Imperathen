@@ -163,6 +163,8 @@ TROOP_CATALOG_RESOURCES = (
     "assets/troops/troops.json",
     "assets/troops/item_families.json",
     "assets/troops/people.json",
+    "scripts/battle/combat_formula.gd",
+    "assets/balance/combat_balance.json",
 )
 FEATURE_RESOURCE_GROUPS = (
     ("original_meshy_youth_content", tuple(f"assets/characters/hero_meshy_italia_{level}.glb" for level in range(4))),
