@@ -24,8 +24,10 @@ const Tribes = preload("res://scripts/domain/tribal_world.gd")
 const Roster = preload("res://scripts/battle/soldier_roster.gd")
 const Relations = preload("res://scripts/domain/actor_relations.gd")
 const Life = preload("res://scripts/battle/soldier_life.gd")
-const VERSION := 1
-const KEYS := ["version", "time", "raids", "military"]
+const Politics = preload("res://scripts/domain/valdora_politics.gd")
+const VERSION := 2
+const LEGACY_KEYS := ["version", "time", "raids", "military"]
+const KEYS := LEGACY_KEYS + ["politics"]
 const RAID_STATUS := ["committed", "booked", "no_band"]
 ## Balance value (central): a promoted soldier serves a season in grade first.
 const MIN_DAYS_IN_GRADE := 90
@@ -34,7 +36,15 @@ const MAX_PROMOTIONS := 512
 
 
 static func new_state() -> Dictionary:
-	return {"version": VERSION, "time": {}, "raids": {}, "military": {"battle_start_jdn": -1, "battle_end_jdn": -1, "promotions": []}}
+	return {"version": VERSION, "time": {}, "raids": {}, "politics": Politics.new_state(),
+		"military": {"battle_start_jdn": -1, "battle_end_jdn": -1, "promotions": []}}
+
+
+static func migrate(world: Dictionary) -> void:
+	var state: Variant = world.get("world_state")
+	if _keys(state, LEGACY_KEYS) and _int(state.version, 1, 1):
+		state.politics = Politics.new_state()
+		state.version = VERSION
 
 
 # --- raids: village <-> tribal ledger -------------------------------------------------
@@ -310,6 +320,9 @@ static func validate(world: Dictionary) -> String:
 	var clock_error := Clock.validate(world)
 	if not clock_error.is_empty():
 		return clock_error
+	var political_error := Politics.validate(world)
+	if not political_error.is_empty():
+		return political_error
 	var raid: Dictionary = world.get("village", {}).get("raid", {"number": 0})
 	for key: Variant in state.raids:
 		var record: Variant = state.raids[key]
@@ -362,6 +375,7 @@ static func normalize(world: Dictionary) -> void:
 	var state: Dictionary = world.world_state
 	state.version = int(state.version)
 	Clock.normalize(world)
+	Politics.normalize(world)
 	for record: Dictionary in state.raids.values():
 		record.jdn = int(record.jdn)
 		record.stolen = int(record.stolen)
