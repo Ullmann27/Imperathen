@@ -495,6 +495,7 @@
       "source_note": "Caesar beschreibt die Ubier als große, blühende Gemeinschaft am Rhein, durch Händler an gallische Sitten gewöhnt und den Sueben tributpflichtig (BG 4,3). Bezirk, Orte, Zahlen und Personen sind Spielannahmen.",
       "atlas_region": "germania",
       "leader": "p_ubii_adalgar",
+      "government": "assembly",
       "families": {
         "f1": "Sippe am Hafen",
         "f2": "Sippe vom Hang"
@@ -586,6 +587,7 @@
       "source_note": "Caesar nennt die Sueben das größte und kriegerischste Volk östlich des Rheins; sie hatten die Ubier tributpflichtig gemacht und bedrängten Usipeter und Tenkterer (BG 4,1–3). Ein Teil zog 58 v. Chr. mit Ariovist (BG 1,37; 1,51). Der Gau, seine Zahlen und Personen sind Spielannahmen.",
       "atlas_region": "germania",
       "leader": "p_suebi_theudmar",
+      "government": "war_leader",
       "families": {
         "f1": "Sippe des Ebers",
         "f2": "Sippe am Moor"
@@ -677,6 +679,7 @@
       "source_note": "Caesar nennt die Sugambrer als Nachbarn am Rhein, die 55 v. Chr. die Reiterei der Usipeter und Tenkterer aufnahmen (BG 4,16–19; 6,35). Zahlen, Orte und Personen sind Spielannahmen.",
       "atlas_region": "germania",
       "leader": "p_sug_ragnald",
+      "government": "hereditary",
       "families": {
         "f1": "Sippe an der Furt",
         "f2": "Sippe der Rossleute"
@@ -767,6 +770,7 @@
       "source_note": "Nach Caesar wurden Usipeter und Tenkterer viele Jahre von den Sueben bedrängt und überquerten im Winter 56/55 v. Chr. den Rhein (BG 4,1–4). Ihre frühere Lage ist unsicher; Ort, Zahlen und Personen sind Spielannahmen.",
       "atlas_region": "germania",
       "leader": "p_usi_hadugar",
+      "government": "war_leader",
       "families": {
         "f1": "Sippe der Pferdezüchter",
         "f2": "Sippe am Bach"
@@ -846,6 +850,7 @@
       "source_note": "Fiktiver Hofverband im Bergland zwischen Ubiern und Sugambrern.",
       "atlas_region": "germania",
       "leader": "p_eic_wulfhard",
+      "government": "elders",
       "families": {
         "f1": "Sippe des Wulfhard",
         "f2": "Sippe am Quellbach"
@@ -934,6 +939,7 @@
       "source_note": "Fiktive Fähr- und Fischergemeinschaft am rechten Rheinufer.",
       "atlas_region": "germania",
       "leader": "p_rav_ortwin",
+      "government": "hereditary",
       "families": {
         "f1": "Fährsippe",
         "f2": "Fischersippe"
@@ -1024,6 +1030,7 @@
       "source_note": "Händler kamen zu den Ubiern; die Sueben ließen Händler vor allem zum Verkauf von Beute zu (BG 4,2–3). Mengen und Personen sind Spielannahmen.",
       "atlas_region": "gallia",
       "leader": "",
+      "government": "assembly",
       "families": {},
       "traits": {
         "boldness": 0.0,
@@ -1089,6 +1096,7 @@
       "source_note": "Fiktive Gruppe von etwa dreißig Reitern für I-10. Herkunft und Auftraggeber bleiben Storyentscheidung (I-08, I-15, I-20).",
       "atlas_region": "italia",
       "leader": "p_riders_leader",
+      "government": "assembly",
       "families": {
         "f1": "Reitergruppe"
       },
@@ -1707,7 +1715,8 @@
       "target": "valdora",
       "story": "I-10",
       "canon_kind": "fictional_story_pending",
-      "source": "campaign_arc"
+      "source": "campaign_arc",
+      "hidden": true
     }
   ],
   "anchors": [
@@ -1951,7 +1960,7 @@
       "visible_raiders": 30,
       "protected": true,
       "recovery_ticks": 26,
-      "note": "Die Nacht der Reiter bleibt ein geschütztes Storyereignis. Ergebnis, Opfer und Familienpfade bestimmt das Drehbuch; dieses Modell übernimmt nur gemeldete Verluste und Beute."
+      "note": "Die Nacht der Reiter bleibt ein geschütztes Storyereignis (D-040: etwa dreißig Reiter zunächst unbekannter Herkunft, keinem Stamm zugeordnet). Ergebnis, Opfer und Familienpfade bestimmt das Drehbuch; dieses Modell übernimmt nur gemeldete Verluste und Beute. Der wahre Auftraggeber bleibt im Zustand verborgen."
     }
   },
   "bands": [
@@ -1978,6 +1987,66 @@
       "roman": "IV",
       "from": -44,
       "to": -27
+    }
+  ],
+  "governments": {
+    "assembly": {
+      "name": "Versammlung der Freien",
+      "source": "caesar_bg_6",
+      "note": "Die Gemeinschaft wählt; Ansehen und Herkunft aus der führenden Familie zählen. Caesar BG 6,23 kennt im Frieden keine gemeinsame Obrigkeit, sondern führende Männer der Gaue.",
+      "blend": 0.4,
+      "challenge": 18,
+      "heir_bonus": 10
+    },
+    "hereditary": {
+      "name": "Erbliches Häuptlingtum",
+      "source": "",
+      "note": "Spielannahme: Die Führung bleibt in der Familie; der volljährige Erbe folgt, Herausforderungen sind schwerer.",
+      "blend": 0.5,
+      "challenge": 28,
+      "heir_bonus": 40
+    },
+    "elders": {
+      "name": "Ältestenrat",
+      "source": "",
+      "note": "Spielannahme: Ein Rat der Älteren wählt den Sprecher; Alter und Besonnenheit zählen, der Rat mäßigt den Anführer.",
+      "blend": 0.25,
+      "challenge": 30,
+      "heir_bonus": 0
+    },
+    "war_leader": {
+      "name": "Gewählter Heerführer im Krieg",
+      "source": "caesar_bg_6",
+      "note": "Caesar BG 6,23: Führt eine Gemeinschaft Krieg, werden Anführer mit Gewalt über Leben und Tod für diesen Krieg gewählt; im Frieden gibt es keine gemeinsame Obrigkeit. Dauer und Wahlregeln sind Spielannahmen.",
+      "blend": 0.4,
+      "challenge": 18,
+      "heir_bonus": 5,
+      "war_blend": 0.6,
+      "campaign_weeks": 26
+    }
+  },
+  "conflict_policy": "D-048: Ein Überfall, eine Fehde, ein Krieg oder eine Eroberung braucht einen gebuchten Anlass: quest_dispute (Mission oder Quest), natural_enemy (hier vordefinierte Feindschaft), alliance_call (Verbündeter angegriffen oder verteidigt), retaliation (Antwort auf einen solchen Konflikt), conquest (Feldzug aus einer solchen Kette). Hunger, Not oder Überlegenheit allein führen zu Handel, Abwanderung, Verhandlung oder Tributforderung.",
+  "natural_enemies": [
+    {
+      "a": "suebi_gau",
+      "b": "ubii_rhine",
+      "canon_kind": "documented_relation",
+      "source": "caesar_bg_4",
+      "note": "Die Sueben machten die Ubier tributpflichtig und bedrängten sie schwer (Caesar, BG 4,3; 4,16)."
+    },
+    {
+      "a": "suebi_gau",
+      "b": "usipetes_tencteri",
+      "canon_kind": "documented_relation",
+      "source": "caesar_bg_4",
+      "note": "Die Sueben bedrängten Usipeter und Tenkterer viele Jahre mit Krieg und hinderten sie am Ackerbau (Caesar, BG 4,1)."
+    },
+    {
+      "a": "eichenhang",
+      "b": "ravensteg",
+      "canon_kind": "design",
+      "source": "",
+      "note": "Fiktiver Streit um den Furtzoll zwischen zwei erfundenen Gemeinschaften."
     }
   ]
 }

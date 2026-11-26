@@ -4,6 +4,7 @@ extends SceneTree
 const Calendar = preload("res://scripts/domain/world_calendar.gd")
 const Era = preload("res://scripts/domain/era_registry.gd")
 const Policy = preload("res://scripts/story/life_path_policy.gd")
+const City = preload("res://scripts/world/city_exploration.gd")
 var checks := 0
 var failures := 0
 
@@ -23,6 +24,7 @@ func _initialize() -> void:
 	_queries()
 	_slots_and_divergence()
 	_hooks()
+	_city_import()
 	_transitions()
 	_calendar_agreement()
 	_invalid_data()
@@ -90,6 +92,40 @@ func _hooks() -> void:
 					parity = false
 	check(parity, "asset_available agrees with LifePathPolicy.asset_available")
 	check(Era.asset_available("sandbox", start, 80) and not Era.asset_available("story", start, 0) and not Era.asset_available("other", start, -58), "sandbox, invalid year and unknown mode")
+
+
+func _city_import() -> void:
+	var visual := Node3D.new()
+	var collision := Node3D.new()
+	var arena := MeshInstance3D.new()
+	arena.name = "Colosseum_Arena"
+	visual.add_child(arena)
+	var monument := MeshInstance3D.new()
+	monument.name = "Monument"
+	monument.set_meta("extras", {"era_min_ce": 80})
+	visual.add_child(monument)
+	var lost_metadata := StaticBody3D.new()
+	lost_metadata.name = "Monument_collision"
+	collision.add_child(lost_metadata)
+	var house := MeshInstance3D.new()
+	house.name = "Domus"
+	house.set_meta("extras", {"era_min_ce": -100})
+	visual.add_child(house)
+	for jdn: int in [Calendar.to_jdn(79, 12, 31), Calendar.to_jdn(80, 1, 1)]:
+		var excluded := {}
+		var rendered := visual.duplicate()
+		var physical := collision.duplicate()
+		City.prune_future_city_nodes(rendered, jdn, excluded)
+		City.prune_future_city_nodes(physical, jdn, excluded)
+		var inaugurated := jdn == Calendar.to_jdn(80, 1, 1)
+		check(rendered.has_node("Colosseum_Arena") == inaugurated, "legacy arena follows official inauguration")
+		check(rendered.has_node("Monument") == inaugurated, "glTF extras gate imported scene nodes")
+		check(physical.has_node("Monument_collision") == inaugurated, "collision copy follows its visual even when import loses extras")
+		check(rendered.has_node("Domus"), "an earlier building remains visible")
+		rendered.free()
+		physical.free()
+	visual.free()
+	collision.free()
 
 
 func _transitions() -> void:

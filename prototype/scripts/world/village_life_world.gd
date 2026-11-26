@@ -543,6 +543,12 @@ func _sync_raiders() -> void:
 		_raider_targets[id] = position
 		if spawned or _restore_raiders:
 			actor.position = position
+			# A raider comes up the north road facing his way in; he does not
+			# appear with his back to the village and turn round on the spot.
+			var ahead: Vector2 = Life.raider_waypoint(state,enemy)-Vector2(position.x,position.z)
+			if ahead.length() > .05:
+				actor.rotation.y = atan2(-ahead.x,-ahead.y)
+			actor.set_meta("pace",0.0)
 			actor.reset_physics_interpolation()
 			_route_points.erase(id)
 		var figure: Node3D = actor.get_node("Figure")

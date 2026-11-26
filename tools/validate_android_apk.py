@@ -133,6 +133,22 @@ CHAPTER_STORY_RESOURCES = (
     "assets/story/missions/band1/index.json",
     *(f"assets/story/missions/band1/{mission}.json" for mission in ("I-01", "I-03", "I-04", "I-05", "I-06", "I-07", "I-09")),
 )
+FIRST_MORNING_RESOURCES = (
+    "scripts/story/i01_three_cups.gd",
+    "scripts/story/i01_film.gd",
+    "scripts/world/village/i01_props.gd",
+)
+WORLD_HISTORY_RESOURCES = (
+    "scripts/domain/world_calendar.gd",
+    "scripts/domain/campaign_timeline.gd",
+    "scripts/domain/era_registry.gd",
+    "assets/story/mission_timeline.json",
+    "assets/world/era_registry.json",
+)
+TRIBAL_WORLD_RESOURCES = (
+    "scripts/domain/tribal_world.gd",
+    "assets/world/tribes/bc58_rhine.json",
+)
 NPC_BEHAVIOR_RESOURCES = (
     "scripts/domain/npc_behavior.gd",
 )
@@ -163,6 +179,21 @@ TROOP_CATALOG_RESOURCES = (
     "assets/troops/troops.json",
     "assets/troops/item_families.json",
     "assets/troops/people.json",
+    "scripts/battle/combat_formula.gd",
+    "assets/balance/combat_balance.json",
+)
+# The shared world state (D-045) reads these at runtime: without the registry
+# the history frame is empty, without the roster the tribal world is.
+WORLD_STATE_RESOURCES = (
+    "scripts/domain/world_clock.gd",
+    "scripts/domain/world_state.gd",
+    "scripts/domain/person_registry.gd",
+    "scripts/domain/world_calendar.gd",
+    "scripts/domain/era_registry.gd",
+    "scripts/domain/tribal_world.gd",
+    "assets/world/era_registry.json",
+    "assets/world/tribes/bc58_rhine.json",
+    "assets/story/mission_timeline.json",
 )
 FEATURE_RESOURCE_GROUPS = (
     ("original_meshy_youth_content", tuple(f"assets/characters/hero_meshy_italia_{level}.glb" for level in range(4))),
@@ -173,6 +204,9 @@ FEATURE_RESOURCE_GROUPS = (
     ("childhood_content", CHILDHOOD_RESOURCES),
     ("campaign_bible_content", CAMPAIGN_BIBLE_RESOURCES),
     ("chapter_story_content", CHAPTER_STORY_RESOURCES),
+    ("first_morning_content", FIRST_MORNING_RESOURCES),
+    ("world_history_content", WORLD_HISTORY_RESOURCES),
+    ("tribal_world_content", TRIBAL_WORLD_RESOURCES),
     ("meshy_registry_content", MESHY_REGISTRY_RESOURCES),
     ("npc_behavior_content", NPC_BEHAVIOR_RESOURCES),
     ("meshy_character_content", MESHY_CHARACTER_RESOURCES),
@@ -180,6 +214,7 @@ FEATURE_RESOURCE_GROUPS = (
     ("service_gear_content", SERVICE_GEAR_RESOURCES),
     ("cc0_motion_content", CC0_MOTION_RESOURCES),
     ("troop_catalog_content", TROOP_CATALOG_RESOURCES),
+    ("world_state_content", WORLD_STATE_RESOURCES),
 )
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (

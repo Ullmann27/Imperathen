@@ -1,11 +1,11 @@
 extends SceneTree
 ## Scripted I-01 playthrough with the real game loop (fixed 60 Hz): films run
-## on Main's own clock, the boy walks by the regular move_axis input through
+## on Main's own clock at accelerated test speed, the boy walks by the regular move_axis input through
 ## the house door to the well and back, and every action uses the regular
 ## interact/dialogue controls. It reports simulated seconds per phase. This is
 ## a reproducible engine measurement of one scripted route, not a human
 ## playtest: reading pauses, exploration and decision time are not included.
-## Manual run (about 90-120 s wall time, therefore not in check_prototype):
+## Manual run (the full simulation can take several minutes):
 ## godot --headless --path prototype --fixed-fps 60 --script res://tests/i01_playthrough_test.gd
 
 const Entry = preload("res://main.tscn")
@@ -13,11 +13,13 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const STEP := 1.0 / 60.0
+const FILM_TEST_SPEED := 8.0
 var game
 var checks := 0
 var failures: Array[String] = []
 var phases: Array[Dictionary] = []
 var walked := 0.0
+var capture_dir := ""
 
 
 func _initialize() -> void:
@@ -25,6 +27,11 @@ func _initialize() -> void:
 		printerr("The playthrough requires isolated settings and saves.")
 		quit(2)
 		return
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with("--capture-dir=") and DisplayServer.get_name() != "headless":
+			capture_dir = arg.trim_prefix("--capture-dir=")
+			DirAccess.make_dir_recursive_absolute(capture_dir)
+			RenderingServer.render_loop_enabled = false
 	_run.call_deferred()
 
 
@@ -36,6 +43,18 @@ func check(value: bool, message: String) -> bool:
 	return value
 
 
+func _capture(label: String) -> void:
+	if capture_dir.is_empty():
+		return
+	# Keep QA movement at 60 Hz without drawing every intermediate frame.
+	RenderingServer.render_loop_enabled = true
+	await process_frame
+	RenderingServer.force_draw()
+	var image := root.get_texture().get_image()
+	check(image != null and not image.is_empty() and image.save_png(capture_dir.path_join(label + ".png")) == OK, "Engine-Aufnahme: " + label)
+	RenderingServer.render_loop_enabled = false
+
+
 func _phase(name: String, seconds: float, kind: String) -> void:
 	phases.append({"phase":name, "seconds":snappedf(seconds, 0.01), "kind":kind})
 
@@ -43,12 +62,14 @@ func _phase(name: String, seconds: float, kind: String) -> void:
 ## Plays the current film on Main's clock until a choice or the handoff.
 func _watch(name: String, limit := 240.0) -> void:
 	var elapsed := 0.0
+	Engine.time_scale = FILM_TEST_SPEED
 	while game.screen == "opening" and elapsed < limit:
 		var beat: Dictionary = game.opening_sequence.beats[game.opening_index]
 		if game._film_choice_open(beat) or bool(beat.get("final", false)):
 			break
 		await process_frame
-		elapsed += STEP
+		elapsed += STEP * FILM_TEST_SPEED
+	Engine.time_scale = 1.0
 	_phase(name, elapsed, "film")
 
 
@@ -137,19 +158,26 @@ func _run() -> void:
 	for i in 4:
 		await process_frame
 	game.ui._finish_intro()
-	game._start_new_game()
+	var new_life := _find_button(game.ui, "Neues Leben")
+	if not check(new_life != null, "Neues Leben ist im Hauptmenü erreichbar"):
+		quit(1)
+		return
+	new_life.pressed.emit()
 	for i in 4:
 		await process_frame
-	# I-00 is not part of I-01; leave it through its own skip path. Watched in
-	# full it measures 47.9 s at the authored beat durations.
-	game._opening_skip()
+	check(game.screen == "opening" and game.opening_sequence.id == "i00_aquileia", "I-00 öffnet mit echtem Filmablauf")
+	await _capture("01-prolog")
+	await _watch("I-00 Prolog")
 	await _confirm_handoff()
 	await _watch("VID-A bis zur Wahl")
 	check(game._film_choice_open(game.opening_sequence.beats[game.opening_index]), "VID-A waits for the choice")
+	await _capture("02-morgenwahl")
 	await _choose("i01_help")
 	await _watch("VID-A Reaktion und Übergabe")
 	await _confirm_handoff()
 	check(game.screen == "playing", "Control returns at the bed")
+	check(int(game.model.data.player.age) == 12 and int(game.model.data.resources.denarii) == 0, "Regulärer Start als Zwölfjähriger ohne eigenes Geld")
+	await _capture("03-familienhaus")
 	# Measured level route: the door ramp leads out toward the provision store,
 	# so the way to the well goes around its south side (probe of real colliders).
 	var door_in := Vector2(-13.0, 12.2)
@@ -165,12 +193,14 @@ func _run() -> void:
 		await _interact("Becher abstellen")
 	check(game.model.data.village.childhood.screenplay.i01_table_by == "player", "Three cups set on the table by walking and interacting")
 	await _walk("Tisch -> Brunnen", to_well)
+	await _capture("04-brunnen")
 	await _interact("Wasser schöpfen")
 	await _walk("Brunnen -> Tisch", from_well)
 	await _interact("Becher füllen")
 	await _interact("Frühstück")
 	check(game.screen == "opening" and game.opening_sequence.id == "i01_vid_b", "Breakfast opens VID-B")
 	await _watch("VID-B bis zur Themenwahl")
+	await _capture("05-tischgespraech")
 	await _choose("i01_topic_workshop")
 	await _watch("VID-B Antwort und Übergabe")
 	await _confirm_handoff()
@@ -207,6 +237,7 @@ func _run() -> void:
 	await _watch("VID-C Übergang zu I-02")
 	await _confirm_handoff()
 	check(Childhood.view(game.model.data).stage == "i02_basket", "I-01 is complete and I-02 begins")
+	await _reload_at_basket()
 	var totals := {"film":0.0, "walk":0.0, "action":0.0}
 	for phase: Dictionary in phases:
 		totals[phase.kind] += float(phase.seconds)
@@ -220,6 +251,34 @@ func _run() -> void:
 		await process_frame
 	print(("I01_PLAYTHROUGH_PASS" if failures.is_empty() else "I01_PLAYTHROUGH_FAILED") + " checks=%d failures=%d" % [checks, failures.size()])
 	quit(0 if failures.is_empty() else 1)
+
+
+func _reload_at_basket() -> void:
+	var before: Dictionary = game.model.data.duplicate(true)
+	var before_position: Vector3 = game.world.get_player_position()
+	game.ui.action_requested.emit("save", {})
+	check(FileAccess.file_exists(game.SAVE_PATH), "Spielstand über Spiel-UI geschrieben")
+	game.queue_free()
+	for i in 4:
+		await process_frame
+	game = Entry.instantiate()
+	root.add_child(game)
+	for i in 4:
+		await process_frame
+	game.set_process(false)
+	game.ui._finish_intro()
+	var resume := _find_button(game.ui, "Fortsetzen")
+	if not check(resume != null and not resume.disabled, "Fortsetzen ist nach neuem Aufbau der Hauptszene aktiv"):
+		return
+	resume.pressed.emit()
+	for i in 6:
+		await process_frame
+	var after: Dictionary = game.model.data
+	check(Childhood.view(after).stage == "i02_basket" and game.screen == "playing", "Fortsetzen erreicht denselben Auftrag")
+	check(after.world_id == before.world_id, "Fortsetzen behält die Welt-ID")
+	check(after.village.childhood.screenplay.i01_events == before.village.childhood.screenplay.i01_events, "I‑01-Erinnerungen überstehen Laden ohne Duplikate")
+	check(game.world.get_player_position().distance_to(before_position) < 0.25, "Fortsetzen setzt die Figur am gespeicherten Ort ab")
+	await _capture("06-auf-der-schwelle")
 
 
 func _find_button(node: Node, caption: String) -> Button:

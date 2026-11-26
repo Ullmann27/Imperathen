@@ -48,7 +48,7 @@ Pro Saison stehen zwei Vorbereitungen zur Verfügung. Die Anzeige nennt Korn, ei
 
 Der neue römische Dorflebenslauf beginnt in seiner Chronik **100 n. Chr. mit zwölf Jahren**. Nach dem ausdrücklich angekündigten sechsjährigen Übergang zeigt die Dorfchronik 106 n. Chr. und ein Alter von achtzehn. Nach dem späteren Truppengefecht und der Folgeentscheidung können saisonale Kartenaktionen die gespeicherte Weltzeit und das Alter weiterführen. Jede Herkunft hat eine Herbstentscheidung mit konkreten Folgen und einem späteren Chronikeintrag. Die Jahreszeiten sind ein vereinfachtes Versorgungsmodell; südliche Auftragsregionen haben entgegengesetzte Jahreszeiten.
 
-**Bekannte Zeitabweichung dieser Prüffassung:** Die Saisonanzeige der Weltkugel rechnet weiterhin ab 100 n. Chr. und übernimmt den sechsjährigen Vorsprung der Dorfchronik noch nicht. Diese beiden Kalenderanzeigen sind deshalb nach dem Altersübergang nicht synchron. Die historische Einordnung des neuen Dorfanfangs steht in [STORY.md](../docs/17_village_life/STORY.md), die ältere Atlasgrundlage in [ATLAS_SOURCES.md](../docs/12_integration/ATLAS_SOURCES.md).
+Dorfchronik, HUD und Weltkugel lesen dieselbe Weltuhr; ältere Laufbahnen um 100 n. Chr. behalten ihre eigene Zeitlinie (siehe [WORLD_STATE.md](../docs/37_world_calendar/WORLD_STATE.md)). Die historische Einordnung des neuen Dorfanfangs steht in [STORY.md](../docs/17_village_life/STORY.md), die ältere Atlasgrundlage in [ATLAS_SOURCES.md](../docs/12_integration/ATLAS_SOURCES.md).
 
 ## Spielweg im neuen römischen Dorf
 

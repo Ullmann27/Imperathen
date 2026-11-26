@@ -21,6 +21,15 @@ const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
 const RaiderStrike := preload("res://scripts/domain/raider_strike.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
 const MESHY_YOUTH_PATH := "res://assets/characters/hero_meshy_italia_%d.glb"
+## Outfits of the same original youth: identical 35-joint rig, MoCap clips and
+## sole calibration, each with its own LOD meshes and retarget report. The
+## original Meshy look ("armoured") stays the default; "civil" is the D-032 wool
+## tunic for the campaign start (tools/characters/build_youth_civil_outfit.py).
+## A later outfit adds an entry here and a rule in youth_outfit.gd.
+const MESHY_YOUTH_OUTFITS := {
+	"armoured": {"path": MESHY_YOUTH_PATH, "motion": "res://assets/animations/accad_youth_motion.json"},
+	"civil": {"path": "res://assets/characters/hero_meshy_italia_civil_%d.glb", "motion": "res://assets/animations/accad_youth_civil_motion.json"},
+}
 # ACCAD measured cycle distance, retargeted to the original 1.50 m youth.
 # The retarget report and the source-specific test verify these values.
 const YOUTH_MOCAP_STRIDES := {"march":1.36795,"run":2.38253}
@@ -72,6 +81,10 @@ var _loaned_gear := false
 var _gear_nodes: Array[Node3D] = []
 var meshy_asset_id := ""
 var _meshy_youth := false
+## Outfit actually shown, and the one the game asked for (they differ only
+## when the requested variant is not installed in this build).
+var youth_outfit := "armoured"
+var requested_youth_outfit := "armoured"
 var _conversation_focused := false
 var _armed_style := ""
 ## Retimed raider blow: the clip's measured contact frame is reached after
@@ -128,17 +141,32 @@ func configure_meshy(stable_id: String) -> bool:
 	return not selected.is_empty()
 
 
-func configure_meshy_youth(enabled: bool = true) -> bool:
+func configure_meshy_youth(enabled: bool = true, outfit: String = "") -> bool:
 	# Exact adolescent identity; this is not an adult or companion morph.
-	var selected := enabled and role=="player" and home=="italia" and age>=12 and age<18
-	if selected:
-		for level in 4:
-			selected = selected and ResourceLoader.exists(MESHY_YOUTH_PATH % level,"PackedScene")
-	if selected!=_meshy_youth:
+	# An empty outfit keeps the current request (the armoured original by default).
+	if not outfit.is_empty():
+		requested_youth_outfit = outfit if MESHY_YOUTH_OUTFITS.has(outfit) else "armoured"
+	var shown := requested_youth_outfit if youth_outfit_installed(requested_youth_outfit) else "armoured"
+	var selected := enabled and role=="player" and home=="italia" and age>=12 and age<18 and youth_outfit_installed(shown)
+	if selected!=_meshy_youth or (selected and shown!=youth_outfit):
 		_meshy_youth = selected
+		youth_outfit = shown
 		if body:
 			_reload(maxi(0,detail))
 	return selected
+
+
+static func youth_outfit_installed(outfit: String) -> bool:
+	if not MESHY_YOUTH_OUTFITS.has(outfit):
+		return false
+	for level in 4:
+		if not ResourceLoader.exists(String(MESHY_YOUTH_OUTFITS[outfit].path) % level,"PackedScene"):
+			return false
+	return true
+
+
+func youth_path(level: int) -> String:
+	return String(MESHY_YOUTH_OUTFITS[youth_outfit].path) % level
 
 
 func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null) -> void:
@@ -186,12 +214,8 @@ func _path(level: int) -> String:
 	# This asset has an authored Italia identity. Other origins and companions
 	# keep their own appearances until their replacement models are available.
 	if role == "player" and home == "italia":
-		if _meshy_youth and age>=12 and age<18:
-			var youth_complete := true
-			for candidate in 4:
-				youth_complete = youth_complete and ResourceLoader.exists(MESHY_YOUTH_PATH % candidate,"PackedScene")
-			if youth_complete:
-				return MESHY_YOUTH_PATH % level
+		if _meshy_youth and age>=12 and age<18 and youth_outfit_installed(youth_outfit):
+			return youth_path(level)
 		var complete_set := true
 		for candidate in 4:
 			if not ResourceLoader.exists(HERO_PATH % candidate, "PackedScene"):
@@ -281,7 +305,7 @@ func _reload(level: int) -> void:
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
 	_motion.bind(body, civilian_motion and not imported_youth, identity)
-	_youth_soles.bind(body if imported_youth else null,detail)
+	_youth_soles.bind(body if imported_youth else null,detail,String(MESHY_YOUTH_OUTFITS[youth_outfit].motion))
 	_motion_identity = identity
 	_motion.restore_world_contacts(contacts)
 	# The external tracks target this authored hero family. Never reuse them

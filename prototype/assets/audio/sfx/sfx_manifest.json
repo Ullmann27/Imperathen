@@ -1,0 +1,1839 @@
+{
+ "schema_version": 1,
+ "generator": "tools/audio/synth_sfx.py",
+ "generator_version": 1,
+ "provenance": "Eigene prozedurale Synthese, keine Aufnahmen Dritter; Lizenz wie Projekt (CC0-Freigabe durch Projekt möglich).",
+ "sample_rate": 44100,
+ "sounds": [
+  {
+   "event": "impact",
+   "name": "metal_metal_light",
+   "variant": 0,
+   "file": "impact/metal_metal_light_00.wav",
+   "seed": 1001,
+   "params": {
+    "materials": [
+     "metal",
+     "metal"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "4978c6b92c215b1be18e92f0b630cbc79270e58668cf3e5b09b52b74707c74ba"
+  },
+  {
+   "event": "impact",
+   "name": "metal_metal_light",
+   "variant": 1,
+   "file": "impact/metal_metal_light_01.wav",
+   "seed": 1002,
+   "params": {
+    "materials": [
+     "metal",
+     "metal"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "a522297f9bffbddb624f3e7c69273b90b220761363a7fdaa77507eff443323e3"
+  },
+  {
+   "event": "impact",
+   "name": "metal_metal_light",
+   "variant": 2,
+   "file": "impact/metal_metal_light_02.wav",
+   "seed": 1003,
+   "params": {
+    "materials": [
+     "metal",
+     "metal"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "f0df2e02cabf3210d2ab2fd2d591f983752b6744b40f387b56d4d1d095bcd42e"
+  },
+  {
+   "event": "impact",
+   "name": "metal_metal_light",
+   "variant": 3,
+   "file": "impact/metal_metal_light_03.wav",
+   "seed": 1004,
+   "params": {
+    "materials": [
+     "metal",
+     "metal"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "106dd8f828a38e701435144a097ff4ef6bfe3114e4b61f21ca7b2ab4e14cdbb9"
+  },
+  {
+   "event": "impact",
+   "name": "metal_metal_heavy",
+   "variant": 0,
+   "file": "impact/metal_metal_heavy_00.wav",
+   "seed": 1005,
+   "params": {
+    "materials": [
+     "metal",
+     "metal"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "4f17cf10697682980604191661064756f2d9fb60873438aaf5b463ce1c94ea59"
+  },
+  {
+   "event": "impact",
+   "name": "metal_metal_heavy",
+   "variant": 1,
+   "file": "impact/metal_metal_heavy_01.wav",
+   "seed": 1006,
+   "params": {
+    "materials": [
+     "metal",
+     "metal"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "4fd99f8b1c0d707506f050c43bb7db57ecc74a7f859d182f00454af6d99f989a"
+  },
+  {
+   "event": "impact",
+   "name": "metal_metal_heavy",
+   "variant": 2,
+   "file": "impact/metal_metal_heavy_02.wav",
+   "seed": 1007,
+   "params": {
+    "materials": [
+     "metal",
+     "metal"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "2a8ed3a6f38851a62bfd6332b43bc4d07756e6a0220ecf7d4ef525b51cc1b72a"
+  },
+  {
+   "event": "impact",
+   "name": "metal_metal_heavy",
+   "variant": 3,
+   "file": "impact/metal_metal_heavy_03.wav",
+   "seed": 1008,
+   "params": {
+    "materials": [
+     "metal",
+     "metal"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "2cc1b49a444b604e0c836e626442bc41e323c100c42a616a544889959ea9acb1"
+  },
+  {
+   "event": "impact",
+   "name": "metal_wood_light",
+   "variant": 0,
+   "file": "impact/metal_wood_light_00.wav",
+   "seed": 1009,
+   "params": {
+    "materials": [
+     "metal",
+     "wood"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "27be746994ebef890f780000c6af694e89e73887a752c24d80317f081c82c92a"
+  },
+  {
+   "event": "impact",
+   "name": "metal_wood_light",
+   "variant": 1,
+   "file": "impact/metal_wood_light_01.wav",
+   "seed": 1010,
+   "params": {
+    "materials": [
+     "metal",
+     "wood"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "a68f509f76e593eaf1381216f21de56a4890c78e8dd179a63ae3da27d9becd19"
+  },
+  {
+   "event": "impact",
+   "name": "metal_wood_light",
+   "variant": 2,
+   "file": "impact/metal_wood_light_02.wav",
+   "seed": 1011,
+   "params": {
+    "materials": [
+     "metal",
+     "wood"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "1024056ac2748cc79e1dcaa8ff18421e7ca1e88ebc91e2ca5e3a04611b38e534"
+  },
+  {
+   "event": "impact",
+   "name": "metal_wood_light",
+   "variant": 3,
+   "file": "impact/metal_wood_light_03.wav",
+   "seed": 1012,
+   "params": {
+    "materials": [
+     "metal",
+     "wood"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "1e2fc7f434a7c917a3ea99b8c243d20dfe471681217d61997afd38855560e6b3"
+  },
+  {
+   "event": "impact",
+   "name": "metal_wood_heavy",
+   "variant": 0,
+   "file": "impact/metal_wood_heavy_00.wav",
+   "seed": 1013,
+   "params": {
+    "materials": [
+     "metal",
+     "wood"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "16cf3a416b65df6c3a1e29b36b3990e830a43ace74d05e9580518864b378fe64"
+  },
+  {
+   "event": "impact",
+   "name": "metal_wood_heavy",
+   "variant": 1,
+   "file": "impact/metal_wood_heavy_01.wav",
+   "seed": 1014,
+   "params": {
+    "materials": [
+     "metal",
+     "wood"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "c1388d124f1656b1f9849d065fda7fd2b0a55cb5ca50f1fd12d57388d0f771b1"
+  },
+  {
+   "event": "impact",
+   "name": "metal_wood_heavy",
+   "variant": 2,
+   "file": "impact/metal_wood_heavy_02.wav",
+   "seed": 1015,
+   "params": {
+    "materials": [
+     "metal",
+     "wood"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "1e7d9d1cb8daf9dfd96f8ba7d456d77a48ad4cbc653fc64cd21be8223cdddf71"
+  },
+  {
+   "event": "impact",
+   "name": "metal_wood_heavy",
+   "variant": 3,
+   "file": "impact/metal_wood_heavy_03.wav",
+   "seed": 1016,
+   "params": {
+    "materials": [
+     "metal",
+     "wood"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "24d72fe854b107e284a24fe05fc7aa5159dbe872095cece6955529f0b558ba79"
+  },
+  {
+   "event": "impact",
+   "name": "metal_leather_light",
+   "variant": 0,
+   "file": "impact/metal_leather_light_00.wav",
+   "seed": 1017,
+   "params": {
+    "materials": [
+     "metal",
+     "leather"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.02,
+   "sha256": "79d3ad389cf7fd4f276f8df2451b340247a9bc9e071d2e52771b4fa64c637ad4"
+  },
+  {
+   "event": "impact",
+   "name": "metal_leather_light",
+   "variant": 1,
+   "file": "impact/metal_leather_light_01.wav",
+   "seed": 1018,
+   "params": {
+    "materials": [
+     "metal",
+     "leather"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.159,
+   "sha256": "fb843195ffd2e3c1c2453d982deea2565f9bfa56d3ad8d8fc7e07d57a2209dba"
+  },
+  {
+   "event": "impact",
+   "name": "metal_leather_light",
+   "variant": 2,
+   "file": "impact/metal_leather_light_02.wav",
+   "seed": 1019,
+   "params": {
+    "materials": [
+     "metal",
+     "leather"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.094,
+   "sha256": "8f176550cf933bfb68250f9bad49ef1cf6f59d308be32f37a74a29c51d5a66e6"
+  },
+  {
+   "event": "impact",
+   "name": "metal_leather_light",
+   "variant": 3,
+   "file": "impact/metal_leather_light_03.wav",
+   "seed": 1020,
+   "params": {
+    "materials": [
+     "metal",
+     "leather"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.953,
+   "sha256": "a5bf08e10ba59b071e0896d3c9f00ae12c244fb780cba0948169e5a8aa103afa"
+  },
+  {
+   "event": "impact",
+   "name": "metal_leather_heavy",
+   "variant": 0,
+   "file": "impact/metal_leather_heavy_00.wav",
+   "seed": 1021,
+   "params": {
+    "materials": [
+     "metal",
+     "leather"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.794,
+   "sha256": "cd4f10258f7bfee3b8d60e83e9780048e510e7bf066dd9b0acbd585d0bf79c1c"
+  },
+  {
+   "event": "impact",
+   "name": "metal_leather_heavy",
+   "variant": 1,
+   "file": "impact/metal_leather_heavy_01.wav",
+   "seed": 1022,
+   "params": {
+    "materials": [
+     "metal",
+     "leather"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.091,
+   "sha256": "44f2cca9d8d107af44e81dd1d065a55c88b0f3e8257b32072538aeb75e232f06"
+  },
+  {
+   "event": "impact",
+   "name": "metal_leather_heavy",
+   "variant": 2,
+   "file": "impact/metal_leather_heavy_02.wav",
+   "seed": 1023,
+   "params": {
+    "materials": [
+     "metal",
+     "leather"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.886,
+   "sha256": "efc174caa1fad0c210608f933e126fa34b837543bd8fbc8a8300b4622f84b4b0"
+  },
+  {
+   "event": "impact",
+   "name": "metal_leather_heavy",
+   "variant": 3,
+   "file": "impact/metal_leather_heavy_03.wav",
+   "seed": 1024,
+   "params": {
+    "materials": [
+     "metal",
+     "leather"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.866,
+   "sha256": "698da1a8690a9463d56f4285d61b128a4e588e772f99621a9870994472c18ae9"
+  },
+  {
+   "event": "impact",
+   "name": "metal_flesh_light",
+   "variant": 0,
+   "file": "impact/metal_flesh_light_00.wav",
+   "seed": 1025,
+   "params": {
+    "materials": [
+     "metal",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.64,
+   "sha256": "e2798c2af07220071f25f0499181c5a4e6e5863ad2cf9c11410725b250dcc47e"
+  },
+  {
+   "event": "impact",
+   "name": "metal_flesh_light",
+   "variant": 1,
+   "file": "impact/metal_flesh_light_01.wav",
+   "seed": 1026,
+   "params": {
+    "materials": [
+     "metal",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.703,
+   "sha256": "401a8fd95bf20e5abdadbdd1c95d8635f208b6f2cb0338c49144de6601999598"
+  },
+  {
+   "event": "impact",
+   "name": "metal_flesh_light",
+   "variant": 2,
+   "file": "impact/metal_flesh_light_02.wav",
+   "seed": 1027,
+   "params": {
+    "materials": [
+     "metal",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.704,
+   "sha256": "e843765a193ea2abf96dd533fb80d366ecd9f5e586dff039cc04a1bd0ef6cf19"
+  },
+  {
+   "event": "impact",
+   "name": "metal_flesh_light",
+   "variant": 3,
+   "file": "impact/metal_flesh_light_03.wav",
+   "seed": 1028,
+   "params": {
+    "materials": [
+     "metal",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.581,
+   "sha256": "0a54615c231f85af3ec713981fa881d0ccb7739355834728e3b99aa07fe77d21"
+  },
+  {
+   "event": "impact",
+   "name": "metal_flesh_heavy",
+   "variant": 0,
+   "file": "impact/metal_flesh_heavy_00.wav",
+   "seed": 1029,
+   "params": {
+    "materials": [
+     "metal",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.642,
+   "sha256": "736bfde9857fb19064ee2effb892b3603f28d2bd1a9ff0a01bf8afa953b5366e"
+  },
+  {
+   "event": "impact",
+   "name": "metal_flesh_heavy",
+   "variant": 1,
+   "file": "impact/metal_flesh_heavy_01.wav",
+   "seed": 1030,
+   "params": {
+    "materials": [
+     "metal",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.531,
+   "sha256": "a674f50418a5f5337cc10d5f8470a27f2412a5eef84b0c8c8d193ab5eddf8147"
+  },
+  {
+   "event": "impact",
+   "name": "metal_flesh_heavy",
+   "variant": 2,
+   "file": "impact/metal_flesh_heavy_02.wav",
+   "seed": 1031,
+   "params": {
+    "materials": [
+     "metal",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.586,
+   "sha256": "384e6f16744d9bca397657183d32c85c725452cf9a399acf3575e62ce11602ed"
+  },
+  {
+   "event": "impact",
+   "name": "metal_flesh_heavy",
+   "variant": 3,
+   "file": "impact/metal_flesh_heavy_03.wav",
+   "seed": 1032,
+   "params": {
+    "materials": [
+     "metal",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.597,
+   "sha256": "3a5ae408dce9cfbc59d1c6dfca0e6bd8994fc8a5cde5ae6f7609c7e5a94db2ea"
+  },
+  {
+   "event": "impact",
+   "name": "wood_wood_light",
+   "variant": 0,
+   "file": "impact/wood_wood_light_00.wav",
+   "seed": 1033,
+   "params": {
+    "materials": [
+     "wood",
+     "wood"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.239,
+   "sha256": "011374d53d9dc6491585542630422cc801024ed285f92737dbf52da33e3f6a44"
+  },
+  {
+   "event": "impact",
+   "name": "wood_wood_light",
+   "variant": 1,
+   "file": "impact/wood_wood_light_01.wav",
+   "seed": 1034,
+   "params": {
+    "materials": [
+     "wood",
+     "wood"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.241,
+   "sha256": "3f25488a21333406208978ed2c3f3f815b7f313b0fe0e365276248f5bb415ce2"
+  },
+  {
+   "event": "impact",
+   "name": "wood_wood_light",
+   "variant": 2,
+   "file": "impact/wood_wood_light_02.wav",
+   "seed": 1035,
+   "params": {
+    "materials": [
+     "wood",
+     "wood"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.193,
+   "sha256": "19cb50d657d5b6941bb98527a10d9a7d06d528b81f2707d980764a950541e4bc"
+  },
+  {
+   "event": "impact",
+   "name": "wood_wood_light",
+   "variant": 3,
+   "file": "impact/wood_wood_light_03.wav",
+   "seed": 1036,
+   "params": {
+    "materials": [
+     "wood",
+     "wood"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.23,
+   "sha256": "7beb3ad525bdb0b504b30b7b4c66496964a0d67df9c299a99a1881aa0b660268"
+  },
+  {
+   "event": "impact",
+   "name": "wood_wood_heavy",
+   "variant": 0,
+   "file": "impact/wood_wood_heavy_00.wav",
+   "seed": 1037,
+   "params": {
+    "materials": [
+     "wood",
+     "wood"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.228,
+   "sha256": "284bdec824c0781d91eb651d2f82dff59138258b37b5b91df11ef722f2bcf2be"
+  },
+  {
+   "event": "impact",
+   "name": "wood_wood_heavy",
+   "variant": 1,
+   "file": "impact/wood_wood_heavy_01.wav",
+   "seed": 1038,
+   "params": {
+    "materials": [
+     "wood",
+     "wood"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.217,
+   "sha256": "f01a442aca56cdb875be1141d51d5d1c961fbf80a924c42c07bc95ba72ec563c"
+  },
+  {
+   "event": "impact",
+   "name": "wood_wood_heavy",
+   "variant": 2,
+   "file": "impact/wood_wood_heavy_02.wav",
+   "seed": 1039,
+   "params": {
+    "materials": [
+     "wood",
+     "wood"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.236,
+   "sha256": "093d1977b545104383de17bf68731da366aa949f6cc4703da1eb15c41104c83e"
+  },
+  {
+   "event": "impact",
+   "name": "wood_wood_heavy",
+   "variant": 3,
+   "file": "impact/wood_wood_heavy_03.wav",
+   "seed": 1040,
+   "params": {
+    "materials": [
+     "wood",
+     "wood"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.225,
+   "sha256": "0265e50cfdfd56260e3c6579145c634def6e3216f2f3d6081bc674057b10fe56"
+  },
+  {
+   "event": "impact",
+   "name": "wood_flesh_light",
+   "variant": 0,
+   "file": "impact/wood_flesh_light_00.wav",
+   "seed": 1041,
+   "params": {
+    "materials": [
+     "wood",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.179,
+   "sha256": "66e800678c2b4f27f0efc613722ed7150c187640890c6b8b5249fc09b31e648f"
+  },
+  {
+   "event": "impact",
+   "name": "wood_flesh_light",
+   "variant": 1,
+   "file": "impact/wood_flesh_light_01.wav",
+   "seed": 1042,
+   "params": {
+    "materials": [
+     "wood",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.211,
+   "sha256": "fb484dab5595f39780ee17516e7ef0619b7fab063deaaeb797f10d9dac6fbc6c"
+  },
+  {
+   "event": "impact",
+   "name": "wood_flesh_light",
+   "variant": 2,
+   "file": "impact/wood_flesh_light_02.wav",
+   "seed": 1043,
+   "params": {
+    "materials": [
+     "wood",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.194,
+   "sha256": "49c7e1ba2b6340788b76bb720612b251019ab12b530e74f4f41d05b33985b431"
+  },
+  {
+   "event": "impact",
+   "name": "wood_flesh_light",
+   "variant": 3,
+   "file": "impact/wood_flesh_light_03.wav",
+   "seed": 1044,
+   "params": {
+    "materials": [
+     "wood",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.196,
+   "sha256": "91985ab5cfcaa1e162b64df9f5cb99794abc40679473f02a732fbee898d15b60"
+  },
+  {
+   "event": "impact",
+   "name": "wood_flesh_heavy",
+   "variant": 0,
+   "file": "impact/wood_flesh_heavy_00.wav",
+   "seed": 1045,
+   "params": {
+    "materials": [
+     "wood",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.201,
+   "sha256": "310d1bdbe0fa27ca117acd03d9298fa50b062a2e9023c4798a9850d720d99ae8"
+  },
+  {
+   "event": "impact",
+   "name": "wood_flesh_heavy",
+   "variant": 1,
+   "file": "impact/wood_flesh_heavy_01.wav",
+   "seed": 1046,
+   "params": {
+    "materials": [
+     "wood",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.175,
+   "sha256": "f1b3b41b14b18307f6bdc66af1960482d7f6d56112d0fca5cac4c7f765aea741"
+  },
+  {
+   "event": "impact",
+   "name": "wood_flesh_heavy",
+   "variant": 2,
+   "file": "impact/wood_flesh_heavy_02.wav",
+   "seed": 1047,
+   "params": {
+    "materials": [
+     "wood",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.203,
+   "sha256": "90910c741542f9f890a8f6b9b4c5b41499ce42f3285225361ea62185c9526b28"
+  },
+  {
+   "event": "impact",
+   "name": "wood_flesh_heavy",
+   "variant": 3,
+   "file": "impact/wood_flesh_heavy_03.wav",
+   "seed": 1048,
+   "params": {
+    "materials": [
+     "wood",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.193,
+   "sha256": "8f873aacb5e1515f14133c13331b7a831f49da6f968a56a294e9de25da5e2680"
+  },
+  {
+   "event": "impact",
+   "name": "flesh_flesh_light",
+   "variant": 0,
+   "file": "impact/flesh_flesh_light_00.wav",
+   "seed": 1049,
+   "params": {
+    "materials": [
+     "flesh",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.081,
+   "sha256": "37d57322db23b680fc0d401518efda1b66a96148bdf18e7273cf29f4815d7050"
+  },
+  {
+   "event": "impact",
+   "name": "flesh_flesh_light",
+   "variant": 1,
+   "file": "impact/flesh_flesh_light_01.wav",
+   "seed": 1050,
+   "params": {
+    "materials": [
+     "flesh",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.083,
+   "sha256": "cd8bb24f299a84687ed588583bd08d6b69c6fd75ea11133d8da6d39ef63ddfe5"
+  },
+  {
+   "event": "impact",
+   "name": "flesh_flesh_light",
+   "variant": 2,
+   "file": "impact/flesh_flesh_light_02.wav",
+   "seed": 1051,
+   "params": {
+    "materials": [
+     "flesh",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.082,
+   "sha256": "90feae58940ffb066a86b238e542b8838ac9d4a6c908945902780c302edc7335"
+  },
+  {
+   "event": "impact",
+   "name": "flesh_flesh_light",
+   "variant": 3,
+   "file": "impact/flesh_flesh_light_03.wav",
+   "seed": 1052,
+   "params": {
+    "materials": [
+     "flesh",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.082,
+   "sha256": "da742c34b748e6a78d37e0edb2db3df1542c9f90d39e9ffec522b2f00a8d41a7"
+  },
+  {
+   "event": "impact",
+   "name": "flesh_flesh_heavy",
+   "variant": 0,
+   "file": "impact/flesh_flesh_heavy_00.wav",
+   "seed": 1053,
+   "params": {
+    "materials": [
+     "flesh",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.077,
+   "sha256": "75539252c732411ed4aad9404d636459db158f2752dec141cfa972736d6b5718"
+  },
+  {
+   "event": "impact",
+   "name": "flesh_flesh_heavy",
+   "variant": 1,
+   "file": "impact/flesh_flesh_heavy_01.wav",
+   "seed": 1054,
+   "params": {
+    "materials": [
+     "flesh",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.076,
+   "sha256": "eabd0683428dd776bd329b21ae13b8be8602418c058b69aa4de83601313b65e2"
+  },
+  {
+   "event": "impact",
+   "name": "flesh_flesh_heavy",
+   "variant": 2,
+   "file": "impact/flesh_flesh_heavy_02.wav",
+   "seed": 1055,
+   "params": {
+    "materials": [
+     "flesh",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.077,
+   "sha256": "a722a4569dd5c6eab3fdc444986bdb26af6485d73e9d9fd1bfdb9c16ae680ce4"
+  },
+  {
+   "event": "impact",
+   "name": "flesh_flesh_heavy",
+   "variant": 3,
+   "file": "impact/flesh_flesh_heavy_03.wav",
+   "seed": 1056,
+   "params": {
+    "materials": [
+     "flesh",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.077,
+   "sha256": "1232438ee8a5107944efae56ffacd36a0e3c4ca3b427b15ec3240a4581b83ea8"
+  },
+  {
+   "event": "impact",
+   "name": "leather_flesh_light",
+   "variant": 0,
+   "file": "impact/leather_flesh_light_00.wav",
+   "seed": 1057,
+   "params": {
+    "materials": [
+     "leather",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.087,
+   "sha256": "866144101fb05715ef58e09a4ca3101917bf223be287a5d3f5e1acb1c7603b7a"
+  },
+  {
+   "event": "impact",
+   "name": "leather_flesh_light",
+   "variant": 1,
+   "file": "impact/leather_flesh_light_01.wav",
+   "seed": 1058,
+   "params": {
+    "materials": [
+     "leather",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.091,
+   "sha256": "d077ebcc1246143a71c5fc2472133356bbd41f6c7d77ff8dcb34b800c8b41446"
+  },
+  {
+   "event": "impact",
+   "name": "leather_flesh_light",
+   "variant": 2,
+   "file": "impact/leather_flesh_light_02.wav",
+   "seed": 1059,
+   "params": {
+    "materials": [
+     "leather",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.082,
+   "sha256": "ad32e176c25b8cae3b4715c7ebf4b8eb23ba3f3c612897382552f9b675c6e6f3"
+  },
+  {
+   "event": "impact",
+   "name": "leather_flesh_light",
+   "variant": 3,
+   "file": "impact/leather_flesh_light_03.wav",
+   "seed": 1060,
+   "params": {
+    "materials": [
+     "leather",
+     "flesh"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 0.084,
+   "sha256": "f9bba2b002ce9a57d891d79b73be818dae9a48206a9710dc49ed9be712729e9a"
+  },
+  {
+   "event": "impact",
+   "name": "leather_flesh_heavy",
+   "variant": 0,
+   "file": "impact/leather_flesh_heavy_00.wav",
+   "seed": 1061,
+   "params": {
+    "materials": [
+     "leather",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.068,
+   "sha256": "bbd050c07f5068dfc36c53eaa35d2e262a6f64271574365de4a474e367441fb3"
+  },
+  {
+   "event": "impact",
+   "name": "leather_flesh_heavy",
+   "variant": 1,
+   "file": "impact/leather_flesh_heavy_01.wav",
+   "seed": 1062,
+   "params": {
+    "materials": [
+     "leather",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.079,
+   "sha256": "fa8af9f52a0388904d19573f230b3a9a5627fcc3ad61f06fdc4655ae376ba27d"
+  },
+  {
+   "event": "impact",
+   "name": "leather_flesh_heavy",
+   "variant": 2,
+   "file": "impact/leather_flesh_heavy_02.wav",
+   "seed": 1063,
+   "params": {
+    "materials": [
+     "leather",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.088,
+   "sha256": "599bfcf264bd7323127812cee747d62cd3dc054ebde0bddf334ee778c68580e3"
+  },
+  {
+   "event": "impact",
+   "name": "leather_flesh_heavy",
+   "variant": 3,
+   "file": "impact/leather_flesh_heavy_03.wav",
+   "seed": 1064,
+   "params": {
+    "materials": [
+     "leather",
+     "flesh"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 0.089,
+   "sha256": "76d541fa62acab1c0ac6aaa13bc08b03b20bb538727f8a615886d83a0edaaa78"
+  },
+  {
+   "event": "impact",
+   "name": "metal_bone_light",
+   "variant": 0,
+   "file": "impact/metal_bone_light_00.wav",
+   "seed": 1065,
+   "params": {
+    "materials": [
+     "metal",
+     "bone"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "0168f880bc500cb2d71333ed36fa004d6c2fc2872fdf2141114c3b5aada3f2da"
+  },
+  {
+   "event": "impact",
+   "name": "metal_bone_light",
+   "variant": 1,
+   "file": "impact/metal_bone_light_01.wav",
+   "seed": 1066,
+   "params": {
+    "materials": [
+     "metal",
+     "bone"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "f52de700d8d9ef6d3654c2bae5bf70d138b3eb013931a72d84c77a0ee7fb9f00"
+  },
+  {
+   "event": "impact",
+   "name": "metal_bone_light",
+   "variant": 2,
+   "file": "impact/metal_bone_light_02.wav",
+   "seed": 1067,
+   "params": {
+    "materials": [
+     "metal",
+     "bone"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "89b168da99e0d0884cb14f35759edbc640d3deec408e9e833c138df418d45f9f"
+  },
+  {
+   "event": "impact",
+   "name": "metal_bone_light",
+   "variant": 3,
+   "file": "impact/metal_bone_light_03.wav",
+   "seed": 1068,
+   "params": {
+    "materials": [
+     "metal",
+     "bone"
+    ],
+    "energy": 0.35
+   },
+   "duration_s": 1.6,
+   "sha256": "d0ca96705936a871c3efee7d95f62d8c4a4a7ed18d34c0a3fced10ea6d417682"
+  },
+  {
+   "event": "impact",
+   "name": "metal_bone_heavy",
+   "variant": 0,
+   "file": "impact/metal_bone_heavy_00.wav",
+   "seed": 1069,
+   "params": {
+    "materials": [
+     "metal",
+     "bone"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "09aed1249c5ff6eb5c324f19b8f378b504c0e50283a65bf54cc163f8c13dab00"
+  },
+  {
+   "event": "impact",
+   "name": "metal_bone_heavy",
+   "variant": 1,
+   "file": "impact/metal_bone_heavy_01.wav",
+   "seed": 1070,
+   "params": {
+    "materials": [
+     "metal",
+     "bone"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "e2f5d44837bb9c5870ff3c1b2f83072e005d86429d61e071a124f8945de64759"
+  },
+  {
+   "event": "impact",
+   "name": "metal_bone_heavy",
+   "variant": 2,
+   "file": "impact/metal_bone_heavy_02.wav",
+   "seed": 1071,
+   "params": {
+    "materials": [
+     "metal",
+     "bone"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "ca03e514fba38eac1a1cfe26bf925d58d1a48bbbfa587a170b5fb0182d64ee18"
+  },
+  {
+   "event": "impact",
+   "name": "metal_bone_heavy",
+   "variant": 3,
+   "file": "impact/metal_bone_heavy_03.wav",
+   "seed": 1072,
+   "params": {
+    "materials": [
+     "metal",
+     "bone"
+    ],
+    "energy": 0.9
+   },
+   "duration_s": 1.6,
+   "sha256": "8f2cd160d80ceb8b1eec059c5ade881032682c48e8e3493c80afc7606e77e004"
+  },
+  {
+   "event": "swish",
+   "name": "light",
+   "variant": 0,
+   "file": "swish/light_00.wav",
+   "seed": 1073,
+   "params": {
+    "weight": "light"
+   },
+   "duration_s": 0.267,
+   "sha256": "affa7af33b76f755c768fd3356134666d970082d71e69f732f8633b99055064f"
+  },
+  {
+   "event": "swish",
+   "name": "light",
+   "variant": 1,
+   "file": "swish/light_01.wav",
+   "seed": 1074,
+   "params": {
+    "weight": "light"
+   },
+   "duration_s": 0.303,
+   "sha256": "789e3158da0f82439bc8e4a1dec20e9573c4e64da0dbf86bce995d76b62c2581"
+  },
+  {
+   "event": "swish",
+   "name": "light",
+   "variant": 2,
+   "file": "swish/light_02.wav",
+   "seed": 1075,
+   "params": {
+    "weight": "light"
+   },
+   "duration_s": 0.292,
+   "sha256": "f17e422c4d7e0983a332cea07c8b775a6d74e7b746a98e69ac66b20490daa500"
+  },
+  {
+   "event": "swish",
+   "name": "light",
+   "variant": 3,
+   "file": "swish/light_03.wav",
+   "seed": 1076,
+   "params": {
+    "weight": "light"
+   },
+   "duration_s": 0.269,
+   "sha256": "1ff1e68b357ab62998b47cd99bfc855369b727438868b755f66ad5cf38824b5c"
+  },
+  {
+   "event": "swish",
+   "name": "heavy",
+   "variant": 0,
+   "file": "swish/heavy_00.wav",
+   "seed": 1077,
+   "params": {
+    "weight": "heavy"
+   },
+   "duration_s": 0.453,
+   "sha256": "de267486f3be596aef2c4dcfd320e8b03f924a58cb778ed52b92198388cef5a4"
+  },
+  {
+   "event": "swish",
+   "name": "heavy",
+   "variant": 1,
+   "file": "swish/heavy_01.wav",
+   "seed": 1078,
+   "params": {
+    "weight": "heavy"
+   },
+   "duration_s": 0.45,
+   "sha256": "b45a0673c2c0d87b0b231a37386e95830793da457ffc92a014891a43f8a6c7c9"
+  },
+  {
+   "event": "swish",
+   "name": "heavy",
+   "variant": 2,
+   "file": "swish/heavy_02.wav",
+   "seed": 1079,
+   "params": {
+    "weight": "heavy"
+   },
+   "duration_s": 0.455,
+   "sha256": "0514baf329ac040eb56fb0a3531399df770a2bd623ebe29489dc4471d96e5390"
+  },
+  {
+   "event": "swish",
+   "name": "heavy",
+   "variant": 3,
+   "file": "swish/heavy_03.wav",
+   "seed": 1080,
+   "params": {
+    "weight": "heavy"
+   },
+   "duration_s": 0.452,
+   "sha256": "bacf08dd2831769835cfff37455943304cc60aa13cf569f7f0828ed60d8658e3"
+  },
+  {
+   "event": "bow",
+   "name": "draw",
+   "variant": 0,
+   "file": "bow/draw_00.wav",
+   "seed": 1081,
+   "params": {},
+   "duration_s": 1.088,
+   "sha256": "bbe881f1637787d1e8bab602f387ffe0a8a24d295adedd5962c5d2d8b9797030"
+  },
+  {
+   "event": "bow",
+   "name": "release",
+   "variant": 0,
+   "file": "bow/release_00.wav",
+   "seed": 1082,
+   "params": {
+    "kind": "bow"
+   },
+   "duration_s": 0.45,
+   "sha256": "166e3824a9c38bdf5566b05fa7d22ca27918cb9211f610415d34e67082d1b3be"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_flight",
+   "variant": 0,
+   "file": "projectile/arrow_flight_00.wav",
+   "seed": 1083,
+   "params": {},
+   "duration_s": 0.9,
+   "sha256": "6e6a3fb926c827a2fd4b18fa42c27e3a3b4a469f42b51c81eaed8e1842cf8fa7"
+  },
+  {
+   "event": "crossbow",
+   "name": "crank",
+   "variant": 0,
+   "file": "crossbow/crank_00.wav",
+   "seed": 1084,
+   "params": {},
+   "duration_s": 1.395,
+   "sha256": "73d2ae60cf5781cb3f3786f7d5123e87612f932b522b8fcc87593a7c7c0a2a82"
+  },
+  {
+   "event": "crossbow",
+   "name": "release",
+   "variant": 0,
+   "file": "crossbow/release_00.wav",
+   "seed": 1085,
+   "params": {
+    "kind": "crossbow"
+   },
+   "duration_s": 0.33,
+   "sha256": "a40c259bbff193aca88f3d5ab244b479f3433c2c5c98c29fcfe557a231f2ad54"
+  },
+  {
+   "event": "bow",
+   "name": "draw",
+   "variant": 1,
+   "file": "bow/draw_01.wav",
+   "seed": 1086,
+   "params": {},
+   "duration_s": 1.173,
+   "sha256": "1f54c8f9a718942f96210852dce9a37933d9aed2a546d5d28b2cd894a30901d9"
+  },
+  {
+   "event": "bow",
+   "name": "release",
+   "variant": 1,
+   "file": "bow/release_01.wav",
+   "seed": 1087,
+   "params": {
+    "kind": "bow"
+   },
+   "duration_s": 0.45,
+   "sha256": "ce765d77e4571248e5f8cacf2b3996fceb93e38d2d26e5ffffe24a6e5ed8f0e9"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_flight",
+   "variant": 1,
+   "file": "projectile/arrow_flight_01.wav",
+   "seed": 1088,
+   "params": {},
+   "duration_s": 0.9,
+   "sha256": "c4bca828f3287ca7eee590afa856a616d6eaf467aa36375e6129b00fa3afc749"
+  },
+  {
+   "event": "crossbow",
+   "name": "crank",
+   "variant": 1,
+   "file": "crossbow/crank_01.wav",
+   "seed": 1089,
+   "params": {},
+   "duration_s": 1.398,
+   "sha256": "3db121d2cac3ca440c4397f5db86e9da721fd225eb2352baad7872fb9e0783f0"
+  },
+  {
+   "event": "crossbow",
+   "name": "release",
+   "variant": 1,
+   "file": "crossbow/release_01.wav",
+   "seed": 1090,
+   "params": {
+    "kind": "crossbow"
+   },
+   "duration_s": 0.33,
+   "sha256": "d2fdfc7584bccaf6444529477b0d5c7cc644b2fd3ea556d1c21eff3a96909d0f"
+  },
+  {
+   "event": "bow",
+   "name": "draw",
+   "variant": 2,
+   "file": "bow/draw_02.wav",
+   "seed": 1091,
+   "params": {},
+   "duration_s": 1.007,
+   "sha256": "80848c4363ef8627d1f4b12dbb3328a870d2eb32fb4641395bd567878a151530"
+  },
+  {
+   "event": "bow",
+   "name": "release",
+   "variant": 2,
+   "file": "bow/release_02.wav",
+   "seed": 1092,
+   "params": {
+    "kind": "bow"
+   },
+   "duration_s": 0.45,
+   "sha256": "677efacb0b8fa0fdf3190919c0ece1add2463ad47398cb1bc7bc2404ee0d2ae7"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_flight",
+   "variant": 2,
+   "file": "projectile/arrow_flight_02.wav",
+   "seed": 1093,
+   "params": {},
+   "duration_s": 0.9,
+   "sha256": "e29a8abe89399ace1ff2ff2e0167e5681855a53cc35386365cc5028af6c3045a"
+  },
+  {
+   "event": "crossbow",
+   "name": "crank",
+   "variant": 2,
+   "file": "crossbow/crank_02.wav",
+   "seed": 1094,
+   "params": {},
+   "duration_s": 1.396,
+   "sha256": "b178787d57cd0f013160e08efa31bb82ac709e7c0842859f52977a46a3c32873"
+  },
+  {
+   "event": "crossbow",
+   "name": "release",
+   "variant": 2,
+   "file": "crossbow/release_02.wav",
+   "seed": 1095,
+   "params": {
+    "kind": "crossbow"
+   },
+   "duration_s": 0.33,
+   "sha256": "66cd89cdf4499be5a3774412f429a47413644c4a01b54c9a95941dcd6d9bc462"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_wood",
+   "variant": 0,
+   "file": "projectile/arrow_impact_wood_00.wav",
+   "seed": 1096,
+   "params": {
+    "target": "wood"
+   },
+   "duration_s": 0.599,
+   "sha256": "44b2792cc35afac0e69dc203ab3ad87bbff4c67f61e00f3b3893f6d212ca77e2"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_wood",
+   "variant": 1,
+   "file": "projectile/arrow_impact_wood_01.wav",
+   "seed": 1097,
+   "params": {
+    "target": "wood"
+   },
+   "duration_s": 0.599,
+   "sha256": "f6122f7164f8dd7907a1c993e73fcdcaf99a023de54ef3e520e000fe16d93824"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_wood",
+   "variant": 2,
+   "file": "projectile/arrow_impact_wood_02.wav",
+   "seed": 1098,
+   "params": {
+    "target": "wood"
+   },
+   "duration_s": 0.6,
+   "sha256": "8f9456c4bde169c135984a4507c42332e55edd4e2571ea36830fd12efc3a7314"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_flesh",
+   "variant": 0,
+   "file": "projectile/arrow_impact_flesh_00.wav",
+   "seed": 1099,
+   "params": {
+    "target": "flesh"
+   },
+   "duration_s": 0.6,
+   "sha256": "58dedaffdc650c0a9250ad4e454a48e9e21fa8d4440653e0c1b81aa932d5a142"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_flesh",
+   "variant": 1,
+   "file": "projectile/arrow_impact_flesh_01.wav",
+   "seed": 1100,
+   "params": {
+    "target": "flesh"
+   },
+   "duration_s": 0.594,
+   "sha256": "e1e6e6e6fbf95866da4ff48d5aed83041e8e54f8d51c9ecf5d09ae6e5e26e905"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_flesh",
+   "variant": 2,
+   "file": "projectile/arrow_impact_flesh_02.wav",
+   "seed": 1101,
+   "params": {
+    "target": "flesh"
+   },
+   "duration_s": 0.6,
+   "sha256": "575b46e655cd9192539fd03ef9d0702363ff307f9e4707906a962671f6a765a1"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_earth",
+   "variant": 0,
+   "file": "projectile/arrow_impact_earth_00.wav",
+   "seed": 1102,
+   "params": {
+    "target": "earth"
+   },
+   "duration_s": 0.597,
+   "sha256": "81eccb30863a95f47f5ba583da74e37f8b3265269c954d810656d88b4acef365"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_earth",
+   "variant": 1,
+   "file": "projectile/arrow_impact_earth_01.wav",
+   "seed": 1103,
+   "params": {
+    "target": "earth"
+   },
+   "duration_s": 0.599,
+   "sha256": "d2349d31a545f163b4c32f2e53459956c8a326f0107b66f6cd357befbd7ba06c"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_earth",
+   "variant": 2,
+   "file": "projectile/arrow_impact_earth_02.wav",
+   "seed": 1104,
+   "params": {
+    "target": "earth"
+   },
+   "duration_s": 0.596,
+   "sha256": "cb3dbcc56605e9346a5807ebf52193c411964f1b01e1d6cff2af06aefa856bba"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_metal",
+   "variant": 0,
+   "file": "projectile/arrow_impact_metal_00.wav",
+   "seed": 1105,
+   "params": {
+    "target": "metal"
+   },
+   "duration_s": 0.6,
+   "sha256": "9f1006fbb4f4d1c4f9e44ee967e1f0ad68dadd12448ea52da42983730fd54263"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_metal",
+   "variant": 1,
+   "file": "projectile/arrow_impact_metal_01.wav",
+   "seed": 1106,
+   "params": {
+    "target": "metal"
+   },
+   "duration_s": 0.6,
+   "sha256": "0c2ddc02bbbef27f12d832ffea0663b96835e8b6f8d88d12e453f7a5b20cb803"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_metal",
+   "variant": 2,
+   "file": "projectile/arrow_impact_metal_02.wav",
+   "seed": 1107,
+   "params": {
+    "target": "metal"
+   },
+   "duration_s": 0.6,
+   "sha256": "6e49706e4bdc197832c524b4016ff24d82d3ded20c6f900aeaffcba90ee43900"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_leather",
+   "variant": 0,
+   "file": "projectile/arrow_impact_leather_00.wav",
+   "seed": 1108,
+   "params": {
+    "target": "leather"
+   },
+   "duration_s": 0.6,
+   "sha256": "c9a7b759ef3a638e6a2ef1f3c4b29733942198f784349a4421ecd748173f0607"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_leather",
+   "variant": 1,
+   "file": "projectile/arrow_impact_leather_01.wav",
+   "seed": 1109,
+   "params": {
+    "target": "leather"
+   },
+   "duration_s": 0.599,
+   "sha256": "303fe8b9ea6d3744de8db73b56f0a440a524334af425dc50925e2d962ebf2587"
+  },
+  {
+   "event": "projectile",
+   "name": "arrow_impact_leather",
+   "variant": 2,
+   "file": "projectile/arrow_impact_leather_02.wav",
+   "seed": 1110,
+   "params": {
+    "target": "leather"
+   },
+   "duration_s": 0.599,
+   "sha256": "f8617025abf19a8d3f32e02e2ca3488e39c0f90869db0b285ee2662910ccfd32"
+  },
+  {
+   "event": "footstep",
+   "name": "dirt",
+   "variant": 0,
+   "file": "footstep/dirt_00.wav",
+   "seed": 1111,
+   "params": {
+    "surface": "dirt"
+   },
+   "duration_s": 0.155,
+   "sha256": "06c846dcb8d3c0ade4ab1da39c8b33cc607725a0a636d28b984386af9f4b3107"
+  },
+  {
+   "event": "footstep",
+   "name": "dirt",
+   "variant": 1,
+   "file": "footstep/dirt_01.wav",
+   "seed": 1112,
+   "params": {
+    "surface": "dirt"
+   },
+   "duration_s": 0.143,
+   "sha256": "87228e8bcb1516b0a308b9ec9c02a54aef813f7e8ff1288bd59734259a444090"
+  },
+  {
+   "event": "footstep",
+   "name": "dirt",
+   "variant": 2,
+   "file": "footstep/dirt_02.wav",
+   "seed": 1113,
+   "params": {
+    "surface": "dirt"
+   },
+   "duration_s": 0.15,
+   "sha256": "1238ce3e8c2e2bec52f593337e58ab60ee3ea6fe8b5d6fe169a3d6e023f5209e"
+  },
+  {
+   "event": "footstep",
+   "name": "dirt",
+   "variant": 3,
+   "file": "footstep/dirt_03.wav",
+   "seed": 1114,
+   "params": {
+    "surface": "dirt"
+   },
+   "duration_s": 0.169,
+   "sha256": "8371df4b616ec9239db6337619b1af201f40ec6019e0d14e6ebed9e6e7aa4e1a"
+  },
+  {
+   "event": "footstep",
+   "name": "stone",
+   "variant": 0,
+   "file": "footstep/stone_00.wav",
+   "seed": 1115,
+   "params": {
+    "surface": "stone"
+   },
+   "duration_s": 0.111,
+   "sha256": "d21efe37773ecbc4a678f336dc2e54fe49be68e3854ad1dde3f7e99bdb57e535"
+  },
+  {
+   "event": "footstep",
+   "name": "stone",
+   "variant": 1,
+   "file": "footstep/stone_01.wav",
+   "seed": 1116,
+   "params": {
+    "surface": "stone"
+   },
+   "duration_s": 0.134,
+   "sha256": "1e95b6cd7b21cd398e5f82ff770a6d5063f4bb9fd62e6c6d75f7e5431d4df2cd"
+  },
+  {
+   "event": "footstep",
+   "name": "stone",
+   "variant": 2,
+   "file": "footstep/stone_02.wav",
+   "seed": 1117,
+   "params": {
+    "surface": "stone"
+   },
+   "duration_s": 0.123,
+   "sha256": "2387b430d77e87abbfa9a30c4374445625e7bd99d3122f190e3312b03493d2c0"
+  },
+  {
+   "event": "footstep",
+   "name": "stone",
+   "variant": 3,
+   "file": "footstep/stone_03.wav",
+   "seed": 1118,
+   "params": {
+    "surface": "stone"
+   },
+   "duration_s": 0.117,
+   "sha256": "b3c2bd9e412e7ba4b161a42aaf112e708300bd66ff734f9181b0f1123f8ca372"
+  },
+  {
+   "event": "footstep",
+   "name": "wood",
+   "variant": 0,
+   "file": "footstep/wood_00.wav",
+   "seed": 1119,
+   "params": {
+    "surface": "wood"
+   },
+   "duration_s": 0.35,
+   "sha256": "c3f58b5cd9ebfb935ac6b10a6067dfa6c31d4cf5f0998499c49f4539fe40c63d"
+  },
+  {
+   "event": "footstep",
+   "name": "wood",
+   "variant": 1,
+   "file": "footstep/wood_01.wav",
+   "seed": 1120,
+   "params": {
+    "surface": "wood"
+   },
+   "duration_s": 0.35,
+   "sha256": "b178e1817a19df95a9dcfed8743ae26a48baed093d07e5e4736c3e47ffad3404"
+  },
+  {
+   "event": "footstep",
+   "name": "wood",
+   "variant": 2,
+   "file": "footstep/wood_02.wav",
+   "seed": 1121,
+   "params": {
+    "surface": "wood"
+   },
+   "duration_s": 0.35,
+   "sha256": "d5cc28ee85f43e944e6093fcb892a6eafcbc839c3f67372ad5f21cebc92192bd"
+  },
+  {
+   "event": "footstep",
+   "name": "wood",
+   "variant": 3,
+   "file": "footstep/wood_03.wav",
+   "seed": 1122,
+   "params": {
+    "surface": "wood"
+   },
+   "duration_s": 0.35,
+   "sha256": "1b92ee498b7e1411aec125def6925b30cfaf66bef1a9cfec2daf76ac3f3688fa"
+  },
+  {
+   "event": "footstep",
+   "name": "grass",
+   "variant": 0,
+   "file": "footstep/grass_00.wav",
+   "seed": 1123,
+   "params": {
+    "surface": "grass"
+   },
+   "duration_s": 0.219,
+   "sha256": "490553109b5bc31c49ac13c805706be279fe6e07035b6cbce8686a8988f71e02"
+  },
+  {
+   "event": "footstep",
+   "name": "grass",
+   "variant": 1,
+   "file": "footstep/grass_01.wav",
+   "seed": 1124,
+   "params": {
+    "surface": "grass"
+   },
+   "duration_s": 0.152,
+   "sha256": "47386144fd4d6432dea5aebd601faa09e679417680acc2f60f642895e8ee1fe3"
+  },
+  {
+   "event": "footstep",
+   "name": "grass",
+   "variant": 2,
+   "file": "footstep/grass_02.wav",
+   "seed": 1125,
+   "params": {
+    "surface": "grass"
+   },
+   "duration_s": 0.201,
+   "sha256": "509d3259569cb50b92524a2091103a126a3921365c7d99c7746fd60177e9b808"
+  },
+  {
+   "event": "footstep",
+   "name": "grass",
+   "variant": 3,
+   "file": "footstep/grass_03.wav",
+   "seed": 1126,
+   "params": {
+    "surface": "grass"
+   },
+   "duration_s": 0.202,
+   "sha256": "5ae0f829a0ba43ec6bac32909cc33e6d0268ad5370c864e40aa6d2a70035d19c"
+  },
+  {
+   "event": "footstep",
+   "name": "gravel",
+   "variant": 0,
+   "file": "footstep/gravel_00.wav",
+   "seed": 1127,
+   "params": {
+    "surface": "gravel"
+   },
+   "duration_s": 0.175,
+   "sha256": "46bfde6349ee1fe767946a10c7c5941091018f412f53c0db028eb78151cb482a"
+  },
+  {
+   "event": "footstep",
+   "name": "gravel",
+   "variant": 1,
+   "file": "footstep/gravel_01.wav",
+   "seed": 1128,
+   "params": {
+    "surface": "gravel"
+   },
+   "duration_s": 0.188,
+   "sha256": "3517c03ddc2ef435aa2a8145ac4557e572bb3dc9d846bdc3dd734c2c1263e487"
+  },
+  {
+   "event": "footstep",
+   "name": "gravel",
+   "variant": 2,
+   "file": "footstep/gravel_02.wav",
+   "seed": 1129,
+   "params": {
+    "surface": "gravel"
+   },
+   "duration_s": 0.128,
+   "sha256": "c52d102e87979de21a2d4dd2aa4ee98e7a84409da43b1f9b878dd89e0205aa9b"
+  },
+  {
+   "event": "footstep",
+   "name": "gravel",
+   "variant": 3,
+   "file": "footstep/gravel_03.wav",
+   "seed": 1130,
+   "params": {
+    "surface": "gravel"
+   },
+   "duration_s": 0.139,
+   "sha256": "55f719556b3adfb2dccb91d9560d07baa541ace58696d096f32d3a730b4c88b9"
+  }
+ ]
+}

@@ -31,8 +31,14 @@ func _run() -> void:
 			if count >= tris:
 				errors.append("LOD reduction " + batch.name)
 			tris = count
-			var leaves := mesh.surface_get_material(1) as StandardMaterial3D
-			if leaves.transparency != BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR or leaves.albedo_texture == null:
+			var leaves := mesh.surface_get_material(1)
+			var textured_cutout := false
+			if leaves is ShaderMaterial and leaves.shader == Grove.CANOPY_WIND:
+				var cutoff := float(leaves.get_shader_parameter("alpha_cut"))
+				textured_cutout = cutoff > 0.0 and cutoff < 1.0 and leaves.get_shader_parameter("foliage") is Texture2D
+			elif leaves is BaseMaterial3D:
+				textured_cutout = leaves.transparency == BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR and leaves.albedo_texture != null
+			if not textured_cutout:
 				errors.append("Leaf alpha material " + batch.name)
 	grove.set_quality("low")
 	for kind in Grove.KINDS:

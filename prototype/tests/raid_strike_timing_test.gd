@@ -12,7 +12,8 @@ const Life = preload("res://scripts/story/village_life.gd")
 const Strike = preload("res://scripts/domain/raider_strike.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
 const DT := 1.0/60.0
-const FIELD := Vector2(40.0,-75.0)
+# Open ground east of the palisade, south of the north ridge foot.
+const FIELD := Vector2(40.0,-58.0)
 var checks := 0
 var failures: Array[String] = []
 var report := {}
@@ -291,6 +292,7 @@ func _setup() -> void:
 	raider = world.village_life_world.raiders[enemy_id]
 	figure = raider.get_node("Figure")
 	await physics_frame
+	_check(world.combat_sight_clear(FIELD + Vector2(-2.5, 0.0), FIELD), "Strike fixture has unobstructed sight before the first approach")
 	_sync_counters()
 
 

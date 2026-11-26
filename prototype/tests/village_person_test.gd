@@ -52,7 +52,7 @@ func check_original_youth(person: Person, label: String) -> void:
 			var material := body.get_active_material(i) as BaseMaterial3D
 			textured = textured or (material != null and material.albedo_texture != null)
 	check(textured,label+" original youth keeps its authored albedo texture")
-	check(person.active_model_path == Person.MESHY_YOUTH_PATH % maxi(0,person.detail),label+" original youth LOD matches the active detail")
+	check(person.active_model_path == person.youth_path(maxi(0,person.detail)),label+" original youth LOD matches the active detail")
 
 
 func metrics(person: Person) -> int:
@@ -125,6 +125,24 @@ func run() -> void:
 	for tint: String in swatches.values(): tints[tint] = true
 	check(swatches.size() == (4 if youth_seen else 5) and tints.size() == swatches.size(),"each home tunic uses a separate material tint")
 	check(youth_seen == youth_available,"original youth presence is exercised exactly when installed")
+	# D-032: the childhood campaign (Band I, 58 BC) shows the civilian outfit
+	# when it is installed; a legacy village save keeps the armoured original.
+	if youth_available:
+		model.new_game("italia", true, true)
+		world.setup(model.data)
+		var child: Person = world.get_node("Player/Figure")
+		var civil_installed := Person.youth_outfit_installed("civil")
+		check(child.requested_youth_outfit == "civil","childhood campaign requests the civilian youth outfit")
+		check(child.youth_outfit == ("civil" if civil_installed else "armoured"),"childhood campaign shows the installed civilian outfit")
+		check(is_original_youth(child) and child.active_model_path == child.youth_path(maxi(0,child.detail)),"civilian outfit keeps the original youth identity and LOD path")
+		if civil_installed:
+			check(child.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_civil_"),"childhood campaign loads the civilian LOD set")
+			check_original_youth(child,"childhood")
+			check(not blade_visible(child),"civilian youth carries no blade")
+		model.new_game("italia")
+		world.setup(model.data)
+		var legacy: Person = world.get_node("Player/Figure")
+		check(legacy.youth_outfit == "armoured" and legacy.active_model_path == Person.MESHY_YOUTH_PATH % maxi(0,legacy.detail),"legacy village save keeps the armoured original youth")
 	model.new_game()
 	world.setup(model.data)
 	var hero: Person = world.get_node("Player/Figure")

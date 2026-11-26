@@ -25,6 +25,14 @@ static func _beat(id: String, shot_id: String, line_id: String, minimum: float, 
 		"voice":"blocked_no_recording"}
 
 
+## A dramatic pause or silent reaction: a shot without a line. It has no
+## line_id (nothing to voice), never holds reading mode and is skipped like
+## any other beat.
+static func _pause(id: String, shot_id: String, seconds: float, actor_id := "") -> Dictionary:
+	return {"id":id, "shot_id":shot_id, "line_id":"", "speaker_id":"", "speaker":"", "role":"", "text":"",
+		"actor_id":actor_id, "duration":seconds, "chapter":CHAPTER, "location":LOCATION, "silent":true, "voice":"none"}
+
+
 static func _choice_beat(id: String, shot_id: String, prompt: String, step_id: String, choices: Array[Dictionary]) -> Dictionary:
 	var beat := _beat(id, shot_id, "", 4.0, "", {"speaker_id":"player", "text":prompt})
 	beat["await_choice"] = true
@@ -69,14 +77,31 @@ static func vid_b(data: Dictionary) -> Dictionary:
 	var reply_id := "I01_B_TOPIC_" + topic.to_upper()
 	if topic == "contact" and not screenplay.get("i01_contacts", []).is_empty():
 		reply_id += "_" + str(screenplay.i01_contacts[0]).to_upper()
+	var reaction_id := I01.julia_reaction_id(data)
+	# Shot plan: wide, insert (pause), close with a reaction cut, silent
+	# reaction, close with a cut to the two-shot, choice over the shoulder,
+	# answer in the close, a last look from Julia before the handoff.
+	var telling := _beat("i01_b_sextus", "i01_close_speaker", "I01_B_SEXTUS", 12.0, "silvanus")
+	telling["cuts"] = [{"at":0.0, "shot_id":"i01_close_speaker", "actor_id":"silvanus"},
+		{"at":0.46, "shot_id":"i01_react_boy", "actor_id":"silvanus"},
+		{"at":0.70, "shot_id":"i01_close_speaker", "actor_id":"silvanus"}]
+	var mother := _beat("i01_b_julia", "i01_close_speaker", reaction_id, 6.0, "julia")
+	mother["cuts"] = [{"at":0.0, "shot_id":"i01_close_speaker", "actor_id":"julia"},
+		{"at":0.62, "shot_id":"i01_two_shot", "actor_id":"julia"}]
+	var answer := _beat("i01_b_reply", "i01_close_speaker", reply_id if not topic.is_empty() else "I01_B_TOPIC_PENDING", 6.0, reply_speaker,
+		{"speaker_id":reply_speaker, "text":str(reply.get("text", "…"))})
+	answer["cuts"] = [{"at":0.0, "shot_id":"i01_close_speaker", "actor_id":reply_speaker},
+		{"at":0.72, "shot_id":"i01_react_boy", "actor_id":reply_speaker}]
 	var beats: Array[Dictionary] = [
 		_beat("i01_b_table", "i01_table_wide", "I01_B_TABLE", 5.0, "silvanus"),
-		_beat("i01_b_sextus", "mission_dialogue", "I01_B_SEXTUS", 12.0, "silvanus"),
-		_beat("i01_b_julia", "mission_dialogue", I01.julia_reaction_id(data), 6.0, "julia"),
+		_pause("i01_b_cups", "i01_cups_insert", 2.8, "silvanus"),
+		telling,
+		_pause("i01_b_listen", "i01_react_julia", 2.4, "silvanus"),
+		mother,
 		_choice_beat("i01_b_choice", "i01_topic_choice", "Worüber sprichst du am Tisch?", "i01_topic", choices),
-		_beat("i01_b_reply", "mission_dialogue", reply_id if not topic.is_empty() else "I01_B_TOPIC_PENDING", 6.0, reply_speaker,
-			{"speaker_id":reply_speaker, "text":str(reply.get("text", "…"))})]
-	return {"id":VID_B, "version":1, "origin_id":"italia", "source_mission_id":"I-01",
+		answer,
+		_pause("i01_b_after", "i01_two_shot", 2.6, reply_speaker)]
+	return {"id":VID_B, "version":2, "origin_id":"italia", "source_mission_id":"I-01",
 		"film_id":"I-01.VID-B", "title":"Am Frühstückstisch", "location":LOCATION, "chapter":CHAPTER,
 		"beats":beats, "objective_title":"Die drei Becher · vor dem Haus",
 		"objective_text":"Julia geht nach dem Frühstück vor das Haus. Sprich dort mit ihr über den Tag.",

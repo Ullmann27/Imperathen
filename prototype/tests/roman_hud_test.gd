@@ -114,6 +114,18 @@ func _director() -> void:
 	_check(director.presence_target("combat") == 1.0 and director.presence_target("mission_detail") == 1.0, "Danger brings combat controls and the objective to full presence")
 	director.observe({"objective": "B", "mode": "city", "health": 100, "stamina": 100.0, "resources": {"wood": 5}})
 	_check(director.presence_target("resources") == 1.0, "City mode shows the stock")
+	# Player setting: nothing rests, but what does not apply still stays away.
+	var steady: Node = Director.new()
+	root.add_child(steady)
+	steady.observe({"objective": "A", "mode": "person", "health": 100, "stamina": 100.0, "resources": {"wood": 1}})
+	_check(steady.presence_target("mission_detail") == 0.0 and steady.presence_target("dock") < 1.0, "By default calm exploration rests")
+	steady.always_visible = true
+	for id in ["mission", "mission_detail", "compass", "vitals", "resources", "dock", "corner", "time", "combat"]:
+		_check(steady.presence_target(id) == 1.0, "Always-visible keeps %s at full presence" % id)
+	_check(steady.presence_target("prompt") == 0.0, "Always-visible shows no prompt without a context")
+	steady.observe({"objective": "A", "mode": "person", "health": 100, "stamina": 100.0, "resources": {"wood": 1}, "no_stock": true})
+	_check(steady.presence_target("resources") == 0.0, "Always-visible still keeps the village stock off the child's first morning")
+	steady.queue_free()
 	detail.queue_free()
 	director.queue_free()
 
@@ -180,6 +192,21 @@ func _integration() -> void:
 		_check(not ui.get("_hud_labels").objective_text.is_visible_in_tree(), "%s: the objective detail rests in calm exploration" % extent)
 		_check(not ui.get("_hud_labels").wood.is_visible_in_tree(), "%s: the village stock stays off the calm child HUD" % extent)
 		_check_targets(ui, Rect2(Vector2.ZERO, Vector2(extent)), "%s calm" % extent)
+	# Setting "Anzeigen dauerhaft einblenden": nothing rests, the child rules stay.
+	ui.set("_hud_always", true)
+	ui.show_game(_state(model, true))
+	await _settle()
+	_rest(ui)
+	ui.update_navigation({"player": Vector2(-8.6, 6.9), "has_target": true, "target": Vector2(-15.3, 12.0), "heading": 0.0, "camera_yaw": 2.45, "context": ""})
+	await _settle()
+	_check(ui.get("_hud_labels").objective_text.is_visible_in_tree(), "Always-visible keeps the objective detail on screen")
+	_check(not ui.get("_hud_labels").wood.is_visible_in_tree(), "Always-visible still shows no village stock on the first morning")
+	for action in ["attack", "guard", "dodge", "techniques"]:
+		_check(not _visible_action(ui, action), "Always-visible adds no %s control for the twelve-year-old" % action)
+	_check_targets(ui, Rect2(Vector2.ZERO, Vector2(root.size)), "always visible")
+	ui.set("_hud_always", false)
+	ui.show_game(_state(model, true))
+	await _settle()
 	# A new objective wakes the detail again.
 	var state := _state(model, true)
 	state.childhood_view.objective = "Bring Julia den Krug."
@@ -364,6 +391,8 @@ func _check_targets(ui, bounds: Rect2, label: String) -> void:
 	_check(not card.get_global_rect().intersects(pad.get_global_rect()) and not card.get_global_rect().intersects(cluster.get_global_rect()), "%s: the objective never covers a thumb zone" % label)
 	var compass := screen.get_node_or_null("VillageCompass") as Control
 	if compass != null:
+		# The ribbon opens the local map on a tap, so it is a touch target too.
+		_check(compass.get_global_rect().size.y >= 48.0 * dp - 0.5, "%s: the compass ribbon is a 48 dp touch target" % label)
 		_check(not compass.get_global_rect().intersects(card.get_global_rect()) and not compass.get_global_rect().intersects(screen.get_node("ResourceBar").get_global_rect()), "%s: compass, objective and command corner stay apart" % label)
 
 

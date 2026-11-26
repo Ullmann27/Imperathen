@@ -8,7 +8,9 @@ const Grove = preload("res://scripts/visuals/grove.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 const VillageLifeWorld = preload("res://scripts/world/village_life_world.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
+const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const YouthOutfit = preload("res://scripts/visuals/youth_outfit.gd")
 const CompanionWorld = preload("res://scripts/world/companion_world.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
@@ -29,7 +31,11 @@ var opening_props = preload("res://scripts/world/village/opening_props.gd").new(
 ## I-01 cups and jug follow the saved morning state (presentation only).
 ## Created with the scene so worlds that never build it own no orphan node.
 const I01Props = preload("res://scripts/world/village/i01_props.gd")
+const I03Props = preload("res://scripts/world/village/i03_props.gd")
+const I04Props = preload("res://scripts/world/village/i04_props.gd")
 var i01_props: Node3D
+var i03_props: Node3D
+var i04_props: Node3D
 var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
@@ -192,7 +198,11 @@ func sync_state(state: Dictionary) -> void:
 	population.show_origin(str(state.get("origin_id","italia")),float(state.get("world_seconds",0)),legacy_recruits)
 	if regional.frontier_details:
 		regional.frontier_details.set_wagon_progress(float(state.get("frontier",{}).get("work_seconds",0))/12.0)
-	_apply_season(int(state.get("strategy",{}).get("turn",0))%4)
+	# The forge fire answers the apprentice's work at bellows, anvil and tub.
+	var interiors := regional.get_node_or_null("HouseInteriors")
+	if interiors:
+		interiors.set_forge_work(str(state.get("village",{}).get("childhood",{}).get("active_work","")))
+	_sync_world_light(state)
 	_sync_resources()
 	_sync_buildings()
 	_sync_companion()
@@ -201,12 +211,18 @@ func sync_state(state: Dictionary) -> void:
 	var player_data: Dictionary = _state.get("player", {})
 	var age := int(player_data.get("age", 12))
 	_figure.configure("player",_state.get("origin_id","italia"),age)
-	# The actual original youth is selected in the campaign as well as free city.
-	_figure.configure_meshy_youth(true)
+	# The actual original youth is selected in the campaign as well as free city;
+	# the childhood campaign (Band I) shows him in his civilian wool tunic.
+	_figure.configure_meshy_youth(true, YouthOutfit.for_state(state))
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_figure.set_service_gear(CombatActions.service_gear(state))
 	if is_instance_valid(i01_props):
 		i01_props.sync_state(state, _figure)
+	if is_instance_valid(i03_props):
+		i03_props.sync_state(state, _figure)
+	if is_instance_valid(i04_props):
+		var visit: Dictionary = Childhood.i04_ctx(state) if Childhood.enabled(state) else {"index":-1, "trial_index":-1}
+		i04_props.sync_state(state, _figure, int(visit.index), int(visit.trial_index))
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -329,6 +345,10 @@ func get_cinematic_anchor(key: String) -> Vector3:
 		_:
 			if key.begins_with("i01_"):
 				return I01Props.anchor(key)
+			if key.begins_with("i03_") and is_instance_valid(i03_props):
+				return to_global(i03_props.anchor(key))
+			if key.begins_with("i04_") and is_instance_valid(i04_props):
+				return to_global(i04_props.anchor(key))
 			return get_player_position()
 
 
@@ -620,6 +640,10 @@ func _build_scene() -> void:
 	add_child(opening_props)
 	i01_props = I01Props.new()
 	add_child(i01_props)
+	i03_props = I03Props.new()
+	add_child(i03_props)
+	i04_props = I04Props.new()
+	add_child(i04_props)
 	_create_build_plot()
 	_buildings_root = Node3D.new()
 	_buildings_root.name = "PlayerBuildings"
@@ -1748,6 +1772,23 @@ func _ui_blocks_pointer() -> bool:
 
 func _horizontal_distance(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
+
+func _sync_world_light(state: Dictionary) -> void:
+	var clock: Variant = state.get("calendar", {}).get("clock")
+	if not WorldCalendar.validate_clock(clock):
+		_apply_season(posmod(int(state.get("strategy", {}).get("turn", 0)), 4))
+		if look.time_of_day >= 0.0:
+			look.set_time_of_day(-1.0)
+		return
+	_apply_season(WorldCalendar.season_index(int(clock.jdn)))
+	# Lighting is sampled every five world minutes to avoid rebuilding
+	# interior sunbeams on successive frames of the accelerated legacy day.
+	@warning_ignore("integer_division")
+	var sample := int(clock.second) / 300
+	var solar_hours := sample / 12.0
+	if not is_equal_approx(look.time_of_day, solar_hours):
+		look.set_time_of_day(solar_hours)
+
 
 func _apply_season(index: int) -> void:
 	if index == season_index:

@@ -25,15 +25,18 @@ FAILURE = re.compile(r"SCRIPT ERROR:|Parse Error:|^ERROR:|^USER ERROR:", re.MULT
 
 def run_check(engine, name, arguments, marker, environment, report):
     started = time.monotonic()
+    timeout = {"import": 600, "motion_measurement": 2400}.get(name, 120)
     try:
         result = subprocess.run([engine, "--headless", "--path", str(PROJECT), *arguments],
                                 cwd=ROOT, env=environment, text=True, encoding="utf-8",
-                                errors="replace", capture_output=True, timeout=2400 if name == "motion_measurement" else 120)
+                                errors="replace", capture_output=True, timeout=timeout)
         combined = result.stdout + result.stderr
         success = result.returncode == 0 and FAILURE.search(combined) is None and (marker is None or marker in combined)
         code = result.returncode
     except subprocess.TimeoutExpired as exc:
-        combined = f"TIMEOUT during {name}: {exc}"
+        stdout = (exc.stdout or b"").decode("utf-8", errors="replace")
+        stderr = (exc.stderr or b"").decode("utf-8", errors="replace")
+        combined = f"TIMEOUT during {name}: {exc}\n{stdout}{stderr}"
         success = False
         code = None
     report.mkdir(parents=True, exist_ok=True)
@@ -111,16 +114,23 @@ def main():
             ("settlement_geometry", ["--fixed-fps", "60", "--script", "res://tests/settlement_geometry_test.gd"], "SETTLEMENT_GEOMETRY_PASS"),
             ("village_collision", ["--fixed-fps", "60", "--script", "res://tests/village_collision_test.gd"], "VILLAGE_COLLISION_PASS"),
             ("village_backdrop", ["--fixed-fps", "60", "--script", "res://tests/village_backdrop_test.gd"], "VILLAGE_BACKDROP_PASS"),
+            ("house_interiors", ["--fixed-fps", "60", "--script", "res://tests/house_interiors_test.gd"], "HOUSE_INTERIORS_PASS"),
             ("frontier_integration", ["--fixed-fps", "60", "--script", "res://tests/frontier_integration_test.gd"], "FRONTIER_INTEGRATION_PASS"),
             ("village_experience", ["--fixed-fps", "60", "--script", "res://tests/village_experience_test.gd"], "VILLAGE_EXPERIENCE_PASS"),
             ("village_panels", ["--fixed-fps", "60", "--script", "res://tests/village_panel_test.gd"], "VILLAGE_PANEL_PASS"),
             ("village_nameplates", ["--fixed-fps", "60", "--script", "res://tests/village_nameplates_test.gd"], "VILLAGE_NAMEPLATES_PASS"),
             ("opening_story", ["--script", "res://tests/opening_story_test.gd"], "OPENING_STORY_PASS"),
+            ("combat_sfx", ["--fixed-fps", "60", "--script", "res://tests/combat_sfx_test.gd"], "COMBAT_SFX_PASS"),
+            ("opening_voice", ["--fixed-fps", "60", "--script", "res://tests/opening_voice_test.gd"], "OPENING_VOICE_PASS"),
+            ("dialogue_lipsync", ["--fixed-fps", "60", "--script", "res://tests/dialogue_lipsync_test.gd"], "DIALOGUE_LIPSYNC_PASS"),
             ("i00_stage", ["--script", "res://tests/i00_stage_test.gd"], "I00_STAGE_PASS"),
             ("campaign_bible", ["--script", "res://tests/campaign_bible_test.gd"], "CAMPAIGN_BIBLE_TEST"),
             ("band1_alignment", ["--script", "res://tests/band1_alignment_test.gd"], "BAND1_ALIGNMENT_PASS"),
             ("i01_slice", ["--script", "res://tests/i01_slice_test.gd"], "I01_SLICE_PASS"),
             ("i01_flow", ["--fixed-fps", "60", "--script", "res://tests/i01_flow_test.gd"], "I01_FLOW_PASS"),
+            ("i03_slice", ["--script", "res://tests/i03_slice_test.gd"], "I03_SLICE_PASS"),
+            ("i03_flow", ["--fixed-fps", "60", "--script", "res://tests/i03_flow_test.gd"], "I03_FLOW_PASS"),
+            ("i04_slice", ["--script", "res://tests/i04_slice_test.gd"], "I04_SLICE_PASS"),
             ("mission_bridge_data", ["--script", "res://tests/mission_bridge_data_test.gd"], "MISSION_BRIDGE_DATA_PASS"),
             ("companion_navigation", ["--fixed-fps", "60", "--script", "res://tests/companion_navigation_test.gd"], "COMPANION_NAVIGATION_PASS"),
             ("companion_turn_motion", ["--fixed-fps", "60", "--script", "res://tests/companion_turn_motion_test.gd"], "COMPANION_TURN_MOTION_PASS"),
@@ -147,10 +157,12 @@ def main():
             ("battle_rules", ["--script", "res://tests/battle_rules_test.gd"], "failures=0"),
             ("troop_catalog", ["--script", "res://tests/troop_catalog_test.gd"], "failures=0 troops="),
             ("battle_command", ["--script", "res://tests/battle_command_test.gd"], "failures=0 metrics="),
+            ("combat_formula", ["--script", "res://tests/combat_formula_test.gd"], "failures=0 metrics="),
             ("valley_orders", ["--fixed-fps", "60", "--script", "res://tests/valley_orders_test.gd"], "failures=0 smallest_row_px="),
             ("soldier_visuals", ["--script", "res://tests/soldier_visual_test.gd"], "0 failed"),
             ("soldier_gait", ["--fixed-fps", "60", "--script", "res://tests/soldier_gait_test.gd"], "failures=0"),
             ("village_people", ["--fixed-fps", "60", "--script", "res://tests/village_person_test.gd"], "checks, 0 failed"),
+            ("youth_outfit", ["--script", "res://tests/youth_outfit_test.gd"], "YOUTH_OUTFIT_PASS"),
             ("meshy_registry", ["--script", "res://tests/meshy_asset_registry_test.gd"], "MESHY_ASSET_REGISTRY"),
             ("meshy_characters", ["--fixed-fps", "60", "--script", "res://tests/meshy_character_test.gd"], "MESHY_CHARACTERS_PASS"),
             ("meshy_equipment", ["--fixed-fps", "60", "--script", "res://tests/meshy_equipment_test.gd"], "MESHY_EQUIPMENT_PASS"),
@@ -173,6 +185,7 @@ def main():
             ("tribal_world", ["--script", "res://tests/tribal_world_test.gd"], "TRIBAL_WORLD_PASS"),
             ("tribal_save", ["--script", "res://tests/tribal_save_test.gd"], "TRIBAL_SAVE_PASS"),
             ("tribal_atlas", ["--fixed-fps", "60", "--script", "res://tests/tribal_atlas_test.gd"], "TRIBAL_ATLAS_PASS"),
+            ("world_state", ["--script", "res://tests/world_state_test.gd"], "WORLD_STATE_PASS"),
             ("figure_gallery", ["--fixed-fps", "60", "--script", "res://tests/figure_gallery_test.gd"], "failures=0 real_textures=true"),
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
             ("regional_workers", ["--fixed-fps", "60", "--script", "res://tests/regional_worker_test.gd"], "REGIONAL_WORKERS_PASS"),
@@ -181,6 +194,10 @@ def main():
             ("main_scene", ["--fixed-fps", "60", "--quit-after", "420"], "IMPERATHEN_READY"),
             ("motion_measurement", ["--fixed-fps", "60", "--script", "res://tests/motion_quality_measurement.gd"], "MOTION_MEASURED"),
         ]
+        original_motion_manifest = PROJECT / "assets/animations/accad_youth_motion.json"
+        if original_motion_manifest.is_file() or (args.only and "youth_mocap" in args.only):
+            checks.insert(-1, ("youth_mocap", ["--fixed-fps", "60", "--script",
+                                             "res://tests/youth_mocap_test.gd"], "YOUTH_MOCAP_RUNTIME_PASS"))
         if args.only:
             unknown = set(args.only) - {entry[0] for entry in checks}
             if unknown:

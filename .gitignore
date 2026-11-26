@@ -52,6 +52,11 @@ android-runtime/
 prototype/assets/meshy/source/*
 !prototype/assets/meshy/source/.gdignore
 !prototype/assets/meshy/source/README.md
+# Private original-youth derivatives staged for authorized QA builds only.
+prototype/assets/characters/hero_meshy_italia_*
+prototype/assets/animations/accad_youth*_motion.json
+docs/28_city_sandbox/youth-build.json
+docs/28_city_sandbox/youth-civil-build.json
 node_modules/
 artifacts/
 dist/

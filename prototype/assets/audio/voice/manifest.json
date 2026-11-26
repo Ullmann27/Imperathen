@@ -1,0 +1,1025 @@
+{
+ "schema_version": 1,
+ "language": "de",
+ "loudness_target_lufs": -20.0,
+ "generator": "tools/audio/generate_voices.py + tools/audio/align_visemes.py",
+ "speakers": {
+  "marcus": {
+   "name": "Marcus",
+   "age": 12,
+   "class": "child",
+   "instruct": "Kinderstimme eines lebhaften Jungen von etwa zwölf Jahren vor dem Stimmbruch, hoch und hell, etwas frech und schnell, deutlich ein Kind, keine erwachsene Frau, natürlich.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    215,
+    340
+   ],
+   "reference_seed": 2202,
+   "reference_sha256": "e5c34d233854c896fd3b8b5f3981569d4c105cec3760c385a154619864e98747",
+   "reference_f0_median_hz": 274.0,
+   "reference_formants_hz": [
+    512.7,
+    2048.6,
+    3364.2
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "julia": {
+   "name": "Julia",
+   "age": 34,
+   "class": "adult_female",
+   "instruct": "Frau Mitte dreißig, Mutter, warme mittelhohe Stimme, liebevoll aber bestimmt, ruhige natürliche Alltagssprache.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    165,
+    245
+   ],
+   "reference_seed": 3401,
+   "reference_sha256": "0ab7bde1cad204fb7637180ff57bd136b5faf352ea47ef3117fb7fc3015c61a3",
+   "reference_f0_median_hz": 171.3,
+   "reference_formants_hz": [
+    390.5,
+    1783.2,
+    2934.8
+   ],
+   "lines": 3,
+   "lines_f0_median_hz": 163.3,
+   "tempo": 1.0,
+   "post": null
+  },
+  "silvanus": {
+   "name": "Silvanus",
+   "age": 39,
+   "class": "adult_male",
+   "instruct": "Mann um die vierzig, Zimmermann und Vater, ruhige, leicht raue Baritonstimme, wortkarg, freundlich und geerdet.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    85,
+    145
+   ],
+   "reference_seed": 4902,
+   "reference_sha256": "4cd0b2b8ef25a67af5507a90789e05233abe69a1c676abc37b08ada6f1fa51e9",
+   "reference_f0_median_hz": 135.9,
+   "reference_formants_hz": [
+    364.0,
+    1470.8,
+    2381.9
+   ],
+   "lines": 1,
+   "lines_f0_median_hz": 115.3,
+   "tempo": 1.0,
+   "post": null
+  },
+  "sextus": {
+   "name": "Sextus",
+   "age": 46,
+   "class": "adult_male",
+   "instruct": "Dorfschmied Mitte vierzig, kräftige tiefe Bassstimme mit leichter Rauheit, geduldig, väterlich streng, langsam und deutlich.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    75,
+    135
+   ],
+   "reference_seed": 4603,
+   "reference_sha256": "7cfb485ccc77c69329545daf688c81d81af710eae6d89cf615bb5a8d2dc0e2fe",
+   "reference_f0_median_hz": 103.5,
+   "reference_formants_hz": [
+    362.2,
+    1510.4,
+    2362.5
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "cassia": {
+   "name": "Cassia",
+   "age": 40,
+   "class": "adult_female",
+   "instruct": "Marktfrau um die vierzig, klare lebhafte Stimme, geschäftig und freundlich, deutliche Artikulation.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    160,
+    245
+   ],
+   "reference_seed": 5004,
+   "reference_sha256": "7df71e1fabe6442814edd5aaec01700e61da31fe76999bd05c417103507d20fc",
+   "reference_f0_median_hz": 209.7,
+   "reference_formants_hz": [
+    466.2,
+    1862.4,
+    3097.8
+   ],
+   "lines": 2,
+   "lines_f0_median_hz": 206.4,
+   "tempo": 1.0,
+   "post": null
+  },
+  "aelia": {
+   "name": "Aelia",
+   "age": 31,
+   "class": "adult_female",
+   "instruct": "Steinmetzin um die dreißig, feste, sachliche Frauenstimme, eher tief, ruhig und bedacht.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    150,
+    230
+   ],
+   "reference_seed": 3105,
+   "reference_sha256": "3145dd2972eac404790903525f43c6acc246a9f9d7deac65cdfc6ea9dbb5086a",
+   "reference_f0_median_hz": 219.0,
+   "reference_formants_hz": [
+    431.4,
+    1711.3,
+    2980.7
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "varro": {
+   "name": "Varro",
+   "age": 35,
+   "class": "adult_male",
+   "instruct": "Jäger und Späher Mitte dreißig, gedämpfte aufmerksame Männerstimme, knapp, ruhig und leise.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    90,
+    150
+   ],
+   "reference_seed": 3506,
+   "reference_sha256": "c73e296b40d2d7d416de344087b286f1b1797ef8c7baf9f005390a00a74848cf",
+   "reference_f0_median_hz": 113.8,
+   "reference_formants_hz": [
+    380.9,
+    1386.0,
+    2298.9
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "fabius": {
+   "name": "Fabius",
+   "age": 52,
+   "class": "adult_male",
+   "instruct": "Holzfäller um die fünfzig, tiefe, behäbige, gutmütige Männerstimme, etwas langsam.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    75,
+    135
+   ],
+   "reference_seed": 5207,
+   "reference_sha256": "f8bcb37aa137f896f5f866eeb48663a960afbf39f803a6e975c6a3fed3f83b7c",
+   "reference_f0_median_hz": 115.6,
+   "reference_formants_hz": [
+    367.7,
+    1377.0,
+    2423.0
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "severus": {
+   "name": "Wachmann",
+   "age": 28,
+   "class": "adult_male",
+   "instruct": "Junger Dorfwächter Ende zwanzig, klare Männerstimme, sachlich und pflichtbewusst.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    95,
+    160
+   ],
+   "reference_seed": 2808,
+   "reference_sha256": "c6e091ef961d3b223a60a67a0fa021e4268b0bc2eed1d447c684c3b47bc8dc46",
+   "reference_f0_median_hz": 105.1,
+   "reference_formants_hz": [
+    314.4,
+    1571.8,
+    2598.9
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "decimus": {
+   "name": "Decimus",
+   "age": 63,
+   "class": "elder_male",
+   "instruct": "Alter Dorfverwalter über sechzig, ältere Männerstimme, würdevoll, leicht heiser und etwas zittrig, bedächtig.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    90,
+    160
+   ],
+   "reference_seed": 6309,
+   "reference_sha256": "abf9459c6408b8320b2d0a22a8bbe15a6007a725a33dcf5ab67535e0e056ecb7",
+   "reference_f0_median_hz": 136.3,
+   "reference_formants_hz": [
+    350.2,
+    1507.6,
+    2606.1
+   ],
+   "lines": 0,
+   "lines_f0_median_hz": null,
+   "tempo": 1.0,
+   "post": null
+  },
+  "aurelia": {
+   "name": "Aurelia",
+   "age": 66,
+   "class": "elder_female",
+   "instruct": "Alte Heilerin über sechzig, ältere Frauenstimme, sanft und leicht brüchig, ruhig und fürsorglich.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    140,
+    225
+   ],
+   "reference_seed": 6610,
+   "reference_sha256": "05bc97ce016106b6248364e4067624fd59650dfae86af8b080f8fb682a107661",
+   "reference_f0_median_hz": 195.5,
+   "reference_formants_hz": [
+    429.9,
+    1800.8,
+    3160.7
+   ],
+   "lines": 1,
+   "lines_f0_median_hz": 183.2,
+   "tempo": 1.0,
+   "post": null
+  },
+  "narrator": {
+   "name": "Chronik",
+   "age": 55,
+   "class": "adult_male",
+   "instruct": "Ruhiger männlicher Erzähler um die fünfzig, warme tiefe Stimme, gemessenes Tempo, sehr deutliche Aussprache, unaufgeregt.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    80,
+    140
+   ],
+   "reference_seed": 5511,
+   "reference_sha256": "d4dec5cd1dcbafa6cabe710aa57723b1b3ab305909a08afdd85d9f3d723b76ee",
+   "reference_f0_median_hz": 137.4,
+   "reference_formants_hz": [
+    538.6,
+    1744.8,
+    2841.3
+   ],
+   "lines": 11,
+   "lines_f0_median_hz": 140.1,
+   "tempo": 1.0,
+   "post": null
+  },
+  "caesar": {
+   "name": "Caesar",
+   "age": 42,
+   "class": "adult_male",
+   "instruct": "Römischer Feldherr Anfang vierzig, kraftvolle, volle Männerstimme mit natürlicher Autorität, beherrscht und klar, trägt über ein Heerlager, aber menschlich, nicht übertrieben, nicht theatralisch.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    85,
+    155
+   ],
+   "reference_seed": 6212,
+   "reference_sha256": "cde7c7112c781399f7a9affd013b93b92b9ad5254797e0cd9d60a543c97919d8",
+   "reference_f0_median_hz": 112.4,
+   "reference_formants_hz": [
+    476.2,
+    1476.6,
+    2562.0
+   ],
+   "lines": 2,
+   "lines_f0_median_hz": 119.7,
+   "tempo": 1.0,
+   "post": null
+  },
+  "labienus": {
+   "name": "Labienus",
+   "age": 42,
+   "class": "adult_male",
+   "instruct": "Erfahrener römischer Offizier Anfang vierzig, knappe, harte, etwas raue Kommandostimme, nüchtern und direkt.",
+   "derived_from": null,
+   "transform": null,
+   "model_design": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb6732",
+   "model_speech": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438",
+   "f0_target_hz": [
+    85,
+    150
+   ],
+   "reference_seed": 4213,
+   "reference_sha256": "ed5123a4ee3988dc3fc774e8d5284d53c1220b6c40e92aa6d0ecb0d1214874dd",
+   "reference_f0_median_hz": 122.4,
+   "reference_formants_hz": [
+    358.5,
+    1501.2,
+    2458.2
+   ],
+   "lines": 1,
+   "lines_f0_median_hz": 124.8,
+   "tempo": 1.0,
+   "post": null
+  }
+ },
+ "lines": [
+  {
+   "line_id": "I-00.i00_caesar",
+   "speaker_id": "caesar",
+   "text": "»Berichte, was du gesehen hast. Nicht, was du glaubst, dass ich hören will.«",
+   "text_key": "825bd7b754769aed",
+   "file": "lines/I-00.i00_caesar.ogg",
+   "sha256": "cb68d6066a01c203ba030ce3743b4b7dc4aa17295f62ac7d48f49c8eb1795749",
+   "visemes": "visemes/I-00.i00_caesar.json",
+   "visemes_sha256": "aa13e02094e7bf5c0c9f012e02f58c4f58c566b5897e1a25f5817f22d33ee5c2",
+   "duration_s": 4.124,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 6212,
+   "seed": 4808634,
+   "asr_wer": 0.0,
+   "asr_text": "Berichte, was du gesehen hast. Nicht, was du glaubst, dass ich hören will.",
+   "lufs_integrated": -21.28,
+   "alignment": {
+    "phonemes": 51,
+    "tokens": 50,
+    "audio_onset_s": 0.055,
+    "first_phoneme_s": 0.055,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 119.7,
+   "formants_hz": [
+    433.8,
+    1590.5,
+    2649.2
+   ]
+  },
+  {
+   "line_id": "I-00.i00_departure",
+   "speaker_id": "caesar",
+   "text": "»Eine Armee bewegt sich nicht durch Mut allein. Sie bewegt sich, weil Brot, Wege und Befehle zur gleichen Zeit ankommen.«",
+   "text_key": "a9a386ab7cc5632c",
+   "file": "lines/I-00.i00_departure.ogg",
+   "sha256": "1f57090b173ecc5b84ea2c59ef5a4f83a3436f5ddf298e29478330f87e54ba48",
+   "visemes": "visemes/I-00.i00_departure.json",
+   "visemes_sha256": "949db8621280e0f18995c1bc126b8e5a422cc8a02f1a4b0abd141c065b79c61d",
+   "duration_s": 6.931,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 6212,
+   "seed": 15741595,
+   "asr_wer": 0.0,
+   "asr_text": "Eine Armee bewegt sich nicht durch Mut allein. Sie bewegt sich, weil Brot, Wege und Befehle zur gleichen Zeit ankommen.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 87,
+    "tokens": 80,
+    "audio_onset_s": 0.065,
+    "first_phoneme_s": 0.065,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 119.0,
+   "formants_hz": [
+    386.8,
+    1591.5,
+    2599.2
+   ]
+  },
+  {
+   "line_id": "I-00.i00_detail",
+   "speaker_id": "narrator",
+   "text": "Regen läuft über Leder, Holz und Metall. Bei Aquileia werden Caesars Legionen zum Marsch bereitgemacht; erst das Detail, dann öffnet sich der Blick auf Lager und Straße.",
+   "text_key": "73fcbdbc00dd3c7e",
+   "file": "lines/I-00.i00_detail.ogg",
+   "sha256": "4199467826c54a6c0c8bea8427ffb9aeae795ca4c850940b43b09fe1d42d9f72",
+   "visemes": "visemes/I-00.i00_detail.json",
+   "visemes_sha256": "c8e1a47572f39fc50431043754f6f57e55c58817e418cabf60c191c9fc1c56cd",
+   "duration_s": 11.027,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 5433260,
+   "asr_wer": 0.074,
+   "asr_text": "Regen läuft über Leder, Holz und Metall. Bei Aquileia werden Caesars Legionen zum Marsch bereit gemacht. Erst das Detail, dann öffnet sich der Blick auf Lager und Straße.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 127,
+    "tokens": 119,
+    "audio_onset_s": 0.065,
+    "first_phoneme_s": 0.065,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 140.8,
+   "formants_hz": [
+    556.2,
+    1726.4,
+    2951.1
+   ]
+  },
+  {
+   "line_id": "I-00.i00_labienus",
+   "speaker_id": "labienus",
+   "text": "»Wenn du Zweifel hast, melde sie. Wenn du Befehle hast, führe sie aus.«",
+   "text_key": "5c85a4492be632cd",
+   "file": "lines/I-00.i00_labienus.ogg",
+   "sha256": "09d029ddcede11bfebaf032c30ca6c3fa9a948a123e301cf4d1d8b4701dc4f2c",
+   "visemes": "visemes/I-00.i00_labienus.json",
+   "visemes_sha256": "8869a50a5ff4b27ed3341d80523a61e37c844aa76aaf3b86ac3b4818f394c61e",
+   "duration_s": 5.379,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 4213,
+   "seed": 2792402,
+   "asr_wer": 0.0,
+   "asr_text": "Wenn du Zweifel hast, melde sie. Wenn du Befehle hast, führe sie aus.",
+   "lufs_integrated": -20.1,
+   "alignment": {
+    "phonemes": 47,
+    "tokens": 44,
+    "audio_onset_s": 0.09,
+    "first_phoneme_s": 0.09,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 124.8,
+   "formants_hz": [
+    349.9,
+    1508.4,
+    2522.8
+   ]
+  },
+  {
+   "line_id": "I-00.i00_legions",
+   "speaker_id": "narrator",
+   "text": "Drei Legionen stehen bei Aquileia bereit. Männer ordnen Gepäck und Waffen, Befehle gehen durch die Reihen. Der Aufbruch hängt ebenso an Versorgung und Wegen wie am Mut.",
+   "text_key": "de93f61777686dcf",
+   "file": "lines/I-00.i00_legions.ogg",
+   "sha256": "8dd64f33bc6ac933203f1aafd0247b188265fef772046a6bc68891b363ba1bdc",
+   "visemes": "visemes/I-00.i00_legions.json",
+   "visemes_sha256": "36c8d13815f49577893e353fa883d17e16a804fa6af22f2adf031f2094456ddb",
+   "duration_s": 11.369,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 9952915,
+   "asr_wer": 0.037,
+   "asr_text": "Drei Legionen stehen bei Aquilea bereit. Männer ordnen Gepäck und Waffen. Befehle gehen durch die Reihen. Der Aufbruch hängt ebenso an Versorgung und Wegen wie am Mut.",
+   "lufs_integrated": -20.39,
+   "alignment": {
+    "phonemes": 121,
+    "tokens": 116,
+    "audio_onset_s": 0.065,
+    "first_phoneme_s": 0.065,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 134.3,
+   "formants_hz": [
+    425.1,
+    1682.9,
+    2912.1
+   ]
+  },
+  {
+   "line_id": "I-01.family_voice",
+   "speaker_id": "julia",
+   "text": "Bist du schon wach? Dein Vater ist vor dem Haus. Komm erst zu mir; für Cassia habe ich eine kleine Besorgung. Zum Erkunden bleibt danach noch Zeit.",
+   "text_key": "95676773c4d56dd3",
+   "file": "lines/I-01.family_voice.ogg",
+   "sha256": "bf8cd8982d5098152f4a4d8e4a8e984a983ba31721a85cd1a44c6b00126c9225",
+   "visemes": "visemes/I-01.family_voice.json",
+   "visemes_sha256": "3ddf264efd807c6d0985dede43bb3c4f0d3e3c25d6d04eec50e19bc9ec8a51a2",
+   "duration_s": 9.409,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 3401,
+   "seed": 15731118,
+   "asr_wer": 0.0,
+   "asr_text": "Bist du schon wach? Dein Vater ist vor dem Haus. Komm erst zu mir. Für Cassia habe ich eine kleine Besorgung. Zum Erkunden bleibt danach noch Zeit.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 109,
+    "tokens": 100,
+    "audio_onset_s": 0.055,
+    "first_phoneme_s": 0.055,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 163.3,
+   "formants_hz": [
+    484.6,
+    1786.3,
+    2989.9
+   ]
+  },
+  {
+   "line_id": "I-01.father_morning",
+   "speaker_id": "silvanus",
+   "text": "»Danke. Mach erst die Arbeit. Reden können wir danach immer noch. Eine Tür braucht gerade Angeln; ein Versprechen braucht jemanden, der es hält. Geh zu Cassia auf den Markt und frage nach unserer Bestellung. Komm anschließend zu Mutter zurück.«",
+   "text_key": "a844b3d9b2f6ffe4",
+   "file": "lines/I-01.father_morning.ogg",
+   "sha256": "ce74ee038ca1559d01514b2950e91fc9ce0e5b9d1295910e3b5a2af97ab7690a",
+   "visemes": "visemes/I-01.father_morning.json",
+   "visemes_sha256": "f88afeafd58b773a31d336699c1807dbf693839086fdac9464962e4621a36f94",
+   "duration_s": 14.863,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 4902,
+   "seed": 11339887,
+   "asr_wer": 0.051,
+   "asr_text": "Danke. Mach erst die Arbeit. Reden können wir danach immer noch. Eine Tür braucht gerade Angeln. Ein Versprechen braucht jemanden, der es hält. Geht zu Kessier auf den Markt und Frage nach unserer Bestellung. Komm anschließend zu Mutter zurück.",
+   "lufs_integrated": -20.25,
+   "alignment": {
+    "phonemes": 174,
+    "tokens": 165,
+    "audio_onset_s": 0.055,
+    "first_phoneme_s": 0.055,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 115.3,
+   "formants_hz": [
+    405.0,
+    1415.5,
+    2490.9
+   ]
+  },
+  {
+   "line_id": "I-01.father_morning.result",
+   "speaker_id": "narrator",
+   "text": "Vater nimmt den Krug. Die Familie verabredet die Besorgung auf dem Markt.",
+   "text_key": "a1500a99f8a457c1",
+   "file": "lines/I-01.father_morning.result.ogg",
+   "sha256": "fb7141479d795ca9fe8bcfcb727a529f5948c76864b1ff7b6672333a4a6cf23e",
+   "visemes": "visemes/I-01.father_morning.result.json",
+   "visemes_sha256": "b746070746da86f426a01e04a556629b11dc34c5632c96dc57a0a492d57c2b79",
+   "duration_s": 4.72,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 16438838,
+   "asr_wer": 0.0,
+   "asr_text": "Vater nimmt den Krug. Die Familie verabredet die Besorgung auf dem Markt.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 55,
+    "tokens": 54,
+    "audio_onset_s": 0.06,
+    "first_phoneme_s": 0.06,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 147.9,
+   "formants_hz": [
+    444.4,
+    1602.0,
+    2936.0
+   ]
+  },
+  {
+   "line_id": "I-01.fill_water.result",
+   "speaker_id": "narrator",
+   "text": "Drei Becher stehen gefüllt auf dem Tisch: für Julia, Silvanus und dich. Den Krug bringst du deinem Vater hinaus.",
+   "text_key": "364c9384581d762c",
+   "file": "lines/I-01.fill_water.result.ogg",
+   "sha256": "407a3198dbebe26aad7d6bbd692db8d41d208be73a864b6361755cfd9d8f6d8b",
+   "visemes": "visemes/I-01.fill_water.result.json",
+   "visemes_sha256": "a9d6407a8ec41218da7b508723b360908a9ea2f65893a8f357c8cb69b8bd28a6",
+   "duration_s": 7.671,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 12003992,
+   "asr_wer": 0.053,
+   "asr_text": "Drei Becher stehen gefüllt auf dem Tisch für Julia, Silvanus und dich. Den Krog bringst du deinem Vater hinaus.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 80,
+    "tokens": 76,
+    "audio_onset_s": 0.055,
+    "first_phoneme_s": 0.055,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 137.4,
+   "formants_hz": [
+    440.0,
+    1796.6,
+    2943.5
+   ]
+  },
+  {
+   "line_id": "I-01.home_morning",
+   "speaker_id": "narrator",
+   "text": "Du wachst im Haus deiner Familie auf. Draußen öffnen die Werkstätten. Auf dem Markt wird schon gehandelt. Diesen Ort musst du nicht erst erschaffen: Hier lebst du.",
+   "text_key": "ef6abcbfe1a03227",
+   "file": "lines/I-01.home_morning.ogg",
+   "sha256": "0b85255378dddfb4149379f37f0569901b96af393ee4a414227a04ad8b170aae",
+   "visemes": "visemes/I-01.home_morning.json",
+   "visemes_sha256": "3d8b4ef5172fb6a32fb820b04ca226b77ad5f614e115b7a96abb24c149098d5a",
+   "duration_s": 10.763,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 14386973,
+   "asr_wer": 0.0,
+   "asr_text": "Du wachst im Haus deiner Familie auf. Draußen öffnen die Werkstätten. Auf dem Markt wird schon gehandelt. Diesen Ort musst du nicht erst erschaffen. Hier lebst du.",
+   "lufs_integrated": -20.45,
+   "alignment": {
+    "phonemes": 117,
+    "tokens": 112,
+    "audio_onset_s": 0.08,
+    "first_phoneme_s": 0.08,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 148.4,
+   "formants_hz": [
+    460.3,
+    1691.1,
+    2941.2
+   ]
+  },
+  {
+   "line_id": "I-01.mother_morning",
+   "speaker_id": "julia",
+   "text": "»Du bist wach. Dein Vater arbeitet heute an einer Tür. Hol bitte zuerst Wasser und füll unsere drei Becher, dann bringt ihr gemeinsam die Besorgungen in Ordnung. Für Cassia lege ich einen Haushaltsdenar bereit. Und wenn du gehst, sag mir wohin. Nicht weil ich dich halten will – weil du zurückkommen sollst.«",
+   "text_key": "594c2170a84246e1",
+   "file": "lines/I-01.mother_morning.ogg",
+   "sha256": "d13daf738e6fb6da40338a9673cda5d04913f77a5ee2b311be87ec42b5f10833",
+   "visemes": "visemes/I-01.mother_morning.json",
+   "visemes_sha256": "fcf1bfad2fe0a1dd96dfde8af9e42bae2fc5801646af4bd9fdecd0a3cb6f812f",
+   "duration_s": 19.669,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 3401,
+   "seed": 6857260,
+   "asr_wer": 0.039,
+   "asr_text": "Du bist wach. Dein Vater arbeitet heute an einer Tür. Hol bitte zuerst Wasser und füll unsere drei Becher, dann bringt ihr gemeinsam die Besorgungen in Ordnung. Für Kassia lege ich einen Haushaltsdiener bereit. Und wenn du gehst, sag mir wohin. Nicht weil ich dich halten will, weil du zurückkommen sollst.",
+   "lufs_integrated": -20.79,
+   "alignment": {
+    "phonemes": 221,
+    "tokens": 207,
+    "audio_onset_s": 0.055,
+    "first_phoneme_s": 0.055,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 151.5,
+   "formants_hz": [
+    481.7,
+    1733.0,
+    2948.3
+   ]
+  },
+  {
+   "line_id": "I-01.mother_morning.result",
+   "speaker_id": "narrator",
+   "text": "Mutter vertraut dir den zweckgebundenen Haushaltsdenar an. Er ist für die Besorgung, nicht dein Taschengeld.",
+   "text_key": "bac770937a7707de",
+   "file": "lines/I-01.mother_morning.result.ogg",
+   "sha256": "9918ab3fd9b539b74ff1643fed9f2a596be6e88e281e831dd89be59ea9ae3547",
+   "visemes": "visemes/I-01.mother_morning.result.json",
+   "visemes_sha256": "d05176b6fea286e26397366050c40d32bdf0d324d831f3a309b775813bd35e95",
+   "duration_s": 6.736,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 4150416,
+   "asr_wer": 0.067,
+   "asr_text": "Mutter vertraut dir den zweckgebundenen Haushaltsdenner an. Er ist für die Besorgung nicht dein Taschengeld.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 84,
+    "tokens": 79,
+    "audio_onset_s": 0.07,
+    "first_phoneme_s": 0.07,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 139.1,
+   "formants_hz": [
+    484.9,
+    1773.0,
+    2955.0
+   ]
+  },
+  {
+   "line_id": "I-01.village_lives",
+   "speaker_id": "narrator",
+   "text": "Du wirst Menschen wiedersehen, Versprechen halten und manchmal etwas falsch machen. Nimm dir Zeit. Heute musst du weder Soldat werden noch ein Dorf regieren.",
+   "text_key": "7df8754d91cca901",
+   "file": "lines/I-01.village_lives.ogg",
+   "sha256": "84980bdba21a4ab9d06b7d888837510b780a412230322f7575a0d5bb6ab1dff1",
+   "visemes": "visemes/I-01.village_lives.json",
+   "visemes_sha256": "1a527cb413afd7b7563ccf71095f9a59463b67beeae75e02e3a1032f34607223",
+   "duration_s": 9.324,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 16256409,
+   "asr_wer": 0.0,
+   "asr_text": "Du wirst Menschen wiedersehen, versprechen halten und manchmal etwas falsch machen. Nimm dir Zeit. Heute musst du weder Soldat werden noch ein Dorf regieren.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 116,
+    "tokens": 112,
+    "audio_onset_s": 0.05,
+    "first_phoneme_s": 0.05,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 141.2,
+   "formants_hz": [
+    488.1,
+    1741.5,
+    2928.2
+   ]
+  },
+  {
+   "line_id": "I-02.i02_basket",
+   "speaker_id": "aurelia",
+   "text": "»Zeig mir erst, welchen Korb Julia dir gegeben hat. Ein Fehler ist kein Weltende, aber wir müssen dann mit seinen Folgen weiterarbeiten.«",
+   "text_key": "22fe85f922b69c7e",
+   "file": "lines/I-02.i02_basket.ogg",
+   "sha256": "f040b8f57bf8eb5dc428e9735ce07e659678299377b7ff8ce86a1b2e0966ba3c",
+   "visemes": "visemes/I-02.i02_basket.json",
+   "visemes_sha256": "81378aa01daa4b2d87ded4863ddf842a31e5bbd50bd421b4209a3de87cdec893",
+   "duration_s": 9.818,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 6610,
+   "seed": 9077409,
+   "asr_wer": 0.0,
+   "asr_text": "Zeig mir erst, welchen Korb Julia dir gegeben hat. Ein Fehler ist kein Weltende, aber wir müssen dann mit seinen Folgen weiterarbeiten.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 103,
+    "tokens": 96,
+    "audio_onset_s": 0.08,
+    "first_phoneme_s": 0.08,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 183.2,
+   "formants_hz": [
+    472.4,
+    1925.8,
+    3116.3
+   ]
+  },
+  {
+   "line_id": "I-02.i02_basket.result",
+   "speaker_id": "narrator",
+   "text": "Aurelia prüft den Korb.",
+   "text_key": "db96c53cceb9a12c",
+   "file": "lines/I-02.i02_basket.result.ogg",
+   "sha256": "f928371281aedd4dbf3f3c0e9b9035236b64deab2661532ec5e16e551d263d87",
+   "visemes": "visemes/I-02.i02_basket.result.json",
+   "visemes_sha256": "af8bb4d92ea9ff333425373224c0eeb1a73243ca352d0fb789db2623f4e79077",
+   "duration_s": 1.855,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 9425824,
+   "asr_wer": 0.0,
+   "asr_text": "Aurelia prüft den Korb.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 18,
+    "tokens": 17,
+    "audio_onset_s": 0.055,
+    "first_phoneme_s": 0.055,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 135.4,
+   "formants_hz": [
+    511.8,
+    1637.6,
+    2897.5
+   ]
+  },
+  {
+   "line_id": "I-02.i02_correct",
+   "speaker_id": "julia",
+   "text": "»Gut, dass du zurückkommst. Fehler verschwinden nicht, weil man sie nicht mag. Wir bringen jetzt den richtigen Korb auf den Weg.«",
+   "text_key": "3980515d761188db",
+   "file": "lines/I-02.i02_correct.ogg",
+   "sha256": "ed17afb96ed11b6c6611ceab2571558e29617be7fb9a8e10fb4dca867de93a12",
+   "visemes": "visemes/I-02.i02_correct.json",
+   "visemes_sha256": "ecc6142c224caba8cc8ca22e318745a32667bc6f8fcb4823c7189e9b70b76145",
+   "duration_s": 7.476,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 3401,
+   "seed": 7186191,
+   "asr_wer": 0.095,
+   "asr_text": "Gut, dass du zurück kommst. Fehler verschwinden nicht, weil man sie nicht mag. Wir bringen jetzt den richtigen Korb auf den Weg.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 91,
+    "tokens": 87,
+    "audio_onset_s": 0.055,
+    "first_phoneme_s": 0.055,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 181.5,
+   "formants_hz": [
+    377.2,
+    1871.9,
+    3022.5
+   ]
+  },
+  {
+   "line_id": "I-02.i02_correct.result",
+   "speaker_id": "narrator",
+   "text": "Der Fehler ist korrigiert und bleibt als Erinnerung gespeichert.",
+   "text_key": "6ad1afdfb8f3d51e",
+   "file": "lines/I-02.i02_correct.result.ogg",
+   "sha256": "7f10c2b43633f96a54ce6f7d5a3c92d4602988e608c5b5b4d70aa0f2d73c08ce",
+   "visemes": "visemes/I-02.i02_correct.result.json",
+   "visemes_sha256": "45cdf9d8ddd5062d489f1f7758ef019b7c29fc16e0a9d3abb285d3218d9c5da6",
+   "duration_s": 3.382,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 11048663,
+   "asr_wer": 0.0,
+   "asr_text": "Der Fehler ist korrigiert und bleibt als Erinnerung gespeichert.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 47,
+    "tokens": 45,
+    "audio_onset_s": 0.055,
+    "first_phoneme_s": 0.055,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 140.1,
+   "formants_hz": [
+    521.9,
+    1900.2,
+    2958.0
+   ]
+  },
+  {
+   "line_id": "I-03.market_meeting",
+   "speaker_id": "cassia",
+   "text": "»Julia hat Brot und Grütze bestellt. Das Päckchen kostet den mitgegebenen Denar. Prüfe erst, ob Name und Bestellung stimmen; dann kaufen wir es gemeinsam.«",
+   "text_key": "b5dd258ab93e611a",
+   "file": "lines/I-03.market_meeting.ogg",
+   "sha256": "b5e020b72535a7f060457867c1fe0a8533c4a206c9e1fa6ecfd17dd26a943586",
+   "visemes": "visemes/I-03.market_meeting.json",
+   "visemes_sha256": "47f20d4266eac214b7006f226c48957690e9e315034a30556f059ca9dd20ba1d",
+   "duration_s": 10.802,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5004,
+   "seed": 4252617,
+   "asr_wer": 0.042,
+   "asr_text": "Julia hat Brot und Grütze bestellt. Das Päckchen kostet den mitgegebenen Dinner. Prüfe erst, ob Name und Bestellung stimmen, dann kaufen wir es gemeinsam.",
+   "lufs_integrated": -20.05,
+   "alignment": {
+    "phonemes": 117,
+    "tokens": 114,
+    "audio_onset_s": 0.1,
+    "first_phoneme_s": 0.1,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 187.8,
+   "formants_hz": [
+    423.8,
+    1899.9,
+    3093.3
+   ]
+  },
+  {
+   "line_id": "I-03.market_meeting.result",
+   "speaker_id": "narrator",
+   "text": "Du hast die richtige Bestellung und ihren Preis erfragt.",
+   "text_key": "514cdfe38d9c2671",
+   "file": "lines/I-03.market_meeting.result.ogg",
+   "sha256": "2303e0a2204cbe83b1ee64af8e339ed7228bf3eb0aef5581b52d191d900a831e",
+   "visemes": "visemes/I-03.market_meeting.result.json",
+   "visemes_sha256": "0d7a6f3b536050bdb0f80a82b9bd5ec347bb1ef9c68b2f2773d2c8e30e7a5d1e",
+   "duration_s": 2.942,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 2355386,
+   "asr_wer": 0.0,
+   "asr_text": "Du hast die richtige Bestellung und ihren Preis erfragt.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 42,
+    "tokens": 41,
+    "audio_onset_s": 0.06,
+    "first_phoneme_s": 0.06,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 147.7,
+   "formants_hz": [
+    473.7,
+    1749.8,
+    2905.1
+   ]
+  },
+  {
+   "line_id": "I-03.market_purchase",
+   "speaker_id": "cassia",
+   "text": "»Hier ist das verschnürte Päckchen für eure Küche. Trag es selbst nach Hause; die Besorgung ist erst fertig, wenn es bei deiner Mutter angekommen ist.«",
+   "text_key": "06716c81a988dfbe",
+   "file": "lines/I-03.market_purchase.ogg",
+   "sha256": "ab13d1aad375630900a0180d163d3885d0a3b2141cff5888113459655dc78210",
+   "visemes": "visemes/I-03.market_purchase.json",
+   "visemes_sha256": "e57bdf286b67bb6967fa1783f07e423fc5b73ed91fd6dedef6e40e736d98222c",
+   "duration_s": 8.025,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5004,
+   "seed": 7144704,
+   "asr_wer": 0.04,
+   "asr_text": "Hier ist das verschnöte Päckchen für eure Küche. Trag es selbst nach Hause. Die Besorgung ist erst fertig, wenn es bei deiner Mutter angekommen ist.",
+   "lufs_integrated": -20.16,
+   "alignment": {
+    "phonemes": 107,
+    "tokens": 103,
+    "audio_onset_s": 0.07,
+    "first_phoneme_s": 0.07,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 206.4,
+   "formants_hz": [
+    494.9,
+    1881.7,
+    3057.2
+   ]
+  },
+  {
+   "line_id": "I-03.market_purchase.result",
+   "speaker_id": "narrator",
+   "text": "Der Haushaltsdenar ist bezahlt. Du trägst das Familienpäckchen tatsächlich im Auftragsinventar.",
+   "text_key": "ce0485bbe8031d9a",
+   "file": "lines/I-03.market_purchase.result.ogg",
+   "sha256": "f4467b87fd74489409d70c0ebaaf49c52d6c15f156671f022ea7e47fc4dd86e3",
+   "visemes": "visemes/I-03.market_purchase.result.json",
+   "visemes_sha256": "4db7ce158efc465d9335b5da0d014ba7824576f15b3ecda7471d97c915df8ebe",
+   "duration_s": 5.96,
+   "model": "Qwen/Qwen3-TTS-12Hz-1.7B-Base@fd4b25438912",
+   "voice_design_model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign@5ecdb67327fd",
+   "reference_seed": 5511,
+   "seed": 11524660,
+   "asr_wer": 0.091,
+   "asr_text": "Der Haushaltsdinner ist bezahlt. Du trägst das Familienpäckchen tatsächlich im Auftragsinventar.",
+   "lufs_integrated": -20.0,
+   "alignment": {
+    "phonemes": 79,
+    "tokens": 75,
+    "audio_onset_s": 0.06,
+    "first_phoneme_s": 0.06,
+    "onset_delta_ms": 0.0
+   },
+   "f0_median_hz": 134.1,
+   "formants_hz": [
+    566.7,
+    1830.0,
+    2967.0
+   ]
+  }
+ ]
+}

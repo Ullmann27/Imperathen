@@ -9,6 +9,7 @@ const BRONZE := Color("b99563")
 const CRIMSON := Color("722b32")
 const INK := Color("111a1b")
 const SETTINGS_PATH := "user://imperathen_ui.cfg"
+const AudioBuses = preload("res://scripts/audio/audio_buses.gd")
 const Origins = preload("res://scripts/strategy/origins.gd")
 const ORIGIN_IDS := ["italia", "germania", "han", "wa", "vistula"]
 const FigureGallery = preload("res://scripts/ui/figure_gallery.gd")
@@ -23,6 +24,7 @@ const CombatActions := preload("res://scripts/domain/combat_actions.gd")
 const FAMILY_HOME := Rect2(-15.6, 8.9, 5.2, 4.2)
 const VillagePanel = preload("res://scripts/ui/village_life_panel.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const WorldClock = preload("res://scripts/domain/world_clock.gd")
 const Navigation = preload("res://scripts/ui/village_navigation.gd")
 const RomanStyle = preload("res://scripts/ui/roman_style.gd")
 const ImperialIntro = preload("res://scripts/ui/imperial_intro.gd")
@@ -97,6 +99,8 @@ var _state: Dictionary = {}
 var _mode := "person"
 var _ui_scale := 1.0
 var _reduce_motion := false
+## Setting "Anzeigen dauerhaft einblenden": the HUD never rests.
+var _hud_always := false
 var _opening_reading := false
 var _volume := 0.55
 var _sound_player: AudioStreamPlayer
@@ -607,6 +611,7 @@ func show_game(state: Dictionary) -> void:
 	_action_buttons.clear()
 	_mode_buttons.clear()
 	_director.reduce_motion = _reduce_motion
+	_director.always_visible = _hud_always
 	_hud = _hud_layout()
 	_build_top_bar()
 	_build_objective_card()
@@ -703,7 +708,14 @@ func update_state(state: Dictionary) -> void:
 	if state.get("village", {}).get("enabled", false):
 		_hud_labels["time"].text = "DORFTAG %d" % int(state.village_economy_view.get("day", 1))
 	if Childhood.enabled(state):
-		_hud_labels["time"].text = "TAG %d · 12 JAHRE" % int(state.get("childhood_view", Childhood.view(state)).get("day", 1))
+		_hud_labels["time"].text = "TAG %d · %d JAHRE" % [int(state.get("childhood_view", Childhood.view(state)).get("day", 1)), int(player.get("age", 12))]
+	# The date of the one world clock (58 v. Chr. in the campaign) leads the
+	# line; the technical day counter of worlds without a village gives way.
+	var world_date := world_date_text(state)
+	if not world_date.is_empty():
+		var village_on: bool = state.get("village", {}).get("enabled", false)
+		_hud_labels["time"].tooltip_text = _hud_labels["time"].text
+		_hud_labels["time"].text = world_date
 	_hud_labels["age"].text = "%d Jahre  ·  %s" % [int(player.get("age", 12)), _career_name(String(progress.get("stage", "prologue")))]
 	var health := clampf(float(player.get("health", 100)), 0, 100)
 	_health_bar.value = health
@@ -1413,7 +1425,7 @@ func _build_top_bar() -> void:
 	stock.minimum_size_changed.connect(_anchor_top_right.bind(stock, Vector2(area.x - float(_hud.gutter), float(_hud.top) + 54.0), 0.0))
 	_anchor_top_right(stock, Vector2(area.x - float(_hud.gutter), float(_hud.top) + 54.0), 0.0)
 	# Widest day caption, so the corner is measured before the state fills it.
-	var time := HudStyle.kicker("TAG 00  ·  00:00", HudStyle.TYPE_MICRO + 1, HudStyle.CHARTA_MUTED)
+	var time := HudStyle.kicker("28. SEPTEMBER 100 V. CHR.", HudStyle.TYPE_MICRO + 1, HudStyle.CHARTA_MUTED)
 	time.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	time.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(time)
@@ -1523,10 +1535,10 @@ func _build_navigation() -> void:
 	var rect: Rect2
 	if _hud.single_row:
 		var x := clampf(area.x * 0.5 - width * 0.5, gutter + 230.0 + HudStyle.GAP, corner.position.x - HudStyle.GAP - width)
-		rect = Rect2(x, top + 1.0, width, 46.0)
+		rect = Rect2(x, top, width, HudStyle.TOUCH_MIN)
 	else:
 		width = minf(width, corner.position.x - HudStyle.GAP - gutter)
-		rect = Rect2(gutter + (corner.position.x - HudStyle.GAP - gutter - width) * 0.5, top + 1.0, width, 46.0)
+		rect = Rect2(gutter + (corner.position.x - HudStyle.GAP - gutter - width) * 0.5, top, width, HudStyle.TOUCH_MIN)
 	_hud.compass = rect
 	# Danger and count-downs read under the compass, in cinnabar.
 	_alert = HudStyle.kicker("", HudStyle.TYPE_CAPTION, HudStyle.MINIUM.lightened(0.25))
@@ -2532,6 +2544,13 @@ func _objective(state: Dictionary) -> Array[String]:
 	return ["Verantwortung übernehmen", "Deine Truppe ist bereit. Bereite die Verteidigung vor und kämpfe persönlich an ihrer Seite."]
 
 
+## HUD date from the one world clock, e.g. "1. MAI 58 V. CHR."; empty for
+## view states without a clock.
+static func world_date_text(state: Dictionary) -> String:
+	var time := WorldClock.view(state)
+	return "" if time.is_empty() else str(time.date_label).to_upper()
+
+
 func _career_name(stage: String) -> String:
 	match stage:
 		"training": return "In Ausbildung"
@@ -2570,6 +2589,18 @@ func _show_settings(return_screen: String) -> void:
 	column.add_child(motion)
 	motion.toggled.connect(func(value: bool):
 		_reduce_motion = value
+		_save_settings()
+	)
+	var presence := CheckButton.new()
+	presence.name = "HudAlwaysSetting"
+	presence.text = "Anzeigen dauerhaft einblenden"
+	presence.button_pressed = _hud_always
+	presence.custom_minimum_size.y = 48
+	presence.tooltip_text = "Aus: Ziel, Vorrat und Werte ruhen in ruhiger Erkundung und erscheinen, sobald sie wichtig werden. Ein: Sie bleiben immer sichtbar."
+	column.add_child(presence)
+	presence.toggled.connect(func(value: bool):
+		_hud_always = value
+		_director.always_visible = value
 		_save_settings()
 	)
 	var touch_toggle := CheckButton.new()
@@ -2784,7 +2815,7 @@ func _panel(accent: bool) -> PanelContainer:
 func _button(text: String, callback: Callable, primary := false, font_size := 17) -> Button:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size.y = maxf(40, 44 * _ui_scale)
+	button.custom_minimum_size.y = _menu_button_height()
 	button.set_meta("base_font_size", font_size)
 	button.add_theme_font_size_override("font_size", roundi(font_size * _ui_scale))
 	button.add_theme_stylebox_override("normal", _button_style(primary, false))
@@ -2795,6 +2826,11 @@ func _button(text: String, callback: Callable, primary := false, font_size := 17
 		callback.call()
 	)
 	return button
+
+
+## Menu buttons follow the text scale and never fall below a 48 dp touch target.
+func _menu_button_height() -> float:
+	return maxf(HudStyle.TOUCH_MIN if _touch_enabled else 40.0, 44.0 * _ui_scale)
 
 
 func _label(text: String, font_size := 16, color := CREAM, serif := false) -> Label:
@@ -2857,7 +2893,7 @@ func _apply_scale(node: Node) -> void:
 	if node is Control and node.has_meta("base_font_size"):
 		node.add_theme_font_size_override("font_size", roundi(float(node.get_meta("base_font_size")) * _ui_scale))
 		if node is Button:
-			node.custom_minimum_size.y = maxf(40, 44 * _ui_scale)
+			node.custom_minimum_size.y = _menu_button_height()
 	for child in node.get_children():
 		_apply_scale(child)
 
@@ -2871,6 +2907,7 @@ func _load_settings() -> void:
 	if config.load(SETTINGS_PATH) == OK:
 		_ui_scale = clampf(float(config.get_value("interface", "scale", 1.0)), 0.85, 1.25)
 		_reduce_motion = bool(config.get_value("interface", "reduce_motion", false))
+		_hud_always = bool(config.get_value("interface", "hud_always", false))
 		_opening_reading = bool(config.get_value("interface", "opening_reading", false))
 		_volume = clampf(float(config.get_value("audio", "volume", 0.55)), 0.0, 1.0)
 		_music_volume = clampf(float(config.get_value("audio", "music", 0.7)), 0.0, 1.0)
@@ -2895,6 +2932,7 @@ func _save_settings() -> void:
 	var config := ConfigFile.new()
 	config.set_value("interface", "scale", _ui_scale)
 	config.set_value("interface", "reduce_motion", _reduce_motion)
+	config.set_value("interface", "hud_always", _hud_always)
 	config.set_value("interface", "opening_reading", _opening_reading)
 	config.set_value("audio", "volume", _volume)
 	config.set_value("audio", "music", _music_volume)
@@ -2938,6 +2976,8 @@ func _setup_sound() -> void:
 func _setup_music() -> void:
 	_music_player = AudioStreamPlayer.new()
 	_music_player.name = "MenuMusic"
+	AudioBuses.ensure_layout()
+	_music_player.bus = AudioBuses.MUSIC
 	var stream: AudioStreamOggVorbis = load(RomanStyle.MUSIC_PATH)
 	stream.loop = true
 	_music_player.stream = stream

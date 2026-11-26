@@ -13,6 +13,9 @@ on:
       - 'prototype/tests/village_childhood_test.gd'
       - 'prototype/tests/i01_slice_test.gd'
       - 'prototype/tests/i01_flow_test.gd'
+      - 'prototype/tests/i03_slice_test.gd'
+      - 'prototype/tests/i03_flow_test.gd'
+      - 'prototype/tests/i03_support.gd'
       - 'prototype/tests/childhood_integration_test.gd'
       - 'prototype/tests/opening_story_test.gd'
       - 'prototype/tests/opening_director_test.gd'
@@ -82,6 +85,7 @@ jobs:
           run_story_test --script res://tests/campaign_bible_test.gd
           run_story_test --script res://tests/village_childhood_test.gd
           run_story_test --script res://tests/i01_slice_test.gd
+          run_story_test --script res://tests/i03_slice_test.gd
           run_story_test --fixed-fps 60 --script res://tests/childhood_integration_test.gd
       - name: Run opening and I-00 cinematic contracts
         shell: bash
@@ -102,3 +106,4 @@ jobs:
           run_story_test --script res://tests/i00_stage_test.gd
           run_story_test --fixed-fps 60 --script res://tests/opening_flow_test.gd
           run_story_test --fixed-fps 60 --script res://tests/i01_flow_test.gd
+          run_story_test --fixed-fps 60 --script res://tests/i03_flow_test.gd

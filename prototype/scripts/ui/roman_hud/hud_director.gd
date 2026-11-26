@@ -15,6 +15,9 @@ const REST := {
 const WAKE_SECONDS := {"mission": 9.0, "mission_detail": 9.0, "resources": 5.0, "vitals": 4.0, "controls_hint": 12.0, "dock": 1.6}
 
 var reduce_motion := false
+## Player setting: nothing rests. Everything that applies to the situation
+## stays fully visible, for players who do not want information to fade.
+var always_visible := false
 var context: Dictionary = {}
 var _elements: Dictionary = {}
 var _awake: Dictionary = {}
@@ -47,7 +50,7 @@ func wake(id: String, seconds := -1.0) -> void:
 
 
 func is_awake(id: String) -> bool:
-	return float(_awake.get(id, 0.0)) > 0.0
+	return always_visible or float(_awake.get(id, 0.0)) > 0.0
 
 
 ## Feed the current game facts; changes since the last call wake elements.
@@ -101,7 +104,7 @@ func presence_target(id: String) -> float:
 		"dock", "corner", "time":
 			return 1.0 if awake or not calm() else float(REST[id])
 		"combat":
-			return 1.0 if danger or bool(context.get("practice", false)) or not calm() else REST.combat
+			return 1.0 if always_visible or danger or bool(context.get("practice", false)) or not calm() else REST.combat
 		"prompt":
 			return 1.0 if not str(context.get("prompt", "")).is_empty() and mode == "person" and not bool(context.get("overlay", false)) else 0.0
 	return 1.0

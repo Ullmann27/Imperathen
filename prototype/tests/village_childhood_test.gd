@@ -4,6 +4,7 @@ extends SceneTree
 
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I03Support = preload("res://tests/i03_support.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
@@ -79,17 +80,19 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 		_check(false, "A valid next childhood action exists")
 		return false
 	var stage := str(view.get("stage", ""))
-	if stage.begins_with("i01_"):
+	# I-01 morning and I-04 workshop visit: first authored option at each real place.
+	if stage.begins_with("i01_") or stage.begins_with("i04_"):
 		_at(model, view.point)
 		return _ok(_action(model, str(view.actions[0].payload.action_id)), "Play the I-01 morning: " + stage)
-	if stage in ["i02_basket", "i02_correct", "i03_marcus", "i07_water_fetch", "i07_water_bring", "i08_tracks", "i08_report", "i11_forge", "i12_father", "i13_morning", "i14_oath"]:
+	if stage.begins_with("i03_"):
+		return _ok(I03Support.play_stage(model), "Play the I-03 errand: " + stage)
+	if stage in ["i02_basket", "i02_correct", "i07_water_fetch", "i07_water_bring", "i08_tracks", "i08_report", "i11_forge", "i12_father", "i13_morning", "i14_oath"]:
 		_at(model, view.point)
 		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):
 			return false
 		var screenplay_actions: Dictionary = {
 			"i02_basket":"basket_check",
 			"i02_correct":"basket_correct",
-			"i03_marcus":"marcus_friend",
 			"i07_water_fetch":"i07_water_fetch",
 			"i07_water_bring":"i07_water_bring",
 			"i08_tracks":"i08_inspect",
@@ -420,12 +423,19 @@ func _test_screenplay_failure_and_relationship_branches() -> void:
 	_near(model, "julia")
 	_ok(_action(model, "basket_correct"), "Julia helps correct the basket mistake")
 	_check(_current(model) == "i03_marcus" and not model.data.companion.met, "I-03 follows I-02 with Marcus still undecided")
-	_at(model, Childhood.POINTS.marcus)
-	_ok(_action(model, "marcus_rival"), "I-03 permits a rivalry outcome")
-	_check(model.data.companion.met and model.data.companion.choice == "decline" and model.data.companion.trust == -5, "Marcus rivalry uses the persistent companion state")
-	_check(model.data.village.childhood.screenplay.i03_outcome == "rival", "I-03 concrete memory is stored in childhood screenplay state")
+	# Screenplay v5: no button decides friend or rival. An open dispute at the
+	# stall (contradicted, not clarified, not apologised) is what later systems
+	# read as the strained summary; it is stored when the two part.
+	_check(not _action(model, "marcus_rival").ok and not _action(model, "marcus_friend").ok and not model.data.companion.met, "No direct friend/rival action exists any more")
+	_check(I03Support.play_errand(model, I03Support.RIVAL) and not model.data.companion.met, "The errand with Marcus is played before anything is summarised")
+	while _current(model) != "i03_farewell":
+		if not _complete(model):
+			break
+	_ok(I03Support.play_stage(model, I03Support.RIVAL), "Marcus and the boy part with the dispute open")
+	_check(model.data.companion.met and model.data.companion.choice == "decline" and model.data.companion.trust == -5, "The open dispute is summarised in the persistent companion state")
+	_check(model.data.village.childhood.screenplay.i03_outcome == "rival" and model.data.village.childhood.screenplay.i03_events.has("I-03.stance.object"), "I-03 concrete memories are stored in childhood screenplay state")
 	var before := _snapshot(model.data)
-	_check(not _action(model, "marcus_friend").ok and _snapshot(model.data) == before, "I-03 cannot be collected twice or silently rewritten")
+	_check(not _action(model, "i03_home_together").ok and not _action(model, "i03_apologise").ok and _snapshot(model.data) == before, "I-03 cannot be collected twice or silently rewritten")
 	_ok(model.save_game(_path("screenplay-branches")), "Save I-02/I-03 branch state")
 	var reloaded = WorldModel.new()
 	_ok(reloaded.load_game(_path("screenplay-branches")), "Reload I-02/I-03 branch state")

@@ -15,20 +15,29 @@ const SHELF_ORIGIN := Vector3(0.0, 0.0, 1.05)
 const TABLE_SLOTS := {"julia":Vector3(-1.35, 0.865, -0.98), "silvanus":Vector3(-0.50, 0.865, -0.50), "player":Vector3(-0.85, 0.865, -0.15)}
 const JUG_TABLE := Vector3(-0.55, 0.865, -0.85)
 const JUG_BENCH := Vector3(1.93, 0.515, 0.18)
+const JUG_HAND := Vector3(0.0, -0.34, 0.06)
 const HAND_CUPS := {"julia":Vector3(0.0, -0.02, 0.05), "silvanus":Vector3(0.0, 0.10, 0.05), "player":Vector3(0.0, 0.22, 0.05)}
 
 var _cups: Dictionary = {}
 var _water: Dictionary = {}
 var _jug: MeshInstance3D
-var _hand_right: Node3D
-var _hand_left: Node3D
+var _skeleton: Skeleton3D
+var _right_bone := -1
+var _left_bone := -1
+var _right_rest := Basis.IDENTITY
+var _left_rest := Basis.IDENTITY
 var _figure_body: Node3D
 var _bench_jug: Node3D
-var _signature := ""
+var _carrier: Node3D
+var _held_cups: Array[String] = []
+var _holding_jug := false
 
 
 func _init() -> void:
 	name = "I01FamilyProps"
+	# Follow the hands after VillagePerson updates the skeleton for this frame.
+	process_priority = 10
+	set_process(false)
 
 
 static func world_point(local: Vector3) -> Vector3:
@@ -87,37 +96,40 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 	var enabled: bool = state.get("village", {}).has("childhood")
 	visible = enabled
 	_find_bench_jug()
+	_carrier = figure
+	_held_cups.clear()
+	_holding_jug = false
 	if not enabled:
+		set_process(false)
 		if is_instance_valid(_bench_jug):
 			_bench_jug.visible = true
 		return
 	var view := I01.presentation(state)
-	_ensure_hands(figure)
 	var cup_state: Dictionary = view.cups
 	var filled: bool = str(view.water) in ["poured", "silvanus"] or str(view.status) == "legacy"
 	for owner: String in I01.CUPS:
 		var cup: MeshInstance3D = _cups[owner]
 		var where := str(cup_state.get(owner, "shelf"))
-		if where == "hand" and is_instance_valid(_hand_right):
-			_place(cup, _hand_right, HAND_CUPS[owner], Basis.IDENTITY)
+		if where == "hand":
+			_held_cups.append(owner)
 		elif where == "table":
-			_place(cup, self, world_point(TABLE_SLOTS[owner]), Basis(Vector3.UP, 0.35 * I01.CUPS.find(owner)))
+			_place(cup, world_point(TABLE_SLOTS[owner]), Basis(Vector3.UP, 0.35 * I01.CUPS.find(owner)))
 		else:
-			_place(cup, self, world_point(SHELF_ORIGIN + SHELF_SLOTS[owner]), Basis.IDENTITY)
+			_place(cup, world_point(SHELF_ORIGIN + SHELF_SLOTS[owner]), Basis.IDENTITY)
 		_water[owner].visible = filled and where == "table"
 	match str(view.jug):
 		"hand":
-			if is_instance_valid(_hand_left):
-				_place(_jug, _hand_left, Vector3(0.0, -0.34, 0.06), Basis.IDENTITY)
-			_jug.visible = true
+			_holding_jug = true
 		"table":
-			_place(_jug, self, world_point(JUG_TABLE), Basis.IDENTITY)
-			_jug.visible = true
+			_place(_jug, world_point(JUG_TABLE), Basis.IDENTITY)
 		"away":
 			_jug.visible = false
 		_:
-			_place(_jug, self, world_point(JUG_BENCH), Basis.IDENTITY)
-			_jug.visible = true
+			_place(_jug, world_point(JUG_BENCH), Basis.IDENTITY)
+	var carrying := not _held_cups.is_empty() or _holding_jug
+	set_process(carrying)
+	if carrying:
+		_sync_hands()
 	# The original bench jug stands for the same object; never show two.
 	if is_instance_valid(_bench_jug):
 		_bench_jug.visible = false
@@ -127,8 +139,8 @@ func cup_location(owner: String) -> String:
 	if not _cups.has(owner):
 		return ""
 	var cup: Node3D = _cups[owner]
-	if cup.get_parent() == _hand_right:
-		return "hand"
+	if owner in _held_cups:
+		return "hand" if cup.visible and _right_bone >= 0 else "elsewhere"
 	var at := cup.global_position
 	for slot: String in ["table", "shelf"]:
 		var expected: Vector3 = world_point(TABLE_SLOTS[owner]) if slot == "table" else world_point(SHELF_ORIGIN + SHELF_SLOTS[owner])
@@ -145,55 +157,62 @@ func jug_node() -> Node3D:
 	return _jug
 
 
-func _place(item: Node3D, parent: Node3D, at: Vector3, basis: Basis) -> void:
+func _place(item: Node3D, at: Vector3, basis: Basis) -> void:
 	var size := 0.48 if item == _jug else 1.0
-	if item.get_parent() != parent:
-		if item.get_parent() != null:
-			item.get_parent().remove_child(item)
-		parent.add_child(item)
-	item.position = at
-	item.basis = basis.scaled(Vector3.ONE * size)
-	if parent != self and item.is_inside_tree():
-		# Bone attachments carry the rig's scale; keep the prop at metre size.
-		var world_scale := parent.global_basis.get_scale()
-		item.basis = basis.scaled(Vector3(size / maxf(world_scale.x, 0.001), size / maxf(world_scale.y, 0.001), size / maxf(world_scale.z, 0.001)))
+	item.transform = Transform3D(basis.scaled(Vector3.ONE * size), at)
+	item.visible = true
 
 
-func _ensure_hands(figure: Node3D) -> void:
-	if not is_instance_valid(figure):
+func _process(_delta: float) -> void:
+	_sync_hands()
+
+
+func _sync_hands() -> void:
+	_ensure_hands()
+	_move_held_props()
+
+
+func _move_held_props() -> void:
+	for owner in _held_cups:
+		_follow_hand(_cups[owner], _right_bone, _right_rest, HAND_CUPS[owner], 1.0)
+	if _holding_jug:
+		_follow_hand(_jug, _left_bone, _left_rest, JUG_HAND, 0.48)
+
+
+func _follow_hand(item: Node3D, bone: int, correction: Basis, at: Vector3, size: float) -> void:
+	# Props stay under I01FamilyProps when a character model is replaced.
+	item.visible = is_instance_valid(_skeleton) and bone >= 0
+	if item.visible:
+		var pose := _skeleton.global_transform * _skeleton.get_bone_global_pose(bone)
+		var orientation := (pose.basis * correction).orthonormalized().scaled(Vector3.ONE * size)
+		item.global_transform = Transform3D(orientation, pose * (correction * at))
+
+
+func _ensure_hands() -> void:
+	var body: Variant = _carrier.get("body") if is_instance_valid(_carrier) else null
+	if is_instance_valid(_figure_body) and body == _figure_body:
 		return
-	var body: Variant = figure.get("body")
-	if not body is Node3D:
-		return
-	if body == _figure_body and is_instance_valid(_hand_right) and is_instance_valid(_hand_left):
+	if is_instance_valid(_skeleton):
+		_skeleton.skeleton_updated.disconnect(_move_held_props)
+	_skeleton = null
+	_figure_body = null
+	_right_bone = -1
+	_left_bone = -1
+	if not is_instance_valid(body) or not body is Node3D:
 		return
 	_figure_body = body
-	var skeletons: Array[Node] = (body as Node3D).find_children("*", "Skeleton3D", true, false)
-	if skeletons.is_empty():
+	var rigs := (body as Node3D).find_children("*", "Skeleton3D", true, false)
+	if rigs.is_empty():
 		return
-	var skeleton := skeletons[0] as Skeleton3D
-	_hand_right = _attachment(skeleton, "Hand_R", "I01CarryRight")
-	_hand_left = _attachment(skeleton, "Hand_L", "I01CarryLeft")
-
-
-func _attachment(skeleton: Skeleton3D, bone: String, label: String) -> Node3D:
-	var index := skeleton.find_bone(bone)
-	if index < 0:
-		return null
-	var existing := skeleton.get_node_or_null(label)
-	if existing != null:
-		return existing.get_node("Props") as Node3D
-	var attachment := BoneAttachment3D.new()
-	attachment.name = label
-	attachment.bone_name = bone
-	attachment.override_pose = false
-	skeleton.add_child(attachment)
-	var props := Node3D.new()
-	props.name = "Props"
-	# Upright in model space at rest, like the borrowed practice gear.
-	props.basis = skeleton.get_bone_global_rest(index).basis.inverse()
-	attachment.add_child(props)
-	return props
+	_skeleton = rigs[0] as Skeleton3D
+	_right_bone = _skeleton.find_bone("Hand_R")
+	_left_bone = _skeleton.find_bone("Hand_L")
+	if _right_bone >= 0:
+		_right_rest = _skeleton.get_bone_global_rest(_right_bone).basis.inverse()
+	if _left_bone >= 0:
+		_left_rest = _skeleton.get_bone_global_rest(_left_bone).basis.inverse()
+	# AnimationMixer can finish a pose after the regular node process.
+	_skeleton.skeleton_updated.connect(_move_held_props)
 
 
 func _find_bench_jug() -> void:

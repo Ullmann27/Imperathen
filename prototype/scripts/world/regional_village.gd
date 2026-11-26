@@ -74,6 +74,12 @@ func show_origin(id: String) -> void:
 		add_child(settlement_details)
 		settlement_details.build(self)
 		settlement_details.set_quality(quality)
+		# Household-specific furniture, hearth light and colliders (docs/35_interiors).
+		var interiors: Node3D = preload("res://scripts/world/village/house_interiors.gd").new()
+		interiors.name = "HouseInteriors"
+		add_child(interiors)
+		interiors.build(self, settlement_details)
+		interiors.set_quality(quality)
 	else:
 		# A communal timber-lined water point for the regional encounter.
 		var wood := Art.material(Color("#785538"))
@@ -158,6 +164,8 @@ func set_quality(profile: String) -> void:
 		frontier_details.set_quality(profile)
 	if settlement_details:
 		settlement_details.set_quality(profile)
+	if has_node("HouseInteriors"):
+		get_node("HouseInteriors").set_quality(profile)
 
 func _tint_house(model: Node3D, tint: Color) -> void:
 	var overrides := {}
