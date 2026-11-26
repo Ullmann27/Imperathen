@@ -191,6 +191,10 @@ def main():
             segments.append([round(s, 3), round(e, 3), VISEMES.index(vis), p])
         segments = refine_phrase_onsets(segments, wave, sr)
         onset = audio_onset(wave, sr)
+        # The first audible energy of a trimmed line is the start of its first
+        # phoneme; CTC often fires late on initial plosives (up to ~0.5 s here).
+        if segments and onset < segments[0][1]:
+            segments[0][0] = round(onset, 3)
         track = {
             "schema_version": 1, "line_id": line_id, "text_key": line["text_key"], "speaker_id": line["speaker_id"],
             "method": "espeak-ng(de) + CTC Viterbi forced alignment " + ALIGNER[0] + "@" + ALIGNER[1][:12],
