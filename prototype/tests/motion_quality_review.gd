@@ -246,6 +246,8 @@ func _configure(actor: SourcePerson, path: String) -> void:
 	elif stem.right(1).is_valid_int():
 		level = int(stem.right(1))
 	if path.contains("hero_quality_") or path.contains("hero_meshy_italia_"):
+		if path.contains("hero_meshy_italia_civil_"):
+			actor.configure_meshy_youth(true, "civil")
 		actor.configure("player", "italia", 28 if str(plan.kind) == "service" else 12)
 	elif path.contains("frontier_"):
 		var appearance := stem.trim_prefix("frontier_")
@@ -305,7 +307,7 @@ func _build_segments() -> void:
 			_append("armed", 1.4, "Schwert: " + technique, technique)
 		for guard: String in Motion.SHIELD_GUARDS:
 			_append("guard", .9, "Schild: " + guard, guard)
-	elif str(plan.family) in ["hero", "original_youth"]:
+	elif str(plan.family) in ["hero", "original_youth", "civil_youth"]:
 		for technique: String in Motion.TECHNIQUES:
 			_append("unarmed", float(Motion.TIMING[technique].z) + .3, "Technik: " + technique, technique)
 	else:

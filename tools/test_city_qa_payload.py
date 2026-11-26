@@ -17,6 +17,7 @@ import tempfile
 import zipfile
 
 from build_android_prototype import QA_PACKAGE, file_sha256
+from validate_android_apk import record_payload_hash, resolve_resource
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKS = {
@@ -45,7 +46,30 @@ def committed(commit, relative):
     return subprocess.check_output(["git", "show", f"{commit}:prototype/{relative}"], cwd=ROOT)
 
 
-def run(apk, output, engine, capture_market=False):
+def outfit_payload(archive):
+    names = set(archive.namelist())
+    resources = []
+    for suffix in ("", "_civil"):
+        path = f"assets/animations/accad_youth{suffix}_motion.json"
+        motion = resolve_resource(archive, names, path)
+        if not motion["entry"]:
+            raise ValueError(f"Bewegungsbericht fehlt im Paket: {path}")
+        lods = json.loads(archive.read(motion["entry"]))["lods"]
+        if sorted(lod["level"] for lod in lods) != [0, 1, 2, 3]:
+            raise ValueError(f"Bewegungsbericht ohne vier LODs: {path}")
+        record_payload_hash(archive, motion)
+        resources.append(motion)
+        for level in range(4):
+            path = f"assets/characters/hero_meshy_italia{suffix}_{level}.glb"
+            scene = resolve_resource(archive, names, path)
+            if scene["mode"] != "remapped" or not scene["entry"].endswith(".scn"):
+                raise ValueError(f"Importierte Figur fehlt im Paket: {path}")
+            record_payload_hash(archive, scene)
+            resources.append(scene)
+    return resources
+
+
+def run(apk, output, engine, capture_market=False, require_civil=False):
     manifest = json.loads(apk.with_suffix(".build.json").read_text(encoding="utf-8"))
     digest = file_sha256(apk)
     if (not manifest["signature_verified"] or manifest["apk_sha256"] != digest
@@ -64,6 +88,8 @@ def run(apk, output, engine, capture_market=False):
         pack = folder / "runtime.zip"
         fixture = committed(commit, FIXTURE)
         with zipfile.ZipFile(apk) as archive, zipfile.ZipFile(pack, "w", zipfile.ZIP_DEFLATED, compresslevel=1) as bundle:
+            if require_civil:
+                report["youth_outfits"] = outfit_payload(archive)
             for path in JSON_PATHS:
                 data = archive.read("assets/" + path)
                 if data != committed(commit, path):
@@ -78,7 +104,10 @@ def run(apk, output, engine, capture_market=False):
                     shutil.copyfileobj(src, dst)
             bundle.writestr(FIXTURE, fixture)
         report["external_fixture_sha256"] = hashlib.sha256(fixture).hexdigest()
-        for script, marker in CHECKS.items():
+        checks = CHECKS.copy()
+        if require_civil:
+            checks["youth_outfit_test"] = "YOUTH_OUTFIT_PASS"
+        for script, marker in checks.items():
             probe = folder / (script + ".gd")
             probe.write_bytes(committed(commit, "tests/" + probe.name))
             environment = os.environ.copy()
@@ -95,6 +124,10 @@ def run(apk, output, engine, capture_market=False):
             (output / (script + ".log")).write_text(result.stdout, encoding="utf-8")
             passed = (result.returncode == 0 and re.search(rf"^{marker}\b", result.stdout, re.M) is not None
                       and re.search(r"SCRIPT ERROR:|^ERROR:|^USER ERROR:", result.stdout, re.M) is None)
+            if script == "youth_outfit_test":
+                line = re.search(r"^YOUTH_OUTFIT_RESULT (.+)$", result.stdout, re.M)
+                outfits = json.loads(line[1]) if line else {}
+                passed = passed and all(outfits.get(key) is True for key in ("armoured_installed", "civil_installed"))
             report["checks"][script] = {"passed": passed, "exit_code": result.returncode,
                                        "graphics": "gl_compatibility" if capture else "headless",
                                        "external_script_sha256": hashlib.sha256(probe.read_bytes()).hexdigest()}
@@ -111,5 +144,7 @@ if __name__ == "__main__":
     parser.add_argument("--godot", default="godot")
     parser.add_argument("--capture-market", action="store_true",
                         help="Den Marktbesuch auf dem aktiven Desktop-Display aufnehmen")
+    parser.add_argument("--require-civil", action="store_true",
+                        help="Beide Originalfiguren mit je vier LODs und beiden Bewegungsberichten prüfen")
     args = parser.parse_args()
-    raise SystemExit(0 if run(args.apk, args.output, args.godot, args.capture_market) else 1)
+    raise SystemExit(0 if run(args.apk, args.output, args.godot, args.capture_market, args.require_civil) else 1)

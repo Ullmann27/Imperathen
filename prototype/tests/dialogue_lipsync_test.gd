@@ -8,6 +8,7 @@ extends SceneTree
 ##     Jaw bone + blend shapes) is within +-1 frame (1/60 s) of the audio onset;
 ##   * the subtitle ends within 1 frame of the audio end.
 
+const MixerTeardown := preload("res://tests/audio_mixer_teardown.gd")
 const Opening = preload("res://scripts/story/opening_story.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
 const VoiceLines = preload("res://scripts/audio/voice_lines.gd")
@@ -173,7 +174,7 @@ func _run() -> void:
 	dialogue.stop()
 	world.queue_free()
 	await process_frame
-	await process_frame
+	await MixerTeardown.drain(self)
 	print("DIALOGUE_LIPSYNC_REPORT " + JSON.stringify(_report))
 	print("DIALOGUE_LIPSYNC_RESULT checks=%d failures=%d" % [checks, failures.size()])
 	for failure in failures:
