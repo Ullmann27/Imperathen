@@ -52,7 +52,9 @@ const FLAMES := {
 	"candelabrum": [[Vector3(.001, 1.331, 0), .040, .30]],
 	"hearth_ring": [[Vector3(0, .10, 0), .36, 1.0], [Vector3(.09, .09, .06), .26, 0.0], [Vector3(-.08, .09, -.05), .22, 0.0],
 		[Vector3(-.03, .09, .09), .18, 0.0]],
-	"hearth_cook": [[Vector3(.02, .09, -.02), .24, 1.0], [Vector3(-.09, .08, .05), .19, 0.0], [Vector3(.10, .08, .07), .16, 0.0]],
+	# The pot starts at .285 m: keep the central flame under it and seat the
+	# outer flame on the .062 m embers crown of the imported hearth.
+	"hearth_cook": [[Vector3(.02, .067, -.02), .19, 1.0], [Vector3(-.09, .08, .05), .19, 0.0], [Vector3(.14, .063, .07), .16, 0.0]],
 	"forge_hearth": [[Vector3(0, .82, .10), .22, 1.5], [Vector3(.07, .82, .06), .15, 0.0], [Vector3(-.06, .82, .13), .13, 0.0]],
 }
 # Fires without an open flame still light the room: [offset, strength].
