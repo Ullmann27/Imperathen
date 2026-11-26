@@ -10,9 +10,12 @@ extends SceneTree
 ## Writes <label>-<shot>-<profile>.png and look.json with render counters.
 ## Frame times come from whatever renderer runs the script (often software):
 ## they are a relative indicator between shots, never device performance.
-## Usage: --script res://tests/village_look_review.gd ++ <out_dir> [label] [frames] [profiles,csv]
+## Usage: --script res://tests/village_look_review.gd ++ <out_dir> [label] [frames] [profiles,csv] [shots,csv]
+## A shot subset writes <label>-<shots>-<profiles>-look.json, so one long capture can be split into short runs.
 
 const SHOTS := ["start", "path", "conversation", "overview"]
+var shots: Array = SHOTS.duplicate()
+var report_name := ""
 ## The camera set is shared with the render-profile study through
 ## assets/village/look/look_values.json ("cameras"); these defaults are the
 ## same values, so the script also runs on commits without that file.
@@ -47,6 +50,9 @@ func _initialize() -> void:
 		frames = clampi(args[2].to_int(), 2, 120)
 	if args.size() > 3:
 		profiles = Array(args[3].split(",", false))
+	if args.size() > 4:
+		shots = Array(args[4].split(",", false)).filter(func(shot: String) -> bool: return shot in SHOTS)
+		report_name = "-%s-%s" % ["+".join(shots), "+".join(profiles)]
 	DirAccess.make_dir_recursive_absolute(output)
 	_read_cameras()
 	_run.call_deferred()
@@ -112,7 +118,7 @@ func _run() -> void:
 	for profile: String in profiles:
 		game.ui.set_quality(profile)
 		RenderingServer.viewport_set_measure_render_time(root.get_viewport_rid(), true)
-		for shot: String in SHOTS:
+		for shot: String in shots:
 			if not await _frame(shot, start):
 				continue
 			await _settle()
@@ -127,7 +133,7 @@ func _run() -> void:
 		if _without_revision(snapshot) != _without_revision(now):
 			errors.append("World state changed in %s: %s" % [profile, _differences(JSON.parse_string(snapshot), JSON.parse_string(now), "")])
 	report.errors = errors
-	var file := FileAccess.open(output.path_join(label + "-look.json"), FileAccess.WRITE)
+	var file := FileAccess.open(output.path_join(label + report_name + "-look.json"), FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "  ") + "\n")
 	file.close()
 	print("VILLAGE_LOOK_REVIEW ", JSON.stringify(errors))
