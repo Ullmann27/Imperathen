@@ -29,7 +29,7 @@
       "mesh_lod_threshold": 3,
       "decoration_fraction": 0.22,
       "glow": false,
-      "look": {"shadow_splits": 1, "shadow_filter": "hard", "sky_radiance": 64, "aerial_perspective": 0.4, "interior_bounce": false, "light_shafts": false},
+      "look": {"shadow_splits": 1, "shadow_filter": "hard", "sky_radiance": 64, "aerial_perspective": 0.4, "interior_bounce": false, "light_shafts": false, "ssao": false},
       "review_limits": {
         "draw_calls": 220,
         "visible_primitives": 160000,
@@ -51,7 +51,7 @@
       "mesh_lod_threshold": 1.5,
       "decoration_fraction": 0.6,
       "glow": false,
-      "look": {"shadow_splits": 2, "shadow_filter": "soft_low", "sky_radiance": 64, "aerial_perspective": 0.5, "interior_bounce": true, "light_shafts": false},
+      "look": {"shadow_splits": 2, "shadow_filter": "soft_low", "sky_radiance": 64, "aerial_perspective": 0.5, "interior_bounce": true, "light_shafts": false, "ssao": false},
       "review_limits": {
         "draw_calls": 350,
         "visible_primitives": 320000,
@@ -74,7 +74,7 @@
       "mesh_lod_threshold": 0.65,
       "decoration_fraction": 1,
       "glow": true,
-      "look": {"shadow_splits": 4, "shadow_filter": "soft_medium", "sky_radiance": 128, "aerial_perspective": 0.5, "interior_bounce": true, "light_shafts": true},
+      "look": {"shadow_splits": 4, "shadow_filter": "soft_medium", "sky_radiance": 128, "aerial_perspective": 0.5, "interior_bounce": true, "light_shafts": true, "ssao": false},
       "review_limits": {
         "draw_calls": 550,
         "visible_primitives": 700000,
@@ -97,7 +97,7 @@
       "mesh_lod_threshold": 0.4,
       "decoration_fraction": 1,
       "glow": true,
-      "look": {"shadow_splits": 4, "shadow_filter": "soft_high", "sky_radiance": 128, "aerial_perspective": 0.5, "interior_bounce": true, "light_shafts": true},
+      "look": {"shadow_splits": 4, "shadow_filter": "soft_high", "sky_radiance": 128, "aerial_perspective": 0.5, "interior_bounce": true, "light_shafts": true, "ssao": false},
       "review_limits": {
         "draw_calls": 750,
         "visible_primitives": 1100000,

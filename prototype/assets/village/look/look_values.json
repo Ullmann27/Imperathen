@@ -5,6 +5,9 @@
   "tonemap": {"mode": "aces", "white": 6.0},
   "fog": {"aerial_perspective": 0.5, "sky_affect": 0.08, "sun_scatter": 0.18, "height": 1.2},
   "glow": {"intensity": 0.55, "strength": 0.9, "bloom": 0.035, "hdr_threshold": 1.05},
+  "grade": {"about": "Optional 17^3 split-tone LUT applied after tonemapping (Environment.adjustment_color_correction): offsets added to shadows (weight (1-luma)^2) and highlights (weight luma^2).",
+    "split_tone": false, "shadows": [-0.012, 0.002, 0.022], "highlights": [0.022, 0.008, -0.02]},
+  "ssao": {"about": "Used where quality_profiles.json look.ssao is true.", "radius": 1.2, "intensity": 2.2, "power": 1.6, "detail": 0.5, "light_affect": 0.15},
   "seasons": [
     {"name": "spring", "sun_angle": [-29, -38], "sun": "#ffdcb0", "sun_energy": 2.0, "ambient": 0.52, "exposure": 0.88,
      "fog": 0.0019, "fog_height": 0.006, "zenith": "#3a73ab", "horizon": "#a9c2cc", "clouds": "#f3ebdc", "haze": "#ffcf96",

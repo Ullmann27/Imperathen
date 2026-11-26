@@ -165,6 +165,36 @@ static func configure_environment(env: Environment, sky: ShaderMaterial) -> void
 	env.glow_bloom = float(VALUES.glow.bloom)
 	env.glow_hdr_threshold = float(VALUES.glow.hdr_threshold)
 	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	var ao: Dictionary = VALUES.ssao
+	env.ssao_radius = float(ao.radius)
+	env.ssao_intensity = float(ao.intensity)
+	env.ssao_power = float(ao.power)
+	env.ssao_detail = float(ao.detail)
+	env.ssao_light_affect = float(ao.light_affect)
+	if bool(VALUES.grade.split_tone):
+		env.adjustment_enabled = true
+		env.adjustment_color_correction = split_tone_lut(VALUES.grade.shadows, VALUES.grade.highlights)
+
+
+## 17^3 colour LUT: small offsets toward `shadows` in dark and `highlights` in
+## bright display values; applied after the tonemapper.
+static func split_tone_lut(shadows: Array, highlights: Array) -> ImageTexture3D:
+	var size := 17
+	var dark := Vector3(shadows[0], shadows[1], shadows[2])
+	var bright := Vector3(highlights[0], highlights[1], highlights[2])
+	var slices: Array[Image] = []
+	for b in size:
+		var slice := Image.create(size, size, false, Image.FORMAT_RGB8)
+		for g in size:
+			for r in size:
+				var colour := Vector3(r, g, b) / float(size - 1)
+				var luma := colour.dot(Vector3(.2126, .7152, .0722))
+				colour += dark * pow(1.0 - luma, 2.0) + bright * luma * luma
+				slice.set_pixel(r, g, Color(clampf(colour.x, 0.0, 1.0), clampf(colour.y, 0.0, 1.0), clampf(colour.z, 0.0, 1.0)))
+		slices.append(slice)
+	var lut := ImageTexture3D.new()
+	lut.create(Image.FORMAT_RGB8, size, size, size, false, slices)
+	return lut
 
 
 static func apply_season_light(index: int, light: DirectionalLight3D, env: Environment, sky: ShaderMaterial) -> void:
@@ -340,6 +370,7 @@ func apply_quality(next_profile: String) -> void:
 	environment.glow_enabled = bool(PROFILE_DATA.data.profiles[profile].get("glow", false))
 	environment.sky.radiance_size = Sky.RADIANCE_SIZE_128 if int(look.get("sky_radiance", 64)) >= 128 else Sky.RADIANCE_SIZE_64
 	environment.fog_aerial_perspective = float(look.get("aerial_perspective", .62))
+	environment.ssao_enabled = bool(look.get("ssao", false))
 	_bounce_allowed = bool(look.get("interior_bounce", true))
 	_shafts_allowed = bool(look.get("light_shafts", false))
 	Surfaces.set_profile(profile)
