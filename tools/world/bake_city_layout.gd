@@ -4,14 +4,14 @@ extends SceneTree
 ##
 ##   godot --headless --path prototype --script ../tools/world/bake_city_layout.gd
 ##
-## Everything is derived from prototype/assets/world/roman_city_manifest.json
-## and physics queries against roman_city_collision.glb, so a changed city
-## (new walls, moved houses) is picked up by baking again. Output is
+## Anchor semantics come from the city manifest and its installed quarter.
+## Collision is queried in the same CityExploration scene as a live player. Output is
 ## deterministic for identical inputs:
-##   prototype/assets/city/activity_anchors/{market_street,forum,residential}.json
+##   prototype/assets/city/activity_anchors/{market_street,forum,residential,roman_quarter}.json
 ##   prototype/assets/city/street_graph.json
 
 const Anchors = preload("res://scripts/domain/city_anchors.gd")
+const City = preload("res://scripts/world/city_exploration.gd")
 const MANIFEST := "res://assets/world/roman_city_manifest.json"
 const COLLISION := "res://assets/world/roman_city_collision.glb"
 const SHOPS := "res://assets/city_detail/shops/city_market_anchors.json"
@@ -26,13 +26,16 @@ const ARTISAN_TRADES := ["carpenter", "cobbler", "weaver", "smith", "potter", "f
 const RAY_HEIGHTS := [0.45, 1.0, 1.6]
 const MAX_EDGE := 22.5
 const MAX_DEGREE := 8
+# Includes all quarter hulls plus a full pedestrian width.
+const QUARTER_BOUNDS := Rect2(12, -39, 36, 56)
+const FLOOR_SAMPLE_STEP := 0.50
 
 var space: PhysicsDirectSpaceState3D
 var nodes: Array[Vector3] = []
 var node_keys := {}
-var files := {"market_street": [], "forum": [], "residential": []}
+var files := {"market_street": [], "forum": [], "residential": [], "roman_quarter": []}
 var anchor_node := {}
-var approach := {}
+var capsule := CapsuleShape3D.new()
 var failures: Array[String] = []
 
 
@@ -46,36 +49,35 @@ func _run() -> void:
 		quit(1)
 		return
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(MANIFEST))
-	var holder := Node3D.new()
-	root.add_child(holder)
-	var ground := StaticBody3D.new()
-	var ground_shape := CollisionShape3D.new()
-	var box := BoxShape3D.new()
-	box.size = Vector3(1400, 0.2, 1400)
-	ground_shape.shape = box
-	ground.add_child(ground_shape)
-	ground.position.y = -0.125
-	holder.add_child(ground)
-	var scene := (load(COLLISION) as PackedScene).instantiate() as Node3D
-	holder.add_child(scene)
-	var bodies := scene.find_children("*", "StaticBody3D", true, false)
-	if bodies.is_empty():
-		for mesh: MeshInstance3D in scene.find_children("*", "MeshInstance3D", true, false):
-			if mesh.mesh == null:
-				continue
-			var body := StaticBody3D.new()
-			var shape := CollisionShape3D.new()
-			shape.shape = mesh.mesh.create_trimesh_shape()
-			body.add_child(shape)
-			holder.add_child(body)
-			body.global_transform = mesh.global_transform
+	# The installed district includes rotated entrances, steps and shop furniture.
+	# Use the same instantiated bodies as the player, on the static-world layer.
+	var city := City.new()
+	city.persist = false
+	city.profile = "low"
+	# A single graph serves later scenarios too. Existing streets must remain
+	# clear when the latest dated structures have actually been constructed.
+	var last_year := 1
+	for entry: Dictionary in manifest.entries:
+		last_year = maxi(last_year, int(entry.era_min_ce))
+	city.world_jdn = City.Calendar.to_jdn(last_year, 12, 31)
+	capsule.radius = 0.32
+	capsule.height = 1.60
+	root.add_child(city)
+	city.set_physics_process(false)
+	city.set_process(false)
+	if not city.city_available or not is_instance_valid(city.quarter) or not is_instance_valid(city.quarter.stable_trader):
+		push_error("CITY_LAYOUT_BAKE_FAIL missing RomanCity or installed district")
+		city.free()
+		quit(1)
+		return
 	for frame in 3:
 		await physics_frame
-	space = holder.get_world_3d().direct_space_state
+	space = city.get_world_3d().direct_space_state
 	_market(manifest)
 	_forum(manifest)
 	_residential(manifest)
 	_street_nodes()
+	_quarter(city.quarter)
 	var graph := _build_graph()
 	if not failures.is_empty():
 		for line: String in failures:
@@ -98,6 +100,7 @@ func _run() -> void:
 	_write(OUT_GRAPH, graph)
 	print("CITY_LAYOUT_BAKED " + JSON.stringify({"anchors": total, "nodes": graph.nodes.size(), "edges": graph.edges.size(),
 		"market": files.market_street.size(), "forum": files.forum.size(), "residential": files.residential.size()}))
+	city.free()
 	quit(0)
 
 
@@ -110,7 +113,8 @@ func _write(path: String, payload: Dictionary) -> void:
 # --- geometry helpers -------------------------------------------------------
 
 func _ground(x: float, z: float) -> float:
-	var query := PhysicsRayQueryParameters3D.create(Vector3(x, 2.6, z), Vector3(x, -1.0, z), 1)
+	var start_y := 0.72 if QUARTER_BOUNDS.has_point(Vector2(x, z)) else 2.6
+	var query := PhysicsRayQueryParameters3D.create(Vector3(x, start_y, z), Vector3(x, -1.0, z), 1)
 	var hit := space.intersect_ray(query)
 	return float(hit.position.y) if not hit.is_empty() else INF
 
@@ -142,6 +146,41 @@ func _clear(a: Vector3, b: Vector3, half_width: float = 0.38) -> bool:
 				var to: Vector3 = pair[1] + offset + Vector3.UP * height
 				if not space.intersect_ray(PhysicsRayQueryParameters3D.create(from, to, 1)).is_empty():
 					return false
+	# Check the entire body on the changing surface of the quarter. Low solid
+	# objects and overhanging shop counters can fall between the legacy rays.
+	var p := Vector2(a.x, a.z)
+	var q := Vector2(b.x, b.z)
+	if not QUARTER_BOUNDS.intersects(Rect2(p, Vector2.ZERO).expand(q).grow(0.4)):
+		return true
+	var samples := maxi(1, ceili(flat.length() / FLOOR_SAMPLE_STEP))
+	var probe := PhysicsShapeQueryParameters3D.new()
+	probe.shape = capsule
+	probe.collision_mask = 1
+	probe.margin = 0.002
+	var last := a
+	for i in range(samples + 1):
+		var foot := a.lerp(b, float(i) / samples)
+		var ray := PhysicsRayQueryParameters3D.create(Vector3(foot.x, 0.72, foot.z), Vector3(foot.x, -0.7, foot.z), 1)
+		var hit := space.intersect_ray(ray)
+		if hit.is_empty() or hit.normal.y < cos(deg_to_rad(46.0)):
+			return false
+		foot.y = hit.position.y
+		if absf(foot.y - last.y) > City.MAX_STEP:
+			return false
+		# The route is evaluated linearly by CityLife. Avoid edges that cut
+		# far below a convex crown or hover over a recessed floor.
+		if absf(foot.y - lerpf(a.y, b.y, float(i) / samples)) > 0.15:
+			return false
+		probe.transform = Transform3D(Basis.IDENTITY, foot + Vector3.UP * (capsule.height / 2.0 + 0.04))
+		probe.motion = Vector3.ZERO
+		if not space.intersect_shape(probe, 1).is_empty():
+			return false
+		if i > 0:
+			probe.transform.origin = last + Vector3.UP * (capsule.height / 2.0 + 0.04)
+			probe.motion = foot - last
+			if space.cast_motion(probe)[0] < 0.9999:
+				return false
+		last = foot
 	return true
 
 
@@ -364,6 +403,39 @@ func _street_nodes() -> void:
 			_node(-408.0 + step * 5.6666667, z)
 
 
+## Intermediate points lead through actual door apertures and up the curb.
+## Keep the established resident and business IDs. New interior destinations
+## are public activity places, not new owners of the existing businesses.
+func _quarter(quarter: Node3D) -> void:
+	for z in range(-32, 17, 2):
+		_node(28.0, z)
+	for x in range(14, 44, 2):
+		_node(x, -17.0)
+	for z: float in [-2.4, 2.4]:
+		for x: float in [30.0, 31.7, 33.4, 34.5]:
+			_node(x, z)
+	for z: float in [0.8, 4.9]:
+		for x: float in [25.4, 24.0, 22.5]:
+			_node(x, z)
+	for x: float in [29.4, 31.0, 32.6, 34.0]:
+		_node(x, -29.2)
+	var stable: Vector3 = quarter.stable_trader.global_position
+	for data: Array in [
+		["south", "entrance", Vector2(28.0, 14.0), ["district:forum"], 0.0],
+		["smith", "entrance", Vector2(34.5, -2.4), ["building:WorkshopAndTavern", "shelter"], -90.0],
+		["taberna", "gossip_spot", Vector2(34.5, 2.4), ["building:WorkshopAndTavern", "shelter"], -90.0],
+		["domus", "entrance", Vector2(22.5, 0.8), ["building:StreetDomus", "shelter"], 90.0],
+		["crossing", "gossip_spot", Vector2(28.0, -17.0), ["district:forum"], 0.0],
+		["west", "entrance", Vector2(16.0, -17.0), ["district:forum"], -90.0],
+		["east", "entrance", Vector2(40.0, -17.0), ["district:forum"], 90.0],
+		["stable", "entrance", Vector2(stable.x, stable.z), ["building:StableYard", "shop:equarius"], -90.0],
+	]:
+		var at := Vector3(data[2].x, 0.0, data[2].y)
+		if not _anchor("roman_quarter", "quarter." + data[0], data[1], at, data[4], 1,
+				[0.0, 24.0], -58, ALL, data[3]):
+			failures.append("district destination is blocked: " + data[0])
+
+
 func _build_graph() -> Dictionary:
 	# Spatial hash so candidate search stays linear.
 	var cells := {}
@@ -373,8 +445,6 @@ func _build_graph() -> Dictionary:
 			cells[key] = []
 		cells[key].append(index)
 	var edge_set := {}
-	var degree: Array[int] = []
-	degree.resize(nodes.size())
 	for index in nodes.size():
 		var at := nodes[index]
 		var key := Vector2i(floori(at.x / MAX_EDGE), floori(at.z / MAX_EDGE))
@@ -454,9 +524,9 @@ func _build_graph() -> Dictionary:
 	# Optional decorative anchors may fall on blocked ground; homes, stalls and
 	# their queues must never be lost.
 	for id: String in dropped:
-		if id.begins_with("home.") or id.begins_with("market.stall_") or id.begins_with("market.queue_") or id.begins_with("workshop."):
+		if id.begins_with("quarter.") or id.begins_with("home.") or id.begins_with("market.stall_") or id.begins_with("market.queue_") or id.begins_with("workshop."):
 			failures.append("anchor %s is not connected to the street graph" % id)
 	print("CITY_LAYOUT_DROPPED " + JSON.stringify(dropped))
 	return {"format": "imperathen-city-street-graph", "schema": 1,
-		"source": "tools/world/bake_city_layout.gd; edges verified by ray casts at 0.45/1.0/1.6 m, 0.76 m wide",
+		"source": "tools/world/bake_city_layout.gd; static CityExploration collision across dated structures, 0.76 m wide rays; installed quarter ground and swept 0.64 m x 1.60 m capsule at 0.50 m intervals",
 		"nodes": out_nodes, "edges": out_edges, "anchor_nodes": out_anchor_nodes}

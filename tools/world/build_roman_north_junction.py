@@ -19,6 +19,9 @@ OUTPUT = ROOT / "prototype/assets/roman_quarter/north_junction"
 FLOOR = .159
 ROAD_TOP = .071
 WALK_WIDTH = .68
+# The quarter's origin is 0.125 m above the datum. The forum is at 0.09 m.
+NORTH_JOIN, NORTH_FOOT = -8.16, -9.36
+FORUM_TOP = .09 - .125
 
 
 @dataclass(frozen=True)
@@ -79,9 +82,35 @@ def tile_rectangle(mesh, centre_x, centre_z, length, width, seed):
             x=x1
 
 
+def ramp_surface(u):
+    fraction = (u - NORTH_FOOT) / (NORTH_JOIN - NORTH_FOOT)
+    return FORUM_TOP + fraction * (ROAD_TOP - FORUM_TOP)
+
+
+def ramp_face(u0, u1, x0, x1, offset=0.0):
+    return [position(u, x, ramp_surface(u) + offset)
+            for u, x in ((u0, x0), (u1, x0), (u1, x1), (u0, x1))]
+
+
+def north_apron(mesh):
+    mesh.prism(ramp_face(NORTH_FOOT, NORTH_JOIN, -3.35, 3.35, -.014),
+               (0, 0, -.040), "paving")
+    # Two staggered courses of stone follow the same grade as the collision.
+    for row in range(2):
+        lo = NORTH_FOOT + row * .6
+        x = -3.35 - row * .28
+        while x < 3.35:
+            left, right = max(-3.35, x), min(3.35, x + .58)
+            if right - left > .05:
+                mesh.prism(ramp_face(lo + .007, lo + .593, left + .008, right - .008, .003),
+                           (0, 0, -.024), "basalt")
+            x += .58
+
+
 def roads(mesh):
     # Main street from the existing northern edge at +4 to the open north.
     tile_rectangle(mesh,0,-2.08,12.16,6.70,58116)
+    north_apron(mesh)
     # East and west arms meet the central stretch without coplanar overlap.
     tile_rectangle(mesh,-8.22,0,4.56,9.74,58117)
     tile_rectangle(mesh,8.72,0,4.56,10.74,58118)
@@ -288,6 +317,14 @@ def collision_nodes():
     boxes=[proxy_box("MainStreet",-2.08,0,-.085,12.16,6.70,ROAD_TOP+.085),
            proxy_box("EastLane",0,8.72,-.085,4.56,10.74,ROAD_TOP+.085),
            proxy_box("WestLane",0,-8.22,-.085,4.56,9.74,ROAD_TOP+.085)]
+    # Godot trimesh preserves the continuous inclined walking plane.
+    ramp_mesh = bpy.data.meshes.new("NorthApron")
+    ramp_mesh.from_pydata(ramp_face(NORTH_FOOT, NORTH_JOIN, -3.35, 3.35), [], [(0, 1, 2, 3)])
+    ramp_mesh.update()
+    ramp = bpy.data.objects.new("NorthApron_collision", ramp_mesh)
+    bpy.context.collection.objects.link(ramp)
+    ramp["collision_mesh_only"] = True
+    boxes.append(ramp)
     for side in (-1,1):
         for z,length in ((-5.22,5.88),(3.24,1.92)):
             boxes.append(proxy_box(f"WalkMain{side}_{z}",z,side*3.69,.036,length,.68,.123))
