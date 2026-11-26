@@ -36,6 +36,13 @@ void fragment() {
 		float indoor = step(0.0, dot(world_normal.xz, NODE_POSITION_WORLD.xz - world_pos.xz));
 		float damp = (1.0 - smoothstep(.42, damp_top, h + jag)) * mix(1.0, .35, indoor);
 		float splash = (1.0 - smoothstep(.36, .66, h + jag * .35)) * (1.0 - indoor);
+		// The tile carries a few spalled patches down to the rubble. Repeated on
+		// every tile they read as a pattern, so they only stay where the wall is
+		// weathered (macro patches outdoors) and are plastered over elsewhere
+		// and in every lived-in room.
+		float spalled = 1.0 - smoothstep(.47, .56, dot(paint, vec3(.2126, .7152, .0722)));
+		float mended = spalled * mix(1.0 - smoothstep(.56, .66, macro), 1.0, indoor);
+		paint = mix(paint, vec3(.80, .755, .665) * (.97 + .06 * mask.b), mended);
 		vec3 base = paint * tint * (.90 + .20 * macro);
 		base = mix(base, base * damp_color, damp * .85);
 		base = mix(base, base * vec3(.66, .58, .47), splash * .55);
@@ -46,9 +53,9 @@ void fragment() {
 		// screen-space pass for.
 		float contact = mix(.55, 1.0, smoothstep(.0, .55, h - mix(0.0, .39, indoor)));
 		float ceiling = mix(1.0, mix(.7, 1.0, smoothstep(3.6, 2.6, h)), indoor);
-		AO = mix(1.0, mask.g, .85) * contact * ceiling;
+		AO = mix(1.0, mask.g, .85 * (1.0 - mended)) * contact * ceiling;
 		AO_LIGHT_AFFECT = .2;
 		NORMAL_MAP = texture(normal_map, uv).rgb;
-		NORMAL_MAP_DEPTH = normal_depth;
+		NORMAL_MAP_DEPTH = normal_depth * (1.0 - .85 * mended);
 	}
 }
