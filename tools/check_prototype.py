@@ -135,6 +135,7 @@ def main():
             ("regional_terrain", ["--fixed-fps", "60", "--script", "res://tests/regional_terrain_test.gd"], "failures=0"),
             ("frontier_story", ["--script", "res://tests/frontier_story_test.gd"], "FRONTIER_STORY_PASS"),
             ("frontier_people", ["--fixed-fps", "60", "--script", "res://tests/frontier_people_test.gd"], "FRONTIER_PEOPLE_PASS"),
+            ("resident_catalog_bridge", ["--fixed-fps", "60", "--script", "res://tests/resident_catalog_bridge_test.gd"], "RESIDENT_CATALOG_BRIDGE_PASS"),
             ("frontier_population", ["--fixed-fps", "60", "--script", "res://tests/frontier_population_test.gd"], "FRONTIER_POPULATION_OK"),
             ("settlement_geometry", ["--fixed-fps", "60", "--script", "res://tests/settlement_geometry_test.gd"], "SETTLEMENT_GEOMETRY_PASS"),
             ("village_collision", ["--fixed-fps", "60", "--script", "res://tests/village_collision_test.gd"], "VILLAGE_COLLISION_PASS"),

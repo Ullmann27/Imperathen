@@ -10,6 +10,7 @@ const LOOPS := ["idle","march","run","talk","work","retreat"]
 # (art/soldiers/build.py STRIDES, shared by the battle soldiers).
 const COMPANY_STRIDES := {"march":1.30,"run":1.75,"retreat":1.48}
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
+const ResidentIdentity := preload("res://scripts/visuals/resident_identity.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
 const YouthSoleContact := preload("res://scripts/visuals/youth_sole_contact.gd")
 const AuthoredGround := preload("res://scripts/visuals/authored_ground.gd")
@@ -81,6 +82,10 @@ var _lod_profile := ""
 var face_seed := 0
 var appearance_id := ""
 var appearance_variation := 0
+## Catalog identity only for named Italian adult residents; no new save fields.
+var resident_id := ""
+var look: Dictionary = {}
+var _resident_tempo := 1.0
 var _loaned_gear := false
 var _gear_nodes: Array[Node3D] = []
 var meshy_asset_id := ""
@@ -121,6 +126,9 @@ func configure(kind: String, origin: String, years: int) -> void:
 	if role == kind and home == origin and age == years and body:
 		return
 	role = kind
+	resident_id = ""
+	look = {}
+	_resident_tempo = 1.0
 	home = origin
 	age = years
 	identity = COMPANIONS.get(home,"marcus") if role == "companion" else ("hero_"+home if role == "player" else role)
@@ -132,6 +140,9 @@ func configure_appearance(new_appearance: String, variation: int = 0) -> void:
 	var selected_variation := posmod(variation, 18)
 	if selected == appearance_id and selected_variation == appearance_variation and face_seed == variation and body:
 		return
+	resident_id = ""
+	look = {}
+	_resident_tempo = 1.0
 	appearance_id = selected
 	face_seed = variation
 	appearance_variation = selected_variation
@@ -184,7 +195,10 @@ func configure_resident(origin: String, years: int, new_appearance: String, vari
 	var selected := new_appearance if new_appearance in APPEARANCES else ""
 	var selected_variation := posmod(variation, 18)
 	var seed_value := variation if actor_uid.is_empty() else actor_uid.hash()
-	var changed := face_seed != seed_value or role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation
+	var named_id := actor_uid.trim_prefix("vil:")
+	if origin != "italia" or years < 18 or not ResidentIdentity.has_person(named_id):
+		named_id = ""
+	var changed := face_seed != seed_value or role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation or resident_id != named_id
 	role = "resident"
 	face_seed = seed_value
 	home = origin
@@ -192,6 +206,18 @@ func configure_resident(origin: String, years: int, new_appearance: String, vari
 	appearance_id = selected
 	appearance_variation = selected_variation
 	identity = "resident_%s_%d" % [appearance_id, appearance_variation] if not appearance_id.is_empty() else "resident"
+	resident_id = named_id
+	look = {} if resident_id.is_empty() else ResidentIdentity.look(resident_id, appearance_id, appearance_variation, age)
+	# A catalog entry may not replace the live roster anatomy or equipment.
+	if str(look.get("kind", "")) != appearance_id:
+		look = {}
+	_resident_tempo = 1.0
+	if not look.is_empty():
+		identity = "resident_" + resident_id
+		var stable := float(absi(resident_id.hash()) % 100003) / 100003.0
+		_resident_tempo = 0.92 + 0.16 * fposmod(stable * 7.31, 1.0)
+		if not body and clip == "idle" and not _posed:
+			phase = stable
 	if not changed and body:
 		refresh_lod(camera)
 		return
@@ -289,7 +315,7 @@ func _reload(level: int) -> void:
 		size_factor = 1.14 if age >= 18 else 1.0
 		if role == "companion": size_factor *= 0.97
 	elif active_model_path.begins_with("res://assets/characters/frontier_") and _frontier_identity() in ["civilian_man", "civilian_woman", "elder"]:
-		size_factor = 1.14 * float(RESIDENT_HEIGHTS[appearance_variation % RESIDENT_HEIGHTS.size()])
+		size_factor = 1.14 * float(look.get("height", RESIDENT_HEIGHTS[appearance_variation % RESIDENT_HEIGHTS.size()]))
 	body.scale = Vector3.ONE * size_factor
 	add_child(body)
 	body.position.y = -0.9
@@ -315,8 +341,8 @@ func _reload(level: int) -> void:
 	if role == "resident" and active_model_path.begins_with("res://assets/characters/frontier_"):
 		ResidentFootwear.apply(body, active_model_path)
 	_hands.bind(body, active_model_path)
-	if level < 2 and active_model_path.begins_with("res://assets/characters/frontier_"):
-		preload("res://scripts/visuals/roman_faces.gd").apply(body, face_seed)
+	if active_model_path.begins_with("res://assets/characters/frontier_") and (level < 2 or not look.is_empty()):
+		preload("res://scripts/visuals/roman_faces.gd").apply(body, face_seed, look)
 	_face.bind(body, identity)
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
@@ -422,12 +448,23 @@ func _style(shape: MeshInstance3D) -> void:
 			shape.set_surface_override_material(i,materials[face_id])
 		elif active_model_path.begins_with("res://assets/characters/frontier_") and source.resource_name in ["FrontierCloth", "HeroHair", "FrontierGreyHair"]:
 			var key := "%d/frontier/%d" % [source.get_instance_id(), appearance_variation]
+			if not look.is_empty():
+				key += "/" + resident_id
 			var mat: StandardMaterial3D
 			if materials.has(key):
 				mat = (materials[key] as WeakRef).get_ref() as StandardMaterial3D
 			if not mat:
 				mat = source.duplicate() as StandardMaterial3D
-				if source.resource_name == "FrontierCloth":
+				if not look.is_empty() and source.resource_name == "FrontierCloth" and not look.get("soldier", false):
+					var dye: Color = look.wear.tunic
+					mat.albedo_color *= dye
+				elif not look.is_empty() and source.resource_name in ["HeroHair", "FrontierGreyHair"]:
+					# Existing hair textures already contain strand shading. Use a
+					# bounded tint rather than multiplying by a near-black dye.
+					var hair: Color = look.hair.color
+					var grey := clampf(float(look.hair.grey), 0.0, 1.0)
+					mat.albedo_color *= hair.lerp(Color.WHITE, 0.55).lerp(Color(0.90, 0.88, 0.85), grey)
+				elif source.resource_name == "FrontierCloth":
 					mat.albedo_color *= CLOTH_TINTS[appearance_variation % CLOTH_TINTS.size()]
 				elif source.resource_name == "HeroHair":
 					var hair_variant := floori(float(appearance_variation) / 6.0) % 3
@@ -997,6 +1034,8 @@ func _process(delta: float) -> void:
 		if clip in ["march","run","retreat"]:
 			var stride := locomotion_stride(clip)
 			advance *= speed * animator.current_animation_length / stride
+		elif role == "resident" and clip == "idle":
+			advance *= _resident_tempo
 		elif clip == "attack" and _strike_windup > 0.0:
 			advance = _strike_clip_time(_strike_elapsed+delta)-_strike_clip_time(_strike_elapsed)
 			_strike_elapsed += delta
