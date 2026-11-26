@@ -11,6 +11,15 @@ const UNLOAD_BUDGET := 8
 ## Keep the adjacent ground ready within one meter, including low quality.
 const SUPPORT_MARGIN_M := 1.0
 const MAX_RESIDENT_SECTORS := 145
+## Authored sRGB ground albedo; the material declares vertex_color_is_srgb, which
+## is a no-op in the Compatibility renderer and converts in Forward+/Mobile.
+## These are the former #67704b/#9b9868/#8c8877 values taken through one
+## sRGB-to-linear step: the albedo the north backdrop has always rendered with.
+## The former values rendered about 1.8x lighter than the adjoining village
+## verge (measured at the east edge of the village ground).
+const EARTH_DRY := Color("232912")
+const EARTH_FRESH := Color("545023")
+const EARTH_STONE := Color("433f2f")
 var sectors: Dictionary = {}
 var demand: Dictionary = {}
 var _last_cell := ""
@@ -31,6 +40,7 @@ var _last_unloads := 0
 func _ready() -> void:
 	_ground = StandardMaterial3D.new()
 	_ground.vertex_color_use_as_albedo = true
+	_ground.vertex_color_is_srgb = true
 	_ground.roughness = 0.95
 	_ground.cull_mode = BaseMaterial3D.CULL_BACK
 
@@ -159,11 +169,7 @@ func _make_sector(entry: Dictionary) -> Node3D:
 			var d := _vertex(node.position, (x + 1) * step, (z + 1) * step)
 			for point: Vector3 in [a, b, c, b, d, c]:
 				var global_point := point + node.position
-				var variation := 0.5 + 0.5 * sin(global_point.x * 0.021) * cos(global_point.z * 0.019)
-				var earth := Color("67704b").lerp(Color("9b9868"), variation * 0.7)
-				if point.y > 120:
-					earth = earth.lerp(Color("8c8877"), clampf((point.y - 120.0) / 140.0, 0, 1))
-				surface.set_color(earth)
+				surface.set_color(ground_color(global_point))
 				surface.set_uv(Vector2(global_point.x, global_point.z) * 0.04)
 				surface.add_vertex(point)
 	surface.generate_normals()
@@ -173,6 +179,40 @@ func _make_sector(entry: Dictionary) -> Node3D:
 	mesh.material_override = _ground
 	node.add_child(mesh)
 	return node
+
+
+## sRGB albedo of the streamed ground at a global point (also used by the
+## north backdrop so its rim carries exactly the terrain colour).
+static func ground_color(global_point: Vector3) -> Color:
+	var variation := 0.5 + 0.5 * sin(global_point.x * 0.021) * cos(global_point.z * 0.019)
+	var earth := EARTH_DRY.lerp(EARTH_FRESH, variation * 0.7)
+	if global_point.y > 120:
+		earth = earth.lerp(EARTH_STONE, clampf((global_point.y - 120.0) / 140.0, 0, 1))
+	return earth
+
+
+## Height of the generated ground mesh (not the analytic field) at a global
+## point: the same sector grid, the same -0.06 offset and the same diagonal
+## split as _make_sector. Grid-aligned scenery can rest exactly on it.
+static func surface_height(position: Vector2) -> float:
+	if not position.is_finite():
+		return INF
+	var cell: Vector2i = Plan.sector_for_position(Vector3(position.x, 0, position.y))
+	var origin: Vector3 = Plan.sector_origin(cell)
+	var step := Plan.SECTOR_SIZE_M / float(GRID)
+	var local := Vector2((position.x - origin.x) / step, (position.y - origin.z) / step)
+	var ix := clampi(floori(local.x), 0, GRID - 1)
+	var iz := clampi(floori(local.y), 0, GRID - 1)
+	var fx := local.x - ix
+	var fz := local.y - iz
+	var x0 := origin.x + ix * step
+	var z0 := origin.z + iz * step
+	var a: float = Plan.terrain_height(Vector2(x0, z0))
+	var b: float = Plan.terrain_height(Vector2(x0 + step, z0))
+	var c: float = Plan.terrain_height(Vector2(x0, z0 + step))
+	var d: float = Plan.terrain_height(Vector2(x0 + step, z0 + step))
+	var height := a + (b - a) * fx + (c - a) * fz if fx + fz <= 1.0 else d + (c - d) * (1.0 - fx) + (b - d) * (1.0 - fz)
+	return height - 0.06
 
 
 func _vertex(origin: Vector3, x: float, z: float) -> Vector3:

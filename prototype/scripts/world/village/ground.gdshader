@@ -8,6 +8,13 @@ uniform vec3 season_tint : source_color = vec3(1.0);
 uniform float wetness : hint_range(0,1) = 0.0;
 uniform float relief_strength = 0.75;
 uniform float frontier_expanded = 0.0;
+// Water ends at a spring at the hill foot; its worn banks end with it.
+uniform float brook_source_z = -95.0;
+// Plane x range, the hill-foot line and the south edge (min_x, max_x, north_z, south_z).
+uniform vec4 handoff_bounds = vec4(-90.0, 90.0, -100.0, 70.0);
+// Albedo of the streamed regional terrain (RegionalTerrain.ground_color).
+uniform vec3 terrain_dry : source_color = vec3(0.137, 0.161, 0.071);
+uniform vec3 terrain_fresh : source_color = vec3(0.329, 0.314, 0.137);
 varying vec2 ground_xz;
 void vertex() {
 	ground_xz = (MODEL_MATRIX * vec4(VERTEX,1.0)).xz;
@@ -21,7 +28,8 @@ void fragment() {
 	float transverse=(1.0-smoothstep(1.08,1.92,crossroad+grain))*(1.0-smoothstep(23.0,26.0,abs(p.x+2.0)));
 	float square=1.0-smoothstep(.56,1.02,length((p-vec2(-5.7,.10))/vec2(7.5,6.1))+grain*.05);
 	float stream=abs(p.x+28.0-.52*sin(p.y*.18)-.23*sin(p.y*.46));
-	float bank=1.0-smoothstep(3.5,5.6,stream+grain);
+	float spring=smoothstep(brook_source_z-1.5,brook_source_z+2.5,p.y);
+	float bank=(1.0-smoothstep(3.5,5.6,stream+grain))*spring;
 	float wear=max(max(longitudinal,transverse),max(square,bank));
 	float east=(1.0-smoothstep(1.35,2.40,abs(p.x-30.0)+grain))*(1.0-smoothstep(34.0,38.0,abs(p.y+9.0)));
 	float north=(1.0-smoothstep(1.15,2.20,abs(p.y+36.5)+grain))*(1.0-smoothstep(24.0,27.0,abs(p.x-7.0)));
@@ -47,12 +55,17 @@ void fragment() {
 	float cultivated=1.0-smoothstep(-.10,.18,max(beds.x,beds.y)+grain*.22);
 	float furrow=sin((p.x-6.73)*8.37758+.14*sin(p.y*1.80));
 	textured=mix(textured,soil*vec3(.69,.60,.51)*(.91+.11*furrow),cultivated);
-	float waterline=(1.0-smoothstep(2.8,4.7,stream))*.19;
-	ALBEDO=textured*(1.0-waterline)*(1.0-wetness*.10);
+	float waterline=(1.0-smoothstep(2.8,4.7,stream))*.19*spring;
+	// Within 14 m of the plane edge (and towards the hill foot) the ground
+	// takes on the untextured regional terrain colour it meets there.
+	float edge=min(min(p.x-handoff_bounds.x,handoff_bounds.y-p.x),min(p.y-handoff_bounds.z,handoff_bounds.w-p.y));
+	float handoff=1.0-smoothstep(0.0,14.0,edge);
+	vec3 earth=mix(terrain_dry,terrain_fresh,(.5+.5*sin(p.x*.021)*cos(p.y*.019))*.7);
+	ALBEDO=mix(textured*(1.0-waterline)*(1.0-wetness*.10),earth,handoff);
 	vec3 surface=mix(texture(verge_relief,vuv).rgb,texture(road_relief,ruv).rgb,wear);
 	surface.r+=cultivated*.085*cos((p.x-6.73)*8.37758+.14*sin(p.y*1.80));
 	NORMAL_MAP=vec3(surface.rg,sqrt(max(.012,1.0-dot(surface.rg*2.0-1.0,surface.rg*2.0-1.0)))*.5+.5);
-	NORMAL_MAP_DEPTH=relief_strength;
+	NORMAL_MAP_DEPTH=relief_strength*(1.0-handoff);
 	ROUGHNESS=clamp(surface.b-wetness*(.10+.31*wear)-waterline,.33,1.0);
 	SPECULAR=.27;
 }
