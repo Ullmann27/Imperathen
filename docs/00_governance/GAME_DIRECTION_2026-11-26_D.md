@@ -130,3 +130,16 @@ Status: **Vorgabe des Auftraggebers** nach Durchsicht von PR #99 und #100. Die E
 | 6 Gemeinsamer Weltzustand | neu: `integ/world-state-20261126` (Kalender #98 + Stammeswelt #99 + Militär #100: eine Weltzeit, ein Speichervertrag, eindeutige Personen-IDs) | neu beauftragt |
 | 7 Leistung | #99 (Wochentick auf Frames verteilt, ca. 2 ms je Frame; Speichern/Laden während eines laufenden Ticks abgesichert) | in Arbeit |
 | 8 Produktion und Regression | alle Pakete; vollständige Regression und Motion-Gate auf dem Integrationsstand | laufend |
+
+## Nachtrag: Entstehung von Konflikten (D-048)
+
+Wortlaut des Auftraggebers:
+
+> Konflikte werden ausschließlich durch Streitigkeiten in jeweiligen Missionen oder Quests befeuert und entstehen dadurch. Es gibt auch schon natürliche Feinde natürlich, aber der Rest der Völker, und wir machen mehrere Völker und mehrere Stämme, und ergibt sich eben aus der Freundschaftsanalyse, also Freundschaftsbeziehung zu den jeweiligen Stämmen durch Missionen, Quests und Verbündete in Angriffen oder Verteidigung, Eroberungen. Das ergibt sich allein aus dem ganzen Spielverlauf. So kannst du denken.
+
+Umsetzungsregel, wie der Lead sie versteht (Korrektur durch den Auftraggeber jederzeit möglich):
+- Ein Konflikt zwischen Völkern oder Stämmen (Überfall, Fehde, Krieg, Eroberungszug) braucht eine nachgewiesene Ursache. Zulässige Ursachen sind ein Streit aus einer Mission oder Quest, eine vorab festgelegte natürliche Feindschaft, eine Bündnispflicht in Angriff oder Verteidigung, eine Vergeltung für einen früheren Konflikt dieser Art oder ein Eroberungszug, der aus einer solchen Kette folgt.
+- Not, Hunger oder ein günstiges Kräfteverhältnis allein lösen keinen Angriff aus. Sie führen zu Handel, Abwanderung, Verhandlung oder Tributbitten.
+- Alle übrigen Beziehungen entstehen aus dem Spielverlauf: Missionen, Quests, gemeinsame Angriffe und Verteidigungen, Eroberungen, Handel und gebrochene oder gehaltene Vereinbarungen.
+- Es gibt mehrere Völker und Stämme, nicht nur germanische Gruppen.
+- Jedes Konfliktereignis speichert seine Ursache und ist im Spiel nachvollziehbar.

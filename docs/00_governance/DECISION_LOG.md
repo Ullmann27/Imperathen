@@ -51,6 +51,7 @@
 | D-045 | Vorgabe (26.11.2026) | Kalender (#98), Stammeswelt (#99) und Militär (#100) kontrolliert zusammenführen: eine autoritative Weltzeit, ein konsistenter Speichervertrag, eindeutige Personenidentitäten; keine doppelte Alterung, doppelten Buchungen, wiederbelebten Soldaten oder widersprüchlichen Stände; Genesung, Beförderung, Handel, Reisen, Schlaf und historische Ereignisse an der Weltzeit. | Integrationsbranch Weltzustand. |
 | D-046 | Vorgabe (26.11.2026) | Wochentick auf mehrere Frames verteilen, Budget etwa 2 ms je Frame (zu prüfen); Determinismus, Ereignisreihenfolge und Transaktionskonsistenz bleiben; Speichern und Laden während eines laufenden Ticks abgesichert; Fold7-Messung gesondert. | #99. |
 | D-047 | Vorgabe (26.11.2026) | Neue Systeme müssen in der begehbaren Welt sicht- und erlebbar sein; Zielbilder und Masterhandbuch bleiben Qualitätsorientierung; vollständige Regression und Motion-Gate auf dem Integrationsstand; kein Main-Merge, keine vorgetäuschten Fertigstellungen. | Alle Pakete. |
+| D-048 | Vorgabe (26.11.2026) | Konflikte zwischen Völkern und Stämmen entstehen ausschließlich aus Streitigkeiten in Missionen oder Quests sowie aus natürlichen Feindschaften; alle übrigen Beziehungen ergeben sich aus dem Spielverlauf (Missionen, Quests, Bündnisse in Angriff und Verteidigung, Eroberungen). Mehrere Völker und Stämme. Not oder Kräfteverhältnis allein lösen keinen Angriff aus; jedes Konfliktereignis speichert seine Ursache. | Regel in GAME_DIRECTION_2026-11-26_D.md (Nachtrag); Stammeswelt #99. |
 
 ## Änderungen an Entscheidungen
 
