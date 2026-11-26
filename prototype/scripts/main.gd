@@ -1303,6 +1303,9 @@ func _open_city_exploration() -> void:
 	ui.process_mode = Node.PROCESS_MODE_DISABLED
 	city_exploration = CityExploration.new()
 	city_exploration.profile = ui.get_quality()
+	if "--horse-test" in OS.get_cmdline_user_args():
+		city_exploration.enable_riding_trial = true
+		city_exploration.persist = false
 	city_exploration.leave_requested.connect(_leave_city_exploration)
 	city_exploration.story_requested.connect(_start_story_from_city)
 	screen = "city_exploration"

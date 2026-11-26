@@ -1,0 +1,91 @@
+{
+	"bones": 37,
+	"bounds": "[P: (-0.255414, 0.0, -1.009763), S: (0.510827, 1.7, 2.019526)]",
+	"clips": {
+		"canter": {
+			"airborne_frames": 13,
+			"cycle_distance_m": 2.105,
+			"length_s": 0.633333325386047,
+			"max_hoof_drift_m": 0.000755569781176746,
+			"max_hoof_floor_error_m": 0.000142969191074371,
+			"max_support": 3,
+			"min_support": 0
+		},
+		"idle": {
+			"airborne_frames": 0,
+			"cycle_distance_m": 0.0,
+			"length_s": 2.0,
+			"max_hoof_drift_m": 0.000815728562884033,
+			"max_hoof_floor_error_m": 0.00192896276712418,
+			"max_support": 4,
+			"min_support": 4
+		},
+		"trot": {
+			"airborne_frames": 4,
+			"cycle_distance_m": 1.54,
+			"length_s": 0.733333349227905,
+			"max_hoof_drift_m": 0.00140176026616246,
+			"max_hoof_floor_error_m": 0.000794563442468643,
+			"max_support": 2,
+			"min_support": 0
+		},
+		"walk": {
+			"airborne_frames": 0,
+			"cycle_distance_m": 1.045,
+			"length_s": 1.03333330154419,
+			"max_hoof_drift_m": 0.000575505895540118,
+			"max_hoof_floor_error_m": 0.000275734812021255,
+			"max_support": 3,
+			"min_support": 2
+		}
+	},
+	"failures": [],
+	"godot": "4.7.2-stable (official)",
+	"sockets": {
+		"SOCKET_HEAD": {
+			"forward": "(-0.0, 0.0, -1.0)",
+			"position": "(-0.147359, 1.213611, -0.956936)",
+			"up": "(0.0, 1.0, 0.0)"
+		},
+		"SOCKET_HOOF_FL": {
+			"forward": "(-0.0, -0.0, -1.0)",
+			"position": "(-0.146, 0.0, -0.26)",
+			"up": "(-0.0, 1.0, -0.0)"
+		},
+		"SOCKET_HOOF_FR": {
+			"forward": "(-0.0, -0.000001, -1.0)",
+			"position": "(0.146, -0.0, -0.26)",
+			"up": "(-0.0, 1.0, -0.0)"
+		},
+		"SOCKET_HOOF_HL": {
+			"forward": "(-0.0, -0.0, -1.0)",
+			"position": "(-0.167, -0.0, 0.745)",
+			"up": "(0.0, 1.0, -0.0)"
+		},
+		"SOCKET_HOOF_HR": {
+			"forward": "(-0.0, -0.0, -1.0)",
+			"position": "(0.167, -0.0, 0.745)",
+			"up": "(-0.0, 1.0, -0.0)"
+		},
+		"SOCKET_REIN_L": {
+			"forward": "(-0.0, -0.0, -1.0)",
+			"position": "(-0.091, 1.225, -0.922)",
+			"up": "(0.0, 1.0, -0.0)"
+		},
+		"SOCKET_REIN_R": {
+			"forward": "(-0.0, -0.0, -1.0)",
+			"position": "(-0.205, 1.241, -0.927)",
+			"up": "(0.0, 1.0, -0.0)"
+		},
+		"SOCKET_RIDER": {
+			"forward": "(-0.0, 0.0, -1.0)",
+			"position": "(0.0, 1.305353, 0.080781)",
+			"up": "(-0.0, 1.0, -0.0)"
+		},
+		"SOCKET_SADDLE": {
+			"forward": "(-0.0, -0.0, -1.0)",
+			"position": "(0.0, 1.255353, 0.080781)",
+			"up": "(-0.0, 1.0, -0.0)"
+		}
+	}
+}

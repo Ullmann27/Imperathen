@@ -10,17 +10,21 @@ const DOMUS := "res://assets/roman_quarter/workshop/roman_narrow_domus.glb"
 const DOMUS_COLLISION := "res://assets/roman_quarter/workshop/roman_narrow_domus_collision.glb"
 const NORTH_JUNCTION := "res://assets/roman_quarter/north_junction/roman_north_junction.glb"
 const NORTH_JUNCTION_COLLISION := "res://assets/roman_quarter/north_junction/roman_north_junction_collision.glb"
+const STABLE := "res://assets/roman_quarter/stable/stable.glb"
+const STABLE_COLLISION := "res://assets/roman_quarter/stable/stable_collision.tscn"
 const FOUNTAIN := "res://assets/roman_quarter/fountain/fontana.glb"
 const TABLET := "res://assets/roman_quarter/tablet/wax_tablet.glb"
 const STREET_NAMES := "res://assets/roman_quarter/street_names.json"
 const WORKSHOP_POSITION := Vector3(4.5, 0.159, 0.0)
 const DOMUS_POSITION := Vector3(-4.5, 0.159, 2.9)
+const STABLE_POSITION := Vector3(4.10, 0.0, -29.2)
 const FOUNTAIN_POSITION := Vector3(-5.34, 0.159, -4.3)
 const TABLET_POSITION := WORKSHOP_POSITION + Vector3(4.70, 1.047, 3.28)
 const TABLET_APPROACH := WORKSHOP_POSITION + Vector3(3.8, 0.9, 3.27)
 
 var _tablet: Node3D
 var _streets: Array[Dictionary] = []
+var stable_trader: Marker3D
 
 
 func install(profile: String, add_imported_colliders: Callable) -> void:
@@ -51,6 +55,11 @@ func install(profile: String, add_imported_colliders: Callable) -> void:
 	_place_building(DOMUS, DOMUS_COLLISION, "StreetDomus", DOMUS_POSITION, PI, add_imported_colliders)
 	_place_building(NORTH_JUNCTION, NORTH_JUNCTION_COLLISION, "NorthJunction", Vector3(0.0, 0.0, -17.0),
 		0.0, add_imported_colliders)
+	if _place_building(STABLE, STABLE_COLLISION, "StableYard", STABLE_POSITION, -PI * 0.5, add_imported_colliders):
+		stable_trader = Marker3D.new()
+		stable_trader.name = "StableTrader"
+		stable_trader.position = Vector3(1.36, 0.90, -3.04)
+		get_node("StableYard").add_child(stable_trader)
 	var fountain := _model(FOUNTAIN, "StreetFountain", FOUNTAIN_POSITION)
 	if fountain != null:
 		fountain.rotation_degrees.y = 90.0

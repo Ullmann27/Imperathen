@@ -53,7 +53,7 @@ static func verified_sites(city: Node3D) -> Dictionary:
 		result[id] = center + FRONT_OFFSET
 	return result
 
-func setup(city: Node3D, body: CharacterBody3D, persistent: bool) -> bool:
+func setup(city: Node3D, body: CharacterBody3D, persistent: bool, stable_trader: Marker3D = null) -> bool:
 	if model != null or is_instance_valid(panel) or not is_instance_valid(body):
 		return false
 	player = body
@@ -62,6 +62,8 @@ func setup(city: Node3D, body: CharacterBody3D, persistent: bool) -> bool:
 	if sites.is_empty():
 		message.emit("Handel nicht verfügbar: Marktstandorte fehlen oder stimmen nicht überein.")
 		return false
+	if is_instance_valid(stable_trader) and stable_trader.is_inside_tree():
+		sites["equarius"] = stable_trader.global_position
 	model = Model.new()
 	model.new_game("italia", true, true)
 	model.city_trade_sites = sites.duplicate(true)
@@ -98,7 +100,7 @@ func nearest() -> Dictionary:
 				id = key
 				distance = d
 	var label := ""
-	for shop: Dictionary in Trade.shop_catalog():
+	for shop: Dictionary in Trade.shop_catalog(sites.has("equarius")):
 		if shop.id == id:
 			label = str(shop.name)
 			break

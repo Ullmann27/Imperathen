@@ -79,7 +79,7 @@ func _run() -> void:
 	_check(actual == expected, "Every eligible authored collider and only eligible colliders are live (%d/%d)" % [actual.size(), expected.size()])
 	_check(is_instance_valid(scene.ambient_people) and not scene.ambient_people.citizens.is_empty(),
 		"Several real adult market pedestrians are connected to the same free city")
-	_check(scene.market.available and scene.market.sites.size()==6,
+	_check(scene.market.available and scene.market.sites.size()==(7 if is_instance_valid(scene.quarter.stable_trader) else 6),
 		"All six original market geometry nodes are bound to one authoritative city trading session")
 	_check(not scene.paused and not scene.market.is_open(),"The player begins an ordinary free exploration session")
 	# Actual character body motion on real city paving: do not warp/teleport

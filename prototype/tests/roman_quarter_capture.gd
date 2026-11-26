@@ -60,6 +60,7 @@ func _run() -> void:
 	await _frame(city, "05-Wachstafel", Vector3(36.52, 1.68, 2.99), Vector3(37.19, 1.33, 3.28), 46.0)
 	await _frame(city, "06-Brunnen", Vector3(26.3, 1.56, -2.35), Vector3(22.51, 1.03, -4.34), 48.0)
 	await _frame(city, "07-Kreuzung", Vector3(28.4, 2.15, -7.7), Vector3(28.0, 1.52, -17.7), 61.0)
+	await _frame(city, "08-Stallhof", Vector3(27.85, 2.40, -29.3), Vector3(38.2, 1.44, -29.2), 67.0)
 	city.free()
 	await process_frame
 	quit(1 if _failed else 0)

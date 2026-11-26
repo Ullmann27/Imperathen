@@ -683,9 +683,13 @@
     {
       "id": "horse_and_other_animals",
       "profile": "animal",
-      "status": "inactive",
-      "resources": [],
-      "required_checks": [],
+      "status": "active",
+      "resources": [
+        "assets/horse/valdora_horse_rig.glb"
+      ],
+      "required_checks": [
+        "horse_rig"
+      ],
       "review_scope": [
         "species_gaits",
         "hoof_paw_contact",
@@ -693,14 +697,18 @@
         "body_head_tail",
         "skin_deformation"
       ],
-      "open_requirements": []
+      "open_requirements": [
+        "The four flat-ground clips require full transition, terrain contact and close deformation acceptance."
+      ]
     },
     {
       "id": "mounted_units",
       "profile": "rider",
-      "status": "inactive",
+      "status": "active",
       "resources": [],
-      "required_checks": [],
+      "required_checks": [
+        "mount_controller"
+      ],
       "review_scope": [
         "mount_dismount",
         "seat_stability",
@@ -708,7 +716,9 @@
         "horse_rider_phase",
         "contact_and_weight"
       ],
-      "open_requirements": []
+      "open_requirements": [
+        "The city trial has a verified seat and safe dismount. Authored boarding motion, hand-to-rein contact and slope acceptance remain open."
+      ]
     },
     {
       "id": "rolling_machines",
@@ -853,11 +863,14 @@
     "scripts/world/city_exploration.gd",
     "scripts/world/city_exploration_crowd.gd",
     "scripts/world/city_exploration_state.gd",
+    "scripts/world/city_riding_trial.gd",
     "scripts/world/city_market_bridge.gd",
     "scripts/world/city_market_signage.gd",
     "scripts/world/city_training.gd",
     "scripts/world/companion_world.gd",
     "scripts/world/game_world.gd",
+    "scripts/world/mount_controller.gd",
+    "scripts/world/mounted_rider_pose.gd",
     "scripts/world/player_action_world.gd",
     "scripts/world/regional_terrain.gd",
     "scripts/world/regional_village.gd",
@@ -963,13 +976,24 @@
     ],
     "scripts/world/city_exploration.gd": [
       "hero",
-      "village_navigation"
+      "village_navigation",
+      "mounted_units"
     ],
     "scripts/world/city_ambient_people.gd": [
       "village_navigation"
     ],
     "scripts/world/city_exploration_crowd.gd": [
       "village_navigation"
+    ],
+    "scripts/world/city_riding_trial.gd": [
+      "horse_and_other_animals",
+      "mounted_units"
+    ],
+    "scripts/world/mount_controller.gd": [
+      "mounted_units"
+    ],
+    "scripts/world/mounted_rider_pose.gd": [
+      "mounted_units"
     ],
     "scripts/visuals/youth_sole_contact.gd": [
       "hero",
