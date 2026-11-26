@@ -19,6 +19,15 @@ var _weapon_axis := Vector3.ZERO
 var _last_state := ""
 ## Crossfade between authoritative states (strike -> recoil, guard -> stance).
 const TRANSITION := 0.14
+## Footwork while idle/guarding: feet stay planted in the world and step when
+## they fall behind their stance position (no sliding during approach).
+const STEP_TRIGGER := 0.08
+const STEP_TIME := 0.24
+const STEP_LIFT := 0.07
+var _planted := {}
+var _step := {}
+var _last_root := Vector3.INF
+var _velocity := Vector3.ZERO
 
 
 ## A VillagePerson (hero, Meshy) whose origin stands 0.9 m above the ground.
@@ -67,6 +76,16 @@ func apply(state: Dictionary, delta: float = 1.0 / 60.0) -> void:
 		pose.bind(model, kit, _weapon_axis)
 	root.position = Vector3(float(f.x), ground_offset, float(f.z))
 	root.rotation.y = float(f.yaw)
+	var root_ground := Vector3(float(f.x), 0.0, float(f.z))
+	if _last_root != Vector3.INF and delta > 0.0:
+		_velocity = _velocity.lerp((root_ground - _last_root) / delta, 0.35)
+	_last_root = root_ground
+	if f.action in ["idle", "guard"]:
+		pose.set_feet(_footwork(root_ground, float(f.yaw), delta))
+	else:
+		_planted.clear()
+		_step.clear()
+		pose.set_feet({})
 	match str(f.action):
 		"attack":
 			var timing := Tracks.timing(kit, str(f.move))
@@ -88,3 +107,50 @@ func apply(state: Dictionary, delta: float = 1.0 / 60.0) -> void:
 			pose.reaction(Vector3(push.x, 0.0, -push.z), float(r.strength), float(r.t), float(r.duration), Vector3(step.x, 0.0, -step.z))
 		_:
 			pose.stance_pose()
+
+
+func _footwork(root: Vector3, yaw: float, delta: float) -> Dictionary:
+	var basis := Basis(Vector3.UP, yaw)
+	var natural := pose.stance_feet()
+	var targets := {}
+	for side: String in ["l", "r"]:
+		var n: Vector3 = natural[side]
+		# Lead the target by the root velocity so steps keep up with motion.
+		targets[side] = root + basis * Vector3(n.x, 0.0, -n.z) + _velocity * STEP_TIME * 0.6
+	if _planted.is_empty():
+		for side: String in ["l", "r"]:
+			_planted[side] = root + basis * Vector3(natural[side].x, 0.0, -natural[side].z)
+	var lift := {"l":0.0, "r":0.0}
+	var world := _planted.duplicate()
+	if not _step.is_empty():
+		_step.t = float(_step.t) + delta
+		var u := clampf(float(_step.t) / STEP_TIME, 0.0, 1.0)
+		# The landing spot follows the body only in the first half of the
+		# swing; afterwards it is committed so the foot cannot skid in.
+		if u < 0.5:
+			_step.to = targets[_step.side]
+		# Travel finishes at 80 % of the step; the foot then sets down
+		# vertically, so it never skids while touching the ground.
+		world[_step.side] = (_step.from as Vector3).lerp(_step.to, smoothstep(0.0, 0.8, u))
+		lift[_step.side] = sin(u * PI) * STEP_LIFT
+		if u >= 1.0:
+			_planted[_step.side] = _step.to
+			world[_step.side] = _step.to
+			lift[_step.side] = 0.0
+			_step = {}
+	if _step.is_empty():
+		var worst := ""
+		var distance := STEP_TRIGGER
+		for side: String in ["l", "r"]:
+			var d := Vector2((targets[side] as Vector3).x - (_planted[side] as Vector3).x, (targets[side] as Vector3).z - (_planted[side] as Vector3).z).length()
+			if d > distance:
+				distance = d
+				worst = side
+		if not worst.is_empty():
+			_step = {"side":worst, "from":_planted[worst], "to":targets[worst], "t":0.0}
+	var out := {"lift_l":lift.l, "lift_r":lift.r}
+	var inverse := basis.inverse()
+	for side: String in ["l", "r"]:
+		var local := inverse * ((world[side] as Vector3) - root)
+		out[side] = Vector3(local.x, 0.0, -local.z)
+	return out

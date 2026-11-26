@@ -32,6 +32,8 @@ func _process(_delta: float) -> bool:
 	_scenario("legionary thrust -> axe fighter guard_front", "legionary", "thrust", "axe_fighter", true, "guard_front", 0.0, "block")
 	_scenario("legionary thrust -> axe fighter side (guard_front)", "legionary", "thrust", "axe_fighter", true, "guard_front", 90.0, "hit")
 	_scenario("youth jab_right -> legionary (no shield)", "youth_unarmed", "jab_right", "legionary", false, "", 0.0, "hit")
+	_footwork("legionary", "idle")
+	_footwork("axe_fighter", "guard")
 	for failure in failures:
 		printerr("FAIL: " + failure)
 	print("MELEE_VISUAL_CONTACT_RESULT checks=%d failures=%d" % [checks, failures.size()])
@@ -44,6 +46,56 @@ func _check(condition: bool, message: String) -> void:
 	checks += 1
 	if not condition:
 		failures.append(message)
+
+
+## Root moved 1.8 m at 1.2 m/s while idle/guarding: planted feet must not
+## slide (<= 15 mm per support phase), must walk the distance and settle.
+func _footwork(kit: String, mode: String) -> void:
+	var actor: Dictionary = _actors[kit]
+	var p: Node3D = actor.node
+	var state := Core.new_state(3)
+	Core.add_fighter(state, "f", kit, {"team":"f"})
+	var presenter := Presenter.new()
+	presenter.bind_person(p, kit, "f")
+	if mode == "guard":
+		Core.command(state, "f", "guard", {"style":"guard_front"})
+	var skeleton := Probe.skeleton_of(p.body)
+	var anchors := {}
+	var start := {}
+	var worst := 0.0
+	var steps := 0
+	var floor_y := INF
+	for frame in 150:
+		if frame < 90:
+			Core.place(state, "f", 0.0, -1.2 * (frame + 1) / 60.0, 0.0)
+		Core.step(state, 1.0 / 60.0)
+		presenter.apply(state)
+		for side: String in ["L", "R"]:
+			var foot: Vector3 = p.global_transform * Probe.bone_in(p, skeleton, "Foot_" + side).origin
+			if frame == 0:
+				start[side] = foot
+				floor_y = minf(floor_y, foot.y)
+			var planted := foot.y <= floor_y + 0.01
+			if planted:
+				if not anchors.has(side):
+					anchors[side] = foot
+				worst = maxf(worst, Vector2(foot.x - anchors[side].x, foot.z - anchors[side].z).length())
+			elif anchors.has(side):
+				anchors.erase(side)
+				steps += 1
+	var root := Vector3(float(state.fighters.f.x), 0.0, float(state.fighters.f.z))
+	var settled := 0.0
+	var natural := presenter.pose.stance_feet()
+	for side: String in ["L", "R"]:
+		var foot: Vector3 = p.global_transform * Probe.bone_in(p, skeleton, "Foot_" + side).origin
+		var n: Vector3 = natural[side.to_lower()]
+		var target := root + Vector3(n.x, 0.0, -n.z)
+		settled = maxf(settled, Vector2(foot.x - target.x, foot.z - target.z).length())
+		_check(start[side].z - foot.z > 1.5, "%s %s: the %s foot walks with the body (%.2f m)" % [kit, mode, side, start[side].z - foot.z])
+	_check(worst <= 0.015, "%s %s: planted feet slide %.4f m (motion-gate limit 0.015)" % [kit, mode, worst])
+	_check(settled <= 0.10, "%s %s: feet settle at the stance after stopping (%.3f m)" % [kit, mode, settled])
+	_check(steps >= 6, "%s %s: the approach is walked in real steps (%d)" % [kit, mode, steps])
+	print("footwork %s %s: max planted slip %.4f m, steps %d, settle error %.3f m" % [kit, mode, worst, steps, settled])
 
 
 func _attachment(root: Node, prefix: String) -> BoneAttachment3D:

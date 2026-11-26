@@ -120,6 +120,9 @@ var _from_position: Array[Vector3] = []
 var _from_rotation: Array[Quaternion] = []
 var _blend_left := 0.0
 var _blend_total := 0.0
+## Optional world-planted feet for stance/guard: fighter-space metres
+## {"l":Vector3, "r":Vector3, "lift_l":m, "lift_r":m} (x right, z forward).
+var _feet_override := {}
 
 
 ## `weapon_axis_in_hand` overrides the kit axis with a measured hand-space
@@ -180,6 +183,22 @@ func advance(delta: float) -> void:
 	_blend_left = maxf(0.0, _blend_left - maxf(0.0, delta))
 
 
+## Footwork from the presenter: stance and guard poses place the feet here
+## instead of at the fixed stance offsets (empty dictionary = stance feet).
+func set_feet(feet: Dictionary) -> void:
+	_feet_override = feet
+
+
+## The kit's natural stance feet in fighter-space metres on this body.
+func stance_feet() -> Dictionary:
+	var stance: Dictionary = STANCES[KITS[kit].stance]
+	var result := {}
+	for side: String in ["L", "R"]:
+		var model := _foot_target(side, {"l":stance.foot_l, "r":stance.foot_r, "lift_l":0.0, "lift_r":0.0})
+		result[side.to_lower()] = Vector3(-model.x, 0.0, model.z) * _world_scale
+	return result
+
+
 ## Strike pose at normalized clip time. Returns false for unknown moves.
 func strike(move: String, normalized: float) -> bool:
 	if not available or not MOVES.has(move) or not is_finite(normalized):
@@ -207,7 +226,7 @@ func guard(style: String, seconds: float) -> bool:
 	target.syaw = float(stance.syaw) + float(g[3])
 	var keys: Array = [_stance_key(stance, 0.0), target]
 	var raise := clampf(seconds / GUARD_RAISE, 0.0, 1.0)
-	_apply(_sample(keys, smoothstep(0.0, 1.0, raise), stance), {"l":stance.foot_l, "r":stance.foot_r, "lift_l":0.0, "lift_r":0.0})
+	_apply(_sample(keys, smoothstep(0.0, 1.0, raise), stance), _stance_feet(stance))
 	return true
 
 
@@ -215,7 +234,7 @@ func stance_pose() -> bool:
 	if not available:
 		return false
 	var stance: Dictionary = STANCES[KITS[kit].stance]
-	_apply(_stance_key(stance, 0.0), {"l":stance.foot_l, "r":stance.foot_r, "lift_l":0.0, "lift_r":0.0})
+	_apply(_stance_key(stance, 0.0), _stance_feet(stance))
 	return true
 
 
@@ -441,7 +460,19 @@ func _apply(key: Dictionary, feet: Dictionary) -> void:
 	skeleton.force_update_all_bone_transforms()
 
 
+func _stance_feet(stance: Dictionary) -> Dictionary:
+	if _feet_override.is_empty():
+		return {"l":stance.foot_l, "r":stance.foot_r, "lift_l":0.0, "lift_r":0.0}
+	return {"metres":true, "l":_feet_override.l, "r":_feet_override.r, "lift_l":float(_feet_override.get("lift_l", 0.0)), "lift_r":float(_feet_override.get("lift_r", 0.0))}
+
+
 func _foot_target(side: String, feet: Dictionary) -> Vector3:
+	var key_m := side.to_lower()
+	if feet.get("metres", false):
+		# Fighter-space metres (x right, z forward) to model space.
+		var m: Vector3 = feet[key_m]
+		var rest_y := _origin("Foot_" + side).y
+		return Vector3(-m.x / _world_scale, rest_y + float(feet["lift_" + key_m]) / _world_scale, m.z / _world_scale)
 	var key := side.to_lower()
 	var rest := _origin("Foot_" + side)
 	var authored: Vector3 = feet[key]
