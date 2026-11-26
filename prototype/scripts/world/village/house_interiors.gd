@@ -14,6 +14,7 @@ extends Node3D
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Kit = preload("res://scripts/world/village/interior_kit.gd")
 const Designs = preload("res://scripts/world/village/household_designs.gd")
+const Family = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
 # Visibility end in metres for [furniture, clutter] per quality profile.
 const RANGES := {"low": [10.0, 5.0], "balanced": [14.0, 7.0], "high": [24.0, 12.0], "very_high": [30.0, 16.0]}
 const LIGHT_RADIUS := {"low": 0.0, "balanced": 9.0, "high": 11.0, "very_high": 13.0}
@@ -45,6 +46,7 @@ var _water_material: StandardMaterial3D
 var _grime_material: StandardMaterial3D
 var _forge_vigor := 1.0
 var _forge_flames: MeshInstance3D
+var _forge_shell: Node3D
 
 
 static func furnishes(id: String) -> bool:
@@ -114,6 +116,12 @@ func _furnish(house: Node3D, id: String) -> Node3D:
 		for shell: MeshInstance3D in house.find_children("*", "MeshInstance3D", true, false):
 			if not room.is_ancestor_of(shell):
 				shell.layers |= FIRE_LAYER
+	if id == Designs.FORGE:
+		_forge_shell = Family.instantiate_forge_shell(_profile)
+		if is_instance_valid(_forge_shell):
+			room.add_child(_forge_shell)
+	# Keep the interior kit's four aligned post colliders, but do not render
+	# its redundant roof when the authored shell is actually instantiated.
 	_merge(room, placed)
 	_collide(room, placed)
 	_add_flames(room, placed, not site)
@@ -490,6 +498,8 @@ func _merge(room: Node3D, placed: Array) -> void:
 		for record: Dictionary in placed:
 			if record.tier != tier:
 				continue
+			if record.prop == "forge_shelter" and room.has_node("AuthoredForgeShell"):
+				continue
 			var mesh: Mesh = Kit.meshes[record.prop]
 			for surface in mesh.get_surface_count():
 				var key := Kit.material_for(mesh.surface_get_material(surface)).resource_name
@@ -561,6 +571,8 @@ func set_forge_work(work: String) -> void:
 func set_quality(profile: String) -> void:
 	_profile = profile if RANGES.has(profile) else "balanced"
 	Kit.set_profile(_profile)
+	if is_instance_valid(_forge_shell):
+		Family.apply_quality(_forge_shell, _profile)
 	var ranges: Array = RANGES[_profile]
 	for layer: GeometryInstance3D in _layers:
 		var tier: String = layer.get_meta("tier")

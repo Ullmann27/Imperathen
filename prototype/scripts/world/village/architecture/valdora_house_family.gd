@@ -15,6 +15,7 @@ const Layout = preload("res://scripts/world/village/village_layout.gd")
 const SHADER = preload("res://scripts/world/village/architecture/valdora_house.gdshader")
 const MANIFEST = preload("res://assets/architecture/valdora/valdora_family.json")
 const ASSET_DIR := "res://assets/architecture/valdora/"
+const FORGE_SCENE := ASSET_DIR + "valdora_forge.glb"
 
 ## Wealth tier follows the household (docs/36_architecture/VALDORA_HOUSE_FAMILY.md).
 const ASSIGNMENT := {
@@ -133,6 +134,40 @@ static func instantiate(home: Dictionary, profile: String) -> Node3D:
 	model.set_meta("porch", bool(variant_data(variant_id).get("features", {}).get("porch", false)))
 	for mesh: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
 		mesh.set_meta("valdora_family_shell", true)
+	apply_quality(model, profile)
+	return model
+
+
+## Use the authored architecture but not its legacy fixture layout: the
+## newer interior design owns the interactable workstations and their physics.
+## The original detail mesh also contains fixture-specific decorations, so
+## it must not be overlaid until those positions have been reconciled.
+static func instantiate_forge_shell(profile: String) -> Node3D:
+	if not ResourceLoader.exists(FORGE_SCENE, "PackedScene"):
+		return null
+	var scene := load(FORGE_SCENE) as PackedScene
+	if scene == null:
+		return null
+	var model := scene.instantiate() as Node3D
+	if model == null:
+		return null
+	var shell_found := false
+	var far_found := false
+	for mesh: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
+		if String(mesh.name) == "valdora_forge_shell" and mesh.mesh != null:
+			shell_found = true
+		elif String(mesh.name) == "valdora_forge_far" and mesh.mesh != null:
+			far_found = true
+		else:
+			mesh.free()
+			continue
+		mesh.set_meta("valdora_family_shell", true)
+	if not shell_found or not far_found:
+		model.free()
+		return null
+	model.name = "AuthoredForgeShell"
+	model.set_meta("plaster_tint", Color("dfd4bd"))
+	model.set_meta("age_state", "worn")
 	apply_quality(model, profile)
 	return model
 
