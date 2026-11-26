@@ -163,6 +163,14 @@ jobs:
           chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
           echo "TEMPLATE_DIR=$RUNNER_TEMP/templates/4.7.2.stable" >> "$GITHUB_ENV"
+      - name: Build the distinct authored Marcus family
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash tools/characters/install_marcus_blender.sh "$RUNNER_TEMP/marcus-blender"
+          "$RUNNER_TEMP/marcus-blender/blender" -b -t 2 --python-exit-code 1 -P tools/characters/build_marcus.py -- --evidence artifacts/marcus
+          python3 tools/characters/validate_hero.py prototype/assets/characters/marcus_quality_{0,1,2,3}.glb --report artifacts/marcus/validation.json
+          echo "IMPERATHEN_REQUIRE_MARCUS=1" >> "$GITHUB_ENV"
       - name: Complete native vegetation meshes and distance impostors
         shell: bash
         run: bash tools/integration/prepare_vegetation_assets.sh
@@ -290,6 +298,7 @@ jobs:
             artifacts/mobile/
             artifacts/city/
             artifacts/engine-checks/
+            artifacts/marcus/
           if-no-files-found: warn
           retention-days: 30
 

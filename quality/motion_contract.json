@@ -1004,7 +1004,8 @@
     "shaders/resident_eye.gdshader",
     "shaders/resident_hair.gdshader",
     "shaders/resident_hair_cards.gdshader",
-    "shaders/resident_skin.gdshader"
+    "shaders/resident_skin.gdshader",
+    "scripts/visuals/marcus_model.gd"
   ],
   "procedural_owners": {
     "scripts/world/village_life_world.gd": [

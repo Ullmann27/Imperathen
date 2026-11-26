@@ -89,7 +89,7 @@ func run() -> void:
 				check_original_youth(person,home)
 				youth_seen = true
 				continue
-			var hero_asset := person.active_model_path.begins_with("res://assets/characters/hero_quality_")
+			var hero_asset := person.active_model_path.begins_with("res://assets/characters/hero_quality_") or Person.MarcusModel.owns(person.active_model_path)
 			var civilian: MeshInstance3D = person.body.find_child("HeroBody" if hero_asset else "Civilian",true,false)
 			var skeleton: Skeleton3D = person.body.find_children("*","Skeleton3D",true,false)[0]
 			check(civilian.skin != null and skeleton.get_bone_count() == 15,home+" uses the imported skin")

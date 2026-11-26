@@ -24,6 +24,7 @@ const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
 const RaiderStrike := preload("res://scripts/domain/raider_strike.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
+const MarcusModel := preload("res://scripts/visuals/marcus_model.gd")
 const MESHY_YOUTH_PATH := "res://assets/characters/hero_meshy_italia_%d.glb"
 ## Outfits of the same original youth: identical 35-joint rig, MoCap clips and
 ## sole calibration, each with its own LOD meshes and retarget report. The
@@ -248,8 +249,10 @@ func _path(level: int) -> String:
 		var meshy_path := MeshyCharacters.path_for(meshy_asset_id, age, level)
 		if not meshy_path.is_empty():
 			return meshy_path
-	# This asset has an authored Italia identity. Other origins and companions
-	# keep their own appearances until their replacement models are available.
+	# Marcus is a separate authored identity, never the private player model.
+	if role == "companion" and home == "italia" and MarcusModel.installed():
+		return MarcusModel.PATH % level
+	# Other origins retain their own appearances.
 	if role == "player" and home == "italia":
 		if _meshy_youth and age>=12 and age<18 and youth_outfit_installed(youth_outfit):
 			return youth_path(level)
@@ -382,6 +385,10 @@ func _reload(level: int) -> void:
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
 		for cached_path: String in scenes.keys():
 			if cached_path.begins_with("res://assets/characters/hero_quality_") and cached_path != path:
+				scenes.erase(cached_path)
+	if MarcusModel.owns(path) or MarcusModel.owns(previous_path):
+		for cached_path: String in scenes.keys():
+			if MarcusModel.owns(cached_path) and cached_path != path:
 				scenes.erase(cached_path)
 	if path.begins_with("res://assets/characters/hero_meshy_italia_") or previous_path.begins_with("res://assets/characters/hero_meshy_italia_"):
 		for cached_path: String in scenes.keys():
