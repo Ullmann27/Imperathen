@@ -8,6 +8,7 @@ const MissionData = preload("res://scripts/story/mission_data.gd")
 const CompanionStory = preload("res://scripts/story/companion_story.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const I03 = preload("res://scripts/story/i03_shortcut.gd")
+const I04 = preload("res://scripts/story/i04_workshop.gd")
 const VERSION := 2
 const LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
@@ -48,10 +49,11 @@ static var BRIDGE_STEPS: Dictionary = MissionData.bridge_steps("band1")
 ## Nachricht und kurze Kontrollrunde“); v4 adds the playable I-01 morning
 ## (cups, well, meal, table talk, event ledger); v5 adds the playable I-03
 ## errand with Marcus (route, stance, resolution, farewell, event ledger).
+## v6 adds the I-04 workshop visit (work, talk at the anvil, event ledger).
 ## Older saves migrate on load.
-const SCREENPLAY_VERSION := 5
+const SCREENPLAY_VERSION := 6
 static var CARRIED_EFFECTS: Dictionary = MissionData.carried_effects("band1")
-const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Kleinholzbündel für Sextus", "stall_water":"Wasserkrug für Cassias Stand", "checked_hinge":"Geprüfter Truhengriff", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
+const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Kleinholzbündel für Sextus", "stall_water":"Wasserkrug für Cassias Stand", "sextus_note":"Sextus’ Wachstäfelchen für Fabius", "checked_hinge":"Geprüfter Truhengriff", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
 static var SOURCE_MISSION_BY_STEP: Dictionary = MissionData.source_missions("band1")
 
@@ -80,6 +82,7 @@ static func start(data: Dictionary) -> bool:
 		"guard_absence":{"active":false,"previous_assignment":"idle","previous_health":100}}
 	data.village.childhood.screenplay.merge(I01.fresh_state())
 	data.village.childhood.screenplay.merge(I03.fresh_state())
+	data.village.childhood.screenplay.merge(I04.fresh_state())
 	return true
 
 
@@ -183,6 +186,8 @@ static func migrate_screenplay(data: Dictionary) -> bool:
 	if I01.migrate(child):
 		migrated = true
 	if I03.migrate(child, data.get("companion", {})):
+		migrated = true
+	if I04.migrate(child, _i04_index()):
 		migrated = true
 	return migrated
 
@@ -326,6 +331,16 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 			child.screenplay.i03_outcome = "friend" if kind == "help" else "rival"
 		_record(data, action, str(errand.message), str(errand.events[0]))
 		return _ok(str(errand.message))
+	if I04.handles(action):
+		var visit := I04.apply(data, action, i04_ctx(data))
+		if not visit.ok:
+			return _fail(str(visit.message))
+		for item: String in visit.carry_add:
+			child.carried.append(item)
+		for item: String in visit.carry_remove:
+			child.carried.erase(item)
+		_record(data, action, str(visit.message), str(visit.event_id))
+		return _ok(str(visit.message))
 	var id: String = step.id
 	if step.get("screenplay", false):
 		var reason := _action_reason(data, step)
@@ -594,6 +609,8 @@ static func view(data: Dictionary) -> Dictionary:
 		items.append("Drei Becher vom Regal")
 	if str(child.screenplay.get("i01_water", "")) == "jug":
 		items.append("Familienkrug mit Brunnenwasser")
+	if bool(child.screenplay.get("i04_hand", false)):
+		items.append("Ein Arm voll Kleinholz")
 	if not step.is_empty():
 		var target := _target(data, step)
 		result["target_position"] = [target.x, target.y]
@@ -610,6 +627,8 @@ static func hud_title(step: Dictionary, mission_id: String, chapter: String) -> 
 	var place := I01.hud_place(step)
 	if place.is_empty():
 		place = I03.hud_place(step)
+	if place.is_empty():
+		place = I04.hud_place(step)
 	if place.is_empty() and step.has("npc"):
 		place = "bei " + str(EXTRA_NPCS.get(step.npc, NEIGHBORS.get(step.npc, {})).get("name", ""))
 	return occasion if place.is_empty() or place == "bei " else "%s · %s" % [occasion, place]
@@ -641,6 +660,7 @@ static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
 			text = step.text
 			var remembered := I01.hook_lines(data, str(step.get("id", "")))
 			remembered.append_array(I03.hook_lines(data, str(step.get("id", ""))))
+			remembered.append_array(I04.hook_lines(data, str(step.get("id", ""))))
 			if not remembered.is_empty():
 				text = "\n\n".join(remembered) + "\n\n" + text
 			choices = _choices(data, step)
@@ -722,6 +742,7 @@ static func validate(data: Dictionary) -> String:
 		"i10","raid_path","visible_raiders","i11","i12","i13","i14","julia_outcome","oath"]
 	screenplay_keys.append_array(I01.KEYS)
 	screenplay_keys.append_array(I03.KEYS)
+	screenplay_keys.append_array(I04.KEYS)
 	if not _keys(screenplay, screenplay_keys) or not _integer(screenplay.version,SCREENPLAY_VERSION,SCREENPLAY_VERSION):
 		return "Ungültiger Drehbuch-Brückenstand."
 	var morning_error := I01.validate(screenplay, child.completed.size())
@@ -753,6 +774,8 @@ static func validate(data: Dictionary) -> String:
 
 	if screenplay.i03_task == "service_bring":
 		expected_items.append("stall_water")
+	if screenplay.i04_note == "carried":
+		expected_items.append("sextus_note")
 	if screenplay.i02 == "complete":
 		expected_items.erase("neighbor_basket")
 	if screenplay.i14 == "complete":
@@ -773,6 +796,9 @@ static func validate(data: Dictionary) -> String:
 	var errand_error := I03.validate(screenplay, data.companion, child.carried)
 	if not errand_error.is_empty():
 		return errand_error
+	var visit_error := I04.validate(screenplay, child.completed.size(), _i04_index(), child.carried)
+	if not visit_error.is_empty():
+		return visit_error
 	if screenplay.i08 in ["report","complete"] and not screenplay.hoof_evidence:
 		return "Die gemeldeten Hufspuren wurden nicht tatsächlich untersucht."
 	if screenplay.i08 == "complete" and not child.completed.has("return_gear"):
@@ -892,6 +918,11 @@ static func _screenplay_step(data: Dictionary) -> Dictionary:
 		var errand := I03.current_step(data, i03_ctx(data))
 		if not errand.is_empty():
 			return errand
+		# I-04: the workshop visit sits between the delivered kindling and the
+		# father's permission, again outside completed[].
+		var visit := I04.current_step(data, i04_ctx(data))
+		if not visit.is_empty():
+			return visit
 	# I-07 story core names water, a message and a short control round. Water is
 	# carried to the known gate section before the supervised watch post.
 	if child.completed.size() == _step_index("watch_post"):
@@ -965,6 +996,11 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 	if step.get("i01", false):
 		for option: Dictionary in I01.options(data, step):
 			var why := _i01_reason(data, str(option.id))
+			result.append({"label":option.label,"command":"village_childhood_action","payload":{"action_id":option.id},"enabled":why.is_empty(),"reason":why})
+		return result
+	if step.get("i04", false):
+		for option: Dictionary in I04.options(data, step):
+			var why := I04.reason(data, str(option.id), i04_ctx(data))
 			result.append({"label":option.label,"command":"village_childhood_action","payload":{"action_id":option.id},"enabled":why.is_empty(),"reason":why})
 		return result
 	if step.get("i03", false):
@@ -1048,6 +1084,23 @@ static func _villager_positions(data: Dictionary) -> Dictionary:
 ## moment Marcus and the boy part at the stall.
 static func _i03_farewell_index() -> int:
 	return _step_index("deliver_food")
+
+
+static func _i04_index() -> int:
+	return _step_index("apprentice_permission")
+
+
+## Context of the I-04 workshop visit: the completed[] size at which it is
+## open, where Sextus and Fabius really are, and the two work places.
+static func i04_ctx(data: Dictionary) -> Dictionary:
+	return {"index":_i04_index(), "trial_index":_step_index("smith_trial"),
+		"sextus":_npc_position(data, "sextus"), "sextus_here":_available(data, "sextus"),
+		"fabius":_npc_position(data, "fabius"), "fabius_here":_available(data, "fabius"),
+		"bundle":POINTS.quench, "hearth":POINTS.bellows}
+
+
+static func i04_reason(data: Dictionary, action: String) -> String:
+	return I04.reason(data, action, i04_ctx(data))
 
 
 ## Context of the I-03 errand: where Cassia really stands and trades (her

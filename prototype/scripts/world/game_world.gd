@@ -29,8 +29,10 @@ var opening_props = preload("res://scripts/world/village/opening_props.gd").new(
 ## Created with the scene so worlds that never build it own no orphan node.
 const I01Props = preload("res://scripts/world/village/i01_props.gd")
 const I03Props = preload("res://scripts/world/village/i03_props.gd")
+const I04Props = preload("res://scripts/world/village/i04_props.gd")
 var i01_props: Node3D
 var i03_props: Node3D
+var i04_props: Node3D
 var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
@@ -207,6 +209,9 @@ func sync_state(state: Dictionary) -> void:
 		i01_props.sync_state(state, _figure)
 	if is_instance_valid(i03_props):
 		i03_props.sync_state(state, _figure)
+	if is_instance_valid(i04_props):
+		var visit: Dictionary = Childhood.i04_ctx(state) if Childhood.enabled(state) else {"index":-1, "trial_index":-1}
+		i04_props.sync_state(state, _figure, int(visit.index), int(visit.trial_index))
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -331,6 +336,8 @@ func get_cinematic_anchor(key: String) -> Vector3:
 				return I01Props.anchor(key)
 			if key.begins_with("i03_") and is_instance_valid(i03_props):
 				return to_global(i03_props.anchor(key))
+			if key.begins_with("i04_") and is_instance_valid(i04_props):
+				return to_global(i04_props.anchor(key))
 			return get_player_position()
 
 
@@ -640,6 +647,8 @@ func _build_scene() -> void:
 	add_child(i01_props)
 	i03_props = I03Props.new()
 	add_child(i03_props)
+	i04_props = I04Props.new()
+	add_child(i04_props)
 	_create_build_plot()
 	_buildings_root = Node3D.new()
 	_buildings_root.name = "PlayerBuildings"

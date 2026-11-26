@@ -52,6 +52,7 @@ var _environment: Environment
 var _lighting: Dictionary = {}
 var _i00_stage: Node3D
 var _rig: Node3D
+var _forge_glow: OmniLight3D
 ## Anchor key of the prop framed by "prop_insert" (set by the film owner).
 var focus_key := ""
 ## False during silent pause and reaction beats (set by the film owner).
@@ -584,9 +585,11 @@ func _apply_grade(amount: float) -> void:
 		var floor_level := 0.72 if historical else lerpf(0.90, INTERIOR_AMBIENT, interior)
 		_environment.ambient_light_energy = float(_lighting.ambient_energy) * lerpf(1.0, floor_level, weight)
 	_apply_interior_rig(weight * interior)
+	_apply_forge_glow(weight)
 
 
 const INTERIOR_AMBIENT := 0.50
+const FORGE_GLOW_RADIUS := 9.0
 
 
 ## 1 while the film camera is inside the family home during an I-01 film,
@@ -602,6 +605,34 @@ func _interior_weight() -> float:
 		return 0.0
 	var table := _world.to_global(I01Props.anchor("i01_table"))
 	return 1.0 if camera.global_position.distance_to(table) <= INTERIOR_RIG_RADIUS else 0.0
+
+
+## Firelight of Sextus' forge for film shots near the hearth (HB S. 15):
+## one warm, slowly breathing light at the embers. It exists only while a
+## film camera is within reach of the forge and fades with the handoff.
+func _apply_forge_glow(weight: float) -> void:
+	var hearth := Vector3.INF
+	if weight > 0.001 and (shot_id in DUO_SHOTS or shot_id in ["mission_dialogue", "mission_reaction", "player"]) and is_instance_valid(_world) and _world.has_method("get_cinematic_anchor") and is_instance_valid(camera):
+		var value: Variant = _world.call("get_cinematic_anchor", "i04_hearth")
+		# Unknown keys fall back to the player position; only a real hearth counts.
+		if value is Vector3 and (value as Vector3).is_finite() and _world.get("i04_props") != null and camera.global_position.distance_to(value) <= FORGE_GLOW_RADIUS:
+			hearth = value
+	if not hearth.is_finite():
+		if is_instance_valid(_forge_glow):
+			_forge_glow.visible = false
+		return
+	if not is_instance_valid(_forge_glow):
+		_forge_glow = OmniLight3D.new()
+		_forge_glow.name = "ForgeGlow"
+		_forge_glow.light_color = Color(1.0, 0.56, 0.26)
+		_forge_glow.omni_range = 6.5
+		_forge_glow.omni_attenuation = 1.4
+		_forge_glow.shadow_enabled = true
+		add_child(_forge_glow)
+	_forge_glow.visible = true
+	_forge_glow.global_position = hearth + Vector3(-0.35, 0.30, 0.25)
+	var breathe := 1.0 if reduced_motion else 1.0 + 0.07 * sin(elapsed * 2.6) + 0.04 * sin(elapsed * 6.3 + 0.7)
+	_forge_glow.light_energy = 2.4 * weight * breathe
 
 
 func _apply_interior_rig(weight: float) -> void:

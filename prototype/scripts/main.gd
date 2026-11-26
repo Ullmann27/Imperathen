@@ -22,6 +22,7 @@ const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const I01Film = preload("res://scripts/story/i01_film.gd")
 const I03 = preload("res://scripts/story/i03_shortcut.gd")
 const I03Film = preload("res://scripts/story/i03_film.gd")
+const I04Film = preload("res://scripts/story/i04_film.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -941,6 +942,8 @@ func _film_sequence(sequence_id: String) -> Dictionary:
 		return I01Film.restore(model.data, sequence_id)
 	if sequence_id in I03Film.IDS:
 		return I03Film.restore(model.data, sequence_id, Childhood.i03_ctx(model.data))
+	if sequence_id in I04Film.IDS:
+		return I04Film.restore(model.data, sequence_id, Childhood.i04_ctx(model.data))
 	return {}
 
 
@@ -1001,6 +1004,8 @@ func _restore_opening() -> bool:
 			sequence = I01Film.restore(model.data, sequence_id)
 		elif sequence_id in I03Film.IDS:
 			sequence = I03Film.restore(model.data, sequence_id, Childhood.i03_ctx(model.data))
+		elif sequence_id in I04Film.IDS:
+			sequence = I04Film.restore(model.data, sequence_id, Childhood.i04_ctx(model.data))
 		elif sequence_id.begins_with(MissionCinematics.PREFIX):
 			sequence = MissionCinematics.restore(model.data,sequence_id)
 	else:
