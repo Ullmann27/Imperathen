@@ -199,6 +199,15 @@ WORLD_STATE_RESOURCES = WORLD_STATE_SCRIPTS + (
 )
 FEATURE_RESOURCE_GROUPS = (
     ("original_meshy_youth_content", tuple(f"assets/characters/hero_meshy_italia_{level}.glb" for level in range(4))),
+    ("original_meshy_youth_civil_content", (
+        *(f"assets/characters/hero_meshy_italia_civil_{level}.glb" for level in range(4)),
+        "assets/animations/accad_youth_civil_motion.json",
+    )),
+    ("colosseum_runtime_content", (
+        "scripts/monuments/colosseum.gd",
+        "assets/monuments/colosseum/colosseum_layout.json",
+        *(f"assets/monuments/colosseum/colosseum_{part}.glb" for part in ("arena", "collision", "far", "modules", "structure")),
+    )),
     ("living_frontier_content", FRONTIER_RESOURCES),
     ("cinematic_opening_content", OPENING_RESOURCES),
     ("village_life_content", VILLAGE_LIFE_RESOURCES),

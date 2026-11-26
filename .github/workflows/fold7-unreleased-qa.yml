@@ -8,6 +8,9 @@ on:
       - 'tools/characters/youth_skin_polish.py'
       - 'tools/characters/youth_anatomy.py'
       - 'tools/characters/retarget_accad_youth.py'
+      - 'tools/characters/stage_youth_civil.py'
+      - 'tools/characters/build_youth_civil_outfit.py'
+      - 'tools/characters/clear_youth_civil_arms.py'
       - '.github/workflows/fold7-unreleased-qa.yml'
       - 'prototype/**'
 
@@ -78,6 +81,14 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/youth-mocap"
           curl -fLsS --retry 3 --connect-timeout 15 --max-time 90 'https://accad.ohio-state.edu/sites/accad.osu.edu/files/Male2_bvh.zip' -o "$RUNNER_TEMP/accad-male2.zip"
+          # The story explicitly requests the original youth in civilian clothing.
+          # Build that private derivative from the pristine sources BEFORE the
+          # armoured retarget overwrites them. Never commit private GLBs.
+          OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 /usr/bin/python3 tools/characters/stage_youth_civil.py \
+            --source prototype/assets/characters --accad-archive "$RUNNER_TEMP/accad-male2.zip" \
+            --work "$RUNNER_TEMP/youth-civil"
+          for lod in 0 1 2 3; do test -s "prototype/assets/characters/hero_meshy_italia_civil_$lod.glb"; done
+          test -s prototype/assets/animations/accad_youth_civil_motion.json
           OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 /usr/bin/python3 tools/characters/retarget_accad_youth.py \
             --archive "$RUNNER_TEMP/accad-male2.zip" --input prototype/assets/characters \
             --output "$RUNNER_TEMP/youth-mocap" --report artifacts/qa/youth-mocap-report.json
