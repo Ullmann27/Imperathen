@@ -270,6 +270,8 @@ func _configure_source(actor: SourcePerson, path: String) -> void:
 		if path.contains("hero_meshy_italia_civil_"):
 			actor.configure_meshy_youth(true, "civil")
 		actor.configure("player","italia",12)
+	elif path.contains("marcus_quality_"):
+		actor.configure("companion","italia",12)
 	elif path.contains("frontier_"):
 		var identity := path.get_file().trim_prefix("frontier_").get_basename()
 		identity = identity.substr(0,identity.length()-2)
@@ -620,7 +622,7 @@ func _run() -> void:
 		if family.status=="active" and family.profile in ["human","animal"]:
 			for path: String in family.resources:
 				_raw_asset(path)
-		if family.id in ["hero", "original_youth", "civil_youth", "frontier_people", "legacy_people", "meshy_people", "regional_workers"]:
+		if family.id in ["hero", "marcus", "original_youth", "civil_youth", "frontier_people", "legacy_people", "meshy_people", "regional_workers"]:
 			await _person_family(family)
 		elif family.id=="battle_rigs":
 			await _battle_family(family)

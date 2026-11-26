@@ -36,6 +36,35 @@
       "open_requirements": []
     },
     {
+      "id": "marcus",
+      "profile": "human",
+      "status": "active",
+      "resources": [
+        "assets/characters/marcus_quality_0.glb",
+        "assets/characters/marcus_quality_1.glb",
+        "assets/characters/marcus_quality_2.glb",
+        "assets/characters/marcus_quality_3.glb"
+      ],
+      "required_checks": [
+        "marcus_character",
+        "village_people",
+        "natural_motion",
+        "locomotion_regression",
+        "motion_skin_measurement"
+      ],
+      "review_scope": [
+        "idle_talk",
+        "walk_run_stop",
+        "attack_guard_reaction",
+        "work_interact",
+        "lod_transition",
+        "contact_and_weight"
+      ],
+      "open_requirements": [
+        "Independent visual approval of the newly generated face, hair and clothing on all four LODs and the physical Fold7 remains outstanding."
+      ]
+    },
+    {
       "id": "original_youth",
       "profile": "human",
       "status": "active",
@@ -1050,7 +1079,8 @@
       "legacy_people",
       "meshy_people",
       "service_gear",
-      "meshy_gear"
+      "meshy_gear",
+      "marcus"
     ],
     "scripts/world/companion_world.gd": [
       "village_navigation"
