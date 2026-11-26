@@ -78,6 +78,23 @@ SUPPORT = {"assets/animations/hero_cc0_library.tres", "main.tscn",
 # Embedded clips, rigs, attachments or instanced scenes need a motion family.
 SCENE_MOTION_RE = re.compile(r'type="(?:Animation\w*|Skeleton3D|BoneAttachment3D|PackedScene|MultiMesh\w*|GPUParticles3D|CPUParticles3D)"'
                              r'|\binstance\s*=|\binstance_placeholder\s*=')
+# A script that is plain data logic cannot move anything on screen and needs no
+# reviewed entry in runtime_scripts. The proof is structural and transitive: a
+# base class that owns no scene node, no scene/spatial/animation/rendering API
+# and no access to a spatial or animation member, and every script it loads
+# is itself reviewed or data logic. Anything else still needs the contract.
+DATA_BASES = {"RefCounted", "Resource", "Object"}
+SCRIPT_MOTION_RE = re.compile(
+    r"\b(?:\w*Node\w*|\w*Skeleton\w*|\w*Animation\w*|\w*Tween\w*|\w*Transform\w*|Vector[234]i?|Rect2i?|Basis|Quaternion|"
+    r"Projection|AABB|Plane|\w*Mesh\w*|\w*Shader\w*|\w*Material\w*|\w*Particles\w*|\w*Server|SceneTree|MainLoop|"
+    r"Engine|PackedScene|\w*Body[23]D|\w*Camera\w*|\w*Curve\w*|\w*Path[23]D|\w*Bone\w*|\w*IK[23]D\w*|ClassDB|"
+    r"instantiate|add_child|get_node\w*|get_tree|get_parent|call_deferred|instance_from_id|"
+    r"_process|_physics_process|_ready|_enter_tree|_input|_unhandled_input)\b"
+    r"|\.\s*(?:(?:global_)?(?:position|rotation|rotation_degrees|transform|basis|scale|origin)|quaternion|velocity|"
+    r"play(?:_\w+)?|seek|advance|stop|look_at\w*|translate\w*|rotate\w*|move_\w*|set_bone\w*|set_instance\w*|"
+    r"set_shader\w*|set_deferred|set_indexed|call|callv|set|emit_signal)\b|[$%]\w|[$%]\"")
+SCRIPT_LOAD_RE = re.compile(r"\b(?:preload|load)\s*\(\s*([^)]*)\)|^\s*extends\s+(\S.*)$", re.M)
+INVENTORY_PREFIXES = ("Unclassified runtime ", "Registered runtime ")
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -313,6 +330,61 @@ def support_scene_errors(path: Path) -> list[str]:
     return []
 
 
+def script_code(text: str) -> tuple[str, list[str]]:
+    """Return GDScript source without comments and string contents, plus the string literals."""
+    code, literals, i = [], [], 0
+    while i < len(text):
+        char = text[i]
+        if char == "#":
+            while i < len(text) and text[i] != "\n":
+                i += 1
+        elif char in "\"'":
+            quote = text[i:i + 3] if text[i:i + 3] in ('"""', "\'\'\'") else char
+            end = i + len(quote)
+            while end < len(text) and not text.startswith(quote, end):
+                end += 2 if text[end] == "\\" else 1
+            literals.append(text[i + len(quote):end])
+            code.append(f'"{len(literals) - 1}"')
+            i = end + len(quote)
+        else:
+            code.append(char)
+            i += 1
+    return "".join(code), literals
+
+
+def data_logic_scripts(project: Path, scripts: set[str], reviewed: set[str]) -> set[str]:
+    """Scripts proven to be plain data logic: no scene, spatial, animation or rendering access."""
+    candidates = {}
+    for path in sorted(scripts - reviewed):
+        if not path.endswith(".gd"):
+            continue
+        try:
+            code, literals = script_code((project / path).read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError):
+            continue
+        if SCRIPT_MOTION_RE.search(code):
+            continue
+        base, loads, plain = None, set(), True
+        for match in SCRIPT_LOAD_RE.finditer(code):
+            argument = (match.group(1) if match.group(1) is not None else match.group(2)).strip()
+            literal = re.fullmatch(r'"(\d+)"', argument)
+            target = literals[int(literal.group(1))] if literal else None
+            if match.group(2) is not None:
+                base = target.removeprefix("res://") if literal else argument
+            if target is not None and target.startswith("res://") and target.endswith(".gd"):
+                loads.add(target.removeprefix("res://"))
+            elif match.group(1) is not None or (literal and base not in DATA_BASES):
+                plain = False  # computed path, or a scene/resource/unknown file
+        if plain and base is not None and (base in DATA_BASES or base in loads):
+            candidates[path] = loads
+    while True:
+        unproven = {path for path, loads in candidates.items() if not loads <= reviewed | candidates.keys()}
+        if not unproven:
+            return set(candidates)
+        for path in unproven:
+            del candidates[path]
+
+
 def inspect_static_glb(path: Path) -> bool:
     with path.open("rb") as f:
         header = f.read(20)
@@ -410,7 +482,7 @@ def validate_inventory(root: Path, contract: dict) -> tuple[dict, list[str]]:
     listed_scripts = strings(contract.get("runtime_scripts"), "Runtime scripts")
     if any(not safe_relative(path) for path in listed_scripts):
         failures.append("Invalid runtime script path")
-    for path in sorted(scripts - set(listed_scripts)):
+    for path in sorted(scripts - set(listed_scripts) - data_logic_scripts(project, scripts, set(listed_scripts))):
         failures.append("Unclassified runtime script: " + path)
     for path in sorted(set(listed_scripts) - scripts):
         failures.append("Registered runtime script missing: " + path)
@@ -813,8 +885,12 @@ def main() -> int:
     temporary.replace(a.evidence / "motion-gate.json")
     for failure in report["failures"]:
         print("MOTION_GATE_BLOCKER", failure)
+    # The inventory share depends only on which paths a branch adds; the motion
+    # share is the one to compare between runs of different branches.
+    inventory_blockers = sum(failure.startswith(INVENTORY_PREFIXES) for failure in report["failures"])
     print("MOTION_QUALITY_GATE_PASS" if report["passed"] else "MOTION_QUALITY_GATE_BLOCKED",
-          "blockers=", len(report["failures"]), "measured_assets=", report.get("measured_assets", 0))
+          "blockers=", len(report["failures"]), "measured_assets=", report.get("measured_assets", 0),
+          "inventory_blockers=", inventory_blockers, "motion_blockers=", len(report["failures"]) - inventory_blockers)
     return 0 if report["passed"] else 1
 
 
