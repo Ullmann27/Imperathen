@@ -177,7 +177,12 @@ func _sync_units() -> void:
 	levels.last = levels.count(agents.agents, dying_actors.size())
 	for uid: String in actors.keys():
 		if not agents.agents.has(uid):
-			_fall(uid)
+			if agents.withdrawn_uids.has(uid):
+				# Left the field alive: no death clip.
+				_release_rig(actors[uid])
+				actors.erase(uid)
+			else:
+				_fall(uid)
 	_upload_far()
 	for s: Dictionary in model.squads.values():
 		var flag: Label3D = standards[s.id]
@@ -359,6 +364,7 @@ func formation_render_states() -> Dictionary:
 		state.detail = a.detail
 		state.level = Levels.LEVEL_NAMES[a.level]
 		state.role = a.role
+		state.leaving = a.leaving
 		result[uid] = state
 	return result
 

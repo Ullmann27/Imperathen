@@ -149,11 +149,14 @@ func _role(s: Dictionary, id: String) -> String:
 func _alive() -> Dictionary:
 	var result := {}
 	for s: Dictionary in v.model.squads.values():
-		if s.strength <= 0 or s.status == "withdrawn":
+		if s.strength <= 0:
 			continue
+		# A withdrawn company is alive and leaving: its men may still be drawn
+		# on their way to the edge, but need not be.
 		for man: Dictionary in v.model.soldiers(s.id):
 			var uid: String = man.get("uid", man.id)
-			result[uid] = {"squad": s.id, "side": s.side, "x": man.x, "z": man.z, "role": _role(s, man.id)}
+			result[uid] = {"squad": s.id, "side": s.side, "x": man.x, "z": man.z, "role": _role(s, man.id),
+				"withdrawn": s.status == "withdrawn"}
 	return result
 
 
@@ -262,7 +265,7 @@ func _observe(t: float) -> void:
 		if not alive.has(uid):
 			identity.unknown_rendered += 1
 	for uid: String in alive:
-		if not states.has(uid):
+		if not states.has(uid) and not alive[uid].withdrawn:
 			identity.missing_rendered += 1
 	if v.has_method("formation_duplicate_count"):
 		identity.duplicates += v.formation_duplicate_count()

@@ -44,6 +44,8 @@ const STEP_OFFSET := 0.04
 const DEATH_SECONDS := 1.25
 const GAIT_HOLD_TICKS := 12
 const ACTION_SPEED_M_S := 0.08
+const LEAVE_EDGE_M := 1.2
+const LEAVE_SECONDS := 10.0
 const ACTIONS := ["attack", "shoot", "block", "hit"]
 
 
@@ -93,6 +95,8 @@ class Agent:
 	var serial := 0
 	var foe_distance := INF
 	var asleep := false
+	var leaving := false
+	var leave_since := 0.0
 
 
 class Unit:
@@ -230,12 +234,15 @@ func sync_model(model) -> void:
 			units[s.id] = u
 		_snapshot_unit(u, s)
 		if s.status == "withdrawn":
+			# The rules take the company off the field once its centre reaches
+			# the edge. Its men are alive: they keep running until they reach
+			# the edge themselves and only then leave (no vanishing mid-field).
 			for uid: String in u.members:
 				if agents.has(uid):
-					agents.erase(uid)
-					withdrawn_uids[uid] = true
-					counters.withdrawn += 1
-			u.members.clear()
+					seen[uid] = true
+					if not agents[uid].leaving:
+						agents[uid].leaving = true
+						agents[uid].leave_since = agent_time()
 			continue
 		var roster: Array = model.soldiers(s.id)
 		var members: Array[String] = []
@@ -588,6 +595,14 @@ func _substep() -> void:
 	for u: Unit in units.values():
 		if u.step_count > 0:
 			u.drum = fposmod(u.drum + u.step_sum / u.step_count, 1.0)
+	for uid: String in agents.keys():
+		var a: Agent = agents[uid]
+		if a.leaving and (absf(a.pos.x) > Field.LIMIT.x - LEAVE_EDGE_M or absf(a.pos.y) > Field.LIMIT.y - LEAVE_EDGE_M \
+				or agent_time() - a.leave_since > LEAVE_SECONDS):
+			agents.erase(uid)
+			units[a.squad].members.erase(uid)
+			withdrawn_uids[uid] = true
+			counters.withdrawn += 1
 	for uid: String in fallen.keys():
 		var a: Agent = fallen[uid]
 		a.prev_phase = a.phase
@@ -627,11 +642,14 @@ func _decide(a: Agent) -> void:
 			return
 	var forward_unit := Vector2(-sin(u.facing), -cos(u.facing))
 	var target: Vector2 = u.slot_world[a.slot] + forward_unit * u.lead
+	if a.leaving:
+		# Off the field along the company's way out, past its parked centre.
+		target = a.pos + forward_unit * 3.0
 	var slot_velocity: Vector2 = u.slot_vel[a.slot]
 	var to := target - a.pos
 	var dist := to.length()
 	var cap := float(lim.walk)
-	if u.status == "routed" or a.model_pose == "retreat":
+	if u.status == "routed" or a.model_pose == "retreat" or a.leaving:
 		cap = float(lim.run)
 	if u.charging or dist > 2.5:
 		cap = float(lim.charge)
@@ -746,8 +764,13 @@ func _avoid(a: Agent, desired: Vector2) -> Vector2:
 		if d < radius:
 			push += direction * (radius - d) / radius * PUSH_M_S
 			crowded = true
-		if a.squad != b.squad and d < 1.2:
-			crowded = true
+		if a.squad != b.squad:
+			if d < 1.2:
+				crowded = true
+			# Men of another company are passed at a speed that can still
+			# brake before bumping into them (the gait cannot show a shove).
+			var allowed_friend := sqrt(brake * maxf(0.0, d - FRIEND_SPACING_M)) - maxf(0.0, b.vel.dot(direction))
+			clamps.append([-direction, maxf(0.0, allowed_friend)])
 		# Anticipation: deflect early toward the side of the predicted closest
 		# approach, so the man turns around a comrade instead of bumping into
 		# him (the gait cannot show a sideways shove).

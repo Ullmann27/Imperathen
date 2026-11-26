@@ -452,13 +452,25 @@ func _test_identity_across_switches(profile: String, large: bool) -> void:
 		reference.tick(1.0 / HZ)
 		stats.frames += 1
 		var alive := {}
+		var leaving_allowed := {}
 		for s: Dictionary in v.model.squads.values():
-			if s.strength > 0 and s.status != "withdrawn":
+			if s.strength > 0:
 				for man: Dictionary in v.model.soldiers(s.id):
-					alive[Agents.uid_of(man)] = true
+					if s.status == "withdrawn":
+						leaving_allowed[Agents.uid_of(man)] = true
+					else:
+						alive[Agents.uid_of(man)] = true
 		var states: Dictionary = v.formation_render_states()
-		if states.keys().size() != alive.size() or not states.keys().all(func(uid): return alive.has(uid)):
+		# Drawn = every man of a company on the field, plus men of a withdrawn
+		# company still on their way to the edge (alive in the rules, marked leaving).
+		var drawn_ok := alive.keys().all(func(uid): return states.has(uid))
+		for uid: String in states:
+			if not alive.has(uid) and not (leaving_allowed.has(uid) and bool(states[uid].leaving)):
+				drawn_ok = false
+		if not drawn_ok:
 			stats.mismatch += 1
+		for uid: String in leaving_allowed:
+			alive[uid] = true
 		stats.duplicates += v.formation_duplicate_count()
 		for uid: String in alive:
 			if dead.has(uid):
