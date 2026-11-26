@@ -969,3 +969,41 @@ Beide Dokumente sind Analysen ohne Engine-Lauf. Kennzeichnung im Text: [V] im Co
     - Einzel- oder Sammelberechnung im Nahkampf;
     - Angriffsgleiten;
     - Kapiteljahre nach Zeitsprüngen.
+
+## 19. Prüfplan für die Zwischenabnahme vor Fable (D-022, D-030)
+
+Fable 5.2 übernimmt erst nach einer gesonderten technischen und qualitativen Zwischenabnahme durch den Auftraggeber. Dieser Plan legt fest, was für jedes Paket belegt sein muss. Status je Paket: **offen** → **eingereicht** (Draft-PR mit Nachweisen) → **CI bestätigt** → **abgenommen** (nur durch den Auftraggeber). Nachweise folgen dem Evidence-Schema (Handbuch S. 48): gleicher Quell-SHA, reale Engine-Aufnahmen, kein Bild eines älteren Stands.
+
+**Gemeinsame Gates für alle Pakete**
+1. Volle Suite (`tools/check_prototype.py --keep-going`) auf dem gemeinsamen Integrationsstand aller eingereichten Pakete, plus die neuen Tests des Pakets.
+2. Motion-Gate: kein neuer Befund. Jede geänderte Zeile ist begründet; entfallene Befunde sind belegt.
+3. CI des Draft-PR mit zeilengleichem Gate-Abgleich gegen die lokale Messung.
+4. Echte Godot-Aufnahmen vorher/nachher in `balanced` und `very_high`, 1280×720 und 1384×1536 (Fold7-Innenformat).
+5. Profile ändern keine Spiellogik (Handbuch S. 45).
+6. Fold7-Leistung bleibt BLOCKED, solange kein Gerät gemessen wurde.
+
+| Paket (Branch) | Abnahmekriterien | Status |
+|---|---|---|
+| #87–#95 Figuren und P0 | wie §14/§15; CI je PR bestätigt | eingereicht, CI bestätigt (#87–#95) |
+| Stadt (`fix/city-ground-walls-20261126`) | 152 → 0 Häuser ohne sichtbaren Boden in `balanced`; 0 m Torbresche; 0 Schnitte zwischen Requisiten oder Bäumen und Gebäuden; 0 Objekte auf Hauptstraßen; Gehtest auf die Portikus-Plattform; Stadtprüfungen der CI bleiben PASS | offen |
+| Landschaft (`fix/village-backdrop-terrain-20261126`) | Hang trägt die Figur mit ≤ 2 cm Abweichung; 807 → 0 Durchstoßpunkte; Spawnpunkte und Korridor der Angreifer frei; sRGB-Farbe des Geländes | offen |
+| Überfall (`fix/village-raid-approach-20261126`) | jeder Angreifer erreicht in Überfall 1–4 das Ziel in 150 s; Überlappung 0; Schlagansatz 0,35–0,6 s vor dem Schaden; Block bis 0,2 s nach Ansatz greift | offen |
+| I-01 (`feat/i01-three-cups-slice-20261126`) | T01, T19, T20, T21 und die fünf I-01-Fälle; Text stimmt mit der Welt überein; kein Militärmenü für das Kind; Start ohne Geld; Migration v3 → v4 | in Arbeit (erster Commit `dc2de38`) |
+| Look-Development (`feat/village-lookdev-20261126`) | feste Referenzaufnahmen vorher/nachher; Render-Zähler und Texturspeicher je Profil | offen |
+| Germanen-KI (`feat/germanic-tribes-ai-20261126`) | Determinismus nach 200 Runden; Hauptbuch geschlossen; nicht monolithisch; gerichtete Beziehungen; Fristen eingehalten/gebrochen; 400 Runden stabil; Save-Migration | offen |
+| Truppen-Kern (`feat/troops-command-core-20261126`) | ≥ 70 % Verluste aus den vorderen 2 Reihen; Schritt ≤ 0,53 m je Simulationsschritt; Sammeln mit Bedingungen; neue Befehle mit Toleranzen; 67 alte Prüfungen grün; feste Soldatenidentität | offen |
+| Nahkampf A (`feat/melee-combat-core-20261126`) | kein Schaden vor dem Kontaktbild; Kontakt ±1 Bild zur Animationsspitze; abgebrochener Schlag macht 0 Schaden; Block nach Schildrichtung | offen |
+| Formationsbewegung B/C (`feat/formation-movement-20261126`) | Gleiten, Tempo, Drehung, Abstände vorher/nachher; Ebenenwechsel ohne Duplikat und Wiederbelebung (ID-Verfolgung); Detailsprung ≤ 0,04 m | offen |
+| Germanische Kriegerfamilien (`feat/germanic-warrior-families-20261126`) | Eindeutigkeit der Varianten; Rig- und Clip-Kompatibilität; Budgets; keine Durchdringung; Vergleichsbilder mit römischen Figuren | offen |
+| Zeitarchitektur (`feat/world-calendar-20261126`) | Arithmetik ohne Jahr null; 113 Missionen mit Jahr, Alter, Ort und Seite; Widersprüche gelistet | offen |
+| Innenräume (`feat/house-interiors-detail-20261126`) | jedes Haus mit Inventar nach Haushalt; nichts schwebt oder steckt in Wänden; Türen frei; Lichtquellen; Kosten je Haus | offen |
+| Menschen (`feat/people-detail-realism-20261126`) | keine Klone unter benannten Bewohnern; Budgets; keine Durchdringung; Vorher/nachher-Nahaufnahmen | offen |
+| QA-Register (`docs/detail-qa-register-20261126`) | Register mit Bildbelegen; „behoben“ nur mit neuer Aufnahme | offen |
+| Governance (#97) | D-015 bis D-030 dokumentiert | eingereicht |
+
+**Offene Entscheidungen des Auftraggebers vor der Abnahme**
+- Rang, ab dem der Spieler Truppen führt.
+- Angriffsgleiten von 0,1675 m hinnehmen oder neu choreografieren.
+- Kleidungsvariante des Originaljungen ohne Rüstung.
+- Meshy-Umfang und Kostenrahmen.
+- Fold7-Budgets nach der ersten Gerätemessung.
