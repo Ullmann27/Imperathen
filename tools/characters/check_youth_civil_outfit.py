@@ -2,7 +2,8 @@
 """Offline motion check of the civilian youth outfit in every clip and LOD.
 
 Poses the final runtime GLBs (after retarget_accad_youth.py) at 60 Hz in all
-animations and measures, per LOD:
+animations, with additional 240 Hz samples during the left uppercut to catch
+brief contacts between its 60 Hz samples. Measures, per LOD:
   * skin_edge_violations: the motion gate criterion (posed edge longer than
     7 x rest + 3 cm), on every primitive of the youth body;
   * body_through_garment_m: how far body points that lie under the wool at
@@ -32,6 +33,7 @@ from ground_death_clip import Glb, Rig  # noqa: E402
 TEAR_FACTOR = 7.0
 TEAR_SLACK_M = 0.03
 SAMPLE_HZ = 60
+UPPERCUT_SAMPLE_HZ = 240
 NEAR_M = 0.05           # judge only points this close to the posed wool
 BORDER_M = 0.035        # ... and this far from its open borders
 HIDDEN_REST_M = 0.004   # under the wool by at least this at rest
@@ -146,8 +148,12 @@ def frames(rig):
     for animation in rig.glb.document.get("animations", []):
         clip = rig.animation(animation["name"])
         count = max(2, math.ceil(clip["duration"] * SAMPLE_HZ))
-        for k in range(count + 1):
-            out.append((animation["name"], rig.globals(clip, clip["duration"] * k / count)))
+        times = {clip["duration"] * k / count for k in range(count + 1)}
+        if animation["name"] == "uppercut_left":
+            dense_count = max(2, math.ceil(clip["duration"] * UPPERCUT_SAMPLE_HZ))
+            times.update(clip["duration"] * k / dense_count for k in range(dense_count + 1))
+        for time_s in sorted(times):
+            out.append((animation["name"], rig.globals(clip, time_s)))
     return out
 
 
@@ -281,6 +287,7 @@ def main() -> int:
     parser.add_argument("--dump", type=Path, help="write per-point worst values of the first GLB (npz)")
     args = parser.parse_args()
     report = {"criterion": {"tear": "posed > 7 x rest + 0.03 m", "sample_hz": SAMPLE_HZ,
+                            "additional_sample_hz": {"uppercut_left": UPPERCUT_SAMPLE_HZ},
                             "max_through_m": args.max_through_m, "max_into_m": args.max_into_m}, "lods": []}
     passed = True
     for k, path in enumerate(args.glb):
