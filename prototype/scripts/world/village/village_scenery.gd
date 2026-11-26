@@ -4,6 +4,10 @@ extends Node3D
 const Art = preload("res://scripts/world/village_art.gd")
 const PROFILE_DATA = preload("res://assets/quality_profiles.json")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
+const Hills = preload("res://scripts/world/village/backdrop_hills.gd")
+const WATER_LEVEL := .021
+## The brook surfaces at a spring whose rounded end narrows over this length.
+const SPRING_ROUNDING_M := 3.5
 const WORKSHOP := Vector3(-9.2,0,-7.35)
 const STORE := Vector3(-10.6,0,15.6)
 const MARKET := Vector3(-9,0,0)
@@ -25,6 +29,8 @@ var _rain: MultiMeshInstance3D
 var _time := 0.0
 var _sky_tick := 0.0
 var _fixed_time := -1.0
+## Northern end of the visible brook water, at the foot of the backdrop hills.
+var brook_source_z := -95.0
 
 func _init() -> void:
 	ground_material.shader = preload("res://scripts/world/village/ground.gdshader")
@@ -109,14 +115,28 @@ func create_land() -> void:
 	add_child(ground)
 	# Keep the same solid ground and bridge crossing under the continuous visual surface.
 	Art.box_collider(self,Vector3(180,.50,170),Vector3(0,-.26,-15))
+	brook_source_z = _brook_source()
+	# The outer edges and the hill foot hand the ground colour over to the
+	# regional terrain, which lies 5.2 cm lower and carries no texture.
+	ground_material.set_shader_parameter("brook_source_z",brook_source_z)
+	ground_material.set_shader_parameter("handoff_bounds",Vector4(ground.position.x-plain.size.x*.5,
+		ground.position.x+plain.size.x*.5,Hills.FOOT_Z-Hills.FOOT_VARIATION_M,ground.position.z+plain.size.y*.5))
+	ground_material.set_shader_parameter("terrain_dry",Hills.Terrain.EARTH_DRY)
+	ground_material.set_shader_parameter("terrain_fresh",Hills.Terrain.EARTH_FRESH)
 	var water := SurfaceTool.new()
 	water.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for row in 80:
-		var z := -95.0+row*2.0
-		var a := _bank(z,-1)
-		var b := _bank(z,1)
-		var c := _bank(z+2,1)
-		var d := _bank(z+2,-1)
+	var rows: Array[float] = []
+	var z_row := brook_source_z
+	while z_row < 65.0:
+		rows.append(z_row)
+		var regular := -95.0+ceilf((z_row+95.0001)/2.0)*2.0
+		z_row = minf(z_row+.5,regular) if z_row < brook_source_z+SPRING_ROUNDING_M else regular
+	rows.append(65.0)
+	for row in rows.size()-1:
+		var a := _spring_bank(rows[row],-1)
+		var b := _spring_bank(rows[row],1)
+		var c := _spring_bank(rows[row+1],1)
+		var d := _spring_bank(rows[row+1],-1)
 		for v in [a,b,d,b,c,d]:
 			water.set_normal(Vector3.UP)
 			water.set_uv(Vector2(v.x,v.z))
@@ -135,38 +155,43 @@ func create_land() -> void:
 
 func _bank(z: float, side: int) -> Vector3:
 	var x := -28.0+.52*sin(z*.18)+.23*sin(z*.46)
-	return Vector3(x+side*(3.78+.18*sin(z*.56+side)),.021,z)
+	return Vector3(x+side*(3.78+.18*sin(z*.56+side)),WATER_LEVEL,z)
+
+## Water edge with a rounded end at the spring.
+func _spring_bank(z: float, side: int) -> Vector3:
+	var centre := _bank(z,0)
+	var t := clampf((z-brook_source_z)/SPRING_ROUNDING_M,0,1)
+	return centre.lerp(_bank(z,side),sqrt(t*(2.0-t)))
+
+## Northernmost water row whose whole width still lies above the hill surface.
+func _brook_source() -> float:
+	var z := -60.0
+	while z > -95.0:
+		var next := z-.1
+		for side in [-1,0,1]:
+			var bank := _bank(next,side)
+			if Hills.surface_height(Vector2(bank.x,next)) > WATER_LEVEL-.004:
+				return z
+		z = next
+	return z
 
 func _make_ridge() -> void:
-	# The far ridge begins beyond the northern play boundary. An irregular terrain
-	# surface gives it a continuous silhouette with exposed stone above the scrub.
-	var mesh := SurfaceTool.new()
-	mesh.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var paint := StandardMaterial3D.new()
-	paint.vertex_color_use_as_albedo = true
-	paint.roughness = .96
-	mesh.set_material(paint)
-	for row in 10:
-		for column in 81:
-			var x := -163.0+column*4
-			var z := -56.0-row*5
-			for p in [Vector2(x,z),Vector2(x,z-5),Vector2(x+4,z),Vector2(x+4,z),Vector2(x,z-5),Vector2(x+4,z-5)]:
-				var h := _ridge_height(p)
-				var rock := smoothstep(9,20,h+3*sin(p.x*.14))
-				var shade := Color("#687451").lerp(Color("#a1957b"),rock).darkened(.13*abs(sin(p.x*.3+p.y*.52)))
-				mesh.set_color(shade.srgb_to_linear())
-				mesh.add_vertex(Vector3(p.x,h,p.y))
-	mesh.generate_normals()
-	mesh.index()
+	# A closed landform on the regional ground: its back and ends run out onto
+	# the terrain and its collision is the visible surface (world layer 1).
 	var ridge := MeshInstance3D.new()
 	ridge.name = "Foothills"
-	ridge.mesh = mesh.commit()
+	ridge.mesh = Hills.build_mesh()
+	ridge.material_override = Hills.material()
 	ridge.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(ridge)
-
-func _ridge_height(p: Vector2) -> float:
-	var rise := smoothstep(0,1,(-p.y-56.0)/38.0)
-	return -.15+rise*(11.0+4.2*sin(p.x*.069)+2.5*sin(p.x*.16+p.y*.079)+1.45*cos(p.x*.22-p.y*.14)+1.05*sin(p.x*.473+p.y*.24))
+	var body := StaticBody3D.new()
+	body.name = "FoothillsCollision"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	var shape := CollisionShape3D.new()
+	shape.shape = ridge.mesh.create_trimesh_shape()
+	body.add_child(shape)
+	ridge.add_child(body)
 
 func _make_flora() -> void:
 	var rng := RandomNumberGenerator.new()

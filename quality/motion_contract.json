@@ -815,6 +815,7 @@
     "scripts/world/player_action_world.gd",
     "scripts/world/regional_terrain.gd",
     "scripts/world/regional_village.gd",
+    "scripts/world/village/backdrop_hills.gd",
     "scripts/world/village/breeze.gdshader",
     "scripts/world/village/clouds.gdshader",
     "scripts/world/village/drizzle.gdshader",
