@@ -186,7 +186,11 @@ func _test_hud_and_props() -> void:
 	check(not str(game.ui._hud_labels.squad.text).contains("Truppe") and not str(game.ui._hud_labels.squad.text).contains("Moral"), "No troop or morale for the child")
 	for metric in ["wood", "grain", "denarii"]:
 		check(not game.ui._hud_labels[metric].visible, "Village stock does not occupy the first-mission HUD: " + metric)
-	check(game.ui._screen.find_child("VillageCompass", true, false) != null, "The objective map stays reachable")
+	var compass: Control = game.ui._screen.find_child("VillageCompass", true, false)
+	game.ui.update_navigation(game.world.navigation_view())
+	check(compass != null and not compass.visible, "Inside the family home with an in-house goal the compass steps aside")
+	game.ui.update_navigation({"player":Vector2(-7.0, 7.0), "target":I01.POINTS.home_shelf, "has_target":true, "heading":0.0})
+	check(compass.visible, "The objective map returns as soon as the boy is outside")
 	await capture("hud-i01-start")
 	game.ui._show_journal()
 	await frames(3)

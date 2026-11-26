@@ -19,6 +19,8 @@ const TouchActionScript := preload("res://scripts/ui/touch_action.gd")
 const TouchLookScript := preload("res://scripts/ui/touch_look.gd")
 const TouchModalScript := preload("res://scripts/ui/touch_modal.gd")
 const CombatActions := preload("res://scripts/domain/combat_actions.gd")
+## Interior of the family home (baker_home at (-13, 11), walls inset).
+const FAMILY_HOME := Rect2(-15.6, 8.9, 5.2, 4.2)
 const VillagePanel = preload("res://scripts/ui/village_life_panel.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Navigation = preload("res://scripts/ui/village_navigation.gd")
@@ -895,6 +897,12 @@ func show_village_panel(state: Dictionary, tab := "overview") -> void:
 func update_navigation(value: Dictionary) -> void:
 	if _view_state == "game" and is_instance_valid(_navigation):
 		_navigation.update_view(value)
+		# HB 3.0 S. 44: the map appears when it helps. While the child's first
+		# mission keeps both the boy and his goal inside the family home, the
+		# compass steps aside; it returns as soon as either is outside.
+		var in_home := func(point: Variant) -> bool:
+			return typeof(point) == TYPE_VECTOR2 and FAMILY_HOME.has_point(point)
+		_navigation.visible = not (_child_first_mission(_state) and in_home.call(value.get("player")) and in_home.call(value.get("target")))
 
 
 func select_combat_technique(id: String) -> void:
