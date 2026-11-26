@@ -13,7 +13,7 @@ Stand 26.11.2026, Abschluss auf Anweisung des Auftraggebers. Einzelheiten und Me
 | Waffen als Daten, epochenunabhängig (Nahkampf, Wurf, Bogen, Armbrust, Schleuder) | umgesetzt, getestet | `melee_weapons` |
 | Ereignisse für den Ton (hit/draw/release mit Material A/B, Energie, Position, Waffenklasse) | umgesetzt, getestet | `melee_weapons`, `melee_feedback` 59 |
 | KI-Duelle kommen zur Entscheidung (Öffnungen, Ausrichten, Schildarm) | umgesetzt, getestet | `melee_core` |
-| Bestand | getestet | `combat_actions` 314, `unarmed_combat` 81, `combat_model` 230, `city_trade` 169, `village_childhood` 516, `natural_motion` 116, `childhood_integration` (über `check_prototype.py`) PASS |
+| Bestand | getestet | `combat_actions` 314, `unarmed_combat` 81, `combat_model` 230, `city_trade` 169, `village_childhood` 516, `natural_motion` 116, `childhood_integration` und `action_world` (über `check_prototype.py`) PASS |
 
 Befehle: `python3 tools/check_prototype.py --godot <Godot 4.7.2> --only <Gruppe> --keep-going --report <Ordner>`; Gruppen `melee_tracks, melee_core, melee_visual_contact, melee_feedback, melee_camera, melee_weapons, combat_formula`.
 
@@ -22,7 +22,7 @@ Befehle: `python3 tools/check_prototype.py --godot <Godot 4.7.2> --only <Gruppe>
 - **Gerendert:** Die Bildfolgen zum aktuellen Stand sind nicht erzeugt worden (der Renderlauf wartete bis zum Abschluss in der gemeinsamen Render-Warteschlange). Es gibt in diesem Branch keine Bilder; die in `LEVEL_A_MELEE.md` Abschnitt 4 beschriebenen Folgen stammen aus einem früheren Lauf vor diesen Änderungen und liegen nur im Arbeitsverzeichnis der Sitzung. Neu erzeugen:
   `MELEE_EVIDENCE_OUT=<Ordner> MELEE_EVIDENCE_COMMIT=<sha> xvfb-run -a -s "-screen 0 960x720x24" godot --path prototype --fixed-fps 60 --resolution 960x720 --script res://tests/melee_evidence_render.gd`, danach `python3 tools/melee_evidence_sheets.py <Ordner> <Ziel>`. Der Renderer selbst (zwei neue KI-Sequenzen, Tondatensätze je Sequenz) ist in dieser Fassung **ungetestet**.
 - Die neuen Posen (hängender Schild, weggerissener Schild) sind nur geometrisch gemessen, nicht im Bild beurteilt.
-- Kein vollständiger Suite-Lauf und kein Motion-Gate-Lauf auf diesem Stand; `action_world` war bei Abschluss nicht schlüssig (ein Lauf außerhalb des Test-Runners teilte sich den Spielstand mit anderen Sitzungen und ist deshalb ungültig).
+- Kein vollständiger Suite-Lauf und kein Motion-Gate-Lauf auf diesem Stand (nur die oben genannten Gruppen einzeln). Szenentests nur über `check_prototype.py` starten: direkt gestartet teilen sie sich den Spielstand mit anderen Sitzungen und schlagen fälschlich fehl.
 - Kein Gerätelauf (Fold7).
 
 ## Offen (nächste Schritte)
