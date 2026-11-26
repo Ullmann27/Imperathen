@@ -3,6 +3,7 @@ extends Node3D
 ## All sectors share edge spacing: changing detail rings cannot open terrain cracks.
 
 const Plan = preload("res://scripts/world/world_stream_plan.gd")
+const Footpath = preload("res://scripts/world/regional_footpath.gd")
 const GRID := 12
 const MESH_BUILD_BUDGET := 2
 const COLLIDER_BUILD_BUDGET := 2
@@ -178,6 +179,7 @@ func _make_sector(entry: Dictionary) -> Node3D:
 	mesh.mesh = surface.commit()
 	mesh.material_override = _ground
 	node.add_child(mesh)
+	Footpath.add_entrance(node, Plan.SECTOR_SIZE_M)
 	return node
 
 
