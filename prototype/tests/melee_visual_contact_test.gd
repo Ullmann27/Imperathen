@@ -11,6 +11,7 @@ const Geo = preload("res://scripts/domain/melee/melee_geometry.gd")
 const Probe = preload("res://tests/melee_rig_probe.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
 const Presenter = preload("res://scripts/visuals/melee_presenter.gd")
+const Pose = preload("res://scripts/visuals/melee_pose.gd")
 const TOLERANCE := 0.012
 var checks := 0
 var failures: Array[String] = []
@@ -35,6 +36,7 @@ func _process(_delta: float) -> bool:
 	_footwork("legionary", "idle")
 	_footwork("axe_fighter", "guard")
 	_approach_then_strike()
+	_reaction_zones()
 	for failure in failures:
 		printerr("FAIL: " + failure)
 	print("MELEE_VISUAL_CONTACT_RESULT checks=%d failures=%d" % [checks, failures.size()])
@@ -137,6 +139,32 @@ func _approach_then_strike() -> void:
 	_check(jump <= 0.01, "Feet do not jump when a strike starts after footwork (%.4f m)" % jump)
 	_check(worst_track <= 0.01, "After footwork the rendered blade stays on the measured track (%.4f m)" % worst_track)
 	print("approach then thrust: foot jump %.4f m, max blade deviation from track %.4f m" % [jump, worst_track])
+
+
+## Individual reactions: the same push produces different bodies per zone.
+func _reaction_zones() -> void:
+	var p: Node3D = _actors.legionary.node
+	var pose := Pose.new()
+	pose.bind(p.body, "legionary")
+	var skeleton := Probe.skeleton_of(p.body)
+	pose.stance_pose()
+	var head_basis0: Basis = Probe.bone_in(p, skeleton, "Head").basis.orthonormalized()
+	var pelvis0: Vector3 = Probe.bone_in(p, skeleton, "Pelvis").origin
+	var shoulder := {}
+	var result := {}
+	for zone: String in ["head", "torso", "leg", "arm_weapon", "arm_shield"]:
+		pose.reaction(Vector3(0, 0, -1), 0.75, 0.15, 0.5, Vector3.ZERO, zone)
+		var head_basis: Basis = Probe.bone_in(p, skeleton, "Head").basis.orthonormalized()
+		var snap := rad_to_deg((head_basis0.inverse() * head_basis).get_rotation_quaternion().get_angle())
+		var pelvis: Vector3 = Probe.bone_in(p, skeleton, "Pelvis").origin
+		var arm_r: Vector3 = Probe.bone_in(p, skeleton, "Arm_R").origin
+		result[zone] = {"head_snap_deg":snap, "pelvis_drop":pelvis0.y - pelvis.y}
+		shoulder[zone] = arm_r.z
+	for zone: String in ["torso", "leg", "arm_weapon", "arm_shield"]:
+		_check(float(result.head.head_snap_deg) > float(result[zone].head_snap_deg), "A head hit snaps the head more than a %s hit (%.1f vs %.1f deg)" % [zone, result.head.head_snap_deg, result[zone].head_snap_deg])
+	_check(float(result.leg.pelvis_drop) > float(result.torso.pelvis_drop) + 0.03, "A leg hit buckles the knees (pelvis drop %.3f vs %.3f m)" % [result.leg.pelvis_drop, result.torso.pelvis_drop])
+	_check(absf(float(shoulder.arm_weapon) - float(shoulder.arm_shield)) > 0.03, "Weapon- and shield-arm hits twist the shoulders differently (%.3f m)" % absf(float(shoulder.arm_weapon) - float(shoulder.arm_shield)))
+	print("reaction zones: " + JSON.stringify(result))
 
 
 func _attachment(root: Node, prefix: String) -> BoneAttachment3D:

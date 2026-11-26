@@ -607,7 +607,7 @@ static func _resolve_hit(state: Dictionary, f: Dictionary, d: Dictionary, m: Dic
 	_morale(state, d, -(damage * 0.5 + 2.0), "took_hit", events)
 	_injury(state, d, zone, damage, events)
 	if reaction != "absorbed":
-		_set_reaction(state, d, reaction, push, events)
+		_set_reaction(state, d, reaction, push, events, zone)
 
 
 static func _injury(state: Dictionary, d: Dictionary, zone: String, damage: float, events: Array) -> void:
@@ -626,7 +626,7 @@ static func _injury(state: Dictionary, d: Dictionary, zone: String, damage: floa
 	_morale(state, d, -8.0, "injury", events)
 
 
-static func _set_reaction(state: Dictionary, d: Dictionary, kind: String, push: Vector3, events: Array) -> void:
+static func _set_reaction(state: Dictionary, d: Dictionary, kind: String, push: Vector3, events: Array, zone: String = "torso") -> void:
 	var spec: Dictionary = REACTIONS[kind]
 	var interrupted: bool = d.action == "attack" and not bool(d.resolved)
 	if interrupted:
@@ -643,7 +643,7 @@ static func _set_reaction(state: Dictionary, d: Dictionary, kind: String, push: 
 	d.guard_style = ""
 	d.dodge = ""
 	d.react = {"kind":kind, "t":0.0, "duration":float(spec.duration), "strength":float(spec.strength),
-		"step":[step.x, step.z], "push":[push.x, push.z], "direction":Geo.side_of(float(d.yaw), -push)}
+		"step":[step.x, step.z], "push":[push.x, push.z], "direction":Geo.side_of(float(d.yaw), -push), "zone":zone}
 	events.append({"type":"reaction", "frame":state.frame, "fighter":d.id, "kind":kind, "direction":d.react.direction,
 		"duration":float(spec.duration), "step_m":snappedf(step.length(), 0.001)})
 

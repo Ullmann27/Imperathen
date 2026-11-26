@@ -284,7 +284,10 @@ func dodge(style: String, seconds: float, root_scale: float = 1.0) -> bool:
 ## direction in fighter space (e.g. (0,0,-1) = pushed backwards), strength
 ## 0..1+ scales the bend; seconds/duration drive the recovery envelope. The
 ## domain applies the matching root displacement (stagger step).
-func reaction(push: Vector3, strength: float, seconds: float, duration: float, root_step: Vector3 = Vector3.ZERO) -> bool:
+## `zone` shapes the reaction individually: a head hit snaps the head and
+## upper spine, a torso hit folds the trunk, an arm hit twists that shoulder
+## back, a leg hit buckles the knees.
+func reaction(push: Vector3, strength: float, seconds: float, duration: float, root_step: Vector3 = Vector3.ZERO, zone: String = "torso") -> bool:
 	if not available or duration <= 0.0 or not is_finite(seconds):
 		return false
 	var stance: Dictionary = STANCES[KITS[kit].stance]
@@ -294,13 +297,19 @@ func reaction(push: Vector3, strength: float, seconds: float, duration: float, r
 	dir = dir.normalized() if dir.length_squared() > 0.0001 else Vector3.BACK * -1.0
 	var amount := clampf(strength, 0.0, 1.6) * envelope
 	var key := _stance_key(stance, 0.0)
-	key.lean = float(stance.lean) + dir.z * 26.0 * amount
-	key.syaw = float(stance.syaw) - dir.x * 30.0 * amount
-	key.pelvis = Vector3(stance.pelvis) + Vector3(dir.x * 0.05, -0.06, dir.z * 0.05) * amount
-	key.head_pitch = dir.z * 22.0 * amount
-	key.head_roll = -dir.x * 18.0 * amount
-	key.r = [Vector3(0.35, -0.7, 0.4).lerp(Vector3(0.6, -0.2, -0.2), amount * 0.6), 0.84]
-	key.l = [Vector3(0.20, -0.45, 1.0).lerp(Vector3(-0.5, -0.4, 0.2), amount * 0.5), 0.76]
+	var trunk := {"head":0.6, "torso":1.0, "arm_weapon":0.7, "arm_shield":0.7, "leg":0.5}.get(zone, 1.0) as float
+	var snap := {"head":1.8, "torso":1.0, "arm_weapon":0.8, "arm_shield":0.8, "leg":0.6}.get(zone, 1.0) as float
+	var twist := {"arm_weapon":-22.0, "arm_shield":22.0}.get(zone, 0.0) as float
+	var buckle := 0.07 if zone == "leg" else 0.0
+	key.lean = float(stance.lean) + dir.z * 26.0 * amount * trunk + (8.0 * amount if zone == "torso" and dir.z < 0.0 else 0.0)
+	key.syaw = float(stance.syaw) - dir.x * 30.0 * amount * trunk + twist * amount
+	key.pelvis = Vector3(stance.pelvis) + Vector3(dir.x * 0.05, -0.06 - buckle, dir.z * 0.05) * amount
+	key.head_pitch = dir.z * 22.0 * amount * snap
+	key.head_roll = -dir.x * 18.0 * amount * snap
+	var hit_arm := 1.0 if zone == "arm_weapon" else 0.6
+	var shield_arm := 1.0 if zone == "arm_shield" else 0.5
+	key.r = [Vector3(0.35, -0.7, 0.4).lerp(Vector3(0.6, -0.2, -0.2), amount * 0.6 * hit_arm), 0.84]
+	key.l = [Vector3(0.20, -0.45, 1.0).lerp(Vector3(-0.5, -0.4, 0.2), amount * shield_arm), 0.76]
 	# Stagger step: the foot on the push side steps with the root displacement.
 	var feet := {"l":stance.foot_l, "r":stance.foot_r, "lift_l":0.0, "lift_r":0.0}
 	if root_step.length() > 0.01:

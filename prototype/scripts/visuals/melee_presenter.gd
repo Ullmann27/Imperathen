@@ -114,7 +114,7 @@ func apply(state: Dictionary, delta: float = 1.0 / 60.0) -> void:
 			var push := basis * Vector3(float(r.push[0]), 0.0, float(r.push[1]))
 			var step := basis * Vector3(float(r.step[0]), 0.0, float(r.step[1]))
 			# Godot local (-Z forward) to the pose module's fighter space.
-			pose.reaction(Vector3(push.x, 0.0, -push.z), float(r.strength), float(r.t), float(r.duration), Vector3(step.x, 0.0, -step.z))
+			pose.reaction(Vector3(push.x, 0.0, -push.z), float(r.strength), float(r.t), float(r.duration), Vector3(step.x, 0.0, -step.z), str(r.get("zone", "torso")))
 		_:
 			pose.stance_pose()
 
