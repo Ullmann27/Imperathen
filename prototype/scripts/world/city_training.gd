@@ -8,7 +8,8 @@ const Model = preload("res://scripts/domain/world_model.gd")
 const Combat = preload("res://scripts/domain/combat_actions.gd")
 const DUMMY := "res://assets/village/training_dummy.glb"
 const PRACTICE_WORLD := Vector3(0.0, 0.0, -7.0)
-const HIT_RADIUS := 1.5
+const TECHNIQUE := "jab_right"
+const TARGET_SELECTION_MARGIN := 0.15
 var available := false
 var model
 var dummy: Node3D
@@ -49,9 +50,12 @@ func execute_attack(position: Vector3, yaw: float) -> Dictionary:
 	model.set_player_position(position)
 	var forward := Vector3.FORWARD.rotated(Vector3.UP,yaw)
 	var delta := Vector2(PRACTICE_WORLD.x-position.x,PRACTICE_WORLD.z-position.z)
-	var target_id := "practice" if delta.length() <= HIT_RADIUS and delta.length() >= Combat.MIN_CONTACT_DISTANCE else "air"
+	# Select only a plausible target. The measured swept strike remains the
+	# sole authority for contact, facing, and any awarded training progress.
+	var reach := float(Combat.measured(TECHNIQUE).reach) * Combat.strike_scale(model.data, TECHNIQUE)
+	var target_id := "practice" if delta.length() <= reach + Combat.PRACTICE_RADIUS + TARGET_SELECTION_MARGIN and delta.length() >= Combat.MIN_CONTACT_DISTANCE else "air"
 	var result: Dictionary = Combat.execute(model.data,"village_unarmed_attack",{
-		"technique":"jab_right","target_id":target_id,
+		"technique":TECHNIQUE,"target_id":target_id,
 		"facing_x":forward.x,"facing_z":forward.z
 	})
 	return result
@@ -63,9 +67,13 @@ func execute_block() -> Dictionary:
 	return Combat.execute(model.data,"village_unarmed_guard",{})
 
 
-func tick(delta: float) -> Dictionary:
+func tick(delta: float, observed_position: Vector3 = Vector3.INF) -> Dictionary:
 	if not available:
 		return {}
+	# The city player may still be braking during wind-up. Use observed world
+	# geometry rather than the stale attack-button position for contact.
+	if observed_position.is_finite():
+		model.set_player_position(observed_position)
 	return Combat.advance(model.data,delta,Callable(self,"_sight_clear"))
 
 

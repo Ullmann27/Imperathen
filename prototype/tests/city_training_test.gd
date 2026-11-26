@@ -27,7 +27,17 @@ func _run() -> void:
 	_check(training.available, "The original village training dummy and combat state are available")
 	_check(is_instance_valid(training.dummy),"The physical 3D training prop comes from an authored GLB")
 	_check(training.state().get("practice_hits",-1) == 0,"Unarmed sandbox starts with no awarded practice hits")
-	var attack := training.execute_attack(Vector3(0.0,0.92,-5.8),0.0)
+	# The recovered contact data defines a real jab, not the previous 1.5 m
+	# radius shortcut. The old 1.2 m position must now remain a miss.
+	var distant := training.execute_attack(Vector3(0.0,0.92,-5.8),0.0)
+	_check(bool(distant.get("ok",false)), "Out-of-reach input still permits a swing")
+	for step in 55:
+		await physics_frame
+		training.tick(1.0/60.0)
+	_check(training.state().get("practice_hits",-1) == 0,"A jab at the old 1.2 m position cannot fabricate a contact")
+	for step in 60:
+		training.tick(1.0/60.0)
+	var attack := training.execute_attack(Vector3(0.0,0.92,-6.4),0.0)
 	_check(bool(attack.get("ok",false)),"Age 12 unarmed jab can enter the combat timing authority")
 	var observed_hit := false
 	for step in 55:
@@ -39,6 +49,22 @@ func _run() -> void:
 	_check(training.state().get("practice_hits",-1) == 1,"A completed strike awards exactly one hit")
 	_check(training.state().get("stamina",100.0) < 100.0,"The strike consumes real sandbox stamina")
 	_check(not bool(training.state().get("service_gear",true)),"A child does not receive adult Gladius or Scutum entitlement")
+	var wrong_facing := training.execute_attack(Vector3(0.0,0.92,-6.4),PI)
+	_check(bool(wrong_facing.get("ok",false)), "A swing facing away is allowed but cannot hit")
+	for step in 55:
+		await physics_frame
+		training.tick(1.0/60.0)
+	_check(training.state().get("practice_hits",-1) == 1, "A wrong-facing swing awards no additional hit")
+	for step in 60:
+		training.tick(1.0/60.0)
+	var moving := training.execute_attack(Vector3(0.0,0.92,-6.4),0.0)
+	_check(bool(moving.get("ok",false)), "A near swing may start before movement is observed")
+	for step in 55:
+		await physics_frame
+		training.tick(1.0/60.0, Vector3(0.0,0.92,-5.8))
+	_check(training.state().get("practice_hits",-1) == 1, "Observed position at contact prevents stale-position phantom hits")
+	for step in 60:
+		training.tick(1.0/60.0)
 	var blocked := training.execute_block()
 	_check(bool(blocked.get("ok",false)),"Unarmed guard uses the existing authoritative defence window")
 	_check(training.state().get("guard_remaining",0.0)>0.0,"Defence has a measurable expiration time")

@@ -314,6 +314,7 @@ func _test_migration_v4_to_v5() -> void:
 	var early = _at_lane()
 	for key: String in I03.KEYS:
 		early.data.village.childhood.screenplay.erase(key)
+	early.data.village.childhood.screenplay.erase("investigation")
 	early.data.village.childhood.screenplay.version = 4
 	_check(Childhood.migrate_screenplay(early.data) and _sp(early).i03s == "pending" and _sp(early).version == Childhood.SCREENPLAY_VERSION and Childhood.validate(early.data).is_empty(), "An undecided v4 save gets the errand")
 	_check(_stage(early) == "i03_marcus", "It continues at the lane")
@@ -322,6 +323,7 @@ func _test_migration_v4_to_v5() -> void:
 	for key: String in I03.KEYS:
 		decided.data.village.childhood.screenplay.erase(key)
 	var s: Dictionary = decided.data.village.childhood.screenplay
+	s.erase("investigation")
 	s.version = 4
 	s.i03 = "complete"
 	s.i03_outcome = "rival"

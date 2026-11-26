@@ -673,7 +673,7 @@ func _physics_process(delta: float) -> void:
 		_crowd_elapsed = 0.0
 		crowd.tick(player.position)
 	_action_left = maxf(0,_action_left-delta)
-	var combat_event: Dictionary = training.tick(delta)
+	var combat_event: Dictionary = training.tick(delta, player.position)
 	var combat_state: Dictionary = training.state()
 	if bool(combat_event.get("practice",false)):
 		_catalog_status = "Kontrollierter Treffer am Übungspfahl: %d" % int(combat_state.get("practice_hits",0))

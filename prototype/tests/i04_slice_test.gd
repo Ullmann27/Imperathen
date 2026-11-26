@@ -233,11 +233,13 @@ func _test_migration_v5_to_v6() -> void:
 	var early = _at_forge("deliver_kindling")
 	for key: String in I04.KEYS:
 		early.data.village.childhood.screenplay.erase(key)
+	early.data.village.childhood.screenplay.erase("investigation")
 	early.data.village.childhood.screenplay.version = 5
-	_check(Childhood.migrate_screenplay(early.data) and _sp(early).i04s == "pending" and _sp(early).version == 6 and Childhood.validate(early.data).is_empty(), "A v5 save still carrying the bundle gets the visit: " + Childhood.validate(early.data))
+	_check(Childhood.migrate_screenplay(early.data) and _sp(early).i04s == "pending" and _sp(early).version == Childhood.SCREENPLAY_VERSION and Childhood.validate(early.data).is_empty(), "A v5 save still carrying the bundle gets the visit: " + Childhood.validate(early.data))
 	var late = _at_forge()
 	for key: String in I04.KEYS:
 		late.data.village.childhood.screenplay.erase(key)
+	late.data.village.childhood.screenplay.erase("investigation")
 	late.data.village.childhood.screenplay.version = 5
 	_check(Childhood.migrate_screenplay(late.data) and _sp(late).i04s == "legacy" and _sp(late).i04_events.is_empty(), "A v5 save past the delivery is marked legacy; nothing is invented")
 	_check(Childhood.validate(late.data).is_empty() and _stage(late) == "apprentice_permission", "It continues with the father's permission")
