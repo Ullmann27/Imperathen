@@ -40,6 +40,8 @@ const TORCH := {"color": Color(1.0, 0.60, 0.31), "energy": 2.4, "range": 8.5, "a
 const TORCH_OFFSETS := [Vector2(-2.6, 4.5), Vector2(2.8, 7.5), Vector2(-2.7, 11.5),
 	Vector2(2.9, 16.0), Vector2(-3.0, 21.0), Vector2(3.0, 27.0)]
 const TORCH_NODE := "RenderBenchTorches"
+## Local solar hour of the night view when the village look provides time of day.
+const NIGHT_HOUR := 23.0
 
 
 static func renderer_info() -> Dictionary:
@@ -312,12 +314,20 @@ static func enter_night(world: Node3D) -> Node3D:
 	var environment: Environment = world._village_environment
 	var torches := Node3D.new()
 	torches.name = TORCH_NODE
-	torches.set_meta("restore", {"sun_energy": sun.light_energy, "sun_color": sun.light_color,
-		"ambient": environment.ambient_light_energy, "sky": environment.background_energy_multiplier})
-	sun.light_energy = float(NIGHT.sun_energy)
-	sun.light_color = NIGHT.sun_color
-	environment.ambient_light_energy *= float(NIGHT.ambient_scale)
-	environment.background_energy_multiplier = float(NIGHT.sky_energy)
+	# With the village look installed, night and fire light come from its data
+	# file (look_values.json: night, fire); the NIGHT/TORCH constants are only
+	# the neutral fallback of a tree without look development.
+	var look: Object = _village_look(world)
+	if look != null:
+		torches.set_meta("restore", {"look_time": look.get("time_of_day")})
+		look.call("set_time_of_day", float(NIGHT_HOUR))
+	else:
+		torches.set_meta("restore", {"sun_energy": sun.light_energy, "sun_color": sun.light_color,
+			"ambient": environment.ambient_light_energy, "sky": environment.background_energy_multiplier})
+		sun.light_energy = float(NIGHT.sun_energy)
+		sun.light_color = NIGHT.sun_color
+		environment.ambient_light_energy *= float(NIGHT.ambient_scale)
+		environment.background_energy_multiplier = float(NIGHT.sky_energy)
 	world.add_child(torches)
 	var camera: Camera3D = world._camera
 	var forward := -camera.global_basis.z
@@ -330,8 +340,20 @@ static func enter_night(world: Node3D) -> Node3D:
 		var offset: Vector2 = TORCH_OFFSETS[index]
 		var at := origin + right * offset.x + forward * offset.y
 		at.y = floor_height(world, at + Vector3.UP * 3.0)
-		torches.add_child(_torch(index, at, pole))
+		var stand := _torch(index, at, pole, look == null)
+		torches.add_child(stand)
+		if look != null:
+			var light: OmniLight3D = look.call("add_fire_light", stand, Vector3(0, float(TORCH.height) + 0.08, 0), "torch")
+			light.shadow_bias = 0.08
+			light.add_to_group(RenderProfile.LIGHT_GROUP)
+			RenderProfile.configure_light(light, RenderProfile.current_profile())
 	return torches
+
+
+## The look-development node of the village (scripts/rendering/village_look.gd), if this tree has it.
+static func _village_look(world: Node3D) -> Object:
+	var look: Variant = world.get("look")
+	return look if look is Object and (look as Object).has_method("set_time_of_day") and (look as Object).has_method("add_fire_light") else null
 
 
 static func leave_night(world: Node3D) -> void:
@@ -339,14 +361,22 @@ static func leave_night(world: Node3D) -> void:
 		return
 	var torches := world.get_node(TORCH_NODE)
 	var saved: Dictionary = torches.get_meta("restore")
+	var look: Object = _village_look(world)
+	world.remove_child(torches)
+	torches.free()
+	if saved.has("look_time") and look != null:
+		# The look node animates its fire lights; forget the ones just freed.
+		var fires: Variant = look.get("_fires")
+		if fires is Array:
+			look.set("_fires", (fires as Array).filter(func(entry): return is_instance_valid(entry.get("light"))))
+		look.call("set_time_of_day", float(saved.look_time))
+		return
 	var sun: DirectionalLight3D = world._sun
 	var environment: Environment = world._village_environment
 	sun.light_energy = float(saved.sun_energy)
 	sun.light_color = saved.sun_color
 	environment.ambient_light_energy = float(saved.ambient)
 	environment.background_energy_multiplier = float(saved.sky)
-	world.remove_child(torches)
-	torches.free()
 
 
 static func _torch_materials() -> Dictionary:
@@ -362,7 +392,7 @@ static func _torch_materials() -> Dictionary:
 	return {"wood": wood, "flame": flame}
 
 
-static func _torch(index: int, at: Vector3, materials: Dictionary) -> Node3D:
+static func _torch(index: int, at: Vector3, materials: Dictionary, with_light := true) -> Node3D:
 	var stand := Node3D.new()
 	stand.name = "TorchStand%d" % index
 	stand.position = at
@@ -384,6 +414,8 @@ static func _torch(index: int, at: Vector3, materials: Dictionary) -> Node3D:
 	flame.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	flame.position.y = float(TORCH.height) + 0.08
 	stand.add_child(flame)
+	if not with_light:
+		return stand
 	var light := OmniLight3D.new()
 	light.name = "TorchLight"
 	light.light_color = TORCH.color
