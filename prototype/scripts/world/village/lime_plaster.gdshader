@@ -41,7 +41,12 @@ void fragment() {
 		base = mix(base, base * vec3(.66, .58, .47), splash * .55);
 		ALBEDO = base;
 		ROUGHNESS = clamp(mask.r + damp * .04 - splash * .03, .5, 1.0);
-		AO = mix(1.0, mask.g, .85);
+		// Ambient occlusion where the wall meets the ground or floor, and under
+		// the eaves/ridge indoors: the contact darkening Compatibility has no
+		// screen-space pass for.
+		float contact = mix(.55, 1.0, smoothstep(.0, .55, h - mix(0.0, .39, indoor)));
+		float ceiling = mix(1.0, mix(.7, 1.0, smoothstep(3.6, 2.6, h)), indoor);
+		AO = mix(1.0, mask.g, .85) * contact * ceiling;
 		AO_LIGHT_AFFECT = .2;
 		NORMAL_MAP = texture(normal_map, uv).rgb;
 		NORMAL_MAP_DEPTH = normal_depth;
