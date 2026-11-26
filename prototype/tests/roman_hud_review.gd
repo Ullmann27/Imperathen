@@ -12,6 +12,7 @@ const EntryScene = preload("res://main.tscn")
 const Life = preload("res://scripts/story/village_life.gd")
 const SIZES := [Vector2i(1280, 720), Vector2i(1384, 1536)]
 const CALM_SECONDS := 14.0
+const DRY_CALM_SECONDS := 2.0
 const YARD := Vector2(-8.6, 6.9)
 const CAMERA_YAW := 2.45
 
@@ -22,11 +23,14 @@ var captures: Array[Dictionary] = []
 var measurements: Array[Dictionary] = []
 var notes: Array[String] = []
 var failed := false
+## Headless logic check only (no pixels): IMPERATHEN_REVIEW_DRYRUN=1.
+var dry_run := false
 
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
-	if args.is_empty() or DisplayServer.get_name() == "headless" or OS.get_environment("IMPERATHEN_ISOLATED_TEST") != "1":
+	dry_run = DisplayServer.get_name() == "headless" and OS.get_environment("IMPERATHEN_REVIEW_DRYRUN") == "1"
+	if args.is_empty() or (DisplayServer.get_name() == "headless" and not dry_run) or OS.get_environment("IMPERATHEN_ISOLATED_TEST") != "1":
 		printerr("An isolated real viewport and an output folder are required.")
 		quit(2)
 		return
@@ -95,7 +99,7 @@ func _sequence() -> void:
 		game.world.set("_camera_yaw", CAMERA_YAW)
 		game.ui.show_game(game._ui_state())
 		var started := Time.get_ticks_msec()
-		while Time.get_ticks_msec() - started < int(CALM_SECONDS * 1000.0):
+		while Time.get_ticks_msec() - started < int((DRY_CALM_SECONDS if dry_run else CALM_SECONDS) * 1000.0):
 			game.world.set("_camera_yaw", CAMERA_YAW)
 			await process_frame
 		await _frames(3)
@@ -162,7 +166,10 @@ func _place(point: Vector2) -> void:
 
 func _frames(count: int) -> void:
 	for index in count:
-		await RenderingServer.frame_post_draw
+		if dry_run:
+			await process_frame
+		else:
+			await RenderingServer.frame_post_draw
 
 
 func _settle(seconds: float) -> void:
@@ -176,7 +183,7 @@ func _perf(count: int) -> Dictionary:
 	var samples: Array[float] = []
 	var last := Time.get_ticks_usec()
 	for index in count:
-		await RenderingServer.frame_post_draw
+		await _frames(1)
 		var now := Time.get_ticks_usec()
 		samples.append((now - last) / 1000.0)
 		last = now
@@ -194,9 +201,9 @@ func _perf(count: int) -> Dictionary:
 
 
 func _capture(name: String, extra: Dictionary = {}) -> void:
-	await RenderingServer.frame_post_draw
-	var picture := root.get_texture().get_image()
-	var saved := picture != null and not picture.is_empty() and picture.save_png(output.path_join(name + ".png")) == OK
+	await _frames(1)
+	var picture := root.get_texture().get_image() if not dry_run else Image.create(root.size.x, root.size.y, false, Image.FORMAT_RGB8)
+	var saved := dry_run or (picture != null and not picture.is_empty() and picture.save_png(output.path_join(name + ".png")) == OK)
 	_expect(saved, "Rendered capture " + name)
 	var entry := {"file": name + ".png", "pixels": [picture.get_width(), picture.get_height()], "screen": game.screen,
 		"ui_state": game.ui.get("_view_state"), "player": [game.world.get_player_position().x, game.world.get_player_position().z],
@@ -222,6 +229,8 @@ func _measure(tag: String) -> Dictionary:
 	var covered := 0
 	for value in mask:
 		covered += value
+	if dry_run:
+		return {"resolution": tag, "geometric_share": snappedf(float(covered) / float(columns * rows), 0.0001), "elements": elements}
 	await RenderingServer.frame_post_draw
 	var with_hud := root.get_texture().get_image()
 	game.ui.visible = false
