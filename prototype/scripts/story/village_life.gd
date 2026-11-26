@@ -4,6 +4,8 @@ extends RefCounted
 
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
+const Route = preload("res://scripts/domain/raid_route.gd")
+const Strike = preload("res://scripts/domain/raider_strike.gd")
 const VERSION := 1
 const DAY_SECONDS := 120.0
 const STEP := 0.1
@@ -15,6 +17,10 @@ const RAID_INTERVAL := 360.0
 const SCOUT_POINT := Vector2(-16.0, -19.0)
 const ALARM_POINT := Vector2(0.0, -16.0)
 const RESCUE_POINT := Vector2(5.0, -9.0)
+## Raider walking pace per rule tick (1.2 m/s) and pursuit radius. Blow
+## timing and reach live in RaiderStrike (scripts/domain/raider_strike.gd).
+const RAIDER_STEP := 0.12
+const RAIDER_CHASE_RADIUS := 7.0
 const WORKPLACE_POSITIONS := Childhood.WORKPLACE_POSITIONS
 const GOODS := ["wood", "grain", "denarii", "stone"]
 const NPCS := {
@@ -239,6 +245,7 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 			raid.strike_cooldown = 0.65
 			var damage := 18 + mini(10,int(data.village.attributes.combat)/5) + (4 if social.profession == "guard" else 0)
 			enemy.health = maxi(0,int(enemy.health)-damage)
+			interrupt_strike(enemy)
 			raid.player_hits += 1
 			raid.participation += 1
 			if not raid.joined:
@@ -302,6 +309,7 @@ static func apply_unarmed_hit(data: Dictionary, target_id: String, damage: int) 
 	if enemy.is_empty() or int(enemy.health) <= 0:
 		return false
 	enemy.health = maxi(0, int(enemy.health) - damage)
+	interrupt_strike(enemy)
 	raid.player_hits += 1
 	raid.participation += 1
 	if not raid.joined:
@@ -356,30 +364,37 @@ static func _tick(data: Dictionary, sight_check: Callable = Callable(), motion_c
 			continue
 		var point := Vector2(enemy.x,enemy.z)
 		var player := _player_point(data)
-		var near := point.distance_to(player)<=2.2
+		var near := point.distance_to(player)<=Strike.reach()
 		if data.village.has("unarmed") and near:
 			near = sight_check.is_valid() and bool(sight_check.call(point, player))
-		if near:
+		# attack_timer within the wind-up is the visible swing. A started swing
+		# completes unless a received hit interrupts it (interrupt_strike): the
+		# blow lands, is blocked or dodged, or misses because the player stepped
+		# out of reach. Neither an approach nor a resolved blow starts a swing.
+		var swinging := Strike.swinging(float(enemy.attack_timer))
+		if near or swinging:
 			enemy.attack_timer = maxf(0.0,float(enemy.attack_timer)-STEP)
 			if float(enemy.attack_timer)<=0.000001:
-				_enemy_attack(data,enemy)
-				enemy.attack_timer = 1.8
+				# A dodge that carried the player out of reach still evades this
+				# blow; simply walking away from it is a plain miss.
+				if near or float(raid.dodge_window)>0.000001:
+					_enemy_attack(data,enemy)
+				enemy.attack_timer = Strike.INTERVAL_SECONDS
 		else:
-			enemy.attack_timer = 0.9
+			enemy.attack_timer = Strike.APPROACH_SECONDS
 			if not observed_raiders.has(str(enemy.id)):
-				var target := player if point.distance_to(player)<7.0 else Vector2(5.0,5.0)
-				target = target.clamp(Vector2(-200,-200),Vector2(200,200))
-				var next_point := point.move_toward(target,0.12)
+				var target := raider_waypoint(data,enemy)
+				var next_point := point.move_toward(target,RAIDER_STEP)
 				if data.village.has("unarmed"):
 					# New combat never teleports a raider through the live collision world.
 					var checked: Variant = motion_check.call(point, next_point) if motion_check.is_valid() else point
-					if checked is Vector2 and checked.is_finite() and point.distance_to(checked) <= 0.120001:
+					if checked is Vector2 and checked.is_finite() and point.distance_to(checked) <= RAIDER_STEP+0.000001:
 						point = checked
 				else:
 					point = next_point
 				enemy.x = point.x
 				enemy.z = point.y
-			if point.distance_to(Vector2(5.0,5.0))<2.0:
+			if point.distance_to(Route.LOOT)<Route.LOOT_RADIUS:
 				enemy.loot_timer += STEP
 				if float(enemy.loot_timer)>=3.0 and int(raid.stolen)<6:
 					enemy.loot_timer = 0.0
@@ -394,6 +409,28 @@ static func _tick(data: Dictionary, sight_check: Callable = Callable(), motion_c
 		_finish_raid(data,"defended")
 	elif raid.remaining<=0.000001 or int(raid.stolen)>=6:
 		_finish_raid(data,"raided")
+
+
+## A received hit stops a raider's begun swing (D-026: the visible hit
+## reaction replaces the blow, so no damage can follow from a hidden swing).
+static func interrupt_strike(enemy: Dictionary) -> void:
+	if int(enemy.health)>0 and Strike.swinging(float(enemy.attack_timer)):
+		enemy.attack_timer = Strike.APPROACH_SECONDS
+
+
+## Where a living raider walks next: the player inside the pursuit radius,
+## otherwise its own place at the granary. Both via the stateless village
+## route (north gate, main street); shared with VillageLifeWorld.
+static func raider_goal(data: Dictionary, enemy: Dictionary) -> Vector2:
+	var point := Vector2(float(enemy.x),float(enemy.z))
+	var player := _player_point(data)
+	var goal := player if point.distance_to(player)<RAIDER_CHASE_RADIUS else Route.loot_point(str(enemy.id))
+	return goal.clamp(Vector2(-200,-200),Vector2(200,200))
+
+
+static func raider_waypoint(data: Dictionary, enemy: Dictionary) -> Vector2:
+	var point := Vector2(float(enemy.x),float(enemy.z))
+	return Route.next_waypoint(point, raider_goal(data, enemy))
 
 
 static func _enemy_attack(data: Dictionary, enemy: Dictionary) -> void:
@@ -432,6 +469,7 @@ static func _guard_support(data: Dictionary) -> void:
 			continue
 		var damage := mini(16,int(nearby.count)*2)+(2 if raid.alarm else 0)+mini(3,int(nearby.allies))
 		enemy.health = maxi(0,int(enemy.health)-damage)
+		interrupt_strike(enemy)
 		break
 
 
@@ -456,7 +494,10 @@ static func _nearby_defenders(data: Dictionary, position: Vector2) -> Dictionary
 		if not bool(person.get("alive",false)) or int(person.get("health",0))<=30 or int(person.get("hunger",3))>=2 or not (duty=="defense" or duty=="watchpost" and watch_ready):
 			continue
 		var id := str(person.get("id",""))
-		if actor_position(data,id).distance_to(position)>12.0:
+		var at := actor_position(data,id)
+		# Guards help only where they can see the raider: never through the
+		# palisade or a house (same static village plan as the raid route).
+		if at.distance_to(position)>12.0 or not Route.sight_clear(at,position):
 			continue
 		count += 1
 		var relation: Dictionary = data.village.social.npcs.get(id,{})

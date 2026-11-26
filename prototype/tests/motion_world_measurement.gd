@@ -9,6 +9,7 @@ const Ranks = preload("res://scripts/visuals/far_ranks.gd")
 const Soldier = preload("res://scripts/visuals/soldier_visual.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Life = preload("res://scripts/story/village_life.gd")
+const RaiderStrike = preload("res://scripts/domain/raider_strike.gd")
 const DT := 1.0/60.0
 var _tree: SceneTree
 
@@ -396,7 +397,11 @@ func _raid(world: Node3D, data: Dictionary) -> Dictionary:
 	_add(family,subject,"walk_run_stop",stopping)
 	var reaction := _observer()
 	for frame in 180:
-		if frame == 0: fixture.village.raid.enemies[0].attack_timer = 1.8
+		# Domain clock as VillageLife drives it: entering the wind-up starts the
+		# visible swing; the blow resolves after the wind-up and the clock
+		# restarts at the interval. A clock reset alone never swings (D-026).
+		if frame == 0: fixture.village.raid.enemies[0].attack_timer = RaiderStrike.windup_seconds()
+		if frame == int(round(RaiderStrike.windup_seconds()/DT)): fixture.village.raid.enemies[0].attack_timer = RaiderStrike.INTERVAL_SECONDS
 		if frame == 60: fixture.village.raid.enemies[0].health = 30
 		if frame == 120: figure.cue("block")
 		projection.sync_state(fixture,"balanced")

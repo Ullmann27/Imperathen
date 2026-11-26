@@ -9,6 +9,7 @@ const Art = preload("res://scripts/world/village_art.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const Strike = preload("res://scripts/domain/raider_strike.gd")
 const PLACES := {"farm":Vector2(24,-30), "woodcamp":Vector2(-43,14),
 	"quarry":Vector2(48,-12), "trade":Vector2(25,24), "watchpost":Vector2(0,-48)}
 var actors: Dictionary = {}
@@ -27,7 +28,16 @@ var _linen: StandardMaterial3D
 # ordinary play sweeps towards those targets on the physics clock.
 const RAIDER_SPEED := 0.12 / Life.STEP
 const RAIDER_TURN_SPEED := 5.0
+const RAIDER_ACCELERATION := 2.4
+const RAIDER_BRAKING := 6.0
+const RAIDER_ALIGN_FROM := deg_to_rad(20.0)
+const RAIDER_ALIGN_TO := deg_to_rad(75.0)
+## Turning towards the player while standing: 180 degrees in under 0.5 s.
+const RAIDER_FACE_SPEED := 6.5
 var _raider_targets: Dictionary = {}
+var _raider_states: Dictionary = {}
+var _route_points: Dictionary = {}
+var _route_clock: Dictionary = {}
 var _world_id := ""
 var _world_seconds := -1.0
 var _restore_raiders := false
@@ -45,6 +55,8 @@ func _advance_raiders(delta: float) -> void:
 		return
 	# Bound a delayed frame without replacing the swept collision operation.
 	var elapsed := minf(delta, .1)
+	var saved: Array = state.get("player",{}).get("position",[0.0,0.0,0.0])
+	var player := Vector2(float(saved[0]),float(saved[2]))
 	for id: String in raiders:
 		var actor: CharacterBody3D = raiders[id]
 		var figure: Node3D = actor.get_node("Figure")
@@ -52,31 +64,95 @@ func _advance_raiders(delta: float) -> void:
 			figure.drive(0.0)
 			continue
 		var target: Vector3 = _raider_targets.get(id,actor.position)
+		var point := Vector2(actor.global_position.x,actor.global_position.z)
+		var enemy: Dictionary = _raider_states.get(id,{})
+		# The same visible-swing window as VillageLife: a raider that has begun
+		# its blow stands and completes it, even if the player steps away.
+		var swinging := not enemy.is_empty() and Strike.swinging(float(enemy.get("attack_timer",Strike.APPROACH_SECONDS)))
+		var engaged := point.distance_to(player) <= Strike.engage_distance()
+		if state.village.has("unarmed") and engaged:
+			engaged = raider_sight_check.is_valid() and bool(raider_sight_check.call(point,player))
 		if physical_raiders:
-			var saved: Array = state.get("player",{}).get("position",[0.0,0.0,0.0])
-			var player := Vector2(float(saved[0]),float(saved[2]))
-			var point := Vector2(actor.global_position.x,actor.global_position.z)
-			var near := point.distance_to(player) <= 2.2
-			if state.village.has("unarmed") and near:
-				near = raider_sight_check.is_valid() and bool(raider_sight_check.call(point,player))
-			var goal := point if near else (player if point.distance_to(player) < 7.0 else Vector2(5.0,5.0))
-			goal = goal.clamp(Vector2(-200,-200),Vector2(200,200))
+			var goal := point
+			if not engaged and not swinging and not enemy.is_empty():
+				_route_clock[id] = float(_route_clock.get(id,0.0))-elapsed
+				if float(_route_clock[id]) <= 0.0 or not _route_points.has(id):
+					# The stateless route is re-evaluated ten times per second
+					# from the actual swept body, exactly as the rule tick does.
+					var probe := enemy.duplicate()
+					probe.x = point.x
+					probe.z = point.y
+					_route_points[id] = Life.raider_waypoint(state,probe)
+					_route_clock[id] = Life.STEP
+				goal = _route_points[id]
 			target = to_local(Vector3(goal.x,actor.global_position.y,goal.y))
 		var offset := target-actor.position
 		offset.y = 0.0
 		var before := actor.position
-		var displacement := offset.limit_length(RAIDER_SPEED*elapsed)
+		var pace := RAIDER_SPEED
+		var wanted_heading := actor.rotation.y
+		if offset.length_squared() > .0001:
+			wanted_heading = atan2(-offset.x,-offset.z)
+		if physical_raiders:
+			# A body does not reach walking speed within one frame and does not
+			# walk sideways while it turns. It turns towards its next waypoint,
+			# steps off as it comes to face it and gathers pace over half a
+			# second; it slows into a sharp corner instead of pivoting at full
+			# pace. Sliding along a contact is not held back by its heading.
+			var limit := RAIDER_SPEED
+			if not bool(actor.get_meta("yielding",false)):
+				limit *= 1.0-smoothstep(RAIDER_ALIGN_FROM,RAIDER_ALIGN_TO,absf(angle_difference(actor.rotation.y,wanted_heading)))
+			var held := float(actor.get_meta("pace",0.0))
+			pace = move_toward(held,limit,(RAIDER_ACCELERATION if limit > held else RAIDER_BRAKING)*elapsed)
+		var displacement := offset.limit_length(pace*elapsed)
 		var hit: KinematicCollision3D
 		if displacement.length_squared() > .00000001:
 			hit = actor.move_and_collide(displacement)
+			if hit != null:
+				_slide_raider(actor,hit,displacement)
 		var travelled := actor.position-before
 		var actual_speed := Vector2(travelled.x,travelled.z).length()/elapsed
 		figure.drive(actual_speed)
 		actor.set_meta("actual_speed",actual_speed)
+		# The pace is the walker's own effort, not the distance a contact left
+		# him: clamping it to a deflected step would leave him creeping round
+		# every person in his way (measured: 0.05 m/s past the watch post).
+		actor.set_meta("pace",0.0 if offset.length_squared() <= .0001 else pace)
 		actor.set_meta("yielding",hit != null)
-		if travelled.length_squared() > .00000001:
-			var heading := atan2(-travelled.x,-travelled.z)
-			actor.rotation.y = rotate_toward(actor.rotation.y,heading,RAIDER_TURN_SPEED*elapsed)
+		if swinging or (offset.length_squared() <= .0001 and point.distance_to(player) <= Strike.reach()+.5):
+			# A standing fighter keeps the player in front of him.
+			var towards := player-point
+			if towards.length() > .05:
+				actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-towards.x,-towards.y),RAIDER_FACE_SPEED*elapsed)
+		elif hit != null and travelled.length_squared() > .00000001:
+			# Along a contact the body faces where it actually goes.
+			actor.rotation.y = rotate_toward(actor.rotation.y,atan2(-travelled.x,-travelled.z),RAIDER_TURN_SPEED*elapsed)
+		elif offset.length_squared() > .0001:
+			actor.rotation.y = rotate_toward(actor.rotation.y,wanted_heading,RAIDER_TURN_SPEED*elapsed)
+
+
+func _slide_raider(actor: CharacterBody3D, hit: KinematicCollision3D, displacement: Vector3) -> void:
+	# Continue the blocked remainder along the contact plane (swept again, so
+	# the slide itself cannot tunnel). A wall met head-on still stops the body.
+	var remainder := hit.get_remainder()
+	remainder.y = 0.0
+	var normal := hit.get_normal()
+	normal.y = 0.0
+	if remainder.length_squared() < .00000001 or normal.length_squared() < .0001:
+		return
+	normal = normal.normalized()
+	var slide := remainder-normal*minf(0.0,remainder.dot(normal))
+	if _is_person(hit.get_collider()) and slide.length() < remainder.length()*.35:
+		# Two people meeting head-on both step to their right, deterministically.
+		slide = Vector3(-displacement.z,0.0,displacement.x).normalized()*remainder.length()*.5
+	if slide.length_squared() > .00000001:
+		actor.move_and_collide(slide)
+
+
+func _is_person(collider: Object) -> bool:
+	if collider is CharacterBody3D and raiders.values().has(collider):
+		return true
+	return collider is CollisionObject3D and int((collider as CollisionObject3D).collision_layer) & Layout.CITIZEN_LAYER != 0
 
 
 func _process(delta: float) -> void:
@@ -439,6 +515,10 @@ func _sync_raiders() -> void:
 			figure.name = "Figure"
 			figure.position.y = .9
 			actor.add_child(figure)
+			# Owner decision D-040: the night riders are of unknown origin. The
+			# second argument only selects the shared northern kit and hair of
+			# the two available attacker models; no tribe, people or faction
+			# is saved, shown or derived for a raider (label "Angreifer").
 			figure.configure("enemy", "germania", 28)
 			figure.configure_appearance("spearman", raiders.size())
 			if raiders.size()%2 == 0:
@@ -463,6 +543,7 @@ func _sync_raiders() -> void:
 		if spawned or _restore_raiders:
 			actor.position = position
 			actor.reset_physics_interpolation()
+			_route_points.erase(id)
 		var figure: Node3D = actor.get_node("Figure")
 		figure.profile = quality
 		figure.refresh_lod(get_viewport().get_camera_3d())
@@ -470,15 +551,24 @@ func _sync_raiders() -> void:
 			figure.drive(0.0)
 			actor.set_meta("actual_speed",0.0)
 		var attack_clock := float(enemy.attack_timer)
-		if active and health > 0 and attack_clock > float(actor.get_meta("attack_clock", attack_clock)) + .2:
-			figure.cue("attack")
+		# The domain clock entering the wind-up starts the visible blow, timed
+		# so the clip's contact frame meets the damage tick (RaiderStrike).
+		# Resets of the clock (approach, after a blow, interrupt) never swing.
+		var previous_clock := INF if spawned or _restore_raiders else float(actor.get_meta("attack_clock", attack_clock))
+		if active and health > 0 and Strike.swinging(attack_clock) and attack_clock > .000001 and not Strike.swinging(previous_clock):
+			var accumulator := float(state.village.social.get("accumulator",0.0))
+			figure.cue_strike(maxf(.05,attack_clock-accumulator))
+			actor.set_meta("strike_cues",int(actor.get_meta("strike_cues",0))+1)
 		actor.set_meta("attack_clock", attack_clock)
+		_raider_states[id] = enemy
 		# A loaded casualty has no new health delta. Reassert the saved
 		# terminal pose after spawn or GameWorld.setup resets the figure.
 		# cue("death") is idempotent, so normal sync never restarts the fall.
 		if health <= 0:
 			figure.cue("death")
 		elif health < previous:
+			# Every received hit shows its own reaction. The rules interrupt a
+			# begun blow on the same hit, so the swing never lands unseen.
 			figure.cue("hit")
 		actor.set_meta("health", health)
 		actor.get_node("Health").text = "Angreifer · %d" % health if health > 0 else "Abgewehrt"
@@ -491,6 +581,9 @@ func _sync_raiders() -> void:
 			actor.free()
 			raiders.erase(id)
 			_raider_targets.erase(id)
+			_raider_states.erase(id)
+			_route_points.erase(id)
+			_route_clock.erase(id)
 	_restore_raiders = false
 
 
