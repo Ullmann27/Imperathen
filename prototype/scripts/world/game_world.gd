@@ -64,6 +64,9 @@ var _enemy_attack_cooldown := 1.3
 var _animation_time := 0.0
 var _resolve_requested := false
 var _touch_move := Vector2.ZERO
+var _navigation_chapter: Dictionary = {}
+var _navigation_chapter_hash := 0
+var _navigation_chapter_known := false
 var _gesture_index := -1
 var _camera_contacts: Dictionary[int, Vector2] = {}
 var _gesture_start := Vector2.ZERO
@@ -466,7 +469,14 @@ func navigation_view() -> Dictionary:
 	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false}
 	if not Childhood.enabled(_state):
 		return result
-	var chapter:=Childhood.view(_state)
+	# Childhood.view() is a pure function of the state; the map calls this
+	# every frame. Recompute it only when the state content has changed.
+	var content:=_state.hash()
+	if not _navigation_chapter_known or content!=_navigation_chapter_hash:
+		_navigation_chapter=Childhood.view(_state)
+		_navigation_chapter_hash=content
+		_navigation_chapter_known=true
+	var chapter:=_navigation_chapter
 	var target: Variant=chapter.get("point",null)
 	var npc:=str(chapter.get("target_npc",""))
 	if not npc.is_empty() and VillageLife.has_npc(_state,npc):

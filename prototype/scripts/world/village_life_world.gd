@@ -33,6 +33,10 @@ var _world_seconds := -1.0
 var _restore_raiders := false
 var physical_raiders := false
 var raider_sight_check: Callable
+# Descendant collision bodies, rebuilt only after a node enters or leaves
+# this subtree. Avoids a full recursive search on every UI refresh.
+var _collision_bodies: Array = []
+var _collision_bodies_dirty := true
 
 
 func _physics_process(delta: float) -> void:
@@ -292,8 +296,30 @@ func sync_state(data: Dictionary, profile: String) -> void:
 	_sync_raiders()
 
 
+func _enter_tree() -> void:
+	_collision_bodies_dirty = true
+	if not get_tree().node_added.is_connected(_on_tree_node_changed):
+		get_tree().node_added.connect(_on_tree_node_changed)
+		get_tree().node_removed.connect(_on_tree_node_changed)
+
+
+func _exit_tree() -> void:
+	_collision_bodies_dirty = true
+	if get_tree().node_added.is_connected(_on_tree_node_changed):
+		get_tree().node_added.disconnect(_on_tree_node_changed)
+		get_tree().node_removed.disconnect(_on_tree_node_changed)
+
+
+func _on_tree_node_changed(node: Node) -> void:
+	if not _collision_bodies_dirty and is_ancestor_of(node):
+		_collision_bodies_dirty = true
+
+
 func _set_collisions(enabled: bool) -> void:
-	for body: CollisionObject3D in find_children("*","CollisionObject3D",true,false):
+	if _collision_bodies_dirty or not is_inside_tree():
+		_collision_bodies = find_children("*","CollisionObject3D",true,false)
+		_collision_bodies_dirty = not is_inside_tree()
+	for body: CollisionObject3D in _collision_bodies:
 		if not body.has_meta("visible_layer"):
 			body.set_meta("visible_layer",body.collision_layer)
 		body.collision_layer = int(body.get_meta("visible_layer")) if enabled else 0
