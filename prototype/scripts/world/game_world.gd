@@ -11,11 +11,15 @@ const VillageLife = preload("res://scripts/story/village_life.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const CompanionWorld = preload("res://scripts/world/companion_world.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
+const FarRelief = preload("res://scripts/world/land/far_relief.gd")
+const ValdoraLand = preload("res://scripts/world/village/valdora_land.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
 const CameraObstruction = preload("res://scripts/world/camera_obstruction.gd")
 var village_life_world: Node3D
 var regional_terrain: Node3D
+## Distant land and mountain horizon beyond the streamed terrain.
+var far_relief: Node3D
 var _village_focus := ""
 var _dodge_remaining := 0.0
 var _dodge_direction := Vector3.ZERO
@@ -642,7 +646,8 @@ func _build_scene() -> void:
 	_camera.name = "WorldCamera"
 	_camera.fov = 54.0
 	_camera.near = 0.12
-	_camera.far = 300.0
+	# Long sight lines: the far relief reaches the mountain horizon.
+	_camera.far = FarRelief.CAMERA_FAR_M
 	add_child(_camera)
 	_camera.current = true
 	_hint = Art.label(_player, "", Vector3(0, 1.25, 0), Color(1, 0.92, 0.70), 33)
@@ -656,6 +661,11 @@ func _build_scene() -> void:
 	regional_terrain = RegionalTerrain.new()
 	regional_terrain.name = "RegionalTerrain"
 	add_child(regional_terrain)
+	far_relief = FarRelief.new()
+	far_relief.name = "FarRelief"
+	add_child(far_relief)
+	scenery.register_land(regional_terrain.ground_material)
+	scenery.register_land(far_relief.material)
 	_update_camera(0.016)
 
 
@@ -714,6 +724,11 @@ func _create_terrain() -> void:
 		var z := random.randf_range(-42, 28) if index < 22 else random.randf_range(-46, -27)
 		var at := Vector3(x,0,z)
 		if VillageLayout.reserved(Vector2(x,z),1.3) or VillageLayout.road(Vector2(x,z)):
+			continue
+		# No trunk on a landscape track; the two draws keep the later sites unchanged.
+		if ValdoraLand.in_track(Vector2(x,z),1.2):
+			random.randf_range(0.8,1.15)
+			random.randf_range(-PI,PI)
 			continue
 		tree_sites.append({"kind":Grove.KINDS[index%3],"position":at,"scale":random.randf_range(0.8,1.15),"yaw":random.randf_range(-PI,PI)})
 		Art.box_collider(ground, Vector3(0.44,2.6,0.44), at+Vector3.UP*1.3)
@@ -1149,6 +1164,7 @@ func _physics_process(delta: float) -> void:
 	if not _built or _camera == null:
 		return
 	_update_camera(delta)
+	far_relief.follow(get_player_position(), _quality_profile)
 	if _state.get("village", {}).get("enabled", false):
 		regional_terrain.follow(get_player_position(), _quality_profile)
 	population.update_nearby(get_player_position(),_active and _mode == "person")

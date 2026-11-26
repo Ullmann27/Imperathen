@@ -50,7 +50,7 @@ func setup(world: Node3D) -> bool:
 		camera = Camera3D.new()
 		camera.name = "OpeningCamera"
 		camera.near = 0.12
-		camera.far = 300.0
+		camera.far = _game_camera.far
 		camera.current = false
 		add_child(camera)
 	set_process(false)

@@ -13,8 +13,9 @@ const TRACK_REACH_M := 420.0
 ## Outer palisade gates (north z, south z, east x) and the west bridge end.
 const NORTH_GATE_Z := -49.0
 const SOUTH_GATE_Z := 30.0
-const EAST_STREET_X := 30.0
 const EAST_GATE_X := 48.0
+## The east track begins outside the gate yard (village_layout.gd reserves it).
+const EAST_TRACK_START_X := 52.0
 const EAST_GATE_Z := -13.0
 const WEST_BRIDGE_X := -33.0
 const BRIDGE_Z := 4.0
@@ -62,8 +63,9 @@ static func track_distance(p: Vector2) -> float:
 		best = minf(best, absf(p.x - north_track_x(p.y)))
 	if p.y > SOUTH_GATE_Z and p.y < TRACK_REACH_M:
 		best = minf(best, absf(p.x - south_track_x(p.y)))
-	if p.x > EAST_STREET_X and p.x < TRACK_REACH_M:
-		best = minf(best, absf(p.y - east_track_z(p.x)))
+	if p.x > EAST_TRACK_START_X and p.x < TRACK_REACH_M:
+		# The tread widens from a point as it leaves the gate yard.
+		best = minf(best, absf(p.y - east_track_z(p.x)) + maxf(0.0, EAST_TRACK_START_X + 4.0 - p.x) * .6)
 	if p.x < WEST_BRIDGE_X and p.x > -TRACK_REACH_M:
 		best = minf(best, absf(p.y - west_track_z(p.x)))
 	return best
@@ -120,20 +122,18 @@ static func bed_offset(p: Vector2, source_z: float) -> float:
 	var half := water_half_width(p.y, source_z)
 	if half <= 0.0:
 		return 0.0
-	# Narrow water near the ends is shallower and has gentler banks.
-	var scale := clampf(half / 2.0, 0.0, 1.0)
 	var outside := absf(p.x - channel_x(p.y)) - half
 	if outside >= BANK_WIDTH_M:
 		return 0.0
 	if outside >= 0.0:
-		return WATER_SURFACE_Y * scale * smoothstep(0.0, 1.0, 1.0 - outside / BANK_WIDTH_M)
-	var deep := smoothstep(0.0, 1.0, minf(1.0, -outside / SHELF_WIDTH_M))
-	return (WATER_SURFACE_Y - (BED_DEPTH_M + WATER_SURFACE_Y) * deep) * scale
+		return WATER_SURFACE_Y * smoothstep(0.0, 1.0, 1.0 - outside / BANK_WIDTH_M)
+	# Narrow water near the spring and in the fen is shallower.
+	var deep := smoothstep(0.0, 1.0, minf(1.0, -outside / SHELF_WIDTH_M)) * clampf(half / 2.0, 0.0, 1.0)
+	return WATER_SURFACE_Y - (BED_DEPTH_M + WATER_SURFACE_Y) * deep
 
 
 ## Water depth in metres at p (0 on land).
 static func water_depth(p: Vector2, source_z: float) -> float:
 	if water_distance(p, source_z) >= 0.0:
 		return 0.0
-	var scale := clampf(water_half_width(p.y, source_z) / 2.0, 0.0, 1.0)
-	return maxf(0.0, WATER_SURFACE_Y * scale - bed_offset(p, source_z))
+	return maxf(0.0, WATER_SURFACE_Y - bed_offset(p, source_z))

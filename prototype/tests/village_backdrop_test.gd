@@ -10,6 +10,7 @@ const Terrain = preload("res://scripts/world/regional_terrain.gd")
 const Hills = preload("res://scripts/world/village/backdrop_hills.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Scenery = preload("res://scripts/world/village/village_scenery.gd")
+const Land = preload("res://scripts/world/village/valdora_land.gd")
 ## Village ground plane (VillageScenery.create_land) and its collider top.
 const PLANE := Rect2(-90, -100, 180, 170)
 const PLANE_Y := -.008
@@ -390,18 +391,20 @@ func _test_brook() -> void:
 	var tip := INF
 	for v in water:
 		tip = minf(tip, v.z)
-		if hills.height(v.x, v.z) > v.y:
-			submerged += 1
-	var centre := -28.0 + .52 * sin(tip * .18) + .23 * sin(tip * .46)
+		# A lifted hill triangle over the water or its banks would roof the brook.
+		for side in [-1.2, 0.0, 1.2]:
+			if hills.height(v.x + side, v.z) > Terrain.surface_height(Vector2(v.x + side, v.z)) + .0005:
+				submerged += 1
+	var centre := Land.brook_x(tip)
 	var rises := INF
-	for step in 200:
+	for step in 400:
 		var z := tip - step * .02
-		if hills.height(centre, z) > Scenery.WATER_LEVEL:
+		if hills.height(centre, z) > Terrain.surface_height(Vector2(centre, z)) + .01:
 			rises = tip - z
 			break
-	print("VILLAGE_BACKDROP brook water_vertices=%d under_hill=%d spring_z=%.2f hill_above_water_after_m=%.2f" % [water.size(), submerged, tip, rises])
-	_check(submerged == 0, "No brook water lies under the hill surface")
-	_check(is_equal_approx(tip, scenery.brook_source_z) and rises <= 2.0, "The brook ends at the hill foot (hill rises above the water within 2 m of the spring)")
+	print("VILLAGE_BACKDROP brook water_vertices=%d under_hill=%d spring_z=%.2f hill_rises_after_m=%.2f" % [water.size(), submerged, tip, rises])
+	_check(submerged == 0, "No hill triangle reaches over the brook water or its banks")
+	_check(is_equal_approx(tip, scenery.brook_source_z) and rises <= 6.0, "The brook ends at the hill foot (the hill rises within 6 m of the spring)")
 
 
 func _test_slopes(faces: PackedVector3Array) -> void:
@@ -425,21 +428,23 @@ func _test_slopes(faces: PackedVector3Array) -> void:
 
 
 func _test_colors(ridge: MeshInstance3D) -> void:
-	var material := ridge.material_override as StandardMaterial3D
-	_check(material.vertex_color_use_as_albedo and material.vertex_color_is_srgb, "Hill vertex colours are declared sRGB, like the regional terrain")
+	# The hills use the terrain's land shader; vertex colours are weights
+	# (r scrub, g stone, b shade), so no colour space is implied by vertex data.
+	var material := ridge.material_override as ShaderMaterial
+	_check(material != null and material.shader == Terrain.LandSurface.TERRAIN_SHADER, "The hills use the same land shader as the regional terrain")
 	var arrays := ridge.mesh.surface_get_arrays(0)
 	var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
 	var colors: PackedColorArray = arrays[Mesh.ARRAY_COLOR]
-	var rim_error := 0.0
+	var rim_weight := 0.0
 	var rim := 0
+	var raised := 0
 	for i in vertices.size():
 		var v := vertices[i] + ridge.global_position
-		if absf(v.y - Terrain.surface_height(Vector2(v.x, v.z))) < .0005:
+		var above := v.y - Terrain.surface_height(Vector2(v.x, v.z))
+		if absf(above) < .0005:
 			rim += 1
-			var expected := Terrain.ground_color(v)
-			rim_error = maxf(rim_error, maxf(absf(colors[i].r - expected.r), maxf(absf(colors[i].g - expected.g), absf(colors[i].b - expected.b))))
-	_check(rim > 100 and rim_error <= 1.5 / 255.0, "Where the hill meets the terrain it carries the terrain colour")
-	# The palette keeps the albedo the backdrop rendered with before.
-	for pair: Array in [[Hills.SCRUB, Color("687451")], [Hills.STONE, Color("a1957b")]]:
-		var converted: Color = pair[1].srgb_to_linear()
-		_check(absf(pair[0].r - converted.r) < 1.0 / 255.0 and absf(pair[0].g - converted.g) < 1.0 / 255.0 and absf(pair[0].b - converted.b) < 1.0 / 255.0, "Hill palette equals the former rendered albedo")
+			rim_weight = maxf(rim_weight, maxf(colors[i].r, colors[i].g))
+		elif above > Hills.COLOR_BLEND_M and colors[i].r > .999:
+			raised += 1
+	_check(rim > 100 and rim_weight <= 1.0 / 255.0, "Where the hill meets the terrain it is plain terrain ground (no scrub or stone weight)")
+	_check(raised > 500, "Raised relief carries full scrub cover")

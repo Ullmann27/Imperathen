@@ -10,6 +10,7 @@ extends RefCounted
 ## reproduces the terrain surface exactly; relief >= 0 keeps the hill on or above it.
 
 const Terrain = preload("res://scripts/world/regional_terrain.gd")
+const Land = preload("res://scripts/world/village/valdora_land.gd")
 const SUBDIVISION := 6
 ## Vertex index ranges (inclusive). x: -208.3..208.3 m, z: -152.8..-66.0 m.
 const COLUMN_FIRST := -60
@@ -25,11 +26,15 @@ const BACK_Z := -150.0
 const FALL_M := 40.0
 const END_X := 205.0
 const TAPER_M := 45.0
-## Scrub and stone albedo (sRGB). These equal #687451/#a1957b taken through one
-## sRGB-to-linear step: exactly the albedo the former backdrop rendered with.
-const SCRUB := Color("232d15")
-const STONE := Color("5b4d33")
+## Raised ground turns from meadow to scrub over this height.
 const COLOR_BLEND_M := 2.5
+## The north track (valdora_land.gd) crosses the hills in a hollow way: the
+## ridge is lower within NOTCH_HALF_WIDTH_M of it and the ground is level
+## across the tread, easing into the natural slope by TREAD_BLEND_M.
+const NOTCH_HALF_WIDTH_M := 26.0
+const NOTCH_DEPTH := 0.45
+const TREAD_HALF_M := 2.6
+const TREAD_BLEND_M := 7.5
 
 
 static func step_m() -> float:
@@ -43,6 +48,15 @@ static func foot_z(x: float) -> float:
 ## Height above the regional ground (>= 0). The crest keeps the former
 ## irregular ridge profile (same harmonics) between about z = -100 and -110.
 static func relief(p: Vector2) -> float:
+	var centre := Land.north_track_x(p.y)
+	var offset := absf(p.x - centre)
+	if offset >= NOTCH_HALF_WIDTH_M:
+		return _ridge(p)
+	var notch := 1.0 - NOTCH_DEPTH * (1.0 - smoothstep(4.0, NOTCH_HALF_WIDTH_M, offset))
+	return lerpf(_ridge(Vector2(centre, p.y)), _ridge(p), smoothstep(TREAD_HALF_M, TREAD_BLEND_M, offset)) * notch
+
+
+static func _ridge(p: Vector2) -> float:
 	var front := smoothstep(0.0, 1.0, (foot_z(p.x) - p.y) / RISE_M)
 	var back := smoothstep(0.0, 1.0, (p.y - BACK_Z) / FALL_M)
 	var ends := smoothstep(0.0, 1.0, (END_X - absf(p.x)) / TAPER_M)
@@ -56,11 +70,11 @@ static func vertex_position(column: int, row: int) -> Vector3:
 	return Vector3(p.x, Terrain.surface_height(p) + relief(p), p.y)
 
 
-static func vertex_color(position: Vector3, height_above_ground: float) -> Color:
+## Weights for terrain.gdshader: r scrub cover, g bare stone, b shade.
+static func vertex_weights(position: Vector3, height_above_ground: float) -> Color:
 	var stone := smoothstep(9.0, 20.0, height_above_ground + 3.0 * sin(position.x * .14))
-	# .28 on the converted palette equals the former .13 darkening before conversion.
-	var hill := SCRUB.lerp(STONE, stone).darkened(.28 * absf(sin(position.x * .3 + position.z * .52)))
-	return Terrain.ground_color(position).lerp(hill, smoothstep(0.0, COLOR_BLEND_M, height_above_ground))
+	return Color(smoothstep(0.0, COLOR_BLEND_M, height_above_ground), stone,
+		absf(sin(position.x * .3 + position.z * .52)), 1.0)
 
 
 static func covers(p: Vector2) -> bool:
@@ -99,7 +113,7 @@ static func build_mesh() -> ArrayMesh:
 			var above := relief(p)
 			var position := Vector3(p.x, Terrain.surface_height(p) + above, p.y)
 			lifted.append(1 if above > 0.0 else 0)
-			surface.set_color(vertex_color(position, above))
+			surface.set_color(vertex_weights(position, above))
 			surface.add_vertex(position)
 	for row in ROW_LAST - ROW_FIRST:
 		for column in columns - 1:
@@ -116,11 +130,6 @@ static func build_mesh() -> ArrayMesh:
 	return surface.commit()
 
 
-## Material shared by the visual mesh: sRGB vertex albedo, like the terrain.
-static func material() -> StandardMaterial3D:
-	var paint := StandardMaterial3D.new()
-	paint.vertex_color_use_as_albedo = true
-	paint.vertex_color_is_srgb = true
-	paint.roughness = .96
-	paint.cull_mode = BaseMaterial3D.CULL_BACK
-	return paint
+## The hills use the terrain's land shader (turf, scrub, scree, track, haze).
+static func material() -> ShaderMaterial:
+	return Terrain.LandSurface.make_terrain()
