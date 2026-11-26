@@ -1,0 +1,1409 @@
+{
+  "family_home": {
+    "bench_cup": [
+      1.92999994754791,
+      -0.379999995231628
+    ],
+    "bench_jug": [
+      1.92999994754791,
+      0.180000007152557
+    ],
+    "bench_top": 0.5,
+    "id": "baker_home",
+    "people": [
+      [
+        -1.14999997615814,
+        -1.72000002861023
+      ],
+      [
+        0.0500000007450581,
+        -0.0500000007450581
+      ],
+      [
+        -1.0,
+        0.550000011920929
+      ],
+      [
+        0.949999988079071,
+        -0.449999988079071
+      ]
+    ],
+    "shelf_cups": [
+      [
+        -2.3199999332428,
+        0.779999971389771
+      ],
+      [
+        -2.3199999332428,
+        1.08000004291534
+      ],
+      [
+        -2.3199999332428,
+        1.37999999523163
+      ]
+    ],
+    "shelf_top": 1.08,
+    "story_props": "three cups and the jug belong to the I-01 slice (world/village/i01_props.gd)",
+    "table_cups": [
+      [
+        -1.35000002384186,
+        -0.980000019073486
+      ],
+      [
+        -0.5,
+        -0.5
+      ],
+      [
+        -0.850000023841858,
+        -0.150000005960464
+      ]
+    ],
+    "table_jug": [
+      -0.550000011920929,
+      -0.850000023841858
+    ],
+    "table_top": 0.865
+  },
+  "households": {
+    "AtriumHouse": {
+      "profession": "landowner",
+      "shell": "atrium_house",
+      "signature_props": [
+        "cartibulum",
+        "arca",
+        "lararium",
+        "loom_warp",
+        "candelabrum",
+        "armarium",
+        "bronze_vessels"
+      ],
+      "wealth": 4
+    },
+    "baker_home": {
+      "profession": "family",
+      "shell": "frontier_house",
+      "signature_props": [
+        "wall_shelf_deep",
+        "table_bread",
+        "farm_tools_lean",
+        "pallet_brown",
+        "oil_lamp"
+      ],
+      "wealth": 1
+    },
+    "carpenter_home": {
+      "profession": "carpenter",
+      "shell": "frontier_house",
+      "signature_props": [
+        "workbench_low",
+        "carpentry_tools"
+      ],
+      "wealth": 2
+    },
+    "charcoal_home": {
+      "profession": "charcoal_burner",
+      "shell": "frontier_house",
+      "signature_props": [
+        "basket_charcoal",
+        "pallet_brown"
+      ],
+      "wealth": 1
+    },
+    "cloth_home": {
+      "profession": "cloth_trader",
+      "shell": "frontier_house",
+      "signature_props": [
+        "cloth_bolts",
+        "workbench"
+      ],
+      "wealth": 3
+    },
+    "cooper_home": {
+      "profession": "cooper",
+      "shell": "frontier_house",
+      "signature_props": [
+        "barrel",
+        "staves_bundle",
+        "workbench_low"
+      ],
+      "wealth": 2
+    },
+    "dairy_home": {
+      "profession": "dairy",
+      "shell": "frontier_house",
+      "signature_props": [
+        "cheese_press",
+        "bucket_milk",
+        "cheese_stack"
+      ],
+      "wealth": 2
+    },
+    "elder_home": {
+      "profession": "elder",
+      "shell": "frontier_house",
+      "signature_props": [
+        "lararium",
+        "arca",
+        "bed_fine",
+        "chair_wicker"
+      ],
+      "wealth": 3
+    },
+    "farmer_home": {
+      "profession": "farmer",
+      "shell": "frontier_house",
+      "signature_props": [
+        "farm_tools_lean",
+        "hang_sickles",
+        "sack_grain"
+      ],
+      "wealth": 1
+    },
+    "grain_home": {
+      "profession": "miller",
+      "shell": "frontier_house",
+      "signature_props": [
+        "quern",
+        "sack_flour",
+        "basket_flour"
+      ],
+      "wealth": 2
+    },
+    "guard_home": {
+      "profession": "guard",
+      "shell": "frontier_house",
+      "signature_props": [
+        "guard_kit",
+        "hang_cloak"
+      ],
+      "wealth": 1
+    },
+    "healer_home": {
+      "profession": "healer",
+      "shell": "frontier_house",
+      "signature_props": [
+        "hang_herbs",
+        "mortar_pestle",
+        "pallet_madder"
+      ],
+      "wealth": 2
+    },
+    "leather_home": {
+      "profession": "leatherworker",
+      "shell": "frontier_house",
+      "signature_props": [
+        "hide_frame",
+        "hides_stack",
+        "hang_leather"
+      ],
+      "wealth": 2
+    },
+    "potter_home": {
+      "profession": "potter",
+      "shell": "frontier_house",
+      "signature_props": [
+        "shelf_rack",
+        "jar_olla",
+        "amphora_stand"
+      ],
+      "wealth": 2
+    },
+    "scribe_home": {
+      "profession": "scribe",
+      "shell": "frontier_house",
+      "signature_props": [
+        "desk_writing",
+        "capsa",
+        "scroll_pile"
+      ],
+      "wealth": 3
+    },
+    "smith_home": {
+      "profession": "smith",
+      "shell": "frontier_house",
+      "signature_props": [
+        "smith_tools",
+        "iron_bars",
+        "basket_charcoal"
+      ],
+      "wealth": 2
+    },
+    "south_baker_home": {
+      "profession": "baker",
+      "shell": "frontier_house",
+      "signature_props": [
+        "hearth_baker",
+        "kneading_trough",
+        "bread_loaves"
+      ],
+      "wealth": 2
+    },
+    "south_weaver_home": {
+      "profession": "spinner",
+      "shell": "frontier_house",
+      "signature_props": [
+        "loom_warp",
+        "spinning_basket",
+        "basket_wool"
+      ],
+      "wealth": 1
+    },
+    "vintner_home": {
+      "profession": "vintner",
+      "shell": "frontier_house",
+      "signature_props": [
+        "dolium",
+        "barrel",
+        "amphora_rack",
+        "tavern_set",
+        "workbench",
+        "basket_grapes",
+        "candle_dish"
+      ],
+      "wealth": 2
+    },
+    "wagon_home": {
+      "profession": "carter",
+      "shell": "frontier_house",
+      "signature_props": [
+        "wheel_lean",
+        "rope_coil",
+        "hang_leather"
+      ],
+      "wealth": 2
+    },
+    "weaver_home": {
+      "profession": "weaver",
+      "shell": "frontier_house",
+      "signature_props": [
+        "loom_madder",
+        "loom_weights_pile",
+        "spinning_basket"
+      ],
+      "wealth": 2
+    }
+  },
+  "interiors": [
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "baker_home",
+      "kind": "house",
+      "origin_abs": [
+        -13.0,
+        0.0,
+        11.0
+      ],
+      "profession": "family",
+      "shell": "frontier_house",
+      "wealth": 1,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "carpenter_home",
+      "kind": "house",
+      "origin_abs": [
+        -14.0,
+        0.0,
+        -11.0
+      ],
+      "profession": "carpenter",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "weaver_home",
+      "kind": "house",
+      "origin_abs": [
+        -5.0,
+        0.0,
+        -19.0
+      ],
+      "profession": "weaver",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "farmer_home",
+      "kind": "house",
+      "origin_abs": [
+        20.0,
+        0.0,
+        -18.0
+      ],
+      "profession": "farmer",
+      "shell": "frontier_house",
+      "wealth": 1,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "potter_home",
+      "kind": "house",
+      "origin_abs": [
+        -14.0,
+        0.0,
+        -28.0
+      ],
+      "profession": "potter",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "healer_home",
+      "kind": "house",
+      "origin_abs": [
+        -14.0,
+        0.0,
+        -41.0
+      ],
+      "profession": "healer",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "elder_home",
+      "kind": "house",
+      "origin_abs": [
+        -4.0,
+        0.0,
+        -41.0
+      ],
+      "profession": "elder",
+      "shell": "frontier_house",
+      "wealth": 3,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "scribe_home",
+      "kind": "house",
+      "origin_abs": [
+        8.0,
+        0.0,
+        -43.0
+      ],
+      "profession": "scribe",
+      "shell": "frontier_house",
+      "wealth": 3,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "vintner_home",
+      "kind": "house",
+      "origin_abs": [
+        24.0,
+        0.0,
+        -43.0
+      ],
+      "profession": "vintner",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "guard_home",
+      "kind": "house",
+      "origin_abs": [
+        38.0,
+        0.0,
+        -39.0
+      ],
+      "profession": "guard",
+      "shell": "frontier_house",
+      "wealth": 1,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": -90.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "smith_home",
+      "kind": "house",
+      "origin_abs": [
+        38.0,
+        0.0,
+        -26.0
+      ],
+      "profession": "smith",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": -90.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "cloth_home",
+      "kind": "house",
+      "origin_abs": [
+        38.0,
+        0.0,
+        -10.0
+      ],
+      "profession": "cloth_trader",
+      "shell": "frontier_house",
+      "wealth": 3,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": -90.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "wagon_home",
+      "kind": "house",
+      "origin_abs": [
+        38.0,
+        0.0,
+        8.0
+      ],
+      "profession": "carter",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": -90.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "charcoal_home",
+      "kind": "house",
+      "origin_abs": [
+        -5.0,
+        0.0,
+        -29.0
+      ],
+      "profession": "charcoal_burner",
+      "shell": "frontier_house",
+      "wealth": 1,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "leather_home",
+      "kind": "house",
+      "origin_abs": [
+        16.0,
+        0.0,
+        -43.0
+      ],
+      "profession": "leatherworker",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "grain_home",
+      "kind": "house",
+      "origin_abs": [
+        21.0,
+        0.0,
+        -8.0
+      ],
+      "profession": "miller",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "south_baker_home",
+      "kind": "house",
+      "origin_abs": [
+        -14.0,
+        0.0,
+        24.0
+      ],
+      "profession": "baker",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "south_weaver_home",
+      "kind": "house",
+      "origin_abs": [
+        -5.0,
+        0.0,
+        24.0
+      ],
+      "profession": "spinner",
+      "shell": "frontier_house",
+      "wealth": 1,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "cooper_home",
+      "kind": "house",
+      "origin_abs": [
+        15.0,
+        0.0,
+        19.0
+      ],
+      "profession": "cooper",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          2.68,
+          2.8675,
+          2.17
+        ],
+        "min": [
+          -2.68,
+          0.0,
+          -2.17
+        ]
+      },
+      "door": {
+        "height": 2.0975,
+        "wall": "S",
+        "x": [
+          -0.56,
+          0.56
+        ]
+      },
+      "floor_abs": 0.3925,
+      "id": "dairy_home",
+      "kind": "house",
+      "origin_abs": [
+        41.0,
+        0.0,
+        23.0
+      ],
+      "profession": "dairy",
+      "shell": "frontier_house",
+      "wealth": 2,
+      "windows": "shells.frontier_house.windows",
+      "yaw_deg": -90.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          5.2,
+          3.0,
+          4.74
+        ],
+        "min": [
+          -5.2,
+          0.0,
+          -4.7
+        ]
+      },
+      "door": {
+        "passage_z": [
+          2.65,
+          4.75
+        ],
+        "wall": "S",
+        "x": [
+          -0.92,
+          0.92
+        ]
+      },
+      "floor_abs": 0.065,
+      "id": "AtriumHouse",
+      "kind": "atrium",
+      "origin_abs": [
+        14.0,
+        0.0,
+        -30.0
+      ],
+      "profession": "landowner",
+      "shell": "atrium_house",
+      "wealth": 4,
+      "windows": "shells.atrium_house.windows",
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          1.45,
+          2.95,
+          3.2
+        ],
+        "min": [
+          -1.9,
+          0.0,
+          -3.35
+        ]
+      },
+      "door": {},
+      "floor_abs": 0.0,
+      "id": "VillageForge",
+      "kind": "smithy",
+      "origin_abs": [
+        34.0999984741211,
+        0.0,
+        -26.2000007629395
+      ],
+      "shell": "open site",
+      "windows": [],
+      "yaw_deg": 0.0
+    },
+    {
+      "bounds_local": {
+        "max": [
+          3.6,
+          2.95,
+          3.4
+        ],
+        "min": [
+          -3.6,
+          0.0,
+          -3.4
+        ]
+      },
+      "door": {},
+      "floor_abs": 0.0,
+      "id": "ValdoraMarket",
+      "kind": "market",
+      "origin_abs": [
+        25.0,
+        0.0,
+        24.0
+      ],
+      "shell": "open site",
+      "windows": [],
+      "yaw_deg": 0.0
+    }
+  ],
+  "min_corridor_width": 0.6,
+  "needs_from_shells": [
+    "A collider whose top equals the visible paving, flat within the standing limits.",
+    "Door clear width >= 1.10 m and height >= 2.00 m; an open leaf rests against a wall, outside the doorway-clear box.",
+    "Interior furniture as separate nodes, not merged into roof or wall meshes (frontier_house bakes table and bench into its roof-board surface).",
+    "A hearth zone of about 1.1 x 1.1 m near a window or the door (smoke, light) with >= 2.6 m clear height above.",
+    "One solid wall run >= 2.3 m without openings below 1.9 m (loom, shelf rack, workbench) and a solid back wall run >= 2.0 m for a bed.",
+    "Plaster faces without openings between 1.2 and 2.0 m where shelves, peg rails or a house shrine hang.",
+    "Wealth tiers: 1-2 one room of >= 20 m2; 3 adds storage space or a second room; 4 (atrium) separate reception and work areas.",
+    "Publish these same keys per new shell so house_interiors.gd can place against it."
+  ],
+  "schema": 2,
+  "shells": {
+    "atrium_house": {
+      "dado_height": {
+        "rear": 1.04,
+        "side": 1.06
+      },
+      "door": {
+        "centre_x": 0.0,
+        "clear_width": 1.84,
+        "open_leaves": "against the fauces walls",
+        "passage_z": [
+          2.65,
+          4.75
+        ],
+        "wall": "S"
+      },
+      "floor_abs": 0.065,
+      "obstacles": "impluvium basin, four columns, rear bench, two jars, mosaic strips (see shell())",
+      "plaster_faces": {
+        "E": 5.2,
+        "N": -4.7,
+        "S": 4.74,
+        "W": -5.2
+      },
+      "standing_limits": {
+        "E": 5.12,
+        "N": -4.73,
+        "S": 4.74,
+        "W": -5.12
+      },
+      "used_by": [
+        "AtriumHouse"
+      ],
+      "windows": [
+        {
+          "head": 2.465,
+          "sill": 1.605,
+          "wall": "S",
+          "x": [
+            -4.05,
+            -2.87
+          ]
+        },
+        {
+          "head": 2.465,
+          "sill": 1.605,
+          "wall": "S",
+          "x": [
+            2.87,
+            4.05
+          ]
+        }
+      ]
+    },
+    "frontier_house": {
+      "baked_furniture": [
+        {
+          "name": "table",
+          "top": 0.85,
+          "x": [
+            -1.825,
+            -0.375
+          ],
+          "z": [
+            -1.1525,
+            -0.0675
+          ]
+        },
+        {
+          "name": "wall_bench",
+          "top": 0.5,
+          "x": [
+            1.68,
+            2.18
+          ],
+          "z": [
+            -0.95,
+            0.95
+          ]
+        },
+        {
+          "centre": [
+            -2.23000001907349,
+            1.47000002861023
+          ],
+          "height": 0.62,
+          "name": "corner_jar",
+          "radius": 0.27
+        }
+      ],
+      "door": {
+        "centre_x": 0.0,
+        "clear_height": 2.0975,
+        "clear_width": 1.12,
+        "open_leaf": {
+          "hinge": [
+            -0.575,
+            2.15
+          ],
+          "length": 1.12,
+          "open_degrees": 100,
+          "thickness": 0.064
+        },
+        "wall": "S"
+      },
+      "floor_abs": 0.3925,
+      "plaster_faces": {
+        "E": 2.68,
+        "N": -2.17,
+        "S": 2.17,
+        "W": -2.68
+      },
+      "standing_limits": {
+        "x": 2.63499999046326,
+        "z": 2.125
+      },
+      "stations": [
+        [
+          0.0,
+          1.95000004768372
+        ],
+        [
+          0.95,
+          -0.85
+        ],
+        [
+          0.8,
+          1.2
+        ],
+        [
+          -0.8,
+          0.25
+        ],
+        [
+          -1.75,
+          0.45
+        ]
+      ],
+      "used_by": [
+        "carpenter_home",
+        "charcoal_home",
+        "cloth_home",
+        "cooper_home",
+        "dairy_home",
+        "elder_home",
+        "farmer_home",
+        "grain_home",
+        "guard_home",
+        "healer_home",
+        "leather_home",
+        "potter_home",
+        "scribe_home",
+        "smith_home",
+        "south_baker_home",
+        "south_weaver_home",
+        "vintner_home",
+        "wagon_home",
+        "weaver_home",
+        "baker_home (family home; cups and jug are I-01 props)"
+      ],
+      "wall_plate_height": 2.8675,
+      "windows": [
+        {
+          "head": 2.0375,
+          "sill": 1.1675,
+          "wall": "S",
+          "x": [
+            -2.25,
+            -1.35
+          ]
+        },
+        {
+          "head": 2.0375,
+          "sill": 1.1675,
+          "wall": "S",
+          "x": [
+            1.35,
+            2.25
+          ]
+        },
+        {
+          "head": 2.0375,
+          "sill": 1.1675,
+          "wall": "E",
+          "z": [
+            -0.45,
+            0.45
+          ]
+        },
+        {
+          "head": 2.0675,
+          "sill": 1.3375,
+          "wall": "N",
+          "x": [
+            -0.43,
+            0.43
+          ]
+        }
+      ],
+      "zones": {
+        "bed": {
+          "x": [
+            0.54,
+            2.53
+          ],
+          "z": [
+            -2.12,
+            -1.08
+          ]
+        },
+        "doorway_clear": {
+          "height": [
+            0.075,
+            1.825
+          ],
+          "x": [
+            -0.5,
+            0.65
+          ],
+          "z": [
+            0.6,
+            2.17
+          ]
+        },
+        "hearth": {
+          "centre": [
+            1.62000000476837,
+            1.5
+          ],
+          "light_height": 0.62,
+          "radius": 0.53
+        },
+        "west_wall_work": {
+          "x": [
+            -2.635,
+            -1.9
+          ],
+          "z": [
+            -1.15,
+            1.15
+          ]
+        }
+      }
+    }
+  },
+  "sites": {
+    "VillageForge": {
+      "eaves_height": [
+        2.48,
+        2.92
+      ],
+      "house_ramp": {
+        "x": [
+          -0.1,
+          1.45
+        ],
+        "z": [
+          -0.43,
+          0.83
+        ]
+      },
+      "house_wall_x": 1.45,
+      "kind": "smithy",
+      "needs": "A lean-to or workshop shell of at least 2.3 x 6.6 m with 2.3 m clear height at the lane side, open to the lane; the hearth stands in the north third, the house door in the middle stays free.",
+      "open_sides": [
+        "W",
+        "N",
+        "S"
+      ],
+      "origin_abs": [
+        34.0999984741211,
+        0.0,
+        -26.2000007629395
+      ],
+      "roof_posts": [
+        [
+          -0.1,
+          -3.15
+        ],
+        [
+          -0.1,
+          3.0
+        ],
+        [
+          1.25,
+          -3.15
+        ],
+        [
+          1.25,
+          3.0
+        ]
+      ],
+      "roof_x": [
+        -0.82,
+        1.42
+      ],
+      "roof_z": [
+        -3.42,
+        3.32
+      ],
+      "work_points": {
+        "anvil": [
+          -1.3,
+          0.0
+        ],
+        "bellows": [
+          -1.4,
+          -2.2
+        ],
+        "quench": [
+          -1.4,
+          2.4
+        ]
+      },
+      "yaw_deg": 0.0
+    }
+  },
+  "source": "prototype/scripts/world/village/household_designs.gd (contract), tools/art/build_architecture.py, art/architecture/build_atrium.py",
+  "units": "metres; house-local axes of the house node: +Y up, entrance at +Z; heights above the walkable floor unless named _abs"
+}

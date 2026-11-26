@@ -192,6 +192,10 @@ func sync_state(state: Dictionary) -> void:
 	population.show_origin(str(state.get("origin_id","italia")),float(state.get("world_seconds",0)),legacy_recruits)
 	if regional.frontier_details:
 		regional.frontier_details.set_wagon_progress(float(state.get("frontier",{}).get("work_seconds",0))/12.0)
+	# The forge fire answers the apprentice's work at bellows, anvil and tub.
+	var interiors := regional.get_node_or_null("HouseInteriors")
+	if interiors:
+		interiors.set_forge_work(str(state.get("village",{}).get("childhood",{}).get("active_work","")))
 	_apply_season(int(state.get("strategy",{}).get("turn",0))%4)
 	_sync_resources()
 	_sync_buildings()
