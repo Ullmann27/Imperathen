@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "note": "Vegetation budgets per graphics profile (D-034). Distances are metres from the camera for a 14 m tree; smaller plants scale them by sqrt(height / 14). Every profile places the same trees and colliders; profiles differ in detail, distance, shadows, wind layers and herb/crop density. Desktop/llvmpipe counts are relative indicators, not Fold7 measurements. Grass blades: tufts per square metre inside grass_end_m, full blade mesh inside grass_near_m, a lighter tuft beyond; grass_far_share thins the outer half of the range. Ultra has no density cap by owner decision D-060; Leicht draws no blade geometry.",
+  "note": "Vegetation budgets per graphics profile (D-034). Distances are metres from the camera for a 14 m tree; smaller plants scale them by sqrt(height / 14). Every profile places the same trees and colliders; profiles differ in detail, distance, shadows, wind layers and herb/crop density. Desktop/llvmpipe counts are relative indicators, not Fold7 measurements. Grass blades: tufts per square metre inside grass_end_m, full blade mesh inside grass_near_m, a lighter tuft beyond; grass_far_share thins the outer half of the range. Ultra has no density cap by owner decision D-060; Leicht draws no blade geometry. Leicht retains the distant silhouette range of Ultra using earlier two-triangle impostors rather than dropping the horizon.",
   "profiles": {
     "low": {
       "label": "Leicht",
@@ -10,7 +10,7 @@
         48,
         80
       ],
-      "impostor_end_m": 170,
+      "impostor_end_m": 300,
       "shadow_lod": -1,
       "wind_detail": 0,
       "herb_end_m": 20,
