@@ -1109,6 +1109,32 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 	return result
 
 
+## Match the actual village actor placement after the childhood work schedule
+## ends; live observations and authored overrides remain authoritative.
+static func _investigation_position(data: Dictionary, npc: String) -> Vector2:
+	var observed: Variant = actor_override(data,npc)
+	if observed is Vector2:
+		return observed
+	var people: Array = data.village.economy.people
+	for index in people.size():
+		var person: Dictionary = people[index]
+		if person.get("id") != npc:
+			continue
+		var duty := str(person.get("assignment","idle"))
+		if WORKPLACE_POSITIONS.has(duty):
+			var rank := 0
+			for previous in index:
+				if people[previous].get("assignment") == duty:
+					rank += 1
+			return WORKPLACE_POSITIONS[duty] + Vector2((rank % 2) * 2.4 - 1.2, 2.1 + floori(float(rank) / 2.0) * 2.0)
+		if npc == "severus":
+			return Vector2(0.0,-7.0)
+		if NEIGHBORS.has(npc):
+			return NEIGHBORS[npc].position
+		return Vector2(32.0,-18.0+float(index)*2.0)
+	return _npc_position(data,npc)
+
+
 static func _investigation_reason(data: Dictionary, npc: String) -> String:
 	if RaidInvestigation.phase(data).is_empty() or data.get("village",{}).get("raid",{}).get("active",false) or data.get("encounter",{}).get("active",false):
 		return "Die Ermittlungen beginnen erst nach dem Überfall."
@@ -1116,7 +1142,7 @@ static func _investigation_reason(data: Dictionary, npc: String) -> String:
 		return "Diese Person ist kein zugänglicher Zeuge."
 	if not _available(data,npc) or not _relation(data,npc).get("met",false):
 		return "Diese Person ist derzeit nicht erreichbar."
-	if _distance(data,_npc_position(data,npc)) > NPC_RANGE:
+	if _distance(data,_investigation_position(data,npc)) > NPC_RANGE:
 		return "Geh zu dieser Person, um ihre Aussage aufzunehmen."
 	return ""
 

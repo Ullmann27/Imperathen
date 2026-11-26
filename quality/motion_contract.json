@@ -863,6 +863,7 @@
     "scripts/story/mission_cinematics.gd",
     "scripts/story/mission_data.gd",
     "scripts/story/opening_story.gd",
+    "scripts/story/raid_investigation.gd",
     "scripts/story/village_childhood.gd",
     "scripts/story/village_life.gd",
     "scripts/strategy/atlas_data.gd",

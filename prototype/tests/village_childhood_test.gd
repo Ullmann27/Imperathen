@@ -451,24 +451,66 @@ func _test_screenplay_failure_and_relationship_branches() -> void:
 	_check(reloaded.data.village.childhood.screenplay.i02_outcome == "wrong" and reloaded.data.village.childhood.screenplay.i03_outcome == "rival", "Failure and relationship memories survive save/load")
 
 
+func _investigation_ids(model) -> Array:
+	var investigation = preload("res://scripts/story/raid_investigation.gd").view(model.data)
+	return investigation.clues.map(func(clue): return clue.id)
+
+
 func _test_night_hide_consequences() -> void:
 	var model = _new()
 	if not _until(model, "i10_choice"):
 		return
 	_at(model, Childhood.POINTS.father)
+	var early := _snapshot(model.data)
+	_check(not model.execute("village_investigation_question",{"npc_id":"aurelia","topic":"night"}).ok, "Witness testimony cannot be obtained before the attack")
+	_check(_snapshot(model.data) == early, "Rejected testimony changes no state")
 	_ok(_action(model, "i10_hide"), "I-10 permits hiding with the parents as a real branch")
+	_check("c_i08_tracks" in _investigation_ids(model) and "c_own_hide" in _investigation_ids(model) and "c_own_defend" not in _investigation_ids(model), "Only the actual raid route and earned tracks become memories")
+	_meet(model,"aurelia")
+	_ok(model.execute("village_investigation_question",{"npc_id":"aurelia","topic":"night"}), "Aurelia supplies her actual night testimony")
+	var before_duplicate := _snapshot(model.data)
+	_check(not model.execute("village_investigation_question",{"npc_id":"aurelia","topic":"night"}).ok, "Duplicate testimony is rejected")
+	_check(_snapshot(model.data) == before_duplicate, "Duplicate testimony changes no state")
+	_meet(model,"fabius")
+	_at(model,Vector2(90,90))
+	_check(not model.execute("village_investigation_question",{"npc_id":"fabius","topic":"night"}).ok, "Distant witness questioning is rejected")
+	_near(model,"fabius")
+	_ok(model.execute("village_investigation_question",{"npc_id":"fabius","topic":"night"}), "Fabius supplies independent testimony")
+	_meet(model,"decimus")
+	_ok(model.execute("village_investigation_compare",{"deduction_id":"d_mixed_band"}), "Decimus compares two acquired testimonies")
+	_check(not model.execute("village_investigation_compare",{"deduction_id":"d_mixed_band"}).ok, "A conclusion cannot be awarded twice")
+
 	_check(model.data.village.raid.status == "aftermath" and model.data.village.raid.completed == 1 and not model.data.village.raid.active, "Hiding does not erase the attack; it resolves persistent raid losses")
 	_check(model.data.village.childhood.screenplay.raid_path == "hide" and _current(model) == "i11_forge", "Hide branch stores its path and still reaches the forge aftermath")
 	_check(_complete(model), "Hide route plays I-11")
 	_check(_complete(model), "Hide route plays I-12")
 	_check(not _person(model, "sextus").alive and not _person(model, "silvanus").alive and not _person(model, "julia").alive, "Hide route leaves Sextus, Silvanus and Julia dead in the shared resident roster")
 	_check(model.data.village.childhood.screenplay.julia_outcome == "dead", "Hide route records Julia's death explicitly")
+	_near(model,"julia")
+	_check(not model.execute("village_investigation_question",{"npc_id":"julia","topic":"night"}).ok, "Dead witness cannot provide testimony")
 	_check(_complete(model) and _complete(model), "Hide route reaches morning and the oath")
+	_near(model,"aurelia")
+	_ok(model.execute("village_investigation_question",{"npc_id":"aurelia","topic":"night"}), "Morning testimony adds new details")
+	_near(model,"fabius")
+	_ok(model.execute("village_investigation_question",{"npc_id":"fabius","topic":"night"}), "Fabius may later repeat a rumor")
+	_ok(model.execute("village_investigation_question",{"npc_id":"fabius","topic":"present:w_aurelia_latin"}), "Confrontation records the witness correction")
+	_check("w_fabius_admits" in _investigation_ids(model) and "w_fabius_germani" in _investigation_ids(model), "Rumor and retraction remain distinct")
+
 	_check(model.data.village.childhood.screenplay.oath and model.data.village.childhood.carried.has("memory_token"), "Hide route can swear the same investigation oath without rewriting its losses")
 	_ok(model.save_game(_path("oath-hide")), "Save the hidden oath outcome")
 	var reloaded = WorldModel.new()
 	_ok(reloaded.load_game(_path("oath-hide")), "Reload the hidden oath outcome")
 	_check(not _person(reloaded, "julia").alive and not _person(reloaded, "silvanus").alive and not _person(reloaded, "sextus").alive, "Hide-route deaths remain real after reload")
+	_check(_investigation_ids(reloaded) == _investigation_ids(model), "Investigation evidence survives save and reload")
+	_check(reloaded.data.village.childhood.screenplay.investigation.deductions == ["d_mixed_band"], "Compared conclusion survives reload")
+	var legacy: Dictionary = model.data.duplicate(true)
+	legacy.village.childhood.screenplay.version = 6
+	legacy.village.childhood.screenplay.erase("investigation")
+	_write(_path("investigation-v6"),legacy)
+	var migrated = WorldModel.new()
+	_ok(migrated.load_game(_path("investigation-v6")), "Migrate an existing v6 campaign without inventing testimony")
+	_check(_investigation_ids(migrated) == ["c_i08_tracks","c_own_hide"], "Migration restores earned memories only")
+
 
 
 func _test_invalid_persistence_and_read_isolation() -> void:

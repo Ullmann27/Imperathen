@@ -160,14 +160,14 @@ static func validate(data: Dictionary) -> String:
 		compared.append(id)
 	return ""
 
-static func choices(data: Dictionary, npc: String, trust: int) -> Array:
+static func choices(data: Dictionary, npc: String, trust: int) -> Array[Dictionary]:
 	if phase(data).is_empty() or not validate(data).is_empty():
 		return []
 	var state: Dictionary = _script(data).investigation
-	var options: Array = []
+	var options: Array[Dictionary] = []
 	if npc == "decimus":
 		if "d_mixed_band" not in state.deductions and _can_compare("d_mixed_band",_known(data)):
-			options.append({"label":"Die Aussagen miteinander vergleichen","command":"village_investigation_compare","payload":{"deduction_id":"d_mixed_band"}})
+			options.append({"label":"Die Aussagen miteinander vergleichen","command":"village_investigation_compare","payload":{"deduction_id":"d_mixed_band"},"enabled":true,"reason":""})
 		return options
 	var topics: Array = []
 	for entry: Dictionary in _lines(npc):
@@ -181,7 +181,7 @@ static func choices(data: Dictionary, npc: String, trust: int) -> Array:
 			label = "Hinweis vorlegen: " + str(clue.get("title",""))
 		elif _clue(entry) == "w_guard_carter":
 			label = "Nach dem Fuhrmann fragen"
-		options.append({"label":label,"command":"village_investigation_question","payload":{"npc_id":npc,"topic":topic}})
+		options.append({"label":label,"command":"village_investigation_question","payload":{"npc_id":npc,"topic":topic},"enabled":true,"reason":""})
 	return options
 
 static func question(data: Dictionary, npc: String, topic: String, trust: int) -> Dictionary:
