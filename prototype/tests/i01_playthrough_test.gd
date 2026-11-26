@@ -13,6 +13,7 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const STEP := 1.0 / 60.0
+const FILM_TEST_SPEED := 8.0
 var game
 var checks := 0
 var failures: Array[String] = []
@@ -61,12 +62,14 @@ func _phase(name: String, seconds: float, kind: String) -> void:
 ## Plays the current film on Main's clock until a choice or the handoff.
 func _watch(name: String, limit := 240.0) -> void:
 	var elapsed := 0.0
+	Engine.time_scale = FILM_TEST_SPEED
 	while game.screen == "opening" and elapsed < limit:
 		var beat: Dictionary = game.opening_sequence.beats[game.opening_index]
 		if game._film_choice_open(beat) or bool(beat.get("final", false)):
 			break
 		await process_frame
-		elapsed += STEP
+		elapsed += STEP * FILM_TEST_SPEED
+	Engine.time_scale = 1.0
 	_phase(name, elapsed, "film")
 
 
