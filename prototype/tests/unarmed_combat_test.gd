@@ -26,7 +26,9 @@ func _run() -> void:
 	model.combat_sight_check = _clear
 	expect(model._validate_state(model.data).is_empty(),"fresh childhood state is valid")
 	expect(Combat.enabled(model.data),"new chapter has unarmed authority")
-	model.set_player_position(Vector3(0,1,-5.7))
+	# 0.6 m from the post centre: inside the measured jab reach (0.52 m strike
+	# reach + 0.16 m post radius), as the player stands when training.
+	model.set_player_position(Vector3(0,1,-6.4))
 	expect(attack(model).ok,"basic jab accepted at twelve")
 	expect(model.data.village.unarmed.practice_hits==0,"accepting a button awards no hit")
 	expect(not attack(model).ok,"cannot overlap recovery with another attack")
@@ -43,7 +45,7 @@ func _run() -> void:
 	expect(attack(model).ok,"swing from far away is accepted")
 	model.advance(.7)
 	expect(model.data.village.unarmed.practice_hits==1,"far target gets no phantom hit")
-	model.set_player_position(Vector3(0,1,-5.7))
+	model.set_player_position(Vector3(0,1,-6.4))
 	model.combat_sight_check=func(_from:Vector2,_to:Vector2): return false
 	attack(model)
 	model.advance(.7)

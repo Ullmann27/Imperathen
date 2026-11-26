@@ -4,6 +4,7 @@ extends SceneTree
 const Entry = preload("res://main.tscn")
 const Art = preload("res://scripts/world/village_art.gd")
 const Combat = preload("res://scripts/domain/combat_actions.gd")
+const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
 var game
 var checks := 0
 var failures: Array[String] = []
@@ -89,15 +90,20 @@ func _run() -> void:
 	var resident_distance := Vector2(game.world._player.position.x - resident_at.x, game.world._player.position.z - resident_at.z).length()
 	_check(resident_distance > 0.53, "Walking toward the resident cannot merge the two bodies")
 
-	# All ten techniques are earned by actual contacts with the real practice post.
-	_place(Vector3(0, 0.92, -6.3))
+	# All ten techniques are earned by actual contacts with the real practice
+	# post. 0.5 m centre distance (6 cm between the 0.28 m player capsule and
+	# the 0.16 m post): inside every displayed unarmed reach, including the
+	# short hook (0.44 m), headbutt (0.44 m) and uppercut (0.38 m).
+	_place(Vector3(0, 0.92, -6.5))
 	await _frames(2)
 	var practice_count := int(game.model.data.village.unarmed.practice_hits)
+	var contact_frame := _contact_frame("jab_left", Vector2(0, -6.5), Combat.PRACTICE_POINT)
+	_check(contact_frame > 0, "The displayed jab reaches the post from 0.5 m (clip frame %d)" % contact_frame)
 	game.ui.action_requested.emit("attack", {"technique":"jab_left"})
 	_check(game.model.data.village.unarmed.practice_hits == practice_count, "The real attack button grants no immediate contact")
-	await _frames(10)
-	_check(game.model.data.village.unarmed.practice_hits == practice_count, "Preparation remains harmless before its active window")
-	await _frames(31)
+	await _frames(contact_frame - 1)
+	_check(game.model.data.village.unarmed.practice_hits == practice_count, "No credit before the frame the displayed fist reaches the post")
+	await _frames(41 - (contact_frame - 1))
 	_check(game.model.data.village.unarmed.practice_hits == practice_count + 1, "One later contact with the actual post grants one practice hit")
 	for index in 13:
 		game.ui.action_requested.emit("attack", {"technique":"jab_left" if index % 2 == 0 else "jab_right"})
@@ -116,15 +122,21 @@ func _run() -> void:
 		_check(int(game.model.data.village.unarmed.practice_hits) == before + 1, "Exactly one world contact for " + id)
 	_check(game.model.data.player.age == 12 and game.model.data.progress.training_hits == 0, "Childhood practice neither ages the child nor awards adult certification")
 
-	# A real inserted wall between hand and post rejects practice as well as damage.
+	# A real inserted wall between body and post rejects practice as well as
+	# damage. From 0.7 m only the front kick (0.81 m + post) still reaches, so
+	# the same kick without the wall is the control that keeps this check real.
+	_place(Vector3(0, 0.92, -6.3))
 	var blocker := Art.box_collider(game.world, Vector3(1.8, 1.8, 0.12), Vector3(0, 0.9, -6.65))
 	await _frames(2)
 	var before_wall := int(game.model.data.village.unarmed.practice_hits)
-	game.ui.action_requested.emit("attack", {"technique":"jab_left"})
-	await _frames(42)
+	game.ui.action_requested.emit("attack", {"technique":"front_kick"})
+	await _frames(70)
 	_check(game.model.data.village.unarmed.practice_hits == before_wall, "The real post grants no credit through an intervening wall")
 	blocker.queue_free()
 	await _frames(2)
+	game.ui.action_requested.emit("attack", {"technique":"front_kick"})
+	await _frames(70)
+	_check(game.model.data.village.unarmed.practice_hits == before_wall + 1, "Without the wall the same kick from 0.7 m reaches the post")
 
 	# Pause/background interrupts both the body input and the accepted pending hit.
 	await _frames(60)
@@ -180,6 +192,17 @@ func _place(at: Vector3) -> void:
 	game.world.set_touch_move(Vector2.ZERO)
 	game.model.set_player_position(at)
 	game.world.sync_state(game.model.data)
+
+
+## First live clip frame at which the displayed technique touches the
+## training post from `player` (facing -Z), from the measured track.
+func _contact_frame(technique: String, player: Vector2, post: Vector2) -> int:
+	var timing := Combat.measured(technique)
+	for frame in range(maxi(1, int(timing.start)), int(timing.end) + 1):
+		var hit := Tracks.sweep_body(Combat.strike_kit(technique), technique, 1.0, Vector3(player.x, 0, player.y), 0.0, frame, Vector3(post.x, 0, post.y), Combat.PRACTICE_RADIUS, Combat.PRACTICE_HEIGHT)
+		if not hit.is_empty():
+			return frame
+	return -1
 
 
 func _frames(number: int) -> void:

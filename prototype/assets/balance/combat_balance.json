@@ -100,6 +100,12 @@
       "cost": 10.0,
       "source": "Handbuch S. 117, IT-015: Distanzwert 25"
     },
+    "crossbow": {
+      "base": 30.0,
+      "strike": "arrow",
+      "cost": 10.0,
+      "source": "Designwert für eine spätere Epoche (nicht Teil der Kampagne 58 v. Chr.); Vorlage aus assets/combat/weapons.json"
+    },
     "sling": {
       "base": 16.0,
       "strike": "blunt",

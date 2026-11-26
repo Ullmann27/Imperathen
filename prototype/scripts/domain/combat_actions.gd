@@ -2,6 +2,13 @@ extends RefCounted
 ## Timed, offline combat authority. The renderer cannot award a hit.
 ## This keeps the coordinating childhood branch's eleven-field v1 save contract.
 ## The caller supplies geometry and the existing world's damage transaction.
+##
+## Level A (D-026): contact is not scheduled. Every 60 Hz clip frame inside the
+## technique's live window sweeps the strike capsule measured from the
+## displayed animation (melee/melee_track_data.gd) against the target's body
+## capsule; the hit is booked on exactly that frame. windup/active/reach/
+## arc_dot below are the measured values (tests keep them in sync with the
+## track data) and are informational for UI and target selection.
 
 const PRACTICE_POINT := Vector2(0.0, -7.0)
 const STAMINA_LIMIT := 100.0
@@ -12,22 +19,28 @@ const GUARD_SECONDS := 0.85
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const CityTrade = preload("res://scripts/city_trade.gd")
 const DODGE_SECONDS := 0.65
+const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
+## TrainingGround post collision cylinder (game_world.gd): radius 0.16, 2 m.
+const PRACTICE_RADIUS := 0.16
+const PRACTICE_HEIGHT := 2.0
+## Adult player body scale (village_person.gd size factor for age >= 18).
+const ADULT_BODY_SCALE := 1.14
 const TECHNIQUES := {
-	"jab_left":{"label":"Linke Gerade", "short":"Gerade L", "duration":0.62, "windup":0.18, "active":0.14, "reach":1.45, "arc_dot":0.72, "damage":6, "cost":7.0, "practice":0, "family":"fist"},
-	"jab_right":{"label":"Rechte Gerade", "short":"Gerade R", "duration":0.68, "windup":0.21, "active":0.14, "reach":1.5, "arc_dot":0.72, "damage":7, "cost":8.0, "practice":0, "family":"fist"},
-	"hook_left":{"label":"Linker Haken", "short":"Haken L", "duration":0.82, "windup":0.27, "active":0.16, "reach":1.15, "arc_dot":0.50, "damage":9, "cost":11.0, "practice":3, "family":"fist"},
-	"hook_right":{"label":"Rechter Haken", "short":"Haken R", "duration":0.82, "windup":0.27, "active":0.16, "reach":1.15, "arc_dot":0.50, "damage":9, "cost":11.0, "practice":3, "family":"fist"},
-	"uppercut_left":{"label":"Linker Uppercut", "short":"Uppercut L", "duration":0.9, "windup":0.30, "active":0.17, "reach":1.05, "arc_dot":0.65, "damage":10, "cost":13.0, "practice":6, "family":"fist"},
-	"uppercut_right":{"label":"Rechter Uppercut", "short":"Uppercut R", "duration":0.9, "windup":0.30, "active":0.17, "reach":1.05, "arc_dot":0.65, "damage":10, "cost":13.0, "practice":6, "family":"fist"},
-	"headbutt":{"label":"Kopfstoß", "short":"Kopfstoß", "duration":0.76, "windup":0.23, "active":0.14, "reach":0.85, "arc_dot":0.80, "damage":7, "cost":12.0, "practice":8, "family":"head"},
-	"front_kick":{"label":"Frontkick", "short":"Frontkick", "duration":1.05, "windup":0.34, "active":0.20, "reach":1.75, "arc_dot":0.78, "damage":11, "cost":15.0, "practice":4, "family":"kick"},
-	"side_kick":{"label":"Sidekick", "short":"Sidekick", "duration":1.2, "windup":0.40, "active":0.22, "reach":1.85, "arc_dot":0.72, "damage":12, "cost":18.0, "practice":10, "family":"kick"},
-	"high_kick":{"label":"Highkick", "short":"Highkick", "duration":1.3, "windup":0.44, "active":0.24, "reach":1.65, "arc_dot":0.60, "damage":12, "cost":21.0, "practice":14, "family":"kick"},
-	"cut_inward":{"label":"Gladius · Innenhieb", "short":"Innenhieb", "duration":0.90, "windup":0.43, "active":0.12, "reach":1.85, "arc_dot":0.55, "damage":16, "cost":14.0, "practice":0, "family":"sword"},
-	"cut_outward":{"label":"Gladius · Außenhieb", "short":"Außenhieb", "duration":0.94, "windup":0.45, "active":0.13, "reach":1.85, "arc_dot":0.55, "damage":16, "cost":14.0, "practice":0, "family":"sword"},
-	"thrust":{"label":"Gladius · Stoß", "short":"Stoß", "duration":0.82, "windup":0.40, "active":0.11, "reach":2.0, "arc_dot":0.85, "damage":18, "cost":15.0, "practice":0, "family":"sword"},
-	"overhead":{"label":"Gladius · Überkopfhieb", "short":"Oben", "duration":1.12, "windup":0.54, "active":0.15, "reach":1.8, "arc_dot":0.75, "damage":22, "cost":21.0, "practice":0, "family":"sword"},
-	"turn_cut":{"label":"Gladius · Drehhieb", "short":"Drehhieb", "duration":1.24, "windup":0.60, "active":0.16, "reach":1.8, "arc_dot":0.42, "damage":20, "cost":23.0, "practice":0, "family":"sword"}
+	"jab_left":{"label":"Linke Gerade", "short":"Gerade L", "duration":0.62, "windup":0.0667, "active":0.2833, "reach":0.725, "arc_dot":0.69, "damage":6, "cost":7.0, "practice":0, "family":"fist"},
+	"jab_right":{"label":"Rechte Gerade", "short":"Gerade R", "duration":0.68, "windup":0.0667, "active":0.3167, "reach":0.725, "arc_dot":0.64, "damage":7, "cost":8.0, "practice":0, "family":"fist"},
+	"hook_left":{"label":"Linker Haken", "short":"Haken L", "duration":0.82, "windup":0.1, "active":0.5667, "reach":0.643, "arc_dot":0.63, "damage":9, "cost":11.0, "practice":3, "family":"fist"},
+	"hook_right":{"label":"Rechter Haken", "short":"Haken R", "duration":0.82, "windup":0.1, "active":0.5667, "reach":0.643, "arc_dot":0.63, "damage":9, "cost":11.0, "practice":3, "family":"fist"},
+	"uppercut_left":{"label":"Linker Uppercut", "short":"Uppercut L", "duration":0.9, "windup":0.1, "active":0.5, "reach":0.582, "arc_dot":0.79, "damage":10, "cost":13.0, "practice":6, "family":"fist"},
+	"uppercut_right":{"label":"Rechter Uppercut", "short":"Uppercut R", "duration":0.9, "windup":0.1, "active":0.5, "reach":0.582, "arc_dot":0.79, "damage":10, "cost":13.0, "practice":6, "family":"fist"},
+	"headbutt":{"label":"Kopfstoß", "short":"Kopfstoß", "duration":0.76, "windup":0.1333, "active":0.3, "reach":0.641, "arc_dot":0.92, "damage":7, "cost":12.0, "practice":8, "family":"head"},
+	"front_kick":{"label":"Frontkick", "short":"Frontkick", "duration":1.05, "windup":0.0333, "active":0.5, "reach":1.017, "arc_dot":0.52, "damage":11, "cost":15.0, "practice":4, "family":"kick"},
+	"side_kick":{"label":"Sidekick", "short":"Sidekick", "duration":1.2, "windup":0.0333, "active":0.5833, "reach":1.086, "arc_dot":0.46, "damage":12, "cost":18.0, "practice":10, "family":"kick"},
+	"high_kick":{"label":"Highkick", "short":"Highkick", "duration":1.3, "windup":0.05, "active":0.6667, "reach":1.041, "arc_dot":0.47, "damage":12, "cost":21.0, "practice":14, "family":"kick"},
+	"cut_inward":{"label":"Gladius · Innenhieb", "short":"Innenhieb", "duration":0.90, "windup":0.3167, "active":0.1667, "reach":1.647, "arc_dot":0.0, "damage":16, "cost":14.0, "practice":0, "family":"sword"},
+	"cut_outward":{"label":"Gladius · Außenhieb", "short":"Außenhieb", "duration":0.94, "windup":0.2667, "active":0.2333, "reach":1.719, "arc_dot":0.08, "damage":16, "cost":14.0, "practice":0, "family":"sword"},
+	"thrust":{"label":"Gladius · Stoß", "short":"Stoß", "duration":0.82, "windup":0.2167, "active":0.25, "reach":1.832, "arc_dot":0.7, "damage":18, "cost":15.0, "practice":0, "family":"sword"},
+	"overhead":{"label":"Gladius · Überkopfhieb", "short":"Oben", "duration":1.12, "windup":0.4167, "active":0.2667, "reach":1.759, "arc_dot":0.41, "damage":22, "cost":21.0, "practice":0, "family":"sword"},
+	"turn_cut":{"label":"Gladius · Drehhieb", "short":"Drehhieb", "duration":1.24, "windup":0.5, "active":0.2, "reach":1.672, "arc_dot":0.0, "damage":20, "cost":23.0, "practice":0, "family":"sword"}
 }
 const COMMAND_FIELDS := {
 	"village_unarmed_attack":["technique", "target_id", "facing_x", "facing_z"],
@@ -158,29 +171,36 @@ static func advance(data: Dictionary, delta: float, sight_check: Callable = Call
 		combat.stamina = minf(STAMINA_LIMIT, float(combat.stamina) + maxf(0.0, delta - busy_seconds) * STAMINA_RECOVERY)
 		return event
 	var spec: Dictionary = TECHNIQUES[combat.technique]
+	var timing := measured(combat.technique)
 	var previous := float(combat.elapsed)
 	var elapsed := minf(float(spec.duration), previous + delta)
-	var active_end := float(spec.windup) + float(spec.active)
 	combat.elapsed = elapsed
 	event.technique = combat.technique
 	event.target_id = combat.target_id
-	# Check interval overlap, including a low-frame-rate tick spanning the window.
-	# A missed contact may enter range later in the same active window, but a hit
-	# consumes it before the authoritative callback to prevent re-entrant damage.
-	if not combat.resolved and previous < active_end and elapsed + EPSILON >= float(spec.windup):
+	# Sweep every clip frame crossed by this tick, including a low-frame-rate
+	# tick spanning the window. A missed contact may still occur on a later
+	# live frame; a hit consumes the window before the authoritative callback.
+	if not combat.resolved:
 		var target := _target(data, combat.target_id)
-		if not target.is_empty() and _contact(data, spec, target, sight_check):
+		for frame in range(Tracks.frame_of(previous) + 1, Tracks.frame_of(elapsed) + 1):
+			if target.is_empty() or combat.resolved:
+				break
+			if frame < int(timing.start) or frame > int(timing.end):
+				continue
+			if _swept_contact(data, combat.technique, frame, target, sight_check).is_empty():
+				continue
+			event.contact_frame = frame
 			if combat.target_id == "practice":
 				combat.resolved = true
 				combat.practice_hits = mini(1000, int(combat.practice_hits) + 1)
 				event.practice = true
 			elif apply_hit.is_valid():
 				combat.resolved = true
-				var accepted: Variant = apply_hit.call(data, combat.target_id, int(spec.damage) + CityTrade.damage_bonus(data, is_armed(str(combat.technique))))
+				var accepted: Variant = apply_hit.call(data, combat.target_id, hit_damage(data, combat.technique, frame))
 				if typeof(accepted) == TYPE_BOOL and accepted:
 					combat.resolved_hits = mini(1000000, int(combat.resolved_hits) + 1)
 					event.hit = true
-	if elapsed + EPSILON >= active_end:
+	if Tracks.frame_of(elapsed) >= int(timing.end):
 		combat.resolved = true
 	if elapsed + EPSILON >= float(spec.duration):
 		_clear_motion(combat)
@@ -212,12 +232,44 @@ static func busy(data: Dictionary) -> bool:
 static func phase(id: String, elapsed: float) -> String:
 	if not TECHNIQUES.has(id) or not is_finite(elapsed) or elapsed < 0.0 or elapsed + EPSILON >= float(TECHNIQUES[id].duration):
 		return "idle"
-	var spec: Dictionary = TECHNIQUES[id]
-	if elapsed + EPSILON < float(spec.windup):
+	var timing := measured(id)
+	var frame := Tracks.frame_of(elapsed)
+	if frame < int(timing.start):
 		return "windup"
-	if elapsed + EPSILON < float(spec.windup) + float(spec.active):
+	if frame <= int(timing.end):
 		return "active"
 	return "recovery"
+
+
+## Damage of the village's saved player path. NOT yet on the shared D-042
+## balance file: this authority keeps its own per-technique values
+## (TECHNIQUES.damage) and the city-trade bonuses, because the raid and
+## encounter targets it strikes (health 45-60, no armour, zone or skill
+## model) are tuned to them and are owned by other branches. Learned skill
+## (as competence) and issued equipment (as quality) are separate, bounded
+## multipliers. Level A proper (melee_core.gd) uses combat_formula.gd only.
+static func hit_damage(data: Dictionary, technique: String, _contact_frame: int) -> int:
+	var base := float(TECHNIQUES[technique].damage)
+	var learned := float(CityTrade.damage_bonus(data, false))
+	var equipped := float(CityTrade.damage_bonus(data, is_armed(technique))) - learned
+	return int(clampf(roundf(base * clampf(1.0 + learned / base, 0.5, 1.5) * clampf(1.0 + equipped / base, 0.85, 1.25)), 1.0, 250.0))
+
+
+## Measured phase boundaries (clip frames at 60 Hz) of a technique.
+static func measured(id: String) -> Dictionary:
+	return Tracks.timing(strike_kit(id), id)
+
+
+static func strike_kit(id: String) -> String:
+	return Tracks.PLAYER_ARMED if is_armed(id) else Tracks.PLAYER_UNARMED
+
+
+## The armed kit was measured on the adult body; unarmed tracks scale with age.
+static func strike_scale(data: Dictionary, id: String) -> float:
+	if is_armed(id):
+		return 1.0
+	var age: Variant = data.get("player", {}).get("age")
+	return ADULT_BODY_SCALE if _number(age, 18.0, 1000000.0) else 1.0
 
 
 static func view(data: Dictionary) -> Dictionary:
@@ -233,8 +285,10 @@ static func view(data: Dictionary) -> Dictionary:
 			continue
 		var item: Dictionary = TECHNIQUES[id].duplicate(true)
 		item["id"] = id
-		item["active_start"] = float(item.windup)
-		item["active_end"] = float(item.windup) + float(item.active)
+		var timing := measured(id)
+		item["active_start"] = float(timing.start_s)
+		item["contact_peak"] = float(timing.peak_s)
+		item["active_end"] = float(int(timing.end) + 1) / float(Tracks.FPS)
 		item["recovery"] = float(item.duration) - float(item.active_end)
 		item["available"] = available(data, id)
 		result.techniques.append(item)
@@ -271,30 +325,37 @@ static func validate(data: Dictionary) -> String:
 			return "Unzulässige aktive Nahkampfbewegung."
 		if float(v.guard_remaining) > EPSILON or float(v.dodge_remaining) > EPSILON:
 			return "Ein Angriff darf keine zweite Abwehrbewegung enthalten."
-		if not v.resolved and float(v.elapsed) + EPSILON >= float(TECHNIQUES[v.technique].windup) + float(TECHNIQUES[v.technique].active):
+		if not v.resolved and Tracks.frame_of(float(v.elapsed)) >= int(measured(v.technique).end):
 			return "Eine erholende Bewegung darf keinen offenen Treffer enthalten."
 	return ""
 
 
-static func _contact(data: Dictionary, spec: Dictionary, target: Dictionary, sight_check: Callable) -> bool:
+## Swept contact of the displayed strike at one clip frame. The world still
+## confirms an unobstructed line (walls, other residents) via sight_check.
+static func _swept_contact(data: Dictionary, technique: String, frame: int, target: Dictionary, sight_check: Callable) -> Dictionary:
 	if not sight_check.is_valid():
-		return false
+		return {}
 	var position: Variant = data.get("player", {}).get("position")
 	if typeof(position) != TYPE_ARRAY or position.size() != 3:
-		return false
+		return {}
 	if not _number(position[0], -1000000.0, 1000000.0) or not _number(position[2], -1000000.0, 1000000.0) or not _number(target.get("x"), -1000000.0, 1000000.0) or not _number(target.get("z"), -1000000.0, 1000000.0):
-		return false
+		return {}
 	var from := Vector2(float(position[0]), float(position[2]))
 	var to := Vector2(float(target.x), float(target.z))
-	var offset := to - from
-	if offset.length() < MIN_CONTACT_DISTANCE or offset.length() > float(spec.reach):
-		return false
+	if from.distance_to(to) < MIN_CONTACT_DISTANCE:
+		return {}
 	var combat: Dictionary = data.village.unarmed
 	var facing := Vector2(float(combat.facing[0]), float(combat.facing[1]))
-	if facing.dot(offset.normalized()) + EPSILON < float(spec.arc_dot):
-		return false
+	var yaw := atan2(-facing.x, -facing.y)
+	var practice := target.has("practice")
+	var body := Tracks.kit("raider")
+	var radius := PRACTICE_RADIUS if practice else float(body.radius)
+	var height := PRACTICE_HEIGHT if practice else float(body.height)
+	var contact := Tracks.sweep_body(strike_kit(technique), technique, strike_scale(data, technique), Vector3(from.x, 0.0, from.y), yaw, frame, Vector3(to.x, 0.0, to.y), radius, height)
+	if contact.is_empty():
+		return {}
 	var clear: Variant = sight_check.call(from, to)
-	return typeof(clear) == TYPE_BOOL and clear
+	return contact if typeof(clear) == TYPE_BOOL and clear else {}
 
 
 static func _enemy(data: Dictionary, id: String) -> Dictionary:
@@ -309,7 +370,7 @@ static func _enemy(data: Dictionary, id: String) -> Dictionary:
 
 static func _target(data: Dictionary, id: String) -> Dictionary:
 	if id == "practice":
-		return {"x":PRACTICE_POINT.x, "z":PRACTICE_POINT.y}
+		return {"x":PRACTICE_POINT.x, "z":PRACTICE_POINT.y, "practice":true}
 	if id == "air":
 		return {}
 	return _enemy(data, id)

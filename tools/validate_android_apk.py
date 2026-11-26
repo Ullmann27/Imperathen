@@ -181,6 +181,7 @@ TROOP_CATALOG_RESOURCES = (
     "assets/troops/people.json",
     "scripts/battle/combat_formula.gd",
     "assets/balance/combat_balance.json",
+    "assets/combat/weapons.json",
 )
 # The shared world state (D-045) reads these at runtime: without the registry
 # the history frame is empty, without the roster the tribal world is.
