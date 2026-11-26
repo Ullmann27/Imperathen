@@ -961,6 +961,20 @@ static func current_step(data: Dictionary) -> Dictionary:
 	return _current(data).duplicate(true) if enabled(data) else {}
 
 
+## The finished action can only improve a companion through the existing
+## WorldModel command that accepted it. The player's authored reward stays
+## with its original ledger. The optional helper never gates story progress.
+static func credit_party_action(data: Dictionary, action: String) -> String:
+	if CompanionStory.task_roles(action).is_empty():
+		return ""
+	for step: Dictionary in STEPS:
+		if step.id == action:
+			return CompanionStory.credit(data, action, _target(data, step))
+	if BRIDGE_STEPS.has(action):
+		return CompanionStory.credit(data, action, _target(data, BRIDGE_STEPS[action]))
+	return ""
+
+
 static func companion_specs(data: Dictionary) -> Dictionary:
 	var step := current_step(data)
 	var mission := str(step.get("mission", SOURCE_MISSION_BY_STEP.get(step.get("id", ""), "")))

@@ -6,6 +6,7 @@ const Rules = preload("res://scripts/battle/battle_model.gd")
 const Landscape = preload("res://scripts/tactics/valley_landscape.gd")
 const HUD = preload("res://scripts/tactics/valley_hud.gd")
 const Soldier = preload("res://scripts/visuals/soldier_visual.gd")
+const Rider = preload("res://scripts/visuals/valley_rider.gd")
 const Roster = preload("res://scripts/battle/soldier_roster.gd")
 const SIDES := {"ally":Color("#67d7c4"),"enemy":Color("#e58663")}
 ## Orders that need a tapped company or a tapped ground point after choosing them.
@@ -177,7 +178,7 @@ func _sync_units() -> void:
 		flag.position = _surface(Vector2(s.x,s.z))+Vector3.UP*2.75
 		flag.pixel_size = clampf(camera.position.distance_to(flag.position)*0.00062,0.004,0.032)
 		flag.visible = s.strength > 0 and s.status != "withdrawn"
-		flag.text = ("◆ " if s.id in selected else "") + str(s.name).to_upper()
+		flag.text = ("◆ " if s.id in selected else "") + str(s.name).to_upper() + (" · %d" % s.strength if s.kind == "cavalry" else "")
 		flag.modulate = Color("#ffe098") if s.id in selected else SIDES[s.side]
 		if not flag.visible:
 			continue
@@ -189,8 +190,18 @@ func _sync_units() -> void:
 			var dist := camera.position.distance_to(destination)
 			var detail := (0 if dist < near_limit else 1) if rigged.has(id) else 2
 			var role := "spear" if s.kind in ["spear", "skirmisher"] else ("archer" if s.kind == "archer" else "heavy")
+			if s.kind == "cavalry":
+				role = "cavalry"
 			if id == s.officer_id and s.side == "ally" and s.kind == "infantry":
 				role = "officer"
+			if role == "cavalry" and detail == 2:
+				# Beyond the rig budget riders stay aggregated under the company flag.
+				# Keep the same UID and re-sample it when it re-enters the budget.
+				if actors.has(id):
+					actors[id].queue_free()
+					actors.erase(id)
+				motion.erase(id)
+				continue
 			counts[detail] += 1
 			_sample_motion(id, destination, float(man.facing)+PI, man.pose, s.formation, role)
 			if detail == 2:
@@ -208,7 +219,7 @@ func _sync_units() -> void:
 				i += 1
 				continue
 			if not actors.has(id):
-				var actor = Soldier.new()
+				var actor = Rider.new() if role == "cavalry" else Soldier.new()
 				actor.role = role
 				actor.variant = Roster.visual_variant(int(man.appearance_seed), str(man.military_rank), Soldier.TINTS.size())
 				actor.detail = detail
@@ -220,6 +231,8 @@ func _sync_units() -> void:
 			if node.role != role:
 				node.configure(role,node.variant)
 			node.set_detail(detail)
+			if role == "cavalry":
+				node.set_mounted(s.mounted)
 
 			i += 1
 	far_ranks.sync(distant, far_gaits, far_starts)
@@ -270,7 +283,7 @@ func _sample_motion(id: String, destination: Vector3, yaw: float, pose: String, 
 	if not Soldier.STRIDES.has(pose):
 		if pose != track.pose:
 			track.phase0 = 0.0
-		track.phase1 = track.phase0+period/Soldier.clip_length(role,pose)
+		track.phase1 = track.phase0+period/Soldier.clip_length("spear" if role == "cavalry" else role,pose)
 		if pose not in Soldier.LOOPING:
 			track.phase1 = minf(1.0,track.phase1)
 	track.pose = pose
@@ -289,6 +302,16 @@ func _action(action: String,arg: String = "") -> void:
 			if model.outcome == "ongoing":
 				paused = not paused
 				message = "Zeit angehalten. Befehle können erteilt werden." if paused else "Talzeichen halten · Formation durch Ziehen ausrichten."
+		"muster":
+			if paused:
+				var result: Dictionary = model.muster(arg)
+				message = result.message
+				if result.ok:
+					var s: Dictionary = model.squads["muster_" + arg]
+					_marker(s.id, s.name.to_upper(), SIDES.ally)
+					hud.add_company(s)
+					selected = [s.id]
+					_sync_units()
 		"speed": speed = 0.35 if speed == 1.0 else 1.0
 		"zoom_in": _zoom(0.8)
 		"zoom_out": _zoom(1.25)
@@ -299,7 +322,7 @@ func _action(action: String,arg: String = "") -> void:
 			else:
 				selected = model.company_ids(arg)
 			pending = ""
-			message = "%d Kohorten ausgewählt." % selected.size()
+			message = "%d Verbände ausgewählt." % selected.size()
 		"select": _select(arg,hud.group_button.button_pressed)
 		"form": _issue("form",arg)
 		"command":

@@ -30,6 +30,21 @@
       "result": "Die Hufspuren werden als offene Warnung protokolliert; ein Täter bleibt unbekannt."
     }
   ],
+  "party_tasks": {
+    "source": "Kreative Erweiterung zu I-08 · freiwillige Aufgaben am Ort des bestehenden Missionsschritts",
+    "steps": {
+      "i08_tracks": {
+        "watch": [
+          "perception",
+          "sieht mit dir die frischen Hufspuren an"
+        ],
+        "guide": [
+          "navigation",
+          "liest mit dir den Verlauf der Spuren"
+        ]
+      }
+    }
+  },
   "companions": [
     {
       "id": "marcus",

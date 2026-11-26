@@ -392,6 +392,10 @@ static func validate(data: Dictionary) -> String:
 				var access_error := _stable_progress_reason(data, Catalog.ITEMS[id])
 				if not access_error.is_empty():
 					return access_error
+	var entrusted := {}
+	for member: Dictionary in data.get("world_state",{}).get("party",{}).get("members",{}).values():
+		for item_id: String in member.equipment.values():
+			entrusted[item_id] = int(entrusted.get(item_id,0)) + 1
 	for id: String in Catalog.ITEMS:
 		if not _integer(trade.inventory[id],0,MAX_COUNT) or not _integer(trade.used[id],0,MAX_COUNT):
 			return "Warenbestand und Verbrauch müssen begrenzte ganze Mengen sein."
@@ -405,7 +409,7 @@ static func validate(data: Dictionary) -> String:
 			expected += int(Catalog.SERVICE_KIT.get(id,0))
 		for reward_id: String in claimed:
 			expected += int(Catalog.REWARDS[reward_id].items.get(id,0))
-		if int(trade.inventory[id])!=expected:
+		if int(trade.inventory[id]) + int(entrusted.get(id,0)) != expected:
 			return "Der Bestand von %s ist nicht durch Erwerb und Verbrauch belegt." % item.name
 	if not _keys(trade.equipment,EQUIPMENT_SLOTS):
 		return "Die Ausrüstungsplätze sind unvollständig."

@@ -320,7 +320,7 @@
       "valid_to": -31,
       "tier": 3,
       "role": "cavalry",
-      "battle_kind": "",
+      "battle_kind": "cavalry",
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 1, "q_max": 3},
         "sidearm": {"family_id": "sword_long", "q_min": 1, "q_max": 3},
@@ -330,9 +330,9 @@
       },
       "drills": {"dismount": 1},
       "upgrades": [],
-      "visual": {"battle_role": "", "meshy_loadout": ""},
+      "visual": {"battle_role": "cavalry", "meshy_loadout": ""},
       "attestation": "attested",
-      "notes": "Belegt ab dem Feldzug 58 v. Chr.; frühere Dienste sind plausibel, aber nicht übernommen. Reiter sind in der Gefechtssimulation noch nicht aktiv.",
+      "notes": "Belegt ab dem Feldzug 58 v. Chr.; frühere Dienste sind plausibel, aber nicht übernommen.",
       "sources": [
         {"ref": "Caes. Gall. 1,15", "note": "equitatus aus der Provinz und von den Haeduern", "verified": false},
         {"ref": "Caes. Gall. 1,18", "note": "Dumnorix führt die haeduische Reiterei", "verified": false}
@@ -558,7 +558,7 @@
       "valid_to": 400,
       "tier": 4,
       "role": "cavalry",
-      "battle_kind": "",
+      "battle_kind": "cavalry",
       "requires": {"materials": {"horse": 4}},
       "max_share": 0.2,
       "loadout": {
@@ -569,9 +569,9 @@
       },
       "drills": {"dismount": 2},
       "upgrades": [],
-      "visual": {"battle_role": "", "meshy_loadout": "germanic_mounted_retainer"},
+      "visual": {"battle_role": "cavalry", "meshy_loadout": "germanic_mounted_retainer"},
       "attestation": "attested",
-      "notes": "Ohne Sattel (Caes. Gall. 4,2); sitzen ab und kämpfen zu Fuß. Reiter sind in der Simulation noch nicht aktiv.",
+      "notes": "Ohne Sattel (Caes. Gall. 4,2); sitzen ab und kämpfen zu Fuß.",
       "sources": [
         {"ref": "Caes. Gall. 1,48", "note": "Reiterei des Ariovist", "verified": false},
         {"ref": "Caes. Gall. 4,2", "note": "ex equis desiliunt; ephippiis uti turpe", "verified": false}
@@ -615,7 +615,7 @@
       "valid_to": -31,
       "tier": 4,
       "role": "cavalry",
-      "battle_kind": "",
+      "battle_kind": "cavalry",
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 2, "q_max": 3},
         "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
@@ -624,7 +624,7 @@
       },
       "drills": {"dismount": 2},
       "upgrades": [],
-      "visual": {"battle_role": "", "meshy_loadout": "germanic_mounted_retainer"},
+      "visual": {"battle_role": "cavalry", "meshy_loadout": "germanic_mounted_retainer"},
       "attestation": "attested",
       "notes": "Germanische Gruppen als Verbündete Roms: Caesar holt 52 v. Chr. Reiter und Leichtbewaffnete von rechtsrheinischen Gemeinwesen.",
       "sources": [

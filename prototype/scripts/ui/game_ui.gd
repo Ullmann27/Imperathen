@@ -22,6 +22,7 @@ const TouchModalScript := preload("res://scripts/ui/touch_modal.gd")
 const CombatActions := preload("res://scripts/domain/combat_actions.gd")
 ## Interior of the family home (baker_home at (-13, 11), walls inset).
 const FAMILY_HOME := Rect2(-15.6, 8.9, 5.2, 4.2)
+const PartyPanel = preload("res://scripts/ui/party_panel.gd")
 const VillagePanel = preload("res://scripts/ui/village_life_panel.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const WorldClock = preload("res://scripts/domain/world_clock.gd")
@@ -43,6 +44,10 @@ const Codex = preload("res://scripts/ui/roman_hud/codex.gd")
 ## scale; the remaining screens scale their fonts individually.
 const HUD_SCREENS := ["game", "dialog", "frontier_dialog", "pause", "journal"]
 const MENU_MUSIC_DB := -9.0
+var party_target := "all"
+var _party_data := {}
+var _party_figures := {}
+var _party_feedback := ""
 var _village_tab := "overview"
 var _navigation: Control
 
@@ -757,7 +762,7 @@ func update_state(state: Dictionary) -> void:
 	_action_buttons["train"].disabled = not completed or not bool(companion.get("met", false)) or unfinished or trained or ended
 	if state.get("village", {}).get("enabled", false) and int(player.get("age", 12)) < 18:
 		_action_buttons["train"].disabled = _action_buttons["train"].disabled or not bool(state.get("village_view", {}).get("training_ready", false))
-	_action_buttons["recruit"].disabled = not trained or int(squad.get("recruits", 0)) >= 3 or int(resources.get("denarii", 0)) < 5 or int(resources.get("grain", 0)) < 2 or ended
+	_action_buttons["recruit"].disabled = not trained or int(state.get("population", {}).get("workers", 0)) <= 0 or int(resources.get("denarii", 0)) < 5 or int(resources.get("grain", 0)) < 2 or ended
 	_action_buttons["skirmish"].disabled = not trained or int(squad.get("alive", 0)) <= 0 or bool(encounter.get("active", false)) or bool(progress.get("skirmish_won", false)) or ended
 	if Childhood.enabled(state):
 		# No military menu for the child (HB 3.0 S. 13: "Keine Waffe und kein Militärmenü").
@@ -1051,6 +1056,16 @@ func show_village_dialog(dialog: Dictionary) -> void:
 	show_frontier_dialog(content)
 
 
+func show_party(page: String, data: Dictionary, figures: Dictionary, feedback: String) -> void:
+	_party_data = data
+	_party_figures = figures
+	_party_feedback = feedback
+	if page == "party_folio":
+		PartyPanel.show_folio(self, data, figures, feedback)
+	else:
+		PartyPanel.show_wheel(self, data)
+
+
 func show_village_panel(state: Dictionary, tab := "overview") -> void:
 	clear_notification()
 	_state = state.duplicate(true)
@@ -1241,7 +1256,7 @@ func handle_back() -> bool:
 				_close_touch_overlays()
 			else:
 				_emit("cancel_build" if _build_active else "pause")
-		"pause", "journal", "village": _emit("resume")
+		"pause", "journal", "village", "party_folio", "party_wheel": _emit("resume")
 		"gallery": _close_gallery()
 		"settings": _return_to(_settings_return)
 		"confirm": _return_to(_confirm_return)
@@ -1762,10 +1777,14 @@ func _build_toolbar() -> void:
 	_action_buttons["atlas"] = atlas
 	if _state.get("village", {}).get("enabled", false):
 		modes_row.add_child(_hud_button("Dorfleben", _emit.bind("village_panel", {}), "village", true))
+	if _state.get("village", {}).get("enabled", false):
+		var party := _hud_button("Gefolge", _emit.bind("party_wheel", {}), "family")
+		party.name = "PartyQuickOrders"
+		modes_row.add_child(party)
 	var actions := [
 		["build", "Hütte · 8 Holz", "Bauplan öffnen. Mit Linksklick einen erlaubten Platz bestätigen."],
 		["train", "Ausbildung", "Benötigt eine fertige Hütte, eine Gefährtenentscheidung und keine offene Baustelle. Am Trainingsplatz fortsetzen."],
-		["recruit", "Rekrutieren", "Ein Rekrut: 5 Denare und 2 Getreide. Ausbildung erforderlich; höchstens drei Rekruten."],
+		["recruit", "Rekrutieren", "Ein Rekrut: 5 Denare und 2 Getreide. Erfordert Ausbildung und einen verfügbaren Bewohner."],
 		["skirmish", "Dorf verteidigen", "Benötigt abgeschlossene Ausbildung und eine lebende eigene Truppe."]
 	]
 	var compact_names := {"build": "Hütte", "train": "Üben", "recruit": "Truppe +", "skirmish": "Verteidigen"}
@@ -1804,6 +1823,10 @@ func _build_touch_toolbar() -> void:
 		row.add_child(button)
 	if _state.get("village", {}).get("enabled", false):
 		row.add_child(_hud_button("Dorf", _emit.bind("village_panel", {}), "village"))
+	if _state.get("village", {}).get("enabled", false):
+		var party := _hud_button("Gefolge", _emit.bind("party_wheel", {}), "family")
+		party.name = "PartyQuickOrders"
+		row.add_child(party)
 	var commands := _hud_button("Vorhaben", _toggle_command_menu, "projects")
 	commands.name = "OpenCommands"
 	row.add_child(commands)
@@ -2456,6 +2479,7 @@ func _rebuild_layout() -> void:
 			if not is_instance_valid(_intro_node):
 				show_intro()
 		"game": show_game(_state)
+		"party_folio", "party_wheel": show_party(_view_state, _party_data, _party_figures, _party_feedback)
 		"menu": show_menu(_can_continue)
 		"settings": _show_settings(_settings_return)
 		"pause": show_pause()

@@ -66,6 +66,31 @@
       "source_mission": "I-04"
     }
   ],
+  "party_tasks": {
+    "source": "Kreative Erweiterung zu I-04 · freiwillige Aufgaben am Ort des bestehenden Missionsschritts",
+    "steps": {
+      "collect_kindling": {
+        "guide": [
+          "navigation",
+          "findet die Markierung des Holzlagers"
+        ],
+        "carry": [
+          "endurance",
+          "hilft dir, das trockene Kleinholz aufzunehmen"
+        ]
+      },
+      "deliver_kindling": {
+        "guide": [
+          "navigation",
+          "weist den Weg zu Sextus"
+        ],
+        "carry": [
+          "endurance",
+          "hilft dir beim Abladen an der Werkstatt"
+        ]
+      }
+    }
+  },
   "companions": [
     {
       "id": "silvanus",

@@ -11,14 +11,14 @@ const MAX_YEAR := 2000
 const MAX_QUALITY := 4
 const ATTESTATIONS := ["attested", "plausible", "design_assumption"]
 const LOADOUT_SLOTS := ["head", "torso", "shield", "main_hand", "sidearm", "missile", "mount", "mount_gear", "standard"]
-const BATTLE_KINDS := ["infantry", "spear", "archer", "skirmisher", ""]
-const BATTLE_ROLES := ["heavy", "spear", "archer", "officer", ""]
+const BATTLE_KINDS := ["infantry", "spear", "archer", "skirmisher", "cavalry", ""]
+const BATTLE_ROLES := ["heavy", "spear", "archer", "officer", "cavalry", ""]
 const SERVICES := ["roman", "own"]
 const OWNERSHIP := ["loan", "own", "issued"]
 const COMMAND_SCOPES := ["army", "company", "deputy", "none"]
 ## A battle kind needs a matching weapon in the named slot, otherwise data and simulation disagree.
-const KIND_WEAPONS := {"infantry": ["gladius", "sword_long", "axe"], "spear": ["spear"], "archer": ["bow", "sling"], "skirmisher": ["javelin"]}
-const KIND_SLOT := {"infantry": "main_hand", "spear": "main_hand", "archer": "main_hand", "skirmisher": "missile"}
+const KIND_WEAPONS := {"infantry": ["gladius", "sword_long", "axe"], "spear": ["spear"], "archer": ["bow", "sling"], "skirmisher": ["javelin"], "cavalry": ["spear", "sword_long"]}
+const KIND_SLOT := {"infantry": "main_hand", "spear": "main_hand", "archer": "main_hand", "skirmisher": "missile", "cavalry": "main_hand"}
 const TIER_KINDS := ["experience", "equipment", "training"]
 ## Inputs of the military options (D-041): scalar minimums and per-id minimums.
 const NEED_SCALARS := ["wealth", "trade", "trade_partners", "population"]
@@ -287,6 +287,8 @@ static func _validate_troop(t: Dictionary, families: Dictionary, troops: Diction
 		var slot: String = KIND_SLOT[kind]
 		if not loadout.has(slot) or typeof(loadout[slot]) != TYPE_DICTIONARY or not loadout[slot].get("family_id") in KIND_WEAPONS[kind]:
 			errors.append(owner + ": battle_kind %s braucht passende Hauptwaffe (%s)" % [kind, slot])
+	if kind == "cavalry" and (not loadout.has_all(["mount", "mount_gear"]) or not t.get("drills") is Dictionary or not is_integer(t.drills.get("dismount"), 1, 3)):
+		errors.append(owner + ": Reiter benötigen ein Dienstpferd, Reitzeug und Reitausbildung.")
 	if t.has("requires") or t.has("max_share"):
 		_check_needs(owner + ": requires", t.get("requires"), errors)
 		if typeof(t.get("max_share")) not in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(t.max_share)) or t.max_share <= 0 or t.max_share > 1:

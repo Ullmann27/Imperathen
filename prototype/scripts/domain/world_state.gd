@@ -25,9 +25,11 @@ const Roster = preload("res://scripts/battle/soldier_roster.gd")
 const Relations = preload("res://scripts/domain/actor_relations.gd")
 const Life = preload("res://scripts/battle/soldier_life.gd")
 const Politics = preload("res://scripts/domain/valdora_politics.gd")
-const VERSION := 2
+const Party = preload("res://scripts/domain/travel_party.gd")
+const VERSION := 3
 const LEGACY_KEYS := ["version", "time", "raids", "military"]
-const KEYS := LEGACY_KEYS + ["politics"]
+const POLITICAL_KEYS := LEGACY_KEYS + ["politics"]
+const KEYS := POLITICAL_KEYS + ["party"]
 const RAID_STATUS := ["committed", "booked", "no_band"]
 ## Balance value (central): a promoted soldier serves a season in grade first.
 const MIN_DAYS_IN_GRADE := 90
@@ -36,7 +38,7 @@ const MAX_PROMOTIONS := 512
 
 
 static func new_state() -> Dictionary:
-	return {"version": VERSION, "time": {}, "raids": {}, "politics": Politics.new_state(),
+	return {"version": VERSION, "time": {}, "raids": {}, "politics": Politics.new_state(), "party":Party.initial(),
 		"military": {"battle_start_jdn": -1, "battle_end_jdn": -1, "promotions": []}}
 
 
@@ -44,7 +46,11 @@ static func migrate(world: Dictionary) -> void:
 	var state: Variant = world.get("world_state")
 	if _keys(state, LEGACY_KEYS) and _int(state.version, 1, 1):
 		state.politics = Politics.new_state()
+		state.version = 2
+	if _keys(state, POLITICAL_KEYS) and _int(state.version, 2, 2):
+		state.party = Party.initial()
 		state.version = VERSION
+		Party.migrate_legacy(world)
 
 
 # --- raids: village <-> tribal ledger -------------------------------------------------

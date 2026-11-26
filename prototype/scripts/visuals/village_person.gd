@@ -14,6 +14,7 @@ const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
 const YouthSoleContact := preload("res://scripts/visuals/youth_sole_contact.gd")
 const AuthoredGround := preload("res://scripts/visuals/authored_ground.gd")
 const HandPose := preload("res://scripts/visuals/hand_pose.gd")
+const PartyGear := preload("res://scripts/visuals/party_gear.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
 const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
@@ -315,6 +316,7 @@ func _reload(level: int) -> void:
 	# new skeleton. LOD changes must not silently erase a valid guard.
 	_sync_loaned_gear()
 	_sync_service_gear()
+	PartyGear.sync(self, get_meta("party_equipment", {}))
 	_play(clip,saved_phase,0)
 	_face.pose("attack" if not _combat_id.is_empty() else clip,saved_phase,detail)
 	if not _combat_id.is_empty():

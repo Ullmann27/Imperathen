@@ -608,9 +608,10 @@ func _test_v5_migration() -> void:
 			_check(time.date_label == expected[name], "%s lands on %s" % [name, str(expected[name])])
 		_check(int(model.data.world_state.time.counts.sleep) == day - 1 and int(model.data.world_state.time.counts.night) == int(night) and int(model.data.world_state.time.counts.jump) == 0, "%s: every lived night is booked as sleep" % name)
 		_check(int(model.data.player.age) == int(payload.player.age) and int(model.data.calendar.births.player.year) == -70 and int(model.data.progress.years_elapsed) == int(payload.progress.years_elapsed), "%s: age and elapsed years are the saved ones" % name)
-		var untouched := true
+		var untouched: bool = model.data.population.soldiers == payload.population.soldiers and model.data.population.dead == payload.population.dead
+		untouched = untouched and model.data.population.workers - payload.population.workers == model.data.population.total - payload.population.total
 		for key: String in payload:
-			if key in ["schema_version", "village"]:
+			if key in ["schema_version", "village", "population"]:
 				continue
 			untouched = untouched and _same(model.data[key], payload[key])
 		for key: String in payload.village:

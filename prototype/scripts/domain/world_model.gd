@@ -19,6 +19,7 @@ const CityTrade = preload("res://scripts/city_trade.gd")
 const TribalWorld = preload("res://scripts/domain/tribal_world.gd")
 const WorldClock = preload("res://scripts/domain/world_clock.gd")
 const WorldState = preload("res://scripts/domain/world_state.gd")
+const Party = preload("res://scripts/domain/travel_party.gd")
 const Politics = preload("res://scripts/domain/valdora_politics.gd")
 const PersonRegistry = preload("res://scripts/domain/person_registry.gd")
 const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
@@ -147,6 +148,8 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 	data.tribes = TribalWorld.new_state(TribalWorld.seed_from_text(str(data.world_id)), TribalWorld.scenario_for_world(data))
 	# One world clock: 1 May 58 BC for the campaign, spring 100 AD for the
 	# legacy careers, which keep their own timeline (D-044).
+	data.population.total = _reserve_size(data)
+	data.population.workers = data.population.total
 	WorldClock.start(data)
 	changed.emit()
 
@@ -158,6 +161,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	command_fields.merge(CombatActions.COMMAND_FIELDS)
 	command_fields.merge(CityTrade.COMMAND_FIELDS)
 	command_fields.merge(Politics.COMMAND_FIELDS)
+	command_fields.merge(Party.COMMAND_FIELDS)
 	if not command_fields.has(command):
 		return _fail("Unbekannter Spielbefehl: %s" % command)
 	if not _exact_keys(args, command_fields[command]):
@@ -294,6 +298,8 @@ func advance(delta: float) -> void:
 	# The village economy day (legacy) and the played battle are derived
 	# passages of the one world clock; ages follow the clock, never a counter.
 	WorldClock.sync(candidate)
+	Party.advance_lessons(candidate, delta)
+	Party.settle_days(candidate, WorldClock.jdn(candidate) - WorldClock.jdn(data))
 	notify_ui = WorldState.bridge_raids(candidate) or notify_ui
 	notify_ui = _pump_tribes(candidate, TRIBE_UNITS_PER_FRAME) or notify_ui
 	candidate.revision = int(data.revision) + 1
@@ -404,6 +410,7 @@ func pass_calendar_days(days: int, reason: String = "", cause: String = "travel"
 	var candidate := _world_copy()
 	var label := reason if not reason.is_empty() else str(WorldClock.PASS_LABELS[cause])
 	WorldClock.book(candidate, str(WorldClock.PASS_CAUSES[cause]), days * WorldClock.DAY, label)
+	Party.settle_days(candidate, days)
 	candidate.revision = int(data.revision) + 1
 	var error := _validate_state(candidate)
 	if not error.is_empty():
@@ -428,6 +435,8 @@ func _after_command(before: Dictionary, state: Dictionary, command: String, resu
 		WorldClock.book(state, "trade", WorldClock.TRADE_SECONDS, "Handel am Stand")
 	WorldState.bridge_raids(state)
 	WorldClock.sync(state)
+	Party.reconcile(state)
+	Party.settle_days(state, WorldClock.jdn(state) - WorldClock.jdn(before))
 
 
 # --- shared world state: soldiers and relations ------------------------------------------
@@ -550,7 +559,9 @@ func checkpoint_valley(battle) -> bool:
 		"allied_losses":summary.ally.losses, "enemy_losses":summary.enemy.losses}
 	# Battle seconds are a derived passage of the world clock; the first final
 	# checkpoint dates the end of the battle for recovery on world time.
+	var prior_day := WorldClock.jdn(data)
 	WorldClock.sync(data)
+	Party.settle_days(data, WorldClock.jdn(data) - prior_day)
 	WorldState.battle_ended(data)
 	if battle.outcome != "ongoing":
 		var result: String = {"victory":"Die Grenzlegion hält die Talstraße.", "defeat":"Der Höhenbund kontrolliert die Talstraße.", "draw":"Die Talstraße bleibt umkämpft."}[battle.outcome]
@@ -737,17 +748,23 @@ func _apply_training_contact(state: Dictionary) -> Dictionary:
 		state.progress.stage = "trained"
 		state.player.role = "soldier"
 		_record(state, "Du beendest die erste Kampfausbildung. Als ausgebildeter Soldat darfst du einen kleinen Wachtrupp anwerben.")
-		_set_story(state, "Eine erste Verantwortung", "Wirb bis zu drei Freiwillige an. Jeder kostet 5 Denarii und 2 Getreide und fehlt anschließend als zivile Arbeitskraft.")
+		_set_story(state, "Eine erste Verantwortung", "Wirb verfügbare Freiwillige an. Jeder kostet 5 Denarii und 2 Getreide und fehlt anschließend als zivile Arbeitskraft.")
 		return _ok("Ausbildung abgeschlossen. Du darfst einen kleinen Trupp anwerben.")
 	return _ok("Gültiger Übungstreffer %d/3." % int(state.progress.training_hits))
 
 
 ## Read-only options for the local steward and the inspection point.
+func party_view() -> Dictionary:
+	return Party.view(data)
+
+
 func politics_view() -> Dictionary:
 	return Politics.view(data)
 
 
 func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dictionary:
+	if Party.COMMAND_FIELDS.has(command):
+		return Party.apply(state, command, args)
 	if Politics.COMMAND_FIELDS.has(command):
 		var result := Politics.apply(state, command, args)
 		if result.ok:
@@ -771,6 +788,8 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			return _fail("Dieser Lebensweg verwendet den bisherigen regionalen Dorfabschnitt.")
 		if Childhood.enabled(state) and command in ["village_request_work","village_assign","village_shift","village_repair","village_resow"]:
 			return _fail("Die Erwachsenen organisieren das Dorf. Du hilfst mit deinen eigenen Aufträgen und lernst ihre Arbeit kennen.")
+		if command in ["village_assign", "village_shift"] and Party.travelling(state, "vil:" + str(args.resident_id)):
+			return _fail("Diese Person reist gerade mit dir.")
 		if command in ["village_assign", "village_shift"] and state.village.militia.has(args.resident_id):
 			return _fail("Diese Person gehört bereits zum angeworbenen Trupp und kann nicht zugleich eine Dorfstelle übernehmen.")
 		var village_result: Dictionary
@@ -780,6 +799,10 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 		else:
 			village_result = VillageLife.execute(state, command, args)
 		state.village.health_delta += int(state.player.health) - previous_health
+		if village_result.ok and command == "village_childhood_action":
+			var shared := Childhood.credit_party_action(state, str(args.action_id))
+			if not shared.is_empty():
+				village_result.message += " " + shared
 		if village_result.get("ok", false) and command not in ["village_strike", "village_block", "village_dodge", "village_unarmed_attack", "village_unarmed_guard", "village_unarmed_dodge"]:
 			_record(state, str(village_result.message))
 		return village_result
@@ -875,8 +898,8 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 				return _fail("Beende zuerst die erwachsene Ausbildung.")
 			if state.encounter.started:
 				return _fail("Die Besetzung dieses Gefechts ist bereits festgelegt.")
-			if int(state.squad.recruits) >= 3:
-				return _fail("Dieser Wachtrupp umfasst höchstens drei Freiwillige.")
+			if int(state.population.workers) <= 0:
+				return _fail("Alle verfügbaren Personen sind bereits eingeteilt.")
 			if int(state.resources.denarii) < 5 or int(state.resources.grain) < 2:
 				return _fail("Ein Freiwilliger benötigt 5 Denarii und 2 Getreide.")
 			var recruit_name := "Ein Freiwilliger"
@@ -1017,6 +1040,8 @@ func _resolve_skirmish(state: Dictionary) -> Dictionary:
 
 
 func _validate_arguments(command: String, args: Dictionary) -> String:
+	if Party.COMMAND_FIELDS.has(command):
+		return Party.validate_arguments(command, args)
 	if Politics.COMMAND_FIELDS.has(command):
 		return Politics.validate_arguments(command, args)
 	if CityTrade.COMMAND_FIELDS.has(command):
@@ -1077,7 +1102,7 @@ func _validate_state(state: Variant) -> String:
 		return "Der Dorfvertrag fehlt."
 	if not _integer(state.village.get("health_delta"), -1000000, 1000000):
 		return "Die Gesundheitsbilanz des Dorflebens ist ungültig."
-	if typeof(state.village.get("militia")) != TYPE_ARRAY or state.village.militia.size() > 3:
+	if typeof(state.village.get("militia")) != TYPE_ARRAY or state.village.militia.size() > VillageEconomy.PEOPLE.size():
 		return "Die persönliche Dorfmiliz ist ungültig."
 	if state.village.enabled and state.origin_id != "italia":
 		return "Der römische Dorfabschnitt passt nicht zur Herkunft."
@@ -1095,9 +1120,6 @@ func _validate_state(state: Variant) -> String:
 	var behavior_error := NpcBehavior.validate(state)
 	if not behavior_error.is_empty():
 		return behavior_error
-	var trade_error := CityTrade.validate(state)
-	if not trade_error.is_empty():
-		return trade_error
 	if float(state.village.social.accumulator) >= VillageLife.STEP + 0.00000001:
 		return "Die Dorfzeit enthält einen nicht abgearbeiteten Zeitsprung."
 	var economic_seconds := int(state.village.economy.day) * VillageEconomy.day_length(state) + float(state.village.economy.day_seconds)
@@ -1132,6 +1154,12 @@ func _validate_state(state: Variant) -> String:
 	var world_error := WorldState.validate(state)
 	if not world_error.is_empty():
 		return world_error
+	var party_error := Party.validate(state)
+	if not party_error.is_empty():
+		return party_error
+	var trade_error := CityTrade.validate(state)
+	if not trade_error.is_empty():
+		return trade_error
 	var jumps := int(state.world_state.time.counts.jump)
 	if adult != (jumps == 1) or (adult and int(state.player.age) < 18):
 		return "Alterssprung und Weltphase widersprechen sich."
@@ -1181,17 +1209,18 @@ func _validate_state(state: Variant) -> String:
 		if int(node.amount) % 4 != 0:
 			return "Der Holzbestand passt nicht zu den Sammelvorgängen."
 		remaining_wood += int(node.amount)
-	if not _exact_keys(state.squad, ["recruits", "alive", "morale"]) or not _integer(state.squad.recruits, 0, 3) or not _integer(state.squad.alive, 0, 3) or not _integer(state.squad.morale, 0, 100):
+	var reserve_size := _reserve_size(state)
+	if not _exact_keys(state.squad, ["recruits", "alive", "morale"]) or not _integer(state.squad.recruits, 0, reserve_size) or not _integer(state.squad.alive, 0, reserve_size) or not _integer(state.squad.morale, 0, 100):
 		return "Ungültiger Wachtrupp."
 	if int(state.squad.alive) > int(state.squad.recruits) or (int(state.squad.recruits) > 0 and not progress.training_complete):
 		return "Truppenstärke oder Befehlsrecht widersprechen sich."
 	if not _exact_keys(state.population, ["total", "workers", "soldiers", "dead"]):
 		return "Ungültige Personalbilanz."
 	for key in state.population:
-		if not _integer(state.population[key], 0, 4):
+		if not _integer(state.population[key], 0, reserve_size):
 			return "Personal muss aus ganzen nichtnegativen Mengen bestehen."
 	var dead := int(state.squad.recruits) - int(state.squad.alive)
-	if state.population.total != 4 or state.population.workers != 4 - int(state.squad.recruits) or state.population.soldiers != state.squad.alive or state.population.dead != dead:
+	if state.population.total != reserve_size or state.population.workers != reserve_size - int(state.squad.recruits) or state.population.soldiers != state.squad.alive or state.population.dead != dead:
 		return "Arbeiter, Soldaten und Gefallene sind nicht bilanziert."
 	if state.village.enabled:
 		if state.village.militia.size() != int(state.squad.recruits):
@@ -1260,7 +1289,7 @@ func _validate_state(state: Variant) -> String:
 		village_ledger[key] = int(state.village.economy.ledger[key]) + int(state.village.social.ledger[key])
 	var childhood_marcus_friend := Childhood.enabled(state) and str(state.village.childhood.screenplay.get("i03_outcome", "")) == "friend"
 	var help_cost := 0 if childhood_marcus_friend else (4 if companion.choice == "help" else 0)
-	if int(state.resources.wood) + HUT_COST * state.buildings.size() + help_cost != 48 - remaining_wood + int(village_ledger.wood):
+	if int(state.resources.wood) + int(state.world_state.party.staff_made) + HUT_COST * state.buildings.size() + help_cost != 48 - remaining_wood + int(village_ledger.wood):
 		return "Die Holzbilanz wurde verletzt."
 	if int(state.resources.stone) != int(village_ledger.stone):
 		return "Die Steinbilanz wurde verletzt."
@@ -1268,9 +1297,9 @@ func _validate_state(state: Variant) -> String:
 	var expected_money := int(state.player.get("start_funds", DEVELOPMENT_START_DENARII)) - 5 * int(state.squad.recruits) + (15 if progress.skirmish_won else 0) + (12 if state.story.choice == "pursue" else 0)
 	expected_grain += int(frontier_effects.grain)
 	expected_money += int(frontier_effects.denarii)
-	expected_grain += int(village_ledger.grain)
+	expected_grain += int(village_ledger.grain) - Party.grain_issued(state.world_state.party)
 	expected_money += int(village_ledger.denarii)
-	expected_money += CityTrade.money_effect(state)
+	expected_money += CityTrade.money_effect(state) - Party.wages_paid(state.world_state.party)
 	if state.resources.grain != expected_grain or state.resources.denarii != expected_money:
 		return "Die Versorgungs- oder Geldbilanz wurde verletzt."
 	var expected_trust := (20 if companion.choice == "help" else (-5 if companion.choice == "decline" else 0)) + (5 if state.story.choice == "protect" else (-5 if state.story.choice == "pursue" else 0))
@@ -1406,6 +1435,8 @@ func _migrate_world_state(state: Dictionary) -> void:
 		reported = int(state.tribes.extra_days)
 		state.tribes.extra_days = 0
 	state.world_state = WorldState.new_state()
+	state.world_state.erase("party")
+	state.world_state.version = 2 # Continue through the same checked party migration.
 	state.calendar = {}
 	var origin := WorldClock.origin_year_of(state)
 	var epoch := WorldClock.start_jdn(origin)
@@ -1475,6 +1506,7 @@ func _restore_integer_fields(state: Dictionary) -> void:
 	CityTrade.restore_integer_fields(state)
 	TribalWorld.normalize(state.tribes)
 	WorldState.normalize(state)
+	Party.normalize(state)
 	for key in ["schema_version", "revision"]:
 		state[key] = int(state[key])
 	state.frontier.schema = int(state.frontier.schema)
@@ -1638,9 +1670,15 @@ func _village_resident(state: Dictionary, id: String) -> Dictionary:
 	return {}
 
 
+func _reserve_size(state: Dictionary) -> int:
+	if not state.village.enabled:
+		return 4 # Regional scenario's original inhabitants.
+	return Party.village_reserve_size()
+
+
 func _available_village_recruit(state: Dictionary) -> Dictionary:
 	for person in state.village.economy.people:
-		if VillageLife.NPCS.has(person.id):
+		if VillageLife.NPCS.has(person.id) or Party.travelling(state, "vil:" + str(person.id)):
 			continue
 		if person.alive and int(person.health) > 30 and int(person.hunger) < 2 and person.assignment == "idle":
 			return person
@@ -1728,7 +1766,9 @@ func act_region(command: String,target: String) -> Dictionary:
 			# ages and elapsed years follow the clock (no separate counter).
 			# Its thirteen tribal weeks follow in frame budgets (advance() in
 			# the world, pump_tribes() while a menu pauses it).
+			var prior_day := WorldClock.jdn(data)
 			WorldClock.season(data, "Jahreszeit der Regionalkampagne")
+			Party.settle_days(data, WorldClock.jdn(data) - prior_day)
 		_record(data,result.message)
 		data.revision += 1
 		changed.emit()

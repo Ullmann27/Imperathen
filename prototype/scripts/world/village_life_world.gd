@@ -503,13 +503,13 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 	caption = Childhood.display_name(state, id, caption)
 	var at: Vector2 = Life.actor_position(state, id)
 	if not actors.has(id):
-		var actor: CollisionObject3D = CharacterBody3D.new() if id == "silvanus" else StaticBody3D.new()
+		var actor := CharacterBody3D.new()
 		actor.name = "Resident_" + id
 		actor.position = Vector3(at.x,0,at.y)
 		actor.collision_layer = Layout.CITIZEN_LAYER
-		actor.collision_mask = (1 | 2 | 4 | Layout.CITIZEN_LAYER) if actor is CharacterBody3D else 0
-		if actor is CharacterBody3D:
-			actor.floor_snap_length = 0.35
+		actor.collision_mask = 1 | 2 | 4 | Layout.CITIZEN_LAYER
+		actor.floor_snap_length = 0.35
+		actor.set_meta("home_position", actor.position)
 		var collision := CollisionShape3D.new()
 		collision.name = "PersonalSpace"
 		var capsule := CapsuleShape3D.new()
@@ -542,7 +542,9 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 	var actor: CollisionObject3D = actors[id]
 	actor.set_meta("display_name",caption)
 	actor.get_node("Nameplate").text = caption + " · " + profession
-	var controlled: bool = id == "silvanus" and Childhood.enabled(state) and person.get("assignment", "idle") == "idle"
+	var can_walk: bool = person.get("assignment", "idle") == "idle" and person.get("alive", true)
+	var member: Dictionary = Childhood.CompanionStory.member(state, id)
+	var controlled: bool = can_walk and (id == "silvanus" and Childhood.enabled(state) or not member.is_empty())
 	actor.set_meta("companion_controlled", controlled)
 	if not controlled:
 		# Inside a house the figure stands on the raised floor, not in it.

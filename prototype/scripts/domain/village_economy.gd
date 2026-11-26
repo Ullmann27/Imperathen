@@ -281,7 +281,8 @@ static func _meal(data: Dictionary) -> void:
 	var shortfall := 0
 	for offset in economy.people.size():
 		var person: Dictionary = economy.people[(int(economy.meal_offset) + offset) % economy.people.size()]
-		if not person.alive:
+		var traveller: Dictionary = data.get("world_state",{}).get("party",{}).get("members",{}).get("vil:" + str(person.id),{})
+		if not person.alive or (traveller.get("status","") == "active" and traveller.order != "home"):
 			continue
 		if int(data.resources.grain) > 0:
 			_transfer(data, "grain", -1)

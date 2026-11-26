@@ -24,6 +24,7 @@ var _political_survey_range := 1.6
 var _village_focus := ""
 var _dodge_remaining := 0.0
 var _dodge_direction := Vector3.ZERO
+const PatrolPeople = preload("res://scripts/domain/person_registry.gd")
 const VillageLayout = preload("res://scripts/world/village/village_layout.gd")
 var population = preload("res://scripts/world/village/village_population.gd").new()
 var regional = preload("res://scripts/world/regional_village.gd").new()
@@ -238,6 +239,7 @@ func sync_state(state: Dictionary) -> void:
 	_shown_health = health_now
 	_shown_work = construction
 	_companion.get_node("Figure").configure("companion",_state.get("origin_id","italia"),age)
+	_story_companions.sync(state)
 	var progress: Dictionary = _state.get("progress", {})
 	var trained := bool(progress.get("training_complete", false))
 	var hits := int(progress.get("training_hits", 0))
@@ -1105,46 +1107,58 @@ func _sync_enemies() -> void:
 
 func _sync_squad() -> void:
 	var squad: Dictionary = _state.get("squad", {})
-	var alive := clampi(int(squad.get("alive", 0)), 0, 3)
-	var residents: Array = _state.get("village", {}).get("economy", {}).get("people", [])
-	var named_militia: Array[Dictionary] = []
-	if _state.get("village", {}).get("enabled", false):
-		for id: String in _state.village.get("militia", []):
-			for person: Dictionary in residents:
-				if person.id == id and person.alive:
-					named_militia.append(person)
-		alive = named_militia.size()
-	while _squad_views.size() < alive:
-		var soldier := CharacterBody3D.new()
-		soldier.name = "Recruit%d" % (_squad_views.size() + 1)
-		soldier.collision_layer = 4
-		soldier.collision_mask = 1
-		soldier.floor_snap_length = 0.25
-		var collider := CollisionShape3D.new()
-		var capsule := CapsuleShape3D.new()
-		capsule.radius = 0.25
-		capsule.height = 1.8
-		collider.shape = capsule
-		soldier.add_child(collider)
-		_squad_root.add_child(soldier)
-		Art.person(soldier,"recruit")
-		var label := Art.label(soldier,"",Vector3(0,1.05,0),Color(0.78,0.88,0.74),28)
-		label.name = "RecruitName"
-		soldier.position = _player.position + Vector3(2 + _squad_views.size(), 0, 2)
+	var alive := int(squad.get("alive", 0))
+	var losses := int(squad.get("recruits", 0)) - alive
+	var residents := {}
+	for person: Dictionary in _state.get("village", {}).get("economy", {}).get("people", []):
+		residents[person.id] = person
+	var previous := {}
+	for view: Node3D in _squad_views:
+		previous[view.get_meta("actor_uid")] = view
+	_squad_views.clear()
+	for index in range(losses, losses + alive):
+		var uid := PatrolPeople.patrol_uid(_state, index)
+		var soldier: Node3D = previous.get(uid)
+		if soldier:
+			previous.erase(uid)
+		else:
+			soldier = _spawn_patrol_member(uid, index, residents)
 		_squad_views.append(soldier)
-	while _squad_views.size() > alive:
-		var removed: Node3D = _squad_views.pop_back()
-		removed.queue_free()
-	for index in range(_squad_views.size()):
-		var recruit_name := "Rekrut %d" % (index + 1)
-		var resident_id := ""
-		if not named_militia.is_empty():
-			recruit_name = str(named_militia[index].name)
-			resident_id = str(named_militia[index].id)
-		elif _state.get("origin_id", "italia") == "italia":
-			recruit_name = VillageLayout.resident(VillageLayout.VOLUNTEERS[index]).name
-		_squad_views[index].set_meta("resident_id", resident_id)
-		_squad_views[index].get_node("RecruitName").text = recruit_name
+	for departed: Node3D in previous.values():
+		departed.queue_free()
+
+
+func _spawn_patrol_member(uid: String, index: int, residents: Dictionary) -> CharacterBody3D:
+	var soldier := CharacterBody3D.new()
+	var resident_id := uid.trim_prefix("vil:") if uid.begins_with("vil:") else ""
+	var recruit_name := "Rekrut %d" % (index + 1)
+	if residents.has(resident_id):
+		recruit_name = str(residents[resident_id].name)
+	elif _state.get("origin_id", "italia") == "italia" and index < VillageLayout.VOLUNTEERS.size():
+		recruit_name = VillageLayout.resident(VillageLayout.VOLUNTEERS[index]).name
+	soldier.name = "Recruit%d" % (index + 1)
+	soldier.set_meta("actor_uid", uid)
+	soldier.set_meta("resident_id", resident_id)
+	soldier.collision_layer = 4
+	soldier.collision_mask = 1
+	soldier.floor_snap_length = 0.25
+	var collider := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.25
+	capsule.height = 1.8
+	collider.shape = capsule
+	soldier.add_child(collider)
+	_squad_root.add_child(soldier)
+	Art.person(soldier, "recruit")
+	var label := Art.label(soldier, recruit_name, Vector3(0,1.05,0), Color(0.78,0.88,0.74), 28)
+	label.name = "RecruitName"
+	soldier.position = _player.position + _patrol_offset(_squad_views.size()).rotated(Vector3.UP, _figure.rotation.y)
+	return soldier
+
+
+func _patrol_offset(index: int) -> Vector3:
+	var file := index % 3
+	return Vector3((file - 1) * 1.7, 0, 2.0 + 2.0 * floori(index / 3.0) + float(file == 1))
 
 
 func _physics_process(delta: float) -> void:
@@ -1334,10 +1348,9 @@ func _update_story_companions(delta: float) -> void:
 
 
 func _update_followers(delta: float) -> void:
-	var offsets: Array[Vector3] = [Vector3(-1.7, 0, 2.0), Vector3(0, 0, 3.0), Vector3(1.7, 0, 2.0)]
 	for index in range(_squad_views.size()):
 		var soldier := _squad_views[index] as CharacterBody3D
-		var desired := _player.position + offsets[index].rotated(Vector3.UP, _figure.rotation.y)
+		var desired := _player.position + _patrol_offset(index).rotated(Vector3.UP, _figure.rotation.y)
 		desired.y = 0.90
 		var displacement := desired - soldier.position
 		var horizontal := Vector3(displacement.x, 0, displacement.z)
