@@ -29,6 +29,8 @@ func _run() -> void:
 	print("PARTY_WORLD_RESULT checks=%d failures=%d" % [checks, failures.size()])
 	for failure: String in failures:
 		printerr("FAIL: " + failure)
+	if failures.is_empty():
+		print("PARTY_WORLD_PASS")
 	quit(0 if failures.is_empty() else 1)
 
 
