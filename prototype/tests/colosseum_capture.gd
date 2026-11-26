@@ -20,13 +20,13 @@ func _rig(parent: Node) -> void:
 	# One neutral daylight rig for both modes so the comparison is fair.
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-42.0, 38.0, 0.0)
-	sun.light_energy = 1.25
+	sun.light_energy = 1.0
 	sun.light_color = Color(1.0, 0.96, 0.88)
 	sun.shadow_enabled = true
 	sun.directional_shadow_max_distance = 260.0
 	parent.add_child(sun)
 	var sky_material := ProceduralSkyMaterial.new()
-	sky_material.sky_top_color = Color(0.22, 0.42, 0.72)
+	sky_material.sky_top_color = Color(0.30, 0.45, 0.68)
 	sky_material.sky_horizon_color = Color(0.72, 0.80, 0.88)
 	sky_material.ground_horizon_color = Color(0.62, 0.60, 0.55)
 	sky_material.ground_bottom_color = Color(0.30, 0.28, 0.25)
@@ -36,7 +36,10 @@ func _rig(parent: Node) -> void:
 	environment.background_mode = Environment.BG_SKY
 	environment.sky = sky
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	environment.ambient_light_energy = 0.9
+	environment.ambient_light_color = Color(0.80, 0.78, 0.74)
+	environment.ambient_light_sky_contribution = 0.45
+	environment.ambient_light_energy = 0.55
+	environment.tonemap_white = 4.0
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	var world := WorldEnvironment.new()
 	world.environment = environment
