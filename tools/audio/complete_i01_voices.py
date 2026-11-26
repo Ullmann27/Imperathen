@@ -84,6 +84,15 @@ def main():
         by_id.add(new_id)
         wanted.append({"line_id": new_id, "scope": "I-01", "speaker_id": sid,
                        "text": text, "text_key": k, "source": str(MISSION.relative_to(ROOT))})
+    # The preceding 16-seed run consistently fused “Abend heim” in the
+    # I01_C_FAREWELL transcription (best WER 0.125). Try natural boundary
+    # alternatives for the synthesizer only; subtitles and WER stay exact.
+    for row in wanted:
+        if row["line_id"] == "I01_C_FAREWELL" and row["text"] == "»Geh nur. Erst zu Aurelia mit dem Korb, dann zu Cassia. Und komm zum Abend heim.«":
+            row["synthesis_variants"] = [
+                "Geh nur! Erst zu Aurelia mit dem Korb, dann zu Cassia. Und komm zum Abend heim!",
+                "Geh nur. Erst zu Aurelia mit dem Korb, dann zu Cassia. Und komm zum Abend – heim.",
+            ]
     if not wanted:
         print("I01_VOICE_COVERAGE_COMPLETE")
         return
@@ -107,12 +116,12 @@ def main():
     py = sys.executable
     # A deterministic retry must try additional seeds, not repeat the four
     # rejected samples forever. Keep the existing WER and alignment gates.
-    subprocess.run([py, "-I", str(TOOLS / "generate_voices.py"), "--strict", "--attempts", "16", "--lines",
+    subprocess.run([py, "-I", str(TOOLS / "generate_voices.py"), "--strict", "--attempts", "32", "--lines",
                     str(work / "missing.json"), "--work", str(work), "--out", str(stage),
                     "--only", *refs.keys()], check=True)
     subprocess.run([py, "-I", str(TOOLS / "align_visemes.py"), "--work", str(work), "--out", str(stage)], check=True)
     meta = read(work / "lines_meta.json")
-    fields = ("line_id", "kind", "speaker_id", "text", "text_key", "file", "sha256", "visemes",
+    fields = ("line_id", "kind", "speaker_id", "text", "text_key", "spoken_text", "file", "sha256", "visemes",
               "visemes_sha256", "duration_s", "model", "voice_design_model", "reference_seed",
               "reference_audio_sha256", "reference_line_id", "seed", "post", "asr_wer", "asr_text",
               "lufs_integrated", "alignment")

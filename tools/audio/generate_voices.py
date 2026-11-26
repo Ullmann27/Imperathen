@@ -204,23 +204,31 @@ def main():
         if sid not in prompts:
             prompts[sid] = base.create_voice_clone_prompt(ref_audio=refs_meta[sid]["file"], ref_text=refs_meta[sid].get("ref_text", ref_text))
         text = speakable(line["text"])
+        # Prosody-only alternatives must preserve every authored word. ASR
+        # acceptance is always measured against the original canonical text.
+        variants = [text, *line.get("synthesis_variants", [])]
+        if any(norm_words(variant) != norm_words(text) for variant in variants):
+            raise SystemExit(f"Non-canonical synthesis variant: {line['line_id']}")
         best = None
         base_seed = int(hashlib.sha256(line["line_id"].encode()).hexdigest()[:6], 16)
         for attempt in range(a.attempts):
             seed = base_seed + attempt
+            # Preserve the first 16 deterministic attempts for the existing
+            # repair; later attempts vary phrasing boundaries, not words.
+            variant = variants[0] if attempt < 16 else variants[(attempt - 16) % len(variants)]
             torch.manual_seed(seed)
             t0 = time.time()
-            w, sr = base.generate_voice_clone(text=text, language="German", voice_clone_prompt=prompts[sid], max_new_tokens=token_budget(text))
+            w, sr = base.generate_voice_clone(text=variant, language="German", voice_clone_prompt=prompts[sid], max_new_tokens=token_budget(text))
             p = work / "raw" / f"{line['line_id']}_{seed}.wav"
             sf.write(p, w[0], sr)
             hyp = transcribe(p)
             err = wer(text, hyp) + (1.0 if too_long(len(w[0]) / sr, text) else 0.0)
             print(f"line {line['line_id']} [{sid}] seed={seed} wer={err:.2f} gen={time.time()-t0:.0f}s :: {hyp}", flush=True)
             if best is None or err < best[0]:
-                best = (err, seed, p, sr, hyp)
+                best = (err, seed, p, sr, hyp, variant)
             if err <= MAX_WER:
                 break
-        err, seed, p, sr, hyp = best
+        err, seed, p, sr, hyp, variant = best
         if a.strict and err > MAX_WER:
             raise SystemExit(f"Unaccepted transcription for {line['line_id']}: WER {err:.3f}")
         wave, _ = sf.read(p)
@@ -235,7 +243,7 @@ def main():
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(master_wav), "-c:a", "libvorbis", "-q:a", "6", "-map_metadata", "-1", "-fflags", "+bitexact", "-flags:a", "+bitexact", str(ogg)], check=True)
         meta[line["line_id"]] = {
             "line_id": line["line_id"], "speaker_id": sid, "text": line["text"], "text_key": line["text_key"],
-            "kind": line.get("kind", "story"), "spoken_text": text, "model": BASE[0] + "@" + BASE[1][:12], "voice_design_model": DESIGN[0] + "@" + DESIGN[1][:12],
+            "kind": line.get("kind", "story"), "spoken_text": variant, "model": BASE[0] + "@" + BASE[1][:12], "voice_design_model": DESIGN[0] + "@" + DESIGN[1][:12],
             "reference_seed": refs_meta[sid]["seed"], "reference_audio_sha256": refs_meta[sid]["sha256"],
             "reference_line_id": refs_meta[sid].get("line_id"), "seed": seed, "asr_wer": round(err, 3), "asr_text": hyp.strip(),
             "lufs_integrated": round(lufs, 2), "duration_s": round(len(mastered) / sr, 3), "sample_rate": sr,
