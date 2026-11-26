@@ -89,6 +89,9 @@ func _add_soldier(person: Dictionary) -> void:
 	figure.detail = 1 if city.profile in ["balanced","low"] else 0
 	var role: String = ["officer","spear","heavy","heavy","spear","heavy"][bodies.size()]
 	figure.configure(role,int(person.appearance_seed))
+	# Company Blender meshes face +Z after glTF conversion. The city
+	# CharacterBody navigation contract faces -Z; rotate only its visual.
+	figure.rotation.y = PI
 	unit.add_child(figure)
 	add_child(unit)
 	bodies.append(unit)
@@ -258,7 +261,17 @@ func _drive(body: CharacterBody3D, target: Vector3, speed: float, delta: float) 
 	var model: Soldier = body.get_node("Soldier")
 	if body == bodies[0] and phase == "scuffle":
 		return
-	model.play_state("march" if moving else "idle")
+	# Actual displacement, not a perpetual one-second walk cycle, drives
+	# the imported gait. The column stops moving its feet when blocked.
+	var gait_phase := float(body.get_meta("city_watch_gait_phase",0.0))
+	if moving:
+		gait_phase = fposmod(gait_phase + movement.length()/float(Soldier.STRIDES.march),1.0)
+		body.set_meta("city_watch_gait_phase",gait_phase)
+		model.present("march",gait_phase,delta)
+	else:
+		gait_phase = fposmod(gait_phase+delta/2.0,1.0)
+		body.set_meta("city_watch_gait_phase",gait_phase)
+		model.present("idle",gait_phase,delta)
 
 func _update_detail(body: CharacterBody3D) -> void:
 	var figure: Soldier = body.get_node("Soldier")
@@ -269,7 +282,9 @@ func _update_detail(body: CharacterBody3D) -> void:
 	if gap < near_range - (1.5 if figure.detail > 0 else 0.0):
 		figure.set_detail(0)
 	elif gap > far_range + (3.0 if figure.detail < 2 else 0.0):
-		figure.set_detail(2)
+		# This small six-man street patrol remains animated at distance.
+		# The battle-only far mesh has no skeleton and would slide.
+		figure.set_detail(1)
 	else:
 		figure.set_detail(1)
 

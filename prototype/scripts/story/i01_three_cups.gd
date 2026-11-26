@@ -87,13 +87,13 @@ static func presentation(data: Dictionary) -> Dictionary:
 	var water := str(screenplay.get("i01_water", "none"))
 	var completed: int = child.get("completed", []).size()
 	var jug := "bench"
-	if child.get("carried", []).has("water_jug"):
-		jug = "hand"
-	elif completed >= 3:
+	if completed >= 3:
 		jug = "away"
+	elif child.get("carried", []).has("water_jug"):
+		jug = "hand"
 	elif water == "jug":
 		jug = "hand"
-	elif water in ["poured", "silvanus"] or status == "legacy" or completed >= 2:
+	elif water in ["jug_table", "poured", "silvanus"] or status == "legacy" or completed >= 2:
 		jug = "table"
 	# Julia stays at the breakfast table until the father has the jug (no
 	# visible jump while the boy is in the house); Silvanus leaves after the
@@ -134,10 +134,14 @@ static func current_step(data: Dictionary) -> Dictionary:
 		return _step("i01_choice")
 	if str(s.i01_meal) == "done":
 		return _step("i01_topic")
+	# Recover saves produced by the former optional-well deadlock: a full
+	# jug must be placed down before retrieving cups that are still on the shelf.
+	if str(s.i01_water) == "jug" and not _table_set(s):
+		return _step("i01_park_jug")
 	if path == "help" and str(s.i01_table_by) != "player":
 		return _step("i01_take_cups") if cup_state.values().has("shelf") else _step("i01_set_table")
 	var water := str(s.i01_water)
-	if water == "jug":
+	if water in ["jug", "jug_table"]:
 		return _step("i01_pour")
 	if water == "none" and path in ["help", "talk"]:
 		return _step("i01_well")
@@ -161,6 +165,8 @@ static func options(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 			for owner: String in CUPS:
 				if s.i01_cups[owner] == "hand":
 					result.append({"id":"i01_place_" + owner, "label":_cup_label(owner)})
+		"i01_park_jug":
+			result.append({"id":"i01_park_jug", "label":"Den gefüllten Krug vorübergehend auf den Tisch stellen"})
 		"i01_well":
 			result.append({"id":"i01_well", "label":"Am Brunnen Wasser in den Krug schöpfen"})
 		"i01_pour":
@@ -190,9 +196,9 @@ static func optional_actions(data: Dictionary) -> Array[Dictionary]:
 	var primary := str(current_step(data).get("id", ""))
 	if str(s.i01_path).is_empty() or str(s.i01_meal) == "done":
 		return result
-	if primary != "i01_well" and str(s.i01_water) == "none" and not s.i01_cups.values().has("hand"):
+	if primary != "i01_well" and str(s.i01_water) == "none" and _table_set(s):
 		result.append({"id":"i01_well", "label":"Am Brunnen Wasser für das Frühstück schöpfen", "point":"well"})
-	if primary != "i01_meal" and primary != "i01_pour" and _table_set(s) and str(s.i01_water) != "jug":
+	if primary != "i01_meal" and primary != "i01_pour" and _table_set(s) and str(s.i01_water) not in ["jug", "jug_table"]:
 		result.append({"id":"i01_meal", "label":"Ohne weitere Hilfe zum Frühstück setzen", "point":"home_table"})
 	return result
 
@@ -329,12 +335,17 @@ static func reason(data: Dictionary, action: String, villager_positions: Diction
 		"i01_well":
 			if str(s.i01_water) != "none":
 				return "Für das Frühstück ist bereits Wasser geholt."
-			if s.i01_cups.values().has("hand"):
-				return "Stell zuerst die Becher ab. Mit drei Bechern in der Hand kannst du keinen Krug tragen."
+			if not _table_set(s):
+				return "Decke zuerst den Tisch. Dann kannst du den Wasserkrug holen."
 			if _distance(data, POINTS.well) > WELL_RANGE:
 				return "Geh zum Brunnen im Hof."
+		"i01_park_jug":
+			if path != "help" or str(s.i01_water) != "jug" or _table_set(s):
+				return "Der Krug muss jetzt nicht abgestellt werden."
+			if _distance(data, POINTS.home_table) > POINT_RANGE:
+				return "Geh zum Frühstückstisch, um den Krug sicher abzustellen."
 		"i01_pour":
-			if str(s.i01_water) != "jug":
+			if str(s.i01_water) not in ["jug", "jug_table"]:
 				return "Du hast kein Brunnenwasser dabei."
 			if not _table_set(s):
 				return "Stell zuerst alle drei Becher auf den Tisch."
@@ -343,7 +354,7 @@ static func reason(data: Dictionary, action: String, villager_positions: Diction
 		"i01_meal":
 			if not _table_set(s):
 				return "Der Tisch ist noch nicht gedeckt."
-			if str(s.i01_water) == "jug":
+			if str(s.i01_water) in ["jug", "jug_table"]:
 				return "Gieß zuerst das Wasser in die Becher."
 			if _distance(data, POINTS.home_table) > POINT_RANGE:
 				return "Komm an den Frühstückstisch im Familienhaus."
@@ -420,6 +431,10 @@ static func apply(data: Dictionary, action: String, villager_positions: Dictiona
 		s.i01_water = "jug"
 		written.append("I-01.water.well")
 		message = "Du schöpfst am Brunnen frisches Wasser in den Familienkrug."
+	elif action == "i01_park_jug":
+		s.i01_water = "jug_table"
+		written.append("I-01.water.parked")
+		message = "Du stellst den gefüllten Krug auf den Tisch. Jetzt sind deine Hände für die Becher frei."
 	elif action == "i01_pour":
 		s.i01_water = "poured"
 		written.append("I-01.water.poured")
@@ -490,8 +505,10 @@ static func expected_events(s: Dictionary) -> Array:
 				result.append("I-01.cup." + owner)
 		if str(s.i01_table_by) == "player":
 			result.append("I-01.cups.table")
-	if str(s.i01_water) in ["jug", "poured"]:
+	if str(s.i01_water) in ["jug", "jug_table", "poured"]:
 		result.append("I-01.water.well")
+	if str(s.i01_water) == "jug_table" or (str(s.i01_water) == "poured" and path == "help" and s.i01_events.has("I-01.water.parked")):
+		result.append("I-01.water.parked")
 	if str(s.i01_water) == "poured":
 		result.append("I-01.water.poured")
 	if str(s.i01_water) == "silvanus":
@@ -528,7 +545,7 @@ static func validate(screenplay: Dictionary, completed: int) -> String:
 	for key: String in ["i01_table_by", "i01_water", "i01_meal", "i01_topic"]:
 		if typeof(screenplay[key]) != TYPE_STRING:
 			return "Ungültiger I-01-Wert."
-	if screenplay.i01_table_by not in ["", "player", "julia"] or screenplay.i01_water not in ["none", "jug", "poured", "silvanus"] or screenplay.i01_meal not in ["pending", "done"] or screenplay.i01_topic not in ["", "workshop", "fields", "contact"]:
+	if screenplay.i01_table_by not in ["", "player", "julia"] or screenplay.i01_water not in ["none", "jug", "jug_table", "poured", "silvanus"] or screenplay.i01_meal not in ["pending", "done"] or screenplay.i01_topic not in ["", "workshop", "fields", "contact"]:
 		return "Ungültiger I-01-Wert."
 	if typeof(screenplay.i01_contacts) != TYPE_ARRAY or typeof(screenplay.i01_events) != TYPE_ARRAY or screenplay.i01_events.size() > 24:
 		return "Ungültige I-01-Ereignisliste."
@@ -557,6 +574,8 @@ static func validate(screenplay: Dictionary, completed: int) -> String:
 		if values != ["table", "table", "table"] or screenplay.i01_table_by != "julia":
 			return "Ohne Mithilfe deckt Julia den Tisch selbst."
 	var table_set: bool = values == ["table", "table", "table"]
+	if screenplay.i01_water == "jug_table" and path != "help":
+		return "Ein abgestellter voller Krug gehört nur zur Tischdeckhilfe."
 	if screenplay.i01_water == "jug" and values.has("hand"):
 		return "Becher und Krug können nicht gleichzeitig getragen werden."
 	if screenplay.i01_water == "poured" and not table_set:
