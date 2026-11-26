@@ -16,7 +16,11 @@ so every company-skeleton export shares it without rebuilding its sources:
   keep their ground position as closely as one rigid translation allows, so
   feet and body roll over the floor instead of sliding.
 
-Only the death Pelvis translation sampler is replaced (240 Hz, LINEAR). Mesh,
+The village crouch "gather" sinks the villagers' soles 3 cm through the floor
+in the same way; --clip gather applies the rule to it, but writes a clip other
+than death only where neither sole penetration nor sole slip gets worse.
+
+Only the clip's Pelvis translation sampler is replaced (240 Hz, LINEAR). Mesh,
 skin, morph, material and all other animation bytes stay unchanged; the
 original bytes are verified before writing. A marker in the animation extras
 makes the step idempotent.
@@ -53,6 +57,7 @@ FOOT_WEIGHT = .5
 # The motion gate's support band (motion_skin_measurement.gd: 2 cm).
 CONTACT_BAND_M = .02
 MARKER = "imperathen_grounded_death"
+NON_DEATH_MIN_GAIN_M = .001
 
 _COMPONENTS = {5120: np.int8, 5121: np.uint8, 5122: np.int16, 5123: np.uint16, 5125: np.uint32, 5126: np.float32}
 _WIDTH = {"SCALAR": 1, "VEC2": 2, "VEC3": 3, "VEC4": 4, "MAT4": 16}
@@ -363,10 +368,16 @@ def measure(rig: Rig, clip: dict, pelvis_keys=None) -> dict:
     return result
 
 
-def ground(path: Path, output: Path | None = None) -> dict:
+def ground(path: Path, output: Path | None = None, clip_name: str = "death") -> dict:
+    """Ground one clip. Death is always grounded; any other clip (e.g. the
+    village crouch "gather") is written only if sole penetration or sole slip
+    improves by more than NON_DEATH_MIN_GAIN_M and neither gets worse, so a
+    clip that is already clean stays byte-identical."""
     glb = Glb(path)
     rig = Rig(glb)
-    clip = rig.animation("death")
+    if clip_name != "death" and not any(a.get("name") == clip_name for a in glb.document.get("animations", [])):
+        return {"path": str(path), "clip": clip_name, "unchanged": "no such clip"}
+    clip = rig.animation(clip_name)
     if MARKER in clip["animation"].get("extras", {}):
         return {"path": str(path), "skipped": "already grounded",
                 "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
@@ -387,13 +398,18 @@ def ground(path: Path, output: Path | None = None) -> dict:
     after = measure(rig, clip, keys)
     times = np.array([[clip["duration"] * frame / count] for frame in range(count + 1)])
     target = output or path
-    report = {"path": str(path), "sha256_before": hashlib.sha256(path.read_bytes()).hexdigest(),
+    report = {"path": str(path), "clip": clip_name, "sha256_before": hashlib.sha256(path.read_bytes()).hexdigest(),
               "keys": count + 1, "key_hz": KEY_HZ, "measured_hz": SAMPLE_HZ, "duration_s": clip["duration"],
               "method": "CPU linear blend skinning of every exported skinned primitive; lowest posed surface on the "
                         "floor of the standing first pose; smallest-circle rigid offset of all 2 cm band contacts",
               "maximum_floor_correction_m": max(raises),
               "endpoint_translation_delta_m": float(np.linalg.norm(keys[-1] - rig.sample(track, clip["duration"], "translation"))),
               "before": before, "after": after}
+    measured = ("max_sole_penetration_m", "max_sole_slip_m")
+    if clip_name != "death" and (any(after[key] > before[key] + 1e-4 for key in measured)
+                                 or not any(before[key] - after[key] > NON_DEATH_MIN_GAIN_M for key in measured)):
+        report["unchanged"] = "grounding would not improve this clip"
+        return report
     if output is not False:
         animation = clip["animation"]
         input_accessor = glb.append_accessor(times, "SCALAR")
@@ -421,17 +437,18 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("glb", nargs="+", type=Path)
     parser.add_argument("--check", action="store_true", help="measure only, do not write")
+    parser.add_argument("--clip", default="death", help="clip to ground (default: death)")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
     reports = []
     for path in args.glb:
-        report = ground(path, False if args.check else None)
+        report = ground(path, False if args.check else None, args.clip)
         reports.append(report)
-        if "skipped" in report:
-            print(f"DEATH_GROUND {path} skipped: {report['skipped']}")
+        if "skipped" in report or "unchanged" in report:
+            print(f"GROUND {args.clip} {path} {report.get('skipped') or report.get('unchanged')}")
             continue
         b, a = report["before"], report["after"]
-        print(f"DEATH_GROUND {path} penetration {b['max_sole_penetration_m']:.4f}->{a['max_sole_penetration_m']:.4f} "
+        print(f"GROUND {args.clip} {path} penetration {b['max_sole_penetration_m']:.4f}->{a['max_sole_penetration_m']:.4f} "
               f"slip {b['max_sole_slip_m']:.4f}->{a['max_sole_slip_m']:.4f} hull {b['max_hull_penetration_m']:.4f}->"
               f"{a['max_hull_penetration_m']:.4f} contact slip {b['max_contact_slip_m']:.4f}->{a['max_contact_slip_m']:.4f} "
               f"raise {report['maximum_floor_correction_m']:.4f}")
