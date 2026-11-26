@@ -25,6 +25,14 @@ var regional = preload("res://scripts/world/regional_village.gd").new()
 var grove = Grove.new()
 var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
 var opening_props = preload("res://scripts/world/village/opening_props.gd").new()
+## I-01 cups and jug follow the saved morning state (presentation only).
+## Created with the scene so worlds that never build it own no orphan node.
+const I01Props = preload("res://scripts/world/village/i01_props.gd")
+const I03Props = preload("res://scripts/world/village/i03_props.gd")
+const I04Props = preload("res://scripts/world/village/i04_props.gd")
+var i01_props: Node3D
+var i03_props: Node3D
+var i04_props: Node3D
 var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
@@ -197,6 +205,13 @@ func sync_state(state: Dictionary) -> void:
 	_figure.configure_meshy_youth(true)
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_figure.set_service_gear(CombatActions.service_gear(state))
+	if is_instance_valid(i01_props):
+		i01_props.sync_state(state, _figure)
+	if is_instance_valid(i03_props):
+		i03_props.sync_state(state, _figure)
+	if is_instance_valid(i04_props):
+		var visit: Dictionary = Childhood.i04_ctx(state) if Childhood.enabled(state) else {"index":-1, "trial_index":-1}
+		i04_props.sync_state(state, _figure, int(visit.index), int(visit.trial_index))
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -316,7 +331,14 @@ func get_cinematic_anchor(key: String) -> Vector3:
 				return to_global(Vector3(float(buildings[0].x), 0, float(buildings[0].z)))
 			return to_global(Vector3(14.5, 0, 4.5))
 		"training": return to_global(TRAINING_LOCATION)
-		_: return get_player_position()
+		_:
+			if key.begins_with("i01_"):
+				return I01Props.anchor(key)
+			if key.begins_with("i03_") and is_instance_valid(i03_props):
+				return to_global(i03_props.anchor(key))
+			if key.begins_with("i04_") and is_instance_valid(i04_props):
+				return to_global(i04_props.anchor(key))
+			return get_player_position()
 
 
 func get_cinematic_figure(actor_id: String) -> Node3D:
@@ -621,6 +643,12 @@ func _build_scene() -> void:
 	_create_terrain()
 	_create_village()
 	add_child(opening_props)
+	i01_props = I01Props.new()
+	add_child(i01_props)
+	i03_props = I03Props.new()
+	add_child(i03_props)
+	i04_props = I04Props.new()
+	add_child(i04_props)
 	_create_build_plot()
 	_buildings_root = Node3D.new()
 	_buildings_root.name = "PlayerBuildings"
@@ -1562,7 +1590,9 @@ func _interact() -> void:
 		if raid.active and raid.rescue_available and not raid.rescued and point.distance_to(VillageLife.RESCUE_POINT) <= VillageLife.RANGE:
 			action_requested.emit("village_rescue", {})
 			return
-		var villager: String = village_life_world.nearest(_player.position)
+		var villager: String = _objective_villager()
+		if villager.is_empty():
+			villager = village_life_world.nearest(_player.position)
 		if not villager.is_empty():
 			action_requested.emit("village_npc", {"npc_id":villager})
 			return
@@ -1692,6 +1722,17 @@ func _place_building() -> void:
 	action_requested.emit("build", {"x": _preview_position.x, "z": _preview_position.z})
 
 
+## The person the current childhood objective names wins over a nearer
+## bystander when both are in reach (HB 3.0 S. 44: no accidental action).
+func _objective_villager() -> String:
+	if not Childhood.enabled(_state) or village_life_world == null:
+		return ""
+	var id := str(Childhood.current_step(_state).get("npc", ""))
+	if id.is_empty() or not village_life_world.actors.has(id) or not village_life_world.actors[id].visible:
+		return ""
+	return id if _horizontal_distance(_player.position, village_life_world.actor_position(id)) <= VillageLife.RANGE else ""
+
+
 func _update_context_hint() -> void:
 	if _hint == null or _player == null:
 		return
@@ -1708,6 +1749,10 @@ func _update_context_hint() -> void:
 		if at.distance_to(CombatActions.PRACTICE_POINT)<2.4:
 			_hint.text="Am Pfahl üben\nTechniken wählen"
 			return
+	var objective_villager := _objective_villager()
+	if not objective_villager.is_empty():
+		_hint.text = "Mit %s sprechen" % str(village_life_world.actors[objective_villager].get_meta("display_name", objective_villager))
+		return
 	if village_life_world != null:
 		var village_hint: String = village_life_world.hint(_player.position)
 		if not village_hint.is_empty():

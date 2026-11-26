@@ -5,6 +5,9 @@ extends RefCounted
 const Follow = preload("res://scripts/story/companion_follow.gd")
 const Story = preload("res://scripts/story/companion_story.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I01 = preload("res://scripts/story/i01_three_cups.gd")
+const I03 = preload("res://scripts/story/i03_shortcut.gd")
+const Layout = preload("res://scripts/world/village/village_layout.gd")
 var world: Node3D
 var controllers: Dictionary = {"marcus":Follow.new(), "silvanus":Follow.new()}
 
@@ -20,6 +23,11 @@ func actor(id: String) -> CharacterBody3D:
 
 
 func home(id: String) -> Vector3:
+	# During the open I-01 morning Silvanus sits at the breakfast table on the
+	# raised house floor; afterwards he walks out to his door work.
+	if id == "silvanus" and bool(I01.presentation(world._state).get("silvanus_at_table", false)):
+		var seat: Vector2 = I01.POINTS.silvanus_table
+		return Vector3(seat.x, Layout.HOUSE_FLOOR, seat.y)
 	var point: Vector2 = Childhood.POINTS.marcus if id == "marcus" else Childhood.POINTS.father
 	return Vector3(point.x, 0.0, point.y)
 
@@ -63,14 +71,34 @@ func advance(delta: float) -> void:
 	var player: Vector3 = world.get_player_position()
 	for id: String in controllers:
 		var body := actor(id)
-		if body == null or not body.visible or not Story.available(data, id):
+		# I-03: before the two have parted Marcus is no companion yet, but he
+		# walks his own errand: with the boy, or ahead to Cassia's stall.
+		var station := I03.marcus_station(data, Childhood.i03_ctx(data)) if id == "marcus" else "home"
+		if body == null or not body.visible or not (Story.available(data, id) or station != "home"):
 			continue
 		body.set_meta("companion_controlled", true)
 		var target := world.to_global(home(id))
 		var distance := 0.15
 		var speed := 1.45
 		var mode := "return"
-		if specs.has(id):
+		if station == "stall":
+			var place: Vector2 = I03.marcus_stall(Childhood.i03_ctx(data))
+			target = world.to_global(Vector3(place.x, 0.0, place.y))
+			speed = 2.3
+			mode = "errand"
+		elif station == "follow":
+			var stall: Vector2 = I03.marcus_stall(Childhood.i03_ctx(data))
+			var stall_at := world.to_global(Vector3(stall.x, 0.0, stall.y))
+			if Vector2(player.x-stall_at.x, player.z-stall_at.z).length() <= 5.0 and str(data.village.childhood.screenplay.i03_stance).is_empty():
+				# Arriving together: Marcus steps up to the stall himself.
+				target = stall_at
+				mode = "errand"
+			else:
+				target = player
+				distance = 1.7
+				mode = "follow"
+			speed = 4.1 if Vector2(player.x-body.global_position.x, player.z-body.global_position.z).length() > 5.0 else 2.3
+		elif specs.has(id):
 			var spec: Dictionary = specs[id]
 			target = player
 			distance = 2.1 if Story.tone(data, id) == "rival" else 1.7

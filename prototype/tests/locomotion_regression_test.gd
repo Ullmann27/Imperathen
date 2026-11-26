@@ -147,12 +147,17 @@ func _run() -> void:
 
 
 func _reach_first_work() -> bool:
-	for index in 24:
+	for index in 40:
 		var view: Dictionary = Childhood.view(game.model.data)
 		if view.get("stage", "") == "forge_bellows":
 			return true
 		if view.is_empty():
 			return false
+		if str(view.get("stage", "")).begins_with("i03_"):
+			# I-03 errand: real commands with Marcus placed where he stands.
+			if not bool(preload("res://tests/i03_support.gd").play_stage(game.model).get("ok", false)):
+				return false
+			continue
 		var at: Vector2 = view.point
 		game.model.set_player_position(Vector3(at.x, 0.92, at.y))
 		var npc := str(view.get("target_npc", ""))

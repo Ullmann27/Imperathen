@@ -79,13 +79,16 @@ func _furnish(house: Node3D, id: String, index: int) -> void:
 		Art.box(shelf,Vector3(.07,1.13,.07),Vector3(0,.565,z),_materials.wood)
 	_jar(shelf,Vector3(0,.52,-.28),.52,index%2==0)
 	_jar(shelf,Vector3(0,.52,.26),.44,false)
-	_cup(shelf,Vector3(0,1.08,-.24))
-	_cup(shelf,Vector3(0,1.08,.20))
+	# The family home's three cups are live I-01 props (world/village/i01_props.gd).
+	if id != "baker_home":
+		_cup(shelf,Vector3(0,1.08,-.24))
+		_cup(shelf,Vector3(0,1.08,.20))
 	Art.box_collider(shelf,Vector3(.5,1.15,1.2),Vector3(0,.575,0))
 	# Use the imported table and wall bench rather than placing a second table.
 	_jar(room,Vector3(-1.52,.865,-.62),.48,true)
-	_cup(room,Vector3(-.72,.865,-.29))
-	_cup(room,Vector3(-.98,.865,-.88))
+	if id != "baker_home":
+		_cup(room,Vector3(-.72,.865,-.29))
+		_cup(room,Vector3(-.98,.865,-.88))
 	Art.sphere(room,.17,Vector3(-1.15,.895,-.40),_materials.bread,Vector3(1.3,.32,.85))
 	var jug := _jar(room,Vector3(1.93,.515,.18),.55,false)
 	jug.name = "DrinkingJug"

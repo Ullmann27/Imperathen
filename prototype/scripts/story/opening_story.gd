@@ -3,10 +3,11 @@ extends RefCounted
 ## Reading a sequence or a dialogue never changes the authoritative world state.
 
 const Origins = preload("res://scripts/strategy/origins.gd")
+const I01Film = preload("res://scripts/story/i01_film.gd")
 const STORY_VERSION := 1
 const HELP_WOOD := 4
 const HUT_WOOD := 8
-const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player", "mission_dialogue", "mission_reaction"]
+const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player", "mission_dialogue", "mission_reaction", "i01_table_detail", "i01_shelf_cups", "i01_bed", "i01_choice", "i01_table_wide", "i01_topic_choice", "i01_cups_insert", "i01_close_speaker", "i01_react_boy", "i01_two_shot", "i01_react_julia", "duo_wide", "duo_close", "duo_react", "duo_ots", "duo_hands", "prop_insert"]
 const REGIONS := {
 	"italia": {
 		"location": "Römische Grenzsiedlung",
@@ -97,7 +98,13 @@ static func historical_prologue() -> Dictionary:
 	}
 
 
-static func childhood() -> Dictionary:
+## VID-A of I-01 (screenplay v4). The former three text cards are kept below as
+## childhood_cards() for reference; the playable opening is the in-engine film.
+static func childhood(data: Dictionary = {}) -> Dictionary:
+	return I01Film.vid_a(data)
+
+
+static func childhood_cards() -> Dictionary:
 	var chapter := "Kapitel I · I-01 · Die drei Becher"
 	var location := "Valdora · Aquileia-Region · 58 v. Chr."
 	return {"id":"childhood_home","version":2,"origin_id":"italia",

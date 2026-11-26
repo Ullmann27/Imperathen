@@ -6,6 +6,7 @@ extends SceneTree
 
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I03Support = preload("res://tests/i03_support.gd")
 const Bible = preload("res://scripts/story/campaign_bible.gd")
 const CompanionStory = preload("res://scripts/story/companion_story.gd")
 const Life = preload("res://scripts/story/village_life.gd")
@@ -97,7 +98,9 @@ func _test_heading_and_texts() -> void:
 	for step: Dictionary in Childhood.STEPS:
 		texts[step.id] = "%s %s %s %s" % [step.label, step.objective, step.text, step.result]
 	_check(texts.mother_morning.contains("sag mir wohin. Nicht weil ich dich halten will – weil du zurückkommen sollst."), "Julia carries her Band 1 I-01 line")
-	_check(texts.fill_water.contains("drei Becher"), "I-01 water task fills the three cups")
+	# The former result claimed three filled cups the world never showed. The
+	# cups are now real props of the I-01 morning; the jug step only reports them.
+	_check(texts.fill_water.contains("drei Becher") and not texts.fill_water.contains("stehen gefüllt"), "I-01 jug step names the three cups without inventing their filling")
 	_check(texts.father_morning.contains("Mach erst die Arbeit. Reden können wir danach immer noch."), "Silvanus carries his Band 1 I-01 line")
 	_check(texts.deliver_food.contains("seinen ältesten Freund"), "I-04 introduces Sextus as Silvanus' oldest friend")
 	_check(texts.deliver_kindling.contains("Wenn du etwas nicht kannst, sag es. Dann kann ich es dir zeigen."), "Sextus carries his Band 1 I-04 line")
@@ -179,6 +182,13 @@ func _advance_to(model: RefCounted, goal: String) -> bool:
 			break
 		if view.stage == goal:
 			return true
+		if str(view.stage).begins_with("i03_"):
+			# I-03 errand: real commands with Marcus placed where he stands.
+			var errand: Dictionary = I03Support.play_stage(model)
+			if not errand.ok:
+				_check(false, "I-03-Abschnitt " + str(view.stage) + ": " + str(errand.get("message", "")))
+				return false
+			continue
 		var point: Vector2 = view.point
 		model.set_player_position(Vector3(point.x, 1.0, point.y))
 		var npc := str(view.get("target_npc", ""))

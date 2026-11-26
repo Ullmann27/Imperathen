@@ -48,5 +48,416 @@
         ]
       }
     }
-  ]
+  ],
+  "slice": {
+    "version": 1,
+    "source": "Masterhandbuch 3.0 S. 14 (I-03 Vertiefungsentwurf), S. 10 (Questvertrag, Knoten I-03.B03) und S. 70 (Originalblatt). Dialogzeilen sind eigene Produktionsentwürfe, kein Wortlaut des Originaldrehbuchs.",
+    "prices": {
+      "small_measure_asses": 2,
+      "large_measure_asses": 3,
+      "marcus_asses": 2
+    },
+    "steps": {
+      "i03_marcus": {
+        "point": "marcus",
+        "chapter": "Marcus kennt eine Abkürzung",
+        "label": "Mit Marcus an der Gasse sprechen",
+        "objective": "Marcus steht an der Gasse zum Markt. Sprich mit ihm und entscheide, wie du zum Markt gehst.",
+        "prompt": "Wie gehst du zum Markt?",
+        "options": [
+          {
+            "id": "i03_together",
+            "label": "Mit Marcus durch die Gasse gehen"
+          },
+          {
+            "id": "i03_later",
+            "label": "Später am Markt treffen"
+          },
+          {
+            "id": "i03_apart",
+            "label": "Den eigenen Weg über den Platz nehmen"
+          }
+        ]
+      },
+      "i03_coin": {
+        "npc": "cassia",
+        "chapter": "Marcus kennt eine Abkürzung",
+        "label": "Der Streit um das dritte As",
+        "objective": "Marcus steht mit zwei Assen an Cassias Stand, Cassia verlangt drei. Geh hin und entscheide, wie du dich verhältst.",
+        "text": "Marcus hält Cassia zwei Asse hin: »Gestern hast du zwei gesagt!« Cassia schüttelt den Kopf: »Für diesen Topf sind es drei.«",
+        "options": [
+          {
+            "id": "i03_watch",
+            "label": "Zusehen und abwarten"
+          },
+          {
+            "id": "i03_offer",
+            "label": "Marcus Hilfe anbieten"
+          },
+          {
+            "id": "i03_object",
+            "label": "Marcus widersprechen: Cassia übervorteilt niemanden"
+          },
+          {
+            "id": "i03_missed",
+            "label": "Marcus ist nicht gekommen – allein weitermachen"
+          }
+        ]
+      },
+      "i03_resolve": {
+        "npc": "cassia",
+        "chapter": "Marcus kennt eine Abkürzung",
+        "label": "Was schlägst du vor?",
+        "objective": "Cassia hat erklärt, wie es zu den zwei Preisen kam. Sag an ihrem Stand, was du vorschlägst.",
+        "prompt": "Was schlägst du vor?",
+        "options": [
+          {
+            "id": "i03_clarify",
+            "label": "Ruhig nachmessen lassen: das kleine Maß für zwei Asse"
+          },
+          {
+            "id": "i03_accept",
+            "label": "Den Preis für das große Maß annehmen"
+          },
+          {
+            "id": "i03_refuse",
+            "label": "Heute kein Salz kaufen"
+          }
+        ]
+      },
+      "i03_measure": {
+        "npc": "cassia",
+        "chapter": "Marcus kennt eine Abkürzung",
+        "label": "Das kleine Maß in Marcus’ Topf füllen",
+        "objective": "Füll an Cassias Stand das kleine Maß Salz in Marcus’ Topf."
+      },
+      "i03_service_fetch": {
+        "point": "well",
+        "chapter": "Marcus kennt eine Abkürzung",
+        "label": "Am Brunnen einen Krug Wasser für Cassia schöpfen",
+        "objective": "Cassia nimmt einen Krug Brunnenwasser für das fehlende As. Schöpf ihn am Brunnen im Hof."
+      },
+      "i03_service_bring": {
+        "npc": "cassia",
+        "chapter": "Marcus kennt eine Abkürzung",
+        "label": "Cassia den Wasserkrug bringen",
+        "objective": "Bring den gefüllten Krug zu Cassias Stand."
+      },
+      "i03_farewell": {
+        "point": "market_stall",
+        "chapter": "Marcus kennt eine Abkürzung",
+        "label": "Der Heimweg",
+        "objective": "Julias Bestellung ist gekauft. Marcus wartet noch am Stand: Entscheide, wie ihr auseinandergeht.",
+        "prompt": "Wie trennt ihr euch?",
+        "options": [
+          {
+            "id": "i03_home_together",
+            "label": "Zusammen heimgehen"
+          },
+          {
+            "id": "i03_home_apart",
+            "label": "Getrennt heimgehen"
+          },
+          {
+            "id": "i03_apologise",
+            "label": "Dich entschuldigen: Du wolltest ihn nicht bloßstellen"
+          },
+          {
+            "id": "i03_home_alone",
+            "label": "Marcus ist nicht mehr da – allein heimgehen"
+          }
+        ]
+      }
+    },
+    "results": {
+      "i03_watch": "Du bleibst neben Marcus stehen und hörst zu.",
+      "i03_offer": "Du sagst Marcus, dass du ihm hilfst, wenn es an einem As hängt. Eigenes Geld hast du nicht, und der Haushaltsdenar gehört Julias Bestellung.",
+      "i03_object": "Du sagst Marcus offen, dass Cassia niemanden übervorteilt. Er presst die Lippen zusammen.",
+      "i03_missed": "Marcus ist nicht an den Stand gekommen. Der Streit um das Salz findet ohne ihn nicht statt.",
+      "i03_measure": "Du füllst das kleine Maß Salz in Marcus’ Topf. Cassia nimmt seine zwei Asse.",
+      "i03_service_fetch": "Du schöpfst am Brunnen einen Krug Wasser für Cassias Stand.",
+      "i03_service_bring": "Cassia nimmt den Krug an und füllt das große Maß in Marcus’ Topf. Das dritte As ist mit dem Wasser abgegolten.",
+      "i03_home_alone": "Marcus ist nicht mehr am Stand. Du trägst Julias Bestellung allein nach Hause."
+    },
+    "lines": {
+      "I03_A_COINS": {
+        "speaker_id": "chronik",
+        "text": "An der Gasse zum Markt hält Marcus zwei Kupfermünzen in der Faust und einen leeren Tontopf unter dem Arm."
+      },
+      "I03_A_STREET": {
+        "speaker_id": "marcus",
+        "text": "»Da bist du ja. Ich soll für meine Mutter Salz holen, zwei Asse hat sie mir mitgegeben. Durch die Gasse sind wir schneller am Markt als über den Platz.«"
+      },
+      "I03_A_WORRY": {
+        "speaker_id": "marcus",
+        "text": "»Unser Ochse lahmt. Wenn das nicht besser wird, muss ich im Sommer mit aufs Feld und darf nicht mit Varro in den Wald. Sag das keinem.«"
+      },
+      "I03_A_REACT_TOGETHER": {
+        "speaker_id": "marcus",
+        "text": "»Gut. Dann gehen wir zusammen.«"
+      },
+      "I03_A_REACT_LATER": {
+        "speaker_id": "marcus",
+        "text": "»Dann bis gleich bei Cassia. Aber komm wirklich, ich warte am Stand.«"
+      },
+      "I03_A_REACT_APART": {
+        "speaker_id": "marcus",
+        "text": "»Wie du willst. Ich bin trotzdem zuerst da.«"
+      },
+      "I03_B_STALL": {
+        "speaker_id": "chronik",
+        "text": "An Cassias Stand liegen Marcus’ zwei Asse neben dem Salzmaß. Cassia hat sie nicht eingesteckt."
+      },
+      "I03_B_CASSIA": {
+        "speaker_id": "cassia",
+        "text": "»Zwei Asse kostet das kleine Maß. Deine Mutter hat mir aber den großen Topf geschickt, und das große Maß kostet drei. Gestern habe ich dir den Preis für das kleine genannt. Gelogen hat keiner von uns.«"
+      },
+      "I03_B_MARCUS_WATCH": {
+        "speaker_id": "marcus",
+        "text": "»Mutter hat mir zwei Asse gegeben und gesagt, das reicht. Mehr weiß ich auch nicht.«"
+      },
+      "I03_B_MARCUS_OFFER": {
+        "speaker_id": "marcus",
+        "text": "»Du musst das nicht für mich machen. Aber wenn du es ernst meinst, vergesse ich es dir nicht.«"
+      },
+      "I03_B_MARCUS_OBJECT": {
+        "speaker_id": "marcus",
+        "text": "»Du hättest dich nicht einmischen müssen. Ich habe nur gesagt, was sie mir gestern gesagt hat.«"
+      },
+      "I03_B_RESOLVE_CLARIFY": {
+        "speaker_id": "cassia",
+        "text": "»Dann messen wir das kleine Maß ab. Füll es selbst in den Topf, dann sieht seine Mutter, wie viel zwei Asse sind.«"
+      },
+      "I03_B_RESOLVE_SERVICE": {
+        "speaker_id": "cassia",
+        "text": "»Das große Maß also. Für das fehlende As bringt ihr mir einen Krug Wasser vom Brunnen, dann ist es bezahlt. Angeschrieben wird nichts.«"
+      },
+      "I03_B_RESOLVE_DEBT": {
+        "speaker_id": "cassia",
+        "text": "»Das große Maß also. Das dritte As bringst du mir morgen, Marcus. Ich schneide eine Kerbe ins Holz, und dein Freund hat es gehört.«"
+      },
+      "I03_B_RESOLVE_REFUSE": {
+        "speaker_id": "cassia",
+        "text": "»Dann bleibt das Salz heute hier. Nimm deine zwei Asse wieder mit und frag deine Mutter, welches Maß sie will.«"
+      },
+      "I03_C_OPEN_FRIENDLY": {
+        "speaker_id": "marcus",
+        "text": "»Das mit dem Salz hätte ich allein nicht so hinbekommen. Gehen wir zusammen zurück?«"
+      },
+      "I03_C_OPEN_DEBT": {
+        "speaker_id": "marcus",
+        "text": "»Morgen muss ich ihr das As bringen. Wenn ich es vergesse, erinnerst du mich. Gehen wir zusammen zurück?«"
+      },
+      "I03_C_OPEN_NONE": {
+        "speaker_id": "marcus",
+        "text": "»Jetzt komme ich ohne Salz heim. Wenigstens habe ich die zwei Asse noch. Kommst du mit?«"
+      },
+      "I03_C_OPEN_DISPUTE": {
+        "speaker_id": "marcus",
+        "text": "»Vor Cassia hast du so geredet, als hätte ich mir den Preis ausgedacht. Das merke ich mir.«"
+      },
+      "I03_C_TOGETHER": {
+        "speaker_id": "marcus",
+        "text": "»Dann komm. Bis zur Gasse haben wir denselben Weg.«"
+      },
+      "I03_C_TOGETHER_TENSE": {
+        "speaker_id": "marcus",
+        "text": "»Von mir aus. Aber reden müssen wir nicht.«"
+      },
+      "I03_C_APART": {
+        "speaker_id": "marcus",
+        "text": "»Gut. Bis morgen.«"
+      },
+      "I03_C_APOLOGY": {
+        "speaker_id": "marcus",
+        "text": "»Schon gut. Ich war auch laut. Bis zur Gasse haben wir denselben Weg.«"
+      },
+      "I03_A_HOOK_WELL": {
+        "speaker_id": "marcus",
+        "text": "»Heute Morgen am Brunnen hast du mir zugehört, als der Eimer leckte. Dafür zeig ich dir jetzt die Abkürzung.«"
+      }
+    },
+    "consequences": {
+      "I-03.route.together": {
+        "speaker_id": "marcus",
+        "line_id": "I03_A_REACT_TOGETHER",
+        "immediate_effect": "Marcus geht mit dir zum Markt.",
+        "delayed_hook": "VID-B: Marcus steht bei deiner Ankunft neben dir am Stand.",
+        "long_term_effect": "Gemeinsamer Weg als Erinnerung, kein Beziehungswert.",
+        "relationship": {}
+      },
+      "I-03.route.later": {
+        "speaker_id": "marcus",
+        "line_id": "I03_A_REACT_LATER",
+        "immediate_effect": "Marcus geht voraus und wartet am Stand; deine Zusage ist offen.",
+        "delayed_hook": "Am Stand wird die Zusage als gehalten gespeichert, sobald du tatsächlich dort bist.",
+        "long_term_effect": "Band II kann an ein gehaltenes Versprechen erinnern.",
+        "relationship": {}
+      },
+      "I-03.route.apart": {
+        "speaker_id": "marcus",
+        "line_id": "I03_A_REACT_APART",
+        "immediate_effect": "Marcus nimmt die Gasse allein, du deinen eigenen Weg.",
+        "delayed_hook": "VID-C: Marcus fragt knapper nach dem Heimweg.",
+        "long_term_effect": "Getrennte Route als Tatsache, keine Abwertung.",
+        "relationship": {}
+      },
+      "I-03.promise.kept": {
+        "speaker_id": "marcus",
+        "line_id": "I03_A_REACT_LATER",
+        "immediate_effect": "Du bist wie zugesagt am Stand erschienen.",
+        "delayed_hook": "VID-C nennt nichts Eigenes; die Erinnerung steht im Ledger.",
+        "long_term_effect": "Band II: »Du bist damals wirklich gekommen.«",
+        "relationship": {}
+      },
+      "I-03.stance.watch": {
+        "speaker_id": "marcus",
+        "line_id": "I03_B_MARCUS_WATCH",
+        "immediate_effect": "Du hörst zu, ohne Partei zu ergreifen.",
+        "delayed_hook": "VID-B: Marcus erklärt sich selbst.",
+        "long_term_effect": "Zeugenwissen über den Preisstreit.",
+        "relationship": {}
+      },
+      "I-03.stance.offer": {
+        "speaker_id": "marcus",
+        "line_id": "I03_B_MARCUS_OFFER",
+        "immediate_effect": "Du bietest Hilfe an; eigenes Geld hast du nicht.",
+        "delayed_hook": "Nimmst du den großen Preis an, verlangt Cassia einen Dienst statt des dritten Asses.",
+        "long_term_effect": "Hilfe-Erinnerung nur nach tatsächlich geleistetem Dienst.",
+        "relationship": {}
+      },
+      "I-03.stance.object": {
+        "speaker_id": "marcus",
+        "line_id": "I03_B_MARCUS_OBJECT",
+        "immediate_effect": "Du widersprichst Marcus vor Cassia.",
+        "delayed_hook": "VID-C: Marcus spricht den Vorwurf an, solange nichts geklärt oder entschuldigt ist.",
+        "long_term_effect": "Offener Streit als Erinnerung; Band II kann ihn als ungeklärt aufgreifen.",
+        "relationship": {}
+      },
+      "I-03.marcus.missed": {
+        "speaker_id": "chronik",
+        "line_id": "",
+        "immediate_effect": "Marcus ist nicht am Stand; es entsteht kein Streit und keine Ersatzfigur.",
+        "delayed_hook": "Kein VID-B, kein VID-C.",
+        "long_term_effect": "Nur die Tatsache seiner Abwesenheit.",
+        "relationship": {}
+      },
+      "I-03.resolve.clarify": {
+        "speaker_id": "cassia",
+        "line_id": "I03_B_RESOLVE_CLARIFY",
+        "immediate_effect": "Ihr lasst das kleine Maß abmessen.",
+        "delayed_hook": "Du füllst das Maß selbst in Marcus’ Topf.",
+        "long_term_effect": "Der Streit gilt als ruhig geklärt.",
+        "relationship": {}
+      },
+      "I-03.resolve.accept": {
+        "speaker_id": "cassia",
+        "line_id": "I03_B_RESOLVE_SERVICE",
+        "immediate_effect": "Der Preis für das große Maß gilt.",
+        "delayed_hook": "Mit Hilfsangebot: Wasserdienst am Brunnen. Ohne: Marcus schuldet Cassia ein As.",
+        "long_term_effect": "Schuld oder Dienst bleiben als Tatsache gespeichert.",
+        "relationship": {}
+      },
+      "I-03.resolve.refuse": {
+        "speaker_id": "cassia",
+        "line_id": "I03_B_RESOLVE_REFUSE",
+        "immediate_effect": "Heute wird kein Salz gekauft.",
+        "delayed_hook": "VID-C: Marcus geht ohne Salz heim.",
+        "long_term_effect": "Kein Kauf, keine Schuld.",
+        "relationship": {}
+      },
+      "I-03.salt.small": {
+        "speaker_id": "cassia",
+        "line_id": "",
+        "immediate_effect": "Marcus’ Topf enthält das kleine Maß; zwei Asse sind bezahlt.",
+        "delayed_hook": "VID-C: freundlicher Abschied.",
+        "long_term_effect": "Münzgeschichte als freundliche Erinnerung.",
+        "relationship": {}
+      },
+      "I-03.service.water": {
+        "speaker_id": "chronik",
+        "line_id": "",
+        "immediate_effect": "Du trägst einen Krug Brunnenwasser.",
+        "delayed_hook": "Cassia rechnet ihn gegen das dritte As.",
+        "long_term_effect": "—",
+        "relationship": {}
+      },
+      "I-03.service.done": {
+        "speaker_id": "cassia",
+        "line_id": "",
+        "immediate_effect": "Cassia hat das Wasser, Marcus das große Maß.",
+        "delayed_hook": "Julia hört bei der Übergabe der Bestellung davon.",
+        "long_term_effect": "Hilfe-Erinnerung: du hast für Marcus’ fehlendes As gearbeitet.",
+        "relationship": {}
+      },
+      "I-03.salt.large": {
+        "speaker_id": "cassia",
+        "line_id": "",
+        "immediate_effect": "Marcus’ Topf enthält das große Maß.",
+        "delayed_hook": "—",
+        "long_term_effect": "—",
+        "relationship": {}
+      },
+      "I-03.salt.debt": {
+        "speaker_id": "cassia",
+        "line_id": "I03_B_RESOLVE_DEBT",
+        "immediate_effect": "Marcus schuldet Cassia ein As; du bist Zeuge.",
+        "delayed_hook": "VID-C: Marcus bittet dich, ihn zu erinnern.",
+        "long_term_effect": "Offene Schuld eines Dritten; kein Wert des Spielers.",
+        "relationship": {}
+      },
+      "I-03.salt.none": {
+        "speaker_id": "cassia",
+        "line_id": "I03_B_RESOLVE_REFUSE",
+        "immediate_effect": "Marcus behält seine zwei Asse.",
+        "delayed_hook": "VID-C: Heimweg ohne Salz.",
+        "long_term_effect": "—",
+        "relationship": {}
+      },
+      "I-03.home.together": {
+        "speaker_id": "marcus",
+        "line_id": "I03_C_TOGETHER",
+        "immediate_effect": "Ihr geht gemeinsam los.",
+        "delayed_hook": "Julia fragt bei der Übergabe nicht nach.",
+        "long_term_effect": "Gemeinsamer Heimweg als Erinnerung.",
+        "relationship": {}
+      },
+      "I-03.home.apart": {
+        "speaker_id": "marcus",
+        "line_id": "I03_C_APART",
+        "immediate_effect": "Ihr geht getrennt heim.",
+        "delayed_hook": "—",
+        "long_term_effect": "Getrennte Heimkehr als Tatsache.",
+        "relationship": {}
+      },
+      "I-03.home.alone": {
+        "speaker_id": "chronik",
+        "line_id": "",
+        "immediate_effect": "Du gehst allein heim.",
+        "delayed_hook": "—",
+        "long_term_effect": "—",
+        "relationship": {}
+      },
+      "I-03.apology": {
+        "speaker_id": "marcus",
+        "line_id": "I03_C_APOLOGY",
+        "immediate_effect": "Du entschuldigst dich; Marcus nimmt es an.",
+        "delayed_hook": "Der Vorwurf gilt als ausgeräumt.",
+        "long_term_effect": "Band II: Entschuldigung statt ungeklärtem Streit.",
+        "relationship": {}
+      }
+    },
+    "hooks": [
+      {
+        "event_id": "I-03.service.done",
+        "step": "deliver_food",
+        "line": "»Cassia hat mir zugerufen, dass du für Marcus Wasser getragen hast, damit sein Salz bezahlt ist.«"
+      },
+      {
+        "event_id": "I-03.salt.debt",
+        "step": "deliver_food",
+        "line": "»Marcus schuldet Cassia ein As, höre ich. Gut, dass du dabei warst und es bezeugen kannst.«"
+      }
+    ]
+  }
 }

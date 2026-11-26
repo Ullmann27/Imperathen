@@ -73,7 +73,11 @@
         "collect_kindling",
         "deliver_kindling",
         "apprentice_permission",
-        "smith_trial"
+        "smith_trial",
+        "i04_work",
+        "i04_stack_take",
+        "i04_stack_put",
+        "i04_topic"
       ],
       "stops": {
         "deliver_kindling": [
@@ -87,6 +91,22 @@
         "smith_trial": [
           30.4,
           -23.2
+        ],
+        "i04_work": [
+          30.4,
+          -23.2
+        ],
+        "i04_stack_take": [
+          30.4,
+          -23.2
+        ],
+        "i04_stack_put": [
+          30.4,
+          -23.2
+        ],
+        "i04_topic": [
+          30.4,
+          -23.2
         ]
       },
       "dialogue": {
@@ -97,5 +117,237 @@
       },
       "direction_note": "Ergänzung: Auswahl nach vorhandener I-03-Entscheidung, Begleitdistanz, Schrittzuordnung und Haltepunkte. Sprechertext wörtlich aus dem angegebenen Drehbuchabschnitt."
     }
-  ]
+  ],
+  "slice": {
+    "version": 1,
+    "source": "Masterhandbuch 3.0 S. 15 (I-04 Vertiefungsentwurf) und S. 71 (Originalblatt). Dialogzeilen sind eigene Produktionsentwürfe, kein Wortlaut des Originaldrehbuchs. Hufbeschlag mit Nägeln ist für 58 v. Chr. nicht belegt; Sextus arbeitet an Hufen, Zaumzeug und Werkzeug.",
+    "steps": {
+      "i04_work": {
+        "npc": "sextus",
+        "chapter": "Der Freund meines Vaters",
+        "label": "Was übernimmst du?",
+        "objective": "Sextus hat das Bündel angenommen. Sag ihm in der Schmiede, welche Arbeit du übernimmst.",
+        "prompt": "Was übernimmst du?",
+        "text": "»Hier fasst du nichts Heißes an. Aber es gibt genug zu tun: Das Kleinholz muss an die Esse, und Fabius wartet auf eine Nachricht von mir. Oder du siehst erst einmal nur zu.«",
+        "options": [
+          {
+            "id": "i04_stack",
+            "label": "Das Kleinholz an der Esse aufschichten"
+          },
+          {
+            "id": "i04_message",
+            "label": "Sextus’ Nachricht zu Fabius bringen"
+          },
+          {
+            "id": "i04_watch",
+            "label": "Erst zusehen und fragen"
+          }
+        ]
+      },
+      "i04_stack_take": {
+        "point": "quench",
+        "chapter": "Der Freund meines Vaters",
+        "label": "Einen Arm voll Kleinholz vom Bündel nehmen",
+        "objective": "Nimm am Kühltrog einen Arm voll Kleinholz von dem Bündel, das du gebracht hast."
+      },
+      "i04_stack_put": {
+        "point": "bellows",
+        "chapter": "Der Freund meines Vaters",
+        "label": "Das Kleinholz neben dem Blasebalg aufschichten",
+        "objective": "Trag das Kleinholz zur Esse und schichte es neben dem Blasebalg auf."
+      },
+      "i04_note_give": {
+        "npc": "fabius",
+        "chapter": "Der Freund meines Vaters",
+        "label": "Fabius die Nachricht von Sextus geben",
+        "objective": "Bring Sextus’ Wachstäfelchen zu Fabius, dem Holzfäller: zwei Körbe Kohle bis zum Markttag.",
+        "text": "»Von Sextus? Zeig her. Zwei Körbe bis zum Markttag, das schaffe ich. Sag ihm, die Kohle kommt trocken.«"
+      },
+      "i04_topic": {
+        "npc": "sextus",
+        "chapter": "Der Freund meines Vaters",
+        "label": "Wonach fragst du?",
+        "objective": "Geh zu Sextus an den Amboss. Er will dir etwas zeigen.",
+        "prompt": "Wonach fragst du?",
+        "text": "»Komm her an den Amboss. Sieh dir diese beiden Zangen an, bevor du mich etwas fragst.«",
+        "options": [
+          {
+            "id": "i04_topic_craft",
+            "label": "Nach dem Handwerk fragen"
+          },
+          {
+            "id": "i04_topic_riding",
+            "label": "Nach den Pferden fragen"
+          },
+          {
+            "id": "i04_topic_father",
+            "label": "Nach deinem Vater fragen"
+          }
+        ]
+      }
+    },
+    "results": {
+      "i04_stack_take": "Du nimmst einen Arm voll Kleinholz vom Bündel.",
+      "i04_stack_put": "Du schichtest das Kleinholz luftig neben den Blasebalg. Am Kühltrog liegt noch ein Rest.",
+      "i04_stack_done": "Das letzte Kleinholz liegt neben dem Blasebalg. Vom Bündel am Kühltrog ist nichts mehr übrig.",
+      "i04_note_give": "Fabius nimmt das Wachstäfelchen und nickt: zwei Körbe Kohle bis zum Markttag."
+    },
+    "lines": {
+      "I04_A_FIRE": {
+        "speaker_id": "chronik",
+        "text": "Unter dem Schutzdach der Schmiede glüht die Esse. Am Gestell hängen Zangen und Hämmer, am Kühltrog liegt das Bündel, das du gebracht hast."
+      },
+      "I04_A_SILVANUS": {
+        "speaker_id": "silvanus",
+        "text": "»Sextus, das ist mein Junge. Er hat das Bündel allein vom Holzlager hergetragen.«"
+      },
+      "I04_A_MEMORY": {
+        "speaker_id": "sextus",
+        "text": "»Allein? Dein Vater bringt mir das Holz für diese Esse, seit ich ihm auf dem Weg nach Aquileia die Achse geflickt habe. Ich habe ihm nie gesagt, dass das nur ein halber Tag Arbeit war.«"
+      },
+      "I04_A_ASK": {
+        "speaker_id": "sextus",
+        "text": "»Hier fasst du nichts Heißes an. Aber es gibt genug zu tun: Das Kleinholz muss an die Esse, und Fabius wartet auf eine Nachricht von mir. Oder du siehst erst einmal nur zu.«"
+      },
+      "I04_A_REACT_STACK": {
+        "speaker_id": "sextus",
+        "text": "»Gut. Nimm immer nur so viel, wie du mit einem Arm halten kannst, und schichte es neben den Blasebalg.«"
+      },
+      "I04_A_REACT_MESSAGE": {
+        "speaker_id": "sextus",
+        "text": "»Dann nimm dieses Wachstäfelchen. Fabius ist der Holzfäller. Sag ihm, ich brauche bis zum Markttag zwei Körbe Kohle.«"
+      },
+      "I04_A_REACT_WATCH": {
+        "speaker_id": "sextus",
+        "text": "»Auch gut. Wer zuerst hinsieht, verbrennt sich seltener. Bleib auf dieser Seite vom Amboss.«"
+      },
+      "I04_B_TOOL": {
+        "speaker_id": "chronik",
+        "text": "Sextus legt zwei Zangen nebeneinander auf den Amboss. Eine hat einen feinen Riss am Gelenk."
+      },
+      "I04_B_SEXTUS": {
+        "speaker_id": "sextus",
+        "text": "»Die eine hält noch ein Jahr, die andere bricht beim nächsten heißen Eisen. Von außen sehen sie fast gleich aus. Darum prüfe ich jedes Werkzeug, bevor ich es ins Feuer halte.«"
+      },
+      "I04_B_WORK_STACK": {
+        "speaker_id": "sextus",
+        "text": "»Dein Holz liegt trocken und luftig. So brennt es, wenn ich es brauche.«"
+      },
+      "I04_B_WORK_MESSAGE": {
+        "speaker_id": "sextus",
+        "text": "»Fabius hat die Nachricht, sagst du. Dann kommt die Kohle rechtzeitig.«"
+      },
+      "I04_B_WORK_WATCH": {
+        "speaker_id": "sextus",
+        "text": "»Du hast zugesehen und nichts angefasst. Das ist mehr, als mancher Erwachsene schafft.«"
+      },
+      "I04_B_TOPIC_CRAFT": {
+        "speaker_id": "sextus",
+        "text": "»Eisen verzeiht keine Eile. Hier, ein kalter, krummer Nagel. Wenn du wiederkommst, zeige ich dir, wie man ihn gerade richtet. So lange bleibt er auf dem Ambossstock liegen.«"
+      },
+      "I04_B_TOPIC_RIDING": {
+        "speaker_id": "sextus",
+        "text": "»Die Händler nach Aquileia bringen mir ihre Pferde, wenn ein Huf ausbricht oder am Zaumzeug ein Ring fehlt. Ein Pferd merkt, ob du Angst hast. Wenn eines hier steht, darfst du den Strick halten, mehr nicht.«"
+      },
+      "I04_B_TOPIC_FATHER": {
+        "speaker_id": "sextus",
+        "text": "»Dein Vater redet nicht viel über sich. Frag ihn nach der Achse und dem Winter. Und wenn er abwinkt, frag mich noch einmal.«"
+      },
+      "I04_C_LESSON_CRAFT": {
+        "speaker_id": "sextus",
+        "text": "»Und der Nagel wartet auf dem Ambossstock, bis du wiederkommst.«"
+      },
+      "I04_C_LESSON_RIDING": {
+        "speaker_id": "sextus",
+        "text": "»Wenn morgen ein Händler mit Pferd kommt, rufe ich dich.«"
+      },
+      "I04_C_LESSON_FATHER": {
+        "speaker_id": "sextus",
+        "text": "»Und frag deinen Vater nach der Achse.«"
+      }
+    },
+    "consequences": {
+      "I-04.work.stack": {
+        "speaker_id": "sextus",
+        "line_id": "I04_A_REACT_STACK",
+        "immediate_effect": "Du übernimmst das Aufschichten; das Bündel liegt am Kühltrog bereit.",
+        "delayed_hook": "VID-B: Sextus nennt das geschichtete Holz.",
+        "long_term_effect": "Werkstatthilfe als Erinnerung; kein zweiter Holzlohn für das bereits gebrachte Bündel.",
+        "relationship": {}
+      },
+      "I-04.work.message": {
+        "speaker_id": "sextus",
+        "line_id": "I04_A_REACT_MESSAGE",
+        "immediate_effect": "Du trägst Sextus’ Wachstäfelchen.",
+        "delayed_hook": "Fabius wird als Lieferkontakt der Schmiede bekannt.",
+        "long_term_effect": "Öffnet später Handwerk und Handel über Fabius; unabhängig vom Schmiedeberuf.",
+        "relationship": {}
+      },
+      "I-04.work.watch": {
+        "speaker_id": "sextus",
+        "line_id": "I04_A_REACT_WATCH",
+        "immediate_effect": "Du siehst zu und fasst nichts an.",
+        "delayed_hook": "VID-B: Sextus erkennt die Zurückhaltung an.",
+        "long_term_effect": "Keine Hilfe gespeichert; die Lehre findet trotzdem statt.",
+        "relationship": {}
+      },
+      "I-04.stack.done": {
+        "speaker_id": "chronik",
+        "line_id": "",
+        "immediate_effect": "Das Kleinholz liegt vollständig neben dem Blasebalg.",
+        "delayed_hook": "Silvanus erwähnt es bei der Erlaubnis.",
+        "long_term_effect": "Tatsächlich geleistete Arbeit in der Werkstatt.",
+        "relationship": {}
+      },
+      "I-04.note.given": {
+        "speaker_id": "chronik",
+        "line_id": "",
+        "immediate_effect": "Fabius hat die Nachricht.",
+        "delayed_hook": "Silvanus erwähnt den Botengang bei der Erlaubnis.",
+        "long_term_effect": "Lieferkontakt Fabius kennt dich als zuverlässigen Boten.",
+        "relationship": {}
+      },
+      "I-04.topic.craft": {
+        "speaker_id": "sextus",
+        "line_id": "I04_B_TOPIC_CRAFT",
+        "immediate_effect": "Sextus zeigt dir einen kalten, krummen Nagel; er bleibt auf dem Ambossstock.",
+        "delayed_hook": "VID-C: Sextus erinnert an den Nagel.",
+        "long_term_effect": "Sextus’ Lehre: Werkzeug prüfen, Eisen verzeiht keine Eile. Kein funktionstüchtiges Werkzeug, keine Waffe.",
+        "relationship": {}
+      },
+      "I-04.topic.riding": {
+        "speaker_id": "sextus",
+        "line_id": "I04_B_TOPIC_RIDING",
+        "immediate_effect": "Du erfährst von den Händlerpferden.",
+        "delayed_hook": "VID-C: Sextus will dich rufen, wenn ein Pferd kommt.",
+        "long_term_effect": "Interesse an Pferden als Erinnerung; kein Reitrecht.",
+        "relationship": {}
+      },
+      "I-04.topic.father": {
+        "speaker_id": "sextus",
+        "line_id": "I04_B_TOPIC_FATHER",
+        "immediate_effect": "Sextus verweist auf die Geschichte mit der Achse.",
+        "delayed_hook": "VID-C: Sextus erinnert an die Frage an den Vater.",
+        "long_term_effect": "Offene Frage an Silvanus als Erinnerung.",
+        "relationship": {}
+      }
+    },
+    "hooks": [
+      {
+        "event_id": "I-04.stack.done",
+        "step": "apprentice_permission",
+        "line": "»Sextus sagt, du hast sein Holz ordentlich an die Esse geschichtet.«"
+      },
+      {
+        "event_id": "I-04.note.given",
+        "step": "apprentice_permission",
+        "line": "»Fabius hat mir zugerufen, dass du ihm die Nachricht gebracht hast.«"
+      },
+      {
+        "event_id": "I-04.work.watch",
+        "step": "apprentice_permission",
+        "line": "»Sextus sagt, du hast erst hingesehen. Das gefällt ihm.«"
+      }
+    ]
+  }
 }

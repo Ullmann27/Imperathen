@@ -6,6 +6,9 @@ signal advance_requested
 signal pause_requested
 signal skip_requested
 signal reading_mode_changed(enabled: bool)
+## AwaitChoice: the player picks an option inside the film. The overlay only
+## reports the authored action id; Main commits it through the checked model.
+signal choice_requested(action_id: String)
 
 const SafeArea = preload("res://scripts/ui/safe_area.gd")
 const TouchAction = preload("res://scripts/ui/touch_action.gd")
@@ -66,6 +69,8 @@ var _content: VBoxContainer
 var _text: Label
 var _objective_heading: Label
 var _objective_text: Label
+var _choices: VBoxContainer
+var _choice_open := false
 var _story_line: StoryLine
 var _footer: HBoxContainer
 var _hint: Label
@@ -164,6 +169,10 @@ func _ready() -> void:
 	_objective_text = _label("", 20, IVORY)
 	_objective_text.name = "OpeningObjectiveText"
 	_content.add_child(_objective_text)
+	_choices = VBoxContainer.new()
+	_choices.name = "OpeningChoices"
+	_choices.add_theme_constant_override("separation", 8)
+	_content.add_child(_choices)
 	_story_line = StoryLine.new()
 	_stack.add_child(_story_line)
 	_footer = HBoxContainer.new()
@@ -213,7 +222,20 @@ func present(beat: Dictionary, index: int, total: int) -> void:
 	_objective_text.text = str(beat.get("objective_text", beat.get("text", "")))
 	_objective_heading.visible = _final
 	_objective_text.visible = _final
-	_skip_button.visible = not _final
+	for old_choice: Node in _choices.get_children():
+		_choices.remove_child(old_choice)
+		old_choice.queue_free()
+	_choice_open = bool(beat.get("choice_open", false)) and not beat.get("choices", []).is_empty()
+	if _choice_open:
+		for choice_index in beat.choices.size():
+			var option: Dictionary = beat.choices[choice_index]
+			var action_id := str(option.get("action_id", ""))
+			var choice := _button(str(option.get("label", "")), "OpeningChoice_" + action_id, func(): _request_choice(action_id), choice_index == 0)
+			choice.set_meta("choice_action", action_id)
+			_choices.add_child(choice)
+	_choices.visible = _choice_open
+	_skip_button.visible = not _final and not _choice_open
+	_advance_button.visible = not _choice_open
 	_advance_button.text = str(beat.get("advance_label", "Ins Dorf" if _final else "Weiter"))
 	_story_line.count = maxi(1, total)
 	_story_line.cue = clampi(index, 0, _story_line.count - 1)
@@ -230,7 +252,26 @@ func present(beat: Dictionary, index: int, total: int) -> void:
 		_panel.modulate.a = 0.3
 		_fade = create_tween()
 		_fade.tween_property(_panel, "modulate:a", 1.0, 0.22).set_trans(Tween.TRANS_SINE)
-	_advance_button.grab_focus.call_deferred()
+	# A silent pause or reaction shot shows the picture without the text panel.
+	var silent := bool(beat.get("silent", false)) and not _final and not _choice_open
+	_panel.visible = not silent
+	if _choice_open:
+		_choices.get_child(0).grab_focus.call_deferred()
+	elif silent:
+		_skip_button.grab_focus.call_deferred()
+	else:
+		_advance_button.grab_focus.call_deferred()
+
+
+func show_choice_feedback(message: String) -> void:
+	if is_instance_valid(_hint) and not message.is_empty():
+		_hint.text = message
+
+
+func _request_choice(action_id: String) -> void:
+	if not _active or _paused or not _choice_open or action_id.is_empty():
+		return
+	choice_requested.emit(action_id)
 
 
 func set_paused(paused: bool) -> void:
@@ -322,8 +363,8 @@ func _toggle_reading() -> void:
 func _update_status() -> void:
 	_reading_button.text = "Lesemodus ✓" if _manual_reading else "Lesemodus"
 	_pause_button.text = "Fortfahren" if _paused else "Pause"
-	_hint.text = "Die Szene wartet auf dich." if _paused else "Dein Weg beginnt hier." if _final else "Du bestimmst das Tempo." if _manual_reading else "In deinem Tempo weiterlesen."
-	if not _touch_enabled and not _final:
+	_hint.text = "Die Szene wartet auf dich." if _paused else "Dein Weg beginnt hier." if _final else "Die Szene wartet auf deine Entscheidung." if _choice_open else "Du bestimmst das Tempo." if _manual_reading else "In deinem Tempo weiterlesen."
+	if not _touch_enabled and not _final and not _choice_open:
 		_hint.text += "  Enter · weiter"
 	_queue_layout()
 
