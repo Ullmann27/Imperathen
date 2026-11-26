@@ -27,8 +27,8 @@ R_WALL5 = (16.3, 16.9)       # 5 m wall behind the maenianum secundum (Platner-A
 R_GALLERY = (1.8, 8.0)       # top gallery behind the wooden tier
 R_TERRACE = (49.5, 52.5)     # podium terrace (senatorial seats)
 Z_PODIUM = 3.8               # podium height: sources give 3.6-5 m
-Z_IMA0 = 4.2
-Z_MEDIA0 = 12.1
+Z_IMA0 = Z_PODIUM
+Z_MEDIA0 = 11.5       # 1.0 m balteus above the first praecinctio
 Z_WOOD0 = 27.35
 IMA_ROWS, MEDIA_ROWS, WOOD_ROWS = 16, 24, 11
 

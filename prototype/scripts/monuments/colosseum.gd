@@ -325,6 +325,18 @@ func _update_lod(force: bool) -> void:
 				slot += 1
 
 
+## Point in building-local space: bay index, u in 0..1 across the bay
+## (counter-clockwise seen from above), r metres inward from the facade line.
+static func bay_point(layout_data: Dictionary, bay: int, u: float, r: float, height: float = 0.0) -> Vector3:
+	var edges: Array = layout_data.edges
+	var a: Array = edges[posmod(bay, edges.size())]
+	var b: Array = edges[posmod(bay + 1, edges.size())]
+	var left := Vector2(a[0] + a[2] * r, a[1] + a[3] * r)
+	var right := Vector2(b[0] + b[2] * r, b[1] + b[3] * r)
+	var p := left.lerp(right, u)
+	return Vector3(p.x, height, p.y)
+
+
 ## Triangles currently submitted by this building (visible nodes only); used for the budget report.
 func visible_triangles() -> int:
 	var total := 0

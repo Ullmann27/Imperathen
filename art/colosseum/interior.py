@@ -13,7 +13,7 @@ PAVE, SPIC, SAND, PLASTER = "travertine_paving", "brick_floor", "sand", "plaster
 AXIS_HALF = 2.2          # half width of the major-axis processional passage
 AXIS_CUT_R = 44.2        # from here inward the major-axis passage is open to the sky
 IMA_CUT_R = 46.3         # ground vomitoria are open cuts from here to the podium terrace
-MEDIA_CUT_R = 31.6
+MEDIA_CUT_R = 31.0
 FLANK = (1, 79, 39, 41)
 LEVELS = ((0.0, R.Z1), (R.Z1, R.Z2), (R.Z2, R.Z3))
 
@@ -79,7 +79,7 @@ def cuts_at(k, r):
         h = hw_pass(k, r) + 0.3
         cuts.append((0.5 - h / w, 0.5 + h / w))
     if has_l2_passage(k) and MEDIA_CUT_R < r < R.R_PRAE1[0]:
-        h = hw_pass(k, r, 1.3) + 0.3
+        h = hw_pass(k, r, 1.05) + 0.3
         cuts.append((0.5 - h / w, 0.5 + h / w))
     if R.bay_type(k) == "axis_minor" and r > 47.3:
         cuts.append((0.0, 1.0))      # replaced by the box platform
@@ -249,7 +249,7 @@ def corridors(mb, col, k):
         elif lvl == 2:
             door_wall(mb, col, k, y3, z0, top, 1.1, z0 + 2.7, BRICK, -1)
         else:
-            door_wall(mb, col, k, y3, z0, top, hw_pass(k, 14.5, 1.5 if lvl == 0 else 1.3), z0 + (4.5 if lvl == 0 else 3.0), BRICK, -1)
+            door_wall(mb, col, k, y3, z0, top, hw_pass(k, 14.5, 1.5 if lvl == 0 else 1.05), z0 + (4.5 if lvl == 0 else 3.0), BRICK, -1)
     # tangential stair to the top gallery (three bays along the facade wall)
     if tstair is not None:
         rise = R.Z3 - R.Z2
@@ -260,7 +260,7 @@ def corridors(mb, col, k):
             z_a, z_b = za + (zb - za) * ua, za + (zb - za) * ub
             mb.quad((("U", ua), 2.7, z_a), (("U", ua), 4.3, z_a), (("U", ua), 4.3, z_b), (("U", ua), 2.7, z_b), WOOD, (-1, 0, 0), ao=0.85)
             mb.quad((("U", ua), 2.7, z_b), (("U", ub), 2.7, z_b), (("U", ub), 4.3, z_b), (("U", ua), 4.3, z_b), WOOD, (0, 0, 1))
-        col.quad((L, 2.7, za), (Rr, 2.7, za), (Rr, 4.3, zb), (L, 4.3, zb), WOOD, (0, 0, 1))
+        col.quad((L, 2.7, za), (Rr, 2.7, zb), (Rr, 4.3, zb), (L, 4.3, za), WOOD, (0, 0, 1))
         mb.quad((L, 2.7, za - 0.3), (Rr, 2.7, zb - 0.3), (Rr, 4.3, zb - 0.3), (L, 4.3, za - 0.3), WOOD, (0, 0, -1), ao=0.6)
         # inner stringer wall / railing
         for m in (mb, col):
@@ -288,9 +288,6 @@ def gallery(mb, col, k):
             slab(mb, col, L, ("U", u_hole), y0, 4.5, z, WOOD, 0.3)
         for m in (mb, col):   # guard rail along the stairwell
             m.box(("U", u_hole), Rr, 4.38, 4.5, z, z + 1.05, WOOD, skip="z-")
-        if tstair == 2:
-            for m in (mb, col):
-                m.box(("R", 0.12), Rr, y0, 4.5, z, z + 1.05, WOOD, skip="z-")
     wall_y(mb, col, L, Rr, y0, z, R.HEIGHT, TRAV, 1, ao=0.85)
     # portico roof over the wooden tier
     zr0, zr1 = 40.6, 38.4
@@ -354,9 +351,9 @@ def passages(mb, col, k):
     # --- level 2 passage to the praecinctio above the maenianum primum ---
     if has_l2_passage(k):
         mb.level_z = R.Z1
-        tunnel(mb, col, k, 14.0, MEDIA_CUT_R, R.Z1, R.Z1, 2.9, 2.9, BRICK, SPIC, cap=1.3)
+        tunnel(mb, col, k, 14.0, MEDIA_CUT_R, R.Z1, R.Z1, 2.7, 2.7, BRICK, SPIC, cap=1.05)
         par = lambda y: R.Z_MEDIA0 + (R.R_PRAE1[0] - y) / (R.R_PRAE1[0] - R.R_PRAE2[1]) * (R.Z2 - R.Z_MEDIA0) + 0.95
-        tunnel(mb, col, k, MEDIA_CUT_R, R.R_PRAE1[0], R.Z1, R.Z1, 0, 0, MARBLE, SPIC, cap=1.3, open_top=True, parapet=par)
+        tunnel(mb, col, k, MEDIA_CUT_R, R.R_PRAE1[0], R.Z1, R.Z1, 0, 0, MARBLE, SPIC, cap=1.05, open_top=True, parapet=par)
         # level 3 doorway through wall 3 and the 5 m wall
         mb.level_z = R.Z2
         tunnel(mb, col, k, 14.0, R.R_WALL5[1], R.Z2, R.Z2, 2.7, 2.7, BRICK, SPIC, cap=1.1)
@@ -464,9 +461,17 @@ def seating(mb, col, k):
     for (ya, yb), z, zwall, wall_r, wm in ((R.R_PRAE1, R.Z1, R.Z_MEDIA0, R.R_PRAE1[0], MARBLE),):
         for m in (mb, col):
             m.quad((L, ya, z), (Rr, ya, z), (Rr, yb, z), (L, yb, z), TRAV, (0, 0, 1))
-        for a, b in surface_intervals(k, wall_r + 0.01):
+        us = 0.9 / R.width(k, wall_r)
+        for a, b in subtract_all([(us, 1.0 - us)], cuts_at(k, wall_r - 0.01)):
             for m in (mb, col):
                 m.quad((("U", a), wall_r, z), (("U", b), wall_r, z), (("U", b), wall_r, zwall), (("U", a), wall_r, zwall), wm, (0, 1, 0))
+        # scalaria continue through the balteus down to the praecinctio (1.8 m wide, straddling the bay edge)
+        cuts = cuts_at(k, wall_r - 0.01)
+        if not cuts or (cuts[0][0] > us and cuts[-1][1] < 1.0 - us):
+            for ua, ub, cheek, side in ((0.0, us, us, 1), (1.0 - us, 1.0, 1.0 - us, -1)):
+                flight(mb, col, ("U", ua), ("U", ub), yb, z, wall_r, zwall)
+                for m in (mb, col):
+                    m.face([(("U", cheek), yb, z), (("U", cheek), wall_r, z), (("U", cheek), wall_r, zwall)], wm, (side, 0, 0))
     # praecinctio 2, the 5 m wall with its doors, base walkway of the wooden tier
     ya, yb = R.R_PRAE2
     for m in (mb, col):
