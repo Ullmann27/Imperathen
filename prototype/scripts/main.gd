@@ -61,8 +61,13 @@ var village_npc := ""
 var village_tab := "overview"
 var simulation_elapsed := 0.0
 var city_exploration
+var _campaign_market_visit := false
 ## True only while a film choice beat commits its childhood action.
 var _film_committing := false
+
+
+func _init() -> void:
+	add_child(opening_voice)
 
 
 func _ready() -> void:
@@ -91,7 +96,6 @@ func _ready() -> void:
 	world.hud_prompts = true
 	world.set_quality(ui.get_quality())
 	_setup_ambient()
-	add_child(opening_voice)
 	# The title sequence is opaque; the village is not drawn underneath it.
 	world.hide()
 	if "--city-test" in OS.get_cmdline_user_args():
@@ -181,7 +185,10 @@ func _on_go_back_requested() -> void:
 	# The window signal is the single Android Back entry point. Handling the
 	# preceding node notification too would process one request twice.
 	if screen == "city_exploration" and is_instance_valid(city_exploration):
-		city_exploration.set_paused(not city_exploration.paused)
+		if city_exploration.market.is_open():
+			city_exploration.market.close()
+		else:
+			city_exploration.set_paused(not city_exploration.paused)
 	elif screen == "opening" and is_instance_valid(opening_overlay):
 		opening_overlay.handle_back()
 	elif screen == "atlas":
@@ -254,6 +261,7 @@ func _refresh() -> void:
 func _ui_state() -> Dictionary:
 	# Presentation data is derived from the authoritative chapter and never saved.
 	var state: Dictionary = model.data.duplicate(true)
+	state["can_visit_market"] = _can_visit_market()
 	state["frontier_objective"] = model.get_frontier_objective()
 	if state.get("village", {}).get("enabled", false):
 		state["village_view"] = VillageLife.view(model.data)
@@ -435,6 +443,7 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 					world.cue_village_defense(action)
 		"atlas_demo": _open_atlas(true)
 		"city_exploration": _open_city_exploration()
+		"campaign_market": _open_city_exploration(true)
 		"atlas": _open_atlas(false)
 		"valley_demo": _open_valley(true)
 		"valley": _open_valley(false)
@@ -652,7 +661,7 @@ func _npc_dialog(npc_id: String) -> Dictionary:
 
 
 func _append_political_choices(dialog: Dictionary, politics: Dictionary) -> void:
-	if not bool(politics.get("available", false)) or dialog.is_empty():
+	if not bool(politics.get("can_discuss", false)) or dialog.is_empty():
 		return
 	var choices: Array = dialog.get("choices", [])
 	for option: Dictionary in politics.get("options", []):
@@ -1341,9 +1350,26 @@ func _leave_atlas() -> void:
 		_resume()
 
 
-func _open_city_exploration() -> void:
-	if screen!="menu" or is_instance_valid(city_exploration):
+func _can_visit_market() -> bool:
+	var data: Dictionary = model.data
+	if not data.get("village", {}).get("enabled", false) or data.progress.career_terminal:
+		return false
+	if data.village.raid.active or data.village.raid.get("status", "") == "warning" or data.encounter.active or not data.story.choices.is_empty():
+		return false
+	return not Childhood.enabled(data) or str(data.village.childhood.screenplay.get("i01", "")) in ["complete", "legacy"]
+
+
+func _open_city_exploration(campaign_visit := false) -> void:
+	if is_instance_valid(city_exploration):
 		return
+	if campaign_visit:
+		if screen != "paused" or not session_started or not _can_visit_market():
+			return
+		if not _save(false).ok:
+			return
+	elif screen != "menu":
+		return
+	_campaign_market_visit = campaign_visit
 	world.set_active(false)
 	world.hide()
 	# Hidden village bodies would otherwise obstruct the separate test city.
@@ -1352,7 +1378,11 @@ func _open_city_exploration() -> void:
 	ui.process_mode = Node.PROCESS_MODE_DISABLED
 	city_exploration = CityExploration.new()
 	city_exploration.profile = ui.get_quality()
-	if "--horse-test" in OS.get_cmdline_user_args():
+	if campaign_visit:
+		city_exploration.campaign = model
+		city_exploration.campaign_path = SAVE_PATH
+		city_exploration.world_jdn = int(model.data.calendar.clock.jdn)
+	elif "--horse-test" in OS.get_cmdline_user_args():
 		city_exploration.enable_riding_trial = true
 		city_exploration.persist = false
 	city_exploration.leave_requested.connect(_leave_city_exploration)
@@ -1361,6 +1391,8 @@ func _open_city_exploration() -> void:
 	add_child(city_exploration)
 
 func _start_story_from_city() -> void:
+	if _campaign_market_visit:
+		return
 	# The city tour has its own save. Starting the campaign must go through
 	# the normal confirmation and must never delete an existing life silently.
 	_leave_city_exploration()
@@ -1376,4 +1408,9 @@ func _leave_city_exploration() -> void:
 	ui.process_mode = Node.PROCESS_MODE_INHERIT
 	ui.show()
 	world.get_node("WorldCamera").current = true
-	_show_menu()
+	if _campaign_market_visit:
+		_campaign_market_visit = false
+		world.show()
+		_resume()
+	else:
+		_show_menu()

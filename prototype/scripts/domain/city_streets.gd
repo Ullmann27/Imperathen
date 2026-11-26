@@ -17,7 +17,7 @@ var anchor_nodes := {}
 var _astar := AStar3D.new()
 var _lengths := {}
 var _routes := {}
-var _route_order: Array[int] = []
+var _route_order: Array[Vector2i] = []
 
 
 func load_graph(path: String = PATH) -> bool:
@@ -65,7 +65,7 @@ func node_for(anchor_id: String, position: Vector3) -> int:
 func length(from: int, to: int) -> float:
 	if from == to:
 		return 0.0
-	var key := mini(from, to) * 16384 + maxi(from, to)
+	var key := Vector2i(mini(from, to), maxi(from, to))
 	if _lengths.has(key):
 		return _lengths[key]
 	var points := _astar.get_point_path(from, to)
@@ -80,7 +80,7 @@ func length(from: int, to: int) -> float:
 
 ## Polyline of the route (street nodes only). Cached for the visible few.
 func route(from: int, to: int) -> PackedVector3Array:
-	var key := from * 16384 + to
+	var key := Vector2i(from, to)
 	if _routes.has(key):
 		return _routes[key]
 	var points := _astar.get_point_path(from, to)

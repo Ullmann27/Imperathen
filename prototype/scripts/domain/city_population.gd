@@ -8,10 +8,10 @@ extends RefCounted
 ## dictionaries so a save file reproduces it exactly.
 
 const Anchors = preload("res://scripts/domain/city_anchors.gd")
-const Relations = preload("res://scripts/domain/actor_relations.gd")
+const Social = preload("res://scripts/domain/city_social.gd")
 const TIERS := ["poor", "common", "prosperous", "elite"]
-const RELATION_SHARDS := 16
-const MAX_KNOWN := 10
+const RELATION_SHARDS := Social.SHARDS
+const MAX_KNOWN := Social.MAX_KNOWN
 const ADULT_AGE := 16
 const ELDER_AGE := 62
 const PRAENOMINA := ["Gaius", "Lucius", "Marcus", "Publius", "Quintus", "Titus", "Aulus", "Gnaeus", "Decimus", "Sextus", "Manius", "Numerius", "Servius", "Spurius", "Tiberius", "Appius"]
@@ -54,14 +54,12 @@ static func between(h: int, low: int, high: int) -> int:
 
 
 static func resident_id(index: int) -> String:
-	return "c%04d" % index
+	return Social.resident_id(index)
 
 
 ## Founds the population. `anchor_ids` are the anchors usable in `year`.
 static func found(seed: int, index: Dictionary, anchor_ids: Array, economy: Dictionary, year: int) -> Dictionary:
-	var state := {"residents": [], "households": [], "businesses": [], "relations": []}
-	for shard in RELATION_SHARDS:
-		state.relations.append(Relations.new_graph())
+	var state := {"residents": [], "households": [], "businesses": [], "relations": Social.new_shards()}
 	var homes: Array[String] = []
 	var stalls: Array[String] = []
 	var workshops: Array[String] = []
@@ -378,25 +376,13 @@ static func _acquaintances(state: Dictionary, seed: int) -> void:
 					meet(state, person, mate, "founding:colleague", 0, "colleague", 14 + mix(seed, person, 81) % 20)
 
 
-static func graph_for(state: Dictionary, observer: int) -> Dictionary:
-	return state.relations[observer % RELATION_SHARDS]
-
-
-## Directed: the observer's feelings about the subject change. A resident
-## keeps at most MAX_KNOWN acquaintances; a chat with one more stranger then
-## leaves no lasting relation, which also bounds the relation graph.
-static func meet(state: Dictionary, observer: int, subject: int, event_id: String, tick: int, kind: String, trust: int) -> void:
-	var known: Array = state.residents[observer].known
-	if not known.has(subject):
-		if known.size() >= MAX_KNOWN:
-			return
-		known.append(subject)
-	Relations.apply(graph_for(state, observer), resident_id(observer), resident_id(subject), event_id, tick, kind, {"trust": float(trust)})
+static func meet(state: Dictionary, observer: int, subject: int, event_id: String, tick: int, kind: String, trust_delta: int) -> void:
+	Social.meeting(state, observer, subject, event_id, tick, kind, trust_delta)
 
 
 static func trust(state: Dictionary, observer: int, subject: int) -> float:
-	return Relations.value(graph_for(state, observer), resident_id(observer), resident_id(subject), "trust")
+	return Social.trust(state, observer, subject)
 
 
 static func knows(state: Dictionary, observer: int, subject: int) -> bool:
-	return Relations.knows(graph_for(state, observer), resident_id(observer), resident_id(subject))
+	return Social.knows(state, observer, subject)

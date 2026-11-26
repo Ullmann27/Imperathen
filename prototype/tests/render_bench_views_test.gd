@@ -60,12 +60,22 @@ func _run() -> void:
 		_check(engine.profile == row.quality, "%s/%s rendered with the requested profile" % [row.quality, row.view])
 		_check(int(row.metrics.frames) == 2, "Measured frame count recorded")
 		atlas[row.quality] = int(engine.viewport.positional_shadow_atlas_size)
-		if row.view == "night_torch":
-			_check(int(engine.lights.omni) == Bench.TORCH_OFFSETS.size(), "Night view has its harness torches")
-			var shadowed := int(engine.lights.shadowed) - (1 if bool(engine.sun.get("shadow", false)) else 0)
-			_check((shadowed == 0) == (row.quality == "low"), "%s torch shadows follow the positional atlas" % row.quality)
-		elif row.view in ["village_lane", "village_overview"]:
-			_check(int(engine.lights.omni) == 0, row.view + " is a day view without harness torches")
+		if row.view in ["night_torch", "village_lane", "village_overview"]:
+			# Both lane shots see the same authored hearth at the 13 m
+			# Very High light radius. Other views here are beyond its range.
+			var sources: Array = engine.lights.scene_omni_paths
+			var weaver_hearth: bool = row.quality == "very_high" and row.view != "village_overview"
+			var expected_scene := 1 if weaver_hearth else 0
+			_check(sources.size() == expected_scene and (not weaver_hearth or
+				str(sources[0]).ends_with("/south_weaver_home/Interior/HearthGlow")),
+				"%s/%s has the expected authored lights: %s" % [row.quality, row.view, sources])
+			var expected_torches := Bench.TORCH_OFFSETS.size() if row.view == "night_torch" else 0
+			_check(int(engine.lights.harness_omni) == expected_torches, "Exact harness torch count for " + str(row.view))
+			_check(int(engine.lights.omni) == expected_scene + expected_torches, "Every visible omni light is accounted for")
+			var shadowed := 0 if row.quality == "low" else expected_torches
+			_check(int(engine.lights.harness_shadowed) == shadowed and
+				int(engine.lights.shadowed) == shadowed + int(bool(engine.sun.get("shadow", false))),
+				"%s/%s exact torch and scene shadow counts" % [row.quality, row.view])
 	_check(atlas == {"low": 0, "balanced": 2048, "high": 4096, "very_high": 8192}, "Torch shadow atlas per profile: " + str(atlas))
 	_check(game.world.get_node_or_null(Bench.TORCH_NODE) == null, "Harness torches are removed afterwards")
 	_check(game.world.is_physics_processing() and game.is_processing() and is_equal_approx(Engine.time_scale, 1.0), "Simulation is resumed afterwards")

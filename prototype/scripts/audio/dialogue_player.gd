@@ -38,6 +38,7 @@ var _latency := 0.0
 var _last_pos := -1.0
 var _pos_changes := 0
 var _last_pos_change := 0.0
+var _last_mix_clock := 0.0
 
 
 func _init() -> void:
@@ -72,38 +73,48 @@ func _start(entry: Dictionary, text: String, speaker_label: String, emitter: Nod
 	_last_pos = -1.0
 	_pos_changes = 0
 	_last_pos_change = 0.0
+	_last_mix_clock = 0.0
 	_latency = AudioServer.get_output_latency()
 	var stream: AudioStream = VoiceLines.stream_for(entry) if current.voiced else null
 	if stream != null:
 		_duration = stream.get_length()
-		if emitter != null:
-			var p3 := AudioStreamPlayer3D.new()
-			p3.unit_size = UNIT_SIZE
-			p3.max_distance = MAX_DISTANCE
-			p3.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
-			p3.attenuation_filter_cutoff_hz = 9000.0
-			p3.attenuation_filter_db = -6.0
-			p3.position = Vector3(0.0, mouth_height, 0.0)
-			emitter.add_child(p3)
-			_player = p3
-		else:
-			var p2 := AudioStreamPlayer.new()
-			add_child(p2)
-			_player = p2
-		_player.stream = stream
-		_player.bus = AudioBuses.VOICE
-		_player.play()
+		# A dummy driver has no audible playback clock. The same decoded
+		# stream duration and face track still drive an offline scene.
+		if AudioServer.get_driver_name() != "Dummy":
+			if emitter != null:
+				var p3 := AudioStreamPlayer3D.new()
+				p3.unit_size = UNIT_SIZE
+				p3.max_distance = MAX_DISTANCE
+				p3.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+				p3.attenuation_filter_cutoff_hz = 9000.0
+				p3.attenuation_filter_db = -6.0
+				p3.position = Vector3(0.0, mouth_height, 0.0)
+				emitter.add_child(p3)
+				_player = p3
+			else:
+				var p2 := AudioStreamPlayer.new()
+				add_child(p2)
+				_player = p2
+			_player.stream = stream
+			_player.bus = AudioBuses.VOICE
+			_player.play()
 		if is_instance_valid(face):
 			face.set_track(VoiceLines.viseme_track(entry), clock)
 	else:
+		current.voiced = false
 		# Reading time ~15 characters per second, at least 2.5 s.
 		_duration = maxf(2.5, text.length() / 15.0)
+	# The subtitle belongs to the moment play() schedules the stream.
+	# Waiting for _process can leave the first displayed frame without text.
+	_started = true
+	line_started.emit(current)
 	return current
 
 
 func stop() -> void:
 	if _player != null and is_instance_valid(_player):
 		_player.stop()
+		_player.stream = null
 		_player.queue_free()
 	_player = null
 	if is_instance_valid(face):
@@ -136,10 +147,14 @@ func clock() -> float:
 			_last_pos = pos
 			_pos_changes += 1
 			_last_pos_change = _frame_time
-		if _pos_changes >= 2 and _frame_time - _last_pos_change < 0.25:
-			t = pos + AudioServer.get_time_since_last_mix() - _latency
-			_frame_time = t
-			clock_source = "audio"
+			_last_mix_clock = maxf(_last_clock, pos - _latency)
+		if _pos_changes >= 2:
+			var since_change := _frame_time - _last_pos_change
+			if since_change < 0.25:
+				t = pos + AudioServer.get_time_since_last_mix() - _latency
+				clock_source = "audio"
+			else:
+				t = _last_mix_clock + since_change
 	t = maxf(t, _last_clock)
 	_last_clock = t
 	return t
@@ -150,8 +165,5 @@ func _process(delta: float) -> void:
 		return
 	_frame_time += delta
 	var t := clock()
-	if not _started and t >= 0.0:
-		_started = true
-		line_started.emit(current)
 	if _started and t >= _duration:
 		stop()
