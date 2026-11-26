@@ -1,0 +1,660 @@
+{
+	"format": "imperathen-activity-anchors",
+	"schema": 1,
+	"area": "forum",
+	"source": "tools/world/bake_city_layout.gd from roman_city_manifest.json (city seed 20261125)",
+	"anchors": [
+		{
+			"id": "forum.portico_west_0",
+			"kind": "gossip_spot",
+			"position": [
+				-80.0,
+				0.36,
+				-39.0
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				21.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"shelter",
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.portico_west_1",
+			"kind": "gossip_spot",
+			"position": [
+				-80.0,
+				0.36,
+				-23.0
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				21.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"shelter",
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.portico_west_2",
+			"kind": "gossip_spot",
+			"position": [
+				-80.0,
+				0.36,
+				-7.0
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				21.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"shelter",
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.portico_west_3",
+			"kind": "gossip_spot",
+			"position": [
+				-80.0,
+				0.36,
+				9.0
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				21.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"shelter",
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.portico_east_0",
+			"kind": "gossip_spot",
+			"position": [
+				59.0,
+				0.36,
+				-39.0
+			],
+			"facing_deg": -90.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				21.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"shelter",
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.portico_east_1",
+			"kind": "gossip_spot",
+			"position": [
+				59.0,
+				0.36,
+				-23.0
+			],
+			"facing_deg": -90.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				21.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"shelter",
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.portico_east_2",
+			"kind": "gossip_spot",
+			"position": [
+				59.0,
+				0.36,
+				-7.0
+			],
+			"facing_deg": -90.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				21.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"shelter",
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.portico_east_3",
+			"kind": "gossip_spot",
+			"position": [
+				59.0,
+				0.36,
+				9.0
+			],
+			"facing_deg": -90.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				21.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"shelter",
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.fountain",
+			"kind": "fountain",
+			"position": [
+				-17.0,
+				0.09,
+				14.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 8,
+			"hours": [
+				5.0,
+				21.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"ring:4.2",
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.gossip_0",
+			"kind": "gossip_spot",
+			"position": [
+				-48.0,
+				0.09,
+				-22.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 5,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.gossip_1",
+			"kind": "gossip_spot",
+			"position": [
+				-14.0,
+				0.09,
+				-22.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 5,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.gossip_2",
+			"kind": "gossip_spot",
+			"position": [
+				20.0,
+				0.09,
+				-22.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 5,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.gossip_3",
+			"kind": "gossip_spot",
+			"position": [
+				-48.0,
+				0.09,
+				18.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 5,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.gossip_4",
+			"kind": "gossip_spot",
+			"position": [
+				-14.0,
+				0.09,
+				18.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 5,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.gossip_5",
+			"kind": "gossip_spot",
+			"position": [
+				20.0,
+				0.09,
+				18.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 5,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.guard_0",
+			"kind": "guard_post",
+			"position": [
+				-70.0,
+				0.09,
+				-52.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum",
+				"patrol:forum"
+			]
+		},
+		{
+			"id": "forum.guard_1",
+			"kind": "guard_post",
+			"position": [
+				46.0,
+				0.09,
+				-52.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum",
+				"patrol:forum"
+			]
+		},
+		{
+			"id": "forum.guard_2",
+			"kind": "guard_post",
+			"position": [
+				-70.0,
+				0.09,
+				36.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum",
+				"patrol:forum"
+			]
+		},
+		{
+			"id": "forum.guard_3",
+			"kind": "guard_post",
+			"position": [
+				46.0,
+				0.09,
+				36.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum",
+				"patrol:forum"
+			]
+		},
+		{
+			"id": "forum.beggar_0",
+			"kind": "beggar_spot",
+			"position": [
+				-8.0,
+				0.09,
+				41.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 1,
+			"hours": [
+				7.0,
+				19.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.beggar_1",
+			"kind": "beggar_spot",
+			"position": [
+				-60.0,
+				0.09,
+				-40.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 1,
+			"hours": [
+				7.0,
+				19.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.play_0",
+			"kind": "play_spot",
+			"position": [
+				30.0,
+				0.09,
+				20.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 5,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "forum.shrine_temple",
+			"kind": "shrine",
+			"position": [
+				0.0,
+				0.09,
+				-38.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 8,
+			"hours": [
+				5.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"requires_node:MeshyTemple",
+				"district:forum"
+			]
+		}
+	]
+}
