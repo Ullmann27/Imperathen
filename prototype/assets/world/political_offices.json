@@ -1,0 +1,157 @@
+{
+  "format": "imperathen-political-offices",
+  "schema": 1,
+  "sources": {
+    "oxford.cursus": {
+      "title": "Oxford Classical Dictionary: cursus honorum",
+      "url": "https://academic.oup.com/edited-volume/61673/chapter-abstract/548724163"
+    },
+    "cambridge.magistracies": {
+      "title": "Cambridge University Press: The City of Rome: Scene of Politics and Growing Metropolis",
+      "url": "https://www.cambridge.org/core/books/rome-and-the-making-of-a-world-state-150-bce20-ce/city-of-rome-scene-of-politics-and-growing-metropolis/6248904FDF5D1A1D83AB182CF5A3101B"
+    },
+    "cambridge.elections": {
+      "title": "Cambridge University Press: Plebs and Politics in the Late Roman Republic, Elections",
+      "url": "https://www.cambridge.org/core/books/abs/plebs-and-politics-in-the-late-roman-republic/elections/BE378E3F9D6A73D937F701592BE0D058"
+    },
+    "cambridge.curiae": {
+      "title": "Cambridge University Press: The Italian Curial Councils",
+      "url": "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/FAF49065CAEC9DA310BE4BE3C2B55774/9781009496964c06_107-121.pdf/the-italian-curial-councils.pdf"
+    },
+    "oxford.municipal": {
+      "title": "Oxford Classical Dictionary: lex Iulia municipalis",
+      "url": "https://academic.oup.com/edited-volume/61673/chapter-abstract/550529649"
+    },
+    "trieste.aquileia": {
+      "title": "Marina Chiabà, Università degli Studi di Trieste: Il quattuorviro Cn. Octavius Cornicula",
+      "url": "https://arts.units.it/handle/11368/2912467"
+    },
+    "polybios.constitution": {
+      "title": "Polybios, Historien 6.12–16, University of Chicago",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Polybius/6%2A.html"
+    },
+    "cambridge.proconsul": {
+      "title": "Cambridge University Press: Proconsuls, Roman Origins",
+      "url": "https://www.cambridge.org/core/books/abs/proconsuls/roman-origins/50265CF797EB1F23F3B8CAB4855EFFF2"
+    },
+    "cambridge.augustus": {
+      "title": "The Cambridge Ancient History: Augustus: power, authority, achievement",
+      "url": "https://www.cambridge.org/core/books/abs/the-cambridge-ancient-history/augustus-power-authority-achievement/442B55852429098188A81FE9870DB062"
+    },
+    "cambridge.dictator": {
+      "title": "The Cambridge Companion to the Roman Republic: Power and Process under the Republican Constitution",
+      "url": "https://www.cambridge.org/core/books/cambridge-companion-to-the-roman-republic/power-and-process-under-the-republican-constitution/72F9A38F210BBF2B5FD9D7EF6AC59DBB"
+    },
+    "augustus.pontificate": {
+      "title": "Augustus, Res Gestae 10, University of Chicago",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Augustus/Res_Gestae/2%2A.html#10"
+    },
+    "augustus.title": {
+      "title": "Augustus, Res Gestae 34, University of Chicago",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Augustus/Res_Gestae/6%2A.html#34"
+    },
+    "tacitus.elections": {
+      "title": "Tacitus, Annalen 1.15, Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Tac.%20Ann.%201.15"
+    }
+  },
+  "offices": [
+    {
+      "id": "municipal.decurion", "label": "Dekurion", "scope": "municipal", "category": "status",
+      "duties": "Als Mitglied des lokalen Rats über Gemeindebelange und öffentliche Mittel beraten.",
+      "sources": ["cambridge.curiae", "oxford.municipal"], "evidence": "local_reconstruction",
+      "note": "Rat und Mitgliedschaft sind belegt. Die Aufnahmevoraussetzungen in Aquileia sind für die Spielzeit unvollständig überliefert.",
+      "forms": {"late_republic": "Aufnahme nach örtlicher Ordnung", "early_principate": "Aufnahme nach örtlicher Ordnung"}
+    },
+    {
+      "id": "municipal.aedile", "label": "Städtische aedilizische Funktion", "scope": "municipal", "category": "election",
+      "duties": "Aufsicht über Märkte, Infrastruktur und öffentliche Räume nach örtlicher Aufgabenverteilung.",
+      "sources": ["cambridge.curiae", "oxford.municipal", "trieste.aquileia"], "evidence": "local_reconstruction",
+      "note": "Kommunale Ädilen und aedilizische Aufgaben sind regional belegt. Wer in Aquileia diese Aufgaben genau ausübte, bleibt als Rekonstruktion markiert.",
+      "forms": {"late_republic": "Örtliche Wahl nach Gemeinderecht", "early_principate": "Örtliche Wahl nach Gemeinderecht"}
+    },
+    {
+      "id": "municipal.chief_magistrate", "label": "Quattuorvir", "scope": "municipal", "category": "election",
+      "duties": "Führende lokale Magistratur in Aquileia.",
+      "sources": ["trieste.aquileia", "cambridge.curiae"], "evidence": "local_reconstruction",
+      "note": "Cn. Octavius Cornicula ist für das republikanische Aquileia als Quattuorvir belegt. Die Wahlbedingungen und genaue Kompetenzen im Kampagnenjahr bleiben eine Rekonstruktion.",
+      "forms": {"late_republic": "Örtliche Wahl nach Gemeinderecht", "early_principate": "Örtliche Wahl nach Gemeinderecht"}
+    },
+    {
+      "id": "rome.quaestor", "label": "Quästor", "scope": "rome", "category": "election",
+      "duties": "Öffentliche Finanzen, Kassen und Rechenschaft betreuen.",
+      "sources": ["oxford.cursus", "cambridge.magistracies", "tacitus.elections"], "evidence": "documented",
+      "note": "Tacitus berichtet für Tiberius von der Verlagerung der Wahlen in den Senat (Annalen 1.15).",
+      "forms": {"late_republic": "Comitia tributa", "early_principate": "Wahl im frühen Prinzipat, zunehmend mit kaiserlichem Einfluss"}
+    },
+    {
+      "id": "rome.aedile", "label": "Ädil", "scope": "rome", "category": "election",
+      "duties": "Je nach Amt Markt, öffentliche Bauten und Spiele beaufsichtigen.",
+      "sources": ["oxford.cursus", "cambridge.magistracies", "tacitus.elections"], "evidence": "documented",
+      "note": "Zusammengefasster Eintrag für die kurule und die plebejische Ädilität. Die beiden Zugangswege werden getrennt ausgebaut.",
+      "required_offices": ["rome.quaestor"],
+      "forms": {"late_republic": "Comitia tributa oder Concilium plebis je nach Amt", "early_principate": "Wahl im frühen Prinzipat, zunehmend mit kaiserlichem Einfluss"}
+    },
+    {
+      "id": "rome.tribune", "label": "Volkstribun", "scope": "rome", "category": "election",
+      "duties": "Plebejer vertreten, Schutz gewähren und je nach Situation Einspruch erheben.",
+      "sources": ["oxford.cursus", "cambridge.magistracies", "tacitus.elections"], "evidence": "documented",
+      "note": "Ein vom Princeps ausgeübtes tribunizisches Recht entspricht keiner Wahl zum Volkstribun.",
+      "plebeian_only": true,
+      "forms": {"late_republic": "Concilium plebis", "early_principate": "Wahl im frühen Prinzipat, zunehmend mit kaiserlichem Einfluss"}
+    },
+    {
+      "id": "rome.praetor", "label": "Prätor", "scope": "rome", "category": "election",
+      "duties": "Gerichtsbarkeit ausüben und je nach Zuweisung öffentliche Aufgaben übernehmen.",
+      "sources": ["oxford.cursus", "cambridge.magistracies", "tacitus.elections"], "evidence": "documented",
+      "required_offices": ["rome.quaestor"],
+      "forms": {"late_republic": "Comitia centuriata", "early_principate": "Wahl im frühen Prinzipat, zunehmend mit kaiserlichem Einfluss"}
+    },
+    {
+      "id": "rome.consul", "label": "Konsul", "scope": "rome", "category": "election",
+      "duties": "Staatliche Leitung und Vorsitz ausüben. Umfang und Gewicht ändern sich im Prinzipat.",
+      "sources": ["oxford.cursus", "cambridge.magistracies", "polybios.constitution", "cambridge.augustus", "tacitus.elections"],
+      "evidence": "documented", "required_offices": ["rome.praetor"],
+      "forms": {"late_republic": "Comitia centuriata", "early_principate": "Wahl im frühen Prinzipat, zunehmend mit kaiserlichem Einfluss"}
+    },
+    {
+      "id": "rome.senator", "label": "Senator", "scope": "rome", "category": "status",
+      "duties": "Im Senat beraten und über Angelegenheiten im jeweiligen Kompetenzbereich mitentscheiden.",
+      "sources": ["polybios.constitution", "oxford.cursus", "cambridge.magistracies", "cambridge.augustus"], "evidence": "documented",
+      "note": "Quästur ist ein regulärer Zugangsweg in sullanischer Zeit. Die Aufnahme und Sonderaufnahmen brauchen einen eigenen Statusakt.",
+      "required_offices": ["rome.quaestor"],
+      "forms": {"late_republic": "Aufnahme nach republikanischer Ordnung", "early_principate": "Aufnahme nach Ordnung des frühen Prinzipats"}
+    },
+    {
+      "id": "rome.pontifex_maximus", "label": "Pontifex Maximus", "scope": "rome", "category": "religion",
+      "duties": "Das Pontifikalkollegium leiten und öffentliche Kultpflichten wahrnehmen.",
+      "sources": ["augustus.pontificate", "cambridge.augustus"], "evidence": "documented",
+      "note": "Augustus übernahm dieses Amt erst nach dem Tod des Lepidus 12 v. Chr. Der Katalog erfasst hier die Amtsform. Verfügbarkeit eines konkreten Sitzes und die kultischen Verfahren benötigen die politische Weltlogik.",
+      "forms": {"late_republic": "Gesondertes kultisches Besetzungsverfahren", "early_principate": "Gesondertes kultisches Besetzungsverfahren"}
+    },
+    {
+      "id": "rome.proconsul", "label": "Prokonsul", "scope": "rome", "category": "appointment",
+      "duties": "Mit prokonsularischer Amtsgewalt einen zugewiesenen Auftrag ausführen.",
+      "sources": ["cambridge.proconsul", "cambridge.augustus"], "evidence": "documented",
+      "note": "Das Modell einer Zugangsmöglichkeit nach der Prätur steht für den regulären Weg, nicht für alle historischen Ausnahmen. Ein Provinzmandat wird gesondert zugewiesen.",
+      "required_offices": ["rome.praetor"],
+      "forms": {"late_republic": "Verlängerung oder Zuweisung des imperium per legitimiertem Beschluss", "early_principate": "Zuweisung eines prokonsularischen Mandats nach Provinzordnung"}
+    },
+    {
+      "id": "rome.dictator", "label": "Diktator Caesars", "scope": "rome", "category": "exception",
+      "duties": "Historischer Sonderstatus für Caesars einzelne Diktaturen.",
+      "sources": ["cambridge.dictator", "cambridge.magistracies"], "evidence": "documented",
+      "note": "Das Epochenfenster bezeichnet den Rahmen mehrerer getrennt verliehener Diktaturen und ihre erzählerische Verfügbarkeit. Die individuellen Amtszeiten werden im Katalog nicht simuliert.",
+      "requires_era": "political.rome.caesar_dictatorship",
+      "forms": {"late_republic": "Geschütztes historisches Ereignis"}
+    },
+    {
+      "id": "rome.augustus", "label": "Augustus als Princeps", "scope": "rome", "category": "exception",
+      "duties": "Historische Stellung des Augustus mit zeitlich unterschiedlicher Titel-, Autoritäts- und Vollmachtskombination.",
+      "sources": ["augustus.title", "cambridge.augustus"], "evidence": "documented",
+      "note": "Der Senat verlieh Octavian den Ehrennamen Augustus 27 v. Chr. Seine Stellung und Befugnisse veränderten sich weiter, insbesondere 23 v. Chr. Diese Stellung entsteht aus geschützten Ereignissen.",
+      "requires_era": "political.rome.principate_augustus",
+      "forms": {"early_principate": "Historischer Senatsbeschluss und gesonderte Vollmachten"}
+    }
+  ]
+}
