@@ -81,7 +81,7 @@ func _test_recorded_saves() -> void:
 		var loaded: Dictionary = model.load_game(path)
 		if not _check(loaded.ok, "Aufgezeichneten v5-Envelope laden: " + stage + ": " + str(loaded.message)):
 			continue
-		_check(model.data.schema_version == 5 and model.data.village.childhood.screenplay.version == 3, "Kein neuer Save- oder Brückenstand: " + stage)
+		_check(model.data.schema_version == WorldModel.SCHEMA_VERSION and model.data.village.childhood.screenplay.version == 3, "Aktuelles Saveschema, unveränderter Brückenstand: " + stage)
 		_check(_save_json(model.data.village.childhood) == _save_json(state.village.childhood), "Kindheitsfortschritt bleibt vollständig erhalten: " + stage)
 		_check(_save_json(model.data.companion) == _save_json(state.companion), "Gespeicherte Marcus-Wahl bleibt erhalten: " + stage)
 		var view: Dictionary = Childhood.view(model.data)

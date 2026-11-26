@@ -50,6 +50,29 @@ func _ready() -> void:
 		pins[id] = pin
 	focus_region(selected)
 
+## Settlements of the tribal world: small pins coloured by strength class.
+var settlement_pins: Array[MeshInstance3D] = []
+var settlement_mesh: SphereMesh
+
+func show_settlements(points: Array) -> void:
+	for pin in settlement_pins:
+		pin.queue_free()
+	settlement_pins.clear()
+	if settlement_mesh == null:
+		settlement_mesh = SphereMesh.new()
+		settlement_mesh.radius = 0.008
+		settlement_mesh.height = 0.016
+		settlement_mesh.radial_segments = 6
+		settlement_mesh.rings = 3
+	for point: Dictionary in points:
+		var pin := MeshInstance3D.new()
+		pin.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		pin.mesh = settlement_mesh
+		pin.position = _direction(deg_to_rad(float(point.lat)), deg_to_rad(float(point.lon))) * 1.014
+		pin.material_override = _ink(Color(str(point.color)))
+		planet.add_child(pin)
+		settlement_pins.append(pin)
+
 func _normal(region: Dictionary) -> Vector3:
 	return _direction(deg_to_rad(region.lat),deg_to_rad(region.lon))
 

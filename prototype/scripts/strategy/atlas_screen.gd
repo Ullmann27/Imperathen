@@ -4,7 +4,14 @@ signal acted(command: String, target: String)
 const Atlas = preload("res://scripts/strategy/atlas_data.gd")
 const Rules = preload("res://scripts/strategy/season_campaign.gd")
 const Safe = preload("res://scripts/ui/safe_area.gd")
+const Tribes = preload("res://scripts/domain/tribal_world.gd")
+const STANCES := {"unknown": "unbekannt", "hostile": "feindselig", "wary": "misstrauisch", "neutral": "neutral", "friendly": "freundlich", "close": "eng verbunden"}
+const PACTS := {"truce": "Waffenruhe", "alliance": "Bündnis", "tribute": "Tribut", "trade_pact": "Handelsbund", "guest_friendship": "Gastfreundschaft", "amicitia": "Freundschaft", "commission": "Auftrag"}
+const CANON := {"attested_people_fictional_district": "belegtes Volk, Bezirk fiktiv", "fictional_local_clan": "fiktiv", "fictional_band": "fiktiv"}
 var data: Dictionary
+## The authoritative tribal world of this save (WorldModel.data.tribes).
+## The demo shows the 58 BC opening situation; an unset campaign says so.
+var tribes: Dictionary = {}
 var can_act := true
 var demo := false
 var young := false
@@ -20,6 +27,7 @@ var title := Label.new()
 var description := Label.new()
 var stock := Label.new()
 var journal := Label.new()
+var tribal := Label.new()
 var message := Label.new()
 var actions := HFlowContainer.new()
 var stories := VBoxContainer.new()
@@ -55,7 +63,9 @@ func _ready() -> void:
 		list.set_item_metadata(list.item_count-1,id)
 	list.item_selected.connect(func(i): _select(list.get_item_metadata(i),true))
 	globe.region_selected.connect(_select.bind(false))
-	for label in [title,description,stock,journal,message]:
+	if demo and tribes.is_empty():
+		tribes = Tribes.new_state(1, "bc58_rhine")
+	for label in [title,description,stock,journal,tribal,message]:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		sheet.add_child(label)
 	title.add_theme_font_size_override("font_size",23)
@@ -134,3 +144,39 @@ func refresh(feedback := "") -> void:
 	for option in Rules.story_options(data):
 		_button(stories,option.label,func(): acted.emit("story",option.id))
 	globe.show_routes(selected,data.owned)
+	tribal.text = tribal_text(selected)
+	globe.show_settlements(Tribes.settlement_points(tribes, "valdora") if not tribes.is_empty() else [])
+
+
+## The same view the simulation exposes; nothing here is computed separately.
+func tribal_text(region_id: String) -> String:
+	if tribes.is_empty():
+		return "Stammeslage · nicht mit diesem Spielstand verbunden."
+	if tribes.scenario == Tribes.NO_SCENARIO:
+		return "Stammeslage · Für diese Epoche ist noch keine Gruppenaufstellung hinterlegt."
+	var lines := PackedStringArray(["Stammeslage · %s%s" % [Tribes.calendar(tribes).label, " · Ausgangslage" if demo else ""]])
+	for item: Dictionary in Tribes.atlas_view(tribes, "valdora"):
+		if item.atlas_region != region_id:
+			continue
+		var tag := " (%s)" % CANON[item.canon_kind] if CANON.has(item.canon_kind) else ""
+		if item.status != "active":
+			lines.append("%s%s · hat das Gebiet verlassen" % [item.name, tag])
+			continue
+		lines.append("%s%s · %s (%.0f) · %d Krieger%s · Anführer %s" % [item.name, tag, item.strength_class, float(item.strength), int(item.warriors_total), " (ein Zug unterwegs)" if item.away else "", item.leader])
+		var stances := PackedStringArray()
+		for relation: Dictionary in item.relations:
+			if relation.stance != "neutral":
+				stances.append("%s %s" % [relation.name, STANCES[relation.stance]])
+		if not stances.is_empty():
+			lines.append("   Haltung: " + ", ".join(stances))
+		var pacts := PackedStringArray()
+		for pact: Dictionary in item.agreements:
+			var label: String = PACTS.get(pact.kind, pact.kind)
+			if pact.kind == "tribute":
+				label += " an" if pact.role == "payer" else " von"
+			pacts.append("%s %s bis Woche %d" % [label, pact.name, int(pact.until)])
+		if not pacts.is_empty():
+			lines.append("   Vereinbarungen: " + ", ".join(pacts))
+	if lines.size() == 1:
+		lines.append("Keine bekannte Gruppe in diesem Gebiet.")
+	return "\n".join(lines)

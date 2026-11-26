@@ -199,7 +199,7 @@ func _test_world_save_and_replay() -> void:
 	var path := save_directory.path_join("market.json")
 	_check(model.save_game(path).ok, "Save an actual food payment and partly completed delivery")
 	var loaded := Model.new()
-	_check(loaded.load_game(path).ok and loaded.data.schema_version == 5 and loaded.data.village.economy.version == 1, "Real envelope reload preserves the published world and economy versions")
+	_check(loaded.load_game(path).ok and loaded.data.schema_version == Model.SCHEMA_VERSION and loaded.data.village.economy.version == 1, "Real envelope reload preserves the published world and economy versions")
 	var loaded_state := JSON.stringify(loaded.data)
 	_check(loaded.execute("village_buy_food", {}, "commerce-food-1") == purchase and JSON.stringify(loaded.data) == loaded_state, "Saved command identity prevents double merchant credit after restart")
 	model.advance(45.0)
