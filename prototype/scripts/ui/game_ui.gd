@@ -21,6 +21,7 @@ const TouchModalScript := preload("res://scripts/ui/touch_modal.gd")
 const CombatActions := preload("res://scripts/domain/combat_actions.gd")
 const VillagePanel = preload("res://scripts/ui/village_life_panel.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const WorldClock = preload("res://scripts/domain/world_clock.gd")
 const Navigation = preload("res://scripts/ui/village_navigation.gd")
 const RomanStyle = preload("res://scripts/ui/roman_style.gd")
 const ImperialIntro = preload("res://scripts/ui/imperial_intro.gd")
@@ -621,7 +622,13 @@ func update_state(state: Dictionary) -> void:
 	if state.get("village", {}).get("enabled", false):
 		_hud_labels["time"].text = "DORFTAG %d" % int(state.village_economy_view.get("day", 1))
 	if Childhood.enabled(state):
-		_hud_labels["time"].text = "TAG %d · 12 JAHRE" % int(state.get("childhood_view", Childhood.view(state)).get("day", 1))
+		_hud_labels["time"].text = "TAG %d · %d JAHRE" % [int(state.get("childhood_view", Childhood.view(state)).get("day", 1)), int(player.get("age", 12))]
+	# The date of the one world clock (58 v. Chr. in the campaign) leads the
+	# line; the technical day counter of worlds without a village gives way.
+	var world_date := world_date_text(state)
+	if not world_date.is_empty():
+		var village_on: bool = state.get("village", {}).get("enabled", false)
+		_hud_labels["time"].text = "%s  ·  %s" % [world_date, _hud_labels["time"].text] if village_on else world_date
 	_hud_labels["age"].text = "%d Jahre  ·  %s" % [int(player.get("age", 12)), _career_name(String(progress.get("stage", "prologue")))]
 	var health := clampf(float(player.get("health", 100)), 0, 100)
 	_health_bar.value = health
@@ -1821,6 +1828,13 @@ func _objective(state: Dictionary) -> Array[String]:
 	if int(state.get("squad", {}).get("alive", 0)) == 0:
 		return ["Gemeinsam stärker", "Du hast die Grundlagen gelernt. Rekrutiere eine kleine Truppe. Jeder Rekrut braucht Sold und Nahrung."]
 	return ["Verantwortung übernehmen", "Deine Truppe ist bereit. Bereite die Verteidigung vor und kämpfe persönlich an ihrer Seite."]
+
+
+## HUD date from the one world clock, e.g. "1. MAI 58 V. CHR."; empty for
+## view states without a clock.
+static func world_date_text(state: Dictionary) -> String:
+	var time := WorldClock.view(state)
+	return "" if time.is_empty() else str(time.date_label).to_upper()
 
 
 func _career_name(stage: String) -> String:
