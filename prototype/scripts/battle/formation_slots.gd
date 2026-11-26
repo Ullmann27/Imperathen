@@ -5,6 +5,10 @@ const NAMES := {
 	"testudo": "Schilddach / Testudo", "wedge": "Keil", "loose": "Lockere Ordnung",
 	"phalanx": "Speerformation / Phalanx",
 }
+## Formed in place and facing every way; not drawn along a front (Caes. Gall. 4,37; 5,33).
+const ALL_ROUND := {"orbis": "Kreis / Orbis"}
+const ORBIS_SPACING := 0.9
+const ORBIS_DEPTH := 1.0
 
 
 static func natural_columns(shape: String, count: int) -> int:
@@ -15,10 +19,31 @@ static func natural_columns(shape: String, count: int) -> int:
 		_: return ceili(sqrt(count))
 
 
+## Rank spacing front to back. Casualty selection groups soldiers by this depth.
+static func rank_depth(shape: String) -> float:
+	match shape:
+		"loose": return 1.55
+		"shield_wall", "testudo": return 0.8
+		"phalanx": return 1.28
+	return 1.05
+
+
 static func offsets(shape: String, count: int, width: float) -> Array[Vector2]:
+	return layout(shape, count, width).offsets
+
+
+## Rank of every slot: 0 is the front rank (towards the facing), rising to the rear.
+static func ranks(shape: String, count: int, width: float) -> Array[int]:
+	return layout(shape, count, width).ranks
+
+
+static func layout(shape: String, count: int, width: float) -> Dictionary:
 	var result: Array[Vector2] = []
+	var rank_of: Array[int] = []
 	if count == 0:
-		return result
+		return {"offsets": result, "ranks": rank_of}
+	if shape == "orbis":
+		return _orbis(count)
 	var spacing := 0.95
 	var depth := 1.05
 	match shape:
@@ -54,13 +79,14 @@ static func offsets(shape: String, count: int, width: float) -> Array[Vector2]:
 			if shape == "loose" and row % 2 == 1:
 				slot.x += spacing * 0.42
 			result.append(slot)
+			rank_of.append(row)
 			center += slot
 		i += n
 		row += 1
 	center /= float(count)
 	for k in range(count):
 		result[k] -= center
-	return result
+	return {"offsets": result, "ranks": rank_of}
 
 
 static func world_slots(shape: String, count: int, width: float, center: Vector2, facing: float) -> Array[Vector2]:
@@ -68,3 +94,31 @@ static func world_slots(shape: String, count: int, width: float, center: Vector2
 	for i in range(points.size()):
 		points[i] = center + points[i].rotated(-facing)
 	return points
+
+
+## Concentric rings, outer ring first (rank 0), about ORBIS_SPACING apart along each ring.
+## Slot 0 of every ring points to the local front (-Y).
+static func _orbis(count: int) -> Dictionary:
+	var result: Array[Vector2] = []
+	var rank_of: Array[int] = []
+	var rings := maxi(1, ceili(count / 40.0))
+	var outer := maxf(1.2 + (rings - 1) * ORBIS_DEPTH, (count * ORBIS_SPACING / TAU + rings * (rings - 1) * 0.5 * ORBIS_DEPTH) / rings)
+	var radii := []
+	var total := 0.0
+	for k in range(rings):
+		radii.append(outer - k * ORBIS_DEPTH)
+		total += radii[k]
+	var left := count
+	for k in range(rings):
+		var n := left if k == rings - 1 else clampi(roundi(count * radii[k] / total), 1, left - (rings - 1 - k))
+		for j in range(n):
+			var angle := TAU * j / n
+			result.append(Vector2(sin(angle), -cos(angle)) * radii[k])
+			rank_of.append(k)
+		left -= n
+	return {"offsets": result, "ranks": rank_of}
+
+
+static func ring_radius(count: int) -> float:
+	var points: Array = _orbis(count).offsets
+	return 0.0 if points.is_empty() else points[0].length()

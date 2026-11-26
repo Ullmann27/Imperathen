@@ -54,7 +54,7 @@ func _test_childhood_single_combat_clock() -> void:
 	_connect_geometry(model)
 	_check(Childhood.enabled(model.data) and Combat.enabled(model.data), "The published third flag starts family childhood with the same combat authority")
 	_check(model.data.village.childhood.completed.is_empty() and model.data.village.childhood.carried.is_empty(), "Combat initialization cannot invent completed childhood or inventory")
-	model.set_player_position(Vector3(0.0, 1.0, -6.0))
+	model.set_player_position(Vector3(0.0, 1.0, -6.4))
 	_ok(_attack(model), "A family child starts a real practice motion")
 	model.advance(0.1)
 	_check(is_equal_approx(float(model.data.village.unarmed.elapsed), 0.1) and model.data.village.unarmed.practice_hits == 0, "A childhood frame advances exactly one combat clock and stays in preparation")
@@ -96,7 +96,7 @@ func _path(name: String) -> String:
 
 func _test_practice_commands_and_persistence() -> void:
 	var model = _new()
-	model.set_player_position(Vector3(0.0, 1.0, -6.0))
+	model.set_player_position(Vector3(0.0, 1.0, -6.4))
 	var accepted := _attack(model, "practice", "jab_left", "practice-one")
 	_ok(accepted, "Practice starts through WorldModel.execute")
 	var before := JSON.stringify(model.data)
@@ -156,8 +156,8 @@ func _test_contradictory_mode_rejected() -> void:
 func _test_clock_partition() -> void:
 	var fine = _new()
 	var coarse = _new()
-	fine.set_player_position(Vector3(0.0, 1.0, -6.0))
-	coarse.set_player_position(Vector3(0.0, 1.0, -6.0))
+	fine.set_player_position(Vector3(0.0, 1.0, -6.4))
+	coarse.set_player_position(Vector3(0.0, 1.0, -6.4))
 	_ok(_attack(fine), "Fine-step practice starts")
 	_ok(_attack(coarse), "Coarse-step practice starts")
 	for frame in 62:
@@ -259,7 +259,7 @@ func _test_raid_finish_and_adult_training() -> void:
 	_ok(loaded.load_game(_path("raid-finished")), "Completed action-combat raid loads")
 	_connect_geometry(loaded)
 	_check(loaded.data.village.raid.won == 1 and loaded.data.village.unarmed.resolved_hits == model.data.village.unarmed.resolved_hits, "Combat proof and raid outcome survive the same save")
-	loaded.set_player_position(Vector3(0.0, 1.0, -6.0))
+	loaded.set_player_position(Vector3(0.0, 1.0, -6.4))
 	loaded.advance(maxf(0.0, 240.0 - float(loaded.data.village.social.seconds)))
 	_ok(loaded.execute("train"), "Lived childhood and completed raid permit the real adult transition")
 	_check(loaded.data.player.age == 18 and loaded.data.progress.stage == "training", "Adult training starts without fabricated completion")

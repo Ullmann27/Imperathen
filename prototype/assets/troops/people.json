@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "rule": "Herkunftsgruppen und Namenslisten für Soldatenidentitäten. Rekruten stammen aus einer benannten Bevölkerungsgruppe (Entscheidung D-027). Reale Orte und belegte Namensbestandteile sind attested; fiktive Siedlungen und konstruierte Namen sind ausdrücklich design_assumption. Die spätere Kopplung an Dorfwirtschaft und Stammes-KI liest dieselben group_id.",
+  "name_pools": {
+    "roman": {
+      "attestation": "attested",
+      "format": "praenomen nomen",
+      "first": ["Gaius", "Lucius", "Marcus", "Publius", "Quintus", "Titus", "Gnaeus", "Aulus", "Sextus", "Decimus", "Spurius", "Servius"],
+      "family": ["Valerius", "Petronius", "Titius", "Vettius", "Baebius", "Caecilius", "Fabius", "Licinius", "Pomponius", "Sempronius", "Varius", "Atilius", "Cassius", "Pupius", "Statius", "Marius"],
+      "note": "Gebräuchliche Praenomina und verbreitete Gentilnamen; Zuordnung zu Einzelpersonen ist fiktiv."
+    },
+    "cretan": {
+      "attestation": "attested",
+      "format": "name",
+      "first": ["Kleon", "Damon", "Philon", "Nikias", "Sosos", "Menon", "Aristón", "Eudamos", "Kydas", "Lykos", "Timon", "Agathon"],
+      "family": [],
+      "note": "Verbreitete griechische Personennamen; Zuordnung fiktiv."
+    },
+    "cisalpine": {
+      "attestation": "design_assumption",
+      "format": "praenomen nomen",
+      "first": ["Gaius", "Lucius", "Marcus", "Quintus", "Titus", "Publius"],
+      "family": ["Ostialius", "Voltius", "Tritius", "Fremius", "Enetius", "Carnius", "Venetius", "Atestius"],
+      "note": "Latinisierte Namensformen für die Ortswehr; die Gentilnamen sind an venetische und karnische Bezüge angelehnt und konstruiert."
+    },
+    "germanic": {
+      "attestation": "design_assumption",
+      "format": "name",
+      "first": ["Agilo", "Berun", "Hrodo", "Liudo", "Wido", "Hardo", "Sigo", "Teudo", "Gerbo", "Ando", "Walo", "Rodo", "Ingo", "Odo", "Badu", "Hiltu"],
+      "family": [],
+      "note": "Konstruierte Kurznamen für die fiktive Gruppe; keine Belege für 58 v. Chr. Historische Einzelnamen (etwa Ariovist) werden bewusst nicht an Mannschaften vergeben."
+    }
+  },
+  "population_groups": [
+    {
+      "group_id": "gallia_cisalpina",
+      "name": "Gallia Cisalpina (Aushebungsgebiet der Legionen)",
+      "names": "roman",
+      "places": ["Aquileia", "Patavium", "Verona", "Cremona", "Placentia", "Bononia", "Mutina", "Ateste", "Tergeste"],
+      "attestation": "attested",
+      "note": "Caesar hebt 58 und 57 v. Chr. Legionen in Italien und Gallia Cisalpina aus; drei Legionen überwintern bei Aquileia.",
+      "sources": [
+        {"ref": "Caes. Gall. 1,10", "note": "duas legiones conscribit et tres quae circum Aquileiam hiemabant", "verified": false},
+        {"ref": "Caes. Gall. 2,2", "note": "duas legiones in citeriore Gallia novas conscripsit", "verified": false}
+      ]
+    },
+    {
+      "group_id": "creta",
+      "name": "Kreta",
+      "names": "cretan",
+      "places": ["Gortyn", "Knossos", "Kydonia", "Lyttos", "Hierapytna", "Eleutherna"],
+      "attestation": "attested",
+      "note": "Städte der Insel im 1. Jh. v. Chr.",
+      "sources": [{"ref": "Caes. Gall. 2,7", "note": "Cretas sagittarios", "verified": false}]
+    },
+    {
+      "group_id": "valdora_district",
+      "name": "Umland von Valdora bei Aquileia",
+      "names": "cisalpine",
+      "places": ["Valdora", "Aquileia", "Tergeste"],
+      "attestation": "design_assumption",
+      "note": "Valdora ist der fiktive Ausgangsort der Kampagne; die Nachbarorte sind real.",
+      "sources": [{"ref": "Owner-Entscheid: Kampagnenstart 58 v. Chr. in Valdora bei Aquileia", "note": "", "verified": true}]
+    },
+    {
+      "group_id": "hoehenbund",
+      "name": "Höhenbund (fiktive germanische Gruppe)",
+      "names": "germanic",
+      "places": ["Hof am Eschenhang", "Weiler an der Quelle", "Siedlung im Föhrental", "Hof der Bergweide", "Ufersiedlung am Furtstein"],
+      "attestation": "design_assumption",
+      "note": "Eigenständige, fiktive germanische Gruppe des Talgefecht-Prüfstands (D-023). Kein Feind per Definition; Haltung zu Rom ist Szenariodaten.",
+      "sources": [{"ref": "Game Direction 26.11.2026 B, D-023", "note": "fiktiv, historisch plausibel", "verified": true}]
+    }
+  ]
+}
