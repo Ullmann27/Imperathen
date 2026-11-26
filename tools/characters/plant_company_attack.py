@@ -9,6 +9,8 @@ stayed inside the motion gate's 2 cm contact band: foot skating, not a step.
 VillagePerson's world-foot solver could only hide part of it with corrective
 turning steps (2-5 cm residual slip), and the battle Soldier, which plays the
 clip without a solver, showed the full 17 cm.
+The "train" clip of the frontier civilians and Meshy units reuses the same
+pose (build_meshy_people.py maps it to the attack) and is planted the same way.
 
 The pelvis and every other leg joint are static in this clip. With the sole
 held at its planted first-pose contact, the two-bone leg below that fixed hip
@@ -38,7 +40,8 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ground_death_clip as grounding  # noqa: E402  (shared glTF reader, CPU skinning and gate surface rule)
 
-CLIP = "attack"
+# The "train" clip of the frontier civilians and Meshy units reuses the same pose.
+CLIPS = ("attack", "train")
 JOINT = "Thigh_L"
 MARKER = "imperathen_planted_attack"
 GATE_SLIP_M = .015
@@ -50,49 +53,63 @@ def _same_rotation(a: np.ndarray, b: np.ndarray, tolerance: float = 1e-5) -> boo
     return abs(abs(float(np.dot(a, b))) - 1.0) <= tolerance
 
 
-def plant(path: Path, write: bool = True) -> dict:
-    glb = grounding.Glb(path)
-    rig = grounding.Rig(glb)
+def _plant_clip(glb, rig, clip_name: str, path: Path) -> dict | None:
+    """Plant one company attack clip in memory; None when it has no lead-leg sweep."""
     names = {node.get("name"): index for index, node in enumerate(rig.nodes)}
-    clip = rig.animation(CLIP)
+    clip = rig.animation(clip_name)
     animation = clip["animation"]
     if MARKER in animation.get("extras", {}):
-        return {"path": str(path), "skipped": "already planted",
-                "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+        return {"clip": clip_name, "skipped": "already planted"}
     joint = names[JOINT]
     track = clip["tracks"].get((joint, "rotation"))
     if track is None:
-        raise ValueError(f"{path}: the attack has no {JOINT} rotation track")
+        raise ValueError(f"{path}: the {clip_name} clip has no {JOINT} rotation track")
     times, values, interpolation = track
+    if float(np.abs(values - values[0]).max()) <= 1e-6:
+        return None
     if interpolation != "LINEAR" or not _same_rotation(values[0], rig.rest[joint][1]):
-        raise ValueError(f"{path}: {JOINT} does not start from its rest rotation")
+        raise ValueError(f"{path}: {clip_name} {JOINT} does not start from its rest rotation")
     for (node, channel), (_, channel_values, _) in clip["tracks"].items():
         name = rig.nodes[node].get("name")
         if name in STATIC_JOINTS and float(np.abs(channel_values - channel_values[0]).max()) > 1e-6:
-            raise ValueError(f"{path}: {name}/{channel} moves in the attack; a constant thigh would not plant the sole")
+            raise ValueError(f"{path}: {name}/{channel} moves in {clip_name}; a constant thigh would not plant the sole")
     channel = next(c for c in animation["channels"] if c["target"]["node"] == joint and c["target"]["path"] == "rotation")
     output = int(animation["samplers"][channel["sampler"]]["output"])
     users = sum(1 for a in glb.document["animations"] for s in a["samplers"] if output in (s["input"], s["output"]))
     if users != 1:
-        raise ValueError(f"{path}: the {JOINT} output accessor is shared")
+        raise ValueError(f"{path}: the {clip_name} {JOINT} output accessor is shared")
     before = grounding.measure(rig, clip)
     planted = np.repeat(values[:1], len(values), axis=0)
     clip["tracks"][(joint, "rotation")] = (times, planted, interpolation)
     after = grounding.measure(rig, clip)
-    report = {"path": str(path), "clip": CLIP, "joint": JOINT, "keys": int(len(times)),
-              "sha256_before": hashlib.sha256(path.read_bytes()).hexdigest(),
-              "max_thigh_sweep_deg": float(np.degrees(max(2 * np.arccos(min(1.0, abs(float(np.dot(v / np.linalg.norm(v), values[0] / np.linalg.norm(values[0])))))) for v in values))),
-              "before": before, "after": after}
     if after["max_sole_slip_m"] > GATE_SLIP_M or after["max_sole_penetration_m"] > before["max_sole_penetration_m"] + 1e-6:
-        raise ValueError(f"{path}: planting does not bring the attack within the gate: {after}")
-    if write:
-        glb.overwrite_accessor(output, planted)
-        animation.setdefault("extras", {})[MARKER] = {
-            "tool": "tools/characters/plant_company_attack.py", "joint": JOINT,
-            "replaced_sampler_output_accessor": output,
-            "max_sole_slip_before_m": round(before["max_sole_slip_m"], 6),
-            "max_sole_slip_m": round(after["max_sole_slip_m"], 6),
-            "max_sole_penetration_m": round(after["max_sole_penetration_m"], 6)}
+        raise ValueError(f"{path}: planting does not bring {clip_name} within the gate: {after}")
+    sweep = max(2 * np.arccos(min(1.0, abs(float(np.dot(v / np.linalg.norm(v), values[0] / np.linalg.norm(values[0]))))))
+                for v in values)
+    glb.overwrite_accessor(output, planted)
+    animation.setdefault("extras", {})[MARKER] = {
+        "tool": "tools/characters/plant_company_attack.py", "joint": JOINT,
+        "replaced_sampler_output_accessor": output,
+        "max_sole_slip_before_m": round(before["max_sole_slip_m"], 6),
+        "max_sole_slip_m": round(after["max_sole_slip_m"], 6),
+        "max_sole_penetration_m": round(after["max_sole_penetration_m"], 6)}
+    return {"clip": clip_name, "joint": JOINT, "keys": int(len(times)), "max_thigh_sweep_deg": float(np.degrees(sweep)),
+            "before": before, "after": after}
+
+
+def plant(path: Path, write: bool = True) -> dict:
+    glb = grounding.Glb(path)
+    rig = grounding.Rig(glb)
+    present = {animation.get("name") for animation in glb.document.get("animations", [])}
+    if "attack" not in present:
+        raise ValueError(f"{path}: no company attack clip")
+    report = {"path": str(path), "sha256_before": hashlib.sha256(path.read_bytes()).hexdigest(), "clips": []}
+    for clip_name in CLIPS:
+        if clip_name in present:
+            result = _plant_clip(glb, rig, clip_name, path)
+            if result is not None:
+                report["clips"].append(result)
+    if write and any("before" in clip for clip in report["clips"]):
         glb.write(path)
         report["sha256_after"] = hashlib.sha256(path.read_bytes()).hexdigest()
         report["bytes_after"] = path.stat().st_size
@@ -109,13 +126,14 @@ def main() -> int:
     for path in args.glb:
         report = plant(path, not args.check)
         reports.append(report)
-        if "skipped" in report:
-            print(f"PLANT attack {path} {report['skipped']}")
-            continue
-        b, a = report["before"], report["after"]
-        print(f"PLANT attack {path} sweep {report['max_thigh_sweep_deg']:.1f} deg slip {b['max_sole_slip_m']:.4f}->"
-              f"{a['max_sole_slip_m']:.4f} penetration {b['max_sole_penetration_m']:.4f}->{a['max_sole_penetration_m']:.4f} "
-              f"contact slip {b['max_contact_slip_m']:.4f}->{a['max_contact_slip_m']:.4f}")
+        for clip in report["clips"]:
+            if "skipped" in clip:
+                print(f"PLANT {clip['clip']} {path} {clip['skipped']}")
+                continue
+            b, a = clip["before"], clip["after"]
+            print(f"PLANT {clip['clip']} {path} sweep {clip['max_thigh_sweep_deg']:.1f} deg slip {b['max_sole_slip_m']:.4f}->"
+                  f"{a['max_sole_slip_m']:.4f} penetration {b['max_sole_penetration_m']:.4f}->{a['max_sole_penetration_m']:.4f} "
+                  f"contact slip {b['max_contact_slip_m']:.4f}->{a['max_contact_slip_m']:.4f}")
     if args.report:
         args.report.write_text(json.dumps(reports, indent=2) + "\n", encoding="utf-8")
     return 0

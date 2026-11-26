@@ -12,8 +12,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_man_0.glb",
           "triangles": 19719,
-          "bytes": 5022072,
-          "sha256": "b2e9b4c1ac18fc4467d60483221d81f7b969a52e26dee2863274c7ece939f0a7",
+          "bytes": 5022308,
+          "sha256": "39dab2c24d5f6f6d08e3cf6875881cdd9b5c588bb335b8fcf64e56dc2cbf8112",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -60,14 +60,20 @@
             "max_sole_slip_before_m": 0.1536,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1593,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_civilian_man_1.glb",
           "triangles": 7628,
-          "bytes": 2555584,
-          "sha256": "edcd8cd33815f79b8801dcb398d9fabc24b9e646038616c88a2744661d093e95",
+          "bytes": 2555816,
+          "sha256": "b79d81eb89cf02186de07a032382c38adeef6c40fb366cf0c4bda2ef240cab1d",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -111,14 +117,20 @@
             "max_sole_slip_before_m": 0.1536,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1592,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_civilian_man_2.glb",
           "triangles": 2406,
-          "bytes": 774036,
-          "sha256": "7656eae0acc1dbb65cc163d064730abf997d30efd25cce86bb8a1b8359b973bf",
+          "bytes": 774268,
+          "sha256": "4a5ba3c4767c0b1978d429ea12eeac320b635910b8f465cb00078380f2f3262a",
           "texture_edge": 256,
           "face_morphs": false,
           "death_ground_contact": {
@@ -162,14 +174,20 @@
             "max_sole_slip_before_m": 0.1534,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1589,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_civilian_man_3.glb",
           "triangles": 846,
-          "bytes": 344924,
-          "sha256": "6066b347f58f194e10f133ef66948852221ebfca0ca9fc414375ec46cf212da9",
+          "bytes": 345156,
+          "sha256": "7a20a9a10e95400399ceeb653b72ae7c709359cc4d19784863f5c4892609ad69",
           "texture_edge": 128,
           "face_morphs": false,
           "death_ground_contact": {
@@ -213,6 +231,12 @@
             "max_sole_slip_before_m": 0.1539,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1595,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         }
       ]
@@ -224,8 +248,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_woman_0.glb",
           "triangles": 20395,
-          "bytes": 5314104,
-          "sha256": "42b86b1113da4eed445e578aac739db8218601392e0d122265e88c18573ce3ac",
+          "bytes": 5314336,
+          "sha256": "c8d8213404573e451c51f9fb697d2250fac6e57d32f85cd2a8aa85bfe4f2f2d6",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -270,14 +294,20 @@
             "max_sole_slip_before_m": 0.1536,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1593,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_civilian_woman_1.glb",
           "triangles": 7889,
-          "bytes": 2642876,
-          "sha256": "9ac241437eba1d87f7066b851e787f3e20aa53f8a4079c0e5b73e6146bbfb35d",
+          "bytes": 2643112,
+          "sha256": "fd419a3468dfaeeb02f16017d19803a3e3d4224eb42d53930954361deffd3f12",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -322,14 +352,20 @@
             "max_sole_slip_before_m": 0.1536,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1592,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_civilian_woman_2.glb",
           "triangles": 2491,
-          "bytes": 799224,
-          "sha256": "444ed994443c6c92807d1b6294f456be3d0b01e21c4534e5c28f3a65de188648",
+          "bytes": 799460,
+          "sha256": "931f8770ff4cb6b193c188b3c88367a23eda6ca3172ca3bb0c71b9a51f1d035c",
           "texture_edge": 256,
           "face_morphs": false,
           "death_ground_contact": {
@@ -374,14 +410,20 @@
             "max_sole_slip_before_m": 0.1534,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1589,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_civilian_woman_3.glb",
           "triangles": 877,
-          "bytes": 350088,
-          "sha256": "57f87ed3f822d2da3ab622c21a204c12a1c9ef2c67dac2697aee6680731367b9",
+          "bytes": 350320,
+          "sha256": "98f372334e47746355b994a84f6b2aad176ad08b64fcf5938e22632a49de4b32",
           "texture_edge": 128,
           "face_morphs": false,
           "death_ground_contact": {
@@ -426,6 +468,12 @@
             "max_sole_slip_before_m": 0.1539,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1595,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         }
       ]
@@ -437,8 +485,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_elder_0.glb",
           "triangles": 19817,
-          "bytes": 4467224,
-          "sha256": "1f08b18b0dfa32eb33e267605e86f968001a8eb814b2308545b904666716e09b",
+          "bytes": 4467456,
+          "sha256": "63843f9bc9e8181e15c672ad54e048e52dfe17013b0f19c56b2b76620a0ee325",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -485,14 +533,20 @@
             "max_sole_slip_before_m": 0.1536,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1593,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_elder_1.glb",
           "triangles": 7666,
-          "bytes": 2406688,
-          "sha256": "2816a97a79306fd57e6698dcef4d8aa946a3f24363961d4e591f88019e9af976",
+          "bytes": 2406924,
+          "sha256": "71dd20f8bf24d03c76208e152f096cffd4345bdc3928afe7360a3f8e48af7146",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -536,14 +590,20 @@
             "max_sole_slip_before_m": 0.1536,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1592,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_elder_2.glb",
           "triangles": 2417,
-          "bytes": 736244,
-          "sha256": "647cb573c3430610d4b861fd6811ad56688decdf1ef693d98c55f6c53e359986",
+          "bytes": 736476,
+          "sha256": "a7b550137b60ab8744d6d8b9326d8ec066929c228bc067c92ca3199e9889d316",
           "texture_edge": 256,
           "face_morphs": false,
           "death_ground_contact": {
@@ -587,14 +647,20 @@
             "max_sole_slip_before_m": 0.1534,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1589,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_elder_3.glb",
           "triangles": 850,
-          "bytes": 335020,
-          "sha256": "9a892e296cec2d4c98829e4738b22573d0700ecd0d26e3437267ab437b6d2605",
+          "bytes": 335252,
+          "sha256": "92dc75b2411ef749fed0315396f6c2a6389ab0e186600c007f5b9d43a030096b",
           "texture_edge": 128,
           "face_morphs": false,
           "death_ground_contact": {
@@ -636,6 +702,12 @@
           "attack_lead_foot": {
             "tool": "tools/characters/plant_company_attack.py",
             "max_sole_slip_before_m": 0.1539,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1595,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
           }

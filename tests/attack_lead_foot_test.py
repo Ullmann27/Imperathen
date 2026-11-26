@@ -1,4 +1,4 @@
-"""Regression for the planted company attack (tools/characters/plant_company_attack.py).
+"""Regression for the planted company attack and train clips (tools/characters/plant_company_attack.py).
 
 The JSON checks need only the standard library. The re-measurement poses the
 committed GLBs on the CPU with the motion gate's 2 cm surface rule and needs
@@ -38,18 +38,19 @@ class PlantedAttackJsonTest(unittest.TestCase):
         for path in COMPANY_EXPORTS:
             with self.subTest(glb=str(path.relative_to(ASSETS))):
                 document, binary = gltf(path)
-                attack = next(a for a in document["animations"] if a["name"] == "attack")
-                marker = attack.get("extras", {}).get(MARKER)
-                self.assertIsNotNone(marker)
-                self.assertLessEqual(marker["max_sole_slip_m"], GATE_SLIP_M)
                 thigh = next(i for i, node in enumerate(document["nodes"]) if node.get("name") == "Thigh_L")
-                channel = next(c for c in attack["channels"]
-                               if c["target"]["node"] == thigh and c["target"]["path"] == "rotation")
-                accessor = document["accessors"][attack["samplers"][channel["sampler"]]["output"]]
-                view = document["bufferViews"][accessor["bufferView"]]
-                start = view.get("byteOffset", 0) + accessor.get("byteOffset", 0)
-                keys = struct.unpack_from("<%df" % (4 * accessor["count"]), binary, start)
-                self.assertEqual(len(set(zip(*[iter(keys)] * 4))), 1)
+                for clip in [a for a in document["animations"] if a["name"] in ("attack", "train")]:
+                    channel = next(c for c in clip["channels"]
+                                   if c["target"]["node"] == thigh and c["target"]["path"] == "rotation")
+                    accessor = document["accessors"][clip["samplers"][channel["sampler"]]["output"]]
+                    view = document["bufferViews"][accessor["bufferView"]]
+                    start = view.get("byteOffset", 0) + accessor.get("byteOffset", 0)
+                    keys = struct.unpack_from("<%df" % (4 * accessor["count"]), binary, start)
+                    self.assertEqual(len(set(zip(*[iter(keys)] * 4))), 1, clip["name"])
+                    marker = clip.get("extras", {}).get(MARKER)
+                    if clip["name"] == "attack" or marker is not None:
+                        self.assertIsNotNone(marker, clip["name"])
+                        self.assertLessEqual(marker["max_sole_slip_m"], GATE_SLIP_M)
 
     def test_source_pose_no_longer_sweeps_the_lead_leg(self):
         source = (ROOT / "art/soldiers/build.py").read_text(encoding="utf-8")
@@ -66,9 +67,13 @@ class PlantedAttackMeasurementTest(unittest.TestCase):
         for path in COMPANY_EXPORTS[::9]:
             with self.subTest(glb=str(path.relative_to(ASSETS))):
                 rig = grounding.Rig(grounding.Glb(path))
-                measured = grounding.measure(rig, rig.animation("attack"))
-                self.assertLessEqual(measured["max_sole_slip_m"], GATE_SLIP_M)
-                self.assertLessEqual(measured["max_sole_penetration_m"], .01)
+                names = {a["name"] for a in rig.glb.document["animations"]}
+                for clip in ("attack", "train"):
+                    if clip not in names:
+                        continue
+                    measured = grounding.measure(rig, rig.animation(clip))
+                    self.assertLessEqual(measured["max_sole_slip_m"], GATE_SLIP_M, clip)
+                    self.assertLessEqual(measured["max_sole_penetration_m"], .01, clip)
 
 
 if __name__ == "__main__":

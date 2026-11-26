@@ -48,8 +48,8 @@
           "triangles": 28000,
           "texture_edge": 2048,
           "rigid_foot_vertices_preserved": 435,
-          "sha256": "dfb16eba036b07d94e4d6f415bccbdda66c5ef03c13b2ae254588068bb5313fb",
-          "size_bytes": 4637188,
+          "sha256": "4e03e4d61460f78694997c9b5088df2094a1b582f6a5dc68a94ba1a9ef7ea2aa",
+          "size_bytes": 4637424,
           "death_ground_contact": {
             "before": {
               "max_sole_penetration_m": 0.19231034680156095,
@@ -75,6 +75,12 @@
             "max_sole_slip_before_m": 0.1868,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1937,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
@@ -83,8 +89,8 @@
           "triangles": 10000,
           "texture_edge": 1024,
           "rigid_foot_vertices_preserved": 167,
-          "sha256": "760362faedbb0e6dc8c629662b0eefb314aaf5b890d7cad3739b58a3968ba7b5",
-          "size_bytes": 1185376,
+          "sha256": "a08dda90c48063ee97c00392e26fc0e58f40b62615a3d437b2d28d33a1275976",
+          "size_bytes": 1185608,
           "death_ground_contact": {
             "before": {
               "max_sole_penetration_m": 0.19266639117516543,
@@ -110,6 +116,12 @@
             "max_sole_slip_before_m": 0.1867,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1936,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
@@ -118,8 +130,8 @@
           "triangles": 3500,
           "texture_edge": 512,
           "rigid_foot_vertices_preserved": 52,
-          "sha256": "9943a82310f75be450b3d84e2c7e6eaa8553bf44f2b18f7057244cc8fb18304e",
-          "size_bytes": 555980,
+          "sha256": "bc31f3f2a88a2c87418ffb946ee73562689a847ca1715cfa7d1165e787fab133",
+          "size_bytes": 556212,
           "death_ground_contact": {
             "before": {
               "max_sole_penetration_m": 0.19380443732744765,
@@ -145,6 +157,12 @@
             "max_sole_slip_before_m": 0.1864,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1933,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
@@ -153,8 +171,8 @@
           "triangles": 1199,
           "texture_edge": 256,
           "rigid_foot_vertices_preserved": 15,
-          "sha256": "5b7d6e1aa46a6b1fc5557a3dbe77ec1b7e9a756a8e7bc12f1acf4337b4a7e691",
-          "size_bytes": 315480,
+          "sha256": "053c9e92836c749e6ac83cca3a29b23bc8de5675a2b7f10bdff63d691ac0b42d",
+          "size_bytes": 315712,
           "death_ground_contact": {
             "before": {
               "max_sole_penetration_m": 0.18783231626667973,
@@ -178,6 +196,12 @@
           "attack_lead_foot": {
             "tool": "tools/characters/plant_company_attack.py",
             "max_sole_slip_before_m": 0.1858,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1926,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
           }
@@ -243,8 +267,8 @@
           "triangles": 27999,
           "texture_edge": 2048,
           "rigid_foot_vertices_preserved": 527,
-          "sha256": "987547d344e4e4190056cc6b31df902891a100e00b49aeec07764aeadc0d2966",
-          "size_bytes": 4091660,
+          "sha256": "72951f0c0d37cbd49bf63d1bb3001eef3209dd5c853d9b71804c8c0f1924c92d",
+          "size_bytes": 4091892,
           "death_ground_contact": {
             "before": {
               "max_sole_penetration_m": 0.18277658218367357,
@@ -276,6 +300,12 @@
             "max_sole_slip_before_m": 0.1846,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1914,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
@@ -284,8 +314,8 @@
           "triangles": 10000,
           "texture_edge": 1024,
           "rigid_foot_vertices_preserved": 169,
-          "sha256": "71e6811b11fb99bbc8b5d5d67f07772baf513c172b45761b5ecd9fff3e843259",
-          "size_bytes": 1121456,
+          "sha256": "e963e3fe22dfbaf06d2844f32dd41cc8822cb3e0c3e0e0d9fda78c8b80513905",
+          "size_bytes": 1121688,
           "death_ground_contact": {
             "before": {
               "max_sole_penetration_m": 0.18257576165450162,
@@ -311,6 +341,12 @@
             "max_sole_slip_before_m": 0.1846,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1914,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
@@ -319,8 +355,8 @@
           "triangles": 3380,
           "texture_edge": 512,
           "rigid_foot_vertices_preserved": 61,
-          "sha256": "5662ffedb31c8ed02ef0b9a6b3dbf6e2d7565f64fbfbe2e5c4bb6357c3a920f1",
-          "size_bytes": 500900,
+          "sha256": "eb312f6d0a290579787e7335e7d7c44fe2381c42d8f1af12bb444c13c7f32a73",
+          "size_bytes": 501132,
           "death_ground_contact": {
             "before": {
               "max_sole_penetration_m": 0.1853204510446443,
@@ -346,6 +382,12 @@
             "max_sole_slip_before_m": 0.1847,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1915,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
           }
         },
         {
@@ -354,8 +396,8 @@
           "triangles": 1075,
           "texture_edge": 256,
           "rigid_foot_vertices_preserved": 18,
-          "sha256": "896664cf569e86844fa1aa415203f9421aa483542c278bf08d84c7e9c6934ab6",
-          "size_bytes": 295568,
+          "sha256": "9b4dfe8558c902dff9277580d5979413805216ad28926e56e62ce9a01d2f9d74",
+          "size_bytes": 295804,
           "death_ground_contact": {
             "before": {
               "max_sole_penetration_m": 0.18731961762941193,
@@ -379,6 +421,12 @@
           "attack_lead_foot": {
             "tool": "tools/characters/plant_company_attack.py",
             "max_sole_slip_before_m": 0.1846,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1914,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
           }
