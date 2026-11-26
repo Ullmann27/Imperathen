@@ -16,6 +16,8 @@ const SHADER = preload("res://scripts/world/village/architecture/valdora_house.g
 const MANIFEST = preload("res://assets/architecture/valdora/valdora_family.json")
 const ASSET_DIR := "res://assets/architecture/valdora/"
 const FORGE_SCENE := ASSET_DIR + "valdora_forge.glb"
+## Only independently movable stations without separate flame, water or support geometry.
+const FORGE_FIXTURES := {"forge_bellows": "Fixture_Bellows", "anvil_block": "Fixture_Anvil", "tool_rack_smith": "Fixture_ToolRack"}
 
 ## Wealth tier follows the household (docs/36_architecture/VALDORA_HOUSE_FAMILY.md).
 const ASSIGNMENT := {
@@ -164,10 +166,9 @@ static func instantiate(home: Dictionary, profile: String) -> Node3D:
 	return model
 
 
-## Use the authored architecture but not its legacy fixture layout: the
-## newer interior design owns the interactable workstations and their physics.
-## The original detail mesh also contains fixture-specific decorations, so
-## it must not be overlaid until those positions have been reconciled.
+## Retain the original architecture and independently movable workstations.
+## The interior design still owns their position, physics and work actions.
+## Unaligned detail, hearth, trough, stock and bench geometry stay excluded.
 static func instantiate_forge_shell(profile: String) -> Node3D:
 	if not ResourceLoader.exists(FORGE_SCENE, "PackedScene"):
 		return null
@@ -184,6 +185,9 @@ static func instantiate_forge_shell(profile: String) -> Node3D:
 			shell_found = true
 		elif String(mesh.name) == "valdora_forge_far" and mesh.mesh != null:
 			far_found = true
+		elif String(mesh.name) in FORGE_FIXTURES.values() and mesh.mesh != null:
+			# Only reveal after the authoritative interior footprint has been fitted.
+			mesh.visible = false
 		else:
 			mesh.free()
 			continue
