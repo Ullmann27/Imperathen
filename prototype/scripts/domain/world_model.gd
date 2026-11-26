@@ -19,6 +19,7 @@ const CityTrade = preload("res://scripts/city_trade.gd")
 const TribalWorld = preload("res://scripts/domain/tribal_world.gd")
 const WorldClock = preload("res://scripts/domain/world_clock.gd")
 const WorldState = preload("res://scripts/domain/world_state.gd")
+const Politics = preload("res://scripts/domain/valdora_politics.gd")
 const PersonRegistry = preload("res://scripts/domain/person_registry.gd")
 const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
 const TimeJump = preload("res://scripts/domain/time_jump_contract.gd")
@@ -156,6 +157,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	command_fields.merge(VillageLife.COMMAND_FIELDS)
 	command_fields.merge(CombatActions.COMMAND_FIELDS)
 	command_fields.merge(CityTrade.COMMAND_FIELDS)
+	command_fields.merge(Politics.COMMAND_FIELDS)
 	if not command_fields.has(command):
 		return _fail("Unbekannter Spielbefehl: %s" % command)
 	if not _exact_keys(args, command_fields[command]):
@@ -740,7 +742,18 @@ func _apply_training_contact(state: Dictionary) -> Dictionary:
 	return _ok("Gültiger Übungstreffer %d/3." % int(state.progress.training_hits))
 
 
+## Read-only options for the local steward and the inspection point.
+func politics_view() -> Dictionary:
+	return Politics.view(data)
+
+
 func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dictionary:
+	if Politics.COMMAND_FIELDS.has(command):
+		var result := Politics.apply(state, command, args)
+		if result.ok:
+			var stamp := WorldClock.view(state)
+			_record(state, "%s · %s" % [stamp.date_label, str(result.message)])
+		return result
 	if CityTrade.COMMAND_FIELDS.has(command):
 		var trade_result := CityTrade.apply(state, command, args, city_trade_sites)
 		if trade_result.ok:
@@ -1004,6 +1017,8 @@ func _resolve_skirmish(state: Dictionary) -> Dictionary:
 
 
 func _validate_arguments(command: String, args: Dictionary) -> String:
+	if Politics.COMMAND_FIELDS.has(command):
+		return Politics.validate_arguments(command, args)
 	if CityTrade.COMMAND_FIELDS.has(command):
 		return CityTrade.validate_arguments(command, args)
 	if CombatActions.COMMAND_FIELDS.has(command):
@@ -1343,6 +1358,7 @@ func _read_save(path: String) -> Dictionary:
 		# v5 -> v6 after the childhood fixes, which can still move the timeline
 		# anchor of version-1 childhood saves to 58 BC.
 		_migrate_world_state(state)
+		WorldState.migrate(state)
 		CityTrade.migrate(state)
 	var error := _validate_state(state)
 	# Only an already valid old childhood save may initialize decisions. The

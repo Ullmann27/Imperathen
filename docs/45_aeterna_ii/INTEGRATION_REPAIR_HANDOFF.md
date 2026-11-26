@@ -7,6 +7,14 @@
 - PR #127 ist ein Draft, keine Freigabe. Keine Änderung an main, kein Release.
 - GitHub-Connector statt lokalem Checkout; Godot, Blender und Android-Runtime waren in der Sitzung nicht verfügbar. Sämtliche neuen Engine-Tests sind unbestätigt.
 
+## Folgeintegration: Politik und Stadtleben auf derselben Basis (26.11.2026)
+
+- Politischer Entwicklungsstand #128 (`0f5637f8e90e8a8492490707289f17109010ca03`) und Reparaturstand #127 (`b367524a77fd5b127058fadb02ccedcc33458c73`) per Merge-Commit zusammengeführt. Beide Branches hatten #126 als gemeinsame Basis; einzige überlappende Datei war der Test-Runner. Sämtliche politischen Testgruppen und die Stadt-Lebenssimulation bleiben registriert.
+- Vollständiger Git-Baum des politischen Stands als Ausgangspunkt; bestehende politische Blender-, GLB-, Skript- und Datendateien bleiben unverändert. Alle 18 nicht überlappenden Dateien aus dem Reparaturstand werden übernommen, Übergabe und Test-Runner aktualisiert.
+- Android-, Linux- und Windows-Exportfilter enthalten jetzt ausdrücklich Aktivitätsanker, Stadtökonomie, Barks, Straßengraph und Ratsstubenmanifest. Keine Änderung von Paketidentität oder Signatur.
+- Vor dem Merge meldete GitHub für den Reparaturstand `b367524a77fd5b127058fadb02ccedcc33458c73` neun erfolgreiche und vier noch laufende Workflows. Diese Ergebnisse gelten ausschließlich für diesen Stand; die kombinierte Version muss neu geprüft werden.
+- Keine lokale Engine-/Blender-Ausführung und keine bestätigte produktive Kampagnenkopplung der Stadtwirtschaft. Politische Integration bewahrt den vorhandenen WorldModel-/Save-Mechanismus aus #128; der noch isolierte Stadt-QA-Modus wird dadurch nicht produktiv.
+
 ## Jetzt implementiert
 
 - Vollständige Domänenübernahme aus #121; Originaldateien außer dem gezielt korrigierten Handel und Test-Runner bleiben erhalten.
@@ -30,7 +38,7 @@
 ## Nächste ausführbare Checks
 
 ```sh
-python3 tools/check_prototype.py --only city_life city_market_bridge
+python3 tools/check_prototype.py --only city_life city_market_bridge valdora_politics political_offices political_persons political_reference_playthrough
 python3 tools/check_prototype.py
 ```
 
