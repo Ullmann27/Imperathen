@@ -41,6 +41,11 @@ func _run() -> void:
 		if game.screen != "opening":
 			break
 		game._opening_skip()
+		if str(game.opening_sequence.id) == "childhood_home":
+			var beat: Dictionary = game.opening_sequence.beats[game.opening_index]
+			if game._film_choice_open(beat):
+				game.opening_overlay.choice_requested.emit("i01_help")
+				game._opening_skip()
 		game._opening_next()
 		await process_frame
 	if game.screen != "playing":
