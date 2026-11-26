@@ -48,6 +48,11 @@ Valdora ist ein fiktives Dorf. Die Liste beschreibt eine glaubwürdige, nicht ve
 | Neuweltpflanzen (Mais, Kartoffel, Tomate, Gartenbohne *Phaseolus*), Robinie, Götterbaum, Platane-Hybride, Amorpha | ausgeschlossen | erst nach 1492 beziehungsweise neuzeitlich eingeführt; Robinie und Amorpha prägen das heutige Friaul, nicht das antike. |
 | Walnuss, Süßkirsche, Feige | nicht modelliert | plausibel (Feige bei Plinius als Rebenträger [Q1]), aber für den Kern von Valdora nicht nötig; spätere Erweiterung. |
 
+## Offene Entscheidungen für den Auftraggeber
+
+- **E-V1 Kastanie, Zypresse, Pinie:** geprüft und für Valdora 58 v. Chr. nicht verwendet (Begründung oben). Sollen sie trotzdem erscheinen, dann nur an klar begründeten Orten: Zypresse und Pinie später in Villengärten, Kastanie auf sauren Hügelböden außerhalb der Schwemmlandebene.
+- **E-V2 „Dinkel“:** Der Auftrag nennt Dinkel, Gerste und Reben. Dinkel (*Triticum spelta*) wurde in Norditalien kaum angebaut [Q6]; das lateinische *far* der Quellen ist Emmer (*Triticum dicoccum*) und wird im Deutschen und Englischen oft ungenau mit „Dinkel“ oder „spelt“ wiedergegeben. Umgesetzt ist deshalb Emmer als Spelzweizen neben Nacktweizen, Gerste und Hirse. Eine eigene Dinkel-Kachel lässt sich im Atlas ergänzen (vier Kacheln sind frei), wäre aber für diese Region eine bewusste Abweichung von der Fundlage.
+
 ## Quellen
 
 - [Q1] Plinius, *Naturalis historia* 17,35 (§ 199–201), Übersetzung Bostock/Riley, [Perseus](https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.02.0137:book=17:chapter=35): Ulme an erster Stelle, dann Schwarzpappel, Esche, Feige, Ölbaum; „In Italy beyond the Padus … the cornel, the opulus, the linden, the maple, the ash, the yoke-elm, and the quercus“; „in Venetia they grow willows for the purpose, on account of the humidity of the soil“. In dieser Sitzung gelesen.

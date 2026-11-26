@@ -45,7 +45,7 @@
       "far_card_share": 0.4,
       "leaf_normal_strength": 0.55,
       "grass_end_m": 12,
-      "grass_near_m": 3.5,
+      "grass_near_m": 0,
       "grass_density": 3.0,
       "grass_far_share": 0.45,
       "grass_cells_per_frame": 1

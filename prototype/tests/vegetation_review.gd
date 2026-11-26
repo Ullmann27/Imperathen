@@ -8,14 +8,18 @@ extends SceneTree
 ##   west_edge    over the brook to the western wood edge
 ##   north_hills  from the north gate toward the backdrop hills (sight line)
 ##   south_fields beyond the southern palisade toward fields and the lagoon side
-## Writes <label>-<shot>-<profile>.png and <label>-vegetation.json with render
+##   meadow       eye height in the meadow south-west of the village, toward the fen
+## Writes <label>-<shot>-<profile>.png and <label>-vegetation-<profiles>.json with render
 ## counters (draw calls, primitives, objects, memory) and, when present, the
 ## vegetation layer's own instance and triangle counts per profile.
 ## Frame times come from whatever renderer runs the script (often software):
 ## relative indicators between shots, never device performance.
-## Usage: --script res://tests/vegetation_review.gd ++ <out_dir> [label] [frames] [profiles,csv]
+## Usage: --script res://tests/vegetation_review.gd ++ <out_dir> [label] [frames] [profiles,csv] [shots,csv] [wind_frames]
+## With wind_frames > 0 every listed shot is also captured as a sequence
+## <label>-<shot>-<profile>-wind<NN>.png, 0.1 s of wind time apart (the wind
+## time is pinned, so the sequence is the same on every run).
 
-const SHOTS := ["path", "overview", "stream", "west_edge", "north_hills", "south_fields"]
+const SHOTS := ["path", "overview", "stream", "west_edge", "north_hills", "south_fields", "meadow"]
 const PATH_POSITION := Vector3(0.9, 0.0, 12.5)
 const VIEWS := {
 	"overview": [Vector3(31.0, 17.5, 33.0), Vector3(-4.0, 1.0, -9.0)],
@@ -23,6 +27,7 @@ const VIEWS := {
 	"west_edge": [Vector3(-21.0, 1.75, -4.0), Vector3(-70.0, 5.0, -12.0)],
 	"north_hills": [Vector3(2.0, 1.75, -54.0), Vector3(-6.0, 9.0, -120.0)],
 	"south_fields": [Vector3(12.0, 2.6, 33.0), Vector3(4.0, 0.8, 75.0)],
+	"meadow": [Vector3(-10.0, 1.7, 44.0), Vector3(-17.0, 0.6, 75.0)],
 }
 var output: String
 var label := "vegetation"
@@ -31,6 +36,8 @@ var profiles: Array = ["low", "balanced", "high", "very_high"]
 var game
 var report := {}
 var errors: Array[String] = []
+var shots: Array = SHOTS.duplicate()
+var wind_frames := 0
 
 
 func _initialize() -> void:
@@ -46,6 +53,10 @@ func _initialize() -> void:
 		frames = clampi(args[2].to_int(), 2, 120)
 	if args.size() > 3:
 		profiles = Array(args[3].split(",", false))
+	if args.size() > 4 and args[4] != "all":
+		shots = Array(args[4].split(",", false)).filter(func(shot: String) -> bool: return shot in SHOTS)
+	if args.size() > 5:
+		wind_frames = clampi(args[5].to_int(), 0, 60)
 	DirAccess.make_dir_recursive_absolute(output)
 	_run.call_deferred()
 
@@ -94,7 +105,7 @@ func _run() -> void:
 	for profile: String in profiles:
 		game.ui.set_quality(profile)
 		RenderingServer.viewport_set_measure_render_time(root.get_viewport_rid(), true)
-		for shot: String in SHOTS:
+		for shot: String in shots:
 			_frame(shot, start)
 			await _settle()
 			var stats := await _measure()
@@ -105,11 +116,16 @@ func _run() -> void:
 				report.shots[shot] = {}
 			report.shots[shot][profile] = stats
 			_capture("%s-%s-%s" % [label, shot, profile])
+			for index in wind_frames:
+				world.set_presentation_time(4.0 + index * .1)
+				await _settle()
+				_capture("%s-%s-%s-wind%02d" % [label, shot, profile, index])
+			world.set_presentation_time(4.0)
 			_restore(start)
 	report.memory = {"static_mib": Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0,
 		"static_max_mib": Performance.get_monitor(Performance.MEMORY_STATIC_MAX) / 1048576.0}
 	report.errors = errors
-	var file := FileAccess.open(output.path_join(label + "-vegetation.json"), FileAccess.WRITE)
+	var file := FileAccess.open(output.path_join("%s-vegetation-%s.json" % [label, "_".join(profiles)]), FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "  ") + "\n")
 	file.close()
 	print("VEGETATION_REVIEW ", JSON.stringify(errors))
