@@ -5,6 +5,7 @@ eyes and skin inherit the source/provenance.json CC0 graphical-data provenance;
 costumes, equipment, rig fitting and the civilian silhouettes are project work.
 
 blender -b -t 4 -P tools/characters/build_frontier_people.py -- --export
+blender -b -t 4 -P tools/characters/build_frontier_people.py -- --export-only --types legionary
 blender -b -t 4 -P tools/characters/build_frontier_people.py -- --review-only
 """
 from __future__ import annotations
@@ -43,6 +44,7 @@ hero = module("frontier_hero_source", ROOT / "tools/characters/build_hero.py")
 soldier = module("frontier_soldier_source", ROOT / "art/soldiers/build.py")
 skirt_seam = module("frontier_skirt_seam", ROOT / "tools/characters/smooth_frontier_skirt_seam.py")
 kit_rivets = module("frontier_kit_rivets", ROOT / "tools/characters/rebind_frontier_kit_rivets.py")
+adult_rig = module("frontier_adult_rig", ROOT / "tools/characters/extend_adult_rig.py")
 
 
 def digest(path):
@@ -471,6 +473,9 @@ def export(kind):
     records = []
     for level, ratio, edge in LOD:
         bpy.ops.wm.open_mainfile(filepath=str(ART / (kind + ".blend")))
+        # Fingers, jaw and eyes on every tier (one skeleton for all detail
+        # switches); soldiers also get adult hands closed on their grips.
+        rig = adult_rig.prepare(bpy.data.objects["FrontierRig"], level, SOLDIERS.get(kind))
         bpy.ops.object.select_all(action="DESELECT")
         for obj in bpy.context.scene.objects:
             if obj.type == "MESH":
@@ -488,6 +493,7 @@ def export(kind):
             export_animation_mode="NLA_TRACKS", export_force_sampling=True,
             export_frame_step=1, export_animations=True, export_morph=True,
             export_morph_animation=False, export_def_bones=False)
+        rig.update(adult_rig.release_runtime_joints(path))
         death_ground = soldier.death_ground.ground(path)
         gather_ground = soldier.death_ground.ground(path, None, "gather")
         seam = skirt_seam.smooth(path)
@@ -499,7 +505,7 @@ def export(kind):
                 count += len(obj.data.loop_triangles)
         records.append({"lod": level, "path": str(path.relative_to(ROOT)), "triangles": count,
                         "bytes": path.stat().st_size, "sha256": digest(path), "texture_edge": edge,
-                        "face_morphs": level < 2, "belt_fit": belt_fit,
+                        "face_morphs": level < 2, "belt_fit": belt_fit, "rig": rig,
                         "death_ground_contact": {key: death_ground[key] for key in ("before", "after", "maximum_floor_correction_m")},
                         "skirt_seam": {key: seam[key] for key in ("before", "after", "unchanged") if key in seam},
                         "gather_ground_contact": {key: gather_ground[key] for key in ("before", "after", "unchanged") if key in gather_ground},
@@ -530,6 +536,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--export", action="store_true")
     parser.add_argument("--review-only", action="store_true")
+    parser.add_argument("--export-only", action="store_true",
+                        help="re-export the runtime tiers from the committed sources without rebuilding them")
     parser.add_argument("--types", nargs="+", choices=TYPES, default=list(TYPES))
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
     for path in (ART, OUT, ART / "review"):
@@ -537,8 +545,9 @@ def main():
     records = []
     for kind in args.types:
         if not args.review_only:
-            make_source(kind)
-            if args.export:
+            if not args.export_only:
+                make_source(kind)
+            if args.export or args.export_only:
                 records.append({"identity": kind, "lods": export(kind)})
         else:
             review(kind)
@@ -552,6 +561,10 @@ def main():
                   "limits": ["No physical Android performance claim.", "Female and elder faces are authored variants of the existing anatomical source, not new scans.",
                              "Distant levels omit facial morphs.", "Armour retains the project's stylised Roman equipment study; no archaeological reconstruction claim."]}
         report_path.write_text(json.dumps(report, indent=2) + "\n")
+    civilian = [kind for kind in args.types if kind in ("civilian_man", "civilian_woman", "elder")]
+    if records and civilian:
+        # The resident identity layer is part of the civilian runtime exports.
+        module("resident_identity", ROOT / "art/village_characters/build_resident_identity.py").run(civilian)
     print("FRONTIER_PEOPLE_COMPLETE", ",".join(args.types))
 
 

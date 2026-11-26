@@ -384,7 +384,7 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 			appearance = "legionary"
 		if id == "decimus":
 			appearance = "elder"
-		figure.configure_resident("italia",32+actors.size()%20,appearance,actors.size(),get_viewport().get_camera_3d())
+		figure.configure_resident("italia",32+actors.size()%20,appearance,actors.size(),get_viewport().get_camera_3d(),id)
 		if id == "severus":
 			figure.configure_meshy("unit_roman_signifer")
 		var label := Art.label(actor, caption + " · " + profession, Vector3(0,2.08,0), Color("efdbad"), 27)
