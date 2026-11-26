@@ -16,6 +16,7 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const CityTrade = preload("res://scripts/city_trade.gd")
+const GearMarket = preload("res://scripts/domain/gear_market.gd")
 const TribalWorld = preload("res://scripts/domain/tribal_world.gd")
 const SCHEMA_VERSION := 6
 ## Weekly ticks of the aggregated tribal world per frame; long time jumps
@@ -53,6 +54,9 @@ var raid_observations: Callable
 var npc_sight_check: Callable
 # A city session owns this verified runtime map; ordinary campaign/test worlds keep it empty.
 var city_trade_sites: Dictionary = {}
+## Shop and home anchors for the equipment market: shop id or "home" -> Vector3.
+## Presentation supplies verified scene positions; without one a place stays closed.
+var gear_sites: Dictionary = {}
 
 
 func _init() -> void:
@@ -123,6 +127,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	command_fields.merge(VillageLife.COMMAND_FIELDS)
 	command_fields.merge(CombatActions.COMMAND_FIELDS)
 	command_fields.merge(CityTrade.COMMAND_FIELDS)
+	command_fields.merge(GearMarket.COMMAND_FIELDS)
 	if not command_fields.has(command):
 		return _fail("Unbekannter Spielbefehl: %s" % command)
 	if not _exact_keys(args, command_fields[command]):
@@ -484,6 +489,11 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			_update_morale(state)
 			_record(state, str(trade_result.message))
 		return trade_result
+	if GearMarket.COMMAND_FIELDS.has(command):
+		var gear_result := GearMarket.apply(state, command, args, gear_sites)
+		if gear_result.ok:
+			_record(state, str(gear_result.message))
+		return gear_result
 	if CombatActions.COMMAND_FIELDS.has(command):
 		if not state.village.enabled:
 			return _fail("Diese Partie verwendet den bisherigen regionalen Dorfabschnitt.")
@@ -742,6 +752,8 @@ func _resolve_skirmish(state: Dictionary) -> Dictionary:
 func _validate_arguments(command: String, args: Dictionary) -> String:
 	if CityTrade.COMMAND_FIELDS.has(command):
 		return CityTrade.validate_arguments(command, args)
+	if GearMarket.COMMAND_FIELDS.has(command):
+		return GearMarket.validate_arguments(command, args)
 	if CombatActions.COMMAND_FIELDS.has(command):
 		return CombatActions.validate_arguments(command, args)
 	if command.begins_with("village_"):
@@ -817,6 +829,9 @@ func _validate_state(state: Variant) -> String:
 	var trade_error := CityTrade.validate(state)
 	if not trade_error.is_empty():
 		return trade_error
+	var gear_error := GearMarket.validate(state)
+	if not gear_error.is_empty():
+		return gear_error
 	if float(state.village.social.accumulator) >= VillageLife.STEP + 0.00000001:
 		return "Die Dorfzeit enthält einen nicht abgearbeiteten Zeitsprung."
 	var economic_seconds := int(state.village.economy.day) * VillageEconomy.day_length(state) + float(state.village.economy.day_seconds)
@@ -985,6 +1000,7 @@ func _validate_state(state: Variant) -> String:
 	expected_grain += int(village_ledger.grain)
 	expected_money += int(village_ledger.denarii)
 	expected_money += CityTrade.money_effect(state)
+	expected_money += GearMarket.money_effect(state)
 	if state.resources.grain != expected_grain or state.resources.denarii != expected_money:
 		return "Die Versorgungs- oder Geldbilanz wurde verletzt."
 	var expected_trust := (20 if companion.choice == "help" else (-5 if companion.choice == "decline" else 0)) + (5 if state.story.choice == "protect" else (-5 if state.story.choice == "pursue" else 0))
@@ -1096,6 +1112,7 @@ func _read_save(path: String) -> Dictionary:
 
 func _restore_integer_fields(state: Dictionary) -> void:
 	CityTrade.restore_integer_fields(state)
+	GearMarket.restore_integer_fields(state)
 	TribalWorld.normalize(state.tribes)
 	for key in ["schema_version", "revision"]:
 		state[key] = int(state[key])

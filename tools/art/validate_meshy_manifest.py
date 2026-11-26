@@ -10,7 +10,7 @@ import sys
 
 
 ALLOWED_STATUS = {"ready_in_meshy", "geometry_ready_untextured"}
-ALLOWED_CATEGORIES = {"weapon", "character", "equipment", "resource", "mount"}
+ALLOWED_CATEGORIES = {"weapon", "character", "equipment", "resource", "mount", "building"}
 
 
 def fail(message: str) -> None:

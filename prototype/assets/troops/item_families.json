@@ -306,6 +306,21 @@
       "sources": [
         {"ref": "Tac. Germ. 7", "note": "effigies et signa quaedam detracta lucis in proelium ferunt", "verified": false}
       ]
+    },
+    {
+      "family_id": "pugio",
+      "handbook_ref": "Ergänzung",
+      "name": "Pugio (Dolch)",
+      "slots": ["sidearm"],
+      "valid_from": -150,
+      "valid_to": 250,
+      "attestation": "attested",
+      "design_stats": {},
+      "notes": "Breiter, taillierter Dolch iberischer Herkunft als Seitenwaffe. Keine Handbuch-Familie; keine Designwerte vergeben, und combat_balance.json führt noch keine Dolch-Waffenbasis. Für den Ausrüstungskatalog der Läden ergänzt (D-058).",
+      "sources": [
+        {"ref": "Bishop/Coulston, Roman Military Equipment, 2. Aufl. 2006", "note": "republikanische und frühkaiserzeitliche Dolche", "verified": false},
+        {"ref": "Funde aus den Lagern vor Numantia (2. Jh. v. Chr.)", "note": "frühe Belege des Typs", "verified": false}
+      ]
     }
   ]
 }

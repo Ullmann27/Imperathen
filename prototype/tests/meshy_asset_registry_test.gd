@@ -20,7 +20,7 @@ func check(ok: bool, message: String) -> void:
 func run() -> void:
 	Registry.reset_cache_for_tests()
 	var entries := Registry.all_metadata()
-	check(entries.size() == 29, "canonical Meshy manifest exposes 29 assets")
+	check(entries.size() == 38, "Meshy manifest exposes 29 text-to-3D and nine image-to-3D assets")
 	var ids := {}
 	var categories := {}
 	for entry: Dictionary in entries:
@@ -40,10 +40,14 @@ func run() -> void:
 		else:
 			check(Registry.instantiate(stable_id) == null, stable_id + " missing optional binary falls back cleanly")
 	check(int(categories.get("weapon", 0)) == 8, "eight weapons registered")
-	check(int(categories.get("character", 0)) == 7, "seven character sources registered")
-	check(int(categories.get("equipment", 0)) == 7, "seven equipment sources registered")
+	check(int(categories.get("character", 0)) == 13, "seven text-to-3D and six image-to-3D character sources registered")
+	check(int(categories.get("equipment", 0)) == 8, "seven equipment props and the muscle cuirass registered")
+	check(int(categories.get("building", 0)) == 1, "the imperial temple is registered as a building source")
 	check(int(categories.get("resource", 0)) == 6, "six resource sources registered")
-	check(int(categories.get("mount", 0)) == 1, "one canonical cavalry mount registered")
+	check(int(categories.get("mount", 0)) == 2, "untextured cavalry horse and textured bay horse registered")
+	var bay := Registry.metadata("mount_legacy_bay_horse")
+	check(str(bay.get("status", "")) == "ready_in_meshy" and str(bay.get("source_api", "")) == "image-to-3d", "bay horse is the textured image-to-3D source")
+	check(str(Registry.metadata("armor_roman_muscle_cuirass").get("historical_status", "")) == "imperial_parade_style_era_gated", "muscle cuirass is registered as era-gated")
 	var horse := Registry.metadata("mount_ancient_cavalry_horse")
 	check(str(horse.get("status", "")) == "geometry_ready_untextured", "cavalry horse remains explicitly untextured")
 	check(horse.get("meshy_task_id", null) == null, "cavalry horse cannot claim a textured final task")

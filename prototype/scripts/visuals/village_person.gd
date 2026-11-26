@@ -13,6 +13,7 @@ const AuthoredGround := preload("res://scripts/visuals/authored_ground.gd")
 const HandPose := preload("res://scripts/visuals/hand_pose.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
+const GearVisuals := preload("res://scripts/visuals/gear_visuals.gd")
 const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
@@ -67,6 +68,9 @@ var _armed_style := ""
 var _armed_sequence := 0
 var _service_gear := false
 var _service_nodes: Array[Node3D] = []
+## Pieces bought and equipped at the equipment shops (GearMarket.equipped_models).
+var _market_gear: Array = []
+var _market_nodes: Array[Node3D] = []
 var _service_external := false
 var _motion_identity := ""
 var youth_ground_floor_y := INF
@@ -224,6 +228,7 @@ func _reload(level: int) -> void:
 		body.free()
 	_gear_nodes.clear()
 	_service_nodes.clear()
+	_market_nodes.clear()
 	detail = level
 	body = replacement
 	active_model_path = path
@@ -272,6 +277,7 @@ func _reload(level: int) -> void:
 	# new skeleton. LOD changes must not silently erase a valid guard.
 	_sync_loaned_gear()
 	_sync_service_gear()
+	_sync_market_gear()
 	_play(clip,saved_phase,0)
 	_face.pose("attack" if not _combat_id.is_empty() else clip,saved_phase,detail)
 	if not _combat_id.is_empty():
@@ -419,6 +425,24 @@ func set_service_gear(enabled: bool) -> void:
 		_service_external = false
 	_sync_service_gear()
 	_update_weapon_visibility()
+
+
+## Shows the equipped shop pieces on the adult player. The domain decides what
+## is equipped; a child or any other role never receives them here.
+func set_market_gear(pieces: Array) -> void:
+	var allowed: Array = pieces.duplicate(true) if role == "player" and age >= 18 else []
+	if allowed == _market_gear:
+		return
+	_market_gear = allowed
+	_sync_market_gear()
+
+
+func _sync_market_gear() -> void:
+	if not body:
+		return
+	if _market_gear.is_empty() and _market_nodes.is_empty():
+		return
+	_market_nodes = GearVisuals.attach(body, _market_gear if role == "player" and age >= 18 else [], detail)
 
 
 func _sync_service_gear() -> void:

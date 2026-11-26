@@ -7,7 +7,7 @@
   "target_engine": "Godot 4.7.2",
   "target_platform": "Android primary; PC portable GLB path",
   "binary_delivery_status": "not_committed_from_this_session",
-  "binary_delivery_note": "Meshy tasks expose downloadable GLB files, but this session cannot transfer the signed Meshy binary URLs into the repository. Runtime integration waits for the exact GLBs to be downloaded and validated. Canonical horse and galena entries are currently geometry-ready but untextured.",
+  "binary_delivery_note": "Raw Meshy GLBs are downloaded with the account key held by the environment proxy, staged untracked under prototype/assets/meshy/source/ and hash-locked in lock.json. Only budgeted runtime derivatives are committed. Galena and the text-to-3D cavalry horse remain untextured geometry.",
   "import_contract": {
     "source_format": "glb",
     "scene_scale": "1 unit = 1 meter",
@@ -45,7 +45,8 @@
       "target_polycount": null,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "weap_roman_spatha",
@@ -60,7 +61,8 @@
       "target_polycount": null,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "weap_roman_pugio",
@@ -75,7 +77,8 @@
       "target_polycount": null,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "weap_roman_pilum",
@@ -90,7 +93,8 @@
       "target_polycount": null,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "weap_germanic_spear",
@@ -105,7 +109,8 @@
       "target_polycount": null,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "weap_germanic_hand_axe",
@@ -120,7 +125,8 @@
       "target_polycount": null,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "weap_roman_aux_bow",
@@ -135,7 +141,8 @@
       "target_polycount": null,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "weap_crossbow_concept",
@@ -150,7 +157,8 @@
       "target_polycount": null,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "research_concept_not_archaeological_replica"
+      "historical_status": "research_concept_not_archaeological_replica",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "unit_roman_heavy_cavalry_rider",
@@ -165,7 +173,8 @@
       "target_polycount": 28000,
       "rigging_required": true,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "unit_roman_light_cavalry_rider",
@@ -180,7 +189,8 @@
       "target_polycount": 28000,
       "rigging_required": true,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "unit_roman_aux_archer",
@@ -195,7 +205,8 @@
       "target_polycount": 28000,
       "rigging_required": true,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "unit_germanic_axe_fighter",
@@ -210,7 +221,8 @@
       "target_polycount": 28000,
       "rigging_required": true,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "unit_germanic_light_spearman",
@@ -225,7 +237,8 @@
       "target_polycount": 28000,
       "rigging_required": true,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "unit_roman_signifer",
@@ -240,7 +253,8 @@
       "target_polycount": 28000,
       "rigging_required": true,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "unit_germanic_mounted_retainer",
@@ -255,7 +269,8 @@
       "target_polycount": 28000,
       "rigging_required": true,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "gear_roman_scutum",
@@ -270,7 +285,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "gear_roman_cavalry_oval_shield",
@@ -285,7 +301,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "gear_germanic_round_shield",
@@ -300,7 +317,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "gear_roman_cavalry_lance",
@@ -315,7 +333,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "gear_sling",
@@ -330,7 +349,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "gear_roman_signum",
@@ -345,7 +365,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded"
+      "historical_status": "historically_grounded",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "gear_roman_four_horn_saddle",
@@ -360,7 +381,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "historically_grounded_no_stirrups"
+      "historical_status": "historically_grounded_no_stirrups",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "resource_iron_ore",
@@ -375,7 +397,8 @@
       "target_polycount": null,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "natural_resource"
+      "historical_status": "natural_resource",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "resource_firewood",
@@ -390,7 +413,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "natural_resource"
+      "historical_status": "natural_resource",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "resource_clay",
@@ -405,7 +429,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "natural_resource"
+      "historical_status": "natural_resource",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "resource_limestone",
@@ -420,7 +445,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "natural_resource"
+      "historical_status": "natural_resource",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "resource_copper_ore",
@@ -435,7 +461,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "natural_resource"
+      "historical_status": "natural_resource",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "resource_galena",
@@ -450,7 +477,8 @@
       "target_polycount": 9000,
       "rigging_required": false,
       "runtime_ready": false,
-      "historical_status": "natural_resource"
+      "historical_status": "natural_resource",
+      "source_api": "text-to-3d"
     },
     {
       "stable_id": "mount_ancient_cavalry_horse",
@@ -465,19 +493,175 @@
       "target_polycount": 28000,
       "rigging_required": true,
       "runtime_ready": false,
-      "historical_status": "historically_grounded_game_mount"
+      "historical_status": "historically_grounded_game_mount",
+      "source_api": "text-to-3d"
+    },
+    {
+      "stable_id": "armor_roman_muscle_cuirass",
+      "category": "equipment",
+      "display_name": "Roman muscle cuirass with pteryges (Meshy name: Roman centurion cuirass 3D)",
+      "status": "ready_in_meshy",
+      "meshy_task_id": "e6687410-20ed-48a1-8823-e591df9cb1d1",
+      "meshy_preview_task_id": null,
+      "intended_source_path": "prototype/assets/meshy/source/equipment/armor_roman_muscle_cuirass.glb",
+      "format": "glb",
+      "texture_profile": "pbr_textured",
+      "target_polycount": null,
+      "rigging_required": false,
+      "runtime_ready": false,
+      "historical_status": "imperial_parade_style_era_gated",
+      "source_api": "image-to-3d",
+      "related_task_ids": [
+        "1fbbb763-0aba-54bf-bb4f-de80ca4d6134"
+      ],
+      "source_expires_utc": "2026-11-28T10:18:09Z",
+      "era_note": "Ornate gilded musculata with knotted sash; registered for the Principate, hidden in 58 BC (gear_catalog.json)."
+    },
+    {
+      "stable_id": "building_roman_imperial_temple",
+      "category": "building",
+      "display_name": "Roman imperial temple",
+      "status": "ready_in_meshy",
+      "meshy_task_id": "629bd668-c5ed-4057-bd6d-c02322c80e4e",
+      "meshy_preview_task_id": null,
+      "intended_source_path": "prototype/assets/meshy/source/building/building_roman_imperial_temple.glb",
+      "format": "glb",
+      "texture_profile": "pbr_textured",
+      "target_polycount": null,
+      "rigging_required": false,
+      "runtime_ready": false,
+      "historical_status": "imperial_architecture_era_gated",
+      "source_api": "image-to-3d",
+      "source_expires_utc": "2026-11-28T08:01:44Z",
+      "era_note": "Imperial marble temple; runtime path is tools/world/build_meshy_temple.py (city package), not the gear pipeline."
+    },
+    {
+      "stable_id": "historical_caesar_image_textured",
+      "category": "character",
+      "display_name": "Gaius Julius Caesar, textured image-to-3D figure (Meshy name: Julius Caesar 3D model)",
+      "status": "ready_in_meshy",
+      "meshy_task_id": "daf2d776-1be5-4960-bdec-bbab84523699",
+      "meshy_preview_task_id": null,
+      "intended_source_path": "prototype/assets/meshy/source/character/historical_caesar_image_textured.glb",
+      "format": "glb",
+      "texture_profile": "pbr_textured",
+      "target_polycount": null,
+      "rigging_required": true,
+      "runtime_ready": false,
+      "historical_status": "historical_person_reference_review_pending",
+      "source_api": "image-to-3d",
+      "related_task_ids": [
+        "33983306-05ce-5a50-a5e9-eace192c0c2a"
+      ],
+      "source_expires_utc": "2026-11-28T10:32:19Z"
+    },
+    {
+      "stable_id": "mount_legacy_bay_horse",
+      "category": "mount",
+      "display_name": "Bay horse, textured (legacy image-to-3D)",
+      "status": "ready_in_meshy",
+      "meshy_task_id": "01a208ff-057d-73d6-8f70-1c3636ccaf6f",
+      "meshy_preview_task_id": null,
+      "intended_source_path": "prototype/assets/meshy/source/mount/mount_legacy_bay_horse.glb",
+      "format": "glb",
+      "texture_profile": "pbr_textured",
+      "target_polycount": null,
+      "rigging_required": true,
+      "runtime_ready": false,
+      "historical_status": "historically_grounded_game_mount",
+      "source_api": "image-to-3d",
+      "source_expires_utc": "2026-11-26T15:21:48Z"
+    },
+    {
+      "stable_id": "unit_legacy_roman_legionary_segmentata",
+      "category": "character",
+      "display_name": "Roman legionary in lorica segmentata (legacy image-to-3D)",
+      "status": "ready_in_meshy",
+      "meshy_task_id": "01a208f9-5601-7111-8751-e447499039dc",
+      "meshy_preview_task_id": null,
+      "intended_source_path": "prototype/assets/meshy/source/character/unit_legacy_roman_legionary_segmentata.glb",
+      "format": "glb",
+      "texture_profile": "pbr_textured",
+      "target_polycount": null,
+      "rigging_required": true,
+      "runtime_ready": false,
+      "historical_status": "imperial_equipment_era_gated",
+      "source_api": "image-to-3d",
+      "source_expires_utc": "2026-11-26T15:15:37Z"
+    },
+    {
+      "stable_id": "unit_legacy_tunic_villager",
+      "category": "character",
+      "display_name": "Long-haired man in tunic and trousers (legacy image-to-3D)",
+      "status": "ready_in_meshy",
+      "meshy_task_id": "01a208fe-0855-74e0-b2ad-2f5c2791c0d0",
+      "meshy_preview_task_id": null,
+      "intended_source_path": "prototype/assets/meshy/source/character/unit_legacy_tunic_villager.glb",
+      "format": "glb",
+      "texture_profile": "pbr_textured",
+      "target_polycount": null,
+      "rigging_required": true,
+      "runtime_ready": false,
+      "historical_status": "historically_oriented_game_model",
+      "source_api": "image-to-3d",
+      "source_expires_utc": "2026-11-26T15:20:40Z"
+    },
+    {
+      "stable_id": "unit_legacy_blacksmith",
+      "category": "character",
+      "display_name": "Blacksmith with leather apron (legacy image-to-3D)",
+      "status": "ready_in_meshy",
+      "meshy_task_id": "01a208fe-236f-731b-97da-2cd94a6e2e09",
+      "meshy_preview_task_id": null,
+      "intended_source_path": "prototype/assets/meshy/source/character/unit_legacy_blacksmith.glb",
+      "format": "glb",
+      "texture_profile": "pbr_textured",
+      "target_polycount": null,
+      "rigging_required": true,
+      "runtime_ready": false,
+      "historical_status": "historically_oriented_game_model",
+      "source_api": "image-to-3d",
+      "source_expires_utc": "2026-11-26T15:20:44Z"
+    },
+    {
+      "stable_id": "unit_legacy_mail_soldier",
+      "category": "character",
+      "display_name": "Soldier in mail shirt (legacy image-to-3D)",
+      "status": "ready_in_meshy",
+      "meshy_task_id": "01a20913-d021-722f-a1e0-10095201c6da",
+      "meshy_preview_task_id": null,
+      "intended_source_path": "prototype/assets/meshy/source/character/unit_legacy_mail_soldier.glb",
+      "format": "glb",
+      "texture_profile": "pbr_textured",
+      "target_polycount": null,
+      "rigging_required": true,
+      "runtime_ready": false,
+      "historical_status": "historically_oriented_game_model",
+      "source_api": "image-to-3d",
+      "source_expires_utc": "2026-11-26T15:44:20Z"
+    },
+    {
+      "stable_id": "unit_legacy_gladiator",
+      "category": "character",
+      "display_name": "Gladiator (legacy image-to-3D)",
+      "status": "ready_in_meshy",
+      "meshy_task_id": "01a20913-e8fb-7039-9639-f72d1d54cfdd",
+      "meshy_preview_task_id": null,
+      "intended_source_path": "prototype/assets/meshy/source/character/unit_legacy_gladiator.glb",
+      "format": "glb",
+      "texture_profile": "pbr_textured",
+      "target_polycount": null,
+      "rigging_required": true,
+      "runtime_ready": false,
+      "historical_status": "historically_oriented_game_model",
+      "source_api": "image-to-3d",
+      "source_expires_utc": "2026-11-26T15:44:27Z"
     }
   ],
   "legacy_generated_unmapped": [
-    "Roman legionary character",
-    "Germanic fighter character",
-    "Sextus blacksmith/mentor character",
-    "Horse",
-    "Mail-armored soldier",
-    "Gladiator",
     "face variants mentioned in prior production"
   ],
-  "legacy_note": "These earlier Meshy outputs were reported as generated in prior work, but exact task IDs are not reliably available in this continuation. They are intentionally not assigned invented IDs.",
+  "legacy_note": "The earlier image-to-3D outputs (legionary, tunic man, blacksmith, horse, mail soldier, gladiator) were found in the account listing of 26.11.2026 and are registered above with their exact task ids. Face variants are not present in the listing.",
   "parallel_candidates": [
     {
       "stable_id": "historical_caesar_58bce_candidate",
@@ -490,5 +674,10 @@
       "canonical_asset": false,
       "note": "Parallel Meshy output discovered in the same project account. Retained as a candidate only; not counted among canonical runtime assets until historical reference review, texture pass, rigging and visual validation."
     }
-  ]
+  ],
+  "inventory_listing": {
+    "listed": "2026-11-26",
+    "document": "docs/20_meshy_assets/meshy-task-inventory.json",
+    "note": "Image-to-3D results expire three days after completion; the staged binaries in lock.json are the only remaining copies after that."
+  }
 }

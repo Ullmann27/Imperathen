@@ -452,6 +452,15 @@ static func _reward_available(data: Dictionary, id: String) -> bool:
 	return true
 
 
+## Read-only facts other shop systems may rely on (equipment market).
+static func trained_soldier(data: Dictionary) -> bool:
+	return _trained_soldier(data)
+
+
+static func reward_proven(data: Dictionary, id: String) -> bool:
+	return Catalog.REWARDS.has(id) and _reward_proven(data, id)
+
+
 static func _trained_soldier(data: Dictionary) -> bool:
 	var player: Dictionary=data.get("player",{})
 	var progress: Dictionary=data.get("progress",{})
