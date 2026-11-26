@@ -5,6 +5,7 @@ extends SceneTree
 const Battle := preload("res://scripts/battle/battle_model.gd")
 const Slots := preload("res://scripts/battle/formation_slots.gd")
 const Catalog := preload("res://scripts/battle/troop_catalog.gd")
+const Roster := preload("res://scripts/battle/soldier_roster.gd")
 const LEGACY := "res://tests/fixtures/valley_schema2_60s.json"
 const GUARD := "valley_guard"
 const ENEMY := "ridge_guard"
@@ -37,6 +38,7 @@ func _initialize() -> void:
 	_test_orbis_and_testudo()
 	_test_invalid_orders()
 	_test_order_determinism()
+	_test_wounds_and_recovery()
 	print("BATTLE_COMMAND_RESULT checks=%d failures=%d metrics=%s" % [checks, failures, JSON.stringify(metrics)])
 	quit(1 if failures else 0)
 
@@ -741,3 +743,34 @@ func _test_order_determinism() -> void:
 		runs.append(m.snapshot())
 	check(runs[0] == runs[1], "New orders keep the battle deterministic")
 	check(Battle.new().restore(runs[0]), "The resulting state validates")
+
+
+func _test_wounds_and_recovery() -> void:
+	var counts := {"dead": 0, "light": 0, "serious": 0, "crippling": 0, "impaired": 0}
+	for i in 2000:
+		var fate := Roster.casualty(58, "probe_%04d" % i, 37)
+		if fate.status == "dead":
+			counts.dead += 1
+		else:
+			counts[fate.wound.severity] += 1
+			counts.impaired += int(fate.wound.impairment != "")
+	metrics["wound_outcomes_2000"] = counts
+	check(absf(counts.dead / 2000.0 - Roster.KILLED_SHARE) < 0.04 and counts.light > counts.serious and counts.serious > counts.crippling and counts.crippling > 0,
+		"Casualty fates follow the design shares (killed %d, light %d, serious %d, crippling %d)" % [counts.dead, counts.light, counts.serious, counts.crippling])
+	check(Roster.casualty(58, "probe_0001", 37) == Roster.casualty(58, "probe_0001", 37), "A fate is reproducible from seed, soldier and step")
+	var m := Battle.new()
+	var person: Dictionary = m.squads[GUARD].people.values()[3]
+	person.status = "wounded"
+	person.wound = {"severity": "serious", "recovery_days": 40, "impairment": "Hinken", "outcome": "return_impaired", "step": 5}
+	var half := Roster.recover(person, 25, -58)
+	check(half.status == "wounded" and half.wound.recovery_days == 15 and person.wound.recovery_days == 40, "Recovery advances on a copy")
+	var healed := Roster.recover(half, 20, -58)
+	check(healed.status == "active" and healed.wound.is_empty() and healed.impairments == ["Hinken"] and healed.service.back().event == "recovered",
+		"A seriously wounded soldier returns with a permanent impairment")
+	person.wound = {"severity": "crippling", "recovery_days": 60, "impairment": "Verlust eines Auges", "outcome": "retire", "step": 5}
+	var retired := Roster.recover(person, 60, -57)
+	check(retired.status == "retired" and retired.impairments == ["Verlust eines Auges"] and retired.service.back() == {"event": "retired", "ref": "Verlust eines Auges", "year": -57, "step": -1},
+		"A crippled soldier leaves the service and keeps his record")
+	person.status = "dead"
+	person.wound = {"severity": "fatal", "recovery_days": 0, "impairment": "", "outcome": "dead", "step": 5}
+	check(Roster.recover(person, 400, -50).status == "dead", "The dead do not recover")
