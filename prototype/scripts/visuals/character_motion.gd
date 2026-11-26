@@ -540,17 +540,22 @@ func combat(technique: String, progress: float) -> void:
 		# The support feet remain fixed; only the authored kicking leg lifts.
 		var bend := Vector3.BACK
 		if technique.ends_with("kick") and side == "R":
+			# The kicking foot leaves and re-enters its floor contact vertically.
+			# Extending along a straight line from the rest contact slid the
+			# landing sole about 2 cm over the floor inside the contact band.
+			var reach := extension * smoothstep(0.03, 0.15, extension)
 			if technique == "front_kick":
-				foot += Vector3(0.02, 0.55 * extension + 0.15 * prepare, 0.57 * extension) * scale
+				foot += Vector3(0.02 * reach, 0.55 * extension + 0.15 * prepare, 0.57 * reach) * scale
 			elif technique == "side_kick":
-				foot += Vector3(-0.01 * extension, 0.65 * extension + 0.12 * prepare, 0.67 * extension) * scale
+				foot += Vector3(-0.01 * reach, 0.65 * extension + 0.12 * prepare, 0.67 * reach) * scale
 				bend = Vector3(-0.8, 0.0, 0.6)
 			else:
-				foot += Vector3(-0.04 * extension, 1.15 * extension, 0.63 * extension) * scale
+				foot += Vector3(-0.04 * reach, 1.15 * extension, 0.63 * reach) * scale
 		_leg(side, foot, bend)
 		if technique.ends_with("kick") and side == "R":
 			var angle := -55.0 if technique == "side_kick" else (-25.0 if technique == "front_kick" else 14.0)
-			_orient("Foot_R", Basis(Vector3.RIGHT, deg_to_rad(angle * extension)) * _global_rest[_ids.Foot_R].basis)
+			var pitch := extension * smoothstep(0.03, 0.15, extension)
+			_orient("Foot_R", Basis(Vector3.RIGHT, deg_to_rad(angle * pitch)) * _global_rest[_ids.Foot_R].basis)
 	skeleton.force_update_all_bone_transforms()
 
 
