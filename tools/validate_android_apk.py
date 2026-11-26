@@ -163,6 +163,21 @@ TROOP_CATALOG_RESOURCES = (
     "assets/troops/troops.json",
     "assets/troops/item_families.json",
     "assets/troops/people.json",
+    "scripts/battle/combat_formula.gd",
+    "assets/balance/combat_balance.json",
+)
+# The shared world state (D-045) reads these at runtime: without the registry
+# the history frame is empty, without the roster the tribal world is.
+WORLD_STATE_RESOURCES = (
+    "scripts/domain/world_clock.gd",
+    "scripts/domain/world_state.gd",
+    "scripts/domain/person_registry.gd",
+    "scripts/domain/world_calendar.gd",
+    "scripts/domain/era_registry.gd",
+    "scripts/domain/tribal_world.gd",
+    "assets/world/era_registry.json",
+    "assets/world/tribes/bc58_rhine.json",
+    "assets/story/mission_timeline.json",
 )
 FEATURE_RESOURCE_GROUPS = (
     ("original_meshy_youth_content", tuple(f"assets/characters/hero_meshy_italia_{level}.glb" for level in range(4))),
@@ -180,6 +195,7 @@ FEATURE_RESOURCE_GROUPS = (
     ("service_gear_content", SERVICE_GEAR_RESOURCES),
     ("cc0_motion_content", CC0_MOTION_RESOURCES),
     ("troop_catalog_content", TROOP_CATALOG_RESOURCES),
+    ("world_state_content", WORLD_STATE_RESOURCES),
 )
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (

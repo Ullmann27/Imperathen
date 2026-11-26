@@ -6,6 +6,8 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const Route = preload("res://scripts/domain/raid_route.gd")
 const Strike = preload("res://scripts/domain/raider_strike.gd")
+const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
+const WorldClock = preload("res://scripts/domain/world_clock.gd")
 const VERSION := 1
 const DAY_SECONDS := 120.0
 const STEP := 0.1
@@ -39,11 +41,8 @@ const COMMAND_FIELDS := {
 	"village_block":[], "village_dodge":[], "village_rescue":[], "village_recover":[],
 	"village_childhood_action":["action_id"], "village_childhood_begin_raid":[]
 }
-const HISTORICAL_ANCHORS := [
-	{"id":"trajan_reign", "year_start":98, "year_end":117, "title":"Trajan regiert das Römische Reich", "kind":"documented", "source":"https://cultura.gov.it/luogo/parco-archeologico-del-colosseo-colonna-traiana"},
-	{"id":"dacian_war_1", "year_start":101, "year_end":102, "title":"Erster Dakerkrieg Trajans", "kind":"documented", "source":"https://colonnatraiana.cultura.gov.it/"},
-	{"id":"dacian_war_2", "year_start":105, "year_end":106, "title":"Zweiter Dakerkrieg Trajans", "kind":"documented", "source":"https://colonnatraiana.cultura.gov.it/"}
-]
+## Historical anchors live with the world clock (WorldClock.history_frame):
+## the era registry for the 58 BC campaign, own entries for 100 AD careers.
 
 
 static func ensure(data: Dictionary) -> void:
@@ -661,10 +660,14 @@ static func view(data: Dictionary) -> Dictionary:
 	if not childhood.is_empty() and not raid.active:
 		objective = childhood.objective
 	var history: Dictionary = data.village.history.duplicate(true)
-	history["current_year"] = int(history.start_year)+int(data.get("progress",{}).get("years_elapsed",0))
-	history["anchors"] = HISTORICAL_ANCHORS.duplicate(true) if str(data.get("origin_id","italia"))=="italia" else []
+	# Year, ruler and anchors read the one world clock (D-045). No year zero:
+	# the year is the clock's own, never start_year + elapsed years.
+	var frame := _history_frame(data)
+	history["current_year"] = int(frame.year)
+	history["year_label"] = str(frame.year_label)
+	history["anchors"] = frame.anchors
 	return {"title":childhood.get("title", "Ein Dorf wird dein Zuhause"), "objective":objective, "day":childhood.get("day", floori((float(social.seconds)+0.000001)/DAY_SECONDS)+1),
-		"seconds":social.seconds, "ruler":_ruler(data),
+		"seconds":social.seconds, "ruler":_ruler(data, frame),
 		"player_authority":"Bewohner", "profession":PROFESSIONS[social.profession], "attributes":data.village.attributes.duplicate(true),
 		"npcs":npcs, "raid":raid.duplicate(true), "history":history, "training_ready":training_ready(data), "defenders":defense_strength(data)}
 
@@ -779,17 +782,34 @@ static func validate(data: Dictionary) -> String:
 	return Childhood.validate(data)
 
 
-static func _ruler(data: Dictionary) -> String:
+## The historical frame of the world date. Village data without a clock (the
+## module's own fixtures) reads the same registry for the spring of its start
+## year plus elapsed years, counted without a year zero.
+static func _history_frame(data: Dictionary) -> Dictionary:
+	if WorldCalendar.validate_world_time(data.get("calendar")):
+		return WorldClock.history_frame(data)
+	var start := int(data.village.history.start_year)
+	var year := WorldCalendar.add_years(start, int(data.get("progress",{}).get("years_elapsed",0)))
+	return WorldClock.frame_at(WorldCalendar.season_start(year, 0), start != WorldClock.CAMPAIGN_ORIGIN_YEAR, str(data.get("origin_id","italia"))=="italia")
+
+
+static func _ruler(data: Dictionary, frame: Dictionary = {}) -> String:
 	if str(data.get("origin_id","italia"))!="italia":
 		return "Bestehende Ortsverwaltung"
-	var year := 100+int(data.get("progress",{}).get("years_elapsed",0))
-	return "Trajan · Dorfverwalter Decimus" if year<=117 else "Römische Staatsgewalt · Dorfverwalter Decimus"
+	if frame.is_empty():
+		frame = _history_frame(data)
+	return "%s · Dorfverwalter Decimus" % str(frame.ruler)
+
+
+## Decimus names Trajan only while Trajan rules on the world date.
+static func _trajan_rules(data: Dictionary) -> bool:
+	return str(data.get("origin_id","italia"))=="italia" and str(_history_frame(data).ruler) == "Trajan"
 
 
 static func _greeting(data: Dictionary, id: String) -> String:
 	if Childhood.enabled(data):
 		return str(Childhood.dialogue(data, id).get("text", ""))
-	if id=="decimus" and (str(data.get("origin_id","italia"))!="italia" or 100+int(data.get("progress",{}).get("years_elapsed",0))>117):
+	if id=="decimus" and not _trajan_rules(data):
 		return "Die örtliche Verwaltung trägt hier die Verantwortung. Hilf beim Wiederaufbau und lerne die Menschen kennen. Vertrauen verdienst du dir mit Taten."
 	return NPCS[id].greeting
 

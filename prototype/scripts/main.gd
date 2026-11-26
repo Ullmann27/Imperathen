@@ -1132,6 +1132,13 @@ func _open_atlas(demo: bool) -> void:
 	atlas.selected = atlas.data.home
 	atlas.pass_status = "" if demo else model.data.valley.get("outcome","")
 	atlas.young = not demo and model.data.player.age < 18
+	if not demo:
+		# One world state for the atlas: the date of the world clock and the
+		# tribal situation of this save, which keeps living in frame budgets
+		# while the atlas pauses the walkable world.
+		atlas.time = model.world_time()
+		atlas.tribes = model.data.tribes
+		atlas.tribes_pump = model.pump_tribes
 	atlas.can_act = demo or (model.data.progress.skirmish_won and model.data.story.choices.is_empty() and not model.data.progress.career_terminal)
 	world.hide()
 	world.set_active(false)
@@ -1153,6 +1160,7 @@ func _act_atlas(command: String,target: String) -> void:
 	else:
 		result = model.act_region(command,target)
 		atlas.data = model.data.strategy
+		atlas.time = model.world_time()
 		if result.ok:
 			var saved := _save(false)
 			if not saved.ok:

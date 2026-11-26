@@ -10,6 +10,44 @@
     "skirmish": "Lockeres Plänkeln.",
     "dismount": "Absitzen und zu Fuß kämpfen."
   },
+  "tiers": {
+    "rule": "Drei unabhängige Stufen je Verband (D-041): Erfahrung bestimmt Fertigkeit und Erfahrungspunkte neuer Soldaten, Ausrüstung die Qualität der ausgegebenen Gegenstände, Ausbildung verschiebt die Drillstufen. Ohne Angabe gelten die Vorgaben der Truppe (Erfahrung nach tier, Ausrüstung q_min, Ausbildung geuebt). Die Werte sind Designwerte.",
+    "experience": [
+      {"id": "rekrut", "label": "Rekrut", "skill": 25, "xp_min": 0, "xp_max": 99},
+      {"id": "ausgebildet", "label": "Ausgebildet", "skill": 40, "xp_min": 100, "xp_max": 399},
+      {"id": "erfahren", "label": "Erfahren", "skill": 52, "xp_min": 400, "xp_max": 899},
+      {"id": "veteran", "label": "Veteran", "skill": 62, "xp_min": 900, "xp_max": 1999},
+      {"id": "elite", "label": "Elite", "skill": 70, "xp_min": 2000, "xp_max": 4000}
+    ],
+    "equipment": [
+      {"id": "aermlich", "label": "Ärmlich (Q0)", "quality": 0},
+      {"id": "einfach", "label": "Einfach (Q1)", "quality": 1},
+      {"id": "solide", "label": "Solide (Q2)", "quality": 2},
+      {"id": "gut", "label": "Gut (Q3)", "quality": 3},
+      {"id": "meisterlich", "label": "Meisterlich (Q4)", "quality": 4}
+    ],
+    "training": [
+      {"id": "ungeuebt", "label": "Ungeübt", "drill_offset": -1},
+      {"id": "geuebt", "label": "Geübt", "drill_offset": 0},
+      {"id": "gedrillt", "label": "Gedrillt", "drill_offset": 1}
+    ]
+  },
+  "military_options": {
+    "rule": "Militärische Möglichkeiten einer Gemeinschaft folgen aus Wohlstand, Handel, Rohstoffen und kultureller Entwicklung (D-041), nicht aus einer festen Liste je Volk. Eingabe ist ein Profil {culture, year, wealth, trade, trade_partners, population, materials{}, development{}}; die Stammeswelt füllt es aus ihrem Zustand (Vertrag: docs/19_motion_combat/TROOPS_COMBAT_INTERFACES.md). needs nennt Mindestwerte; alle müssen erfüllt sein. Die höchste erfüllte Stufe begrenzt Ausrüstung und Ausbildung neuer Verbände. Schwellen sind Designwerte, an den Beständen der Stammeswelt (bc58_rhine) ausgerichtet.",
+    "cultures": {"tribal_world": {"germanic_rhine": "germanic"}},
+    "equipment_caps": [
+      {"tier": "aermlich", "needs": {}},
+      {"tier": "einfach", "needs": {"materials": {"wood": 20}}},
+      {"tier": "solide", "needs": {"materials": {"iron": 10}, "development": {"smithy": 1}}},
+      {"tier": "gut", "needs": {"wealth": 80, "trade": 0.5, "materials": {"iron": 30}, "development": {"smithy": 1}}},
+      {"tier": "meisterlich", "needs": {"wealth": 200, "trade_partners": 2, "materials": {"iron": 60}, "development": {"smithy": 2}}}
+    ],
+    "training_caps": [
+      {"tier": "ungeuebt", "needs": {}},
+      {"tier": "geuebt", "needs": {"population": 60}},
+      {"tier": "gedrillt", "needs": {"wealth": 100, "population": 300, "development": {"hall": 1}}}
+    ]
+  },
   "authorities": {
     "depot": "Römisches Depot gibt berechtigte Gegenstände gegen Soldabzug aus (Handbuch S. 43/68; Designregel).",
     "evocatio": "Wiedereinberufung eines entlassenen Veteranen.",
@@ -199,7 +237,7 @@
       "upgrades": [],
       "visual": {"battle_role": "spear", "meshy_loadout": ""},
       "attestation": "design_assumption",
-      "notes": "Fiktive Ortswehr des Prüfstands bei Aquileia (Kolonie seit 181 v. Chr.). Die Legion der Caesarzeit führte keine Speerträger in der Linie; deshalb ist die Speerkompanie ein örtliches Aufgebot unter römischem Befehl. Bewaffnung mit Speer, Brettschild und einfachem Helm ist für die Region plausibel, die Einheit selbst ist Spielerfindung.",
+      "notes": "Fiktives regionales Aufgebot (bestätigt durch D-041). Ortswehr des Prüfstands bei Aquileia (Kolonie seit 181 v. Chr.). Die Legion der Caesarzeit führte keine Speerträger in der Linie; deshalb ist die Speerkompanie ein örtliches Aufgebot unter römischem Befehl. Bewaffnung mit Speer, Brettschild und einfachem Helm ist für die Region plausibel, die Einheit selbst ist Spielerfindung.",
       "sources": [
         {"ref": "Liv. 40,34", "note": "Gründung der Kolonie Aquileia 181 v. Chr.", "verified": false},
         {"ref": "Caes. Gall. 8,24", "note": "Einfälle bei Tergeste, Schutz der Region", "verified": false}
@@ -259,7 +297,7 @@
       "valid_to": -31,
       "tier": 2,
       "role": "skirmisher",
-      "battle_kind": "",
+      "battle_kind": "skirmisher",
       "loadout": {
         "shield": {"family_id": "shield_round", "q_min": 0, "q_max": 2},
         "missile": {"family_id": "javelin", "q_min": 1, "q_max": 2, "count": 3}
@@ -268,7 +306,7 @@
       "upgrades": [],
       "visual": {"battle_role": "", "meshy_loadout": ""},
       "attestation": "attested",
-      "notes": "Speerwerfer sind in der Gefechtssimulation noch nicht als eigene Art umgesetzt (battle_kind leer).",
+      "notes": "Speerwerfer mit eigener Gefechtsart (skirmisher): Wurfspeersalven mit Reichweite, Takt und endlichem Vorrat, danach Nahkampf.",
       "sources": [
         {"ref": "Caes. Gall. 2,10", "note": "levis armaturae Numidas", "verified": false}
       ]
@@ -309,7 +347,9 @@
       "valid_to": 200,
       "tier": 1,
       "role": "skirmisher",
-      "battle_kind": "",
+      "battle_kind": "skirmisher",
+      "requires": {"materials": {"wood": 5}},
+      "max_share": 0.2,
       "loadout": {
         "shield": {"family_id": "shield_round", "q_min": 0, "q_max": 1},
         "missile": {"family_id": "javelin", "q_min": 0, "q_max": 1, "count": 3}
@@ -337,6 +377,8 @@
       "tier": 1,
       "role": "levy",
       "battle_kind": "spear",
+      "requires": {},
+      "max_share": 1.0,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 0, "q_max": 1},
         "missile": {"family_id": "javelin", "q_min": 0, "q_max": 1, "count": 1}
@@ -352,7 +394,8 @@
       "sources": [
         {"ref": "Caes. Gall. 1,51", "note": "Wagenburg, Frauen und Kinder am Schlachtfeld", "verified": false},
         {"ref": "Tac. Germ. 6", "note": "Hauptbewaffnung Speer", "verified": false}
-      ]
+      ],
+      "external_ids": {"tribal_world": ["aufgebot"]}
     },
     {
       "troop_id": "germanic_levy",
@@ -364,6 +407,8 @@
       "tier": 2,
       "role": "spear_infantry",
       "battle_kind": "spear",
+      "requires": {"materials": {"wood": 10}},
+      "max_share": 1.0,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 1, "q_max": 2},
         "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 2},
@@ -382,7 +427,8 @@
       "sources": [
         {"ref": "Tac. Germ. 6", "note": "framea, scuta", "verified": false},
         {"ref": "Caes. Gall. 1,52", "note": "phalange facta (Ariovist)", "verified": false}
-      ]
+      ],
+      "external_ids": {"tribal_world": ["speerkrieger"]}
     },
     {
       "troop_id": "germanic_axe_shield",
@@ -394,6 +440,8 @@
       "tier": 2,
       "role": "axe_infantry",
       "battle_kind": "infantry",
+      "requires": {"materials": {"iron": 5}},
+      "max_share": 0.03,
       "variant_of": "germanic_levy",
       "rarity": "rare",
       "reconstruction": "artistic",
@@ -408,7 +456,8 @@
       "notes": "Künstlerisch rekonstruierte, seltenere Ausrüstungsvariante für das vorhandene Meshy-Modell (Entscheidung D-024). Kein historischer Standard germanischer Gruppen und nie Vorgabe für ganze Verbände.",
       "sources": [
         {"ref": "Game Direction 26.11.2026 B, D-024", "note": "Axt und Schild als seltenere rekonstruierte Variante", "verified": true}
-      ]
+      ],
+      "external_ids": {"tribal_world": ["axtkrieger"]}
     },
     {
       "troop_id": "germanic_warrior",
@@ -420,6 +469,8 @@
       "tier": 3,
       "role": "spear_infantry",
       "battle_kind": "spear",
+      "requires": {"materials": {"iron": 10}, "development": {"smithy": 1}},
+      "max_share": 0.5,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 2, "q_max": 3},
         "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
@@ -450,6 +501,8 @@
       "tier": 3,
       "role": "mixed_foot",
       "battle_kind": "",
+      "requires": {"materials": {"horse": 4}},
+      "max_share": 0.15,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 1, "q_max": 2},
         "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 2},
@@ -474,6 +527,8 @@
       "tier": 4,
       "role": "sword_infantry",
       "battle_kind": "infantry",
+      "requires": {"wealth": 40, "materials": {"iron": 10}, "development": {"hall": 1}},
+      "max_share": 0.1,
       "loadout": {
         "main_hand": {"family_id": "sword_long", "q_min": 2, "q_max": 3},
         "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
@@ -491,7 +546,8 @@
         {"ref": "Tac. Germ. 13", "note": "comitatus", "verified": false},
         {"ref": "Tac. Germ. 14", "note": "Gaben des princeps an die Gefolgschaft", "verified": false},
         {"ref": "Tac. Germ. 6", "note": "rari gladiis", "verified": false}
-      ]
+      ],
+      "external_ids": {"tribal_world": ["schwertkaempfer", "gefolgsmann"]}
     },
     {
       "troop_id": "germanic_rider",
@@ -503,6 +559,8 @@
       "tier": 4,
       "role": "cavalry",
       "battle_kind": "",
+      "requires": {"materials": {"horse": 4}},
+      "max_share": 0.2,
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 2, "q_max": 3},
         "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
@@ -517,7 +575,8 @@
       "sources": [
         {"ref": "Caes. Gall. 1,48", "note": "Reiterei des Ariovist", "verified": false},
         {"ref": "Caes. Gall. 4,2", "note": "ex equis desiliunt; ephippiis uti turpe", "verified": false}
-      ]
+      ],
+      "external_ids": {"tribal_world": ["reiter"]}
     },
     {
       "troop_id": "germanic_noble",
@@ -529,6 +588,8 @@
       "tier": 5,
       "role": "elite_infantry",
       "battle_kind": "infantry",
+      "requires": {"wealth": 100, "materials": {"iron": 20, "horse": 2}, "development": {"hall": 1}},
+      "max_share": 0.02,
       "loadout": {
         "main_hand": {"family_id": "sword_long", "q_min": 3, "q_max": 4},
         "shield": {"family_id": "shield_round", "q_min": 3, "q_max": 4},
@@ -581,6 +642,9 @@
       "tier": 2,
       "role": "archer",
       "battle_kind": "archer",
+      "requires": {"trade_partners": 1, "materials": {"wood": 20}},
+      "max_share": 0.05,
+      "rarity": "rare",
       "loadout": {
         "main_hand": {"family_id": "bow", "q_min": 1, "q_max": 2}
       },
@@ -588,11 +652,42 @@
       "upgrades": [],
       "visual": {"battle_role": "archer", "meshy_loadout": ""},
       "attestation": "design_assumption",
-      "notes": "Hält die vorhandene Schützenrolle des Prüfstands. Bogenschützen sind für germanische Gruppen um 58 v. Chr. literarisch nicht belegt (Tacitus nennt Speer, Wurfspeer und Schild); Bögen sind erst in späteren Moorfunden gut fassbar. Umstellung auf Speerwerfer (germanic_youth_javelin) ist eine offene Entscheidung und braucht eigene Wurfspeer-Regeln und Modelle.",
+      "notes": "Seltene, quellenkritisch gekennzeichnete Designvariante (D-041); reguläre germanische Fernkämpfer sind die Speerwerfer (germanic_skirmisher). Früher die Schützenrolle des Prüfstands, alte Spielstände behalten sie. Bogenschützen sind für germanische Gruppen um 58 v. Chr. literarisch nicht belegt (Tacitus nennt Speer, Wurfspeer und Schild); Bögen sind erst in späteren Moorfunden gut fassbar. Modelle für Speerwerfer entstehen im Paket feat/germanic-warrior-families.",
       "sources": [
         {"ref": "Tac. Germ. 6", "note": "keine Bögen genannt", "verified": false},
         {"ref": "Moorfunde Nydam/Illerup (3.–4. Jh. n. Chr.)", "note": "spätere Bogenfunde", "verified": false}
       ]
+    },
+    {
+      "troop_id": "germanic_skirmisher",
+      "name": "Speerwerfer",
+      "culture": "germanic",
+      "service": "own",
+      "valid_from": -120,
+      "valid_to": 400,
+      "tier": 2,
+      "role": "skirmisher",
+      "battle_kind": "skirmisher",
+      "requires": {"materials": {"wood": 10}},
+      "max_share": 0.35,
+      "loadout": {
+        "main_hand": {"family_id": "spear", "q_min": 0, "q_max": 2},
+        "shield": {"family_id": "shield_round", "q_min": 1, "q_max": 2},
+        "missile": {"family_id": "javelin", "q_min": 1, "q_max": 2, "count": 3}
+      },
+      "drills": {"skirmish": 2},
+      "upgrades": [
+        {"to": "germanic_warrior", "xp": 300, "authority": "own_means",
+         "items": [{"family_id": "spear", "q_min": 2, "n": 1}, {"family_id": "shield_round", "q_min": 2, "n": 1}]}
+      ],
+      "visual": {"battle_role": "spear", "meshy_loadout": "germanic_light_spearman"},
+      "attestation": "plausible",
+      "notes": "Reguläre germanische Fernkampfvariante (D-041): drei Wurfspeere je Mann in Salven, danach Speer und Schild im Nahkampf. Tacitus (um 98 n. Chr.) auf 58 v. Chr. übertragen.",
+      "sources": [
+        {"ref": "Tac. Germ. 6", "note": "missilia spargunt, pluraque singuli, atque in immensum vibrant", "verified": false},
+        {"ref": "Tac. Ann. 2,14", "note": "hinter der ersten Reihe kurze oder angebrannte Wurfwaffen", "verified": false}
+      ],
+      "external_ids": {"tribal_world": ["plaenkler"]}
     }
   ]
 }

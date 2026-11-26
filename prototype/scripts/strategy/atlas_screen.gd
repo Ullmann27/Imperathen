@@ -5,6 +5,7 @@ const Atlas = preload("res://scripts/strategy/atlas_data.gd")
 const Rules = preload("res://scripts/strategy/season_campaign.gd")
 const Safe = preload("res://scripts/ui/safe_area.gd")
 const Tribes = preload("res://scripts/domain/tribal_world.gd")
+const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
 const STANCES := {"unknown": "unbekannt", "hostile": "feindselig", "wary": "misstrauisch", "neutral": "neutral", "friendly": "freundlich", "close": "eng verbunden"}
 const PACTS := {"truce": "Waffenruhe", "alliance": "Bündnis", "tribute": "Tribut", "trade_pact": "Handelsbund", "guest_friendship": "Gastfreundschaft", "amicitia": "Freundschaft", "commission": "Auftrag"}
 const CANON := {"attested_people_fictional_district": "belegtes Volk, Bezirk fiktiv", "fictional_local_clan": "fiktiv", "fictional_band": "fiktiv"}
@@ -12,6 +13,14 @@ var data: Dictionary
 ## The authoritative tribal world of this save (WorldModel.data.tribes).
 ## The demo shows the 58 BC opening situation; an unset campaign says so.
 var tribes: Dictionary = {}
+## Optional, while the atlas pauses the world: called once per frame to spend
+## one tribal frame budget; returns {"tribes": Dictionary, "pending_weeks": int}.
+var tribes_pump: Callable
+var tribes_pending := 0
+## The world date of this save (WorldModel.world_time()); the header shows
+## it. The demo shows the campaign's opening date; a caller that sets nothing
+## gets the round's year on the legacy timeline.
+var time: Dictionary = {}
 var can_act := true
 var demo := false
 var young := false
@@ -59,7 +68,7 @@ func _ready() -> void:
 	sheet.add_child(list)
 	list.fit_to_longest_item = false
 	for id in Atlas.REGIONS:
-		list.add_item(Atlas.REGIONS[id].name)
+		list.add_item(str(Atlas.region_view(id, date_jdn()).name))
 		list.set_item_metadata(list.item_count-1,id)
 	list.item_selected.connect(func(i): _select(list.get_item_metadata(i),true))
 	globe.region_selected.connect(_select.bind(false))
@@ -79,6 +88,43 @@ func _ready() -> void:
 	_layout()
 	_select(selected,true)
 	print("IMPERATHEN_ATLAS_READY")
+
+func _process(_delta: float) -> void:
+	if not tribes_pump.is_valid():
+		return
+	var report: Variant = tribes_pump.call()
+	if typeof(report) != TYPE_DICTIONARY:
+		return
+	var latest: Dictionary = report.get("tribes", tribes)
+	var pending := int(report.get("pending_weeks", 0))
+	if not is_same(latest, tribes) or pending != tribes_pending:
+		tribes = latest
+		tribes_pending = pending
+		tribal.text = tribal_text(selected)
+		globe.show_settlements(Tribes.settlement_points(tribes, "valdora") if not tribes.is_empty() else [])
+
+## The date the atlas describes: the world clock of the save; the free
+## scenario shows the campaign's opening situation (like its tribal layer).
+func date_jdn() -> int:
+	if not time.is_empty():
+		return int(time.jdn)
+	return WorldCalendar.campaign_start_jdn() if demo else -1
+
+
+## Header from the one world clock: season, year without a year zero and the
+## day. The regional round's own season is named only when it differs.
+static func header(time: Dictionary, season: Dictionary, young: bool, demo: bool) -> String:
+	var suffix := "   ·   Freies Szenario" if demo else ""
+	if time.is_empty():
+		if demo:
+			var start := WorldCalendar.campaign_start_jdn()
+			return "Weltkugel   ·   %s %s%s" % [WorldCalendar.SEASON_NAMES_DE[WorldCalendar.season_index(start)], WorldCalendar.format_year(WorldCalendar.year_of(start)), suffix]
+		return "Weltkugel   ·   %s %s%s" % [season.season, WorldCalendar.format_year(int(season.year)), suffix]
+	var text := "Weltkugel   ·   %s %s   ·   %s" % [str(time.season_name), str(time.year_label), str(time.day_label)]
+	if not young and str(season.season) != str(time.season_name):
+		text += "   ·   Kampagnenrunde: %s" % str(season.season)
+	return text + suffix
+
 
 func _layout() -> void:
 	var area := Safe.for_viewport(get_viewport())
@@ -119,13 +165,12 @@ func _command(cmd: String) -> void:
 func refresh(feedback := "") -> void:
 	var info: Dictionary = Rules.region_info(data,selected)
 	var season: Dictionary = Rules.summary(data)
-	var region: Dictionary = Atlas.REGIONS[selected]
-	var year: int = 94 if young else season.year
-	date.text = "Weltkugel   ·   %s %d n. Chr.%s" % [season.season,year,"   ·   Freies Szenario" if demo else ""]
+	var region: Dictionary = Atlas.region_view(selected, date_jdn())
+	date.text = header(time, season, young, demo)
 	title.text = region.name
 	description.text = region.note
 	stock.text = "%s · %d/%d Gebiete\nKorn %d   ·   Speicher %d/%d   ·   Reisevorrat %d\nUnruhe %d   ·   Saisonaktionen %d" % [season.mandate_name,data.owned.size(),Atlas.REGIONS.size(),data.grain,data.stores,season.winter_need,data.supply,data.unrest,data.actions]
-	journal.text = "Auftrag · %s\n%s" % [Atlas.REGIONS[data.mission.target].name, data.last_event]
+	journal.text = "Auftrag · %s\n%s" % [str(Atlas.region_view(str(data.mission.target), date_jdn()).name), data.last_event]
 	var route := "Eigenes Gebiet" if info.owned else ("Übernahme kostet %d Reisevorräte" % info.cost if info.reachable else "Kein Anschluss an dein Gebiet")
 	if pass_status == "defeat":
 		route += "\nTalstraße verloren · jeder Transport kostet einen Reisevorrat zusätzlich."
@@ -154,7 +199,7 @@ func tribal_text(region_id: String) -> String:
 		return "Stammeslage · nicht mit diesem Spielstand verbunden."
 	if tribes.scenario == Tribes.NO_SCENARIO:
 		return "Stammeslage · Für diese Epoche ist noch keine Gruppenaufstellung hinterlegt."
-	var lines := PackedStringArray(["Stammeslage · %s%s" % [Tribes.calendar(tribes).label, " · Ausgangslage" if demo else ""]])
+	var lines := PackedStringArray(["Stammeslage · %s%s%s" % [Tribes.calendar(tribes).label, " · Ausgangslage" if demo else "", (" · noch %d Wochen werden berechnet" % tribes_pending) if tribes_pending > 0 else ""]])
 	for item: Dictionary in Tribes.atlas_view(tribes, "valdora"):
 		if item.atlas_region != region_id:
 			continue
@@ -163,6 +208,13 @@ func tribal_text(region_id: String) -> String:
 			lines.append("%s%s · hat das Gebiet verlassen" % [item.name, tag])
 			continue
 		lines.append("%s%s · %s (%.0f) · %d Krieger%s · Anführer %s" % [item.name, tag, item.strength_class, float(item.strength), int(item.warriors_total), " (ein Zug unterwegs)" if item.away else "", item.leader])
+		var order := PackedStringArray([str(item.government_name)]) if str(item.get("government_name", "")) != "" else PackedStringArray()
+		if str(item.get("war_leader", "")) != "":
+			order.append("Heerführer " + str(item.war_leader))
+		for role: String in item.get("profile", []):
+			order.append(role)
+		if not order.is_empty():
+			lines.append("   " + " · ".join(order))
 		var stances := PackedStringArray()
 		for relation: Dictionary in item.relations:
 			if relation.stance != "neutral":

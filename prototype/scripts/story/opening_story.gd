@@ -4,6 +4,7 @@ extends RefCounted
 
 const Origins = preload("res://scripts/strategy/origins.gd")
 const I01Film = preload("res://scripts/story/i01_film.gd")
+const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
 const STORY_VERSION := 1
 const HELP_WOOD := 4
 const HUT_WOOD := 8
@@ -67,9 +68,14 @@ const REGIONS := {
 }
 
 
+## The campaign year comes from the world calendar, never from a literal.
+static func campaign_year_label() -> String:
+	return WorldCalendar.format_year(int(WorldCalendar.CAMPAIGN_START.year))
+
+
 static func historical_prologue() -> Dictionary:
 	var chapter := "Prolog · I-00 · Drei Legionen im Regen"
-	var location := "Aquileia und Umland · 58 v. Chr."
+	var location := "Aquileia und Umland · " + campaign_year_label()
 	return {
 		"id":"i00_aquileia","version":2,"origin_id":"italia",
 		"source_mission_id":"I-00",
@@ -77,7 +83,7 @@ static func historical_prologue() -> Dictionary:
 		"title":"Drei Legionen im Regen","location":location,"chapter":chapter,
 		"chain_to":"childhood_home",
 		"beats":[
-			_beat("i00_detail","aquileia_detail","Chronik","Aquileia · 58 v. Chr.",
+			_beat("i00_detail","aquileia_detail","Chronik","Aquileia · " + campaign_year_label(),
 				"Regen läuft über Leder, Holz und Metall. Bei Aquileia werden Caesars Legionen zum Marsch bereitgemacht; erst das Detail, dann öffnet sich der Blick auf Lager und Straße.",
 				7.0,chapter,location),
 			_beat("i00_legions","legions_rain","Chronik","Drei Legionen",
@@ -106,7 +112,7 @@ static func childhood(data: Dictionary = {}) -> Dictionary:
 
 static func childhood_cards() -> Dictionary:
 	var chapter := "Kapitel I · I-01 · Die drei Becher"
-	var location := "Valdora · Aquileia-Region · 58 v. Chr."
+	var location := "Valdora · Aquileia-Region · " + campaign_year_label()
 	return {"id":"childhood_home","version":2,"origin_id":"italia",
 		"title":"Ein Morgen zu Hause","location":location,"chapter":chapter,
 		"beats":[
