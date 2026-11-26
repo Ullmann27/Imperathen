@@ -2590,7 +2590,7 @@ func _show_settings(return_screen: String) -> void:
 	quality_select.add_item("Leicht · Limit 30 FPS")
 	quality_select.add_item("Ausgewogen · Limit 60 FPS")
 	quality_select.add_item("Hoch · bis 4K · Limit 60 FPS" if OS.has_feature("pc") else "Hoch · Limit 60 FPS")
-	quality_select.add_item("Sehr hoch · Limit 30 FPS")
+	quality_select.add_item("Ultra · Limit 30 FPS")
 	quality_select.custom_minimum_size.y = 46
 	var profiles := ["low", "balanced", "high", "very_high"]
 	quality_select.selected = profiles.find(_quality)
@@ -2598,7 +2598,7 @@ func _show_settings(return_screen: String) -> void:
 	quality_select.item_selected.connect(func(index: int):
 		set_quality(profiles[index])
 	)
-	var sustained_note := _label("Fold7-Grafikziel: Hoch · 60 FPS, Sehr hoch · 30 FPS.\nBei dauerhaft langen Bildzeiten wird nur die 3D-Auflösung reduziert; Menü und Touch bleiben scharf. Kein gemessener Temperaturwert.", 14, MUTED)
+	var sustained_note := _label("Fold7-Grafikziel: Hoch · 60 FPS, Ultra · 30 FPS.\nBei dauerhaft langen Bildzeiten wird nur die 3D-Auflösung reduziert; Menü und Touch bleiben scharf. Kein gemessener Temperaturwert.", 14, MUTED)
 	sustained_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(sustained_note)
 	var diagnostics := CheckButton.new()

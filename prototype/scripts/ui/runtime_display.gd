@@ -3,6 +3,7 @@ extends CanvasLayer
 
 const SafeArea = preload("res://scripts/ui/safe_area.gd")
 const SustainedQuality = preload("res://scripts/rendering/fold7_quality_policy.gd")
+const RenderProfile = preload("res://scripts/rendering/render_profile.gd")
 const BACKGROUND_FPS := 15
 
 var _profiles: Dictionary
@@ -21,10 +22,35 @@ var _application_paused := false
 var _sustained_scene := false
 var _sustained_paused := false
 var _governor: Dictionary = SustainedQuality.initial("balanced")
+var _render_applied: Dictionary = {}
+var _environment_watcher: EnvironmentWatcher
+
+
+## Applies profile post-processing (ambient occlusion) to whichever Environment
+## the 3D view renders with, including worlds created after the profile change.
+class EnvironmentWatcher extends Node:
+	var _environment_id := 0
+	var _profile := ""
+
+	func _process(_delta: float) -> void:
+		var environment := RenderProfile.active_environment(get_viewport())
+		var id := environment.get_instance_id() if environment != null else 0
+		if id == _environment_id and _profile == RenderProfile.current_profile():
+			return
+		_environment_id = id
+		_profile = RenderProfile.current_profile()
+		RenderProfile.apply_environment(environment, _profile)
 
 
 func _ready() -> void:
 	_profiles = JSON.parse_string(FileAccess.get_file_as_string("res://assets/quality_profiles.json")).profiles
+	# Texture packages replace imported textures and must be mounted before any
+	# scene loads them: use the saved profile; a change applies at next start.
+	var saved := ConfigFile.new()
+	var saved_profile := "balanced"
+	if saved.load("user://imperathen_ui.cfg") == OK:
+		saved_profile = str(saved.get_value("graphics", "quality", "balanced"))
+	RenderProfile.mount_texture_package(RenderProfile.texture_tier(saved_profile))
 	layer = 100
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_panel = PanelContainer.new()
@@ -39,6 +65,11 @@ func _ready() -> void:
 	_label.add_theme_font_size_override("font_size", 14)
 	_panel.add_child(_label)
 	get_viewport().size_changed.connect(_on_size_changed)
+	_environment_watcher = EnvironmentWatcher.new()
+	_environment_watcher.name = "ProfileEnvironment"
+	_environment_watcher.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_environment_watcher)
+	get_tree().node_added.connect(_on_node_added)
 	set_diagnostics(false)
 	if OS.is_debug_build() and OS.has_feature("android") and FileAccess.file_exists("user://graphics-probe.txt"):
 		var probe = preload("res://scripts/ui/android_graphics_probe.gd").new()
@@ -54,10 +85,16 @@ func apply_quality(profile: String) -> void:
 	_foreground_fps = 30 if profile in ["low", "very_high"] else 60
 	_apply_frame_limit()
 	var viewport := get_viewport()
-	viewport.mesh_lod_threshold = float(settings.mesh_lod_threshold)
 	viewport.msaa_3d = Viewport.MSAA_4X if settings.msaa_samples == 4 else (Viewport.MSAA_2X if settings.msaa_samples == 2 else Viewport.MSAA_DISABLED)
-	RenderingServer.directional_shadow_atlas_set_size(int(settings.shadow_atlas_size), true)
+	# Shadow atlases and filters, LOD threshold, anisotropy, AO quality and the
+	# positional light budget (scripts/rendering/render_profile.gd).
+	_render_applied = RenderProfile.apply_viewport(viewport, profile)
 	_on_size_changed()
+
+
+func _on_node_added(node: Node) -> void:
+	if node is Light3D and node.is_in_group(RenderProfile.LIGHT_GROUP):
+		RenderProfile.configure_light(node, _quality)
 
 
 func _on_size_changed() -> void:
@@ -105,6 +142,7 @@ func quality_report() -> Dictionary:
 		"dynamic_3d_ratio":float(_governor.get("ratio",1.0)),
 		"effective_3d_scale":get_viewport().scaling_3d_scale,
 		"renderer":RenderingServer.get_current_rendering_method(),
+		"engine_switches":_render_applied.duplicate(true),
 		"gpu_timing_available":RenderingServer.viewport_get_measured_render_time_gpu(get_viewport().get_viewport_rid())>0.0,
 		"thermal_measured":false}
 

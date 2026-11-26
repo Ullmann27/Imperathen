@@ -445,7 +445,7 @@ func _build_controls() -> void:
 	controls.add_child(_view_choice)
 	_view_choice.item_selected.connect(set_view_mode)
 	_quality_choice = OptionButton.new()
-	for label in ["Leicht", "Ausgewogen", "Hoch", "Sehr hoch"]:
+	for label in ["Leicht", "Ausgewogen", "Hoch", "Ultra"]:
 		_quality_choice.add_item(label)
 	_quality_choice.select(1)
 	_quality_choice.custom_minimum_size.y = 38
