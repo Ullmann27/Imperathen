@@ -12,37 +12,184 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_man_0.glb",
           "triangles": 19719,
-          "bytes": 5003724,
-          "sha256": "477001694752dd67f6802da6c30cf246df0a97240914fc75e79315ebfe443622",
+          "bytes": 5021840,
+          "sha256": "827afa1f90f8a295f29cc197ca833214a86d4d00c2e9e47fdfeac16e902219be",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.18505268172065345,
+              "max_sole_slip_m": 0.817939655794347,
+              "max_hull_penetration_m": 0.18505268172065345,
+              "max_contact_slip_m": 0.817939655794347
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.01113059549848254,
+              "max_hull_penetration_m": 4.9873299934333204e-18,
+              "max_contact_slip_m": 0.01113059549848254
+            },
+            "maximum_floor_correction_m": 0.18807107230928316
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 93,
+              "body_through_skirt_m": 0.08227024244351026
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0822702424435103
+            }
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378706938368338,
+              "max_sole_slip_m": 0.00969328950254483,
+              "max_hull_penetration_m": 0.006378706938368338,
+              "max_contact_slip_m": 0.00969328950254483
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0005302357286903957,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0005302357286903957
+            }
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_civilian_man_1.glb",
           "triangles": 7628,
-          "bytes": 2544848,
-          "sha256": "30aabba76fa5db4b2fa8b879905611d340998d6294f3e8a1a6636de55de1ecef",
+          "bytes": 2555352,
+          "sha256": "eec584b058e896756793403844d28971dfdc3c5b72ff3878f8f1c50e7425d781",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17789526899019986,
+              "max_sole_slip_m": 0.806782418031492,
+              "max_hull_penetration_m": 0.17789526899019986,
+              "max_contact_slip_m": 0.806782418031492
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008947885375770749,
+              "max_hull_penetration_m": 4.336808689942018e-19,
+              "max_contact_slip_m": 0.008947885375770749
+            },
+            "maximum_floor_correction_m": 0.180895251835488
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.07850376270136564
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006385000691636493,
+              "max_sole_slip_m": 0.009693287624099878,
+              "max_hull_penetration_m": 0.006385000691636493,
+              "max_contact_slip_m": 0.009693287624099878
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.00037978332168634094,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.00037978332168634094
+            }
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_civilian_man_2.glb",
           "triangles": 2406,
-          "bytes": 763304,
-          "sha256": "fcae8394615557c9b4eee7f64ac683be88344295e2b8a7f07a4a536de92c0ec9",
+          "bytes": 773804,
+          "sha256": "cdde48942cd1d960b2d09de343b482d941379080f0f77a7fed4eeeafbc0676e3",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17566236405554322,
+              "max_sole_slip_m": 0.8068358471996434,
+              "max_hull_penetration_m": 0.17566236405554322,
+              "max_contact_slip_m": 0.8068358471996434
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008265426576280299,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008265426576280299
+            },
+            "maximum_floor_correction_m": 0.17871928189400332
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.08449843766181969
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378971802102338,
+              "max_sole_slip_m": 0.00969329143040031,
+              "max_hull_penetration_m": 0.006378971802102338,
+              "max_contact_slip_m": 0.00969329143040031
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0001758551946953379,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0001758551946953379
+            }
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_civilian_man_3.glb",
           "triangles": 846,
-          "bytes": 334192,
-          "sha256": "69a97af3b49b3c8d4b996758470b83cc818b690a3833affc4913a1d25040075a",
+          "bytes": 344688,
+          "sha256": "8f55435e5e13be045f01b627c497b935e01b52ca54bec36203b56ff27ddcd228",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17681173573037648,
+              "max_sole_slip_m": 0.8104862832497677,
+              "max_hull_penetration_m": 0.17681173573037648,
+              "max_contact_slip_m": 0.8104862832497677
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008258026494470525,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008258026494470525
+            },
+            "maximum_floor_correction_m": 0.17983381990866765
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0933410291845978
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006416374334533781,
+              "max_sole_slip_m": 0.009675435030420763,
+              "max_hull_penetration_m": 0.006416374334533781,
+              "max_contact_slip_m": 0.009675435030420763
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 9.771759047675533e-05,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 9.771759047675533e-05
+            }
+          }
         }
       ]
     },
@@ -53,37 +200,185 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_woman_0.glb",
           "triangles": 20395,
-          "bytes": 5308548,
-          "sha256": "3f445fed8e5564b5b5a8338564e343d8ec9f5e92c4117eff1c2b86acd0b54ca2",
+          "bytes": 5313872,
+          "sha256": "24629494474116ac6049cc7c26bbb5d4defc495cd3e22e6ed7e9763253a1e787",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.185057433003374,
+              "max_sole_slip_m": 0.8179462425573103,
+              "max_hull_penetration_m": 0.185057433003374,
+              "max_contact_slip_m": 0.8179462425573103
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.012227127371222026,
+              "max_hull_penetration_m": 2.927345865710862e-18,
+              "max_contact_slip_m": 0.012227127371222026
+            },
+            "maximum_floor_correction_m": 0.188075866225061
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.2333323255469783
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006383719065319269,
+              "max_sole_slip_m": 0.009696406632573784,
+              "max_hull_penetration_m": 0.006383719065319269,
+              "max_contact_slip_m": 0.009696406632573784
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.019686661464057963,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.019686661464057963
+            },
+            "unchanged": "grounding would not improve this clip"
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_civilian_woman_1.glb",
           "triangles": 7889,
-          "bytes": 2637320,
-          "sha256": "0060242580c098f5d94ce144cdf320a4f47b26d84026042ab136c583c81acca1",
+          "bytes": 2642644,
+          "sha256": "35183e840746c2dfcc232e8042f4e3ed83c771e9a6ed3f0d8cb47e94075fc002",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17789997177869163,
+              "max_sole_slip_m": 0.8067890762569824,
+              "max_hull_penetration_m": 0.17789997177869163,
+              "max_contact_slip_m": 0.8067890762569824
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011701362254272549,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.011701362254272549
+            },
+            "maximum_floor_correction_m": 0.18089999676194668
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.23154538062506233
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006390046856647853,
+              "max_sole_slip_m": 0.009696413060750968,
+              "max_hull_penetration_m": 0.006390046856647853,
+              "max_contact_slip_m": 0.009696413060750968
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.019595637167324795,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.019595637167324795
+            },
+            "unchanged": "grounding would not improve this clip"
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_civilian_woman_2.glb",
           "triangles": 2491,
-          "bytes": 793672,
-          "sha256": "c7d02261332c880df124ca75f437f5352ae9143777c61804745120706160c594",
+          "bytes": 798992,
+          "sha256": "e2a9e06a12e3fc9e9b0db34ccc26df3a49b7cb215819e61663d0f955bb34034e",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17566713609040613,
+              "max_sole_slip_m": 0.8068424593330924,
+              "max_hull_penetration_m": 0.17566713609040613,
+              "max_contact_slip_m": 0.8068424593330924
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011308724187122442,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.011311702397735551
+            },
+            "maximum_floor_correction_m": 0.17872396403652868
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.19100078067425957
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006383983209280833,
+              "max_sole_slip_m": 0.009696468229032685,
+              "max_hull_penetration_m": 0.006383983209280833,
+              "max_contact_slip_m": 0.009696468229032685
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.019760174253499012,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.019760174253499012
+            },
+            "unchanged": "grounding would not improve this clip"
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_civilian_woman_3.glb",
           "triangles": 877,
-          "bytes": 344532,
-          "sha256": "c191923876021d4fec0e4fe7e343a101ac69925dc36ebe2b2f8de4ed626f3dc0",
+          "bytes": 349856,
+          "sha256": "1f650f51df44a3b7416f1a3609aed5d80612c5990faf080cc6081bddc23f71e5",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17681639800938875,
+              "max_sole_slip_m": 0.8104929328276869,
+              "max_hull_penetration_m": 0.17681639800938875,
+              "max_contact_slip_m": 0.8104929328276869
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008258072577487483,
+              "max_hull_penetration_m": 8.239936510889834e-18,
+              "max_contact_slip_m": 0.008258072577487483
+            },
+            "maximum_floor_correction_m": 0.179838568472665
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.08997666187457762
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.0064214346272957815,
+              "max_sole_slip_m": 0.009678656016884016,
+              "max_hull_penetration_m": 0.0064214346272957815,
+              "max_contact_slip_m": 0.009678656016884016
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.01933673945752967,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.01933673945752967
+            },
+            "unchanged": "grounding would not improve this clip"
+          }
         }
       ]
     },
@@ -94,37 +389,184 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_elder_0.glb",
           "triangles": 19817,
-          "bytes": 4448876,
-          "sha256": "b03051329d7e344fb95bb5a7e6a0eab953163f1549f103f4592ebfc1e3f4fefb",
+          "bytes": 4466988,
+          "sha256": "8f4fcfa52b4a025980f1dece21e87d9d4e581d924d84c495cca83cc11243f824",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.18505268172065345,
+              "max_sole_slip_m": 0.817939655794347,
+              "max_hull_penetration_m": 0.18505268172065345,
+              "max_contact_slip_m": 0.817939655794347
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.01113059549848254,
+              "max_hull_penetration_m": 4.9873299934333204e-18,
+              "max_contact_slip_m": 0.01113059549848254
+            },
+            "maximum_floor_correction_m": 0.18807107230928316
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 93,
+              "body_through_skirt_m": 0.08227024244351026
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0822702424435103
+            }
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378706938368338,
+              "max_sole_slip_m": 0.00969328950254483,
+              "max_hull_penetration_m": 0.006378706938368338,
+              "max_contact_slip_m": 0.00969328950254483
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0005302357286903957,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0005302357286903957
+            }
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_elder_1.glb",
           "triangles": 7666,
-          "bytes": 2395952,
-          "sha256": "5b1b3453f984f3e2c91c5535ecd5fef57f9733e4e41be33dc82111e073f5a12e",
+          "bytes": 2406456,
+          "sha256": "be24675cdb558c93c2d681e5453d3ebc567feba841fdf352112c1b73a6a96cdf",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17789526899019986,
+              "max_sole_slip_m": 0.806782418031492,
+              "max_hull_penetration_m": 0.17789526899019986,
+              "max_contact_slip_m": 0.806782418031492
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008947885375770749,
+              "max_hull_penetration_m": 4.336808689942018e-19,
+              "max_contact_slip_m": 0.008947885375770749
+            },
+            "maximum_floor_correction_m": 0.180895251835488
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.07850376270136564
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006385000691636493,
+              "max_sole_slip_m": 0.009693287624099878,
+              "max_hull_penetration_m": 0.006385000691636493,
+              "max_contact_slip_m": 0.009693287624099878
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.00037978332168634094,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.00037978332168634094
+            }
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_elder_2.glb",
           "triangles": 2417,
-          "bytes": 725508,
-          "sha256": "80435022982a4521a963185efd005d9413746c82c17247f5b1e4071a05f2e146",
+          "bytes": 736008,
+          "sha256": "7368e4567ef50fb8e033e44ad52a00684d67c5370f61338447a1e5cef8714418",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17566236405554322,
+              "max_sole_slip_m": 0.8068358471996434,
+              "max_hull_penetration_m": 0.17566236405554322,
+              "max_contact_slip_m": 0.8068358471996434
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008265426576280299,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008265426576280299
+            },
+            "maximum_floor_correction_m": 0.17871928189400332
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.08449843766181969
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378971802102338,
+              "max_sole_slip_m": 0.00969329143040031,
+              "max_hull_penetration_m": 0.006378971802102338,
+              "max_contact_slip_m": 0.00969329143040031
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0001758551946953379,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0001758551946953379
+            }
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_elder_3.glb",
           "triangles": 850,
-          "bytes": 324288,
-          "sha256": "42f713f0b05aace710e337a468e5ccffb9a32b6238234a93cbec56b334909a3a",
+          "bytes": 334784,
+          "sha256": "2e6373d4876ccc6064dd7081b7f50faaab83a80a8dbf09784a6d72fec6e5fdce",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17681173573037648,
+              "max_sole_slip_m": 0.8104862832497677,
+              "max_hull_penetration_m": 0.17681173573037648,
+              "max_contact_slip_m": 0.8104862832497677
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008258026494470525,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008258026494470525
+            },
+            "maximum_floor_correction_m": 0.17983381990866765
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0933410291845978
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006416374334533781,
+              "max_sole_slip_m": 0.009675435030420763,
+              "max_hull_penetration_m": 0.006416374334533781,
+              "max_contact_slip_m": 0.009675435030420763
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 9.771759047675533e-05,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 9.771759047675533e-05
+            }
+          }
         }
       ]
     },
@@ -135,37 +577,155 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_legionary_0.glb",
           "triangles": 19060,
-          "bytes": 3613592,
-          "sha256": "7937cbb3c3a510609d7a9d62b8adebf9f6a6678d997436faa2cce735146e8bda",
+          "bytes": 3689256,
+          "sha256": "8325b1227627261319a8199f03c7e24a4268b3653a67e74f91d7ecbaede760b3",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17337126688971916,
+              "max_sole_slip_m": 0.8569329318493337,
+              "max_hull_penetration_m": 0.17337126688971916,
+              "max_contact_slip_m": 0.8569329318493337
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.009697254118629841,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.009697254118629841
+            },
+            "maximum_floor_correction_m": 0.1763753302468184
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 637,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 4,
+            "snapped": 12,
+            "max_lift_before_m": 0.0327,
+            "max_gap_before_m": 0.0354
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_legionary_1.glb",
           "triangles": 7345,
-          "bytes": 2265392,
-          "sha256": "a7b3d582f378c6cd6fadbb2d42a778a5b2b567e7c64312c054d8eae207cd6148",
+          "bytes": 2301416,
+          "sha256": "36951fc546d3c27a4d9ef16ccb1f16880adf1d4d9c9e245e1cdfb22400160ff7",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.16474143253695434,
+              "max_sole_slip_m": 0.8497658778040881,
+              "max_hull_penetration_m": 0.16474143253695434,
+              "max_contact_slip_m": 0.8497658778040881
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.012010453208621688,
+              "max_hull_penetration_m": 6.938893903907228e-18,
+              "max_contact_slip_m": 0.012010453208621688
+            },
+            "maximum_floor_correction_m": 0.16774666277503203
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 222,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 13,
+            "max_lift_before_m": 0.0478,
+            "max_gap_before_m": 0.0393
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_legionary_2.glb",
           "triangles": 2289,
-          "bytes": 677524,
-          "sha256": "5e929aa27938c60fb94bad246c5ab7b6391110d0a12157df090a8eb6346eab05",
+          "bytes": 693784,
+          "sha256": "358213e64e6cab363268f503daf6fecf21ca4881b025c6a6db3b9929aea4d733",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.163005870838917,
+              "max_sole_slip_m": 0.8489850724406742,
+              "max_hull_penetration_m": 0.163005870838917,
+              "max_contact_slip_m": 0.8489850724406742
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011677856562015473,
+              "max_hull_penetration_m": 6.938893903907228e-18,
+              "max_contact_slip_m": 0.011677856562015473
+            },
+            "maximum_floor_correction_m": 0.16602647906392376
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 12,
+            "max_lift_before_m": 0.0798,
+            "max_gap_before_m": 0.0399
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_legionary_3.glb",
           "triangles": 807,
-          "bytes": 302912,
-          "sha256": "05cced36031ec8f7627302dbed9235df8404617873d91e0f6ad569c9d65e47e3",
+          "bytes": 310356,
+          "sha256": "b914efb5b104d3741f27f4a9e2dd06d964585d0dc171e519385582522926a870",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.165957383773048,
+              "max_sole_slip_m": 0.85794907183952,
+              "max_hull_penetration_m": 0.165957383773048,
+              "max_contact_slip_m": 0.85794907183952
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008739019099622611,
+              "max_hull_penetration_m": 3.469446951953614e-18,
+              "max_contact_slip_m": 0.008739019099622611
+            },
+            "maximum_floor_correction_m": 0.16896504659371236
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 5,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0374
+          }
         }
       ]
     },
@@ -176,37 +736,155 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_officer_0.glb",
           "triangles": 19264,
-          "bytes": 3652028,
-          "sha256": "46152dd3fc4da12bc772ab04084947f40f3c1d391c37435402af2bab4f0f2e86",
+          "bytes": 3737376,
+          "sha256": "cb94bb52b6bd351c14cc451450c05c23e5342e360f122b98a11fedf7028b6e1a",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17337126688971916,
+              "max_sole_slip_m": 0.8569329318493337,
+              "max_hull_penetration_m": 0.17732603740686848,
+              "max_contact_slip_m": 0.8569329318493337
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008574962652797525,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008574962652797525
+            },
+            "maximum_floor_correction_m": 0.17732603740686848
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 637,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 5,
+            "snapped": 12,
+            "max_lift_before_m": 0.0316,
+            "max_gap_before_m": 0.0354
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_officer_1.glb",
           "triangles": 7418,
-          "bytes": 2296496,
-          "sha256": "2d47a6f35dc7ce73ec959384090271c88ff3e0ea0a420197403912a4ed159bfc",
+          "bytes": 2337668,
+          "sha256": "e56c28e33e104aa4714f60ab26ac6c5999e1beff12f8d8d01fd871070b42824a",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.16474143253695434,
+              "max_sole_slip_m": 0.8497658778040881,
+              "max_hull_penetration_m": 0.16474143253695434,
+              "max_contact_slip_m": 0.8497658778040881
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.010377656372830701,
+              "max_hull_penetration_m": 3.469446951953614e-17,
+              "max_contact_slip_m": 0.010377656372830701
+            },
+            "maximum_floor_correction_m": 0.16774666277503203
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 222,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 14,
+            "max_lift_before_m": 0.0172,
+            "max_gap_before_m": 0.0393
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_officer_2.glb",
           "triangles": 2300,
-          "bytes": 683916,
-          "sha256": "3ae746ffe5f0380b7bf38ab8b098b387257c9a74e784f613872cde013f0ef66b",
+          "bytes": 701692,
+          "sha256": "8a11d210574283d1e9017ac9492ce8d208b334b03c62fb471e275e0fd9dd3c37",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.163005870838917,
+              "max_sole_slip_m": 0.8489850724406742,
+              "max_hull_penetration_m": 0.163005870838917,
+              "max_contact_slip_m": 0.8489850724406742
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011677856562015473,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.011677856562015473
+            },
+            "maximum_floor_correction_m": 0.16602647906392376
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 12,
+            "max_lift_before_m": 0.0798,
+            "max_gap_before_m": 0.0399
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_officer_3.glb",
           "triangles": 822,
-          "bytes": 309616,
-          "sha256": "39eccc496ad4f61f5ba7473ee2fec5fc08a4b77c574c477fd728100f349f43d4",
+          "bytes": 317600,
+          "sha256": "db19042cd1fe36c1e0846e4de2ff85dc88304a2f4a672bf4567735ecb1102888",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.165957383773048,
+              "max_sole_slip_m": 0.85794907183952,
+              "max_hull_penetration_m": 0.165957383773048,
+              "max_contact_slip_m": 0.85794907183952
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008739019099622611,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008739019099622611
+            },
+            "maximum_floor_correction_m": 0.16896504659371236
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 6,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0374
+          }
         }
       ]
     },
@@ -217,37 +895,155 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_spearman_0.glb",
           "triangles": 18978,
-          "bytes": 3636424,
-          "sha256": "46a06aff153e865667933c22b9aec4173b9be987d40d2e6c9226829061a8e2b4",
+          "bytes": 3709032,
+          "sha256": "198ee953c34af0121a1f1c5abf863dee35cda646ccfdd00694a818d0d6c7e65f",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17337126688971916,
+              "max_sole_slip_m": 0.8569329318493337,
+              "max_hull_penetration_m": 0.17337126688971916,
+              "max_contact_slip_m": 0.8569329318493337
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.009697254118629841,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.009697254118629841
+            },
+            "maximum_floor_correction_m": 0.1763753302468184
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 637,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 4,
+            "snapped": 12,
+            "max_lift_before_m": 0.0327,
+            "max_gap_before_m": 0.0354
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_spearman_1.glb",
           "triangles": 7319,
-          "bytes": 2291108,
-          "sha256": "534e6d54304a3ffc75ad528fcb8f76063a0e75fafb744d0de18fe232fa3040a5",
+          "bytes": 2325836,
+          "sha256": "f16c28fa4e7f1b5ebce47562b0a49a95f98092eedaa11fdb58459be3c3e82354",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.16474143253695434,
+              "max_sole_slip_m": 0.8497658778040881,
+              "max_hull_penetration_m": 0.16474143253695434,
+              "max_contact_slip_m": 0.8497658778040881
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.012010453208621688,
+              "max_hull_penetration_m": 6.938893903907228e-18,
+              "max_contact_slip_m": 0.012010453208621688
+            },
+            "maximum_floor_correction_m": 0.16774666277503203
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 222,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 13,
+            "max_lift_before_m": 0.0478,
+            "max_gap_before_m": 0.0393
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_spearman_2.glb",
           "triangles": 2284,
-          "bytes": 680212,
-          "sha256": "fe2e7b71db6487e04bf5663996aabc770a4ae1422b205084922b3ea6602c828b",
+          "bytes": 695932,
+          "sha256": "b08f4f5a59c36673239bae1ec930a86b37067cb53b22c583286f1aa3b7490ee3",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.163005870838917,
+              "max_sole_slip_m": 0.8489850724406742,
+              "max_hull_penetration_m": 0.163005870838917,
+              "max_contact_slip_m": 0.8489850724406742
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011677856562015473,
+              "max_hull_penetration_m": 6.938893903907228e-18,
+              "max_contact_slip_m": 0.011677856562015473
+            },
+            "maximum_floor_correction_m": 0.16602647906392376
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 12,
+            "max_lift_before_m": 0.0798,
+            "max_gap_before_m": 0.0399
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_spearman_3.glb",
           "triangles": 802,
-          "bytes": 306508,
-          "sha256": "8751356259a6caa85f66e74b84da9b8613ac2702f13ed25f91b004c875530e98",
+          "bytes": 313776,
+          "sha256": "548acee998875f26af451b09b9c76276803587801034c8b3a4dbed8d98016a43",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.165957383773048,
+              "max_sole_slip_m": 0.85794907183952,
+              "max_hull_penetration_m": 0.165957383773048,
+              "max_contact_slip_m": 0.85794907183952
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008739019099622611,
+              "max_hull_penetration_m": 3.469446951953614e-18,
+              "max_contact_slip_m": 0.008739019099622611
+            },
+            "maximum_floor_correction_m": 0.16896504659371236
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 5,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0374
+          }
         }
       ]
     },
@@ -258,37 +1054,155 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_archer_0.glb",
           "triangles": 18308,
-          "bytes": 3609796,
-          "sha256": "b6f00b194403079db32647f2239e4d8fab90c245059e23a6c9dc6d089e461722",
+          "bytes": 3633420,
+          "sha256": "c1e22d6f14c34d1f49e2a107084291c3aa465953fc1f23fa31866b0ea03bdbf3",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17337126688971916,
+              "max_sole_slip_m": 0.8569329318493337,
+              "max_hull_penetration_m": 0.17337126688971916,
+              "max_contact_slip_m": 0.8569329318493337
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.009697254118629841,
+              "max_hull_penetration_m": 5.551115123125783e-17,
+              "max_contact_slip_m": 0.009697254118629841
+            },
+            "maximum_floor_correction_m": 0.1763753302468184
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 637,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 7,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0318
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_archer_1.glb",
           "triangles": 7064,
-          "bytes": 2289128,
-          "sha256": "14b2ffaab3191d75e4a624e6c7f2cbdfa8db6d470470783f302553adcb52fb6c",
+          "bytes": 2302504,
+          "sha256": "aed853ff5cd7da1b308728706c1f9c28c164df8de0c270bbda85755532e453fb",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.16474143253695434,
+              "max_sole_slip_m": 0.8497658778040881,
+              "max_hull_penetration_m": 0.16474143253695434,
+              "max_contact_slip_m": 0.8497658778040881
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.012010453208621688,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.012010453208621688
+            },
+            "maximum_floor_correction_m": 0.16774666277503203
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 222,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 7,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0349
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_archer_2.glb",
           "triangles": 2207,
-          "bytes": 688556,
-          "sha256": "fcc4c04e26446f3b122852a3fb9c3252f84d403b41ddcb126e4636eeb7a6e87b",
+          "bytes": 695780,
+          "sha256": "17990105ecfe72a07534796ef2f59aab8dbe38f74c754861245196e01ea5d681",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.163005870838917,
+              "max_sole_slip_m": 0.8489850724406742,
+              "max_hull_penetration_m": 0.163005870838917,
+              "max_contact_slip_m": 0.8489850724406742
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011677856562015473,
+              "max_hull_penetration_m": 6.938893903907228e-18,
+              "max_contact_slip_m": 0.011677856562015473
+            },
+            "maximum_floor_correction_m": 0.16602647906392376
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 6,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0393
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_archer_3.glb",
           "triangles": 791,
-          "bytes": 322296,
-          "sha256": "b148570829a68da85d5bacd69845c8158d1b59584f95092571638e3d71aa0b6b",
+          "bytes": 329164,
+          "sha256": "016b2a519f6385637a30f604e3074296b92a0f94e100f2d0864e3601587fb1d9",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.165957383773048,
+              "max_sole_slip_m": 0.85794907183952,
+              "max_hull_penetration_m": 0.165957383773048,
+              "max_contact_slip_m": 0.85794907183952
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008739019099622611,
+              "max_hull_penetration_m": 3.469446951953614e-18,
+              "max_contact_slip_m": 0.008739019099622611
+            },
+            "maximum_floor_correction_m": 0.16896504659371236
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 6,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0393
+          }
         }
       ]
     }

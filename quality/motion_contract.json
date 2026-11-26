@@ -707,6 +707,7 @@
     "scripts/ui/ui_smoke.gd",
     "scripts/ui/village_life_panel.gd",
     "scripts/ui/village_navigation.gd",
+    "scripts/visuals/authored_ground.gd",
     "scripts/visuals/cc0_gestures.gd",
     "scripts/visuals/character_motion.gd",
     "scripts/visuals/facial_motion.gd",
