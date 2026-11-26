@@ -1,0 +1,6726 @@
+{
+ "format": "imperathen-street-furniture-layout",
+ "schema": 1,
+ "seed": 80,
+ "frame": "metres in Godot axes relative to the layout origin; yaw_deg rotates the item front (+Z) about Y",
+ "area": "colosseum_piazza",
+ "era_set": "imperial",
+ "entries": [
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    111.388,
+    0.0,
+    2.149
+   ],
+   "yaw_deg": -92.25254443370027,
+   "scale": 1.003,
+   "tint": [
+    0.97,
+    0.946,
+    0.939
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    111.388,
+    0.0,
+    -2.149
+   ],
+   "yaw_deg": -89.51638852652647,
+   "scale": 1.004,
+   "tint": [
+    0.984,
+    0.981,
+    0.98
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    111.164,
+    0.0,
+    -6.432
+   ],
+   "yaw_deg": -88.91805140952874,
+   "scale": 0.979,
+   "tint": [
+    0.982,
+    0.961,
+    0.968
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    110.717,
+    0.0,
+    -10.701
+   ],
+   "yaw_deg": -82.30279811207191,
+   "scale": 0.978,
+   "tint": [
+    0.912,
+    0.934,
+    0.883
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    110.052,
+    0.0,
+    -14.93
+   ],
+   "yaw_deg": -83.47750270792473,
+   "scale": 0.966,
+   "tint": [
+    0.883,
+    0.874,
+    0.88
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    109.17,
+    0.0,
+    -19.117
+   ],
+   "yaw_deg": -81.08130906750328,
+   "scale": 0.989,
+   "tint": [
+    0.938,
+    0.948,
+    0.907
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    108.082,
+    0.0,
+    -23.239
+   ],
+   "yaw_deg": -77.88486358998226,
+   "scale": 0.99,
+   "tint": [
+    0.958,
+    0.946,
+    0.969
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    106.787,
+    0.0,
+    -27.296
+   ],
+   "yaw_deg": -74.25597784767238,
+   "scale": 0.988,
+   "tint": [
+    0.953,
+    0.93,
+    0.914
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    107.862,
+    0.0,
+    -25.404
+   ],
+   "yaw_deg": -76.75,
+   "scale": 1.0,
+   "tint": [
+    0.937,
+    0.929,
+    0.916
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    105.301,
+    0.0,
+    -31.267
+   ],
+   "yaw_deg": -73.55622023641516,
+   "scale": 0.96,
+   "tint": [
+    0.998,
+    0.989,
+    0.988
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    103.624,
+    0.0,
+    -35.151
+   ],
+   "yaw_deg": -69.20457613951588,
+   "scale": 1.028,
+   "tint": [
+    0.918,
+    0.921,
+    0.919
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    101.773,
+    0.0,
+    -38.934
+   ],
+   "yaw_deg": -67.36202521704801,
+   "scale": 1.021,
+   "tint": [
+    0.884,
+    0.885,
+    0.86
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    99.749,
+    0.0,
+    -42.615
+   ],
+   "yaw_deg": -67.67134800454103,
+   "scale": 1.023,
+   "tint": [
+    0.943,
+    0.953,
+    0.917
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    97.57,
+    0.0,
+    -46.182
+   ],
+   "yaw_deg": -64.25115894388203,
+   "scale": 1.039,
+   "tint": [
+    0.951,
+    0.948,
+    0.918
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    95.237,
+    0.0,
+    -49.635
+   ],
+   "yaw_deg": -63.57815956740835,
+   "scale": 1.005,
+   "tint": [
+    0.912,
+    0.892,
+    0.927
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    92.767,
+    0.0,
+    -52.965
+   ],
+   "yaw_deg": -58.01369879206095,
+   "scale": 0.966,
+   "tint": [
+    0.901,
+    0.896,
+    0.875
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    90.161,
+    0.0,
+    -56.175
+   ],
+   "yaw_deg": -58.82753396658778,
+   "scale": 1.008,
+   "tint": [
+    0.892,
+    0.906,
+    0.864
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    87.437,
+    0.0,
+    -59.257
+   ],
+   "yaw_deg": -54.409504862663,
+   "scale": 0.974,
+   "tint": [
+    0.972,
+    0.977,
+    0.989
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    84.594,
+    0.0,
+    -62.213
+   ],
+   "yaw_deg": -52.065337498893015,
+   "scale": 1.023,
+   "tint": [
+    0.968,
+    0.939,
+    0.96
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    86.34,
+    0.0,
+    -61.047
+   ],
+   "yaw_deg": -54.74,
+   "scale": 1.0,
+   "tint": [
+    0.966,
+    0.977,
+    0.984
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    81.65,
+    0.0,
+    -65.04
+   ],
+   "yaw_deg": -49.59592120826333,
+   "scale": 1.039,
+   "tint": [
+    0.919,
+    0.902,
+    0.884
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    78.602,
+    0.0,
+    -67.738
+   ],
+   "yaw_deg": -47.27259820860371,
+   "scale": 0.978,
+   "tint": [
+    0.928,
+    0.919,
+    0.903
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    75.468,
+    0.0,
+    -70.306
+   ],
+   "yaw_deg": -45.5667983777893,
+   "scale": 1.04,
+   "tint": [
+    0.93,
+    0.905,
+    0.918
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    72.246,
+    0.0,
+    -72.745
+   ],
+   "yaw_deg": -47.22649410722212,
+   "scale": 0.986,
+   "tint": [
+    0.922,
+    0.931,
+    0.943
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    68.95,
+    0.0,
+    -75.055
+   ],
+   "yaw_deg": -41.95010201151092,
+   "scale": 0.984,
+   "tint": [
+    0.988,
+    0.962,
+    0.971
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    65.579,
+    0.0,
+    -77.236
+   ],
+   "yaw_deg": -37.962191495037885,
+   "scale": 1.036,
+   "tint": [
+    0.946,
+    0.934,
+    0.905
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    62.146,
+    0.0,
+    -79.289
+   ],
+   "yaw_deg": -39.78761333155382,
+   "scale": 1.02,
+   "tint": [
+    0.889,
+    0.875,
+    0.89
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    58.65,
+    0.0,
+    -81.215
+   ],
+   "yaw_deg": -35.43332930112418,
+   "scale": 1.02,
+   "tint": [
+    0.897,
+    0.889,
+    0.904
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    55.102,
+    0.0,
+    -83.016
+   ],
+   "yaw_deg": -33.70198914995604,
+   "scale": 0.973,
+   "tint": [
+    0.909,
+    0.896,
+    0.895
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    51.501,
+    0.0,
+    -84.69
+   ],
+   "yaw_deg": -32.880156561668166,
+   "scale": 1.023,
+   "tint": [
+    0.917,
+    0.894,
+    0.87
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    53.491,
+    0.0,
+    -84.261
+   ],
+   "yaw_deg": -32.41,
+   "scale": 1.0,
+   "tint": [
+    0.955,
+    0.95,
+    0.953
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    47.857,
+    0.0,
+    -86.241
+   ],
+   "yaw_deg": -30.38850062971535,
+   "scale": 1.029,
+   "tint": [
+    0.925,
+    0.898,
+    0.87
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    44.17,
+    0.0,
+    -87.668
+   ],
+   "yaw_deg": -25.888168895098985,
+   "scale": 0.994,
+   "tint": [
+    0.951,
+    0.972,
+    0.934
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    40.448,
+    0.0,
+    -88.973
+   ],
+   "yaw_deg": -22.3334605159989,
+   "scale": 0.974,
+   "tint": [
+    0.955,
+    0.953,
+    0.936
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    36.69,
+    0.0,
+    -90.155
+   ],
+   "yaw_deg": -19.73241459517086,
+   "scale": 0.982,
+   "tint": [
+    0.925,
+    0.919,
+    0.888
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    32.905,
+    0.0,
+    -91.218
+   ],
+   "yaw_deg": -20.00770552528993,
+   "scale": 1.031,
+   "tint": [
+    0.917,
+    0.907,
+    0.868
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    29.093,
+    0.0,
+    -92.16
+   ],
+   "yaw_deg": -16.892457424564192,
+   "scale": 1.019,
+   "tint": [
+    0.898,
+    0.917,
+    0.892
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    25.259,
+    0.0,
+    -92.982
+   ],
+   "yaw_deg": -13.23099178945765,
+   "scale": 0.975,
+   "tint": [
+    0.905,
+    0.926,
+    0.899
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    21.404,
+    0.0,
+    -93.686
+   ],
+   "yaw_deg": -14.528108723161916,
+   "scale": 1.009,
+   "tint": [
+    0.95,
+    0.947,
+    0.953
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    17.535,
+    0.0,
+    -94.272
+   ],
+   "yaw_deg": -11.58288128928462,
+   "scale": 0.98,
+   "tint": [
+    0.897,
+    0.875,
+    0.851
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    13.651,
+    0.0,
+    -94.74
+   ],
+   "yaw_deg": -10.311799955566672,
+   "scale": 1.03,
+   "tint": [
+    0.933,
+    0.954,
+    0.937
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    15.647,
+    0.0,
+    -94.953
+   ],
+   "yaw_deg": -9.36,
+   "scale": 1.0,
+   "tint": [
+    0.902,
+    0.892,
+    0.881
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    9.759,
+    0.0,
+    -95.091
+   ],
+   "yaw_deg": -6.855859524260197,
+   "scale": 1.02,
+   "tint": [
+    0.915,
+    0.905,
+    0.888
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    5.857,
+    0.0,
+    -95.325
+   ],
+   "yaw_deg": -1.367169847885544,
+   "scale": 0.988,
+   "tint": [
+    0.9,
+    0.91,
+    0.889
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    1.953,
+    0.0,
+    -95.442
+   ],
+   "yaw_deg": -3.159889792191474,
+   "scale": 0.976,
+   "tint": [
+    0.964,
+    0.952,
+    0.918
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -1.953,
+    0.0,
+    -95.442
+   ],
+   "yaw_deg": 2.3914237923238124,
+   "scale": 0.975,
+   "tint": [
+    0.882,
+    0.889,
+    0.863
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -5.857,
+    0.0,
+    -95.325
+   ],
+   "yaw_deg": 2.098578782677993,
+   "scale": 0.969,
+   "tint": [
+    0.891,
+    0.899,
+    0.875
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -9.759,
+    0.0,
+    -95.091
+   ],
+   "yaw_deg": 7.6158781909587905,
+   "scale": 1.013,
+   "tint": [
+    0.941,
+    0.941,
+    0.932
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -13.651,
+    0.0,
+    -94.74
+   ],
+   "yaw_deg": 6.28442921431711,
+   "scale": 0.969,
+   "tint": [
+    0.889,
+    0.91,
+    0.9
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -17.535,
+    0.0,
+    -94.272
+   ],
+   "yaw_deg": 11.573500301184234,
+   "scale": 0.976,
+   "tint": [
+    0.982,
+    0.973,
+    0.947
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -21.404,
+    0.0,
+    -93.686
+   ],
+   "yaw_deg": 10.469627619472268,
+   "scale": 1.039,
+   "tint": [
+    0.89,
+    0.892,
+    0.863
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -25.259,
+    0.0,
+    -92.982
+   ],
+   "yaw_deg": 17.66108292236571,
+   "scale": 0.987,
+   "tint": [
+    0.895,
+    0.885,
+    0.893
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    -23.412,
+    0.0,
+    -93.777
+   ],
+   "yaw_deg": 14.02,
+   "scale": 1.0,
+   "tint": [
+    0.907,
+    0.898,
+    0.874
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -29.093,
+    0.0,
+    -92.16
+   ],
+   "yaw_deg": 16.46227205019469,
+   "scale": 0.97,
+   "tint": [
+    0.906,
+    0.903,
+    0.904
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -32.905,
+    0.0,
+    -91.218
+   ],
+   "yaw_deg": 19.062646273262224,
+   "scale": 0.994,
+   "tint": [
+    0.914,
+    0.933,
+    0.917
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -36.69,
+    0.0,
+    -90.155
+   ],
+   "yaw_deg": 20.576352507852434,
+   "scale": 1.029,
+   "tint": [
+    0.927,
+    0.932,
+    0.923
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -40.448,
+    0.0,
+    -88.973
+   ],
+   "yaw_deg": 24.355100001421942,
+   "scale": 1.007,
+   "tint": [
+    0.93,
+    0.941,
+    0.931
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -44.17,
+    0.0,
+    -87.668
+   ],
+   "yaw_deg": 27.870372912554256,
+   "scale": 1.028,
+   "tint": [
+    0.956,
+    0.944,
+    0.899
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -47.857,
+    0.0,
+    -86.241
+   ],
+   "yaw_deg": 28.457216313831758,
+   "scale": 0.969,
+   "tint": [
+    0.92,
+    0.931,
+    0.908
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -51.501,
+    0.0,
+    -84.69
+   ],
+   "yaw_deg": 29.858595260183083,
+   "scale": 1.034,
+   "tint": [
+    0.964,
+    0.963,
+    0.932
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -55.102,
+    0.0,
+    -83.016
+   ],
+   "yaw_deg": 32.77939710517439,
+   "scale": 1.03,
+   "tint": [
+    0.976,
+    0.966,
+    0.99
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -58.65,
+    0.0,
+    -81.215
+   ],
+   "yaw_deg": 35.318217438136195,
+   "scale": 0.982,
+   "tint": [
+    0.944,
+    0.95,
+    0.912
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -62.146,
+    0.0,
+    -79.289
+   ],
+   "yaw_deg": 36.84990553104957,
+   "scale": 1.015,
+   "tint": [
+    0.949,
+    0.924,
+    0.924
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    -60.615,
+    0.0,
+    -80.646
+   ],
+   "yaw_deg": 36.93,
+   "scale": 1.0,
+   "tint": [
+    0.99,
+    0.96,
+    0.984
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -65.579,
+    0.0,
+    -77.236
+   ],
+   "yaw_deg": 42.23372861395726,
+   "scale": 1.029,
+   "tint": [
+    0.917,
+    0.92,
+    0.9
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -68.95,
+    0.0,
+    -75.055
+   ],
+   "yaw_deg": 44.33163389447526,
+   "scale": 0.961,
+   "tint": [
+    0.913,
+    0.89,
+    0.888
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -72.246,
+    0.0,
+    -72.745
+   ],
+   "yaw_deg": 43.979562639640996,
+   "scale": 0.985,
+   "tint": [
+    0.983,
+    0.978,
+    0.932
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -75.468,
+    0.0,
+    -70.306
+   ],
+   "yaw_deg": 45.051275765454875,
+   "scale": 1.014,
+   "tint": [
+    0.97,
+    0.986,
+    0.932
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -78.602,
+    0.0,
+    -67.738
+   ],
+   "yaw_deg": 49.14230607147399,
+   "scale": 0.97,
+   "tint": [
+    0.949,
+    0.966,
+    0.961
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -81.65,
+    0.0,
+    -65.04
+   ],
+   "yaw_deg": 49.98849339805243,
+   "scale": 0.963,
+   "tint": [
+    0.912,
+    0.91,
+    0.894
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -84.594,
+    0.0,
+    -62.213
+   ],
+   "yaw_deg": 51.665384092499465,
+   "scale": 1.027,
+   "tint": [
+    0.91,
+    0.886,
+    0.851
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -87.437,
+    0.0,
+    -59.257
+   ],
+   "yaw_deg": 54.01504310075359,
+   "scale": 0.962,
+   "tint": [
+    0.991,
+    0.976,
+    0.991
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -90.161,
+    0.0,
+    -56.175
+   ],
+   "yaw_deg": 58.005974069255934,
+   "scale": 1.002,
+   "tint": [
+    0.923,
+    0.893,
+    0.93
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -92.767,
+    0.0,
+    -52.965
+   ],
+   "yaw_deg": 61.56472155390889,
+   "scale": 1.004,
+   "tint": [
+    0.885,
+    0.873,
+    0.848
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    -91.813,
+    0.0,
+    -54.853
+   ],
+   "yaw_deg": 59.14,
+   "scale": 1.0,
+   "tint": [
+    0.903,
+    0.897,
+    0.893
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -95.237,
+    0.0,
+    -49.635
+   ],
+   "yaw_deg": 64.55675901157703,
+   "scale": 0.986,
+   "tint": [
+    0.942,
+    0.914,
+    0.883
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -97.57,
+    0.0,
+    -46.182
+   ],
+   "yaw_deg": 66.60271978368408,
+   "scale": 0.975,
+   "tint": [
+    0.943,
+    0.927,
+    0.942
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -99.749,
+    0.0,
+    -42.615
+   ],
+   "yaw_deg": 65.6938716543438,
+   "scale": 1.006,
+   "tint": [
+    0.878,
+    0.871,
+    0.89
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -101.773,
+    0.0,
+    -38.934
+   ],
+   "yaw_deg": 69.64962482092157,
+   "scale": 0.979,
+   "tint": [
+    0.936,
+    0.922,
+    0.934
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -103.624,
+    0.0,
+    -35.151
+   ],
+   "yaw_deg": 69.19433142130994,
+   "scale": 0.971,
+   "tint": [
+    0.919,
+    0.933,
+    0.916
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -105.301,
+    0.0,
+    -31.267
+   ],
+   "yaw_deg": 74.96630412766078,
+   "scale": 1.006,
+   "tint": [
+    0.908,
+    0.91,
+    0.892
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -106.787,
+    0.0,
+    -27.296
+   ],
+   "yaw_deg": 75.04774460900308,
+   "scale": 1.037,
+   "tint": [
+    0.915,
+    0.898,
+    0.893
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -108.082,
+    0.0,
+    -23.239
+   ],
+   "yaw_deg": 79.09651796992324,
+   "scale": 1.037,
+   "tint": [
+    0.921,
+    0.916,
+    0.919
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -109.17,
+    0.0,
+    -19.117
+   ],
+   "yaw_deg": 78.47812223799816,
+   "scale": 1.004,
+   "tint": [
+    0.889,
+    0.908,
+    0.909
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -110.052,
+    0.0,
+    -14.93
+   ],
+   "yaw_deg": 82.36156340006983,
+   "scale": 0.986,
+   "tint": [
+    0.94,
+    0.93,
+    0.914
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    -110.051,
+    0.0,
+    -17.116
+   ],
+   "yaw_deg": 81.16,
+   "scale": 1.0,
+   "tint": [
+    0.919,
+    0.902,
+    0.878
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -110.717,
+    0.0,
+    -10.701
+   ],
+   "yaw_deg": 84.13579873839994,
+   "scale": 1.011,
+   "tint": [
+    0.96,
+    0.969,
+    0.934
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -111.164,
+    0.0,
+    -6.432
+   ],
+   "yaw_deg": 89.01253526456345,
+   "scale": 1.031,
+   "tint": [
+    0.991,
+    0.988,
+    0.936
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -111.388,
+    0.0,
+    -2.149
+   ],
+   "yaw_deg": 91.10075965722122,
+   "scale": 1.005,
+   "tint": [
+    0.937,
+    0.94,
+    0.895
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -111.388,
+    0.0,
+    2.149
+   ],
+   "yaw_deg": 92.92520811105616,
+   "scale": 0.962,
+   "tint": [
+    0.916,
+    0.892,
+    0.923
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -111.164,
+    0.0,
+    6.432
+   ],
+   "yaw_deg": 95.71099340221502,
+   "scale": 0.989,
+   "tint": [
+    0.932,
+    0.919,
+    0.91
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -110.717,
+    0.0,
+    10.701
+   ],
+   "yaw_deg": 95.08560500664989,
+   "scale": 1.013,
+   "tint": [
+    0.984,
+    0.951,
+    0.95
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -110.052,
+    0.0,
+    14.93
+   ],
+   "yaw_deg": 99.98247944223748,
+   "scale": 1.022,
+   "tint": [
+    0.914,
+    0.913,
+    0.891
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -109.17,
+    0.0,
+    19.117
+   ],
+   "yaw_deg": 101.61789489150202,
+   "scale": 0.962,
+   "tint": [
+    0.903,
+    0.886,
+    0.855
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -108.082,
+    0.0,
+    23.239
+   ],
+   "yaw_deg": 104.4693220312345,
+   "scale": 0.972,
+   "tint": [
+    0.97,
+    0.97,
+    0.955
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -106.787,
+    0.0,
+    27.296
+   ],
+   "yaw_deg": 103.80900021040488,
+   "scale": 0.975,
+   "tint": [
+    0.957,
+    0.951,
+    0.94
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    -107.862,
+    0.0,
+    25.404
+   ],
+   "yaw_deg": 103.25,
+   "scale": 1.0,
+   "tint": [
+    0.944,
+    0.927,
+    0.94
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -105.301,
+    0.0,
+    31.267
+   ],
+   "yaw_deg": 106.9188539459866,
+   "scale": 0.965,
+   "tint": [
+    0.931,
+    0.921,
+    0.935
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -103.624,
+    0.0,
+    35.151
+   ],
+   "yaw_deg": 108.1157932878803,
+   "scale": 1.018,
+   "tint": [
+    0.919,
+    0.906,
+    0.923
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -101.773,
+    0.0,
+    38.934
+   ],
+   "yaw_deg": 110.71094731230227,
+   "scale": 0.993,
+   "tint": [
+    0.94,
+    0.907,
+    0.926
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -99.749,
+    0.0,
+    42.615
+   ],
+   "yaw_deg": 114.83071196517083,
+   "scale": 1.028,
+   "tint": [
+    0.942,
+    0.939,
+    0.944
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -97.57,
+    0.0,
+    46.182
+   ],
+   "yaw_deg": 115.45429065862847,
+   "scale": 1.031,
+   "tint": [
+    0.938,
+    0.94,
+    0.884
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -95.237,
+    0.0,
+    49.635
+   ],
+   "yaw_deg": 116.96400561744981,
+   "scale": 1.015,
+   "tint": [
+    0.925,
+    0.929,
+    0.917
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -92.767,
+    0.0,
+    52.965
+   ],
+   "yaw_deg": 118.3006380741301,
+   "scale": 1.009,
+   "tint": [
+    0.969,
+    0.974,
+    0.926
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -90.161,
+    0.0,
+    56.175
+   ],
+   "yaw_deg": 121.42325762685105,
+   "scale": 1.014,
+   "tint": [
+    0.986,
+    0.985,
+    0.969
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -87.437,
+    0.0,
+    59.257
+   ],
+   "yaw_deg": 125.65468561674433,
+   "scale": 1.034,
+   "tint": [
+    0.941,
+    0.946,
+    0.932
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -84.594,
+    0.0,
+    62.213
+   ],
+   "yaw_deg": 128.49995232261645,
+   "scale": 1.012,
+   "tint": [
+    0.946,
+    0.934,
+    0.915
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    -86.34,
+    0.0,
+    61.047
+   ],
+   "yaw_deg": 125.26,
+   "scale": 1.0,
+   "tint": [
+    0.887,
+    0.907,
+    0.912
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -81.65,
+    0.0,
+    65.04
+   ],
+   "yaw_deg": 128.55498278718323,
+   "scale": 0.969,
+   "tint": [
+    0.99,
+    0.962,
+    0.961
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -78.602,
+    0.0,
+    67.738
+   ],
+   "yaw_deg": 132.9970473803532,
+   "scale": 0.977,
+   "tint": [
+    0.979,
+    0.944,
+    0.959
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -75.468,
+    0.0,
+    70.306
+   ],
+   "yaw_deg": 134.48476674916552,
+   "scale": 0.962,
+   "tint": [
+    0.961,
+    0.961,
+    0.952
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -72.246,
+    0.0,
+    72.745
+   ],
+   "yaw_deg": 134.53757501765588,
+   "scale": 1.027,
+   "tint": [
+    0.884,
+    0.883,
+    0.876
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -68.95,
+    0.0,
+    75.055
+   ],
+   "yaw_deg": 139.89101128648366,
+   "scale": 0.986,
+   "tint": [
+    0.912,
+    0.893,
+    0.913
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -65.579,
+    0.0,
+    77.236
+   ],
+   "yaw_deg": 138.71091266831922,
+   "scale": 0.987,
+   "tint": [
+    0.901,
+    0.903,
+    0.883
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -62.146,
+    0.0,
+    79.289
+   ],
+   "yaw_deg": 141.10591936685353,
+   "scale": 0.988,
+   "tint": [
+    0.925,
+    0.913,
+    0.897
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -58.65,
+    0.0,
+    81.215
+   ],
+   "yaw_deg": 143.44401215292183,
+   "scale": 0.998,
+   "tint": [
+    0.892,
+    0.876,
+    0.868
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -55.102,
+    0.0,
+    83.016
+   ],
+   "yaw_deg": 145.66301502935647,
+   "scale": 0.98,
+   "tint": [
+    0.969,
+    0.958,
+    0.928
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -51.501,
+    0.0,
+    84.69
+   ],
+   "yaw_deg": 150.5109700908867,
+   "scale": 0.988,
+   "tint": [
+    0.916,
+    0.917,
+    0.934
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    -53.491,
+    0.0,
+    84.261
+   ],
+   "yaw_deg": 147.59,
+   "scale": 1.0,
+   "tint": [
+    0.981,
+    0.969,
+    0.963
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -47.857,
+    0.0,
+    86.241
+   ],
+   "yaw_deg": 151.93541378828138,
+   "scale": 0.966,
+   "tint": [
+    0.93,
+    0.936,
+    0.881
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -44.17,
+    0.0,
+    87.668
+   ],
+   "yaw_deg": 152.91461102410383,
+   "scale": 1.0,
+   "tint": [
+    0.972,
+    0.963,
+    0.949
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -40.448,
+    0.0,
+    88.973
+   ],
+   "yaw_deg": 157.08917009136587,
+   "scale": 1.008,
+   "tint": [
+    0.943,
+    0.938,
+    0.961
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -36.69,
+    0.0,
+    90.155
+   ],
+   "yaw_deg": 158.31646978716415,
+   "scale": 0.98,
+   "tint": [
+    0.925,
+    0.901,
+    0.884
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -32.905,
+    0.0,
+    91.218
+   ],
+   "yaw_deg": 162.16536550997785,
+   "scale": 1.004,
+   "tint": [
+    0.929,
+    0.911,
+    0.884
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -29.093,
+    0.0,
+    92.16
+   ],
+   "yaw_deg": 163.72193316148469,
+   "scale": 0.993,
+   "tint": [
+    0.906,
+    0.891,
+    0.92
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -25.259,
+    0.0,
+    92.982
+   ],
+   "yaw_deg": 164.91296440071017,
+   "scale": 0.998,
+   "tint": [
+    0.978,
+    0.986,
+    0.972
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -21.404,
+    0.0,
+    93.686
+   ],
+   "yaw_deg": 166.43591654578188,
+   "scale": 1.034,
+   "tint": [
+    0.945,
+    0.948,
+    0.903
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -17.535,
+    0.0,
+    94.272
+   ],
+   "yaw_deg": 169.05596788224963,
+   "scale": 1.034,
+   "tint": [
+    0.985,
+    0.965,
+    0.929
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -13.651,
+    0.0,
+    94.74
+   ],
+   "yaw_deg": 170.74249226216872,
+   "scale": 0.99,
+   "tint": [
+    0.906,
+    0.906,
+    0.926
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    -15.647,
+    0.0,
+    94.953
+   ],
+   "yaw_deg": 170.64,
+   "scale": 1.0,
+   "tint": [
+    0.923,
+    0.932,
+    0.938
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -9.759,
+    0.0,
+    95.091
+   ],
+   "yaw_deg": 175.95646648996325,
+   "scale": 1.005,
+   "tint": [
+    0.935,
+    0.948,
+    0.915
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -5.857,
+    0.0,
+    95.325
+   ],
+   "yaw_deg": 178.60101635998916,
+   "scale": 0.971,
+   "tint": [
+    0.984,
+    0.979,
+    0.962
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    -1.953,
+    0.0,
+    95.442
+   ],
+   "yaw_deg": 178.44039004570357,
+   "scale": 0.961,
+   "tint": [
+    0.966,
+    0.98,
+    0.922
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    1.953,
+    0.0,
+    95.442
+   ],
+   "yaw_deg": -176.88572929986964,
+   "scale": 1.023,
+   "tint": [
+    0.97,
+    0.969,
+    0.937
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    5.857,
+    0.0,
+    95.325
+   ],
+   "yaw_deg": -175.8730177921481,
+   "scale": 1.005,
+   "tint": [
+    0.967,
+    0.957,
+    0.926
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    9.759,
+    0.0,
+    95.091
+   ],
+   "yaw_deg": -172.03842912674662,
+   "scale": 1.024,
+   "tint": [
+    0.914,
+    0.917,
+    0.904
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    13.651,
+    0.0,
+    94.74
+   ],
+   "yaw_deg": -170.16664088290605,
+   "scale": 1.026,
+   "tint": [
+    0.915,
+    0.9,
+    0.874
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    17.535,
+    0.0,
+    94.272
+   ],
+   "yaw_deg": -169.58086076345543,
+   "scale": 0.966,
+   "tint": [
+    0.974,
+    0.946,
+    0.92
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    21.404,
+    0.0,
+    93.686
+   ],
+   "yaw_deg": -166.31667866770698,
+   "scale": 1.016,
+   "tint": [
+    0.908,
+    0.905,
+    0.892
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    25.259,
+    0.0,
+    92.982
+   ],
+   "yaw_deg": -162.42510288349266,
+   "scale": 0.976,
+   "tint": [
+    0.917,
+    0.918,
+    0.884
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    23.412,
+    0.0,
+    93.777
+   ],
+   "yaw_deg": -165.98,
+   "scale": 1.0,
+   "tint": [
+    0.971,
+    0.982,
+    0.958
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    29.093,
+    0.0,
+    92.16
+   ],
+   "yaw_deg": -164.1924129896782,
+   "scale": 1.023,
+   "tint": [
+    0.912,
+    0.907,
+    0.922
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    32.905,
+    0.0,
+    91.218
+   ],
+   "yaw_deg": -161.9358333060422,
+   "scale": 1.033,
+   "tint": [
+    0.988,
+    0.983,
+    0.964
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    36.69,
+    0.0,
+    90.155
+   ],
+   "yaw_deg": -159.01664470408838,
+   "scale": 1.038,
+   "tint": [
+    0.946,
+    0.929,
+    0.943
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    40.448,
+    0.0,
+    88.973
+   ],
+   "yaw_deg": -154.41018881958036,
+   "scale": 1.014,
+   "tint": [
+    0.936,
+    0.908,
+    0.888
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    44.17,
+    0.0,
+    87.668
+   ],
+   "yaw_deg": -153.72629055181932,
+   "scale": 0.98,
+   "tint": [
+    0.902,
+    0.917,
+    0.907
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    47.857,
+    0.0,
+    86.241
+   ],
+   "yaw_deg": -151.65887260275787,
+   "scale": 0.987,
+   "tint": [
+    0.977,
+    0.962,
+    0.936
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    51.501,
+    0.0,
+    84.69
+   ],
+   "yaw_deg": -148.7954325365136,
+   "scale": 1.013,
+   "tint": [
+    0.965,
+    0.929,
+    0.959
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    55.102,
+    0.0,
+    83.016
+   ],
+   "yaw_deg": -148.12896627367078,
+   "scale": 0.984,
+   "tint": [
+    0.898,
+    0.915,
+    0.896
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    58.65,
+    0.0,
+    81.215
+   ],
+   "yaw_deg": -146.43496830445963,
+   "scale": 0.971,
+   "tint": [
+    0.921,
+    0.913,
+    0.878
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    62.146,
+    0.0,
+    79.289
+   ],
+   "yaw_deg": -139.62388530656128,
+   "scale": 0.966,
+   "tint": [
+    0.954,
+    0.968,
+    0.958
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    60.615,
+    0.0,
+    80.646
+   ],
+   "yaw_deg": -143.07,
+   "scale": 1.0,
+   "tint": [
+    0.9,
+    0.877,
+    0.886
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    65.579,
+    0.0,
+    77.236
+   ],
+   "yaw_deg": -138.3194261005757,
+   "scale": 0.977,
+   "tint": [
+    0.979,
+    0.966,
+    0.986
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    68.95,
+    0.0,
+    75.055
+   ],
+   "yaw_deg": -139.6181402674352,
+   "scale": 1.009,
+   "tint": [
+    0.936,
+    0.929,
+    0.94
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    72.246,
+    0.0,
+    72.745
+   ],
+   "yaw_deg": -135.27683495427223,
+   "scale": 1.021,
+   "tint": [
+    0.981,
+    0.967,
+    0.963
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    75.468,
+    0.0,
+    70.306
+   ],
+   "yaw_deg": -131.6518002929414,
+   "scale": 0.979,
+   "tint": [
+    0.892,
+    0.89,
+    0.894
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    78.602,
+    0.0,
+    67.738
+   ],
+   "yaw_deg": -131.33315346569157,
+   "scale": 1.018,
+   "tint": [
+    0.933,
+    0.929,
+    0.903
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    81.65,
+    0.0,
+    65.04
+   ],
+   "yaw_deg": -126.09322139976797,
+   "scale": 0.988,
+   "tint": [
+    0.98,
+    0.968,
+    0.977
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    84.594,
+    0.0,
+    62.213
+   ],
+   "yaw_deg": -124.44213924230506,
+   "scale": 0.986,
+   "tint": [
+    0.879,
+    0.881,
+    0.881
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    87.437,
+    0.0,
+    59.257
+   ],
+   "yaw_deg": -123.14067332919086,
+   "scale": 1.026,
+   "tint": [
+    0.924,
+    0.907,
+    0.879
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    90.161,
+    0.0,
+    56.175
+   ],
+   "yaw_deg": -123.6837951747519,
+   "scale": 0.977,
+   "tint": [
+    0.982,
+    0.96,
+    0.989
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    92.767,
+    0.0,
+    52.965
+   ],
+   "yaw_deg": -120.45352972751148,
+   "scale": 1.025,
+   "tint": [
+    0.957,
+    0.956,
+    0.955
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    91.813,
+    0.0,
+    54.853
+   ],
+   "yaw_deg": -120.86,
+   "scale": 1.0,
+   "tint": [
+    0.955,
+    0.938,
+    0.956
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    95.237,
+    0.0,
+    49.635
+   ],
+   "yaw_deg": -118.34350204099354,
+   "scale": 1.014,
+   "tint": [
+    0.932,
+    0.939,
+    0.944
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    97.57,
+    0.0,
+    46.182
+   ],
+   "yaw_deg": -115.77203208226841,
+   "scale": 1.014,
+   "tint": [
+    0.921,
+    0.912,
+    0.888
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    99.749,
+    0.0,
+    42.615
+   ],
+   "yaw_deg": -112.29702144439294,
+   "scale": 1.025,
+   "tint": [
+    0.906,
+    0.882,
+    0.882
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    101.773,
+    0.0,
+    38.934
+   ],
+   "yaw_deg": -112.83013038999079,
+   "scale": 1.021,
+   "tint": [
+    0.902,
+    0.914,
+    0.896
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    103.624,
+    0.0,
+    35.151
+   ],
+   "yaw_deg": -107.64274127457844,
+   "scale": 1.002,
+   "tint": [
+    0.962,
+    0.967,
+    0.953
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    105.301,
+    0.0,
+    31.267
+   ],
+   "yaw_deg": -108.30960426348659,
+   "scale": 1.007,
+   "tint": [
+    0.943,
+    0.944,
+    0.972
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    106.787,
+    0.0,
+    27.296
+   ],
+   "yaw_deg": -104.6046678997687,
+   "scale": 0.981,
+   "tint": [
+    0.945,
+    0.923,
+    0.949
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    108.082,
+    0.0,
+    23.239
+   ],
+   "yaw_deg": -100.57166975796409,
+   "scale": 0.989,
+   "tint": [
+    0.975,
+    0.959,
+    0.98
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    109.17,
+    0.0,
+    19.117
+   ],
+   "yaw_deg": -101.86556917113006,
+   "scale": 1.023,
+   "tint": [
+    0.944,
+    0.945,
+    0.934
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    110.052,
+    0.0,
+    14.93
+   ],
+   "yaw_deg": -99.19555486712729,
+   "scale": 0.976,
+   "tint": [
+    0.893,
+    0.893,
+    0.917
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "drain_grate",
+   "position": [
+    110.051,
+    0.0,
+    17.116
+   ],
+   "yaw_deg": -98.84,
+   "scale": 1.0,
+   "tint": [
+    0.922,
+    0.924,
+    0.892
+   ]
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    110.717,
+    0.0,
+    10.701
+   ],
+   "yaw_deg": -95.8922144641411,
+   "scale": 0.998,
+   "tint": [
+    0.941,
+    0.94,
+    0.904
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "cippus_amphitheatre",
+   "position": [
+    111.164,
+    0.0,
+    6.432
+   ],
+   "yaw_deg": -92.6117506224695,
+   "scale": 1.0,
+   "tint": [
+    0.897,
+    0.914,
+    0.879
+   ],
+   "era_id": "building.amphitheatrum_flavium"
+  },
+  {
+   "item": "meta_sudans",
+   "position": [
+    -128.0,
+    0.0,
+    34.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "era_id": "building.meta_sudans"
+  },
+  {
+   "item": "honorific_column_imperial",
+   "position": [
+    -106.894,
+    0.0,
+    -11.374
+   ],
+   "yaw_deg": 263.93,
+   "scale": 1.012,
+   "tint": [
+    0.94,
+    0.924,
+    0.917
+   ]
+  },
+  {
+   "item": "honorific_column_imperial",
+   "position": [
+    -106.894,
+    0.0,
+    11.374
+   ],
+   "yaw_deg": 276.07,
+   "scale": 0.978,
+   "tint": [
+    0.898,
+    0.885,
+    0.872
+   ]
+  },
+  {
+   "item": "honorific_column_imperial",
+   "position": [
+    106.894,
+    0.0,
+    11.374
+   ],
+   "yaw_deg": 83.93,
+   "scale": 0.982,
+   "tint": [
+    0.965,
+    0.961,
+    0.95
+   ]
+  },
+  {
+   "item": "honorific_column_imperial",
+   "position": [
+    106.894,
+    0.0,
+    -11.374
+   ],
+   "yaw_deg": 96.07,
+   "scale": 1.001,
+   "tint": [
+    0.894,
+    0.89,
+    0.905
+   ]
+  },
+  {
+   "item": "statue_marble_1",
+   "position": [
+    95.832,
+    0.0,
+    -38.066
+   ],
+   "yaw_deg": 107.77229125034813,
+   "scale": 1.058,
+   "tint": [
+    0.927,
+    0.911,
+    0.937
+   ]
+  },
+  {
+   "item": "statue_marble_2",
+   "position": [
+    64.278,
+    0.0,
+    -71.532
+   ],
+   "yaw_deg": 136.7409371750746,
+   "scale": 1.038,
+   "tint": [
+    0.961,
+    0.985,
+    0.939
+   ]
+  },
+  {
+   "item": "statue_marble_1",
+   "position": [
+    36.985,
+    0.0,
+    -84.533
+   ],
+   "yaw_deg": 152.96954838896707,
+   "scale": 1.024,
+   "tint": [
+    0.896,
+    0.876,
+    0.889
+   ]
+  },
+  {
+   "item": "statue_marble_2",
+   "position": [
+    -37.107,
+    0.0,
+    -84.92
+   ],
+   "yaw_deg": 204.51052415777025,
+   "scale": 0.944,
+   "tint": [
+    0.949,
+    0.941,
+    0.9
+   ]
+  },
+  {
+   "item": "statue_marble_1",
+   "position": [
+    -64.77,
+    0.0,
+    -72.291
+   ],
+   "yaw_deg": 225.447312025493,
+   "scale": 1.042,
+   "tint": [
+    0.986,
+    0.977,
+    0.979
+   ]
+  },
+  {
+   "item": "statue_marble_2",
+   "position": [
+    -96.729,
+    0.0,
+    -38.559
+   ],
+   "yaw_deg": 248.21976529089565,
+   "scale": 0.995,
+   "tint": [
+    0.956,
+    0.949,
+    0.912
+   ]
+  },
+  {
+   "item": "statue_marble_3",
+   "position": [
+    -96.228,
+    0.0,
+    38.284
+   ],
+   "yaw_deg": 291.10656548233595,
+   "scale": 1.028,
+   "tint": [
+    0.943,
+    0.942,
+    0.928
+   ]
+  },
+  {
+   "item": "statue_marble_0",
+   "position": [
+    -64.935,
+    0.0,
+    72.547
+   ],
+   "yaw_deg": 316.6700050612204,
+   "scale": 0.94,
+   "tint": [
+    0.962,
+    0.987,
+    0.966
+   ]
+  },
+  {
+   "item": "statue_marble_3",
+   "position": [
+    -37.191,
+    0.0,
+    85.187
+   ],
+   "yaw_deg": 338.4626312582983,
+   "scale": 0.986,
+   "tint": [
+    0.969,
+    0.959,
+    0.941
+   ]
+  },
+  {
+   "item": "statue_marble_0",
+   "position": [
+    36.933,
+    0.0,
+    84.369
+   ],
+   "yaw_deg": 23.7884875657462,
+   "scale": 1.026,
+   "tint": [
+    0.956,
+    0.932,
+    0.933
+   ]
+  },
+  {
+   "item": "statue_marble_3",
+   "position": [
+    64.572,
+    0.0,
+    71.987
+   ],
+   "yaw_deg": 37.259817777713934,
+   "scale": 0.996,
+   "tint": [
+    0.916,
+    0.917,
+    0.873
+   ]
+  },
+  {
+   "item": "statue_marble_0",
+   "position": [
+    95.925,
+    0.0,
+    38.117
+   ],
+   "yaw_deg": 72.85278859313145,
+   "scale": 0.966,
+   "tint": [
+    0.938,
+    0.941,
+    0.941
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    105.912,
+    0.0,
+    -24.782
+   ],
+   "yaw_deg": -79.61681595067105,
+   "scale": 0.99,
+   "tint": [
+    0.98,
+    0.978,
+    0.938
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    106.187,
+    0.0,
+    -20.965
+   ],
+   "yaw_deg": 316.33304204456016,
+   "scale": 1.037,
+   "tint": [
+    0.949,
+    0.948,
+    0.92
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    84.863,
+    0.0,
+    -59.627
+   ],
+   "yaw_deg": -56.378443268692735,
+   "scale": 0.991,
+   "tint": [
+    0.918,
+    0.93,
+    0.881
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    86.709,
+    0.0,
+    -56.41
+   ],
+   "yaw_deg": 73.18835209540444,
+   "scale": 0.89,
+   "tint": [
+    0.975,
+    0.956,
+    0.95
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    52.627,
+    0.0,
+    -82.403
+   ],
+   "yaw_deg": -34.1972657887165,
+   "scale": 0.985,
+   "tint": [
+    0.893,
+    0.892,
+    0.879
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    55.42,
+    0.0,
+    -80.112
+   ],
+   "yaw_deg": 231.37088466121773,
+   "scale": 1.009,
+   "tint": [
+    0.902,
+    0.894,
+    0.892
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    -90.223,
+    0.0,
+    -53.563
+   ],
+   "yaw_deg": 56.06598016667379,
+   "scale": 0.99,
+   "tint": [
+    0.892,
+    0.878,
+    0.85
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    -87.24,
+    0.0,
+    -55.809
+   ],
+   "yaw_deg": 272.7227143704319,
+   "scale": 0.981,
+   "tint": [
+    0.91,
+    0.915,
+    0.883
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    -105.912,
+    0.0,
+    -24.782
+   ],
+   "yaw_deg": 80.0011594984391,
+   "scale": 1.021,
+   "tint": [
+    0.904,
+    0.902,
+    0.872
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    -103.924,
+    0.0,
+    -28.052
+   ],
+   "yaw_deg": 197.29022235445336,
+   "scale": 1.065,
+   "tint": [
+    0.894,
+    0.91,
+    0.895
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    -105.912,
+    0.0,
+    24.782
+   ],
+   "yaw_deg": 104.47855315921936,
+   "scale": 0.967,
+   "tint": [
+    0.946,
+    0.965,
+    0.923
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    -106.187,
+    0.0,
+    20.965
+   ],
+   "yaw_deg": 236.62250010488322,
+   "scale": 0.993,
+   "tint": [
+    0.973,
+    0.958,
+    0.93
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    -84.863,
+    0.0,
+    59.627
+   ],
+   "yaw_deg": 125.25790847322521,
+   "scale": 1.002,
+   "tint": [
+    0.941,
+    0.92,
+    0.906
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    -86.709,
+    0.0,
+    56.41
+   ],
+   "yaw_deg": 263.91091129690795,
+   "scale": 0.962,
+   "tint": [
+    0.94,
+    0.93,
+    0.901
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    -52.627,
+    0.0,
+    82.403
+   ],
+   "yaw_deg": 151.3885927333284,
+   "scale": 1.019,
+   "tint": [
+    0.948,
+    0.953,
+    0.918
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    -55.42,
+    0.0,
+    80.112
+   ],
+   "yaw_deg": 81.38500016570188,
+   "scale": 1.024,
+   "tint": [
+    0.98,
+    0.957,
+    0.962
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    -15.402,
+    0.0,
+    92.919
+   ],
+   "yaw_deg": 172.55074055864088,
+   "scale": 1.004,
+   "tint": [
+    0.956,
+    0.964,
+    0.939
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    -18.722,
+    0.0,
+    91.612
+   ],
+   "yaw_deg": 87.15460710125465,
+   "scale": 0.813,
+   "tint": [
+    0.897,
+    0.891,
+    0.9
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    23.044,
+    0.0,
+    91.761
+   ],
+   "yaw_deg": -169.62184100725906,
+   "scale": 0.984,
+   "tint": [
+    0.907,
+    0.92,
+    0.921
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    19.481,
+    0.0,
+    91.497
+   ],
+   "yaw_deg": 149.92457842988088,
+   "scale": 1.043,
+   "tint": [
+    0.971,
+    0.986,
+    0.962
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    52.627,
+    0.0,
+    82.403
+   ],
+   "yaw_deg": -148.39935930089118,
+   "scale": 1.022,
+   "tint": [
+    0.976,
+    0.942,
+    0.927
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    49.075,
+    0.0,
+    83.063
+   ],
+   "yaw_deg": 341.3615131488606,
+   "scale": 0.894,
+   "tint": [
+    0.958,
+    0.936,
+    0.895
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    90.223,
+    0.0,
+    53.563
+   ],
+   "yaw_deg": -119.48992405055253,
+   "scale": 0.975,
+   "tint": [
+    0.951,
+    0.945,
+    0.913
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    87.24,
+    0.0,
+    55.809
+   ],
+   "yaw_deg": 247.36674759688785,
+   "scale": 1.089,
+   "tint": [
+    0.951,
+    0.953,
+    0.918
+   ]
+  },
+  {
+   "item": "bench_marble_exedra",
+   "position": [
+    108.048,
+    0.0,
+    16.694
+   ],
+   "yaw_deg": -98.91598044842799,
+   "scale": 0.965,
+   "tint": [
+    0.894,
+    0.893,
+    0.871
+   ]
+  },
+  {
+   "item": "shrub_laurel",
+   "position": [
+    106.398,
+    0.0,
+    20.165
+   ],
+   "yaw_deg": 83.66765204255219,
+   "scale": 0.978,
+   "tint": [
+    0.924,
+    0.89,
+    0.864
+   ]
+  },
+  {
+   "item": "lacus_imperial",
+   "position": [
+    94.63,
+    0.0,
+    -54.95
+   ],
+   "yaw_deg": 120.14,
+   "scale": 1.0,
+   "tint": [
+    0.914,
+    0.9,
+    0.902
+   ]
+  },
+  {
+   "item": "bollard_basalt",
+   "position": [
+    95.862,
+    0.0,
+    -52.482
+   ],
+   "yaw_deg": 179.59830574915046,
+   "scale": 0.964,
+   "tint": [
+    0.986,
+    0.958,
+    0.972
+   ]
+  },
+  {
+   "item": "bollard_basalt",
+   "position": [
+    92.561,
+    0.0,
+    -56.548
+   ],
+   "yaw_deg": 323.62152114891825,
+   "scale": 1.039,
+   "tint": [
+    0.933,
+    0.94,
+    0.907
+   ]
+  },
+  {
+   "item": "lacus_imperial",
+   "position": [
+    -80.664,
+    0.0,
+    -69.515
+   ],
+   "yaw_deg": 229.25,
+   "scale": 1.0,
+   "tint": [
+    0.89,
+    0.891,
+    0.896
+   ]
+  },
+  {
+   "item": "bollard_basalt",
+   "position": [
+    -78.284,
+    0.0,
+    -70.822
+   ],
+   "yaw_deg": 233.49665966453142,
+   "scale": 0.949,
+   "tint": [
+    0.9,
+    0.902,
+    0.873
+   ]
+  },
+  {
+   "item": "bollard_basalt",
+   "position": [
+    -82.139,
+    0.0,
+    -67.409
+   ],
+   "yaw_deg": 140.4167568126035,
+   "scale": 0.984,
+   "tint": [
+    0.976,
+    0.949,
+    0.962
+   ]
+  },
+  {
+   "item": "lacus_imperial",
+   "position": [
+    -25.391,
+    0.0,
+    95.702
+   ],
+   "yaw_deg": 345.14,
+   "scale": 1.0,
+   "tint": [
+    0.961,
+    0.975,
+    0.917
+   ]
+  },
+  {
+   "item": "bollard_basalt",
+   "position": [
+    -27.783,
+    0.0,
+    94.655
+   ],
+   "yaw_deg": 51.85687259600408,
+   "scale": 0.958,
+   "tint": [
+    0.928,
+    0.9,
+    0.868
+   ]
+  },
+  {
+   "item": "bollard_basalt",
+   "position": [
+    -22.925,
+    0.0,
+    95.542
+   ],
+   "yaw_deg": 294.4689115605017,
+   "scale": 1.064,
+   "tint": [
+    0.999,
+    0.972,
+    0.963
+   ]
+  },
+  {
+   "item": "lacus_imperial",
+   "position": [
+    80.664,
+    0.0,
+    69.515
+   ],
+   "yaw_deg": 49.25,
+   "scale": 1.0,
+   "tint": [
+    0.912,
+    0.909,
+    0.878
+   ]
+  },
+  {
+   "item": "bollard_basalt",
+   "position": [
+    78.284,
+    0.0,
+    70.822
+   ],
+   "yaw_deg": 282.2129568961171,
+   "scale": 0.936,
+   "tint": [
+    0.929,
+    0.947,
+    0.916
+   ]
+  },
+  {
+   "item": "bollard_basalt",
+   "position": [
+    82.139,
+    0.0,
+    67.409
+   ],
+   "yaw_deg": 108.054590018188,
+   "scale": 0.92,
+   "tint": [
+    0.915,
+    0.914,
+    0.894
+   ]
+  },
+  {
+   "item": "compital_shrine_imperial",
+   "position": [
+    -16.072,
+    0.0,
+    -98.476
+   ],
+   "yaw_deg": 189.27,
+   "scale": 1.0,
+   "tint": [
+    0.945,
+    0.937,
+    0.931
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -9.231,
+    0.0,
+    -98.797
+   ],
+   "yaw_deg": 262.9019669672801,
+   "scale": 0.867,
+   "tint": [
+    0.907,
+    0.896,
+    0.872
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -22.793,
+    0.0,
+    -97.162
+   ],
+   "yaw_deg": 137.59069215833955,
+   "scale": 0.922,
+   "tint": [
+    0.929,
+    0.923,
+    0.948
+   ]
+  },
+  {
+   "item": "compital_shrine_imperial",
+   "position": [
+    16.072,
+    0.0,
+    98.476
+   ],
+   "yaw_deg": 9.27000000000001,
+   "scale": 1.0,
+   "tint": [
+    0.954,
+    0.946,
+    0.964
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    9.231,
+    0.0,
+    98.797
+   ],
+   "yaw_deg": 339.43878170235195,
+   "scale": 0.909,
+   "tint": [
+    0.97,
+    0.962,
+    0.944
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    22.793,
+    0.0,
+    97.162
+   ],
+   "yaw_deg": 152.2753477247407,
+   "scale": 0.993,
+   "tint": [
+    0.975,
+    0.948,
+    0.93
+   ]
+  },
+  {
+   "item": "sundial_column",
+   "position": [
+    15.832,
+    0.0,
+    -96.491
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.946,
+    0.921,
+    0.913
+   ]
+  },
+  {
+   "item": "milestone_imperial",
+   "position": [
+    -122.804,
+    0.0,
+    19.801
+   ],
+   "yaw_deg": 189.16,
+   "scale": 1.0,
+   "tint": [
+    0.895,
+    0.909,
+    0.922
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    125.352,
+    0.0,
+    -29.895
+   ],
+   "yaw_deg": -76.59,
+   "scale": 1.0,
+   "tint": [
+    0.949,
+    0.949,
+    0.949
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    124.17,
+    0.0,
+    -33.599
+   ],
+   "yaw_deg": -74.86,
+   "scale": 1.0,
+   "tint": [
+    0.989,
+    0.989,
+    0.989
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    125.632,
+    0.0,
+    -34.11
+   ],
+   "yaw_deg": -74.86,
+   "scale": 1.0,
+   "tint": [
+    0.896,
+    0.898,
+    0.884
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    122.75,
+    0.0,
+    -37.469
+   ],
+   "yaw_deg": -73.03,
+   "scale": 1.0,
+   "tint": [
+    0.943,
+    0.943,
+    0.943
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    122.006,
+    0.0,
+    -37.175
+   ],
+   "yaw_deg": 106.97,
+   "scale": 1.0,
+   "tint": [
+    0.901,
+    0.883,
+    0.867
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    121.225,
+    0.0,
+    -41.0
+   ],
+   "yaw_deg": -71.31,
+   "scale": 1.0,
+   "tint": [
+    0.997,
+    0.997,
+    0.997
+   ]
+  },
+  {
+   "item": "shop_sign_2",
+   "position": [
+    119.807,
+    0.0,
+    -40.38
+   ],
+   "yaw_deg": -71.31,
+   "scale": 1.0,
+   "tint": [
+    0.887,
+    0.888,
+    0.88
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    119.6,
+    0.0,
+    -44.766
+   ],
+   "yaw_deg": -69.48,
+   "scale": 1.0,
+   "tint": [
+    0.971,
+    0.971,
+    0.971
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    118.16,
+    0.0,
+    -44.069
+   ],
+   "yaw_deg": -69.48,
+   "scale": 1.0,
+   "tint": [
+    0.99,
+    0.985,
+    0.974
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    117.688,
+    0.0,
+    -48.344
+   ],
+   "yaw_deg": -67.67,
+   "scale": 1.0,
+   "tint": [
+    0.969,
+    0.969,
+    0.969
+   ]
+  },
+  {
+   "item": "dipinto_2",
+   "position": [
+    119.056,
+    0.0,
+    -49.07
+   ],
+   "yaw_deg": -67.67,
+   "scale": 1.0,
+   "tint": [
+    0.93,
+    0.93,
+    0.904
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    115.736,
+    0.0,
+    -51.894
+   ],
+   "yaw_deg": -65.85,
+   "scale": 1.0,
+   "tint": [
+    0.984,
+    0.984,
+    0.984
+   ]
+  },
+  {
+   "item": "bench_wood",
+   "position": [
+    114.872,
+    0.0,
+    -51.392
+   ],
+   "yaw_deg": -65.85,
+   "scale": 1.0,
+   "tint": [
+    0.927,
+    0.924,
+    0.898
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    113.817,
+    0.0,
+    -55.148
+   ],
+   "yaw_deg": -64.15,
+   "scale": 1.0,
+   "tint": [
+    0.936,
+    0.936,
+    0.936
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    111.439,
+    0.0,
+    -58.666
+   ],
+   "yaw_deg": -62.24,
+   "scale": 1.0,
+   "tint": [
+    0.955,
+    0.955,
+    0.955
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    110.779,
+    0.0,
+    -58.216
+   ],
+   "yaw_deg": 117.75999999999999,
+   "scale": 1.0,
+   "tint": [
+    0.931,
+    0.917,
+    0.877
+   ]
+  },
+  {
+   "item": "shop_sign_1",
+   "position": [
+    110.16,
+    0.0,
+    -57.794
+   ],
+   "yaw_deg": -62.24,
+   "scale": 1.0,
+   "tint": [
+    0.9,
+    0.891,
+    0.922
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    109.201,
+    0.0,
+    -61.978
+   ],
+   "yaw_deg": -60.42,
+   "scale": 1.0,
+   "tint": [
+    0.966,
+    0.966,
+    0.966
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    110.449,
+    0.0,
+    -62.897
+   ],
+   "yaw_deg": -60.42,
+   "scale": 1.0,
+   "tint": [
+    0.969,
+    0.983,
+    0.933
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    106.747,
+    0.0,
+    -65.07
+   ],
+   "yaw_deg": -58.63,
+   "scale": 1.0,
+   "tint": [
+    0.938,
+    0.938,
+    0.938
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    104.263,
+    0.0,
+    -68.13
+   ],
+   "yaw_deg": -56.84,
+   "scale": 1.0,
+   "tint": [
+    0.938,
+    0.938,
+    0.938
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    103.043,
+    0.0,
+    -67.096
+   ],
+   "yaw_deg": -56.84,
+   "scale": 1.0,
+   "tint": [
+    0.977,
+    0.975,
+    0.943
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    101.7,
+    0.0,
+    -71.093
+   ],
+   "yaw_deg": -55.04,
+   "scale": 1.0,
+   "tint": [
+    0.962,
+    0.962,
+    0.962
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    98.837,
+    0.0,
+    -74.07
+   ],
+   "yaw_deg": -53.15,
+   "scale": 1.0,
+   "tint": [
+    0.935,
+    0.935,
+    0.935
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    99.947,
+    0.0,
+    -75.15
+   ],
+   "yaw_deg": -53.15,
+   "scale": 1.0,
+   "tint": [
+    0.874,
+    0.883,
+    0.898
+   ]
+  },
+  {
+   "item": "shop_sign_2",
+   "position": [
+    97.727,
+    0.0,
+    -72.99
+   ],
+   "yaw_deg": -53.15,
+   "scale": 1.0,
+   "tint": [
+    0.943,
+    0.941,
+    0.924
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    96.142,
+    0.0,
+    -76.872
+   ],
+   "yaw_deg": -51.36,
+   "scale": 1.0,
+   "tint": [
+    0.936,
+    0.936,
+    0.936
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    95.587,
+    0.0,
+    -76.296
+   ],
+   "yaw_deg": 128.64,
+   "scale": 1.0,
+   "tint": [
+    0.923,
+    0.919,
+    0.887
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    93.102,
+    0.0,
+    -79.59
+   ],
+   "yaw_deg": -49.47,
+   "scale": 1.0,
+   "tint": [
+    0.96,
+    0.96,
+    0.96
+   ]
+  },
+  {
+   "item": "bench_wood",
+   "position": [
+    92.433,
+    0.0,
+    -78.847
+   ],
+   "yaw_deg": -49.47,
+   "scale": 1.0,
+   "tint": [
+    0.993,
+    0.966,
+    0.974
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    90.05,
+    0.0,
+    -82.292
+   ],
+   "yaw_deg": -47.58,
+   "scale": 1.0,
+   "tint": [
+    0.94,
+    0.94,
+    0.94
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    87.095,
+    0.0,
+    -84.691
+   ],
+   "yaw_deg": -45.8,
+   "scale": 1.0,
+   "tint": [
+    0.945,
+    0.945,
+    0.945
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    88.055,
+    0.0,
+    -85.906
+   ],
+   "yaw_deg": -45.8,
+   "scale": 1.0,
+   "tint": [
+    0.969,
+    0.946,
+    0.93
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    83.885,
+    0.0,
+    -87.121
+   ],
+   "yaw_deg": -43.92,
+   "scale": 1.0,
+   "tint": [
+    0.987,
+    0.987,
+    0.987
+   ]
+  },
+  {
+   "item": "shop_sign_1",
+   "position": [
+    82.964,
+    0.0,
+    -85.875
+   ],
+   "yaw_deg": -43.92,
+   "scale": 1.0,
+   "tint": [
+    0.893,
+    0.876,
+    0.84
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    82.934,
+    0.0,
+    -85.835
+   ],
+   "yaw_deg": -43.92,
+   "scale": 1.0,
+   "tint": [
+    0.925,
+    0.913,
+    0.866
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    80.653,
+    0.0,
+    -89.503
+   ],
+   "yaw_deg": -42.02,
+   "scale": 1.0,
+   "tint": [
+    0.942,
+    0.942,
+    0.942
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    77.312,
+    0.0,
+    -91.665
+   ],
+   "yaw_deg": -40.14,
+   "scale": 1.0,
+   "tint": [
+    0.968,
+    0.968,
+    0.968
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    76.877,
+    0.0,
+    -90.994
+   ],
+   "yaw_deg": 139.86,
+   "scale": 1.0,
+   "tint": [
+    0.923,
+    0.935,
+    0.883
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    73.971,
+    0.0,
+    -93.827
+   ],
+   "yaw_deg": -38.25,
+   "scale": 1.0,
+   "tint": [
+    0.998,
+    0.998,
+    0.998
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    74.773,
+    0.0,
+    -95.153
+   ],
+   "yaw_deg": -38.25,
+   "scale": 1.0,
+   "tint": [
+    0.968,
+    0.94,
+    0.906
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    70.338,
+    0.0,
+    -95.885
+   ],
+   "yaw_deg": -36.26,
+   "scale": 1.0,
+   "tint": [
+    0.935,
+    0.935,
+    0.935
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    66.888,
+    0.0,
+    -97.786
+   ],
+   "yaw_deg": -34.37,
+   "scale": 1.0,
+   "tint": [
+    0.933,
+    0.933,
+    0.933
+   ]
+  },
+  {
+   "item": "shop_sign_0",
+   "position": [
+    66.168,
+    0.0,
+    -96.414
+   ],
+   "yaw_deg": -34.37,
+   "scale": 1.0,
+   "tint": [
+    0.957,
+    0.941,
+    0.913
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    63.391,
+    0.0,
+    -99.552
+   ],
+   "yaw_deg": -32.49,
+   "scale": 1.0,
+   "tint": [
+    0.983,
+    0.983,
+    0.983
+   ]
+  },
+  {
+   "item": "bench_wood",
+   "position": [
+    62.953,
+    0.0,
+    -98.654
+   ],
+   "yaw_deg": -32.49,
+   "scale": 1.0,
+   "tint": [
+    0.881,
+    0.873,
+    0.894
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    59.644,
+    0.0,
+    -101.295
+   ],
+   "yaw_deg": -30.49,
+   "scale": 1.0,
+   "tint": [
+    0.949,
+    0.949,
+    0.949
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    60.281,
+    0.0,
+    -102.707
+   ],
+   "yaw_deg": -30.49,
+   "scale": 1.0,
+   "tint": [
+    0.983,
+    0.982,
+    0.967
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    58.986,
+    0.0,
+    -99.837
+   ],
+   "yaw_deg": -30.49,
+   "scale": 1.0,
+   "tint": [
+    0.958,
+    0.938,
+    0.915
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    56.088,
+    0.0,
+    -102.882
+   ],
+   "yaw_deg": -28.6,
+   "scale": 1.0,
+   "tint": [
+    0.997,
+    0.997,
+    0.997
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    55.78,
+    0.0,
+    -102.144
+   ],
+   "yaw_deg": 151.4,
+   "scale": 1.0,
+   "tint": [
+    0.93,
+    0.925,
+    0.892
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    52.264,
+    0.0,
+    -104.362
+   ],
+   "yaw_deg": -26.6,
+   "scale": 1.0,
+   "tint": [
+    0.951,
+    0.951,
+    0.951
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    48.652,
+    0.0,
+    -105.76
+   ],
+   "yaw_deg": -24.7,
+   "scale": 1.0,
+   "tint": [
+    0.941,
+    0.941,
+    0.941
+   ]
+  },
+  {
+   "item": "shop_sign_2",
+   "position": [
+    48.138,
+    0.0,
+    -104.298
+   ],
+   "yaw_deg": -24.7,
+   "scale": 1.0,
+   "tint": [
+    0.886,
+    0.888,
+    0.867
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    44.77,
+    0.0,
+    -106.997
+   ],
+   "yaw_deg": -22.71,
+   "scale": 1.0,
+   "tint": [
+    0.934,
+    0.934,
+    0.934
+   ]
+  },
+  {
+   "item": "dipinto_2",
+   "position": [
+    45.243,
+    0.0,
+    -108.473
+   ],
+   "yaw_deg": -22.71,
+   "scale": 1.0,
+   "tint": [
+    0.895,
+    0.879,
+    0.865
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    40.885,
+    0.0,
+    -108.22
+   ],
+   "yaw_deg": -20.7,
+   "scale": 1.0,
+   "tint": [
+    0.938,
+    0.938,
+    0.938
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    37.183,
+    0.0,
+    -109.208
+   ],
+   "yaw_deg": -18.8,
+   "scale": 1.0,
+   "tint": [
+    0.95,
+    0.95,
+    0.95
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    33.25,
+    0.0,
+    -110.18
+   ],
+   "yaw_deg": -16.79,
+   "scale": 1.0,
+   "tint": [
+    0.996,
+    0.996,
+    0.996
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    33.07,
+    0.0,
+    -109.4
+   ],
+   "yaw_deg": 163.21,
+   "scale": 1.0,
+   "tint": [
+    0.953,
+    0.95,
+    0.93
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    32.89,
+    0.0,
+    -108.621
+   ],
+   "yaw_deg": -16.79,
+   "scale": 1.0,
+   "tint": [
+    0.895,
+    0.888,
+    0.868
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    29.301,
+    0.0,
+    -111.042
+   ],
+   "yaw_deg": -14.78,
+   "scale": 1.0,
+   "tint": [
+    0.968,
+    0.968,
+    0.968
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    29.607,
+    0.0,
+    -112.561
+   ],
+   "yaw_deg": -14.78,
+   "scale": 1.0,
+   "tint": [
+    0.944,
+    0.94,
+    0.927
+   ]
+  },
+  {
+   "item": "shop_sign_2",
+   "position": [
+    28.994,
+    0.0,
+    -109.523
+   ],
+   "yaw_deg": -14.78,
+   "scale": 1.0,
+   "tint": [
+    0.972,
+    0.956,
+    0.935
+   ]
+  },
+  {
+   "item": "bench_wood",
+   "position": [
+    29.103,
+    0.0,
+    -110.062
+   ],
+   "yaw_deg": -14.78,
+   "scale": 1.0,
+   "tint": [
+    0.914,
+    0.906,
+    0.917
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    25.331,
+    0.0,
+    -111.766
+   ],
+   "yaw_deg": -12.77,
+   "scale": 1.0,
+   "tint": [
+    0.988,
+    0.988,
+    0.988
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    17.362,
+    0.0,
+    112.918
+   ],
+   "yaw_deg": -171.26,
+   "scale": 1.0,
+   "tint": [
+    0.972,
+    0.972,
+    0.972
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    21.357,
+    0.0,
+    112.437
+   ],
+   "yaw_deg": -169.25,
+   "scale": 1.0,
+   "tint": [
+    0.979,
+    0.979,
+    0.979
+   ]
+  },
+  {
+   "item": "dipinto_2",
+   "position": [
+    21.579,
+    0.0,
+    113.971
+   ],
+   "yaw_deg": -169.25,
+   "scale": 1.0,
+   "tint": [
+    0.908,
+    0.894,
+    0.91
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    25.331,
+    0.0,
+    111.766
+   ],
+   "yaw_deg": -167.23,
+   "scale": 1.0,
+   "tint": [
+    0.976,
+    0.976,
+    0.976
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    25.195,
+    0.0,
+    110.978
+   ],
+   "yaw_deg": 12.77000000000001,
+   "scale": 1.0,
+   "tint": [
+    0.966,
+    0.956,
+    0.956
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    29.301,
+    0.0,
+    111.042
+   ],
+   "yaw_deg": -165.22,
+   "scale": 1.0,
+   "tint": [
+    0.951,
+    0.951,
+    0.951
+   ]
+  },
+  {
+   "item": "shop_sign_0",
+   "position": [
+    28.994,
+    0.0,
+    109.523
+   ],
+   "yaw_deg": -165.22,
+   "scale": 1.0,
+   "tint": [
+    0.911,
+    0.9,
+    0.912
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    33.25,
+    0.0,
+    110.18
+   ],
+   "yaw_deg": -163.21,
+   "scale": 1.0,
+   "tint": [
+    0.957,
+    0.957,
+    0.957
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    32.89,
+    0.0,
+    108.621
+   ],
+   "yaw_deg": -163.21,
+   "scale": 1.0,
+   "tint": [
+    0.977,
+    0.985,
+    0.978
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    37.183,
+    0.0,
+    109.208
+   ],
+   "yaw_deg": -161.2,
+   "scale": 1.0,
+   "tint": [
+    0.95,
+    0.95,
+    0.95
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    37.574,
+    0.0,
+    110.707
+   ],
+   "yaw_deg": -161.2,
+   "scale": 1.0,
+   "tint": [
+    0.928,
+    0.906,
+    0.908
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    40.885,
+    0.0,
+    108.22
+   ],
+   "yaw_deg": -159.3,
+   "scale": 1.0,
+   "tint": [
+    0.944,
+    0.944,
+    0.944
+   ]
+  },
+  {
+   "item": "bench_wood",
+   "position": [
+    40.607,
+    0.0,
+    107.26
+   ],
+   "yaw_deg": -159.3,
+   "scale": 1.0,
+   "tint": [
+    0.984,
+    0.994,
+    0.942
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    44.77,
+    0.0,
+    106.997
+   ],
+   "yaw_deg": -157.29,
+   "scale": 1.0,
+   "tint": [
+    0.953,
+    0.953,
+    0.953
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    48.652,
+    0.0,
+    105.76
+   ],
+   "yaw_deg": -155.3,
+   "scale": 1.0,
+   "tint": [
+    0.983,
+    0.983,
+    0.983
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    48.387,
+    0.0,
+    105.005
+   ],
+   "yaw_deg": 24.69999999999999,
+   "scale": 1.0,
+   "tint": [
+    0.893,
+    0.881,
+    0.847
+   ]
+  },
+  {
+   "item": "shop_sign_2",
+   "position": [
+    48.138,
+    0.0,
+    104.298
+   ],
+   "yaw_deg": -155.3,
+   "scale": 1.0,
+   "tint": [
+    0.996,
+    0.989,
+    0.95
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    52.264,
+    0.0,
+    104.362
+   ],
+   "yaw_deg": -153.4,
+   "scale": 1.0,
+   "tint": [
+    0.944,
+    0.944,
+    0.944
+   ]
+  },
+  {
+   "item": "dipinto_2",
+   "position": [
+    52.818,
+    0.0,
+    105.809
+   ],
+   "yaw_deg": -153.4,
+   "scale": 1.0,
+   "tint": [
+    0.898,
+    0.901,
+    0.919
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    56.088,
+    0.0,
+    102.882
+   ],
+   "yaw_deg": -151.4,
+   "scale": 1.0,
+   "tint": [
+    0.976,
+    0.976,
+    0.976
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    59.644,
+    0.0,
+    101.295
+   ],
+   "yaw_deg": -149.51,
+   "scale": 1.0,
+   "tint": [
+    0.971,
+    0.971,
+    0.971
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    58.986,
+    0.0,
+    99.837
+   ],
+   "yaw_deg": -149.51,
+   "scale": 1.0,
+   "tint": [
+    0.969,
+    0.969,
+    0.962
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    63.391,
+    0.0,
+    99.552
+   ],
+   "yaw_deg": -147.51,
+   "scale": 1.0,
+   "tint": [
+    0.943,
+    0.943,
+    0.943
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    66.888,
+    0.0,
+    97.786
+   ],
+   "yaw_deg": -145.63,
+   "scale": 1.0,
+   "tint": [
+    0.932,
+    0.932,
+    0.932
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    67.607,
+    0.0,
+    99.158
+   ],
+   "yaw_deg": -145.63,
+   "scale": 1.0,
+   "tint": [
+    0.915,
+    0.921,
+    0.863
+   ]
+  },
+  {
+   "item": "shop_sign_2",
+   "position": [
+    66.168,
+    0.0,
+    96.414
+   ],
+   "yaw_deg": -145.63,
+   "scale": 1.0,
+   "tint": [
+    0.895,
+    0.907,
+    0.898
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    70.338,
+    0.0,
+    95.885
+   ],
+   "yaw_deg": -143.74,
+   "scale": 1.0,
+   "tint": [
+    0.953,
+    0.953,
+    0.953
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    69.946,
+    0.0,
+    95.189
+   ],
+   "yaw_deg": 36.25999999999999,
+   "scale": 1.0,
+   "tint": [
+    0.913,
+    0.888,
+    0.871
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    73.971,
+    0.0,
+    93.827
+   ],
+   "yaw_deg": -141.75,
+   "scale": 1.0,
+   "tint": [
+    0.99,
+    0.99,
+    0.99
+   ]
+  },
+  {
+   "item": "bench_wood",
+   "position": [
+    73.454,
+    0.0,
+    92.971
+   ],
+   "yaw_deg": -141.75,
+   "scale": 1.0,
+   "tint": [
+    0.983,
+    0.996,
+    0.972
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    77.312,
+    0.0,
+    91.665
+   ],
+   "yaw_deg": -139.86,
+   "scale": 1.0,
+   "tint": [
+    0.932,
+    0.932,
+    0.932
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    80.653,
+    0.0,
+    89.503
+   ],
+   "yaw_deg": -137.98,
+   "scale": 1.0,
+   "tint": [
+    0.978,
+    0.978,
+    0.978
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    81.534,
+    0.0,
+    90.777
+   ],
+   "yaw_deg": -137.98,
+   "scale": 1.0,
+   "tint": [
+    0.896,
+    0.911,
+    0.882
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    83.885,
+    0.0,
+    87.121
+   ],
+   "yaw_deg": -136.08,
+   "scale": 1.0,
+   "tint": [
+    0.939,
+    0.939,
+    0.939
+   ]
+  },
+  {
+   "item": "shop_sign_1",
+   "position": [
+    82.964,
+    0.0,
+    85.875
+   ],
+   "yaw_deg": -136.08,
+   "scale": 1.0,
+   "tint": [
+    0.945,
+    0.928,
+    0.928
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    82.934,
+    0.0,
+    85.835
+   ],
+   "yaw_deg": -136.08,
+   "scale": 1.0,
+   "tint": [
+    0.938,
+    0.952,
+    0.93
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    87.095,
+    0.0,
+    84.691
+   ],
+   "yaw_deg": -134.2,
+   "scale": 1.0,
+   "tint": [
+    0.967,
+    0.967,
+    0.967
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    90.05,
+    0.0,
+    82.292
+   ],
+   "yaw_deg": -132.42,
+   "scale": 1.0,
+   "tint": [
+    0.941,
+    0.941,
+    0.941
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    89.535,
+    0.0,
+    81.68
+   ],
+   "yaw_deg": 47.58000000000001,
+   "scale": 1.0,
+   "tint": [
+    0.931,
+    0.943,
+    0.884
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    93.102,
+    0.0,
+    79.59
+   ],
+   "yaw_deg": -130.53,
+   "scale": 1.0,
+   "tint": [
+    0.936,
+    0.936,
+    0.936
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    94.138,
+    0.0,
+    80.742
+   ],
+   "yaw_deg": -130.53,
+   "scale": 1.0,
+   "tint": [
+    0.958,
+    0.939,
+    0.908
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    96.142,
+    0.0,
+    76.872
+   ],
+   "yaw_deg": -128.64,
+   "scale": 1.0,
+   "tint": [
+    0.937,
+    0.937,
+    0.937
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    98.837,
+    0.0,
+    74.07
+   ],
+   "yaw_deg": -126.85,
+   "scale": 1.0,
+   "tint": [
+    0.959,
+    0.959,
+    0.959
+   ]
+  },
+  {
+   "item": "shop_sign_2",
+   "position": [
+    97.727,
+    0.0,
+    72.99
+   ],
+   "yaw_deg": -126.85,
+   "scale": 1.0,
+   "tint": [
+    0.959,
+    0.947,
+    0.913
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    101.7,
+    0.0,
+    71.093
+   ],
+   "yaw_deg": -124.96,
+   "scale": 1.0,
+   "tint": [
+    0.971,
+    0.971,
+    0.971
+   ]
+  },
+  {
+   "item": "bench_wood",
+   "position": [
+    100.959,
+    0.0,
+    70.421
+   ],
+   "yaw_deg": -124.96,
+   "scale": 1.0,
+   "tint": [
+    0.903,
+    0.891,
+    0.89
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    104.263,
+    0.0,
+    68.13
+   ],
+   "yaw_deg": -123.16,
+   "scale": 1.0,
+   "tint": [
+    0.994,
+    0.994,
+    0.994
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    105.444,
+    0.0,
+    69.131
+   ],
+   "yaw_deg": -123.16,
+   "scale": 1.0,
+   "tint": [
+    0.926,
+    0.926,
+    0.918
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    103.043,
+    0.0,
+    67.096
+   ],
+   "yaw_deg": -123.16,
+   "scale": 1.0,
+   "tint": [
+    0.937,
+    0.958,
+    0.906
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    106.747,
+    0.0,
+    65.07
+   ],
+   "yaw_deg": -121.37,
+   "scale": 1.0,
+   "tint": [
+    0.959,
+    0.959,
+    0.959
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    106.12,
+    0.0,
+    64.574
+   ],
+   "yaw_deg": 58.629999999999995,
+   "scale": 1.0,
+   "tint": [
+    0.875,
+    0.885,
+    0.879
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    109.201,
+    0.0,
+    61.978
+   ],
+   "yaw_deg": -119.58,
+   "scale": 1.0,
+   "tint": [
+    0.975,
+    0.975,
+    0.975
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    111.439,
+    0.0,
+    58.666
+   ],
+   "yaw_deg": -117.76,
+   "scale": 1.0,
+   "tint": [
+    0.933,
+    0.933,
+    0.933
+   ]
+  },
+  {
+   "item": "shop_sign_1",
+   "position": [
+    110.16,
+    0.0,
+    57.794
+   ],
+   "yaw_deg": -117.76,
+   "scale": 1.0,
+   "tint": [
+    0.88,
+    0.883,
+    0.859
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    113.677,
+    0.0,
+    55.355
+   ],
+   "yaw_deg": -115.96,
+   "scale": 1.0,
+   "tint": [
+    0.968,
+    0.968,
+    0.968
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    114.987,
+    0.0,
+    56.181
+   ],
+   "yaw_deg": -115.96,
+   "scale": 1.0,
+   "tint": [
+    0.969,
+    0.971,
+    0.926
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    115.736,
+    0.0,
+    51.894
+   ],
+   "yaw_deg": -114.15,
+   "scale": 1.0,
+   "tint": [
+    0.967,
+    0.967,
+    0.967
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    117.688,
+    0.0,
+    48.344
+   ],
+   "yaw_deg": -112.33,
+   "scale": 1.0,
+   "tint": [
+    0.938,
+    0.938,
+    0.938
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    119.6,
+    0.0,
+    44.766
+   ],
+   "yaw_deg": -110.52,
+   "scale": 1.0,
+   "tint": [
+    0.949,
+    0.949,
+    0.949
+   ]
+  },
+  {
+   "item": "thermopolium_counter",
+   "position": [
+    118.88,
+    0.0,
+    44.418
+   ],
+   "yaw_deg": 69.48,
+   "scale": 1.0,
+   "tint": [
+    0.956,
+    0.961,
+    0.939
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    118.16,
+    0.0,
+    44.069
+   ],
+   "yaw_deg": -110.52,
+   "scale": 1.0,
+   "tint": [
+    0.951,
+    0.95,
+    0.933
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    121.124,
+    0.0,
+    41.235
+   ],
+   "yaw_deg": -108.8,
+   "scale": 1.0,
+   "tint": [
+    0.988,
+    0.988,
+    0.988
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    122.541,
+    0.0,
+    41.859
+   ],
+   "yaw_deg": -108.8,
+   "scale": 1.0,
+   "tint": [
+    0.906,
+    0.911,
+    0.929
+   ]
+  },
+  {
+   "item": "shop_sign_0",
+   "position": [
+    119.707,
+    0.0,
+    40.612
+   ],
+   "yaw_deg": -108.8,
+   "scale": 1.0,
+   "tint": [
+    0.884,
+    0.904,
+    0.906
+   ]
+  },
+  {
+   "item": "bench_wood",
+   "position": [
+    120.21,
+    0.0,
+    40.833
+   ],
+   "yaw_deg": -108.8,
+   "scale": 1.0,
+   "tint": [
+    0.974,
+    0.954,
+    0.924
+   ]
+  },
+  {
+   "item": "portico_bay_imperial",
+   "position": [
+    122.75,
+    0.0,
+    37.469
+   ],
+   "yaw_deg": -106.97,
+   "scale": 1.0,
+   "tint": [
+    0.998,
+    0.998,
+    0.998
+   ]
+  },
+  {
+   "item": "stall_masonry_0",
+   "position": [
+    86.195,
+    0.0,
+    -75.077
+   ],
+   "yaw_deg": -52.005329166591444,
+   "scale": 0.99,
+   "tint": [
+    0.908,
+    0.906,
+    0.882
+   ]
+  },
+  {
+   "item": "amphora_group",
+   "position": [
+    89.282,
+    0.0,
+    -74.115
+   ],
+   "yaw_deg": 27.999234188188534,
+   "scale": 1.044,
+   "tint": [
+    0.977,
+    0.951,
+    0.935
+   ]
+  },
+  {
+   "item": "stall_masonry_1",
+   "position": [
+    66.726,
+    0.0,
+    -89.22
+   ],
+   "yaw_deg": -40.448550717544165,
+   "scale": 1.027,
+   "tint": [
+    0.909,
+    0.916,
+    0.888
+   ]
+  },
+  {
+   "item": "stall_masonry_2",
+   "position": [
+    41.507,
+    0.0,
+    -99.597
+   ],
+   "yaw_deg": -17.850576137330712,
+   "scale": 1.044,
+   "tint": [
+    0.887,
+    0.893,
+    0.88
+   ]
+  },
+  {
+   "item": "dolium",
+   "position": [
+    44.764,
+    0.0,
+    -100.139
+   ],
+   "yaw_deg": 139.6726745002471,
+   "scale": 0.854,
+   "tint": [
+    0.954,
+    0.945,
+    0.916
+   ]
+  },
+  {
+   "item": "stall_masonry_0",
+   "position": [
+    -50.757,
+    0.0,
+    -96.376
+   ],
+   "yaw_deg": 34.577826155585726,
+   "scale": 0.961,
+   "tint": [
+    0.939,
+    0.958,
+    0.936
+   ]
+  },
+  {
+   "item": "stall_masonry_1",
+   "position": [
+    -100.022,
+    0.0,
+    -60.52
+   ],
+   "yaw_deg": 63.65551954063424,
+   "scale": 1.045,
+   "tint": [
+    0.921,
+    0.92,
+    0.897
+   ]
+  },
+  {
+   "item": "amphora_group",
+   "position": [
+    -102.658,
+    0.0,
+    -59.71
+   ],
+   "yaw_deg": 285.6778982107183,
+   "scale": 0.865,
+   "tint": [
+    0.895,
+    0.887,
+    0.868
+   ]
+  },
+  {
+   "item": "stall_masonry_2",
+   "position": [
+    -114.381,
+    0.0,
+    -35.265
+   ],
+   "yaw_deg": 79.04662195307034,
+   "scale": 1.002,
+   "tint": [
+    0.955,
+    0.953,
+    0.892
+   ]
+  },
+  {
+   "item": "amphora_group",
+   "position": [
+    -117.004,
+    0.0,
+    -35.17
+   ],
+   "yaw_deg": 139.53765091101567,
+   "scale": 0.877,
+   "tint": [
+    0.938,
+    0.92,
+    0.932
+   ]
+  },
+  {
+   "item": "stall_masonry_0",
+   "position": [
+    -103.886,
+    0.0,
+    55.586
+   ],
+   "yaw_deg": 126.20513309034749,
+   "scale": 0.962,
+   "tint": [
+    0.97,
+    0.941,
+    0.912
+   ]
+  },
+  {
+   "item": "amphora_group",
+   "position": [
+    -104.015,
+    0.0,
+    58.719
+   ],
+   "yaw_deg": 37.712530189520706,
+   "scale": 0.864,
+   "tint": [
+    0.904,
+    0.889,
+    0.883
+   ]
+  },
+  {
+   "item": "stall_masonry_1",
+   "position": [
+    -87.617,
+    0.0,
+    74.414
+   ],
+   "yaw_deg": 123.78808867941373,
+   "scale": 0.986,
+   "tint": [
+    0.929,
+    0.907,
+    0.894
+   ]
+  },
+  {
+   "item": "stall_masonry_2",
+   "position": [
+    -64.71,
+    0.0,
+    90.342
+   ],
+   "yaw_deg": 137.0947000984713,
+   "scale": 0.991,
+   "tint": [
+    0.904,
+    0.887,
+    0.903
+   ]
+  },
+  {
+   "item": "stall_masonry_0",
+   "position": [
+    52.134,
+    0.0,
+    96.07
+   ],
+   "yaw_deg": -153.1524942260974,
+   "scale": 1.021,
+   "tint": [
+    0.949,
+    0.97,
+    0.968
+   ]
+  },
+  {
+   "item": "dolium",
+   "position": [
+    49.958,
+    0.0,
+    98.097
+   ],
+   "yaw_deg": 215.45088489168984,
+   "scale": 0.94,
+   "tint": [
+    0.95,
+    0.935,
+    0.899
+   ]
+  },
+  {
+   "item": "stall_masonry_1",
+   "position": [
+    72.601,
+    0.0,
+    85.435
+   ],
+   "yaw_deg": -148.46703727357757,
+   "scale": 1.035,
+   "tint": [
+    0.953,
+    0.943,
+    0.894
+   ]
+  },
+  {
+   "item": "amphora_group",
+   "position": [
+    70.826,
+    0.0,
+    87.926
+   ],
+   "yaw_deg": 281.80225256418447,
+   "scale": 0.929,
+   "tint": [
+    0.908,
+    0.92,
+    0.905
+   ]
+  },
+  {
+   "item": "stall_masonry_2",
+   "position": [
+    95.003,
+    0.0,
+    66.663
+   ],
+   "yaw_deg": -119.50206645769244,
+   "scale": 1.002,
+   "tint": [
+    0.911,
+    0.897,
+    0.899
+   ]
+  },
+  {
+   "item": "dolium",
+   "position": [
+    93.849,
+    0.0,
+    69.911
+   ],
+   "yaw_deg": 4.581693416319679,
+   "scale": 0.936,
+   "tint": [
+    0.937,
+    0.929,
+    0.915
+   ]
+  },
+  {
+   "item": "cart_plaustrum",
+   "position": [
+    -17.225,
+    0.0,
+    -101.939
+   ],
+   "yaw_deg": 90.73208411331166,
+   "scale": 1.0,
+   "tint": [
+    0.927,
+    0.916,
+    0.901
+   ]
+  },
+  {
+   "item": "cart_plaustrum",
+   "position": [
+    -110.423,
+    0.0,
+    35.781
+   ],
+   "yaw_deg": 190.44452405382663,
+   "scale": 1.0,
+   "tint": [
+    0.967,
+    0.985,
+    0.928
+   ]
+  },
+  {
+   "item": "cart_plaustrum",
+   "position": [
+    17.225,
+    0.0,
+    101.939
+   ],
+   "yaw_deg": -79.55969378646914,
+   "scale": 1.0,
+   "tint": [
+    0.964,
+    0.981,
+    0.966
+   ]
+  },
+  {
+   "item": "cart_plaustrum",
+   "position": [
+    110.423,
+    0.0,
+    35.781
+   ],
+   "yaw_deg": -22.282580215709807,
+   "scale": 1.0,
+   "tint": [
+    0.912,
+    0.936,
+    0.919
+   ]
+  },
+  {
+   "item": "torch_post",
+   "position": [
+    100.403,
+    0.0,
+    5.584
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.917,
+    0.896,
+    0.908
+   ]
+  },
+  {
+   "item": "torch_post",
+   "position": [
+    100.403,
+    0.0,
+    -5.584
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.96,
+    0.926,
+    0.9
+   ]
+  },
+  {
+   "item": "torch_post",
+   "position": [
+    5.367,
+    0.0,
+    -84.447
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.97,
+    0.972,
+    0.981
+   ]
+  },
+  {
+   "item": "torch_post",
+   "position": [
+    -5.367,
+    0.0,
+    -84.447
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.994,
+    0.998,
+    0.983
+   ]
+  },
+  {
+   "item": "torch_post",
+   "position": [
+    -100.403,
+    0.0,
+    -5.584
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.906,
+    0.887,
+    0.898
+   ]
+  },
+  {
+   "item": "torch_post",
+   "position": [
+    -100.403,
+    0.0,
+    5.584
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.888,
+    0.884,
+    0.901
+   ]
+  },
+  {
+   "item": "torch_post",
+   "position": [
+    -5.367,
+    0.0,
+    84.447
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.963,
+    0.973,
+    0.963
+   ]
+  },
+  {
+   "item": "torch_post",
+   "position": [
+    5.367,
+    0.0,
+    84.447
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.888,
+    0.89,
+    0.869
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    69.235,
+    0.0,
+    124.376
+   ],
+   "yaw_deg": 99.32491423963229,
+   "scale": 1.053,
+   "tint": [
+    0.946,
+    0.951,
+    0.925
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    -110.204,
+    0.0,
+    -64.885
+   ],
+   "yaw_deg": 186.36068731878322,
+   "scale": 0.917,
+   "tint": [
+    0.877,
+    0.997,
+    0.87
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    78.544,
+    0.0,
+    117.314
+   ],
+   "yaw_deg": 160.8298882464718,
+   "scale": 1.079,
+   "tint": [
+    0.99,
+    0.955,
+    0.939
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    153.688,
+    0.0,
+    -5.375
+   ],
+   "yaw_deg": 310.0344161806645,
+   "scale": 0.971,
+   "tint": [
+    0.984,
+    0.996,
+    0.992
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    138.423,
+    0.0,
+    6.241
+   ],
+   "yaw_deg": 15.193440879105555,
+   "scale": 0.956,
+   "tint": [
+    0.926,
+    0.907,
+    0.961
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -141.985,
+    0.0,
+    24.733
+   ],
+   "yaw_deg": 294.2247558018392,
+   "scale": 1.036,
+   "tint": [
+    0.964,
+    0.903,
+    0.908
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -118.427,
+    0.0,
+    65.359
+   ],
+   "yaw_deg": 238.11313352448005,
+   "scale": 0.879,
+   "tint": [
+    1.0,
+    0.988,
+    0.977
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    -47.806,
+    0.0,
+    130.125
+   ],
+   "yaw_deg": 64.37034528777305,
+   "scale": 0.925,
+   "tint": [
+    0.912,
+    0.956,
+    0.938
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    92.972,
+    0.0,
+    -109.687
+   ],
+   "yaw_deg": 20.73666550271525,
+   "scale": 1.083,
+   "tint": [
+    0.912,
+    0.991,
+    0.975
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -131.361,
+    0.0,
+    -66.665
+   ],
+   "yaw_deg": 312.83791791097156,
+   "scale": 1.188,
+   "tint": [
+    0.91,
+    0.945,
+    0.922
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    139.758,
+    0.0,
+    1.524
+   ],
+   "yaw_deg": 48.84294177333687,
+   "scale": 0.965,
+   "tint": [
+    0.887,
+    0.933,
+    0.896
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -61.474,
+    0.0,
+    116.961
+   ],
+   "yaw_deg": 30.294403491789083,
+   "scale": 1.13,
+   "tint": [
+    0.987,
+    0.965,
+    0.855
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -23.915,
+    0.0,
+    -131.06
+   ],
+   "yaw_deg": 297.55210990335416,
+   "scale": 0.991,
+   "tint": [
+    0.89,
+    0.968,
+    0.972
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    84.984,
+    0.0,
+    103.064
+   ],
+   "yaw_deg": 277.08652625704957,
+   "scale": 1.169,
+   "tint": [
+    0.922,
+    0.959,
+    0.89
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    20.054,
+    0.0,
+    -135.997
+   ],
+   "yaw_deg": 119.39142767822918,
+   "scale": 1.16,
+   "tint": [
+    0.885,
+    0.952,
+    0.905
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    -13.657,
+    0.0,
+    -135.912
+   ],
+   "yaw_deg": 170.34451358740677,
+   "scale": 1.147,
+   "tint": [
+    0.868,
+    0.93,
+    0.962
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -18.893,
+    0.0,
+    123.635
+   ],
+   "yaw_deg": 354.37441782142884,
+   "scale": 0.84,
+   "tint": [
+    0.88,
+    0.924,
+    0.935
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    109.944,
+    0.0,
+    95.472
+   ],
+   "yaw_deg": 101.11350552029148,
+   "scale": 1.2,
+   "tint": [
+    0.856,
+    0.948,
+    0.943
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    -144.705,
+    0.0,
+    40.296
+   ],
+   "yaw_deg": 29.793722483684935,
+   "scale": 0.926,
+   "tint": [
+    0.873,
+    0.956,
+    0.864
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    67.098,
+    0.0,
+    -106.945
+   ],
+   "yaw_deg": 351.9176258847115,
+   "scale": 0.812,
+   "tint": [
+    0.937,
+    0.911,
+    0.956
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    47.698,
+    0.0,
+    -130.367
+   ],
+   "yaw_deg": 129.47040456740507,
+   "scale": 1.017,
+   "tint": [
+    0.972,
+    0.993,
+    0.885
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    27.14,
+    0.0,
+    123.49
+   ],
+   "yaw_deg": 229.47597238507544,
+   "scale": 0.904,
+   "tint": [
+    0.916,
+    0.994,
+    0.963
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    128.138,
+    0.0,
+    61.441
+   ],
+   "yaw_deg": 324.54958148625593,
+   "scale": 1.001,
+   "tint": [
+    0.948,
+    0.907,
+    0.967
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    87.645,
+    0.0,
+    95.246
+   ],
+   "yaw_deg": 351.06567039507223,
+   "scale": 0.93,
+   "tint": [
+    0.937,
+    0.935,
+    0.96
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    77.243,
+    0.0,
+    107.99
+   ],
+   "yaw_deg": 287.096417491104,
+   "scale": 1.099,
+   "tint": [
+    0.858,
+    0.964,
+    0.953
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    146.98,
+    0.0,
+    35.912
+   ],
+   "yaw_deg": 11.383578376630341,
+   "scale": 0.845,
+   "tint": [
+    0.892,
+    0.941,
+    0.873
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    82.014,
+    0.0,
+    -113.534
+   ],
+   "yaw_deg": 9.21792529720381,
+   "scale": 0.93,
+   "tint": [
+    0.948,
+    0.931,
+    0.993
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    103.873,
+    0.0,
+    -99.273
+   ],
+   "yaw_deg": 314.7531686664661,
+   "scale": 1.02,
+   "tint": [
+    0.955,
+    0.961,
+    0.852
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    91.275,
+    0.0,
+    -97.802
+   ],
+   "yaw_deg": 152.92855404204914,
+   "scale": 0.87,
+   "tint": [
+    0.868,
+    0.931,
+    0.978
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -61.603,
+    0.0,
+    105.83
+   ],
+   "yaw_deg": 137.86159100517196,
+   "scale": 1.153,
+   "tint": [
+    0.98,
+    0.991,
+    0.9
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    129.647,
+    0.0,
+    -14.444
+   ],
+   "yaw_deg": 123.51174894449201,
+   "scale": 0.842,
+   "tint": [
+    0.859,
+    0.99,
+    0.917
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -100.211,
+    0.0,
+    -78.777
+   ],
+   "yaw_deg": 305.5533819792453,
+   "scale": 0.978,
+   "tint": [
+    0.931,
+    0.901,
+    0.967
+   ]
+  },
+  {
+   "item": "tree_cypress",
+   "position": [
+    -106.633,
+    0.0,
+    62.2
+   ],
+   "yaw_deg": 223.61391847974218,
+   "scale": 1.158,
+   "tint": [
+    0.862,
+    0.949,
+    0.877
+   ]
+  },
+  {
+   "item": "tree_stone_pine",
+   "position": [
+    -101.116,
+    0.0,
+    -100.238
+   ],
+   "yaw_deg": 329.3798665603814,
+   "scale": 1.018,
+   "tint": [
+    0.923,
+    0.949,
+    0.992
+   ]
+  }
+ ]
+}
