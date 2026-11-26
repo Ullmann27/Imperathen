@@ -722,7 +722,8 @@
           "tier": 0,
           "path": "prototype/assets/meshy/equipment/weap_roman_pilum_0.glb",
           "triangles": 1390,
-          "accent_triangles_max": 1442,
+          "permanent_triangles": 50,
+          "accent_triangles_max": 1502,
           "texture_edges": {
             "base_color": 1024,
             "normal": 512,
@@ -748,7 +749,8 @@
           "tier": 1,
           "path": "prototype/assets/meshy/equipment/weap_roman_pilum_1.glb",
           "triangles": 700,
-          "accent_triangles_max": 1442,
+          "permanent_triangles": 50,
+          "accent_triangles_max": 1502,
           "texture_edges": {
             "base_color": 512,
             "normal": 256,
@@ -774,7 +776,8 @@
           "tier": 2,
           "path": "prototype/assets/meshy/equipment/weap_roman_pilum_2.glb",
           "triangles": 300,
-          "accent_triangles_max": 38,
+          "permanent_triangles": 50,
+          "accent_triangles_max": 50,
           "texture_edges": {
             "base_color": 256,
             "normal": 128,

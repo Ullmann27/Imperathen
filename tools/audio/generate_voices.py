@@ -116,7 +116,11 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--only", nargs="*", help="speaker ids")
     ap.add_argument("--strict", action="store_true", help="Reject output above the existing MAX_WER threshold")
+    ap.add_argument("--attempts", type=int, default=ATTEMPTS,
+                    help="Maximum distinct deterministic seeds per line (1-32)")
     a = ap.parse_args()
+    if not 1 <= a.attempts <= 32:
+        ap.error("--attempts must be between 1 and 32")
     from qwen_tts import Qwen3TTSModel
     from transformers import pipeline
 
@@ -202,7 +206,7 @@ def main():
         text = speakable(line["text"])
         best = None
         base_seed = int(hashlib.sha256(line["line_id"].encode()).hexdigest()[:6], 16)
-        for attempt in range(ATTEMPTS):
+        for attempt in range(a.attempts):
             seed = base_seed + attempt
             torch.manual_seed(seed)
             t0 = time.time()

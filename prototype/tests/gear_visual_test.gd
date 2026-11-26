@@ -23,12 +23,14 @@ func _check(value: bool, label: String) -> void:
 		failures.append(label)
 
 
-func _triangles(node: Node, with_fittings: bool) -> int:
+func _triangles(node: Node, with_fittings: bool, only_names: Variant = null) -> int:
 	var total := 0
 	var shapes: Array[Node] = node.find_children("*", "MeshInstance3D", true, false)
 	for value: Node in shapes:
 		var shape := value as MeshInstance3D
 		if shape.mesh == null or (not with_fittings and str(shape.name).begins_with("Q_")):
+			continue
+		if only_names != null and not only_names.has(str(shape.name)):
 			continue
 		for surface in shape.mesh.get_surface_count():
 			var arrays := shape.mesh.surface_get_arrays(surface)
@@ -84,6 +86,10 @@ func _run() -> void:
 			_check(Visuals.instantiate(id, 2) == null, "Held-back item has no prop: " + id)
 			continue
 		var record: Dictionary = build.get("gear", {}).get(str(entry.model), {})
+		var permanent_names: Array[String] = []
+		for accent: Variant in record.get("accents", []):
+			if not str(accent).begins_with("Q_"):
+				permanent_names.append(str(accent))
 		var previous := 1 << 30
 		for lod in int(entry.lods):
 			var prop := Visuals.instantiate(id, 2, lod)
@@ -95,7 +101,11 @@ func _run() -> void:
 			_check(triangles > 0 and triangles <= previous, "%s LOD %d does not grow (%d triangles)" % [id, lod, triangles])
 			previous = triangles
 			if not record.is_empty():
-				_check(triangles <= int(record.tiers[lod].triangles) + 2, "%s LOD %d matches its build record (%d/%d)" % [id, lod, triangles, int(record.tiers[lod].triangles)])
+				var permanent := _triangles(prop, false, permanent_names)
+				var expected_permanent := int(record.tiers[lod].get("permanent_triangles", 0))
+				var base_triangles := triangles - permanent
+				_check(permanent == expected_permanent, "%s LOD %d permanent fittings match exact build record (%d/%d)" % [id, lod, permanent, expected_permanent])
+				_check(base_triangles > 0 and base_triangles <= int(record.tiers[lod].triangles) + 2, "%s LOD %d base mesh matches its unchanged build budget (%d/%d)" % [id, lod, base_triangles, int(record.tiers[lod].triangles)])
 				var texture := _main_material(prop)
 				_check(texture != null and texture.albedo_texture.get_width() <= int(record.tiers[lod].texture_edges.base_color), "%s LOD %d texture stays in budget" % [id, lod])
 				_check(texture != null and texture.normal_enabled and texture.normal_texture != null, "%s LOD %d keeps its normal map" % [id, lod])

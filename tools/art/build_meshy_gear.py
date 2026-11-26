@@ -552,9 +552,16 @@ def build(identity, profile, catalog, lock):
                                   export_animations=False, export_skins=False, export_morph=False,
                                   export_apply=True, export_image_format="JPEG", export_jpeg_quality=88)
         obj.data.calc_loop_triangles()
-        accent_triangles = sum(len(accent.data.polygons) * 2 for accent in shown)
+        # Count actual triangles, not polygon_count * 2: capped rods and
+        # pyramids contain triangles and n-gons as well as quads.
+        for accent in shown:
+            accent.data.calc_loop_triangles()
+        accent_triangles = sum(len(accent.data.loop_triangles) for accent in shown)
+        permanent_triangles = sum(len(accent.data.loop_triangles) for accent in shown
+                                  if not accent.name.startswith("Q_"))
         low_t, high_t = bounds([vertex.co for vertex in obj.data.vertices])
         tiers.append({"tier": tier, "path": str(path.relative_to(ROOT)), "triangles": len(obj.data.loop_triangles),
+                      "permanent_triangles": permanent_triangles,
                       "accent_triangles_max": accent_triangles, "texture_edges": {"base_color": edges[0], "normal": edges[1], "metallic_roughness": edges[2]},
                       "texel_density_px_per_m": round(texel_density(obj.data, edges[0]), 1),
                       "bounds_blender": [[round(v, 5) for v in low_t], [round(v, 5) for v in high_t]],

@@ -105,7 +105,9 @@ def main():
     write(work / "refs.json", refs)
     write(work / "missing.json", {"lines": wanted})
     py = sys.executable
-    subprocess.run([py, "-I", str(TOOLS / "generate_voices.py"), "--strict", "--lines",
+    # A deterministic retry must try additional seeds, not repeat the four
+    # rejected samples forever. Keep the existing WER and alignment gates.
+    subprocess.run([py, "-I", str(TOOLS / "generate_voices.py"), "--strict", "--attempts", "16", "--lines",
                     str(work / "missing.json"), "--work", str(work), "--out", str(stage),
                     "--only", *refs.keys()], check=True)
     subprocess.run([py, "-I", str(TOOLS / "align_visemes.py"), "--work", str(work), "--out", str(stage)], check=True)
