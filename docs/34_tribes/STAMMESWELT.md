@@ -12,27 +12,27 @@ Stand 26.11.2026, Branch `feat/germanic-tribes-ai-20261126`. Dieses Dokument bes
 | Speichervertrag v6, Migration v5→v6, Kalenderanschluss | `prototype/scripts/domain/world_model.gd` | gebaut, getestet |
 | Strategieatlas: Siedlungen, Stärkeklasse, Haltungen aus denselben Daten | `prototype/scripts/strategy/atlas_screen.gd`, `globe.gd` | gebaut, getestet |
 | Tests | `prototype/tests/tribal_world_test.gd`, `tribal_save_test.gd`, `tribal_atlas_test.gd` | Gruppen `tribal_world`, `tribal_save`, `tribal_atlas` |
-| Anschluss an `village_life.gd` (Überfälle, I-10) | — | Plan in Abschnitt 8, nicht verdrahtet |
+| Anschluss an `village_life.gd` (Überfälle, I-10) | `prototype/scripts/domain/world_state.gd` | I-10 verbunden und einmal gebucht (WORLD_STATE.md, Abschnitt 3); übrige Überfälle: Plan in Abschnitt 8 |
 | Germanische Siedlungsgrafik | — | Plan in Abschnitt 11, nicht gebaut |
 
 ## 2. Zeitmodell und Takt
 
 Ein Simulationsschritt ist **eine Kalenderwoche**. Das Spieljahr hat 52 Wochen, jede Jahreszeit 13 Wochen und beginnt im März. Es gibt kein Jahr 0: Auf 1 v. Chr. folgt 1 n. Chr. (`TribalWorld.year_of`).
 
-Das Spiel besitzt keine einheitliche Uhr. `world_seconds` mischt Dorfsekunden (ein Kindheitstag dauert 3600 s, ein älterer Dorftag 120 s) mit Strategiesprüngen von `YEAR_SECONDS/4`. Die Stammeswelt liest deshalb nicht `world_seconds`, sondern bildet den Kalendertag aus den vorhandenen, autoritativen Zählern:
+Seit der Zusammenführung (D-045, [WORLD_STATE.md](../37_world_calendar/WORLD_STATE.md)) gibt es eine Weltuhr. Die Stammeswelt zählt keine eigenen Tage:
 
 ```
-Kalendertag = village.economy.day + progress.years_elapsed · 364 + (strategy.turn mod 4) · 91 + tribes.extra_days
+Kalendertag = Tag der Weltuhr − 1. März des Szenariojahres
 ```
 
-`extra_days` nehmen Reise, Schlaf oder Warten außerhalb der Dorfuhr auf (`WorldModel.pass_calendar_days(days, reason)`). Begründung der Woche gegenüber Alternativen:
+Reise, Schlaf und Warten buchen ihre Tage auf der Weltuhr (`WorldModel.pass_calendar_days(tage, grund, ursache)`); `extra_days` bleibt im Format und muss 0 sein. Eine Kampagne beginnt am 1. Mai 58 v. Chr., das Stammesjahr am 1. März: Die ersten acht Wochen werden nach Spielbeginn im Bildbudget nachgeholt. Stammeszustände ohne Weltmodell (Modultests) nutzen weiter die ältere Ableitung aus den Zählern. Begründung der Woche gegenüber Alternativen:
 
 - Eine Jahreszeit der Strategiekarte entspricht genau 13 Schritten; Karte und Welt bleiben deckungsgleich.
 - Bauvorhaben (2–6 Wochen), Ernte (Wochen 22–31), Fristen (Waffenruhe 26, Tribut alle 13 Wochen) und Kriegszüge (Reise 1–2 Wochen) lassen sich ohne künstliche Stückelung abbilden.
 - 400 Schritte umfassen 58–51 v. Chr., also Band I samt Übergang zu Band II.
 - Tages- oder Bildschritte hätten bei gleicher Aussage die siebenfache bzw. geräteabhängige Last erzeugt.
 
-Der Kalendertag steht im Weltmodell hinter genau einer Funktion, `WorldModel.calendar_day(state)` (D-045). Der gemeinsame Weltkalender aus #98 ersetzt nur deren Inhalt.
+Der Kalendertag steht im Weltmodell hinter genau einer Funktion, `WorldModel.calendar_day(state)` (D-045); sie liest die Weltuhr. Das interne Jahr aus 52 Wochen läuft gegenüber dem Kalender um etwa 1,25 Tage pro Jahr nach (siehe WORLD_STATE.md, Abschnitt 1).
 
 ### Bildbudget (D-046)
 
@@ -200,7 +200,7 @@ Qualitätsmaßstab ist die Lesbarkeit und Dichte, die der Eigentümer mit Assass
 ## 14. Offene Eigentümerentscheidungen
 
 1. **Valdora liegt laut Drehbuch bei Aquileia** (`campaign_arc.json`), rund 600–700 km vom Rhein. Die Rheingruppen erreichen Valdora deshalb nicht (`out_of_reach`). Wer Valdora überfällt, legt das Drehbuch fest; I-08 verbietet, vorschnell ein Volk zu benennen. Umgesetzt ist eine fiktive Reitergruppe ohne Herkunft mit einem verborgenen Auftrag des Handelshauses mit dem roten Siegel (I-15/I-20), ohne Personen oder Schuld festzulegen. Bitte bestätigen oder ändern.
-2. **Kalenderanzeige**: `season_campaign.gd` schreibt fest `100 + turn/4` n. Chr.; der Atlas zeigt in einer Kindheitspartie deshalb oben ein anderes Jahr als die Stammeslage (58 v. Chr.). Die Strategiekarte gehört nicht zu diesem Paket.
+2. **Kalenderanzeige**: behoben mit der Zusammenführung; der Atlaskopf zeigt das Datum der Weltuhr (WORLD_STATE.md, Abschnitt 7).
 3. **Ältere Laufbahnen um 100 n. Chr.** erhalten keine Gruppenaufstellung (`scenario: none`). Für eine Rheingrenze um 100 n. Chr. wären andere Gruppen zu belegen (die Ubier lebten dann links des Rheins).
 4. **Wirkungsgrößen der Anker** (Schaden, Furcht) sind Spielannahmen; die Ereignisse selbst sind belegt.
 5. **Weibliche Erbin** in Ravensteg ist eine fiktive Entscheidung für eine fiktive Gemeinschaft; für belegte Völker sind Anführer männlich angelegt.
