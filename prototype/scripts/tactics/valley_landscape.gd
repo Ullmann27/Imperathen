@@ -1,6 +1,7 @@
 extends Node3D
 ## The mesh, command cursor and formation slots sample the same height function.
 const Rules = preload("res://scripts/battle/battle_model.gd")
+const RenderProfile = preload("res://scripts/rendering/render_profile.gd")
 var grove = preload("res://scripts/visuals/grove.gd").new()
 var sun := DirectionalLight3D.new()
 var foliage: Array[MultiMeshInstance3D] = []
@@ -109,7 +110,8 @@ func apply_quality(profile: String) -> void:
 	sun.shadow_enabled = profile != "low"
 	sun.directional_shadow_max_distance = 110.0 if profile == "very_high" else (85.0 if profile == "high" else (48.0 if profile == "balanced" else 24.0))
 	for node in foliage:
-		var fraction := 1.0 if profile in ["high", "very_high"] else (0.6 if profile == "balanced" else 0.22)
+		# Profile vegetation density hook, limited to the instances authored here.
+		var fraction := minf(1.0, RenderProfile.density(profile, "vegetation"))
 		node.multimesh.visible_instance_count = int(node.multimesh.instance_count * fraction)
 
 func _land_height(x: float,z: float) -> float:

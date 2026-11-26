@@ -128,6 +128,8 @@ def main():
             ("camera_collision", ["--fixed-fps", "60", "--script", "res://tests/camera_collision_test.gd"], "CAMERA_COLLISION_PASS"),
             ("runtime_display_lifecycle", ["--fixed-fps", "60", "--script", "res://tests/runtime_display_lifecycle_test.gd"], "RUNTIME_DISPLAY_LIFECYCLE_PASS"),
             ("fold7_graphics_policy", ["--fixed-fps", "60", "--script", "res://tests/fold7_graphics_policy_test.gd"], "FOLD7_GRAPHICS_POLICY_PASS"),
+            ("render_profile", ["--fixed-fps", "60", "--script", "res://tests/render_profile_test.gd"], "RENDER_PROFILE_PASS"),
+            ("render_bench_views", ["--fixed-fps", "60", "--script", "res://tests/render_bench_views_test.gd"], "RENDER_BENCH_VIEWS_PASS"),
             ("touch_controls", ["--fixed-fps", "60", "--script", "res://tests/touch_controls_test.gd"], "TOUCH_CONTROLS_PASS"),
             ("action_adapter", ["--fixed-fps", "60", "--script", "res://tests/action_adapter_test.gd"], "ACTION_ADAPTER_PASS"),
             ("action_world", ["--fixed-fps", "60", "--script", "res://tests/action_world_test.gd"], "ACTION_WORLD_PASS"),

@@ -72,7 +72,7 @@ func populate(model) -> void:
 	_menu(command_row,"Befehl",{"move":"Marschieren","hold":"Halten","attack":"Angriff","attack_move":"Angriffsmarsch","defend":"Verteidigen","flank":"Flanke","retreat":"Rückzug","rally":"Sammeln","reserve":"Reserve","focus_fire":"Feuer bündeln","cease_fire":"Feuer einstellen"},"command")
 	quality_picker.name = "ValleyQuality"
 	quality_picker.tooltip_text = "Grafikqualität"
-	for caption in ["Leicht", "Ausgewogen", "Hoch", "Sehr hoch"]:
+	for caption in ["Leicht", "Ausgewogen", "Hoch", "Ultra"]:
 		quality_picker.add_item(caption)
 	quality_picker.selected = PROFILE_KEYS.find(get_parent().profile)
 	quality_picker.item_selected.connect(func(index: int): requested.emit("quality",PROFILE_KEYS[index]))
