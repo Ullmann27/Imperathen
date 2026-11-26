@@ -1,0 +1,5434 @@
+{
+	"format": "imperathen-activity-anchors",
+	"schema": 1,
+	"area": "market_street",
+	"source": "tools/world/bake_city_layout.gd from roman_city_manifest.json (city seed 20261125)",
+	"anchors": [
+		{
+			"id": "market.stall_01",
+			"kind": "stall",
+			"position": [
+				-385.0,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:produce",
+				"stall_node:Market_01_Type0_Build0_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_01",
+			"kind": "queue",
+			"position": [
+				-385.0,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_01",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_02",
+			"kind": "stall",
+			"position": [
+				-372.58,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fish",
+				"stall_node:Market_02_Type1_Build0_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_02",
+			"kind": "queue",
+			"position": [
+				-372.58,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_02",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_02",
+			"kind": "gossip_spot",
+			"position": [
+				-366.38,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_03",
+			"kind": "stall",
+			"position": [
+				-360.16,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:bakery",
+				"stall_node:Market_03_Type2_Build0_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_03",
+			"kind": "queue",
+			"position": [
+				-360.16,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_03",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_03",
+			"kind": "play_spot",
+			"position": [
+				-353.96,
+				0.0,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_04",
+			"kind": "stall",
+			"position": [
+				-347.74,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:pottery",
+				"stall_node:Market_04_Type3_Build0_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_04",
+			"kind": "queue",
+			"position": [
+				-347.74,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_04",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.cart_stop_04",
+			"kind": "cart_stop",
+			"position": [
+				-341.54,
+				0.11,
+				59.6
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				4.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_05",
+			"kind": "stall",
+			"position": [
+				-335.32,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:textiles",
+				"stall_node:Market_05_Type4_Build0_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_05",
+			"kind": "queue",
+			"position": [
+				-335.32,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_05",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.beggar_05",
+			"kind": "beggar_spot",
+			"position": [
+				-329.12,
+				0.0,
+				51.4
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				7.0,
+				19.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_06",
+			"kind": "stall",
+			"position": [
+				-322.9,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:metalware",
+				"stall_node:Market_06_Type5_Build0_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_06",
+			"kind": "queue",
+			"position": [
+				-322.9,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_06",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_06",
+			"kind": "gossip_spot",
+			"position": [
+				-316.7,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.guard_06",
+			"kind": "guard_post",
+			"position": [
+				-316.7,
+				0.0,
+				57.0
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market",
+				"patrol:market"
+			]
+		},
+		{
+			"id": "market.stall_07",
+			"kind": "stall",
+			"position": [
+				-310.48,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cookshop",
+				"stall_node:Market_07_Type6_Build0_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_07",
+			"kind": "queue",
+			"position": [
+				-310.48,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_07",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.tavern_07",
+			"kind": "tavern_seat",
+			"position": [
+				-309.21,
+				0.0,
+				49.63
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				10.0,
+				22.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous"
+			],
+			"tags": [
+				"stall:market.stall_07",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_08",
+			"kind": "stall",
+			"position": [
+				-298.06,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:produce",
+				"stall_node:Market_08_Type0_Build1_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_08",
+			"kind": "queue",
+			"position": [
+				-298.06,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_08",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_09",
+			"kind": "stall",
+			"position": [
+				-285.65,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fish",
+				"stall_node:Market_09_Type1_Build1_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_09",
+			"kind": "queue",
+			"position": [
+				-285.65,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_09",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_09",
+			"kind": "play_spot",
+			"position": [
+				-279.45,
+				0.0,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_10",
+			"kind": "stall",
+			"position": [
+				-273.23,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:bakery",
+				"stall_node:Market_10_Type2_Build1_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_10",
+			"kind": "queue",
+			"position": [
+				-273.23,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_10",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_10",
+			"kind": "gossip_spot",
+			"position": [
+				-267.03,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_11",
+			"kind": "stall",
+			"position": [
+				-260.81,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:pottery",
+				"stall_node:Market_11_Type3_Build1_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_11",
+			"kind": "queue",
+			"position": [
+				-260.81,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_11",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.cart_stop_11",
+			"kind": "cart_stop",
+			"position": [
+				-254.61,
+				0.11,
+				59.6
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				4.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_12",
+			"kind": "stall",
+			"position": [
+				-248.39,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:textiles",
+				"stall_node:Market_12_Type4_Build1_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_12",
+			"kind": "queue",
+			"position": [
+				-248.39,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_12",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_13",
+			"kind": "stall",
+			"position": [
+				-235.97,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:metalware",
+				"stall_node:Market_13_Type5_Build1_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_13",
+			"kind": "queue",
+			"position": [
+				-235.97,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_13",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_14",
+			"kind": "stall",
+			"position": [
+				-223.55,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cookshop",
+				"stall_node:Market_14_Type6_Build1_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_14",
+			"kind": "queue",
+			"position": [
+				-223.55,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_14",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.tavern_14",
+			"kind": "tavern_seat",
+			"position": [
+				-222.27,
+				0.0,
+				49.63
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				10.0,
+				22.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous"
+			],
+			"tags": [
+				"stall:market.stall_14",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_14",
+			"kind": "gossip_spot",
+			"position": [
+				-217.35,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.beggar_14",
+			"kind": "beggar_spot",
+			"position": [
+				-217.35,
+				0.0,
+				51.4
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				7.0,
+				19.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_15",
+			"kind": "stall",
+			"position": [
+				-211.13,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:produce",
+				"stall_node:Market_15_Type0_Build2_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_15",
+			"kind": "queue",
+			"position": [
+				-211.13,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_15",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_15",
+			"kind": "play_spot",
+			"position": [
+				-204.93,
+				0.0,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_16",
+			"kind": "stall",
+			"position": [
+				-198.71,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fish",
+				"stall_node:Market_16_Type1_Build2_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_16",
+			"kind": "queue",
+			"position": [
+				-198.71,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_16",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.guard_16",
+			"kind": "guard_post",
+			"position": [
+				-192.51,
+				0.0,
+				57.0
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market",
+				"patrol:market"
+			]
+		},
+		{
+			"id": "market.stall_17",
+			"kind": "stall",
+			"position": [
+				-186.29,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:bakery",
+				"stall_node:Market_17_Type2_Build2_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_17",
+			"kind": "queue",
+			"position": [
+				-186.29,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_17",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_18",
+			"kind": "stall",
+			"position": [
+				-173.87,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:pottery",
+				"stall_node:Market_18_Type3_Build2_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_18",
+			"kind": "queue",
+			"position": [
+				-173.87,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_18",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.cart_stop_18",
+			"kind": "cart_stop",
+			"position": [
+				-167.67,
+				0.11,
+				59.6
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				4.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_18",
+			"kind": "gossip_spot",
+			"position": [
+				-167.67,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_19",
+			"kind": "stall",
+			"position": [
+				-161.45,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:textiles",
+				"stall_node:Market_19_Type4_Build2_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_19",
+			"kind": "queue",
+			"position": [
+				-161.45,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_19",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_20",
+			"kind": "stall",
+			"position": [
+				-149.03,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:metalware",
+				"stall_node:Market_20_Type5_Build2_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_20",
+			"kind": "queue",
+			"position": [
+				-149.03,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_20",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_21",
+			"kind": "stall",
+			"position": [
+				-136.61,
+				0.0,
+				46.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cookshop",
+				"stall_node:Market_21_Type6_Build2_Size0",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_21",
+			"kind": "queue",
+			"position": [
+				-136.61,
+				0.0,
+				49.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_21",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.tavern_21",
+			"kind": "tavern_seat",
+			"position": [
+				-135.34,
+				0.0,
+				49.63
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				10.0,
+				22.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous"
+			],
+			"tags": [
+				"stall:market.stall_21",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_21",
+			"kind": "play_spot",
+			"position": [
+				-130.41,
+				0.0,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_22",
+			"kind": "stall",
+			"position": [
+				-124.19,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:produce",
+				"stall_node:Market_22_Type0_Build0_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_22",
+			"kind": "queue",
+			"position": [
+				-124.19,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_22",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_22",
+			"kind": "gossip_spot",
+			"position": [
+				-117.99,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_23",
+			"kind": "stall",
+			"position": [
+				-111.77,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fish",
+				"stall_node:Market_23_Type1_Build0_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_23",
+			"kind": "queue",
+			"position": [
+				-111.77,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_23",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.beggar_23",
+			"kind": "beggar_spot",
+			"position": [
+				-105.57,
+				0.11,
+				51.4
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				7.0,
+				19.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_24",
+			"kind": "stall",
+			"position": [
+				-99.35,
+				0.11,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:bakery",
+				"stall_node:Market_24_Type2_Build0_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_24",
+			"kind": "queue",
+			"position": [
+				-99.35,
+				0.11,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_24",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_25",
+			"kind": "stall",
+			"position": [
+				-86.94,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:pottery",
+				"stall_node:Market_25_Type3_Build0_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_25",
+			"kind": "queue",
+			"position": [
+				-86.94,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_25",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.cart_stop_25",
+			"kind": "cart_stop",
+			"position": [
+				-80.74,
+				0.11,
+				59.6
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				4.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_26",
+			"kind": "stall",
+			"position": [
+				-74.52,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:textiles",
+				"stall_node:Market_26_Type4_Build0_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_26",
+			"kind": "queue",
+			"position": [
+				-74.52,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_26",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_26",
+			"kind": "gossip_spot",
+			"position": [
+				-68.32,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.guard_26",
+			"kind": "guard_post",
+			"position": [
+				-68.32,
+				0.0,
+				57.0
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market",
+				"patrol:market"
+			]
+		},
+		{
+			"id": "market.stall_27",
+			"kind": "stall",
+			"position": [
+				-62.1,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:metalware",
+				"stall_node:Market_27_Type5_Build0_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_27",
+			"kind": "queue",
+			"position": [
+				-62.1,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_27",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_27",
+			"kind": "play_spot",
+			"position": [
+				-55.9,
+				0.09,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_28",
+			"kind": "stall",
+			"position": [
+				-49.68,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cookshop",
+				"stall_node:Market_28_Type6_Build0_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_28",
+			"kind": "queue",
+			"position": [
+				-49.68,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_28",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.tavern_28",
+			"kind": "tavern_seat",
+			"position": [
+				-48.18,
+				0.0,
+				49.8
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				10.0,
+				22.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous"
+			],
+			"tags": [
+				"stall:market.stall_28",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_29",
+			"kind": "stall",
+			"position": [
+				-37.26,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:produce",
+				"stall_node:Market_29_Type0_Build1_Size1",
+				"district:market",
+				"shop:foodstall"
+			]
+		},
+		{
+			"id": "market.queue_29",
+			"kind": "queue",
+			"position": [
+				-37.26,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_29",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_30",
+			"kind": "stall",
+			"position": [
+				-24.84,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fish",
+				"stall_node:Market_30_Type1_Build1_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_30",
+			"kind": "queue",
+			"position": [
+				-24.84,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_30",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_30",
+			"kind": "gossip_spot",
+			"position": [
+				-18.64,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_31",
+			"kind": "stall",
+			"position": [
+				-12.42,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:bakery",
+				"stall_node:Market_31_Type2_Build1_Size1",
+				"district:market",
+				"shop:bakery"
+			]
+		},
+		{
+			"id": "market.queue_31",
+			"kind": "queue",
+			"position": [
+				-12.42,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_31",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_32",
+			"kind": "stall",
+			"position": [
+				0.0,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:pottery",
+				"stall_node:Market_32_Type3_Build1_Size1",
+				"district:market",
+				"shop:pottery"
+			]
+		},
+		{
+			"id": "market.queue_32",
+			"kind": "queue",
+			"position": [
+				0.0,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_32",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.cart_stop_32",
+			"kind": "cart_stop",
+			"position": [
+				6.2,
+				0.11,
+				59.6
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				4.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.beggar_32",
+			"kind": "beggar_spot",
+			"position": [
+				6.2,
+				0.0,
+				51.4
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				7.0,
+				19.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_33",
+			"kind": "stall",
+			"position": [
+				12.42,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:textiles",
+				"stall_node:Market_33_Type4_Build1_Size1",
+				"district:market",
+				"shop:clothier"
+			]
+		},
+		{
+			"id": "market.queue_33",
+			"kind": "queue",
+			"position": [
+				12.42,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_33",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_33",
+			"kind": "play_spot",
+			"position": [
+				18.62,
+				0.09,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_34",
+			"kind": "stall",
+			"position": [
+				24.84,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:metalware",
+				"stall_node:Market_34_Type5_Build1_Size1",
+				"district:market",
+				"shop:armorer"
+			]
+		},
+		{
+			"id": "market.queue_34",
+			"kind": "queue",
+			"position": [
+				24.84,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_34",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_34",
+			"kind": "gossip_spot",
+			"position": [
+				31.04,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_35",
+			"kind": "stall",
+			"position": [
+				37.26,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cookshop",
+				"stall_node:Market_35_Type6_Build1_Size1",
+				"district:market",
+				"shop:thermopolium"
+			]
+		},
+		{
+			"id": "market.queue_35",
+			"kind": "queue",
+			"position": [
+				37.26,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_35",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.tavern_35",
+			"kind": "tavern_seat",
+			"position": [
+				38.76,
+				0.0,
+				49.8
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				10.0,
+				22.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous"
+			],
+			"tags": [
+				"stall:market.stall_35",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_36",
+			"kind": "stall",
+			"position": [
+				49.68,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:produce",
+				"stall_node:Market_36_Type0_Build2_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_36",
+			"kind": "queue",
+			"position": [
+				49.68,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_36",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.guard_36",
+			"kind": "guard_post",
+			"position": [
+				55.88,
+				0.0,
+				57.0
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market",
+				"patrol:market"
+			]
+		},
+		{
+			"id": "market.stall_37",
+			"kind": "stall",
+			"position": [
+				62.1,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fish",
+				"stall_node:Market_37_Type1_Build2_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_37",
+			"kind": "queue",
+			"position": [
+				62.1,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_37",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_38",
+			"kind": "stall",
+			"position": [
+				74.52,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:bakery",
+				"stall_node:Market_38_Type2_Build2_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_38",
+			"kind": "queue",
+			"position": [
+				74.52,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_38",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_38",
+			"kind": "gossip_spot",
+			"position": [
+				80.72,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_39",
+			"kind": "stall",
+			"position": [
+				86.94,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:pottery",
+				"stall_node:Market_39_Type3_Build2_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_39",
+			"kind": "queue",
+			"position": [
+				86.94,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_39",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.cart_stop_39",
+			"kind": "cart_stop",
+			"position": [
+				93.14,
+				0.11,
+				59.6
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				4.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_39",
+			"kind": "play_spot",
+			"position": [
+				93.14,
+				0.0,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_40",
+			"kind": "stall",
+			"position": [
+				99.35,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:textiles",
+				"stall_node:Market_40_Type4_Build2_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_40",
+			"kind": "queue",
+			"position": [
+				99.35,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_40",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_41",
+			"kind": "stall",
+			"position": [
+				111.77,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:metalware",
+				"stall_node:Market_41_Type5_Build2_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_41",
+			"kind": "queue",
+			"position": [
+				111.77,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_41",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.beggar_41",
+			"kind": "beggar_spot",
+			"position": [
+				117.97,
+				0.0,
+				51.4
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				7.0,
+				19.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_42",
+			"kind": "stall",
+			"position": [
+				124.19,
+				0.0,
+				46.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cookshop",
+				"stall_node:Market_42_Type6_Build2_Size1",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_42",
+			"kind": "queue",
+			"position": [
+				124.19,
+				0.0,
+				49.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_42",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.tavern_42",
+			"kind": "tavern_seat",
+			"position": [
+				125.69,
+				0.0,
+				49.8
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				10.0,
+				22.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous"
+			],
+			"tags": [
+				"stall:market.stall_42",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_42",
+			"kind": "gossip_spot",
+			"position": [
+				130.39,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_43",
+			"kind": "stall",
+			"position": [
+				136.61,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:produce",
+				"stall_node:Market_43_Type0_Build0_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_43",
+			"kind": "queue",
+			"position": [
+				136.61,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_43",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_44",
+			"kind": "stall",
+			"position": [
+				149.03,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fish",
+				"stall_node:Market_44_Type1_Build0_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_44",
+			"kind": "queue",
+			"position": [
+				149.03,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_44",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_45",
+			"kind": "stall",
+			"position": [
+				161.45,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:bakery",
+				"stall_node:Market_45_Type2_Build0_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_45",
+			"kind": "queue",
+			"position": [
+				161.45,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_45",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_45",
+			"kind": "play_spot",
+			"position": [
+				167.65,
+				0.0,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_46",
+			"kind": "stall",
+			"position": [
+				173.87,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:pottery",
+				"stall_node:Market_46_Type3_Build0_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_46",
+			"kind": "queue",
+			"position": [
+				173.87,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_46",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.cart_stop_46",
+			"kind": "cart_stop",
+			"position": [
+				180.07,
+				0.11,
+				59.6
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				4.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_46",
+			"kind": "gossip_spot",
+			"position": [
+				180.07,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.guard_46",
+			"kind": "guard_post",
+			"position": [
+				180.07,
+				0.0,
+				57.0
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market",
+				"patrol:market"
+			]
+		},
+		{
+			"id": "market.stall_47",
+			"kind": "stall",
+			"position": [
+				186.29,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:textiles",
+				"stall_node:Market_47_Type4_Build0_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_47",
+			"kind": "queue",
+			"position": [
+				186.29,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_47",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_48",
+			"kind": "stall",
+			"position": [
+				198.71,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:metalware",
+				"stall_node:Market_48_Type5_Build0_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_48",
+			"kind": "queue",
+			"position": [
+				198.71,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_48",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_49",
+			"kind": "stall",
+			"position": [
+				211.13,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cookshop",
+				"stall_node:Market_49_Type6_Build0_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_49",
+			"kind": "queue",
+			"position": [
+				211.13,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_49",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.tavern_49",
+			"kind": "tavern_seat",
+			"position": [
+				212.93,
+				0.0,
+				50.03
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				10.0,
+				22.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous"
+			],
+			"tags": [
+				"stall:market.stall_49",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_50",
+			"kind": "stall",
+			"position": [
+				223.55,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:produce",
+				"stall_node:Market_50_Type0_Build1_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_50",
+			"kind": "queue",
+			"position": [
+				223.55,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_50",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_50",
+			"kind": "gossip_spot",
+			"position": [
+				229.75,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.beggar_50",
+			"kind": "beggar_spot",
+			"position": [
+				229.75,
+				0.0,
+				51.4
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				7.0,
+				19.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_51",
+			"kind": "stall",
+			"position": [
+				235.97,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fish",
+				"stall_node:Market_51_Type1_Build1_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_51",
+			"kind": "queue",
+			"position": [
+				235.97,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_51",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_51",
+			"kind": "play_spot",
+			"position": [
+				242.17,
+				0.0,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_52",
+			"kind": "stall",
+			"position": [
+				248.39,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:bakery",
+				"stall_node:Market_52_Type2_Build1_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_52",
+			"kind": "queue",
+			"position": [
+				248.39,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_52",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_53",
+			"kind": "stall",
+			"position": [
+				260.81,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:pottery",
+				"stall_node:Market_53_Type3_Build1_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_53",
+			"kind": "queue",
+			"position": [
+				260.81,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_53",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.cart_stop_53",
+			"kind": "cart_stop",
+			"position": [
+				267.01,
+				0.11,
+				59.6
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				4.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_54",
+			"kind": "stall",
+			"position": [
+				273.23,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:textiles",
+				"stall_node:Market_54_Type4_Build1_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_54",
+			"kind": "queue",
+			"position": [
+				273.23,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_54",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_54",
+			"kind": "gossip_spot",
+			"position": [
+				279.43,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_55",
+			"kind": "stall",
+			"position": [
+				285.65,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:metalware",
+				"stall_node:Market_55_Type5_Build1_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_55",
+			"kind": "queue",
+			"position": [
+				285.65,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_55",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_56",
+			"kind": "stall",
+			"position": [
+				298.06,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cookshop",
+				"stall_node:Market_56_Type6_Build1_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_56",
+			"kind": "queue",
+			"position": [
+				298.06,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_56",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.tavern_56",
+			"kind": "tavern_seat",
+			"position": [
+				299.86,
+				0.0,
+				50.03
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				10.0,
+				22.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous"
+			],
+			"tags": [
+				"stall:market.stall_56",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.guard_56",
+			"kind": "guard_post",
+			"position": [
+				304.26,
+				0.0,
+				57.0
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market",
+				"patrol:market"
+			]
+		},
+		{
+			"id": "market.stall_57",
+			"kind": "stall",
+			"position": [
+				310.48,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:produce",
+				"stall_node:Market_57_Type0_Build2_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_57",
+			"kind": "queue",
+			"position": [
+				310.48,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_57",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_57",
+			"kind": "play_spot",
+			"position": [
+				316.68,
+				0.0,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_58",
+			"kind": "stall",
+			"position": [
+				322.9,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fish",
+				"stall_node:Market_58_Type1_Build2_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_58",
+			"kind": "queue",
+			"position": [
+				322.9,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_58",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_58",
+			"kind": "gossip_spot",
+			"position": [
+				329.1,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_59",
+			"kind": "stall",
+			"position": [
+				335.32,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:bakery",
+				"stall_node:Market_59_Type2_Build2_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_59",
+			"kind": "queue",
+			"position": [
+				335.32,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_59",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.beggar_59",
+			"kind": "beggar_spot",
+			"position": [
+				341.52,
+				0.0,
+				51.4
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				7.0,
+				19.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_60",
+			"kind": "stall",
+			"position": [
+				347.74,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:pottery",
+				"stall_node:Market_60_Type3_Build2_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_60",
+			"kind": "queue",
+			"position": [
+				347.74,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_60",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.cart_stop_60",
+			"kind": "cart_stop",
+			"position": [
+				353.94,
+				0.11,
+				59.6
+			],
+			"facing_deg": 90.0,
+			"capacity": 4,
+			"hours": [
+				4.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_61",
+			"kind": "stall",
+			"position": [
+				360.16,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:textiles",
+				"stall_node:Market_61_Type4_Build2_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_61",
+			"kind": "queue",
+			"position": [
+				360.16,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_61",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_62",
+			"kind": "stall",
+			"position": [
+				372.58,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:metalware",
+				"stall_node:Market_62_Type5_Build2_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_62",
+			"kind": "queue",
+			"position": [
+				372.58,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_62",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.gossip_62",
+			"kind": "gossip_spot",
+			"position": [
+				378.78,
+				0.0,
+				55.2
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "market.stall_63",
+			"kind": "stall",
+			"position": [
+				385.0,
+				0.0,
+				45.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 1,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cookshop",
+				"stall_node:Market_63_Type6_Build2_Size2",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.queue_63",
+			"kind": "queue",
+			"position": [
+				385.0,
+				0.0,
+				49.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"stall:market.stall_63",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.tavern_63",
+			"kind": "tavern_seat",
+			"position": [
+				386.8,
+				0.0,
+				50.03
+			],
+			"facing_deg": 0.0,
+			"capacity": 3,
+			"hours": [
+				10.0,
+				22.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous"
+			],
+			"tags": [
+				"stall:market.stall_63",
+				"district:market"
+			]
+		},
+		{
+			"id": "market.play_63",
+			"kind": "play_spot",
+			"position": [
+				391.2,
+				0.0,
+				40.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"district:market"
+			]
+		},
+		{
+			"id": "city.exit_west",
+			"kind": "entrance",
+			"position": [
+				-384.0,
+				0.11,
+				65.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 64,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"city_exit",
+				"district:market"
+			]
+		},
+		{
+			"id": "city.exit_east",
+			"kind": "entrance",
+			"position": [
+				384.0,
+				0.11,
+				65.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 64,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"city_exit",
+				"district:market"
+			]
+		},
+		{
+			"id": "city.exit_north",
+			"kind": "entrance",
+			"position": [
+				-100.0,
+				0.11,
+				-312.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 64,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"city_exit",
+				"district:market"
+			]
+		},
+		{
+			"id": "city.exit_south",
+			"kind": "entrance",
+			"position": [
+				-100.0,
+				0.11,
+				312.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 64,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"city_exit",
+				"district:market"
+			]
+		}
+	]
+}

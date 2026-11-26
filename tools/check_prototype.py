@@ -87,6 +87,7 @@ def main():
             ("horse_rig", ["--script", "res://tests/horse_rig_test.gd"], "HORSE_RIG_PASS"),
             ("mount_controller", ["--fixed-fps", "60", "--script", "res://tests/mount_controller_test.gd"], "MOUNT_CONTROLLER_PASS"),
             ("city_market_bridge", ["--fixed-fps", "60", "--script", "res://tests/city_market_bridge_test.gd"], "CITY_MARKET_BRIDGE_PASS"),
+            ("city_life", ["--script", "res://tests/city_life_test.gd"], "CITY_LIFE_PASS"),
             ("city_inventory_ui", ["--fixed-fps", "60", "--script", "res://tests/city_inventory_ui_test.gd"], "CITY_INVENTORY_UI_PASS"),
             ("city_character_detail", ["--fixed-fps", "60", "--script", "res://tests/city_character_detail_test.gd"], "0 failures"),
             ("city_support", ["--fixed-fps", "60", "--script", "res://tests/city_support_integration_test.gd"], "CITY_SUPPORT_PASS"),
