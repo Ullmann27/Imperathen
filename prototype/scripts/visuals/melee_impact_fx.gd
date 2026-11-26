@@ -64,6 +64,7 @@ func spawn(event: Dictionary, point: Vector3, normal: Vector3) -> Dictionary:
 		particles.scale_amount_min = 0.6
 		particles.scale_amount_max = 1.4
 		particles.position = to_local(point) if is_inside_tree() else point
+		particles.visible = true
 		particles.restart()
 		particles.emitting = true
 	var sound: Dictionary = feedback.sound
@@ -80,11 +81,13 @@ func spawn(event: Dictionary, point: Vector3, normal: Vector3) -> Dictionary:
 
 ## Stop every burst and sound (scene reset, cutscene cut, level change).
 func clear() -> void:
+	# Stopping emission alone lets live particles finish their lifetime;
+	# hide them as well. The next spawn restarts (clears) and shows a slot.
 	for slot: Dictionary in _slots:
 		for kind: String in KINDS:
-			(slot[kind] as CPUParticles3D).emitting = false
-			(slot[kind] as CPUParticles3D).restart()
-			(slot[kind] as CPUParticles3D).emitting = false
+			var particles: CPUParticles3D = slot[kind]
+			particles.emitting = false
+			particles.visible = false
 		(slot.player as AudioStreamPlayer3D).stop()
 
 
@@ -93,7 +96,7 @@ func active_particles() -> int:
 	for slot: Dictionary in _slots:
 		for kind: String in KINDS:
 			var p: CPUParticles3D = slot[kind]
-			if p.emitting:
+			if p.emitting and p.visible:
 				total += p.amount
 	return total
 

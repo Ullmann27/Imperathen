@@ -89,6 +89,14 @@ func _test_pool_budget_and_duel_events() -> void:
 	for i in 20:
 		fx.spawn({"type":"hit", "weapon_material":"iron", "surface_material":"iron", "energy_j":300.0}, Vector3(0, 1, 0), Vector3.BACK)
 	_check(fx.active_particles() <= Feedback.MAX_BURST * Feedback.MAX_ACTIVE_BURSTS, "Concurrent particles stay within %d (got %d)" % [Feedback.MAX_BURST * Feedback.MAX_ACTIVE_BURSTS, fx.active_particles()])
+	fx.clear()
+	var visible := 0
+	for child in fx.get_children():
+		if child is CPUParticles3D and child.visible:
+			visible += 1
+	_check(visible == 0 and fx.active_particles() == 0, "clear() removes every live burst from view (%d visible)" % visible)
+	fx.spawn({"type":"hit", "weapon_material":"iron", "surface_material":"iron", "energy_j":100.0}, Vector3(0, 1, 0), Vector3.BACK)
+	_check(fx.active_particles() > 0, "A burst after clear() is shown again")
 	# Real duel events drive the same feedback.
 	var state := Core.new_state(4)
 	Core.add_fighter(state, "a", "axe_fighter", {"team":"t"})
