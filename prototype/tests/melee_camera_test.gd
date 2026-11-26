@@ -2,6 +2,8 @@ extends SceneTree
 ## Combat camera: framing, player control, smoothing and impact shake.
 
 const Cam = preload("res://scripts/visuals/melee_camera.gd")
+const Core = preload("res://scripts/domain/melee/melee_core.gd")
+const Geo = preload("res://scripts/domain/melee/melee_geometry.gd")
 const DT := 1.0 / 60.0
 var checks := 0
 var failures: Array[String] = []
@@ -12,6 +14,7 @@ func _initialize() -> void:
 	_test_control()
 	_test_smoothing()
 	_test_shake()
+	_test_own_shield_never_blocks_the_view()
 	for failure in failures:
 		printerr("FAIL: " + failure)
 	print("MELEE_CAMERA_RESULT checks=%d failures=%d" % [checks, failures.size()])
@@ -105,3 +108,28 @@ func _test_shake() -> void:
 	weak.impact({"type":"block", "energy_j":5.0, "frame":3})
 	strong.impact({"type":"block", "energy_j":250.0, "frame":3})
 	_check(strong._shake > weak._shake, "Shake amplitude grows with impact energy")
+
+
+func _test_own_shield_never_blocks_the_view() -> void:
+	# The real scutum of a legionary in a high guard, from the melee core.
+	for guard: String in ["guard_high", "guard_front", "guard_right"]:
+		var state := Core.new_state(1)
+		Core.add_fighter(state, "rome", "legionary", {"team":"r"})
+		Core.add_fighter(state, "axe", "axe_fighter", {"team":"t", "x":0.1, "z":-1.5})
+		Core.face(state, "rome", "axe")
+		Core.command(state, "rome", "guard", {"style":guard})
+		Core.step(state, 0.5)
+		var shield: Array = Core.shield_world(state.fighters.rome)
+		var occluder := [shield[0], shield[1], shield[2], Core.shield_half(state.fighters.rome)]
+		var cam = Cam.new()
+		var a := Vector3(float(state.fighters.rome.x), 0, float(state.fighters.rome.z))
+		var b := Vector3(float(state.fighters.axe.x), 0, float(state.fighters.axe.z))
+		var plain: Dictionary = cam.desired(a, b)
+		var aware: Dictionary = cam.desired(a, b, occluder)
+		var blocked := false
+		for h: float in [1.25, 1.6]:
+			blocked = blocked or Geo.segment_box(aware.position, b + Vector3(0, h, 0), occluder[0], occluder[1], occluder[2], occluder[3], 0.0) >= 0.0
+		_check(not blocked, "%s: the opponent's chest and head stay visible past the own scutum (side %.0f deg)" % [guard, float(aware.side_deg)])
+		var xf := Transform3D(Basis.looking_at(aware.target - aware.position, Vector3.UP), aware.position)
+		_check(_inside(xf, cam, b + Vector3(0, 1.0, 0)) and _inside(xf, cam, a + Vector3(0, 1.0, 0)), "%s: both fighters stay framed while avoiding the shield" % guard)
+		print("camera %s: side %.0f deg (plain %.0f deg)" % [guard, float(aware.side_deg), float(plain.side_deg)])

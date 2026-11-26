@@ -5,7 +5,9 @@ extends RefCounted
 ## adds a short, energy-scaled impact shake on the exact contact frame.
 ## Presentation only; it never touches the melee state.
 
+const Geo = preload("res://scripts/domain/melee/melee_geometry.gd")
 const TARGET_HEIGHT := 1.25
+const MAX_SIDE_ANGLE := deg_to_rad(80.0)
 const MIN_DISTANCE := 2.6
 const MAX_DISTANCE := 7.0
 const SIDE_ANGLE := deg_to_rad(32.0)
@@ -47,26 +49,44 @@ func impact(event: Dictionary) -> void:
 	_shake_seed = int(event.get("frame", 0))
 
 
-## Desired (unsmoothed) camera position and look target.
-func desired(focus: Vector3, opponent: Vector3) -> Dictionary:
+## Desired (unsmoothed) camera position and look target. `occluder` is the
+## focused fighter's own shield [centre, u, v, half] (Core.shield_world +
+## Core.shield_half): the camera swings toward the weapon side and up until
+## the sight line to the opponent's chest and head is clear of it.
+func desired(focus: Vector3, opponent: Vector3, occluder: Array = []) -> Dictionary:
 	var a := Vector3(focus.x, 0.0, focus.z)
 	var b := Vector3(opponent.x, 0.0, opponent.z)
 	var line := b - a
 	var separation := line.length()
 	var forward := line / separation if separation > 0.001 else Vector3.FORWARD
 	var look := a.lerp(b, 0.45) + Vector3(0.0, TARGET_HEIGHT, 0.0)
-	# Behind the focused fighter, swung toward its right shoulder.
-	var back := (-forward).rotated(Vector3.UP, -SIDE_ANGLE + yaw_offset)
-	var distance := clampf((separation * 0.9 + 2.2) * zoom, MIN_DISTANCE, MAX_DISTANCE)
+	var side := SIDE_ANGLE
+	var lift := 0.0
 	var eye := Vector3.ZERO
-	# Pull back until both bodies (head and feet) fit the horizontal and
-	# vertical field of view with a margin.
-	for i in 24:
-		eye = look + back * distance + Vector3(0.0, 0.45 + distance * 0.12, 0.0)
-		if _fits(eye, look, [a, b]) or distance >= MAX_DISTANCE:
+	var distance := 0.0
+	for attempt in 12:
+		# Behind the focused fighter, swung toward its right (weapon) shoulder.
+		var back := (-forward).rotated(Vector3.UP, -side + yaw_offset)
+		distance = clampf((separation * 0.9 + 2.2) * zoom, MIN_DISTANCE, MAX_DISTANCE)
+		# Pull back until both bodies (head and feet) fit the horizontal and
+		# vertical field of view with a margin.
+		for i in 24:
+			eye = look + back * distance + Vector3(0.0, 0.45 + distance * 0.12 + lift, 0.0)
+			if _fits(eye, look, [a, b]) or distance >= MAX_DISTANCE:
+				break
+			distance = minf(MAX_DISTANCE, distance * 1.08)
+		if occluder.is_empty() or _clear_view(eye, b, occluder):
 			break
-		distance = minf(MAX_DISTANCE, distance * 1.08)
-	return {"position":eye, "target":look, "distance":distance}
+		side = minf(MAX_SIDE_ANGLE, side + deg_to_rad(6.0))
+		lift += 0.08
+	return {"position":eye, "target":look, "distance":distance, "side_deg":rad_to_deg(side)}
+
+
+func _clear_view(eye: Vector3, opponent: Vector3, occluder: Array) -> bool:
+	for height: float in [1.25, 1.6]:
+		if Geo.segment_box(eye, opponent + Vector3(0.0, height, 0.0), occluder[0], occluder[1], occluder[2], occluder[3], 0.03) >= 0.0:
+			return false
+	return true
 
 
 func _fits(eye: Vector3, look: Vector3, bodies: Array) -> bool:
@@ -84,8 +104,8 @@ func _fits(eye: Vector3, look: Vector3, bodies: Array) -> bool:
 
 
 ## Advance the smoothed camera; returns the Transform3D to apply.
-func update(focus: Vector3, opponent: Vector3, delta: float) -> Transform3D:
-	var want := desired(focus, opponent)
+func update(focus: Vector3, opponent: Vector3, delta: float, occluder: Array = []) -> Transform3D:
+	var want := desired(focus, opponent, occluder)
 	if not _initialized:
 		position = want.position
 		target = want.target
