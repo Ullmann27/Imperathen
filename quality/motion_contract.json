@@ -727,6 +727,7 @@
     "scripts/visuals/far_ranks.gd",
     "scripts/visuals/grove.gd",
     "scripts/visuals/hand_pose.gd",
+    "scripts/visuals/melee_camera.gd",
     "scripts/visuals/melee_impact_audio.gd",
     "scripts/visuals/melee_impact_fx.gd",
     "scripts/visuals/melee_pose.gd",
