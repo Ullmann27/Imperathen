@@ -27,6 +27,10 @@ const FORUM_DETAIL := "res://assets/world/roman_forum_paving_detail.glb"
 const FORUM_COLLISION := "res://assets/world/roman_forum_paving_collision.glb"
 const MAX_STEP := 0.25
 const SOLE_OFFSET := 0.9
+const VISIBILITY_MARGIN := 20.0
+# Ground, main-street and plot surfaces are exported as tiles under these group
+# nodes (tools/world/build_roman_test_city.py, SurfaceTiles).
+const SURFACE_TILE_GROUPS := ["City_Ground", "Main_Streets", "Residential_Roads"]
 const CATALOG_PATH := "res://assets/world/city_catalog.json"
 const CATALOG_ORIGIN := Vector3(475,0,90)
 const WALK_SPEED := 1.45
@@ -143,9 +147,10 @@ func _load_city() -> void:
 		city.name = "RomanCity"
 		add_child(city)
 		city_available = true
+		var reach := 270.0 if profile in ["low","balanced"] else 450.0
 		for mesh: MeshInstance3D in city.find_children("*","MeshInstance3D",true,false):
-			mesh.visibility_range_end = 270.0 if profile in ["low","balanced"] else 450.0
-			mesh.visibility_range_end_margin = 20.0
+			mesh.visibility_range_end = reach + surface_tile_extra_reach(mesh)
+			mesh.visibility_range_end_margin = VISIBILITY_MARGIN
 	var collision := _scene(CITY_COLLISION)
 	if collision!=null:
 		add_child(collision)
@@ -191,6 +196,18 @@ func _load_city() -> void:
 	print("IMPERATHEN_FACADE_DETAIL " + JSON.stringify(CitySurfaceMicrodetail.install(city, profile)))
 	# Use real already-exported close-up GLBs. No extra collision bodies or economy.
 	print("IMPERATHEN_VIVA_PROPS " + JSON.stringify(VivaCloseupProps.install(city, profile)))
+
+## Godot culls by the camera distance to a mesh's AABB centre. A flat ground
+## tile is 136-188 m wide, so its centre can be out of range while a house standing
+## on its edge is still drawn. Surface tiles therefore get their half diagonal
+## plus both hysteresis margins on top of the profile range: whenever a house can
+## be visible, the ground, street and plot surface under it is drawn as well.
+static func surface_tile_extra_reach(mesh: MeshInstance3D) -> float:
+	var group := mesh.get_parent()
+	if group == null or str(group.name) not in SURFACE_TILE_GROUPS:
+		return 0.0
+	var size := mesh.get_aabb().size
+	return 0.5*Vector2(size.x,size.z).length()+2.0*VISIBILITY_MARGIN
 
 func _add_static_colliders(source: Node3D,prefix: String) -> void:
 	# Godot's -colonly importer may already have generated the physics body.

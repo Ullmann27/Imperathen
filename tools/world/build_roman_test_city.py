@@ -110,10 +110,14 @@ def material(name,color,kind,out,scale=2,rough=.86,metal=0):
 
 class Mesh:
     """Triangle-ready geometry and a separately collected structural collider."""
-    def __init__(self,name,collect_collision=True):
+    def __init__(self,name,collect_collision=True,uv_origin=(0,0,0)):
         self.name=name; self.v=[]; self.f=[]; self.mi=[]; self.uv=[]; self.sm=[]
         self.physical=collect_collision
         self.cv=[]; self.cf=[]
+        # Planar UVs are projected from (vertex + uv_origin). A tile authored
+        # around its own origin therefore keeps the world-aligned texture of
+        # the unsplit surface: no seams where neighbouring tiles meet.
+        self.uv_origin=uv_origin
 
     def face(self,vertices,mat,smooth=False):
         offset=len(self.v); self.v.extend(vertices)
@@ -122,7 +126,8 @@ class Mesh:
         n=(Vector(vertices[1])-Vector(vertices[0])).cross(Vector(vertices[2])-Vector(vertices[0]))
         axis=max(range(3),key=lambda a:abs(n[a]))
         a,b=[i for i in range(3) if i!=axis]
-        self.uv.append([(v[a]/SCALES[mat],v[b]/SCALES[mat]) for v in vertices])
+        o=self.uv_origin
+        self.uv.append([((v[a]+o[a])/SCALES[mat],(v[b]+o[b])/SCALES[mat]) for v in vertices])
         if self.physical:
             offset=len(self.cv); self.cv.extend(vertices)
             self.cf.append(tuple(range(offset,offset+len(vertices))))
@@ -252,6 +257,9 @@ class Mesh:
 
 
 def install(key,mesh):
+    if mesh.v:
+        BOUNDS[key]=tuple(tuple(f(p[i] for p in mesh.v) for i in range(3)) for f in (min,max))
+        SHAPES[key]=mesh
     PROTO[key]=mesh.finish()
 
 
@@ -266,7 +274,198 @@ def put(key,name,x,y,z=0,angle=0,scale=1,category='architecture',era=-100):
         physics.location=obj.location; physics.rotation_euler=obj.rotation_euler; physics.scale=obj.scale
         physics['era_min_ce']=era; physics['collision_mesh_only']=True
     ENTRIES.append({'name':name,'module':key,'category':category,'position_blender_m':[x,y,z],'rotation_z':angle,'scale':scale,'era_min_ce':era})
+    if category in SOLID_CATEGORIES:
+        add_obstacle(name,category,footprint(key,x,y,z,angle,scale))
+    elif category in PROP_CATEGORIES:
+        for part in band_parts(key,x,y,angle,scale):
+            add_obstacle(name,category,part)
     return obj
+
+
+# --- Placement validation ---------------------------------------------------
+# Props, trees, stalls and fountains are no longer dropped blindly on authored
+# coordinates: each one must clear every registered solid (buildings, walls,
+# gates, plot walls, main streets, other stalls/props) by a clearance margin.
+# A conflicting object moves to the nearest free site; if none exists the build
+# fails instead of exporting an object inside a house or a street.
+BOUNDS={}
+SHAPES={}
+_BANDS={}
+OBSTACLES=[]
+OBSTACLE_GRID={}
+OBSTACLE_CELL=16.0
+# Buildings and walls are solid over their whole bounding box. Placed props are
+# validated (and then registered) per 1 m height band, so a tree canopy may
+# hang over a 0.8 m plot wall or a market awning but never into a building.
+SOLID_CATEGORIES={'residential','craft_shop','civic','baths','portico','fountain','city_wall','gate','aqueduct'}
+PROP_CATEGORIES={'market_stall','street_detail','vegetation'}
+CITY_INTERIOR=(-408.75,-318.75,408.75,318.75)  # inner faces of the 2.5 m thick city wall
+RELOCATED=[]
+
+
+def bands(key):
+    """Local bounds of a prototype per 1 m height band, built from its faces
+    so that a tall face also fills the bands between its vertices."""
+    if key not in _BANDS:
+        mesh=SHAPES[key];rows={}
+        for face in mesh.f:
+            pts=[mesh.v[i] for i in face]
+            lo,hi=[min(p[k] for p in pts) for k in range(3)],[max(p[k] for p in pts) for k in range(3)]
+            for band in range(math.floor(lo[2]),math.floor(hi[2])+1):
+                z0,z1=max(lo[2],band),min(hi[2],band+1)
+                row=rows.setdefault(band,[lo[0],lo[1],z0,hi[0],hi[1],z1])
+                row[:]=[min(row[0],lo[0]),min(row[1],lo[1]),min(row[2],z0),max(row[3],hi[0]),max(row[4],hi[1]),max(row[5],z1)]
+        _BANDS[key]=[((r[0],r[1],r[2]),(r[3],r[4],r[5])) for _b,r in sorted(rows.items())]
+    return _BANDS[key]
+
+
+def band_parts(key,x,y,angle=0,scale=1,pad=0.0):
+    return [footprint(key,x,y,0,angle,scale,pad,part) for part in bands(key)]
+
+
+def footprint(key,x,y,z=0,angle=0,scale=1,pad=0.0,bounds=None):
+    """World plan rectangle and height span of a prototype's visual bounds."""
+    (x0,y0,z0),(x1,y1,z1)=BOUNDS[key] if bounds is None else bounds
+    c,s=math.cos(angle),math.sin(angle)
+    lx,ly=(x0+x1)*.5*scale,(y0+y1)*.5*scale
+    return {'cx':x+lx*c-ly*s,'cy':y+lx*s+ly*c,'hx':(x1-x0)*.5*scale+pad,'hy':(y1-y0)*.5*scale+pad,
+            'angle':angle,'z0':z+z0*scale,'z1':z+z1*scale}
+
+
+def plan_rect(x0,y0,x1,y1,z0,z1):
+    return {'cx':(x0+x1)*.5,'cy':(y0+y1)*.5,'hx':(x1-x0)*.5,'hy':(y1-y0)*.5,'angle':0,'z0':z0,'z1':z1}
+
+
+def _corners(box):
+    c,s=math.cos(box['angle']),math.sin(box['angle'])
+    return [(box['cx']+dx*c-dy*s,box['cy']+dx*s+dy*c) for dx,dy in
+            ((-box['hx'],-box['hy']),(box['hx'],-box['hy']),(box['hx'],box['hy']),(-box['hx'],box['hy']))]
+
+
+def _separated(a,b):
+    if a['z1']<=b['z0'] or b['z1']<=a['z0']:
+        return True
+    ca,cb=_corners(a),_corners(b)
+    for box in (a,b):
+        c,s=math.cos(box['angle']),math.sin(box['angle'])
+        for ax,ay in ((c,s),(-s,c)):
+            pa=[px*ax+py*ay for px,py in ca];pb=[px*ax+py*ay for px,py in cb]
+            if max(pa)<=min(pb) or max(pb)<=min(pa):
+                return True
+    return False
+
+
+def _cells(box):
+    r=math.hypot(box['hx'],box['hy'])
+    for i in range(math.floor((box['cx']-r)/OBSTACLE_CELL),math.floor((box['cx']+r)/OBSTACLE_CELL)+1):
+        for j in range(math.floor((box['cy']-r)/OBSTACLE_CELL),math.floor((box['cy']+r)/OBSTACLE_CELL)+1):
+            yield i,j
+
+
+def add_obstacle(name,category,box):
+    box=dict(box,name=name,category=category)
+    OBSTACLES.append(box)
+    for cell in _cells(box):
+        OBSTACLE_GRID.setdefault(cell,[]).append(box)
+
+
+def blocker(box,parts=None):
+    """Name of the first solid the box (or its height bands) touches, or None."""
+    x0,y0,x1,y1=CITY_INTERIOR
+    if any(not (x0<px<x1 and y0<py<y1) for px,py in _corners(box)):
+        return 'city wall line'
+    seen=set()
+    for cell in _cells(box):
+        for other in OBSTACLE_GRID.get(cell,()):
+            if id(other) not in seen:
+                seen.add(id(other))
+                if not _separated(box,other) and (parts is None or any(not _separated(p,other) for p in parts)):
+                    return other['name']
+    return None
+
+
+_SPIRALS={}
+
+
+def spiral(radius=24.0,step=.5):
+    """Deterministic search offsets ordered by distance from the authored point."""
+    if (radius,step) not in _SPIRALS:
+        n=int(radius/step)
+        points=[(i*step,j*step) for i in range(-n,n+1) for j in range(-n,n+1) if math.hypot(i,j)*step<=radius]
+        points.sort(key=lambda p:(round(math.hypot(*p),6),round(math.atan2(p[1],p[0]),6)))
+        _SPIRALS[radius,step]=points
+    return _SPIRALS[radius,step]
+
+
+def site_blocker(key,x,y,angle,scale,clearance):
+    return blocker(footprint(key,x,y,0,angle,scale,clearance),band_parts(key,x,y,angle,scale,clearance))
+
+
+def free_site(key,name,x,y,angle=0,scale=1,clearance=.3,offsets=None):
+    for dx,dy in (spiral() if offsets is None else offsets):
+        if site_blocker(key,x+dx,y+dy,angle,scale,clearance) is None:
+            if dx or dy:
+                RELOCATED.append({'name':name,'from_blender_m':[round(x,3),round(y,3)],
+                                  'to_blender_m':[round(x+dx,3),round(y+dy,3)]})
+            return x+dx,y+dy
+    raise RuntimeError('No free site for %s near (%.2f, %.2f): %s'%(
+        name,x,y,site_blocker(key,x,y,angle,scale,clearance)))
+
+
+def put_clear(key,name,x,y,angle=0,scale=1,category='architecture',era=-100,clearance=.3,offsets=None):
+    x,y=free_site(key,name,x,y,angle,scale,clearance,offsets)
+    return put(key,name,x,y,angle=angle,scale=scale,category=category,era=era)
+
+
+# --- Tiled ground surfaces ---------------------------------------------------
+# Godot culls a mesh by the distance from the camera to its AABB centre. The
+# whole-city ground, main streets and residential plots used to be three meshes
+# centred on the forum, so in the low/balanced 270 m range they vanished around
+# every outer house while their colliders stayed (invisible plot walls). The
+# visuals are now split on plot boundaries (4 x 4 plots, 136 x 156 m inner
+# tiles); each surface keeps ONE unchanged collision mesh.
+TILE_X=(-460,-272,-136,0,136,272,460)
+TILE_Y=(-370,-155.5,.5,156.5,370)
+
+
+class SurfaceTiles:
+    def __init__(self,name,mesh_name):
+        self.name=name;self.physical=True;self.tiles={}
+        self.collider=Mesh(mesh_name)
+
+    def box(self,center,size,mat):
+        if self.physical:
+            self.collider.box(center,size,mat)
+        cx,cy,cz=center;sx,sy,sz=size
+        x0,x1,y0,y1=cx-sx*.5,cx+sx*.5,cy-sy*.5,cy+sy*.5
+        for i in range(len(TILE_X)-1):
+            for j in range(len(TILE_Y)-1):
+                a,b=max(x0,TILE_X[i]),min(x1,TILE_X[i+1])
+                c,d=max(y0,TILE_Y[j]),min(y1,TILE_Y[j+1])
+                if b-a<1e-6 or d-c<1e-6:
+                    continue
+                if (i,j) not in self.tiles:
+                    origin=((TILE_X[i]+TILE_X[i+1])*.5,(TILE_Y[j]+TILE_Y[j+1])*.5)
+                    self.tiles[i,j]=Mesh('%s_Tile_%d_%d'%(self.name,i,j),False,(origin[0],origin[1],0))
+                    self.tiles[i,j].origin=origin
+                tile=self.tiles[i,j]
+                tile.box(((a+b)*.5-tile.origin[0],(c+d)*.5-tile.origin[1],cz),(b-a,d-c,sz),mat)
+
+    def place(self,key,category,era=-100):
+        install(key,self.collider)
+        physics=bpy.data.objects.new(self.name+'_collision',PROTO[key][1]);COLLISION.objects.link(physics)
+        physics['era_min_ce']=era;physics['collision_mesh_only']=True
+        group=bpy.data.objects.new(self.name,None);CITY.objects.link(group)
+        group['category']=category;group['era_min_ce']=era;group['imperathen_asset']='roman_test_city'
+        group['visual_tiles']=len(self.tiles)
+        names=[]
+        for (i,j),tile in sorted(self.tiles.items()):
+            tile_key='%s_%d_%d'%(key,i,j);install(tile_key,tile)
+            put(tile_key,tile.name,tile.origin[0],tile.origin[1],category=category,era=era).parent=group
+            names.append(tile.name)
+        ENTRIES.append({'name':self.name,'module':key,'category':category,'position_blender_m':[0,0,0],
+                        'rotation_z':0,'scale':1,'era_min_ce':era,'collision':'single unchanged mesh',
+                        'visual_tiles':names})
 
 
 def window(m,x,y,z,w=1.0,h=1.5,angle=0,shutters=True):
@@ -496,7 +695,14 @@ def baths():
 
 
 def portico():
-    m=Mesh('portico');m.box((0,0,.18),(70,6,.36),MARBLE)
+    m=Mesh('portico')
+    # The 0.36 m stylobate stood 0.27 m above the 0.09 m forum piazza, above the
+    # player's 0.25 m step limit. Like the basilica stair it now has steps, here
+    # on every side: three 0.12 m risers with 0.5 m treads (first riser from
+    # the piazza 0.03 m, from the street 0.12 m).
+    for step in range(3):
+        grow=(2-step)*.5
+        m.box((0,0,(step+1)*.06),(70+2*grow,6+2*grow,(step+1)*.12),MARBLE)
     for x in np.linspace(-34,34,17):
         for y in (-2,2):m.column(float(x),y,.36,5.2,.32,1)
     m.physical=False
@@ -678,18 +884,38 @@ def aqueduct():
         key='aqueduct_'+str(part);install(key,m);put(key,m.name,-5,211,category='aqueduct',era=52)
 
 
+WALL_SIDES=[('north',0,320,820,0),('south',0,-320,820,0),('west',-410,0,640,math.pi*.5),('east',410,0,640,math.pi*.5)]
+GATE_ALONG_WALL={'west':-65,'east':-65,'north':-100,'south':-100}
+GATE_TOWER_OFFSET=11.5
+
+
+def wall_module(length):
+    """Wall piece of an exact length; one shared mesh per distinct length."""
+    key='wall_%05d'%round(length*100)
+    if key not in PROTO:
+        m=Mesh('Wall_Module_%05d'%round(length*100))
+        m.box((0,0,4.4),(length,2.5,8.8),STONE)
+        m.physical=False;m.box((0,0,8.85),(length,3.1,.42),STONE)
+        merlons=max(1,round(length/1.96))
+        for i in range(merlons):m.box((-length*.5+(i+.5)*length/merlons,0,9.5),(1.05,2.65,1),STONE)
+        install(key,m)
+    return key
+
+
 def walls():
-    m=Mesh('Wall_Module')
-    m.box((0,0,4.4),(27.4,2.5,8.8),STONE)
-    m.physical=False;m.box((0,0,8.85),(27.4,3.1,.42),STONE)
-    for i in range(14):m.box((-12.7+i*1.96,0,9.5),(1.05,2.65,1),STONE)
-    install('wall',m)
-    for side,x,y,length,angle in [('north',0,320,820,0),('south',0,-320,820,0),('west',-410,0,640,math.pi*.5),('east',410,0,640,math.pi*.5)]:
-        count=round(length/27.3)
-        for n in range(count):
-            local=-length*.5+(n+.5)*length/count
-            if (side in ('west','east') and abs(local+65)<22) or (side in ('north','south') and abs(local+100)<22):continue
-            put('wall','Wall_%s_%02d'%(side,n),x+local*math.cos(angle),y+local*math.sin(angle),angle=angle,era=271,category='city_wall')
+    # Every side is two continuous runs from the corner to the axis of a gate
+    # tower, divided into equal pieces close to the former 27.3 m module. The
+    # earlier fixed 27.4 m module skipped whole slots beside the gates (16.5 m
+    # and 7.3 m open beside the west/east gates, 1.8 m at north/south) and left
+    # 0.43 m slits between every west/east module.
+    for side,x,y,length,angle in WALL_SIDES:
+        gate=GATE_ALONG_WALL[side];index=0
+        for start,end in ((-length*.5,gate-GATE_TOWER_OFFSET),(gate+GATE_TOWER_OFFSET,length*.5)):
+            count=max(1,round((end-start)/27.3));piece=(end-start)/count;key=wall_module(piece)
+            for n in range(count):
+                local=start+(n+.5)*piece
+                put(key,'Wall_%s_%02d'%(side,index),x+local*math.cos(angle),y+local*math.sin(angle),angle=angle,era=271,category='city_wall')
+                index+=1
     m=Mesh('Gate')
     m.arch(0,0,0,10.5,13,5,pier=3,segments=15)
     for x in (-11.5,11.5):
@@ -706,16 +932,21 @@ def walls():
 
 
 def ground():
-    m=Mesh('Ground');m.box((0,0,-.35),(920,740,.7),GROUND)
-    install('ground',m);put('ground','City_Ground',0,0,category='ground',era=-1000)
+    m=SurfaceTiles('City_Ground','Ground');m.box((0,0,-.35),(920,740,.7),GROUND)
+    m.place('ground','ground',era=-1000)
     m=Mesh('Forum_Piazza');m.box((-13,10,.045),(140,108,.09),MARBLE)
     install('forum',m);put('forum','Forum_Piazza',0,0,category='public_space')
-    m=Mesh('Main_Streets')
+    m=SurfaceTiles('Main_Streets','Main_Streets')
     m.box((0,-65,.055),(835,14,.11),PAVING)
     m.box((-100,0,.055),(13,655,.11),PAVING)
     m.physical=False
     for y in (-72.4,-57.6):m.box((0,y,.16),(815,.65,.32),STONE)
-    install('streets',m);put('streets','Main_Streets',0,0,category='road')
+    m.place('streets','road')
+    # Nothing but people may stand in the two 14/13 m main streets.
+    add_obstacle('Main_Streets_east_west','main_street',plan_rect(-417.5,-72.725,417.5,-57.275,0,4))
+    add_obstacle('Main_Streets_north_south','main_street',plan_rect(-106.5,-327.5,-93.5,327.5,0,4))
+    # The private Meshy temple's 44 x 46 m forum plot stays empty.
+    add_obstacle('Meshy_Temple_Reservation','reserved',plan_rect(-22,32,22,78,-1,40))
     m=Mesh('Worn_Cobbles',False)
     # The 23x32 individually modeled basalt slabs need a physical-looking
     # mortar bed. Previously a bright marble plaza showed through every open
@@ -754,8 +985,9 @@ def populate():
             candidates.append((x,y,row,col))
     candidates.sort(key=lambda p:(p[0]**2+p[1]**2,p[1],p[0]))
     if len(candidates)<243:raise RuntimeError('Not enough non-overlapping plots')
-    m=Mesh('Residential_Roads')
+    m=SurfaceTiles('Residential_Roads','Residential_Roads')
     kinds=['insula','domus','artisan','atrium','villa']
+    details=[];yards=[]
     for index,(x,y,row,col) in enumerate(candidates[:240]):
         kind=kinds[(index*3+row)%5];key=kind+str((row*7+col)%3)
         front_extent={'insula':12,'domus':15.5,'artisan':10,'atrium':14,'villa':15.5}[kind]
@@ -767,31 +999,50 @@ def populate():
         m.physical=False
         m.box((x,y,.079),(29.8,32.8,.028),GROUND)
         m.physical=True
-        for side in (-1,1):m.box((x+side*14.8,y,.43),(.3,31.8,.75),STONE)
+        for side in (-1,1):
+            m.box((x+side*14.8,y,.43),(.3,31.8,.75),STONE)
+            add_obstacle('Plot_Wall_%03d_%d'%(index+1,side),'plot_wall',plan_rect(x+side*14.8-.15,y-15.9,x+side*14.8+.15,y+15.9,.055,.805))
         m.box((x,y-sign*15.9,.43),(29.9,.3,.75),STONE)
+        add_obstacle('Plot_Wall_%03d_back'%(index+1),'plot_wall',plan_rect(x-14.95,y-sign*15.9-.15,x+14.95,y-sign*15.9+.15,.055,.805))
         m.physical=True
-        if index%2==0:put('clutter'+str(index%3),'Street_Detail_%03d'%index,x+9,y+sign*15.2,angle=math.pi if row%2 else 0,category='street_detail')
-        if index%11==0:put('cypress','Courtyard_Tree_'+str(index),x+14.5,y+12,scale=.55,category='vegetation')
-    install('residential_roads',m);put('residential_roads','Residential_Roads',0,0,category='road')
-    for n in range(63):
-        kind=n%7;construction=(n//7)%3;size=n//21
-        put('stall%d%d'%(kind,construction),'Market_%02d_Type%d_Build%d_Size%d'%(n+1,kind,construction,size),
-            -385+n*770/62,-47,scale=[.85,1,1.2][size],category='market_stall')
+        if index%2==0:details.append((index,x,y,sign,row))
+        if index%11==0:yards.append((index,x,y))
+    m.place('residential_roads','road')
     for n,(x,y,row,col) in enumerate(candidates[240:243]):
         put('craft'+str(n),['Pistrinum_Bakery','Fabrica_Blacksmith','Mercator_Store'][n],x,y,angle=math.pi if row%2 else 0,category='craft_shop')
     put('basilica','Basilica_Civica',-42,108,era=-46,category='civic')
     put('baths','Thermae_Imperiales',-213,128,era=216,category='baths')
     put('portico','Forum_Portico_West',-80,15,angle=math.pi*.5,category='portico')
     put('portico','Forum_Portico_East',59,15,angle=math.pi*.5,category='portico')
-    put('fountain','Forum_Fountain',-17,-14,category='fountain')
-    put('fountain','Northern_Fountain',-103,154,category='fountain')
+    put_clear('fountain','Forum_Fountain',-17,-14,category='fountain',clearance=.5)
+    # Authored at (-103, 154) it covered half of the 13 m north-south street.
+    put_clear('fountain','Northern_Fountain',-103,154,category='fountain',clearance=.5)
+    # The market row keeps its authored rhythm. A stand whose site falls on a
+    # main street (Market_24 stood in the middle of the north-south street)
+    # takes the next unused site at the end of the same row instead.
+    spare=[-385+n*770/62 for n in list(range(63,70))+list(range(-1,-8,-1))]
+    for n in range(63):
+        kind=n%7;construction=(n//7)%3;size=n//21
+        x,y=-385+n*770/62,-47
+        put_clear('stall%d%d'%(kind,construction),'Market_%02d_Type%d_Build%d_Size%d'%(n+1,kind,construction,size),
+            x,y,scale=[.85,1,1.2][size],category='market_stall',offsets=[(0,0)]+[(site-x,0) for site in spare])
+    # Street details used to sit 1.3 m inside the house front (y+-15.2 while
+    # every front is at y+-16.5). They now stand just in front of it.
+    for index,x,y,sign,row in details:
+        put_clear('clutter'+str(index%3),'Street_Detail_%03d'%index,x+9,y+sign*15.2,angle=math.pi if row%2 else 0,
+            category='street_detail',offsets=[(0,sign*k*.1) for k in range(81)]+spiral(12,.5))
+    for index,x,y in yards:
+        put_clear('cypress','Courtyard_Tree_'+str(index),x+14.5,y+12,scale=.55,category='vegetation')
     for n in range(52):
         x=-388+(n%26)*31;y=308 if n<26 else -308
         if abs(x+100)<12:continue
-        put('cypress' if n%3 else 'pine','Avenue_Tree_'+str(n),x,y,scale=.62+RNG.random()*.22,category='vegetation')
+        # Wide stone pines rarely fit the 9-10 m strip between house fronts and
+        # the wall; they take the nearest gap between houses instead.
+        put_clear('cypress' if n%3 else 'pine','Avenue_Tree_'+str(n),x,y,scale=.62+RNG.random()*.22,category='vegetation',
+            offsets=spiral(40,.5))
     for n,(x,y) in enumerate([(-64,-31),(-64,53),(42,-31),(42,53),(-155,126),(-270,135),(71,129),
                               (294,10),(292,85),(78,-13),(82,123),(-15,143),(45,144),(104,145)]):
-        put('pine','Garden_Pine_'+str(n),x,y,scale=.8,category='vegetation')
+        put_clear('pine','Garden_Pine_'+str(n),x,y,scale=.8,category='vegetation')
 
 
 def set_camera(camera,position,target,lens=40):
@@ -846,26 +1097,8 @@ def main():
     COLLISION.hide_render=True
     scene=bpy.context.scene;scene.unit_settings.system='METRIC';scene.unit_settings.scale_length=1
     scene['player_reference_height_m']=1.5;scene['city_mode']='free_exploration_test'
-    global STONE,PLASTER,OCHRE,RED,BRICK,ROOF,WOOD,PAVING,MARBLE,DARK,BRONZE,WATER,CLAY,CLOTH,LEAF,GARDEN,GROUND,SAND
-    STONE=material('Travertine',(.65,.57,.43),'stone',out,2.4)
-    PLASTER=material('Lime_Plaster',(.78,.71,.57),'plaster',out)
-    OCHRE=material('Ochre_Plaster',(.66,.43,.20),'plaster',out)
-    RED=material('Pompeian_Red',(.42,.12,.075),'plaster',out)
-    BRICK=material('Roman_Brick',(.43,.24,.14),'brick',out)
-    ROOF=material('Terracotta_Tiles',(.49,.22,.105),'roof',out)
-    WOOD=material('Oak_Timber',(.23,.13,.065),'wood',out)
-    PAVING=material('Basalt_Paving',(.30,.31,.29),'paving',out,3)
-    MARBLE=material('Warm_Marble',(.70,.64,.55),'marble',out,3,.83)
-    DARK=material('Window_Recess',(.035,.027,.02),None,out)
-    BRONZE=material('Aged_Bronze',(.23,.24,.12),None,out,rough=.5,metal=.65)
-    WATER=material('Water_Surface',(.035,.3,.3),None,out,rough=.2,metal=.1)
-    CLAY=material('Amphora_Clay',(.57,.33,.17),'plaster',out,1)
-    CLOTH=material('Linen_Canopy',(.70,.61,.43),'plaster',out)
-    LEAF=material('Mediterranean_Foliage',(.10,.20,.075),'ground',out)
-    GARDEN=material('Garden_Soil',(.19,.14,.075),'ground',out,3)
-    GROUND=material('Dry_Earth',(.39,.36,.23),'ground',out,5)
-    SAND=material('Arena_Sand',(.62,.51,.32),'ground',out,4)
-    ground();populate();amphitheatre();aqueduct();walls()
+    create_materials(out)
+    build_city()
     for name,position in [('MESHY_TEMPLE_INSERTION_POINT',(0,55,0)),('FREE_EXPLORE_SPAWN',(0,-24,.15))]:
         obj=bpy.data.objects.new(name,None);CITY.objects.link(obj);obj.location=position
         obj['description']='Original Meshy temple anchor; 44 x 46 m reservation' if name.startswith('MESHY') else 'No forced mission; face north toward forum'
@@ -887,6 +1120,10 @@ def main():
         'mesh_objects':sum(o.type=='MESH' for o in CITY.objects),
         'unique_meshes':len({o.data for o in CITY.objects if o.type=='MESH'}),
         'triangles_instanced':triangles(CITY),'collision_triangles_instanced':triangles(COLLISION),
+        'surface_tiles':{'groups':['City_Ground','Main_Streets','Residential_Roads'],
+            'tile_edges_blender_x_m':list(TILE_X),'tile_edges_blender_y_m':list(TILE_Y),
+            'note':'Visual meshes split on plot boundaries for per-tile visibility culling; one unchanged collider per group.'},
+        'relocated_from_authored_site':RELOCATED,
         'entries':ENTRIES,'surface_pipeline':{'style':SURFACE_STYLE,'texture_size':512 if SURFACE_STYLE=='legacy' else TEXTURE_SIZE,'render_samples':20 if SURFACE_STYLE=='legacy' else RENDER_SAMPLES,'review_required':True},'verification':{'gltf_export':'pending','real_blender_renders':'pending','android_device':'not run','runtime_walkthrough':'not run'}}
     (out/'city_manifest.json').write_text(json.dumps(manifest,indent=2,ensure_ascii=False))
     bpy.ops.wm.save_as_mainfile(filepath=str(out/'imperathen_roman_test_city.blend'),compress=True)
@@ -906,6 +1143,34 @@ def main():
         manifest['verification']['real_blender_renders']='four Cycles renders completed; visual review required'
     (out/'city_manifest.json').write_text(json.dumps(manifest,indent=2,ensure_ascii=False))
     print('CITY_BUILD_COMPLETE',json.dumps({k:manifest[k] for k in ['mesh_objects','unique_meshes','triangles_instanced','collision_triangles_instanced','residential_count','market_stall_count']}))
+
+
+def build_city():
+    """Author every city object. Walls and large buildings exist before props
+    are validated against them; RNG consumption order is unchanged."""
+    ground();walls();amphitheatre();aqueduct();populate()
+
+
+def create_materials(out):
+    global STONE,PLASTER,OCHRE,RED,BRICK,ROOF,WOOD,PAVING,MARBLE,DARK,BRONZE,WATER,CLAY,CLOTH,LEAF,GARDEN,GROUND,SAND
+    STONE=material('Travertine',(.65,.57,.43),'stone',out,2.4)
+    PLASTER=material('Lime_Plaster',(.78,.71,.57),'plaster',out)
+    OCHRE=material('Ochre_Plaster',(.66,.43,.20),'plaster',out)
+    RED=material('Pompeian_Red',(.42,.12,.075),'plaster',out)
+    BRICK=material('Roman_Brick',(.43,.24,.14),'brick',out)
+    ROOF=material('Terracotta_Tiles',(.49,.22,.105),'roof',out)
+    WOOD=material('Oak_Timber',(.23,.13,.065),'wood',out)
+    PAVING=material('Basalt_Paving',(.30,.31,.29),'paving',out,3)
+    MARBLE=material('Warm_Marble',(.70,.64,.55),'marble',out,3,.83)
+    DARK=material('Window_Recess',(.035,.027,.02),None,out)
+    BRONZE=material('Aged_Bronze',(.23,.24,.12),None,out,rough=.5,metal=.65)
+    WATER=material('Water_Surface',(.035,.3,.3),None,out,rough=.2,metal=.1)
+    CLAY=material('Amphora_Clay',(.57,.33,.17),'plaster',out,1)
+    CLOTH=material('Linen_Canopy',(.70,.61,.43),'plaster',out)
+    LEAF=material('Mediterranean_Foliage',(.10,.20,.075),'ground',out)
+    GARDEN=material('Garden_Soil',(.19,.14,.075),'ground',out,3)
+    GROUND=material('Dry_Earth',(.39,.36,.23),'ground',out,5)
+    SAND=material('Arena_Sand',(.62,.51,.32),'ground',out,4)
 
 
 if __name__=='__main__':
