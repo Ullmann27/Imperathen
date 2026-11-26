@@ -5,6 +5,7 @@ extends SceneTree
 
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I03Support = preload("res://tests/i03_support.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 var checks := 0
 var failures: Array[String] = []
@@ -99,6 +100,8 @@ func _current_data(data: Dictionary) -> String:
 func _complete(model) -> bool:
 	var view: Dictionary = Childhood.view(model.data)
 	var stage := str(view.get("stage", ""))
+	if stage.begins_with("i03_"):
+		return _ok(I03Support.play_stage(model), "I-03 errand " + stage)
 	if stage.begins_with("i0") or stage.begins_with("i1"):
 		_at(model, view.point)
 		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):

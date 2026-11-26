@@ -7,6 +7,7 @@ const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
 const CompanionStory = preload("res://scripts/story/companion_story.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
+const I03 = preload("res://scripts/story/i03_shortcut.gd")
 const VERSION := 2
 const LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
@@ -45,10 +46,12 @@ static var STEPS: Array = MissionData.steps("band1")
 static var BRIDGE_STEPS: Dictionary = MissionData.bridge_steps("band1")
 ## Screenplay bridge state version. v3 adds I-07 water (story core „Wasser,
 ## Nachricht und kurze Kontrollrunde“); v4 adds the playable I-01 morning
-## (cups, well, meal, table talk, event ledger). Older saves migrate on load.
-const SCREENPLAY_VERSION := 4
+## (cups, well, meal, table talk, event ledger); v5 adds the playable I-03
+## errand with Marcus (route, stance, resolution, farewell, event ledger).
+## Older saves migrate on load.
+const SCREENPLAY_VERSION := 5
 static var CARRIED_EFFECTS: Dictionary = MissionData.carried_effects("band1")
-const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Kleinholzbündel für Sextus", "checked_hinge":"Geprüfter Truhengriff", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
+const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Kleinholzbündel für Sextus", "stall_water":"Wasserkrug für Cassias Stand", "checked_hinge":"Geprüfter Truhengriff", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
 static var SOURCE_MISSION_BY_STEP: Dictionary = MissionData.source_missions("band1")
 
@@ -76,6 +79,7 @@ static func start(data: Dictionary) -> bool:
 		"screenplay":{"version":SCREENPLAY_VERSION,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i07_water":"locked","i08":"locked","hoof_evidence":false,"i10":"locked","raid_path":"","visible_raiders":30,"i11":"locked","i12":"locked","i13":"locked","i14":"locked","julia_outcome":"undecided","oath":false},
 		"guard_absence":{"active":false,"previous_assignment":"idle","previous_health":100}}
 	data.village.childhood.screenplay.merge(I01.fresh_state())
+	data.village.childhood.screenplay.merge(I03.fresh_state())
 	return true
 
 
@@ -177,6 +181,8 @@ static func migrate_screenplay(data: Dictionary) -> bool:
 		screenplay.version = 3
 		migrated = true
 	if I01.migrate(child):
+		migrated = true
+	if I03.migrate(child, data.get("companion", {})):
 		migrated = true
 	return migrated
 
@@ -302,6 +308,24 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 			return _fail(str(morning.message))
 		_record(data, action, str(morning.message), str(morning.events[0]))
 		return _ok(str(morning.message))
+	if I03.handles(action):
+		var errand := I03.apply(data, action, i03_ctx(data))
+		if not errand.ok:
+			return _fail(str(errand.message))
+		for item: String in errand.carry_add:
+			child.carried.append(item)
+		for item: String in errand.carry_remove:
+			child.carried.erase(item)
+		if bool(errand.parted):
+			# The two part: the stored memories are summarised once for the
+			# systems that still read the older companion fields.
+			var kind := I03.summary(child.screenplay)
+			data.companion.met = true
+			data.companion.choice = kind
+			data.companion.trust = 20 if kind == "help" else -5
+			child.screenplay.i03_outcome = "friend" if kind == "help" else "rival"
+		_record(data, action, str(errand.message), str(errand.events[0]))
+		return _ok(str(errand.message))
 	var id: String = step.id
 	if step.get("screenplay", false):
 		var reason := _action_reason(data, step)
@@ -424,24 +448,6 @@ static func _apply_screenplay(data: Dictionary, step: Dictionary, action: String
 			screenplay.i03 = "pending"
 			child.carried.erase("neighbor_basket")
 			message = "Julia hilft dir, den Fehler zu korrigieren. Der falsche Korb bleibt als Ereignis erhalten, statt durch einen Reload zu verschwinden."
-		"i03_marcus":
-			if data.companion.met:
-				return _fail("Die Beziehung zu Marcus wurde bereits festgelegt.")
-			if action == "marcus_friend":
-				data.companion.met = true
-				data.companion.choice = "help"
-				data.companion.trust = 20
-				screenplay.i03_outcome = "friend"
-				message = "Ihr beendet den Münzstreit als Freunde. Marcus merkt sich, dass ihr gemeinsam weitergeht."
-			elif action == "marcus_rival":
-				data.companion.met = true
-				data.companion.choice = "decline"
-				data.companion.trust = -5
-				screenplay.i03_outcome = "rival"
-				message = "Der Münzstreit bleibt zwischen euch. Marcus geht mit, aber eure Beziehung beginnt angespannt."
-			else:
-				return _fail("Entscheide, wie du den Streit mit Marcus beendest.")
-			screenplay.i03 = "complete"
 		"i07_water_fetch":
 			if action != "i07_water_fetch":
 				return _fail("Schöpfe zuerst das Wasser für den Torposten.")
@@ -602,6 +608,8 @@ static func hud_title(step: Dictionary, mission_id: String, chapter: String) -> 
 	if occasion.is_empty():
 		occasion = chapter
 	var place := I01.hud_place(step)
+	if place.is_empty():
+		place = I03.hud_place(step)
 	if place.is_empty() and step.has("npc"):
 		place = "bei " + str(EXTRA_NPCS.get(step.npc, NEIGHBORS.get(step.npc, {})).get("name", ""))
 	return occasion if place.is_empty() or place == "bei " else "%s · %s" % [occasion, place]
@@ -632,6 +640,7 @@ static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
 		if step.get("npc", "") == npc_id:
 			text = step.text
 			var remembered := I01.hook_lines(data, str(step.get("id", "")))
+			remembered.append_array(I03.hook_lines(data, str(step.get("id", ""))))
 			if not remembered.is_empty():
 				text = "\n\n".join(remembered) + "\n\n" + text
 			choices = _choices(data, step)
@@ -656,7 +665,8 @@ static func interactables(data: Dictionary) -> Array[Dictionary]:
 	if I01.active(data):
 		return I01.interactables(data, func(action: String) -> String: return _i01_reason(data, action))
 	var step := _current(data)
-	if not step.has("point") or step.get("id", "") == "i03_marcus":
+	# Marcus (lane, farewell) is a person: he is addressed, not a world point.
+	if not step.has("point") or step.get("id", "") in ["i03_marcus", "i03_farewell"]:
 		return result
 	var point: Vector2 = POINTS[step.point]
 	for choice: Dictionary in _choices(data, step):
@@ -711,6 +721,7 @@ static func validate(data: Dictionary) -> String:
 	var screenplay_keys := ["version","i02","i02_outcome","i03","i03_outcome","i07_water","i08","hoof_evidence",
 		"i10","raid_path","visible_raiders","i11","i12","i13","i14","julia_outcome","oath"]
 	screenplay_keys.append_array(I01.KEYS)
+	screenplay_keys.append_array(I03.KEYS)
 	if not _keys(screenplay, screenplay_keys) or not _integer(screenplay.version,SCREENPLAY_VERSION,SCREENPLAY_VERSION):
 		return "Ungültiger Drehbuch-Brückenstand."
 	var morning_error := I01.validate(screenplay, child.completed.size())
@@ -740,15 +751,28 @@ static func validate(data: Dictionary) -> String:
 	if typeof(screenplay.hoof_evidence) != TYPE_BOOL or typeof(screenplay.oath) != TYPE_BOOL or not _integer(screenplay.visible_raiders,30,30):
 		return "Drehbuchbeleg, Schwur oder sichtbare Reiterzahl ist ungültig."
 
+	if screenplay.i03_task == "service_bring":
+		expected_items.append("stall_water")
 	if screenplay.i02 == "complete":
 		expected_items.erase("neighbor_basket")
 	if screenplay.i14 == "complete":
 		expected_items.append("memory_token")
-	if screenplay.i03 == "complete" and screenplay.i03_outcome != "legacy":
-		if not data.companion.met or screenplay.i03_outcome == "friend" and data.companion.choice != "help" or screenplay.i03_outcome == "rival" and data.companion.choice != "decline":
-			return "Marcus-Beziehung und I-03 widersprechen sich."
-	elif screenplay.i03 != "complete" and data.companion.met:
-		return "Marcus darf vor I-03 nicht stillschweigend als Gefährte entschieden sein."
+	if screenplay.i03s == "legacy":
+		# Saves decided before the playable errand keep their stored decision.
+		if screenplay.i03 == "complete" and screenplay.i03_outcome != "legacy":
+			if not data.companion.met or screenplay.i03_outcome == "friend" and data.companion.choice != "help" or screenplay.i03_outcome == "rival" and data.companion.choice != "decline":
+				return "Marcus-Beziehung und I-03 widersprechen sich."
+		elif screenplay.i03 != "complete" and data.companion.met:
+			return "Marcus darf vor I-03 nicht stillschweigend als Gefährte entschieden sein."
+	else:
+		var summary_outcome: String = "" if screenplay.i03s != "complete" else ("friend" if I03.summary(screenplay) == "help" else "rival")
+		if screenplay.i03_outcome != summary_outcome:
+			return "Die I-03-Zusammenfassung widerspricht den gespeicherten Erinnerungen."
+		if screenplay.i03s == "pending" and screenplay.i03 == "complete" and child.completed.size() > _i03_farewell_index():
+			return "Die Bestellung kann nicht übergeben sein, bevor Marcus und du auseinandergegangen seid."
+	var errand_error := I03.validate(screenplay, data.companion, child.carried)
+	if not errand_error.is_empty():
+		return errand_error
 	if screenplay.i08 in ["report","complete"] and not screenplay.hoof_evidence:
 		return "Die gemeldeten Hufspuren wurden nicht tatsächlich untersucht."
 	if screenplay.i08 == "complete" and not child.completed.has("return_gear"):
@@ -865,11 +889,9 @@ static func _screenplay_step(data: Dictionary) -> Dictionary:
 			return BRIDGE_STEPS["i02_basket"].duplicate(true)
 		if screenplay.i02 == "correction":
 			return BRIDGE_STEPS["i02_correct"].duplicate(true)
-		if screenplay.i02 == "complete" and screenplay.i03 == "pending":
-			return {"id":"i03_marcus","mission":"I-03","screenplay":true,"point":"marcus",
-				"chapter":"Marcus kennt eine Abkürzung","label":"Mit Marcus über Marktweg und Münzstreit entscheiden",
-				"objective":"Triff Marcus bei der Gasse zum Markt. Entscheide, ob ihr den Streit als Freunde löst oder euch gegeneinander verhärtet.",
-				"text":"","result":"Die Beziehung zu Marcus erhält eine konkrete Erinnerung."}
+		var errand := I03.current_step(data, i03_ctx(data))
+		if not errand.is_empty():
+			return errand
 	# I-07 story core names water, a message and a short control round. Water is
 	# carried to the known gate section before the supervised watch post.
 	if child.completed.size() == _step_index("watch_post"):
@@ -945,6 +967,11 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 			var why := _i01_reason(data, str(option.id))
 			result.append({"label":option.label,"command":"village_childhood_action","payload":{"action_id":option.id},"enabled":why.is_empty(),"reason":why})
 		return result
+	if step.get("i03", false):
+		for option: Dictionary in I03.options(data, step):
+			var why := I03.reason(data, str(option.id), i03_ctx(data))
+			result.append({"label":option.label,"command":"village_childhood_action","payload":{"action_id":option.id},"enabled":why.is_empty(),"reason":why})
+		return result
 	var options: Array = [{"id":step.id,"label":step.label}]
 	if step.id == "market_trade":
 		options = [{"id":"market_fair","label":"Den vereinbarten Lohn nehmen · 2 Denare"},
@@ -954,9 +981,6 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 			{"id":"basket_rush","label":"Ohne Prüfung abgeben"}]
 	elif step.id == "i02_correct":
 		options = [{"id":"basket_correct","label":"Fehler korrigieren und richtigen Korb schicken"}]
-	elif step.id == "i03_marcus":
-		options = [{"id":"marcus_friend","label":"Den Münzstreit beilegen und gemeinsam gehen"},
-			{"id":"marcus_rival","label":"Auf dem eigenen Standpunkt beharren"}]
 	elif step.id == "i07_water_fetch":
 		options = [{"id":"i07_water_fetch","label":"Wasserkrug füllen"}]
 	elif step.id == "i07_water_bring":
@@ -1006,6 +1030,8 @@ static func _action_reason(data: Dictionary, step: Dictionary) -> String:
 
 
 static func _target(data: Dictionary, step: Dictionary) -> Vector2:
+	if str(step.get("point", "")) == "market_stall":
+		return I03.marcus_stall(i03_ctx(data))
 	if step.has("npc"):
 		return _npc_position(data, step.npc)
 	return POINTS[step.point]
@@ -1016,6 +1042,22 @@ static func _villager_positions(data: Dictionary) -> Dictionary:
 	for id: String in ["cassia", "aelia"]:
 		result[id] = _npc_position(data, id)
 	return result
+
+
+## completed[] size at which Julia's order is bought and still carried: the
+## moment Marcus and the boy part at the stall.
+static func _i03_farewell_index() -> int:
+	return _step_index("deliver_food")
+
+
+## Context of the I-03 errand: where Cassia really stands and trades (her
+## stall is in front of her) and whether she is there at all.
+static func i03_ctx(data: Dictionary) -> Dictionary:
+	return {"farewell_index":_i03_farewell_index(), "cassia":_npc_position(data, "cassia"), "cassia_here":_available(data, "cassia")}
+
+
+static func i03_reason(data: Dictionary, action: String) -> String:
+	return I03.reason(data, action, i03_ctx(data))
 
 
 static func i01_reason(data: Dictionary, action: String) -> String:

@@ -83,6 +83,21 @@ func _build() -> void:
 
 ## Called from GameWorld.sync_state with the authoritative state.
 func sync_state(state: Dictionary, figure: Node3D) -> void:
+	# Props carried in a hand are children of the figure's skeleton; when the
+	# figure body is replaced (reload, age) they are freed with it. Rebuild.
+	var lost := is_instance_valid(_jug) != (not _cups.is_empty())
+	for cup: Variant in _cups.values():
+		lost = lost or not is_instance_valid(cup)
+	if lost:
+		for cup: Variant in _cups.values():
+			if is_instance_valid(cup):
+				cup.queue_free()
+		if is_instance_valid(_jug):
+			_jug.queue_free()
+		_cups.clear()
+		_water.clear()
+		_jug = null
+		_signature = ""
 	_build()
 	var enabled: bool = state.get("village", {}).has("childhood")
 	visible = enabled

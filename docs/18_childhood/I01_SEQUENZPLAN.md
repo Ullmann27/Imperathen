@@ -15,10 +15,34 @@ Stand: 26.11.2026, Branch `feat/i01-three-cups-slice-20261126`. Grundlage: Maste
 | ID | Klasse | Dauer (gemessen, Autorendauer der Beats) | Cast | Ort | Entry state | Exit state | Abbruchregel |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | I-01.VID-A (`childhood_home` v3) | B, In-Engine | 29,7 s bis zur Wahl, 9,1 s Reaktion + Übergabe | Julia, Silvanus, Junge | Familienhaus (baker_home), Tisch, Regal, Bett | `i01=pending`, `i01_path=""` | `i01_path` gesetzt, Ereignis `I-01.choice.*` | Skip springt zur offenen Wahl, trifft sie nie; nach der Wahl springt Skip zur Übergabe. Back/Suspend speichern Beat-Index; Continue setzt dort fort. |
-| I-01.VID-B (`i01_vid_b`) | B, In-Engine | 32,9 s bis zur Themenwahl, 12,2 s Antwort + Übergabe | Silvanus, Julia, Junge | Frühstückstisch | `i01_meal=done`, `i01_topic=""` | `i01_topic` gesetzt, `i01=complete` | wie VID-A; Abbruch ändert das Ergebnis nicht (Test „Film abgebrochen“). |
+| I-01.VID-B (`i01_vid_b` v2) | B, In-Engine | wird mit `i01_playthrough_test` neu gemessen (v1: 32,9 s bis zur Themenwahl, 12,2 s Antwort + Übergabe; v2 hat zusätzlich 7,8 s Pausen) | Silvanus, Julia, Junge | Frühstückstisch | `i01_meal=done`, `i01_topic=""` | `i01_topic` gesetzt, `i01=complete` | wie VID-A; Abbruch ändert das Ergebnis nicht (Test „Film abgebrochen“). |
 | I-01.VID-C (`mission_transition_father_morning`) | B, In-Engine | 31,9 s | Silvanus (Junge) | vor dem Familienhaus | Krug an Silvanus übergeben | I-02 aktiv | keine Wahl; Skip führt zum Ziel von I-02. |
 
 Shotlist (Kamera aus `scripts/cinematic/opening_director.gd`, Brennweite als FOV): `i01_table_detail` (FOV 40→34, über Brot/Becherplatz zu Julia), `i01_shelf_cups` (44→36, Regal mit drei Bechern), `i01_bed` (46→42, Schulteraufnahme am Bett Richtung Julia), `i01_choice` (Halten der Schulteraufnahme während der Wahl), `mission_dialogue` (43→38, Gegenschuss mit Blickpaar, Wandabweisung), `i01_table_wide` (58→54, Tisch in der Totalen), `i01_topic_choice` (Schulter des Jungen Richtung Silvanus). Letzter Shot `player` endet exakt auf der Spielkamera.
+
+### VID-B als filmische Gesprächsszene (D-052)
+
+Das Tischgespräch ist die Referenz für Gesprächsszenen. Es nutzt fünf Einstellungsgrößen, Reaktionsschnitte innerhalb einer Zeile, stumme Pausen und ein eigenes Innenlicht. Alle Kameras werden aus den lebenden Figuren am Tisch berechnet (Julia, Silvanus, Junge), nicht aus festen Weltkoordinaten.
+
+| Beat | Einstellung | Inhalt | Dauer |
+| --- | --- | --- | --- |
+| `i01_b_table` | Totale `i01_table_wide` (FOV 58→54) | Chronikzeile `I01_B_TABLE` | Zeilenlänge, mind. 5 s |
+| `i01_b_cups` | Detail `i01_cups_insert` (33→30,5) | **Pause**, schiefer Becher vorn, Silvanus’ Becher dahinter | 2,8 s |
+| `i01_b_sextus` | Nah `i01_close_speaker` (35→31,5), Schnitt bei 46 % auf `i01_react_boy` (36→34), bei 70 % zurück | Silvanus erzählt von Sextus (`I01_B_SEXTUS`), Reaktion des Jungen | Zeilenlänge, mind. 12 s |
+| `i01_b_listen` | Nah `i01_react_julia` (33→31) | **Pause**, Julia hört zu | 2,4 s |
+| `i01_b_julia` | Nah auf Julia, Schnitt bei 62 % auf Halbtotale `i01_two_shot` (50→47) | Julias Reaktion nach Faktenlage (5 Varianten) | Zeilenlänge, mind. 6 s |
+| `i01_b_choice` | Schulter `i01_topic_choice` (46→42) | Themenwahl, wartet auf den Spieler | offen |
+| `i01_b_reply` | Nah auf den Antwortenden, Schnitt bei 72 % auf `i01_react_boy` | Antwort auf das Thema | Zeilenlänge, mind. 6 s |
+| `i01_b_after` | Halbtotale `i01_two_shot` | **Pause** vor der Rückgabe | 2,6 s |
+| Übergabe | `player` | Kamerafahrt endet transformgleich auf der Spielkamera; das Filmlicht blendet mit derselben Kurve aus | – |
+
+Technik: Ein Beat kann `cuts` tragen (`[{at, shot_id, actor_id}]`). `main.gd` wählt den Schnitt aus dem Zeilenfortschritt, jeder Schnitt hat seine eigene Kamerafahrt, die Uhr der Zeile läuft durch. Stumme Beats (`silent`) haben keine `line_id`, zeigen kein Textfeld, lassen niemanden die Sprechpose spielen und halten den Lesemodus nicht an. Bei „Bewegung reduzieren“ entfallen die Schnitte innerhalb einer Zeile.
+
+Licht (`I01FilmLights` unter dem Filmregisseur, nur während der Innenaufnahmen): Fensterlicht als schattenwerfender Spot von der Nordwand (Tageslicht, Energie 2,6), warme Herdseite als Punktlicht mit langsamem Atmen (1,25), schwache kühle Aufhellung an der Kamera (0,30); das Umgebungslicht sinkt auf 50 %. Nach dem Film sind Umgebungslicht und Sonne wieder exakt auf dem Ausgangswert (Test). Der Compatibility-Renderer erlaubt je Mesh 8 Punkt- und 8 Spotlichter; Lichter mit Schatten rechnet er in einem eigenen Durchgang, was ihr Aussehen leicht verändert (Godot-Dokumentation „3D lights and shadows“).
+
+Stimmen: `line_id` und `speaker_id` der gesprochenen Beats sind unverändert (`I01_B_TABLE`, `I01_B_SEXTUS`, `I01_B_JULIA_*`, `I01_B_TOPIC_*`). Pausen tragen `voice: "none"`.
+
+Einordnung der Methode: Die Grundkadrierung entsteht regelbasiert aus Figuren und Achse, Schnitte, Reaktionen und Pausen sind von Hand gesetzt. So beschreibt CD Projekt Red die Dialogszenen von The Witcher 3 (GDC 2016, „Behind the Scenes of Cinematic Dialogues in The Witcher 3“: Generator nur als Basis, Schnitt- und Größenwechsel durch Menschen); Ubisoft nennt für Assassin’s Creed Odyssey zusätzlich regelbasiertes Staging und Licht (GDC 2019, „Procedural Generation of Cinematic Dialogues in Assassin’s Creed Odyssey“). Quellen: https://gdcvault.com/play/1022988/ , https://www.gdcvault.com/play/1025980 , https://docs.godotengine.org/en/stable/tutorials/3d/lights_and_shadows.html
 
 Varianten: VID-A-Reaktion je Weg (3), VID-B-Reaktion je Faktenlage (5), Themenantwort (Werkstatt, Feld, je Begegnung 3), VID-C (2 Elternzeilen, 0–1 Begegnungszeile).
 

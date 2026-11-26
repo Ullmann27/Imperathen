@@ -235,10 +235,65 @@ func _test_hud_and_props() -> void:
 	check(game.screen == "opening" and game.opening_sequence.id == I01Film.VID_B, "Breakfast at the table opens VID-B")
 
 
+## D-052 film dialogue: several shot sizes, reaction shots inside a line,
+## silent pauses, the interior light rig and stable voice ids. Runs on the
+## first beat of VID-B and restores the film clock afterwards.
+func _check_vid_b_direction() -> void:
+	var beats: Array = game.opening_sequence.beats
+	var shots := {}
+	var pauses := 0
+	var reactions := 0
+	for beat: Dictionary in beats:
+		shots[str(beat.shot_id)] = true
+		for cut: Dictionary in beat.get("cuts", []):
+			shots[str(cut.shot_id)] = true
+			if str(cut.shot_id).begins_with("i01_react"):
+				reactions += 1
+		if bool(beat.get("silent", false)):
+			pauses += 1
+			check(str(beat.text).is_empty() and str(beat.line_id).is_empty() and float(beat.duration) >= 2.0 and float(beat.duration) <= 4.0, "A pause carries no line and lasts 2–4 s: " + str(beat.id))
+		elif not bool(beat.get("await_choice", false)) and not bool(beat.get("final", false)):
+			check(not str(beat.get("line_id", "")).is_empty() and not str(beat.get("speaker_id", "")).is_empty(), "Spoken beat keeps line_id and speaker_id: " + str(beat.id))
+	for wanted: String in ["i01_table_wide", "i01_two_shot", "i01_close_speaker", "i01_cups_insert", "i01_react_boy", "i01_react_julia", "i01_topic_choice"]:
+		check(shots.has(wanted), "VID-B uses shot size " + wanted)
+	check(pauses >= 3 and reactions >= 2, "VID-B has dramatic pauses (%d) and reaction cuts (%d)" % [pauses, reactions])
+	var ids: Array = beats.map(func(b): return str(b.get("line_id", "")))
+	check(ids.has("I01_B_TABLE") and ids.has("I01_B_SEXTUS"), "Line ids of the table talk are unchanged for the voice session")
+	var director: Node3D = game.opening_director
+	# Distinct compositions: every shot size has its own lens and distance.
+	var table: Vector3 = game.world.to_global(preload("res://scripts/world/village/i01_props.gd").anchor("i01_table"))
+	var fovs := {}
+	for shot: String in ["i01_table_wide", "i01_two_shot", "i01_close_speaker", "i01_cups_insert", "i01_react_boy"]:
+		director.mission_actor_id = "silvanus"
+		var frame: Dictionary = director.sample(shot, 0.5)
+		fovs[shot] = float(frame.fov)
+		check((frame.position as Vector3).distance_to(table) < 6.0, "Shot stays inside the family home: " + shot)
+	check(fovs.i01_table_wide > fovs.i01_two_shot and fovs.i01_two_shot > fovs.i01_close_speaker and fovs.i01_close_speaker > fovs.i01_cups_insert, "Lenses narrow from wide to insert: " + str(fovs))
+	# A reaction cut inside Silvanus' line keeps the line and changes the frame.
+	var telling: Dictionary = beats[ids.find("I01_B_SEXTUS")]
+	check(str(game._beat_cut(telling, 0.1).shot_id) == "i01_close_speaker" and str(game._beat_cut(telling, 0.55).shot_id) == "i01_react_boy" and str(game._beat_cut(telling, 0.9).shot_id) == "i01_close_speaker", "The boy's reaction is cut into Silvanus' line")
+	var cut: Dictionary = game._beat_cut(telling, 0.58)
+	check(float(cut.local) > 0.0 and float(cut.local) < 1.0 and is_equal_approx(float(cut.span), 0.24), "The reaction cut has its own clock inside the line")
+	# Light: window key with shadow, warm hearth, weak camera fill, darker ambient.
+	var rig := director.get_node_or_null("I01FilmLights") as Node3D
+	if check(rig != null and rig.visible, "Interior film light rig is active at the table"):
+		var key := rig.get_node("WindowKey") as SpotLight3D
+		var hearth := rig.get_node("HearthWarm") as OmniLight3D
+		var fill := rig.get_node("CameraFill") as OmniLight3D
+		check(key.shadow_enabled and key.light_energy > hearth.light_energy and hearth.light_energy > fill.light_energy and fill.light_energy > 0.0, "Key, warm second source and fill keep a clear ratio")
+		check(hearth.light_color.r > hearth.light_color.b * 2.0 and key.light_color.b > hearth.light_color.b, "Hearth is warm, window light is daylight")
+		check(game.world.find_children("*", "WorldEnvironment", true, false)[0].environment.ambient_light_energy < float(director._lighting.ambient_energy) * 0.6, "Ambient fill is lowered for the interior scene")
+	# Restore the running beat exactly.
+	director.mission_actor_id = str(_beat().get("actor_id", ""))
+	director.sample(str(_beat().shot_id), 0.0)
+
+
 func _test_vid_b_interrupted() -> void:
 	# T20 at VID-B: skip lands on the topic choice without choosing.
 	var before := JSON.stringify(game.model.data.village.childhood)
 	await capture("vid-b-0-table")
+	_check_vid_b_direction()
+	var choice_index: int = game.opening_sequence.beats.map(func(b): return str(b.id)).find("i01_b_choice")
 	game.opening_overlay._request_skip()
 	await frames(3)
 	check(str(_beat().get("id", "")) == "i01_b_choice" and game._film_choice_open(_beat()), "T20: skip stops at the open table-talk choice")
@@ -249,20 +304,28 @@ func _test_vid_b_interrupted() -> void:
 	check(game.opening_paused, "T21: Back pauses the film at the choice")
 	game.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
 	var checkpoint: Dictionary = Checkpoint.read(str(game.model.data.world_id))
-	check(checkpoint.get("sequence_id", "") == I01Film.VID_B and int(checkpoint.get("index", -1)) == 3, "T21: suspend checkpoints the choice beat")
+	check(checkpoint.get("sequence_id", "") == I01Film.VID_B and int(checkpoint.get("index", -1)) == choice_index, "T21: suspend checkpoints the choice beat")
 	game._show_menu()
 	game._continue_game()
 	await frames(6)
-	check(game.screen == "opening" and game.opening_sequence.id == I01Film.VID_B and game.opening_index == 3 and JSON.stringify(game.model.data.village.childhood) == before, "T21: Continue returns to the same beat without duplicate events")
-	var labels: Array = game.opening_sequence.beats[3].choices.map(func(c): return c.label)
+	check(game.screen == "opening" and game.opening_sequence.id == I01Film.VID_B and game.opening_index == choice_index and JSON.stringify(game.model.data.village.childhood) == before, "T21: Continue returns to the same beat without duplicate events")
+	var labels: Array = game.opening_sequence.beats[choice_index].choices.map(func(c): return c.label)
 	check(labels == ["Nach der Werkstatt fragen", "Nach der Feldarbeit fragen"], "No contact topic without an actual encounter: " + str(labels))
 	await _press_choice("i01_topic_workshop")
 	check(_childhood().screenplay.i01 == "complete" and _events().count("I-01.topic.workshop") == 1, "Topic committed once")
 	check(str(_beat().get("id", "")) == "i01_b_reply" and str(_beat().text).contains("Angeln"), "Silvanus answers the chosen topic")
 	await capture("vid-b-reply")
 	_play_film()
+	# Seamless return: the last shot ends on the play camera with the film
+	# light faded out; afterwards light and ambient are exactly as before.
+	check(bool(_beat().get("final", false)) and game.opening_director.camera.global_transform.is_equal_approx(game.world.get_node("WorldCamera").global_transform)
+		and is_equal_approx(game.opening_director.camera.fov, game.world.get_node("WorldCamera").fov), "VID-B ends exactly on the play camera")
+	var ambient_before := float(game.opening_director._lighting.get("ambient_energy", -1.0))
+	var film_rig := game.opening_director.get_node_or_null("I01FilmLights") as Node3D
+	check(film_rig == null or not film_rig.visible, "Film light is off when the play camera takes over")
 	game.opening_overlay._request_advance()
 	await frames(6)
+	check(is_equal_approx(game.world.find_children("*", "WorldEnvironment", true, false)[0].environment.ambient_light_energy, ambient_before), "Ambient light is restored after the film")
 	check(game.screen == "playing" and Childhood.view(game.model.data).stage == "mother_morning", "After VID-B the established family step follows")
 	check(game.world.i01_props.cup_location("player") == "table", "Visible cup stays at its place after the film")
 
@@ -344,7 +407,8 @@ func _test_vid_a_skip_and_resume() -> void:
 	_place(I01.POINTS.player_table)
 	await _interact()
 	check(game.screen == "opening" and game.opening_sequence.id == I01Film.VID_B, "Breakfast happens without help")
-	check(str(game.opening_sequence.beats[2].text).contains("draußen"), "Julia reacts to the absence")
+	var julia_beats: Array = game.opening_sequence.beats.filter(func(b): return str(b.id) == "i01_b_julia")
+	check(julia_beats.size() == 1 and str(julia_beats[0].text).contains("draußen"), "Julia reacts to the absence")
 	game._opening_skip()
 	await frames(2)
 	var labels: Array = _beat().choices.map(func(c): return c.label)
@@ -381,9 +445,17 @@ func _test_vid_a_skip_and_resume() -> void:
 	_place(Vector2(at.x + 0.8, at.z))
 	game._show_companion()
 	await frames(3)
-	check(_all_text(game.ui._screen).contains("Heute Morgen am Brunnen"), "I-03 recalls the shared morning at the well (memory, not a loyalty value)")
-	game._resume()
-	await frames(2)
+	# Reaching Marcus starts I-03 VID-A; the morning at the well is recalled
+	# there because the encounter is in the I-01 ledger.
+	var recalled: Array = game.opening_sequence.get("beats", []).filter(func(b): return str(b.get("line_id", "")) == "I03_A_HOOK_WELL") if game.screen == "opening" else []
+	check(recalled.size() == 1 and str(recalled[0].text).contains("Heute Morgen am Brunnen"), "I-03 recalls the shared morning at the well (memory, not a loyalty value)")
+	if game.screen == "opening":
+		game._opening_skip()
+		await _press_choice("i03_together")
+		game._opening_skip()
+		game._opening_next()
+	await frames(4)
+	check(game.screen == "playing" and Childhood.view(game.model.data).stage == "i03_coin", "The chosen route hands back to play on the way to the stall")
 
 
 func _test_film_aborted_equivalence() -> void:

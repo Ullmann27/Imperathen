@@ -252,8 +252,13 @@ func present(beat: Dictionary, index: int, total: int) -> void:
 		_panel.modulate.a = 0.3
 		_fade = create_tween()
 		_fade.tween_property(_panel, "modulate:a", 1.0, 0.22).set_trans(Tween.TRANS_SINE)
+	# A silent pause or reaction shot shows the picture without the text panel.
+	var silent := bool(beat.get("silent", false)) and not _final and not _choice_open
+	_panel.visible = not silent
 	if _choice_open:
 		_choices.get_child(0).grab_focus.call_deferred()
+	elif silent:
+		_skip_button.grab_focus.call_deferred()
 	else:
 		_advance_button.grab_focus.call_deferred()
 

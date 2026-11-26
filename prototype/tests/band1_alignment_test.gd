@@ -6,6 +6,7 @@ extends SceneTree
 
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I03Support = preload("res://tests/i03_support.gd")
 const Bible = preload("res://scripts/story/campaign_bible.gd")
 const CompanionStory = preload("res://scripts/story/companion_story.gd")
 const Life = preload("res://scripts/story/village_life.gd")
@@ -181,6 +182,13 @@ func _advance_to(model: RefCounted, goal: String) -> bool:
 			break
 		if view.stage == goal:
 			return true
+		if str(view.stage).begins_with("i03_"):
+			# I-03 errand: real commands with Marcus placed where he stands.
+			var errand: Dictionary = I03Support.play_stage(model)
+			if not errand.ok:
+				_check(false, "I-03-Abschnitt " + str(view.stage) + ": " + str(errand.get("message", "")))
+				return false
+			continue
 		var point: Vector2 = view.point
 		model.set_player_position(Vector3(point.x, 1.0, point.y))
 		var npc := str(view.get("target_npc", ""))

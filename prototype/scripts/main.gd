@@ -20,6 +20,8 @@ const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const CityExploration = preload("res://scripts/world/city_exploration.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const I01Film = preload("res://scripts/story/i01_film.gd")
+const I03 = preload("res://scripts/story/i03_shortcut.gd")
+const I03Film = preload("res://scripts/story/i03_film.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -471,15 +473,13 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 				ui.notify("Wähle einen freien Bauplatz auf der markierten Fläche. Kosten: 8 Holz.")
 		"companion_help", "companion_decline":
 			_resume()
-			var childhood_view: Dictionary = Childhood.view(model.data)
-			var in_marcus_mission := Childhood.enabled(model.data) and str(childhood_view.get("stage", "")) == "i03_marcus"
-			var companion_result: Dictionary
-			if in_marcus_mission:
-				companion_result = _command("village_childhood_action", {"action_id":"marcus_friend" if action == "companion_help" else "marcus_rival"})
-			else:
-				companion_result = _command("choose_companion", {"choice": "help" if action == "companion_help" else "decline"})
+			# Legacy careers only. The childhood decides nothing about Marcus by
+			# a button; I-03 stores what actually happened on the market errand.
+			if Childhood.enabled(model.data):
+				return
+			var companion_result := _command("choose_companion", {"choice": "help" if action == "companion_help" else "decline"})
 			if companion_result.get("ok", false):
-				ui.notify(str(companion_result.get("message", "")) if in_marcus_mission else OpeningStory.companion_reply(model.data))
+				ui.notify(OpeningStory.companion_reply(model.data))
 			else:
 				_show_companion()
 		"i01_contact_marcus":
@@ -540,6 +540,10 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	# Real-time button presses are guarded by the active movement, not stored
 	# as thousands of permanent economic orders. Their consequences are saved.
 	var command_id := "" if realtime_combat else "%s_%d" % [run_id, command_serial]
+	if command == "village_childhood_action":
+		# Presence checks (Marcus at the lane or the stall) use the bodies as
+		# they stand now, not an older observation.
+		model.capture_npc_observations()
 	var previous_childhood_step: Dictionary = Childhood.current_step(model.data) if command == "village_childhood_action" and Childhood.enabled(model.data) else {}
 	var result: Dictionary = model.execute(command, payload, command_id)
 	if not _film_committing and (not result.get("ok", false) or (not realtime_combat and command not in ["receive_damage", "train"])):
@@ -675,21 +679,30 @@ func _choose_frontier(payload: Dictionary) -> void:
 func _show_companion() -> void:
 	var companion: Dictionary = model.data.get("companion", {})
 	var childhood_view: Dictionary = Childhood.view(model.data)
-	if Childhood.enabled(model.data) and str(childhood_view.get("stage", "")) == "i03_marcus":
+	var stage := str(childhood_view.get("stage", ""))
+	if Childhood.enabled(model.data) and stage in ["i03_marcus", "i03_farewell"]:
+		# I-03 VID-A / VID-C start when the boy actually reaches Marcus. No
+		# film, reward or stand-in while Marcus is absent or out of reach.
+		model.capture_npc_observations()
+		var first_option := "i03_together" if stage == "i03_marcus" else "i03_home_apart"
+		var blocked := Childhood.i03_reason(model.data, first_option)
+		if not blocked.is_empty():
+			ui.notify(blocked)
+			return
+		var film: Dictionary = I03Film.vid_a(model.data, Childhood.i03_ctx(model.data)) if stage == "i03_marcus" else I03Film.vid_c(model.data, Childhood.i03_ctx(model.data))
+		_begin_opening(film)
+		return
+	if Childhood.enabled(model.data) and not companion.get("met", false) and str(model.data.village.childhood.screenplay.get("i03s", "")) == "pending" and not str(model.data.village.childhood.screenplay.get("i03_route", "")).is_empty():
+		# During the errand Marcus has his own business; he only says where he is headed.
+		model.capture_npc_observations()
+		var boy_at: Vector3 = world.get_player_position()
+		var friend_at: Vector3 = world._companion.global_position
+		if Vector2(boy_at.x-friend_at.x, boy_at.z-friend_at.z).length() > Childhood.NPC_RANGE or not world._companion.visible:
+			ui.notify("Geh näher zu Marcus, um mit ihm zu sprechen.")
+			return
 		screen = "dialog"
 		world.set_active(false)
-		var i03_text := "Marcus kennt den schnelleren Weg zum Markt. Der alte Münzstreit zwischen euch entscheidet nicht über Sieg oder Niederlage, sondern darüber, welche Erinnerung eure Freundschaft künftig trägt."
-		if I01.has_event(model.data, "I-01.contact.marcus"):
-			# Delayed hook of the I-01 encounter: a shared memory, not a loyalty value.
-			i03_text = "»Heute Morgen am Brunnen hast du mir zugehört, als der Eimer leckte. Jetzt zeig ich dir die Abkürzung.«\n\n" + i03_text
-		ui.show_dialog(
-			"Marcus · Eine Münze und eine Abkürzung",
-			i03_text,
-			[
-				{"label":"Den Streit beilegen und gemeinsam gehen", "action":"companion_help", "choice":"friend", "enabled":true, "reason":""},
-				{"label":"Auf dem eigenen Standpunkt beharren", "action":"companion_decline", "choice":"rival", "enabled":true, "reason":""}
-			]
-		)
+		ui.show_dialog("Marcus · auf dem Weg zum Markt", "»Erst das Salz. Wir sehen uns an Cassias Stand.«", [{"label":"Weitergehen", "action":"resume", "enabled":true, "reason":""}])
 		return
 	if Childhood.enabled(model.data) and not companion.get("met", false):
 		# Before I-03 Marcus only greets. The former hut dialogue ("4 Holz
@@ -793,14 +806,17 @@ func _opening_present() -> void:
 	shown["choice_open"] = _film_choice_open(beat)
 	opening_overlay.present(shown, opening_index, opening_sequence.beats.size())
 	opening_overlay.set_paused(opening_paused)
-	opening_director.mission_actor_id = str(beat.get("actor_id",""))
-	opening_director.play(str(beat.shot_id), maxf(0.1, float(beat.duration)), bool(ui.opening_preferences().reduce_motion))
+	var cut := _beat_cut(beat, 0.0)
+	opening_director.mission_actor_id = str(cut.actor_id)
+	opening_director.focus_key = str(beat.get("anchor", ""))
+	opening_director.speaking = not bool(beat.get("silent", false))
+	opening_director.play(str(cut.shot_id), maxf(0.1, float(beat.duration) * float(cut.span)), bool(ui.opening_preferences().reduce_motion))
 	# One clock drives subtitle timing and camera travel. Reading mode can hold
 	# the finished composition without skipping a sentence or simulating time.
 	opening_director.set_process(false)
 	opening_director.set_paused(opening_paused)
 	if bool(beat.get("final", false)):
-		opening_director.sample(str(beat.shot_id), 1.0)
+		opening_director.sample(str(cut.shot_id), 1.0)
 		opening_overlay.set_progress(1.0)
 	else:
 		opening_overlay.set_progress(0.0)
@@ -816,11 +832,44 @@ func _opening_process(delta: float) -> void:
 		return
 	var duration := maxf(0.1, float(beat.duration))
 	opening_elapsed = minf(duration, opening_elapsed + maxf(0.0, delta))
-	opening_director.sample(str(beat.shot_id), opening_elapsed / duration)
+	var cut := _beat_cut(beat, opening_elapsed / duration)
+	if str(cut.shot_id) != opening_director.shot_id or str(cut.actor_id) != opening_director.mission_actor_id:
+		# A cut inside the line (reaction shot): same clock, new composition.
+		opening_director.mission_actor_id = str(cut.actor_id)
+		opening_director.play(str(cut.shot_id), maxf(0.1, duration * float(cut.span)), bool(ui.opening_preferences().reduce_motion))
+		opening_director.set_process(false)
+		opening_director.set_paused(opening_paused)
+	opening_director.sample(str(cut.shot_id), float(cut.local))
 	opening_overlay.set_progress(opening_elapsed / duration)
 	# AwaitChoice holds only this scene (HB S. 29); the composition stays.
-	if opening_elapsed >= duration and not opening_manual and not _film_choice_open(beat):
+	# Silent pauses carry no sentence, so reading mode does not hold them.
+	if opening_elapsed >= duration and (not opening_manual or bool(beat.get("silent", false))) and not _film_choice_open(beat):
 		_opening_next()
+
+
+## The shot of a beat at a normalized time. A beat may list "cuts"
+## ([{at, shot_id, actor_id}], ascending "at" in 0..1) to change the shot size
+## or show a reaction while the same line continues. Returns the shot, the
+## actor it frames, the cut's share of the beat and the time inside the cut.
+func _beat_cut(beat: Dictionary, fraction: float) -> Dictionary:
+	var result := {"shot_id":str(beat.shot_id), "actor_id":str(beat.get("actor_id", "")), "span":1.0, "local":clampf(fraction, 0.0, 1.0)}
+	var cuts: Array = beat.get("cuts", [])
+	if cuts.is_empty() or bool(ui.opening_preferences().reduce_motion):
+		return result
+	var begin := 0.0
+	var finish := 1.0
+	for index in cuts.size():
+		var at := clampf(float(cuts[index].get("at", 0.0)), 0.0, 1.0)
+		if fraction + 0.000001 < at:
+			finish = at
+			break
+		begin = at
+		finish = 1.0
+		result.shot_id = str(cuts[index].get("shot_id", beat.shot_id))
+		result.actor_id = str(cuts[index].get("actor_id", beat.get("actor_id", "")))
+	result.span = maxf(0.02, finish - begin)
+	result.local = clampf((fraction - begin) / float(result.span), 0.0, 1.0)
+	return result
 
 
 func _opening_next() -> void:
@@ -890,6 +939,8 @@ func _film_sequence(sequence_id: String) -> Dictionary:
 		return OpeningStory.childhood(model.data)
 	if sequence_id == I01Film.VID_B:
 		return I01Film.restore(model.data, sequence_id)
+	if sequence_id in I03Film.IDS:
+		return I03Film.restore(model.data, sequence_id, Childhood.i03_ctx(model.data))
 	return {}
 
 
@@ -948,6 +999,8 @@ func _restore_opening() -> bool:
 			sequence = OpeningStory.childhood(model.data)
 		elif sequence_id == I01Film.VID_B:
 			sequence = I01Film.restore(model.data, sequence_id)
+		elif sequence_id in I03Film.IDS:
+			sequence = I03Film.restore(model.data, sequence_id, Childhood.i03_ctx(model.data))
 		elif sequence_id.begins_with(MissionCinematics.PREFIX):
 			sequence = MissionCinematics.restore(model.data,sequence_id)
 	else:

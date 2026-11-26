@@ -115,6 +115,8 @@ def main():
             ("band1_alignment", ["--script", "res://tests/band1_alignment_test.gd"], "BAND1_ALIGNMENT_PASS"),
             ("i01_slice", ["--script", "res://tests/i01_slice_test.gd"], "I01_SLICE_PASS"),
             ("i01_flow", ["--fixed-fps", "60", "--script", "res://tests/i01_flow_test.gd"], "I01_FLOW_PASS"),
+            ("i03_slice", ["--script", "res://tests/i03_slice_test.gd"], "I03_SLICE_PASS"),
+            ("i03_flow", ["--fixed-fps", "60", "--script", "res://tests/i03_flow_test.gd"], "I03_FLOW_PASS"),
             ("mission_bridge_data", ["--script", "res://tests/mission_bridge_data_test.gd"], "MISSION_BRIDGE_DATA_PASS"),
             ("companion_navigation", ["--fixed-fps", "60", "--script", "res://tests/companion_navigation_test.gd"], "COMPANION_NAVIGATION_PASS"),
             ("companion_turn_motion", ["--fixed-fps", "60", "--script", "res://tests/companion_turn_motion_test.gd"], "COMPANION_TURN_MOTION_PASS"),

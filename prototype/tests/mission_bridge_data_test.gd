@@ -6,6 +6,7 @@ extends SceneTree
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
+const I03 = preload("res://scripts/story/i03_shortcut.gd")
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const FIXTURES := "res://tests/fixtures/mission_bridge_data/"
@@ -44,8 +45,17 @@ func _test_runtime(baseline: Dictionary) -> void:
 		_check(not ids.has(id), "Brücke wurde nicht in childhood.completed eingefügt: " + id)
 	var seen := {}
 	for scenario: Dictionary in baseline.selector_cases:
-		var selected: Dictionary = Childhood._screenplay_step(scenario.state)
 		var expected: String = baseline.bridge_runtime_json[scenario.expected_id]
+		if scenario.expected_id == "i03_marcus":
+			# Screenplay v5 replaced the former two-button Marcus bridge by the
+			# playable I-03 errand (HB 3.0 S. 14; no friend/rival button). The
+			# recorded cases still prove the selection priority; the selected
+			# step is now the authored first errand step. A v5 save always
+			# carries the errand fields, so the recorded minimal state gets them.
+			scenario.state.village.childhood.screenplay.merge(I03.fresh_state())
+			expected = _json(I03.current_step(scenario.state, Childhood.i03_ctx(scenario.state)))
+			_check(expected.contains("\"id\":\"i03_marcus\"") and expected.contains("\"mission\":\"I-03\"") and expected.contains("\"point\":\"marcus\""), "I-03 beginnt weiterhin bei Marcus an der Gasse: " + str(scenario.name))
+		var selected: Dictionary = Childhood._screenplay_step(scenario.state)
 		_check(_json(selected) == expected, "Aufgezeichneter Selektorfall: " + str(scenario.name))
 		seen[scenario.expected_id] = true
 		if not selected.is_empty():
@@ -85,6 +95,9 @@ func _test_recorded_saves() -> void:
 		# Screenplay v4 (I-01 morning) migrates these v3 recordings on load. They
 		# stand past the family talk, so I-01 is "legacy" and nothing else changes.
 		_check(model.data.schema_version == 5 and model.data.village.childhood.screenplay.version == Childhood.SCREENPLAY_VERSION and model.data.village.childhood.screenplay.i01 == "legacy" and model.data.village.childhood.screenplay.i01_events.is_empty(), "Kein neuer Save-Stand; Brückenstand nur um I-01 (legacy) erweitert: " + stage)
+		# v5: a recording that already holds the Marcus decision keeps it as
+		# "legacy"; the one standing before I-03 gets the playable errand.
+		_check(model.data.village.childhood.screenplay.i03s == ("pending" if stage == "i02_correct" else "legacy") and model.data.village.childhood.screenplay.i03_events.is_empty(), "I-03-Felder ohne erfundene Handlung ergänzt: " + stage)
 		_check(_save_json(_without_i01(model.data.village.childhood)) == _save_json(_without_i01(state.village.childhood)), "Kindheitsfortschritt bleibt vollständig erhalten: " + stage)
 		_check(_save_json(model.data.companion) == _save_json(state.companion), "Gespeicherte Marcus-Wahl bleibt erhalten: " + stage)
 		var view: Dictionary = Childhood.view(model.data)
@@ -117,6 +130,9 @@ func _cleanup() -> void:
 func _without_i01(childhood: Dictionary) -> Dictionary:
 	var copy: Dictionary = childhood.duplicate(true)
 	for key: String in I01.KEYS:
+		copy.screenplay.erase(key)
+	# v5 adds the I-03 errand fields the same way (checked separately above).
+	for key: String in I03.KEYS:
 		copy.screenplay.erase(key)
 	copy.screenplay.erase("version")
 	return copy

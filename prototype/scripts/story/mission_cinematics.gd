@@ -4,6 +4,8 @@ extends RefCounted
 ## those effects and hands the next objective to this authored sequence.
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const I01Film = preload("res://scripts/story/i01_film.gd")
+const I03 = preload("res://scripts/story/i03_shortcut.gd")
+const I03Film = preload("res://scripts/story/i03_film.gd")
 const PREFIX := "mission_transition_"
 const KEY_DIALOGUES := ["deliver_kindling","smith_trial","smith_apprentice","deliver_hinge","patrol_brief","watch_permission","borrow_gear","return_gear"]
 
@@ -21,6 +23,15 @@ static func sequence_for(data: Dictionary, previous: Dictionary, following: Dict
 	if next_id == "i01_topic":
 		return I01Film.vid_b(data)
 	if id.begins_with("i01_"):
+		return {}
+	# I-03 VID-B: the committed stance at the stall opens Cassia's explanation.
+	if next_id == "i03_resolve":
+		return I03Film.vid_b(data, Childhood.i03_ctx(data))
+	# I-03 VID-C: with Julia's order bought, Marcus speaks about the way home.
+	# Without Marcus there is no film and no stand-in.
+	if next_id == "i03_farewell":
+		return I03Film.vid_c(data, Childhood.i03_ctx(data)) if I03.marcus_present(data) else {}
+	if id.begins_with("i03_") and next_id.begins_with("i03_") or id == "i03_farewell":
 		return {}
 	var old_mission := _mission(previous)
 	var next_mission := _mission(following)

@@ -5,6 +5,7 @@ extends SceneTree
 
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I03Support = preload("res://tests/i03_support.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
@@ -110,9 +111,11 @@ func _current(model) -> String:
 func _complete(model) -> bool:
 	var view: Dictionary = Childhood.view(model.data)
 	var stage := str(view.get("stage", ""))
-	var screenplay_actions := {"i02_basket":"basket_check", "i02_correct":"basket_correct", "i03_marcus":"marcus_friend",
+	var screenplay_actions := {"i02_basket":"basket_check", "i02_correct":"basket_correct",
 		"i07_water_fetch":"i07_water_fetch", "i07_water_bring":"i07_water_bring",
 		"i08_tracks":"i08_inspect", "i08_report":"i08_report"}
+	if stage.begins_with("i03_"):
+		return _ok(I03Support.play_stage(model), "I-03 errand " + stage)
 	if stage.begins_with("i01_"):
 		# Screenplay v4 I-01 morning: first authored option at each real point.
 		_at(model, view.point)

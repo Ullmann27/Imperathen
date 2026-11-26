@@ -7,7 +7,7 @@ const I01Film = preload("res://scripts/story/i01_film.gd")
 const STORY_VERSION := 1
 const HELP_WOOD := 4
 const HUT_WOOD := 8
-const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player", "mission_dialogue", "mission_reaction", "i01_table_detail", "i01_shelf_cups", "i01_bed", "i01_choice", "i01_table_wide", "i01_topic_choice"]
+const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player", "mission_dialogue", "mission_reaction", "i01_table_detail", "i01_shelf_cups", "i01_bed", "i01_choice", "i01_table_wide", "i01_topic_choice", "i01_cups_insert", "i01_close_speaker", "i01_react_boy", "i01_two_shot", "i01_react_julia", "duo_wide", "duo_close", "duo_react", "duo_ots", "duo_hands", "prop_insert"]
 const REGIONS := {
 	"italia": {
 		"location": "Römische Grenzsiedlung",

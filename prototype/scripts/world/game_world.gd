@@ -28,7 +28,9 @@ var opening_props = preload("res://scripts/world/village/opening_props.gd").new(
 ## I-01 cups and jug follow the saved morning state (presentation only).
 ## Created with the scene so worlds that never build it own no orphan node.
 const I01Props = preload("res://scripts/world/village/i01_props.gd")
+const I03Props = preload("res://scripts/world/village/i03_props.gd")
 var i01_props: Node3D
+var i03_props: Node3D
 var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
@@ -203,6 +205,8 @@ func sync_state(state: Dictionary) -> void:
 	_figure.set_service_gear(CombatActions.service_gear(state))
 	if is_instance_valid(i01_props):
 		i01_props.sync_state(state, _figure)
+	if is_instance_valid(i03_props):
+		i03_props.sync_state(state, _figure)
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -325,6 +329,8 @@ func get_cinematic_anchor(key: String) -> Vector3:
 		_:
 			if key.begins_with("i01_"):
 				return I01Props.anchor(key)
+			if key.begins_with("i03_") and is_instance_valid(i03_props):
+				return to_global(i03_props.anchor(key))
 			return get_player_position()
 
 
@@ -632,6 +638,8 @@ func _build_scene() -> void:
 	add_child(opening_props)
 	i01_props = I01Props.new()
 	add_child(i01_props)
+	i03_props = I03Props.new()
+	add_child(i03_props)
 	_create_build_plot()
 	_buildings_root = Node3D.new()
 	_buildings_root.name = "PlayerBuildings"
