@@ -333,7 +333,18 @@ func _update_cards(camera: Camera3D) -> void:
 	if camera == null:
 		return
 	var budget: Dictionary = PROFILES.data.profiles[profile]
-	var eye := camera.get_camera_transform().origin
+	var view := camera.get_camera_transform()
+	var eye := view.origin
+	var forward := Vector2(-view.basis.z.x, -view.basis.z.z)
+	forward = forward.normalized() if forward.length() > .05 else Vector2.ZERO
+	var aspect := 1.78
+	if is_inside_tree():
+		var size := get_viewport().get_visible_rect().size
+		aspect = maxf(1.0, size.x / maxf(1.0, size.y))
+	# Use the same conservative, padded fan as the trees. Nearby cards
+	# remain active during quick camera turns; distant cards behind the
+	# camera do not consume batch submissions or inflate the active budget.
+	var half_fov := rad_to_deg(atan(tan(deg_to_rad(camera.fov * .5)) * aspect)) + FAN_MARGIN_DEG
 	_visible_cards = {"chunks": 0, "instances": 0, "triangles": 0}
 	var near_tris := _card_triangles("clump_near")
 	var far_tris := _card_triangles("clump_far")
@@ -343,7 +354,7 @@ func _update_cards(camera: Camera3D) -> void:
 		var end := float(budget.crop_end_m if crops else budget.herb_end_m)
 		var center: Vector3 = chunk.center
 		var d := maxf(0.0, Vector2(eye.x - center.x, eye.z - center.z).length() - Ecology.CHUNK * .71)
-		if d > end:
+		if d > end or not _in_fan(eye, forward, half_fov, node.multimesh.custom_aabb):
 			node.visible = false
 			continue
 		node.visible = true
