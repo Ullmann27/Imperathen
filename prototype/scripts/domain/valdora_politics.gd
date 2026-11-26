@@ -78,14 +78,14 @@ static func apply(candidate: Dictionary, command: String, args: Dictionary) -> D
 	match command:
 		"politics_survey":
 			id = SURVEY
-			message = "Am Südweg hat Regen den Rand ausgespült. Ein voller Wagen braucht dort einen breiteren Durchlass."
+			message = "Am Südweg hat der Regen die Erde unter einer Bohle ausgespült. Vom festen Rand aus siehst du die fehlende Auflage."
 		"politics_help":
 			id = ROUTES[args.route]
 			if args.route == "wood":
 				Life._pay(candidate, {"wood": DONATION_WOOD})
 				message = "Decimus übernimmt vier Holz für den Südweg und merkt sich deine Hilfe."
 			else:
-				message = "Decimus hält deinen Bericht über den ausgewaschenen Südweg fest."
+				message = "Decimus hält deinen Bericht über die lose Bohle am Südweg fest."
 			message += " Er spricht dir persönlich seine Empfehlung aus."
 		"politics_audience":
 			id = AUDIENCE

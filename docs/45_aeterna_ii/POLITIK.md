@@ -2,7 +2,7 @@
 
 Decimus, der fiktive und bereits im Dorf vorhandene Verwalter, bittet um Hilfe am ausgewaschenen Südweg. Nach I‑01 und einer persönlichen Vorstellung kann die Hauptfigur eine von zwei Antworten wählen. Sie kann den Südweg begutachten und Decimus einen Bericht bringen oder vier Holz für die Arbeiten geben. Der Bericht setzt den tatsächlichen Besuch der Stelle voraus. Die Spende wird vom vorhandenen Holzvorrat und im Dorfbuch erfasst.
 
-Decimus spricht eine einmalige persönliche Empfehlung aus. Ein Bericht stärkt seinen Respekt, die Spende sein Vertrauen. Die Beziehung, die Empfehlung und ihre Herkunft ergeben sich aus derselben Ereignisfolge. Ab achtzehn Jahren kann die Hauptfigur damit bei anwesendem Decimus um eine Audienz bitten. Diese Möglichkeit steht sowohl zivilen als auch militärischen Lebenswegen offen. Sie vergibt weder ein Amt noch einen Rang.
+Decimus spricht eine einmalige persönliche Empfehlung aus. Ein Bericht stärkt seinen Respekt, die Spende sein Vertrauen. Die Beziehung, die Empfehlung und ihre Herkunft ergeben sich aus derselben Ereignisfolge. Ab achtzehn Jahren kann die Hauptfigur damit bei anwesendem Decimus um eine Audienz bitten. Diese Möglichkeit steht sowohl zivilen als auch militärischen Lebenswegen offen. Die Audienz ist ein persönliches Gespräch über den Ort.
 
 ## Spielschnittstelle
 
