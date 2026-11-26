@@ -944,3 +944,28 @@ Die Rekonstruktion des Builders `tools/world/build_roman_test_city.py` ohne Blen
 | 08 Riesige Open World | E, P2 | Hügelkulisse und Geländefarbe in Arbeit; Region, Wege und Ortschaften offen |
 | 09 Legionen und Großschlacht | E, P3 | Talgefecht vorhanden; Massenschlacht nach gemessenen Gates (P3) |
 | 10 Macht, Intrigen, Aufstieg | Systembibel 10, B | Beziehungs- und Fraktionskern in Arbeit, zuerst als KI der germanischen Gruppen: Aufbau, Angriffe, Bündnisse, gerichtete Beziehungen, Vereinbarungen mit Fristen |
+
+## 18. Entwürfe für P1 und Truppen (26.11.2026, lesende Analysen, nicht umgesetzt)
+
+Beide Dokumente sind Analysen ohne Engine-Lauf. Kennzeichnung im Text: [V] im Code geprüft, [D] dokumentiert, [I] Ableitung, [Q] antike Quelle, die Stelle ist vor Übernahme zu prüfen.
+
+- **`entwuerfe/i01_i03_i04_lueckenanalyse.md`:** I-01, I-03 und I-04 Beat für Beat gegen das Handbuch (S. 13–15) und den Code, mit Bauplan für den I-01-Abschnitt.
+  - Die Umsetzung läuft auf `feat/i01-three-cups-slice-20261126`.
+  - Gefunden wurden ein erfundener Erfolg (Text „drei Becher gefüllt“ gegen zwei unveränderte Becher in der Welt), ein veralteter Marcus-Dialog vor I-03 und „Truppe/Moral“ im Journal des Kindes.
+- **`entwuerfe/truppen_kommando_darstellung.md`:** Truppendesign, Kommando und Schlachtdarstellung; Maßstab Mount & Blade II: Bannerlord, nur als Qualitätsmaßstab.
+  - Bestand des Talgefechts: 6 Verbände mit 30 gegen 30, 7 Formationen, 13 Befehle, 67 Regelprüfungen.
+  - Lücken:
+    - Verluste immer im hintersten Glied, Soldaten-ID ist der Platzindex;
+    - der Offizier fällt immer nach drei Verlusten;
+    - „Sammeln“ beendet die Flucht sofort;
+    - beide Seiten mit gleichen Modellen;
+    - keine Truppendaten, Kulturen oder Stufen.
+  - Entwurf: zeitabhängige Truppenbäume für Rom und germanische Gemeinwesen, neue Befehle, Moral mit Ansteckung, Banner, Einheitenkarten, Detailstufen-Budgets.
+  - Arbeitspakete P1–P9 mit Abnahmezahlen; P1–P4 sind in Umsetzung.
+  - Offene Entscheidungen des Auftraggebers (Abschnitt 5 des Entwurfs):
+    - Benennung des Talgefechts;
+    - Axtkrieger als Designannahme;
+    - ab welchem Rang der Spieler Truppen führt;
+    - Einzel- oder Sammelberechnung im Nahkampf;
+    - Angriffsgleiten;
+    - Kapiteljahre nach Zeitsprüngen.
