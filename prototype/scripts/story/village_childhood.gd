@@ -9,12 +9,13 @@ const CompanionStory = preload("res://scripts/story/companion_story.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const I03 = preload("res://scripts/story/i03_shortcut.gd")
 const I04 = preload("res://scripts/story/i04_workshop.gd")
+const RaidInvestigation = preload("res://scripts/story/raid_investigation.gd")
 const VERSION := 2
 const LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
 const POINT_RANGE := 1.6
 const MAX_RESOURCE := 1000000
-const COMMAND_FIELDS := {"village_childhood_action":["action_id"], "village_childhood_begin_raid":[]}
+const COMMAND_FIELDS := {"village_childhood_action":["action_id"], "village_childhood_begin_raid":[], "village_investigation_question":["npc_id","topic"], "village_investigation_compare":["deduction_id"]}
 const WORKPLACE_POSITIONS := {"farm":Vector2(24.0,-30.0),"woodcamp":Vector2(-43.0,14.0),"quarry":Vector2(48.0,-12.0),"trade":Vector2(25.0,24.0),"watchpost":Vector2(0.0,-48.0),"defense":Vector2(0.0,-16.0)}
 const POINTS := {
 	"mother":Vector2(-15.3,14.8), "father":Vector2(-16.2,16.7),
@@ -51,7 +52,7 @@ static var BRIDGE_STEPS: Dictionary = MissionData.bridge_steps("band1")
 ## errand with Marcus (route, stance, resolution, farewell, event ledger).
 ## v6 adds the I-04 workshop visit (work, talk at the anvil, event ledger).
 ## Older saves migrate on load.
-const SCREENPLAY_VERSION := 6
+const SCREENPLAY_VERSION := 7
 static var CARRIED_EFFECTS: Dictionary = MissionData.carried_effects("band1")
 const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Kleinholzbündel für Sextus", "stall_water":"Wasserkrug für Cassias Stand", "sextus_note":"Sextus’ Wachstäfelchen für Fabius", "checked_hinge":"Geprüfter Truhengriff", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
@@ -83,6 +84,7 @@ static func start(data: Dictionary) -> bool:
 	data.village.childhood.screenplay.merge(I01.fresh_state())
 	data.village.childhood.screenplay.merge(I03.fresh_state())
 	data.village.childhood.screenplay.merge(I04.fresh_state())
+	data.village.childhood.screenplay.investigation = RaidInvestigation.fresh_state()
 	return true
 
 
@@ -210,6 +212,10 @@ static func migrate_screenplay(data: Dictionary) -> bool:
 		migrated = true
 	if I04.migrate(child, _i04_index()):
 		migrated = true
+	if child.screenplay.get("version") == 6 and not child.screenplay.has("investigation"):
+		child.screenplay.investigation = RaidInvestigation.fresh_state()
+		child.screenplay.version = 7
+		migrated = true
 	return migrated
 
 
@@ -314,6 +320,17 @@ static func talk(data: Dictionary, id: String, choice: String) -> Dictionary:
 
 
 static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dictionary:
+	if RaidInvestigation.COMMAND_FIELDS.has(command):
+		for value in args.values():
+			if not value is String or value.is_empty() or value.length() > 64:
+				return _fail("Ungültige Ermittlungsangabe.")
+		var witness := str(args.get("npc_id","decimus"))
+		var reason := _investigation_reason(data,witness)
+		if not reason.is_empty():
+			return _fail(reason)
+		if command == "village_investigation_question":
+			return RaidInvestigation.question(data,witness,args.topic,int(_relation(data,witness).get("trust",0)))
+		return RaidInvestigation.compare(data,args.deduction_id)
 	var child: Dictionary = data.village.childhood
 	if command == "village_childhood_begin_raid":
 		if child.completed.size() != STEPS.size() or child.night_event != "pending" or child.screenplay.i10 != "pending":
@@ -695,6 +712,8 @@ static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
 		var companion_line := companion_dialogue(data, npc_id)
 		if step.get("npc", "") != npc_id and not companion_line.is_empty():
 			text = companion_line.text
+		if _investigation_reason(data,npc_id).is_empty():
+			choices.append_array(RaidInvestigation.choices(data,npc_id,int(relation.get("trust",0))))
 		text += "\n\nVertrauen: %d · Erzählter Dorftag %d. Du bist weiterhin Teil deiner Familie und des Dorfes." % [int(relation.get("trust",0)),int(data.village.childhood.day)]
 	return {"title":"%s · %s" % [spec.name,spec.role],"text":text,"choices":choices}
 
@@ -768,6 +787,7 @@ static func validate(data: Dictionary) -> String:
 	screenplay_keys.append_array(I01.KEYS)
 	screenplay_keys.append_array(I03.KEYS)
 	screenplay_keys.append_array(I04.KEYS)
+	screenplay_keys.append("investigation")
 	if not _keys(screenplay, screenplay_keys) or not _integer(screenplay.version,SCREENPLAY_VERSION,SCREENPLAY_VERSION):
 		return "Ungültiger Drehbuch-Brückenstand."
 	var morning_error := I01.validate(screenplay, child.completed.size())
@@ -889,6 +909,9 @@ static func validate(data: Dictionary) -> String:
 		return "Vor der freigegebenen Nacht darf kein Überfall begonnen oder abgeschlossen sein."
 	if child.night_event == "resolved" and (raid.get("status","") != "aftermath" or int(raid.get("completed",0)) < 1):
 		return "Der Schwur darf keinen unabgeschlossenen Nachtangriff überspringen."
+	var investigation_error := RaidInvestigation.validate(data)
+	if not investigation_error.is_empty():
+		return investigation_error
 
 	if not _integer(child.day,1,4) or child.day != expected_day or child.carried != expected_items:
 		return "Tag oder Auftragsgegenstände sind nicht durch erledigte Handlungen belegt."
@@ -1084,6 +1107,18 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 	for option: Dictionary in options:
 		result.append({"label":option.label,"command":"village_childhood_action","payload":{"action_id":option.id},"enabled":reason.is_empty(),"reason":reason})
 	return result
+
+
+static func _investigation_reason(data: Dictionary, npc: String) -> String:
+	if RaidInvestigation.phase(data).is_empty() or data.get("village",{}).get("raid",{}).get("active",false) or data.get("encounter",{}).get("active",false):
+		return "Die Ermittlungen beginnen erst nach dem Überfall."
+	if npc not in RaidInvestigation.WITNESSES and npc != "decimus":
+		return "Diese Person ist kein zugänglicher Zeuge."
+	if not _available(data,npc) or not _relation(data,npc).get("met",false):
+		return "Diese Person ist derzeit nicht erreichbar."
+	if _distance(data,_npc_position(data,npc)) > NPC_RANGE:
+		return "Geh zu dieser Person, um ihre Aussage aufzunehmen."
+	return ""
 
 
 static func _action_reason(data: Dictionary, step: Dictionary) -> String:

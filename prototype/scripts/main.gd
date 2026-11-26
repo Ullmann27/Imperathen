@@ -584,9 +584,10 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	# as thousands of permanent economic orders. Their consequences are saved.
 	var command_id := "" if realtime_combat else "%s_%d" % [run_id, command_serial]
 	var political_command := command.begins_with("politics_")
-	var durable_change := command in ["choose_adult_path","village_dispatch_grain"] or political_command or TravelParty.COMMAND_FIELDS.has(command) or Allegiance.COMMAND_FIELDS.has(command) or gear_choice
+	var investigation_command := command.begins_with("village_investigation_")
+	var durable_change := command in ["choose_adult_path","village_dispatch_grain"] or investigation_command or political_command or TravelParty.COMMAND_FIELDS.has(command) or Allegiance.COMMAND_FIELDS.has(command) or gear_choice
 	var previous_data: Dictionary = model.data.duplicate(true) if durable_change else {}
-	if command == "village_childhood_action" or party_choice:
+	if command == "village_childhood_action" or party_choice or investigation_command:
 		# Presence checks (Marcus at the lane or the stall) use the bodies as
 		# they stand now, not an older observation.
 		model.capture_npc_observations()
@@ -602,6 +603,8 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 			model.data = previous_data
 			_refresh()
 			var save_feedback := "Decimus' Eintrag konnte nicht gespeichert werden. Die Änderung wurde zurückgenommen." if political_command else "Der Gefährtenauftrag konnte nicht gespeichert werden. Die Änderung wurde zurückgenommen."
+			if investigation_command:
+				save_feedback = "Die Aussage konnte nicht gespeichert werden. Sie wurde zurückgenommen."
 			if gear_choice:
 				save_feedback = "Die Ausrüstungsbuchung konnte nicht gespeichert werden. Sie wurde zurückgenommen."
 			if command == "village_dispatch_grain":
@@ -754,6 +757,8 @@ func _show_village_npc(npc_id: String) -> void:
 
 
 func _village_command(command: String, args: Dictionary) -> void:
+	if command.begins_with("village_investigation_") and (screen != "village_dialog" or village_npc != str(args.get("npc_id","decimus"))):
+		return
 	var political_choice := screen == "village_dialog" and village_npc == "decimus" and command in ["politics_help", "politics_audience"]
 	if command in ["party_invite","party_hire"]:
 		_party_command(command, args)
