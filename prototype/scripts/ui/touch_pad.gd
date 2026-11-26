@@ -3,12 +3,16 @@ extends Control
 
 signal axis_changed(axis: Vector2)
 
+const Style = preload("res://scripts/ui/roman_hud/hud_style.gd")
 const DEAD_ZONE := 0.12
 var touch_index := -1
 var axis := Vector2.ZERO
 var _mouse_captured := false
 var _knob := Vector2.ZERO
 var _ignore_mouse_until := 0
+## Eased 0..1 while a finger holds the pad; at rest the pad recedes so the
+## world stays visible (it never stops accepting a new contact).
+var _engaged := 0.0
 
 
 func _ready() -> void:
@@ -101,15 +105,24 @@ func _update_axis(point: Vector2) -> void:
 	queue_redraw()
 
 
+func _process(delta: float) -> void:
+	var held := touch_index != -1 or _mouse_captured
+	var next := move_toward(_engaged, 1.0 if held else 0.0, delta / (0.08 if held else 0.35))
+	if not is_equal_approx(next, _engaged):
+		_engaged = next
+		queue_redraw()
+
+
 func _draw() -> void:
+	# Roman bronze ring: four gilded diamonds mark the axes, the knob is a coin.
 	var center := size * 0.5
 	var radius := maxf(24.0, minf(size.x, size.y) * 0.5 - 19.0)
-	var bronze := Color("b99563")
-	draw_circle(center, radius, Color(0.04, 0.07, 0.07, 0.65))
-	draw_arc(center, radius, 0, TAU, 64, Color(bronze, 0.78), 1.5, true)
-	draw_arc(center, radius * 0.66, 0, TAU, 56, Color(bronze, 0.22), 1, true)
+	var presence := lerpf(0.6, 1.0, _engaged)
+	draw_circle(center, radius, Color(0.045, 0.034, 0.025, 0.2 + 0.25 * _engaged))
+	draw_arc(center, radius, 0, TAU, 80, Color(Style.BRONZE, 0.78 * presence), 1.8, true)
+	draw_arc(center, radius - 5.0, 0, TAU, 80, Color(Style.AURUM, 0.22 * presence), 1.0, true)
+	draw_arc(center, radius * 0.62, 0, TAU, 64, Color(Style.BRONZE, 0.14 + 0.12 * _engaged), 1.0, true)
 	for direction in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
-		draw_line(center + direction * radius * 0.80, center + direction * radius * 0.89, Color(bronze, 0.70), 2, true)
+		Style.draw_diamond(self, center + direction * (radius - 2.5), 4.5, Color(Style.AURUM, 0.8 * presence))
 	var knob_center := center + _knob * (radius - 25)
-	draw_circle(knob_center, radius * 0.29, Color(0.42, 0.28, 0.16, 0.91))
-	draw_arc(knob_center, radius * 0.29, 0, TAU, 40, Color("e4ca9b"), 1.5, true)
+	Style.draw_medallion(self, knob_center, radius * 0.29, _engaged, false, _engaged > 0.5)
