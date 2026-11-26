@@ -9,6 +9,7 @@ extends Node3D
 ## server-side static body. Nothing here changes the simulation.
 
 const Library = preload("res://scripts/vegetation/vegetation_library.gd")
+const Safe := preload("res://scripts/vegetation/vegetation_safe.gd")
 const Ecology = preload("res://scripts/vegetation/vegetation_ecology.gd")
 const Grass = preload("res://scripts/vegetation/vegetation_grass.gd")
 const PROFILES := preload("res://assets/vegetation/vegetation_profiles.json")
@@ -63,6 +64,7 @@ func build(ground_height: Callable, legacy_sites: Array, brook_source_z := -95.0
 	add_child(grass)
 	set_quality(profile)
 	apply_season(season)
+	print("IMPERATHEN_VEGETATION_RENDER_PATH ", "android_static" if Safe.active() else "animated_world_space", " trees=",placed_trees," card_chunks=",_card_chunks.size())
 
 
 func _build_cells() -> void:
@@ -125,21 +127,33 @@ func _attach_collision() -> void:
 func _build_cards() -> void:
 	for key: String in ecology.cards:
 		var chunk: Dictionary = ecology.cards[key]
-		var batch := MultiMeshInstance3D.new()
-		batch.name = "Cards_" + key
-		var multimesh := MultiMesh.new()
-		multimesh.transform_format = MultiMesh.TRANSFORM_3D
-		multimesh.use_custom_data = true
-		multimesh.mesh = Library.card_mesh("clump_near", chunk.atlas)
-		multimesh.instance_count = chunk.count
-		multimesh.buffer = chunk.buffer
 		var half := Ecology.CHUNK * .5 + 1.5
-		multimesh.custom_aabb = AABB(Vector3(chunk.center.x - half, chunk.min_y - .2, chunk.center.z - half), Vector3(half * 2.0, chunk.max_y - chunk.min_y + 3.4, half * 2.0))
-		batch.multimesh = multimesh
-		batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(batch)
-		_card_chunks.append({"node": batch, "atlas": chunk.atlas, "center": chunk.center, "count": chunk.count, "lod": "near"})
-
+		var bounds := AABB(Vector3(chunk.center.x-half,chunk.min_y-.2,chunk.center.z-half),Vector3(half*2.0,chunk.max_y-chunk.min_y+3.4,half*2.0))
+		if Safe.active():
+			# The atlas-bearing small foliage is an ordinary CPU-baked chunk.
+			# Lazily allocate only visible geometry, and reuse it across turns.
+			var node := MeshInstance3D.new()
+			node.name = "Cards_" + key
+			node.position = chunk.center
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			node.hide()
+			add_child(node)
+			_card_chunks.append({"node":node,"atlas":chunk.atlas,"center":chunk.center,"count":chunk.count,
+				"lod":"","render_count":0,"bounds":bounds,"buffer":chunk.buffer})
+		else:
+			var batch := MultiMeshInstance3D.new()
+			batch.name = "Cards_" + key
+			var multimesh := MultiMesh.new()
+			multimesh.transform_format = MultiMesh.TRANSFORM_3D
+			multimesh.use_custom_data = true
+			multimesh.mesh = Library.card_mesh("clump_near",chunk.atlas)
+			multimesh.instance_count = chunk.count
+			multimesh.buffer = chunk.buffer
+			multimesh.custom_aabb = bounds
+			batch.multimesh = multimesh
+			batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			add_child(batch)
+			_card_chunks.append({"node":batch,"atlas":chunk.atlas,"center":chunk.center,"count":chunk.count,"lod":"near","bounds":bounds})
 
 func _exit_tree() -> void:
 	if _body.is_valid():
@@ -154,10 +168,11 @@ func set_quality(next_profile: String) -> void:
 	profile = next_profile if PROFILES.data.profiles.has(next_profile) else "balanced"
 	var budget: Dictionary = PROFILES.data.profiles[profile]
 	for material: ShaderMaterial in Library.materials():
-		material.set_shader_parameter("wind_detail", int(budget.wind_detail))
-		if material.shader == Library.LEAF_SHADER:
+		if not Safe.active():
+			material.set_shader_parameter("wind_detail", int(budget.wind_detail))
+		if material.get_meta("vegetation_family","") == "leaf":
 			material.set_shader_parameter("normal_strength", float(budget.leaf_normal_strength))
-		if material.shader == Library.CARD_SHADER:
+		if not Safe.active() and material.get_meta("vegetation_family","") == "card":
 			var crops: bool = material.get_shader_parameter("crops")
 			var end := float(budget.crop_end_m if crops else budget.herb_end_m)
 			material.set_shader_parameter("fade_end", end)
@@ -171,32 +186,37 @@ func set_quality(next_profile: String) -> void:
 func apply_season(index: int) -> void:
 	season = posmod(index, 4)
 	for material: ShaderMaterial in Library.materials():
-		material.set_shader_parameter("wind_strength", SEASON_GUST[season])
-		if material.shader == Library.LEAF_SHADER or material.shader == Library.IMPOSTOR_SHADER:
+		if not Safe.active():
+			material.set_shader_parameter("wind_strength", SEASON_GUST[season])
+		var family: String = material.get_meta("vegetation_family","")
+		if family in ["leaf","impostor"]:
 			material.set_shader_parameter("season_tint", SEASON_TINT[season])
 			material.set_shader_parameter("autumn", SEASON_AUTUMN[season])
 			material.set_shader_parameter("leaf_presence", SEASON_LEAVES[season])
-		elif material.shader == Library.CARD_SHADER:
+		elif family == "card":
 			material.set_shader_parameter("season_tint", SEASON_TINT[season].lerp(Color.WHITE, .5))
 			material.set_shader_parameter("bloom", SEASON_BLOOM[season])
 			material.set_shader_parameter("crop_stage", SEASON_CROP[season])
 			material.set_shader_parameter("dryness", SEASON_DRY[season])
-		elif material.shader == Library.BARK_SHADER:
+		elif family == "bark":
 			material.set_shader_parameter("wetness", [.25, .0, .55, .35][season])
-		elif material.shader == Library.GRASS_SHADER:
+		elif family == "grass":
 			material.set_shader_parameter("season_tint", [Color("#f0ffd0"), Color("#ffffff"), Color("#f0dcae"), Color("#b9ab8c")][season])
 			material.set_shader_parameter("dryness", [.0, .3, .6, .75][season])
 
 
 func set_wind_time(seconds: float) -> void:
 	_wind_time = seconds
+	if Safe.active():
+		return
 	for material: ShaderMaterial in Library.materials():
 		material.set_shader_parameter("wind_time", seconds)
 
 
 ## The blade grass is pressed down around this point (the player's feet).
 func set_player_position(at: Vector3) -> void:
-	Library.grass_material().set_shader_parameter("player_position", at)
+	if not Safe.active():
+		Library.grass_material().set_shader_parameter("player_position", at)
 
 
 func _process(delta: float) -> void:
@@ -291,7 +311,7 @@ func refresh(camera: Camera3D, complete_grass := true) -> void:
 			batch.name = key.replace("|", "_")
 			batch.multimesh = MultiMesh.new()
 			batch.multimesh.transform_format = MultiMesh.TRANSFORM_3D
-			batch.multimesh.use_custom_data = true
+			batch.multimesh.use_custom_data = not Safe.active()
 			batch.multimesh.mesh = info.impostor if level == 4 else info.lods[level]
 			batch.multimesh.custom_aabb = AABB(Vector3(-400, -20, -400), Vector3(800, 120, 800))
 			_batches[key] = batch
@@ -299,12 +319,25 @@ func refresh(camera: Camera3D, complete_grass := true) -> void:
 		var data: PackedFloat32Array = groups[key]
 		var count := data.size() / 16
 		var multimesh := batch.multimesh
-		if count > multimesh.instance_count:
-			multimesh.instance_count = nearest_po2(count)
-		if data.size() < multimesh.instance_count * 16:
-			data.resize(multimesh.instance_count * 16)
-		multimesh.buffer = data
-		multimesh.visible_instance_count = count
+		if Safe.active():
+			# Allocate a fresh buffer before a capacity increase. No partially
+			# filled, padded zero transforms are ever presented to GLES.
+			if count > multimesh.instance_count:
+				multimesh = Safe.new_multimesh(multimesh.mesh,nearest_po2(count),multimesh.custom_aabb)
+				if not Safe.upload(multimesh,data,count):
+					batch.hide()
+					continue
+				batch.multimesh = multimesh
+			elif not Safe.upload(multimesh,data,count):
+				batch.hide()
+				continue
+		else:
+			if count > multimesh.instance_count:
+				multimesh.instance_count = nearest_po2(count)
+			if data.size() < multimesh.instance_count * 16:
+				data.resize(multimesh.instance_count * 16)
+			multimesh.buffer = data
+			multimesh.visible_instance_count = count
 		batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if level <= shadow_lod else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		batch.show()
 		_visible[key] = count
@@ -349,25 +382,42 @@ func _update_cards(camera: Camera3D) -> void:
 	var near_tris := _card_triangles("clump_near")
 	var far_tris := _card_triangles("clump_far")
 	for chunk: Dictionary in _card_chunks:
-		var node: MultiMeshInstance3D = chunk.node
+		var node: GeometryInstance3D = chunk.node
 		var crops: bool = chunk.atlas == "crops"
 		var end := float(budget.crop_end_m if crops else budget.herb_end_m)
 		var center: Vector3 = chunk.center
 		var d := maxf(0.0, Vector2(eye.x - center.x, eye.z - center.z).length() - Ecology.CHUNK * .71)
-		if d > end or not _in_fan(eye, forward, half_fov, node.multimesh.custom_aabb):
+		if d > end or not _in_fan(eye, forward, half_fov, chunk.bounds):
 			node.visible = false
+			if Safe.active() and d > end + Ecology.CHUNK * 2.0:
+				(node as MeshInstance3D).mesh = null
+				chunk.render_count = 0
 			continue
-		node.visible = true
 		var near := d < float(budget.herb_near_m)
 		var lod := "near" if near else "far"
-		if chunk.lod != lod:
-			node.multimesh.mesh = Library.card_mesh("clump_" + lod, chunk.atlas)
-			chunk.lod = lod
 		var density := float(budget.crop_density if crops else budget.herb_density)
 		if d > end * .55:
 			density *= float(budget.far_card_share)
 		var count := ceili(int(chunk.count) * density)
-		node.multimesh.visible_instance_count = count
+		if Safe.active():
+			var baked := node as MeshInstance3D
+			if count <= 0:
+				node.hide()
+				continue
+			if chunk.lod != lod or chunk.render_count != count or baked.mesh == null:
+				baked.mesh = Safe.merge_cards(Library.card_mesh("clump_"+lod,chunk.atlas),chunk.buffer,count,chunk.center)
+				chunk.render_count = count if baked.mesh != null else 0
+				chunk.lod = lod
+			if baked.mesh == null:
+				node.hide()
+				continue
+		else:
+			var batch := node as MultiMeshInstance3D
+			if chunk.lod != lod:
+				batch.multimesh.mesh = Library.card_mesh("clump_"+lod,chunk.atlas)
+				chunk.lod = lod
+			batch.multimesh.visible_instance_count = count
+		node.show()
 		_visible_cards.chunks += 1
 		_visible_cards.instances += count
 		_visible_cards.triangles += count * (near_tris if near else far_tris)
@@ -413,7 +463,7 @@ func stats() -> Dictionary:
 	var placed := {}
 	if ecology:
 		placed = ecology.counts.duplicate()
-	return {"profile": profile, "season": season, "placed_trees_shrubs_vines": placed_trees, "placed": placed,
+	return {"profile": profile, "season": season, "render_path": "android_static" if Safe.active() else "animated_world_space", "placed_trees_shrubs_vines": placed_trees, "placed": placed,
 		"colliders": ecology.colliders.size() if ecology else 0, "visible_by_level": by_level,
 		"visible_tree_batches": batches, "tree_triangles_submitted": triangles,
 		"card_chunks_visible": _visible_cards.chunks, "card_instances_visible": _visible_cards.instances,

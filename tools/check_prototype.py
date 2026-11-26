@@ -28,7 +28,7 @@ FAILURE = re.compile(r"SCRIPT ERROR:|Parse Error:|^ERROR:|^USER ERROR:", re.MULT
 
 def run_check(engine, name, arguments, marker, environment, report):
     started = time.monotonic()
-    timeout = {"import": 600, "motion_measurement": 2400, "formation_agents": 600, "formation_levels": 600}.get(name, 120)
+    timeout = {"import": 600, "vegetation_safe": 360, "motion_measurement": 2400, "formation_agents": 600, "formation_levels": 600}.get(name, 120)
     try:
         result = subprocess.run([engine, "--headless", "--path", str(PROJECT), *arguments],
                                 cwd=ROOT, env=environment, text=True, encoding="utf-8",
@@ -239,6 +239,7 @@ def main():
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
             ("village_landscape", ["--fixed-fps", "60", "--script", "res://tests/village_landscape_test.gd"], "VILLAGE_LANDSCAPE_PASS"),
             ("vegetation", ["--script", "res://tests/vegetation_test.gd"], "VEGETATION_PASS"),
+            ("vegetation_safe", ["--fixed-fps", "60", "--script", "res://tests/vegetation_safe_test.gd"], "VEGETATION_SAFE_PASS"),
             ("valdora_house_family", ["--script", str(ROOT / "art/architecture/valdora_family/verify_family.gd")], "VALDORA_FAMILY errors []"),
             ("regional_workers", ["--fixed-fps", "60", "--script", "res://tests/regional_worker_test.gd"], "REGIONAL_WORKERS_PASS"),
             ("motion_skin_measurement", ["--fixed-fps", "60", "--script", "res://tests/motion_skin_measurement_test.gd"], "checks; 0 failed"),

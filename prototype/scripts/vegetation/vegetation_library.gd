@@ -4,6 +4,7 @@ extends RefCounted
 ## are shared per bark/leaf texture so profile, season and wind settings reach
 ## every instance through a few uniforms.
 
+const Safe := preload("res://scripts/vegetation/vegetation_safe.gd")
 const MANIFEST_PATH := "res://assets/vegetation/manifest.json"
 const TEXTURES := "res://assets/vegetation/textures/"
 const BARK_SHADER := preload("res://scripts/vegetation/vegetation_bark.gdshader")
@@ -56,7 +57,7 @@ static func asset(name: String) -> Dictionary:
 		if node == null:
 			push_error("Vegetation LOD missing: %s_lod%d" % [name, lod])
 			continue
-		var mesh := node.mesh
+		var mesh: Mesh = Safe.copy_uncompressed(node.mesh) if Safe.active() else node.mesh
 		for surface in mesh.get_surface_count():
 			var source := mesh.surface_get_material(surface)
 			var leafy := source != null and source.resource_name.begins_with("leaf_")
@@ -67,7 +68,7 @@ static func asset(name: String) -> Dictionary:
 	var impostor: Dictionary = meta.get("impostor", {})
 	if not impostor.is_empty() and ResourceLoader.exists(TEXTURES + "impostor_%s_albedo.png" % name):
 		result.impostor = _impostor_mesh(name, impostor, result.height, result.kind)
-		result.triangles.append(2)
+		result.triangles.append(_triangles(result.impostor))
 	_assets[name] = result
 	return result
 
@@ -77,7 +78,8 @@ static func bark_material(texture: String, height: float, kind: String) -> Shade
 	if _materials.has(key):
 		return _materials[key]
 	var material := ShaderMaterial.new()
-	material.shader = BARK_SHADER
+	material.shader = Safe.BARK if Safe.active() else BARK_SHADER
+	material.set_meta("vegetation_family","bark")
 	material.set_shader_parameter("bark_albedo", load(TEXTURES + "bark_%s_albedo.png" % texture))
 	material.set_shader_parameter("bark_normal", load(TEXTURES + "bark_%s_normal.png" % texture))
 	_wind_defaults(material, height, kind)
@@ -90,11 +92,13 @@ static func leaf_material(texture: String, height: float, kind: String) -> Shade
 	if _materials.has(key):
 		return _materials[key]
 	var material := ShaderMaterial.new()
-	material.shader = LEAF_SHADER
+	material.shader = Safe.LEAF if Safe.active() else LEAF_SHADER
+	material.set_meta("vegetation_family","leaf")
 	material.set_shader_parameter("leaf_albedo", load(TEXTURES + "leaf_%s_albedo.png" % texture))
 	material.set_shader_parameter("leaf_normal", load(TEXTURES + "leaf_%s_normal.png" % texture))
 	# Willow leaves are silvery and thin; alder leaves dark and leathery.
-	material.set_shader_parameter("translucency", {"willow": .38, "alder": .32, "vine": .55}.get(texture, .5))
+	if not Safe.active():
+		material.set_shader_parameter("translucency", {"willow": .38, "alder": .32, "vine": .55}.get(texture, .5))
 	_wind_defaults(material, height, kind)
 	_materials[key] = material
 	return material
@@ -105,13 +109,15 @@ static func card_material(atlas: String) -> ShaderMaterial:
 	if _materials.has(key):
 		return _materials[key]
 	var material := ShaderMaterial.new()
-	material.shader = CARD_SHADER
+	material.shader = Safe.CARD if Safe.active() else CARD_SHADER
+	material.set_meta("vegetation_family","card")
 	material.set_shader_parameter("card_albedo", load(TEXTURES + "%s_albedo.png" % atlas))
 	material.set_shader_parameter("crops", atlas == "crops")
-	material.set_shader_parameter("plant_height", 1.0)
-	material.set_shader_parameter("trunk_sway", 0.16 if atlas == "herbs" else 0.11)
-	material.set_shader_parameter("branch_amplitude", 0.0)
-	material.set_shader_parameter("leaf_amplitude", 0.025)
+	if not Safe.active():
+		material.set_shader_parameter("plant_height", 1.0)
+		material.set_shader_parameter("trunk_sway", 0.16 if atlas == "herbs" else 0.11)
+		material.set_shader_parameter("branch_amplitude", 0.0)
+		material.set_shader_parameter("leaf_amplitude", 0.025)
 	_materials[key] = material
 	return material
 
@@ -124,7 +130,7 @@ static func card_mesh(variant: String, atlas: String) -> Mesh:
 	var packed := load("res://assets/vegetation/herb_cards.glb") as PackedScene
 	var scene := packed.instantiate()
 	var node := scene.find_child(variant, true, false) as MeshInstance3D
-	var mesh := node.mesh.duplicate() as Mesh
+	var mesh: Mesh = Safe.copy_uncompressed(node.mesh) if Safe.active() else node.mesh.duplicate() as Mesh
 	scene.free()
 	mesh.surface_set_material(0, card_material(atlas))
 	_cards[key] = mesh
@@ -141,7 +147,7 @@ static func grass_mesh(variant: String) -> Mesh:
 	var node := scene.find_child(variant, true, false) as MeshInstance3D
 	var mesh: Mesh = null
 	if node != null:
-		mesh = node.mesh.duplicate() as Mesh
+		mesh = Safe.copy_uncompressed(node.mesh) if Safe.active() else node.mesh.duplicate() as Mesh
 		mesh.surface_set_material(0, grass_material())
 		_cards[variant] = mesh
 	else:
@@ -154,7 +160,8 @@ static func grass_material() -> ShaderMaterial:
 	if _materials.has("grass"):
 		return _materials["grass"]
 	var material := ShaderMaterial.new()
-	material.shader = GRASS_SHADER
+	material.shader = Safe.GRASS if Safe.active() else GRASS_SHADER
+	material.set_meta("vegetation_family","grass")
 	_materials["grass"] = material
 	return material
 
@@ -164,6 +171,8 @@ static func materials() -> Array:
 
 
 static func _wind_defaults(material: ShaderMaterial, height: float, kind: String) -> void:
+	if Safe.active():
+		return
 	material.set_shader_parameter("plant_height", maxf(height, 1.0))
 	material.set_shader_parameter("trunk_sway", SWAY.get(kind, 0.022))
 	material.set_shader_parameter("branch_amplitude", 0.13 if kind == "tree" else 0.07)
@@ -172,18 +181,22 @@ static func _wind_defaults(material: ShaderMaterial, height: float, kind: String
 
 static func _impostor_mesh(name: String, meta: Dictionary, height: float, kind: String) -> ArrayMesh:
 	var material := ShaderMaterial.new()
-	material.shader = IMPOSTOR_SHADER
+	material.shader = Safe.IMPOSTOR if Safe.active() else IMPOSTOR_SHADER
+	material.set_meta("vegetation_family","impostor")
 	material.set_shader_parameter("impostor_albedo", load(TEXTURES + "impostor_%s_albedo.png" % name))
-	material.set_shader_parameter("impostor_normal", load(TEXTURES + "impostor_%s_normal.png" % name))
-	material.set_shader_parameter("frame_size", float(meta.frame_size_m))
-	material.set_shader_parameter("center_height", float(meta.center_height_m))
-	material.set_shader_parameter("views", float(meta.views))
+	if not Safe.active():
+		material.set_shader_parameter("impostor_normal", load(TEXTURES + "impostor_%s_normal.png" % name))
+		material.set_shader_parameter("frame_size", float(meta.frame_size_m))
+		material.set_shader_parameter("center_height", float(meta.center_height_m))
+		material.set_shader_parameter("views", float(meta.views))
 	_wind_defaults(material, height, kind)
 	_materials["impostor_" + name] = material
 	# The shader rebuilds the camera-facing quad; the vertices only carry UVs
 	# and a bounding box that covers every orientation of the card.
 	var size := float(meta.frame_size_m)
 	var bottom := float(meta.center_height_m) - size * .5
+	if Safe.active():
+		return Safe.crossed_impostor(size,bottom,int(meta.views),material)
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array([Vector3(-size * .5, bottom, -size * .5), Vector3(size * .5, bottom, size * .5),

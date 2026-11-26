@@ -392,6 +392,14 @@ NATIVE_VEGETATION_RESOURCES = (
 )
 FEATURE_RESOURCE_GROUPS = (
     ("native_vegetation_content", NATIVE_VEGETATION_RESOURCES),
+    ("android_static_vegetation_content", (
+        "scripts/vegetation/vegetation_safe.gd",
+        "scripts/vegetation/safe_bark.gdshader",
+        "scripts/vegetation/safe_leaf.gdshader",
+        "scripts/vegetation/safe_card.gdshader",
+        "scripts/vegetation/safe_grass.gdshader",
+        "scripts/vegetation/safe_impostor.gdshader",
+    )),
     ("valdora_house_content", VALDORA_HOUSE_RESOURCES),
     ("village_look_content", VILLAGE_LOOK_RESOURCES),
     ("city_architecture_content", CITY_ARCHITECTURE_RESOURCES),
@@ -431,6 +439,7 @@ FEATURE_RESOURCE_GROUPS = (
 )
 FEATURE_ACTIVATION_RESOURCES = {
     "native_vegetation_content": ("scripts/vegetation/vegetation_field.gd",),
+    "android_static_vegetation_content": ("scripts/vegetation/vegetation_safe.gd",),
     "valdora_house_content": ("scripts/world/village/architecture/valdora_house_family.gd",),
     "village_look_content": ("scripts/rendering/village_look.gd",),
     "city_architecture_content": ("scripts/rendering/city_architecture_detail.gd",),

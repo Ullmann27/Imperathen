@@ -1,0 +1,16 @@
+# Android critical vegetation rendering regression — 26 November 2026
+
+**Input:** owner screenshots of the ARM64 QA build from `77f7944a46021e4c1522cee3f0ccb4902526c913`: huge green and yellow stretched triangles, detached plant tufts, visible in the menu, I-00 Aquileia introduction, the family window and the I-01 well. The phone has failed visual acceptance. The screenshots do not identify a proven driver root cause.
+
+## Hotfix
+- Select the independent static geometry path on Android, at all four quality levels. Retain the authored species, ecology, routes, collisions, materials, texture atlases, distance detail and densities.
+- All five Android-safe vegetation shaders have no position displacement, no camera-facing world-space vertex reconstruction and no custom instance attributes. Near and far blade grass and geometric trees retain native engine transforms only. Reconstruct the imported static mesh arrays without the optional position-compression flag.
+- Upload verified finite, orthogonal, bounded, positive-scale transforms through the public Godot API, without the packed 16-float GPU custom-data path. Hide invalid batches; never display unused capacity. Herb/crop cards use CPU-baked cell-local geometry with explicit UV2 atlas tile and variation data. Far trees use two fixed orthogonal original atlas views.
+- No content or save migration. On the desktop keep the animated vegetation path, with additional bounds on shared wind displacement. On Android plant wind, contact bending and shader-driven distance shrink are temporarily disabled; CPU/card rebuild cost and physical-device FPS need retest. This is a conservative rendering workaround, not a proven driver bug fix.
+
+## Evidence
+Both the normal and Android-safe path have engine tests. The new test forces the safe path in an isolated process, verifies real transforms, rejects malformed records, traverses the production menu/prologue/childhood path and checks the four vegetation profiles. A dedicated real Compatibility framebuffer gate separately draws two actual imported plants at translated world coordinates for each category and tests both visible pixel regions and out-of-bounds pixels. It also captures actual game frames at the menu, historical prologue, handoff, well and meadow. The QA APK workflow requires these tests and validates all six safe runtime resources in the exported APK. Desktop Mesa is not an Adreno 830 or a physical Fold7. APK and visual release status must not be claimed until CI evidence and owner screenshots are available.
+
+## Follow-up: run #150 failed after passing the geometry assertions
+
+GitHub run 45884310993 and dedicated run 45884311024 report `VEGETATION_SAFE_RESULT checks=3961 failures=0 profiles=[0, 1333, 4967, 15595]`, followed by `ERROR: Resumed function '_log_opening_geometry()' after await, but class instance is gone` at main.gd:1224. The strict test runner correctly rejects this engine error. Both menu and opening debug geometry loggers now use lifetime-bound one-shot callbacks instead of suspended coroutines, retaining the two-frame layout delay and debug markers. The regression deliberately destroys the scene with a pending callback and processes further frames. No engine error filtering or geometry acceptance condition is relaxed. The physical rendering gate and signed APK still require a successful fresh run.

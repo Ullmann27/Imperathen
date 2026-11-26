@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("visual_apk_validator", ROOT / "tools/validate_android_apk.py")
 VALIDATOR = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(VALIDATOR)
-GROUP_IDS = ["village_look_content","city_architecture_content","city_market_data_content","city_crowd_data_content","city_catalog_content","weapon_catalog_content"]
+GROUP_IDS = ["village_look_content","city_architecture_content","city_market_data_content","city_crowd_data_content","city_catalog_content","weapon_catalog_content","android_static_vegetation_content"]
 GROUPS = {key: paths for key, paths in VALIDATOR.FEATURE_RESOURCE_GROUPS if key in GROUP_IDS}
 RESOURCES = {path for group in GROUPS.values() for path in group}
 RAW_DATA = ["assets/story/chapter1_abilities.json","assets/story/investigation/valdora_raid.json","assets/village/look/look_values.json","assets/world/city_catalog.json","assets/world/city_crowd_layout.json","assets/city_detail/architecture/architecture_manifest.json","assets/city_detail/shops/city_market_anchors.json","assets/city_detail/characters/provenance.json","assets/interiors/kit_manifest.json","assets/interiors/shell_contract.json","assets/interiors/textures/manifest.json","assets/roman_material_lab/manifest.json","assets/roman_quarter/paving/metrics.json","assets/audio/sfx/sfx_manifest.json","assets/world/road_landmarks/old_quarry_asset.json","assets/world_expansion/manifest.json","assets/viva_country/manifest.json","assets/viva_country/hinterland_trees.json","assets/viva_country/scatter_0.json","assets/viva_country/scatter_1.json","assets/viva_country/scatter_2.json","data/weapons/weapon_catalog.v1.json"]

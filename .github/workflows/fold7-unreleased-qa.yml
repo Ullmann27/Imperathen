@@ -1,7 +1,7 @@
 name: IMPERATHEN isolated installable ARM64 QA – NOT a release
 on:
   push:
-    branches: ['feature/fold7-qa-installable-not-release-20261125', 'fix/hero-identity-city-motion-20261125', 'build/imperathen-integrated-arm64-qa-20261126', 'feat/marcus-authored-character-20261126']
+    branches: ['feature/fold7-qa-installable-not-release-20261125', 'fix/hero-identity-city-motion-20261125', 'build/imperathen-integrated-arm64-qa-20261126', 'feat/marcus-authored-character-20261126', 'fix/android-vegetation-render-20261126']
   pull_request:
     paths:
       - 'tools/build_unreleased_city_qa.py'
@@ -142,7 +142,7 @@ jobs:
         run: |
           set -euo pipefail
           IMPERATHEN_FULL_ASSET_ACCEPTANCE=1 python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going \
-            --only import vegetation valdora_house_family village_landscape opening_flow opening_voice i01_flow roman_menu city_trade city_market_bridge city_inventory_ui \
+            --only import vegetation vegetation_safe valdora_house_family village_landscape opening_flow opening_voice i01_flow roman_menu city_trade city_market_bridge city_inventory_ui \
               city_support city_viva_props city_exploration_detail npc_physical_conversation \
               touch_controls fold7_graphics_policy main_scene \
               combat_actions melee_tracks melee_core melee_visual_contact melee_feedback melee_camera melee_weapons \
@@ -166,6 +166,13 @@ jobs:
           grep -q MISSION_CINEMATICS_PASS artifacts/qa/mission-cinematics.log
           "$GODOT_BIN" --headless --path prototype --script res://tests/youth_mocap_test.gd 2>&1 | tee artifacts/qa/youth-mocap-runtime.log
           grep -q YOUTH_MOCAP_RUNTIME_PASS artifacts/qa/youth-mocap-runtime.log
+      - name: Verify Android-safe vegetation in a real Compatibility framebuffer
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri
+          bash tools/integration/check_vegetation_safe_render.sh "$GODOT_BIN" artifacts/qa/vegetation-render
       - name: Create separate ephemeral QA signing key (NOT existing app certificate)
         shell: bash
         run: |

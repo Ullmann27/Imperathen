@@ -1034,7 +1034,13 @@
     "shaders/resident_hair.gdshader",
     "shaders/resident_hair_cards.gdshader",
     "shaders/resident_skin.gdshader",
-    "scripts/visuals/marcus_model.gd"
+    "scripts/visuals/marcus_model.gd",
+    "scripts/vegetation/vegetation_safe.gd",
+    "scripts/vegetation/safe_bark.gdshader",
+    "scripts/vegetation/safe_leaf.gdshader",
+    "scripts/vegetation/safe_card.gdshader",
+    "scripts/vegetation/safe_grass.gdshader",
+    "scripts/vegetation/safe_impostor.gdshader"
   ],
   "procedural_owners": {
     "scripts/world/village_life_world.gd": [

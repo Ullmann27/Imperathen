@@ -43,7 +43,8 @@ float vegetation_gust(vec2 xz, float t) {
 
 // World-space displacement (render_mode world_vertex_coords).
 vec3 vegetation_wind(vec3 world, vec3 world_normal, vec4 weights, vec4 custom, vec3 anchor, float scale, float t) {
-	vec3 wind = normalize(vec3(wind_direction.x, 0.0, wind_direction.y));
+	vec3 direction = vec3(wind_direction.x, 0.0, wind_direction.y);
+	vec3 wind = length(direction) > 0.0001 ? normalize(direction) : vec3(1.0,0.0,0.0);
 	float phase = custom.x * 6.2832 + vegetation_hash(anchor.xz) * 6.2832;
 	float stiffness = max(0.35, custom.y);
 	// Gust fronts travel across the landscape along the wind (Leicht keeps
@@ -52,12 +53,12 @@ vec3 vegetation_wind(vec3 world, vec3 world_normal, vec4 weights, vec4 custom, v
 	float gust = wind_strength * (0.55 + 0.45 * front + 0.12 * sin(t * 1.31 + phase)) / stiffness;
 	vec3 rel = world - anchor;
 	float len = length(rel);
-	float height = max(0.0, rel.y) / max(0.5, plant_height * scale);
+	float height = clamp(rel.y / max(0.5, plant_height * scale), 0.0, 1.25);
 	float bend = height * height;
 	float sway = (0.75 + 0.25 * sin(t * 0.83 + phase)) * gust;
 	rel.xz += wind.xz * bend * sway * trunk_sway * plant_height * scale;
 	rel.xz += vec2(-wind.z, wind.x) * bend * sin(t * 1.12 + phase * 1.7) * trunk_sway * 0.35 * plant_height * scale * gust;
-	rel = normalize(rel) * len;
+	rel = length(rel) > 0.0001 ? normalize(rel) * len : vec3(0.0);
 	vec3 moved = anchor + rel;
 	if (wind_detail >= 1) {
 		float branch_phase = weights.g * 6.2832 + phase;
@@ -70,5 +71,8 @@ vec3 vegetation_wind(vec3 world, vec3 world_normal, vec4 weights, vec4 custom, v
 		float flutter = sin(t * (7.3 + 3.1 * weights.g) + dot(world, vec3(3.1, 2.3, 1.7)) + phase);
 		moved += world_normal * weights.b * leaf_amplitude * scale * flutter * (0.5 + 0.5 * gust);
 	}
-	return moved;
+	float max_offset = max(0.06, plant_height * scale * 0.18);
+	vec3 offset = moved - world;
+	float amount = length(offset);
+	return amount > max_offset ? world + offset * (max_offset / amount) : moved;
 }
