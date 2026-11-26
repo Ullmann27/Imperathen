@@ -787,7 +787,7 @@ func update_state(state: Dictionary) -> void:
 		announce = float(_navigation.announce)
 	_director.observe({"objective": objective[0] + "|" + objective[1], "resources": {"wood": int(resources.get("wood", 0)), "grain": int(resources.get("grain", 0)), "denarii": int(resources.get("denarii", 0))},
 		"health": int(health), "stamina": stamina, "danger": danger, "mode": _mode, "build": _build_active,
-		"overlay": _touch_overlay_open(), "prompt": _context, "announce": announce})
+		"overlay": _touch_overlay_open(), "prompt": _context, "announce": announce, "no_stock": calm_child})
 	_update_combat_controls()
 	_update_touch_visibility()
 
@@ -1728,23 +1728,28 @@ func _build_toolbar() -> void:
 	_hud_labels["controls"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(_hud_labels["controls"])
 	_director.register("controls_hint", _hud_labels["controls"], true)
-	var row := HFlowContainer.new()
-	row.mouse_filter = Control.MOUSE_FILTER_PASS
-	row.add_theme_constant_override("h_separation", 6)
-	row.add_theme_constant_override("v_separation", 6)
-	column.add_child(row)
+	_hud_labels["controls"].autowrap_mode = TextServer.AUTOWRAP_OFF
+	# Row one: modes and the village; row two: adult projects (hidden for a child).
+	var modes_row := HBoxContainer.new()
+	modes_row.mouse_filter = Control.MOUSE_FILTER_PASS
+	modes_row.add_theme_constant_override("separation", 6)
+	column.add_child(modes_row)
+	var projects_row := HBoxContainer.new()
+	projects_row.name = "Projects"
+	projects_row.mouse_filter = Control.MOUSE_FILTER_PASS
+	projects_row.add_theme_constant_override("separation", 6)
+	column.add_child(projects_row)
 	var modes := [["person", "Figur", "person"], ["city", "Stadt", "city"], ["map", "Karte", "map"]] if _compact_layout else [["person", "Persönlich", "person"], ["city", "Städtebau · Tab", "city"], ["map", "Landkarte · M", "map"]]
-	var plaques: Array[Button] = []
 	for item in modes:
 		var button := _hud_button(item[1], _emit.bind("mode_" + item[0], {}), item[2])
 		_mode_buttons[item[0]] = button
-		plaques.append(button)
+		modes_row.add_child(button)
 	var atlas := _hud_button("Weltkugel", func(): _emit("atlas"), "globe")
 	atlas.visible = _mode == "map"
-	plaques.append(atlas)
+	modes_row.add_child(atlas)
 	_action_buttons["atlas"] = atlas
 	if _state.get("village", {}).get("enabled", false):
-		plaques.append(_hud_button("Dorfleben", _emit.bind("village_panel", {}), "village", true))
+		modes_row.add_child(_hud_button("Dorfleben", _emit.bind("village_panel", {}), "village", true))
 	var actions := [
 		["build", "Hütte · 8 Holz", "Bauplan öffnen. Mit Linksklick einen erlaubten Platz bestätigen."],
 		["train", "Ausbildung", "Benötigt eine fertige Hütte, eine Gefährtenentscheidung und keine offene Baustelle. Am Trainingsplatz fortsetzen."],
@@ -1756,17 +1761,13 @@ func _build_toolbar() -> void:
 		var button := _hud_button(compact_names[item[0]] if _compact_layout else item[1], _emit.bind(item[0], {}), "projects")
 		button.tooltip_text = item[2]
 		_action_buttons[item[0]] = button
-		plaques.append(button)
-	var natural := 0.0
-	for button in plaques:
-		row.add_child(button)
-		natural += button.get_combined_minimum_size().x + 6.0
-	var width := minf(area.x - gutter * 2.0 - 280.0, natural + 60.0)
-	panel.size = Vector2(maxf(320.0, width), 0)
+		projects_row.add_child(button)
+		# The row disappears with its last visible project (the child has none).
+		button.visibility_changed.connect(_hide_empty_row.bind(projects_row))
 	_hud.dock = panel
 	_director.register("dock", panel)
-	panel.minimum_size_changed.connect(_anchor_bottom_left.bind(panel, Vector2(gutter, area.y - gutter), maxf(320.0, width)))
-	_anchor_bottom_left(panel, Vector2(gutter, area.y - gutter), maxf(320.0, width))
+	panel.minimum_size_changed.connect(_anchor_bottom_left.bind(panel, Vector2(gutter, area.y - gutter), 0.0))
+	_anchor_bottom_left(panel, Vector2(gutter, area.y - gutter), 0.0)
 	panel.mouse_entered.connect(func(): _director.wake("dock", 3.0))
 
 
@@ -1918,6 +1919,10 @@ func _layout_touch_actions() -> void:
 	if visible.is_empty():
 		cluster.size = Vector2.ZERO
 		return
+	var signature := "%s|%s" % [area, visible.map(func(button: Button) -> String: return str(button.get_meta("touch_action")))]
+	if cluster.get_meta("signature", "") == signature:
+		return
+	cluster.set_meta("signature", signature)
 	var by_action := {}
 	for button in visible:
 		by_action[str(button.get_meta("touch_action"))] = button
@@ -2045,8 +2050,18 @@ func _anchor_top_right(control: Control, corner: Vector2, min_height: float) -> 
 func _anchor_bottom_left(control: Control, corner: Vector2, width: float) -> void:
 	if not is_instance_valid(control) or not control.is_inside_tree():
 		return
-	control.size = Vector2(width, 0)
+	var fitted := control.get_combined_minimum_size()
+	control.size = Vector2(maxf(width, fitted.x), fitted.y)
 	control.position = Vector2(corner.x, corner.y - control.size.y)
+
+
+func _hide_empty_row(row: Control) -> void:
+	if not is_instance_valid(row) or not row.is_inside_tree():
+		return
+	var any := false
+	for child: Node in row.get_children():
+		any = any or (child as Control).visible
+	row.visible = any
 
 
 func _anchor_bottom_center(control: Control, bottom: Vector2, height: float) -> void:

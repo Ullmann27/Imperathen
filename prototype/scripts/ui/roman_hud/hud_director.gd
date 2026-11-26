@@ -93,6 +93,8 @@ func presence_target(id: String) -> float:
 			var needed := danger or int(context.get("health", 100)) < 100 or float(context.get("stamina", 100.0)) < 99.0
 			return 1.0 if needed or awake else 0.0
 		"resources":
+			if bool(context.get("no_stock", false)):
+				return 0.0
 			return 1.0 if mode != "person" or awake else 0.0
 		"controls_hint":
 			return 1.0 if mode != "person" or awake else 0.0
