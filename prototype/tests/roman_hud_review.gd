@@ -6,7 +6,9 @@ extends SceneTree
 ## inventory and the pause menu. It also measures the screen share of the HUD
 ## in calm exploration, geometrically and by a pixel difference against the
 ## same frame without the HUD layer.
-## Usage: godot --path prototype --script res://tests/roman_hud_review.gd -- <output> [label]
+## The run can be split into parts (explore, world, fixtures) so that one
+## render job stays short on a shared machine; every part writes its own receipt.
+## Usage: godot --path prototype --script res://tests/roman_hud_review.gd -- <output> [label] [parts]
 
 const EntryScene = preload("res://main.tscn")
 const Life = preload("res://scripts/story/village_life.gd")
@@ -23,6 +25,7 @@ const CAMERA_YAW := 2.45
 var game
 var output := ""
 var label := "review"
+var parts: PackedStringArray = ["explore", "world", "fixtures"]
 var captures: Array[Dictionary] = []
 var measurements: Array[Dictionary] = []
 var notes: Array[String] = []
@@ -41,6 +44,8 @@ func _initialize() -> void:
 	output = args[0]
 	if args.size() > 1:
 		label = args[1]
+	if args.size() > 2:
+		parts = args[2].split(",", false)
 	DirAccess.make_dir_recursive_absolute(output)
 	_run.call_deferred()
 
@@ -48,53 +53,58 @@ func _initialize() -> void:
 func _run() -> void:
 	root.content_scale_size = Vector2i.ZERO
 	root.size = SIZES[0]
-	game = EntryScene.instantiate()
-	root.add_child(game)
-	await _frames(4)
-	game.ui.set("_touch_enabled", true)
-	game.ui.set_quality("balanced")
-	game.ui._finish_intro()
-	await _frames(2)
-	game.ui.action_requested.emit("new_game", {})
-	await _frames(4)
-	game._opening_skip()
-	game._opening_next()
-	await _frames(6)
-	game._opening_skip()
-	if game.screen == "opening":
-		game.opening_overlay.choice_requested.emit("i01_help")
-		await _frames(4)
-		game._opening_skip()
-		game._opening_next()
-	await _frames(10)
-	_expect(game.screen == "playing", "The fresh childhood reaches play")
-	await _sequence()
 	var report := {
-		"label": label, "engine": Engine.get_version_info().string,
+		"label": label, "parts": Array(parts), "engine": Engine.get_version_info().string,
 		"renderer": RenderingServer.get_current_rendering_method(),
 		"adapter": RenderingServer.get_video_adapter_name(), "vendor": RenderingServer.get_video_adapter_vendor(),
 		"api": RenderingServer.get_video_adapter_api_version(), "display_driver": DisplayServer.get_name(),
-		"quality_profile": game.ui.get_quality(), "world_profile": game.world.get_quality_profile(),
 		"touch_hud": true, "calm_seconds": CALM_SECONDS, "camera_yaw": CAMERA_YAW, "yard_position": [YARD.x, YARD.y],
-		"loaded_models": _loaded_models(), "ui_assets": _ui_assets(), "lighting": _lighting(),
-		"captures": captures, "hud_area": measurements, "notes": notes,
+		"ui_assets": _ui_assets(), "captures": captures, "hud_area": measurements, "notes": notes,
 		"performance_note": "Software rendering under xvfb (llvmpipe); frame times are relative only and say nothing about the Fold7.",
 	}
-	game.queue_free()
-	await _frames(3)
-	game = null
-	await _fixtures()
-	var file := FileAccess.open(output.path_join("roman-hud-review-%s.json" % label), FileAccess.WRITE)
+	if parts.has("explore") or parts.has("world"):
+		game = EntryScene.instantiate()
+		root.add_child(game)
+		await _frames(4)
+		game.ui.set("_touch_enabled", true)
+		game.ui.set_quality("balanced")
+		game.ui._finish_intro()
+		await _frames(2)
+		game.ui.action_requested.emit("new_game", {})
+		await _frames(4)
+		game._opening_skip()
+		game._opening_next()
+		await _frames(6)
+		game._opening_skip()
+		if game.screen == "opening":
+			game.opening_overlay.choice_requested.emit("i01_help")
+			await _frames(4)
+			game._opening_skip()
+			game._opening_next()
+		await _frames(10)
+		_expect(game.screen == "playing", "The fresh childhood reaches play")
+		if parts.has("explore"):
+			await _explore()
+		if parts.has("world"):
+			await _sequence()
+		report.merge({"quality_profile": game.ui.get_quality(), "world_profile": game.world.get_quality_profile(),
+			"loaded_models": _loaded_models(), "lighting": _lighting()})
+		game.queue_free()
+		await _frames(3)
+		game = null
+	if parts.has("fixtures"):
+		await _fixtures()
+	var suffix := "" if parts.size() == 3 else "-" + "-".join(parts)
+	var file := FileAccess.open(output.path_join("roman-hud-review-%s%s.json" % [label, suffix]), FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "  ") + "\n")
 	file.close()
+	await process_frame
 	print("ROMAN_HUD_REVIEW_FAIL" if failed else "ROMAN_HUD_REVIEW_PASS")
 	quit(1 if failed else 0)
 
 
-func _sequence() -> void:
-	# Each state is captured at every size before the story moves on, so both
-	# resolutions show exactly the same game state.
-	# 1. Calm exploration in the yard, the same place and camera every time.
+## Calm exploration in the yard, the same place and camera every time.
+func _explore() -> void:
 	for extent: Vector2i in SIZES:
 		var tag := "%dx%d" % [extent.x, extent.y]
 		await _resize(extent)
@@ -112,8 +122,16 @@ func _sequence() -> void:
 		var frame := await _perf(90)
 		await _capture("explore-" + tag, {"frame": frame})
 		measurements.append(await _measure(tag))
-	# 2. A conversation with choices: Julia at the family table.
+
+
+## Each state is captured at every size before the story moves on, so both
+## resolutions show exactly the same game state.
+func _sequence() -> void:
+	# A conversation with choices: Julia at the family table.
 	await _resize(SIZES[0])
+	if game.screen != "playing":
+		game._resume()
+		await _frames(4)
 	var julia := Life.actor_position(game.model.data, "julia")
 	_place(julia + Vector2(0.9, 0.7))
 	await _frames(3)
