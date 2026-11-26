@@ -51,6 +51,9 @@ const PLOT_MAX := Vector2(24, 13)
 var _state: Dictionary = {}
 var _materials: Dictionary = {}
 var _active := false
+## The Roman HUD names the context action itself (touch medallion caption or
+## desktop key prompt); the label above the boy then stays hidden.
+var hud_prompts := false
 var _running := false
 var _built := false
 var _mode := "person"
@@ -292,7 +295,7 @@ func set_active(active: bool) -> void:
 	if _preview != null:
 		_preview.visible = active and _build_mode and _mode == "city"
 	if _hint != null:
-		_hint.visible = active and _mode == "person"
+		_hint.visible = active and _mode == "person" and not hud_prompts
 	if _plot != null:
 		_plot.visible = active and _mode == "city"
 	if not active:
@@ -472,7 +475,8 @@ func cue_unarmed(technique: String) -> void:
 
 
 func navigation_view() -> Dictionary:
-	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false}
+	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false,
+		"camera_yaw":snappedf(_camera_yaw,.01),"context":_hint.text if _hint != null and _active and _mode == "person" else ""}
 	if not Childhood.enabled(_state):
 		return result
 	var chapter:=Childhood.view(_state)
@@ -1719,9 +1723,10 @@ func _objective_villager() -> String:
 func _update_context_hint() -> void:
 	if _hint == null or _player == null:
 		return
-	_hint.visible = _active and _mode == "person"
+	var showing := _active and _mode == "person"
+	_hint.visible = showing and not hud_prompts
 	_hint.text = ""
-	if not _hint.visible:
+	if not showing:
 		return
 	if Childhood.enabled(_state):
 		var at:=Vector2(_player.position.x,_player.position.z)

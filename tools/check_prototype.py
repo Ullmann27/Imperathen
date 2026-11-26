@@ -132,6 +132,7 @@ def main():
             ("opening_flow", ["--fixed-fps", "60", "--script", "res://tests/opening_flow_test.gd"], "OPENING_FLOW_PASS"),
             ("ui", ["--fixed-fps", "60", "--script", "res://scripts/ui/ui_smoke.gd"], "UI_SMOKE_PASS"),
             ("roman_menu", ["--fixed-fps", "60", "--script", "res://tests/roman_menu_test.gd"], "ROMAN_MENU_PASS"),
+            ("roman_hud", ["--fixed-fps", "60", "--script", "res://tests/roman_hud_test.gd"], "ROMAN_HUD_PASS"),
             ("camera_collision", ["--fixed-fps", "60", "--script", "res://tests/camera_collision_test.gd"], "CAMERA_COLLISION_PASS"),
             ("runtime_display_lifecycle", ["--fixed-fps", "60", "--script", "res://tests/runtime_display_lifecycle_test.gd"], "RUNTIME_DISPLAY_LIFECYCLE_PASS"),
             ("fold7_graphics_policy", ["--fixed-fps", "60", "--script", "res://tests/fold7_graphics_policy_test.gd"], "FOLD7_GRAPHICS_POLICY_PASS"),

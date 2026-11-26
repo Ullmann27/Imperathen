@@ -79,6 +79,7 @@ func _ready() -> void:
 	ui = UIScript.new()
 	add_child(ui)
 	ui.action_requested.connect(_on_ui_action)
+	world.hud_prompts = true
 	world.set_quality(ui.get_quality())
 	_setup_ambient()
 	# The title sequence is opaque; the village is not drawn underneath it.
@@ -112,8 +113,8 @@ func _process(delta: float) -> void:
 		return
 	if screen == "playing":
 		world.set_frontier_time(float(model.data.world_seconds))
-		if Childhood.enabled(model.data):
-			ui.update_navigation(world.navigation_view())
+		# Compass, local map and the context action follow the live world.
+		ui.update_navigation(world.navigation_view())
 		autosave_elapsed += delta
 		if autosave_elapsed >= 45.0:
 			autosave_elapsed = 0.0
