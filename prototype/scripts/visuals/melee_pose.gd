@@ -115,7 +115,6 @@ var _leg_len := {}
 var _weapon_axis := Vector3.UP
 var _weapon_edge := Vector3.RIGHT
 var _shield_normal := Vector3.BACK
-var _ground := 0.0
 var _world_scale := 1.0
 var _from_position: Array[Vector3] = []
 var _from_rotation: Array[Quaternion] = []
@@ -145,7 +144,6 @@ func bind(model: Node3D, kit_id: String, weapon_axis_in_hand: Vector3 = Vector3.
 	for required: String in ["Pelvis", "Spine", "Head", "Arm_L", "Forearm_L", "Hand_L", "Arm_R", "Forearm_R", "Hand_R", "Thigh_L", "Shin_L", "Foot_L", "Thigh_R", "Shin_R", "Foot_R"]:
 		if not _ids.has(required):
 			return false
-	_ground = 0.0
 	# Root motion is authored in world metres; the actor body may be scaled.
 	_world_scale = maxf(0.01, model.scale.y)
 	_k = _origin("Head").y / REF_HEAD
@@ -182,12 +180,8 @@ func advance(delta: float) -> void:
 	_blend_left = maxf(0.0, _blend_left - maxf(0.0, delta))
 
 
-static func has_move(move: String) -> bool:
-	return MOVES.has(move)
-
-
 ## Strike pose at normalized clip time. Returns false for unknown moves.
-func strike(move: String, normalized: float, overlay: Dictionary = {}) -> bool:
+func strike(move: String, normalized: float) -> bool:
 	if not available or not MOVES.has(move) or not is_finite(normalized):
 		return false
 	var program: Dictionary = MOVES[move]
@@ -197,12 +191,12 @@ func strike(move: String, normalized: float, overlay: Dictionary = {}) -> bool:
 	keys.append(_stance_key(stance, 1.0))
 	var at := clampf(normalized, 0.0, 1.0)
 	var feet := _feet_at(stance, program.get("steps", []), at)
-	_apply(_sample(keys, at, stance), feet, overlay)
+	_apply(_sample(keys, at, stance), feet)
 	return true
 
 
 ## Guard held for `seconds` (raise over GUARD_RAISE, then hold).
-func guard(style: String, seconds: float, overlay: Dictionary = {}) -> bool:
+func guard(style: String, seconds: float) -> bool:
 	if not available or not GUARDS.has(style) or not is_finite(seconds):
 		return false
 	var stance: Dictionary = STANCES[KITS[kit].stance]
@@ -213,15 +207,15 @@ func guard(style: String, seconds: float, overlay: Dictionary = {}) -> bool:
 	target.syaw = float(stance.syaw) + float(g[3])
 	var keys: Array = [_stance_key(stance, 0.0), target]
 	var raise := clampf(seconds / GUARD_RAISE, 0.0, 1.0)
-	_apply(_sample(keys, smoothstep(0.0, 1.0, raise), stance), {"l":stance.foot_l, "r":stance.foot_r, "lift_l":0.0, "lift_r":0.0}, overlay)
+	_apply(_sample(keys, smoothstep(0.0, 1.0, raise), stance), {"l":stance.foot_l, "r":stance.foot_r, "lift_l":0.0, "lift_r":0.0})
 	return true
 
 
-func stance_pose(overlay: Dictionary = {}) -> bool:
+func stance_pose() -> bool:
 	if not available:
 		return false
 	var stance: Dictionary = STANCES[KITS[kit].stance]
-	_apply(_stance_key(stance, 0.0), {"l":stance.foot_l, "r":stance.foot_r, "lift_l":0.0, "lift_r":0.0}, overlay)
+	_apply(_stance_key(stance, 0.0), {"l":stance.foot_l, "r":stance.foot_r, "lift_l":0.0, "lift_r":0.0})
 	return true
 
 
@@ -263,7 +257,7 @@ func dodge(style: String, seconds: float, root_scale: float = 1.0) -> bool:
 	var crouch := sin(at * PI)
 	key.pelvis = Vector3(stance.pelvis) + Vector3(0.0, -0.05 * crouch, 0.0) + _units(total * smoothstep(0.0, 0.5, at) - root) * 0.35
 	key.lean = float(stance.lean) + (-8.0 if style == "dodge_back" else 2.0) * crouch
-	_apply(key, feet, {})
+	_apply(key, feet)
 	return true
 
 
@@ -299,14 +293,8 @@ func reaction(push: Vector3, strength: float, seconds: float, duration: float, r
 		var progress := smoothstep(0.08, 0.45, at)
 		feet[stepping] = Vector3(stance["foot_" + stepping]) + _units(root_step * progress - root_now)
 		feet["lift_" + stepping] = sin(progress * PI) * 0.06 if progress > 0.0 and progress < 1.0 else 0.0
-	_apply(key, feet, {})
+	_apply(key, feet)
 	return true
-
-
-## Fighter-space ground position of a bone (diagnostics, foot-slip checks).
-func bone_fighter_position(bone: String) -> Vector3:
-	var p := skeleton.get_bone_global_pose(_ids[bone]).origin
-	return Vector3(-p.x, p.y, p.z)
 
 
 func _stance_key(stance: Dictionary, t: float) -> Dictionary:
@@ -406,7 +394,7 @@ static func _m(v: Vector3) -> Vector3:
 	return Vector3(-v.x, v.y, v.z)
 
 
-func _apply(key: Dictionary, feet: Dictionary, overlay: Dictionary) -> void:
+func _apply(key: Dictionary, feet: Dictionary) -> void:
 	_reset()
 	var pelvis_offset: Vector3 = _m(Vector3(key.pelvis) * REF_HEAD) * _k
 	var pyaw := deg_to_rad(float(key.pyaw))
