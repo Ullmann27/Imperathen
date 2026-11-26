@@ -1219,11 +1219,25 @@ func _opening_set_paused(value: bool) -> void:
 
 
 func _log_opening_geometry() -> void:
-	if not OS.is_debug_build() or screen != "opening":
+	if not OS.is_debug_build() or screen != "opening" or not is_inside_tree() or is_queued_for_deletion():
 		return
-	await get_tree().process_frame
-	await get_tree().process_frame
-	if screen != "opening" or not is_instance_valid(opening_overlay):
+	# Bound one-shot signals are disconnected when this node is freed.
+	# An awaited coroutine would instead resume after scene destruction.
+	var tree := get_tree()
+	if not tree.process_frame.is_connected(_log_opening_geometry_next_frame):
+		tree.process_frame.connect(_log_opening_geometry_next_frame, CONNECT_ONE_SHOT)
+
+
+func _log_opening_geometry_next_frame() -> void:
+	if not is_inside_tree() or is_queued_for_deletion() or screen != "opening":
+		return
+	var tree := get_tree()
+	if not tree.process_frame.is_connected(_emit_opening_geometry):
+		tree.process_frame.connect(_emit_opening_geometry, CONNECT_ONE_SHOT)
+
+
+func _emit_opening_geometry() -> void:
+	if not is_inside_tree() or is_queued_for_deletion() or screen != "opening" or not is_instance_valid(opening_overlay):
 		return
 	var buttons := {}
 	for name_key: String in ["OpeningSkip", "OpeningAdvance", "OpeningPause"]:
@@ -1359,11 +1373,23 @@ func _exit_tree() -> void:
 func _log_menu_geometry() -> void:
 	# Debug builds expose only this button's screen coordinates so Android smoke
 	# checks can tap the actual laid-out control without guessed pixel positions.
-	if not OS.is_debug_build() or screen != "menu":
+	if not OS.is_debug_build() or screen != "menu" or not is_inside_tree() or is_queued_for_deletion():
 		return
-	await get_tree().process_frame
-	await get_tree().process_frame
-	if screen != "menu":
+	var tree := get_tree()
+	if not tree.process_frame.is_connected(_log_menu_geometry_next_frame):
+		tree.process_frame.connect(_log_menu_geometry_next_frame, CONNECT_ONE_SHOT)
+
+
+func _log_menu_geometry_next_frame() -> void:
+	if not is_inside_tree() or is_queued_for_deletion() or screen != "menu":
+		return
+	var tree := get_tree()
+	if not tree.process_frame.is_connected(_emit_menu_geometry):
+		tree.process_frame.connect(_emit_menu_geometry, CONNECT_ONE_SHOT)
+
+
+func _emit_menu_geometry() -> void:
+	if not is_inside_tree() or is_queued_for_deletion() or screen != "menu":
 		return
 	var button := _find_start_button(ui)
 	if button != null:

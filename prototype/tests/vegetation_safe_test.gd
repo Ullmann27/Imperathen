@@ -259,8 +259,21 @@ func _run() -> void:
 			receipt.close()
 		else:
 			_check(false,"Graphical report could not be written")
+	# Exercise the real debug layout callback across scene destruction. The
+	# original await-based logger emitted a fatal error after the 3961
+	# vegetation checks had passed. Do not simply drain all frames first.
+	game._show_menu()
+	game._log_menu_geometry()
+	if OS.is_debug_build():
+		_check(process_frame.is_connected(game._log_menu_geometry_next_frame),"Menu layout callback is scheduled as a lifetime-bound signal")
+	var old_menu_callback: Callable = game._log_menu_geometry_next_frame
+	var old_menu_emit: Callable = game._emit_menu_geometry
+	var old_opening_callback: Callable = game._log_opening_geometry_next_frame
+	var old_opening_emit: Callable = game._emit_opening_geometry
 	game.free()
-	await process_frame
+	_check(not old_menu_callback.is_valid() and not old_menu_emit.is_valid() and not old_opening_callback.is_valid() and not old_opening_emit.is_valid(),"Scene destruction invalidates every bound layout callback")
+	for i in 3:
+		await process_frame
 	print("VEGETATION_SAFE_RESULT checks=",checks," failures=",failures.size()," profiles=",counts)
 	print("VEGETATION_SAFE_PASS" if failures.is_empty() else "VEGETATION_SAFE_FAIL")
 	quit(0 if failures.is_empty() else 1)
