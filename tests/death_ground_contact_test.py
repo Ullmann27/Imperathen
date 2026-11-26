@@ -72,6 +72,17 @@ class GroundedDeathJsonTest(unittest.TestCase):
                 self.assertEqual(times["count"], 289)
                 self.assertAlmostEqual(times["max"][0], 1.2, places=5)
 
+    def test_godot_keeps_the_grounded_curve(self):
+        # Godot's default keyframe optimizer drops up to 92 % of the grounded
+        # Pelvis keys (289 -> 22) and lowered the Meshy pelvis by 1.3 cm in
+        # mid-fall; with it disabled the import keeps the 30 fps bake (37 keys)
+        # within 0.3 mm of the authored curve.
+        for path in COMPANY_EXPORTS:
+            with self.subTest(glb=str(path.relative_to(ASSETS))):
+                settings = path.with_name(path.name + ".import").read_text(encoding="utf-8")
+                self.assertIn('"PATH:AnimationPlayer": {\n"optimizer/enabled": false', settings)
+                self.assertIn("animation/fps=30", settings)
+
     def test_hero_keeps_its_own_blender_grounding(self):
         for path in sorted(ASSETS.glob("characters/hero_quality_*.glb")):
             with self.subTest(glb=path.name):

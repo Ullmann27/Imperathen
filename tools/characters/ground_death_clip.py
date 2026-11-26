@@ -20,6 +20,12 @@ Only the death Pelvis translation sampler is replaced (240 Hz, LINEAR). Mesh,
 skin, morph, material and all other animation bytes stay unchanged; the
 original bytes are verified before writing. A marker in the animation extras
 makes the step idempotent.
+
+Godot's default keyframe optimizer (scene import, AnimationPlayer node) is
+lossy enough to undo this: it kept 22 of 289 keys and lowered the Meshy
+pelvis by 1.3 cm in mid-fall. The .import files of these exports therefore
+disable it ("PATH:AnimationPlayer" -> "optimizer/enabled": false); the import
+then keeps its 30 fps bake within 0.3 mm of the grounded curve.
 """
 from __future__ import annotations
 
