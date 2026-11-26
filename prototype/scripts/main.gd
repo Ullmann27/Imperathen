@@ -569,7 +569,9 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 		if political_command and not persisted:
 			model.data = previous_politics
 			_refresh()
-			return {"ok": false, "message": "Decimus' Eintrag konnte nicht gespeichert werden. Die Änderung wurde zurückgenommen."}
+			var save_feedback := "Decimus' Eintrag konnte nicht gespeichert werden. Die Änderung wurde zurückgenommen."
+			ui.notify(save_feedback)
+			return {"ok": false, "message": save_feedback}
 	if result.get("ok", false) and command == "train":
 		if persisted:
 			_begin_opening(OpeningStory.adulthood(model.data))
