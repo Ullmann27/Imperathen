@@ -24,6 +24,7 @@ func _initialize() -> void:
 	_test_legacy_and_presentation()
 	_test_measured_contact_frames()
 	_test_catalogue_matches_measurement()
+	_test_adult_body_reach()
 	for failure: String in failures:
 		printerr("FAIL: " + failure)
 	print("COMBAT_ACTIONS_RESULT checks=%d failures=%d" % [checks, failures.size()])
@@ -486,6 +487,25 @@ func _test_catalogue_matches_measurement() -> void:
 		_check(absf(float(spec.active) - (int(timing.end) - int(timing.start) + 1) / 60.0) < 0.0001, "%s active equals the measured live window" % id)
 		_check(absf(float(spec.reach) - (float(timing.reach) + RAIDER_RADIUS)) < 0.001, "%s reach equals measured strike reach plus the raider capsule" % id)
 		_check(is_equal_approx(float(timing.duration), float(spec.duration)), "%s track duration equals the technique duration" % id)
+
+
+func _test_adult_body_reach() -> void:
+	# The adult body is the same pose at 1.14 scale: a raider just beyond the
+	# child's displayed jab is inside the adult's.
+	var child_reach := float(Combat.measured("jab_right").reach) + RAIDER_RADIUS
+	var target_z := -(child_reach + 0.04)
+	var child := _fixture()
+	child.village.raid.enemies[0].z = target_z
+	_attack(child, "jab_right")
+	_step(child, 0.68)
+	_check(child.hit_calls.is_empty(), "A 12-year-old's jab does not reach %.2f m" % -target_z)
+	var adult := _fixture()
+	adult.player.age = 18
+	adult.village.raid.enemies[0].z = target_z
+	_check(is_equal_approx(Combat.strike_scale(adult, "jab_right"), Combat.ADULT_BODY_SCALE), "Adult unarmed strikes use the measured 1.14 body scale")
+	_attack(adult, "jab_right")
+	_step(adult, 0.68)
+	_check(adult.hit_calls.size() == 1, "The same jab from the adult body reaches %.2f m" % -target_z)
 
 
 func _check(condition: bool, message: String) -> void:
