@@ -1,0 +1,156 @@
+{
+ "size": 512,
+ "materials": {
+  "oak": {
+   "tile_metres": 0.6,
+   "roughness": 0.72,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "wood_rough": {
+   "tile_metres": 0.6,
+   "roughness": 0.86,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "wicker": {
+   "tile_metres": 0.24,
+   "roughness": 0.82,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "straw": {
+   "tile_metres": 0.4,
+   "roughness": 0.9,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "linen": {
+   "tile_metres": 0.2,
+   "roughness": 0.92,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "wool": {
+   "tile_metres": 0.25,
+   "roughness": 0.96,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "leather": {
+   "tile_metres": 0.35,
+   "roughness": 0.62,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "terracotta": {
+   "tile_metres": 0.4,
+   "roughness": 0.8,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "coarseware": {
+   "tile_metres": 0.4,
+   "roughness": 0.9,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "iron": {
+   "tile_metres": 0.3,
+   "roughness": 0.58,
+   "metallic": 0.72,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "bronze": {
+   "tile_metres": 0.3,
+   "roughness": 0.42,
+   "metallic": 0.85,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "stone": {
+   "tile_metres": 0.6,
+   "roughness": 0.9,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "food": {
+   "tile_metres": 0.2,
+   "roughness": 0.78,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "hearth_clay": {
+   "tile_metres": 0.5,
+   "roughness": 0.95,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "normal",
+    "orm"
+   ]
+  },
+  "embers": {
+   "tile_metres": 0.4,
+   "roughness": 0.93,
+   "metallic": 0.0,
+   "maps": [
+    "albedo",
+    "emission",
+    "normal",
+    "orm"
+   ]
+  }
+ }
+}
