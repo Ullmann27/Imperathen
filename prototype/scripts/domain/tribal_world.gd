@@ -13,6 +13,7 @@ extends RefCounted
 ## only through events with ids. Decisions are utility-based and seeded.
 
 const Relations = preload("res://scripts/domain/actor_relations.gd")
+const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
 const VERSION := 2
 const NO_SCENARIO := "none"
 const SCENARIO_INDEX := {"bc58_rhine": "res://assets/world/tribes/bc58_rhine.json"}
@@ -252,6 +253,17 @@ static func day(state: Dictionary) -> int:
 	return int(state.tick) * TICK_DAYS
 
 
+## Chronicle and ledger keep their newest lines (balances live in `flows`).
+## The week closes with it, and so does every write between two weeks (a
+## played raid, a deed of the player), which would otherwise overflow a full
+## ledger and make the whole world transaction invalid.
+static func trim(state: Dictionary) -> void:
+	while state.events.size() > MAX_EVENTS:
+		state.events.pop_front()
+	while state.ledger.size() > MAX_LEDGER:
+		state.ledger.pop_front()
+
+
 ## Runs every full week between the consumed calendar and `target_day`, at most
 ## `max_ticks` per call so a long time jump cannot stall a frame. Returns ticks run.
 static func advance_to_day(state: Dictionary, target_day: int, max_ticks: int = MAX_CATCHUP) -> int:
@@ -354,10 +366,7 @@ static func week_step(runner: Dictionary) -> int:
 			for gid: String in _sorted(state.groups):
 				var g: Dictionary = state.groups[gid]
 				g.weariness = _q(maxf(0.0, float(g.weariness) * 0.96))
-			while state.events.size() > MAX_EVENTS:
-				state.events.pop_front()
-			while state.ledger.size() > MAX_LEDGER:
-				state.ledger.pop_front()
+			trim(state)
 	if finished:
 		runner.stage = int(runner.stage) + 1
 		runner.index = 0
@@ -2883,15 +2892,32 @@ static func _name(state: Dictionary, actor: String) -> String:
 
 # ---------------------------------------------------------------- world clock
 
-## Calendar days the world has lived through, derived from clocks the world
-## model already owns: village days, whole years of the age jump and the
-## strategy seasons, plus days reported by travel or sleep (`extra_days`).
+## Calendar days since the tribal epoch, read from the one world clock
+## (WorldModel `calendar`, D-045): tick t is the week starting at
+## epoch_jdn + 7 t. Worlds without a clock (unit fixtures) use the older
+## derivation from the village, jump and season counters.
 static func world_calendar_day(world: Dictionary) -> int:
+	var clock: Variant = world.get("calendar", {}).get("clock") if world.get("calendar") is Dictionary else null
+	if clock is Dictionary and WorldCalendar.validate_clock(clock) and world.has("tribes"):
+		return maxi(0, int(clock.jdn) - epoch_jdn(world.tribes, int(world.calendar.get("origin_year", 100))))
 	var economy_days := int(world.get("village", {}).get("economy", {}).get("day", 0))
 	var years := int(world.get("progress", {}).get("years_elapsed", 0))
 	var seasons := int(world.get("strategy", {}).get("turn", 0)) % 4
 	var extra := int(world.get("tribes", {}).get("extra_days", 0))
 	return economy_days + years * WEEKS * TICK_DAYS + seasons * 13 * TICK_DAYS + extra
+
+
+## First day of tick 0: 1 March of the scenario year (the scenario's weeks and
+## seasons start in March); without a roster, spring of the world's origin year.
+static func epoch_jdn(state: Dictionary, origin_year: int = 100) -> int:
+	var scn := scenario(str(state.get("scenario", NO_SCENARIO)))
+	var year := int(scn.era.start_year) if not scn.is_empty() else origin_year
+	return WorldCalendar.season_start(year, 0)
+
+
+## The world date of a tick (start of its week) on the shared calendar.
+static func tick_jdn(state: Dictionary, tick: int, origin_year: int = 100) -> int:
+	return epoch_jdn(state, origin_year) + tick * TICK_DAYS
 
 
 static func scenario_for_world(world: Dictionary) -> String:
@@ -3077,6 +3103,7 @@ static func commit_story_raid(state: Dictionary, story_id: String) -> Dictionary
 	var target: Dictionary = state.targets[str(info.target)]
 	target.story_lock_until = int(state.tick) + int(info.recovery_ticks)
 	target.story_lock_reason = story_id
+	trim(state)
 	return {"ok": true, "expedition": str(e.id), "riders": _force_summary(e.troops), "riders_total": _force_count(e.troops)}
 
 
@@ -3178,6 +3205,7 @@ static func apply_raid_result(state: Dictionary, expedition_id: String, result: 
 	e.return_tick = t + (1 if e.kind == "story_raid" else travel_ticks(_distance_groups(state, gid, target)))
 	g.last_raid_tick = t
 	state.stats.external_raids = int(state.stats.external_raids) + 1
+	trim(state)
 	return {"ok": true, "message": text, "attacker_losses": int(fallen.count), "survivors": survivors, "loot_booked": booked, "recovery_until": t + recovery}
 
 
@@ -3221,6 +3249,7 @@ static func record_player_action(state: Dictionary, gid: String, kind: String, n
 	var spread := kind in ["help", "attack", "broke_promise"]
 	var event := _event(state, "player_" + kind, ["player", gid], "Die Spielfigur: %s bei %s. %s" % [kind, _name(state, gid), note], "Spielerhandlung", ["player", gid], spread)
 	_affect(state, gid, "player", event, "player_" + kind, PLAYER_EFFECTS[kind])
+	trim(state)
 	return {"ok": true, "event": event, "stance": Relations.stance(state.relations, gid, "player")}
 
 
@@ -3238,6 +3267,7 @@ static func player_mediate(state: Dictionary, a: String, b: String) -> Dictionar
 	var t := int(state.tick)
 	if not willing:
 		var refused := _event(state, "mediation_failed", ["player", a, b], "Die Vermittlung zwischen %s und %s scheitert." % [_name(state, a), _name(state, b)], "Kein Friedenswille", ["player", a, b])
+		trim(state)
 		return {"ok": false, "message": "Keine Einigung.", "event": refused}
 	var item := _make_agreement(state, "truce", a, b, t, 26, {}, 0, "player_mediated")
 	var event := _event(state, "agreement_made", [a, b, "player"], "Durch Vermittlung der Spielfigur schließen %s und %s Waffenruhe bis Woche %d." % [_name(state, a), _name(state, b), int(item.end)], "Vermittlung", ["player", a, b], true)
@@ -3245,6 +3275,7 @@ static func player_mediate(state: Dictionary, a: String, b: String) -> Dictionar
 		_affect(state, gid, "player", event, "mediated", {"trust": 5.0, "respect": 5.0})
 	_affect(state, a, b, event, "agreement_made", {"trust": 2.0})
 	_affect(state, b, a, event, "agreement_made", {"trust": 2.0})
+	trim(state)
 	return {"ok": true, "agreement": str(item.id), "event": event}
 
 
@@ -3254,6 +3285,7 @@ static func reveal(state: Dictionary, observer: String, subject: String, evidenc
 	if not ids.has(observer) or not ids.has(subject) or evidence.is_empty():
 		return false
 	var event := _event(state, "evidence", [observer, subject], "%s erfährt durch %s von %s." % [_name(state, observer), evidence, _name(state, subject)], evidence, [observer])
+	trim(state)
 	return Relations.introduce(state.relations, observer, subject, event, int(state.tick), "evidence")
 
 
