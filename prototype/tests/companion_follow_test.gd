@@ -7,6 +7,7 @@ const World = preload("res://scripts/world/game_world.gd")
 const Main = preload("res://scripts/main.gd")
 const UI = preload("res://scripts/ui/game_ui.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I03Support = preload("res://tests/i03_support.gd")
 const Story = preload("res://scripts/story/companion_story.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
@@ -84,6 +85,12 @@ func _reach(model: RefCounted, goal: String, rival := false) -> bool:
 			return false
 		if view.stage == goal:
 			return true
+		if str(view.stage).begins_with("i03_"):
+			# I-03 errand: the stored memories decide the later tone.
+			var errand: Dictionary = I03Support.play_stage(model, I03Support.RIVAL if rival else I03Support.FRIEND)
+			if not _check(errand.ok, "I-03-Abschnitt " + str(view.stage) + ": " + str(errand.get("message", ""))):
+				return false
+			continue
 		var point: Vector2 = view.point
 		model.set_player_position(Vector3(point.x, 1.0, point.y))
 		var npc: String = view.get("target_npc", "")
@@ -92,8 +99,6 @@ func _reach(model: RefCounted, goal: String, rival := false) -> bool:
 				return false
 		view = Childhood.view(model.data)
 		var action: String = view.actions[0].payload.action_id
-		if view.stage == "i03_marcus":
-			action = "marcus_rival" if rival else "marcus_friend"
 		var result: Dictionary = model.execute("village_childhood_action", {"action_id":action})
 		if not _check(result.ok, "Echter Missionsbefehl " + action + ": " + str(result.message)):
 			return false

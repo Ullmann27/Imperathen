@@ -8,6 +8,7 @@ const Stage = preload("res://scripts/cinematic/i00_stage.gd")
 const Ranks = preload("res://scripts/visuals/far_ranks.gd")
 const Soldier = preload("res://scripts/visuals/soldier_visual.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I03Support = preload("res://tests/i03_support.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const RaiderStrike = preload("res://scripts/domain/raider_strike.gd")
 const DT := 1.0/60.0
@@ -232,6 +233,12 @@ func _reach_companion_stage(model: RefCounted, stage: String, family: Dictionary
 			return false
 		if str(view.stage) == stage:
 			return true
+		if str(view.stage).begins_with("i03_"):
+			var errand: Dictionary = I03Support.play_stage(model)
+			if not errand.ok:
+				family.errors.append("Companion fixture could not play "+str(view.stage)+": "+str(errand.get("message","")))
+				return false
+			continue
 		var point: Vector2 = view.point
 		model.set_player_position(Vector3(point.x,1.0,point.y))
 		var npc := str(view.get("target_npc",""))
@@ -242,8 +249,6 @@ func _reach_companion_stage(model: RefCounted, stage: String, family: Dictionary
 				return false
 		view = Childhood.view(model.data)
 		var action := str(view.actions[0].payload.action_id)
-		if str(view.stage) == "i03_marcus":
-			action = "marcus_friend"
 		var result: Dictionary = model.execute("village_childhood_action",{"action_id":action})
 		if not result.ok:
 			family.errors.append("Companion fixture command "+action+": "+str(result.message))

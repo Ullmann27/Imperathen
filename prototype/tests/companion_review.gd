@@ -6,6 +6,7 @@ extends SceneTree
 
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I03Support = preload("res://tests/i03_support.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const World = preload("res://scripts/world/game_world.gd")
 const Interface = preload("res://scripts/ui/game_ui.gd")
@@ -202,6 +203,8 @@ func _until(model, wanted: String, relation: String) -> bool:
 
 func _complete(model, relation: String) -> bool:
 	var view: Dictionary = Childhood.view(model.data)
+	if str(view.get("stage", "")).begins_with("i03_"):
+		return bool(I03Support.play_stage(model, I03Support.RIVAL if relation == "rival" else I03Support.FRIEND).get("ok", false))
 	if not view.has("point"):
 		_check(false, "Aktiver Auftrag mit Zielpunkt")
 		return false
@@ -220,9 +223,7 @@ func _complete(model, relation: String) -> bool:
 		_check(false, "Ausführbarer Auftrag: " + stage)
 		return false
 	var action := str(actions[0].payload.action_id)
-	if stage == "i03_marcus":
-		action = "marcus_rival" if relation == "rival" else "marcus_friend"
-	elif stage == "market_trade":
+	if stage == "market_trade":
 		action = "market_fair"
 	return _command(model, "village_childhood_action", {"action_id":action})
 

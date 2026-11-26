@@ -76,7 +76,7 @@ func _test_fresh_start_t01() -> void:
 	var data: Dictionary = model.data
 	_check(model._validate_state(data).is_empty(), "Fresh regular I-01 world validates: " + model._validate_state(data))
 	_check(_stage(model) == "i01_choice", "A new life starts with the I-01 choice beat, not with an errand")
-	_check(_sp(model).version == 4 and _sp(model).i01 == "pending" and _sp(model).i01_events.is_empty(), "Screenplay v4 starts the morning with an empty event ledger")
+	_check(_sp(model).version == Childhood.SCREENPLAY_VERSION and _sp(model).i01 == "pending" and _sp(model).i01_events.is_empty(), "Screenplay v4 starts the morning with an empty event ledger")
 	_check(I01.cups(data) == {"julia":"shelf", "silvanus":"shelf", "player":"shelf"}, "All three cups start on the real shelf")
 	var start := Vector2(float(data.player.position[0]), float(data.player.position[2]))
 	_check(start.distance_to(I01.POINTS.home_bed) < 0.05, "The boy starts beside his actual bed")
@@ -240,7 +240,7 @@ func _test_migration_v3_to_v4() -> void:
 	_write(_path("v3_start"), _v3_save(model, []))
 	var start = WorldModel.new()
 	_check(start.load_game(_path("v3_start")).ok, "v3 save before the family talk loads: " + str(start.load_game(_path("v3_start")).message))
-	_check(_sp(start).version == 4 and _sp(start).i01 == "pending" and _sp(start).i01_events.is_empty() and _sp(start).i01_path == "", "Migration opens the new morning without completing anything")
+	_check(_sp(start).version == Childhood.SCREENPLAY_VERSION and _sp(start).i01 == "pending" and _sp(start).i01_events.is_empty() and _sp(start).i01_path == "", "Migration opens the new morning without completing anything")
 	_check(_stage(start) == "i01_choice" and start.data.village.childhood.completed.is_empty(), "Migrated start continues at the I-01 choice")
 	_check(int(start.data.resources.denarii) == WorldModel.DEVELOPMENT_START_DENARII, "Migration keeps the money stored in the old save")
 	# A v3 save already past the family conversation.
