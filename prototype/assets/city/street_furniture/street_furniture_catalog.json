@@ -1,0 +1,718 @@
+{
+ "era_sets": {
+  "both": "usable in either set",
+  "imperial": "decor.street_furniture.imperial",
+  "late_republic": "decor.street_furniture.late_republic"
+ },
+ "format": "imperathen-street-furniture-catalog",
+ "front": "+Z in Godot (-Y in Blender)",
+ "items": {
+  "altar_tuff": {
+   "anchor_kind": "shrine",
+   "bounds_m": [
+    0.8,
+    1.07,
+    0.72
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.6,
+   "seats": 2,
+   "solid": true,
+   "source": "Street altars for offerings, tuff with pulvini",
+   "triangles": 82
+  },
+  "amphora_group": {
+   "anchor_kind": "",
+   "bounds_m": [
+    1.01,
+    1.05,
+    0.72
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.7,
+   "solid": true,
+   "source": "Transport amphorae leaning by shop doors and stalls",
+   "triangles": 640
+  },
+  "bench_marble_exedra": {
+   "anchor_kind": "bench",
+   "bounds_m": [
+    3.5,
+    1.0,
+    2.07
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 1.9,
+   "seats": 5,
+   "solid": true,
+   "source": "Curved public seat (schola) with lion-paw ends, a form known from Pompeian tomb benches",
+   "triangles": 192
+  },
+  "bench_tuff": {
+   "anchor_kind": "bench",
+   "bounds_m": [
+    2.08,
+    0.45,
+    0.52
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 1.1,
+   "seats": 3,
+   "solid": true,
+   "source": "Masonry benches against house fronts, as at Pompeii",
+   "triangles": 22
+  },
+  "bench_wood": {
+   "anchor_kind": "bench",
+   "bounds_m": [
+    1.8,
+    0.48,
+    0.4
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 1.0,
+   "seats": 3,
+   "solid": true,
+   "source": "Plain timber benches outside houses and shops",
+   "triangles": 44
+  },
+  "bollard_basalt": {
+   "anchor_kind": "",
+   "bounds_m": [
+    0.4,
+    0.78,
+    0.4
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.25,
+   "solid": true,
+   "source": "Kerb-side guard stones protecting corners and fountains from cart wheels",
+   "triangles": 40
+  },
+  "cart_plaustrum": {
+   "anchor_kind": "cart_stop",
+   "bounds_m": [
+    1.8,
+    1.6,
+    4.2
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 1.8,
+   "seats": 2,
+   "solid": true,
+   "source": "Two-wheeled ox cart (plaustrum) with solid wheels",
+   "triangles": 630
+  },
+  "cippus_amphitheatre": {
+   "anchor_kind": "",
+   "bounds_m": [
+    0.72,
+    1.75,
+    0.56
+   ],
+   "era_id": "building.amphitheatrum_flavium",
+   "era_set": "imperial",
+   "footprint_radius_m": 0.45,
+   "solid": true,
+   "source": "Travertine boundary stones around the amphitheatre pavement (five in situ on the east side), with sockets for barriers",
+   "triangles": 80
+  },
+  "columna_rostrata": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    2.24,
+    9.35,
+    1.72
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 1.2,
+   "seats": 4,
+   "solid": true,
+   "source": "Rostral column in the manner of the column of C. Duilius (260 BC): shaft with ship's beaks, statue on top",
+   "triangles": 1074
+  },
+  "compital_shrine_imperial": {
+   "anchor_kind": "shrine",
+   "bounds_m": [
+    2.0,
+    3.7,
+    2.12
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 1.5,
+   "seats": 4,
+   "solid": true,
+   "source": "Lares Augusti after the reorganisation of the vici in 7 BC; marble aedicula with altar",
+   "triangles": 785
+  },
+  "compital_shrine_republic": {
+   "anchor_kind": "shrine",
+   "bounds_m": [
+    1.9,
+    2.75,
+    0.9
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 1.2,
+   "seats": 3,
+   "solid": true,
+   "source": "Crossroads shrines of the Lares Compitales (Compitalia); painted masonry aedicula with altar",
+   "triangles": 187
+  },
+  "dipinto_0": {
+   "anchor_kind": "",
+   "bounds_m": [
+    1.96,
+    0.8,
+    0.0
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 1.0,
+   "solid": false,
+   "source": "Painted wall notices: electoral programmata in red or black and edicta munerum announcing gladiator shows (Pompeii)",
+   "triangles": 76
+  },
+  "dipinto_1": {
+   "anchor_kind": "",
+   "bounds_m": [
+    1.95,
+    0.8,
+    0.0
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 1.0,
+   "solid": false,
+   "source": "Painted wall notices: electoral programmata in red or black and edicta munerum announcing gladiator shows (Pompeii)",
+   "triangles": 122
+  },
+  "dipinto_2": {
+   "anchor_kind": "",
+   "bounds_m": [
+    1.97,
+    0.8,
+    0.0
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 1.0,
+   "solid": false,
+   "source": "Painted wall notices: electoral programmata in red or black and edicta munerum announcing gladiator shows (Pompeii)",
+   "triangles": 106
+  },
+  "dolium": {
+   "anchor_kind": "",
+   "bounds_m": [
+    1.1,
+    1.08,
+    1.1
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.6,
+   "solid": true,
+   "source": "Large storage jar (dolium) for wine, oil or grain",
+   "triangles": 180
+  },
+  "drain_grate": {
+   "anchor_kind": "",
+   "bounds_m": [
+    0.9,
+    0.03,
+    0.9
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.5,
+   "solid": false,
+   "source": "Stone drain cover with slots over the street sewer; gutters lead rainwater from the pavement",
+   "triangles": 60
+  },
+  "garland_swag": {
+   "anchor_kind": "",
+   "bounds_m": [
+    3.14,
+    1.11,
+    0.13
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 1.6,
+   "solid": false,
+   "source": "Festival garlands (serta) of leaves and ribbons hung between posts and across doorways",
+   "triangles": 106
+  },
+  "honorific_column_imperial": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    2.4,
+    12.66,
+    2.4
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 1.4,
+   "seats": 5,
+   "solid": true,
+   "source": "Marble honorific column with gilded bronze statue",
+   "triangles": 957
+  },
+  "lacus_imperial": {
+   "anchor_kind": "fountain",
+   "bounds_m": [
+    2.44,
+    1.62,
+    2.2
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 1.8,
+   "seats": 4,
+   "solid": true,
+   "source": "Agrippa's programme of 33 BC: 700 lacus and 500 salientes (Pliny, NH 36.121)",
+   "triangles": 118
+  },
+  "lacus_republic": {
+   "anchor_kind": "fountain",
+   "bounds_m": [
+    2.1,
+    1.25,
+    1.8
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 1.6,
+   "seats": 4,
+   "solid": true,
+   "source": "Public basins (lacus) fed by the republican aqueducts; slab basin with spout stone as catalogued at Pompeii",
+   "triangles": 122
+  },
+  "meta_sudans": {
+   "anchor_kind": "fountain",
+   "bounds_m": [
+    16.6,
+    17.75,
+    16.6
+   ],
+   "era_id": "building.meta_sudans",
+   "era_set": "imperial",
+   "footprint_radius_m": 8.2,
+   "seats": 16,
+   "solid": true,
+   "source": "Flavian conical fountain beside the amphitheatre, Domitianic (c. AD 89-96); about 17 m high, basin about 16 m wide",
+   "triangles": 1582
+  },
+  "milestone_imperial": {
+   "anchor_kind": "",
+   "bounds_m": [
+    0.68,
+    2.1,
+    0.68
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 0.4,
+   "solid": true,
+   "source": "Imperial milestones with the emperor's titulature, numerals picked out in red",
+   "triangles": 144
+  },
+  "milestone_republic": {
+   "anchor_kind": "",
+   "bounds_m": [
+    0.64,
+    1.82,
+    0.64
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 0.4,
+   "solid": true,
+   "source": "Cylindrical milestones on the roads from the 2nd century BC; about 1.5 m high, 0.5 m diameter, square base",
+   "triangles": 94
+  },
+  "portico_bay_imperial": {
+   "anchor_kind": "gossip_spot",
+   "bay_width_m": 4.0,
+   "bounds_m": [
+    4.34,
+    5.95,
+    4.0
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 2.8,
+   "seats": 5,
+   "solid": true,
+   "source": "Colonnaded portico (porticus) with travertine columns, architrave and tiled roof, giving shade along a piazza",
+   "triangles": 236
+  },
+  "portico_bay_republic": {
+   "anchor_kind": "gossip_spot",
+   "bay_width_m": 4.0,
+   "bounds_m": [
+    4.2,
+    4.1,
+    3.37
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 2.6,
+   "seats": 4,
+   "solid": true,
+   "source": "Timber-posted lean-to portico with tiled roof shading shop fronts",
+   "triangles": 50
+  },
+  "shop_awning": {
+   "anchor_kind": "",
+   "bounds_m": [
+    3.2,
+    0.75,
+    1.36
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 1.6,
+   "solid": false,
+   "source": "Cloth awnings and projecting timber lean-tos (pergulae, maeniana) over shop fronts",
+   "triangles": 26
+  },
+  "shop_shutter": {
+   "anchor_kind": "doorway",
+   "bounds_m": [
+    3.0,
+    2.5,
+    0.4
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 1.6,
+   "seats": 2,
+   "solid": true,
+   "source": "Taberna front: grooved threshold with vertical plank shutters and a night door",
+   "triangles": 88
+  },
+  "shop_sign_0": {
+   "anchor_kind": "",
+   "bounds_m": [
+    1.1,
+    0.45,
+    0.04
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.6,
+   "solid": false,
+   "source": "Painted shop signs on boards and plaster panels",
+   "triangles": 32
+  },
+  "shop_sign_1": {
+   "anchor_kind": "",
+   "bounds_m": [
+    1.1,
+    0.45,
+    0.04
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.6,
+   "solid": false,
+   "source": "Painted shop signs on boards and plaster panels",
+   "triangles": 46
+  },
+  "shop_sign_2": {
+   "anchor_kind": "",
+   "bounds_m": [
+    1.1,
+    0.45,
+    0.04
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.6,
+   "solid": false,
+   "source": "Painted shop signs on boards and plaster panels",
+   "triangles": 50
+  },
+  "shrub_laurel": {
+   "anchor_kind": "",
+   "bounds_m": [
+    1.74,
+    1.83,
+    1.63
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.9,
+   "solid": false,
+   "source": "Bay laurel (Laurus nobilis) and myrtle as low planting",
+   "triangles": 202,
+   "vegetation": true
+  },
+  "stall_masonry_0": {
+   "anchor_kind": "stall",
+   "bounds_m": [
+    2.6,
+    2.48,
+    1.9
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 1.7,
+   "seats": 3,
+   "solid": true,
+   "source": "Vendor stalls with plastered, painted counters (imperial tabernae and thermopolia)",
+   "triangles": 361
+  },
+  "stall_masonry_1": {
+   "anchor_kind": "stall",
+   "bounds_m": [
+    2.6,
+    2.48,
+    1.9
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 1.7,
+   "seats": 3,
+   "solid": true,
+   "source": "Vendor stalls with plastered, painted counters (imperial tabernae and thermopolia)",
+   "triangles": 899
+  },
+  "stall_masonry_2": {
+   "anchor_kind": "stall",
+   "bounds_m": [
+    2.6,
+    2.48,
+    1.9
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 1.7,
+   "seats": 3,
+   "solid": true,
+   "source": "Vendor stalls with plastered, painted counters (imperial tabernae and thermopolia)",
+   "triangles": 298
+  },
+  "stall_wood_0": {
+   "anchor_kind": "stall",
+   "bounds_m": [
+    2.6,
+    2.5,
+    1.9
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 1.7,
+   "seats": 3,
+   "solid": true,
+   "source": "Trestle stalls of street vendors under cloth awnings",
+   "triangles": 381
+  },
+  "stall_wood_1": {
+   "anchor_kind": "stall",
+   "bounds_m": [
+    2.6,
+    2.5,
+    1.9
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 1.7,
+   "seats": 3,
+   "solid": true,
+   "source": "Trestle stalls of street vendors under cloth awnings",
+   "triangles": 919
+  },
+  "stall_wood_2": {
+   "anchor_kind": "stall",
+   "bounds_m": [
+    2.6,
+    2.5,
+    1.9
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 1.7,
+   "seats": 3,
+   "solid": true,
+   "source": "Trestle stalls of street vendors under cloth awnings",
+   "triangles": 318
+  },
+  "statue_bronze_0": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    1.12,
+    3.26,
+    1.12
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 0.8,
+   "lod_tris": true,
+   "seats": 3,
+   "solid": true,
+   "source": "Honorific bronze statues on tuff bases in public places of the late Republic",
+   "triangles": 453
+  },
+  "statue_bronze_1": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    1.13,
+    3.26,
+    1.12
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 0.8,
+   "lod_tris": true,
+   "seats": 3,
+   "solid": true,
+   "source": "Honorific bronze statues on tuff bases in public places of the late Republic",
+   "triangles": 501
+  },
+  "statue_bronze_2": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    1.53,
+    3.94,
+    1.12
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 0.8,
+   "lod_tris": true,
+   "seats": 3,
+   "solid": true,
+   "source": "Honorific bronze statues on tuff bases in public places of the late Republic",
+   "triangles": 556
+  },
+  "statue_bronze_3": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    1.14,
+    3.26,
+    1.12
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 0.8,
+   "lod_tris": true,
+   "seats": 3,
+   "solid": true,
+   "source": "Honorific bronze statues on tuff bases in public places of the late Republic",
+   "triangles": 513
+  },
+  "statue_marble_0": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    1.5,
+    4.19,
+    1.5
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 0.9,
+   "seats": 3,
+   "solid": true,
+   "source": "Marble statues on inscribed, moulded bases",
+   "triangles": 509
+  },
+  "statue_marble_1": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    1.5,
+    4.19,
+    1.5
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 0.9,
+   "seats": 3,
+   "solid": true,
+   "source": "Marble statues on inscribed, moulded bases",
+   "triangles": 565
+  },
+  "statue_marble_2": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    1.88,
+    4.99,
+    1.5
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 0.9,
+   "seats": 3,
+   "solid": true,
+   "source": "Marble statues on inscribed, moulded bases",
+   "triangles": 622
+  },
+  "statue_marble_3": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    1.5,
+    4.19,
+    1.5
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 0.9,
+   "seats": 3,
+   "solid": true,
+   "source": "Marble statues on inscribed, moulded bases",
+   "triangles": 579
+  },
+  "stepping_stones": {
+   "anchor_kind": "",
+   "bounds_m": [
+    3.02,
+    0.28,
+    0.51
+   ],
+   "era_set": "late_republic",
+   "footprint_radius_m": 1.6,
+   "solid": true,
+   "source": "Raised crossing stones between the kerbs; attested at Pompeii, used here for the unpaved-to-silex streets of the Republic",
+   "triangles": 144
+  },
+  "sundial_column": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    0.7,
+    2.95,
+    0.7
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.5,
+   "seats": 2,
+   "solid": true,
+   "source": "Public sundial (hemicyclium) on a column; Rome had public dials from the 3rd century BC",
+   "triangles": 206
+  },
+  "thermopolium_counter": {
+   "anchor_kind": "tavern_seat",
+   "bounds_m": [
+    3.08,
+    1.46,
+    2.34
+   ],
+   "era_set": "imperial",
+   "footprint_radius_m": 1.9,
+   "seats": 4,
+   "solid": true,
+   "source": "L-shaped masonry bar counter with embedded dolia, marble-faced (Pompeii, Herculaneum, Ostia)",
+   "triangles": 276
+  },
+  "torch_post": {
+   "anchor_kind": "guard_post",
+   "bounds_m": [
+    0.36,
+    2.25,
+    0.33
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 0.3,
+   "solid": true,
+   "source": "Free-standing cresset for festivals and night watch; regular street lighting is not attested",
+   "triangles": 107
+  },
+  "tree_cypress": {
+   "anchor_kind": "",
+   "bounds_m": [
+    1.84,
+    10.2,
+    1.87
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 1.2,
+   "solid": true,
+   "source": "Mediterranean cypress (Cupressus sempervirens), common by sanctuaries and tombs",
+   "triangles": 84,
+   "vegetation": true
+  },
+  "tree_stone_pine": {
+   "anchor_kind": "gossip_spot",
+   "bounds_m": [
+    9.4,
+    11.52,
+    9.55
+   ],
+   "era_set": "both",
+   "footprint_radius_m": 3.5,
+   "seats": 3,
+   "solid": true,
+   "source": "Umbrella pine (Pinus pinea), planted in Rome since the Republic",
+   "triangles": 460,
+   "vegetation": true
+  }
+ },
+ "schema": 1
+}

@@ -30,6 +30,7 @@ const Calendar := preload("res://scripts/domain/world_calendar.gd")
 const EraRegistry := preload("res://scripts/domain/era_registry.gd")
 const RomanQuarter := preload("res://scripts/world/roman_quarter.gd")
 const RidingTrial := preload("res://scripts/world/city_riding_trial.gd")
+const FlavianAmphitheatre := preload("res://scripts/monuments/colosseum.gd")
 const CITY_PATH := "res://assets/world/roman_city_test.glb"
 const CITY_COLLISION := "res://assets/world/roman_city_collision.glb"
 const TEMPLE_PATH := "res://assets/world/roman_meshy_temple_%d.glb"
@@ -68,6 +69,8 @@ var living_city: CityLifeSession
 var _living_city_clock: Dictionary = {}
 # Callers entering a dated scenario assign its authoritative JDN before add_child.
 var world_jdn := Calendar.campaign_start_jdn()
+# Only the independently dated free city uses the new monument until the full campaign assets are accepted.
+var use_flavian_kit := false
 # Review toggle: keep an exact legacy light/ground path for comparison.
 var viva_visuals := true
 var save_path := State.PATH
@@ -229,6 +232,8 @@ func _load_city() -> void:
 	if city!=null:
 		city.name = "RomanCity"
 		prune_future_city_nodes(city, world_jdn, excluded)
+		if use_flavian_kit and FlavianAmphitheatre.available_at(world_jdn):
+			_remove_legacy_amphitheatre(city)
 		add_child(city)
 		city_available = true
 		var reach := 270.0 if profile in ["low","balanced"] else 450.0
@@ -239,9 +244,19 @@ func _load_city() -> void:
 	if collision!=null:
 		# Apply chronology before converting collision meshes into live bodies.
 		prune_future_city_nodes(collision, world_jdn, excluded)
+		if use_flavian_kit and FlavianAmphitheatre.available_at(world_jdn):
+			_remove_legacy_amphitheatre(collision)
 		add_child(collision)
 		_add_static_colliders(collision,"CityCollision_")
 		collision.queue_free()
+	if city_available and use_flavian_kit and FlavianAmphitheatre.available_at(world_jdn):
+		var monument := FlavianAmphitheatre.new()
+		monument.name = "FlavianAmphitheatre"
+		# The city builder places the legacy kit at Blender (181, 42, 0); glTF converts Y to -Z.
+		monument.position = Vector3(181, 0, -42)
+		monument.profile = profile
+		monument.world_jdn = world_jdn
+		add_child(monument)
 	var temple_level := 2 if profile=="low" else (1 if profile=="balanced" else 0)
 	var temple := _scene(TEMPLE_PATH % temple_level)
 	if temple!=null:
@@ -282,6 +297,15 @@ func _load_city() -> void:
 	print("IMPERATHEN_FACADE_DETAIL " + JSON.stringify(CitySurfaceMicrodetail.install(city, profile)))
 	# Use real already-exported close-up GLBs. No extra collision bodies or economy.
 	print("IMPERATHEN_VIVA_PROPS " + JSON.stringify(VivaCloseupProps.install(city, profile)))
+
+## Remove both mesh and collision forms before installing the replacement.
+static func _remove_legacy_amphitheatre(root: Node) -> void:
+	for node: Node in root.get_children():
+		var identity := str(node.name)
+		if identity == "Colosseum" or identity.begins_with("Colosseum_"):
+			node.free()
+		else:
+			_remove_legacy_amphitheatre(node)
 
 ## The builder exports dates on both visual and collision nodes. Keep the
 ## names removed from the visual GLB for older collision imports without extras.

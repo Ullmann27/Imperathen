@@ -1,0 +1,1226 @@
+{
+ "format": "imperathen-street-furniture-layout",
+ "schema": 1,
+ "seed": 58,
+ "frame": "metres in Godot axes relative to the layout origin; yaw_deg rotates the item front (+Z) about Y",
+ "area": "republic_street_sample",
+ "era_set": "late_republic",
+ "street_axis": "X",
+ "entries": [
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    -30.0,
+    0.0,
+    -5.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.958,
+    0.958,
+    0.958
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    -31.0,
+    0.0,
+    -5.1
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.978,
+    0.944,
+    0.966
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    -26.0,
+    0.0,
+    -5.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.974,
+    0.974,
+    0.974
+   ]
+  },
+  {
+   "item": "shop_awning",
+   "position": [
+    -26.0,
+    0.0,
+    -4.7
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.959,
+    0.927,
+    0.912
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    -22.0,
+    0.0,
+    -5.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.998,
+    0.998,
+    0.998
+   ]
+  },
+  {
+   "item": "shop_sign_0",
+   "position": [
+    -21.0,
+    0.0,
+    -4.65
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.971,
+    0.974,
+    0.92
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    -18.0,
+    0.0,
+    -5.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.904,
+    0.904,
+    0.904
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    -19.0,
+    0.0,
+    -5.1
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.939,
+    0.926,
+    0.935
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    -14.0,
+    0.0,
+    -4.8
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.941,
+    0.941,
+    0.941
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    -10.0,
+    0.0,
+    -4.8
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.994,
+    0.994,
+    0.994
+   ]
+  },
+  {
+   "item": "shop_awning",
+   "position": [
+    -10.0,
+    0.0,
+    -4.7
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.909,
+    0.902,
+    0.881
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    -6.0,
+    0.0,
+    -4.8
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.981,
+    0.981,
+    0.981
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    -7.0,
+    0.0,
+    -5.1
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.903,
+    0.918,
+    0.909
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    -2.0,
+    0.0,
+    -4.8
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.997,
+    0.997,
+    0.997
+   ]
+  },
+  {
+   "item": "shop_sign_2",
+   "position": [
+    -1.0,
+    0.0,
+    -4.65
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.936,
+    0.934,
+    0.918
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    2.0,
+    0.0,
+    -5.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.942,
+    0.942,
+    0.942
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    6.0,
+    0.0,
+    -5.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.987,
+    0.987,
+    0.987
+   ]
+  },
+  {
+   "item": "shop_awning",
+   "position": [
+    6.0,
+    0.0,
+    -4.7
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.907,
+    0.896,
+    0.88
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    5.0,
+    0.0,
+    -5.1
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.899,
+    0.901,
+    0.887
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    10.0,
+    0.0,
+    -5.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.901,
+    0.901,
+    0.901
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    14.0,
+    0.0,
+    -5.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.921,
+    0.921,
+    0.921
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    18.0,
+    0.0,
+    -4.8
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.975,
+    0.975,
+    0.975
+   ]
+  },
+  {
+   "item": "shop_sign_1",
+   "position": [
+    19.0,
+    0.0,
+    -4.65
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.933,
+    0.953,
+    0.931
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    17.0,
+    0.0,
+    -5.1
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.94,
+    0.95,
+    0.932
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    22.0,
+    0.0,
+    -4.8
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.966,
+    0.966,
+    0.966
+   ]
+  },
+  {
+   "item": "shop_awning",
+   "position": [
+    22.0,
+    0.0,
+    -4.7
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.965,
+    0.979,
+    0.971
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    26.0,
+    0.0,
+    -4.8
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.906,
+    0.906,
+    0.906
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    30.0,
+    0.0,
+    -4.8
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.978,
+    0.978,
+    0.978
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    29.0,
+    0.0,
+    -5.1
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.915,
+    0.9,
+    0.931
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    -30.0,
+    0.0,
+    5.6
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.93,
+    0.93,
+    0.93
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    -31.0,
+    0.0,
+    5.1
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.977,
+    0.956,
+    0.918
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    -26.0,
+    0.0,
+    5.6
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.987,
+    0.987,
+    0.987
+   ]
+  },
+  {
+   "item": "shop_awning",
+   "position": [
+    -26.0,
+    0.0,
+    4.7
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.902,
+    0.905,
+    0.868
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    -22.0,
+    0.0,
+    5.6
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.931,
+    0.931,
+    0.931
+   ]
+  },
+  {
+   "item": "shop_sign_2",
+   "position": [
+    -21.0,
+    0.0,
+    4.65
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.961,
+    0.932,
+    0.903
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    -18.0,
+    0.0,
+    5.6
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.961,
+    0.961,
+    0.961
+   ]
+  },
+  {
+   "item": "dipinto_0",
+   "position": [
+    -19.0,
+    0.0,
+    5.1
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.953,
+    0.956,
+    0.908
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    -14.0,
+    0.0,
+    4.8
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.976,
+    0.976,
+    0.976
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    -10.0,
+    0.0,
+    4.8
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.991,
+    0.991,
+    0.991
+   ]
+  },
+  {
+   "item": "shop_awning",
+   "position": [
+    -10.0,
+    0.0,
+    4.7
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.937,
+    0.948,
+    0.932
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    -6.0,
+    0.0,
+    4.8
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.916,
+    0.916,
+    0.916
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    -7.0,
+    0.0,
+    5.1
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.939,
+    0.952,
+    0.918
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    -2.0,
+    0.0,
+    4.8
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.913,
+    0.913,
+    0.913
+   ]
+  },
+  {
+   "item": "shop_sign_0",
+   "position": [
+    -1.0,
+    0.0,
+    4.65
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.952,
+    0.934,
+    0.914
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    2.0,
+    0.0,
+    5.6
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.972,
+    0.972,
+    0.972
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    6.0,
+    0.0,
+    5.6
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.923,
+    0.923,
+    0.923
+   ]
+  },
+  {
+   "item": "shop_awning",
+   "position": [
+    6.0,
+    0.0,
+    4.7
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.976,
+    0.977,
+    0.975
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    5.0,
+    0.0,
+    5.1
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.973,
+    0.984,
+    0.973
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    10.0,
+    0.0,
+    5.6
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.983,
+    0.983,
+    0.983
+   ]
+  },
+  {
+   "item": "portico_bay_republic",
+   "position": [
+    14.0,
+    0.0,
+    5.6
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.967,
+    0.967,
+    0.967
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    18.0,
+    0.0,
+    4.8
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.91,
+    0.91,
+    0.91
+   ]
+  },
+  {
+   "item": "shop_sign_2",
+   "position": [
+    19.0,
+    0.0,
+    4.65
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.933,
+    0.907,
+    0.873
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    17.0,
+    0.0,
+    5.1
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.959,
+    0.948,
+    0.918
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    22.0,
+    0.0,
+    4.8
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.959,
+    0.959,
+    0.959
+   ]
+  },
+  {
+   "item": "shop_awning",
+   "position": [
+    22.0,
+    0.0,
+    4.7
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.926,
+    0.942,
+    0.915
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    26.0,
+    0.0,
+    4.8
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.967,
+    0.967,
+    0.967
+   ]
+  },
+  {
+   "item": "shop_shutter",
+   "position": [
+    30.0,
+    0.0,
+    4.8
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.933,
+    0.933,
+    0.933
+   ]
+  },
+  {
+   "item": "dipinto_1",
+   "position": [
+    29.0,
+    0.0,
+    5.1
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.961,
+    0.979,
+    0.958
+   ]
+  },
+  {
+   "item": "compital_shrine_republic",
+   "position": [
+    0.0,
+    0.0,
+    -3.3
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.91,
+    0.903,
+    0.916
+   ]
+  },
+  {
+   "item": "lacus_republic",
+   "position": [
+    14.0,
+    0.0,
+    3.1
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.885,
+    0.896,
+    0.863
+   ]
+  },
+  {
+   "item": "stepping_stones",
+   "position": [
+    -22.0,
+    0.0,
+    -0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "tint": [
+    0.971,
+    0.993,
+    0.965
+   ]
+  },
+  {
+   "item": "stepping_stones",
+   "position": [
+    6.0,
+    0.0,
+    -0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "tint": [
+    0.937,
+    0.959,
+    0.951
+   ]
+  },
+  {
+   "item": "stepping_stones",
+   "position": [
+    26.0,
+    0.0,
+    -0.0
+   ],
+   "yaw_deg": 90.0,
+   "scale": 1.0,
+   "tint": [
+    0.927,
+    0.928,
+    0.885
+   ]
+  },
+  {
+   "item": "milestone_republic",
+   "position": [
+    -29.0,
+    0.0,
+    3.3
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.943,
+    0.939,
+    0.923
+   ]
+  },
+  {
+   "item": "columna_rostrata",
+   "position": [
+    -12.0,
+    0.0,
+    3.0
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.946,
+    0.937,
+    0.931
+   ]
+  },
+  {
+   "item": "statue_bronze_1",
+   "position": [
+    22.0,
+    0.0,
+    -3.2
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.978,
+    0.951,
+    0.971
+   ]
+  },
+  {
+   "item": "statue_bronze_2",
+   "position": [
+    -24.0,
+    0.0,
+    -3.2
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.963,
+    0.965,
+    0.96
+   ]
+  },
+  {
+   "item": "sundial_column",
+   "position": [
+    8.0,
+    0.0,
+    -3.3
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.915,
+    0.889,
+    0.905
+   ]
+  },
+  {
+   "item": "altar_tuff",
+   "position": [
+    0.0,
+    0.0,
+    -1.9
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.906,
+    0.909,
+    0.872
+   ]
+  },
+  {
+   "item": "stall_wood_0",
+   "position": [
+    -17.0,
+    0.0,
+    -2.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 0.963,
+   "tint": [
+    0.982,
+    0.945,
+    0.982
+   ]
+  },
+  {
+   "item": "stall_wood_1",
+   "position": [
+    -6.0,
+    0.0,
+    2.6
+   ],
+   "yaw_deg": 0.0,
+   "scale": 0.976,
+   "tint": [
+    0.967,
+    0.981,
+    0.927
+   ]
+  },
+  {
+   "item": "stall_wood_2",
+   "position": [
+    3.5,
+    0.0,
+    -2.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 0.996,
+   "tint": [
+    0.976,
+    0.976,
+    0.94
+   ]
+  },
+  {
+   "item": "stall_wood_0",
+   "position": [
+    18.0,
+    0.0,
+    2.6
+   ],
+   "yaw_deg": 0.0,
+   "scale": 0.97,
+   "tint": [
+    0.937,
+    0.943,
+    0.906
+   ]
+  },
+  {
+   "item": "bench_tuff",
+   "position": [
+    10.5,
+    0.0,
+    3.4
+   ],
+   "yaw_deg": 0.0,
+   "scale": 1.0,
+   "tint": [
+    0.899,
+    0.889,
+    0.875
+   ]
+  },
+  {
+   "item": "bench_tuff",
+   "position": [
+    27.5,
+    0.0,
+    -3.4
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.932,
+    0.934,
+    0.928
+   ]
+  },
+  {
+   "item": "amphora_group",
+   "position": [
+    -2.555,
+    0.0,
+    3.629
+   ],
+   "yaw_deg": 316.7953717082803,
+   "scale": 0.973,
+   "tint": [
+    0.899,
+    0.902,
+    0.866
+   ]
+  },
+  {
+   "item": "dolium",
+   "position": [
+    -10.041,
+    0.0,
+    -3.494
+   ],
+   "yaw_deg": 253.5429028867079,
+   "scale": 0.882,
+   "tint": [
+    0.962,
+    0.968,
+    0.95
+   ]
+  },
+  {
+   "item": "amphora_group",
+   "position": [
+    -20.819,
+    0.0,
+    3.686
+   ],
+   "yaw_deg": 21.119569045089634,
+   "scale": 0.902,
+   "tint": [
+    0.914,
+    0.912,
+    0.89
+   ]
+  },
+  {
+   "item": "amphora_group",
+   "position": [
+    26.922,
+    0.0,
+    3.641
+   ],
+   "yaw_deg": 237.84636284232516,
+   "scale": 1.016,
+   "tint": [
+    0.954,
+    0.938,
+    0.962
+   ]
+  },
+  {
+   "item": "dolium",
+   "position": [
+    -4.881,
+    0.0,
+    -3.36
+   ],
+   "yaw_deg": 276.7254647475826,
+   "scale": 1.032,
+   "tint": [
+    0.958,
+    0.945,
+    0.924
+   ]
+  },
+  {
+   "item": "garland_swag",
+   "position": [
+    0.0,
+    0.0,
+    -3.6
+   ],
+   "yaw_deg": 180.0,
+   "scale": 1.0,
+   "tint": [
+    0.906,
+    0.907,
+    0.922
+   ]
+  }
+ ]
+}

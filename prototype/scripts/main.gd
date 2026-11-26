@@ -448,6 +448,7 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 					world.cue_village_defense(action)
 		"atlas_demo": _open_atlas(true)
 		"city_exploration": _open_city_exploration()
+		"imperial_city_exploration": _open_city_exploration(false, false, true)
 		"campaign_market": _open_city_exploration(true)
 		"regional_goal":
 			if screen == "village_panel":
@@ -1460,7 +1461,7 @@ func _can_visit_market() -> bool:
 	return not Childhood.enabled(data) or str(data.village.childhood.screenplay.get("i01", "")) in ["complete", "legacy"]
 
 
-func _open_city_exploration(campaign_visit := false, from_road := false) -> void:
+func _open_city_exploration(campaign_visit := false, from_road := false, imperial_visit := false) -> void:
 	var passengers: Array[CharacterBody3D] = []
 	if is_instance_valid(city_exploration):
 		return
@@ -1487,6 +1488,10 @@ func _open_city_exploration(campaign_visit := false, from_road := false) -> void
 		city_exploration.party_visit.passengers = passengers
 		city_exploration.campaign_path = SAVE_PATH
 		city_exploration.world_jdn = int(model.data.calendar.clock.jdn)
+	elif imperial_visit:
+		city_exploration.world_jdn = preload("res://scripts/domain/world_calendar.gd").to_jdn(100, 6, 1)
+		city_exploration.use_flavian_kit = true
+		city_exploration.persist = false
 	elif "--horse-test" in OS.get_cmdline_user_args():
 		city_exploration.enable_riding_trial = true
 		city_exploration.persist = false
