@@ -15,7 +15,9 @@ civilian LODs only and adds the smallest shoulder rotation that clears it:
   * the corrections are smoothed in time (cyclic for closed gait cycles) and
     re-verified, then written to the same keys of all four LODs.
 
-Only the two Arm rotation tracks change. Key times, every other joint, the
+The uppercut's returning right forearm also opens about its own elbow in
+the original flexion plane, clearing the rolled sleeve at the lower LODs.
+Only shoulder rotations and this Forearm_R rotation change. Key times, the
 pelvis, legs and feet (stride, sole calibration, grounding) are untouched.
 The armoured original is never processed.
 """
@@ -333,6 +335,62 @@ def guard_clearance(model: Model) -> dict:
     return {"hook_left": {"R": {"local": np.asarray(guarding)}}}
 
 
+def ease_out(fraction: float) -> float:
+    """Quintic taper with zero velocity and acceleration at either end."""
+    t = float(np.clip(fraction, 0.0, 1.0))
+    return 1.0 - t ** 3 * (10.0 + t * (-15.0 + 6.0 * t))
+
+
+def clear_uppercut_elbow(path: Path, output: Path) -> float:
+    """Open the returning guard elbow slightly, in its measured flexion plane.
+
+    The right cuff moves with the upper arm. Rotating the shoulder also moves
+    that cuff and does not change the elbow angle. Use the actual posed elbow
+    and wrist of this LOD after the shoulder pass, without moving the fist of
+    the striking left arm or changing any joint's position or key times.
+    """
+    glb = Glb(path)
+    rig = Rig(glb)
+    names = {node.get("name"): i for i, node in enumerate(glb.document["nodes"])}
+    shoulder, elbow, wrist = (names[name] for name in ("Arm_R", "Forearm_R", "Hand_R"))
+    clip = rig.animation("uppercut_left")
+    animation = next(item for item in glb.document["animations"] if item["name"] == "uppercut_left")
+    channel = next(item for item in animation["channels"]
+                   if item["target"] == {"node": elbow, "path": "rotation"})
+    sampler = animation["samplers"][channel["sampler"]]
+    times = glb.accessor(sampler["input"]).reshape(-1)
+    original = glb.accessor(sampler["output"])
+    values = original.copy()
+    maximum = 0.0
+    # Calibration in normalized clip time (0.59 s peak in the 0.90 s
+    # mocap), including a smooth return to the original final guard.
+    for key, time_s in enumerate(times):
+        phase = float(time_s) / clip["duration"]
+        opening = ease_out(abs(phase - 59 / 90) / 0.4)
+        recovery = ease_out((phase - 0.96) / 0.04)
+        angle = math.radians(12.0) * opening * recovery
+        if angle <= 1e-10:
+            continue
+        world = rig.globals(clip, float(time_s))
+        upper_arm = world[elbow][:3, 3] - world[shoulder][:3, 3]
+        forearm = world[wrist][:3, 3] - world[elbow][:3, 3]
+        axis = np.cross(forearm, upper_arm)
+        length = np.linalg.norm(axis)
+        if length < 1e-10:
+            continue  # A straight elbow has no unique flexion plane.
+        # Never turn past straight even if the input is retargeted again.
+        flexion = math.atan2(length, float(np.dot(forearm, upper_arm)))
+        angle = min(angle, flexion)
+        local = pure_rotation(world[rig.parent[elbow]]).T @ (axis / length)
+        turned = multiply(quaternion(local * angle), original[key])
+        values[key] = turned / np.linalg.norm(turned)
+        maximum = max(maximum, math.degrees(angle))
+    sampler["output"] = glb.append_accessor(values, "VEC4")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    glb.write(output)
+    return maximum
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--input", type=Path, required=True, help="directory with the retargeted civilian LODs")
@@ -359,8 +417,11 @@ def main() -> int:
             target = args.output / path.name
             initial = Path(temporary) / path.name
             apply(path, initial, corrections)
-            apply(initial, target, guard)
-            report["outputs"].append({"path": target.name, "sha256": digest(target)})
+            guarded = initial.with_suffix(".guard.glb")
+            apply(initial, guarded, guard)
+            degrees = clear_uppercut_elbow(guarded, target)
+            report["outputs"].append({"path": target.name, "sha256": digest(target),
+                                      "uppercut_left_guard_elbow_deg": degrees})
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print("YOUTH_CIVIL_ARMS_CLEARED", flush=True)
