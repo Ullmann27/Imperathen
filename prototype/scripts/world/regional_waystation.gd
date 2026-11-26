@@ -56,7 +56,7 @@ func update_nearby(player: Vector3, receipt: Dictionary, delta := 1.0) -> void:
 func _block_table(table: Node3D) -> void:
 	var solid := StaticBody3D.new()
 	table.add_child(solid)
-	_box(solid,Vector3(1.65,.8,.81),Vector3(0,.4,0))
+	_box(solid, Vector3(Freight.TABLE_FOOTPRINT.x, 0.8, Freight.TABLE_FOOTPRINT.y), Vector3(0, 0.4, 0))
 
 func _ground(offset: Vector2) -> Vector3:
 	return Vector3(offset.x,float(_height.call(COUNTER + offset))-position.y,offset.y)

@@ -6,6 +6,8 @@ const DESK := Road.FREIGHT_DESK
 const LOADING_BAY := Vector2(241,112)
 const RECEIVING_BAY := Vector2(51,-13)
 const DEPOT := Road.GATE_DEPOT
+# Shared physical table footprint for both streamed collision and raid navigation.
+const TABLE_FOOTPRINT := Vector2(1.65, 0.81)
 const SPEED := 1.65
 const LOAD := 16
 const READY := "ready"

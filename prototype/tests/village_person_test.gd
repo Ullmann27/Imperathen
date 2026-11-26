@@ -164,6 +164,8 @@ func run() -> void:
 	var state := model.data.duplicate(true)
 	state.buildings = [{"id":"hut_1","x":8.0,"z":4.0,"progress":0.0,"completed":false}]
 	state.player.age = 18
+	# One recruited, living person; the identity-aware view uses both counters.
+	state.squad.recruits = 1
 	state.squad.alive = 1
 	state.encounter.enemies = [{"id":"rover","x":6.0,"z":7.0,"health":60}]
 	# Construction hints apply to an idle, active person. This visual fixture

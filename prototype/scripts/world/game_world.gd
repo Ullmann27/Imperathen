@@ -500,7 +500,7 @@ func select_route(id: String) -> void:
 
 func _near_freight(point: Vector2) -> bool:
 	var here := get_player_position()
-	return _state.village.enabled and Vector2(here.x,here.z).distance_to(point) <= 2.4
+	return bool(_state.get("village", {}).get("enabled", false)) and Vector2(here.x,here.z).distance_to(point) <= 2.4
 
 func at_waystation() -> bool:
 	return Waystation.at_counter(get_player_position())
@@ -1609,7 +1609,7 @@ func _interact() -> void:
 	if _near_freight(Freight.DEPOT):
 		action_requested.emit("freight_receipt",{})
 		return
-	if at_waystation() and _state.village.enabled:
+	if at_waystation() and bool(_state.get("village", {}).get("enabled", false)):
 		action_requested.emit("waystation_market",{})
 		return
 	if Childhood.enabled(_state):
@@ -1795,7 +1795,7 @@ func _update_context_hint() -> void:
 	if _near_freight(Freight.DEPOT):
 		_hint.text = "Empfangsbuch am Osttor lesen"
 		return
-	if at_waystation() and _state.village.enabled:
+	if at_waystation() and bool(_state.get("village", {}).get("enabled", false)):
 		_hint.text = "Weidenhof · zum Stadtmarkt weiterreisen"
 		return
 	if Childhood.enabled(_state):

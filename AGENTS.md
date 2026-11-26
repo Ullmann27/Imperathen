@@ -1,5 +1,9 @@
 # Arbeitsauftrag für Agenten – IMPERATHEN
 
+## Verbindliche Lieferregel: gemeinsamer Stand Null (26.11.2026)
+
+Der Auftraggeber verlangt die vollständige Integration der jeweils bereits entwickelten Neuerungen und selbstständige Reparatur aller fehlgeschlagenen Prüfungen. Keine alten APKs, Zwischen-Builds, isolierten Teilstände, Screenshots oder Arbeitspläne als Ersatz für die beauftragte Lieferung ausgeben. Alle parallelen Entwicklungen gegen einen gemeinsamen Quellstand abgleichen, Konflikte und fehlende Laufzeitanschlüsse beheben, CI-Fehler bis zur Ursache verfolgen und die vollständige Regression, Motion-/Sprach-/Asset-Gates, APK-Inhaltsprüfung und Signatur auf derselben Quellrevision erneut ausführen. Tests nicht löschen, umgehen oder Qualitätsgrenzen absenken. Noch nicht integrierte Änderungen oder fehlende Prüfnachweise blockieren die Gesamtauslieferung. Interne CI-Prüfpakete sind keine Nutzerlieferung. Erst nach belegter Gesamtfreigabe den aktuellen APK-Link samt knappen Nachweisen ausgeben; bei einer technisch nicht abschließbaren Aufgabe knapp und wahrheitsgemäß den Blocker benennen, ohne eine Zwischen-APK als Ergebnis anzubieten. Bestehende Grenzen zu main, Signierschlüsseln, Kosten und Geräteabnahme bleiben unverändert.
+
 ## Präzisierung der Game Direction – 26.11.2026
 
 Verbindlich ergänzend zum Masterhandbuch 3.0 (Wortlaut und Folgen: [docs/00_governance/GAME_DIRECTION_2026-11-26.md](docs/00_governance/GAME_DIRECTION_2026-11-26.md), Entscheidungen D-015 bis D-022):

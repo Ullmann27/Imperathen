@@ -16,6 +16,7 @@ extends RefCounted
 ## physics world in tests/raid_route_world_test.gd.
 
 const Layout = preload("res://scripts/world/village/village_layout.gd")
+const Freight = preload("res://scripts/domain/regional_freight.gd")
 const LOOT := Vector2(5.0, 5.0)
 const LOOT_RADIUS := 2.0
 const RADIUS := 0.28
@@ -46,6 +47,7 @@ const YARDS := [
 ## the training post, bridge rails). Measured from the GameWorld colliders;
 ## tests/raid_route_world_test.gd fails if a real prop is not covered.
 const PROPS := [
+	Rect2(Freight.DEPOT - Freight.TABLE_FOOTPRINT * 0.5, Freight.TABLE_FOOTPRINT),
 	Rect2(-32.8, 2.38, 9.6, 0.13), Rect2(-32.8, 5.49, 9.6, 0.13),
 	Rect2(-19.21, 14.79, 0.42, 0.42), Rect2(-18.21, 7.79, 0.42, 0.42), Rect2(1.21, -41.9, 0.44, 0.44),
 	Rect2(5.79, -12.21, 0.42, 0.42), Rect2(25.79, 15.79, 0.42, 0.42),
