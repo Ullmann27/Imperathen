@@ -15,6 +15,8 @@ const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
 const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
+const ResidentIdentity := preload("res://scripts/visuals/resident_identity.gd")
+const ResidentLook := preload("res://scripts/visuals/resident_look.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
 const MESHY_YOUTH_PATH := "res://assets/characters/hero_meshy_italia_%d.glb"
 # ACCAD measured cycle distance, retargeted to the original 1.50 m youth.
@@ -71,6 +73,12 @@ var _service_external := false
 var _motion_identity := ""
 var youth_ground_floor_y := INF
 var _youth_soles := YouthSoleContact.new()
+## Stable village id of a named resident; empty for generic villagers.
+var resident_id := ""
+var look: Dictionary = {}
+## Residents breathe, talk and work at their own tempo and phase, so a group
+## of neighbours never idles in lockstep.
+var _resident_tempo := 1.0
 
 
 func _ready() -> void:
@@ -122,18 +130,25 @@ func configure_meshy_youth(enabled: bool = true) -> bool:
 	return selected
 
 
-func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null) -> void:
+func configure_resident(origin: String, years: int, new_appearance: String, variation: int = 0, camera: Camera3D = null, new_resident_id: String = "") -> void:
 	# Resident population builders already know the complete identity. Configure
 	# it atomically so they never load an unused generic body or a near LOD first.
 	var selected := new_appearance if new_appearance in APPEARANCES else ""
 	var selected_variation := posmod(variation, 18)
-	var changed := role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation
+	var changed := role != "resident" or home != origin or age != years or appearance_id != selected or appearance_variation != selected_variation or resident_id != new_resident_id
 	role = "resident"
 	home = origin
 	age = years
 	appearance_id = selected
 	appearance_variation = selected_variation
+	resident_id = new_resident_id
 	identity = "resident_%s_%d" % [appearance_id, appearance_variation] if not appearance_id.is_empty() else "resident"
+	if ResidentIdentity.has_person(resident_id):
+		identity = "resident_" + resident_id
+	var stable := float(absi(identity.hash()) % 100003) / 100003.0
+	_resident_tempo = 0.92 + 0.16 * fposmod(stable * 7.31, 1.0)
+	if not body and clip == "idle" and not _posed:
+		phase = stable
 	if not changed and body:
 		refresh_lod(camera)
 		return
@@ -234,7 +249,7 @@ func _reload(level: int) -> void:
 		size_factor = 1.14 if age >= 18 else 1.0
 		if role == "companion": size_factor *= 0.97
 	elif active_model_path.begins_with("res://assets/characters/frontier_") and _frontier_identity() in ["civilian_man", "civilian_woman", "elder"]:
-		size_factor = 1.14 * float(RESIDENT_HEIGHTS[appearance_variation % RESIDENT_HEIGHTS.size()])
+		size_factor = 1.14 * float(_resident_look().get("height", RESIDENT_HEIGHTS[appearance_variation % RESIDENT_HEIGHTS.size()]))
 	body.scale = Vector3.ONE * size_factor
 	add_child(body)
 	body.position.y = -0.9
@@ -257,6 +272,8 @@ func _reload(level: int) -> void:
 			animator.add_animation_library(library_name, library)
 	for shape: MeshInstance3D in body.find_children("*","MeshInstance3D",true,false):
 		_style(shape)
+	if active_model_path.begins_with("res://assets/characters/frontier_"):
+		ResidentLook.apply(body, _resident_look(), detail)
 	_hands.bind(body, active_model_path)
 	_face.bind(body, identity)
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
@@ -310,6 +327,20 @@ func _reload(level: int) -> void:
 		for cached_path: String in scenes.keys():
 			if cached_path.begins_with(family) and cached_path != path:
 				scenes.erase(cached_path)
+
+
+func _resident_look() -> Dictionary:
+	# Named residents keep one look at every distance; generic villagers get a
+	# stable look from their appearance and variation. Other roles have none.
+	if role != "resident":
+		look = {}
+		return look
+	var key := "%s|%s|%d|%d" % [resident_id, appearance_id, appearance_variation, age]
+	if str(look.get("_key", "")) != key:
+		look = ResidentIdentity.look(resident_id, appearance_id, appearance_variation, age)
+		if not look.is_empty():
+			look["_key"] = key
+	return look
 
 
 func _instantiate(path: String) -> Node3D:
@@ -826,6 +857,8 @@ func _process(delta: float) -> void:
 		if clip in ["march","run"]:
 			var stride := locomotion_stride(clip)
 			advance *= speed * animator.current_animation_length / stride
+		elif role == "resident" and clip in ["idle", "talk", "work"]:
+			advance *= _resident_tempo
 		animator.advance(advance)
 		if animator.current_animation != "":
 			phase = animator.current_animation_position / animator.current_animation_length

@@ -43,6 +43,7 @@ hero = module("frontier_hero_source", ROOT / "tools/characters/build_hero.py")
 soldier = module("frontier_soldier_source", ROOT / "art/soldiers/build.py")
 skirt_seam = module("frontier_skirt_seam", ROOT / "tools/characters/smooth_frontier_skirt_seam.py")
 kit_rivets = module("frontier_kit_rivets", ROOT / "tools/characters/rebind_frontier_kit_rivets.py")
+adult_rig = module("frontier_adult_rig", ROOT / "tools/characters/extend_adult_rig.py")
 
 
 def digest(path):
@@ -471,6 +472,9 @@ def export(kind):
     records = []
     for level, ratio, edge in LOD:
         bpy.ops.wm.open_mainfile(filepath=str(ART / (kind + ".blend")))
+        # Fingers, jaw and eyes on the near tiers, the same hands in the mesh
+        # of the distant tiers; soldiers also get adult hands on their grips.
+        rig = adult_rig.prepare(bpy.data.objects["FrontierRig"], level, SOLDIERS.get(kind))
         bpy.ops.object.select_all(action="DESELECT")
         for obj in bpy.context.scene.objects:
             if obj.type == "MESH":
@@ -499,7 +503,7 @@ def export(kind):
                 count += len(obj.data.loop_triangles)
         records.append({"lod": level, "path": str(path.relative_to(ROOT)), "triangles": count,
                         "bytes": path.stat().st_size, "sha256": digest(path), "texture_edge": edge,
-                        "face_morphs": level < 2, "belt_fit": belt_fit,
+                        "face_morphs": level < 2, "belt_fit": belt_fit, "rig": rig,
                         "death_ground_contact": {key: death_ground[key] for key in ("before", "after", "maximum_floor_correction_m")},
                         "skirt_seam": {key: seam[key] for key in ("before", "after", "unchanged") if key in seam},
                         "gather_ground_contact": {key: gather_ground[key] for key in ("before", "after", "unchanged") if key in gather_ground},
@@ -552,6 +556,10 @@ def main():
                   "limits": ["No physical Android performance claim.", "Female and elder faces are authored variants of the existing anatomical source, not new scans.",
                              "Distant levels omit facial morphs.", "Armour retains the project's stylised Roman equipment study; no archaeological reconstruction claim."]}
         report_path.write_text(json.dumps(report, indent=2) + "\n")
+    civilian = [kind for kind in args.types if kind in ("civilian_man", "civilian_woman", "elder")]
+    if records and civilian:
+        # The resident identity layer is part of the civilian runtime exports.
+        module("resident_identity", ROOT / "art/village_characters/build_resident_identity.py").run(civilian)
     print("FRONTIER_PEOPLE_COMPLETE", ",".join(args.types))
 
 
