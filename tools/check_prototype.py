@@ -150,6 +150,7 @@ def main():
             ("hero_cloth_grounding", ["--fixed-fps", "60", "--script", "res://tests/hero_cloth_grounding_test.gd"], "checks; 0 failed"),
             ("village_scenery", ["--script", str(ROOT / "art/village/verify.gd")], "VILLAGE_SCENERY errors []"),
             ("atrium", ["--script", str(ROOT / "art/architecture/verify_atrium.gd")], "ATR_VISUAL errors []"),
+            ("valdora_family", ["--fixed-fps", "60", "--script", str(ROOT / "art/architecture/valdora_family/verify_family.gd")], "VALDORA_FAMILY errors []"),
             ("seasons", ["--script", "res://tests/season_campaign_test.gd"], "failures=0"),
             ("figure_gallery", ["--fixed-fps", "60", "--script", "res://tests/figure_gallery_test.gd"], "failures=0 real_textures=true"),
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),

@@ -3,11 +3,13 @@ extends Node3D
 
 const Art = preload("res://scripts/world/village_art.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
+const Family = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
 var _materials: Dictionary = {}
 var _groups: Array[Node3D] = []
 var _jar_mesh: ArrayMesh
 var _cup_mesh: ArrayMesh
 var _ember: MeshInstance3D
+var _forge_model: Node3D
 var _interactive: Array[Node] = []
 
 
@@ -48,6 +50,7 @@ func set_quality(profile: String) -> void:
 		for mesh: GeometryInstance3D in group.find_children("*","GeometryInstance3D",true,false):
 			mesh.visibility_range_end = distance
 			mesh.visibility_range_end_margin = 2.5
+	_forge_quality(profile)
 
 
 func _group(parent: Node3D, title: String, at := Vector3.ZERO) -> Node3D:
@@ -100,12 +103,16 @@ func _furnish(house: Node3D, id: String, index: int) -> void:
 		Art.cylinder(stool,.04,.41,Vector3(cos(angle)*.18,.205,sin(angle)*.18),_materials.wood)
 	Art.box_collider(stool,Vector3(.54,.47,.54),Vector3(0,.235,0))
 	var yard := _group(house,"DoorstepSupplies")
-	_jar(yard,Vector3(-1.90,0,2.98),.90,index%2==0)
-	_jar(yard,Vector3(-2.35,0,2.80),.65,false)
+	# A porch house (columns at x = +-1.75) keeps its supplies beside the stylobate.
+	var porch := bool(house.get_meta("porch", false))
+	var left := Vector3(-.9,0,0) if porch else Vector3.ZERO
+	var right := Vector3(.85,0,.3) if porch else Vector3.ZERO
+	_jar(yard,Vector3(-1.90,0,2.98)+left,.90,index%2==0)
+	_jar(yard,Vector3(-2.35,0,2.80)+left,.65,false)
 	# Chopped wood is piled beside the door, outside the walking ramp.
 	for row in 2:
 		for column in 3-row:
-			var log := Art.cylinder(yard,.075,.68,Vector3(2.17+(column-1)*.16,.10+row*.15,2.68),_materials.wood,.07)
+			var log := Art.cylinder(yard,.075,.68,Vector3(2.17+(column-1)*.16,.10+row*.15,2.68)+right,_materials.wood,.07)
 			log.rotation.x = PI/2
 	if id == "baker_home":
 		room.name = "FamilyHome"
@@ -116,54 +123,68 @@ func _furnish(house: Node3D, id: String, index: int) -> void:
 func _make_forge() -> void:
 	var forge := _group(self,"VillageForge",Vector3(34.1,0,-26.2))
 	forge.set_meta("smith_anchor",Vector3(32.8,0,-25.0))
-	# A lean-to faces the street; its posts leave the approach and all work
-	# stations clear. The shelter stays on the house side of the public lane.
+	forge.set_meta("building_function","smithy")
+	forge.set_meta("household_id","smith_home")
+	# Nerva's forge from the Valdora building kit (art/architecture/valdora_family/
+	# family_forge.py): tiled lean-to on oak posts in front of his house, every
+	# work station a separate node. The stations keep their places, so the
+	# story points of the forge lesson, the colliders and the path from the
+	# lane to the house door (local z -0.75..0.75) stay as they were.
+	_forge_model = (load("res://assets/architecture/valdora/valdora_forge.glb") as PackedScene).instantiate() as Node3D
+	_forge_model.name = "ForgeModel"
+	forge.add_child(_forge_model)
 	for z in [-3.15,3.0]:
 		for x in [-.10,1.25]:
-			Art.box(forge,Vector3(.12,2.55,.12),Vector3(x,1.275,z),_materials.wood,true)
-	var cover := Art.box(forge,Vector3(2.45,.13,6.6),Vector3(.45,2.65,-.05),_materials.wood)
-	cover.rotation.z = -.08
-	for z in [-2.6,-1.3,0,1.3,2.6]:
-		Art.box(forge,Vector3(2.6,.12,.10),Vector3(.45,2.54,z),_materials.cut)
+			Art.box_collider(forge,Vector3(.16,2.4,.16),Vector3(x,1.2,z)).name = "PostCollision"
+	Art.box_collider(forge,Vector3(1.4,2.0,.12),Vector3(.6,1.0,-3.33)).name = "WattleScreenCollision"
 	var hearth := _group(forge,"Hearth",Vector3(.05,0,-2.85))
-	Art.box(hearth,Vector3(1.18,.72,.85),Vector3(0,.36,0),_materials.dark_stone,true)
-	for side in [-1,1]:
-		Art.box(hearth,Vector3(.16,.43,.90),Vector3(side*.53,.935,0),_materials.stone)
-	Art.box(hearth,Vector3(1.14,.43,.16),Vector3(0,.935,-.37),_materials.stone)
-	Art.box(hearth,Vector3(.65,1.8,.44),Vector3(.24,1.6,-.27),_materials.dark_stone)
-	_ember = Art.box(hearth,Vector3(.70,.035,.48),Vector3(0,.75,0),_materials.ember)
-	for index in 7:
-		Art.sphere(hearth,.09,Vector3(-.28+(index%4)*.18,.80,-.12+floori(index/4)*.23),_materials.coal,Vector3(1.1,.55,.8))
+	hearth.set_meta("station","hearth")
+	Art.box_collider(hearth,Vector3(1.18,.72,.85),Vector3(0,.36,0))
+	Art.box_collider(hearth,Vector3(.65,1.8,.44),Vector3(.24,1.6,-.27))
+	# Glowing fire bed between the charcoal lumps.
+	_ember = Art.box(hearth,Vector3(.66,.03,.40),Vector3(0,.70,0),_materials.ember)
 	var bellows := _group(forge,"Bellows",Vector3(-.12,0,-1.95))
-	Art.box(bellows,Vector3(.95,.16,.47),Vector3(0,.68,0),_materials.wood)
-	Art.sphere(bellows,.29,Vector3(0,.80,0),_materials.red_cloth,Vector3(1.55,.38,.75))
-	Art.box(bellows,Vector3(.95,.06,.47),Vector3(0,.91,0),_materials.cut)
-	Art.box(bellows,Vector3(.08,.05,.50),Vector3(-.35,1.02,0),_materials.wood).rotation.z = -.18
+	bellows.set_meta("station","bellows")
 	Art.box_collider(bellows,Vector3(1.05,1.06,.56),Vector3(0,.53,0))
 	var anvil := _group(forge,"Anvil",Vector3(0,0,1.0))
-	Art.cylinder(anvil,.32,.53,Vector3(0,.265,0),_materials.wood)
-	Art.box(anvil,Vector3(.58,.14,.34),Vector3(0,.59,0),_materials.iron)
-	Art.box(anvil,Vector3(.25,.20,.24),Vector3(0,.75,0),_materials.iron)
-	Art.box(anvil,Vector3(.76,.12,.36),Vector3(0,.91,0),_materials.iron)
-	var horn := Art.cylinder(anvil,.13,.45,Vector3(-.50,.91,0),_materials.iron,0)
-	horn.rotation.z = PI/2
-	Art.box_collider(anvil,Vector3(1.15,.97,.68),Vector3(-.16,.485,0))
-	# Tongs, hammer and unfinished tools have readable silhouettes on a rack.
+	anvil.set_meta("station","anvil")
+	Art.box_collider(anvil,Vector3(.70,.97,.68),Vector3(0,.485,0))
 	var rack := _group(forge,"ToolRack",Vector3(.94,0,1.45))
-	Art.box(rack,Vector3(.08,1.65,1.24),Vector3(0,.825,0),_materials.wood)
-	for index in 4:
-		var z := -.43+index*.27
-		Art.box(rack,Vector3(.055,.58,.055),Vector3(-.12,1.11,z),_materials.cut)
-		Art.box(rack,Vector3(.20,.10,.16),Vector3(-.12,1.42,z),_materials.iron)
+	rack.set_meta("station","tools")
+	Art.box_collider(rack,Vector3(.16,1.66,1.24),Vector3(-.02,.83,0))
 	var tub := _group(forge,"QuenchTrough",Vector3(.10,0,2.40))
-	for side in [-1,1]:
-		Art.box(tub,Vector3(.10,.57,.90),Vector3(side*.39,.285,0),_materials.wood)
-		Art.box(tub,Vector3(.72,.57,.09),Vector3(0,.285,side*.42),_materials.wood)
-	Art.box(tub,Vector3(.70,.045,.76),Vector3(0,.44,0),_materials.water)
+	tub.set_meta("station","quench")
+	Art.box(tub,Vector3(.70,.03,.76),Vector3(0,.44,0),_materials.water)
 	Art.box_collider(tub,Vector3(.88,.59,.9),Vector3(0,.295,0))
-	for z in [1.2,1.45,1.7]:
-		var bar := Art.box(forge,Vector3(.055,.055,1.1),Vector3(.75,.10,z),_materials.iron)
-		bar.rotation.y = .2
+	var bench := _group(forge,"Workbench",Vector3(1.02,0,-1.25))
+	bench.set_meta("station","goods")
+	bench.set_meta("goods",["sickle","knife","axe_head","plough_share","nails"])
+	Art.box_collider(bench,Vector3(.52,.84,.97),Vector3(0,.42,0))
+	var stock := _group(forge,"Stock",Vector3(1.06,0,-2.52))
+	stock.set_meta("station","raw_material")
+	stock.set_meta("materials",["bar_iron","bloom_iron","charcoal"])
+	Art.box_collider(stock,Vector3(.56,.46,.56),Vector3(0,.23,0))
+	_forge_quality("balanced")
+
+
+## Shared kit material and visibility ranges of the forge model per profile.
+func _forge_quality(profile: String) -> void:
+	if _forge_model == null:
+		return
+	var paint := Family.material(profile, Color("dfd4bd"), "worn")
+	var ranges: Dictionary = Family.RANGES.get(profile, Family.RANGES.balanced)
+	for mesh: MeshInstance3D in _forge_model.find_children("*","MeshInstance3D",true,false):
+		mesh.material_override = paint
+		mesh.visibility_range_begin = 0.0
+		mesh.visibility_range_end_margin = 4.0
+		if mesh.name.ends_with("_far"):
+			mesh.visibility_range_begin = ranges.house
+			mesh.visibility_range_end = 0.0
+		elif mesh.name.ends_with("_detail"):
+			mesh.visibility_range_end = ranges.detail
+			mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if profile in ["low","balanced"] else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+		else:
+			mesh.visibility_range_end = ranges.house
 
 
 func _make_market_goods() -> void:

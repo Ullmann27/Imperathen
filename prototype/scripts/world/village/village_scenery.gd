@@ -4,6 +4,7 @@ extends Node3D
 const Art = preload("res://scripts/world/village_art.gd")
 const PROFILE_DATA = preload("res://assets/quality_profiles.json")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
+const HouseFamily = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
 const WORKSHOP := Vector3(-9.2,0,-7.35)
 const STORE := Vector3(-10.6,0,15.6)
 const MARKET := Vector3(-9,0,0)
@@ -84,6 +85,7 @@ func apply_season(index: int, sun: DirectionalLight3D, environment: Environment)
 	grass_material.set_shader_parameter("gust",GUST[season])
 	for material in [ground_material,water_material]:
 		material.set_shader_parameter("wetness",WET[season])
+	HouseFamily.set_wetness(WET[season])
 	sun.light_color = [Color("#fff1d6"),Color("#ffebc7"),Color("#eee5d1"),Color("#e6edfa")][season]
 	sun.light_energy = [.46,.55,.32,.44][season]
 	sun.rotation_degrees = Vector3([-43.0,-56.0,-32.0,-27.0][season],[-34.0,-29.0,-47.0,-39.0][season],0)

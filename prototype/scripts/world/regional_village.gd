@@ -6,6 +6,7 @@ const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Dressing = preload("res://scripts/world/village/frontier_dressing.gd")
 const Settlement = preload("res://scripts/world/village/settlement_dressing.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
+const Family = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
 var current_origin := ""
 var quality := "balanced"
 var frontier_details: Node3D
@@ -37,14 +38,21 @@ func show_origin(id: String) -> void:
 	var house: String = Origins.PEOPLES[id].house
 	var places := [Vector3(-13,0,11),Vector3(-14,0,-11),Vector3(-5,0,-19),Vector3(20,0,-18)]
 	if id == "italia":
+		# Valdora house family (art/architecture/valdora_family): variant by
+		# household wealth, shared materials, colliders in the visible planes.
 		for home: Dictionary in Layout.HOMES:
-			var model := _add_scene("res://assets/architecture/frontier_house.glb",home.at)
-			model.name = home.id
+			var model := Family.instantiate(home, quality)
+			model.position = home.at
 			model.rotation.y = float(home.yaw)
-			model.set_meta("household_id",home.id)
-			_tint_house(model,Color(home.tint))
-			_static_collision(model,"roman")
+			add_child(model)
+			Family.build_collision(model)
 			house_count += 1
+		# Cobbled square, house aprons, drip strips and paths (visual only).
+		var paving := preload("res://scripts/world/village/architecture/valdora_paving.gd").new()
+		paving.name = "ValdoraPaving"
+		add_child(paving)
+		paving.profile = quality
+		paving.build(self)
 	for i in (0 if id == "italia" else places.size()):
 		var path := "res://assets/landscape/%s.glb" % house
 		if id == "italia":
@@ -153,6 +161,11 @@ func set_quality(profile: String) -> void:
 	quality = profile
 	if is_instance_valid(worker_figure):
 		worker_figure.profile = profile
+	for child in get_children():
+		if Family.is_family_house(child):
+			Family.apply_quality(child, profile)
+	if has_node("ValdoraPaving"):
+		get_node("ValdoraPaving").set_quality(profile)
 	if frontier_details:
 		frontier_details.set_quality(profile)
 	if settlement_details:
