@@ -1,6 +1,6 @@
 extends Node
-## A single market session for the existing exploration player and camera.
-## The ordinary campaign remains suspended and is never passed into this node.
+## Campaign visits share the active WorldModel. Standalone free-city sessions
+## retain the published sandbox contract and its separate legacy slot.
 
 signal closed
 signal message(text: String)
@@ -20,6 +20,7 @@ var model
 var panel
 var _serial := 0
 var _living_city: LifeSession
+var _campaign := false
 
 
 static func verified_sites(city: Node3D) -> Dictionary:
@@ -56,7 +57,7 @@ static func verified_sites(city: Node3D) -> Dictionary:
 		result[id] = center + FRONT_OFFSET
 	return result
 
-func setup(city: Node3D, body: CharacterBody3D, persistent: bool, stable_trader: Marker3D = null) -> bool:
+func setup(city: Node3D, body: CharacterBody3D, persistent: bool, stable_trader: Marker3D = null, campaign: Model = null, campaign_path := "", scene_nodes := Callable()) -> bool:
 	if model != null or is_instance_valid(panel) or not is_instance_valid(body):
 		return false
 	player = body
@@ -67,19 +68,37 @@ func setup(city: Node3D, body: CharacterBody3D, persistent: bool, stable_trader:
 		return false
 	if is_instance_valid(stable_trader) and stable_trader.is_inside_tree():
 		sites["equarius"] = stable_trader.global_position
-	model = Model.new()
-	model.new_game("italia", true, true)
-	model.city_trade_sites = sites.duplicate(true)
-	if persist and (FileAccess.file_exists(save_path) or FileAccess.file_exists(save_path + ".bak")):
-		var loaded: Dictionary = model.load_game(save_path)
-		if not loaded.get("ok", false):
-			message.emit("Marktspielstand beschädigt. Die Datei bleibt erhalten; Handel gesperrt.")
+	if campaign != null:
+		if not persistent or campaign_path.is_empty() or not campaign.data.village.enabled:
 			return false
-	var enabled: Dictionary = model.execute("city_trade_enable", {})
-	if not enabled.get("ok", false):
-		message.emit(str(enabled.get("message", "Handel konnte nicht geöffnet werden.")))
-		return false
+		model = campaign
+		save_path = campaign_path
+		_living_city = LifeSession.new()
+		if not _living_city.open_campaign(model.data, scene_nodes):
+			message.emit("Stadtwirtschaft konnte nicht aus der Kampagne geladen werden: " + _living_city.error)
+			return false
+		_campaign = true
+		if not Trade.enabled(model.data):
+			var enabled: Dictionary = model.execute_city_at("city_trade_enable", {}, "", _living_city, sites, player.global_position, save_path)
+			if not enabled.ok:
+				message.emit(str(enabled.message))
+				return false
+	else:
+		model = Model.new()
+		model.new_game("italia", true, true)
+		model.city_trade_sites = sites.duplicate(true)
+		if persist and (FileAccess.file_exists(save_path) or FileAccess.file_exists(save_path + ".bak")):
+			var loaded: Dictionary = model.load_game(save_path)
+			if not loaded.get("ok", false):
+				message.emit("Marktspielstand beschädigt. Die Datei bleibt erhalten; Handel gesperrt.")
+				return false
+		var enabled: Dictionary = model.execute("city_trade_enable", {})
+		if not enabled.get("ok", false):
+			message.emit(str(enabled.get("message", "Handel konnte nicht geöffnet werden.")))
+			return false
 	panel = MarketPanel.new()
+	if _campaign:
+		panel.quote_item = _living_city.quote
 	panel.layer = 21
 	panel.embedded_city = true
 	panel.shop_sites = sites.duplicate(true)
@@ -97,6 +116,23 @@ func attach_living_city(session: LifeSession) -> bool:
 		return false
 	_living_city = session
 	return true
+
+func campaign_session() -> LifeSession:
+	return _living_city if _campaign and available else null
+
+func sync_campaign() -> Dictionary:
+	if campaign_session() == null or not _living_city.owns(model.data):
+		return {"ok": false, "done": false}
+	var was_ready := bool(_living_city.last_sync.get("done", false))
+	var result := _living_city.sync_to(model.data.calendar.clock)
+	if is_open() and bool(result.get("done", false)) != was_ready:
+		_sync()
+	return result
+
+func checkpoint_campaign() -> Dictionary:
+	if campaign_session() == null:
+		return {"ok": false, "message": "Kein gemeinsamer Stadtbesuch aktiv."}
+	return model.checkpoint_city(_living_city, save_path)
 
 func is_open() -> bool:
 	return available and is_instance_valid(panel) and panel.is_open()
@@ -124,7 +160,8 @@ func open_shop() -> bool:
 	if not target.reachable:
 		message.emit("Gehe zum gewünschten Marktstand (höchstens 3 m).")
 		return false
-	model.set_player_position(player.global_position)
+	if not _campaign:
+		model.set_player_position(player.global_position)
 	_sync()
 	panel.open_shop(str(target.id))
 	panel.notify("")
@@ -133,7 +170,8 @@ func open_shop() -> bool:
 func open_inventory() -> bool:
 	if not available or is_open():
 		return false
-	model.set_player_position(player.global_position)
+	if not _campaign:
+		model.set_player_position(player.global_position)
 	_sync()
 	panel.open_inventory()
 	panel.notify("")
@@ -145,13 +183,30 @@ func close() -> void:
 
 func _sync() -> void:
 	if is_instance_valid(panel):
-		panel.update_state(model.data)
+		var presentation: Dictionary = model.data
+		if _campaign:
+			presentation = model.data.duplicate()
+			presentation.player = model.data.player.duplicate()
+			var position := player.global_position
+			presentation.player.position = [position.x, position.y, position.z]
+		panel.update_state(presentation)
 
-func execute(command: String, args: Dictionary) -> Dictionary:
+func execute(command: String, args: Dictionary, request_id := "") -> Dictionary:
 	if not is_open() or command == "city_trade_enable" or not Trade.COMMAND_FIELDS.has(command):
 		return {"ok": false, "message": "Kein aktiver Handelsdialog."}
 	if args.has("shop_id") and str(args.shop_id) != str(panel.shop_id):
 		return {"ok": false, "message": "Der Auftrag gehört zu einem anderen Marktstand."}
+	if _campaign:
+		if not persist:
+			return {"ok": false, "message": "Kampagnenhandel erfordert gemeinsame Speicherung."}
+		_serial += 1
+		if request_id.is_empty():
+			request_id = "city-%d-%d-%d" % [Time.get_ticks_usec(), int(model.data.revision), _serial]
+		var outcome: Dictionary = model.execute_city_at(command, args, request_id, _living_city, sites, player.global_position, save_path)
+		_sync()
+		panel.notify(str(outcome.message))
+		message.emit(str(outcome.message))
+		return outcome
 	if _living_city != null and persist:
 		var notice := "Stadtwirtschaft: Gemeinsamer Speichervertrag fehlt; persistenter Handel ist gesperrt."
 		panel.notify(notice)

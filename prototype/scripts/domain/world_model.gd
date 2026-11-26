@@ -15,6 +15,9 @@ const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
+const CitySession = preload("res://scripts/world/city_life_session.gd")
+const CityCheckpoint = preload("res://scripts/domain/city_checkpoint.gd")
+const CityCatalog = preload("res://scripts/city_trade_catalog.gd")
 const CityTrade = preload("res://scripts/city_trade.gd")
 const TribalWorld = preload("res://scripts/domain/tribal_world.gd")
 const WorldClock = preload("res://scripts/domain/world_clock.gd")
@@ -152,6 +155,16 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 
 
 func execute(command: String, args: Dictionary = {}, command_id: String = "") -> Dictionary:
+	return _run_command(command, args, command_id, null, {}, Vector3.ZERO, "")
+
+
+func execute_city_at(command: String, args: Dictionary, command_id: String, session: CitySession, sites: Dictionary, position: Vector3, path: String) -> Dictionary:
+	if session == null or not session.owns(data) or path.is_empty() or not position.is_finite() or not CityTrade.COMMAND_FIELDS.has(command):
+		return _fail("Der Stadthandel gehört zu keinem aktuellen Kampagnenstand.")
+	return _run_command(command, args, command_id, session, sites, position, path)
+
+
+func _run_command(command: String, args: Dictionary, command_id: String, session: CitySession, sites: Dictionary, position: Vector3, path: String) -> Dictionary:
 	var command_fields: Dictionary = COMMAND_FIELDS.duplicate()
 	command_fields.merge(VillageEconomy.COMMAND_FIELDS)
 	command_fields.merge(VillageLife.COMMAND_FIELDS)
@@ -181,10 +194,26 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	if data.progress.career_terminal:
 		return _fail("Dieser Lebensbogen ist abgeschlossen. Ein neues Leben beginnt im Hauptmenü.")
 	var candidate := _world_copy()
-	if npc_observations.is_valid():
-		NpcBehavior.observe(candidate, npc_observations.call(), true)
-	_observe_raid_positions(candidate)
-	var result := _apply_command(candidate, command, args)
+	if session == null:
+		if npc_observations.is_valid():
+			NpcBehavior.observe(candidate, npc_observations.call(), true)
+		_observe_raid_positions(candidate)
+	var quote := {}
+	var staged_city := {}
+	var previous_position: Array = candidate.player.position
+	if session != null:
+		candidate.player.position = [position.x, position.y, position.z]
+		if command in ["city_buy", "city_sell"] and CityTrade.simulated_good(args.item_id):
+			if session.life.clock() != WorldCalendar.normalize_clock(data.calendar.clock):
+				return _fail("Der Markt holt die Kampagnenzeit auf.")
+			quote = session.quote(args.shop_id, args.item_id)
+			if quote.is_empty():
+				return _fail("Dieser Stand hat für die Ware keinen zugeordneten Betrieb.")
+	elif data.world_state.has("city") and command in ["city_buy", "city_sell"] and CityTrade.simulated_good(args.item_id):
+		return _fail("Diese Ware wird beim zuständigen Betrieb in der Stadt gehandelt.")
+	var result := _apply_command(candidate, command, args, sites if session != null else city_trade_sites, quote)
+	if session != null:
+		candidate.player.position = previous_position
 	result.message = _regional_text(candidate, result.message)
 	if not result.ok:
 		return result
@@ -194,9 +223,28 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	result["revision"] = candidate.revision
 	if not command_id.is_empty():
 		candidate.command_log[command_id] = {"fingerprint": fingerprint, "result": result.duplicate(true)}
+	if session != null:
+		if not quote.is_empty():
+			var item: Dictionary = CityCatalog.ITEMS[args.item_id]
+			var buying := command == "city_buy"
+			var amount := int(args.quantity) * int(item.price if buying else item.sell_price)
+			staged_city = session.stage_trade(args.shop_id, args.item_id, args.quantity, amount, buying)
+			if staged_city.is_empty():
+				return _fail("Der Stadtbetrieb kann diese Buchung nicht decken.")
+		var snapshot := CityCheckpoint.pack_city(session.life.state if staged_city.is_empty() else staged_city, session.generation + 1, session.opening_trade_balance)
+		if snapshot.is_empty():
+			return _fail("Der Stadtzustand kann nicht gespeichert werden.")
+		candidate.world_state.city = snapshot
 	state_error = _validate_state(candidate)
 	if not state_error.is_empty():
 		return _fail("Der Vorgang wurde vollständig verworfen: " + state_error)
+	if session != null:
+		var written := _save_candidate(path, candidate)
+		if not written.ok:
+			return _fail("Stadtbuchung verworfen: " + str(written.message))
+		if not staged_city.is_empty():
+			session.life.state = staged_city
+		session.generation += 1
 	data = candidate
 	changed.emit()
 	return result
@@ -394,6 +442,39 @@ func finish_tribes(max_frames: int = 100000) -> int:
 ## Travel, waiting or sleeping away from the village book their days on the
 ## one world clock; the tribal world (in frame budgets), recovering soldiers
 ## and every date reader then live through them like any other time.
+func advance_city_visit(seconds: int) -> Dictionary:
+	if seconds < 1 or seconds > WorldClock.DAY or data.is_empty() or data.progress.career_terminal:
+		return _fail("Ungültiger Zeitabschnitt für den Stadtbesuch.")
+	if data.encounter.active or data.village.get("raid", {}).get("status", "") in ["warning", "active"]:
+		return _fail("Ein laufender Angriff verhindert den Stadtbesuch.")
+	var next := WorldCalendar.advance_clock(data.calendar.clock, seconds)
+	if next.is_empty():
+		return _fail("Dieser Tag liegt außerhalb des Weltkalenders.")
+	var continuing: bool = data.world_state.time.last.reason == "Aufenthalt in der Stadt"
+	WorldClock.book(data, "wait", seconds, "Aufenthalt in der Stadt")
+	if continuing:
+		data.world_state.time.counts.wait -= 1
+	data.revision = int(data.revision) + 1
+	return _ok("Stadtzeit fortgeschrieben.")
+
+
+func checkpoint_city(session: CitySession, path: String) -> Dictionary:
+	if session == null or not session.owns(data):
+		return _fail("Diese Stadtsitzung ist veraltet.")
+	var candidate := _world_copy()
+	var snapshot := CityCheckpoint.pack_city(session.life.state, session.generation + 1, session.opening_trade_balance)
+	if snapshot.is_empty():
+		return _fail("Der Stadtzustand kann nicht gespeichert werden.")
+	candidate.world_state.city = snapshot
+	candidate.revision = int(candidate.revision) + 1
+	var written := _save_candidate(path, candidate)
+	if written.ok:
+		session.generation += 1
+		data = candidate
+		changed.emit()
+	return written
+
+
 func pass_calendar_days(days: int, reason: String = "", cause: String = "travel") -> Dictionary:
 	if days < 1 or days > WorldClock.MAX_PASS_DAYS or data.is_empty() or data.progress.career_terminal:
 		return _fail("Ungültige Zeitspanne.")
@@ -580,21 +661,28 @@ func _valid_valley(state: Dictionary) -> bool:
 
 
 func save_game(path: String) -> Dictionary:
+	return _save_candidate(path, data, true)
+
+
+func _save_candidate(path: String, candidate: Dictionary, capture_observations := false) -> Dictionary:
 	var absolute := _save_path(path)
 	if absolute.is_empty():
 		return _fail("Speichern benötigt einen Benutzerpfad oder absoluten Dateipfad außerhalb der Projektressourcen.")
-	var state_error := _validate_state(data)
+	var state_error := _validate_state(candidate)
 	if state_error.is_empty():
-		state_error = PersonRegistry.validate(data)
+		state_error = PersonRegistry.validate(candidate)
 	if not state_error.is_empty():
 		return _fail("Der Spielstand wurde nicht gespeichert: " + state_error)
-	if npc_observations.is_valid():
-		NpcBehavior.observe(data,npc_observations.call(),true)
-	_observe_raid_positions(data)
+	if DirAccess.dir_exists_absolute(absolute) or DirAccess.dir_exists_absolute(absolute + ".bak"):
+		return _fail("Der Speicherplatz ist durch ein Verzeichnis belegt.")
+	if capture_observations:
+		if npc_observations.is_valid():
+			NpcBehavior.observe(candidate, npc_observations.call(), true)
+		_observe_raid_positions(candidate)
 	var directory_error := DirAccess.make_dir_recursive_absolute(absolute.get_base_dir())
 	if directory_error != OK:
 		return _fail("Der Speicherordner kann nicht angelegt werden (Fehler %d)." % directory_error)
-	var payload := JSON.stringify(data, "", true, true)
+	var payload := JSON.stringify(candidate, "", true, true)
 	var envelope := JSON.stringify({"format": SAVE_FORMAT, "format_version": 1, "payload": payload, "sha256": payload.sha256_text()})
 	if envelope.to_utf8_buffer().size() > MAX_SAVE_BYTES:
 		return _fail("Der Spielstand überschreitet die erlaubte Dateigröße.")
@@ -622,16 +710,24 @@ func save_game(path: String) -> Dictionary:
 			_remove_if_present(temporary)
 			_remove_if_present(backup_temporary)
 			return _fail("Die Sicherung konnte nicht geschrieben werden; der bisherige Spielstand bleibt erhalten.")
-		var backup_error := DirAccess.rename_absolute(backup_temporary, backup)
-		if backup_error != OK:
-			_remove_if_present(temporary)
-			_remove_if_present(backup_temporary)
-			return _fail("Die Sicherung konnte nicht übernommen werden (Fehler %d)." % backup_error)
+		if old_main.ok:
+			var backup_error := DirAccess.rename_absolute(backup_temporary, backup)
+			if backup_error != OK:
+				_remove_if_present(temporary)
+				_remove_if_present(backup_temporary)
+				return _fail("Die Sicherung konnte nicht übernommen werden (Fehler %d)." % backup_error)
 	# Same-directory replacement: readers see a complete old or new main file.
 	var rename_error := DirAccess.rename_absolute(temporary, absolute)
 	if rename_error != OK:
 		_remove_if_present(temporary)
+		_remove_if_present(backup_temporary)
 		return _fail("Die Speicherdatei konnte nicht übernommen werden (Fehler %d)." % rename_error)
+	# On the first save a readable backup must never expose an uncommitted
+	# purchase if installing the primary failed. Publish it only afterwards.
+	if not old_main.ok and not backup_text.is_empty():
+		if DirAccess.rename_absolute(backup_temporary, backup) != OK:
+			_remove_if_present(backup_temporary)
+			return _ok("Spiel gespeichert. Die erste Sicherung konnte nicht angelegt werden.")
 	return _ok("Spiel gespeichert. Eine geprüfte Sicherung des letzten Speichervorgangs liegt bereit.")
 
 
@@ -747,7 +843,7 @@ func politics_view() -> Dictionary:
 	return Politics.view(data)
 
 
-func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dictionary:
+func _apply_command(state: Dictionary, command: String, args: Dictionary, sites: Dictionary, quote: Dictionary) -> Dictionary:
 	if Politics.COMMAND_FIELDS.has(command):
 		var result := Politics.apply(state, command, args)
 		if result.ok:
@@ -755,7 +851,7 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 			_record(state, "%s · %s" % [stamp.date_label, str(result.message)])
 		return result
 	if CityTrade.COMMAND_FIELDS.has(command):
-		var trade_result := CityTrade.apply(state, command, args, city_trade_sites)
+		var trade_result := CityTrade.apply(state, command, args, sites, quote)
 		if trade_result.ok:
 			_update_morale(state)
 			_record(state, str(trade_result.message))
@@ -1361,6 +1457,16 @@ func _read_save(path: String) -> Dictionary:
 		WorldState.migrate(state)
 		CityTrade.migrate(state)
 	var error := _validate_state(state)
+	if error.is_empty() and state.world_state.has("city"):
+		var city := CityCheckpoint.unpack_city(state.world_state.city)
+		if city.is_empty():
+			error = "Der eingebettete Stadtstand ist beschädigt."
+		elif not CityTrade.enabled(state) or int(city.external.player) != (CityTrade.money_effect(state, true) - int(state.world_state.city.opening_denarii)) * CitySession.quadrantes_per_denarius():
+			error = "Die Händlerbuchungen stimmen nicht mit den Kassen der Stadt überein."
+		else:
+			var offset := (int(state.calendar.clock.jdn) - int(city.origin_jdn)) * WorldClock.DAY + int(state.calendar.clock.second)
+			if offset < int(city.now):
+				error = "Die Stadt läuft der Kampagnenuhr voraus."
 	# Only an already valid old childhood save may initialize decisions. The
 	# initializer reads family and economy data, so malformed legacy input must
 	# be rejected before it reaches that code. Present behavior is never replaced.

@@ -132,6 +132,14 @@ func load_state(saved: Variant) -> bool:
 		Relations.normalize(graph)
 	year = Calendar.year_of(int(state.origin_jdn) + int(state.now) / DAY)
 	_index_anchors()
+	for resident: Dictionary in state.residents:
+		if not _usable.has(resident.at) or not _usable.has(resident.prev) or int(resident.slot) < -1 or int(resident.slot) >= int(index.anchors[resident.at].capacity):
+			error = "Unbekannter oder nicht nutzbarer Aufenthaltsort eines Einwohners."
+			return false
+	for household: Dictionary in state.households:
+		if not _usable.has(household.get("home")):
+			error = "Die Wohnung eines Haushalts fehlt."
+			return false
 	_rebuild_runtime()
 	_push(int(state.sys.day) * KEY + SYS_DAY)
 	_push(int(state.sys.weather) * KEY + SYS_WEATHER)
@@ -143,19 +151,85 @@ func load_state(saved: Variant) -> bool:
 static func validate(saved: Variant) -> String:
 	if not saved is Dictionary or int(saved.get("version", 0)) != VERSION:
 		return "Unbekannter Stadtstand."
-	for key: String in ["seed", "origin_jdn", "t", "now", "residents", "households", "businesses", "relations", "external", "money_total", "events", "jobs", "sys", "flow"]:
-		if not saved.has(key):
-			return "Stadtstand unvollständig: %s fehlt." % key
-	if not saved.residents is Array or not saved.households is Array or not saved.businesses is Array:
-		return "Stadtstand beschädigt."
-	if saved.residents.size() >= SYS_WEATHER:
-		return "Zu viele Bewohner für diesen Stand."
+	for key: String in ["seed", "origin_jdn", "t", "now", "money_total", "event_seq", "next_job", "news", "closed_day"]:
+		if not Calendar.is_integral(saved.get(key)):
+			return "Ungültige Stadtzeit oder Zähler: " + key
+	if saved.t < 0 or saved.now < saved.t or saved.origin_jdn < 0 or saved.origin_jdn + int(saved.now) / DAY > Calendar.max_jdn():
+		return "Stadtzeit außerhalb des Weltkalenders."
+	for key: String in ["residents", "households", "businesses", "jobs", "events", "relations"]:
+		if not saved.get(key) is Array:
+			return "Stadtregister fehlt: " + key
+	for key: String in ["flow", "sys", "stats", "external", "ledger"]:
+		if not saved.get(key) is Dictionary:
+			return "Stadtbuch fehlt: " + key
+	if not saved.external.has_all(["hinterland", "export", "estates", "aerarium", "player"]) or not saved.sys.has_all(["day", "weather", "stage", "hungry"]) or saved.get("weather") not in WEATHER or not saved.get("weather_forced") is bool:
+		return "Kalenderdienst, Wetter oder externe Konten fehlen."
+	if saved.residents.is_empty() or saved.residents.size() >= SYS_WEATHER or saved.events.size() > MAX_EVENTS or saved.relations.size() != Population.RELATION_SHARDS:
+		return "Ungültige Größe des Stadtregisters."
+	var people := {}
+	for number in saved.residents.size():
+		var person: Variant = saved.residents[number]
+		if not person is Dictionary or not person.has_all(["hh", "name", "act", "at", "prev", "slot", "wake", "birth_year", "purse", "role", "job", "bag", "errand", "known"]) or not person.get("traits") is Array or person.traits.size() != 5:
+			return "Ungültiges Personenregister."
+		if not Calendar.is_integral(person.hh) or not Calendar.is_integral(person.slot) or not Calendar.is_integral(person.wake) or not Calendar.is_integral(person.purse) or person.purse < 0:
+			return "Ungültiger Einwohnerzustand."
+		people[Population.resident_id(number)] = true
+	for graph: Variant in saved.relations:
+		var error_text := Relations.validate(graph, people, int(saved.t) / DAY / 7)
+		if not error_text.is_empty():
+			return error_text
 	for household: Variant in saved.households:
-		if not household is Dictionary or not household.get("members") is Array:
+		if not household is Dictionary or not household.get("members") is Array or not Calendar.is_integral(household.get("funds")) or household.funds < 0:
 			return "Haushalt beschädigt."
 		for member: Variant in household.members:
-			if int(member) < 0 or int(member) >= saved.residents.size():
+			if not Calendar.is_integral(member) or int(member) < 0 or int(member) >= saved.residents.size():
 				return "Haushalt verweist auf unbekannte Person."
+	var cash := 0
+	for amount: Variant in saved.external.values():
+		if not Calendar.is_integral(amount):
+			return "Ungültiges Außenkonto."
+		cash += int(amount)
+	for resident: Dictionary in saved.residents:
+		cash += int(resident.purse)
+	for household: Dictionary in saved.households:
+		cash += int(household.funds)
+	var stock := {}
+	for good: String in saved.flow:
+		var flow: Variant = saved.flow[good]
+		if not flow is Dictionary or not flow.has_all(["start", "in", "made", "sold", "out"]):
+			return "Ungültiger Warenfluss."
+		for amount: Variant in flow.values():
+			if not Calendar.is_integral(amount) or amount < 0:
+				return "Ungültige Warenmenge."
+		stock[good] = 0
+	for business: Variant in saved.businesses:
+		if not business is Dictionary or not business.has_all(["anchor", "queue", "shop", "price", "type", "node", "stock", "owner"]) or not business.get("staff") is Array or not business.stock is Dictionary or not Calendar.is_integral(business.get("till")) or business.till < 0:
+			return "Betrieb beschädigt."
+		if not Calendar.is_integral(business.owner) or business.owner < -1 or business.owner >= saved.households.size() or not business.get("open") is Array or business.open.size() != 2:
+			return "Betrieb ohne gültige Eigentums- oder Öffnungsdaten."
+		for employee: Variant in business.staff:
+			if not Calendar.is_integral(employee) or employee < 0 or employee >= saved.residents.size():
+				return "Betrieb mit unbekannter Arbeitskraft."
+		for good: String in business.stock:
+			var amount: Variant = business.stock[good]
+			if not stock.has(good) or not Calendar.is_integral(amount) or amount < 0:
+				return "Ungültiger Betriebsbestand."
+			stock[good] += int(amount)
+		cash += int(business.till)
+	if cash != int(saved.money_total):
+		return "Die Stadtgeldbilanz stimmt nicht."
+	for job: Variant in saved.jobs:
+		if not job is Dictionary or not job.get("goods") is Dictionary or not Calendar.is_integral(job.get("business")) or job.business < 0 or job.business >= saved.businesses.size():
+			return "Ungültiger Transportauftrag."
+		if job.get("state") == "carried":
+			for good: String in job.goods:
+				if not stock.has(good) or not Calendar.is_integral(job.goods[good]) or job.goods[good] < 0:
+					return "Ungültiges Transportgut."
+				stock[good] += int(job.goods[good])
+	for good: String in stock:
+		var flow: Dictionary = saved.flow[good]
+		if stock[good] != int(flow.start + flow["in"] + flow.made - flow.sold - flow.out):
+			return "Die Stadtwarenbilanz stimmt nicht."
 	var seen := {}
 	for hh in saved.households.size():
 		for member: Variant in saved.households[hh].members:
@@ -181,6 +255,20 @@ static func _canon(value: Variant) -> Variant:
 			for slot in value.size():
 				value[slot] = _canon(value[slot])
 	return value
+
+
+## A newly available historical building may be added to the index. Retiring
+## an occupied district needs a settlement migration, so preserve its people.
+func enter_year(next_year: int) -> bool:
+	var available := {}
+	for id: String in Anchors.usable(index, next_year, present_nodes):
+		available[id] = true
+	for id: String in _usable:
+		if not available.has(id):
+			return false
+	year = next_year
+	_index_anchors()
+	return true
 
 
 func _index_anchors() -> void:
@@ -1810,7 +1898,7 @@ func offers(number: int) -> Array:
 
 
 ## Maps an item to exactly one simulated good at this business.
-func _player_trade_good(number: int, shop_item: String) -> String:
+func player_trade_good(number: int, shop_item: String) -> String:
 	if number < 0 or shop_item.is_empty():
 		return ""
 	var business: Dictionary = state.businesses[number]
@@ -1832,7 +1920,7 @@ func player_trade_error(shop_id: String, shop_item: String, quantity: int, denar
 	var number := business_for_shop(shop_id)
 	if number < 0:
 		return "unmapped_shop"
-	var good := _player_trade_good(number, shop_item)
+	var good := player_trade_good(number, shop_item)
 	if good.is_empty():
 		return "unmapped_item"
 	var business: Dictionary = state.businesses[number]
@@ -1853,7 +1941,7 @@ func record_player_trade(shop_id: String, shop_item: String, quantity: int, dena
 		return false
 	var number := business_for_shop(shop_id)
 	var business: Dictionary = state.businesses[number]
-	var good := _player_trade_good(number, shop_item)
+	var good := player_trade_good(number, shop_item)
 	var amount := denarii * int(economy.currency.per_denarius)
 	if buying:
 		_pay("ext", "player", "biz", number, amount, "player_purchase")
