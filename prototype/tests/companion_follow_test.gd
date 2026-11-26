@@ -206,6 +206,10 @@ func _test_dialog(model: RefCounted, world: Node3D, stage: String) -> void:
 	world._player.position += Vector3(20.0,0.0,0.0)
 	session._show_companion()
 	_check(session.screen == "playing", "Entfernter Marcus kann nicht aus der Ferne angesprochen werden")
+	# This dialog session was instantiated off-tree. Its audio player must
+	# still share its lifetime when a user closes the dialogue fixture.
+	var voice_id := session.opening_voice.get_instance_id()
 	ui.queue_free()
 	session.free()
+	_check(not is_instance_id_valid(voice_id), "Das Beenden der Dialogsitzung gibt deren Sprachspieler frei")
 	await process_frame
