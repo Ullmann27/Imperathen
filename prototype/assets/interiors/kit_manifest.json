@@ -1,0 +1,2060 @@
+{
+ "front": "+Z (Godot)",
+ "props": {
+  "amphora_lean": {
+   "aabb_max": [
+    0.168,
+    1.0841,
+    0.0856
+   ],
+   "aabb_min": [
+    -0.168,
+    -0.0008,
+    -0.3489
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_terracotta"
+   ],
+   "triangles": 1162
+  },
+  "amphora_rack": {
+   "aabb_max": [
+    0.62,
+    1.09,
+    0.205
+   ],
+   "aabb_min": [
+    -0.62,
+    0.0,
+    -0.205
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_terracotta"
+   ],
+   "triangles": 10536
+  },
+  "amphora_stand": {
+   "aabb_max": [
+    0.2619,
+    1.15,
+    0.2949
+   ],
+   "aabb_min": [
+    -0.2556,
+    0.0,
+    -0.1692
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_terracotta"
+   ],
+   "triangles": 4038
+  },
+  "anvil_block": {
+   "aabb_max": [
+    0.3112,
+    0.79,
+    0.3126
+   ],
+   "aabb_min": [
+    -0.3056,
+    0.0,
+    -0.3034
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_iron"
+   ],
+   "triangles": 2912
+  },
+  "arca": {
+   "aabb_max": [
+    0.515,
+    0.6645,
+    0.3143
+   ],
+   "aabb_min": [
+    -0.515,
+    0.0,
+    -0.298
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_bronze"
+   ],
+   "triangles": 4788
+  },
+  "armarium": {
+   "aabb_max": [
+    0.49,
+    1.66,
+    0.25
+   ],
+   "aabb_min": [
+    -0.49,
+    0.0,
+    -0.25
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_bronze"
+   ],
+   "triangles": 1908
+  },
+  "balance_scale": {
+   "aabb_max": [
+    0.253,
+    0.42,
+    0.078
+   ],
+   "aabb_min": [
+    -0.253,
+    0.0,
+    -0.078
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_bronze",
+    "INT_stone",
+    "INT_food"
+   ],
+   "triangles": 924
+  },
+  "barrel": {
+   "aabb_max": [
+    0.2704,
+    0.78,
+    0.2705
+   ],
+   "aabb_min": [
+    -0.2705,
+    0.0,
+    -0.2705
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wicker"
+   ],
+   "triangles": 2832
+  },
+  "barrel_iron": {
+   "aabb_max": [
+    0.2533,
+    0.7,
+    0.2534
+   ],
+   "aabb_min": [
+    -0.2534,
+    0.0,
+    -0.2534
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_iron"
+   ],
+   "triangles": 2832
+  },
+  "basket_apples": {
+   "aabb_max": [
+    0.2359,
+    0.3055,
+    0.236
+   ],
+   "aabb_min": [
+    -0.236,
+    -0.0007,
+    -0.236
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wicker",
+    "INT_food"
+   ],
+   "triangles": 2516
+  },
+  "basket_bread": {
+   "aabb_max": [
+    0.2659,
+    0.2104,
+    0.266
+   ],
+   "aabb_min": [
+    -0.266,
+    -0.0007,
+    -0.266
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wicker",
+    "INT_food"
+   ],
+   "triangles": 1676
+  },
+  "basket_charcoal": {
+   "aabb_max": [
+    0.2659,
+    0.3504,
+    0.266
+   ],
+   "aabb_min": [
+    -0.266,
+    -0.0007,
+    -0.266
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wicker",
+    "INT_stone"
+   ],
+   "triangles": 1436
+  },
+  "basket_empty": {
+   "aabb_max": [
+    0.2359,
+    0.2904,
+    0.236
+   ],
+   "aabb_min": [
+    -0.236,
+    -0.0007,
+    -0.236
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wicker"
+   ],
+   "triangles": 956
+  },
+  "basket_flour": {
+   "aabb_max": [
+    0.2359,
+    0.2904,
+    0.236
+   ],
+   "aabb_min": [
+    -0.236,
+    -0.0007,
+    -0.236
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wicker",
+    "INT_food"
+   ],
+   "triangles": 1236
+  },
+  "basket_grain": {
+   "aabb_max": [
+    0.2359,
+    0.2904,
+    0.236
+   ],
+   "aabb_min": [
+    -0.236,
+    -0.0007,
+    -0.236
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wicker",
+    "INT_food"
+   ],
+   "triangles": 1236
+  },
+  "basket_grapes": {
+   "aabb_max": [
+    0.2359,
+    0.3622,
+    0.236
+   ],
+   "aabb_min": [
+    -0.236,
+    -0.0007,
+    -0.236
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wicker",
+    "INT_food"
+   ],
+   "triangles": 2516
+  },
+  "basket_onions": {
+   "aabb_max": [
+    0.2359,
+    0.3,
+    0.236
+   ],
+   "aabb_min": [
+    -0.236,
+    -0.0007,
+    -0.236
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wicker",
+    "INT_food"
+   ],
+   "triangles": 2516
+  },
+  "basket_wool": {
+   "aabb_max": [
+    0.2359,
+    0.2904,
+    0.236
+   ],
+   "aabb_min": [
+    -0.236,
+    -0.0007,
+    -0.236
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wicker",
+    "INT_wool"
+   ],
+   "triangles": 1964
+  },
+  "bed_brown": {
+   "aabb_max": [
+    1.0083,
+    0.66,
+    0.4904
+   ],
+   "aabb_min": [
+    -0.9775,
+    0.0,
+    -0.4904
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_linen",
+    "INT_wool"
+   ],
+   "triangles": 5536
+  },
+  "bed_fine": {
+   "aabb_max": [
+    1.0302,
+    0.8643,
+    0.5186
+   ],
+   "aabb_min": [
+    -1.0161,
+    0.0,
+    -0.5186
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_linen",
+    "INT_wool",
+    "INT_bronze"
+   ],
+   "triangles": 6128
+  },
+  "bed_madder": {
+   "aabb_max": [
+    1.0083,
+    0.66,
+    0.4904
+   ],
+   "aabb_min": [
+    -0.9775,
+    0.0,
+    -0.4904
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_linen",
+    "INT_wool"
+   ],
+   "triangles": 5536
+  },
+  "bed_natural": {
+   "aabb_max": [
+    1.0083,
+    0.66,
+    0.4904
+   ],
+   "aabb_min": [
+    -0.9775,
+    0.0,
+    -0.4904
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_linen",
+    "INT_wool"
+   ],
+   "triangles": 5536
+  },
+  "bed_ochre": {
+   "aabb_max": [
+    1.0083,
+    0.66,
+    0.4904
+   ],
+   "aabb_min": [
+    -0.9775,
+    0.0,
+    -0.4904
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_linen",
+    "INT_wool"
+   ],
+   "triangles": 5536
+  },
+  "bed_woad": {
+   "aabb_max": [
+    1.0083,
+    0.66,
+    0.4904
+   ],
+   "aabb_min": [
+    -0.9775,
+    0.0,
+    -0.4904
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_linen",
+    "INT_wool"
+   ],
+   "triangles": 5536
+  },
+  "bench_plain": {
+   "aabb_max": [
+    0.7,
+    0.4525,
+    0.15
+   ],
+   "aabb_min": [
+    -0.7,
+    0.0,
+    -0.15
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak"
+   ],
+   "triangles": 648
+  },
+  "bench_short": {
+   "aabb_max": [
+    0.5,
+    0.4525,
+    0.15
+   ],
+   "aabb_min": [
+    -0.5,
+    0.0,
+    -0.15
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak"
+   ],
+   "triangles": 648
+  },
+  "brazier": {
+   "aabb_max": [
+    0.2987,
+    0.58,
+    0.2987
+   ],
+   "aabb_min": [
+    -0.2987,
+    -0.0009,
+    -0.2987
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_iron",
+    "INT_bronze",
+    "INT_embers"
+   ],
+   "triangles": 1312
+  },
+  "bread_loaves": {
+   "aabb_max": [
+    0.2995,
+    0.0407,
+    0.0892
+   ],
+   "aabb_min": [
+    -0.289,
+    -0.0001,
+    -0.119
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_food"
+   ],
+   "triangles": 1080
+  },
+  "bronze_vessels": {
+   "aabb_max": [
+    0.4204,
+    0.2859,
+    0.1491
+   ],
+   "aabb_min": [
+    -0.185,
+    0.0,
+    -0.22
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_bronze"
+   ],
+   "triangles": 1312
+  },
+  "broom": {
+   "aabb_max": [
+    0.11,
+    1.2917,
+    0.3741
+   ],
+   "aabb_min": [
+    -0.11,
+    0.0011,
+    -0.0591
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_straw"
+   ],
+   "triangles": 160
+  },
+  "bucket": {
+   "aabb_max": [
+    0.1606,
+    0.4048,
+    0.1607
+   ],
+   "aabb_min": [
+    -0.1607,
+    0.0,
+    -0.1607
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_iron"
+   ],
+   "triangles": 690
+  },
+  "bucket_milk": {
+   "aabb_max": [
+    0.1606,
+    0.4048,
+    0.1607
+   ],
+   "aabb_min": [
+    -0.1607,
+    0.0,
+    -0.1607
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_iron",
+    "INT_food"
+   ],
+   "triangles": 726
+  },
+  "candelabrum": {
+   "aabb_max": [
+    0.184,
+    1.3301,
+    0.1619
+   ],
+   "aabb_min": [
+    -0.1015,
+    0.0,
+    -0.1619
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_bronze",
+    "INT_food",
+    "INT_embers"
+   ],
+   "triangles": 592
+  },
+  "candle_dish": {
+   "aabb_max": [
+    0.066,
+    0.1221,
+    0.065
+   ],
+   "aabb_min": [
+    -0.066,
+    0.0,
+    -0.065
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_coarseware",
+    "INT_food",
+    "INT_embers"
+   ],
+   "triangles": 348
+  },
+  "capsa": {
+   "aabb_max": [
+    0.1489,
+    0.4722,
+    0.149
+   ],
+   "aabb_min": [
+    -0.149,
+    0.0,
+    -0.149
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_linen",
+    "INT_leather",
+    "INT_bronze"
+   ],
+   "triangles": 1512
+  },
+  "carpentry_tools": {
+   "aabb_max": [
+    0.33,
+    0.104,
+    0.2505
+   ],
+   "aabb_min": [
+    -0.48,
+    0.0,
+    -0.2719
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_iron"
+   ],
+   "triangles": 1556
+  },
+  "cartibulum": {
+   "aabb_max": [
+    0.6,
+    0.835,
+    0.29
+   ],
+   "aabb_min": [
+    -0.6,
+    0.0,
+    -0.29
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_stone"
+   ],
+   "triangles": 576
+  },
+  "chair_wicker": {
+   "aabb_max": [
+    0.27,
+    0.84,
+    0.268
+   ],
+   "aabb_min": [
+    -0.27,
+    0.0,
+    -0.284
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wicker",
+    "INT_wool"
+   ],
+   "triangles": 690
+  },
+  "cheese_press": {
+   "aabb_max": [
+    0.36,
+    0.98,
+    0.225
+   ],
+   "aabb_min": [
+    -0.35,
+    0.0,
+    -0.225
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wicker",
+    "INT_stone"
+   ],
+   "triangles": 2132
+  },
+  "cheese_stack": {
+   "aabb_max": [
+    0.36,
+    0.16,
+    0.11
+   ],
+   "aabb_min": [
+    -0.11,
+    0.0,
+    -0.13
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_food"
+   ],
+   "triangles": 840
+  },
+  "chest_small": {
+   "aabb_max": [
+    0.325,
+    0.4445,
+    0.2343
+   ],
+   "aabb_min": [
+    -0.325,
+    0.0,
+    -0.218
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_iron"
+   ],
+   "triangles": 2844
+  },
+  "chest_wood": {
+   "aabb_max": [
+    0.475,
+    0.5445,
+    0.2743
+   ],
+   "aabb_min": [
+    -0.475,
+    0.0,
+    -0.258
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_iron"
+   ],
+   "triangles": 3168
+  },
+  "cloth_bolts": {
+   "aabb_max": [
+    0.2191,
+    0.2676,
+    0.1571
+   ],
+   "aabb_min": [
+    -0.2177,
+    0.0,
+    -0.157
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_linen",
+    "INT_wool"
+   ],
+   "triangles": 800
+  },
+  "cloth_bolts_b": {
+   "aabb_max": [
+    0.2193,
+    0.2508,
+    0.1557
+   ],
+   "aabb_min": [
+    -0.2166,
+    0.0,
+    -0.1569
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_linen",
+    "INT_wool"
+   ],
+   "triangles": 800
+  },
+  "crate_greens": {
+   "aabb_max": [
+    0.31,
+    0.2928,
+    0.22
+   ],
+   "aabb_min": [
+    -0.3107,
+    0.0,
+    -0.22
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_food"
+   ],
+   "triangles": 4868
+  },
+  "desk_writing": {
+   "aabb_max": [
+    0.46,
+    0.77,
+    0.26
+   ],
+   "aabb_min": [
+    -0.46,
+    0.0,
+    -0.26
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_straw",
+    "INT_linen",
+    "INT_bronze",
+    "INT_food"
+   ],
+   "triangles": 3824
+  },
+  "dolium": {
+   "aabb_max": [
+    0.415,
+    1.075,
+    0.415
+   ],
+   "aabb_min": [
+    -0.415,
+    0.0,
+    -0.415
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_terracotta"
+   ],
+   "triangles": 1390
+  },
+  "farm_tools_lean": {
+   "aabb_max": [
+    0.3877,
+    1.3225,
+    0.3792
+   ],
+   "aabb_min": [
+    -0.2949,
+    -0.0003,
+    -0.0153
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_iron"
+   ],
+   "triangles": 1546
+  },
+  "firewood_small": {
+   "aabb_max": [
+    0.3059,
+    0.3737,
+    0.2431
+   ],
+   "aabb_min": [
+    -0.3182,
+    0.0009,
+    -0.2356
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough"
+   ],
+   "triangles": 1188
+  },
+  "firewood_stack": {
+   "aabb_max": [
+    0.3981,
+    0.3797,
+    0.3211
+   ],
+   "aabb_min": [
+    -0.4032,
+    0.0006,
+    -0.3069
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough"
+   ],
+   "triangles": 1584
+  },
+  "forge_bellows": {
+   "aabb_max": [
+    0.29,
+    0.9586,
+    0.5196
+   ],
+   "aabb_min": [
+    -0.29,
+    0.0,
+    -0.6054
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_leather",
+    "INT_hearth_clay"
+   ],
+   "triangles": 5964
+  },
+  "forge_hearth": {
+   "aabb_max": [
+    0.5583,
+    1.4,
+    0.6049
+   ],
+   "aabb_min": [
+    -0.5536,
+    -0.0027,
+    -0.5044
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_iron",
+    "INT_stone",
+    "INT_hearth_clay",
+    "INT_embers"
+   ],
+   "triangles": 2116
+  },
+  "forge_shelter": {
+   "aabb_max": [
+    1.4799,
+    2.9385,
+    3.317
+   ],
+   "aabb_min": [
+    -0.8703,
+    0.0,
+    -3.45
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_stone"
+   ],
+   "triangles": 2684
+  },
+  "guard_kit": {
+   "aabb_max": [
+    0.3177,
+    2.3297,
+    0.4245
+   ],
+   "aabb_min": [
+    -0.4699,
+    -0.0,
+    -0.0329
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_leather",
+    "INT_iron",
+    "INT_bronze"
+   ],
+   "triangles": 2646
+  },
+  "hang_cloak": {
+   "aabb_max": [
+    0.4302,
+    0.0089,
+    0.1739
+   ],
+   "aabb_min": [
+    -0.4271,
+    -1.0602,
+    0.0074
+   ],
+   "hanging": true,
+   "materials": [
+    "INT_wool"
+   ],
+   "triangles": 1544
+  },
+  "hang_herbs": {
+   "aabb_max": [
+    0.093,
+    -0.0182,
+    0.0938
+   ],
+   "aabb_min": [
+    -0.092,
+    -0.4662,
+    -0.0122
+   ],
+   "hanging": true,
+   "materials": [
+    "INT_straw"
+   ],
+   "triangles": 1892
+  },
+  "hang_leather": {
+   "aabb_max": [
+    0.12,
+    0.0008,
+    0.096
+   ],
+   "aabb_min": [
+    -0.12,
+    -0.6507,
+    0.008
+   ],
+   "hanging": true,
+   "materials": [
+    "INT_leather"
+   ],
+   "triangles": 226
+  },
+  "hang_onions": {
+   "aabb_max": [
+    0.0642,
+    0.0005,
+    0.0777
+   ],
+   "aabb_min": [
+    -0.0634,
+    -0.553,
+    -0.017
+   ],
+   "hanging": true,
+   "materials": [
+    "INT_straw",
+    "INT_food"
+   ],
+   "triangles": 1346
+  },
+  "hang_sickles": {
+   "aabb_max": [
+    0.3288,
+    -0.02,
+    0.056
+   ],
+   "aabb_min": [
+    -0.3288,
+    -0.3816,
+    0.0256
+   ],
+   "hanging": true,
+   "materials": [
+    "INT_wood_rough",
+    "INT_iron"
+   ],
+   "triangles": 184
+  },
+  "hearth_baker": {
+   "aabb_max": [
+    0.486,
+    0.305,
+    0.4917
+   ],
+   "aabb_min": [
+    -0.4847,
+    0.0,
+    -0.5082
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_stone",
+    "INT_hearth_clay",
+    "INT_embers"
+   ],
+   "triangles": 1030
+  },
+  "hearth_cook": {
+   "aabb_max": [
+    0.5027,
+    0.545,
+    0.5087
+   ],
+   "aabb_min": [
+    -0.4939,
+    0.0,
+    -0.5236
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_coarseware",
+    "INT_iron",
+    "INT_stone",
+    "INT_food",
+    "INT_hearth_clay",
+    "INT_embers"
+   ],
+   "triangles": 1896
+  },
+  "hearth_ring": {
+   "aabb_max": [
+    0.4971,
+    0.2,
+    0.5087
+   ],
+   "aabb_min": [
+    -0.514,
+    0.0,
+    -0.5053
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_iron",
+    "INT_stone",
+    "INT_hearth_clay",
+    "INT_embers"
+   ],
+   "triangles": 1112
+  },
+  "hide_frame": {
+   "aabb_max": [
+    0.61,
+    1.2717,
+    0.2446
+   ],
+   "aabb_min": [
+    -0.61,
+    0.001,
+    -0.0645
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_straw",
+    "INT_leather"
+   ],
+   "triangles": 3240
+  },
+  "hides_stack": {
+   "aabb_max": [
+    0.4341,
+    0.1614,
+    0.3429
+   ],
+   "aabb_min": [
+    -0.4232,
+    0.0,
+    -0.3143
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_leather"
+   ],
+   "triangles": 1000
+  },
+  "iron_bars": {
+   "aabb_max": [
+    0.1075,
+    0.048,
+    0.31
+   ],
+   "aabb_min": [
+    -0.1075,
+    0.0,
+    -0.31
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_iron"
+   ],
+   "triangles": 756
+  },
+  "iron_blooms": {
+   "aabb_max": [
+    0.3129,
+    0.2408,
+    0.1798
+   ],
+   "aabb_min": [
+    -0.2871,
+    0.0,
+    -0.2147
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_iron",
+    "INT_stone"
+   ],
+   "triangles": 140
+  },
+  "jar_coarse": {
+   "aabb_max": [
+    0.15,
+    0.392,
+    0.15
+   ],
+   "aabb_min": [
+    -0.15,
+    0.0,
+    -0.15
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_coarseware"
+   ],
+   "triangles": 934
+  },
+  "jar_olla": {
+   "aabb_max": [
+    0.17,
+    0.452,
+    0.17
+   ],
+   "aabb_min": [
+    -0.17,
+    0.0,
+    -0.17
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_terracotta",
+    "INT_coarseware"
+   ],
+   "triangles": 934
+  },
+  "kneading_trough": {
+   "aabb_max": [
+    0.523,
+    0.8055,
+    0.22
+   ],
+   "aabb_min": [
+    -0.523,
+    -0.0015,
+    -0.22
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_food"
+   ],
+   "triangles": 1428
+  },
+  "lararium": {
+   "aabb_max": [
+    0.27,
+    0.52,
+    0.13
+   ],
+   "aabb_min": [
+    -0.27,
+    0.0,
+    -0.13
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_terracotta",
+    "INT_bronze"
+   ],
+   "triangles": 3108
+  },
+  "loom_madder": {
+   "aabb_max": [
+    0.92,
+    2.0747,
+    0.3508
+   ],
+   "aabb_min": [
+    -0.92,
+    -0.0011,
+    -0.3178
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_wool",
+    "INT_terracotta"
+   ],
+   "triangles": 5164
+  },
+  "loom_warp": {
+   "aabb_max": [
+    0.92,
+    2.0747,
+    0.3508
+   ],
+   "aabb_min": [
+    -0.92,
+    -0.0011,
+    -0.3178
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_wool",
+    "INT_terracotta"
+   ],
+   "triangles": 5164
+  },
+  "loom_weights_pile": {
+   "aabb_max": [
+    0.1613,
+    0.11,
+    0.113
+   ],
+   "aabb_min": [
+    -0.123,
+    0.0,
+    -0.1317
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_terracotta"
+   ],
+   "triangles": 72
+  },
+  "mortar_pestle": {
+   "aabb_max": [
+    0.105,
+    0.1954,
+    0.105
+   ],
+   "aabb_min": [
+    -0.105,
+    0.0,
+    -0.105
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_stone"
+   ],
+   "triangles": 312
+  },
+  "oil_lamp": {
+   "aabb_max": [
+    0.0824,
+    0.0378,
+    0.0414
+   ],
+   "aabb_min": [
+    -0.0608,
+    0.0,
+    -0.0414
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_terracotta",
+    "INT_embers"
+   ],
+   "triangles": 344
+  },
+  "pallet_brown": {
+   "aabb_max": [
+    0.9,
+    0.14,
+    0.4
+   ],
+   "aabb_min": [
+    -0.9,
+    0.0,
+    -0.4
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_straw",
+    "INT_linen",
+    "INT_wool"
+   ],
+   "triangles": 1152
+  },
+  "pallet_madder": {
+   "aabb_max": [
+    0.9,
+    0.14,
+    0.4
+   ],
+   "aabb_min": [
+    -0.9,
+    0.0,
+    -0.4
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_straw",
+    "INT_linen",
+    "INT_wool"
+   ],
+   "triangles": 1152
+  },
+  "peg_rail": {
+   "aabb_max": [
+    0.45,
+    0.08,
+    0.1316
+   ],
+   "aabb_min": [
+    -0.45,
+    0.0,
+    -0.015
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough"
+   ],
+   "triangles": 988
+  },
+  "pot_cook": {
+   "aabb_max": [
+    0.115,
+    0.2,
+    0.1138
+   ],
+   "aabb_min": [
+    -0.115,
+    0.0,
+    -0.1138
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_coarseware"
+   ],
+   "triangles": 568
+  },
+  "quench_trough": {
+   "aabb_max": [
+    0.39,
+    0.6192,
+    0.4895
+   ],
+   "aabb_min": [
+    -0.39,
+    0.0,
+    -0.4895
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_iron"
+   ],
+   "triangles": 2216
+  },
+  "quern": {
+   "aabb_max": [
+    0.36,
+    0.37,
+    0.36
+   ],
+   "aabb_min": [
+    -0.36,
+    0.0,
+    -0.36
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_stone",
+    "INT_food"
+   ],
+   "triangles": 684
+  },
+  "rope_coil": {
+   "aabb_max": [
+    0.1989,
+    0.0444,
+    0.1909
+   ],
+   "aabb_min": [
+    -0.1908,
+    0.0015,
+    -0.199
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_straw"
+   ],
+   "triangles": 1796
+  },
+  "rush_mat": {
+   "aabb_max": [
+    0.8025,
+    0.012,
+    0.4625
+   ],
+   "aabb_min": [
+    -0.8025,
+    0.0,
+    -0.4625
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_straw"
+   ],
+   "triangles": 1404
+  },
+  "sack_flour": {
+   "aabb_max": [
+    0.2026,
+    0.5527,
+    0.1987
+   ],
+   "aabb_min": [
+    -0.2074,
+    0.0,
+    -0.2069
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_straw",
+    "INT_linen"
+   ],
+   "triangles": 600
+  },
+  "sack_grain": {
+   "aabb_max": [
+    0.2133,
+    0.6231,
+    0.2092
+   ],
+   "aabb_min": [
+    -0.2183,
+    0.0,
+    -0.2178
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_straw",
+    "INT_linen"
+   ],
+   "triangles": 600
+  },
+  "sack_hemp": {
+   "aabb_max": [
+    0.2102,
+    0.5829,
+    0.1955
+   ],
+   "aabb_min": [
+    -0.2006,
+    0.0,
+    -0.2069
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_straw",
+    "INT_linen"
+   ],
+   "triangles": 600
+  },
+  "scroll_pile": {
+   "aabb_max": [
+    0.33,
+    0.092,
+    0.11
+   ],
+   "aabb_min": [
+    -0.162,
+    0.0,
+    -0.074
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_linen",
+    "INT_food"
+   ],
+   "triangles": 548
+  },
+  "shelf_bowls": {
+   "aabb_max": [
+    0.3428,
+    0.094,
+    0.1
+   ],
+   "aabb_min": [
+    -0.1,
+    0.0,
+    -0.1
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_terracotta"
+   ],
+   "triangles": 1396
+  },
+  "shelf_jars": {
+   "aabb_max": [
+    0.2784,
+    0.25,
+    0.0774
+   ],
+   "aabb_min": [
+    -0.256,
+    0.0,
+    -0.1136
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_terracotta",
+    "INT_coarseware"
+   ],
+   "triangles": 1608
+  },
+  "shelf_low": {
+   "aabb_max": [
+    0.5,
+    1.0,
+    0.2
+   ],
+   "aabb_min": [
+    -0.5,
+    0.0,
+    -0.2
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough"
+   ],
+   "triangles": 2160
+  },
+  "shelf_rack": {
+   "aabb_max": [
+    0.55,
+    1.62,
+    0.18
+   ],
+   "aabb_min": [
+    -0.55,
+    0.0,
+    -0.18
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough"
+   ],
+   "triangles": 2160
+  },
+  "smith_tools": {
+   "aabb_max": [
+    0.1577,
+    0.057,
+    0.1371
+   ],
+   "aabb_min": [
+    -0.2502,
+    0.0014,
+    -0.2833
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_iron"
+   ],
+   "triangles": 1432
+  },
+  "smith_wares": {
+   "aabb_max": [
+    0.385,
+    0.0553,
+    0.19
+   ],
+   "aabb_min": [
+    -0.372,
+    0.0,
+    -0.16
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough",
+    "INT_coarseware",
+    "INT_iron"
+   ],
+   "triangles": 1248
+  },
+  "smith_wares_b": {
+   "aabb_max": [
+    0.443,
+    0.0488,
+    0.2603
+   ],
+   "aabb_min": [
+    -0.444,
+    0.0,
+    -0.2
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_iron"
+   ],
+   "triangles": 720
+  },
+  "spinning_basket": {
+   "aabb_max": [
+    0.2683,
+    0.3306,
+    0.206
+   ],
+   "aabb_min": [
+    -0.206,
+    -0.0007,
+    -0.206
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_wicker",
+    "INT_wool",
+    "INT_terracotta"
+   ],
+   "triangles": 2216
+  },
+  "stall_trestle": {
+   "aabb_max": [
+    1.0803,
+    2.27,
+    0.6493
+   ],
+   "aabb_min": [
+    -1.0803,
+    0.0,
+    -0.6503
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_linen"
+   ],
+   "triangles": 3980
+  },
+  "stall_trestle_b": {
+   "aabb_max": [
+    1.0803,
+    2.27,
+    0.6493
+   ],
+   "aabb_min": [
+    -1.0803,
+    0.0,
+    -0.6503
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_linen"
+   ],
+   "triangles": 3980
+  },
+  "staves_bundle": {
+   "aabb_max": [
+    0.3159,
+    0.1277,
+    0.3809
+   ],
+   "aabb_min": [
+    -0.316,
+    -0.0006,
+    -0.3809
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wicker"
+   ],
+   "triangles": 3708
+  },
+  "stool_log": {
+   "aabb_max": [
+    0.1861,
+    0.42,
+    0.1848
+   ],
+   "aabb_min": [
+    -0.1739,
+    0.0,
+    -0.1757
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough"
+   ],
+   "triangles": 326
+  },
+  "stool_three": {
+   "aabb_max": [
+    0.1977,
+    0.455,
+    0.2014
+   ],
+   "aabb_min": [
+    -0.1713,
+    0.0009,
+    -0.1713
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_wood_rough"
+   ],
+   "triangles": 1060
+  },
+  "table_bread": {
+   "aabb_max": [
+    0.2626,
+    0.0792,
+    0.27
+   ],
+   "aabb_min": [
+    -0.2095,
+    0.0,
+    -0.2232
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_terracotta",
+    "INT_iron",
+    "INT_food"
+   ],
+   "triangles": 1184
+  },
+  "table_meal": {
+   "aabb_max": [
+    0.305,
+    0.24,
+    0.1428
+   ],
+   "aabb_min": [
+    -0.2428,
+    0.0,
+    -0.275
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_terracotta",
+    "INT_food"
+   ],
+   "triangles": 2160
+  },
+  "table_round": {
+   "aabb_max": [
+    0.37,
+    0.7,
+    0.37
+   ],
+   "aabb_min": [
+    -0.37,
+    0.0,
+    -0.37
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak"
+   ],
+   "triangles": 594
+  },
+  "tavern_set": {
+   "aabb_max": [
+    0.3625,
+    0.26,
+    0.1928
+   ],
+   "aabb_min": [
+    -0.34,
+    0.0,
+    -0.2133
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_terracotta",
+    "INT_coarseware",
+    "INT_food"
+   ],
+   "triangles": 2692
+  },
+  "tool_rack_smith": {
+   "aabb_max": [
+    0.5,
+    1.62,
+    0.21
+   ],
+   "aabb_min": [
+    -0.5,
+    0.0,
+    -0.21
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_iron"
+   ],
+   "triangles": 6732
+  },
+  "tripod_pot": {
+   "aabb_max": [
+    0.32,
+    0.505,
+    0.2798
+   ],
+   "aabb_min": [
+    -0.17,
+    0.0,
+    -0.2798
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_coarseware",
+    "INT_iron",
+    "INT_food"
+   ],
+   "triangles": 1080
+  },
+  "wall_shelf": {
+   "aabb_max": [
+    0.6,
+    0.235,
+    0.13
+   ],
+   "aabb_min": [
+    -0.6,
+    0.0,
+    -0.13
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak"
+   ],
+   "triangles": 540
+  },
+  "wall_shelf_deep": {
+   "aabb_max": [
+    0.6,
+    0.235,
+    0.23
+   ],
+   "aabb_min": [
+    -0.6,
+    0.0,
+    -0.23
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak"
+   ],
+   "triangles": 540
+  },
+  "wheel_lean": {
+   "aabb_max": [
+    0.5304,
+    1.0463,
+    0.2205
+   ],
+   "aabb_min": [
+    -0.5305,
+    0.001,
+    -0.0205
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_iron"
+   ],
+   "triangles": 3916
+  },
+  "workbench": {
+   "aabb_max": [
+    0.7,
+    0.802,
+    0.3
+   ],
+   "aabb_min": [
+    -0.7,
+    0.0,
+    -0.3
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_embers"
+   ],
+   "triangles": 1368
+  },
+  "workbench_low": {
+   "aabb_max": [
+    0.6,
+    0.622,
+    0.275
+   ],
+   "aabb_min": [
+    -0.6,
+    0.0,
+    -0.275
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak",
+    "INT_wood_rough",
+    "INT_embers"
+   ],
+   "triangles": 1368
+  },
+  "yoke": {
+   "aabb_max": [
+    0.7546,
+    0.1441,
+    0.1547
+   ],
+   "aabb_min": [
+    -0.7546,
+    0.0009,
+    -0.0441
+   ],
+   "hanging": false,
+   "materials": [
+    "INT_oak"
+   ],
+   "triangles": 876
+  }
+ },
+ "total_triangles": 225214,
+ "units": "metres"
+}
