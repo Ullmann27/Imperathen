@@ -79,6 +79,8 @@ class Glb:
             raise ValueError(f"{path}: expected one embedded binary buffer")
         self.binary = bytearray(data[at + 8:at + 8 + bin_size])
         self.original_binary = bytes(self.binary)
+        # Byte ranges of the original binary that overwrite_accessor replaced.
+        self.rewritten = []
         self.path = path
 
     def accessor(self, index: int) -> np.ndarray:
@@ -115,8 +117,44 @@ class Glb:
                                            "max": [float(x) for x in rows.max(axis=0)]})
         return accessor
 
+    def overwrite_accessor(self, index: int, values: np.ndarray) -> None:
+        """Rewrite a tightly packed, unshared accessor in place with values of its own component type."""
+        accessor = self.document["accessors"][index]
+        doc = self.document
+        references = [used for mesh in doc.get("meshes", []) for primitive in mesh["primitives"]
+                      for used in [*primitive["attributes"].values(), primitive.get("indices"),
+                                   *(value for target in primitive.get("targets", []) for value in target.values())]]
+        references += [used for animation in doc.get("animations", []) for sampler in animation["samplers"]
+                       for used in (sampler["input"], sampler["output"])]
+        references += [skin.get("inverseBindMatrices") for skin in doc.get("skins", [])]
+        users = references.count(index)
+        if users != 1 or "sparse" in accessor or accessor.get("normalized"):
+            raise ValueError("Only plain accessors used by one primitive are rewritten in place")
+        view = self.document["bufferViews"][accessor["bufferView"]]
+        kind = _COMPONENTS[accessor["componentType"]]
+        width = _WIDTH[accessor["type"]]
+        values = np.asarray(values).reshape(accessor["count"], width)
+        item = np.dtype(kind).itemsize * width
+        if view.get("byteStride", item) != item:
+            raise ValueError("Only tightly packed accessors are rewritten in place")
+        if np.issubdtype(kind, np.integer):
+            limits = np.iinfo(kind)
+            if values.min() < limits.min or values.max() > limits.max or not np.array_equal(values, np.round(values)):
+                raise ValueError("Values do not fit the accessor's component type")
+        packed = np.ascontiguousarray(values, dtype=kind)
+        start = view.get("byteOffset", 0) + accessor.get("byteOffset", 0)
+        self.binary[start:start + packed.nbytes] = packed.tobytes()
+        self.rewritten.append((start, start + packed.nbytes))
+        if "min" in accessor:
+            cast = int if np.issubdtype(kind, np.integer) else float
+            accessor["min"] = [cast(v) for v in packed.min(axis=0)]
+            accessor["max"] = [cast(v) for v in packed.max(axis=0)]
+
     def write(self, path: Path) -> None:
-        if bytes(self.binary[:len(self.original_binary)]) != self.original_binary:
+        expected = bytearray(self.original_binary)
+        for start, end in self.rewritten:
+            expected[start:end] = self.binary[start:end]
+        if bytes(self.binary[:len(expected)]) != bytes(expected):
             raise AssertionError("Original glTF bytes changed")
         self.binary.extend(b"\0" * (-len(self.binary) % 4))
         self.document["buffers"][0]["byteLength"] = len(self.binary)

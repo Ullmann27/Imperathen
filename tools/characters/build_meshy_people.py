@@ -49,6 +49,7 @@ def module(name, path):
 
 
 soldier = module("meshy_motion_source", ROOT / "art/soldiers/build.py")
+body_seam = module("meshy_body_seam", ROOT / "tools/characters/smooth_meshy_body_seam.py")
 original_pose = soldier.pose
 
 
@@ -610,11 +611,13 @@ def export_tiers(asset_id, body, arm):
                                   export_frame_step=1, export_animations=True, export_morph=False,
                                   export_def_bones=False, export_image_format="JPEG", export_jpeg_quality=88)
         death_ground = soldier.death_ground.ground(path)
+        seam = body_seam.smooth(path)
         body.data.calc_loop_triangles()
         outputs.append({"level": level, "path": str(path.relative_to(ROOT)),
                         "triangles": len(body.data.loop_triangles), "texture_edge": texture_edge,
                         "rigid_foot_vertices_preserved": rigid_foot_vertices,
                         "death_ground_contact": {key: death_ground[key] for key in ("before", "after", "maximum_floor_correction_m")},
+                        "body_seam": {key: seam[key] for key in ("before", "after", "changed_vertices") if key in seam},
                         "sha256": digest(path), "size_bytes": path.stat().st_size})
     return outputs
 
