@@ -1,0 +1,2247 @@
+{
+  "generator": "tools/art/build_meshy_gear.py",
+  "new_generation_submitted": false,
+  "gear": {
+    "weap_roman_gladius_pompeii": {
+      "stable_id": "weap_roman_gladius_pompeii",
+      "kind": "blade",
+      "source_path": "prototype/assets/meshy/source/weapon/weap_roman_gladius_pompeii.glb",
+      "source_sha256": "53c4c1262faee9758e1e25cdc97a69d50b541f4a87ed7eeeafc2f3311bc6f98d",
+      "source_bytes": 4308744,
+      "source_triangles": 2084,
+      "removed_artifacts": [
+        {
+          "vertices": 58,
+          "t": [
+            0.331,
+            0.3508
+          ]
+        },
+        {
+          "vertices": 58,
+          "t": [
+            0.2744,
+            0.2937
+          ]
+        }
+      ],
+      "source_bounds": [
+        [
+          -0.0876460000872612,
+          -0.0373539999127388,
+          -0.4787600040435791
+        ],
+        [
+          0.0881349965929985,
+          0.03881800174713135,
+          0.4787600040435791
+        ]
+      ],
+      "uniform_scale": 0.7101679278310215,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.09200000017881393
+      ],
+      "bounds_blender": [
+        [
+          -0.03745020925998688,
+          -0.02756800875067711,
+          -0.09200000017881393
+        ],
+        [
+          0.03745020553469658,
+          0.026526903733611107,
+          0.5879999995231628
+        ]
+      ],
+      "proportion_corrections": [
+        {
+          "t": [
+            0.222,
+            0.268
+          ],
+          "x": 0.6,
+          "y": 1.5,
+          "why": "The source guard is a 12.5 cm wide thin cross-guard; a gladius guard is a compact oval block."
+        }
+      ],
+      "sockets": {
+        "SOCKET_RIGHT_HAND": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_TIP": [
+          0.0,
+          0.0,
+          0.588
+        ],
+        "SOCKET_BLADE_BASE": [
+          0.0,
+          0.0,
+          0.105
+        ],
+        "SOCKET_HIP": [
+          0.0,
+          0.0,
+          0.068
+        ],
+        "SOCKET_BACK": [
+          0.0,
+          0.0,
+          0.208
+        ]
+      },
+      "accents": [
+        "Q_GE3_GuardPlate",
+        "Q_GE3_PeenBlock",
+        "Q_GE4_GripFerruleUpper",
+        "Q_GE4_GripFerruleLower",
+        "Q_LE0_RepairThong"
+      ],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/weap_roman_gladius_pompeii_0.glb",
+          "triangles": 1859,
+          "accent_triangles_max": 1936,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 1943.2,
+          "bounds_blender": [
+            [
+              -0.03745,
+              -0.02757,
+              -0.092
+            ],
+            [
+              0.03745,
+              0.02653,
+              0.588
+            ]
+          ],
+          "size_bytes": 278456,
+          "sha256": "3aea1f138b7f7dfd1087f99daf90aed31f9f9a5537f53e82c32d2a0d2767702e"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/weap_roman_gladius_pompeii_1.glb",
+          "triangles": 950,
+          "accent_triangles_max": 1936,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 963.4,
+          "bounds_blender": [
+            [
+              -0.03723,
+              -0.02757,
+              -0.09197
+            ],
+            [
+              0.0375,
+              0.02653,
+              0.588
+            ]
+          ],
+          "size_bytes": 151284,
+          "sha256": "e626d96bd19615417ec008a43397ba4b431868023b58c97465a36c743c8a00b1"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/equipment/weap_roman_gladius_pompeii_2.glb",
+          "triangles": 380,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 450.9,
+          "bounds_blender": [
+            [
+              -0.03766,
+              -0.02544,
+              -0.09188
+            ],
+            [
+              0.03803,
+              0.02642,
+              0.58135
+            ]
+          ],
+          "size_bytes": 42344,
+          "sha256": "77179b83f6ba561fddcf7b4402d782acd979c70c312c7b7caeea1a0851a2244c"
+        }
+      ],
+      "collision": "none: hand props use sockets and the combat sweep"
+    },
+    "weap_roman_pugio": {
+      "stable_id": "weap_roman_pugio",
+      "kind": "blade",
+      "source_path": "prototype/assets/meshy/source/weapon/weap_roman_pugio.glb",
+      "source_sha256": "af1ddaf7b89f12f01e21a03d4c7551164fb1c669205df3b34139d83b11bdd3ed",
+      "source_bytes": 6677020,
+      "source_triangles": 1852,
+      "removed_artifacts": [
+        {
+          "vertices": 54,
+          "t": [
+            0.6706,
+            0.6752
+          ]
+        },
+        {
+          "vertices": 57,
+          "t": [
+            0.6106,
+            0.6727
+          ]
+        },
+        {
+          "vertices": 55,
+          "t": [
+            0.6106,
+            0.6727
+          ]
+        }
+      ],
+      "source_bounds": [
+        [
+          -0.0529789999127388,
+          -0.03344700112938881,
+          -0.47582998871803284
+        ],
+        [
+          0.0529789999127388,
+          0.03442399948835373,
+          0.47582998871803284
+        ]
+      ],
+      "uniform_scale": 0.3467625074336701,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.05000000074505806
+      ],
+      "bounds_blender": [
+        [
+          -0.032915737479925156,
+          -0.014180419966578484,
+          -0.05000000074505806
+        ],
+        [
+          0.033220332115888596,
+          0.015238477848470211,
+          0.2800000011920929
+        ]
+      ],
+      "proportion_corrections": [
+        {
+          "t": [
+            0.0,
+            1.0
+          ],
+          "x": 1.8,
+          "y": 1.25,
+          "why": "The source is a slender dagger; a pugio has a broad waisted blade of about 4.5 cm."
+        }
+      ],
+      "sockets": {
+        "SOCKET_RIGHT_HAND": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_TIP": [
+          0.0,
+          0.0,
+          0.28
+        ],
+        "SOCKET_BLADE_BASE": [
+          0.0,
+          0.0,
+          0.049
+        ],
+        "SOCKET_HIP": [
+          0.0,
+          0.0,
+          0.03
+        ],
+        "SOCKET_BACK": [
+          0.0,
+          0.0,
+          0.1
+        ]
+      },
+      "accents": [
+        "Q_GE3_GuardPlate",
+        "Q_GE4_PommelRivet",
+        "Q_LE0_RepairThong"
+      ],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/weap_roman_pugio_0.glb",
+          "triangles": 1532,
+          "accent_triangles_max": 1208,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 4330.4,
+          "bounds_blender": [
+            [
+              -0.03292,
+              -0.01418,
+              -0.05
+            ],
+            [
+              0.03322,
+              0.01524,
+              0.28
+            ]
+          ],
+          "size_bytes": 299224,
+          "sha256": "0711ff327f77074739cde0eb39f1894639519b692a33dd8590a1474c8edb163d"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/weap_roman_pugio_1.glb",
+          "triangles": 849,
+          "accent_triangles_max": 1208,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 1778.8,
+          "bounds_blender": [
+            [
+              -0.03299,
+              -0.01433,
+              -0.04999
+            ],
+            [
+              0.03334,
+              0.01535,
+              0.27986
+            ]
+          ],
+          "size_bytes": 145384,
+          "sha256": "e1531d1bf09aacc3d1bcc9c5f7e58082ab4078669b6f36cb672294c0dd585857"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/equipment/weap_roman_pugio_2.glb",
+          "triangles": 340,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 744.4,
+          "bounds_blender": [
+            [
+              -0.03299,
+              -0.01434,
+              -0.05034
+            ],
+            [
+              0.03345,
+              0.01534,
+              0.27826
+            ]
+          ],
+          "size_bytes": 44280,
+          "sha256": "47eb301017c08583d1e38775eb920700ce85c4a7b351cc53c370b8bc9b945158"
+        }
+      ],
+      "collision": "none: hand props use sockets and the combat sweep"
+    },
+    "weap_roman_spatha": {
+      "stable_id": "weap_roman_spatha",
+      "kind": "blade",
+      "source_path": "prototype/assets/meshy/source/weapon/weap_roman_spatha.glb",
+      "source_sha256": "55104c2596cb58cb516140cebb5c1caa6f9c8faf93154fa9da3ab46aba3d8a84",
+      "source_bytes": 5746172,
+      "source_triangles": 2154,
+      "source_bounds": [
+        [
+          -0.07055699825286865,
+          -0.029541000723838806,
+          -0.4753420054912567
+        ],
+        [
+          0.06958000361919403,
+          0.030517999082803726,
+          0.47582998871803284
+        ]
+      ],
+      "uniform_scale": 1.0631473184792637,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.13600000739097595
+      ],
+      "bounds_blender": [
+        [
+          -0.044695883989334106,
+          -0.031925782561302185,
+          -0.13600000739097595
+        ],
+        [
+          0.044695883989334106,
+          0.031925782561302185,
+          0.7639999389648438
+        ]
+      ],
+      "proportion_corrections": [
+        {
+          "t": [
+            0.081,
+            0.294
+          ],
+          "x": 0.7,
+          "y": 1.15,
+          "why": "Source grip is 20 cm long and 5 cm wide; reduced to a one-hand grip."
+        },
+        {
+          "t": [
+            0.295,
+            0.345
+          ],
+          "x": 0.6,
+          "y": 1.3,
+          "why": "Source guard is 13 cm wide."
+        },
+        {
+          "t": [
+            0.346,
+            1.0
+          ],
+          "x": 0.85,
+          "y": 1.0,
+          "why": "Blade narrowed from 6.7 to 5.7 cm."
+        }
+      ],
+      "axial_remap": [
+        [
+          0.0,
+          0.08,
+          0.0,
+          0.0899
+        ],
+        [
+          0.08,
+          0.3,
+          0.0899,
+          0.2135
+        ],
+        [
+          0.3,
+          1.0,
+          0.2135,
+          1.0
+        ]
+      ],
+      "sockets": {
+        "SOCKET_RIGHT_HAND": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_TIP": [
+          0.0,
+          0.0,
+          0.764
+        ],
+        "SOCKET_BLADE_BASE": [
+          0.0,
+          0.0,
+          0.104
+        ],
+        "SOCKET_HIP": [
+          0.0,
+          0.0,
+          0.064
+        ],
+        "SOCKET_BACK": [
+          0.0,
+          0.0,
+          0.264
+        ]
+      },
+      "accents": [
+        "Q_GE3_GuardPlate",
+        "Q_LE0_RepairThong"
+      ],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/weap_roman_spatha_0.glb",
+          "triangles": 2154,
+          "accent_triangles_max": 1084,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 2362.4,
+          "bounds_blender": [
+            [
+              -0.0447,
+              -0.03193,
+              -0.136
+            ],
+            [
+              0.0447,
+              0.03193,
+              0.764
+            ]
+          ],
+          "size_bytes": 305836,
+          "sha256": "f3a045d53cf92cceadd122f6f5f38d27b8216ca15c88fd416f83e6503ce59238"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/weap_roman_spatha_1.glb",
+          "triangles": 949,
+          "accent_triangles_max": 1084,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 1047.9,
+          "bounds_blender": [
+            [
+              -0.0447,
+              -0.03203,
+              -0.136
+            ],
+            [
+              0.0447,
+              0.03187,
+              0.764
+            ]
+          ],
+          "size_bytes": 145928,
+          "sha256": "c2945f8c3f9cee731e158286426074de818588e6ea7590bcb468560eae2448bc"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/equipment/weap_roman_spatha_2.glb",
+          "triangles": 380,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 436.7,
+          "bounds_blender": [
+            [
+              -0.04444,
+              -0.03202,
+              -0.136
+            ],
+            [
+              0.04452,
+              0.03137,
+              0.75343
+            ]
+          ],
+          "size_bytes": 46916,
+          "sha256": "4aadaa35ec8b6e4cca3a67681795715b7fadb3b604189491a81625f31a3a7247"
+        }
+      ],
+      "collision": "none: hand props use sockets and the combat sweep"
+    },
+    "weap_roman_pilum": {
+      "stable_id": "weap_roman_pilum",
+      "kind": "polearm",
+      "source_path": "prototype/assets/meshy/source/weapon/weap_roman_pilum.glb",
+      "source_sha256": "26b31585c5af044e17636fd55d00fca9c5245ec9406788d7663e3e5cb3b02c76",
+      "source_bytes": 5465904,
+      "source_triangles": 1390,
+      "source_bounds": [
+        [
+          -0.013915999792516232,
+          -0.013427999801933765,
+          -0.4787600040435791
+        ],
+        [
+          0.014403999783098698,
+          0.013427999801933765,
+          0.4782710075378418
+        ]
+      ],
+      "uniform_scale": 2.0897964389838863,
+      "origin_shift": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "bounds_blender": [
+        [
+          -0.021223971620202065,
+          -0.022449428215622902,
+          -1.0
+        ],
+        [
+          0.022857356816530228,
+          0.022449428215622902,
+          0.48000001907348633
+        ]
+      ],
+      "proportion_corrections": [
+        {
+          "t": [
+            0.0,
+            0.774
+          ],
+          "x": 0.55,
+          "y": 0.55,
+          "why": "Source shaft is 5.4 cm thick at two metres."
+        },
+        {
+          "t": [
+            0.774,
+            0.801
+          ],
+          "x": 0.8,
+          "y": 0.8,
+          "why": "The binding becomes the junction block."
+        },
+        {
+          "t": [
+            0.801,
+            0.924
+          ],
+          "x": 0.6,
+          "y": 0.6
+        },
+        {
+          "t": [
+            0.924,
+            1.0
+          ],
+          "x": 0.34,
+          "y": 0.34,
+          "why": "The source point becomes the socket taper below the iron shank."
+        }
+      ],
+      "axial_remap": [
+        [
+          0.0,
+          0.1,
+          0.0,
+          0.06
+        ],
+        [
+          0.1,
+          0.15,
+          0.06,
+          0.09
+        ],
+        [
+          0.15,
+          0.775,
+          0.09,
+          0.63
+        ],
+        [
+          0.775,
+          0.8,
+          0.63,
+          0.665
+        ],
+        [
+          0.8,
+          0.925,
+          0.665,
+          0.685
+        ],
+        [
+          0.925,
+          0.95,
+          0.685,
+          0.715
+        ],
+        [
+          0.95,
+          1.0,
+          0.715,
+          0.74
+        ]
+      ],
+      "sockets": {
+        "SOCKET_RIGHT_HAND": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_TIP": [
+          0.0,
+          0.0,
+          0.48
+        ],
+        "SOCKET_BUTT": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "SOCKET_LEFT_HAND_SUPPORT": [
+          0.0,
+          0.0,
+          -0.38
+        ],
+        "SOCKET_BACK": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "accents": [
+        "Shank",
+        "ShankHead",
+        "Q_GE3_JunctionCollar",
+        "Q_LE0_RepairThong"
+      ],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/weap_roman_pilum_0.glb",
+          "triangles": 1390,
+          "accent_triangles_max": 1442,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 1930.5,
+          "bounds_blender": [
+            [
+              -0.02122,
+              -0.02245,
+              -1.0
+            ],
+            [
+              0.02286,
+              0.02245,
+              0.48
+            ]
+          ],
+          "size_bytes": 291552,
+          "sha256": "1959b319bf0061f356102562d193ae8ec931076580cf7c7646a23abbbb3d7510"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/weap_roman_pilum_1.glb",
+          "triangles": 700,
+          "accent_triangles_max": 1442,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 845.7,
+          "bounds_blender": [
+            [
+              -0.02126,
+              -0.0225,
+              -1.0
+            ],
+            [
+              0.02286,
+              0.02232,
+              0.48001
+            ]
+          ],
+          "size_bytes": 151920,
+          "sha256": "fb91e86fae63076aefdd6d753f0cc81f3c804cafe77feebd42128e64836f071b"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/equipment/weap_roman_pilum_2.glb",
+          "triangles": 300,
+          "accent_triangles_max": 38,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 352.6,
+          "bounds_blender": [
+            [
+              -0.02079,
+              -0.02245,
+              -1.00007
+            ],
+            [
+              0.02269,
+              0.02254,
+              0.48003
+            ]
+          ],
+          "size_bytes": 49276,
+          "sha256": "8aeaffa934480660dc4af55fcff3efb215419ea3ba371383714729e5476302d4"
+        }
+      ],
+      "collision": "none: hand props use sockets and the combat sweep"
+    },
+    "weap_germanic_spear": {
+      "stable_id": "weap_germanic_spear",
+      "kind": "polearm",
+      "source_path": "prototype/assets/meshy/source/weapon/weap_germanic_spear.glb",
+      "source_sha256": "fac91734016bb5bfa1c45e2a4d6668ee96d57151e91f848945958769280c35d7",
+      "source_bytes": 3320048,
+      "source_triangles": 1402,
+      "source_bounds": [
+        [
+          -0.019286999478936195,
+          -0.0007319999858736992,
+          -0.4748539924621582
+        ],
+        [
+          0.01879899948835373,
+          0.0095210000872612,
+          0.47582998871803284
+        ]
+      ],
+      "uniform_scale": 2.1037485665991422,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.8799999952316284
+      ],
+      "bounds_blender": [
+        [
+          -0.03204934671521187,
+          -0.01509881392121315,
+          -0.8799999952316284
+        ],
+        [
+          0.03204934671521187,
+          0.01509881392121315,
+          1.1200000047683716
+        ]
+      ],
+      "proportion_corrections": [
+        {
+          "t": [
+            0.0,
+            0.879
+          ],
+          "x": 1.0,
+          "y": 1.4,
+          "why": "Round the 2.5 x 1.8 cm source shaft to 2.5 cm."
+        },
+        {
+          "t": [
+            0.879,
+            1.0
+          ],
+          "x": 0.8,
+          "y": 1.4,
+          "why": "Narrower head for the short narrow iron that Tacitus describes."
+        }
+      ],
+      "sockets": {
+        "SOCKET_RIGHT_HAND": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_TIP": [
+          0.0,
+          0.0,
+          1.12
+        ],
+        "SOCKET_BUTT": [
+          0.0,
+          0.0,
+          -0.88
+        ],
+        "SOCKET_LEFT_HAND_SUPPORT": [
+          0.0,
+          0.0,
+          -0.38
+        ],
+        "SOCKET_BACK": [
+          0.0,
+          0.0,
+          0.07
+        ]
+      },
+      "accents": [
+        "Q_GE3_SocketBand",
+        "Q_LE0_RepairThong"
+      ],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/weap_germanic_spear_0.glb",
+          "triangles": 1400,
+          "accent_triangles_max": 1404,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 1696.0,
+          "bounds_blender": [
+            [
+              -0.03205,
+              -0.0151,
+              -0.88
+            ],
+            [
+              0.03205,
+              0.0151,
+              1.12
+            ]
+          ],
+          "size_bytes": 226420,
+          "sha256": "d9ed05e88f0636044b2022c711f25e0ca98d9de07dc6f5269c9c87c2795cb285"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/weap_germanic_spear_1.glb",
+          "triangles": 699,
+          "accent_triangles_max": 1404,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 759.1,
+          "bounds_blender": [
+            [
+              -0.03123,
+              -0.0152,
+              -0.88
+            ],
+            [
+              0.03205,
+              0.0151,
+              1.11897
+            ]
+          ],
+          "size_bytes": 134272,
+          "sha256": "5d1c87bcd056867f2d388ef376d65376956552fd68a826724cee3f099cf14ddf"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/equipment/weap_germanic_spear_2.glb",
+          "triangles": 299,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 301.9,
+          "bounds_blender": [
+            [
+              -0.03068,
+              -0.01527,
+              -0.88
+            ],
+            [
+              0.03232,
+              0.01518,
+              1.11881
+            ]
+          ],
+          "size_bytes": 41136,
+          "sha256": "302b010dcc257ec55909599e4b958e34c52525cca7353a4d6e3413773b762ec4"
+        }
+      ],
+      "collision": "none: hand props use sockets and the combat sweep"
+    },
+    "gear_roman_cavalry_lance": {
+      "stable_id": "gear_roman_cavalry_lance",
+      "kind": "polearm",
+      "source_path": "prototype/assets/meshy/source/equipment/gear_roman_cavalry_lance.glb",
+      "source_sha256": "e9d8d6f73f65f132333591f73ea2f186dc59e87febf7443e079982b773d893c8",
+      "source_bytes": 10360640,
+      "source_triangles": 9618,
+      "repair": {
+        "removed_second_lance_vertices": 2402,
+        "kept_vertices": 2609
+      },
+      "source_bounds": [
+        [
+          -0.018032189458608627,
+          -0.013132845982909203,
+          -0.6467841863632202
+        ],
+        [
+          0.015908747911453247,
+          0.014000154100358486,
+          0.568366289138794
+        ]
+      ],
+      "uniform_scale": 1.8927696992010825,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.9800000190734863
+      ],
+      "bounds_blender": [
+        [
+          -0.023381875827908516,
+          -0.025138821452856064,
+          -0.9800000190734863
+        ],
+        [
+          0.04086050018668175,
+          0.02621769905090332,
+          1.3199999332427979
+        ]
+      ],
+      "proportion_corrections": [],
+      "sockets": {
+        "SOCKET_RIGHT_HAND": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_TIP": [
+          0.0,
+          0.0,
+          1.32
+        ],
+        "SOCKET_BUTT": [
+          0.0,
+          0.0,
+          -0.98
+        ],
+        "SOCKET_LEFT_HAND_SUPPORT": [
+          0.0,
+          0.0,
+          -0.38
+        ],
+        "SOCKET_BACK": [
+          0.0,
+          0.0,
+          0.12
+        ]
+      },
+      "accents": [],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/gear_roman_cavalry_lance_0.glb",
+          "triangles": 2600,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 470.6,
+          "bounds_blender": [
+            [
+              -0.0234,
+              -0.02468,
+              -0.97621
+            ],
+            [
+              0.04075,
+              0.02569,
+              1.31819
+            ]
+          ],
+          "size_bytes": 286280,
+          "sha256": "fc47bfe3a27a1d082586df2aea32f1dbd0284d1106945e77813ab97604b2b473"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/gear_roman_cavalry_lance_1.glb",
+          "triangles": 999,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 219.7,
+          "bounds_blender": [
+            [
+              -0.0234,
+              -0.02381,
+              -0.97598
+            ],
+            [
+              0.0409,
+              0.02532,
+              1.31731
+            ]
+          ],
+          "size_bytes": 110504,
+          "sha256": "0fe08848353964ecc142b9bed2d628a9d75dcf3bc3019f10210b97606bab5bd9"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/equipment/gear_roman_cavalry_lance_2.glb",
+          "triangles": 319,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 103.4,
+          "bounds_blender": [
+            [
+              -0.02111,
+              -0.02422,
+              -0.9763
+            ],
+            [
+              0.04075,
+              0.02384,
+              1.31521
+            ]
+          ],
+          "size_bytes": 42876,
+          "sha256": "dc74a18494c825ef0a50034e15fb1e315a7551338c25720713813b5430f69c8b"
+        }
+      ],
+      "collision": "none: hand props use sockets and the combat sweep"
+    },
+    "gear_sling": {
+      "stable_id": "gear_sling",
+      "kind": "soft",
+      "source_path": "prototype/assets/meshy/source/equipment/gear_sling.glb",
+      "source_sha256": "508ac15abc53703485baa35362d197ba4c11288a840e0b954fce432146e7f50b",
+      "source_bytes": 24995384,
+      "source_triangles": 9473,
+      "source_bounds": [
+        [
+          -0.5,
+          -0.1070529967546463,
+          -0.41195499897003174
+        ],
+        [
+          0.5,
+          0.10744199901819229,
+          0.41319501399993896
+        ]
+      ],
+      "uniform_scale": 0.62,
+      "origin_shift": [
+        0.2006799578666687,
+        0.045069098472595215,
+        0.497829407453537
+      ],
+      "bounds_blender": [
+        [
+          -0.5106799602508545,
+          -0.11156255006790161,
+          -0.497829407453537
+        ],
+        [
+          0.10932004451751709,
+          0.02142435312271118,
+          0.013763576745986938
+        ]
+      ],
+      "proportion_corrections": [],
+      "sockets": {
+        "SOCKET_RIGHT_HAND": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_HIP": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "accents": [],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/gear_sling_0.glb",
+          "triangles": 4200,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 1643.4,
+          "bounds_blender": [
+            [
+              -0.51089,
+              -0.11148,
+              -0.49797
+            ],
+            [
+              0.10938,
+              0.02174,
+              0.01364
+            ]
+          ],
+          "size_bytes": 387652,
+          "sha256": "d7dbe55579b30048769334531133c2e18235599817448c86fed65829366e76c2"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/gear_sling_1.glb",
+          "triangles": 1499,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 696.2,
+          "bounds_blender": [
+            [
+              -0.51052,
+              -0.11216,
+              -0.49823
+            ],
+            [
+              0.10932,
+              0.02196,
+              0.01345
+            ]
+          ],
+          "size_bytes": 153076,
+          "sha256": "9b3dabe92673f598aff4ac9f34a2284d6835124bcd7db5333857d03dcf4ab241"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/equipment/gear_sling_2.glb",
+          "triangles": 448,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 260.0,
+          "bounds_blender": [
+            [
+              -0.51058,
+              -0.11534,
+              -0.49367
+            ],
+            [
+              0.10953,
+              0.02407,
+              0.01102
+            ]
+          ],
+          "size_bytes": 58340,
+          "sha256": "34351c4ca329f8bbe8aa335332a67211119a86760400153ba1aa63a95c231f4e"
+        }
+      ],
+      "collision": "none: hand props use sockets and the combat sweep"
+    },
+    "gear_roman_scutum": {
+      "stable_id": "gear_roman_scutum",
+      "kind": "shield",
+      "source_path": "prototype/assets/meshy/source/equipment/gear_roman_scutum.glb",
+      "source_sha256": "1c371df2a0058de23c6cb0b6857fd187de96f2b00e1503f0d5dfe6721c7cc610",
+      "source_bytes": 13661952,
+      "source_triangles": 8456,
+      "source_bounds": [
+        [
+          -0.2527160048484802,
+          -0.06769300252199173,
+          -0.5
+        ],
+        [
+          0.24900099635124207,
+          0.06796400249004364,
+          0.5
+        ]
+      ],
+      "uniform_scale": 1.06,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.5299999713897705
+      ],
+      "bounds_blender": [
+        [
+          -0.26590999960899353,
+          -0.0718982145190239,
+          -0.5299999713897705
+        ],
+        [
+          0.26590999960899353,
+          0.0718982145190239,
+          0.5299999713897705
+        ]
+      ],
+      "proportion_corrections": [],
+      "sockets": {
+        "SOCKET_LEFT_HAND": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_BLOCK_CENTER": [
+          0.0,
+          -0.0719,
+          0.0
+        ],
+        "SOCKET_BACK": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_FOREARM": [
+          -0.13,
+          0.0,
+          0.0
+        ]
+      },
+      "accents": [],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/gear_roman_scutum_0.glb",
+          "triangles": 8455,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 2048,
+            "normal": 1024,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 971.6,
+          "bounds_blender": [
+            [
+              -0.26591,
+              -0.0719,
+              -0.53
+            ],
+            [
+              0.26591,
+              0.0719,
+              0.53
+            ]
+          ],
+          "size_bytes": 685208,
+          "sha256": "8aeec61616f2b8303b01ad499a0fda7010d79de9337474d9dd7bc2b74e87a27e"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/equipment/gear_roman_scutum_1.glb",
+          "triangles": 1900,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 240.7,
+          "bounds_blender": [
+            [
+              -0.26571,
+              -0.07181,
+              -0.5301
+            ],
+            [
+              0.265,
+              0.07181,
+              0.53006
+            ]
+          ],
+          "size_bytes": 136256,
+          "sha256": "9ea9dd8c1522ccc4458f33086f8b26c7bac013559ed9c9eb74fd2455fc49d639"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/equipment/gear_roman_scutum_2.glb",
+          "triangles": 479,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 116.9,
+          "bounds_blender": [
+            [
+              -0.26571,
+              -0.07033,
+              -0.53283
+            ],
+            [
+              0.26177,
+              0.07174,
+              0.53038
+            ]
+          ],
+          "size_bytes": 46412,
+          "sha256": "30474e75cff6379dbcb1ebe40a95f3a939b722e3a287f7d325d9901bee46c7f5"
+        }
+      ],
+      "collision": "none: hand props use sockets and the combat sweep"
+    },
+    "gear_roman_cavalry_oval_shield": {
+      "stable_id": "gear_roman_cavalry_oval_shield",
+      "kind": "shield",
+      "source_path": "prototype/assets/meshy/source/equipment/gear_roman_cavalry_oval_shield.glb",
+      "source_sha256": "9b82cf2b9a77854f5d412729c4428c6f54e35b262ad46769b798038df506c8a9",
+      "source_bytes": 22916200,
+      "source_triangles": 8901,
+      "repair": {
+        "board_width_factor": 0.6545454545454544,
+        "round_fittings_kept": 25
+      },
+      "source_bounds": [
+        [
+          -0.3272727131843567,
+          -0.06105000153183937,
+          -0.5
+        ],
+        [
+          0.3272727131843567,
+          0.05683299899101257,
+          0.5
+        ]
+      ],
+      "uniform_scale": 1.1,
+      "origin_shift": [
+        0.0,
+        0.07193514704704285,
+        0.550000011920929
+      ],
+      "bounds_blender": [
+        [
+          -0.35999998450279236,
+          -0.1367707997560501,
+          -0.550000011920929
+        ],
+        [
+          0.35999998450279236,
+          -0.0070994943380355835,
+          0.550000011920929
+        ]
+      ],
+      "proportion_corrections": [],
+      "sockets": {
+        "SOCKET_LEFT_HAND": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_BLOCK_CENTER": [
+          0.0,
+          -0.13677,
+          0.0
+        ],
+        "SOCKET_BACK": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "SOCKET_FOREARM": [
+          -0.13,
+          0.0,
+          0.0
+        ]
+      },
+      "accents": [],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/equipment/gear_roman_cavalry_oval_shield_0.glb",
+          "triangles": 8901,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 2048,
+            "normal": 1024,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 1211.5,
+          "bounds_blender": [
+            [
+              -0.36,
+              -0.13677,
+              -0.55
+            ],
+            [
+              0.36,
+              -0.0071,
+              0.55
+            ]
+          ],
+          "size_bytes": 1001724,
+          "sha256": "d41f7f1de48d4da71d49a1a556e473bdb270b63ca59b9128afbec781a0bb9f6f"
+        }
+      ],
+      "collision": "none: hand props use sockets and the combat sweep",
+      "far_tiers": "not shipped: reduction tears the layered board; see gear_profiles.json lod_note"
+    },
+    "mount_legacy_bay_horse": {
+      "stable_id": "mount_legacy_bay_horse",
+      "kind": "mount",
+      "source_path": "prototype/assets/meshy/source/mount/mount_legacy_bay_horse.glb",
+      "source_sha256": "dca7e438402e71e4c86f5c81d4f1fd38ca7ebd1a29202bd9339f610b74ef1d41",
+      "source_bytes": 6342220,
+      "source_triangles": 14002,
+      "source_bounds": [
+        [
+          -0.12182600051164627,
+          -0.4787600040435791,
+          -0.4006350040435791
+        ],
+        [
+          0.1193849965929985,
+          0.4748539924621582,
+          0.40209999680519104
+        ]
+      ],
+      "uniform_scale": 2.1177599846981563,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds_blender": [
+        [
+          -0.2554135024547577,
+          -1.0097627639770508,
+          0.0
+        ],
+        [
+          0.2554135024547577,
+          1.0097627639770508,
+          1.7000000476837158
+        ]
+      ],
+      "proportion_corrections": [],
+      "withers_or_back_height_m": 1.2553530931472778,
+      "sockets": {
+        "SOCKET_SADDLE": [
+          0.0,
+          0.08078,
+          1.25535
+        ],
+        "SOCKET_RIDER": [
+          0.0,
+          0.08078,
+          1.30535
+        ],
+        "SOCKET_HEAD": [
+          0.14736,
+          -0.95694,
+          1.21361
+        ]
+      },
+      "accents": [],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/mounts/mount_legacy_bay_horse_0.glb",
+          "triangles": 13971,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 2048,
+            "normal": 1024,
+            "metallic_roughness": 1024
+          },
+          "texel_density_px_per_m": 473.2,
+          "bounds_blender": [
+            [
+              -0.25541,
+              -1.00976,
+              0.0
+            ],
+            [
+              0.25541,
+              1.00976,
+              1.7
+            ]
+          ],
+          "size_bytes": 3247436,
+          "sha256": "42c1ce14fa361c645a5422c575d811176bb05e01fd2094d7dcd861c436c748a7"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/mounts/mount_legacy_bay_horse_1.glb",
+          "triangles": 5163,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 233.0,
+          "bounds_blender": [
+            [
+              -0.25657,
+              -1.01014,
+              0.00052
+            ],
+            [
+              0.25542,
+              1.00886,
+              1.70099
+            ]
+          ],
+          "size_bytes": 398276,
+          "sha256": "0a508ec54c3ea62c3663d911904ca41125536da2bdf17ab641f10ffa3dcb7877"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/mounts/mount_legacy_bay_horse_2.glb",
+          "triangles": 1430,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 106.9,
+          "bounds_blender": [
+            [
+              -0.25388,
+              -1.0024,
+              -0.00123
+            ],
+            [
+              0.25623,
+              1.02851,
+              1.68669
+            ]
+          ],
+          "size_bytes": 144828,
+          "sha256": "da3d92123c6de856e0b4724e5e49f5f2f86dd6df99e1bb2ee90007d2f716d0e3"
+        }
+      ],
+      "collision": "convex hull, at most 96 triangles (Godot -convcolonly)"
+    },
+    "resource_firewood": {
+      "stable_id": "resource_firewood",
+      "kind": "prop",
+      "source_path": "prototype/assets/meshy/source/resource/resource_firewood.glb",
+      "source_sha256": "bf31ee78e55de1d8477cb4b76e028cf1dd1f2f3113f32a3e0608674b1d8a8333",
+      "source_bytes": 23541956,
+      "source_triangles": 9230,
+      "source_bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.41276100277900696
+        ],
+        [
+          0.5,
+          0.5,
+          0.4085499942302704
+        ]
+      ],
+      "uniform_scale": 1.6,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds_blender": [
+        [
+          -0.800000011920929,
+          -0.800000011920929,
+          0.0
+        ],
+        [
+          0.800000011920929,
+          0.800000011920929,
+          1.3140976428985596
+        ]
+      ],
+      "proportion_corrections": [],
+      "sockets": {},
+      "accents": [],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/props/resource_firewood_0.glb",
+          "triangles": 9230,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 104.6,
+          "bounds_blender": [
+            [
+              -0.8,
+              -0.8,
+              0.0
+            ],
+            [
+              0.8,
+              0.8,
+              1.3141
+            ]
+          ],
+          "size_bytes": 688940,
+          "sha256": "bf0f4270f4de2b1ce3b307cd2edcb00810b29537ef88e67628981750609a0e79"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/props/resource_firewood_1.glb",
+          "triangles": 4195,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 47.2,
+          "bounds_blender": [
+            [
+              -0.80331,
+              -0.80212,
+              -0.00084
+            ],
+            [
+              0.80098,
+              0.80001,
+              1.3141
+            ]
+          ],
+          "size_bytes": 360464,
+          "sha256": "a44e6027309e9708daf0ca8ae5318b19d96ffb072a2d6be9461b21b8343f5b43"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/props/resource_firewood_2.glb",
+          "triangles": 1991,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 20.7,
+          "bounds_blender": [
+            [
+              -0.80331,
+              -0.80212,
+              -0.00187
+            ],
+            [
+              0.80295,
+              0.80278,
+              1.29758
+            ]
+          ],
+          "size_bytes": 198192,
+          "sha256": "05962e78594d76afad237cdfd3243aeb1a115756ca322bbc8dc5234296357c8a"
+        }
+      ],
+      "collision": "convex hull, at most 96 triangles (Godot -convcolonly)"
+    },
+    "resource_iron_ore": {
+      "stable_id": "resource_iron_ore",
+      "kind": "prop",
+      "source_path": "prototype/assets/meshy/source/resource/resource_iron_ore.glb",
+      "source_sha256": "4c97adb87c76c19c19371f6e18202e727115f6d9579d9a347a2394a90996382e",
+      "source_bytes": 7377284,
+      "source_triangles": 2524,
+      "source_bounds": [
+        [
+          -0.4782710075378418,
+          -0.28881800174713135,
+          -0.2277829945087433
+        ],
+        [
+          0.4826659858226776,
+          0.28881800174713135,
+          0.2277829945087433
+        ]
+      ],
+      "uniform_scale": 2.289432030372697,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds_blender": [
+        [
+          -1.100000023841858,
+          -0.6612291932106018,
+          0.0
+        ],
+        [
+          1.100000023841858,
+          0.6612291932106018,
+          1.04298734664917
+        ]
+      ],
+      "proportion_corrections": [],
+      "sockets": {},
+      "accents": [],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/props/resource_iron_ore_0.glb",
+          "triangles": 2524,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 285.7,
+          "bounds_blender": [
+            [
+              -1.1,
+              -0.66123,
+              0.0
+            ],
+            [
+              1.1,
+              0.66123,
+              1.04299
+            ]
+          ],
+          "size_bytes": 239564,
+          "sha256": "4631140e70752bfc2edc16b2848cbd753b6e4dbd69e050f97762fec83e78866c"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/props/resource_iron_ore_1.glb",
+          "triangles": 1200,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 127.8,
+          "bounds_blender": [
+            [
+              -1.09792,
+              -0.66135,
+              0.00097
+            ],
+            [
+              1.09898,
+              0.66219,
+              1.04753
+            ]
+          ],
+          "size_bytes": 102076,
+          "sha256": "ed60fcdbbf5a5b520f359b65273ecefb3a5289942463623ef511f30ff0de8e07"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/props/resource_iron_ore_2.glb",
+          "triangles": 400,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 53.2,
+          "bounds_blender": [
+            [
+              -1.08865,
+              -0.66571,
+              0.00183
+            ],
+            [
+              1.10319,
+              0.6695,
+              1.04704
+            ]
+          ],
+          "size_bytes": 47952,
+          "sha256": "c5ab32f130737ebd105fc84dd10c707e38870c2c1f0961d32cd5b34c9b513789"
+        }
+      ],
+      "collision": "convex hull, at most 96 triangles (Godot -convcolonly)"
+    },
+    "resource_clay": {
+      "stable_id": "resource_clay",
+      "kind": "prop",
+      "source_path": "prototype/assets/meshy/source/resource/resource_clay.glb",
+      "source_sha256": "ba4a9fb8b82c3d6f9f9e418aa93852d13d179ad364155b1e5f2316f4d4e5c2e6",
+      "source_bytes": 14606648,
+      "source_triangles": 9552,
+      "source_bounds": [
+        [
+          -0.5000860095024109,
+          -0.5,
+          -0.2150070071220398
+        ],
+        [
+          0.5,
+          0.5,
+          0.21318699419498444
+        ]
+      ],
+      "uniform_scale": 2.399793451920475,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds_blender": [
+        [
+          -1.1999999284744263,
+          -1.1998966932296753,
+          0.0
+        ],
+        [
+          1.1999999284744263,
+          1.1998966932296753,
+          1.0275770425796509
+        ]
+      ],
+      "proportion_corrections": [],
+      "sockets": {},
+      "accents": [],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/props/resource_clay_0.glb",
+          "triangles": 6000,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 134.0,
+          "bounds_blender": [
+            [
+              -1.20004,
+              -1.19993,
+              0.0001
+            ],
+            [
+              1.20239,
+              1.2012,
+              1.02755
+            ]
+          ],
+          "size_bytes": 368860,
+          "sha256": "2edb5c903feb738fc31ae63014329f8f7bedae94be61429bc4b405cd63558d6c"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/props/resource_clay_1.glb",
+          "triangles": 2185,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 55.2,
+          "bounds_blender": [
+            [
+              -1.20153,
+              -1.20335,
+              6e-05
+            ],
+            [
+              1.20144,
+              1.20395,
+              1.0291
+            ]
+          ],
+          "size_bytes": 175648,
+          "sha256": "6f4aae0bb4f359a888e42ba61639ac3d1d1843b5a7702e6b514720e04d6d1c00"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/props/resource_clay_2.glb",
+          "triangles": 541,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 19.2,
+          "bounds_blender": [
+            [
+              -1.21493,
+              -1.20335,
+              0.00033
+            ],
+            [
+              1.20496,
+              1.21158,
+              1.01431
+            ]
+          ],
+          "size_bytes": 62524,
+          "sha256": "cae6f27ae34f5dbe1a3c779c8573f1668be01ec8114a8e551ff023f7e28fd145"
+        }
+      ],
+      "collision": "convex hull, at most 96 triangles (Godot -convcolonly)"
+    },
+    "resource_limestone": {
+      "stable_id": "resource_limestone",
+      "kind": "prop",
+      "source_path": "prototype/assets/meshy/source/resource/resource_limestone.glb",
+      "source_sha256": "294ab91a5cf3cd4f0cf477ff0cfa20037bdf3e91d63e0c2f8a233b6fc6d1fd32",
+      "source_bytes": 18510092,
+      "source_triangles": 9299,
+      "source_bounds": [
+        [
+          -0.5,
+          -0.5,
+          -0.3471049964427948
+        ],
+        [
+          0.5,
+          0.5,
+          0.34396401047706604
+        ]
+      ],
+      "uniform_scale": 2.2,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds_blender": [
+        [
+          -1.100000023841858,
+          -1.100000023841858,
+          0.0
+        ],
+        [
+          1.100000023841858,
+          1.100000023841858,
+          1.5203518867492676
+        ]
+      ],
+      "proportion_corrections": [],
+      "sockets": {},
+      "accents": [],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/props/resource_limestone_0.glb",
+          "triangles": 5999,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 131.3,
+          "bounds_blender": [
+            [
+              -1.1,
+              -1.10436,
+              -0.00078
+            ],
+            [
+              1.1017,
+              1.1,
+              1.52035
+            ]
+          ],
+          "size_bytes": 388344,
+          "sha256": "b5f018fc96e3e194635c0031d358ecf5133c76c80df4befe90328ced538153a5"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/props/resource_limestone_1.glb",
+          "triangles": 2200,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 56.5,
+          "bounds_blender": [
+            [
+              -1.10832,
+              -1.10393,
+              0.00295
+            ],
+            [
+              1.10711,
+              1.10592,
+              1.51266
+            ]
+          ],
+          "size_bytes": 181024,
+          "sha256": "3bf91dcc0a5e3ec5c2adc780e615649c66d647a095eef571a5235f64d9c46d3c"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/props/resource_limestone_2.glb",
+          "triangles": 599,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 22.3,
+          "bounds_blender": [
+            [
+              -1.12057,
+              -1.11594,
+              0.01214
+            ],
+            [
+              1.1099,
+              1.10736,
+              1.51954
+            ]
+          ],
+          "size_bytes": 75696,
+          "sha256": "a3d621ed57d8e2865d6239afe6ee881a89cdf4e5b069b28c52e4733970da07c9"
+        }
+      ],
+      "collision": "convex hull, at most 96 triangles (Godot -convcolonly)"
+    },
+    "resource_copper_ore": {
+      "stable_id": "resource_copper_ore",
+      "kind": "prop",
+      "source_path": "prototype/assets/meshy/source/resource/resource_copper_ore.glb",
+      "source_sha256": "007e52115c43bf719d25d61f4439e910c289a4b6473ad72b5e413ef43e8c2dd9",
+      "source_bytes": 25805988,
+      "source_triangles": 9998,
+      "source_bounds": [
+        [
+          -0.5,
+          -0.4190169870853424,
+          -0.3441630005836487
+        ],
+        [
+          0.5,
+          0.42296698689460754,
+          0.34270399808883667
+        ]
+      ],
+      "uniform_scale": 2.0,
+      "origin_shift": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds_blender": [
+        [
+          -1.0,
+          -0.84198397397995,
+          0.0
+        ],
+        [
+          1.0,
+          0.84198397397995,
+          1.3737339973449707
+        ]
+      ],
+      "proportion_corrections": [],
+      "sockets": {},
+      "accents": [],
+      "tiers": [
+        {
+          "tier": 0,
+          "path": "prototype/assets/meshy/props/resource_copper_ore_0.glb",
+          "triangles": 6000,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 1024,
+            "normal": 512,
+            "metallic_roughness": 512
+          },
+          "texel_density_px_per_m": 223.1,
+          "bounds_blender": [
+            [
+              -1.00072,
+              -0.84173,
+              0.00114
+            ],
+            [
+              1.00008,
+              0.84211,
+              1.37373
+            ]
+          ],
+          "size_bytes": 336812,
+          "sha256": "ddb4ef368de1989230f438a8e793dfef4d92ae2d54d35b92a44de911b82148d7"
+        },
+        {
+          "tier": 1,
+          "path": "prototype/assets/meshy/props/resource_copper_ore_1.glb",
+          "triangles": 2200,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 512,
+            "normal": 256,
+            "metallic_roughness": 256
+          },
+          "texel_density_px_per_m": 101.5,
+          "bounds_blender": [
+            [
+              -1.0014,
+              -0.8414,
+              0.00149
+            ],
+            [
+              1.00148,
+              0.84249,
+              1.37505
+            ]
+          ],
+          "size_bytes": 140036,
+          "sha256": "cb984846e05c46b1519a198e11e4c0e7665afd14a2bf2062727c669e0fea9a96"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/props/resource_copper_ore_2.glb",
+          "triangles": 600,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 41.4,
+          "bounds_blender": [
+            [
+              -1.00892,
+              -0.84875,
+              -0.00138
+            ],
+            [
+              1.00429,
+              0.84557,
+              1.37108
+            ]
+          ],
+          "size_bytes": 62684,
+          "sha256": "cda17cfde954d344ac2dc4f080e89f39f2b62bbbd089802a318c3ff4f9dcf4a5"
+        }
+      ],
+      "collision": "convex hull, at most 96 triangles (Godot -convcolonly)"
+    }
+  },
+  "blender": "4.3.2"
+}

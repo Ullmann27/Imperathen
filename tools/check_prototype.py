@@ -176,6 +176,8 @@ def main():
             ("battle_rules", ["--script", "res://tests/battle_rules_test.gd"], "failures=0"),
             ("troop_catalog", ["--script", "res://tests/troop_catalog_test.gd"], "failures=0 troops="),
             ("battle_command", ["--script", "res://tests/battle_command_test.gd"], "failures=0 metrics="),
+            ("gear_market", ["--script", "res://tests/gear_market_test.gd"], "GEAR_MARKET_PASS"),
+            ("gear_visuals", ["--fixed-fps", "60", "--script", "res://tests/gear_visual_test.gd"], "GEAR_VISUALS_PASS"),
             ("combat_formula", ["--script", "res://tests/combat_formula_test.gd"], "failures=0 metrics="),
             ("valley_orders", ["--fixed-fps", "60", "--script", "res://tests/valley_orders_test.gd"], "failures=0 smallest_row_px="),
             ("soldier_visuals", ["--script", "res://tests/soldier_visual_test.gd"], "0 failed"),

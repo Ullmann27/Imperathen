@@ -11,300 +11,564 @@
       "family_id": "helmet_montefortino",
       "handbook_ref": "IT-018",
       "name": "Montefortino-Helm",
-      "slots": ["head"],
+      "slots": [
+        "head"
+      ],
       "valid_from": -400,
       "valid_to": 20,
       "attestation": "attested",
-      "design_stats": {"head_protection": 14, "weight": 1.8},
+      "design_stats": {
+        "head_protection": 14,
+        "weight": 1.8
+      },
       "notes": "Spätrepublikanische Ausprägung (Typ Buggenum) neben dem Coolus-Helm Leitform der Caesarzeit.",
       "sources": [
-        {"ref": "Bishop/Coulston, Roman Military Equipment, 2. Aufl. 2006, Kap. Republik", "note": "Typologie und Datierung", "verified": false},
-        {"ref": "Handbuch 3.0 S. 118 (IT-018)", "note": "Q2-Richtwert und Epochenhinweis", "verified": true}
+        {
+          "ref": "Bishop/Coulston, Roman Military Equipment, 2. Aufl. 2006, Kap. Republik",
+          "note": "Typologie und Datierung",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 118 (IT-018)",
+          "note": "Q2-Richtwert und Epochenhinweis",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "helmet_coolus",
       "handbook_ref": "IT-019",
       "name": "Coolus-Helm",
-      "slots": ["head"],
+      "slots": [
+        "head"
+      ],
       "valid_from": -120,
       "valid_to": 70,
       "attestation": "attested",
-      "design_stats": {"head_protection": 16},
+      "design_stats": {
+        "head_protection": 16
+      },
       "notes": "Bronzener Kappenhelm gallischen Ursprungs (Typ Mannheim) in spätrepublikanischem und frühkaiserzeitlichem Gebrauch.",
       "sources": [
-        {"ref": "Bishop/Coulston, Roman Military Equipment, 2. Aufl. 2006", "note": "Coolus/Mannheim-Typen", "verified": false},
-        {"ref": "Handbuch 3.0 S. 119 (IT-019)", "note": "weitere zeitpassende Helmtypen", "verified": true}
+        {
+          "ref": "Bishop/Coulston, Roman Military Equipment, 2. Aufl. 2006",
+          "note": "Coolus/Mannheim-Typen",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 119 (IT-019)",
+          "note": "weitere zeitpassende Helmtypen",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "helmet_imperial_gallic",
       "handbook_ref": "IT-019",
       "name": "Kaiserzeitlicher Helm (Typ Weisenau)",
-      "slots": ["head"],
+      "slots": [
+        "head"
+      ],
       "valid_from": -20,
       "valid_to": 200,
       "attestation": "plausible",
-      "design_stats": {"head_protection": 16},
+      "design_stats": {
+        "head_protection": 16
+      },
       "notes": "Frühestens augusteisch; Beginn der Spanne ist eine vorsichtige Annahme. Nie in der Caesar-Phase.",
       "sources": [
-        {"ref": "Bishop/Coulston, Roman Military Equipment, 2. Aufl. 2006", "note": "Weisenau/Imperial-Gallic", "verified": false},
-        {"ref": "Handbuch 3.0 S. 82", "note": "keine spätere Kaiserzeit-Ausrüstung in der Caesar-Phase", "verified": true}
+        {
+          "ref": "Bishop/Coulston, Roman Military Equipment, 2. Aufl. 2006",
+          "note": "Weisenau/Imperial-Gallic",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 82",
+          "note": "keine spätere Kaiserzeit-Ausrüstung in der Caesar-Phase",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "lorica_hamata",
       "handbook_ref": "IT-020",
       "name": "Kettenrüstung (lorica hamata)",
-      "slots": ["torso"],
+      "slots": [
+        "torso"
+      ],
       "valid_from": -300,
       "valid_to": 500,
       "attestation": "attested",
-      "design_stats": {"torso_protection": 35, "weight": 9},
+      "design_stats": {
+        "torso_protection": 35,
+        "weight": 9
+      },
       "notes": "Römische Hauptkörperrüstung der späten Republik; bei germanischen Gruppen nur vereinzelt (Tac. Germ. 6).",
       "sources": [
-        {"ref": "Polybios 6,23", "note": "Kettenpanzer der vermögenderen Bürger", "verified": false},
-        {"ref": "Tac. Germ. 6", "note": "paucis loricae – selten bei Germanen", "verified": false},
-        {"ref": "Handbuch 3.0 S. 119 (IT-020)", "note": "Q2-Richtwert", "verified": true}
+        {
+          "ref": "Polybios 6,23",
+          "note": "Kettenpanzer der vermögenderen Bürger",
+          "verified": false
+        },
+        {
+          "ref": "Tac. Germ. 6",
+          "note": "paucis loricae – selten bei Germanen",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 119 (IT-020)",
+          "note": "Q2-Richtwert",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "lorica_segmentata",
       "handbook_ref": "Ergänzung",
       "name": "Schienenpanzer (lorica segmentata)",
-      "slots": ["torso"],
+      "slots": [
+        "torso"
+      ],
       "valid_from": 9,
       "valid_to": 250,
       "attestation": "attested",
       "design_stats": {},
       "notes": "Frühester gesicherter Fundkontext Kalkriese (9 n. Chr.); frühere augusteische Datierungen sind umstritten und hier bewusst nicht übernommen. Darf nie in der Caesar-Phase erscheinen (Handbuch S. 82). Keine Handbuch-Familie; keine Designwerte vergeben.",
       "sources": [
-        {"ref": "Fundplatz Kalkriese (9 n. Chr.)", "note": "Typ Kalkriese", "verified": false},
-        {"ref": "Bishop, Lorica Segmentata I, 2002", "note": "Typologie und Laufzeit", "verified": false},
-        {"ref": "Handbuch 3.0 S. 82", "note": "Epochengate für Kaiserzeit-Lorica", "verified": true}
+        {
+          "ref": "Fundplatz Kalkriese (9 n. Chr.)",
+          "note": "Typ Kalkriese",
+          "verified": false
+        },
+        {
+          "ref": "Bishop, Lorica Segmentata I, 2002",
+          "note": "Typologie und Laufzeit",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 82",
+          "note": "Epochengate für Kaiserzeit-Lorica",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "scutum",
       "handbook_ref": "IT-016",
       "name": "Scutum",
-      "slots": ["shield"],
+      "slots": [
+        "shield"
+      ],
       "valid_from": -400,
       "valid_to": 300,
       "attestation": "attested",
-      "design_stats": {"block": 30, "weight": 5},
+      "design_stats": {
+        "block": 30,
+        "weight": 5
+      },
       "notes": "Gewölbter Langschild; in der Caesarzeit ovale Form, rechteckige Form erst kaiserzeitlich (Modellvariante, keine eigene Familie).",
       "sources": [
-        {"ref": "Polybios 6,23", "note": "Aufbau des Scutum", "verified": false},
-        {"ref": "Schildfund Kasr el-Harit (Fayum)", "note": "erhaltener spätrepublikanischer Schild", "verified": false},
-        {"ref": "Handbuch 3.0 S. 118 (IT-016)", "note": "Q2-Richtwert", "verified": true}
+        {
+          "ref": "Polybios 6,23",
+          "note": "Aufbau des Scutum",
+          "verified": false
+        },
+        {
+          "ref": "Schildfund Kasr el-Harit (Fayum)",
+          "note": "erhaltener spätrepublikanischer Schild",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 118 (IT-016)",
+          "note": "Q2-Richtwert",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "shield_round",
       "handbook_ref": "IT-017",
       "name": "Rund-/Ovalschild (Brettschild)",
-      "slots": ["shield"],
+      "slots": [
+        "shield"
+      ],
       "valid_from": -800,
       "valid_to": 900,
       "attestation": "attested",
-      "design_stats": {"block": 20, "handling": 75},
+      "design_stats": {
+        "block": 20,
+        "handling": 75
+      },
       "notes": "Familie für flache Holzschilde mit Schildbuckel (germanisch, gallisch, numidisch). Form und Bemalung sind Stammes-/Modellvarianten.",
       "sources": [
-        {"ref": "Tac. Germ. 6", "note": "scuta lectissimis coloribus distinguunt", "verified": false},
-        {"ref": "Hjortspring-Fund (4. Jh. v. Chr.)", "note": "erhaltene Holzschilde", "verified": false},
-        {"ref": "Handbuch 3.0 S. 118 (IT-017)", "note": "Q2-Richtwert", "verified": true}
+        {
+          "ref": "Tac. Germ. 6",
+          "note": "scuta lectissimis coloribus distinguunt",
+          "verified": false
+        },
+        {
+          "ref": "Hjortspring-Fund (4. Jh. v. Chr.)",
+          "note": "erhaltene Holzschilde",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 118 (IT-017)",
+          "note": "Q2-Richtwert",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "gladius",
       "handbook_ref": "IT-011",
       "name": "Gladius",
-      "slots": ["main_hand"],
+      "slots": [
+        "main_hand"
+      ],
       "valid_from": -200,
       "valid_to": 250,
       "attestation": "attested",
-      "design_stats": {"damage": 24, "handling": 70},
+      "design_stats": {
+        "damage": 24,
+        "handling": 70
+      },
       "notes": "Gladius hispaniensis in der Caesarzeit; Mainz-/Pompeji-Typen sind spätere Modellvarianten derselben Familie.",
       "sources": [
-        {"ref": "Polybios 6,23", "note": "iberisches Schwert", "verified": false},
-        {"ref": "Caes. Gall. 1,25", "note": "gladiis destrictis nach dem Pilenwurf", "verified": false},
-        {"ref": "Handbuch 3.0 S. 116 (IT-011)", "note": "Q2-Richtwert", "verified": true}
+        {
+          "ref": "Polybios 6,23",
+          "note": "iberisches Schwert",
+          "verified": false
+        },
+        {
+          "ref": "Caes. Gall. 1,25",
+          "note": "gladiis destrictis nach dem Pilenwurf",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 116 (IT-011)",
+          "note": "Q2-Richtwert",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "pilum",
       "handbook_ref": "IT-012",
       "name": "Pilum",
-      "slots": ["missile"],
+      "slots": [
+        "missile"
+      ],
       "valid_from": -400,
       "valid_to": 300,
       "attestation": "attested",
-      "design_stats": {"throw": 18, "stock": 1},
+      "design_stats": {
+        "throw": 18,
+        "stock": 1
+      },
       "notes": "Schwerer Wurfspeer; durchschlägt und verbindet Schilde (Caes. Gall. 1,25).",
       "sources": [
-        {"ref": "Polybios 6,23", "note": "zwei pila je Mann", "verified": false},
-        {"ref": "Caes. Gall. 1,25", "note": "Wirkung auf gallische Schilde", "verified": false},
-        {"ref": "Handbuch 3.0 S. 116 (IT-012)", "note": "Q2-Richtwert", "verified": true}
+        {
+          "ref": "Polybios 6,23",
+          "note": "zwei pila je Mann",
+          "verified": false
+        },
+        {
+          "ref": "Caes. Gall. 1,25",
+          "note": "Wirkung auf gallische Schilde",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 116 (IT-012)",
+          "note": "Q2-Richtwert",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "spear",
       "handbook_ref": "IT-013",
       "name": "Stoßspeer (hasta, framea)",
-      "slots": ["main_hand"],
+      "slots": [
+        "main_hand"
+      ],
       "valid_from": -3000,
       "valid_to": 1500,
       "attestation": "attested",
-      "design_stats": {"reach": 30, "handling": 55},
+      "design_stats": {
+        "reach": 30,
+        "handling": 55
+      },
       "notes": "Die germanische framea ist eine Variante mit kurzer Spitze für Stoß und Wurf.",
       "sources": [
-        {"ref": "Tac. Germ. 6", "note": "framea als Hauptwaffe", "verified": false},
-        {"ref": "Handbuch 3.0 S. 117 (IT-013)", "note": "Q2-Richtwert", "verified": true}
+        {
+          "ref": "Tac. Germ. 6",
+          "note": "framea als Hauptwaffe",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 117 (IT-013)",
+          "note": "Q2-Richtwert",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "javelin",
       "handbook_ref": "Ergänzung",
       "name": "Wurfspeer (leicht)",
-      "slots": ["missile"],
+      "slots": [
+        "missile"
+      ],
       "valid_from": -3000,
       "valid_to": 1500,
       "attestation": "attested",
       "design_stats": {},
       "notes": "Leichte Wurfspeere der Plänkler. Keine Handbuch-Familie; keine Designwerte vergeben.",
       "sources": [
-        {"ref": "Tac. Germ. 6", "note": "missilia spargunt", "verified": false},
-        {"ref": "Caes. Gall. 2,10", "note": "levis armaturae Numidae", "verified": false}
+        {
+          "ref": "Tac. Germ. 6",
+          "note": "missilia spargunt",
+          "verified": false
+        },
+        {
+          "ref": "Caes. Gall. 2,10",
+          "note": "levis armaturae Numidae",
+          "verified": false
+        }
       ]
     },
     {
       "family_id": "axe",
       "handbook_ref": "IT-014",
       "name": "Axt",
-      "slots": ["main_hand"],
+      "slots": [
+        "main_hand"
+      ],
       "valid_from": -3000,
       "valid_to": 1500,
       "attestation": "attested",
-      "design_stats": {"damage": 26, "handling": 48},
+      "design_stats": {
+        "damage": 26,
+        "handling": 48
+      },
       "notes": "Als Werkzeug allgemein belegt; als Hauptwaffe germanischer Krieger um 58 v. Chr. selten. Die Truppe germanic_axe_shield ist deshalb eine künstlerisch rekonstruierte, seltene Variante.",
       "sources": [
-        {"ref": "Handbuch 3.0 S. 117 (IT-014)", "note": "Werkzeug zivil; Waffenvariante", "verified": true}
+        {
+          "ref": "Handbuch 3.0 S. 117 (IT-014)",
+          "note": "Werkzeug zivil; Waffenvariante",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "bow",
       "handbook_ref": "IT-015",
       "name": "Bogen",
-      "slots": ["main_hand"],
+      "slots": [
+        "main_hand"
+      ],
       "valid_from": -3000,
       "valid_to": 1500,
       "attestation": "attested",
-      "design_stats": {"range": 25, "precision": 55},
+      "design_stats": {
+        "range": 25,
+        "precision": 55
+      },
       "notes": "Epochen- und Kulturgate liegt an der Truppe, nicht an der Familie (Handbuch: Epoche prüfen).",
       "sources": [
-        {"ref": "Caes. Gall. 2,7", "note": "Cretas sagittarios", "verified": false},
-        {"ref": "Handbuch 3.0 S. 117 (IT-015)", "note": "Q2-Richtwert", "verified": true}
+        {
+          "ref": "Caes. Gall. 2,7",
+          "note": "Cretas sagittarios",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 117 (IT-015)",
+          "note": "Q2-Richtwert",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "sling",
       "handbook_ref": "Ergänzung",
       "name": "Schleuder (funda)",
-      "slots": ["main_hand"],
+      "slots": [
+        "main_hand"
+      ],
       "valid_from": -3000,
       "valid_to": 1500,
       "attestation": "attested",
       "design_stats": {},
       "notes": "Keine Handbuch-Familie; keine Designwerte vergeben.",
       "sources": [
-        {"ref": "Caes. Gall. 2,7", "note": "funditores Baleares", "verified": false}
+        {
+          "ref": "Caes. Gall. 2,7",
+          "note": "funditores Baleares",
+          "verified": false
+        }
       ]
     },
     {
       "family_id": "sword_long",
       "handbook_ref": "Ergänzung",
       "name": "Langschwert (latènezeitlich/germanisch)",
-      "slots": ["main_hand", "sidearm"],
+      "slots": [
+        "main_hand",
+        "sidearm"
+      ],
       "valid_from": -450,
       "valid_to": 400,
       "attestation": "attested",
       "design_stats": {},
       "notes": "Ein- oder zweischneidige Langschwerter; bei germanischen Gruppen selten und Zeichen von Rang oder Gabe. Keine Handbuch-Familie (IT-011 ist nur der Gladius).",
       "sources": [
-        {"ref": "Tac. Germ. 6", "note": "rari gladiis aut maioribus lanceis utuntur", "verified": false},
-        {"ref": "Waffengräber der Przeworsk-Kultur", "note": "einschneidige Schwerter, Rangzeichen", "verified": false}
+        {
+          "ref": "Tac. Germ. 6",
+          "note": "rari gladiis aut maioribus lanceis utuntur",
+          "verified": false
+        },
+        {
+          "ref": "Waffengräber der Przeworsk-Kultur",
+          "note": "einschneidige Schwerter, Rangzeichen",
+          "verified": false
+        }
       ]
     },
     {
       "family_id": "horse_service",
       "handbook_ref": "IT-031",
       "name": "Dienst-/Kriegspferd",
-      "slots": ["mount"],
+      "slots": [
+        "mount"
+      ],
       "valid_from": -3000,
       "valid_to": 1900,
       "attestation": "attested",
-      "design_stats": {"endurance": 75, "handling": 70},
+      "design_stats": {
+        "endurance": 75,
+        "handling": 70
+      },
       "notes": "Berittene Einheiten sind in der Gefechtssimulation noch nicht aktiv (motion_contract mounted_units).",
       "sources": [
-        {"ref": "Handbuch 3.0 S. 123 (IT-031)", "note": "Q2-Richtwert", "verified": true}
+        {
+          "ref": "Handbuch 3.0 S. 123 (IT-031)",
+          "note": "Q2-Richtwert",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "bridle",
       "handbook_ref": "IT-026",
       "name": "Zaumzeug",
-      "slots": ["mount_gear"],
+      "slots": [
+        "mount_gear"
+      ],
       "valid_from": -3000,
       "valid_to": 1900,
       "attestation": "attested",
-      "design_stats": {"handling": 5},
+      "design_stats": {
+        "handling": 5
+      },
       "notes": "",
       "sources": [
-        {"ref": "Handbuch 3.0 S. 121 (IT-026)", "note": "Q2-Richtwert", "verified": true}
+        {
+          "ref": "Handbuch 3.0 S. 121 (IT-026)",
+          "note": "Q2-Richtwert",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "saddle_four_horn",
       "handbook_ref": "IT-027",
       "name": "Hörnchensattel",
-      "slots": ["mount_gear"],
+      "slots": [
+        "mount_gear"
+      ],
       "valid_from": -100,
       "valid_to": 400,
       "attestation": "plausible",
-      "design_stats": {"riding_comfort": 8},
+      "design_stats": {
+        "riding_comfort": 8
+      },
       "notes": "Keltisch-römischer Sattel; Beginn der Spanne vorsichtig. Germanische Reiter verachteten Sättel (Caes. Gall. 4,2) und tragen ihn deshalb nicht.",
       "sources": [
-        {"ref": "Caes. Gall. 4,2", "note": "Sueben halten Sattelgebrauch für schimpflich", "verified": false},
-        {"ref": "Handbuch 3.0 S. 121 (IT-027)", "note": "Q2-Richtwert", "verified": true}
+        {
+          "ref": "Caes. Gall. 4,2",
+          "note": "Sueben halten Sattelgebrauch für schimpflich",
+          "verified": false
+        },
+        {
+          "ref": "Handbuch 3.0 S. 121 (IT-027)",
+          "note": "Q2-Richtwert",
+          "verified": true
+        }
       ]
     },
     {
       "family_id": "signum",
       "handbook_ref": "Ergänzung",
       "name": "Feldzeichen (signum)",
-      "slots": ["standard"],
+      "slots": [
+        "standard"
+      ],
       "valid_from": -200,
       "valid_to": 400,
       "attestation": "attested",
       "design_stats": {},
       "notes": "Wird vom Signifer als Ernennung getragen, nicht als Truppenstufe. Vorhandenes Asset gear_roman_signum.",
       "sources": [
-        {"ref": "Caes. Gall. 2,25", "note": "signifero interfecto, signo amisso", "verified": false}
+        {
+          "ref": "Caes. Gall. 2,25",
+          "note": "signifero interfecto, signo amisso",
+          "verified": false
+        }
       ]
     },
     {
       "family_id": "standard_germanic",
       "handbook_ref": "Ergänzung",
       "name": "Germanisches Feldzeichen (Tierbild)",
-      "slots": ["standard"],
+      "slots": [
+        "standard"
+      ],
       "valid_from": -200,
       "valid_to": 400,
       "attestation": "plausible",
       "design_stats": {},
       "notes": "Tac. Germ. 7 (um 98 n. Chr.) auf 58 v. Chr. übertragen; Gestalt der Zeichen ist Designarbeit.",
       "sources": [
-        {"ref": "Tac. Germ. 7", "note": "effigies et signa quaedam detracta lucis in proelium ferunt", "verified": false}
+        {
+          "ref": "Tac. Germ. 7",
+          "note": "effigies et signa quaedam detracta lucis in proelium ferunt",
+          "verified": false
+        }
+      ]
+    },
+    {
+      "family_id": "pugio",
+      "handbook_ref": "Ergänzung",
+      "name": "Pugio (Dolch)",
+      "slots": [
+        "sidearm"
+      ],
+      "valid_from": -150,
+      "valid_to": 250,
+      "attestation": "attested",
+      "design_stats": {},
+      "notes": "Breiter, taillierter Dolch iberischer Herkunft als Seitenwaffe. Keine Handbuch-Familie; keine Designwerte vergeben, und combat_balance.json führt noch keine Dolch-Waffenbasis. Für den Ausrüstungskatalog der Läden ergänzt (D-058).",
+      "sources": [
+        {
+          "ref": "Bishop/Coulston, Roman Military Equipment, 2. Aufl. 2006",
+          "note": "republikanische und frühkaiserzeitliche Dolche",
+          "verified": false
+        },
+        {
+          "ref": "Funde aus den Lagern vor Numantia (2. Jh. v. Chr.)",
+          "note": "frühe Belege des Typs",
+          "verified": false
+        }
       ]
     }
   ]
