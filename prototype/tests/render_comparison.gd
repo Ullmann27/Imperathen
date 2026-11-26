@@ -58,6 +58,7 @@ var views: Array = []
 var frames := 5
 var report := {}
 var errors: Array[String] = []
+var _earlier := {}
 
 
 func _initialize() -> void:
@@ -111,12 +112,48 @@ func _run() -> void:
 	else:
 		await _run_city()
 	report.errors = errors
-	var file := FileAccess.open(output.path_join(label + "-report.json"), FileAccess.WRITE)
-	file.store_string(JSON.stringify(report, "  ") + "\n")
-	file.close()
+	report.complete = true
+	_write_report()
 	print("RENDER_COMPARISON ", JSON.stringify({"label": label, "renderer": report.renderer.method, "errors": errors}))
 	Engine.time_scale = 1
 	quit(0 if errors.is_empty() else 1)
+
+
+## Written after every view, so a run cut off by the shared machine's time
+## limit keeps what it rendered. With IMPERATHEN_REPORT_APPEND=1 the shots of
+## an earlier run of the same label (other views or profiles, same renderer)
+## are kept and extended instead of replaced.
+func _write_report() -> void:
+	var path := output.path_join(label + "-report.json")
+	var merged: Dictionary = report.duplicate(true)
+	if OS.get_environment("IMPERATHEN_REPORT_APPEND") == "1" and _earlier.is_empty() and FileAccess.file_exists(path):
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+		# Every shot carries its own source commit, so runs may span commits.
+		if parsed is Dictionary and str(parsed.get("renderer", {}).get("method", "")) == str(report.renderer.method):
+			_earlier = parsed
+		else:
+			_earlier = {"shots": {}}
+	if not _earlier.is_empty():
+		var shots: Dictionary = (_earlier.get("shots", {}) as Dictionary).duplicate(true)
+		for view: String in report.shots:
+			if not shots.has(view):
+				shots[view] = {}
+			for profile: String in report.shots[view]:
+				if not shots[view].has(profile):
+					shots[view][profile] = {}
+				(shots[view][profile] as Dictionary).merge(report.shots[view][profile], true)
+		merged.shots = shots
+		if not merged.has("loaded_assets") and _earlier.has("loaded_assets"):
+			merged.loaded_assets = _earlier.loaded_assets
+		for key in ["profiles", "variants"]:
+			var union: Array = (_earlier.get(key, []) as Array).duplicate()
+			for value in report[key]:
+				if value not in union:
+					union.append(value)
+			merged[key] = union
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	file.store_string(JSON.stringify(merged, "  ") + "\n")
+	file.close()
 
 
 func _run_village() -> void:
@@ -208,6 +245,7 @@ func _shoot(view: String, profile: String, scene: Node) -> void:
 		var stats: Dictionary = await Bench.measure(root, frames)
 		var name := "%s-%s-%s-%s" % [label, view, profile, variant]
 		stats.image = name + ".png"
+		stats.source_commit = report.source_commit
 		stats.engine = Bench.engine_state(root, scene)
 		if variant == "fx":
 			stats.fx_enabled = restore.get("enabled", [])
@@ -223,6 +261,8 @@ func _shoot(view: String, profile: String, scene: Node) -> void:
 			_revert_fx(restore)
 		elif variant == "ultra":
 			_revert_ultra(restore)
+	report.errors = errors
+	_write_report()
 
 
 ## Every advanced post-process/GI feature the running renderer supports, with

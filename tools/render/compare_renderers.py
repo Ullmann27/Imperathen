@@ -28,6 +28,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import signal
 import subprocess
 import time
 
@@ -68,7 +69,7 @@ def git(*args: str) -> str:
 
 
 def run_step(godot: str, name: str, renderer_id: str, script: str, user_args: list[str], out: Path,
-             size: tuple[int, int], timeout: int, texture_tier: str = "") -> dict:
+             size: tuple[int, int], timeout: int, texture_tier: str = "", append: bool = False) -> dict:
     renderer = RENDERERS[renderer_id]
     command = ["xvfb-run", "-a", "-s", f"-screen 0 {size[0]}x{size[1]}x24", godot, "--path", str(PROJECT),
                "--rendering-method", renderer["method"], "--rendering-driver", renderer["driver"],
@@ -78,13 +79,22 @@ def run_step(godot: str, name: str, renderer_id: str, script: str, user_args: li
     env = environment(renderer, out)
     if texture_tier:
         env["IMPERATHEN_TEXTURE_TIER"] = texture_tier
+    if append:
+        env["IMPERATHEN_REPORT_APPEND"] = "1"
+    # Own process group: a time limit must end Xvfb and Godot too, not only xvfb-run.
+    process = subprocess.Popen(command, cwd=ROOT, env=env, text=True, encoding="utf-8", errors="replace",
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, start_new_session=True)
     try:
-        result = subprocess.run(command, cwd=ROOT, env=env, text=True, encoding="utf-8",
-                                errors="replace", capture_output=True, timeout=timeout)
-        log = result.stdout + result.stderr
-        code = result.returncode
-    except subprocess.TimeoutExpired as exc:
-        log = f"TIMEOUT {name}: {exc}\n" + ((exc.stdout or b"").decode(errors="replace") if isinstance(exc.stdout, bytes) else str(exc.stdout or ""))
+        log, _ = process.communicate(timeout=timeout)
+        code = process.returncode
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGTERM)
+        try:
+            log, _ = process.communicate(timeout=15)
+        except subprocess.TimeoutExpired:
+            os.killpg(process.pid, signal.SIGKILL)
+            log, _ = process.communicate()
+        log = f"TIMEOUT {name} after {timeout} s (inconclusive; views finished before it are in the report)\n" + (log or "")
         code = None
     (out / f"{name}.log").write_text(log, encoding="utf-8")
     record = {"step": name, "renderer": renderer_id, "texture_tier": texture_tier or "base", "exit_code": code, "elapsed_s": round(time.monotonic() - started, 1),
@@ -372,7 +382,7 @@ def showcase_sheets(out: Path) -> list[str]:
                 sheet.paste(Image.open(folder / data["image"]).convert("RGB").resize(thumb, Image.LANCZOS), (c * thumb[0], y + 22))
                 engine = data.get("engine", {})
                 meta["images"].append({"shot": shot["id"], "area": shot["area"], "renderer": renderer, "profile": profile, "variant": variant,
-                                       "image": str((folder / data["image"]).relative_to(out)), "source_commit": report.get("source_commit"),
+                                       "image": str((folder / data["image"]).relative_to(out)), "source_commit": data.get("source_commit") or report.get("source_commit"),
                                        "driver": report["renderer"], "resolution": report.get("output_pixels"),
                                        "camera": engine.get("camera"), "sun": engine.get("sun"), "lights": engine.get("lights"),
                                        "environment": engine.get("environment"), "viewport": engine.get("viewport"),
@@ -524,6 +534,8 @@ def main() -> int:
     parser.add_argument("--lock", type=Path, help="Shared heavy-work lock, held for the whole batch")
     parser.add_argument("--timeout", type=int, default=3600, help="Per step, seconds")
     parser.add_argument("--analyze-only", action="store_true")
+    parser.add_argument("--append", action="store_true",
+                        help="Keep the shots of an earlier run of the same step and add this run's views/profiles (split captures)")
     parser.add_argument("--tag", default="", help="Suffix for step labels, e.g. tex_half")
     parser.add_argument("--texture-tier", default="", help="Mount this texture package in the harness (IMPERATHEN_TEXTURE_TIER)")
     args = parser.parse_args()
@@ -552,7 +564,7 @@ def main() -> int:
                         script = "res://tests/render_comparison.gd"
                         views = ",".join(showcase_ids(step)) if args.showcase else args.views
                         user = [str(folder), step, label, args.profiles, args.variants, str(args.frames), args.fx_profiles, views]
-                    record = run_step(godot, label, renderer, script, user, out, size, args.timeout, args.texture_tier)
+                    record = run_step(godot, label, renderer, script, user, out, size, args.timeout, args.texture_tier, args.append)
                     records = [r for r in records if r["step"] != label] + [record]
                     records_path.write_text(json.dumps(records, indent=1) + "\n")
         finally:
