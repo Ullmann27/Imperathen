@@ -89,7 +89,7 @@ func _fade(relative: float) -> float:
 
 
 func _draw() -> void:
-	var band_top := 2.0
+	var band_top := 3.0
 	var band := minf(26.0, size.y * 0.6)
 	var mid := band_top + band * 0.5
 	# Velum behind the ribbon, open at both ends.

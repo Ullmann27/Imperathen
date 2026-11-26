@@ -36,7 +36,8 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--label", default="after")
     parser.add_argument("--tree", type=Path, default=ROOT, help="Checkout whose prototype is rendered.")
-    parser.add_argument("--timeout", type=int, default=1500)
+    parser.add_argument("--timeout", type=int, default=700)
+    parser.add_argument("--parts", default="", help="Comma list of explore, world, fixtures; empty renders all in one run.")
     args = parser.parse_args()
     engine = shutil.which(args.godot) or args.godot
     tree = args.tree.resolve()
@@ -52,16 +53,17 @@ def main() -> int:
             env[f"XDG_{kind}_HOME"] = str(location)
         command = ["xvfb-run", "-a", "-s", "-screen 0 1400x1560x24", engine, "--display-driver", "x11",
                    "--rendering-method", "gl_compatibility", "--audio-driver", "Dummy", "--path", str(tree / "prototype"),
-                   "--resolution", "1280x720", "--script", "res://tests/roman_hud_review.gd", "--", str(output), args.label]
+                   "--resolution", "1280x720", "--script", "res://tests/roman_hud_review.gd", "--", str(output), args.label] + ([args.parts] if args.parts else [])
         try:
             result = subprocess.run(command, env=env, cwd=tree, text=True, stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT, timeout=args.timeout)
             log, code = result.stdout, result.returncode
         except subprocess.TimeoutExpired as error:
             log, code = f"TIMEOUT {error}", None
-    (output / f"runtime-{args.label}.log").write_text(log, encoding="utf-8")
+    suffix = "" if not args.parts or len(args.parts.split(",")) == 3 else "-" + "-".join(args.parts.split(","))
+    (output / f"runtime-{args.label}{suffix}.log").write_text(log, encoding="utf-8")
     passed = code == 0 and "ROMAN_HUD_REVIEW_PASS" in log
-    receipt = output / f"roman-hud-review-{args.label}.json"
+    receipt = output / f"roman-hud-review-{args.label}{suffix}.json"
     if not receipt.exists():
         print(json.dumps({"passed": False, "exit": code, "log_tail": log[-4000:]}))
         return 1

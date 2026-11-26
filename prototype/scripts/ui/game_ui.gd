@@ -97,6 +97,8 @@ var _state: Dictionary = {}
 var _mode := "person"
 var _ui_scale := 1.0
 var _reduce_motion := false
+## Setting "Anzeigen dauerhaft einblenden": the HUD never rests.
+var _hud_always := false
 var _opening_reading := false
 var _volume := 0.55
 var _sound_player: AudioStreamPlayer
@@ -607,6 +609,7 @@ func show_game(state: Dictionary) -> void:
 	_action_buttons.clear()
 	_mode_buttons.clear()
 	_director.reduce_motion = _reduce_motion
+	_director.always_visible = _hud_always
 	_hud = _hud_layout()
 	_build_top_bar()
 	_build_objective_card()
@@ -1523,10 +1526,10 @@ func _build_navigation() -> void:
 	var rect: Rect2
 	if _hud.single_row:
 		var x := clampf(area.x * 0.5 - width * 0.5, gutter + 230.0 + HudStyle.GAP, corner.position.x - HudStyle.GAP - width)
-		rect = Rect2(x, top + 1.0, width, 46.0)
+		rect = Rect2(x, top, width, HudStyle.TOUCH_MIN)
 	else:
 		width = minf(width, corner.position.x - HudStyle.GAP - gutter)
-		rect = Rect2(gutter + (corner.position.x - HudStyle.GAP - gutter - width) * 0.5, top + 1.0, width, 46.0)
+		rect = Rect2(gutter + (corner.position.x - HudStyle.GAP - gutter - width) * 0.5, top, width, HudStyle.TOUCH_MIN)
 	_hud.compass = rect
 	# Danger and count-downs read under the compass, in cinnabar.
 	_alert = HudStyle.kicker("", HudStyle.TYPE_CAPTION, HudStyle.MINIUM.lightened(0.25))
@@ -2572,6 +2575,18 @@ func _show_settings(return_screen: String) -> void:
 		_reduce_motion = value
 		_save_settings()
 	)
+	var presence := CheckButton.new()
+	presence.name = "HudAlwaysSetting"
+	presence.text = "Anzeigen dauerhaft einblenden"
+	presence.button_pressed = _hud_always
+	presence.custom_minimum_size.y = 48
+	presence.tooltip_text = "Aus: Ziel, Vorrat und Werte ruhen in ruhiger Erkundung und erscheinen, sobald sie wichtig werden. Ein: Sie bleiben immer sichtbar."
+	column.add_child(presence)
+	presence.toggled.connect(func(value: bool):
+		_hud_always = value
+		_director.always_visible = value
+		_save_settings()
+	)
 	var touch_toggle := CheckButton.new()
 	touch_toggle.name = "TouchControlsSetting"
 	touch_toggle.text = "Touch-Steuerung"
@@ -2784,7 +2799,7 @@ func _panel(accent: bool) -> PanelContainer:
 func _button(text: String, callback: Callable, primary := false, font_size := 17) -> Button:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size.y = maxf(40, 44 * _ui_scale)
+	button.custom_minimum_size.y = _menu_button_height()
 	button.set_meta("base_font_size", font_size)
 	button.add_theme_font_size_override("font_size", roundi(font_size * _ui_scale))
 	button.add_theme_stylebox_override("normal", _button_style(primary, false))
@@ -2795,6 +2810,11 @@ func _button(text: String, callback: Callable, primary := false, font_size := 17
 		callback.call()
 	)
 	return button
+
+
+## Menu buttons follow the text scale and never fall below a 48 dp touch target.
+func _menu_button_height() -> float:
+	return maxf(HudStyle.TOUCH_MIN if _touch_enabled else 40.0, 44.0 * _ui_scale)
 
 
 func _label(text: String, font_size := 16, color := CREAM, serif := false) -> Label:
@@ -2857,7 +2877,7 @@ func _apply_scale(node: Node) -> void:
 	if node is Control and node.has_meta("base_font_size"):
 		node.add_theme_font_size_override("font_size", roundi(float(node.get_meta("base_font_size")) * _ui_scale))
 		if node is Button:
-			node.custom_minimum_size.y = maxf(40, 44 * _ui_scale)
+			node.custom_minimum_size.y = _menu_button_height()
 	for child in node.get_children():
 		_apply_scale(child)
 
@@ -2871,6 +2891,7 @@ func _load_settings() -> void:
 	if config.load(SETTINGS_PATH) == OK:
 		_ui_scale = clampf(float(config.get_value("interface", "scale", 1.0)), 0.85, 1.25)
 		_reduce_motion = bool(config.get_value("interface", "reduce_motion", false))
+		_hud_always = bool(config.get_value("interface", "hud_always", false))
 		_opening_reading = bool(config.get_value("interface", "opening_reading", false))
 		_volume = clampf(float(config.get_value("audio", "volume", 0.55)), 0.0, 1.0)
 		_music_volume = clampf(float(config.get_value("audio", "music", 0.7)), 0.0, 1.0)
@@ -2895,6 +2916,7 @@ func _save_settings() -> void:
 	var config := ConfigFile.new()
 	config.set_value("interface", "scale", _ui_scale)
 	config.set_value("interface", "reduce_motion", _reduce_motion)
+	config.set_value("interface", "hud_always", _hud_always)
 	config.set_value("interface", "opening_reading", _opening_reading)
 	config.set_value("audio", "volume", _volume)
 	config.set_value("audio", "music", _music_volume)

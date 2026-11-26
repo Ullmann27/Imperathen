@@ -6,10 +6,16 @@ extends SceneTree
 ## inventory and the pause menu. It also measures the screen share of the HUD
 ## in calm exploration, geometrically and by a pixel difference against the
 ## same frame without the HUD layer.
-## Usage: godot --path prototype --script res://tests/roman_hud_review.gd -- <output> [label]
+## The run can be split into parts (explore, world, fixtures) so that one
+## render job stays short on a shared machine; every part writes its own receipt.
+## Usage: godot --path prototype --script res://tests/roman_hud_review.gd -- <output> [label] [parts]
 
 const EntryScene = preload("res://main.tscn")
 const Life = preload("res://scripts/story/village_life.gd")
+const UI = preload("res://scripts/ui/game_ui.gd")
+const Model = preload("res://scripts/domain/world_model.gd")
+const Economy = preload("res://scripts/domain/village_economy.gd")
+const MarketPanel = preload("res://scripts/city_support_panel.gd")
 const SIZES := [Vector2i(1280, 720), Vector2i(1384, 1536)]
 const CALM_SECONDS := 14.0
 const DRY_CALM_SECONDS := 2.0
@@ -19,6 +25,7 @@ const CAMERA_YAW := 2.45
 var game
 var output := ""
 var label := "review"
+var parts: PackedStringArray = ["explore", "world", "fixtures"]
 var captures: Array[Dictionary] = []
 var measurements: Array[Dictionary] = []
 var notes: Array[String] = []
@@ -37,6 +44,8 @@ func _initialize() -> void:
 	output = args[0]
 	if args.size() > 1:
 		label = args[1]
+	if args.size() > 2:
+		parts = args[2].split(",", false)
 	DirAccess.make_dir_recursive_absolute(output)
 	_run.call_deferred()
 
@@ -44,51 +53,58 @@ func _initialize() -> void:
 func _run() -> void:
 	root.content_scale_size = Vector2i.ZERO
 	root.size = SIZES[0]
-	game = EntryScene.instantiate()
-	root.add_child(game)
-	await _frames(4)
-	game.ui.set("_touch_enabled", true)
-	game.ui.set_quality("balanced")
-	game.ui._finish_intro()
-	await _frames(2)
-	game.ui.action_requested.emit("new_game", {})
-	await _frames(4)
-	game._opening_skip()
-	game._opening_next()
-	await _frames(6)
-	game._opening_skip()
-	if game.screen == "opening":
-		game.opening_overlay.choice_requested.emit("i01_help")
-		await _frames(4)
-		game._opening_skip()
-		game._opening_next()
-	await _frames(10)
-	_expect(game.screen == "playing", "The fresh childhood reaches play")
-	await _sequence()
 	var report := {
-		"label": label, "engine": Engine.get_version_info().string,
+		"label": label, "parts": Array(parts), "engine": Engine.get_version_info().string,
 		"renderer": RenderingServer.get_current_rendering_method(),
 		"adapter": RenderingServer.get_video_adapter_name(), "vendor": RenderingServer.get_video_adapter_vendor(),
 		"api": RenderingServer.get_video_adapter_api_version(), "display_driver": DisplayServer.get_name(),
-		"quality_profile": game.ui.get_quality(), "world_profile": game.world.get_quality_profile(),
 		"touch_hud": true, "calm_seconds": CALM_SECONDS, "camera_yaw": CAMERA_YAW, "yard_position": [YARD.x, YARD.y],
-		"loaded_models": _loaded_models(), "ui_assets": _ui_assets(), "lighting": _lighting(),
-		"captures": captures, "hud_area": measurements, "notes": notes,
+		"ui_assets": _ui_assets(), "captures": captures, "hud_area": measurements, "notes": notes,
 		"performance_note": "Software rendering under xvfb (llvmpipe); frame times are relative only and say nothing about the Fold7.",
 	}
-	var file := FileAccess.open(output.path_join("roman-hud-review-%s.json" % label), FileAccess.WRITE)
+	if parts.has("explore") or parts.has("world"):
+		game = EntryScene.instantiate()
+		root.add_child(game)
+		await _frames(4)
+		game.ui.set("_touch_enabled", true)
+		game.ui.set_quality("balanced")
+		game.ui._finish_intro()
+		await _frames(2)
+		game.ui.action_requested.emit("new_game", {})
+		await _frames(4)
+		game._opening_skip()
+		game._opening_next()
+		await _frames(6)
+		game._opening_skip()
+		if game.screen == "opening":
+			game.opening_overlay.choice_requested.emit("i01_help")
+			await _frames(4)
+			game._opening_skip()
+			game._opening_next()
+		await _frames(10)
+		_expect(game.screen == "playing", "The fresh childhood reaches play")
+		if parts.has("explore"):
+			await _explore()
+		if parts.has("world"):
+			await _sequence()
+		report.merge({"quality_profile": game.ui.get_quality(), "world_profile": game.world.get_quality_profile(),
+			"loaded_models": _loaded_models(), "lighting": _lighting()})
+		game.queue_free()
+		await _frames(3)
+		game = null
+	if parts.has("fixtures"):
+		await _fixtures()
+	var suffix := "" if parts.size() == 3 else "-" + "-".join(parts)
+	var file := FileAccess.open(output.path_join("roman-hud-review-%s%s.json" % [label, suffix]), FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "  ") + "\n")
 	file.close()
-	game.queue_free()
 	await process_frame
 	print("ROMAN_HUD_REVIEW_FAIL" if failed else "ROMAN_HUD_REVIEW_PASS")
 	quit(1 if failed else 0)
 
 
-func _sequence() -> void:
-	# Each state is captured at every size before the story moves on, so both
-	# resolutions show exactly the same game state.
-	# 1. Calm exploration in the yard, the same place and camera every time.
+## Calm exploration in the yard, the same place and camera every time.
+func _explore() -> void:
 	for extent: Vector2i in SIZES:
 		var tag := "%dx%d" % [extent.x, extent.y]
 		await _resize(extent)
@@ -106,8 +122,16 @@ func _sequence() -> void:
 		var frame := await _perf(90)
 		await _capture("explore-" + tag, {"frame": frame})
 		measurements.append(await _measure(tag))
-	# 2. A conversation with choices: Julia at the family table.
+
+
+## Each state is captured at every size before the story moves on, so both
+## resolutions show exactly the same game state.
+func _sequence() -> void:
+	# A conversation with choices: Julia at the family table.
 	await _resize(SIZES[0])
+	if game.screen != "playing":
+		game._resume()
+		await _frames(4)
 	var julia := Life.actor_position(game.model.data, "julia")
 	_place(julia + Vector2(0.9, 0.7))
 	await _frames(3)
@@ -142,6 +166,26 @@ func _sequence() -> void:
 		await _capture("inventory-%dx%d" % [extent.x, extent.y])
 	game.ui.action_requested.emit("resume", {})
 	await _frames(6)
+	# 3b. Character and abilities, then the child's view of village life.
+	if game.ui.get_method_argument_count("_show_journal") >= 2:
+		game.ui._show_journal(true, "abilities")
+		for extent: Vector2i in SIZES:
+			await _resize(extent)
+			await _settle(0.8)
+			await _capture("abilities-%dx%d" % [extent.x, extent.y])
+		game.ui.action_requested.emit("resume", {})
+		await _frames(6)
+	game.ui.action_requested.emit("village_panel", {"tab": "overview"})
+	await _frames(6)
+	if game.screen == "village_panel":
+		for extent: Vector2i in SIZES:
+			await _resize(extent)
+			await _settle(0.8)
+			await _capture("village-%dx%d" % [extent.x, extent.y])
+	else:
+		notes.append("village panel did not open (screen %s)" % game.screen)
+	game.ui.action_requested.emit("resume", {})
+	await _frames(6)
 	# 4. The pause menu over the live world.
 	game.ui.action_requested.emit("pause", {})
 	for extent: Vector2i in SIZES:
@@ -150,6 +194,85 @@ func _sequence() -> void:
 		await _capture("menu-%dx%d" % [extent.x, extent.y])
 	game.ui.action_requested.emit("resume", {})
 	await _frames(6)
+
+
+## Screens the twelve-year-old does not reach yet: administration with work
+## assignment, the adult character sheet and the market. The real UI classes
+## show real model state on a plain backdrop (no world behind them); the
+## captures are marked "fixture" and are not in-world frames.
+func _fixtures() -> void:
+	var backdrop := ColorRect.new()
+	backdrop.color = Color(0.2, 0.22, 0.2)
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root.add_child(backdrop)
+	var model = Model.new()
+	model.new_game("italia", true)
+	model.set_player_position(Vector3(2, 1, 9))
+	model.execute("village_talk", {"npc_id": "decimus", "choice": "meet"})
+	model.execute("village_request_work")
+	var ui = UI.new()
+	root.add_child(ui)
+	await _frames(4)
+	ui.set("_touch_enabled", true)
+	for tab in ["overview", "work", "people", "map"]:
+		for extent: Vector2i in SIZES:
+			await _resize(extent)
+			ui.show_village_panel(model.data, tab)
+			await _settle(0.6)
+			await _plain("admin-%s-%dx%d" % [tab, extent.x, extent.y], "village panel, tab " + tab)
+	var state: Dictionary = model.data.duplicate(true)
+	state["village_view"] = Life.view(model.data)
+	state["village_economy_view"] = Economy.view(model.data)
+	if ui.get_method_argument_count("_show_journal") >= 2:
+		for tab in ["abilities", "equipment"]:
+			for extent: Vector2i in SIZES:
+				await _resize(extent)
+				ui.show_game(state)
+				ui._show_journal(false, tab)
+				await _settle(0.6)
+				await _plain("character-%s-%dx%d" % [tab, extent.x, extent.y], "adult codex, tab " + tab)
+	else:
+		for extent: Vector2i in SIZES:
+			await _resize(extent)
+			ui.show_game(state)
+			ui._show_journal(false)
+			await _settle(0.6)
+			await _plain("character-journal-%dx%d" % [extent.x, extent.y], "adult journal")
+	ui.queue_free()
+	await _frames(3)
+	# Market and bag of the city district (adult fixture, as in city_inventory_ui_test).
+	var trader = Model.new()
+	trader.new_game("italia", true, true)
+	trader.execute("city_trade_enable", {})
+	var market_state: Dictionary = trader.data.duplicate(true)
+	market_state.player.age = 18
+	market_state.village.city_trade.inventory.linen_tunic = 1
+	market_state.village.city_trade.purchases.clothier.linen_tunic = 1
+	market_state.village.city_trade.equipment.body = "linen_tunic"
+	var panel := MarketPanel.new()
+	root.add_child(panel)
+	await _frames(3)
+	panel.update_state(market_state)
+	for extent: Vector2i in SIZES:
+		await _resize(extent)
+		panel.open_shop("clothier")
+		await _settle(0.6)
+		await _plain("trade-shop-%dx%d" % [extent.x, extent.y], "market, clothier")
+		panel.open_inventory()
+		await _settle(0.6)
+		await _plain("trade-bag-%dx%d" % [extent.x, extent.y], "market, bag")
+	panel.queue_free()
+	backdrop.queue_free()
+	await _frames(3)
+	root.size = SIZES[0]
+
+
+func _plain(name: String, what: String) -> void:
+	await _frames(1)
+	var picture := root.get_texture().get_image() if not dry_run else Image.create(root.size.x, root.size.y, false, Image.FORMAT_RGB8)
+	var saved := dry_run or (picture != null and not picture.is_empty() and picture.save_png(output.path_join(name + ".png")) == OK)
+	_expect(saved, "Rendered capture " + name)
+	captures.append({"file": name + ".png", "pixels": [picture.get_width(), picture.get_height()], "screen": what, "fixture": true})
 
 
 func _resize(extent: Vector2i) -> void:
