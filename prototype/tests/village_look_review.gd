@@ -25,6 +25,7 @@ var profiles: Array = ["balanced", "very_high"]
 var game
 var report := {}
 var errors: Array[String] = []
+var _turned := {}
 
 
 func _initialize() -> void:
@@ -98,7 +99,7 @@ func _run() -> void:
 			_capture("%s-%s-%s" % [label, shot, profile])
 			_restore(start)
 		var now: String = JSON.stringify(game.model.data)
-		if snapshot != now:
+		if _without_revision(snapshot) != _without_revision(now):
 			errors.append("World state changed in %s: %s" % [profile, _differences(JSON.parse_string(snapshot), JSON.parse_string(now), "")])
 	report.errors = errors
 	var file := FileAccess.open(output.path_join(label + "-look.json"), FileAccess.WRITE)
@@ -125,8 +126,9 @@ func _frame(shot: String, start: Dictionary) -> bool:
 			world._camera_initialized = false
 			world._update_camera(0)
 		"conversation":
-			# Over-the-shoulder two-shot: the player faces a resident at talking
-			# distance; the camera sits behind the player's right shoulder.
+			# Over-the-shoulder two-shot: the player stands at talking distance on
+			# open floor, the resident turns to the player, the camera sits behind
+			# the player's shoulder.
 			var id := _conversation_partner()
 			if id.is_empty():
 				errors.append("No visible resident for the conversation shot")
@@ -137,15 +139,17 @@ func _frame(shot: String, start: Dictionary) -> bool:
 			var facing := -body.global_basis.z
 			facing.y = 0
 			facing = facing.normalized() if facing.length() > .1 else Vector3.BACK
-			var stand := at + facing * 1.35
-			_place_player(stand, atan2(facing.x, facing.z))
+			var away := _open_direction(at, [facing, -facing, facing.rotated(Vector3.UP, PI / 2), facing.rotated(Vector3.UP, -PI / 2)])
+			_place_player(at + away * 1.35, atan2(away.x, away.z))
+			_turned = {"node": body, "yaw": body.global_rotation.y}
+			body.global_rotation.y = atan2(away.x, away.z) + PI
 			var feet: Vector3 = world.get_player_position() - Vector3.UP * float(report.player_lift)
-			var right := Vector3.UP.cross(-facing).normalized()
+			var side := Vector3.UP.cross(-away).normalized()
 			camera.fov = 44.0
-			camera.global_position = feet + facing * 1.15 - right * .52 + Vector3.UP * 1.62
-			camera.look_at(Vector3(at.x, feet.y, at.z) + Vector3.UP * 1.42 - right * .18, Vector3.UP)
+			camera.global_position = feet + away * 1.15 - side * .52 + Vector3.UP * 1.62
+			camera.look_at(Vector3(at.x, feet.y, at.z) + Vector3.UP * 1.42 - side * .18, Vector3.UP)
 			report["conversation_partner"] = id
-			report["conversation_layout"] = {"partner": str(at), "partner_facing": str(facing), "player": str(world.get_player_position()), "camera": str(camera.global_position)}
+			report["conversation_layout"] = {"partner": str(at), "direction": str(away), "player": str(world.get_player_position()), "camera": str(camera.global_position)}
 		"overview":
 			camera.global_position = OVERVIEW_EYE
 			camera.look_at(OVERVIEW_TARGET, Vector3.UP)
@@ -154,6 +158,22 @@ func _frame(shot: String, start: Dictionary) -> bool:
 			figure.refresh_lod(camera)
 	world.population.update_nearby(world.get_player_position(), true)
 	return true
+
+
+## First direction from `at` with level floor 1.35 m away and a clear chest-high line.
+func _open_direction(at: Vector3, candidates: Array) -> Vector3:
+	var world = game.world
+	var space: PhysicsDirectSpaceState3D = world.get_world_3d().direct_space_state
+	var ground := _floor(at + Vector3.UP * .5)
+	for direction: Vector3 in candidates:
+		var stand: Vector3 = at + direction * 1.35
+		if absf(_floor(Vector3(stand.x, ground + .5, stand.z)) - ground) > .3:
+			continue
+		var line := PhysicsRayQueryParameters3D.create(at + Vector3.UP * 1.2 + direction * .35, stand + Vector3.UP * 1.2 + direction * .6, 1, [world._player.get_rid()])
+		if space.intersect_ray(line).is_empty():
+			return direction
+	errors.append("No open floor beside the conversation partner")
+	return candidates[0]
 
 
 func _conversation_partner() -> String:
@@ -174,13 +194,16 @@ func _place_player(at: Vector3, yaw: float) -> void:
 
 func _floor(at: Vector3) -> float:
 	var world = game.world
-	var query := PhysicsRayQueryParameters3D.create(Vector3(at.x, at.y + 4.0, at.z), Vector3(at.x, at.y - 6.0, at.z), 1, [world._player.get_rid()])
+	var query := PhysicsRayQueryParameters3D.create(Vector3(at.x, at.y + 1.0, at.z), Vector3(at.x, at.y - 6.0, at.z), 1, [world._player.get_rid()])
 	var hit: Dictionary = world.get_world_3d().direct_space_state.intersect_ray(query)
 	return float(hit.position.y) if not hit.is_empty() else 0.0
 
 
 func _restore(start: Dictionary) -> void:
 	var world = game.world
+	if not _turned.is_empty():
+		(_turned.node as Node3D).global_rotation.y = float(_turned.yaw)
+		_turned = {}
 	if not world._village_focus.is_empty():
 		world.clear_frontier_focus()
 	world._player.global_position = start.player
@@ -222,6 +245,13 @@ func _measure() -> Dictionary:
 		"texture_mib": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TEXTURE_MEM_USED) / 1048576.0,
 		"buffer_mib": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_BUFFER_MEM_USED) / 1048576.0,
 		"video_mib": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_VIDEO_MEM_USED) / 1048576.0}
+
+
+## "revision" counts model notifications (e.g. the quality setting), not world content.
+func _without_revision(json: String) -> String:
+	var data: Dictionary = JSON.parse_string(json)
+	data.erase("revision")
+	return JSON.stringify(data)
 
 
 func _differences(before: Variant, after: Variant, path: String) -> Array:
