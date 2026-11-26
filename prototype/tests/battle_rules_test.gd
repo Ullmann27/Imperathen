@@ -157,8 +157,8 @@ func _test_battle_factors() -> void:
 	check(m.squads[BOWS].ammo < 18 and m.squads[BOWS].ammo >= 0, "Ammunition expended in finite volleys")
 	for s: Dictionary in m.squads.values():
 		check(s.wounded + s.dead == s.initial_strength - s.strength, "Wounded plus dead balance " + s.id)
-		if s.strength > 0 and s.strength <= s.initial_strength - 3:
-			check(s.officer_id == s.deputy_id, "Surviving deputy takes command")
+		if s.strength > 0 and not s.uids.has(s.commander_id):
+			check(s.officer_id == (s.deputy_id if s.uids.has(s.deputy_id) else ""), "Surviving deputy takes command")
 	for soldier in m.soldiers(GUARD):
 		check(ids.has(soldier.id), "Survivors retain identity")
 
