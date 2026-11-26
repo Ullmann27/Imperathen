@@ -76,6 +76,7 @@ func _test_calendar_and_round_trip() -> void:
 	var result: Dictionary = loaded.load_game(path)
 	_check(result.ok, "Load with tribes: " + str(result.message))
 	_check(_json(loaded.data.tribes) == _json(model.data.tribes), "Tribal state survives the atomic save exactly")
+	_check(Tribes.is_validated(loaded.data.tribes), "The loaded tribal state needs no second full validation in its first frame")
 	model.pass_calendar_days(35)
 	loaded.pass_calendar_days(35)
 	model.finish_tribes()

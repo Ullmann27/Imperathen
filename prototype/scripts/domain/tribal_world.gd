@@ -3455,7 +3455,8 @@ static func _keys(v: Variant, keys: Array) -> bool:
 
 
 static func _mark(state: Dictionary) -> String:
-	return "%s:%s:%s" % [str(state.get("tick")), str(state.get("next_id")), str(state.get("extra_days"))]
+	# Integers on purpose: a loaded state (JSON floats, then normalised) keeps its mark.
+	return "%d:%d:%d" % [int(state.get("tick", -1)), int(state.get("next_id", -1)), int(state.get("extra_days", -1))]
 
 
 static func is_validated(state: Variant) -> bool:
