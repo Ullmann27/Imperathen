@@ -8,6 +8,7 @@ const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
 const Data = preload("res://scripts/domain/melee/melee_track_data.gd")
 const Weapons = preload("res://scripts/domain/melee/weapon_catalog.gd")
 const Ranged = preload("res://scripts/domain/melee/melee_ranged.gd")
+const Feedback = preload("res://scripts/domain/melee/melee_feedback.gd")
 const Impacts = preload("res://scripts/domain/melee/combat_impacts.gd")
 const Formula = preload("res://scripts/battle/combat_formula.gd")
 const DT := 1.0 / 60.0
@@ -241,6 +242,9 @@ func _test_shield_and_pilum() -> void:
 	var hit := _first(log, "projectile_hit")
 	_check(not hit.is_empty() and hit.get("direction", "") == "back" and int(hit.damage) > 0, "The same pilum from behind hits the body (%s)" % hit.get("zone", "-"))
 	table.append("Pilum 9 m in den Rücken (Kettenhemd): %s, %d Schaden, %.0f J, Reaktion %s" % [hit.get("zone", "-"), int(hit.get("damage", 0)), float(hit.get("energy_j", 0.0)), hit.get("reaction", "-")])
+	var scatter := Feedback.for_event(block)
+	_check(not scatter.is_empty() and scatter.bursts.map(func(x): return x.kind).has("splinters") and scatter.sound.id == "wood_chop", "A pilum in the shield board throws splinters like an axe in wood")
+	_check(Feedback.for_event({"type":"projectile_miss", "energy_j":30.0, "surface_material":"soil"}).bursts[0].kind == "dust", "A missile in the ground raises dust")
 	# Arrow sticks without fouling; a sling bullet glances off.
 	for weapon: String in ["bow", "sling"]:
 		var s := _range(weapon, 9.0, 5, {}, {}, "legionary")

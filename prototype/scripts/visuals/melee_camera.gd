@@ -41,7 +41,7 @@ func zoom_by(factor: float) -> void:
 ## Impact from a melee event (hit/block/parry/guard_broken): amplitude grows
 ## with the logarithm of the impact energy.
 func impact(event: Dictionary) -> void:
-	if not event.get("type", "") in ["hit", "block", "parry", "guard_broken"]:
+	if not event.get("type", "") in ["hit", "block", "parry", "guard_broken", "projectile_hit", "projectile_block"]:
 		return
 	var energy := float(event.get("energy_j", 0.0))
 	_shake = maxf(_shake, clampf(log(1.0 + energy) / log(1.0 + 300.0), 0.0, 1.0) * 0.05)

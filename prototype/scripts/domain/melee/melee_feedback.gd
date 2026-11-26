@@ -11,13 +11,15 @@ extends RefCounted
 const MAX_BURST := 48
 const MAX_ACTIVE_BURSTS := 6
 const HARD := ["iron", "bronze"]
+const MISSILE_AS := {"projectile_hit":"hit", "projectile_block":"block", "projectile_miss":"ground"}
 
 
 ## Returns {"bursts":[{kind, count, speed, spread_deg, lifetime, gravity}],
 ## "sound":{id, gain_db, pitch}} for hit/block/parry/guard_broken/whiff/
-## shield_broken events; {} for events without an impact.
+## shield_broken events and missile impacts; {} for events without one.
 static func for_event(event: Dictionary) -> Dictionary:
-	var type := str(event.get("type", ""))
+	# A missile meeting a surface sounds and scatters like a blow on it.
+	var type := str(MISSILE_AS.get(event.get("type", ""), event.get("type", "")))
 	var energy := float(event.get("energy_j", 0.0))
 	var weapon := str(event.get("weapon_material", ""))
 	var surface := str(event.get("surface_material", ""))
@@ -29,6 +31,8 @@ static func for_event(event: Dictionary) -> Dictionary:
 		"shield_broken":
 			return {"bursts":[_burst("splinters", 1.0, 2.6, 70.0, 1.1), _burst("dust", 0.6, 0.9, 80.0, 1.4)],
 				"sound":{"id":"wood_crack", "gain_db":-2.0, "pitch":1.0}}
+		"ground":
+			return {"bursts":[_burst("dust", level * 0.6, 0.9, 70.0, 1.0)], "sound":{"id":"body_thud", "gain_db":lerpf(-20.0, -6.0, level), "pitch":0.9}}
 		"hit", "block", "parry", "guard_broken":
 			pass
 		_:
