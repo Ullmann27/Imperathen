@@ -1,0 +1,62 @@
+{
+  "buffer_memory_bytes": 22022588,
+  "device_confirmed": false,
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "mode": "before",
+  "profile": "high",
+  "renderer": "gl_compatibility",
+  "resolution": [
+    1280,
+    720
+  ],
+  "shots": [
+    {
+      "draw_calls": 2139,
+      "file": "before_high_exterior_wide.jpg",
+      "id": "exterior_wide",
+      "objects": 2139,
+      "primitives": 967168
+    },
+    {
+      "draw_calls": 1017,
+      "file": "before_high_arcade_closeup.jpg",
+      "id": "arcade_closeup",
+      "objects": 1017,
+      "primitives": 939978
+    },
+    {
+      "draw_calls": 1289,
+      "file": "before_high_entrance.jpg",
+      "id": "entrance",
+      "objects": 1289,
+      "primitives": 1028728
+    },
+    {
+      "draw_calls": 1413,
+      "file": "before_high_cavea_from_arena.jpg",
+      "id": "cavea_from_arena",
+      "objects": 1413,
+      "primitives": 918321
+    },
+    {
+      "draw_calls": 1671,
+      "file": "before_high_arena_floor.jpg",
+      "id": "arena_floor",
+      "objects": 1671,
+      "primitives": 1053542
+    },
+    {
+      "draw_calls": 2570,
+      "file": "before_high_piazza.jpg",
+      "id": "piazza",
+      "objects": 2570,
+      "primitives": 1151431
+    }
+  ],
+  "source_commit": "f77002555ae13f28d612914851c7409876527c77",
+  "static_memory_bytes": 41914152,
+  "texture_memory_bytes": 197019198,
+  "video_adapter": "llvmpipe (LLVM 20.1.2, 256 bits)",
+  "note": "PNG framebuffers converted to JPEG (quality 88) for repository size; unedited otherwise."
+}
