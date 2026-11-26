@@ -16,25 +16,26 @@ const SOLE_CONTACT_BAND_M := .004
 const SAMPLES_PER_REGION := 24
 ## Offline retarget report. It is produced by the youth build and is absent in
 ## checkouts and builds without the original youth, where only the legacy
-## bind-pose band applies.
+## bind-pose band applies. Each outfit variant of the youth has its own report
+## (same rig and clips, its own LOD meshes); see village_person.gd.
 const MOTION_REPORT := "res://assets/animations/accad_youth_motion.json"
-static var _report_read := false
-static var _report: Dictionary = {}
+static var _reports: Dictionary = {}
 
 
-## Reads the report once per process instead of on every LOD reload, and never
+## Reads each report once per process instead of on every LOD reload, and never
 ## asks the JSON parser for a file that does not exist.
-static func motion_report() -> Dictionary:
-	if not _report_read:
-		_report_read = true
-		if FileAccess.file_exists(MOTION_REPORT):
-			var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(MOTION_REPORT))
+static func motion_report(path: String = MOTION_REPORT) -> Dictionary:
+	if not _reports.has(path):
+		var report: Dictionary = {}
+		if FileAccess.file_exists(path):
+			var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 			if parsed is Dictionary:
-				_report = parsed
-	return _report
+				report = parsed
+		_reports[path] = report
+	return _reports[path]
 
 
-func bind(model: Node3D, level: int) -> void:
+func bind(model: Node3D, level: int, report_path: String = MOTION_REPORT) -> void:
 	samples.clear()
 	run_clearance.clear()
 	sole_planes.clear()
@@ -43,7 +44,7 @@ func bind(model: Node3D, level: int) -> void:
 	if not is_instance_valid(model):
 		return
 	var lod_report: Dictionary = {}
-	var lods: Array = motion_report().get("lods",[])
+	var lods: Array = motion_report(report_path).get("lods",[])
 	if level>=0 and level<lods.size() and lods[level] is Dictionary:
 		lod_report=lods[level]
 	var planes: Dictionary = lod_report.get("sole_planes",{})
