@@ -242,3 +242,36 @@ func _vessel_mesh(profile: Array[Vector2]) -> ArrayMesh:
 				mesh.add_vertex(points[corner])
 	mesh.generate_normals()
 	return mesh.commit()
+
+
+## Lets a dedicated interior (house_interiors.gd) replace the generic household
+## set of one home. The doorstep supplies outside the house are kept. In the
+## family home the story props (drinking jug and cup) and the anchors stay.
+func release_household(id: String) -> void:
+	for entry in _groups.duplicate():
+		if not is_instance_valid(entry) or entry.get_meta("household_id", "") != id or entry.name not in ["Household", "FamilyHome"]:
+			continue
+		if entry.name == "FamilyHome":
+			for child in entry.get_children():
+				if child not in _interactive:
+					_drop(child)
+		else:
+			_drop(entry)
+
+
+## Empties a craft site (the forge) for house_interiors.gd and returns its
+## node; the node, its position and its anchors stay.
+func release_site(title: String) -> Node3D:
+	var site := get_node_or_null(NodePath(title)) as Node3D
+	if site:
+		for child in site.get_children():
+			_drop(child)
+	return site
+
+
+func _drop(node: Node) -> void:
+	for inner in _groups.duplicate():
+		if is_instance_valid(inner) and (inner == node or node.is_ancestor_of(inner)):
+			_groups.erase(inner)
+	node.get_parent().remove_child(node)
+	node.free()
