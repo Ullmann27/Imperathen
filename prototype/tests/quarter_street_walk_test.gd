@@ -9,7 +9,33 @@ const DESTINATIONS := ["smith", "taberna", "domus", "west", "crossing", "east", 
 func _initialize() -> void:
 	_run.call_deferred()
 
+## Expansion across node 16384 used to alias (0,16386) with (1,2) in
+## both distance and route caches. Use the normal serialized graph loader.
+func _distinct_routes() -> bool:
+	var graph_path := OS.get_temp_dir().path_join("imperathen-street-pairs-%d.json" % OS.get_process_id())
+	var nodes := []
+	for i in 16387:
+		nodes.append([i, 0, 0])
+	var file := FileAccess.open(graph_path, FileAccess.WRITE)
+	if file == null:
+		return false
+	file.store_string(JSON.stringify({"format": Streets.FORMAT, "nodes": nodes, "edges": [[0, 16386], [1, 2]]}))
+	file.close()
+	var graph := Streets.new()
+	var loaded := graph.load_graph(graph_path)
+	DirAccess.remove_absolute(graph_path)
+	if not loaded:
+		return false
+	return graph.length(0, 16386) == 16386.0 and graph.length(1, 2) == 1.0 \
+		and graph.route(0, 16386)[1] == Vector3(16386, 0, 0) and graph.route(1, 2)[1] == Vector3(2, 0, 0) \
+		and graph.route(2, 1)[1] == Vector3(1, 0, 0)
+
+
 func _run() -> void:
+	if not _distinct_routes():
+		printerr("QUARTER_STREET_WALK_FAIL aliased route keys")
+		quit(1)
+		return
 	var city := City.new()
 	city.persist = false
 	city.profile = "low"
