@@ -20,9 +20,9 @@ const Calendar = preload("res://scripts/domain/world_calendar.gd")
 const Anchors = preload("res://scripts/domain/city_anchors.gd")
 const Streets = preload("res://scripts/domain/city_streets.gd")
 const Population = preload("res://scripts/domain/city_population.gd")
-const Relations = preload("res://scripts/domain/actor_relations.gd")
+const Social = preload("res://scripts/domain/city_social.gd")
 
-const VERSION := 1
+const VERSION := 2
 const ECONOMY_PATH := "res://assets/city/economy/city_economy.json"
 const DAY := 86400
 const SYS_DAY := 8190
@@ -101,8 +101,7 @@ func found(seed: int, jdn: int, second_of_day: int) -> bool:
 		_stock_pantry(state.households[hh])
 	state.money_total = _money_sum()
 	state = _canon(state)
-	for graph: Dictionary in state.relations:
-		Relations.normalize(graph)
+	Social.restore(state)
 	_rebuild_runtime()
 	var first_close := (second_of_day / DAY) * DAY + CLOSE_HOUR * 3600
 	if first_close <= second_of_day:
@@ -128,8 +127,7 @@ func load_state(saved: Variant) -> bool:
 		error = problem
 		return false
 	state = _canon((saved as Dictionary).duplicate(true))
-	for graph: Dictionary in state.relations:
-		Relations.normalize(graph)
+	Social.restore(state)
 	year = Calendar.year_of(int(state.origin_jdn) + int(state.now) / DAY)
 	_index_anchors()
 	for resident: Dictionary in state.residents:
@@ -149,7 +147,7 @@ func load_state(saved: Variant) -> bool:
 
 
 static func validate(saved: Variant) -> String:
-	if not saved is Dictionary or int(saved.get("version", 0)) != VERSION:
+	if not saved is Dictionary or not Calendar.is_integral(saved.get("version")) or int(saved.version) not in [1, VERSION]:
 		return "Unbekannter Stadtstand."
 	for key: String in ["seed", "origin_jdn", "t", "now", "money_total", "event_seq", "next_job", "news", "closed_day"]:
 		if not Calendar.is_integral(saved.get(key)):
@@ -174,10 +172,9 @@ static func validate(saved: Variant) -> String:
 		if not Calendar.is_integral(person.hh) or not Calendar.is_integral(person.slot) or not Calendar.is_integral(person.wake) or not Calendar.is_integral(person.purse) or person.purse < 0:
 			return "Ungültiger Einwohnerzustand."
 		people[Population.resident_id(number)] = true
-	for graph: Variant in saved.relations:
-		var error_text := Relations.validate(graph, people, int(saved.t) / DAY / 7)
-		if not error_text.is_empty():
-			return error_text
+	var relation_error := Social.validate_saved(saved, people, int(saved.t) / DAY / 7)
+	if not relation_error.is_empty():
+		return relation_error
 	for household: Variant in saved.households:
 		if not household is Dictionary or not household.get("members") is Array or not Calendar.is_integral(household.get("funds")) or household.funds < 0:
 			return "Haushalt beschädigt."
@@ -1452,8 +1449,7 @@ func _theft(person: int, resident: Dictionary, t: int) -> void:
 	state.news = int(state.news) + 1
 	_event(t, "theft", {"a": person, "b": vendor, "business": number, "at": business.queue, "good": good, "noticed": noticed})
 	if noticed:
-		var id := "theft:%d:%d" % [t, person]
-		Relations.apply(Population.graph_for(state, vendor), Population.resident_id(vendor), Population.resident_id(person), id, t / DAY / 7, "theft", {"trust": -25.0, "grievance": 30.0})
+		Social.witnessed_theft(state, vendor, person, t)
 		state.residents[vendor].heard = int(state.news)
 		alarm(t, "theft", business.queue, 45.0, person)
 	resident.until = t + 2
@@ -1623,7 +1619,7 @@ func _close_day(t: int) -> void:
 		if weekly:
 			_job_market(t)
 	elif stage <= business_stages + household_stages + shard_stages:
-		Relations.decay(state.relations[stage - business_stages - household_stages - 1], 1)
+		Social.close_week(state, stage - business_stages - household_stages - 1)
 	elif stage <= business_stages + household_stages + shard_stages + resident_stages:
 		var first: int = (stage - business_stages - household_stages - shard_stages - 1) * CLOSE_RESIDENT_CHUNK
 		_courtship(t, first, mini(state.residents.size(), first + CLOSE_RESIDENT_CHUNK))

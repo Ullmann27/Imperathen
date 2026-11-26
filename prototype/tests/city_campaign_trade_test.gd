@@ -54,7 +54,9 @@ func _run() -> void:
 	var failed := model.execute_city_at("city_buy", Bread, "receipt", session, Sites, Sites.bakery, broken)
 	_check(not failed.ok and session.generation == before and not model.data.command_log.has("receipt"), "Schreibfehler verbraucht weder Generation noch Befehlskennung")
 	_check(model.data.resources.denarii == start_cash and session.life.state.businesses[biz].stock.bread == stock and session.life.state.businesses[biz].till == till, "Schreibfehler verändert keine Kasse und keinen Vorrat")
+	var buy_started := Time.get_ticks_usec()
 	var bought := model.execute_city_at("city_buy", Bread, "receipt", session, Sites, Sites.bakery, path)
+	var buy_usec := Time.get_ticks_usec() - buy_started
 	_check(bought.ok, "Kauf gilt nach atomarem Schreiben: " + str(bought))
 	_check(model.data.player.position == origin, "Marktkoordinaten verändern Dorfrückkehrposition nicht")
 	_check(int(model.data.resources.denarii) == start_cash - 2 and int(model.data.village.city_trade.inventory.bread) == 1, "Ein Brot gegen zwei Denare")
@@ -63,7 +65,9 @@ func _run() -> void:
 	_check(session.life.audit().ok, "Stadtbilanz stimmt")
 	_check(not model.checkpoint_city(inactive, path).ok, "Veraltete Stadtsitzung darf Kauf nicht überschreiben")
 	var reloaded := Model.new()
+	var load_started := Time.get_ticks_usec()
 	_check(reloaded.load_game(path).ok, "Welt, Geld und Inventar im selben Neustart geladen")
+	var load_usec := Time.get_ticks_usec() - load_started
 	var resumed := Session.new()
 	_check(resumed.open_campaign(reloaded.data, Callable()), "Haushalte und Betriebe aus Kampagnenslot wiederhergestellt")
 	_check(resumed.life.state.businesses[biz].till == till + 128 and resumed.life.state.businesses[biz].stock.bread == stock - 1, "Bäcker hat nach Neustart denselben Bestand und dieselbe Kasse")
@@ -85,7 +89,21 @@ func _run() -> void:
 	_check(recovery.data.village.city_trade.inventory.bread == 1 and recovery.data.resources.denarii == start_cash - 2, "Sicherung stellt Spieler und Transaktion zusammen wieder her")
 	var recovered_city := Session.new()
 	_check(recovered_city.open_campaign(recovery.data, Callable()) and recovered_city.life.state.businesses[biz].stock.bread == stock - 1, "Betrieb im Sicherungsstand passt zur Ware")
+	var old_city := recovered_city.life.save_state()
+	old_city.version = 1
+	for shard in old_city.relations.size():
+		old_city.relations[shard] = {"version": 1, "edges": old_city.relations[shard].edges}
+	var restored_study := Session.new()
+	_check(restored_study.restore(recovery.data.calendar.clock, old_city), "Belegter Studienstand v1 erhält eindeutig zugeordnete Stadtbeziehungen")
+	_check(restored_study.life.state.version == 2 and restored_study.life.state.relations == recovered_city.life.state.relations, "Frühere Personenbeziehungen und Ereignisse bleiben genau erhalten")
+	var missing_site := recovered_city.life.save_state()
+	missing_site.residents[0].at = "forum.shrine_temple"
+	missing_site.residents[0].prev = "forum.shrine_temple"
+	missing_site.residents[0].slot = -1
+	var incompatible := Session.new()
+	_check(not incompatible.restore(recovery.data.calendar.clock, missing_site, func(_node: String) -> bool: return false), "Bei fehlender bewohnter 3D-Verankerung bleibt die alte Stadt unangetastet")
 	var pack: Dictionary = recovery.data.world_state.city
+	print("CITY_SAVE_DESKTOP buy_commit_usec=%d world_load_usec=%d" % [buy_usec, load_usec])
 	print("CITY_SAVE compressed_base64_bytes=%d json_city_bytes=%d people=%d businesses=%d purchase_denarii=2 paid_quadrantes=128" % [str(pack.zstd).length(), int(pack.bytes), session.life.state.residents.size(), session.life.state.businesses.size()])
 	# Carry pre-integration receipts forward without booking old cash into the
 	# new city's till, and reject a city snapshot spliced from a different trade.

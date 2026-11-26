@@ -3,6 +3,7 @@ extends SceneTree
 ## world (#99) and military (#100); one save contract with a real migration
 ## chain; one person-id namespace; one write path into the relation graph.
 
+const CitySocial = preload("res://scripts/domain/city_social.gd")
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const WorldClock = preload("res://scripts/domain/world_clock.gd")
 const WorldState = preload("res://scripts/domain/world_state.gd")
@@ -795,15 +796,33 @@ func _test_relation_api() -> void:
 	_check(model.save_game(path).ok and loaded.load_game(path).ok and _json(loaded.data.tribes.relations) == _json(model.data.tribes.relations), "The graph survives save and load exactly")
 	var legacy = WorldModel.new()
 	_check(not legacy.relation_event("pc:player", "ubii_rhine", "gift").ok, "A world without a tribal situation has no graph to write")
-	# One write path: only the relation core changes edges, only the tribal
-	# simulation calls it, and everything else goes through the world state.
+	# The tribal ledger retains exactly its original writer. Local city memories
+	# occupy differently shaped, stamped shards in the same saved world.
 	var writers := {}
 	_scan("res://scripts", writers)
 	var callers: Array = writers.get("calls", [])
 	var raw: Array = writers.get("raw", [])
 	callers.sort()
-	_check(callers == ["res://scripts/domain/tribal_world.gd"], "Only the tribal simulation calls the relation core's writers: " + str(callers))
+	_check(callers == ["res://scripts/domain/tribal_world.gd"], "Only the tribal simulation calls the tribal relation core's writers: " + str(callers))
+	_check(writers.get("city_calls", []) == ["res://scripts/domain/city_social.gd"], "Only the district adapter writes city relations")
 	_check(raw.is_empty(), "No script edits relation edges directly: " + str(raw))
+	var city := {"version": 2, "residents": [{"known": []}, {"known": []}], "relations": CitySocial.new_shards()}
+	var original_tribes := _json(model.data.tribes.relations)
+	_check(CitySocial.meeting(city, 0, 1, "forum:1", 0, "work", 3) and CitySocial.trust(city, 0, 1) == 3, "Meeting creates a local dated, directed resident relationship")
+	_check(not CitySocial.meeting(city, -1, 1, "forum:2", 0, "work", 3) and not CitySocial.witnessed_theft(city, 1, 77, 0), "Unknown city residents cannot enter the graph")
+	var rightful: Dictionary = city.relations[0]
+	city.relations[0] = model.data.tribes.relations
+	_check(not CitySocial.meeting(city, 0, 1, "wrong-ledger", 0, "work", 3) and not CitySocial.close_week(city, 0), "A tribal graph injected into a city shard rejects both writes and decay")
+	_check(_json(model.data.tribes.relations) == original_tribes, "Injected tribal ledger remains intact")
+	city.relations[0] = city.relations[1]
+	_check(not CitySocial.witnessed_theft(city, 0, 1, 100), "Moving a shard to a foreign resident index does not reassign its owners")
+	city.relations[0] = rightful
+	var probe := {}
+	_inspect_relations("foreign.gd", 'const Other = preload("res://scripts/domain/actor_relations.gd")\nOther.apply(tribes.relations, a, b)', probe)
+	_check(probe.get("calls", []) == ["foreign.gd"], "Unauthorised relation writer with renamed import is detected")
+	probe = {}
+	_inspect_relations("res://scripts/domain/city_social.gd", "Relations.apply(state.tribes.relations, a, b)", probe)
+	_check(probe.get("calls", []) == ["res://scripts/domain/city_social.gd"], "Even the adapter cannot pass a tribal ledger to the core")
 
 
 func _scan(path: String, found: Dictionary) -> void:
@@ -816,18 +835,28 @@ func _scan(path: String, found: Dictionary) -> void:
 		if not filename.ends_with(".gd"):
 			continue
 		var file := path.path_join(filename)
-		if file == "res://scripts/domain/actor_relations.gd":
-			continue
-		var text := FileAccess.get_file_as_string(file)
-		for writer: String in ["Relations.apply(", "Relations.introduce(", "Relations.decay(", "Relations.decay_keys("]:
-			if text.contains(writer):
-				if not found.has("calls"):
-					found["calls"] = []
-				if not file in found.calls:
-					found.calls.append(file)
-		for pattern: String in ["relations\\.edges\\[[^\\]]*\\](\\.\\w+|\\[[^\\]]*\\])*\\s*[-+*/]?=[^=]", "relations\\.edges\\.(erase|clear|merge)\\(", "relations\\.edges\\s*=[^=]"]:
-			var regex := RegEx.create_from_string(pattern)
-			if regex.search(text) != null:
-				if not found.has("raw"):
-					found["raw"] = []
-				found.raw.append(file)
+		if file != "res://scripts/domain/actor_relations.gd":
+			_inspect_relations(file, FileAccess.get_file_as_string(file), found)
+
+
+func _inspect_relations(file: String, text: String, found: Dictionary) -> void:
+	var aliases := ["Relations"]
+	var imports := RegEx.create_from_string('(?m)^\\s*const\\s+(\\w+)\\s*:?=\\s*preload\\(["\']res://scripts/domain/actor_relations\\.gd["\']\\)')
+	for match_result in imports.search_all(text):
+		var alias := match_result.get_string(1)
+		if alias not in aliases:
+			aliases.append(alias)
+	for alias: String in aliases:
+		var invocation := RegEx.create_from_string("\\b" + alias + "\\.\\s*(apply|introduce|decay|decay_keys|remove_actor)\\s*\\(\\s*([^,)]*)")
+		for call_info in invocation.search_all(text):
+			var is_local := file == "res://scripts/domain/city_social.gd" and call_info.get_string(2).strip_edges() == "graph"
+			var key := "city_calls" if is_local else "calls"
+			if not found.has(key):
+				found[key] = []
+			if file not in found[key]:
+				found[key].append(file)
+	for pattern: String in ["\\.edges\\[[^\\]]*\\](\\.\\w+|\\[[^\\]]*\\])*\\s*[-+*/]?=[^=]", "\\.edges\\.(erase|clear|merge)\\(", "\\.edges\\s*=[^=]"]:
+		if RegEx.create_from_string(pattern).search(text) != null:
+			if not found.has("raw"):
+				found["raw"] = []
+			found.raw.append(file)
