@@ -47,12 +47,16 @@ const ROMAN_NUMERALS := ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX",
 
 static var _body_font: Font
 static var _display_cache: Dictionary = {}
+## Test hook: simulate a phone density (logical units per dp) on desktop.
+static var dp_override := 0.0
 
 
 ## Logical units per dp. Desktop and the headless tests use one unit per dp.
 ## On a phone the canvas is stretched from the 1280 x 720 design size, so a
 ## unit covers a different number of physical pixels on every display.
 static func units_per_dp(viewport: Viewport) -> float:
+	if dp_override > 0.0:
+		return dp_override
 	if viewport == null or not OS.has_feature("mobile"):
 		return 1.0
 	var dpi := float(DisplayServer.screen_get_dpi())

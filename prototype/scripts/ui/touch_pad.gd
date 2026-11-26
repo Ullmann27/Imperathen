@@ -117,7 +117,7 @@ func _draw() -> void:
 	# Roman bronze ring: four gilded diamonds mark the axes, the knob is a coin.
 	var center := size * 0.5
 	var radius := maxf(24.0, minf(size.x, size.y) * 0.5 - 19.0)
-	var presence := lerpf(0.6, 1.0, _engaged)
+	var presence := lerpf(0.5, 1.0, _engaged)
 	draw_circle(center, radius, Color(0.045, 0.034, 0.025, 0.2 + 0.25 * _engaged))
 	draw_arc(center, radius, 0, TAU, 80, Color(Style.BRONZE, 0.78 * presence), 1.8, true)
 	draw_arc(center, radius - 5.0, 0, TAU, 80, Color(Style.AURUM, 0.22 * presence), 1.0, true)

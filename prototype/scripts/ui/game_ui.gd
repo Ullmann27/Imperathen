@@ -150,6 +150,8 @@ var _alert: Label
 var _context := ""
 var _journal_tab := "chronicle"
 var _hud: Dictionary = {}
+var _chrome_buttons: Array[Button] = []
+var _chrome_compact := false
 
 
 func _ready() -> void:
@@ -1047,6 +1049,7 @@ func update_navigation(value: Dictionary) -> void:
 	if _view_state != "game":
 		return
 	_set_context(str(value.get("context", "")))
+	_update_chrome()
 	if not is_instance_valid(_navigation):
 		return
 	_navigation.update_view(value)
@@ -1150,7 +1153,12 @@ func set_mode(mode: String) -> void:
 		return
 	for key in _mode_buttons:
 		var button: Button = _mode_buttons[key]
+		button.set_meta("plaque_active", key == mode)
 		HudStyle.style_plaque_button(button, false, HudStyle.TYPE_CAPTION + 1, key == mode)
+		if bool(button.get_meta("compact", false)):
+			_icon_only(button)
+	if is_instance_valid(_director) and _director.context.get("mode", mode) != mode:
+		_director.wake("dock", 6.0)
 	var hints := {
 		"person": "WASD bewegen  ·  Rechte Maus drehen  ·  E interagieren  ·  Linksklick / Leertaste kämpfen",
 		"city": "B Bauplan öffnen  ·  Linksklick platzieren  ·  Tab zur Figur  ·  Die Figur bleibt an ihrem Ort.",
@@ -1251,6 +1259,8 @@ func _open_screen(screen_name: String, darken: bool, menu_style := false) -> voi
 	_mission_card = null
 	_alert = null
 	_context = ""
+	_chrome_buttons.clear()
+	_chrome_compact = false
 	if is_instance_valid(_director):
 		_director.clear()
 	if _screen != null:
@@ -1418,6 +1428,7 @@ func _build_top_bar() -> void:
 		button.name = "Corner_" + button.text.get_slice(" ", 0)
 		row.add_child(button)
 		_director.register("corner", button)
+		_chrome_buttons.append(button)
 	# Fit: names when there is room beside compass and objective, glyphs otherwise.
 	var compass_width := clampf(area.x * 0.26, 220.0, 340.0)
 	var room := func() -> float:
@@ -1426,6 +1437,7 @@ func _build_top_bar() -> void:
 	if room.call() < 230.0:
 		for button in buttons:
 			_icon_only(button)
+			button.set_meta("always_compact", true)
 	if room.call() < 230.0:
 		time.visible = false
 	var width := row.get_combined_minimum_size().x + 30.0
@@ -1442,6 +1454,7 @@ func _build_top_bar() -> void:
 func _hud_button(text: String, callback: Callable, glyph := "", primary := false) -> Button:
 	var button: Button = TouchActionScript.new() if _touch_enabled else Button.new()
 	button.text = text
+	button.set_meta("plaque_primary", primary)
 	HudStyle.style_plaque_button(button, primary, HudStyle.TYPE_CAPTION + 1)
 	if not glyph.is_empty():
 		button.icon = HudIcons.texture(glyph, roundi(20 * _screen_scale), 1.6)
@@ -1457,8 +1470,10 @@ func _hud_button(text: String, callback: Callable, glyph := "", primary := false
 	return button
 
 
-## Glyph-only plaque on narrow displays; the name stays as text and tooltip.
+## Glyph-only plaque on narrow displays and while exploration is calm; the
+## name stays as text and tooltip. `_plaque_labels` brings the name back.
 func _icon_only(button: Button) -> void:
+	button.set_meta("compact", true)
 	button.clip_text = true
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	for color in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_disabled_color", "font_outline_color"]:
@@ -1471,6 +1486,32 @@ func _icon_only(button: Button) -> void:
 			box.content_margin_left = 8
 			box.content_margin_right = 8
 			button.add_theme_stylebox_override(state, box)
+
+
+func _plaque_labels(button: Button) -> void:
+	button.set_meta("compact", false)
+	button.clip_text = false
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.custom_minimum_size.x = 0.0
+	HudStyle.style_plaque_button(button, bool(button.get_meta("plaque_primary", false)), HudStyle.TYPE_CAPTION + 1, bool(button.get_meta("plaque_active", false)))
+
+
+## Calm exploration shows command plaques as glyphs only; entering the game,
+## a mode change or leaving calm brings their names back.
+func _update_chrome() -> void:
+	if not _touch_enabled or not is_instance_valid(_director) or _view_state != "game":
+		return
+	var compact: bool = _director.calm() and not _director.is_awake("controls_hint") and not _director.is_awake("dock")
+	if compact == _chrome_compact:
+		return
+	_chrome_compact = compact
+	for button: Button in _chrome_buttons:
+		if not is_instance_valid(button) or bool(button.get_meta("always_compact", false)):
+			continue
+		if compact:
+			_icon_only(button)
+		else:
+			_plaque_labels(button)
 
 
 func _build_navigation() -> void:
@@ -1755,13 +1796,20 @@ func _build_touch_toolbar() -> void:
 	row.add_child(commands)
 	var natural := row.get_combined_minimum_size().x + 68.0
 	var width := minf(natural, area.x - gutter * 2.0)
+	for child: Node in row.get_children():
+		if child is Button:
+			_chrome_buttons.append(child as Button)
 	if natural > area.x - gutter * 2.0:
 		for child: Node in row.get_children():
 			(child as Control).size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			if child is Button:
 				_icon_only(child)
-	panel.size = Vector2(width, _hud.dock_height)
-	panel.position = Vector2((area.x - width) * 0.5, area.y - 8.0 - _hud.dock_height)
+				child.set_meta("always_compact", true)
+		panel.size = Vector2(width, _hud.dock_height)
+		panel.position = Vector2((area.x - width) * 0.5, area.y - 8.0 - _hud.dock_height)
+	else:
+		panel.minimum_size_changed.connect(_anchor_bottom_center.bind(panel, Vector2(area.x * 0.5, area.y - 8.0), _hud.dock_height))
+		_anchor_bottom_center(panel, Vector2(area.x * 0.5, area.y - 8.0), _hud.dock_height)
 	_director.register("dock", panel)
 	_hud_labels["controls"] = HudStyle.label("", HudStyle.TYPE_CAPTION, HudStyle.CHARTA_MUTED)
 	_hud_labels["controls"].hide()
@@ -1999,6 +2047,14 @@ func _anchor_bottom_left(control: Control, corner: Vector2, width: float) -> voi
 		return
 	control.size = Vector2(width, 0)
 	control.position = Vector2(corner.x, corner.y - control.size.y)
+
+
+func _anchor_bottom_center(control: Control, bottom: Vector2, height: float) -> void:
+	if not is_instance_valid(control) or not control.is_inside_tree():
+		return
+	var fitted := control.get_combined_minimum_size()
+	control.size = Vector2(fitted.x, height)
+	control.position = Vector2(bottom.x - fitted.x * 0.5, bottom.y - height)
 
 
 func _anchor_center(control: Control, center: Vector2) -> void:
