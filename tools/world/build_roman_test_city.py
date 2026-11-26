@@ -177,8 +177,10 @@ class Mesh:
     def column(self,x,y,base,h,r=.3,order=0):
         saved=self.physical
         self.cylinder((x,y,base+h*.5),r,h,STONE,12,r_top=r*.86)
-        self.physical=False
+        # The plinth is as solid as the shaft: its corners stand out of the
+        # shaft's collider at shin height.
         self.box((x,y,base+.12),(r*2.9,r*2.9,.24),STONE)
+        self.physical=False
         self.cylinder((x,y,base+.35),r*1.24,.22,STONE)
         self.cylinder((x,y,base+h-.34),r*1.24,.22,STONE)
         self.box((x,y,base+h-.12),(r*3,r*3,.24),STONE)
@@ -308,7 +310,7 @@ OBSTACLE_CELL=16.0
 # Buildings and walls are solid over their whole bounding box. Placed props are
 # validated (and then registered) per 1 m height band, so a tree canopy may
 # hang over a 0.8 m plot wall or a market awning but never into a building.
-KERB_TOP=.22
+KERB_TOP=.16
 SOLID_CATEGORIES={'residential','craft_shop','civic','baths','portico','fountain','city_wall','gate','aqueduct'}
 PROP_CATEGORIES={'market_stall','street_detail','vegetation'}
 CITY_INTERIOR=(-408.75,-318.75,408.75,318.75)  # inner faces of the 2.5 m thick city wall
@@ -635,7 +637,9 @@ def stall(kind,construction):
         for n in range(12):m.cylinder((-1.3+(n%4)*.85,-.8+(n//4)*.5,1.23),.27,.2,OCHRE,10,r_top=.20)
     elif kind==3:
         for n in range(8):
-            x=-1.4+(n%4)*.92;y=-.6+(n//4)*.9
+            # Both rows stand on the 1.4 m board (the back row used to hang
+            # half over its edge at y=.3).
+            x=-1.4+(n%4)*.92;y=-.82+(n//4)*.72
             m.cylinder((x,y,1.39),.24,.6,CLAY,10,r_top=.18)
             m.cylinder((x,y,1.74),.1,.2,CLAY,10)
             for side in (-1,1):m.beam((x+side*.14,y,1.7),(x+side*.32,y,1.48),.035,CLAY)
@@ -1002,10 +1006,12 @@ def ground():
     m=SurfaceTiles('Main_Streets','Main_Streets')
     m.box((0,-65,.055),(835,14,.11),PAVING)
     m.box((-100,0,.055),(13,655,.11),PAVING)
-    # Kerbs are solid and low enough to step onto from either side (0.22 m
-    # above the ground, 0.11 m above the paving; the player step limit is
-    # 0.25 m). They used to be 0.32 m visual-only boxes that feet sank into,
-    # and ran straight across the north-south street.
+    # Kerbs are solid: 0.16 m above the ground, 0.05 m above the paving. They
+    # used to be 0.32 m visual-only boxes that feet sank into, and ran straight
+    # across the north-south street. The heights are chosen for the player
+    # capsule (radius 0.24 m): from the paving the 0.05 m edge is a walkable
+    # slope; a 0.11 m edge (first attempt, 0.22 m kerb) meets the capsule at
+    # about 45 degrees, where the controller neither steps nor slides.
     for y in (-72.4,-57.6):
         for x0,x1 in ((-407.5,-106.5),(-93.5,407.5)):
             m.box(((x0+x1)*.5,y,KERB_TOP*.5),(x1-x0,.65,KERB_TOP),STONE)

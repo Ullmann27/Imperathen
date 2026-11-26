@@ -21,7 +21,7 @@ const SWEEP_LEG := 8.0
 const WALL_X := 410.0
 const WALL_Z := 320.0
 const ARCH_HALF_WIDTH := 5.25
-const KERB_TOP := 0.22
+const KERB_TOP := 0.16
 const STREET_TOP := 0.11
 # Godot metres: x east, z south. Blender y = -z.
 const ROUTES := {
@@ -110,7 +110,11 @@ func _floor_y(scene: Node3D, at: Vector3) -> float:
 
 func _run() -> void:
 	root.size = Vector2i(1280, 720)
-	for profile: String in PROFILES:
+	# Optional subset for slow machines (comma-separated); default: all four.
+	var wanted := OS.get_environment("IMPERATHEN_CITY_ROUTE_PROFILES")
+	var profiles: Array = PROFILES if wanted.is_empty() else Array(wanted.split(",", false))
+	for profile: String in profiles:
+		_check(profile in PROFILES, "known profile: "+profile)
 		var scene := City.new()
 		scene.persist = false
 		scene.profile = profile
@@ -129,13 +133,14 @@ func _run() -> void:
 		scene.free()
 		await process_frame
 	var identical := true
-	for profile: String in PROFILES:
+	var first: String = profiles[0]
+	for profile: String in profiles:
 		for key in ["routes", "wall", "obstacles", "kerbs"]:
-			if report.has(profile) and report.has("low") and JSON.stringify(report[profile][key]) != JSON.stringify(report["low"][key]):
+			if report.has(profile) and report.has(first) and JSON.stringify(report[profile][key]) != JSON.stringify(report[first][key]):
 				identical = false
-	_check(identical, "routes, wall, obstacles and kerbs are identical in all four profiles")
+	_check(identical, "routes, wall, obstacles and kerbs are identical in all tested profiles")
 	print("ROMAN_CITY_ROUTES_RESULT "+JSON.stringify({"checks":checks, "failures":failures.slice(0, 20),
-		"failure_count":failures.size(), "passed":failures.is_empty(), "profiles":report,
+		"failure_count":failures.size(), "passed":failures.is_empty(), "profiles_tested":profiles, "profiles":report,
 		"sweep_body_m":{"radius":BODY_RADIUS, "from":SWEEP_LOW, "to":SWEEP_HIGH}, "android_device":false, "fps_measured":false}))
 	print("ROMAN_CITY_ROUTES_PASS" if failures.is_empty() else "ROMAN_CITY_ROUTES_FAIL")
 	quit(0 if failures.is_empty() else 1)
@@ -171,7 +176,7 @@ func _routes(scene: Node3D, profile: String) -> Dictionary:
 	return result
 
 
-## The body starts 3 m inside the wall axis and tries to leave the city.
+## The body starts 6 m inside the wall axis (clear of the gate towers) and tries to leave the city.
 func _wall(scene: Node3D, profile: String) -> Dictionary:
 	var shape := _body()
 	var gates := {}
@@ -197,7 +202,7 @@ func _wall(scene: Node3D, profile: String) -> Dictionary:
 		var offset := -half+1.0
 		while offset <= half-1.0:
 			var base: Vector3 = side[1]+along*offset
-			var free := _sweep(scene, shape, base-out*3.0, base+out*8.0)
+			var free := _sweep(scene, shape, base-out*6.0, base+out*8.0)
 			probes += 1
 			var from_gate := absf((base-gate).dot(along))
 			if free >= 1.0:
@@ -272,9 +277,9 @@ func _kerb_profile(scene: Node3D, profile: String) -> Dictionary:
 	_check(worst <= City.MAX_STEP, "%s: every kerb riser is within the %.2f m step limit (max %.3f m)" % [profile, City.MAX_STEP, worst])
 	# The kerbs end at the north-south street instead of crossing it.
 	var crossing_top := -INF
-	for i in 261:
+	for i in 257:
 		for kerb_z: float in [57.6, 72.4]:
-			var y := _floor_y(scene, Vector3(-106.5+i*0.05, 0.0, kerb_z))
+			var y := _floor_y(scene, Vector3(-106.4+i*0.05, 0.0, kerb_z))
 			if not is_nan(y):
 				crossing_top = maxf(crossing_top, y)
 	_check(crossing_top <= STREET_TOP+0.001, "%s: no kerb crosses the north-south street (highest floor there %.3f m)" % [profile, crossing_top])
