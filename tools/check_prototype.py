@@ -28,7 +28,7 @@ FAILURE = re.compile(r"SCRIPT ERROR:|Parse Error:|^ERROR:|^USER ERROR:", re.MULT
 
 def run_check(engine, name, arguments, marker, environment, report):
     started = time.monotonic()
-    timeout = {"import": 600, "motion_measurement": 2400}.get(name, 120)
+    timeout = {"import": 600, "motion_measurement": 2400, "formation_agents": 600, "formation_levels": 600}.get(name, 120)
     try:
         result = subprocess.run([engine, "--headless", "--path", str(PROJECT), *arguments],
                                 cwd=ROOT, env=environment, text=True, encoding="utf-8",
@@ -182,6 +182,8 @@ def main():
             ("valley_orders", ["--fixed-fps", "60", "--script", "res://tests/valley_orders_test.gd"], "failures=0 smallest_row_px="),
             ("soldier_visuals", ["--script", "res://tests/soldier_visual_test.gd"], "0 failed"),
             ("soldier_gait", ["--fixed-fps", "60", "--script", "res://tests/soldier_gait_test.gd"], "failures=0"),
+            ("formation_agents", ["--fixed-fps", "60", "--script", "res://tests/formation_agents_test.gd"], "FORMATION_AGENTS_PASS"),
+            ("formation_levels", ["--fixed-fps", "60", "--script", "res://tests/formation_agents_test.gd", "++", "large"], "FORMATION_AGENTS_PASS"),
             ("village_people", ["--fixed-fps", "60", "--script", "res://tests/village_person_test.gd"], "checks, 0 failed"),
             ("youth_outfit_skin", ["--script", "res://tests/youth_outfit_skin_test.gd"], "YOUTH_OUTFIT_SKIN_PASS"),
             ("youth_outfit", ["--script", "res://tests/youth_outfit_test.gd"], "YOUTH_OUTFIT_PASS"),

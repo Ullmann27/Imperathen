@@ -436,7 +436,9 @@
       "required_checks": [
         "soldier_gait",
         "soldier_visuals",
-        "frontier_people"
+        "frontier_people",
+        "formation_agents",
+        "formation_levels"
       ],
       "review_scope": [
         "march_run_retreat",
@@ -460,7 +462,9 @@
       "required_checks": [
         "soldier_visuals",
         "soldier_gait",
-        "battle_rules"
+        "battle_rules",
+        "formation_agents",
+        "formation_levels"
       ],
       "review_scope": [
         "stride_contact_at_visible_distance",
@@ -807,6 +811,7 @@
     "scripts/city_trade.gd",
     "scripts/city_trade_catalog.gd",
     "scripts/domain/calendar_ageing_participant.gd",
+    "scripts/domain/city_checkpoint.gd",
     "scripts/domain/combat_actions.gd",
     "scripts/domain/npc_behavior.gd",
     "scripts/domain/npc_social_memory.gd",
@@ -817,6 +822,9 @@
     "scripts/domain/unarmed_combat.gd",
     "scripts/domain/village_economy.gd",
     "scripts/domain/world_model.gd",
+    "scripts/formation/formation_agents.gd",
+    "scripts/formation/formation_levels.gd",
+    "scripts/formation/troop_motion.gd",
     "scripts/main.gd",
     "scripts/monuments/colosseum.gd",
     "scripts/monuments/colosseum_showcase.gd",
@@ -897,6 +905,7 @@
     "scripts/visuals/meshy_loadout_registry.gd",
     "scripts/visuals/natural_motion.gd",
     "scripts/visuals/practice_gear.gd",
+    "scripts/visuals/resident_footwear.gd",
     "scripts/visuals/service_gear.gd",
     "scripts/visuals/soldier_visual.gd",
     "scripts/visuals/village_person.gd",
@@ -908,12 +917,14 @@
     "scripts/viva_roma/closeup_lab.gd",
     "scripts/world/camera_obstruction.gd",
     "scripts/world/city_ambient_people.gd",
+    "scripts/world/city_bakery_display.gd",
     "scripts/world/city_exploration.gd",
     "scripts/world/city_exploration_crowd.gd",
     "scripts/world/city_exploration_state.gd",
-    "scripts/world/city_riding_trial.gd",
     "scripts/world/city_market_bridge.gd",
     "scripts/world/city_market_signage.gd",
+    "scripts/world/city_resident_view.gd",
+    "scripts/world/city_riding_trial.gd",
     "scripts/world/city_training.gd",
     "scripts/world/companion_world.gd",
     "scripts/world/game_world.gd",
@@ -961,11 +972,7 @@
     "shaders/viva_country/soil.gdshader",
     "shaders/viva_roma_ground.gdshader",
     "shaders/world_expansion/ground_detail.gdshader",
-    "shaders/world_expansion/vegetation_wind.gdshader",
-    "scripts/domain/city_checkpoint.gd",
-    "scripts/world/city_bakery_display.gd",
-    "scripts/world/city_resident_view.gd",
-    "scripts/visuals/resident_footwear.gd"
+    "shaders/world_expansion/vegetation_wind.gdshader"
   ],
   "procedural_owners": {
     "scripts/world/village_life_world.gd": [

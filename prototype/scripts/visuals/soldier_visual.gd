@@ -7,6 +7,7 @@ const LODS := ["near", "mid", "far"]
 const LOOPING := ["idle", "march", "run", "block", "wall", "testudo", "retreat"]
 const ALIASES := {"walk": "march", "fall": "death", "shield_wall": "wall", "bow": "shoot"}
 const STRIDES := {"march":1.30, "run":1.75, "retreat":1.48}
+const SWAP_AFTER := ["attack", "hit", "shoot"]
 const TINTS := [Color.WHITE, Color(0.96, 0.88, 0.77), Color(0.83, 0.91, 0.97)]
 const FRONTIER_ROLES := {"heavy": "legionary", "spear": "spearman", "archer": "archer", "officer": "officer"}
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
@@ -27,6 +28,7 @@ var _animation_sources: Dictionary = {}
 var _body: Node3D
 var _phase := 0.0
 var _manual_live := false
+var _blend_left := 0.0
 var _face := FacialMotion.new()
 
 func _ready() -> void:
@@ -54,6 +56,7 @@ func set_detail(level: int) -> void:
 
 func play_state(new_state: String, phase: float = 0.0) -> void:
 	_manual_live = false
+	_blend_left = 0.0
 	if player:
 		player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_IDLE
 	var clip: String = ALIASES.get(new_state, new_state)
@@ -79,6 +82,7 @@ func present(pose: String, phase: float, delta: float) -> void:
 		_manual_live = true
 		state = clip
 		player.play(clip,blend)
+		_blend_left = blend
 	# Both locomotion and actions use the timeline retained by ValleyScene.
 	# Replacing a far actor or changing its mesh cannot restart an attack.
 	var target := (fposmod(phase,1.0) if looping else clampf(phase,0.0,1.0))*animation.length
@@ -90,7 +94,41 @@ func present(pose: String, phase: float, delta: float) -> void:
 		player.advance(0.0)
 	else:
 		player.advance(forward)
+		_blend_left = maxf(0.0, _blend_left - forward)
 	_face.advance(delta, clip, detail)
+
+
+## The authored rank motion cannot be exchanged in a crossfade or an action.
+func blending() -> bool:
+	return _manual_live and _blend_left > 0.0
+
+
+func switch_ready() -> bool:
+	return not blending() and not (_manual_live and state in SWAP_AFTER)
+
+
+func reset_presentation() -> void:
+	_manual_live = false
+	_blend_left = 0.0
+
+
+## A reused rig is a different visual owner, never a different soldier UID.
+## Reset every instance's tint and face to the new roster identity.
+func prepare_reuse(new_variant: int, new_seed: int) -> void:
+	variant = posmod(new_variant, TINTS.size())
+	face_seed = new_seed
+	_appearance_seed = new_variant
+	reset_presentation()
+	if not is_instance_valid(_body):
+		return
+	var meshes: Array = [_body] if _body is MeshInstance3D else _body.find_children("*", "MeshInstance3D", true, false)
+	for instance: MeshInstance3D in meshes:
+		if instance.has_meta("formation_authored_material_known"):
+			instance.material_override = instance.get_meta("formation_authored_material", null)
+		_apply_tint(instance)
+	if detail < 2:
+		preload("res://scripts/visuals/roman_faces.gd").apply(_body, face_seed)
+	_face.bind(_body, "soldier_%s_%d_%d" % [role, variant, face_seed])
 
 
 static func clip_length(role_name: String, clip: String) -> float:
@@ -170,6 +208,10 @@ func _replace_body() -> void:
 	_play_clip()
 
 func _apply_tint(instance: MeshInstance3D) -> void:
+	if not instance.has_meta("formation_authored_material_known"):
+		instance.set_meta("formation_authored_material_known", true)
+		if instance.material_override != null:
+			instance.set_meta("formation_authored_material", instance.material_override)
 	if variant == 0:
 		return
 	var base := instance.mesh.surface_get_material(0) as StandardMaterial3D

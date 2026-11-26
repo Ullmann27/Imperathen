@@ -43,14 +43,26 @@ var pressed_at := 0
 var ghost := MultiMeshInstance3D.new()
 var agents: Agents
 var levels: Levels
-var _detail_clock := 0
+var presentation_clock := 0.0
+var levels_clock := 0.0
 var sampled_step := -1
 var lod_due := 0.0
+var rig_pool := {}
+var dying_actors := {}
+var far_index: Array[String] = []
+var rig_instantiations := 0
+var pool_deferrals := 0
+var instance_quota := 0
+var _initial_materialization := true
+const INSTANCES_PER_PASS := 3
+const MAX_POOLED_RIGS := 24
 
 func set_quality(new_profile: String) -> void:
 	if new_profile not in ["low", "balanced", "high", "very_high"]:
 		return
 	profile = new_profile
+	if levels != null:
+		levels.profile = profile
 	if is_inside_tree():
 		land.apply_quality(profile)
 		_sync_units()
@@ -58,9 +70,8 @@ func set_quality(new_profile: String) -> void:
 
 func _ready() -> void:
 	frame_remainder = float(model.snapshot().remainder)
-	if model.scenario.has("contracts"):
-		agents = Agents.new()
-		levels = Levels.new()
+	agents = Agents.new()
+	levels = Levels.new()
 	add_child(land)
 	add_child(far_ranks)
 	land.apply_quality(profile)
@@ -131,6 +142,7 @@ func _process(delta: float) -> void:
 		if model.outcome != "ongoing":
 			paused = true
 			battle_finished.emit()
+	presentation_clock += maxf(0.0, delta)
 	var turn := float(Input.is_key_pressed(KEY_E))-float(Input.is_key_pressed(KEY_Q))
 	if turn != 0:
 		azimuth += turn*delta*1.2
@@ -138,165 +150,180 @@ func _process(delta: float) -> void:
 	var direction := Vector2(float(Input.is_key_pressed(KEY_D))-float(Input.is_key_pressed(KEY_A)),float(Input.is_key_pressed(KEY_S))-float(Input.is_key_pressed(KEY_W)))
 	if direction != Vector2.ZERO:
 		_pan(direction.normalized().rotated(-azimuth)*delta*distance*0.55)
-	var agent_steps := agents.advance(model) if agents != null else 0
+	if hud.probe_step >= 0 and model.steps > hud.probe_step and agents.first_stride_probe < 0:
+		agents.first_stride_probe = hud.probe_step
+	var substeps: int = agents.advance(model)
+	if not agents.first_stride.is_empty():
+		if hud.probe_step >= 0:
+			hud.report_first_stride(model.steps, agents.first_stride.uid, agents.first_stride.pose, agents.first_stride.meters)
+		agents.first_stride_probe = -1
+		agents.first_stride = {}
 	lod_due -= delta
-	if sampled_step != model.steps or lod_due <= 0:
-		lod_due = 0.28
+	if sampled_step != model.steps or lod_due <= 0.0:
+		lod_due = 0.25
 		sampled_step = model.steps
 		_sync_units()
 		_refresh()
-	var fraction := clampf(frame_remainder / Rules.STEP,0.0,1.0)
-	if agents != null and agent_steps > 0:
+	elif substeps > 0:
 		_sync_formation_instances()
-	far_ranks.set_step_fraction(agents.render_fraction(model) if agents != null else fraction)
-	for id in actors:
-		var track: Dictionary = motion[id]
-		var actor = actors[id]
-		if agents != null and agents.agents.has(id):
-			var pose := agents.present_state(agents.agents[id], agents.render_fraction(model))
-			actor.position = pose.position
-			actor.rotation.y = pose.yaw
-			actor.present(pose.pose, pose.phase, elapsed)
-			continue
-		actor.position = track.start.lerp(track.end,fraction)
-		actor.rotation.y = lerp_angle(track.start_yaw, track.yaw, fraction)
-		actor.present(track.pose,lerpf(track.phase0,track.phase1,fraction),elapsed)
+	_present_agents(elapsed)
 	if gesture == "touch" and not selected.is_empty() and Time.get_ticks_msec()-pressed_at >= 360:
 		gesture = "deploy"
 		message = "Ziehe die Front. Loslassen bestätigt die markierten Plätze."
 		_preview()
 
+## One roster-owned identity and one visible representation per soldier.
+## The rule model still owns orders, losses and morale; this is the original
+## individual formation presentation, also used by ordinary campaign battles.
 func _sync_units() -> void:
-	var live := {}
-	var distant := {}
-	var far_gaits := {}
-	var far_starts := {}
-	var roster := {}
-	if agents != null:
-		agents.sync_model(model)
-		levels.profile = profile
-		var now := Time.get_ticks_msec()
-		levels.assign(agents.agents, camera.global_position, camera.is_position_in_frustum,
-			func(_uid: String) -> bool: return false, (now - _detail_clock) / 1000.0)
-		_detail_clock = now
-	var ranked := []
-	var near_limit := float({"low":13, "balanced":18, "high":25, "very_high":35}[profile])
-	var mid_limit := near_limit + float({"low":30, "balanced":30, "high":42, "very_high":55}[profile])
-	for s: Dictionary in model.squads.values():
-		if s.strength <= 0 or s.status == "withdrawn":
+	agents.sync_model(model)
+	# Transfer real casualties to the death timeline before assigning budgets.
+	for uid: String in actors.keys():
+		if agents.agents.has(uid):
 			continue
-		roster[s.id] = model.soldiers(s.id)
-		if agents != null:
+		var node = actors[uid]
+		actors.erase(uid)
+		if agents.fallen.has(uid) and node.role != "cavalry":
+			dying_actors[uid] = node
+		else:
+			_release_rig(node)
+	for uid: String in dying_actors.keys():
+		if not agents.fallen.has(uid):
+			_release_rig(dying_actors[uid])
+			dying_actors.erase(uid)
+	# A profile reduction cannot leave excess hidden or dying animated rigs.
+	var budget: Dictionary = Levels.BUDGETS[profile]
+	var cap := int(budget.near_rigs) + int(budget.mid_rigs)
+	while dying_actors.size() > cap:
+		var uid: String = dying_actors.keys()[0]
+		_release_rig(dying_actors[uid])
+		dying_actors.erase(uid)
+	levels.profile = profile
+	var clock_delta := maxf(0.0, presentation_clock - levels_clock)
+	levels_clock = presentation_clock
+	levels.assign(agents.agents, camera.global_position, camera.is_position_in_frustum,
+		_switch_held, clock_delta, dying_actors.size())
+	instance_quota = cap if _initial_materialization else INSTANCES_PER_PASS
+	# Release obsolete rigs first so promotions can use the actual ready pool.
+	for a: Agents.Agent in agents.agents.values():
+		if _is_cavalry(a) and a.detail == Levels.DETAIL_FAR:
+			a.detail = Levels.DETAIL_AGGREGATE
+		var node = actors.get(a.uid)
+		if node != null and (a.detail > Levels.DETAIL_MID or str(node.get_meta("formation_pool_key", "")) != _pool_key(a)):
+			actors.erase(a.uid)
+			_release_rig(node)
+	for a: Agents.Agent in agents.agents.values():
+		if a.detail > Levels.DETAIL_MID:
 			continue
-		for man: Dictionary in roster[s.id]:
-			var at := _surface(Vector2(man.x, man.z)) + Vector3.UP
-			var distance := camera.global_position.distance_to(at)
-			if distance <= mid_limit and camera.is_position_in_frustum(at):
-				# A small margin stabilises the cutoff when neighbouring soldiers exchange places.
-				ranked.append([distance - (0.7 if actors.has(man.id) else 0.0), man.id])
-	ranked.sort()
-	var rigged := {}
-	var budget: int = render_profiles[profile].review_limits.animated_valley_actors
-	for i in mini(budget, ranked.size()):
-		rigged[ranked[i][1]] = true
-	var counts := [0,0,0]
-	for s: Dictionary in model.squads.values():
-		var flag: Label3D = standards[s.id]
-		flag.position = _surface(Vector2(s.x,s.z))+Vector3.UP*2.75
-		flag.pixel_size = clampf(camera.position.distance_to(flag.position)*0.00062,0.004,0.032)
-		flag.visible = s.strength > 0 and s.status != "withdrawn"
-		flag.text = ("◆ " if s.id in selected else "") + str(s.name).to_upper() + (" · %d" % s.strength if s.kind == "cavalry" else "")
-		flag.modulate = Color("#ffe098") if s.id in selected else SIDES[s.side]
-		if not flag.visible:
-			continue
-		var i := 0
-		for man in roster[s.id]:
-			var id: String = man.id
-			live[id] = true
-			var destination := _surface(Vector2(man.x,man.z))
-			var dist := camera.position.distance_to(destination)
-			var detail := (0 if dist < near_limit else 1) if rigged.has(id) else 2
-			if agents != null:
-				detail = agents.agents[id].detail
-			var role := "spear" if s.kind in ["spear", "skirmisher"] else ("archer" if s.kind == "archer" else "heavy")
-			if s.kind == "cavalry":
-				role = "cavalry"
-			if id == s.officer_id and s.side == "ally" and s.kind == "infantry":
-				role = "officer"
-			if detail == Levels.DETAIL_AGGREGATE or (role == "cavalry" and detail == Levels.DETAIL_FAR):
-				# Beyond the rig budget riders stay aggregated under the company flag.
-				# Keep the same UID and re-sample it when it re-enters the budget.
-				if actors.has(id):
-					actors[id].queue_free()
-					actors.erase(id)
-				motion.erase(id)
+		var node = actors.get(a.uid)
+		if node == null:
+			node = _take_rig(a)
+			if node == null:
+				a.detail = Levels.DETAIL_FAR if a.visible and not _is_cavalry(a) else Levels.DETAIL_AGGREGATE
+				a.detail_since = -1e9
+				pool_deferrals += 1
 				continue
-			counts[detail] += 1
-			_sample_motion(id, destination, float(man.facing)+PI, man.pose, s.formation, role)
-			if detail == 2:
-				if agents == null:
-					var family: String = TribalFigure.FAMILIES.get(s.troop_id, role)
-					if not distant.has(family):
-						distant[family] = []
-						far_gaits[family] = []
-						far_starts[family] = []
-					var track: Dictionary = motion[id]
-					distant[family].append(Transform3D(Basis(Vector3.UP, track.yaw), track.end))
-					far_starts[family].append(Transform3D(Basis(Vector3.UP, track.start_yaw), track.start))
-					far_gaits[family].append(far_ranks.gait_data(track.pose, track.phase0, track.phase1))
-				if actors.has(id):
-					actors[id].queue_free()
-					actors.erase(id)
-				i += 1
-				continue
-			if not actors.has(id):
-				var actor
-				if role == "cavalry":
-					actor = Rider.new()
-				elif TribalFigure.FAMILIES.has(s.troop_id):
-					actor = TribalFigure.new()
-					actor.family = TribalFigure.FAMILIES[s.troop_id]
-				else:
-					actor = Soldier.new()
-				actor.role = role
-				actor.face_seed = int(man.appearance_seed)
-				actor.variant = Roster.visual_variant(int(man.appearance_seed), str(man.military_rank), Soldier.TINTS.size())
-				actor.detail = detail
-				actors[id] = actor
-				actor.position = destination
-				actor.rotation.y = float(man.facing)+PI
-				add_child(actor)
-			var node = actors[id]
-			if node.role != role:
-				node.configure(role,node.variant)
-			node.set_detail(detail)
-			if role == "cavalry":
-				node.set_mounted(s.mounted)
+			actors[a.uid] = node
+			var state: Dictionary = agents.present_state(a, agents.render_fraction(model))
+			node.position = state.position
+			node.rotation.y = state.yaw
+			node.present(state.pose, state.phase, 0.0)
+		if _is_cavalry(a):
+			node.set_mounted(bool(model.squads[a.squad].mounted))
+	_initial_materialization = false
+	levels.last = levels.count(agents.agents, dying_actors.size())
+	_sync_formation_instances()
+	_place_agent_flags()
+	var counts: Dictionary = levels.last
+	get_node("/root/RuntimeDisplay").set_unit_counts(int(counts.rigs_near), int(counts.rigs_mid), int(counts.far_instances))
 
-			i += 1
-	if agents == null:
-		far_ranks.sync(distant, far_gaits, far_starts)
+
+func _is_cavalry(a: Agents.Agent) -> bool:
+	return model.squads.has(a.squad) and model.squads[a.squad].kind == "cavalry"
+
+
+func _visual_family(a: Agents.Agent) -> String:
+	return "cavalry" if _is_cavalry(a) else str(TribalFigure.FAMILIES.get(a.troop_id, a.role))
+
+
+func _pool_key(a: Agents.Agent) -> String:
+	return "%s/%s/%d" % [_visual_family(a), a.role, a.detail]
+
+
+func _switch_held(uid: String) -> bool:
+	var node = actors.get(uid)
+	if node != null and node.has_method("switch_ready"):
+		return not node.switch_ready()
+	var a = agents.agents.get(uid)
+	return a != null and a.pose in Soldier.SWAP_AFTER
+
+
+func _take_rig(a: Agents.Agent):
+	var key := _pool_key(a)
+	var variant := Roster.visual_variant(a.appearance_seed, a.military_rank, Soldier.TINTS.size())
+	var pool: Array = rig_pool.get(key, [])
+	var node
+	if not pool.is_empty():
+		node = pool.pop_back()
+		node.process_mode = Node.PROCESS_MODE_INHERIT
+		node.prepare_reuse(variant, a.appearance_seed)
+		node.show()
 	else:
-		_sync_formation_instances()
-	get_node("/root/RuntimeDisplay").set_unit_counts(counts[0],counts[1],counts[2])
-	for id in actors.keys():
-		if not live.has(id):
-			var fallen = actors[id]
-			actors.erase(id)
-			fallen.play_state("death")
-			var fade := create_tween()
-			fade.tween_interval(1.25)
-			fade.tween_callback(fallen.queue_free)
+		if instance_quota <= 0:
+			return null
+		instance_quota -= 1
+		if _is_cavalry(a):
+			node = Rider.new()
+		elif TribalFigure.FAMILIES.has(a.troop_id):
+			node = TribalFigure.new()
+			node.family = TribalFigure.FAMILIES[a.troop_id]
+		else:
+			node = Soldier.new()
+		node.role = "cavalry" if _is_cavalry(a) else a.role
+		node.face_seed = a.appearance_seed
+		node.variant = variant
+		node.detail = a.detail
+		node.set_meta("formation_pool_key", key)
+		add_child(node)
+		if node.has_method("reset_presentation"):
+			node.reset_presentation()
+		rig_instantiations += 1
+	node.set_meta("formation_uid", a.uid)
+	return node
 
-## Far instances and full rigs sample the same agent tick during a detail change.
+
+func _pooled_count() -> int:
+	var count := 0
+	for pool: Array in rig_pool.values():
+		count += pool.size()
+	return count
+
+
+func _release_rig(node) -> void:
+	node.hide()
+	node.process_mode = Node.PROCESS_MODE_DISABLED
+	node.remove_meta("formation_uid")
+	# Mounts keep their own seat/horse rig. Do not reuse them across identities.
+	if node.role == "cavalry" or not node.has_method("prepare_reuse") or _pooled_count() >= MAX_POOLED_RIGS:
+		remove_child(node)
+		node.queue_free()
+		return
+	var key := str(node.get_meta("formation_pool_key"))
+	if not rig_pool.has(key):
+		rig_pool[key] = []
+	rig_pool[key].append(node)
+
+
 func _sync_formation_instances() -> void:
 	var ends := {}
 	var starts := {}
 	var gaits := {}
-	for a: Agents.Agent in agents.agents.values():
-		if a.detail != Levels.DETAIL_FAR or model.squads[a.squad].kind == "cavalry":
-			continue
-		var family: String = TribalFigure.FAMILIES.get(model.squads[a.squad].troop_id, a.role)
+	far_index.clear()
+	motion.clear()
+	var batch := func(a: Agents.Agent) -> void:
+		var family := _visual_family(a)
+		if family == "cavalry":
+			return
 		if not ends.has(family):
 			ends[family] = []
 			starts[family] = []
@@ -304,51 +331,114 @@ func _sync_formation_instances() -> void:
 		starts[family].append(Transform3D(Basis(Vector3.UP, a.prev_yaw), _surface(a.prev_pos)))
 		ends[family].append(Transform3D(Basis(Vector3.UP, a.yaw), _surface(a.pos)))
 		gaits[family].append(far_ranks.gait_data(a.pose, a.prev_phase if Agents.continuous(a) else a.phase, a.phase))
+		far_index.append(a.uid)
+	for a: Agents.Agent in agents.agents.values():
+		motion[a.uid] = {"step":model.steps, "pose":a.pose, "phase0":a.prev_phase, "phase1":a.phase,
+			"stride_phase":a.phase, "start":_surface(a.prev_pos), "end":_surface(a.pos),
+			"start_yaw":a.prev_yaw, "yaw":a.yaw, "level":a.level, "detail":a.detail}
+		if a.detail == Levels.DETAIL_FAR and not actors.has(a.uid):
+			batch.call(a)
+	for uid: String in agents.fallen:
+		var a: Agents.Agent = agents.fallen[uid]
+		if not dying_actors.has(uid) and not actors.has(uid) and a.detail <= Levels.DETAIL_FAR:
+			batch.call(a)
 	far_ranks.sync(ends, gaits, starts)
 
 
-func _sample_motion(id: String, destination: Vector3, yaw: float, pose: String, formation: String, role: String = "heavy") -> void:
-	var first_sample := not motion.has(id)
-	if first_sample:
-		# Adjacent files keep the same cadence with individual placement across
-		# the step. The same saved member always receives the same initial phase.
-		var seed_phase := fposmod((id.hash() % 997)/997.0 + int(id.right(2))*0.381966, 1.0)
-		var heading := Vector2(sin(yaw),cos(yaw))
-		seed_phase = fposmod(seed_phase + Vector2(destination.x,destination.z).dot(heading)/float(Soldier.STRIDES.march),1.0)
-		motion[id] = {"step":-1, "start":destination, "end":destination, "start_yaw":yaw, "yaw":yaw,
-			"phase0":seed_phase, "phase1":seed_phase, "stride_phase":seed_phase, "pose":"idle"}
-	var track: Dictionary = motion[id]
-	if track.step == model.steps:
-		return
-	var displacement := Vector2(destination.x-track.end.x,destination.z-track.end.z)
-	var distance := displacement.length()
-	var period := 0.0 if first_sample else maxi(1,model.steps-int(track.step))*Rules.STEP
-	track.start = track.end
-	track.end = destination
-	track.start_yaw = track.yaw
-	track.yaw = yaw
-	track.phase0 = fposmod(track.phase1,1.0) if track.pose in Soldier.LOOPING else track.phase1
-	track.phase1 = track.phase0
-	if pose in ["walk","idle","retreat"] and distance > 0.018:
-		pose = "retreat" if pose == "retreat" else ("run" if distance / maxf(.001,period) > 2.65 else "march")
-		track.phase0 = float(track.stride_phase)
-		track.phase1 = track.phase0+distance/float(Soldier.STRIDES[pose])
-		track.stride_phase = fposmod(track.phase1,1.0)
-		if hud.probe_step >= 0 and model.steps > hud.probe_step:
-			hud.report_first_stride(model.steps, id, pose, distance)
-		track.yaw = atan2(displacement.x,displacement.y)
-	elif pose in ["walk","retreat"]:
-		pose = ("march" if pose == "walk" else "retreat") if first_sample else "idle"
-	if pose == "idle" and formation in ["shield_wall","testudo"]:
-		pose = "wall" if formation == "shield_wall" else "testudo"
-	if not Soldier.STRIDES.has(pose):
-		if pose != track.pose:
-			track.phase0 = 0.0
-		track.phase1 = track.phase0+period/Soldier.clip_length("spear" if role == "cavalry" else role,pose)
-		if pose not in Soldier.LOOPING:
-			track.phase1 = minf(1.0,track.phase1)
-	track.pose = pose
-	track.step = model.steps
+func _present_agents(elapsed: float) -> void:
+	var fraction: float = agents.render_fraction(model)
+	far_ranks.set_step_fraction(fraction)
+	for uid: String in actors:
+		var a = agents.agents.get(uid)
+		if a == null:
+			continue
+		var state: Dictionary = agents.present_state(a, fraction)
+		var node = actors[uid]
+		node.position = state.position
+		node.rotation.y = state.yaw
+		node.present(state.pose, state.phase, elapsed)
+	for uid: String in dying_actors.keys():
+		var a = agents.fallen.get(uid)
+		if a == null:
+			_release_rig(dying_actors[uid])
+			dying_actors.erase(uid)
+			continue
+		var state: Dictionary = agents.present_state(a, fraction)
+		var node = dying_actors[uid]
+		node.position = state.position
+		node.rotation.y = state.yaw
+		node.present("death", state.phase, elapsed)
+	_place_agent_flags()
+
+
+func _place_agent_flags() -> void:
+	for s: Dictionary in model.squads.values():
+		var flag: Label3D = standards[s.id]
+		var unit = agents.units.get(s.id)
+		var at: Vector2 = Vector2(s.x,s.z) if unit == null or unit.members.is_empty() else unit.frame_center
+		flag.position = _surface(at) + Vector3.UP*2.75
+		flag.pixel_size = clampf(camera.position.distance_to(flag.position)*0.00062,0.004,0.032)
+		flag.visible = s.strength > 0 and s.status != "withdrawn"
+		flag.text = ("◆ " if s.id in selected else "") + str(s.name).to_upper() + (" · %d" % s.strength if s.kind == "cavalry" else "")
+		flag.modulate = Color("#ffe098") if s.id in selected else SIDES[s.side]
+
+
+## Expose actual rig/far/aggregate state to the original movement measurements.
+func formation_render_states() -> Dictionary:
+	var fraction: float = agents.render_fraction(model)
+	var result := {}
+	for uid: String in agents.agents:
+		var a: Agents.Agent = agents.agents[uid]
+		var state: Dictionary = agents.present_state(a, fraction)
+		if actors.has(uid):
+			state.position = actors[uid].position
+			state.yaw = actors[uid].rotation.y
+		state.detail = a.detail
+		state.level = Levels.LEVEL_NAMES[a.level]
+		state.role = a.role
+		state.visual_family = _visual_family(a)
+		state.leaving = a.leaving
+		state.represented = actors.has(uid) or far_index.has(uid)
+		result[uid] = state
+	return result
+
+
+func formation_far_gait(uid: String) -> Color:
+	var a = agents.agents.get(uid)
+	if a == null:
+		return Color()
+	var phase: float = agents.present_state(a, agents.render_fraction(model)).phase
+	return far_ranks.gait_data(a.pose, phase, phase)
+
+
+func formation_rig_nodes() -> Dictionary:
+	return actors
+
+
+func formation_duplicate_count() -> int:
+	var seen := {}
+	var duplicates := 0
+	for uid: String in far_index:
+		if seen.has(uid) or actors.has(uid) or dying_actors.has(uid):
+			duplicates += 1
+		seen[uid] = true
+	for uid: String in actors:
+		if dying_actors.has(uid) or str(actors[uid].get_meta("formation_uid", "")) != uid:
+			duplicates += 1
+	return duplicates
+
+
+func formation_counters() -> Dictionary:
+	var result: Dictionary = levels.count(agents.agents, dying_actors.size())
+	result.strength = 0
+	for s: Dictionary in model.squads.values():
+		result.strength += int(s.strength)
+	result.dying = agents.fallen.size()
+	result.rig_instantiations = rig_instantiations
+	result.pool_deferrals = pool_deferrals
+	result.pooled_rigs = _pooled_count()
+	result.agents = agents.counters.duplicate()
+	return result
 
 
 func _refresh() -> void:
