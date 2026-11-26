@@ -64,6 +64,11 @@
               "max_contact_slip_m": 0.008538380409991326
             },
             "maximum_floor_correction_m": 0.19533840297444083
+          },
+          "body_seam": {
+            "before": {
+              "tearing": 0
+            }
           }
         },
         {
@@ -88,6 +93,11 @@
               "max_contact_slip_m": 0.007858033858522046
             },
             "maximum_floor_correction_m": 0.1956944473480452
+          },
+          "body_seam": {
+            "before": {
+              "tearing": 0
+            }
           }
         },
         {
@@ -112,6 +122,11 @@
               "max_contact_slip_m": 0.0032573462169063613
             },
             "maximum_floor_correction_m": 0.19682688728610975
+          },
+          "body_seam": {
+            "before": {
+              "tearing": 0
+            }
           }
         },
         {
@@ -136,6 +151,11 @@
               "max_contact_slip_m": 0.004430411223141494
             },
             "maximum_floor_correction_m": 0.19078453039244092
+          },
+          "body_seam": {
+            "before": {
+              "tearing": 0
+            }
           }
         }
       ],
@@ -199,8 +219,8 @@
           "triangles": 27999,
           "texture_edge": 2048,
           "rigid_foot_vertices_preserved": 527,
-          "sha256": "bdc5e35a5a749e518034c4e10d0beba859c08753af5fac419a256cd2bb3b8ad3",
-          "size_bytes": 4091232,
+          "sha256": "893655cd0fad967bbacf1a299c95f36ee284866d0f77abda9a1ca903d56214b7",
+          "size_bytes": 4091428,
           "death_ground_contact": {
             "before": {
               "max_sole_penetration_m": 0.18277658218367357,
@@ -215,6 +235,17 @@
               "max_contact_slip_m": 0.008647724729336092
             },
             "maximum_floor_correction_m": 0.18570917943074594
+          },
+          "body_seam": {
+            "before": {
+              "tearing": 211,
+              "neighbour_through_m": 0.019759061237989282
+            },
+            "after": {
+              "tearing": 0,
+              "neighbour_through_m": 0.010133835483221068
+            },
+            "changed_vertices": 76
           }
         },
         {
@@ -239,6 +270,11 @@
               "max_contact_slip_m": 0.00863722631039331
             },
             "maximum_floor_correction_m": 0.18551295259691714
+          },
+          "body_seam": {
+            "before": {
+              "tearing": 0
+            }
           }
         },
         {
@@ -263,6 +299,11 @@
               "max_contact_slip_m": 0.007326439655014383
             },
             "maximum_floor_correction_m": 0.18827188744901568
+          },
+          "body_seam": {
+            "before": {
+              "tearing": 0
+            }
           }
         },
         {
@@ -287,6 +328,11 @@
               "max_contact_slip_m": 0.006163289178026864
             },
             "maximum_floor_correction_m": 0.19028337634351178
+          },
+          "body_seam": {
+            "before": {
+              "tearing": 0
+            }
           }
         }
       ],

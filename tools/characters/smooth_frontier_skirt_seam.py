@@ -117,7 +117,8 @@ def _measure(skirt: dict, body: dict, frames: list, weights: tuple, edges: np.nd
     return {"tearing": tearing, "torn_vertices": sorted(torn), "body_through_skirt_m": deepest}
 
 
-def _smoothed(skirt: dict, rest: np.ndarray, triangles: np.ndarray, torn: list) -> tuple[np.ndarray, np.ndarray, int]:
+def _smoothed(skirt: dict, rest: np.ndarray, triangles: np.ndarray, torn: list,
+              rings: int = RINGS, passes: int = PASSES) -> tuple[np.ndarray, np.ndarray, int]:
     count, joints = len(rest), len(skirt["joints"])
     values = np.zeros((count, joints))
     for slot in range(4):
@@ -136,7 +137,7 @@ def _smoothed(skirt: dict, rest: np.ndarray, triangles: np.ndarray, torn: list) 
     first, last = edges[:, 0], edges[:, 1]
     region = np.zeros(size, bool)
     region[welded[torn]] = True
-    for _ in range(RINGS):
+    for _ in range(rings):
         grown = region.copy()
         grown[first[region[last]]] = True
         grown[last[region[first]]] = True
@@ -146,7 +147,7 @@ def _smoothed(skirt: dict, rest: np.ndarray, triangles: np.ndarray, torn: list) 
     np.add.at(totals, first, influence)
     np.add.at(totals, last, influence)
     active = region & (totals > 0.)
-    for _ in range(PASSES):
+    for _ in range(passes):
         neighbours = np.zeros_like(shared)
         np.add.at(neighbours, first, shared[last] * influence[:, None])
         np.add.at(neighbours, last, shared[first] * influence[:, None])
