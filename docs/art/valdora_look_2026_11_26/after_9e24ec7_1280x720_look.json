@@ -1,0 +1,156 @@
+{
+  "adapter": "llvmpipe (LLVM 20.1.2, 256 bits)",
+  "conversation_layout": {
+    "camera": "(-14.78, 1.61, 17.3)",
+    "direction": "(0.0, 0.0, 1.0)",
+    "partner": "(-15.3, 0.0, 14.8)",
+    "player": "(-15.3, 0.890078, 16.15)"
+  },
+  "conversation_partner": "julia",
+  "driver": "opengl3",
+  "engine": "4.7.2-stable (official)",
+  "errors": [],
+  "frames_per_measurement": 3,
+  "note": "Frame times are relative indicators on this renderer/driver, not device performance.",
+  "output_pixels": [
+    1280,
+    720
+  ],
+  "player_lift": 0.900078237056732,
+  "renderer": "gl_compatibility",
+  "shots": {
+    "conversation": {
+      "balanced": {
+        "buffer_mib": 33.1673164367676,
+        "camera": "[X: (0.990878, 0.0, -0.134759), Y: (-0.010649, 0.996873, -0.078302), Z: (0.134338, 0.079022, 0.98778), O: (-14.78, 1.61, 17.3)]",
+        "draw_calls": 803.0,
+        "objects": 835.0,
+        "primitives": 579727.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 496816,
+        "texture_mib": 233.361440658569,
+        "video_mib": 266.528757095337,
+        "viewport_cpu_ms_p50": 25310.05859375,
+        "viewport_gpu_ms_p50": 25296.21875,
+        "wall_ms_p50": 28352.599
+      },
+      "very_high": {
+        "buffer_mib": 37.8309440612793,
+        "camera": "[X: (0.990878, 0.0, -0.134759), Y: (-0.010649, 0.996873, -0.078302), Z: (0.134338, 0.079022, 0.98778), O: (-14.78, 1.61, 17.3)]",
+        "draw_calls": 1795.0,
+        "objects": 1827.0,
+        "primitives": 833863.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 1633358,
+        "texture_mib": 288.330803871155,
+        "video_mib": 326.161747932434,
+        "viewport_cpu_ms_p50": 31865.11328125,
+        "viewport_gpu_ms_p50": 31855.744140625,
+        "wall_ms_p50": 37579.058
+      }
+    },
+    "overview": {
+      "balanced": {
+        "buffer_mib": 23.6871967315674,
+        "camera": "[X: (0.768221, 0.0, -0.640184), Y: (-0.184968, 0.95735, -0.221962), Z: (0.612881, 0.28893, 0.735457), O: (31.0, 17.5, 33.0)]",
+        "draw_calls": 1280.0,
+        "objects": 1354.0,
+        "primitives": 731135.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 321593,
+        "texture_mib": 144.528195381165,
+        "video_mib": 168.215392112732,
+        "viewport_cpu_ms_p50": 30889.12890625,
+        "viewport_gpu_ms_p50": 30895.728515625,
+        "wall_ms_p50": 31864.105
+      },
+      "very_high": {
+        "buffer_mib": 27.7051887512207,
+        "camera": "[X: (0.768221, 0.0, -0.640184), Y: (-0.184968, 0.95735, -0.221962), Z: (0.612881, 0.28893, 0.735457), O: (31.0, 17.5, 33.0)]",
+        "draw_calls": 2849.0,
+        "objects": 2923.0,
+        "primitives": 1051233.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 1385045,
+        "texture_mib": 204.080874443054,
+        "video_mib": 231.786063194275,
+        "viewport_cpu_ms_p50": 34975.92578125,
+        "viewport_gpu_ms_p50": 34968.94921875,
+        "wall_ms_p50": 32521.364
+      }
+    },
+    "path": {
+      "balanced": {
+        "buffer_mib": 29.5635929107666,
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.990828, -0.135127), Z: (0.0, 0.135127, 0.990828), O: (1.26, 2.235071, 15.46258)]",
+        "draw_calls": 1055.0,
+        "objects": 1083.0,
+        "primitives": 638703.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 445264,
+        "texture_mib": 210.778116226196,
+        "video_mib": 240.341709136963,
+        "viewport_cpu_ms_p50": 26958.1953125,
+        "viewport_gpu_ms_p50": 26973.63671875,
+        "wall_ms_p50": 38835.416
+      },
+      "very_high": {
+        "buffer_mib": 37.6502780914307,
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.990828, -0.135127), Z: (0.0, 0.135127, 0.990828), O: (1.26, 2.235071, 15.46258)]",
+        "draw_calls": 2783.0,
+        "objects": 2811.0,
+        "primitives": 945442.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 1934537,
+        "texture_mib": 277.997479438782,
+        "video_mib": 315.647757530212,
+        "viewport_cpu_ms_p50": 29889.986328125,
+        "viewport_gpu_ms_p50": 29851.560546875,
+        "wall_ms_p50": 27913.771
+      }
+    },
+    "start": {
+      "balanced": {
+        "buffer_mib": 32.1697959899902,
+        "camera": "[X: (0.830949, 0.0, -0.556349), Y: (-0.039793, 0.997439, -0.059433), Z: (0.554924, 0.071524, 0.82882), O: (-10.86016, 2.121331, 12.94984)]",
+        "draw_calls": 674.0,
+        "objects": 692.0,
+        "primitives": 445825.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 513334,
+        "texture_mib": 223.361440658569,
+        "video_mib": 255.53123664856,
+        "viewport_cpu_ms_p50": 15724.892578125,
+        "viewport_gpu_ms_p50": 15732.6953125,
+        "wall_ms_p50": 21036.173
+      },
+      "very_high": {
+        "buffer_mib": 38.575267791748,
+        "camera": "[X: (0.830949, 0.0, -0.556349), Y: (-0.039793, 0.997439, -0.059433), Z: (0.554924, 0.071524, 0.82882), O: (-10.86016, 2.121331, 12.94984)]",
+        "draw_calls": 1363.0,
+        "objects": 1381.0,
+        "primitives": 620035.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 1338093,
+        "texture_mib": 288.330803871155,
+        "video_mib": 326.906071662903,
+        "viewport_cpu_ms_p50": 25669.306640625,
+        "viewport_gpu_ms_p50": 25662.9296875,
+        "wall_ms_p50": 31853.034
+      }
+    }
+  },
+  "start_state": {
+    "camera": "[X: (0.830949, 0.0, -0.556349), Y: (-0.039793, 0.997439, -0.059433), Z: (0.554924, 0.071524, 0.82882), O: (-10.86016, 2.121331, 12.94984)]",
+    "player": "(-12.0, 1.292578, 11.7)",
+    "world_sha256": "48f8ca6c1477283017c9575d12d5bcf142d363bcffe2ba5da3ee63da2b34cf0c"
+  }
+}
