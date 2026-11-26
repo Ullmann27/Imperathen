@@ -143,6 +143,11 @@ static func load_all(directory: String = DIR) -> Dictionary:
 		result.errors.append("anchor directory missing: " + directory)
 		return result
 	for name: String in folder.get_files():
+		# The amphitheatre authoring manifests are monument-local metres and
+		# use a different wealth/seat schema. Keep them out of the global
+		# city economy until a coordinate/schema adapter actually mounts them.
+		if directory == DIR and name in ["colosseum_interior.json", "colosseum_piazza.json"]:
+			continue
 		if name.ends_with(".json"):
 			names.append(name)
 	names.sort()
