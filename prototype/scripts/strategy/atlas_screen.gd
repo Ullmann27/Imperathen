@@ -12,6 +12,10 @@ var data: Dictionary
 ## The authoritative tribal world of this save (WorldModel.data.tribes).
 ## The demo shows the 58 BC opening situation; an unset campaign says so.
 var tribes: Dictionary = {}
+## Optional, while the atlas pauses the world: called once per frame to spend
+## one tribal frame budget; returns {"tribes": Dictionary, "pending_weeks": int}.
+var tribes_pump: Callable
+var tribes_pending := 0
 var can_act := true
 var demo := false
 var young := false
@@ -79,6 +83,20 @@ func _ready() -> void:
 	_layout()
 	_select(selected,true)
 	print("IMPERATHEN_ATLAS_READY")
+
+func _process(_delta: float) -> void:
+	if not tribes_pump.is_valid():
+		return
+	var report: Variant = tribes_pump.call()
+	if typeof(report) != TYPE_DICTIONARY:
+		return
+	var latest: Dictionary = report.get("tribes", tribes)
+	var pending := int(report.get("pending_weeks", 0))
+	if not is_same(latest, tribes) or pending != tribes_pending:
+		tribes = latest
+		tribes_pending = pending
+		tribal.text = tribal_text(selected)
+		globe.show_settlements(Tribes.settlement_points(tribes, "valdora") if not tribes.is_empty() else [])
 
 func _layout() -> void:
 	var area := Safe.for_viewport(get_viewport())
@@ -154,7 +172,7 @@ func tribal_text(region_id: String) -> String:
 		return "Stammeslage · nicht mit diesem Spielstand verbunden."
 	if tribes.scenario == Tribes.NO_SCENARIO:
 		return "Stammeslage · Für diese Epoche ist noch keine Gruppenaufstellung hinterlegt."
-	var lines := PackedStringArray(["Stammeslage · %s%s" % [Tribes.calendar(tribes).label, " · Ausgangslage" if demo else ""]])
+	var lines := PackedStringArray(["Stammeslage · %s%s%s" % [Tribes.calendar(tribes).label, " · Ausgangslage" if demo else "", (" · noch %d Wochen werden berechnet" % tribes_pending) if tribes_pending > 0 else ""]])
 	for item: Dictionary in Tribes.atlas_view(tribes, "valdora"):
 		if item.atlas_region != region_id:
 			continue
@@ -163,6 +181,13 @@ func tribal_text(region_id: String) -> String:
 			lines.append("%s%s · hat das Gebiet verlassen" % [item.name, tag])
 			continue
 		lines.append("%s%s · %s (%.0f) · %d Krieger%s · Anführer %s" % [item.name, tag, item.strength_class, float(item.strength), int(item.warriors_total), " (ein Zug unterwegs)" if item.away else "", item.leader])
+		var order := PackedStringArray([str(item.government_name)]) if str(item.get("government_name", "")) != "" else PackedStringArray()
+		if str(item.get("war_leader", "")) != "":
+			order.append("Heerführer " + str(item.war_leader))
+		for role: String in item.get("profile", []):
+			order.append(role)
+		if not order.is_empty():
+			lines.append("   " + " · ".join(order))
 		var stances := PackedStringArray()
 		for relation: Dictionary in item.relations:
 			if relation.stance != "neutral":

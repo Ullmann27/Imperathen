@@ -32,13 +32,26 @@ Kalendertag = village.economy.day + progress.years_elapsed · 364 + (strategy.tu
 - 400 Schritte umfassen 58–51 v. Chr., also Band I samt Übergang zu Band II.
 - Tages- oder Bildschritte hätten bei gleicher Aussage die siebenfache bzw. geräteabhängige Last erzeugt.
 
-Der Weltmodell-Hook `_sync_tribes` läuft am Ende von `advance()` (höchstens 2 Wochen pro Bild) und nach einer Jahreszeit in `act_region("advance")` (13 Wochen). Ein Zeitsprung von sechs Jahren (312 Wochen) wird über rund 156 Bilder nachgeholt statt ein Bild zu blockieren. Der Stammeszustand wird dabei als Kopie ersetzt; ein verworfener Kandidat kann die angenommene Welt nicht verändern.
+Der Kalendertag steht im Weltmodell hinter genau einer Funktion, `WorldModel.calendar_day(state)` (D-045). Der gemeinsame Weltkalender aus #98 ersetzt nur deren Inhalt.
+
+### Bildbudget (D-046)
+
+Eine Woche wird nicht mehr in einem Bild gerechnet. `WorldModel._pump_tribes` arbeitet je Bild höchstens `TRIBE_UNITS_PER_FRAME = 6` Arbeitseinheiten ab:
+
+1. Kopie des angenommenen Stammeszustands in Scheiben (Grundteil, Personen, Chronik, Ledger, Beziehungen zu je 48 Kanten).
+2. Die Woche in der Reihenfolge des bisherigen Ticks: Anker, Kriegszüge, Wirtschaft je eine Gruppe, Vereinbarungen, Führung, Nachrichten, Entscheidungsgrundlage, Entscheidung je eine Gemeinschaft, Abklingen je 96 Kanten, Abschluss.
+3. Vollständige Validierung in Scheiben (Kopf, Kriegszüge, je Gruppe, Personen, Ziele, Beziehungen zu je 24 Kanten, Vereinbarungen, Chronik, Streitfälle).
+4. Erst dann wird der neue Zustand atomar übernommen und als geprüft vermerkt; es folgt keine zweite Vollprüfung im selben Bild.
+
+Jede Scheibe hat feste Kosten (`TribalWorld.UNITS`, kalibriert auf etwa 0,25 ms je Einheit beim 95. Perzentil der Scheibe auf dem Entwicklungsrechner); keine Scheibe kostet mehr als das Bildbudget. Eine Woche kostet 118–132 Einheiten, also etwa 20 Bilder. `tick()` selbst läuft über dieselben Scheiben, daher sind gescheibte und durchgerechnete Wochen bitgleich (Test).
+
+Speichern während einer laufenden Woche: Gespeichert wird immer die zuletzt übernommene Woche. Die halbfertige Woche wird verworfen und nach dem Laden deterministisch neu gerechnet; das Ergebnis ist bitgleich mit einem ununterbrochenen Lauf (Test `tribal_save`). Ändert sich der angenommene Stammeszustand während eines Auftrags (Raidergebnis, Reisetage), beginnt die Woche neu. `pump_tribes()` dient Menüs, die die Welt anhalten (Atlas über `tribes_pump`); `finish_tribes()` dient Tests und Ladebildschirmen.
 
 ## 3. Zustand (`data.tribes`)
 
 `version, scenario, seed, rng, tick, extra_days, next_id, groups, persons, targets, relations, agreements, expeditions, events, ledger, flows, opening, intel, anchors, raid_windows, story, stats, visits`
 
-- **Gruppe** (`groups[actor_id]`, Art `tribe`, `band` oder `market`): Kanonmarker, Quelle, Status (`active`, `departed`, `left_area`, `dispersed`), Anführer (Personen-ID), Familien, Grundeigenschaften (Kühnheit, Vorsicht, Stolz, Handel, Treue), Ziele, Reichweite, bis zu drei Siedlungen (Lage, Bevölkerung, Felder, Raseneisenerz, Gebäude, Schaden), freie Siedlungsplätze, Bestand (`stock`), getragene Ausrüstung (`held`), Truppen, Moral, Bauvorhaben, Restbeträge, Geschichte.
+- **Gruppe** (`groups[actor_id]`, Art `tribe`, `band` oder `market`): Kanonmarker, Quelle, Status (`active`, `departed`, `left_area`, `dispersed`), Anführer (Personen-ID), Herrschaftsform und gegebenenfalls Heerführer, Familien, Grundeigenschaften (Kühnheit, Vorsicht, Stolz, Handel, Treue), Ziele, Reichweite, bis zu drei Siedlungen (Lage, Bevölkerung, Felder, Raseneisenerz, Gebäude, Schaden), freie Siedlungsplätze, Bestand (`stock`), getragene Ausrüstung (`held`), Truppen, Moral, Bauvorhaben, Restbeträge, Geschichte.
 - **Truppen** je Typ: `count`, `xp`, `gear`. Typen (Kulturbaum `germanic_rhine`): Aufgebot der Höfe mit gemischter Ausrüstung (Speer, Wurfspeere, Axt oder unbewaffnet; je Mann höchstens eine Waffe), Speerkrieger (framea und Schild), Plänkler, seltene erfahrene Schwertkämpfer (höchstens 5 %), Axtkämpfer als rekonstruierte Variante (höchstens 3 %), Reiter, Gefolgsleute. Aufwertungen verlangen Erfahrung, Ausrüstung aus dem Bestand und für die Gefolgschaft eine Halle; der Mann behält passende Teile und gibt übrige zurück.
 - **Personen** (`persons`): Anführer, Erbe, Rivale je Gruppe sowie **jeder Gefolgsmann einzeln** (Name, Familie, Geburtswoche, Eigenschaften, Ansehen, Aufenthalt `with`, Taten, Schicksal). Gefallene werden nicht ersetzt; neue Gefolgsleute sind neue Personen. Tote und Fortgezogene bleiben zwei Jahre erhalten und werden dann samt Beziehungen entfernt.
 - **Ziele** (`targets`): Valdora, Spielfigur, Rom, Handelshaus mit dem roten Siegel. Ihre Güter gehören nicht in dieses Ledger.
@@ -68,8 +81,42 @@ Wissen breitet sich aus: Verbreitbare Ereignisse (Überfall, gebrochener Eid, Ei
 Waffenruhe (26 Wochen), Bündnis (52), Tribut (52, Fälligkeit alle 13 Wochen), Handelsbund (52), Gastfreundschaft (156), Auftrag (Storybindung), Freundschaft mit Rom (Anker). Jede Vereinbarung ist ein Datensatz mit Frist, Bedingungen, Zahlungsstand und Ausgang (`kept`, `broken`, `expired`, `void`, `fulfilled`).
 
 - Eingehalten bis zur Frist: Vertrauen und Respekt steigen, freundliche Partner erneuern.
-- Gebrochen (Überfall unter Frieden, unbezahlter Tribut, ausbleibende Bündnishilfe): Vertrauen und Groll ändern sich beim Opfer, die Nachricht verbreitet sich, der Preis beim Handel steigt (`trade_terms`), der Zugang kann wegfallen, ein Strafzug wird wahrscheinlicher.
+- Gebrochen (Überfall unter Frieden, unbezahlter Tribut, ausbleibende Bündnishilfe): Vertrauen und Groll ändern sich beim Opfer, die Nachricht verbreitet sich, der Preis beim Handel steigt (`trade_terms`), der Zugang kann wegfallen. Ein Strafzug folgt nur, wenn schon ein Streit mit erlaubtem Anlass besteht (D-048). Einen Tribut nimmt nur an, wer ihn aus dem eigenen Bestand zweimal zahlen kann.
 - Ein Kriegszug, der zwischen frisch Geeinten unterwegs ist, kehrt um.
+
+## 6a. Konfliktanlässe (D-048, D-049)
+
+Kein Überfall, keine Fehde und kein Feldzug ohne gebuchten Anlass. Das Streitregister (`disputes`) hält Anlass, Quelle, Beginn, Ende und Richtung:
+
+| Anlass | Entsteht durch |
+|---|---|
+| `quest_dispute` | Mission oder Quest über `open_dispute()`; I-10 trägt `mission:I-10` |
+| `natural_enemy` | Roster: Sueben ↔ Ubier (BG 4,3; 4,16), Sueben ↔ Usipeter/Tenkterer (BG 4,1), Eichenhang ↔ Ravensteg (Design, fiktiv) |
+| `alliance_call` | Bündnispartner angegriffen oder in der Verteidigung |
+| `retaliation` | Antwort auf einen solchen Konflikt; ein gebrochener Tribut verlängert nur einen bestehenden Streit |
+| `conquest` | klarer Sieg innerhalb eines Streits; endet mit vereinbartem Tribut |
+| `need` | Hunger, Mangel oder strategische Not beim Ausbau, gebucht mit Anlass (Hungerstufe, Vorratswochen, fehlende Güter, Charakter des Anführers, Vertrauen zum Ziel) |
+
+Ob Not zu Handel, Abwanderung, Verhandlung oder Überfall führt, entscheidet der Nutzenvergleich nach Lage, Charakter und Beziehung; Freunde auszurauben kostet Vertrauen. Überlegenheit allein ist kein Anlass. Jeder Kriegszug und jedes Konfliktereignis speichert Anlass, Streit-ID und Quelle; die Validierung lehnt Konfliktereignisse ohne erlaubten Anlass ab. Eine eingehaltene Waffenruhe beendet Fehden zwischen den Partnern; die natürliche Feindschaft bleibt.
+
+## 6b. Herrschaftsformen (D-044)
+
+| Form | Gruppen | Wirkung |
+|---|---|---|
+| Versammlung | Ubier, Händler, Reiter | Ansehen und Herkunft entscheiden; Rivale kann gewinnen |
+| Erbliches Häuptlingtum | Sugambrer, Ravensteg (Erbin Swanahild) | Erbe der Familie folgt; Herausforderungen schwerer |
+| Ältestenrat | Eichenhang | Alter und Besonnenheit zählen; der Rat mäßigt den Anführer |
+| Gewählter Heerführer | Sueben, Usipeter/Tenkterer | im Krieg Wahl eines Heerführers für 26 Wochen (Caesar BG 6,23), dessen Charakter wiegt dann schwerer; ein siegreicher Heerführer kann die Führung anstreben |
+
+Nur die Heerführerregel stützt sich auf eine Quelle; die anderen Zuordnungen sind Spielannahmen. Langfristig wachsen Gruppen über Siedlungsgröße (Weiler, Dorf, Großsiedlung), Handelsbünde, Bündnisse und Tributnehmer zu Handelsgemeinschaften oder Machtzentren; der Atlas zeigt dieses Profil.
+
+## 6c. Verborgene Wahrheit (D-040)
+
+Die etwa dreißig Reiter für I-10 sind keinem Volk und keinem Stamm zugeordnet. Ihr Auftraggeber steht nur im Zustand (verdeckter Auftrag, `hidden`). `observed_facts(state, akteur)` und `chronicle(state, n, akteur)` liefern nur, was der Akteur gesehen oder erzählt bekommen hat. `planned_raids` zeigt für die Reiter weder Auftrag noch Auftraggeber. Erst `reveal()` (Beweis, Zeuge) schafft Wissen; das Ermittlungs- und Zeugensystem baut der Agent auf `feat/raid-conspiracy-investigation-20261126`.
+
+## 6d. Regionale Völker um Aquileia (Vorbereitung)
+
+`prototype/assets/world/tribes/regional_candidates_aquileia.json` enthält Karner, Histrer, Taurisker/Noriker, Iapyden und Veneter als **ungeprüfte Kandidaten**. Jeder Eintrag hat Prüfaufträge (Quellenstellen) und offene Fragen, aber keine Zahlen und keine behaupteten Ereignisse; nichts davon wird simuliert, bevor es geprüft und freigegeben ist. Kulturen, Kriegerbäume und Namen sind im Szenarioformat bereits je Kultur angelegt.
 
 ## 7. Entscheidungen
 
@@ -98,7 +145,8 @@ Anschlussstellen in `prototype/scripts/story/village_life.gd` (Stand Basis `ffbe
 3. **Ergebnis zurückmelden** (`_finish_raid`, Z. 554, und `_resolve_hidden_childhood_raid`, Z. 533): `TribalWorld.apply_raid_result(TribalWorld.writable(data), id, {"outcome": outcome, "attacker_losses": gefallene volle KIs, "loot": {"grain": raid.stolen}, "defender_casualties": …, "damage": …})`. Getreide wird mit 10 Rationen je Dorfeinheit gebucht (`EXTERNAL_GOODS`), Denare mit 0,25 Wertgütern; der Dorfledger bleibt führend.
 4. **I-10** (`_apply`, Z. 120–135, Befehle `village_childhood_begin_raid`, `i10_defend`, `i10_hide`): vor `_begin_warning(data, true)` → `TribalWorld.commit_story_raid(TribalWorld.writable(data), "I-10")`. Das Drehbuch bestimmt Ablauf, Opfer und Familienpfade; die Simulation liefert nur die konsistente Gruppe (30 Reiter mit Pferden, Speer, Schild) und bucht das gemeldete Ergebnis. Danach sperrt sie Valdora 26 Wochen für jeden weiteren Zug (Wiederaufbau I-13 bis I-16).
 5. **Verteidigung melden**: am Ende jedes Dorftags oder nach `_finish_raid` → `report_target_state(writable(data), "valdora", VillageLife.defense_strength(data), rebuilt)`.
-6. **Atlas** (`main.gd` `_open_atlas`, nach `atlas.data = …`): `atlas.tribes = model.data.tribes if not demo else {}`; in `_act_atlas` nach `atlas.data = model.data.strategy` ebenfalls `atlas.tribes = model.data.tribes`.
+6. **Atlas** (`main.gd` `_open_atlas`, nach `atlas.data = …`): `atlas.tribes = model.data.tribes if not demo else {}` und `atlas.tribes_pump = func(): return model.pump_tribes()` (nicht im Demo). Solange der Atlas die Welt anhält, rechnet er so die Wochen einer Jahreszeit im Bildbudget nach und zeigt „noch N Wochen werden berechnet“.
+7. **Streit aus Quests** (D-048): Missionen melden Streitigkeiten mit `TribalWorld.open_dispute(writable(data), a, b, "quest_dispute", "quest:<id>", Notiz, Wochen)` und beenden sie mit `close_dispute`.
 
 Endlose Überfallserien verhindert das Modell selbst: eigene Abklingzeit des Angreifers (6 Wochen), Erholungsfenster des Ziels (6–26 Wochen je nach Schaden und Verlusten, beim Storyüberfall 26), Umkehr vor einem gerade geplünderten Ziel, Lerneffekt nach erfolglosen Zügen, Kosten (Proviant, Arbeitskraft, Gefallene), Abschwächung bei Frieden.
 
@@ -116,7 +164,9 @@ Die Zahlen stammen aus den Testläufen dieses Branches; sie sind keine Geräteme
 - Determinismus: gleicher Seed → identischer Zustand nach 200 Wochen; Speichern und Laden nach Woche 100 → bitgleiche Fortsetzung. Godots JSON überträgt nur korrekt gerundete Dezimalzahlen exakt; alle gespeicherten Bruchwerte werden deshalb auf vier Dezimalen gerundet.
 - Ledger: vollständige Wiederholung aller Buchungen über 200 Wochen ergibt jeden Bestand, jede getragene Ausrüstung und jede Bevölkerungszahl; jeder Transfer hat genau Sender und Empfänger.
 - 400 Wochen, Seeds 1, 2026, 58: gültig, keine Gemeinschaft unter 30 % oder über 200 % der Anfangsbevölkerung, keine gegenseitige Feindschaft länger als drei Jahre, höchstens 12 Überfälle je Gruppe und Jahr (gemessen: 7–16 Überfälle der ganzen Region in 400 Wochen, Seeds 1/2026/58), Erholungsfrist eingehalten, Frieden, Handel und Bau finden statt.
-- Kosten: 5–15 ms je Wochenschritt und 7–16 ms je Vollvalidierung, stark abhängig von der Last der parallel laufenden Agenten. Das Weltmodell validiert die Stammeswelt nur bei neuem Zustand vollständig (Identitätsprüfung), sonst zwischengespeichert.
+- Kosten einer ganzen Woche: 6–15 ms Rechnen und 6–16 ms Vollvalidierung, stark abhängig von der Last der parallel laufenden Agenten. Seit D-046 werden beide in Scheiben über etwa 20 Bilder verteilt.
+- Bildbudget (Entwicklungsrechner, headless, 4 Kerne bei Last 6–8, nur relativ, keine Gerätemessung): je Bild höchstens 6 Einheiten (Test, keine Uhrzeit). Gemessene Bildzeiten über 52 Wochen Aufholen: p50 0,58–0,79 ms, p95 1,8–2,7 ms, p99 2,7–5,5 ms, Maximum 3,6–7,4 ms. Die Ausreißer entstehen durch Verdrängung auf dem überlasteten Rechner. Minimum je Scheibe aus drei gleichen Läufen: p95 1,36 ms je Bild. Die größten regulären Scheiben sind Nachrichten (bis 1,9 ms), Entscheidung und Führung (bis 1,3 ms). Ein Maximum von 2 ms ist auf diesem Rechner nicht belegbar; die Messung auf einem ruhigen Rechner und auf dem Fold7 steht aus.
+- Konfliktanlässe: 3 × 400 Wochen ohne Konfliktereignis ohne erlaubten Anlass (40 Konfliktereignisse); eine satte Welt ohne Streit bleibt ein halbes Jahr ohne Kriegszug; ein Hungerzug bucht `need` mit Anlass.
 
 ## 11. Germanische Siedlungen · Grafik- und LOD-Plan (späteres Paket)
 
@@ -154,7 +204,7 @@ Qualitätsmaßstab ist die Lesbarkeit und Dichte, die der Eigentümer mit Assass
 3. **Ältere Laufbahnen um 100 n. Chr.** erhalten keine Gruppenaufstellung (`scenario: none`). Für eine Rheingrenze um 100 n. Chr. wären andere Gruppen zu belegen (die Ubier lebten dann links des Rheins).
 4. **Wirkungsgrößen der Anker** (Schaden, Furcht) sind Spielannahmen; die Ereignisse selbst sind belegt.
 5. **Weibliche Erbin** in Ravensteg ist eine fiktive Entscheidung für eine fiktive Gemeinschaft; für belegte Völker sind Anführer männlich angelegt.
-6. **Kriegslast**: Die Region erzeugt in 400 Wochen 7–16 Überfälle, dazu 47–68 Tauschgeschäfte und 47 eingehaltene Vereinbarungen (Seeds 1/2026/58); ob das genug Bedrohung ist, entscheidet ein Spieltest.
+6. **Kriegslast**: Nach D-048/D-049 erzeugt die Region in 400 Wochen 6–7 Überfälle (Plünderung, Abwehr und Gefecht gemischt), dazu 55–75 Tauschgeschäfte und 41–57 eingehaltene Vereinbarungen (Seeds 1/2026/58). Es gibt keine erzwungene Zahl; Missionen und Quests sollen Konflikte anstoßen. Die Dichte bewertet der Spieltest.
 
 ## 15. Risiken
 
@@ -162,3 +212,5 @@ Qualitätsmaßstab ist die Lesbarkeit und Dichte, die der Eigentümer mit Assass
 - Leistung auf dem Fold7 ist nicht gemessen; der Catch-up ist auf 2 Wochen je Bild begrenzt.
 - Die Balance (Ertrag, Geburten, Überfallnutzen) ist nur gegen Stabilitätskriterien geprüft, nicht gegen Spielspaß.
 - Die fixen Bezugstexte in `village_life.gd` ändern sich parallel; die Zeilenangaben in Abschnitt 8 sind vor dem Anschluss zu prüfen.
+- Stammeszustand v2 (Herrschaftsformen, Streitregister): `TribalWorld.migrate()` hebt Stände des ersten #99-Builds an. Dabei kehren Kriegszüge ohne gebuchten Anlass heim, und alte Konfliktereignisse werden als `legacy` (vor D-048) markiert.
+- `writable()` für Raidergebnisse kopiert den ganzen Zustand in einem Bild (etwa 5 ms auf dem Entwicklungsrechner). Das geschieht einmal je gemeldetem Überfall und lässt sich später auf denselben Scheibenmechanismus umstellen.

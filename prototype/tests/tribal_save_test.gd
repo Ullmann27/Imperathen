@@ -21,6 +21,7 @@ func _run() -> void:
 	_test_v5_migration()
 	_test_legacy_migration()
 	_test_rejections()
+	_test_frame_budget()
 	if failures.is_empty():
 		print("TRIBAL_SAVE_PASS %d checks" % checks)
 		quit(0)
@@ -64,7 +65,9 @@ func _test_calendar_and_round_trip() -> void:
 	model.advance(1.0)
 	_check(int(model.data.tribes.tick) == 0, "One second of village time is no tribal week")
 	var passed: Dictionary = model.pass_calendar_days(70, "Reise")
-	_check(passed.ok and int(model.data.tribes.tick) == 10 and int(model.data.revision) > before, "Seventy reported days run ten weekly ticks: %s" % str(passed.message))
+	_check(passed.ok and int(model.data.tribes.tick) == 0 and model.tribes_pending_weeks() == 10 and int(model.data.revision) > before, "Seventy reported days queue ten weeks without running them in this frame: %s" % str(passed.message))
+	var frames: int = model.finish_tribes()
+	_check(int(model.data.tribes.tick) == 10 and model.tribes_pending_weeks() == 0 and frames >= 10, "The ten weeks run over %d frame budgets" % frames)
 	_check(Tribes.day(model.data.tribes) <= Tribes.world_calendar_day(model.data), "The tribal world never runs ahead of the shared calendar")
 	var path := directory.path_join("round_trip.json")
 	var saved: Dictionary = model.save_game(path)
@@ -73,8 +76,11 @@ func _test_calendar_and_round_trip() -> void:
 	var result: Dictionary = loaded.load_game(path)
 	_check(result.ok, "Load with tribes: " + str(result.message))
 	_check(_json(loaded.data.tribes) == _json(model.data.tribes), "Tribal state survives the atomic save exactly")
+	_check(Tribes.is_validated(loaded.data.tribes), "The loaded tribal state needs no second full validation in its first frame")
 	model.pass_calendar_days(35)
 	loaded.pass_calendar_days(35)
+	model.finish_tribes()
+	loaded.finish_tribes()
 	_check(int(model.data.tribes.tick) == 15 and _json(loaded.data.tribes) == _json(model.data.tribes), "Saved and unsaved worlds continue identically")
 	var rejected: Dictionary = model.pass_calendar_days(0)
 	_check(not rejected.ok and int(model.data.tribes.tick) == 15, "An empty time span is rejected")
@@ -100,8 +106,7 @@ func _test_v5_migration() -> void:
 	# The loader restores schema integers that JSON.parse reads as floats.
 	_check(_json(JSON.parse_string(_json(model.data.village.childhood))) == _json(JSON.parse_string(_json(payload.village.childhood))), "Migration leaves the childhood story untouched")
 	var target := floori(Tribes.world_calendar_day(model.data) / float(Tribes.TICK_DAYS))
-	for i in 8:
-		model.advance(0.1)
+	model.finish_tribes()
 	_check(int(model.data.tribes.tick) == target, "Elapsed calendar weeks are caught up after load (%d of %d)" % [int(model.data.tribes.tick), target])
 	var again := directory.path_join("v6.json")
 	_check(model.save_game(again).ok and WorldModel.new().load_game(again).ok, "Migrated world saves and loads as v6")
@@ -144,3 +149,68 @@ func _test_rejections() -> void:
 	var loaded = WorldModel.new()
 	var result: Dictionary = loaded.load_game(path)
 	_check(result.ok and result.recovered_backup and int(loaded.data.tribes.groups.ubii_rhine.stock.wealth) == int(model.data.tribes.groups.ubii_rhine.stock.wealth), "A save with unbooked goods falls back to the verified backup")
+
+
+func _test_frame_budget() -> void:
+	# One year of reported travel is caught up in frame budgets, never in one frame.
+	var model = _childhood()
+	var reference: Dictionary = Tribes.copy_state(model.data.tribes)
+	_check(model.pass_calendar_days(364, "Reise").ok and model.tribes_pending_weeks() == 52, "A year of travel queues 52 weeks")
+	var budget: int = WorldModel.TRIBE_UNITS_PER_FRAME
+	var frames := 0
+	var over := 0
+	var jumps := 0
+	var commits := 0
+	var times := []
+	var last_tick := int(model.data.tribes.tick)
+	while model.tribes_pending_weeks() > 0 and frames < 20000:
+		var started := Time.get_ticks_usec()
+		var report: Dictionary = model.pump_tribes()
+		times.append(Time.get_ticks_usec() - started)
+		frames += 1
+		over += int(int(report.units) > budget)
+		var now := int(model.data.tribes.tick)
+		jumps += int(now - last_tick > 1 or (now != last_tick) != bool(report.committed))
+		commits += int(report.committed)
+		last_tick = now
+	_check(model.tribes_pending_weeks() == 0 and commits == 52, "All 52 weeks were committed (%d frames)" % frames)
+	_check(over == 0, "No frame spent more than %d work units" % budget)
+	_check(jumps == 0, "The committed world advances one finished week at a time, only on commit")
+	_check(frames >= 52 * 4, "A week needs several frames instead of one spike (%d frames for 52 weeks)" % frames)
+	Tribes.advance_ticks(reference, 52)
+	reference.extra_days = int(reference.extra_days) + 364
+	_check(_json(reference) == _json(model.data.tribes), "Budgeted weeks equal direct weeks bit for bit")
+	times.sort()
+	print("TRIBAL_FRAME desktop (development machine, loaded, relative only): p50 %d us, p95 %d us, p99 %d us, max %d us over %d frames of %d units" % [times[times.size() / 2], times[floori(times.size() * 0.95)], times[floori(times.size() * 0.99)], times.back(), frames, budget])
+	# The world's own frame clock spends the same budget through advance().
+	var world = _childhood()
+	world.pass_calendar_days(28)
+	var calls := 0
+	var advance_over := 0
+	while world.tribes_pending_weeks() > 0 and calls < 5000:
+		world.advance(0.1)
+		calls += 1
+		advance_over += int(int(world.tribe_units_last_pump) > budget)
+	_check(world.tribes_pending_weeks() == 0 and advance_over == 0, "advance() catches up four weeks within the frame budget (%d calls)" % calls)
+	# A save in the middle of a week keeps the last committed week only.
+	var first = _childhood()
+	first.pass_calendar_days(21)
+	for i in 5:
+		first.pump_tribes()
+	var mid_tick := int(first.data.tribes.tick)
+	_check(not first._tribe_job.is_empty() and str(first._tribe_job.stage) in ["copy", "week", "check"], "The save happens while a week is in progress (%s)" % str(first._tribe_job.get("stage", "none")))
+	var path := directory.path_join("mid_week.json")
+	_check(first.save_game(path).ok, "Save in the middle of a week")
+	var second = WorldModel.new()
+	_check(second.load_game(path).ok and int(second.data.tribes.tick) == mid_tick, "The loaded world has the last committed week")
+	first.finish_tribes()
+	second.finish_tribes()
+	_check(int(first.data.tribes.tick) == 3 and _json(first.data.tribes) == _json(second.data.tribes), "Saved mid-week and uninterrupted runs reach the same week bit for bit (D-046)")
+	# A change of the committed world restarts the week in progress.
+	var restart = _childhood()
+	restart.pass_calendar_days(14)
+	restart.pump_tribes()
+	restart.pass_calendar_days(7)
+	restart.finish_tribes()
+	_check(int(restart.data.tribes.tick) == 3 and restart.tribe_job_error.is_empty(), "A job whose base changed starts again and reaches the calendar")
+
