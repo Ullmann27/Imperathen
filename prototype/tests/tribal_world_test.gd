@@ -27,7 +27,6 @@ func _run() -> void:
 	_test_player_and_knowledge()
 	_test_visit_materialisation()
 	_test_stability()
-	_test_cost()
 	if failures.is_empty():
 		print("TRIBAL_WORLD_PASS %d checks" % checks)
 		quit(0)
@@ -452,8 +451,11 @@ func _test_stability() -> void:
 		var hostile_streak := {}
 		var longest := 0
 		var first_error := ""
+		var tick_time := 0
 		for i in 400:
+			var started := Time.get_ticks_usec()
 			Tribes.tick(state)
+			tick_time += Time.get_ticks_usec() - started
 			if i % 25 == 24 and first_error == "":
 				first_error = Tribes.validate(state)
 			for a: String in Tribes._active_tribes(state):
@@ -494,15 +496,9 @@ func _test_stability() -> void:
 			print("TRIBAL_STATS seed 1 ", JSON.stringify(state.stats))
 			for line: String in Tribes.chronicle(state, 12):
 				print("TRIBAL_CHRONICLE ", line)
-
-
-func _test_cost() -> void:
-	var state := Tribes.new_state(4)
-	var started := Time.get_ticks_usec()
-	Tribes.advance_ticks(state, 400)
-	var per_tick := (Time.get_ticks_usec() - started) / 400.0
-	started = Time.get_ticks_usec()
-	var error := Tribes.validate(state)
-	var validation := Time.get_ticks_usec() - started
-	print("TRIBAL_COST %.0f us per weekly tick, %d us per full validation (this machine, relative only)" % [per_tick, validation])
-	_check(error == "" and per_tick < 40000.0, "Weekly tick cost stays bounded on this machine")
+			var started := Time.get_ticks_usec()
+			var error := Tribes.validate(state)
+			var validation := Time.get_ticks_usec() - started
+			var per_tick := tick_time / 400.0
+			print("TRIBAL_COST %.0f us per weekly tick, %d us per full validation (this machine, relative only)" % [per_tick, validation])
+			_check(error == "" and per_tick < 40000.0, "Weekly tick cost stays bounded on this machine")
