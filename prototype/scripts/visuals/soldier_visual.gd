@@ -6,6 +6,7 @@ const LODS := ["near", "mid", "far"]
 const LOOPING := ["idle", "march", "run", "block", "wall", "testudo", "retreat"]
 const ALIASES := {"walk": "march", "fall": "death", "shield_wall": "wall", "bow": "shoot"}
 const STRIDES := {"march":1.30, "run":1.75, "retreat":1.48}
+const SWAP_AFTER := ["attack", "hit", "shoot"]
 const TINTS := [Color.WHITE, Color(0.96, 0.88, 0.77), Color(0.83, 0.91, 0.97)]
 const FRONTIER_ROLES := {"heavy": "legionary", "spear": "spearman", "archer": "archer", "officer": "officer"}
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
@@ -25,6 +26,10 @@ var _body: Node3D
 var _phase := 0.0
 var _manual_live := false
 var _face := FacialMotion.new()
+# Remaining crossfade of the manual timeline, in animation seconds. A level of
+# detail switch waits for it: the distant silhouette and a fresh rig show the
+# pure clip, so swapping during a crossfade would make the pose jump.
+var _blend_left := 0.0
 
 func _ready() -> void:
 	if _body == null:
@@ -75,6 +80,7 @@ func present(pose: String, phase: float, delta: float) -> void:
 		_manual_live = true
 		state = clip
 		player.play(clip,blend)
+		_blend_left = blend
 	# Both locomotion and actions use the timeline retained by ValleyScene.
 	# Replacing a far actor or changing its mesh cannot restart an attack.
 	var target := (fposmod(phase,1.0) if looping else clampf(phase,0.0,1.0))*animation.length
@@ -86,7 +92,42 @@ func present(pose: String, phase: float, delta: float) -> void:
 		player.advance(0.0)
 	else:
 		player.advance(forward)
+		_blend_left = maxf(0.0, _blend_left - forward)
 	_face.advance(delta, clip, detail)
+
+
+## True while the manual timeline still crossfades from the previous clip.
+func blending() -> bool:
+	return _manual_live and _blend_left > 0.0
+
+
+## A distant silhouette reproduces gaits, stances and guards, not the footwork
+## of one-shot actions (the attack clip slides its feet by about 0.16 m). A
+## level-of-detail swap waits for the crossfade and for such an action to end.
+func switch_ready() -> bool:
+	return not blending() and not (_manual_live and state in SWAP_AFTER)
+
+
+## A pooled figure taken over by another soldier starts without a crossfade
+## from the previous owner's pose.
+func reset_presentation() -> void:
+	_manual_live = false
+	_blend_left = 0.0
+
+
+## Change the cloth variant of the existing figure without rebuilding it.
+func retint(new_variant: int) -> void:
+	var tint := posmod(new_variant, TINTS.size())
+	if tint == variant:
+		return
+	variant = tint
+	if _body == null:
+		return
+	var meshes: Array = [_body] if _body is MeshInstance3D else _body.find_children("*", "MeshInstance3D", true, false)
+	for instance: MeshInstance3D in meshes:
+		instance.material_override = instance.get_meta("authored_override", null)
+		_apply_tint(instance)
+	_face.bind(_body, "soldier_%s_%d" % [role, variant])
 
 
 static func clip_length(role_name: String, clip: String) -> float:
@@ -159,6 +200,8 @@ func _replace_body() -> void:
 	_play_clip()
 
 func _apply_tint(instance: MeshInstance3D) -> void:
+	if not instance.has_meta("authored_override"):
+		instance.set_meta("authored_override", instance.material_override)
 	if variant == 0:
 		return
 	var base := instance.mesh.surface_get_material(0) as StandardMaterial3D

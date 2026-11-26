@@ -136,6 +136,8 @@ def main():
             ("battle_rules", ["--script", "res://tests/battle_rules_test.gd"], "failures=0"),
             ("soldier_visuals", ["--script", "res://tests/soldier_visual_test.gd"], "0 failed"),
             ("soldier_gait", ["--fixed-fps", "60", "--script", "res://tests/soldier_gait_test.gd"], "failures=0"),
+            ("formation_agents", ["--fixed-fps", "60", "--script", "res://tests/formation_agents_test.gd"], "FORMATION_AGENTS_PASS"),
+            ("formation_levels", ["--fixed-fps", "60", "--script", "res://tests/formation_agents_test.gd", "++", "large"], "FORMATION_AGENTS_PASS"),
             ("village_people", ["--fixed-fps", "60", "--script", "res://tests/village_person_test.gd"], "checks, 0 failed"),
             ("meshy_registry", ["--script", "res://tests/meshy_asset_registry_test.gd"], "MESHY_ASSET_REGISTRY"),
             ("meshy_characters", ["--fixed-fps", "60", "--script", "res://tests/meshy_character_test.gd"], "MESHY_CHARACTERS_PASS"),
