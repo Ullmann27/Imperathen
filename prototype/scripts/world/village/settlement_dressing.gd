@@ -103,6 +103,8 @@ func _furnish(house: Node3D, id: String, index: int) -> void:
 		Art.cylinder(stool,.04,.41,Vector3(cos(angle)*.18,.205,sin(angle)*.18),_materials.wood)
 	Art.box_collider(stool,Vector3(.54,.47,.54),Vector3(0,.235,0))
 	var yard := _group(house,"DoorstepSupplies")
+	if bool(house.get_meta("porch", false)):
+		yard.position.z += 1.20
 	_jar(yard,Vector3(-1.90,0,2.98),.90,index%2==0)
 	_jar(yard,Vector3(-2.35,0,2.80),.65,false)
 	# Chopped wood is piled beside the door, outside the walking ramp.

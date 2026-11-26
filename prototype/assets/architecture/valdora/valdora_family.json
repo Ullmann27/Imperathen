@@ -1,0 +1,2319 @@
+{
+ "variants": {
+  "valdora_t1_daub": {
+   "id": "valdora_t1_daub",
+   "tier": 1,
+   "label": "Fachwerk mit Lehmflechtwerk, Bruchsteinsockel",
+   "walls": "daub",
+   "roof": "gable_front",
+   "file": "valdora_t1_daub.glb",
+   "triangles": {
+    "shell": 28914,
+    "detail": 2816,
+    "far": 16,
+    "table": 396,
+    "bench": 132,
+    "jar": 286
+   },
+   "triangles_lod0_total": 32544,
+   "budget_lod0": 36000,
+   "budget_detail": 6000,
+   "budget_far": 400,
+   "within_budget": true,
+   "bounds_godot_min": [
+    -3.498,
+    -0.064,
+    -2.916
+   ],
+   "bounds_godot_max": [
+    3.498,
+    5.029,
+    4.009
+   ],
+   "colliders": [
+    {
+     "name": "WallWest",
+     "centre": [
+      -2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallEast",
+     "centre": [
+      2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallRear",
+     "centre": [
+      0.0,
+      1.7,
+      -2.335
+     ],
+     "size": [
+      6.0,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      -1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "DoorHead",
+     "centre": [
+      0.0,
+      2.98,
+      2.335
+     ],
+     "size": [
+      1.38,
+      0.84,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -3.0225,
+      0.31,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.62,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -1.845,
+      0.31,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.62,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      3.0225,
+      0.31,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.62,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      0.0,
+      0.31,
+      -2.5225
+     ],
+     "size": [
+      6.09,
+      0.62,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      1.845,
+      0.31,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.62,
+      0.045
+     ],
+     "yaw": 0
+    }
+   ],
+   "metadata": {
+    "socle_height_m": 0.62,
+    "ridge_height_m": 5.045,
+    "eave_height_m": 3.073,
+    "roof": "gable_front",
+    "tile_rows": [
+     8,
+     8
+    ],
+    "tile_columns": [
+     13,
+     13
+    ],
+    "entry": {
+     "landing_top": 0.445,
+     "ramp_start_z": 2.95,
+     "ramp_run": 1.05,
+     "width": 1.25
+    }
+   },
+   "seed": 501,
+   "features": {
+    "canopy": false,
+    "porch": false,
+    "upper": false,
+    "paint": null,
+    "quoins": false,
+    "grilles": false,
+    "antefixes": false
+   },
+   "build_seconds": 3.3,
+   "sha256": "f6f159dbbe8db81fea6ecd74dbca22d5edb866522f582010b8a0e013a1ac09d9",
+   "bytes": 4474140
+  },
+  "valdora_t1_rubble": {
+   "id": "valdora_t1_rubble",
+   "tier": 1,
+   "label": "Bruchsteinhaus mit Lehmputzresten",
+   "walls": "stone",
+   "roof": "eave_front",
+   "file": "valdora_t1_rubble.glb",
+   "triangles": {
+    "shell": 28728,
+    "detail": 2596,
+    "far": 16,
+    "table": 396,
+    "bench": 132,
+    "jar": 286
+   },
+   "triangles_lod0_total": 32138,
+   "budget_lod0": 36000,
+   "budget_detail": 6000,
+   "budget_far": 400,
+   "within_budget": true,
+   "bounds_godot_min": [
+    -3.415,
+    -0.061,
+    -2.997
+   ],
+   "bounds_godot_max": [
+    3.414,
+    4.676,
+    4.009
+   ],
+   "colliders": [
+    {
+     "name": "WallWest",
+     "centre": [
+      -2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallEast",
+     "centre": [
+      2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallRear",
+     "centre": [
+      0.0,
+      1.7,
+      -2.335
+     ],
+     "size": [
+      6.0,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      -1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "DoorHead",
+     "centre": [
+      0.0,
+      2.98,
+      2.335
+     ],
+     "size": [
+      1.38,
+      0.84,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -3.0225,
+      0.36,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.72,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -1.845,
+      0.36,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.72,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      3.0225,
+      0.36,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.72,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      0.0,
+      0.36,
+      -2.5225
+     ],
+     "size": [
+      6.09,
+      0.72,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      1.845,
+      0.36,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.72,
+      0.045
+     ],
+     "yaw": 0
+    }
+   ],
+   "metadata": {
+    "socle_height_m": 0.72,
+    "ridge_height_m": 4.691,
+    "eave_height_m": 3.09,
+    "roof": "eave_front",
+    "tile_rows": [
+     7,
+     7
+    ],
+    "tile_columns": [
+     15,
+     15
+    ],
+    "entry": {
+     "landing_top": 0.445,
+     "ramp_start_z": 2.95,
+     "ramp_run": 1.05,
+     "width": 1.25
+    }
+   },
+   "seed": 502,
+   "features": {
+    "canopy": false,
+    "porch": false,
+    "upper": false,
+    "paint": null,
+    "quoins": false,
+    "grilles": false,
+    "antefixes": false
+   },
+   "build_seconds": 3.2,
+   "sha256": "7b07a994995b0efe3f4fcacd131cf898ff4fae2eff7ccca398f6fc8b9e40e88b",
+   "bytes": 4386668
+  },
+  "valdora_t2_render": {
+   "id": "valdora_t2_render",
+   "tier": 2,
+   "label": "Kalkputzhaus mit Vordach",
+   "walls": "render",
+   "roof": "gable_front",
+   "file": "valdora_t2_render.glb",
+   "triangles": {
+    "shell": 28090,
+    "detail": 3520,
+    "far": 16,
+    "table": 396,
+    "bench": 132,
+    "jar": 286
+   },
+   "triangles_lod0_total": 32424,
+   "budget_lod0": 38000,
+   "budget_detail": 6000,
+   "budget_far": 400,
+   "within_budget": true,
+   "bounds_godot_min": [
+    -3.497,
+    -0.107,
+    -2.916
+   ],
+   "bounds_godot_max": [
+    3.497,
+    4.959,
+    4.013
+   ],
+   "colliders": [
+    {
+     "name": "RampCheek",
+     "centre": [
+      -0.745,
+      0.25,
+      3.475
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "RampCheek",
+     "centre": [
+      0.745,
+      0.25,
+      3.475
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallWest",
+     "centre": [
+      -2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallEast",
+     "centre": [
+      2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallRear",
+     "centre": [
+      0.0,
+      1.7,
+      -2.335
+     ],
+     "size": [
+      6.0,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      -1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "DoorHead",
+     "centre": [
+      0.0,
+      2.98,
+      2.335
+     ],
+     "size": [
+      1.38,
+      0.84,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      0.0,
+      0.275,
+      -2.5225
+     ],
+     "size": [
+      6.09,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    }
+   ],
+   "metadata": {
+    "socle_height_m": 0.55,
+    "ridge_height_m": 4.974,
+    "eave_height_m": 3.082,
+    "roof": "gable_front",
+    "tile_rows": [
+     8,
+     8
+    ],
+    "tile_columns": [
+     13,
+     13
+    ],
+    "entry": {
+     "landing_top": 0.445,
+     "ramp_start_z": 2.95,
+     "ramp_run": 1.05,
+     "width": 1.25
+    },
+    "canopy": {
+     "depth_m": 1.05,
+     "width_m": 2.1,
+     "clear_height_m": 2.74
+    }
+   },
+   "seed": 601,
+   "features": {
+    "canopy": true,
+    "porch": false,
+    "upper": false,
+    "paint": "paint_red",
+    "quoins": false,
+    "grilles": false,
+    "antefixes": false
+   },
+   "build_seconds": 3.5,
+   "sha256": "f97d5e5afafe8ffad546bd19b4f9aff8a9f889352088545d072e034335f9369d",
+   "bytes": 4404836
+  },
+  "valdora_t2_eave": {
+   "id": "valdora_t2_eave",
+   "tier": 2,
+   "label": "Traufst\u00e4ndiges Putzhaus mit Ockerband",
+   "walls": "render",
+   "roof": "eave_front",
+   "file": "valdora_t2_eave.glb",
+   "triangles": {
+    "shell": 26840,
+    "detail": 4004,
+    "far": 16,
+    "table": 396,
+    "bench": 132,
+    "jar": 286
+   },
+   "triangles_lod0_total": 31658,
+   "budget_lod0": 38000,
+   "budget_detail": 6000,
+   "budget_far": 400,
+   "within_budget": true,
+   "bounds_godot_min": [
+    -3.415,
+    -0.107,
+    -2.997
+   ],
+   "bounds_godot_max": [
+    3.413,
+    4.618,
+    4.013
+   ],
+   "colliders": [
+    {
+     "name": "RampCheek",
+     "centre": [
+      -0.745,
+      0.25,
+      3.475
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "RampCheek",
+     "centre": [
+      0.745,
+      0.25,
+      3.475
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallWest",
+     "centre": [
+      -2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallEast",
+     "centre": [
+      2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallRear",
+     "centre": [
+      0.0,
+      1.7,
+      -2.335
+     ],
+     "size": [
+      6.0,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      -1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "DoorHead",
+     "centre": [
+      0.0,
+      2.98,
+      2.335
+     ],
+     "size": [
+      1.38,
+      0.84,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      0.0,
+      0.275,
+      -2.5225
+     ],
+     "size": [
+      6.09,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    }
+   ],
+   "metadata": {
+    "socle_height_m": 0.55,
+    "ridge_height_m": 4.632,
+    "eave_height_m": 3.098,
+    "roof": "eave_front",
+    "tile_rows": [
+     7,
+     7
+    ],
+    "tile_columns": [
+     15,
+     15
+    ],
+    "entry": {
+     "landing_top": 0.445,
+     "ramp_start_z": 2.95,
+     "ramp_run": 1.05,
+     "width": 1.25
+    }
+   },
+   "seed": 602,
+   "features": {
+    "canopy": false,
+    "porch": false,
+    "upper": false,
+    "paint": "paint_ochre",
+    "quoins": false,
+    "grilles": true,
+    "antefixes": false
+   },
+   "build_seconds": 3.4,
+   "sha256": "649bd6e0a2917a8c783aeb6b4bfe02e735275c1a18f862a3440db8153f532c7f",
+   "bytes": 4317024
+  },
+  "valdora_t2_mixed": {
+   "id": "valdora_t2_mixed",
+   "tier": 2,
+   "label": "Teilverputztes Bruchsteinhaus mit Fenstergittern",
+   "walls": "render",
+   "roof": "gable_front",
+   "file": "valdora_t2_mixed.glb",
+   "triangles": {
+    "shell": 28644,
+    "detail": 3916,
+    "far": 16,
+    "table": 396,
+    "bench": 132,
+    "jar": 286
+   },
+   "triangles_lod0_total": 33374,
+   "budget_lod0": 38000,
+   "budget_detail": 6000,
+   "budget_far": 400,
+   "within_budget": true,
+   "bounds_godot_min": [
+    -3.498,
+    -0.107,
+    -2.916
+   ],
+   "bounds_godot_max": [
+    3.498,
+    5.103,
+    4.013
+   ],
+   "colliders": [
+    {
+     "name": "RampCheek",
+     "centre": [
+      -0.745,
+      0.25,
+      3.475
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "RampCheek",
+     "centre": [
+      0.745,
+      0.25,
+      3.475
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallWest",
+     "centre": [
+      -2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallEast",
+     "centre": [
+      2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallRear",
+     "centre": [
+      0.0,
+      1.7,
+      -2.335
+     ],
+     "size": [
+      6.0,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      -1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "DoorHead",
+     "centre": [
+      0.0,
+      2.98,
+      2.335
+     ],
+     "size": [
+      1.38,
+      0.84,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      0.0,
+      0.275,
+      -2.5225
+     ],
+     "size": [
+      6.09,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    }
+   ],
+   "metadata": {
+    "socle_height_m": 0.55,
+    "ridge_height_m": 5.118,
+    "eave_height_m": 3.065,
+    "roof": "gable_front",
+    "tile_rows": [
+     9,
+     9
+    ],
+    "tile_columns": [
+     13,
+     13
+    ],
+    "entry": {
+     "landing_top": 0.445,
+     "ramp_start_z": 2.95,
+     "ramp_run": 1.05,
+     "width": 1.25
+    }
+   },
+   "seed": 603,
+   "features": {
+    "canopy": false,
+    "porch": false,
+    "upper": false,
+    "paint": null,
+    "quoins": false,
+    "grilles": true,
+    "antefixes": false
+   },
+   "build_seconds": 3.4,
+   "sha256": "d6594082ace05276be58923952be06f4c5093f2858e90ef35b70bf6aeed3864b",
+   "bytes": 4522528
+  },
+  "valdora_t2_hip": {
+   "id": "valdora_t2_hip",
+   "tier": 2,
+   "label": "Putzhaus mit Walmdach und Ockersockel",
+   "walls": "render",
+   "roof": "hip",
+   "file": "valdora_t2_hip.glb",
+   "triangles": {
+    "shell": 27972,
+    "detail": 4004,
+    "far": 18,
+    "table": 396,
+    "bench": 132,
+    "jar": 286
+   },
+   "triangles_lod0_total": 32790,
+   "budget_lod0": 38000,
+   "budget_detail": 6000,
+   "budget_far": 400,
+   "within_budget": true,
+   "bounds_godot_min": [
+    -3.456,
+    -0.107,
+    -3.016
+   ],
+   "bounds_godot_max": [
+    3.456,
+    4.654,
+    4.013
+   ],
+   "colliders": [
+    {
+     "name": "RampCheek",
+     "centre": [
+      -0.745,
+      0.25,
+      3.475
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "RampCheek",
+     "centre": [
+      0.745,
+      0.25,
+      3.475
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallWest",
+     "centre": [
+      -2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallEast",
+     "centre": [
+      2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallRear",
+     "centre": [
+      0.0,
+      1.7,
+      -2.335
+     ],
+     "size": [
+      6.0,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      -1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "DoorHead",
+     "centre": [
+      0.0,
+      2.98,
+      2.335
+     ],
+     "size": [
+      1.38,
+      0.84,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      0.0,
+      0.275,
+      -2.5225
+     ],
+     "size": [
+      6.09,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    }
+   ],
+   "metadata": {
+    "socle_height_m": 0.55,
+    "ridge_height_m": 4.691,
+    "eave_height_m": 3.09,
+    "roof": "hip",
+    "tile_rows": [
+     7,
+     7,
+     7,
+     7
+    ],
+    "tile_columns": [
+     15,
+     15,
+     13,
+     13
+    ],
+    "entry": {
+     "landing_top": 0.445,
+     "ramp_start_z": 2.95,
+     "ramp_run": 1.05,
+     "width": 1.25
+    }
+   },
+   "seed": 604,
+   "features": {
+    "canopy": false,
+    "porch": false,
+    "upper": false,
+    "paint": "paint_ochre",
+    "quoins": false,
+    "grilles": true,
+    "antefixes": false
+   },
+   "build_seconds": 3.4,
+   "sha256": "1d97a7245923bc329c9eee1cc63988515adb13471ae431315467bc2700f8df92",
+   "bytes": 4461028
+  },
+  "valdora_t3_portico": {
+   "id": "valdora_t3_portico",
+   "tier": 3,
+   "label": "Haus mit tuskischer Vorhalle, Antefixen und Ziermalerei",
+   "walls": "render",
+   "roof": "eave_front",
+   "file": "valdora_t3_portico.glb",
+   "triangles": {
+    "shell": 31608,
+    "detail": 5136,
+    "far": 18,
+    "table": 396,
+    "bench": 132,
+    "jar": 286
+   },
+   "triangles_lod0_total": 37558,
+   "budget_lod0": 50000,
+   "budget_detail": 6000,
+   "budget_far": 400,
+   "within_budget": true,
+   "bounds_godot_min": [
+    -3.415,
+    -0.107,
+    -2.997
+   ],
+   "bounds_godot_max": [
+    3.416,
+    4.619,
+    4.563
+   ],
+   "colliders": [
+    {
+     "name": "RampCheek",
+     "centre": [
+      -0.745,
+      0.25,
+      4.025
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "RampCheek",
+     "centre": [
+      0.745,
+      0.25,
+      4.025
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "PorchFloor",
+     "centre": [
+      0.0,
+      0.2225,
+      3.025
+     ],
+     "size": [
+      4.84,
+      0.445,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "PorchStep",
+     "centre": [
+      -1.65,
+      0.15,
+      3.71
+     ],
+     "size": [
+      1.54,
+      0.3,
+      0.32
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "PorchStep",
+     "centre": [
+      -1.65,
+      0.075,
+      4.03
+     ],
+     "size": [
+      1.54,
+      0.15,
+      0.32
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "PorchStep",
+     "centre": [
+      1.65,
+      0.15,
+      3.71
+     ],
+     "size": [
+      1.54,
+      0.3,
+      0.32
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "PorchStep",
+     "centre": [
+      1.65,
+      0.075,
+      4.03
+     ],
+     "size": [
+      1.54,
+      0.15,
+      0.32
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "PorchColumn",
+     "centre": [
+      -1.75,
+      1.4919,
+      3.27
+     ],
+     "size": [
+      0.4,
+      2.0939,
+      0.4
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "PorchColumn",
+     "centre": [
+      1.75,
+      1.4919,
+      3.27
+     ],
+     "size": [
+      0.4,
+      2.0939,
+      0.4
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallWest",
+     "centre": [
+      -2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallEast",
+     "centre": [
+      2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallRear",
+     "centre": [
+      0.0,
+      1.7,
+      -2.335
+     ],
+     "size": [
+      6.0,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      -1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "DoorHead",
+     "centre": [
+      0.0,
+      2.98,
+      2.335
+     ],
+     "size": [
+      1.38,
+      0.84,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      0.0,
+      0.275,
+      -2.5225
+     ],
+     "size": [
+      6.09,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    }
+   ],
+   "metadata": {
+    "socle_height_m": 0.55,
+    "ridge_height_m": 4.632,
+    "eave_height_m": 3.098,
+    "roof": "eave_front",
+    "tile_rows": [
+     9,
+     7
+    ],
+    "tile_columns": [
+     15,
+     15
+    ],
+    "entry": {
+     "landing_top": 0.445,
+     "ramp_start_z": 3.5,
+     "ramp_run": 1.05,
+     "width": 1.25
+    },
+    "porch": {
+     "columns": 2,
+     "order": "Tuscan (Italic)",
+     "depth_m": 1.05,
+     "floor_top_m": 0.445,
+     "column_height_m": 2.094,
+     "clear_height_m": 2.094
+    }
+   },
+   "seed": 701,
+   "features": {
+    "canopy": false,
+    "porch": true,
+    "upper": false,
+    "paint": "paint_red",
+    "quoins": true,
+    "grilles": true,
+    "antefixes": true
+   },
+   "build_seconds": 3.9,
+   "sha256": "4b3c1d1b87acd5378f01c5d3913b599e9f5898a1bee8fee412c6c632f3ef4751",
+   "bytes": 5073556
+  },
+  "valdora_t3_upper": {
+   "id": "valdora_t3_upper",
+   "tier": 3,
+   "label": "Zweigeschossiges Haus mit Holzbalkon (maenianum)",
+   "walls": "render",
+   "roof": "gable_front",
+   "file": "valdora_t3_upper.glb",
+   "triangles": {
+    "shell": 38068,
+    "detail": 4532,
+    "far": 16,
+    "table": 396,
+    "bench": 132,
+    "jar": 286
+   },
+   "triangles_lod0_total": 43414,
+   "budget_lod0": 50000,
+   "budget_detail": 6000,
+   "budget_far": 400,
+   "within_budget": true,
+   "bounds_godot_min": [
+    -3.497,
+    -0.107,
+    -2.916
+   ],
+   "bounds_godot_max": [
+    3.497,
+    7.231,
+    4.013
+   ],
+   "colliders": [
+    {
+     "name": "RampCheek",
+     "centre": [
+      -0.745,
+      0.25,
+      3.475
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "RampCheek",
+     "centre": [
+      0.745,
+      0.25,
+      3.475
+     ],
+     "size": [
+      0.22,
+      0.5,
+      1.05
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallWest",
+     "centre": [
+      -2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallEast",
+     "centre": [
+      2.84,
+      1.7,
+      -0.0
+     ],
+     "size": [
+      0.32,
+      3.4,
+      5.0
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallRear",
+     "centre": [
+      0.0,
+      1.7,
+      -2.335
+     ],
+     "size": [
+      6.0,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      -1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "WallFront",
+     "centre": [
+      1.845,
+      1.7,
+      2.335
+     ],
+     "size": [
+      2.31,
+      3.4,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "DoorHead",
+     "centre": [
+      0.0,
+      2.98,
+      2.335
+     ],
+     "size": [
+      1.38,
+      0.84,
+      0.33
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      -1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      3.0225,
+      0.275,
+      -0.0
+     ],
+     "size": [
+      0.045,
+      0.55,
+      5.09
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      0.0,
+      0.275,
+      -2.5225
+     ],
+     "size": [
+      6.09,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "SocleSkirt",
+     "centre": [
+      1.845,
+      0.275,
+      2.5225
+     ],
+     "size": [
+      2.31,
+      0.55,
+      0.045
+     ],
+     "yaw": 0
+    },
+    {
+     "name": "BalconyFloor",
+     "centre": [
+      0.0,
+      3.52,
+      3.0
+     ],
+     "size": [
+      4.7,
+      0.12,
+      1.05
+     ],
+     "yaw": 0
+    }
+   ],
+   "metadata": {
+    "socle_height_m": 0.55,
+    "ridge_height_m": 7.243,
+    "eave_height_m": 5.43,
+    "roof": "gable_front",
+    "tile_rows": [
+     8,
+     8
+    ],
+    "tile_columns": [
+     13,
+     13
+    ],
+    "entry": {
+     "landing_top": 0.445,
+     "ramp_start_z": 2.95,
+     "ramp_run": 1.05,
+     "width": 1.25
+    },
+    "balcony": {
+     "depth_m": 0.95,
+     "floor_z_m": 3.52,
+     "rail_height_m": 1.0
+    }
+   },
+   "seed": 702,
+   "features": {
+    "canopy": false,
+    "porch": false,
+    "upper": true,
+    "paint": "paint_ochre",
+    "quoins": true,
+    "grilles": true,
+    "antefixes": false
+   },
+   "build_seconds": 5.0,
+   "sha256": "4b03203346a17335f2c9deefb724499c8320ddc14be97fedf2cf32f719790d34",
+   "bytes": 6162600
+  }
+ },
+ "schema": 1,
+ "family": "valdora_house_family",
+ "period": "58 BC, late Republic, countryside of Aquileia (Gallia Cisalpina)",
+ "units": "metres; Godot house-local axes (+Y up, street/door side +Z); collider boxes are centre/size/yaw",
+ "texture_layers": [
+  "plaster_lime",
+  "plaster_aged",
+  "opus_incertum",
+  "rubble_socle",
+  "ashlar",
+  "daub",
+  "oak_grey",
+  "oak_brown",
+  "tegula",
+  "tegula_old",
+  "mortar",
+  "iron",
+  "paint_red",
+  "paint_ochre",
+  "flagstone",
+  "cocciopesto"
+ ],
+ "textures": {
+  "very_high": [
+   "family_albedo_1024.jpg",
+   "family_normal_1024.jpg",
+   "family_orm_1024.jpg"
+  ],
+  "balanced_high": [
+   "family_albedo_512.jpg",
+   "family_normal_512.jpg",
+   "family_orm_512.jpg"
+  ],
+  "low": [
+   "family_albedo_256.jpg",
+   "family_orm_256.jpg"
+  ]
+ },
+ "mesh_roles": {
+  "shell": "walls, roof, frames, doors (all profiles)",
+  "detail": "fittings, nails, grilles, antefixes, pebbles (range per profile)",
+  "far": "silhouette beyond the far range",
+  "Fixture_*": "interior contract furniture, separate nodes"
+ },
+ "budgets_triangles_lod0": {
+  "tier_1": 36000,
+  "tier_2": 38000,
+  "tier_3": 50000,
+  "detail": 6000,
+  "far": 400
+ },
+ "floor_abs": 0.3925,
+ "interior_contract": {
+  "applies_to": "all variants (ground-floor room)",
+  "floor_abs": 0.3925,
+  "plaster_faces": {
+   "W": -2.68,
+   "E": 2.68,
+   "N": -2.17,
+   "S": 2.17
+  },
+  "standing_limits": {
+   "x": 2.635,
+   "z": 2.125
+  },
+  "wall_plate_height": 2.8675,
+  "ceiling_clear_min": 2.8,
+  "door": {
+   "wall": "S",
+   "centre_x": 0.0,
+   "clear_width": 1.12,
+   "clear_height": 2.08,
+   "open_leaf": {
+    "hinge": [
+     -0.575,
+     2.15
+    ],
+    "open_degrees": 100,
+    "length": 1.12,
+    "thickness": 0.064
+   }
+  },
+  "windows": [
+   {
+    "wall": "S",
+    "x": [
+     -2.32,
+     -1.28
+    ],
+    "sill": 1.1275,
+    "head": 2.0875
+   },
+   {
+    "wall": "S",
+    "x": [
+     1.28,
+     2.32
+    ],
+    "sill": 1.1275,
+    "head": 2.0875
+   },
+   {
+    "wall": "E",
+    "z": [
+     -0.52,
+     0.52
+    ],
+    "sill": 1.1275,
+    "head": 2.0875
+   },
+   {
+    "wall": "N",
+    "x": [
+     -0.48,
+     0.48
+    ],
+    "sill": 1.3075,
+    "head": 2.1075
+   }
+  ],
+  "fixtures": {
+   "Fixture_Table": {
+    "x": [
+     -1.825,
+     -0.375
+    ],
+    "z": [
+     -1.1525,
+     -0.0675
+    ],
+    "top": 0.85
+   },
+   "Fixture_Bench": {
+    "x": [
+     1.68,
+     2.18
+    ],
+    "z": [
+     -0.95,
+     0.95
+    ],
+    "top": 0.5
+   },
+   "Fixture_Jar": {
+    "centre": [
+     -2.23,
+     1.47
+    ],
+    "radius": 0.27,
+    "height": 0.62
+   }
+  },
+  "hearth_zone": {
+   "centre": [
+    1.62,
+    1.5
+   ],
+   "smoke_vent": "roof hood above the hearth zone (detail mesh)"
+  },
+  "tier_extras": {
+   "valdora_t3_upper": "upper floor (loft) above joists at 2.82 m clear; no inner stair yet",
+   "valdora_t3_portico": "covered porch 4.84 x 1.05 m at 0.445 m in front of the door"
+  }
+ },
+ "generator": "art/architecture/valdora_family/build_family.py",
+ "blender": "4.3.2",
+ "structures": {
+  "valdora_forge": {
+   "id": "valdora_forge",
+   "label": "Schmiede des Nerva (Pultdach auf Eichenpfosten)",
+   "file": "valdora_forge.glb",
+   "triangles": {
+    "shell": 6260,
+    "detail": 2286,
+    "far": 36,
+    "Hearth": 3804,
+    "Bellows": 972,
+    "Anvil": 576,
+    "ToolRack": 1276,
+    "QuenchTrough": 748,
+    "Workbench": 740,
+    "Stock": 2432
+   },
+   "triangles_lod0_total": 19094,
+   "budget_lod0": 24000,
+   "budget_far": 400,
+   "within_budget": true,
+   "bounds_godot_min": [
+    -1.061,
+    -0.043,
+    -3.655
+   ],
+   "bounds_godot_max": [
+    1.539,
+    3.109,
+    3.49
+   ],
+   "fixtures": [
+    "Fixture_Hearth",
+    "Fixture_Bellows",
+    "Fixture_Anvil",
+    "Fixture_ToolRack",
+    "Fixture_QuenchTrough",
+    "Fixture_Workbench",
+    "Fixture_Stock"
+   ],
+   "metadata": {
+    "tile_rows": 5,
+    "tile_columns": 16,
+    "function": "smithy of Nerva (smith_home): hearth, bellows, anvil, quench trough, tool rack, workbench with goods, bar stock, charcoal",
+    "stations_godot": {
+     "hearth": [
+      0.05000000074505806,
+      -2.8499999046325684
+     ],
+     "bellows": [
+      -0.11999999731779099,
+      -1.9500000476837158
+     ],
+     "anvil": [
+      0.0,
+      1.0
+     ],
+     "tool_rack": [
+      0.9399999976158142,
+      1.4500000476837158
+     ],
+     "quench_trough": [
+      0.10000000149011612,
+      2.4000000953674316
+     ],
+     "workbench": [
+      1.02,
+      -1.25
+     ],
+     "stock": [
+      0.8,
+      1.45
+     ],
+     "charcoal": [
+      1.06,
+      -2.52
+     ]
+    },
+    "roof": "mono-pitch lean-to, tegulae and imbrices, 14.8 deg",
+    "eave_height_m": 2.33,
+    "top_height_m": 2.95
+   },
+   "build_seconds": 1.7,
+   "sha256": "bb48428b4c13f5f9daa239fa1dbba33fce0573fd269022ef79869b1cc6c64d79",
+   "bytes": 2665756
+  }
+ }
+}

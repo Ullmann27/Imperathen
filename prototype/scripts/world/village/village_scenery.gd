@@ -9,6 +9,7 @@ const WATER_LEVEL := .021
 ## The brook surfaces at a spring whose rounded end narrows over this length.
 const SPRING_ROUNDING_M := 3.5
 const Look = preload("res://scripts/rendering/village_look.gd")
+const HouseFamily = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
 const Grove = preload("res://scripts/visuals/grove.gd")
 const WORKSHOP := Vector3(-9.2,0,-7.35)
 const STORE := Vector3(-10.6,0,15.6)
@@ -106,6 +107,7 @@ func apply_season(index: int, sun: DirectionalLight3D, environment: Environment)
 	grass_material.set_shader_parameter("bloom",[1.0,.85,.25,0.0][season])
 	for material in [ground_material,water_material]:
 		material.set_shader_parameter("wetness",WET[season])
+	HouseFamily.set_wetness(WET[season])
 	# Sun, sky, ambient and haze presets are owned by the look script.
 	Look.apply_season_light(season,sun,environment,sky_material)
 	if _rain:
