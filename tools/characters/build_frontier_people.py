@@ -41,6 +41,7 @@ def module(name, path):
 
 hero = module("frontier_hero_source", ROOT / "tools/characters/build_hero.py")
 soldier = module("frontier_soldier_source", ROOT / "art/soldiers/build.py")
+skirt_seam = module("frontier_skirt_seam", ROOT / "tools/characters/smooth_frontier_skirt_seam.py")
 
 
 def digest(path):
@@ -487,6 +488,7 @@ def export(kind):
             export_frame_step=1, export_animations=True, export_morph=True,
             export_morph_animation=False, export_def_bones=False)
         death_ground = soldier.death_ground.ground(path)
+        seam = skirt_seam.smooth(path)
         count = 0
         for obj in bpy.context.scene.objects:
             if obj.type == "MESH":
@@ -495,7 +497,8 @@ def export(kind):
         records.append({"lod": level, "path": str(path.relative_to(ROOT)), "triangles": count,
                         "bytes": path.stat().st_size, "sha256": digest(path), "texture_edge": edge,
                         "face_morphs": level < 2, "belt_fit": belt_fit,
-                        "death_ground_contact": {key: death_ground[key] for key in ("before", "after", "maximum_floor_correction_m")}})
+                        "death_ground_contact": {key: death_ground[key] for key in ("before", "after", "maximum_floor_correction_m")},
+                        "skirt_seam": {key: seam[key] for key in ("before", "after", "unchanged") if key in seam}})
     return records
 
 
