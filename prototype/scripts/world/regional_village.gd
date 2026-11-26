@@ -7,6 +7,8 @@ const Dressing = preload("res://scripts/world/village/frontier_dressing.gd")
 const Settlement = preload("res://scripts/world/village/settlement_dressing.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
 const Surfaces = preload("res://scripts/rendering/village_surfaces.gd")
+const Family = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
+const Paving = preload("res://scripts/world/village/architecture/valdora_paving.gd")
 var current_origin := ""
 var quality := "balanced"
 var frontier_details: Node3D
@@ -39,13 +41,17 @@ func show_origin(id: String) -> void:
 	var places := [Vector3(-13,0,11),Vector3(-14,0,-11),Vector3(-5,0,-19),Vector3(20,0,-18)]
 	if id == "italia":
 		for home: Dictionary in Layout.HOMES:
-			var model := _add_scene("res://assets/architecture/frontier_house.glb",home.at)
-			model.name = home.id
+			var model := Family.instantiate(home, quality)
+			model.position = home.at
 			model.rotation.y = float(home.yaw)
-			model.set_meta("household_id",home.id)
-			_tint_house(model,Color(home.tint))
-			_static_collision(model,"roman")
+			add_child(model)
+			Family.build_collision(model)
 			house_count += 1
+		var paving := Paving.new()
+		paving.name = "ValdoraPaving"
+		add_child(paving)
+		paving.build(self)
+		paving.set_quality(quality)
 	for i in (0 if id == "italia" else places.size()):
 		var path := "res://assets/landscape/%s.glb" % house
 		if id == "italia":
@@ -158,6 +164,12 @@ func _physics_process(delta: float) -> void:
 
 func set_quality(profile: String) -> void:
 	quality = profile
+	for child in get_children():
+		if Family.is_family_house(child):
+			Family.apply_quality(child as Node3D, profile)
+	var paving = get_node_or_null("ValdoraPaving")
+	if paving:
+		paving.set_quality(profile)
 	if is_instance_valid(worker_figure):
 		worker_figure.profile = profile
 	if frontier_details:

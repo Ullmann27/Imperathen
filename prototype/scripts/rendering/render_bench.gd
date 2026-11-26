@@ -111,6 +111,9 @@ static func stage_village(world: Node3D, view: String, start: Dictionary) -> boo
 			world._camera_initialized = false
 			world._update_camera(0)
 		"village_lane", "night_torch":
+			# Fixed comparison time: a fresh campaign may start before sunrise.
+			# Do not let its saved clock turn the daytime comparison into a night shot.
+			_set_bench_day(world)
 			var lane: Dictionary = cameras().lane
 			place_player(world, lane.player, lane.yaw, float(start.get("lift", 1.0)))
 			world._camera_yaw = lane.yaw
@@ -120,6 +123,7 @@ static func stage_village(world: Node3D, view: String, start: Dictionary) -> boo
 			if view == "night_torch":
 				enter_night(world)
 		"village_overview":
+			_set_bench_day(world)
 			var overview: Dictionary = cameras().overview
 			camera.fov = overview.fov
 			camera.global_position = overview.eye
@@ -132,6 +136,11 @@ static func stage_village(world: Node3D, view: String, start: Dictionary) -> boo
 		if figure.has_method("refresh_lod") and figure.is_visible_in_tree():
 			figure.refresh_lod(camera)
 	world.population.update_nearby(world.get_player_position(), true)
+	# Refresh the same native light selection at the new camera before a
+	# fixed-frame comparison; a zero-time sample changes no simulation clock.
+	var look: Object = _village_look(world)
+	if look != null:
+		look.call("_process", 0.0)
 	return true
 
 
@@ -276,8 +285,10 @@ static func _stage_conversation(world: Node3D, shot: Dictionary, start: Dictiona
 static func village_start(world: Node3D) -> Dictionary:
 	var camera: Camera3D = world._camera
 	var player: CharacterBody3D = world._player
+	var look: Object = _village_look(world)
 	return {"player": player.global_position, "yaw": world._camera_yaw, "pitch": world._camera_pitch,
 		"camera": camera.global_transform, "fov": camera.fov, "figure_yaw": world._figure.rotation.y,
+		"look_time": float(look.get("time_of_day")) if look != null else -1.0,
 		"lift": player.global_position.y - floor_height(world, player.global_position)}
 
 
@@ -296,6 +307,16 @@ static func restore_village(world: Node3D, start: Dictionary) -> void:
 	world._camera_pitch = start.pitch
 	world._camera.fov = start.fov
 	world._camera.global_transform = start.camera
+	var look: Object = _village_look(world)
+	if look != null and start.has("look_time"):
+		look.call("set_time_of_day", float(start.look_time))
+		look.call("_process", 0.0)
+
+
+static func _set_bench_day(world: Node3D) -> void:
+	var look: Object = _village_look(world)
+	if look != null:
+		look.call("set_time_of_day", -1.0)
 
 
 static func place_player(world: Node3D, at: Vector3, yaw: float, lift: float) -> void:
@@ -576,6 +597,7 @@ static func engine_state(viewport: Viewport, scene: Node) -> Dictionary:
 			"positional_shadow_atlas_size": viewport.positional_shadow_atlas_size,
 			"anisotropic_filtering_level": viewport.anisotropic_filtering_level},
 		"camera": {"set": cameras().source, "transform": str(camera.global_transform) if camera else "", "fov": camera.fov if camera else 0.0,
+			"position": [camera.global_position.x, camera.global_position.y, camera.global_position.z] if camera else [],
 			"near": camera.near if camera else 0.0, "far": camera.far if camera else 0.0},
 		"sun": sun, "lights": lights, "environment": env}
 

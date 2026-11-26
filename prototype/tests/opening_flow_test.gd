@@ -7,6 +7,9 @@ const VillageLife = preload("res://scripts/story/village_life.gd")
 const Model = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const OpeningStory = preload("res://scripts/story/opening_story.gd")
+const Person = preload("res://scripts/visuals/village_person.gd")
+const Layout = preload("res://scripts/world/village/village_layout.gd")
+const HouseFamily = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
 var failures: Array[String] = []
 var checks := 0
 var game
@@ -86,10 +89,12 @@ func _run() -> void:
 	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_home" and bool(game.opening_sequence.beats[game.opening_index].final), "After the choice, skip stops at its real objective")
 	game.opening_overlay._request_advance()
 	_check(game.screen == "playing" and game.world.get_node("WorldCamera").current and game.world.get("_active"), "Explicit family-objective acceptance returns the ordinary camera and movement")
+	_check_release_visuals("new campaign")
 	_check(game.model.data.companion.choice == "" and game.model.data.resources.wood == 0, "Skipping both cinematics does not choose relationships or collect resources")
 	game._show_menu()
 	game._continue_game()
 	_check(game.screen == "playing", "Completed I-00 and family introductions are not forced again on Continue")
+	_check_release_visuals("continued campaign")
 	_check(Checkpoint.read("another-life").is_empty(), "The sidecar cannot attach an introduction to another save")
 
 	# Keep the previous six-year transition as a saved-campaign compatibility
@@ -174,6 +179,48 @@ func _move(position: Vector3) -> void:
 	game.world.get_node("Player").position = position
 	game.model.set_player_position(position)
 	game.world.sync_state(game.model.data)
+
+
+## Run on the original-asset APK build, not optional developer fixtures.
+## The ordinary New Life and Continue routes must both instantiate the assets.
+func _check_release_visuals(context: String) -> void:
+	if OS.get_environment("IMPERATHEN_FULL_ASSET_ACCEPTANCE") != "1":
+		return
+	for outfit: String in ["armoured", "civil"]:
+		_check(Person.youth_outfit_installed(outfit), context + ": all original " + outfit + " youth LODs are installed")
+		_check(FileAccess.file_exists(String(Person.MESHY_YOUTH_OUTFITS[outfit].motion)), context + ": original " + outfit + " retarget report is installed")
+	var figure = game.world._figure
+	_check(is_instance_valid(figure), context + ": the live player figure exists")
+	if is_instance_valid(figure):
+		_check(figure.age == 12 and figure.youth_outfit == "civil" and figure.active_model_path == String(Person.MESHY_YOUTH_OUTFITS.civil.path) % figure.detail, context + ": actual twelve-year-old Meshy civilian body, not a generic fallback")
+		_check(figure._uses_youth_mocap(), context + ": original retargeted animation route drives the player")
+		_check(is_instance_valid(figure.body) and figure.body.find_child("MeshyYouthBody", true, false) is MeshInstance3D, context + ": original skinned youth mesh is instantiated")
+		for clip: String in ["march", "run", "jab_left", "jab_right", "block"]:
+			_check(is_instance_valid(figure.animator) and figure.animator.has_animation(clip), context + ": live youth clip " + clip)
+	var regional = game.world.regional
+	_check(is_instance_valid(regional) and regional.current_origin == "italia", context + ": actual Valdora settlement is attached")
+	if is_instance_valid(regional):
+		_check(regional.house_count == Layout.HOMES.size(), context + ": all household buildings are placed")
+		var variants := {}
+		for home: Dictionary in Layout.HOMES:
+			var house: Node = regional.get_node_or_null(String(home.id))
+			_check(is_instance_valid(house), context + ": household " + String(home.id))
+			if not is_instance_valid(house):
+				continue
+			var variant := String(house.get_meta("house_variant", ""))
+			_check(variant == HouseFamily.variant_for(String(home.id)), context + ": original house variant " + String(home.id))
+			_check(house.has_node("FamilyCollision"), context + ": original household collision " + String(home.id))
+			variants[variant] = true
+		_check(variants.size() == 8 and not variants.has(""), context + ": all eight authored building variants are used")
+		_check(regional.has_node("ValdoraPaving") and regional.has_node("HouseInteriors") and regional.has_node("HouseholdsAndForge"), context + ": paving, interiors and forge are part of the playable village")
+	var plants = game.world.vegetation
+	_check(is_instance_valid(plants) and plants.is_inside_tree(), context + ": native vegetation field is attached")
+	if is_instance_valid(plants):
+		_check(plants.placed_trees > 1200, context + ": native field contains the authored landscape, not sparse placeholders")
+	var scenery: Node = game.world.scenery
+	_check(is_instance_valid(scenery) and scenery.has_node("TrackAndVerge") and scenery.has_node("BrookBedCollision") and scenery.has_node("Stream"), context + ": original ground, water and brook physics are attached")
+	_check(is_instance_valid(game.world.far_relief) and game.world.far_relief.is_inside_tree(), context + ": native mountain relief is attached")
+	print("IMPERATHEN_RELEASE_CAMPAIGN_ASSETS_CHECKED " + context)
 
 
 func _check(condition: bool, message: String) -> void:

@@ -451,8 +451,8 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 				if defense_result.get("ok", false):
 					world.cue_village_defense(action)
 		"atlas_demo": _open_atlas(true)
-		"city_exploration": _open_city_exploration()
-		"imperial_city_exploration": _open_city_exploration(false, false, true)
+		"city_exploration": _open_city_exploration(false, false, true)
+		"imperial_city_exploration": _open_city_exploration(false, false, true, true)
 		"campaign_market": _open_city_exploration(true)
 		"regional_goal":
 			if screen == "village_panel":
@@ -1024,8 +1024,11 @@ func _opening_present() -> void:
 	shown["choice_open"] = _film_choice_open(beat)
 	opening_overlay.present(shown, opening_index, opening_sequence.beats.size())
 	opening_overlay.set_paused(opening_paused)
-	_update_opening_voice(beat)
 	var cut := _beat_cut(beat, 0.0)
+	# Materialize the actual close rig before the speech driver takes references.
+	opening_director.prepare_cinematic_cast(str(cut.shot_id), str(cut.actor_id))
+	opening_director.prepare_cinematic_cast(str(cut.shot_id), str(beat.get("speaker_id", "")))
+	_update_opening_voice(beat)
 	opening_director.mission_actor_id = str(cut.actor_id)
 	opening_director.focus_key = str(beat.get("anchor", ""))
 	opening_director.speaking = not bool(beat.get("silent", false))
@@ -1517,7 +1520,7 @@ func _can_visit_market() -> bool:
 	return not Childhood.enabled(data) or str(data.village.childhood.screenplay.get("i01", "")) in ["complete", "legacy"]
 
 
-func _open_city_exploration(campaign_visit := false, from_road := false, imperial_visit := false) -> void:
+func _open_city_exploration(campaign_visit := false, from_road := false, imperial_visit := false, monument_entry := false) -> void:
 	var passengers: Array[CharacterBody3D] = []
 	if is_instance_valid(city_exploration):
 		return
@@ -1544,10 +1547,17 @@ func _open_city_exploration(campaign_visit := false, from_road := false, imperia
 		city_exploration.party_visit.passengers = passengers
 		city_exploration.campaign_path = SAVE_PATH
 		city_exploration.world_jdn = int(model.data.calendar.clock.jdn)
+		# The same authored monument is available in the persistent campaign
+		# whenever the authoritative historical date permits it.
+		city_exploration.use_flavian_kit = true
 	elif imperial_visit:
 		city_exploration.world_jdn = preload("res://scripts/domain/world_calendar.gd").to_jdn(100, 6, 1)
 		city_exploration.use_flavian_kit = true
-		city_exploration.persist = false
+		# The normal free tour keeps its own dated position. The direct monument
+		# visit is disposable and never replaces either the old or campaign save.
+		city_exploration.persist = not monument_entry
+		city_exploration.save_path = "user://imperathen_imperial_city_exploration.json"
+		city_exploration.start_at_colosseum = monument_entry
 	elif "--horse-test" in OS.get_cmdline_user_args():
 		city_exploration.enable_riding_trial = true
 		city_exploration.persist = false

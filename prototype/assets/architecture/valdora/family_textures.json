@@ -1,0 +1,91 @@
+{
+  "layers": [
+    "plaster_lime",
+    "plaster_aged",
+    "opus_incertum",
+    "rubble_socle",
+    "ashlar",
+    "daub",
+    "oak_grey",
+    "oak_brown",
+    "tegula",
+    "tegula_old",
+    "mortar",
+    "iron",
+    "paint_red",
+    "paint_ochre",
+    "flagstone",
+    "cocciopesto"
+  ],
+  "repeat_metres": {
+    "plaster_lime": 2.0,
+    "plaster_aged": 2.0,
+    "opus_incertum": 1.6,
+    "rubble_socle": 1.6,
+    "ashlar": 1.5,
+    "daub": 1.6,
+    "oak_grey": 1.0,
+    "oak_brown": 1.0,
+    "tegula": 1.0,
+    "tegula_old": 1.0,
+    "mortar": 1.0,
+    "iron": 0.5,
+    "paint_red": 2.0,
+    "paint_ochre": 2.0,
+    "flagstone": 1.2,
+    "cocciopesto": 1.6
+  },
+  "grid": 4,
+  "files": {
+    "family_albedo_1024.jpg": {
+      "bytes": 1879209,
+      "sha256": "780f00088fab519710cf8bd947b77f8aa2dae5dd0311d4f4cacdcfbbcbf59283",
+      "slices": 16,
+      "slice_size": 1024
+    },
+    "family_normal_1024.jpg": {
+      "bytes": 10445677,
+      "sha256": "69547ab79ea19630f424743a4f0233ae624694ff76cfb55cdcb4fd1972a8167a",
+      "slices": 16,
+      "slice_size": 1024
+    },
+    "family_orm_1024.jpg": {
+      "bytes": 3031139,
+      "sha256": "21b7faa5e39b50f66c0ef954671ba9bb2846bf82ee3551a50939fe327be9071c",
+      "slices": 16,
+      "slice_size": 1024
+    },
+    "family_albedo_512.jpg": {
+      "bytes": 677586,
+      "sha256": "6cb73db4c5a9d858000e93a39eee9b96bb7ad19efa471684fefe8b5128d4f2b7",
+      "slices": 16,
+      "slice_size": 512
+    },
+    "family_normal_512.jpg": {
+      "bytes": 3014088,
+      "sha256": "0bcd22751d1e90f9a9cbda349356b447380f48a3ce05394c6fac8657ada8d5ac",
+      "slices": 16,
+      "slice_size": 512
+    },
+    "family_orm_512.jpg": {
+      "bytes": 1168625,
+      "sha256": "9b0ebf01418bfd0b443be16b1ab1e0ad51408552ee975d2c88ddd10b63c53112",
+      "slices": 16,
+      "slice_size": 512
+    },
+    "family_albedo_256.jpg": {
+      "bytes": 203339,
+      "sha256": "0f3c23cb44994e29a9a98270608411eebed6a494387bec4b74493321d8229df9",
+      "slices": 16,
+      "slice_size": 256
+    },
+    "family_orm_256.jpg": {
+      "bytes": 336105,
+      "sha256": "7a10f15bb0d589b947f68aeb3199934f1ce264466c11660cb83a0cf8311ef576",
+      "slices": 16,
+      "slice_size": 256
+    }
+  },
+  "generator": "art/architecture/valdora_family/family_textures.py",
+  "provenance": "Procedural, seeded NumPy/Pillow patterns authored for IMPERATHEN; no scans or downloads."
+}

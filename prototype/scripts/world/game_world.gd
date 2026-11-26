@@ -13,12 +13,17 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const YouthOutfit = preload("res://scripts/visuals/youth_outfit.gd")
 const CompanionWorld = preload("res://scripts/world/companion_world.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
+const FarRelief = preload("res://scripts/world/land/far_relief.gd")
+const ValdoraLand = preload("res://scripts/world/village/valdora_land.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const GearMarket = preload("res://scripts/domain/gear_market.gd")
 const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
 const CameraObstruction = preload("res://scripts/world/camera_obstruction.gd")
+const Vegetation = preload("res://scripts/vegetation/vegetation_field.gd")
+const VegetationGround = preload("res://scripts/vegetation/vegetation_ground.gd")
 var village_life_world: Node3D
 var regional_terrain: Node3D
+var far_relief: Node3D
 var _political_survey_pending := false
 var _political_survey_at := Vector2.ZERO
 var _political_survey_range := 1.6
@@ -42,6 +47,8 @@ var i01_props: Node3D
 var i03_props: Node3D
 var i04_props: Node3D
 var tree_sites := []
+var vegetation: Node3D
+var _vegetation_wind_time := -1.0
 var crops := Node3D.new()
 var season_index := -1
 const PLAYER_SPEED := 4.6
@@ -173,7 +180,8 @@ func setup(state: Dictionary) -> void:
 			for tree in placements:
 				if tree.kind == "olive":
 					tree.kind = "oak"
-		grove.populate(placements)
+		_set_vegetation_origin(id)
+		grove.populate([] if is_instance_valid(vegetation) else placements)
 	sync_state(state)
 	_story_companions.reset(state)
 	set_mode("person")
@@ -439,6 +447,8 @@ func set_quality(profile: String) -> void:
 	_update_people_profile()
 	grove.set_quality(profile)
 	scenery.set_quality(profile)
+	if is_instance_valid(vegetation):
+		vegetation.set_quality(profile)
 	regional.set_quality(profile)
 	population.set_quality(profile)
 	_apply_quality()
@@ -453,6 +463,9 @@ func _update_people_profile() -> void:
 
 func set_presentation_time(seconds: float) -> void:
 	scenery.set_presentation_time(seconds)
+	_vegetation_wind_time = seconds
+	if is_instance_valid(vegetation):
+		vegetation.set_wind_time(seconds)
 
 
 func get_quality_profile() -> String:
@@ -698,7 +711,7 @@ func _build_scene() -> void:
 	_camera.name = "WorldCamera"
 	_camera.fov = 54.0
 	_camera.near = 0.12
-	_camera.far = 300.0
+	_camera.far = FarRelief.CAMERA_FAR_M
 	add_child(_camera)
 	_camera.current = true
 	_hint = Art.label(_player, "", Vector3(0, 1.25, 0), Color(1, 0.92, 0.70), 33)
@@ -712,6 +725,11 @@ func _build_scene() -> void:
 	regional_terrain = RegionalTerrain.new()
 	regional_terrain.name = "RegionalTerrain"
 	add_child(regional_terrain)
+	far_relief = FarRelief.new()
+	far_relief.name = "FarRelief"
+	add_child(far_relief)
+	scenery.register_land(regional_terrain.ground_material)
+	scenery.register_land(far_relief.material)
 	_update_camera(0.016)
 
 
@@ -720,6 +738,28 @@ func _create_atmosphere() -> void:
 	look.name = "VillageLook"
 	add_child(look)
 	_sun = look.setup(self, _village_environment, scenery.sky_material)
+
+
+## Valdora uses the authored regional flora; non-Italian starts retain the
+## original grove. The existing village verges and plot crops remain visible.
+func _set_vegetation_origin(id: String) -> void:
+	if id != "italia":
+		if is_instance_valid(vegetation):
+			vegetation.get_parent().remove_child(vegetation)
+			vegetation.free()
+			vegetation = null
+		return
+	if not is_instance_valid(vegetation):
+		var surface := VegetationGround.new()
+		surface.add_mesh(scenery.get_node_or_null("Foothills") as MeshInstance3D)
+		vegetation = Vegetation.new()
+		vegetation.name = "Vegetation"
+		get_node("Landscape").add_child(vegetation)
+		vegetation.build(surface.height, tree_sites, scenery.brook_source_z)
+		vegetation.set_quality(_quality_profile)
+		vegetation.set_wind_time(_vegetation_wind_time)
+		if season_index >= 0:
+			vegetation.apply_season(season_index)
 
 
 func _create_terrain() -> void:
@@ -734,6 +774,13 @@ func _create_terrain() -> void:
 	ground.add_child(bridge)
 	for index in range(14):
 		Art.box(bridge, Vector3(0.68, 0.10, 3.1), Vector3(-4.45 + index * 0.68, 0, 0), _materials["timber"])
+	# Draw both short approach ramps on the matching Brook collision.
+	for side: float in [-1.0, 1.0]:
+		var run := 0.7
+		var rise := 0.09
+		var pitch := atan2(rise, run)
+		var ramp := Art.box(bridge, Vector3(Vector2(run, rise).length(), 0.06, 3.1), Vector3(side * 5.15, -0.025, 0), _materials["timber"])
+		ramp.rotation.z = -side * pitch
 	for z: float in [-1.55, 1.55]:
 		Art.box(bridge, Vector3(9.6, 0.13, 0.13), Vector3(0, 0.75, z), _materials["timber"], true)
 		for x: float in [-4.3, -2.2, 0, 2.2, 4.3]:
@@ -746,6 +793,10 @@ func _create_terrain() -> void:
 		var z := random.randf_range(-42, 28) if index < 22 else random.randf_range(-46, -27)
 		var at := Vector3(x,0,z)
 		if VillageLayout.reserved(Vector2(x,z),1.3) or VillageLayout.road(Vector2(x,z)):
+			continue
+		if ValdoraLand.in_track(Vector2(x,z),1.2):
+			random.randf_range(0.8,1.15)
+			random.randf_range(-PI,PI)
 			continue
 		tree_sites.append({"kind":Grove.KINDS[index%3],"position":at,"scale":random.randf_range(0.8,1.15),"yaw":random.randf_range(-PI,PI)})
 		Art.box_collider(ground, Vector3(0.44,2.6,0.44), at+Vector3.UP*1.3)
@@ -1193,10 +1244,13 @@ func _physics_process(delta: float) -> void:
 	if not _built or _camera == null:
 		return
 	_update_camera(delta)
+	far_relief.follow(get_player_position(), _quality_profile)
 	if _state.get("village", {}).get("enabled", false):
 		regional_terrain.follow(get_player_position(), _quality_profile)
 		regional_terrain.waystation.update_nearby(get_player_position(),_state.village.economy.get("freight",{}),delta)
 	population.update_nearby(get_player_position(),_active and _mode == "person")
+	if is_instance_valid(vegetation):
+		vegetation.set_player_position(get_player_position())
 	if not _active:
 		return
 	_animation_time += delta
@@ -1892,4 +1946,6 @@ func _apply_season(index: int) -> void:
 	_materials.wheat.albedo_color = grain[index]
 	scenery.apply_season(index,_sun,_village_environment)
 	look.apply_season(index)
+	if is_instance_valid(vegetation):
+		vegetation.apply_season(index)
 	crops.visible = index != 3

@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "note": "Vegetation budgets per graphics profile (D-034). Distances are metres from the camera for a 14 m tree; smaller plants scale them by sqrt(height / 14). Every profile places the same trees and colliders; profiles differ in detail, distance, shadows, wind layers and herb/crop density. Desktop/llvmpipe counts are relative indicators, not Fold7 measurements. Grass blades: tufts per square metre inside grass_end_m, full blade mesh inside grass_near_m, a lighter tuft beyond; grass_far_share thins the outer half of the range. Ultra has no density cap by owner decision D-060; Leicht draws no blade geometry. Leicht retains the distant silhouette range of Ultra using earlier two-triangle impostors rather than dropping the horizon.",
+  "profiles": {
+    "low": {
+      "label": "Leicht",
+      "tree_lod_m": [
+        10,
+        24,
+        48,
+        80
+      ],
+      "impostor_end_m": 300,
+      "shadow_lod": -1,
+      "wind_detail": 0,
+      "herb_end_m": 20,
+      "herb_density": 0.25,
+      "herb_near_m": 8,
+      "crop_end_m": 55,
+      "crop_density": 0.3,
+      "far_card_share": 0.35,
+      "leaf_normal_strength": 0.0,
+      "grass_end_m": 0,
+      "grass_near_m": 0,
+      "grass_density": 0,
+      "grass_far_share": 0.0,
+      "grass_cells_per_frame": 1
+    },
+    "balanced": {
+      "label": "Ausgewogen",
+      "tree_lod_m": [
+        16,
+        36,
+        70,
+        115
+      ],
+      "impostor_end_m": 240,
+      "shadow_lod": 1,
+      "wind_detail": 2,
+      "herb_end_m": 36,
+      "herb_density": 0.55,
+      "herb_near_m": 14,
+      "crop_end_m": 80,
+      "crop_density": 0.55,
+      "far_card_share": 0.4,
+      "leaf_normal_strength": 0.55,
+      "grass_end_m": 12,
+      "grass_near_m": 0,
+      "grass_density": 3.0,
+      "grass_far_share": 0.45,
+      "grass_cells_per_frame": 1
+    },
+    "high": {
+      "label": "Hoch",
+      "tree_lod_m": [
+        26,
+        55,
+        100,
+        160
+      ],
+      "impostor_end_m": 290,
+      "shadow_lod": 2,
+      "wind_detail": 2,
+      "herb_end_m": 55,
+      "herb_density": 0.85,
+      "herb_near_m": 22,
+      "crop_end_m": 130,
+      "crop_density": 0.85,
+      "far_card_share": 0.5,
+      "leaf_normal_strength": 0.65,
+      "grass_end_m": 26,
+      "grass_near_m": 10,
+      "grass_density": 6.5,
+      "grass_far_share": 0.5,
+      "grass_cells_per_frame": 2
+    },
+    "very_high": {
+      "label": "Ultra",
+      "tree_lod_m": [
+        36,
+        75,
+        130,
+        200
+      ],
+      "impostor_end_m": 300,
+      "shadow_lod": 2,
+      "wind_detail": 2,
+      "herb_end_m": 75,
+      "herb_density": 1.0,
+      "herb_near_m": 32,
+      "crop_end_m": 160,
+      "crop_density": 1.0,
+      "far_card_share": 0.6,
+      "leaf_normal_strength": 0.7,
+      "grass_end_m": 42,
+      "grass_near_m": 17,
+      "grass_density": 12.0,
+      "grass_far_share": 0.6,
+      "grass_cells_per_frame": 3
+    }
+  }
+}

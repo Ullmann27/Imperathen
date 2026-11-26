@@ -47,6 +47,7 @@ var _speaker: Node3D
 var mission_actor_id := ""
 var _speaker_actor := ""
 var _mission_rotations: Array[Dictionary] = []
+var _cinematic_cast: Array[Node3D] = []
 var _sun: DirectionalLight3D
 var _environment: Environment
 var _lighting: Dictionary = {}
@@ -74,7 +75,7 @@ func setup(world: Node3D) -> bool:
 		camera = Camera3D.new()
 		camera.name = "OpeningCamera"
 		camera.near = 0.12
-		camera.far = 300.0
+		camera.far = _game_camera.far
 		camera.current = false
 		add_child(camera)
 	set_process(false)
@@ -129,6 +130,7 @@ func finish() -> void:
 		return
 	active = false
 	_release_speaker()
+	_release_cinematic_cast()
 	_interior_film = false
 	_apply_grade(0.0)
 	_lighting.clear()
@@ -532,7 +534,30 @@ func _face_mission_pair() -> void:
 		figure.global_rotation=angle
 
 
+## Keep the actual live rig stable throughout the film, including reaction
+## cuts. Replacing a LOD after FaceDriver.bind() invalidates its mesh targets.
+func prepare_cinematic_cast(next_shot: String, actor_id: String) -> void:
+	var ids: Array[String] = []
+	if next_shot in I01_SHOTS or (_interior_film and next_shot in ["mission_dialogue", "mission_reaction"]):
+		ids = ["player", "julia", "silvanus"]
+	elif next_shot in DUO_SHOTS or next_shot in ["mission_dialogue", "mission_reaction"]:
+		ids = ["player", actor_id]
+	for id: String in ids:
+		var figure := _mission_figure(id)
+		if is_instance_valid(figure) and figure.has_method("set_cinematic_detail") and not _cinematic_cast.has(figure):
+			figure.set_cinematic_detail(true)
+			_cinematic_cast.append(figure)
+
+
+func _release_cinematic_cast() -> void:
+	for figure: Node3D in _cinematic_cast:
+		if is_instance_valid(figure):
+			figure.set_cinematic_detail(false)
+	_cinematic_cast.clear()
+
+
 func _change_speaker(next_shot: String) -> void:
+	prepare_cinematic_cast(next_shot, mission_actor_id)
 	if next_shot == shot_id and _speaker_actor == mission_actor_id and (is_instance_valid(_speaker) or next_shot in ["mission_dialogue","mission_reaction"]):
 		return
 	_release_speaker()

@@ -1,0 +1,1262 @@
+{
+  "repository": "Ullmann27/Imperathen",
+  "branch": "integration/imperathen-player-visible-recovery-20261126",
+  "start": "2025db2d839288168863d4b277a454df63e5ebed",
+  "recovered_code_head": "26096cdd3a415552cdb20ea4795bdb661d860c95",
+  "remote_heads_audited": 121,
+  "clean_source_merges": 3,
+  "source_snapshot_races": [],
+  "unresolved_count": 36,
+  "release_approved": false,
+  "runtime_tests_passed": false,
+  "branches": [
+    {
+      "branch": "docs/bootstrap-governance-20261122",
+      "sha": "a3e036ba24b99416b016337d81ab2b4067350fa3",
+      "pr": 1,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/entry-foundation-three-agents-20261122",
+      "sha": "201298a7c8b11a70c503fe5e68da292dca055ea1",
+      "pr": 19,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/prototype-foundation-20261122",
+      "sha": "11909b76453a1e07dab2754ea9323c69c306bed3",
+      "pr": 20,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/visual-quality-three-agents-20261122",
+      "sha": "1afdbf45afb66495d6433eb51d4ec1e35dbb411f",
+      "pr": 21,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/android-formation-20261122",
+      "sha": "b2d28ee1795d35c04102432a4fcaa408262b700a",
+      "pr": 22,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/four-android-quality-presets-20261122",
+      "sha": "465ba3728cd8cb237f2489f3b0a3d57a8e15071c",
+      "pr": 24,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/realistic-android-23",
+      "sha": "0f23134460ed0565b36c44adefd22bc6a7da75b1",
+      "pr": 25,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/weapon-contract-20261122",
+      "sha": "5b32c600cf3245cc6f996114313a7d746d2b61b0",
+      "pr": 29,
+      "changes": [
+        {
+          "status": "A",
+          "path": "prototype/data/weapons/README.md"
+        },
+        {
+          "status": "A",
+          "path": "prototype/data/weapons/weapon_catalog.v1.json"
+        },
+        {
+          "status": "A",
+          "path": "tools/validate_weapon_catalog.py"
+        }
+      ],
+      "status": "merged_clean",
+      "integration_commit": "c9a2c7c1b8a26df538dd606c9eab1fa636d53c3d",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/blender-weapons-procedural-20261122",
+      "sha": "f6c533abc23b20bc0df0f6d84fb628126de14ead",
+      "pr": 30,
+      "status": "conflict",
+      "conflict_paths": [
+        ".github/workflows/blender-weapons.yml",
+        "tools/build_roman_weapons.py",
+        "tools/validate_weapon_glb.py"
+      ],
+      "diagnostic": "dd87d87991cc8130d6ff66143cae93ca5cf03783\n.github/workflows/blender-weapons.yml\ntools/build_roman_weapons.py\ntools/validate_weapon_glb.py\n\nAuto-merging .github/workflows/blender-weapons.yml\nCONFLICT (add/add): Merge conflict in .github/workflows/blender-weapons.yml\nAuto-merging tools/build_roman_weapons.py\nCONFLICT (add/add): Merge conflict in tools/build_roman_weapons.py\nAuto-merging tools/validate_weapon_glb.py\nCONFLICT (add/add): Merge conflict in tools/validate_weapon_glb.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/combat-weapon-tests-20261122",
+      "sha": "e1ab038786da98c0fc460c1d3fb48b35cfdbb20f",
+      "pr": 31,
+      "changes": [
+        {
+          "status": "A",
+          "path": "prototype/scripts/domain/weapon_rules.gd"
+        },
+        {
+          "status": "A",
+          "path": "prototype/tests/weapon_rules_test.gd"
+        }
+      ],
+      "status": "merged_clean",
+      "integration_commit": "6d481aace0a1c132f7082467160634418fc50503",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/android-graphics-qa-20261122",
+      "sha": "9ef240738782fac9abf8c8396628e4f144d54e73",
+      "pr": 32,
+      "changes": [
+        {
+          "status": "A",
+          "path": "docs/13_visual_upgrade/ANDROID_QA_NEXT.md"
+        },
+        {
+          "status": "A",
+          "path": "prototype/data/graphics/android_qa_targets.v1.json"
+        },
+        {
+          "status": "A",
+          "path": "tools/check_android_graphics_targets.py"
+        }
+      ],
+      "status": "merged_clean",
+      "integration_commit": "26096cdd3a415552cdb20ea4795bdb661d860c95",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/hero-realism-20261122",
+      "sha": "148dd69a417c155392791e3b20afc6f8e599e730",
+      "pr": 34,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/cinematic-opening-20261123",
+      "sha": "ea9987c08a7a98f3bca6b793a424d396b2c0dab6",
+      "pr": 35,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/village-life-delivery-20261123",
+      "sha": "f2900eb86b90b185627dcd490fef550fd0cbed11",
+      "pr": 36,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/chat-b-village-world-20261123",
+      "sha": "7ca4873ab8b2d174ffbe7ac475299ae1d6ee1c28",
+      "pr": 37,
+      "status": "conflict",
+      "conflict_paths": [
+        ".github/workflows/android-prototype.yml",
+        "prototype/export_presets.cfg",
+        "prototype/scripts/domain/village_economy.gd",
+        "prototype/scripts/domain/world_model.gd",
+        "prototype/scripts/main.gd",
+        "prototype/scripts/story/village_childhood.gd",
+        "prototype/scripts/story/village_life.gd",
+        "prototype/scripts/ui/android_village_diagnostics.gd",
+        "prototype/scripts/ui/game_ui.gd",
+        "prototype/scripts/ui/village_life_panel.gd",
+        "prototype/scripts/visuals/village_person.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/regional_village.gd",
+        "prototype/scripts/world/village_life_world.gd",
+        "prototype/tests/childhood_integration_test.gd",
+        "prototype/tests/frontier_integration_test.gd",
+        "prototype/tests/integration_test.gd",
+        "prototype/tests/opening_flow_test.gd",
+        "prototype/tests/village_childhood_test.gd",
+        "tests/android_childhood_payload_test.py",
+        "tools/android_runtime_smoke.py",
+        "tools/publish_village_download.py",
+        "tools/validate_android_apk.py"
+      ],
+      "diagnostic": "882eb1d13c891e330f0760edd61f9cbc3c1c538c\n.github/workflows/android-prototype.yml\nprototype/export_presets.cfg\nprototype/scripts/domain/village_economy.gd\nprototype/scripts/domain/world_model.gd\nprototype/scripts/main.gd\nprototype/scripts/story/village_childhood.gd\nprototype/scripts/story/village_life.gd\nprototype/scripts/ui/android_village_diagnostics.gd\nprototype/scripts/ui/game_ui.gd\nprototype/scripts/ui/village_life_panel.gd\nprototype/scripts/visuals/village_person.gd\nprototype/scripts/world/game_world.gd\nprototype/scripts/world/regional_village.gd\nprototype/scripts/world/village_life_world.gd\nprototype/tests/childhood_integration_test.gd\nprototype/tests/frontier_integration_test.gd\nprototype/tests/integration_test.gd\nprototype/tests/opening_flow_test.gd\nprototype/tests/village_childhood_test.gd\ntests/android_childhood_payload_test.py\ntools/android_runtime_smoke.py\ntools/publish_village_download.py\ntools/validate_android_apk.py\n\nAuto-merging .github/workflows/android-prototype.yml\nCONFLICT (content): Merge conflict in .github/workflows/android-prototype.yml\nAuto-merging AGENTS.md\nAuto-merging prototype/export_presets.cfg\nCONFLICT (content): Merge conflict in prototype/export_presets.cfg\nAuto-merging prototype/scripts/domain/village_economy.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/village_economy.gd\nAuto-merging prototype/scripts/domain/world_model.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/world_model.gd\nAuto-merging prototype/scripts/main.gd\nCONFLICT (content): Merge conflict in prototype/scripts/main.gd\nAuto-merging prototype/scripts/story/village_childhood.gd\nCONFLICT (content): Merge conflict in prototype/scripts/story/village_childhood.gd\nAuto-merging prototype/scripts/story/village_life.gd\nCONFLICT (content): Merge conflict in prototype/scripts/story/village_life.gd\nAuto-merging prototype/scripts/ui/android_village_diagnostics.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/android_village_diagnostics.gd\nAuto-merging prototype/scripts/ui/game_ui.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/game_ui.gd\nAuto-merging prototype/scripts/ui/village_life_panel.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/village_life_panel.gd\nAuto-merging prototype/scripts/visuals/village_person.gd\nCONFLICT (content): Merge conflict in prototype/scripts/visuals/village_person.gd\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/regional_village.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/regional_village.gd\nAuto-merging prototype/scripts/world/village/settlement_dressing.gd\nAuto-merging prototype/scripts/world/village/village_population.gd\nAuto-merging prototype/scripts/world/village_life_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/village_life_world.gd\nAuto-merging prototype/tests/childhood_integration_test.gd\nCONFLICT (content): Merge conflict in prototype/tests/childhood_integration_test.gd\nAuto-merging prototype/tests/frontier_integration_test.gd\nCONFLICT (content): Merge conflict in prototype/tests/frontier_integration_test.gd\nAuto-merging prototype/tests/integration_test.gd\nCONFLICT (content): Merge conflict in prototype/tests/integration_test.gd\nAuto-merging prototype/tests/opening_flow_test.gd\nCONFLICT (content): Merge conflict in prototype/tests/opening_flow_test.gd\nAuto-merging prototype/tests/village_childhood_test.gd\nCONFLICT (content): Merge conflict in prototype/tests/village_childhood_test.gd\nAuto-merging prototype/tests/village_collision_test.gd\nAuto-merging prototype/tests/village_experience_test.gd\nAuto-merging tests/android_childhood_payload_test.py\nCONFLICT (add/add): Merge conflict in tests/android_childhood_payload_test.py\nAuto-merging tools/android_runtime_smoke.py\nCONFLICT (content): Merge conflict in tools/android_runtime_smoke.py\nAuto-merging tools/check_prototype.py\nAuto-merging tools/publish_village_download.py\nCONFLICT (content): Merge conflict in tools/publish_village_download.py\nAuto-merging tools/validate_android_apk.py\nCONFLICT (content): Merge conflict in tools/validate_android_apk.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/childhood-village-20261123",
+      "sha": "e5735509622c9a94564dc5fe21257c07074f9df5",
+      "pr": 38,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/chat-a-movement-combat-20261123",
+      "sha": "c52ad1ab6b31a1f914f2d8b073de06573709ff95",
+      "pr": 39,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "art/meshy-unit-library-20261123",
+      "sha": "d0bb6a3b8b07e4ab5ad25448fa60c63c8dc75aa2",
+      "pr": 40,
+      "status": "conflict",
+      "conflict_paths": [
+        ".github/workflows/android-prototype.yml",
+        "prototype/assets/meshy/README.md",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "2b9ee4530e4a62d1911414c777551b44903422f8\n.github/workflows/android-prototype.yml\nprototype/assets/meshy/README.md\ntools/check_prototype.py\n\nAuto-merging .github/workflows/android-prototype.yml\nCONFLICT (content): Merge conflict in .github/workflows/android-prototype.yml\nAuto-merging prototype/assets/meshy/README.md\nCONFLICT (add/add): Merge conflict in prototype/assets/meshy/README.md\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "story/canonical-bible-alignment-20261123",
+      "sha": "73f6f5f338e11f21c8866222e713bb266d70888e",
+      "pr": 41,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "story/i00-aquileia-cold-open-20261123",
+      "sha": "1a22a2d1fe00b41b0dd923f3aa078dc3661a47d3",
+      "pr": 42,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/build68-story-meshy-20261123",
+      "sha": "d7e3a7306f84ee61d74609e127b87d6b34a96efd",
+      "pr": 43,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/living-npcs-meshy-movement-20261124",
+      "sha": "c28f345a28a80f3e8d48f51ac6455b27b858fa35",
+      "pr": 44,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/npc-perception-rest-regression-20261124",
+      "sha": "e2f78833ca355076d43aeb200dbff4b5372ab855",
+      "pr": 45,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/cc0-motion-import-20261124",
+      "sha": "c4cced15bfd80e924ad3493b911b5df83a88f53a",
+      "pr": 46,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/motion-combat-cc0-20261124",
+      "sha": "7c3194db13acef2702e5e92336b94e9be41c7b58",
+      "pr": 47,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/motion-quality-gate-20261124",
+      "sha": "e2255759f93b11dce4764fe042a6182ac03e5c06",
+      "pr": 48,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "ui/roman-menu-intro-20261124",
+      "sha": "d9a251d4aa0fa5520c8e81370989ba500bb0c4e1",
+      "pr": 49,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "chapter1/band1-alignment-20261124",
+      "sha": "38344fffb703f64978d4f6904f542e1912de668d",
+      "pr": 50,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "handoff/sol-20261124",
+      "sha": "94bb7cdd76a3fe2577610eac8da6948e29b0faab",
+      "pr": 51,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "planning/aeterna-masterplan-20261124",
+      "sha": "fc84e29f81138d7ac406c71b470397a60d645353",
+      "pr": 52,
+      "changes": [],
+      "status": "tree_equivalent",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/ap1-ap2-companions-20261124",
+      "sha": "5e0b90c7a0bb5b44c8c72e1ecef51802a49357f8",
+      "pr": 53,
+      "status": "conflict",
+      "conflict_paths": [
+        ".github/workflows/android-prototype.yml",
+        "prototype/export_presets.cfg",
+        "tools/validate_android_apk.py"
+      ],
+      "diagnostic": "6620d9d59d7c03668ea0824e3167549c463a2bcb\n.github/workflows/android-prototype.yml\nprototype/export_presets.cfg\ntools/validate_android_apk.py\n\nAuto-merging .github/workflows/android-prototype.yml\nCONFLICT (content): Merge conflict in .github/workflows/android-prototype.yml\nAuto-merging prototype/export_presets.cfg\nCONFLICT (content): Merge conflict in prototype/export_presets.cfg\nAuto-merging tools/validate_android_apk.py\nCONFLICT (content): Merge conflict in tools/validate_android_apk.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/team-c-presentation-delivery-20261124",
+      "sha": "6c94e1e8fd0a3a5d309a4690e2ca200663e87816",
+      "pr": 54,
+      "status": "conflict",
+      "conflict_paths": [
+        ".github/workflows/presentation-delivery.yml",
+        "prototype/scripts/ui/runtime_display.gd",
+        "tests/android_signing_identity_test.py",
+        "tools/build_android_prototype.py",
+        "tools/check_prototype.py",
+        "tools/publish_village_download.py"
+      ],
+      "diagnostic": "a3b4c8798c460cf496d89558cd1a440fc94434df\n.github/workflows/presentation-delivery.yml\nprototype/scripts/ui/runtime_display.gd\ntests/android_signing_identity_test.py\ntools/build_android_prototype.py\ntools/check_prototype.py\ntools/publish_village_download.py\n\nAuto-merging .github/workflows/android-prototype.yml\nAuto-merging .github/workflows/presentation-delivery.yml\nCONFLICT (add/add): Merge conflict in .github/workflows/presentation-delivery.yml\nAuto-merging prototype/scripts/ui/runtime_display.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/runtime_display.gd\nAuto-merging tests/android_signing_identity_test.py\nCONFLICT (add/add): Merge conflict in tests/android_signing_identity_test.py\nAuto-merging tools/build_android_prototype.py\nCONFLICT (content): Merge conflict in tools/build_android_prototype.py\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\nAuto-merging tools/publish_village_download.py\nCONFLICT (content): Merge conflict in tools/publish_village_download.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/team-b-living-world-20261124",
+      "sha": "7af39f35b1947595f95e365eb7762592feabf234",
+      "pr": 55,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/scripts/domain/world_model.gd",
+        "prototype/scripts/ui/village_life_panel.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/regional_terrain.gd",
+        "prototype/tests/commerce_transaction_test.gd",
+        "prototype/tests/team_b_integration_test.gd",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "78ed7fb80e75179dbd711aa6b267f45576493ef9\nprototype/scripts/domain/npc_behavior.gd\nprototype/scripts/domain/world_model.gd\nprototype/scripts/ui/village_life_panel.gd\nprototype/scripts/world/game_world.gd\nprototype/scripts/world/regional_terrain.gd\nprototype/tests/commerce_transaction_test.gd\nprototype/tests/team_b_integration_test.gd\ntools/check_prototype.py\n\nAuto-merging prototype/scripts/domain/npc_behavior.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/npc_behavior.gd\nAuto-merging prototype/scripts/domain/village_economy.gd\nAuto-merging prototype/scripts/domain/world_model.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/world_model.gd\nAuto-merging prototype/scripts/main.gd\nAuto-merging prototype/scripts/ui/village_life_panel.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/village_life_panel.gd\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/regional_terrain.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/regional_terrain.gd\nAuto-merging prototype/tests/commerce_transaction_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/commerce_transaction_test.gd\nAuto-merging prototype/tests/regional_terrain_test.gd\nAuto-merging prototype/tests/team_b_integration_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/team_b_integration_test.gd\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "fix/aeterna-camera-overlap-20261125",
+      "sha": "261639105dcaa72f8dd92e73f4db1d9ab7d90a23",
+      "pr": 56,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "art/roman-life-shops-interiors-20261125",
+      "sha": "1c0575096bd51c7da9e1ab83bcb2abf61306d0b9",
+      "pr": 57,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/scripts/domain/world_model.gd",
+        "prototype/scripts/ui/village_life_panel.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/regional_terrain.gd",
+        "prototype/tests/commerce_transaction_test.gd",
+        "prototype/tests/team_b_integration_test.gd",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "914fd7b67c7a290ea4d8d83f12039e633c653c76\nprototype/scripts/domain/npc_behavior.gd\nprototype/scripts/domain/world_model.gd\nprototype/scripts/ui/village_life_panel.gd\nprototype/scripts/world/game_world.gd\nprototype/scripts/world/regional_terrain.gd\nprototype/tests/commerce_transaction_test.gd\nprototype/tests/team_b_integration_test.gd\ntools/check_prototype.py\n\nAuto-merging prototype/scripts/domain/npc_behavior.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/npc_behavior.gd\nAuto-merging prototype/scripts/domain/village_economy.gd\nAuto-merging prototype/scripts/domain/world_model.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/world_model.gd\nAuto-merging prototype/scripts/main.gd\nAuto-merging prototype/scripts/ui/village_life_panel.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/village_life_panel.gd\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/regional_terrain.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/regional_terrain.gd\nAuto-merging prototype/tests/commerce_transaction_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/commerce_transaction_test.gd\nAuto-merging prototype/tests/regional_terrain_test.gd\nAuto-merging prototype/tests/team_b_integration_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/team_b_integration_test.gd\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/world-expansion-blender-20261125",
+      "sha": "3070fdedf2abc019207bcaf4b46b3671e3c2429a",
+      "pr": 58,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/scripts/domain/world_model.gd",
+        "prototype/scripts/ui/village_life_panel.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/regional_terrain.gd",
+        "prototype/scripts/world_expansion/preview.gd",
+        "prototype/shaders/world_expansion/vegetation_wind.gdshader",
+        "prototype/tests/commerce_transaction_test.gd",
+        "prototype/tests/team_b_integration_test.gd",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "c56df5ae509f559942b05faf66ec494238854b0b\nprototype/scripts/domain/npc_behavior.gd\nprototype/scripts/domain/world_model.gd\nprototype/scripts/ui/village_life_panel.gd\nprototype/scripts/world/game_world.gd\nprototype/scripts/world/regional_terrain.gd\nprototype/scripts/world_expansion/preview.gd\nprototype/shaders/world_expansion/vegetation_wind.gdshader\nprototype/tests/commerce_transaction_test.gd\nprototype/tests/team_b_integration_test.gd\ntools/check_prototype.py\n\nAuto-merging prototype/scripts/domain/npc_behavior.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/npc_behavior.gd\nAuto-merging prototype/scripts/domain/village_economy.gd\nAuto-merging prototype/scripts/domain/world_model.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/world_model.gd\nAuto-merging prototype/scripts/main.gd\nAuto-merging prototype/scripts/ui/village_life_panel.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/village_life_panel.gd\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/regional_terrain.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/regional_terrain.gd\nAuto-merging prototype/scripts/world_expansion/preview.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/world_expansion/preview.gd\nAuto-merging prototype/shaders/world_expansion/vegetation_wind.gdshader\nCONFLICT (add/add): Merge conflict in prototype/shaders/world_expansion/vegetation_wind.gdshader\nAuto-merging prototype/tests/commerce_transaction_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/commerce_transaction_test.gd\nAuto-merging prototype/tests/regional_terrain_test.gd\nAuto-merging prototype/tests/team_b_integration_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/team_b_integration_test.gd\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "art/roman-life-materials-followup-20261125",
+      "sha": "391331e01efcd929a9becd219f6d6e233fce310f",
+      "pr": 59,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/scripts/domain/world_model.gd",
+        "prototype/scripts/ui/village_life_panel.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/regional_terrain.gd",
+        "prototype/tests/commerce_transaction_test.gd",
+        "prototype/tests/team_b_integration_test.gd",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "288b862a993c5a6a0e124a8a3248e1c4e1a703c0\nprototype/scripts/domain/npc_behavior.gd\nprototype/scripts/domain/world_model.gd\nprototype/scripts/ui/village_life_panel.gd\nprototype/scripts/world/game_world.gd\nprototype/scripts/world/regional_terrain.gd\nprototype/tests/commerce_transaction_test.gd\nprototype/tests/team_b_integration_test.gd\ntools/check_prototype.py\n\nAuto-merging prototype/scripts/domain/npc_behavior.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/npc_behavior.gd\nAuto-merging prototype/scripts/domain/village_economy.gd\nAuto-merging prototype/scripts/domain/world_model.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/world_model.gd\nAuto-merging prototype/scripts/main.gd\nAuto-merging prototype/scripts/ui/village_life_panel.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/village_life_panel.gd\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/regional_terrain.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/regional_terrain.gd\nAuto-merging prototype/tests/commerce_transaction_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/commerce_transaction_test.gd\nAuto-merging prototype/tests/regional_terrain_test.gd\nAuto-merging prototype/tests/team_b_integration_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/team_b_integration_test.gd\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/city-detail-overlay-20261125",
+      "sha": "de2aeaad19ded95ca055261b2a5b9cc3f668aa1e",
+      "pr": 60,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/aeterna-contact-validation-20261125",
+      "sha": "7240463b9803d747d6d5648c988d3def528e3c5e",
+      "pr": 61,
+      "status": "conflict",
+      "conflict_paths": [
+        "docs/20_meshy_assets/character-build.json",
+        "prototype/assets/meshy/characters/unit_germanic_axe_fighter_0.glb",
+        "prototype/assets/meshy/characters/unit_germanic_axe_fighter_1.glb",
+        "prototype/assets/meshy/characters/unit_germanic_axe_fighter_2.glb",
+        "prototype/assets/meshy/characters/unit_germanic_axe_fighter_3.glb",
+        "prototype/assets/meshy/characters/unit_roman_signifer_0.glb",
+        "prototype/assets/meshy/characters/unit_roman_signifer_1.glb",
+        "prototype/assets/meshy/characters/unit_roman_signifer_2.glb",
+        "prototype/assets/meshy/characters/unit_roman_signifer_3.glb",
+        "prototype/scripts/visuals/village_person.gd",
+        "tools/characters/build_meshy_people.py"
+      ],
+      "diagnostic": "2093608ca0bd380d4585a332f41aba112248065b\ndocs/20_meshy_assets/character-build.json\nprototype/assets/meshy/characters/unit_germanic_axe_fighter_0.glb\nprototype/assets/meshy/characters/unit_germanic_axe_fighter_1.glb\nprototype/assets/meshy/characters/unit_germanic_axe_fighter_2.glb\nprototype/assets/meshy/characters/unit_germanic_axe_fighter_3.glb\nprototype/assets/meshy/characters/unit_roman_signifer_0.glb\nprototype/assets/meshy/characters/unit_roman_signifer_1.glb\nprototype/assets/meshy/characters/unit_roman_signifer_2.glb\nprototype/assets/meshy/characters/unit_roman_signifer_3.glb\nprototype/scripts/visuals/village_person.gd\ntools/characters/build_meshy_people.py\n\nAuto-merging docs/20_meshy_assets/character-build.json\nCONFLICT (content): Merge conflict in docs/20_meshy_assets/character-build.json\nwarning: Cannot merge binary files: prototype/assets/meshy/characters/unit_germanic_axe_fighter_0.glb (26096cdd3a415552cdb20ea4795bdb661d860c95 vs. 7240463b9803d747d6d5648c988d3def528e3c5e)\nAuto-merging prototype/assets/meshy/characters/unit_germanic_axe_fighter_0.glb\nCONFLICT (content): Merge conflict in prototype/assets/meshy/characters/unit_germanic_axe_fighter_0.glb\nwarning: Cannot merge binary files: prototype/assets/meshy/characters/unit_germanic_axe_fighter_1.glb (26096cdd3a415552cdb20ea4795bdb661d860c95 vs. 7240463b9803d747d6d5648c988d3def528e3c5e)\nAuto-merging prototype/assets/meshy/characters/unit_germanic_axe_fighter_1.glb\nCONFLICT (content): Merge conflict in prototype/assets/meshy/characters/unit_germanic_axe_fighter_1.glb\nwarning: Cannot merge binary files: prototype/assets/meshy/characters/unit_germanic_axe_fighter_2.glb (26096cdd3a415552cdb20ea4795bdb661d860c95 vs. 7240463b9803d747d6d5648c988d3def528e3c5e)\nAuto-merging prototype/assets/meshy/characters/unit_germanic_axe_fighter_2.glb\nCONFLICT (content): Merge conflict in prototype/assets/meshy/characters/unit_germanic_axe_fighter_2.glb\nwarning: Cannot merge binary files: prototype/assets/meshy/characters/unit_germanic_axe_fighter_3.glb (26096cdd3a415552cdb20ea4795bdb661d860c95 vs. 7240463b9803d747d6d5648c988d3def528e3c5e)\nAuto-merging prototype/assets/meshy/characters/unit_germanic_axe_fighter_3.glb\nCONFLICT (content): Merge conflict in prototype/assets/meshy/characters/unit_germanic_axe_fighter_3.glb\nwarning: Cannot merge binary files: prototype/assets/meshy/characters/unit_roman_signifer_0.glb (26096cdd3a415552cdb20ea4795bdb661d860c95 vs. 7240463b9803d747d6d5648c988d3def528e3c5e)\nAuto-merging prototype/assets/meshy/characters/unit_roman_signifer_0.glb\nCONFLICT (content): Merge conflict in prototype/assets/meshy/characters/unit_roman_signifer_0.glb\nwarning: Cannot merge binary files: prototype/assets/meshy/characters/unit_roman_signifer_1.glb (26096cdd3a415552cdb20ea4795bdb661d860c95 vs. 7240463b9803d747d6d5648c988d3def528e3c5e)\nAuto-merging prototype/assets/meshy/characters/unit_roman_signifer_1.glb\nCONFLICT (content): Merge conflict in prototype/assets/meshy/characters/unit_roman_signifer_1.glb\nwarning: Cannot merge binary files: prototype/assets/meshy/characters/unit_roman_signifer_2.glb (26096cdd3a415552cdb20ea4795bdb661d860c95 vs. 7240463b9803d747d6d5648c988d3def528e3c5e)\nAuto-merging prototype/assets/meshy/characters/unit_roman_signifer_2.glb\nCONFLICT (content): Merge conflict in prototype/assets/meshy/characters/unit_roman_signifer_2.glb\nwarning: Cannot merge binary files: prototype/assets/meshy/characters/unit_roman_signifer_3.glb (26096cdd3a415552cdb20ea4795bdb661d860c95 vs. 7240463b9803d747d6d5648c988d3def528e3c5e)\nAuto-merging prototype/assets/meshy/characters/unit_roman_signifer_3.glb\nCONFLICT (content): Merge conflict in prototype/assets/meshy/characters/unit_roman_signifer_3.glb\nAuto-merging prototype/scripts/visuals/village_person.gd\nCONFLICT (content): Merge conflict in prototype/scripts/visuals/village_person.gd\nAuto-merging tools/characters/build_meshy_people.py\nCONFLICT (content): Merge conflict in tools/characters/build_meshy_people.py\nAuto-merging tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/city-detail-commerce-support-20261125",
+      "sha": "8315d7b27e635ab09653de4767451e11acb5a673",
+      "pr": 62,
+      "status": "conflict",
+      "conflict_paths": [
+        ".gitignore",
+        "prototype/scripts/city_support_panel.gd",
+        "prototype/scripts/city_trade.gd",
+        "prototype/scripts/city_trade_catalog.gd",
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/scripts/domain/world_model.gd",
+        "prototype/scripts/rendering/city_character_detail.gd",
+        "prototype/scripts/ui/village_life_panel.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/regional_terrain.gd",
+        "prototype/tests/commerce_transaction_test.gd",
+        "prototype/tests/team_b_integration_test.gd",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "ac8d55048b71119317d83cafd12e4bc5da114974\n.gitignore\nprototype/scripts/city_support_panel.gd\nprototype/scripts/city_trade.gd\nprototype/scripts/city_trade_catalog.gd\nprototype/scripts/domain/npc_behavior.gd\nprototype/scripts/domain/world_model.gd\nprototype/scripts/rendering/city_character_detail.gd\nprototype/scripts/ui/village_life_panel.gd\nprototype/scripts/world/game_world.gd\nprototype/scripts/world/regional_terrain.gd\nprototype/tests/commerce_transaction_test.gd\nprototype/tests/team_b_integration_test.gd\ntools/check_prototype.py\n\nAuto-merging .gitignore\nCONFLICT (content): Merge conflict in .gitignore\nAuto-merging prototype/scripts/city_support_panel.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/city_support_panel.gd\nAuto-merging prototype/scripts/city_trade.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/city_trade.gd\nAuto-merging prototype/scripts/city_trade_catalog.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/city_trade_catalog.gd\nAuto-merging prototype/scripts/domain/npc_behavior.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/npc_behavior.gd\nAuto-merging prototype/scripts/domain/village_economy.gd\nAuto-merging prototype/scripts/domain/world_model.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/world_model.gd\nAuto-merging prototype/scripts/main.gd\nAuto-merging prototype/scripts/rendering/city_character_detail.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/rendering/city_character_detail.gd\nAuto-merging prototype/scripts/ui/village_life_panel.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/village_life_panel.gd\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/regional_terrain.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/regional_terrain.gd\nAuto-merging prototype/tests/commerce_transaction_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/commerce_transaction_test.gd\nAuto-merging prototype/tests/regional_terrain_test.gd\nAuto-merging prototype/tests/team_b_integration_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/team_b_integration_test.gd\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "fix/city-inventory-interaction-20261125",
+      "sha": "95752213861fa014343be7817d3607957b9676e2",
+      "pr": 63,
+      "status": "conflict",
+      "conflict_paths": [
+        ".github/workflows/city-inventory-ui.yml",
+        ".gitignore",
+        "prototype/scripts/city_support_panel.gd",
+        "prototype/scripts/city_trade.gd",
+        "prototype/scripts/city_trade_catalog.gd",
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/scripts/domain/world_model.gd",
+        "prototype/scripts/rendering/city_character_detail.gd",
+        "prototype/scripts/ui/village_life_panel.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/regional_terrain.gd",
+        "prototype/tests/commerce_transaction_test.gd",
+        "prototype/tests/team_b_integration_test.gd",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "8a285ceca6f2f354f5aace1da26e7ded3528fc85\n.github/workflows/city-inventory-ui.yml\n.gitignore\nprototype/scripts/city_support_panel.gd\nprototype/scripts/city_trade.gd\nprototype/scripts/city_trade_catalog.gd\nprototype/scripts/domain/npc_behavior.gd\nprototype/scripts/domain/world_model.gd\nprototype/scripts/rendering/city_character_detail.gd\nprototype/scripts/ui/village_life_panel.gd\nprototype/scripts/world/game_world.gd\nprototype/scripts/world/regional_terrain.gd\nprototype/tests/commerce_transaction_test.gd\nprototype/tests/team_b_integration_test.gd\ntools/check_prototype.py\n\nAuto-merging .github/workflows/city-inventory-ui.yml\nCONFLICT (add/add): Merge conflict in .github/workflows/city-inventory-ui.yml\nAuto-merging .gitignore\nCONFLICT (content): Merge conflict in .gitignore\nAuto-merging prototype/scripts/city_support_panel.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/city_support_panel.gd\nAuto-merging prototype/scripts/city_trade.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/city_trade.gd\nAuto-merging prototype/scripts/city_trade_catalog.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/city_trade_catalog.gd\nAuto-merging prototype/scripts/domain/npc_behavior.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/npc_behavior.gd\nAuto-merging prototype/scripts/domain/village_economy.gd\nAuto-merging prototype/scripts/domain/world_model.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/world_model.gd\nAuto-merging prototype/scripts/main.gd\nAuto-merging prototype/scripts/rendering/city_character_detail.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/rendering/city_character_detail.gd\nAuto-merging prototype/scripts/ui/village_life_panel.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/village_life_panel.gd\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/regional_terrain.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/regional_terrain.gd\nAuto-merging prototype/tests/commerce_transaction_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/commerce_transaction_test.gd\nAuto-merging prototype/tests/regional_terrain_test.gd\nAuto-merging prototype/tests/team_b_integration_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/team_b_integration_test.gd\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/city-market-wayfinding-20261125",
+      "sha": "8515544599827fad5585fb085a7e24820d4821a1",
+      "pr": 64,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/npc-physical-conversation-detail-20261125",
+      "sha": "9eb10f924db2f93e4f15d601745fec14b16c0aa9",
+      "pr": 65,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/scripts/domain/world_model.gd",
+        "prototype/scripts/ui/village_life_panel.gd",
+        "prototype/scripts/world/regional_terrain.gd",
+        "prototype/scripts/world/village_life_world.gd",
+        "prototype/tests/commerce_transaction_test.gd",
+        "prototype/tests/team_b_integration_test.gd",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "d30a1ef3f9cb00302a6bfee2f696ec75da47da20\nprototype/scripts/domain/npc_behavior.gd\nprototype/scripts/domain/world_model.gd\nprototype/scripts/ui/village_life_panel.gd\nprototype/scripts/world/regional_terrain.gd\nprototype/scripts/world/village_life_world.gd\nprototype/tests/commerce_transaction_test.gd\nprototype/tests/team_b_integration_test.gd\ntools/check_prototype.py\n\nAuto-merging prototype/scripts/domain/npc_behavior.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/npc_behavior.gd\nAuto-merging prototype/scripts/domain/village_economy.gd\nAuto-merging prototype/scripts/domain/world_model.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/world_model.gd\nAuto-merging prototype/scripts/main.gd\nAuto-merging prototype/scripts/ui/village_life_panel.gd\nCONFLICT (content): Merge conflict in prototype/scripts/ui/village_life_panel.gd\nAuto-merging prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/regional_terrain.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/regional_terrain.gd\nAuto-merging prototype/scripts/world/village_life_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/village_life_world.gd\nAuto-merging prototype/tests/commerce_transaction_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/commerce_transaction_test.gd\nAuto-merging prototype/tests/regional_terrain_test.gd\nAuto-merging prototype/tests/team_b_integration_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/team_b_integration_test.gd\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "art/viva-roma-sprint1-20261125",
+      "sha": "9385c3d487adb17e618978c5a52e9997c25233f5",
+      "pr": 66,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/rendering/viva_roma_atmosphere.gd",
+        "prototype/scripts/world/city_exploration.gd",
+        "tools/world/build_roman_test_city.py",
+        "tools/world/render_viva_roma_fixture.py",
+        "tools/world/viva_roma_surfaces.py"
+      ],
+      "diagnostic": "ecdacc157483135e6622809c2edad632730927e0\nprototype/scripts/rendering/viva_roma_atmosphere.gd\nprototype/scripts/world/city_exploration.gd\ntools/world/build_roman_test_city.py\ntools/world/render_viva_roma_fixture.py\ntools/world/viva_roma_surfaces.py\n\nAuto-merging prototype/scripts/rendering/viva_roma_atmosphere.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/rendering/viva_roma_atmosphere.gd\nAuto-merging prototype/scripts/world/city_exploration.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/city_exploration.gd\nAuto-merging tools/world/build_roman_test_city.py\nCONFLICT (content): Merge conflict in tools/world/build_roman_test_city.py\nAuto-merging tools/world/render_viva_roma_fixture.py\nCONFLICT (add/add): Merge conflict in tools/world/render_viva_roma_fixture.py\nAuto-merging tools/world/viva_roma_surfaces.py\nCONFLICT (add/add): Merge conflict in tools/world/viva_roma_surfaces.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/city-facade-street-microdetail-20261125",
+      "sha": "52c037bd3b53d78df79b938c7f43820d7786e7bf",
+      "pr": 67,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/world/city_exploration.gd"
+      ],
+      "diagnostic": "868191f890ae3926422e430980a2e655ba6b34a4\nprototype/scripts/world/city_exploration.gd\n\nAuto-merging prototype/scripts/world/city_exploration.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/city_exploration.gd\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "integration/city-stand0-20261125",
+      "sha": "e756f1eb3204f615335cccd7c833d9fd98460bb7",
+      "pr": 68,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/city-ambient-people-detail-20261125",
+      "sha": "620348e0b4ae4fab1598745c7d93f91fb661d5d2",
+      "pr": 69,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/world/city_ambient_people.gd",
+        "prototype/scripts/world/city_exploration.gd"
+      ],
+      "diagnostic": "e6fdbd1095914b6714588726d9dd4df1b736ef18\nprototype/scripts/world/city_ambient_people.gd\nprototype/scripts/world/city_exploration.gd\n\nAuto-merging prototype/scripts/world/city_ambient_people.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/world/city_ambient_people.gd\nAuto-merging prototype/scripts/world/city_exploration.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/city_exploration.gd\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "integration/city-visuals-npc-details-20261125",
+      "sha": "f74a44ac4103c2a33b4162da69688913137d4005",
+      "pr": 70,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/world/city_ambient_people.gd",
+        "prototype/scripts/world/city_exploration.gd"
+      ],
+      "diagnostic": "7ab3eee86a057fbe30c28ecda3b5d7da77c193b3\nprototype/scripts/world/city_ambient_people.gd\nprototype/scripts/world/city_exploration.gd\n\nAuto-merging prototype/scripts/world/city_ambient_people.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/world/city_ambient_people.gd\nAuto-merging prototype/scripts/world/city_exploration.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/city_exploration.gd\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "art/viva-roma-sprint2-20261125",
+      "sha": "b846c67db7f6a167d4092eb33f520644550ee5aa",
+      "pr": 71,
+      "status": "conflict",
+      "conflict_paths": [
+        ".github/workflows/viva-roma-closeup.yml",
+        "tools/viva_roma/blender_prop_review.py"
+      ],
+      "diagnostic": "708652362afbf27bc621b5f53b17033da9b12247\n.github/workflows/viva-roma-closeup.yml\ntools/viva_roma/blender_prop_review.py\n\nAuto-merging .github/workflows/viva-roma-closeup.yml\nCONFLICT (add/add): Merge conflict in .github/workflows/viva-roma-closeup.yml\nAuto-merging prototype/scripts/world/city_exploration.gd\nAuto-merging tools/viva_roma/blender_prop_review.py\nCONFLICT (add/add): Merge conflict in tools/viva_roma/blender_prop_review.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/fold7-high-sustained-graphics-20261125",
+      "sha": "c91b9f208958668d313d4e6337dea89eb2ce602d",
+      "pr": 72,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/city-graphics-release-blockers-20261125",
+      "sha": "3bc805ac59ae993a6a2a2271894b827027f8cd45",
+      "pr": 73,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/roman-city-asset-build-20261125",
+      "sha": "6f4bfd3abd9f7a1fd56cfe07533613d1a4f99b5f",
+      "pr": 74,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/viva-blender-pack-operator-20261125",
+      "sha": "82ed861ba213bc4214f0e7dc5d90c07bfc397b98",
+      "pr": 75,
+      "changes": [],
+      "status": "tree_equivalent",
+      "final_ancestry": false
+    },
+    {
+      "branch": "art/viva-roma-country-road-20261125",
+      "sha": "21c3a8bf142465448b09573d98509389650c9918",
+      "pr": 76,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/viva_country/country_walk.gd",
+        "tools/viva_country/prepare_fixture.py"
+      ],
+      "diagnostic": "49ded13049b6cb7c749df2237cf8ed7e44f7a0fc\nprototype/scripts/viva_country/country_walk.gd\ntools/viva_country/prepare_fixture.py\n\nAuto-merging prototype/scripts/viva_country/country_walk.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/viva_country/country_walk.gd\nAuto-merging tools/viva_country/prepare_fixture.py\nCONFLICT (add/add): Merge conflict in tools/viva_country/prepare_fixture.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "integration/verified-city-blender-20261125",
+      "sha": "9d1328e5027ae5dff03ce0cab3fee8f1e8b12979",
+      "pr": 77,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/fold7-release-candidate-20261125",
+      "sha": "d555cc158a11559660a20296c945ae781bb3f939",
+      "pr": 78,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/roman-city-real-visuals-20261125",
+      "sha": "5bde307a49ded13a1555e7ca8d94b540e474889b",
+      "pr": 79,
+      "status": "conflict",
+      "conflict_paths": [
+        ".github/workflows/fold7-city-apk.yml",
+        "prototype/assets/city_detail/shops/city_market_anchors.json",
+        "tools/world/build_roman_test_city.py"
+      ],
+      "diagnostic": "cdc91195cbf6f394c67387db8cd39ecc77191b4b\n.github/workflows/fold7-city-apk.yml\nprototype/assets/city_detail/shops/city_market_anchors.json\ntools/world/build_roman_test_city.py\n\nAuto-merging .github/workflows/fold7-city-apk.yml\nCONFLICT (content): Merge conflict in .github/workflows/fold7-city-apk.yml\nAuto-merging prototype/assets/city_detail/shops/city_market_anchors.json\nCONFLICT (content): Merge conflict in prototype/assets/city_detail/shops/city_market_anchors.json\nAuto-merging tools/world/build_roman_test_city.py\nCONFLICT (content): Merge conflict in tools/world/build_roman_test_city.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/fold7-qa-installable-not-release-20261125",
+      "sha": "b3d3ae82b2a7e055b07e7898dee3ffe99071eaa0",
+      "pr": 80,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/hero-identity-city-motion-20261125",
+      "sha": "7d01a4f15e2b17a14913b2ed4d92de8c715e479e",
+      "pr": 81,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/full-candidate-original-youth-proof-20261125",
+      "sha": "6787a63c46f3fec61bd639ed8431cf795aa94658",
+      "pr": 83,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/lod-active-motion-continuity-20261125",
+      "sha": "5fe8f96cfc81993ec5c65db470db323a7f56820e",
+      "pr": 84,
+      "changes": [],
+      "status": "tree_equivalent",
+      "final_ancestry": false
+    },
+    {
+      "branch": "fix/city-render-resource-lifecycle-20261125",
+      "sha": "94235b92ed16afd8c89ccc39464d633fbd21e066",
+      "pr": 85,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/tests/roman_city_visual_capture.gd"
+      ],
+      "diagnostic": "0be298f799d5c16b4e71b374cd64849a4b740fad\nprototype/tests/roman_city_visual_capture.gd\n\nAuto-merging prototype/scripts/world/city_exploration.gd\nAuto-merging prototype/tests/roman_city_visual_capture.gd\nCONFLICT (content): Merge conflict in prototype/tests/roman_city_visual_capture.gd\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "integration/imperathen-unified-20261125",
+      "sha": "2c549548497aad901bda32d71c19c2a1961d9591",
+      "pr": 86,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/youth-sole-slab-calibration-20261125",
+      "sha": "89e735df9d619a1c55a7393bf3066f2b81a50ba6",
+      "pr": 87,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/youth-hand-tunic-separation-20261126",
+      "sha": "6478fefc575a09f89fc8b31c87943f3ff513317c",
+      "pr": 88,
+      "changes": [],
+      "status": "tree_equivalent",
+      "final_ancestry": false
+    },
+    {
+      "branch": "fix/frontier-soldier-sole-lift-20261126",
+      "sha": "e5bf8b9a0d6159368b68c513d59531366820af44",
+      "pr": 89,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/company-death-ground-contact-20261126",
+      "sha": "037ac6ea3ef88b1ab76ab6f8b7fcd1a4c6aee2b3",
+      "pr": 90,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/frontier-cloth-weight-refit-20261126",
+      "sha": "293d4b6b9a7ccdd63c55694932f3eb9e3adc36f2",
+      "pr": 91,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/village-gather-ground-20261126",
+      "sha": "f30caec1cee763d9738a6e92b1f355409c6af824",
+      "pr": 92,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/hero-death-gather-ground-20261126",
+      "sha": "704329698727b15773b1403220776f2175d12671",
+      "pr": 93,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/frontier-kit-rivets-20261126",
+      "sha": "95adade4f52c42e9ccc0859d3de9964d690beb29",
+      "pr": 94,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/meshy-cloak-seam-20261126",
+      "sha": "df15a2eb4658ad98ff41d7806975bedb877112ce",
+      "pr": 95,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "docs/handover-gpt-fable-20261126",
+      "sha": "3e51be714ff39b625ba58487d6c26e1b84508266",
+      "pr": 96,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "docs/game-direction-20261126",
+      "sha": "f413c65f8297e2943d1671f9a63c4315a4046a69",
+      "pr": 97,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/world-calendar-20261126",
+      "sha": "d1ca5ec8ade88842e675ba9b2d2078978d99ce33",
+      "pr": 98,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/germanic-tribes-ai-20261126",
+      "sha": "82367a8e7ee6315448218f575b837e7711f798ab",
+      "pr": 99,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/troops-command-core-20261126",
+      "sha": "ee57ec60597720e4c0287b47c469e954e96152e8",
+      "pr": 100,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integ/reference-candidate-20261126",
+      "sha": "7f46fa0a2332f1b9b853979a60bce6a798647971",
+      "pr": 101,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/motion-gate-blockers-20261126",
+      "sha": "cf9e64b19c9bc8e98369c8788f021062e9bc9181",
+      "pr": 102,
+      "changes": [],
+      "status": "tree_equivalent",
+      "final_ancestry": false
+    },
+    {
+      "branch": "fix/village-raid-approach-20261126",
+      "sha": "8d94d0c4fe6ed3fe94870961d486b9417bb82d6b",
+      "pr": 103,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/i01-three-cups-slice-20261126",
+      "sha": "0cb01956660cbc027c951be7bf9fd56a897f1fd9",
+      "pr": 104,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/roman-hud-20261126",
+      "sha": "fb1779274ed2b5f756ea1ba868925d4ed971d51f",
+      "pr": 105,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/city-ground-walls-20261126",
+      "sha": "015ee2b690afad81d28075109d9440766e6a3fc6",
+      "pr": 106,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/village-backdrop-terrain-20261126",
+      "sha": "9cc2f00e66f1bf577fdfe1534adfeda8b6e4bb19",
+      "pr": 107,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/regional_terrain.gd",
+        "prototype/scripts/world/village/village_scenery.gd",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "2e13d996326630da896c46979cdf4aa679941fd1\nprototype/scripts/world/game_world.gd\nprototype/scripts/world/regional_terrain.gd\nprototype/scripts/world/village/village_scenery.gd\ntools/check_prototype.py\n\nAuto-merging prototype/scripts/cinematic/opening_director.gd\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/regional_terrain.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/regional_terrain.gd\nAuto-merging prototype/scripts/world/village/village_scenery.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/village/village_scenery.gd\nAuto-merging prototype/tests/regional_terrain_test.gd\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/village-lookdev-20261126",
+      "sha": "39e7ae40c52968703ffeaee0d02aea092b96d68f",
+      "pr": 108,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/render-profiles-study-20261126",
+      "sha": "6b52a3c5ffbb391119105ed3372cc925702ca9c9",
+      "pr": 109,
+      "changes": [],
+      "status": "tree_equivalent",
+      "final_ancestry": false
+    },
+    {
+      "branch": "integ/world-state-20261126",
+      "sha": "9f14a11c8c551031cb4a97236279f4057e9550c1",
+      "pr": 110,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/melee-combat-core-20261126",
+      "sha": "2bfbf99bbdf90a11614a306230c9aa582dd0c1fe",
+      "pr": 111,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/export_presets.cfg",
+        "quality/motion_contract.json"
+      ],
+      "diagnostic": "c9f0195719aeed3cd739c9f1158f93f90ab5db38\nprototype/export_presets.cfg\nquality/motion_contract.json\n\nAuto-merging prototype/export_presets.cfg\nCONFLICT (content): Merge conflict in prototype/export_presets.cfg\nAuto-merging prototype/scripts/world/player_action_world.gd\nAuto-merging prototype/tests/action_world_test.gd\nAuto-merging prototype/tests/village_childhood_test.gd\nAuto-merging quality/motion_contract.json\nCONFLICT (content): Merge conflict in quality/motion_contract.json\nAuto-merging tools/check_prototype.py\nAuto-merging tools/validate_android_apk.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/formation-movement-20261126",
+      "sha": "2c6c34de8e4a800dd694e60fdd2cd4c92d7a18c8",
+      "pr": 112,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/formation/formation_agents.gd",
+        "prototype/scripts/formation/formation_levels.gd",
+        "prototype/scripts/formation/troop_motion.gd",
+        "prototype/scripts/tactics/valley_scene.gd"
+      ],
+      "diagnostic": "1816e2d5fadae057a7854d0f15880c601d6db0ce\nprototype/scripts/formation/formation_agents.gd\nprototype/scripts/formation/formation_levels.gd\nprototype/scripts/formation/troop_motion.gd\nprototype/scripts/tactics/valley_scene.gd\n\nAuto-merging prototype/scripts/formation/formation_agents.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/formation/formation_agents.gd\nAuto-merging prototype/scripts/formation/formation_levels.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/formation/formation_levels.gd\nAuto-merging prototype/scripts/formation/troop_motion.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/formation/troop_motion.gd\nAuto-merging prototype/scripts/tactics/valley_scene.gd\nCONFLICT (content): Merge conflict in prototype/scripts/tactics/valley_scene.gd\nAuto-merging prototype/scripts/visuals/soldier_visual.gd\nAuto-merging tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/raid-conspiracy-investigation-20261126",
+      "sha": "6c89d4003269a3feb929e3fbd63d29ab937792af",
+      "pr": 113,
+      "changes": [],
+      "status": "tree_equivalent",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/youth-civil-clothing-20261126",
+      "sha": "c08d18d73a96a0749f7b7550dc763ed79ee61d89",
+      "pr": 114,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/visuals/village_person.gd",
+        "prototype/tests/youth_outfit_review.gd",
+        "tools/characters/check_youth_civil_outfit.py",
+        "tools/characters/clear_youth_civil_arms.py",
+        "tools/characters/stage_youth_civil.py",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "793da8a0a7fcdcdd7077fdbb7f7893edc3c87823\nprototype/scripts/visuals/village_person.gd\nprototype/tests/youth_outfit_review.gd\ntools/characters/check_youth_civil_outfit.py\ntools/characters/clear_youth_civil_arms.py\ntools/characters/stage_youth_civil.py\ntools/check_prototype.py\n\nAuto-merging prototype/scripts/visuals/village_person.gd\nCONFLICT (content): Merge conflict in prototype/scripts/visuals/village_person.gd\nAuto-merging prototype/scripts/world/game_world.gd\nAuto-merging prototype/tests/village_person_test.gd\nAuto-merging prototype/tests/youth_outfit_review.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/youth_outfit_review.gd\nAuto-merging tools/characters/check_youth_civil_outfit.py\nCONFLICT (add/add): Merge conflict in tools/characters/check_youth_civil_outfit.py\nAuto-merging tools/characters/clear_youth_civil_arms.py\nCONFLICT (add/add): Merge conflict in tools/characters/clear_youth_civil_arms.py\nAuto-merging tools/characters/stage_youth_civil.py\nCONFLICT (add/add): Merge conflict in tools/characters/stage_youth_civil.py\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/germanic-warrior-families-20261126",
+      "sha": "58185a19d0cb82980a4155821a87186d7cf65e71",
+      "pr": 115,
+      "status": "conflict",
+      "conflict_paths": [
+        "art/germanic_warriors/build.py"
+      ],
+      "diagnostic": "4dd10b483b37e72dd5a1ea492d0d88161d269050\nart/germanic_warriors/build.py\n\nAuto-merging art/germanic_warriors/build.py\nCONFLICT (add/add): Merge conflict in art/germanic_warriors/build.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/vegetation-20261126",
+      "sha": "6050b1564e5d6cf70eeffc3985eb72e34e9000bb",
+      "pr": 116,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/world/game_world.gd"
+      ],
+      "diagnostic": "231e9bb8cc87a001b80bb98a6af294630a249d87\nprototype/scripts/world/game_world.gd\n\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/people-detail-realism-20261126",
+      "sha": "01af2fbd3a447d269a9e2f5b94f13a3c5b320e83",
+      "pr": 117,
+      "status": "conflict",
+      "conflict_paths": [
+        "art/frontier_people/provenance.json",
+        "prototype/scripts/visuals/village_person.gd",
+        "prototype/scripts/world/village/village_population.gd",
+        "prototype/scripts/world/village_life_world.gd",
+        "quality/motion_contract.json",
+        "tools/characters/build_frontier_people.py"
+      ],
+      "diagnostic": "8e5c4327d0149ed63b66da0d1cfab16f32eab505\nart/frontier_people/provenance.json\nprototype/scripts/visuals/village_person.gd\nprototype/scripts/world/village/village_population.gd\nprototype/scripts/world/village_life_world.gd\nquality/motion_contract.json\ntools/characters/build_frontier_people.py\n\nAuto-merging art/frontier_people/provenance.json\nCONFLICT (content): Merge conflict in art/frontier_people/provenance.json\nAuto-merging prototype/scripts/visuals/village_person.gd\nCONFLICT (content): Merge conflict in prototype/scripts/visuals/village_person.gd\nAuto-merging prototype/scripts/world/village/village_population.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/village/village_population.gd\nAuto-merging prototype/scripts/world/village_life_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/village_life_world.gd\nAuto-merging quality/motion_contract.json\nCONFLICT (content): Merge conflict in quality/motion_contract.json\nAuto-merging tools/characters/build_frontier_people.py\nCONFLICT (content): Merge conflict in tools/characters/build_frontier_people.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/house-interiors-detail-20261126",
+      "sha": "932ec4b73446658f6d800f3579db5d1f35c305fb",
+      "pr": 118,
+      "status": "conflict",
+      "conflict_paths": [
+        "docs/35_interiors/INTERIORS.md",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/village/household_designs.gd",
+        "prototype/scripts/world/village/interior_kit.gd",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "c667ffe1f8cc4189c6730e8a50de3a379c36db8a\ndocs/35_interiors/INTERIORS.md\nprototype/scripts/world/game_world.gd\nprototype/scripts/world/village/household_designs.gd\nprototype/scripts/world/village/interior_kit.gd\ntools/check_prototype.py\n\nAuto-merging docs/35_interiors/INTERIORS.md\nCONFLICT (add/add): Merge conflict in docs/35_interiors/INTERIORS.md\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/regional_village.gd\nAuto-merging prototype/scripts/world/village/household_designs.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/world/village/household_designs.gd\nAuto-merging prototype/scripts/world/village/interior_kit.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/world/village/interior_kit.gd\nAuto-merging prototype/scripts/world/village/settlement_dressing.gd\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/meshy-assets-shops-20261126",
+      "sha": "b9016ff0a9e937e2e76c147e941d59a4c6c60eef",
+      "pr": 119,
+      "status": "conflict",
+      "conflict_paths": [
+        "docs/20_meshy_assets/gear-build.json",
+        "prototype/scripts/city_trade.gd",
+        "prototype/scripts/domain/gear_market.gd",
+        "prototype/scripts/domain/world_model.gd",
+        "prototype/scripts/visuals/village_person.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/tests/gear_market_test.gd",
+        "prototype/tests/gear_visual_test.gd",
+        "tools/art/build_meshy_gear.py"
+      ],
+      "diagnostic": "ead0e3ac8af106281edef206f1f08a53bf9cfa3b\ndocs/20_meshy_assets/gear-build.json\nprototype/scripts/city_trade.gd\nprototype/scripts/domain/gear_market.gd\nprototype/scripts/domain/world_model.gd\nprototype/scripts/visuals/village_person.gd\nprototype/scripts/world/game_world.gd\nprototype/tests/gear_market_test.gd\nprototype/tests/gear_visual_test.gd\ntools/art/build_meshy_gear.py\n\nAuto-merging .gitignore\nAuto-merging docs/20_meshy_assets/gear-build.json\nCONFLICT (add/add): Merge conflict in docs/20_meshy_assets/gear-build.json\nAuto-merging prototype/assets/troops/item_families.json\nAuto-merging prototype/scripts/city_trade.gd\nCONFLICT (content): Merge conflict in prototype/scripts/city_trade.gd\nAuto-merging prototype/scripts/domain/gear_market.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/domain/gear_market.gd\nAuto-merging prototype/scripts/domain/world_model.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/world_model.gd\nAuto-merging prototype/scripts/visuals/village_person.gd\nCONFLICT (content): Merge conflict in prototype/scripts/visuals/village_person.gd\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/tests/gear_market_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/gear_market_test.gd\nAuto-merging prototype/tests/gear_visual_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/gear_visual_test.gd\nAuto-merging tools/art/build_meshy_gear.py\nCONFLICT (add/add): Merge conflict in tools/art/build_meshy_gear.py\nAuto-merging tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/colosseum-plaza-20261126",
+      "sha": "060d06733e8697a9930801aaa6eb9b5e96542b68",
+      "pr": 120,
+      "status": "conflict",
+      "conflict_paths": [
+        "quality/motion_contract.json",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "2ca45d54fec96192b9f6630f62e55f571b50f92b\nquality/motion_contract.json\ntools/check_prototype.py\n\nAuto-merging prototype/assets/world/era_registry.json\nAuto-merging quality/motion_contract.json\nCONFLICT (content): Merge conflict in quality/motion_contract.json\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/living-city-20261126",
+      "sha": "c2d4ab3b9b3f78a1db6f2b95773acc64b28037ef",
+      "pr": 121,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feat/voices-lipsync-sfx-20261126",
+      "sha": "82eb3b7eeb453558b80defdef6d54c416203a53b",
+      "pr": 122,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "perf/runtime-optimization-20261126",
+      "sha": "350496da0a518d1444f420e4aca80de3f00af628",
+      "pr": 123,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/domain/world_model.gd",
+        "prototype/scripts/world/game_world.gd",
+        "prototype/scripts/world/village_life_world.gd",
+        "prototype/tests/runtime_profile_harness.gd",
+        "tools/perf/runtime_profile.py"
+      ],
+      "diagnostic": "84bcee17466c25f5b43a9fd37432f309fb5540bf\nprototype/scripts/domain/world_model.gd\nprototype/scripts/world/game_world.gd\nprototype/scripts/world/village_life_world.gd\nprototype/tests/runtime_profile_harness.gd\ntools/perf/runtime_profile.py\n\nAuto-merging prototype/assets/quality_profiles.json\nAuto-merging prototype/scripts/domain/world_model.gd\nCONFLICT (content): Merge conflict in prototype/scripts/domain/world_model.gd\nAuto-merging prototype/scripts/visuals/village_person.gd\nAuto-merging prototype/scripts/world/game_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/game_world.gd\nAuto-merging prototype/scripts/world/village_life_world.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/village_life_world.gd\nAuto-merging prototype/tests/runtime_profile_harness.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/runtime_profile_harness.gd\nAuto-merging tools/perf/runtime_profile.py\nCONFLICT (add/add): Merge conflict in tools/perf/runtime_profile.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "aeterna/living-empire-20261126",
+      "sha": "13d173d658a7d4bb4adc9ee271ed7cc3d17e5098",
+      "pr": 124,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "aeterna/roman-street-20261126",
+      "sha": "817777f127783cfac163bafdeb280574f540608e",
+      "pr": 125,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "aeterna/regional-roads-20261126",
+      "sha": "1ab12647deafb8645c97b327fc584587b962343e",
+      "pr": 126,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/aeterna-repair-city-life-20261126",
+      "sha": "3f61a2d9080b6c1df5dfae87cf9dd7f33530b792",
+      "pr": 127,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "aeterna/imperium-politicum-20261126",
+      "sha": "0f5637f8e90e8a8492490707289f17109010ca03",
+      "pr": 128,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/aeterna-iii-campaign-city",
+      "sha": "df6ef5fc2e0724fac69dd4fec2a9a5ddfd587752",
+      "pr": 129,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/legio-aeterna-valdora-20261126",
+      "sha": "4209e5504e857f31d76a79cff18676ed743de7db",
+      "pr": 130,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "fix/aeterna-iii-market-outfit",
+      "sha": "3c72aa85a79bebd1764761ba4bd358d513bc8561",
+      "pr": 131,
+      "status": "conflict",
+      "conflict_paths": [
+        ".github/workflows/presentation-delivery.yml"
+      ],
+      "diagnostic": "dc4fcb82fba2a557731b681276809b21a1f32244\n.github/workflows/presentation-delivery.yml\n\nAuto-merging .github/workflows/presentation-delivery.yml\nCONFLICT (content): Merge conflict in .github/workflows/presentation-delivery.yml\nAuto-merging prototype/tests/dialogue_lipsync_test.gd\nAuto-merging prototype/tests/opening_voice_test.gd\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "qa/legio-regression-runner-20261126",
+      "sha": "fdd5f75b6734d9cf5741e6ba79d1dc546e6dfc86",
+      "pr": 132,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/legio-story-qa-20261126",
+      "sha": "2aeb14b5ffcdce71fdf62d7837d81d5e7cddc333",
+      "pr": 133,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/imperathen-complete-qa-20261126",
+      "sha": "a1bd1d2da7aeb2ba11385d584c54bf47e2278fba",
+      "pr": 134,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/imperathen-gear-qa-20261126",
+      "sha": "0262aa01745dcfcfa9ead142def46f3d41219354",
+      "pr": 135,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/imperathen-player-visible-recovery-20261126",
+      "sha": "2025db2d839288168863d4b277a454df63e5ebed",
+      "pr": 136,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "art/meshy-unit-library-rebase-20261123",
+      "sha": "a0f500b568ea2a55b29e09798e5d2a08a8466d60",
+      "pr": null,
+      "status": "conflict",
+      "conflict_paths": [
+        ".github/workflows/android-prototype.yml",
+        "docs/20_meshy_assets/ASSET_LEDGER.md",
+        "docs/20_meshy_assets/INTEGRATION.md",
+        "prototype/assets/meshy/README.md",
+        "prototype/assets/meshy/manifest.json",
+        "prototype/scripts/visuals/meshy_asset_registry.gd",
+        "prototype/tests/meshy_asset_registry_test.gd",
+        "tests/android_meshy_asset_test.py",
+        "tools/art/validate_meshy_manifest.py",
+        "tools/check_prototype.py"
+      ],
+      "diagnostic": "4c30cb6a83d15041d2c23eaa2364ad29e50d4160\n.github/workflows/android-prototype.yml\ndocs/20_meshy_assets/ASSET_LEDGER.md\ndocs/20_meshy_assets/INTEGRATION.md\nprototype/assets/meshy/README.md\nprototype/assets/meshy/manifest.json\nprototype/scripts/visuals/meshy_asset_registry.gd\nprototype/tests/meshy_asset_registry_test.gd\ntests/android_meshy_asset_test.py\ntools/art/validate_meshy_manifest.py\ntools/check_prototype.py\n\nAuto-merging .github/workflows/android-prototype.yml\nCONFLICT (content): Merge conflict in .github/workflows/android-prototype.yml\nAuto-merging docs/20_meshy_assets/ASSET_LEDGER.md\nCONFLICT (add/add): Merge conflict in docs/20_meshy_assets/ASSET_LEDGER.md\nAuto-merging docs/20_meshy_assets/INTEGRATION.md\nCONFLICT (add/add): Merge conflict in docs/20_meshy_assets/INTEGRATION.md\nAuto-merging prototype/assets/meshy/README.md\nCONFLICT (add/add): Merge conflict in prototype/assets/meshy/README.md\nAuto-merging prototype/assets/meshy/manifest.json\nCONFLICT (add/add): Merge conflict in prototype/assets/meshy/manifest.json\nAuto-merging prototype/scripts/visuals/meshy_asset_registry.gd\nCONFLICT (add/add): Merge conflict in prototype/scripts/visuals/meshy_asset_registry.gd\nAuto-merging prototype/tests/meshy_asset_registry_test.gd\nCONFLICT (add/add): Merge conflict in prototype/tests/meshy_asset_registry_test.gd\nAuto-merging tests/android_meshy_asset_test.py\nCONFLICT (add/add): Merge conflict in tests/android_meshy_asset_test.py\nAuto-merging tools/art/validate_meshy_manifest.py\nCONFLICT (add/add): Merge conflict in tools/art/validate_meshy_manifest.py\nAuto-merging tools/check_prototype.py\nCONFLICT (content): Merge conflict in tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feat/architecture-families-20261126",
+      "sha": "c881b67f52faaf60f1f2b2822014e036bba2851b",
+      "pr": null,
+      "status": "conflict",
+      "conflict_paths": [
+        "prototype/scripts/world/regional_village.gd",
+        "prototype/scripts/world/village/village_scenery.gd"
+      ],
+      "diagnostic": "0557055392c9250d1de0d4b5c481cc80b1c8a280\nprototype/scripts/world/regional_village.gd\nprototype/scripts/world/village/village_scenery.gd\n\nAuto-merging prototype/scripts/world/regional_village.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/regional_village.gd\nAuto-merging prototype/scripts/world/village/settlement_dressing.gd\nAuto-merging prototype/scripts/world/village/village_scenery.gd\nCONFLICT (content): Merge conflict in prototype/scripts/world/village/village_scenery.gd\nAuto-merging tools/check_prototype.py\n",
+      "final_ancestry": false
+    },
+    {
+      "branch": "feature/living-frontier-20261123",
+      "sha": "148dd69a417c155392791e3b20afc6f8e599e730",
+      "pr": null,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/meshy-player-city-exploration-20261125",
+      "sha": "5b5eecad31e395e3ead48b3e631d9f48690480a6",
+      "pr": null,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "feature/team-a-character-gameplay-20261124",
+      "sha": "fba220ba635e942a66642da9208b8c4b156aa221",
+      "pr": null,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "integration/fold7-quality-latest-20261125",
+      "sha": "09a631560a6632eb86308068ed3b67a4bca52405",
+      "pr": null,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "main",
+      "sha": "e9e1bb16da02de9217e422fa013fdafdb5b80a80",
+      "pr": null,
+      "status": "ancestor",
+      "final_ancestry": true
+    },
+    {
+      "branch": "staging/hero-transfer-20261122",
+      "sha": "3306c4a6662229b84947c33262e40fc702719b3b",
+      "pr": null,
+      "changes": [
+        {
+          "status": "A",
+          "path": ".github/workflows/hero-transfer.yml"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/manifest.json"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-000.bin"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-001.bin"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-002.bin"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-003.bin"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-004.bin"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-005.bin"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-006.bin"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-007.bin"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-008.bin"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-009.bin"
+        },
+        {
+          "status": "A",
+          "path": "_hero_transfer/part-010.bin"
+        }
+      ],
+      "status": "historical_unique_review",
+      "final_ancestry": false
+    }
+  ]
+}

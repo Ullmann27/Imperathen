@@ -370,12 +370,12 @@ func show_menu(can_continue: bool) -> void:
 	var demo_button := _roman_button("Talgefecht erproben", func(): _emit("valley_demo"), false, font_size, button_height)
 	var city_button := _roman_button("Stadt frei erkunden", func(): _emit("city_exploration"), true, font_size, button_height)
 	city_button.name = "FreeCityExploration"
-	city_button.tooltip_text = "Eine freie Testrunde durch die Stadt und vorhandene Modelle beginnen."
-	more.add_child(city_button)
-	var imperial_button := _roman_button("Rom 100 n. Chr. · Kolosseum", func(): _emit("imperial_city_exploration"), false, font_size, button_height)
+	city_button.tooltip_text = "Freie Erkundung der vollständigen Stadt um 100 n. Chr. mit Kolosseum und eigener Speicherung."
+	life.add_child(city_button)
+	var imperial_button := _roman_button("Rom 100 n. Chr. · Kolosseum", func(): _emit("imperial_city_exploration"), true, font_size, button_height)
 	imperial_button.name = "ImperialCityExploration"
-	imperial_button.tooltip_text = "Historisch späterer freier Stadtbesuch mit begehbarem Amphitheater; verändert deinen Kampagnenspielstand nicht."
-	life.add_child(imperial_button)
+	imperial_button.tooltip_text = "Direkt am begehbaren Kolosseum beginnen; verändert deinen Kampagnenspielstand nicht."
+	more.add_child(imperial_button)
 	more.add_child(demo_button)
 	var atlas_button := _roman_button("Weltkugel erkunden", func(): _emit("atlas_demo"), false, font_size, button_height)
 	more.add_child(atlas_button)

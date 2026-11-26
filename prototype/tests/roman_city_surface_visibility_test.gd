@@ -1,7 +1,7 @@
 extends SceneTree
 ## The ground, main-street and plot surfaces under every house front and gate of
 ## the ACTUAL RomanCity GLB must lie inside the visibility range that the
-## production CityExploration assigns in the low and balanced profiles.
+## production CityExploration assigns in every graphics profile.
 ## Godot hides a mesh by the camera distance to its AABB centre (with
 ## hysteresis: hidden beyond end+margin, shown again only inside end-margin).
 ## A surface counts as visible only when even the farthest third-person camera
@@ -31,7 +31,7 @@ func _check(ok: bool, label: String) -> void:
 
 
 func _run() -> void:
-	for profile in ["low", "balanced"]:
+	for profile in ["low", "balanced", "high", "very_high"]:
 		var scene := City.new()
 		scene.persist = false
 		scene.profile = profile

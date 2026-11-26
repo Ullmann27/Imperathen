@@ -8,6 +8,9 @@ extends SceneTree
 
 const Bench = preload("res://scripts/rendering/render_bench.gd")
 const Probe = preload("res://scripts/ui/android_graphics_probe.gd")
+const Layout = preload("res://scripts/world/village/village_layout.gd")
+const Profiles = preload("res://assets/quality_profiles.json")
+const LookValues = preload("res://assets/village/look/look_values.json")
 var checks := 0
 var failures: Array[String] = []
 
@@ -61,14 +64,28 @@ func _run() -> void:
 		_check(int(row.metrics.frames) == 2, "Measured frame count recorded")
 		atlas[row.quality] = int(engine.viewport.positional_shadow_atlas_size)
 		if row.view in ["night_torch", "village_lane", "village_overview"]:
-			# Both lane shots see the same authored hearth at the 13 m
-			# Very High light radius. Other views here are beyond its range.
+			# The updated village has real authored sconces as well as the room
+			# hearth. Independently derive the expected nearest light identities
+			# from the actual fixed camera and the authoring coordinates.
 			var sources: Array = engine.lights.scene_omni_paths
+			var eye := Vector3(float(engine.camera.position[0]), float(engine.camera.position[1]), float(engine.camera.position[2]))
+			var authored := _expected_managed_fires(eye, String(row.quality), row.view == "night_torch")
+			var actual: Array = []
+			var room_sources: Array = []
+			for source: String in sources:
+				if source.begins_with("VillageLook/"):
+					actual.append(source)
+				else:
+					room_sources.append(source)
+			actual.sort()
+			authored.sort()
+			_check(actual == authored, "%s/%s has the exact nearest authored fire lights: %s expected %s" % [row.quality, row.view, actual, authored])
 			var weaver_hearth: bool = row.quality == "very_high" and row.view != "village_overview"
-			var expected_scene := 1 if weaver_hearth else 0
-			_check(sources.size() == expected_scene and (not weaver_hearth or
-				str(sources[0]).ends_with("/south_weaver_home/Interior/HearthGlow")),
-				"%s/%s has the expected authored lights: %s" % [row.quality, row.view, sources])
+			var room_count := 1 if weaver_hearth else 0
+			_check(room_sources.size() == room_count and (not weaver_hearth or
+				str(room_sources[0]).ends_with("/south_weaver_home/Interior/HearthGlow")),
+				"%s/%s has the exact authored room light: %s" % [row.quality, row.view, room_sources])
+			var expected_scene := authored.size() + room_count
 			var expected_torches := Bench.TORCH_OFFSETS.size() if row.view == "night_torch" else 0
 			_check(int(engine.lights.harness_omni) == expected_torches, "Exact harness torch count for " + str(row.view))
 			_check(int(engine.lights.omni) == expected_scene + expected_torches, "Every visible omni light is accounted for")
@@ -87,3 +104,36 @@ func _run() -> void:
 	else:
 		print("RENDER_BENCH_VIEWS_FAIL checks=%d failures=%d" % [checks, failures.size()])
 	quit(0 if failures.is_empty() else 1)
+
+
+## This calculation uses authoring data and the sampled camera, never the
+## look node's visible flags or internal ranking. The scene light budget stays
+## separate from the explicitly synthetic stress-test torches.
+func _expected_managed_fires(eye: Vector3, profile: String, night: bool) -> Array:
+	var data: Dictionary = LookValues.data.village_fires
+	var ranked: Array = []
+	var forge := Vector3(float(data.forge.at[0]), float(data.forge.at[1]), float(data.forge.at[2]))
+	_add_expected_fire(ranked, eye, forge, 1.0 if night else float(data.forge.day_share), "VillageLook/ForgeHearthLight")
+	var index := 0
+	var local := Vector3(float(data.sconce_local[0]), float(data.sconce_local[1]), float(data.sconce_local[2]))
+	var offset := Vector3(float(data.sconce_light_offset[0]), float(data.sconce_light_offset[1]), float(data.sconce_light_offset[2]))
+	for home: Dictionary in Layout.HOMES:
+		if home.id not in data.sconce_homes:
+			continue
+		var yaw := float(home.yaw)
+		var at: Vector3 = home.at + (local + offset + Vector3(0, .1, .12)).rotated(Vector3.UP, yaw)
+		_add_expected_fire(ranked, eye, at, 1.0 if night else 0.0, "VillageLook/DoorTorchLight%d" % index)
+		index += 1
+	ranked.sort_custom(func(a: Array, b: Array) -> bool: return float(a[0]) < float(b[0]))
+	var limit := int(Profiles.data.profiles[profile].look.fire_lights)
+	var result: Array = []
+	for row: Array in ranked.slice(0, limit):
+		result.append(row[1])
+	return result
+
+
+func _add_expected_fire(ranked: Array, eye: Vector3, at: Vector3, power: float, path: String) -> void:
+	var data: Dictionary = LookValues.data.village_fires
+	var distance := eye.distance_to(at)
+	if power * (1.0 - smoothstep(float(data.fade_start), float(data.fade_end), distance)) > .01:
+		ranked.append([distance, path])

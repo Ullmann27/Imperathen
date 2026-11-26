@@ -7,11 +7,20 @@ class SpeakingFigure:
 	var sampled := "idle"
 	var reset_count := 0
 	var age := 22
+	var pinned := false
+	func set_cinematic_detail(enabled: bool) -> void:
+		pinned = enabled
 	func sample_pose(action: String, _phase: float) -> void:
 		sampled = action
 	func reset_motion() -> void:
 		sampled = "idle"
 		reset_count += 1
+
+class FilmWorld:
+	extends Node3D
+	var cast: Dictionary = {}
+	func get_cinematic_figure(id: String) -> Node3D:
+		return cast.get(id) as Node3D
 
 var checks := 0
 var errors: Array[String] = []
@@ -29,7 +38,7 @@ func _check(ok: bool, message: String) -> void:
 
 
 func _run() -> void:
-	var stage := Node3D.new()
+	var stage := FilmWorld.new()
 	root.add_child(stage)
 	var gameplay := Camera3D.new()
 	gameplay.name = "WorldCamera"
@@ -49,6 +58,7 @@ func _run() -> void:
 	var speaking := SpeakingFigure.new()
 	speaking.name = "Figure"
 	companion.add_child(speaking)
+	stage.cast = {"julia": speaking}
 	var label := Label3D.new()
 	stage.add_child(label)
 	var hidden := Label3D.new()
@@ -97,6 +107,8 @@ func _run() -> void:
 	director.sample("player", 1.0)
 	_check(director.camera.global_transform.is_equal_approx(gameplay.global_transform) and is_equal_approx(director.camera.fov, gameplay.fov), "Final pose exactly matches the gameplay camera")
 	_check(actor.transform == actor_before and gameplay.transform == gameplay_before, "Neither player nor original camera is moved")
+	director.prepare_cinematic_cast("i01_close_speaker", "julia")
+	_check(speaking.pinned, "Story actor uses close detail before voice binding")
 	director.play("well", 10.0, true)
 	_check(speaking.sampled == "talk" and speaking.age == 22, "The existing grown companion gestures without changing age or identity")
 	before = director.camera.global_transform
@@ -105,6 +117,7 @@ func _run() -> void:
 	director.finish()
 	director.finish()
 	_check(speaking.sampled == "idle" and speaking.reset_count > 0, "Leaving the shot releases the companion pose")
+	_check(not speaking.pinned, "Film teardown releases the detail lock")
 	_check(gameplay.current and label.visible and not hidden.visible, "Repeated finish restores the camera and original label visibility")
 	_check(sun.light_color.is_equal_approx(original_light) and is_equal_approx(environment.environment.ambient_light_energy, 0.6), "Finish restores the original light and ambient energy")
 	_check(not director.active and not director.is_processing(), "Finished director consumes no per-frame work")

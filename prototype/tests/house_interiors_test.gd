@@ -9,6 +9,7 @@ const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const Kit = preload("res://scripts/world/village/interior_kit.gd")
 const Designs = preload("res://scripts/world/village/household_designs.gd")
+const Family = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
 const TEST_LAYER := 1 << 19
 const CONTACT_TOLERANCE := .006
 const OVERLAP_TOLERANCE := .012
@@ -130,8 +131,22 @@ func _finish() -> void:
 
 ## Test-only bodies made from the visible house meshes (walls, paving, the
 ## imported table and bench), so contact is measured against what is drawn.
+func _support_meshes(house: Node3D, id: String) -> Array:
+	if Family.is_family_house(house):
+		return Family.interior_support_meshes(house)
+	return house.find_children(Designs.shell(id).meshes, "MeshInstance3D", true, false)
+
+
 func _shell_geometry(house: Node3D, id: String) -> void:
-	for mesh: MeshInstance3D in house.find_children(Designs.shell(id).meshes, "MeshInstance3D", true, false):
+	var meshes := _support_meshes(house, id)
+	if Family.is_family_house(house):
+		var names := []
+		for mesh: MeshInstance3D in meshes:
+			names.append(String(mesh.name))
+		_check(meshes.size() == 4 and names.has("Fixture_Table") and names.has("Fixture_Bench") and names.has("Fixture_Jar"), id + ": the four actual original structural/fixture meshes are measured, not the closed far proxy")
+	else:
+		_check(not meshes.is_empty(), id + ": actual shell geometry available for physical support measurements")
+	for mesh: MeshInstance3D in meshes:
 		var body := StaticBody3D.new()
 		body.collision_layer = TEST_LAYER
 		body.collision_mask = 0
@@ -474,7 +489,7 @@ func _check_lights(interiors: Node3D, region: Node3D) -> void:
 	_check(confined == everything.size(), "Indoor lights reach only their house, the open forge reaches the lane (%d/%d)" % [confined, everything.size()])
 	for id: String in ["weaver_home", Designs.ATRIUM]:
 		var house := region.get_node(id) as Node3D
-		for mesh: MeshInstance3D in house.find_children(Designs.shell(id).meshes, "MeshInstance3D", true, false):
+		for mesh: MeshInstance3D in _support_meshes(house, id):
 			_check((mesh.layers & interiors.FIRE_LAYER) != 0, "%s shell mesh %s receives the hearth light" % [id, mesh.name])
 	report.hearth_lights = hearths
 	report.lamp_lights = lamps

@@ -1,0 +1,40 @@
+name: Recover all published IMPERATHEN agent branches
+on:
+  push:
+    branches: [integration/imperathen-player-visible-recovery-20261126]
+    paths:
+      - '.github/workflows/published-agent-recovery.yml'
+      - 'tools/integration/recover_published_agent_work.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: read
+concurrency:
+  group: imperathen-published-agent-recovery
+  cancel-in-progress: false
+jobs:
+  recover:
+    if: github.repository == 'Ullmann27/Imperathen' && github.ref_name == 'integration/imperathen-player-visible-recovery-20261126'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          filter: blob:none
+      - name: Audit all remote heads and merge conflict-free active source changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 -m py_compile tools/integration/recover_published_agent_work.py
+          python3 tools/integration/recover_published_agent_work.py --expected-head "$GITHUB_SHA" --report "$RUNNER_TEMP/published-agent-recovery.json"
+      - name: Preserve the exact source coverage report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-published-agent-recovery-${{ github.run_id }}
+          path: ${{ runner.temp }}/published-agent-recovery.json
+          if-no-files-found: error
+          retention-days: 30

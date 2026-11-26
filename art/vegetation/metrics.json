@@ -1,0 +1,301 @@
+{
+  "acer_campestre": {
+    "asset": "acer_campestre",
+    "bark": "maple",
+    "branches": 342,
+    "bytes": 784912,
+    "crown_radius_m": 5.008,
+    "height_m": 9.718,
+    "kind": "tree",
+    "leaf": "maple",
+    "leaf_cards_lod0": 675,
+    "triangles": [
+      14112,
+      3014,
+      572,
+      240
+    ]
+  },
+  "acer_campestre_arbustum": {
+    "asset": "acer_campestre_arbustum",
+    "bark": "maple",
+    "branches": 57,
+    "bytes": 251816,
+    "crown_radius_m": 2.299,
+    "height_m": 5.805,
+    "kind": "tree",
+    "leaf": "maple",
+    "leaf_cards_lod0": 146,
+    "triangles": [
+      3728,
+      1768,
+      564,
+      68
+    ]
+  },
+  "alnus_glutinosa": {
+    "asset": "alnus_glutinosa",
+    "bark": "alder",
+    "branches": 295,
+    "bytes": 649272,
+    "crown_radius_m": 3.78,
+    "height_m": 14.251,
+    "kind": "tree",
+    "leaf": "alder",
+    "leaf_cards_lod0": 296,
+    "triangles": [
+      12280,
+      3022,
+      622,
+      306
+    ]
+  },
+  "carpinus_betulus": {
+    "asset": "carpinus_betulus",
+    "bark": "hornbeam",
+    "branches": 445,
+    "bytes": 1010236,
+    "crown_radius_m": 5.403,
+    "height_m": 12.379,
+    "kind": "tree",
+    "leaf": "hornbeam",
+    "leaf_cards_lod0": 953,
+    "triangles": [
+      18136,
+      3504,
+      678,
+      300
+    ]
+  },
+  "corylus_avellana": {
+    "asset": "corylus_avellana",
+    "bark": "hazel",
+    "branches": 234,
+    "bytes": 558344,
+    "crown_radius_m": 3.27,
+    "height_m": 5.228,
+    "kind": "shrub",
+    "leaf": "hazel",
+    "leaf_cards_lod0": 508,
+    "triangles": [
+      9112,
+      2284,
+      648,
+      316
+    ]
+  },
+  "crataegus_monogyna": {
+    "asset": "crataegus_monogyna",
+    "bark": "thorn",
+    "branches": 147,
+    "bytes": 342796,
+    "crown_radius_m": 2.476,
+    "height_m": 4.506,
+    "kind": "shrub",
+    "leaf": "hawthorn",
+    "leaf_cards_lod0": 338,
+    "triangles": [
+      5816,
+      1274,
+      250,
+      108
+    ]
+  },
+  "fraxinus_angustifolia": {
+    "asset": "fraxinus_angustifolia",
+    "bark": "ash",
+    "branches": 190,
+    "bytes": 477728,
+    "crown_radius_m": 5.73,
+    "height_m": 16.516,
+    "kind": "tree",
+    "leaf": "ash",
+    "leaf_cards_lod0": 310,
+    "triangles": [
+      8412,
+      2144,
+      532,
+      238
+    ]
+  },
+  "herb_cards": {
+    "asset": "herb_cards",
+    "kind": "cards",
+    "triangles": [
+      18,
+      4,
+      154,
+      27
+    ]
+  },
+  "populus_nigra": {
+    "asset": "populus_nigra",
+    "bark": "poplar",
+    "branches": 342,
+    "bytes": 912756,
+    "crown_radius_m": 7.371,
+    "height_m": 21.775,
+    "kind": "tree",
+    "leaf": "poplar",
+    "leaf_cards_lod0": 911,
+    "triangles": [
+      15664,
+      3318,
+      798,
+      344
+    ]
+  },
+  "prunus_spinosa": {
+    "asset": "prunus_spinosa",
+    "bark": "thorn",
+    "branches": 221,
+    "bytes": 480192,
+    "crown_radius_m": 2.178,
+    "height_m": 2.927,
+    "kind": "shrub",
+    "leaf": "blackthorn",
+    "leaf_cards_lod0": 338,
+    "triangles": [
+      7904,
+      2174,
+      582,
+      328
+    ]
+  },
+  "quercus_cerris": {
+    "asset": "quercus_cerris",
+    "bark": "cerris",
+    "branches": 311,
+    "bytes": 707592,
+    "crown_radius_m": 5.926,
+    "height_m": 17.198,
+    "kind": "tree",
+    "leaf": "cerris",
+    "leaf_cards_lod0": 529,
+    "triangles": [
+      12844,
+      2756,
+      588,
+      282
+    ]
+  },
+  "quercus_robur": {
+    "asset": "quercus_robur",
+    "bark": "oak",
+    "branches": 342,
+    "bytes": 860944,
+    "crown_radius_m": 8.039,
+    "height_m": 16.407,
+    "kind": "tree",
+    "leaf": "oak",
+    "leaf_cards_lod0": 782,
+    "triangles": [
+      15012,
+      3192,
+      754,
+      346
+    ]
+  },
+  "salix_alba": {
+    "asset": "salix_alba",
+    "bark": "willow",
+    "branches": 433,
+    "bytes": 1006560,
+    "crown_radius_m": 6.238,
+    "height_m": 14.319,
+    "kind": "tree",
+    "leaf": "willow",
+    "leaf_cards_lod0": 1117,
+    "triangles": [
+      17468,
+      3350,
+      660,
+      146
+    ]
+  },
+  "salix_alba_pollard": {
+    "asset": "salix_alba_pollard",
+    "bark": "willow",
+    "branches": 105,
+    "bytes": 563604,
+    "crown_radius_m": 2.549,
+    "height_m": 6.969,
+    "kind": "tree",
+    "leaf": "willow",
+    "leaf_cards_lod0": 501,
+    "triangles": [
+      8552,
+      3784,
+      958,
+      76
+    ]
+  },
+  "sambucus_nigra": {
+    "asset": "sambucus_nigra",
+    "bark": "elder",
+    "branches": 156,
+    "bytes": 353824,
+    "crown_radius_m": 3.368,
+    "height_m": 4.689,
+    "kind": "shrub",
+    "leaf": "elder",
+    "leaf_cards_lod0": 229,
+    "triangles": [
+      5908,
+      1614,
+      476,
+      218
+    ]
+  },
+  "ulmus_minor": {
+    "asset": "ulmus_minor",
+    "bark": "elm",
+    "branches": 334,
+    "bytes": 834616,
+    "crown_radius_m": 6.234,
+    "height_m": 16.005,
+    "kind": "tree",
+    "leaf": "elm",
+    "leaf_cards_lod0": 892,
+    "triangles": [
+      14488,
+      2872,
+      592,
+      240
+    ]
+  },
+  "vitis_arbustum": {
+    "asset": "vitis_arbustum",
+    "bark": "vine",
+    "branches": 10,
+    "bytes": 95576,
+    "crown_radius_m": 2.991,
+    "height_m": 3.776,
+    "kind": "vine",
+    "leaf": "vine",
+    "leaf_cards_lod0": 67,
+    "triangles": [
+      1228,
+      740,
+      114,
+      66
+    ]
+  },
+  "vitis_stake": {
+    "asset": "vitis_stake",
+    "bark": "vine",
+    "branches": 11,
+    "bytes": 60828,
+    "crown_radius_m": 1.638,
+    "height_m": 2.671,
+    "kind": "vine",
+    "leaf": "vine",
+    "leaf_cards_lod0": 28,
+    "triangles": [
+      720,
+      460,
+      62,
+      48
+    ]
+  }
+}

@@ -71,6 +71,7 @@ var _living_city_clock: Dictionary = {}
 var world_jdn := Calendar.campaign_start_jdn()
 # Only the independently dated free city uses the new monument until the full campaign assets are accepted.
 var use_flavian_kit := false
+var start_at_colosseum := false
 # Review toggle: keep an exact legacy light/ground path for comparison.
 var viva_visuals := true
 var save_path := State.PATH
@@ -142,6 +143,8 @@ func _ready() -> void:
 		_read_catalog()
 	_build_ui()
 	_restore(State.read(save_path) if persist and campaign == null else State.defaults())
+	if start_at_colosseum:
+		go_to_colosseum()
 	add_child(market)
 	market.message.connect(_market_message)
 	market.closed.connect(_close_market)
@@ -553,7 +556,7 @@ func _build_ui() -> void:
 	_safe.add_child(_look)
 	var heading := Label.new()
 	heading.name = "Heading"
-	heading.text = "IMPERATHEN · STADTMARKT" if campaign != null else "IMPERATHEN · FREIE STADTERKUNDUNG"
+	heading.text = "IMPERATHEN · STADTMARKT" if campaign != null else ("IMPERATHEN · ROM 100 N. CHR." if use_flavian_kit else "IMPERATHEN · FREIE STADTERKUNDUNG")
 	heading.add_theme_font_size_override("font_size",21)
 	heading.add_theme_color_override("font_color",Color("f1dfb4"))
 	heading.add_theme_color_override("font_shadow_color",Color.BLACK)
@@ -618,6 +621,12 @@ func _build_ui() -> void:
 	column.add_child(description)
 	column.add_child(_button("Weiter erkunden",func(): set_paused(false)))
 	if campaign == null:
+		if is_instance_valid(get_node_or_null("FlavianAmphitheatre")):
+			var monument_button := _button("Zum Kolosseum", func():
+				if go_to_colosseum():
+					set_paused(false))
+			monument_button.name = "GoToColosseum"
+			column.add_child(monument_button)
 		column.add_child(_button("Neues Leben · Geschichte beginnen",_request_story))
 	column.add_child(_button("Zurück ins Dorf" if campaign != null else "Zum Hauptmenü",_request_leave))
 	_pause_panel.add_child(column)
@@ -1050,6 +1059,24 @@ func set_paused(value: bool) -> void:
 	if paused:
 		save_state()
 
+## The processional entrance is an authored open route (bay 40); the same
+## bay geometry is exercised by colosseum_walkthrough_test.gd.
+func go_to_colosseum() -> bool:
+	if campaign != null or _horse_mounted():
+		return false
+	var monument := get_node_or_null("FlavianAmphitheatre") as Node3D
+	if not is_instance_valid(monument) or monument.get("layout").is_empty():
+		return false
+	var layout: Dictionary = monument.get("layout")
+	var entrance := monument.to_global(FlavianAmphitheatre.bay_point(layout, 40, 0.5, -6.0, SOLE_OFFSET + 0.02))
+	var inward := monument.to_global(FlavianAmphitheatre.bay_point(layout, 40, 0.5, 1.3)) - entrance
+	teleport(entrance)
+	_yaw = atan2(-inward.x, -inward.z)
+	figure.rotation.y = _yaw
+	_pitch = -0.18
+	_place_camera(0.0)
+	return true
+
 func teleport(point: Vector3) -> void:
 	if not point.is_finite():
 		return
@@ -1117,6 +1144,8 @@ func _update_status() -> void:
 		description += " · Trainingspfahl nicht verfügbar"
 	if not city_available:
 		description = "Stadtmodell ist noch nicht importiert."
+	elif use_flavian_kit and not is_instance_valid(get_node_or_null("FlavianAmphitheatre")):
+		description = "Kolosseum fehlt in dieser Stadtfassung."
 	elif not youth_available and (campaign == null or (int(campaign.data.player.age) in range(12,18) and campaign.data.origin_id == "italia")):
 		description += " · ORIGINAL-MESHY-JUNGE FEHLT: Ersatzmodell aktiv"
 	if not _catalog_status.is_empty():

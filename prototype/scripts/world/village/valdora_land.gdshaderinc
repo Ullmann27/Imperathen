@@ -20,8 +20,8 @@ float land_track_distance(vec2 p) {
 	if (p.y > 30.0 && p.y < LAND_TRACK_REACH) {
 		best = min(best, abs(p.x - land_lane_x(p.y) - 3.0 * sin((p.y - 38.0) * .02) * smoothstep(38.0, 60.0, p.y)));
 	}
-	if (p.x > 30.0 && p.x < LAND_TRACK_REACH) {
-		best = min(best, abs(p.y + 13.0 - 5.0 * sin((p.x - 48.0) * .015) * smoothstep(48.0, 70.0, p.x)));
+	if (p.x > 52.0 && p.x < LAND_TRACK_REACH) {
+		best = min(best, abs(p.y + 13.0 - 5.0 * sin((p.x - 48.0) * .015) * smoothstep(48.0, 70.0, p.x)) + max(0.0, 56.0 - p.x) * .6);
 	}
 	if (p.x < -33.0 && p.x > -LAND_TRACK_REACH) {
 		best = min(best, abs(p.y - 4.0 - .14 * sin(p.x * .43) - 3.0 * sin((p.x + 33.0) * .03) * smoothstep(33.0, 47.0, -p.x)));

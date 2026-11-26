@@ -1,0 +1,78 @@
+{
+  "layers": [
+    "cobbles",
+    "flags",
+    "gravel",
+    "soil",
+    "silex",
+    "kerb",
+    "turf_soil",
+    "mud"
+  ],
+  "repeat_metres": {
+    "cobbles": 1.6,
+    "flags": 2.4,
+    "gravel": 1.6,
+    "soil": 2.0,
+    "silex": 2.4,
+    "kerb": 1.2,
+    "turf_soil": 2.0,
+    "mud": 2.0
+  },
+  "grid": [
+    4,
+    2
+  ],
+  "files": {
+    "paving_albedo_1024.jpg": {
+      "bytes": 1132216,
+      "sha256": "be8698f82c85058b8107e3cf6cffbb29b7313b9955cfb40a99b1052744590a5f",
+      "slices": 8,
+      "slice_size": 1024
+    },
+    "paving_normal_1024.jpg": {
+      "bytes": 4499840,
+      "sha256": "b4484d53666055363782df94c04ee0a3f9231bf6122d5de8f0fa4d429bd496ab",
+      "slices": 8,
+      "slice_size": 1024
+    },
+    "paving_orm_1024.jpg": {
+      "bytes": 1376438,
+      "sha256": "3b5e06db01330d8a61e9fd1676409ef99f4133fbe2bda34a71f10379b2086b41",
+      "slices": 8,
+      "slice_size": 1024
+    },
+    "paving_albedo_512.jpg": {
+      "bytes": 439848,
+      "sha256": "42775f3c8efdc161e22b0adb31e2b1d539b73290c3f5d1e94d5e73025a63fb28",
+      "slices": 8,
+      "slice_size": 512
+    },
+    "paving_normal_512.jpg": {
+      "bytes": 1423831,
+      "sha256": "79efdc3afe2c9914f3c1eae421d2f6d3bf136f0f36e6ca9e65bd712ce556bc9e",
+      "slices": 8,
+      "slice_size": 512
+    },
+    "paving_orm_512.jpg": {
+      "bytes": 635042,
+      "sha256": "1694442a7a64816265bffa97b06c6bdd6ee90d435fd5be99108a469511a72978",
+      "slices": 8,
+      "slice_size": 512
+    },
+    "paving_albedo_256.jpg": {
+      "bytes": 143289,
+      "sha256": "64abb6c63f22c9ae61bafd5537b68fdfd5b994478e8af7579324c4e3e493e119",
+      "slices": 8,
+      "slice_size": 256
+    },
+    "paving_orm_256.jpg": {
+      "bytes": 218595,
+      "sha256": "542e2fa2e0083f9fdcf17dee329335574306f917748e41260ac09a0d50a159db",
+      "slices": 8,
+      "slice_size": 256
+    }
+  },
+  "generator": "art/architecture/valdora_family/paving_textures.py",
+  "provenance": "Procedural, seeded NumPy/Pillow patterns authored for IMPERATHEN; no scans or downloads."
+}

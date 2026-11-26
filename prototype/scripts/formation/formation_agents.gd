@@ -56,6 +56,9 @@ class Agent:
 	var side := ""
 	var kind := "infantry"
 	var role := "heavy"
+	var appearance_seed := 0
+	var military_rank := ""
+	var troop_id := ""
 	var limits: Dictionary = {}
 	var pos := Vector2.ZERO
 	var prev_pos := Vector2.ZERO
@@ -269,6 +272,14 @@ func sync_model(model) -> void:
 			var agent: Agent = agents.get(uid)
 			if agent == null:
 				agent = _create(uid, s, man, u, index)
+			if agent.squad != s.id:
+				agent.squad = s.id
+				agent.unit = u
+				agent.side = s.side
+				u.needs_match = true
+			agent.appearance_seed = int(man.appearance_seed)
+			agent.military_rank = str(man.military_rank)
+			agent.troop_id = str(s.troop_id)
 			if agent.kind != u.kind:
 				agent.kind = u.kind
 				_set_limits(agent, u)
@@ -341,6 +352,9 @@ func _create(uid: String, s: Dictionary, man: Dictionary, u: Unit, index: int) -
 	a.side = s.side
 	a.kind = u.kind
 	a.role = _role(s, str(man.id))
+	a.appearance_seed = int(man.appearance_seed)
+	a.military_rank = str(man.military_rank)
+	a.troop_id = str(s.troop_id)
 	a.unit = u
 	_set_limits(a, u)
 	a.pos = Vector2(man.x, man.z)
