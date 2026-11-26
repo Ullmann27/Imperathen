@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "old_quarry",
+  "historical_status": "fiktiv",
+  "reference_year": -58,
+  "source_kind": "Eigenproduktion IMPERATHEN",
+  "production_pipeline": "tools/world/build_roman_quarry.py",
+  "tools": {
+    "blender": "4.3.2",
+    "godot": "4.7.2"
+  },
+  "metrics": {
+    "visible_triangles": 16754,
+    "visible_meshes": 4,
+    "collision_meshes": 15
+  },
+  "placement": {
+    "anchor_xz": [
+      1500.0,
+      -750.0
+    ],
+    "origin_xz": [
+      1503.104,
+      -752.524
+    ],
+    "yaw_degrees": 39.1,
+    "local_terrain_tangent": [
+      0.029,
+      0.057
+    ]
+  },
+  "files": [
+    {
+      "path": "old_quarry.glb",
+      "sha256": "a40ad40478c8b67054fddcfc3edb31d1cd027640165763b8a02b7e263e728d06"
+    },
+    {
+      "path": "old_quarry_collision.glb",
+      "sha256": "b1b183d85f3b55f56ead2acc72f54d0a8ef267333825c637ba18f66d8a913dbf"
+    },
+    {
+      "path": "old_quarry_source/old_quarry.blend",
+      "sha256": "f7731c5f1fce6b41687513537e5ec0dd06f8500d6414a0dd7fe0a1a6e5b5211b"
+    }
+  ]
+}
