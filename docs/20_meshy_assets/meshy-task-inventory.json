@@ -1,0 +1,3609 @@
+{
+ "format": "imperathen-meshy-task-inventory",
+ "schema": 1,
+ "listed_utc": "2026-11-26T07:48:23Z",
+ "endpoints": [
+  "GET /openapi/v2/text-to-3d",
+  "GET /openapi/v1/image-to-3d"
+ ],
+ "note": "Read-only listing. No task was created, refined, remeshed, retextured or rigged. Signed download URLs are deliberately not stored. Image-to-3D results expire three days after completion (expires_utc); text-to-3D results carry no expiry.",
+ "counts": {
+  "text_to_3d": 58,
+  "image_to_3d": 43,
+  "imperathen": 71,
+  "other_project": 30
+ },
+ "tasks": [
+  {
+   "id": "01a208f7-87f2-71bb-9765-7e5682142993",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "One Roman gladius of the Pompeii pattern, circa AD100, isolated full weapon, straight double-edged iron blade with parallel sides and a short triangular point, small elliptical wooden guard, ribbed bone-colored grip, rounded wooden pommel. Believable practical construction, restrained wear, realistic metal and organic materials. Blade and hilt aligned on one axis, exact bilateral blade symmetry, unobstructed tip and grip, no scabbard, no hand, no stand, no text, no oversized fantasy guard, no medieval crossguard. Clean separate material regions, suitable as a modular game weapon.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:12:52Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "weap_roman_gladius_pompeii",
+   "role": "preview_of_01a208f9-7d6d-7433-81f3-b939a32df26c"
+  },
+  {
+   "id": "01a208f9-7d6d-7433-81f3-b939a32df26c",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "One Roman gladius of the Pompeii pattern, circa AD100, isolated full weapon, straight double-edged iron blade with parallel sides and a short triangular point, small elliptical wooden guard, ribbed bone-colored grip, rounded wooden pommel. Believable practical construction, restrained wear, realistic metal and organic materials. Blade and hilt aligned on one axis, exact bilateral blade symmetry, unobstructed tip and grip, no scabbard, no hand, no stand, no text, no oversized fantasy guard, no medieval crossguard. Clean separate material regions, suitable as a modular game weapon.",
+   "texture_prompt": "Roman sword materials. Blade brushed aged iron with subtle sharpening marks, no engraved symbols; compact guard and rounded pommel dark brown wood; handgrip pale carved bone with faint wear. Practical restrained material finish, no jewels, no gold, no glow, no fantasy decoration. Metallic blade and nonmetallic wooden hilt.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:15:00Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 2084,
+   "vertices": 2376,
+   "glb_bytes": 4308744,
+   "sha256": "53c4c1262faee9758e1e25cdc97a69d50b541f4a87ed7eeeafc2f3311bc6f98d",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "weap_roman_gladius_pompeii",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/weapon/weap_roman_gladius_pompeii.glb"
+  },
+  {
+   "id": "01a208fc-d9bb-73ea-b046-04e965956c37",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "One practical Roman cavalry spatha sword circa AD100, isolated entire weapon. Long straight parallel-sided double-edged blade, small pointed tip, compact oval wooden guard only a little wider than the blade, simple ribbed bone grip and round wooden pommel. Straight symmetrical construction. Very small guard, no projecting crossguard, no medieval cruciform hilt, no blade notches, no serrations, no fantasy decoration, no jewel, no engraved text. No hand, scabbard, stand or background. Readable metal blade and organic hilt as a modular realistic game prop.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:18:40Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "weap_roman_spatha",
+   "role": "preview_of_01a20901-f1c3-76c5-ab9f-81ad2a6c0250"
+  },
+  {
+   "id": "01a208fc-f450-748b-a4c0-c5f9ac954c1d",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "One Roman pugio dagger circa AD100, isolated whole object. Short broad leaf-shaped double-edged iron blade narrowing to a sharp central point, compact small guard and waist-shaped grip with rounded pommel. Simple practical military dagger, blade and hilt aligned and bilaterally symmetrical. No sheath, hand, pedestal, text, serrations, exaggerated guard, gemstone or fantasy decoration. Clear blade edge and believable handle proportions, suitable as a modular game weapon.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:18:47Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "weap_roman_pugio",
+   "role": "preview_of_01a2091d-c4d6-7211-bd16-ce6cf3ba04d6"
+  },
+  {
+   "id": "01a208fd-1033-7116-a97c-27ac88a0a728",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "One Roman pilum javelin circa AD100, entire long weapon isolated. Straight long ash wood shaft with a slender straight iron shank extending from its upper end, terminating in a small narrow pyramidal iron point. Practical slender proportions. Clearly distinguish long wooden handle from thinner iron shank. No broad spear leaf, no large barbs, no crossguard, no flag, no ornament, no hand, stand, ground or scenery. Suitable for a realistic Roman game, clean continuous structure and readable material boundaries.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:18:54Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "weap_roman_pilum",
+   "role": "preview_of_01a20902-102b-764b-b107-03a81497c2e1"
+  },
+  {
+   "id": "01a208fd-2c10-7654-9968-8ef13dc1d475",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "One practical early first-century AD European iron-tipped spear, whole object isolated. Long straight wooden shaft, small symmetrical narrow leaf-shaped iron spearhead with short socket securely fitted to the shaft. Plain utilitarian construction for a Germanic frontier infantryman. Thin balanced proportions, minimal fittings, no flag, tassel, hook, crosspiece, runes or fantasy blade. Entire weapon including point and shaft end visible, no hands, scenery or pedestal. Distinct wooden shaft and forged iron head.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:19:01Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "weap_germanic_spear",
+   "role": "preview_of_01a20902-324a-77d5-9f1c-fa7d95ab11fc"
+  },
+  {
+   "id": "01a208ff-8bc6-7133-9a34-31184e75e3ce",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "One practical compact early European iron hand axe, isolated whole tool and weapon. Straight slightly curved wooden handle, small plain wedge-shaped forged iron head with single cutting edge and a short blunt rear poll. Modest working axe proportions suitable for first-century frontier equipment. No double blade, no huge Viking bearded head, no spikes, runes, horns, ornament or fantasy parts. Clearly separate wooden handle and iron head, believable socket, no hand, scenery or pedestal.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:21:37Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "weap_germanic_hand_axe",
+   "role": "preview_of_01a2091d-a272-7367-a22f-848695eccb27"
+  },
+  {
+   "id": "01a208ff-a9a8-717d-9928-fea573ee555a",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "One compact ancient composite recurve bow for a Roman auxiliary archer, isolated entire bow. Symmetrical recurved wooden limbs with modest stiff tips, narrow central grip, a single thin taut bowstring joining the two ends. Practical natural proportions and modest curves. Bow alone, no arrow, quiver, hand, scenery, base, text or ornaments. No modern cams, pulleys, sight, scope or compound bow machinery. Clearly readable silhouette and separation of string from limbs, suitable as a modular game prop.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:21:45Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "weap_roman_aux_bow",
+   "role": "preview_of_01a2091d-8656-76a6-bb5d-ed0e061dddb6"
+  },
+  {
+   "id": "01a208ff-cb33-746f-9e56-0859c8827458",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "One simple historical-style wooden crossbow concept, isolated whole object, three-quarter view. Plain straight wooden stock with an arrow groove, transverse modest wooden bow at the front, simple string and small trigger lever beneath the stock. Plausible handmade construction, restrained proportions, wooden bow not steel, no foot stirrup, no wheel, no crank, no scope, no modern accessories. Separate readable stock, bow and string, no loaded projectile, stand, hand, decoration or scenery. This is a research concept prop rather than an archaeological replica.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:21:53Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "weap_crossbow_concept",
+   "role": "preview_of_01a2091d-61c4-7096-8831-4b411f591505"
+  },
+  {
+   "id": "01a208ff-eb64-7106-b014-ca149feb9102",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "One natural iron-bearing rock outcrop for a realistic game landscape. Irregular low broad rugged boulder with fractured sedimentary surface, rusty ochre and dark iron-oxide seams naturally embedded in grey brown host rock. Believable heavy geology, no giant metal crystals, no floating chunks, no cut gemstone or fantasy glow. One continuous low rock mass with a flat hidden base suitable to sit in terrain. No vegetation, mine equipment, text, scenery or pedestal. Readable varied surface suitable for modular resource deposits.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:22:02Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "resource_iron_ore",
+   "role": "preview_of_01a20902-4f21-73b9-a775-2770650563fd"
+  },
+  {
+   "id": "01a20901-f1c3-76c5-ab9f-81ad2a6c0250",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "One practical Roman cavalry spatha sword circa AD100, isolated entire weapon. Long straight parallel-sided double-edged blade, small pointed tip, compact oval wooden guard only a little wider than the blade, simple ribbed bone grip and round wooden pommel. Straight symmetrical construction. Very small guard, no projecting crossguard, no medieval cruciform hilt, no blade notches, no serrations, no fantasy decoration, no jewel, no engraved text. No hand, scabbard, stand or background. Readable metal blade and organic hilt as a modular realistic game prop.",
+   "texture_prompt": "Plain worn iron blade with narrow sharpening marks, dark brown wooden oval guard and pommel, warm ivory-colored bone grip. Restrained Roman military finish. No symbols or ornament, no glow.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:24:15Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 2154,
+   "vertices": 2378,
+   "glb_bytes": 5746172,
+   "sha256": "55104c2596cb58cb516140cebb5c1caa6f9c8faf93154fa9da3ab46aba3d8a84",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "weap_roman_spatha",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/weapon/weap_roman_spatha.glb"
+  },
+  {
+   "id": "01a20902-102b-764b-b107-03a81497c2e1",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "One Roman pilum javelin circa AD100, entire long weapon isolated. Straight long ash wood shaft with a slender straight iron shank extending from its upper end, terminating in a small narrow pyramidal iron point. Practical slender proportions. Clearly distinguish long wooden handle from thinner iron shank. No broad spear leaf, no large barbs, no crossguard, no flag, no ornament, no hand, stand, ground or scenery. Suitable for a realistic Roman game, clean continuous structure and readable material boundaries.",
+   "texture_prompt": "Long pale brown ash wood shaft, darker end grain, thin weathered dark iron shank and small sharp metallic point. Subtle handled wear and realistic PBR roughness, no painted markings.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:24:22Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 1390,
+   "vertices": 1897,
+   "glb_bytes": 5465904,
+   "sha256": "26b31585c5af044e17636fd55d00fca9c5245ec9406788d7663e3e5cb3b02c76",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "weap_roman_pilum",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/weapon/weap_roman_pilum.glb"
+  },
+  {
+   "id": "01a20902-324a-77d5-9f1c-fa7d95ab11fc",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "One practical early first-century AD European iron-tipped spear, whole object isolated. Long straight wooden shaft, small symmetrical narrow leaf-shaped iron spearhead with short socket securely fitted to the shaft. Plain utilitarian construction for a Germanic frontier infantryman. Thin balanced proportions, minimal fittings, no flag, tassel, hook, crosspiece, runes or fantasy blade. Entire weapon including point and shaft end visible, no hands, scenery or pedestal. Distinct wooden shaft and forged iron head.",
+   "texture_prompt": "Warm worn ash wood shaft with lengthwise grain and a matte dark forged iron socket and spearhead, light sharpening on the two blade edges. No symbols, no bright fantasy metal.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:24:31Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 1402,
+   "vertices": 2147,
+   "glb_bytes": 3320048,
+   "sha256": "fac91734016bb5bfa1c45e2a4d6668ee96d57151e91f848945958769280c35d7",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "weap_germanic_spear",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/weapon/weap_germanic_spear.glb"
+  },
+  {
+   "id": "01a20902-4f21-73b9-a775-2770650563fd",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "One natural iron-bearing rock outcrop for a realistic game landscape. Irregular low broad rugged boulder with fractured sedimentary surface, rusty ochre and dark iron-oxide seams naturally embedded in grey brown host rock. Believable heavy geology, no giant metal crystals, no floating chunks, no cut gemstone or fantasy glow. One continuous low rock mass with a flat hidden base suitable to sit in terrain. No vegetation, mine equipment, text, scenery or pedestal. Readable varied surface suitable for modular resource deposits.",
+   "texture_prompt": "Rough grey brown host rock with rusty ochre iron oxide seams, darker mineral fractures and subtle fine mineral grain. Dry matte natural rock, no polished metal or fluorescent colors.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:24:38Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 2524,
+   "vertices": 2273,
+   "glb_bytes": 7377284,
+   "sha256": "4c97adb87c76c19c19371f6e18202e727115f6d9579d9a347a2394a90996382e",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "resource_iron_ore",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/resource/resource_iron_ore.glb"
+  },
+  {
+   "id": "01a2091d-61c4-7096-8831-4b411f591505",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "One simple historical-style wooden crossbow concept, isolated whole object, three-quarter view. Plain straight wooden stock with an arrow groove, transverse modest wooden bow at the front, simple string and small trigger lever beneath the stock. Plausible handmade construction, restrained proportions, wooden bow not steel, no foot stirrup, no wheel, no crank, no scope, no modern accessories. Separate readable stock, bow and string, no loaded projectile, stand, hand, decoration or scenery. This is a research concept prop rather than an archaeological replica.",
+   "texture_prompt": "Historically restrained handmade early mechanical crossbow concept: warm dark ash wood stock and bow, natural hemp string, small forged iron trigger and pins, subtle wear and tool marks. No bright paint, gold, runes, fantasy glow or modern parts. Clear readable wood, cord and iron material separation for a realistic game prop.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:54:15Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 2588,
+   "vertices": 3432,
+   "glb_bytes": 4042944,
+   "sha256": "edea1f0d2b1e8f9526b0ae18e5c54a92715eb57c3cfe5ee8411770fbd4b08a5c",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "weap_crossbow_concept",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/weapon/weap_crossbow_concept.glb"
+  },
+  {
+   "id": "01a2091d-8656-76a6-bb5d-ed0e061dddb6",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "One compact ancient composite recurve bow for a Roman auxiliary archer, isolated entire bow. Symmetrical recurved wooden limbs with modest stiff tips, narrow central grip, a single thin taut bowstring joining the two ends. Practical natural proportions and modest curves. Bow alone, no arrow, quiver, hand, scenery, base, text or ornaments. No modern cams, pulleys, sight, scope or compound bow machinery. Clearly readable silhouette and separation of string from limbs, suitable as a modular game prop.",
+   "texture_prompt": "Realistic ancient composite recurve bow: layered dark yew and pale horn limbs, wrapped leather grip, thin natural sinew string, restrained handcrafted wear. No metal cams, modern fittings, bright paint, magic effects or ornament. Clear readable wood, horn, leather and string materials for an AD100 game prop.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:54:22Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 1819,
+   "vertices": 2460,
+   "glb_bytes": 7011756,
+   "sha256": "2663515295088886d34b4b377c032c9bc6256d0df3ed1ae90c872c05e7ac4396",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "weap_roman_aux_bow",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/weapon/weap_roman_aux_bow.glb"
+  },
+  {
+   "id": "01a2091d-a272-7367-a22f-848695eccb27",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "One practical compact early European iron hand axe, isolated whole tool and weapon. Straight slightly curved wooden handle, small plain wedge-shaped forged iron head with single cutting edge and a short blunt rear poll. Modest working axe proportions suitable for first-century frontier equipment. No double blade, no huge Viking bearded head, no spikes, runes, horns, ornament or fantasy parts. Clearly separate wooden handle and iron head, believable socket, no hand, scenery or pedestal.",
+   "texture_prompt": "Practical first-century frontier hand axe: medium brown ash handle with visible grain and darkened hand wear, compact forged iron head with uneven hammer texture, sharpened single edge and blunt rear poll. No runes, bright paint, oversized Viking styling, spikes or fantasy ornament.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:54:30Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 1860,
+   "vertices": 2179,
+   "glb_bytes": 7332848,
+   "sha256": "6c665a3e0c5d929031c64632e2159ba60e0d75f7ccc3b1cf0856f9d4778af87c",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "weap_germanic_hand_axe",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/weapon/weap_germanic_hand_axe.glb"
+  },
+  {
+   "id": "01a2091d-c4d6-7211-bd16-ce6cf3ba04d6",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "One Roman pugio dagger circa AD100, isolated whole object. Short broad leaf-shaped double-edged iron blade narrowing to a sharp central point, compact small guard and waist-shaped grip with rounded pommel. Simple practical military dagger, blade and hilt aligned and bilaterally symmetrical. No sheath, hand, pedestal, text, serrations, exaggerated guard, gemstone or fantasy decoration. Clear blade edge and believable handle proportions, suitable as a modular game weapon.",
+   "texture_prompt": "Roman military pugio circa AD100: dark forged iron leaf-shaped blade with a clean sharpened edge and restrained patina, compact bone-and-dark-wood grip, small iron fittings, practical campaign wear. No gemstones, gold, text, fantasy decoration or oversized guard. Clear blade and hilt material separation.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:54:38Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 1852,
+   "vertices": 2237,
+   "glb_bytes": 6677020,
+   "sha256": "af1ddaf7b89f12f01e21a03d4c7551164fb1c669205df3b34139d83b11bdd3ed",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "weap_roman_pugio",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/weapon/weap_roman_pugio.glb"
+  },
+  {
+   "id": "01a2091f-9b06-7524-904a-8b453bbd057f",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready full-body Roman heavy cavalry rider circa AD 100, standing neutral A-pose for rigging, arms slightly away from torso, hands open, feet apart. Adult male, realistic human anatomy and face. Lorica hamata mail shirt over short wool tunic, military belt, fitted trousers, leather riding boots, historically plausible Roman cavalry helmet, simple oval shield strapped flat to back, empty sword suspension for a separate spatha prop. No weapon in hands, no horse, no cape crossing limbs, no base, no text, no fantasy ornament. Clean separated silhouette, practical worn iron, leather and wool.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:56:39Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "unit_roman_heavy_cavalry_rider",
+   "role": "preview_of_01a20922-0cce-7353-80a4-3d06dead3be3"
+  },
+  {
+   "id": "01a2091f-ac3e-7185-b5cc-bd35aa5eefc4",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready full-body Roman auxiliary light cavalry rider circa AD 100, neutral A-pose for rigging, realistic adult male anatomy. Light wool tunic, fitted trousers, leather riding boots, broad military belt, simple neck scarf, modest iron cavalry helmet, small oval shield strapped to back, light protective leather and limited mail details rather than heavy armor. No weapon in hands, no horse, no oversized cloak, no base, no text, no fantasy elements. Distinct face, believable frontier soldier, clean limbs and fingers for animation.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:56:43Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "unit_roman_light_cavalry_rider",
+   "role": "preview_of_01a20922-1d22-777f-b822-865f6b994efe"
+  },
+  {
+   "id": "01a2091f-bdae-76b8-9b03-f3396166de10",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready full-body Roman auxiliary archer circa AD 100, neutral A-pose for rigging, realistic adult male with distinct Mediterranean/provincial face. Short wool tunic, narrow belt, practical trousers, leather boots, light quilted or leather torso protection, simple iron helmet, compact quiver strapped high on back but no bow in hands. No legionary segmentata, no fantasy armor, no base, no text. Clear hands, face and shoulder silhouette, historically grounded frontier auxiliary appearance, worn natural wool, leather and iron materials.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:56:47Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "unit_roman_aux_archer",
+   "role": "preview_of_01a20922-2cd0-7548-8505-5e2a143809ac"
+  },
+  {
+   "id": "01a2091f-cf92-72cb-8fcd-237fd23e6927",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready full-body Germanic axe fighter circa AD 100, neutral A-pose for rigging, realistic adult male anatomy and face, strong but natural build. Knee-length undyed wool tunic, fitted wool trousers, leather belt and shoes, simple cloak pinned at one shoulder but kept clear of arms, small utility pouch, short natural beard, shoulder-length practical hair. No weapon in hands, no horned helmet, no Viking fantasy, no plate armor, no tattoos required, no base or text. Historically plausible frontier warrior, rough wool and leather, clean separated limbs and fingers.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:56:53Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "unit_germanic_axe_fighter",
+   "role": "preview_of_01a20922-3da8-7164-b3ef-0d60b4c04729"
+  },
+  {
+   "id": "01a2091f-e310-7255-9783-54110690e55e",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready full-body Germanic light spearman circa AD 100, standing neutral A-pose for rigging, realistic lean adult male. Plain woven wool tunic, trousers, leather belt, shoes and small pouch, simple cloak folded behind shoulders, modest short hair and beard, no helmet or only a very simple iron cap. Round wooden shield strapped flat to back; spear is separate and not held. No horned helmet, no chain fantasy, no Viking styling, no base, no text. Clean hands and feet, distinct human face, believable first-second century frontier equipment.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:56:57Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "unit_germanic_light_spearman",
+   "role": "preview_of_01a20922-4d17-70f5-89b9-7a658e7dae82"
+  },
+  {
+   "id": "01a2091f-f20e-76ae-baa7-83f0e604bbf2",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready full-body Roman signifer standard bearer circa AD 100, neutral A-pose for rigging, realistic adult male anatomy. Lorica hamata mail shirt over red-brown wool tunic, military belt, leather boots and greaves, historically plausible helmet plus modest animal-skin headdress draped behind without covering face or hands. No standard pole in hands, no shield, no weapon held, no base, no text, no fantasy. Veteran face, practical worn iron, bronze, leather and wool, clean silhouette for animation; standard will be a separate prop.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:56:59Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "unit_roman_signifer",
+   "role": "preview_of_01a20922-65cb-74a8-9cc1-7479aec8622b"
+  },
+  {
+   "id": "01a2091f-ffb8-7033-bc53-f7a3e307e028",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready full-body elite Germanic mounted retainer circa AD 100, neutral A-pose for rigging, realistic adult male anatomy and distinct face. High-status but restrained equipment: knee-length mail shirt, wool tunic, fitted trousers, leather riding boots, broad belt with simple iron fittings, fur-edged cloak kept behind the arms, natural beard and tied-back hair. Small round shield strapped to back, no weapon in hands, no horse, no horned helmet, no Viking fantasy, no base, no text. Worn iron, wool and leather, animation-friendly silhouette.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T15:57:03Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "unit_germanic_mounted_retainer",
+   "role": "preview_of_01a20922-790b-77dc-aa63-9cee4c47c625"
+  },
+  {
+   "id": "01a20920-772d-7175-b422-b72e14a5a269",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready Roman legionary scutum circa AD 100 as one isolated prop. Tall curved rectangular wooden shield with rounded corners, central iron boss, reinforced rim, believable layered wood construction and leather edging. Slight practical wear, no soldier, no hand, no emblem text, no fantasy ornament, no pedestal. Clean back with horizontal hand grip and simple fittings; readable convex curvature, suitable for animation and modular equipment.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T15:57:35Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "gear_roman_scutum",
+   "role": "preview_of_01a20922-872f-701d-a442-b55d0673a9b3"
+  },
+  {
+   "id": "01a20920-8795-70b1-8fab-88ee2b50b3e6",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready Roman cavalry oval shield circa AD 100, isolated prop. Medium oval slightly convex wooden shield, central iron boss, thin reinforced rim, simple painted geometric Roman frontier pattern without letters, realistic leather and wood backside with grip. No soldier, hand, base, text, spikes or fantasy ornament. Balanced thickness, clean silhouette, animation-ready modular equipment.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T15:57:39Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "gear_roman_cavalry_oval_shield",
+   "role": "preview_of_01a20922-9c05-77b1-9b22-42ac731456e2"
+  },
+  {
+   "id": "01a20920-9962-778f-a6c8-41a757190433",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready Germanic round wooden shield circa AD 100, isolated prop. Round plank-built shield, central iron boss, modest iron rim clamps, rawhide edge, simple hand grip on back, restrained natural red ochre and dark wood painted sectors, weathered but intact. No Viking symbols, runes, spikes, soldier, hand, base or text. Historically plausible frontier equipment, clean readable geometry.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T15:57:43Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "gear_germanic_round_shield",
+   "role": "preview_of_01a20922-ab81-74fa-9139-87adebe3a5d9"
+  },
+  {
+   "id": "01a20920-a798-7288-8c0c-df88b4ab0037",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready Roman cavalry lance circa AD 100, isolated entire weapon. Long straight ash wood shaft with a narrow symmetrical iron spearhead and small iron butt spike, practical cavalry proportions, no banner or decoration. Entire weapon visible from tip to butt, no hands, horse, base, text, oversized fantasy blade or medieval elements. Distinct iron and wood materials, straight clean geometry for mounted combat animations.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T15:57:47Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "gear_roman_cavalry_lance",
+   "role": "preview_of_01a20922-ba31-769d-837c-6303249958a9"
+  },
+  {
+   "id": "01a20920-b693-77dd-93d9-601b98758d46",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready ancient leather sling circa AD 100, isolated whole weapon. Small woven leather or wool pouch at center with two long braided cords, one looped end and one free release end, natural flexible hanging shape but clearly separated cords. No stone projectile, hand, soldier, scenery, base, text, modern parts or fantasy. Simple historically plausible ranged weapon prop with clean readable silhouette.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T15:57:50Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "gear_sling",
+   "role": "preview_of_01a20924-ac18-7424-a1fe-b05e3f13aaf9"
+  },
+  {
+   "id": "01a20920-c4bc-70d3-b11a-00a2363126e0",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready Roman signum military standard circa AD 100, isolated prop. Tall straight wooden or metal pole, modest spear-shaped finial, several small circular phalera discs and simple wreath elements arranged vertically, practical crossbar details, metal handhold area. No eagle aquila, no letters, no cloth banner, no soldier, no base, no fantasy decoration. Restrained bronze and iron weathering, clean modular prop for a signifer.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T15:57:54Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "gear_roman_signum",
+   "role": "preview_of_01a20924-b3e4-7055-bc44-a7d05160d252"
+  },
+  {
+   "id": "01a20920-d47d-7741-9095-c72a2060527e",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready Roman four-horn cavalry saddle circa AD 100, isolated equipment prop without horse or rider. Brown leather padded saddle with four prominent supportive horns, simple leather straps and girth fittings, no stirrups, no medieval high cantle, no metal stirrup irons. Historically plausible Roman cavalry construction, worn leather, clean underside and straps, no base, text or fantasy ornament.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T15:57:58Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "gear_roman_four_horn_saddle",
+   "role": "preview_of_01a20924-cc2d-73ae-aeb5-2e8dbcdf2739"
+  },
+  {
+   "id": "01a20920-e4d9-7542-a5f2-1cbce8db4d2d",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready resource prop: stacked split firewood and rough timber logs for a Roman frontier village circa AD 100. One compact believable pile of short cut logs with bark, several split pieces, natural irregular stacking and a flat terrain-contact base. No modern saw marks, nails, rope, tools, text, vegetation or scenery. Realistic wood grain, dry and fresh variation, modular economy resource object.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T15:58:03Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "resource_firewood",
+   "role": "preview_of_01a20924-e498-76cf-ad2f-66e95a923d97"
+  },
+  {
+   "id": "01a20920-f729-70f1-8af5-f88852d2c1b8",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready clay resource deposit for an ancient Roman frontier landscape. One low irregular exposed bank of reddish-brown natural clay mixed with soil and small pebbles, cracked damp and dry surfaces, flat hidden base for terrain placement. No pot, brick, tools, mine cart, crystals, fantasy glow, vegetation, text or scenery. Realistic geological resource node, readable from gameplay camera.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T15:58:07Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "resource_clay",
+   "role": "preview_of_01a20924-f606-7041-b3ab-2e80125567f0"
+  },
+  {
+   "id": "01a20921-07b3-72bc-a515-848d7d18c612",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready limestone building-stone resource outcrop for a Roman frontier landscape circa AD 100. One low broad pale beige-grey fractured limestone formation with layered bedding, blocky natural breaks and quarry-friendly faces, flat hidden terrain base. No carved blocks, tools, plants, text, crystals, fantasy glow or scenery. Realistic weathered stone surface and readable modular resource-node silhouette.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T15:58:11Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "resource_limestone",
+   "role": "preview_of_01a20925-0424-70bc-bf56-271a644fd6f9"
+  },
+  {
+   "id": "01a20922-0cce-7353-80a4-3d06dead3be3",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready full-body Roman heavy cavalry rider circa AD 100, standing neutral A-pose for rigging, arms slightly away from torso, hands open, feet apart. Adult male, realistic human anatomy and face. Lorica hamata mail shirt over short wool tunic, military belt, fitted trousers, leather riding boots, historically plausible Roman cavalry helmet, simple oval shield strapped flat to back, empty sword suspension for a separate spatha prop. No weapon in hands, no horse, no cape crossing limbs, no base, no text, no fantasy ornament. Clean separated silhouette, practical worn iron, leather and wool.",
+   "texture_prompt": "Roman heavy cavalry circa AD 100. Realistic worn iron mail and helmet, dark brown leather straps and riding boots, muted red-brown wool tunic, off-white linen details, subdued bronze fittings, natural human skin, dirt and sweat only subtle. Historically grounded materials, no fantasy glow, no pristine chrome.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:59:18Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 26817,
+   "vertices": 32472,
+   "glb_bytes": 21468276,
+   "sha256": "8277efdc7b388429a3ad1900b4592c92460643a0572dfa4bb80bfecb887a9e84",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_roman_heavy_cavalry_rider",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/character/unit_roman_heavy_cavalry_rider.glb"
+  },
+  {
+   "id": "01a20922-1d22-777f-b822-865f6b994efe",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready full-body Roman auxiliary light cavalry rider circa AD 100, neutral A-pose for rigging, realistic adult male anatomy. Light wool tunic, fitted trousers, leather riding boots, broad military belt, simple neck scarf, modest iron cavalry helmet, small oval shield strapped to back, light protective leather and limited mail details rather than heavy armor. No weapon in hands, no horse, no oversized cloak, no base, no text, no fantasy elements. Distinct face, believable frontier soldier, clean limbs and fingers for animation.",
+   "texture_prompt": "Roman auxiliary light cavalry circa AD 100. Natural undyed and muted red-brown wool, dark leather riding gear, modest iron helmet and fittings, restrained mail or leather protection, realistic skin and hair. Frontier wear, dust and scratches, no fantasy colors, no glossy modern materials.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:59:22Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 25164,
+   "vertices": 29691,
+   "glb_bytes": 20080968,
+   "sha256": "ce951f45320868ea572fdb3d24a175b9e4872049727fe40e0689c52a846ffc3e",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_roman_light_cavalry_rider",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/character/unit_roman_light_cavalry_rider.glb"
+  },
+  {
+   "id": "01a20922-2cd0-7548-8505-5e2a143809ac",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready full-body Roman auxiliary archer circa AD 100, neutral A-pose for rigging, realistic adult male with distinct Mediterranean/provincial face. Short wool tunic, narrow belt, practical trousers, leather boots, light quilted or leather torso protection, simple iron helmet, compact quiver strapped high on back but no bow in hands. No legionary segmentata, no fantasy armor, no base, no text. Clear hands, face and shoulder silhouette, historically grounded frontier auxiliary appearance, worn natural wool, leather and iron materials.",
+   "texture_prompt": "Roman auxiliary archer circa AD 100. Earth-tone wool tunic, brown leather quiver and boots, aged iron helmet, simple linen and leather protection, natural human skin and hair, subtle dust and sweat. Historically plausible provincial frontier palette, no bright fantasy ornament.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:59:27Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 29218,
+   "vertices": 28733,
+   "glb_bytes": 21435244,
+   "sha256": "79bf1148a66f23bfa8b9dd2b7c7a315be0cdb2ece47194e087d9b96a37342018",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_roman_aux_archer",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/character/unit_roman_aux_archer.glb"
+  },
+  {
+   "id": "01a20922-3da8-7164-b3ef-0d60b4c04729",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready full-body Germanic axe fighter circa AD 100, neutral A-pose for rigging, realistic adult male anatomy and face, strong but natural build. Knee-length undyed wool tunic, fitted wool trousers, leather belt and shoes, simple cloak pinned at one shoulder but kept clear of arms, small utility pouch, short natural beard, shoulder-length practical hair. No weapon in hands, no horned helmet, no Viking fantasy, no plate armor, no tattoos required, no base or text. Historically plausible frontier warrior, rough wool and leather, clean separated limbs and fingers.",
+   "texture_prompt": "Germanic axe fighter circa AD 100. Coarse undyed grey-brown wool tunic and trousers, weathered brown leather belt and shoes, muted natural cloak, realistic skin, beard and hair, simple iron fittings, dirt at hems and knees. No Viking fantasy, no blue glow, no modern fabrics.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:59:31Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 29134,
+   "vertices": 32771,
+   "glb_bytes": 21163904,
+   "sha256": "9c6cb7e4f57ce3b0c4178bb269cad830183bb0796ccd419d5c74ada31ba9bffc",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_germanic_axe_fighter",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/character/unit_germanic_axe_fighter.glb"
+  },
+  {
+   "id": "01a20922-4d17-70f5-89b9-7a658e7dae82",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready full-body Germanic light spearman circa AD 100, standing neutral A-pose for rigging, realistic lean adult male. Plain woven wool tunic, trousers, leather belt, shoes and small pouch, simple cloak folded behind shoulders, modest short hair and beard, no helmet or only a very simple iron cap. Round wooden shield strapped flat to back; spear is separate and not held. No horned helmet, no chain fantasy, no Viking styling, no base, no text. Clean hands and feet, distinct human face, believable first-second century frontier equipment.",
+   "texture_prompt": "Germanic light spearman circa AD 100. Natural wool in tan, grey and muted ochre, rawhide and brown leather, simple iron boss and fittings, natural wood shield back, realistic skin and hair, weathered frontier appearance. No Viking runes, fantasy metals or saturated colors.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:59:37Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 29555,
+   "vertices": 31801,
+   "glb_bytes": 25138612,
+   "sha256": "377b4559e4e1746df0377f80284883b3499761ad85f4594047dce41fa9acb08e",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_germanic_light_spearman",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/character/unit_germanic_light_spearman.glb"
+  },
+  {
+   "id": "01a20922-65cb-74a8-9cc1-7479aec8622b",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready full-body Roman signifer standard bearer circa AD 100, neutral A-pose for rigging, realistic adult male anatomy. Lorica hamata mail shirt over red-brown wool tunic, military belt, leather boots and greaves, historically plausible helmet plus modest animal-skin headdress draped behind without covering face or hands. No standard pole in hands, no shield, no weapon held, no base, no text, no fantasy. Veteran face, practical worn iron, bronze, leather and wool, clean silhouette for animation; standard will be a separate prop.",
+   "texture_prompt": "Roman signifer circa AD 100. Dark iron mail, aged bronze fittings, red-brown wool tunic, brown leather, off-white fur with natural darker tips for animal-skin headdress, realistic skin and veteran face. Practical military wear and patina, no fantasy glow or ceremonial excess.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:59:42Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 29527,
+   "vertices": 30892,
+   "glb_bytes": 23719052,
+   "sha256": "15b2afb0c22d187f45c37a84d272cb215ff39388ee4fde23c8cec668cb042370",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_roman_signifer",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/character/unit_roman_signifer.glb"
+  },
+  {
+   "id": "01a20922-790b-77dc-aa63-9cee4c47c625",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready full-body elite Germanic mounted retainer circa AD 100, neutral A-pose for rigging, realistic adult male anatomy and distinct face. High-status but restrained equipment: knee-length mail shirt, wool tunic, fitted trousers, leather riding boots, broad belt with simple iron fittings, fur-edged cloak kept behind the arms, natural beard and tied-back hair. Small round shield strapped to back, no weapon in hands, no horse, no horned helmet, no Viking fantasy, no base, no text. Worn iron, wool and leather, animation-friendly silhouette.",
+   "texture_prompt": "Elite Germanic mounted retainer circa AD 100. Aged iron mail, dark brown leather riding boots and belt, coarse wool in charcoal, muted green-brown and tan, restrained natural fur edge, realistic skin, beard and hair. High-status but practical, no Viking fantasy, no polished plate armor.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:59:46Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 29280,
+   "vertices": 31699,
+   "glb_bytes": 23457180,
+   "sha256": "2a17910f5e33a49af1193b2693124bb33cb95ac6161af475f01e2e1d823902c3",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_germanic_mounted_retainer",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/character/unit_germanic_mounted_retainer.glb"
+  },
+  {
+   "id": "01a20922-872f-701d-a442-b55d0673a9b3",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready Roman legionary scutum circa AD 100 as one isolated prop. Tall curved rectangular wooden shield with rounded corners, central iron boss, reinforced rim, believable layered wood construction and leather edging. Slight practical wear, no soldier, no hand, no emblem text, no fantasy ornament, no pedestal. Clean back with horizontal hand grip and simple fittings; readable convex curvature, suitable for animation and modular equipment.",
+   "texture_prompt": "Roman scutum circa AD 100. Deep muted red painted wood, aged iron boss and rim fittings, brown leather edge and rear grip, visible wood grain beneath wear, scratches and chipped paint kept realistic. No letters or fantasy symbols.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:59:51Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 8456,
+   "vertices": 7550,
+   "glb_bytes": 13661952,
+   "sha256": "1c371df2a0058de23c6cb0b6857fd187de96f2b00e1503f0d5dfe6721c7cc610",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "gear_roman_scutum",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/equipment/gear_roman_scutum.glb"
+  },
+  {
+   "id": "01a20922-9c05-77b1-9b22-42ac731456e2",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready Roman cavalry oval shield circa AD 100, isolated prop. Medium oval slightly convex wooden shield, central iron boss, thin reinforced rim, simple painted geometric Roman frontier pattern without letters, realistic leather and wood backside with grip. No soldier, hand, base, text, spikes or fantasy ornament. Balanced thickness, clean silhouette, animation-ready modular equipment.",
+   "texture_prompt": "Roman cavalry oval shield circa AD 100. Muted red, ochre and dark natural geometric paint on wood, aged iron boss, brown leather edging and grip, believable scratches and dust, restrained frontier look, no letters, no fantasy motifs.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:59:55Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 8901,
+   "vertices": 7883,
+   "glb_bytes": 22916200,
+   "sha256": "9b82cf2b9a77854f5d412729c4428c6f54e35b262ad46769b798038df506c8a9",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "gear_roman_cavalry_oval_shield",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/equipment/gear_roman_cavalry_oval_shield.glb"
+  },
+  {
+   "id": "01a20922-ab81-74fa-9139-87adebe3a5d9",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready Germanic round wooden shield circa AD 100, isolated prop. Round plank-built shield, central iron boss, modest iron rim clamps, rawhide edge, simple hand grip on back, restrained natural red ochre and dark wood painted sectors, weathered but intact. No Viking symbols, runes, spikes, soldier, hand, base or text. Historically plausible frontier equipment, clean readable geometry.",
+   "texture_prompt": "Germanic round shield circa AD 100. Natural dark wood planks, rawhide rim, aged iron boss and clamps, simple faded red-ochre painted sectors, dirt and edge wear. No runes, Viking knots, fantasy patterns or glossy finish.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T15:59:59Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 8732,
+   "vertices": 7310,
+   "glb_bytes": 23833312,
+   "sha256": "e0ca7bd76079567cff1b3f91425e9534af978358dc11dd4498af18fd04c78be0",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "gear_germanic_round_shield",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/equipment/gear_germanic_round_shield.glb"
+  },
+  {
+   "id": "01a20922-ba31-769d-837c-6303249958a9",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready Roman cavalry lance circa AD 100, isolated entire weapon. Long straight ash wood shaft with a narrow symmetrical iron spearhead and small iron butt spike, practical cavalry proportions, no banner or decoration. Entire weapon visible from tip to butt, no hands, horse, base, text, oversized fantasy blade or medieval elements. Distinct iron and wood materials, straight clean geometry for mounted combat animations.",
+   "texture_prompt": "Roman cavalry lance circa AD 100. Straight ash wood shaft with warm natural grain, dark aged forged iron spearhead and butt spike, subtle handling wear. No paint, glow, ornament or fantasy metal.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T16:00:03Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 9618,
+   "vertices": 10835,
+   "glb_bytes": 10360640,
+   "sha256": "e9d8d6f73f65f132333591f73ea2f186dc59e87febf7443e079982b773d893c8",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "gear_roman_cavalry_lance",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/equipment/gear_roman_cavalry_lance.glb"
+  },
+  {
+   "id": "01a20924-ac18-7424-a1fe-b05e3f13aaf9",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready ancient leather sling circa AD 100, isolated whole weapon. Small woven leather or wool pouch at center with two long braided cords, one looped end and one free release end, natural flexible hanging shape but clearly separated cords. No stone projectile, hand, soldier, scenery, base, text, modern parts or fantasy. Simple historically plausible ranged weapon prop with clean readable silhouette.",
+   "texture_prompt": "Ancient sling circa AD 100. Worn vegetable-tanned brown leather pouch, braided natural flax and wool cords in beige and brown, realistic fibers and subtle dirt. No modern synthetic materials or decoration.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T16:02:08Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 9473,
+   "vertices": 7591,
+   "glb_bytes": 24995384,
+   "sha256": "508ac15abc53703485baa35362d197ba4c11288a840e0b954fce432146e7f50b",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "gear_sling",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/equipment/gear_sling.glb"
+  },
+  {
+   "id": "01a20924-b3e4-7055-bc44-a7d05160d252",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready Roman signum military standard circa AD 100, isolated prop. Tall straight wooden or metal pole, modest spear-shaped finial, several small circular phalera discs and simple wreath elements arranged vertically, practical crossbar details, metal handhold area. No eagle aquila, no letters, no cloth banner, no soldier, no base, no fantasy decoration. Restrained bronze and iron weathering, clean modular prop for a signifer.",
+   "texture_prompt": "Roman signum circa AD 100. Aged bronze phalera discs and wreath details with restrained patina, dark iron and wooden pole components, practical military wear, subtle dust. No fantasy gold glow, no letters, no modern polish.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T16:02:13Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 8522,
+   "vertices": 7527,
+   "glb_bytes": 16869116,
+   "sha256": "ec927a279e63e395de29f8a8bb7bd3c1e16ed26dc3a7df0c9aa7dfe5e5bacbd7",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "gear_roman_signum",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/equipment/gear_roman_signum.glb"
+  },
+  {
+   "id": "01a20924-cc2d-73ae-aeb5-2e8dbcdf2739",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready Roman four-horn cavalry saddle circa AD 100, isolated equipment prop without horse or rider. Brown leather padded saddle with four prominent supportive horns, simple leather straps and girth fittings, no stirrups, no medieval high cantle, no metal stirrup irons. Historically plausible Roman cavalry construction, worn leather, clean underside and straps, no base, text or fantasy ornament.",
+   "texture_prompt": "Roman four-horn cavalry saddle circa AD 100. Dark chestnut and medium brown vegetable-tanned leather, slightly lighter padded wear areas, natural stitching, aged bronze or iron buckles only where appropriate, dust and sweat staining. Absolutely no stirrups or medieval decoration.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T16:02:21Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 9455,
+   "vertices": 8744,
+   "glb_bytes": 19204448,
+   "sha256": "231c99a8e485e84d05004bb54f4f975533c552919ab81f612230b7b5a653362d",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "gear_roman_four_horn_saddle",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/equipment/gear_roman_four_horn_saddle.glb"
+  },
+  {
+   "id": "01a20924-e498-76cf-ad2f-66e95a923d97",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready resource prop: stacked split firewood and rough timber logs for a Roman frontier village circa AD 100. One compact believable pile of short cut logs with bark, several split pieces, natural irregular stacking and a flat terrain-contact base. No modern saw marks, nails, rope, tools, text, vegetation or scenery. Realistic wood grain, dry and fresh variation, modular economy resource object.",
+   "texture_prompt": "Ancient frontier firewood and timber resource pile. Natural mixed bark browns and grey weathered wood, pale fresh split faces, dirt in crevices, realistic roughness and grain. No modern cut paint or labels.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T16:02:24Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 9230,
+   "vertices": 10132,
+   "glb_bytes": 23541956,
+   "sha256": "bf31ee78e55de1d8477cb4b76e028cf1dd1f2f3113f32a3e0608674b1d8a8333",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "resource_firewood",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/resource/resource_firewood.glb"
+  },
+  {
+   "id": "01a20924-f606-7041-b3ab-2e80125567f0",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready clay resource deposit for an ancient Roman frontier landscape. One low irregular exposed bank of reddish-brown natural clay mixed with soil and small pebbles, cracked damp and dry surfaces, flat hidden base for terrain placement. No pot, brick, tools, mine cart, crystals, fantasy glow, vegetation, text or scenery. Realistic geological resource node, readable from gameplay camera.",
+   "texture_prompt": "Natural clay resource deposit. Reddish-brown and burnt umber clay with darker damp pockets, dusty pale dry cracks, small grey-brown pebbles and soil inclusions. Realistic rough geological material, no fantasy glow.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T16:02:29Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 9552,
+   "vertices": 8441,
+   "glb_bytes": 14606648,
+   "sha256": "ba4a9fb8b82c3d6f9f9e418aa93852d13d179ad364155b1e5f2316f4d4e5c2e6",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "resource_clay",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/resource/resource_clay.glb"
+  },
+  {
+   "id": "01a20925-0424-70bc-bf56-271a644fd6f9",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready limestone building-stone resource outcrop for a Roman frontier landscape circa AD 100. One low broad pale beige-grey fractured limestone formation with layered bedding, blocky natural breaks and quarry-friendly faces, flat hidden terrain base. No carved blocks, tools, plants, text, crystals, fantasy glow or scenery. Realistic weathered stone surface and readable modular resource-node silhouette.",
+   "texture_prompt": "Natural limestone building-stone outcrop. Pale beige, warm grey and chalky off-white strata, darker dirt in fractures, subtle weathering and dust, realistic rough stone PBR. No crystal sparkle, fantasy glow or carved markings.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T16:02:33Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 9299,
+   "vertices": 7848,
+   "glb_bytes": 18510092,
+   "sha256": "294ab91a5cf3cd4f0cf477ff0cfa20037bdf3e91d63e0c2f8a233b6fc6d1fd32",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "resource_limestone",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/resource/resource_limestone.glb"
+  },
+  {
+   "id": "01a20925-8e9e-76ba-b788-202a5c316e1c",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready full-body Roman heavy cavalry rider circa AD 100, standing neutral A-pose for rigging, arms slightly away from torso, hands open, feet apart. Adult male, realistic human anatomy and face. Lorica hamata mail shirt over short wool tunic, military belt, fitted trousers, leather riding boots, historically plausible Roman cavalry helmet, simple oval shield strapped flat to back, empty sword suspension for a separate spatha prop. No weapon in hands, no horse, no cape crossing limbs, no base, no text, no fantasy ornament. Clean separated silhouette, practical worn iron, leather and wool.",
+   "texture_prompt": "Game-ready full-body Roman heavy cavalry rider circa AD 100, standing neutral A-pose for rigging, arms slightly away from torso, hands open, feet apart. Adult male, realistic human anatomy and face. Lorica hamata mail shirt over short wool tunic, military belt, fitted trousers, leather riding boots, historically plausible Roman cavalry helmet, simple oval shield strapped flat to back, empty sword suspension for a separate spatha prop. No weapon in hands, no horse, no cape crossing limbs, no base, no text, no fantasy ornament. Clean separated silhouette, practical worn iron, leather and wool.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T16:03:06Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 26817,
+   "vertices": 32472,
+   "glb_bytes": 23858120,
+   "sha256": "68118a900e66956a7c26e472f3a5decda705a87f6f0127d9a69ebc9133109b8b",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_roman_heavy_cavalry_rider",
+   "role": "duplicate_refine",
+   "staged_path": null,
+   "note": "kept outside the repository (untextured twin, duplicate refine or superseded preview)"
+  },
+  {
+   "id": "01a20926-3261-7070-aee2-6bdcfb8f4f4c",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready copper ore resource outcrop for an ancient Roman frontier landscape. One low broad natural rock formation with grey-brown host stone, subtle green malachite and blue-green copper mineral staining embedded in fractures, occasional dark metallic copper-bearing seams, flat hidden terrain base. No giant crystals, cut gemstones, fantasy glow, mine tools, text, plants or scenery. Realistic geological resource node readable from gameplay camera.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T16:03:49Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "resource_copper_ore",
+   "role": "preview_of_01a20926-b179-7152-b822-7eceeb32d867"
+  },
+  {
+   "id": "01a20926-3f65-721f-9f63-6f5a42644d73",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready lead and silver-bearing galena ore resource outcrop for an ancient Roman frontier landscape. One low irregular heavy grey rock mass with small natural cubic dark metallic galena faces and pale calcite veins embedded in ordinary stone, flat hidden terrain base. No oversized crystals, pure silver nuggets, fantasy glow, mine cart, tools, text, plants or scenery. Realistic subtle metallic mineralization, readable modular resource node.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2",
+   "created_utc": "2026-11-23T16:03:53Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 9201,
+   "vertices": 5046,
+   "glb_bytes": 171680,
+   "sha256": "9f666da9187d2cb39f98494bbd1953fd1bb974d4b81a323be9975288954307b2",
+   "images": [],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "resource_galena",
+   "role": "canonical_preview",
+   "staged_path": "prototype/assets/meshy/source/resource/resource_galena.glb"
+  },
+  {
+   "id": "01a20926-85e5-70be-a646-d57d40c474d0",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready full-body Gaius Julius Caesar, age about 42 in 58 BCE, neutral A-pose for rigging. Historically grounded late Roman Republic male: lean wiry build, clean-shaven, thinning short dark hair and receding hairline, long narrow slightly gaunt face, pronounced cheekbones and temples, deep-set alert eyes, prominent straight-aquiline nose, thin controlled mouth, light wrinkles, severe intelligent expression inspired by Tusculum/Chiaramonti portrait traditions, not a modern actor. Off-white wool tunic, late-Republic military belt, leather calcei, restrained red paludamentum pinned behind shoulder clear of arms. No crown, no laurel, no fantasy armor, no weapons, no base, no text. Natural proportions, separate fingers, animation-friendly silhouette.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T16:04:11Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 31457,
+   "vertices": 15984,
+   "glb_bytes": 570020,
+   "sha256": "b9a8269042fdbfb63ec4c5ad5ec8d3f6c99d19499b8aa330f46b8b25ff73f9da",
+   "images": [],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "historical_caesar_58bce_candidate",
+   "role": "parallel_candidate",
+   "staged_path": null,
+   "note": "kept outside the repository (untextured twin, duplicate refine or superseded preview)"
+  },
+  {
+   "id": "01a20926-b179-7152-b822-7eceeb32d867",
+   "api": "text-to-3d",
+   "mode": "refine",
+   "name": "",
+   "prompt": "Game-ready copper ore resource outcrop for an ancient Roman frontier landscape. One low broad natural rock formation with grey-brown host stone, subtle green malachite and blue-green copper mineral staining embedded in fractures, occasional dark metallic copper-bearing seams, flat hidden terrain base. No giant crystals, cut gemstones, fantasy glow, mine tools, text, plants or scenery. Realistic geological resource node readable from gameplay camera.",
+   "texture_prompt": "Natural copper-bearing ore outcrop. Grey-brown stone with subtle green malachite and blue-green copper staining concentrated in cracks, occasional dark metallic mineral seams, realistic oxidation, dirt and roughness. No fantasy glow or oversized crystals.",
+   "ai_model": "meshy-7",
+   "created_utc": "2026-11-23T16:04:23Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 10,
+   "expires_utc": null,
+   "textured": true,
+   "formats": [
+    "fbx",
+    "glb",
+    "mtl",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 9998,
+   "vertices": 6921,
+   "glb_bytes": 25805988,
+   "sha256": "007e52115c43bf719d25d61f4439e910c289a4b6473ad72b5e413ef43e8c2dd9",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "resource_copper_ore",
+   "role": "final",
+   "staged_path": "prototype/assets/meshy/source/resource/resource_copper_ore.glb"
+  },
+  {
+   "id": "01a20934-c44a-77ea-95a7-5e2c2c804d5e",
+   "api": "text-to-3d",
+   "mode": "preview",
+   "name": "",
+   "prompt": "Game-ready full-body ancient cavalry horse for a Roman frontier setting, standing square in a neutral animation-friendly pose with all four legs clearly separated and straight, head forward and slightly lowered, ears natural, tail hanging free, realistic mature horse anatomy, compact strong endurance build suitable for first- and second-century military riding rather than a modern oversized sport horse. Bare horse only: no saddle, bridle, reins, armor, rider, blanket, base, text or fantasy decoration. Clean hoof shapes, readable joints, separated mane and tail silhouette, symmetric neutral stance suitable for later quadruped rigging and Roman four-horn saddle attachment.",
+   "texture_prompt": "",
+   "ai_model": "meshy-t2.5",
+   "created_utc": "2026-11-23T16:19:45Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 5,
+   "expires_utc": null,
+   "textured": false,
+   "formats": [
+    "fbx",
+    "glb",
+    "obj",
+    "stl",
+    "usdz"
+   ],
+   "triangles": 23137,
+   "vertices": 14830,
+   "glb_bytes": 456332,
+   "sha256": "01a7ca06bf72c6edb1311c9549c0668ee68e4f0188acd8e23cc9165730fed5df",
+   "images": [],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "mount_ancient_cavalry_horse",
+   "role": "canonical_preview",
+   "staged_path": "prototype/assets/meshy/source/mount/mount_ancient_cavalry_horse.glb"
+  },
+  {
+   "id": "8f1778e3-4147-40cf-a264-6bd65f57a566",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "continuum_meshy_source",
+   "prompt": "",
+   "label": "continuum_meshy_source (expired, HTTP 403)",
+   "created_utc": "2026-11-04T15:26:51Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 0,
+   "expires_utc": "2026-11-07T15:27:55Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "expired"
+  },
+  {
+   "id": "aa8cb5ca-a1c5-53b0-b02d-e1c101a02d87",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "continuum_meshy_source",
+   "prompt": "",
+   "label": "continuum_meshy_source (expired, HTTP 403)",
+   "created_utc": "2026-11-04T15:27:57Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 0,
+   "expires_utc": "2026-11-07T15:27:57Z",
+   "textured": false,
+   "texture_maps": [],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "expired"
+  },
+  {
+   "id": "01a208f1-dc5a-76c1-bb5a-de37af413136",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:06:39Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:07:15Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 25265,
+   "vertices": 16714,
+   "glb_bytes": 3775116,
+   "sha256": "4ca9ff22279bd13586d0c47d5b28d50cf609588e330c0c0e6ca5048552836ca9",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f1-fadb-7712-9573-e442c381a995",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:06:46Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:07:15Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 22480,
+   "vertices": 16787,
+   "glb_bytes": 4296588,
+   "sha256": "2556d81de7a7cd5d356eaf9864c9aa37d1f4ed4936a3cfcb008a6355f21bf878",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f2-16ba-7472-93a3-d99c4062e1f2",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:06:54Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:07:31Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 21013,
+   "vertices": 13947,
+   "glb_bytes": 4250088,
+   "sha256": "8a25b10d518963abd9bb0fdee87190296e5b912664202624e376671d6377149b",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f4-521a-74ee-b3c7-d141335b0d6a",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:09:20Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:09:51Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 23005,
+   "vertices": 16655,
+   "glb_bytes": 4646048,
+   "sha256": "70dc43c4eea3550bb1d2e6a320c8bebfbf483f482e9c27882a5ede690f6eb529",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f4-7093-7622-a4cd-0bc3f65a3835",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:09:28Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:09:56Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 23100,
+   "vertices": 20508,
+   "glb_bytes": 5296036,
+   "sha256": "45843bab81456b9c35e318453d5a9fd1f0598e49ed26e9c3eee66332ab026bac",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f4-8987-7645-b995-cbfdbdf4da43",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:09:34Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:10:04Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 23073,
+   "vertices": 16294,
+   "glb_bytes": 4654248,
+   "sha256": "203176c0111138a29105d239bba7ae37fd223582a93e4bf8a5d0d9e2b9a24586",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f4-a0c6-7268-afe9-ccf417b38e39",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:09:40Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:10:08Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 23197,
+   "vertices": 15361,
+   "glb_bytes": 4663392,
+   "sha256": "1f0a751e1c7dd60a33ff32471ff7092aae03c7def85420433f532c5a32bad336",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f4-b791-7137-8267-65bec9ad74bf",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:09:46Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:10:16Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 23098,
+   "vertices": 15451,
+   "glb_bytes": 4215216,
+   "sha256": "3243698db47a4e42354acbf7bf456e733817de9aa3e28861726cc08cc3eed27c",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f4-cc5c-724e-af02-a3dead4905b2",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:09:51Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:10:29Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 23106,
+   "vertices": 14980,
+   "glb_bytes": 4237060,
+   "sha256": "14ed9030b5328de7ebb2d5d44cddad33a890a092c201453b0bcb623272d68157",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f5-e2ae-7524-9771-191ff2260646",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:11:02Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:11:30Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 23084,
+   "vertices": 15245,
+   "glb_bytes": 3463604,
+   "sha256": "17db07199e33ca550fc26f2703fad627029b21124ca3816e87f370933aacefaa",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f5-fa88-71aa-b7b8-ef546d0992ea",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:11:08Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:11:40Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 19053,
+   "vertices": 15858,
+   "glb_bytes": 4038768,
+   "sha256": "8feb17e921ee2c64a1cfafdb2fff305701d24256ffdc054726d7d743f0669381",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f6-1513-72af-a6dd-0c9cbd47aa43",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:11:15Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:11:40Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 19129,
+   "vertices": 15408,
+   "glb_bytes": 4162172,
+   "sha256": "a939ce258d2a4774f1337c5050df291e616abce5eae4521b363e8bde028fbc13",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f6-2bd1-717d-9048-bca34d55b133",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:11:21Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:11:54Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 18964,
+   "vertices": 17216,
+   "glb_bytes": 4128408,
+   "sha256": "f5bffd23d3a95dbe002fccca5c1f0a591f2efb28d0957e48201661273a0bb107",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f6-40c3-761e-9e63-8f3c35ac38a6",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:11:26Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:12:04Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 18624,
+   "vertices": 13973,
+   "glb_bytes": 3220640,
+   "sha256": "7bfd4d5358f84d9648dd920c3ff30bbdb2655814f91b67ce9f70fe5aff888000",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f6-5696-756a-b2fb-c8cf4b032d25",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:11:32Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:11:55Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 19070,
+   "vertices": 15507,
+   "glb_bytes": 3704176,
+   "sha256": "bf1891545681b6ae1ce368de2f4a2837fe0145f511fdf4bdcdd6c2192779f99f",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f8-fdfc-7211-b08e-9beb07d1c7d2",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:14:26Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:14:59Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 19205,
+   "vertices": 15361,
+   "glb_bytes": 3278228,
+   "sha256": "06bb5b26551146fc82b4decb47cee26948765e4a43d2ca8004255209a1126d1d",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f9-1360-76eb-9cf8-f0b5130304f2",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:14:31Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:15:20Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 19015,
+   "vertices": 16015,
+   "glb_bytes": 4446488,
+   "sha256": "adf80a9760556277ce334ebe7e210926fef0cc9576eba6a8ba3b54a21c57451c",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f9-2c4a-7417-8aa5-9a932ab4fb4d",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:14:38Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:15:16Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 18976,
+   "vertices": 14447,
+   "glb_bytes": 4205864,
+   "sha256": "67ab2519fab0fdc080af68efcb269d50332bb0398a233e06fab48e2f44ce0f13",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f9-4430-72fc-ae88-8efb9b9bea3f",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:14:44Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:15:23Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 17786,
+   "vertices": 15309,
+   "glb_bytes": 3712420,
+   "sha256": "5a26928fa92938b38a6081251331e31f8700fbd235995d2e197a69ed0b7fe2c6",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f9-599e-76a8-b2ae-177c5cc55edf",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:14:49Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:15:28Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 18961,
+   "vertices": 15894,
+   "glb_bytes": 3771340,
+   "sha256": "90bb0b38c788c32b5ec7169df12a08d898eb09c09dd8a0cb5bfe7165a025860f",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208f9-5601-7111-8751-e447499039dc",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "Roman legionary, lorica segmentata (legacy image-to-3d)",
+   "created_utc": "2026-11-23T15:14:51Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:15:37Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": 15218,
+   "vertices": 11906,
+   "glb_bytes": 8853336,
+   "sha256": "ed81d048a87d9c6e1118e56093c0dea130c9ad1a33f327efe74f111962858230",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_legacy_roman_legionary_segmentata",
+   "role": "image_to_3d_output",
+   "staged_path": "prototype/assets/meshy/source/character/unit_legacy_roman_legionary_segmentata.glb"
+  },
+  {
+   "id": "01a208fa-7a36-74e9-9692-c46231c84fd2",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:16:03Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:16:42Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 19083,
+   "vertices": 14889,
+   "glb_bytes": 3986076,
+   "sha256": "4ba213e5cb6a57f4eb7ccfc19f35f9a5a17053c80bee6fe9aabb424064edef28",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208fa-920a-7050-a321-6ea885205e9b",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:16:09Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:16:42Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 18899,
+   "vertices": 15508,
+   "glb_bytes": 4659856,
+   "sha256": "9f2a475faed1f2dbac01254508ae5f6ed6c9c373828341caa72cc79cefbdae1a",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208fa-a8d5-728e-a575-56a6a71e2c58",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:16:15Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:16:51Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 19123,
+   "vertices": 15498,
+   "glb_bytes": 4623304,
+   "sha256": "6b1bdb9e2d9348719ebb30a866bb8f40daeba8f2f4a89ca9f3fb73cd1b8f6a8d",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208fa-c002-7308-a7be-f87bb90f9658",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:16:21Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:17:07Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 19100,
+   "vertices": 15052,
+   "glb_bytes": 3541772,
+   "sha256": "ea9cd38d226a3d8394fb7156b9bf980d5d64585adf112e7dd067ed14c92d2ab0",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208fa-dabd-70a4-8096-f01b82f614b6",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:16:28Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:16:55Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 10792,
+   "vertices": 9134,
+   "glb_bytes": 3481100,
+   "sha256": "1e72824dfd63c15236c9da29561540c610513c52d6bba710a09568936f59b1eb",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208fa-f574-746a-bd10-34f286262996",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:16:34Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:16:59Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 6978,
+   "vertices": 5719,
+   "glb_bytes": 2659248,
+   "sha256": "01084ade55885e9936f1de3a4369d540f0325a16fda130b2db7c389fff9f7edb",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208fb-0f07-75e3-bf4d-fe3d76ad3c96",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:16:41Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:17:15Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 11631,
+   "vertices": 11330,
+   "glb_bytes": 3894360,
+   "sha256": "1ae949b50fc26121c44ff3734eb1d3fd7f4ba5877afc77f1562e73f8a7e3e386",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208fb-255d-7770-a1e7-c5e76d827ffa",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "not an Imperathen asset (stylised animal racer / vehicle body / toy prop)",
+   "created_utc": "2026-11-23T15:16:47Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:17:21Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color"
+   ],
+   "triangles": 14553,
+   "vertices": 13606,
+   "glb_bytes": 4998144,
+   "sha256": "15bea2db7cc6d5e840b6ed6216f4c90f8c110c6c379d6df7c9f2ed50467a12a7",
+   "images": [
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "other",
+   "stable_id": "other_project",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "not an Imperathen asset; copy kept outside the repository because the result expires"
+  },
+  {
+   "id": "01a208fe-0855-74e0-b2ad-2f5c2791c0d0",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "Long-haired man in tunic and trousers (legacy image-to-3d)",
+   "created_utc": "2026-11-23T15:19:56Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:20:40Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": 14245,
+   "vertices": 16125,
+   "glb_bytes": 8958280,
+   "sha256": "a7b1bcbe364ae636d7571886401d298099f5472bec2a82f0df45401d6e7e9507",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_legacy_tunic_villager",
+   "role": "image_to_3d_output",
+   "staged_path": "prototype/assets/meshy/source/character/unit_legacy_tunic_villager.glb"
+  },
+  {
+   "id": "01a208fe-236f-731b-97da-2cd94a6e2e09",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "Blacksmith with leather apron (legacy image-to-3d, Sextus candidate)",
+   "created_utc": "2026-11-23T15:20:03Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:20:44Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": 15484,
+   "vertices": 11694,
+   "glb_bytes": 8350208,
+   "sha256": "9f972cab24f3ea8dd896e7d19058dc2c83688942c2cfffd46357670c2aa947e0",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_legacy_blacksmith",
+   "role": "image_to_3d_output",
+   "staged_path": "prototype/assets/meshy/source/character/unit_legacy_blacksmith.glb"
+  },
+  {
+   "id": "01a208ff-057d-73d6-8f70-1c3636ccaf6f",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "Bay horse, textured (legacy image-to-3d)",
+   "created_utc": "2026-11-23T15:21:01Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:21:48Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": 14002,
+   "vertices": 13963,
+   "glb_bytes": 6342220,
+   "sha256": "dca7e438402e71e4c86f5c81d4f1fd38ca7ebd1a29202bd9339f610b74ef1d41",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "mount_legacy_bay_horse",
+   "role": "image_to_3d_output",
+   "staged_path": "prototype/assets/meshy/source/mount/mount_legacy_bay_horse.glb"
+  },
+  {
+   "id": "01a20913-d021-722f-a1e0-10095201c6da",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "Soldier in mail shirt (legacy image-to-3d)",
+   "created_utc": "2026-11-23T15:43:44Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:44:20Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": 14733,
+   "vertices": 10804,
+   "glb_bytes": 8518648,
+   "sha256": "3549d86c63a26fb90af84aa4241d3f04139a9c2e5552add7b6fc353954d20f6f",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_legacy_mail_soldier",
+   "role": "image_to_3d_output",
+   "staged_path": "prototype/assets/meshy/source/character/unit_legacy_mail_soldier.glb"
+  },
+  {
+   "id": "01a20913-e8fb-7039-9639-f72d1d54cfdd",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "",
+   "prompt": "",
+   "label": "Gladiator (legacy image-to-3d)",
+   "created_utc": "2026-11-23T15:43:50Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 15,
+   "expires_utc": "2026-11-26T15:44:27Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": 15568,
+   "vertices": 16426,
+   "glb_bytes": 8040208,
+   "sha256": "977e0cc2190b9267711a8a353593f21173335460015a41b80a207f30471585b5",
+   "images": [
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     2048,
+     2048
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "unit_legacy_gladiator",
+   "role": "image_to_3d_output",
+   "staged_path": "prototype/assets/meshy/source/character/unit_legacy_gladiator.glb"
+  },
+  {
+   "id": "b6856033-bc9f-44fe-af12-e9843f161aed",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "Roman adolescent warrior 3D",
+   "prompt": "",
+   "label": "Roman adolescent warrior (private, owned by another agent)",
+   "created_utc": "2026-11-25T07:50:43Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 0,
+   "expires_utc": "2026-11-28T07:52:02Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "PRIVATE_YOUTH_NOT_TOUCHED",
+   "role": "private_not_touched"
+  },
+  {
+   "id": "acdf2d5b-769e-5b81-9997-b3d673338762",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "Roman adolescent warrior 3D",
+   "prompt": "",
+   "label": "Roman adolescent warrior (untextured twin; private)",
+   "created_utc": "2026-11-25T07:52:04Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 0,
+   "expires_utc": "2026-11-28T07:52:04Z",
+   "textured": false,
+   "texture_maps": [],
+   "triangles": null,
+   "vertices": null,
+   "glb_bytes": null,
+   "sha256": null,
+   "images": [],
+   "downloaded": false,
+   "project": "imperathen",
+   "stable_id": "PRIVATE_YOUTH_NOT_TOUCHED",
+   "role": "private_not_touched"
+  },
+  {
+   "id": "629bd668-c5ed-4057-bd6d-c02322c80e4e",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "Roman imperial temple 3D",
+   "prompt": "",
+   "label": "Roman imperial temple",
+   "created_utc": "2026-11-25T07:59:04Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 0,
+   "expires_utc": "2026-11-28T08:01:44Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": 4673896,
+   "vertices": 2733509,
+   "glb_bytes": 180997876,
+   "sha256": "39d7c33c1f489410c90b74d7b787a30a600925e1fd85957451d6e1a1ac209325",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "building_roman_imperial_temple",
+   "role": "image_to_3d_output",
+   "staged_path": "prototype/assets/meshy/source/building/building_roman_imperial_temple.glb"
+  },
+  {
+   "id": "e6687410-20ed-48a1-8823-e591df9cb1d1",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "Roman centurion cuirass 3D",
+   "prompt": "",
+   "label": "Roman centurion cuirass (textured)",
+   "created_utc": "2026-11-25T10:15:43Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 0,
+   "expires_utc": "2026-11-28T10:18:09Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": 3576992,
+   "vertices": 2089794,
+   "glb_bytes": 142232400,
+   "sha256": "9a35f68bd73f999f270b7e9d0096ee32c91aec075d5a2d98f099d51698161d58",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "armor_roman_muscle_cuirass",
+   "role": "image_to_3d_output",
+   "staged_path": "prototype/assets/meshy/source/equipment/armor_roman_muscle_cuirass.glb"
+  },
+  {
+   "id": "1fbbb763-0aba-54bf-bb4f-de80ca4d6134",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "Roman centurion cuirass 3D",
+   "prompt": "",
+   "label": "Roman centurion cuirass (untextured twin)",
+   "created_utc": "2026-11-25T10:18:15Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 0,
+   "expires_utc": "2026-11-28T10:18:15Z",
+   "textured": false,
+   "texture_maps": [],
+   "triangles": 3576992,
+   "vertices": 1787574,
+   "glb_bytes": 85826588,
+   "sha256": "fdeef68a6dc7e012ed547a7abca10b4ef4c7b5b302c561d87df4d0088e4212b9",
+   "images": [],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "armor_roman_muscle_cuirass",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "kept outside the repository (untextured twin, duplicate refine or superseded preview)"
+  },
+  {
+   "id": "daf2d776-1be5-4960-bdec-bbab84523699",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "Julius Caesar 3D model",
+   "prompt": "",
+   "label": "Julius Caesar (textured)",
+   "created_utc": "2026-11-25T10:30:45Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 0,
+   "expires_utc": "2026-11-28T10:32:19Z",
+   "textured": true,
+   "texture_maps": [
+    "base_color",
+    "metallic",
+    "normal",
+    "roughness"
+   ],
+   "triangles": 2245620,
+   "vertices": 1316639,
+   "glb_bytes": 97248940,
+   "sha256": "9b0889c2397296aa4ffc4ca83182a7ad64e5c0703b9a59de20e453be0ca0d051",
+   "images": [
+    [
+     4096,
+     4096
+    ],
+    [
+     2048,
+     2048
+    ],
+    [
+     4096,
+     4096
+    ]
+   ],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "historical_caesar_image",
+   "role": "image_to_3d_output",
+   "staged_path": "prototype/assets/meshy/source/character/historical_caesar_image_textured.glb"
+  },
+  {
+   "id": "33983306-05ce-5a50-a5e9-eace192c0c2a",
+   "api": "image-to-3d",
+   "mode": null,
+   "name": "Julius Caesar 3D model",
+   "prompt": "",
+   "label": "Julius Caesar (untextured twin)",
+   "created_utc": "2026-11-25T10:32:21Z",
+   "status": "SUCCEEDED",
+   "consumed_credits": 0,
+   "expires_utc": "2026-11-28T10:32:21Z",
+   "textured": false,
+   "texture_maps": [],
+   "triangles": 2245620,
+   "vertices": 1122624,
+   "glb_bytes": 53891328,
+   "sha256": "92f6657a3002dbc75b96b8499b0ec6261c00f0f8366429a78db19a43c1bbc802",
+   "images": [],
+   "downloaded": true,
+   "project": "imperathen",
+   "stable_id": "historical_caesar_image",
+   "role": "image_to_3d_output",
+   "staged_path": null,
+   "note": "kept outside the repository (untextured twin, duplicate refine or superseded preview)"
+  }
+ ]
+}
