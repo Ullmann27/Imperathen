@@ -57,6 +57,11 @@ func _run() -> void:
 			_check(bool(session.last_sync.get("done", false)), "city simulation reaches supplied clock")
 			_check(not session.sync_to(Calendar.new_clock(int(clock.jdn), int(clock.second) - 1)).ok, "clock rollback refused")
 			_check(not session.sync_to(Calendar.new_clock(Calendar.first_day_of_year(-57), 0)).ok, "unimplemented era migration refused")
+			_check(session.trade_error("bakery", "bread", 1, 2, true) == "simulation_pending", "rejected clock blocks trade")
+			for _retry in range(100):
+				if bool(session.sync_to(clock).get("done", false)):
+					break
+			_check(bool(session.last_sync.get("done", false)), "valid clock restores readiness")
 			bridge.persist = true
 			_check(not bridge.attach_living_city(session), "separate persistent save is refused")
 			bridge.persist = false
@@ -67,6 +72,13 @@ func _run() -> void:
 		var till := int(session.life.state.businesses[business].till) if business >= 0 else -1
 		_check(bridge.open_shop(), "real shop opens at its authored frontage")
 		_check(bridge.panel.shop_id == "bakery" and not bridge.panel.pad.visible, "one embedded modal, no extra touch stick")
+		if ready:
+			bridge.persist = true
+			var before_persist := JSON.stringify(session.save_state(), "", true)
+			_check(not bridge.execute("city_buy", args).ok, "persistent mode cannot be enabled after attaching")
+			_check(JSON.stringify(session.save_state(), "", true) == before_persist, "blocked persistent trade leaves city unchanged")
+			_check(int(bridge.model.data.resources.denarii) == initial, "blocked persistent trade leaves wallet unchanged")
+			bridge.persist = false
 		_check(bridge.execute("city_buy", args).ok, "buy bread at actual frontage")
 		_check(int(bridge.model.data.resources.denarii) == initial - 2, "authoritative debit")
 		_check(int(bridge.model.data.village.city_trade.inventory.bread) == 1, "authoritative inventory")

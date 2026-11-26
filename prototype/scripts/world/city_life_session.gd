@@ -42,14 +42,18 @@ func restore(clock: Dictionary, saved: Dictionary, scene_nodes: Callable = Calla
 ## Synchronize only to a supplied, validated, monotonic world clock. A change
 ## of historical year requires a separate population/anchor migration; fail
 ## closed instead of running the previous era's buildings into a new year.
+func _reject_clock(reason: String) -> Dictionary:
+	last_sync = {"ok": false, "done": false, "error": reason}
+	return last_sync.duplicate(true)
+
 func sync_to(clock: Dictionary, budget_usec: int = MAX_FRAME_BUDGET_USEC) -> Dictionary:
 	if life == null or not Calendar.validate_clock(clock):
-		return {"ok": false, "done": false, "error": "invalid_clock"}
+		return _reject_clock("invalid_clock")
 	var offset := (int(clock.jdn) - int(life.state.origin_jdn)) * Calendar.DAY_SECONDS + int(clock.second)
 	if offset < int(life.state.now):
-		return {"ok": false, "done": false, "error": "clock_reversed"}
+		return _reject_clock("clock_reversed")
 	if Calendar.year_of(int(clock.jdn)) != life.year:
-		return {"ok": false, "done": false, "error": "era_rebuild_required"}
+		return _reject_clock("era_rebuild_required")
 	last_sync = life.advance_to(offset, clampi(budget_usec, 1, MAX_FRAME_BUDGET_USEC))
 	last_sync["ok"] = true
 	return last_sync.duplicate(true)

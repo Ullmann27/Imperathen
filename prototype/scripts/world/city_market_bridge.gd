@@ -152,6 +152,11 @@ func execute(command: String, args: Dictionary) -> Dictionary:
 		return {"ok": false, "message": "Kein aktiver Handelsdialog."}
 	if args.has("shop_id") and str(args.shop_id) != str(panel.shop_id):
 		return {"ok": false, "message": "Der Auftrag gehört zu einem anderen Marktstand."}
+	if _living_city != null and persist:
+		var notice := "Stadtwirtschaft: Gemeinsamer Speichervertrag fehlt; persistenter Handel ist gesperrt."
+		panel.notify(notice)
+		message.emit(notice)
+		return {"ok": false, "message": notice}
 	var coupled := _living_city != null and command in ["city_buy", "city_sell"]
 	var buying := command == "city_buy"
 	var amount := 0
