@@ -12,8 +12,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_man_0.glb",
           "triangles": 19719,
-          "bytes": 5022308,
-          "sha256": "39dab2c24d5f6f6d08e3cf6875881cdd9b5c588bb335b8fcf64e56dc2cbf8112",
+          "bytes": 5050156,
+          "sha256": "0a6fc92ebf07e410c3fcd0de0f9ef3f2a1224ae7ca500d24330560425002d328",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -68,7 +68,13 @@
             "max_sole_penetration_m": 0.0
           },
           "tunic_seam": {
-            "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
+            "tearing_before": 32,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0394,
+            "body_through_tunic_m": 0.039,
+            "smoothed_welded_vertices": 22,
+            "rings": 1,
+            "passes": 1
           }
         },
         {
@@ -264,8 +270,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_woman_0.glb",
           "triangles": 20395,
-          "bytes": 5314336,
-          "sha256": "c8d8213404573e451c51f9fb697d2250fac6e57d32f85cd2a8aa85bfe4f2f2d6",
+          "bytes": 5342164,
+          "sha256": "e682c57438d68580a05027ca8b05e10adf9910fd5a8fa2fc5aea250fdce55ac7",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -318,7 +324,13 @@
             "max_sole_penetration_m": 0.0
           },
           "tunic_seam": {
-            "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
+            "tearing_before": 33,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0337,
+            "body_through_tunic_m": 0.0335,
+            "smoothed_welded_vertices": 23,
+            "rings": 1,
+            "passes": 1
           }
         },
         {
@@ -513,8 +525,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_elder_0.glb",
           "triangles": 19817,
-          "bytes": 4467456,
-          "sha256": "63843f9bc9e8181e15c672ad54e048e52dfe17013b0f19c56b2b76620a0ee325",
+          "bytes": 4495308,
+          "sha256": "03659c484a84c70b595e4803b9308b809f8e8f2b0506e93211f8429dca961c3e",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -569,15 +581,21 @@
             "max_sole_penetration_m": 0.0
           },
           "tunic_seam": {
-            "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
+            "tearing_before": 32,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0394,
+            "body_through_tunic_m": 0.039,
+            "smoothed_welded_vertices": 22,
+            "rings": 1,
+            "passes": 1
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_elder_1.glb",
           "triangles": 7666,
-          "bytes": 2406924,
-          "sha256": "71dd20f8bf24d03c76208e152f096cffd4345bdc3928afe7360a3f8e48af7146",
+          "bytes": 2418428,
+          "sha256": "a913ee9fb3dc5d87e6dc514fb1eff9f4fb447fddf2b29d506bf6a27b355730d5",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -629,7 +647,13 @@
             "max_sole_penetration_m": 0.0
           },
           "tunic_seam": {
-            "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
+            "tearing_before": 25,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0133,
+            "body_through_tunic_m": 0.0133,
+            "smoothed_welded_vertices": 7,
+            "rings": 0,
+            "passes": 1
           }
         },
         {

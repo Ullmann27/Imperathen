@@ -52,6 +52,9 @@ MARKER = "imperathen_skirt_seam_smoothing"
 SKIRT = "HeroTunicSkirt"
 TUNIC = "HeroTunic"
 MARKERS = {SKIRT: MARKER, TUNIC: "imperathen_tunic_seam_smoothing"}
+# The tunic falls back to gentler blends (rings, passes) when the default one
+# would expose the body; the first setting meeting both criteria is written.
+TUNIC_FALLBACKS = ((1, 2), (1, 1), (0, 2), (0, 1))
 BODY = "HeroBody"
 # Gate tearing criterion (motion_skin_measurement.gd).
 TEAR_FACTOR = 7.
@@ -219,11 +222,18 @@ def smooth(path: Path, output: Path | None = None, cloth: str = SKIRT, strict: b
     if not before["torn_vertices"]:
         report["unchanged"] = "skirt does not tear" if cloth == SKIRT else "tunic does not tear"
         return report
-    joint_index, weight, region = _smoothed(skirt, rest, triangles, before["torn_vertices"])
-    after = measure((joint_index, weight))
+    rejected = lambda result: (result["tearing"] or
+                               result["body_through_skirt_m"] > before["body_through_skirt_m"] + CLEARANCE_TOLERANCE_M)
+    settings = ((RINGS, PASSES),) + (TUNIC_FALLBACKS if cloth == TUNIC else ())
+    for rings, passes in settings:
+        joint_index, weight, region = _smoothed(skirt, rest, triangles, before["torn_vertices"], rings, passes)
+        after = measure((joint_index, weight))
+        if not rejected(after):
+            break
     report.update(after={key: after[key] for key in ("tearing", "body_through_skirt_m")},
-                  smoothed_welded_vertices=region, torn_vertices_before=len(before["torn_vertices"]))
-    if after["tearing"] or after["body_through_skirt_m"] > before["body_through_skirt_m"] + CLEARANCE_TOLERANCE_M:
+                  smoothed_welded_vertices=region, torn_vertices_before=len(before["torn_vertices"]),
+                  rings=rings, passes=passes)
+    if rejected(after):
         if not strict:
             report["unchanged"] = "rejected: smoothing would tear or let the body further through the cloth"
             return report
@@ -233,7 +243,7 @@ def smooth(path: Path, output: Path | None = None, cloth: str = SKIRT, strict: b
         primitive["attributes"]["JOINTS_0"] = _append_joints(glb, joint_index)
         primitive["attributes"]["WEIGHTS_0"] = glb.append_accessor(weight.astype(np.float32), "VEC4")
         mesh.setdefault("extras", {})[marker] = {
-            "tool": "tools/characters/smooth_frontier_skirt_seam.py", "passes": PASSES, "rings": RINGS,
+            "tool": "tools/characters/smooth_frontier_skirt_seam.py", "passes": passes, "rings": rings,
             "blend": BLEND, "tearing_before": before["tearing"], "tearing_after": after["tearing"]}
         target = output or path
         glb.write(target)
