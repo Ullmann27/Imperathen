@@ -1,0 +1,15 @@
+{
+  "source": "tools/world/build_roman_quarter_paving.py",
+  "seed": 581126,
+  "length_m": 26.0,
+  "width_m": 9.0,
+  "triangles_by_mesh": {
+    "Fugenbett": 320,
+    "Basaltpflaster": 20400,
+    "Bordsteine": 3080,
+    "Gehwegplatten": 4620,
+    "Kiesel_am_Rinnstein": 10025,
+    "Trittsteine": 200
+  },
+  "sha256_glb": "e34a7ff6095a2fff7725cf58174642e8241182a1e07dd97ec4055655cbf4022d"
+}
