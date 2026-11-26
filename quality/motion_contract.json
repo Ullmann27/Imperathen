@@ -61,6 +61,38 @@
       "open_requirements": []
     },
     {
+      "id": "civil_youth",
+      "profile": "human",
+      "status": "active",
+      "resources": [
+        "assets/characters/hero_meshy_italia_civil_0.glb",
+        "assets/characters/hero_meshy_italia_civil_1.glb",
+        "assets/characters/hero_meshy_italia_civil_2.glb",
+        "assets/characters/hero_meshy_italia_civil_3.glb"
+      ],
+      "required_checks": [
+        "youth_mocap",
+        "village_people",
+        "locomotion_regression",
+        "action_world",
+        "motion_skin_measurement",
+        "youth_outfit",
+        "youth_outfit_skin",
+        "campaign_market_visit"
+      ],
+      "review_scope": [
+        "idle_talk",
+        "walk_run_stop",
+        "attack_guard_reaction",
+        "work_interact",
+        "lod_transition",
+        "contact_and_weight"
+      ],
+      "open_requirements": [
+        "Dark surface discontinuities at the right elbow and wrist, visible in the independent Godot close-up, remain open."
+      ]
+    },
+    {
       "id": "frontier_people",
       "profile": "human",
       "status": "active",
