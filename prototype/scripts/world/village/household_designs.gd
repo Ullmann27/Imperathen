@@ -335,9 +335,9 @@ static func items(id: String) -> Array:
 				_floor("anvil_block", -.55, -.92, 180.0, "anvil"), _floor("tool_rack_smith", 1.08, -1.17, -90.0),
 				_floor("quench_trough", -.30, 2.45), _floor("workbench", 1.0, 1.60, -90.0, "bench"),
 				_on("smith_wares", "bench", -.30, .02), _on("oil_lamp", "bench", .17, -.14, 0, 140.0),
-				_on("smith_tools", "bench", .46, .0, 0, 100.0), _floor("chest_wood", .50, 2.93, 180.0, "stock"),
-				_on("smith_wares_b", "stock", 0, .0), _floor("iron_bars", .45, 2.36, 90.0), _floor("iron_blooms", .92, -3.08),
-				_floor("basket_charcoal", .36, -3.07), _floor("basket_charcoal", -.55, -2.95), _floor("bucket", .35, -.80)]
+				_on("smith_tools", "bench", .46, .0, 0, 100.0), _floor("chest_wood", .62, 2.93, 180.0, "stock"),
+				_on("smith_wares_b", "stock", 0, .0), _floor("iron_bars", .40, 2.25), _floor("iron_blooms", .84, -3.10),
+				_floor("basket_charcoal", .24, -3.07), _floor("basket_charcoal", -.55, -2.95), _floor("bucket", .35, -.80)]
 		"ValdoraMarket":
 			# Two trestle stalls face the street (+z); sellers stand behind.
 			list = [_floor("stall_trestle_b", -1.25, -1.0, 0.0, "food"), _on("bread_loaves", "food", -.55, .05),
@@ -346,8 +346,8 @@ static func items(id: String) -> Array:
 				_on("cloth_bolts", "wares", .52, .02), _floor("crate_greens", -2.15, .12, 8.0), _floor("basket_apples", -1.45, .0),
 				_floor("basket_onions", -.75, -.03), _floor("sack_grain", -2.0, -2.0), _floor("sack_grain", -1.58, -2.14),
 				_floor("stool_three", -.30, -2.2), _floor("jar_olla", .62, -.08), _floor("jar_coarse", 1.08, -.05),
-				_floor("amphora_stand", 1.95, .0), _floor("chest_small", 1.9, -2.1, 180.0, "box"), _on("cloth_bolts_b", "box", 0, 0),
-				_floor("stool_log", .9, -2.1)]
+				_floor("amphora_stand", 1.95, .0), _floor("chest_small", 2.1, -2.15, 180.0, "box"), _on("cloth_bolts_b", "box", 0, 0),
+				_floor("stool_log", .35, -2.25)]
 		"carpenter_home":
 			list = _core("bed_ochre")
 			list += [_wall("workbench_low", "W", .05, "work"), _on("carpentry_tools", "work", .0, .02),
