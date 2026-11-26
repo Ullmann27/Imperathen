@@ -33,7 +33,7 @@ func _run() -> void:
 	var imported := PHYSICS.instantiate() as Node3D
 	parcel.add_child(imported)
 	var hulls := imported.find_children("*", "MeshInstance3D", true, false)
-	_check(hulls.size() == 43, "separate street and building collision hulls")
+	_check(hulls.size() == 44, "separate street and building collision hulls")
 	for source: MeshInstance3D in hulls:
 		var body := StaticBody3D.new()
 		var shape := CollisionShape3D.new()
@@ -56,7 +56,7 @@ func _run() -> void:
 	_check(not _blocked(walker,28,-12.78,Vector3(0,0,-11.60)),"through the existing street join toward the north")
 	_check(not _blocked(walker,28,-17,Vector3(-11.5,0,0)),"unblocked west arm")
 	_check(not _blocked(walker,28,-17,Vector3(11.5,0,0)),"unblocked east arm")
-	for p: Vector2 in [Vector2(16.5,-17),Vector2(39.5,-17),Vector2(28,-14),Vector2(28,-23.7)]:
+	for p: Vector2 in [Vector2(16.5,-17),Vector2(39.5,-17),Vector2(28,-14),Vector2(28,-23.7),Vector2(28,-25.76)]:
 		_check(_blocked(walker,p.x,p.y,Vector3(0,-.24,0)),"road floor at " + str(p))
 	for point: Vector2 in [Vector2(-3.98,-5.31),Vector2(3.98,-5.20),Vector2(-3.98,5.12),Vector2(3.98,5.29)]:
 		var side := signf(point.x)

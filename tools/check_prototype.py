@@ -5,6 +5,9 @@ script errors, and success markers; Godot can log script errors with a zero exit
 Usage: python tools/check_prototype.py --godot godot --report docs/10_development/evidence
 """
 
+from concurrent.futures import ThreadPoolExecutor
+from itertools import groupby
+
 import argparse
 import hashlib
 import json
@@ -57,7 +60,11 @@ def main():
     parser.add_argument("--keep-going", action="store_true", help="Collect every check result; any failed check still fails the run.")
     parser.add_argument("--only", nargs="+", help="Run only these named check groups; omitted means the complete suite.")
     parser.add_argument("--report", type=Path, default=ROOT / "docs/10_development/evidence")
+    parser.add_argument("--jobs", type=int, default=1,
+                        help="Parallel independent engine groups in keep-going mode (default: 1).")
     args = parser.parse_args()
+    if args.jobs < 1 or args.jobs > 1 and not args.keep_going:
+        parser.error("--jobs must be positive; parallel checks require --keep-going")
     engine = shutil.which(args.godot)
     if engine is None:
         raise SystemExit(f"Godot not found: {args.godot}")
@@ -91,6 +98,9 @@ def main():
             ("political_persons", ["--script", "res://tests/political_persons_test.gd"], "POLITICAL_PERSONS_PASS"),
             ("political_reference_playthrough", ["--fixed-fps", "60", "--script", "res://tests/political_reference_playthrough.gd"], "POLITICAL_REFERENCE_PLAYTHROUGH"),
             ("city_market_bridge", ["--fixed-fps", "60", "--script", "res://tests/city_market_bridge_test.gd"], "CITY_MARKET_BRIDGE_PASS"),
+            ("city_campaign_trade", ["--script", "res://tests/city_campaign_trade_test.gd"], "CITY_CAMPAIGN_TRADE_PASS"),
+            ("campaign_market_visit", ["--fixed-fps", "60", "--script", "res://tests/campaign_market_visit_test.gd"], "CAMPAIGN_MARKET_VISIT_PASS"),
+            ("quarter_street_walk", ["--fixed-fps", "60", "--script", "res://tests/quarter_street_walk_test.gd"], "QUARTER_STREET_WALK_PASS"),
             ("city_life", ["--script", "res://tests/city_life_test.gd"], "CITY_LIFE_PASS"),
             ("city_inventory_ui", ["--fixed-fps", "60", "--script", "res://tests/city_inventory_ui_test.gd"], "CITY_INVENTORY_UI_PASS"),
             ("city_character_detail", ["--fixed-fps", "60", "--script", "res://tests/city_character_detail_test.gd"], "0 failures"),
@@ -211,26 +221,42 @@ def main():
             if unknown:
                 parser.error("Unknown check groups: " + ", ".join(sorted(unknown)))
             checks = [entry for entry in checks if entry[0] in args.only]
-        for name, arguments, marker in checks:
+        def execute(check):
+            nonlocal checked_fingerprint, measured_fingerprint
+            name, arguments, marker = check
+            isolated = environment.copy()
             # Each executable scenario starts with its own account state. A
             # completed opening test must not become another test's Continue.
             for variable in ("XDG_DATA_HOME", "XDG_CONFIG_HOME", "XDG_CACHE_HOME"):
                 location = Path(temporary) / name / variable.lower()
                 location.mkdir(parents=True)
-                environment[variable] = str(location)
+                isolated[variable] = str(location)
             if name == "motion_measurement":
                 measured_fingerprint = motion_fingerprint(ROOT)
-                environment["IMPERATHEN_MOTION_CONTRACT"] = str(ROOT / "quality/motion_contract.json")
-                environment["IMPERATHEN_MOTION_REPORT"] = str(report / "motion-measurements.json")
-                environment["IMPERATHEN_MOTION_SOURCE"] = measured_fingerprint
-            record = run_check(engine, name, arguments, marker, environment, report)
-            records.append(record)
+                isolated["IMPERATHEN_MOTION_CONTRACT"] = str(ROOT / "quality/motion_contract.json")
+                isolated["IMPERATHEN_MOTION_REPORT"] = str(report / "motion-measurements.json")
+                isolated["IMPERATHEN_MOTION_SOURCE"] = measured_fingerprint
+            record = run_check(engine, name, arguments, marker, isolated, report)
             if name == "import":
                 # Import may create deterministic metadata on a fresh checkout.
                 # Every actual regression afterwards must inspect these same bytes.
                 checked_fingerprint = motion_fingerprint(ROOT)
-            if not record["passed"] and not args.keep_going:
-                break
+            return record
+
+        if args.jobs == 1:
+            for check in checks:
+                record = execute(check)
+                records.append(record)
+                if not record["passed"] and not args.keep_going:
+                    break
+        else:
+            # Import and motion fingerprint the entire project. The landscape
+            # probe also has a wall-clock deadline measured on an idle host.
+            exclusive = {"import", "landscape", "motion_measurement"}
+            with ThreadPoolExecutor(max_workers=args.jobs) as pool:
+                for solo, batch in groupby(checks, key=lambda check: check[0] in exclusive):
+                    results = map(execute, batch) if solo else pool.map(execute, batch)
+                    records.extend(results)
     source_hashes = {}
     for path in sorted(PROJECT.rglob("*")):
         if path.is_file() and ".godot" not in path.parts and path.suffix in {".gd", ".gdshader", ".gdshaderinc", ".tscn", ".godot", ".glb", ".res", ".wav", ".ogg", ".svg", ".ttf", ".json", ".webp", ".jpg", ".png", ".import"}:
@@ -252,7 +278,7 @@ def main():
         baseline = checked_fingerprint if "import" in [entry["check"] for entry in records] else start_fingerprint
         source_unchanged = (baseline == final_fingerprint
                             and checked_commit == source_commit(ROOT))
-    result = {"engine": version,
+    result = {"engine": version, "parallel_jobs": args.jobs,
               "passed": len(records) == len(checks) and all(item["passed"] for item in records) and source_unchanged,
               "motion_quality_measurement": "required_same_source" if selected_motion else "not_run_selected_subset",
               "motion_source_fingerprint": final_fingerprint, "source_commit": checked_commit,

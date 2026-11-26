@@ -31,6 +31,7 @@ var inventory_open := false
 var embedded_city := false
 var shop_sites: Dictionary = {}
 var _state: Dictionary = {}
+var quote_item: Callable
 var _overlay: ColorRect
 var _root: Control
 var modal_kicker: Label
@@ -259,7 +260,7 @@ func _clear_contents() -> void:
 
 func _refresh_contents() -> void:
 	_clear_contents()
-	var view: Dictionary = Trade.view(_state, shop_id, shop_sites)
+	var view: Dictionary = Trade.view(_state, shop_id, shop_sites, quote_item)
 	if _state.has("resources") and is_instance_valid(modal_purse):
 		modal_purse.text = "Börse · %d Denare" % int(_state.resources.denarii)
 	if inventory_open:

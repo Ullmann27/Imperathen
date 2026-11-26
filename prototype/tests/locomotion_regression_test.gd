@@ -4,6 +4,8 @@ extends SceneTree
 
 const Entry := preload("res://main.tscn")
 const Childhood := preload("res://scripts/story/village_childhood.gd")
+const I03 := preload("res://scripts/story/i03_shortcut.gd")
+const I03Support := preload("res://tests/i03_support.gd")
 const Life := preload("res://scripts/story/village_life.gd")
 var game
 var checks := 0
@@ -157,8 +159,14 @@ func _reach_first_work() -> bool:
 		if view.is_empty():
 			return false
 		if str(view.get("stage", "")).begins_with("i03_"):
-			# I-03 errand: real commands with Marcus placed where he stands.
-			if not bool(preload("res://tests/i03_support.gd").play_stage(game.model).get("ok", false)):
+			# This is a live world. Its observation of the physical body
+			# overrides a model-only placement when the command executes.
+			var point: Vector2 = I03.POINTS.lane if view.stage == "i03_marcus" else I03.marcus_stall(Childhood.i03_ctx(game.model.data))
+			var body: Node3D = game.world._companion
+			body.position = Vector3(point.x, body.position.y, point.y)
+			var errand := I03Support.play_stage(game.model)
+			if not errand.ok:
+				printerr("Work fixture stalled at %s: %s" % [view.stage, errand.message])
 				return false
 			continue
 		var at: Vector2 = view.point

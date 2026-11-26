@@ -1,0 +1,236 @@
+{
+	"format": "imperathen-activity-anchors",
+	"schema": 1,
+	"area": "roman_quarter",
+	"source": "tools/world/bake_city_layout.gd from roman_city_manifest.json (city seed 20261125)",
+	"anchors": [
+		{
+			"id": "quarter.south",
+			"kind": "entrance",
+			"position": [
+				28.0,
+				0.09,
+				14.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 1,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -58,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "quarter.smith",
+			"kind": "entrance",
+			"position": [
+				34.5,
+				0.28,
+				-2.4
+			],
+			"facing_deg": -90.0,
+			"capacity": 1,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -58,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:WorkshopAndTavern",
+				"shelter"
+			]
+		},
+		{
+			"id": "quarter.taberna",
+			"kind": "gossip_spot",
+			"position": [
+				34.5,
+				0.28,
+				2.4
+			],
+			"facing_deg": -90.0,
+			"capacity": 1,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -58,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:WorkshopAndTavern",
+				"shelter"
+			]
+		},
+		{
+			"id": "quarter.domus",
+			"kind": "entrance",
+			"position": [
+				22.5,
+				0.28,
+				0.8
+			],
+			"facing_deg": 90.0,
+			"capacity": 1,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -58,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:StreetDomus",
+				"shelter"
+			]
+		},
+		{
+			"id": "quarter.crossing",
+			"kind": "gossip_spot",
+			"position": [
+				28.0,
+				0.2,
+				-17.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 1,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -58,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "quarter.west",
+			"kind": "entrance",
+			"position": [
+				16.0,
+				0.2,
+				-17.0
+			],
+			"facing_deg": -90.0,
+			"capacity": 1,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -58,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "quarter.east",
+			"kind": "entrance",
+			"position": [
+				40.0,
+				0.2,
+				-17.0
+			],
+			"facing_deg": 90.0,
+			"capacity": 1,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -58,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:forum"
+			]
+		},
+		{
+			"id": "quarter.stable",
+			"kind": "entrance",
+			"position": [
+				35.14,
+				0.13,
+				-27.84
+			],
+			"facing_deg": -90.0,
+			"capacity": 1,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -58,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:StableYard",
+				"shop:equarius"
+			]
+		}
+	]
+}

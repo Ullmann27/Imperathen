@@ -531,7 +531,9 @@ static func percentile(values: Array, fraction: float) -> float:
 static func engine_state(viewport: Viewport, scene: Node) -> Dictionary:
 	var camera := viewport.get_camera_3d()
 	var environment: Environment = RenderProfile.active_environment(viewport)
-	var lights := {"directional": 0, "omni": 0, "spot": 0, "visible": 0, "shadowed": 0}
+	var torches := scene.get_node_or_null(TORCH_NODE)
+	var lights := {"directional": 0, "omni": 0, "spot": 0, "visible": 0, "shadowed": 0,
+		"harness_omni": 0, "harness_shadowed": 0, "scene_omni_paths": []}
 	var sun := {}
 	for light: Light3D in scene.find_children("*", "Light3D", true, false):
 		if not light.is_visible_in_tree():
@@ -548,6 +550,11 @@ static func engine_state(viewport: Viewport, scene: Node) -> Dictionary:
 					"blend_splits": light.directional_shadow_blend_splits}
 		elif light is OmniLight3D:
 			lights.omni += 1
+			if torches != null and torches.is_ancestor_of(light):
+				lights.harness_omni += 1
+				lights.harness_shadowed += 1 if light.shadow_enabled else 0
+			else:
+				lights.scene_omni_paths.append(str(scene.get_path_to(light)))
 		elif light is SpotLight3D:
 			lights.spot += 1
 	var env := {}

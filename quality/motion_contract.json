@@ -522,7 +522,9 @@
         "action_world",
         "companion_navigation",
         "companion_follow",
-        "camera_collision"
+        "camera_collision",
+        "quarter_street_walk",
+        "campaign_market_visit"
       ],
       "review_scope": [
         "world_displacement",
@@ -532,7 +534,8 @@
         "contact_and_weight"
       ],
       "open_requirements": [
-        "City walking and occupants (city_support_district.gd, city_exploration.gd, city_ambient_people.gd, city_exploration_crowd.gd) drive VillagePerson/CharacterBody3D or imported clips outside the village, but no world-motion fixture measures their contact, collision or transitions yet."
+        "City walking and occupants (city_support_district.gd, city_exploration.gd, city_ambient_people.gd, city_exploration_crowd.gd) drive VillagePerson/CharacterBody3D or imported clips outside the village, but no world-motion fixture measures their contact, collision or transitions yet.",
+        "CityResidentView streams saved adults using real collision and locomotion. The market visit verifies their identities and count. Individual resident foot trajectories, turns, contacts and animation transitions still require measured and reviewed sequences."
       ]
     },
     {
@@ -621,6 +624,7 @@
         "assets/architecture/atrium_house.glb",
         "assets/architecture/frontier_house.glb",
         "assets/architecture/village_well.glb",
+        "assets/city/bakery/market_bakery.glb",
         "assets/city_detail/architecture/city_architecture_library.glb",
         "assets/frontier_hut.glb",
         "assets/landscape/han_house.glb",
@@ -636,6 +640,7 @@
         "assets/landscape/wa_house.glb",
         "assets/landscape/wa_store.glb",
         "assets/landscape/wood_longhouse.glb",
+        "assets/roman_quarter/paving/paving.glb",
         "assets/village/market.glb",
         "assets/village/palisade_bay.glb",
         "assets/village/palisade_silhouette.glb",
@@ -913,7 +918,10 @@
     "shaders/viva_country/soil.gdshader",
     "shaders/viva_roma_ground.gdshader",
     "shaders/world_expansion/ground_detail.gdshader",
-    "shaders/world_expansion/vegetation_wind.gdshader"
+    "shaders/world_expansion/vegetation_wind.gdshader",
+    "scripts/domain/city_checkpoint.gd",
+    "scripts/world/city_bakery_display.gd",
+    "scripts/world/city_resident_view.gd"
   ],
   "procedural_owners": {
     "scripts/world/village_life_world.gd": [
@@ -998,6 +1006,9 @@
     "scripts/visuals/youth_sole_contact.gd": [
       "hero",
       "original_youth"
+    ],
+    "scripts/world/city_resident_view.gd": [
+      "village_navigation"
     ]
   }
 }

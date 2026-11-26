@@ -127,13 +127,19 @@ func _complete(model, trade_choice := "market_fair") -> bool:
 
 
 func _until(model, stage: String, trade_choice := "market_fair") -> bool:
-	for _index in Childhood.STEPS.size() + 16:
-		if _current(model) == stage:
-			return true
+	# The authored morning, errand and workshop add real intermediate
+	# stages outside STEPS. Reject a cycle in the actual chapter state.
+	var seen := {}
+	while _current(model) != stage:
+		var child: Dictionary = model.data.village.childhood
+		var progress := JSON.stringify([child.completed, child.screenplay], "", true)
+		if seen.has(progress):
+			_check(false, "Childhood route stopped at %s before %s" % [_current(model), stage])
+			return false
+		seen[progress] = true
 		if not _complete(model, trade_choice):
 			return false
-	_check(false, "Requested stage is reachable: " + stage)
-	return false
+	return true
 
 
 func _test_fresh_opt_in_and_legacy() -> void:

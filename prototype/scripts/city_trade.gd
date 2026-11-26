@@ -82,7 +82,7 @@ static func validate_arguments(command: String, args: Dictionary) -> String:
 
 
 ## Called only on WorldModel's private candidate, after complete state validation.
-static func apply(data: Dictionary, command: String, args: Dictionary, sites: Dictionary = {}) -> Dictionary:
+static func apply(data: Dictionary, command: String, args: Dictionary, sites: Dictionary = {}, quote: Dictionary = {}) -> Dictionary:
 	var error := validate_arguments(command,args)
 	if not error.is_empty():
 		return _result(false,error)
@@ -116,7 +116,9 @@ static func apply(data: Dictionary, command: String, args: Dictionary, sites: Di
 				error = _purchase_access_reason(data, item)
 				if not error.is_empty():
 					return _result(false, error)
-			if buying and _stock(data,shop_id,item_id) < quantity:
+			if not str(quote.get("reason", "")).is_empty():
+				return _result(false, str(quote.reason))
+			if buying and int(quote.get("stock", _stock(data,shop_id,item_id))) < quantity:
 				return _result(false,"Diese Menge ist hier nicht vorrätig.")
 			if not buying and int(trade.inventory[item_id]) < quantity:
 				return _result(false,"Diese Menge trägst du nicht bei dir.")
@@ -126,7 +128,7 @@ static func apply(data: Dictionary, command: String, args: Dictionary, sites: Di
 				return _result(false,"Diese geöffnete Verbrauchsware wird nicht zurückgekauft.")
 			var total := quantity * int(item.price if buying else item.sell_price)
 			var delta := -total if buying else total
-			error = _money_reason(data,delta)
+			error = _money_reason(data,delta,quote)
 			if not error.is_empty():
 				return _result(false,error)
 			if buying and int(trade.inventory[item_id]) > MAX_COUNT-quantity:
@@ -134,7 +136,7 @@ static func apply(data: Dictionary, command: String, args: Dictionary, sites: Di
 			var counters: Dictionary = trade.purchases if buying else trade.sales
 			if int(counters[shop_id][item_id]) > MAX_COUNT-quantity:
 				return _result(false,"Das Warenbuch ist für diese Ware voll.")
-			_transfer_money(data,delta)
+			_transfer_money(data,delta,quote.is_empty())
 			trade.inventory[item_id] = int(trade.inventory[item_id]) + (quantity if buying else -quantity)
 			counters[shop_id][item_id] = int(counters[shop_id][item_id]) + quantity
 			return _result(true,"%d × %s %s: %d Denare." % [quantity,item.name,"gekauft" if buying else "verkauft",total])
@@ -218,7 +220,7 @@ static func apply(data: Dictionary, command: String, args: Dictionary, sites: Di
 	return _result(false,"Unbekannter Handelsauftrag.")
 
 
-static func view(data: Dictionary, shop_id := "", sites: Dictionary = {}) -> Dictionary:
+static func view(data: Dictionary, shop_id := "", sites: Dictionary = {}, quote_item: Callable = Callable()) -> Dictionary:
 	var result := {"enabled":enabled(data),"money":int(data.get("resources",{}).get("denarii",0)),
 		"shops":shop_catalog(sites.has(Catalog.STABLE_ID)),"offers":[],"inventory":[],"skills":skills(data),
 		"equipment_bonuses":equipment_bonuses(data),"service":{},"rewards":[],"selected_horse":{}}
@@ -251,12 +253,13 @@ static func view(data: Dictionary, shop_id := "", sites: Dictionary = {}) -> Dic
 			reason = _ready_reason(data)
 		for id: String in Catalog.SHOPS[shop_id].items:
 			var item: Dictionary = Catalog.ITEMS[id]
-			var stock := _stock(data,shop_id,id)
-			var payment_reason := _money_reason(data, -int(item.price))
+			var quote: Dictionary = quote_item.call(shop_id, id) if quote_item.is_valid() else {}
+			var stock := int(quote.get("stock", _stock(data,shop_id,id)))
+			var payment_reason := _money_reason(data, -int(item.price), quote)
 			var access_reason := _purchase_access_reason(data, item)
 			var can_sell: bool = int(trade.inventory[id])>0 and int(item.sell_price)>0 and not trade.equipment.values().has(id)
-			can_sell = can_sell and _money_reason(data,int(item.sell_price)).is_empty()
-			var offer_reason := reason
+			can_sell = can_sell and _money_reason(data,int(item.sell_price),quote).is_empty() and str(quote.get("reason", "")).is_empty()
+			var offer_reason := reason if not reason.is_empty() else str(quote.get("reason", ""))
 			if offer_reason.is_empty():
 				offer_reason = access_reason if not access_reason.is_empty() else payment_reason
 			var offer := {"item_id":id,"name":item.name,"price":item.price,"sell_price":item.sell_price,
@@ -386,7 +389,10 @@ static func validate(data: Dictionary) -> String:
 				return "Käufe und Verkäufe müssen begrenzte ganze Mengen sein."
 			var stock := _stock(data, shop_id, id)
 			var max_stock := 1 if id in Catalog.HORSE_IDS else MAX_COUNT
-			if stock < 0 or stock > max_stock:
+			# For a city-supplied item purchases/sales are receipts, not a
+			# finite reservation on the legacy shop's founding stock.
+			var city_supplied: bool = data.world_state.get("city", {}).has("version") and simulated_good(id)
+			if not city_supplied and (stock < 0 or stock > max_stock):
 				return "Die Verkaufsstelle hat mehr Ware ausgegeben, als sie besitzt."
 			if id in Catalog.STABLE_ITEMS and int(trade.purchases[shop_id][id]) > 0:
 				var access_error := _stable_progress_reason(data, Catalog.ITEMS[id])
@@ -472,7 +478,7 @@ static func restore_integer_fields(data: Dictionary) -> void:
 				shop[key]=int(shop[key])
 
 
-static func money_effect(data: Dictionary) -> int:
+static func money_effect(data: Dictionary, city_goods_only := false) -> int:
 	# A derived contribution to WorldModel's existing resource ledger. Keeping
 	# receipts and the money proof separate detects unpaid inventory changes;
 	# the only spendable player balance remains resources.denarii.
@@ -482,10 +488,13 @@ static func money_effect(data: Dictionary) -> int:
 	var total:=0
 	for shop_id: String in Catalog.SHOPS:
 		for id: String in Catalog.SHOPS[shop_id].items:
+			if city_goods_only and not simulated_good(id):
+				continue
 			total -= int(trade.purchases[shop_id][id])*int(Catalog.ITEMS[id].price)
 			total += int(trade.sales[shop_id][id])*int(Catalog.ITEMS[id].sell_price)
-	for id: String in trade.claimed_rewards:
-		total += int(Catalog.REWARDS[id].money)
+	if not city_goods_only:
+		for id: String in trade.claimed_rewards:
+			total += int(Catalog.REWARDS[id].money)
 	return total
 
 
@@ -611,21 +620,32 @@ static func _stock(data: Dictionary, shop_id: String, item_id: String) -> int:
 	return int(Catalog.ITEMS[item_id].stock)-int(trade.purchases[shop_id][item_id])+int(trade.sales[shop_id][item_id])
 
 
-static func _money_reason(data: Dictionary, delta: int) -> String:
+static var _simulated_goods: Dictionary = {}
+
+static func simulated_good(item_id: String) -> bool:
+	if _simulated_goods.is_empty():
+		var catalogue: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/city/economy/city_economy.json"))
+		for good: Dictionary in catalogue.goods.values():
+			if good.has("shop_item"):
+				_simulated_goods[str(good.shop_item)] = true
+	return _simulated_goods.has(item_id)
+
+static func _money_reason(data: Dictionary, delta: int, quote: Dictionary = {}) -> String:
 	var money:=int(data.resources.denarii)
-	var treasury:=int(data.village.economy.stocks.merchant_denarii)
+	var treasury:=int(quote.get("funds", data.village.economy.stocks.merchant_denarii))
 	if money+delta<0:
 		return "Dafür reichen deine Denare nicht."
 	if treasury-delta<0:
 		return "Die gemeinsame Händlerkasse kann diesen Betrag gerade nicht auszahlen."
-	if money+delta>MAX_COUNT or treasury-delta>MAX_COUNT:
+	if money+delta>MAX_COUNT or (quote.is_empty() and treasury-delta>MAX_COUNT):
 		return "Diese Zahlung würde den zulässigen Geldbestand überschreiten."
 	return ""
 
 
-static func _transfer_money(data: Dictionary, delta: int) -> void:
+static func _transfer_money(data: Dictionary, delta: int, village_counterparty := true) -> void:
 	data.resources.denarii=int(data.resources.denarii)+delta
-	data.village.economy.stocks.merchant_denarii=int(data.village.economy.stocks.merchant_denarii)-delta
+	if village_counterparty:
+		data.village.economy.stocks.merchant_denarii=int(data.village.economy.stocks.merchant_denarii)-delta
 
 
 static func _keys(value: Variant, expected: Array) -> bool:
