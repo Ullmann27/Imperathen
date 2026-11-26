@@ -121,12 +121,15 @@ jobs:
           chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
           echo "TEMPLATE_DIR=$RUNNER_TEMP/templates/4.7.2.stable" >> "$GITHUB_ENV"
+      - name: Complete native vegetation meshes and distance impostors
+        shell: bash
+        run: bash tools/integration/prepare_vegetation_assets.sh
       - name: Reject broken app functionality but keep separate release-motion finding
         shell: bash
         run: |
           set -euo pipefail
           python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going \
-            --only import roman_menu city_trade city_market_bridge city_inventory_ui \
+            --only import vegetation valdora_house_family roman_menu city_trade city_market_bridge city_inventory_ui \
               city_support city_viva_props city_exploration_detail npc_physical_conversation \
               touch_controls fold7_graphics_policy main_scene \
             --report artifacts/qa/engine

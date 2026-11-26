@@ -17,6 +17,8 @@ const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const GearMarket = preload("res://scripts/domain/gear_market.gd")
 const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
 const CameraObstruction = preload("res://scripts/world/camera_obstruction.gd")
+const Vegetation = preload("res://scripts/vegetation/vegetation_field.gd")
+const VegetationGround = preload("res://scripts/vegetation/vegetation_ground.gd")
 var village_life_world: Node3D
 var regional_terrain: Node3D
 var _political_survey_pending := false
@@ -42,6 +44,8 @@ var i01_props: Node3D
 var i03_props: Node3D
 var i04_props: Node3D
 var tree_sites := []
+var vegetation: Node3D
+var _vegetation_wind_time := -1.0
 var crops := Node3D.new()
 var season_index := -1
 const PLAYER_SPEED := 4.6
@@ -173,7 +177,8 @@ func setup(state: Dictionary) -> void:
 			for tree in placements:
 				if tree.kind == "olive":
 					tree.kind = "oak"
-		grove.populate(placements)
+		_set_vegetation_origin(id)
+		grove.populate([] if is_instance_valid(vegetation) else placements)
 	sync_state(state)
 	_story_companions.reset(state)
 	set_mode("person")
@@ -439,6 +444,8 @@ func set_quality(profile: String) -> void:
 	_update_people_profile()
 	grove.set_quality(profile)
 	scenery.set_quality(profile)
+	if is_instance_valid(vegetation):
+		vegetation.set_quality(profile)
 	regional.set_quality(profile)
 	population.set_quality(profile)
 	_apply_quality()
@@ -453,6 +460,9 @@ func _update_people_profile() -> void:
 
 func set_presentation_time(seconds: float) -> void:
 	scenery.set_presentation_time(seconds)
+	_vegetation_wind_time = seconds
+	if is_instance_valid(vegetation):
+		vegetation.set_wind_time(seconds)
 
 
 func get_quality_profile() -> String:
@@ -720,6 +730,28 @@ func _create_atmosphere() -> void:
 	look.name = "VillageLook"
 	add_child(look)
 	_sun = look.setup(self, _village_environment, scenery.sky_material)
+
+
+## Valdora uses the authored regional flora; non-Italian starts retain the
+## original grove. The existing village verges and plot crops remain visible.
+func _set_vegetation_origin(id: String) -> void:
+	if id != "italia":
+		if is_instance_valid(vegetation):
+			vegetation.get_parent().remove_child(vegetation)
+			vegetation.free()
+			vegetation = null
+		return
+	if not is_instance_valid(vegetation):
+		var surface := VegetationGround.new()
+		surface.add_mesh(scenery.get_node_or_null("Foothills") as MeshInstance3D)
+		vegetation = Vegetation.new()
+		vegetation.name = "Vegetation"
+		get_node("Landscape").add_child(vegetation)
+		vegetation.build(surface.height, tree_sites, scenery.brook_source_z)
+		vegetation.set_quality(_quality_profile)
+		vegetation.set_wind_time(_vegetation_wind_time)
+		if season_index >= 0:
+			vegetation.apply_season(season_index)
 
 
 func _create_terrain() -> void:
@@ -1197,6 +1229,8 @@ func _physics_process(delta: float) -> void:
 		regional_terrain.follow(get_player_position(), _quality_profile)
 		regional_terrain.waystation.update_nearby(get_player_position(),_state.village.economy.get("freight",{}),delta)
 	population.update_nearby(get_player_position(),_active and _mode == "person")
+	if is_instance_valid(vegetation):
+		vegetation.set_player_position(get_player_position())
 	if not _active:
 		return
 	_animation_time += delta
@@ -1892,4 +1926,6 @@ func _apply_season(index: int) -> void:
 	_materials.wheat.albedo_color = grain[index]
 	scenery.apply_season(index,_sun,_village_environment)
 	look.apply_season(index)
+	if is_instance_valid(vegetation):
+		vegetation.apply_season(index)
 	crops.visible = index != 3

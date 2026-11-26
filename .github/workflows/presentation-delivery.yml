@@ -73,6 +73,9 @@ jobs:
           cp "$city/imperathen_roman_test_city.glb" prototype/assets/world/roman_city_test.glb
           cp "$city/roman_city_collision.glb" prototype/assets/world/roman_city_collision.glb
           cp "$city/city_manifest.json" prototype/assets/world/roman_city_manifest.json
+      - name: Complete native vegetation meshes and distance impostors
+        shell: bash
+        run: bash tools/integration/prepare_vegetation_assets.sh
       - name: Run the complete isolated engine regression
         run: python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --report artifacts/team-c/engine
       - name: Keep test evidence

@@ -163,6 +163,9 @@ jobs:
           chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           echo "GODOT_BIN=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
           echo "TEMPLATE_DIR=$RUNNER_TEMP/templates/4.7.2.stable" >> "$GITHUB_ENV"
+      - name: Complete native vegetation meshes and distance impostors
+        shell: bash
+        run: bash tools/integration/prepare_vegetation_assets.sh
       - name: Real Godot world, full movement regressions and built assets
         shell: bash
         run: |
