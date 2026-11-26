@@ -24,6 +24,29 @@ const Person = preload("res://scripts/visuals/village_person.gd")
 const Architecture = preload("res://scripts/rendering/city_architecture_detail.gd")
 const SETTLE_FRAMES := 5
 const FX_SETTLE_FRAMES := 18
+const ULTRA_SETTLE_FRAMES := 24
+## D-050 Ultra prototype, applied on top of the Sehr-hoch/Ultra profile: per
+## renderer everything that measurably adds image quality there (feature probe
+## in docs/39_rendering). Engine-level parameters chosen for the prototype; the
+## look (exposure, tonemapper, grade, sun, sky, fog colour) is untouched.
+## A physically plausible sun disc (0.53 degrees) drives contact-hardening
+## shadows where PCSS exists.
+const ULTRA := {
+	"forward_plus": {
+		"env": {"ssao_enabled": true, "ssao_radius": 1.2, "ssao_intensity": 1.4, "ssil_enabled": true,
+			"sdfgi_enabled": true, "sdfgi_use_occlusion": true, "sdfgi_cascades": 4, "sdfgi_min_cell_size": 0.15,
+			"sdfgi_bounce_feedback": 0.5, "volumetric_fog_enabled": true, "volumetric_fog_density": 0.006,
+			"volumetric_fog_length": 96.0, "volumetric_fog_gi_inject": 1.0, "glow_enabled": true},
+		"viewport": {"use_taa": true}, "sun": {"light_angular_distance": 0.53}, "torch": {"light_size": 0.08},
+		"filter": "soft_ultra", "voxel_gi_interior": true},
+	"mobile": {
+		"env": {"glow_enabled": true},
+		"viewport": {"screen_space_aa": Viewport.SCREEN_SPACE_AA_SMAA}, "sun": {}, "torch": {"light_size": 0.08},
+		"filter": "soft_ultra", "voxel_gi_interior": false},
+	"gl_compatibility": {
+		"env": {"ssao_enabled": true, "ssao_radius": 1.2, "ssao_intensity": 1.4, "glow_enabled": true},
+		"viewport": {}, "sun": {}, "torch": {}, "filter": "soft_ultra", "voxel_gi_interior": false},
+}
 
 var output: String
 var scene_kind := "village"
@@ -173,10 +196,14 @@ func _shoot(view: String, profile: String, scene: Node) -> void:
 	for variant: String in variants:
 		if variant == "fx" and profile not in fx_profiles:
 			continue
+		if variant == "ultra" and profile != "very_high":
+			continue
 		var restore := {}
 		if variant == "fx":
 			restore = _apply_fx()
-		for i in (FX_SETTLE_FRAMES if variant == "fx" else SETTLE_FRAMES):
+		elif variant == "ultra":
+			restore = _apply_ultra(view, scene)
+		for i in {"fx": FX_SETTLE_FRAMES, "ultra": ULTRA_SETTLE_FRAMES}.get(variant, SETTLE_FRAMES):
 			await RenderingServer.frame_post_draw
 		var stats: Dictionary = await Bench.measure(root, frames)
 		var name := "%s-%s-%s-%s" % [label, view, profile, variant]
@@ -184,6 +211,8 @@ func _shoot(view: String, profile: String, scene: Node) -> void:
 		stats.engine = Bench.engine_state(root, scene)
 		if variant == "fx":
 			stats.fx_enabled = restore.get("enabled", [])
+		elif variant == "ultra":
+			stats.ultra = restore.get("applied", {})
 		_capture(name)
 		if not report.shots.has(view):
 			report.shots[view] = {}
@@ -192,6 +221,8 @@ func _shoot(view: String, profile: String, scene: Node) -> void:
 		report.shots[view][profile][variant] = stats
 		if variant == "fx":
 			_revert_fx(restore)
+		elif variant == "ultra":
+			_revert_ultra(restore)
 
 
 ## Every advanced post-process/GI feature the running renderer supports, with
@@ -224,6 +255,74 @@ func _revert_fx(restore: Dictionary) -> void:
 	var environment: Environment = restore.environment
 	for key: String in restore.previous:
 		environment.set(key, restore.previous[key])
+
+
+func _apply_ultra(view: String, scene: Node) -> Dictionary:
+	var preset: Dictionary = ULTRA.get(RenderProfile.renderer(), {})
+	var environment: Environment = RenderProfile.active_environment(root)
+	var saved := {"env": {}, "viewport": {}, "sun": {}, "torch": [], "added": []}
+	if environment != null:
+		for key: String in preset.get("env", {}):
+			saved.env[key] = environment.get(key)
+			environment.set(key, preset.env[key])
+	for key: String in preset.get("viewport", {}):
+		saved.viewport[key] = root.get(key)
+		root.set(key, preset.viewport[key])
+	var sun: DirectionalLight3D = null
+	for light: DirectionalLight3D in scene.find_children("*", "DirectionalLight3D", true, false):
+		if light.is_visible_in_tree():
+			sun = light
+			break
+	if sun != null:
+		for key: String in preset.get("sun", {}):
+			saved.sun[key] = sun.get(key)
+			sun.set(key, preset.sun[key])
+	for light: Light3D in scene.find_children("*", "OmniLight3D", true, false):
+		if light.is_in_group(RenderProfile.LIGHT_GROUP):
+			for key: String in preset.get("torch", {}):
+				saved.torch.append([light, key, light.get(key)])
+				light.set(key, preset.torch[key])
+	var filter: int = RenderProfile.FILTERS.get(str(preset.get("filter", "")), -1)
+	if filter >= 0:
+		RenderingServer.directional_soft_shadow_filter_set_quality(filter)
+		RenderingServer.positional_soft_shadow_filter_set_quality(filter)
+	var baked_ms := 0
+	if view == "house_interior" and bool(preset.get("voxel_gi_interior", false)):
+		# Real-time bounce light in the home from a VoxelGI baked at run time.
+		var gi := VoxelGI.new()
+		gi.name = "UltraInteriorVoxelGI"
+		gi.size = Vector3(12, 7, 12)
+		gi.subdiv = VoxelGI.SUBDIV_128
+		scene.add_child(gi)
+		gi.global_position = root.get_camera_3d().global_position + Vector3(0, 0.5, 0)
+		var started := Time.get_ticks_msec()
+		gi.bake(scene, false)
+		baked_ms = Time.get_ticks_msec() - started
+		saved.added.append(gi)
+	return {"saved": saved, "environment": environment, "sun": sun, "filter": filter,
+		"applied": {"renderer": RenderProfile.renderer(), "env": preset.get("env", {}).keys(), "viewport": preset.get("viewport", {}).keys(),
+			"sun": preset.get("sun", {}), "torch": preset.get("torch", {}), "filter": preset.get("filter", ""),
+			"voxel_gi_bake_ms": baked_ms if baked_ms > 0 else null}}
+
+
+func _revert_ultra(restore: Dictionary) -> void:
+	var saved: Dictionary = restore.saved
+	var environment: Environment = restore.environment
+	if environment != null:
+		for key: String in saved.env:
+			environment.set(key, saved.env[key])
+	for key: String in saved.viewport:
+		root.set(key, saved.viewport[key])
+	if restore.sun != null:
+		for key: String in saved.sun:
+			(restore.sun as Light3D).set(key, saved.sun[key])
+	for entry: Array in saved.torch:
+		(entry[0] as Light3D).set(entry[1], entry[2])
+	for node: Node in saved.added:
+		node.get_parent().remove_child(node)
+		node.free()
+	# Profile filters back (Ultra profile values).
+	RenderProfile.apply_viewport(root, RenderProfile.current_profile())
 
 
 func _capture(name: String) -> void:

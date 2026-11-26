@@ -118,6 +118,41 @@ static func texture_package() -> Dictionary:
 	return _texture_package.duplicate()
 
 
+## Renderer a profile asks for ("render.renderer"). Godot cannot change the
+## renderer of a running process; project.godot points
+## application/config/project_settings_override at RENDERER_OVERRIDE, so the
+## choice takes effect at the next start - on Android too, in one APK.
+## D-033: every profile asks for gl_compatibility until a device comparison
+## approves a switch; then only the profile data changes.
+const RENDERER_OVERRIDE := "user://render_override.cfg"
+
+
+static func desired_renderer(profile: String) -> String:
+	return str(render(profile).get("renderer", "gl_compatibility"))
+
+
+static func request_renderer(profile: String) -> Dictionary:
+	return write_renderer_override(desired_renderer(profile), renderer(), RENDERER_OVERRIDE,
+		str(ProjectSettings.get_setting("rendering/renderer/rendering_method", "gl_compatibility")))
+
+
+## Writes the override when `wanted` differs from the project default and
+## removes it otherwise. restart_required tells the UI to ask for a restart.
+static func write_renderer_override(wanted: String, current: String, path: String, project_default: String) -> Dictionary:
+	if wanted not in ["gl_compatibility", "mobile", "forward_plus"]:
+		return {"ok": false, "renderer": current, "restart_required": false, "reason": "unknown renderer " + wanted}
+	var status := OK
+	if wanted == project_default:
+		if FileAccess.file_exists(path):
+			status = DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	else:
+		var override := ConfigFile.new()
+		override.set_value("rendering", "renderer/rendering_method", wanted)
+		override.set_value("rendering", "renderer/rendering_method.mobile", wanted)
+		status = override.save(path)
+	return {"ok": status == OK, "renderer": wanted, "current": current, "restart_required": wanted != current, "path": path}
+
+
 ## Global and root-viewport switches. Returns what was actually applied.
 static func apply_viewport(viewport: Viewport, profile: String) -> Dictionary:
 	_current = profile if profiles().has(profile) else "balanced"
@@ -156,6 +191,7 @@ static func apply_viewport(viewport: Viewport, profile: String) -> Dictionary:
 	applied.ssao_quality = str(ao.get("quality", "")) if applied.ssao else ""
 	applied.texture_tier = texture_tier(_current)
 	applied.texture_package = _texture_package.duplicate()
+	applied.renderer_request = request_renderer(_current)
 	var lights := 0
 	if viewport.is_inside_tree():
 		for light in viewport.get_tree().get_nodes_in_group(LIGHT_GROUP):

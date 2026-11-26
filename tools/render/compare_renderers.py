@@ -172,8 +172,9 @@ def analyze_views(out: Path, scene: str) -> dict:
                 if a in by_profile and b in by_profile and "base" in by_profile[a] and "base" in by_profile[b]:
                     steps[f"{view}:{a}->{b}"] = difference(folder / by_profile[a]["base"]["image"], folder / by_profile[b]["base"]["image"])
             for profile, variants in by_profile.items():
-                if "base" in variants and "fx" in variants:
-                    steps[f"{view}:{profile}:base->fx"] = difference(folder / variants["base"]["image"], folder / variants["fx"]["image"])
+                for extra in ("fx", "ultra"):
+                    if "base" in variants and extra in variants:
+                        steps[f"{view}:{profile}:base->{extra}"] = difference(folder / variants["base"]["image"], folder / variants[extra]["image"])
         result["profile_steps"][renderer] = steps
     names = list(reports)
     for i, a in enumerate(names):
@@ -207,7 +208,7 @@ def contact_sheets(out: Path, scene: str) -> list[str]:
                 views.append(view)
     thumb = (480, 270)
     for view in views:
-        columns = [(p, "base") for p in PROFILES] + [("balanced", "fx")]
+        columns = [(p, "base") for p in PROFILES] + [("balanced", "fx"), ("very_high", "ultra")]
         sheet = Image.new("RGB", (thumb[0] * len(columns), (thumb[1] + 22) * len(reports) + 22), (18, 18, 18))
         draw = ImageDraw.Draw(sheet)
         for c, (profile, variant) in enumerate(columns):
@@ -224,6 +225,47 @@ def contact_sheets(out: Path, scene: str) -> list[str]:
         target = out / f"sheet-{scene}-{view}.jpg"
         sheet.save(target, quality=88)
         sheets.append(target.name)
+    return sheets
+
+
+def ultra_sheet(out: Path, scene: str) -> list[str]:
+    """Same camera: today's Ausgewogen and Ultra (former Sehr hoch, Compatibility) against the Ultra prototype per renderer."""
+    from PIL import Image, ImageDraw
+    columns = [("compatibility", "balanced", "base", "heute Ausgewogen (Compat)"),
+               ("compatibility", "very_high", "base", "heute Ultra, bisher Sehr hoch (Compat)"),
+               ("compatibility", "very_high", "ultra", "Ultra-Prototyp Compat"),
+               ("mobile", "very_high", "ultra", "Ultra-Prototyp Mobile"),
+               ("forward_plus", "very_high", "ultra", "Ultra-Prototyp Forward+")]
+    reports = {}
+    for renderer in RENDERERS:
+        path = out / f"{scene}-{renderer}" / f"{scene}-{renderer}-report.json"
+        if path.is_file():
+            reports[renderer] = (path.parent, json.loads(path.read_text()))
+    views = []
+    for _, (_, report) in reports.items():
+        for view in report.get("shots", {}):
+            if view not in views:
+                views.append(view)
+    sheets = []
+    thumb = (640, 360)
+    for view in views:
+        sheet = Image.new("RGB", (thumb[0] * len(columns), thumb[1] + 40), (18, 18, 18))
+        draw = ImageDraw.Draw(sheet)
+        found = 0
+        for c, (renderer, profile, variant, caption) in enumerate(columns):
+            draw.text((c * thumb[0] + 6, 4), caption, fill=(255, 220, 150))
+            draw.text((c * thumb[0] + 6, 18), "software renderer, not device data", fill=(160, 160, 160))
+            if renderer not in reports:
+                continue
+            folder, report = reports[renderer]
+            shot = report.get("shots", {}).get(view, {}).get(profile, {}).get(variant)
+            if shot:
+                sheet.paste(Image.open(folder / shot["image"]).convert("RGB").resize(thumb, Image.LANCZOS), (c * thumb[0], 40))
+                found += 1
+        if found:
+            target = out / f"sheet-ultra-{scene}-{view}.jpg"
+            sheet.save(target, quality=90)
+            sheets.append(target.name)
     return sheets
 
 
@@ -295,7 +337,7 @@ def analyze(out: Path, records: list[dict]) -> dict:
                "runs": records, "features": features,
                "village": analyze_views(out, "village"), "city": analyze_views(out, "city"),
                "texture_packages": analyze_texture_tiers(out),
-               "sheets": contact_sheets(out, "village") + contact_sheets(out, "city")}
+               "sheets": contact_sheets(out, "village") + contact_sheets(out, "city") + ultra_sheet(out, "village") + ultra_sheet(out, "city")}
     for name, ids in {"gi": ["ssao", "ssil", "sdfgi", "voxel_gi", "ssr", "volumetric_fog"],
                       "post": ["glow", "tonemap_agx", "tonemap_aces", "depth_of_field", "auto_exposure", "fog_sun_scatter"],
                       "aa": ["msaa_off", "msaa_4x", "fxaa", "smaa", "taa", "fsr2_67"],
@@ -411,6 +453,7 @@ def main() -> int:
     parser.add_argument("--steps", default="probe,village,city")
     parser.add_argument("--profiles", default=",".join(PROFILES))
     parser.add_argument("--fx-profiles", default="balanced")
+    parser.add_argument("--variants", default="base,fx,ultra", help="base, fx (capability showcase), ultra (D-050 prototype on very_high)")
     parser.add_argument("--views", default="", help="Comma separated subset of views (default: all of the scene)")
     parser.add_argument("--features", default="", help="Comma separated subset of probe features")
     parser.add_argument("--frames", type=int, default=5)
@@ -444,7 +487,7 @@ def main() -> int:
                         script, user = "res://tests/render_feature_probe.gd", [str(folder), label, str(args.frames), args.features]
                     else:
                         script = "res://tests/render_comparison.gd"
-                        user = [str(folder), step, label, args.profiles, "base,fx", str(args.frames), args.fx_profiles, args.views]
+                        user = [str(folder), step, label, args.profiles, args.variants, str(args.frames), args.fx_profiles, args.views]
                     record = run_step(godot, label, renderer, script, user, out, size, args.timeout, args.texture_tier)
                     records = [r for r in records if r["step"] != label] + [record]
                     records_path.write_text(json.dumps(records, indent=1) + "\n")

@@ -38,7 +38,7 @@ func _run() -> void:
 	var profiles := RenderProfile.profiles()
 	_check(profiles.keys() == ORDER, "Exactly the four profiles in order")
 	_check([profiles.low.label, profiles.balanced.label, profiles.high.label, profiles.very_high.label]
-		== ["Leicht", "Ausgewogen", "Hoch", "Sehr hoch"], "German profile labels")
+		== ["Leicht", "Ausgewogen", "Hoch", "Ultra"], "Profile labels (D-050: the top profile is Ultra)")
 	# Monotonic quality ladders per D-034 dimension.
 	var rising := ["shadow_atlas_size", "render/positional_shadow_atlas", "shadow_distance_metres", "max_3d_pixels",
 		"render/light_fade_begin", "render/light_shadow_fade", "render/anisotropic_samples", "density/vegetation",
@@ -90,7 +90,7 @@ func _run() -> void:
 	RenderProfile.configure_light(torch, "low")
 	_check(not torch.shadow_enabled and torch.distance_fade_enabled and is_equal_approx(torch.distance_fade_begin, 18.0), "Leicht torches fade early and cast no shadow")
 	RenderProfile.configure_light(torch, "very_high")
-	_check(torch.shadow_enabled and is_equal_approx(torch.distance_fade_begin, 70.0) and is_equal_approx(torch.distance_fade_shadow, 45.0), "Sehr hoch torches reach far with shadows")
+	_check(torch.shadow_enabled and is_equal_approx(torch.distance_fade_begin, 70.0) and is_equal_approx(torch.distance_fade_shadow, 45.0), "Ultra torches reach far with shadows")
 	torch.set_meta("no_shadow", true)
 	RenderProfile.configure_light(torch, "very_high")
 	_check(not torch.shadow_enabled, "A light can refuse shadows")
@@ -115,6 +115,19 @@ func _run() -> void:
 	_check(RenderProfile.supports("ssao", "gl_compatibility") and not RenderProfile.supports("ssao", "mobile"), "AO: Compatibility and Forward+, not Mobile")
 	_check(is_equal_approx(RenderProfile.density("very_high", "vegetation"), 1.4) and is_equal_approx(RenderProfile.density("nope", "crowd"), 0.67),
 		"Density hook reads the profile and falls back to Ausgewogen")
+	# Renderer selection per profile through the user-level settings override.
+	for profile: String in ORDER:
+		_check(RenderProfile.desired_renderer(profile) == "gl_compatibility", profile + " keeps Compatibility until a device comparison approves a switch (D-033)")
+	var override_path := "user://render_override_test.cfg"
+	var wish := RenderProfile.write_renderer_override("mobile", "gl_compatibility", override_path, "gl_compatibility")
+	var written := ConfigFile.new()
+	_check(wish.ok and wish.restart_required and written.load(override_path) == OK
+		and written.get_value("rendering", "renderer/rendering_method.mobile") == "mobile", "A Vulkan request is written for the next start")
+	var back := RenderProfile.write_renderer_override("gl_compatibility", "mobile", override_path, "gl_compatibility")
+	_check(back.ok and back.restart_required and not FileAccess.file_exists(override_path), "Returning to the project default removes the override")
+	_check(not RenderProfile.write_renderer_override("vulkan_magic", "gl_compatibility", override_path, "gl_compatibility").ok, "Unknown renderers are refused")
+	_check(str(ProjectSettings.get_setting("application/config/project_settings_override", "")) == RenderProfile.RENDERER_OVERRIDE,
+		"project.godot reads the renderer override at start")
 	# The global RuntimeDisplay applies the same switches and configures lights added later.
 	var display := root.get_node_or_null("RuntimeDisplay")
 	_check(is_instance_valid(display), "RuntimeDisplay autoload is present")
@@ -122,7 +135,7 @@ func _run() -> void:
 		display.apply_quality("very_high")
 		var report: Dictionary = display.quality_report()
 		_check(int(report.engine_switches.positional_shadow_atlas) == 8192 and int(report.engine_switches.directional_shadow_atlas) == 8192,
-			"Sehr hoch report shows its shadow atlases")
+			"Ultra report shows its shadow atlases")
 		var late := OmniLight3D.new()
 		late.add_to_group(RenderProfile.LIGHT_GROUP)
 		root.add_child(late)

@@ -57,7 +57,7 @@ func _ready() -> void:
 	line.add_child(_button("Laden", func(): load_requested.emit()))
 	quality = OptionButton.new()
 	quality.custom_minimum_size = Vector2(150, 48)
-	for name in ["Leicht", "Ausgewogen", "Hoch", "Sehr hoch"]:
+	for name in ["Leicht", "Ausgewogen", "Hoch", "Ultra"]:
 		quality.add_item(name)
 	quality.select(1)
 	quality.item_selected.connect(func(index: int): quality_requested.emit(QUALITY_IDS[index]))

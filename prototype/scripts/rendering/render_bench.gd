@@ -22,6 +22,10 @@ const OVERVIEW_EYE := Vector3(31.0, 17.5, 33.0)
 const OVERVIEW_TARGET := Vector3(-4.0, 1.0, -9.0)
 ## Same spots as tests/roman_city_visual_capture.gd.
 const CITY_SPOTS := {"city_forum": Vector3(-8.0, 0.92, 24.0), "city_market": Vector3(-12.0, 0.92, 68.0)}
+## The village look development keeps its shot set in this file; when present
+## its "cameras" win, so look reviews and renderer/profile benches stay
+## same-camera. The constants above are the identical fallback.
+const LOOK_VALUES := "res://assets/village/look/look_values.json"
 ## Harness night: neutral test values for an engine comparison of positional
 ## lights and shadows. They are NOT look-development presets; moon, sky and
 ## torch colours belong to the village look and replace these once they exist.
@@ -97,16 +101,19 @@ static func stage_village(world: Node3D, view: String, start: Dictionary) -> boo
 			world._camera_initialized = false
 			world._update_camera(0)
 		"village_lane", "night_torch":
-			place_player(world, LANE_POSITION, LANE_YAW, float(start.get("lift", 1.0)))
-			world._camera_yaw = LANE_YAW
-			world._camera_pitch = LANE_PITCH
+			var lane: Dictionary = cameras().lane
+			place_player(world, lane.player, lane.yaw, float(start.get("lift", 1.0)))
+			world._camera_yaw = lane.yaw
+			world._camera_pitch = lane.pitch
 			world._camera_initialized = false
 			world._update_camera(0)
 			if view == "night_torch":
 				enter_night(world)
 		"village_overview":
-			camera.global_position = OVERVIEW_EYE
-			camera.look_at(OVERVIEW_TARGET, Vector3.UP)
+			var overview: Dictionary = cameras().overview
+			camera.fov = overview.fov
+			camera.global_position = overview.eye
+			camera.look_at(overview.target, Vector3.UP)
 		_:
 			return false
 	for figure in world.get_tree().get_nodes_in_group("village_people"):
@@ -114,6 +121,27 @@ static func stage_village(world: Node3D, view: String, start: Dictionary) -> boo
 			figure.refresh_lod(camera)
 	world.population.update_nearby(world.get_player_position(), true)
 	return true
+
+
+## Lane and overview cameras: the look-values shot set if installed, else the constants.
+static func cameras() -> Dictionary:
+	var result := {"source": "render_bench.gd constants",
+		"lane": {"player": LANE_POSITION, "yaw": LANE_YAW, "pitch": LANE_PITCH},
+		"overview": {"eye": OVERVIEW_EYE, "target": OVERVIEW_TARGET, "fov": 54.0}}
+	if not FileAccess.file_exists(LOOK_VALUES):
+		return result
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(LOOK_VALUES))
+	var shots: Dictionary = data.get("cameras", {}) if data is Dictionary else {}
+	if shots.has("path") and shots.path.get("player") is Array:
+		var p: Array = shots.path.player
+		result.lane = {"player": Vector3(p[0], p[1], p[2]), "yaw": float(shots.path.yaw), "pitch": float(shots.path.pitch)}
+		result.source = LOOK_VALUES
+	if shots.has("overview") and shots.overview.get("eye") is Array:
+		var e: Array = shots.overview.eye
+		var t: Array = shots.overview.target
+		result.overview = {"eye": Vector3(e[0], e[1], e[2]), "target": Vector3(t[0], t[1], t[2]), "fov": float(shots.overview.get("fov", 54.0))}
+		result.source = LOOK_VALUES
+	return result
 
 
 static func village_start(world: Node3D) -> Dictionary:
@@ -368,7 +396,7 @@ static func engine_state(viewport: Viewport, scene: Node) -> Dictionary:
 			"mesh_lod_threshold": viewport.mesh_lod_threshold,
 			"positional_shadow_atlas_size": viewport.positional_shadow_atlas_size,
 			"anisotropic_filtering_level": viewport.anisotropic_filtering_level},
-		"camera": {"transform": str(camera.global_transform) if camera else "", "fov": camera.fov if camera else 0.0,
+		"camera": {"set": cameras().source, "transform": str(camera.global_transform) if camera else "", "fov": camera.fov if camera else 0.0,
 			"near": camera.near if camera else 0.0, "far": camera.far if camera else 0.0},
 		"sun": sun, "lights": lights, "environment": env}
 
