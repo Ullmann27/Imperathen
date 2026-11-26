@@ -103,12 +103,15 @@ func _test_routes() -> void:
 	var places: Array = World.points_of_interest()
 	var ids := {}
 	var planned := 0
+	var workplaces: Array[String] = []
 	for place in places:
 		_check(not ids.has(place.id),"Unique place " + place.id)
 		ids[place.id] = true
 		planned += int(place.content_status == "planned")
+		if place.content_status == "visible_workplace":
+			workplaces.append(place.id)
 		_check(absf(place.position[0]) < 16000 and absf(place.position[2]) < 16000,"Place lies inside world " + place.id)
-	_check(planned == places.size()-1,"Only existing home village declared implemented")
+	_check(workplaces == ["stone_quarry"] and planned == places.size()-2,"Only the quarry is declared as a visible workplace alongside the inhabited village")
 	var reachable := {"home_village":true}
 	var links: Array = World.roads()
 	for road in links:

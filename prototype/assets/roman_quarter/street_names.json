@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "streets": [
+    {
+      "id": "vicus_figulorum",
+      "name_de": "Töpfergasse",
+      "name_la": "Vicus Figulorum",
+      "status": "fiktiv",
+      "x0": 14.90,
+      "z0": -19.28,
+      "width": 27.21,
+      "depth": 4.56
+    },
+    {
+      "id": "vicus_fabrum",
+      "name_de": "Handwerksgasse",
+      "name_la": "Vicus Fabrum",
+      "status": "fiktiv",
+      "x0": 24.65,
+      "z0": -14.72,
+      "width": 6.70,
+      "depth": 27.72
+    },
+    {
+      "id": "via_ad_forum_septentrionale",
+      "name_de": "Zum Nordmarkt",
+      "name_la": "Ad Forum Septentrionale",
+      "status": "fiktiv",
+      "x0": 24.65,
+      "z0": -25.16,
+      "width": 6.70,
+      "depth": 5.88
+    }
+  ]
+}

@@ -33,7 +33,7 @@ const POIS := [
 	{"id":"home_village", "name":"Unser Grenzdorf", "kind":"village", "position":[0.0,0.0,0.0], "content_status":"existing_village"},
 	{"id":"western_farm", "name":"Westliche Höfe", "kind":"farm", "position":[-1250.0,0.0,250.0], "content_status":"planned"},
 	{"id":"forest_camp", "name":"Waldarbeiterlager", "kind":"woodcamp", "position":[-750.0,0.0,-1500.0], "content_status":"planned"},
-	{"id":"stone_quarry", "name":"Alter Steinbruch", "kind":"quarry", "position":[1500.0,0.0,-750.0], "content_status":"planned"},
+	{"id":"stone_quarry", "name":"Alter Steinbruch", "kind":"quarry", "position":[1500.0,0.0,-750.0], "content_status":"visible_workplace"},
 	{"id":"river_bridge", "name":"Flussbrücke", "kind":"bridge", "position":[750.0,0.0,1750.0], "content_status":"planned"},
 	{"id":"watch_fort", "name":"Grenzwache", "kind":"fort", "position":[3000.0,0.0,-2500.0], "content_status":"planned"},
 	{"id":"market_town", "name":"Marktstadt", "kind":"town", "position":[-6000.0,0.0,1500.0], "content_status":"planned"},
@@ -227,4 +227,4 @@ static func overview(position: Vector3 = Vector3.ZERO, quality: String = "balanc
 		"requested_sectors":result.sectors.size(),"active_limit":result.active_limit,
 		"detailed_people_limit":result.detailed_people_limit,"places":points_of_interest(),
 		"roads":roads(),"playable_place_ids":["home_village"],
-		"status":"Gestreamte Geländegrundlage; Grenzdorf vorhanden, Fernorte und deren Bevölkerung noch geplant."}
+		"status":"Gestreamtes Gelände mit Grenzdorf und sichtbarem Steinbruch; übrige Fernorte und deren Bevölkerung sind geplant."}

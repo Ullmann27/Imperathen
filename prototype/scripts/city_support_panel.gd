@@ -285,11 +285,16 @@ func _refresh_contents() -> void:
 				detail = {"body": "Kleidung", "belt": "Gürtel", "weapon": "Waffe", "shield": "Schild"}.get(str(catalog.slot), "")
 			elif int(catalog.get("health", 0)) > 0 or float(catalog.get("stamina", 0.0)) > 0.0:
 				detail = "Stärkt: +%d Leben · +%d Ausdauer" % [int(catalog.get("health", 0)), roundi(float(catalog.get("stamina", 0.0)))]
+			if item.has("horse"):
+				detail = "Begleitpferd" if item.get("equipped", false) else "Im Stall"
 			var row := _item_row("%s × %d" % [item.name, int(item.quantity)], detail, Icons.item_kind(str(item.item_id), str(item.name)), bool(item.get("equipped", false)))
 			if item.get("can_consume", false):
 				row.add_child(_button("Verbrauchen", func(): command_requested.emit("city_consume", {"item_id":item.item_id}), "food"))
 			if item.get("can_equip", false):
-				var b := _button("Ablegen" if item.get("equipped", false) else "Anlegen", func(): command_requested.emit("city_equip", {"item_id":item.item_id}), "garment")
+				var action := "Ablegen" if item.get("equipped", false) else "Anlegen"
+				if item.has("horse"):
+					action = "In den Stall" if item.get("equipped", false) else "Auswählen"
+				var b := _button(action, func(): command_requested.emit("city_equip", {"item_id":item.item_id}), "garment")
 				# The domain command toggles the equipped item; disabling this button
 				# would prevent players from unequipping (and then selling) their gear.
 				row.add_child(b)
@@ -304,7 +309,15 @@ func _refresh_contents() -> void:
 		if shop.id == shop_id:
 			modal_title.text = shop.name
 	for offer: Dictionary in view.get("offers", []):
-		var row := _item_row("%s · %d Denare" % [offer.name, int(offer.price)], "Vorrat: %d · In deinem Beutel: %d" % [int(offer.stock), int(offer.owned)], Icons.item_kind(str(offer.item_id), str(offer.name)), false)
+		var detail := "Vorrat: %d · In deinem Beutel: %d" % [int(offer.stock), int(offer.owned)]
+		if offer.has("horse"):
+			var horse: Dictionary = offer.horse
+			detail = "%s · Tempo %d · Ausdauer %d · Handhabung %d" % [
+				"In deinem Stall" if offer.owned > 0 else ("Verfügbar" if offer.stock > 0 else "Verkauft"),
+				horse.pace, horse.endurance, horse.handling,
+			]
+		var row := _item_row("%s · %d Denare" % [offer.name, int(offer.price)], detail,
+			Icons.item_kind(str(offer.item_id), str(offer.name)), false)
 		var card := row.get_parent().get_parent() as Control
 		var buy := _button("Kaufen", func(): command_requested.emit("city_buy", {"shop_id":shop_id, "item_id":offer.item_id, "quantity":1}), "coin", true)
 		buy.disabled = not bool(offer.get("can_buy", false))

@@ -3,11 +3,13 @@ extends RefCounted
 ## Quest parcels in childhood.carried are never copied, sold or consumed here.
 
 const Catalog = preload("res://scripts/city_trade_catalog.gd")
-const VERSION := 1
+const Era = preload("res://scripts/domain/era_registry.gd")
+const VERSION := 2
 const RANGE := 3.0
 const MAX_COUNT := 1000000
 const MAX_TRANSACTION := 99
-const EQUIPMENT_SLOTS := ["weapon","shield","body","belt"]
+const LEGACY_EQUIPMENT_SLOTS := ["weapon","shield","body","belt"]
+const EQUIPMENT_SLOTS := LEGACY_EQUIPMENT_SLOTS + ["mount", "tack"]
 const COMMAND_FIELDS := {
 	"city_trade_enable":[],
 	"city_buy":["shop_id","item_id","quantity"],
@@ -37,14 +39,20 @@ static func _initial() -> Dictionary:
 		for id: String in Catalog.SHOPS[shop_id].items:
 			purchases[shop_id][id] = 0
 			sales[shop_id][id] = 0
+	var equipment := {}
+	for slot: String in EQUIPMENT_SLOTS:
+		equipment[slot] = ""
 	return {"version":VERSION,"inventory":inventory,"purchases":purchases,"sales":sales,
-		"used":used,"service_issued":false,"claimed_rewards":[],
-		"equipment":{"weapon":"","shield":"","body":"","belt":""}}
+		"used":used,"service_issued":false,"claimed_rewards":[],"equipment":equipment}
 
 
-static func shop_catalog() -> Array[Dictionary]:
+## Existing districts retain their six required anchors. Optional stalls can
+## be supplied independently by a city that has verified their placement.
+static func shop_catalog(include_optional := false) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for id: String in Catalog.SHOPS:
+		if id == Catalog.STABLE_ID and not include_optional:
+			continue
 		var shop: Dictionary = Catalog.SHOPS[id].duplicate(true)
 		shop["id"] = id
 		result.append(shop)
@@ -104,8 +112,10 @@ static func apply(data: Dictionary, command: String, args: Dictionary, sites: Di
 			var item: Dictionary = Catalog.ITEMS[item_id]
 			var quantity := int(args.quantity)
 			var buying := command == "city_buy"
-			if buying and str(item.slot) in ["weapon","shield"] and not _trained_soldier(data):
-				return _result(false,"Waffen und Schild gehören zu deiner abgeschlossenen erwachsenen Ausbildung.")
+			if buying:
+				error = _purchase_access_reason(data, item)
+				if not error.is_empty():
+					return _result(false, error)
 			if buying and _stock(data,shop_id,item_id) < quantity:
 				return _result(false,"Diese Menge ist hier nicht vorrätig.")
 			if not buying and int(trade.inventory[item_id]) < quantity:
@@ -162,8 +172,13 @@ static func apply(data: Dictionary, command: String, args: Dictionary, sites: Di
 				return _result(false,"Du besitzt diesen Gegenstand nicht.")
 			if slot in ["weapon","shield"] and not _trained_soldier(data):
 				return _result(false,"Waffen und Schild setzen deine abgeschlossene erwachsene Ausbildung voraus.")
+			if slot == "tack" and str(trade.equipment.mount).is_empty():
+				return _result(false, "Wähle zuerst eines deiner Pferde aus.")
 			var removing: bool = trade.equipment[slot] == id
 			trade.equipment[slot] = "" if removing else id
+			if slot == "mount":
+				trade.equipment.tack = ""
+				return _result(true, "%s %s." % [item.horse.name, "in den Stall zurückgebracht" if removing else "als Begleitpferd ausgewählt"])
 			return _result(true,"%s %s." % [item.name,"abgelegt" if removing else "angelegt"])
 		"city_issue_service":
 			if args.shop_id != "armorer":
@@ -205,8 +220,8 @@ static func apply(data: Dictionary, command: String, args: Dictionary, sites: Di
 
 static func view(data: Dictionary, shop_id := "", sites: Dictionary = {}) -> Dictionary:
 	var result := {"enabled":enabled(data),"money":int(data.get("resources",{}).get("denarii",0)),
-		"shops":shop_catalog(),"offers":[],"inventory":[],"skills":skills(data),
-		"equipment_bonuses":equipment_bonuses(data),"service":{},"rewards":[]}
+		"shops":shop_catalog(sites.has(Catalog.STABLE_ID)),"offers":[],"inventory":[],"skills":skills(data),
+		"equipment_bonuses":equipment_bonuses(data),"service":{},"rewards":[],"selected_horse":{}}
 	if not enabled(data):
 		return result
 	var error := validate(data)
@@ -214,6 +229,7 @@ static func view(data: Dictionary, shop_id := "", sites: Dictionary = {}) -> Dic
 		result["error"] = error
 		return result
 	var trade: Dictionary = data.village.city_trade
+	result.selected_horse = selected_horse(data)
 	for id: String in Catalog.ITEMS:
 		var count := int(trade.inventory[id])
 		if count <= 0:
@@ -223,8 +239,12 @@ static func view(data: Dictionary, shop_id := "", sites: Dictionary = {}) -> Dic
 		var can_equip := _ready_reason(data).is_empty() and not str(item.slot).is_empty() and int(data.player.age)>=18
 		if str(item.slot) in ["weapon","shield"]:
 			can_equip = can_equip and _trained_soldier(data)
-		result.inventory.append({"item_id":id,"name":item.name,"quantity":count,
-			"can_consume":can_consume,"can_equip":can_equip,"equipped":trade.equipment.values().has(id)})
+		if str(item.slot) == "tack":
+			can_equip = can_equip and not str(trade.equipment.mount).is_empty()
+		var inventory_entry := {"item_id":id,"name":item.name,"quantity":count,
+			"can_consume":can_consume,"can_equip":can_equip,"equipped":trade.equipment.values().has(id)}
+		_add_stable_details(data, id, inventory_entry)
+		result.inventory.append(inventory_entry)
 	if Catalog.SHOPS.has(shop_id):
 		var reason := _shop_reason(data,shop_id,sites)
 		if reason.is_empty():
@@ -232,13 +252,18 @@ static func view(data: Dictionary, shop_id := "", sites: Dictionary = {}) -> Dic
 		for id: String in Catalog.SHOPS[shop_id].items:
 			var item: Dictionary = Catalog.ITEMS[id]
 			var stock := _stock(data,shop_id,id)
-			var affordable := _money_reason(data,-int(item.price)).is_empty()
-			var authorized := str(item.slot) not in ["weapon","shield"] or _trained_soldier(data)
+			var payment_reason := _money_reason(data, -int(item.price))
+			var access_reason := _purchase_access_reason(data, item)
 			var can_sell: bool = int(trade.inventory[id])>0 and int(item.sell_price)>0 and not trade.equipment.values().has(id)
 			can_sell = can_sell and _money_reason(data,int(item.sell_price)).is_empty()
-			result.offers.append({"item_id":id,"name":item.name,"price":item.price,"sell_price":item.sell_price,
-				"stock":stock,"owned":int(trade.inventory[id]),"can_buy":reason.is_empty() and stock>0 and affordable and authorized,
-				"can_sell":reason.is_empty() and can_sell,"reason":reason if authorized else "Waffen und Schild: erst nach erwachsener Ausbildung."})
+			var offer_reason := reason
+			if offer_reason.is_empty():
+				offer_reason = access_reason if not access_reason.is_empty() else payment_reason
+			var offer := {"item_id":id,"name":item.name,"price":item.price,"sell_price":item.sell_price,
+				"stock":stock,"owned":int(trade.inventory[id]),"can_buy":offer_reason.is_empty() and stock>0,
+				"can_sell":reason.is_empty() and can_sell,"reason":offer_reason}
+			_add_stable_details(data, id, offer)
+			result.offers.append(offer)
 	var service_reason := ""
 	if trade.service_issued:
 		service_reason = "Bereits einmal ausgegeben."
@@ -359,8 +384,14 @@ static func validate(data: Dictionary) -> String:
 		for id: String in items:
 			if not _integer(trade.purchases[shop_id][id],0,MAX_COUNT) or not _integer(trade.sales[shop_id][id],0,MAX_COUNT):
 				return "Käufe und Verkäufe müssen begrenzte ganze Mengen sein."
-			if _stock(data,shop_id,id)<0 or _stock(data,shop_id,id)>MAX_COUNT:
+			var stock := _stock(data, shop_id, id)
+			var max_stock := 1 if id in Catalog.HORSE_IDS else MAX_COUNT
+			if stock < 0 or stock > max_stock:
 				return "Die Verkaufsstelle hat mehr Ware ausgegeben, als sie besitzt."
+			if id in Catalog.STABLE_ITEMS and int(trade.purchases[shop_id][id]) > 0:
+				var access_error := _stable_progress_reason(data, Catalog.ITEMS[id])
+				if not access_error.is_empty():
+					return access_error
 	for id: String in Catalog.ITEMS:
 		if not _integer(trade.inventory[id],0,MAX_COUNT) or not _integer(trade.used[id],0,MAX_COUNT):
 			return "Warenbestand und Verbrauch müssen begrenzte ganze Mengen sein."
@@ -390,7 +421,37 @@ static func validate(data: Dictionary) -> String:
 			return "Ein Kind kann keine erwachsene Kampfausrüstung tragen."
 		if slot in ["weapon","shield"] and not _trained_soldier(data):
 			return "Bewaffnung ohne abgeschlossene erwachsene Ausbildung."
+	if not str(trade.equipment.tack).is_empty() and str(trade.equipment.mount).is_empty():
+		return "Pferdegeschirr ist ohne ausgewähltes Pferd angelegt."
 	return ""
+
+
+## Migrate only a structurally recognisable v1 market. Existing purchases
+## and selections remain unchanged. Strict validation follows in WorldModel.
+static func migrate(data: Dictionary) -> void:
+	if not enabled(data):
+		return
+	var trade: Variant = data.village.city_trade
+	if not trade is Dictionary or not _integer(trade.get("version"), 1, 1):
+		return
+	var item_ids := Catalog.ITEMS.keys()
+	for id: String in Catalog.STABLE_ITEMS:
+		item_ids.erase(id)
+	var shop_ids := Catalog.SHOPS.keys()
+	shop_ids.erase(Catalog.STABLE_ID)
+	if not _keys(trade.get("equipment"), LEGACY_EQUIPMENT_SLOTS) or not _keys(trade.get("inventory"), item_ids) or not _keys(trade.get("used"), item_ids):
+		return
+	if not _keys(trade.get("purchases"), shop_ids) or not _keys(trade.get("sales"), shop_ids):
+		return
+	var fresh := _initial()
+	for section: String in ["purchases", "sales"]:
+		trade[section][Catalog.STABLE_ID] = fresh[section][Catalog.STABLE_ID]
+	for section: String in ["inventory", "used"]:
+		for id: String in Catalog.STABLE_ITEMS:
+			trade[section][id] = 0
+	trade.equipment.mount = ""
+	trade.equipment.tack = ""
+	trade.version = VERSION
 
 
 static func restore_integer_fields(data: Dictionary) -> void:
@@ -458,6 +519,60 @@ static func _trained_soldier(data: Dictionary) -> bool:
 	return int(player.get("age",0))>=18 and player.get("role","")=="soldier" and progress.get("training_complete",false)==true and progress.get("stage","") in ["trained","skirmish","aftermath","ended","fallen"]
 
 
+static func _purchase_access_reason(data: Dictionary, item: Dictionary) -> String:
+	if str(item.slot) in ["weapon","shield"] and not _trained_soldier(data):
+		return "Waffen und Schild gehören zu deiner abgeschlossenen erwachsenen Ausbildung."
+	if not item.has("era"):
+		return ""
+	var calendar: Dictionary = data.get("calendar", {})
+	var date := int(calendar.get("clock", {}).get("jdn", -1))
+	if not Era.available(str(item.era), date, calendar.get("divergences", {})):
+		return "Dieses Angebot gehört nicht in die aktuelle Epoche."
+	return _stable_progress_reason(data, item)
+
+
+static func _stable_progress_reason(data: Dictionary, item: Dictionary) -> String:
+	if int(data.get("player", {}).get("age", 0)) < 18:
+		return "Pferde und Pferdegeschirr sind für deinen Erwachsenenweg vorgesehen."
+	if str(item.access) in ["delivery", "escort"] and not _reward_proven(data, "frontier_delivery"):
+		return "Eine bestätigte Versorgungslieferung dient dem Händler als Empfehlung."
+	if item.access == "escort" and not _reward_proven(data, "valley_victory") and not _reward_proven(data, "village_defense"):
+		return "Für dieses Pferd braucht der Händler einen Nachweis, dass du einen gefährdeten Ort verteidigt hast."
+	return ""
+
+
+## Reads the individual chosen in the existing equipment screen. Ownership
+## comes solely from the city receipt ledger and is never saved a second time.
+static func selected_horse(data: Dictionary) -> Dictionary:
+	if not enabled(data):
+		return {}
+	var trade: Variant = data.village.city_trade
+	if not trade is Dictionary or not trade.get("equipment") is Dictionary or not trade.get("inventory") is Dictionary:
+		return {}
+	var id := str(trade.equipment.get("mount", ""))
+	if id not in Catalog.HORSE_IDS or int(trade.inventory.get(id, 0)) != 1:
+		return {}
+	var result := {}
+	_add_stable_details(data, id, result)
+	var horse: Dictionary = result.horse
+	horse.item_id = id
+	var tack_id := str(trade.equipment.get("tack", ""))
+	if tack_id in Catalog.TACK_IDS and int(trade.inventory.get(tack_id, 0)) > 0:
+		horse.tack = {"item_id":tack_id,"name":Catalog.ITEMS[tack_id].name}
+		horse.tack.merge(Catalog.ITEMS[tack_id].tack)
+	return horse
+
+
+static func _add_stable_details(data: Dictionary, id: String, target: Dictionary) -> void:
+	var item: Dictionary = Catalog.ITEMS[id]
+	if item.has("horse"):
+		var horse: Dictionary = item.horse.duplicate()
+		horse.uid = "%s:mount:%s" % [str(data.world_id), id]
+		target.horse = horse
+	elif item.has("tack"):
+		target.tack = item.tack.duplicate()
+
+
 static func _ready_reason(data: Dictionary) -> String:
 	if int(data.get("player",{}).get("health",0))<=0:
 		return "Du kannst gerade keinen Handel treiben."
@@ -470,16 +585,17 @@ static func _ready_reason(data: Dictionary) -> String:
 
 
 static func _shop_reason(data: Dictionary, shop_id: String, sites: Dictionary = {}) -> String:
-	var point: Array = Catalog.SHOPS[shop_id].position
-	var target := Vector3(float(point[0]),1.0,float(point[1]))
-	# Existing isolated market tests keep their original catalog positions.
-	# The real city must supply all six independently verified scene anchors.
-	if not sites.is_empty():
+	var target: Vector3
+	# The optional stable always needs a verified site, also in a campaign.
+	if shop_id == Catalog.STABLE_ID or not sites.is_empty():
 		if not sites.has(shop_id) or typeof(sites[shop_id]) != TYPE_VECTOR3:
 			return "Diese Verkaufsstelle ist nicht an die Stadt angeschlossen."
 		target = sites[shop_id]
 		if not target.is_finite():
 			return "Der Standort dieser Verkaufsstelle ist ungültig."
+	else:
+		var point: Array = Catalog.SHOPS[shop_id].position
+		target = Vector3(float(point[0]), 1.0, float(point[1]))
 	var at: Array=data.get("player",{}).get("position",[])
 	if at.size()!=3 or Vector3(float(at[0]),float(at[1]),float(at[2])).distance_to(target)>RANGE:
 		return "Gehe näher zur Verkaufsstelle: %s." % Catalog.SHOPS[shop_id].name

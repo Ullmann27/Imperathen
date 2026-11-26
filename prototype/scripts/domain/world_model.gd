@@ -1343,6 +1343,7 @@ func _read_save(path: String) -> Dictionary:
 		# v5 -> v6 after the childhood fixes, which can still move the timeline
 		# anchor of version-1 childhood saves to 58 BC.
 		_migrate_world_state(state)
+		CityTrade.migrate(state)
 	var error := _validate_state(state)
 	# Only an already valid old childhood save may initialize decisions. The
 	# initializer reads family and economy data, so malformed legacy input must

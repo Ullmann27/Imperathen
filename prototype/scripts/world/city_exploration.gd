@@ -23,6 +23,7 @@ const SafeArea := preload("res://scripts/ui/safe_area.gd")
 const Calendar := preload("res://scripts/domain/world_calendar.gd")
 const EraRegistry := preload("res://scripts/domain/era_registry.gd")
 const RomanQuarter := preload("res://scripts/world/roman_quarter.gd")
+const RidingTrial := preload("res://scripts/world/city_riding_trial.gd")
 const CITY_PATH := "res://assets/world/roman_city_test.glb"
 const CITY_COLLISION := "res://assets/world/roman_city_collision.glb"
 const TEMPLE_PATH := "res://assets/world/roman_meshy_temple_%d.glb"
@@ -43,6 +44,7 @@ const RUN_ACCELERATION := 6.0
 const BRAKING_DECELERATION := 8.0
 var profile := "balanced"
 var persist := true
+var enable_riding_trial := false
 # Callers entering a dated scenario assign its authoritative JDN before add_child.
 var world_jdn := Calendar.campaign_start_jdn()
 # Review toggle: keep an exact legacy light/ground path for comparison.
@@ -56,6 +58,7 @@ var city_available := false
 var youth_available := false
 var ambient_people: CityAmbientPeople
 var quarter: RomanQuarter
+var riding_trial: RidingTrial
 var crowd := Crowd.new()
 var training := CityTraining.new()
 var _crowd_elapsed := 0.0
@@ -65,6 +68,7 @@ var _catalog_pending := ""
 var _catalog_pending_index := -1
 var _catalog_elapsed := 0.0
 var _catalog_status := ""
+var _street_caption := ""
 var _touch_move := Vector2.ZERO
 var _yaw := 0.0
 var _pitch := -0.18
@@ -114,7 +118,9 @@ func _ready() -> void:
 	add_child(market)
 	market.message.connect(_market_message)
 	market.closed.connect(_close_market)
-	market.setup(get_node_or_null("RomanCity") as Node3D, player, persist)
+	market.setup(get_node_or_null("RomanCity") as Node3D, player, persist, quarter.stable_trader if quarter != null else null)
+	if enable_riding_trial:
+		_start_riding_trial()
 	_bag_button.disabled = not market.available
 	_refresh_market_buttons()
 	get_viewport().size_changed.connect(_layout_ui)
@@ -568,6 +574,9 @@ func _physics_process(delta: float) -> void:
 	axis = axis.limit_length(1)
 	var direction := Vector3(axis.x,0,axis.y).rotated(Vector3.UP,_yaw)
 	var running := _running or Input.is_physical_key_pressed(KEY_SHIFT)
+	if riding_trial != null and riding_trial.advance(delta, axis, _yaw, running):
+		_place_camera(delta)
+		return
 	var speed := RUN_SPEED if running else WALK_SPEED
 	var previous_yaw := figure.rotation.y
 	if direction.length_squared()>0.01 and _action_left<=0:
@@ -646,6 +655,7 @@ func _process(delta: float) -> void:
 		_catalog_elapsed = 0
 		_stream_catalog()
 		_refresh_market_buttons()
+		_update_street_caption()
 	if paused or market.is_open():
 		return
 	_save_elapsed += delta
@@ -656,7 +666,10 @@ func _process(delta: float) -> void:
 func _place_camera(delta: float) -> void:
 	var anchor := player.position+Vector3(0,0.4,0)
 	var wanted := anchor+Vector3(0,0,_distance).rotated(Vector3.RIGHT,_pitch).rotated(Vector3.UP,_yaw)
-	var placed := _camera_solver.place(get_world_3d().direct_space_state,anchor,wanted,_camera_previous,1-exp(-12*delta),[player.get_rid()])
+	var exclusions: Array[RID] = [player.get_rid()]
+	if riding_trial != null:
+		exclusions = riding_trial.controller.camera_exclusions()
+	var placed := _camera_solver.place(get_world_3d().direct_space_state,anchor,wanted,_camera_previous,1-exp(-12*delta),exclusions)
 	if placed.is_finite():
 		camera.position = placed
 		_camera_previous = placed
@@ -701,8 +714,23 @@ func _market_message(value: String) -> void:
 	_catalog_status = value
 	_update_status()
 
+func _update_street_caption() -> void:
+	if not is_instance_valid(quarter):
+		return
+	var caption := quarter.street_at(player.global_position)
+	if caption != _street_caption:
+		_street_caption = caption
+		_update_status()
+
 func _refresh_market_buttons() -> void:
 	if not is_instance_valid(_trade_button):
+		return
+	var riding_action := riding_trial.controller.interaction_label() if riding_trial != null else ""
+	_bag_button.disabled = not market.available or _horse_mounted()
+	if not riding_action.is_empty():
+		_trade_button.disabled = false
+		_trade_button.text = riding_action
+		_trade_button.tooltip_text = "Reitprüfung"
 		return
 	if _tablet_is_near():
 		_trade_button.disabled = false
@@ -711,7 +739,7 @@ func _refresh_market_buttons() -> void:
 		return
 	var target := market.nearest()
 	_trade_button.disabled = not market.available or not bool(target.reachable)
-	_trade_button.text = "Handel" if not target.reachable else "Kaufen"
+	_trade_button.text = "Handel" if not target.reachable else ("Pferdehandel" if target.id == "equarius" else "Kaufen")
 	_trade_button.tooltip_text = str(target.label) if target.reachable else "Gehe zu einem Marktstand"
 
 func _tablet_is_near() -> bool:
@@ -719,6 +747,8 @@ func _tablet_is_near() -> bool:
 
 func _interact() -> void:
 	if paused or market.is_open() or _tablet_dialog.visible:
+		return
+	if riding_trial != null and _action_left <= 0.0 and riding_trial.controller.request_interact():
 		return
 	if _tablet_is_near():
 		_touch_move = Vector2.ZERO
@@ -732,7 +762,7 @@ func _interact() -> void:
 		_open_market(false)
 
 func _open_market(inventory: bool) -> void:
-	if paused or _action_left > 0 or market.is_open():
+	if paused or _action_left > 0 or market.is_open() or _horse_mounted():
 		return
 	var opened: bool = market.open_inventory() if inventory else market.open_shop()
 	if not opened:
@@ -761,10 +791,34 @@ func _close_market() -> void:
 
 func _toggle_pace() -> void:
 	_running = not _running
-	_pace.text = "Rennen" if _running else "Gehen"
+	_update_pace_caption()
+
+func _update_pace_caption() -> void:
+	_pace.text = ("Schneller" if _running else "Schritt") if _horse_mounted() else ("Rennen" if _running else "Gehen")
+
+func _horse_mounted() -> bool:
+	return riding_trial != null and riding_trial.controller.is_mounted()
+
+func _start_riding_trial() -> void:
+	if quarter == null or not quarter.has_node("StableYard"):
+		_market_message("Die Reitprüfung benötigt den Stallhof.")
+		return
+	var trial := RidingTrial.new()
+	add_child(trial)
+	var stable := quarter.get_node("StableYard") as Node3D
+	var horse_at := stable.to_global(Vector3(0.0, 0.002, -2.20))
+	if not trial.install(player, figure, horse_at, stable.global_rotation.y + PI):
+		trial.queue_free()
+		_market_message("Die Reitprüfung benötigt das animierte Pferdemodell.")
+		return
+	riding_trial = trial
+	riding_trial.feedback.connect(_market_message)
+	riding_trial.controller.state_changed.connect(func(_mounted: bool) -> void: _update_pace_caption())
+	teleport(stable.to_global(Vector3(-1.11, SOLE_OFFSET + 0.023, -2.20)))
+	_market_message("Reitprüfung · Aufsteigen mit E oder der Aktionstaste")
 
 func perform_action(action: String) -> void:
-	if paused or market.is_open() or _action_left>0 or action not in ["attack","block"]:
+	if paused or market.is_open() or _horse_mounted() or _action_left>0 or action not in ["attack","block"]:
 		return
 	var response: Dictionary = training.execute_attack(player.position,figure.rotation.y) if action == "attack" else training.execute_block()
 	if not bool(response.get("ok",false)):
@@ -796,7 +850,10 @@ func set_paused(value: bool) -> void:
 	_look.reset()
 	player.velocity = Vector3.ZERO
 	figure.drive(0)
-	figure.set_process(not paused)
+	if riding_trial != null:
+		riding_trial.controller.clear_pending()
+		riding_trial.animation.active = not paused
+	figure.set_process(not paused and not _horse_mounted())
 	crowd.set_paused(paused)
 	if is_instance_valid(ambient_people):
 		ambient_people.set_active(not paused)
@@ -811,6 +868,9 @@ func set_paused(value: bool) -> void:
 
 func teleport(point: Vector3) -> void:
 	if not point.is_finite():
+		return
+	if _horse_mounted():
+		_market_message("Steig vor dem Ortswechsel ab.")
 		return
 	player.position = point
 	player.velocity = Vector3.ZERO
@@ -853,6 +913,8 @@ func _request_story() -> void:
 
 func _update_status() -> void:
 	var description := "Stadt · Modellpark · Gehen · Rennen · unbewaffnetes Übungstraining"
+	if not _street_caption.is_empty():
+		description = _street_caption
 	if not training.available:
 		description += " · Trainingspfahl nicht verfügbar"
 	if not city_available:
