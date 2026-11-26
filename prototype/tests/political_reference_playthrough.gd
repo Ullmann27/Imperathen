@@ -118,6 +118,20 @@ func _play(route: String) -> void:
 	var button := _dialog_choice("politics_help", {"route":route})
 	if not check(button != null and not button.disabled, "A visible and enabled answer offers the route " + route):
 		return
+	if route == "wood":
+		var blocked_temp := ProjectSettings.globalize_path(SAVE + ".tmp")
+		if not check(DirAccess.make_dir_absolute(blocked_temp) == OK, "Create a write obstacle inside the isolated save fixture"):
+			return
+		button.pressed.emit()
+		await _frames()
+		DirAccess.remove_absolute(blocked_temp)
+		var feedback := str(game.ui.get("_frontier_dialog_data").get("feedback", ""))
+		check(int(game.model.data.resources.wood) == cost_before and _events().size() == event_count and
+			game.model.politics_view().recommendation.is_empty() and feedback.contains("zurückgenommen"),
+			"Failed save rolls back both the material cost and the political event and gives feedback")
+		button = _dialog_choice("politics_help", {"route":route})
+		if not check(button != null and not button.disabled, "The same answer can be selected again after the save obstacle is cleared"):
+			return
 	await _capture(route + "-03-auswahl")
 	button.pressed.emit()
 	await _frames()
