@@ -13,6 +13,10 @@ const RenderProfile = preload("res://scripts/rendering/render_profile.gd")
 
 const VILLAGE_VIEWS := ["house_interior", "village_lane", "village_overview", "night_torch"]
 const CITY_VIEWS := ["city_forum", "city_market"]
+## D-052 showcase: the shared fixed camera list of the visual reference
+## environment (family house, Valdora, forge, landscape path, dialogue, Roman
+## main street, market, forum). One file for every graphics branch.
+const SHOWCASE := "res://assets/rendering/showcase_cameras.json"
 ## Same lane and overview cameras as tests/village_look_review.gd ("path",
 ## "overview"), so look development and renderer comparison share framings.
 const LANE_POSITION := Vector3(0.9, 0.0, 12.5)
@@ -115,7 +119,9 @@ static func stage_village(world: Node3D, view: String, start: Dictionary) -> boo
 			camera.global_position = overview.eye
 			camera.look_at(overview.target, Vector3.UP)
 		_:
-			return false
+			var shot := showcase_shot(view)
+			if shot.is_empty() or str(shot.get("scene", "")) != "village" or not _stage_showcase(world, shot, start):
+				return false
 	for figure in world.get_tree().get_nodes_in_group("village_people"):
 		if figure.has_method("refresh_lod") and figure.is_visible_in_tree():
 			figure.refresh_lod(camera)
@@ -144,6 +150,123 @@ static func cameras() -> Dictionary:
 	return result
 
 
+## Showcase shots by id, numbers resolved against the look file ("look" key).
+static func showcase() -> Dictionary:
+	var result := {"source": SHOWCASE, "shots": {}, "order": [], "profiles": ["balanced", "very_high"]}
+	if not FileAccess.file_exists(SHOWCASE):
+		return result
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(SHOWCASE))
+	if not data is Dictionary:
+		return result
+	result.profiles = data.get("profiles", result.profiles)
+	var look := {}
+	var look_file := str(data.get("look_file", LOOK_VALUES))
+	if FileAccess.file_exists(look_file):
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(look_file))
+		if parsed is Dictionary:
+			look = parsed.get("cameras", {})
+	for entry: Dictionary in data.get("shots", []):
+		var shot := entry.duplicate(true)
+		var key := str(shot.get("look", ""))
+		if look.has(key) and look[key] is Dictionary:
+			shot.merge(look[key], true)
+			shot["numbers_from"] = look_file
+		result.shots[str(shot.id)] = shot
+		result.order.append(str(shot.id))
+	return result
+
+
+static func showcase_shot(view: String) -> Dictionary:
+	return showcase().shots.get(view, {})
+
+
+static func showcase_views(scene: String) -> Array:
+	var data := showcase()
+	var views := []
+	for id: String in data.order:
+		if str(data.shots[id].get("scene", "")) == scene:
+			views.append(id)
+	return views
+
+
+static func _vec(value: Variant) -> Vector3:
+	return Vector3(value[0], value[1], value[2])
+
+
+static func _stage_showcase(world: Node3D, shot: Dictionary, start: Dictionary) -> bool:
+	var camera: Camera3D = world._camera
+	match str(shot.get("kind", "")):
+		"start":
+			restore_village(world, start)
+			world._camera_initialized = false
+			world._update_camera(0)
+		"free":
+			camera.fov = float(shot.get("fov", 54.0))
+			camera.global_position = _vec(shot.eye)
+			camera.look_at(_vec(shot.target), Vector3.UP)
+		"player":
+			place_player(world, _vec(shot.player), float(shot.yaw), float(start.get("lift", 1.0)))
+			world._camera_yaw = float(shot.yaw)
+			world._camera_pitch = float(shot.pitch)
+			world._camera_initialized = false
+			world._update_camera(0)
+			if bool(shot.get("night", false)):
+				enter_night(world)
+		"conversation":
+			return _stage_conversation(world, shot, start)
+		_:
+			return false
+	return true
+
+
+## Over-the-shoulder two-shot, the same construction as the look review's
+## "conversation": the player stands at talking distance on open floor, the
+## resident turns to the player, the camera sits behind the player's shoulder.
+## The resident's previous facing is stored and restored by restore_village().
+static func _stage_conversation(world: Node3D, shot: Dictionary, start: Dictionary) -> bool:
+	var life = world.village_life_world
+	var id := ""
+	for candidate in shot.get("partners", []):
+		if life.actors.has(candidate) and (life.actors[candidate] as Node3D).is_visible_in_tree():
+			id = str(candidate)
+			break
+	if id.is_empty():
+		return false
+	var at: Vector3 = life.actor_position(id)
+	var actor: Node3D = life.actors[id]
+	var body: Node3D = actor.get_node("Figure") if actor.has_node("Figure") else actor
+	var facing := -body.global_basis.z
+	facing.y = 0
+	facing = facing.normalized() if facing.length() > 0.1 else Vector3.BACK
+	var distance := float(shot.get("distance", 1.35))
+	var space: PhysicsDirectSpaceState3D = world.get_world_3d().direct_space_state
+	var ground := floor_height(world, at + Vector3.UP * 0.5)
+	var away: Vector3 = facing
+	for direction: Vector3 in [facing, -facing, facing.rotated(Vector3.UP, PI / 2), facing.rotated(Vector3.UP, -PI / 2)]:
+		var stand: Vector3 = at + direction * distance
+		if absf(floor_height(world, Vector3(stand.x, ground + 0.5, stand.z)) - ground) > 0.3:
+			continue
+		var line := PhysicsRayQueryParameters3D.create(at + Vector3.UP * 1.2 + direction * 0.35,
+			stand + Vector3.UP * 1.2 + direction * 0.6, 1, [world._player.get_rid()])
+		if space.intersect_ray(line).is_empty():
+			away = direction
+			break
+	var lift := float(start.get("lift", 1.0))
+	var stand_at: Vector3 = at + away * distance
+	place_player(world, Vector3(stand_at.x, ground + 0.5, stand_at.z), atan2(away.x, away.z), lift)
+	world.set_meta("render_bench_turned", {"node": body, "yaw": body.global_rotation.y})
+	body.global_rotation.y = atan2(away.x, away.z) + PI
+	var feet: Vector3 = world.get_player_position() - Vector3.UP * lift
+	var side := Vector3.UP.cross(-away).normalized()
+	var camera: Camera3D = world._camera
+	camera.fov = float(shot.get("fov", 44.0))
+	camera.global_position = feet + away * float(shot.get("camera_back", 1.15)) - side * float(shot.get("camera_side", 0.52)) \
+		+ Vector3.UP * float(shot.get("camera_height", 1.62))
+	camera.look_at(Vector3(at.x, feet.y, at.z) + Vector3.UP * 1.42 - side * 0.18, Vector3.UP)
+	world.set_meta("render_bench_conversation", {"partner": id, "partner_position": str(at), "player": str(world.get_player_position())})
+	return true
+
+
 static func village_start(world: Node3D) -> Dictionary:
 	var camera: Camera3D = world._camera
 	var player: CharacterBody3D = world._player
@@ -154,6 +277,11 @@ static func village_start(world: Node3D) -> Dictionary:
 
 static func restore_village(world: Node3D, start: Dictionary) -> void:
 	leave_night(world)
+	if world.has_meta("render_bench_turned"):
+		var turned: Dictionary = world.get_meta("render_bench_turned")
+		if is_instance_valid(turned.node):
+			(turned.node as Node3D).global_rotation.y = float(turned.yaw)
+		world.remove_meta("render_bench_turned")
 	if not world._village_focus.is_empty():
 		world.clear_frontier_focus()
 	world._player.global_position = start.player
@@ -273,6 +401,14 @@ static func _torch(index: int, at: Vector3, materials: Dictionary) -> Node3D:
 
 ## City exploration (scripts/world/city_exploration.gd) at a fixed spot.
 static func stage_city(city: Node3D, view: String) -> bool:
+	var shot := showcase_shot(view)
+	if str(shot.get("kind", "")) == "city":
+		city.teleport(_vec(shot.spot))
+		city._yaw = float(shot.get("yaw", 0.0))
+		city._pitch = float(shot.get("pitch", -0.18))
+		city._distance = float(shot.get("distance", 4.2))
+		city._place_camera(0.2)
+		return true
 	if not CITY_SPOTS.has(view):
 		return false
 	city.teleport(CITY_SPOTS[view])

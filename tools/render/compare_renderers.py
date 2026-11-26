@@ -328,6 +328,67 @@ def analyze_texture_tiers(out: Path) -> dict:
     return result
 
 
+SHOWCASE = PROJECT / "assets" / "rendering" / "showcase_cameras.json"
+
+
+def showcase_shots() -> list[dict]:
+    return json.loads(SHOWCASE.read_text(encoding="utf-8"))["shots"] if SHOWCASE.is_file() else []
+
+
+def showcase_ids(scene: str) -> list[str]:
+    return [shot["id"] for shot in showcase_shots() if shot["scene"] == scene]
+
+
+def showcase_sheets(out: Path) -> list[str]:
+    """D-052: one sheet per renderer, a row per showcase shot: Ausgewogen, Ultra, Ultra prototype (same camera).
+    showcase.json carries the D-038 metadata of every image."""
+    from PIL import Image, ImageDraw
+    shots = showcase_shots()
+    sheets, meta = [], {"camera_list": str(SHOWCASE.relative_to(ROOT)), "source_commit": git("rev-parse", "HEAD"),
+                        "note": "Software renderer images; times are relative indicators, never device data.", "images": []}
+    thumb = (640, 360)
+    columns = [("balanced", "base", "Ausgewogen"), ("very_high", "base", "Ultra (Profil)"), ("very_high", "ultra", "Ultra-Prototyp")]
+    for renderer in RENDERERS:
+        reports = {}
+        for scene in ("village", "city"):
+            path = out / f"{scene}-{renderer}" / f"{scene}-{renderer}-report.json"
+            if path.is_file():
+                reports[scene] = (path.parent, json.loads(path.read_text()))
+        rows = [s for s in shots if s["scene"] in reports and s["id"] in reports[s["scene"]][1].get("shots", {})]
+        if not rows:
+            continue
+        sheet = Image.new("RGB", (thumb[0] * len(columns), (thumb[1] + 22) * len(rows) + 24), (18, 18, 18))
+        draw = ImageDraw.Draw(sheet)
+        adapter = next(iter(reports.values()))[1]["renderer"]["adapter"]
+        draw.text((6, 5), f"{renderer} ({adapter}) - software renderer, not device data - " + "  |  ".join(c[2] for c in columns), fill=(255, 210, 120))
+        for r, shot in enumerate(rows):
+            folder, report = reports[shot["scene"]]
+            y = 24 + r * (thumb[1] + 22)
+            draw.text((6, y + 4), f"{shot['area']} - {shot['id']}", fill=(230, 230, 230))
+            for c, (profile, variant, caption) in enumerate(columns):
+                data = report["shots"][shot["id"]].get(profile, {}).get(variant)
+                if not data:
+                    continue
+                sheet.paste(Image.open(folder / data["image"]).convert("RGB").resize(thumb, Image.LANCZOS), (c * thumb[0], y + 22))
+                engine = data.get("engine", {})
+                meta["images"].append({"shot": shot["id"], "area": shot["area"], "renderer": renderer, "profile": profile, "variant": variant,
+                                       "image": str((folder / data["image"]).relative_to(out)), "source_commit": report.get("source_commit"),
+                                       "driver": report["renderer"], "resolution": report.get("output_pixels"),
+                                       "camera": engine.get("camera"), "sun": engine.get("sun"), "lights": engine.get("lights"),
+                                       "environment": engine.get("environment"), "viewport": engine.get("viewport"),
+                                       "applied_profile": engine.get("applied_profile"), "ultra": data.get("ultra"),
+                                       "memory_mib": {k: data.get(k) for k in ("texture_mib", "buffer_mib", "video_mib", "rss_mib")},
+                                       "performance": {k: data.get(k) for k in ("wall_ms_p50", "wall_ms_p95", "render_cpu_ms_p50", "render_gpu_ms_p50",
+                                                                                "draw_calls", "primitives", "objects", "shadow_draw_calls", "shadow_primitives")},
+                                       "loaded_assets": f"{folder.name}/{folder.name}-report.json#loaded_assets ({(report.get('loaded_assets') or {}).get('count')} files with sha256)"})
+        target = out / f"showcase-{renderer}.jpg"
+        sheet.save(target, quality=90)
+        sheets.append(target.name)
+    if meta["images"]:
+        (out / "showcase.json").write_text(json.dumps(meta, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    return sheets
+
+
 def analyze(out: Path, records: list[dict]) -> dict:
     features = analyze_features(out)
     summary = {"schema": "imperathen-renderer-comparison-1", "source_commit": git("rev-parse", "HEAD"),
@@ -337,7 +398,7 @@ def analyze(out: Path, records: list[dict]) -> dict:
                "runs": records, "features": features,
                "village": analyze_views(out, "village"), "city": analyze_views(out, "city"),
                "texture_packages": analyze_texture_tiers(out),
-               "sheets": contact_sheets(out, "village") + contact_sheets(out, "city") + ultra_sheet(out, "village") + ultra_sheet(out, "city")}
+               "sheets": contact_sheets(out, "village") + contact_sheets(out, "city") + ultra_sheet(out, "village") + ultra_sheet(out, "city") + showcase_sheets(out)}
     for name, ids in {"gi": ["ssao", "ssil", "sdfgi", "voxel_gi", "ssr", "volumetric_fog"],
                       "post": ["glow", "tonemap_agx", "tonemap_aces", "depth_of_field", "auto_exposure", "fog_sun_scatter"],
                       "aa": ["msaa_off", "msaa_4x", "fxaa", "smaa", "taa", "fsr2_67"],
@@ -454,6 +515,8 @@ def main() -> int:
     parser.add_argument("--profiles", default=",".join(PROFILES))
     parser.add_argument("--fx-profiles", default="balanced")
     parser.add_argument("--variants", default="base,fx,ultra", help="base, fx (capability showcase), ultra (D-050 prototype on very_high)")
+    parser.add_argument("--showcase", action="store_true",
+                        help="D-052: views = the shared showcase camera list (prototype/assets/rendering/showcase_cameras.json) per scene")
     parser.add_argument("--views", default="", help="Comma separated subset of views (default: all of the scene)")
     parser.add_argument("--features", default="", help="Comma separated subset of probe features")
     parser.add_argument("--frames", type=int, default=5)
@@ -487,7 +550,8 @@ def main() -> int:
                         script, user = "res://tests/render_feature_probe.gd", [str(folder), label, str(args.frames), args.features]
                     else:
                         script = "res://tests/render_comparison.gd"
-                        user = [str(folder), step, label, args.profiles, args.variants, str(args.frames), args.fx_profiles, args.views]
+                        views = ",".join(showcase_ids(step)) if args.showcase else args.views
+                        user = [str(folder), step, label, args.profiles, args.variants, str(args.frames), args.fx_profiles, views]
                     record = run_step(godot, label, renderer, script, user, out, size, args.timeout, args.texture_tier)
                     records = [r for r in records if r["step"] != label] + [record]
                     records_path.write_text(json.dumps(records, indent=1) + "\n")

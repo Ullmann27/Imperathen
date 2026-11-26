@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "about": "D-052 visual reference environment: the one fixed camera list for showcase captures, before/after comparisons of every graphics branch and the renderer/profile bench (scripts/rendering/render_bench.gd). Entries with \"look\" take their numbers from the cameras block of the village look file when that file is installed, so the look development and this list can never drift; the values written here are the identical fallback. Light values are never stored here: they come from the look file.",
+  "look_file": "res://assets/village/look/look_values.json",
+  "profiles": ["balanced", "very_high"],
+  "resolutions": [[1280, 720], [1384, 1536]],
+  "shots": [
+    {"id": "house_interior", "area": "Familienhaus", "scene": "village", "kind": "start",
+      "note": "Game camera right after a new life (I-01 family house)."},
+    {"id": "village_lane", "area": "Valdora", "scene": "village", "kind": "player", "look": "path",
+      "player": [0.9, 0.0, 12.5], "yaw": 0.0, "pitch": 0.24},
+    {"id": "village_overview", "area": "Valdora", "scene": "village", "kind": "free", "look": "overview",
+      "eye": [31.0, 17.5, 33.0], "target": [-4.0, 1.0, -9.0], "fov": 54},
+    {"id": "smithy", "area": "Schmiede", "scene": "village", "kind": "free",
+      "eye": [29.6, 1.7, -21.4], "target": [34.1, 1.15, -26.6], "fov": 50,
+      "note": "Village forge (settlement_dressing.gd VillageForge at 34.1/0/-26.2): hearth, bellows, anvil, tool rack."},
+    {"id": "landscape_path", "area": "Landschaft und Wege", "scene": "village", "kind": "player",
+      "player": [0.4, 0.0, 30.0], "yaw": 3.14159265, "pitch": 0.16,
+      "note": "On the road south of the gate, looking out of the village past the milestone."},
+    {"id": "dialogue", "area": "Filmische Gesprächsszene", "scene": "village", "kind": "conversation", "look": "conversation",
+      "partners": ["julia", "silvanus", "sextus", "cassia"], "distance": 1.35, "camera_back": 1.15, "camera_side": 0.52,
+      "camera_height": 1.62, "fov": 44},
+    {"id": "night_torch", "area": "Valdora bei Nacht", "scene": "village", "kind": "player", "look": "path", "night": true,
+      "player": [0.9, 0.0, 12.5], "yaw": 0.0, "pitch": 0.24},
+    {"id": "city_main_street", "area": "Römische Hauptstraße", "scene": "city", "kind": "city",
+      "spot": [0.0, 0.92, 44.0], "yaw": 0.0, "pitch": -0.14, "distance": 4.2},
+    {"id": "city_market", "area": "Marktviertel", "scene": "city", "kind": "city",
+      "spot": [-12.0, 0.92, 68.0], "yaw": 0.0, "pitch": -0.18, "distance": 4.2},
+    {"id": "city_forum", "area": "Forum", "scene": "city", "kind": "city",
+      "spot": [-8.0, 0.92, 24.0], "yaw": 0.0, "pitch": -0.18, "distance": 4.2}
+  ]
+}
