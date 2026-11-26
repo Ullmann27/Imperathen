@@ -6,6 +6,7 @@ const Bible = preload("res://scripts/story/campaign_bible.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
 const CompanionStory = preload("res://scripts/story/companion_story.gd")
+const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const VERSION := 2
 const LEGACY_RELATION_IDS := {"antonia":"julia", "sextus":"silvanus", "quintus":"sextus"}
 const NPC_RANGE := 3.2
@@ -21,7 +22,8 @@ const POINTS := {
 	"wood_bundle":Vector2(-43.0,17.0), "patrol_inner":Vector2(0.0,-16.0),
 	"patrol_road":Vector2(0.0,-35.0), "patrol_gate":Vector2(0.0,-46.0),
 	"sick_guard":Vector2(10.0,18.5), "marcus":Vector2(-3.0,4.0),
-	"hoof_tracks":Vector2(0.0,-35.0), "oath_ridge":Vector2(-16.0,-19.0)
+	"hoof_tracks":Vector2(0.0,-35.0), "oath_ridge":Vector2(-16.0,-19.0),
+	"home_shelf":Vector2(-15.32,12.05), "home_table":Vector2(-14.1,10.39), "well":Vector2(-7.0,6.0)
 }
 const EXTRA_NPCS := {
 	"julia":{"name":"Julia", "role":"Deine Mutter", "point":"mother", "profession":""},
@@ -42,8 +44,9 @@ static var STEPS: Array = MissionData.steps("band1")
 ## Separater Datenkatalog; die Save-relevante STEPS-Reihenfolge bleibt erhalten.
 static var BRIDGE_STEPS: Dictionary = MissionData.bridge_steps("band1")
 ## Screenplay bridge state version. v3 adds I-07 water (story core „Wasser,
-## Nachricht und kurze Kontrollrunde“); older saves migrate on load.
-const SCREENPLAY_VERSION := 3
+## Nachricht und kurze Kontrollrunde“); v4 adds the playable I-01 morning
+## (cups, well, meal, table talk, event ledger). Older saves migrate on load.
+const SCREENPLAY_VERSION := 4
 static var CARRIED_EFFECTS: Dictionary = MissionData.carried_effects("band1")
 const ITEM_NAMES := {"household_coin":"Reservierter Haushaltsdenar", "neighbor_basket":"Julias Nachbarschaftskorb", "memory_token":"Erinnerungsstück aus Valdora", "water_jug":"Gefüllter Familienkrug", "family_parcel":"Cassias Familienbestellung", "kindling_bundle":"Kleinholzbündel für Sextus", "checked_hinge":"Geprüfter Truhengriff", "medicine_parcel":"Aurelias Versorgungspäckchen", "gate_message":"Durchlassnachricht vom Tor"}
 const WORKPLACE_CAPACITY := {"farm":2,"woodcamp":2,"quarry":4,"trade":2,"watchpost":2}
@@ -72,6 +75,7 @@ static func start(data: Dictionary) -> bool:
 		"gear":"none","apprenticeship":"none","night_event":"none",
 		"screenplay":{"version":SCREENPLAY_VERSION,"i02":"pending","i02_outcome":"","i03":"locked","i03_outcome":"","i07_water":"locked","i08":"locked","hoof_evidence":false,"i10":"locked","raid_path":"","visible_raiders":30,"i11":"locked","i12":"locked","i13":"locked","i14":"locked","julia_outcome":"undecided","oath":false},
 		"guard_absence":{"active":false,"previous_assignment":"idle","previous_health":100}}
+	data.village.childhood.screenplay.merge(I01.fresh_state())
 	return true
 
 
@@ -157,6 +161,7 @@ static func migrate_legacy_ids(data: Dictionary) -> bool:
 ## Adds the v3 screenplay fields to v2 childhood saves without completing
 ## anything retroactively: a save already past the watch post keeps I-07 water
 ## as "legacy"; a save standing exactly before it gets the new water task.
+## The chain continues with v3 -> v4 (I-01 morning, see I01.migrate).
 static func migrate_screenplay(data: Dictionary) -> bool:
 	if not enabled(data):
 		return false
@@ -164,13 +169,16 @@ static func migrate_screenplay(data: Dictionary) -> bool:
 	if typeof(child) != TYPE_DICTIONARY or typeof(child.get("screenplay")) != TYPE_DICTIONARY or typeof(child.get("completed")) != TYPE_ARRAY:
 		return false
 	var screenplay: Dictionary = child.screenplay
-	if int(screenplay.get("version", 0)) != 2:
-		return false
-	var water_index := _step_index("watch_post")
-	var done: int = child.completed.size()
-	screenplay.i07_water = "locked" if done < water_index else ("pending" if done == water_index else "legacy")
-	screenplay.version = SCREENPLAY_VERSION
-	return true
+	var migrated := false
+	if int(screenplay.get("version", 0)) == 2:
+		var water_index := _step_index("watch_post")
+		var done: int = child.completed.size()
+		screenplay.i07_water = "locked" if done < water_index else ("pending" if done == water_index else "legacy")
+		screenplay.version = 3
+		migrated = true
+	if I01.migrate(child):
+		migrated = true
+	return migrated
 
 
 static func _step_index(step_id: String) -> int:
@@ -217,6 +225,8 @@ static func actor_override(data: Dictionary, id: String) -> Variant:
 			return POINTS.patrol_road + Vector2(1.8, 0)
 		if current.get("id", "") in ["patrol_gate","patrol_report"]:
 			return POINTS.patrol_gate + Vector2(1.8, 0)
+	if id in ["julia", "silvanus"] and bool(I01.presentation(data).get(id + "_at_table", false)) and str(_person(data, id).get("assignment", "idle")) == "idle":
+		return I01.POINTS[id + "_table"]
 	if EXTRA_NPCS.has(id) and str(_person(data, id).get("assignment", "idle")) == "idle":
 		return POINTS[EXTRA_NPCS[id].point]
 	if child.completed.size() < STEPS.size() and NEIGHBORS.has(id):
@@ -286,6 +296,12 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 	if step.is_empty():
 		return _fail("Die Aufgaben dieses Kindheitskapitels sind bereits abgeschlossen.")
 	var action: String = args.action_id
+	if I01.handles(action):
+		var morning := I01.apply(data, action, _villager_positions(data))
+		if not morning.ok:
+			return _fail(str(morning.message))
+		_record(data, action, str(morning.message), str(morning.events[0]))
+		return _ok(str(morning.message))
 	var id: String = step.id
 	if step.get("screenplay", false):
 		var reason := _action_reason(data, step)
@@ -564,12 +580,31 @@ static func view(data: Dictionary) -> Dictionary:
 		"can_rest":step.get("rest", false) or step.get("id", "") == "night_rest",
 		"night_raid_pending":child.night_event == "pending","night_event":child.night_event,
 		"guard_absent":child.guard_absence.active,"target_npc":step.get("npc", ""),
-		"target_point":step.get("point", ""),"actions":_choices(data, step)}
+		"target_point":step.get("point", ""),"actions":_choices(data, step),
+		"hud_title":hud_title(step, mission_id, chapter),"in_first_mission":I01.in_mission(data),
+		"morning":I01.presentation(data)}
+	var cup_state: Dictionary = I01.cups(data)
+	if cup_state.values().has("hand"):
+		items.append("Drei Becher vom Regal")
+	if str(child.screenplay.get("i01_water", "")) == "jug":
+		items.append("Familienkrug mit Brunnenwasser")
 	if not step.is_empty():
 		var target := _target(data, step)
 		result["target_position"] = [target.x, target.y]
 		result["point"] = target
 	return result
+
+
+## Player-facing objective heading (HB 3.0 S. 44): occasion and place instead
+## of a technical mission ID. The ID-bearing title stays for chronicle/tests.
+static func hud_title(step: Dictionary, mission_id: String, chapter: String) -> String:
+	var occasion := str(Bible.mission(mission_id).get("title", "")) if not mission_id.is_empty() else ""
+	if occasion.is_empty():
+		occasion = chapter
+	var place := I01.hud_place(step)
+	if place.is_empty() and step.has("npc"):
+		place = "bei " + str(EXTRA_NPCS.get(step.npc, NEIGHBORS.get(step.npc, {})).get("name", ""))
+	return occasion if place.is_empty() or place == "bei " else "%s · %s" % [occasion, place]
 
 
 ## HUD heading for a childhood step: the screenplay mission ID and its authored
@@ -596,7 +631,14 @@ static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
 		var step := _current(data)
 		if step.get("npc", "") == npc_id:
 			text = step.text
+			var remembered := I01.hook_lines(data, str(step.get("id", "")))
+			if not remembered.is_empty():
+				text = "\n\n".join(remembered) + "\n\n" + text
 			choices = _choices(data, step)
+		elif I01.contact_open(data, npc_id):
+			text = I01.contact_line(npc_id)
+			var why := I01.reason(data, "i01_contact_" + npc_id, _villager_positions(data))
+			choices.append({"label":"Kurz zuhören und antworten","command":"village_childhood_action","payload":{"action_id":"i01_contact_" + npc_id},"enabled":why.is_empty(),"reason":why})
 		elif typeof(step.get("visits")) == TYPE_DICTIONARY and step.visits.has(npc_id):
 			# Optional visits authored in the mission data (e.g. I-09 evening).
 			text = str(step.visits[npc_id])
@@ -611,6 +653,8 @@ static func interactables(data: Dictionary) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	if not enabled(data) or not validate(data).is_empty():
 		return result
+	if I01.active(data):
+		return I01.interactables(data, func(action: String) -> String: return _i01_reason(data, action))
 	var step := _current(data)
 	if not step.has("point") or step.get("id", "") == "i03_marcus":
 		return result
@@ -666,8 +710,12 @@ static func validate(data: Dictionary) -> String:
 	var screenplay: Variant = child.screenplay
 	var screenplay_keys := ["version","i02","i02_outcome","i03","i03_outcome","i07_water","i08","hoof_evidence",
 		"i10","raid_path","visible_raiders","i11","i12","i13","i14","julia_outcome","oath"]
+	screenplay_keys.append_array(I01.KEYS)
 	if not _keys(screenplay, screenplay_keys) or not _integer(screenplay.version,SCREENPLAY_VERSION,SCREENPLAY_VERSION):
 		return "Ungültiger Drehbuch-Brückenstand."
+	var morning_error := I01.validate(screenplay, child.completed.size())
+	if not morning_error.is_empty():
+		return morning_error
 	var water_index := _step_index("watch_post")
 	var water_allowed: Array = ["locked"]
 	if child.completed.size() == water_index:
@@ -807,6 +855,9 @@ static func validate(data: Dictionary) -> String:
 static func _screenplay_step(data: Dictionary) -> Dictionary:
 	var child: Dictionary = data.village.childhood
 	var screenplay: Dictionary = child.screenplay
+	# I-01: the playable first morning precedes the established family steps.
+	if I01.active(data):
+		return I01.current_step(data)
 	# I-02 and I-03 sit after the established family morning. They are separate
 	# from completed[] so older 35-step saves keep their exact sequence indices.
 	if child.completed.size() >= 3:
@@ -889,6 +940,11 @@ static func _choices(data: Dictionary, step: Dictionary) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	if step.is_empty():
 		return result
+	if step.get("i01", false):
+		for option: Dictionary in I01.options(data, step):
+			var why := _i01_reason(data, str(option.id))
+			result.append({"label":option.label,"command":"village_childhood_action","payload":{"action_id":option.id},"enabled":why.is_empty(),"reason":why})
+		return result
 	var options: Array = [{"id":step.id,"label":step.label}]
 	if step.id == "market_trade":
 		options = [{"id":"market_fair","label":"Den vereinbarten Lohn nehmen · 2 Denare"},
@@ -950,7 +1006,24 @@ static func _action_reason(data: Dictionary, step: Dictionary) -> String:
 
 
 static func _target(data: Dictionary, step: Dictionary) -> Vector2:
-	return _npc_position(data, step.npc) if step.has("npc") else POINTS[step.point]
+	if step.has("npc"):
+		return _npc_position(data, step.npc)
+	return POINTS[step.point]
+
+
+static func _villager_positions(data: Dictionary) -> Dictionary:
+	var result := {}
+	for id: String in ["cassia", "aelia"]:
+		result[id] = _npc_position(data, id)
+	return result
+
+
+static func i01_reason(data: Dictionary, action: String) -> String:
+	return _i01_reason(data, action)
+
+
+static func _i01_reason(data: Dictionary, action: String) -> String:
+	return I01.reason(data, action, _villager_positions(data))
 
 
 static func _npc_position(data: Dictionary, id: String) -> Vector2:
@@ -1021,13 +1094,13 @@ static func _idle_text(id: String) -> String:
 		"sextus":"»Eine Schmiede ist ein Arbeitsplatz, keine Abkürzung zum Heldentum. Erst zuhören, dann gemeinsam üben und die Arbeit ordentlich übergeben.«"}.get(id, "")
 
 
-static func _record(data: Dictionary, id: String, message: String) -> void:
+static func _record(data: Dictionary, id: String, message: String, event_id := "") -> void:
 	var history: Dictionary = data.village.history
 	history.mode = "fictional_branch"
 	history.player_changes.append("childhood_"+id)
 	if history.player_changes.size() > 128:
 		history.player_changes.pop_front()
-	history.events.append({"seconds":data.village.social.seconds,"kind":"childhood_action","text":message,"provenance":"fictional_playable_event"})
+	history.events.append({"seconds":data.village.social.seconds,"kind":"childhood_action" if event_id.is_empty() else event_id,"text":message,"provenance":"fictional_playable_event"})
 	if history.events.size() > 64:
 		history.events.pop_front()
 
