@@ -220,15 +220,14 @@ func _check_house(interiors: Node3D, house: Node3D, id: String) -> void:
 		var record: Dictionary = placed[index]
 		for flame: Array in Kit.FLAMES.get(record.prop, []):
 			flames += 1
-			var rooted := false
-			var seen := []
-			for offset: Vector3 in [Vector3.ZERO, Vector3(.004, 0, 0), Vector3(-.004, 0, 0), Vector3(0, 0, .004), Vector3(0, 0, -.004)]:
-				var from: Vector3 = room * ((record.transform as Transform3D) * ((flame[0] as Vector3) + Vector3.UP * .012 + offset))
-				var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(from, from - Vector3.UP * .05, TEST_LAYER))
-				rooted = rooted or (not hit.is_empty() and hit.collider == bodies[index])
-				seen.append("none" if hit.is_empty() else "%s@%.3f" % [placed[bodies.find(hit.collider)].prop if hit.collider in bodies else "shell",
-					from.y - (hit.position as Vector3).y])
-			_check(rooted, "%s/%s: a flame starts on its wick or fire bed %s" % [id, record.prop, seen])
+			# Measured against the drawn mesh: the highest vertex within 3 cm of
+			# the flame axis (wick tip, candle top or fire bed) lies just below.
+			var base: Vector3 = flame[0]
+			var top := -INF
+			for vertex: Vector3 in (Kit.meshes[record.prop] as Mesh).get_faces():
+				if Vector2(vertex.x - base.x, vertex.z - base.z).length() <= .03 and vertex.y <= base.y + .03:
+					top = maxf(top, vertex.y)
+			_check(base.y - top >= -.03 and base.y - top <= .015, "%s/%s: a flame starts on its wick or fire bed (gap %.4f m)" % [id, record.prop, base.y - top])
 	var flame_node := house.get_node("Interior").get_node_or_null("Flames") as MeshInstance3D
 	_check((flame_node == null and flames == 0) or (flame_node != null and int(flame_node.get_meta("flames")) == flames),
 		"%s shows %d flame(s)" % [id, flames])

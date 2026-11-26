@@ -605,7 +605,7 @@
     "INT_food",
     "INT_embers"
    ],
-   "triangles": 588
+   "triangles": 592
   },
   "candle_dish": {
    "aabb_max": [
@@ -624,7 +624,7 @@
     "INT_food",
     "INT_embers"
    ],
-   "triangles": 344
+   "triangles": 348
   },
   "capsa": {
    "aabb_max": [
@@ -940,14 +940,14 @@
   },
   "forge_hearth": {
    "aabb_max": [
-    0.5531,
+    0.5583,
     1.4,
-    0.6044
+    0.6049
    ],
    "aabb_min": [
-    -0.5534,
-    0.0,
-    -0.5043
+    -0.5536,
+    -0.0027,
+    -0.5044
    ],
    "hanging": false,
    "materials": [
@@ -956,16 +956,16 @@
     "INT_hearth_clay",
     "INT_embers"
    ],
-   "triangles": 18104
+   "triangles": 2116
   },
   "forge_shelter": {
    "aabb_max": [
-    1.4786,
-    2.9371,
+    1.4799,
+    2.9385,
     3.317
    ],
    "aabb_min": [
-    -0.869,
+    -0.8703,
     0.0,
     -3.45
    ],
@@ -975,7 +975,7 @@
     "INT_wood_rough",
     "INT_stone"
    ],
-   "triangles": 24140
+   "triangles": 2684
   },
   "guard_kit": {
    "aabb_max": [
@@ -1695,7 +1695,7 @@
    ],
    "aabb_min": [
     -0.372,
-    -0.0016,
+    0.0,
     -0.16
    ],
    "hanging": false,
@@ -1752,7 +1752,7 @@
    ],
    "aabb_min": [
     -1.0803,
-    -0.0084,
+    0.0,
     -0.6503
    ],
    "hanging": false,
@@ -1771,7 +1771,7 @@
    ],
    "aabb_min": [
     -1.0803,
-    -0.0084,
+    0.0,
     -0.6503
    ],
    "hanging": false,
@@ -2055,6 +2055,6 @@
    "triangles": 876
   }
  },
- "total_triangles": 262650,
+ "total_triangles": 225214,
  "units": "metres"
 }
