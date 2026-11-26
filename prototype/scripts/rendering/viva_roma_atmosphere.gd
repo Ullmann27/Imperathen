@@ -12,7 +12,7 @@ static func ground_material(profile: String) -> ShaderMaterial:
 static func configure_sun(sun: DirectionalLight3D, profile: String) -> void:
 	sun.rotation_degrees = Vector3(-36.0,-37.0,0.0)
 	sun.light_color = Color(1.0,0.91,0.80)
-	sun.light_energy = 1.35
+	sun.light_energy = 1.10
 	sun.shadow_enabled = profile != "low"
 	sun.directional_shadow_max_distance = float(DISTANCE.get(profile,48.0))
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
@@ -39,5 +39,6 @@ static func environment(profile: String) -> Environment:
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	env.fog_enabled = true
 	env.fog_density = 0.0016
+	env.fog_sky_affect = 0.24
 	env.fog_light_color = Color("c5c6b9")
 	return env

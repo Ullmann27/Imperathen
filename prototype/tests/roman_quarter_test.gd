@@ -43,13 +43,16 @@ func _run() -> void:
 		quit(1)
 		return
 	var quarter := city.quarter
-	for name_in_scene: String in ["Paving", "WorkshopAndTavern", "StreetFountain", "WaxTablet"]:
+	for name_in_scene: String in ["Paving", "WorkshopAndTavern", "StreetDomus", "StreetFountain", "WaxTablet"]:
 		_check(quarter.has_node(name_in_scene), name_in_scene + " is present in the playing city")
 	var street := await _walk(city, Vector3(28.0, 1.1, 15.5), Vector2(0, -1), 200)
 	_check(street.z < 12.0 and street.y > 1.07, "Player walks onto the crowned road from the forum")
 	for door_z: float in [-2.4, 2.4]:
 		var inside := await _walk(city, Vector3(30.05, 1.15, door_z), Vector2.RIGHT, 180)
 		_check(inside.x > 33.5 and absf(inside.y - 1.184) < 0.045, "Player climbs the curb and walks through door at %.1f: %s" % [door_z, inside])
+	for door_z: float in [0.8, 4.9]:
+		var inside := await _walk(city, Vector3(25.9, 1.15, door_z), Vector2.LEFT, 155)
+		_check(inside.x < 22.7 and absf(inside.y - 1.184) < 0.075, "Player crosses the opposite sidewalk through the house at %.1f: %s" % [door_z, inside])
 	var blocked := await _walk(city, Vector3(31.1, 1.2, 0.0), Vector2.RIGHT, 90)
 	_check(blocked.x < 32.5 and blocked.x > 31.7, "Same movement is blocked by the facade between doors")
 	var fountain := await _walk(city, Vector3(25.1, 1.17, -4.3), Vector2.LEFT, 120)
@@ -67,21 +70,27 @@ func _run() -> void:
 	await _frames(2)
 	_check(not city._tablet_dialog.visible and city.quarter == quarter, "Dismiss returns to the same city")
 	var structure_count := quarter.find_children("*", "StaticBody3D", true, false).size()
-	var workshop_hulls := city.find_children("QuarterCollision_*", "StaticBody3D", false, false).size()
+	var workshop_hulls := city.find_children("QuarterCollision_WorkshopAndTavern_*", "StaticBody3D", false, false).size()
 	_check(workshop_hulls == 18, "All 18 authored workshop and furniture hulls are live")
+	var domus_hulls := city.find_children("QuarterCollision_StreetDomus_*", "StaticBody3D", false, false).size()
+	_check(domus_hulls > 8, "Street domus has a floor and walls rather than empty facade")
 	city.free()
 
-	city = City.new()
-	city.persist = false
-	city.profile = "low"
-	root.add_child(city)
-	await _frames(8)
-	var gravel := city.quarter.find_child("Kiesel_am_Rinnstein", true, false) as GeometryInstance3D
-	_check(gravel != null and not gravel.visible, "Light profile omits cosmetic pebbles")
-	_check(city.quarter.find_children("*", "StaticBody3D", true, false).size() == structure_count and
-		city.find_children("QuarterCollision_*", "StaticBody3D", false, false).size() == workshop_hulls,
-		"Light profile preserves every traversable structure and physical hull")
-	city.free()
+	for profile: String in ["low", "high", "very_high"]:
+		city = City.new()
+		city.persist = false
+		city.profile = profile
+		root.add_child(city)
+		await _frames(8)
+		var gravel := city.quarter.find_child("Kiesel_am_Rinnstein", true, false) as GeometryInstance3D
+		var cosmetic_distance := {"low": 0.0, "high": 29.0, "very_high": 0.0}
+		_check(gravel != null and gravel.visible == (profile != "low") and
+			is_equal_approx(gravel.visibility_range_end, cosmetic_distance[profile]),
+			"Profile %s controls cosmetic pebbles" % profile)
+		_check(city.quarter.find_children("*", "StaticBody3D", true, false).size() == structure_count and
+			city.find_children("QuarterCollision_*", "StaticBody3D", false, false).size() == workshop_hulls + domus_hulls,
+			"Profile %s preserves every traversable structure and physical hull" % profile)
+		city.free()
 	await _frames(2)
 	print("ROMAN_QUARTER_%s checks=%d failures=%d" % ["PASS" if failures == 0 else "FAIL", checks, failures])
 	quit(0 if failures == 0 else 1)

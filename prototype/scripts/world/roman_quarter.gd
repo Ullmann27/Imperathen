@@ -6,9 +6,12 @@ const ORIGIN := Vector3(28.0, 0.125, 0.0)
 const PAVING := "res://assets/roman_quarter/paving/paving.glb"
 const WORKSHOP := "res://assets/roman_quarter/workshop/roman_workshop.glb"
 const WORKSHOP_COLLISION := "res://assets/roman_quarter/workshop/roman_workshop_collision.glb"
+const DOMUS := "res://assets/roman_quarter/workshop/roman_narrow_domus.glb"
+const DOMUS_COLLISION := "res://assets/roman_quarter/workshop/roman_narrow_domus_collision.glb"
 const FOUNTAIN := "res://assets/roman_quarter/fountain/fontana.glb"
 const TABLET := "res://assets/roman_quarter/tablet/wax_tablet.glb"
 const WORKSHOP_POSITION := Vector3(4.5, 0.159, 0.0)
+const DOMUS_POSITION := Vector3(-4.5, 0.159, 2.9)
 const FOUNTAIN_POSITION := Vector3(-5.34, 0.159, -4.3)
 const TABLET_POSITION := WORKSHOP_POSITION + Vector3(4.70, 1.047, 3.28)
 const TABLET_APPROACH := WORKSHOP_POSITION + Vector3(3.8, 0.9, 3.27)
@@ -35,16 +38,12 @@ func install(profile: String, add_imported_colliders: Callable) -> void:
 	for x: float in [-2.55, -1.85, -0.13, 1.62, 2.39]:
 		_floor_box(Vector3(x, 0.159, 6.2), Vector3(0.52, 0.15, 0.69))
 
-	if ResourceLoader.exists(WORKSHOP_COLLISION, "PackedScene"):
-		var workshop := _model(WORKSHOP, "WorkshopAndTavern", WORKSHOP_POSITION)
-		if workshop != null:
-			var collision := _model(WORKSHOP_COLLISION, "WorkshopHulls", WORKSHOP_POSITION)
-			if collision != null:
-				add_imported_colliders.call(collision, "QuarterCollision_")
-				collision.queue_free()
-				_tablet = _model(TABLET, "WaxTablet", TABLET_POSITION)
-				if _tablet != null:
-					_tablet.rotation_degrees.y = -13.0
+	if _place_building(WORKSHOP, WORKSHOP_COLLISION, "WorkshopAndTavern",
+			WORKSHOP_POSITION, 0.0, add_imported_colliders):
+		_tablet = _model(TABLET, "WaxTablet", TABLET_POSITION)
+		if _tablet != null:
+			_tablet.rotation_degrees.y = -13.0
+	_place_building(DOMUS, DOMUS_COLLISION, "StreetDomus", DOMUS_POSITION, PI, add_imported_colliders)
 	var fountain := _model(FOUNTAIN, "StreetFountain", FOUNTAIN_POSITION)
 	if fountain != null:
 		fountain.rotation_degrees.y = 90.0
@@ -58,6 +57,19 @@ func tablet_reachable(player: CharacterBody3D) -> bool:
 	var eye := player.global_position + Vector3.UP * 0.43
 	var query := PhysicsRayQueryParameters3D.create(eye, _tablet.global_position + Vector3.UP * 0.08, 1, [player.get_rid()])
 	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
+
+
+func _place_building(path: String, hulls: String, node_name: String, at: Vector3, yaw: float, add_imported_colliders: Callable) -> bool:
+	var collision := _model(hulls, node_name + "HullSource", at)
+	if collision == null:
+		return false
+	var model := _model(path, node_name, at)
+	if model != null:
+		model.rotation.y = yaw
+		collision.rotation.y = yaw
+		add_imported_colliders.call(collision, "QuarterCollision_" + node_name + "_")
+	collision.queue_free()
+	return model != null
 
 
 func _model(path: String, node_name: String, at: Vector3) -> Node3D:
