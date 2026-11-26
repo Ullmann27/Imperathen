@@ -33,6 +33,8 @@ func _run() -> void:
 	_check(env.tonemap_mode in [Environment.TONE_MAPPER_ACES, Environment.TONE_MAPPER_AGX, Environment.TONE_MAPPER_FILMIC], "Filmic tonemapper")
 	_check(env.ambient_light_source == Environment.AMBIENT_SOURCE_BG and env.fog_enabled and env.fog_aerial_perspective > 0.0, "Sky ambient and aerial haze")
 	_check(not env.adjustment_enabled, "No blanket contrast/saturation grade")
+	_check(Look.SEASONS.size() == 4 and Look.SEASONS[0].sun is Color and Look.DAYLIGHT[1] is Vector3 and Look.OPENINGS[0] is Vector4, "Look values decoded from look_values.json")
+	_check(Look.VALUES.cameras.overview.eye is Vector3 and Look.VALUES.cameras.resolutions.size() == 2, "Shared camera set present")
 	_check(world.find_children("*", "CollisionObject3D", true, false).is_empty(), "Look adds no physics bodies")
 	for profile in ["low", "balanced", "high", "very_high"]:
 		look.apply_quality(profile)
@@ -57,7 +59,7 @@ func _run() -> void:
 	look.set_time_of_day(-1.0)
 	_check(look.night == 0.0 and is_equal_approx(sun.light_energy, afternoon_energy), "Clearing the time restores the afternoon preset")
 	look.set_weather("rain")
-	_check(sun.light_energy < afternoon_energy * .3 and env.fog_density > Look.SEASONS[0].fog * 2.0, "Rain dims the sun and thickens haze")
+	_check(sun.light_energy < afternoon_energy * .3 and env.fog_density > float(Look.SEASONS[0].fog) * 2.0, "Rain dims the sun and thickens haze")
 	look.set_weather("clear")
 	_check(is_equal_approx(sun.light_energy, afternoon_energy), "Clear weather restores the preset")
 	# Interior: a camera inside a home switches to the room light and back.

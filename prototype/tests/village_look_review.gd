@@ -13,11 +13,17 @@ extends SceneTree
 ## Usage: --script res://tests/village_look_review.gd ++ <out_dir> [label] [frames] [profiles,csv]
 
 const SHOTS := ["start", "path", "conversation", "overview"]
-const PATH_POSITION := Vector3(0.9, 0.0, 12.5)
-const PATH_YAW := 0.0
-const PATH_PITCH := 0.24
-const OVERVIEW_EYE := Vector3(31.0, 17.5, 33.0)
-const OVERVIEW_TARGET := Vector3(-4.0, 1.0, -9.0)
+## The camera set is shared with the render-profile study through
+## assets/village/look/look_values.json ("cameras"); these defaults are the
+## same values, so the script also runs on commits without that file.
+const CAMERA_FILE := "res://assets/village/look/look_values.json"
+var PATH_POSITION := Vector3(0.9, 0.0, 12.5)
+var PATH_YAW := 0.0
+var PATH_PITCH := 0.24
+var OVERVIEW_EYE := Vector3(31.0, 17.5, 33.0)
+var OVERVIEW_TARGET := Vector3(-4.0, 1.0, -9.0)
+var PARTNERS: Array = ["julia", "silvanus", "sextus", "cassia"]
+var TALK := {"distance": 1.35, "camera_back": 1.15, "camera_side": .52, "camera_height": 1.62, "fov": 44.0}
 var output: String
 var label := "look"
 var frames := 4
@@ -42,7 +48,26 @@ func _initialize() -> void:
 	if args.size() > 3:
 		profiles = Array(args[3].split(",", false))
 	DirAccess.make_dir_recursive_absolute(output)
+	_read_cameras()
 	_run.call_deferred()
+
+
+func _read_cameras() -> void:
+	if not FileAccess.file_exists(CAMERA_FILE):
+		return
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(CAMERA_FILE))
+	if not data is Dictionary or not data.has("cameras"):
+		return
+	var cams: Dictionary = data.cameras
+	var v := func(a: Array) -> Vector3: return Vector3(a[0], a[1], a[2])
+	PATH_POSITION = v.call(cams.path.player)
+	PATH_YAW = float(cams.path.yaw)
+	PATH_PITCH = float(cams.path.pitch)
+	OVERVIEW_EYE = v.call(cams.overview.eye)
+	OVERVIEW_TARGET = v.call(cams.overview.target)
+	PARTNERS = cams.conversation.partners
+	for key in TALK:
+		TALK[key] = float(cams.conversation.get(key, TALK[key]))
 
 
 func _run() -> void:
@@ -140,13 +165,13 @@ func _frame(shot: String, start: Dictionary) -> bool:
 			facing.y = 0
 			facing = facing.normalized() if facing.length() > .1 else Vector3.BACK
 			var away := _open_direction(at, [facing, -facing, facing.rotated(Vector3.UP, PI / 2), facing.rotated(Vector3.UP, -PI / 2)])
-			_place_player(at + away * 1.35, atan2(away.x, away.z))
+			_place_player(at + away * float(TALK.distance), atan2(away.x, away.z))
 			_turned = {"node": body, "yaw": body.global_rotation.y}
 			body.global_rotation.y = atan2(away.x, away.z) + PI
 			var feet: Vector3 = world.get_player_position() - Vector3.UP * float(report.player_lift)
 			var side := Vector3.UP.cross(-away).normalized()
-			camera.fov = 44.0
-			camera.global_position = feet + away * 1.15 - side * .52 + Vector3.UP * 1.62
+			camera.fov = float(TALK.fov)
+			camera.global_position = feet + away * float(TALK.camera_back) - side * float(TALK.camera_side) + Vector3.UP * float(TALK.camera_height)
 			camera.look_at(Vector3(at.x, feet.y, at.z) + Vector3.UP * 1.42 - side * .18, Vector3.UP)
 			report["conversation_partner"] = id
 			report["conversation_layout"] = {"partner": str(at), "direction": str(away), "player": str(world.get_player_position()), "camera": str(camera.global_position)}
@@ -166,7 +191,7 @@ func _open_direction(at: Vector3, candidates: Array) -> Vector3:
 	var space: PhysicsDirectSpaceState3D = world.get_world_3d().direct_space_state
 	var ground := _floor(at + Vector3.UP * .5)
 	for direction: Vector3 in candidates:
-		var stand: Vector3 = at + direction * 1.35
+		var stand: Vector3 = at + direction * float(TALK.distance)
 		if absf(_floor(Vector3(stand.x, ground + .5, stand.z)) - ground) > .3:
 			continue
 		var line := PhysicsRayQueryParameters3D.create(at + Vector3.UP * 1.2 + direction * .35, stand + Vector3.UP * 1.2 + direction * .6, 1, [world._player.get_rid()])
@@ -178,7 +203,7 @@ func _open_direction(at: Vector3, candidates: Array) -> Vector3:
 
 func _conversation_partner() -> String:
 	var life = game.world.village_life_world
-	for id in ["julia", "silvanus", "sextus", "cassia"]:
+	for id in PARTNERS:
 		if life.actors.has(id) and (life.actors[id] as Node3D).is_visible_in_tree():
 			return id
 	return ""

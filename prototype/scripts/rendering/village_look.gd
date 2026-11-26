@@ -7,58 +7,37 @@ const PROFILE_DATA = preload("res://assets/quality_profiles.json")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Surfaces = preload("res://scripts/rendering/village_surfaces.gd")
 const SUN_NAME := "AfternoonSun"
-# Spring, summer, autumn (wet, overcast) and winter. Sun angles are pitch/yaw
-# in degrees; a low afternoon sun gives long, readable shadows.
-const SEASONS := [
-	{"sun_angle":Vector2(-29,-38), "sun":Color("#ffdcb0"), "sun_energy":2.0,
-		"ambient":.52, "exposure":.88, "fog":.0019, "fog_height":.006,
-		"zenith":Color("#3a73ab"), "horizon":Color("#a9c2cc"), "clouds":Color("#f3ebdc"), "haze":Color("#ffcf96"),
-		"ground":Color("#4d4f33"), "coverage":.43},
-	{"sun_angle":Vector2(-34,-31), "sun":Color("#ffd6a0"), "sun_energy":2.2,
-		"ambient":.48, "exposure":.86, "fog":.0023, "fog_height":.008,
-		"zenith":Color("#467eae"), "horizon":Color("#bccad0"), "clouds":Color("#f4e6cf"), "haze":Color("#ffc584"),
-		"ground":Color("#5a5232"), "coverage":.30},
-	{"sun_angle":Vector2(-24,-47), "sun":Color("#f2ddc4"), "sun_energy":1.25,
-		"ambient":.66, "exposure":.95, "fog":.0048, "fog_height":.02,
-		"zenith":Color("#66808f"), "horizon":Color("#a9b2b1"), "clouds":Color("#c3c9c4"), "haze":Color("#e6cfae"),
-		"ground":Color("#443f30"), "coverage":.86},
-	{"sun_angle":Vector2(-19,-39), "sun":Color("#f6e6d2"), "sun_energy":1.45,
-		"ambient":.62, "exposure":.92, "fog":.0036, "fog_height":.015,
-		"zenith":Color("#5f84a0"), "horizon":Color("#b4c5cd"), "clouds":Color("#dde2df"), "haze":Color("#f2d6b4"),
-		"ground":Color("#56585a"), "coverage":.61},
-]
-# Sun path for Valdora (about 45.6 N): sunrise and sunset in local solar hours
-# and the noon elevation per season. Used only when a time of day is set.
-const DAYLIGHT := [Vector3(6.3, 18.5, 50.0), Vector3(5.3, 19.6, 64.0), Vector3(6.6, 17.4, 36.0), Vector3(7.6, 16.4, 22.0)]
-const NIGHT_SKY := {"zenith":Color("#070d1a"), "horizon":Color("#1a2638"), "clouds":Color("#262d3a"), "haze":Color("#3d4a66"), "ground":Color("#0e1014")}
-const MOON := {"color":Color("#9fb4e6"), "energy":.14, "angle":Vector2(-48, 150)}
+const SHAFT_SHADER := preload("res://scripts/rendering/sun_shaft.gdshader")
+const GLOW_SHADER := preload("res://scripts/rendering/window_glow.gdshader")
+## All colours, energies and the camera set live in one data file shared with
+## the render-profile study (assets/village/look/look_values.json).
+const VALUES_FILE := preload("res://assets/village/look/look_values.json")
+static var VALUES: Dictionary = _decode(VALUES_FILE.data)
+# Spring, summer, autumn (wet, overcast) and winter: sun [pitch, yaw], colours,
+# energies, haze and sky. A low afternoon sun gives long, readable shadows.
+static var SEASONS: Array = VALUES.seasons
+# Per season Vector3(sunrise, sunset, noon elevation) for about 45.6 N.
+static var DAYLIGHT: Array = VALUES.daylight.path
+static var NIGHT_SKY: Dictionary = VALUES.night
+static var MOON := {"color":VALUES.night.moon, "energy":float(VALUES.night.moon_energy), "angle":VALUES.night.moon_angle}
 # Fire light kinds: colour, energy, range, flicker depth.
-const FIRE := {"candle":[Color("#ffb066"), .55, 2.6, .10], "torch":[Color("#ff9a48"), 1.6, 7.0, .16], "hearth":[Color("#ff8a3c"), 2.2, 5.0, .20]}
+static var FIRE: Dictionary = VALUES.fire
 # Weather on top of season and time of day: cloud cover, direct and sky
 # light, haze. Rain and mist also darken and cool the horizon.
-const WEATHER := {
-	"clear": {"coverage":-1.0, "sun":1.0, "ambient":1.0, "fog":1.0, "height":1.0, "grey":0.0},
-	"overcast": {"coverage":.9, "sun":.35, "ambient":1.25, "fog":1.8, "height":1.4, "grey":.45},
-	"rain": {"coverage":1.0, "sun":.18, "ambient":1.12, "fog":2.6, "height":2.2, "grey":.6},
-	"mist": {"coverage":.7, "sun":.55, "ambient":1.15, "fog":4.0, "height":3.5, "grey":.3},
-}
+static var WEATHER: Dictionary = VALUES.weather
 # Inside a home the open sky no longer lights the room: ambient becomes the
 # warm, dimmer bounce from floor and walls, and the eye adapts upwards. Two
 # unshadowed lights follow the camera's home: warm light bounced off the sunlit
 # threshold just inside the door, and cool skylight from the rear window.
-# frontier_house.glb has one small high rear window (x -0.35..0.55,
-# y 1.8..2.4, inner face z -2.17); door and two windows face +z.
-const BOUNCE_LOCAL := Vector3(0.0, .55, 1.55)
+static var BOUNCE_LOCAL: Vector3 = VALUES.interior.bounce_local
+static var WINDOW_LOCAL: Vector3 = VALUES.interior.window_local
 # Front openings (x0, x1, y0, y1 at the inner wall face z = 2.17) for sunbeams.
-const OPENINGS := [Vector4(-.65, .55, .45, 2.55), Vector4(-2.3, -1.4, 1.65, 2.4), Vector4(1.3, 2.2, 1.65, 2.4)]
-const SHAFT_SHADER := preload("res://scripts/rendering/sun_shaft.gdshader")
-const GLOW_SHADER := preload("res://scripts/rendering/window_glow.gdshader")
-const WINDOW_LOCAL := Vector3(0.1, 2.25, -1.55)
-var interior_ambient := Color("#4a433b")
-var interior_sky_share := .28
-var interior_exposure := 1.3
-var bounce_energy := 2.4
-var window_energy := 3.0
+static var OPENINGS: Array = VALUES.interior.openings
+var interior_ambient: Color = VALUES.interior.ambient
+var interior_sky_share := float(VALUES.interior.sky_share)
+var interior_exposure := float(VALUES.interior.exposure)
+var bounce_energy := float(VALUES.interior.bounce_energy)
+var window_energy := float(VALUES.interior.window_energy)
 
 var environment: Environment
 var sun: DirectionalLight3D
@@ -83,6 +62,30 @@ var _fires: Array[Dictionary] = []
 var _clock := 0.0
 
 
+## Typed copy of look_values.json: "#rrggbb" strings become Colors, the named
+## coordinate arrays become vectors; fire specs become [Color, energy, range, depth].
+static func _decode(raw: Variant, key := "") -> Variant:
+	if raw is String and (raw as String).begins_with("#"):
+		return Color(raw)
+	if raw is Dictionary:
+		var result := {}
+		for name: String in raw:
+			result[name] = _decode(raw[name], name)
+		return result
+	if raw is Array:
+		var items: Array = raw
+		if key in ["sun_angle", "moon_angle"]:
+			return Vector2(items[0], items[1])
+		if key in ["bounce_local", "window_local", "player", "eye", "target", "origin", "back"]:
+			return Vector3(items[0], items[1], items[2])
+		if key == "path":
+			return items.map(func(entry: Array) -> Vector3: return Vector3(entry[0], entry[1], entry[2]))
+		if key == "openings":
+			return items.map(func(entry: Array) -> Vector4: return Vector4(entry[0], entry[1], entry[2], entry[3]))
+		return items.map(func(entry: Variant) -> Variant: return _decode(entry))
+	return raw
+
+
 ## Builds the WorldEnvironment and the sun as children of `world` and returns the sun.
 func setup(world: Node3D, target: Environment, sky: ShaderMaterial) -> DirectionalLight3D:
 	environment = target
@@ -98,8 +101,8 @@ func setup(world: Node3D, target: Environment, sky: ShaderMaterial) -> Direction
 	world.add_child(sun)
 	_bounce = OmniLight3D.new()
 	_bounce.name = "InteriorBounce"
-	_bounce.light_color = Color("#ffc995")
-	_bounce.omni_range = 3.8
+	_bounce.light_color = VALUES.interior.bounce_colour
+	_bounce.omni_range = float(VALUES.interior.bounce_range)
 	_bounce.omni_attenuation = 1.8
 	_bounce.shadow_enabled = false
 	_bounce.light_specular = 0.15
@@ -108,8 +111,8 @@ func setup(world: Node3D, target: Environment, sky: ShaderMaterial) -> Direction
 	# Cool skylight falling in through the rear window onto floor and table.
 	_window = SpotLight3D.new()
 	_window.name = "WindowSkylight"
-	_window.light_color = Color("#c9dcff")
-	_window.spot_range = 3.8
+	_window.light_color = VALUES.interior.window_colour
+	_window.spot_range = float(VALUES.interior.window_range)
 	_window.spot_angle = 64.0
 	_window.spot_angle_attenuation = 2.0
 	_window.spot_attenuation = 1.2
@@ -140,10 +143,10 @@ static func configure_environment(env: Environment, sky: ShaderMaterial) -> void
 	# instead of one flat colour; the share drops indoors.
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_BG
 	env.ambient_light_sky_contribution = 1.0
-	env.ambient_light_color = Color("#4a433b")
+	env.ambient_light_color = VALUES.interior.ambient
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
-	env.tonemap_mode = Environment.TONE_MAPPER_ACES
-	env.tonemap_white = 6.0
+	env.tonemap_mode = {"aces":Environment.TONE_MAPPER_ACES, "agx":Environment.TONE_MAPPER_AGX, "filmic":Environment.TONE_MAPPER_FILMIC}.get(str(VALUES.tonemap.mode), Environment.TONE_MAPPER_ACES)
+	env.tonemap_white = float(VALUES.tonemap.white)
 	# The tonemapper and the light carry the image; no blanket contrast or
 	# saturation boost on top (owner directive: natural, not just punchier).
 	env.adjustment_enabled = false
@@ -151,16 +154,16 @@ static func configure_environment(env: Environment, sky: ShaderMaterial) -> void
 	# distant hills fade into the horizon colour; height fog settles in the valley.
 	env.fog_enabled = true
 	env.fog_mode = Environment.FOG_MODE_EXPONENTIAL
-	env.fog_aerial_perspective = .5
-	env.fog_sky_affect = .08
-	env.fog_sun_scatter = .18  # no effect in Compatibility; kept for Mobile/Forward+ A/B
-	env.fog_height = 1.2
+	env.fog_aerial_perspective = float(VALUES.fog.aerial_perspective)
+	env.fog_sky_affect = float(VALUES.fog.sky_affect)
+	env.fog_sun_scatter = float(VALUES.fog.sun_scatter)  # no effect in Compatibility; kept for Mobile/Forward+ A/B
+	env.fog_height = float(VALUES.fog.height)
 	env.glow_enabled = false
 	env.glow_normalized = true
-	env.glow_intensity = .55
-	env.glow_strength = .9
-	env.glow_bloom = .035
-	env.glow_hdr_threshold = 1.05
+	env.glow_intensity = float(VALUES.glow.intensity)
+	env.glow_strength = float(VALUES.glow.strength)
+	env.glow_bloom = float(VALUES.glow.bloom)
+	env.glow_hdr_threshold = float(VALUES.glow.hdr_threshold)
 	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
 
 
@@ -219,7 +222,7 @@ func _apply_time(hours: float) -> void:
 	var azimuth := lerpf(-105.0, 105.0, clampf(day, 0.0, 1.0))
 	var low := 1.0 - smoothstep(2.0, 24.0, elevation)
 	night = smoothstep(1.0, -7.0, elevation)
-	var warm := Color("#ff8a46").lerp(Color("#ffc58e"), smoothstep(1.0, 12.0, elevation)).lerp(preset.sun, smoothstep(12.0, 40.0, elevation))
+	var warm: Color = (VALUES.daylight.dawn_sun as Color).lerp(VALUES.daylight.low_sun, smoothstep(1.0, 12.0, elevation)).lerp(preset.sun, smoothstep(12.0, 40.0, elevation))
 	if elevation > 0.0:
 		sun.rotation_degrees = Vector3(-maxf(elevation, 1.5), -azimuth, 0)
 		sun.light_color = warm
@@ -229,14 +232,14 @@ func _apply_time(hours: float) -> void:
 		sun.rotation_degrees = Vector3(MOON.angle.x, MOON.angle.y, 0)
 		sun.light_color = MOON.color
 		sun.light_energy = MOON.energy * night
-	environment.ambient_light_energy = float(preset.ambient) * lerpf(1.0, .22, night) * lerpf(1.0, .75, low * (1.0 - night))
-	var exposure := float(preset.exposure) * lerpf(1.0, 1.7, night) * lerpf(1.0, 1.12, low * (1.0 - night))
+	environment.ambient_light_energy = float(preset.ambient) * lerpf(1.0, float(NIGHT_SKY.ambient_scale), night) * lerpf(1.0, .75, low * (1.0 - night))
+	var exposure := float(preset.exposure) * lerpf(1.0, float(NIGHT_SKY.exposure_scale), night) * lerpf(1.0, 1.12, low * (1.0 - night))
 	environment.set_meta("look_exposure", exposure)
 	environment.tonemap_exposure = exposure
 	var twilight := low * (1.0 - night)
-	var zenith: Color = (preset.zenith as Color).lerp(Color("#2c4775"), twilight * .6).lerp(NIGHT_SKY.zenith, night)
-	var horizon: Color = (preset.horizon as Color).lerp(Color("#e8a070"), twilight * .7).lerp(NIGHT_SKY.horizon, night)
-	var haze: Color = (preset.haze as Color).lerp(Color("#ff8c4a"), twilight).lerp(NIGHT_SKY.haze, night)
+	var zenith: Color = (preset.zenith as Color).lerp(VALUES.daylight.twilight_zenith, twilight * .6).lerp(NIGHT_SKY.zenith, night)
+	var horizon: Color = (preset.horizon as Color).lerp(VALUES.daylight.twilight_horizon, twilight * .7).lerp(NIGHT_SKY.horizon, night)
+	var haze: Color = (preset.haze as Color).lerp(VALUES.daylight.twilight_haze, twilight).lerp(NIGHT_SKY.haze, night)
 	environment.fog_light_color = horizon.lerp(haze, .3)
 	environment.fog_density = float(preset.fog) * lerpf(1.0, 1.35, twilight)
 	if sky_material != null:
@@ -244,7 +247,7 @@ func _apply_time(hours: float) -> void:
 		sky_material.set_shader_parameter("horizon", horizon)
 		sky_material.set_shader_parameter("sun_haze", haze)
 		sky_material.set_shader_parameter("haze_strength", lerpf(.38, .8, twilight))
-		sky_material.set_shader_parameter("cloud_color", (preset.clouds as Color).lerp(Color("#f2b48a"), twilight * .6).lerp(NIGHT_SKY.clouds, night))
+		sky_material.set_shader_parameter("cloud_color", (preset.clouds as Color).lerp(VALUES.daylight.twilight_clouds, twilight * .6).lerp(NIGHT_SKY.clouds, night))
 		sky_material.set_shader_parameter("ground_color", (preset.ground as Color).lerp(NIGHT_SKY.ground, night))
 
 
@@ -277,7 +280,7 @@ func _build_window_glow() -> void:
 
 func _update_window_glow() -> void:
 	_glow.visible = night > .25
-	_glow.material_override.set_shader_parameter("strength", .85 * smoothstep(.25, 1.0, night))
+	_glow.material_override.set_shader_parameter("strength", float(VALUES.interior.window_glow_strength) * smoothstep(.25, 1.0, night))
 
 
 ## Weather-dependent light: "clear", "overcast", "rain" or "mist".
@@ -294,7 +297,7 @@ func _apply_weather() -> void:
 	environment.ambient_light_energy *= float(w.ambient)
 	environment.fog_density *= float(w.fog)
 	environment.fog_height_density *= float(w.height)
-	var grey := Color("#9aa3a6").lerp(Color("#1c222b"), night)
+	var grey: Color = (VALUES.weather_grey.day as Color).lerp(VALUES.weather_grey.night, night)
 	environment.fog_light_color = environment.fog_light_color.lerp(grey, float(w.grey))
 	if sky_material != null:
 		sky_material.set_shader_parameter("coverage", maxf(float(w.coverage), float(sky_material.get_shader_parameter("coverage"))))
@@ -387,15 +390,15 @@ func _apply_interior(value: float) -> void:
 	_bounce.visible = _bounce_allowed and interior > .01
 	# By night the threshold bounce becomes the hearth and the window only
 	# lets in a little cool moonlight.
-	_bounce.light_color = Color("#ffc995").lerp(FIRE.hearth[0], night)
+	_bounce.light_color = (VALUES.interior.bounce_colour as Color).lerp(FIRE.hearth[0], night)
 	_bounce.light_energy = bounce_energy * interior * (1.25 if season in [2, 3] else 1.0) * lerpf(1.0, .75, night)
 	_window.visible = _bounce.visible
-	_window.light_color = Color("#c9dcff").lerp(MOON.color, night)
+	_window.light_color = (VALUES.interior.window_colour as Color).lerp(MOON.color, night)
 	_window.light_energy = window_energy * interior * lerpf(1.0, .08, night)
 	_shafts.visible = _shafts_allowed and interior > .5 and night < .5 and _shafts.mesh != null
 	var beam: ShaderMaterial = _shafts.material_override
 	beam.set_shader_parameter("beam_color", sun.light_color)
-	beam.set_shader_parameter("strength", .16 * clampf(sun.light_energy / 2.0, 0.0, 1.2) * (1.0 - night))
+	beam.set_shader_parameter("strength", float(VALUES.interior.sunbeam_strength) * clampf(sun.light_energy / 2.0, 0.0, 1.2) * (1.0 - night))
 
 
 func _home_at(point: Vector3) -> int:
@@ -413,7 +416,7 @@ func _place_bounce(index: int) -> void:
 	_bounce.global_position = (home.at as Vector3) + BOUNCE_LOCAL.rotated(Vector3.UP, yaw)
 	_window.global_position = (home.at as Vector3) + WINDOW_LOCAL.rotated(Vector3.UP, yaw)
 	# Point into the room (+z local) and down toward the floor.
-	_window.global_basis = Basis.from_euler(Vector3(deg_to_rad(-60.0), yaw + PI, 0.0))
+	_window.global_basis = Basis.from_euler(Vector3(deg_to_rad(float(VALUES.interior.window_pitch)), yaw + PI, 0.0))
 	_build_shafts(index)
 
 
