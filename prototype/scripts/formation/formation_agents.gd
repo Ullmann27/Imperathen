@@ -34,6 +34,7 @@ const PUSH_M_S := 1.4
 const ENEMY_BRAKE_BAND_M := 3.5
 const CONTACT_SETTLE_M := 0.45
 const CONTACT_DRESS_M_S := 0.8
+const CONTACT_HOLD_M := 2.0
 const ROCK_CLEARANCE_M := 0.3
 const REFILE_DEG := 75.0
 const WHEEL_SHARE := 0.8
@@ -656,11 +657,14 @@ func _decide(a: Agent) -> void:
 	elif dist > 1.2:
 		cap = maxf(cap, float(lim.run))
 	var desired := slot_velocity
-	if a.contact:
+	# The press holds a man only near his own place in a company that still
+	# stands; a man cut off from it, routing or leaving disengages.
+	var held := a.contact and dist < CONTACT_HOLD_M and u.status != "routed" and not a.leaving
+	if held:
 		# In the press men do not dress ranks to the centimetre and step at
 		# most slowly into a gap.
 		cap = minf(cap, CONTACT_DRESS_M_S)
-	var settle := CONTACT_SETTLE_M if a.contact else (RESUME_M if a.settled else SETTLE_M)
+	var settle := CONTACT_SETTLE_M if held else (RESUME_M if a.settled else SETTLE_M)
 	if dist > settle:
 		a.settled = false
 		var approach := minf(sqrt(2.0 * float(lim.brake) * 0.6 * dist), 1.8 * dist)
@@ -668,7 +672,7 @@ func _decide(a: Agent) -> void:
 	elif slot_velocity.length() < 0.05:
 		a.settled = true
 		desired = Vector2.ZERO
-	if a.model_pose in ACTIONS and (a.contact or (u.lead < 0.05 and dist < 1.0)):
+	if a.model_pose in ACTIONS and (held or (u.lead < 0.05 and dist < 1.0)):
 		# A striking, shooting or bracing man plants his feet, also in the press.
 		desired = Vector2.ZERO
 	if desired.length() > cap:
@@ -681,11 +685,11 @@ func _decide(a: Agent) -> void:
 	if desired_speed > 0.04:
 		var direction := desired / desired_speed
 		var front := Vector2(sin(face_yaw), cos(face_yaw))
-		if direction.dot(front) < -0.5 and (a.contact or (desired_speed <= float(lim.back) * 1.5 and dist < 1.0 \
+		if direction.dot(front) < -0.5 and (held or (desired_speed <= float(lim.back) * 1.5 and dist < 1.0 \
 				and slot_velocity.length() < 0.3 and not u.charging)):
 			# Step back facing the front; in contact never turn away.
 			a.reverse = true
-		elif a.contact and direction.dot(front) < 0.3:
+		elif held and direction.dot(front) < 0.3:
 			# Sideways in the press: keep facing the enemy, no strafing glide.
 			desired = Vector2.ZERO
 		else:
