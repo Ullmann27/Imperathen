@@ -1,0 +1,242 @@
+extends SceneTree
+## Troop catalog: loading, era filter, validation failures and item-gated upgrades.
+
+const Catalog := preload("res://scripts/battle/troop_catalog.gd")
+
+var checks := 0
+var failures := 0
+
+
+func _initialize() -> void:
+	var catalog := Catalog.load_default()
+	check(catalog.ok and catalog.errors.is_empty(), "Default catalog validates: " + str(catalog.errors))
+	if not catalog.ok:
+		_finish(catalog)
+		return
+	_test_contents(catalog)
+	_test_era_filter(catalog)
+	_test_rejections()
+	_test_upgrades(catalog)
+	_test_calendar()
+	_test_tiers_and_variants(catalog)
+	_test_military_options(catalog)
+	_finish(catalog)
+
+
+func _finish(catalog: Dictionary) -> void:
+	var counts := {"attested": 0, "plausible": 0, "design_assumption": 0}
+	for t: Dictionary in catalog.troops.values():
+		counts[t.attestation] += 1
+	print("TROOP_CATALOG_RESULT checks=%d failures=%d troops=%d families=%d appointments=%d attestation=%s available_-58=%d" % [
+		checks, failures, catalog.troops.size(), catalog.families.size(), catalog.appointments.size(), counts,
+		Catalog.available(catalog, -58).size() if catalog.ok else 0])
+	quit(1 if failures else 0)
+
+
+func check(ok: bool, message: String) -> void:
+	checks += 1
+	if not ok:
+		failures += 1
+		printerr("FAIL ", message)
+
+
+func _docs() -> Array:
+	return [Catalog.read_json(Catalog.FAMILIES_PATH), Catalog.read_json(Catalog.TROOPS_PATH), Catalog.read_json(Catalog.PEOPLE_PATH)]
+
+
+func _test_contents(catalog: Dictionary) -> void:
+	check(catalog.troops.size() >= 11, "At least the eleven planned entries load (got %d)" % catalog.troops.size())
+	var cultures := {}
+	for t: Dictionary in catalog.troops.values():
+		cultures[t.culture] = true
+		check(t.attestation in Catalog.ATTESTATIONS and (t.attestation == "design_assumption" or not t.sources.is_empty()), "Attestation and sources: " + t.troop_id)
+		check(not t.notes.is_empty() or t.attestation != "design_assumption", "Design assumptions carry a reason: " + t.troop_id)
+		for item: Dictionary in t.loadout.values():
+			check(catalog.families.has(item.family_id), "Loadout family exists: %s %s" % [t.troop_id, item.family_id])
+	check(cultures.has("roman") and cultures.has("germanic"), "Roman and Germanic entries present")
+	var axe: Dictionary = Catalog.troop(catalog, "germanic_axe_shield")
+	check(axe.attestation == "design_assumption" and axe.rarity == "rare" and axe.reconstruction == "artistic" and axe.variant_of == "germanic_levy",
+		"Axe and shield is a rare, artistically reconstructed variant, not the Germanic standard (D-024)")
+	var standard := 0
+	for t: Dictionary in catalog.troops.values():
+		if t.culture == "germanic" and t.get("rarity", "common") == "common":
+			standard += 1
+	check(standard >= 6, "Several common Germanic warrior families exist besides the axe variant")
+	var allied := Catalog.available(catalog, -52, "germanic", "roman")
+	check(allied == ["germanic_eques_auxiliaris"] and Catalog.available(catalog, -58, "germanic", "roman").is_empty(),
+		"Germanic culture can serve Rome from 52 BC (culture is not enmity)")
+	var registry: Dictionary = Catalog.read_json("res://assets/meshy/loadouts.json")
+	var visual_ids := {}
+	for entry: Dictionary in registry.loadouts:
+		visual_ids[entry.id] = true
+	for t: Dictionary in catalog.troops.values():
+		check(t.visual.meshy_loadout == "" or visual_ids.has(t.visual.meshy_loadout), "Visual loadout reference exists: " + t.troop_id)
+	check(catalog.appointments.has("legatus") and Catalog.valid_at(catalog.appointments.legatus, -58) and Catalog.valid_at(catalog.appointments.dux, -58),
+		"Command appointments exist for 58 BC")
+	var miles := Catalog.resolve_loadout(catalog, "roman_miles")
+	check(miles.missile == {"family_id": "pilum", "quality": 1, "count": 2} and miles.shield.family_id == "scutum", "Issued kit resolves family, minimum quality and count")
+	check(Catalog.entry_xp(catalog, "roman_miles") == 120 and Catalog.entry_xp(catalog, "roman_tiro") == 0, "Entry experience follows the upgrade thresholds")
+
+
+func _test_era_filter(catalog: Dictionary) -> void:
+	var at_58 := Catalog.available(catalog, -58)
+	check(at_58.has("roman_miles") and at_58.has("germanic_levy") and at_58.has("aux_sagittarius_creticus") and at_58.has("aux_eques_gallicus"), "58 BC offers the Caesarian army and Germanic groups")
+	var segmentata := false
+	var late_helmet := false
+	for id in at_58:
+		segmentata = segmentata or "lorica_segmentata" in Catalog.families_of(catalog, id)
+		late_helmet = late_helmet or "helmet_imperial_gallic" in Catalog.families_of(catalog, id)
+	check(not segmentata and not late_helmet, "A 58 BC filter yields no lorica segmentata and no imperial helmet")
+	check(not at_58.has("roman_legionarius_principate") and not at_58.has("germanic_eques_auxiliaris"), "Later variants are absent in 58 BC")
+	var at_9 := Catalog.available(catalog, 9)
+	check(at_9.has("roman_legionarius_principate") and "lorica_segmentata" in Catalog.families_of(catalog, "roman_legionarius_principate"), "AD 9 offers the segmentata variant")
+	check(not at_9.has("roman_miles"), "Republican kit leaves the filter after its span")
+	check(Catalog.available(catalog, 0).is_empty(), "Year 0 matches nothing")
+	check(Catalog.troop(catalog, "missing").is_empty(), "Unknown troop yields an empty copy")
+	var copy := Catalog.troop(catalog, "roman_miles")
+	copy.loadout.clear()
+	check(not Catalog.troop(catalog, "roman_miles").loadout.is_empty(), "Queries return copies")
+
+
+func _mutated(change: Callable) -> Dictionary:
+	var docs := _docs()
+	change.call(docs[0], docs[1], docs[2])
+	return Catalog.build(docs[0], docs[1], docs[2])
+
+
+func _troop(doc: Dictionary, id: String) -> Dictionary:
+	for t: Dictionary in doc.troops:
+		if t.troop_id == id:
+			return t
+	return {}
+
+
+func _rejects(label: String, needle: String, change: Callable) -> void:
+	var built := _mutated(change)
+	var mentioned := false
+	for e: String in built.errors:
+		mentioned = mentioned or e.contains(needle)
+	check(not built.ok and built.troops.is_empty() and mentioned, "Rejects %s (%s)" % [label, str(built.errors)])
+
+
+func _test_rejections() -> void:
+	_rejects("missing family_id", "family_id fehlt", func(_f, t, _p): _troop(t, "roman_miles").loadout.head.erase("family_id"))
+	_rejects("year zero", "Zeitspanne", func(_f, t, _p): _troop(t, "roman_miles").valid_from = 0)
+	_rejects("reversed dates", "Zeitspanne", func(_f, t, _p): _troop(t, "roman_miles").valid_to = -200)
+	_rejects("fractional year", "Zeitspanne", func(_f, t, _p): _troop(t, "roman_miles").valid_from = -58.5)
+	_rejects("missing date", "Zeitspanne", func(_f, t, _p): _troop(t, "germanic_levy").erase("valid_to"))
+	_rejects("segmentata in the Caesar phase", "lorica_segmentata", func(_f, t, _p): _troop(t, "roman_miles").loadout.torso.family_id = "lorica_segmentata")
+	_rejects("unknown family", "unbekannte family_id", func(_f, t, _p): _troop(t, "germanic_levy").loadout.shield.family_id = "tower_shield")
+	_rejects("quality outside Q0-Q4", "Qualitätsspanne", func(_f, t, _p): _troop(t, "germanic_levy").loadout.shield.q_max = 5)
+	_rejects("upgrade without items", "ohne Gegenstand", func(_f, t, _p): _troop(t, "roman_tiro").upgrades[0].items = [])
+	_rejects("upgrade item without family", "ohne family_id", func(_f, t, _p): _troop(t, "roman_tiro").upgrades[0].items[0].erase("family_id"))
+	_rejects("artistic reconstruction marked as attested", "künstlerische Rekonstruktion", func(_f, t, _p): _troop(t, "germanic_axe_shield").attestation = "attested")
+	_rejects("archer kind without a bow", "Hauptwaffe", func(_f, t, _p): _troop(t, "aux_sagittarius_creticus").loadout.main_hand.family_id = "spear")
+	_rejects("family with year zero", "Zeitspanne", func(f, _t, _p): f.families[0].valid_to = 0)
+	_rejects("attested entry without sources", "Quellen", func(_f, t, _p): _troop(t, "roman_miles").sources = [])
+	_rejects("downward upgrade", "höhere Stufe", func(_f, t, _p): _troop(t, "roman_miles").upgrades[0].to = "roman_tiro")
+	check(Catalog.load_default().ok and Catalog.load_default().troops.has("roman_miles"), "Rejected variants never replace the loaded catalog")
+
+
+func _test_upgrades(catalog: Dictionary) -> void:
+	var recruit := {"uid": "t_00", "troop_id": "roman_tiro", "xp": 130, "service": []}
+	var stock := [{"family_id": "lorica_hamata", "quality": 0, "count": 1}, {"family_id": "lorica_hamata", "quality": 3, "count": 1},
+		{"family_id": "lorica_hamata", "quality": 1, "count": 1}, {"family_id": "pilum", "quality": 2, "count": 2}]
+	var before := stock.duplicate(true)
+	var too_green := recruit.duplicate(true)
+	too_green.xp = 40
+	for attempt in [[too_green, -58, ["depot"], "Erfahrung"], [recruit, -58, [], "Befugnis"], [recruit, 9, ["depot"], "Zielstufe"]]:
+		var r := Catalog.apply_upgrade(catalog, attempt[0], "roman_miles", attempt[1], stock, attempt[2])
+		check(not r.ok and r.message.contains(attempt[3]) and r.record.is_empty() and stock == before, "Upgrade rejected atomically: " + attempt[3])
+	var no_mail := [{"family_id": "lorica_hamata", "quality": 0, "count": 3}, {"family_id": "pilum", "quality": 2, "count": 2}]
+	var missing := Catalog.apply_upgrade(catalog, recruit, "roman_miles", -58, no_mail, ["depot"])
+	check(not missing.ok and missing.message.contains("lorica_hamata"), "Without a sufficient real item there is no upgrade")
+	var done := Catalog.apply_upgrade(catalog, recruit, "roman_miles", -58, stock, ["depot"])
+	check(done.ok and done.record.troop_id == "roman_miles" and recruit.troop_id == "roman_tiro" and stock == before, "Upgrade returns new copies")
+	check(done.consumed == [{"family_id": "lorica_hamata", "quality": 1, "count": 1}, {"family_id": "pilum", "quality": 2, "count": 1}], "Consumes the lowest sufficient quality exactly once")
+	check(done.inventory == [{"family_id": "lorica_hamata", "quality": 0, "count": 1}, {"family_id": "lorica_hamata", "quality": 3, "count": 1}, {"family_id": "pilum", "quality": 2, "count": 1}], "Remaining stock is exact")
+	check(done.record.service.back() == {"event": "promoted", "ref": "roman_miles", "year": -58, "step": -1}, "Service record notes the promotion")
+	var youth := {"uid": "g_00", "troop_id": "germanic_youth_javelin", "xp": 100, "service": []}
+	var gift := [{"family_id": "spear", "quality": 1, "count": 1}, {"family_id": "shield_round", "quality": 2, "count": 1}]
+	check(Catalog.apply_upgrade(catalog, youth, "germanic_levy", -58, gift, ["kin"]).ok, "Germanic youth is armed by kin with spear and shield")
+	check(not Catalog.apply_upgrade(catalog, youth, "germanic_levy", -58, gift, ["depot"]).ok, "A Roman depot cannot arm a Germanic youth")
+	check(not Catalog.apply_upgrade(catalog, youth, "germanic_warrior", -58, gift, ["kin"]).ok, "No skipping tiers outside the defined paths")
+
+
+func _test_calendar() -> void:
+	check(Catalog.years_between(-58, 9) == 66 and Catalog.years_between(-1, 1) == 1 and Catalog.years_between(-58, -52) == 6 and Catalog.years_between(9, -58) == -66, "Elapsed years skip the missing year zero")
+	check(Catalog.year_label(-58) == "58 v. Chr." and Catalog.year_label(9) == "9 n. Chr.", "Year labels")
+	check(not Catalog.valid_year(0) and Catalog.valid_year(-58) and not Catalog.valid_year(-58.5), "Year validation")
+
+
+func _test_tiers_and_variants(catalog: Dictionary) -> void:
+	var javelins := Catalog.troop(catalog, "germanic_skirmisher")
+	check(javelins.battle_kind == "skirmisher" and javelins.loadout.missile.family_id == "javelin" and javelins.loadout.missile.count == 3
+		and javelins.get("rarity", "common") == "common" and javelins.attestation != "design_assumption", "Spear-throwers are the regular Germanic ranged troop (D-041)")
+	var bows := Catalog.troop(catalog, "germanic_bow_skirmisher")
+	check(bows.rarity == "rare" and bows.attestation == "design_assumption" and bows.notes.contains("quellenkritisch"), "Germanic archers stay a rare, source-critically flagged design variant")
+	check(Catalog.troop(catalog, "cisalpine_militia_spear").notes.contains("Fiktives regionales Aufgebot"), "The Passwache stays a fictional regional levy")
+	check(Catalog.available(catalog, -58, "germanic").has("germanic_skirmisher") and Catalog.troop(catalog, "germanic_youth_javelin").battle_kind == "skirmisher", "Youths and Numidians fight as skirmishers")
+	var mapped := {}
+	for t: Dictionary in catalog.troops.values():
+		for ref in t.get("external_ids", {}).get("tribal_world", []):
+			mapped[ref] = t.troop_id
+	for tribal in ["aufgebot", "plaenkler", "speerkrieger", "axtkrieger", "schwertkaempfer", "gefolgsmann", "reiter"]:
+		check(mapped.has(tribal), "Tribal-world troop type %s maps to a catalog troop" % tribal)
+	check(Catalog.company_tiers(catalog, "roman_miles", {}) == {"experience": "ausgebildet", "equipment": "", "training": "geuebt"}, "Default tiers follow the troop")
+	check(Catalog.company_tiers(catalog, "germanic_levy", {"experience": "veteran", "equipment": "gut", "training": "gedrillt"}).experience == "veteran", "Tiers can be chosen independently")
+	check(Catalog.company_tiers(catalog, "germanic_levy", {"equipment": "golden"}).is_empty(), "Unknown tiers are refused")
+	check(catalog.tiers.experience.veteran.skill > catalog.tiers.experience.rekrut.skill and catalog.tiers.equipment.meisterlich.quality == 4 and catalog.tiers.training.ungeuebt.drill_offset == -1, "Experience, equipment and training tiers carry their values")
+	_rejects("skirmisher without javelins", "Hauptwaffe", func(_f, t, _p): _troop(t, "germanic_skirmisher").loadout.missile.family_id = "pilum")
+	_rejects("overlapping experience tiers", "xp-Spanne", func(_f, t, _p): t.tiers.experience[2].xp_min = 50)
+	_rejects("equipment tier above Q4", "Q0–Q4", func(_f, t, _p): t.tiers.equipment[4].quality = 5)
+	_rejects("empty external id list", "external_ids", func(_f, t, _p): _troop(t, "germanic_skirmisher").external_ids.tribal_world = [])
+
+
+func _test_military_options(catalog: Dictionary) -> void:
+	# Profiles as the tribal world would fill them (stocks of bc58_rhine as orientation).
+	var poor := {"system": "tribal_world", "culture": "germanic_rhine", "year": -58, "wealth": 6, "trade": 0.2, "trade_partners": 0,
+		"population": 90, "materials": {"wood": 40, "iron": 2}, "development": {}}
+	var rich := {"system": "tribal_world", "culture": "germanic_rhine", "year": -58, "wealth": 120, "trade": 0.85, "trade_partners": 2,
+		"population": 520, "materials": {"wood": 220, "iron": 45, "horse": 8}, "development": {"smithy": 1, "hall": 1}}
+	var a := Catalog.military_options(catalog, poor)
+	var b := Catalog.military_options(catalog, rich)
+	check(a.ok and b.ok and a.culture == "germanic" and a != b, "Two Germanic communities do not get identical military options")
+	check(a.equipment_cap == "einfach" and a.training_cap == "geuebt" and b.equipment_cap == "gut" and b.training_cap == "gedrillt",
+		"Wealth, trade, iron and buildings set the equipment and training caps (%s/%s, %s/%s)" % [a.equipment_cap, a.training_cap, b.equipment_cap, b.training_cap])
+	check(a.troops.germanic_skirmisher.available and a.troops.germanic_levy.available and a.troops.germanic_civil_levy.available,
+		"A poor community still raises levy, spearmen and spear-throwers")
+	check(not a.troops.germanic_retainer.available and not a.troops.germanic_rider.available and not a.troops.germanic_warrior.available and not a.troops.germanic_bow_skirmisher.available,
+		"Without wealth, horses, a smithy or trade there are no retainers, riders, armed warriors or archers")
+	check(b.troops.germanic_retainer.available and b.troops.germanic_rider.available and b.troops.germanic_noble.available and b.troops.germanic_bow_skirmisher.available,
+		"The rich trading community can field them")
+	check(b.troops.germanic_bow_skirmisher.rarity == "rare" and b.troops.germanic_bow_skirmisher.max_share <= 0.05 and b.troops.germanic_skirmisher.max_share >= 0.3 and b.troops.germanic_skirmisher.rarity == "common",
+		"Archers stay a small share even where available; spear-throwers are regular")
+	check(a.troops.germanic_retainer.missing.size() == 3 and a.next.equipment == ["materials.iron 2/10", "development.smithy 0/1"],
+		"Missing requirements are named (%s; next equipment tier: %s)" % [str(a.troops.germanic_retainer.missing), str(a.next.equipment)])
+	check(not a.troops.has("roman_miles") and not a.troops.has("germanic_eques_auxiliaris"), "Only the community's own troops are offered, none in Roman service")
+	check(a.troops.germanic_skirmisher.external_ids.tribal_world == ["plaenkler"], "Options carry the tribal-world ids")
+	var step := rich.duplicate(true)
+	step.wealth = 79
+	check(Catalog.military_options(catalog, step).equipment_cap == "solide", "One input below its threshold lowers the cap")
+	step = rich.duplicate(true)
+	step.materials.horse = 0
+	check(not Catalog.military_options(catalog, step).troops.germanic_rider.available and Catalog.military_options(catalog, step).troops.germanic_retainer.available, "Raw materials gate single troops")
+	check(Catalog.military_options(catalog, rich) == b and rich.materials.iron == 45, "Options are a pure function of the profile")
+	check(Catalog.capped_tiers(catalog, a, "germanic_levy", {"equipment": "meisterlich", "training": "gedrillt"}) == {"experience": "ausgebildet", "equipment": "einfach", "training": "geuebt"},
+		"A company's tiers never exceed the community's caps")
+	check(Catalog.capped_tiers(catalog, b, "germanic_levy", {"equipment": "solide"}).equipment == "solide" and Catalog.capped_tiers(catalog, b, "germanic_levy", {}).equipment == "", "Choices below the cap stay")
+	var bare := {"culture": "germanic", "year": -58}
+	var none := Catalog.military_options(catalog, bare)
+	check(none.ok and none.equipment_cap == "aermlich" and none.training_cap == "ungeuebt" and none.troops.germanic_civil_levy.available and not none.troops.germanic_levy.available,
+		"With nothing a community has only its unarmed levy")
+	check(Catalog.capped_tiers(catalog, none, "germanic_skirmisher", {}).equipment == "aermlich", "A troop whose minimum kit is out of reach is fielded at the cap")
+	for bad: Variant in [null, {"culture": "germanic"}, {"culture": "germanic", "year": 0}, {"culture": "germanic", "year": -58, "wealth": -1},
+			{"culture": "germanic", "year": -58, "gold": 5}, {"culture": "germanic", "year": -58, "materials": {"iron": NAN}},
+			{"system": "tribal_world", "culture": "unknown", "year": -58}, {"culture": "germanic", "year": 1500}]:
+		check(not Catalog.military_options(catalog, bad).ok, "Refuses profile %s" % str(bad))
+	_rejects("unknown requirement", "unbekannte Voraussetzung", func(_f, t, _p): _troop(t, "germanic_rider").requires.gold = 3)
+	_rejects("share above one", "max_share", func(_f, t, _p): _troop(t, "germanic_rider").max_share = 1.5)
+	_rejects("caps out of tier order", "Reihenfolge", func(_f, t, _p): t.military_options.equipment_caps.reverse())
+	_rejects("lowest cap with requirements", "unterste Stufe", func(_f, t, _p): t.military_options.training_caps[0].needs = {"wealth": 1})
+	_rejects("missing options", "military_options fehlt", func(_f, t, _p): t.erase("military_options"))
