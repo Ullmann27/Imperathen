@@ -182,7 +182,12 @@ func _sample(rig: Skeleton3D, sampler: Callable, name: String, seconds: float, l
 func _raw_asset(path: String) -> void:
 	var entry := {"finite":true,"sample_count":0,"metrics":_metrics(),"clips":[],"errors":[]}
 	records[path] = entry
-	var packed := load("res://"+path) as PackedScene
+	var resource := "res://" + path
+	if not ResourceLoader.exists(resource, "PackedScene"):
+		entry.errors.append("Registered imported PackedScene missing")
+		entry.finite = false
+		return
+	var packed := load(resource) as PackedScene
 	if packed == null:
 		entry.errors.append("PackedScene import missing")
 		entry.finite=false
@@ -261,7 +266,7 @@ func _configure_source(actor: SourcePerson, path: String) -> void:
 	actor.position = Vector3(0,.9,0)
 	actor.set_process(false)
 	actor._check_lod = 100000.0
-	if path.contains("hero_quality_"):
+	if path.contains("hero_quality_") or path.contains("hero_meshy_italia_"):
 		actor.configure("player","italia",12)
 	elif path.contains("frontier_"):
 		var identity := path.get_file().trim_prefix("frontier_").get_basename()
@@ -386,12 +391,15 @@ func _person_family(family: Dictionary) -> void:
 	family_metrics[family.id] = measured
 	var lod_poses := {}
 	for path: String in family.resources:
+		if not ResourceLoader.exists("res://" + path, "PackedScene"):
+			measured.errors.append(path + ": registered imported rig missing")
+			continue
 		var actor := SourcePerson.new()
 		root.add_child(actor)
 		_configure_source(actor,path)
 		await process_frame
 		var rig: Skeleton3D = actor._motion.skeleton
-		if not is_instance_valid(rig) or actor.animator == null:
+		if actor.active_model_path != "res://" + path or not is_instance_valid(rig) or actor.animator == null:
 			fatal.append("Runtime rig or animation player missing: "+path)
 			actor.free()
 			continue
@@ -423,7 +431,7 @@ func _person_family(family: Dictionary) -> void:
 				# The skin fixture includes this real embedded skinned kit in
 				# every pose, so its worst-case tearing bound is also observed.
 				_observe(measured,path,"military_equipment",int(clip.sample_count),bool(clip.finite),{"skin_edge_violations":metrics.skin_edge_violations})
-		if family.id=="hero":
+		if family.id in ["hero", "original_youth"]:
 			for action: String in Motion.TECHNIQUES:
 				var duration: float = Motion.TIMING[action].z
 				var sampler := func(phase: float) -> void:
@@ -610,7 +618,7 @@ func _run() -> void:
 		if family.status=="active" and family.profile in ["human","animal"]:
 			for path: String in family.resources:
 				_raw_asset(path)
-		if family.id in ["hero","frontier_people","legacy_people","meshy_people","regional_workers"]:
+		if family.id in ["hero", "original_youth", "frontier_people", "legacy_people", "meshy_people", "regional_workers"]:
 			await _person_family(family)
 		elif family.id=="battle_rigs":
 			await _battle_family(family)
