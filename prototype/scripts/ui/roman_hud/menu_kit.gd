@@ -116,7 +116,8 @@ static func choice(caption: String, index: int, primary := false) -> ChoicePlaqu
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.custom_minimum_size.y = Style.TOUCH_COMFORT
-	button.mouse_filter = Control.MOUSE_FILTER_STOP
+	# Answers sit in a scroll: a swipe that starts on one scrolls and cancels it.
+	button.mouse_filter = Control.MOUSE_FILTER_PASS
 	var states := {"normal": _choice_box(primary, false), "hover": _choice_box(primary, true), "pressed": _choice_box(true, true),
 		"disabled": _choice_box(false, false, true), "focus": _choice_focus()}
 	for key: String in states:

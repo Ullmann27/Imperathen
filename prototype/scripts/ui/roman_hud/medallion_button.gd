@@ -101,11 +101,24 @@ func _draw() -> void:
 
 func _draw_caption(top: float) -> void:
 	var font := Style.display_font(700 if primary else 600, 0)
-	var lines := text.split("\n", false)
 	var width := size.x + 6.0
+	var lines := Array(text.split("\n", false))
+	if lines.size() == 1 and font.get_string_size(str(lines[0]), HORIZONTAL_ALIGNMENT_LEFT, -1, caption_size).x > width:
+		# A context caption such as "Mit Julia sprechen" wraps at a word.
+		var words := str(lines[0]).split(" ", false)
+		var first := ""
+		var index := 0
+		while index < words.size():
+			var candidate := (first + " " + words[index]).strip_edges()
+			if not first.is_empty() and font.get_string_size(candidate, HORIZONTAL_ALIGNMENT_LEFT, -1, caption_size).x > width:
+				break
+			first = candidate
+			index += 1
+		var rest := " ".join(words.slice(index))
+		lines = [first, rest] if not rest.is_empty() else [first]
 	var y := top + caption_size
 	for index in range(mini(2, lines.size())):
-		var line := lines[index]
+		var line := str(lines[index])
 		var fitted := line
 		var measured := font.get_string_size(fitted, HORIZONTAL_ALIGNMENT_LEFT, -1, caption_size).x
 		while measured > width and fitted.length() > 3:

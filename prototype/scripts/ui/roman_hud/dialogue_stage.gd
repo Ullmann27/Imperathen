@@ -9,6 +9,23 @@ const Style = preload("res://scripts/ui/roman_hud/hud_style.gd")
 const Kit = preload("res://scripts/ui/roman_hud/menu_kit.gd")
 
 
+## Lower-third panel that hugs its content up to a limit; longer text scrolls.
+class LowerThird extends PanelContainer:
+	var body: Control
+	var area := Vector2.ZERO
+	var max_height := 0.0
+	var bottom_bar := 0.0
+
+	func refit() -> void:
+		if not is_inside_tree() or not is_instance_valid(body):
+			return
+		var box := get_theme_stylebox("panel")
+		var needed := body.get_combined_minimum_size().y + (box.content_margin_top + box.content_margin_bottom if box != null else 0.0)
+		var height := clampf(needed, minf(160.0, max_height), max_height)
+		size = Vector2(area.x - 4.0, height)
+		position = Vector2(2.0, area.y - height - bottom_bar * 0.25)
+
+
 ## spec keys: name, scroll_name, kicker, speaker, role, text, feedback, note,
 ## portrait (Texture2D), portrait_name, choices [{caption, callback, enabled,
 ## reason, name, meta}], close {caption, callback, name}, area (dp Vector2),
@@ -25,7 +42,7 @@ static func build(screen: Control, spec: Dictionary) -> Dictionary:
 	var wide := area.x >= 860.0 and area.x >= area.y * 1.2
 	var portrait_layout := area.y > area.x * 1.15
 	var margin := clampf(area.x * 0.04, 12.0, 48.0)
-	var panel := PanelContainer.new()
+	var panel := LowerThird.new()
 	panel.name = str(spec.get("name", "DialogueStage"))
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	var shade := Style.velum(3, Vector4(margin, 26, margin, 14), 0.9, false)
@@ -33,8 +50,8 @@ static func build(screen: Control, spec: Dictionary) -> Dictionary:
 	screen.add_child(panel)
 	var max_height := area.y * (0.56 if portrait_layout else 0.5 if wide else 0.62)
 	var bottom_bar := area.y * letterbox.bar
-	panel.position = Vector2(0, area.y - max_height - bottom_bar * 0.25)
-	panel.size = Vector2(area.x, max_height)
+	panel.position = Vector2(2.0, area.y - max_height - bottom_bar * 0.25)
+	panel.size = Vector2(area.x - 4.0, max_height)
 	var scroll := ScrollContainer.new()
 	scroll.name = str(spec.get("scroll_name", "DialogueScroll"))
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -158,15 +175,12 @@ static func build(screen: Control, spec: Dictionary) -> Dictionary:
 			close_button.pressed.connect(close_callback)
 		answers.add_child(close_button)
 	# The panel hugs its content up to the lower-third limit; longer text scrolls.
-	var fit := func():
-		if not is_instance_valid(panel) or not is_instance_valid(body):
-			return
-		var needed := body.get_combined_minimum_size().y + shade.content_margin_top + shade.content_margin_bottom
-		var height := clampf(needed, minf(160.0, max_height), max_height)
-		panel.size = Vector2(area.x, height)
-		panel.position = Vector2(0, area.y - height - bottom_bar * 0.25)
-	body.minimum_size_changed.connect(fit)
-	fit.call_deferred()
+	panel.body = body
+	panel.area = area
+	panel.max_height = max_height
+	panel.bottom_bar = bottom_bar
+	body.minimum_size_changed.connect(panel.refit)
+	panel.refit.call_deferred()
 	Style.reveal(panel, reduce_motion, 0.06, Vector2.ZERO)
 	var stagger := 0.12
 	for child: Node in answers.get_children():
