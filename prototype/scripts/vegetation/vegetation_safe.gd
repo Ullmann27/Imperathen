@@ -93,8 +93,8 @@ static func copy_uncompressed(source: Mesh) -> ArrayMesh:
 
 
 static func merge_cards(source: Mesh, data: PackedFloat32Array, count: int, centre: Vector3) -> ArrayMesh:
-	# The herb atlas requires per-clump tile and colour. Bake these into vertex
-	# colour and geometry on the CPU, rather than using INSTANCE_CUSTOM.
+	# The herb atlas requires per-clump tile and colour. Bake these into UV2
+	# and geometry on the CPU, rather than using INSTANCE_CUSTOM.
 	# Each chunk has only one material/draw submission and local coordinates.
 	if source == null or source.get_surface_count() != 1 or count <= 0 or count*STRIDE > data.size():
 		return null
@@ -121,11 +121,13 @@ static func merge_cards(source: Mesh, data: PackedFloat32Array, count: int, cent
 	var ns := PackedVector3Array()
 	var cs := PackedColorArray()
 	var tex := PackedVector2Array()
+	var atlas_data := PackedVector2Array()
 	var ids := PackedInt32Array()
 	vertices.resize(n*count)
 	ns.resize(n*count)
 	cs.resize(n*count)
 	tex.resize(n*count)
+	atlas_data.resize(n*count)
 	ids.resize(indices.size()*count)
 	for i in count:
 		var t := decoded[i]
@@ -139,9 +141,11 @@ static func merge_cards(source: Mesh, data: PackedFloat32Array, count: int, cent
 			var dst := i*n+j
 			vertices[dst] = t*points[j]-centre
 			ns[dst] = (normal_basis*normals[j]).normalized()
-			# RGBA: variation, tile/16, tip weight, local ambient occlusion.
-			cs[dst] = Color(clampf(variation,0.0,1.0),tile,clampf(colors[j].b,0.0,1.0),clampf(colors[j].a,0.0,1.0))
+			# UV2 carries exact atlas indices independently of any vertex
+			# colour quantization or gamma conversion in the renderer.
+			cs[dst] = colors[j]
 			tex[dst] = uvs[j]
+			atlas_data[dst] = Vector2(tile,clampf(variation,0.0,1.0))
 		for j in indices.size():
 			ids[i*indices.size()+j] = i*n+indices[j]
 	var result_arrays := []
@@ -150,6 +154,7 @@ static func merge_cards(source: Mesh, data: PackedFloat32Array, count: int, cent
 	result_arrays[Mesh.ARRAY_NORMAL] = ns
 	result_arrays[Mesh.ARRAY_COLOR] = cs
 	result_arrays[Mesh.ARRAY_TEX_UV] = tex
+	result_arrays[Mesh.ARRAY_TEX_UV2] = atlas_data
 	result_arrays[Mesh.ARRAY_INDEX] = ids
 	var result := ArrayMesh.new()
 	result.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,result_arrays,[],{},0)
