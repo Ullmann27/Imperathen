@@ -52,6 +52,7 @@ const BOUNCE_LOCAL := Vector3(0.0, .55, 1.55)
 # Front openings (x0, x1, y0, y1 at the inner wall face z = 2.17) for sunbeams.
 const OPENINGS := [Vector4(-.65, .55, .45, 2.55), Vector4(-2.3, -1.4, 1.65, 2.4), Vector4(1.3, 2.2, 1.65, 2.4)]
 const SHAFT_SHADER := preload("res://scripts/rendering/sun_shaft.gdshader")
+const GLOW_SHADER := preload("res://scripts/rendering/window_glow.gdshader")
 const WINDOW_LOCAL := Vector3(0.1, 2.25, -1.55)
 var interior_ambient := Color("#4a433b")
 var interior_sky_share := .28
@@ -70,6 +71,7 @@ var _window: SpotLight3D
 var _bounce_allowed := true
 var _shafts_allowed := false
 var _shafts: MeshInstance3D
+var _glow: MultiMeshInstance3D
 var _home := -1
 ## Local solar hours; negative keeps the season's afternoon preset.
 var time_of_day := -1.0
@@ -123,6 +125,7 @@ func setup(world: Node3D, target: Environment, sky: ShaderMaterial) -> Direction
 	_shafts.material_override.shader = SHAFT_SHADER
 	_shafts.visible = false
 	add_child(_shafts)
+	_build_window_glow()
 	apply_season_light(season, sun, environment, sky_material)
 	return sun
 
@@ -189,6 +192,7 @@ func apply_season(index: int) -> void:
 	if time_of_day >= 0.0:
 		_apply_time(time_of_day)
 	_apply_weather()
+	_update_window_glow()
 	if _home >= 0:
 		_build_shafts(_home)
 	_apply_interior(interior)
@@ -242,6 +246,38 @@ func _apply_time(hours: float) -> void:
 		sky_material.set_shader_parameter("haze_strength", lerpf(.38, .8, twilight))
 		sky_material.set_shader_parameter("cloud_color", (preset.clouds as Color).lerp(Color("#f2b48a"), twilight * .6).lerp(NIGHT_SKY.clouds, night))
 		sky_material.set_shader_parameter("ground_color", (preset.ground as Color).lerp(NIGHT_SKY.ground, night))
+
+
+## One batch of warm cards inside the door and front windows of every Valdora
+## home; visible only at night, so lit rooms read from the lanes.
+func _build_window_glow() -> void:
+	var card := QuadMesh.new()
+	card.size = Vector2.ONE
+	var batch := MultiMesh.new()
+	batch.transform_format = MultiMesh.TRANSFORM_3D
+	batch.mesh = card
+	batch.instance_count = Layout.HOMES.size() * OPENINGS.size()
+	var index := 0
+	for home: Dictionary in Layout.HOMES:
+		var house := Transform3D(Basis(Vector3.UP, float(home.yaw)), home.at)
+		for opening: Vector4 in OPENINGS:
+			var size := Vector3(opening.y - opening.x, opening.w - opening.z, 1.0)
+			var centre := Vector3((opening.x + opening.y) * .5, (opening.z + opening.w) * .5, 1.95)
+			batch.set_instance_transform(index, house * Transform3D(Basis.from_scale(size), centre))
+			index += 1
+	_glow = MultiMeshInstance3D.new()
+	_glow.name = "NightWindowGlow"
+	_glow.multimesh = batch
+	_glow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_glow.material_override = ShaderMaterial.new()
+	_glow.material_override.shader = GLOW_SHADER
+	_glow.visible = false
+	add_child(_glow)
+
+
+func _update_window_glow() -> void:
+	_glow.visible = night > .25
+	_glow.material_override.set_shader_parameter("strength", .85 * smoothstep(.25, 1.0, night))
 
 
 ## Weather-dependent light: "clear", "overcast", "rain" or "mist".
