@@ -16,7 +16,14 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const CityTrade = preload("res://scripts/city_trade.gd")
-const SCHEMA_VERSION := 5
+const TribalWorld = preload("res://scripts/domain/tribal_world.gd")
+const SCHEMA_VERSION := 6
+## Work units of the tribal world per frame. A week is copied, simulated and
+## fully validated in fixed slices (TribalWorld "sliced work") and replaces
+## the committed tribal state only when all slices of that week are done.
+## Six units are about 1.5 ms (95th percentile) on the development desktop;
+## no single slice costs more (TribalWorld.MAX_SLICE_UNITS). See the test log.
+const TRIBE_UNITS_PER_FRAME := 6
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
 const MAX_COMMAND_IDS := 1024
@@ -48,6 +55,12 @@ var raid_observations: Callable
 var npc_sight_check: Callable
 # A city session owns this verified runtime map; ordinary campaign/test worlds keep it empty.
 var city_trade_sites: Dictionary = {}
+## The week in progress; never saved. Only its finished, validated result is
+## committed, so a rejected candidate or a save mid-week cannot leak it.
+var _tribe_job: Dictionary = {}
+## Work units spent by the last pump; observable for budget tests.
+var tribe_units_last_pump := 0
+var tribe_job_error := ""
 
 
 func _init() -> void:
@@ -106,6 +119,9 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 		CombatActions.start(data)
 	if data.village.enabled and childhood_enabled:
 		NpcBehavior.start(data)
+	# The tribal world follows the campaign era: 58 BC childhood games get the
+	# Rhine roster; the Trajan-era careers have no roster yet (empty world).
+	data.tribes = TribalWorld.new_state(TribalWorld.seed_from_text(str(data.world_id)), TribalWorld.scenario_for_world(data))
 	changed.emit()
 
 
@@ -247,12 +263,111 @@ func advance(delta: float) -> void:
 		var frontier_event := Frontier.advance(candidate, delta)
 		if not frontier_event.is_empty():
 			_record(candidate, frontier_event)
+	notify_ui = _pump_tribes(candidate, TRIBE_UNITS_PER_FRAME) or notify_ui
 	candidate.revision = int(data.revision) + 1
 	if not _validate_state(candidate).is_empty():
 		return
 	data = candidate
 	if notify_ui:
 		changed.emit()
+
+
+## The world's calendar day for every time-driven system of this model. One
+## function on purpose: the shared world calendar (#98) replaces its body.
+func calendar_day(state: Dictionary) -> int:
+	return TribalWorld.world_calendar_day(state)
+
+
+## Advances the tribal world by at most `budget` work units. A new week is
+## started only when the shared calendar has passed it; its working copy is
+## private to this model until every slice, including the full validation,
+## is done. Returns true when a finished week was committed into `state`.
+func _pump_tribes(state: Dictionary, budget: int) -> bool:
+	tribe_units_last_pump = 0
+	if not _tribe_job.is_empty() and not is_same(_tribe_job.base, state.tribes):
+		_tribe_job = {} # The committed world changed under the job: start again.
+	if _tribe_job.is_empty():
+		if (int(state.tribes.tick) + 1) * TribalWorld.TICK_DAYS > calendar_day(state):
+			return false
+		_tribe_job = {"base": state.tribes, "stage": "copy", "runner": TribalWorld.copy_begin(state.tribes), "work": {}}
+	if _tribe_job.stage == "failed":
+		return false
+	while true:
+		var job := _tribe_job
+		if job.stage == "commit":
+			if tribe_units_last_pump > 0 and tribe_units_last_pump + 1 > budget:
+				return false
+			state.tribes = job.work
+			tribe_units_last_pump += 1
+			_tribe_job = {}
+			return true
+		var runner: Dictionary = job.runner
+		var cost := TribalWorld.next_units(runner)
+		if tribe_units_last_pump > 0 and tribe_units_last_pump + cost > budget:
+			return false
+		tribe_units_last_pump += TribalWorld.step(runner)
+		if bool(runner.done):
+			match str(job.stage):
+				"copy":
+					job.work = runner.target
+					job.stage = "week"
+					job.runner = TribalWorld.week_begin(job.work)
+				"week":
+					job.stage = "check"
+					job.runner = TribalWorld.check_begin(job.work)
+				"check":
+					if str(runner.error) != "":
+						tribe_job_error = str(runner.error)
+						push_error("Stammeswoche verworfen: " + tribe_job_error)
+						job.stage = "failed"
+						return false
+					TribalWorld.mark_validated(job.work)
+					job.stage = "commit"
+	return false
+
+
+## Weeks the tribal world still has to live through to reach the calendar.
+func tribes_pending_weeks() -> int:
+	if data.is_empty():
+		return 0
+	return maxi(0, floori(calendar_day(data) / float(TribalWorld.TICK_DAYS)) - int(data.tribes.tick))
+
+
+## For screens that pause the world (strategy atlas, loading): spends one
+## frame budget on the tribal world of the accepted state.
+func pump_tribes(budget: int = TRIBE_UNITS_PER_FRAME) -> Dictionary:
+	var committed := false
+	if not data.is_empty() and not data.progress.career_terminal:
+		committed = _pump_tribes(data, budget)
+		if committed:
+			data.revision = int(data.revision) + 1
+			changed.emit()
+	return {"tribes": data.get("tribes", {}), "pending_weeks": tribes_pending_weeks(), "committed": committed, "units": tribe_units_last_pump}
+
+
+## Tests and tools: pump frame budgets until the calendar is reached.
+func finish_tribes(max_frames: int = 100000) -> int:
+	var frames := 0
+	while frames < max_frames and tribes_pending_weeks() > 0 and tribe_job_error.is_empty():
+		pump_tribes()
+		frames += 1
+	return frames
+
+
+## Travel, sleep or waiting outside the village clocks report the days they
+## take; the tribal world then lives through them over the next frames.
+func pass_calendar_days(days: int, reason: String = "") -> Dictionary:
+	if days < 1 or days > 3650 or data.is_empty() or data.progress.career_terminal:
+		return _fail("Ungültige Zeitspanne.")
+	var candidate := _world_copy()
+	candidate.tribes = TribalWorld.with_extra_days(data.tribes, days)
+	candidate.revision = int(data.revision) + 1
+	var error := _validate_state(candidate)
+	if not error.is_empty():
+		return _fail("Zeitspanne verworfen: " + error)
+	data = candidate
+	changed.emit()
+	return _ok("%d Tage vergehen%s." % [days, (" (" + reason + ")") if not reason.is_empty() else ""])
 
 
 func _advance_construction(candidate: Dictionary, delta: float) -> bool:
@@ -385,6 +500,10 @@ func load_game(path: String) -> Dictionary:
 		return _fail("Kein gültiger Spielstand geladen. Hauptdatei: %s Sicherung: %s" % [primary_error, loaded.message])
 	# Validate the entire candidate before touching the active world.
 	data = loaded.state.duplicate(true)
+	# The copy has the content the loader just validated; the first frame after
+	# loading need not repeat the full tribal check.
+	if TribalWorld.is_validated(loaded.state.tribes):
+		TribalWorld.mark_validated(data.tribes)
 	changed.emit()
 	var result := _ok("Geprüfte Sicherung geladen; die Hauptdatei war nicht nutzbar." if recovered else "Spielstand geladen.")
 	result["recovered_backup"] = recovered
@@ -734,10 +853,15 @@ func _validate_arguments(command: String, args: Dictionary) -> String:
 
 
 func _validate_state(state: Variant) -> String:
-	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley", "origin_id", "strategy", "frontier", "village"]):
+	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley", "origin_id", "strategy", "frontier", "village", "tribes"]):
 		return "Unvollständiger oder unbekannter Datenvertrag."
 	if not _integer(state.schema_version, SCHEMA_VERSION, SCHEMA_VERSION):
 		return "Diese Schemaversion wird nicht unterstützt; es wurde keine Migration ausgeführt."
+	var tribal_error := TribalWorld.validate_cached(state.tribes)
+	if not tribal_error.is_empty():
+		return "Stammeswelt: " + tribal_error
+	if TribalWorld.day(state.tribes) > calendar_day(state):
+		return "Die Stammeswelt läuft der gemeinsamen Weltzeit voraus."
 	if typeof(state.origin_id) != TYPE_STRING or not Origins.PEOPLES.has(state.origin_id) or typeof(state.strategy) != TYPE_DICTIONARY or not Seasons.validate(state.strategy) or state.strategy.home != state.origin_id:
 		return "Unbekannte Herkunft oder ungültige Regionalkampagne."
 	if state.strategy.turn > 0 and (typeof(state.progress) != TYPE_DICTIONARY or not state.progress.get("skirmish_won",false)):
@@ -1008,7 +1132,18 @@ func _read_save(path: String) -> Dictionary:
 		state.village.enabled = false
 		state.village.health_delta = 0
 		state.village.militia = []
+		state.schema_version = 5
+	if typeof(state) == TYPE_DICTIONARY and state.get("schema_version") == 5 and typeof(state.get("village")) == TYPE_DICTIONARY:
+		# v5 -> v6: the aggregated tribal world starts at its scenario's opening
+		# week and lives through the save's elapsed calendar on the next frames.
+		# No v5 build wrote this key; any value present is validated strictly.
+		if not state.has("tribes"):
+			state.tribes = TribalWorld.new_state(TribalWorld.seed_from_text(str(state.get("world_id", ""))), TribalWorld.scenario_for_world(state))
 		state.schema_version = SCHEMA_VERSION
+	# Tribal state v1 (first #99 build) gains forms of government and the
+	# D-048 dispute register before strict validation.
+	if typeof(state) == TYPE_DICTIONARY and typeof(state.get("tribes")) == TYPE_DICTIONARY:
+		TribalWorld.migrate(state.tribes)
 	# Nested childhood actor IDs changed when the production screenplay fixed
 	# Julia/Silvanus/Sextus as mother/father/smith. Migrate only version-1
 	# childhood saves before strict state validation; all other saves are untouched.
@@ -1043,6 +1178,7 @@ func _read_save(path: String) -> Dictionary:
 
 func _restore_integer_fields(state: Dictionary) -> void:
 	CityTrade.restore_integer_fields(state)
+	TribalWorld.normalize(state.tribes)
 	for key in ["schema_version", "revision"]:
 		state[key] = int(state[key])
 	state.frontier.schema = int(state.frontier.schema)
@@ -1272,7 +1408,7 @@ func _world_copy() -> Dictionary:
 	var candidate := {}
 	for key in data:
 		var value: Variant = data[key]
-		if key not in ["strategy","valley"] and typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY]:
+		if key not in ["strategy","valley","tribes"] and typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY]:
 			candidate[key] = value.duplicate(true)
 		else:
 			candidate[key] = value
@@ -1292,6 +1428,8 @@ func act_region(command: String,target: String) -> Dictionary:
 			data.progress.years_elapsed = 6 + floori(data.strategy.turn/4.0)
 			data.player.age = 12 + data.progress.years_elapsed
 			data.companion.age = data.player.age
+			# The season's thirteen tribal weeks follow in frame budgets
+			# (advance() in the world, pump_tribes() while a menu pauses it).
 		_record(data,result.message)
 		data.revision += 1
 		changed.emit()

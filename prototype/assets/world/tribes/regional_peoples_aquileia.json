@@ -1,0 +1,618 @@
+{
+  "schema": 2,
+  "roster_id": "aquileia_region_58bc",
+  "status": "sources_checked_not_simulated",
+  "checked_on": "2026-11-26",
+  "purpose": "Rosterdaten für die Völker im Raum Aquileia (Valdora) um 58 v. Chr. Jede historische Aussage nennt Quelle, Stelle und den geprüften Wortlaut aus der verlinkten Ausgabe. Zahlen, Herrschaftsform, Truppen und Rollen im Spiel stehen getrennt unter design_hooks und sind Spielannahmen.",
+  "use_rule": "Noch kein Szenario: Siedlungszahlen, Bestände und Truppen fehlen bewusst und werden erst mit dem Szenario »Aquileia 58 v. Chr.« als Spielannahmen angelegt. Aussagen mit canon_kind documented sind am Wortlaut geprüft, inferred sind Schlüsse aus den genannten Stellen, secondary stützt sich auf Sekundärliteratur. Eine Fachprüfung durch einen Althistoriker steht aus.",
+  "regional_context": [
+    {
+      "claim": "Im Winter 59/58 v. Chr. überwintern drei Legionen Caesars um Aquileia und werden im Frühjahr 58 gegen die Helvetier herangeführt.",
+      "source": "caesar_bg_1",
+      "passage": "1,10",
+      "quote": "quae circum Aquileiam hiemabant",
+      "canon_kind": "documented"
+    },
+    {
+      "claim": "Aquileia ist Handelsplatz für die Illyrer an der Donau: Meeresprodukte, Wein in Holzfässern und Öl gegen Sklaven, Vieh und Häute.",
+      "source": "strabo_5",
+      "passage": "5,1,8",
+      "quote": "Aquileia has been given over as an emporium for those tribes of the Illyrians that live near the Ister.",
+      "canon_kind": "documented"
+    }
+  ],
+  "sources": {
+    "caesar_bg_1": {
+      "citation": "C. Iulius Caesar, De bello Gallico 1,5; 1,10; 1,53",
+      "url": "https://www.thelatinlibrary.com/caesar/gall1.shtml"
+    },
+    "hirtius_bg_8": {
+      "citation": "A. Hirtius, De bello Gallico 8,24",
+      "url": "https://www.thelatinlibrary.com/caesar/gall8.shtml"
+    },
+    "caesar_bc_1": {
+      "citation": "C. Iulius Caesar, De bello civili 1,18",
+      "url": "https://www.thelatinlibrary.com/caesar/bc1.shtml"
+    },
+    "livy_40": {
+      "citation": "T. Livius, Ab urbe condita 40,34",
+      "url": "https://www.thelatinlibrary.com/livy/liv.40.shtml"
+    },
+    "livy_41": {
+      "citation": "T. Livius, Ab urbe condita 41,4; 41,11",
+      "url": "https://www.thelatinlibrary.com/livy/liv.41.shtml"
+    },
+    "livy_43": {
+      "citation": "T. Livius, Ab urbe condita 43,5",
+      "url": "https://www.thelatinlibrary.com/livy/liv.43.shtml"
+    },
+    "polybius_2": {
+      "citation": "Polybios, Historien 2,17–18; 2,23–24 (Übers. Paton, Loeb)",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Polybius/2*.html"
+    },
+    "strabo_4": {
+      "citation": "Strabon, Geographika 4,6,9–12 (Übers. Jones, Loeb)",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Strabo/4F*.html"
+    },
+    "strabo_5": {
+      "citation": "Strabon, Geographika 5,1,4–9 (Übers. Jones, Loeb)",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Strabo/5A*.html"
+    },
+    "strabo_7": {
+      "citation": "Strabon, Geographika 7,5,2–4 (Übers. Jones, Loeb)",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Strabo/7E*.html"
+    },
+    "pliny_nh_3": {
+      "citation": "C. Plinius Secundus, Naturalis historia 3,126–133",
+      "url": "https://penelope.uchicago.edu/Thayer/L/Roman/Texts/Pliny_the_Elder/3*.html"
+    },
+    "appian_illyr": {
+      "citation": "Appian, Illyrike 16; 18–19 (Übers. White)",
+      "url": "https://www.livius.org/sources/content/appian/appian-the-illyrian-wars/appian-the-illyrian-wars-4/"
+    },
+    "fasti_triumphales": {
+      "citation": "Fasti triumphales zu 177, 129 und 115 v. Chr. (engl. Übertragung)",
+      "url": "https://www.attalus.org/translate/fasti.html"
+    },
+    "dio_41": {
+      "citation": "Cassius Dio, Römische Geschichte 41,36,3 (Übers. Cary, Loeb)",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Cassius_Dio/41*.html"
+    },
+    "lex_pompeia_secondary": {
+      "citation": "Sekundär: Lex Pompeia de Transpadanis, 89 v. Chr. (Asconius, In Pisonianam 3 Clark; Überblick und Forschungsstand)",
+      "url": "https://en.wikipedia.org/wiki/Lex_Pompeia_de_Transpadanis",
+      "kind": "secondary"
+    }
+  },
+  "peoples": {
+    "carni": {
+      "name": "Karner",
+      "latin": "Carni",
+      "culture": "carnic",
+      "language_note": "In den Fasti als »Galli Karni« geführt (keltische Zuordnung durch Rom); Sprache selbst ist hier nicht belegt.",
+      "region": "Ostalpenrand und Ebene nördlich und östlich von Aquileia bis zum Pass über die Ocra",
+      "places": [
+        {
+          "name": "Aquileia",
+          "modern": "Aquileia",
+          "lat": 45.77,
+          "lon": 13.37,
+          "identification": "secure",
+          "role": "römische Kolonie im Land der Karner"
+        },
+        {
+          "name": "Tergeste",
+          "modern": "Triest",
+          "lat": 45.65,
+          "lon": 13.77,
+          "identification": "secure",
+          "role": "karnisches Dorf bzw. Feste, später Kolonie"
+        },
+        {
+          "name": "Iulium Carnicum",
+          "modern": "Zuglio",
+          "lat": 46.46,
+          "lon": 13.03,
+          "identification": "secure",
+          "role": "Vorort der Iulienses Carnorum; Gründungszeit nach 58 v. Chr. möglich, hier nicht belegt"
+        }
+      ],
+      "statements": [
+        {
+          "claim": "Die Gegend um Aquileia bewohnen Karner und ein Teil der Noriker.",
+          "source": "strabo_4",
+          "passage": "4,6,9",
+          "quote": "the districts round about Aquileia, namely, the Carni as well as certain of the Norici",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Plinius nennt das Gebiet von Aquileia bis Tergeste Land der Karner, daran anschließend das der Iapyden.",
+          "source": "pliny_nh_3",
+          "passage": "3,126–127",
+          "quote": "Carnorum haec regio iunctaque Iapudum",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Tergeste ist ein karnisches Dorf; von dort führt ein Pass über die Ocra.",
+          "source": "strabo_7",
+          "passage": "7,5,2",
+          "quote": "there is a pass which leads over Ocra from Tergeste, a Carnic village",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "171/170 v. Chr. beschweren sich Gesandte der Karner, Histrer und Iapyden beim Senat über den Konsul C. Cassius, der ihr Gebiet verwüstet hatte.",
+          "source": "livy_43",
+          "passage": "43,5",
+          "quote": "Sub idem tempus Carnorum Histrorumque et Iapydum legati uenerunt",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "115 v. Chr. triumphiert der Konsul M. Aemilius Scaurus über die karnischen Gallier.",
+          "source": "fasti_triumphales",
+          "passage": "zu 115 v. Chr.",
+          "quote": "M. Aemilius M.f. L.n. Scaurus, consul, over the Carnian Gauls",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Aquileia wurde 181 v. Chr. als latinische Kolonie auf gallischem Boden gegründet, laut Strabon als Bollwerk gegen die oberhalb wohnenden Barbaren.",
+          "source": "livy_40",
+          "passage": "40,34; Strabon 5,1,8",
+          "quote": "Aquileia colonia Latina eodem anno in agrum Gallorum est deducta.",
+          "canon_kind": "documented"
+        }
+      ],
+      "status_58bc": {
+        "text": "Seit dem Triumph von 115 v. Chr. unter römischer Oberhoheit in der Provinz Gallia Cisalpina; im Winter 59/58 v. Chr. liegen drei Legionen Caesars um Aquileia. Eigene politische Verfassung der Karner in diesem Jahr ist nicht überliefert.",
+        "canon_kind": "inferred",
+        "basis": [
+          "fasti_triumphales",
+          "caesar_bg_1"
+        ]
+      },
+      "attested_persons": [],
+      "design_hooks": {
+        "canon_kind": "game_assumption",
+        "government": "elders",
+        "role": "Nachbarn und Bergbauern im Umland von Valdora; Führer über die Pässe, Viehhandel",
+        "troops": "Aufgebot und Speerträger; keine belegte Bewaffnung"
+      },
+      "open_questions": [
+        "Gründungsdatum von Iulium Carnicum und Forum Iulii (caesarisch, Jahr offen)",
+        "Sprache und Namengut (Inschriften) für einen Namenspool"
+      ]
+    },
+    "histri": {
+      "name": "Histrer",
+      "latin": "Histri (Istri)",
+      "culture": "histrian",
+      "language_note": "Sprachzuordnung in den geprüften Stellen nicht genannt; Strabon zählt sie als erstes Volk der illyrischen Küste.",
+      "region": "Halbinsel Istrien südöstlich von Tergeste bis Pola",
+      "places": [
+        {
+          "name": "Nesactium",
+          "modern": "Vizače bei Pula",
+          "lat": 44.92,
+          "lon": 13.97,
+          "identification": "secure",
+          "role": "Königssitz bis 177 v. Chr."
+        },
+        {
+          "name": "Pola",
+          "modern": "Pula",
+          "lat": 44.87,
+          "lon": 13.85,
+          "identification": "secure",
+          "role": "histrische Stadt, später Grenze Italiens"
+        }
+      ],
+      "statements": [
+        {
+          "claim": "Die Histrer sind das erste Volk der illyrischen Küste; ihr Land schließt an Italien und die Karner an.",
+          "source": "strabo_7",
+          "passage": "7,5,3",
+          "quote": "the Istrians were the first people on the Illyrian seaboard",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "178 v. Chr. flieht der König der Histrer aus dem überrannten Lager.",
+          "source": "livy_41",
+          "passage": "41,4",
+          "quote": "rex tamen Histrorum temulentus ex conuiuio, raptim a suis in equum impositus, fugit.",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "177 v. Chr. belagert der Konsul C. Claudius Nesactium, wohin sich die Vornehmen und der Kleinkönig Aepulo zurückgezogen hatten.",
+          "source": "livy_41",
+          "passage": "41,11",
+          "quote": "oppidum Nesattium, quo se principes Histrorum et regulus ipse Aepulo receperat",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Mit der Zerstörung von drei Städten und dem Tod des Königs war ganz Histrien befriedet.",
+          "source": "livy_41",
+          "passage": "41,11",
+          "quote": "Histria tota trium oppidorum excidio et morte regis pacata est",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "C. Claudius Pulcher triumphiert über Histrer und Ligurer.",
+          "source": "fasti_triumphales",
+          "passage": "zu 177 v. Chr.",
+          "quote": "C. Claudius [Ap.f. P.n.] Pulcher, consul, over the Istri and Ligurians",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Der Fluss Formio war die alte Grenze des erweiterten Italien, zu Plinius' Zeit die Arsia; Histrien lag 58 v. Chr. demnach außerhalb Italiens.",
+          "source": "pliny_nh_3",
+          "passage": "3,127; 3,129",
+          "quote": "anticus auctae Italiae terminus, nunc vero Histriae.",
+          "canon_kind": "documented",
+          "note": "Die Datierung der Formio-Grenze auf die späte Republik ist Forschungsmeinung."
+        }
+      ],
+      "status_58bc": {
+        "text": "Seit 177 v. Chr. unterworfen, ohne König; Küstenorte unter römischer Aufsicht. Für 58 v. Chr. sind keine Ereignisse überliefert.",
+        "canon_kind": "inferred",
+        "basis": [
+          "livy_41",
+          "pliny_nh_3"
+        ]
+      },
+      "attested_persons": [
+        {
+          "name": "Aepulo",
+          "role": "regulus der Histrer, † 177 v. Chr.",
+          "source": "livy_41",
+          "usable_58bc": false
+        }
+      ],
+      "design_hooks": {
+        "canon_kind": "game_assumption",
+        "government": "elders",
+        "role": "Küstenleute, Fischer, Schiffer und Viehhalter; Seeweg nach Aquileia",
+        "troops": "leichte Küstenaufgebote; keine belegte Bewaffnung"
+      },
+      "open_questions": [
+        "Seeraub der Histrer ist für das 3./2. Jh. überliefert (Livius 10,2; Periocha 20), nicht für 58 v. Chr.; vor Verwendung prüfen",
+        "Gründungsjahr der Kolonie Pola"
+      ]
+    },
+    "taurisci_norici": {
+      "name": "Taurisker und Noriker",
+      "latin": "Taurisci, Norici",
+      "culture": "noric_celtic",
+      "language_note": "Strabon nennt Boier und Taurisker keltische Stämme.",
+      "region": "Ostalpen nördlich und nordöstlich der Karner; Taurisker bis Nauportus an der Straße von Aquileia",
+      "places": [
+        {
+          "name": "Nauportus",
+          "modern": "Vrhnika",
+          "lat": 45.96,
+          "lon": 14.3,
+          "identification": "secure",
+          "role": "Siedlung der Taurisker, Umschlagplatz der Wagen aus Aquileia"
+        },
+        {
+          "name": "Noreia",
+          "modern": "",
+          "lat": null,
+          "lon": null,
+          "identification": "unknown",
+          "role": "Stadt in Noricum; Lage in der Forschung ungeklärt"
+        }
+      ],
+      "statements": [
+        {
+          "claim": "Die Taurisker gehören zu den Norikern.",
+          "source": "strabo_4",
+          "passage": "4,6,9",
+          "quote": "the Taurisci, also, belong to the Norici.",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Plinius: neben den Karnern die einst Taurisker genannten, jetzt Noriker.",
+          "source": "pliny_nh_3",
+          "passage": "3,133",
+          "quote": "Carnos quondam Taurisci appellati, nunc Norici.",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Nach Polybios wurde bei den norischen Tauriskern nahe Aquileia Gold gefunden; die Taurisker vertrieben die italischen Mitarbeiter und behielten das Monopol.",
+          "source": "strabo_4",
+          "passage": "4,6,12",
+          "quote": "when the Taurisci learned this they cast out their fellow-workers and carried on a monopoly.",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Waren aus Aquileia gehen auf Wagen über die Ocra nach Nauportus, einer Siedlung der Taurisker.",
+          "source": "strabo_7",
+          "passage": "7,5,2; 4,6,10",
+          "quote": "a settlement of the Taurisci, whither the wagons are brought",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Die Gegend um Noreia hat Goldwäschen und Eisenwerke.",
+          "source": "strabo_5",
+          "passage": "5,1,8",
+          "quote": "This region has places that are naturally well-suited to gold-washing, and has also iron-works.",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Kurz vor 58 v. Chr. waren Boier in norisches Gebiet eingedrungen und belagerten Noreia; sie schlossen sich den Helvetiern an.",
+          "source": "caesar_bg_1",
+          "passage": "1,5",
+          "quote": "Boiosque, qui trans Rhenum incoluerant et in agrum Noricum transierant Noreiamque oppugnabant",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Ariovists zweite Frau war eine Norikerin, Schwester des Königs Voccio.",
+          "source": "caesar_bg_1",
+          "passage": "1,53",
+          "quote": "altera Norica, regis Voccionis soror, quam in Gallia duxerat a fratre missam",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "49 v. Chr. schickt der norische König Caesar etwa 300 Reiter.",
+          "source": "caesar_bc_1",
+          "passage": "1,18",
+          "quote": "equitesque ab rege Norico circiter CCC",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "170 v. Chr. schickt ein gallischer König Cincibilus Gesandte nach Rom; der Senat erlaubt die Ausfuhr von je zehn Pferden.",
+          "source": "livy_43",
+          "passage": "43,5",
+          "quote": "et legati regis Gallorum Cincibili uenerunt.",
+          "canon_kind": "documented",
+          "note": "Die Gleichsetzung seines Reichs mit Noricum ist Forschungsmeinung, nicht Wortlaut."
+        },
+        {
+          "claim": "Die Daker unterwarfen Boier und Taurisker unter Critasirus.",
+          "source": "strabo_7",
+          "passage": "7,5,2",
+          "quote": "the Dacians when they subdued the Boii and Taurisci, Celtic tribes under the rule of Critasirus",
+          "canon_kind": "documented",
+          "note": "Datierung umstritten (etwa 60–40 v. Chr.); für 58 v. Chr. nicht als geschehen voraussetzen."
+        }
+      ],
+      "status_58bc": {
+        "text": "Eigenständiges Königreich Noricum außerhalb der Provinz, in Verbindung mit Rom und mit Ariovist verschwägert; Handel mit Aquileia (Eisen, Gold, Vieh) über die Pässe.",
+        "canon_kind": "inferred",
+        "basis": [
+          "caesar_bg_1",
+          "caesar_bc_1",
+          "strabo_4",
+          "strabo_5"
+        ]
+      },
+      "attested_persons": [
+        {
+          "name": "Voccio",
+          "role": "König in Noricum, 58 v. Chr. bezeugt",
+          "source": "caesar_bg_1",
+          "usable_58bc": true
+        },
+        {
+          "name": "Critasirus",
+          "role": "Herrscher über Boier und Taurisker; Zeit umstritten",
+          "source": "strabo_7",
+          "usable_58bc": false
+        },
+        {
+          "name": "Cincibilus",
+          "role": "gallischer König, 170 v. Chr.",
+          "source": "livy_43",
+          "usable_58bc": false
+        }
+      ],
+      "design_hooks": {
+        "canon_kind": "game_assumption",
+        "government": "hereditary",
+        "role": "Handelspartner für Eisen und Gold, Reiter als Söldner oder Bundesgenossen, Machtzentrum jenseits der Pässe",
+        "troops": "Reiterei belegt (BC 1,18); übrige Bewaffnung nicht belegt"
+      },
+      "open_questions": [
+        "Lage von Noreia",
+        "Zeitpunkt der dakischen Niederlage der Taurisker",
+        "Römischer Handelsplatz auf dem Magdalensberg (archäologisch, ab etwa Mitte 1. Jh. v. Chr.): Stand der Forschung vor Verwendung prüfen"
+      ]
+    },
+    "iapydes": {
+      "name": "Iapyden",
+      "latin": "Iapydes (Iapodes, Iapudes)",
+      "culture": "iapodian",
+      "language_note": "Strabon: ein aus Illyrern und Kelten gemischtes Volk.",
+      "region": "Bergland am Mons Albius östlich der Karner und hinter Tergeste, bis zur Küste",
+      "places": [
+        {
+          "name": "Metulum",
+          "modern": "wohl Viničica bei Josipdol",
+          "lat": 45.19,
+          "lon": 15.28,
+          "identification": "probable",
+          "role": "Hauptort der Iapyden"
+        }
+      ],
+      "statements": [
+        {
+          "claim": "Die Iapoden sind ein aus Illyrern und Kelten gemischtes Volk; ihre Städte sind Metulum, Arupini, Monetium und Vendo.",
+          "source": "strabo_4",
+          "passage": "4,6,10",
+          "quote": "Their cities are: Metulum, Arupini, Monetium, and Vendo.",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Ihre Rüstung ist keltisch; sie sind tätowiert wie die übrigen Illyrer und die Thraker.",
+          "source": "strabo_7",
+          "passage": "7,5,4",
+          "quote": "Their armour is Celtic, and they are tattooed like the rest of the Illyrians and the Thracians.",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "129 v. Chr. triumphiert der Konsul C. Sempronius Tuditanus über die Iapyden.",
+          "source": "fasti_triumphales",
+          "passage": "zu 129 v. Chr.",
+          "quote": "C. Sempronius C.f. C.n. Tuditanus, consul, over the Iapydes",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Die Iapyden jenseits der Alpen schlugen die Römer binnen etwa zwanzig Jahren zweimal zurück, überrannten Aquileia und plünderten Tergeste.",
+          "source": "appian_illyr",
+          "passage": "18",
+          "quote": "drove back the Romans twice within the space of about twenty years",
+          "canon_kind": "documented",
+          "note": "Appian schreibt im Rückblick auf 35 v. Chr.; die Einfälle fallen damit etwa in die Jahre 55–35 v. Chr."
+        },
+        {
+          "claim": "Im Sommer 52 v. Chr. wurden die Tergestiner von einem plötzlichen Raubeinfall überwältigt; Caesar schickt 51 v. Chr. die 15. Legion nach Oberitalien.",
+          "source": "hirtius_bg_8",
+          "passage": "8,24",
+          "quote": "superiore aestate Tergestinis acciderat, qui repentino latrocinio atque impetu illorum erant oppressi.",
+          "canon_kind": "documented",
+          "note": "Hirtius nennt die Angreifer nur Barbaren; die Zuordnung zu den Iapyden folgt aus Appian, Illyrike 18."
+        },
+        {
+          "claim": "Metulum ist der Hauptort der Iapyden (Feldzug Octavians 35 v. Chr.).",
+          "source": "appian_illyr",
+          "passage": "19",
+          "quote": "Thence he advanced to another place called Metulus, which is the chief town of the Iapydes.",
+          "canon_kind": "documented"
+        }
+      ],
+      "status_58bc": {
+        "text": "Frei und außerhalb der Provinz; nach dem Triumph von 129 v. Chr. dem Namen nach gebunden, tatsächlich Raubzüge gegen die römischen Orte an der Küste, belegt für 52 v. Chr.",
+        "canon_kind": "inferred",
+        "basis": [
+          "fasti_triumphales",
+          "appian_illyr",
+          "hirtius_bg_8"
+        ]
+      },
+      "attested_persons": [],
+      "documented_hostilities": [
+        {
+          "against": "Tergeste und Aquileia (römische Orte im Karnerland)",
+          "year": -52,
+          "source": "hirtius_bg_8",
+          "supporting": "appian_illyr",
+          "note": "Kandidat für eine natürliche Feindschaft nach D-048; als Anker für 52 v. Chr. verwendbar. Für 58 v. Chr. ist kein Einfall belegt."
+        }
+      ],
+      "design_hooks": {
+        "canon_kind": "game_assumption",
+        "government": "war_leader",
+        "role": "Bergvolk mit Raubzügen gegen die Küstenorte; der einzige quellengestützte Kandidat für eine natürliche Feindschaft im Raum Valdora",
+        "troops": "keltische Rüstung belegt (Strabon 7,5,4); Tätowierung als Erscheinungsmerkmal"
+      },
+      "open_questions": [
+        "Lage von Metulum, Arupium, Monetium und Vendo (Identifikationen der Forschung)",
+        "Die Reiter von I-10 dürfen keinem Volk zugeordnet werden (D-040); Iapyden sind dafür ausdrücklich nicht vorgesehen"
+      ]
+    },
+    "veneti_adriatic": {
+      "name": "Veneter (Adria)",
+      "latin": "Veneti (Heneti)",
+      "culture": "venetic",
+      "language_note": "Polybios: in Sitte und Tracht den Kelten ähnlich, aber mit eigener Sprache.",
+      "region": "Venetien westlich von Aquileia zwischen Alpen, Po und Adria",
+      "places": [
+        {
+          "name": "Patavium",
+          "modern": "Padua",
+          "lat": 45.41,
+          "lon": 11.88,
+          "identification": "secure",
+          "role": "bedeutendste Stadt"
+        },
+        {
+          "name": "Ateste",
+          "modern": "Este",
+          "lat": 45.23,
+          "lon": 11.66,
+          "identification": "secure",
+          "role": "Stadt der Veneter"
+        }
+      ],
+      "statements": [
+        {
+          "claim": "Die Veneter unterscheiden sich in Sitte und Tracht wenig von den Kelten, sprechen aber eine andere Sprache.",
+          "source": "polybius_2",
+          "passage": "2,17,5",
+          "quote": "differing slightly from the Gauls in customs and costume and speaking another language",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Ein Einfall der Veneter in ihr Land zwang die Gallier zum Abzug von Rom.",
+          "source": "polybius_2",
+          "passage": "2,18,3",
+          "quote": "being diverted by an invasion of their own country by the Veneti",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Im Keltenkrieg (225 v. Chr.) entschieden sich Veneter und Cenomanen nach einer römischen Gesandtschaft für Rom; 20 000 von ihnen standen an der gallischen Grenze.",
+          "source": "polybius_2",
+          "passage": "2,23,2; 2,24,7",
+          "quote": "the Veneti and Cenomani, on the Romans sending an embassy to them, decided to give them their support",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Die Pferdezucht der Veneter war einst berühmt, zu Strabons Zeit aber verschwunden.",
+          "source": "strabo_5",
+          "passage": "5,1,4",
+          "quote": "a devotion which now, indeed, has wholly disappeared, although formerly it was prized among them.",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "Patavium ist die beste Stadt der Gegend, mit 500 Rittern beim letzten Zensus und großer Warenausfuhr nach Rom.",
+          "source": "strabo_5",
+          "passage": "5,1,7",
+          "quote": "this city by recent census, so it is said, had five hundred knights",
+          "canon_kind": "documented",
+          "note": "Zensus augusteischer Zeit; für 58 v. Chr. nur als Hinweis auf Wohlstand."
+        },
+        {
+          "claim": "Plinius führt Ateste als Stadt der Veneter.",
+          "source": "pliny_nh_3",
+          "passage": "3,130",
+          "quote": "Venetorum autem Ateste",
+          "canon_kind": "documented"
+        },
+        {
+          "claim": "89 v. Chr. erhielten die Gemeinden jenseits des Po latinisches Recht.",
+          "source": "lex_pompeia_secondary",
+          "passage": "Asconius, In Pisonianam 3 Clark",
+          "quote": "",
+          "canon_kind": "secondary",
+          "note": "Sekundär belegt; Asconius-Text hier nicht im Wortlaut geprüft."
+        },
+        {
+          "claim": "49 v. Chr. gab Caesar den Bewohnern jenseits des Po das römische Bürgerrecht.",
+          "source": "dio_41",
+          "passage": "41,36,3",
+          "quote": "to the Gauls living south of the Alps and beyond the Po he gave citizenship because he had once governed them.",
+          "canon_kind": "documented"
+        }
+      ],
+      "status_58bc": {
+        "text": "Seit Langem mit Rom verbündet, städtisch und wohlhabend; Gemeinden latinischen Rechts in der Provinz Gallia Cisalpina unter dem Statthalter Caesar, noch ohne römisches Bürgerrecht.",
+        "canon_kind": "inferred",
+        "basis": [
+          "polybius_2",
+          "lex_pompeia_secondary",
+          "dio_41"
+        ]
+      },
+      "attested_persons": [],
+      "design_hooks": {
+        "canon_kind": "game_assumption",
+        "government": "assembly",
+        "role": "städtische Handelsgemeinschaft und Markt westlich von Valdora; Wolle, Handwerk, Pferde als Erinnerung",
+        "troops": "städtische Aufgebote unter römischem Befehl; kein eigenständiger Kriegsakteur"
+      },
+      "open_questions": [
+        "Nicht mit den gallischen Venetern am Atlantik (Caesar, BG 3) verwechseln; Strabon 5,1,4 diskutiert die Namensgleichheit",
+        "Venetische Personennamen aus Inschriften (Este) für einen Namenspool"
+      ]
+    }
+  }
+}
