@@ -16,6 +16,7 @@ extends RefCounted
 ## physics world in tests/raid_route_world_test.gd.
 
 const Layout = preload("res://scripts/world/village/village_layout.gd")
+const FamilyManifest = preload("res://assets/architecture/valdora/valdora_family.json")
 const Freight = preload("res://scripts/domain/regional_freight.gd")
 const LOOT := Vector2(5.0, 5.0)
 const LOOT_RADIUS := 2.0
@@ -57,8 +58,8 @@ const PROPS := [
 	Rect2(4.96, -28.25, 0.48, 1.9), Rect2(6.25, 22.4, 2.3, 5.6), Rect2(13.16, -24.74, 1.68, 0.71),
 	Rect2(14.95, -23.68, 1.5, 0.76), Rect2(32.34, 0.61, 1.32, 1.58), Rect2(33.4, 16.5, 1.2, 3.0),
 ]
-## Houses without the raised entrance ramp in front of the door.
-const HOUSES_WITHOUT_RAMP := ["baker_home"]
+## All authored house variants have a ramp; the shared manifest supplies the
+## larger portico, footing skirts and ramp cheeks that changed the old plan.
 ## Street waypoints. Index 0/1 are the outer and inner point of the north gate.
 const NODES := [
 	Vector2(0.0, -52.5), Vector2(0.0, -45.2), Vector2(0.0, -40.6), Vector2(2.6, -36.6),
@@ -234,16 +235,24 @@ static func _ensure() -> void:
 	for rect: Rect2 in PROPS:
 		rects.append(rect)
 	for index in Layout.HOMES.size():
-		rects.append(Layout.house_footprint(Layout.HOMES[index]))
-		if str(Layout.HOMES[index].id) not in HOUSES_WITHOUT_RAMP:
-			rects.append(_entrance(index))
+		var home: Dictionary = Layout.HOMES[index]
+		rects.append(_family_footprint(home))
+		rects.append(_entrance(index))
+		# The actual house builder uses these same manifest boxes. Cover their
+		# exact projected extent, including the porch and entry cheeks.
+		for item: Dictionary in _family_variant(home).get("colliders", []):
+			var cy := float(item.centre[1])
+			var sy := float(item.size[1])
+			if cy + sy * .5 < .1 or cy - sy * .5 > 1.9:
+				continue
+			rects.append(_family_collider_rect(home, item))
 	_obstacles = rects
 	var blockers: Array[Rect2] = []
 	for rect: Rect2 in WALLS:
 		blockers.append(rect)
 	blockers.append(YARDS[0])
 	for home: Dictionary in Layout.HOMES:
-		blockers.append(Layout.house_footprint(home))
+		blockers.append(_family_footprint(home))
 	_sight_blockers = blockers
 	# All-pairs street distances (Floyd-Warshall over the fixed graph).
 	var count := NODES.size()
@@ -291,6 +300,36 @@ static func _door_direction(house: int) -> Vector2:
 	return Vector2(sin(yaw), cos(yaw))
 
 
+static func _family_variant(home: Dictionary) -> Dictionary:
+	return FamilyManifest.data.variants[Layout.HOUSE_FAMILY_ASSIGNMENT.get(home.id, "valdora_t2_render")]
+
+
+static func _family_footprint(home: Dictionary) -> Rect2:
+	# The measured socle skirts extend 45 mm beyond the 6 x 5 m outer walls.
+	var centre := Vector2(home.at.x, home.at.z)
+	var size := Vector2(6.09, 5.09) if is_zero_approx(float(home.yaw)) else Vector2(5.09, 6.09)
+	return Rect2(centre - size * .5, size)
+
+
+static func _family_collider_rect(home: Dictionary, item: Dictionary) -> Rect2:
+	var centre := Vector2(float(item.centre[0]), float(item.centre[2]))
+	var half := Vector2(float(item.size[0]), float(item.size[2])) * .5
+	var yaw := float(home.yaw)
+	var local_yaw := float(item.get("yaw", 0.0))
+	var origin := Vector2(home.at.x, home.at.z)
+	var rect := Rect2()
+	var first := true
+	for x: float in [-half.x, half.x]:
+		for z: float in [-half.y, half.y]:
+			var p := origin + (centre + Vector2(x, z).rotated(-local_yaw)).rotated(-yaw)
+			if first:
+				rect = Rect2(p, Vector2.ZERO)
+				first = false
+			else:
+				rect = rect.expand(p)
+	return rect
+
+
 static func _entrance(house: int) -> Rect2:
 	# Threshold landing plus ramp: 1.25 m wide, from 0.4 m inside the front
 	# wall to 1.95 m in front of it (VillageScenery WalkableEntrance).
@@ -298,8 +337,9 @@ static func _entrance(house: int) -> Rect2:
 	var center := Vector2(home.at.x, home.at.z)
 	var direction := _door_direction(house)
 	var inner := center + direction * 2.05
-	var outer := center + direction * 4.0
-	var side := Vector2(direction.y, -direction.x) * 0.625
+	var entry: Dictionary = _family_variant(home).metadata.entry
+	var outer := center + direction * (float(entry.ramp_start_z) + float(entry.ramp_run))
+	var side := Vector2(direction.y, -direction.x) * (float(entry.width) * .5)
 	var rect := Rect2(inner - side, Vector2.ZERO).expand(inner + side).expand(outer - side).expand(outer + side)
 	return rect
 
@@ -308,7 +348,9 @@ static func _door_point(house: int, outside: bool) -> Vector2:
 	var home: Dictionary = Layout.HOMES[house]
 	var center := Vector2(home.at.x, home.at.z)
 	# The door is centred in the 5.9 m front wall; the house is 4.9 m deep.
-	return center + _door_direction(house) * (4.7 if outside else 1.55)
+	var entry: Dictionary = _family_variant(home).metadata.entry
+	var outside_z := maxf(4.7, float(entry.ramp_start_z) + float(entry.ramp_run) + RADIUS + CLEARANCE + .1)
+	return center + _door_direction(house) * (outside_z if outside else 1.55)
 
 
 static func _leave_house(house: int, from: Vector2) -> Vector2:

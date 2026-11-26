@@ -210,6 +210,8 @@ func _test_brook_ground() -> void:
 			probes += 1
 			if hit.is_empty() or hit.collider != bed:
 				wrong_body += 1
+				var collider = hit.get("collider")
+				print("VILLAGE_LANDSCAPE_BED_MISMATCH ", p, " hit=", hit.get("position", Vector3.INF), " body=", collider.get_path() if collider is Node else str(collider), " rid=", hit.get("rid", RID()))
 				continue
 			var visible := _mesh_height(faces, p)
 			worst = maxf(worst, absf(hit.position.y - visible))

@@ -209,6 +209,8 @@ func _test_physics_surface() -> void:
 			probes += 1
 			if hit.is_empty() or hit.collider != hill_body:
 				wrong += 1
+				var collider = hit.get("collider")
+				print("VILLAGE_BACKDROP_RAY_MISMATCH ", Vector2(xi, zi), " visible_y=", visible, " hit=", hit.get("position", Vector3.INF), " body=", collider.get_path() if collider is Node else str(collider), " rid=", hit.get("rid", RID()))
 				continue
 			worst = maxf(worst, absf(hit.position.y - visible))
 	print("VILLAGE_BACKDROP downward_rays=%d not_hill=%d max_difference_m=%.6f" % [probes, wrong, worst])
@@ -235,6 +237,9 @@ func _test_physics_surface() -> void:
 			var result := _sight_line(start, finish)
 			if result == "fault":
 				faults.append("%s +%.1f" % [line[0], lift])
+				var hit := _space().intersect_ray(PhysicsRayQueryParameters3D.create(start, finish, 1))
+				var collider = hit.get("collider")
+				print("VILLAGE_BACKDROP_LINE_MISMATCH ", start, " -> ", finish, " hit=", hit.get("position", Vector3.INF), " body=", collider.get_path() if collider is Node else str(collider))
 			elif result == "blocked":
 				blocked += 1
 			elif result == "terrain":

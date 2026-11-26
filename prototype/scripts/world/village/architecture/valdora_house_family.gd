@@ -17,15 +17,7 @@ const MANIFEST = preload("res://assets/architecture/valdora/valdora_family.json"
 const ASSET_DIR := "res://assets/architecture/valdora/"
 
 ## Wealth tier follows the household (docs/36_architecture/VALDORA_HOUSE_FAMILY.md).
-const ASSIGNMENT := {
-	"baker_home": "valdora_t2_render", "carpenter_home": "valdora_t2_hip", "weaver_home": "valdora_t2_eave",
-	"farmer_home": "valdora_t1_daub", "potter_home": "valdora_t2_mixed", "healer_home": "valdora_t2_render",
-	"elder_home": "valdora_t3_portico", "scribe_home": "valdora_t3_upper", "vintner_home": "valdora_t2_eave",
-	"guard_home": "valdora_t1_rubble", "smith_home": "valdora_t2_mixed", "cloth_home": "valdora_t3_upper",
-	"wagon_home": "valdora_t2_hip", "charcoal_home": "valdora_t1_daub", "leather_home": "valdora_t2_hip",
-	"grain_home": "valdora_t2_render", "south_baker_home": "valdora_t2_hip", "south_weaver_home": "valdora_t1_rubble",
-	"cooper_home": "valdora_t2_eave", "dairy_home": "valdora_t2_mixed",
-}
+const ASSIGNMENT := Layout.HOUSE_FAMILY_ASSIGNMENT
 ## Ageing states: dirt/damp, moss and lichen, soot, worn edges.
 const AGE_STATES := {
 	"kept": [0.35, 0.22, 0.30, 0.25],
@@ -139,6 +131,17 @@ static func instantiate(home: Dictionary, profile: String) -> Node3D:
 
 static func is_family_house(model: Node) -> bool:
 	return model.has_meta("house_variant")
+
+
+## The near structural shell contains the actual paving, plaster and openings.
+## Fixtures are separate original meshes; the distant closed silhouette is
+## never used as room geometry or as a physical support surface.
+static func interior_support_meshes(model: Node3D) -> Array[MeshInstance3D]:
+	var result: Array[MeshInstance3D] = []
+	for mesh: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
+		if mesh.has_meta("valdora_family_shell") and (mesh.name.ends_with("_shell") or mesh.name.begins_with("Fixture_")):
+			result.append(mesh)
+	return result
 
 
 static func apply_quality(model: Node3D, profile: String) -> void:
