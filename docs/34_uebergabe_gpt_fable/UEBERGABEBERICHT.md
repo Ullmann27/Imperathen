@@ -863,3 +863,55 @@ Das Gate bleibt rot. Die restlichen 351 Befunde verteilen sich so:
 | Tests | `tests/death_ground_contact_test.py`, `frontier_skirt_seam_test.py`, `frontier_kit_rivets_test.py`, `meshy_body_seam_test.py` (NumPy-Teil wird übersprungen, wo NumPy fehlt) |
 
 Alle vier Werkzeuge werden von den Build-Skripten nach dem Export aufgerufen.
+
+## 16. Bestandsaufnahme Stadt, Karte und Gegner (26.11.2026, auf Anweisung des Projektinhabers)
+
+Drei Agenten haben Stadt und Gebäude, Karte und Landschaft sowie Gegner und Überfälle **nur lesend** geprüft: Code, Projektdoku, CI-Log von #94, Python-Nachrechnungen, ohne Godot-Lauf. Alle Befunde unten sind deshalb Code- und Geometriebefunde. Engine-Nachweise entstehen erst in den Reparatur-Branches (§16.4). Die Rechenskripte liegen nicht im Repository.
+
+### 16.1 Stadt und Gebäude
+
+Die Rekonstruktion des Builders `tools/world/build_roman_test_city.py` ohne Blender ergibt exakt die 374 Kollisionsmeshes aus dem CI-Log.
+- **Hoch – Boden und Straßen verschwinden in `low`/`balanced`:** `city_exploration.gd:146-148` setzt `visibility_range_end = 270` auf jedes Mesh. `City_Ground`, `Main_Streets` und `Residential_Roads` sind je ein einziges Mesh mit Mittelpunkt (0,0). 152 von 240 Häusern liegen mehr als 290 m davon entfernt; dort fehlt der Boden, die Kollision bleibt. `balanced` ist das Standardprofil.
+- **Mittel:**
+  - Spieler und Besucher kollidieren nicht miteinander.
+  - 63 Stände, 86 Bäume und 120 Requisiten haben keine Kollision.
+  - Mauerbreschen neben den Toren: 16,5/7,3 m West/Ost, 1,8 m Nord/Süd.
+  - 55 Requisiten und 17 Bäume stecken in Gebäuden; `Market_24` und der Nordbrunnen stehen auf der Hauptstraße.
+  - Die Portikus-Stufe von 0,27 m liegt über `MAX_STEP` 0,25.
+- **Entscheidungen, keine Fehler:** Epochenkanon (`era_min_ce` wird exportiert, aber nirgends gelesen) und Kalender (58 v. Chr. gegen 100 n. Chr.).
+- **Blockiert:** privater Tempel (Secret leer), 8 Release-Gates (Features), Gerätetests.
+
+### 16.2 Karte und Landschaft
+
+- **Hoch – Hügelkulisse hinter dem Nordtor:** `village_scenery.gd:140-165` baut sie ohne Kollision, das Nordtor ist offen (`game_world.gd:790-807`). Ihre Hinterkante schwebt bis 19 m, das Gelände ragt an 807 Punkten hindurch. Die Kontrollrunde der Kindheit führt dorthin.
+- **Hoch – Sichtweite:** Die Kamera zeichnet bis 300 m (`game_world.gd:645`), die Nebeldichte liegt an der Grenze nur bei 45–81 %. Je nach Profil liegen 21–133 gestreamte Sektoren ganz außer Sicht.
+- **Mittel:**
+  - Das Regionalgelände ist ohne sRGB-Umrechnung zu hell (`regional_terrain.gd:31-35`) und hat keine Textur.
+  - Die adaptive Fold7-Auflösung wirkt nur in der Stadt.
+  - Außerhalb des Dorfes fehlen Vegetation, Wege und Gewässer.
+- **Niedrig:**
+  - Einige Requisiten ohne Kollision.
+  - Gras und Bäume wechseln die Detailstufe ohne Übergang.
+  - Harter Weltrand bei ±16 km.
+- **Geprüft, unkritisch:** Sektorkanten ohne Lücken, Normalensprung ≤ 1,9°, Hangneigung ≤ 7,7°.
+
+### 16.3 Gegner, Überfälle, Schlacht
+
+- **Hoch – Angreifer bleiben am Nordzaun hängen:** Sie gehen geradeaus mit `move_and_collide`, ohne Wegsuche (`village_life_world.gd:62,71`; `village_life.gd:371-381`). Sie starten bei z = −62/−64 vor der Palisade, deren Tor nur 6 m breit ist. Nachgerechnet kommt pro Überfall nur ein Angreifer durch.
+- **Hoch – kein sichtbarer Schlagansatz:** Der Schaden kommt vor dem sichtbaren Schlag, und beim Verlassen der Reichweite gibt es einen Schlag ohne Schaden. Ein Block auf den sichtbaren Schlag kommt deshalb zu spät. Stehende Angreifer drehen sich nicht zum Spieler, und die Schlagreichweite von 2,2 m passt nicht zur 0,62 m langen Axt.
+- **Mittel:**
+  - Wachen treffen durch die Palisade.
+  - Alle Angreifer verschwinden im selben Frame.
+  - Im Talgefecht fallen Verluste immer im hintersten Glied, und Soldaten rücken mit bis zu 4,8 m/s nach.
+  - Beide Heere sind optisch gleich.
+  - Germanische Angreifer tragen römische Ausrüstung.
+- **Gate:** Die Ursache des Übergangssprungs in `raid_motion` (0,127 m / 24,6°) ist offen.
+- **Fehlt ganz:** Stealth und Schwierigkeitsgrad.
+
+### 16.4 Reparaturen in Arbeit (je eigener Branch auf #87, Ergebnisse folgen hier)
+
+| Branch | Inhalt | Abnahme |
+|---|---|---|
+| `fix/village-raid-approach-20261126` | Wegführung der Angreifer durchs Tor mit Abgleiten; Schlagansatz vor dem Schaden; Ausrichtung zum Spieler | Headless-Test: jeder Angreifer erreicht in 150 s das Ziel, Überlappung 0; Schlag W s vor dem Treffer; ein Block bis 0,2 s nach dem Ansatz greift |
+| `fix/village-backdrop-terrain-20261126` | Hügelkulisse geschlossen und mit Kollision; sRGB-Farbe des Geländes | Engine-Lauftest am Hang; 807 → 0 Durchstoßpunkte; Spawnpunkte und Korridor der Angreifer bleiben frei |
+| `fix/city-ground-walls-20261126` | Boden und Straßen in Kacheln; Mauern geschlossen; Requisiten versetzt; Portikus-Stufen | 152 → 0 Häuser ohne sichtbaren Boden in `balanced`; 0 m Bresche; 0 Schnitte zwischen Requisiten und Gebäuden; Gehtest auf die Plattform |
