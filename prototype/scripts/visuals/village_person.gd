@@ -15,6 +15,7 @@ const YouthSoleContact := preload("res://scripts/visuals/youth_sole_contact.gd")
 const AuthoredGround := preload("res://scripts/visuals/authored_ground.gd")
 const HandPose := preload("res://scripts/visuals/hand_pose.gd")
 const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
+const ResidentFootwear := preload("res://scripts/visuals/resident_footwear.gd")
 const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
 const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
@@ -300,6 +301,8 @@ func _reload(level: int) -> void:
 			animator.add_animation_library(library_name, library)
 	for shape: MeshInstance3D in body.find_children("*","MeshInstance3D",true,false):
 		_style(shape)
+	if role == "resident" and active_model_path.begins_with("res://assets/characters/frontier_"):
+		ResidentFootwear.apply(body, active_model_path)
 	_hands.bind(body, active_model_path)
 	_face.bind(body, identity)
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
