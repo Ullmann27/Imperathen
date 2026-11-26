@@ -5,6 +5,7 @@ eyes and skin inherit the source/provenance.json CC0 graphical-data provenance;
 costumes, equipment, rig fitting and the civilian silhouettes are project work.
 
 blender -b -t 4 -P tools/characters/build_frontier_people.py -- --export
+blender -b -t 4 -P tools/characters/build_frontier_people.py -- --export-only --types legionary
 blender -b -t 4 -P tools/characters/build_frontier_people.py -- --review-only
 """
 from __future__ import annotations
@@ -472,8 +473,8 @@ def export(kind):
     records = []
     for level, ratio, edge in LOD:
         bpy.ops.wm.open_mainfile(filepath=str(ART / (kind + ".blend")))
-        # Fingers, jaw and eyes on the near tiers, the same hands in the mesh
-        # of the distant tiers; soldiers also get adult hands on their grips.
+        # Fingers, jaw and eyes on every tier (one skeleton for all detail
+        # switches); soldiers also get adult hands closed on their grips.
         rig = adult_rig.prepare(bpy.data.objects["FrontierRig"], level, SOLDIERS.get(kind))
         bpy.ops.object.select_all(action="DESELECT")
         for obj in bpy.context.scene.objects:
@@ -492,6 +493,7 @@ def export(kind):
             export_animation_mode="NLA_TRACKS", export_force_sampling=True,
             export_frame_step=1, export_animations=True, export_morph=True,
             export_morph_animation=False, export_def_bones=False)
+        rig.update(adult_rig.release_runtime_joints(path))
         death_ground = soldier.death_ground.ground(path)
         gather_ground = soldier.death_ground.ground(path, None, "gather")
         seam = skirt_seam.smooth(path)
@@ -534,6 +536,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--export", action="store_true")
     parser.add_argument("--review-only", action="store_true")
+    parser.add_argument("--export-only", action="store_true",
+                        help="re-export the runtime tiers from the committed sources without rebuilding them")
     parser.add_argument("--types", nargs="+", choices=TYPES, default=list(TYPES))
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
     for path in (ART, OUT, ART / "review"):
@@ -541,8 +545,9 @@ def main():
     records = []
     for kind in args.types:
         if not args.review_only:
-            make_source(kind)
-            if args.export:
+            if not args.export_only:
+                make_source(kind)
+            if args.export or args.export_only:
                 records.append({"identity": kind, "lods": export(kind)})
         else:
             review(kind)

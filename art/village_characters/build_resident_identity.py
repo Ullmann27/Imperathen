@@ -1221,13 +1221,12 @@ def export(kind, source_path):
         near = level < 2
 
         def keep(name):
-            return name not in EXPRESSION or near
+            return (name not in EXPRESSION and name not in _frontier_module().adult_rig.FACE_SHAPES) or near
 
         piece_ratio = cap[level]
         for attempt in range(6):
             bpy.ops.wm.open_mainfile(filepath=str(source_path))
-            # Fingers, jaw and eyes on the near tiers; the resting hand in the
-            # mesh of the distant tiers (tools/characters/extend_adult_rig.py).
+            # Fingers, jaw and eyes on every tier (tools/characters/extend_adult_rig.py).
             rig = _frontier_module().adult_rig.prepare(bpy.data.objects["FrontierRig"], level)
             raw = 0
             for obj in list(meshes()):
@@ -1274,6 +1273,7 @@ def export(kind, source_path):
                                   export_morph_animation=False, export_def_bones=False)
         # The same post-export repairs as build_frontier_people.export():
         # grounded death and gather clips, closed skirt seam, kit rivets.
+        rig.update(frontier.adult_rig.release_runtime_joints(path))
         death_ground = frontier.soldier.death_ground.ground(path)
         gather_ground = frontier.soldier.death_ground.ground(path, None, "gather")
         seam = frontier.skirt_seam.smooth(path)

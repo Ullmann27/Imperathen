@@ -1,6 +1,9 @@
 extends RefCounted
 ## Drives authored glTF face shapes on individual instances. This is expressive
 ## motion for the existing silent dialogue clips, not audio-derived lip sync.
+## Rigs with `Eye_L`/`Eye_R` joints also get a living gaze: short saccades
+## around the rest direction, or toward a target the owner sets. No clip keys
+## those joints, so the gaze holds between updates.
 
 const SHAPES := ["Blink_L", "Blink_R", "JawOpen", "Smile", "BrowDown"]
 var _targets: Array[Dictionary] = []
@@ -12,6 +15,16 @@ var _elapsed := 0.0
 var _blink_at := -1.0
 var _blink_duration := 0.18
 var _next_blink := 2.0
+const GAZE_YAW := deg_to_rad(24.0)
+const GAZE_PITCH := deg_to_rad(14.0)
+var _rig: Skeleton3D
+var _eyes := PackedInt32Array()
+var _gaze := Vector2.ZERO
+var _gaze_from := Vector2.ZERO
+var _gaze_to := Vector2.ZERO
+var _gaze_at := 0.0
+var _next_gaze := 1.0
+var _gaze_target := Vector3.INF
 
 
 func bind(model: Node3D, actor_identity: String) -> void:
@@ -24,6 +37,15 @@ func bind(model: Node3D, actor_identity: String) -> void:
 		_next_blink = _random.randf_range(1.2, 3.8)
 		_values.fill(0.0)
 	_elapsed = 0.0
+	_rig = null
+	_eyes = PackedInt32Array()
+	for rig: Skeleton3D in model.find_children("*", "Skeleton3D", true, false):
+		var left := rig.find_bone("Eye_L")
+		var right := rig.find_bone("Eye_R")
+		if left >= 0 and right >= 0:
+			_rig = rig
+			_eyes = PackedInt32Array([left, right])
+			break
 	for mesh: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
 		if not mesh.mesh:
 			continue
@@ -43,6 +65,8 @@ func advance(delta: float, action: String, detail: int) -> void:
 		return
 	_clock += delta
 	_elapsed += delta
+	if detail < 2:
+		_advance_gaze(action)
 	if _clock >= _next_blink:
 		_blink_at = _clock
 		_blink_duration = _random.randf_range(0.16, 0.21)
@@ -75,7 +99,85 @@ func pose(action: String, normalized: float, detail: int) -> void:
 		_values[1] = 1.0
 	if detail >= 2:
 		_values.fill(0.0)
+	_gaze = Vector2.ZERO
+	_gaze_from = Vector2.ZERO
+	_gaze_to = Vector2.ZERO
+	_apply_gaze()
 	_apply()
+
+
+## World-space point the eyes should hold; `Vector3.INF` returns to idle saccades.
+func set_gaze_target(point: Vector3) -> void:
+	_gaze_target = point
+
+
+func has_eyes() -> bool:
+	return _rig != null and is_instance_valid(_rig)
+
+
+## Current eye direction as yaw and pitch in radians, relative to the head.
+func gaze() -> Vector2:
+	return _gaze
+
+
+func _advance_gaze(action: String) -> void:
+	if not has_eyes():
+		return
+	if action == "death":
+		_gaze = Vector2(0.0, -0.5 * GAZE_PITCH)
+		_apply_gaze()
+		return
+	if _clock >= _next_gaze:
+		_gaze_from = _gaze
+		_gaze_at = _clock
+		if _gaze_target.is_finite():
+			_gaze_to = _toward(_gaze_target)
+			_next_gaze = _clock + _random.randf_range(0.25, 0.6)
+		else:
+			# Mostly small corrections around the front, now and then a real glance.
+			var wide := _random.randf() < 0.22
+			var reach := 1.0 if wide else 0.3
+			_gaze_to = Vector2(_random.randf_range(-GAZE_YAW, GAZE_YAW) * reach,
+				_random.randf_range(-GAZE_PITCH, GAZE_PITCH * 0.6) * reach)
+			if action in ["attack", "train", "block", "work", "gather"]:
+				_gaze_to *= 0.35
+			_next_gaze = _clock + (_random.randf_range(0.5, 1.4) if wide else _random.randf_range(1.2, 3.6))
+	# A saccade covers its way in about 50 ms, a glance in about 90 ms.
+	var span := 0.05 + 0.04 * minf(1.0, _gaze_from.distance_to(_gaze_to) / GAZE_YAW)
+	_gaze = _gaze_from.lerp(_gaze_to, smoothstep(0.0, 1.0, (_clock - _gaze_at) / span))
+	_apply_gaze()
+
+
+func _toward(point: Vector3) -> Vector2:
+	var result := Vector2.ZERO
+	var centre := Vector3.ZERO
+	for eye in _eyes:
+		centre += _rig.get_bone_global_rest(eye).origin * 0.5
+	var forward := _rig.get_bone_global_rest(_eyes[0]).basis.y.normalized()
+	var head := _rig.get_bone_parent(_eyes[0])
+	# Express the target in the head's rest frame, so head motion is respected.
+	var head_now := _rig.global_transform * _rig.get_bone_global_pose(head)
+	var head_rest := _rig.get_bone_global_rest(head)
+	var local := head_rest * (head_now.affine_inverse() * point) - centre
+	if local.length() < 0.05:
+		return result
+	local = local.normalized()
+	var side := Vector3.UP.cross(forward).normalized()
+	result.x = clampf(atan2(local.dot(side), local.dot(forward)), -GAZE_YAW, GAZE_YAW)
+	result.y = clampf(asin(clampf(local.dot(Vector3.UP), -1.0, 1.0)), -GAZE_PITCH, GAZE_PITCH)
+	return result
+
+
+func _apply_gaze() -> void:
+	if not has_eyes():
+		return
+	for eye in _eyes:
+		var rest_global := _rig.get_bone_global_rest(eye).basis.orthonormalized()
+		var forward := rest_global.y
+		var side := Vector3.UP.cross(forward).normalized()
+		var turn := Basis(Vector3.UP, _gaze.x) * Basis(side, -_gaze.y)
+		var local := _rig.get_bone_rest(eye).basis.orthonormalized() * (rest_global.inverse() * turn * rest_global)
+		_rig.set_bone_pose_rotation(eye, local.get_rotation_quaternion())
 
 
 func _blink(offset: float) -> float:

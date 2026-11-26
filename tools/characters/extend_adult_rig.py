@@ -10,7 +10,8 @@ and `Head`. This module unfolds them again:
 * 15 finger joints per hand (`Thumb1..3_L`, `Index1..3_L`, `Middle1..3_L`,
   `Ring1..3_L`, `Pinky1..3_L`, same for `_R`) as children of `Hand_*`,
 * `Jaw` as a child of `Head` (same name as the youth's jaw joint),
-* `Eye_L` / `Eye_R` as children of `Head` for the eyeballs.
+* `Eye_L` / `Eye_R` as children of `Head` for the eyeballs,
+* ten lip, lid and brow shapes for phoneme lip sync (`FACE_SHAPES`).
 
 The fifteen original joints keep their names, parents, rest poses and keys, so
 locomotion, IK, sole contact and the motion-gate families are untouched. Joint
@@ -23,12 +24,17 @@ that morph.
 `bake()` adds finger keys to every clip. Soldiers close each finger until it
 touches the weapon or shield grip that is bound to that hand.
 
-Only the two near tiers are extended; the distant tiers keep fifteen joints.
+All four tiers carry the same joints and keys, because the runtime hands poses
+from tier to tier joint by joint. The lip-sync shapes stay on the near tiers.
+`release_runtime_joints()` removes the clip channels of jaw and eyes after the
+export, so speech and gaze own them at runtime.
 """
 from __future__ import annotations
 
 import importlib.util
+import json
 import math
+import struct
 from collections import defaultdict
 from pathlib import Path
 
@@ -49,7 +55,6 @@ FLEX = (78.0, 98.0, 62.0)
 THUMB_FLEX = (34.0, 36.0, 58.0)
 # A resting hand is never flat: the little finger curls most.
 RELAXED = {"Thumb": .30, "Index": .22, "Middle": .28, "Ring": .33, "Pinky": .38}
-NEAR_LEVELS = (0, 1)
 
 _HERO = None
 _ANATOMY = None
@@ -288,6 +293,95 @@ def _finger_shares(body, used, raw, hands):
     return result
 
 
+# Lip, lid and brow shapes for phoneme lip sync. Names follow the ARKit set
+# that docs/41_audio/FACIAL_RIG_PLAN.md (audio session) asks for.
+FACE_SHAPES = ("mouthClose", "mouthFunnel", "mouthPucker", "mouthStretchLeft", "mouthStretchRight",
+               "mouthRollLower", "mouthUpperUp", "eyeSquintLeft", "eyeSquintRight", "browInnerUp")
+
+
+def _smooth(a, b, x):
+    t = max(0.0, min(1.0, (x - a) / (b - a)))
+    return t * t * (3 - 2 * t)
+
+
+def add_face_shapes(body, used, raw):
+    """Author the lip-sync shapes on the skin from MakeHuman's CC0 facial muscle weights.
+
+    The muscle weights only serve as soft masks (upper lip, lower lip, lids,
+    brows); the displacements are authored here in millimetres of the source
+    head and scaled with the width of each mouth.
+    """
+    basis = body.data.shape_keys.key_blocks[0]
+    rows = []
+    for i, source in enumerate(used):
+        r = raw.get(source)
+        if not r:
+            continue
+        upper = min(1.0, r.get("oris05", 0) + r.get("oris03.L", 0) + r.get("oris03.R", 0))
+        lower = min(1.0, r.get("oris01", 0) + r.get("oris07.L", 0) + r.get("oris07.R", 0))
+        row = {"upper": upper, "lower": lower,
+               "lid_L": min(1.0, r.get("orbicularis04.L", 0)), "lid_R": min(1.0, r.get("orbicularis04.R", 0)),
+               "cheek_L": min(1.0, r.get("levator05.L", 0)), "cheek_R": min(1.0, r.get("levator05.R", 0)),
+               "pull_L": min(1.0, r.get("risorius03.L", 0)), "pull_R": min(1.0, r.get("risorius03.R", 0)),
+               "wing": min(1.0, r.get("levator06.L", 0) + r.get("levator06.R", 0)),
+               "brow": min(1.0, r.get("oculi01.L", 0) + r.get("oculi01.R", 0))}
+        if any(v > 0 for v in row.values()):
+            rows.append((i, basis.data[i].co.copy(), row))
+    lips = [(p, row) for _, p, row in rows if row["upper"] > .3 or row["lower"] > .3]
+    if len(lips) < 40:
+        raise ValueError("Too little lip skin for the lip-sync shapes: %d" % len(lips))
+    up = [p for p, row in lips if row["upper"] > .5]
+    low = [p for p, row in lips if row["lower"] > .5]
+    line = (sum(p.z for p in up) / len(up) + sum(p.z for p in low) / len(low)) / 2
+    centre = sum(p.x for p, _ in lips) / len(lips)
+    half = max(abs(p.x - centre) for p, row in lips if row["upper"] > .3 and row["lower"] > .1 or
+               row["lower"] > .3 and row["upper"] > .1)
+    k = half / .025  # millimetre values below are for a 50 mm mouth
+    deltas = {name: {} for name in FACE_SHAPES}
+    for i, p, row in rows:
+        u, l = row["upper"], row["lower"]
+        lip = min(1.0, u + l)
+        x = p.x - centre
+        side = "L" if x > 0 else "R"
+        mid = 1.0 - min(1.0, (x / half) ** 2)
+        if lip > 0:
+            deltas["mouthClose"][i] = Vector((0, .0008 * lip, -.0012 * u + .0018 * l)) * k
+            deltas["mouthPucker"][i] = Vector((-x * .38 * lip, -.0060 * lip * (.35 + .65 * mid) * k,
+                                               (line - p.z) * .15 * lip))
+            deltas["mouthFunnel"][i] = Vector((-x * .25 * lip, -.0045 * lip * (.4 + .6 * mid) * k,
+                                               (.0022 * u - .0030 * l) * k))
+            corner = lip * _smooth(.2, 1.0, abs(x) / half)
+            if corner > 0:
+                sign = 1.0 if x > 0 else -1.0
+                name = "mouthStretchLeft" if x > 0 else "mouthStretchRight"
+                deltas[name][i] = Vector((sign * .0050 * corner, .0020 * corner, 0)) * k
+        if l > 0:
+            deltas["mouthRollLower"][i] = Vector((0, .0035 * l, .0020 * l)) * k
+        if u > 0 or row["wing"] > 0:
+            deltas["mouthUpperUp"][i] = Vector((0, 0, .0030 * u + .0008 * row["wing"] * (1 - u))) * k
+        for s, name in (("L", "eyeSquintLeft"), ("R", "eyeSquintRight")):
+            amount = .0018 * row["lid_" + s] + .0008 * row["cheek_" + s] * (1 - lip)
+            pull = row["pull_" + s] * (1 - lip)
+            if name.startswith("mouth"):
+                continue
+            if amount > 0:
+                deltas[name][i] = Vector((0, 0, amount)) * k
+            stretch = "mouthStretchLeft" if s == "L" else "mouthStretchRight"
+            if pull > 0 and i not in deltas[stretch]:
+                deltas[stretch][i] = Vector(((1.0 if s == "L" else -1.0) * .0015 * pull, 0, 0)) * k
+        if row["brow"] > 0:
+            inner = 1.0 - _smooth(.012 * k, .034 * k, abs(x))
+            if inner > 0:
+                deltas["browInnerUp"][i] = Vector((0, 0, .0035 * row["brow"] * inner)) * k
+    for name in FACE_SHAPES:
+        key = body.shape_key_add(name=name, from_mix=False)
+        key.value = 0.0
+        for i, delta in deltas[name].items():
+            key.data[i].co = basis.data[i].co + delta
+    return {"shapes": {name: len(deltas[name]) for name in FACE_SHAPES},
+            "mouth_half_width_m": round(half, 5), "lip_line_z": round(line, 5)}, deltas
+
+
 def _limit(weights):
     pairs = sorted(((n, w) for n, w in weights.items() if w > 1e-5), key=lambda p: p[1], reverse=True)[:4]
     total = sum(w for _, w in pairs)
@@ -390,6 +484,7 @@ def extend(arm):
                 head_group.remove([v.index])
             eye_groups[side].add([v.index], 1.0, "REPLACE")
             counts["Eye_" + side] += 1
+    face, face_deltas = add_face_shapes(body, used, raw)
     # A fitted beard is a copy of chin and cheek skin and has to open with the jaw.
     followers = {}
     tree = KDTree(len(P))
@@ -419,6 +514,15 @@ def extend(arm):
             head_group.add([v.index], share * (1 - part), "REPLACE")
             jaw_group.add([v.index], share * part, "REPLACE")
             moved += 1
+        if obj.data.shape_keys:
+            nearest = [tree.find(basis[v.index].co)[1] for v in obj.data.vertices]
+            for name in FACE_SHAPES:
+                key = obj.shape_key_add(name=name, from_mix=False)
+                key.value = 0.0
+                for index, source_index in enumerate(nearest):
+                    delta = face_deltas[name].get(source_index)
+                    if delta is not None:
+                        key.data[index].co = basis[index].co + delta
         followers[obj.name] = moved
     missing = [name for name, *_ in spec if counts[name] < 4]
     if missing:
@@ -440,7 +544,7 @@ def extend(arm):
                                               for f, c in hand["chains"].items()},
                          "finger_radius_m": {f: [round(x, 4) for x in c["radius"]] for f, c in hand["chains"].items()}}
                   for side, hand in hands.items()},
-        "followers": followers,
+        "followers": followers, "face": face,
     }
     return report
 
@@ -877,47 +981,8 @@ def refit_soldier_hands(arm):
     return report
 
 
-def settle(arm, soldier_role=None):
-    """Distant tiers: no added joints, but the same closed or resting hand in the mesh."""
-    body = bpy.data.objects["HeroBody"]
-    used, raw, hands = _hands_of(body)
-    shares = _finger_shares(body, used, raw, hands)
-    state = {"hands": hands}
-    if soldier_role:
-        state["grips"] = _fit_grips(arm, hands)
-    blocks = list(body.data.shape_keys.key_blocks) if body.data.shape_keys else []
-    transforms = {}
-    for side in ("L", "R"):
-        curls = _grip_curls(state, side, FIST) if soldier_role else RELAXED
-        if soldier_role == "archer" and side == "R":
-            curls = _mix(RELAXED, FIST, .35)
-        hand = hands[side]
-        for finger, _ in FINGERS:
-            chain = hand["chains"][finger]
-            positions, _, world = _posed_chain(chain, hand, finger, curls[finger])
-            for segment in (1, 2, 3):
-                transforms[bone_name(finger, segment, side)] = (chain["joints"][segment - 1], positions[segment - 1],
-                                                                world[segment - 1])
-    for i, row in shares.items():
-        vertex = body.data.vertices[i]
-        targets = [block.data[i] for block in blocks] or [vertex]
-        for target in targets:
-            moved = Vector()
-            for name, weight in row.items():
-                if name in transforms:
-                    joint, posed, rotation = transforms[name]
-                    moved += (posed + rotation @ (target.co - joint) - target.co) * weight
-            total = sum(g.weight for g in vertex.groups)
-            target.co = target.co + moved / max(total, 1e-6)
-        if blocks:
-            vertex.co = blocks[0].data[i].co
-    body.data.update()
-    return {"joints": len(arm.data.bones), "posed_vertices": len(shares),
-            "grips": state.get("grips")}
-
-
 def apply(arm, soldier_role=None):
-    """Extend the opened source and key its clips. One call per near-tier export."""
+    """Extend the opened source and key its clips."""
     report = extend(arm)
     if soldier_role:
         report["grips"] = fit_grips(arm)
@@ -926,12 +991,42 @@ def apply(arm, soldier_role=None):
 
 
 def prepare(arm, level, soldier_role=None):
-    """Everything an export tier needs, on the freshly opened source before decimation."""
+    """Everything an export tier needs, on the freshly opened source before decimation.
+
+    Every tier gets the same joints and finger keys: the runtime carries poses
+    across a detail switch joint by joint, and the motion gate compares them.
+    """
     report = {"level": level}
     if soldier_role:
         report["hand_refit"] = refit_soldier_hands(arm)
-    if level in NEAR_LEVELS:
-        report.update(apply(arm, soldier_role))
-    else:
-        report.update(settle(arm, soldier_role))
+    report.update(apply(arm, soldier_role))
     return report
+
+
+RUNTIME_JOINTS = ("Jaw", "Eye_L", "Eye_R")
+
+
+def release_runtime_joints(path):
+    """Drop the clip channels of jaw and eyes from an exported GLB.
+
+    Speech, gaze and expression drive these joints at runtime. A clip that
+    keyed them (the exporter writes a constant rest key for every joint) would
+    reset them on every animation step. Only the JSON chunk changes.
+    """
+    data = Path(path).read_bytes()
+    length = struct.unpack("<I", data[12:16])[0]
+    document = json.loads(data[20:20 + length])
+    rest = data[20 + length:]
+    released = {i for i, node in enumerate(document.get("nodes", [])) if node.get("name") in RUNTIME_JOINTS}
+    removed = 0
+    for animation in document.get("animations", []):
+        kept = [c for c in animation["channels"] if c["target"].get("node") not in released]
+        removed += len(animation["channels"]) - len(kept)
+        animation["channels"] = kept
+    if not removed:
+        return {"released_channels": 0}
+    text = json.dumps(document, separators=(",", ":")).encode("utf-8")
+    text += b" " * (-len(text) % 4)
+    body = struct.pack("<I4s", len(text), b"JSON") + text + rest
+    Path(path).write_bytes(data[:8] + struct.pack("<I", 12 + len(body)) + body)
+    return {"released_channels": removed}
