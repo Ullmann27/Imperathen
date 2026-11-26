@@ -26,6 +26,14 @@
 | D-020 | Vorgabe (26.11.2026) | Fester 360-s-Überfalltakt wird nach geprüfter Integration durch das Fraktionssystem ersetzt; Überfälle mit Ursachen und Folgen; I-10 bleibt geschütztes Storyereignis; keine endlosen Überfallserien. | Erholungsfenster, Story-Schutz und Konsistenz der Angreifer im Weltzustand testen. |
 | D-021 | Vorgabe (26.11.2026) | Die Welt entwickelt sich ohne Anwesenheit des Spielers weiter; Strategiekarte, Open World und Storymissionen nutzen denselben autoritativen Weltzustand. | Weltzeit-Takt bei Reisen, Schlaf, Handel; aggregierte Fernsimulation mit Materialisierung beim Besuch. |
 | D-022 | Vorgabe (26.11.2026) | Zehn Zielbilder als visuelle Orientierung; Blender, Meshy, Rendering, Motion Capture, vollständige Skelette, hochwertige Texturen und individuelle Gesichter nutzen; keine künstliche Begrenzung des Umfangs, aber Speicher-, Streaming- und Paketarchitektur; drei Ebenen vorausdenken; Fable 5.2 erst nach gesonderter Zwischenabnahme. | Meshy-Einsatz erst nach Freigabe von Umfang und Kosten; Paketplan nach Handbuch S. 42; kein Merge nach `main`. |
+| D-023 | Vorgabe (26.11.2026) | Talgefecht als historisch plausible, fiktive Auseinandersetzung Rom gegen eine eigenständige germanische Gruppe; separat erreichbarer Prüfstand 58 v. Chr.; das Kind befehligt keine Legion; vielfältige Ausgangslagen und Ausgänge. | Befehlsrecht nach Rang; Szenariodaten; Nutzung ab dem Erwachsenenalter. Details: [Game Direction B](GAME_DIRECTION_2026-11-26_B.md). |
+| D-024 | Vorgabe (26.11.2026) | Meshy-Axtkämpfer bleibt; Axt und Schild als seltenere rekonstruierte Variante, nicht als Standard; Kriegerfamilien mit stammeseigenen Varianten; Ausrüstungsqualität aus Wohlstand, Handel, Handwerk, Erfahrung; keine umgefärbten Römer. | Kennzeichnung im Truppenkatalog; Kunstpaket germanische Kriegerfamilien. |
+| D-025 | Vorgabe (26.11.2026) | Militärweg freiwillig; Führung nur aus Erfahrung, Vertrauen, Ausbildung, Ernennung, Vakanz und Beziehungen; Mentorbeziehung; Beförderung ablehnbar; Degradierung, Entlassung, Desertion und Wiedereingliederung mit Folgen. | Laufbahnzustand auf dem Akteurkern (D-016). |
+| D-026 | Vorgabe (26.11.2026) | Hybrides Echtzeit-Kampfsystem mit drei Ebenen (A Nahbereich einzeln, B mittlere Distanz vereinfachte Einzelagenten, C Ferne Verbandsrechnung mit persistenten Soldaten); kein Schaden vor dem Trefferzeitpunkt der Animation; Ebenenwechsel ohne Duplikat, Wiederbelebung oder Rücknahme von Verlusten. Referenzen Ryse, Bannerlord, Total War nur als Qualitätsmaßstab. | Eigene Agents für Nahkampf und Formationsbewegung; Tests für Treffer-Animations-Synchronität und Ebenenkonsistenz. |
+| D-027 | Vorgabe (26.11.2026) | Soldaten mit Identität, Herkunft, Erfahrung, Fähigkeiten, Beziehungen und Lebenslauf; Verwundung mit Genesung, Ausscheiden oder Einschränkung; keine identischen Ersatzfiguren; Rekruten aus realer Bevölkerung mit Folgen für Arbeitskraft; Zusammenhalt und gemeinsame Erinnerungen. | Persistente Soldatenidentitäten im Gefechts- und Stammeszustand. |
+| D-028 | Vorgabe (26.11.2026) | Vier Originaldrehbücher verbindlich: Band I 58–52, II 51–47, III 47–44, IV 44–27 v. Chr. und Sandbox; Jahres- und Altersangaben aus den Missionsübersichten; Zeitsprünge schreiben Veränderungen fort; Zeitarchitektur ohne Jahr null. | Kalendermodul und Missionsjahresdaten. |
+| D-029 | Vorgabe (26.11.2026) | Dynastiesystem als spätere Erweiterung (Altern, Familie, Besitz, Stellung, Vermächtnis, Nachfolger; Ausbau bis 9 n. Chr. und weiter); darf P0/P1 nicht verzögern. | Nur Datenmodell vorbereiten. |
+| D-030 | Vorgabe (26.11.2026) | Produktionsstandard bestätigt: drei Ebenen vorausdenken, Originaljunge und Qualitätsverbesserungen erhalten, Blender/Meshy/Rendering/Motion Capture, keine künstliche Obergrenze, skalierbare Architektur, reale Engine-Aufnahmen, kein Main-Merge, Fable nach Zwischenabnahme. | Wie D-022. |
 
 ## Änderungen an Entscheidungen
 
@@ -45,4 +53,8 @@ Praktische Umsetzung: dependencyfreie Browser-Vorschau als ausführbarer Einstie
 ## 26.11.2026 – Fortsetzungsanweisung der Game Direction
 
 Der Auftraggeber hat acht Präzisierungen zum Masterhandbuch 3.0 vorgegeben (D-015 bis D-022). Wortlaut und Umsetzungsfolgen auf drei Ebenen: [GAME_DIRECTION_2026-11-26.md](GAME_DIRECTION_2026-11-26.md). D-012 ist für Kalender und Startalter entschieden; Zeitsprung, Alter beim Eintritt in den Kampf und Prologdauer bleiben offen.
+
+## 26.11.2026 – Erweiterte Entscheidungen zur Truppen-, Kampf- und Lebenssimulation
+
+Weitere Vorgaben des Auftraggebers (D-023 bis D-030), Wortlaut und Folgen: [GAME_DIRECTION_2026-11-26_B.md](GAME_DIRECTION_2026-11-26_B.md).
 

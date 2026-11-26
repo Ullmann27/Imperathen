@@ -12,6 +12,7 @@ Verbindlich ergänzend zum Masterhandbuch 3.0 (Wortlaut und Folgen: [docs/00_gov
 - Überfälle aus dem Fraktionssystem mit Ursachen und Folgen; I-10 bleibt geschützt; keine endlosen Überfallserien.
 - Ein autoritativer Weltzustand für Strategie, Open World und Missionen; die Welt entwickelt sich auch ohne den Spieler.
 - Zielbilder als Orientierung; keine künstliche Größenbegrenzung, aber Paket- und Streaming-Architektur; kostenpflichtige Dienste (z. B. Meshy) erst nach Freigabe von Umfang und Kosten; Fable 5.2 erst nach gesonderter Zwischenabnahme; kein Merge nach `main`.
+- Ergänzt (D-023 bis D-030, [Wortlaut](docs/00_governance/GAME_DIRECTION_2026-11-26_B.md)): Talgefecht als Prüfstand 58 v. Chr. Rom gegen eine eigenständige germanische Gruppe, Kind ohne Befehlsgewalt; Axt und Schild nur seltene rekonstruierte Variante, weitere Kriegerfamilien, keine umgefärbten Römer; Militärweg freiwillig, Führung nur über Laufbahn; hybrides Kampfsystem in drei Ebenen, kein Schaden vor dem Trefferzeitpunkt, keine Duplikate beim Ebenenwechsel; Soldaten als Menschen mit Lebenslauf; Bände I–IV 58–27 v. Chr., Zeitarchitektur ohne Jahr null; Dynastie später, ohne P0/P1 zu verzögern.
 
 ## Präzisierung nach dem Spieltest – 23.11.2026
 
