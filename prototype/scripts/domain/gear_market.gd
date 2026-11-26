@@ -340,7 +340,9 @@ static func apply(data: Dictionary, command: String, args: Dictionary, sites: Di
 			var uid := int(gear.serial)
 			gear.serial = uid + 1
 			gear.items.append({"uid": uid, "id": item_id, "q": quality, "wear": 0.0, "at": "carried"})
-			return _result(true, "%s (%s) gekauft: %d Denare." % [item(item_id).name, quality_name(quality), cost], {"uid": uid})
+			# The stored command result must stay {ok, message}; the new piece is
+			# the last entry of gear.items.
+			return _result(true, "%s (%s) gekauft: %d Denare." % [item(item_id).name, quality_name(quality), cost])
 		"gear_sell":
 			var shop_id: String = args.shop_id
 			var index := _index(gear, int(args.uid))
@@ -712,7 +714,5 @@ static func _integer(value: Variant, low: int, high: int) -> bool:
 	return typeof(value) in [TYPE_INT, TYPE_FLOAT] and is_finite(float(value)) and float(value) >= low and float(value) <= high and float(value) == floorf(float(value))
 
 
-static func _result(ok: bool, message: String, extra: Dictionary = {}) -> Dictionary:
-	var result := {"ok": ok, "message": message}
-	result.merge(extra)
-	return result
+static func _result(ok: bool, message: String) -> Dictionary:
+	return {"ok": ok, "message": message}

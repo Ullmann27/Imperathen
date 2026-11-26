@@ -313,7 +313,7 @@ func _test_adult_world_commands() -> void:
 	var before := _snapshot(model)
 	var bought := _buy(model, "market", "hand_axe", 0, "axe-once")
 	_ok(bought, "Buy a worn hand axe at the market")
-	_check(int(bought.get("uid", 0)) == 1, "The purchase returns the piece number")
+	_check(model.data.village.gear.items.size() == 1 and model.data.village.gear.items[0].uid == 1, "The purchase is the last entry of the gear list")
 	_check(model.data.resources.denarii == money - 14 and model.data.village.economy.stocks.merchant_denarii == cash + 14, "Price reaches the merchant treasury exactly")
 	_check(Gear.stock(model.data, "market", "hand_axe", 0) == 0, "Finite stock went down")
 	before = _snapshot(model)
