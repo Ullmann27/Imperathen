@@ -21,7 +21,7 @@ static func _beat(id: String, shot_id: String, line_id: String, minimum: float, 
 	var text := str(override.get("text", line.get("text", "")))
 	var names: Array = SPEAKERS.get(speaker_id, [speaker_id.capitalize(), ""])
 	var recorded := VoiceLines.find(text)
-	var has_recording := not recorded.is_empty() and recorded.get("speaker_id", "") == VoiceLines.speaker_id(speaker_id)
+	var has_recording: bool = not recorded.is_empty() and str(recorded.get("speaker_id", "")) == VoiceLines.speaker_id(speaker_id)
 	return {"id":id, "shot_id":shot_id, "line_id":line_id, "speaker_id":speaker_id,
 		"speaker":names[0], "role":names[1], "text":text, "actor_id":actor_id,
 		"duration":maxf(minimum, 2.0 + text.length() / 17.0), "chapter":CHAPTER, "location":LOCATION,

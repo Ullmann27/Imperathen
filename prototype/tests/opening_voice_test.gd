@@ -3,6 +3,7 @@ extends SceneTree
 ## menu, film pause and continuing from a checkpoint own its lifetime.
 
 const Entry = preload("res://main.tscn")
+const MixerTeardown := preload("res://tests/audio_mixer_teardown.gd")
 var failures: Array[String] = []
 
 
@@ -38,6 +39,7 @@ func _run() -> void:
 	check(not voice.is_active(), "Returning to menu leaves no voice playing")
 	game.free()
 	await process_frame
+	await MixerTeardown.drain(self)
 	for error in failures:
 		printerr(error)
 	print("OPENING_VOICE_PASS" if failures.is_empty() else "OPENING_VOICE_FAILED")

@@ -38,8 +38,11 @@ jobs:
           sudo apt-get install -y --no-install-recommends ffmpeg espeak-ng libsndfile1 sox
           python3 -m venv "$RUNNER_TEMP/audio-venv"
           "$RUNNER_TEMP/audio-venv/bin/python" -m pip install --upgrade pip
-          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install qwen-tts==0.1.1 praat-parselmouth==0.4.7 pyloudnorm==0.2.0 soundfile librosa scipy
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install torch==2.8.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          printf 'torch==2.8.0\ntorchaudio==2.8.0\ntransformers==4.57.3\n' > "$RUNNER_TEMP/audio-constraints.txt"
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip install -c "$RUNNER_TEMP/audio-constraints.txt" qwen-tts==0.1.1 praat-parselmouth==0.4.7 pyloudnorm==0.2.0 soundfile librosa scipy
+          "$RUNNER_TEMP/audio-venv/bin/python" -m pip check
+          "$RUNNER_TEMP/audio-venv/bin/python" -c 'import torch, torchaudio; from qwen_tts import Qwen3TTSModel; assert torch.version.cuda is None; assert "+cpu" in torchaudio.__version__; print(torch.__version__, torchaudio.__version__)'
       - name: Generate missing authored German lines without overwriting existing audio
         run: |
           "$RUNNER_TEMP/audio-venv/bin/python" tools/audio/complete_i01_voices.py --work "$RUNNER_TEMP/i01-voice-work"
