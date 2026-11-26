@@ -65,6 +65,7 @@ var _catalog_pending := ""
 var _catalog_pending_index := -1
 var _catalog_elapsed := 0.0
 var _catalog_status := ""
+var _street_caption := ""
 var _touch_move := Vector2.ZERO
 var _yaw := 0.0
 var _pitch := -0.18
@@ -646,6 +647,7 @@ func _process(delta: float) -> void:
 		_catalog_elapsed = 0
 		_stream_catalog()
 		_refresh_market_buttons()
+		_update_street_caption()
 	if paused or market.is_open():
 		return
 	_save_elapsed += delta
@@ -700,6 +702,14 @@ func _look_by(delta: Vector2) -> void:
 func _market_message(value: String) -> void:
 	_catalog_status = value
 	_update_status()
+
+func _update_street_caption() -> void:
+	if not is_instance_valid(quarter):
+		return
+	var caption := quarter.street_at(player.global_position)
+	if caption != _street_caption:
+		_street_caption = caption
+		_update_status()
 
 func _refresh_market_buttons() -> void:
 	if not is_instance_valid(_trade_button):
@@ -853,6 +863,8 @@ func _request_story() -> void:
 
 func _update_status() -> void:
 	var description := "Stadt · Modellpark · Gehen · Rennen · unbewaffnetes Übungstraining"
+	if not _street_caption.is_empty():
+		description = _street_caption
 	if not training.available:
 		description += " · Trainingspfahl nicht verfügbar"
 	if not city_available:
