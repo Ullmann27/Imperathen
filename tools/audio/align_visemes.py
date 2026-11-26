@@ -143,12 +143,16 @@ def main():
     ap.add_argument("--work", required=True)
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
-    from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+    from transformers import Wav2Vec2ForCTC, Wav2Vec2FeatureExtractor
+    from huggingface_hub import hf_hub_download
     import librosa
-    proc = Wav2Vec2Processor.from_pretrained(ALIGNER[0], revision=ALIGNER[1])
+    # The phoneme tokenizer class would pull in the GPL 'phonemizer' package
+    # only to phonemize text; we phonemize with espeak-ng ourselves and need
+    # just the vocabulary.
+    proc = Wav2Vec2FeatureExtractor.from_pretrained(ALIGNER[0], revision=ALIGNER[1])
     model = Wav2Vec2ForCTC.from_pretrained(ALIGNER[0], revision=ALIGNER[1]).eval()
-    vocab = proc.tokenizer.get_vocab()
-    blank = proc.tokenizer.pad_token_id
+    vocab = json.loads(Path(hf_hub_download(ALIGNER[0], "vocab.json", revision=ALIGNER[1])).read_text(encoding="utf-8"))
+    blank = vocab["<pad>"]
     work, out = Path(a.work), Path(a.out)
     (out / "visemes").mkdir(parents=True, exist_ok=True)
     meta = json.loads((work / "lines_meta.json").read_text(encoding="utf-8"))
