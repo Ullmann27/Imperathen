@@ -218,7 +218,10 @@ func _check_release_visuals(context: String) -> void:
 		if is_instance_valid(forge):
 			var shell := forge.find_child("valdora_forge_shell", true, false) as MeshInstance3D
 			_check(is_instance_valid(shell) and shell.mesh != null and shell.is_visible_in_tree(), context + ": original forge shell has visible mesh geometry")
-			_check(forge.find_children("*", "MeshInstance3D", true, false).size() == 2, context + ": only compatible original shell and far proxy are attached, no duplicate legacy fixtures")
+			_check(forge.find_children("*", "MeshInstance3D", true, false).size() == 2 + HouseFamily.FORGE_FIXTURES.size(), context + ": only compatible original forge meshes are attached")
+			for prop: String in HouseFamily.FORGE_FIXTURES:
+				var fixture := forge.find_child(HouseFamily.FORGE_FIXTURES[prop], true, false) as MeshInstance3D
+				_check(is_instance_valid(fixture) and fixture.mesh != null and fixture.is_visible_in_tree() and fixture.get_meta("forge_work_prop", "") == prop, context + ": original fitted workstation " + prop + " is visible")
 	var plants = game.world.vegetation
 	_check(is_instance_valid(plants) and plants.is_inside_tree(), context + ": native vegetation field is attached")
 	if is_instance_valid(plants):
