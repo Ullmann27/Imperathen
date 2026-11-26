@@ -28,10 +28,12 @@ var _fixed_time := -1.0
 
 func _init() -> void:
 	ground_material.shader = preload("res://scripts/world/village/ground.gdshader")
-	ground_material.set_shader_parameter("road_color",preload("res://assets/village/track_color.png"))
-	ground_material.set_shader_parameter("verge_color",preload("res://assets/village/verge_color.png"))
-	ground_material.set_shader_parameter("road_relief",preload("res://assets/village/track_relief.png"))
-	ground_material.set_shader_parameter("verge_relief",preload("res://assets/village/verge_relief.png"))
+	ground_material.set_shader_parameter("road_color",preload("res://assets/village/look/trodden_earth_color.png"))
+	# Compacted lane earth and dense turf (blades, dry strands, clover; no bright
+	# specks), both from tools/world/village_look_textures.py.
+	ground_material.set_shader_parameter("verge_color",preload("res://assets/village/look/meadow_sod_color.png"))
+	ground_material.set_shader_parameter("road_relief",preload("res://assets/village/look/trodden_earth_relief.png"))
+	ground_material.set_shader_parameter("verge_relief",preload("res://assets/village/look/meadow_sod_relief.png"))
 	water_material.shader = preload("res://scripts/world/village/water.gdshader")
 	grass_material.shader = preload("res://scripts/world/village/breeze.gdshader")
 	rain_material.shader = preload("res://scripts/world/village/drizzle.gdshader")
