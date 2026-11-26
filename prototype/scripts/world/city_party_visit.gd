@@ -1,6 +1,7 @@
 extends RefCounted
 ## Transient city projection borrowing the exact bodies from the detached
 ## village. City coordinates never overwrite the campaign's village anchors.
+const Party = preload("res://scripts/domain/travel_party.gd")
 const Follow = preload("res://scripts/story/companion_follow.gd")
 var passengers: Array[CharacterBody3D] = []
 var returning := {}
@@ -35,11 +36,19 @@ func _arrival(city: Node3D, player: CharacterBody3D, body: CharacterBody3D, slot
 	return null
 
 
-func advance(city: Node3D, player: CharacterBody3D, members: Dictionary, delta: float) -> void:
+func advance(city: Node3D, player: CharacterBody3D, data: Dictionary, delta: float) -> void:
 	for slot in passengers.size():
 		var body := passengers[slot]
-		var member: Dictionary = members.get(body.get_meta("actor_uid"), {})
-		if member.get("status", "") != "active" or member.get("order", "") not in ["follow", "assist"]:
+		var uid: String = body.get_meta("actor_uid")
+		var member: Dictionary = data.world_state.party.members.get(uid, {})
+		var resident := Party.resident(data, uid)
+		if not resident.get("alive", true):
+			if walkers.has(body):
+				body.hide()
+				body.collision_layer = 0
+				walkers[body].pause(body)
+			continue
+		if int(resident.get("health", 100)) <= 30 or member.get("status", "") != "active" or member.get("order", "") not in ["follow", "assist"]:
 			if walkers.has(body):
 				walkers[body].pause(body)
 				body.get_node("Figure").drive(0.0)

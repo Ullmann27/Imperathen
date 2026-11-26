@@ -1,5 +1,9 @@
 # Erwachsene im Talgefecht
 
+Im regulären Spiel erscheint nach dem selbst gesprochenen Schwur am Waldrand von Valdora unter **Gefolge → Gefährten ansehen → Dein Lebensweg** eine freiwillige Wahl. **Sechs Jahre später · Zivilleben** und **Sechs Jahre später · Wachausbildung** buchen denselben Kalenderübergang. Das Familienhaus gilt als Unterkunft. Wer zunächst zivil bleibt, kann später die Wachausbildung aufnehmen. Ausbildungsfortschritt entsteht durch drei tatsächliche Übungstreffer am nördlichen Platz. Rekrutierung, Ausrüstung und die begrenzte Passwache folgen anschließend ihren bestehenden Bedingungen.
+
+Der Modellbefehl `choose_adult_path` nimmt `path` als `civil` oder `training` entgegen. Die bestätigte Kindheitsgeschichte, alle verbuchten Verluste, Beziehungen und bisherigen Eigentümer bleiben im gemeinsamen Spielstand. Laufende Reiseverträge werden über denselben Tagesabschluss abgerechnet. Das Kindheitsarchiv bleibt auch im Erwachsenenalter validiert. Der Lebensweg und die erneute freiwillige Einschreibung sind kreative Erweiterungen nach I-14.
+
 Im Hauptmenü öffnet **Talgefecht erproben** die Übung. In der angehaltenen Aufstellung stehen im **Aufgebot** drei konkret besetzte Kontingente bereit. Vier haeduische Reiter kosten 20 Denare, vier Rationen, vier Dienstpferde und vier Futterportionen. Die Ortswehr kostet zehn Denare und fünf Rationen. Von 30 Übungsdenaren bleiben nach beiden Verpflichtungen null. Diese Preise, Liefermengen und Personennamen sind Spielrekonstruktionen.
 
 Jeder angenommene Vertrag erzeugt einmalig die namentliche Musterliste im bestehenden BattleModel. Die Musterrolle zeigt Sollstärke, verfügbare Personen, Verwundete, Gefallene, Ausbildung und den aktuell verantwortlichen Offizier. Ist ein Offizier ausgefallen, übernimmt die vorhandene Stellvertretung nach den Gefechtsregeln. Ein geflohener Verband kann Personal besitzen und zugleich keine einsatzbereiten Soldaten melden.
@@ -32,9 +36,13 @@ Der CPU-Messlauf erzeugte je Stufe 16, 64, 256, 512 und 1.024 Identitäten und s
 
 ## Prüfabläufe
 
-Vom Repository-Wurzelverzeichnis aus laufen die Godot-Prüfungen mit:
+Der Erwachsenenpfad wurde im isolierten Spielverzeichnis mit 124 erfolgreichen Prüfungen ausgeführt. Der Lauf lädt den aufgezeichneten Spielstand vor I-10, spielt Verstecken, Schmiede, Vater, Morgen und Schwur, prüft beide freiwilligen Lebenswege sowie drei Übungstreffer, Rekrutierung, Dorfverteidigung, beschränktes Talkommando und das Laden nach einer Regionaljahreszeit. Die Schaltflächen im Gefolgschaftsbuch wurden über die reguläre Oberfläche betätigt und die automatisch geschriebenen Kampagnenspielstände geladen.
+
+Vom Repository-Wurzelverzeichnis aus lassen sich diese Läufe wiederholen.
 
 ```sh
+adult_runtime=$(mktemp -d)
+IMPERATHEN_ISOLATED_TEST=1 XDG_DATA_HOME="$adult_runtime/data" XDG_CONFIG_HOME="$adult_runtime/config" XDG_CACHE_HOME="$adult_runtime/cache" godot --headless --fixed-fps 60 --path prototype --script res://tests/adult_path_test.gd
 godot --headless --path prototype --script res://tests/valley_muster_test.gd
 godot --headless --path prototype --script res://tests/formation_scale_benchmark.gd -- /tmp/imperathen-formation.json
 godot --headless --path prototype --script res://tests/battle_command_test.gd
@@ -44,7 +52,23 @@ godot --headless --path prototype --script res://tests/soldier_gait_test.gd
 godot --headless --path prototype --script res://tests/valley_orders_test.gd
 ```
 
-Mit einem Grafiktreiber und Ausgabeverzeichnis nach `--` zeichnet `valley_muster_test.gd` das tatsächliche Aufgebot sowie den gemeinsamen Einsatz der Reiter und Fußtruppe auf. Der Test prüft zwei abgeschlossene Angriffsaktionen am selben Ziel, Ausrüstungsverschleiß, Übergänge zwischen Detailstufen und Wiederherstellung der identischen Stammrolle. Der Lauf im Headless-Modus ergab 36 bestandene Prüfungen. In den vorhandenen Suiten bestanden 413 Befehls-, 145 Gefechtsregel-, 232 Katalog-, 125 Gangbild- sowie 28 HUD-Prüfungen.
+Mit einem Grafiktreiber und Ausgabeverzeichnis nach `--` zeichnet `valley_muster_test.gd` das tatsächliche Aufgebot sowie den gemeinsamen Einsatz der Reiter und Fußtruppe auf. Der Test prüft zwei abgeschlossene Angriffsaktionen am selben Ziel, Ausrüstungsverschleiß, Übergänge zwischen Detailstufen und Wiederherstellung der identischen Stammrolle. Der abschließende Lauf im Headless-Modus ergab 37 bestandene Prüfungen. Im OpenGL-Lauf mit Mesa llvmpipe kamen die beiden erfolgreichen Bildausgaben hinzu. In den vorhandenen Suiten bestanden 413 Befehls-, 145 Gefechtsregel-, 232 Katalog-, 125 Gangbild- sowie 28 HUD-Prüfungen.
+
+## Ausrüstung und kulturelle Figuren
+
+Die drei Verbände des Höhenbundes verwenden eigenständig modellierte Figuren aus der Blender-Arbeit von PR #115. Der Schwertkämpfer trägt Schwert und Rundschild, der Speerkämpfer eine Framea, der Plänkler mehrere Wurfspeere. Kleidung, Haar, Schildformen und Bewaffnung stammen aus dem Register der fiktiven Waldsippen. Die Axtfigur gehört weiterhin zur seltenen Rekonstruktion. Das gallische Reiterkontingent verwendet einen zivil gekleideten Reiter mit Rundschild und Speer auf dem vorhandenen riggbaren Pferd. Der Sattel folgt dessen Sitzsockel, die Lanze der rechten Hand.
+
+Blender 4.3.2 exportierte für diese Lieferung folgende Dreieckszahlen. Die Fernfiguren verwenden je ein eingefrorenes Originalnetz, eine kleine Pigmenttextur und das bestehende MultiMesh für die Gangbewegung.
+
+| Figur | Nah | Mittel | Instanz |
+| --- | ---: | ---: | ---: |
+| Plänkler | 21.647 | 7.465 | 880 |
+| Speerkämpfer | 21.652 | 7.469 | 885 |
+| Schwertkämpfer | 21.653 | 7.468 | 885 |
+
+Der Generator liegt unter `art/germanic_warriors/`. Zuerst baut `build.py` mit `--export --figures forest_swordsman forest_spear forest_skirmisher --export-dir <Arbeitsordner>` die riggbaren Figuren. Anschließend übernimmt `valley_export.py -- <Arbeitsordner>/figures <Familie>` die zwei Laufzeitstufen und erzeugt die gebündelte Fernfigur. Beide Skripte laufen als Blender-Python-Skripte. Die vollständige historische und künstlerische Kleidungsauswertung der zehn ursprünglichen Entwürfe bleibt offen.
+
+[Reiteraufgebot](evidence/reiteraufgebot.webp) · [Gemeinsamer Einsatz](evidence/gemeinsames-gefecht.webp) · [75 aufeinanderfolgende Engineframes](evidence/talgefecht.mp4)
 
 ## Historische Einordnung und offene Umsetzung
 

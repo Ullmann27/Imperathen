@@ -488,11 +488,17 @@ func cue_unarmed(technique: String) -> void:
 var _mission_route := preload("res://scripts/world/village/mission_route.gd").new()
 var _route_destination := "mission"
 const TravelPath = preload("res://scripts/world/regional_footpath.gd")
+const Freight = preload("res://scripts/domain/regional_freight.gd")
+const TravelEconomy = preload("res://scripts/domain/village_economy.gd")
 const Waystation = preload("res://scripts/world/regional_waystation.gd")
 
 func select_route(id: String) -> void:
 	if TravelPath.DESTINATIONS.has(id):
 		_route_destination = id
+
+func _near_freight(point: Vector2) -> bool:
+	var here := get_player_position()
+	return _state.village.enabled and Vector2(here.x,here.z).distance_to(point) <= 2.4
 
 func at_waystation() -> bool:
 	return Waystation.at_counter(get_player_position())
@@ -500,13 +506,15 @@ func at_waystation() -> bool:
 func navigation_view() -> Dictionary:
 	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false,
 		"camera_yaw":snappedf(_camera_yaw,.01),"context":_hint.text if _hint != null and _active and _mode == "person" else ""}
-	if not Childhood.enabled(_state):
+	if not _state.get("village",{}).get("enabled",false):
 		return result
-	var chapter:=Childhood.view(_state)
-	var target: Variant=chapter.get("point",null)
-	var npc:=str(chapter.get("target_npc",""))
-	if not npc.is_empty() and VillageLife.has_npc(_state,npc):
-		target=VillageLife.actor_position(_state,npc)
+	var target: Variant = null
+	if Childhood.enabled(_state):
+		var chapter := Childhood.view(_state)
+		target = chapter.get("point",null)
+		var npc := str(chapter.get("target_npc",""))
+		if not npc.is_empty() and VillageLife.has_npc(_state,npc):
+			target = VillageLife.actor_position(_state,npc)
 	if _route_destination != "mission":
 		target = TravelPath.destination(_route_destination)
 		result["destination_name"] = TravelPath.DESTINATIONS[_route_destination]
@@ -1185,7 +1193,7 @@ func _physics_process(delta: float) -> void:
 	_update_camera(delta)
 	if _state.get("village", {}).get("enabled", false):
 		regional_terrain.follow(get_player_position(), _quality_profile)
-		regional_terrain.waystation.update_nearby(get_player_position(),float(_state.world_seconds),delta)
+		regional_terrain.waystation.update_nearby(get_player_position(),_state.village.economy.get("freight",{}),delta)
 	population.update_nearby(get_player_position(),_active and _mode == "person")
 	if not _active:
 		return
@@ -1593,6 +1601,12 @@ func _at_council_records() -> bool:
 func _interact() -> void:
 	if _mode != "person":
 		return
+	if _near_freight(Freight.DESK):
+		action_requested.emit("village_dispatch_grain",{})
+		return
+	if _near_freight(Freight.DEPOT):
+		action_requested.emit("freight_receipt",{})
+		return
 	if at_waystation() and _state.village.enabled:
 		action_requested.emit("waystation_market",{})
 		return
@@ -1771,6 +1785,13 @@ func _update_context_hint() -> void:
 	_hint.visible = showing and not hud_prompts
 	_hint.text = ""
 	if not showing:
+		return
+	if _near_freight(Freight.DESK):
+		var receipt: Dictionary = _state.village.economy.get("freight",{})
+		_hint.text = "16 Getreide nach Valdora liefern · %d Denare" % TravelEconomy.emergency_food_price(_state) if receipt.get("leg",Freight.READY) == Freight.READY else Freight.status(_state.village.economy)
+		return
+	if _near_freight(Freight.DEPOT):
+		_hint.text = "Empfangsbuch am Osttor lesen"
 		return
 	if at_waystation() and _state.village.enabled:
 		_hint.text = "Weidenhof · zum Stadtmarkt weiterreisen"

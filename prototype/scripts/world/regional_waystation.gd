@@ -1,6 +1,7 @@
 extends Node3D
 ## Weidenhof, a fictional inhabited stop alongside the existing quarry road.
-## The cart phase comes from campaign seconds. Sector reloads do not restart it.
+## The village economy owns the shipment, grain and payment. Rendering follows its route.
+const Freight = preload("res://scripts/domain/regional_freight.gd")
 const Region = preload("res://scripts/world/world_stream_plan.gd")
 const Footpath = preload("res://scripts/world/regional_footpath.gd")
 const Person = preload("res://scripts/visuals/village_person.gd")
@@ -8,12 +9,14 @@ const ASSETS := "res://assets/world/waystation/"
 const HORSE := "res://assets/horse/valdora_horse_rig.glb"
 const COUNTER := Vector2(241,119)
 const NEAR := 128.0
-var _installed := false
+var _yard: Node3D
+var _depot: Node3D
+var _load: Node3D
+var _animator: AnimationPlayer
 var _height: Callable
 var _wagon: AnimatableBody3D
 var _wheels: Array[Node3D] = []
-var _last_second := -1.0
-var _subsecond := 0.0
+
 
 static func at_counter(player: Vector3) -> bool:
 	return Vector2(player.x,player.z).distance_to(COUNTER) <= 2.8
@@ -22,25 +25,38 @@ func setup(height: Callable) -> void:
 	_height = height
 	position = Vector3(COUNTER.x,height.call(COUNTER),COUNTER.y)
 
-func update_nearby(player: Vector3, seconds: float, delta: float) -> void:
-	var distance := Vector2(player.x,player.z).distance_to(COUNTER)
-	visible = distance < NEAR
-	if not visible:
-		if _installed and distance > NEAR + 60.0:
-			for child: Node in get_children():
-				child.free()
-			_wheels.clear()
-			_installed = false
-		return
-	if not _installed:
+func update_nearby(player: Vector3, receipt: Dictionary, delta := 1.0) -> void:
+	var p := Vector2(player.x,player.z)
+	if p.distance_to(COUNTER) < NEAR and not is_instance_valid(_yard):
+		_yard = Node3D.new()
+		_yard.name = "Yard"
+		add_child(_yard)
 		_build()
-		_installed = true
-	if seconds != _last_second:
-		_last_second = seconds
-		_subsecond = 0.0
-	else:
-		_subsecond = minf(0.24,_subsecond + delta)
-	_drive(seconds + _subsecond)
+	elif p.distance_to(COUNTER) > NEAR+60.0 and is_instance_valid(_yard):
+		_yard.free()
+	if p.distance_to(Freight.DEPOT) < NEAR and not is_instance_valid(_depot):
+		_depot = _asset(ASSETS+"freight_table.glb",self)
+		_depot.name = "EastGateReceivingDesk"
+		_depot.position = _ground(Freight.DEPOT-COUNTER)
+		_block_table(_depot)
+	elif p.distance_to(Freight.DEPOT) > NEAR+60.0 and is_instance_valid(_depot):
+		_depot.free()
+	var pose := Freight.pose(receipt)
+	var here: Vector2 = pose.position
+	if p.distance_to(here) < NEAR:
+		var spawned := not is_instance_valid(_wagon)
+		if spawned:
+			_build_wagon()
+		_drive(pose,receipt,delta,spawned)
+	elif is_instance_valid(_wagon) and p.distance_to(here) > NEAR+60.0:
+		_wagon.free()
+		_wheels.clear()
+
+
+func _block_table(table: Node3D) -> void:
+	var solid := StaticBody3D.new()
+	table.add_child(solid)
+	_box(solid,Vector3(1.65,.8,.81),Vector3(0,.4,0))
 
 func _ground(offset: Vector2) -> Vector3:
 	return Vector3(offset.x,float(_height.call(COUNTER + offset))-position.y,offset.y)
@@ -51,7 +67,7 @@ func _asset(path: String, parent: Node3D) -> Node3D:
 	return node
 
 func _place(asset: String, offset: Vector2, angle: float, solid := false) -> Node3D:
-	var model := _asset(ASSETS + asset + ".glb",self)
+	var model := _asset(ASSETS + asset + ".glb",_yard)
 	model.name = asset
 	model.position = _ground(offset)
 	model.rotation.y = angle
@@ -69,21 +85,28 @@ func _build() -> void:
 	for prop: Array in [["ancestor_bust",Vector2(-4,3)],["transport_amphora",Vector2(2.2,2.4)]]:
 		var path := "res://assets/legio/" + str(prop[0]) + ".glb"
 		if ResourceLoader.exists(path,"PackedScene"):
-			var art := _asset(path,self)
+			var art := _asset(path,_yard)
 			art.position = _ground(prop[1])
 	var vendor := Person.new()
 	vendor.name = "Tertia"
 	vendor.set_meta("actor_uid","road:weidenhof_tertia")
-	add_child(vendor)
+	_yard.add_child(vendor)
 	vendor.position = _ground(Vector2(0,3.1))
 	vendor.configure_resident("italia",39,"civilian_woman",7,null,"road:weidenhof_tertia")
+	var desk := _place("freight_table",Freight.DESK-COUNTER,0)
+	_block_table(desk)
 	_build_grove()
 	_build_spring()
+	_build_verge()
+
+func _build_wagon() -> void:
 	_wagon = AnimatableBody3D.new()
-	_wagon.name = "AmphoraWagon"
+	_wagon.name = "FreightWagon"
 	_wagon.sync_to_physics = false
 	add_child(_wagon)
 	_asset(ASSETS+"cart.glb",_wagon)
+	_load = _asset(ASSETS+"grain_load.glb",_wagon)
+	_load.name = "SixGrainSacks"
 	_box(_wagon,Vector3(1.52,1.12,1.9),Vector3(0,.72,0))
 	for sign_x: int in [-1,1]:
 		var wheel := _asset(ASSETS+"cart_wheel.glb",_wagon)
@@ -93,9 +116,9 @@ func _build() -> void:
 	horse.position.z = 2.4
 	horse.rotation.y = PI
 	_box(_wagon,Vector3(.76,1.5,1.9),Vector3(0,.75,2.4))
-	var animator := horse.find_children("*","AnimationPlayer",true,false)[0] as AnimationPlayer
-	animator.get_animation("walk").loop_mode = Animation.LOOP_LINEAR
-	animator.play("walk")
+	_animator = horse.find_children("*","AnimationPlayer",true,false)[0] as AnimationPlayer
+	_animator.get_animation("walk").loop_mode = Animation.LOOP_LINEAR
+	_animator.play("walk")
 
 func _box(parent: CollisionObject3D, dimensions: Vector3, at: Vector3) -> void:
 	var node := CollisionShape3D.new()
@@ -130,21 +153,36 @@ func _build_grove() -> void:
 	trees.instance_count = transforms.size()
 	for i in transforms.size():
 		trees.set_instance_transform(i,transforms[i])
+	var trunks := StaticBody3D.new()
+	trunks.name = "WillowTrunks"
+	_yard.add_child(trunks)
+	var trunk := CylinderShape3D.new()
+	trunk.height = 2.0
+	trunk.radius = .19
+	for t in transforms:
+		var solid := CollisionShape3D.new()
+		solid.shape = trunk
+		solid.position = t.origin + Vector3.UP
+		trunks.add_child(solid)
 	var stand := MultiMeshInstance3D.new()
 	stand.name = "WillowGroves"
 	stand.multimesh = trees
-	add_child(stand)
+	_yard.add_child(stand)
 
-func _drive(seconds: float) -> void:
-	# Smooth turns through a staging yard north of the houses. No turn-around
-	# jump; pulling direction and wheel rotation are derived from one phase.
-	var phase := fposmod(seconds,52.0)*TAU/52.0
-	var offset := Vector2(8.4*cos(phase),-9.0+4.2*sin(phase))
-	var direction := Vector2(-8.4*sin(phase),4.2*cos(phase)).normalized()
-	_wagon.position = _ground(offset)
+func _drive(pose: Dictionary, receipt: Dictionary, delta: float, spawned: bool) -> void:
+	var here: Vector2 = pose.position
+	var direction: Vector2 = pose.direction
+	var ground := _ground(here-COUNTER)
+	_wagon.position = ground if spawned else _wagon.position.move_toward(ground,Freight.SPEED * 1.25 * delta)
 	_wagon.rotation.y = atan2(direction.x,direction.y)
+	var grade := float(_height.call(here + direction)) - float(_height.call(here-direction))
+	_wagon.rotation.x = -atan2(grade,2.0)
+	_load.visible = pose.loaded
+	_animator.speed_scale = 1.0 if pose.moving else 0.0
+	var metres := float(receipt.get("metres",0.0))
 	for wheel in _wheels:
-		wheel.rotation.x = seconds*1.50
+		wheel.rotation.x = metres/.52
+
 
 func _build_spring() -> void:
 	# The water plane intersects the depressed terrain. The existing solid
@@ -178,4 +216,29 @@ void fragment() {
 	var surface := ShaderMaterial.new()
 	surface.shader = water_shader
 	water.material_override = surface
-	add_child(water)
+	_yard.add_child(water)
+
+func _build_verge() -> void:
+	var template := (load(ASSETS+"verge.glb") as PackedScene).instantiate()
+	var batch := MultiMesh.new()
+	batch.transform_format = MultiMesh.TRANSFORM_3D
+	batch.mesh = (template.find_children("*","MeshInstance3D",true,false)[0] as MeshInstance3D).mesh
+	template.free()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 12732
+	var patches: Array[Transform3D] = []
+	for i in 550:
+		var offset := Vector2(rng.randf_range(-21,23),rng.randf_range(-22,24))
+		# Keep the approach to the shop, cart circuit and buildings clear.
+		if absf(offset.x) < 12 and offset.y > -15.0 and offset.y < 13.0:
+			continue
+		var size_factor := rng.randf_range(.7,1.5)
+		patches.append(Transform3D(Basis(Vector3.UP,rng.randf_range(-PI,PI)).scaled(Vector3.ONE*size_factor),_ground(offset)))
+	batch.instance_count = patches.size()
+	for i in patches.size():
+		batch.set_instance_transform(i,patches[i])
+	var verge := MultiMeshInstance3D.new()
+	verge.name = "RoadsideHerbs"
+	verge.multimesh = batch
+	verge.visibility_range_end = 74.0
+	_yard.add_child(verge)

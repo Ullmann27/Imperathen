@@ -1,6 +1,8 @@
 extends RefCounted
 ## Personal company in WorldState. Person records, story facts, the clock and
 ## bought items keep their original owners. Keys are canonical PersonRegistry IDs.
+const Conversations = preload("res://scripts/domain/party_conversations.gd")
+const CompanionStory = preload("res://scripts/story/companion_story.gd")
 const Clock = preload("res://scripts/domain/world_clock.gd")
 const Calendar = preload("res://scripts/domain/world_calendar.gd")
 const Life = preload("res://scripts/story/village_life.gd")
@@ -9,6 +11,7 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const FRIEND := "pc:companion"
 const FATHER := "vil:silvanus"
+const FRAME_WOOD := 2
 ## Authored local biographies. Ages for Silvanus and the two specialists are
 ## creative year-precision estimates; no invented historical birth day.
 const PROFILES := {
@@ -16,6 +19,7 @@ const PROFILES := {
 	"vil:aurelia":{"age":34,"personality":"Geduldig, lehnt vermeidbare Risiken ab","interest":"Heilkunde","goal":"Verletzte versorgen","family":""},
 	"vil:varro":{"age":32,"personality":"Aufmerksam, erkundet gern unbekannte Wege","interest":"Navigation","goal":"Sichere Wege zwischen den Höfen finden","family":""}
 }
+const Supplies = preload("res://scripts/domain/travel_provisions.gd")
 const SPECIALISTS := ["vil:aurelia","vil:varro"]
 const DAILY_WAGE := 2
 const POST := Vector2(0, -7)
@@ -26,9 +30,10 @@ const REQUESTS := ["follow","wait","assist","home"]
 const ROLES := ["guide","carry","watch","aid"]
 const KIT := {"walking_staff":"tool", "wool_cloak":"body", "linen_tunic":"body", "leather_belt":"belt", "bronze_brooch":"belt"}
 const COMMAND_FIELDS := {
+	"party_exchange":["actor_uid","step","choice"], "party_mend":["actor_uid","step"],
 	"party_invite":["actor_uid"], "party_hire":["actor_uid"], "party_dismiss":["actor_uid"],
 	"party_order":["actor_uid","order"], "party_assign":["actor_uid","assignment"],
-	"party_supply":["actor_uid","quantity"], "party_equip":["actor_uid","item_id"],
+	"party_provision":["actor_uid","item_id","quantity"], "party_supply":["actor_uid","quantity"], "party_equip":["actor_uid","item_id"],
 	"party_train":["actor_uid","skill"], "party_delegate":["actor_uid","leader_uid"]
 }
 
@@ -94,10 +99,14 @@ static func validate_arguments(command: String, args: Dictionary) -> String:
 	var group := command == "party_order" and (uid == "all" or uid.begins_with("group:"))
 	if not group and uid != FRIEND and not uid.begins_with("vil:"):
 		return "Diese Person kann hier keine Begleitung zusagen."
+	if command == "party_exchange" and args.choice not in ["accept","decline"]:
+		return "Wähle eine Antwort auf den Vorschlag."
 	if command == "party_order" and args.order not in REQUESTS:
 		return "Eine zivile Reisegruppe kann nur freiwillige Begleitaufgaben übernehmen."
 	if command == "party_assign" and args.assignment not in ROLES:
 		return "Unbekannte Begleitaufgabe."
+	if command == "party_provision" and args.item_id not in Supplies.ITEMS:
+		return "Dieser Vorrat eignet sich nicht als Reiseproviant."
 	if command == "party_equip" and not KIT.has(args.item_id):
 		return "Dieser Gegenstand eignet sich nicht für die Reisegruppe."
 	if command == "party_train" and args.skill not in ["perception","endurance"]:
@@ -106,6 +115,41 @@ static func validate_arguments(command: String, args: Dictionary) -> String:
 
 static func _result(ok: bool, message: String) -> Dictionary:
 	return {"ok":ok,"message":message}
+
+## A creative later encounter. The original I-03/legacy choice and its
+## source-specific trust never change when the two make peace.
+static func _can_mend(world: Dictionary) -> bool:
+	if not world.companion.met or world.companion.choice != "decline":
+		return false
+	if Childhood.enabled(world):
+		return world.village.childhood.completed.has("deliver_kindling")
+	for node: Variant in world.resource_nodes if world.resource_nodes is Array else []:
+		if node is Dictionary and _integer(node.get("amount"),0,15):
+			return true
+	return false
+
+static func mending_choice(world: Dictionary) -> String:
+	if not _can_mend(world):
+		return ""
+	match world.world_state.party.get("mending",""):
+		"": return "promise"
+		"promised": return "deliver"
+	return ""
+
+static func _mend(world: Dictionary, uid: String, step: String) -> Dictionary:
+	if uid != FRIEND or step not in ["promise","deliver"] or step != mending_choice(world) or not healthy(world,uid):
+		return _result(false,"Diese Hilfe ist hier gerade nicht vereinbart.")
+	if position(world,uid).distance_to(player_position(world)) > REACH:
+		return _result(false,"Besprich das persönlich mit deinem früheren Weggefährten.")
+	var party: Dictionary = world.world_state.party
+	if step == "promise":
+		party.mending = "promised"
+		return _result(true,"»Dann bring mir zwei Holz für das Tragegestell. Ich warte hier auf dich.«")
+	if int(world.resources.wood) < FRAME_WOOD:
+		return _result(false,"Für das Tragegestell fehlen zwei Holz.")
+	world.resources.wood -= FRAME_WOOD
+	party.mending = "delivered"
+	return _result(true,"Ihr ersetzt die beiden gebrochenen Streben. »Darauf konnte ich mich verlassen. Wenn du Gesellschaft brauchst, frag mich.«")
 
 static func _invite(world: Dictionary, uid: String, hired: bool) -> Dictionary:
 	var members: Dictionary = world.world_state.party.members
@@ -117,7 +161,7 @@ static func _invite(world: Dictionary, uid: String, hired: bool) -> Dictionary:
 		return _result(false,"Sprich mit der verfügbaren Person vor Ort.")
 	if uid == FATHER and not Childhood.enabled(world):
 		return _result(false,"Dieser Lebensweg kennt Silvanus nicht als Vater.")
-	if uid == FRIEND and (not world.companion.met or world.companion.choice != "help"):
+	if uid == FRIEND and (not world.companion.met or (world.companion.choice != "help" and world.world_state.party.get("mending","") != "delivered")):
 		return _result(false,"Dein Gegenüber ist noch nicht bereit, mit dir zu reisen.")
 	if uid != FRIEND and uid != FATHER and uid not in SPECIALISTS and not willing_resident(world,uid):
 		return _result(false,"Diese Person möchte sich erst besser kennenlernen oder hat noch Verpflichtungen.")
@@ -135,6 +179,9 @@ static func _invite(world: Dictionary, uid: String, hired: bool) -> Dictionary:
 			return _result(false,"Silvanus muss den Vertrag vor Ort mit dir vereinbaren.")
 	if not members.has(uid):
 		members[uid] = new_member()
+		if uid == FRIEND and world.world_state.party.get("mending","") == "delivered":
+			members[uid].bond = 12
+			remember(members[uid],"Nach unserem Streit hast du Wort gehalten. Wir haben mein Tragegestell gemeinsam ausgebessert.")
 		if uid == "vil:aurelia":
 			members[uid].skills.healing = 12
 		elif uid == "vil:varro":
@@ -160,6 +207,8 @@ static func apply(world: Dictionary, command: String, args: Dictionary) -> Dicti
 	var members: Dictionary = world.world_state.party.members
 	if protected(world) or int(world.player.health) <= 0:
 		return _result(false,"Die laufende Gefahr hat Vorrang.")
+	if command == "party_mend":
+		return _mend(world,uid,args.step)
 	if command in ["party_invite","party_hire"]:
 		return _invite(world,uid,command == "party_hire")
 	if command == "party_order":
@@ -202,6 +251,8 @@ static func apply(world: Dictionary, command: String, args: Dictionary) -> Dicti
 		var chief: Dictionary = members.get(leader,{})
 		if leader == uid or chief.get("status","") != "active" or chief.has("deputy") or not healthy(world,leader) or chief.order == "home":
 			return _result(false,"Die gewählte Person kann diese Reisegruppe nicht übernehmen.")
+		if Conversations.stance(world,uid,leader,Conversations.opinions(world,uid)) in ["wary","hostile"]:
+			return _result(false,"»Wir sind uns unterwegs immer wieder in die Quere gekommen. Ich reise vorerst lieber mit dir.«")
 		for other: Dictionary in members.values():
 			if other.get("deputy","") == uid:
 				return _result(false,"Übergib zuerst die bereits betreuten Mitreisenden.")
@@ -215,9 +266,15 @@ static func apply(world: Dictionary, command: String, args: Dictionary) -> Dicti
 		return _result(true,"Dein Gefährte übernimmt die Aufgabe.")
 	if member.order == "home" or position(world,uid).distance_to(player_position(world)) > REACH:
 		return _result(false,"Gehe für die Übergabe oder Übung zu deinem Gefährten.")
+	if command == "party_provision":
+		return Supplies.give(world.village.get("city_trade",{}),member,args.item_id,int(args.quantity),capacity(member))
+	if command == "party_exchange":
+		if CompanionStory.observed_position(world,local_id(world,uid)) == null:
+			return _result(false,"Diese Person ist gerade nicht für ein Gespräch anwesend.")
+		return Conversations.answer(world,uid,args.step,args.choice)
 	if command == "party_supply":
 		var count := int(args.quantity)
-		if int(world.resources.grain) < count or int(member.rations) + count > capacity(member):
+		if int(world.resources.grain) < count or Supplies.load_count(member) + count > capacity(member):
 			return _result(false,"Der Vorrat oder der freie Trageplatz reicht nicht.")
 		world.resources.grain -= count
 		member.rations += count
@@ -248,7 +305,7 @@ static func _equip(world: Dictionary, member: Dictionary, id: String) -> Diction
 	var old: String = member.equipment.get(slot,"")
 	var party: Dictionary = world.world_state.party
 	var trade: Dictionary = world.village.get("city_trade",{})
-	if old == id and slot == "tool" and int(member.rations) > capacity(member)-4:
+	if old == id and slot == "tool" and Supplies.load_count(member) > capacity(member)-4:
 		return _result(false,"Verbrauche zuerst einen Teil der getragenen Rationen.")
 	if old != id:
 		if id == "walking_staff":
@@ -299,7 +356,7 @@ static func settle_days(world: Dictionary, days: int) -> void:
 		var member: Dictionary = world.world_state.party.members[uid]
 		if member.status != "active" or member.order == "home":
 			continue
-		var served_days := mini(days,int(member.rations) + 2 - int(member.shortage))
+		var served_days := mini(days,int(member.rations) + Supplies.food(member) + 2 - int(member.shortage))
 		var unpaid := false
 		if member.contract == "paid":
 			var credit := mini(served_days,int(member.prepaid))
@@ -313,11 +370,22 @@ static func settle_days(world: Dictionary, days: int) -> void:
 		var fed := mini(int(member.rations),served_days)
 		member.rations -= fed
 		member.meals += fed
+		fed += Supplies.consume(member,Supplies.FOOD,served_days-fed)
+		# A filled skin travels with the person. Water is needed on the
+		# regional road beyond Valdora, where the village well is out of reach.
+		var dry_days := 0
+		if member.order != "wait" and player_position(world).length() > 70.0:
+			dry_days = served_days-Supplies.consume(member,["water"],served_days)
 		if fed > 0:
 			member.shortage = 0
 		var missed := mini(2 - int(member.shortage),served_days-fed)
 		member.shortage += missed
-		member.morale = clampi(int(member.morale)+fed-8*missed,0,100)
+		member.morale = clampi(int(member.morale)+fed-8*missed-3*dry_days,0,100)
+		var person := resident(world,uid)
+		if not person.is_empty() and person.alive:
+			# Meals and injuries update the same health that the village, rescue
+			# and story read. Hunger sends a living traveller home to recover.
+			person.health = maxi(1,mini(100,int(person.health) + fed) - 3*missed - 2*dry_days)
 		if missed > 0:
 			member.bond = maxi(-100,int(member.bond)-missed)
 		if unpaid:
@@ -326,6 +394,9 @@ static func settle_days(world: Dictionary, days: int) -> void:
 			member.assignment = ""
 			_order(member,"home")
 			remember(member,"Der bezahlte Begleitvertrag endete, als der vereinbarte Lohn ausblieb.")
+		elif not person.is_empty() and int(person.health) <= 30:
+			_order(member,"home")
+			remember(member,"Die Reise unterbrochen, um sich zu erholen.")
 		elif member.shortage >= 2:
 			_order(member,"home")
 			remember(member,"Wegen fehlender Rationen nach Hause zurückgekehrt.")
@@ -367,12 +438,21 @@ static func view(world: Dictionary) -> Dictionary:
 		row.interest = profile.interest
 		row.goal = profile.goal
 		row.family = profile.family
+		row.conversation = Conversations.row(world,uid)
+		if not healthy(world,uid) or not travelling(world,uid) or protected(world):
+			row.conversation.offer = {}
 		row.trust = clampi(base_trust(world,uid)+int(member.bond),-100,100)
 		row.location = "Unterkunft" if member.order == "home" else "Valdora"
 		row.wage = DAILY_WAGE if member.contract == "paid" else 0
 		row.capacity = capacity(member)
+		row.food_days = int(member.rations)+Supplies.food(member)
+		row.water_days = Supplies.packed(member,"water")
 		row.items = []
 		var inventory: Dictionary = world.village.get("city_trade",{}).get("inventory",{})
+		row.market_provisions = []
+		for item_id: String in Supplies.ITEMS:
+			if int(inventory.get(item_id,0)) > 0:
+				row.market_provisions.append(item_id)
 		for item_id: String in KIT:
 			if item_id == "walking_staff" or int(inventory.get(item_id,0)) > 0 or member.equipment.values().has(item_id):
 				row.items.append(item_id)
@@ -381,14 +461,36 @@ static func view(world: Dictionary) -> Dictionary:
 
 static func validate(world: Dictionary) -> String:
 	var party: Variant = world.world_state.get("party")
-	if not _keys(party,["members","staff_stock","staff_made"]) or typeof(party.members) != TYPE_DICTIONARY or not _integer(party.staff_stock,0,1000000) or not _integer(party.staff_made,0,1000000):
+	var party_fields := ["members","staff_stock","staff_made"]
+	if party is Dictionary and party.has("mending"):
+		if not _can_mend(world) or party.mending not in ["promised","delivered"]:
+			return "Widersprüchliche spätere Aussöhnung."
+		party_fields.append("mending")
+	if party is Dictionary and party.has("outings"):
+		party_fields.append("outings")
+	if not _keys(party,party_fields) or typeof(party.members) != TYPE_DICTIONARY or not _integer(party.staff_stock,0,1000000) or not _integer(party.staff_made,0,1000000):
 		return "Ungültiges Gefolgebuch."
+	var conversation_error := Conversations.validate(world,party.get("outings",[]),CompanionStory.task_roles)
+	if not conversation_error.is_empty():
+		return conversation_error
 	var staffs := int(party.staff_stock)
 	for uid: Variant in party.members:
 		if typeof(uid) != TYPE_STRING or (uid != FRIEND and (not uid.begins_with("vil:") or not world.village.enabled or not Life.has_npc(world,local_id(world,uid)) or resident(world,uid).is_empty())) or (uid == FATHER and not Childhood.enabled(world)) or (uid == FRIEND and not world.companion.met):
 			return "Unbekannte oder noch nicht getroffene Person im Gefolge."
 		var member: Variant = party.members[uid]
 		var fields := new_member().keys()
+		if member is Dictionary and member.has("provisions"):
+			if not world.village.has("city_trade") or not Supplies.valid(member.provisions):
+				return "Ungültige persönliche Reisevorräte."
+			fields.append("provisions")
+		if member is Dictionary and member.has("deputy"):
+			var leader: Variant = member.deputy
+			if typeof(leader) != TYPE_STRING or leader == uid or member.get("status") != "active":
+				return "Ungültige Leitung einer Reisegruppe."
+			var chief: Variant = party.members.get(leader)
+			if not chief is Dictionary or chief.get("status") != "active" or chief.has("deputy"):
+				return "Fehlende oder mehrdeutige Leitung einer Reisegruppe."
+			fields.append("deputy")
 		if member is Dictionary and member.has("travel_position"):
 			if NpcBehavior.enabled(world) or not NpcBehavior._position(member.travel_position):
 				return "Ungültiger beobachteter Reiseort."
@@ -418,7 +520,7 @@ static func validate(world: Dictionary) -> String:
 		for note: Variant in member.memories:
 			if typeof(note) != TYPE_STRING or note.is_empty() or note.length() > 240:
 				return "Ungültige persönliche Erinnerung."
-		if typeof(member.practice) not in [TYPE_FLOAT,TYPE_INT] or not is_finite(member.practice) or member.practice < 0 or member.practice >= LESSON_SECONDS or int(member.rations) > capacity(member):
+		if typeof(member.practice) not in [TYPE_FLOAT,TYPE_INT] or not is_finite(member.practice) or member.practice < 0 or member.practice >= LESSON_SECONDS or Supplies.load_count(member) > capacity(member):
 			return "Übungszeit oder Traglast ist ungültig."
 		if member.order == "train":
 			if member.lesson not in ["perception","endurance"] or int(member.skills.get(member.lesson,0)) >= 10:
@@ -450,6 +552,9 @@ static func reconcile(world: Dictionary) -> void:
 			member.assignment = ""
 			_order(member,"home")
 			remember(member,"Im Dorf verstorben.")
+		elif member.status == "active" and member.order != "home" and int(person.get("health",100)) <= 30:
+			_order(member,"home")
+			remember(member,"Die Reise unterbrochen, um sich zu erholen.")
 	clear_vacant_roles(world)
 
 static func village_reserve_size() -> int:
@@ -481,9 +586,14 @@ static func normalize(world: Dictionary) -> void:
 	var party: Dictionary = world.world_state.party
 	party.staff_stock = int(party.staff_stock)
 	party.staff_made = int(party.staff_made)
+	for outing: Dictionary in party.get("outings",[]):
+		outing.jdn = int(outing.jdn)
 	for member: Dictionary in party.members.values():
 		for field: String in ["rations","meals","bond","morale","shortage","paid","prepaid"]:
 			member[field] = int(member[field])
+		for lot: Dictionary in member.get("provisions",{}).values():
+			lot.issued = int(lot.issued)
+			lot.consumed = int(lot.consumed)
 		for skill: String in member.skills:
 			member.skills[skill] = int(member.skills[skill])
 

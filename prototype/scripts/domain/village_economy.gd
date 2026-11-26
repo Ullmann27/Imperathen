@@ -2,6 +2,7 @@ extends RefCounted
 ## Named people are assigned once. Production, food and repair share real elapsed time.
 ## Owns data.village.economy; all spendable goods remain in data.resources.
 
+const Freight = preload("res://scripts/domain/regional_freight.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const DAY_SECONDS := 120.0
 const MAX_RESOURCE := 1000000
@@ -19,6 +20,7 @@ const COMMAND_FIELDS := {
 	"village_repair": ["workplace_id"],
 	"village_shift": ["resident_id", "duty"],
 	"village_buy_food": [],
+	"village_dispatch_grain": [],
 	"village_resow": []
 }
 const PEOPLE := [
@@ -105,6 +107,31 @@ static func execute(data: Dictionary, command: String, args: Dictionary = {}) ->
 
 static func _execute(data: Dictionary, command: String, args: Dictionary) -> Dictionary:
 	var economy: Dictionary = data.village.economy
+	if command == "village_dispatch_grain":
+		var position: Variant = data.get("player",{}).get("position")
+		if not data.village.get("enabled",false) or not position is Array or position.size() != 3:
+			return _fail("Der Spielerstandort für die Abholung fehlt.")
+		if not _number(position[0],-16000,16000) or not _number(position[2],-16000,16000) or Vector2(position[0],position[2]).distance_to(Freight.DESK) > 2.4:
+			return _fail("Der Frachtauftrag wird am Ladetisch des Weidenhofs vereinbart.")
+		if _raid_active(data) or data.village.get("raid",{}).get("status","") == "warning":
+			return _fail("Während des Alarms ruht der Frachtverkehr.")
+		var receipt: Dictionary = economy.get("freight", Freight.empty_receipt())
+		if receipt.leg != Freight.READY:
+			return _fail(Freight.status(economy))
+		var price := emergency_food_price(data)
+		if int(economy.stocks.emergency_grain) < Freight.LOAD or int(data.resources.denarii) < price:
+			return _fail("Die Lieferung benötigt 16 Getreide im Handelsvorrat und %d Denare." % price)
+		if int(economy.stocks.merchant_denarii) > MAX_RESOURCE-price or int(data.resources.grain) > MAX_RESOURCE-Freight.LOAD:
+			return _fail("Die Kasse oder das Empfangslager ist voll.")
+		_transfer(data,"denarii",-price)
+		economy.stocks.merchant_denarii += price
+		economy.stocks.emergency_grain -= Freight.LOAD
+		receipt.leg = Freight.OUTBOUND
+		receipt.sent += 1
+		receipt.price = price
+		economy.freight = receipt
+		economy.last_report = "Ladeschein %d · Weidenhof an Valdora · 16 Getreide übernommen · %d Denare bezahlt." % [receipt.sent,price]
+		return _ok(economy.last_report)
 	if command == "village_request_work":
 		if economy.authority.work_permit:
 			return _fail("Decimus hat dir die Mitarbeit bereits erlaubt.")
@@ -247,7 +274,31 @@ static func _advance(data: Dictionary, delta: float) -> void:
 			economy.day_seconds = 0.0
 			economy.day += 1
 			_meal(data)
+		_advance_freight(data,step)
 		remaining -= step
+
+
+static func _advance_freight(data: Dictionary, seconds: float) -> void:
+	var economy: Dictionary = data.village.economy
+	var receipt: Dictionary = economy.get("freight",{})
+	var distance := seconds * Freight.SPEED
+	while distance > 0.0 and not receipt.is_empty() and receipt.leg != Freight.READY:
+		var remaining := maxf(0.0,Freight.length_m()-float(receipt.metres))
+		var step := minf(distance,remaining)
+		receipt.metres = float(receipt.metres)+step
+		distance -= step
+		if remaining-step > EPSILON:
+			return
+		if receipt.leg == Freight.OUTBOUND:
+			if int(data.resources.grain) > MAX_RESOURCE-Freight.LOAD:
+				return
+			_transfer(data,"grain",Freight.LOAD)
+			receipt.received += 1
+			receipt.leg = Freight.RETURNING
+			economy.last_report = "Quittung %d · Valdora, Osttor · 16 Getreide auf den Dorfvorrat gebucht." % receipt.received
+		else:
+			receipt.leg = Freight.READY
+		receipt.metres = 0.0
 
 
 static func _transaction_copy(data: Dictionary) -> Dictionary:
@@ -494,6 +545,8 @@ static func validate(data: Dictionary) -> String:
 	for key in ["forest", "rock", "harvest", "merchant_denarii", "emergency_grain"]:
 		if not _integer(economy.stocks.get(key), 0, MAX_RESOURCE):
 			return "Ungültiger örtlicher Vorrat"
+	if economy.has("freight") and not Freight.valid(economy.freight):
+		return "Ungültiger Ladeschein im Dorfbestand"
 	var seen: Dictionary = {}
 	for person in economy.people:
 		if typeof(person) != TYPE_DICTIONARY:

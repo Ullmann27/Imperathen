@@ -60,7 +60,10 @@ func sync(data: Dictionary) -> void:
 
 func reset(data: Dictionary) -> void:
 	_trail.clear()
-	for id: String in controllers:
+	for id: String in controllers.keys():
+		if id not in Story.ACTORS and Story.member(data, id).is_empty():
+			controllers.erase(id)
+			continue
 		controllers[id].reset()
 		var body := actor(id)
 		if body == null:
@@ -68,12 +71,15 @@ func reset(data: Dictionary) -> void:
 		body.velocity = Vector3.ZERO
 		if body.has_meta("waiting_anchor"):
 			body.remove_meta("waiting_anchor")
-		body.set_meta("companion_controlled", Story.available(data, id))
-		if not Childhood.enabled(data) and Story.member(data, id).is_empty():
+		var membership := Story.member(data, id)
+		var available := Story.available(data, id)
+		var recovering: bool = membership.get("status", "") == "active" and membership.order == "home" and body.visible and body.get_meta("assignment", "idle") == "idle"
+		body.set_meta("companion_controlled", available or recovering)
+		if not Childhood.enabled(data) and membership.is_empty():
 			if id == "marcus":
 				body.global_position = world.to_global(home(id))
 			continue
-		if id == "silvanus" and not Story.available(data, id):
+		if id == "silvanus" and not available and membership.is_empty():
 			continue
 		# Einmalige Platzierung beim Neu-/Laden, niemals beim normalen State-Sync.
 		body.global_position = Story.restored_position(data, id, world.to_global(home(id)))
@@ -93,7 +99,7 @@ func advance(delta: float) -> void:
 		return
 	var paused: bool = not world._active or world._mode != "person" or data.village.raid.active or data.encounter.active
 	var night: String = data.village.get("childhood", {}).get("night_event", "")
-	if paused or night in ["pending", "released"]:
+	if paused or (night == "released" and data.village.raid.status != "aftermath"):
 		pause()
 		return
 	var step := Childhood.current_step(data)
@@ -111,17 +117,34 @@ func advance(delta: float) -> void:
 		# I-03: before the two have parted Marcus is no companion yet, but he
 		# walks his own errand: with the boy, or ahead to Cassia's stall.
 		var station := I03.marcus_station(data, Childhood.i03_ctx(data)) if id == "marcus" and Childhood.enabled(data) else "home"
-		if body == null or not body.visible or not (Story.available(data, id) or station != "home"):
+		if body == null or not body.visible:
+			continue
+		var membership := Story.member(data, id)
+		var available := Story.available(data, id)
+		var recovering: bool = not available and membership.get("status", "") == "active" and membership.order == "home" and body.get_meta("companion_controlled", false)
+		if not available and station == "home" and not recovering:
+			continue
+		var night_call: bool = id in ["silvanus", "julia", "sextus"] and (night == "pending" or str(step.get("id", "")) in ["family_evening", "night_rest", "i11_forge", "i12_father"])
+		if night == "pending" and not night_call:
+			controllers[id].pause(body)
+			body.get_node("Figure").drive(0.0)
 			continue
 		body.set_meta("companion_controlled", true)
 		var target := world.to_global(home(id))
 		var distance := 0.15
 		var speed := 1.45
 		var mode := "return"
-		var membership := Story.member(data, id)
 		if membership.get("order", "") != "wait" and body.has_meta("waiting_anchor"):
 			body.remove_meta("waiting_anchor")
-		if membership.get("status", "") == "active":
+		if recovering:
+			mode = "recover"
+			speed = 0.85
+		elif night_call:
+			# Family and smith return on foot to their authored duties as the
+			# night approaches. A previous request cannot move I-10 elsewhere.
+			mode = "return"
+			speed = 3.0
+		elif membership.get("status", "") == "active":
 			mode = str(membership.order)
 			var slot := follower
 			follower += 1

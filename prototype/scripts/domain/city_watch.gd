@@ -36,7 +36,7 @@ static func roster(world: Dictionary) -> Array[Dictionary]:
 static func validate_arguments(command: String, args: Dictionary) -> String:
 	if command == "city_watch_contact":
 		return "" if args.is_empty() else "Der Kontakt enthält ungültige Angaben."
-	return "" if args.get("choice") is String and args.choice in CHOICES else "Wähle eine Antwort an die Wache."
+	return "" if command == "city_watch_reply" and args.size() == 1 and args.get("choice") is String and args.choice in CHOICES else "Wähle eine Antwort an die Wache."
 
 static func reputation(world: Dictionary) -> int:
 	return -2 * int(world.world_state.politics.get("street_watch",{}).get("disputes",0))

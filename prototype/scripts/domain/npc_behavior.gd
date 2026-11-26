@@ -114,6 +114,19 @@ static func start(data: Dictionary) -> void:
 	_decide_all(data, 0.0)
 
 
+## Retain people, observations' last positions and dated memories. Decisions
+## resume on the new simulation clock without replaying years of local ticks.
+static func resume_after_interlude(data: Dictionary) -> void:
+	if not enabled(data):
+		return
+	var behavior: Dictionary = data.village.behavior
+	behavior.seconds = float(data.world_seconds) - float(behavior.accumulator)
+	for person: Dictionary in behavior.people.values():
+		person.since = behavior.seconds
+		person.next_decision = behavior.seconds
+		person.observed = false
+
+
 static func ensure_social(data: Dictionary) -> void:
 	# Call only after validating a legacy save. A present invalid record is never
 	# overwritten, and migration invents no past relationships or conversation time.

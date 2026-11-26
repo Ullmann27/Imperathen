@@ -120,11 +120,7 @@ def tablet():
     inscription('Recipient','FABIO',(-.054,.041,.0101),.015,groove)
     inscription('Quantity','II',(-.054,.008,.0101),.025,groove)
     inscription('Author','SEXTVS',(.054,-.040,.0101),.012,groove)
-    for i,n in enumerate([8,5,9]):
-        for j in range(n):
-            x = .018+j*.0073
-            cord('Incised cursive',[(x,.044-i*.020,.0101),(x+.0026,.049-i*.020,.0101),
-                                     (x+.005,.043-i*.020,.0101)],.00038,groove)
+    inscription('Order','AD NVNDINAS\nII CORBES\nCARBONIS',(.054,.018,.0101),.010,groove)
     cord('Bronze stylus',[(-.098,-.071,.012),(-.059,-.068,.013),(-.011,-.065,.012)],.0015,bronze)
     export('sextus_tablet')
 
@@ -153,8 +149,7 @@ def gate_letter():
         mod.thickness=.0008
     inscription('Addressee','CASSIAE',(0,.06,.0016),.019,ink)
     inscription('Notice','VIA   LIBERA\nAD   PORTAM',(0,0,.0016),.014,ink)
-    for i in range(5):
-        cord('Ink stroke',[(-.06+i*.020,-.052,.0018),(-.055+i*.02,-.050,.0018),(-.050+i*.02,-.054,.0018)],.0007,ink)
+    inscription('Instructions','PLAVSTRVM MITTE',(0,-.049,.0016),.012,ink)
     export('gate_letter')
 
 
@@ -235,8 +230,8 @@ def render_letters(destination):
 
     scene = bpy.context.scene
     scene.render.engine = 'CYCLES'
-    scene.cycles.samples = 20
-    scene.cycles.use_denoising = True
+    scene.cycles.samples = 64
+    scene.cycles.use_denoising = False
     scene.render.resolution_x = 900
     scene.render.resolution_y = 560
     scene.render.resolution_percentage = 100
@@ -265,11 +260,15 @@ def render_letters(destination):
     bpy.ops.render.render(write_still=True)
 
 
-if '--review' in sys.argv:
-    render_letters(sys.argv[sys.argv.index('--review')+1])
-else:
-    OUT.mkdir(parents=True,exist_ok=True)
-    tablet()
-    gate_letter()
-    amphora()
-    bust()
+if __name__ == '__main__':
+    if '--letters' in sys.argv:
+        tablet()
+        gate_letter()
+    elif '--review' in sys.argv:
+        render_letters(sys.argv[sys.argv.index('--review')+1])
+    else:
+        OUT.mkdir(parents=True,exist_ok=True)
+        tablet()
+        gate_letter()
+        amphora()
+        bust()

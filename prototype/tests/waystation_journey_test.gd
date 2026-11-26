@@ -9,11 +9,6 @@ const DT := 1.0/60.0
 func _visit() -> void:
 	var world: Node3D = game.world
 	var body := world.get_node("Player") as CharacterBody3D
-	# Choose the normal noon lighting for the visual fixture; gameplay still
-	# loads I-02 and the market test below checks this same campaign clock.
-	var calendar: Dictionary = game.model.data.calendar
-	calendar.clock = preload("res://scripts/domain/world_calendar.gd").new_clock(int(calendar.clock.jdn),12 * 3600)
-	world._sync_world_light(game.model.data)
 	game.ui.action_requested.emit("village_panel",{"tab":"map"})
 	var choose := button(game.ui,"Route · Weidenhof")
 	if not expect(choose != null, "Ziel im regulären Regionalmenü wählbar"):
@@ -25,6 +20,7 @@ func _visit() -> void:
 		game.ui._toggle_local_map()
 		for frame in 35:
 			await process_frame
+		world.look.set_time_of_day(12)
 		await capture("valdora-wegkarte")
 		game.ui._toggle_local_map()
 	var inside := VillageRoute.local_path(Vector2(-13,10),Vector2(32.8,-25))
@@ -56,7 +52,7 @@ func _visit() -> void:
 				break
 			world.set_touch_move(before.direction_to(goal))
 			terrain.follow(body.position,"low")
-			terrain.waystation.update_nearby(body.position,distance/3.6,DT)
+			terrain.waystation.update_nearby(body.position,game.model.data.village.economy.get("freight",{}))
 			await physics_frame
 			world._move_player(DT)
 			var after := Vector2(body.position.x,body.position.z)
@@ -74,14 +70,14 @@ func _visit() -> void:
 			return
 	expect(off_road_distance > 30 and sectors.size() >= 3 and support_lost < 6,"Abseits der Straße über Sektorgrenzen auf begehbarem Boden")
 	var stop: Node3D = terrain.waystation
-	var spring: Node3D = stop.get_node("WillowSpring")
+	var spring: Node3D = stop.get_node("Yard/WillowSpring")
 	var water_depth: float = spring.global_position.y - terrain.surface_height(Profile.SPRING)
 	expect(water_depth > .6 and water_depth < 1.0,"Quelle liegt über der passierbaren Senke")
-	var wagon := stop.get_node("AmphoraWagon") as AnimatableBody3D
+	var wagon := stop.get_node("FreightWagon") as AnimatableBody3D
 	var wagon_start := wagon.position
-	stop.update_nearby(body.position,10,DT)
-	expect(wagon.position.distance_to(wagon_start) > .3 and wagon.find_children("*","AnimationPlayer",true,false).size() > 0,"Regionaluhr bewegt den bespannten Wagen")
-	expect(stop.get_node("WillowGroves").multimesh.instance_count > 35 and world.at_waystation(),"Weidenhaine, Laden und begehbarer Tresen erreicht")
+	stop.update_nearby(body.position,{})
+	expect(wagon.position.is_equal_approx(wagon_start) and not wagon.get_node("SixGrainSacks").visible and wagon.find_children("*","AnimationPlayer",true,false).size() > 0,"Leerer bespannter Wagen wartet auf Fracht")
+	expect(stop.get_node("Yard/WillowGroves").multimesh.instance_count > 35 and world.at_waystation(),"Weidenhaine, Laden und begehbarer Tresen erreicht")
 	print("WEIDENHOF_PHYSICS ",JSON.stringify({"weg_m":snappedf(distance,.01),"abseits_m":snappedf(off_road_distance,.01),"abstand_zur_trasse_max_m":snappedf(max_route_gap,.01),"sektoren":sectors.size(),"kontaktlose_ticks":support_lost,"kartenknicke":inside.size()}))
 	if not capture_dir.is_empty():
 		var city_camera := Camera3D.new()
@@ -91,7 +87,9 @@ func _visit() -> void:
 		city_camera.fov = 53
 		city_camera.current = true
 		game.ui.hide()
+		world.look.set_time_of_day(12)
 		await capture("weidenhof")
+		world._sync_world_light(game.model.data)
 		game.ui.show()
 		city_camera.free()
 		world.get_node("WorldCamera").current = true
@@ -100,6 +98,13 @@ func _visit() -> void:
 	var city = game.city_exploration
 	if not expect(city != null and city.market.available and city.market.model == game.model,"Tresen öffnet denselben gespeicherten Stadtmarkt"):
 		return
+	var chart_button := button(city._safe,"Stadtplan")
+	chart_button.pressed.emit()
+	city.street_chart.select("foodstall")
+	expect(city.street_chart.visible and city.street_chart.route.size() >= 3 and city.street_chart.route[-1] == city.market.sites.foodstall,"Stadtplan führt über denselben Straßengraphen zum Laden")
+	if not capture_dir.is_empty():
+		await capture("rom-stadtplan")
+	city.street_chart.hide()
 	var before_clock: Dictionary = game.model.data.calendar.clock.duplicate()
 	city._request_leave()
 	expect(game.screen == "playing" and world.at_waystation() and game.model.data.calendar.clock == before_clock,"Rückweg behält Standort und Kampagnenuhr")

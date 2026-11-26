@@ -54,7 +54,7 @@ static func _support(world: Dictionary, uid: String) -> bool:
 	return trust >= 10 and int(member.morale) >= 40 and (member.contract == "voluntary" or trust >= 20)
 
 static func _near(world: Dictionary, actor: String) -> bool:
-	return Life.relationship(world,actor).get("met",false) and Party.player_position(world).distance_to(Life.actor_position(world,actor)) <= Party.REACH
+	return Life.is_available(world,actor) and Life.relationship(world,actor).get("met",false) and Party.player_position(world).distance_to(Life.actor_position(world,actor)) <= Party.REACH
 
 static func reason(world: Dictionary, cmd: String, target: String) -> String:
 	if not available(world) or Party.protected(world) or world.progress.career_terminal:
@@ -147,6 +147,7 @@ static func validate(world: Dictionary) -> String:
 	var last_day := int(world.world_state.time.epoch.jdn)
 	var local := "rome"
 	var gifts := {}
+	var appointed := true
 	for event: Variant in entries:
 		if typeof(event) != TYPE_DICTIONARY or event.size() != 3 or not event.has_all(["target","kind","day"]) or typeof(event.target) != TYPE_STRING or not Calendar.is_integral(event.day):
 			return "Ungültige politische Erklärung."
@@ -160,9 +161,10 @@ static func validate(world: Dictionary) -> String:
 				return "Ungültige doppelte oder ziellose Lieferung."
 			gifts[key] = true
 		elif event.kind == "declare":
-			if event.target == local or (event.target == "service" and local != "rome"):
+			if event.target == local or (event.target == "service" and (local != "rome" or appointed)):
 				return "Widersprüchlicher Wechsel der Gefolgschaft."
-			local = "rome" if event.target == "service" else str(event.target)
+			appointed = event.target == "service"
+			local = "rome" if appointed else str(event.target)
 		else:
 			return "Unbekannte politische Handlung."
 		last_day = int(event.day)

@@ -15,9 +15,10 @@ Das Bildnis verwendet das aktuell sichtbare Figurenmodell und seine tatsächlich
 | Grafikprofile | In Low, Balanced und Very High wurde jeweils von LOD 3 auf 0 gewechselt. Der ausgestattete Körper trug auf jeder Stufe genau einen Wanderstab. |
 | Standbilder | 50 bestandene Prüfungen im grafischen Lauf bei 960 × 640. OpenGL Compatibility unter Mesa llvmpipe. Das Setup platziert die Körper für die Gesprächs- und Übergabeprüfung an begehbaren Punkten. Die Lichtstimmung stammt vom Spielkalender. |
 | Durchgehender Film | 108 aufeinanderfolgende Frames des laufenden Godot-Viewports, 720 × 404, 12 Bilder pro Spielsekunde, 9 Sekunden. Nach dem Einrichten der Kamera und der Startpositionen laufen reale Bewegungs-, Ausrüstungs- und Trainingsbefehle. 48 bestandene Prüfungen einschließlich gemessenem Weg des Begleiters und durchlaufener zweiter Lektion. Die Bildrate ist die Aufnahmezeitbasis. |
-| Decimus | Nach Integration von PR 129 wurden 14 Prüfungen im bestehenden `npc_behavior_ui_test.gd` bestanden, darunter die unveränderte Einführung im älteren Spielstand. |
+| Decimus | Nach Integration von PR 129 und 131 bestanden alle 20 Prüfungen in `npc_behavior_ui_test.gd`, darunter die unveränderte Einführung im älteren Spielstand. |
+| Kleidung und Markt | Der Kampagnenmarkt bestand 24 Prüfungen im grafischen Lauf. Die Szene lud die zivile Figur aus dem ursprünglichen italienischen Figurensatz. Der Figurentest bestand 16 Prüfungen mit beiden installierten Kleidungsvarianten. Die Kleidungsprüfung untersuchte 1.335 Posen je LOD anhand von 60 Hz und zusätzlich 240 Hz beim linken Aufwärtshieb. Sie fand keine gerissenen Dreieckskanten nach dem Prüfkriterium des Generators. Die größte gemessene Durchdringung zwischen Körper und Kleidung betrug 6,23 mm. |
 
-[Gefährtenrad](evidence/befehlsrad.webp) · [Marcus mit Wanderstab](evidence/ausruestung.webp) · [Beaufsichtigte Übung](evidence/uebungsplatz.webp) · [Fähigkeit nach der Übung](evidence/training.webp) · [Film aus Valdora](evidence/valdora-uebung.mp4)
+[Gefährtenrad](evidence/befehlsrad.webp) · [Marcus mit Wanderstab](evidence/ausruestung.webp) · [Beaufsichtigte Übung](evidence/uebungsplatz.webp) · [Fähigkeit nach der Übung](evidence/training.webp) · [Film aus Valdora](evidence/valdora-uebung.mp4) · [Das Kind am Stadtmarkt](evidence/markt-zivilfigur.webp)
 
 ### Wiederholen
 

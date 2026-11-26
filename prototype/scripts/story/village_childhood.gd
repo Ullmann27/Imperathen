@@ -90,6 +90,27 @@ static func enabled(data: Dictionary) -> bool:
 	return typeof(data.get("village")) == TYPE_DICTIONARY and data.village.has("childhood")
 
 
+## Authored childhood remains a permanent record after leaving home.
+static func active(data: Dictionary) -> bool:
+	return enabled(data) and int(data.get("player", {}).get("age", 0)) < 18
+
+
+static func oath_earned(data: Dictionary) -> bool:
+	if not enabled(data) or not data.village.childhood is Dictionary:
+		return false
+	var child: Dictionary = data.village.childhood
+	var script: Variant = child.get("screenplay")
+	return script is Dictionary and child.get("night_event") == "resolved" and script.get("i14") == "complete" and script.get("oath") == true
+
+
+static func adult_paths(data: Dictionary) -> Array:
+	if not oath_earned(data) or bool(data.get("progress", {}).get("career_terminal", false)):
+		return []
+	if active(data):
+		return ["civil", "training"]
+	return ["training"] if data.progress.stage == "civil" else []
+
+
 static func migrate_legacy_ids(data: Dictionary) -> bool:
 	# The first playable childhood build used Antonia/Sextus/Quintus for
 	# mother/father/smith. The production screenplay fixes those roles as
@@ -580,7 +601,7 @@ static func on_raid_finished(data: Dictionary) -> void:
 
 
 static func view(data: Dictionary) -> Dictionary:
-	if not enabled(data) or not validate(data).is_empty():
+	if not active(data) or not validate(data).is_empty():
 		return {}
 	var child: Dictionary = data.village.childhood
 	var step := _current(data)
@@ -700,7 +721,11 @@ static func interactables(data: Dictionary) -> Array[Dictionary]:
 static func validate(data: Dictionary) -> String:
 	if not enabled(data):
 		return ""
-	if data.get("origin_id", "") != "italia" or not data.village.get("enabled", false) or not _integer(data.get("player", {}).get("age"), 12, 12) or data.get("progress", {}).get("years_elapsed", -1) != 0:
+	var adult := _integer(data.get("player", {}).get("age"), 18, 250018)
+	var progress: Dictionary = data.get("progress", {})
+	var entitled: bool = adult and oath_earned(data) and progress.get("stage") not in ["prologue", "settlement"] and _integer(progress.get("years_elapsed"), 6, 250006)
+	var original: bool = _integer(data.get("player", {}).get("age"), 12, 12) and data.get("progress", {}).get("years_elapsed", -1) == 0
+	if data.get("origin_id", "") != "italia" or not data.village.get("enabled", false) or not (original or entitled):
 		return "Dieses Kindheitskapitel beginnt im römischen Dorf mit zwölf Jahren und ohne übersprungene Lebensjahre."
 	var child: Variant = data.village.childhood
 	if not _keys(child,["version","completed","day","carried","relationships","active_work","work_seconds","gear","apprenticeship","night_event","screenplay","guard_absence"]) or not _integer(child.version,VERSION,VERSION):
@@ -964,15 +989,12 @@ static func current_step(data: Dictionary) -> Dictionary:
 ## The finished action can only improve a companion through the existing
 ## WorldModel command that accepted it. The player's authored reward stays
 ## with its original ledger. The optional helper never gates story progress.
-static func credit_party_action(data: Dictionary, action: String) -> String:
-	if CompanionStory.task_roles(action).is_empty():
+static func credit_party_action(data: Dictionary, step: Dictionary, sight: Callable = Callable()) -> String:
+	var id: String = step.id
+	if CompanionStory.task_roles(id).is_empty() or str(current_step(data).get("id", "")) == id:
 		return ""
-	for step: Dictionary in STEPS:
-		if step.id == action:
-			return CompanionStory.credit(data, action, _target(data, step))
-	if BRIDGE_STEPS.has(action):
-		return CompanionStory.credit(data, action, _target(data, BRIDGE_STEPS[action]))
-	return ""
+	return CompanionStory.credit(data, id, _target(data, step), str(step.get("npc", "")), sight)
+
 
 
 static func companion_specs(data: Dictionary) -> Dictionary:
@@ -1072,6 +1094,8 @@ static func _action_reason(data: Dictionary, step: Dictionary) -> String:
 			return "Diese Person ist derzeit nicht im Dorf verfügbar."
 		if not _relation(data, step.npc).get("met", false):
 			return "Lerne diese Person zuerst im Gespräch kennen."
+	if step.id == "i10_choice" and _distance(data, POINTS.father) > NPC_RANGE:
+		return "Kehre für die Nachtentscheidung zu deiner Familie am Haus zurück."
 	if _distance(data, _target(data, step)) > (NPC_RANGE if step.has("npc") else POINT_RANGE):
 		return "Gehe selbst zum angegebenen Menschen oder Arbeitsplatz."
 	if step.has("seconds") and step.id.begins_with("forge_") and not _available(data,"sextus"):

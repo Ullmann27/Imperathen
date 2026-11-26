@@ -806,6 +806,7 @@ func _test_relation_api() -> void:
 	callers.sort()
 	_check(callers == ["res://scripts/domain/tribal_world.gd"], "Only the tribal simulation calls the tribal relation core's writers: " + str(callers))
 	_check(writers.get("city_calls", []) == ["res://scripts/domain/city_social.gd"], "Only the district adapter writes city relations")
+	_check(writers.get("party_projection", []) == ["res://scripts/domain/party_conversations.gd"], "Companion recollections build an unsaved, local opinion projection")
 	_check(raw.is_empty(), "No script edits relation edges directly: " + str(raw))
 	var city := {"version": 2, "residents": [{"known": []}, {"known": []}], "relations": CitySocial.new_shards()}
 	var original_tribes := _json(model.data.tribes.relations)
@@ -824,6 +825,12 @@ func _test_relation_api() -> void:
 	probe = {}
 	_inspect_relations("res://scripts/domain/city_social.gd", "Relations.apply(state.tribes.relations, a, b)", probe)
 	_check(probe.get("calls", []) == ["res://scripts/domain/city_social.gd"], "Even the adapter cannot pass a tribal ledger to the core")
+	var adapter := "res://scripts/domain/party_conversations.gd"
+	for injected: String in ["Relations.apply(world.tribes.relations,a,b)", "var projection := world.tribes.relations\nRelations.apply(projection,a,b)", "var projection := Relations.new_graph()\nprojection = world.tribes.relations\nRelations.apply(projection,a,b)"]:
+		probe = {}
+		_inspect_relations(adapter,"static func opinions(world, uid):\n" + injected,probe)
+		_check(probe.get("calls",[]) == [adapter],"Companion code cannot inject a foreign tribal graph")
+
 
 
 func _scan(path: String, found: Dictionary) -> void:
@@ -852,6 +859,12 @@ func _inspect_relations(file: String, text: String, found: Dictionary) -> void:
 		for call_info in invocation.search_all(text):
 			var is_local := file == "res://scripts/domain/city_social.gd" and call_info.get_string(2).strip_edges() == "graph"
 			var key := "city_calls" if is_local else "calls"
+			if file == "res://scripts/domain/party_conversations.gd" and call_info.get_string(1) == "apply" and call_info.get_string(2).strip_edges() == "projection":
+				var before_call := text.left(call_info.get_start())
+				var body := before_call.substr(before_call.rfind("func "))
+				var fresh := body.begins_with("func opinions(") and body.contains("var projection := " + alias + ".new_graph()")
+				if fresh and RegEx.create_from_string("(?m)^\\s*projection\\s*=").search(body) == null:
+					key = "party_projection"
 			if not found.has(key):
 				found[key] = []
 			if file not in found[key]:

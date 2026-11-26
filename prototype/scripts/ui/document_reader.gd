@@ -1,17 +1,19 @@
 extends VBoxContainer
-## View-only inspection of a single owned mission document.
+## View-only inspection of one actually carried, handled or borrowed mission object.
 const Documents := preload("res://scripts/story/mission_documents.gd")
 const Kit := preload("res://scripts/ui/roman_hud/menu_kit.gd")
 const Style := preload("res://scripts/ui/roman_hud/hud_style.gd")
 
 func build(id: String) -> void:
+	set_meta("story_object",id)
 	var entry: Dictionary = Documents.ENTRIES[id]
-	var toggle := Kit.choice(str(entry.title) + " lesen", 1)
-	toggle.name = "ReadDocument"
+	var action := " lesen" if entry.get("document",false) else " ansehen"
+	var toggle := Kit.choice(str(entry.title) + action, 1)
+	toggle.name = "ReadDocument" if entry.get("document",false) else "InspectObject"
 	toggle.toggle_mode = true
 	add_child(toggle)
 	toggle.toggled.connect(func(open: bool):
-		toggle.text = str(entry.title) + (" schließen" if open else " lesen")
+		toggle.text = str(entry.title) + (" schließen" if open else action)
 		if open:
 			_open(entry)
 		else:
@@ -50,7 +52,8 @@ func _open(entry: Dictionary) -> void:
 	var stage := Node3D.new()
 	viewport.add_child(stage)
 	var scene := load(entry.model) as PackedScene
-	stage.add_child(scene.instantiate())
+	var model := scene.instantiate() as Node3D
+	stage.add_child(model)
 	var lighting := WorldEnvironment.new()
 	var environment := Environment.new()
 	environment.background_mode = Environment.BG_COLOR
@@ -66,15 +69,32 @@ func _open(entry: Dictionary) -> void:
 	stage.add_child(lamp)
 	var camera := Camera3D.new()
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = .245
-	camera.near = .01
+	var bounds := model_bounds(model)
+	var centre := bounds.get_center()
+	var extent := maxf(bounds.size.length(),.02)
+	camera.size = extent * .90
+	camera.near = extent * .012
 	stage.add_child(camera)
-	camera.position = Vector3(.012,.35,.18)
-	camera.look_at(Vector3.ZERO,Vector3.UP)
+	var angle := Vector3(.08,.96,.38) if entry.get("view","") == "flat" else Vector3(.48,.45,.89)
+	camera.position = centre + extent*1.7*angle.normalized()
+	camera.look_at(centre,Vector3.UP)
 	camera.current = true
 	image.resized.connect(func(): viewport.render_target_update_mode = SubViewport.UPDATE_ONCE)
 	var text := Style.label(str(entry.text),20,Style.CHARTA,false,1)
 	text.name = "Transcription"
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	panel.add_child(text)
-	panel.add_child(Style.label(str(entry.mission) + " · Kreative Ausgestaltung des Schriftstücks",14,Style.CHARTA_MUTED,false,1))
+	panel.add_child(Style.label(str(entry.mission) + (" · Kreative Ausgestaltung des Schriftstücks" if entry.get("document",false) else " · Gestalterische Ausarbeitung"),14,Style.CHARTA_MUTED,false,1))
+
+static func model_bounds(model: Node3D) -> AABB:
+	var bounds := AABB()
+	var measured := false
+	var shapes := model.find_children("*","MeshInstance3D",true,false)
+	if model is MeshInstance3D:
+		shapes.append(model)
+	for part: MeshInstance3D in shapes:
+		if part.mesh:
+			var box_in_world := part.global_transform * part.get_aabb()
+			bounds = bounds.merge(box_in_world) if measured else box_in_world
+			measured = true
+	return bounds

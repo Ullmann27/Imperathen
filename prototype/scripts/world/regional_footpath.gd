@@ -78,10 +78,16 @@ void fragment() {
 
 ## Fictional wayside settlement on a spur at the third surveyed waypoint.
 const HAMLET := Vector2(241,119)
+const FREIGHT_DESK := Vector2(235.5,115)
+const GATE_DEPOT := Vector2(51,-9.6)
 const HAMLET_ID := "willow_station"
-const DESTINATIONS := {"mission":"Missionsziel","willow_station":"Weidenhof","stone_quarry":"Alter Steinbruch","home_village":"Valdora"}
+const DESTINATIONS := {"mission":"Missionsziel","willow_station":"Weidenhof","stone_quarry":"Alter Steinbruch","home_village":"Valdora","freight_desk":"Ladetisch am Weidenhof","gate_depot":"Empfang am Osttor"}
 
 static func destination(id: String) -> Vector2:
+	if id == "freight_desk":
+		return FREIGHT_DESK+Vector2(0,-1.35)
+	if id == "gate_depot":
+		return GATE_DEPOT+Vector2(0,-1.35)
 	if id == HAMLET_ID:
 		return HAMLET
 	if id == "stone_quarry":

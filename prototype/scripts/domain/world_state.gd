@@ -399,6 +399,8 @@ static func normalize(world: Dictionary) -> void:
 		record.jdn = int(record.jdn)
 		record.stolen = int(record.stolen)
 		record.booked = _ints(record.booked)
+	for event: Dictionary in state.get("allegiance",[]):
+		event.day = int(event.day)
 	state.military.battle_start_jdn = int(state.military.battle_start_jdn)
 	state.military.battle_end_jdn = int(state.military.battle_end_jdn)
 	for promotion: Dictionary in state.military.promotions:

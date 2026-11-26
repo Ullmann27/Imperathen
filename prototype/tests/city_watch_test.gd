@@ -80,12 +80,20 @@ func _walk_and_reply(visit: City, world: World) -> void:
 	var warned := false
 	var approached := false
 	var approach_start := Vector3.ZERO
+	var followed_frames := 0
 	for i in 550:
 		if patrol.phase == "march":
 			var front: Vector3 = leader.position + patrol._heading*.85
+			if not adult and patrol._warned:
+				front = leader.position - patrol._heading * 4.05
+				var stick: Vector3 = patrol._heading.rotated(Vector3.UP,-visit._yaw)
+				visit._touch_move = Vector2(stick.x,stick.z)
+				followed_frames += 1
 			visit.player.global_position = Vector3(front.x,leader.position.y+visit.SOLE_OFFSET,front.z)
 		elif patrol.phase == "approach" and not approached:
 			approached = true
+			visit._touch_move = Vector2.ZERO
+			visit.player.velocity = Vector3.ZERO
 			approach_start = leader.position
 			var side: Vector3 = patrol._heading.cross(Vector3.UP)
 			visit.player.global_position = leader.position + side*3.2 + Vector3.UP*visit.SOLE_OFFSET
@@ -95,6 +103,8 @@ func _walk_and_reply(visit: City, world: World) -> void:
 		warned = warned or patrol._warned
 	var approached_metres := approach_start.distance_to(leader.position)
 	check(warned,"First obstruction produces a warning")
+	if not adult:
+		check(followed_frames >= 120,"Child fixture continues walking behind the warned column")
 	if not check(approached and patrol.phase == "talk","Continued obstruction halts the column and opens the encounter"):
 		return
 	check(approach_start.distance_to(leader.position) > .8 and patrol._gap(leader)<1.9,"The commander walks up to the player")
@@ -104,8 +114,7 @@ func _walk_and_reply(visit: City, world: World) -> void:
 	if not adult:
 		check(not world.execute("city_watch_reply",{"choice":"resist"}).ok and not patrol._answer.visible,"A child can argue and withdraw safely")
 	if not capture_dir.is_empty() and not adult:
-		camera.global_position = leader.position + Vector3(3.5,2.4,2.2)
-		camera.look_at(leader.position + Vector3.UP*.95)
+		_frame_pair(visit,leader,patrol._heading)
 		await _capture(visit,"marktwache-streit")
 	if adult:
 		var health: int = world.data.player.health
@@ -114,8 +123,7 @@ func _walk_and_reply(visit: City, world: World) -> void:
 		for i in 60:
 			await physics_frame
 			if i == 8 and not capture_dir.is_empty():
-				camera.global_position = leader.position + Vector3(2.1,1.6,3.3)
-				camera.look_at((leader.position+visit.player.position)/2.0 + Vector3.UP*.75)
+				_frame_pair(visit,leader,patrol._heading)
 				await _capture(visit,"marktwache-handgemenge")
 			if patrol.phase != "scuffle":
 				break
@@ -166,6 +174,16 @@ func check(ok: bool,message: String) -> bool:
 		failures.append(message)
 		printerr("FAIL: "+message)
 	return ok
+
+func _frame_pair(visit: City, leader: CharacterBody3D, heading: Vector3) -> void:
+	var feet := visit.player.position - Vector3.UP*visit.SOLE_OFFSET
+	var centre := (leader.position+feet)*.5 + Vector3.UP
+	var axis := (feet-leader.position).normalized()
+	var side := axis.cross(Vector3.UP).normalized()
+	if side.dot(heading) < 0:
+		side = -side
+	visit.camera.position = centre + (side+.25*axis).normalized()*3.6 + Vector3.UP*.35
+	visit.camera.look_at(centre)
 
 func _capture(visit: City, label: String) -> void:
 	# Freeze the live scene and render its current pose from the selected

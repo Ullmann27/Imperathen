@@ -400,6 +400,8 @@ static func validate(data: Dictionary) -> String:
 					return access_error
 	var entrusted := {}
 	for member: Dictionary in data.get("world_state",{}).get("party",{}).get("members",{}).values():
+		for item_id: String in member.get("provisions",{}):
+			entrusted[item_id] = int(entrusted.get(item_id,0))+int(member.provisions[item_id].issued)
 		for item_id: String in member.equipment.values():
 			entrusted[item_id] = int(entrusted.get(item_id,0)) + 1
 	for id: String in Catalog.ITEMS:

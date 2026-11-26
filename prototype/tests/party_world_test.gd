@@ -39,6 +39,7 @@ func _wood_run(model: Model) -> void:
 	party_world.set_active(true)
 	party_world.set_physics_process(false)
 	model.npc_observations = party_world.npc_observations
+	model.npc_sight_check = party_world.npc_sight_clear
 	await physics_frame
 	var walker = party_world._story_companions
 	var marcus: CharacterBody3D = walker.actor("marcus")
@@ -69,6 +70,10 @@ func _wood_run(model: Model) -> void:
 	if not await _arrive(site, bodies, "woodcamp"):
 		return
 	await _capture_group(site, "i04-holzlager")
+	model.capture_npc_observations()
+	var blocked := model.data.duplicate(true)
+	var blocked_feedback := preload("res://scripts/story/companion_story.gd").credit(blocked,"collect_kindling",destination,"",func(_from,_to): return false)
+	_check(blocked_feedback.is_empty() and blocked.world_state.party == model.data.world_state.party,"An occluded mission site awards neither participation nor an eyewitness memory")
 	var before: Dictionary = model.data.resources.duplicate()
 	if not _command(model, "village_childhood_action", {"action_id":"collect_kindling"}):
 		return

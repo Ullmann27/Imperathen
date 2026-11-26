@@ -154,6 +154,8 @@ func _ui(bench: Dictionary) -> void:
 				saw_highland = true
 		check(saw_highland, "Höhenbund uses the authored Germanic swordsman with distinct clothing, weapon and shield")
 		await _capture("gemeinsames-gefecht")
+		if OS.get_cmdline_user_args().size() > 1 and DisplayServer.get_name() != "headless":
+			await _film(scene, OS.get_cmdline_user_args()[1])
 	scene.queue_free()
 	await process_frame
 
@@ -164,3 +166,21 @@ func _capture(name: String) -> void:
 	await RenderingServer.frame_post_draw
 	var directory := OS.get_cmdline_user_args()[0]
 	check(root.get_texture().get_image().save_webp(directory.path_join(name + ".webp"), false, 0.88) == OK, "Engine capture " + name)
+
+
+## Optional consecutive game frames. The exporter controls only the camera
+## and the fixed sampling interval. Combat, wear and deaths still run live.
+func _film(scene: Node, frame_dir: String) -> void:
+	for frame in 75:
+		for tick in 2:
+			scene._process(1.0 / 30.0)
+		var horse: Dictionary = scene.model.squads[UNIT]
+		var enemy: Dictionary = scene.model.squads.ridge_guard
+		var at := Vector2(horse.x + enemy.x, horse.z + enemy.z) * 0.5
+		scene.focus = scene.focus.lerp(at, 0.15)
+		scene._place_camera()
+		await RenderingServer.frame_post_draw
+		var path := frame_dir.path_join("frame-%03d.png" % frame)
+		if root.get_texture().get_image().save_png(path) != OK:
+			check(false, "Could not capture combat frame")
+			return

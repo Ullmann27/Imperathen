@@ -2,8 +2,9 @@ extends RefCounted
 ## Begleitregie aus Missionsmetadaten. Fortschritt und Beziehung stammen aus
 ## vorhandenen Save-Fakten; dieses Modul erzeugt keinen weiteren Spielstand.
 
+const Conversations = preload("res://scripts/domain/party_conversations.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
-const MISSIONS := ["I-04", "I-06", "I-08", "I-09"]
+const MISSIONS := ["I-04", "I-06", "I-07", "I-08", "I-09", "I-13"]
 const ACTORS := ["marcus", "silvanus"]
 static var _catalog: Dictionary = {}
 static var _tasks: Dictionary = {}
@@ -46,20 +47,29 @@ static func task_roles(step: String) -> Dictionary:
 
 ## Only called inside the successful original mission transaction. The physical
 ## observations are supplied by GameWorld, never by the issuing UI command.
-static func credit(data: Dictionary, step: String, site: Vector2) -> String:
+static func credit(data: Dictionary, step: String, site: Vector2, counterpart := "", sight: Callable = Callable()) -> String:
 	var roles := task_roles(step)
 	if roles.is_empty():
 		return ""
 	var feedback := PackedStringArray()
+	var witnesses := {}
 	var members: Dictionary = data.get("world_state", {}).get("party", {}).get("members", {})
 	for uid: String in members:
 		var id := str(data.companion.id) if uid == "pc:companion" else uid.trim_prefix("vil:")
 		var person: Dictionary = members[uid]
 		var role := str(person.assignment)
-		if person.status != "active" or person.order != "assist" or not roles.has(role):
+		if person.status != "active" or person.order not in ["follow","assist"]:
 			continue
 		var observed: Variant = observed_position(data, id)
 		if observed == null or site.distance_to(observed) > 3.5:
+			continue
+		if sight.is_valid():
+			var hero: Array = data.player.position
+			var player_feet := Vector3(hero[0],float(hero[1])-0.9,hero[2])
+			if not sight.call(restored_position(data,id,player_feet),player_feet):
+				continue
+		witnesses[uid] = role if person.order == "assist" and roles.has(role) and id != counterpart else "witness"
+		if witnesses[uid] == "witness":
 			continue
 		var details: Array = roles[role]
 		var skill := str(details[0])
@@ -72,6 +82,9 @@ static func credit(data: Dictionary, step: String, site: Vector2) -> String:
 		if person.memories.size() > 32:
 			person.memories.pop_front()
 		feedback.append("%s %s." % [id.capitalize(), details[1]])
+	var proposal := Conversations.record(data,step,witnesses)
+	if not proposal.is_empty():
+		feedback.append(proposal)
 	return " ".join(feedback)
 
 
@@ -112,8 +125,6 @@ static func dialogue(data: Dictionary, id: String, mission: String, step: String
 
 
 static func _coordinates(data: Dictionary, id: String) -> Array:
-	if not available(data, id):
-		return []
 	var observed: Dictionary = data.village.get("behavior", {}).get("people", {}).get(id, {})
 	if observed.get("observed", false):
 		return observed.position
@@ -121,6 +132,8 @@ static func _coordinates(data: Dictionary, id: String) -> Array:
 
 
 static func observed_position(data: Dictionary, id: String) -> Variant:
+	if not available(data, id):
+		return null
 	var coordinates := _coordinates(data, id)
 	return Vector2(coordinates[0], coordinates[2]) if coordinates.size() == 3 else null
 

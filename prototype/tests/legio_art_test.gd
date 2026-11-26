@@ -48,6 +48,7 @@ func _run_art() -> void:
 	var ui := GameUI.new()
 	root.add_child(ui)
 	ui.show_village_panel(model.data)
+	await process_frame
 	var toggle: Button = ui.find_child("ReadDocument",true,false)
 	_check(is_instance_valid(toggle),"Found held tablet in village inventory")
 	toggle.button_pressed = true

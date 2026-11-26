@@ -292,10 +292,10 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 		_text(ui, today, str(chapter.get("title", "Ein Morgen zu Hause")), 22)
 		_text(ui, today, str(chapter.get("objective", "")), 18)
 		_text(ui, today, "Der nächste Tag beginnt, wenn du zu Hause bewusst schlafen gehst.", 14, true)
-		if not chapter.get("carried", []).is_empty():
+		var held := Documents.held(data)
+		if not held.is_empty():
 			column.add_child(Kit.heading("Bei dir"))
-			_text(ui, column, ", ".join(chapter.carried), 16)
-			for id: String in Documents.held(data):
+			for id: String in held:
 				var reader := Reader.new()
 				column.add_child(reader)
 				reader.build(id)
@@ -485,13 +485,15 @@ static func _map(ui, column: VBoxContainer, data: Dictionary) -> void:
 	map.places = Plan.points_of_interest()
 	map.roads = Plan.roads()
 	column.add_child(map)
-	if Childhood.enabled(data):
+	if data.village.enabled:
 		var goals := HFlowContainer.new()
 		column.add_child(goals)
 		for id: String in Footpath.DESTINATIONS:
 			var name: String = Footpath.DESTINATIONS[id]
 			var button: Button = ui._button("Route · "+name, ui._emit.bind("regional_goal",{"id":id}), false, 14)
 			goals.add_child(button)
+	if data.village.economy.has("freight"):
+		_text(ui,column,preload("res://scripts/domain/regional_freight.gd").status(data.village.economy),15)
 	_text(ui, column, "32 × 32 km · neun Regionen · Gelände wird in Sektoren geladen", 18)
 	_text(ui, column, "Aktueller Ort: %s · %.0f / %.0f m" % [Plan.region_label(map.position_world), position[0], position[2]], 14)
 	var distance := String.num(Footpath.length_m() / 1000.0, 2).replace(".", ",")

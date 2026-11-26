@@ -181,5 +181,26 @@
       "source_mission": "I-07"
     }
   ],
-  "name_note": "Ergänzung: Der unbenannte kranke Wachmann wird durch die bestehende Actor-ID severus dargestellt. Kein Eigenname im Original; Decimus wird nicht zum Kranken umgedeutet. Band 1 · I-07 · Tabelle 10."
+  "name_note": "Ergänzung: Der unbenannte kranke Wachmann wird durch die bestehende Actor-ID severus dargestellt. Kein Eigenname im Original; Decimus wird nicht zum Kranken umgedeutet. Band 1 · I-07 · Tabelle 10.",
+  "party_tasks": {
+    "source": "Kreative Erweiterung zu I-07 · freiwillige Hilfe am Ort des bestehenden Missionsschritts",
+    "steps": {
+      "deliver_medicine": {
+        "aid": [
+          "healing",
+          "hilft bei der Übergabe von Aurelias vorbereitetem Päckchen"
+        ],
+        "carry": [
+          "endurance",
+          "trägt das Versorgungspäckchen mit dir zum Wachmann"
+        ]
+      },
+      "i07_water_bring": {
+        "carry": [
+          "endurance",
+          "stützt den Wasserkrug auf dem Weg zum Torposten"
+        ]
+      }
+    }
+  }
 }

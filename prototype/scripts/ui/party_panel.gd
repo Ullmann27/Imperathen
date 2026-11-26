@@ -1,6 +1,7 @@
 extends RefCounted
 ## Touch wheel and individual folio. All decisions return to the campaign command handler.
 
+const TradeCatalog = preload("res://scripts/city_trade_catalog.gd")
 const Style = preload("res://scripts/ui/roman_hud/hud_style.gd")
 const Kit = preload("res://scripts/ui/roman_hud/menu_kit.gd")
 const Portrait = preload("res://scripts/ui/party_portrait.gd")
@@ -102,7 +103,7 @@ static func show_wheel(ui, data: Dictionary) -> void:
 			button.offset_top = -24
 			button.offset_bottom = 24
 	var controls := _flow(column)
-	if not members.is_empty() or not data.get("allegiance",{}).is_empty():
+	if not data.get("members", []).is_empty() or not data.get("allegiance",{}).is_empty() or not data.get("adult_paths",[]).is_empty():
 		_button(ui, controls, "Gefährten ansehen", ui._emit.bind("party_folio", {}), true)
 	_button(ui, controls, "Zurück ins Spiel", ui._emit.bind("resume", {}))
 
@@ -113,9 +114,12 @@ static func show_folio(ui, data: Dictionary, figures: Dictionary, feedback: Stri
 	var column: VBoxContainer = ui._modal("GEFOLGSCHAFT", "Deine Gefährten", "", 780)
 	if not feedback.is_empty():
 		_text(column, feedback)
+	_show_adult_paths(ui, column, data)
+	var former: Array = data.get("members", []).filter(func(person): return person.get("status") == "dismissed")
 	if members.is_empty():
 		_show_allegiance(ui,column,data)
 		_text(column, "Zurzeit reist niemand mit dir.")
+		_former_members(column, former)
 		_button(ui, column, "Zurück ins Spiel", ui._emit.bind("resume", {}))
 		return
 	var picker := _picker(column, members, ui.party_target, false, func(value: String):
@@ -143,10 +147,11 @@ static func show_folio(ui, data: Dictionary, figures: Dictionary, feedback: Stri
 	if location is Array and location.size() >= 2:
 		location = "Valdora · %.0f / %.0f" % [location[0], location[-1]]
 	_text(details, str(location))
-	_text(details, "Proviant für %d Tage  ·  %d Denare pro Tag" % [int(person.rations), int(person.wage)])
+	_text(details, "Nahrung für %d Tage · Wasser für %d Reisetage · Tageslohn %d Denare" % [int(person.get("food_days",person.rations)),int(person.get("water_days",0)),int(person.wage)])
 	var order := str(person.get("order", ""))
 	var task := str(person.get("assignment", ""))
 	_text(details, "%s · %s" % [ORDERS.get(order, "Übt am Platz" if order == "train" else order), TASKS.get(task, "Ohne Aufgabe")])
+	_show_exchange(ui,column,person)
 	column.add_child(Kit.heading("Aufgaben"))
 	var tasks := _flow(column)
 	for id: String in TASKS:
@@ -163,6 +168,8 @@ static func show_folio(ui, data: Dictionary, figures: Dictionary, feedback: Stri
 	column.add_child(Kit.heading("Gepäck und Proviant"))
 	var gear := _flow(column)
 	_action(ui, gear, "Eine Ration geben", "party_supply", {"actor_uid":uid,"quantity":1})
+	for item: String in person.get("market_provisions",[]):
+		_action(ui,gear,str(TradeCatalog.ITEMS[item].name)+" mitgeben","party_provision",{"actor_uid":uid,"item_id":item,"quantity":1})
 	var equipment: Dictionary = person.get("equipment", {})
 	var options: Array = person.get("items", []).duplicate()
 	for value in equipment.values():
@@ -193,10 +200,50 @@ static func show_folio(ui, data: Dictionary, figures: Dictionary, feedback: Stri
 			elif memory is Dictionary:
 				_text(column, str(memory.get("text", memory.get("label", ""))))
 	_show_allegiance(ui,column,data)
+	_former_members(column, former)
 	var controls := _flow(column)
 	_button(ui, controls, "Befehlsrad", ui._emit.bind("party_wheel", {}))
 	_action(ui, controls, "Getrennte Wege vereinbaren", "party_dismiss", {"actor_uid":uid})
 	_button(ui, controls, "Zurück ins Spiel", ui._emit.bind("resume", {}), true)
+
+
+static func _former_members(column: Control, people: Array) -> void:
+	if people.is_empty():
+		return
+	column.add_child(Kit.heading("Frühere Weggefährten"))
+	for person: Dictionary in people:
+		var fate := "Verstorben" if int(person.health) <= 0 else "Getrennte Wege"
+		_text(column, "%s · %s" % [person.name, fate])
+
+
+static func _show_adult_paths(ui, column: Control, data: Dictionary) -> void:
+	var paths: Array = data.get("adult_paths", [])
+	if paths.is_empty():
+		return
+	column.add_child(Kit.heading("Dein Lebensweg"))
+	var choices := _flow(column)
+	if paths.has("civil"):
+		_action(ui, choices, "Sechs Jahre später · Zivilleben", "choose_adult_path", {"path":"civil"})
+		_action(ui, choices, "Sechs Jahre später · Wachausbildung", "choose_adult_path", {"path":"training"})
+	else:
+		_action(ui, choices, "Die Wachausbildung aufnehmen", "choose_adult_path", {"path":"training"})
+
+
+static func _show_exchange(ui, column: Control, person: Dictionary) -> void:
+	var scene: Dictionary = person.get("conversation",{})
+	if scene.get("entries",[]).is_empty():
+		return
+	column.add_child(Kit.heading("Unterwegs erlebt"))
+	for entry: String in scene.entries.slice(-3):
+		_text(column,entry)
+	for contact: String in scene.contacts:
+		_text(column,contact)
+	var offer: Dictionary = scene.offer
+	if not offer.is_empty():
+		_text(column,"%s · »%s«" % [person.name,offer.line])
+		var replies := _flow(column)
+		_action(ui,replies,"Einverstanden","party_exchange",{"actor_uid":person.actor_uid,"step":offer.step,"choice":"accept"})
+		_action(ui,replies,"Bisherige Aufgabe behalten","party_exchange",{"actor_uid":person.actor_uid,"step":offer.step,"choice":"decline"})
 
 
 static func _show_allegiance(ui, column: Control, data: Dictionary) -> void:

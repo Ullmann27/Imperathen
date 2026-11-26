@@ -138,9 +138,9 @@ static func _apply(data: Dictionary, command: String, args: Dictionary) -> Dicti
 				_begin_warning(data, true)
 				_resolve_hidden_childhood_raid(data)
 		return result
-	if Childhood.enabled(data) and command in ["village_learn", "village_ally"]:
+	if Childhood.active(data) and command in ["village_learn", "village_ally"]:
 		return _fail("Deine erste Lehre und dein Vertrauen entstehen in den gemeinsamen Kindheitsaufgaben, nicht durch einen sofortigen Karrierewechsel.")
-	if Childhood.enabled(data) and command == "village_talk" and args.choice != "meet":
+	if Childhood.active(data) and command == "village_talk" and args.choice != "meet":
 		return _fail("Im Kindheitskapitel entstehen Hilfe und Vertrauen durch eure vereinbarten Wege und Übergaben. Sprich über deinen aktuellen Auftrag.")
 	if command in ["village_talk", "village_learn", "village_ally"]:
 		var id: String = args.npc_id
@@ -673,7 +673,7 @@ static func view(data: Dictionary) -> Dictionary:
 
 
 static func dialogue(data: Dictionary, npc_id: String) -> Dictionary:
-	if Childhood.enabled(data):
+	if Childhood.active(data) or Childhood.has_npc(data, npc_id):
 		return Childhood.dialogue(data, npc_id)
 	if not NPCS.has(npc_id) or not validate(data).is_empty():
 		return {}
@@ -807,7 +807,7 @@ static func _trajan_rules(data: Dictionary) -> bool:
 
 
 static func _greeting(data: Dictionary, id: String) -> String:
-	if Childhood.enabled(data):
+	if Childhood.active(data) or Childhood.has_npc(data, id):
 		return str(Childhood.dialogue(data, id).get("text", ""))
 	if id=="decimus" and not _trajan_rules(data):
 		return "Die örtliche Verwaltung trägt hier die Verantwortung. Hilf beim Wiederaufbau und lerne die Menschen kennen. Vertrauen verdienst du dir mit Taten."

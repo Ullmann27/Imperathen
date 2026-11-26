@@ -58,6 +58,7 @@ func _run() -> void:
 	_check(str(ambient.text) == "Der Markt ist heute geöffnet.", "Decoration leaves the original dialogue object unchanged")
 	model.new_game("italia", true)
 	_check(session._npc_dialog("decimus") == Life.dialogue(model.data, "decimus"), "Legacy saves retain their existing conversation")
+	_check_legacy_decimus(session, model)
 	ui.queue_free()
 	session.free()
 	await process_frame
@@ -66,6 +67,31 @@ func _run() -> void:
 	print("NPC_BEHAVIOR_UI_RESULT checks=%d failures=%d" % [checks, failures.size()])
 	print("NPC_BEHAVIOR_UI_PASS" if failures.is_empty() else "NPC_BEHAVIOR_UI_FAIL")
 	quit(0 if failures.is_empty() else 1)
+
+
+## File emitted by WorldModel.save_game in a clean 3f61a2d9 checkout after
+## new_game("italia", true). Exercise the real v6 envelope and party migration.
+func _check_legacy_decimus(session: Node, model: RefCounted) -> void:
+	var path := "user://decimus_pr127_%d.json" % Time.get_ticks_usec()
+	var copy := DirAccess.copy_absolute(
+		ProjectSettings.globalize_path("res://tests/fixtures/decimus_pr127_v6.json"),
+		ProjectSettings.globalize_path(path))
+	_check(copy == OK, "The untouched PR 127 envelope is copied to an isolated save slot")
+	if copy != OK:
+		return
+	var loaded: Dictionary = model.load_game(path)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	_check(loaded.ok, "The real pre-party Decimus career loads: " + str(loaded.message))
+	if not loaded.ok:
+		return
+	_check(not Life.relationship(model.data, "decimus").met and session._npc_dialog("decimus") == Life.dialogue(model.data, "decimus"), "A saved first encounter keeps every Decimus line and choice after migration")
+	var at := Life.actor_position(model.data, "decimus")
+	model.set_player_position(Vector3(at.x, 0.92, at.y))
+	_check(model.execute("village_talk", {"npc_id":"decimus", "choice":"meet"}).ok, "The old career can introduce itself to Decimus in the village")
+	var original: Dictionary = Life.dialogue(model.data, "decimus")
+	var shown: Dictionary = session._npc_dialog("decimus")
+	_check(shown.text.begins_with(original.text) and shown.choices.slice(0, original.choices.size()) == original.choices, "After meeting, the continuation still contains the original exchange")
+	_check(shown.choices.any(func(choice: Dictionary) -> bool: return choice.get("command", "") == "politics_help"), "The same conversation now offers Decimus' local errand")
 
 
 func _labels(ui: CanvasLayer) -> String:

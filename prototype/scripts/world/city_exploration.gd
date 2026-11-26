@@ -107,6 +107,7 @@ var _pause_panel := PanelContainer.new()
 var _pad: Control
 var _look: Control
 var _toolbar: HBoxContainer
+var street_chart := preload("res://scripts/ui/roman_hud/city_route_chart.gd").new()
 var _trade_bar: HBoxContainer
 var _trade_button: Button
 var _bag_button: Button
@@ -562,6 +563,10 @@ func _build_ui() -> void:
 	_bag_button.disabled = true
 	_trade_bar.add_child(_trade_button)
 	_trade_bar.add_child(_bag_button)
+	add_child(street_chart)
+	_trade_bar.add_child(_button("Stadtplan",func():
+		if market.available:
+			street_chart.open_chart(player,market.sites,living_city.life.streets if living_city != null else null)))
 	_safe.add_child(_trade_bar)
 	_pad = TouchPad.new()
 	_pad.axis_changed.connect(func(axis: Vector2): _touch_move=axis)
@@ -651,6 +656,8 @@ func _physics_process(delta: float) -> void:
 	var direction := Vector3(axis.x,0,axis.y).rotated(Vector3.UP,_yaw)
 	var running := _running or Input.is_physical_key_pressed(KEY_SHIFT)
 	if riding_trial != null and riding_trial.advance(delta, axis, _yaw, running):
+		if is_instance_valid(street_watch):
+			street_watch.tick(delta)
 		_place_camera(delta)
 		return
 	var speed := RUN_SPEED if running else WALK_SPEED
@@ -679,7 +686,7 @@ func _physics_process(delta: float) -> void:
 	if player.position.y < -8:
 		teleport(State.SPAWN)
 	if campaign != null and market.available:
-		party_visit.advance(self, player, campaign.data.world_state.party.members, delta)
+		party_visit.advance(self, player, campaign.data, delta)
 	if is_instance_valid(street_watch):
 		street_watch.tick(delta)
 	var actual := (player.position-previous_position)/maxf(delta,0.000001)
@@ -890,6 +897,8 @@ func _interact() -> void:
 	if riding_trial != null and _action_left <= 0.0 and riding_trial.controller.request_interact():
 		return
 	if _tablet_is_near():
+		if is_instance_valid(street_watch):
+			street_watch.suspend()
 		_touch_move = Vector2.ZERO
 		_pad.reset()
 		_look.reset()

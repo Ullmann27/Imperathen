@@ -200,13 +200,15 @@ func _build() -> void:
 
 
 func _make_carried() -> void:
-	_armful = _armful_node("CarriedArmful", 9)
-	_armful.visible = false
-	add_child(_armful)
-	_note = Node3D.new()
-	_note.name = "WaxTablet"
-	_note.visible = false
-	add_child(_note)
+	if not is_instance_valid(_armful):
+		_armful = _armful_node("CarriedArmful", 9)
+		_armful.visible = false
+		add_child(_armful)
+	if not is_instance_valid(_note):
+		_note = Node3D.new()
+		_note.name = "WaxTablet"
+		_note.visible = false
+		add_child(_note)
 
 
 ## Called from GameWorld.sync_state with the authoritative state; `index` is
@@ -236,7 +238,7 @@ func sync_state(state: Dictionary, figure: Node3D, index: int, trial_index: int)
 	_bundle[I04.STICKS].visible = delivered
 	_tongs.visible = status in ["pending", "complete"] and completed >= index and completed <= trial_index and (not str(s.get("i04_topic", "")).is_empty() or _talk_open(s))
 	_nail.visible = I04.nail_kept(state)
-	var held := Documents.held(state)
+	var held := Documents.held_documents(state)
 	var noted := not held.is_empty()
 	if noted and str(_note.get_meta("document_id","")) != held[0]:
 		for old in _note.get_children():

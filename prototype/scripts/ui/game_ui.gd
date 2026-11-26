@@ -712,7 +712,7 @@ func update_state(state: Dictionary) -> void:
 	_hud_labels["time"].text = "TAG %d  ·  %02d:%02d" % [seconds / 86400 + 1, (seconds / 3600) % 24, (seconds / 60) % 60]
 	if state.get("village", {}).get("enabled", false):
 		_hud_labels["time"].text = "DORFTAG %d" % int(state.village_economy_view.get("day", 1))
-	if Childhood.enabled(state):
+	if Childhood.active(state):
 		_hud_labels["time"].text = "TAG %d · %d JAHRE" % [int(state.get("childhood_view", Childhood.view(state)).get("day", 1)), int(player.get("age", 12))]
 	# The date of the one world clock (58 v. Chr. in the campaign) leads the
 	# line; the technical day counter of worlds without a village gives way.
@@ -727,13 +727,13 @@ func update_state(state: Dictionary) -> void:
 	_hud_labels["health"].text = "Lebenskraft   %d / 100" % int(health)
 	_hud_labels["companion"].text = "%s · Vertrauen %+d" % [_companion_name(state), int(companion.get("trust", 0))] if bool(companion.get("met", false)) else "%s wartet im Dorf." % _companion_name(state)
 	_hud_labels["squad"].text = "Truppe   %d / %d am Leben\nMoral   %d / 100" % [int(squad.get("alive", 0)), int(squad.get("recruits", 0)), int(squad.get("morale", 0))]
-	if Childhood.enabled(state):
+	if Childhood.active(state):
 		# A twelve-year-old has a family, not a troop (HB 3.0 S. 13/44).
 		_hud_labels["squad"].text = _family_line(state)
 	var stamina := float(CombatActions.view(state).get("stamina", 100.0)) if CombatActions.enabled(state) else 100.0
 	if _hud_labels.has("compact_life"):
 		_hud_labels["compact_life"].text = "Leben %d/100  ·  Truppe %d/%d" % [int(health), int(squad.get("alive", 0)), int(squad.get("recruits", 0))]
-		if Childhood.enabled(state):
+		if Childhood.active(state):
 			_hud_labels["compact_life"].text = "Leben %d · Ausdauer %d" % [int(health), int(stamina)]
 			if _child_first_mission(state):
 				var carried: Array = state.get("childhood_view", {}).get("carried", [])
@@ -764,10 +764,12 @@ func update_state(state: Dictionary) -> void:
 		_action_buttons["train"].disabled = _action_buttons["train"].disabled or not bool(state.get("village_view", {}).get("training_ready", false))
 	_action_buttons["recruit"].disabled = not trained or int(state.get("population", {}).get("workers", 0)) <= 0 or int(resources.get("denarii", 0)) < 5 or int(resources.get("grain", 0)) < 2 or ended
 	_action_buttons["skirmish"].disabled = not trained or int(squad.get("alive", 0)) <= 0 or bool(encounter.get("active", false)) or bool(progress.get("skirmish_won", false)) or ended
-	if Childhood.enabled(state):
-		# No military menu for the child (HB 3.0 S. 13: "Keine Waffe und kein Militärmenü").
-		for key in ["build", "train", "recruit", "skirmish"]:
-			_action_buttons[key].hide()
+	# The same HUD can outlive the transition from childhood to adulthood.
+	for key in ["build", "train", "recruit", "skirmish"]:
+		_action_buttons[key].visible = not Childhood.active(state)
+	if Childhood.enabled(state) and not Childhood.active(state):
+		_action_buttons["train"].visible = progress.stage == "civil"
+		_action_buttons["train"].disabled = false
 	var calm_child := _child_first_mission(state)
 	for metric: String in ["wood", "grain", "denarii"]:
 		# The village stock is not the child's property; it stays in the village
@@ -819,7 +821,7 @@ func _danger(state: Dictionary) -> bool:
 ## I-01 for the child: no combat buttons, no troop/morale, no village stock on
 ## screen unless danger is actually present (HB 3.0 S. 13 and S. 44).
 func _child_first_mission(state: Dictionary) -> bool:
-	if not Childhood.enabled(state):
+	if not Childhood.active(state):
 		return false
 	if bool(state.get("village", {}).get("raid", {}).get("active", false)) or bool(state.get("encounter", {}).get("active", false)):
 		return false
@@ -838,7 +840,7 @@ func _family_line(state: Dictionary) -> String:
 func show_pause() -> void:
 	_open_screen("pause", true)
 	var area := _area()
-	var child := Childhood.enabled(_state)
+	var child := Childhood.active(_state)
 	var wide := area.x >= 880.0 and area.x > area.y
 	var width := minf(430.0, area.x - 32.0)
 	var margin := clampf(minf(area.x, area.y) * 0.05, 16.0, 56.0)
@@ -931,7 +933,7 @@ func _pause_situation(rect: Rect2) -> void:
 	column.add_child(MenuKit.Rule.new())
 	var player: Dictionary = _state.get("player", {})
 	var lines: Array[String] = ["%d Jahre · Leben %d / 100" % [int(player.get("age", 12)), int(player.get("health", 100))]]
-	if Childhood.enabled(_state):
+	if Childhood.active(_state):
 		lines.append(_family_line(_state).replace("\n", " · "))
 	var companion: Dictionary = _state.get("companion", {})
 	if bool(companion.get("met", false)):
@@ -1090,7 +1092,7 @@ func update_navigation(value: Dictionary) -> void:
 	# compass steps aside; it returns as soon as either is outside.
 	var in_home := func(point: Variant) -> bool:
 		return typeof(point) == TYPE_VECTOR2 and FAMILY_HOME.has_point(point)
-	_navigation.visible = not (_child_first_mission(_state) and in_home.call(value.get("player")) and in_home.call(value.get("target")))
+	_navigation.visible = (Childhood.active(_state) or value.has("destination_name")) and not (_child_first_mission(_state) and in_home.call(value.get("player")) and in_home.call(value.get("target")))
 	if not _navigation.visible and is_instance_valid(_local_map):
 		_local_map.hide()
 
@@ -1562,12 +1564,12 @@ func _build_navigation() -> void:
 	_alert = HudStyle.kicker("", HudStyle.TYPE_CAPTION, HudStyle.MINIUM.lightened(0.25))
 	_alert.name = "AlertLine"
 	_alert.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_alert.position = Vector2(rect.position.x - 60.0, rect.end.y + (14.0 if Childhood.enabled(_state) else -26.0))
+	_alert.position = Vector2(rect.position.x - 60.0, rect.end.y + (14.0 if Childhood.active(_state) else -26.0))
 	_alert.size = Vector2(rect.size.x + 120.0, 18.0)
 	_alert.visible = false
 	_screen.add_child(_alert)
 	_hud_labels["status"] = _alert
-	if not Childhood.enabled(_state):
+	if not _state.get("village",{}).get("enabled",false):
 		return
 	_navigation = CompassRibbon.new()
 	_navigation.name = "VillageCompass"
@@ -2543,7 +2545,14 @@ func _objective(state: Dictionary) -> Array[String]:
 	var stage := String(progress.get("stage", "prologue"))
 	if stage == "fallen":
 		return ["Dein Weg ist zu Ende", "Du bist im Kampf gefallen. Im Menü kannst du einen gespeicherten Stand laden oder ein neues Leben beginnen."]
-	if Childhood.enabled(state):
+	if Childhood.oath_earned(state):
+		if Childhood.active(state):
+			return ["Nach dem Schwur", "Wenn du bereit bist, öffne Gefolgschaft → Lebensweg. Du entscheidest, wie du nach sechs Jahren in Valdora weiterlebst."]
+		if stage == "civil":
+			return ["Ein Leben in Valdora", "Pflege deine Beziehungen, arbeite im Dorf oder reise. Die Wachausbildung steht dir im Gefolgschaftsbuch offen."]
+		if stage == "training":
+			return ["Beim Wachausbilder", "Triff den Übungspfahl am nördlichen Platz dreimal. Übungstreffer: %d / 3." % int(progress.training_hits)]
+	if Childhood.active(state):
 		var childhood: Dictionary = state.get("childhood_view", Childhood.view(state))
 		# Occasion and place, not a technical mission ID (HB 3.0 S. 44).
 		return [str(childhood.get("hud_title", childhood.get("title", "Ein Morgen zu Hause"))), str(childhood.get("objective", "Sprich mit deiner Mutter vor dem Haus."))]
@@ -2564,7 +2573,7 @@ func _objective(state: Dictionary) -> Array[String]:
 	if bool(progress.get("skirmish_won", false)):
 		return ["Was bleibt nach dem Sieg?", "Die Verteidigung ist entschieden. Deine nächste Wahl bestimmt den Abschluss dieses Abschnitts."]
 	var buildings: Array = state.get("buildings", [])
-	if buildings.is_empty():
+	if buildings.is_empty() and not Childhood.oath_earned(state):
 		if int(state.get("resources", {}).get("wood", 0)) < 8:
 			return ["Ein Dach für die Nacht", "Gehe zu den Holzstellen. Mit %s sammelst du Holz. Deine erste Hütte braucht acht Holz." % ("„Interagieren“" if _touch_enabled else "E")]
 		return ["Dein erster Bauplatz", "Wähle „Hütte“ und danach eine freie Fläche im markierten Baugebiet."]
@@ -2591,6 +2600,7 @@ static func world_date_text(state: Dictionary) -> String:
 
 func _career_name(stage: String) -> String:
 	match stage:
+		"civil": return "Zivilleben"
 		"training": return "In Ausbildung"
 		"trained": return "Ausgebildet"
 		"skirmish", "aftermath": return "Truppenführer"

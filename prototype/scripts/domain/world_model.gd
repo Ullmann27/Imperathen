@@ -53,12 +53,12 @@ const WORK_RANGE := 4.5
 const ENEMY_RANGE := 2.3
 const ATTACK_COOLDOWN := 0.6
 const DAMAGE_COOLDOWN := 1.25
-const STAGES := ["prologue", "settlement", "training", "trained", "skirmish", "aftermath", "ended", "fallen"]
+const STAGES := ["prologue", "settlement", "civil", "training", "trained", "skirmish", "aftermath", "ended", "fallen"]
 const NODE_POSITIONS := [[-8.0, 2.0], [-11.0, -3.0], [-5.0, -7.0]]
 const ENEMY_POSITIONS := [[6.0, -10.0], [10.0, -11.0], [14.0, -10.0]]
 const COMMAND_FIELDS := {
 	"gather": ["node_id"], "choose_companion": ["choice"], "build": ["x", "z"],
-	"train": [], "training_hit": [], "recruit": [], "start_skirmish": [],
+	"choose_adult_path": ["path"], "train": [], "training_hit": [], "recruit": [], "start_skirmish": [],
 	"strike_enemy": ["enemy_id"], "receive_damage": ["amount"],
 	"resolve_skirmish": [], "choose_story": ["choice"],
 	"frontier_talk": ["npc_id"], "frontier_choice": ["npc_id", "choice"]
@@ -655,7 +655,9 @@ func checkpoint_valley(battle) -> bool:
 	var previous_steps := int(previous.get("snapshot", {}).get("steps", 0))
 	if battle.steps < previous_steps or previous.get("outcome","ongoing") != "ongoing":
 		return false
-	data.world_seconds += (battle.steps - previous_steps) * BattleModel.STEP
+	if battle.steps > previous_steps:
+		data.world_seconds += (battle.steps - previous_steps) * BattleModel.STEP
+		NpcBehavior.resume_after_interlude(data)
 	# The muster is dated before the battle's own seconds count.
 	WorldState.battle_started(data)
 	data.valley = {"snapshot":battle.snapshot(), "outcome":battle.outcome,
@@ -851,12 +853,38 @@ func _time_jump(state: Dictionary, years: int, reason: String) -> Dictionary:
 	var aged: Dictionary = outcome.world.domains.characters.actors
 	if int(aged.player.age) != int(state.player.age) or int(aged.companion.age) != int(state.companion.age):
 		return _fail("Zeitsprung und Weltuhr ergeben verschiedene Alter; der Sprung wurde verworfen.")
+	state.world_seconds = float(state.world_seconds) + years * YEAR_SECONDS
+	NpcBehavior.resume_after_interlude(state)
 	var changes := 0
 	for entry: Dictionary in outcome.ledger:
 		if entry.domain == "characters":
 			changes += 1
 	return {"ok": true, "message": reason, "days": days, "digest": str(outcome.digest),
 		"summary": "%d Tage, %d Altersschritte; nicht simuliert: Beziehungen, Siedlungen, Besitz, Politik, Ausrüstung (unverändert)." % [days, changes]}
+
+
+## Either choice books the same six calendar years exactly once. The later
+## civilian enrolment only changes occupation. Rank is earned at the target.
+func _choose_adult_path(state: Dictionary, path: String) -> Dictionary:
+	if path not in Childhood.adult_paths(state):
+		return _fail("Diesen Lebensweg kannst du nach deinem Schwur am Waldrand wählen.")
+	if state.village.raid.status in ["warning", "active"] or state.encounter.active:
+		return _fail("Kläre zuerst die unmittelbare Gefahr im Dorf.")
+	if path == "training" and Allegiance.affiliation(state) != "rome":
+		return _fail("Für diesen Wachdienst benötigst du die Zustimmung der römischen Verwaltung.")
+	var narrative := ""
+	if Childhood.active(state):
+		var jump := _time_jump(state, 6, "Sechs Jahre in Valdora nach dem Schwur")
+		if not jump.ok:
+			return jump
+		narrative = "Sechs Jahre später, %s. " % WorldClock.view(state).date_label
+	state.progress.stage = "civil" if path == "civil" else "training"
+	state.player.role = "civilian" if path == "civil" else "trainee"
+	var title := "Ein Leben in Valdora" if path == "civil" else "Beim Wachausbilder"
+	var next := "Du gehst deiner Arbeit nach und kannst mit deinen Gefährten reisen." if path == "civil" else "Die Ausbildung beginnt. Übe am Pfahl im Norden drei kontrollierte Treffer."
+	_set_story(state, title, next)
+	_record(state, narrative + next)
+	return _ok(narrative + next)
 
 
 func _apply_training_contact(state: Dictionary) -> Dictionary:
@@ -882,6 +910,7 @@ func _apply_training_contact(state: Dictionary) -> Dictionary:
 func party_view() -> Dictionary:
 	var view := Party.view(data)
 	view.allegiance = Allegiance.view(data)
+	view.adult_paths = Childhood.adult_paths(data)
 	return view
 
 
@@ -892,7 +921,7 @@ func politics_view() -> Dictionary:
 func _apply_command(state: Dictionary, command: String, args: Dictionary, sites: Dictionary, quote: Dictionary) -> Dictionary:
 	if Allegiance.COMMAND_FIELDS.has(command):
 		return Allegiance.apply(state,command,args)
-	if command in ["recruit","start_skirmish"] and not Allegiance.roman_command(state):
+	if command in ["recruit","start_skirmish","city_issue_service"] and not Allegiance.roman_command(state):
 		return _fail("Dieses militärische Kommando erfordert eine römische Ernennung.")
 	if CityWatch.COMMAND_FIELDS.has(command):
 		var observation: Dictionary = city_watch_observation.call() if city_watch_observation.is_valid() else {}
@@ -920,7 +949,7 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary, sites:
 	if command.begins_with("village_"):
 		if not state.village.enabled:
 			return _fail("Dieser Lebensweg verwendet den bisherigen regionalen Dorfabschnitt.")
-		if Childhood.enabled(state) and command in ["village_request_work","village_assign","village_shift","village_repair","village_resow"]:
+		if Childhood.active(state) and command in ["village_request_work","village_assign","village_shift","village_repair","village_resow"]:
 			return _fail("Die Erwachsenen organisieren das Dorf. Du hilfst mit deinen eigenen Aufträgen und lernst ihre Arbeit kennen.")
 		if command in ["village_assign", "village_shift"] and Party.travelling(state, "vil:" + str(args.resident_id)):
 			return _fail("Diese Person reist gerade mit dir.")
@@ -928,13 +957,16 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary, sites:
 			return _fail("Diese Person gehört bereits zum angeworbenen Trupp und kann nicht zugleich eine Dorfstelle übernehmen.")
 		var village_result: Dictionary
 		var previous_health := int(state.player.health)
+		var group_step := {}
+		if command == "village_childhood_action" and not state.world_state.party.members.is_empty():
+			group_step = Childhood.current_step(state)
 		if VillageEconomy.COMMAND_FIELDS.has(command):
 			village_result = VillageEconomy.execute(state, command, args)
 		else:
 			village_result = VillageLife.execute(state, command, args)
 		state.village.health_delta += int(state.player.health) - previous_health
-		if village_result.ok and command == "village_childhood_action":
-			var shared := Childhood.credit_party_action(state, str(args.action_id))
+		if village_result.ok and not group_step.is_empty():
+			var shared := Childhood.credit_party_action(state, group_step,npc_sight_check)
 			if not shared.is_empty():
 				village_result.message += " " + shared
 		if village_result.get("ok", false) and command not in ["village_strike", "village_block", "village_dodge", "village_unarmed_attack", "village_unarmed_guard", "village_unarmed_dodge"]:
@@ -982,7 +1014,7 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary, sites:
 			_record(state, "Du behältst dein Holz. Marcus sucht seinen eigenen Weg.")
 			return _ok("Du lehnst ab. Marcus merkt sich deine Entscheidung.")
 		"build":
-			if Childhood.enabled(state) and state.village.childhood.night_event!="released":
+			if Childhood.active(state) and state.village.childhood.night_event!="released":
 				return _fail("Deine Familie hat ein Zuhause. Lerne zuerst das Dorf und seine Handwerker kennen.")
 			var x := float(args.x)
 			var z := float(args.z)
@@ -999,9 +1031,13 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary, sites:
 			state.buildings.append({"id": "hut_%d" % (state.buildings.size() + 1), "x": x, "z": z, "progress": 0.0, "completed": false})
 			_record(state, "Du setzt einen Bauauftrag und verbrauchst acht Holz. Die Arbeit beginnt erst bei deiner Anwesenheit.")
 			return _ok("Bauauftrag gesetzt. Bleibe für die Arbeit höchstens 4,5 Meter entfernt.")
+		"choose_adult_path":
+			return _choose_adult_path(state, args.path)
 		"train":
 			if Childhood.enabled(state):
-				return _fail("Du bleibst zwölf. Am Übungspfahl kannst du Fausttechniken lernen; ein Sprung in die erwachsene Militärlaufbahn findet hier nicht statt.")
+				if state.progress.stage == "civil" and _distance_to(state, 0.0, -7.0) <= INTERACTION_RANGE:
+					return _choose_adult_path(state, "training")
+				return _fail("Nach deinem Schwur kannst du im Gefolgschaftsbuch deinen Lebensweg wählen.")
 			if state.player.age >= 18:
 				return _fail("Du befindest dich bereits im erwachsenen Ausbildungsabschnitt.")
 			if state.village.enabled and state.village.raid.status in ["warning", "active"]:
@@ -1018,8 +1054,6 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary, sites:
 			var jump := _time_jump(state, 6, "Sechs Jahre später: Ausbildung zum Soldaten")
 			if not jump.ok:
 				return jump
-			# world_seconds stays the technical simulation clock of the village systems.
-			state.world_seconds = float(state.world_seconds) + 6.0 * YEAR_SECONDS
 			state.player.role = "trainee"
 			state.progress.stage = "training"
 			_record(state, "Sechs Jahre später (%s): Du und Marcus sind erwachsen. Deine Unterkunft und deine frühere Entscheidung bleiben Teil dieser Welt. %s" % [WorldClock.view(state).date_label, jump.summary])
@@ -1201,6 +1235,9 @@ func _validate_arguments(command: String, args: Dictionary) -> String:
 		var key := "node_id" if command == "gather" else "enemy_id"
 		if not _text(args[key], 1, 64):
 			return "Eine gültige Zielkennung fehlt."
+	elif command == "choose_adult_path":
+		if not _text(args.path, 1, 16) or args.path not in ["civil", "training"]:
+			return "Wähle das Zivilleben oder die Ausbildung."
 	elif command == "choose_companion":
 		if not _text(args.choice, 1, 16) or args.choice not in ["help", "decline"]:
 			return "Wähle Hilfe oder Ablehnung."
@@ -1304,11 +1341,15 @@ func _validate_state(state: Variant) -> String:
 	if float(state.world_seconds) < float(jumps) * 6.0 * YEAR_SECONDS:
 		return "Der Alterssprung fehlt in der gemeinsamen Weltzeit."
 	var expected_role := "child" if not adult else ("trainee" if progress.stage == "training" else "soldier")
+	if progress.stage == "civil":
+		if not Childhood.oath_earned(state):
+			return "Das Zivilleben in Valdora setzt den Schwur am Waldrand voraus."
+		expected_role = "civilian"
 	if state.player.role != expected_role:
 		return "Die Rolle passt nicht zur Ausbildung."
 	if progress.training_complete != (int(progress.training_hits) == 3) or progress.training_complete != (progress.stage in ["trained", "skirmish", "aftermath", "ended", "fallen"]):
 		return "Ausbildung und Phase widersprechen sich."
-	if (not adult and int(progress.training_hits) != 0) or (progress.career_terminal != (progress.stage == "fallen")) or (progress.chapter_complete != (progress.stage == "ended")):
+	if ((not adult or progress.stage == "civil") and int(progress.training_hits) != 0) or (progress.career_terminal != (progress.stage == "fallen")) or (progress.chapter_complete != (progress.stage == "ended")):
 		return "Unzulässiger Ausbildungs- oder Abschlusszustand."
 	if (int(state.player.health) == 0) != progress.career_terminal:
 		return "Tod und terminaler Zustand widersprechen sich."
@@ -1329,7 +1370,7 @@ func _validate_state(state: Variant) -> String:
 			var other: Dictionary = state.buildings[other_index]
 			if Vector2(hut.x, hut.z).distance_to(Vector2(other.x, other.z)) < 4.99999:
 				return "Gebäude überschneiden den erforderlichen Abstand."
-	if (adult or progress.stage == "settlement") and completed_count == 0:
+	if (progress.stage == "settlement" or (adult and not Childhood.enabled(state))) and completed_count == 0:
 		return "Der erforderliche fertige Wohnplatz fehlt."
 	if adult and not companion.met:
 		return "Der erwachsene Abschnitt überspringt die Gefährtenentscheidung."
@@ -1427,6 +1468,8 @@ func _validate_state(state: Variant) -> String:
 		village_ledger[key] = int(state.village.economy.ledger[key]) + int(state.village.social.ledger[key])
 	var childhood_marcus_friend := Childhood.enabled(state) and str(state.village.childhood.screenplay.get("i03_outcome", "")) == "friend"
 	var help_cost := 0 if childhood_marcus_friend else (4 if companion.choice == "help" else 0)
+	if state.world_state.party.get("mending","") == "delivered":
+		help_cost += Party.FRAME_WOOD
 	if int(state.resources.wood) + int(state.world_state.party.staff_made) + HUT_COST * state.buildings.size() + help_cost != 48 - remaining_wood + int(village_ledger.wood):
 		return "Die Holzbilanz wurde verletzt."
 	if int(state.resources.stone) != int(village_ledger.stone):
@@ -1920,6 +1963,7 @@ func act_region(command: String,target: String) -> Dictionary:
 			data.strategy.last_event = result.message
 		if command == "advance":
 			data.world_seconds += YEAR_SECONDS/4.0
+			NpcBehavior.resume_after_interlude(data)
 			# The season moves the one world clock to the next season start;
 			# ages and elapsed years follow the clock (no separate counter).
 			# Its thirteen tribal weeks follow in frame budgets (advance() in

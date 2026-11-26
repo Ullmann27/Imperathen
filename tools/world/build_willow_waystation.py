@@ -176,9 +176,34 @@ def cart():
             m.box(s*.63,0,.81+i*.14,.085,1.86,.12,"oak" if i==2 else "plank")
         m.rod((s*.49,-.85,.64),(s*.4,-3.5,.86),.065,.045,"oak")
     m.rod((-.88,.16,.53),(.88,.16,.53),.1,.1,"iron")
-    for x in [-.31,.30]:
-        for y in [-.5,.0,.5]:
-            m.pot(x,y,.76,.88)
+    return m
+
+
+def grain_load():
+    m = Mesh("LinenGrainSacks")
+    for x in [-.29,.29]:
+        for y in [-.51,0,.51]:
+            rings=[(.0,.12),(.035,.22),(.16,.266),(.33,.23),(.43,.115),(.49,.065),(.53,.102)]
+            verts=[(x+r*math.cos(k*math.tau/13),y+.85*r*math.sin(k*math.tau/13),
+                    .76+h+.007*math.sin(k*1.8)) for h,r in rings for k in range(13)]
+            faces=[(j*13+k,j*13+(k+1)%13,(j+1)*13+(k+1)%13,(j+1)*13+k)
+                   for j in range(len(rings)-1) for k in range(13)]
+            m.shape(verts,faces,"linen")
+            m.rod((x,y,1.234),(x,y,1.254),.075,.075,"oak",10)
+    return m
+
+
+def loading_table():
+    m = Mesh("FreightTable")
+    m.box(0,0,.38,1.65,.81,.72,"plank")
+    for x in [-.72,0,.72]:
+        m.box(x,-.421,.42,.09,.07,.81,"oak")
+    for i in range(5):
+        m.box(0,-.4+i*.195,.81,1.78,.187,.09,"plank")
+    # Hinged wooden writing tablet with recessed dark wax on the desk.
+    for x in [-.16,.16]:
+        m.box(x,-.04,.874,.30,.42,.035,"oak")
+        m.box(x,-.04,.898,.256,.38,.015,"shade")
     return m
 
 
@@ -200,6 +225,26 @@ def tree():
             bottom=(p+.13,q,h-.95)
             ring=[(p+w*math.cos(k*math.tau/7),q+w*.72*math.sin(k*math.tau/7),h+rng.uniform(-.12,.12)) for k in range(7)]
             m.shape([top,bottom]+ring,[(0,2+k,2+(k+1)%7) for k in range(7)]+[(1,2+(k+1)%7,2+k) for k in range(7)],rng.choice(["shade","olive","olive","leaf"]))
+    return m
+
+
+def verge():
+    """Bent grass blades, low flowering stalks and rounded fragments of stone."""
+    m = Mesh("RoadVerge")
+    for i in range(36):
+        x, y = rng.uniform(-.85,.85), rng.uniform(-.55,.55)
+        a = rng.uniform(0,math.tau)
+        dx, dy = math.cos(a), math.sin(a)
+        width, h = rng.uniform(.014,.035), rng.uniform(.14,.54)
+        w, v = -dy*width, dx*width
+        m.shape([(x+w,y+v,-.02),(x-w,y-v,-.02),(x+.08*dx-w,y+.08*dy-v,h*.56),
+                 (x+.08*dx+w,y+.08*dy+v,h*.56),(x+.24*dx,y+.24*dy,h)],
+                 [(0,1,2,3),(3,2,4),(3,2,1,0),(4,2,3)],rng.choice(["shade","olive","leaf"]))
+    for i in range(5):
+        x,y = rng.uniform(-.7,.7),rng.uniform(-.4,.4)
+        r = rng.uniform(.035,.11)
+        ring=[(x+math.cos(k*math.tau/7)*r,y+math.sin(k*math.tau/7)*r*.58,0) for k in range(7)]
+        m.shape(ring+[(x+r*.14,y,r*.42)],[(k,(k+1)%7,7) for k in range(7)],"stone")
     return m
 
 
@@ -228,6 +273,9 @@ def main():
         m.box(0,y,.42,2.5,.16,.52,"stone")
     m.box(0,0,.44,2.45,.83,.03,"water")
     export("trough",[m])
+    export("verge",[verge()])
+    export("grain_load",[grain_load()])
+    export("freight_table",[loading_table()])
 
 
 if __name__=="__main__":
