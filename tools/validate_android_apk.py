@@ -159,6 +159,7 @@ CC0_MOTION_RESOURCES = (
 )
 TROOP_CATALOG_RESOURCES = (
     "scripts/battle/troop_catalog.gd",
+    "scripts/battle/soldier_roster.gd",
     "assets/troops/troops.json",
     "assets/troops/item_families.json",
     "assets/troops/people.json",

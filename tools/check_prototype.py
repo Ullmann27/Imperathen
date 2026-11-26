@@ -135,6 +135,7 @@ def main():
             ("integration", ["--fixed-fps", "60", "--script", "res://tests/integration_test.gd"], "INTEGRATION_PASS"),
             ("battle_rules", ["--script", "res://tests/battle_rules_test.gd"], "failures=0"),
             ("troop_catalog", ["--script", "res://tests/troop_catalog_test.gd"], "failures=0 troops="),
+            ("battle_command", ["--script", "res://tests/battle_command_test.gd"], "failures=0 metrics="),
             ("soldier_visuals", ["--script", "res://tests/soldier_visual_test.gd"], "0 failed"),
             ("soldier_gait", ["--fixed-fps", "60", "--script", "res://tests/soldier_gait_test.gd"], "failures=0"),
             ("village_people", ["--fixed-fps", "60", "--script", "res://tests/village_person_test.gd"], "checks, 0 failed"),

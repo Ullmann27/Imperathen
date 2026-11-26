@@ -1,9 +1,15 @@
 extends RefCounted
-## Offline, fixed-step rules for the stand-alone valley encounter.
+## Offline, fixed-step rules for the stand-alone valley encounter (test bench, 58 BC:
+## Roman companies against an independent, fictional Germanic group; decision D-023).
 ## Coordinates are ground (x,z). Facing is the Y rotation of a model looking -Z.
+## This model is the single authority over every soldier's existence and state (D-026).
+## Visual layers read soldiers(), soldier_record() and roster(); all return copies, so a
+## change of detail level can never duplicate, revive or undo a soldier.
 
 const Field := preload("res://scripts/battle/valley_field.gd")
 const Slots := preload("res://scripts/battle/formation_slots.gd")
+const Catalog := preload("res://scripts/battle/troop_catalog.gd")
+const Roster := preload("res://scripts/battle/soldier_roster.gd")
 const FORMATIONS := Slots.NAMES
 const OBSTACLES := Field.ROCKS
 const ARMIES := {
@@ -21,31 +27,99 @@ const EQUIPPED_FORMATIONS := {"shield_wall": ["infantry", "spear"], "testudo": [
 	"phalanx": ["spear"], "wedge": ["infantry", "spear"]}
 const COMMANDS := ["move", "hold", "form", "deploy", "attack", "attack_move", "defend",
 	"flank", "retreat", "rally", "reserve", "focus_fire", "cease_fire"]
+const SCHEMA := 3
+const DEFAULT_SEED := 58
+## Per-soldier speed cap. No member, and therefore no company anchor, moves faster.
+const MEMBER_SPEED := 2.65
+const MEMBER_STEP := MEMBER_SPEED * STEP
+const ROUT_SPEED := MEMBER_SPEED
+const RETREAT_SPEED := MEMBER_SPEED
+## Casualty share of the first and second depth band facing the attacker; the rest
+## falls deeper. Melee strikes hit the front; missiles reach further back (design values).
+const MELEE_BANDS := [0.80, 0.15]
+const MISSILE_BANDS := [0.40, 0.25]
+const MEMORY_EVENTS := ["first_contact", "officer_fallen"]
+const MAX_MEMORIES := 24
+## Squad keys added by schema 3. A legacy save carries none of them (or all of them).
+const SCHEMA3_KEYS := ["troop_id", "loadout", "drills", "uids", "people", "memories"]
+## Data hook for later scenarios (outnumbered, defence, reinforcement, retreat,
+## negotiation, capture). Only this test bench exists so far; build none of them here.
+const VALLEY_SCENARIO := {
+	"id": "valley_58bc",
+	"year": -58,
+	"companies": [
+		{"id": "valley_guard", "title": "Talwache", "side": "ally", "kind": "infantry", "shape": "shield_wall", "at": Vector2(-7, 8), "count": 12,
+			"troop_id": "roman_miles", "origin": "gallia_cisalpina"},
+		{"id": "valley_spears", "title": "Passwache", "side": "ally", "kind": "spear", "shape": "phalanx", "at": Vector2(5, 8), "count": 10,
+			"troop_id": "cisalpine_militia_spear", "origin": "valdora_district"},
+		{"id": "valley_bows", "title": "Talbogner", "side": "ally", "kind": "archer", "shape": "loose", "at": Vector2(1, 13), "count": 8,
+			"troop_id": "aux_sagittarius_creticus", "origin": "creta"},
+		{"id": "ridge_guard", "title": "Höhenbund", "side": "enemy", "kind": "infantry", "shape": "wedge", "at": Vector2(-8, -14), "count": 12,
+			"troop_id": "germanic_retainer", "origin": "hoehenbund"},
+		{"id": "ridge_spears", "title": "Felsbanner", "side": "enemy", "kind": "spear", "shape": "line", "at": Vector2(6, -13), "count": 10,
+			"troop_id": "germanic_levy", "origin": "hoehenbund"},
+		{"id": "ridge_bows", "title": "Hangbogner", "side": "enemy", "kind": "archer", "shape": "loose", "at": Vector2(0, -18), "count": 8,
+			"troop_id": "germanic_bow_skirmisher", "origin": "hoehenbund"},
+	],
+}
 
 var squads: Dictionary = {}
 var outcome := "ongoing"
 var reason := ""
 var steps := 0
 var capture := 0
+var battle_seed := DEFAULT_SEED
+var year := -58
+var scenario: Dictionary = VALLEY_SCENARIO
+## Runtime measurement only (not saved): one entry per soldier taken out of the ranks.
+var casualty_log: Array = []
 var _remainder := 0.0
 var _field := Field.new()
+var _plans := {}
 
 
-func _init() -> void:
-	_add_squad("valley_guard", "Talwache", "ally", "infantry", "shield_wall", Vector2(-7, 8), 12)
-	_add_squad("valley_spears", "Passwache", "ally", "spear", "phalanx", Vector2(5, 8), 10)
-	_add_squad("valley_bows", "Talbogner", "ally", "archer", "loose", Vector2(1, 13), 8)
-	_add_squad("ridge_guard", "Höhenbund", "enemy", "infantry", "wedge", Vector2(-8, -14), 12)
-	_add_squad("ridge_spears", "Felsbanner", "enemy", "spear", "line", Vector2(6, -13), 10)
-	_add_squad("ridge_bows", "Hangbogner", "enemy", "archer", "loose", Vector2(0, -18), 8)
+func _init(p_seed: int = DEFAULT_SEED, p_scenario: Dictionary = VALLEY_SCENARIO) -> void:
+	battle_seed = p_seed
+	scenario = p_scenario
+	year = int(scenario.year)
+	for company: Dictionary in scenario.companies:
+		_plans[company.id] = company
+	for company: Dictionary in scenario.companies:
+		_add_squad(company.id, company.title, company.side, company.kind, company.shape, company.at, company.count)
 
 
 static func ground_height(x: float, z: float) -> float:
 	return Field.height(x, z)
 
 
+## A company resolves its troop type, issued kit and drill from the era-aware catalog.
+## Unknown companies (tests may add some) fall back to a minimal kind-based kit.
+func _troop_for(id: String, kind: String) -> Dictionary:
+	var catalog := Catalog.load_default()
+	var plan: Dictionary = _plans.get(id, {})
+	var troop := Catalog.troop(catalog, plan.get("troop_id", "")) if catalog.ok else {}
+	if not troop.is_empty() and troop.battle_kind == kind and Catalog.valid_at(troop, year):
+		return troop
+	if not plan.is_empty():
+		push_error("Company %s has no valid %s troop for %s." % [id, kind, Catalog.year_label(year)])
+	var weapon: String = {"infantry": "gladius", "spear": "spear", "archer": "bow"}[kind]
+	var loadout := {"main_hand": {"family_id": weapon, "q_min": 1, "q_max": 1}}
+	if kind != "archer":
+		loadout.shield = {"family_id": "shield_round", "q_min": 1, "q_max": 1}
+	return {"troop_id": "", "tier": 2, "culture": "", "battle_kind": kind, "loadout": loadout, "drills": {}}
+
+
+func _kit(troop: Dictionary) -> Dictionary:
+	var kit := {}
+	for slot in troop.loadout:
+		var item: Dictionary = troop.loadout[slot]
+		kit[slot] = {"family_id": item.family_id, "quality": int(item.q_min), "count": int(item.get("count", 1))}
+	return kit
+
+
 func _add_squad(id: String, title: String, side: String, kind: String, shape: String, at: Vector2, count: int) -> void:
 	var facing := 0.0 if side == "ally" else PI
+	var troop := _troop_for(id, kind)
 	var s := {"id": id, "army_id": "talwache" if side == "ally" else "hoehenbund",
 		"name": title, "side": side, "kind": kind, "formation": shape,
 		"strength": count, "initial_strength": count, "morale": 90.0, "fatigue": 0.0,
@@ -60,10 +134,40 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 		"experience": 52 if side == "ally" else 45, "discipline": 72 if side == "ally" else 62,
 		"pending_formation": "", "formation_at": 0,
 		"last_action": "", "action_step": -1, "hit_step": -1, "block_step": -1,
-		"wounded": 0, "dead": 0, "cohesion": 100.0, "reaction_seconds": 0.4, "ready_at": 0}
-	for slot in Slots.world_slots(shape, count, 0.0, at, facing):
-		s.members.append([slot.x, slot.y])
+		"wounded": 0, "dead": 0, "cohesion": 100.0, "reaction_seconds": 0.4, "ready_at": 0,
+		"troop_id": troop.troop_id, "loadout": _kit(troop), "drills": troop.drills.duplicate(true),
+		"uids": [], "people": {}, "memories": []}
+	var catalog := Catalog.load_default()
+	var plan: Dictionary = _plans.get(id, {})
+	var group: Dictionary = catalog.groups.get(plan.get("origin", ""), {}) if catalog.ok else {}
+	var pool: Dictionary = catalog.name_pools.get(group.get("names", ""), {}) if catalog.ok else {}
+	var entry_xp := Catalog.entry_xp(catalog, troop.troop_id) if catalog.ok else 0
+	for i in range(count):
+		var person := Roster.identity(battle_seed, id, i, count, troop, pool, group, entry_xp, s.discipline, year)
+		s.people[person.uid] = person
+	var order := _arrangement(shape, count, s.commander_id, s.deputy_id, id)
+	var slots := Slots.world_slots(shape, count, 0.0, at, facing)
+	for i in range(count):
+		s.members.append([slots[i].x, slots[i].y])
+		s.uids.append(order[i])
 	squads[id] = s
+
+
+## Initial places: the commander fights at the right of the front rank, the deputy
+## closes the rear, everyone else keeps muster order. Losses decide who falls, not slots.
+func _arrangement(shape: String, count: int, commander: String, deputy: String, id: String) -> Array:
+	var order := []
+	for i in range(count):
+		order.append(_soldier_id(id, i))
+	if count < 3:
+		return order
+	var ranks := Slots.ranks(shape, count, 0.0)
+	var front_right := ranks.rfind(0)
+	order.erase(commander)
+	order.erase(deputy)
+	order.insert(mini(front_right, order.size()), commander)
+	order.append(deputy)
+	return order
 
 
 static func _soldier_id(company_id: String, index: int) -> String:
@@ -90,8 +194,7 @@ func hierarchy() -> Dictionary:
 			for id in company_ids(group_id, false):
 				var s: Dictionary = squads[id]
 				var members: Array[String] = []
-				for i in range(s.strength):
-					members.append(_soldier_id(id, i))
+				members.assign(s.uids)
 				group.companies.append({"id":id, "name":s.name, "status":s.status,
 					"initial_strength":s.initial_strength, "strength":s.strength, "soldier_ids":members})
 				group.initial_strength += s.initial_strength
@@ -108,6 +211,7 @@ func soldiers(id: String) -> Array:
 	if not squads.has(id):
 		return result
 	var s: Dictionary = squads[id]
+	var ranks := Slots.ranks(s.formation, s.strength, s.width)
 	for i in range(s.members.size()):
 		var m: Array = s.members[i]
 		var pose := "idle"
@@ -121,7 +225,26 @@ func soldiers(id: String) -> Array:
 			pose = s.last_action
 		elif s.status == "moving":
 			pose = "walk"
-		result.append({"id": _soldier_id(id, i), "x": m[0], "z": m[1], "facing": s.facing, "pose": pose})
+		var uid: String = s.uids[i]
+		result.append({"id": uid, "x": m[0], "z": m[1], "facing": s.facing, "pose": pose, "rank": ranks[i],
+			"appearance_seed": s.people[uid].appearance_seed})
+	return result
+
+
+## Read-only identity record of one soldier, alive or fallen ({} if unknown).
+func soldier_record(uid: String) -> Dictionary:
+	for s: Dictionary in squads.values():
+		if s.people.has(uid):
+			return s.people[uid].duplicate(true)
+	return {}
+
+
+## Read-only records of everyone who ever served in a company, including the fallen.
+func roster(id: String) -> Array:
+	var result := []
+	if squads.has(id):
+		for uid in squads[id].people:
+			result.append(squads[id].people[uid].duplicate(true))
 	return result
 
 
@@ -285,7 +408,9 @@ func _nearest(s: Dictionary) -> Dictionary:
 
 func _delay(s: Dictionary) -> void:
 	var delay := 2 if s.discipline >= 65 else 3
-	if s.officer_id != s.commander_id:
+	if s.officer_id == "":
+		delay += 3
+	elif s.officer_id != s.commander_id:
 		delay += 2
 	if s.morale < 40:
 		delay += 1
@@ -356,7 +481,7 @@ func _step() -> void:
 			_ai(s, enemy)
 		if s.status == "routed":
 			var edge := Vector2(s.x, 21 if s.side == "ally" else -21)
-			if _walk(s, edge, 3.3):
+			if _walk(s, edge, ROUT_SPEED):
 				s.status = "withdrawn"
 		else:
 			_act(s, enemy, hits)
@@ -365,20 +490,26 @@ func _step() -> void:
 	# another squad's hit from the same simulation step.
 	for id in hits:
 		var s: Dictionary = squads[id]
+		var hit: Dictionary = hits[id]
 		s.hit_step = steps
-		s.damage += hits[id]
+		_remember(s, "first_contact", hit.sources[0].from)
+		s.damage += hit.damage
 		var lost := mini(s.strength, floori(s.damage + 0.000001))
 		if lost == 0:
 			continue
 		s.damage = maxf(0, s.damage - lost) if lost < s.strength else 0.0
+		var led_by: String = s.officer_id
+		for fallen in _choose_casualties(s, lost, hit.sources):
+			_fall(s, fallen)
 		s.strength -= lost
-		s.members.resize(s.strength)
-		var total_lost: int = s.initial_strength - s.strength
-		s.dead = floori(total_lost / 3.0)
-		s.wounded = total_lost - s.dead
-		if s.strength <= s.initial_strength - 3 and s.officer_id == s.commander_id:
-			s.officer_id = s.deputy_id
-			s.morale = maxf(0, s.morale - 4)
+		_count_losses(s)
+		s.officer_id = _expected_officer(s)
+		if s.officer_id != led_by:
+			if led_by == s.commander_id:
+				s.morale = maxf(0, s.morale - 4)
+				_remember(s, "officer_fallen", led_by)
+			if s.officer_id != "":
+				Roster.note(s.people[s.officer_id], "took_command", led_by, year, steps)
 		s.morale = maxf(0, s.morale - 84.0 * lost / s.initial_strength)
 		if s.strength == 0:
 			s.status = "destroyed"
@@ -386,6 +517,129 @@ func _step() -> void:
 		elif s.morale <= 24:
 			s.status = "routed"
 	_evaluate()
+
+
+func _add_hit(hits: Dictionary, attacker: Dictionary, target: Dictionary, damage: float, mode: String) -> void:
+	if not hits.has(target.id):
+		hits[target.id] = {"damage": 0.0, "sources": []}
+	hits[target.id].damage += damage
+	hits[target.id].sources.append({"from": attacker.id, "at": _pos(attacker), "damage": damage, "mode": mode})
+
+
+## Soldiers who strike together gain experience and trust their neighbours more.
+func _credit(s: Dictionary, ranged: bool) -> void:
+	var ranks := Slots.ranks(s.formation, s.strength, s.width)
+	for i in range(s.uids.size()):
+		if ranged or ranks[i] <= 1:
+			s.people[s.uids[i]].xp += 2
+		if i + 1 < s.uids.size() and ranks[i] == 0 and ranks[i + 1] == 0:
+			for pair in [[s.uids[i], s.uids[i + 1]], [s.uids[i + 1], s.uids[i]]]:
+				var relations: Dictionary = s.people[pair[0]].relations
+				relations[pair[1]] = mini(100, int(relations.get(pair[1], 0)) + 1)
+
+
+func _remember(s: Dictionary, event: String, ref: String) -> void:
+	if event == "first_contact":
+		for m: Dictionary in s.memories:
+			if m.event == event:
+				return
+	if s.memories.size() >= MAX_MEMORIES:
+		s.memories.remove_at(0)
+	s.memories.append({"event": event, "step": steps, "ref": ref})
+
+
+func _expected_officer(s: Dictionary) -> String:
+	if s.strength == 0:
+		return ""
+	if s.commander_id in s.uids:
+		return s.commander_id
+	return s.deputy_id if s.deputy_id in s.uids else ""
+
+
+func _count_losses(s: Dictionary) -> void:
+	s.dead = 0
+	s.wounded = 0
+	for person: Dictionary in s.people.values():
+		if person.status == "dead":
+			s.dead += 1
+		elif person.status == "wounded":
+			s.wounded += 1
+
+
+func _front(s: Dictionary) -> Vector2:
+	return Vector2(-sin(s.facing), -cos(s.facing))
+
+
+## Picks who is taken out of the ranks. Soldiers are grouped in depth bands seen from
+## the attacker; melee mostly reaches the first band, missiles reach further back.
+## Within a band the less skilled are a little more likely to fall.
+func _choose_casualties(s: Dictionary, lost: int, sources: Array) -> Array[String]:
+	var chosen: Array[String] = []
+	var alive := range(s.strength)
+	var ranks := Slots.ranks(s.formation, s.strength, s.width)
+	var band_depth := Slots.rank_depth(s.formation) * 0.8
+	var salt := Roster.text_salt(s.id)
+	var total := 0.0
+	for source: Dictionary in sources:
+		total += source.damage
+	for k in range(lost):
+		var pick := Roster.roll(battle_seed, salt, steps, k * 4) * total
+		var source: Dictionary = sources.back()
+		for candidate: Dictionary in sources:
+			pick -= candidate.damage
+			if pick < 0.0:
+				source = candidate
+				break
+		var dir := _pos(s).direction_to(source.at)
+		if dir == Vector2.ZERO:
+			dir = _front(s)
+		var exposure := {}
+		var highest := -INF
+		for i in alive:
+			exposure[i] = (Vector2(s.members[i][0], s.members[i][1]) - _pos(s)).dot(dir)
+			highest = maxf(highest, exposure[i])
+		var weights: Array = MELEE_BANDS if source.mode == "melee" else MISSILE_BANDS
+		var r := Roster.roll(battle_seed, salt, steps, k * 4 + 1)
+		var band := 0 if r < weights[0] else (1 if r < weights[0] + weights[1] else 2)
+		var candidates := []
+		while candidates.is_empty():
+			for i in alive:
+				var depth := mini(2, floori((highest - exposure[i]) / band_depth))
+				if depth == band:
+					candidates.append(i)
+			band -= 1
+		var weight := []
+		var sum := 0.0
+		for i in candidates:
+			var w := 1.5 - float(s.people[s.uids[i]].skills.melee) / 100.0 if source.mode == "melee" else 1.0
+			weight.append(w)
+			sum += w
+		var r2 := Roster.roll(battle_seed, salt, steps, k * 4 + 2) * sum
+		var victim: int = candidates.back()
+		for j in range(candidates.size()):
+			r2 -= weight[j]
+			if r2 < 0.0:
+				victim = candidates[j]
+				break
+		alive.erase(victim)
+		chosen.append(s.uids[victim])
+		casualty_log.append({"step": steps, "squad": s.id, "uid": s.uids[victim], "rank": ranks[victim],
+			"band": band + 1, "mode": source.mode, "by": source.from})
+	return chosen
+
+
+func _fall(s: Dictionary, uid: String) -> void:
+	var i: int = s.uids.find(uid)
+	s.uids.remove_at(i)
+	s.members.remove_at(i)
+	var person: Dictionary = s.people[uid]
+	var fate := Roster.casualty(battle_seed, uid, steps)
+	person.status = fate.status
+	person.wound = fate.wound
+	Roster.note(person, "killed" if fate.status == "dead" else "wounded", "", year, steps)
+	for comrade in s.uids:
+		if int(s.people[comrade].relations.get(uid, 0)) >= Roster.COMRADE_BOND:
+			Roster.note(s.people[comrade], "lost_comrade", uid, year, steps)
 
 
 func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
@@ -431,7 +685,8 @@ func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
 			if _shield_factor(s, enemy, ranged) < 1.0:
 				enemy.block_step = steps
 			var damage := _attack_power(s, enemy, ranged) * STEP * interval
-			hits[enemy.id] = float(hits.get(enemy.id, 0.0)) + damage
+			_add_hit(hits, s, enemy, damage, "missile" if ranged else "melee")
+			_credit(s, ranged)
 		s.fatigue = minf(100, s.fatigue + STEP)
 	elif s.command in ["hold", "reserve", "rally"]:
 		s.fatigue = maxf(0, s.fatigue - 2 * STEP)
@@ -442,7 +697,7 @@ func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
 	else:
 		var speed := 2.3 if s.formation == "column" else 1.85
 		if s.command == "retreat":
-			speed = 3.0
+			speed = RETREAT_SPEED
 		if _walk(s, dest, speed):
 			if s.command == "deploy":
 				s.facing = s.goal_facing
@@ -488,16 +743,52 @@ func _walk(s: Dictionary, dest: Vector2, speed: float) -> bool:
 	return next.distance_to(dest) < 0.02
 
 
+## Members take the nearest free slot (greedy nearest-sort), so rear ranks step up into
+## gaps instead of the whole line shuffling by index. Nobody moves more than MEMBER_STEP.
 func _align_members(s: Dictionary) -> void:
 	var slots := Slots.world_slots(s.formation, s.strength, s.width, _pos(s), s.facing)
+	var goals: Array[Vector2] = []
+	for slot in slots:
+		goals.append(Field.project(slot))
+	_assign_slots(s, goals)
 	var deviation := 0.0
-	for i in range(slots.size()):
+	for i in range(goals.size()):
 		var at := Vector2(s.members[i][0], s.members[i][1])
-		var goal := Field.project(slots[i])
-		var next := _field.next_position(at, goal, 4.8 * STEP)
+		var next := _field.next_position(at, goals[i], MEMBER_STEP)
 		s.members[i] = [next.x, next.y]
-		deviation += next.distance_to(goal)
+		deviation += next.distance_to(goals[i])
 	s.cohesion = clampf(100.0 - 12.0 * deviation / maxi(1, slots.size()), 0, 100)
+
+
+func _assign_slots(s: Dictionary, goals: Array[Vector2]) -> void:
+	var n := goals.size()
+	var pairs := []
+	for i in range(n):
+		var at := Vector2(s.members[i][0], s.members[i][1])
+		for j in range(n):
+			pairs.append([at.distance_squared_to(goals[j]), i, j])
+	pairs.sort()
+	var member_of := []
+	member_of.resize(n)
+	member_of.fill(-1)
+	var used := []
+	used.resize(n)
+	used.fill(false)
+	var placed := 0
+	for pair: Array in pairs:
+		if member_of[pair[2]] == -1 and not used[pair[1]]:
+			member_of[pair[2]] = pair[1]
+			used[pair[1]] = true
+			placed += 1
+			if placed == n:
+				break
+	var members := []
+	var uids := []
+	for j in range(n):
+		members.append(s.members[member_of[j]])
+		uids.append(s.uids[member_of[j]])
+	s.members = members
+	s.uids = uids
 
 
 func _evaluate() -> void:
@@ -512,9 +803,9 @@ func _evaluate() -> void:
 	reason = result[1]
 
 
-func _result(roster: Dictionary, elapsed: int, held: int) -> Array:
+func _result(companies: Dictionary, elapsed: int, held: int) -> Array:
 	var present := {"ally": 0, "enemy": 0}
-	for s: Dictionary in roster.values():
+	for s: Dictionary in companies.values():
 		if _active(s):
 			present[s.side] += 1
 	if present.ally == 0 and present.enemy == 0:
@@ -545,7 +836,7 @@ func summary() -> Dictionary:
 
 
 func snapshot() -> Dictionary:
-	return {"schema": 2, "steps": steps, "capture": capture, "remainder": _remainder,
+	return {"schema": SCHEMA, "seed": battle_seed, "steps": steps, "capture": capture, "remainder": _remainder,
 		"outcome": outcome, "reason": reason, "squads": squads.duplicate(true)}
 
 
@@ -553,8 +844,86 @@ func _number(v: Variant, low: float, high: float, integer: bool = false) -> bool
 	return typeof(v) in [TYPE_INT, TYPE_FLOAT] and is_finite(v) and v >= low and v <= high and (not integer or v == floorf(v))
 
 
+## Schema 1 lacked the pending-formation and action timing fields.
+func _migrate_v1(s: Dictionary) -> Variant:
+	s = s.duplicate(true)
+	for key in ["pending_formation", "formation_at", "last_action", "action_step", "hit_step", "block_step"]:
+		if s.has(key):
+			return null
+	s.merge({"pending_formation":"", "formation_at":0, "last_action":"", "action_step":-1, "hit_step":-1, "block_step":-1})
+	if s.has("kind") and s.has("formation") and typeof(s.kind) == TYPE_STRING and typeof(s.formation) == TYPE_STRING and FORMATIONS.has(s.formation) and not can_form(s.kind, s.formation):
+		s.formation = "line"
+	return s
+
+
+## Schema 2 identified soldier i by its slot index and removed losses from the rear,
+## counting a third of them as dead. The migration keeps exactly that history: the
+## survivors are the first `strength` soldiers, the fallen are marked in the order
+## they were removed, every third of them dead, and their wounds as unrecorded.
+func _migrate_v2(s: Dictionary, original: Dictionary) -> Variant:
+	var present := 0
+	for key in SCHEMA3_KEYS:
+		present += int(s.has(key))
+	if present == SCHEMA3_KEYS.size():
+		return s
+	if present > 0 or not _number(s.get("strength"), 0, original.initial_strength, true):
+		return null
+	s = s.duplicate(true)
+	s.troop_id = original.troop_id
+	s.loadout = original.loadout.duplicate(true)
+	s.drills = original.drills.duplicate(true)
+	s.memories = []
+	s.uids = []
+	for i in range(int(s.strength)):
+		s.uids.append(_soldier_id(original.id, i))
+	s.people = original.people.duplicate(true)
+	var k := 0
+	for index in range(original.initial_strength - 1, int(s.strength) - 1, -1):
+		var person: Dictionary = s.people[_soldier_id(original.id, index)]
+		var dead := (k + 1) % 3 == 0
+		person.status = "dead" if dead else "wounded"
+		person.wound = {"severity": "unrecorded", "recovery_days": 0, "impairment": "", "outcome": "dead" if dead else "pending", "step": 0}
+		Roster.note(person, "legacy_casualty", "", year, 0)
+		k += 1
+	return s
+
+
+func _valid_people(s: Dictionary, original: Dictionary, save_steps: int) -> bool:
+	if typeof(s.get("uids")) != TYPE_ARRAY or s.uids.size() != s.strength or typeof(s.get("people")) != TYPE_DICTIONARY:
+		return false
+	if s.people.size() != original.people.size() or not s.people.has_all(original.people.keys()):
+		return false
+	var company: Array = original.people.keys()
+	var seen := {}
+	for uid: Variant in s.uids:
+		if typeof(uid) != TYPE_STRING or seen.has(uid) or not s.people.has(uid):
+			return false
+		seen[uid] = true
+	var counts := {"active": 0, "wounded": 0, "dead": 0}
+	for uid in original.people:
+		var person: Variant = s.people[uid]
+		if not Roster.valid_record(person, original.people[uid], company, save_steps):
+			return false
+		if (person.status == "active") != seen.has(uid):
+			return false
+		counts[person.status] += 1
+	if counts.active != s.strength or counts.dead != s.dead or counts.wounded != s.wounded:
+		return false
+	if typeof(s.get("memories")) != TYPE_ARRAY or s.memories.size() > MAX_MEMORIES:
+		return false
+	for m: Variant in s.memories:
+		if typeof(m) != TYPE_DICTIONARY or m.size() != 3 or not m.get("event") in MEMORY_EVENTS or typeof(m.get("ref")) != TYPE_STRING or not _number(m.get("step"), 1, save_steps, true):
+			return false
+	return true
+
+
 func restore(save: Dictionary) -> bool:
-	if save.size() != 7 or not _number(save.get("schema"), 1, 2, true) or typeof(save.get("squads")) != TYPE_DICTIONARY or save.squads.size() != squads.size():
+	if not _number(save.get("schema"), 1, SCHEMA, true) or typeof(save.get("squads")) != TYPE_DICTIONARY:
+		return false
+	# Schema 3 adds the seed. Older saves ran on the default seed.
+	if save.size() != (8 if save.has("seed") else 7) or (save.schema == SCHEMA and not save.has("seed")):
+		return false
+	if save.has("seed") and not _number(save.seed, 0, 2147483647, true):
 		return false
 	if not _number(save.get("steps"), 0, DEFENCE_SECONDS / STEP, true) or not _number(save.get("capture"), 0, CAPTURE_SECONDS / STEP, true):
 		return false
@@ -562,31 +931,47 @@ func restore(save: Dictionary) -> bool:
 		return false
 	if save.capture > save.steps or save.remainder >= STEP or (save.outcome != "ongoing" and save.remainder != 0):
 		return false
+	var save_seed := int(save.get("seed", DEFAULT_SEED))
+	# Validate against a pristine company list of the same seed and scenario: identities
+	# are regenerated, so a save can never invent, rename or revive a soldier.
+	var reference = get_script().new(save_seed, scenario)
+	if save.squads.size() != reference.squads.size():
+		return false
 	var restored := {}
-	for id in squads:
-		var original: Dictionary = squads[id]
+	for id in reference.squads:
+		var original: Dictionary = reference.squads[id]
 		var s: Variant = save.squads.get(id)
 		if typeof(s) != TYPE_DICTIONARY:
 			return false
+		s = s.duplicate(true)
 		if save.schema == 1:
-			s = s.duplicate(true)
-			for key in ["pending_formation", "formation_at", "last_action", "action_step", "hit_step", "block_step"]:
-				if s.has(key):
-					return false
-			s.merge({"pending_formation":"", "formation_at":0, "last_action":"", "action_step":-1, "hit_step":-1, "block_step":-1})
-			if s.has("kind") and s.has("formation") and typeof(s.kind) == TYPE_STRING and typeof(s.formation) == TYPE_STRING and FORMATIONS.has(s.formation) and not can_form(s.kind, s.formation):
-				s.formation = "line"
+			s = _migrate_v1(s)
+			if s == null:
+				return false
+		if save.schema <= 2:
+			s = _migrate_v2(s, original)
+			if s == null:
+				return false
 		if s.size() != original.size() or not s.has_all(original.keys()):
 			return false
-		for key in ["id", "army_id", "side", "name", "kind", "initial_strength", "equipment", "experience", "discipline", "commander_id", "deputy_id"]:
+		# Nested records hold only whole numbers; compare them with the same types.
+		for key in ["loadout", "drills", "people", "memories"]:
+			if not Roster.integral(s[key]):
+				return false
+			s[key] = Roster.integers(s[key])
+		for key in ["id", "army_id", "side", "name", "kind", "initial_strength", "equipment", "experience", "discipline", "commander_id", "deputy_id", "troop_id", "loadout", "drills"]:
 			if s.get(key) != original[key]:
 				return false
 		if not _number(s.get("strength"), 0, original.initial_strength, true) or typeof(s.get("members")) != TYPE_ARRAY or s.members.size() != s.strength:
 			return false
 		if not _number(s.get("dead"), 0, original.initial_strength, true) or not _number(s.get("wounded"), 0, original.initial_strength, true) or s.wounded + s.dead != original.initial_strength - s.strength:
 			return false
-		var expected_officer: String = s.commander_id if s.strength > s.initial_strength - 3 else s.deputy_id
-		if s.get("officer_id") != (expected_officer if s.strength > 0 else ""):
+		if not _valid_people(s, original, int(save.steps)):
+			return false
+		var expected_officer := ""
+		if s.strength > 0:
+			expected_officer = s.commander_id if s.commander_id in s.uids else (s.deputy_id if s.deputy_id in s.uids else "")
+		if s.get("officer_id") != expected_officer:
 			return false
 		if not _number(s.get("cohesion"), 0, 100) or not _number(s.get("reaction_seconds"), 0, 2) or not _number(s.get("ready_at"), 0, save.steps + 8, true):
 			return false
@@ -611,7 +996,7 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if not is_equal_approx(s.reaction_seconds / STEP, roundf(s.reaction_seconds / STEP)) or s.ready_at > save.steps + roundi(s.reaction_seconds / STEP):
 			return false
-		if s.reaction_seconds < 2 * STEP or s.reaction_seconds > 6 * STEP + 0.00001:
+		if s.reaction_seconds < 2 * STEP or s.reaction_seconds > 7 * STEP + 0.00001:
 			return false
 		if typeof(s.formation) != TYPE_STRING or not can_form(s.kind, s.formation) or not COMMANDS.has(s.get("command")) or not s.get("status") in ["ready","engaged","moving","routed","withdrawn","destroyed"]:
 			return false
@@ -621,7 +1006,7 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if s.command in ["attack","flank","focus_fire"] and s.target == "":
 			return false
-		if s.target != "" and (not squads.has(s.target) or squads[s.target].side == original.side):
+		if s.target != "" and (not reference.squads.has(s.target) or reference.squads[s.target].side == original.side):
 			return false
 		if not _number(s.get("morale"), 0, 100) or not _number(s.get("fatigue"), 0, 100) or not _number(s.get("damage"), 0, 1) or not _number(s.get("width"), 0, 80):
 			return false
@@ -631,8 +1016,6 @@ func restore(save: Dictionary) -> bool:
 			return false
 		var goal := Vector2(s.goal_x, s.goal_z)
 		if not Field.clear_segment(goal, goal) or s.damage >= 1.0:
-			return false
-		if s.dead != floori((s.initial_strength - s.strength) / 3.0):
 			return false
 		if not Field.clear_segment(_pos(s), _pos(s)) or (s.strength == 0) != (s.status == "destroyed"):
 			return false
@@ -647,9 +1030,11 @@ func restore(save: Dictionary) -> bool:
 	if _result(restored, int(save.steps), int(save.capture)) != [save.outcome, save.reason]:
 		return false
 	squads = restored
+	battle_seed = save_seed
 	steps = int(save.steps)
 	capture = int(save.capture)
 	_remainder = float(save.remainder)
 	outcome = save.outcome
 	reason = save.reason
+	casualty_log.clear()
 	return true

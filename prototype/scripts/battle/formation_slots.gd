@@ -15,10 +15,29 @@ static func natural_columns(shape: String, count: int) -> int:
 		_: return ceili(sqrt(count))
 
 
+## Rank spacing front to back. Casualty selection groups soldiers by this depth.
+static func rank_depth(shape: String) -> float:
+	match shape:
+		"loose": return 1.55
+		"shield_wall", "testudo": return 0.8
+		"phalanx": return 1.28
+	return 1.05
+
+
 static func offsets(shape: String, count: int, width: float) -> Array[Vector2]:
+	return layout(shape, count, width).offsets
+
+
+## Rank of every slot: 0 is the front rank (towards the facing), rising to the rear.
+static func ranks(shape: String, count: int, width: float) -> Array[int]:
+	return layout(shape, count, width).ranks
+
+
+static func layout(shape: String, count: int, width: float) -> Dictionary:
 	var result: Array[Vector2] = []
+	var rank_of: Array[int] = []
 	if count == 0:
-		return result
+		return {"offsets": result, "ranks": rank_of}
 	var spacing := 0.95
 	var depth := 1.05
 	match shape:
@@ -54,13 +73,14 @@ static func offsets(shape: String, count: int, width: float) -> Array[Vector2]:
 			if shape == "loose" and row % 2 == 1:
 				slot.x += spacing * 0.42
 			result.append(slot)
+			rank_of.append(row)
 			center += slot
 		i += n
 		row += 1
 	center /= float(count)
 	for k in range(count):
 		result[k] -= center
-	return result
+	return {"offsets": result, "ranks": rank_of}
 
 
 static func world_slots(shape: String, count: int, width: float, center: Vector2, facing: float) -> Array[Vector2]:
