@@ -37,6 +37,7 @@ func _process(_delta: float) -> bool:
 	_footwork("axe_fighter", "guard")
 	_approach_then_strike()
 	_reaction_zones()
+	_shield_out_of_line()
 	for failure in failures:
 		printerr("FAIL: " + failure)
 	print("MELEE_VISUAL_CONTACT_RESULT checks=%d failures=%d" % [checks, failures.size()])
@@ -165,6 +166,47 @@ func _reaction_zones() -> void:
 	_check(float(result.leg.pelvis_drop) > float(result.torso.pelvis_drop) + 0.03, "A leg hit buckles the knees (pelvis drop %.3f vs %.3f m)" % [result.leg.pelvis_drop, result.torso.pelvis_drop])
 	_check(absf(float(shoulder.arm_weapon) - float(shoulder.arm_shield)) > 0.03, "Weapon- and shield-arm hits twist the shoulders differently (%.3f m)" % absf(float(shoulder.arm_weapon) - float(shoulder.arm_shield)))
 	print("reaction zones: " + JSON.stringify(result))
+
+
+## The rendered shield follows the authority's openings: in stance it stands
+## in the line of a frontal thrust; hanging from a spent arm or thrown wide
+## by a broken guard it does not, and it is back when the opening ends.
+func _shield_out_of_line() -> void:
+	for name: String in ["legionary", "axe_fighter"]:
+		var actor: Dictionary = _actors[name]
+		var p: Node3D = actor.node
+		var pose := Pose.new()
+		pose.bind(p.body, name)
+		pose.stance_pose()
+		var box := _rendered_shield(actor)
+		var origin := p.global_position
+		var front := Vector3(box[0].x - origin.x, 0.0, box[0].z - origin.z).normalized()
+		var from := Vector3(origin.x, box[0].y, origin.z) + front * 1.7
+		var to := Vector3(origin.x, box[0].y, origin.z)
+		var covers := func() -> bool:
+			var b := _rendered_shield(actor)
+			return Geo.segment_box(from, to, b[0], b[1], b[2], b[3], 0.02) >= 0.0
+		_check(covers.call(), "%s: in stance the rendered shield stands in a frontal thrust's line" % name)
+		pose.stance_pose(1.0)
+		var hanging := _rendered_shield(actor)
+		_check(not covers.call() and hanging[0].y < box[0].y - 0.15, "%s: a spent arm's shield hangs out of the line (centre %.2f m lower)" % [name, box[0].y - hanging[0].y])
+		var duration := float(Core.REACTIONS.guard_broken.duration)
+		var open_frames := 0
+		var mismatch := 0
+		for i in int(duration * 60.0):
+			var t := float(i) / 60.0
+			pose.reaction(Vector3(0, 0, -1), float(Core.REACTIONS.guard_broken.strength), t, duration, Vector3.ZERO, "torso", Core.SHIELD_OPEN_UNTIL)
+			var authority_open := t < duration * Core.SHIELD_OPEN_UNTIL
+			if not covers.call():
+				open_frames += 1
+			if covers.call() == authority_open:
+				mismatch += 1
+		_check(open_frames >= int(duration * Core.SHIELD_OPEN_UNTIL * 60.0) - 6, "%s: a broken guard throws the rendered shield wide for the opening (%d frames)" % [name, open_frames])
+		_check(mismatch <= 6, "%s: rendered shield and authority disagree about the opening on at most 6 of %d frames (%d)" % [name, int(duration * 60.0), mismatch])
+		pose.reaction(Vector3(0, 0, -1), float(Core.REACTIONS.guard_broken.strength), duration, duration, Vector3.ZERO, "torso", Core.SHIELD_OPEN_UNTIL)
+		_check(covers.call(), "%s: at the end of the reaction the shield is back in line" % name)
+		print("%s shield opening: rendered open %d frames, authority %d, disagreeing frames %d; hanging centre %.2f m lower" % [name, open_frames, int(ceil(duration * Core.SHIELD_OPEN_UNTIL * 60.0)), mismatch, box[0].y - hanging[0].y])
+		pose.stance_pose()
 
 
 func _attachment(root: Node, prefix: String) -> BoneAttachment3D:

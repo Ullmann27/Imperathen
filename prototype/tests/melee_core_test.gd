@@ -34,6 +34,10 @@ func _initialize() -> void:
 	_test_fighting_styles()
 	_test_damage_formula()
 	_test_hitstop_scales_with_impact()
+	_test_simultaneous_trade()
+	_test_shield_openings()
+	_test_aim_and_preview()
+	_test_ai_duels_reach_a_decision()
 	for line in table:
 		print(line)
 	for failure in failures:
@@ -659,3 +663,142 @@ func _test_hitstop_scales_with_impact() -> void:
 	_check(pauses.size() == 3 and pauses.jab_left[0] < pauses.axe_overhead[0] and pauses.jab_left[0] >= int(Core.HITSTOP_RANGE[0]) and pauses.axe_overhead[0] <= int(Core.HITSTOP_RANGE[1]), "A child's jab checks shorter than a full axe blow (%s)" % JSON.stringify(pauses))
 	_check(Core.hitstop_frames(200.0, true) == Core.hitstop_frames(200.0, false) + 1, "A shield holds the weapon one frame longer than a body")
 	table.append("Trefferpause nach Aufprallenergie [Frames, J]: %s" % JSON.stringify(pauses))
+
+
+func _test_simultaneous_trade() -> void:
+	# Two unshielded legionaries thrust on the same frame: both contacts are
+	# found against the frame's start state and both land (fair trade).
+	var reach := Core.nominal_reach("legionary", "thrust", float(Tracks.kit("legionary").radius)) - 0.03
+	var state := Core.new_state(4)
+	Core.add_fighter(state, "a", "legionary", {"team":"a"})
+	Core.add_fighter(state, "b", "legionary", {"team":"b", "z":-reach})
+	for id: String in ["a", "b"]:
+		state.fighters[id].has_shield = false
+	state.fighters.a.yaw = Core.aim_yaw(state, "a", "b", "thrust")
+	state.fighters.b.yaw = Core.aim_yaw(state, "b", "a", "thrust")
+	Core.command(state, "a", "attack", {"move":"thrust"})
+	Core.command(state, "b", "attack", {"move":"thrust"})
+	var log := _run(state, 60)
+	var hits := log.filter(func(e): return e.type == "hit")
+	_check(hits.size() == 2 and int(hits[0].frame) == int(hits[1].frame) and hits[0].attacker != hits[1].attacker, "Simultaneous thrusts both land on the same frame (%d hits)" % hits.size())
+	_check(hits.size() == 2 and hits[0].move == "thrust" and hits[1].move == "thrust" and float(state.fighters.a.health) < 100.0 and float(state.fighters.b.health) < 100.0, "Both fighters are wounded by the trade")
+
+
+func _test_shield_openings() -> void:
+	# A shield covers only while the arm can hold it and it is in line.
+	var reach := Core.nominal_reach("legionary", "thrust", float(Tracks.kit("axe_fighter").radius)) - 0.02
+	var outcomes := {}
+	for label: String in ["fresh", "spent"]:
+		var duel := Core.new_state(2)
+		Core.add_fighter(duel, "a", "legionary", {"team":"a"})
+		Core.add_fighter(duel, "d", "axe_fighter", {"team":"d", "z":-reach})
+		Core.face(duel, "d", "a")
+		duel.fighters.a.yaw = Core.aim_yaw(duel, "a", "d", "thrust")
+		if label == "spent":
+			# Worn out and wavering: the arm does not recover within the thrust.
+			duel.fighters.d.stamina = 0.0
+			duel.fighters.d.fatigue = 1.0
+			duel.fighters.d.morale = 20.0
+			_check(Core.shield_lowered(duel.fighters.d) and Core.shield_world(duel.fighters.d).is_empty(), "A spent shield arm lets the shield hang")
+		Core.command(duel, "a", "attack", {"move":"thrust"})
+		for e: Dictionary in _run(duel, 60, ["hit", "block", "guard_broken", "whiff"]):
+			if e.type in ["hit", "block", "guard_broken", "whiff"]:
+				outcomes[label] = e.type
+	_check(outcomes.get("fresh", "") == "block" and outcomes.get("spent", "") == "hit", "A fresh fighter's shield stops the frontal thrust, the spent one is hit (%s)" % JSON.stringify(outcomes))
+	var state := Core.new_state(6)
+	Core.add_fighter(state, "a", "legionary", {"team":"a"})
+	Core.add_fighter(state, "d", "axe_fighter", {"team":"d", "z":-reach, "stamina":60.0})
+	Core.face(state, "d", "a")
+	_check(Core.shield_usable(state.fighters.d) and not Core.shield_world(state.fighters.d).is_empty(), "In stance the shield is in line")
+	Core._set_reaction(state, state.fighters.d, "guard_broken", Vector3(0.0, 0.0, -1.0), [])
+	_check(Core.shield_open(state.fighters.d) and Core.shield_world(state.fighters.d).is_empty(), "A broken guard tears the shield out of line")
+	state.fighters.a.yaw = Core.aim_yaw(state, "a", "d", "thrust")
+	_check(Core.preview_strike(state, "a", "thrust").kind == "body", "The opening is visible to the opponent")
+	var frames := 0
+	while Core.shield_open(state.fighters.d) and frames < 120:
+		Core.step(state, DT)
+		frames += 1
+	_check(frames == int(ceil(float(Core.REACTIONS.guard_broken.duration) * Core.SHIELD_OPEN_UNTIL * 60.0 - 0.0001)) and state.fighters.d.action == "react", "The opening lasts the first %d frames of the reaction, then the shield is back" % frames)
+	_check(not Core.shield_world(state.fighters.d).is_empty(), "After that the shield covers again")
+	table.append("Schildöffnung nach Deckungsbruch: %d Frames (%.2f s); erschöpfter Schildarm (< %.0f Ausdauer): Schild hängt" % [frames, frames / 60.0, Core.GUARD_MIN_STAMINA])
+
+
+func _test_aim_and_preview() -> void:
+	# aim_yaw points the strike's own line (its tip at the measured peak) at
+	# the target for every move, wherever the two stand.
+	var worst := 0.0
+	for kit: String in ["legionary", "axe_fighter", "spearman", "youth_unarmed"]:
+		for move: String in Tracks.moves_of(kit):
+			var state := Core.new_state(1)
+			Core.add_fighter(state, "a", kit, {"team":"a", "x":1.0, "z":2.0})
+			Core.add_fighter(state, "b", "raider", {"team":"b", "x":2.2, "z":0.9})
+			state.fighters.a.yaw = Core.aim_yaw(state, "a", "b", move)
+			state.fighters.a.move = move
+			var tip: Vector3 = Core.strike_world(state.fighters.a, int(Tracks.timing(kit, move).peak))[1]
+			worst = maxf(worst, absf(Vector2(1.2, -1.1).angle_to(Vector2(tip.x - 1.0, tip.z - 2.0))))
+	_check(worst < 0.0001, "Every move's peak tip points exactly at the target after aim_yaw (worst %.5f rad)" % worst)
+	# The preview agrees with what the strike then does, and changes nothing.
+	var agree := 0
+	var total := 0
+	for bearing: float in [0.0, 45.0, 90.0, -45.0, -90.0]:
+		for move: String in ["thrust", "cut_inward", "cut_outward", "overhead"]:
+			var reach := Core.nominal_reach("legionary", move, float(Tracks.kit("axe_fighter").radius)) - 0.03
+			var state := Core.new_state(9)
+			var rad := deg_to_rad(bearing)
+			Core.add_fighter(state, "d", "axe_fighter", {"team":"d"})
+			Core.add_fighter(state, "a", "legionary", {"team":"a", "x":sin(rad) * reach, "z":-cos(rad) * reach})
+			state.fighters.a.yaw = Core.aim_yaw(state, "a", "d", move)
+			var before := JSON.stringify(state)
+			var preview := Core.preview_strike(state, "a", move)
+			_check(JSON.stringify(state) == before, "preview_strike leaves the state untouched (%s, %.0f deg)" % [move, bearing])
+			Core.command(state, "a", "attack", {"move":move})
+			var outcome := ""
+			for e: Dictionary in _run(state, 90, ["hit", "block", "parry", "guard_broken", "whiff"]):
+				if e.type in ["hit", "block", "parry", "guard_broken", "whiff"]:
+					outcome = {"hit":"body", "whiff":"none"}.get(e.type, "shield")
+			total += 1
+			if outcome == preview.kind:
+				agree += 1
+	_check(agree == total, "Against a standing opponent the preview predicts the strike's outcome (%d of %d)" % [agree, total])
+
+
+func _decided_duel(kit_a: String, kit_b: String, seed: int, seconds: int) -> Dictionary:
+	var state := Core.new_state(seed)
+	Core.add_fighter(state, "a", kit_a, {"team":"a"})
+	Core.add_fighter(state, "b", kit_b, {"team":"b", "x":0.3, "z":-4.0})
+	var counts := {}
+	for frame in 60 * seconds:
+		for pair: Array in [["a", "b"], ["b", "a"]]:
+			AI.apply(state, pair[0], pair[1], AI.decide(state, pair[0], pair[1]), DT)
+		for e: Dictionary in Core.step(state, DT):
+			counts[e.type] = int(counts.get(e.type, 0)) + 1
+		for id: String in ["a", "b"]:
+			var f: Dictionary = state.fighters[id]
+			if not bool(f.alive) or f.morale_state == "breaking":
+				return {"loser":id, "seconds":frame / 60.0, "counts":counts}
+	return {"loser":"", "seconds":float(seconds), "counts":counts}
+
+
+func _test_ai_duels_reach_a_decision() -> void:
+	# A duel must not be an endless exchange on shields: within 90 s one side
+	# is dead or its morale breaks, through hits that found an opening.
+	for pairing: Array in [["axe_fighter", "axe_fighter", 10], ["legionary", "axe_fighter", 7], ["spearman", "axe_fighter", 9]]:
+		var decided := 0
+		var times: Array = []
+		var totals := {}
+		var winners := {"a":0, "b":0}
+		for seed in range(1, 13):
+			var duel := _decided_duel(pairing[0], pairing[1], seed, 90)
+			if duel.loser != "":
+				decided += 1
+				times.append(float(duel.seconds))
+				winners["b" if duel.loser == "a" else "a"] += 1
+			for key: String in ["hit", "block", "parry", "guard_broken", "whiff", "injury"]:
+				totals[key] = int(totals.get(key, 0)) + int(duel.counts.get(key, 0))
+		times.sort()
+		var median: float = times[times.size() / 2] if not times.is_empty() else 0.0
+		_check(decided >= int(pairing[2]), "%s vs %s: %d of 12 duels are decided within 90 s (need %d)" % [pairing[0], pairing[1], decided, int(pairing[2])])
+		_check(int(totals.hit) >= 24 and int(totals.whiff) < int(totals.hit) + int(totals.block) + int(totals.parry), "%s vs %s: strikes find body or shield far more often than the air, and the body at least twice per duel (%s)" % [pairing[0], pairing[1], JSON.stringify(totals)])
+		table.append("KI-Duelle %s gegen %s (Seeds 1-12, bis 90 s): %d entschieden (Sieger a/b %d/%d), Median %.0f s, %s" % [pairing[0], pairing[1], decided, int(winners.a), int(winners.b), median, JSON.stringify(totals)])
+	var once := _decided_duel("legionary", "axe_fighter", 3, 30)
+	_check(JSON.stringify(once) == JSON.stringify(_decided_duel("legionary", "axe_fighter", 3, 30)), "A decided duel replays identically")

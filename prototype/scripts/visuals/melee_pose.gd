@@ -99,6 +99,10 @@ const GUARDS := {
 	"guard_left":[Vector3(-0.55, -0.35, 0.80), 0.80, Vector3(-0.75, 0.0, 0.70), 10.0],
 	"guard_right":[Vector3(0.95, -0.35, 0.75), 0.86, Vector3(0.70, 0.0, 0.72), -24.0],
 }
+## Shield arm out of line: hanging at the side (spent arm) and thrown wide
+## (guard broken, stumble): [arm direction, arm extension, shield normal].
+const SHIELD_HANGING := [Vector3(-0.22, -0.97, 0.10), 0.92, Vector3(-0.96, 0.0, 0.28)]
+const SHIELD_WIDE := [Vector3(-0.90, -0.40, 0.18), 0.88, Vector3(-0.93, 0.0, 0.37)]
 const GUARD_RAISE := 0.14
 var skeleton: Skeleton3D
 var available := false
@@ -230,11 +234,19 @@ func guard(style: String, seconds: float) -> bool:
 	return true
 
 
-func stance_pose() -> bool:
+## `lowered` (0..1): the shield arm hangs at the side, as the authority
+## treats the shield of a fighter too spent to hold it up (covers nothing).
+func stance_pose(lowered: float = 0.0) -> bool:
 	if not available:
 		return false
 	var stance: Dictionary = STANCES[KITS[kit].stance]
-	_apply(_stance_key(stance, 0.0), _stance_feet(stance))
+	var key := _stance_key(stance, 0.0)
+	if lowered > 0.0:
+		var u := clampf(lowered, 0.0, 1.0)
+		key.l = [_slerp_dir(Vector3(stance.l[0]).normalized(), SHIELD_HANGING[0], u) * lerpf(Vector3(stance.l[0]).length(), 1.0, u), lerpf(float(stance.l[1]), float(SHIELD_HANGING[1]), u)]
+		key.s = _slerp_dir(Vector3(stance.s).normalized(), SHIELD_HANGING[2], u)
+		key.lean = float(stance.lean) + 5.0 * u
+	_apply(key, _stance_feet(stance))
 	return true
 
 
@@ -287,7 +299,9 @@ func dodge(style: String, seconds: float, root_scale: float = 1.0) -> bool:
 ## `zone` shapes the reaction individually: a head hit snaps the head and
 ## upper spine, a torso hit folds the trunk, an arm hit twists that shoulder
 ## back, a leg hit buckles the knees.
-func reaction(push: Vector3, strength: float, seconds: float, duration: float, root_step: Vector3 = Vector3.ZERO, zone: String = "torso") -> bool:
+## `shield_wide` (0..1 of the reaction's length): until then the shield arm
+## is thrown wide, matching the authority's opening after a broken guard.
+func reaction(push: Vector3, strength: float, seconds: float, duration: float, root_step: Vector3 = Vector3.ZERO, zone: String = "torso", shield_wide: float = 0.0) -> bool:
 	if not available or duration <= 0.0 or not is_finite(seconds):
 		return false
 	var stance: Dictionary = STANCES[KITS[kit].stance]
@@ -310,6 +324,11 @@ func reaction(push: Vector3, strength: float, seconds: float, duration: float, r
 	var shield_arm := 1.0 if zone == "arm_shield" else 0.5
 	key.r = [Vector3(0.35, -0.7, 0.4).lerp(Vector3(0.6, -0.2, -0.2), amount * 0.6 * hit_arm), 0.84]
 	key.l = [Vector3(0.20, -0.45, 1.0).lerp(Vector3(-0.5, -0.4, 0.2), amount * shield_arm), 0.76]
+	if shield_wide > 0.0:
+		# Out by 12 % of the reaction, back in line around `shield_wide`.
+		var wide := smoothstep(0.0, 0.12, at) * (1.0 - smoothstep(shield_wide - 0.1, shield_wide + 0.1, at))
+		key.l = [_slerp_dir(Vector3(key.l[0]).normalized(), Vector3(SHIELD_WIDE[0]).normalized(), wide) * lerpf(Vector3(key.l[0]).length(), 1.0, wide), lerpf(float(key.l[1]), float(SHIELD_WIDE[1]), wide)]
+		key.s = _slerp_dir(Vector3(key.s).normalized(), SHIELD_WIDE[2], wide)
 	# Stagger step: the foot on the push side steps with the root displacement.
 	var feet := {"l":stance.foot_l, "r":stance.foot_r, "lift_l":0.0, "lift_r":0.0}
 	if root_step.length() > 0.01:

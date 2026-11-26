@@ -51,6 +51,10 @@ const DODGES := {
 	"dodge_back":{"duration":0.46, "root":Vector3(0.0, 0.0, 0.55)},
 	"dodge_left":{"duration":0.46, "root":Vector3(-0.50, 0.0, 0.08)},
 	"dodge_right":{"duration":0.46, "root":Vector3(0.50, 0.0, 0.08)}}
+## Reactions that tear the shield out of line: for the first part of the
+## reaction it covers nothing (the opening a broken guard gives).
+const SHIELD_OPEN_REACTIONS := ["guard_broken", "stumble"]
+const SHIELD_OPEN_UNTIL := 0.8
 const MORALE_WAVERING := 35.0
 const MORALE_BREAKING := 15.0
 
@@ -402,9 +406,32 @@ static func _origin(f: Dictionary) -> Vector3:
 	return Vector3(float(f.x), 0.0, float(f.z))
 
 
+## Whether the shield covers anything right now: it exists, the arm still has
+## the strength to hold it up (an exhausted fighter's shield hangs) and it has
+## not just been knocked out of line.
+static func shield_usable(f: Dictionary) -> bool:
+	if not bool(f.has_shield) or float(f.shield_integrity) <= 0.0:
+		return false
+	if shield_lowered(f):
+		return false
+	return not shield_open(f)
+
+
+## Too exhausted to hold the shield up (outside a committed strike).
+static func shield_lowered(f: Dictionary) -> bool:
+	return bool(f.has_shield) and float(f.stamina) < GUARD_MIN_STAMINA and f.action != "attack"
+
+
+## Knocked out of line by a guard break or a stumble.
+static func shield_open(f: Dictionary) -> bool:
+	if f.action != "react" or not str(f.react.get("kind", "")) in SHIELD_OPEN_REACTIONS:
+		return false
+	return float(f.react.t) < float(f.react.duration) * SHIELD_OPEN_UNTIL
+
+
 ## Current shield frame (world) of a defender, or [] without a usable shield.
 static func shield_world(f: Dictionary) -> Array:
-	if not bool(f.has_shield) or float(f.shield_integrity) <= 0.0:
+	if not shield_usable(f):
 		return []
 	var pose := "stance"
 	var frame := 0
@@ -503,7 +530,7 @@ static func _contact_record(state: Dictionary, f: Dictionary, d: Dictionary, g: 
 	var v_base: Vector3 = (cur[0] - prev[0]) * FPS
 	var v_tip: Vector3 = (cur[1] - prev[1]) * FPS
 	var velocity := v_base.lerp(v_tip, clampf(along, 0.0, 1.0))
-	return {"attacker":f.id, "defender":d.id, "kind":kind, "clip_frame":g, "substep":float(k) / float(steps),
+	return {"attacker":f.id, "defender":d.id, "move":f.move, "kind":kind, "clip_frame":g, "substep":float(k) / float(steps),
 		"point":point, "velocity":velocity, "along":along, "frame":state.frame}
 
 
@@ -512,14 +539,17 @@ static func _resolve(state: Dictionary, c: Dictionary, events: Array) -> void:
 	var d: Dictionary = state.fighters[c.defender]
 	if not bool(d.alive):
 		return
-	var m := Tracks.move(str(f.kit), str(f.move))
+	# The contact's own move: a strike that landed in the same frame may
+	# already have knocked this attacker out of it (a fair trade).
+	var move_id := str(c.move)
+	var m := Tracks.move(str(f.kit), move_id)
 	var family := str(m.family)
 	var speed := (c.velocity as Vector3).length()
 	# Drive speed: the fastest the striking point has moved inside the live
 	# window up to this contact. A free-air clip decelerates into full
 	# extension; a target met there still receives the stroke's momentum,
 	# while a strike jammed early only carries what it has built up so far.
-	var drive_speed := maxf(speed, Tracks.drive_speed(str(f.kit), str(f.move), int(c.clip_frame), float(c.along)) * float(f.scale))
+	var drive_speed := maxf(speed, Tracks.drive_speed(str(f.kit), move_id, int(c.clip_frame), float(c.along)) * float(f.scale))
 	var energy := 0.5 * Weapons.effective_mass(family) * pow(float(f.scale), 3.0) * drive_speed * drive_speed
 	# A strike caught early in its window (jammed) has not developed its drive.
 	var progress := clampf(float(int(c.clip_frame) - int(m.start)) / maxf(1.0, float(int(m.peak) - int(m.start))), 0.0, 1.0)
@@ -529,9 +559,9 @@ static func _resolve(state: Dictionary, c: Dictionary, events: Array) -> void:
 		push = Vector3(float(d.x) - float(f.x), 0.0, float(d.z) - float(f.z))
 	push = push.normalized()
 	var base_event := {"frame":state.frame, "clip_frame":int(c.clip_frame), "attacker":f.id, "defender":d.id,
-		"move":f.move, "family":family, "energy_j":snappedf(energy, 0.01), "speed_m_s":snappedf(speed, 0.001), "drive_speed_m_s":snappedf(drive_speed, 0.001),
+		"move":move_id, "family":family, "energy_j":snappedf(energy, 0.01), "speed_m_s":snappedf(speed, 0.001), "drive_speed_m_s":snappedf(drive_speed, 0.001),
 		"point":c.point, "direction":Geo.side_of(float(d.yaw), -push), "direction_vector":push,
-		"weapon_material":Weapons.material(family), "strike_kind":Weapons.strike_kind(family, str(f.move))}
+		"weapon_material":Weapons.material(family), "strike_kind":Weapons.strike_kind(family, move_id)}
 	if c.kind == "shield":
 		_resolve_block(state, f, d, energy, push, c, base_event, events)
 		return
@@ -556,9 +586,8 @@ static func _resolve_block(state: Dictionary, f: Dictionary, d: Dictionary, ener
 	event.braced = braced
 	event.surface_material = "bronze" if boss and str(shield_spec.material).contains("bronze") else ("iron" if boss else "wood")
 	event.stamina_cost = snappedf(cost, 0.01)
-	f.hitstop = hitstop_frames(energy, true)
-	event.hitstop_frames = int(f.hitstop)
-	f.recoil = [-push.x, -push.z]
+	event.hitstop_frames = hitstop_frames(energy, true)
+	_hold(f, int(event.hitstop_frames), push)
 	f.weapon_wear = minf(1.0, float(f.weapon_wear) + float(Damage.Formula.balance().wear.weapon_per_hit.shield))
 	d.shield_integrity = maxf(0.0, float(d.shield_integrity) - energy / 1500.0)
 	event.shield_integrity = snappedf(float(d.shield_integrity), 0.0001)
@@ -583,6 +612,13 @@ static func _resolve_block(state: Dictionary, f: Dictionary, d: Dictionary, ener
 		_morale(state, d, 1.0, "block", events)
 		if not braced:
 			_set_reaction(state, d, "flinch", push, events)
+
+
+## Impact pause and rebound of a striker who is still in the strike.
+static func _hold(f: Dictionary, frames: int, push: Vector3) -> void:
+	if f.action == "attack":
+		f.hitstop = frames
+		f.recoil = [-push.x, -push.z]
 
 
 static func hitstop_frames(energy: float, on_shield: bool) -> int:
@@ -674,9 +710,8 @@ static func _resolve_hit(state: Dictionary, f: Dictionary, d: Dictionary, m: Dic
 	var reference := 0.5 * Weapons.effective_mass(family) * pow(float(f.scale), 3.0) * pow(float(m.window_top_speed) * float(f.scale), 2.0)
 	var event := base.duplicate()
 	event.type = "hit"
-	f.hitstop = hitstop_frames(energy, false)
-	event.hitstop_frames = int(f.hitstop)
-	f.recoil = [-push.x, -push.z]
+	event.hitstop_frames = hitstop_frames(energy, false)
+	_hold(f, int(event.hitstop_frames), push)
 	f.stats.hits = int(f.stats.hits) + 1
 	# This frame is the measured contact; the one per-hit formula (D-042).
 	var result := _book_hit(state, d, {"weapon_id":family, "strike_kind":str(base.strike_kind), "weapon_quality":int(f.weapon_quality),
@@ -745,6 +780,39 @@ static func _roll(state: Dictionary, tag: String) -> float:
 	return Geo.unit_random("%d:%d:%s" % [int(state.seed), int(state.rng), tag])
 
 
+## Yaw that points `move`'s own line (the bearing of its tip at the measured
+## peak; cuts and the spear arrive off the body's centre line) at the target.
+static func aim_yaw(state: Dictionary, id: String, target_id: String, move_id: String) -> float:
+	var f := fighter(state, id)
+	var t := fighter(state, target_id)
+	var timing := Tracks.timing(str(f.get("kit", "")), move_id)
+	if f.is_empty() or t.is_empty() or timing.is_empty():
+		return float(f.get("yaw", 0.0))
+	var d := Vector2(float(t.x) - float(f.x), float(t.z) - float(f.z))
+	if d.length_squared() < 0.000001:
+		return float(f.yaw)
+	var tip: Vector3 = Tracks.segment(str(f.kit), move_id, int(timing.peak))[1]
+	# Facing yaw turns forward (-Z) to (-sin, -cos); a tip that arrives to the
+	# right of forward needs the body turned left by its bearing.
+	return wrapf(atan2(-d.x, -d.y) + atan2(tip.x, -tip.z), -PI, PI)
+
+
+## What `move` would meet if `id` struck now and nobody moved: {"kind":
+## "body"|"shield"|"none", "defender", "clip_frame"}. Reads only; the AI uses
+## it to see an opening before committing.
+static func preview_strike(state: Dictionary, id: String, move_id: String, yaw: float = NAN) -> Dictionary:
+	var f := fighter(state, id)
+	if f.is_empty() or not Tracks.has_move(str(f.kit), move_id):
+		return {"kind":"none", "defender":"", "clip_frame":-1}
+	var probe := {"id":f.id, "kit":f.kit, "team":f.team, "x":f.x, "z":f.z, "yaw":f.yaw if is_nan(yaw) else yaw, "scale":f.scale, "height":f.height, "move":move_id}
+	var timing := Tracks.timing(str(f.kit), move_id)
+	for g in range(maxi(1, int(timing.start)), int(timing.end) + 1):
+		var contact := _sweep(state, probe, g, Callable())
+		if not contact.is_empty():
+			return {"kind":contact.kind, "defender":contact.defender, "clip_frame":g}
+	return {"kind":"none", "defender":"", "clip_frame":-1}
+
+
 ## Phase of an attacking fighter, from the measured window.
 static func phase(f: Dictionary) -> String:
 	if f.action != "attack":
@@ -779,13 +847,11 @@ static func simulate_strike(attacker_kit: String, move: String, defender_kit: St
 		return {}
 	if not add_fighter(state, "attacker", attacker_kit, attacker_options.merged({"team":"attacker", "x":sin(bearing) * distance, "z":-cos(bearing) * distance}, true)).is_empty():
 		return {}
-	face(state, "attacker", "defender")
 	# Aim the strike's own bearing (measured at its peak) at the defender.
 	var timing := Tracks.timing(attacker_kit, move)
 	if timing.is_empty():
 		return {}
-	var tip: Vector3 = Tracks.segment(attacker_kit, move, int(timing.peak))[1]
-	state.fighters.attacker.yaw = float(state.fighters.attacker.yaw) - atan2(tip.x, -tip.z)
+	state.fighters.attacker.yaw = aim_yaw(state, "attacker", "defender", move)
 	if not guard.is_empty():
 		command(state, "defender", "guard", {"style":guard})
 		step(state, 0.5)

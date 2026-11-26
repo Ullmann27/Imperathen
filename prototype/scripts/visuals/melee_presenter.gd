@@ -59,7 +59,8 @@ func apply(state: Dictionary, delta: float = 1.0 / 60.0) -> void:
 	var f: Dictionary = state.fighters.get(fighter_id, {})
 	if f.is_empty() or root == null:
 		return
-	var label := "%s:%s%s%s" % [f.action, f.move, f.guard_style, str(f.react.get("kind", "")) if typeof(f.react) == TYPE_DICTIONARY else ""]
+	var lowered: bool = Core.shield_lowered(f) and not f.action in ["react", "down"]
+	var label := "%s:%s%s%s" % ["lowered" if lowered else str(f.action), f.move, f.guard_style, str(f.react.get("kind", "")) if typeof(f.react) == TYPE_DICTIONARY else ""]
 	if label != _last_state:
 		# Strikes, guards and dodges start from the stance pose itself, so
 		# entering them from idle needs no blend; a strike is never blended,
@@ -114,9 +115,10 @@ func apply(state: Dictionary, delta: float = 1.0 / 60.0) -> void:
 			var push := basis * Vector3(float(r.push[0]), 0.0, float(r.push[1]))
 			var step := basis * Vector3(float(r.step[0]), 0.0, float(r.step[1]))
 			# Godot local (-Z forward) to the pose module's fighter space.
-			pose.reaction(Vector3(push.x, 0.0, -push.z), float(r.strength), float(r.t), float(r.duration), Vector3(step.x, 0.0, -step.z), str(r.get("zone", "torso")))
+			pose.reaction(Vector3(push.x, 0.0, -push.z), float(r.strength), float(r.t), float(r.duration), Vector3(step.x, 0.0, -step.z), str(r.get("zone", "torso")),
+				Core.SHIELD_OPEN_UNTIL if bool(f.has_shield) and str(r.kind) in Core.SHIELD_OPEN_REACTIONS else 0.0)
 		_:
-			pose.stance_pose()
+			pose.stance_pose(1.0 if lowered else 0.0)
 
 
 func _footwork(root: Vector3, yaw: float, delta: float) -> Dictionary:
