@@ -131,8 +131,20 @@ func _finish() -> void:
 
 ## Test-only bodies made from the visible house meshes (walls, paving, the
 ## imported table and bench), so contact is measured against what is drawn.
+func _authored_shell_meshes(house: Node3D, id: String) -> Array[Node]:
+	if not Family.is_family_house(house):
+		return house.find_children(Designs.shell(id).meshes, "MeshInstance3D", true, false)
+	var result: Array[Node] = []
+	for mesh: MeshInstance3D in house.find_children("*", "MeshInstance3D", true, false):
+		if mesh.has_meta("valdora_family_shell") and not String(mesh.name).ends_with("_far") and mesh.mesh != null:
+			result.append(mesh)
+	return result
+
+
 func _shell_geometry(house: Node3D, id: String) -> void:
-	for mesh: MeshInstance3D in house.find_children(Designs.shell(id).meshes, "MeshInstance3D", true, false):
+	var meshes := _authored_shell_meshes(house, id)
+	_check(not meshes.is_empty(), id + " has actual authored shell meshes to test")
+	for mesh: MeshInstance3D in meshes:
 		var body := StaticBody3D.new()
 		body.collision_layer = TEST_LAYER
 		body.collision_mask = 0
@@ -475,7 +487,7 @@ func _check_lights(interiors: Node3D, region: Node3D) -> void:
 	_check(confined == everything.size(), "Indoor lights reach only their house, the open forge reaches the lane (%d/%d)" % [confined, everything.size()])
 	for id: String in ["weaver_home", Designs.ATRIUM]:
 		var house := region.get_node(id) as Node3D
-		for mesh: MeshInstance3D in house.find_children(Designs.shell(id).meshes, "MeshInstance3D", true, false):
+		for mesh: MeshInstance3D in _authored_shell_meshes(house, id):
 			_check((mesh.layers & interiors.FIRE_LAYER) != 0, "%s shell mesh %s receives the hearth light" % [id, mesh.name])
 	report.hearth_lights = hearths
 	report.lamp_lights = lamps
