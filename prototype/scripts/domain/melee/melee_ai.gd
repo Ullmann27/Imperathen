@@ -14,15 +14,28 @@ const Geo = preload("res://scripts/domain/melee/melee_geometry.gd")
 ## How far inside the measured peak reach an attacker wants to stand (m).
 const SPACING := 0.08
 const EXHAUSTED := 25.0
+## Fighting styles per warrior family (design data, not measurements):
+## move weights, how far inside the measured reach they stand, and how often
+## they read an incoming strike. Roman: stab from behind the scutum; Germanic
+## axe: committed overhead/diagonal cuts at closer range; spear: keep the
+## longer distance. Unknown kits fall back to equal weights.
+const STYLES := {
+	"legionary":{"weights":{"thrust":5.0, "cut_inward":1.5, "cut_outward":1.5, "overhead":0.7, "turn_cut":0.3}, "spacing":0.10, "skill":0.75},
+	"axe_fighter":{"weights":{"axe_overhead":3.0, "axe_cut_inward":2.0, "axe_cut_outward":1.2}, "spacing":0.18, "skill":0.6},
+	"spearman":{"weights":{"spear_thrust":1.0}, "spacing":0.05, "skill":0.65},
+	"youth_unarmed":{"weights":{"jab_left":3.0, "jab_right":3.0, "front_kick":1.0}, "spacing":0.05, "skill":0.5}}
 
 
 ## `skill` (0..1) is the chance to read an incoming strike in time; fatigue
 ## and wavering morale lower it. The roll is seeded once per strike.
-static func decide(state: Dictionary, id: String, target_id: String, skill: float = 0.7) -> Dictionary:
+static func decide(state: Dictionary, id: String, target_id: String, skill: float = -1.0) -> Dictionary:
 	var f := Core.fighter(state, id)
 	var t := Core.fighter(state, target_id)
 	if f.is_empty() or t.is_empty() or not bool(f.alive) or not bool(t.alive):
 		return {"action":"wait", "args":{}}
+	var style: Dictionary = STYLES.get(str(f.kit), {})
+	if skill < 0.0:
+		skill = float(style.get("skill", 0.7))
 	if f.action in ["attack", "react", "down", "dodge"]:
 		return {"action":"wait", "args":{}}
 	var to_target := Vector2(float(t.x) - float(f.x), float(t.z) - float(f.z))
@@ -34,9 +47,9 @@ static func decide(state: Dictionary, id: String, target_id: String, skill: floa
 		var reach := Core.nominal_reach(str(t.kit), str(t.move), float(f.radius), float(t.scale))
 		if frame <= int(timing.end) and distance <= reach + 0.25 and reads(state, f, t, skill):
 			if bool(f.has_shield) and float(f.shield_integrity) > 0.0 and float(f.stamina) >= Core.GUARD_MIN_STAMINA:
-				var style := guard_for(state, f, t)
-				if f.action != "guard" or str(f.guard_style) != style:
-					return {"action":"guard", "args":{"style":style}}
+				var guard_style := guard_for(state, f, t)
+				if f.action != "guard" or str(f.guard_style) != guard_style:
+					return {"action":"guard", "args":{"style":guard_style}}
 				return {"action":"wait", "args":{}}
 			if float(f.stamina) >= Core.DODGE_COST and frame < int(timing.peak) - 6:
 				return {"action":"dodge", "args":{"style":"dodge_back"}}
@@ -48,7 +61,7 @@ static func decide(state: Dictionary, id: String, target_id: String, skill: floa
 		var away := -to_target.normalized() if distance > 0.0001 else Vector2(0.0, 1.0)
 		return {"action":"retreat", "args":{}, "goal":Vector2(float(f.x), float(f.z)) + away * 0.6}
 	# 3. Close to the measured reach of the chosen move, then strike.
-	var want := Core.nominal_reach(str(f.kit), str(best.move), float(t.radius), float(f.scale)) - SPACING
+	var want := Core.nominal_reach(str(f.kit), str(best.move), float(t.radius), float(f.scale)) - float(style.get("spacing", SPACING))
 	if distance > want:
 		var goal := Vector2(float(t.x), float(t.z)) - to_target.normalized() * want
 		return {"action":"approach", "args":{}, "goal":goal}
@@ -63,18 +76,28 @@ static func reads(state: Dictionary, f: Dictionary, t: Dictionary, skill: float)
 	return Geo.unit_random("%d:read:%s:%s:%d" % [int(state.seed), str(f.id), str(t.id), started]) < chance
 
 
-## Longest-reaching affordable move whose reach still covers the distance;
-## ties broken by the seeded stream so fighters do not repeat one pattern.
+## Affordable move drawn from the family's style weights (seeded), so each
+## warrior family fights differently without repeating one fixed pattern.
 static func best_move(state: Dictionary, f: Dictionary, t: Dictionary) -> Dictionary:
+	var weights: Dictionary = STYLES.get(str(f.kit), {}).get("weights", {})
 	var options: Array = []
+	var total := 0.0
 	for move: String in Tracks.moves_of(str(f.kit)):
 		if Core.move_cost(str(f.kit), move) > float(f.stamina):
 			continue
-		options.append({"move":move, "reach":Core.nominal_reach(str(f.kit), move, float(t.radius), float(f.scale))})
+		var weight := float(weights.get(move, 1.0 if weights.is_empty() else 0.0))
+		if weight <= 0.0:
+			continue
+		total += weight
+		options.append({"move":move, "weight":weight, "reach":Core.nominal_reach(str(f.kit), move, float(t.radius), float(f.scale))})
 	if options.is_empty():
 		return {}
-	var pick := int(floor(Geo.unit_random("%d:%d:ai:%s" % [int(state.seed), int(state.frame), str(f.id)]) * options.size()))
-	return options[clampi(pick, 0, options.size() - 1)]
+	var roll := Geo.unit_random("%d:%d:ai:%s" % [int(state.seed), int(state.frame), str(f.id)]) * total
+	for option: Dictionary in options:
+		roll -= float(option.weight)
+		if roll < 0.0:
+			return option
+	return options[options.size() - 1]
 
 
 ## Guard style from where the incoming weapon is: high for strikes that come

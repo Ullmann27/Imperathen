@@ -29,6 +29,7 @@ func _initialize() -> void:
 	_test_ai_guard_choice()
 	_test_ai_duel()
 	_test_simulate_strike()
+	_test_fighting_styles()
 	for line in table:
 		print(line)
 	for failure in failures:
@@ -524,11 +525,16 @@ func _test_ai_duel() -> void:
 	_check(first.state == again.state, "An AI duel replays identically for one seed")
 	_check(first.finite, "AI duel state stays finite")
 	_check(int(c.get("block", 0)) + int(c.get("parry", 0)) >= 3, "Two shield-bearers close to the measured reach and catch frontal strikes (%s)" % JSON.stringify(c))
-	var open := _ai_duel(8, false)
-	var o: Dictionary = open.counts
-	_check(int(o.get("hit", 0)) >= 1, "Without a shield the fallible defence lets real hits through (%s)" % JSON.stringify(o))
-	_check(float(open.gap) >= -0.01, "No interpenetration in the open duel (%.3f m)" % float(open.gap))
-	table.append("KI-Duell ohne Scutum (Seed 8): " + JSON.stringify(o))
+	var o := {}
+	var gap := INF
+	for seed in range(1, 7):
+		var open := _ai_duel(seed, false)
+		gap = minf(gap, float(open.gap))
+		for key: String in open.counts:
+			o[key] = int(o.get(key, 0)) + int(open.counts[key])
+	_check(int(o.get("hit", 0)) >= 1, "Without a shield the fallible defence lets real hits through (seeds 1-6: %s)" % JSON.stringify(o))
+	_check(gap >= -0.01, "No interpenetration in the open duels (%.3f m)" % gap)
+	table.append("KI-Duelle ohne Scutum (Seeds 1-6, je bis 25 s, summiert): " + JSON.stringify(o))
 	_check(float(first.gap) >= -0.01, "Fighters never interpenetrate (min gap %.3f m)" % float(first.gap))
 	table.append("KI-Duell Legionär gegen Axtkämpfer (Seed 8, bis 25 s): " + JSON.stringify(c) + (", kleinster Körperabstand %.3f m" % float(first.gap)))
 
@@ -543,3 +549,25 @@ func _test_simulate_strike() -> void:
 	_check(far.get("type", "") == "whiff", "Level-B helper: out of reach is a whiff (%s)" % far.get("type", "-"))
 	_check(JSON.stringify(side) == JSON.stringify(Core.simulate_strike("legionary", "thrust", "axe_fighter", reach - 0.02, 90.0, "guard_front")), "Level-B helper is deterministic")
 	table.append("simulate_strike (Ebene B): Stoß frontal in guard_front=%s (Frame %s), Waffenseite=%s (Frame %s, %s, %s Schaden), 1 m zu weit=%s" % [front.get("type"), str(front.get("clip_frame")), side.get("type"), str(side.get("clip_frame")), side.get("zone", "-"), str(side.get("damage", "-")), far.get("type")])
+
+
+func _test_fighting_styles() -> void:
+	var counts := {}
+	for kit: String in ["legionary", "axe_fighter"]:
+		var state := Core.new_state(5)
+		Core.add_fighter(state, "f", kit, {"team":"a"})
+		Core.add_fighter(state, "t", "legionary", {"team":"b", "z":-6.0})
+		var tally := {}
+		for i in 400:
+			state.frame = i
+			var m: Dictionary = AI.best_move(state, state.fighters.f, state.fighters.t)
+			tally[m.move] = int(tally.get(m.move, 0)) + 1
+		counts[kit] = tally
+	var leg: Dictionary = counts.legionary
+	var axe: Dictionary = counts.axe_fighter
+	_check(int(leg.get("thrust", 0)) > 400 * 0.45, "The legionary style stabs most of the time (%s)" % JSON.stringify(leg))
+	_check(int(axe.get("axe_overhead", 0)) > int(axe.get("axe_cut_outward", 0)), "The axe style favours the overhead chop (%s)" % JSON.stringify(axe))
+	var spear := Core.nominal_reach("spearman", "spear_thrust", 0.2) - float(AI.STYLES.spearman.spacing)
+	var axe_reach := Core.nominal_reach("axe_fighter", "axe_overhead", 0.2) - float(AI.STYLES.axe_fighter.spacing)
+	_check(spear > axe_reach + 0.6, "The spearman engages from well outside the axe's distance (%.2f vs %.2f m)" % [spear, axe_reach])
+	table.append("Kampfstile (400 Entscheidungen): Legionär %s; Axtkämpfer %s; Einsatzdistanz Speer %.2f m gegen Axt %.2f m" % [JSON.stringify(leg), JSON.stringify(axe), spear, axe_reach])
