@@ -101,9 +101,99 @@ path (Spieler (0,9 | 0 | 12,5), Yaw 0, Pitch 0,24), conversation (Julia; Spieler
 Kamera 1,15 m hinter / 0,52 m neben / 1,62 m hoch, FOV 44), overview (Auge (31 | 17,5 | 33) → Ziel (-4 | 1 | -9)).
 Auflösungen 1280×720 und 1384×1536 (Fold7-Innenseitenverhältnis), Profile balanced und very_high.
 
-## 6. Messungen
+## 6. Vorher/Nachher-Aufnahmen und Messungen (D-038)
 
-Wird mit den Vorher/Nachher-Aufnahmen ergänzt (Commit, Profil, Renderer, Speicher, llvmpipe-Zeiten nur relativ).
+Bilder und Zähler liegen in `docs/art/valdora_look_2026_11_26/`:
+
+- `before_after_1280x720_balanced.jpg`, `before_after_1280x720_very_high.jpg`: start, path und overview, links vorher,
+  rechts nachher, **identische Kamera** (Kameramatrix in beiden JSON-Dateien gleich).
+- `after_conversation_1280x720.jpg`: Gesprächseinstellung nur nachher. Eine Vorher-Aufnahme mit derselben Kamera
+  **fehlt** (die Vorher-Läufe haben den Spieler anders platziert); sie ist offen.
+- `before_ffbe3ad_1280x720_look.json`, `after_9e24ec7_1280x720_look.json`: Zähler je Einstellung und Profil.
+  `png_sha256.txt`: Prüfsummen der Einzelbilder (die PNGs selbst liegen nur im Arbeitsverzeichnis des Laufs).
+
+| Angabe | Wert |
+|---|---|
+| Quellstand vorher / nachher | ffbe3ad / 9e24ec7 (spätere Commits dieses Branches sind **nicht** in diesen Bildern) |
+| Befehl | `xvfb-run … godot --path prototype --resolution 1280x720 --script res://tests/village_look_review.gd ++ <out> <label> 3` |
+| Spielpfad | main.tscn → neues Leben → Valdora, Frühling, Nachmittags-Voreinstellung, klares Wetter |
+| Profile | balanced (Ausgewogen) und very_high (Ultra) |
+| Renderer / Treiber | gl_compatibility, OpenGL 4.5 Core, Mesa 25.2.8 llvmpipe (LLVM 20.1.2, Software) |
+| Auflösung | 1280×720, Render-Skalierung 1,0 |
+| Licht | Sonne −29°/−38°, Energie 2,0, `#ffdcb0`; Himmels-Umgebungslicht 0,52; ACES, Belichtung 0,88 |
+| Look-Texturen (sha256, 16 Stellen) | lime_plaster albedo 171d1c3531a1ecfa, mask c59414455ebcc216, normal fec3771b2f9b075f; meadow_sod afeffb3604d92ef4 / f147e355b89ac14b; trodden_earth 527198c6938ba0c7 / 01f16dbf69dea6b1; wear_detail 1c525a5f4ae733a9 / d7345eefc7adfef1 |
+| Hausmodell | frontier_house.glb 2fb464187ecec393 |
+| Fehler im Lauf | nachher keine Review-Fehler; in beiden Läufen fehlt `gear_roman_signum_1.glb` (veralteter Import-Cache des Arbeitsverzeichnisses), ein Ausrüstungsteil ist daher nicht im Bild |
+
+Zähler vorher → nachher (Median aus 3 Bildern; Zeiten sind llvmpipe-Software-Zeiten unter wechselnder Maschinenlast,
+**keine** Geräteleistung und untereinander nur grob vergleichbar):
+
+| Einstellung | Profil | Draw Calls | Primitive (Tsd.) | Schattenprimitive (Tsd.) | Videospeicher MiB | Sekunden je Bild |
+|---|---|---|---|---|---|---|
+| start | balanced | 635 → 674 | 428 → 446 | 511 → 513 | 246 → 256 | 9,5 → 21,0 |
+| start | very_high | 955 → 1363 | 530 → 620 | 987 → 1338 | 313 → 327 | 13,7 → 31,9 |
+| path | balanced | 1033 → 1055 | 617 → 639 | 461 → 445 | 232 → 240 | 7,4 → 38,8 |
+| path | very_high | 2504 → 2783 | 785 → 945 | 1649 → 1935 | 302 → 316 | 15,6 → 27,9 |
+| overview | balanced | 1275 → 1280 | 721 → 731 | 336 → 322 | 159 → 168 | 10,7 → 31,9 |
+| overview | very_high | 2550 → 2849 | 885 → 1051 | 1190 → 1385 | 218 → 232 | 11,3 → 32,5 |
+
+Die Nachher-Läufe liefen bei deutlich höherer Maschinenlast (Last 10–14 statt etwa 4); der Zeitzuwachs ist deshalb
+nicht dem Look zuzuordnen. Belastbar sind Draw Calls, Primitive und Speicher: balanced +1 bis +6 % Draw Calls und
++9 MiB Videospeicher; Ultra +11 bis +43 % Draw Calls (dichtere Vegetation, Lichtschächte) und +14 MiB.
+
+Helligkeitsverteilung der Nachher-Bilder (Anteil Pixel mit einem Kanal ≥ 0,985):
+
+| Einstellung | balanced | very_high |
+|---|---|---|
+| start | 0,10 % | 0,04 % |
+| path | 5,12 % | 0,01 % |
+| overview | 3,49 % | 0,00 % |
+| conversation | 13,32 % | 0,01 % |
+
+**Sichtbare Verbesserungen:** gerichtetes warmes Sonnenlicht mit lesbaren Gebäude- und Baumschatten statt flacher
+Ausleuchtung; Himmelslicht in den Schatten; Tiefendunst zu den Hügeln; Kalkputz mit Struktur statt gekachelter
+Flecken; dunklerer, gerichteter Innenraum mit Sonnenfleck an der Tür; dichtere Wegränder.
+
+**Verbleibende Fehler (ehrlich):**
+
+1. **Ausgewogen überstrahlt sonnenbeschienenen Putz, Haut und helle Requisiten** (bis 13 % ausgefressene Pixel,
+   gelb-orange Farbverschiebung), Ultra nicht. Wahrscheinliche Ursache, noch nicht durch einen Gegenlauf belegt: Ohne
+   Glow wendet der Compatibility-Renderer das Tonemapping je Lichtdurchgang im 8-Bit-Ziel an (die Schattensonne wird
+   additiv gezeichnet), mit Glow dagegen einmal am Ende aus dem HDR-Puffer. Nächster Schritt: auf balanced den
+   HDR-Nachbearbeitungspfad erzwingen (Glow mit Intensität 0) oder die Belichtung dort senken, und die Kosten messen.
+   Ein Abstimmlauf dazu (`glow0`, AgX, Belichtung 0,7) war beim Abschluss noch in der Warteschlange.
+2. Innenraum (start) auf balanced sehr dunkel (Mittelwert 0,22); die Putzabplatzungen wiederholten sich als Muster.
+   Für das Muster gibt es eine Shader-Korrektur in einem späteren Commit (nicht gerendert).
+3. Heller Fleck des Fensterlichts an der Rückwand (Kegel streift die Wand); Winkel liegt jetzt als
+   `interior.window_angle` in den Look-Werten, der Wert ist noch nicht nachgestellt.
+4. Amphoren und einige Requisiten bleiben einfarbig-flach; helle Baumkrone im Vordergrund der Übersicht.
+5. Tageszeit, Wetter, Nacht und Feuerlicht sind nur headless getestet, **nicht gerendert**.
+6. Keine Aufnahmen in 1384×1536, keine für low/high, keine Gerätemessung.
+
+## 7. Status beim Abschluss (26.11.2026, Wrap-up)
+
+| Teil | umgesetzt | getestet | gerendert |
+|---|---|---|---|
+| Sonne, Himmelslicht, Dunst, ACES, Profile | ja | `village_look_test` grün | ja (Abschnitt 6), balanced überstrahlt |
+| Kalkputz, Abnutzung, Wege/Wiese | ja | ja | ja |
+| Innenraumlicht, Lichtschächte | ja | ja | ja (start), Feinabstimmung offen |
+| Tageszeit, Mond, Fensterglut, Wetter | ja | headless | **nein** |
+| Feuerlicht: Schmiedeherd, Türfackeln, Budget je Profil (1/3/5/7) | ja (wip) | headless, 43 Prüfungen | **nein** |
+| Putz: Abplatzungen nur in verwitterten Zonen, nie im Wohnraum | ja (wip) | Shader nicht geladen geprüft | **nein** |
+| SSAO, Split-Tone-LUT | Schalter vorhanden, aus | – | Wirkung nicht belegt |
+| Spieluhr treibt Tageszeit | nein (Schnittstelle `set_time_of_day`) | – | – |
+| Gerätebestätigung Fold7 | nein | – | – |
+
+Befehle: `python3 tools/check_prototype.py --godot <godot> --only village_look` bzw.
+`godot --headless --path prototype --script res://tests/village_look_test.gd` (43 Prüfungen, 0 Fehler, Stand db068d6);
+Aufnahmen in kurzen Läufen: `… --script res://tests/village_look_review.gd ++ <out> <label> 2 balanced start,path`.
+
+Nächste Schritte: (1) Überstrahlung auf balanced beheben und nachrendern; (2) Gesprächs-Vorheraufnahme mit gleicher
+Kamera; (3) Nacht-, Dämmerungs-, Wetter- und Fackelaufnahmen, danach Fackelposition und Lichtstärken abstimmen;
+(4) AgX gegen ACES im HDR-Pfad vergleichen; (5) 1384×1536 und Profile low/high; (6) LightmapGI für die statischen Häuser.
+
+Für den Render-Profil-Agenten bleiben stabil: `cameras.path`, `cameras.overview`, `cameras.conversation`, `night`, `fire`
+in `look_values.json` sowie `set_time_of_day` und `add_fire_light`.
 
 [godot-env]: https://docs.godotengine.org/en/4.6/classes/class_environment.html
 [godot-lightmap]: https://docs.godotengine.org/en/4.7/tutorials/3d/global_illumination/using_lightmap_gi.html
