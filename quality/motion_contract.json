@@ -21,7 +21,9 @@
         "action_world",
         "camera_collision",
         "motion_skin_measurement",
-        "hero_cloth_grounding"
+        "hero_cloth_grounding",
+        "melee_tracks",
+        "melee_visual_contact"
       ],
       "review_scope": [
         "idle_talk",
@@ -345,7 +347,8 @@
       "required_checks": [
         "meshy_characters",
         "meshy_equipment",
-        "npc_behavior_world"
+        "npc_behavior_world",
+        "melee_tracks"
       ],
       "review_scope": [
         "idle_talk",
@@ -376,7 +379,8 @@
       "required_checks": [
         "soldier_gait",
         "soldier_visuals",
-        "frontier_people"
+        "frontier_people",
+        "melee_tracks"
       ],
       "review_scope": [
         "march_run_retreat",
@@ -448,7 +452,9 @@
         "character_motion",
         "combat_actions",
         "combat_model",
-        "motion_mesh_clearance"
+        "motion_mesh_clearance",
+        "melee_tracks",
+        "melee_visual_contact"
       ],
       "review_scope": [
         "grip_socket",
@@ -473,7 +479,9 @@
       "required_checks": [
         "meshy_equipment",
         "meshy_characters",
-        "motion_mesh_clearance"
+        "motion_mesh_clearance",
+        "melee_tracks",
+        "melee_visual_contact"
       ],
       "review_scope": [
         "grip_socket",
@@ -667,6 +675,11 @@
     "scripts/cinematic/opening_checkpoint.gd",
     "scripts/cinematic/opening_director.gd",
     "scripts/domain/combat_actions.gd",
+    "scripts/domain/melee/melee_core.gd",
+    "scripts/domain/melee/melee_feedback.gd",
+    "scripts/domain/melee/melee_geometry.gd",
+    "scripts/domain/melee/melee_track_data.gd",
+    "scripts/domain/melee/melee_tracks.gd",
     "scripts/domain/npc_behavior.gd",
     "scripts/domain/unarmed_combat.gd",
     "scripts/domain/village_economy.gd",
@@ -713,6 +726,10 @@
     "scripts/visuals/far_ranks.gd",
     "scripts/visuals/grove.gd",
     "scripts/visuals/hand_pose.gd",
+    "scripts/visuals/melee_impact_audio.gd",
+    "scripts/visuals/melee_impact_fx.gd",
+    "scripts/visuals/melee_pose.gd",
+    "scripts/visuals/melee_presenter.gd",
     "scripts/visuals/meshy_asset_registry.gd",
     "scripts/visuals/meshy_character_registry.gd",
     "scripts/visuals/meshy_equipment.gd",
@@ -804,6 +821,20 @@
     "scripts/world/camera_obstruction.gd": [
       "hero",
       "village_navigation"
+    ],
+    "scripts/visuals/melee_pose.gd": [
+      "hero",
+      "service_gear",
+      "meshy_people",
+      "meshy_gear",
+      "battle_rigs"
+    ],
+    "scripts/visuals/melee_presenter.gd": [
+      "hero",
+      "service_gear",
+      "meshy_people",
+      "meshy_gear",
+      "battle_rigs"
     ]
   }
 }
