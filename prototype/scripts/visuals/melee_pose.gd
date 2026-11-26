@@ -392,6 +392,19 @@ func _hermite(keys: Array, i: int, u: float, field: String) -> Variant:
 
 
 func _feet_at(stance: Dictionary, steps: Array, at: float) -> Dictionary:
+	if not _feet_override.is_empty():
+		# A strike that starts from planted footwork steps from where the
+		# feet actually stand (no jump back to the nominal stance).
+		var metres := REF_HEAD * _k * _world_scale
+		var placed := {"metres":true, "l":Vector3(_feet_override.l), "r":Vector3(_feet_override.r), "lift_l":0.0, "lift_r":0.0}
+		for step: Array in steps:
+			var side: String = step[0]
+			var progress := smoothstep(float(step[1]), float(step[2]), at)
+			var offset := Vector3(step[3]) * progress * metres
+			placed[side] = Vector3(placed[side]) + Vector3(offset.x, 0.0, offset.z)
+			if progress > 0.0 and progress < 1.0:
+				placed["lift_" + side] = maxf(float(placed["lift_" + side]), sin(progress * PI) * float(step[4]) * metres)
+		return placed
 	var feet := {"l":Vector3(stance.foot_l), "r":Vector3(stance.foot_r), "lift_l":0.0, "lift_r":0.0}
 	for step: Array in steps:
 		var side: String = step[0]

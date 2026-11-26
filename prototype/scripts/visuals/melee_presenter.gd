@@ -28,6 +28,7 @@ var _planted := {}
 var _step := {}
 var _last_root := Vector3.INF
 var _velocity := Vector3.ZERO
+var _strike_feet := {}
 
 
 ## A VillagePerson (hero, Meshy) whose origin stands 0.9 m above the ground.
@@ -81,8 +82,17 @@ func apply(state: Dictionary, delta: float = 1.0 / 60.0) -> void:
 		_velocity = _velocity.lerp((root_ground - _last_root) / delta, 0.35)
 	_last_root = root_ground
 	if f.action in ["idle", "guard"]:
+		_strike_feet = {}
 		pose.set_feet(_footwork(root_ground, float(f.yaw), delta))
+	elif f.action == "attack" and kit != "youth_unarmed":
+		# The strike starts from the feet where footwork planted them.
+		if _strike_feet.is_empty():
+			_strike_feet = _planted_feet(root_ground, float(f.yaw))
+		pose.set_feet(_strike_feet)
+		_planted.clear()
+		_step.clear()
 	else:
+		_strike_feet = {}
 		_planted.clear()
 		_step.clear()
 		pose.set_feet({})
@@ -152,5 +162,21 @@ func _footwork(root: Vector3, yaw: float, delta: float) -> Dictionary:
 	var inverse := basis.inverse()
 	for side: String in ["l", "r"]:
 		var local := inverse * ((world[side] as Vector3) - root)
+		out[side] = Vector3(local.x, 0.0, -local.z)
+	return out
+
+
+## Feet in fighter metres as last planted (in-flight feet use their landing
+## spot); empty when footwork never ran, so the strike uses its own stance.
+func _planted_feet(root: Vector3, yaw: float) -> Dictionary:
+	if _planted.is_empty():
+		return {}
+	var spots := _planted.duplicate()
+	if not _step.is_empty():
+		spots[_step.side] = _step.to
+	var inverse := Basis(Vector3.UP, yaw).inverse()
+	var out := {}
+	for side: String in ["l", "r"]:
+		var local := inverse * ((spots[side] as Vector3) - root)
 		out[side] = Vector3(local.x, 0.0, -local.z)
 	return out

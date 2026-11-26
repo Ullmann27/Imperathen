@@ -34,6 +34,7 @@ func _process(_delta: float) -> bool:
 	_scenario("youth jab_right -> legionary (no shield)", "youth_unarmed", "jab_right", "legionary", false, "", 0.0, "hit")
 	_footwork("legionary", "idle")
 	_footwork("axe_fighter", "guard")
+	_approach_then_strike()
 	for failure in failures:
 		printerr("FAIL: " + failure)
 	print("MELEE_VISUAL_CONTACT_RESULT checks=%d failures=%d" % [checks, failures.size()])
@@ -96,6 +97,46 @@ func _footwork(kit: String, mode: String) -> void:
 	_check(settled <= 0.10, "%s %s: feet settle at the stance after stopping (%.3f m)" % [kit, mode, settled])
 	_check(steps >= 6, "%s %s: the approach is walked in real steps (%d)" % [kit, mode, steps])
 	print("footwork %s %s: max planted slip %.4f m, steps %d, settle error %.3f m" % [kit, mode, worst, steps, settled])
+
+
+## Walk in with footwork, then thrust: the feet must not jump when the strike
+## starts and the rendered blade must stay on the measured track.
+func _approach_then_strike() -> void:
+	var actor: Dictionary = _actors.legionary
+	var p: Node3D = actor.node
+	var state := Core.new_state(4)
+	Core.add_fighter(state, "f", "legionary", {"team":"f"})
+	var presenter := Presenter.new()
+	presenter.bind_person(p, "legionary", "f")
+	var skeleton := Probe.skeleton_of(p.body)
+	for frame in 75:
+		if frame < 60:
+			Core.place(state, "f", 0.0, -1.2 * (frame + 1) / 60.0, 0.0)
+		Core.step(state, 1.0 / 60.0)
+		presenter.apply(state)
+	var feet_before := {}
+	for side: String in ["L", "R"]:
+		feet_before[side] = p.global_transform * Probe.bone_in(p, skeleton, "Foot_" + side).origin
+	Core.command(state, "f", "attack", {"move":"thrust"})
+	var timing := Tracks.timing("legionary", "thrust")
+	var worst_track := 0.0
+	var jump := 0.0
+	for frame in int(timing.frames) - 1:
+		Core.step(state, 1.0 / 60.0)
+		presenter.apply(state)
+		if frame == 0:
+			for side: String in ["L", "R"]:
+				var foot: Vector3 = p.global_transform * Probe.bone_in(p, skeleton, "Foot_" + side).origin
+				jump = maxf(jump, Vector2(foot.x - feet_before[side].x, foot.z - feet_before[side].z).length())
+		var f: Dictionary = state.fighters.f
+		if f.action != "attack":
+			break
+		var rendered := _rendered_strike(actor)
+		var measured := Core.strike_world(f, Tracks.frame_of(float(f.t)))
+		worst_track = maxf(worst_track, maxf((rendered[0] as Vector3).distance_to(measured[0]), (rendered[1] as Vector3).distance_to(measured[1])))
+	_check(jump <= 0.01, "Feet do not jump when a strike starts after footwork (%.4f m)" % jump)
+	_check(worst_track <= 0.01, "After footwork the rendered blade stays on the measured track (%.4f m)" % worst_track)
+	print("approach then thrust: foot jump %.4f m, max blade deviation from track %.4f m" % [jump, worst_track])
 
 
 func _attachment(root: Node, prefix: String) -> BoneAttachment3D:
