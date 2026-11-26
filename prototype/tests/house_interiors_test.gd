@@ -558,7 +558,29 @@ func _check_forge(interiors: Node3D, region: Node3D) -> void:
 		_check(is_instance_valid(shell) and shell.scene_file_path == Family.FORGE_SCENE, "The authored forge shell is used in the live settlement")
 		if is_instance_valid(shell):
 			var meshes := shell.find_children("*", "MeshInstance3D", true, false)
-			_check(meshes.size() == 2, "Only the original shell and distant proxy are rendered; no duplicated workshop fixtures")
+			_check(meshes.size() == 2 + Family.FORGE_FIXTURES.size(), "The original shell, distant proxy and independently fitted workstations are retained")
+			var fitted_count := 0
+			for record: Dictionary in interiors.manifest[Designs.FORGE]:
+				var prop: String = record.prop
+				if not Family.FORGE_FIXTURES.has(prop):
+					continue
+				var fixture_name: String = Family.FORGE_FIXTURES[prop]
+				var fixture := shell.find_child(fixture_name, true, false) as MeshInstance3D
+				var fitted := is_instance_valid(fixture) and fixture.mesh != null and fixture.is_visible_in_tree() and record.get("authored_visual", "") == fixture_name
+				_check(fitted, prop + " uses its fitted original mesh instead of the kit visual")
+				if not fitted:
+					continue
+				fitted_count += 1
+				var actual: AABB = shell.transform * fixture.transform * fixture.mesh.get_aabb()
+				var expected: AABB = (record.transform as Transform3D) * Kit.aabb(prop)
+				_check(expected.grow(.002).encloses(actual), prop + " original visual stays inside its established gameplay envelope")
+				_check(absf(actual.position.y - expected.position.y) < .002, prop + " stands on the established floor")
+				_check(Vector2(actual.get_center().x, actual.get_center().z).distance_to(Vector2(expected.get_center().x, expected.get_center().z)) < .002, prop + " remains centred at its established workstation")
+				for profile: String in ["low", "balanced", "high", "very_high"]:
+					interiors.set_quality(profile)
+					_check(fixture.is_visible_in_tree() and fixture.material_override != null and is_equal_approx(fixture.visibility_range_end, float(Family.RANGES[profile].detail)), prop + " retains its original material and profile-specific LOD in " + profile)
+			_check(fitted_count == Family.FORGE_FIXTURES.size(), "All independently movable authored workstations are fitted")
+			interiors.set_quality("balanced")
 			var original := shell.find_child("valdora_forge_shell", true, false) as MeshInstance3D
 			var proxy := shell.find_child("valdora_forge_far", true, false) as MeshInstance3D
 			_check(is_instance_valid(original) and is_instance_valid(proxy), "The two original forge LOD roles are present")

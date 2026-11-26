@@ -120,6 +120,7 @@ func _furnish(house: Node3D, id: String) -> Node3D:
 		_forge_shell = Family.instantiate_forge_shell(_profile)
 		if is_instance_valid(_forge_shell):
 			room.add_child(_forge_shell)
+			_fit_forge_fixtures(_forge_shell, placed)
 	# Keep the interior kit's four aligned post colliders, but do not render
 	# its redundant roof when the authored shell is actually instantiated.
 	_merge(room, placed)
@@ -492,6 +493,42 @@ func resolve(items: Array, house_id := "") -> Array:
 	return placed
 
 
+## The original GLB has baked-in legacy station coordinates. Fit the mesh to
+## the current design's room-local envelope, not the other way around. Keep
+## the gameplay transforms, colliders and markers identical. If the asset
+## is missing, malformed or would require excessive compression, retain the
+## existing kit visual; never suppress it on an unsuccessful import.
+func _fit_forge_fixtures(model: Node3D, placed: Array) -> void:
+	for record: Dictionary in placed:
+		var prop: String = record.prop
+		if not Family.FORGE_FIXTURES.has(prop):
+			continue
+		var fixture_name: String = Family.FORGE_FIXTURES[prop]
+		var mesh := model.find_child(fixture_name, true, false) as MeshInstance3D
+		if mesh == null or mesh.mesh == null or mesh.get_parent() != model:
+			continue
+		var old_pose := model.transform * mesh.transform
+		var source: AABB = old_pose * mesh.mesh.get_aabb()
+		var target: AABB = (record.transform as Transform3D) * Kit.aabb(prop)
+		if not source.size.is_finite() or not target.size.is_finite() or minf(source.size.x, minf(source.size.y, source.size.z)) <= .001:
+			continue
+		var scale_fit := target.size / source.size
+		if minf(scale_fit.x, minf(scale_fit.y, scale_fit.z)) < .65:
+			continue
+		# A narrow tool board must not become an unnaturally thick slab.
+		scale_fit = Vector3(minf(scale_fit.x, 1.2), minf(scale_fit.y, 1.2), minf(scale_fit.z, 1.2))
+		var offset := target.get_center() - source.get_center() * scale_fit
+		offset.y = target.position.y - source.position.y * scale_fit.y
+		var fitted := Transform3D(Basis.from_scale(scale_fit), offset) * old_pose
+		var actual: AABB = fitted * mesh.mesh.get_aabb()
+		if not target.grow(.002).encloses(actual):
+			continue
+		mesh.transform = model.transform.affine_inverse() * fitted
+		mesh.visible = true
+		mesh.set_meta("forge_work_prop", prop)
+		record["authored_visual"] = fixture_name
+
+
 func _merge(room: Node3D, placed: Array) -> void:
 	for tier: String in ["furniture", "detail"]:
 		var tools := {}
@@ -499,6 +536,8 @@ func _merge(room: Node3D, placed: Array) -> void:
 			if record.tier != tier:
 				continue
 			if record.prop == "forge_shelter" and room.has_node("AuthoredForgeShell"):
+				continue
+			if record.has("authored_visual"):
 				continue
 			var mesh: Mesh = Kit.meshes[record.prop]
 			for surface in mesh.get_surface_count():
