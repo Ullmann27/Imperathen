@@ -840,7 +840,9 @@ func _resolve_contacts() -> void:
 			var offset := a.pos - b.pos
 			if absf(offset.x) < limit + 0.1 and absf(offset.y) < limit + 0.1 and offset.length() < limit + 0.1:
 				pairs.append([a, b, limit])
-	for iteration in 2:
+	# The pair list is short; four passes keep a deep company pressing into
+	# the enemy from compressing its own men below the body limit.
+	for iteration in 4:
 		for pair in pairs:
 			var a: Agent = pair[0]
 			var b: Agent = pair[1]
