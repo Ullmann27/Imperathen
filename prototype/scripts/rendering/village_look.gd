@@ -344,6 +344,9 @@ func apply_quality(next_profile: String) -> void:
 
 
 func _process(delta: float) -> void:
+	# The valley, city or menu camera never switches the village interior.
+	if not is_visible_in_tree():
+		return
 	var camera := get_viewport().get_camera_3d()
 	if camera == null or environment == null:
 		return
