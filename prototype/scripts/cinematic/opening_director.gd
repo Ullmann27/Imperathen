@@ -6,7 +6,11 @@ signal shot_started(shot_id: String)
 signal shot_finished(shot_id: String)
 
 const HistoricalStage = preload("res://scripts/cinematic/i00_stage.gd")
-const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player", "mission_dialogue", "mission_reaction"]
+const I01Props = preload("res://scripts/world/village/i01_props.gd")
+const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player", "mission_dialogue", "mission_reaction", "i01_table_detail", "i01_shelf_cups", "i01_bed", "i01_choice", "i01_table_wide", "i01_topic_choice"]
+## I-01 shots inside the real family home (HB S. 13): table, cups and hands,
+## the shelf, the boy's bed, the breakfast table and the table-talk choice.
+const I01_SHOTS := ["i01_table_detail", "i01_shelf_cups", "i01_bed", "i01_choice", "i01_table_wide", "i01_topic_choice"]
 const DEFAULT_ANCHORS := {
 	"road": Vector3(0, 0, 18),
 	"market": Vector3(-14, 0, 4),
@@ -30,6 +34,7 @@ var _original_camera_current := false
 var _completed := false
 var _speaker: Node3D
 var mission_actor_id := ""
+var _speaker_actor := ""
 var _mission_rotations: Array[Dictionary] = []
 var _sun: DirectionalLight3D
 var _environment: Environment
@@ -181,6 +186,8 @@ func _anchor(key: String) -> Vector3:
 		var actor := _world.get_node_or_null("Marcus") as Node3D
 		if actor:
 			return actor.global_position - Vector3.UP * 0.9
+	if key.begins_with("i01_"):
+		return _world.to_global(I01Props.anchor(key))
 	return _world.to_global(DEFAULT_ANCHORS[key])
 
 
@@ -296,6 +303,14 @@ func _apply_sample(normalized_time: float) -> void:
 			target_end = face + Vector3.UP * 0.02
 			fov_start = 43.0
 			fov_end = 38.0
+		"i01_table_detail", "i01_shelf_cups", "i01_bed", "i01_choice", "i01_table_wide", "i01_topic_choice":
+			var framing := _i01_framing(shot_id)
+			start = framing[0]
+			end = framing[1]
+			target_start = framing[2]
+			target_end = framing[3]
+			fov_start = framing[4]
+			fov_end = framing[5]
 		"player":
 			var ground := _anchor("player") - Vector3.UP * 0.9
 			start = ground + Vector3(-1.5, 1.55, -2.4)
@@ -315,7 +330,7 @@ func _apply_sample(normalized_time: float) -> void:
 		var handle_b := ground + Vector3(-3.0, 1.9, 3.3)
 		camera.global_position = start.bezier_interpolate(handle_a, handle_b, end, eased)
 	var target := target_start.lerp(target_end, eased)
-	if shot_id in ["mission_dialogue","mission_reaction"]:
+	if shot_id in ["mission_dialogue","mission_reaction"] or shot_id in I01_SHOTS:
 		# Avoid placing a cutscene camera beyond a wall; only presentation moves.
 		var desired := camera.global_position
 		var query := PhysicsRayQueryParameters3D.create(target,desired,1)
@@ -336,6 +351,39 @@ func _apply_sample(normalized_time: float) -> void:
 		# Exact handoff, including any aspect-dependent camera basis. No jump.
 		camera.global_transform = _game_camera.global_transform
 		camera.fov = _game_camera.fov
+
+
+## Over-the-shoulder and table framings derived from the live figures, with
+## the authored anchors as fallback. Returns start, end, targets and lenses.
+func _i01_framing(id: String) -> Array:
+	var table := _anchor("i01_table")
+	match id:
+		"i01_table_detail":
+			return [table + Vector3(0.75, 0.42, 0.95), table + Vector3(0.25, 0.30, 0.72),
+				table + Vector3(0.10, 0.02, 0.05), table + Vector3(-0.05, 0.02, -0.80), 40.0, 34.0]
+		"i01_shelf_cups":
+			var shelf := _anchor("i01_shelf")
+			return [shelf + Vector3(1.45, 0.25, -0.55), shelf + Vector3(1.0, 0.12, -0.30),
+				shelf + Vector3(0.0, 0.05, 0.0), shelf + Vector3(0.0, 0.02, 0.02), 44.0, 36.0]
+		"i01_table_wide":
+			return [table + Vector3(2.85, 1.10, 2.55), table + Vector3(2.55, 0.95, 2.30),
+				table + Vector3(0.0, -0.10, 0.0), table + Vector3(-0.15, -0.05, 0.0), 58.0, 54.0]
+		"i01_bed", "i01_choice", "i01_topic_choice":
+			var boy := _mission_figure("player")
+			var origin := boy.global_position if is_instance_valid(boy) else _anchor("i01_bed") + Vector3.UP * 0.9
+			var partner := _mission_figure("silvanus" if id == "i01_topic_choice" else "julia")
+			var facing := partner.global_position if is_instance_valid(partner) else _anchor("i01_silvanus" if id == "i01_topic_choice" else "i01_julia") + Vector3.UP * 0.9
+			var direction := facing - origin
+			direction.y = 0.0
+			direction = direction.normalized() if direction.length() > 0.1 else Vector3.FORWARD
+			var lateral := Vector3.UP.cross(direction).normalized()
+			var shoulder := origin + Vector3.UP * 0.32
+			var near := 0.70 if id == "i01_choice" else 0.85
+			var rise := 0.0 if id != "i01_bed" else -0.12
+			return [shoulder - direction * (near + 0.15) + lateral * 0.42 + Vector3.UP * (0.10 + rise),
+				shoulder - direction * near + lateral * 0.36 + Vector3.UP * 0.10,
+				facing + Vector3.UP * 0.42, facing + Vector3.UP * 0.45, 46.0, 42.0]
+	return [table, table + Vector3.UP, table, table, 45.0, 45.0]
 
 
 func _mission_figure(actor_id: String) -> Node3D:
@@ -363,14 +411,21 @@ func _face_mission_pair() -> void:
 
 
 func _change_speaker(next_shot: String) -> void:
-	if next_shot == shot_id and (is_instance_valid(_speaker) or next_shot in ["mission_dialogue","mission_reaction"]):
+	if next_shot == shot_id and _speaker_actor == mission_actor_id and (is_instance_valid(_speaker) or next_shot in ["mission_dialogue","mission_reaction"]):
 		return
 	_release_speaker()
+	_speaker_actor = mission_actor_id
 	if next_shot in ["caesar_orders", "labienus_orders"]:
 		var historical_id := "caesar" if next_shot == "caesar_orders" else "labienus"
 		var figure := _ensure_i00_stage().call("speaker", historical_id) as Node3D
 		if figure and figure.has_method("sample_pose") and figure.has_method("reset_motion"):
 			_speaker = figure
+	elif next_shot in I01_SHOTS:
+		# The named speaker of an I-01 shot uses the existing talk pose; the
+		# face pair turns only inside the dialogue shots below.
+		var speaking := _mission_figure(mission_actor_id)
+		if is_instance_valid(speaking) and speaking.has_method("sample_pose") and speaking.has_method("reset_motion"):
+			_speaker = speaking
 	elif next_shot in ["mission_dialogue","mission_reaction"]:
 		_face_mission_pair()
 		if next_shot == "mission_dialogue":

@@ -628,10 +628,17 @@ func update_state(state: Dictionary) -> void:
 	_hud_labels["health"].text = "Lebenskraft   %d / 100" % int(health)
 	_hud_labels["companion"].text = "%s · Vertrauen %+d" % [_companion_name(state), int(companion.get("trust", 0))] if bool(companion.get("met", false)) else "%s wartet im Dorf." % _companion_name(state)
 	_hud_labels["squad"].text = "Truppe   %d / %d am Leben\nMoral   %d / 100" % [int(squad.get("alive", 0)), int(squad.get("recruits", 0)), int(squad.get("morale", 0))]
+	if Childhood.enabled(state):
+		# A twelve-year-old has a family, not a troop (HB 3.0 S. 13/44).
+		_hud_labels["squad"].text = _family_line(state)
 	if _hud_labels.has("compact_life"):
 		_hud_labels["compact_life"].text = "Leben %d/100  ·  Truppe %d/%d" % [int(health), int(squad.get("alive", 0)), int(squad.get("recruits", 0))]
 		if Childhood.enabled(state):
 			_hud_labels["compact_life"].text = "Leben %d · Ausdauer %d" % [int(health), int(CombatActions.view(state).get("stamina", 100))]
+			if _child_first_mission(state):
+				var carried: Array = state.get("childhood_view", {}).get("carried", [])
+				_hud_labels["compact_life"].text = "Du trägst: " + ", ".join(carried) if not carried.is_empty() else ""
+			_hud_labels["compact_life"].visible = not _hud_labels["compact_life"].text.is_empty() and not (_touch_enabled and _content_size().y < 470)
 	var objective := _objective(state)
 	_hud_labels["objective_title"].text = objective[0]
 	_hud_labels["objective_text"].text = objective[1]
@@ -660,6 +667,15 @@ func update_state(state: Dictionary) -> void:
 	if Childhood.enabled(state):
 		for key in ["build", "train", "recruit", "skirmish"]:
 			_action_buttons[key].hide()
+	var calm_child := _child_first_mission(state)
+	for metric: String in ["wood", "grain", "denarii"]:
+		# The village stock is not the child's property; it stays in the village
+		# panel and the chronicle instead of occupying the first-mission HUD.
+		_hud_labels[metric].visible = not calm_child
+	if is_instance_valid(_life_panel):
+		_life_panel.visible = not _compact_layout and not calm_child
+	if is_instance_valid(_chronicle_panel):
+		_chronicle_panel.visible = not _compact_layout and not calm_child
 	if bool(encounter.get("active", false)):
 		var remaining := 0
 		for enemy in encounter.get("enemies", []):
@@ -675,6 +691,26 @@ func update_state(state: Dictionary) -> void:
 		elif raid.active:
 			_hud_labels["status"].text = "ÜBERFALL · AUSDAUER %d" % int(raid.stamina)
 	_update_combat_controls()
+	_update_touch_visibility()
+
+
+## I-01 for the child: no combat buttons, no troop/morale, no village stock on
+## screen unless danger is actually present (HB 3.0 S. 13 and S. 44).
+func _child_first_mission(state: Dictionary) -> bool:
+	if not Childhood.enabled(state):
+		return false
+	if bool(state.get("village", {}).get("raid", {}).get("active", false)) or bool(state.get("encounter", {}).get("active", false)):
+		return false
+	return bool(state.get("childhood_view", {}).get("in_first_mission", false))
+
+
+func _family_line(state: Dictionary) -> String:
+	var relations: Dictionary = state.get("childhood_view", {}).get("relationships", {})
+	var parts: Array[String] = []
+	for id: String in ["julia", "silvanus"]:
+		if relations.has(id):
+			parts.append("%s · Vertrauen %d" % [{"julia":"Julia", "silvanus":"Silvanus"}[id], int(relations[id].get("trust", 0))])
+	return "Familie\n" + "\n".join(parts) if not parts.is_empty() else "Familie"
 
 
 func show_pause() -> void:
@@ -1621,6 +1657,8 @@ func _update_touch_visibility() -> void:
 		if is_instance_valid(button):
 			var action := str(button.get_meta("touch_action", ""))
 			button.visible = personal and (action not in ["guard", "dodge"] or _state.get("village", {}).get("enabled", false))
+			if action in ["attack", "guard", "dodge", "techniques"] and _child_first_mission(_state):
+				button.visible = false
 	if is_instance_valid(_cancel_build_button):
 		_cancel_build_button.visible = _build_active and not overlay
 
@@ -1702,6 +1740,17 @@ func _show_journal(pause_world := true) -> void:
 		int(player.get("age", 12)), int(player.get("health", 100)), int(squad.get("alive", 0)), int(squad.get("recruits", 0)), int(squad.get("morale", 0)),
 		_companion_name(_state), "Vertrauen %+d" % int(companion.get("trust", 0)) if bool(companion.get("met", false)) else "noch nicht kennengelernt", objective[0], objective[1]
 	]
+	if Childhood.enabled(_state):
+		# The journal of a child lists family, carried things and the village
+		# stock (reachable here instead of on the first-mission HUD).
+		var child_view: Dictionary = _state.get("childhood_view", {})
+		var carried: Array = child_view.get("carried", [])
+		var stock: Dictionary = _state.get("resources", {})
+		summary = "%d Jahre · Leben %d / 100\n%s\n%s: %s\nDu trägst: %s\nVorrat: %d Holz · %d Getreide · Denare: %d\n\n%s\n%s" % [
+			int(player.get("age", 12)), int(player.get("health", 100)), _family_line(_state).replace("\n", " · "),
+			_companion_name(_state), "Vertrauen %+d" % int(companion.get("trust", 0)) if bool(companion.get("met", false)) else "noch nicht kennengelernt",
+			", ".join(carried) if not carried.is_empty() else "nichts", int(stock.get("wood", 0)), int(stock.get("grain", 0)), int(stock.get("denarii", 0)),
+			objective[0], objective[1]]
 	var report := _region_report()
 	if not report.is_empty():
 		summary += "\n\n" + report
@@ -1787,7 +1836,8 @@ func _objective(state: Dictionary) -> Array[String]:
 		return ["Dein Weg ist zu Ende", "Du bist im Kampf gefallen. Im Menü kannst du einen gespeicherten Stand laden oder ein neues Leben beginnen."]
 	if Childhood.enabled(state):
 		var childhood: Dictionary = state.get("childhood_view", Childhood.view(state))
-		return [str(childhood.get("title", "Ein Morgen zu Hause")), str(childhood.get("objective", "Sprich mit deiner Mutter vor dem Haus."))]
+		# Occasion and place, not a technical mission ID (HB 3.0 S. 44).
+		return [str(childhood.get("hud_title", childhood.get("title", "Ein Morgen zu Hause"))), str(childhood.get("objective", "Sprich mit deiner Mutter vor dem Haus."))]
 	var village: Dictionary = state.get("village_view", {})
 	if state.get("village", {}).get("enabled", false):
 		var has_roof := false

@@ -1018,6 +1018,10 @@ static func _villager_positions(data: Dictionary) -> Dictionary:
 	return result
 
 
+static func i01_reason(data: Dictionary, action: String) -> String:
+	return _i01_reason(data, action)
+
+
 static func _i01_reason(data: Dictionary, action: String) -> String:
 	return I01.reason(data, action, _villager_positions(data))
 
