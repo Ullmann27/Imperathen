@@ -25,6 +25,7 @@ BELLY_SHRINK_M = 0.010   # ... and the belt gear in front of the belly is gone
 SKIRT_EASE_M = 0.002
 SHOULDER_RING_Y = 1.150  # last horizontal ring; the shoulder yoke closes above
 SLEEVE_HEM_T = 0.58      # the cloth falls over the upper arm to just past its middle
+SLEEVE_FRONT_CUT_T = 0.11 # ... and is shorter in front, where the forearm folds up against it
 SLEEVE_START_T = 0.0     # the tube starts at the shoulder joint, closed by a dome above it
 SLEEVE_EASE_M = 0.007    # wool over the measured upper arm
 SHOULDER_WIDEN_M = 0.022 # the yoke runs out over the deltoid (dropped shoulder of a wide tunic)
@@ -302,6 +303,13 @@ class Garment:
         w = np.cross(axis, u)
         return a, b, axis, u, w
 
+    def sleeve_hem(self, side, phi):
+        """Hem position along the upper arm per angle: the cloth hangs longest
+        at the back of the arm and is cut away toward the front, so a fully
+        bent elbow does not drive the forearm into the hem."""
+        front = np.pi / 2 if side == "L" else 3 * np.pi / 2
+        return SLEEVE_HEM_T - SLEEVE_FRONT_CUT_T * (0.5 + 0.5 * np.cos(np.asarray(phi, float) - front)) ** 1.5
+
     def sleeve_radius(self, side, t, phi, folds=True):
         """Radius about the upper-arm axis: the measured arm plus ease, fuller
         over the deltoid, hanging away from the arm on the body side toward
@@ -387,10 +395,11 @@ class Garment:
             a, b, axis, u, w = self.sleeve_axis(side)
             t, rr = segment_param(p, a, b)
             phi = np.arctan2((p - a) @ w, (p - a) @ u)
-            sel = (t >= SLEEVE_START_T) & (t <= SLEEVE_HEM_T)
+            hem = self.sleeve_hem(side, phi)
+            sel = (t >= SLEEVE_START_T) & (t <= hem)
             if sel.any():
                 rs = self.sleeve_radius(side, t[sel], phi[sel], folds=False)
-                best[sel] = np.maximum(best[sel], np.minimum(rs - rr[sel], (SLEEVE_HEM_T - t[sel]) * np.linalg.norm(b - a)))
+                best[sel] = np.maximum(best[sel], np.minimum(rs - rr[sel], (hem[sel] - t[sel]) * np.linalg.norm(b - a)))
             dome = t < SLEEVE_START_T
             if dome.any():
                 r0 = self.sleeve_radius(side, np.zeros(dome.sum()), phi[dome], folds=False)

@@ -32,11 +32,12 @@ import numpy as np
 from scipy.spatial import cKDTree
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from check_youth_civil_outfit import BORDER_M, OUTSIDE_REST_M, border_vertices, vertex_normals  # noqa: E402
+from check_youth_civil_outfit import (BORDER_M, OUTSIDE_REST_M, Surface, adjacency, border_vertices,  # noqa: E402
+                                      vertex_normals)
 from ground_death_clip import Glb, Rig, _quat_matrix  # noqa: E402
 
 CLEAR_M = 0.003          # target: no probe point deeper than this
-REACH_M = 0.08           # probe points this close to the wool are judged
+REACH_M = 0.05           # probe points this close to the wool are judged
 MAX_ANGLE = math.radians(40.0)
 STEP = math.radians(1.5)
 SMOOTH_S = 0.07          # temporal smoothing of the correction
@@ -95,7 +96,7 @@ class Subset:
 
 
 class Model:
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, others: tuple = ()):
         self.glb = Glb(path)
         self.rig = Rig(self.glb)
         doc = self.glb.document
@@ -125,19 +126,31 @@ class Model:
         remap[self.target] = np.arange(len(self.target))
         self.tri = remap[tri[keep]]
         self.garment = Subset(garment, self.target)
-        normal = vertex_normals(g_rest[self.target], self.tri)
-        tree = cKDTree(g_rest[self.target])
+        self.table = adjacency(len(self.target), self.tri)
+        rest_surface = Surface(g_rest[self.target], self.tri, self.table)
         s_rest = Subset(shell, np.arange(len(shell["position"]))).skin(rest)
-        d, idx = tree.query(s_rest)
-        sd = ((s_rest - g_rest[self.target][idx]) * normal[idx]).sum(1)
-        self.probe = {}
+        _, sd, _ = rest_surface.query(s_rest)
+        self.probe = {"L": [], "R": []}
         self.arm = {}
         self.subtree = {}
+        # Probe points: the forearms and hands of every LOD (the coarse hands
+        # of the far LODs are larger than the LOD 0 hands).
+        shells = [(shell, s_rest, sd)]
+        for other in others:
+            other_glb = Glb(other)
+            other_rig = Rig(other_glb)
+            other_doc = other_glb.document
+            other_body = next(i for i, n in enumerate(other_doc["nodes"]) if n.get("name") == "MeshyYouthBody")
+            other_shell = next(p for p in other_rig.primitives if p["node"] == other_body)
+            if [other_doc["nodes"][j].get("name") for j in other_shell["joints"]] != names or other_shell["joints"] != shell["joints"]:
+                raise ValueError(f"{other}: rig layout differs from {path}")
+            o_rest = Subset(other_shell, np.arange(len(other_shell["position"]))).skin(rest)
+            shells.append((other_shell, o_rest, rest_surface.query(o_rest)[1]))
         for side in "LR":
             limb = [k for k, n in enumerate(names) if n.startswith(LIMB_PREFIX) and n.endswith("_" + side)]
-            weight = (shell["weight"] * np.isin(shell["joint_index"], limb)).sum(1)
-            select = np.flatnonzero((weight > 0.5) & (sd > OUTSIDE_REST_M))
-            self.probe[side] = Subset(shell, select)
+            for one, _, one_sd in shells:
+                weight = (one["weight"] * np.isin(one["joint_index"], limb)).sum(1)
+                self.probe[side].append(Subset(one, np.flatnonzero((weight > 0.5) & (one_sd > OUTSIDE_REST_M))))
             self.arm[side] = self.node["Arm_" + side]
             nodes, stack = [], [self.arm[side]]
             while stack:
@@ -166,13 +179,13 @@ class Frame:
         self.world = world
         self.points = model.garment.skin(world)
         self.normal = vertex_normals(self.points, model.tri)
-        self.tree = cKDTree(self.points)
+        self.surface = Surface(self.points, model.tri, model.table)
 
     def contact(self, side: str, vector: np.ndarray):
         model = self.model
-        p = model.probe[side].skin(model.turned(self.world, side, vector))
-        d, i = self.tree.query(p)
-        sd = ((p - self.points[i]) * self.normal[i]).sum(1)
+        world = model.turned(self.world, side, vector)
+        p = np.concatenate([probe.skin(world) for probe in model.probe[side]])
+        d, sd, i = self.surface.query(p)
         depth = np.where((d < REACH_M) & (sd < 0) & model.target_judged[i], -sd, 0.0)
         return depth, p, self.normal[i]
 
@@ -302,9 +315,9 @@ def main() -> int:
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
     paths = [args.input / f"hero_meshy_italia_{i}.glb" for i in range(4)]
-    model = Model(paths[0])
+    model = Model(paths[0], tuple(paths[1:]))
     corrections, report = {}, {"tool": "tools/characters/clear_youth_civil_arms.py", "clear_m": CLEAR_M,
-                               "solved_on": paths[0].name, "clips": {}}
+                               "solved_on": paths[0].name, "probe_lods": [p.name for p in paths], "clips": {}}
     for animation in model.glb.document.get("animations", []):
         name = animation["name"]
         corrections[name] = solve_clip(model, name)

@@ -90,13 +90,15 @@ def tessellate(g: Garment, level: int):
         a, b, axis, _, _ = g.sleeve_axis(side)
         length = np.linalg.norm(b - a) * (SLEEVE_HEM_T - SLEEVE_START_T)
         ts = list(np.linspace(SLEEVE_START_T, SLEEVE_HEM_T, max(3, int(length * per_m * 1.3)) + 1))
-        rows = [g.sleeve_point(side, np.full_like(phi, t), phi, folds) for t in ts]
+        hem_t = g.sleeve_hem(side, phi)
+        rows = [g.sleeve_point(side, SLEEVE_START_T + (hem_t - SLEEVE_START_T) * (t - SLEEVE_START_T) / (SLEEVE_HEM_T - SLEEVE_START_T),
+                               phi, folds) for t in ts]
         # Shoulder dome above the joint; its small pole opening lies under the yoke.
         alphas = np.linspace(0.16, np.pi / 2, max(2, int(0.075 * per_m)) + 1)[:-1]
         rows = [g.sleeve_dome(side, np.full_like(phi, al), phi) for al in alphas] + rows
         ts = [SLEEVE_START_T - 0.25 * (1 - al / (np.pi / 2)) for al in alphas] + ts
         if level <= 2:
-            centre = a + (b - a) * SLEEVE_HEM_T
+            centre = a + (b - a) * hem_t[:, None]
             hem = rows[-1]
             radial = (hem - centre) / np.linalg.norm(hem - centre, axis=1, keepdims=True)
             rows.append(hem - 0.0055 * radial - 0.002 * axis)

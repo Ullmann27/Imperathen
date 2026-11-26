@@ -50,8 +50,10 @@ BUDGET = {0: (32000, 2048), 1: (16000, 1024), 2: (6000, 512), 3: (2000, 256)}
 GARMENT_TEXTURE = {0: 1024, 1: 512, 2: 256, 3: 128}
 TYPE_N = {"SCALAR": 1, "VEC2": 2, "VEC3": 3, "VEC4": 4, "MAT4": 16}
 DTYPE = {5120: np.int8, 5121: np.uint8, 5122: np.int16, 5123: np.uint16, 5125: np.uint32, 5126: np.float32}
-TORSO_JOINTS = ("Pelvis", "Lumbar", "Spine", "Chest", "Neck", "Clavicle_L", "Clavicle_R",
-                "Arm_L", "Arm_R", "UpperArmTwist_L", "UpperArmTwist_R")
+# The body of the tunic hangs from the trunk and the shoulder girdle. It does
+# not follow the upper arms: only the sleeves do, turning on their shoulder
+# domes. Wool pulled along by a raised arm would be driven into the forearm.
+TORSO_JOINTS = ("Pelvis", "Lumbar", "Spine", "Chest", "Neck", "Clavicle_L", "Clavicle_R")
 BELT_JOINTS = ("Pelvis", "Lumbar", "Spine")
 FOOT_JOINTS = ("Foot_L", "Foot_R", "Toe_L", "Toe_R")
 ARM_PREFIXES = ("Arm_", "Forearm_", "Hand_", "Clavicle_", "UpperArmTwist_", "ForearmTwist_", "Palm_", "FingerCurl_", "Thumb_")
@@ -480,6 +482,8 @@ def garment_weights(joint_names, gv, kind, gparam, gf, old_v, old_j, old_w, rig)
     for side in "LR":
         m = (kind == PART_KIND["sleeve_" + side]) & (dense.sum(1) <= 1e-9)
         dense[m, joint_names.index("Arm_" + side)] = 1.0
+    lonely = (kind == PART_KIND["torso"]) & (dense.sum(1) <= 1e-9)
+    dense[lonely, joint_names.index("Chest")] = 1.0
     total = dense.sum(1, keepdims=True)
     if (total <= 0).any():
         dense[total[:, 0] <= 0, joint_names.index("Spine")] = 1.0
@@ -508,6 +512,45 @@ def garment_weights(joint_names, gv, kind, gparam, gf, old_v, old_j, old_w, rig)
     wts = np.take_along_axis(dense, order, 1)
     wts /= wts.sum(1, keepdims=True)
     return order.astype(np.uint16), wts.astype(np.float32)
+
+
+def follow_cloth(garment, rig, v, f, keep, locked, depth, J, W, gv, gj, gw, joint_count):
+    """Shell left under the wool moves with the wool.
+
+    What remains of the old shell under the garment (thigh tops, arm stubs,
+    a few faces Meshy skinned partly to a hand) keeps its own weights and
+    would come out through the cloth when the joints turn. Away from the hem
+    and sleeve openings such vertices take the weights of the nearest garment
+    vertex, so they cannot move relative to it; toward the openings the limb
+    keeps its own skinning and the blend fades out."""
+    used = np.unique(f[keep])
+    used = used[~np.isin(used, np.unique(f[locked]))]
+    p = v[used]
+    blend = smoothstep(0.002, 0.012, depth[used])
+    below = p[:, 1] < BELT_Y
+    blend = np.where(below, blend * smoothstep(HEM_Y + 0.02, HEM_Y + 0.07, p[:, 1]), blend)
+    for side in "LR":
+        a, b, _, _, _ = garment.sleeve_axis(side)
+        t, r = segment_param(p, a, b)
+        in_sleeve = (t > 0.25) & (t < SLEEVE_HEM_T + 0.05) & (r < 0.09)
+        blend = np.where(in_sleeve, blend * (1 - smoothstep(SLEEVE_HEM_T - 0.14, SLEEVE_HEM_T - 0.05, t)), blend)
+    move = blend > 1e-3
+    if not move.any():
+        return J, W, 0
+    ids = used[move]
+    k = blend[move][:, None]
+    dense = np.zeros((len(ids), joint_count))
+    rows = np.repeat(np.arange(len(ids)), 4)
+    np.add.at(dense, (rows, J[ids].reshape(-1)), ((1 - k) * W[ids]).reshape(-1))
+    _, near = cKDTree(gv).query(v[ids])
+    np.add.at(dense, (rows, gj[near].astype(np.int64).reshape(-1)), (k * gw[near]).reshape(-1))
+    order = np.argsort(-dense, axis=1)[:, :4]
+    weights = np.take_along_axis(dense, order, 1)
+    weights /= weights.sum(1, keepdims=True)
+    J, W = J.copy(), W.copy()
+    J[ids] = order
+    W[ids] = weights
+    return J, W, int(len(ids))
 
 
 # ----------------------------------------------------------- texturing
@@ -727,6 +770,7 @@ def build_lod(raw: bytes, level: int, garment: Garment, reference, plan: Plan) -
     old_v, old_j, old_w = reference
     gj, gw = garment_weights(joint_names, gv, gkind, gparam, gf, old_v, old_j, old_w, rig)
     gn = vertex_normals(gv, gf, weld(gv)[0])
+    J, W, followed = follow_cloth(garment, rig, v, f, keep, locked, vertex_depth, J, W, gv, gj, gw, len(joint_names))
     gsize = GARMENT_TEXTURE[level]
     gbase, gnormal, gmr = garment_textures(gsize, garment.fold)
 
@@ -802,6 +846,7 @@ def build_lod(raw: bytes, level: int, garment: Garment, reference, plan: Plan) -
         "repainted_texels": painted, "head_texels": int(head_texels.sum()),
         "limbs": limb_report, "collar_faces": int((masks["collar"] & keep).sum()),
         "small_debris_faces": int(masks["small_debris"].sum()), "hand_fin_faces_removed": int(fins.sum()),
+        "shell_vertices_following_cloth": followed,
         "sole_vertices_sha256": sole_before,
         "sole_vertices_unchanged": bool(np.array_equal(moved[np.unique(f[masks["foot"]])], v[np.unique(f[masks["foot"]])])),
         "sole_faces_kept": bool(keep[masks["foot"]].all()),
