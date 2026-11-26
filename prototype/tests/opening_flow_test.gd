@@ -213,6 +213,12 @@ func _check_release_visuals(context: String) -> void:
 			variants[variant] = true
 		_check(variants.size() == 8 and not variants.has(""), context + ": all eight authored building variants are used")
 		_check(regional.has_node("ValdoraPaving") and regional.has_node("HouseInteriors") and regional.has_node("HouseholdsAndForge"), context + ": paving, interiors and forge are part of the playable village")
+		var forge := regional.get_node_or_null("HouseholdsAndForge/VillageForge/Interior/AuthoredForgeShell") as Node3D
+		_check(is_instance_valid(forge) and forge.scene_file_path == HouseFamily.FORGE_SCENE, context + ": original authored forge architecture is instantiated")
+		if is_instance_valid(forge):
+			var shell := forge.find_child("valdora_forge_shell", true, false) as MeshInstance3D
+			_check(is_instance_valid(shell) and shell.mesh != null and shell.is_visible_in_tree(), context + ": original forge shell has visible mesh geometry")
+			_check(forge.find_children("*", "MeshInstance3D", true, false).size() == 2, context + ": only compatible original shell and far proxy are attached, no duplicate legacy fixtures")
 	var plants = game.world.vegetation
 	_check(is_instance_valid(plants) and plants.is_inside_tree(), context + ": native vegetation field is attached")
 	if is_instance_valid(plants):

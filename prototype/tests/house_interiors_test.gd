@@ -9,6 +9,7 @@ const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const Kit = preload("res://scripts/world/village/interior_kit.gd")
 const Designs = preload("res://scripts/world/village/household_designs.gd")
+const Family = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
 const TEST_LAYER := 1 << 19
 const CONTACT_TOLERANCE := .006
 const OVERLAP_TOLERANCE := .012
@@ -540,6 +541,21 @@ func _check_family_home(interiors: Node3D, house: Node3D) -> void:
 ## The smithy keeps the work stations of the apprenticeship usable.
 func _check_forge(interiors: Node3D, region: Node3D) -> void:
 	var forge := region.find_child(Designs.SITES[Designs.FORGE].node, true, false) as Node3D
+	if ResourceLoader.exists(Family.FORGE_SCENE, "PackedScene"):
+		var shell := forge.get_node_or_null("Interior/AuthoredForgeShell") as Node3D
+		_check(is_instance_valid(shell) and shell.scene_file_path == Family.FORGE_SCENE, "The authored forge shell is used in the live settlement")
+		if is_instance_valid(shell):
+			var meshes := shell.find_children("*", "MeshInstance3D", true, false)
+			_check(meshes.size() == 2, "Only the original shell and distant proxy are rendered; no duplicated workshop fixtures")
+			var original := shell.find_child("valdora_forge_shell", true, false) as MeshInstance3D
+			var proxy := shell.find_child("valdora_forge_far", true, false) as MeshInstance3D
+			_check(is_instance_valid(original) and is_instance_valid(proxy), "The two original forge LOD roles are present")
+			if is_instance_valid(original) and is_instance_valid(proxy):
+				for profile: String in ["low", "balanced", "high", "very_high"]:
+					interiors.set_quality(profile)
+					var ranges: Dictionary = Family.RANGES[profile]
+					_check(is_equal_approx(original.visibility_range_end, float(ranges.house)) and is_equal_approx(proxy.visibility_range_begin, float(ranges.house)), "Forge shell and proxy share the house LOD boundary in " + profile)
+				interiors.set_quality("balanced")
 	var Childhood = load("res://scripts/story/village_childhood.gd")
 	for pair: Array in [["Bellows", "bellows"], ["Anvil", "anvil"], ["QuenchTrough", "quench"]]:
 		var marker := forge.get_node_or_null(pair[0]) as Node3D
