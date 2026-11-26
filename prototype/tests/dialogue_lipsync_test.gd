@@ -50,7 +50,13 @@ func _audio_onset(stream: AudioStream) -> Dictionary:
 	var frames := int(ceil(stream.get_length() * rate))
 	var samples: PackedVector2Array = PackedVector2Array()
 	while samples.size() < frames:
-		samples.append_array(playback.mix_audio(1.0, mini(4096, frames - samples.size())))
+		var batch := playback.mix_audio(1.0, mini(4096, frames - samples.size()))
+		if batch.is_empty():
+			break
+		samples.append_array(batch)
+	playback.stop()
+	if samples.size() < int(0.010 * rate):
+		return {}
 	var win := int(0.010 * rate)
 	var hop := int(0.005 * rate)
 	var rms := PackedFloat32Array()
@@ -104,18 +110,19 @@ func _run() -> void:
 			continue
 		_check(track.text_key == entry.text_key, "%s track belongs to this text" % entry.line_id)
 		var audio := _audio_onset(stream)
-		var started_at := -1.0
-		var started_frame := -1
-		var finished_at := -1.0
+		_check(not audio.is_empty(), "%s exposes decoded audio samples" % entry.line_id)
+		if audio.is_empty():
+			continue
+		var stamps := {"start":-1.0, "start_frame":-1, "finish":-1.0}
 		var mouth_at := -1.0
 		var max_jaw := 0.0
 		var shapes_follow := true
 		var clocks: Array[float] = []
 		var on_start := func(_l: Dictionary) -> void:
-			started_at = dialogue.clock()
-			started_frame = clocks.size()
+			stamps.start = dialogue.clock()
+			stamps.start_frame = clocks.size()
 		var on_end := func(_l: Dictionary) -> void:
-			finished_at = dialogue._last_clock
+			stamps.finish = dialogue._last_clock
 		dialogue.line_started.connect(on_start)
 		dialogue.line_finished.connect(on_end)
 		dialogue.play(line.text, line.speaker)
@@ -137,6 +144,9 @@ func _run() -> void:
 				shapes_follow = false
 		dialogue.line_started.disconnect(on_start)
 		dialogue.line_finished.disconnect(on_end)
+		var started_at := float(stamps.start)
+		var started_frame := int(stamps.start_frame)
+		var finished_at := float(stamps.finish)
 		var monotonic := true
 		for k in range(1, clocks.size()):
 			if clocks[k] < clocks[k - 1]:
@@ -161,6 +171,9 @@ func _run() -> void:
 	var record := dialogue.play("Diese Zeile hat keine Aufnahme.", "Chronik")
 	_check(not record.voiced, "unknown text is reported as unvoiced")
 	dialogue.stop()
+	world.queue_free()
+	await process_frame
+	await process_frame
 	print("DIALOGUE_LIPSYNC_REPORT " + JSON.stringify(_report))
 	print("DIALOGUE_LIPSYNC_RESULT checks=%d failures=%d" % [checks, failures.size()])
 	for failure in failures:
