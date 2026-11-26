@@ -2,6 +2,10 @@ extends RefCounted
 ## Geometry adapter for the authoritative combat state. Never awards damage.
 
 const Combat = preload("res://scripts/domain/combat_actions.gd")
+const MeleePose = preload("res://scripts/visuals/melee_pose.gd")
+const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
+## Selection margin beyond the measured reach; the swept contact decides.
+const AIM_MARGIN := 0.15
 const PEOPLE_LAYER := 4
 const CIVILIAN_LAYER := 8
 var world: Node3D
@@ -12,6 +16,10 @@ var _guarding := false
 var _dodging := false
 var _body_shape := CapsuleShape3D.new()
 var _personal_bodies: Array[StaticBody3D] = []
+# Level-A sword poses: the contact frames of the issued gladius were measured
+# on these poses, so the player must see exactly them (D-026).
+var _armed_pose := MeleePose.new()
+var _armed_body: Node3D
 
 
 func _init(scene: Node3D) -> void:
@@ -30,7 +38,8 @@ func sync(data: Dictionary) -> void:
 	if not technique.is_empty():
 		var progress := float(combat.elapsed) / float(Combat.TECHNIQUES[technique].duration)
 		if Combat.is_armed(technique):
-			world._figure.sample_service_combat(technique, progress)
+			if world._figure.sample_service_combat(technique, progress):
+				_pose_armed(technique, progress)
 		else:
 			world._figure.sample_combat(technique, progress)
 	elif not _last_technique.is_empty():
@@ -52,6 +61,16 @@ func sync(data: Dictionary) -> void:
 	world._training_label.text = ("Übungsplatz · Gladius und Schild\nKontrollierte Treffer: %d" if Combat.service_gear(data) else "Übungsplatz\nKontrollierte Treffer: %d") % int(combat.practice_hits)
 
 
+func _pose_armed(technique: String, progress: float) -> void:
+	var body: Node3D = world._figure.body
+	if body == null:
+		return
+	if body != _armed_body:
+		_armed_body = body if _armed_pose.bind(body, "legionary") else null
+	if _armed_body != null:
+		_armed_pose.strike(technique, progress)
+
+
 func reset() -> void:
 	world._dodge_remaining = 0.0
 	var owns_pose := not _last_technique.is_empty() or _guarding or _dodging
@@ -69,7 +88,9 @@ func attack() -> void:
 	var facing := Vector2(direction.x, direction.z).normalized()
 	var source := Vector2(world._player.position.x, world._player.position.z)
 	var spec: Dictionary = Combat.TECHNIQUES[selected]
-	var closest := float(spec.reach) + 0.3
+	# Measured strike reach at this body size plus the target capsule.
+	var strike_reach := float(Combat.measured(selected).reach) * Combat.strike_scale(state, selected)
+	var closest := strike_reach + float(Tracks.kit("raider").radius) + AIM_MARGIN
 	var target_id := "air"
 	var targets: Array = []
 	if bool(state.village.raid.active):
@@ -82,7 +103,7 @@ func attack() -> void:
 			closest = offset.length()
 			target_id = str(enemy.id)
 	var practice := Combat.PRACTICE_POINT - source
-	if target_id == "air" and practice.length() > 0.05 and practice.length() <= float(spec.reach) + 0.3 and facing.dot(practice.normalized()) >= float(spec.arc_dot):
+	if target_id == "air" and practice.length() > 0.05 and practice.length() <= strike_reach + Combat.PRACTICE_RADIUS + AIM_MARGIN and facing.dot(practice.normalized()) >= float(spec.arc_dot):
 		target_id = "practice"
 	world.action_requested.emit("village_unarmed_attack", {"technique":selected, "target_id":target_id, "facing_x":facing.x, "facing_z":facing.y})
 

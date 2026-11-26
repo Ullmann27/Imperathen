@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "rule": "Epochenunabhängige Waffendefinitionen (D-050). Eine Waffe ist reine Datenzeile: Klasse, Mechanismus, Materialien (für Treffergeräusch und Partikel) und die physikalischen Werte der Ebene-A-Autorität. Schadensbasis und Ausdauerkosten stehen ausschließlich in assets/balance/combat_balance.json unter balance_family (D-042). Nahkampfzeiten kommen immer aus den vermessenen Schlagspuren (timing_source measured_clip); Phasen der Fernwaffen sind gesetzte Werte (authored), bis Zieh-/Wurfclips vermessen sind. Physikalische Werte sind Ingenieursschätzungen, keine Messungen. Jahreszahlen: negativ = v. Chr.",
+  "classes": [
+    "unarmed",
+    "melee",
+    "thrown",
+    "bow",
+    "crossbow",
+    "sling"
+  ],
+  "ranged_classes": [
+    "thrown",
+    "bow",
+    "crossbow",
+    "sling"
+  ],
+  "mechanisms": [
+    "strike",
+    "cut_thrust",
+    "chop",
+    "thrust",
+    "throw",
+    "draw_hold_release",
+    "span_trigger",
+    "whirl_release"
+  ],
+  "materials": [
+    "flesh",
+    "leather",
+    "iron",
+    "bronze",
+    "wood",
+    "sinew",
+    "hemp",
+    "lead",
+    "stone"
+  ],
+  "strike_kinds": [
+    "cut",
+    "thrust",
+    "blunt"
+  ],
+  "weapons": {
+    "fist": {
+      "class": "unarmed",
+      "mechanism": "strike",
+      "material": "flesh",
+      "strike_kind": "blunt",
+      "effective_mass_kg": 1.2,
+      "valid_from": -100000,
+      "valid_to": 100000,
+      "attestation": "design_assumption",
+      "timing_source": "measured_clip",
+      "balance_family": "fist"
+    },
+    "foot": {
+      "class": "unarmed",
+      "mechanism": "strike",
+      "material": "leather",
+      "strike_kind": "blunt",
+      "effective_mass_kg": 3.0,
+      "valid_from": -100000,
+      "valid_to": 100000,
+      "attestation": "design_assumption",
+      "timing_source": "measured_clip",
+      "balance_family": "foot",
+      "one_legged": true
+    },
+    "head": {
+      "class": "unarmed",
+      "mechanism": "strike",
+      "material": "flesh",
+      "strike_kind": "blunt",
+      "effective_mass_kg": 4.0,
+      "valid_from": -100000,
+      "valid_to": 100000,
+      "attestation": "design_assumption",
+      "timing_source": "measured_clip",
+      "balance_family": "head"
+    },
+    "gladius": {
+      "class": "melee",
+      "mechanism": "cut_thrust",
+      "material": "iron",
+      "strike_kind": "cut",
+      "effective_mass_kg": 1.8,
+      "valid_from": -200,
+      "valid_to": 250,
+      "attestation": "attested",
+      "timing_source": "measured_clip",
+      "balance_family": "gladius",
+      "grip_material": "wood",
+      "move_kinds": {
+        "thrust": "thrust"
+      }
+    },
+    "axe": {
+      "class": "melee",
+      "mechanism": "chop",
+      "material": "iron",
+      "strike_kind": "cut",
+      "effective_mass_kg": 2.4,
+      "valid_from": -3000,
+      "valid_to": 1500,
+      "attestation": "attested",
+      "timing_source": "measured_clip",
+      "balance_family": "axe",
+      "grip_material": "wood"
+    },
+    "spear": {
+      "class": "melee",
+      "mechanism": "thrust",
+      "material": "iron",
+      "strike_kind": "thrust",
+      "effective_mass_kg": 2.2,
+      "valid_from": -3000,
+      "valid_to": 1500,
+      "attestation": "attested",
+      "timing_source": "measured_clip",
+      "balance_family": "spear",
+      "grip_material": "wood"
+    },
+    "pilum": {
+      "class": "thrown",
+      "mechanism": "throw",
+      "material": "iron",
+      "strike_kind": "thrust",
+      "balance_family": "pilum",
+      "phases": {
+        "draw_s": 0.55,
+        "hold_max_s": 1.5,
+        "release_s": 0.1,
+        "recover_s": 0.5
+      },
+      "hold_stamina_per_s": 4.0,
+      "release_point": [
+        0.18,
+        1.78,
+        -0.25
+      ],
+      "spread_deg": {
+        "novice": 4.0,
+        "expert": 1.2
+      },
+      "ammo": 2,
+      "projectile": {
+        "id": "pilum",
+        "mass_kg": 2.0,
+        "speed_m_s": 18.0,
+        "radius_m": 0.012,
+        "length_m": 2.0,
+        "drag_per_m": 0.00015,
+        "material": "iron",
+        "lodges_in_shield": true,
+        "bends": true
+      },
+      "valid_from": -400,
+      "valid_to": 300,
+      "attestation": "attested",
+      "timing_source": "authored",
+      "grip_material": "wood",
+      "note": "Schwerer Wurfspeer; der weiche Eisenschaft verbiegt sich und bleibt im getroffenen Schild stecken (Caes. Gall. 1,25)."
+    },
+    "javelin": {
+      "class": "thrown",
+      "mechanism": "throw",
+      "material": "iron",
+      "strike_kind": "thrust",
+      "balance_family": "throw_javelin",
+      "phases": {
+        "draw_s": 0.45,
+        "hold_max_s": 1.5,
+        "release_s": 0.08,
+        "recover_s": 0.4
+      },
+      "hold_stamina_per_s": 3.0,
+      "release_point": [
+        0.18,
+        1.76,
+        -0.25
+      ],
+      "spread_deg": {
+        "novice": 3.5,
+        "expert": 1.0
+      },
+      "ammo": 3,
+      "projectile": {
+        "id": "javelin",
+        "mass_kg": 0.8,
+        "speed_m_s": 22.0,
+        "radius_m": 0.01,
+        "length_m": 1.6,
+        "drag_per_m": 0.0004,
+        "material": "iron",
+        "lodges_in_shield": true,
+        "bends": false
+      },
+      "valid_from": -3000,
+      "valid_to": 1500,
+      "attestation": "attested",
+      "timing_source": "authored",
+      "grip_material": "wood"
+    },
+    "bow": {
+      "class": "bow",
+      "mechanism": "draw_hold_release",
+      "material": "wood",
+      "strike_kind": "thrust",
+      "balance_family": "bow",
+      "phases": {
+        "draw_s": 0.7,
+        "hold_max_s": 4.0,
+        "release_s": 0.05,
+        "recover_s": 0.45
+      },
+      "hold_stamina_per_s": 3.0,
+      "release_point": [
+        0.05,
+        1.48,
+        -0.55
+      ],
+      "spread_deg": {
+        "novice": 2.5,
+        "expert": 0.6
+      },
+      "ammo": 24,
+      "projectile": {
+        "id": "arrow",
+        "mass_kg": 0.03,
+        "speed_m_s": 50.0,
+        "radius_m": 0.006,
+        "length_m": 0.75,
+        "drag_per_m": 0.002,
+        "material": "iron",
+        "lodges_in_shield": true,
+        "bends": false
+      },
+      "valid_from": -3000,
+      "valid_to": 1800,
+      "attestation": "attested",
+      "timing_source": "authored",
+      "string_material": "sinew",
+      "hold_comfort_s": 2.0
+    },
+    "crossbow": {
+      "class": "crossbow",
+      "mechanism": "span_trigger",
+      "material": "wood",
+      "strike_kind": "thrust",
+      "balance_family": "crossbow",
+      "phases": {
+        "draw_s": 4.0,
+        "hold_max_s": 600.0,
+        "release_s": 0.04,
+        "recover_s": 0.3
+      },
+      "hold_stamina_per_s": 0.0,
+      "release_point": [
+        0.05,
+        1.45,
+        -0.5
+      ],
+      "spread_deg": {
+        "novice": 1.4,
+        "expert": 0.4
+      },
+      "ammo": 20,
+      "projectile": {
+        "id": "bolt",
+        "mass_kg": 0.06,
+        "speed_m_s": 55.0,
+        "radius_m": 0.007,
+        "length_m": 0.38,
+        "drag_per_m": 0.0015,
+        "material": "iron",
+        "lodges_in_shield": true,
+        "bends": false
+      },
+      "valid_from": 1000,
+      "valid_to": 1600,
+      "attestation": "design_assumption",
+      "timing_source": "authored",
+      "string_material": "hemp",
+      "holds_loaded": true,
+      "note": "Vorlage für eine spätere Epoche, nicht Teil der Kampagne 58 v. Chr.; Zeitspanne vor Verwendung belegen."
+    },
+    "sling": {
+      "class": "sling",
+      "mechanism": "whirl_release",
+      "material": "leather",
+      "strike_kind": "blunt",
+      "balance_family": "sling",
+      "phases": {
+        "draw_s": 0.9,
+        "hold_max_s": 3.0,
+        "release_s": 0.06,
+        "recover_s": 0.35
+      },
+      "hold_stamina_per_s": 2.5,
+      "release_point": [
+        0.25,
+        1.7,
+        -0.3
+      ],
+      "spread_deg": {
+        "novice": 3.0,
+        "expert": 1.0
+      },
+      "ammo": 30,
+      "projectile": {
+        "id": "glans",
+        "mass_kg": 0.035,
+        "speed_m_s": 35.0,
+        "radius_m": 0.01,
+        "length_m": 0.03,
+        "drag_per_m": 0.0027,
+        "material": "lead",
+        "lodges_in_shield": false,
+        "bends": false
+      },
+      "valid_from": -3000,
+      "valid_to": 1500,
+      "attestation": "attested",
+      "timing_source": "authored",
+      "string_material": "hemp"
+    }
+  }
+}

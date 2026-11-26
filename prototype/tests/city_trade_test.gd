@@ -223,7 +223,8 @@ func _trained_villager():
 		model.advance(1)
 		attempts+=1
 	_check(model.data.village.raid.won==1,"All real enemies defeated before any reward is claimed")
-	model.set_player_position(Vector3(0,1,-6))
+	# Within the displayed adult jab of the training post (0.59 m + 0.16 m post).
+	model.set_player_position(Vector3(0,1,-6.4))
 	model.advance(maxf(0.0,240.0-float(model.data.village.social.seconds)))
 	_ok(model.execute("train"),"Existing legacy adult transition follows lived defense")
 	for i in 3:
