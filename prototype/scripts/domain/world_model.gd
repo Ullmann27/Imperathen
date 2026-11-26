@@ -48,6 +48,12 @@ var raid_observations: Callable
 var npc_sight_check: Callable
 # A city session owns this verified runtime map; ordinary campaign/test worlds keep it empty.
 var city_trade_sites: Dictionary = {}
+# Content hash of the last state that passed _validate_state(). The
+# validator is a pure function of the state, so an unchanged state cannot
+# change its result. Any in-place edit (position, observations, external
+# writes) changes the hash and the full validation runs again.
+var _validated_hash := 0
+var _validated_known := false
 
 
 func _init() -> void:
@@ -124,7 +130,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	var argument_error := _validate_arguments(command, args)
 	if not argument_error.is_empty():
 		return _fail(argument_error)
-	var state_error := _validate_state(data)
+	var state_error := _current_state_error()
 	if not state_error.is_empty():
 		return _fail("Ungültiger Weltzustand; keine Änderung: " + state_error)
 	var fingerprint := JSON.stringify([command, args]).sha256_text()
@@ -154,6 +160,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	if not state_error.is_empty():
 		return _fail("Der Vorgang wurde vollständig verworfen: " + state_error)
 	data = candidate
+	_remember_valid(data)
 	changed.emit()
 	return result
 
@@ -203,7 +210,7 @@ func interrupt_combat() -> void:
 func advance(delta: float) -> void:
 	if not is_finite(delta) or delta <= 0.0 or delta > 3600.0 or data.is_empty():
 		return
-	if not _validate_state(data).is_empty() or data.progress.career_terminal:
+	if not _current_state_error().is_empty() or data.progress.career_terminal:
 		return
 	if float(data.world_seconds) + delta > 1000000000000.0:
 		return
@@ -251,8 +258,27 @@ func advance(delta: float) -> void:
 	if not _validate_state(candidate).is_empty():
 		return
 	data = candidate
+	_remember_valid(data)
 	if notify_ui:
 		changed.emit()
+
+
+func _current_state_error() -> String:
+	# Same result as _validate_state(data); skips only the repeated check of
+	# a state whose content is unchanged since it last passed validation.
+	var content_hash := data.hash()
+	if _validated_known and content_hash == _validated_hash:
+		return ""
+	var error := _validate_state(data)
+	if error.is_empty():
+		_validated_hash = content_hash
+		_validated_known = true
+	return error
+
+
+func _remember_valid(state: Dictionary) -> void:
+	_validated_hash = state.hash()
+	_validated_known = true
 
 
 func _advance_construction(candidate: Dictionary, delta: float) -> bool:

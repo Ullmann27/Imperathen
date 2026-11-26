@@ -1,0 +1,1565 @@
+{
+ "label": "after-village",
+ "engine": "4.7.2.stable.official.ed1daf0bf",
+ "source_commit": "89e735df9d619a1c55a7393bf3066f2b81a50ba6",
+ "working_tree_modified": true,
+ "frames": 600,
+ "warmup": 180,
+ "repeat": 7,
+ "fixed_fps": 60,
+ "evidence_class": "desktop headless CPU and Mesa llvmpipe render counters; relative only; no Android device",
+ "results": {
+  "village/low": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 266.5,
+     "mesh_instances": 1292,
+     "microbench": {
+      "advance_0_1s_ms": 2.3101,
+      "advance_1_60s_ms": 2.1532,
+      "state_bytes": 32508,
+      "step_ms": {
+       "childhood_advance": 0.2725,
+       "combat_advance": 0.2111,
+       "copy_only": 0.1817,
+       "economy_advance": 0.5869,
+       "life_advance": 0.3959,
+       "npc_advance": 0.1901,
+       "npc_observations_call": 0.054,
+       "npc_observe": 0.3587
+      },
+      "validate_state_ms": 0.8426,
+      "validators_ms": {
+       "city_trade": 0.001,
+       "combat_actions": 0.0123,
+       "frontier": 0.0077,
+       "npc_behavior": 0.4188,
+       "seasons": 0.0155,
+       "village_economy": 0.1461,
+       "village_life": 0.1253
+      },
+      "world_copy_ms": 0.19
+     },
+     "multimesh_instances": 1675,
+     "multimesh_nodes": 318,
+     "nodes": 3203,
+     "objects": 7859,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 427
+     },
+     "resources": 996,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 238,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d1_shown": 6,
+      "d2_hidden": 1,
+      "d2_shown": 4,
+      "d3_shown": 32
+     },
+     "visible_mesh_instances": 1222
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 580.4,
+    "mode": "natural",
+    "msaa_3d": 0,
+    "quality": "low",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 28.725,
+      "mean": 5.8024,
+      "p50": 4.549,
+      "p95": 11.646,
+      "p99": 14.225
+     },
+     "navigation_ms": {
+      "max": 0.026,
+      "mean": 0.0129,
+      "p50": 0.008,
+      "p95": 0.026,
+      "p99": 0.026
+     },
+     "nodes": {
+      "max": 3203.0,
+      "mean": 3203.0,
+      "p50": 3203.0,
+      "p95": 3203.0,
+      "p99": 3203.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 26.06,
+      "mean": 13.5938,
+      "p50": 10.298,
+      "p95": 26.06,
+      "p99": 26.06
+     },
+     "physics_pairs": {
+      "max": 45.0,
+      "mean": 43.395,
+      "p50": 44.0,
+      "p95": 45.0,
+      "p99": 45.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 183.693,
+      "mean": 36.1793,
+      "p50": 12.714,
+      "p95": 183.693,
+      "p99": 183.693
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     5.3843,
+     5.735,
+     5.7415,
+     5.8024,
+     5.8521,
+     6.034,
+     6.287
+    ],
+    "repeat_frame_p95_ms": [
+     10.55,
+     11.334,
+     11.301,
+     11.646,
+     11.617,
+     12.784,
+     12.653
+    ],
+    "best_frame_mean_ms": 5.3843,
+    "best_frame_p95_ms": 10.55
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 266.52,
+     "mesh_instances": 1292,
+     "microbench": {},
+     "multimesh_instances": 1675,
+     "multimesh_nodes": 318,
+     "nodes": 3203,
+     "objects": 7859,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 427
+     },
+     "resources": 996,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 238,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d1_shown": 6,
+      "d2_hidden": 1,
+      "d2_shown": 4,
+      "d3_shown": 32
+     },
+     "visible_mesh_instances": 1222
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 565.3,
+    "mode": "attributed",
+    "msaa_3d": 0,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.6953,
+      "script": "res://scripts/world/game_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.6603,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.3249,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0016,
+      "script": "res://scripts/world/regional_village.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 44.0,
+      "ms_per_frame": 2.0774,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 1.0258,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0854,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0314,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0037,
+      "script": "res://scripts/world/village/village_scenery.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0013,
+      "script": "res://scripts/world/village/village_population.gd"
+     }
+    ],
+    "quality": "low",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 24.356,
+      "mean": 5.5319,
+      "p50": 4.038,
+      "p95": 9.918,
+      "p99": 12.042
+     },
+     "navigation_ms": {
+      "max": 0.011,
+      "mean": 0.0078,
+      "p50": 0.007,
+      "p95": 0.01,
+      "p99": 0.011
+     },
+     "nodes": {
+      "max": 3203.0,
+      "mean": 3203.0,
+      "p50": 3203.0,
+      "p95": 3203.0,
+      "p99": 3203.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 10.078,
+      "mean": 7.8075,
+      "p50": 7.502,
+      "p95": 8.875,
+      "p99": 10.078
+     },
+     "physics_pairs": {
+      "max": 45.0,
+      "mean": 43.3967,
+      "p50": 44.0,
+      "p95": 45.0,
+      "p99": 45.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 173.684,
+      "mean": 21.5576,
+      "p50": 14.555,
+      "p95": 23.967,
+      "p99": 173.684
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "village/balanced": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 286.07,
+     "mesh_instances": 1316,
+     "microbench": {
+      "advance_0_1s_ms": 2.6882,
+      "advance_1_60s_ms": 2.196,
+      "state_bytes": 32508,
+      "step_ms": {
+       "childhood_advance": 0.2647,
+       "combat_advance": 0.2112,
+       "copy_only": 0.2398,
+       "economy_advance": 0.5748,
+       "life_advance": 0.3319,
+       "npc_advance": 0.1894,
+       "npc_observations_call": 0.0535,
+       "npc_observe": 0.3736
+      },
+      "validate_state_ms": 0.9432,
+      "validators_ms": {
+       "city_trade": 0.001,
+       "combat_actions": 0.0155,
+       "frontier": 0.0077,
+       "npc_behavior": 0.446,
+       "seasons": 0.014,
+       "village_economy": 0.1437,
+       "village_life": 0.1477
+      },
+      "world_copy_ms": 0.2023
+     },
+     "multimesh_instances": 2303,
+     "multimesh_nodes": 320,
+     "nodes": 3269,
+     "objects": 7996,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 435
+     },
+     "resources": 1011,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 241,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 3,
+      "d1_shown": 6,
+      "d2_hidden": 1,
+      "d2_shown": 5,
+      "d3_shown": 29
+     },
+     "visible_mesh_instances": 1246
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 653.2,
+    "mode": "natural",
+    "msaa_3d": 1,
+    "quality": "balanced",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 20.363,
+      "mean": 7.6197,
+      "p50": 6.349,
+      "p95": 13.87,
+      "p99": 17.85
+     },
+     "navigation_ms": {
+      "max": 0.032,
+      "mean": 0.0106,
+      "p50": 0.005,
+      "p95": 0.032,
+      "p99": 0.032
+     },
+     "nodes": {
+      "max": 3269.0,
+      "mean": 3269.0,
+      "p50": 3269.0,
+      "p95": 3269.0,
+      "p99": 3269.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 10.111,
+      "mean": 8.8167,
+      "p50": 8.732,
+      "p95": 10.111,
+      "p99": 10.111
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3867,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 18.385,
+      "mean": 16.5562,
+      "p50": 16.727,
+      "p95": 18.385,
+      "p99": 18.385
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     7.0761,
+     7.3208,
+     7.3991,
+     7.6197,
+     7.6277,
+     7.6759,
+     7.9403
+    ],
+    "repeat_frame_p95_ms": [
+     12.485,
+     12.688,
+     13.59,
+     13.87,
+     14.535,
+     14.094,
+     14.926
+    ],
+    "best_frame_mean_ms": 7.0761,
+    "best_frame_p95_ms": 12.485
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 286.08,
+     "mesh_instances": 1316,
+     "microbench": {},
+     "multimesh_instances": 2303,
+     "multimesh_nodes": 320,
+     "nodes": 3269,
+     "objects": 7996,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 435
+     },
+     "resources": 1011,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 241,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 3,
+      "d1_shown": 6,
+      "d2_hidden": 1,
+      "d2_shown": 5,
+      "d3_shown": 29
+     },
+     "visible_mesh_instances": 1246
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 739.8,
+    "mode": "attributed",
+    "msaa_3d": 1,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.7548,
+      "script": "res://scripts/world/game_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.7065,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.3438,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0019,
+      "script": "res://scripts/world/regional_village.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 44.0,
+      "ms_per_frame": 3.6724,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 1.0967,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0955,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0349,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0039,
+      "script": "res://scripts/world/village/village_scenery.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0015,
+      "script": "res://scripts/world/village/village_population.gd"
+     }
+    ],
+    "quality": "balanced",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 34.439,
+      "mean": 7.3748,
+      "p50": 5.795,
+      "p95": 13.409,
+      "p99": 16.137
+     },
+     "navigation_ms": {
+      "max": 0.032,
+      "mean": 0.0117,
+      "p50": 0.006,
+      "p95": 0.032,
+      "p99": 0.032
+     },
+     "nodes": {
+      "max": 3269.0,
+      "mean": 3269.0,
+      "p50": 3269.0,
+      "p95": 3269.0,
+      "p99": 3269.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 11.668,
+      "mean": 9.6128,
+      "p50": 9.042,
+      "p95": 11.668,
+      "p99": 11.668
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3883,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 93.131,
+      "mean": 21.6347,
+      "p50": 16.062,
+      "p95": 93.131,
+      "p99": 93.131
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "village/high": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 296.46,
+     "mesh_instances": 1356,
+     "microbench": {
+      "advance_0_1s_ms": 3.7655,
+      "advance_1_60s_ms": 3.4992,
+      "state_bytes": 32508,
+      "step_ms": {
+       "childhood_advance": 0.4047,
+       "combat_advance": 0.2887,
+       "copy_only": 0.2728,
+       "economy_advance": 0.8831,
+       "life_advance": 0.5155,
+       "npc_advance": 0.2617,
+       "npc_observations_call": 0.0809,
+       "npc_observe": 0.5476
+      },
+      "validate_state_ms": 1.4314,
+      "validators_ms": {
+       "city_trade": 0.0014,
+       "combat_actions": 0.021,
+       "frontier": 0.0101,
+       "npc_behavior": 0.6627,
+       "seasons": 0.0225,
+       "village_economy": 0.2196,
+       "village_life": 0.1818
+      },
+      "world_copy_ms": 0.2671
+     },
+     "multimesh_instances": 2930,
+     "multimesh_nodes": 321,
+     "nodes": 3350,
+     "objects": 8090,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 435
+     },
+     "resources": 974,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 243,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 4,
+      "d1_hidden": 1,
+      "d1_shown": 7,
+      "d2_shown": 7,
+      "d3_shown": 25
+     },
+     "visible_mesh_instances": 1286
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 705.0,
+    "mode": "natural",
+    "msaa_3d": 2,
+    "quality": "high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 52.196,
+      "mean": 7.4244,
+      "p50": 6.198,
+      "p95": 13.547,
+      "p99": 17.427
+     },
+     "navigation_ms": {
+      "max": 0.018,
+      "mean": 0.0074,
+      "p50": 0.003,
+      "p95": 0.018,
+      "p99": 0.018
+     },
+     "nodes": {
+      "max": 3350.0,
+      "mean": 3350.0,
+      "p50": 3350.0,
+      "p95": 3350.0,
+      "p99": 3350.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 11.737,
+      "mean": 9.9198,
+      "p50": 10.154,
+      "p95": 11.737,
+      "p99": 11.737
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3867,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 169.271,
+      "mean": 26.9031,
+      "p50": 17.594,
+      "p95": 50.476,
+      "p99": 50.476
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     6.8998,
+     7.1497,
+     7.3668,
+     7.4244,
+     7.4395,
+     7.7387,
+     7.7588
+    ],
+    "repeat_frame_p95_ms": [
+     12.138,
+     12.534,
+     13.622,
+     13.547,
+     13.958,
+     14.094,
+     14.212
+    ],
+    "best_frame_mean_ms": 6.8998,
+    "best_frame_p95_ms": 12.138
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 296.48,
+     "mesh_instances": 1356,
+     "microbench": {},
+     "multimesh_instances": 2930,
+     "multimesh_nodes": 321,
+     "nodes": 3350,
+     "objects": 8090,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 435
+     },
+     "resources": 974,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 243,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 4,
+      "d1_hidden": 1,
+      "d1_shown": 7,
+      "d2_shown": 7,
+      "d3_shown": 25
+     },
+     "visible_mesh_instances": 1286
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 979.0,
+    "mode": "attributed",
+    "msaa_3d": 2,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.8915,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.889,
+      "script": "res://scripts/world/game_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.412,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0023,
+      "script": "res://scripts/world/regional_village.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 44.0,
+      "ms_per_frame": 4.4292,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 1.4149,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1138,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0414,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0047,
+      "script": "res://scripts/world/village/village_scenery.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0018,
+      "script": "res://scripts/world/village/village_population.gd"
+     }
+    ],
+    "quality": "high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 64.684,
+      "mean": 9.0148,
+      "p50": 7.666,
+      "p95": 16.079,
+      "p99": 18.467
+     },
+     "navigation_ms": {
+      "max": 0.063,
+      "mean": 0.0213,
+      "p50": 0.006,
+      "p95": 0.063,
+      "p99": 0.063
+     },
+     "nodes": {
+      "max": 3350.0,
+      "mean": 3350.0,
+      "p50": 3350.0,
+      "p95": 3350.0,
+      "p99": 3350.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 11.102,
+      "mean": 9.8545,
+      "p50": 10.445,
+      "p95": 11.102,
+      "p99": 11.102
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3883,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 63.62,
+      "mean": 27.7363,
+      "p50": 17.603,
+      "p95": 63.62,
+      "p99": 63.62
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "village/very_high": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 322.51,
+     "mesh_instances": 1404,
+     "microbench": {
+      "advance_0_1s_ms": 3.4418,
+      "advance_1_60s_ms": 3.5841,
+      "state_bytes": 32508,
+      "step_ms": {
+       "childhood_advance": 0.286,
+       "combat_advance": 0.2111,
+       "copy_only": 0.1847,
+       "economy_advance": 0.5676,
+       "life_advance": 0.3329,
+       "npc_advance": 0.1888,
+       "npc_observations_call": 0.0721,
+       "npc_observe": 0.4435
+      },
+      "validate_state_ms": 1.4492,
+      "validators_ms": {
+       "city_trade": 0.0016,
+       "combat_actions": 0.012,
+       "frontier": 0.0072,
+       "npc_behavior": 0.4129,
+       "seasons": 0.0139,
+       "village_economy": 0.1429,
+       "village_life": 0.1248
+      },
+      "world_copy_ms": 0.2598
+     },
+     "multimesh_instances": 2930,
+     "multimesh_nodes": 321,
+     "nodes": 3478,
+     "objects": 8367,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 451
+     },
+     "resources": 1013,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 246,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 8,
+      "d1_hidden": 1,
+      "d1_shown": 6,
+      "d2_shown": 16,
+      "d3_shown": 13
+     },
+     "visible_mesh_instances": 1334
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 1049.8,
+    "mode": "natural",
+    "msaa_3d": 2,
+    "quality": "very_high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 20.386,
+      "mean": 8.0176,
+      "p50": 6.987,
+      "p95": 15.66,
+      "p99": 17.52
+     },
+     "navigation_ms": {
+      "max": 0.052,
+      "mean": 0.0237,
+      "p50": 0.036,
+      "p95": 0.052,
+      "p99": 0.052
+     },
+     "nodes": {
+      "max": 3478.0,
+      "mean": 3478.0,
+      "p50": 3478.0,
+      "p95": 3478.0,
+      "p99": 3478.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 13.749,
+      "mean": 9.7505,
+      "p50": 8.048,
+      "p95": 13.749,
+      "p99": 13.749
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3867,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 17.664,
+      "mean": 15.7264,
+      "p50": 15.446,
+      "p95": 17.664,
+      "p99": 17.664
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     7.4069,
+     7.6933,
+     7.7726,
+     8.0176,
+     8.4447,
+     8.5201,
+     9.6694
+    ],
+    "repeat_frame_p95_ms": [
+     13.141,
+     14.679,
+     14.075,
+     15.66,
+     16.75,
+     16.705,
+     17.8
+    ],
+    "best_frame_mean_ms": 7.4069,
+    "best_frame_p95_ms": 13.141
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 322.52,
+     "mesh_instances": 1404,
+     "microbench": {},
+     "multimesh_instances": 2930,
+     "multimesh_nodes": 321,
+     "nodes": 3478,
+     "objects": 8367,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 451
+     },
+     "resources": 1013,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 246,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 8,
+      "d1_hidden": 1,
+      "d1_shown": 6,
+      "d2_shown": 16,
+      "d3_shown": 13
+     },
+     "visible_mesh_instances": 1334
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 847.2,
+    "mode": "attributed",
+    "msaa_3d": 2,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 1.043,
+      "script": "res://scripts/world/game_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.9376,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.4577,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0025,
+      "script": "res://scripts/world/regional_village.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 44.0,
+      "ms_per_frame": 4.9821,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 1.4291,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1311,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0474,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0053,
+      "script": "res://scripts/world/village/village_scenery.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.002,
+      "script": "res://scripts/world/village/village_population.gd"
+     }
+    ],
+    "quality": "very_high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 30.226,
+      "mean": 9.9743,
+      "p50": 9.08,
+      "p95": 19.139,
+      "p99": 22.137
+     },
+     "navigation_ms": {
+      "max": 0.038,
+      "mean": 0.0172,
+      "p50": 0.018,
+      "p95": 0.038,
+      "p99": 0.038
+     },
+     "nodes": {
+      "max": 3478.0,
+      "mean": 3478.0,
+      "p50": 3478.0,
+      "p95": 3478.0,
+      "p99": 3478.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 13.444,
+      "mean": 10.8007,
+      "p50": 10.327,
+      "p95": 13.444,
+      "p99": 13.444
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3883,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 25.743,
+      "mean": 19.5295,
+      "p50": 19.391,
+      "p95": 25.743,
+      "p99": 25.743
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  }
+ }
+}

@@ -28,6 +28,7 @@
       "shadow_distance_metres": 24,
       "mesh_lod_threshold": 3,
       "decoration_fraction": 0.22,
+      "far_actor_foot_contacts": false,
       "glow": false,
       "review_limits": {
         "draw_calls": 220,

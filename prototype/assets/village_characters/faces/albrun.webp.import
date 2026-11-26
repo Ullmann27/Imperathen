@@ -3,27 +3,29 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cssv2gpnj6o7j"
-path="res://.godot/imported/albrun.webp-f44059dc47ef323735dd442f3a5f3d6b.ctex"
+path.bptc="res://.godot/imported/albrun.webp-f44059dc47ef323735dd442f3a5f3d6b.bptc.ctex"
+path.astc="res://.godot/imported/albrun.webp-f44059dc47ef323735dd442f3a5f3d6b.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/village_characters/faces/albrun.webp"
-dest_files=["res://.godot/imported/albrun.webp-f44059dc47ef323735dd442f3a5f3d6b.ctex"]
+dest_files=["res://.godot/imported/albrun.webp-f44059dc47ef323735dd442f3a5f3d6b.bptc.ctex", "res://.godot/imported/albrun.webp-f44059dc47ef323735dd442f3a5f3d6b.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

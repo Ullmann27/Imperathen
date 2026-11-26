@@ -1,0 +1,5345 @@
+{
+ "label": "after",
+ "engine": "4.7.2.stable.official.ed1daf0bf",
+ "source_commit": "89e735df9d619a1c55a7393bf3066f2b81a50ba6",
+ "working_tree_modified": true,
+ "frames": 600,
+ "warmup": 180,
+ "repeat": 3,
+ "fixed_fps": 60,
+ "evidence_class": "desktop headless CPU and Mesa llvmpipe render counters; relative only; no Android device",
+ "results": {
+  "village/low": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 279.24,
+     "mesh_instances": 1292,
+     "microbench": {
+      "advance_0_1s_ms": 3.5655,
+      "advance_1_60s_ms": 2.1259,
+      "state_bytes": 32508,
+      "step_ms": {
+       "childhood_advance": 0.2587,
+       "combat_advance": 0.2106,
+       "copy_only": 0.185,
+       "economy_advance": 0.5688,
+       "life_advance": 0.3356,
+       "npc_advance": 0.1951,
+       "npc_observations_call": 0.0533,
+       "npc_observe": 0.353
+      },
+      "validate_state_ms": 1.4889,
+      "validators_ms": {
+       "city_trade": 0.0009,
+       "combat_actions": 0.012,
+       "frontier": 0.0075,
+       "npc_behavior": 0.4078,
+       "seasons": 0.0154,
+       "village_economy": 0.1403,
+       "village_life": 0.1259
+      },
+      "world_copy_ms": 0.2854
+     },
+     "multimesh_instances": 1675,
+     "multimesh_nodes": 318,
+     "nodes": 3203,
+     "objects": 7931,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 427
+     },
+     "resources": 1051,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 238,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d1_shown": 6,
+      "d2_hidden": 1,
+      "d2_shown": 4,
+      "d3_shown": 32
+     },
+     "visible_mesh_instances": 1222
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 586.4,
+    "mode": "natural",
+    "msaa_3d": 0,
+    "quality": "low",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 31.682,
+      "mean": 6.4253,
+      "p50": 4.997,
+      "p95": 13.558,
+      "p99": 17.6
+     },
+     "navigation_ms": {
+      "max": 0.092,
+      "mean": 0.0131,
+      "p50": 0.006,
+      "p95": 0.092,
+      "p99": 0.092
+     },
+     "nodes": {
+      "max": 3203.0,
+      "mean": 3203.0,
+      "p50": 3203.0,
+      "p95": 3203.0,
+      "p99": 3203.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 14.787,
+      "mean": 11.2796,
+      "p50": 10.528,
+      "p95": 14.787,
+      "p99": 14.787
+     },
+     "physics_pairs": {
+      "max": 45.0,
+      "mean": 43.395,
+      "p50": 44.0,
+      "p95": 45.0,
+      "p99": 45.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 26.592,
+      "mean": 19.9393,
+      "p50": 17.301,
+      "p95": 26.592,
+      "p99": 26.592
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     6.3881,
+     6.4253,
+     6.7473
+    ],
+    "repeat_frame_p95_ms": [
+     12.557,
+     13.558,
+     13.718
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 279.26,
+     "mesh_instances": 1292,
+     "microbench": {},
+     "multimesh_instances": 1675,
+     "multimesh_nodes": 318,
+     "nodes": 3203,
+     "objects": 7931,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 427
+     },
+     "resources": 1051,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 238,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d1_shown": 6,
+      "d2_hidden": 1,
+      "d2_shown": 4,
+      "d3_shown": 32
+     },
+     "visible_mesh_instances": 1222
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 649.9,
+    "mode": "attributed",
+    "msaa_3d": 0,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.794,
+      "script": "res://scripts/world/game_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.7819,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.3841,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.002,
+      "script": "res://scripts/world/regional_village.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 44.0,
+      "ms_per_frame": 2.4692,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 1.1979,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1002,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0362,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0045,
+      "script": "res://scripts/world/village/village_scenery.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0015,
+      "script": "res://scripts/world/village/village_population.gd"
+     }
+    ],
+    "quality": "low",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 30.211,
+      "mean": 6.5702,
+      "p50": 5.435,
+      "p95": 13.752,
+      "p99": 16.292
+     },
+     "navigation_ms": {
+      "max": 0.045,
+      "mean": 0.0207,
+      "p50": 0.01,
+      "p95": 0.045,
+      "p99": 0.045
+     },
+     "nodes": {
+      "max": 3203.0,
+      "mean": 3203.0,
+      "p50": 3203.0,
+      "p95": 3203.0,
+      "p99": 3203.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 19.524,
+      "mean": 12.2649,
+      "p50": 9.163,
+      "p95": 19.524,
+      "p99": 19.524
+     },
+     "physics_pairs": {
+      "max": 45.0,
+      "mean": 43.3967,
+      "p50": 44.0,
+      "p95": 45.0,
+      "p99": 45.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 117.318,
+      "mean": 33.0679,
+      "p50": 21.014,
+      "p95": 117.318,
+      "p99": 117.318
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "village/balanced": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 286.15,
+     "mesh_instances": 1316,
+     "microbench": {
+      "advance_0_1s_ms": 4.1209,
+      "advance_1_60s_ms": 3.6801,
+      "state_bytes": 32508,
+      "step_ms": {
+       "childhood_advance": 0.4207,
+       "combat_advance": 0.3385,
+       "copy_only": 0.2729,
+       "economy_advance": 0.9906,
+       "life_advance": 0.5992,
+       "npc_advance": 0.2733,
+       "npc_observations_call": 0.0818,
+       "npc_observe": 0.6249
+      },
+      "validate_state_ms": 1.5609,
+      "validators_ms": {
+       "city_trade": 0.0009,
+       "combat_actions": 0.02,
+       "frontier": 0.0073,
+       "npc_behavior": 0.4829,
+       "seasons": 0.0142,
+       "village_economy": 0.2215,
+       "village_life": 0.2051
+      },
+      "world_copy_ms": 0.2773
+     },
+     "multimesh_instances": 2303,
+     "multimesh_nodes": 320,
+     "nodes": 3269,
+     "objects": 8017,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 435
+     },
+     "resources": 1025,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 241,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 3,
+      "d1_shown": 6,
+      "d2_hidden": 1,
+      "d2_shown": 5,
+      "d3_shown": 29
+     },
+     "visible_mesh_instances": 1246
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 694.2,
+    "mode": "natural",
+    "msaa_3d": 1,
+    "quality": "balanced",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 19.746,
+      "mean": 7.8563,
+      "p50": 6.75,
+      "p95": 14.567,
+      "p99": 17.278
+     },
+     "navigation_ms": {
+      "max": 0.032,
+      "mean": 0.0087,
+      "p50": 0.007,
+      "p95": 0.013,
+      "p99": 0.032
+     },
+     "nodes": {
+      "max": 3269.0,
+      "mean": 3269.0,
+      "p50": 3269.0,
+      "p95": 3269.0,
+      "p99": 3269.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 11.085,
+      "mean": 9.2821,
+      "p50": 8.257,
+      "p95": 11.085,
+      "p99": 11.085
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3867,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 28.686,
+      "mean": 17.2801,
+      "p50": 16.443,
+      "p95": 28.686,
+      "p99": 28.686
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     7.7054,
+     7.8563,
+     8.5442
+    ],
+    "repeat_frame_p95_ms": [
+     14.33,
+     14.567,
+     15.774
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 286.17,
+     "mesh_instances": 1316,
+     "microbench": {},
+     "multimesh_instances": 2303,
+     "multimesh_nodes": 320,
+     "nodes": 3269,
+     "objects": 8017,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 435
+     },
+     "resources": 1025,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 241,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 3,
+      "d1_shown": 6,
+      "d2_hidden": 1,
+      "d2_shown": 5,
+      "d3_shown": 29
+     },
+     "visible_mesh_instances": 1246
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 822.9,
+    "mode": "attributed",
+    "msaa_3d": 1,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.7977,
+      "script": "res://scripts/world/game_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.7482,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.3645,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0019,
+      "script": "res://scripts/world/regional_village.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 44.0,
+      "ms_per_frame": 3.8408,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 1.1662,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1011,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0366,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0037,
+      "script": "res://scripts/world/village/village_scenery.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0014,
+      "script": "res://scripts/world/village/village_population.gd"
+     }
+    ],
+    "quality": "balanced",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 18.939,
+      "mean": 7.768,
+      "p50": 6.348,
+      "p95": 13.777,
+      "p99": 16.674
+     },
+     "navigation_ms": {
+      "max": 0.026,
+      "mean": 0.0147,
+      "p50": 0.014,
+      "p95": 0.026,
+      "p99": 0.026
+     },
+     "nodes": {
+      "max": 3269.0,
+      "mean": 3269.0,
+      "p50": 3269.0,
+      "p95": 3269.0,
+      "p99": 3269.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 10.393,
+      "mean": 9.173,
+      "p50": 8.886,
+      "p95": 10.393,
+      "p99": 10.393
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3883,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 39.486,
+      "mean": 19.2137,
+      "p50": 16.878,
+      "p95": 39.486,
+      "p99": 39.486
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "village/high": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 309.32,
+     "mesh_instances": 1356,
+     "microbench": {
+      "advance_0_1s_ms": 2.8914,
+      "advance_1_60s_ms": 2.3081,
+      "state_bytes": 32508,
+      "step_ms": {
+       "childhood_advance": 0.3188,
+       "combat_advance": 0.2108,
+       "copy_only": 0.1847,
+       "economy_advance": 0.6316,
+       "life_advance": 0.3357,
+       "npc_advance": 0.1964,
+       "npc_observations_call": 0.056,
+       "npc_observe": 0.6308
+      },
+      "validate_state_ms": 0.9011,
+      "validators_ms": {
+       "city_trade": 0.001,
+       "combat_actions": 0.0131,
+       "frontier": 0.0072,
+       "npc_behavior": 0.4059,
+       "seasons": 0.0131,
+       "village_economy": 0.1356,
+       "village_life": 0.1235
+      },
+      "world_copy_ms": 0.2173
+     },
+     "multimesh_instances": 2930,
+     "multimesh_nodes": 321,
+     "nodes": 3350,
+     "objects": 8162,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 435
+     },
+     "resources": 1029,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 243,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 4,
+      "d1_hidden": 1,
+      "d1_shown": 7,
+      "d2_shown": 7,
+      "d3_shown": 25
+     },
+     "visible_mesh_instances": 1286
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 933.2,
+    "mode": "natural",
+    "msaa_3d": 2,
+    "quality": "high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 58.409,
+      "mean": 7.6188,
+      "p50": 6.497,
+      "p95": 13.443,
+      "p99": 17.171
+     },
+     "navigation_ms": {
+      "max": 0.044,
+      "mean": 0.022,
+      "p50": 0.028,
+      "p95": 0.044,
+      "p99": 0.044
+     },
+     "nodes": {
+      "max": 3350.0,
+      "mean": 3350.0,
+      "p50": 3350.0,
+      "p95": 3350.0,
+      "p99": 3350.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 15.002,
+      "mean": 9.6931,
+      "p50": 7.933,
+      "p95": 15.002,
+      "p99": 15.002
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3867,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 56.564,
+      "mean": 23.9593,
+      "p50": 15.977,
+      "p95": 56.564,
+      "p99": 56.564
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     7.5253,
+     7.6188,
+     8.3871
+    ],
+    "repeat_frame_p95_ms": [
+     13.708,
+     13.443,
+     15.565
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 309.33,
+     "mesh_instances": 1356,
+     "microbench": {},
+     "multimesh_instances": 2930,
+     "multimesh_nodes": 321,
+     "nodes": 3350,
+     "objects": 8162,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 435
+     },
+     "resources": 1029,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 243,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 4,
+      "d1_hidden": 1,
+      "d1_shown": 7,
+      "d2_shown": 7,
+      "d3_shown": 25
+     },
+     "visible_mesh_instances": 1286
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 659.6,
+    "mode": "attributed",
+    "msaa_3d": 2,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.7858,
+      "script": "res://scripts/world/game_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.7461,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.3688,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.002,
+      "script": "res://scripts/world/regional_village.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 44.0,
+      "ms_per_frame": 3.8905,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 1.2293,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1015,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0357,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0041,
+      "script": "res://scripts/world/village/village_scenery.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0013,
+      "script": "res://scripts/world/village/village_population.gd"
+     }
+    ],
+    "quality": "high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 49.16,
+      "mean": 7.8982,
+      "p50": 6.949,
+      "p95": 15.09,
+      "p99": 16.707
+     },
+     "navigation_ms": {
+      "max": 0.029,
+      "mean": 0.0145,
+      "p50": 0.008,
+      "p95": 0.029,
+      "p99": 0.029
+     },
+     "nodes": {
+      "max": 3350.0,
+      "mean": 3350.0,
+      "p50": 3350.0,
+      "p95": 3350.0,
+      "p99": 3350.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 18.642,
+      "mean": 10.1477,
+      "p50": 9.1,
+      "p95": 18.642,
+      "p99": 18.642
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3883,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 48.542,
+      "mean": 24.4235,
+      "p50": 19.301,
+      "p95": 48.542,
+      "p99": 48.542
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "village/very_high": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 335.25,
+     "mesh_instances": 1404,
+     "microbench": {
+      "advance_0_1s_ms": 2.3159,
+      "advance_1_60s_ms": 2.0878,
+      "state_bytes": 32508,
+      "step_ms": {
+       "childhood_advance": 0.26,
+       "combat_advance": 0.2113,
+       "copy_only": 0.1864,
+       "economy_advance": 0.5644,
+       "life_advance": 0.3282,
+       "npc_advance": 0.1885,
+       "npc_observations_call": 0.0546,
+       "npc_observe": 0.3521
+      },
+      "validate_state_ms": 0.8189,
+      "validators_ms": {
+       "city_trade": 0.0009,
+       "combat_actions": 0.0127,
+       "frontier": 0.007,
+       "npc_behavior": 0.4136,
+       "seasons": 0.0157,
+       "village_economy": 0.1384,
+       "village_life": 0.1238
+      },
+      "world_copy_ms": 0.188
+     },
+     "multimesh_instances": 2930,
+     "multimesh_nodes": 321,
+     "nodes": 3478,
+     "objects": 8442,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 451
+     },
+     "resources": 1070,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 246,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 8,
+      "d1_hidden": 1,
+      "d1_shown": 6,
+      "d2_shown": 16,
+      "d3_shown": 13
+     },
+     "visible_mesh_instances": 1334
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 736.0,
+    "mode": "natural",
+    "msaa_3d": 2,
+    "quality": "very_high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 22.79,
+      "mean": 7.8006,
+      "p50": 6.902,
+      "p95": 14.366,
+      "p99": 17.8
+     },
+     "navigation_ms": {
+      "max": 0.009,
+      "mean": 0.0055,
+      "p50": 0.005,
+      "p95": 0.009,
+      "p99": 0.009
+     },
+     "nodes": {
+      "max": 3478.0,
+      "mean": 3478.0,
+      "p50": 3478.0,
+      "p95": 3478.0,
+      "p99": 3478.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 10.446,
+      "mean": 8.4017,
+      "p50": 8.516,
+      "p95": 10.446,
+      "p99": 10.446
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3867,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 20.107,
+      "mean": 17.0343,
+      "p50": 16.735,
+      "p95": 20.107,
+      "p99": 20.107
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     7.6766,
+     7.8006,
+     8.2147
+    ],
+    "repeat_frame_p95_ms": [
+     14.088,
+     14.366,
+     15.305
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 44,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 551,
+     "lights": 1,
+     "memory_static_mib": 335.27,
+     "mesh_instances": 1404,
+     "microbench": {},
+     "multimesh_instances": 2930,
+     "multimesh_nodes": 321,
+     "nodes": 3478,
+     "objects": 8442,
+     "physics_bodies": {
+      "CharacterBody3D": 29,
+      "StaticBody3D": 451
+     },
+     "resources": 1070,
+     "shadow_lights": 1,
+     "skeletons": 44,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 246,
+     "video_mem_mib": 0.0,
+     "village_people": 44,
+     "village_people_by_detail": {
+      "d0_shown": 8,
+      "d1_hidden": 1,
+      "d1_shown": 6,
+      "d2_shown": 16,
+      "d3_shown": 13
+     },
+     "visible_mesh_instances": 1334
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 757.8,
+    "mode": "attributed",
+    "msaa_3d": 2,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.8521,
+      "script": "res://scripts/world/game_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.7615,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.3785,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0023,
+      "script": "res://scripts/world/regional_village.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 44.0,
+      "ms_per_frame": 3.9788,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 1.1705,
+      "script": "res://scripts/main.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1093,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0372,
+      "script": "res://scripts/world/village_life_world.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0043,
+      "script": "res://scripts/world/village/village_scenery.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0016,
+      "script": "res://scripts/world/village/village_population.gd"
+     }
+    ],
+    "quality": "very_high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "village",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 20.846,
+      "mean": 8.0549,
+      "p50": 6.934,
+      "p95": 14.953,
+      "p99": 17.461
+     },
+     "navigation_ms": {
+      "max": 0.031,
+      "mean": 0.0138,
+      "p50": 0.005,
+      "p95": 0.031,
+      "p99": 0.031
+     },
+     "nodes": {
+      "max": 3478.0,
+      "mean": 3478.0,
+      "p50": 3478.0,
+      "p95": 3478.0,
+      "p99": 3478.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 10.0,
+      "mean": 4.3517,
+      "p50": 2.0,
+      "p95": 10.0,
+      "p99": 10.0
+     },
+     "physics_ms": {
+      "max": 17.709,
+      "mean": 10.7664,
+      "p50": 11.543,
+      "p95": 17.709,
+      "p99": 17.709
+     },
+     "physics_pairs": {
+      "max": 82.0,
+      "mean": 80.3883,
+      "p50": 81.0,
+      "p95": 82.0,
+      "p99": 82.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 19.362,
+      "mean": 16.8919,
+      "p50": 16.856,
+      "p95": 19.362,
+      "p99": 19.362
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "city/low": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 5,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 2,
+     "lights": 1,
+     "memory_static_mib": 273.65,
+     "mesh_instances": 72,
+     "microbench": {},
+     "multimesh_instances": 0,
+     "multimesh_nodes": 0,
+     "nodes": 219,
+     "objects": 7140,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 5
+     },
+     "resources": 892,
+     "shadow_lights": 0,
+     "skeletons": 5,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 28,
+     "video_mem_mib": 0.0,
+     "village_people": 1,
+     "village_people_by_detail": {
+      "d2_shown": 1
+     },
+     "visible_mesh_instances": 71
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 97.0,
+    "mode": "natural",
+    "msaa_3d": 0,
+    "quality": "low",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "city",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 2.248,
+      "mean": 0.6467,
+      "p50": 0.604,
+      "p95": 0.939,
+      "p99": 1.172
+     },
+     "navigation_ms": {
+      "max": 0.002,
+      "mean": 0.002,
+      "p50": 0.002,
+      "p95": 0.002,
+      "p99": 0.002
+     },
+     "nodes": {
+      "max": 219.0,
+      "mean": 217.4833,
+      "p50": 219.0,
+      "p95": 219.0,
+      "p99": 219.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 0.345,
+      "mean": 0.345,
+      "p50": 0.345,
+      "p95": 0.345,
+      "p99": 0.345
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 2.86,
+      "mean": 2.86,
+      "p50": 2.86,
+      "p95": 2.86,
+      "p99": 2.86
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     0.5829,
+     0.6467,
+     0.8397
+    ],
+    "repeat_frame_p95_ms": [
+     0.865,
+     0.939,
+     1.076
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 5,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 2,
+     "lights": 1,
+     "memory_static_mib": 273.66,
+     "mesh_instances": 72,
+     "microbench": {},
+     "multimesh_instances": 0,
+     "multimesh_nodes": 0,
+     "nodes": 219,
+     "objects": 7140,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 5
+     },
+     "resources": 892,
+     "shadow_lights": 0,
+     "skeletons": 5,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 28,
+     "video_mem_mib": 0.0,
+     "village_people": 1,
+     "village_people_by_detail": {
+      "d2_shown": 1
+     },
+     "visible_mesh_instances": 71
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 77.6,
+    "mode": "attributed",
+    "msaa_3d": 0,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.2947,
+      "script": "res://scripts/world/city_exploration.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0009,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1527,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0062,
+      "script": "res://scripts/ui/runtime_display.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0043,
+      "script": "res://scripts/world/city_exploration.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0011,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "quality": "low",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "city",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 10.821,
+      "mean": 0.7151,
+      "p50": 0.659,
+      "p95": 0.985,
+      "p99": 1.389
+     },
+     "navigation_ms": {
+      "max": 0.002,
+      "mean": 0.002,
+      "p50": 0.002,
+      "p95": 0.002,
+      "p99": 0.002
+     },
+     "nodes": {
+      "max": 219.0,
+      "mean": 217.4833,
+      "p50": 219.0,
+      "p95": 219.0,
+      "p99": 219.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 0.292,
+      "mean": 0.292,
+      "p50": 0.292,
+      "p95": 0.292,
+      "p99": 0.292
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 2.51,
+      "mean": 2.51,
+      "p50": 2.51,
+      "p95": 2.51,
+      "p99": 2.51
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "city/balanced": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 9,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 2,
+     "lights": 1,
+     "memory_static_mib": 303.13,
+     "mesh_instances": 128,
+     "microbench": {},
+     "multimesh_instances": 0,
+     "multimesh_nodes": 0,
+     "nodes": 306,
+     "objects": 7345,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 9
+     },
+     "resources": 973,
+     "shadow_lights": 1,
+     "skeletons": 9,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 33,
+     "video_mem_mib": 0.0,
+     "village_people": 1,
+     "village_people_by_detail": {
+      "d1_shown": 1
+     },
+     "visible_mesh_instances": 127
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 158.3,
+    "mode": "natural",
+    "msaa_3d": 1,
+    "quality": "balanced",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "city",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 1.753,
+      "mean": 0.7103,
+      "p50": 0.682,
+      "p95": 1.004,
+      "p99": 1.293
+     },
+     "navigation_ms": {
+      "max": 0.003,
+      "mean": 0.003,
+      "p50": 0.003,
+      "p95": 0.003,
+      "p99": 0.003
+     },
+     "nodes": {
+      "max": 306.0,
+      "mean": 299.6417,
+      "p50": 305.0,
+      "p95": 306.0,
+      "p99": 306.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 0.93,
+      "mean": 0.93,
+      "p50": 0.93,
+      "p95": 0.93,
+      "p99": 0.93
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 147.278,
+      "mean": 147.278,
+      "p50": 147.278,
+      "p95": 147.278,
+      "p99": 147.278
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     0.7043,
+     0.7103,
+     0.7257
+    ],
+    "repeat_frame_p95_ms": [
+     1.043,
+     1.004,
+     1.084
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 9,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 2,
+     "lights": 1,
+     "memory_static_mib": 303.14,
+     "mesh_instances": 128,
+     "microbench": {},
+     "multimesh_instances": 0,
+     "multimesh_nodes": 0,
+     "nodes": 306,
+     "objects": 7345,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 9
+     },
+     "resources": 973,
+     "shadow_lights": 1,
+     "skeletons": 9,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 33,
+     "video_mem_mib": 0.0,
+     "village_people": 1,
+     "village_people_by_detail": {
+      "d1_shown": 1
+     },
+     "visible_mesh_instances": 127
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 168.2,
+    "mode": "attributed",
+    "msaa_3d": 1,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.2827,
+      "script": "res://scripts/world/city_exploration.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0009,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1588,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0061,
+      "script": "res://scripts/ui/runtime_display.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0042,
+      "script": "res://scripts/world/city_exploration.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0011,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "quality": "balanced",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "city",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 3.603,
+      "mean": 0.7251,
+      "p50": 0.649,
+      "p95": 1.091,
+      "p99": 1.698
+     },
+     "navigation_ms": {
+      "max": 0.031,
+      "mean": 0.021,
+      "p50": 0.031,
+      "p95": 0.031,
+      "p99": 0.031
+     },
+     "nodes": {
+      "max": 306.0,
+      "mean": 302.215,
+      "p50": 305.0,
+      "p95": 306.0,
+      "p99": 306.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 1.626,
+      "mean": 1.2048,
+      "p50": 1.626,
+      "p95": 1.626,
+      "p99": 1.626
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 157.358,
+      "mean": 103.1582,
+      "p50": 157.358,
+      "p95": 157.358,
+      "p99": 157.358
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "city/high": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 13,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 2,
+     "lights": 1,
+     "memory_static_mib": 303.1,
+     "mesh_instances": 184,
+     "microbench": {},
+     "multimesh_instances": 0,
+     "multimesh_nodes": 0,
+     "nodes": 390,
+     "objects": 7466,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 13
+     },
+     "resources": 977,
+     "shadow_lights": 1,
+     "skeletons": 13,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 33,
+     "video_mem_mib": 0.0,
+     "village_people": 1,
+     "village_people_by_detail": {
+      "d0_shown": 1
+     },
+     "visible_mesh_instances": 183
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 54.3,
+    "mode": "natural",
+    "msaa_3d": 2,
+    "quality": "high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "city",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 4.839,
+      "mean": 0.7742,
+      "p50": 0.663,
+      "p95": 1.077,
+      "p99": 1.759
+     },
+     "navigation_ms": {
+      "max": 0.002,
+      "mean": 0.002,
+      "p50": 0.002,
+      "p95": 0.002,
+      "p99": 0.002
+     },
+     "nodes": {
+      "max": 390.0,
+      "mean": 365.7833,
+      "p50": 390.0,
+      "p95": 390.0,
+      "p99": 390.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 0.414,
+      "mean": 0.414,
+      "p50": 0.414,
+      "p95": 0.414,
+      "p99": 0.414
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 5.283,
+      "mean": 5.283,
+      "p50": 5.283,
+      "p95": 5.283,
+      "p99": 5.283
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     0.6948,
+     0.7742,
+     0.8728
+    ],
+    "repeat_frame_p95_ms": [
+     1.083,
+     1.077,
+     1.266
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 13,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 2,
+     "lights": 1,
+     "memory_static_mib": 303.1,
+     "mesh_instances": 184,
+     "microbench": {},
+     "multimesh_instances": 0,
+     "multimesh_nodes": 0,
+     "nodes": 390,
+     "objects": 7466,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 13
+     },
+     "resources": 977,
+     "shadow_lights": 1,
+     "skeletons": 13,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 33,
+     "video_mem_mib": 0.0,
+     "village_people": 1,
+     "village_people_by_detail": {
+      "d0_shown": 1
+     },
+     "visible_mesh_instances": 183
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 38.9,
+    "mode": "attributed",
+    "msaa_3d": 2,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.2684,
+      "script": "res://scripts/world/city_exploration.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0008,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1509,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0057,
+      "script": "res://scripts/ui/runtime_display.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0039,
+      "script": "res://scripts/world/city_exploration.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0009,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "quality": "high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "city",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 1.937,
+      "mean": 0.6963,
+      "p50": 0.664,
+      "p95": 0.946,
+      "p99": 1.506
+     },
+     "navigation_ms": {
+      "max": 0.001,
+      "mean": 0.001,
+      "p50": 0.001,
+      "p95": 0.001,
+      "p99": 0.001
+     },
+     "nodes": {
+      "max": 390.0,
+      "mean": 359.37,
+      "p50": 390.0,
+      "p95": 390.0,
+      "p99": 390.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 0.416,
+      "mean": 0.416,
+      "p50": 0.416,
+      "p95": 0.416,
+      "p99": 0.416
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 3.47,
+      "mean": 3.47,
+      "p50": 3.47,
+      "p95": 3.47,
+      "p99": 3.47
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "city/very_high": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 13,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 2,
+     "lights": 1,
+     "memory_static_mib": 307.22,
+     "mesh_instances": 184,
+     "microbench": {},
+     "multimesh_instances": 0,
+     "multimesh_nodes": 0,
+     "nodes": 390,
+     "objects": 7529,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 13
+     },
+     "resources": 1020,
+     "shadow_lights": 1,
+     "skeletons": 13,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 33,
+     "video_mem_mib": 0.0,
+     "village_people": 1,
+     "village_people_by_detail": {
+      "d0_shown": 1
+     },
+     "visible_mesh_instances": 183
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 51.3,
+    "mode": "natural",
+    "msaa_3d": 2,
+    "quality": "very_high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "city",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 1.564,
+      "mean": 0.7153,
+      "p50": 0.693,
+      "p95": 0.956,
+      "p99": 1.34
+     },
+     "navigation_ms": {
+      "max": 0.003,
+      "mean": 0.0027,
+      "p50": 0.003,
+      "p95": 0.003,
+      "p99": 0.003
+     },
+     "nodes": {
+      "max": 390.0,
+      "mean": 356.2067,
+      "p50": 390.0,
+      "p95": 390.0,
+      "p99": 390.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 1.306,
+      "mean": 0.99,
+      "p50": 1.306,
+      "p95": 1.306,
+      "p99": 1.306
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 72.855,
+      "mean": 49.9539,
+      "p50": 72.855,
+      "p95": 72.855,
+      "p99": 72.855
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     0.6495,
+     0.7153,
+     0.7361
+    ],
+    "repeat_frame_p95_ms": [
+     0.984,
+     0.956,
+     1.044
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 13,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 2,
+     "lights": 1,
+     "memory_static_mib": 307.23,
+     "mesh_instances": 184,
+     "microbench": {},
+     "multimesh_instances": 0,
+     "multimesh_nodes": 0,
+     "nodes": 390,
+     "objects": 7529,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 13
+     },
+     "resources": 1020,
+     "shadow_lights": 1,
+     "skeletons": 13,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 33,
+     "video_mem_mib": 0.0,
+     "village_people": 1,
+     "village_people_by_detail": {
+      "d0_shown": 1
+     },
+     "visible_mesh_instances": 183
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 50.2,
+    "mode": "attributed",
+    "msaa_3d": 2,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.2841,
+      "script": "res://scripts/world/city_exploration.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0011,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1602,
+      "script": "res://scripts/visuals/village_person.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0062,
+      "script": "res://scripts/ui/runtime_display.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.004,
+      "script": "res://scripts/world/city_exploration.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0013,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "quality": "very_high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "city",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 1.786,
+      "mean": 0.7282,
+      "p50": 0.712,
+      "p95": 1.078,
+      "p99": 1.469
+     },
+     "navigation_ms": {
+      "max": 0.004,
+      "mean": 0.004,
+      "p50": 0.004,
+      "p95": 0.004,
+      "p99": 0.004
+     },
+     "nodes": {
+      "max": 390.0,
+      "mean": 353.0,
+      "p50": 390.0,
+      "p95": 390.0,
+      "p99": 390.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 0.389,
+      "mean": 0.389,
+      "p50": 0.389,
+      "p95": 0.389,
+      "p99": 0.389
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 79.19,
+      "mean": 79.19,
+      "p50": 79.19,
+      "p95": 79.19,
+      "p99": 79.19
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "district/low": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 7,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 0,
+     "lights": 1,
+     "memory_static_mib": 289.71,
+     "mesh_instances": 136,
+     "microbench": {},
+     "multimesh_instances": 77,
+     "multimesh_nodes": 2,
+     "nodes": 452,
+     "objects": 7539,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 31
+     },
+     "resources": 852,
+     "shadow_lights": 0,
+     "skeletons": 7,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 40,
+     "video_mem_mib": 0.0,
+     "village_people": 7,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d2_shown": 1,
+      "d3_shown": 5
+     },
+     "visible_mesh_instances": 135
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 228.5,
+    "mode": "natural",
+    "msaa_3d": 0,
+    "quality": "low",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "district",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 1.805,
+      "mean": 1.0043,
+      "p50": 0.955,
+      "p95": 1.375,
+      "p99": 1.535
+     },
+     "navigation_ms": {
+      "max": 0.005,
+      "mean": 0.0022,
+      "p50": 0.002,
+      "p95": 0.005,
+      "p99": 0.005
+     },
+     "nodes": {
+      "max": 452.0,
+      "mean": 452.0,
+      "p50": 452.0,
+      "p95": 452.0,
+      "p99": 452.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 2.997,
+      "mean": 0.3236,
+      "p50": 0.168,
+      "p95": 2.997,
+      "p99": 2.997
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 214.606,
+      "mean": 57.2862,
+      "p50": 48.13,
+      "p95": 214.606,
+      "p99": 214.606
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     0.986,
+     1.0043,
+     1.073
+    ],
+    "repeat_frame_p95_ms": [
+     1.368,
+     1.375,
+     1.314
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 7,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 0,
+     "lights": 1,
+     "memory_static_mib": 289.71,
+     "mesh_instances": 136,
+     "microbench": {},
+     "multimesh_instances": 77,
+     "multimesh_nodes": 2,
+     "nodes": 452,
+     "objects": 7539,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 31
+     },
+     "resources": 852,
+     "shadow_lights": 0,
+     "skeletons": 7,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 40,
+     "video_mem_mib": 0.0,
+     "village_people": 7,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d2_shown": 1,
+      "d3_shown": 5
+     },
+     "visible_mesh_instances": 135
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 271.6,
+    "mode": "attributed",
+    "msaa_3d": 0,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.148,
+      "script": "res://scripts/city_support_district.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 7.0,
+      "ms_per_frame": 0.6605,
+      "script": "res://scripts/visuals/village_person.gd"
+     }
+    ],
+    "quality": "low",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "district",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 4.721,
+      "mean": 1.1023,
+      "p50": 1.072,
+      "p95": 1.519,
+      "p99": 2.288
+     },
+     "navigation_ms": {
+      "max": 0.025,
+      "mean": 0.0059,
+      "p50": 0.003,
+      "p95": 0.025,
+      "p99": 0.025
+     },
+     "nodes": {
+      "max": 452.0,
+      "mean": 452.0,
+      "p50": 452.0,
+      "p95": 452.0,
+      "p99": 452.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 1.871,
+      "mean": 0.7565,
+      "p50": 0.585,
+      "p95": 1.871,
+      "p99": 1.871
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 253.505,
+      "mean": 220.2063,
+      "p50": 253.505,
+      "p95": 253.505,
+      "p99": 253.505
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "district/balanced": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 7,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 0,
+     "lights": 1,
+     "memory_static_mib": 298.63,
+     "mesh_instances": 136,
+     "microbench": {},
+     "multimesh_instances": 77,
+     "multimesh_nodes": 2,
+     "nodes": 455,
+     "objects": 7561,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 31
+     },
+     "resources": 851,
+     "shadow_lights": 1,
+     "skeletons": 7,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 40,
+     "video_mem_mib": 0.0,
+     "village_people": 7,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d2_shown": 4,
+      "d3_shown": 2
+     },
+     "visible_mesh_instances": 135
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 249.4,
+    "mode": "natural",
+    "msaa_3d": 1,
+    "quality": "balanced",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "district",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 4.011,
+      "mean": 1.3098,
+      "p50": 1.309,
+      "p95": 1.656,
+      "p99": 3.099
+     },
+     "navigation_ms": {
+      "max": 0.025,
+      "mean": 0.0167,
+      "p50": 0.025,
+      "p95": 0.025,
+      "p99": 0.025
+     },
+     "nodes": {
+      "max": 455.0,
+      "mean": 455.0,
+      "p50": 455.0,
+      "p95": 455.0,
+      "p99": 455.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 2.517,
+      "mean": 1.815,
+      "p50": 2.517,
+      "p95": 2.517,
+      "p99": 2.517
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 223.935,
+      "mean": 144.622,
+      "p50": 223.935,
+      "p95": 223.935,
+      "p99": 223.935
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     1.2107,
+     1.3098,
+     1.4145
+    ],
+    "repeat_frame_p95_ms": [
+     1.614,
+     1.656,
+     1.655
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 7,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 0,
+     "lights": 1,
+     "memory_static_mib": 298.64,
+     "mesh_instances": 136,
+     "microbench": {},
+     "multimesh_instances": 77,
+     "multimesh_nodes": 2,
+     "nodes": 455,
+     "objects": 7561,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 31
+     },
+     "resources": 851,
+     "shadow_lights": 1,
+     "skeletons": 7,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 40,
+     "video_mem_mib": 0.0,
+     "village_people": 7,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d2_shown": 4,
+      "d3_shown": 2
+     },
+     "visible_mesh_instances": 135
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 314.5,
+    "mode": "attributed",
+    "msaa_3d": 1,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1392,
+      "script": "res://scripts/city_support_district.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 7.0,
+      "ms_per_frame": 0.9087,
+      "script": "res://scripts/visuals/village_person.gd"
+     }
+    ],
+    "quality": "balanced",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "district",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 5.059,
+      "mean": 1.3062,
+      "p50": 1.307,
+      "p95": 1.747,
+      "p99": 2.033
+     },
+     "navigation_ms": {
+      "max": 0.004,
+      "mean": 0.004,
+      "p50": 0.004,
+      "p95": 0.004,
+      "p99": 0.004
+     },
+     "nodes": {
+      "max": 455.0,
+      "mean": 455.0,
+      "p50": 455.0,
+      "p95": 455.0,
+      "p99": 455.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 0.846,
+      "mean": 0.846,
+      "p50": 0.846,
+      "p95": 0.846,
+      "p99": 0.846
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 286.52,
+      "mean": 286.52,
+      "p50": 286.52,
+      "p95": 286.52,
+      "p99": 286.52
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "district/high": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 7,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 0,
+     "lights": 1,
+     "memory_static_mib": 313.92,
+     "mesh_instances": 136,
+     "microbench": {},
+     "multimesh_instances": 77,
+     "multimesh_nodes": 2,
+     "nodes": 455,
+     "objects": 7742,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 31
+     },
+     "resources": 973,
+     "shadow_lights": 1,
+     "skeletons": 7,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 40,
+     "video_mem_mib": 0.0,
+     "village_people": 7,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d1_shown": 1,
+      "d2_shown": 5
+     },
+     "visible_mesh_instances": 135
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 322.7,
+    "mode": "natural",
+    "msaa_3d": 2,
+    "quality": "high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "district",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 3.642,
+      "mean": 1.1886,
+      "p50": 1.129,
+      "p95": 1.6,
+      "p99": 1.856
+     },
+     "navigation_ms": {
+      "max": 0.004,
+      "mean": 0.004,
+      "p50": 0.004,
+      "p95": 0.004,
+      "p99": 0.004
+     },
+     "nodes": {
+      "max": 455.0,
+      "mean": 455.0,
+      "p50": 455.0,
+      "p95": 455.0,
+      "p99": 455.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 0.806,
+      "mean": 0.806,
+      "p50": 0.806,
+      "p95": 0.806,
+      "p99": 0.806
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 296.964,
+      "mean": 296.964,
+      "p50": 296.964,
+      "p95": 296.964,
+      "p99": 296.964
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     1.158,
+     1.1886,
+     1.2258
+    ],
+    "repeat_frame_p95_ms": [
+     1.551,
+     1.6,
+     1.699
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 7,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 0,
+     "lights": 1,
+     "memory_static_mib": 313.92,
+     "mesh_instances": 136,
+     "microbench": {},
+     "multimesh_instances": 77,
+     "multimesh_nodes": 2,
+     "nodes": 455,
+     "objects": 7742,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 31
+     },
+     "resources": 973,
+     "shadow_lights": 1,
+     "skeletons": 7,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 40,
+     "video_mem_mib": 0.0,
+     "village_people": 7,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d1_shown": 1,
+      "d2_shown": 5
+     },
+     "visible_mesh_instances": 135
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 353.1,
+    "mode": "attributed",
+    "msaa_3d": 2,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.1334,
+      "script": "res://scripts/city_support_district.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 7.0,
+      "ms_per_frame": 0.8296,
+      "script": "res://scripts/visuals/village_person.gd"
+     }
+    ],
+    "quality": "high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "district",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 3.847,
+      "mean": 1.2265,
+      "p50": 1.142,
+      "p95": 1.683,
+      "p99": 2.122
+     },
+     "navigation_ms": {
+      "max": 0.004,
+      "mean": 0.0036,
+      "p50": 0.004,
+      "p95": 0.004,
+      "p99": 0.004
+     },
+     "nodes": {
+      "max": 455.0,
+      "mean": 455.0,
+      "p50": 455.0,
+      "p95": 455.0,
+      "p99": 455.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 0.985,
+      "mean": 0.9062,
+      "p50": 0.985,
+      "p95": 0.985,
+      "p99": 0.985
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 322.01,
+      "mean": 252.3609,
+      "p50": 322.01,
+      "p95": 322.01,
+      "p99": 322.01
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "district/very_high": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 7,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 0,
+     "lights": 1,
+     "memory_static_mib": 315.49,
+     "mesh_instances": 136,
+     "microbench": {},
+     "multimesh_instances": 77,
+     "multimesh_nodes": 2,
+     "nodes": 455,
+     "objects": 7755,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 31
+     },
+     "resources": 973,
+     "shadow_lights": 1,
+     "skeletons": 7,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 40,
+     "video_mem_mib": 0.0,
+     "village_people": 7,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d1_shown": 2,
+      "d2_shown": 4
+     },
+     "visible_mesh_instances": 135
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 285.4,
+    "mode": "natural",
+    "msaa_3d": 2,
+    "quality": "very_high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "district",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 7.623,
+      "mean": 1.2868,
+      "p50": 1.145,
+      "p95": 1.795,
+      "p99": 3.424
+     },
+     "navigation_ms": {
+      "max": 0.004,
+      "mean": 0.0035,
+      "p50": 0.004,
+      "p95": 0.004,
+      "p99": 0.004
+     },
+     "nodes": {
+      "max": 455.0,
+      "mean": 455.0,
+      "p50": 455.0,
+      "p95": 455.0,
+      "p99": 455.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 4.717,
+      "mean": 2.6137,
+      "p50": 4.717,
+      "p95": 4.717,
+      "p99": 4.717
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 265.545,
+      "mean": 139.0274,
+      "p50": 265.545,
+      "p95": 265.545,
+      "p99": 265.545
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     1.1484,
+     1.2868,
+     1.3554
+    ],
+    "repeat_frame_p95_ms": [
+     1.606,
+     1.795,
+     1.72
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 7,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 0,
+     "lights": 1,
+     "memory_static_mib": 315.49,
+     "mesh_instances": 136,
+     "microbench": {},
+     "multimesh_instances": 77,
+     "multimesh_nodes": 2,
+     "nodes": 455,
+     "objects": 7755,
+     "physics_bodies": {
+      "CharacterBody3D": 1,
+      "StaticBody3D": 31
+     },
+     "resources": 973,
+     "shadow_lights": 1,
+     "skeletons": 7,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 40,
+     "video_mem_mib": 0.0,
+     "village_people": 7,
+     "village_people_by_detail": {
+      "d0_shown": 1,
+      "d1_shown": 2,
+      "d2_shown": 4
+     },
+     "visible_mesh_instances": 135
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 344.1,
+    "mode": "attributed",
+    "msaa_3d": 2,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.141,
+      "script": "res://scripts/city_support_district.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 7.0,
+      "ms_per_frame": 0.8648,
+      "script": "res://scripts/visuals/village_person.gd"
+     }
+    ],
+    "quality": "very_high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "district",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 3.307,
+      "mean": 1.2778,
+      "p50": 1.191,
+      "p95": 1.823,
+      "p99": 2.53
+     },
+     "navigation_ms": {
+      "max": 0.004,
+      "mean": 0.0034,
+      "p50": 0.003,
+      "p95": 0.004,
+      "p99": 0.004
+     },
+     "nodes": {
+      "max": 455.0,
+      "mean": 455.0,
+      "p50": 455.0,
+      "p95": 455.0,
+      "p99": 455.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "physics_ms": {
+      "max": 1.231,
+      "mean": 0.6365,
+      "p50": 0.203,
+      "p95": 1.231,
+      "p99": 1.231
+     },
+     "physics_pairs": {
+      "max": 1.0,
+      "mean": 1.0,
+      "p50": 1.0,
+      "p95": 1.0,
+      "p99": 1.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 311.351,
+      "mean": 165.5711,
+      "p50": 59.282,
+      "p95": 311.351,
+      "p99": 311.351
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "valley/low": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 54,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 528,
+     "lights": 2,
+     "memory_static_mib": 299.81,
+     "mesh_instances": 1339,
+     "microbench": {},
+     "multimesh_instances": 1988,
+     "multimesh_nodes": 329,
+     "nodes": 3254,
+     "objects": 8028,
+     "physics_bodies": {
+      "CharacterBody3D": 28,
+      "StaticBody3D": 385
+     },
+     "resources": 993,
+     "shadow_lights": 0,
+     "skeletons": 54,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 268,
+     "video_mem_mib": 0.0,
+     "village_people": 29,
+     "village_people_by_detail": {
+      "d0_hidden": 1,
+      "d1_hidden": 1,
+      "d2_hidden": 5,
+      "d3_hidden": 22
+     },
+     "visible_mesh_instances": 343
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 243.1,
+    "mode": "natural",
+    "msaa_3d": 0,
+    "quality": "low",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "valley",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 4.384,
+      "mean": 0.652,
+      "p50": 0.479,
+      "p95": 2.663,
+      "p99": 2.989
+     },
+     "navigation_ms": {
+      "max": 0.016,
+      "mean": 0.0031,
+      "p50": 0.002,
+      "p95": 0.016,
+      "p99": 0.016
+     },
+     "nodes": {
+      "max": 3254.0,
+      "mean": 3236.1717,
+      "p50": 3235.0,
+      "p95": 3254.0,
+      "p99": 3254.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_ms": {
+      "max": 0.605,
+      "mean": 0.5865,
+      "p50": 0.605,
+      "p95": 0.605,
+      "p99": 0.605
+     },
+     "physics_pairs": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 240.543,
+      "mean": 21.9538,
+      "p50": 2.946,
+      "p95": 240.543,
+      "p99": 240.543
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     0.5411,
+     0.652,
+     0.6917
+    ],
+    "repeat_frame_p95_ms": [
+     2.431,
+     2.663,
+     2.717
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 54,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 528,
+     "lights": 2,
+     "memory_static_mib": 299.82,
+     "mesh_instances": 1339,
+     "microbench": {},
+     "multimesh_instances": 1988,
+     "multimesh_nodes": 329,
+     "nodes": 3254,
+     "objects": 8028,
+     "physics_bodies": {
+      "CharacterBody3D": 28,
+      "StaticBody3D": 385
+     },
+     "resources": 993,
+     "shadow_lights": 0,
+     "skeletons": 54,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 268,
+     "video_mem_mib": 0.0,
+     "village_people": 29,
+     "village_people_by_detail": {
+      "d0_hidden": 1,
+      "d1_hidden": 1,
+      "d2_hidden": 5,
+      "d3_hidden": 22
+     },
+     "visible_mesh_instances": 343
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 304.2,
+    "mode": "attributed",
+    "msaa_3d": 0,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0015,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.5133,
+      "script": "res://scripts/tactics/valley_scene.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0068,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0015,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "quality": "low",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "valley",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 4.058,
+      "mean": 0.8203,
+      "p50": 0.61,
+      "p95": 2.744,
+      "p99": 3.065
+     },
+     "navigation_ms": {
+      "max": 0.003,
+      "mean": 0.003,
+      "p50": 0.003,
+      "p95": 0.003,
+      "p99": 0.003
+     },
+     "nodes": {
+      "max": 3254.0,
+      "mean": 3236.1717,
+      "p50": 3235.0,
+      "p95": 3254.0,
+      "p99": 3254.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_ms": {
+      "max": 0.538,
+      "mean": 0.2788,
+      "p50": 0.23,
+      "p95": 0.538,
+      "p99": 0.538
+     },
+     "physics_pairs": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 299.135,
+      "mean": 252.3798,
+      "p50": 299.135,
+      "p95": 299.135,
+      "p99": 299.135
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "valley/balanced": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 71,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 528,
+     "lights": 2,
+     "memory_static_mib": 301.55,
+     "mesh_instances": 1560,
+     "microbench": {},
+     "multimesh_instances": 3001,
+     "multimesh_nodes": 329,
+     "nodes": 3580,
+     "objects": 8386,
+     "physics_bodies": {
+      "CharacterBody3D": 28,
+      "StaticBody3D": 385
+     },
+     "resources": 953,
+     "shadow_lights": 1,
+     "skeletons": 71,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 269,
+     "video_mem_mib": 0.0,
+     "village_people": 29,
+     "village_people_by_detail": {
+      "d0_hidden": 2,
+      "d1_hidden": 2,
+      "d2_hidden": 7,
+      "d3_hidden": 18
+     },
+     "visible_mesh_instances": 564
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 220.0,
+    "mode": "natural",
+    "msaa_3d": 1,
+    "quality": "balanced",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "valley",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 4.734,
+      "mean": 0.779,
+      "p50": 0.584,
+      "p95": 2.205,
+      "p99": 3.342
+     },
+     "navigation_ms": {
+      "max": 0.03,
+      "mean": 0.0054,
+      "p50": 0.003,
+      "p95": 0.03,
+      "p99": 0.03
+     },
+     "nodes": {
+      "max": 3580.0,
+      "mean": 3525.6283,
+      "p50": 3542.0,
+      "p95": 3561.0,
+      "p99": 3580.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_ms": {
+      "max": 0.63,
+      "mean": 0.5943,
+      "p50": 0.63,
+      "p95": 0.63,
+      "p99": 0.63
+     },
+     "physics_pairs": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 214.286,
+      "mean": 22.6509,
+      "p50": 3.698,
+      "p95": 214.286,
+      "p99": 214.286
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     0.7283,
+     0.779,
+     0.8644
+    ],
+    "repeat_frame_p95_ms": [
+     2.172,
+     2.205,
+     2.683
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 71,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 528,
+     "lights": 2,
+     "memory_static_mib": 301.56,
+     "mesh_instances": 1560,
+     "microbench": {},
+     "multimesh_instances": 3001,
+     "multimesh_nodes": 329,
+     "nodes": 3580,
+     "objects": 8386,
+     "physics_bodies": {
+      "CharacterBody3D": 28,
+      "StaticBody3D": 385
+     },
+     "resources": 953,
+     "shadow_lights": 1,
+     "skeletons": 71,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 269,
+     "video_mem_mib": 0.0,
+     "village_people": 29,
+     "village_people_by_detail": {
+      "d0_hidden": 2,
+      "d1_hidden": 2,
+      "d2_hidden": 7,
+      "d3_hidden": 18
+     },
+     "visible_mesh_instances": 564
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 186.8,
+    "mode": "attributed",
+    "msaa_3d": 1,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0013,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.5319,
+      "script": "res://scripts/tactics/valley_scene.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0055,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0012,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "quality": "balanced",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "valley",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 3.857,
+      "mean": 0.8291,
+      "p50": 0.657,
+      "p95": 2.119,
+      "p99": 3.146
+     },
+     "navigation_ms": {
+      "max": 0.003,
+      "mean": 0.003,
+      "p50": 0.003,
+      "p95": 0.003,
+      "p99": 0.003
+     },
+     "nodes": {
+      "max": 3580.0,
+      "mean": 3525.6283,
+      "p50": 3542.0,
+      "p95": 3561.0,
+      "p99": 3580.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_ms": {
+      "max": 0.476,
+      "mean": 0.476,
+      "p50": 0.476,
+      "p95": 0.476,
+      "p99": 0.476
+     },
+     "physics_pairs": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 3.587,
+      "mean": 3.587,
+      "p50": 3.587,
+      "p95": 3.587,
+      "p99": 3.587
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "valley/high": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 88,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 528,
+     "lights": 2,
+     "memory_static_mib": 315.36,
+     "mesh_instances": 1781,
+     "microbench": {},
+     "multimesh_instances": 4034,
+     "multimesh_nodes": 326,
+     "nodes": 3900,
+     "objects": 8875,
+     "physics_bodies": {
+      "CharacterBody3D": 28,
+      "StaticBody3D": 385
+     },
+     "resources": 1017,
+     "shadow_lights": 1,
+     "skeletons": 88,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 271,
+     "video_mem_mib": 0.0,
+     "village_people": 29,
+     "village_people_by_detail": {
+      "d0_hidden": 2,
+      "d1_hidden": 5,
+      "d2_hidden": 12,
+      "d3_hidden": 10
+     },
+     "visible_mesh_instances": 785
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 202.2,
+    "mode": "natural",
+    "msaa_3d": 2,
+    "quality": "high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "valley",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 3.618,
+      "mean": 1.083,
+      "p50": 0.899,
+      "p95": 2.692,
+      "p99": 3.004
+     },
+     "navigation_ms": {
+      "max": 0.048,
+      "mean": 0.0313,
+      "p50": 0.048,
+      "p95": 0.048,
+      "p99": 0.048
+     },
+     "nodes": {
+      "max": 3919.0,
+      "mean": 3917.8917,
+      "p50": 3919.0,
+      "p95": 3919.0,
+      "p99": 3919.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_ms": {
+      "max": 0.329,
+      "mean": 0.238,
+      "p50": 0.186,
+      "p95": 0.329,
+      "p99": 0.329
+     },
+     "physics_pairs": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 194.722,
+      "mean": 125.2687,
+      "p50": 194.722,
+      "p95": 194.722,
+      "p99": 194.722
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     1.0651,
+     1.083,
+     1.4488
+    ],
+    "repeat_frame_p95_ms": [
+     2.652,
+     2.692,
+     3.359
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 88,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 528,
+     "lights": 2,
+     "memory_static_mib": 315.37,
+     "mesh_instances": 1781,
+     "microbench": {},
+     "multimesh_instances": 4034,
+     "multimesh_nodes": 326,
+     "nodes": 3900,
+     "objects": 8875,
+     "physics_bodies": {
+      "CharacterBody3D": 28,
+      "StaticBody3D": 385
+     },
+     "resources": 1017,
+     "shadow_lights": 1,
+     "skeletons": 88,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 271,
+     "video_mem_mib": 0.0,
+     "village_people": 29,
+     "village_people_by_detail": {
+      "d0_hidden": 2,
+      "d1_hidden": 5,
+      "d2_hidden": 12,
+      "d3_hidden": 10
+     },
+     "visible_mesh_instances": 785
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 223.6,
+    "mode": "attributed",
+    "msaa_3d": 2,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0018,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.8958,
+      "script": "res://scripts/tactics/valley_scene.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.007,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0016,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "quality": "high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "valley",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 6.417,
+      "mean": 1.4128,
+      "p50": 1.166,
+      "p95": 3.142,
+      "p99": 4.362
+     },
+     "navigation_ms": {
+      "max": 0.003,
+      "mean": 0.0028,
+      "p50": 0.003,
+      "p95": 0.003,
+      "p99": 0.003
+     },
+     "nodes": {
+      "max": 3919.0,
+      "mean": 3917.9233,
+      "p50": 3919.0,
+      "p95": 3919.0,
+      "p99": 3919.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_ms": {
+      "max": 0.381,
+      "mean": 0.2972,
+      "p50": 0.281,
+      "p95": 0.381,
+      "p99": 0.381
+     },
+     "physics_pairs": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 214.722,
+      "mean": 180.8564,
+      "p50": 214.722,
+      "p95": 214.722,
+      "p99": 214.722
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  },
+  "valley/very_high": {
+   "cpu": {
+    "adapter": "",
+    "census": {
+     "animation_players": 88,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 528,
+     "lights": 2,
+     "memory_static_mib": 334.88,
+     "mesh_instances": 1781,
+     "microbench": {},
+     "multimesh_instances": 4034,
+     "multimesh_nodes": 327,
+     "nodes": 3901,
+     "objects": 9012,
+     "physics_bodies": {
+      "CharacterBody3D": 28,
+      "StaticBody3D": 385
+     },
+     "resources": 1107,
+     "shadow_lights": 1,
+     "skeletons": 88,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 285,
+     "video_mem_mib": 0.0,
+     "village_people": 29,
+     "village_people_by_detail": {
+      "d0_hidden": 2,
+      "d1_hidden": 7,
+      "d2_hidden": 13,
+      "d3_hidden": 7
+     },
+     "visible_mesh_instances": 785
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 352.8,
+    "mode": "natural",
+    "msaa_3d": 2,
+    "quality": "very_high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "valley",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 5.833,
+      "mean": 1.162,
+      "p50": 0.928,
+      "p95": 2.63,
+      "p99": 3.763
+     },
+     "navigation_ms": {
+      "max": 0.003,
+      "mean": 0.0027,
+      "p50": 0.003,
+      "p95": 0.003,
+      "p99": 0.003
+     },
+     "nodes": {
+      "max": 3920.0,
+      "mean": 3918.8917,
+      "p50": 3920.0,
+      "p95": 3920.0,
+      "p99": 3920.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_ms": {
+      "max": 0.452,
+      "mean": 0.2671,
+      "p50": 0.201,
+      "p95": 0.452,
+      "p99": 0.452
+     },
+     "physics_pairs": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 341.363,
+      "mean": 252.6502,
+      "p50": 341.363,
+      "p95": 341.363,
+      "p99": 341.363
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": [],
+    "repeat_frame_mean_ms": [
+     1.1376,
+     1.162,
+     1.5629
+    ],
+    "repeat_frame_p95_ms": [
+     2.688,
+     2.63,
+     4.102
+    ]
+   },
+   "attributed": {
+    "adapter": "",
+    "census": {
+     "animation_players": 88,
+     "buffer_mem_mib": 0.0,
+     "geometry_with_visibility_range": 528,
+     "lights": 2,
+     "memory_static_mib": 334.89,
+     "mesh_instances": 1781,
+     "microbench": {},
+     "multimesh_instances": 4034,
+     "multimesh_nodes": 327,
+     "nodes": 3901,
+     "objects": 9012,
+     "physics_bodies": {
+      "CharacterBody3D": 28,
+      "StaticBody3D": 385
+     },
+     "resources": 1107,
+     "shadow_lights": 1,
+     "skeletons": 88,
+     "sleeping_rigid_bodies": 0,
+     "texture_mem_mib": 0.0,
+     "unique_materials": 285,
+     "video_mem_mib": 0.0,
+     "village_people": 29,
+     "village_people_by_detail": {
+      "d0_hidden": 2,
+      "d1_hidden": 7,
+      "d2_hidden": 13,
+      "d3_hidden": 7
+     },
+     "visible_mesh_instances": 785
+    },
+    "display": "headless",
+    "evidence_class": "desktop software renderer, relative only; not an Android device measurement",
+    "failures": [],
+    "frames": 600,
+    "harness": "runtime_profile_harness.gd",
+    "load_ms": 348.9,
+    "mode": "attributed",
+    "msaa_3d": 2,
+    "physics_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0017,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "physics_frames": 600,
+    "process_attribution": [
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 1.0034,
+      "script": "res://scripts/tactics/valley_scene.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0077,
+      "script": "res://scripts/visuals/grove.gd"
+     },
+     {
+      "calls_per_frame": 1.0,
+      "ms_per_frame": 0.0019,
+      "script": "res://scripts/main.gd"
+     }
+    ],
+    "quality": "very_high",
+    "renderer": "gl_compatibility",
+    "scale_3d": 1.0,
+    "scene": "valley",
+    "schema": 1,
+    "seed": 20261126,
+    "summary": {
+     "draw_calls": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "frame_ms": {
+      "max": 6.047,
+      "mean": 1.5657,
+      "p50": 1.366,
+      "p95": 3.45,
+      "p99": 4.106
+     },
+     "navigation_ms": {
+      "max": 0.048,
+      "mean": 0.0307,
+      "p50": 0.048,
+      "p95": 0.048,
+      "p99": 0.048
+     },
+     "nodes": {
+      "max": 3920.0,
+      "mean": 3918.9233,
+      "p50": 3920.0,
+      "p95": 3920.0,
+      "p99": 3920.0
+     },
+     "objects": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_active": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "physics_ms": {
+      "max": 0.208,
+      "mean": 0.1908,
+      "p50": 0.18,
+      "p95": 0.208,
+      "p99": 0.208
+     },
+     "physics_pairs": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "primitives": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "process_ms": {
+      "max": 338.632,
+      "mean": 230.8062,
+      "p50": 338.632,
+      "p95": 338.632,
+      "p99": 338.632
+     },
+     "render_cpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     },
+     "render_gpu_ms": {
+      "max": 0.0,
+      "mean": 0.0,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0
+     }
+    },
+    "viewport": [
+     1280,
+     720
+    ],
+    "walk": true,
+    "warmup_frames": 180,
+    "script_errors": []
+   }
+  }
+ }
+}
