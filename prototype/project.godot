@@ -4,6 +4,8 @@ config_version=5
 [application]
 config/name="IMPERATHEN — Grenzdorf"
 config/icon="res://assets/icon.svg"
+; Renderer chosen by the graphics profile, applied at the next start (scripts/rendering/render_profile.gd).
+config/project_settings_override="user://render_override.cfg"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.0", "GL Compatibility")
 

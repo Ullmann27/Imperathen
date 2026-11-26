@@ -96,7 +96,7 @@ func _ui() -> void:
 	row.position=Vector2(16,16)
 	row.add_theme_constant_override("separation",8)
 	root_control.add_child(row)
-	for config: Array in [["Licht",["morning","noon","afternoon"],["Morgen","Mittag","Nachmittag"],2],["Grafik",["low","balanced","high","very_high"],["Leicht","Ausgewogen","Hoch","Sehr hoch"],2]]:
+	for config: Array in [["Licht",["morning","noon","afternoon"],["Morgen","Mittag","Nachmittag"],2],["Grafik",["low","balanced","high","very_high"],["Leicht","Ausgewogen","Hoch","Ultra"],2]]:
 		var picker:=OptionButton.new()
 		picker.custom_minimum_size=Vector2(148,48)
 		picker.focus_mode=Control.FOCUS_NONE

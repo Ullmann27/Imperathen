@@ -12,37 +12,254 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_man_0.glb",
           "triangles": 19719,
-          "bytes": 5003724,
-          "sha256": "477001694752dd67f6802da6c30cf246df0a97240914fc75e79315ebfe443622",
+          "bytes": 5050156,
+          "sha256": "0a6fc92ebf07e410c3fcd0de0f9ef3f2a1224ae7ca500d24330560425002d328",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.18505268172065345,
+              "max_sole_slip_m": 0.817939655794347,
+              "max_hull_penetration_m": 0.18505268172065345,
+              "max_contact_slip_m": 0.817939655794347
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.01113059549848254,
+              "max_hull_penetration_m": 4.9873299934333204e-18,
+              "max_contact_slip_m": 0.01113059549848254
+            },
+            "maximum_floor_correction_m": 0.18807107230928316
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 93,
+              "body_through_skirt_m": 0.08227024244351026
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0822702424435103
+            }
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378706938368338,
+              "max_sole_slip_m": 0.00969328950254483,
+              "max_hull_penetration_m": 0.006378706938368338,
+              "max_contact_slip_m": 0.00969328950254483
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0005302357286903957,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0005302357286903957
+            }
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1536,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1593,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 32,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0394,
+            "body_through_tunic_m": 0.039,
+            "smoothed_welded_vertices": 22,
+            "rings": 1,
+            "passes": 1
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_civilian_man_1.glb",
           "triangles": 7628,
-          "bytes": 2544848,
-          "sha256": "30aabba76fa5db4b2fa8b879905611d340998d6294f3e8a1a6636de55de1ecef",
+          "bytes": 2567324,
+          "sha256": "8099a2dcfb2b2d83133c3211b71d0eacf420240998f42dc0fbebd0e14127dd9b",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17789526899019986,
+              "max_sole_slip_m": 0.806782418031492,
+              "max_hull_penetration_m": 0.17789526899019986,
+              "max_contact_slip_m": 0.806782418031492
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008947885375770749,
+              "max_hull_penetration_m": 4.336808689942018e-19,
+              "max_contact_slip_m": 0.008947885375770749
+            },
+            "maximum_floor_correction_m": 0.180895251835488
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.07850376270136564
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006385000691636493,
+              "max_sole_slip_m": 0.009693287624099878,
+              "max_hull_penetration_m": 0.006385000691636493,
+              "max_contact_slip_m": 0.009693287624099878
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.00037978332168634094,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.00037978332168634094
+            }
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1536,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1592,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 25,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0499,
+            "body_through_tunic_m": 0.0499,
+            "smoothed_welded_vertices": 30
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_civilian_man_2.glb",
           "triangles": 2406,
-          "bytes": 763304,
-          "sha256": "fcae8394615557c9b4eee7f64ac683be88344295e2b8a7f07a4a536de92c0ec9",
+          "bytes": 774268,
+          "sha256": "4a5ba3c4767c0b1978d429ea12eeac320b635910b8f465cb00078380f2f3262a",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17566236405554322,
+              "max_sole_slip_m": 0.8068358471996434,
+              "max_hull_penetration_m": 0.17566236405554322,
+              "max_contact_slip_m": 0.8068358471996434
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008265426576280299,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008265426576280299
+            },
+            "maximum_floor_correction_m": 0.17871928189400332
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.08449843766181969
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378971802102338,
+              "max_sole_slip_m": 0.00969329143040031,
+              "max_hull_penetration_m": 0.006378971802102338,
+              "max_contact_slip_m": 0.00969329143040031
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0001758551946953379,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0001758551946953379
+            }
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1534,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1589,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_civilian_man_3.glb",
           "triangles": 846,
-          "bytes": 334192,
-          "sha256": "69a97af3b49b3c8d4b996758470b83cc818b690a3833affc4913a1d25040075a",
+          "bytes": 345156,
+          "sha256": "7a20a9a10e95400399ceeb653b72ae7c709359cc4d19784863f5c4892609ad69",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17681173573037648,
+              "max_sole_slip_m": 0.8104862832497677,
+              "max_hull_penetration_m": 0.17681173573037648,
+              "max_contact_slip_m": 0.8104862832497677
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008258026494470525,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008258026494470525
+            },
+            "maximum_floor_correction_m": 0.17983381990866765
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0933410291845978
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006416374334533781,
+              "max_sole_slip_m": 0.009675435030420763,
+              "max_hull_penetration_m": 0.006416374334533781,
+              "max_contact_slip_m": 0.009675435030420763
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 9.771759047675533e-05,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 9.771759047675533e-05
+            }
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1539,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1595,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
+          }
         }
       ]
     },
@@ -53,37 +270,251 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_civilian_woman_0.glb",
           "triangles": 20395,
-          "bytes": 5308548,
-          "sha256": "3f445fed8e5564b5b5a8338564e343d8ec9f5e92c4117eff1c2b86acd0b54ca2",
+          "bytes": 5342164,
+          "sha256": "e682c57438d68580a05027ca8b05e10adf9910fd5a8fa2fc5aea250fdce55ac7",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.185057433003374,
+              "max_sole_slip_m": 0.8179462425573103,
+              "max_hull_penetration_m": 0.185057433003374,
+              "max_contact_slip_m": 0.8179462425573103
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.012227127371222026,
+              "max_hull_penetration_m": 2.927345865710862e-18,
+              "max_contact_slip_m": 0.012227127371222026
+            },
+            "maximum_floor_correction_m": 0.188075866225061
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.2333323255469783
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006383719065319269,
+              "max_sole_slip_m": 0.009696406632573784,
+              "max_hull_penetration_m": 0.006383719065319269,
+              "max_contact_slip_m": 0.009696406632573784
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.019686661464057963,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.019686661464057963
+            },
+            "unchanged": "grounding would not improve this clip"
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1536,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1593,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 33,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0337,
+            "body_through_tunic_m": 0.0335,
+            "smoothed_welded_vertices": 23,
+            "rings": 1,
+            "passes": 1
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_civilian_woman_1.glb",
           "triangles": 7889,
-          "bytes": 2637320,
-          "sha256": "0060242580c098f5d94ce144cdf320a4f47b26d84026042ab136c583c81acca1",
+          "bytes": 2643112,
+          "sha256": "fd419a3468dfaeeb02f16017d19803a3e3d4224eb42d53930954361deffd3f12",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17789997177869163,
+              "max_sole_slip_m": 0.8067890762569824,
+              "max_hull_penetration_m": 0.17789997177869163,
+              "max_contact_slip_m": 0.8067890762569824
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011701362254272549,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.011701362254272549
+            },
+            "maximum_floor_correction_m": 0.18089999676194668
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.23154538062506233
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006390046856647853,
+              "max_sole_slip_m": 0.009696413060750968,
+              "max_hull_penetration_m": 0.006390046856647853,
+              "max_contact_slip_m": 0.009696413060750968
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.019595637167324795,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.019595637167324795
+            },
+            "unchanged": "grounding would not improve this clip"
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1536,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1592,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_civilian_woman_2.glb",
           "triangles": 2491,
-          "bytes": 793672,
-          "sha256": "c7d02261332c880df124ca75f437f5352ae9143777c61804745120706160c594",
+          "bytes": 799460,
+          "sha256": "931f8770ff4cb6b193c188b3c88367a23eda6ca3172ca3bb0c71b9a51f1d035c",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17566713609040613,
+              "max_sole_slip_m": 0.8068424593330924,
+              "max_hull_penetration_m": 0.17566713609040613,
+              "max_contact_slip_m": 0.8068424593330924
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011308724187122442,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.011311702397735551
+            },
+            "maximum_floor_correction_m": 0.17872396403652868
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.19100078067425957
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006383983209280833,
+              "max_sole_slip_m": 0.009696468229032685,
+              "max_hull_penetration_m": 0.006383983209280833,
+              "max_contact_slip_m": 0.009696468229032685
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.019760174253499012,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.019760174253499012
+            },
+            "unchanged": "grounding would not improve this clip"
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1534,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1589,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_civilian_woman_3.glb",
           "triangles": 877,
-          "bytes": 344532,
-          "sha256": "c191923876021d4fec0e4fe7e343a101ac69925dc36ebe2b2f8de4ed626f3dc0",
+          "bytes": 350320,
+          "sha256": "98f372334e47746355b994a84f6b2aad176ad08b64fcf5938e22632a49de4b32",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17681639800938875,
+              "max_sole_slip_m": 0.8104929328276869,
+              "max_hull_penetration_m": 0.17681639800938875,
+              "max_contact_slip_m": 0.8104929328276869
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008258072577487483,
+              "max_hull_penetration_m": 8.239936510889834e-18,
+              "max_contact_slip_m": 0.008258072577487483
+            },
+            "maximum_floor_correction_m": 0.179838568472665
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.08997666187457762
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.0064214346272957815,
+              "max_sole_slip_m": 0.009678656016884016,
+              "max_hull_penetration_m": 0.0064214346272957815,
+              "max_contact_slip_m": 0.009678656016884016
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.01933673945752967,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.01933673945752967
+            },
+            "unchanged": "grounding would not improve this clip"
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1539,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1595,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
+          }
         }
       ]
     },
@@ -94,37 +525,256 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_elder_0.glb",
           "triangles": 19817,
-          "bytes": 4448876,
-          "sha256": "b03051329d7e344fb95bb5a7e6a0eab953163f1549f103f4592ebfc1e3f4fefb",
+          "bytes": 4495308,
+          "sha256": "03659c484a84c70b595e4803b9308b809f8e8f2b0506e93211f8429dca961c3e",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.18505268172065345,
+              "max_sole_slip_m": 0.817939655794347,
+              "max_hull_penetration_m": 0.18505268172065345,
+              "max_contact_slip_m": 0.817939655794347
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.01113059549848254,
+              "max_hull_penetration_m": 4.9873299934333204e-18,
+              "max_contact_slip_m": 0.01113059549848254
+            },
+            "maximum_floor_correction_m": 0.18807107230928316
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 93,
+              "body_through_skirt_m": 0.08227024244351026
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0822702424435103
+            }
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378706938368338,
+              "max_sole_slip_m": 0.00969328950254483,
+              "max_hull_penetration_m": 0.006378706938368338,
+              "max_contact_slip_m": 0.00969328950254483
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0005302357286903957,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0005302357286903957
+            }
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1536,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1593,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 32,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0394,
+            "body_through_tunic_m": 0.039,
+            "smoothed_welded_vertices": 22,
+            "rings": 1,
+            "passes": 1
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_elder_1.glb",
           "triangles": 7666,
-          "bytes": 2395952,
-          "sha256": "5b1b3453f984f3e2c91c5535ecd5fef57f9733e4e41be33dc82111e073f5a12e",
+          "bytes": 2418428,
+          "sha256": "a913ee9fb3dc5d87e6dc514fb1eff9f4fb447fddf2b29d506bf6a27b355730d5",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17789526899019986,
+              "max_sole_slip_m": 0.806782418031492,
+              "max_hull_penetration_m": 0.17789526899019986,
+              "max_contact_slip_m": 0.806782418031492
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008947885375770749,
+              "max_hull_penetration_m": 4.336808689942018e-19,
+              "max_contact_slip_m": 0.008947885375770749
+            },
+            "maximum_floor_correction_m": 0.180895251835488
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.07850376270136564
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006385000691636493,
+              "max_sole_slip_m": 0.009693287624099878,
+              "max_hull_penetration_m": 0.006385000691636493,
+              "max_contact_slip_m": 0.009693287624099878
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.00037978332168634094,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.00037978332168634094
+            }
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1536,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1592,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 25,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0133,
+            "body_through_tunic_m": 0.0133,
+            "smoothed_welded_vertices": 7,
+            "rings": 0,
+            "passes": 1
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_elder_2.glb",
           "triangles": 2417,
-          "bytes": 725508,
-          "sha256": "80435022982a4521a963185efd005d9413746c82c17247f5b1e4071a05f2e146",
+          "bytes": 736476,
+          "sha256": "a7b550137b60ab8744d6d8b9326d8ec066929c228bc067c92ca3199e9889d316",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17566236405554322,
+              "max_sole_slip_m": 0.8068358471996434,
+              "max_hull_penetration_m": 0.17566236405554322,
+              "max_contact_slip_m": 0.8068358471996434
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008265426576280299,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008265426576280299
+            },
+            "maximum_floor_correction_m": 0.17871928189400332
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.08449843766181969
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006378971802102338,
+              "max_sole_slip_m": 0.00969329143040031,
+              "max_hull_penetration_m": 0.006378971802102338,
+              "max_contact_slip_m": 0.00969329143040031
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.0001758551946953379,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.0001758551946953379
+            }
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1534,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1589,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_elder_3.glb",
           "triangles": 850,
-          "bytes": 324288,
-          "sha256": "42f713f0b05aace710e337a468e5ccffb9a32b6238234a93cbec56b334909a3a",
+          "bytes": 335252,
+          "sha256": "92dc75b2411ef749fed0315396f6c2a6389ab0e186600c007f5b9d43a030096b",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17681173573037648,
+              "max_sole_slip_m": 0.8104862832497677,
+              "max_hull_penetration_m": 0.17681173573037648,
+              "max_contact_slip_m": 0.8104862832497677
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008258026494470525,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008258026494470525
+            },
+            "maximum_floor_correction_m": 0.17983381990866765
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0933410291845978
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "gather_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.006416374334533781,
+              "max_sole_slip_m": 0.009675435030420763,
+              "max_hull_penetration_m": 0.006416374334533781,
+              "max_contact_slip_m": 0.009675435030420763
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 9.771759047675533e-05,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 9.771759047675533e-05
+            }
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1539,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "train_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1595,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
+          }
         }
       ]
     },
@@ -135,37 +785,203 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_legionary_0.glb",
           "triangles": 19060,
-          "bytes": 3613592,
-          "sha256": "7937cbb3c3a510609d7a9d62b8adebf9f6a6678d997436faa2cce735146e8bda",
+          "bytes": 3717316,
+          "sha256": "3defd4ea4f3000505c1014ceebb4498acda20e7ebd65189cd1ef42168aba2af5",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17337126688971916,
+              "max_sole_slip_m": 0.8569329318493337,
+              "max_hull_penetration_m": 0.17337126688971916,
+              "max_contact_slip_m": 0.8569329318493337
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.009697254118629841,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.009697254118629841
+            },
+            "maximum_floor_correction_m": 0.1763753302468184
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 637,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 4,
+            "snapped": 12,
+            "max_lift_before_m": 0.0327,
+            "max_gap_before_m": 0.0354
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1348,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 1167,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0306,
+            "body_through_tunic_m": 0.0306,
+            "smoothed_welded_vertices": 51
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_legionary_1.glb",
           "triangles": 7345,
-          "bytes": 2265392,
-          "sha256": "a7b3d582f378c6cd6fadbb2d42a778a5b2b567e7c64312c054d8eae207cd6148",
+          "bytes": 2313176,
+          "sha256": "10be255ac1cff3885e36ebd728235292e38b490f80fd65753be4ec20274e7d4f",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.16474143253695434,
+              "max_sole_slip_m": 0.8497658778040881,
+              "max_hull_penetration_m": 0.16474143253695434,
+              "max_contact_slip_m": 0.8497658778040881
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.012010453208621688,
+              "max_hull_penetration_m": 6.938893903907228e-18,
+              "max_contact_slip_m": 0.012010453208621688
+            },
+            "maximum_floor_correction_m": 0.16774666277503203
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 222,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 13,
+            "max_lift_before_m": 0.0478,
+            "max_gap_before_m": 0.0393
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1347,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 586,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.031,
+            "body_through_tunic_m": 0.031,
+            "smoothed_welded_vertices": 38
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_legionary_2.glb",
           "triangles": 2289,
-          "bytes": 677524,
-          "sha256": "5e929aa27938c60fb94bad246c5ab7b6391110d0a12157df090a8eb6346eab05",
+          "bytes": 698176,
+          "sha256": "ff7279745ab8ba3b04a5b6ac4a29c7cd3cf6f02fa364f193bb66ce553613961e",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.163005870838917,
+              "max_sole_slip_m": 0.8489850724406742,
+              "max_hull_penetration_m": 0.163005870838917,
+              "max_contact_slip_m": 0.8489850724406742
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011677856562015473,
+              "max_hull_penetration_m": 6.938893903907228e-18,
+              "max_contact_slip_m": 0.011677856562015473
+            },
+            "maximum_floor_correction_m": 0.16602647906392376
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 12,
+            "max_lift_before_m": 0.0798,
+            "max_gap_before_m": 0.0399
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1003,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 106,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0119,
+            "body_through_tunic_m": 0.0119,
+            "smoothed_welded_vertices": 8
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_legionary_3.glb",
           "triangles": 807,
-          "bytes": 302912,
-          "sha256": "05cced36031ec8f7627302dbed9235df8404617873d91e0f6ad569c9d65e47e3",
+          "bytes": 310592,
+          "sha256": "0d6f8b2f2436bafb353df1f57ae68c3eb66fd9f41309e55961e3829fcf73108f",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.165957383773048,
+              "max_sole_slip_m": 0.85794907183952,
+              "max_hull_penetration_m": 0.165957383773048,
+              "max_contact_slip_m": 0.85794907183952
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008739019099622611,
+              "max_hull_penetration_m": 3.469446951953614e-18,
+              "max_contact_slip_m": 0.008739019099622611
+            },
+            "maximum_floor_correction_m": 0.16896504659371236
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 5,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0374
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.0621,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
+          }
         }
       ]
     },
@@ -176,37 +992,203 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_officer_0.glb",
           "triangles": 19264,
-          "bytes": 3652028,
-          "sha256": "46152dd3fc4da12bc772ab04084947f40f3c1d391c37435402af2bab4f0f2e86",
+          "bytes": 3765440,
+          "sha256": "071ebcfeaa9d6cbfc118023317e38b96694b744234138298005fad0264c8dea5",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17337126688971916,
+              "max_sole_slip_m": 0.8569329318493337,
+              "max_hull_penetration_m": 0.17732603740686848,
+              "max_contact_slip_m": 0.8569329318493337
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008574962652797525,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008574962652797525
+            },
+            "maximum_floor_correction_m": 0.17732603740686848
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 637,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 5,
+            "snapped": 12,
+            "max_lift_before_m": 0.0316,
+            "max_gap_before_m": 0.0354
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1348,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 1167,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0306,
+            "body_through_tunic_m": 0.0306,
+            "smoothed_welded_vertices": 51
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_officer_1.glb",
           "triangles": 7418,
-          "bytes": 2296496,
-          "sha256": "2d47a6f35dc7ce73ec959384090271c88ff3e0ea0a420197403912a4ed159bfc",
+          "bytes": 2349428,
+          "sha256": "ad5efe328a3b63ad36ef35e74a0eb78bf03994f237cfbe1a5dd9dae1ee611412",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.16474143253695434,
+              "max_sole_slip_m": 0.8497658778040881,
+              "max_hull_penetration_m": 0.16474143253695434,
+              "max_contact_slip_m": 0.8497658778040881
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.010377656372830701,
+              "max_hull_penetration_m": 3.469446951953614e-17,
+              "max_contact_slip_m": 0.010377656372830701
+            },
+            "maximum_floor_correction_m": 0.16774666277503203
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 222,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 14,
+            "max_lift_before_m": 0.0172,
+            "max_gap_before_m": 0.0393
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1347,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 586,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.031,
+            "body_through_tunic_m": 0.031,
+            "smoothed_welded_vertices": 38
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_officer_2.glb",
           "triangles": 2300,
-          "bytes": 683916,
-          "sha256": "3ae746ffe5f0380b7bf38ab8b098b387257c9a74e784f613872cde013f0ef66b",
+          "bytes": 706080,
+          "sha256": "bc6e4e0d969027018f4d4393cf63675b93c49ba1f365bbc59fa4c2b8fe02c955",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.163005870838917,
+              "max_sole_slip_m": 0.8489850724406742,
+              "max_hull_penetration_m": 0.163005870838917,
+              "max_contact_slip_m": 0.8489850724406742
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011677856562015473,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.011677856562015473
+            },
+            "maximum_floor_correction_m": 0.16602647906392376
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 12,
+            "max_lift_before_m": 0.0798,
+            "max_gap_before_m": 0.0399
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1003,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 106,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0119,
+            "body_through_tunic_m": 0.0119,
+            "smoothed_welded_vertices": 8
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_officer_3.glb",
           "triangles": 822,
-          "bytes": 309616,
-          "sha256": "39eccc496ad4f61f5ba7473ee2fec5fc08a4b77c574c477fd728100f349f43d4",
+          "bytes": 317832,
+          "sha256": "bb72871f352796cdf444f93ca2aba0bd629c05217da480883a94a1c90bc0022c",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.165957383773048,
+              "max_sole_slip_m": 0.85794907183952,
+              "max_hull_penetration_m": 0.165957383773048,
+              "max_contact_slip_m": 0.85794907183952
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008739019099622611,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.008739019099622611
+            },
+            "maximum_floor_correction_m": 0.16896504659371236
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 6,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0374
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.0621,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
+          }
         }
       ]
     },
@@ -217,37 +1199,203 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_spearman_0.glb",
           "triangles": 18978,
-          "bytes": 3636424,
-          "sha256": "46a06aff153e865667933c22b9aec4173b9be987d40d2e6c9226829061a8e2b4",
+          "bytes": 3737092,
+          "sha256": "a61e31a80c537158b560c4730e4d686c731eac4c376fdcb2fdd3983908e6ab4e",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17337126688971916,
+              "max_sole_slip_m": 0.8569329318493337,
+              "max_hull_penetration_m": 0.17337126688971916,
+              "max_contact_slip_m": 0.8569329318493337
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.009697254118629841,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.009697254118629841
+            },
+            "maximum_floor_correction_m": 0.1763753302468184
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 637,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 4,
+            "snapped": 12,
+            "max_lift_before_m": 0.0327,
+            "max_gap_before_m": 0.0354
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1348,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 1167,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0306,
+            "body_through_tunic_m": 0.0306,
+            "smoothed_welded_vertices": 51
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_spearman_1.glb",
           "triangles": 7319,
-          "bytes": 2291108,
-          "sha256": "534e6d54304a3ffc75ad528fcb8f76063a0e75fafb744d0de18fe232fa3040a5",
+          "bytes": 2337596,
+          "sha256": "aa15cecf61de4f3132de6ff6b0f05efdd6727ba376f9bd13393bd50c3bb7713e",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.16474143253695434,
+              "max_sole_slip_m": 0.8497658778040881,
+              "max_hull_penetration_m": 0.16474143253695434,
+              "max_contact_slip_m": 0.8497658778040881
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.012010453208621688,
+              "max_hull_penetration_m": 6.938893903907228e-18,
+              "max_contact_slip_m": 0.012010453208621688
+            },
+            "maximum_floor_correction_m": 0.16774666277503203
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 222,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 13,
+            "max_lift_before_m": 0.0478,
+            "max_gap_before_m": 0.0393
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1347,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 586,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.031,
+            "body_through_tunic_m": 0.031,
+            "smoothed_welded_vertices": 38
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_spearman_2.glb",
           "triangles": 2284,
-          "bytes": 680212,
-          "sha256": "fe2e7b71db6487e04bf5663996aabc770a4ae1422b205084922b3ea6602c828b",
+          "bytes": 700324,
+          "sha256": "df316b3ce37635b97244f94eb53604146aa83bd28a3ec26b28d1bcf8a24543b9",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.163005870838917,
+              "max_sole_slip_m": 0.8489850724406742,
+              "max_hull_penetration_m": 0.163005870838917,
+              "max_contact_slip_m": 0.8489850724406742
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011677856562015473,
+              "max_hull_penetration_m": 6.938893903907228e-18,
+              "max_contact_slip_m": 0.011677856562015473
+            },
+            "maximum_floor_correction_m": 0.16602647906392376
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 2,
+            "snapped": 12,
+            "max_lift_before_m": 0.0798,
+            "max_gap_before_m": 0.0399
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1003,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 106,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0119,
+            "body_through_tunic_m": 0.0119,
+            "smoothed_welded_vertices": 8
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_spearman_3.glb",
           "triangles": 802,
-          "bytes": 306508,
-          "sha256": "8751356259a6caa85f66e74b84da9b8613ac2702f13ed25f91b004c875530e98",
+          "bytes": 314008,
+          "sha256": "4babcc578fa8f222a5fb83374a82b938be137c9b05c98f122a6832e2b259dd22",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.165957383773048,
+              "max_sole_slip_m": 0.85794907183952,
+              "max_hull_penetration_m": 0.165957383773048,
+              "max_contact_slip_m": 0.85794907183952
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008739019099622611,
+              "max_hull_penetration_m": 3.469446951953614e-18,
+              "max_contact_slip_m": 0.008739019099622611
+            },
+            "maximum_floor_correction_m": 0.16896504659371236
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 5,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0374
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.0621,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
+          }
         }
       ]
     },
@@ -258,37 +1406,203 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_archer_0.glb",
           "triangles": 18308,
-          "bytes": 3609796,
-          "sha256": "b6f00b194403079db32647f2239e4d8fab90c245059e23a6c9dc6d089e461722",
+          "bytes": 3661484,
+          "sha256": "75237719a81410d5e1d96941b91974f37243a24816d893a9b4348e35c7698fba",
           "texture_edge": 1024,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.17337126688971916,
+              "max_sole_slip_m": 0.8569329318493337,
+              "max_hull_penetration_m": 0.17337126688971916,
+              "max_contact_slip_m": 0.8569329318493337
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.009697254118629841,
+              "max_hull_penetration_m": 5.551115123125783e-17,
+              "max_contact_slip_m": 0.009697254118629841
+            },
+            "maximum_floor_correction_m": 0.1763753302468184
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 637,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 7,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0318
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1348,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 1297,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0507,
+            "body_through_tunic_m": 0.0507,
+            "smoothed_welded_vertices": 71
+          }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_archer_1.glb",
           "triangles": 7064,
-          "bytes": 2289128,
-          "sha256": "14b2ffaab3191d75e4a624e6c7f2cbdfa8db6d470470783f302553adcb52fb6c",
+          "bytes": 2314268,
+          "sha256": "521648fbfe4888e62a10d6a8e64712a8e5238a8a4c3b320a8480ee1d6835b7f5",
           "texture_edge": 512,
-          "face_morphs": true
+          "face_morphs": true,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.16474143253695434,
+              "max_sole_slip_m": 0.8497658778040881,
+              "max_hull_penetration_m": 0.16474143253695434,
+              "max_contact_slip_m": 0.8497658778040881
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.012010453208621688,
+              "max_hull_penetration_m": 0.0,
+              "max_contact_slip_m": 0.012010453208621688
+            },
+            "maximum_floor_correction_m": 0.16774666277503203
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 222,
+              "body_through_skirt_m": 0.0
+            },
+            "after": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            }
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 7,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0349
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1347,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 672,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.031,
+            "body_through_tunic_m": 0.031,
+            "smoothed_welded_vertices": 50
+          }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_archer_2.glb",
           "triangles": 2207,
-          "bytes": 688556,
-          "sha256": "fcc4c04e26446f3b122852a3fb9c3252f84d403b41ddcb126e4636eeb7a6e87b",
+          "bytes": 700172,
+          "sha256": "55d5392556ed5fddc945e0ee82c0af42e6a2be8c297ea35dbc6b2b6c8803c2db",
           "texture_edge": 256,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.163005870838917,
+              "max_sole_slip_m": 0.8489850724406742,
+              "max_hull_penetration_m": 0.163005870838917,
+              "max_contact_slip_m": 0.8489850724406742
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.011677856562015473,
+              "max_hull_penetration_m": 6.938893903907228e-18,
+              "max_contact_slip_m": 0.011677856562015473
+            },
+            "maximum_floor_correction_m": 0.16602647906392376
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 6,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0393
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.1003,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 106,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0375,
+            "body_through_tunic_m": 0.0375,
+            "smoothed_welded_vertices": 8
+          }
         },
         {
           "lod": 3,
           "path": "prototype/assets/characters/frontier_archer_3.glb",
           "triangles": 791,
-          "bytes": 322296,
-          "sha256": "b148570829a68da85d5bacd69845c8158d1b59584f95092571638e3d71aa0b6b",
+          "bytes": 329400,
+          "sha256": "2493d07b4cc313acf827f548e705cb20ac4a3a75a6dbbfae3af86a037739e24f",
           "texture_edge": 128,
-          "face_morphs": false
+          "face_morphs": false,
+          "death_ground_contact": {
+            "before": {
+              "max_sole_penetration_m": 0.165957383773048,
+              "max_sole_slip_m": 0.85794907183952,
+              "max_hull_penetration_m": 0.165957383773048,
+              "max_contact_slip_m": 0.85794907183952
+            },
+            "after": {
+              "max_sole_penetration_m": 0.0,
+              "max_sole_slip_m": 0.008739019099622611,
+              "max_hull_penetration_m": 3.469446951953614e-18,
+              "max_contact_slip_m": 0.008739019099622611
+            },
+            "maximum_floor_correction_m": 0.16896504659371236
+          },
+          "skirt_seam": {
+            "before": {
+              "tearing": 0,
+              "body_through_skirt_m": 0.0
+            },
+            "unchanged": "skirt does not tear"
+          },
+          "kit_rivets": {
+            "rebound": 0,
+            "snapped": 6,
+            "max_lift_before_m": 0.0,
+            "max_gap_before_m": 0.0393
+          },
+          "attack_lead_foot": {
+            "tool": "tools/characters/plant_company_attack.py",
+            "max_sole_slip_before_m": 0.0621,
+            "max_sole_slip_m": 0.0,
+            "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
+          }
         }
       ]
     }

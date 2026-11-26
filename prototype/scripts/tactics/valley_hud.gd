@@ -12,6 +12,12 @@ var command_row := HBoxContainer.new()
 var status := Label.new()
 var heading := Label.new()
 const PROFILE_KEYS := ["low", "balanced", "high", "very_high"]
+const MOVEMENT_ORDERS := {"move":"Marschieren","hold":"Halten","follow":"Folgen","advance":"Vorrücken","fall_back":"Zurückfallen",
+	"face":"Ausrichten","defend":"Verteidigen","attack_move":"Angriffsmarsch","retreat":"Rückzug","rally":"Sammeln","reserve":"Reserve"}
+const COMBAT_ORDERS := {"attack":"Angriff","charge":"Sturmangriff","flank":"Flanke","pila":"Pila werfen",
+	"focus_fire":"Feuer bündeln","fire_at_will":"Feuer frei","cease_fire":"Feuer einstellen"}
+## Menu rows at least as tall as the 44 px base buttons, so orders stay tappable.
+const MENU_ROW_SPACING := 22
 var quality_picker := OptionButton.new()
 var pause_button: Button
 var probe_step := -1
@@ -68,11 +74,12 @@ func populate(model) -> void:
 			card.toggle_mode = true
 			card_by_id[id] = card
 	_menu(command_row,"Verband",{"talwache_front":"Linienverband","talwache_support":"Unterstützung","talwache":"Gesamte Legion"},"group")
-	_menu(command_row,"Formation",model.FORMATIONS,"form")
-	_menu(command_row,"Befehl",{"move":"Marschieren","hold":"Halten","attack":"Angriff","attack_move":"Angriffsmarsch","defend":"Verteidigen","flank":"Flanke","retreat":"Rückzug","rally":"Sammeln","reserve":"Reserve","focus_fire":"Feuer bündeln","cease_fire":"Feuer einstellen"},"command")
+	_menu(command_row,"Formation",model.SHAPES,"form")
+	_menu(command_row,"Bewegung",MOVEMENT_ORDERS,"command")
+	_menu(command_row,"Kampf",COMBAT_ORDERS,"command")
 	quality_picker.name = "ValleyQuality"
 	quality_picker.tooltip_text = "Grafikqualität"
-	for caption in ["Leicht", "Ausgewogen", "Hoch", "Sehr hoch"]:
+	for caption in ["Leicht", "Ausgewogen", "Hoch", "Ultra"]:
 		quality_picker.add_item(caption)
 	quality_picker.selected = PROFILE_KEYS.find(get_parent().profile)
 	quality_picker.item_selected.connect(func(index: int): requested.emit("quality",PROFILE_KEYS[index]))
@@ -152,6 +159,7 @@ func _menu(row: Control,caption: String,labels: Dictionary,action: String) -> vo
 	button.focus_mode = Control.FOCUS_NONE
 	row.add_child(button)
 	var popup := button.get_popup()
+	popup.add_theme_constant_override("v_separation", MENU_ROW_SPACING)
 	for id in labels:
 		popup.add_item(labels[id])
 		popup.set_item_metadata(popup.item_count-1,id)

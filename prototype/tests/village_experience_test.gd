@@ -11,6 +11,7 @@ const Model = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const OpeningStory = preload("res://scripts/story/opening_story.gd")
 const VillageWorld = preload("res://scripts/world/village_life_world.gd")
+const Combat = preload("res://scripts/domain/combat_actions.gd")
 var game
 var checks := 0
 var failures: Array[String] = []
@@ -456,6 +457,10 @@ func _approach_combat_target(target: Dictionary) -> bool:
 		var candidate := point + offset
 		if not game.world.combat_sight_clear(candidate, point):
 			continue
+		# Raiders now converge on the same gate and street. Approach from a side
+		# where this raider, not a neighbour, is the jab's nearest target.
+		if _other_raider_targeted(target, candidate, point):
+			continue
 		var query := PhysicsShapeQueryParameters3D.new()
 		query.shape = shape
 		query.transform = Transform3D(Basis.IDENTITY, Vector3(candidate.x, 1.0, candidate.y))
@@ -467,6 +472,18 @@ func _approach_combat_target(target: Dictionary) -> bool:
 		var direction := (point - candidate).normalized()
 		game.world._figure.rotation.y = atan2(-direction.x, -direction.y)
 		return true
+	return false
+
+
+func _other_raider_targeted(target: Dictionary, from: Vector2, point: Vector2) -> bool:
+	var spec: Dictionary = Combat.TECHNIQUES.jab_left
+	var facing := (point - from).normalized()
+	for enemy: Dictionary in game.model.data.village.raid.enemies:
+		if str(enemy.id) == str(target.id) or int(enemy.health) <= 0:
+			continue
+		var offset := Vector2(float(enemy.x), float(enemy.z)) - from
+		if offset.length() <= from.distance_to(point) + 0.05 and offset.length() < float(spec.reach) + 0.3 and facing.dot(offset.normalized()) >= float(spec.arc_dot):
+			return true
 	return false
 
 

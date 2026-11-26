@@ -338,10 +338,14 @@ func _live_person_clip(actor: Person, action: String, skin: RefCounted) -> Dicti
 	# world-foot solver, instead of the sample_pose preview shortcut.
 	actor.position = Vector3(0,.9,0)
 	actor.reset_motion()
-	var walking := action in ["march","run"]
-	var speed := 1.45 if action == "march" else (3.6 if action == "run" else 0.0)
+	# Every authored travelling cycle is observed with actual root travel. The
+	# company retreat advances 1.48 m per cycle; the battle fixture drives the
+	# same clip at 1.8 m/s. Played in place it is a treadmill whose world-locked
+	# stance foot is dragged 0.75 m from its authored path.
+	var walking := action in ["march","run","retreat"]
+	var speed := 1.45 if action == "march" else (3.6 if action == "run" else (1.8 if action == "retreat" else 0.0))
 	actor.drive(speed)
-	if action in ["idle","march","run"]:
+	if action in ["idle","march","run","retreat"]:
 		actor._play(action,0.0,0.0)
 	else:
 		actor.cue(action)
@@ -366,7 +370,7 @@ func _live_person_clip(actor: Person, action: String, skin: RefCounted) -> Dicti
 		actor._process(delta)
 		elapsed.seconds = target
 	var contact := {"gait":walking,"stance":0.32 if action=="run" else 0.53}
-	if action in ["idle","talk","work","march","run"]:
+	if action in ["idle","talk","work","march","run","retreat"]:
 		contact["supported"] = Callable(actor,"world_foot_supported")
 		contact["require_both_feet"] = true
 	var result := _sample(actor._motion.skeleton,sampler,action,seconds,action in LOOPS,
@@ -405,7 +409,7 @@ func _person_family(family: Dictionary) -> void:
 		if "work" not in actions and "work_interact" in family.review_scope:
 			actions.append("work")
 		for action: String in actions:
-			var walking := action in ["march","run"]
+			var walking := action in ["march","run","retreat"]
 			var clip := _live_person_clip(actor,action,skin)
 			_record_clip(measured,path,clip)
 			var metrics: Dictionary = clip.surface_metrics.duplicate()

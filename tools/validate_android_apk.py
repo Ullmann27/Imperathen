@@ -157,6 +157,13 @@ CC0_MOTION_RESOURCES = (
     "scripts/visuals/cc0_gestures.gd",
     "assets/animations/hero_cc0_library.tres",
 )
+TROOP_CATALOG_RESOURCES = (
+    "scripts/battle/troop_catalog.gd",
+    "scripts/battle/soldier_roster.gd",
+    "assets/troops/troops.json",
+    "assets/troops/item_families.json",
+    "assets/troops/people.json",
+)
 FEATURE_RESOURCE_GROUPS = (
     ("original_meshy_youth_content", tuple(f"assets/characters/hero_meshy_italia_{level}.glb" for level in range(4))),
     ("living_frontier_content", FRONTIER_RESOURCES),
@@ -172,6 +179,7 @@ FEATURE_RESOURCE_GROUPS = (
     ("meshy_equipment_content", MESHY_EQUIPMENT_RESOURCES),
     ("service_gear_content", SERVICE_GEAR_RESOURCES),
     ("cc0_motion_content", CC0_MOTION_RESOURCES),
+    ("troop_catalog_content", TROOP_CATALOG_RESOURCES),
 )
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (

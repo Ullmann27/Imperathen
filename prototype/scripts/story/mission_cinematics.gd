@@ -3,6 +3,7 @@ extends RefCounted
 ## unlock, reward or mutate a mission. The existing successful transaction owns
 ## those effects and hands the next objective to this authored sequence.
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I01Film = preload("res://scripts/story/i01_film.gd")
 const PREFIX := "mission_transition_"
 const KEY_DIALOGUES := ["deliver_kindling","smith_trial","smith_apprentice","deliver_hinge","patrol_brief","watch_permission","borrow_gear","return_gear"]
 
@@ -15,6 +16,11 @@ static func sequence_for(data: Dictionary, previous: Dictionary, following: Dict
 	var id := str(previous.get("id",""))
 	var next_id := str(following.get("id",""))
 	if id.is_empty() or next_id.is_empty() or id == next_id:
+		return {}
+	# I-01 VID-B: the committed breakfast opens the table talk.
+	if next_id == "i01_topic":
+		return I01Film.vid_b(data)
+	if id.begins_with("i01_"):
 		return {}
 	var old_mission := _mission(previous)
 	var next_mission := _mission(following)
@@ -34,6 +40,9 @@ static func sequence_for(data: Dictionary, previous: Dictionary, following: Dict
 		beats.append({"id":id+"_dialogue","shot_id":"mission_dialogue","actor_id":actor,
 			"speaker":caption,"role":"Gespräch · Auftrag abgeschlossen","text":dialogue,
 			"duration":maxf(5.0,2.0+dialogue.length()/17.0),"chapter":chapter,"location":location})
+	if id == "father_morning":
+		# I-01 VID-C variants at the border to I-02 (HB S. 13, 30–34).
+		beats.append_array(I01Film.vid_c_beats(data, chapter, location))
 	var result := str(previous.get("result",""))
 	if not result.is_empty():
 		beats.append({"id":id+"_reaction","shot_id":"mission_reaction","actor_id":actor,

@@ -18,6 +18,8 @@ const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const CityExploration = preload("res://scripts/world/city_exploration.gd")
+const I01 = preload("res://scripts/story/i01_three_cups.gd")
+const I01Film = preload("res://scripts/story/i01_film.gd")
 const SAVE_PATH = "user://imperathen_campaign.json"
 
 var model
@@ -50,6 +52,8 @@ var village_npc := ""
 var village_tab := "overview"
 var simulation_elapsed := 0.0
 var city_exploration
+## True only while a film choice beat commits its childhood action.
+var _film_committing := false
 
 
 func _ready() -> void:
@@ -75,6 +79,7 @@ func _ready() -> void:
 	ui = UIScript.new()
 	add_child(ui)
 	ui.action_requested.connect(_on_ui_action)
+	world.hud_prompts = true
 	world.set_quality(ui.get_quality())
 	_setup_ambient()
 	# The title sequence is opaque; the village is not drawn underneath it.
@@ -108,8 +113,8 @@ func _process(delta: float) -> void:
 		return
 	if screen == "playing":
 		world.set_frontier_time(float(model.data.world_seconds))
-		if Childhood.enabled(model.data):
-			ui.update_navigation(world.navigation_view())
+		# Compass, local map and the context action follow the live world.
+		ui.update_navigation(world.navigation_view())
 		autosave_elapsed += delta
 		if autosave_elapsed >= 45.0:
 			autosave_elapsed = 0.0
@@ -277,7 +282,9 @@ func _request_new_game() -> void:
 func _start_new_game() -> void:
 	_release_opening()
 	pending_opening = {}
-	model.new_game(ui.origin_id, true, true)
+	# The player-facing entry is the only regular start: no own money (Game
+	# Direction 26.11.2026); development/test worlds keep their named fund.
+	model.new_game(ui.origin_id, true, true, false, true)
 	simulation_elapsed = 0.0
 	last_story_id = ""
 	world.setup(model.data)
@@ -476,6 +483,9 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 				ui.notify(str(companion_result.get("message", "")) if in_marcus_mission else OpeningStory.companion_reply(model.data))
 			else:
 				_show_companion()
+		"i01_contact_marcus":
+			_resume()
+			_command("village_childhood_action", {"action_id":"i01_contact_marcus"})
 		"train", "recruit": _command(action, payload)
 		"skirmish": _command("start_skirmish", payload)
 		"story_choice":
@@ -522,7 +532,7 @@ func _on_world_action(action: String, payload: Dictionary) -> void:
 func _command(command: String, payload: Dictionary) -> Dictionary:
 	var chapter_choice := screen == "frontier_dialog" and command == "frontier_choice"
 	var village_choice := screen in ["village_panel", "village_dialog"] and command.begins_with("village_")
-	if screen != "playing" and not chapter_choice and not village_choice:
+	if screen != "playing" and not chapter_choice and not village_choice and not _film_committing:
 		return {"ok": false, "message": "Die Welt ist pausiert."}
 	_flush_simulation()
 	model.set_player_position(world.get_player_position())
@@ -533,7 +543,7 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	var command_id := "" if realtime_combat else "%s_%d" % [run_id, command_serial]
 	var previous_childhood_step: Dictionary = Childhood.current_step(model.data) if command == "village_childhood_action" and Childhood.enabled(model.data) else {}
 	var result: Dictionary = model.execute(command, payload, command_id)
-	if not result.get("ok", false) or (not realtime_combat and command not in ["receive_damage", "train"]):
+	if not _film_committing and (not result.get("ok", false) or (not realtime_combat and command not in ["receive_damage", "train"])):
 		ui.notify(str(result.get("message", "")))
 	_refresh()
 	var persisted := true
@@ -545,7 +555,7 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 		else:
 			pending_opening = OpeningStory.adulthood(model.data)
 			_pause()
-	elif result.get("ok",false) and not previous_childhood_step.is_empty():
+	elif result.get("ok",false) and not previous_childhood_step.is_empty() and not _film_committing:
 		var transition := MissionCinematics.sequence_for(model.data,previous_childhood_step,Childhood.current_step(model.data))
 		if not transition.is_empty():
 			if persisted:
@@ -669,14 +679,38 @@ func _show_companion() -> void:
 	if Childhood.enabled(model.data) and str(childhood_view.get("stage", "")) == "i03_marcus":
 		screen = "dialog"
 		world.set_active(false)
+		var i03_text := "Marcus kennt den schnelleren Weg zum Markt. Der alte Münzstreit zwischen euch entscheidet nicht über Sieg oder Niederlage, sondern darüber, welche Erinnerung eure Freundschaft künftig trägt."
+		if I01.has_event(model.data, "I-01.contact.marcus"):
+			# Delayed hook of the I-01 encounter: a shared memory, not a loyalty value.
+			i03_text = "»Heute Morgen am Brunnen hast du mir zugehört, als der Eimer leckte. Jetzt zeig ich dir die Abkürzung.«\n\n" + i03_text
 		ui.show_dialog(
 			"Marcus · Eine Münze und eine Abkürzung",
-			"Marcus kennt den schnelleren Weg zum Markt. Der alte Münzstreit zwischen euch entscheidet nicht über Sieg oder Niederlage, sondern darüber, welche Erinnerung eure Freundschaft künftig trägt.",
+			i03_text,
 			[
 				{"label":"Den Streit beilegen und gemeinsam gehen", "action":"companion_help", "choice":"friend", "enabled":true, "reason":""},
 				{"label":"Auf dem eigenen Standpunkt beharren", "action":"companion_decline", "choice":"rival", "enabled":true, "reason":""}
 			]
 		)
+		return
+	if Childhood.enabled(model.data) and not companion.get("met", false):
+		# Before I-03 Marcus only greets. The former hut dialogue ("4 Holz
+		# teilen") belongs to legacy careers and never sets a companion choice.
+		model.capture_npc_observations()
+		var here: Vector3 = world.get_player_position()
+		var marcus_at: Vector3 = world._companion.global_position
+		if Vector2(here.x-marcus_at.x, here.z-marcus_at.z).length() > Childhood.NPC_RANGE or not world._companion.visible:
+			ui.notify("Geh näher zu Marcus, um mit ihm zu sprechen.")
+			return
+		screen = "dialog"
+		world.set_active(false)
+		var greeting_choices: Array = []
+		var greeting := "»Morgen! Ich muss weiter, der Eimer wartet nicht.«"
+		if I01.contact_open(model.data, "marcus"):
+			greeting = I01.contact_line("marcus")
+			var why := Childhood.i01_reason(model.data, "i01_contact_marcus")
+			greeting_choices.append({"label":"Kurz zuhören und antworten", "action":"i01_contact_marcus", "enabled":why.is_empty(), "reason":why})
+		greeting_choices.append({"label":"Weitergehen", "action":"resume", "enabled":true, "reason":""})
+		ui.show_dialog("Marcus · am Brunnen", greeting, greeting_choices)
 		return
 	if Childhood.enabled(model.data) and companion.get("met", false):
 		model.capture_npc_observations()
@@ -741,6 +775,7 @@ func _begin_opening(sequence: Dictionary, start_index: int = 0) -> void:
 	opening_overlay.pause_requested.connect(func(): _opening_set_paused(not opening_paused))
 	opening_overlay.skip_requested.connect(_opening_skip)
 	opening_overlay.reading_mode_changed.connect(_opening_reading_changed)
+	opening_overlay.choice_requested.connect(_opening_choose)
 	_opening_present()
 	print("IMPERATHEN_OPENING_STARTED " + str(opening_sequence.id))
 
@@ -749,8 +784,15 @@ func _opening_present() -> void:
 	if screen != "opening" or not is_instance_valid(opening_overlay):
 		return
 	var beat: Dictionary = opening_sequence.beats[opening_index]
+	if bool(beat.get("await_choice", false)) and not _film_choice_open(beat) and opening_index < opening_sequence.beats.size() - 1:
+		# Resumed after the choice was committed: never offer or commit it twice.
+		opening_index += 1
+		_opening_present()
+		return
 	opening_elapsed = 0.0
-	opening_overlay.present(beat, opening_index, opening_sequence.beats.size())
+	var shown: Dictionary = beat.duplicate(true)
+	shown["choice_open"] = _film_choice_open(beat)
+	opening_overlay.present(shown, opening_index, opening_sequence.beats.size())
 	opening_overlay.set_paused(opening_paused)
 	opening_director.mission_actor_id = str(beat.get("actor_id",""))
 	opening_director.play(str(beat.shot_id), maxf(0.1, float(beat.duration)), bool(ui.opening_preferences().reduce_motion))
@@ -777,12 +819,15 @@ func _opening_process(delta: float) -> void:
 	opening_elapsed = minf(duration, opening_elapsed + maxf(0.0, delta))
 	opening_director.sample(str(beat.shot_id), opening_elapsed / duration)
 	opening_overlay.set_progress(opening_elapsed / duration)
-	if opening_elapsed >= duration and not opening_manual:
+	# AwaitChoice holds only this scene (HB S. 29); the composition stays.
+	if opening_elapsed >= duration and not opening_manual and not _film_choice_open(beat):
 		_opening_next()
 
 
 func _opening_next() -> void:
 	if screen != "opening" or opening_paused:
+		return
+	if _film_choice_open(opening_sequence.beats[opening_index]):
 		return
 	if opening_index >= opening_sequence.beats.size() - 1:
 		_opening_finish()
@@ -795,9 +840,58 @@ func _opening_skip() -> void:
 	if screen != "opening":
 		return
 	# Skipping cinematics still explains the objective, then waits for the player.
-	opening_index = opening_sequence.beats.size() - 1
+	# An open decision is never skipped or made for the player (HB S. 29, T20).
+	var target: int = opening_sequence.beats.size() - 1
+	for index in range(opening_index, opening_sequence.beats.size()):
+		if _film_choice_open(opening_sequence.beats[index]):
+			target = index
+			break
+	opening_index = target
 	opening_paused = false
 	_opening_present()
+
+
+func _film_choice_open(beat: Dictionary) -> bool:
+	if not bool(beat.get("await_choice", false)) or not Childhood.enabled(model.data):
+		return false
+	return str(Childhood.current_step(model.data).get("id", "")) == str(beat.get("choice_step", ""))
+
+
+## A film choice is committed by the same checked childhood transaction as the
+## in-world dialogue. The following beats are rebuilt from the new state.
+func _opening_choose(action_id: String) -> void:
+	if screen != "opening" or opening_paused or opening_sequence.is_empty():
+		return
+	var beat: Dictionary = opening_sequence.beats[opening_index]
+	if not _film_choice_open(beat):
+		return
+	var offered := false
+	for option: Dictionary in beat.get("choices", []):
+		offered = offered or str(option.get("action_id", "")) == action_id
+	if not offered:
+		return
+	_film_committing = true
+	var result := _command("village_childhood_action", {"action_id": action_id})
+	_film_committing = false
+	if not result.get("ok", false):
+		if is_instance_valid(opening_overlay):
+			opening_overlay.show_choice_feedback(str(result.get("message", "")))
+		return
+	var next_index := opening_index + 1
+	var rebuilt := _film_sequence(str(opening_sequence.get("id", "")))
+	if rebuilt.is_empty():
+		_opening_finish()
+		return
+	_begin_opening(rebuilt, next_index)
+	print("IMPERATHEN_FILM_CHOICE " + action_id)
+
+
+func _film_sequence(sequence_id: String) -> Dictionary:
+	if sequence_id == "childhood_home":
+		return OpeningStory.childhood(model.data)
+	if sequence_id == I01Film.VID_B:
+		return I01Film.restore(model.data, sequence_id)
+	return {}
 
 
 func _opening_set_paused(value: bool) -> void:
@@ -852,7 +946,9 @@ func _restore_opening() -> bool:
 		if sequence_id == "i00_aquileia":
 			sequence = OpeningStory.historical_prologue()
 		elif sequence_id == "childhood_home":
-			sequence = OpeningStory.childhood()
+			sequence = OpeningStory.childhood(model.data)
+		elif sequence_id == I01Film.VID_B:
+			sequence = I01Film.restore(model.data, sequence_id)
 		elif sequence_id.begins_with(MissionCinematics.PREFIX):
 			sequence = MissionCinematics.restore(model.data,sequence_id)
 	else:
@@ -874,7 +970,7 @@ func _opening_finish() -> void:
 	var checkpoint_failed := opening_checkpoint_failed
 	_release_opening()
 	if chain_to == "childhood_home" and Childhood.enabled(model.data):
-		_begin_opening(OpeningStory.childhood())
+		_begin_opening(OpeningStory.childhood(model.data))
 		if checkpoint_failed:
 			ui.notify("Der Prolog-Fortschritt konnte nicht gespeichert werden. Die Kindheitsszene läuft weiter; beim Fortsetzen kann der Prolog erneut erscheinen.")
 		print("IMPERATHEN_OPENING_CHAINED " + finished_id + " -> childhood_home")

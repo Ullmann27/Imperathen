@@ -9,6 +9,7 @@ const Ranks = preload("res://scripts/visuals/far_ranks.gd")
 const Soldier = preload("res://scripts/visuals/soldier_visual.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Life = preload("res://scripts/story/village_life.gd")
+const RaiderStrike = preload("res://scripts/domain/raider_strike.gd")
 const DT := 1.0/60.0
 var _tree: SceneTree
 
@@ -93,12 +94,21 @@ func _observe_person(sample: Dictionary, actor: Node3D, figure: Node3D) -> void:
 		sample.finite = bool(sample.finite) and transform.is_finite()
 	_maximum(sample,"max_collision_overlap_m",_collision_depth(actor),context)
 	if not previous.is_empty():
-		_maximum(sample,"max_root_step_m",at.distance_to(previous.root),context)
+		var root_step: Vector3 = at-Vector3(previous.root)
+		context["root_step_m"] = root_step.length()
+		_maximum(sample,"max_root_step_m",root_step.length(),context)
 		if previous.pose.size() == pose.size():
 			for bone in pose.size():
 				var old: Transform3D = previous.pose[bone]
 				context["bone"] = rig.get_bone_name(bone)
 				_maximum(sample,"max_transition_position_jump_m",pose[bone].origin.distance_to(old.origin),context)
+				# Diagnostic only, never a gate metric: the same bone step with the
+				# actor's own travel removed separates a pose pop from plain speed.
+				var relative := (pose[bone].origin-old.origin-root_step).length()
+				if relative > float(sample.worst.get("root_relative_position_jump",{}).get("value_m",0.0)):
+					var record := context.duplicate()
+					record["value_m"] = relative
+					sample.worst["root_relative_position_jump"] = record
 				var angle := rad_to_deg(pose[bone].basis.orthonormalized().get_rotation_quaternion().angle_to(old.basis.orthonormalized().get_rotation_quaternion()))
 				_maximum(sample,"max_transition_rotation_jump_deg",angle,context)
 	var contacts: Dictionary = previous.get("contacts",{})
@@ -387,7 +397,11 @@ func _raid(world: Node3D, data: Dictionary) -> Dictionary:
 	_add(family,subject,"walk_run_stop",stopping)
 	var reaction := _observer()
 	for frame in 180:
-		if frame == 0: fixture.village.raid.enemies[0].attack_timer = 1.8
+		# Domain clock as VillageLife drives it: entering the wind-up starts the
+		# visible swing; the blow resolves after the wind-up and the clock
+		# restarts at the interval. A clock reset alone never swings (D-026).
+		if frame == 0: fixture.village.raid.enemies[0].attack_timer = RaiderStrike.windup_seconds()
+		if frame == int(round(RaiderStrike.windup_seconds()/DT)): fixture.village.raid.enemies[0].attack_timer = RaiderStrike.INTERVAL_SECONDS
 		if frame == 60: fixture.village.raid.enemies[0].health = 30
 		if frame == 120: figure.cue("block")
 		projection.sync_state(fixture,"balanced")

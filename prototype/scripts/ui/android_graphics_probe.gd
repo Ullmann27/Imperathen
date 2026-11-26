@@ -1,8 +1,18 @@
 extends Node
 ## Runs only when a debug QA installation has an explicit app-private request.
 ## The driver operates the same village, settings, HUD and battle model as a player.
+## Mode "views" renders the fixed renderer-comparison views of
+## scripts/rendering/render_bench.gd in all four profiles (D-033/D-034), so a
+## Fold7 run is directly comparable with tests/render_comparison.gd.
 
 const PROFILES := ["low", "balanced", "high", "very_high"]
+const Bench = preload("res://scripts/rendering/render_bench.gd")
+## Device sampling per view: settle, then measure (about 0.5 s and 4 s at 60 FPS).
+## The flag file may override them: "views <settle> <measure>".
+const VIEW_SETTLE_FRAMES := 30
+const VIEW_MEASURE_FRAMES := 240
+var view_settle := VIEW_SETTLE_FRAMES
+var view_measure := VIEW_MEASURE_FRAMES
 const PHASE_SECONDS := 300.0
 var output: FileAccess
 var mode := ""
@@ -22,8 +32,12 @@ var phase_started := 0
 var animation_census := {}
 
 func _ready() -> void:
-	mode = FileAccess.get_file_as_string("user://graphics-probe.txt").strip_edges()
-	if mode not in ["soak", "renderer", "quick"]:
+	var request := FileAccess.get_file_as_string("user://graphics-probe.txt").strip_edges().split(" ", false)
+	mode = request[0] if not request.is_empty() else ""
+	if mode == "views" and request.size() >= 3:
+		view_settle = clampi(request[1].to_int(), 1, 600)
+		view_measure = clampi(request[2].to_int(), 2, 3600)
+	if mode not in ["soak", "renderer", "quick", "views"]:
 		queue_free()
 		return
 	output = FileAccess.open("user://graphics-frames.jsonl", FileAccess.WRITE)
@@ -54,7 +68,19 @@ func _process(_delta: float) -> void:
 		if game.screen == "menu":
 			game._on_ui_action("continue" if FileAccess.file_exists(game.SAVE_PATH) else "new_game", {})
 			return
+		if mode == "views" and game.screen == "opening":
+			# A fresh QA install has no save; the bench needs the village, not the story.
+			game._opening_skip()
+			# I-01 VID-A waits for the morning choice (no-op on any other beat).
+			game._opening_choose("i01_yard")
+			game._opening_skip()
+			game._opening_next()
+			return
 		if game.screen != "playing":
+			return
+		if mode == "views":
+			set_process(false)
+			_views(game)
 			return
 		if village_profile >= 0:
 			var actual: String = game.world.get_quality_profile()
@@ -144,6 +170,43 @@ func _process(_delta: float) -> void:
 			phase_usec = 0
 			phase_started = 0
 			last_frame = 0
+
+## Same views, cameras, harness night and counters as the desktop comparison.
+## Simulation, input and time are frozen while measuring and restored afterwards.
+func _views(game: Node) -> void:
+	for i in 30:
+		await get_tree().process_frame
+	var world = game.world
+	var start: Dictionary = Bench.village_start(world)
+	var previous_profile: String = game.ui.get_quality()
+	game.set_process(false)
+	world.set_physics_process(false)
+	world.set_presentation_time(4.0)
+	Engine.time_scale = 0
+	_write({"event":"views_start","renderer":Bench.renderer_info(),"views":Bench.VILLAGE_VIEWS,
+		"settle_frames":view_settle,"measure_frames":view_measure})
+	for profile: String in PROFILES:
+		game.ui.set_quality(profile)
+		for view: String in Bench.VILLAGE_VIEWS:
+			if not Bench.stage_village(world, view, start):
+				_fail("Unknown bench view " + view)
+				return
+			for i in view_settle:
+				await Bench.next_frame(get_tree())
+			var stats: Dictionary = await Bench.measure(get_viewport(), view_measure)
+			stats.engine = Bench.engine_state(get_viewport(), world)
+			_write({"event":"view","quality":profile,"view":view,"metrics":stats})
+			print("IMPERATHEN_RENDER_BENCH " + JSON.stringify({"quality":profile,"view":view,
+				"renderer":stats.engine.renderer.method,"wall_ms_p50":stats.wall_ms_p50,"wall_ms_p95":stats.wall_ms_p95,
+				"gpu_ms_p50":stats.render_gpu_ms_p50,"draw_calls":stats.draw_calls,"primitives":stats.primitives,
+				"video_mib":stats.video_mib,"rss_mib":stats.rss_mib}))
+			Bench.restore_village(world, start)
+	Engine.time_scale = 1
+	game.ui.set_quality(previous_profile)
+	world.set_physics_process(true)
+	game.set_process(true)
+	_finish()
+
 
 func _counters(scene: Node) -> Dictionary:
 	var viewport := get_viewport()

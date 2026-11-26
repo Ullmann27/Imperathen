@@ -2,6 +2,7 @@
 
 blender -b -t 2 -P art/soldiers/build.py
 """
+import importlib.util
 import json
 import math
 from pathlib import Path
@@ -11,6 +12,12 @@ from mathutils import Quaternion, Vector
 
 SOURCE = Path(__file__).resolve().parent
 OUTPUT = SOURCE.parents[1] / "prototype/assets/soldiers"
+# Post-export step shared by every company-skeleton export: grounds the fixed
+# pelvis drop of the death pose below on the actual skinned body.
+_death_spec = importlib.util.spec_from_file_location(
+    "company_death_ground", SOURCE.parents[1] / "tools/characters/ground_death_clip.py")
+death_ground = importlib.util.module_from_spec(_death_spec)
+_death_spec.loader.exec_module(death_ground)
 ROLES = ("heavy", "spear", "archer", "officer")
 TAU = math.tau
 
@@ -471,7 +478,12 @@ def pose(clip,t,role):
         swing=max(0,1-abs(t-.59)/.28)
         angles={"Spine":(8*swing,0,24*wind-31*swing),"Arm_R":(-65*wind-42*swing,-23*wind,14*swing),
                 "Forearm_R":(-41*wind-18*swing,0,0),"Hand_R":(15*wind-63*swing,0,0),
-                "Arm_L":(-21*swing,0,0),"Thigh_L":(-12*swing,0,0)}
+                "Arm_L":(-21*swing,0,0)}
+        # No Thigh_L sweep: with a static pelvis and no knee/ankle compensation
+        # it skated the straight lead leg's sole 13-19 cm over the floor. The
+        # planted lead foot keeps its contact; the cut's weight transfer is in
+        # the spine and arms (tools/characters/plant_company_attack.py applies
+        # the same to existing exports).
         if role=="spear":
             angles["Hand_R"]=(-48*swing+25*wind,0,0)
             angles["Arm_R"]=(-57*swing+12*wind,0,0)
@@ -672,6 +684,8 @@ def build(role,detail):
                               export_animations=bool(arm),export_animation_mode="NLA_TRACKS",
                               export_force_sampling=True,export_frame_step=1,
                               export_optimize_animation_size=True,export_def_bones=False)
+    if arm:
+        death_ground.ground(filename)
     obj.data.calc_loop_triangles()
     return {"role":role,"lod":suffix,"triangles":len(obj.data.loop_triangles),
             "bones":len(arm.data.bones) if arm else 0,"bytes":filename.stat().st_size}

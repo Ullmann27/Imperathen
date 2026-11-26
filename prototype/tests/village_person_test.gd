@@ -8,6 +8,11 @@ var checks := 0
 
 
 func _initialize() -> void:
+	# A script error aborts run() before quit(); fail visibly instead of
+	# leaving the engine idle until the external harness timeout.
+	create_timer(100.0).timeout.connect(func() -> void:
+		push_error("village_person_test watchdog: run() did not finish")
+		quit(1))
 	run.call_deferred()
 
 
@@ -25,6 +30,31 @@ func surface(shape: MeshInstance3D, label: String) -> StandardMaterial3D:
 	return null
 
 
+func is_original_youth(person: Person) -> bool:
+	return person.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
+
+
+func blade_visible(person: Person) -> bool:
+	# The original youth's source sword is removed offline; a missing blade
+	# node is the expected bare-handed state, never a hidden test failure.
+	var blade := person.body.find_child("PracticeBlade",true,false)
+	return blade is MeshInstance3D and (blade as MeshInstance3D).visible
+
+
+func check_original_youth(person: Person, label: String) -> void:
+	var body := person.body.find_child("MeshyYouthBody",true,false) as MeshInstance3D
+	check(body != null and body.skin != null,label+" original youth uses its imported skin")
+	var skeletons := person.body.find_children("*","Skeleton3D",true,false)
+	check(not skeletons.is_empty() and (skeletons[0] as Skeleton3D).get_bone_count() == 35,label+" original youth keeps the exact 35-joint rig")
+	var textured := false
+	if body != null:
+		for i in body.mesh.get_surface_count():
+			var material := body.get_active_material(i) as BaseMaterial3D
+			textured = textured or (material != null and material.albedo_texture != null)
+	check(textured,label+" original youth keeps its authored albedo texture")
+	check(person.active_model_path == Person.MESHY_YOUTH_PATH % maxi(0,person.detail),label+" original youth LOD matches the active detail")
+
+
 func metrics(person: Person) -> int:
 	var result := 0
 	for shape: MeshInstance3D in person.body.find_children("*","MeshInstance3D",true,false):
@@ -39,6 +69,10 @@ func run() -> void:
 	var model := Model.new()
 	root.add_child(world)
 	var swatches := {}
+	var youth_available := true
+	for level in 4:
+		youth_available = youth_available and ResourceLoader.exists(Person.MESHY_YOUTH_PATH % level,"PackedScene")
+	var youth_seen := false
 	for home: String in Person.COMPANIONS:
 		model.new_game(home)
 		world.setup(model.data)
@@ -46,7 +80,15 @@ func run() -> void:
 		var hero: Person = world.get_node("Player/Figure")
 		var friend: Person = world.get_node("Marcus/Figure")
 		var state_before := model.data.duplicate(true)
+		# The campaign selects the original youth for a 12-17 year old Italia
+		# player whenever all four derivatives exist (game_world.gd).
+		check(is_original_youth(hero) == (home == "italia" and youth_available),home+" original youth only for the Italia player")
+		check(not is_original_youth(friend),home+" companion never receives the player's youth body")
 		for person: Person in [hero,friend]:
+			if is_original_youth(person):
+				check_original_youth(person,home)
+				youth_seen = true
+				continue
 			var hero_asset := person.active_model_path.begins_with("res://assets/characters/hero_quality_")
 			var civilian: MeshInstance3D = person.body.find_child("HeroBody" if hero_asset else "Civilian",true,false)
 			var skeleton: Skeleton3D = person.body.find_children("*","Skeleton3D",true,false)[0]
@@ -60,7 +102,7 @@ func run() -> void:
 			var garment := person.body.find_child("HeroTunic",true,false) as MeshInstance3D if hero_asset else civilian
 			var tunic := surface(garment,"HeroLinen" if hero_asset else "Civilian_Linen")
 			check(tunic != null and tunic.albedo_texture != null and tunic.normal_texture != null and tunic.roughness_texture != null,expected+" linen texture, normal and roughness")
-			if person == hero: swatches[tunic.albedo_color.to_html()] = true
+			if person == hero: swatches[home] = tunic.albedo_color.to_html()
 			if not hero_asset:
 				for region: String in Person.COMPANIONS:
 					check(person.body.find_child("Garment_"+region,true,false).visible == (region == home), expected+" only equips its regional garment")
@@ -78,7 +120,11 @@ func run() -> void:
 			world.set_quality(quality)
 			check(hero.profile == quality and friend.profile == quality,"both live actors receive profile "+quality)
 		check(model.data == state_before,home+" model unchanged by rendered choices")
-	check(swatches.size() == 5,"all five home tunics use separate material tints")
+	# Every home whose player is not the original youth keeps its own tint.
+	var tints := {}
+	for tint: String in swatches.values(): tints[tint] = true
+	check(swatches.size() == (4 if youth_seen else 5) and tints.size() == swatches.size(),"each home tunic uses a separate material tint")
+	check(youth_seen == youth_available,"original youth presence is exercised exactly when installed")
 	model.new_game()
 	world.setup(model.data)
 	var hero: Person = world.get_node("Player/Figure")
@@ -92,7 +138,7 @@ func run() -> void:
 		for joint in skeleton.get_bone_count():
 			if skeleton.get_bone_pose_rotation(joint).angle_to(Quaternion.IDENTITY) > .015: changed = true
 		check(changed,clip+" actually rotates the rig")
-		check(not hero.body.find_child("PracticeBlade",true,false).visible,"child uses bare hands")
+		check(not blade_visible(hero),"child uses bare hands")
 	world._player.position = World.TRAINING_LOCATION
 	hero.cue("train")
 	mentor.cue("block")
@@ -128,12 +174,12 @@ func run() -> void:
 	else:
 		check(surface(adult,"PortraitSkin").albedo_texture.resource_path.ends_with("/adult_italia.webp"),"adult Italian portrait UV")
 	hero.sample_pose("train",.4)
-	check(not hero.body.find_child("PracticeBlade",true,false).visible,"adulthood alone does not grant equipment")
+	check(not blade_visible(hero),"adulthood alone does not grant equipment")
 	hero.set_equipment(true)
 	hero.sample_pose("train",.4)
-	check(hero.body.find_child("PracticeBlade",true,false).visible,"explicitly equipped adult blade follows action")
+	check(blade_visible(hero),"explicitly equipped adult blade follows action")
 	hero.sample_pose("idle",.4)
-	check(not hero.body.find_child("PracticeBlade",true,false).visible,"idle stows equipment")
+	check(not blade_visible(hero),"idle stows equipment")
 	hero.set_equipment(false)
 	for node_path in ["TrainingGround/Mentor/Figure","Squad/Recruit1/Figure","Encounter/rover/Figure"]:
 		var soldier: Person = world.get_node(node_path)

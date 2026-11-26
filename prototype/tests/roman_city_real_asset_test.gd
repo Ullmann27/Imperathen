@@ -61,7 +61,10 @@ func _check_city() -> void:
 	var stalls := city.find_children("Market_*","MeshInstance3D",true,false)
 	_check(residences.size()==240,"Runtime contains all 240 actual residential meshes")
 	_check(stalls.size()==63,"Runtime contains 63 individually accessible original market stalls")
-	_check(city.find_child("Main_Streets",true,false) is MeshInstance3D,"Real stone street is part of the GLB")
+	# City_Ground, Main_Streets and Residential_Roads are split into visual
+	# tiles (per-tile visibility culling); each name now groups its tiles.
+	_check(_street_tiles_cover_main_streets(city),
+		"Real stone street is part of the GLB: Main_Streets tiles cover both main streets end to end")
 	# Forum_Piazza and the worn paved stonework are already exported into the
 	# authoritative city GLB. Duplicating them in another optional GLB causes
 	# z-fighting and doubles the material/triangle budget.
@@ -101,3 +104,30 @@ func _check_city() -> void:
 	city.free()
 	colliders.free()
 	quit(0 if failures.is_empty() else 1)
+
+
+func _street_tiles_cover_main_streets(city: Node3D) -> bool:
+	var group := city.find_child("Main_Streets",true,false)
+	if group == null:
+		return false
+	var boxes: Array[AABB] = []
+	for tile: Node in group.find_children("Main_Streets_Tile_*","MeshInstance3D",false,false):
+		var mesh := tile as MeshInstance3D
+		boxes.append(mesh.global_transform*mesh.get_aabb())
+	if boxes.size() < 4:
+		return false
+	# Blender y=-65 east-west street (Godot z=65) and x=-100 north-south street.
+	var samples: Array[Vector3] = []
+	for step in range(0,168):
+		samples.append(Vector3(lerpf(-417.0,417.0,step/167.0),0.1,65.0))
+	for step in range(0,131):
+		samples.append(Vector3(-100.0,0.1,-327.0+step*5.0))
+	for point in samples:
+		var covered := false
+		for box in boxes:
+			if point.x>=box.position.x and point.x<=box.end.x and point.z>=box.position.z and point.z<=box.end.z:
+				covered = true
+				break
+		if not covered:
+			return false
+	return true

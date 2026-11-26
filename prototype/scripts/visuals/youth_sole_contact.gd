@@ -8,14 +8,52 @@ var run_clearance: Array = []
 var last_lowest_world_y := INF
 var last_correction_m := 0.0
 var last_target_y := INF
+## Bind-space sandal sole planes per side from the offline retarget report
+## (Vector4: normal xyz, offset w). Empty for reports without calibration.
+var sole_planes: Array[Vector4] = []
+var slab_sample_count := 0
+const SOLE_CONTACT_BAND_M := .004
+const SAMPLES_PER_REGION := 24
+## Offline retarget report. It is produced by the youth build and is absent in
+## checkouts and builds without the original youth, where only the legacy
+## bind-pose band applies.
+const MOTION_REPORT := "res://assets/animations/accad_youth_motion.json"
+static var _report_read := false
+static var _report: Dictionary = {}
+
+
+## Reads the report once per process instead of on every LOD reload, and never
+## asks the JSON parser for a file that does not exist.
+static func motion_report() -> Dictionary:
+	if not _report_read:
+		_report_read = true
+		if FileAccess.file_exists(MOTION_REPORT):
+			var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(MOTION_REPORT))
+			if parsed is Dictionary:
+				_report = parsed
+	return _report
 
 
 func bind(model: Node3D, level: int) -> void:
 	samples.clear()
 	run_clearance.clear()
+	sole_planes.clear()
+	slab_sample_count=0
 	rig = null
 	if not is_instance_valid(model):
 		return
+	var lod_report: Dictionary = {}
+	var lods: Array = motion_report().get("lods",[])
+	if level>=0 and level<lods.size() and lods[level] is Dictionary:
+		lod_report=lods[level]
+	var planes: Dictionary = lod_report.get("sole_planes",{})
+	for side_name in ["L","R"]:
+		var plane: Dictionary = planes.get(side_name,{})
+		var n: Array = plane.get("rest_normal",[])
+		if n.size()==3 and plane.has("plane_offset"):
+			sole_planes.append(Vector4(float(n[0]),float(n[1]),float(n[2]),float(plane.plane_offset)))
+	if sole_planes.size()!=2:
+		sole_planes.clear()
 	var mesh := model.find_child("MeshyYouthBody",true,false) as MeshInstance3D
 	if not is_instance_valid(mesh) or mesh.mesh == null or mesh.skin == null:
 		return
@@ -35,7 +73,11 @@ func bind(model: Node3D, level: int) -> void:
 		binds.append(mesh.skin.get_bind_pose(i))
 		var name := rig.get_bone_name(bone)
 		foot_sides.append(1 if name in ["Foot_L","Toe_L"] else (2 if name in ["Foot_R","Toe_R"] else 0))
+	# Two pools per side: the lowest bind-pose band (legacy) and the actual
+	# sandal slab, which only becomes the contact surface once the inward
+	# rolled original feet are flattened by the retargeted clips.
 	var candidates: Array = [[],[]]
+	var slab_candidates: Array = [[],[]]
 	for surface in mesh.mesh.get_surface_count():
 		var arrays := mesh.mesh.surface_get_arrays(surface)
 		var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
@@ -44,10 +86,34 @@ func bind(model: Node3D, level: int) -> void:
 		if vertices.is_empty() or joints.size()!=weights.size() or joints.size()!=vertices.size()*4:
 			continue
 		for v in vertices.size():
-			# Same metric sole band as the offline source retargeter.
-			if vertices[v].y > .065:
+			# Same metric sole band and slab rule as the offline retargeter.
+			var in_band := vertices[v].y <= .065
+			var plane_distance := INF
+			if not sole_planes.is_empty():
+				var x_side := 0 if vertices[v].x>0.0 else 1
+				var plane: Vector4 = sole_planes[x_side]
+				plane_distance=Vector3(plane.x,plane.y,plane.z).dot(vertices[v])+plane.w
+			var on_slab := plane_distance<=SOLE_CONTACT_BAND_M
+			if not in_band and not on_slab:
 				continue
+			# Classify by foot weight first; only foot vertices pay for the
+			# bind-space transforms below.
 			var side_weights := Vector2.ZERO
+			for slot in 4:
+				var k := v*4+slot
+				var index := joints[k]
+				if index<0 or index>=bone_ids.size() or weights[k]<=0.0:
+					continue
+				if foot_sides[index]==1: side_weights.x+=weights[k]
+				if foot_sides[index]==2: side_weights.y+=weights[k]
+			var side := 0 if side_weights.x>=.6 else (1 if side_weights.y>=.6 else -1)
+			if side<0:
+				continue
+			# The slab rule uses the plane of the vertex's own foot.
+			if on_slab and (side==0)!=(vertices[v].x>0.0):
+				on_slab=false
+			if not in_band and not on_slab:
+				continue
 			var ids := PackedInt32Array()
 			var local := PackedVector3Array()
 			var amounts := PackedFloat32Array()
@@ -57,40 +123,50 @@ func bind(model: Node3D, level: int) -> void:
 				var w := weights[k]
 				if index<0 or index>=bone_ids.size() or w<=0.0:
 					continue
-				if foot_sides[index]==1: side_weights.x+=w
-				if foot_sides[index]==2: side_weights.y+=w
 				ids.append(bone_ids[index])
 				local.append(binds[index]*vertices[v])
 				amounts.append(w)
-			var side := 0 if side_weights.x>=.6 else (1 if side_weights.y>=.6 else -1)
-			if side>=0 and ids.size()>0:
-				candidates[side].append({"y":vertices[v].y,"z":vertices[v].z,
-					"bones":ids,"local":local,"weights":amounts})
+			if ids.size()>0:
+				var value := {"y":vertices[v].y,"z":vertices[v].z,"d":plane_distance,
+					"bones":ids,"local":local,"weights":amounts}
+				if in_band:
+					candidates[side].append(value)
+				if on_slab:
+					slab_candidates[side].append(value)
 	for side in 2:
 		var foot: Array = candidates[side]
-		if foot.is_empty():
+		if foot.is_empty() and slab_candidates[side].is_empty():
 			samples.clear()
+			slab_sample_count=0
 			return
 		foot.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return float(a.y)<float(b.y))
-		# Include the lowest heel/forefoot samples independently; a dense
-		# heel patch must not hide the toe contact at push-off.
-		var minimum_z := INF
-		var maximum_z := -INF
-		for value: Dictionary in foot:
-			minimum_z=minf(minimum_z,float(value.z))
-			maximum_z=maxf(maximum_z,float(value.z))
-		var mid := (minimum_z+maximum_z)*.5
-		var counts := [0,0]
-		for value: Dictionary in foot:
-			var region := 0 if float(value.z)<mid else 1
-			if counts[region]<24:
-				samples.append(value)
-				counts[region]+=1
-	var report: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://assets/animations/accad_youth_motion.json"))
-	if report is Dictionary:
-		var lods: Array = report.get("lods",[])
-		if level>=0 and level<lods.size():
-			run_clearance=lods[level].get("clips",{}).get("run",{}).get("sole_clearance_curve_m",[])
+		_take_regions(foot)
+		# Most protruding slab/heel/toe-cap vertices first.
+		var slab: Array = slab_candidates[side]
+		slab.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return float(a.d)<float(b.d))
+		slab_sample_count+=_take_regions(slab)
+	if not lod_report.is_empty():
+		run_clearance=lod_report.get("clips",{}).get("run",{}).get("sole_clearance_curve_m",[])
+
+
+## Include the heel and forefoot halves independently; a dense heel patch
+## must not hide the toe contact at push-off. Returns the samples added.
+func _take_regions(foot: Array) -> int:
+	if foot.is_empty():
+		return 0
+	var minimum_z := INF
+	var maximum_z := -INF
+	for value: Dictionary in foot:
+		minimum_z=minf(minimum_z,float(value.z))
+		maximum_z=maxf(maximum_z,float(value.z))
+	var mid := (minimum_z+maximum_z)*.5
+	var counts := [0,0]
+	for value: Dictionary in foot:
+		var region := 0 if float(value.z)<mid else 1
+		if counts[region]<SAMPLES_PER_REGION:
+			samples.append(value)
+			counts[region]+=1
+	return counts[0]+counts[1]
 
 
 func clearance(action: String, phase: float) -> float:

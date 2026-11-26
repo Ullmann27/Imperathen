@@ -61,7 +61,7 @@ func _test_journey_persistence_and_effects() -> void:
 	_write(_path("before-abilities"), legacy)
 	var migrated = WorldModel.new()
 	_ok(migrated.load_game(_path("before-abilities")), "Load a v5 save that predates the ability record")
-	_check(migrated.data.schema_version == 5 and migrated.data.village.abilities.earned == ["ch1_look_before_force", "ch1_price_is_promise"], "Migration stays on schema v5 and restores proven abilities")
+	_check(migrated.data.schema_version == WorldModel.SCHEMA_VERSION and migrated.data.village.abilities.earned == ["ch1_look_before_force", "ch1_price_is_promise"], "Migration reaches the current schema and restores proven abilities")
 	var forged: Dictionary = resumed.data.duplicate(true)
 	forged.village.abilities.earned.append("ch1_unknown")
 	_write(_path("forged"), forged)
@@ -113,6 +113,10 @@ func _complete(model) -> bool:
 	var screenplay_actions := {"i02_basket":"basket_check", "i02_correct":"basket_correct", "i03_marcus":"marcus_friend",
 		"i07_water_fetch":"i07_water_fetch", "i07_water_bring":"i07_water_bring",
 		"i08_tracks":"i08_inspect", "i08_report":"i08_report"}
+	if stage.begins_with("i01_"):
+		# Screenplay v4 I-01 morning: first authored option at each real point.
+		_at(model, view.point)
+		return _ok(_action(model, str(view.actions[0].payload.action_id)), "I-01 morning " + stage)
 	if screenplay_actions.has(stage):
 		_at(model, view.point)
 		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):

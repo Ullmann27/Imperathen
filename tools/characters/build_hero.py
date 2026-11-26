@@ -24,6 +24,7 @@ from mathutils.kdtree import KDTree
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pack_hero_delivery import pack_blend_lossless, pack_hero_glb
+import ground_death_clip
 
 ART = ROOT / 'art/hero_quality'
 SRC = ART / 'source'
@@ -853,11 +854,16 @@ def export_lods():
             export_animations=True,export_morph=True,export_morph_animation=False,export_def_bones=False)
         death_keys=preserve_grounded_death_keys(path,bpy.data.objects['HeroRig'])
         delivery=pack_hero_glb(path) if level==0 else None
+        # The Blender fall above pins the heel; the shared post-export step then
+        # rolls the contacts with the least slip and grounds the crouch.
+        death_ground=ground_death_clip.ground(path)
+        gather_ground=ground_death_clip.ground(path,None,'gather')
         triangles=0;meshes=[]
         for obj in bpy.context.scene.objects:
             if obj.type=='MESH':
                 obj.data.calc_loop_triangles();n=len(obj.data.loop_triangles);triangles+=n;meshes.append({'name':obj.name,'triangles':n})
-        report.append({'lod':level,'triangles':triangles,'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'meshes':meshes,'texture_edge_max':texsize,'belt_fit':belt_fit,'grounded_death_translation_keys':death_keys,'lossless_delivery':delivery,
+        report.append({'lod':level,'triangles':triangles,'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'meshes':meshes,'texture_edge_max':texsize,'belt_fit':belt_fit,'grounded_death_translation_keys':death_keys,'lossless_delivery':delivery,'death_ground_contact':{key:death_ground[key] for key in ('before','after','maximum_floor_correction_m') if key in death_ground},
+                       'gather_ground_contact':{key:gather_ground[key] for key in ('before','after','unchanged') if key in gather_ground},
                        'death_export_clearance':{'maximum_m':DEATH_EXPORT_CLEARANCE_M,'curve':'sin(pi * normalized_time)^2','channel':'death/Pelvis/translation/Y','endpoint_position_delta_m':0,'interpolation':'LINEAR'}})
     return report
 

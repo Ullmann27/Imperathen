@@ -97,6 +97,37 @@ func _test_mesh(terrain: Node3D, position: Vector3) -> void:
 	_check(clockwise,"Godot clockwise front faces match upward normals")
 	_check(finite and height_correct,"All mesh vertices match finite global terrain heights")
 	_check(ground.material_override.vertex_color_use_as_albedo and ground.material_override.cull_mode == BaseMaterial3D.CULL_BACK,"Production material renders colored front faces")
+	# Vertex data is sRGB albedo in every renderer (a no-op in Compatibility,
+	# converted in Forward+/Mobile); a manual srgb_to_linear() would double it.
+	_check(ground.material_override.vertex_color_is_srgb,"Terrain material declares its vertex colours as sRGB")
+	var color_error := 0.0
+	for i in vertices.size():
+		var expected := Terrain.ground_color(vertices[i]+sector.position)
+		color_error = maxf(color_error,maxf(absf(colors[i].r-expected.r),maxf(absf(colors[i].g-expected.g),absf(colors[i].b-expected.b))))
+	_check(color_error <= 1.0/255.0,"Every terrain vertex carries the shared sRGB ground colour")
+	for pair: Array in [[Terrain.EARTH_DRY,Color("67704b")],[Terrain.EARTH_FRESH,Color("9b9868")],[Terrain.EARTH_STONE,Color("8c8877")]]:
+		var converted: Color = pair[1].srgb_to_linear()
+		_check(absf(pair[0].r-converted.r) < 1.0/255.0 and absf(pair[0].g-converted.g) < 1.0/255.0 and absf(pair[0].b-converted.b) < 1.0/255.0,"Terrain palette is the former palette taken through one sRGB-to-linear step")
+	# The static surface helper (used by grid-aligned scenery) reproduces the
+	# actual triangles, including the diagonal split.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 2027
+	var step := Plan.SECTOR_SIZE_M/float(Terrain.GRID)
+	var helper_error := 0.0
+	for sample in 300:
+		var local := Vector2(rng.randf_range(0.0,Plan.SECTOR_SIZE_M-.001),rng.randf_range(0.0,Plan.SECTOR_SIZE_M-.001))
+		var ix := floori(local.x/step)
+		var iz := floori(local.y/step)
+		var fx := local.x/step-ix
+		var fz := local.y/step-iz
+		var base := (iz*Terrain.GRID+ix)*6
+		var a: Vector3 = vertices[base]
+		var b: Vector3 = vertices[base+1]
+		var c: Vector3 = vertices[base+2]
+		var d: Vector3 = vertices[base+4]
+		var mesh_height := a.y+(b.y-a.y)*fx+(c.y-a.y)*fz if fx+fz <= 1.0 else d.y+(c.y-d.y)*(1.0-fx)+(b.y-d.y)*(1.0-fz)
+		helper_error = maxf(helper_error,absf(Terrain.surface_height(Vector2(sector.position.x+local.x,sector.position.z+local.y))-mesh_height))
+	_check(helper_error < .001,"Terrain.surface_height matches the generated triangles (%.6f m)" % helper_error)
 	_check(sector.has_node("GroundCollision"),"Player sector owns a real collision body")
 
 

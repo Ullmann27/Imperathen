@@ -24,7 +24,12 @@ var population = preload("res://scripts/world/village/village_population.gd").ne
 var regional = preload("res://scripts/world/regional_village.gd").new()
 var grove = Grove.new()
 var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
+var look = preload("res://scripts/rendering/village_look.gd").new()
 var opening_props = preload("res://scripts/world/village/opening_props.gd").new()
+## I-01 cups and jug follow the saved morning state (presentation only).
+## Created with the scene so worlds that never build it own no orphan node.
+const I01Props = preload("res://scripts/world/village/i01_props.gd")
+var i01_props: Node3D
 var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
@@ -47,6 +52,9 @@ const PLOT_MAX := Vector2(24, 13)
 var _state: Dictionary = {}
 var _materials: Dictionary = {}
 var _active := false
+## The Roman HUD names the context action itself (touch medallion caption or
+## desktop key prompt); the label above the boy then stays hidden.
+var hud_prompts := false
 var _running := false
 var _built := false
 var _mode := "person"
@@ -197,6 +205,8 @@ func sync_state(state: Dictionary) -> void:
 	_figure.configure_meshy_youth(true)
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_figure.set_service_gear(CombatActions.service_gear(state))
+	if is_instance_valid(i01_props):
+		i01_props.sync_state(state, _figure)
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -286,7 +296,7 @@ func set_active(active: bool) -> void:
 	if _preview != null:
 		_preview.visible = active and _build_mode and _mode == "city"
 	if _hint != null:
-		_hint.visible = active and _mode == "person"
+		_hint.visible = active and _mode == "person" and not hud_prompts
 	if _plot != null:
 		_plot.visible = active and _mode == "city"
 	if not active:
@@ -316,7 +326,10 @@ func get_cinematic_anchor(key: String) -> Vector3:
 				return to_global(Vector3(float(buildings[0].x), 0, float(buildings[0].z)))
 			return to_global(Vector3(14.5, 0, 4.5))
 		"training": return to_global(TRAINING_LOCATION)
-		_: return get_player_position()
+		_:
+			if key.begins_with("i01_"):
+				return I01Props.anchor(key)
+			return get_player_position()
 
 
 func get_cinematic_figure(actor_id: String) -> Node3D:
@@ -420,26 +433,9 @@ func get_quality_profile() -> String:
 func _apply_quality() -> void:
 	if _sun == null or not is_inside_tree():
 		return
-	var viewport := get_viewport()
 	# These are real Compatibility-renderer settings; simulation is untouched.
-	_sun.shadow_enabled = true
-	match _quality_profile:
-		"low":
-			viewport.msaa_3d = Viewport.MSAA_DISABLED
-			_sun.directional_shadow_max_distance = 24.0
-			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
-		"balanced":
-			viewport.msaa_3d = Viewport.MSAA_2X
-			_sun.directional_shadow_max_distance = 48.0
-			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
-		"high":
-			viewport.msaa_3d = Viewport.MSAA_4X
-			_sun.directional_shadow_max_distance = 85.0
-			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
-		"very_high":
-			viewport.msaa_3d = Viewport.MSAA_4X
-			_sun.directional_shadow_max_distance = 110.0
-			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
+	get_viewport().msaa_3d = {"low":Viewport.MSAA_DISABLED, "balanced":Viewport.MSAA_2X}.get(_quality_profile, Viewport.MSAA_4X)
+	look.apply_quality(_quality_profile)
 
 
 func set_touch_move(axis: Vector2) -> void:
@@ -463,7 +459,8 @@ func cue_unarmed(technique: String) -> void:
 
 
 func navigation_view() -> Dictionary:
-	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false}
+	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false,
+		"camera_yaw":snappedf(_camera_yaw,.01),"context":_hint.text if _hint != null and _active and _mode == "person" else ""}
 	if not Childhood.enabled(_state):
 		return result
 	var chapter:=Childhood.view(_state)
@@ -621,6 +618,8 @@ func _build_scene() -> void:
 	_create_terrain()
 	_create_village()
 	add_child(opening_props)
+	i01_props = I01Props.new()
+	add_child(i01_props)
 	_create_build_plot()
 	_buildings_root = Node3D.new()
 	_buildings_root.name = "PlayerBuildings"
@@ -660,34 +659,10 @@ func _build_scene() -> void:
 
 
 func _create_atmosphere() -> void:
-	var world_environment := WorldEnvironment.new()
-	var environment := _village_environment
-	environment.background_mode = Environment.BG_SKY
-	var sky := Sky.new()
-	sky.radiance_size = Sky.RADIANCE_SIZE_64
-	sky.sky_material = scenery.sky_material
-	environment.sky = sky
-	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color(0.69, 0.77, 0.85)
-	environment.ambient_light_energy = 0.58
-	environment.ambient_light_sky_contribution = 0.0
-	environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
-	environment.fog_enabled = true
-	environment.fog_sky_affect = 0.06
-	environment.fog_sun_scatter = 0.04
-	environment.fog_density = 0.0015
-	environment.fog_light_color = Color(0.63, 0.69, 0.66)
-	world_environment.environment = environment
-	add_child(world_environment)
-	var sun := DirectionalLight3D.new()
-	sun.name = "AfternoonSun"
-	sun.rotation_degrees = Vector3(-42, -28, 0)
-	sun.light_color = Color(1.0, 0.88, 0.69)
-	sun.light_energy = 0.46
-	sun.shadow_enabled = true
-	sun.directional_shadow_max_distance = 95.0
-	add_child(sun)
-	_sun = sun
+	# Sun, sky, haze, grade and interior light live in rendering/village_look.gd.
+	look.name = "VillageLook"
+	add_child(look)
+	_sun = look.setup(self, _village_environment, scenery.sky_material)
 
 
 func _create_terrain() -> void:
@@ -1562,7 +1537,9 @@ func _interact() -> void:
 		if raid.active and raid.rescue_available and not raid.rescued and point.distance_to(VillageLife.RESCUE_POINT) <= VillageLife.RANGE:
 			action_requested.emit("village_rescue", {})
 			return
-		var villager: String = village_life_world.nearest(_player.position)
+		var villager: String = _objective_villager()
+		if villager.is_empty():
+			villager = village_life_world.nearest(_player.position)
 		if not villager.is_empty():
 			action_requested.emit("village_npc", {"npc_id":villager})
 			return
@@ -1692,12 +1669,24 @@ func _place_building() -> void:
 	action_requested.emit("build", {"x": _preview_position.x, "z": _preview_position.z})
 
 
+## The person the current childhood objective names wins over a nearer
+## bystander when both are in reach (HB 3.0 S. 44: no accidental action).
+func _objective_villager() -> String:
+	if not Childhood.enabled(_state) or village_life_world == null:
+		return ""
+	var id := str(Childhood.current_step(_state).get("npc", ""))
+	if id.is_empty() or not village_life_world.actors.has(id) or not village_life_world.actors[id].visible:
+		return ""
+	return id if _horizontal_distance(_player.position, village_life_world.actor_position(id)) <= VillageLife.RANGE else ""
+
+
 func _update_context_hint() -> void:
 	if _hint == null or _player == null:
 		return
-	_hint.visible = _active and _mode == "person"
+	var showing := _active and _mode == "person"
+	_hint.visible = showing and not hud_prompts
 	_hint.text = ""
-	if not _hint.visible:
+	if not showing:
 		return
 	if Childhood.enabled(_state):
 		var at:=Vector2(_player.position.x,_player.position.z)
@@ -1708,6 +1697,10 @@ func _update_context_hint() -> void:
 		if at.distance_to(CombatActions.PRACTICE_POINT)<2.4:
 			_hint.text="Am Pfahl üben\nTechniken wählen"
 			return
+	var objective_villager := _objective_villager()
+	if not objective_villager.is_empty():
+		_hint.text = "Mit %s sprechen" % str(village_life_world.actors[objective_villager].get_meta("display_name", objective_villager))
+		return
 	if village_life_world != null:
 		var village_hint: String = village_life_world.hint(_player.position)
 		if not village_hint.is_empty():
@@ -1765,4 +1758,5 @@ func _apply_season(index: int) -> void:
 	_materials.earth.albedo_color = soil[index]
 	_materials.wheat.albedo_color = grain[index]
 	scenery.apply_season(index,_sun,_village_environment)
+	look.apply_season(index)
 	crops.visible = index != 3
