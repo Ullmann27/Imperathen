@@ -113,6 +113,18 @@ Beide Reihen sind **keine Aufnahmen des belebten Dorfs**. Die vollständige
 Spielszene und die Android-Prüf-APK werden im übergeordneten Durchgang geprüft.
 Es wird keine gemessene Android-Bildrate oder thermische Stabilität behauptet.
 
+## Individuelle Bewohner (Identitätsschicht)
+
+Die drei zivilen Exporte (`civilian_man`, `civilian_woman`, `elder`) erhalten
+nach dem Export zusätzlich die Identitätsschicht aus
+[`../village_characters/build_resident_identity.py`](../village_characters/build_resident_identity.py):
+Gesichts- und Körperformen als Morphs, Haar-, Bart- und Kleidungsteile,
+neutrales Leinen für echte Färbungen. `build_frontier_people.py` ruft diesen
+Schritt bei zivilen Exporten selbst auf. Die Bewohner wählen ihr Aussehen über
+`scripts/visuals/resident_identity.gd`; die frühere reine Farbvariation gilt
+nur noch als Rückfall. Einzelheiten in
+[`../village_characters/README.md`](../village_characters/README.md).
+
 ## Noch offene sichtbare Grenzen
 
 Haare und Kinnbart sind eine vereinfachte erste Ausarbeitung. Gesicht und Hände
