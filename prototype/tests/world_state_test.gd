@@ -17,6 +17,7 @@ const Seasons = preload("res://scripts/strategy/season_campaign.gd")
 const Atlas = preload("res://scripts/strategy/atlas_data.gd")
 const GameUi = preload("res://scripts/ui/game_ui.gd")
 const OpeningStory = preload("res://scripts/story/opening_story.gd")
+const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const FIXTURES := "res://tests/fixtures/mission_bridge_data/"
 const DAY := 86400
 var checks := 0
@@ -607,10 +608,25 @@ func _test_v5_migration() -> void:
 				continue
 			untouched = untouched and _same(model.data[key], payload[key])
 		for key: String in payload.village:
-			if key in ["behavior"]:
+			if key in ["behavior", "childhood"]:
 				continue
 			untouched = untouched and _same(model.data.village[key], payload.village[key])
+		var previous_child: Dictionary = payload.village.childhood
+		var child: Dictionary = model.data.village.childhood
+		for key: String in previous_child:
+			if key != "screenplay":
+				untouched = untouched and _same(child[key], previous_child[key])
+		# The screenplay migrations add mission fields. They do not change
+		# decisions the player already made in the recorded save.
+		for key: String in previous_child.screenplay:
+			if key != "version":
+				untouched = untouched and _same(child.screenplay[key], previous_child.screenplay[key])
 		_check(untouched, "%s: nothing the save had decided is changed" % name)
+		var previous_morning := I01.legacy_state()
+		var morning_preserved := true
+		for key: String in previous_morning:
+			morning_preserved = morning_preserved and _same(child.screenplay.get(key), previous_morning[key])
+		_check(morning_preserved, "%s: migrated morning has no invented choices or events" % name)
 		_check(model.data.tribes.scenario == "bc58_rhine" and int(model.data.tribes.tick) == 0 and model.tribes_pending_weeks() == floori((61 + day - 1) / 7.0), "%s: the Rhine roster starts and waits for the clock" % name)
 		model.finish_tribes()
 		var again := _path("v6_" + name.get_basename())
