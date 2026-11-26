@@ -12,6 +12,7 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const CompanionWorld = preload("res://scripts/world/companion_world.gd")
 const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
+const GearMarket = preload("res://scripts/domain/gear_market.gd")
 const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
 const CameraObstruction = preload("res://scripts/world/camera_obstruction.gd")
 var village_life_world: Node3D
@@ -197,6 +198,7 @@ func sync_state(state: Dictionary) -> void:
 	_figure.configure_meshy_youth(true)
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_figure.set_service_gear(CombatActions.service_gear(state))
+	_figure.set_market_gear(GearMarket.equipped_models(state))
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0

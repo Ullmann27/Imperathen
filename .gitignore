@@ -37,6 +37,14 @@ prototype/assets/meshy/equipment/*.png
 prototype/assets/meshy/equipment/*.png.import
 prototype/assets/meshy/equipment/*.jpg
 prototype/assets/meshy/equipment/*.jpg.import
+prototype/assets/meshy/mounts/*.png
+prototype/assets/meshy/mounts/*.png.import
+prototype/assets/meshy/mounts/*.jpg
+prototype/assets/meshy/mounts/*.jpg.import
+prototype/assets/meshy/props/*.png
+prototype/assets/meshy/props/*.png.import
+prototype/assets/meshy/props/*.jpg
+prototype/assets/meshy/props/*.jpg.import
 exports/
 *.blend1
 
