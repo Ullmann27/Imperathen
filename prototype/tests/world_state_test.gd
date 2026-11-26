@@ -335,7 +335,8 @@ func _test_time_causes() -> void:
 
 
 ## Plays the next authored childhood step the way village_childhood_test does.
-const SCREENPLAY_ACTIONS := {"i02_basket": "basket_check", "i02_correct": "basket_correct", "i03_marcus": "marcus_friend",
+const I03Support = preload("res://tests/i03_support.gd")
+const SCREENPLAY_ACTIONS := {"i02_basket": "basket_check", "i02_correct": "basket_correct",
 	"i07_water_fetch": "i07_water_fetch", "i07_water_bring": "i07_water_bring", "i08_tracks": "i08_inspect", "i08_report": "i08_report"}
 
 
@@ -353,6 +354,11 @@ func _play_step(model) -> bool:
 	var stage := str(view.get("stage", ""))
 	var point: Vector2 = view.point
 	model.set_player_position(Vector3(point.x, 1.0, point.y))
+	if stage.begins_with("i03_"):
+		return bool(I03Support.play_stage(model).ok)
+	if stage.begins_with("i01_") or stage.begins_with("i04_"):
+		var action_id: String = "i04_watch" if stage == "i04_work" else view.actions[0].payload.action_id
+		return bool(model.execute("village_childhood_action", {"action_id": action_id}).ok)
 	if SCREENPLAY_ACTIONS.has(stage):
 		if not str(view.get("target_npc", "")).is_empty():
 			_meet(model, str(view.target_npc))
