@@ -39,7 +39,8 @@ const COMMAND_FIELDS := {
 	"village_talk":["npc_id","choice"], "village_learn":["npc_id"], "village_ally":["npc_id"],
 	"village_scout":[], "village_alarm":[], "village_strike":["enemy_id"],
 	"village_block":[], "village_dodge":[], "village_rescue":[], "village_recover":[],
-	"village_childhood_action":["action_id"], "village_childhood_begin_raid":[]
+	"village_childhood_action":["action_id"], "village_childhood_begin_raid":[],
+	"village_investigation_question":["npc_id","topic"], "village_investigation_compare":["deduction_id"]
 }
 ## Historical anchors live with the world clock (WorldClock.history_frame):
 ## the era registry for the 58 BC campaign, own entries for 100 AD careers.

@@ -15,6 +15,7 @@ const CombatActions = preload("res://scripts/domain/combat_actions.gd")
 const Trade = preload("res://scripts/city_trade.gd")
 const TradeCatalog = preload("res://scripts/city_trade_catalog.gd")
 
+const RaidInvestigation = preload("res://scripts/story/raid_investigation.gd")
 const TABS := [["chronicle", "Chronik", "chronicle"], ["equipment", "Ausrüstung", "pouch"], ["abilities", "Fähigkeiten", "ability"], ["people", "Menschen", "family"]]
 const SLOT_NAMES := {"head": "Kopf", "body": "Körper", "belt": "Gürtel", "hand": "In der Hand", "weapon": "Waffe", "shield": "Schild"}
 
@@ -47,8 +48,14 @@ static func build(ui, state: Dictionary, tab: String) -> Dictionary:
 	titles.add_theme_constant_override("separation", 0)
 	header.add_child(titles)
 	titles.add_child(Style.kicker("DEIN LEBENSWEG", Style.TYPE_MICRO + 1))
+	var tabs := TABS.duplicate(true)
+	var case_view := RaidInvestigation.view(state)
+	if case_view.visible:
+		tabs.append(["investigation","Ermittlungen","chronicle"])
+	elif tab == "investigation":
+		tab = "chronicle"
 	var tab_title := "Chronik"
-	for entry: Array in TABS:
+	for entry: Array in tabs:
 		if entry[0] == tab:
 			tab_title = entry[1]
 	var heading := Style.label(tab_title, 28 if area.y >= 560 else 22, Style.AURUM_LIGHT, true, 2)
@@ -72,7 +79,7 @@ static func build(ui, state: Dictionary, tab: String) -> Dictionary:
 	rail.add_theme_constant_override("v_separation", 6)
 	layout.add_child(rail)
 	var active_tab: Button
-	for entry: Array in TABS:
+	for entry: Array in tabs:
 		var id: String = entry[0]
 		var button := Button.new()
 		button.text = entry[1]
@@ -105,6 +112,7 @@ static func build(ui, state: Dictionary, tab: String) -> Dictionary:
 		"equipment": _equipment(column, state, two_columns)
 		"abilities": _abilities(column, state, two_columns)
 		"people": _people(ui, column, state)
+		"investigation": _investigation(column, case_view)
 		_: _chronicle(ui, column, state)
 	Style.reveal(panel, reduce_motion, 0.0, Vector2.ZERO)
 	Style.reveal(column, reduce_motion, 0.08, Vector2.ZERO)
@@ -422,3 +430,21 @@ static func _people(ui, column: VBoxContainer, state: Dictionary) -> void:
 			bond.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			row.add_child(bond)
 	_text(column, "Vertrauen wächst durch gehaltene Zusagen und echte Hilfe. Es zeigt nur, was du selbst erlebt hast.", Style.TYPE_CAPTION + 1, Style.CHARTA_MUTED)
+
+
+static func _investigation(column: VBoxContainer, case_view: Dictionary) -> void:
+	var intro := _card(column, true)
+	intro.add_child(Style.kicker("ERMITTLUNGEN"))
+	_text(intro,str(case_view.title),Style.TYPE_TITLE)
+	_text(intro,"Beobachtungen und Aussagen bleiben getrennt. Vergleiche widersprüchliche Hinweise im Gespräch mit Decimus.",Style.TYPE_BODY,Style.CHARTA_MUTED)
+	for clue: Dictionary in case_view.clues:
+		var card := _card(column)
+		card.add_child(Style.kicker("HINWEIS · " + str(clue.reliability).to_upper()))
+		_text(card,str(clue.title),Style.TYPE_TITLE)
+		_text(card,str(clue.text))
+		_text(card,str(clue.source_label),Style.TYPE_CAPTION,Style.CHARTA_MUTED)
+	for conclusion: Dictionary in case_view.deductions:
+		var card := _card(column,true)
+		card.add_child(Style.kicker("SCHLUSSFOLGERUNG · " + str(conclusion.strength).to_upper()))
+		_text(card,str(conclusion.title),Style.TYPE_TITLE)
+		_text(card,str(conclusion.text))
