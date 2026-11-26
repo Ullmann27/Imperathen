@@ -116,8 +116,56 @@ func safe_actor_motion(from: Vector2, to: Vector2) -> Vector2:
 	query.margin = 0.015
 	query.collision_mask = 1 | 2 | PEOPLE_LAYER | CIVILIAN_LAYER
 	query.exclude = _bodies_at(from)
-	var result := world.get_world_3d().direct_space_state.cast_motion(query)
-	return from + Vector2(motion.x, motion.z) * maxf(0.0, float(result[0]) - 0.01) if result.size() == 2 else from
+	var space := world.get_world_3d().direct_space_state
+	var result := space.cast_motion(query)
+	if result.size() != 2:
+		return from
+	var safe := maxf(0.0, float(result[0]) - 0.01)
+	var reached := from + Vector2(motion.x, motion.z) * safe
+	if float(result[0]) >= 1.0:
+		return reached
+	# Raid rule tick: slide the blocked remainder along the contact plane and
+	# sweep that slide again, the same rule as VillageLifeWorld._slide_raider.
+	# A wall met head-on still stops; two people head-on pass on the right.
+	var remainder := motion * (1.0 - safe)
+	# Lifted 5 cm for the contact query only, so the ground is never taken
+	# for the blocking surface; walls and props are vertical at this height.
+	query.transform = Transform3D(Basis.IDENTITY, Vector3(reached.x, 0.97, reached.y))
+	query.motion = Vector3.ZERO
+	query.margin = 0.04
+	var contact := space.get_rest_info(query)
+	query.transform = Transform3D(Basis.IDENTITY, Vector3(reached.x, 0.92, reached.y))
+	if contact.is_empty():
+		return reached
+	var normal: Vector3 = contact.normal
+	normal.y = 0.0
+	if normal.length_squared() < 0.0001:
+		return reached
+	normal = normal.normalized()
+	if remainder.dot(normal) > 0.0:
+		normal = -normal
+	var slide := remainder - normal * remainder.dot(normal)
+	if _is_person(contact.rid) and slide.length() < remainder.length() * 0.35:
+		slide = Vector3(-motion.z, 0.0, motion.x).normalized() * remainder.length() * 0.5
+	if slide.length_squared() < 0.00000001:
+		return reached
+	query.margin = 0.015
+	query.motion = slide
+	var second := space.cast_motion(query)
+	if second.size() != 2:
+		return reached
+	return reached + Vector2(slide.x, slide.z) * maxf(0.0, float(second[0]) - 0.01)
+
+
+func _is_person(rid: RID) -> bool:
+	if not rid.is_valid():
+		return false
+	if PhysicsServer3D.body_get_collision_layer(rid) & (PEOPLE_LAYER | CIVILIAN_LAYER) != 0:
+		return true
+	for raider: CollisionObject3D in world.village_life_world.raiders.values():
+		if raider.get_rid() == rid:
+			return true
+	return false
 
 
 func sync_personal_space() -> void:

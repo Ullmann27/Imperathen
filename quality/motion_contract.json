@@ -514,7 +514,12 @@
       "required_checks": [
         "combat_model",
         "action_adapter",
-        "npc_behavior_world"
+        "npc_behavior_world",
+        "raid_route_world_a",
+        "raid_route_world_b",
+        "raid_route_world_c",
+        "raid_route_world_d",
+        "raid_strike_timing"
       ],
       "review_scope": [
         "world_displacement",
@@ -524,7 +529,7 @@
         "contact_and_weight"
       ],
       "open_requirements": [
-        "Continuous raid physics is implemented; full contact, collision, transition and visual acceptance remains open."
+        "Routed raid bodies, step-off, blows, flinch and guard are measured at 60 Hz. Open: the swing leg of the shared march gait travels up to 0.073 m per frame at the 1.2 m/s raid pace and the shared standing recovery step after a head-on stop up to 0.071 m (limit 0.06 m); exact-source visual acceptance."
       ]
     },
     {
@@ -668,6 +673,8 @@
     "scripts/cinematic/opening_director.gd",
     "scripts/domain/combat_actions.gd",
     "scripts/domain/npc_behavior.gd",
+    "scripts/domain/raid_route.gd",
+    "scripts/domain/raider_strike.gd",
     "scripts/domain/unarmed_combat.gd",
     "scripts/domain/village_economy.gd",
     "scripts/domain/world_model.gd",

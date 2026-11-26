@@ -14,6 +14,7 @@ const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
 const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
+const RaiderStrike := preload("res://scripts/domain/raider_strike.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
 const MESHY_YOUTH_PATH := "res://assets/characters/hero_meshy_italia_%d.glb"
 # ACCAD measured cycle distance, retargeted to the original 1.50 m youth.
@@ -24,6 +25,12 @@ const APPEARANCES := ["civilian_man", "civilian_woman", "elder", "legionary", "o
 const CLOTH_TINTS := [Color(1.0, 1.0, 1.0), Color(0.72, 0.90, 1.10), Color(1.10, 0.75, 0.60), Color(0.75, 1.05, 0.79), Color(1.15, 1.06, 0.76), Color(0.76, 0.73, 0.84)]
 const RESIDENT_HEIGHTS := [0.97, 1.03, 1.0, 0.95, 1.04, 0.99]
 const LOD_DISTANCES := [11.0,23.0,44.0]
+const ENEMY_CUE_BLENDS := {"block":0.32,"hit":0.18,"attack":0.12}
+const ENEMY_RECOVER_BLEND := 0.16
+const ENEMY_STEP_OFF_PHASE := 0.32
+const OVERLAY_FADE_FROM := deg_to_rad(120.0)
+const OVERLAY_FADE_TO := deg_to_rad(170.0)
+const OVERLAY_RATE := deg_to_rad(240.0)
 const CROWD_LOD_DISTANCES := [6.0,15.0,30.0]
 static var scenes := {}
 static var materials := {}
@@ -63,6 +70,11 @@ var meshy_asset_id := ""
 var _meshy_youth := false
 var _conversation_focused := false
 var _armed_style := ""
+## Retimed raider blow: the clip's measured contact frame is reached after
+## _strike_windup seconds, then the follow-through plays at its own speed.
+var _strike_windup := 0.0
+var _strike_contact := 0.0
+var _strike_elapsed := 0.0
 var _armed_sequence := 0
 var _service_gear := false
 var _service_nodes: Array[Node3D] = []
@@ -70,6 +82,10 @@ var _service_external := false
 var _motion_identity := ""
 var youth_ground_floor_y := INF
 var _youth_soles := YouthSoleContact.new()
+var _overlay_offsets: Array[Quaternion] = []
+var _overlay_rig := 0
+var _overlay_style := ""
+var _overlay_phase := 0.0
 
 
 func _ready() -> void:
@@ -479,6 +495,7 @@ func cue_combat(technique: String, duration: float) -> void:
 
 
 func cancel_action() -> void:
+	_strike_windup = 0.0
 	_service_external = false
 	_conversation_focused = false
 	_combat_id = ""
@@ -490,8 +507,38 @@ func cancel_action() -> void:
 	_play("idle", 0.0, 0.12)
 
 
+func strike_contact_seconds() -> float:
+	var length := animator.get_animation("attack").length if animator and animator.has_animation("attack") else 0.8
+	return RaiderStrike.clip_contact_seconds(active_model_path, length)
+
+
+func cue_strike(seconds_to_contact: float) -> float:
+	# Presentation of a domain-timed raider blow. The wind-up is stretched or
+	# compressed so the weapon's contact frame coincides with the rule tick
+	# that resolves the blow; the follow-through keeps the clip's own speed.
+	cue("attack")
+	if clip != "attack" or not animator or animator.current_animation == "" or not is_finite(seconds_to_contact) or seconds_to_contact <= 0.0:
+		return 0.0
+	var length := animator.current_animation_length
+	_strike_contact = clampf(strike_contact_seconds(), 0.05, length)
+	_strike_windup = seconds_to_contact
+	_strike_elapsed = 0.0
+	_remaining = _strike_windup+length-_strike_contact
+	return _strike_windup
+
+
+func strike_progress() -> Dictionary:
+	return {"active":_strike_windup > 0.0 and clip == "attack", "elapsed":_strike_elapsed, "windup":_strike_windup,
+		"contact":_strike_contact, "clip_time":animator.current_animation_position if animator and animator.current_animation != "" else 0.0}
+
+
+func _strike_clip_time(elapsed: float) -> float:
+	return RaiderStrike.clip_time(elapsed, _strike_windup, _strike_contact)
+
+
 func cue(action: String, preferred_style: String = "") -> void:
 	if action == "death" and clip == "death": return
+	_strike_windup = 0.0
 	_service_external = false
 	if action != "talk":
 		_conversation_focused = false
@@ -505,7 +552,7 @@ func cue(action: String, preferred_style: String = "") -> void:
 		_armed_sequence = (_armed_sequence + 1) % variants.size()
 	elif action == "block" and _can_armed_style("guard_front"):
 		_armed_style = preferred_style if preferred_style in CharacterMotion.SHIELD_GUARDS else "guard_front"
-	_play(action,0,0.12)
+	_play(action,0,_cue_blend(action))
 	_remaining = animator.current_animation_length if animator and animator.current_animation != "" else 0.8
 
 
@@ -559,7 +606,16 @@ func _sync_loaned_gear() -> void:
 		if is_instance_valid(node): node.visible = _loaned_gear
 
 
+func _cue_blend(action: String) -> float:
+	# The player's own guard answers at once. An attacker's guard and flinch
+	# cross the same distance in a time the eye can follow: measured at the
+	# 0.12 s default, his shield hand travelled 0.10 m and his forearm turned
+	# 20.6 degrees within single 60-Hz frames.
+	return float(ENEMY_CUE_BLENDS.get(action,0.12)) if role == "enemy" else 0.12
+
+
 func reset_motion() -> void:
+	_strike_windup = 0.0
 	_motion.reset_world_contacts()
 	_service_external = false
 	_conversation_focused = false
@@ -667,6 +723,8 @@ func sample_pose(action: String, normalized: float) -> void:
 
 
 func _play(action: String, normalized: float, blend: float) -> void:
+	if action != "attack":
+		_strike_windup = 0.0
 	_motion.capture_transition(blend if action != clip else 0.0)
 	clip = action
 	if action not in ["attack","train","block"]:
@@ -754,10 +812,39 @@ func _apply_imported_axe_pose() -> void:
 	if not _motion.armed_pose(_armed_style, phase, true):
 		return
 	const OVERLAY_WEIGHT := 0.15
-	for bone in rig.get_bone_count():
+	# Blow in progress on this rig: the overlay may only move as far as the
+	# clip time that has passed allows. A stateless sample (review, gallery,
+	# first frame of a blow, replacement rig) takes the overlay exactly.
+	var count := rig.get_bone_count()
+	var clip_seconds := (phase-_overlay_phase)*animation.length
+	var following := _overlay_rig == rig.get_instance_id() and _overlay_style == _armed_style and _overlay_offsets.size() == count and clip_seconds >= 0.0 and clip_seconds <= 0.1
+	var allowance := OVERLAY_RATE*clip_seconds
+	if not following:
+		_overlay_offsets.resize(count)
+	for bone in count:
 		rig.set_bone_pose_position(bone, base_positions[bone].lerp(rig.get_bone_pose_position(bone), OVERLAY_WEIGHT))
-		rig.set_bone_pose_rotation(bone, base_rotations[bone].slerp(rig.get_bone_pose_rotation(bone), OVERLAY_WEIGHT))
+		# A slerp takes the shorter arc. Where the imported and the overlay
+		# rotation pass 180 degrees apart, that arc flips sides between two
+		# frames and a fixed share of it throws the joint by up to 54 degrees
+		# (measured on the overhead blow). Fade the share out before the
+		# flip, so the overlay stays continuous through it.
+		var imported := base_rotations[bone]
+		var overlay := rig.get_bone_pose_rotation(bone)
+		var share := OVERLAY_WEIGHT*(1.0-smoothstep(OVERLAY_FADE_FROM,OVERLAY_FADE_TO,imported.angle_to(overlay)))
+		var offset := imported.inverse()*imported.slerp(overlay, share)
+		if following:
+			# The procedural target itself can turn a forearm over within one
+			# frame on this rig (shortest-arc aim past the rest axis). The
+			# share of it shown here follows at a bounded rate instead.
+			var shown: Quaternion = _overlay_offsets[bone]
+			var change := shown.angle_to(offset)
+			offset = shown.slerp(offset, minf(1.0, allowance/change)) if change > 0.00001 else shown
+		_overlay_offsets[bone] = offset
+		rig.set_bone_pose_rotation(bone, (imported*offset).normalized())
 		rig.set_bone_pose_scale(bone, base_scales[bone])
+	_overlay_rig = rig.get_instance_id()
+	_overlay_style = _armed_style
+	_overlay_phase = phase
 	rig.force_update_all_bone_transforms()
 
 
@@ -814,12 +901,21 @@ func _process(delta: float) -> void:
 			var next := _locomotion_clip()
 			if next != clip:
 				var carry_phase := phase if clip in ["march", "run"] and next in ["march", "run"] else 0.0
-				_play(next, carry_phase, 0.20 if _uses_youth_mocap() else 0.13)
+				if role == "enemy" and next in ["march", "run"] and clip not in ["march", "run"]:
+					# A standing man has both feet under him. Start the gait
+					# where the clip has one foot there in mid-stance and the
+					# other just lifted, not at a heel strike half a pace ahead
+					# that the planted foot then has to make up in one swing.
+					carry_phase = ENEMY_STEP_OFF_PHASE
+				_play(next, carry_phase, 0.20 if _uses_youth_mocap() else (ENEMY_RECOVER_BLEND if role == "enemy" and clip in ENEMY_CUE_BLENDS else 0.13))
 	if animator and animator.is_playing():
 		var advance := delta
 		if clip in ["march","run"]:
 			var stride := locomotion_stride(clip)
 			advance *= speed * animator.current_animation_length / stride
+		elif clip == "attack" and _strike_windup > 0.0:
+			advance = _strike_clip_time(_strike_elapsed+delta)-_strike_clip_time(_strike_elapsed)
+			_strike_elapsed += delta
 		animator.advance(advance)
 		if animator.current_animation != "":
 			phase = animator.current_animation_position / animator.current_animation_length
