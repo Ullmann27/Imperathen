@@ -3,7 +3,7 @@
   "version": 1,
   "authority": "read-only city signage and site survey; NOT active commerce",
   "source": "tools/world/build_roman_test_city.py",
-  "source_blob_sha": "1488bd78eff352187dac65cf5b6b10987234dec1",
+  "source_blob_sha": "22bb27b0dbe2182867ff37b57fa40e072144cbe0",
   "city_generator_formula": "market n=0..62; x=-385+n*770/62; Blender y=-47 maps to Godot z=47; n%7 kind, (n//7)%3 construction, n//21 size; only a stand whose site lies on a main street (n=23, Market_24) takes the next row site x=-385+63*770/62",
   "trading_contract": "prototype/scripts/city_trade_catalog.gd on feature/city-detail-commerce-support-20261125",
   "authoritative_commerce_enabled": false,

@@ -16,6 +16,7 @@ on:
       - 'tools/check_prototype.py'
       - 'tests/android_package_isolation_test.py'
       - 'tests/roman_city_layout_test.py'
+      - 'tests/city_collision_match_test.py'
       - '.github/workflows/fold7-city-apk.yml'
 
 permissions:
@@ -75,6 +76,13 @@ jobs:
           cp "$RUNNER_TEMP/city-export/roman_city_collision.glb" prototype/assets/world/roman_city_collision.glb
           cp "$RUNNER_TEMP/city-export/city_manifest.json" prototype/assets/world/roman_city_manifest.json
           sha256sum prototype/assets/world/roman_city_test.glb prototype/assets/world/roman_city_collision.glb > artifacts/city/city-sha256.txt
+          # Exported bytes: everything visible at body height has a collider and
+          # no collider is invisible (stalls, props, trees, kerbs, colonnades).
+          python3 tools/world/check_city_collision_match.py \
+            --city prototype/assets/world/roman_city_test.glb \
+            --collision prototype/assets/world/roman_city_collision.glb \
+            --output artifacts/city/collision-match.json | tee artifacts/city/collision-match.log
+          grep -q CITY_COLLISION_MATCH_PASS artifacts/city/collision-match.log
       - name: Import the original private Meshy temple if secure URL is available
         shell: bash
         run: |
@@ -176,6 +184,10 @@ jobs:
             --script res://tests/roman_city_portico_walk_test.gd \
             2>&1 | tee artifacts/city/portico-walk.log
           grep -q ROMAN_CITY_PORTICO_WALK_PASS artifacts/city/portico-walk.log
+          "$GODOT_BIN" --headless --path prototype --fixed-fps 60 \
+            --script res://tests/roman_city_routes_test.gd \
+            2>&1 | tee artifacts/city/routes.log
+          grep -q ROMAN_CITY_ROUTES_PASS artifacts/city/routes.log
           # Release acceptance remains mandatory; source-specific proofs above are
           # collected first so a known global motion failure cannot hide them.
           python3 tools/motion_quality_gate.py --evidence artifacts/engine-checks

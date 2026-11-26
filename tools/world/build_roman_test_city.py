@@ -141,6 +141,17 @@ class Mesh:
         for f in [(0,3,2,1),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7),(4,5,6,7)]:
             self.face([p[i] for i in f],mat)
 
+    def solid_box(self,center,size,angle=0):
+        """Collider-only box: one simple body for a group of small visible parts."""
+        cx,cy,cz=center; sx,sy,sz=[v*.5 for v in size]
+        c,s=math.cos(angle),math.sin(angle)
+        p=[(cx+x*c-y*s,cy+x*s+y*c,cz+z) for x,y,z in
+           [(-sx,-sy,-sz),(sx,-sy,-sz),(sx,sy,-sz),(-sx,sy,-sz),
+            (-sx,-sy,sz),(sx,-sy,sz),(sx,sy,sz),(-sx,sy,sz)]]
+        for f in [(0,3,2,1),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7),(4,5,6,7)]:
+            offset=len(self.cv); self.cv.extend(p[i] for i in f)
+            self.cf.append(tuple(range(offset,offset+4)))
+
     def cylinder(self,center,radius,depth,mat,sides=12,r_top=None):
         cx,cy,cz=center
         rt=radius if r_top is None else r_top
@@ -297,6 +308,7 @@ OBSTACLE_CELL=16.0
 # Buildings and walls are solid over their whole bounding box. Placed props are
 # validated (and then registered) per 1 m height band, so a tree canopy may
 # hang over a 0.8 m plot wall or a market awning but never into a building.
+KERB_TOP=.22
 SOLID_CATEGORIES={'residential','craft_shop','civic','baths','portico','fountain','city_wall','gate','aqueduct'}
 PROP_CATEGORIES={'market_stall','street_detail','vegetation'}
 CITY_INTERIOR=(-408.75,-318.75,408.75,318.75)  # inner faces of the 2.5 m thick city wall
@@ -532,6 +544,7 @@ def house(kind,variant):
         for x in (-9.3,9.3):m.roof(x,0,8.0,31,4.7,2,True)
         for y in (-11.9,11.9):m.roof(0,y,12,7.5,4.7,1.8)
         for x in (-5.2,5.2):m.box((x,0,3.7),(.55,19,.24),STONE)
+        m.physical=True   # raised garden beds are solid
         for y in (-6.4,6.4):m.box((0,y,.35),(5.4,2,.35),GARDEN)
     elif kind=='artisan':
         w,d,h=13.5,16,6.8; outer_walls(m,w,d,h,wall,2,2.6)
@@ -548,6 +561,7 @@ def house(kind,variant):
             m.box((x,-9,4.65),(.15,2,.15),WOOD)
         m.roof(0,0,14.5,17,6.9,3.1)
         m.box((4.5,3.7,8.4),(1.2,1.1,3.9),BRICK)
+        m.physical=True   # the two shop counters are solid
         for x in (-4.3,4.3):
             m.box((x,-6.8,.95),(3.3,1.3,.18),WOOD)
             for dx in (-1.2,1.2):m.box((x+dx,-6.8,.45),(.15,1,.9),WOOD)
@@ -575,29 +589,38 @@ def house(kind,variant):
         for y in (-10,-5,0,5):m.column(-4.6,y,.12,4,.24,1)
         m.physical=False
         m.box((-4.6,-2.5,4.22),(.6,20,.26),STONE)
+        m.physical=True   # garden terrace, basin block and the four large pots are solid
         m.box((4,-2,.28),(11.5,15,.3),GARDEN)
         m.box((4,-2,.48),(4,7,.23),MARBLE)
+        m.physical=False
         m.box((4,-2,.61),(3.5,6.5,.04),WATER)
+        m.physical=True
         for x in (0,8):
             for y in (-7,3):m.cylinder((x,y,.65),.8,1.1,CLAY,10,r_top=.9)
     return m
 
 
 def stall(kind,construction):
+    # A stall is solid where it looks solid: posts, back panel, barrels and one
+    # body for the counter with the goods on it. Awnings stay above head height.
     m=Mesh('stall_%d_%d'%(kind,construction),False)
+    m.physical=True
     for x in (-1.85,1.85):
         for y in (-1.45,1.45):m.box((x,y,1.45),(.15,.15,2.9),WOOD)
+    m.physical=False
     for y in (-1.45,1.45):m.box((0,y,2.85),(4,.16,.2),WOOD)
     if construction==0:
         m.face([(-2.3,-1.8,2.65),(2.3,-1.8,2.65),(2.3,0,3.25),(-2.3,0,3.25)],CLOTH)
         m.face([(-2.3,0,3.25),(2.3,0,3.25),(2.3,1.8,2.65),(-2.3,1.8,2.65)],RED if kind%2 else OCHRE)
     elif construction==1:
         m.roof(0,0,4.6,3.8,2.9,.8)
-        m.box((0,1.48,1),(4,.12,2),WOOD)
+        m.physical=True;m.box((0,1.48,1),(4,.12,2),WOOD);m.physical=False
     else:
         for i in range(15):m.beam((-2.1+i*.3,-1.8,2.85),(-2.1+i*.3,1.8,3.15),.11,WOOD,5)
+        m.physical=True
         for x in (-1.3,1.3):
             for y in (-1.25,1.25):m.cylinder((x,y,.5),.47,.22,WOOD,12)
+        m.physical=False
     m.box((0,-.45,1),(3.6,1.4,.18),WOOD)
     for x in (-1.5,1.5):
         for y in (-1,.1):m.box((x,y,.49),(.13,.13,.98),WOOD)
@@ -618,19 +641,27 @@ def stall(kind,construction):
             for side in (-1,1):m.beam((x+side*.14,y,1.7),(x+side*.32,y,1.48),.035,CLAY)
     elif kind==4:
         for n in range(5):m.box((-1.45+n*.7,-.6,1.3),(.6,1.3,.22),[CLOTH,RED,OCHRE,LEAF,PLASTER][n])
+        m.physical=True
         for x in (-1.3,0,1.3):m.box((x,1.35,1.9),(.75,.05,1.6),RED if x else CLOTH)
+        m.physical=False
     elif kind==5:
         for n in range(6):
             x=-1.4+n*.55
             m.beam((x,-.85,1.17),(x,.05,1.17),.035,BRONZE)
             m.box((x,-.72,1.21),(.3,.1,.06),BRONZE)
+        m.physical=True
         m.box((1.25,.7,.8),(.6,.55,1.5),STONE)
         m.box((1.25,.7,1.62),(.9,.42,.2),BRONZE)
+        m.physical=False
     else:
         for n in range(10):
             x=-1.45+(n%5)*.72;y=-.8+(n//5)*.6
             m.cylinder((x,y,1.22),.25,.18,WOOD,10,r_top=.3)
             m.cylinder((x,y,1.35),.23,.12,[RED,OCHRE,GARDEN,CLOTH][n%4],10,r_top=0)
+    # Counter, legs and goods as one body up to the top of the goods (at most
+    # head height), so nobody walks through the table or reaches into the wares.
+    top=min(1.5,max(z for x,y,z in m.v if abs(x)<=1.85 and -1.2<=y<=.3 and z<2.4))
+    m.solid_box((0,-.45,top*.5),(3.6,1.4,top))
     return m
 
 
@@ -689,7 +720,9 @@ def baths():
     for x in (-33,33):
         m.box((x,0,7),(8,58,.35),STONE);m.roof(x,0,9,59,7.3,2.4,True)
     for y in (18,32):
+        m.physical=True   # the pool colonnade is solid
         for x in range(-20,21,5):m.column(x,y,.5,6.5,.38,2)
+        m.physical=False
         m.box((0,y,7.1),(44,.8,.35),STONE)
     return m
 
@@ -714,33 +747,48 @@ def portico():
 def craft_shop(kind):
     m=Mesh('craft_shop_'+str(kind));outer_walls(m,11.5,10,3.7,[OCHRE,RED,PLASTER][kind],3.4,2.7)
     m.roof(0,0,12.5,11,3.8,2)
-    m.physical=False
+    # Awning posts, the counter, ovens, mills, forge and furniture are solid;
+    # cloth, domes above head height, handles and small wares stay visual only.
     for x in (-4.8,4.8):m.box((x,-7.6,1.55),(.14,.14,3.1),WOOD)
+    m.physical=False
     m.face([(-5,-5.3,3.35),(5,-5.3,3.35),(5,-7.9,2.9),(-5,-7.9,2.9)],CLOTH)
+    m.physical=True
     m.box((3.5,-3.8,.95),(3,1.3,.2),WOOD)
+    m.solid_box((3.5,-3.8,.425),(3,1.3,.85))
     if kind==0:
         m.cylinder((0,2,.65),1.65,1.3,BRICK,18)
         dome(m,0,2,1.3,1.65,1.55,BRICK,24,8)
+        m.physical=False
         m.arch(0,.48,.85,.85,1.15,.3,pier=.18,segments=8)
         m.box((0,.43,1.25),(.7,.08,.7),DARK)
         m.box((.4,2.4,3.4),(.7,.7,2.7),BRICK)
         for x in (-3,3):
+            m.physical=True
             m.cylinder((x,2,.5),.65,1,STONE)
             m.cylinder((x,2,1.2),.76,.4,STONE,r_top=.58)
+            m.physical=False
             m.beam((x,2,1.5),(x+1.1,2,1.5),.065,WOOD)
         for n in range(8):m.cylinder((2.3+(n%4)*.7,-4+(n//4)*.5,1.17),.25,.2,OCHRE,10,r_top=.2)
     elif kind==1:
         m.box((0,3.5,.7),(2.9,2,1.4),BRICK);m.box((0,3.5,1.47),(2.4,1.5,.18),DARK)
+        m.physical=False
         m.box((0,3.8,2.6),(2.2,1.5,.45),BRONZE);m.box((0,4.1,4.2),(.85,.85,3.1),BRICK)
+        m.physical=True
         m.cylinder((-2,-1,.5),.48,1,WOOD,9)
         m.box((-2,-1,1.2),(1.15,.5,.35),BRONZE)
+        m.physical=False
         m.beam((-2,-1,1.2),(-.9,-1,1.2),.14,BRONZE)
         for n in range(5):m.beam((3.3+n*.2,2,0),(3.3+n*.2,2,2.1),.045,BRONZE)
+        # The rack of iron bars leaning on the wall as one body.
+        m.solid_box((3.7,2,1.05),(1.0,.3,2.1))
     else:
         for x in (-4.8,4.8):
             for z in (.65,1.5,2.35):
                 m.box((x,1.5,z),(1.1,5.5,.15),WOOD)
                 for n in range(5):m.cylinder((x,-.5+n,z+.34),.22,.5,CLAY,9,r_top=.15)
+            # Shelves with their vessels as one body per wall.
+            m.solid_box((x,1.5,1.5),(1.1,5.5,3.0))
+    m.physical=True
     return m
 
 
@@ -760,39 +808,53 @@ def canopy(m,cx,cy,cz,rx,ry,rz,phase=0):
 
 
 def clutter(kind):
+    # Vessels, crates, barrels, planters and benches are solid bodies; handles,
+    # hoops and the small tree crown stay visual only.
     m=Mesh('street_clutter_'+str(kind),False)
     if kind==0:
         for i in range(3):
             x=-1.0+i*.65
+            m.physical=True
             m.cylinder((x,0,.44),.25,.72,CLAY,10,r_top=.15)
             m.cylinder((x,0,.87),.09,.16,CLAY,10)
+            m.physical=False
             m.beam((x+.12,0,.8),(x+.29,0,.58),.035,CLAY)
-        m.box((.85,.2,.35),(.8,.7,.7),WOOD)
+        m.physical=True;m.box((.85,.2,.35),(.8,.7,.7),WOOD);m.physical=False
         for z in (.12,.55):m.box((.85,-.16,z),(.9,.08,.08),BRONZE)
     elif kind==1:
+        m.physical=True
         m.cylinder((0,0,.4),.65,.8,CLAY,12,r_top=.78)
+        m.physical=False
         m.cylinder((0,0,.83),.69,.08,GARDEN,12)
-        m.beam((0,0,.8),(.1,0,2.5),.10,WOOD,7)
+        m.physical=True;m.beam((0,0,.8),(.1,0,2.5),.10,WOOD,7);m.physical=False
         canopy(m,.1,0,2.6,1.0,.8,1.15,.4)
         for x in (-1.4,1.35):
-            m.cylinder((x,.1,.48),.35,.9,WOOD,12,r_top=.32)
+            m.physical=True;m.cylinder((x,.1,.48),.35,.9,WOOD,12,r_top=.32);m.physical=False
             for z in (.15,.78):m.cylinder((x,.1,z),.36,.055,BRONZE,12)
     else:
+        m.physical=True
         for x in (-1,1):m.box((x,0,.35),(.25,.55,.7),STONE)
         m.box((0,0,.77),(2.7,.7,.2),MARBLE)
         m.box((1.8,.1,.38),(.6,.6,.75),WOOD)
+        m.physical=False
         for i in range(4):m.cylinder((1.8,.1,.86+i*.14),.28,.12,OCHRE,10,r_top=.24)
+        # The stacked bowls on the crate as one body.
+        m.solid_box((1.8,.1,1.045),(.5,.5,.59))
     return m
 
 
 def tree(pine=False):
     m=Mesh('pine' if pine else 'cypress',False)
+    # Trunks are solid. A cypress is dense down to knee height, so its lowest
+    # foliage cone is solid as well; pine crowns start far above head height.
     if not pine:
+        m.physical=True
         m.cylinder((0,0,2.2),.21,4.4,WOOD,7,r_top=.12)
         for z,r,h in [(3.6,1.45,4.5),(5,1.2,4.7),(6.5,.85,4.2),(7.8,.5,3.1)]:
             m.cylinder((0,0,z),r,h,LEAF,10,r_top=.06)
+            m.physical=False
     else:
-        m.beam((0,0,0),(.45,0,7.5),.35,WOOD,8)
+        m.physical=True;m.beam((0,0,0),(.45,0,7.5),.35,WOOD,8);m.physical=False
         for i in range(7):
             a=i*TAU/7;end=(math.cos(a)*3.5,math.sin(a)*3.5,9+(i%2)*.8)
             m.beam((.3,0,5.2),end,.17,WOOD)
@@ -826,9 +888,10 @@ def amphitheatre():
                 tangent=math.atan2(ry*math.cos(a),-rx*math.sin(a))
                 seg=math.hypot(rx*math.sin(a),ry*math.cos(a))*TAU/80
                 m.arch(rx*math.cos(a),ry*math.sin(a),base,seg-1.65,10.5,2.4,pier=.8,angle=tangent)
-                m.physical=False
+                # Ground-tier engaged columns are solid like their arcade.
                 edge=n*TAU/80
                 m.column((rx+.9)*math.cos(edge),(ry+.9)*math.sin(edge),base+.25,10.1,.52,tier)
+                m.physical=False
                 m.box((rx*math.cos(a),ry*math.sin(a),base+11.8),(seg+.1,3.1,.7),STONE,tangent)
                 m.physical=(tier==0)
         m.physical=False
@@ -939,8 +1002,13 @@ def ground():
     m=SurfaceTiles('Main_Streets','Main_Streets')
     m.box((0,-65,.055),(835,14,.11),PAVING)
     m.box((-100,0,.055),(13,655,.11),PAVING)
-    m.physical=False
-    for y in (-72.4,-57.6):m.box((0,y,.16),(815,.65,.32),STONE)
+    # Kerbs are solid and low enough to step onto from either side (0.22 m
+    # above the ground, 0.11 m above the paving; the player step limit is
+    # 0.25 m). They used to be 0.32 m visual-only boxes that feet sank into,
+    # and ran straight across the north-south street.
+    for y in (-72.4,-57.6):
+        for x0,x1 in ((-407.5,-106.5),(-93.5,407.5)):
+            m.box(((x0+x1)*.5,y,KERB_TOP*.5),(x1-x0,.65,KERB_TOP),STONE)
     m.place('streets','road')
     # Nothing but people may stand in the two 14/13 m main streets.
     add_obstacle('Main_Streets_east_west','main_street',plan_rect(-417.5,-72.725,417.5,-57.275,0,4))
