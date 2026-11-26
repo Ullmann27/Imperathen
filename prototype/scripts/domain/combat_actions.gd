@@ -20,6 +20,7 @@ const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const CityTrade = preload("res://scripts/city_trade.gd")
 const DODGE_SECONDS := 0.65
 const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
+const Damage = preload("res://scripts/domain/melee/melee_damage.gd")
 ## TrainingGround post collision cylinder (game_world.gd): radius 0.16, 2 m.
 const PRACTICE_RADIUS := 0.16
 const PRACTICE_HEIGHT := 2.0
@@ -196,7 +197,7 @@ static func advance(data: Dictionary, delta: float, sight_check: Callable = Call
 				event.practice = true
 			elif apply_hit.is_valid():
 				combat.resolved = true
-				var accepted: Variant = apply_hit.call(data, combat.target_id, int(spec.damage) + CityTrade.damage_bonus(data, is_armed(str(combat.technique))))
+				var accepted: Variant = apply_hit.call(data, combat.target_id, hit_damage(data, combat.technique, frame))
 				if typeof(accepted) == TYPE_BOOL and accepted:
 					combat.resolved_hits = mini(1000000, int(combat.resolved_hits) + 1)
 					event.hit = true
@@ -239,6 +240,18 @@ static func phase(id: String, elapsed: float) -> String:
 	if frame <= int(timing.end):
 		return "active"
 	return "recovery"
+
+
+## Damage through the single D-042 formula (melee_damage.gd). The legacy
+## raid/encounter targets carry no armour or hit-zone model yet, so those
+## terms stay neutral here; learned combat skill is competence and issued
+## equipment is quality (separate sources, no double bonus).
+static func hit_damage(data: Dictionary, technique: String, contact_frame: int) -> int:
+	var base := float(TECHNIQUES[technique].damage)
+	var learned := float(CityTrade.damage_bonus(data, false))
+	var equipped := float(CityTrade.damage_bonus(data, is_armed(technique))) - learned
+	return int(Damage.compute({"weapon_base":base, "competence":1.0 + learned / base, "quality":1.0 + equipped / base,
+		"zone":"neutral", "armor":"none", "contact_frame":contact_frame, "roll":0.5}).damage)
 
 
 ## Measured phase boundaries (clip frames at 60 Hz) of a technique.

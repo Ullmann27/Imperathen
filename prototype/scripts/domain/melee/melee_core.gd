@@ -15,6 +15,7 @@ extends RefCounted
 const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
 const Geo = preload("res://scripts/domain/melee/melee_geometry.gd")
 const Actions = preload("res://scripts/domain/combat_actions.gd")
+const Damage = preload("res://scripts/domain/melee/melee_damage.gd")
 
 const VERSION := 1
 const FPS := 60
@@ -22,14 +23,9 @@ const DT := 1.0 / 60.0
 ## Engineering estimates (not measured): effective striking mass including
 ## the driving arm/leg segment, kg.
 const EFFECTIVE_MASS := {"fist":1.2, "foot":3.0, "head":4.0, "gladius":1.8, "axe":2.4, "spear":2.2}
-const BASE_DAMAGE := {"fist":6.0, "foot":11.0, "head":7.0, "gladius":16.0, "axe":20.0, "spear":18.0}
 const FAMILY_COST := {"fist":8.0, "foot":15.0, "head":12.0, "gladius":15.0, "axe":19.0, "spear":16.0}
 const WEAPON_MATERIAL := {"fist":"flesh", "foot":"leather", "head":"flesh", "gladius":"iron", "axe":"iron", "spear":"iron"}
 const ARMOR_MATERIAL := {"mail":"iron", "wool_leather":"leather", "linen":"cloth", "none":"flesh"}
-## Fraction of damage passing the armour, by strike kind.
-const ARMOR := {"mail":{"cut":0.45, "thrust":0.70, "blunt":0.80}, "wool_leather":{"cut":0.75, "thrust":0.85, "blunt":0.90},
-	"linen":{"cut":0.90, "thrust":0.95, "blunt":1.0}, "none":{"cut":1.0, "thrust":1.0, "blunt":1.0}}
-const ZONE_DAMAGE := {"head":1.5, "torso":1.0, "arm_weapon":0.7, "arm_shield":0.7, "leg":0.8}
 const PARRY_WINDOW := 0.20
 const GUARD_MIN_STAMINA := 5.0
 const DODGE_COST := 16.0
@@ -60,7 +56,8 @@ static func new_state(seed: int) -> Dictionary:
 	return {"version":VERSION, "seed":seed, "frame":0, "accumulator":0.0, "rng":0, "fighters":{}}
 
 
-## options: team, x, z, yaw, scale, health, armor, morale, stamina.
+## options: team, x, z, yaw, scale, health, armor, morale, stamina,
+## quality (equipment) and competence (training) for the D-042 formula.
 static func add_fighter(state: Dictionary, id: String, kit_id: String, options: Dictionary = {}) -> String:
 	var kit := Tracks.kit(kit_id)
 	if kit.is_empty():
@@ -75,6 +72,7 @@ static func add_fighter(state: Dictionary, id: String, kit_id: String, options: 
 		"scale":scale, "radius":float(kit.radius) * scale, "height":float(kit.height) * scale,
 		"mass":float(kit.mass_kg) * pow(scale, 3.0), "armor":str(options.get("armor", kit.armor)),
 		"has_shield":typeof(shield) == TYPE_DICTIONARY, "shield_integrity":1.0,
+		"quality":float(options.get("quality", 1.0)), "competence":float(options.get("competence", 1.0)), "weapon_wear":0.0,
 		"health":float(options.get("health", 100.0)), "max_health":float(options.get("health", 100.0)),
 		"stamina":float(options.get("stamina", STAMINA_LIMIT)), "fatigue":0.0,
 		"morale":float(options.get("morale", 70.0)), "morale_state":"steady",
@@ -518,6 +516,7 @@ static func _resolve_block(state: Dictionary, f: Dictionary, d: Dictionary, ener
 	event.stamina_cost = snappedf(cost, 0.01)
 	f.hitstop = HITSTOP_BLOCK
 	f.recoil = [-push.x, -push.z]
+	f.weapon_wear = minf(1.0, float(f.weapon_wear) + energy / 6000.0)
 	d.shield_integrity = maxf(0.0, float(d.shield_integrity) - energy / 1500.0)
 	event.shield_integrity = snappedf(float(d.shield_integrity), 0.0001)
 	if float(d.stamina) + 0.000001 < cost:
@@ -558,15 +557,15 @@ static func _resolve_hit(state: Dictionary, f: Dictionary, d: Dictionary, m: Dic
 		zone = "arm_weapon" if local.x > 0.0 else "arm_shield"
 	var kind := "thrust" if family == "spear" or str(f.move) == "thrust" else ("cut" if family in ["gladius", "axe"] else "blunt")
 	var reference := 0.5 * float(EFFECTIVE_MASS[family]) * pow(float(m.window_top_speed), 2.0)
-	var drive := clampf(sqrt(energy / maxf(0.01, reference)), 0.3, 1.3)
 	var armor := "none" if zone == "head" else str(d.armor)
-	var weapon_factor := 1.0
-	for injury: Dictionary in f.injuries:
-		if injury.kind == "arm_wound":
-			weapon_factor *= 0.75
-	var variance := lerpf(0.92, 1.08, _roll(state, "damage:%s:%s" % [f.id, d.id]))
-	var damage := float(BASE_DAMAGE[family]) * drive * float(ZONE_DAMAGE[zone]) * float(ARMOR[armor][kind]) * weapon_factor * variance
-	damage = maxf(1.0, roundf(damage))
+	# The one per-hit formula (D-042); this frame is the measured contact.
+	var result := Damage.compute({"family":family, "quality":float(f.quality), "competence":float(f.competence),
+		"zone":zone, "armor":armor, "strike_kind":kind, "attacker_stamina":float(f.stamina) / STAMINA_LIMIT,
+		"injuries":f.injuries, "weapon_wear":float(f.weapon_wear), "contact_drive":sqrt(energy / maxf(0.01, reference)),
+		"contact_frame":int(c.clip_frame), "roll":_roll(state, "damage:%s:%s" % [f.id, d.id])})
+	var damage := float(result.damage)
+	if armor == "mail":
+		f.weapon_wear = minf(1.0, float(f.weapon_wear) + energy / 12000.0)
 	d.health = maxf(0.0, float(d.health) - damage)
 	f.hitstop = HITSTOP_BODY
 	f.recoil = [-push.x, -push.z]
@@ -577,6 +576,7 @@ static func _resolve_hit(state: Dictionary, f: Dictionary, d: Dictionary, m: Dic
 	event.zone = zone
 	event.strike_kind = kind
 	event.damage = int(damage)
+	event.damage_terms = result.terms
 	event.surface_material = ARMOR_MATERIAL[armor]
 	event.health_after = snappedf(float(d.health), 0.01)
 	# Reaction from impulse versus the defender's poise (mass, stance, state).

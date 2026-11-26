@@ -5,6 +5,7 @@ const Core = preload("res://scripts/domain/melee/melee_core.gd")
 const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
 const Geo = preload("res://scripts/domain/melee/melee_geometry.gd")
 const AI = preload("res://scripts/domain/melee/melee_ai.gd")
+const Damage = preload("res://scripts/domain/melee/melee_damage.gd")
 const DT := 1.0 / 60.0
 var checks := 0
 var failures: Array[String] = []
@@ -30,6 +31,7 @@ func _initialize() -> void:
 	_test_ai_duel()
 	_test_simulate_strike()
 	_test_fighting_styles()
+	_test_damage_formula()
 	for line in table:
 		print(line)
 	for failure in failures:
@@ -571,3 +573,37 @@ func _test_fighting_styles() -> void:
 	var axe_reach := Core.nominal_reach("axe_fighter", "axe_overhead", 0.2) - float(AI.STYLES.axe_fighter.spacing)
 	_check(spear > axe_reach + 0.6, "The spearman engages from well outside the axe's distance (%.2f vs %.2f m)" % [spear, axe_reach])
 	table.append("Kampfstile (400 Entscheidungen): Legionär %s; Axtkämpfer %s; Einsatzdistanz Speer %.2f m gegen Axt %.2f m" % [JSON.stringify(leg), JSON.stringify(axe), spear, axe_reach])
+
+
+func _test_damage_formula() -> void:
+	# D-042: base x quality x competence x zone x protection (+ stamina,
+	# injuries, wear, contact), every factor reported, reproducible.
+	var hit := {"family":"gladius", "quality":1.1, "competence":1.2, "zone":"torso", "armor":"wool_leather", "strike_kind":"cut",
+		"attacker_stamina":0.9, "injuries":[], "weapon_wear":0.0, "contact_drive":1.0, "contact_frame":27, "roll":0.5}
+	var r := Damage.compute(hit)
+	var t: Dictionary = r.terms
+	var product := float(t.weapon_base) * float(t.quality) * float(t.competence) * float(t.zone) * float(t.protection) * float(t.stamina) * float(t.injury) * float(t.wear) * float(t.contact) * float(t.variance)
+	_check(r.damage == int(roundf(product)) and int(t.contact_frame) == 27, "Damage is exactly the reported product of the formula terms (%d)" % r.damage)
+	_check(JSON.stringify(Damage.compute(hit)) == JSON.stringify(r), "The formula is a pure, reproducible function")
+	var veteran: int = Damage.compute(hit.merged({"competence":1.4, "quality":1.0}, true)).damage
+	var recruit: int = Damage.compute(hit.merged({"competence":0.6, "quality":5.0}, true)).damage
+	_check(veteran > recruit, "A trained fighter with ordinary gear outdamages a recruit with the best gear (%d vs %d)" % [veteran, recruit])
+	_check(float(Damage.compute(hit.merged({"quality":5.0}, true)).terms.quality) == 1.25, "Equipment quality is clamped (no uncontrolled multiplier)")
+	var head: int = Damage.compute(hit.merged({"zone":"head", "armor":"none"}, true)).damage
+	var mail: int = Damage.compute(hit.merged({"armor":"mail"}, true)).damage
+	_check(head > r.damage and mail < r.damage, "Hit zone and protection act in the expected direction (%d / %d / %d)" % [head, r.damage, mail])
+	var tired: int = Damage.compute(hit.merged({"attacker_stamina":0.02}, true)).damage
+	var worn: int = Damage.compute(hit.merged({"weapon_wear":1.0}, true)).damage
+	var wounded: int = Damage.compute(hit.merged({"injuries":[{"kind":"arm_wound"}]}, true)).damage
+	var jammed: int = Damage.compute(hit.merged({"contact_drive":0.2}, true)).damage
+	_check(tired < r.damage and worn < r.damage and wounded < r.damage and jammed < r.damage, "Exhaustion, weapon wear, a weapon-arm wound and an early jammed contact each weaken the blow (%d %d %d %d)" % [tired, worn, wounded, jammed])
+	# The core books exactly the formula's result at the contact frame.
+	var spot := _peak_spot("legionary", "cut_inward", float(Tracks.kit("axe_fighter").radius), 0.02)
+	var state := _duel("legionary", "axe_fighter", spot)
+	state.fighters.d.has_shield = false
+	Core.command(state, "a", "attack", {"move":"cut_inward"})
+	var event := _first(_run(state, 60, ["hit"]), "hit")
+	_check(not event.is_empty() and event.has("damage_terms") and int(event.damage_terms.contact_frame) == int(event.clip_frame), "Each hit reports its formula terms with the measured contact frame")
+	_check(not event.is_empty() and 100.0 - float(state.fighters.d.health) == float(event.damage), "Health changes by exactly the formula's damage")
+	_check(float(state.fighters.a.weapon_wear) == 0.0 or str(state.fighters.d.armor) == "mail", "Weapon wear only grows on hard contacts")
+	table.append("Schadensformel D-042 (Gladius-Hieb, Rumpf, Wolle/Leder): %d; Veteran/gewöhnlich %d gegen Rekrut/beste Ausrüstung %d; Kopf %d, Kettenhemd %d; erschöpft %d, verschlissen %d, Armwunde %d, gestaucht %d" % [r.damage, veteran, recruit, head, mail, tired, worn, wounded, jammed])

@@ -677,6 +677,7 @@
     "scripts/domain/combat_actions.gd",
     "scripts/domain/melee/melee_ai.gd",
     "scripts/domain/melee/melee_core.gd",
+    "scripts/domain/melee/melee_damage.gd",
     "scripts/domain/melee/melee_feedback.gd",
     "scripts/domain/melee/melee_geometry.gd",
     "scripts/domain/melee/melee_track_data.gd",
