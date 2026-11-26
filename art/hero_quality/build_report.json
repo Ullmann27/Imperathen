@@ -46,8 +46,8 @@
     {
       "lod": 0,
       "triangles": 32820,
-      "bytes": 9254508,
-      "sha256": "f0600db20ea4957fc50411439fa8b1591ec4fe4389326a27bde89aab6bb63f51",
+      "bytes": 9265012,
+      "sha256": "7e8fe8260da744812844185cb19f3ca423428642584b33828e46540e27b114f7",
       "meshes": [
         {
           "name": "HeroBody",
@@ -135,13 +135,42 @@
         "external_image_byte_identical": true,
         "preserved_buffer_views": 654,
         "other_buffer_view_payloads_byte_identical": true
+      },
+      "death_ground_contact": {
+        "before": {
+          "max_sole_penetration_m": 0.0,
+          "max_sole_slip_m": 0.021314064091044898,
+          "max_hull_penetration_m": 1.0187590685999709e-09,
+          "max_contact_slip_m": 0.021314064091044898
+        },
+        "after": {
+          "max_sole_penetration_m": 0.0,
+          "max_sole_slip_m": 0.011019254526407443,
+          "max_hull_penetration_m": 0.0,
+          "max_contact_slip_m": 0.011019254526407443
+        },
+        "maximum_floor_correction_m": 0.00015487590974150311
+      },
+      "gather_ground_contact": {
+        "before": {
+          "max_sole_penetration_m": 0.0063850157264436075,
+          "max_sole_slip_m": 0.009693265640477561,
+          "max_hull_penetration_m": 0.0063850157264436075,
+          "max_contact_slip_m": 0.009693265640477561
+        },
+        "after": {
+          "max_sole_penetration_m": 0.0,
+          "max_sole_slip_m": 0.000522022273257445,
+          "max_hull_penetration_m": 0.0,
+          "max_contact_slip_m": 0.000522022273257445
+        }
       }
     },
     {
       "lod": 1,
       "triangles": 16465,
-      "bytes": 6035452,
-      "sha256": "e6705a4a2eeae2f18c2c7fa761b442c4cf07382a294ac389939a630230e5ac0b",
+      "bytes": 6045952,
+      "sha256": "6b8205c1f29b9008bdda2eacbb392ad5da4447b0d1ba0134861553a0d55e7bd5",
       "meshes": [
         {
           "name": "HeroBody",
@@ -216,13 +245,42 @@
         "channel": "death/Pelvis/translation/Y",
         "endpoint_position_delta_m": 0,
         "interpolation": "LINEAR"
+      },
+      "death_ground_contact": {
+        "before": {
+          "max_sole_penetration_m": 0.00015963361031646523,
+          "max_sole_slip_m": 0.021314064091044898,
+          "max_hull_penetration_m": 0.00017408244859379692,
+          "max_contact_slip_m": 0.021314064091044898
+        },
+        "after": {
+          "max_sole_penetration_m": 0.0,
+          "max_sole_slip_m": 0.011003527139723664,
+          "max_hull_penetration_m": 0.0,
+          "max_contact_slip_m": 0.011003527139723664
+        },
+        "maximum_floor_correction_m": 0.0005028802546185596
+      },
+      "gather_ground_contact": {
+        "before": {
+          "max_sole_penetration_m": 0.0063850157264436075,
+          "max_sole_slip_m": 0.009693265640477561,
+          "max_hull_penetration_m": 0.0063850157264436075,
+          "max_contact_slip_m": 0.009693265640477561
+        },
+        "after": {
+          "max_sole_penetration_m": 0.0,
+          "max_sole_slip_m": 0.000522021706504426,
+          "max_hull_penetration_m": 0.0,
+          "max_contact_slip_m": 0.000522021706504426
+        }
       }
     },
     {
       "lod": 2,
       "triangles": 7297,
-      "bytes": 3032928,
-      "sha256": "b61797af321454919d8ab0e7fd6fa6f5c1fcf0443acbc39ae0a96db38f8e4281",
+      "bytes": 3043432,
+      "sha256": "8ba253bcae6ee0c670c4572ec32facdee735c422943454cd3705b1d1c4374d4b",
       "meshes": [
         {
           "name": "HeroBody",
@@ -297,13 +355,42 @@
         "channel": "death/Pelvis/translation/Y",
         "endpoint_position_delta_m": 0,
         "interpolation": "LINEAR"
+      },
+      "death_ground_contact": {
+        "before": {
+          "max_sole_penetration_m": 0.0,
+          "max_sole_slip_m": 0.018888329282640743,
+          "max_hull_penetration_m": 0.0007807605457569809,
+          "max_contact_slip_m": 0.018888329282640743
+        },
+        "after": {
+          "max_sole_penetration_m": 0.0,
+          "max_sole_slip_m": 0.009228627366518534,
+          "max_hull_penetration_m": 0.0,
+          "max_contact_slip_m": 0.009228627366518534
+        },
+        "maximum_floor_correction_m": 0.0007807605457569866
+      },
+      "gather_ground_contact": {
+        "before": {
+          "max_sole_penetration_m": 0.00638483379046697,
+          "max_sole_slip_m": 0.009693280260820891,
+          "max_hull_penetration_m": 0.00638483379046697,
+          "max_contact_slip_m": 0.009693280260820891
+        },
+        "after": {
+          "max_sole_penetration_m": 0.0,
+          "max_sole_slip_m": 0.000430591085357412,
+          "max_hull_penetration_m": 0.0,
+          "max_contact_slip_m": 0.000430591085357412
+        }
       }
     },
     {
       "lod": 3,
       "triangles": 2908,
-      "bytes": 974108,
-      "sha256": "c125c6a7dd65d29dabfe309f1e21494dc62349cb04a5c9db959068e874bd6475",
+      "bytes": 984608,
+      "sha256": "6d365714f2ccac28a1bcd6be17e92aa900bbcdff03ab8dfba16e8b7a70c7b2b4",
       "meshes": [
         {
           "name": "HeroBody",
@@ -378,6 +465,35 @@
         "channel": "death/Pelvis/translation/Y",
         "endpoint_position_delta_m": 0,
         "interpolation": "LINEAR"
+      },
+      "death_ground_contact": {
+        "before": {
+          "max_sole_penetration_m": 0.00027657924975153087,
+          "max_sole_slip_m": 0.016260557289976697,
+          "max_hull_penetration_m": 0.00027657924975153087,
+          "max_contact_slip_m": 0.016260557289976697
+        },
+        "after": {
+          "max_sole_penetration_m": 0.0,
+          "max_sole_slip_m": 0.008095089477315942,
+          "max_hull_penetration_m": 9.887489167258873e-11,
+          "max_contact_slip_m": 0.008095089477315942
+        },
+        "maximum_floor_correction_m": 0.0004434420525262217
+      },
+      "gather_ground_contact": {
+        "before": {
+          "max_sole_penetration_m": 0.006397521639859166,
+          "max_sole_slip_m": 0.009693289190128395,
+          "max_hull_penetration_m": 0.006397521639859166,
+          "max_contact_slip_m": 0.009693289190128395
+        },
+        "after": {
+          "max_sole_penetration_m": 0.0,
+          "max_sole_slip_m": 0.00029342897399838193,
+          "max_hull_penetration_m": 0.0,
+          "max_contact_slip_m": 0.00029342897399838193
+        }
       }
     }
   ],
