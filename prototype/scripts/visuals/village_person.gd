@@ -90,6 +90,8 @@ var _meshy_youth := false
 var youth_outfit := "armoured"
 var requested_youth_outfit := "armoured"
 var _conversation_focused := false
+## Film actors retain the original near rig until the director releases them.
+var _cinematic_detail := false
 var _armed_style := ""
 ## Retimed raider blow: the clip's measured contact frame is reached after
 ## _strike_windup seconds, then the follow-through plays at its own speed.
@@ -924,8 +926,23 @@ func _distance_lod(distance: float) -> int:
 	return level
 
 
+func set_cinematic_detail(enabled: bool) -> void:
+	if _cinematic_detail == enabled:
+		return
+	_cinematic_detail = enabled
+	if enabled and body and detail != 0:
+		_reload(0)
+	elif not enabled:
+		# The normal distance policy may resume on the next process tick.
+		_lod_profile = ""
+
+
 func refresh_lod(camera: Camera3D) -> void:
 	if not is_instance_valid(camera) or not body: return
+	if _cinematic_detail:
+		if detail != 0:
+			_reload(0)
+		return
 	var distance := global_position.distance_to(camera.global_position)
 	var factor := float({"low":0.55,"balanced":0.86,"high":1.15,"very_high":1.5}.get(profile,1.0))
 	var distances: Array = CROWD_LOD_DISTANCES if role == "resident" else LOD_DISTANCES

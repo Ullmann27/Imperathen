@@ -1024,8 +1024,11 @@ func _opening_present() -> void:
 	shown["choice_open"] = _film_choice_open(beat)
 	opening_overlay.present(shown, opening_index, opening_sequence.beats.size())
 	opening_overlay.set_paused(opening_paused)
-	_update_opening_voice(beat)
 	var cut := _beat_cut(beat, 0.0)
+	# Materialize the actual close rig before the speech driver takes references.
+	opening_director.prepare_cinematic_cast(str(cut.shot_id), str(cut.actor_id))
+	opening_director.prepare_cinematic_cast(str(cut.shot_id), str(beat.get("speaker_id", "")))
+	_update_opening_voice(beat)
 	opening_director.mission_actor_id = str(cut.actor_id)
 	opening_director.focus_key = str(beat.get("anchor", ""))
 	opening_director.speaking = not bool(beat.get("silent", false))
