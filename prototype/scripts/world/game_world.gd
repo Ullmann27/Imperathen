@@ -25,6 +25,8 @@ var regional = preload("res://scripts/world/regional_village.gd").new()
 var grove = Grove.new()
 var scenery = preload("res://scripts/world/village/village_scenery.gd").new()
 var opening_props = preload("res://scripts/world/village/opening_props.gd").new()
+## I-01 cups and jug follow the saved morning state (presentation only).
+var i01_props = preload("res://scripts/world/village/i01_props.gd").new()
 var tree_sites := []
 var crops := Node3D.new()
 var season_index := -1
@@ -197,6 +199,7 @@ func sync_state(state: Dictionary) -> void:
 	_figure.configure_meshy_youth(true)
 	_figure.set_loaned_gear(Childhood.enabled(state) and state.village.childhood.gear=="loaned")
 	_figure.set_service_gear(CombatActions.service_gear(state))
+	i01_props.sync_state(state, _figure)
 	_update_people_profile()
 	var health_now := int(player_data.get("health",100))
 	var construction := 0.0
@@ -316,7 +319,10 @@ func get_cinematic_anchor(key: String) -> Vector3:
 				return to_global(Vector3(float(buildings[0].x), 0, float(buildings[0].z)))
 			return to_global(Vector3(14.5, 0, 4.5))
 		"training": return to_global(TRAINING_LOCATION)
-		_: return get_player_position()
+		_:
+			if key.begins_with("i01_"):
+				return i01_props.anchor(key)
+			return get_player_position()
 
 
 func get_cinematic_figure(actor_id: String) -> Node3D:
@@ -621,6 +627,7 @@ func _build_scene() -> void:
 	_create_terrain()
 	_create_village()
 	add_child(opening_props)
+	add_child(i01_props)
 	_create_build_plot()
 	_buildings_root = Node3D.new()
 	_buildings_root.name = "PlayerBuildings"

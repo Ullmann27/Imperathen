@@ -5,6 +5,8 @@ extends RefCounted
 const Follow = preload("res://scripts/story/companion_follow.gd")
 const Story = preload("res://scripts/story/companion_story.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
+const I01 = preload("res://scripts/story/i01_three_cups.gd")
+const Layout = preload("res://scripts/world/village/village_layout.gd")
 var world: Node3D
 var controllers: Dictionary = {"marcus":Follow.new(), "silvanus":Follow.new()}
 
@@ -20,6 +22,11 @@ func actor(id: String) -> CharacterBody3D:
 
 
 func home(id: String) -> Vector3:
+	# During the open I-01 morning Silvanus sits at the breakfast table on the
+	# raised house floor; afterwards he walks out to his door work.
+	if id == "silvanus" and I01.active(world._state):
+		var seat: Vector2 = I01.POINTS.silvanus_table
+		return Vector3(seat.x, Layout.HOUSE_FLOOR, seat.y)
 	var point: Vector2 = Childhood.POINTS.marcus if id == "marcus" else Childhood.POINTS.father
 	return Vector3(point.x, 0.0, point.y)
 
