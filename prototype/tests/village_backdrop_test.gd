@@ -183,7 +183,12 @@ func _test_closed_rim(ridge: MeshInstance3D) -> void:
 	var span := Rect2()
 	for index: int in rim:
 		var v := vertices[index] + ridge.global_position
-		worst = maxf(worst, absf(v.y - ground.height(v.x, v.z)))
+		var base := ground.height(v.x, v.z)
+		if base == -INF:
+			# The terrain is open under the village's sunk brook bed; there the
+			# rim lies on the terrain surface the open cells would have had.
+			base = Terrain.surface_height(Vector2(v.x, v.z))
+		worst = maxf(worst, absf(v.y - base))
 		span = Rect2(v.x, v.z, 0, 0) if span.size == Vector2.ZERO and span.position == Vector2.ZERO else span.expand(Vector2(v.x, v.z))
 	print("VILLAGE_BACKDROP rim vertices=%d extent=%s max_gap_to_terrain_m=%.6f" % [rim.size(), span, worst])
 	_check(rim.size() > 100 and worst <= .002, "The open edge of the hill surface lies on the terrain all round (no floating back or ends)")
@@ -321,7 +326,10 @@ func _test_walk() -> void:
 		if run.label == "run_10s":
 			_check(hill_frames > 120 and player.global_position.z < -80.0 and foot_on(player) > 2.0, "Running north from the gate for 10 s climbs the hill on its collision")
 		if run.label == "run_over_crest":
-			_check(player.global_position.z < -165.0 and crest > 7.0 and floor_frames >= frames * .95, "The hill can be crossed on foot: up the front, over the crest and down onto the terrain")
+			# The north track crosses the ridge in a hollow way (saddle about 5 m
+			# on the track, 11-19 m beside it), so the crossing climbs less than
+			# the former 9.7 m over the open crest.
+			_check(player.global_position.z < -165.0 and crest > 4.0 and floor_frames >= frames * .95, "The hill can be crossed on foot: up the front, over the crest and down onto the terrain")
 
 
 func foot_on(player: CharacterBody3D) -> float:

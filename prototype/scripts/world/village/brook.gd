@@ -158,7 +158,7 @@ static func water_mesh(source_z: float) -> ArrayMesh:
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var lines: Array = []
 	for z in rows(source_z):
-		if z < source_z or z > Land.FEN_END_Z:
+		if z < source_z - .001 or z > Land.FEN_END_Z + .001:
 			continue
 		var centre := Land.channel_x(z)
 		# The sheet reaches slightly into the bank so no gap shows at the waterline.
