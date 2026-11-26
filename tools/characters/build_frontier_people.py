@@ -42,6 +42,7 @@ def module(name, path):
 hero = module("frontier_hero_source", ROOT / "tools/characters/build_hero.py")
 soldier = module("frontier_soldier_source", ROOT / "art/soldiers/build.py")
 skirt_seam = module("frontier_skirt_seam", ROOT / "tools/characters/smooth_frontier_skirt_seam.py")
+kit_rivets = module("frontier_kit_rivets", ROOT / "tools/characters/rebind_frontier_kit_rivets.py")
 
 
 def digest(path):
@@ -490,6 +491,7 @@ def export(kind):
         death_ground = soldier.death_ground.ground(path)
         gather_ground = soldier.death_ground.ground(path, None, "gather")
         seam = skirt_seam.smooth(path)
+        rivets = kit_rivets.rebind(path)
         count = 0
         for obj in bpy.context.scene.objects:
             if obj.type == "MESH":
@@ -500,7 +502,9 @@ def export(kind):
                         "face_morphs": level < 2, "belt_fit": belt_fit,
                         "death_ground_contact": {key: death_ground[key] for key in ("before", "after", "maximum_floor_correction_m")},
                         "skirt_seam": {key: seam[key] for key in ("before", "after", "unchanged") if key in seam},
-                        "gather_ground_contact": {key: gather_ground[key] for key in ("before", "after", "unchanged") if key in gather_ground}})
+                        "gather_ground_contact": {key: gather_ground[key] for key in ("before", "after", "unchanged") if key in gather_ground},
+                        "kit_rivets": {"rebound": sum(entry["applied"] for entry in rivets.get("islands", [])),
+                                       "snapped": len(rivets.get("snapped", [])), **({"unchanged": rivets["unchanged"]} if "unchanged" in rivets else {})}})
     return records
 
 
