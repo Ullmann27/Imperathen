@@ -146,7 +146,7 @@ jobs:
               city_support city_viva_props city_exploration_detail npc_physical_conversation city_watch i03_flow \
               touch_controls fold7_graphics_policy main_scene \
               combat_actions melee_tracks melee_core melee_visual_contact melee_feedback melee_camera melee_weapons \
-              frontier_people resident_catalog_bridge marcus_character village_childhood i01_slice i03_slice i04_slice \
+              frontier_people resident_catalog_bridge marcus_character village_childhood i01_slice i03_slice i04_slice mission_bridge_data band1_expansion companion_turn_motion \
             --report artifacts/qa/engine
           "$GODOT_BIN" --headless --path prototype --script res://tests/roman_city_real_asset_test.gd \
             2>&1 | tee artifacts/qa/real-city-import.log

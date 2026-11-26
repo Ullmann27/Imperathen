@@ -41,7 +41,7 @@ var _jug_from := Transform3D.IDENTITY
 var _jug_goal := Transform3D.IDENTITY
 
 func begin_jug_action(action: String) -> void:
-	if action in ["i01_well","i01_park_jug","i01_pour","fill_water","father_morning"]:
+	if action in ["i01_well","i01_park_jug","i01_pour","fill_water","father_morning","i07_water_fetch","i07_water_bring"]:
 		_jug_pending = action
 
 func jug_in_hand() -> bool:
@@ -137,6 +137,14 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 			_place(cup, world_point(SHELF_ORIGIN + SHELF_SLOTS[owner]), Basis.IDENTITY)
 		_water[owner].visible = filled and where == "table"
 	var next_mode := str(view.jug)
+	# The same family vessel also supplies the later supervised gate watch.
+	# Do not inject a second inventory item or keep the I-01 carry flag alive.
+	var child: Dictionary = state.village.childhood
+	var watch_water := str(child.screenplay.get("i07_water","locked"))
+	if watch_water == "carry":
+		next_mode = "hand"
+	elif watch_water == "complete" and child.get("gear","") == "loaned":
+		next_mode = "gate"
 	if next_mode != _jug_mode and _jug_pending.is_empty():
 		_jug_action = ""
 	_jug_mode = next_mode
@@ -147,6 +155,11 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 			_jug_goal = _hand_transform(_left_bone,_left_rest,JUG_HAND,1.0)
 	elif next_mode == "away":
 		_jug_goal = prior
+		if _jug_pending == "father_morning" and is_instance_valid(_carrier):
+			_jug_goal.origin += -_carrier.global_basis.z.normalized()*.15
+	elif next_mode == "gate":
+		# Next to, rather than in the middle of, the authored gate route.
+		_jug_goal = global_transform*Transform3D(Basis.IDENTITY,Vector3(1.0,.04,-46.0))
 	else:
 		var destination := JUG_TABLE if next_mode == "table" else JUG_BENCH
 		_jug_goal = global_transform*Transform3D(Basis.IDENTITY,world_point(destination))
@@ -156,11 +169,11 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 		_jug_clock = 0.0
 		_jug_duration = .50 if _jug_action == "i01_pour" else .32
 		_jug_from = prior
-		if _holding_jug and (_jug_action == "i01_well" or not prior_visible or prior.origin.distance_to(_jug_goal.origin) > .85):
+		if _holding_jug and (_jug_action in ["i01_well","i07_water_fetch"] or not prior_visible or prior.origin.distance_to(_jug_goal.origin) > .85):
 			# The well action starts locally, never flies from the family bench.
 			_jug_from = _jug_goal
 			_jug_from.origin.y -= .24
-		if not _holding_jug and next_mode == "table" and prior.origin.distance_to(_jug_goal.origin) > .85:
+		if not _holding_jug and next_mode in ["table","gate"] and prior.origin.distance_to(_jug_goal.origin) > .85:
 			# Interaction range exceeds arm reach: use a local tabletop
 			# approach rather than stretching the model or flying a prop.
 			_jug_from = _jug_goal
