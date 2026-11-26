@@ -1,0 +1,151 @@
+[gd_scene format=3]
+
+[sub_resource type="BoxShape3D" id="YardFloor"]
+size = Vector3(7.45, 0.13, 7.22)
+
+[sub_resource type="BoxShape3D" id="Rear"]
+size = Vector3(7.52, 3.41, 0.28)
+
+[sub_resource type="BoxShape3D" id="Divider"]
+size = Vector3(0.155, 1.35, 3.23)
+
+[sub_resource type="BoxShape3D" id="Trough"]
+size = Vector3(0.81, 0.72, 1.54)
+
+[sub_resource type="BoxShape3D" id="AccountsTable"]
+size = Vector3(1.39, 0.92, 0.66)
+
+[sub_resource type="BoxShape3D" id="FeedBin"]
+size = Vector3(0.75, 0.8, 1.86)
+
+[sub_resource type="BoxShape3D" id="WestStreet"]
+size = Vector3(2.23, 1.08, 0.28)
+
+[sub_resource type="BoxShape3D" id="WestPier"]
+size = Vector3(0.38, 1.62, 0.39)
+
+[sub_resource type="BoxShape3D" id="WestWall"]
+size = Vector3(0.26, 1.42, 3.59)
+
+[sub_resource type="BoxShape3D" id="WestStableWall"]
+size = Vector3(0.26, 2.09, 3.91)
+
+[sub_resource type="BoxShape3D" id="WestOpenGate"]
+size = Vector3(0.14, 1.22, 1.25)
+
+[sub_resource type="BoxShape3D" id="WestRack"]
+size = Vector3(1.59, 1.12, 0.61)
+
+[sub_resource type="BoxShape3D" id="WestFrontPost"]
+size = Vector3(0.25, 2.82, 0.29)
+
+[sub_resource type="BoxShape3D" id="EastStreet"]
+size = Vector3(2.23, 1.08, 0.28)
+
+[sub_resource type="BoxShape3D" id="EastPier"]
+size = Vector3(0.38, 1.62, 0.39)
+
+[sub_resource type="BoxShape3D" id="EastWall"]
+size = Vector3(0.26, 1.42, 3.59)
+
+[sub_resource type="BoxShape3D" id="EastStableWall"]
+size = Vector3(0.26, 2.09, 3.91)
+
+[sub_resource type="BoxShape3D" id="EastOpenGate"]
+size = Vector3(0.14, 1.22, 1.25)
+
+[sub_resource type="BoxShape3D" id="EastRack"]
+size = Vector3(1.59, 1.12, 0.61)
+
+[sub_resource type="BoxShape3D" id="EastFrontPost"]
+size = Vector3(0.25, 2.82, 0.29)
+
+[sub_resource type="BoxShape3D" id="FrontPost"]
+size = Vector3(0.25, 2.82, 0.29)
+
+[node name="StableCollision" type="StaticBody3D"]
+collision_mask = 0
+
+[node name="YardFloor" type="CollisionShape3D" parent="."]
+position = Vector3(0, -0.065000, -3.69)
+shape = SubResource("YardFloor")
+
+[node name="Rear" type="CollisionShape3D" parent="."]
+position = Vector3(0, 1.705000, -7.16)
+shape = SubResource("Rear")
+
+[node name="Divider" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.675000, -5.41)
+shape = SubResource("Divider")
+
+[node name="Trough" type="CollisionShape3D" parent="."]
+position = Vector3(-3.02, 0.360000, -2.31)
+shape = SubResource("Trough")
+
+[node name="AccountsTable" type="CollisionShape3D" parent="."]
+position = Vector3(2.85, 0.460000, -0.975)
+shape = SubResource("AccountsTable")
+
+[node name="FeedBin" type="CollisionShape3D" parent="."]
+position = Vector3(3.1, 0.400000, -2.53)
+shape = SubResource("FeedBin")
+
+[node name="WestStreet" type="CollisionShape3D" parent="."]
+position = Vector3(-2.58, 0.540000, -0.13)
+shape = SubResource("WestStreet")
+
+[node name="WestPier" type="CollisionShape3D" parent="."]
+position = Vector3(-1.48, 0.810000, -0.15)
+shape = SubResource("WestPier")
+
+[node name="WestWall" type="CollisionShape3D" parent="."]
+position = Vector3(-3.64, 0.710000, -1.84)
+shape = SubResource("WestWall")
+
+[node name="WestStableWall" type="CollisionShape3D" parent="."]
+position = Vector3(-3.65, 1.045000, -5.34)
+shape = SubResource("WestStableWall")
+
+[node name="WestOpenGate" type="CollisionShape3D" parent="."]
+position = Vector3(-3.39, 0.610000, -4.31)
+shape = SubResource("WestOpenGate")
+
+[node name="WestRack" type="CollisionShape3D" parent="."]
+position = Vector3(-1.69, 1.350000, -6.65)
+shape = SubResource("WestRack")
+
+[node name="WestFrontPost" type="CollisionShape3D" parent="."]
+position = Vector3(-3.54, 1.410000, -3.64)
+shape = SubResource("WestFrontPost")
+
+[node name="EastStreet" type="CollisionShape3D" parent="."]
+position = Vector3(2.58, 0.540000, -0.13)
+shape = SubResource("EastStreet")
+
+[node name="EastPier" type="CollisionShape3D" parent="."]
+position = Vector3(1.48, 0.810000, -0.15)
+shape = SubResource("EastPier")
+
+[node name="EastWall" type="CollisionShape3D" parent="."]
+position = Vector3(3.64, 0.710000, -1.84)
+shape = SubResource("EastWall")
+
+[node name="EastStableWall" type="CollisionShape3D" parent="."]
+position = Vector3(3.65, 1.045000, -5.34)
+shape = SubResource("EastStableWall")
+
+[node name="EastOpenGate" type="CollisionShape3D" parent="."]
+position = Vector3(3.39, 0.610000, -4.31)
+shape = SubResource("EastOpenGate")
+
+[node name="EastRack" type="CollisionShape3D" parent="."]
+position = Vector3(1.69, 1.350000, -6.65)
+shape = SubResource("EastRack")
+
+[node name="EastFrontPost" type="CollisionShape3D" parent="."]
+position = Vector3(3.54, 1.410000, -3.64)
+shape = SubResource("EastFrontPost")
+
+[node name="FrontPost" type="CollisionShape3D" parent="."]
+position = Vector3(0, 1.410000, -3.64)
+shape = SubResource("FrontPost")
