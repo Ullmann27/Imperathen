@@ -28,6 +28,7 @@ func _initialize() -> void:
 	_test_shield_coverage()
 	_test_ai_guard_choice()
 	_test_ai_duel()
+	_test_simulate_strike()
 	for line in table:
 		print(line)
 	for failure in failures:
@@ -530,3 +531,15 @@ func _test_ai_duel() -> void:
 	table.append("KI-Duell ohne Scutum (Seed 8): " + JSON.stringify(o))
 	_check(float(first.gap) >= -0.01, "Fighters never interpenetrate (min gap %.3f m)" % float(first.gap))
 	table.append("KI-Duell Legionär gegen Axtkämpfer (Seed 8, bis 25 s): " + JSON.stringify(c) + (", kleinster Körperabstand %.3f m" % float(first.gap)))
+
+
+func _test_simulate_strike() -> void:
+	var reach := Core.nominal_reach("legionary", "thrust", float(Tracks.kit("axe_fighter").radius))
+	var front := Core.simulate_strike("legionary", "thrust", "axe_fighter", reach - 0.02, 0.0, "guard_front")
+	var side := Core.simulate_strike("legionary", "thrust", "axe_fighter", reach - 0.02, 90.0, "guard_front")
+	var far := Core.simulate_strike("legionary", "thrust", "axe_fighter", reach + 1.0, 0.0, "", 1, {"health":100.0})
+	_check(front.get("type", "") == "block", "Level-B helper: frontal thrust into a front guard is a block (%s)" % front.get("type", "-"))
+	_check(side.get("type", "") == "hit" and int(side.clip_frame) >= int(Tracks.timing("legionary", "thrust").start), "Level-B helper: weapon-side thrust is a hit on a live frame (%s)" % side.get("type", "-"))
+	_check(far.get("type", "") == "whiff", "Level-B helper: out of reach is a whiff (%s)" % far.get("type", "-"))
+	_check(JSON.stringify(side) == JSON.stringify(Core.simulate_strike("legionary", "thrust", "axe_fighter", reach - 0.02, 90.0, "guard_front")), "Level-B helper is deterministic")
+	table.append("simulate_strike (Ebene B): Stoß frontal in guard_front=%s (Frame %s), Waffenseite=%s (Frame %s, %s, %s Schaden), 1 m zu weit=%s" % [front.get("type"), str(front.get("clip_frame")), side.get("type"), str(side.get("clip_frame")), side.get("zone", "-"), str(side.get("damage", "-")), far.get("type")])

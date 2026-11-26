@@ -686,3 +686,33 @@ static func nominal_reach(kit_id: String, move_id: String, defender_radius: floa
 	if timing.is_empty():
 		return 0.0
 	return float(timing.reach) * scale + defender_radius
+
+
+## Level-B convenience: run one strike in a private state and return its
+## first contact or whiff event (with clip frame, outcome, damage, reaction).
+## `bearing_deg` is where the attacker stands relative to the defender's
+## facing (0 = in front, +90 = on its weapon/right side). Deterministic.
+static func simulate_strike(attacker_kit: String, move: String, defender_kit: String, distance: float, bearing_deg: float = 0.0, guard: String = "", seed: int = 1, defender_options: Dictionary = {}) -> Dictionary:
+	var state := new_state(seed)
+	var bearing := deg_to_rad(bearing_deg)
+	if not add_fighter(state, "defender", defender_kit, defender_options.merged({"team":"defender"}, true)).is_empty():
+		return {}
+	if not add_fighter(state, "attacker", attacker_kit, {"team":"attacker", "x":sin(bearing) * distance, "z":-cos(bearing) * distance}).is_empty():
+		return {}
+	face(state, "attacker", "defender")
+	# Aim the strike's own bearing (measured at its peak) at the defender.
+	var timing := Tracks.timing(attacker_kit, move)
+	if timing.is_empty():
+		return {}
+	var tip: Vector3 = Tracks.segment(attacker_kit, move, int(timing.peak))[1]
+	state.fighters.attacker.yaw = float(state.fighters.attacker.yaw) - atan2(tip.x, -tip.z)
+	if not guard.is_empty():
+		command(state, "defender", "guard", {"style":guard})
+		step(state, 0.5)
+	if not command(state, "attacker", "attack", {"move":move}).ok:
+		return {}
+	for i in int(timing.frames) + 2:
+		for e: Dictionary in step(state, DT):
+			if e.type in ["hit", "block", "parry", "guard_broken", "whiff"] and e.get("attacker", "attacker") == "attacker":
+				return e
+	return {}
