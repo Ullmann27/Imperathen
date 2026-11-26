@@ -184,10 +184,12 @@ TROOP_CATALOG_RESOURCES = (
 )
 # The shared world state (D-045) reads these at runtime: without the registry
 # the history frame is empty, without the roster the tribal world is.
-WORLD_STATE_RESOURCES = (
+WORLD_STATE_SCRIPTS = (
     "scripts/domain/world_clock.gd",
     "scripts/domain/world_state.gd",
     "scripts/domain/person_registry.gd",
+)
+WORLD_STATE_RESOURCES = WORLD_STATE_SCRIPTS + (
     "scripts/domain/world_calendar.gd",
     "scripts/domain/era_registry.gd",
     "scripts/domain/tribal_world.gd",
@@ -216,6 +218,9 @@ FEATURE_RESOURCE_GROUPS = (
     ("troop_catalog_content", TROOP_CATALOG_RESOURCES),
     ("world_state_content", WORLD_STATE_RESOURCES),
 )
+FEATURE_ACTIVATION_RESOURCES = {
+    "world_state_content": WORLD_STATE_SCRIPTS,
+}
 GALLERY_SCRIPT = "scripts/ui/figure_gallery.gd"
 PORTRAIT_IDS = (
     "legionary", "auxiliary_spear", "archer", "centurion", "signifer", "emperor",
@@ -422,12 +427,15 @@ def inspect_zip(apk: Path, report: dict, expected_abi: str, source_root: Path) -
                 required_resources += HERO_RESOURCES
             features = []
             for identifier, resources in FEATURE_RESOURCE_GROUPS:
-                required_by_source = any((source_root / source).is_file() for source in resources)
-                detected_in_archive = any(resolve_resource(archive, names, source)["entry"] for source in resources)
+                # The calendar and tribes existed before the shared state.
+                # Detect that generation by its own scripts, then verify all dependencies.
+                markers = FEATURE_ACTIVATION_RESOURCES.get(identifier, resources)
+                required_by_source = any((source_root / source).is_file() for source in markers)
+                detected_in_archive = any(resolve_resource(archive, names, source)["entry"] for source in markers)
                 if required_by_source or detected_in_archive:
                     required_resources += resources
                     features.append((identifier, resources, required_by_source, detected_in_archive))
-            resolved = [resolve_resource(archive, names, source) for source in required_resources]
+            resolved = [resolve_resource(archive, names, source) for source in dict.fromkeys(required_resources)]
             missing_resources = [item["source"] for item in resolved if item["entry"] is None]
             packs = sorted(name for name in names if name.startswith("assets/") and name.endswith(".pck"))
             if require_hero:

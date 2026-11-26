@@ -17,6 +17,7 @@ GROUPS = {
     "first_morning_content": VALIDATOR.FIRST_MORNING_RESOURCES,
     "world_history_content": VALIDATOR.WORLD_HISTORY_RESOURCES,
     "tribal_world_content": VALIDATOR.TRIBAL_WORLD_RESOURCES,
+    "world_state_content": VALIDATOR.WORLD_STATE_RESOURCES,
 }
 RESOURCES = {item for group in GROUPS.values() for item in group}
 
@@ -68,6 +69,14 @@ class ReferencePayloadGateTest(unittest.TestCase):
         checks = inspect_fixture(current_source=False, exported=set())
         self.assertEqual(checks["godot_project_content"]["status"], "pass")
         self.assertFalse(GROUPS.keys() & checks.keys())
+
+    def test_calendar_and_tribes_do_not_activate_the_later_shared_state(self):
+        payload = RESOURCES - set(VALIDATOR.WORLD_STATE_SCRIPTS)
+        checks = inspect_fixture(current_source=False, exported=payload)
+        self.assertEqual(checks["world_history_content"]["status"], "pass")
+        self.assertEqual(checks["tribal_world_content"]["status"], "pass")
+        self.assertNotIn("world_state_content", checks)
+        self.assertEqual(checks["godot_project_content"]["status"], "pass")
 
 
 if __name__ == "__main__":

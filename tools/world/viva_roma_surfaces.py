@@ -2,7 +2,7 @@
 import math
 import numpy as np
 
-KINDS = ('stone', 'brick', 'paving', 'roof', 'wood', 'plaster', 'marble', 'ground', 'linen', 'clay')
+KINDS = ('stone', 'brick', 'paving', 'roof', 'wood', 'plaster', 'marble', 'ground', 'linen', 'clay', 'basalt', 'limestone')
 
 def bake(kind, color, size, seed, metres, roughness, offset=(0,0)):
     if kind not in KINDS or size not in (256, 512, 1024, 2048) or not math.isfinite(metres) or metres <= 0:
@@ -61,6 +61,16 @@ def bake(kind, color, size, seed, metres, roughness, offset=(0,0)):
         height+=relief*face-.0025*pitting*face
         tone+=.18*(variation-.5)*face-.30*(1-face)-.055*pitting
         rough+=.09*(1-face)+.07*pitting
+    elif kind in ('basalt', 'limestone'):
+        # Individual blocks already have modeled joints and edges. Bake only
+        # mineral variation, pits and tool marks within their exposed faces.
+        pores = smooth(.70,.94,fine*.64+grain*.36)
+        tracks = np.sin(2*np.pi*(u*54+v*2+.28*(mid-.5)))
+        tooling = smooth(.75,.98,tracks)*smooth(.39,.67,macro)
+        deposits = smooth(.54,.83,macro*.62+mid*.38)
+        tone += .095*deposits-.22*pores-.038*tooling
+        height -= .0025*pores+.00045*tooling
+        rough += .105*pores+.065*deposits
     elif kind=='roof':
         x=u*10; y=v*8
         fx,fy=x-np.floor(x),y-np.floor(y)

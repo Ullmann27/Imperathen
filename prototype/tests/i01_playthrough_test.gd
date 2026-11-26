@@ -20,6 +20,7 @@ var failures: Array[String] = []
 var phases: Array[Dictionary] = []
 var walked := 0.0
 var capture_dir := ""
+var continue_to_marcus := false
 
 
 func _initialize() -> void:
@@ -28,7 +29,9 @@ func _initialize() -> void:
 		quit(2)
 		return
 	for arg: String in OS.get_cmdline_user_args():
-		if arg.begins_with("--capture-dir=") and DisplayServer.get_name() != "headless":
+		if arg == "--bis-marcus":
+			continue_to_marcus = true
+		elif arg.begins_with("--capture-dir=") and DisplayServer.get_name() != "headless":
 			capture_dir = arg.trim_prefix("--capture-dir=")
 			DirAccess.make_dir_recursive_absolute(capture_dir)
 			RenderingServer.render_loop_enabled = false
@@ -238,6 +241,8 @@ func _run() -> void:
 	await _confirm_handoff()
 	check(Childhood.view(game.model.data).stage == "i02_basket", "I-01 is complete and I-02 begins")
 	await _reload_at_basket()
+	if continue_to_marcus and failures.is_empty():
+		await _walk_to_marcus()
 	var totals := {"film":0.0, "walk":0.0, "action":0.0}
 	for phase: Dictionary in phases:
 		totals[phase.kind] += float(phase.seconds)
@@ -279,6 +284,27 @@ func _reload_at_basket() -> void:
 	check(after.village.childhood.screenplay.i01_events == before.village.childhood.screenplay.i01_events, "I‑01-Erinnerungen überstehen Laden ohne Duplikate")
 	check(game.world.get_player_position().distance_to(before_position) < 0.25, "Fortsetzen setzt die Figur am gespeicherten Ort ab")
 	await _capture("06-auf-der-schwelle")
+
+
+func _walk_to_marcus() -> void:
+	game.set_process(true)
+	var before_time := float(game.model.data.world_seconds)
+	await _walk("Familienhaus → Aurelia", [Vector2(-16, 20.2), Vector2(6.7, 20.2), Vector2(7.8, 19.6)], 34.0)
+	await _interact("Aurelia ansprechen")
+	check(game.screen == "village_dialog" and game.village_npc == "aurelia", "Aurelia persönlich erreicht")
+	await _dialogue_choice("Korb gemeinsam prüfen")
+	if game.screen == "village_dialog":
+		await _dialogue_choice("Weiter")
+	if game.screen == "opening":
+		await _watch("Übergang zum Marktweg")
+		await _confirm_handoff()
+	if not check(Childhood.view(game.model.data).stage == "i03_marcus" and game.screen == "playing", "Geprüfter Korb eröffnet den Marktweg"):
+		return
+	await _walk("Aurelia → Marcus", [Vector2(3, 10), Vector2(2, 4), Vector2(-2.0, 4)], 27.0)
+	await _interact("Marcus begrüßen")
+	check(game.screen == "opening" and game.opening_sequence.id == "i03_vid_a", "Persönlich bei Marcus, Film öffnet sich")
+	check(float(game.model.data.world_seconds) > before_time + 10.0, "Weltzeit schreitet während der Erkundung voran")
+	await _capture("07-marcus")
 
 
 func _find_button(node: Node, caption: String) -> Button:
