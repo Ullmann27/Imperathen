@@ -52,6 +52,9 @@ func _visit() -> void:
 		if city != null:
 			city._request_leave()
 		return
+	expect(city.figure.requested_youth_outfit == "civil", "Die Kindheit fordert beim Stadtwechsel dieselbe zivile Tunika wie in Valdora an")
+	if city.figure.youth_outfit_installed("civil"):
+		expect(city.figure.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_civil_"), "Am Markt wird bei vollständigem Outfit die zivile Originalfigur geladen")
 	var home: Array = game.model.data.player.position.duplicate()
 	var district = city.living_city.life
 	var baker: int = district.business_for_shop("bakery")

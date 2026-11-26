@@ -3,6 +3,7 @@ extends Node3D
 signal leave_requested
 signal story_requested
 const Person := preload("res://scripts/visuals/village_person.gd")
+const YouthOutfit := preload("res://scripts/visuals/youth_outfit.gd")
 const State := preload("res://scripts/world/city_exploration_state.gd")
 const CameraObstruction := preload("res://scripts/world/camera_obstruction.gd")
 const CityDetailAdapter := preload("res://scripts/rendering/city_exploration_detail_adapter.gd")
@@ -365,11 +366,12 @@ func _build_player() -> void:
 	player.add_child(figure)
 	var age := int(campaign.data.player.age) if campaign != null else 12
 	var origin := str(campaign.data.origin_id) if campaign != null else "italia"
+	var outfit := YouthOutfit.for_state(campaign.data) if campaign != null else YouthOutfit.ARMOURED
 	if age == 12 and origin == "italia":
-		youth_available = figure.configure_meshy_youth()
+		youth_available = figure.configure_meshy_youth(true, outfit)
 	figure.configure("player", origin, age)
 	if age != 12:
-		youth_available = figure.configure_meshy_youth()
+		youth_available = figure.configure_meshy_youth(true, outfit)
 	figure._check_lod = 10000.0
 	if is_instance_valid(figure.body):
 		CityCharacterFinish.apply_to(figure.body, profile, figure.detail)
