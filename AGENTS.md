@@ -1,5 +1,18 @@
 # Arbeitsauftrag für Agenten – IMPERATHEN
 
+## Präzisierung der Game Direction – 26.11.2026
+
+Verbindlich ergänzend zum Masterhandbuch 3.0 (Wortlaut und Folgen: [docs/00_governance/GAME_DIRECTION_2026-11-26.md](docs/00_governance/GAME_DIRECTION_2026-11-26.md), Entscheidungen D-015 bis D-022):
+
+- Kampagnenbeginn 58 v. Chr. in Valdora bei Aquileia, Held zwölf Jahre; die Welt verändert sich über Jahrzehnte (keine statische historische Welt).
+- Kein binäres Freund-/Rivale-Flag als Grundlage; Marcus und schrittweise alle wichtigen NPCs mit Erinnerungen, Beziehungen, Interessen, eigenen Entscheidungen und Alterung.
+- Regulärer Start ohne Geld, Waffen oder Rüstung; 30 Denare nur in gekennzeichneten Test-/Entwicklungsszenarien; bestehende Saves unbeschädigt.
+- Drehbuchfiguren bleiben; Nerva, Livia und Priscilla werden eigenständige Bewohner statt Doppelrollen.
+- Germanische Gruppen als eigenständige Zivilisationen, nicht automatisch Feinde.
+- Überfälle aus dem Fraktionssystem mit Ursachen und Folgen; I-10 bleibt geschützt; keine endlosen Überfallserien.
+- Ein autoritativer Weltzustand für Strategie, Open World und Missionen; die Welt entwickelt sich auch ohne den Spieler.
+- Zielbilder als Orientierung; keine künstliche Größenbegrenzung, aber Paket- und Streaming-Architektur; kostenpflichtige Dienste (z. B. Meshy) erst nach Freigabe von Umfang und Kosten; Fable 5.2 erst nach gesonderter Zwischenabnahme; kein Merge nach `main`.
+
 ## Präzisierung nach dem Spieltest – 23.11.2026
 
 Heinz bewertet die bisherige APK als sehr frühe Rohfassung. Der neue Anfang soll einen Zwölfjährigen in einem **bereits bestehenden, funktionierenden Dorf** mit Eltern, Nachbarn, Markt und Handwerk zeigen. Der frühere sofortige Wiederaufbau und die erste selbst gebaute Hütte sind für diesen neuen Einstieg überholt. Beziehungen, sinnvolle verbundene Aufgaben, Schmiedelehre, beaufsichtigte Kontrollrunde und vorübergehende Wachhilfe gehen dem überraschenden nächtlichen Überfall voraus. Kein automatischer kurzer Sprung vom Kind zum Erwachsenen, Soldaten oder Kaiser.
@@ -12,7 +25,7 @@ Der aktuelle Arbeitszweig heißt `feature/childhood-village-20261123`. Vor Ände
 
 ### Erweiterung vom 23.11.2026: gelebtes Dorf und offene Römerwelt
 
-Heinz beauftragt drei Agenten, den Anfang mit Handlung, Gesprächen und tatsächlicher Spielmechanik auszubauen. Zunächst regiert ein anderer. Der Spieler hilft beim Wiederaufbau, lernt Menschen und Berufe kennen, lebt im Dorf, verteidigt es und entwickelt Fähigkeiten durch seine Handlungen. Reale Einwohner besetzen Arbeitsplätze und fehlen dort, wenn sie verteidigen oder zur Truppe wechseln. Die langfristige Richtung ist eine offene Römerwelt mit historisch belegter Ausgangslage und durch Spielerhandlungen abweichenden Verläufen. Das vorhandene Startjahr um 100 n. Chr. bleibt erhalten; lokale Fiktion, belegte Ereignisse und alternative Geschichte sind ausdrücklich zu unterscheiden.
+Heinz beauftragt drei Agenten, den Anfang mit Handlung, Gesprächen und tatsächlicher Spielmechanik auszubauen. Zunächst regiert ein anderer. Der Spieler hilft beim Wiederaufbau, lernt Menschen und Berufe kennen, lebt im Dorf, verteidigt es und entwickelt Fähigkeiten durch seine Handlungen. Reale Einwohner besetzen Arbeitsplätze und fehlen dort, wenn sie verteidigen oder zur Truppe wechseln. Die langfristige Richtung ist eine offene Römerwelt mit historisch belegter Ausgangslage und durch Spielerhandlungen abweichenden Verläufen. Der Kampagnenbeginn ist 58 v. Chr. in Valdora bei Aquileia (Vorgabe D-015 vom 26.11.2026; ersetzt das frühere Startjahr um 100 n. Chr.); lokale Fiktion, belegte Ereignisse und alternative Geschichte sind ausdrücklich zu unterscheiden.
 
 Der integrierte Entwicklungsstand und die tatsächlichen Grenzen stehen in `docs/17_village_life/PLAYER_VISION.md`, `ECONOMY.md`, `STORY.md` und `ASSETS_AND_WORLD.md`. 32 × 32 km sind eine eigene technische Geländeplanung, keine verifizierte GTA-VI-Fläche und keine Behauptung einer fertig bevölkerten Welt. Android bleibt erstes Ziel; ein PS5-/AAA-Niveau ist das Gestaltungsziel, kein bereits belegtes Ergebnis. Die bisherigen Befugnisse für isolierte Implementierung, Tests, Android-Prüfbau und Draft-PR gelten weiter.
 
