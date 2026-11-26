@@ -329,6 +329,11 @@ func _test_vid_b_and_service() -> void:
 	game.ui.action_requested.emit("interact", {})
 	await frames(4)
 	check(_sp().i03_task == "service_bring" and props.jug_in_hand(), "The filled jug is really in the boy's hand")
+	var carried: Node3D = props._jug
+	var actor = game.world._figure
+	actor._reload((actor.detail+1)%4)
+	await frames(6)
+	check(is_instance_valid(carried) and carried == props._jug and carried.get_parent() == props and props.jug_in_hand(),"Market jug survives LOD replacement without being duplicated or freed")
 	await capture("well-jug")
 	_place((_ctx().cassia as Vector2) + Vector2(0.4, 2.2))
 	game.model.capture_npc_observations()

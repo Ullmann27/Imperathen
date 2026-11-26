@@ -670,6 +670,51 @@ func blend_transition() -> void:
 		_blend_transition()
 
 
+## Carrying is a local two-bone presentation overlay, not a replacement
+## locomotion clip. The spine, root, legs and authored arm lengths stay intact.
+func carry_left() -> void:
+	if not available or not is_instance_valid(skeleton):
+		return
+	for name: String in ["Arm_L","Forearm_L","Hand_L"]:
+		if not _ids.has(name):
+			return
+	var arm: int = _ids.Arm_L
+	var fore: int = _ids.Forearm_L
+	var hand: int = _ids.Hand_L
+	skeleton.force_update_all_bone_transforms()
+	var shoulder := skeleton.get_bone_global_pose(arm).origin
+	var upper := _rest[fore].origin.length()
+	var lower := _rest[hand].origin.length()
+	var reach := upper+lower
+	if reach < .05 or not is_finite(reach):
+		return
+	var side := 1.0 if _global_rest[arm].origin.x >= 0.0 else -1.0
+	# Both imported character families face +Z in skeleton rest space.
+	var wrist := shoulder+Vector3(side*.10,-.60,.47)*reach
+	var elbow := _joint(shoulder,wrist,upper,lower,Vector3(side*.7,-1.0,-.2))
+	_aim_live_segment(arm,fore,elbow-shoulder)
+	_aim_live_segment(fore,hand,wrist-skeleton.get_bone_global_pose(fore).origin)
+	# An upright jug requires a wrist orientation independent of arm swing.
+	var parent_basis := skeleton.get_bone_global_pose(fore).basis.orthonormalized()
+	var upright := _global_rest[hand].basis.orthonormalized()
+	skeleton.set_bone_pose_rotation(hand,(parent_basis.inverse()*upright).get_rotation_quaternion())
+	skeleton.force_update_all_bone_transforms()
+
+
+func _aim_live_segment(bone: int,child: int,toward: Vector3) -> void:
+	var current := skeleton.get_bone_global_pose(bone)
+	var segment := skeleton.get_bone_global_pose(child).origin-current.origin
+	if segment.length_squared() < .000001 or toward.length_squared() < .000001:
+		return
+	var rotation := Quaternion(segment.normalized(),toward.normalized())
+	var basis := Basis(rotation)*current.basis.orthonormalized()
+	var parent := skeleton.get_bone_parent(bone)
+	if parent >= 0:
+		basis = skeleton.get_bone_global_pose(parent).basis.orthonormalized().inverse()*basis
+	skeleton.set_bone_pose_rotation(bone,basis.get_rotation_quaternion())
+	skeleton.force_update_all_bone_transforms()
+
+
 func _reset() -> void:
 	for bone in _rest.size():
 		skeleton.set_bone_pose_position(bone, _rest[bone].origin)

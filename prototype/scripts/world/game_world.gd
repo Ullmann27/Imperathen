@@ -236,6 +236,7 @@ func sync_state(state: Dictionary) -> void:
 		i01_props.sync_state(state, _figure)
 	if is_instance_valid(i03_props):
 		i03_props.sync_state(state, _figure)
+	_figure.set_jug_carry((is_instance_valid(i01_props) and i01_props.jug_in_hand()) or (is_instance_valid(i03_props) and i03_props.jug_in_hand()))
 	if is_instance_valid(i04_props):
 		var visit: Dictionary = Childhood.i04_ctx(state) if Childhood.enabled(state) else {"index":-1, "trial_index":-1}
 		i04_props.sync_state(state, _figure, int(visit.index), int(visit.trial_index))
