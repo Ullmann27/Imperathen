@@ -25,6 +25,14 @@ This step therefore only touches the skirt and only where it tears:
 Only JOINTS_0/WEIGHTS_0 of HeroTunicSkirt are replaced; the original binary
 is verified before writing and a marker in the mesh extras makes the step
 idempotent. Exports whose skirt does not tear stay byte-identical.
+
+The same local rule (--cloth HeroTunic) closes the tunic's torn left armpit
+seam: tunic edges bound fully to Arm_L next to Spine/Pelvis vertices stretched
+beyond the gate criterion whenever the shield or bow arm rises (testudo,
+shoot; 1167 tearing samples in frontier_legionary_0), and the civilian
+tunic tore at the right armpit in attack/train. Only the torn vertices and one
+ring are blended, the whole-tunic smoothing stays rejected, and the body may
+not come further through the tunic than before.
 """
 from __future__ import annotations
 
@@ -42,6 +50,8 @@ from ground_death_clip import Glb, Rig  # noqa: E402
 
 MARKER = "imperathen_skirt_seam_smoothing"
 SKIRT = "HeroTunicSkirt"
+TUNIC = "HeroTunic"
+MARKERS = {SKIRT: MARKER, TUNIC: "imperathen_tunic_seam_smoothing"}
 BODY = "HeroBody"
 # Gate tearing criterion (motion_skin_measurement.gd).
 TEAR_FACTOR = 7.
@@ -173,17 +183,19 @@ def _append_joints(glb: Glb, joint_index: np.ndarray) -> int:
     return len(doc["accessors"]) - 1
 
 
-def smooth(path: Path, output: Path | None = None) -> dict:
+def smooth(path: Path, output: Path | None = None, cloth: str = SKIRT, strict: bool = True) -> dict:
+    """strict=False keeps a rejected export unchanged and reports why instead of raising."""
+    marker = MARKERS[cloth]
     glb = Glb(path)
     rig = Rig(glb)
     doc = glb.document
-    found = [p for p, primitive in enumerate(rig.primitives) if primitive["name"] == SKIRT]
+    found = [p for p, primitive in enumerate(rig.primitives) if primitive["name"] == cloth]
     if len(found) != 1:
-        raise ValueError(f"Expected one {SKIRT} primitive in {path}")
+        raise ValueError(f"Expected one {cloth} primitive in {path}")
     s = found[0]
     skirt = rig.primitives[s]
     mesh = doc["meshes"][doc["nodes"][skirt["node"]]["mesh"]]
-    if MARKER in mesh.get("extras", {}):
+    if marker in mesh.get("extras", {}):
         return {"path": str(path), "skipped": "already smoothed", "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
     body = next(primitive for primitive in rig.primitives if primitive["name"] == BODY)
     siblings = [p for p, primitive in enumerate(rig.primitives) if primitive["node"] == skirt["node"]]
@@ -201,23 +213,26 @@ def smooth(path: Path, output: Path | None = None) -> dict:
     frames = _frames(rig)
     measure = lambda weights: _measure(skirt, body, frames, weights, edges, rest_length, triangles, near, rest_clearance)
     before = measure((skirt["joint_index"], skirt["weight"]))
-    report = {"path": str(path), "sha256_before": hashlib.sha256(path.read_bytes()).hexdigest(),
+    report = {"path": str(path), "cloth": cloth, "sha256_before": hashlib.sha256(path.read_bytes()).hexdigest(),
               "skirt_vertices": len(rest),
               "before": {key: before[key] for key in ("tearing", "body_through_skirt_m")}}
     if not before["torn_vertices"]:
-        report["unchanged"] = "skirt does not tear"
+        report["unchanged"] = "skirt does not tear" if cloth == SKIRT else "tunic does not tear"
         return report
     joint_index, weight, region = _smoothed(skirt, rest, triangles, before["torn_vertices"])
     after = measure((joint_index, weight))
     report.update(after={key: after[key] for key in ("tearing", "body_through_skirt_m")},
                   smoothed_welded_vertices=region, torn_vertices_before=len(before["torn_vertices"]))
     if after["tearing"] or after["body_through_skirt_m"] > before["body_through_skirt_m"] + CLEARANCE_TOLERANCE_M:
+        if not strict:
+            report["unchanged"] = "rejected: smoothing would tear or let the body further through the cloth"
+            return report
         raise ValueError(f"Rejected seam smoothing for {path}: {report}")
     if output is not False:
         primitive = mesh["primitives"][siblings.index(s)]
         primitive["attributes"]["JOINTS_0"] = _append_joints(glb, joint_index)
         primitive["attributes"]["WEIGHTS_0"] = glb.append_accessor(weight.astype(np.float32), "VEC4")
-        mesh.setdefault("extras", {})[MARKER] = {
+        mesh.setdefault("extras", {})[marker] = {
             "tool": "tools/characters/smooth_frontier_skirt_seam.py", "passes": PASSES, "rings": RINGS,
             "blend": BLEND, "tearing_before": before["tearing"], "tearing_after": after["tearing"]}
         target = output or path
@@ -230,11 +245,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("glb", nargs="+", type=Path)
     parser.add_argument("--check", action="store_true", help="measure only, do not write")
+    parser.add_argument("--cloth", choices=sorted(MARKERS), default=SKIRT)
+    parser.add_argument("--keep-rejected", action="store_true", help="leave a rejected export unchanged instead of failing")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
     reports = []
     for path in args.glb:
-        report = smooth(path, False if args.check else None)
+        report = smooth(path, False if args.check else None, args.cloth, not args.keep_rejected)
         reports.append(report)
         if "skipped" in report or "unchanged" in report:
             print(f"SKIRT_SEAM {path} {report.get('skipped') or report.get('unchanged')}", flush=True)

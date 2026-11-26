@@ -66,14 +66,17 @@
             "max_sole_slip_before_m": 0.1593,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_civilian_man_1.glb",
           "triangles": 7628,
-          "bytes": 2555816,
-          "sha256": "b79d81eb89cf02186de07a032382c38adeef6c40fb366cf0c4bda2ef240cab1d",
+          "bytes": 2567324,
+          "sha256": "8099a2dcfb2b2d83133c3211b71d0eacf420240998f42dc0fbebd0e14127dd9b",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -123,6 +126,13 @@
             "max_sole_slip_before_m": 0.1592,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 25,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0499,
+            "body_through_tunic_m": 0.0499,
+            "smoothed_welded_vertices": 30
           }
         },
         {
@@ -180,6 +190,9 @@
             "max_sole_slip_before_m": 0.1589,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
           }
         },
         {
@@ -237,6 +250,9 @@
             "max_sole_slip_before_m": 0.1595,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
           }
         }
       ]
@@ -300,6 +316,9 @@
             "max_sole_slip_before_m": 0.1593,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
           }
         },
         {
@@ -358,6 +377,9 @@
             "max_sole_slip_before_m": 0.1592,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
           }
         },
         {
@@ -416,6 +438,9 @@
             "max_sole_slip_before_m": 0.1589,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
           }
         },
         {
@@ -474,6 +499,9 @@
             "max_sole_slip_before_m": 0.1595,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
           }
         }
       ]
@@ -539,6 +567,9 @@
             "max_sole_slip_before_m": 0.1593,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
           }
         },
         {
@@ -596,6 +627,9 @@
             "max_sole_slip_before_m": 0.1592,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "rejected: local smoothing removes the tearing but lets the body further through the tunic"
           }
         },
         {
@@ -653,6 +687,9 @@
             "max_sole_slip_before_m": 0.1589,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
           }
         },
         {
@@ -710,6 +747,9 @@
             "max_sole_slip_before_m": 0.1595,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
           }
         }
       ]
@@ -721,8 +761,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_legionary_0.glb",
           "triangles": 19060,
-          "bytes": 3689488,
-          "sha256": "38bf6e1a558b0b6354d1e886be692ebd2689f9a668e9ab3d8a093d316d73b0e4",
+          "bytes": 3717316,
+          "sha256": "3defd4ea4f3000505c1014ceebb4498acda20e7ebd65189cd1ef42168aba2af5",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -761,14 +801,21 @@
             "max_sole_slip_before_m": 0.1348,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 1167,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0306,
+            "body_through_tunic_m": 0.0306,
+            "smoothed_welded_vertices": 51
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_legionary_1.glb",
           "triangles": 7345,
-          "bytes": 2301648,
-          "sha256": "ecdaedfc1c8071cdd9c94466ecaa864ccf6f16e26742e2b801dbcc5a058bc97c",
+          "bytes": 2313176,
+          "sha256": "10be255ac1cff3885e36ebd728235292e38b490f80fd65753be4ec20274e7d4f",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -807,14 +854,21 @@
             "max_sole_slip_before_m": 0.1347,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 586,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.031,
+            "body_through_tunic_m": 0.031,
+            "smoothed_welded_vertices": 38
           }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_legionary_2.glb",
           "triangles": 2289,
-          "bytes": 694020,
-          "sha256": "fe1e15878b9c7ac32aa05186ff800333f057e373af4ff06e99305ce34c31606b",
+          "bytes": 698176,
+          "sha256": "ff7279745ab8ba3b04a5b6ac4a29c7cd3cf6f02fa364f193bb66ce553613961e",
           "texture_edge": 256,
           "face_morphs": false,
           "death_ground_contact": {
@@ -850,6 +904,13 @@
             "max_sole_slip_before_m": 0.1003,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 106,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0119,
+            "body_through_tunic_m": 0.0119,
+            "smoothed_welded_vertices": 8
           }
         },
         {
@@ -893,6 +954,9 @@
             "max_sole_slip_before_m": 0.0621,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
           }
         }
       ]
@@ -904,8 +968,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_officer_0.glb",
           "triangles": 19264,
-          "bytes": 3737612,
-          "sha256": "28864b2a84884061f67909248146cc88db80471cc90d8e49c476f184e9e6c515",
+          "bytes": 3765440,
+          "sha256": "071ebcfeaa9d6cbfc118023317e38b96694b744234138298005fad0264c8dea5",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -944,14 +1008,21 @@
             "max_sole_slip_before_m": 0.1348,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 1167,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0306,
+            "body_through_tunic_m": 0.0306,
+            "smoothed_welded_vertices": 51
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_officer_1.glb",
           "triangles": 7418,
-          "bytes": 2337900,
-          "sha256": "d8341ec18a19bb13ff3151dc23359962076e643c8c11dae2a25b596e80211445",
+          "bytes": 2349428,
+          "sha256": "ad5efe328a3b63ad36ef35e74a0eb78bf03994f237cfbe1a5dd9dae1ee611412",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -990,14 +1061,21 @@
             "max_sole_slip_before_m": 0.1347,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 586,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.031,
+            "body_through_tunic_m": 0.031,
+            "smoothed_welded_vertices": 38
           }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_officer_2.glb",
           "triangles": 2300,
-          "bytes": 701924,
-          "sha256": "d91e52f8a4db842bbc53e7b0ce7a3bed5860ea8c7890749dbdec4630ee9da88f",
+          "bytes": 706080,
+          "sha256": "bc6e4e0d969027018f4d4393cf63675b93c49ba1f365bbc59fa4c2b8fe02c955",
           "texture_edge": 256,
           "face_morphs": false,
           "death_ground_contact": {
@@ -1033,6 +1111,13 @@
             "max_sole_slip_before_m": 0.1003,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 106,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0119,
+            "body_through_tunic_m": 0.0119,
+            "smoothed_welded_vertices": 8
           }
         },
         {
@@ -1076,6 +1161,9 @@
             "max_sole_slip_before_m": 0.0621,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
           }
         }
       ]
@@ -1087,8 +1175,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_spearman_0.glb",
           "triangles": 18978,
-          "bytes": 3709264,
-          "sha256": "56066fb4e6d0b882400f34a4be7ab2af0ffb247d57fbe1f0381de9a4beec3ea4",
+          "bytes": 3737092,
+          "sha256": "a61e31a80c537158b560c4730e4d686c731eac4c376fdcb2fdd3983908e6ab4e",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -1127,14 +1215,21 @@
             "max_sole_slip_before_m": 0.1348,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 1167,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0306,
+            "body_through_tunic_m": 0.0306,
+            "smoothed_welded_vertices": 51
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_spearman_1.glb",
           "triangles": 7319,
-          "bytes": 2326068,
-          "sha256": "ac2101e5995e3a1bfffa3f347fe2c7c53cfe7566b841691af09528cdb921ba6c",
+          "bytes": 2337596,
+          "sha256": "aa15cecf61de4f3132de6ff6b0f05efdd6727ba376f9bd13393bd50c3bb7713e",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -1173,14 +1268,21 @@
             "max_sole_slip_before_m": 0.1347,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 586,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.031,
+            "body_through_tunic_m": 0.031,
+            "smoothed_welded_vertices": 38
           }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_spearman_2.glb",
           "triangles": 2284,
-          "bytes": 696164,
-          "sha256": "ebbbfc1ead54e8728925534f145add7df9be6ad8e019f2b64cd7870d1e667438",
+          "bytes": 700324,
+          "sha256": "df316b3ce37635b97244f94eb53604146aa83bd28a3ec26b28d1bcf8a24543b9",
           "texture_edge": 256,
           "face_morphs": false,
           "death_ground_contact": {
@@ -1216,6 +1318,13 @@
             "max_sole_slip_before_m": 0.1003,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 106,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0119,
+            "body_through_tunic_m": 0.0119,
+            "smoothed_welded_vertices": 8
           }
         },
         {
@@ -1259,6 +1368,9 @@
             "max_sole_slip_before_m": 0.0621,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
           }
         }
       ]
@@ -1270,8 +1382,8 @@
           "lod": 0,
           "path": "prototype/assets/characters/frontier_archer_0.glb",
           "triangles": 18308,
-          "bytes": 3633656,
-          "sha256": "dbe0d5564e1034044fba91a00556f1fb4f00cdfe6b7a90295f8375705f95053e",
+          "bytes": 3661484,
+          "sha256": "75237719a81410d5e1d96941b91974f37243a24816d893a9b4348e35c7698fba",
           "texture_edge": 1024,
           "face_morphs": true,
           "death_ground_contact": {
@@ -1310,14 +1422,21 @@
             "max_sole_slip_before_m": 0.1348,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 1297,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0507,
+            "body_through_tunic_m": 0.0507,
+            "smoothed_welded_vertices": 71
           }
         },
         {
           "lod": 1,
           "path": "prototype/assets/characters/frontier_archer_1.glb",
           "triangles": 7064,
-          "bytes": 2302740,
-          "sha256": "de0b0a9ea8b2f01267416ef72594e8c22d9b84a31ebaa04c1350380876085e14",
+          "bytes": 2314268,
+          "sha256": "521648fbfe4888e62a10d6a8e64712a8e5238a8a4c3b320a8480ee1d6835b7f5",
           "texture_edge": 512,
           "face_morphs": true,
           "death_ground_contact": {
@@ -1356,14 +1475,21 @@
             "max_sole_slip_before_m": 0.1347,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 672,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.031,
+            "body_through_tunic_m": 0.031,
+            "smoothed_welded_vertices": 50
           }
         },
         {
           "lod": 2,
           "path": "prototype/assets/characters/frontier_archer_2.glb",
           "triangles": 2207,
-          "bytes": 696012,
-          "sha256": "d8b4d4fb9bb1f4a3f7a036d50752ad76329d317213035f793fcd5b31f41ab3ba",
+          "bytes": 700172,
+          "sha256": "55d5392556ed5fddc945e0ee82c0af42e6a2be8c297ea35dbc6b2b6c8803c2db",
           "texture_edge": 256,
           "face_morphs": false,
           "death_ground_contact": {
@@ -1399,6 +1525,13 @@
             "max_sole_slip_before_m": 0.1003,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "tearing_before": 106,
+            "tearing_after": 0,
+            "body_through_tunic_before_m": 0.0375,
+            "body_through_tunic_m": 0.0375,
+            "smoothed_welded_vertices": 8
           }
         },
         {
@@ -1442,6 +1575,9 @@
             "max_sole_slip_before_m": 0.0621,
             "max_sole_slip_m": 0.0,
             "max_sole_penetration_m": 0.0
+          },
+          "tunic_seam": {
+            "unchanged": "tunic does not tear"
           }
         }
       ]
