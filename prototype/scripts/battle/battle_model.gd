@@ -38,10 +38,22 @@ const RETREAT_SPEED := MEMBER_SPEED
 ## falls deeper. Melee strikes hit the front; missiles reach further back (design values).
 const MELEE_BANDS := [0.80, 0.15]
 const MISSILE_BANDS := [0.40, 0.25]
-const MEMORY_EVENTS := ["first_contact", "officer_fallen"]
+const MEMORY_EVENTS := ["first_contact", "officer_fallen", "banner_lost", "routed", "rallied"]
 const MAX_MEMORIES := 24
+## Morale and rally (design values, P3). A routed company only becomes ready again when
+## it has rallied: morale at least RALLY_MORALE, RALLY_STEPS since the rally order took
+## effect, no fighting enemy within RALLY_CLEARANCE and a living commander or deputy.
+const ROUT_MORALE := 24.0
+const RALLY_MORALE := 40.0
+const RALLY_CLEARANCE := 8.0
+const RALLY_STEPS := 25
+const RALLY_RATE := 4.0
+const CONTAGION_RADIUS := 12.0
+const CONTAGION_SHOCK := 8.0
+const REAR_FACTOR := 1.5
+const BANNER_SHOCK := 15.0
 ## Squad keys added by schema 3. A legacy save carries none of them (or all of them).
-const SCHEMA3_KEYS := ["troop_id", "loadout", "drills", "uids", "people", "memories"]
+const SCHEMA3_KEYS := ["troop_id", "loadout", "drills", "uids", "people", "memories", "signifer_id", "rally_from"]
 ## Data hook for later scenarios (outnumbered, defence, reinforcement, retreat,
 ## negotiation, capture). Only this test bench exists so far; build none of them here.
 const VALLEY_SCENARIO := {
@@ -136,7 +148,8 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 		"last_action": "", "action_step": -1, "hit_step": -1, "block_step": -1,
 		"wounded": 0, "dead": 0, "cohesion": 100.0, "reaction_seconds": 0.4, "ready_at": 0,
 		"troop_id": troop.troop_id, "loadout": _kit(troop), "drills": troop.drills.duplicate(true),
-		"uids": [], "people": {}, "memories": []}
+		"uids": [], "people": {}, "memories": [],
+		"signifer_id": _soldier_id(id, 1) if count >= 5 else "", "rally_from": 0}
 	var catalog := Catalog.load_default()
 	var plan: Dictionary = _plans.get(id, {})
 	var group: Dictionary = catalog.groups.get(plan.get("origin", ""), {}) if catalog.ok else {}
@@ -145,7 +158,7 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 	for i in range(count):
 		var person := Roster.identity(battle_seed, id, i, count, troop, pool, group, entry_xp, s.discipline, year)
 		s.people[person.uid] = person
-	var order := _arrangement(shape, count, s.commander_id, s.deputy_id, id)
+	var order := _arrangement(shape, count, [s.commander_id, s.deputy_id, s.signifer_id], id)
 	var slots := Slots.world_slots(shape, count, 0.0, at, facing)
 	for i in range(count):
 		s.members.append([slots[i].x, slots[i].y])
@@ -153,21 +166,32 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 	squads[id] = s
 
 
-## Initial places: the commander fights at the right of the front rank, the deputy
-## closes the rear, everyone else keeps muster order. Losses decide who falls, not slots.
-func _arrangement(shape: String, count: int, commander: String, deputy: String, id: String) -> Array:
+## Initial places: the commander fights at the right of the front rank, the standard
+## bearer stands in the middle of the second rank (behind the antesignani), the deputy
+## closes the rear; everyone else keeps muster order. Losses decide who falls, not slots.
+func _arrangement(shape: String, count: int, leaders: Array, id: String) -> Array:
 	var order := []
 	for i in range(count):
 		order.append(_soldier_id(id, i))
-	if count < 3:
+	if count < 5:
 		return order
 	var ranks := Slots.ranks(shape, count, 0.0)
-	var front_right := ranks.rfind(0)
-	order.erase(commander)
-	order.erase(deputy)
-	order.insert(mini(front_right, order.size()), commander)
-	order.append(deputy)
-	return order
+	var second := []
+	for i in range(count):
+		if ranks[i] == 1:
+			second.append(i)
+	var placed := {ranks.rfind(0): leaders[0], count - 1: leaders[1]}
+	var standard: int = second[second.size() / 2] if not second.is_empty() else ranks.rfind(0) / 2
+	if leaders[2] != "" and not placed.has(standard):
+		placed[standard] = leaders[2]
+	var rest := []
+	for uid in order:
+		if not uid in placed.values():
+			rest.append(uid)
+	var result := []
+	for slot in range(count):
+		result.append(placed[slot] if placed.has(slot) else rest.pop_front())
+	return result
 
 
 static func _soldier_id(company_id: String, index: int) -> String:
@@ -215,7 +239,7 @@ func soldiers(id: String) -> Array:
 	for i in range(s.members.size()):
 		var m: Array = s.members[i]
 		var pose := "idle"
-		if s.status == "routed":
+		if s.status == "routed" or (s.status == "rallying" and steps < s.ready_at):
 			pose = "retreat"
 		elif s.hit_step >= 0 and steps - s.hit_step < 2 and i % 3 == s.hit_step % 3:
 			pose = "hit"
@@ -309,7 +333,7 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 		var s: Dictionary = squads[id]
 		if s.side != "ally" or s.strength < 1 or s.status == "withdrawn":
 			return _reply(false, "Dieser Verband untersteht dem Befehl nicht.")
-		if s.status == "routed" and command != "rally":
+		if s.status in ["routed", "rallying"] and command != "rally":
 			return _reply(false, "Der Verband flieht. Sammeln ist noch möglich.")
 		if command == "form" and (typeof(target) != TYPE_STRING or not can_form(s.kind, target)):
 			return _reply(false, "Die Ausrüstung passt nicht zu dieser Formation.")
@@ -344,6 +368,8 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 		if command == "form":
 			_queue_formation(s, target)
 			continue
+		if command == "rally" and s.status == "rallying":
+			continue
 		_delay(s)
 		if command == "cease_fire":
 			s.fire = false
@@ -363,7 +389,13 @@ func order(ids: Array, command: String, target: Variant = null) -> Dictionary:
 			"retreat": _set_goal(s, Vector2(s.x, 20))
 			"move", "attack_move", "defend": _set_goal(s, destinations[id])
 			"rally":
-				s.status = "ready"
+				# A routed company keeps running until the order arrives, then rallies
+				# as a state; it only fights again once _rally_step lets it.
+				if s.status == "routed":
+					s.status = "rallying"
+					s.rally_from = s.ready_at
+				else:
+					s.status = "ready"
 				_set_goal(s, _pos(s))
 			_: _set_goal(s, _pos(s))
 	return _reply(true, "Befehl bestätigt.")
@@ -390,7 +422,7 @@ func _set_goal(s: Dictionary, p: Vector2) -> void:
 
 
 func _active(s: Dictionary) -> bool:
-	return s.strength > 0 and s.status not in ["routed", "withdrawn"]
+	return s.strength > 0 and s.status not in ["routed", "rallying", "withdrawn"]
 
 
 func _nearest(s: Dictionary) -> Dictionary:
@@ -428,7 +460,7 @@ func _archer_target(s: Dictionary, fallback: Dictionary) -> Dictionary:
 
 
 func _ai(s: Dictionary, enemy: Dictionary) -> void:
-	if s.status == "withdrawn" or s.status == "routed":
+	if s.status in ["withdrawn", "routed", "rallying"]:
 		return
 	var previous: String = s.command
 	if s.morale < 35 or (s.command == "rally" and s.morale < 52):
@@ -479,15 +511,24 @@ func _step() -> void:
 		var enemy := _nearest(s)
 		if s.side == "enemy" and (steps == 1 or steps % 5 == 0):
 			_ai(s, enemy)
-		if s.status == "routed":
+		if s.status == "routed" or (s.status == "rallying" and steps < s.ready_at):
 			var edge := Vector2(s.x, 21 if s.side == "ally" else -21)
 			if _walk(s, edge, ROUT_SPEED):
 				s.status = "withdrawn"
+				s.rally_from = 0
+		elif s.status == "rallying":
+			_rally_step(s, enemy)
 		else:
 			_act(s, enemy, hits)
 		_align_members(s)
-	# Apply all attacks after every squad has acted. A casualty cannot erase
-	# another squad's hit from the same simulation step.
+	_apply_hits(hits)
+	_evaluate()
+
+
+## Apply all attacks after every squad has acted. A casualty cannot erase another
+## squad's hit from the same simulation step. Panic then spreads from new routs.
+func _apply_hits(hits: Dictionary) -> void:
+	var routed: Array[String] = []
 	for id in hits:
 		var s: Dictionary = squads[id]
 		var hit: Dictionary = hits[id]
@@ -498,25 +539,96 @@ func _step() -> void:
 		if lost == 0:
 			continue
 		s.damage = maxf(0, s.damage - lost) if lost < s.strength else 0.0
-		var led_by: String = s.officer_id
-		for fallen in _choose_casualties(s, lost, hit.sources):
-			_fall(s, fallen)
-		s.strength -= lost
-		_count_losses(s)
-		s.officer_id = _expected_officer(s)
-		if s.officer_id != led_by:
-			if led_by == s.commander_id:
-				s.morale = maxf(0, s.morale - 4)
-				_remember(s, "officer_fallen", led_by)
-			if s.officer_id != "":
-				Roster.note(s.people[s.officer_id], "took_command", led_by, year, steps)
-		s.morale = maxf(0, s.morale - 84.0 * lost / s.initial_strength)
-		if s.strength == 0:
-			s.status = "destroyed"
-			s.officer_id = ""
-		elif s.morale <= 24:
-			s.status = "routed"
-	_evaluate()
+		if _take_losses(s, _choose_casualties(s, lost, hit.sources), hit.sources):
+			routed.append(id)
+	_spread_panic(routed)
+
+
+## Removes the given soldiers and applies every morale consequence. Returns true when
+## the company breaks because of it.
+func _take_losses(s: Dictionary, fallen: Array, sources: Array) -> bool:
+	var led_by: String = s.officer_id
+	var banner: String = s.signifer_id
+	for uid in fallen:
+		_fall(s, uid)
+	s.strength -= fallen.size()
+	_count_losses(s)
+	s.officer_id = _expected_officer(s)
+	if s.officer_id != led_by:
+		if led_by == s.commander_id:
+			s.morale = maxf(0, s.morale - 4)
+			_remember(s, "officer_fallen", led_by)
+		if s.officer_id != "":
+			Roster.note(s.people[s.officer_id], "took_command", led_by, year, steps)
+	if banner != "" and not banner in s.uids:
+		s.signifer_id = ""
+		s.morale = maxf(0, s.morale - BANNER_SHOCK)
+		_remember(s, "banner_lost", banner)
+	s.morale = maxf(0, s.morale - casualty_morale(s, fallen.size(), sources))
+	return _check_rout(s, "")
+
+
+## Morale cost of casualties; the share of damage that came from behind weighs 1.5x.
+func casualty_morale(s: Dictionary, lost: int, sources: Array) -> float:
+	var total := 0.0
+	var weighted := 0.0
+	for source: Dictionary in sources:
+		total += source.damage
+		weighted += source.damage * (REAR_FACTOR if _from_rear(s, source.at) else 1.0)
+	return 84.0 * lost / s.initial_strength * (weighted / total if total > 0.0 else 1.0)
+
+
+func _from_rear(s: Dictionary, at: Vector2) -> bool:
+	return _front(s).dot(_pos(s).direction_to(at)) < -0.5
+
+
+func _check_rout(s: Dictionary, cause: String) -> bool:
+	if s.strength == 0:
+		s.status = "destroyed"
+		s.officer_id = ""
+		s.rally_from = 0
+		return false
+	if s.morale <= ROUT_MORALE and s.status not in ["routed", "withdrawn", "destroyed"]:
+		s.status = "routed"
+		s.rally_from = 0
+		_remember(s, "routed", cause)
+		return true
+	return false
+
+
+## Every new rout shakes friendly companies within CONTAGION_RADIUS once; a company
+## that breaks from it spreads the panic further in the same step.
+func _spread_panic(routed: Array[String]) -> void:
+	var queue := routed.duplicate()
+	var i := 0
+	while i < queue.size():
+		var source: Dictionary = squads[queue[i]]
+		i += 1
+		for other: Dictionary in squads.values():
+			if other.side != source.side or other.id == source.id or other.strength == 0 or other.status in ["routed", "withdrawn", "destroyed"]:
+				continue
+			if _pos(other).distance_to(_pos(source)) <= CONTAGION_RADIUS:
+				other.morale = maxf(0, other.morale - CONTAGION_SHOCK)
+				if _check_rout(other, source.id):
+					queue.append(other.id)
+
+
+## Comrades who know each other steady faster (0.8x at no bond, 1.2x at full bond).
+func _bond_factor(s: Dictionary) -> float:
+	return 0.8 + Roster.bond(s.people, s.uids) / 250.0
+
+
+func _rally_step(s: Dictionary, enemy: Dictionary) -> void:
+	_set_goal(s, _pos(s))
+	s.fatigue = maxf(0, s.fatigue - 2 * STEP)
+	if s.morale < 78.0:
+		s.morale = minf(78.0, s.morale + RALLY_RATE * STEP * _bond_factor(s))
+	var clear := enemy.is_empty() or _pos(s).distance_to(_pos(enemy)) > RALLY_CLEARANCE
+	if s.morale >= RALLY_MORALE and steps - s.rally_from >= RALLY_STEPS and clear and s.officer_id != "":
+		s.status = "ready"
+		s.command = "hold"
+		s.rally_from = 0
+		_remember(s, "rallied", s.officer_id)
 
 
 func _add_hit(hits: Dictionary, attacker: Dictionary, target: Dictionary, damage: float, mode: String) -> void:
@@ -690,8 +802,8 @@ func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
 		s.fatigue = minf(100, s.fatigue + STEP)
 	elif s.command in ["hold", "reserve", "rally"]:
 		s.fatigue = maxf(0, s.fatigue - 2 * STEP)
-		if s.command == "rally":
-			s.morale = minf(78.0, s.morale + 4.0 * STEP) if s.morale < 78.0 else s.morale
+		if s.command == "rally" and s.morale < 78.0:
+			s.morale = minf(78.0, s.morale + RALLY_RATE * STEP * _bond_factor(s))
 	elif pursue and contact:
 		pass
 	else:
@@ -738,7 +850,7 @@ func _walk(s: Dictionary, dest: Vector2, speed: float) -> bool:
 		s.x = next.x
 		s.z = next.y
 		s.fatigue = minf(100, s.fatigue + 0.22 * STEP)
-		if s.status != "routed":
+		if s.status not in ["routed", "rallying"]:
 			s.status = "moving"
 	return next.distance_to(dest) < 0.02
 
@@ -829,7 +941,7 @@ func summary() -> Dictionary:
 				total.losses += s.initial_strength - s.strength
 				total.wounded += s.wounded
 				total.dead += s.dead
-				if s.status in ["routed", "withdrawn"]:
+				if s.status in ["routed", "rallying", "withdrawn"]:
 					total.routed += s.strength
 		result[side] = total
 	return result
@@ -873,9 +985,11 @@ func _migrate_v2(s: Dictionary, original: Dictionary) -> Variant:
 	s.loadout = original.loadout.duplicate(true)
 	s.drills = original.drills.duplicate(true)
 	s.memories = []
+	s.rally_from = 0
 	s.uids = []
 	for i in range(int(s.strength)):
 		s.uids.append(_soldier_id(original.id, i))
+	s.signifer_id = original.signifer_id if original.signifer_id in s.uids else ""
 	s.people = original.people.duplicate(true)
 	var k := 0
 	for index in range(original.initial_strength - 1, int(s.strength) - 1, -1):
@@ -973,6 +1087,12 @@ func restore(save: Dictionary) -> bool:
 			expected_officer = s.commander_id if s.commander_id in s.uids else (s.deputy_id if s.deputy_id in s.uids else "")
 		if s.get("officer_id") != expected_officer:
 			return false
+		if s.get("signifer_id") != (original.signifer_id if original.signifer_id in s.uids else ""):
+			return false
+		if not _number(s.get("rally_from"), 0, save.steps + 8, true) or (s.rally_from > 0) != (s.get("status") == "rallying"):
+			return false
+		if s.status == "rallying" and s.get("command") != "rally":
+			return false
 		if not _number(s.get("cohesion"), 0, 100) or not _number(s.get("reaction_seconds"), 0, 2) or not _number(s.get("ready_at"), 0, save.steps + 8, true):
 			return false
 		if not _number(s.get("ammo"), 0, 18 if original.kind == "archer" else 0, true) or not _number(s.get("next_volley"), 0, save.steps + 9, true):
@@ -998,7 +1118,7 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if s.reaction_seconds < 2 * STEP or s.reaction_seconds > 7 * STEP + 0.00001:
 			return false
-		if typeof(s.formation) != TYPE_STRING or not can_form(s.kind, s.formation) or not COMMANDS.has(s.get("command")) or not s.get("status") in ["ready","engaged","moving","routed","withdrawn","destroyed"]:
+		if typeof(s.formation) != TYPE_STRING or not can_form(s.kind, s.formation) or not COMMANDS.has(s.get("command")) or not s.get("status") in ["ready","engaged","moving","routed","rallying","withdrawn","destroyed"]:
 			return false
 		if typeof(s.get("fire")) != TYPE_BOOL or typeof(s.get("ai_reason")) != TYPE_STRING or typeof(s.get("target")) != TYPE_STRING:
 			return false
@@ -1025,7 +1145,7 @@ func restore(save: Dictionary) -> bool:
 			if not Field.clear_segment(Vector2(m[0], m[1]), Vector2(m[0], m[1])):
 				return false
 		restored[id] = s.duplicate(true)
-		for key in ["strength", "initial_strength", "action_step", "hit_step", "block_step", "formation_at", "ready_at", "next_volley", "ammo", "experience", "discipline", "wounded", "dead"]:
+		for key in ["strength", "initial_strength", "action_step", "hit_step", "block_step", "formation_at", "ready_at", "next_volley", "ammo", "experience", "discipline", "wounded", "dead", "rally_from"]:
 			restored[id][key] = int(s[key])
 	if _result(restored, int(save.steps), int(save.capture)) != [save.outcome, save.reason]:
 		return false

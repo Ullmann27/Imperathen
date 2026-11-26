@@ -22,6 +22,10 @@ func _initialize() -> void:
 	_test_officer_spread()
 	_test_determinism()
 	_test_legacy_save()
+	_test_rally()
+	_test_rally_conditions()
+	_test_contagion()
+	_test_rear_and_banner()
 	print("BATTLE_COMMAND_RESULT checks=%d failures=%d metrics=%s" % [checks, failures, JSON.stringify(metrics)])
 	quit(1 if failures else 0)
 
@@ -300,3 +304,140 @@ func _test_legacy_save() -> void:
 	var revived := legacy.duplicate(true)
 	revived.squads[GUARD].strength = 5
 	check(not Battle.new().restore(revived), "A legacy save cannot revive a soldier")
+
+
+func _source(m, target: String, at: Vector2) -> Array:
+	return [{"from": ENEMY, "at": at, "damage": 1.0, "mode": "melee"}]
+
+
+func _test_rally() -> void:
+	var m := Battle.new()
+	check(_place(m, {GUARD: Vector2(-18, 15)}), "Rally fixture loads")
+	var g: Dictionary = m.squads[GUARD]
+	g.status = "routed"
+	g.morale = 20.0
+	var start := Vector2(g.x, g.z)
+	check(m.order([GUARD], "rally").ok and g.status == "rallying" and not m._active(g), "Rally at morale 20 starts a rally but the company still flees")
+	var ordered: int = m.steps
+	var fled := false
+	var ready_at := -1
+	var never_early := true
+	for i in 60:
+		m.tick(Battle.STEP)
+		fled = fled or g.z > start.y + 0.3
+		if g.status == "ready":
+			ready_at = m.steps
+			break
+		never_early = never_early and g.status in ["rallying", "routed"] and not m._active(g)
+		if m.steps - ordered < Battle.RALLY_STEPS:
+			never_early = never_early and g.status != "ready"
+	metrics["rally_from_20_seconds"] = (ready_at - ordered) * Battle.STEP if ready_at > 0 else -1.0
+	check(fled, "Until the order arrives the routed company keeps running")
+	check(never_early and ready_at > 0 and ready_at - ordered >= Battle.RALLY_STEPS and g.morale >= Battle.RALLY_MORALE,
+		"Routing ends only with morale >= 40 after at least 5 s (%.1f s, morale %.1f)" % [(ready_at - ordered) * Battle.STEP, g.morale])
+	check(ready_at - ordered <= 45 and g.command == "hold" and m._active(g) and g.memories.back().event == "rallied", "A rallied company holds and counts again")
+	var saved := Battle.new()
+	m.order([GUARD], "retreat")
+	check(saved.restore(JSON.parse_string(JSON.stringify(m.snapshot()))), "Rallied state saves")
+
+
+func _rallying(m) -> Dictionary:
+	var g: Dictionary = m.squads[GUARD]
+	g.status = "rallying"
+	g.command = "rally"
+	g.morale = 60.0
+	g.rally_from = maxi(1, m.steps - 30)
+	return g
+
+
+func _test_rally_conditions() -> void:
+	var m := Battle.new()
+	m.steps = 40
+	var near := {"x": m.squads[GUARD].x, "z": m.squads[GUARD].z + 6.0}
+	var far := {"x": m.squads[GUARD].x, "z": m.squads[GUARD].z + 9.0}
+	var g := _rallying(m)
+	m._rally_step(g, near)
+	check(g.status == "rallying", "No rally while a fighting enemy is within 8 m")
+	m._rally_step(g, far)
+	check(g.status == "ready", "Rally completes once the nearest enemy is beyond 8 m")
+	g = _rallying(m)
+	g.officer_id = ""
+	m._rally_step(g, {})
+	check(g.status == "rallying", "No rally without a living commander or deputy")
+	g = _rallying(m)
+	g.rally_from = m.steps - Battle.RALLY_STEPS + 1
+	m._rally_step(g, {})
+	check(g.status == "rallying", "No rally before 5 s have passed")
+	g = _rallying(m)
+	g.morale = 30.0
+	m._rally_step(g, {})
+	check(g.status == "rallying", "No rally below morale 40")
+	var save := Battle.new()
+	var snap: Dictionary = Battle.new().snapshot()
+	snap.squads[GUARD].status = "rallying"
+	snap.squads[GUARD].command = "rally"
+	check(not save.restore(snap), "A rallying company without a rally start is rejected")
+	snap.squads[GUARD].rally_from = 2
+	snap.steps = 1
+	check(save.restore(snap), "A consistent rallying company is accepted")
+	var still := Battle.new()
+	check(_place(still, {GUARD: Vector2(-18, 15)}), "Unrallied fixture loads")
+	still.squads[GUARD].status = "routed"
+	still.squads[GUARD].morale = 70.0
+	var recovered := false
+	for i in 50:
+		still.tick(Battle.STEP)
+		recovered = recovered or still.squads[GUARD].status == "ready"
+	check(not recovered, "Without a rally order routing never ends by itself")
+
+
+func _test_contagion() -> void:
+	var m := Battle.new()
+	check(_place(m, {"valley_spears": Vector2(3, 8), "valley_bows": Vector2(12, 12)}), "Contagion fixture loads")
+	var g: Dictionary = m.squads[GUARD]
+	var spears: Dictionary = m.squads["valley_spears"]
+	var bows: Dictionary = m.squads["valley_bows"]
+	g.morale = 27.0
+	var spear_morale: float = spears.morale
+	var bow_morale: float = bows.morale
+	m._apply_hits({GUARD: {"damage": 1.0, "sources": _source(m, GUARD, Vector2(g.x, g.z - 3))}})
+	check(g.status == "routed", "A company that falls below morale 24 routs")
+	check(is_equal_approx(spears.morale, spear_morale - Battle.CONTAGION_SHOCK) and is_equal_approx(bows.morale, bow_morale),
+		"A rout costs neighbours within 12 m exactly 8 morale and leaves those further away alone")
+	var chain := Battle.new()
+	check(_place(chain, {"valley_spears": Vector2(3, 8), "valley_bows": Vector2(12, 12)}), "Cascade fixture loads")
+	chain.squads[GUARD].morale = 27.0
+	chain.squads["valley_spears"].morale = 30.0
+	var before: float = chain.squads["valley_bows"].morale
+	chain._apply_hits({GUARD: {"damage": 1.0, "sources": _source(chain, GUARD, Vector2(-7, 5))}})
+	check(chain.squads["valley_spears"].status == "routed" and is_equal_approx(chain.squads["valley_bows"].morale, before - Battle.CONTAGION_SHOCK)
+		and chain.squads["valley_spears"].memories.back().ref == GUARD, "Panic cascades through a company that breaks from it")
+
+
+func _test_rear_and_banner() -> void:
+	var m := Battle.new()
+	m.steps = 10
+	var g: Dictionary = m.squads[GUARD]
+	var front := Vector2(g.x, g.z) + m._front(g) * 3.0
+	var rear := Vector2(g.x, g.z) - m._front(g) * 3.0
+	var side := Vector2(g.x, g.z) + m._front(g).orthogonal() * 3.0
+	var one: float = 84.0 / g.initial_strength
+	check(is_equal_approx(m.casualty_morale(g, 1, _source(m, GUARD, front)), one) and is_equal_approx(m.casualty_morale(g, 1, _source(m, GUARD, side)), one),
+		"Front and flank casualties cost the base morale")
+	check(is_equal_approx(m.casualty_morale(g, 1, _source(m, GUARD, rear)), one * 1.5), "Casualties from behind weigh 1.5x")
+	var mixed := _source(m, GUARD, front) + _source(m, GUARD, rear)
+	check(is_equal_approx(m.casualty_morale(g, 1, mixed), one * 1.25), "Mixed attacks weigh by their damage share")
+	var banner: String = g.signifer_id
+	check(banner == "valley_guard_01" and Slots.ranks(g.formation, g.strength, g.width)[g.uids.find(banner)] == 1, "The standard bearer stands in the second rank")
+	var morale: float = g.morale
+	m._take_losses(g, [banner], _source(m, GUARD, front))
+	check(is_equal_approx(g.morale, morale - one - Battle.BANNER_SHOCK) and g.signifer_id == "" and g.memories.back().event == "banner_lost",
+		"Losing the standard costs 15 morale on top of the casualty")
+	morale = g.morale
+	var next: String = g.uids[3] if g.uids[3] != g.commander_id else g.uids[4]
+	m._take_losses(g, [next], _source(m, GUARD, front))
+	check(is_equal_approx(g.morale, morale - one), "The banner shock applies only once")
+	var revived: Dictionary = m.snapshot()
+	revived.squads[GUARD].signifer_id = banner
+	check(not Battle.new().restore(revived), "A save cannot raise a fallen standard bearer")
+	check(Battle.new().restore(m.snapshot()), "A company without its standard saves validly")
