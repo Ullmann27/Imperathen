@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "status": "candidates_unverified",
+  "purpose": "Vorbereitete Rosterstruktur für Völker im Raum Aquileia (Valdora). Keine dieser Gruppen wird simuliert, bevor Quellen, Lage und Zeitstellung für 58 v. Chr. geprüft und Zahlen als Spielannahmen markiert sind. Es werden hier keine historischen Tatsachen behauptet; die Quellenhinweise sind Prüfaufträge.",
+  "use_rule": "Ein Eintrag wird erst mit verified=true, Quellenbeleg je Aussage und Freigabe in ein Szenario übernommen. Gallische Kontakte laufen bis dahin über die Händler (mercatores) des Rheinszenarios.",
+  "candidates": {
+    "carni": {
+      "name": "Karner",
+      "culture_hint": "alpine",
+      "region_hint": "Alpen- und Voralpenraum nördlich von Aquileia",
+      "verified": false,
+      "sources_to_check": [
+        "Plinius d. Ä., Naturalis historia 3 (Regio X)",
+        "Fasti triumphales (Triumph über Karner, späte Republik)",
+        "Strabon, Geographika 4–5"
+      ],
+      "open_questions": [
+        "Siedlungsraum um 58 v. Chr.",
+        "Verhältnis zu Rom und Aquileia zu dieser Zeit"
+      ]
+    },
+    "histri": {
+      "name": "Histrer",
+      "culture_hint": "adriatic",
+      "region_hint": "Istrien südöstlich von Aquileia",
+      "verified": false,
+      "sources_to_check": [
+        "Livius, Ab urbe condita 41 (Histrischer Krieg)",
+        "Plinius d. Ä., Naturalis historia 3",
+        "Strabon, Geographika 5"
+      ],
+      "open_questions": [
+        "Status nach der römischen Unterwerfung im 2. Jh. v. Chr.",
+        "Siedlungen und Häfen um 58 v. Chr."
+      ]
+    },
+    "taurisci_norici": {
+      "name": "Taurisker und Noriker",
+      "culture_hint": "alpine_celtic",
+      "region_hint": "Ostalpen, Noricum",
+      "verified": false,
+      "sources_to_check": [
+        "Caesar, BG 1,5 (Boier, Noreia)",
+        "Strabon, Geographika 4–5",
+        "Polybios (Goldvorkommen der Taurisker)"
+      ],
+      "open_questions": [
+        "Verhältnis Taurisker/Noriker",
+        "Handel mit Aquileia (Eisen, Gold)"
+      ]
+    },
+    "iapydes": {
+      "name": "Iapyden",
+      "culture_hint": "illyrian",
+      "region_hint": "Hinterland östlich von Tergeste",
+      "verified": false,
+      "sources_to_check": [
+        "Appian, Illyrike",
+        "Caesar, BG 8,24 (Einfälle bei Tergeste, durch Hirtius)",
+        "Strabon, Geographika 4,6; 7,5"
+      ],
+      "open_questions": [
+        "Datierung der Einfälle in Bezug auf 58–52 v. Chr.",
+        "Belegte Ziele und Bündnisse"
+      ]
+    },
+    "veneti_adriatic": {
+      "name": "Veneter (Adria)",
+      "culture_hint": "venetic",
+      "region_hint": "Venetien westlich von Aquileia",
+      "verified": false,
+      "sources_to_check": [
+        "Polybios 2",
+        "Strabon, Geographika 5",
+        "Livius 10"
+      ],
+      "open_questions": [
+        "Rechtsstellung gegenüber Rom um 58 v. Chr.",
+        "Abgrenzung zu den gallischen Venetern Caesars (BG 3)"
+      ]
+    }
+  }
+}

@@ -13,7 +13,7 @@ extends RefCounted
 ## only through events with ids. Decisions are utility-based and seeded.
 
 const Relations = preload("res://scripts/domain/actor_relations.gd")
-const VERSION := 1
+const VERSION := 2
 const NO_SCENARIO := "none"
 const SCENARIO_INDEX := {"bc58_rhine": "res://assets/world/tribes/bc58_rhine.json"}
 ## A roster is the default only inside its era window [first year, last year].
@@ -41,7 +41,12 @@ const SEASON_NAMES := ["Frühjahr", "Sommer", "Herbst", "Winter"]
 const VULNERABILITY := {1: 1.3, 2: 1.0, 3: 0.7}
 ## Village goods reported by an external raid, converted to this ledger's goods.
 const EXTERNAL_GOODS := {"grain": {"food": 10}, "denarii": {"wealth": 0.25}, "wood": {"wood": 1}}
-const STATE_KEYS := ["version", "scenario", "seed", "rng", "tick", "extra_days", "next_id", "groups", "persons", "targets", "relations", "agreements", "expeditions", "events", "ledger", "flows", "opening", "intel", "anchors", "raid_windows", "story", "stats", "visits"]
+const STATE_KEYS := ["version", "scenario", "seed", "rng", "tick", "extra_days", "next_id", "groups", "persons", "targets", "relations", "agreements", "expeditions", "events", "ledger", "flows", "opening", "intel", "anchors", "raid_windows", "story", "stats", "visits", "disputes"]
+## D-048/D-049: the only recorded causes for a raid, feud, war or conquest.
+## `need` (hunger, scarcity, strategic necessity) is recorded with its occasion.
+const CONFLICT_CAUSES := ["quest_dispute", "natural_enemy", "alliance_call", "retaliation", "conquest", "need"]
+const CONFLICT_EVENTS := ["war_band_departs", "raid", "raid_external"]
+const MAX_DISPUTES := 128
 const STAT_KEYS := ["raids", "plunders", "skirmishes", "repulsed", "trades", "agreements_made", "agreements_kept", "agreements_broken", "feasts", "gifts", "buildings", "settlements_founded", "leader_changes", "challenges", "starvation_deaths", "births", "external_raids"]
 
 ## Tests may capture every booking (unbounded) to replay the ledger.
@@ -89,7 +94,7 @@ static func _empty_state(seed: int, scenario_id: String) -> Dictionary:
 		"tick": 0, "extra_days": 0, "next_id": 1, "groups": {}, "persons": {}, "targets": {},
 		"relations": Relations.new_graph(), "agreements": [], "expeditions": [], "events": [],
 		"ledger": [], "flows": {}, "opening": {}, "intel": {}, "anchors": {}, "raid_windows": {},
-		"story": {}, "stats": stats, "visits": {}}
+		"story": {}, "stats": stats, "visits": {}, "disputes": []}
 
 
 static func new_state(seed: int, scenario_id: String = "bc58_rhine") -> Dictionary:
@@ -102,7 +107,8 @@ static func new_state(seed: int, scenario_id: String = "bc58_rhine") -> Dictiona
 		var src: Dictionary = scn.groups[gid]
 		var group := {"name": str(src.name), "people": str(src.people), "kind": str(src.kind), "culture": str(src.culture),
 			"canon_kind": str(src.canon_kind), "source_note": str(src.source_note), "atlas_region": str(src.atlas_region),
-			"status": "active", "leader": str(src.leader), "families": (src.families as Dictionary).duplicate(true),
+			"status": "active", "leader": str(src.leader), "government": str(src.get("government", "assembly")), "war_leader": "", "war_until": -1,
+			"families": (src.families as Dictionary).duplicate(true),
 			"traits": {}, "goals": (src.goals as Array).duplicate(), "raid_range_km": float(src.raid_range_km),
 			"settlements": [], "sites": [], "stock": {}, "held": {}, "troops": {}, "morale": float(src.morale),
 			"project": {}, "acc": {}, "last_action": "idle", "last_action_tick": -1, "last_raid_tick": -100,
@@ -162,6 +168,8 @@ static func new_state(seed: int, scenario_id: String = "bc58_rhine") -> Dictiona
 		state.targets[tid] = {"name": str(src.name), "kind": str(src.kind), "canon_kind": str(src.canon_kind), "lat": float(src.lat), "lon": float(src.lon),
 			"atlas_region": str(src.atlas_region), "raidable": bool(src.raidable), "defence": 0, "defender_strength": 2.0, "rebuilt": true, "story_lock_until": -1, "story_lock_reason": ""}
 	_initial_relations(state, scn)
+	for item: Dictionary in scn.get("natural_enemies", []):
+		_open(state, str(item.a), str(item.b), "natural_enemy", "roster:" + str(item.get("source", "design")), str(item.note), -1, true)
 	for item: Dictionary in scn.agreements:
 		var terms := {}
 		for good: String in item.terms:
@@ -170,6 +178,8 @@ static func new_state(seed: int, scenario_id: String = "bc58_rhine") -> Dictiona
 		if item.has("target"):
 			record["target"] = str(item.target)
 			record["story"] = str(item.story)
+		if bool(item.get("hidden", false)):
+			record["hidden"] = true
 	state.stats.agreements_made = 0
 	for story_id: String in _sorted(scn.story_raids):
 		state.story[story_id] = {"status": "pending", "expedition": "", "result": ""}
@@ -260,43 +270,104 @@ static func advance_ticks(state: Dictionary, ticks: int) -> void:
 # ---------------------------------------------------------------- tick
 
 static func tick(state: Dictionary) -> void:
+	var runner := week_begin(state)
+	while week_step(runner) > 0:
+		pass
+
+
+## A week in slices (see "sliced work"): anchors, war bands, the economy of
+## one group per slice, agreements, leadership, news, the decision cache, one
+## community's decision per slice, relation decay in edge slices, closing.
+## The order of slices is the order of the monolithic week.
+static func week_begin(state: Dictionary) -> Dictionary:
 	var t := int(state.tick) + 1
 	state.tick = t
 	var scn := scenario(str(state.scenario))
-	if scn.is_empty():
-		return
-	var week := (t - 1) % WEEKS
-	_anchors(state, scn, t)
-	_expeditions(state, scn, t)
-	for gid: String in _sorted(state.groups):
-		var g: Dictionary = state.groups[gid]
-		if g.status != "active":
-			continue
-		match str(g.kind):
-			"tribe":
-				_economy(state, scn, gid, t, week)
-			"band":
-				_band_economy(state, gid, t)
-			"market":
-				_market_economy(state, gid, week)
-	_agreements_tick(state, scn, t)
-	_leadership(state, scn, t)
-	_news(state, scn, t)
-	var tribes := _active_tribes(state)
-	if not tribes.is_empty():
-		# Decisions of one week read the situation at the start of the week.
-		var cache := _decision_cache(state, t)
-		var offset := t % tribes.size()
-		for i in tribes.size():
-			_decide(state, scn, tribes[(i + offset) % tribes.size()], t, week, cache)
-	Relations.decay(state.relations, 1)
-	for gid: String in _sorted(state.groups):
-		var g: Dictionary = state.groups[gid]
-		g.weariness = _q(maxf(0.0, float(g.weariness) * 0.96))
-	while state.events.size() > MAX_EVENTS:
-		state.events.pop_front()
-	while state.ledger.size() > MAX_LEDGER:
-		state.ledger.pop_front()
+	return {"kind": "week", "state": state, "t": t, "week": (t - 1) % WEEKS, "stage": 0, "index": 0, "items": [], "cache": {}, "done": scn.is_empty(), "entered": false}
+
+
+static func week_step(runner: Dictionary) -> int:
+	if bool(runner.done):
+		return 0
+	var state: Dictionary = runner.state
+	var scn := scenario(str(state.scenario))
+	var t := int(runner.t)
+	var week := int(runner.week)
+	var cost := next_units(runner)
+	var stage: String = WEEK_STAGES[int(runner.stage)]
+	var finished := true
+	match stage:
+		"anchors":
+			_anchors(state, scn, t)
+		"expeditions":
+			_expeditions(state, scn, t)
+		"economy":
+			if not bool(runner.entered):
+				runner.items = _sorted(state.groups)
+				runner.index = 0
+				runner.entered = true
+			# One active group per slice; inactive groups cost nothing.
+			while int(runner.index) < runner.items.size():
+				var gid: String = runner.items[int(runner.index)]
+				runner.index = int(runner.index) + 1
+				var g: Dictionary = state.groups[gid]
+				if g.status != "active":
+					continue
+				match str(g.kind):
+					"tribe":
+						_economy(state, scn, gid, t, week)
+					"band":
+						_band_economy(state, gid, t)
+					"market":
+						_market_economy(state, gid, week)
+				break
+			finished = int(runner.index) >= runner.items.size()
+		"agreements":
+			_agreements_tick(state, scn, t)
+		"leadership":
+			_leadership(state, scn, t)
+		"news":
+			_news(state, scn, t)
+		"decision_cache":
+			var tribes := _active_tribes(state)
+			runner.items = []
+			if not tribes.is_empty():
+				# Decisions of one week read the situation at the start of the week.
+				runner.cache = _decision_cache(state, t)
+				var offset := t % tribes.size()
+				for i in tribes.size():
+					runner.items.append(tribes[(i + offset) % tribes.size()])
+			runner.index = 0
+		"decide":
+			if int(runner.index) < runner.items.size():
+				_decide(state, scn, runner.items[int(runner.index)], t, week, runner.cache)
+				runner.index = int(runner.index) + 1
+			finished = int(runner.index) >= runner.items.size()
+		"decay":
+			if int(runner.index) == 0:
+				runner.items = state.relations.edges.keys()
+			var stop := mini(runner.items.size(), int(runner.index) + EDGE_SLICE * 2)
+			Relations.decay_keys(state.relations, runner.items.slice(int(runner.index), stop), 1)
+			runner.index = stop
+			finished = stop >= runner.items.size()
+		"close":
+			for gid: String in _sorted(state.groups):
+				var g: Dictionary = state.groups[gid]
+				g.weariness = _q(maxf(0.0, float(g.weariness) * 0.96))
+			while state.events.size() > MAX_EVENTS:
+				state.events.pop_front()
+			while state.ledger.size() > MAX_LEDGER:
+				state.ledger.pop_front()
+	if finished:
+		runner.stage = int(runner.stage) + 1
+		runner.index = 0
+		runner.entered = false
+		# A stage without work (no decisions this week) still ends cleanly.
+		while int(runner.stage) < WEEK_STAGES.size() and WEEK_STAGES[int(runner.stage)] == "decide" and runner.items.is_empty():
+			runner.stage = int(runner.stage) + 1
+		if int(runner.stage) >= WEEK_STAGES.size():
+			runner.done = true
+	return cost
 
 
 # ---------------------------------------------------------------- ledger
@@ -523,17 +594,29 @@ static func _rand(state: Dictionary) -> float:
 
 
 static func traits(state: Dictionary, gid: String) -> Dictionary:
-	## Group culture blended with the current leader's personality.
+	## Group culture blended with the person who leads: the chief, or during a
+	## campaign the elected war leader. The form of government sets the weight.
 	var g: Dictionary = state.groups[gid]
 	var result := {}
+	var gov := government(state, gid)
 	var leader: Dictionary = state.persons.get(str(g.leader), {})
+	var weight := float(gov.get("blend", 0.4))
+	if str(g.war_leader) != "" and state.persons.has(str(g.war_leader)):
+		leader = state.persons[str(g.war_leader)]
+		weight = float(gov.get("war_blend", weight))
 	for trait_id: String in g.traits:
 		var base := float(g.traits[trait_id])
 		if not leader.is_empty() and leader.traits.has(trait_id):
-			base = 0.6 * base + 0.4 * float(leader.traits[trait_id])
+			base = (1.0 - weight) * base + weight * float(leader.traits[trait_id])
 		result[trait_id] = clampf(base, 0.0, 1.0)
 	result["ambition"] = float(leader.traits.get("ambition", 0.4)) if not leader.is_empty() else 0.4
 	return result
+
+
+static func government(state: Dictionary, gid: String) -> Dictionary:
+	var scn := scenario(str(state.scenario))
+	var model := str(state.groups[gid].get("government", "assembly"))
+	return scn.get("governments", {}).get(model, {"blend": 0.4, "challenge": 18, "heir_bonus": 10})
 
 
 static func _drift(g: Dictionary, trait_id: String, amount: float) -> void:
@@ -572,14 +655,38 @@ static func _fort(g: Dictionary, s: Dictionary) -> float:
 
 
 static func defence(state: Dictionary, gid: String, warned: bool = false) -> float:
+	## Defenders are farmers spread over the farmsteads: how many gather before
+	## the attackers arrive depends on warning. Prepared communities stand ready.
 	var scn := scenario(str(state.scenario))
 	var g: Dictionary = state.groups[gid]
 	if g.settlements.is_empty():
 		return 0.0
 	var s: Dictionary = g.settlements[0]
 	var civilians := maxi(0, roundi(_population(g) * float(scn.economy.adult_share)) - _warriors_home(g) - _warriors_away(state, gid))
-	var alert := 1.15 if warned or int(g.prepared_until) >= int(state.tick) or int(s.buildings.get("watchpost", 0)) > 0 else 0.85
-	return (strength(state, gid) * _fort(g, s) * alert + civilians * 0.25) * (1.0 - float(s.damage) / 300.0)
+	var muster := 0.5
+	if int(g.prepared_until) >= int(state.tick):
+		muster = 1.0
+	elif warned or int(s.buildings.get("watchpost", 0)) > 0:
+		muster = 0.8
+	return (strength(state, gid) * _fort(g, s) + civilians * 0.25) * muster * (1.0 - float(s.damage) / 300.0)
+
+
+static func settlement_class(population: int) -> String:
+	if population < 150:
+		return "Weiler"
+	if population < 400:
+		return "Dorf"
+	return "Großsiedlung"
+
+
+## What an attacker must expect: a community with a watch post will be warned
+## and stand ready, one without it is caught on its farmsteads.
+static func expected_defence(state: Dictionary, gid: String) -> float:
+	var g: Dictionary = state.groups[gid]
+	if g.settlements.is_empty():
+		return 0.0
+	var ready := int(g.settlements[0].buildings.get("watchpost", 0)) > 0
+	return defence(state, gid) / (0.8 if ready else 0.5) * (1.0 if ready else 0.5) if int(g.prepared_until) < int(state.tick) else defence(state, gid)
 
 
 static func strength_class(value: float) -> String:
@@ -612,22 +719,130 @@ static func _affect(state: Dictionary, observer: String, subject: String, event_
 			Relations.apply(state.relations, chief, subject, event_id, int(state.tick), kind, deltas)
 
 
-static func _event(state: Dictionary, kind: String, actors: Array, text: String, cause: String, known_by: Array, spread: bool = false, canon: String = "simulation") -> String:
+static func _event(state: Dictionary, kind: String, actors: Array, text: String, cause: String, known_by: Array, spread: bool = false, canon: String = "simulation", conflict: Dictionary = {}) -> String:
 	var id := _next(state, "e")
 	var knowers := []
 	for actor: String in known_by:
 		if actor not in knowers:
 			knowers.append(actor)
 	knowers.sort()
-	state.events.append({"id": id, "tick": int(state.tick), "kind": kind, "actors": actors.duplicate(), "text": text, "cause": cause, "known_by": knowers, "spread": spread, "canon": canon})
+	var record := {"id": id, "tick": int(state.tick), "kind": kind, "actors": actors.duplicate(), "text": text, "cause": cause, "known_by": knowers, "spread": spread, "canon": canon}
+	if not conflict.is_empty():
+		record["conflict"] = {"cause": str(conflict.cause), "dispute": str(conflict.dispute), "source": str(conflict.source)}
+	state.events.append(record)
 	return id
+
+
+# ---------------------------------------------------------------- disputes
+# D-048: conflicts start only from a recorded dispute. A dispute allows its
+# holder `a` to strike `b` (both ways when `mutual`) until `until` (-1: lasting).
+
+static func _open(state: Dictionary, a: String, b: String, cause: String, source: String, note: String, weeks: int, mutual: bool = false) -> Dictionary:
+	if not (cause in CONFLICT_CAUSES) or a == b:
+		return {}
+	var t := int(state.tick)
+	for item: Dictionary in state.disputes:
+		if item.status == "open" and item.cause == cause and item.a == a and item.b == b:
+			item.until = -1 if weeks < 0 or int(item.until) < 0 else maxi(int(item.until), t + weeks)
+			return item
+	var record := {"id": _next(state, "d"), "a": a, "b": b, "cause": cause, "source": source, "note": note, "since": t, "until": -1 if weeks < 0 else t + weeks, "mutual": mutual, "status": "open"}
+	state.disputes.append(record)
+	while state.disputes.size() > MAX_DISPUTES:
+		var dropped := false
+		for i in state.disputes.size():
+			if state.disputes[i].status != "open":
+				state.disputes.remove_at(i)
+				dropped = true
+				break
+		if not dropped:
+			break
+	return record
+
+
+## The story or quest layer records a dispute that a mission created.
+static func open_dispute(state: Dictionary, a: String, b: String, cause: String, source: String, note: String = "", weeks: int = 52) -> Dictionary:
+	var ids := actor_ids(state)
+	if not ids.has(a) or not ids.has(b) or not (cause in CONFLICT_CAUSES) or source.is_empty():
+		return {}
+	return _open(state, a, b, cause, source, note, weeks)
+
+
+static func close_dispute(state: Dictionary, id: String, reason: String) -> bool:
+	for item: Dictionary in state.disputes:
+		if item.id == id and item.status == "open":
+			item.status = "closed"
+			item.note = str(item.note) + " · beendet: " + reason
+			_next(state, "r")
+			return true
+	return false
+
+
+## D-049: hunger, scarcity or strategic necessity as a cause, with the facts
+## that made it one. Empty when the community is not in real need.
+static func _need_occasion(state: Dictionary, gid: String, target: String, ctx: Dictionary) -> Dictionary:
+	var g: Dictionary = state.groups[gid]
+	if g.kind != "tribe":
+		return {}
+	var missing := []
+	var level := 0.0
+	if float(ctx.hunger) >= 0.5:
+		missing.append("Nahrung")
+		level = maxf(level, float(ctx.hunger))
+	if float(ctx.land_pressure) >= 0.6 and g.sites.is_empty():
+		missing.append("Land und Vieh")
+		level = maxf(level, float(ctx.land_pressure) * 0.8)
+	if not g.project.is_empty() and int(state.tick) - int(g.project.progress_tick) >= 8:
+		for good: String in _sorted(g.project.cost_left):
+			if int(g.project.cost_left[good]) > int(g.stock[good]):
+				missing.append(str(good))
+				level = maxf(level, 0.5)
+	if missing.is_empty():
+		return {}
+	var tr: Dictionary = ctx.traits
+	var occasion := "Hunger %.2f (%.1f Wochen Vorrat); fehlt: %s; Anführer kühn %.2f, vorsichtig %.2f; Vertrauen zu %s %.0f" % [float(ctx.hunger), float(ctx.food_weeks), ", ".join(missing), float(tr.boldness), float(tr.caution), _name(state, target), _rel(state, gid, target, "trust")]
+	return {"level": clampf(level, 0.0, 1.0), "missing": missing, "occasion": occasion}
+
+
+static func _natural_enemies(state: Dictionary, a: String, b: String) -> bool:
+	for item: Dictionary in state.disputes:
+		if item.status == "open" and item.cause == "natural_enemy" and ((item.a == a and item.b == b) or (item.a == b and item.b == a)):
+			return true
+	return false
+
+
+## The open dispute that lets `attacker` strike `target`, strongest cause first.
+static func dispute_for(state: Dictionary, attacker: String, target: String) -> Dictionary:
+	var t := int(state.tick)
+	var best := {}
+	for item: Dictionary in state.disputes:
+		if item.status != "open" or (int(item.until) >= 0 and int(item.until) < t):
+			continue
+		var matches: bool = (item.a == attacker and item.b == target) or (bool(item.mutual) and item.a == target and item.b == attacker)
+		if matches and (best.is_empty() or CONFLICT_CAUSES.find(str(item.cause)) < CONFLICT_CAUSES.find(str(best.cause))):
+			best = item
+	return best
+
+
+static func _expire_disputes(state: Dictionary, t: int) -> void:
+	for item: Dictionary in state.disputes:
+		if item.status == "open" and int(item.until) >= 0 and int(item.until) < t:
+			item.status = "expired"
+
+
+## After a peace kept to its end, the feud between the partners is over;
+## a natural enmity remains.
+static func _settle_disputes(state: Dictionary, a: String, b: String, reason: String) -> void:
+	for item: Dictionary in state.disputes:
+		if item.status == "open" and item.cause != "natural_enemy" and ((item.a == a and item.b == b) or (item.a == b and item.b == a)):
+			item.status = "closed"
+			item.note = str(item.note) + " · beendet: " + reason
 
 
 static func _observe(state: Dictionary, observer: String, subject: String) -> void:
 	if not state.groups.has(observer) or not state.groups.has(subject):
 		return
 	var h: Dictionary = state.groups[subject]
-	state.intel[observer][subject] = {"tick": int(state.tick), "strength": _q2(strength(state, subject)), "defence": _q2(defence(state, subject)),
+	state.intel[observer][subject] = {"tick": int(state.tick), "strength": _q2(strength(state, subject)), "defence": _q2(expected_defence(state, subject)),
 		"food": int(h.stock.food), "cattle": int(h.stock.cattle), "wealth": int(h.stock.wealth), "warriors": _warriors_home(h)}
 
 
@@ -1210,6 +1425,9 @@ static func _prestige(state: Dictionary, gid: String, amount: float) -> void:
 	var chief: Dictionary = state.persons.get(str(state.groups[gid].leader), {})
 	if not chief.is_empty():
 		chief.prestige = _q(clampf(float(chief.prestige) + amount, 0.0, 100.0))
+	var war_leader: Dictionary = state.persons.get(str(state.groups[gid].get("war_leader", "")), {})
+	if not war_leader.is_empty() and str(state.groups[gid].war_leader) != str(state.groups[gid].leader):
+		war_leader.prestige = _q(clampf(float(war_leader.prestige) + amount, 0.0, 100.0))
 
 
 # ---------------------------------------------------------------- anchors
@@ -1366,6 +1584,7 @@ static func _break_agreement(state: Dictionary, item: Dictionary, breaker: Strin
 
 
 static func _agreements_tick(state: Dictionary, scn: Dictionary, t: int) -> void:
+	_expire_disputes(state, t)
 	for item: Dictionary in state.agreements.duplicate():
 		if item.status != "active":
 			continue
@@ -1385,6 +1604,8 @@ static func _agreements_tick(state: Dictionary, scn: Dictionary, t: int) -> void
 			state.stats.agreements_kept = int(state.stats.agreements_kept) + 1
 			var event := _event(state, "agreement_kept", [a, b], "%s und %s haben die Vereinbarung (%s) eingehalten." % [_name(state, a), _name(state, b), item.kind], "Frist erreicht ohne Bruch", [a, b], true)
 			var bonus := 8.0 if item.kind == "alliance" else 5.0
+			if item.kind in ["truce", "alliance", "guest_friendship"]:
+				_settle_disputes(state, a, b, "%s eingehalten" % item.kind)
 			if item.kind == "tribute":
 				_affect(state, b, a, event, "agreement_kept", {"trust": 3.0})
 			else:
@@ -1425,6 +1646,9 @@ static func _tribute_due(state: Dictionary, item: Dictionary, t: int) -> void:
 		_break_agreement(state, item, payer, t, "Tribut nicht geliefert (%s)" % ("Weigerung" if can_pay else "Mangel"))
 		var event := str(state.events.back().id)
 		_affect(state, receiver, payer, event, "tribute_refused", {"grievance": 15.0})
+		# A broken tribute rekindles an existing feud; on its own it is no cause.
+		if not dispute_for(state, receiver, payer).is_empty():
+			_open(state, receiver, payer, "retaliation", "agreement:" + str(item.id), "Tribut verweigert", 26)
 
 
 # ---------------------------------------------------------------- leadership
@@ -1453,6 +1677,18 @@ static func _leadership(state: Dictionary, scn: Dictionary, t: int) -> void:
 			_event(state, "person_died", [str(p.group), pid], "%s (%s) stirbt im Alter von %d Jahren." % [p.name, g.name, floori(age)], "Alter", [str(p.group)], g.kind == "tribe" and p.role in ["chief", "heir", "rival"])
 			if g.leader == pid:
 				_succession(state, scn, str(p.group), t, "Tod des Anführers")
+	for gid: String in _sorted(state.groups):
+		var g: Dictionary = state.groups[gid]
+		var war_leader := str(g.war_leader)
+		if war_leader == "":
+			continue
+		if not state.persons.has(war_leader) or state.persons[war_leader].status != "alive" or g.status != "active":
+			g.war_leader = ""
+			g.war_until = -1
+		elif t > int(g.war_until):
+			g.war_leader = ""
+			g.war_until = -1
+			_event(state, "war_leader_resigns", [gid, war_leader], "%s legt die Heerführung in %s nieder; der Krieg ist vorbei." % [state.persons[war_leader].name, g.name], "Wochen ohne Kampf", [gid])
 	for gid: String in _active_tribes(state):
 		_challenge(state, scn, gid, t)
 	# The dead and the departed are remembered for two years, then pruned.
@@ -1499,33 +1735,80 @@ static func _members(state: Dictionary, gid: String, role: String = "") -> Array
 
 static func _succession(state: Dictionary, scn: Dictionary, gid: String, t: int, why: String) -> void:
 	var g: Dictionary = state.groups[gid]
+	var gov := government(state, gid)
+	var model := str(g.government)
+	var old := str(g.leader)
+	var family := str(state.persons[old].family) if state.persons.has(old) else ""
 	var best := ""
 	var best_score := -1000.0
 	for pid: String in _members(state, gid):
 		var p: Dictionary = state.persons[pid]
-		if pid == g.leader or age_of(state, pid) < 18.0 or p.role in ["exile", "elder", "retainer"]:
+		if pid == old or age_of(state, pid) < 18.0 or p.role in ["exile", "elder", "retainer"]:
 			continue
-		var score := float(p.prestige) + (10.0 if p.role == "heir" else 0.0) + float(p.traits.get("ambition", 0.5)) * 10.0
+		var score := float(p.prestige) + float(p.traits.get("ambition", 0.5)) * 10.0
+		match model:
+			"hereditary":
+				# The chief's own family keeps the seat; the heir first.
+				score += (float(gov.heir_bonus) if p.role == "heir" else 0.0) + (25.0 if p.family == family else 0.0)
+			"elders":
+				# The council prefers age and a cool head over a famous name.
+				score += age_of(state, pid) * 0.5 + float(p.traits.get("caution", 0.5)) * 15.0 - float(p.traits.get("ambition", 0.5)) * 10.0
+			_:
+				score += float(gov.get("heir_bonus", 10)) if p.role == "heir" else 0.0
 		if score > best_score:
 			best_score = score
 			best = pid
 	if best == "":
 		best = _new_person(state, scn, gid, "chief", 25.0, 20.0)
-	var old := str(g.leader)
 	var previous_role := str(state.persons[best].role)
 	state.persons[best].role = "chief"
+	state.persons[best].since = t
 	g.leader = best
+	if str(g.war_leader) == best:
+		g.war_leader = ""
+		g.war_until = -1
 	g.history.leaders = int(g.history.leaders) + 1
 	state.stats.leader_changes = int(state.stats.leader_changes) + 1
-	var event := _event(state, "leader_chosen", [gid, best], "Die Versammlung von %s wählt %s zum Anführer." % [g.name, state.persons[best].name], why, [gid], true)
+	var bodies := {"assembly": "Die Versammlung", "hereditary": "Die Familie", "elders": "Der Ältestenrat", "war_leader": "Die Versammlung"}
+	var event := _event(state, "leader_chosen", [gid, best], "%s von %s bestimmt %s zum Anführer." % [bodies.get(model, "Die Versammlung"), g.name, state.persons[best].name], why, [gid], true)
 	if state.persons.has(old) and state.persons[old].status == "alive":
 		Relations.apply(state.relations, old, best, event, t, "replaced", {"grievance": 30.0, "envy": 20.0})
 	if _members(state, gid, "heir").is_empty() or previous_role == "heir":
 		var heir := _new_person(state, scn, gid, "heir", 17.0, 10.0)
+		state.persons[heir].family = str(state.persons[best].family)
 		Relations.apply(state.relations, heir, best, event, t, "kin", {"loyalty": 40.0, "trust": 30.0})
 	if _members(state, gid, "rival").is_empty():
 		var rival := _new_person(state, scn, gid, "rival", 30.0, 25.0)
 		Relations.apply(state.relations, rival, best, event, t, "family_rivalry", {"envy": 15.0})
+
+
+## Caesar BG 6,23: a community at war elects leaders for that war. Only
+## groups with this form of government do so; the campaign ends after weeks
+## without fighting and the leader steps back.
+static func _war_council(state: Dictionary, gid: String, t: int, cause: String) -> void:
+	var g: Dictionary = state.groups[gid]
+	if str(g.get("government", "")) != "war_leader" or g.status != "active":
+		return
+	var gov := government(state, gid)
+	var weeks := int(gov.get("campaign_weeks", 26))
+	if str(g.war_leader) != "" and state.persons.has(str(g.war_leader)) and state.persons[g.war_leader].status == "alive":
+		g.war_until = maxi(int(g.war_until), t + weeks)
+		return
+	var best := ""
+	var best_score := -1000.0
+	for pid: String in _members(state, gid):
+		var p: Dictionary = state.persons[pid]
+		if age_of(state, pid) < 18.0 or p.role in ["exile", "retainer"]:
+			continue
+		var score := float(p.prestige) + float(p.traits.get("boldness", 0.5)) * 25.0 + mini(20, int(p.deeds)) * 1.0
+		if score > best_score:
+			best_score = score
+			best = pid
+	if best == "":
+		return
+	g.war_leader = best
+	g.war_until = t + weeks
+	_event(state, "war_leader_elected", [gid, best], "%s wählt %s zum Heerführer für diesen Krieg." % [g.name, state.persons[best].name], cause, [gid], true)
 
 
 static func _new_person(state: Dictionary, scn: Dictionary, gid: String, role: String, age: float, prestige: float) -> String:
@@ -1548,13 +1831,17 @@ static func _challenge(state: Dictionary, scn: Dictionary, gid: String, t: int) 
 	var chief: Dictionary = state.persons.get(str(g.leader), {})
 	if chief.is_empty() or t - int(chief.since) < 26:
 		return
-	for pid: String in _members(state, gid, "rival"):
+	var threshold := float(government(state, gid).get("challenge", 18))
+	var contenders := _members(state, gid, "rival")
+	if str(g.war_leader) != "" and str(g.war_leader) != str(g.leader) and not (str(g.war_leader) in contenders):
+		contenders.append(str(g.war_leader)) # A victorious war leader can reach for lasting rule.
+	for pid: String in contenders:
 		var rival: Dictionary = state.persons[pid]
 		if age_of(state, pid) < 18.0:
 			continue
 		var unrest := (25.0 if float(g.morale) < 35.0 else 0.0) + 15.0 * minf(1.0, int(g.hunger_weeks) / 6.0) + 20.0 * minf(1.0, float(g.weariness) / 0.3)
 		var drive := float(rival.traits.get("ambition", 0.5)) * (float(rival.prestige) - float(chief.prestige) + unrest + _rel(state, pid, str(g.leader), "envy") * 0.3)
-		if drive <= 18.0:
+		if drive <= threshold:
 			continue
 		state.stats.challenges = int(state.stats.challenges) + 1
 		var rival_support := float(rival.prestige) + unrest + 20.0 * _rand(state)
@@ -1566,6 +1853,9 @@ static func _challenge(state: Dictionary, scn: Dictionary, gid: String, t: int) 
 			rival.role = "chief"
 			rival.since = t
 			g.leader = pid
+			if str(g.war_leader) == pid:
+				g.war_leader = ""
+				g.war_until = -1
 			g.history.leaders = int(g.history.leaders) + 1
 			state.stats.leader_changes = int(state.stats.leader_changes) + 1
 			var event := _event(state, "power_struggle", [gid, pid, old], "In %s setzt sich %s gegen %s durch und führt nun die Gemeinschaft." % [g.name, rival.name, chief.name], "Unruhe %.0f, Ansehen %.0f gegen %.0f" % [unrest, float(rival.prestige), float(chief.prestige)], [gid], true)
@@ -1766,6 +2056,18 @@ static func _raid_score(state: Dictionary, scn: Dictionary, gid: String, target:
 	if not Relations.knows(state.relations, gid, target):
 		result.blocked = "unknown_target"
 		return result
+	# D-048/D-049: no attack without a recorded cause. Power alone is none;
+	# real need is one, recorded with its occasion.
+	var dispute := dispute_for(state, gid, target)
+	var need := {}
+	if dispute.is_empty():
+		need = _need_occasion(state, gid, target, ctx)
+		if need.is_empty():
+			result.blocked = "no_cause"
+			return result
+		dispute = {"cause": "need", "id": "", "source": "need:" + str(need.occasion)}
+	result["dispute"] = dispute
+	result["need"] = need
 	if not _expedition_of(state, gid).is_empty():
 		result.blocked = "band_already_away"
 		return result
@@ -1803,20 +2105,26 @@ static func _raid_score(state: Dictionary, scn: Dictionary, gid: String, target:
 		loot = 0.6
 	var ratio := att / maxf(1.0, def_est)
 	result.ratio = ratio
-	var success := 1.0 / (1.0 + exp(-3.0 * (ratio - 1.1)))
+	# With a recorded cause a band accepts more risk than it would for loot.
+	var success := 1.0 / (1.0 + exp(-3.0 * (ratio - 0.95)))
 	var grievance := _rel(state, gid, target, "grievance") / 100.0
 	var cache: Dictionary = ctx.cache
 	var punitive := 0.5 if cache.punitive.has(gid + ">" + target) else 0.0
 	# Renown comes from beating a worthy opponent, not from crushing the weak.
 	var worth := clampf(def_est / maxf(1.0, att), 0.15, 1.0)
-	var motives := {"hunger": 0.5 * clampf(loot, 0.0, 1.5) * (0.3 + float(ctx.hunger)), "grievance": 0.6 * grievance + punitive, "prestige": (0.3 * float(tr.ambition) + 0.2 * float(tr.pride)) * worth, "wealth": 0.3 * float(ctx.wealth_need) * clampf(loot, 0.0, 1.0)}
+	# The cause carries the decision; need, feelings and renown only change its
+	# urgency inside an existing dispute.
+	var cause_drive := {"quest_dispute": 0.6, "natural_enemy": 0.45, "alliance_call": 0.45, "retaliation": 0.45, "conquest": 0.5, "need": 0.2 + 0.4 * float(need.get("level", 0.0))}
+	var motives := {"cause": float(cause_drive.get(str(dispute.cause), 0.3)), "grievance": 0.6 * grievance + punitive,
+		"need": 0.25 * clampf(loot, 0.0, 1.5) * float(ctx.hunger), "renown": (0.15 * float(tr.ambition) + 0.1 * float(tr.pride)) * worth}
 	var drive := 0.0
-	var best := ""
 	for key: String in _sorted(motives):
 		drive += float(motives[key])
-		if best == "" or float(motives[key]) > float(motives[best]):
-			best = key
+	var best := str(dispute.cause)
 	var utility := float(tr.boldness) * drive * success - float(tr.caution) * (1.0 - success) - _rel(state, gid, target, "fear") / 100.0 * 0.4
+	if not need.is_empty():
+		# Need does not justify robbing friends; the faithful think twice.
+		utility -= maxf(0.0, _rel(state, gid, target, "trust")) / 100.0 + float(g.traits.faith) * 0.2
 	# Experience: raids that brought no plunder in the last year weigh on the next decision.
 	var lessons := 0
 	for memory: Dictionary in state.relations.edges.get(Relations.key(gid, target), {}).get("memories", []):
@@ -1868,7 +2176,8 @@ static func _decide(state: Dictionary, scn: Dictionary, gid: String, t: int, wee
 	for other: String in targets:
 		var score := _raid_score(state, scn, gid, other, ctx, t, week)
 		if score.blocked == "":
-			options.append({"action": "raid", "target": other, "utility": float(score.utility), "force": score.force, "motive": score.motive, "cause": "Motiv %s, Kräfteverhältnis %.2f" % [score.motive, float(score.ratio)]})
+			var motive := str(score.dispute.source) if str(score.dispute.cause) == "need" else str(score.motive)
+			options.append({"action": "raid", "target": other, "utility": float(score.utility), "force": score.force, "motive": motive, "cause": "Anlass %s, Kräfteverhältnis %.2f" % [score.dispute.cause, float(score.ratio)]})
 	_trade_options(state, scn, gid, ctx, options)
 	_diplomacy_options(state, scn, gid, ctx, t, options)
 	if int(g.stock.food) > float(ctx.weekly) * 25.0 and int(g.stock.wealth) >= 5 and ((week >= 30 and week <= 45) or float(g.morale) < 35.0) and t - int(g.history.get("last_feast", -100)) >= 20:
@@ -2036,7 +2345,7 @@ static func _diplomacy_options(state: Dictionary, scn: Dictionary, gid: String, 
 		var recent := bool(cache.get("recent_raid", {}).get(gid + ">" + other, false))
 		var trust := _rel(state, gid, other, "trust")
 		if (hostile or recent) and not peace and not _recently(state, gid, other, ["refused_truce"], 8):
-			var utility := float(tr.caution) * _rel(state, gid, other, "fear") / 100.0 + float(g.weariness) + float(ctx.hunger) * 0.4 - float(tr.pride) * _rel(state, gid, other, "grievance") / 100.0 * 0.5 + (0.15 if recent else 0.0)
+			var utility := float(tr.caution) * _rel(state, gid, other, "fear") / 100.0 + float(g.weariness) + float(ctx.hunger) * 0.4 - float(tr.pride) * _rel(state, gid, other, "grievance") / 100.0 * 0.5 + (0.15 if recent else 0.0) - (0.2 if _natural_enemies(state, gid, other) else 0.0)
 			options.append({"action": "negotiate", "kind": "truce", "partner": other, "utility": utility, "cause": "Furcht %.0f, Erschöpfung %.2f" % [_rel(state, gid, other, "fear"), float(g.weariness)]})
 		if trust >= 15.0 and not _has_pact(cache, gid, other, ["alliance"]) and not _recently(state, gid, other, ["refused_alliance"], 26):
 			var shared := 0.0
@@ -2175,6 +2484,12 @@ static func _launch_raid(state: Dictionary, scn: Dictionary, gid: String, target
 	var g: Dictionary = state.groups[gid]
 	if state.expeditions.size() >= MAX_EXPEDITIONS:
 		return {}
+	var dispute := dispute_for(state, gid, target)
+	if dispute.is_empty() and motive.begins_with("need:"):
+		# D-049: the need and its occasion become the recorded cause.
+		dispute = _open(state, gid, target, "need", motive, "Not", 4)
+	if dispute.is_empty():
+		return {} # D-048: no war band leaves without a recorded cause.
 	var troops := {}
 	var warriors := 0
 	var id := _next(state, "x")
@@ -2194,10 +2509,12 @@ static func _launch_raid(state: Dictionary, scn: Dictionary, gid: String, target
 	var travel := travel_ticks(km)
 	if kind == "story_raid":
 		travel = 0
+	_war_council(state, gid, t, "Kriegszug gegen " + _name(state, target))
 	var provisions := mini(int(g.stock.food), warriors * travel * 4)
 	_tx(state, gid, "food", provisions, "consume", "war_band_provisions")
+	var conflict := {"cause": str(dispute.cause), "dispute": str(dispute.id), "source": str(dispute.source)}
 	var expedition := {"id": id, "group": gid, "target": target, "target_kind": "group" if state.groups.has(target) else "external", "kind": kind,
-		"troops": troops, "depart_tick": t, "arrive_tick": t + travel, "return_tick": -1, "status": "outbound", "cargo": {}, "motive": motive, "protected": protected, "outcome": ""}
+		"troops": troops, "depart_tick": t, "arrive_tick": t + travel, "return_tick": -1, "status": "outbound", "cargo": {}, "motive": str(dispute.cause), "protected": protected, "outcome": "", "cause": conflict}
 	if kind == "story_raid":
 		expedition.status = "arrived"
 	state.expeditions.append(expedition)
@@ -2206,7 +2523,7 @@ static func _launch_raid(state: Dictionary, scn: Dictionary, gid: String, target
 	var known := [gid]
 	if state.groups.has(target) and int(state.groups[target].settlements[0].buildings.get("watchpost", 0)) > 0:
 		known.append(target)
-	_event(state, "war_band_departs", [gid, target], "%s zieht mit %d Kriegern gegen %s." % [g.name, warriors, _name(state, target)], cause, known)
+	_event(state, "war_band_departs", [gid, target], "%s zieht mit %d Kriegern gegen %s." % [g.name, warriors, _name(state, target)], "%s · Anlass %s" % [cause, str(dispute.cause)], known, false, "simulation", conflict)
 	return expedition
 
 
@@ -2262,6 +2579,9 @@ static func _propose(state: Dictionary, scn: Dictionary, gid: String, partner: S
 	match kind:
 		"truce":
 			var peace := float(htr.caution) * _rel(state, partner, gid, "fear") / 100.0 + float(h.weariness) + clampf((16.0 - float(h.stock.food) / maxf(1.0, _population(h))) / 16.0, 0.0, 1.0) * 0.4 - float(htr.pride) * _rel(state, partner, gid, "grievance") / 100.0 * 0.5 + 0.1
+			# Natural enemies distrust each other's truces (D-048 natural_enemy).
+			if _natural_enemies(state, gid, partner):
+				peace -= 0.35
 			accept = peace > 0.0
 		"alliance":
 			# The partner joins against the named enemy or against its own worst threat.
@@ -2272,7 +2592,9 @@ static func _propose(state: Dictionary, scn: Dictionary, gid: String, partner: S
 			accept = _rel(state, partner, gid, "trust") >= 10.0 and enemy != "" and ((_rel(state, partner, enemy, "grievance") + _rel(state, partner, enemy, "fear")) >= 30.0 or own >= 40.0)
 		"tribute":
 			var ratio := strength(state, gid) / maxf(1.0, defence(state, partner))
-			accept = _rel(state, partner, gid, "fear") >= 30.0 or (ratio >= 2.5 and float(htr.pride) < 0.7)
+			# Nobody agrees to a tribute it cannot pay twice from its own stock.
+			var payable := int(h.stock.cattle) >= 2 * maxi(2, roundi(int(h.stock.cattle) * 0.03)) and int(h.stock.wealth) >= 2 * maxi(1, roundi(int(h.stock.wealth) * 0.08))
+			accept = payable and (_rel(state, partner, gid, "fear") >= 30.0 or (ratio >= 2.5 and float(htr.pride) < 0.7))
 		"trade_pact":
 			accept = float(htr.trade) >= 0.3 and _rel(state, partner, gid, "trust") >= 10.0
 		"guest_friendship":
@@ -2303,6 +2625,10 @@ static func _propose(state: Dictionary, scn: Dictionary, gid: String, partner: S
 		if kind == "tribute":
 			_affect(state, partner, gid, event, "tribute_imposed", {"grievance": 12.0, "fear": 8.0})
 			_prestige(state, gid, 4.0)
+			for record: Dictionary in state.disputes:
+				if record.status == "open" and record.cause == "conquest" and record.a == gid and record.b == partner:
+					record.status = "closed"
+					record.note = str(record.note) + " · beendet: Tribut vereinbart"
 		else:
 			_affect(state, gid, partner, event, "agreement_made", {"trust": warmth})
 			_affect(state, partner, gid, event, "agreement_made", {"trust": warmth})
@@ -2411,6 +2737,7 @@ static func _battle(state: Dictionary, scn: Dictionary, e: Dictionary, t: int) -
 		e.outcome = "target_recovering"
 		_event(state, "war_band_turns_back", [gid, hid], "%s findet %s bereits ausgeplündert und kehrt um." % [g.name, h.name], "Erholungsfrist nach %s" % _name(state, str(window.by)), [gid, hid])
 		return
+	_war_council(state, hid, t, "Angriff durch " + g.name)
 	var htr := traits(state, hid)
 	var tr := traits(state, gid)
 	var att := troops_strength(scn, e.troops) * _morale_factor(float(g.morale))
@@ -2492,7 +2819,8 @@ static func _battle(state: Dictionary, scn: Dictionary, e: Dictionary, t: int) -
 	h.history.raided = int(h.history.raided) + 1
 	var labels := {"plunder": "plündert", "skirmish": "liefert sich ein Gefecht mit", "repulsed": "wird abgewiesen von"}
 	var text := "%s %s %s. Gefallene: %d Angreifer, %d Verteidiger%s." % [g.name, labels[outcome], h.name, int(fallen_att.count), int(fallen_def.count), (", Beute " + JSON.stringify(loot)) if not loot.is_empty() else ""]
-	var event := _event(state, "raid", [gid, hid], text, "Motiv %s, Verhältnis %.2f%s%s" % [e.motive, ratio, ", gewarnt" if warned else "", ", Zuflucht" if refuge else ""], [gid, hid] + helpers, true)
+	var event := _event(state, "raid", [gid, hid], text, "Anlass %s, Verhältnis %.2f%s%s" % [e.cause.cause, ratio, ", gewarnt" if warned else "", ", Zuflucht" if refuge else ""], [gid, hid] + helpers, true, "simulation", e.cause)
+	_conflict_followups(state, gid, hid, event, outcome, ratio, helpers)
 	var pride_h := float(htr.pride)
 	var caution_h := float(htr.caution)
 	var victim: Variant = {"plunder": {"grievance": 30.0 * (0.6 + pride_h * 0.8), "trust": -25.0, "fear": 15.0 * minf(2.0, ratio / 1.3) * (0.5 + caution_h), "respect": 5.0},
@@ -2518,6 +2846,22 @@ static func _battle(state: Dictionary, scn: Dictionary, e: Dictionary, t: int) -
 	state.raid_windows[hid] = {"until": t + recovery, "reason": "recovery_after_" + outcome, "by": gid}
 	_observe(state, gid, hid)
 	_observe(state, hid, gid)
+
+
+## D-048 chains: the victim may answer (retaliation), its allies are called
+## (alliance_call), and a clear victory can turn into a campaign (conquest).
+static func _conflict_followups(state: Dictionary, attacker: String, victim: String, event: String, outcome: String, ratio: float, helpers: Array) -> void:
+	if state.groups.has(victim) and state.groups[victim].kind == "tribe":
+		_open(state, victim, attacker, "retaliation", "event:" + event, "Antwort auf den Überfall", 52)
+	for item: Dictionary in state.agreements:
+		if item.status == "active" and item.kind == "alliance" and (item.a == victim or item.b == victim):
+			var ally := str(item.b) if item.a == victim else str(item.a)
+			if ally != attacker and state.groups.has(ally):
+				_open(state, ally, attacker, "alliance_call", "event:" + event, "Bündnispflicht gegenüber " + _name(state, victim), 26)
+	for ally: String in helpers:
+		_open(state, attacker, ally, "retaliation", "event:" + event, "Gegner im Kampf um " + _name(state, victim), 26)
+	if outcome == "plunder" and ratio >= 2.0 and state.groups.has(victim):
+		_open(state, attacker, victim, "conquest", "event:" + event, "Feldzug zur Unterwerfung", 52)
 
 
 static func _event_knowers(state: Dictionary, kind: String, actor: String, tick: int) -> Array:
@@ -2637,13 +2981,14 @@ static func planned_raids(state: Dictionary, target_id: String) -> Array:
 					commission = item
 			entry.warriors = _force_summary(g.troops)
 			entry.strength = _q2(troops_strength(scn, g.troops))
+			# D-040: who pays the riders is not an observable fact.
 			if commission.is_empty():
 				entry.status = "blocked"
-				entry.reason = "no_commission"
+				entry.reason = "no_cause"
 			else:
-				entry.status = "commissioned"
+				entry.status = "story_bound"
 				entry.reason = "story_event_" + str(commission.get("story", ""))
-				entry.motive = "commission"
+				entry.motive = "unknown"
 		else:
 			var cache := _decision_cache(state, t)
 			var ctx := _context(state, scn, gid, t, week, cache)
@@ -2653,6 +2998,7 @@ static func planned_raids(state: Dictionary, target_id: String) -> Array:
 			entry.warriors = _force_summary(score.force)
 			entry.strength = _q2(troops_strength(scn, score.force) * _morale_factor(float(g.morale)))
 			entry.motive = str(score.motive)
+			entry["occasion"] = str(score.get("dispute", {}).get("source", ""))
 			entry.utility = _q(float(score.utility))
 			if score.blocked != "":
 				entry.status = "blocked"
@@ -2679,7 +3025,8 @@ static func commit_raid(state: Dictionary, gid: String, target_id: String) -> Di
 	for entry: Dictionary in planned_raids(state, target_id):
 		if entry.group == gid and entry.status == "planned":
 			var force := _raid_force(state, scn, gid, float(traits(state, gid).caution))
-			var e := _launch_raid(state, scn, gid, target_id, force, str(entry.motive), "Geplanter Zug (Nutzen %.2f)" % float(entry.utility), int(state.tick), false, "raid")
+			var motive := str(entry.get("occasion", "")) if str(entry.motive) == "need" else str(entry.motive)
+			var e := _launch_raid(state, scn, gid, target_id, force, motive, "Geplanter Zug (Nutzen %.2f)" % float(entry.utility), int(state.tick), false, "raid")
 			if e.is_empty():
 				return {"ok": false, "message": "Kein Kriegszug möglich."}
 			return {"ok": true, "expedition": str(e.id), "warriors": _force_summary(e.troops), "arrive_tick": int(e.arrive_tick)}
@@ -2720,7 +3067,9 @@ static func commit_story_raid(state: Dictionary, story_id: String) -> Dictionary
 	var force := {}
 	for type_id: String in _sorted(g.troops):
 		force[type_id] = {"count": int(g.troops[type_id].count)}
-	var e := _launch_raid(state, scn, gid, str(info.target), force, "commission", "Storyereignis " + story_id, int(state.tick), true, "story_raid")
+	# The mission is the cause (D-048); who stands behind it stays hidden (D-040).
+	_open(state, gid, str(info.target), "quest_dispute", "mission:" + story_id, "Storyereignis " + story_id, 26)
+	var e := _launch_raid(state, scn, gid, str(info.target), force, "quest_dispute", "Storyereignis " + story_id, int(state.tick), true, "story_raid")
 	if e.is_empty():
 		return {"ok": false, "message": "Kein Kriegszug möglich."}
 	state.story[story_id].status = "committed"
@@ -2811,7 +3160,7 @@ static func apply_raid_result(state: Dictionary, expedition_id: String, result: 
 	for type_id: String in e.troops:
 		e.troops[type_id].xp = _q(minf(40.0, float(e.troops[type_id].xp) + (3.0 if won else 1.5)))
 	var text := "%s überfällt %s (%s). Gefallene Angreifer: %d, gemeldete Beute: %s." % [g.name, _name(state, target), outcome, int(fallen.count), JSON.stringify(booked)]
-	var event := _event(state, "raid_external", [gid, target], text, "Lokal gespieltes Ergebnis", [gid, target])
+	var event := _event(state, "raid_external", [gid, target], text, "Lokal gespieltes Ergebnis · Anlass " + str(e.cause.cause), [gid, target], false, "simulation", e.cause)
 	var felt: Variant = {"defended": {"grievance": 20.0, "trust": -20.0, "fear": 5.0}, "raided": {"grievance": 40.0, "trust": -30.0, "fear": 20.0},
 		"wounded": {"grievance": 35.0, "trust": -30.0, "fear": 15.0}, "hidden": {"grievance": 40.0, "trust": -30.0, "fear": 25.0}}[outcome]
 	Relations.apply(state.relations, target, gid, event, t, "raided", felt)
@@ -2985,14 +3334,36 @@ static func atlas_view(state: Dictionary, viewer: String = "") -> Array:
 				var other := str(item.b) if item.a == gid else str(item.a)
 				pacts.append({"kind": str(item.kind), "other": other, "name": _name(state, other), "until": int(item.end), "role": "payer" if item.kind == "tribute" and item.a == gid else ""})
 		var leader: Dictionary = state.persons.get(str(g.leader), {})
+		var war_leader: Dictionary = state.persons.get(str(g.get("war_leader", "")), {})
+		var tributaries := 0
+		var allies := 0
+		var pacts_of_trade := 0
+		for item: Dictionary in state.agreements:
+			if item.status != "active":
+				continue
+			if item.kind == "tribute" and item.b == gid:
+				tributaries += 1
+			elif item.kind == "alliance" and (item.a == gid or item.b == gid):
+				allies += 1
+			elif item.kind == "trade_pact" and (item.a == gid or item.b == gid):
+				pacts_of_trade += 1
+		var profile := []
+		if tributaries >= 2:
+			profile.append("Machtzentrum")
+		if pacts_of_trade >= 2 or int(g.history.get("trades", 0)) >= 20:
+			profile.append("Handelsgemeinschaft")
+		if allies >= 1:
+			profile.append("Bündnispartner")
 		var labels := []
 		for type_id: String in _sorted(total):
 			labels.append("%d %s" % [int(total[type_id]), str(scn.troop_types[type_id].name)])
 		result.append({"id": gid, "name": str(g.name), "people": str(g.people), "kind": str(g.kind), "canon_kind": str(g.canon_kind), "status": str(g.status),
-			"atlas_region": str(g.atlas_region), "settlements": g.settlements.map(func(s: Dictionary) -> Dictionary: return {"name": s.name, "lat": float(s.lat), "lon": float(s.lon), "population": int(s.population)}),
+			"atlas_region": str(g.atlas_region), "settlements": g.settlements.map(func(s: Dictionary) -> Dictionary: return {"name": s.name, "lat": float(s.lat), "lon": float(s.lon), "population": int(s.population), "size": settlement_class(int(s.population))}),
 			"population": _population(g), "warriors": total, "warriors_total": _force_count(g.troops) + (_force_count(e.troops) if not e.is_empty() else 0), "troop_labels": labels,
 			"strength": snappedf(power, 0.1), "strength_class": strength_class(power), "away": not e.is_empty(), "leader": str(leader.get("name", "")), "relations": relations, "agreements": pacts,
-			"project": str(g.project.get("name", "")), "last_action": str(g.last_action)})
+			"project": str(g.project.get("name", "")), "last_action": str(g.last_action),
+			"government": str(g.get("government", "")), "government_name": str(scn.get("governments", {}).get(str(g.get("government", "")), {}).get("name", "")),
+			"war_leader": str(war_leader.get("name", "")), "profile": profile, "tributaries": tributaries})
 	return result
 
 
@@ -3006,12 +3377,25 @@ static func settlement_points(state: Dictionary, viewer: String = "") -> Array:
 	return points
 
 
-static func chronicle(state: Dictionary, limit: int = 20) -> Array:
+## The chronicle as the simulation knows it, or (with `viewer`) as that
+## actor knows it: only events it took part in, saw or was told about.
+static func chronicle(state: Dictionary, limit: int = 20, viewer: String = "") -> Array:
 	var result := []
-	var start := maxi(0, state.events.size() - limit)
-	for i in range(start, state.events.size()):
-		var ev: Dictionary = state.events[i]
+	var events: Array = state.events if viewer == "" else observed_facts(state, viewer)
+	var start := maxi(0, events.size() - limit)
+	for i in range(start, events.size()):
+		var ev: Dictionary = events[i]
 		result.append("[%s] %s (Anlass: %s)" % [calendar_at(state, int(ev.tick)), str(ev.text), str(ev.cause)])
+	return result
+
+
+## D-040 / handbook p. 11: an actor knows what it observed or was told.
+## Hidden facts (who commissioned the riders) never leave the state this way.
+static func observed_facts(state: Dictionary, observer: String) -> Array:
+	var result := []
+	for ev: Dictionary in state.events:
+		if observer in ev.known_by:
+			result.append(ev.duplicate(true))
 	return result
 
 
@@ -3045,14 +3429,17 @@ static func totals(state: Dictionary, gid: String) -> Dictionary:
 
 # ---------------------------------------------------------------- validation
 
-const GROUP_KEYS := ["name", "people", "kind", "culture", "canon_kind", "source_note", "atlas_region", "status", "leader", "families", "traits", "goals", "raid_range_km", "settlements", "sites", "stock", "held", "troops", "morale", "project", "acc", "last_action", "last_action_tick", "last_raid_tick", "refuge_until", "prepared_until", "weariness", "hunger_weeks", "history", "extra"]
+const GROUP_KEYS := ["name", "people", "kind", "culture", "canon_kind", "source_note", "atlas_region", "status", "leader", "government", "war_leader", "war_until", "families", "traits", "goals", "raid_range_km", "settlements", "sites", "stock", "held", "troops", "morale", "project", "acc", "last_action", "last_action_tick", "last_raid_tick", "refuge_until", "prepared_until", "weariness", "hunger_weeks", "history", "extra"]
 const PERSON_KEYS := ["name", "group", "family", "role", "born_tick", "traits", "prestige", "status", "canon_kind", "since", "with", "deeds", "fate"]
 const PERSON_ROLES := ["chief", "heir", "rival", "elder", "retainer", "veteran", "exile"]
 const PERSON_STATUS := ["alive", "dead", "left", "left_area"]
 const AGREEMENT_STATUS := ["active", "kept", "broken", "expired", "void", "fulfilled"]
 const EXPEDITION_STATUS := ["outbound", "arrived", "returning"]
-static var _validated_ref: Dictionary = {}
-static var _validated_mark := ""
+## Recently validated states, compared by identity and by a mark that changes
+## with every tick, booking and event. Several slots, so that the committed
+## world and a freshly finished week never evict each other.
+const VALIDATED_SLOTS := 4
+static var _validated: Array = []
 
 
 static func _num(v: Variant, low: float, high: float) -> bool:
@@ -3067,19 +3454,217 @@ static func _keys(v: Variant, keys: Array) -> bool:
 	return typeof(v) == TYPE_DICTIONARY and v.size() == keys.size() and v.has_all(keys)
 
 
+static func _mark(state: Dictionary) -> String:
+	return "%s:%s:%s" % [str(state.get("tick")), str(state.get("next_id")), str(state.get("extra_days"))]
+
+
+static func is_validated(state: Variant) -> bool:
+	if typeof(state) != TYPE_DICTIONARY:
+		return false
+	for slot: Array in _validated:
+		if is_same(slot[0], state) and slot[1] == _mark(state):
+			return true
+	return false
+
+
+## Records a state whose complete validation has passed (all slices of a
+## check runner). Only callers that ran that validation may use it.
+static func mark_validated(state: Dictionary) -> void:
+	for i in range(_validated.size() - 1, -1, -1):
+		if is_same(_validated[i][0], state):
+			_validated.remove_at(i)
+	_validated.append([state, _mark(state)])
+	while _validated.size() > VALIDATED_SLOTS:
+		_validated.pop_front()
+
+
 ## Validation is pure but not free; the world model calls this cached form
-## every frame. The mark changes with every tick, booking and event.
+## every frame and pays for a full check only for a state it has not seen.
 static func validate_cached(state: Variant) -> String:
-	if typeof(state) == TYPE_DICTIONARY and is_same(state, _validated_ref) and _validated_mark == "%s:%s" % [str(state.get("tick")), str(state.get("next_id"))]:
+	if is_validated(state):
 		return ""
 	var error := validate(state)
 	if error.is_empty():
-		_validated_ref = state
-		_validated_mark = "%s:%s" % [str(state.tick), str(state.next_id)]
+		mark_validated(state)
 	return error
 
 
+## A shallow copy that differs from an already validated state only in its
+## calendar offset needs no new full check.
+static func with_extra_days(state: Dictionary, days: int) -> Dictionary:
+	var next := state.duplicate(false)
+	next.extra_days = int(state.extra_days) + days
+	if is_validated(state) and days >= 0:
+		mark_validated(next)
+	return next
+
+
 static func validate(state: Variant) -> String:
+	var runner := check_begin(state)
+	while check_step(runner) > 0:
+		pass
+	return str(runner.error)
+
+
+# ---------------------------------------------------------------- sliced work
+# Three resumable runners share one contract: `*_step` performs exactly one
+# slice and returns its cost in work units (0 once the runner is done);
+# `next_units` says what the next slice will cost. One unit stands for a
+# fixed slice size, not for measured time, so budgets are reproducible.
+# Running all slices of a runner equals the monolithic operation exactly.
+
+## Calibrated so that one unit is about 0.25 ms at the 95th percentile of
+## each slice on the development desktop (headless, loaded machine).
+const UNITS := {"copy_base": 3, "copy_persons": 3, "copy_events": 2, "copy_ledger": 3, "copy_edges": 2,
+	"anchors": 1, "expeditions": 1, "economy": 4, "agreements": 1, "leadership": 3, "news": 6,
+	"decision_cache": 2, "decide": 4, "decay": 2, "close": 1,
+	"check_header": 1, "check_expeditions": 1, "check_group": 1, "check_persons": 3, "check_targets": 1,
+	"check_edges": 2, "check_records": 2}
+const MAX_SLICE_UNITS := 6
+const EDGE_SLICE := 48
+const CHECK_EDGE_SLICE := 24
+const WEEK_STAGES := ["anchors", "expeditions", "economy", "agreements", "leadership", "news", "decision_cache", "decide", "decay", "close"]
+
+
+static func next_units(runner: Dictionary) -> int:
+	if bool(runner.done):
+		return 0
+	match str(runner.kind):
+		"copy":
+			return int(UNITS[["copy_base", "copy_persons", "copy_events", "copy_ledger", "copy_edges"][mini(4, int(runner.stage))]])
+		"week":
+			return int(UNITS[WEEK_STAGES[int(runner.stage)]])
+		"check":
+			return int(UNITS[str(runner.steps[int(runner.index)]).get_slice(":", 0)]) if int(runner.index) < runner.steps.size() else 1
+	return 1
+
+
+static func step(runner: Dictionary) -> int:
+	match str(runner.kind):
+		"copy":
+			return copy_step(runner)
+		"week":
+			return week_step(runner)
+		"check":
+			return check_step(runner)
+	return 0
+
+
+## Deep copy in slices; the result is independent of the source afterwards.
+static func copy_begin(source: Dictionary) -> Dictionary:
+	return {"kind": "copy", "source": source, "target": {}, "stage": 0, "keys": [], "index": 0, "done": false}
+
+
+static func copy_step(runner: Dictionary) -> int:
+	if bool(runner.done):
+		return 0
+	var source: Dictionary = runner.source
+	var target: Dictionary = runner.target
+	var cost := next_units(runner)
+	match int(runner.stage):
+		0:
+			for key: String in source:
+				var value: Variant = source[key]
+				if key in ["persons", "events", "ledger", "relations"]:
+					target[key] = null # keeps the key order of the source
+				elif typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY]:
+					target[key] = value.duplicate(true)
+				else:
+					target[key] = value
+			runner.stage = 1
+		1:
+			target.persons = (source.persons as Dictionary).duplicate(true)
+			runner.stage = 2
+		2:
+			target.events = (source.events as Array).duplicate(true)
+			runner.stage = 3
+		3:
+			target.ledger = (source.ledger as Array).duplicate(true)
+			target.relations = {"version": source.relations.version, "edges": {}}
+			runner.keys = source.relations.edges.keys()
+			runner.stage = 4
+			if runner.keys.is_empty():
+				runner.done = true
+		_:
+			var edges: Dictionary = target.relations.edges
+			var keys: Array = runner.keys
+			var stop := mini(keys.size(), int(runner.index) + EDGE_SLICE)
+			for i in range(int(runner.index), stop):
+				edges[keys[i]] = (source.relations.edges[keys[i]] as Dictionary).duplicate(true)
+			runner.index = stop
+			if stop >= keys.size():
+				runner.done = true
+	return cost
+
+
+static func copy_state(source: Dictionary) -> Dictionary:
+	var runner := copy_begin(source)
+	while copy_step(runner) > 0:
+		pass
+	return runner.target
+
+
+static func check_begin(state: Variant) -> Dictionary:
+	return {"kind": "check", "state": state, "steps": ["check_header"], "index": 0, "ctx": {}, "error": "", "done": false}
+
+
+static func check_step(runner: Dictionary) -> int:
+	if bool(runner.done):
+		return 0
+	var cost := next_units(runner)
+	var step := str(runner.steps[int(runner.index)])
+	var error := _check(runner, step)
+	runner.index = int(runner.index) + 1
+	if error != "":
+		runner.error = error
+		runner.done = true
+	elif int(runner.index) >= runner.steps.size():
+		runner.done = true
+	return cost
+
+
+static func _check(runner: Dictionary, step: String) -> String:
+	var state: Variant = runner.state
+	var ctx: Dictionary = runner.ctx
+	var kind := step.get_slice(":", 0)
+	if kind == "check_header":
+		return _check_header(runner, state)
+	var scn := scenario(str(state.scenario))
+	var t := int(state.tick)
+	match kind:
+		"check_expeditions":
+			return _check_expeditions(state, scn, t, ctx)
+		"check_group":
+			return _check_group(state, scn, t, ctx, step.get_slice(":", 1))
+		"check_persons":
+			return _check_persons(state, t, ctx)
+		"check_targets":
+			for tid: Variant in state.targets:
+				var target: Variant = state.targets[tid]
+				if not _keys(target, ["name", "kind", "canon_kind", "lat", "lon", "atlas_region", "raidable", "defence", "defender_strength", "rebuilt", "story_lock_until", "story_lock_reason"]) or not _int(target.defence, 0, 100000) or not _int(target.story_lock_until, -1, 100000000):
+					return "Ungültiges Ziel %s." % tid
+			var header := Relations.validate_header(state.relations)
+			if header != "":
+				return header
+			ctx["ids"] = actor_ids(state)
+			var keys: Array = state.relations.edges.keys()
+			ctx["edges"] = keys
+			# The relation check is appended now that the graph size is known.
+			var insert := int(runner.index) + 1
+			for start in range(0, keys.size(), CHECK_EDGE_SLICE):
+				runner.steps.insert(insert, "check_edges:%d" % start)
+				insert += 1
+			return ""
+		"check_edges":
+			var keys: Array = ctx.edges
+			var start := int(step.get_slice(":", 1))
+			return Relations.validate_edges(state.relations, keys.slice(start, mini(keys.size(), start + CHECK_EDGE_SLICE)), ctx.ids, t)
+		"check_records":
+			return _check_records(state, t, ctx)
+	return "Unbekannter Prüfschritt %s." % step
+
+
+static func _check_header(runner: Dictionary, state: Variant) -> String:
 	if not _keys(state, STATE_KEYS):
 		return "Unvollständiger Stammesweltvertrag."
 	if not _int(state.version, VERSION, VERSION) or typeof(state.scenario) != TYPE_STRING:
@@ -3095,16 +3680,29 @@ static func validate(state: Variant) -> String:
 		return ""
 	if scn.is_empty():
 		return "Unbekanntes Szenario %s." % state.scenario
-	var t := int(state.tick)
-	var goods: Array = scn.goods.keys()
 	if typeof(state.groups) != TYPE_DICTIONARY or typeof(state.persons) != TYPE_DICTIONARY or typeof(state.targets) != TYPE_DICTIONARY:
 		return "Akteurlisten fehlen."
+	if typeof(state.expeditions) != TYPE_ARRAY or typeof(state.relations) != TYPE_DICTIONARY:
+		return "Kriegszüge oder Beziehungen fehlen."
+	var steps: Array = ["check_header", "check_expeditions"]
+	for gid: Variant in state.groups:
+		steps.append("check_group:%s" % gid)
+	steps.append_array(["check_persons", "check_targets", "check_records"])
+	runner.steps = steps
+	return ""
+
+
+static func _check_expeditions(state: Dictionary, scn: Dictionary, t: int, ctx: Dictionary) -> String:
+	var goods: Array = scn.goods.keys()
 	var cargo := {}
 	var away_gear := {}
 	var away_retinue := {}
 	for e: Variant in state.expeditions:
-		if not _keys(e, ["id", "group", "target", "target_kind", "kind", "troops", "depart_tick", "arrive_tick", "return_tick", "status", "cargo", "motive", "protected", "outcome"]) and not _keys(e, ["id", "group", "target", "target_kind", "kind", "troops", "depart_tick", "arrive_tick", "return_tick", "status", "cargo", "motive", "protected", "outcome", "await_until"]):
+		var fields := ["id", "group", "target", "target_kind", "kind", "troops", "depart_tick", "arrive_tick", "return_tick", "status", "cargo", "motive", "protected", "outcome", "cause"]
+		if not _keys(e, fields) and not _keys(e, fields + ["await_until"]):
 			return "Ungültiger Kriegszug."
+		if typeof(e.cause) != TYPE_DICTIONARY or not (str(e.cause.get("cause", "")) in CONFLICT_CAUSES) or str(e.cause.get("dispute", "")).is_empty():
+			return "Kriegszug ohne gebuchten Anlass (D-048)."
 		if not state.groups.has(e.group) or not (e.status in EXPEDITION_STATUS) or not (state.groups.has(e.target) or state.targets.has(e.target)):
 			return "Kriegszug ohne gültige Gruppe, Ziel oder Status."
 		if not _int(e.depart_tick, 0, t) or not _int(e.arrive_tick, int(e.depart_tick), t + 100):
@@ -3120,68 +3718,85 @@ static func validate(state: Variant) -> String:
 			for good: String in e.troops[type_id].gear:
 				away_gear[str(e.group) + ":" + good] = int(away_gear.get(str(e.group) + ":" + good, 0)) + int(e.troops[type_id].gear[good])
 		away_retinue[str(e.id)] = int(e.troops.get("gefolgsmann", {}).get("count", 0))
-	for gid: Variant in state.groups:
-		var g: Variant = state.groups[gid]
-		if not _keys(g, GROUP_KEYS):
-			return "Unvollständige Gruppe %s." % gid
-		if not (g.status in GROUP_STATUS) or not (g.kind in ["tribe", "band", "market"]):
-			return "Ungültiger Gruppenstatus %s." % gid
-		if not _num(g.morale, 0.0, 100.0) or not _num(g.weariness, 0.0, 100.0) or not _int(g.hunger_weeks, 0, 100000):
-			return "Ungültige Moral oder Erschöpfung in %s." % gid
-		for trait_id: Variant in g.traits:
-			if not _num(g.traits[trait_id], 0.0, 1.0):
-				return "Ungültige Eigenschaft in %s." % gid
-		for key: Variant in g.acc:
-			if not _num(g.acc[key], 0.0, 1.0):
-				return "Ungültiger Restbetrag in %s." % gid
-		if not _keys(g.stock, goods) or not _keys(g.held, goods):
-			return "Unvollständiger Güterbestand in %s." % gid
-		for good: String in goods:
-			if not _int(g.stock[good], 0, 100000000) or not _int(g.held[good], 0, 100000000):
-				return "Negativer oder ungültiger Bestand %s.%s." % [gid, good]
-		var troop_error := _validate_troops(scn, g.troops)
-		if troop_error != "":
-			return troop_error
-		var home_gear := {}
-		for type_id: String in g.troops:
-			for good: String in g.troops[type_id].gear:
-				home_gear[good] = int(home_gear.get(good, 0)) + int(g.troops[type_id].gear[good])
-		for good: String in goods:
-			if int(g.held[good]) != int(home_gear.get(good, 0)) + int(away_gear.get(str(gid) + ":" + good, 0)):
-				return "Getragene Ausrüstung %s.%s entspricht nicht den Kriegern." % [gid, good]
-		if typeof(g.settlements) != TYPE_ARRAY or g.settlements.is_empty() or g.settlements.size() > int(scn.economy.max_settlements):
-			return "Ungültige Siedlungen in %s." % gid
-		for s: Variant in g.settlements:
-			if not _keys(s, ["id", "name", "lat", "lon", "population", "fields", "ore", "food_bonus", "buildings", "damage", "founded"]) or not _int(s.population, 0, 10000000) or not _num(s.damage, 0.0, 100.0) or not _num(s.lat, -90.0, 90.0) or not _num(s.lon, -180.0, 180.0):
-				return "Ungültige Siedlung in %s." % gid
-			for b: Variant in s.buildings:
-				if not scn.buildings.has(b) or not _int(s.buildings[b], 0, 1000):
-					return "Ungültiges Gebäude in %s." % gid
-		var warriors := _warriors_home(g)
-		for e: Dictionary in state.expeditions:
-			if e.group == gid:
-				warriors += _force_count(e.troops)
-		if warriors > _population(g):
-			return "Mehr Krieger als Menschen in %s." % gid
-		# The ledger proves every quantity: opening + inflows - outflows.
-		var flows: Dictionary = state.flows.get(gid, {})
-		for good: String in goods + ["people"]:
-			var inflow := 0
-			var outflow := 0
-			var f: Dictionary = flows.get(good, {})
-			for category: String in INFLOW:
-				inflow += int(f.get(category, 0))
-			for category: String in OUTFLOW:
-				outflow += int(f.get(category, 0))
-			var actual := _population(g) if good == "people" else int(g.stock[good]) + int(g.held[good]) + int(cargo.get(str(gid) + ":" + good, 0))
-			if actual != int(state.opening[gid][good]) + inflow - outflow:
-				return "Ledgerbilanz verletzt: %s.%s (Ist %d, Soll %d)." % [gid, good, actual, int(state.opening[gid][good]) + inflow - outflow]
-		if not g.project.is_empty():
-			if not _num(g.project.labour_left, 0.0, 100000.0) or not _int(g.project.progress_tick, 0, t):
-				return "Ungültiges Bauvorhaben in %s." % gid
-			for good: Variant in g.project.cost_left:
-				if not _int(g.project.cost_left[good], 0, int(g.project.cost_total[good])):
-					return "Ungültige Baukosten in %s." % gid
+	ctx["cargo"] = cargo
+	ctx["away_gear"] = away_gear
+	ctx["away_retinue"] = away_retinue
+	return ""
+
+
+static func _check_group(state: Dictionary, scn: Dictionary, t: int, ctx: Dictionary, gid: String) -> String:
+	var goods: Array = scn.goods.keys()
+	var cargo: Dictionary = ctx.cargo
+	var away_gear: Dictionary = ctx.away_gear
+	var g: Variant = state.groups[gid]
+	if not _keys(g, GROUP_KEYS):
+		return "Unvollständige Gruppe %s." % gid
+	if not (g.status in GROUP_STATUS) or not (g.kind in ["tribe", "band", "market"]):
+		return "Ungültiger Gruppenstatus %s." % gid
+	if not _num(g.morale, 0.0, 100.0) or not _num(g.weariness, 0.0, 100.0) or not _int(g.hunger_weeks, 0, 100000):
+		return "Ungültige Moral oder Erschöpfung in %s." % gid
+	if not scn.get("governments", {}).has(g.government) or not _int(g.war_until, -1, 100000000) or typeof(g.war_leader) != TYPE_STRING:
+		return "Ungültige Herrschaftsform oder Heerführung in %s." % gid
+	if str(g.war_leader) != "" and (not state.persons.has(g.war_leader) or state.persons[g.war_leader].group != gid or state.persons[g.war_leader].status != "alive"):
+		return "Heerführer von %s ist keine lebende Person der Gruppe." % gid
+	for trait_id: Variant in g.traits:
+		if not _num(g.traits[trait_id], 0.0, 1.0):
+			return "Ungültige Eigenschaft in %s." % gid
+	for key: Variant in g.acc:
+		if not _num(g.acc[key], 0.0, 1.0):
+			return "Ungültiger Restbetrag in %s." % gid
+	if not _keys(g.stock, goods) or not _keys(g.held, goods):
+		return "Unvollständiger Güterbestand in %s." % gid
+	for good: String in goods:
+		if not _int(g.stock[good], 0, 100000000) or not _int(g.held[good], 0, 100000000):
+			return "Negativer oder ungültiger Bestand %s.%s." % [gid, good]
+	var troop_error := _validate_troops(scn, g.troops)
+	if troop_error != "":
+		return troop_error
+	var home_gear := {}
+	for type_id: String in g.troops:
+		for good: String in g.troops[type_id].gear:
+			home_gear[good] = int(home_gear.get(good, 0)) + int(g.troops[type_id].gear[good])
+	for good: String in goods:
+		if int(g.held[good]) != int(home_gear.get(good, 0)) + int(away_gear.get(gid + ":" + good, 0)):
+			return "Getragene Ausrüstung %s.%s entspricht nicht den Kriegern." % [gid, good]
+	if typeof(g.settlements) != TYPE_ARRAY or g.settlements.is_empty() or g.settlements.size() > int(scn.economy.max_settlements):
+		return "Ungültige Siedlungen in %s." % gid
+	for s: Variant in g.settlements:
+		if not _keys(s, ["id", "name", "lat", "lon", "population", "fields", "ore", "food_bonus", "buildings", "damage", "founded"]) or not _int(s.population, 0, 10000000) or not _num(s.damage, 0.0, 100.0) or not _num(s.lat, -90.0, 90.0) or not _num(s.lon, -180.0, 180.0):
+			return "Ungültige Siedlung in %s." % gid
+		for b: Variant in s.buildings:
+			if not scn.buildings.has(b) or not _int(s.buildings[b], 0, 1000):
+				return "Ungültiges Gebäude in %s." % gid
+	var warriors := _warriors_home(g)
+	for e: Dictionary in state.expeditions:
+		if e.group == gid:
+			warriors += _force_count(e.troops)
+	if warriors > _population(g):
+		return "Mehr Krieger als Menschen in %s." % gid
+	# The ledger proves every quantity: opening + inflows - outflows.
+	var flows: Dictionary = state.flows.get(gid, {})
+	for good: String in goods + ["people"]:
+		var inflow := 0
+		var outflow := 0
+		var f: Dictionary = flows.get(good, {})
+		for category: String in INFLOW:
+			inflow += int(f.get(category, 0))
+		for category: String in OUTFLOW:
+			outflow += int(f.get(category, 0))
+		var actual := _population(g) if good == "people" else int(g.stock[good]) + int(g.held[good]) + int(cargo.get(gid + ":" + good, 0))
+		if actual != int(state.opening[gid][good]) + inflow - outflow:
+			return "Ledgerbilanz verletzt: %s.%s (Ist %d, Soll %d)." % [gid, good, actual, int(state.opening[gid][good]) + inflow - outflow]
+	if not g.project.is_empty():
+		if not _num(g.project.labour_left, 0.0, 100000.0) or not _int(g.project.progress_tick, 0, t):
+			return "Ungültiges Bauvorhaben in %s." % gid
+		for good: Variant in g.project.cost_left:
+			if not _int(g.project.cost_left[good], 0, int(g.project.cost_total[good])):
+				return "Ungültige Baukosten in %s." % gid
+	return ""
+
+
+static func _check_persons(state: Dictionary, t: int, ctx: Dictionary) -> String:
 	var home_retinue := {}
 	var away_counted := {}
 	for pid: Variant in state.persons:
@@ -3201,22 +3816,20 @@ static func validate(state: Variant) -> String:
 		var leader := str(state.groups[gid].leader)
 		if state.groups[gid].kind != "market" and state.groups[gid].status == "active" and (not state.persons.has(leader) or state.persons[leader].status != "alive" or state.persons[leader].role != "chief"):
 			return "Aktive Gruppe %s ohne lebenden Anführer." % gid
+	var away_retinue: Dictionary = ctx.away_retinue
 	for xid: String in away_retinue:
 		if int(away_retinue[xid]) != int(away_counted.get(xid, 0)):
 			return "Gefolgsleute im Kriegszug %s stimmen nicht." % xid
 	for xid: Variant in away_counted:
 		if not away_retinue.has(xid):
 			return "Gefolgsmann in einem nicht bestehenden Kriegszug."
-	for tid: Variant in state.targets:
-		var target: Variant = state.targets[tid]
-		if not _keys(target, ["name", "kind", "canon_kind", "lat", "lon", "atlas_region", "raidable", "defence", "defender_strength", "rebuilt", "story_lock_until", "story_lock_reason"]) or not _int(target.defence, 0, 100000) or not _int(target.story_lock_until, -1, 100000000):
-			return "Ungültiges Ziel %s." % tid
-	var relation_error := Relations.validate(state.relations, actor_ids(state), t)
-	if relation_error != "":
-		return relation_error
+	return ""
+
+
+static func _check_records(state: Dictionary, t: int, ctx: Dictionary) -> String:
 	if typeof(state.agreements) != TYPE_ARRAY or state.agreements.size() > MAX_AGREEMENTS:
 		return "Ungültige Vereinbarungen."
-	var ids := actor_ids(state)
+	var ids: Dictionary = ctx.ids
 	for item: Variant in state.agreements:
 		if typeof(item) != TYPE_DICTIONARY or not item.has_all(["id", "kind", "a", "b", "start", "end", "every", "terms", "status", "paid", "missed", "broken_by", "closed_tick", "canon_kind"]):
 			return "Unvollständige Vereinbarung."
@@ -3229,6 +3842,17 @@ static func validate(state: Variant) -> String:
 	for ev: Variant in state.events:
 		if typeof(ev) != TYPE_DICTIONARY or not _int(ev.get("tick"), 0, t):
 			return "Ereignis ohne gültige Zeit."
+		if str(ev.get("kind", "")) in CONFLICT_EVENTS and not bool(ev.get("legacy", false)):
+			var conflict: Variant = ev.get("conflict")
+			if typeof(conflict) != TYPE_DICTIONARY or not (str(conflict.get("cause", "")) in CONFLICT_CAUSES):
+				return "Konfliktereignis ohne erlaubten Anlass (D-048): %s." % ev.get("id", "")
+	if typeof(state.disputes) != TYPE_ARRAY or state.disputes.size() > MAX_DISPUTES:
+		return "Ungültige Streitliste."
+	for item: Variant in state.disputes:
+		if not _keys(item, ["id", "a", "b", "cause", "source", "note", "since", "until", "mutual", "status"]) or not (item.cause in CONFLICT_CAUSES) or not ids.has(item.a) or not ids.has(item.b):
+			return "Ungültiger Streit."
+		if not (item.status in ["open", "closed", "expired"]) or not _int(item.since, 0, t) or not _int(item.until, -1, 100000000) or typeof(item.source) != TYPE_STRING or str(item.source).is_empty():
+			return "Streit ohne Quelle oder gültige Zeit: %s." % item.id
 	for target_id: Variant in state.raid_windows:
 		if not _int(state.raid_windows[target_id].get("until"), 0, 100000000):
 			return "Ungültiges Erholungsfenster."
@@ -3266,6 +3890,42 @@ static func _validate_troops(scn: Dictionary, troops: Variant) -> String:
 	return ""
 
 
+## Tribal state v1 (first #99 build) -> v2: forms of government and war
+## leaders. Groups take the scenario's form; nobody leads a war yet.
+static func migrate(state: Variant) -> void:
+	if typeof(state) != TYPE_DICTIONARY or not _num(state.get("version"), 1, 1) or typeof(state.get("groups")) != TYPE_DICTIONARY or typeof(state.get("expeditions")) != TYPE_ARRAY or typeof(state.get("persons")) != TYPE_DICTIONARY:
+		return
+	for e: Variant in state.expeditions:
+		if typeof(e) != TYPE_DICTIONARY or not e.has_all(["group", "troops", "cargo", "id"]) or not state.groups.has(e.group):
+			return # Malformed: leave it to strict validation.
+	var scn := scenario(str(state.get("scenario", NO_SCENARIO)))
+	for gid: Variant in state.get("groups", {}):
+		var g: Variant = state.groups[gid]
+		if typeof(g) != TYPE_DICTIONARY or g.has("government"):
+			continue
+		g["government"] = str(scn.get("groups", {}).get(gid, {}).get("government", "assembly"))
+		g["war_leader"] = ""
+		g["war_until"] = -1
+	for item: Variant in state.get("agreements", []):
+		if typeof(item) == TYPE_DICTIONARY and item.get("kind", "") == "commission":
+			item["hidden"] = true
+	# D-048 came after v1: lasting enmities come from the roster; war bands
+	# that left without a recorded cause go home; old conflict records are
+	# kept as history and marked as written before the rule.
+	state["disputes"] = []
+	if not scn.is_empty():
+		for item: Dictionary in scn.get("natural_enemies", []):
+			if state.groups.has(item.a) and state.groups.has(item.b):
+				_open(state, str(item.a), str(item.b), "natural_enemy", "roster:" + str(item.get("source", "design")), str(item.note), -1, true)
+		for e: Variant in state.get("expeditions", []).duplicate():
+			if typeof(e) == TYPE_DICTIONARY:
+				_return_home(state, scn, e, int(state.tick))
+	for ev: Variant in state.get("events", []):
+		if typeof(ev) == TYPE_DICTIONARY and str(ev.get("kind", "")) in CONFLICT_EVENTS and not ev.has("conflict"):
+			ev["legacy"] = true
+	state.version = 2
+
+
 ## JSON turns integers into floats. Restore exact types so that a loaded
 ## world continues bit-identically to one that was never saved.
 static func normalize(state: Dictionary) -> void:
@@ -3278,7 +3938,7 @@ static func normalize(state: Dictionary) -> void:
 		for section: String in ["stock", "held"]:
 			for good: String in g[section]:
 				g[section][good] = int(g[section][good])
-		for key: String in ["last_action_tick", "last_raid_tick", "refuge_until", "prepared_until", "hunger_weeks"]:
+		for key: String in ["last_action_tick", "last_raid_tick", "refuge_until", "prepared_until", "hunger_weeks", "war_until"]:
 			g[key] = int(g[key])
 		for key: String in g.history:
 			g.history[key] = int(g.history[key])
@@ -3339,6 +3999,9 @@ static func normalize(state: Dictionary) -> void:
 				info[key] = int(info[key])
 	for target_id: String in state.raid_windows:
 		state.raid_windows[target_id].until = int(state.raid_windows[target_id].until)
+	for item: Dictionary in state.disputes:
+		item.since = int(item.since)
+		item.until = int(item.until)
 	for gid: String in state.visits:
 		var visit: Dictionary = state.visits[gid]
 		for key: String in ["tick", "population", "warriors"]:

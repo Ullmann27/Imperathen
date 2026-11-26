@@ -106,13 +106,21 @@ static func apply(graph: Dictionary, observer: String, subject: String, event_id
 
 ## Slow fading toward the baseline. Memories stay; feelings soften.
 static func decay(graph: Dictionary, ticks: int = 1) -> void:
+	decay_keys(graph, graph.edges.keys(), ticks)
+
+
+## Fades the named edges only. Every edge fades independently, so fading the
+## graph in several slices gives exactly the result of one call.
+static func decay_keys(graph: Dictionary, keys: Array, ticks: int = 1) -> void:
 	if ticks <= 0:
 		return
 	var kept := {}
 	for dimension: String in DIMENSIONS:
 		kept[dimension] = pow(1.0 - float(DIMENSIONS[dimension][2]), ticks)
-	# Every edge fades independently, so the visiting order cannot matter.
-	for target: Dictionary in graph.edges.values():
+	for k: Variant in keys:
+		if not graph.edges.has(k):
+			continue
+		var target: Dictionary = graph.edges[k]
 		for dimension: String in DIMENSIONS:
 			var baseline := float(DIMENSIONS[dimension][3])
 			var current := float(target[dimension])
@@ -124,7 +132,6 @@ static func decay(graph: Dictionary, ticks: int = 1) -> void:
 			target[dimension] = next
 
 
-## A readable label for UI and AI shorthand. Thresholds are part of the contract.
 static func stance(graph: Dictionary, observer: String, subject: String) -> String:
 	if not knows(graph, observer, subject):
 		return "unknown"
@@ -184,12 +191,24 @@ static func normalize(graph: Dictionary) -> void:
 
 
 static func validate(graph: Variant, actor_ids: Dictionary, now_tick: int) -> String:
+	var error := validate_header(graph)
+	if error != "":
+		return error
+	return validate_edges(graph, graph.edges.keys(), actor_ids, now_tick)
+
+
+static func validate_header(graph: Variant) -> String:
 	if typeof(graph) != TYPE_DICTIONARY or graph.size() != 2 or not graph.has_all(["version", "edges"]):
 		return "Ungültiger Beziehungsgraph."
 	if not _is_int(graph.version) or int(graph.version) != VERSION or typeof(graph.edges) != TYPE_DICTIONARY or graph.edges.size() > MAX_EDGES:
 		return "Unbekannte Beziehungsversion oder zu viele Beziehungen."
+	return ""
+
+
+## Checks the named edges; slices of the key list together check the graph.
+static func validate_edges(graph: Dictionary, keys: Array, actor_ids: Dictionary, now_tick: int) -> String:
 	var fields := DIMENSIONS.size() + 3
-	for k: Variant in graph.edges:
+	for k: Variant in keys:
 		if typeof(k) != TYPE_STRING:
 			return "Ungültiger Beziehungsschlüssel."
 		var parts := str(k).split(">")
@@ -219,7 +238,6 @@ static func validate(graph: Variant, actor_ids: Dictionary, now_tick: int) -> St
 	return ""
 
 
-## Rounded to four decimals that survive Godot's JSON save/load exactly.
 static func _q(x: float) -> float:
 	return roundf(x * 10000.0) / 10000.0
 
