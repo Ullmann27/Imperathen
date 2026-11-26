@@ -6,6 +6,7 @@ const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Economy = preload("res://scripts/domain/village_economy.gd")
+const I01 = preload("res://scripts/story/i01_three_cups.gd")
 var checks := 0
 var failures: Array[String] = []
 var directory := "user://village_childhood_%s" % Time.get_ticks_usec()
@@ -60,12 +61,27 @@ func _current(model) -> String:
 	return str(Childhood.view(model.data).get("stage", "invalid"))
 
 
+## Plays the I-01 morning (screenplay v4) through its real commands: the
+## first listed option at each authored point (talk, well, pour, meal, topic).
+func _morning(model) -> bool:
+	for _index in 12:
+		var stage := _current(model)
+		if not stage.begins_with("i01_"):
+			return true
+		if not _complete(model):
+			return false
+	return false
+
+
 func _complete(model, trade_choice := "market_fair") -> bool:
 	var view: Dictionary = Childhood.view(model.data)
 	if view.is_empty():
 		_check(false, "A valid next childhood action exists")
 		return false
 	var stage := str(view.get("stage", ""))
+	if stage.begins_with("i01_"):
+		_at(model, view.point)
+		return _ok(_action(model, str(view.actions[0].payload.action_id)), "Play the I-01 morning: " + stage)
 	if stage in ["i02_basket", "i02_correct", "i03_marcus", "i07_water_fetch", "i07_water_bring", "i08_tracks", "i08_report", "i11_forge", "i12_father", "i13_morning", "i14_oath"]:
 		_at(model, view.point)
 		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):
@@ -120,9 +136,17 @@ func _until(model, stage: String, trade_choice := "market_fair") -> bool:
 func _test_fresh_opt_in_and_legacy() -> void:
 	var model = _new()
 	_check(model.data.village.economy.people.size() == 14 and Life.npc_catalog(model.data).size() == 10, "Parents and smith reuse the fourteen real adults and expand seven dialogue people to ten")
-	_check(model.data.buildings.is_empty() and _current(model) == "mother_morning", "Family beginning needs no newly built hut")
+	_check(model.data.buildings.is_empty() and _current(model) == "i01_choice", "Family beginning needs no newly built hut and opens with the I-01 morning choice")
 	_check(Life.relationship(model.data, "julia").met and Life.relationship(model.data, "silvanus").met and not Life.relationship(model.data, "sextus").met, "Parents are already known; the smith is met in play")
-	_check(Life.actor_position(model.data, "julia") == Childhood.POINTS.mother and Life.actor_position(model.data, "silvanus") == Childhood.POINTS.father and Life.actor_position(model.data, "sextus") == Childhood.POINTS.smith, "Canonical family and smith render at the same authored points used by childhood interactions")
+	# Screenplay v4: during the open I-01 morning the parents are at the breakfast
+	# table; afterwards they return to the authored points of the family steps.
+	_check(Life.actor_position(model.data, "julia") == I01.POINTS.julia_table and Life.actor_position(model.data, "silvanus") == I01.POINTS.silvanus_table, "Parents are at the breakfast table during the I-01 morning")
+	var after_morning = _new()
+	_check(_morning(after_morning), "The I-01 morning can be played through its commands")
+	_check(Life.actor_position(after_morning.data, "julia") == I01.POINTS.julia_table and Life.actor_position(after_morning.data, "silvanus") == Childhood.POINTS.father, "After breakfast Julia stays at the table for her errand and Silvanus goes to his door work")
+	for _index in 3:
+		_complete(after_morning)
+	_check(Life.actor_position(after_morning.data, "julia") == Childhood.POINTS.mother and Life.actor_position(after_morning.data, "silvanus") == Childhood.POINTS.father and Life.actor_position(after_morning.data, "sextus") == Childhood.POINTS.smith, "Canonical family and smith render at the same authored points used by childhood interactions")
 	for place: Dictionary in model.data.village.economy.workplaces.values():
 		_check(place.condition == 100, "The fresh existing village is not a ruin awaiting reconstruction")
 	_check(Economy.day_length(model.data) == 3600.0 and model.data.village.childhood.day == 1, "Narrative day one and the longer economic cycle are distinct")
@@ -180,7 +204,7 @@ func _test_idle_and_bypasses() -> void:
 	var model = _new()
 	model.advance(600.0)
 	_check(model.data.world_seconds > 599.9 and model.data.player.age == 12 and model.data.progress.years_elapsed == 0, "Ten minutes of actual idle simulation do not age the child")
-	_check(_current(model) == "mother_morning" and model.data.village.childhood.day == 1 and model.data.village.raid.status == "quiet", "Idle time cannot finish a task, end a narrative day or start the old timed raid")
+	_check(_current(model) == "i01_choice" and model.data.village.childhood.screenplay.i01_events.is_empty() and model.data.village.childhood.day == 1 and model.data.village.raid.status == "quiet", "Idle time cannot finish a task, make the morning choice, end a narrative day or start the old timed raid")
 	_check(model.data.village.economy.day == 0 and model.data.village.economy.day_seconds > 599.9, "Six hundred seconds do not turn into five economic days")
 	_check(not Life.training_ready(model.data), "The legacy training gate stays closed")
 	var before := _snapshot(model.data)
@@ -194,6 +218,7 @@ func _test_idle_and_bypasses() -> void:
 
 func _test_action_transactions() -> void:
 	var model = _new()
+	_check(_morning(model), "Play the I-01 morning before the household errand")
 	_at(model, Vector2(70.0, 70.0))
 	var before := _snapshot(model.data)
 	_check(not _action(model, "mother_morning").ok and _snapshot(model.data) == before, "Remote parent action cannot advance or grant an item")
@@ -468,7 +493,7 @@ func _test_invalid_persistence_and_read_isolation() -> void:
 	catalog.back().name = "Invented name"
 	_check(_snapshot(model.data) == before, "Mutating returned UI views, relationship copies or catalogs cannot alter authoritative state")
 	var copy: Dictionary = model.data.duplicate(true)
-	_check(Childhood.view(copy).objective.length() > 0 and Childhood.dialogue(copy, "julia").choices.size() == 1, "Fresh state exposes an actionable family conversation")
+	_check(Childhood.view(copy).objective.length() > 0 and Childhood.dialogue(copy, "julia").choices.size() == 3, "Fresh state exposes the actionable I-01 family choice (talk, help, yard)")
 
 
 func _person(model, id: String) -> Dictionary:

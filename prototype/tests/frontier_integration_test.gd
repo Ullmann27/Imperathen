@@ -313,6 +313,12 @@ func _enter_fresh_childhood() -> void:
 	game.opening_overlay._request_advance()
 	_check(game.screen == "opening" and game.opening_sequence.get("id", "") == "childhood_home" and _snapshot() == before, "I-00 chains into the family opening without mutating the campaign")
 	game.opening_overlay._request_skip()
+	# I-01 VID-A (screenplay v4): skip stops at the open morning choice and
+	# chooses nothing; the choice itself is the first real campaign change.
+	_check(game.screen == "opening" and str(game.opening_sequence.beats[game.opening_index].get("id", "")) == "i01_a_choice" and _snapshot() == before, "Skipping the family opening stops at its open choice without changing the campaign")
+	game.opening_overlay.choice_requested.emit("i01_yard")
+	before = _snapshot()
+	game.opening_overlay._request_skip()
 	_check(game.screen == "opening" and bool(game.opening_sequence.beats[game.opening_index].get("final", false)), "Skipping the family opening keeps its explicit objective")
 	game.opening_overlay._request_advance()
 	_check(game.screen == "playing" and _snapshot() == before, "Accepting the family objective releases play without changing the campaign")

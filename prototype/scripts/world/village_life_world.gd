@@ -476,7 +476,8 @@ func _sync_actor(id: String, caption: String, profession: String, person: Dictio
 	var controlled: bool = id == "silvanus" and Childhood.enabled(state) and person.get("assignment", "idle") == "idle"
 	actor.set_meta("companion_controlled", controlled)
 	if not controlled:
-		actor.position = Vector3(at.x, 0, at.y)
+		# Inside a house the figure stands on the raised floor, not in it.
+		actor.position = Vector3(at.x, Layout.HOUSE_FLOOR if _indoors(at) else 0.0, at.y)
 	actor.visible = bool(person.get("alive", true)) and not state.village.get("militia", []).has(id)
 	actor.collision_layer = Layout.CITIZEN_LAYER if actor.visible and visible else 0
 	actor.set_meta("assignment", person.get("assignment", "idle"))
@@ -603,6 +604,13 @@ func nearest(position: Vector3, radius := 3.2) -> String:
 			distance = value
 			best = npc.id
 	return best
+
+
+static func _indoors(at: Vector2) -> bool:
+	for home: Dictionary in Layout.HOMES:
+		if Layout.house_footprint(home, -0.35).has_point(at):
+			return true
+	return false
 
 
 func actor_position(id: String) -> Vector3:

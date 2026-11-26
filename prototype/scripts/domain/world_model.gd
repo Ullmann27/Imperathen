@@ -59,7 +59,14 @@ func _init() -> void:
 	new_game()
 
 
-func new_game(origin_id := "italia", extended_village := false, childhood_enabled := false, action_combat := false) -> void:
+## Development and test worlds keep the former 30-denarii start fund. Only the
+## player-facing "Neues Leben" entry passes regular_start = true: a regular life
+## starts without own money, weapon or armour (Game Direction 26.11.2026).
+## Loading never changes money already stored in an existing save.
+const DEVELOPMENT_START_DENARII := 30
+
+
+func new_game(origin_id := "italia", extended_village := false, childhood_enabled := false, action_combat := false, regular_start := false) -> void:
 	if not Origins.PEOPLES.has(origin_id):
 		origin_id = "italia"
 	var origin: Dictionary = Origins.PEOPLES[origin_id]
@@ -67,7 +74,7 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 		"schema_version": SCHEMA_VERSION,
 		"world_id": "%s-%s" % [Time.get_ticks_usec(), randi()],
 		"revision": 0, "world_seconds": 0.0,
-		"resources": {"wood": 0, "grain": 12, "denarii": 30},
+		"resources": {"wood": 0, "grain": 12, "denarii": 0 if regular_start else DEVELOPMENT_START_DENARII},
 		"player": {"position": [0.0, 1.0, 8.0], "health": 100, "age": 12, "role": "child"},
 		"companion": {"id": origin.companion.to_lower(), "met": false, "choice": "", "trust": 0, "age": 12},
 		"progress": {"stage": "prologue", "training_hits": 0, "training_complete": false,
@@ -82,6 +89,10 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 		"origin_id":origin_id, "strategy":Seasons.new_game(origin_id), "valley": {}, "command_log": {},
 		"frontier": Frontier.new_state()
 	}
+	if regular_start:
+		# Stored so the money balance proves the regular 0-denarii start. Saves
+		# without this key are development/legacy worlds with the former fund.
+		data.player["start_funds"] = 0
 	for index in NODE_POSITIONS.size():
 		data.resource_nodes.append({"id": "timber_%d" % index, "x": NODE_POSITIONS[index][0], "z": NODE_POSITIONS[index][1], "amount": 16})
 	VillageEconomy.ensure(data)
@@ -101,7 +112,8 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 				# games. Two actual residents meet the unchanged staffing contract.
 				person.assignment="trade"
 		data.village.economy.last_report = "Markt, Felder und Werkstätten arbeiten bereits. Decimus verwaltet das Dorf; du beginnst als Kind deiner Familie."
-		data.player.position = [-12.0, 1.35, 11.7]
+		# I-01 begins beside the boy's actual bed in the family home (HB S. 13).
+		data.player.position = [-12.05, 1.35, 10.55]
 		data.story.title = "Ein Morgen zu Hause"
 		data.story.text = "Deine Familie und das Dorf sind schon da. Geh zu deiner Mutter vor dem Haus. Heute beginnt deine Geschichte mit den Menschen, die dich kennen."
 		data.chronicle = [{"time":0.0,"text":"Du bist zwölf. In Valdora beginnt ein gewöhnlicher Morgen zwischen Familie, Handwerk und Markt."}]
@@ -826,7 +838,7 @@ func _validate_state(state: Variant) -> String:
 	for key in state.resources:
 		if not _integer(state.resources[key], 0, 1000000):
 			return "Güter müssen endliche nichtnegative ganze Mengen sein."
-	if not _exact_keys(state.player, ["position", "health", "age", "role"]):
+	if not _exact_keys(state.player, ["position", "health", "age", "role"]) and not (_exact_keys(state.player, ["position", "health", "age", "role", "start_funds"]) and _integer(state.player.start_funds, 0, 0)):
 		return "Ungültige Spielerfigur."
 	if not _valid_position(state.player.position) or not _integer(state.player.health, 0, 100) or not _integer(state.player.age, 12, 250018) or not _text(state.player.role, 1, 20):
 		return "Ungültiger Ort, Gesundheit, Alter oder Rolle."
@@ -979,7 +991,7 @@ func _validate_state(state: Variant) -> String:
 	if int(state.resources.stone) != int(village_ledger.stone):
 		return "Die Steinbilanz wurde verletzt."
 	var expected_grain := 12 - 2 * int(state.squad.recruits) + (4 if progress.skirmish_won else 0) + (4 if state.story.choice == "protect" else 0)
-	var expected_money := 30 - 5 * int(state.squad.recruits) + (15 if progress.skirmish_won else 0) + (12 if state.story.choice == "pursue" else 0)
+	var expected_money := int(state.player.get("start_funds", DEVELOPMENT_START_DENARII)) - 5 * int(state.squad.recruits) + (15 if progress.skirmish_won else 0) + (12 if state.story.choice == "pursue" else 0)
 	expected_grain += int(frontier_effects.grain)
 	expected_money += int(frontier_effects.denarii)
 	expected_grain += int(village_ledger.grain)
@@ -1103,8 +1115,9 @@ func _restore_integer_fields(state: Dictionary) -> void:
 	state.frontier.step = int(state.frontier.step)
 	for key in state.resources:
 		state.resources[key] = int(state.resources[key])
-	for key in ["health", "age"]:
-		state.player[key] = int(state.player[key])
+	for key in ["health", "age", "start_funds"]:
+		if state.player.has(key):
+			state.player[key] = int(state.player[key])
 	for key in ["trust", "age"]:
 		state.companion[key] = int(state.companion[key])
 	for key in ["training_hits", "years_elapsed"]:
@@ -1162,6 +1175,7 @@ func _restore_integer_fields(state: Dictionary) -> void:
 		state.village.abilities.version = int(state.village.abilities.version)
 	if Childhood.enabled(state):
 		state.village.childhood.version=int(state.village.childhood.version)
+		state.village.childhood.screenplay.version=int(state.village.childhood.screenplay.version)
 		state.village.childhood.day=int(state.village.childhood.day)
 		state.village.childhood.guard_absence.previous_health=int(state.village.childhood.guard_absence.previous_health)
 		for relation:Dictionary in state.village.childhood.relationships.values():

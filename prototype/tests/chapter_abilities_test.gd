@@ -113,6 +113,10 @@ func _complete(model) -> bool:
 	var screenplay_actions := {"i02_basket":"basket_check", "i02_correct":"basket_correct", "i03_marcus":"marcus_friend",
 		"i07_water_fetch":"i07_water_fetch", "i07_water_bring":"i07_water_bring",
 		"i08_tracks":"i08_inspect", "i08_report":"i08_report"}
+	if stage.begins_with("i01_"):
+		# Screenplay v4 I-01 morning: first authored option at each real point.
+		_at(model, view.point)
+		return _ok(_action(model, str(view.actions[0].payload.action_id)), "I-01 morning " + stage)
 	if screenplay_actions.has(stage):
 		_at(model, view.point)
 		if not str(view.get("target_npc", "")).is_empty() and not _meet(model, str(view.target_npc)):

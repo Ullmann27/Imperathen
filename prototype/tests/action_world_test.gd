@@ -32,6 +32,9 @@ func _run() -> void:
 	game._opening_next()
 	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_home", "I-00 hands the same saved life to the family opening")
 	game._opening_skip()
+	# I-01 VID-A waits for the player's morning choice (screenplay v4).
+	game.opening_overlay.choice_requested.emit("i01_yard")
+	game._opening_skip()
 	game._opening_next()
 	_check(game.screen == "playing" and game.model.data.player.age == 12 and Combat.enabled(game.model.data), "The actual new child receives movement and combat controls after both authored openings")
 	await _frames(3)

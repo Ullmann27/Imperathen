@@ -74,7 +74,16 @@ func _run() -> void:
 	checkpoint = Checkpoint.read(str(game.model.data.world_id))
 	_check(checkpoint.get("sequence_id", "") == "childhood_home" and not bool(checkpoint.get("completed", true)), "The chained family scene replaces the completed prologue checkpoint")
 	game.opening_overlay._request_skip()
-	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_home" and bool(game.opening_sequence.beats[game.opening_index].final), "Skipping the family cinematic still stops at its real objective")
+	# I-01 VID-A (screenplay v4) ends with an interactive choice. Skip stops at
+	# the open choice instead of making it (HB 3.0 S. 29, T20).
+	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_home" and str(game.opening_sequence.beats[game.opening_index].get("id", "")) == "i01_a_choice", "Skipping the family cinematic stops at its open choice")
+	_check(JSON.parse_string(JSON.stringify(game.model.data)) == JSON.parse_string(campaign), "Skipping to the choice makes no decision")
+	game.opening_overlay._request_advance()
+	_check(str(game.opening_sequence.beats[game.opening_index].get("id", "")) == "i01_a_choice", "Advance cannot pass the open choice")
+	game.opening_overlay.choice_requested.emit("i01_yard")
+	_check(game.model.data.village.childhood.screenplay.i01_path == "yard", "The choice is committed through the real childhood command")
+	game.opening_overlay._request_skip()
+	_check(game.screen == "opening" and game.opening_sequence.id == "childhood_home" and bool(game.opening_sequence.beats[game.opening_index].final), "After the choice, skip stops at its real objective")
 	game.opening_overlay._request_advance()
 	_check(game.screen == "playing" and game.world.get_node("WorldCamera").current and game.world.get("_active"), "Explicit family-objective acceptance returns the ordinary camera and movement")
 	_check(game.model.data.companion.choice == "" and game.model.data.resources.wood == 0, "Skipping both cinematics does not choose relationships or collect resources")

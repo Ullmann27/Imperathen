@@ -5,6 +5,7 @@ extends SceneTree
 
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
+const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const WorldModel = preload("res://scripts/domain/world_model.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const FIXTURES := "res://tests/fixtures/mission_bridge_data/"
@@ -81,8 +82,11 @@ func _test_recorded_saves() -> void:
 		var loaded: Dictionary = model.load_game(path)
 		if not _check(loaded.ok, "Aufgezeichneten v5-Envelope laden: " + stage + ": " + str(loaded.message)):
 			continue
-		_check(model.data.schema_version == WorldModel.SCHEMA_VERSION and model.data.village.childhood.screenplay.version == 3, "Aktuelles Saveschema, unveränderter Brückenstand: " + stage)
-		_check(_save_json(model.data.village.childhood) == _save_json(state.village.childhood), "Kindheitsfortschritt bleibt vollständig erhalten: " + stage)
+		# Screenplay v4 (I-01 morning) migrates these v3 recordings on load. They
+		# stand past the family talk, so I-01 is "legacy" and nothing else changes.
+		# The save envelope itself is migrated to the current schema (world calendar).
+		_check(model.data.schema_version == WorldModel.SCHEMA_VERSION and model.data.village.childhood.screenplay.version == Childhood.SCREENPLAY_VERSION and model.data.village.childhood.screenplay.i01 == "legacy" and model.data.village.childhood.screenplay.i01_events.is_empty(), "Aktuelles Saveschema; Brückenstand nur um I-01 (legacy) erweitert: " + stage)
+		_check(_save_json(_without_i01(model.data.village.childhood)) == _save_json(_without_i01(state.village.childhood)), "Kindheitsfortschritt bleibt vollständig erhalten: " + stage)
 		_check(_save_json(model.data.companion) == _save_json(state.companion), "Gespeicherte Marcus-Wahl bleibt erhalten: " + stage)
 		var view: Dictionary = Childhood.view(model.data)
 		_check(view.stage == stage, "Aufgezeichneter Spielstand setzt an derselben Brücke fort: " + stage)
@@ -109,6 +113,14 @@ func _cleanup() -> void:
 	for name: String in folder.get_files():
 		folder.remove(name)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(directory))
+
+
+func _without_i01(childhood: Dictionary) -> Dictionary:
+	var copy: Dictionary = childhood.duplicate(true)
+	for key: String in I01.KEYS:
+		copy.screenplay.erase(key)
+	copy.screenplay.erase("version")
+	return copy
 
 
 func _json(value: Variant) -> String:
