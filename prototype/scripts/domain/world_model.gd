@@ -75,6 +75,10 @@ var _tribe_job: Dictionary = {}
 ## Work units spent by the last pump; observable for budget tests.
 var tribe_units_last_pump := 0
 var tribe_job_error := ""
+## Cache only the bytes of a generation that was actually verified. A matching
+## path or timestamp alone is never sufficient to promote a backup.
+var _verified_save_path := ""
+var _verified_envelope := ""
 
 
 func _init() -> void:
@@ -697,20 +701,23 @@ func _save_candidate(path: String, candidate: Dictionary, capture_observations :
 		_remove_if_present(temporary)
 		return _fail("Die neue Speicherdatei konnte nicht verifiziert werden.")
 	# Preserve the previous *valid* main file. Never overwrite a good backup with corruption.
-	var old_main := _read_save(absolute)
-	var old_backup := _read_save(backup)
-	var backup_text := ""
-	if old_main.ok:
-		backup_text = old_main.envelope
-	elif not old_backup.ok:
+	var old_envelope := ""
+	if absolute == _verified_save_path and not _verified_envelope.is_empty() and _file_matches(absolute, _verified_envelope):
+		old_envelope = _verified_envelope
+	else:
+		old_envelope = str(_read_save(absolute).get("envelope", ""))
+	var backup_text := old_envelope
+	if old_envelope.is_empty() and not _read_save(backup).ok:
 		backup_text = envelope
 	if not backup_text.is_empty():
 		written = _write_file(backup_temporary, backup_text)
-		if not written.ok or not _read_save(backup_temporary).ok:
+		# Both possible sources were fully parsed and checked. A byte-exact
+		# readback verifies the copy without deserializing 2,095 people again.
+		if not written.ok or not _file_matches(backup_temporary, backup_text):
 			_remove_if_present(temporary)
 			_remove_if_present(backup_temporary)
 			return _fail("Die Sicherung konnte nicht geschrieben werden; der bisherige Spielstand bleibt erhalten.")
-		if old_main.ok:
+		if not old_envelope.is_empty():
 			var backup_error := DirAccess.rename_absolute(backup_temporary, backup)
 			if backup_error != OK:
 				_remove_if_present(temporary)
@@ -724,7 +731,9 @@ func _save_candidate(path: String, candidate: Dictionary, capture_observations :
 		return _fail("Die Speicherdatei konnte nicht übernommen werden (Fehler %d)." % rename_error)
 	# On the first save a readable backup must never expose an uncommitted
 	# purchase if installing the primary failed. Publish it only afterwards.
-	if not old_main.ok and not backup_text.is_empty():
+	_verified_save_path = absolute
+	_verified_envelope = envelope
+	if old_envelope.is_empty() and not backup_text.is_empty():
 		if DirAccess.rename_absolute(backup_temporary, backup) != OK:
 			_remove_if_present(backup_temporary)
 			return _ok("Spiel gespeichert. Die erste Sicherung konnte nicht angelegt werden.")
@@ -745,6 +754,8 @@ func load_game(path: String) -> Dictionary:
 		return _fail("Kein gültiger Spielstand geladen. Hauptdatei: %s Sicherung: %s" % [primary_error, loaded.message])
 	# Validate the entire candidate before touching the active world.
 	data = loaded.state.duplicate(true)
+	_verified_save_path = absolute + ".bak" if recovered else absolute
+	_verified_envelope = str(loaded.envelope)
 	# The copy has the content the loader just validated; the first frame after
 	# loading need not repeat the full tribal check.
 	if TribalWorld.is_validated(loaded.state.tribes):
@@ -1653,6 +1664,16 @@ func _restore_integer_fields(state: Dictionary) -> void:
 		state.village.childhood.guard_absence.previous_health=int(state.village.childhood.guard_absence.previous_health)
 		for relation:Dictionary in state.village.childhood.relationships.values():
 			relation.trust=int(relation.trust)
+
+
+func _file_matches(path: String, verified: String) -> bool:
+	if not FileAccess.file_exists(path):
+		return false
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return false
+	var bytes := verified.to_utf8_buffer()
+	return file.get_length() == bytes.size() and file.get_buffer(bytes.size()) == bytes
 
 
 func _write_file(path: String, text: String) -> Dictionary:
