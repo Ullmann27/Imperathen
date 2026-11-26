@@ -4,6 +4,9 @@ extends SceneTree
 ## checks that no physics body is created and the sun keeps its node name.
 
 const Look = preload("res://scripts/rendering/village_look.gd")
+const GameWorld = preload("res://scripts/world/game_world.gd")
+const WorldModel = preload("res://scripts/domain/world_model.gd")
+const WorldClock = preload("res://scripts/domain/world_clock.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 var failures: Array[String] = []
 var checks := 0
@@ -80,7 +83,32 @@ func _run() -> void:
 	look._process(.05)
 	_check(not torch.shadow_enabled and torch.light_energy > 0.0 and not is_equal_approx(first, torch.light_energy), "Fire light flickers, unshadowed")
 	world.free()
+	_test_world_light()
 	print("VILLAGE_LOOK_TEST %d checks, %d failed %s" % [checks, failures.size(), failures])
 	if failures.is_empty():
 		print("VILLAGE_LOOK_PASS")
 	quit(0 if failures.is_empty() else 1)
+
+
+func _test_world_light() -> void:
+	var model := WorldModel.new()
+	model.new_game("italia", true, true)
+	var world := GameWorld.new()
+	root.add_child(world)
+	world.setup(model.data)
+	_check(is_equal_approx(world.look.time_of_day, 6.0) and world.season_index == 0, "The opening sun reads 06:00 on the spring world clock")
+	var later := model.data.duplicate(true)
+	WorldClock.book(later, "trade", WorldClock.TRADE_SECONDS, "Handel am Stand")
+	world.sync_state(later)
+	_check(is_equal_approx(world.look.time_of_day, 6.5), "The village presents time spent trading")
+	WorldClock.book(later, "travel", 93 * WorldClock.DAY, "Reise")
+	world.sync_state(later)
+	_check(world.season_index == 1 and is_equal_approx(world.look.time_of_day, 6.5), "The village follows the season of the travelled date")
+	WorldClock.night(later, "Nachtruhe vor der Nacht der Reiter")
+	world.sync_state(later)
+	_check(is_equal_approx(world.look.time_of_day, 22.0) and world.look.night > 0.9, "The 22:00 story transition uses actual moonlight")
+	var old := model.data.duplicate(true)
+	old.erase("calendar")
+	world.sync_state(old)
+	_check(world.look.time_of_day < 0.0 and world.season_index == 0, "A clockless preview restores the old light preset")
+	world.free()

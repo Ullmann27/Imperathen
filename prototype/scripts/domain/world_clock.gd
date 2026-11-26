@@ -31,6 +31,7 @@ extends RefCounted
 ## JDN. Nothing else may count calendar time.
 
 const Calendar = preload("res://scripts/domain/world_calendar.gd")
+const VillageEconomy = preload("res://scripts/domain/village_economy.gd")
 const Era = preload("res://scripts/domain/era_registry.gd")
 
 const VERSION := 1
@@ -129,7 +130,7 @@ static func village_seconds(world: Dictionary) -> int:
 	if not bool(village.get("enabled", false)) or village.has("childhood") or not village.has("economy"):
 		return 0
 	var economy: Dictionary = village.economy
-	var length := 120.0
+	var length := VillageEconomy.day_length(world)
 	return int(economy.get("day", 0)) * DAY + floori(float(economy.get("day_seconds", 0.0)) * DAY / length)
 
 

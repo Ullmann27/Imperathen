@@ -141,15 +141,18 @@ static func battle_records(world: Dictionary) -> Dictionary:
 ## A soldier's campaign record on a world date: recovered on the clock, then
 ## the stored promotions applied in order. Pure; never stored.
 static func soldier(world: Dictionary, uid: String, at_jdn: int = -1) -> Dictionary:
-	var records := battle_records(world)
-	if not records.has(uid):
+	var record: Dictionary = battle_records(world).get(uid, {})
+	if record.is_empty():
 		return {}
-	var record: Dictionary = (records[uid] as Dictionary).duplicate(true)
-	var day := Clock.jdn(world) if at_jdn < 0 else at_jdn
+	return _soldier_at(world, record, Clock.jdn(world) if at_jdn < 0 else at_jdn)
+
+
+static func _soldier_at(world: Dictionary, battle_record: Dictionary, day: int) -> Dictionary:
+	var record := battle_record.duplicate(true)
 	if int(world.world_state.military.battle_end_jdn) >= 0:
 		record = Roster.recover(record, days_since_battle(world, day), Calendar.year_of(day))
 	for promotion: Dictionary in world.world_state.military.promotions:
-		if promotion.uid == uid and int(promotion.jdn) <= day:
+		if promotion.uid == battle_record.uid and int(promotion.jdn) <= day:
 			record.troop_id = str(promotion.to)
 			Roster.note(record, "promoted", str(promotion.to), int(promotion.year), -1)
 	return record
@@ -157,10 +160,14 @@ static func soldier(world: Dictionary, uid: String, at_jdn: int = -1) -> Diction
 
 static func soldiers(world: Dictionary) -> Array:
 	var result := []
-	var ids: Array = battle_records(world).keys()
+	var records := battle_records(world)
+	if records.is_empty():
+		return result
+	var ids := records.keys()
+	var day := Clock.jdn(world)
 	ids.sort()
 	for uid: String in ids:
-		result.append(soldier(world, uid))
+		result.append(_soldier_at(world, records[uid], day))
 	return result
 
 
@@ -177,11 +184,12 @@ static func settlement_events(world: Dictionary, at_jdn: int = -1) -> Array:
 	if start < 0:
 		return []
 	var day := Clock.jdn(world) if at_jdn < 0 else at_jdn
-	var records: Array = []
-	var ids: Array = battle_records(world).keys()
+	var participants := battle_records(world)
+	var ids := participants.keys()
 	ids.sort()
+	var records: Array = []
 	for uid: String in ids:
-		records.append(battle_records(world)[uid])
+		records.append(participants[uid])
 	var blank := []
 	for record: Dictionary in records:
 		var fresh: Dictionary = record.duplicate(true)
@@ -194,8 +202,8 @@ static func settlement_events(world: Dictionary, at_jdn: int = -1) -> Array:
 		return events
 	events.append_array(Life.settlement_events(blank, records, {"year": Calendar.year_of(end), "stamp": "battle-%d" % end}))
 	var today := []
-	for uid: String in ids:
-		today.append(soldier(world, uid, day))
+	for record: Dictionary in records:
+		today.append(_soldier_at(world, record, day))
 	for event: Dictionary in Life.settlement_events(records, today, {"year": Calendar.year_of(day), "stamp": "aftercare-%d" % end}):
 		if event.type != "promoted":
 			events.append(event)
