@@ -67,6 +67,32 @@ static func variant_data(variant_id: String) -> Dictionary:
 	return MANIFEST.data.variants.get(variant_id, {})
 
 
+## Conservative 2D obstacle plan derived from the same authored manifest as
+## build_collision(). Used by stateless navigation, not by the renderer.
+static func navigation_footprints(home: Dictionary) -> Array[Rect2]:
+	var data := variant_data(variant_for(str(home.id)))
+	var shell := Layout.house_footprint(home)
+	var extra: Array[Rect2] = []
+	var pose := Transform3D(Basis(Vector3.UP, float(home.yaw)), home.at)
+	for item: Dictionary in data.get("colliders", []):
+		var size := _vec(item.size)
+		var centre := _vec(item.centre)
+		if centre.y + size.y * .5 < .1 or centre.y - size.y * .5 > 1.9:
+			continue
+		var local := Transform3D(Basis(Vector3.UP, float(item.get("yaw", 0.0))), centre)
+		var box: AABB = pose * local * AABB(-size * .5, size)
+		var footprint := Rect2(box.position.x, box.position.z, box.size.x, box.size.z)
+		if str(item.name).begins_with("Wall") or str(item.name).begins_with("SocleSkirt"):
+			shell = shell.merge(footprint)
+		else:
+			extra.append(footprint)
+	var result: Array[Rect2] = [shell]
+	for rect: Rect2 in extra:
+		if not shell.encloses(rect):
+			result.append(rect)
+	return result
+
+
 static func _texture_set(profile: String) -> Dictionary:
 	# Leicht 256 px without normal maps, Ausgewogen/Hoch 512 px, Sehr hoch 1024 px.
 	var size: int = {"low": 256, "very_high": 1024}.get(profile, 512)

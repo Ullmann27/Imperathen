@@ -16,6 +16,7 @@ extends RefCounted
 ## physics world in tests/raid_route_world_test.gd.
 
 const Layout = preload("res://scripts/world/village/village_layout.gd")
+const HouseFamily = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
 const Freight = preload("res://scripts/domain/regional_freight.gd")
 const LOOT := Vector2(5.0, 5.0)
 const LOOT_RADIUS := 2.0
@@ -57,8 +58,7 @@ const PROPS := [
 	Rect2(4.96, -28.25, 0.48, 1.9), Rect2(6.25, 22.4, 2.3, 5.6), Rect2(13.16, -24.74, 1.68, 0.71),
 	Rect2(14.95, -23.68, 1.5, 0.76), Rect2(32.34, 0.61, 1.32, 1.58), Rect2(33.4, 16.5, 1.2, 3.0),
 ]
-## Houses without the raised entrance ramp in front of the door.
-const HOUSES_WITHOUT_RAMP := ["baker_home"]
+## All current authored house variants have an entrance ramp.
 ## Street waypoints. Index 0/1 are the outer and inner point of the north gate.
 const NODES := [
 	Vector2(0.0, -52.5), Vector2(0.0, -45.2), Vector2(0.0, -40.6), Vector2(2.6, -36.6),
@@ -234,9 +234,8 @@ static func _ensure() -> void:
 	for rect: Rect2 in PROPS:
 		rects.append(rect)
 	for index in Layout.HOMES.size():
-		rects.append(Layout.house_footprint(Layout.HOMES[index]))
-		if str(Layout.HOMES[index].id) not in HOUSES_WITHOUT_RAMP:
-			rects.append(_entrance(index))
+		rects.append_array(HouseFamily.navigation_footprints(Layout.HOMES[index]))
+		rects.append(_entrance(index))
 	_obstacles = rects
 	var blockers: Array[Rect2] = []
 	for rect: Rect2 in WALLS:
@@ -292,14 +291,14 @@ static func _door_direction(house: int) -> Vector2:
 
 
 static func _entrance(house: int) -> Rect2:
-	# Threshold landing plus ramp: 1.25 m wide, from 0.4 m inside the front
-	# wall to 1.95 m in front of it (VillageScenery WalkableEntrance).
+	# The landing and ramp are shared with the actual variant's collision.
 	var home: Dictionary = Layout.HOMES[house]
+	var entry: Dictionary = HouseFamily.variant_data(HouseFamily.variant_for(str(home.id))).get("metadata", {}).get("entry", {})
 	var center := Vector2(home.at.x, home.at.z)
 	var direction := _door_direction(house)
 	var inner := center + direction * 2.05
-	var outer := center + direction * 4.0
-	var side := Vector2(direction.y, -direction.x) * 0.625
+	var outer := center + direction * (float(entry.get("ramp_start_z", 2.95)) + float(entry.get("ramp_run", 1.05)))
+	var side := Vector2(direction.y, -direction.x) * float(entry.get("width", 1.25)) * .5
 	var rect := Rect2(inner - side, Vector2.ZERO).expand(inner + side).expand(outer - side).expand(outer + side)
 	return rect
 
