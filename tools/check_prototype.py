@@ -101,6 +101,7 @@ def main():
             ("city_campaign_trade", ["--script", "res://tests/city_campaign_trade_test.gd"], "CITY_CAMPAIGN_TRADE_PASS"),
             ("campaign_market_visit", ["--fixed-fps", "60", "--script", "res://tests/campaign_market_visit_test.gd"], "CAMPAIGN_MARKET_VISIT_PASS"),
             ("quarter_street_walk", ["--fixed-fps", "60", "--script", "res://tests/quarter_street_walk_test.gd"], "QUARTER_STREET_WALK_PASS"),
+            ("resident_footwear", ["--script", "res://tests/resident_footwear_test.gd"], "RESIDENT_FOOTWEAR_PASS"),
             ("city_life", ["--script", "res://tests/city_life_test.gd"], "CITY_LIFE_PASS"),
             ("city_inventory_ui", ["--fixed-fps", "60", "--script", "res://tests/city_inventory_ui_test.gd"], "CITY_INVENTORY_UI_PASS"),
             ("city_character_detail", ["--fixed-fps", "60", "--script", "res://tests/city_character_detail_test.gd"], "0 failures"),
