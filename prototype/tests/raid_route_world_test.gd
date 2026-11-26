@@ -440,7 +440,9 @@ func _check_obstacle_model() -> void:
 				covered = true
 				break
 		if not covered:
-			uncovered.append("%s %s" % [str(world.get_path_to(body)),str(footprint)])
+			var finding := "%s %s" % [str(world.get_path_to(body)),str(footprint)]
+			uncovered.append(finding)
+			print("RAID_ROUTE_UNMODELLED_COLLIDER ", finding)
 	_check(uncovered.is_empty(),"Every static collider at body height is part of the raid route plan: %s" % ", ".join(uncovered))
 	# Every street edge is walkable by the real raider capsule (static geometry).
 	var space := world.get_world_3d().direct_space_state
@@ -467,6 +469,7 @@ func _check_obstacle_model() -> void:
 			var fraction := space.cast_motion(query)
 			if fraction.size() != 2 or float(fraction[0]) < 1.0:
 				blocked.append("%d-%d" % [a,b])
+				print("RAID_ROUTE_BLOCKED_EDGE %d-%d from=%s to=%s fraction=%s" % [a,b,node,other,fraction])
 	_check(edges >= 60 and blocked.is_empty(),"All %d street edges are swept free of static geometry (blocked: %s)" % [edges,",".join(blocked)])
 	# Rule-side motion check: a step diagonally into the palisade slides along
 	# it; a step straight into it stops at the wall.
