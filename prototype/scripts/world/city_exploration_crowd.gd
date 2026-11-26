@@ -2,6 +2,10 @@ extends Node3D
 ## Stream authored city occupants from the optional private model pack.
 ## Market sellers represented by the active pedestrian system are not duplicated.
 const LAYOUT := "res://assets/world/city_crowd_layout.json"
+const RenderProfile := preload("res://scripts/rendering/render_profile.gd")
+## Streamed figures at crowd density 1.0 (Hoch). Higher profile densities ask
+## for more; the authored entries of the layout remain the actual ceiling.
+const REFERENCE_CROWD := 12
 const RANGE := 100.0
 const MERCHANT_IDS := {"foodstall":"CityMerchant01","bakery":"CityMerchant02","clothier":"CityMerchant03","thermopolium":"CityMerchant04"}
 var profile := "balanced"
@@ -29,7 +33,7 @@ func _ready() -> void:
 			entries.append(item)
 
 func limit() -> int:
-	return 4 if profile=="low" else (8 if profile=="balanced" else 12)
+	return roundi(REFERENCE_CROWD * RenderProfile.density(profile, "crowd"))
 
 func point(index: int) -> Vector3:
 	var at: Array = entries[index].position

@@ -44,6 +44,13 @@ class EnvironmentWatcher extends Node:
 
 func _ready() -> void:
 	_profiles = JSON.parse_string(FileAccess.get_file_as_string("res://assets/quality_profiles.json")).profiles
+	# Texture packages replace imported textures and must be mounted before any
+	# scene loads them: use the saved profile; a change applies at next start.
+	var saved := ConfigFile.new()
+	var saved_profile := "balanced"
+	if saved.load("user://imperathen_ui.cfg") == OK:
+		saved_profile = str(saved.get_value("graphics", "quality", "balanced"))
+	RenderProfile.mount_texture_package(RenderProfile.texture_tier(saved_profile))
 	layer = 100
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_panel = PanelContainer.new()

@@ -51,6 +51,7 @@ const SUPPORT := {
 
 static var _current := "balanced"
 static var _applied := {}
+static var _texture_package := {"tier": "base", "mounted": false, "path": ""}
 
 
 static func profiles() -> Dictionary:
@@ -92,6 +93,31 @@ static func texture_tier(profile: String) -> String:
 	return str(render(profile).get("texture_tier", "base"))
 
 
+## Mounts a separate texture package (tools/render/build_texture_package.py)
+## over the imported textures. It must run before the textures are loaded,
+## i.e. at start; a tier change therefore applies after the next start.
+## A missing package is reported, never faked: the originals stay in use.
+static func mount_texture_package(tier: String) -> Dictionary:
+	if tier == "base" or tier.is_empty():
+		_texture_package = {"tier": "base", "mounted": false, "path": ""}
+		return _texture_package
+	if _texture_package.get("mounted", false):
+		return _texture_package
+	var file := "textures_%s.pck" % tier
+	for folder in ["res://packages", "user://packages", OS.get_executable_path().get_base_dir().path_join("packages")]:
+		var path: String = folder.path_join(file)
+		if FileAccess.file_exists(path):
+			var mounted := ProjectSettings.load_resource_pack(path, true)
+			_texture_package = {"tier": tier, "mounted": mounted, "path": path}
+			return _texture_package
+	_texture_package = {"tier": tier, "mounted": false, "path": "", "status": "package_not_installed"}
+	return _texture_package
+
+
+static func texture_package() -> Dictionary:
+	return _texture_package.duplicate()
+
+
 ## Global and root-viewport switches. Returns what was actually applied.
 static func apply_viewport(viewport: Viewport, profile: String) -> Dictionary:
 	_current = profile if profiles().has(profile) else "balanced"
@@ -129,6 +155,7 @@ static func apply_viewport(viewport: Viewport, profile: String) -> Dictionary:
 	applied.ssao = bool(ao.get("enabled", false)) and supports("ssao", method)
 	applied.ssao_quality = str(ao.get("quality", "")) if applied.ssao else ""
 	applied.texture_tier = texture_tier(_current)
+	applied.texture_package = _texture_package.duplicate()
 	var lights := 0
 	if viewport.is_inside_tree():
 		for light in viewport.get_tree().get_nodes_in_group(LIGHT_GROUP):
