@@ -10,6 +10,7 @@ extends Node3D
 ## Visual only: no collision, no simulation state.
 
 const Library = preload("res://scripts/vegetation/vegetation_library.gd")
+const Safe := preload("res://scripts/vegetation/vegetation_safe.gd")
 const CELL := 8.0
 const KEEP_CELLS := 420
 ## Cover is sampled on a coarse lattice per cell and interpolated per tuft.
@@ -35,13 +36,17 @@ func configure(budget: Dictionary) -> void:
 	near_m = float(budget.get("grass_near_m", 0.0))
 	far_share = float(budget.get("grass_far_share", .5))
 	cells_per_frame = maxi(1, int(budget.get("grass_cells_per_frame", 1)))
-	Library.grass_material().set_shader_parameter("fade_end", maxf(end_m, 1.0))
+	# Ensure the grass material exists before the first season update.
+	var material := Library.grass_material()
+	if not Safe.active():
+		material.set_shader_parameter("fade_end", maxf(end_m, 1.0))
 	visible = density > 0.0 and end_m > 0.0
 
 
 func clear() -> void:
 	for cell: Dictionary in _cells.values():
 		if cell.has("node"):
+			(cell.node as Node3D).hide()
 			(cell.node as Node).queue_free()
 	_cells.clear()
 
@@ -200,13 +205,20 @@ func _build(key: Vector2i) -> Dictionary:
 		var from: int = order[i] * 16
 		for k in 16:
 			shuffled[i * 16 + k] = buffer[from + k]
-	var multimesh := MultiMesh.new()
-	multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	multimesh.use_custom_data = true
-	multimesh.mesh = Library.grass_mesh("grass_tuft_far")
-	multimesh.instance_count = count
-	multimesh.buffer = shuffled
-	multimesh.custom_aabb = AABB(Vector3(origin.x - 1.0, low - .3, origin.y - 1.0), Vector3(CELL + 2.0, high - low + 1.8, CELL + 2.0))
+	var bounds := AABB(Vector3(origin.x-1.0,low-.3,origin.y-1.0),Vector3(CELL+2.0,high-low+1.8,CELL+2.0))
+	var multimesh: MultiMesh
+	if Safe.active():
+		multimesh = Safe.new_multimesh(Library.grass_mesh("grass_tuft_far"),count,bounds)
+		if not Safe.upload(multimesh,shuffled,count):
+			return {}
+	else:
+		multimesh = MultiMesh.new()
+		multimesh.transform_format = MultiMesh.TRANSFORM_3D
+		multimesh.use_custom_data = true
+		multimesh.mesh = Library.grass_mesh("grass_tuft_far")
+		multimesh.instance_count = count
+		multimesh.buffer = shuffled
+		multimesh.custom_aabb = bounds
 	var node := MultiMeshInstance3D.new()
 	node.name = "Grass_%d_%d" % [key.x, key.y]
 	node.multimesh = multimesh
