@@ -252,7 +252,9 @@ def main():
         else:
             # Import and motion fingerprint the entire project. The landscape
             # probe also has a wall-clock deadline measured on an idle host.
-            exclusive = {"import", "landscape", "motion_measurement"}
+            # CityLife also checks a wall-clock budget for individual simulation
+            # slices; a competing Godot test changes that measurement.
+            exclusive = {"import", "landscape", "motion_measurement", "city_life"}
             with ThreadPoolExecutor(max_workers=args.jobs) as pool:
                 for solo, batch in groupby(checks, key=lambda check: check[0] in exclusive):
                     results = map(execute, batch) if solo else pool.map(execute, batch)
