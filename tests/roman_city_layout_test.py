@@ -27,6 +27,7 @@ PROPS = {"street_detail", "vegetation", "market_stall"}
 NOT_ON_STREET_CHECK = {"road", "ground", "public_space", "detail", "city_wall", "gate"}
 ANCHOR_INDICES = range(28, 35)
 SURFACE_GROUPS = ("City_Ground", "Main_Streets", "Residential_Roads")
+PLAYER_STEP = 0.25  # CityExploration.MAX_STEP
 TOLERANCE = 0.05   # a prop may touch a solid; 5 cm inside counts as penetration
 
 
@@ -395,6 +396,50 @@ class RomanCityLayoutTest(unittest.TestCase):
                     rises = [b - a for a, b in zip(profile, profile[1:])]
                     self.assertLessEqual(max(rises), 0.18 + 1e-9)
                     self.assertGreaterEqual(min(rises), -1e-9)
+
+    def test_every_prop_stall_and_tree_has_a_collider_in_body_height(self):
+        """Nobody walks through a market counter, a crate, a planter or a trunk."""
+        colliders = {c.name: c for c in self.city.colliders}
+        for category, expected in (("market_stall", 63), ("street_detail", 120), ("vegetation", 86)):
+            objects = self.city.category(category)
+            self.assertEqual(len(objects), expected)
+            for obj in objects:
+                with self.subTest(name=obj.name):
+                    collider = colliders.get(obj.name + "_collision")
+                    self.assertIsNotNone(collider, "no collider")
+                    self.assertEqual(tuple(collider.location), tuple(obj.location))
+                    self.assertEqual(tuple(collider.scale), tuple(obj.scale))
+                    self.assertEqual(collider.rotation_euler[2], obj.rotation_euler[2])
+                    heights = [v[2] * obj.scale[0] for v in collider.data.cv]
+                    self.assertLessEqual(min(heights), PLAYER_STEP, "collider starts above the step limit")
+                    self.assertGreaterEqual(max(heights), 0.8, "collider is lower than a body can step over")
+                    # The collider never reaches outside what is drawn.
+                    (x0, y0, z0), (x1, y1, z1) = local_aabb(obj.data)
+                    for x, y, z in collider.data.cv:
+                        self.assertTrue(x0 - 1e-6 <= x <= x1 + 1e-6 and y0 - 1e-6 <= y <= y1 + 1e-6
+                                        and z0 - 1e-6 <= z <= z1 + 1e-6, (x, y, z))
+
+    def test_main_street_kerbs_are_solid_low_and_open_at_the_crossing(self):
+        collider = next(c for c in self.city.colliders if c.name == "Main_Streets_collision")
+        records = self.city.boxes[id(collider.data)]
+        kerbs = [r for r in records if abs(r[1][1] - 0.65) < 1e-9]
+        self.assertEqual(len(kerbs), 4)
+        ns = MAIN_STREETS["north_south"]
+        for (cx, cy, cz), (sx, sy, sz), _angle, physical in kerbs:
+            with self.subTest(kerb=(cx, cy)):
+                self.assertTrue(physical, "kerb has no collider")
+                top = cz + sz / 2
+                self.assertAlmostEqual(cz - sz / 2, 0.0)
+                self.assertLessEqual(top, PLAYER_STEP - 0.02, "kerb is too high to step onto from the ground")
+                self.assertGreater(top, 0.11, "kerb does not rise above the paving")
+                self.assertTrue(cx + sx / 2 <= ns[0] + 1e-9 or cx - sx / 2 >= ns[2] - 1e-9,
+                                "kerb crosses the north-south street")
+        # Every visible surface box of the streets has collision.
+        tiles = [o for o in self.city.objects if o.parent is self.city.groups["Main_Streets"]]
+        self.assertTrue(all(r[3] for r in records))
+        visual_volume = sum(sx * sy * sz for tile in tiles for (_c, (sx, sy, sz), _a, _p) in self.city.boxes[id(tile.data)])
+        solid_volume = sum(sx * sy * sz for (_c, (sx, sy, sz), _a, _p) in records)
+        self.assertAlmostEqual(visual_volume, solid_volume, delta=1e-6 * solid_volume)
 
 
 if __name__ == "__main__":
