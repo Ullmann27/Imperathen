@@ -14,7 +14,7 @@ Stand: 26.11.2026, Branch `feat/i01-three-cups-slice-20261126`. Grundlage: Maste
 
 | ID | Klasse | Dauer (gemessen, Autorendauer der Beats) | Cast | Ort | Entry state | Exit state | Abbruchregel |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| I-01.VID-A (`childhood_home` v3) | B, In-Engine | 29,3 s bis zur Wahl, 9,1 s Reaktion + Übergabe | Julia, Silvanus, Junge | Familienhaus (baker_home), Tisch, Regal, Bett | `i01=pending`, `i01_path=""` | `i01_path` gesetzt, Ereignis `I-01.choice.*` | Skip springt zur offenen Wahl, trifft sie nie; nach der Wahl springt Skip zur Übergabe. Back/Suspend speichern Beat-Index; Continue setzt dort fort. |
+| I-01.VID-A (`childhood_home` v3) | B, In-Engine | 29,7 s bis zur Wahl, 9,1 s Reaktion + Übergabe | Julia, Silvanus, Junge | Familienhaus (baker_home), Tisch, Regal, Bett | `i01=pending`, `i01_path=""` | `i01_path` gesetzt, Ereignis `I-01.choice.*` | Skip springt zur offenen Wahl, trifft sie nie; nach der Wahl springt Skip zur Übergabe. Back/Suspend speichern Beat-Index; Continue setzt dort fort. |
 | I-01.VID-B (`i01_vid_b`) | B, In-Engine | 32,9 s bis zur Themenwahl, 12,2 s Antwort + Übergabe | Silvanus, Julia, Junge | Frühstückstisch | `i01_meal=done`, `i01_topic=""` | `i01_topic` gesetzt, `i01=complete` | wie VID-A; Abbruch ändert das Ergebnis nicht (Test „Film abgebrochen“). |
 | I-01.VID-C (`mission_transition_father_morning`) | B, In-Engine | 31,9 s | Silvanus (Junge) | vor dem Familienhaus | Krug an Silvanus übergeben | I-02 aktiv | keine Wahl; Skip führt zum Ziel von I-02. |
 
@@ -30,7 +30,7 @@ Gemessen mit `prototype/tests/i01_playthrough_test.gd` (feste 60 Hz, Main-Uhr, n
 
 | Phase | Sekunden |
 | --- | --- |
-| VID-A bis Wahl / Reaktion + Übergabe | 29,3 / 9,1 |
+| VID-A bis Wahl / Reaktion + Übergabe | 29,7 / 9,1 |
 | Bett → Regal, Becher nehmen, Regal → Tisch, 3× abstellen | 3,0 + 0,4 |
 | Tisch → Brunnen (Tür, um das Vorratshaus herum) | 15,9 |
 | Brunnen → Tisch, füllen, Frühstück | 15,7 + 0,2 |
@@ -38,7 +38,7 @@ Gemessen mit `prototype/tests/i01_playthrough_test.gd` (feste 60 Hz, Main-Uhr, n
 | Warten bis Silvanus hinausgeht, Julia, Krug | 3,7 + 0,2 |
 | Tisch → Silvanus vor dem Haus, Übergabe | 5,6 + 0,1 |
 | VID-C | 31,9 |
-| **Summe** | **Film 115,4 s · Laufen 44,0 s (49,4 m) · Aktionen ≈ 1 s** |
+| **Summe** | **Film 115,8 s · Laufen 44,0 s (49,4 m) · Aktionen ≈ 1 s** |
 
 Ergebnis: rund 2:40 min ohne Lese-, Entscheidungs- und Erkundungszeit. Das Handbuch nennt 34 min Referenz für I-01; der Vertikalschnitt erreicht diese Spielzeit **nicht**. Der offene zweite Beat (Minute 18–30: Nachbar, Marktrand, freiwilliger Dienst) ist nicht umgesetzt.
 
