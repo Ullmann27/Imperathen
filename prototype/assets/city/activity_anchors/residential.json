@@ -1,0 +1,10630 @@
+{
+	"format": "imperathen-activity-anchors",
+	"schema": 1,
+	"area": "residential",
+	"source": "tools/world/bake_city_layout.gd from roman_city_manifest.json (city seed 20261125)",
+	"anchors": [
+		{
+			"id": "residential.fountain_north",
+			"kind": "fountain",
+			"position": [
+				-103.0,
+				0.11,
+				-154.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 8,
+			"hours": [
+				5.0,
+				21.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"ring:4.2",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.001",
+			"kind": "doorway",
+			"position": [
+				-18.53,
+				0.2,
+				86.61
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_001_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.002",
+			"kind": "doorway",
+			"position": [
+				16.81,
+				0.2,
+				87.72
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_002_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.003",
+			"kind": "doorway",
+			"position": [
+				-50.19,
+				0.2,
+				87.87
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_003_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_003",
+			"kind": "play_spot",
+			"position": [
+				-43.94,
+				0.07,
+				78.17
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.004",
+			"kind": "doorway",
+			"position": [
+				49.6,
+				0.24,
+				87.69
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_004_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.005",
+			"kind": "doorway",
+			"position": [
+				85.05,
+				0.2,
+				84.57
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_005_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_005",
+			"kind": "workshop",
+			"position": [
+				83.45,
+				0.07,
+				79.97
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:carpenter",
+				"building:Residential_005_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_005",
+			"kind": "gossip_spot",
+			"position": [
+				78.05,
+				0.07,
+				77.97
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.006",
+			"kind": "doorway",
+			"position": [
+				-15.95,
+				0.24,
+				145.28
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_006_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.007",
+			"kind": "doorway",
+			"position": [
+				17.2,
+				0.2,
+				148.46
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_007_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_007",
+			"kind": "workshop",
+			"position": [
+				18.8,
+				0.07,
+				153.06
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cobbler",
+				"building:Residential_007_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.008",
+			"kind": "doorway",
+			"position": [
+				-49.39,
+				0.2,
+				146.48
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_008_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.009",
+			"kind": "doorway",
+			"position": [
+				51.14,
+				0.2,
+				145.24
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_009_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.010",
+			"kind": "doorway",
+			"position": [
+				119.26,
+				0.2,
+				84.43
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_010_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_010",
+			"kind": "workshop",
+			"position": [
+				117.66,
+				0.07,
+				79.83
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:weaver",
+				"building:Residential_010_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_010",
+			"kind": "gossip_spot",
+			"position": [
+				112.26,
+				0.07,
+				77.83
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_010",
+			"kind": "play_spot",
+			"position": [
+				126.26,
+				0.07,
+				78.03
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.011",
+			"kind": "doorway",
+			"position": [
+				-152.95,
+				0.2,
+				6.54
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_011_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_011",
+			"kind": "workshop",
+			"position": [
+				-154.55,
+				0.07,
+				1.94
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:smith",
+				"building:Residential_011_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.012",
+			"kind": "doorway",
+			"position": [
+				-153.99,
+				0.2,
+				-10.79
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_012_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.013",
+			"kind": "doorway",
+			"position": [
+				83.58,
+				0.2,
+				146.64
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_013_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.014",
+			"kind": "doorway",
+			"position": [
+				-152.98,
+				0.2,
+				-68.22
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_014_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.015",
+			"kind": "doorway",
+			"position": [
+				-15.35,
+				0.2,
+				164.61
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_015_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_015",
+			"kind": "gossip_spot",
+			"position": [
+				-24.1,
+				0.07,
+				156.01
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.016",
+			"kind": "doorway",
+			"position": [
+				16.7,
+				0.2,
+				165.68
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_016_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.017",
+			"kind": "doorway",
+			"position": [
+				-18.43,
+				0.2,
+				-165.5
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_017_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_017",
+			"kind": "play_spot",
+			"position": [
+				-23.68,
+				0.07,
+				-157.1
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.018",
+			"kind": "doorway",
+			"position": [
+				17.04,
+				0.2,
+				-166.78
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_018_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.019",
+			"kind": "doorway",
+			"position": [
+				118.66,
+				0.2,
+				145.3
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_019_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.020",
+			"kind": "doorway",
+			"position": [
+				-152.74,
+				0.2,
+				84.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_020_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_020",
+			"kind": "workshop",
+			"position": [
+				-154.34,
+				0.07,
+				79.9
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:potter",
+				"building:Residential_020_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_020",
+			"kind": "gossip_spot",
+			"position": [
+				-159.74,
+				0.07,
+				77.9
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.021",
+			"kind": "doorway",
+			"position": [
+				154.96,
+				0.2,
+				86.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_021_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.022",
+			"kind": "doorway",
+			"position": [
+				-50.33,
+				0.2,
+				165.66
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_022_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.023",
+			"kind": "doorway",
+			"position": [
+				49.74,
+				0.24,
+				165.69
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_023_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.024",
+			"kind": "doorway",
+			"position": [
+				-51.85,
+				0.2,
+				-166.88
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_024_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_024",
+			"kind": "play_spot",
+			"position": [
+				-58.1,
+				0.07,
+				-157.18
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.025",
+			"kind": "doorway",
+			"position": [
+				52.02,
+				0.24,
+				-166.7
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_025_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_025",
+			"kind": "gossip_spot",
+			"position": [
+				57.77,
+				0.07,
+				-156.8
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.026",
+			"kind": "doorway",
+			"position": [
+				-186.86,
+				0.2,
+				6.54
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_026_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_026",
+			"kind": "workshop",
+			"position": [
+				-188.46,
+				0.07,
+				1.94
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fuller",
+				"building:Residential_026_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.027",
+			"kind": "doorway",
+			"position": [
+				-187.69,
+				0.2,
+				-10.9
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_027_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.028",
+			"kind": "doorway",
+			"position": [
+				84.09,
+				0.24,
+				165.66
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_028_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.029",
+			"kind": "doorway",
+			"position": [
+				84.24,
+				0.2,
+				-166.76
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_029_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.030",
+			"kind": "doorway",
+			"position": [
+				-186.35,
+				0.2,
+				-68.16
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_030_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_030",
+			"kind": "gossip_spot",
+			"position": [
+				-194.1,
+				0.07,
+				-78.06
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.031",
+			"kind": "doorway",
+			"position": [
+				-151.93,
+				0.24,
+				145.07
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_031_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_031",
+			"kind": "play_spot",
+			"position": [
+				-160.18,
+				0.07,
+				154.77
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.032",
+			"kind": "doorway",
+			"position": [
+				152.7,
+				0.2,
+				148.56
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_032_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_032",
+			"kind": "workshop",
+			"position": [
+				154.3,
+				0.07,
+				153.16
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:carpenter",
+				"building:Residential_032_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.033",
+			"kind": "doorway",
+			"position": [
+				-186.46,
+				0.2,
+				87.82
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_033_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.034",
+			"kind": "doorway",
+			"position": [
+				185.71,
+				0.24,
+				87.82
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_034_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.035",
+			"kind": "doorway",
+			"position": [
+				121.03,
+				0.2,
+				164.48
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_035_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_035",
+			"kind": "gossip_spot",
+			"position": [
+				112.28,
+				0.07,
+				155.88
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.036",
+			"kind": "doorway",
+			"position": [
+				118.98,
+				0.2,
+				-163.53
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_036_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_036",
+			"kind": "workshop",
+			"position": [
+				120.58,
+				0.07,
+				-158.93
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cobbler",
+				"building:Residential_036_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.037",
+			"kind": "doorway",
+			"position": [
+				-14.99,
+				0.2,
+				224.41
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_037_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.038",
+			"kind": "doorway",
+			"position": [
+				16.89,
+				0.2,
+				223.07
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_038_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_038",
+			"kind": "play_spot",
+			"position": [
+				9.89,
+				0.07,
+				232.77
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.039",
+			"kind": "doorway",
+			"position": [
+				-51.84,
+				0.2,
+				223.08
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_039_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.040",
+			"kind": "doorway",
+			"position": [
+				52.58,
+				0.24,
+				223.08
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_040_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_040",
+			"kind": "gossip_spot",
+			"position": [
+				58.33,
+				0.07,
+				232.98
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.041",
+			"kind": "doorway",
+			"position": [
+				-50.92,
+				0.2,
+				-224.23
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_041_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.042",
+			"kind": "doorway",
+			"position": [
+				-219.53,
+				0.2,
+				8.49
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_042_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.043",
+			"kind": "doorway",
+			"position": [
+				-219.53,
+				0.24,
+				-10.76
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_043_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.044",
+			"kind": "doorway",
+			"position": [
+				-221.3,
+				0.2,
+				-68.19
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_044_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.045",
+			"kind": "doorway",
+			"position": [
+				86.26,
+				0.24,
+				223.12
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_045_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_045",
+			"kind": "gossip_spot",
+			"position": [
+				92.01,
+				0.07,
+				233.02
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_045",
+			"kind": "play_spot",
+			"position": [
+				78.01,
+				0.07,
+				232.82
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.046",
+			"kind": "doorway",
+			"position": [
+				-185.69,
+				0.24,
+				145.31
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_046_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.047",
+			"kind": "doorway",
+			"position": [
+				187.18,
+				0.2,
+				148.61
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_047_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_047",
+			"kind": "workshop",
+			"position": [
+				188.78,
+				0.07,
+				153.21
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:weaver",
+				"building:Residential_047_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.048",
+			"kind": "doorway",
+			"position": [
+				-154.25,
+				0.24,
+				165.82
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_048_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.049",
+			"kind": "doorway",
+			"position": [
+				152.97,
+				0.2,
+				162.48
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_049_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_049",
+			"kind": "workshop",
+			"position": [
+				151.37,
+				0.07,
+				157.88
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:smith",
+				"building:Residential_049_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.050",
+			"kind": "doorway",
+			"position": [
+				154.16,
+				0.24,
+				-166.89
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_050_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_050",
+			"kind": "gossip_spot",
+			"position": [
+				159.91,
+				0.07,
+				-156.99
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.051",
+			"kind": "doorway",
+			"position": [
+				-222.93,
+				0.2,
+				86.59
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_051_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.052",
+			"kind": "doorway",
+			"position": [
+				221.0,
+				0.2,
+				87.88
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_052_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_052",
+			"kind": "play_spot",
+			"position": [
+				228.0,
+				0.07,
+				78.18
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.053",
+			"kind": "doorway",
+			"position": [
+				119.16,
+				0.2,
+				223.24
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_053_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.054",
+			"kind": "doorway",
+			"position": [
+				-18.31,
+				0.2,
+				242.52
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_054_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.055",
+			"kind": "doorway",
+			"position": [
+				16.67,
+				0.2,
+				243.85
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_055_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_055",
+			"kind": "gossip_spot",
+			"position": [
+				9.67,
+				0.07,
+				233.95
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.056",
+			"kind": "doorway",
+			"position": [
+				-16.09,
+				0.24,
+				-244.7
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_056_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.057",
+			"kind": "doorway",
+			"position": [
+				16.9,
+				0.2,
+				-241.48
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_057_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_057",
+			"kind": "workshop",
+			"position": [
+				18.5,
+				0.07,
+				-236.88
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:potter",
+				"building:Residential_057_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.058",
+			"kind": "doorway",
+			"position": [
+				-255.14,
+				0.2,
+				9.68
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_058_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.059",
+			"kind": "doorway",
+			"position": [
+				-254.8,
+				0.2,
+				-7.43
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_059_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_059",
+			"kind": "workshop",
+			"position": [
+				-253.2,
+				0.07,
+				-2.83
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fuller",
+				"building:Residential_059_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_059",
+			"kind": "play_spot",
+			"position": [
+				-261.8,
+				0.07,
+				-1.03
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.060",
+			"kind": "doorway",
+			"position": [
+				-185.43,
+				0.2,
+				164.42
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_060_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_060",
+			"kind": "gossip_spot",
+			"position": [
+				-194.18,
+				0.07,
+				155.82
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.061",
+			"kind": "doorway",
+			"position": [
+				187.17,
+				0.2,
+				165.94
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_061_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.062",
+			"kind": "doorway",
+			"position": [
+				185.03,
+				0.2,
+				-165.49
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_062_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.063",
+			"kind": "doorway",
+			"position": [
+				-50.74,
+				0.2,
+				240.58
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_063_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_063",
+			"kind": "workshop",
+			"position": [
+				-52.34,
+				0.07,
+				235.98
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:carpenter",
+				"building:Residential_063_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.064",
+			"kind": "doorway",
+			"position": [
+				52.99,
+				0.2,
+				242.42
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_064_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.065",
+			"kind": "doorway",
+			"position": [
+				-51.92,
+				0.2,
+				-244.73
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_065_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_065",
+			"kind": "gossip_spot",
+			"position": [
+				-44.17,
+				0.07,
+				-234.83
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.066",
+			"kind": "doorway",
+			"position": [
+				52.0,
+				0.24,
+				-244.78
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_066_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_066",
+			"kind": "play_spot",
+			"position": [
+				43.75,
+				0.07,
+				-235.08
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.067",
+			"kind": "doorway",
+			"position": [
+				-220.9,
+				0.2,
+				148.65
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_067_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_067",
+			"kind": "workshop",
+			"position": [
+				-219.3,
+				0.07,
+				153.25
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cobbler",
+				"building:Residential_067_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.068",
+			"kind": "doorway",
+			"position": [
+				222.91,
+				0.2,
+				146.64
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_068_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.069",
+			"kind": "doorway",
+			"position": [
+				-255.34,
+				0.2,
+				-68.08
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_069_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.070",
+			"kind": "doorway",
+			"position": [
+				-152.05,
+				0.24,
+				223.31
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_070_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_070",
+			"kind": "gossip_spot",
+			"position": [
+				-146.3,
+				0.07,
+				233.21
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.071",
+			"kind": "doorway",
+			"position": [
+				153.19,
+				0.2,
+				226.57
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_071_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_071",
+			"kind": "workshop",
+			"position": [
+				154.79,
+				0.07,
+				231.17
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:weaver",
+				"building:Residential_071_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.072",
+			"kind": "doorway",
+			"position": [
+				-152.42,
+				0.2,
+				-224.18
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_072_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.073",
+			"kind": "doorway",
+			"position": [
+				85.33,
+				0.2,
+				240.49
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_073_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_073",
+			"kind": "workshop",
+			"position": [
+				83.73,
+				0.07,
+				235.89
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:smith",
+				"building:Residential_073_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_073",
+			"kind": "play_spot",
+			"position": [
+				92.33,
+				0.07,
+				234.09
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.074",
+			"kind": "doorway",
+			"position": [
+				84.69,
+				0.2,
+				-244.68
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_074_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.075",
+			"kind": "doorway",
+			"position": [
+				-255.04,
+				0.2,
+				84.54
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_075_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_075",
+			"kind": "workshop",
+			"position": [
+				-256.64,
+				0.07,
+				79.94
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:potter",
+				"building:Residential_075_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_075",
+			"kind": "gossip_spot",
+			"position": [
+				-262.04,
+				0.07,
+				77.94
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.076",
+			"kind": "doorway",
+			"position": [
+				256.75,
+				0.2,
+				86.38
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_076_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.077",
+			"kind": "doorway",
+			"position": [
+				118.0,
+				0.24,
+				243.66
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_077_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.078",
+			"kind": "doorway",
+			"position": [
+				117.02,
+				0.2,
+				-243.35
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_078_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.079",
+			"kind": "doorway",
+			"position": [
+				-220.99,
+				0.2,
+				162.58
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_079_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_079",
+			"kind": "workshop",
+			"position": [
+				-222.59,
+				0.07,
+				157.98
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fuller",
+				"building:Residential_079_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.080",
+			"kind": "doorway",
+			"position": [
+				222.51,
+				0.2,
+				164.36
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_080_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_080",
+			"kind": "gossip_spot",
+			"position": [
+				213.76,
+				0.07,
+				155.76
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_080",
+			"kind": "play_spot",
+			"position": [
+				227.76,
+				0.07,
+				155.96
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.081",
+			"kind": "doorway",
+			"position": [
+				221.3,
+				0.2,
+				-163.43
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_081_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_081",
+			"kind": "workshop",
+			"position": [
+				222.9,
+				0.07,
+				-158.83
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:carpenter",
+				"building:Residential_081_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.082",
+			"kind": "doorway",
+			"position": [
+				-188.68,
+				0.2,
+				224.55
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_082_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.083",
+			"kind": "doorway",
+			"position": [
+				187.29,
+				0.2,
+				223.16
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_083_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.084",
+			"kind": "doorway",
+			"position": [
+				-186.74,
+				0.2,
+				-227.39
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_084_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_084",
+			"kind": "workshop",
+			"position": [
+				-188.34,
+				0.07,
+				-231.99
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cobbler",
+				"building:Residential_084_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.085",
+			"kind": "doorway",
+			"position": [
+				-256.09,
+				0.2,
+				145.06
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_085_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_085",
+			"kind": "gossip_spot",
+			"position": [
+				-248.34,
+				0.07,
+				154.96
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.086",
+			"kind": "doorway",
+			"position": [
+				256.12,
+				0.24,
+				145.1
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_086_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.087",
+			"kind": "doorway",
+			"position": [
+				-291.1,
+				0.2,
+				8.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_087_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_087",
+			"kind": "play_spot",
+			"position": [
+				-282.35,
+				0.07,
+				0.13
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.088",
+			"kind": "doorway",
+			"position": [
+				-287.98,
+				0.24,
+				-10.69
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_088_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.089",
+			"kind": "doorway",
+			"position": [
+				-15.66,
+				0.24,
+				301.06
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_089_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.090",
+			"kind": "doorway",
+			"position": [
+				17.08,
+				0.2,
+				304.45
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_090_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_090",
+			"kind": "workshop",
+			"position": [
+				18.68,
+				0.07,
+				309.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:weaver",
+				"building:Residential_090_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_090",
+			"kind": "gossip_spot",
+			"position": [
+				24.08,
+				0.07,
+				311.05
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.091",
+			"kind": "doorway",
+			"position": [
+				-18.78,
+				0.2,
+				-303.63
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_091_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.092",
+			"kind": "doorway",
+			"position": [
+				16.77,
+				0.2,
+				-302.34
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_092_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.093",
+			"kind": "doorway",
+			"position": [
+				-290.33,
+				0.2,
+				-69.59
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_093_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.094",
+			"kind": "doorway",
+			"position": [
+				-151.6,
+				0.2,
+				242.52
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_094_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_094",
+			"kind": "play_spot",
+			"position": [
+				-146.35,
+				0.07,
+				234.12
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.095",
+			"kind": "doorway",
+			"position": [
+				153.26,
+				0.2,
+				243.78
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_095_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_095",
+			"kind": "gossip_spot",
+			"position": [
+				146.26,
+				0.07,
+				233.88
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.096",
+			"kind": "doorway",
+			"position": [
+				-49.02,
+				0.2,
+				302.6
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_096_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.097",
+			"kind": "doorway",
+			"position": [
+				50.69,
+				0.2,
+				301.21
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_097_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.098",
+			"kind": "doorway",
+			"position": [
+				-155.02,
+				0.2,
+				-243.59
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_098_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.099",
+			"kind": "doorway",
+			"position": [
+				152.98,
+				0.2,
+				-244.81
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_099_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.100",
+			"kind": "doorway",
+			"position": [
+				-51.16,
+				0.2,
+				-305.65
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_100_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_100",
+			"kind": "workshop",
+			"position": [
+				-52.76,
+				0.07,
+				-310.25
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:smith",
+				"building:Residential_100_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_100",
+			"kind": "gossip_spot",
+			"position": [
+				-58.16,
+				0.07,
+				-312.25
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.101",
+			"kind": "doorway",
+			"position": [
+				49.2,
+				0.2,
+				-303.38
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_101_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_101",
+			"kind": "play_spot",
+			"position": [
+				57.95,
+				0.07,
+				-311.78
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.102",
+			"kind": "doorway",
+			"position": [
+				85.33,
+				0.2,
+				301.12
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_102_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.103",
+			"kind": "doorway",
+			"position": [
+				-288.05,
+				0.2,
+				87.86
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_103_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.104",
+			"kind": "doorway",
+			"position": [
+				287.74,
+				0.24,
+				87.81
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_104_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.105",
+			"kind": "doorway",
+			"position": [
+				85.08,
+				0.2,
+				-305.48
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_105_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_105",
+			"kind": "workshop",
+			"position": [
+				83.48,
+				0.07,
+				-310.08
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:potter",
+				"building:Residential_105_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_105",
+			"kind": "gossip_spot",
+			"position": [
+				78.08,
+				0.07,
+				-312.08
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.106",
+			"kind": "doorway",
+			"position": [
+				-287.07,
+				0.2,
+				-87.36
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_106_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.107",
+			"kind": "doorway",
+			"position": [
+				-219.36,
+				0.2,
+				224.64
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_107_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.108",
+			"kind": "doorway",
+			"position": [
+				221.16,
+				0.2,
+				223.11
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_108_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_108",
+			"kind": "play_spot",
+			"position": [
+				214.16,
+				0.07,
+				232.81
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.109",
+			"kind": "doorway",
+			"position": [
+				-221.12,
+				0.2,
+				-227.35
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_109_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_109",
+			"kind": "workshop",
+			"position": [
+				-222.72,
+				0.07,
+				-231.95
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fuller",
+				"building:Residential_109_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.110",
+			"kind": "doorway",
+			"position": [
+				-256.93,
+				0.2,
+				164.5
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_110_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_110",
+			"kind": "gossip_spot",
+			"position": [
+				-262.18,
+				0.07,
+				155.9
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.111",
+			"kind": "doorway",
+			"position": [
+				254.73,
+				0.2,
+				165.85
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_111_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.112",
+			"kind": "doorway",
+			"position": [
+				256.41,
+				0.2,
+				-165.61
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_112_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.113",
+			"kind": "doorway",
+			"position": [
+				-186.98,
+				0.2,
+				240.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_113_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_113",
+			"kind": "workshop",
+			"position": [
+				-188.58,
+				0.07,
+				235.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:carpenter",
+				"building:Residential_113_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.114",
+			"kind": "doorway",
+			"position": [
+				188.49,
+				0.2,
+				242.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_114_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.115",
+			"kind": "doorway",
+			"position": [
+				118.9,
+				0.2,
+				304.42
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_115_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_115",
+			"kind": "workshop",
+			"position": [
+				120.5,
+				0.07,
+				309.02
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cobbler",
+				"building:Residential_115_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_115",
+			"kind": "gossip_spot",
+			"position": [
+				125.9,
+				0.07,
+				311.02
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_115",
+			"kind": "play_spot",
+			"position": [
+				111.9,
+				0.07,
+				310.82
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.116",
+			"kind": "doorway",
+			"position": [
+				-185.71,
+				0.24,
+				-244.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_116_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.117",
+			"kind": "doorway",
+			"position": [
+				187.12,
+				0.2,
+				-241.48
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_117_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_117",
+			"kind": "workshop",
+			"position": [
+				188.72,
+				0.07,
+				-236.88
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:weaver",
+				"building:Residential_117_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.118",
+			"kind": "doorway",
+			"position": [
+				119.63,
+				0.2,
+				-302.33
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_118_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.119",
+			"kind": "doorway",
+			"position": [
+				-289.19,
+				0.2,
+				145.14
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_119_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.120",
+			"kind": "doorway",
+			"position": [
+				288.43,
+				0.2,
+				145.24
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_120_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_120",
+			"kind": "gossip_spot",
+			"position": [
+				296.18,
+				0.07,
+				155.14
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.121",
+			"kind": "doorway",
+			"position": [
+				-288.39,
+				0.2,
+				-146.18
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_121_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.122",
+			"kind": "doorway",
+			"position": [
+				-324.31,
+				0.2,
+				8.48
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_122_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_122",
+			"kind": "play_spot",
+			"position": [
+				-315.81,
+				0.07,
+				0.08
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.123",
+			"kind": "doorway",
+			"position": [
+				322.98,
+				0.2,
+				9.72
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_123_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.124",
+			"kind": "doorway",
+			"position": [
+				-323.02,
+				0.2,
+				-7.44
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_124_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_124",
+			"kind": "workshop",
+			"position": [
+				-321.42,
+				0.07,
+				-2.84
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:smith",
+				"building:Residential_124_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.125",
+			"kind": "doorway",
+			"position": [
+				324.46,
+				0.2,
+				-9.51
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_125_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_125",
+			"kind": "gossip_spot",
+			"position": [
+				329.96,
+				0.07,
+				-0.91
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.126",
+			"kind": "doorway",
+			"position": [
+				-324.04,
+				0.24,
+				-68.33
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_126_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.127",
+			"kind": "doorway",
+			"position": [
+				322.94,
+				0.2,
+				-71.61
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_127_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_127",
+			"kind": "workshop",
+			"position": [
+				321.34,
+				0.07,
+				-76.21
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:potter",
+				"building:Residential_127_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.128",
+			"kind": "doorway",
+			"position": [
+				-153.9,
+				0.2,
+				301.31
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_128_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.129",
+			"kind": "doorway",
+			"position": [
+				154.02,
+				0.24,
+				301.33
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_129_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_129",
+			"kind": "play_spot",
+			"position": [
+				145.77,
+				0.07,
+				311.03
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.130",
+			"kind": "doorway",
+			"position": [
+				-153.18,
+				0.2,
+				-305.44
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_130_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_130",
+			"kind": "workshop",
+			"position": [
+				-154.78,
+				0.07,
+				-310.04
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fuller",
+				"building:Residential_130_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_130",
+			"kind": "gossip_spot",
+			"position": [
+				-160.18,
+				0.07,
+				-312.04
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.131",
+			"kind": "doorway",
+			"position": [
+				151.4,
+				0.2,
+				-303.36
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_131_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.132",
+			"kind": "doorway",
+			"position": [
+				-256.96,
+				0.2,
+				224.51
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_132_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.133",
+			"kind": "doorway",
+			"position": [
+				254.95,
+				0.2,
+				223.25
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_133_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.134",
+			"kind": "doorway",
+			"position": [
+				-255.18,
+				0.2,
+				-227.44
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_134_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_134",
+			"kind": "workshop",
+			"position": [
+				-256.78,
+				0.07,
+				-232.04
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:carpenter",
+				"building:Residential_134_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.135",
+			"kind": "doorway",
+			"position": [
+				-221.02,
+				0.2,
+				243.92
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_135_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_135",
+			"kind": "gossip_spot",
+			"position": [
+				-228.02,
+				0.07,
+				234.02
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.136",
+			"kind": "doorway",
+			"position": [
+				221.77,
+				0.2,
+				243.81
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_136_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_136",
+			"kind": "play_spot",
+			"position": [
+				228.02,
+				0.07,
+				234.11
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.137",
+			"kind": "doorway",
+			"position": [
+				-220.71,
+				0.2,
+				-241.64
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_137_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_137",
+			"kind": "workshop",
+			"position": [
+				-219.11,
+				0.07,
+				-237.04
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cobbler",
+				"building:Residential_137_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.138",
+			"kind": "doorway",
+			"position": [
+				219.43,
+				0.2,
+				-243.5
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_138_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.139",
+			"kind": "doorway",
+			"position": [
+				-324.17,
+				0.24,
+				87.83
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_139_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.140",
+			"kind": "doorway",
+			"position": [
+				323.32,
+				0.2,
+				84.49
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_140_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_140",
+			"kind": "workshop",
+			"position": [
+				321.72,
+				0.07,
+				79.89
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:weaver",
+				"building:Residential_140_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_140",
+			"kind": "gossip_spot",
+			"position": [
+				316.32,
+				0.07,
+				77.89
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.141",
+			"kind": "doorway",
+			"position": [
+				-321.24,
+				0.2,
+				-87.64
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_141_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.142",
+			"kind": "doorway",
+			"position": [
+				322.69,
+				0.2,
+				-88.65
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_142_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.143",
+			"kind": "doorway",
+			"position": [
+				-290.04,
+				0.24,
+				165.94
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_143_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_143",
+			"kind": "play_spot",
+			"position": [
+				-281.79,
+				0.07,
+				156.24
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.144",
+			"kind": "doorway",
+			"position": [
+				289.18,
+				0.2,
+				162.47
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_144_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_144",
+			"kind": "workshop",
+			"position": [
+				287.58,
+				0.07,
+				157.87
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:smith",
+				"building:Residential_144_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.145",
+			"kind": "doorway",
+			"position": [
+				-287.88,
+				0.24,
+				-166.81
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_145_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_145",
+			"kind": "gossip_spot",
+			"position": [
+				-282.13,
+				0.07,
+				-156.91
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.146",
+			"kind": "doorway",
+			"position": [
+				289.1,
+				0.2,
+				-163.43
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_146_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_146",
+			"kind": "workshop",
+			"position": [
+				290.7,
+				0.07,
+				-158.83
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:potter",
+				"building:Residential_146_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.147",
+			"kind": "doorway",
+			"position": [
+				-186.72,
+				0.2,
+				301.28
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_147_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.148",
+			"kind": "doorway",
+			"position": [
+				186.55,
+				0.2,
+				301.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_148_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.149",
+			"kind": "doorway",
+			"position": [
+				-187.93,
+				0.24,
+				-302.07
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_149_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.150",
+			"kind": "doorway",
+			"position": [
+				186.76,
+				0.2,
+				-305.53
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_150_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_150",
+			"kind": "workshop",
+			"position": [
+				185.16,
+				0.07,
+				-310.13
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fuller",
+				"building:Residential_150_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_150",
+			"kind": "gossip_spot",
+			"position": [
+				179.76,
+				0.07,
+				-312.13
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_150",
+			"kind": "play_spot",
+			"position": [
+				193.76,
+				0.07,
+				-311.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.151",
+			"kind": "doorway",
+			"position": [
+				-321.93,
+				0.24,
+				145.29
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_151_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.152",
+			"kind": "doorway",
+			"position": [
+				323.21,
+				0.2,
+				148.43
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_152_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_152",
+			"kind": "workshop",
+			"position": [
+				324.81,
+				0.07,
+				153.03
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:carpenter",
+				"building:Residential_152_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.153",
+			"kind": "doorway",
+			"position": [
+				-323.25,
+				0.2,
+				-149.46
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_153_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_153",
+			"kind": "workshop",
+			"position": [
+				-324.85,
+				0.07,
+				-154.06
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cobbler",
+				"building:Residential_153_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.154",
+			"kind": "doorway",
+			"position": [
+				321.57,
+				0.2,
+				-147.62
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_154_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.155",
+			"kind": "doorway",
+			"position": [
+				-358.28,
+				0.24,
+				9.67
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_155_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_155",
+			"kind": "gossip_spot",
+			"position": [
+				-364.03,
+				0.07,
+				-0.23
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.156",
+			"kind": "doorway",
+			"position": [
+				356.69,
+				0.2,
+				6.45
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_156_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_156",
+			"kind": "workshop",
+			"position": [
+				355.09,
+				0.07,
+				1.85
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:weaver",
+				"building:Residential_156_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.157",
+			"kind": "doorway",
+			"position": [
+				-357.92,
+				0.2,
+				-10.87
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_157_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_157",
+			"kind": "play_spot",
+			"position": [
+				-364.17,
+				0.07,
+				-1.17
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.158",
+			"kind": "doorway",
+			"position": [
+				358.48,
+				0.24,
+				-10.72
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_158_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.159",
+			"kind": "doorway",
+			"position": [
+				-256.55,
+				0.2,
+				242.58
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_159_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.160",
+			"kind": "doorway",
+			"position": [
+				255.32,
+				0.2,
+				243.88
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_160_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_160",
+			"kind": "gossip_spot",
+			"position": [
+				248.32,
+				0.07,
+				233.98
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.161",
+			"kind": "doorway",
+			"position": [
+				-289.18,
+				0.2,
+				226.47
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_161_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_161",
+			"kind": "workshop",
+			"position": [
+				-287.58,
+				0.07,
+				231.07
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:smith",
+				"building:Residential_161_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.162",
+			"kind": "doorway",
+			"position": [
+				290.96,
+				0.2,
+				224.44
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_162_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.163",
+			"kind": "doorway",
+			"position": [
+				-256.99,
+				0.2,
+				-243.42
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_163_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.164",
+			"kind": "doorway",
+			"position": [
+				254.76,
+				0.2,
+				-244.83
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_164_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_164",
+			"kind": "play_spot",
+			"position": [
+				247.76,
+				0.07,
+				-235.13
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.165",
+			"kind": "doorway",
+			"position": [
+				-290.87,
+				0.2,
+				-225.51
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_165_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_165",
+			"kind": "gossip_spot",
+			"position": [
+				-296.12,
+				0.07,
+				-234.11
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.166",
+			"kind": "doorway",
+			"position": [
+				-358.4,
+				0.24,
+				-68.08
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_166_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.167",
+			"kind": "doorway",
+			"position": [
+				356.68,
+				0.2,
+				-71.63
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_167_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_167",
+			"kind": "workshop",
+			"position": [
+				355.08,
+				0.07,
+				-76.23
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:potter",
+				"building:Residential_167_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.168",
+			"kind": "doorway",
+			"position": [
+				-221.98,
+				0.2,
+				301.27
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_168_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.169",
+			"kind": "doorway",
+			"position": [
+				222.45,
+				0.24,
+				301.11
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_169_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.170",
+			"kind": "doorway",
+			"position": [
+				-220.81,
+				0.2,
+				-305.57
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_170_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_170",
+			"kind": "workshop",
+			"position": [
+				-222.41,
+				0.07,
+				-310.17
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fuller",
+				"building:Residential_170_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_170",
+			"kind": "gossip_spot",
+			"position": [
+				-227.81,
+				0.07,
+				-312.17
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.171",
+			"kind": "doorway",
+			"position": [
+				222.9,
+				0.2,
+				-303.63
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_171_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_171",
+			"kind": "play_spot",
+			"position": [
+				228.15,
+				0.07,
+				-312.03
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.172",
+			"kind": "doorway",
+			"position": [
+				-322.18,
+				0.2,
+				165.79
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_172_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.173",
+			"kind": "doorway",
+			"position": [
+				321.68,
+				0.24,
+				165.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_173_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.174",
+			"kind": "doorway",
+			"position": [
+				-323.9,
+				0.2,
+				-166.86
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_174_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.175",
+			"kind": "doorway",
+			"position": [
+				324.47,
+				0.24,
+				-166.78
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_175_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_175",
+			"kind": "gossip_spot",
+			"position": [
+				330.22,
+				0.07,
+				-156.88
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.176",
+			"kind": "doorway",
+			"position": [
+				-358.72,
+				0.2,
+				86.43
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_176_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.177",
+			"kind": "doorway",
+			"position": [
+				357.27,
+				0.2,
+				87.7
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_177_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.178",
+			"kind": "doorway",
+			"position": [
+				-357.58,
+				0.2,
+				-88.72
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_178_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_178",
+			"kind": "play_spot",
+			"position": [
+				-363.83,
+				0.07,
+				-79.02
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.179",
+			"kind": "doorway",
+			"position": [
+				358.33,
+				0.24,
+				-88.94
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_179_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.180",
+			"kind": "doorway",
+			"position": [
+				-357.43,
+				0.2,
+				145.23
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_180_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_180",
+			"kind": "gossip_spot",
+			"position": [
+				-349.68,
+				0.07,
+				155.13
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.181",
+			"kind": "doorway",
+			"position": [
+				358.39,
+				0.24,
+				145.15
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_181_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.182",
+			"kind": "doorway",
+			"position": [
+				-358.28,
+				0.24,
+				-146.27
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_182_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.183",
+			"kind": "doorway",
+			"position": [
+				357.02,
+				0.2,
+				-149.52
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_183_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_183",
+			"kind": "workshop",
+			"position": [
+				355.42,
+				0.07,
+				-154.12
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:carpenter",
+				"building:Residential_183_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.184",
+			"kind": "doorway",
+			"position": [
+				-290.79,
+				0.2,
+				242.58
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_184_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.185",
+			"kind": "doorway",
+			"position": [
+				289.27,
+				0.2,
+				243.86
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_185_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_185",
+			"kind": "gossip_spot",
+			"position": [
+				282.27,
+				0.07,
+				233.96
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_185",
+			"kind": "play_spot",
+			"position": [
+				296.27,
+				0.07,
+				234.16
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.186",
+			"kind": "doorway",
+			"position": [
+				-287.73,
+				0.24,
+				-244.67
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_186_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.187",
+			"kind": "doorway",
+			"position": [
+				288.81,
+				0.2,
+				-241.43
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_187_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_187",
+			"kind": "workshop",
+			"position": [
+				290.41,
+				0.07,
+				-236.83
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cobbler",
+				"building:Residential_187_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.188",
+			"kind": "doorway",
+			"position": [
+				-323.01,
+				0.2,
+				223.23
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_188_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.189",
+			"kind": "doorway",
+			"position": [
+				321.96,
+				0.2,
+				223.25
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_189_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.190",
+			"kind": "doorway",
+			"position": [
+				-254.96,
+				0.2,
+				304.63
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_190_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_190",
+			"kind": "workshop",
+			"position": [
+				-253.36,
+				0.07,
+				309.23
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:weaver",
+				"building:Residential_190_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_190",
+			"kind": "gossip_spot",
+			"position": [
+				-247.96,
+				0.07,
+				311.23
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.191",
+			"kind": "doorway",
+			"position": [
+				256.84,
+				0.2,
+				302.4
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_191_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.192",
+			"kind": "doorway",
+			"position": [
+				-322.29,
+				0.2,
+				-224.3
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_192_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_192",
+			"kind": "play_spot",
+			"position": [
+				-316.04,
+				0.07,
+				-234.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.193",
+			"kind": "doorway",
+			"position": [
+				-254.52,
+				0.2,
+				-302.06
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_193_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.194",
+			"kind": "doorway",
+			"position": [
+				253.74,
+				0.24,
+				-302.16
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_194_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.195",
+			"kind": "doorway",
+			"position": [
+				-392.31,
+				0.24,
+				9.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_195_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_195",
+			"kind": "gossip_spot",
+			"position": [
+				-398.06,
+				0.07,
+				0.03
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.196",
+			"kind": "doorway",
+			"position": [
+				391.17,
+				0.2,
+				6.43
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_196_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_196",
+			"kind": "workshop",
+			"position": [
+				389.57,
+				0.07,
+				1.83
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:smith",
+				"building:Residential_196_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.197",
+			"kind": "doorway",
+			"position": [
+				-391.44,
+				0.2,
+				-10.9
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_197_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.198",
+			"kind": "doorway",
+			"position": [
+				392.17,
+				0.24,
+				-10.68
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_198_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.199",
+			"kind": "doorway",
+			"position": [
+				-390.96,
+				0.2,
+				-68.1
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_199_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_199",
+			"kind": "play_spot",
+			"position": [
+				-383.96,
+				0.07,
+				-77.8
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.200",
+			"kind": "doorway",
+			"position": [
+				391.87,
+				0.2,
+				-68.15
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_200_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_200",
+			"kind": "gossip_spot",
+			"position": [
+				384.12,
+				0.07,
+				-78.05
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.201",
+			"kind": "doorway",
+			"position": [
+				-357.13,
+				0.2,
+				165.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_201_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.202",
+			"kind": "doorway",
+			"position": [
+				357.88,
+				0.2,
+				165.9
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_202_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.203",
+			"kind": "doorway",
+			"position": [
+				-356.7,
+				0.2,
+				-166.81
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_203_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.204",
+			"kind": "doorway",
+			"position": [
+				356.15,
+				0.2,
+				-166.72
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_204_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.205",
+			"kind": "doorway",
+			"position": [
+				-390.96,
+				0.2,
+				84.39
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_205_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_205",
+			"kind": "workshop",
+			"position": [
+				-392.56,
+				0.07,
+				79.79
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:potter",
+				"building:Residential_205_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_205",
+			"kind": "gossip_spot",
+			"position": [
+				-397.96,
+				0.07,
+				77.79
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.206",
+			"kind": "doorway",
+			"position": [
+				389.16,
+				0.2,
+				86.62
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_206_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_206",
+			"kind": "play_spot",
+			"position": [
+				397.91,
+				0.07,
+				78.22
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.207",
+			"kind": "doorway",
+			"position": [
+				-390.72,
+				0.2,
+				-88.87
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_207_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.208",
+			"kind": "doorway",
+			"position": [
+				390.32,
+				0.2,
+				-88.67
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_208_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.209",
+			"kind": "doorway",
+			"position": [
+				-324.57,
+				0.2,
+				242.46
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_209_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.210",
+			"kind": "doorway",
+			"position": [
+				323.04,
+				0.2,
+				243.83
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_210_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_210",
+			"kind": "gossip_spot",
+			"position": [
+				316.04,
+				0.07,
+				233.93
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.211",
+			"kind": "doorway",
+			"position": [
+				-287.61,
+				0.2,
+				302.43
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_211_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.212",
+			"kind": "doorway",
+			"position": [
+				288.66,
+				0.2,
+				301.34
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_212_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.213",
+			"kind": "doorway",
+			"position": [
+				-321.54,
+				0.2,
+				-243.42
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_213_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_213",
+			"kind": "play_spot",
+			"position": [
+				-330.29,
+				0.07,
+				-235.02
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.214",
+			"kind": "doorway",
+			"position": [
+				323.02,
+				0.2,
+				-244.75
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_214_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.215",
+			"kind": "doorway",
+			"position": [
+				-288.88,
+				0.2,
+				-305.4
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_215_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_215",
+			"kind": "workshop",
+			"position": [
+				-290.48,
+				0.07,
+				-310.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fuller",
+				"building:Residential_215_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_215",
+			"kind": "gossip_spot",
+			"position": [
+				-295.88,
+				0.07,
+				-312.0
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.216",
+			"kind": "doorway",
+			"position": [
+				287.48,
+				0.2,
+				-303.42
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_216_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.217",
+			"kind": "doorway",
+			"position": [
+				-390.81,
+				0.2,
+				148.63
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_217_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_217",
+			"kind": "workshop",
+			"position": [
+				-389.21,
+				0.07,
+				153.23
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:carpenter",
+				"building:Residential_217_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.218",
+			"kind": "doorway",
+			"position": [
+				392.21,
+				0.2,
+				146.52
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_218_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.219",
+			"kind": "doorway",
+			"position": [
+				-392.54,
+				0.2,
+				-147.36
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_219_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.220",
+			"kind": "doorway",
+			"position": [
+				390.85,
+				0.2,
+				-146.18
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_220_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_220",
+			"kind": "gossip_spot",
+			"position": [
+				383.85,
+				0.07,
+				-156.08
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_220",
+			"kind": "play_spot",
+			"position": [
+				397.85,
+				0.07,
+				-155.88
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.221",
+			"kind": "doorway",
+			"position": [
+				-357.15,
+				0.2,
+				226.62
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_221_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_221",
+			"kind": "workshop",
+			"position": [
+				-355.55,
+				0.07,
+				231.22
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:cobbler",
+				"building:Residential_221_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.222",
+			"kind": "doorway",
+			"position": [
+				358.76,
+				0.2,
+				224.45
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_222_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.223",
+			"kind": "doorway",
+			"position": [
+				-358.41,
+				0.24,
+				-224.1
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_223_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.224",
+			"kind": "doorway",
+			"position": [
+				357.25,
+				0.2,
+				-227.62
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_224_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_224",
+			"kind": "workshop",
+			"position": [
+				355.65,
+				0.07,
+				-232.22
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:weaver",
+				"building:Residential_224_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.225",
+			"kind": "doorway",
+			"position": [
+				-392.77,
+				0.2,
+				164.58
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_225_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_225",
+			"kind": "gossip_spot",
+			"position": [
+				-398.27,
+				0.07,
+				155.98
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.226",
+			"kind": "doorway",
+			"position": [
+				390.91,
+				0.2,
+				165.94
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_226_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.227",
+			"kind": "doorway",
+			"position": [
+				-389.7,
+				0.2,
+				-165.46
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_227_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_227",
+			"kind": "play_spot",
+			"position": [
+				-398.2,
+				0.07,
+				-157.06
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.228",
+			"kind": "doorway",
+			"position": [
+				391.33,
+				0.2,
+				-166.78
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_228_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.229",
+			"kind": "doorway",
+			"position": [
+				-321.98,
+				0.24,
+				301.19
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_229_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.230",
+			"kind": "doorway",
+			"position": [
+				322.8,
+				0.2,
+				304.37
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_230_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_230",
+			"kind": "workshop",
+			"position": [
+				324.4,
+				0.07,
+				308.97
+			],
+			"facing_deg": 180.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:smith",
+				"building:Residential_230_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_230",
+			"kind": "gossip_spot",
+			"position": [
+				329.8,
+				0.07,
+				310.97
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.231",
+			"kind": "doorway",
+			"position": [
+				-324.84,
+				0.2,
+				-303.42
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_231_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.232",
+			"kind": "doorway",
+			"position": [
+				323.21,
+				0.2,
+				-302.22
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_232_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.233",
+			"kind": "doorway",
+			"position": [
+				-357.24,
+				0.2,
+				240.38
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_233_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_233",
+			"kind": "workshop",
+			"position": [
+				-358.84,
+				0.07,
+				235.78
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:potter",
+				"building:Residential_233_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.234",
+			"kind": "doorway",
+			"position": [
+				355.63,
+				0.2,
+				242.37
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_234_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.play_234",
+			"kind": "play_spot",
+			"position": [
+				364.13,
+				0.07,
+				233.97
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				8.0,
+				18.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.235",
+			"kind": "doorway",
+			"position": [
+				-357.97,
+				0.2,
+				-244.79
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous"
+			],
+			"tags": [
+				"building:Residential_235_domus",
+				"house:domus",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_235",
+			"kind": "gossip_spot",
+			"position": [
+				-350.22,
+				0.07,
+				-234.89
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.236",
+			"kind": "doorway",
+			"position": [
+				358.47,
+				0.24,
+				-244.87
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"elite"
+			],
+			"tags": [
+				"building:Residential_236_villa",
+				"house:villa",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.237",
+			"kind": "doorway",
+			"position": [
+				-389.56,
+				0.2,
+				224.46
+			],
+			"facing_deg": 180.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_237_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.238",
+			"kind": "doorway",
+			"position": [
+				391.12,
+				0.2,
+				223.09
+			],
+			"facing_deg": 180.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"building:Residential_238_atrium",
+				"house:atrium",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.239",
+			"kind": "doorway",
+			"position": [
+				-391.0,
+				0.2,
+				-227.37
+			],
+			"facing_deg": 0.0,
+			"capacity": 6,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"common"
+			],
+			"tags": [
+				"building:Residential_239_artisan",
+				"house:artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.artisan_239",
+			"kind": "workshop",
+			"position": [
+				-392.6,
+				0.07,
+				-231.97
+			],
+			"facing_deg": 0.0,
+			"capacity": 2,
+			"hours": [
+				6.5,
+				17.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:fuller",
+				"building:Residential_239_artisan",
+				"district:residential"
+			]
+		},
+		{
+			"id": "home.240",
+			"kind": "doorway",
+			"position": [
+				389.74,
+				0.2,
+				-225.47
+			],
+			"facing_deg": 0.0,
+			"capacity": 12,
+			"hours": [
+				0.0,
+				24.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common"
+			],
+			"tags": [
+				"building:Residential_240_insula",
+				"house:insula",
+				"district:residential"
+			]
+		},
+		{
+			"id": "residential.gossip_240",
+			"kind": "gossip_spot",
+			"position": [
+				384.24,
+				0.07,
+				-234.07
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				7.0,
+				20.5
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.pistrinum_bakery",
+			"kind": "workshop",
+			"position": [
+				-357.0,
+				0.0,
+				298.6
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:bakery_oven",
+				"building:Pistrinum_Bakery",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.fabrica_blacksmith",
+			"kind": "workshop",
+			"position": [
+				357.0,
+				0.0,
+				298.6
+			],
+			"facing_deg": 180.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:smith",
+				"building:Fabrica_Blacksmith",
+				"district:residential"
+			]
+		},
+		{
+			"id": "workshop.mercator_store",
+			"kind": "workshop",
+			"position": [
+				-357.0,
+				0.0,
+				-299.6
+			],
+			"facing_deg": 0.0,
+			"capacity": 4,
+			"hours": [
+				6.0,
+				18.0
+			],
+			"era": {
+				"from_year": -100,
+				"to_year": null
+			},
+			"wealth_tiers": [
+				"poor",
+				"common",
+				"prosperous",
+				"elite"
+			],
+			"tags": [
+				"business:merchant",
+				"building:Mercator_Store",
+				"district:residential"
+			]
+		}
+	]
+}
