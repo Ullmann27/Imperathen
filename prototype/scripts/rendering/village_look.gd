@@ -239,8 +239,13 @@ func set_time_of_day(hours: float) -> void:
 
 
 func _apply_time(hours: float) -> void:
-	var preset: Dictionary = SEASONS[season]
-	var path: Vector3 = DAYLIGHT[season]
+	night = apply_solar_time(hours, season, sun, environment, sky_material)
+
+
+## Shared solar path, exposure and horizon for the city and the home village.
+static func apply_solar_time(hours: float, season_index: int, light: DirectionalLight3D, env: Environment, shader_sky: ShaderMaterial) -> float:
+	var preset: Dictionary = SEASONS[season_index]
+	var path: Vector3 = DAYLIGHT[season_index]
 	var day := (hours - path.x) / (path.y - path.x)
 	# Elevation follows a sine arc between sunrise and sunset and keeps
 	# sinking after sunset so the twilight fades in a believable order.
@@ -251,34 +256,41 @@ func _apply_time(hours: float) -> void:
 		elevation = (day - 1.0) * (path.y - path.x) * -15.0
 	var azimuth := lerpf(-105.0, 105.0, clampf(day, 0.0, 1.0))
 	var low := 1.0 - smoothstep(2.0, 24.0, elevation)
-	night = smoothstep(1.0, -7.0, elevation)
+	var darkness := smoothstep(1.0, -7.0, elevation)
 	var warm: Color = (VALUES.daylight.dawn_sun as Color).lerp(VALUES.daylight.low_sun, smoothstep(1.0, 12.0, elevation)).lerp(preset.sun, smoothstep(12.0, 40.0, elevation))
 	if elevation > 0.0:
-		sun.rotation_degrees = Vector3(-maxf(elevation, 1.5), -azimuth, 0)
-		sun.light_color = warm
+		light.rotation_degrees = Vector3(-maxf(elevation, 1.5), -azimuth, 0)
+		light.light_color = warm
 		# Extinction through more air near the horizon.
-		sun.light_energy = float(preset.sun_energy) * smoothstep(0.0, 8.0, elevation) * lerpf(.55, 1.0, smoothstep(8.0, 40.0, elevation))
+		light.light_energy = float(preset.sun_energy) * smoothstep(0.0, 8.0, elevation) * lerpf(.55, 1.0, smoothstep(8.0, 40.0, elevation))
 	else:
-		sun.rotation_degrees = Vector3(MOON.angle.x, MOON.angle.y, 0)
-		sun.light_color = MOON.color
-		sun.light_energy = MOON.energy * night
-	environment.ambient_light_energy = float(preset.ambient) * lerpf(1.0, float(NIGHT_SKY.ambient_scale), night) * lerpf(1.0, .75, low * (1.0 - night))
-	var exposure := float(preset.exposure) * lerpf(1.0, float(NIGHT_SKY.exposure_scale), night) * lerpf(1.0, 1.12, low * (1.0 - night))
-	environment.set_meta("look_exposure", exposure)
-	environment.tonemap_exposure = exposure
-	var twilight := low * (1.0 - night)
-	var zenith: Color = (preset.zenith as Color).lerp(VALUES.daylight.twilight_zenith, twilight * .6).lerp(NIGHT_SKY.zenith, night)
-	var horizon: Color = (preset.horizon as Color).lerp(VALUES.daylight.twilight_horizon, twilight * .7).lerp(NIGHT_SKY.horizon, night)
-	var haze: Color = (preset.haze as Color).lerp(VALUES.daylight.twilight_haze, twilight).lerp(NIGHT_SKY.haze, night)
-	environment.fog_light_color = horizon.lerp(haze, .3)
-	environment.fog_density = float(preset.fog) * lerpf(1.0, 1.35, twilight)
-	if sky_material != null:
-		sky_material.set_shader_parameter("zenith", zenith)
-		sky_material.set_shader_parameter("horizon", horizon)
-		sky_material.set_shader_parameter("sun_haze", haze)
-		sky_material.set_shader_parameter("haze_strength", lerpf(.38, .8, twilight))
-		sky_material.set_shader_parameter("cloud_color", (preset.clouds as Color).lerp(VALUES.daylight.twilight_clouds, twilight * .6).lerp(NIGHT_SKY.clouds, night))
-		sky_material.set_shader_parameter("ground_color", (preset.ground as Color).lerp(NIGHT_SKY.ground, night))
+		light.rotation_degrees = Vector3(MOON.angle.x, MOON.angle.y, 0)
+		light.light_color = MOON.color
+		light.light_energy = MOON.energy * darkness
+	env.ambient_light_energy = float(preset.ambient) * lerpf(1.0, float(NIGHT_SKY.ambient_scale), darkness) * lerpf(1.0, .75, low * (1.0 - darkness))
+	var exposure := float(preset.exposure) * lerpf(1.0, float(NIGHT_SKY.exposure_scale), darkness) * lerpf(1.0, 1.12, low * (1.0 - darkness))
+	env.set_meta("look_exposure", exposure)
+	env.tonemap_exposure = exposure
+	var twilight := low * (1.0 - darkness)
+	var zenith: Color = (preset.zenith as Color).lerp(VALUES.daylight.twilight_zenith, twilight * .6).lerp(NIGHT_SKY.zenith, darkness)
+	var horizon: Color = (preset.horizon as Color).lerp(VALUES.daylight.twilight_horizon, twilight * .7).lerp(NIGHT_SKY.horizon, darkness)
+	var haze: Color = (preset.haze as Color).lerp(VALUES.daylight.twilight_haze, twilight).lerp(NIGHT_SKY.haze, darkness)
+	env.fog_light_color = horizon.lerp(haze, .3)
+	env.fog_density = float(preset.fog) * lerpf(1.0, 1.35, twilight)
+	if shader_sky != null:
+		shader_sky.set_shader_parameter("zenith", zenith)
+		shader_sky.set_shader_parameter("horizon", horizon)
+		shader_sky.set_shader_parameter("sun_haze", haze)
+		shader_sky.set_shader_parameter("haze_strength", lerpf(.38, .8, twilight))
+		shader_sky.set_shader_parameter("cloud_color", (preset.clouds as Color).lerp(VALUES.daylight.twilight_clouds, twilight * .6).lerp(NIGHT_SKY.clouds, darkness))
+		shader_sky.set_shader_parameter("ground_color", (preset.ground as Color).lerp(NIGHT_SKY.ground, darkness))
+	elif env.sky != null and env.sky.sky_material is ProceduralSkyMaterial:
+		var sky_surface := env.sky.sky_material as ProceduralSkyMaterial
+		sky_surface.sky_top_color = zenith
+		sky_surface.sky_horizon_color = horizon
+		sky_surface.ground_horizon_color = horizon.lerp(haze, .3)
+		sky_surface.ground_bottom_color = (preset.ground as Color).lerp(NIGHT_SKY.ground, darkness)
+	return darkness
 
 
 ## One batch of warm cards inside the door and front windows of every Valdora

@@ -38,12 +38,14 @@ static func view(world: Dictionary) -> Dictionary:
 	var route := _completed_help(ids)
 	var audience := ids.has(AUDIENCE)
 	var relation := Life.relationship(world, OFFICIAL_ID)
+	var can_discuss := _shared_reason(world).is_empty()
 	var result := {
 		"available": enabled(world),
+		"can_discuss": can_discuss,
 		"official_id": OFFICIAL_ID,
 		"report_point": SURVEY_POINT,
 		"report_radius": RANGE,
-		"survey_pending": _shared_reason(world).is_empty() and route.is_empty() and not ids.has(SURVEY),
+		"survey_pending": can_discuss and route.is_empty() and not ids.has(SURVEY),
 		"relationship": {"actor_id": "vil:decimus", "trust": int(relation.get("trust", 0)), "respect": 0},
 		"recommendation": {},
 		"learning": "",

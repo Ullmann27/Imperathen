@@ -865,6 +865,8 @@ func show_pause() -> void:
 	column.add_child(_tablet_button("Chronik", func(): _show_journal(false)))
 	if _state.get("village", {}).get("enabled", false):
 		column.add_child(_tablet_button("Dorfleben und Wiederaufbau", _emit.bind("village_panel", {})))
+	if _state.get("can_visit_market", false):
+		column.add_child(_tablet_button("Stadtmarkt besuchen", func(): _emit("campaign_market")))
 	column.add_child(_tablet_button("Weltkugel", func(): _emit("atlas")))
 	if not child:
 		# The regional legion is an adult career step; the child never sees it.
@@ -1627,6 +1629,16 @@ func _build_objective_card() -> void:
 	_hud_labels["objective_text"].max_lines_visible = maxi(1, lines - 1)
 	_hud_labels["objective_text"].text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	detail.add_child(_hud_labels["objective_text"])
+	if _touch_enabled:
+		# The scaled label fonts and the actual two-line title determine the
+		# remaining room above the stick. A fixed 18 px line undercounts
+		# the body font at 125% on the narrow Fold display.
+		var title: Label = _hud_labels.objective_title
+		var body: Label = _hud_labels.objective_text
+		var reserved := panel.get_theme_stylebox("panel").get_minimum_size().y + kicker.get_line_height() + 6
+		reserved += title.max_lines_visible * (title.get_line_height() + title.get_theme_constant("line_spacing"))
+		var line_height := body.get_line_height() + body.get_theme_constant("line_spacing")
+		body.max_lines_visible = clampi(floori((limit - reserved) / maxf(line_height, 1)), 1, body.max_lines_visible)
 	_hud_labels["compact_life"] = HudStyle.label("", HudStyle.TYPE_CAPTION + 1, HudStyle.AURUM)
 	_hud_labels["compact_life"].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_hud_labels["compact_life"].max_lines_visible = 2

@@ -1,5 +1,5 @@
 extends Node3D
-## Independent free walk: no mission, economy or campaign simulation is started.
+## The menu tour owns its sandbox. Campaign visits borrow the running WorldModel.
 signal leave_requested
 signal story_requested
 const Person := preload("res://scripts/visuals/village_person.gd")
@@ -9,6 +9,9 @@ const CityDetailAdapter := preload("res://scripts/rendering/city_exploration_det
 const CityCharacterFinish := preload("res://scripts/rendering/city_character_detail.gd")
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
 const CityMarketBridge := preload("res://scripts/world/city_market_bridge.gd")
+const Daylight := preload("res://scripts/rendering/village_look.gd")
+const BakeryDisplay := preload("res://scripts/world/city_bakery_display.gd")
+const ResidentView := preload("res://scripts/world/city_resident_view.gd")
 const CityLifeSession := preload("res://scripts/world/city_life_session.gd")
 const CitySurfaceMicrodetail := preload("res://scripts/rendering/city_surface_microdetail.gd")
 const VivaCloseupProps := preload("res://scripts/rendering/city_viva_closeup_props.gd")
@@ -46,6 +49,15 @@ const BRAKING_DECELERATION := 8.0
 var profile := "balanced"
 var persist := true
 var enable_riding_trial := false
+var campaign
+var campaign_path := ""
+var resident_view: ResidentView
+var _bakery: BakeryDisplay
+var _bakery_business := -1
+var _visit_elapsed := 0.0
+var _market_sun: DirectionalLight3D
+var _solar_minute := -1
+var _wait_button: Button
 # Only explicit, non-persistent QA callers may attach the new city economy.
 var enable_living_city_qa := false
 var living_city: CityLifeSession
@@ -111,19 +123,44 @@ func _ready() -> void:
 	_build_player()
 	_build_camera()
 	add_child(training)
-	_build_ambient_people()
+	if campaign == null:
+		_build_ambient_people()
 	crowd.profile = profile
 	if is_instance_valid(ambient_people):
 		for record: Dictionary in ambient_people.citizens:
 			crowd.exclude_market_shop(str(record.get("shop", "")))
 	add_child(crowd)
-	_read_catalog()
+	if campaign == null:
+		_read_catalog()
 	_build_ui()
-	_restore(State.read(save_path) if persist else State.defaults())
+	_restore(State.read(save_path) if persist and campaign == null else State.defaults())
 	add_child(market)
 	market.message.connect(_market_message)
 	market.closed.connect(_close_market)
-	market.setup(get_node_or_null("RomanCity") as Node3D, player, persist, quarter.stable_trader if quarter != null else null)
+	var stable := quarter.stable_trader if quarter != null else null
+	var city := get_node_or_null("RomanCity") as Node3D
+	if campaign != null:
+		var has_site := func(site: String) -> bool: return is_instance_valid(find_child(site, true, false))
+		market.setup(city, player, true, stable, campaign, campaign_path, has_site)
+		if market.available:
+			# The street approaches the counters from +Z. Leave a walking
+			# distance before the bakery so arrival cannot trigger a purchase.
+			teleport(market.sites.bakery + Vector3(0, 0, 6))
+		living_city = market.campaign_session()
+		if living_city != null:
+			resident_view = ResidentView.new()
+			add_child(resident_view)
+			resident_view.setup(living_city.life, player, camera, profile)
+			_bakery_business = living_city.life.business_for_shop("bakery")
+			if _bakery_business >= 0:
+				var display := BakeryDisplay.new()
+				if display.install(city):
+					_bakery = display
+					_update_bakery()
+				else:
+					display.free()
+	else:
+		market.setup(city, player, persist, stable)
 	if enable_living_city_qa and not persist and market.available:
 		var session := CityLifeSession.new()
 		var clock := Calendar.new_clock(world_jdn, 12 * 3600)
@@ -143,7 +180,7 @@ func _ready() -> void:
 	var renderer := get_node_or_null("/root/RuntimeDisplay")
 	if is_instance_valid(renderer):
 		renderer.set_sustained_scene(true)
-	print("IMPERATHEN_CITY_READY "+JSON.stringify({"city":city_available,"meshy_youth":youth_available,"selected_player_model":figure.active_model_path,"original_youth_active":youth_available and figure.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"),"catalog_families":catalog.size(),"campaign_started":false,"combat_mode":"authoritative_unarmed_training","mocap_active":figure._uses_youth_mocap()}))
+	print("IMPERATHEN_CITY_READY "+JSON.stringify({"city":city_available,"meshy_youth":youth_available,"selected_player_model":figure.active_model_path,"original_youth_active":youth_available and figure.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"),"catalog_families":catalog.size(),"campaign_started":campaign != null,"combat_mode":"authoritative_unarmed_training","mocap_active":figure._uses_youth_mocap()}))
 
 func _build_ground() -> void:
 	var ground := MeshInstance3D.new()
@@ -167,6 +204,7 @@ func _build_ground() -> void:
 	if viva_visuals:
 		VivaAtmosphere.configure_sun(sun, profile)
 	add_child(sun)
+	_market_sun = sun
 
 func _scene(path: String) -> Node3D:
 	if not ResourceLoader.exists(path,"PackedScene"):
@@ -309,7 +347,7 @@ func _build_ambient_people() -> void:
 func _build_player() -> void:
 	player.name = "ExplorationPlayer"
 	player.collision_layer = 2
-	player.collision_mask = 1
+	player.collision_mask = 3 if campaign != null else 1
 	player.safe_margin = 0.002
 	player.floor_snap_length = 0.24
 	player.floor_max_angle = deg_to_rad(46.0)
@@ -325,8 +363,13 @@ func _build_player() -> void:
 	figure.profile = profile
 	figure.detail = 2 if profile=="low" else (1 if profile=="balanced" else 0)
 	player.add_child(figure)
-	youth_available = figure.configure_meshy_youth()
-	figure.configure("player","italia",12)
+	var age := int(campaign.data.player.age) if campaign != null else 12
+	var origin := str(campaign.data.origin_id) if campaign != null else "italia"
+	if age == 12 and origin == "italia":
+		youth_available = figure.configure_meshy_youth()
+	figure.configure("player", origin, age)
+	if age != 12:
+		youth_available = figure.configure_meshy_youth()
 	figure._check_lod = 10000.0
 	if is_instance_valid(figure.body):
 		CityCharacterFinish.apply_to(figure.body, profile, figure.detail)
@@ -474,7 +517,7 @@ func _build_ui() -> void:
 	_safe.add_child(_look)
 	var heading := Label.new()
 	heading.name = "Heading"
-	heading.text = "IMPERATHEN · FREIE STADTERKUNDUNG"
+	heading.text = "IMPERATHEN · STADTMARKT" if campaign != null else "IMPERATHEN · FREIE STADTERKUNDUNG"
 	heading.add_theme_font_size_override("font_size",21)
 	heading.add_theme_color_override("font_color",Color("f1dfb4"))
 	heading.add_theme_color_override("font_shadow_color",Color.BLACK)
@@ -490,9 +533,14 @@ func _build_ui() -> void:
 	_safe.add_child(_status)
 	_toolbar = HBoxContainer.new()
 	_toolbar.add_theme_constant_override("separation",8)
-	_toolbar.add_child(_button("Stadt",func(): teleport(State.SPAWN)))
-	_toolbar.add_child(_button("Modelle",func(): teleport(CATALOG_ORIGIN+Vector3(0,0.92,12))))
-	_toolbar.add_child(_button("Übung",func(): teleport(Vector3(0,0.92,-5.8))))
+	if campaign == null:
+		_toolbar.add_child(_button("Stadt",func(): teleport(State.SPAWN)))
+		_toolbar.add_child(_button("Modelle",func(): teleport(CATALOG_ORIGIN+Vector3(0,0.92,12))))
+		_toolbar.add_child(_button("Übung",func(): teleport(Vector3(0,0.92,-5.8))))
+	else:
+		_toolbar.add_child(_button("Zurück ins Dorf", _request_leave))
+		_wait_button = _button("1 Std. warten", _wait_at_market)
+		_toolbar.add_child(_wait_button)
 	_toolbar.add_child(_button("Pause",func(): set_paused(not paused)))
 	_safe.add_child(_toolbar)
 	_trade_bar = HBoxContainer.new()
@@ -525,10 +573,13 @@ func _build_ui() -> void:
 	var description := Label.new()
 	description.text = "Freie Testrunde\n\nWASD / linker Stick: bewegen\nShift / Gehen: Tempo wechseln\nRechte Maustaste / Wischen: umsehen\nLeertaste: Hieb · Q: Abwehr\n\nDiese Stadt startet keine Mission."
 	description.add_theme_font_size_override("font_size",17)
+	if campaign != null:
+		description.text = "Stadtmarkt\n\nDein Beutel gehört zur laufenden Kampagne. Gehe zu einem Händler, um seinen Stand zu öffnen."
 	column.add_child(description)
 	column.add_child(_button("Weiter erkunden",func(): set_paused(false)))
-	column.add_child(_button("Neues Leben · Geschichte beginnen",_request_story))
-	column.add_child(_button("Zum Hauptmenü",_request_leave))
+	if campaign == null:
+		column.add_child(_button("Neues Leben · Geschichte beginnen",_request_story))
+	column.add_child(_button("Zurück ins Dorf" if campaign != null else "Zum Hauptmenü",_request_leave))
 	_pause_panel.add_child(column)
 	_safe.add_child(_pause_panel)
 	_pause_panel.hide()
@@ -569,7 +620,7 @@ func _physics_process(delta: float) -> void:
 	if paused or market.is_open() or _tablet_dialog.visible:
 		return
 	_crowd_elapsed += delta
-	if _crowd_elapsed >= 0.2:
+	if campaign == null and _crowd_elapsed >= 0.2:
 		_crowd_elapsed = 0.0
 		crowd.tick(player.position)
 	_action_left = maxf(0,_action_left-delta)
@@ -675,12 +726,27 @@ func set_living_city_clock(clock: Dictionary) -> bool:
 	return true
 
 func _process(delta: float) -> void:
-	if living_city != null and not paused and not market.is_open() and not bool(living_city.last_sync.get("done", false)):
+	if campaign != null and living_city != null and not paused:
+		if not market.is_open() and not _tablet_dialog.visible:
+			_visit_elapsed += delta
+			var seconds := floori(_visit_elapsed)
+			if seconds > 0:
+				_visit_elapsed -= seconds
+				var moved: Dictionary = campaign.advance_city_visit(seconds)
+				if not moved.ok:
+					_market_message(str(moved.message))
+					set_paused(true)
+		var sync: Dictionary = market.sync_campaign()
+		_wait_button.disabled = not bool(sync.get("done", false))
+		_update_market_daylight()
+		_update_bakery()
+	elif living_city != null and not paused and not market.is_open() and not bool(living_city.last_sync.get("done", false)):
 		living_city.sync_to(_living_city_clock)
 	_catalog_elapsed += delta
 	if _catalog_elapsed>=0.15:
 		_catalog_elapsed = 0
-		_stream_catalog()
+		if campaign == null:
+			_stream_catalog()
 		_refresh_market_buttons()
 		_update_street_caption()
 	if paused or market.is_open():
@@ -689,6 +755,37 @@ func _process(delta: float) -> void:
 	if _save_elapsed>=30:
 		_save_elapsed = 0
 		save_state()
+
+func _update_bakery() -> void:
+	if is_instance_valid(_bakery):
+		_bakery.set_stock(int(living_city.life.state.businesses[_bakery_business].stock.bread))
+
+
+func _wait_at_market() -> void:
+	if campaign == null or living_city == null or paused or market.is_open() or _tablet_dialog.visible:
+		return
+	if not bool(living_city.last_sync.get("done", false)):
+		return
+	var result: Dictionary = campaign.advance_city_visit(3600)
+	if result.ok:
+		_wait_button.disabled = true
+		market.sync_campaign()
+		_update_market_daylight()
+	else:
+		_market_message(str(result.message))
+
+
+func _update_market_daylight() -> void:
+	var clock: Dictionary = campaign.data.calendar.clock
+	var minute := int(clock.jdn) * 1440 + floori(float(clock.second) / 60.0)
+	if minute == _solar_minute:
+		return
+	_solar_minute = minute
+	Daylight.apply_solar_time(float(clock.second) / 3600.0, Calendar.season_index(clock.jdn),
+		_market_sun, camera.environment, null)
+	_safe.get_node("Heading").text = "STADTMARKT · %s · %02d:%02d" % [
+		Calendar.format_date(clock.jdn), floori(float(clock.second) / 3600.0), minute % 60]
+
 
 func _place_camera(delta: float) -> void:
 	var anchor := player.position+Vector3(0,0.4,0)
@@ -800,6 +897,8 @@ func _open_market(inventory: bool) -> void:
 	player.velocity = Vector3.ZERO
 	figure.drive(0)
 	crowd.set_paused(true)
+	if resident_view:
+		resident_view.process_mode = Node.PROCESS_MODE_DISABLED
 	if is_instance_valid(ambient_people):
 		ambient_people.set_active(false)
 	var display := get_node_or_null("/root/RuntimeDisplay")
@@ -813,6 +912,8 @@ func _close_market() -> void:
 	if is_instance_valid(display):
 		display.set_sustained_paused(paused)
 	crowd.set_paused(paused)
+	if resident_view:
+		resident_view.process_mode = Node.PROCESS_MODE_DISABLED if paused else Node.PROCESS_MODE_INHERIT
 	if is_instance_valid(ambient_people):
 		ambient_people.set_active(not paused)
 
@@ -867,7 +968,8 @@ func perform_action(action: String) -> void:
 func set_paused(value: bool) -> void:
 	if market.is_open():
 		market.close()
-		return
+		if not value:
+			return
 	paused = value
 	var quality_monitor := get_node_or_null("/root/RuntimeDisplay")
 	if is_instance_valid(quality_monitor):
@@ -882,6 +984,8 @@ func set_paused(value: bool) -> void:
 		riding_trial.animation.active = not paused
 	figure.set_process(not paused and not _horse_mounted())
 	crowd.set_paused(paused)
+	if resident_view:
+		resident_view.process_mode = Node.PROCESS_MODE_DISABLED if paused else Node.PROCESS_MODE_INHERIT
 	if is_instance_valid(ambient_people):
 		ambient_people.set_active(not paused)
 	_pause_panel.visible = paused
@@ -920,6 +1024,14 @@ func _restore(state: Dictionary) -> void:
 	_pace.text = "Rennen" if _running else "Gehen"
 
 func save_state() -> Error:
+	if campaign != null:
+		if living_city == null:
+			return OK # Entry failed before a campaign market was attached.
+		var result: Dictionary = market.checkpoint_campaign()
+		if not result.ok:
+			_market_message(str(result.message))
+			return ERR_CANT_CREATE
+		return OK
 	if not persist:
 		return OK
 	var error := State.write(snapshot(),save_path)
@@ -940,13 +1052,15 @@ func _request_story() -> void:
 
 func _update_status() -> void:
 	var description := "Stadt · Modellpark · Gehen · Rennen · unbewaffnetes Übungstraining"
+	if campaign != null:
+		description = "Marktviertel · Gehe an einen Stand, um zu handeln."
 	if not _street_caption.is_empty():
 		description = _street_caption
 	if not training.available:
 		description += " · Trainingspfahl nicht verfügbar"
 	if not city_available:
 		description = "Stadtmodell ist noch nicht importiert."
-	elif not youth_available:
+	elif not youth_available and (campaign == null or (int(campaign.data.player.age) in range(12,18) and campaign.data.origin_id == "italia")):
 		description += " · ORIGINAL-MESHY-JUNGE FEHLT: Ersatzmodell aktiv"
 	if not _catalog_status.is_empty():
 		description += "\n"+_catalog_status
