@@ -162,6 +162,7 @@ def main():
             ("tribal_world", ["--script", "res://tests/tribal_world_test.gd"], "TRIBAL_WORLD_PASS"),
             ("tribal_save", ["--script", "res://tests/tribal_save_test.gd"], "TRIBAL_SAVE_PASS"),
             ("tribal_atlas", ["--fixed-fps", "60", "--script", "res://tests/tribal_atlas_test.gd"], "TRIBAL_ATLAS_PASS"),
+            ("world_state", ["--script", "res://tests/world_state_test.gd"], "WORLD_STATE_PASS"),
             ("figure_gallery", ["--fixed-fps", "60", "--script", "res://tests/figure_gallery_test.gd"], "failures=0 real_textures=true"),
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
             ("regional_workers", ["--fixed-fps", "60", "--script", "res://tests/regional_worker_test.gd"], "REGIONAL_WORKERS_PASS"),
