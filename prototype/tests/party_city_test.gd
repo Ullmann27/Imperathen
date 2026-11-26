@@ -67,3 +67,5 @@ func _visit() -> void:
 	await physics_frame
 	expect(father.get_parent() == village_parent and not father.is_inside_tree() and city.party_visit.passengers.is_empty(), "Der wartende Vater bleibt ohne zweite Darstellung am Dorfanker")
 	city._request_leave()
+	if errors.is_empty():
+		print("PARTY_CITY_PASS")

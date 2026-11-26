@@ -92,6 +92,8 @@ func _run() -> void:
 	print("MUSTER_MEASURE ", JSON.stringify({"initial_people": 69, "fixed_steps": 50, "cpu_usec": Time.get_ticks_usec() - begin, "mounted_move_m": d1, "dismounted_move_m": d2}))
 	await _ui(bench)
 	print("VALLEY_MUSTER_RESULT checks=%d failures=%d" % [tests, failures])
+	if failures == 0:
+		print("VALLEY_MUSTER_PASS")
 	quit(1 if failures else 0)
 
 
