@@ -78,26 +78,23 @@ func _start(entry: Dictionary, text: String, speaker_label: String, emitter: Nod
 	var stream: AudioStream = VoiceLines.stream_for(entry) if current.voiced else null
 	if stream != null:
 		_duration = stream.get_length()
-		# A dummy driver has no audible playback clock. The same decoded
-		# stream duration and face track still drive an offline scene.
-		if AudioServer.get_driver_name() != "Dummy":
-			if emitter != null:
-				var p3 := AudioStreamPlayer3D.new()
-				p3.unit_size = UNIT_SIZE
-				p3.max_distance = MAX_DISTANCE
-				p3.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
-				p3.attenuation_filter_cutoff_hz = 9000.0
-				p3.attenuation_filter_db = -6.0
-				p3.position = Vector3(0.0, mouth_height, 0.0)
-				emitter.add_child(p3)
-				_player = p3
-			else:
-				var p2 := AudioStreamPlayer.new()
-				add_child(p2)
-				_player = p2
-			_player.stream = stream
-			_player.bus = AudioBuses.VOICE
-			_player.play()
+		if emitter != null:
+			var p3 := AudioStreamPlayer3D.new()
+			p3.unit_size = UNIT_SIZE
+			p3.max_distance = MAX_DISTANCE
+			p3.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+			p3.attenuation_filter_cutoff_hz = 9000.0
+			p3.attenuation_filter_db = -6.0
+			p3.position = Vector3(0.0, mouth_height, 0.0)
+			emitter.add_child(p3)
+			_player = p3
+		else:
+			var p2 := AudioStreamPlayer.new()
+			add_child(p2)
+			_player = p2
+		_player.stream = stream
+		_player.bus = AudioBuses.VOICE
+		_player.play()
 		if is_instance_valid(face):
 			face.set_track(VoiceLines.viseme_track(entry), clock)
 	else:
@@ -139,9 +136,13 @@ func is_active() -> bool:
 
 ## Seconds since the line became audible (negative before that).
 func clock() -> float:
+	if not is_processing():
+		return _last_clock
 	var t := _frame_time
 	clock_source = "frame"
-	if _player != null and is_instance_valid(_player) and _player.playing:
+	# The dummy mixer still owns the stream for pause/resume and lifetime.
+	# Its wall clock cannot pace a fixed-step simulation without audio output.
+	if AudioServer.get_driver_name() != "Dummy" and is_instance_valid(_player) and _player.playing:
 		var pos: float = _player.get_playback_position()
 		if pos != _last_pos:
 			_last_pos = pos
