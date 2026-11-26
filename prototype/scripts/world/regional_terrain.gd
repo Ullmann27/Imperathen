@@ -4,6 +4,7 @@ extends Node3D
 
 const Plan = preload("res://scripts/world/world_stream_plan.gd")
 const Footpath = preload("res://scripts/world/regional_footpath.gd")
+const Quarry = preload("res://scripts/world/regional_quarry.gd")
 const GRID := 12
 const MESH_BUILD_BUDGET := 2
 const COLLIDER_BUILD_BUDGET := 2
@@ -180,6 +181,7 @@ func _make_sector(entry: Dictionary) -> Node3D:
 	mesh.material_override = _ground
 	node.add_child(mesh)
 	Footpath.add_entrance(node, Plan.SECTOR_SIZE_M)
+	Quarry.add_site(node, Plan.SECTOR_SIZE_M, surface_height)
 	return node
 
 
@@ -231,9 +233,11 @@ func _set_collision(node: Node3D, enabled: bool) -> void:
 		shape.shape = (node.get_node("Ground") as MeshInstance3D).mesh.create_trimesh_shape()
 		body.add_child(shape)
 		node.add_child(body)
+		Quarry.add_collision(node)
 	elif not enabled and collision != null:
 		node.remove_child(collision)
 		collision.free()
+		Quarry.remove_collision(node)
 
 
 func report() -> Dictionary:

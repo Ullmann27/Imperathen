@@ -7,6 +7,7 @@ const World = preload("res://scripts/world/game_world.gd")
 const Footpath = preload("res://scripts/world/regional_footpath.gd")
 const Plan = preload("res://scripts/world/world_stream_plan.gd")
 const Terrain = preload("res://scripts/world/regional_terrain.gd")
+const Quarry = preload("res://scripts/world/regional_quarry.gd")
 const Model = preload("res://scripts/domain/world_model.gd")
 const RIDING_REFERENCE_SPEED := 2.90
 const WAYPOINT_RADIUS := 0.20
@@ -43,8 +44,8 @@ func _run() -> void:
 		if place.id == "stone_quarry":
 			stone_quarry = place
 			break
-	_check(not stone_quarry.is_empty() and goal == _flat(Vector3(stone_quarry.position[0], 0, stone_quarry.position[2])) and stone_quarry.content_status == "planned",
-		"The route ends at the planned quarry's actual atlas position.")
+	_check(not stone_quarry.is_empty() and goal == _flat(Vector3(stone_quarry.position[0], 0, stone_quarry.position[2])) and stone_quarry.content_status == "visible_workplace",
+		"The route ends at the visible quarry's atlas position.")
 	_check(Footpath.map_points()[0] == [46.0, 0.0, -13.0] and first.x < 48 and Footpath.WAYPOINTS[1].x > 48,
 		"The drawn route crosses the authored eastern gate from inside Valdora.")
 	var foot: Dictionary = await _replay(world, body, terrain, World.WALK_SPEED, true)
@@ -54,6 +55,7 @@ func _run() -> void:
 	_check(float(mounted_reference.elapsed_seconds) >= 600.0 and float(mounted_reference.elapsed_seconds) <= 625.0, "Faster capsule stays near the 10-minute riding target.")
 	_check(absf(float(foot.elapsed_seconds) - float(mounted_reference.elapsed_seconds) * 2.0) <= 6.0,
 		"Both passes follow the same physical route.")
+	await _test_landmark(world, terrain, body.position)
 	var entrance_cells := terrain.find_children("EastGateFootpath", "MeshInstance3D", true, false)
 	_check(entrance_cells.is_empty(), "The entrance retires with its terrain cell.")
 	print("REGIONAL_FOOTPATH ", JSON.stringify({
@@ -125,7 +127,7 @@ func _replay(world: Node3D, body: CharacterBody3D, terrain: Node3D, speed: float
 				break
 	_check(crossed_gate, "The capsule crosses the physical eastern gate opening.")
 	_check(next_waypoint == Footpath.WAYPOINTS.size() and _flat(body.position).distance_to(finish) <= WAYPOINT_RADIUS,
-		"The capsule reaches the planned quarry anchor through every route waypoint.")
+		"The capsule reaches the quarry anchor through every route waypoint.")
 	_check(floor_losses == 0 and max_grid_height_error < 0.08,
 		"The capsule remains grounded on streamed terrain (lost contact=%d, greatest height delta=%.3f m)." % [floor_losses, max_grid_height_error])
 	_check(traversed.size() >= 8 and crossings >= 8, "The route crosses actual streamed sector boundaries.")
@@ -134,6 +136,37 @@ func _replay(world: Node3D, body: CharacterBody3D, terrain: Node3D, speed: float
 		"distance_m": snappedf(travelled, 0.01), "sector_crossings": crossings, "sectors": traversed.size(),
 		"ungrounded_frames": floor_losses, "max_ground_offset_error_m": snappedf(max_grid_height_error, 0.001),
 		"end_xz_m": [body.position.x, body.position.z]}
+
+
+func _test_landmark(world: Node3D, terrain: Node3D, arrival: Vector3) -> void:
+	for frame in 10:
+		terrain.follow(arrival, "low")
+		await physics_frame
+	var landmarks := terrain.find_children(Quarry.SITE_NAME, "Node3D", true, false)
+	_check(landmarks.size() == 1, "Both passes arrive at a single streamed quarry.")
+	if landmarks.size() != 1:
+		return
+	var site := landmarks[0] as Node3D
+	var point := Quarry.site_coordinates()
+	_check(absf(site.global_position.y - Terrain.surface_height(point) - 0.04) < 0.002,
+		"The quarry follows the real terrain height, not a fixed floor plane.")
+	var orientation := site.global_basis.x
+	var forward := Quarry.approach_direction()
+	_check(Vector2(orientation.x, orientation.z).dot(forward) > 0.999, "The open front faces the route.")
+	var visible_meshes := site.find_children("*", "MeshInstance3D", true, false)
+	_check(visible_meshes.size() >= 4, "The exported limestone, shelter and tools load as actual visible geometry.")
+	var body := site.get_node_or_null(Quarry.COLLISION_NAME) as StaticBody3D
+	_check(body != null, "The streamed limestone and objects provide active collision near the route.")
+	if body == null:
+		return
+	var space := world.get_world_3d().direct_space_state
+	var start := site.to_global(Vector3(-4, 1.1, 0))
+	var lane := PhysicsRayQueryParameters3D.create(start, site.to_global(Vector3(10.0, 1.55, 0)), 1)
+	var rock := PhysicsRayQueryParameters3D.create(start, site.to_global(Vector3(18.0, 1.75, 0)), 1)
+	_check(space.intersect_ray(lane).is_empty(), "The arrival corridor stays open past the work yard.")
+	_check(space.intersect_ray(rock).get("collider") == body, "The excavation wall physically stops the approach.")
+	print("REGIONAL_QUARRY ", JSON.stringify({"origin": [site.global_position.x, site.global_position.y, site.global_position.z],
+		"yaw_degrees": rad_to_deg(site.rotation.y), "visible_meshes": visible_meshes.size()}))
 
 
 func _stop_scene_updates(node: Node) -> void:

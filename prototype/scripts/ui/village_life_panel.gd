@@ -63,19 +63,22 @@ class RegionalMap extends Control:
 		for place: Dictionary in places:
 			var at := point(place.position)
 			var inhabited: bool = place.id == "home_village"
+			var workplace: bool = place.get("content_status", "") == "visible_workplace"
 			if inhabited:
 				draw_circle(at, 10.0, Color(Style.AURUM, 0.18))
 				Style.draw_diamond(self, at, 7.5, Color(0.05, 0.03, 0.02, 0.9))
 				Style.draw_diamond(self, at, 6.0, Style.AURUM)
+			elif workplace:
+				draw_circle(at, 4.2, Style.AERUGO.lightened(0.25))
 			else:
 				draw_circle(at, 4.0, Color(0.05, 0.04, 0.03, 0.9))
 				draw_circle(at, 2.8, Color(Style.STONE, 0.9))
-			if inhabited or place.id == "stone_quarry" or place.kind in ["town", "port", "fort"]:
+			if inhabited or workplace or place.kind in ["town", "port", "fort"]:
 				var caption := str(place.name)
 				var caption_size := 13 if inhabited else 11
 				var width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, caption_size).x
 				var origin := at + Vector2(9, -6)
-				if place.id == "stone_quarry":
+				if workplace:
 					origin.y -= 7.0
 				if origin.x + width > size.x - 8.0:
 					origin.x = at.x - 9.0 - width
@@ -477,5 +480,5 @@ static func _map(ui, column: VBoxContainer, data: Dictionary) -> void:
 	_text(ui, column, "32 × 32 km · neun Regionen · Gelände wird in Sektoren geladen", 18)
 	_text(ui, column, "Aktueller Ort: %s · %.0f / %.0f m" % [Plan.region_label(map.position_world), position[0], position[2]], 14)
 	var distance := String.num(Footpath.length_m() / 1000.0, 2).replace(".", ",")
-	_text(ui, column, "Osttor – Alter Steinbruch · %s km. Der ausgebaute Fußweg beginnt am Osttor. Steinbruch und weiterer Wegebau sind geplant." % distance, 14)
-	_text(ui, column, "Goldene Raute: bewohntes Grenzdorf. Türkise Linie: erkundbare Trasse. Blasse Orte und Verbindungen: geplante Siedlungen und Straßen.", 14, true)
+	_text(ui, column, "Osttor – Alter Steinbruch · %s km. Der Erdweg beginnt am Osttor. Der Steinbruch ist als sichtbarer Arbeitsplatz erreichbar." % distance, 14)
+	_text(ui, column, "Goldene Raute: bewohntes Grenzdorf. Türkise Linie: erkundbare Trasse zum Steinbruch. Blasse Orte und Verbindungen: geplante Siedlungen und Straßen.", 14, true)

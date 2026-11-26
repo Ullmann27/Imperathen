@@ -1,6 +1,6 @@
 # Valdoras Osttor und die Route zum Alten Steinbruch
 
-Die Regionalübersicht markiert die 1.780,99 m lange Trasse vom Osttor (46 / −13 m) zum Atlasanker des Alten Steinbruchs (1500 / −750 m). Am Tor führt ein sichtbarer 44 m langer Erdweg über den bestehenden Dorf- und Kollisionsboden. Dahinter geht die Trasse über die bereits gestreamten Geländezellen. Die Regionalkarte zeigt ihren Verlauf und bezeichnet den Steinbruch als geplanten Zielort.
+Die Regionalübersicht markiert die 1.780,99 m lange Trasse vom Osttor (46 / −13 m) zum Atlasanker des Alten Steinbruchs (1500 / −750 m). Am Tor führt ein sichtbarer 44 m langer Erdweg über den bestehenden Dorf- und Kollisionsboden. Dahinter geht die Trasse über die bereits gestreamten Geländezellen. Die Regionalkarte zeigt ihren Verlauf und markiert den Alten Steinbruch als sichtbaren Arbeitsplatz. Kalksteinbruch, Unterstand und behauene Blöcke folgen der Hangneigung. Ein freier Anmarsch vor der modellierten Anlage führt über den bestehenden Geländeboden. Abbau und Handel werden hier noch nicht simuliert.
 
 Valdora ist die bewohnte Einstiegssiedlung dieser Geländewelt. Die Aquileia-Inszenierung der Einleitung und die Rom-Stadtansicht verwenden eigene Szenen. Die vorhandenen Atlasorte stellen keinen durchgehenden Weg zwischen diesen Städten bereit.
 
@@ -14,6 +14,8 @@ Valdora ist die bewohnte Einstiegssiedlung dieser Geländewelt. Die Aquileia-Ins
 Beide Durchgänge erreichen alle neun Wegpunkte, bleiben über neun Sektorwechsel am Boden und enden weniger als 20 cm vom Zielpunkt entfernt. Das Reittempo ist ein Richtwert für die Geländephysik. Es verwendet dieselbe Kapsel mit einer festen Zielgeschwindigkeit. Für die Gehzeit sind Beschleunigung, Steuerung und Gelände bereits berücksichtigt.
 
 Die Zeiten zählen Spiel-Physikschritte. In der Kindheit läuft die technische Simulationszeit während des Spielens mit. Der historische Kalender schreitet in diesem Abschnitt bei erzählten Ereignissen fort. Der Test verwendet einen frischen Zustand ohne Speichern.
+
+Die Steinbruchgeometrie wird einmalig in ihrer Geländezelle bei (1503,103 / 76,496 / −752,524 m) und rund 39,13° Drehung geladen. Die Kollisionskörper sind nur im Nahbereich aktiv. Der Test prüft den freien Anmarsch sowie die Kollision an der Abbauwand mit Strahlen im tatsächlichen Godot-Gelände.
 
 ```sh
 IMPERATHEN_ISOLATED_TEST=1 godot --headless --path prototype --fixed-fps 60 --script res://tests/regional_footpath_test.gd
