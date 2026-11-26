@@ -15,13 +15,14 @@ extends RefCounted
 ## ("vil:marcus" -> "pc:companion") and the tribal target "player" ("pc:player").
 ## Ages are never stored here: they derive from the world clock (world_clock.gd).
 
+const CityWatch = preload("res://scripts/domain/city_watch.gd")
 const Clock = preload("res://scripts/domain/world_clock.gd")
 const Calendar = preload("res://scripts/domain/world_calendar.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const VillageLife = preload("res://scripts/story/village_life.gd")
 const Frontier = preload("res://scripts/story/frontier_chapter.gd")
 const WorldState = preload("res://scripts/domain/world_state.gd")
-const NAMESPACES := ["pc", "vil", "frt", "trb", "sol"]
+const NAMESPACES := ["pc", "vil", "frt", "trb", "sol", "lev"]
 const ID_PATTERN := "^[a-z0-9_]{1,64}$"
 
 
@@ -34,6 +35,16 @@ static func split(global: String) -> Array:
 	if index <= 0:
 		return []
 	return [global.substr(0, index), global.substr(index + 1)]
+
+
+## Stable identity for the regional prototype's previously anonymous residents.
+## A named villager keeps the same UID when assigned to the watch.
+static func patrol_uid(world: Dictionary, index: int) -> String:
+	if index < 0 or index >= int(world.squad.recruits):
+		return ""
+	if world.village.enabled:
+		return global_id("vil", str(world.village.militia[index]))
+	return global_id("lev","volunteer_%d" % (index+1))
 
 
 ## Every person of the world, keyed by global id. Pure; reads the owning modules.
@@ -59,6 +70,11 @@ static func collect(world: Dictionary) -> Dictionary:
 	elif not world.get("frontier", {}).is_empty():
 		for id: String in Frontier.NPCS:
 			people[global_id("frt", id)] = {"name": str(Frontier.NPCS[id].get("name", id)), "source": "frontier", "local_id": id, "alive": true, "age": -1}
+	if not village.get("enabled",false):
+		for index in int(world.get("squad",{}).get("recruits",0)):
+			var uid := patrol_uid(world,index)
+			people[uid] = {"name":"Freiwilliger %d" % (index+1),"source":"regional_watch","local_id":split(uid)[1],
+				"alive":index >= int(world.squad.recruits) - int(world.squad.alive),"age":-1}
 	var tribes: Dictionary = world.get("tribes", {})
 	for pid: String in tribes.get("persons", {}):
 		var person: Dictionary = tribes.persons[pid]
@@ -69,6 +85,10 @@ static func collect(world: Dictionary) -> Dictionary:
 	for record: Dictionary in WorldState.soldiers(world) if world.has("world_state") else []:
 		people[global_id("sol", str(record.uid))] = {"name": str(record.name), "source": "soldier", "local_id": str(record.uid),
 			"alive": str(record.status) != "dead", "status": str(record.status), "troop_id": str(record.troop_id), "age": soldier_age(world, record)}
+	if world.get("world_state",{}).has("city") or world.get("world_state",{}).get("politics",{}).has("street_watch"):
+		for record: Dictionary in CityWatch.roster(world):
+			people[global_id("sol",record.uid)] = {"name":record.name,"source":"market_detachment","local_id":record.uid,
+				"alive":true,"status":record.status,"troop_id":record.troop_id,"age":record.age}
 	return {"people": people, "aliases": aliases}
 
 

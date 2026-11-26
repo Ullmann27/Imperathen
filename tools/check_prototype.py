@@ -101,6 +101,7 @@ def main():
             ("city_campaign_trade", ["--script", "res://tests/city_campaign_trade_test.gd"], "CITY_CAMPAIGN_TRADE_PASS"),
             ("campaign_market_visit", ["--fixed-fps", "60", "--script", "res://tests/campaign_market_visit_test.gd"], "CAMPAIGN_MARKET_VISIT_PASS"),
             ("quarter_street_walk", ["--fixed-fps", "60", "--script", "res://tests/quarter_street_walk_test.gd"], "QUARTER_STREET_WALK_PASS"),
+            ("resident_footwear", ["--script", "res://tests/resident_footwear_test.gd"], "RESIDENT_FOOTWEAR_PASS"),
             ("city_life", ["--script", "res://tests/city_life_test.gd"], "CITY_LIFE_PASS"),
             ("city_inventory_ui", ["--fixed-fps", "60", "--script", "res://tests/city_inventory_ui_test.gd"], "CITY_INVENTORY_UI_PASS"),
             ("city_character_detail", ["--fixed-fps", "60", "--script", "res://tests/city_character_detail_test.gd"], "0 failures"),
@@ -180,6 +181,7 @@ def main():
             ("soldier_visuals", ["--script", "res://tests/soldier_visual_test.gd"], "0 failed"),
             ("soldier_gait", ["--fixed-fps", "60", "--script", "res://tests/soldier_gait_test.gd"], "failures=0"),
             ("village_people", ["--fixed-fps", "60", "--script", "res://tests/village_person_test.gd"], "checks, 0 failed"),
+            ("youth_outfit_skin", ["--script", "res://tests/youth_outfit_skin_test.gd"], "YOUTH_OUTFIT_SKIN_PASS"),
             ("youth_outfit", ["--script", "res://tests/youth_outfit_test.gd"], "YOUTH_OUTFIT_PASS"),
             ("meshy_registry", ["--script", "res://tests/meshy_asset_registry_test.gd"], "MESHY_ASSET_REGISTRY"),
             ("meshy_characters", ["--fixed-fps", "60", "--script", "res://tests/meshy_character_test.gd"], "MESHY_CHARACTERS_PASS"),
@@ -203,6 +205,21 @@ def main():
             ("tribal_world", ["--script", "res://tests/tribal_world_test.gd"], "TRIBAL_WORLD_PASS"),
             ("tribal_save", ["--script", "res://tests/tribal_save_test.gd"], "TRIBAL_SAVE_PASS"),
             ("tribal_atlas", ["--fixed-fps", "60", "--script", "res://tests/tribal_atlas_test.gd"], "TRIBAL_ATLAS_PASS"),
+            ("party_transactions", ["--fixed-fps", "60", "--script", "res://tests/party_transactions_test.gd"], "PARTY_TRANSACTIONS_PASS"),
+            ("party_world", ["--fixed-fps", "60", "--script", "res://tests/party_world_test.gd"], "failures=0"),
+            ("party_city", ["--fixed-fps", "60", "--script", "res://tests/party_city_test.gd"], "CAMPAIGN_MARKET_VISIT_PASS"),
+            ("party_ui", ["--fixed-fps", "60", "--script", "res://tests/party_ui_test.gd"], "PARTY_UI_PASS"),
+            ("adult_path", ["--fixed-fps", "60", "--script", "res://tests/adult_path_test.gd"], "failures=0"),
+            ("valley_muster", ["--fixed-fps", "60", "--script", "res://tests/valley_muster_test.gd"], "failures=0"),
+            ("legio_objects", ["--fixed-fps", "60", "--script", "res://tests/legio_objects_test.gd"], "failures=0"),
+            ("party_reconciliation", ["--fixed-fps", "60", "--script", "res://tests/party_reconciliation_test.gd"], "failures=0"),
+            ("regional_freight", ["--fixed-fps", "60", "--script", "res://tests/regional_freight_test.gd"], "REGIONAL_FREIGHT"),
+            ("legio_art", ["--fixed-fps", "60", "--script", "res://tests/legio_art_test.gd"], "failures=0"),
+            ("city_watch", ["--fixed-fps", "60", "--script", "res://tests/city_watch_test.gd"], "\"failures\":[]"),
+            ("waystation_journey", ["--fixed-fps", "60", "--script", "res://tests/waystation_journey_test.gd"], "CAMPAIGN_MARKET_VISIT_PASS"),
+            ("party_aftermath", ["--fixed-fps", "60", "--script", "res://tests/party_aftermath_test.gd"], "failures=0"),
+            ("party_conversations", ["--fixed-fps", "60", "--script", "res://tests/party_conversations_test.gd"], '"failures":[]'),
+            ("campaign_allegiance", ["--fixed-fps", "60", "--script", "res://tests/campaign_allegiance_test.gd"], "CAMPAIGN_ALLEGIANCE_PASS"),
             ("world_state", ["--script", "res://tests/world_state_test.gd"], "WORLD_STATE_PASS"),
             ("figure_gallery", ["--fixed-fps", "60", "--script", "res://tests/figure_gallery_test.gd"], "failures=0 real_textures=true"),
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
@@ -252,7 +269,9 @@ def main():
         else:
             # Import and motion fingerprint the entire project. The landscape
             # probe also has a wall-clock deadline measured on an idle host.
-            exclusive = {"import", "landscape", "motion_measurement"}
+            # CityLife also checks a wall-clock budget for individual simulation
+            # slices; a competing Godot test changes that measurement.
+            exclusive = {"import", "landscape", "motion_measurement", "city_life"}
             with ThreadPoolExecutor(max_workers=args.jobs) as pool:
                 for solo, batch in groupby(checks, key=lambda check: check[0] in exclusive):
                     results = map(execute, batch) if solo else pool.map(execute, batch)

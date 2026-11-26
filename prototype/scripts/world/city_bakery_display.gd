@@ -19,12 +19,19 @@ func install(city: Node3D) -> bool:
 	if surface < 0:
 		return false
 	var dressing := KIT.instantiate() as Node3D
+	var crust: StandardMaterial3D
 	for index in 6:
 		var loaf := dressing.find_child("Panis_%02d" % index, true, false) as MeshInstance3D
 		if loaf == null:
 			loaves.clear()
 			dressing.free()
 			return false
+		if index == 0:
+			# The GLB has linear COLOR_0 values for crust and cut marks.
+			# Godot 4.7.2 imports this material with vertex colour disabled.
+			crust = loaf.get_active_material(0).duplicate() as StandardMaterial3D
+			crust.vertex_color_use_as_albedo = true
+		loaf.set_surface_override_material(0, crust)
 		loaves.append(loaf)
 	# The ochre surface consists exclusively of the old twelve cylinders.
 	# Keep the shared market prototype intact for every other stand.

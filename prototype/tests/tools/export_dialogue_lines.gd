@@ -23,6 +23,8 @@ func _initialize() -> void:
 		_add("I-00", "I-00." + str(beat.id), str(beat.speaker), str(beat.text), "opening_story.historical_prologue")
 	var home: Dictionary = Opening.childhood()
 	for beat: Dictionary in home.beats:
+		if beat.get("await_choice", false) or beat.get("silent", false):
+			continue
 		_add("I-01", "I-01." + str(beat.id), str(beat.speaker), str(beat.text), "opening_story.childhood")
 	for mission: Dictionary in MissionData.mission_files("band1"):
 		var mission_id := str(mission.mission)

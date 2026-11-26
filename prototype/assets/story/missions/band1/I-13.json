@@ -18,5 +18,20 @@
       "text": "»Wir zählen keine Schatten. Wir zählen Menschen. Wer fehlt, fehlt auch morgen noch an seinem Arbeitsplatz.«",
       "result": "Der Morgen übernimmt die tatsächlichen Personen- und Verlustzustände der Nacht."
     }
-  ]
+  ],
+  "party_tasks": {
+    "source": "Kreative Erweiterung zu I-13 · freiwillige Hilfe am Ort des bestehenden Missionsschritts",
+    "steps": {
+      "i13_morning": {
+        "aid": [
+          "healing",
+          "hält mit Aurelia fest, welche Verletzten Hilfe brauchen"
+        ],
+        "watch": [
+          "perception",
+          "zählt mit Aurelia die leeren Arbeitsplätze nach"
+        ]
+      }
+    }
+  }
 }

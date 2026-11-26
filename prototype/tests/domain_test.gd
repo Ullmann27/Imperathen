@@ -189,8 +189,9 @@ func _test_age_training_and_recruitment() -> void:
 		_check(model.execute("recruit").ok, "Recruitment within the limit succeeds")
 	_check(model.data.squad.alive == 3 and model.data.population.workers == 1, "Three actual workers became three soldiers")
 	_check(model.data.resources.denarii == 15 and model.data.resources.grain == 6, "Recruitment costs conserve money and food")
+	_check(model.execute("recruit").ok and model.data.population.workers == 0, "The fourth actual resident can volunteer")
 	after = _snapshot(model)
-	_check(not model.execute("recruit").ok and _snapshot(model) == after, "Fourth recruit rejected without a partial charge")
+	_check(not model.execute("recruit").ok and _snapshot(model) == after, "Exhausted workforce refuses a fifth recruitment atomically")
 
 
 func _test_combat_and_persistent_losses() -> void:

@@ -267,6 +267,8 @@ func _configure_source(actor: SourcePerson, path: String) -> void:
 	actor.set_process(false)
 	actor._check_lod = 100000.0
 	if path.contains("hero_quality_") or path.contains("hero_meshy_italia_"):
+		if path.contains("hero_meshy_italia_civil_"):
+			actor.configure_meshy_youth(true, "civil")
 		actor.configure("player","italia",12)
 	elif path.contains("frontier_"):
 		var identity := path.get_file().trim_prefix("frontier_").get_basename()
@@ -431,7 +433,7 @@ func _person_family(family: Dictionary) -> void:
 				# The skin fixture includes this real embedded skinned kit in
 				# every pose, so its worst-case tearing bound is also observed.
 				_observe(measured,path,"military_equipment",int(clip.sample_count),bool(clip.finite),{"skin_edge_violations":metrics.skin_edge_violations})
-		if family.id in ["hero", "original_youth"]:
+		if family.id in ["hero", "original_youth", "civil_youth"]:
 			for action: String in Motion.TECHNIQUES:
 				var duration: float = Motion.TIMING[action].z
 				var sampler := func(phase: float) -> void:
@@ -618,7 +620,7 @@ func _run() -> void:
 		if family.status=="active" and family.profile in ["human","animal"]:
 			for path: String in family.resources:
 				_raw_asset(path)
-		if family.id in ["hero", "original_youth", "frontier_people", "legacy_people", "meshy_people", "regional_workers"]:
+		if family.id in ["hero", "original_youth", "civil_youth", "frontier_people", "legacy_people", "meshy_people", "regional_workers"]:
 			await _person_family(family)
 		elif family.id=="battle_rigs":
 			await _battle_family(family)

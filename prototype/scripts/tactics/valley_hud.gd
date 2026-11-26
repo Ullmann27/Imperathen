@@ -13,11 +13,14 @@ var status := Label.new()
 var heading := Label.new()
 const PROFILE_KEYS := ["low", "balanced", "high", "very_high"]
 const MOVEMENT_ORDERS := {"move":"Marschieren","hold":"Halten","follow":"Folgen","advance":"Vorrücken","fall_back":"Zurückfallen",
-	"face":"Ausrichten","defend":"Verteidigen","attack_move":"Angriffsmarsch","retreat":"Rückzug","rally":"Sammeln","reserve":"Reserve"}
+	"face":"Ausrichten","defend":"Verteidigen","attack_move":"Angriffsmarsch","retreat":"Rückzug","rally":"Sammeln","reserve":"Reserve", "mount":"Aufsteigen", "dismount":"Absitzen"}
 const COMBAT_ORDERS := {"attack":"Angriff","charge":"Sturmangriff","flank":"Flanke","pila":"Pila werfen",
 	"focus_fire":"Feuer bündeln","fire_at_will":"Feuer frei","cease_fire":"Feuer einstellen"}
 ## Menu rows at least as tall as the 44 px base buttons, so orders stay tappable.
 const MENU_ROW_SPACING := 22
+var rolls := AcceptDialog.new()
+var roll_text := RichTextLabel.new()
+var muster_button: MenuButton
 var quality_picker := OptionButton.new()
 var pause_button: Button
 var probe_step := -1
@@ -59,6 +62,13 @@ func _ready() -> void:
 	_scroll_row(body,command_row)
 	group_button = _button(cards,"Gruppe +","multi")
 	group_button.toggle_mode = true
+	rolls.title = "Musterrolle"
+	rolls.ok_button_text = "Schließen"
+	roll_text.fit_content = false
+	roll_text.scroll_active = true
+	roll_text.add_theme_font_size_override("normal_font_size", 16)
+	rolls.add_child(roll_text)
+	add_child(rolls)
 	add_child(marquee)
 	marquee.visible = false
 	marquee.color = Color(0.8,0.68,0.38,0.28)
@@ -67,13 +77,17 @@ func _ready() -> void:
 	_resize()
 
 func populate(model) -> void:
-	for id in model.squads:
-		var s: Dictionary = model.squads[id]
+	for s: Dictionary in model.squads.values():
 		if s.side == "ally":
-			var card := _button(cards,s.name,"select",id)
-			card.toggle_mode = true
-			card_by_id[id] = card
-	_menu(command_row,"Verband",{"talwache_front":"Linienverband","talwache_support":"Unterstützung","talwache":"Gesamte Legion"},"group")
+			add_company(s)
+	if model.scenario.has("contracts"):
+		var offers := {}
+		for id: String in model.Muster.OFFERS:
+			var offer: Dictionary = model.Muster.OFFERS[id]
+			offers[id] = "%s · %d Personen · %d Denare" % [offer.title, offer.count, offer.cost.denarii]
+		muster_button = _menu(command_row, "Aufgebot", offers, "muster")
+	_menu(command_row,"Verband",{"talwache_front":"Linienverband","talwache_support":"Unterstützung","talwache":"Gesamtes Aufgebot"},"group")
+	_button(command_row, "Musterrolle", "rolls")
 	_menu(command_row,"Formation",model.SHAPES,"form")
 	_menu(command_row,"Bewegung",MOVEMENT_ORDERS,"command")
 	_menu(command_row,"Kampf",COMBAT_ORDERS,"command")
@@ -88,6 +102,31 @@ func populate(model) -> void:
 	_button(command_row,"−","zoom_out")
 	_button(command_row,"+","zoom_in")
 	_resize()
+
+func add_company(s: Dictionary) -> void:
+	var card := _button(cards, s.name, "select", s.id)
+	card.toggle_mode = true
+	card_by_id[s.id] = card
+
+
+func show_rolls(model) -> void:
+	var lines := PackedStringArray()
+	var catalog: Dictionary = model.Catalog.load_default()
+	var army: Dictionary = model.hierarchy().talwache
+	lines.append("%s · %s" % [army.name, model.Catalog.year_label(model.year)])
+	for group: Dictionary in army.groups:
+		for company: Dictionary in group.companies:
+			lines.append("\n%s · %s" % [company.name, catalog.troops[company.troop_id].name])
+			lines.append("Soll %d · Anwesend %d · Einsatzbereit %d · Verwundet %d · Gefallen %d" % [
+				company.target_strength, company.strength + company.wounded, company.available, company.wounded, company.dead])
+			var officer: Dictionary = model.soldier_record(company.officer)
+			lines.append("Führung: %s · Ausbildung: %s" % [officer.get("name", "unbesetzt"), company.tiers.training.capitalize()])
+	lines.append("\nOrganisationsformen der Epoche")
+	for entry: Dictionary in model.Catalog.organization_options(catalog, "roman", model.year):
+		lines.append("%s · %s" % [entry.name, entry.function])
+	roll_text.text = "\n".join(lines)
+	rolls.popup_centered_ratio(0.82)
+
 
 func report_ready(step: int) -> void:
 	if not OS.is_debug_build():
@@ -111,7 +150,18 @@ func refresh(model, selected: Array, paused: bool, rate: float, message: String)
 			var card: Button = card_by_id[s.id]
 			card.set_pressed_no_signal(s.id in selected)
 			card.text = "%s · %d" % [s.name,s.strength]
-	heading.text = "TALWACHT   ·   %d:%02d   ·   Legion %d   /   Stämme %d" % [floori((model.DEFENCE_SECONDS-model.steps*model.STEP)/60.0),int(model.DEFENCE_SECONDS-model.steps*model.STEP)%60,counts.ally,counts.enemy]
+	if muster_button != null:
+		muster_button.disabled = model.steps > 0 or not paused
+		var depot: Dictionary = model.Muster.remaining(model.scenario.contracts)
+		muster_button.text = "Aufgebot · %d Denare" % depot.denarii
+		var popup := muster_button.get_popup()
+		for index in popup.item_count:
+			var id: String = popup.get_item_metadata(index)
+			var available: bool = not id in model.scenario.contracts
+			for key in model.Muster.OFFERS[id].cost:
+				available = available and depot[key] >= model.Muster.OFFERS[id].cost[key]
+			popup.set_item_disabled(index, not available)
+	heading.text = "TALWACHT   ·   %d:%02d   ·   Talwache %d   /   Höhenbund %d" % [floori((model.DEFENCE_SECONDS-model.steps*model.STEP)/60.0),int(model.DEFENCE_SECONDS-model.steps*model.STEP)%60,counts.ally,counts.enemy]
 	pause_button.text = "Fortsetzen" if paused else "Pause"
 	var outcome_labels := {"victory":"Sieg der Grenzlegion","defeat":"Die Talstraße ist verloren","draw":"Unentschieden"}
 	if model.outcome != "ongoing":
@@ -152,7 +202,7 @@ func _scroll_row(body: Control,row: HBoxContainer) -> void:
 	body.add_child(scroll)
 	scroll.add_child(row)
 
-func _menu(row: Control,caption: String,labels: Dictionary,action: String) -> void:
+func _menu(row: Control,caption: String,labels: Dictionary,action: String) -> MenuButton:
 	var button := MenuButton.new()
 	button.text = caption + " ▾"
 	button.custom_minimum_size = Vector2(104,40)
@@ -164,3 +214,4 @@ func _menu(row: Control,caption: String,labels: Dictionary,action: String) -> vo
 		popup.add_item(labels[id])
 		popup.set_item_metadata(popup.item_count-1,id)
 	popup.index_pressed.connect(func(i): requested.emit(action,popup.get_item_metadata(i)))
+	return button

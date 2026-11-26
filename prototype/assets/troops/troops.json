@@ -57,6 +57,16 @@
     "own_means": "Erwerb aus eigenem Wohlstand, Handel oder Handwerk.",
     "kin_status": "Stellung der Familie (Designannahme)."
   },
+  "organizations": [
+    {"id":"republic_tent", "name":"Contubernium", "culture":"roman", "valid_from":-105, "valid_to":-31, "parent":"republic_century", "function":"Gemeinsame Unterkunft, Verpflegung und Gepäck.", "source":"Rekonstruktion für die republikanische Kampagne; keine feste Kopfzahl."},
+    {"id":"republic_century", "name":"Centurie", "culture":"roman", "valid_from":-105, "valid_to":-31, "parent":"republic_cohort", "function":"Infanterie unter einem Centurio mit Stellvertretung und Feldzeichen.", "source":"Caes. Gall. 2,25"},
+    {"id":"republic_cohort", "name":"Kohorte", "culture":"roman", "valid_from":-105, "valid_to":-31, "parent":"republic_legion", "function":"Mehrere Centurien; Unterstärke und abkommandierte Teile werden getrennt erfasst.", "source":"Caes. civ. 3,88–89"},
+    {"id":"republic_legion", "name":"Legion", "culture":"roman", "valid_from":-105, "valid_to":-31, "parent":"", "function":"Aufgebot aus Kohorten, mit separat unterstellten Hilfskontingenten.", "source":"Caes. civ. 3,88–89"},
+    {"id":"republic_auxilia", "name":"Verbündetes Kontingent", "culture":"roman", "valid_from":-105, "valid_to":-31, "parent":"", "function":"Zeitweise unterstellte Reiter, Kundschafter oder Schützen mit eigener Herkunft.", "source":"Caes. Gall. 1,15; 2,7"},
+    {"id":"rhine_following", "name":"Gefolge", "culture":"germanic", "valid_from":-120, "valid_to":200, "parent":"", "function":"Persönliche Bindung an örtliche Anführer; Zusammensetzung folgt der Gemeinschaft.", "source":"Caes. Gall. 6,23; regionale Spielrekonstruktion"},
+    {"id":"aeduian_horse", "name":"Haeduisches Reiterkontingent", "culture":"gallic", "valid_from":-58, "valid_to":-31, "parent":"", "function":"Aufgebot aus den Reitern der Verbündeten.", "source":"Caes. Gall. 1,15; 1,18"},
+    {"id":"principate_aux_cohort", "name":"Auxiliarkohorte des Prinzipats", "culture":"roman", "valid_from":9, "valid_to":200, "parent":"", "function":"Eigener Truppenkörper. Anwesende, Abkommandierte und Dienstfähige werden unterschieden.", "source":"Tab. Vindol. 154 (cohors I Tungrorum)"}
+  ],
   "appointments": [
     {"appointment_id": "legatus", "name": "Legat", "culture": "roman", "valid_from": -200, "valid_to": 300, "command_scope": "army",
      "attestation": "attested", "sources": [{"ref": "Caes. Gall. 1,10", "note": "T. Labienus legatus", "verified": false}]},
@@ -320,7 +330,7 @@
       "valid_to": -31,
       "tier": 3,
       "role": "cavalry",
-      "battle_kind": "",
+      "battle_kind": "cavalry",
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 1, "q_max": 3},
         "sidearm": {"family_id": "sword_long", "q_min": 1, "q_max": 3},
@@ -330,12 +340,12 @@
       },
       "drills": {"dismount": 1},
       "upgrades": [],
-      "visual": {"battle_role": "", "meshy_loadout": ""},
+      "visual": {"battle_role": "cavalry", "meshy_loadout": ""},
       "attestation": "attested",
-      "notes": "Belegt ab dem Feldzug 58 v. Chr.; frühere Dienste sind plausibel, aber nicht übernommen. Reiter sind in der Gefechtssimulation noch nicht aktiv.",
+      "notes": "Belegt ab dem Feldzug 58 v. Chr.; frühere Dienste sind plausibel, aber nicht übernommen.",
       "sources": [
-        {"ref": "Caes. Gall. 1,15", "note": "equitatus aus der Provinz und von den Haeduern", "verified": false},
-        {"ref": "Caes. Gall. 1,18", "note": "Dumnorix führt die haeduische Reiterei", "verified": false}
+        {"ref": "Caes. Gall. 1,15", "note": "equitatus aus der Provinz und von den Haeduern", "verified": true},
+        {"ref": "Caes. Gall. 1,18", "note": "Dumnorix führt die haeduische Reiterei", "verified": true}
       ]
     },
     {
@@ -558,7 +568,7 @@
       "valid_to": 400,
       "tier": 4,
       "role": "cavalry",
-      "battle_kind": "",
+      "battle_kind": "cavalry",
       "requires": {"materials": {"horse": 4}},
       "max_share": 0.2,
       "loadout": {
@@ -569,12 +579,12 @@
       },
       "drills": {"dismount": 2},
       "upgrades": [],
-      "visual": {"battle_role": "", "meshy_loadout": "germanic_mounted_retainer"},
+      "visual": {"battle_role": "cavalry", "meshy_loadout": "germanic_mounted_retainer"},
       "attestation": "attested",
-      "notes": "Ohne Sattel (Caes. Gall. 4,2); sitzen ab und kämpfen zu Fuß. Reiter sind in der Simulation noch nicht aktiv.",
+      "notes": "Ohne Sattel (Caes. Gall. 4,2); sitzen ab und kämpfen zu Fuß.",
       "sources": [
-        {"ref": "Caes. Gall. 1,48", "note": "Reiterei des Ariovist", "verified": false},
-        {"ref": "Caes. Gall. 4,2", "note": "ex equis desiliunt; ephippiis uti turpe", "verified": false}
+        {"ref": "Caes. Gall. 1,48", "note": "Reiterei des Ariovist", "verified": true},
+        {"ref": "Caes. Gall. 4,2", "note": "ex equis desiliunt; ephippiis uti turpe", "verified": true}
       ],
       "external_ids": {"tribal_world": ["reiter"]}
     },
@@ -615,7 +625,7 @@
       "valid_to": -31,
       "tier": 4,
       "role": "cavalry",
-      "battle_kind": "",
+      "battle_kind": "cavalry",
       "loadout": {
         "main_hand": {"family_id": "spear", "q_min": 2, "q_max": 3},
         "shield": {"family_id": "shield_round", "q_min": 2, "q_max": 3},
@@ -624,12 +634,12 @@
       },
       "drills": {"dismount": 2},
       "upgrades": [],
-      "visual": {"battle_role": "", "meshy_loadout": "germanic_mounted_retainer"},
+      "visual": {"battle_role": "cavalry", "meshy_loadout": "germanic_mounted_retainer"},
       "attestation": "attested",
       "notes": "Germanische Gruppen als Verbündete Roms: Caesar holt 52 v. Chr. Reiter und Leichtbewaffnete von rechtsrheinischen Gemeinwesen.",
       "sources": [
-        {"ref": "Caes. Gall. 7,65", "note": "equites et levis armaturae pedites aus Germanien", "verified": false},
-        {"ref": "Caes. Gall. 7,80", "note": "Entscheidung durch germanische Reiter", "verified": false}
+        {"ref": "Caes. Gall. 7,65", "note": "equites et levis armaturae pedites aus Germanien", "verified": true},
+        {"ref": "Caes. Gall. 7,80", "note": "Entscheidung durch germanische Reiter", "verified": true}
       ]
     },
     {

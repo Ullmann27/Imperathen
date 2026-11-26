@@ -25,10 +25,13 @@ const Roster = preload("res://scripts/battle/soldier_roster.gd")
 const Relations = preload("res://scripts/domain/actor_relations.gd")
 const Life = preload("res://scripts/battle/soldier_life.gd")
 const Politics = preload("res://scripts/domain/valdora_politics.gd")
+const Allegiance = preload("res://scripts/domain/campaign_allegiance.gd")
+const Party = preload("res://scripts/domain/travel_party.gd")
 const CityCheckpoint = preload("res://scripts/domain/city_checkpoint.gd")
-const VERSION := 2
+const VERSION := 3
 const LEGACY_KEYS := ["version", "time", "raids", "military"]
-const KEYS := LEGACY_KEYS + ["politics"]
+const POLITICAL_KEYS := LEGACY_KEYS + ["politics"]
+const KEYS := POLITICAL_KEYS + ["party"]
 const RAID_STATUS := ["committed", "booked", "no_band"]
 ## Balance value (central): a promoted soldier serves a season in grade first.
 const MIN_DAYS_IN_GRADE := 90
@@ -37,7 +40,7 @@ const MAX_PROMOTIONS := 512
 
 
 static func new_state() -> Dictionary:
-	return {"version": VERSION, "time": {}, "raids": {}, "politics": Politics.new_state(),
+	return {"version": VERSION, "time": {}, "raids": {}, "politics": Politics.new_state(), "party":Party.initial(),
 		"military": {"battle_start_jdn": -1, "battle_end_jdn": -1, "promotions": []}}
 
 
@@ -45,7 +48,11 @@ static func migrate(world: Dictionary) -> void:
 	var state: Variant = world.get("world_state")
 	if _keys(state, LEGACY_KEYS) and _int(state.version, 1, 1):
 		state.politics = Politics.new_state()
+		state.version = 2
+	if (_keys(state, POLITICAL_KEYS) or _keys(state, POLITICAL_KEYS + ["city"])) and _int(state.version, 2, 2):
+		state.party = Party.initial()
 		state.version = VERSION
+		Party.migrate_legacy(world)
 
 
 # --- raids: village <-> tribal ledger -------------------------------------------------
@@ -319,11 +326,19 @@ static func validate(world: Dictionary) -> String:
 	var has_city: bool = state is Dictionary and state.has("city")
 	if has_city and not CityCheckpoint.valid_header(state.city):
 		return "Der Stadtstand ist beschädigt."
-	if not _keys(state, KEYS + ["city"] if has_city else KEYS) or not _int(state.version, VERSION, VERSION) or typeof(state.raids) != TYPE_DICTIONARY or state.raids.size() > MAX_RAIDS:
+	var keys := KEYS.duplicate()
+	if has_city:
+		keys.append("city")
+	if state is Dictionary and state.has("allegiance"):
+		keys.append("allegiance")
+	if not _keys(state, keys) or not _int(state.version, VERSION, VERSION) or typeof(state.raids) != TYPE_DICTIONARY or state.raids.size() > MAX_RAIDS:
 		return "Der gemeinsame Weltzustand fehlt oder ist ungültig."
 	var clock_error := Clock.validate(world)
 	if not clock_error.is_empty():
 		return clock_error
+	var allegiance_error := Allegiance.validate(world)
+	if not allegiance_error.is_empty():
+		return allegiance_error
 	var political_error := Politics.validate(world)
 	if not political_error.is_empty():
 		return political_error
@@ -384,6 +399,8 @@ static func normalize(world: Dictionary) -> void:
 		record.jdn = int(record.jdn)
 		record.stolen = int(record.stolen)
 		record.booked = _ints(record.booked)
+	for event: Dictionary in state.get("allegiance",[]):
+		event.day = int(event.day)
 	state.military.battle_start_jdn = int(state.military.battle_start_jdn)
 	state.military.battle_end_jdn = int(state.military.battle_end_jdn)
 	for promotion: Dictionary in state.military.promotions:

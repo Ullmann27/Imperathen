@@ -51,12 +51,31 @@ func node_position(index: int) -> Vector3:
 	return _astar.get_point_position(index)
 
 
+func closest_node(position: Vector3) -> int:
+	return int(_astar.get_closest_point(position))
+
+
+## One drawing batch from the pedestrian survey. Diagonal shortcuts are useful
+## to walkers; cardinal links describe the street surface on the chart.
+func survey_lines() -> PackedVector2Array:
+	var lines := PackedVector2Array()
+	for a in node_count:
+		var start := node_position(a)
+		for b in _astar.get_point_connections(a):
+			if a < b:
+				var end := node_position(b)
+				if absf(start.x-end.x) < .1 or absf(start.z-end.z) < .1:
+					lines.append(Vector2(start.x,start.z))
+					lines.append(Vector2(end.x,end.z))
+	return lines
+
+
 ## Street node used to reach an anchor; anchors from other packages that are
 ## not part of the bake attach to the closest node.
 func node_for(anchor_id: String, position: Vector3) -> int:
 	if anchor_nodes.has(anchor_id):
 		return anchor_nodes[anchor_id]
-	var nearest := int(_astar.get_closest_point(position))
+	var nearest := closest_node(position)
 	anchor_nodes[anchor_id] = nearest
 	return nearest
 

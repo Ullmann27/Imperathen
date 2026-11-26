@@ -1,9 +1,10 @@
 extends Node3D
-## Bounded terrain residency. The authored village remains the only inhabited region.
+## Bounded terrain residency. The village, quarry and Weidenhof share the same ground.
 ## All sectors share edge spacing: changing detail rings cannot open terrain cracks.
 
 const Plan = preload("res://scripts/world/world_stream_plan.gd")
 const Footpath = preload("res://scripts/world/regional_footpath.gd")
+const Waystation = preload("res://scripts/world/regional_waystation.gd")
 const Quarry = preload("res://scripts/world/regional_quarry.gd")
 const GRID := 12
 const MESH_BUILD_BUDGET := 2
@@ -22,6 +23,7 @@ const MAX_RESIDENT_SECTORS := 145
 const EARTH_DRY := Color("232912")
 const EARTH_FRESH := Color("545023")
 const EARTH_STONE := Color("433f2f")
+var waystation := Waystation.new()
 var sectors: Dictionary = {}
 var demand: Dictionary = {}
 var _last_cell := ""
@@ -40,6 +42,9 @@ var _last_unloads := 0
 
 
 func _ready() -> void:
+	waystation.name = "Weidenhof"
+	add_child(waystation)
+	waystation.setup(surface_height)
 	_ground = StandardMaterial3D.new()
 	_ground.vertex_color_use_as_albedo = true
 	_ground.vertex_color_is_srgb = true
@@ -181,6 +186,7 @@ func _make_sector(entry: Dictionary) -> Node3D:
 	mesh.material_override = _ground
 	node.add_child(mesh)
 	Footpath.add_entrance(node, Plan.SECTOR_SIZE_M)
+	Footpath.add_tracks(node,Plan.SECTOR_SIZE_M,surface_height)
 	Quarry.add_site(node, Plan.SECTOR_SIZE_M, surface_height)
 	return node
 
@@ -258,4 +264,4 @@ func report() -> Dictionary:
 		"last_mesh_builds":_last_mesh_builds, "last_collider_builds":_last_collider_builds,
 		"last_unloads":_last_unloads, "quality":_last_quality,
 		"world_size_m":Plan.WORLD_SIZE_M,
-		"inhabited_content":"authored village; distant settlements remain planned"}
+		"inhabited_content":"authored village and Weidenhof; distant settlements remain planned"}

@@ -246,7 +246,9 @@ static func validate(state: Dictionary) -> String:
 		return "Der Wagen wurde ohne abgeschlossene Vorbereitung übergeben."
 	if chapter.completed and float(chapter.completed_at) < 0.0 or not chapter.completed and float(chapter.completed_at) != -1.0:
 		return "Zeitpunkt und Abschluss des Dorfkapitels widersprechen sich."
-	if state.origin_id != "italia" and chapter != new_state():
+	# JSON represents both 0 and 0.0 as a float on load. The validated
+	# zero step fixes all choice, work and completion fields at their defaults.
+	if state.origin_id != "italia" and (step != 0 or not chapter.met.is_empty()):
 		return "Das römische Dorfkapitel gehört nicht zu dieser Herkunft."
 	if step > 0 or chapter.preparation != "":
 		if not state.progress.chapter_complete or int(state.player.age) < 18:

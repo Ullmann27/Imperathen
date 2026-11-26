@@ -2,10 +2,12 @@ extends RefCounted
 ## Begleitregie aus Missionsmetadaten. Fortschritt und Beziehung stammen aus
 ## vorhandenen Save-Fakten; dieses Modul erzeugt keinen weiteren Spielstand.
 
+const Conversations = preload("res://scripts/domain/party_conversations.gd")
 const MissionData = preload("res://scripts/story/mission_data.gd")
-const MISSIONS := ["I-04", "I-06", "I-08", "I-09"]
+const MISSIONS := ["I-04", "I-06", "I-07", "I-08", "I-09", "I-13"]
 const ACTORS := ["marcus", "silvanus"]
 static var _catalog: Dictionary = {}
+static var _tasks: Dictionary = {}
 
 
 static func _entries() -> Dictionary:
@@ -13,24 +15,86 @@ static func _entries() -> Dictionary:
 		for mission: String in MISSIONS:
 			var source := MissionData._json(MissionData.ROOT + "band1/" + mission + ".json")
 			_catalog[mission] = source.get("companions", [])
+			_tasks.merge(source.get("party_tasks", {}).get("steps", {}))
 	return _catalog
 
 
+static func actor_uid(data: Dictionary, id: String) -> String:
+	return "pc:companion" if id in ["marcus", str(data.get("companion", {}).get("id", ""))] else "vil:" + id
+
+
+static func member(data: Dictionary, id: String) -> Dictionary:
+	return data.get("world_state", {}).get("party", {}).get("members", {}).get(actor_uid(data, id), {})
+
+
 static func available(data: Dictionary, id: String) -> bool:
-	if not data.get("village", {}).has("childhood") or id not in ACTORS:
+	if not data.get("village", {}).has("childhood") and member(data, id).is_empty():
 		return false
-	if id == "marcus":
+	if actor_uid(data, id) == "pc:companion":
 		return bool(data.get("companion", {}).get("met", false))
+	if id not in ACTORS and member(data, id).is_empty():
+		return false
 	for person: Dictionary in data.village.economy.people:
 		if person.id == id:
-			return bool(person.alive) and person.assignment == "idle" and not data.village.get("militia", []).has(id)
+			return bool(person.alive) and int(person.health) > 30 and person.assignment == "idle" and not data.village.get("militia", []).has(id)
 	return false
+
+
+static func task_roles(step: String) -> Dictionary:
+	_entries()
+	return _tasks.get(step, {})
+
+
+## Only called inside the successful original mission transaction. The physical
+## observations are supplied by GameWorld, never by the issuing UI command.
+static func credit(data: Dictionary, step: String, site: Vector2, counterpart := "", sight: Callable = Callable()) -> String:
+	var roles := task_roles(step)
+	if roles.is_empty():
+		return ""
+	var feedback := PackedStringArray()
+	var witnesses := {}
+	var members: Dictionary = data.get("world_state", {}).get("party", {}).get("members", {})
+	for uid: String in members:
+		var id := str(data.companion.id) if uid == "pc:companion" else uid.trim_prefix("vil:")
+		var person: Dictionary = members[uid]
+		var role := str(person.assignment)
+		if person.status != "active" or person.order not in ["follow","assist"]:
+			continue
+		var observed: Variant = observed_position(data, id)
+		if observed == null or site.distance_to(observed) > 3.5:
+			continue
+		if sight.is_valid():
+			var hero: Array = data.player.position
+			var player_feet := Vector3(hero[0],float(hero[1])-0.9,hero[2])
+			if not sight.call(restored_position(data,id,player_feet),player_feet):
+				continue
+		witnesses[uid] = role if person.order == "assist" and roles.has(role) and id != counterpart else "witness"
+		if witnesses[uid] == "witness":
+			continue
+		var details: Array = roles[role]
+		var skill := str(details[0])
+		var memory := "%s · %s" % [step, details[1]]
+		if person.memories.has(memory):
+			continue
+		person.skills[skill] = mini(100, int(person.skills.get(skill, 0)) + 1)
+		person.bond = mini(100, int(person.bond) + 1)
+		person.memories.append(memory)
+		if person.memories.size() > 32:
+			person.memories.pop_front()
+		feedback.append("%s %s." % [id.capitalize(), details[1]])
+	var proposal := Conversations.record(data,step,witnesses)
+	if not proposal.is_empty():
+		feedback.append(proposal)
+	return " ".join(feedback)
 
 
 static func for_step(data: Dictionary, mission: String, step: String) -> Dictionary:
 	var result := {}
 	for entry: Dictionary in _entries().get(mission, []):
 		var id := str(entry.get("id", ""))
+		var membership := member(data, id)
+		if not membership.is_empty() and (membership.status != "active" or membership.order in ["wait", "home", "train"]):
+			continue
 		if available(data, id) and entry.get("steps", []).has(step):
 			result[id] = entry.duplicate(true)
 	return result
@@ -60,23 +124,27 @@ static func dialogue(data: Dictionary, id: String, mission: String, step: String
 		"source":str(line.source), "companion_dialogue":true}
 
 
+static func _coordinates(data: Dictionary, id: String) -> Array:
+	var observed: Dictionary = data.village.get("behavior", {}).get("people", {}).get(id, {})
+	if observed.get("observed", false):
+		return observed.position
+	return member(data, id).get("travel_position", [])
+
+
 static func observed_position(data: Dictionary, id: String) -> Variant:
 	if not available(data, id):
 		return null
-	var observed: Dictionary = data.village.get("behavior", {}).get("people", {}).get(id, {})
-	var coordinates: Variant = observed.get("position")
-	if not observed.get("observed", false) or typeof(coordinates) != TYPE_ARRAY or coordinates.size() != 3:
-		return null
-	return Vector2(float(coordinates[0]), float(coordinates[2]))
+	var coordinates := _coordinates(data, id)
+	return Vector2(coordinates[0], coordinates[2]) if coordinates.size() == 3 else null
 
 
 static func restored_position(data: Dictionary, id: String, fallback: Vector3) -> Vector3:
-	if observed_position(data, id) == null:
+	var coordinates := _coordinates(data, id)
+	if coordinates.size() != 3:
 		return fallback
-	var coordinates: Array = data.village.behavior.people[id].position
-	# Marcus' vorhandene Beobachtungen speichern seit Build 7 den Figurenmittelpunkt.
-	# Diese Konvention bleibt erhalten; nur der bewegliche Körper hat einen Fußursprung.
-	return Vector3(float(coordinates[0]), float(coordinates[1]) - (0.9 if id == "marcus" else 0.0), float(coordinates[2]))
+	# Observations measure the common friend's centre, the other residents' feet.
+	var centre_height := 0.9 if actor_uid(data, id) == "pc:companion" else 0.0
+	return Vector3(coordinates[0], coordinates[1] - centre_height, coordinates[2])
 
 
 static func display_name(data: Dictionary, id: String, fallback: String) -> String:

@@ -52,6 +52,9 @@ func _visit() -> void:
 		if city != null:
 			city._request_leave()
 		return
+	expect(city.figure.requested_youth_outfit == "civil", "Die Kindheit fordert beim Stadtwechsel dieselbe zivile Tunika wie in Valdora an")
+	if city.figure.youth_outfit_installed("civil"):
+		expect(city.figure.active_model_path.begins_with("res://assets/characters/hero_meshy_italia_civil_"), "Am Markt wird bei vollständigem Outfit die zivile Originalfigur geladen")
 	var home: Array = game.model.data.player.position.duplicate()
 	var district = city.living_city.life
 	var baker: int = district.business_for_shop("bakery")
@@ -103,6 +106,10 @@ func _visit() -> void:
 		city._request_leave()
 		return
 	if expect(city._bakery != null, "Blender-Auslage am vorhandenen Tresen installiert"):
+		var loaf: MeshInstance3D = city._bakery.loaves[0]
+		var crust := loaf.get_active_material(0) as StandardMaterial3D
+		var colors: PackedColorArray = loaf.mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR]
+		expect(crust != null and crust.vertex_color_use_as_albedo and not colors.is_empty() and colors[0].r > colors[0].b, "Krustenmaterial benutzt die warmen Scheitelpunktfarben der Blender-Laibe")
 		city._bakery.set_stock(1)
 		expect(city._bakery.loaves.filter(func(loaf): return loaf.visible).size() == 1, "Beim letzten Brot bleibt genau ein Laib ausgestellt")
 		city._update_bakery()

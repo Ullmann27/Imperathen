@@ -121,6 +121,7 @@ func _test_legacy_migration() -> void:
 	var old: Dictionary = model.data.duplicate(true)
 	old.world_state.version = 1
 	old.world_state.erase("politics")
+	old.world_state.erase("party")
 	var path := folder.path_join("legacy.json")
 	var payload := JSON.stringify(old, "", true, true)
 	var file := FileAccess.open(path, FileAccess.WRITE)
@@ -130,7 +131,7 @@ func _test_legacy_migration() -> void:
 	var result := restored.load_game(path)
 	_check(result.ok, "A v6 save with the original world-state block migrates: " + result.message)
 	if result.ok:
-		_check(restored.data.world_state.version == 2 and restored.politics_view().events.is_empty(), "Migration begins with no invented introductions or favors")
+		_check(restored.data.world_state.version == 3 and restored.politics_view().events.is_empty(), "Migration begins with no invented introductions or favors")
 		var current_path := folder.path_join("current.json")
 		var current := Model.new()
 		_check(model.save_game(current_path).ok and current.load_game(current_path).ok, "Read the same world's v2 control save")

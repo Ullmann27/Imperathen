@@ -78,10 +78,25 @@ const ERA_VARIANTS := {
 }
 
 
+## Political geography for the opening campaign year. Dates with later
+## regimes retain their own era-specific descriptions. Sources in ATLAS_58.md.
+const OPENING_YEAR := {
+	"italia":"In der Römischen Republik bestimmen unter anderem Konsuln und Senat die Politik. Caesar, Pompeius und Crassus verbindet ein privates Bündnis. Caesar führt als Prokonsul Truppen in Gallien. Ein persönliches Gefolge begründet keinen staatlichen Oberbefehl.",
+	"gallia":"Jenseits der römischen Provinz handeln gallische Gemeinschaften selbständig. Der Zug der Helvetier und die Beziehungen der Haeduer zu Rom prägen das Jahr. Bei den Haeduern führt ein jährlich bestellter Vergobret die Regierung.",
+	"germania":"Am Rhein treffen lokale Gefolgschaften, Sueben und Verbündete Ariovists auf gallische Nachbarn. Persönliche Bindungen und Abgaben verbinden politisch eigenständige Gruppen.",
+	"hispania":"Rom verwaltet Hispania Citerior und Hispania Ulterior. Der Baetis liegt in Ulterior. Gemeinschaften im nordwestlichen Binnenland liegen außerhalb der römischen Provinzherrschaft.",
+	"britannia":"Südliche Gemeinschaften stehen über den Ärmelkanal mit Gallien in Verbindung. Caesars Expeditionen auf die Insel beginnen erst 55 v. Chr.",
+	"greek":"Griechische Städte besitzen unterschiedliche Bündnisverträge und Rechte. Der Statthalter von Macedonia übt Aufsicht aus. Auf der südlichen Halbinsel wird erst 27 v. Chr. eine eigene Provinz eingerichtet.",
+	"africa":"Utica ist Sitz des römischen Statthalters in Africa. Westlich der Provinz liegt das Königreich Numidien mit eigener Führung und eigenen Truppen.",
+	"aegyptus":"Alexandria ist das Zentrum des ptolemäischen Königreichs. Im Laufe des Jahres 58 v. Chr. verliert Ptolemaios XII. die Herrschaft in Alexandria. Berenike IV. besteigt den Thron.",
+	"parthia":"Östlich des Euphrat herrschen die Arsakiden. Adlige Gefolgschaften stellen berittene Bogenschützen und gepanzerte Reiter für das königliche Aufgebot."
+}
+
 ## Name and note of a region on a world date. `jdn` < 0 (no clock) keeps the
 ## reference timeline.
 static func region_view(id: String, jdn: int = -1) -> Dictionary:
 	var base: Dictionary = REGIONS[id]
+	var opening: String = OPENING_YEAR.get(id, "") if jdn >= 0 and int(WorldCalendar.from_jdn(jdn).year) == -58 else ""
 	if jdn >= 0:
 		for variant: Dictionary in ERA_VARIANTS.get(id, []):
 			var matches := false
@@ -90,5 +105,5 @@ static func region_view(id: String, jdn: int = -1) -> Dictionary:
 			elif variant.has("before"):
 				matches = jdn < WorldCalendar.to_jdn(int(variant.before), 1, 1)
 			if matches:
-				return {"name": str(variant.name), "note": str(variant.note)}
-	return {"name": str(base.name), "note": str(base.note)}
+				return {"name": str(variant.name), "note": str(variant.note) if opening.is_empty() else opening}
+	return {"name": str(base.name), "note": str(base.note) if opening.is_empty() else opening}

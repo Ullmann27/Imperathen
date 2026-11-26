@@ -55,6 +55,10 @@ func relative_bearing() -> float:
 		return 0.0
 	var player: Vector2 = view.get("player", Vector2.ZERO)
 	var target: Vector2 = view.get("target", Vector2.ZERO)
+	for waypoint: Vector2 in view.get("route",PackedVector2Array()):
+		if player.distance_to(waypoint) > 2.5:
+			target = waypoint
+			break
 	return wrapf(bearing(player, target) - _shown_heading, -PI, PI)
 
 
@@ -204,7 +208,7 @@ class LocalMap extends Control:
 		var road := [Vector2(0, -49), Vector2(0, 28)]
 		var a := _to_map(road[0], center, radius)
 		var b := _to_map(road[1], center, radius)
-		var clipped := Geometry2D.clip_polyline_with_polygon(PackedVector2Array([a, b]), _disc(center, radius * 0.94))
+		var clipped := Geometry2D.intersect_polyline_with_polygon(PackedVector2Array([a, b]), _disc(center, radius * 0.94))
 		for piece: PackedVector2Array in clipped:
 			draw_polyline(piece, Color(0.62, 0.53, 0.38, 0.8), 3.0, true)
 		for home: Dictionary in Layout.HOMES:
@@ -223,7 +227,16 @@ class LocalMap extends Control:
 			var at := _to_map(target, center, radius)
 			if at.distance_to(center) > radius * 0.86:
 				at = center + (at - center).normalized() * radius * 0.86
-			draw_line(center, at, Color(Style.AURUM, 0.55), 1.5, true)
+			var mapped := PackedVector2Array()
+			for waypoint: Vector2 in view.get("route",PackedVector2Array()):
+				var pixel := _to_map(waypoint, center, radius)
+				if mapped.is_empty() or mapped[-1].distance_squared_to(pixel) > .01:
+					mapped.append(pixel)
+			if mapped.size() >= 2:
+				for piece: PackedVector2Array in Geometry2D.intersect_polyline_with_polygon(mapped,_disc(center,radius*.9)):
+					if piece.size() >= 2:
+						draw_polyline(piece,Color("403422"),4.0,true)
+						draw_polyline(piece,Style.AURUM_LIGHT,2.2,true)
 			Style.draw_diamond(self, at, 7.0, Color(0.1, 0.06, 0.02))
 			Style.draw_diamond(self, at, 5.5, Style.AURUM)
 		# Player arrow along the camera facing.
@@ -238,7 +251,7 @@ class LocalMap extends Control:
 		var north := center + Vector2(0, -radius + 14.0)
 		draw_string_outline(font, north + Vector2(-5, 5), "N", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, 3, Color(0.05, 0.03, 0.02))
 		draw_string(font, north + Vector2(-5, 5), "N", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Style.AURUM_LIGHT)
-		var label := "Ortskarte · %d m" % roundi(span)
+		var label := str(view.get("destination_name","Ortskarte")) + " · %d m" % roundi(span)
 		var small := Style.display_font(600, 1)
 		var width := small.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x
 		draw_string(small, center + Vector2(-width * 0.5, radius - 12.0), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Style.CHARTA_MUTED)

@@ -1,0 +1,167 @@
+{
+  "cores": 5,
+  "engine": "4.7.2-stable (official)",
+  "processor": "AMD EPYC 9V74 80-Core Processor",
+  "rows": [
+    {
+      "deaths": 0,
+      "level": "B",
+      "mean_usec_per_tick": 538.336666666667,
+      "ms_per_second_at_30hz": 16.1501,
+      "p95_usec_per_tick": 548.0,
+      "rematches": 31,
+      "soldiers": 16,
+      "ticks": 300,
+      "usec_by_phase": {
+        "animate": 64478,
+        "contacts": 29297,
+        "steer": 40096,
+        "units": 19420
+      }
+    },
+    {
+      "deaths": 0,
+      "level": "C",
+      "mean_usec_per_tick": 158.9,
+      "ms_per_second_at_30hz": 4.767,
+      "p95_usec_per_tick": 314.0,
+      "rematches": 31,
+      "soldiers": 16,
+      "ticks": 300,
+      "usec_by_phase": {
+        "animate": 11855,
+        "contacts": 3354,
+        "steer": 11871,
+        "units": 13010
+      }
+    },
+    {
+      "deaths": 0,
+      "level": "B",
+      "mean_usec_per_tick": 1734.83666666667,
+      "ms_per_second_at_30hz": 52.0451,
+      "p95_usec_per_tick": 2539.0,
+      "rematches": 31,
+      "soldiers": 64,
+      "ticks": 300,
+      "usec_by_phase": {
+        "animate": 47181,
+        "contacts": 169125,
+        "steer": 213007,
+        "units": 63825
+      }
+    },
+    {
+      "deaths": 0,
+      "level": "C",
+      "mean_usec_per_tick": 543.403333333333,
+      "ms_per_second_at_30hz": 16.3021,
+      "p95_usec_per_tick": 962.0,
+      "rematches": 31,
+      "soldiers": 64,
+      "ticks": 300,
+      "usec_by_phase": {
+        "animate": 42514,
+        "contacts": 11121,
+        "steer": 45079,
+        "units": 41297
+      }
+    },
+    {
+      "deaths": 36,
+      "level": "B",
+      "mean_usec_per_tick": 7963.10666666667,
+      "ms_per_second_at_30hz": 238.8932,
+      "p95_usec_per_tick": 11011.0,
+      "rematches": 181,
+      "soldiers": 256,
+      "ticks": 300,
+      "usec_by_phase": {
+        "animate": 173612,
+        "contacts": 658197,
+        "steer": 1233545,
+        "units": 226458
+      }
+    },
+    {
+      "deaths": 36,
+      "level": "C",
+      "mean_usec_per_tick": 2808.37666666667,
+      "ms_per_second_at_30hz": 84.2513,
+      "p95_usec_per_tick": 5365.0,
+      "rematches": 181,
+      "soldiers": 256,
+      "ticks": 300,
+      "usec_by_phase": {
+        "animate": 186454,
+        "contacts": 48164,
+        "steer": 203364,
+        "units": 262886
+      }
+    },
+    {
+      "deaths": 44,
+      "level": "B",
+      "mean_usec_per_tick": 16968.9633333333,
+      "ms_per_second_at_30hz": 509.0689,
+      "p95_usec_per_tick": 23854.0,
+      "rematches": 362,
+      "soldiers": 512,
+      "ticks": 300,
+      "usec_by_phase": {
+        "animate": 389269,
+        "contacts": 1439232,
+        "steer": 2514331,
+        "units": 529024
+      }
+    },
+    {
+      "deaths": 44,
+      "level": "C",
+      "mean_usec_per_tick": 4750.03,
+      "ms_per_second_at_30hz": 142.5009,
+      "p95_usec_per_tick": 9128.0,
+      "rematches": 362,
+      "soldiers": 512,
+      "ticks": 300,
+      "usec_by_phase": {
+        "animate": 372222,
+        "contacts": 103125,
+        "steer": 394877,
+        "units": 345950
+      }
+    },
+    {
+      "deaths": 68,
+      "level": "B",
+      "mean_usec_per_tick": 38998.44,
+      "ms_per_second_at_30hz": 1169.9532,
+      "p95_usec_per_tick": 68188.0,
+      "rematches": 838,
+      "soldiers": 1024,
+      "ticks": 300,
+      "usec_by_phase": {
+        "animate": 906718,
+        "contacts": 3491669,
+        "steer": 5762028,
+        "units": 1093145
+      }
+    },
+    {
+      "deaths": 68,
+      "level": "C",
+      "mean_usec_per_tick": 11254.52,
+      "ms_per_second_at_30hz": 337.6356,
+      "p95_usec_per_tick": 25943.0,
+      "rematches": 838,
+      "soldiers": 1024,
+      "ticks": 300,
+      "usec_by_phase": {
+        "animate": 820377,
+        "contacts": 261593,
+        "steer": 945619,
+        "units": 888923
+      }
+    }
+  ]
+}

@@ -18,6 +18,8 @@ static var _materials: Dictionary = {}
 static var _clip_lengths: Dictionary = {}
 var role := "heavy"
 var variant := 0
+var face_seed := -1
+var _appearance_seed := 0
 var detail := 0
 var state := "idle"
 var player: AnimationPlayer
@@ -34,8 +36,9 @@ func _ready() -> void:
 func configure(new_role: String, new_variant: int = 0) -> void:
 	var resolved := new_role if new_role in ROLES else "heavy"
 	var tint := posmod(new_variant, TINTS.size())
-	if resolved == role and tint == variant and _body:
+	if resolved == role and tint == variant and _body and _appearance_seed == new_variant:
 		return
+	_appearance_seed = new_variant
 	role = resolved
 	variant = tint
 	_replace_body()
@@ -161,6 +164,8 @@ func _replace_body() -> void:
 		for instance in _body.find_children("*", "MeshInstance3D", true, false):
 			_apply_tint(instance as MeshInstance3D)
 	add_child(_body)
+	if detail < 2:
+		preload("res://scripts/visuals/roman_faces.gd").apply(_body, face_seed if face_seed != -1 else _appearance_seed)
 	_face.bind(_body, "soldier_%s_%d" % [role, variant])
 	_play_clip()
 

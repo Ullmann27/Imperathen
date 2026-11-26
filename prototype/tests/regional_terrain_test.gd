@@ -138,7 +138,7 @@ func _check_residency(terrain: Node3D, position: Vector3, quality: String) -> vo
 	for entry in demand.sectors:
 		desired[entry.id] = entry
 		collisions += int(entry.collision)
-	_check(terrain.sectors.size() == desired.size() and terrain.get_child_count() == desired.size(),"No stale sector nodes remain after stream settles")
+	_check(terrain.sectors.size() == desired.size() and terrain.get_child_count() == desired.size() + 1 and terrain.waystation.get_parent() == terrain,"No stale sector nodes remain after stream settles")
 	for id in terrain.sectors:
 		_check(desired.has(id),"Loaded sector belongs to current demand")
 		_check(terrain.sectors[id].has_node("GroundCollision") == desired[id].collision,"Physics follows current near ring")

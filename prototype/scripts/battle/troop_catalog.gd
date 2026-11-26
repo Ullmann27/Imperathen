@@ -11,14 +11,14 @@ const MAX_YEAR := 2000
 const MAX_QUALITY := 4
 const ATTESTATIONS := ["attested", "plausible", "design_assumption"]
 const LOADOUT_SLOTS := ["head", "torso", "shield", "main_hand", "sidearm", "missile", "mount", "mount_gear", "standard"]
-const BATTLE_KINDS := ["infantry", "spear", "archer", "skirmisher", ""]
-const BATTLE_ROLES := ["heavy", "spear", "archer", "officer", ""]
+const BATTLE_KINDS := ["infantry", "spear", "archer", "skirmisher", "cavalry", ""]
+const BATTLE_ROLES := ["heavy", "spear", "archer", "officer", "cavalry", ""]
 const SERVICES := ["roman", "own"]
 const OWNERSHIP := ["loan", "own", "issued"]
 const COMMAND_SCOPES := ["army", "company", "deputy", "none"]
 ## A battle kind needs a matching weapon in the named slot, otherwise data and simulation disagree.
-const KIND_WEAPONS := {"infantry": ["gladius", "sword_long", "axe"], "spear": ["spear"], "archer": ["bow", "sling"], "skirmisher": ["javelin"]}
-const KIND_SLOT := {"infantry": "main_hand", "spear": "main_hand", "archer": "main_hand", "skirmisher": "missile"}
+const KIND_WEAPONS := {"infantry": ["gladius", "sword_long", "axe"], "spear": ["spear"], "archer": ["bow", "sling"], "skirmisher": ["javelin"], "cavalry": ["spear", "sword_long"]}
+const KIND_SLOT := {"infantry": "main_hand", "spear": "main_hand", "archer": "main_hand", "skirmisher": "missile", "cavalry": "main_hand"}
 const TIER_KINDS := ["experience", "equipment", "training"]
 ## Inputs of the military options (D-041): scalar minimums and per-id minimums.
 const NEED_SCALARS := ["wealth", "trade", "trade_partners", "population"]
@@ -56,6 +56,9 @@ static func build(families_doc: Variant, troops_doc: Variant, people_doc: Varian
 	catalog.name_pools = people_doc.name_pools.duplicate(true)
 	for g: Dictionary in people_doc.population_groups:
 		catalog.groups[g.group_id] = g.duplicate(true)
+	catalog.organizations = {}
+	for entry: Dictionary in troops_doc.get("organizations", []):
+		catalog.organizations[entry.id] = _integers(entry.duplicate(true))
 	catalog.drills = troops_doc.drills.duplicate(true)
 	catalog.authorities = troops_doc.authorities.duplicate(true)
 	catalog.tiers = {}
@@ -139,6 +142,39 @@ static func _check_sources(owner: String, entry: Dictionary, errors: Array[Strin
 			errors.append("%s: Quellenangabe braucht ref, note und verified" % owner)
 
 
+static func organization_options(catalog: Dictionary, culture: String, year: int) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for entry: Dictionary in catalog.get("organizations", {}).values():
+		if entry.culture == culture and valid_at(entry, year):
+			result.append(entry.duplicate())
+	return result
+
+
+static func _validate_organizations(entries: Variant, errors: Array[String]) -> void:
+	if not entries is Array:
+		errors.append("organizations muss eine Liste sein.")
+		return
+	var by_id := {}
+	for entry: Variant in entries:
+		if not entry is Dictionary or not _identifier(entry.get("id")) or not _identifier(entry.get("culture")):
+			errors.append("Organisationsform ohne Kennung oder Kultur.")
+			continue
+		if by_id.has(entry.id) or not valid_span(entry) or not entry.get("parent") is String or not _text(entry.get("name")) or not _text(entry.get("function")) or not _text(entry.get("source")):
+			errors.append("Ungültige Organisationsform " + str(entry.id))
+			continue
+		by_id[entry.id] = entry
+	for entry: Dictionary in by_id.values():
+		var seen := {entry.id: true}
+		var parent: String = entry.parent
+		while not parent.is_empty():
+			var upper: Dictionary = by_id.get(parent, {})
+			if upper.is_empty() or seen.has(parent) or upper.culture != entry.culture or upper.valid_from > entry.valid_from or upper.valid_to < entry.valid_to:
+				errors.append("Ungültige Unterstellung für " + str(entry.id))
+				break
+			seen[parent] = true
+			parent = upper.parent
+
+
 static func validate(families_doc: Variant, troops_doc: Variant, people_doc: Variant) -> Array[String]:
 	var errors: Array[String] = []
 	if typeof(families_doc) != TYPE_DICTIONARY or families_doc.get("schema_version") != 1.0 or typeof(families_doc.get("families")) != TYPE_ARRAY:
@@ -186,6 +222,7 @@ static func validate(families_doc: Variant, troops_doc: Variant, people_doc: Var
 		_check_sources(owner, f, errors, true)
 	var drills: Dictionary = troops_doc.drills
 	var authorities: Dictionary = troops_doc.authorities
+	_validate_organizations(troops_doc.get("organizations", []), errors)
 	_validate_tiers(troops_doc.get("tiers"), errors)
 	_validate_options(troops_doc.get("military_options"), troops_doc.get("tiers"), errors)
 	var appointments := {}
@@ -287,6 +324,8 @@ static func _validate_troop(t: Dictionary, families: Dictionary, troops: Diction
 		var slot: String = KIND_SLOT[kind]
 		if not loadout.has(slot) or typeof(loadout[slot]) != TYPE_DICTIONARY or not loadout[slot].get("family_id") in KIND_WEAPONS[kind]:
 			errors.append(owner + ": battle_kind %s braucht passende Hauptwaffe (%s)" % [kind, slot])
+	if kind == "cavalry" and (not loadout.has_all(["mount", "mount_gear"]) or not t.get("drills") is Dictionary or not is_integer(t.drills.get("dismount"), 1, 3)):
+		errors.append(owner + ": Reiter benötigen ein Dienstpferd, Reitzeug und Reitausbildung.")
 	if t.has("requires") or t.has("max_share"):
 		_check_needs(owner + ": requires", t.get("requires"), errors)
 		if typeof(t.get("max_share")) not in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(t.max_share)) or t.max_share <= 0 or t.max_share > 1:

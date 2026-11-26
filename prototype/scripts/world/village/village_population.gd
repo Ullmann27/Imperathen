@@ -99,7 +99,7 @@ func _add_resident(item: Dictionary, index: int) -> void:
 	figure.position.y = .9
 	figure.profile = profile
 	actor.add_child(figure)
-	figure.configure_resident("italia",int(item.age),item.appearance,index,get_viewport().get_camera_3d())
+	figure.configure_resident("italia",int(item.age),item.appearance,index,get_viewport().get_camera_3d(), "vil:" + str(item.id))
 	var nameplate := Art.label(actor,item.name+" · "+item.occupation,Vector3(0,2.05,0),Color("#efdbad"),29)
 	nameplate.name = "Nameplate"
 	nameplate.pixel_size = .003

@@ -388,6 +388,7 @@ func _test_released_combat(model) -> void:
 	_check(_complete(model), "Play I-12 at Silvanus")
 	_check(not _person(model, "silvanus").alive and _person(model, "julia").alive and model.data.village.childhood.screenplay.julia_outcome == "survived", "Defend/rescue path kills Silvanus but preserves the actually rescued Julia")
 	_check(_complete(model), "Play I-13 with Aurelia")
+	_check(not preload("res://scripts/story/mission_documents.gd").held(model.data).has("memory_token"), "The keepsake does not appear before the oath at the ridge")
 	_check(_complete(model), "Play I-14 at the ridge")
 	_check(model.data.village.childhood.screenplay.oath and model.data.village.childhood.night_event == "resolved" and model.data.village.childhood.carried.has("memory_token"), "The oath and keepsake close I-14 without granting adulthood")
 	_ok(model.save_game(_path("oath-defend")), "Save the defended oath outcome")

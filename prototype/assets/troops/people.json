@@ -23,6 +23,13 @@
       "family": ["Ostialius", "Voltius", "Tritius", "Fremius", "Enetius", "Carnius", "Venetius", "Atestius"],
       "note": "Latinisierte Namensformen für die Ortswehr; die Gentilnamen sind an venetische und karnische Bezüge angelehnt und konstruiert."
     },
+    "gallic": {
+      "attestation": "design_assumption",
+      "format": "name",
+      "first": ["Catumaros", "Brennos", "Ategnios", "Segomaros", "Dagos", "Cintus"],
+      "family": [],
+      "note": "Fiktive Mitglieder des haeduischen Hilfskontingents im Prüfgefecht."
+    },
     "germanic": {
       "attestation": "design_assumption",
       "format": "name",
@@ -43,6 +50,15 @@
         {"ref": "Caes. Gall. 1,10", "note": "duas legiones conscribit et tres quae circum Aquileiam hiemabant", "verified": false},
         {"ref": "Caes. Gall. 2,2", "note": "duas legiones in citeriore Gallia novas conscripsit", "verified": false}
       ]
+    },
+    {
+      "group_id": "aeduian_allies",
+      "name": "Haeduisches Aufgebot",
+      "names": "gallic",
+      "places": ["Umland von Bibracte", "Haeduisches Gehöft"],
+      "attestation": "design_assumption",
+      "note": "Fiktive Herkunftsorte einzelner Reiter im überlieferten haeduischen Kontingent.",
+      "sources": [{"ref": "Caes. Gall. 1,15; 1,18", "note": "Haeduische Reiterei", "verified": true}]
     },
     {
       "group_id": "creta",

@@ -29,6 +29,8 @@ func _test_i07_water_and_migration() -> void:
 	if not _until(model, "borrow_gear"):
 		return
 	var before_water: Dictionary = model.data.duplicate(true)
+	var documents := preload("res://scripts/story/mission_documents.gd")
+	_check(not documents.held(before_water).has("watch_helmet"),"No borrowed items before Severus grants them")
 	_check(model.data.village.childhood.screenplay.i07_water == "locked", "Water stays locked before the watch gear is borrowed")
 	if not _complete(model):
 		return
@@ -36,6 +38,7 @@ func _test_i07_water_and_migration() -> void:
 	_check(view.stage == "i07_water_fetch" and view.title == "I-07 · Der kranke Wachmann", "After borrowing gear, I-07 asks for water first: " + str(view.get("stage")))
 	_check(not model.execute("village_childhood_action", {"action_id":"watch_post"}).ok, "The watch post cannot be skipped past the water task")
 	var at_water: Dictionary = model.data.duplicate(true)
+	_check(documents.held(at_water) == ["watch_helmet","watch_shield"], "Both loans remain tied to the actual watch loan")
 	_at(model, view.point)
 	_check(_action(model, "i07_water_fetch").ok, "Fill the jug at the house")
 	_check(model.data.village.childhood.screenplay.i07_water == "carry", "The filled jug is a saved state")
@@ -43,15 +46,24 @@ func _test_i07_water_and_migration() -> void:
 	_ok(model.save_game(_path("carry")), "Save while carrying water")
 	var resumed = WorldModel.new()
 	_ok(resumed.load_game(_path("carry")), "Reload while carrying water")
+	_check(documents.held(resumed.data).has("watch_water"),"The jug remains in hand across the real save/load")
 	_check(_current(resumed) == "i07_water_bring", "Carry state survives the round trip")
 	_at(resumed, Childhood.view(resumed.data).point)
 	_check(_action(resumed, "i07_water_bring").ok, "Deliver water at the gate")
+	_check(not documents.held(resumed.data).has("watch_water"),"Delivering water removes its inspection action")
 	_check(_current(resumed) == "watch_post", "After the water, the supervised watch post follows")
 	_check(str(Childhood.dialogue(resumed.data, "silvanus").get("text", "")).contains("Mut ist leicht, wenn nichts auf dem Spiel steht."), "Optional visit: Silvanus carries I-07 line 08 at the watch post")
 	var after_water: Dictionary = resumed.data.duplicate(true)
 	if not _until(resumed, "watch_message"):
 		return
 	var past_post: Dictionary = resumed.data.duplicate(true)
+	_check(documents.held_documents(past_post) == ["gate_message"],"The tested gate grants Cassia’s readable report")
+	if not _complete(resumed):
+		return
+	_check(documents.held_documents(resumed.data).is_empty(),"Cassia takes the original report on delivery")
+	if not _complete(resumed):
+		return
+	_check(not documents.held(resumed.data).has("watch_shield") and not documents.held(resumed.data).has("watch_helmet"),"Both loaned objects leave on return")
 	# Screenplay v2 saves (written before this round) migrate without retroactive completion.
 	_check(_migrated(before_water).i07_water == "locked", "v2 save before the gear: water locked")
 	_check(_migrated(at_water).i07_water == "pending", "v2 save standing at the watch post gets the water task")

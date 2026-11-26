@@ -24,6 +24,7 @@ var _political_survey_range := 1.6
 var _village_focus := ""
 var _dodge_remaining := 0.0
 var _dodge_direction := Vector3.ZERO
+const PatrolPeople = preload("res://scripts/domain/person_registry.gd")
 const VillageLayout = preload("res://scripts/world/village/village_layout.gd")
 var population = preload("res://scripts/world/village/village_population.gd").new()
 var regional = preload("res://scripts/world/regional_village.gd").new()
@@ -134,6 +135,8 @@ func _ready() -> void:
 
 
 func setup(state: Dictionary) -> void:
+	if state.get("world_id","") != _state.get("world_id",""):
+		_route_destination = "mission"
 	clear_frontier_focus()
 	_shown_health = -1
 	_shown_work = -1.0
@@ -238,6 +241,7 @@ func sync_state(state: Dictionary) -> void:
 	_shown_health = health_now
 	_shown_work = construction
 	_companion.get_node("Figure").configure("companion",_state.get("origin_id","italia"),age)
+	_story_companions.sync(state)
 	var progress: Dictionary = _state.get("progress", {})
 	var trained := bool(progress.get("training_complete", false))
 	var hits := int(progress.get("training_hits", 0))
@@ -481,17 +485,41 @@ func cue_unarmed(technique: String) -> void:
 	_figure.cue_unarmed(technique)
 
 
+var _mission_route := preload("res://scripts/world/village/mission_route.gd").new()
+var _route_destination := "mission"
+const TravelPath = preload("res://scripts/world/regional_footpath.gd")
+const Freight = preload("res://scripts/domain/regional_freight.gd")
+const TravelEconomy = preload("res://scripts/domain/village_economy.gd")
+const Waystation = preload("res://scripts/world/regional_waystation.gd")
+
+func select_route(id: String) -> void:
+	if TravelPath.DESTINATIONS.has(id):
+		_route_destination = id
+
+func _near_freight(point: Vector2) -> bool:
+	var here := get_player_position()
+	return _state.village.enabled and Vector2(here.x,here.z).distance_to(point) <= 2.4
+
+func at_waystation() -> bool:
+	return Waystation.at_counter(get_player_position())
+
 func navigation_view() -> Dictionary:
 	var result:={"player":Vector2(snappedf(_player.position.x,.1),snappedf(_player.position.z,.1)),"heading":snappedf(_figure.rotation.y,.02),"has_target":false,
 		"camera_yaw":snappedf(_camera_yaw,.01),"context":_hint.text if _hint != null and _active and _mode == "person" else ""}
-	if not Childhood.enabled(_state):
+	if not _state.get("village",{}).get("enabled",false):
 		return result
-	var chapter:=Childhood.view(_state)
-	var target: Variant=chapter.get("point",null)
-	var npc:=str(chapter.get("target_npc",""))
-	if not npc.is_empty() and VillageLife.has_npc(_state,npc):
-		target=VillageLife.actor_position(_state,npc)
+	var target: Variant = null
+	if Childhood.enabled(_state):
+		var chapter := Childhood.view(_state)
+		target = chapter.get("point",null)
+		var npc := str(chapter.get("target_npc",""))
+		if not npc.is_empty() and VillageLife.has_npc(_state,npc):
+			target = VillageLife.actor_position(_state,npc)
+	if _route_destination != "mission":
+		target = TravelPath.destination(_route_destination)
+		result["destination_name"] = TravelPath.DESTINATIONS[_route_destination]
 	if typeof(target)==TYPE_VECTOR2:
+		result["route"] = _mission_route.route(result.player,target)
 		result["target"]=target
 		result.has_target=true
 	return result
@@ -1041,14 +1069,14 @@ func npc_observations() -> Dictionary:
 	var observations: Dictionary = population.behavior_observations()
 	if is_instance_valid(village_life_world):
 		observations.merge(village_life_world.behavior_observations(), true)
-	if is_instance_valid(_companion) and _companion.visible and str(_state.get("origin_id", "italia")) == "italia":
+	if is_instance_valid(_companion) and _companion.is_visible_in_tree():
 		var at: Vector3 = _companion.global_position + Vector3.UP * 0.9
-		observations["marcus"] = {"position": [at.x, at.y, at.z], "route_distance": 0.0}
+		observations[str(_state.get("companion", {}).get("id", "marcus"))] = {"position": [at.x, at.y, at.z], "route_distance": 0.0}
 	return observations
 
 
 func _sync_companion() -> void:
-	_companion.collision_layer = VillageLayout.CITIZEN_LAYER if Childhood.enabled(_state) else (4 if CombatActions.enabled(_state) else 0)
+	_companion.collision_layer = VillageLayout.CITIZEN_LAYER if Childhood.enabled(_state) or not Childhood.CompanionStory.member(_state, "marcus").is_empty() else (4 if CombatActions.enabled(_state) else 0)
 	var companion: Dictionary = _state.get("companion", {})
 	if not bool(companion.get("met", false)):
 		_companion_label.text = "%s · E\nGefährten kennenlernen" % Origins.PEOPLES[_state.get("origin_id","italia")].companion
@@ -1105,46 +1133,58 @@ func _sync_enemies() -> void:
 
 func _sync_squad() -> void:
 	var squad: Dictionary = _state.get("squad", {})
-	var alive := clampi(int(squad.get("alive", 0)), 0, 3)
-	var residents: Array = _state.get("village", {}).get("economy", {}).get("people", [])
-	var named_militia: Array[Dictionary] = []
-	if _state.get("village", {}).get("enabled", false):
-		for id: String in _state.village.get("militia", []):
-			for person: Dictionary in residents:
-				if person.id == id and person.alive:
-					named_militia.append(person)
-		alive = named_militia.size()
-	while _squad_views.size() < alive:
-		var soldier := CharacterBody3D.new()
-		soldier.name = "Recruit%d" % (_squad_views.size() + 1)
-		soldier.collision_layer = 4
-		soldier.collision_mask = 1
-		soldier.floor_snap_length = 0.25
-		var collider := CollisionShape3D.new()
-		var capsule := CapsuleShape3D.new()
-		capsule.radius = 0.25
-		capsule.height = 1.8
-		collider.shape = capsule
-		soldier.add_child(collider)
-		_squad_root.add_child(soldier)
-		Art.person(soldier,"recruit")
-		var label := Art.label(soldier,"",Vector3(0,1.05,0),Color(0.78,0.88,0.74),28)
-		label.name = "RecruitName"
-		soldier.position = _player.position + Vector3(2 + _squad_views.size(), 0, 2)
+	var alive := int(squad.get("alive", 0))
+	var losses := int(squad.get("recruits", 0)) - alive
+	var residents := {}
+	for person: Dictionary in _state.get("village", {}).get("economy", {}).get("people", []):
+		residents[person.id] = person
+	var previous := {}
+	for view: Node3D in _squad_views:
+		previous[view.get_meta("actor_uid")] = view
+	_squad_views.clear()
+	for index in range(losses, losses + alive):
+		var uid := PatrolPeople.patrol_uid(_state, index)
+		var soldier: Node3D = previous.get(uid)
+		if soldier:
+			previous.erase(uid)
+		else:
+			soldier = _spawn_patrol_member(uid, index, residents)
 		_squad_views.append(soldier)
-	while _squad_views.size() > alive:
-		var removed: Node3D = _squad_views.pop_back()
-		removed.queue_free()
-	for index in range(_squad_views.size()):
-		var recruit_name := "Rekrut %d" % (index + 1)
-		var resident_id := ""
-		if not named_militia.is_empty():
-			recruit_name = str(named_militia[index].name)
-			resident_id = str(named_militia[index].id)
-		elif _state.get("origin_id", "italia") == "italia":
-			recruit_name = VillageLayout.resident(VillageLayout.VOLUNTEERS[index]).name
-		_squad_views[index].set_meta("resident_id", resident_id)
-		_squad_views[index].get_node("RecruitName").text = recruit_name
+	for departed: Node3D in previous.values():
+		departed.queue_free()
+
+
+func _spawn_patrol_member(uid: String, index: int, residents: Dictionary) -> CharacterBody3D:
+	var soldier := CharacterBody3D.new()
+	var resident_id := uid.trim_prefix("vil:") if uid.begins_with("vil:") else ""
+	var recruit_name := "Rekrut %d" % (index + 1)
+	if residents.has(resident_id):
+		recruit_name = str(residents[resident_id].name)
+	elif _state.get("origin_id", "italia") == "italia" and index < VillageLayout.VOLUNTEERS.size():
+		recruit_name = VillageLayout.resident(VillageLayout.VOLUNTEERS[index]).name
+	soldier.name = "Recruit%d" % (index + 1)
+	soldier.set_meta("actor_uid", uid)
+	soldier.set_meta("resident_id", resident_id)
+	soldier.collision_layer = 4
+	soldier.collision_mask = 1
+	soldier.floor_snap_length = 0.25
+	var collider := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.25
+	capsule.height = 1.8
+	collider.shape = capsule
+	soldier.add_child(collider)
+	_squad_root.add_child(soldier)
+	Art.person(soldier, "recruit")
+	var label := Art.label(soldier, recruit_name, Vector3(0,1.05,0), Color(0.78,0.88,0.74), 28)
+	label.name = "RecruitName"
+	soldier.position = _player.position + _patrol_offset(_squad_views.size()).rotated(Vector3.UP, _figure.rotation.y)
+	return soldier
+
+
+func _patrol_offset(index: int) -> Vector3:
+	var file := index % 3
+	return Vector3((file - 1) * 1.7, 0, 2.0 + 2.0 * floori(index / 3.0) + float(file == 1))
 
 
 func _physics_process(delta: float) -> void:
@@ -1153,6 +1193,7 @@ func _physics_process(delta: float) -> void:
 	_update_camera(delta)
 	if _state.get("village", {}).get("enabled", false):
 		regional_terrain.follow(get_player_position(), _quality_profile)
+		regional_terrain.waystation.update_nearby(get_player_position(),_state.village.economy.get("freight",{}),delta)
 	population.update_nearby(get_player_position(),_active and _mode == "person")
 	if not _active:
 		return
@@ -1334,10 +1375,9 @@ func _update_story_companions(delta: float) -> void:
 
 
 func _update_followers(delta: float) -> void:
-	var offsets: Array[Vector3] = [Vector3(-1.7, 0, 2.0), Vector3(0, 0, 3.0), Vector3(1.7, 0, 2.0)]
 	for index in range(_squad_views.size()):
 		var soldier := _squad_views[index] as CharacterBody3D
-		var desired := _player.position + offsets[index].rotated(Vector3.UP, _figure.rotation.y)
+		var desired := _player.position + _patrol_offset(index).rotated(Vector3.UP, _figure.rotation.y)
 		desired.y = 0.90
 		var displacement := desired - soldier.position
 		var horizontal := Vector3(displacement.x, 0, displacement.z)
@@ -1561,6 +1601,15 @@ func _at_council_records() -> bool:
 func _interact() -> void:
 	if _mode != "person":
 		return
+	if _near_freight(Freight.DESK):
+		action_requested.emit("village_dispatch_grain",{})
+		return
+	if _near_freight(Freight.DEPOT):
+		action_requested.emit("freight_receipt",{})
+		return
+	if at_waystation() and _state.village.enabled:
+		action_requested.emit("waystation_market",{})
+		return
 	if Childhood.enabled(_state):
 		var at:=Vector2(_player.position.x,_player.position.z)
 		for item: Dictionary in Childhood.interactables(_state):
@@ -1736,6 +1785,16 @@ func _update_context_hint() -> void:
 	_hint.visible = showing and not hud_prompts
 	_hint.text = ""
 	if not showing:
+		return
+	if _near_freight(Freight.DESK):
+		var receipt: Dictionary = _state.village.economy.get("freight",{})
+		_hint.text = "16 Getreide nach Valdora liefern · %d Denare" % TravelEconomy.emergency_food_price(_state) if receipt.get("leg",Freight.READY) == Freight.READY else Freight.status(_state.village.economy)
+		return
+	if _near_freight(Freight.DEPOT):
+		_hint.text = "Empfangsbuch am Osttor lesen"
+		return
+	if at_waystation() and _state.village.enabled:
+		_hint.text = "Weidenhof · zum Stadtmarkt weiterreisen"
 		return
 	if Childhood.enabled(_state):
 		var at:=Vector2(_player.position.x,_player.position.z)

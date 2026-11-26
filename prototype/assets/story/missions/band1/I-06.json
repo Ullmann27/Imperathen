@@ -41,6 +41,21 @@
       "source_mission": "I-06"
     }
   ],
+  "party_tasks": {
+    "source": "Kreative Erweiterung zu I-06 · freiwillige Aufgaben am Ort des bestehenden Missionsschritts",
+    "steps": {
+      "deliver_hinge": {
+        "guide": [
+          "navigation",
+          "findet Cassias Stand"
+        ],
+        "carry": [
+          "trade",
+          "prüft mit dir die Lieferung"
+        ]
+      }
+    }
+  },
   "companions": [
     {
       "id": "marcus",

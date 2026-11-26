@@ -13,6 +13,8 @@ const Roster := preload("res://scripts/battle/soldier_roster.gd")
 const Life := preload("res://scripts/battle/soldier_life.gd")
 const Formula := preload("res://scripts/battle/combat_formula.gd")
 ## Formations that can be drawn along a front. SHAPES adds the all-round orbis.
+const Muster := preload("res://scripts/battle/valley_muster.gd")
+
 const FORMATIONS := Slots.NAMES
 const SHAPES := {"line": "Linie", "column": "Marschkolonne", "shield_wall": "Schildwall",
 	"testudo": "Schilddach / Testudo", "wedge": "Keil", "loose": "Lockere Ordnung",
@@ -30,12 +32,12 @@ const CAPTURE_SECONDS := 8
 const VOLLEY_STEPS := 9
 const STRIKE_STEPS := 6
 const EQUIPPED_FORMATIONS := {"shield_wall": ["infantry", "spear"], "testudo": ["infantry"],
-	"phalanx": ["spear"], "wedge": ["infantry", "spear"], "orbis": ["infantry", "spear"]}
+	"phalanx": ["spear"], "wedge": ["infantry", "spear", "cavalry"], "orbis": ["infantry", "spear"]}
 const COMMANDS := ["move", "hold", "form", "deploy", "attack", "attack_move", "defend",
 	"flank", "retreat", "rally", "reserve", "focus_fire", "cease_fire",
-	"follow", "advance", "fall_back", "charge", "face", "pila", "fire_at_will"]
+	"follow", "advance", "fall_back", "charge", "face", "pila", "fire_at_will", "mount", "dismount"]
 ## Orders that only change a modifier and are never stored as the company's command.
-const MODIFIERS := ["form", "cease_fire", "fire_at_will"]
+const MODIFIERS := ["form", "cease_fire", "fire_at_will", "mount", "dismount"]
 const ENEMY_TARGETED := ["attack", "flank", "focus_fire", "charge", "pila", "advance"]
 ## Orders that move the company; a company standing in the orbis must re-form first.
 const MOVING_COMMANDS := ["move", "attack_move", "deploy", "attack", "flank", "retreat", "follow", "advance", "fall_back", "charge"]
@@ -53,6 +55,7 @@ const SCHEMA := 4
 const DEFAULT_SEED := 58
 ## Per-soldier speed cap. No member, and therefore no company anchor, moves faster.
 const MEMBER_SPEED := 2.65
+const MOUNT_SPEED_FACTOR := 1.55
 const MEMBER_STEP := MEMBER_SPEED * STEP
 const ROUT_SPEED := MEMBER_SPEED
 const RETREAT_SPEED := MEMBER_SPEED
@@ -173,6 +176,34 @@ func _init(p_seed: int = DEFAULT_SEED, p_scenario: Dictionary = VALLEY_SCENARIO)
 		_add_squad(company.id, company.title, company.side, company.kind, company.shape, company.at, company.count)
 
 
+## The campaign delegates only the local guard after actual adult service.
+## The independent practice scenario supplies its own preappointed commander.
+static func campaign_authority(world: Dictionary) -> String:
+	if not preload("res://scripts/domain/campaign_allegiance.gd").roman_command(world):
+		return ""
+	var player: Dictionary = world.get("player", {})
+	var progress: Dictionary = world.get("progress", {})
+	if int(player.get("age", 0)) < 18 or player.get("role") != "soldier":
+		return ""
+	if not progress.get("training_complete", false) or not progress.get("skirmish_won", false) or progress.get("career_terminal", false):
+		return ""
+	return "praefectus_valley_spears" if int(world.get("squad", {}).get("alive", 0)) > 0 else ""
+
+
+func muster(troop_id: String) -> Dictionary:
+	if not scenario.has("contracts") or steps != 0 or _remainder != 0.0 or commander != "legatus_valdora":
+		return _reply(false, "Aushebung nur vor Übungsbeginn mit erteiltem Kommando.")
+	if not Muster.OFFERS.has(troop_id) or troop_id in scenario.contracts:
+		return _reply(false, "Dieses Kontingent ist nicht verfügbar.")
+	var plan := Muster.scenario(VALLEY_SCENARIO, scenario.contracts + [troop_id])
+	if plan.is_empty():
+		return _reply(false, "Die Mittel im Übungsdepot reichen nicht.")
+	_use_scenario(plan)
+	var company: Dictionary = _plans["muster_" + troop_id]
+	_add_squad(company.id, company.title, company.side, company.kind, company.shape, company.at, company.count)
+	return _reply(true, "%s: %d Erwachsene eingeteilt." % [company.title, company.count])
+
+
 func _use_scenario(source: Dictionary) -> void:
 	scenario = source
 	year = int(scenario.year)
@@ -195,7 +226,7 @@ func _troop_for(id: String, kind: String) -> Dictionary:
 		return troop
 	if not plan.is_empty():
 		push_error("Company %s has no valid %s troop for %s." % [id, kind, Catalog.year_label(year)])
-	var weapon: String = {"infantry": "gladius", "spear": "spear", "archer": "bow", "skirmisher": "spear"}[kind]
+	var weapon: String = {"infantry": "gladius", "spear": "spear", "archer": "bow", "skirmisher": "spear", "cavalry": "spear"}[kind]
 	var loadout := {"main_hand": {"family_id": weapon, "q_min": 1, "q_max": 1}}
 	if kind != "archer":
 		loadout.shield = {"family_id": "shield_round", "q_min": 1, "q_max": 1}
@@ -283,7 +314,7 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 		"damage": 0.0, "members": [], "ai_reason": "",
 		"commander_id": "%s_%02d" % [id, count - 3], "deputy_id": id + "_00",
 		"officer_id": "%s_%02d" % [id, count - 3],
-		"equipment": {"infantry":"Schwert und Schild", "spear":"Speer und Schild", "archer":"Bogen", "skirmisher":"Wurfspeere und Schild"}[kind],
+		"equipment": {"infantry":"Schwert und Schild", "spear":"Speer und Schild", "archer":"Bogen", "skirmisher":"Wurfspeere und Schild", "cavalry":"Reitpferd, Speer und Schild"}[kind],
 		"ammo": ARROWS if kind == "archer" else 0, "next_volley": 0,
 		"experience": 52 if side == "ally" else 45, "discipline": 72 if side == "ally" else 62,
 		"pending_formation": "", "formation_at": 0,
@@ -296,6 +327,8 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 		"wear": {"weapon": 0.0, "shield": 0.0, "armor": 0.0}}
 	if s.loadout.has("missile") and s.loadout.missile.family_id == "pilum":
 		s.pila = s.loadout.missile.count
+	if kind == "cavalry":
+		s.mounted = true
 	if kind == "skirmisher":
 		s.ammo = s.loadout.missile.count
 	var catalog := Catalog.load_default()
@@ -314,7 +347,7 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 		var person := Roster.identity(battle_seed, id, i, count, troop, pool, group, entry_xp, s.discipline, year, experience, rank)
 		s.people[person.uid] = person
 	var order := _arrangement(shape, count, [s.commander_id, s.deputy_id, s.signifer_id], id)
-	var slots := Slots.world_slots(shape, count, 0.0, at, facing)
+	var slots := _company_slots(s, shape, 0.0, at, facing)
 	for i in range(count):
 		s.members.append([slots[i].x, slots[i].y])
 		s.uids.append(order[i])
@@ -375,7 +408,11 @@ func hierarchy() -> Dictionary:
 				var members: Array[String] = []
 				members.assign(s.uids)
 				group.companies.append({"id":id, "name":s.name, "status":s.status,
-					"initial_strength":s.initial_strength, "strength":s.strength, "soldier_ids":members})
+					"target_strength":_plans.get(id, {}).get("count", s.initial_strength),
+					"initial_strength":s.initial_strength, "strength":s.strength, "soldier_ids":members,
+					"available":s.strength if _active(s) else 0, "dead":s.dead, "wounded":s.wounded,
+					"officer":s.officer_id, "deputy":s.deputy_id if s.deputy_id in s.uids else "",
+					"standard":s.signifer_id, "troop_id":s.troop_id, "tiers":s.tiers.duplicate()})
 				group.initial_strength += s.initial_strength
 				group.strength += s.strength
 			army.groups.append(group)
@@ -457,6 +494,17 @@ func roster(id: String) -> Array:
 	return result
 
 
+## Mounted companies leave room for horse length both at rest and in a turn.
+## Width is supplied in metres and remains the length drawn by the player.
+func _company_slots(s: Dictionary, shape: String, width: float, center: Vector2, facing: float) -> Array[Vector2]:
+	var spacing := 2.1 if s.kind == "cavalry" else 1.0
+	var points := Slots.world_slots(shape, s.strength, width / spacing, center, facing)
+	if spacing != 1.0:
+		for i in points.size():
+			points[i] = center + (points[i] - center) * spacing
+	return points
+
+
 func preview(id: String, start: Vector2, end: Vector2) -> Array:
 	if not squads.has(id) or not start.is_finite() or not end.is_finite():
 		return []
@@ -467,7 +515,7 @@ func preview(id: String, start: Vector2, end: Vector2) -> Array:
 	var shape := _shape(s)
 	if shape == "orbis":
 		return []
-	var points := Slots.world_slots(shape, s.strength, span.length(), (start + end) * 0.5, -span.angle())
+	var points := _company_slots(s, shape, span.length(), (start + end) * 0.5, -span.angle())
 	for point in points:
 		if not Field.clear_segment(point, point):
 			return []
@@ -500,8 +548,12 @@ func _form_problem(s: Dictionary, shape: String) -> String:
 	var shield: String = s.loadout.get("shield", {}).get("family_id", "")
 	if shape in ["shield_wall", "testudo", "orbis"] and shield == "":
 		return "Ohne Schilde ist diese Formation nicht möglich."
-	if shape == "testudo" and (shield != "scutum" or int(s.drills.get("testudo", 0)) < 2):
-		return "Das Schilddach verlangt Scuta und eingeübten Drill (Stufe 2)."
+	if shape == "testudo":
+		var troop := Catalog.troop(Catalog.load_default(), str(s.troop_id))
+		if troop.is_empty() or troop.service != "roman" or not Catalog.valid_at(troop, year):
+			return "Für diesen Verband ist das Schilddach in dieser Epoche nicht verfügbar."
+		if shield != "scutum" or int(s.drills.get("testudo", 0)) < 2:
+			return "Das Schilddach verlangt Scuta und eingeübten Drill (Stufe 2)."
 	if shape == "orbis" and int(s.drills.get("orbis", 0)) < 1:
 		return "Der Kreis ist für diesen Verband nicht eingeübt."
 	return ""
@@ -545,6 +597,11 @@ func order(ids: Array, command: String, target: Variant = null, by: String = "")
 			return _reply(false, "Dieser Verband untersteht dem Befehl nicht.")
 		if s.status in ["routed", "rallying"] and command != "rally":
 			return _reply(false, "Der Verband flieht. Sammeln ist noch möglich.")
+		if command in ["mount", "dismount"]:
+			if s.kind != "cavalry" or int(s.drills.get("dismount", 0)) < 1 or bool(s.mounted) == (command == "mount"):
+				return _reply(false, "Dieser Reitbefehl setzt den passenden Zustand und eingeübtes Absitzen voraus.")
+			if s.command != "hold" or s.status != "ready" or steps < s.ready_at:
+				return _reply(false, "Der Verband muss zuerst halten und zur Ruhe kommen.")
 		if command == "form":
 			if typeof(target) != TYPE_STRING:
 				return _reply(false, "Die Ausrüstung passt nicht zu dieser Formation.")
@@ -629,6 +686,9 @@ func order(ids: Array, command: String, target: Variant = null, by: String = "")
 		if command == "rally" and s.status == "rallying":
 			continue
 		_delay(s)
+		if command in ["mount", "dismount"]:
+			s.mounted = command == "mount"
+			continue
 		if command == "cease_fire":
 			s.fire = false
 			continue
@@ -1268,6 +1328,11 @@ func _shield_factor(s: Dictionary, enemy: Dictionary, ranged: bool) -> float:
 
 func _walk(s: Dictionary, dest: Vector2, speed: float, keep_facing: bool = false) -> bool:
 	var at := _pos(s)
+	var mounted: bool = s.get("mounted", false)
+	if mounted:
+		# A tired horse loses its pace. The gait and the individual slot
+		# correction below use the same ceiling so no rider falls behind.
+		speed *= lerpf(MOUNT_SPEED_FACTOR, 1.0, float(s.fatigue) / 100.0)
 	var next := _field.next_position(at, dest, speed * STEP)
 	if next != at:
 		var dir := at.direction_to(next)
@@ -1275,7 +1340,7 @@ func _walk(s: Dictionary, dest: Vector2, speed: float, keep_facing: bool = false
 			s.facing = atan2(-dir.x, -dir.y)
 		s.x = next.x
 		s.z = next.y
-		s.fatigue = minf(100, s.fatigue + 0.22 * STEP)
+		s.fatigue = minf(100, s.fatigue + (0.48 if mounted else 0.22) * STEP)
 		if s.status not in ["routed", "rallying"]:
 			s.status = "moving"
 	return next.distance_to(dest) < 0.02
@@ -1284,7 +1349,7 @@ func _walk(s: Dictionary, dest: Vector2, speed: float, keep_facing: bool = false
 ## Members take the nearest free slot (greedy nearest-sort), so rear ranks step up into
 ## gaps instead of the whole line shuffling by index. Nobody moves more than MEMBER_STEP.
 func _align_members(s: Dictionary) -> void:
-	var slots := Slots.world_slots(s.formation, s.strength, s.width, _pos(s), s.facing)
+	var slots := _company_slots(s, s.formation, s.width, _pos(s), s.facing)
 	var goals: Array[Vector2] = []
 	for slot in slots:
 		goals.append(Field.project(slot))
@@ -1292,7 +1357,8 @@ func _align_members(s: Dictionary) -> void:
 	var deviation := 0.0
 	for i in range(goals.size()):
 		var at := Vector2(s.members[i][0], s.members[i][1])
-		var next := _field.next_position(at, goals[i], MEMBER_STEP)
+		var step_limit := MEMBER_STEP * MOUNT_SPEED_FACTOR if s.get("mounted", false) else MEMBER_STEP
+		var next := _field.next_position(at, goals[i], step_limit)
 		s.members[i] = [next.x, next.y]
 		deviation += next.distance_to(goals[i])
 	s.cohesion = clampf(100.0 - 12.0 * deviation / maxi(1, slots.size()), 0, 100)
@@ -1512,7 +1578,9 @@ func restore(save: Dictionary) -> bool:
 	if save.size() != 7 + int(save.has("seed")) + int(save.has("scenario")) or (save.schema >= 3 and not save.has("seed")) or (save.schema >= 4 and not save.has("scenario")):
 		return false
 	var scenario_id := str(save.get("scenario", "valley_58bc"))
-	var source: Dictionary = scenario if scenario_id == str(scenario.id) else SCENARIOS.get(scenario_id, {})
+	var source := scenario
+	if scenario_id != str(scenario.id):
+		source = Muster.restore_plan(VALLEY_SCENARIO, scenario_id) if scenario.has("contracts") else SCENARIOS.get(scenario_id, {})
 	if source.is_empty():
 		return false
 	if save.has("seed") and not _number(save.seed, 0, 2147483647, true):
@@ -1558,6 +1626,8 @@ func restore(save: Dictionary) -> bool:
 		for key in ["id", "army_id", "side", "name", "kind", "initial_strength", "equipment", "experience", "discipline", "commander_id", "deputy_id", "troop_id", "loadout", "drills", "commandable_by", "tiers"]:
 			if s.get(key) != original[key]:
 				return false
+		if original.kind == "cavalry" and typeof(s.mounted) != TYPE_BOOL:
+			return false
 		if not _number(s.get("strength"), 0, original.initial_strength, true) or typeof(s.get("members")) != TYPE_ARRAY or s.members.size() != s.strength:
 			return false
 		if not _number(s.get("dead"), 0, original.initial_strength, true) or not _number(s.get("wounded"), 0, original.initial_strength, true) or s.wounded + s.dead != original.initial_strength - s.strength:

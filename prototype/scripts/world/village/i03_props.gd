@@ -18,7 +18,7 @@ var _coins: Node3D
 var _pot: MeshInstance3D
 var _salt: MeshInstance3D
 var _notch: MeshInstance3D
-var _jug: MeshInstance3D
+var _jug: Node3D
 var _hand_left: Node3D
 var _figure_body: Node3D
 var _stall: Node3D
@@ -106,11 +106,9 @@ func _build() -> void:
 	add_child(_jug)
 
 
-func _make_jug() -> MeshInstance3D:
-	var jug := MeshInstance3D.new()
+func _make_jug() -> Node3D:
+	var jug := (preload("res://assets/legio/water_pitcher.glb") as PackedScene).instantiate() as Node3D
 	jug.name = "StallWaterJug"
-	jug.mesh = _lathe([Vector2(0.0, 0.0), Vector2(0.072, 0.0), Vector2(0.12, 0.058), Vector2(0.149, 0.173), Vector2(0.115, 0.274), Vector2(0.058, 0.312), Vector2(0.055, 0.365), Vector2(0.067, 0.37), Vector2(0.067, 0.389), Vector2(0.046, 0.389), Vector2(0.046, 0.346), Vector2(0.0, 0.317)])
-	jug.material_override = Art.material(Color("c18b5e"), 0.80)
 	jug.visible = false
 	return jug
 

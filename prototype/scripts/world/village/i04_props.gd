@@ -5,6 +5,7 @@ extends Node3D
 ## and Sextus' wax tablet. Presentation only – everything is derived from the
 ## saved I-04 state and never changes it.
 
+const Documents = preload("res://scripts/story/mission_documents.gd")
 const I04 = preload("res://scripts/story/i04_workshop.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 ## World positions inside the existing forge (settlement_dressing VillageForge
@@ -199,26 +200,15 @@ func _build() -> void:
 
 
 func _make_carried() -> void:
-	_armful = _armful_node("CarriedArmful", 9)
-	_armful.visible = false
-	add_child(_armful)
-	_note = Node3D.new()
-	_note.name = "WaxTablet"
-	var frame := MeshInstance3D.new()
-	var board := BoxMesh.new()
-	board.size = Vector3(0.11, 0.012, 0.075)
-	frame.mesh = board
-	frame.material_override = Art.material(Color("6b4a2f"), 0.85)
-	_note.add_child(frame)
-	var wax := MeshInstance3D.new()
-	var field := BoxMesh.new()
-	field.size = Vector3(0.092, 0.003, 0.058)
-	wax.mesh = field
-	wax.material_override = Art.material(Color("2b241c"), 0.5)
-	wax.position.y = 0.006
-	_note.add_child(wax)
-	_note.visible = false
-	add_child(_note)
+	if not is_instance_valid(_armful):
+		_armful = _armful_node("CarriedArmful", 9)
+		_armful.visible = false
+		add_child(_armful)
+	if not is_instance_valid(_note):
+		_note = Node3D.new()
+		_note.name = "WaxTablet"
+		_note.visible = false
+		add_child(_note)
 
 
 ## Called from GameWorld.sync_state with the authoritative state; `index` is
@@ -248,7 +238,14 @@ func sync_state(state: Dictionary, figure: Node3D, index: int, trial_index: int)
 	_bundle[I04.STICKS].visible = delivered
 	_tongs.visible = status in ["pending", "complete"] and completed >= index and completed <= trial_index and (not str(s.get("i04_topic", "")).is_empty() or _talk_open(s))
 	_nail.visible = I04.nail_kept(state)
-	var noted: bool = child.get("carried", []).has("sextus_note")
+	var held := Documents.held_documents(state)
+	var noted := not held.is_empty()
+	if noted and str(_note.get_meta("document_id","")) != held[0]:
+		for old in _note.get_children():
+			old.free()
+		var scene := load(Documents.ENTRIES[held[0]].model) as PackedScene
+		_note.add_child(scene.instantiate())
+		_note.set_meta("document_id", held[0])
 	if in_hand or noted:
 		_ensure_hands(figure)
 	_carry(_armful, _hand_left, in_hand, Vector3(0.0, -0.20, 0.10))

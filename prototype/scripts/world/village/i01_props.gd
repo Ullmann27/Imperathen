@@ -4,6 +4,7 @@ extends Node3D
 ## table) and never changes it. Carrying is a greybox: the cups and the jug
 ## follow the boy's Hand_R/Hand_L bones; there is no authored carry clip yet.
 
+const Objects := preload("res://scripts/story/mission_documents.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const FLOOR := 0.3925
@@ -20,7 +21,7 @@ const HAND_CUPS := {"julia":Vector3(0.0, -0.02, 0.05), "silvanus":Vector3(0.0, 0
 
 var _cups: Dictionary = {}
 var _water: Dictionary = {}
-var _jug: MeshInstance3D
+var _jug: Node3D
 var _skeleton: Skeleton3D
 var _right_bone := -1
 var _left_bone := -1
@@ -59,14 +60,11 @@ static func anchor(key: String) -> Vector3:
 func _build() -> void:
 	if not _cups.is_empty():
 		return
-	var clay := {"julia":Art.material(Color("a56343")), "silvanus":Art.material(Color("8a5238")), "player":Art.material(Color("c18b5e"))}
 	var water := Art.material(Color("4f6a66"), .12)
 	for owner: String in I01.CUPS:
-		var cup := MeshInstance3D.new()
+		var scene := load(Objects.ENTRIES["cup_"+owner].model) as PackedScene
+		var cup := scene.instantiate() as Node3D
 		cup.name = "FamilyCup_" + owner
-		# The boy's cup is the "crooked" one from Silvanus' joke: its rim leans.
-		cup.mesh = _vessel([Vector2(.07,0),Vector2(.075,.02),Vector2(.095,.13),Vector2(.105,.15),Vector2(.083,.15),Vector2(.071,.035)], 0.42 if owner == "player" else 0.0)
-		cup.material_override = clay[owner]
 		cup.set_meta("i01_cup", owner)
 		add_child(cup)
 		_cups[owner] = cup
@@ -82,11 +80,8 @@ func _build() -> void:
 		surface.position = Vector3(0.033 if owner == "player" else 0.0, .118, 0)
 		cup.add_child(surface)
 		_water[owner] = surface
-	_jug = MeshInstance3D.new()
+	_jug = (load(Objects.ENTRIES.water_jug.model) as PackedScene).instantiate() as Node3D
 	_jug.name = "FamilyJug"
-	_jug.mesh = _vessel([Vector2(.15,0),Vector2(.25,.12),Vector2(.31,.36),Vector2(.24,.57),Vector2(.12,.65),Vector2(.115,.76),Vector2(.14,.77),Vector2(.14,.81),Vector2(.095,.81),Vector2(.095,.72),Vector2(.08,.66)], 0.0)
-	_jug.material_override = Art.material(Color("c18b5e"))
-	_jug.scale = Vector3.ONE * .48
 	add_child(_jug)
 
 
@@ -108,7 +103,7 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 	var cup_state: Dictionary = view.cups
 	var filled: bool = str(view.water) in ["poured", "silvanus"] or str(view.status) == "legacy"
 	for owner: String in I01.CUPS:
-		var cup: MeshInstance3D = _cups[owner]
+		var cup: Node3D = _cups[owner]
 		var where := str(cup_state.get(owner, "shelf"))
 		if where == "hand":
 			_held_cups.append(owner)
@@ -158,8 +153,7 @@ func jug_node() -> Node3D:
 
 
 func _place(item: Node3D, at: Vector3, basis: Basis) -> void:
-	var size := 0.48 if item == _jug else 1.0
-	item.transform = Transform3D(basis.scaled(Vector3.ONE * size), at)
+	item.transform = Transform3D(basis, at)
 	item.visible = true
 
 
@@ -176,7 +170,7 @@ func _move_held_props() -> void:
 	for owner in _held_cups:
 		_follow_hand(_cups[owner], _right_bone, _right_rest, HAND_CUPS[owner], 1.0)
 	if _holding_jug:
-		_follow_hand(_jug, _left_bone, _left_rest, JUG_HAND, 0.48)
+		_follow_hand(_jug, _left_bone, _left_rest, JUG_HAND, 1.0)
 
 
 func _follow_hand(item: Node3D, bone: int, correction: Basis, at: Vector3, size: float) -> void:
@@ -224,24 +218,3 @@ func _find_bench_jug() -> void:
 	var home := world.find_child("FamilyHome", true, false)
 	if home != null:
 		_bench_jug = home.get_node_or_null("DrinkingJug") as Node3D
-
-
-func _vessel(profile: Array[Vector2], lean: float) -> ArrayMesh:
-	var mesh := SurfaceTool.new()
-	mesh.begin(Mesh.PRIMITIVE_TRIANGLES)
-	const SEGMENTS := 14
-	var top := profile.reduce(func(best: float, p: Vector2) -> float: return maxf(best, p.y), 0.0) as float
-	for row in profile.size() - 1:
-		for index in SEGMENTS:
-			var a := TAU * index / SEGMENTS
-			var b := TAU * (index + 1) / SEGMENTS
-			var low: Vector2 = profile[row]
-			var high: Vector2 = profile[row + 1]
-			var low_shift := lean * low.y / maxf(top, 0.001) * 0.09
-			var high_shift := lean * high.y / maxf(top, 0.001) * 0.09
-			var points := [Vector3(cos(a)*low.x + low_shift, low.y, sin(a)*low.x), Vector3(cos(b)*low.x + low_shift, low.y, sin(b)*low.x),
-				Vector3(cos(b)*high.x + high_shift, high.y, sin(b)*high.x), Vector3(cos(a)*high.x + high_shift, high.y, sin(a)*high.x)]
-			for corner in [0, 2, 1, 0, 3, 2]:
-				mesh.add_vertex(points[corner])
-	mesh.generate_normals()
-	return mesh.commit()
