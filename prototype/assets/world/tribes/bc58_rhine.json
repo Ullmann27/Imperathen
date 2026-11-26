@@ -1,0 +1,1983 @@
+{
+  "schema": 1,
+  "scenario_id": "bc58_rhine",
+  "title": "Rheingrenze · Frühjahr 58 v. Chr.",
+  "era": {
+    "start_year": -58,
+    "tick_days": 7,
+    "weeks_per_year": 52,
+    "season_weeks": 13,
+    "calendar_note": "Spieljahr mit 52 Wochen zu 7 Tagen, Beginn im März. Die Abweichung zum julianischen Kalender ist bewusst; Ankerdaten sind auf Wochen gerundet.",
+    "bands_note": "Bandzeiträume laut Spielrichtung (D-023 bis D-030). Es gibt kein Jahr 0; auf 1 v. Chr. folgt 1 n. Chr."
+  },
+  "canon_policy": "Gruppen mit canon_kind attested_people_fictional_district sind in antiken Quellen belegte Völker; der simulierte Bezirk, seine Zahlen, Orte und Personen sind Spielannahmen. fictional_local_clan, fictional_person und fictional_band sind frei erfunden. documented_anchor beschreibt ein belegtes Ereignis; seine Wirkungsgrößen sind als game_interpretation gekennzeichnet.",
+  "sources": {
+    "caesar_bg_1": {
+      "citation": "C. Iulius Caesar, De bello Gallico 1,31–54 (Ariovist, Haruden, Sueben am Rhein)",
+      "url": "https://www.thelatinlibrary.com/caesar/gall1.shtml"
+    },
+    "caesar_bg_4": {
+      "citation": "C. Iulius Caesar, De bello Gallico 4,1–19 (Sueben, Ubier, Usipeter und Tenkterer, Sugambrer, Rheinbrücke 55 v. Chr.)",
+      "url": "https://www.thelatinlibrary.com/caesar/gall4.shtml"
+    },
+    "caesar_bg_6": {
+      "citation": "C. Iulius Caesar, De bello Gallico 6,9–10; 6,21–24; 6,29; 6,35 (zweiter Rheinübergang 53 v. Chr., Lebensweise, Sugambrer)",
+      "url": "https://www.thelatinlibrary.com/caesar/gall6.shtml"
+    },
+    "tacitus_germania": {
+      "citation": "P. Cornelius Tacitus, Germania 5–7, 13–15 (Bewaffnung, Gefolgschaft, Herden), um 98 n. Chr. – späterer Beleg, nur für Ausrüstung und Gefolgschaft herangezogen",
+      "url": "https://www.thelatinlibrary.com/tacitus/tac.ger.shtml"
+    },
+    "strabo_ubii": {
+      "citation": "Strabon, Geographika 4,3,4; Tacitus, Annales 12,27 und Germania 28 (Ansiedlung der Ubier links des Rheins unter Agrippa)",
+      "url": ""
+    },
+    "campaign_arc": {
+      "citation": "prototype/assets/story/campaign_arc.json: Valdora im Raum Aquileia, 58 v. Chr.; I-08, I-10, I-15, I-20",
+      "url": ""
+    }
+  },
+  "economy": {
+    "season_productivity": [
+      [
+        0,
+        12,
+        1.2,
+        1.0
+      ],
+      [
+        13,
+        21,
+        2.0,
+        0.8
+      ],
+      [
+        22,
+        31,
+        10.0,
+        1.0
+      ],
+      [
+        32,
+        38,
+        1.5,
+        0.6
+      ],
+      [
+        39,
+        51,
+        0.5,
+        0.25
+      ]
+    ],
+    "season_note": "[erste Woche, letzte Woche, Nahrung je zugeteilter Arbeitswoche, Anteil der Feldarbeitskraft]",
+    "dairy_per_cattle": 0.25,
+    "dairy_weeks": [
+      0,
+      31
+    ],
+    "calving_weeks": [
+      6,
+      9
+    ],
+    "calving_rate_per_week": 0.05,
+    "slaughter_weeks": [
+      33,
+      36
+    ],
+    "slaughter_food": 15,
+    "herd_per_person": 0.6,
+    "wood_per_labour": 4.0,
+    "ore_per_labour": 1.5,
+    "base_storage": 1500,
+    "spoilage_per_week": 0.005,
+    "overflow_spoilage": 0.1,
+    "births_per_week": 0.00077,
+    "deaths_per_week": 0.00054,
+    "starvation_deaths": 0.02,
+    "emigration_per_week": 0.01,
+    "adult_share": 0.5,
+    "warrior_labour": 0.5,
+    "trade_labour_share": 0.03,
+    "retinue_wealth_per_week": 0.05,
+    "max_settlements": 3
+  },
+  "goods": {
+    "food": {
+      "name": "Nahrung (Rationen)",
+      "value": 0.04
+    },
+    "cattle": {
+      "name": "Rinder",
+      "value": 1.0
+    },
+    "wood": {
+      "name": "Holz",
+      "value": 0.03
+    },
+    "ore": {
+      "name": "Raseneisenerz",
+      "value": 0.08
+    },
+    "iron": {
+      "name": "Eisen (Luppe)",
+      "value": 0.6
+    },
+    "wealth": {
+      "name": "Wertgüter (Silber, Bernstein, Schmuck)",
+      "value": 1.0
+    },
+    "spear": {
+      "name": "Speer (framea)",
+      "value": 0.25
+    },
+    "shield": {
+      "name": "Schild",
+      "value": 0.2
+    },
+    "axe": {
+      "name": "Axt",
+      "value": 0.35
+    },
+    "javelin": {
+      "name": "Wurfspeere (Satz)",
+      "value": 0.3
+    },
+    "blade": {
+      "name": "Klinge (Schwert oder Sax)",
+      "value": 2.0
+    },
+    "horse": {
+      "name": "Pferd",
+      "value": 3.0
+    }
+  },
+  "recipes": {
+    "smelt": {
+      "inputs": {
+        "ore": 2,
+        "wood": 3
+      },
+      "output": "iron",
+      "quantity": 1,
+      "labour": 2,
+      "building": "smithy"
+    },
+    "spear": {
+      "inputs": {
+        "iron": 1,
+        "wood": 1
+      },
+      "output": "spear",
+      "quantity": 3,
+      "labour": 1,
+      "building": "smithy"
+    },
+    "javelin": {
+      "inputs": {
+        "iron": 1,
+        "wood": 1
+      },
+      "output": "javelin",
+      "quantity": 2,
+      "labour": 1,
+      "building": "smithy"
+    },
+    "axe": {
+      "inputs": {
+        "iron": 1,
+        "wood": 1
+      },
+      "output": "axe",
+      "quantity": 2,
+      "labour": 1,
+      "building": "smithy"
+    },
+    "blade": {
+      "inputs": {
+        "iron": 2
+      },
+      "output": "blade",
+      "quantity": 1,
+      "labour": 2,
+      "building": "smithy"
+    },
+    "shield": {
+      "inputs": {
+        "wood": 2
+      },
+      "output": "shield",
+      "quantity": 1,
+      "labour": 1,
+      "building": ""
+    }
+  },
+  "buildings": {
+    "longhouse": {
+      "name": "Wohnstallhaus",
+      "cost": {
+        "wood": 30
+      },
+      "labour": 40,
+      "housing": 20,
+      "max": 60,
+      "from_year": -500,
+      "to_year": 500
+    },
+    "granary": {
+      "name": "Speicherbau",
+      "cost": {
+        "wood": 15
+      },
+      "labour": 20,
+      "storage": 4000,
+      "max": 6,
+      "from_year": -500,
+      "to_year": 500
+    },
+    "smithy": {
+      "name": "Schmiede mit Rennofen",
+      "cost": {
+        "wood": 20
+      },
+      "labour": 30,
+      "craft_labour": 8,
+      "max": 2,
+      "from_year": -500,
+      "to_year": 500
+    },
+    "palisade": {
+      "name": "Palisade und Graben",
+      "cost": {
+        "wood": 80
+      },
+      "labour": 120,
+      "defence": 0.35,
+      "max": 2,
+      "from_year": -500,
+      "to_year": 500
+    },
+    "hall": {
+      "name": "Halle des Anführers",
+      "cost": {
+        "wood": 50,
+        "wealth": 20
+      },
+      "labour": 80,
+      "retinue": 15,
+      "max": 1,
+      "from_year": -500,
+      "to_year": 500
+    },
+    "watchpost": {
+      "name": "Warte am Weg",
+      "cost": {
+        "wood": 10
+      },
+      "labour": 15,
+      "warning": true,
+      "max": 1,
+      "from_year": -500,
+      "to_year": 500
+    }
+  },
+  "projects": {
+    "found_settlement": {
+      "name": "Neue Siedlung gründen",
+      "cost": {
+        "wood": 60,
+        "food": 300
+      },
+      "labour": 80,
+      "migrants": 60,
+      "longhouses": 3
+    },
+    "repair": {
+      "name": "Schäden ausbessern",
+      "wood_per_damage": 2,
+      "labour_per_damage": 2
+    }
+  },
+  "troop_trees": {
+    "germanic_rhine": {
+      "name": "Rheingermanische Aufgebote",
+      "source": [
+        "tacitus_germania",
+        "caesar_bg_1",
+        "caesar_bg_4"
+      ],
+      "note": "Aufgebot der Höfe mit gemischter Ausrüstung, Speerkrieger mit framea und Schild, Plänkler mit Wurfspeeren, wenige erfahrene Schwertkämpfer, Reiter, die persönliche Gefolgschaft des Anführers (Tacitus, Germania 6, 13–14; Caesar BG 1,48; 4,2). Axtkämpfer sind eine seltene rekonstruierte Variante, kein Standard.",
+      "recruit": "aufgebot",
+      "upgrade_rule": "Eine Aufwertung übernimmt die vorhandene Ausrüstung des Mannes, ergänzt die fehlenden Teile aus dem Bestand und gibt nicht benötigte Teile an den Bestand zurück."
+    },
+    "mounted_band": {
+      "name": "Berittene Söldner (Herkunft offen)",
+      "source": [
+        "campaign_arc"
+      ],
+      "note": "Fiktive Reitergruppe für I-10. Das Drehbuch legt bewusst kein Volk fest (I-08).",
+      "recruit": "band_rider"
+    }
+  },
+  "troop_types": {
+    "aufgebot": {
+      "name": "Aufgebot der Höfe (gemischte Ausrüstung)",
+      "tree": "germanic_rhine",
+      "tier": 1,
+      "role": "levy",
+      "equipment_mode": "mixed",
+      "slots": [
+        "spear",
+        "javelin",
+        "axe"
+      ],
+      "equipment": {},
+      "strength": 1.0,
+      "unarmed_strength": 0.5,
+      "upgrades": [
+        {
+          "to": "speerkrieger",
+          "xp": 8
+        },
+        {
+          "to": "plaenkler",
+          "xp": 6
+        },
+        {
+          "to": "axtkrieger",
+          "xp": 12,
+          "rare": 0.03
+        }
+      ],
+      "from_year": -500,
+      "to_year": 500,
+      "canon_kind": "documented_institution",
+      "note": "Freie Männer der Höfe mit dem, was vorhanden ist; die Ausrüstung je Mann steht im Ledger."
+    },
+    "plaenkler": {
+      "name": "Plänkler mit Wurfspeeren",
+      "tree": "germanic_rhine",
+      "tier": 2,
+      "role": "skirmish",
+      "equipment": {
+        "javelin": 1
+      },
+      "strength": 1.6,
+      "upgrades": [],
+      "from_year": -500,
+      "to_year": 500,
+      "canon_kind": "documented_equipment"
+    },
+    "speerkrieger": {
+      "name": "Speerkrieger mit framea und Schild",
+      "tree": "germanic_rhine",
+      "tier": 2,
+      "role": "spear",
+      "equipment": {
+        "spear": 1,
+        "shield": 1
+      },
+      "strength": 2.2,
+      "upgrades": [
+        {
+          "to": "gefolgsmann",
+          "xp": 20,
+          "building": "hall"
+        },
+        {
+          "to": "reiter",
+          "xp": 14
+        },
+        {
+          "to": "schwertkaempfer",
+          "xp": 24,
+          "rare": 0.05
+        }
+      ],
+      "from_year": -500,
+      "to_year": 500,
+      "canon_kind": "documented_equipment"
+    },
+    "schwertkaempfer": {
+      "name": "Erfahrener Schwertkämpfer (selten)",
+      "tree": "germanic_rhine",
+      "tier": 3,
+      "role": "sword",
+      "equipment": {
+        "blade": 1,
+        "shield": 1
+      },
+      "strength": 3.6,
+      "upgrades": [],
+      "from_year": -500,
+      "to_year": 500,
+      "canon_kind": "documented_rare",
+      "note": "Schwerter waren selten (Tacitus, Germania 6); Anteil im Modell begrenzt."
+    },
+    "axtkrieger": {
+      "name": "Axtkämpfer mit Schild (rekonstruierte Variante)",
+      "tree": "germanic_rhine",
+      "tier": 2,
+      "role": "shock",
+      "equipment": {
+        "axe": 1,
+        "shield": 1
+      },
+      "strength": 2.4,
+      "upgrades": [],
+      "from_year": -500,
+      "to_year": 500,
+      "canon_kind": "reconstructed_variant",
+      "note": "Für das vorhandene Modell des germanischen Axtkämpfers; kein Standardkrieger dieser Zeit, Anteil im Modell sehr klein."
+    },
+    "reiter": {
+      "name": "Reiter mit framea und Schild",
+      "tree": "germanic_rhine",
+      "tier": 3,
+      "role": "horse",
+      "equipment": {
+        "spear": 1,
+        "shield": 1,
+        "horse": 1
+      },
+      "strength": 3.4,
+      "upgrades": [],
+      "from_year": -500,
+      "to_year": 500,
+      "canon_kind": "documented_equipment"
+    },
+    "gefolgsmann": {
+      "name": "Gefolgsmann des Anführers",
+      "tree": "germanic_rhine",
+      "tier": 3,
+      "role": "retinue",
+      "equipment": {
+        "spear": 1,
+        "shield": 1,
+        "horse": 1
+      },
+      "strength": 4.0,
+      "upgrades": [],
+      "upkeep_wealth": true,
+      "persons": true,
+      "from_year": -500,
+      "to_year": 500,
+      "canon_kind": "documented_institution",
+      "note": "Gefolgschaft mit Pferd und framea aus der Freigebigkeit des Anführers (Tacitus, Germania 13–14). Jeder Gefolgsmann ist eine Person mit eigener Erinnerung."
+    },
+    "band_rider": {
+      "name": "Berittener Söldner",
+      "tree": "mounted_band",
+      "tier": 2,
+      "role": "horse",
+      "equipment": {
+        "spear": 1,
+        "shield": 1,
+        "horse": 1
+      },
+      "strength": 3.0,
+      "upgrades": [],
+      "from_year": -500,
+      "to_year": 500,
+      "canon_kind": "fictional_band"
+    }
+  },
+  "groups": {
+    "ubii_rhine": {
+      "name": "Ubier · Bezirk am Rheinbogen",
+      "people": "Ubier",
+      "kind": "tribe",
+      "culture": "germanic_rhine",
+      "canon_kind": "attested_people_fictional_district",
+      "source": [
+        "caesar_bg_4"
+      ],
+      "source_note": "Caesar beschreibt die Ubier als große, blühende Gemeinschaft am Rhein, durch Händler an gallische Sitten gewöhnt und den Sueben tributpflichtig (BG 4,3). Bezirk, Orte, Zahlen und Personen sind Spielannahmen.",
+      "atlas_region": "germania",
+      "leader": "p_ubii_adalgar",
+      "families": {
+        "f1": "Sippe am Hafen",
+        "f2": "Sippe vom Hang"
+      },
+      "traits": {
+        "boldness": 0.35,
+        "caution": 0.6,
+        "pride": 0.4,
+        "trade": 0.85,
+        "faith": 0.65
+      },
+      "goals": [
+        "Den Tribut an die Sueben abschütteln",
+        "Handel über den Rhein sichern"
+      ],
+      "raid_range_km": 110,
+      "settlements": [
+        {
+          "id": "s1",
+          "name": "Hof am Rheinbogen",
+          "lat": 50.43,
+          "lon": 7.47,
+          "population": 520,
+          "fields": 170,
+          "ore": true,
+          "food_bonus": 0.0,
+          "buildings": {
+            "longhouse": 26,
+            "granary": 2,
+            "smithy": 1,
+            "palisade": 1,
+            "hall": 1,
+            "watchpost": 1
+          }
+        }
+      ],
+      "expansion_sites": [
+        {
+          "name": "Lahnhöfe",
+          "lat": 50.33,
+          "lon": 7.72,
+          "fields": 60,
+          "ore": true,
+          "food_bonus": 0.0
+        }
+      ],
+      "stock": {
+        "food": 5200,
+        "cattle": 300,
+        "wood": 220,
+        "ore": 40,
+        "iron": 25,
+        "wealth": 60,
+        "spear": 12,
+        "shield": 10,
+        "axe": 2,
+        "javelin": 6,
+        "blade": 1,
+        "horse": 8
+      },
+      "troops": {
+        "aufgebot": {
+          "count": 50,
+          "gear": {
+            "spear": 34,
+            "javelin": 8,
+            "axe": 2
+          }
+        },
+        "speerkrieger": 35,
+        "plaenkler": 15,
+        "axtkrieger": 1,
+        "schwertkaempfer": 2,
+        "reiter": 10,
+        "gefolgsmann": 6
+      },
+      "morale": 60
+    },
+    "suebi_gau": {
+      "name": "Sueben · Grenzgau östlich der Ubier",
+      "people": "Sueben",
+      "kind": "tribe",
+      "culture": "germanic_rhine",
+      "canon_kind": "attested_people_fictional_district",
+      "source": [
+        "caesar_bg_1",
+        "caesar_bg_4"
+      ],
+      "source_note": "Caesar nennt die Sueben das größte und kriegerischste Volk östlich des Rheins; sie hatten die Ubier tributpflichtig gemacht und bedrängten Usipeter und Tenkterer (BG 4,1–3). Ein Teil zog 58 v. Chr. mit Ariovist (BG 1,37; 1,51). Der Gau, seine Zahlen und Personen sind Spielannahmen.",
+      "atlas_region": "germania",
+      "leader": "p_suebi_theudmar",
+      "families": {
+        "f1": "Sippe des Ebers",
+        "f2": "Sippe am Moor"
+      },
+      "traits": {
+        "boldness": 0.8,
+        "caution": 0.25,
+        "pride": 0.85,
+        "trade": 0.15,
+        "faith": 0.5
+      },
+      "goals": [
+        "Vorherrschaft über die Nachbarn",
+        "Tribut und Land"
+      ],
+      "raid_range_km": 140,
+      "settlements": [
+        {
+          "id": "s1",
+          "name": "Höfe in der Wetterau",
+          "lat": 50.35,
+          "lon": 8.75,
+          "population": 600,
+          "fields": 180,
+          "ore": true,
+          "food_bonus": 0.0,
+          "buildings": {
+            "longhouse": 30,
+            "granary": 2,
+            "smithy": 1,
+            "palisade": 0,
+            "hall": 1,
+            "watchpost": 1
+          }
+        }
+      ],
+      "expansion_sites": [
+        {
+          "name": "Höfe an der Nidda",
+          "lat": 50.22,
+          "lon": 8.95,
+          "fields": 70,
+          "ore": false,
+          "food_bonus": 0.0
+        }
+      ],
+      "stock": {
+        "food": 5400,
+        "cattle": 420,
+        "wood": 180,
+        "ore": 30,
+        "iron": 18,
+        "wealth": 40,
+        "spear": 14,
+        "shield": 8,
+        "axe": 2,
+        "javelin": 8,
+        "blade": 2,
+        "horse": 14
+      },
+      "troops": {
+        "aufgebot": {
+          "count": 70,
+          "gear": {
+            "spear": 46,
+            "javelin": 10,
+            "axe": 2
+          }
+        },
+        "speerkrieger": 60,
+        "plaenkler": 20,
+        "axtkrieger": 1,
+        "schwertkaempfer": 3,
+        "reiter": 30,
+        "gefolgsmann": 14
+      },
+      "morale": 70
+    },
+    "sugambri_sieg": {
+      "name": "Sugambrer · Höfe an der Sieg",
+      "people": "Sugambrer",
+      "kind": "tribe",
+      "culture": "germanic_rhine",
+      "canon_kind": "attested_people_fictional_district",
+      "source": [
+        "caesar_bg_4",
+        "caesar_bg_6"
+      ],
+      "source_note": "Caesar nennt die Sugambrer als Nachbarn am Rhein, die 55 v. Chr. die Reiterei der Usipeter und Tenkterer aufnahmen (BG 4,16–19; 6,35). Zahlen, Orte und Personen sind Spielannahmen.",
+      "atlas_region": "germania",
+      "leader": "p_sug_ragnald",
+      "families": {
+        "f1": "Sippe an der Furt",
+        "f2": "Sippe der Rossleute"
+      },
+      "traits": {
+        "boldness": 0.7,
+        "caution": 0.35,
+        "pride": 0.7,
+        "trade": 0.35,
+        "faith": 0.55
+      },
+      "goals": [
+        "Ruhm durch Beutezüge",
+        "Unabhängigkeit gegenüber den Sueben"
+      ],
+      "raid_range_km": 140,
+      "settlements": [
+        {
+          "id": "s1",
+          "name": "Siegtalhöfe",
+          "lat": 50.85,
+          "lon": 7.45,
+          "population": 480,
+          "fields": 150,
+          "ore": true,
+          "food_bonus": 0.0,
+          "buildings": {
+            "longhouse": 24,
+            "granary": 2,
+            "smithy": 1,
+            "palisade": 1,
+            "hall": 1,
+            "watchpost": 0
+          }
+        }
+      ],
+      "expansion_sites": [
+        {
+          "name": "Höfe an der Agger",
+          "lat": 50.92,
+          "lon": 7.25,
+          "fields": 55,
+          "ore": false,
+          "food_bonus": 0.0
+        }
+      ],
+      "stock": {
+        "food": 4600,
+        "cattle": 330,
+        "wood": 200,
+        "ore": 30,
+        "iron": 16,
+        "wealth": 35,
+        "spear": 10,
+        "shield": 8,
+        "axe": 2,
+        "javelin": 6,
+        "blade": 1,
+        "horse": 12
+      },
+      "troops": {
+        "aufgebot": {
+          "count": 50,
+          "gear": {
+            "spear": 32,
+            "javelin": 8,
+            "axe": 2
+          }
+        },
+        "speerkrieger": 45,
+        "plaenkler": 15,
+        "axtkrieger": 1,
+        "schwertkaempfer": 2,
+        "reiter": 25,
+        "gefolgsmann": 10
+      },
+      "morale": 65
+    },
+    "usipetes_tencteri": {
+      "name": "Usipeter und Tenkterer · bedrängte Höfe",
+      "people": "Usipeter und Tenkterer",
+      "kind": "tribe",
+      "culture": "germanic_rhine",
+      "canon_kind": "attested_people_fictional_district",
+      "source": [
+        "caesar_bg_4"
+      ],
+      "source_note": "Nach Caesar wurden Usipeter und Tenkterer viele Jahre von den Sueben bedrängt und überquerten im Winter 56/55 v. Chr. den Rhein (BG 4,1–4). Ihre frühere Lage ist unsicher; Ort, Zahlen und Personen sind Spielannahmen.",
+      "atlas_region": "germania",
+      "leader": "p_usi_hadugar",
+      "families": {
+        "f1": "Sippe der Pferdezüchter",
+        "f2": "Sippe am Bach"
+      },
+      "traits": {
+        "boldness": 0.55,
+        "caution": 0.55,
+        "pride": 0.5,
+        "trade": 0.3,
+        "faith": 0.6
+      },
+      "goals": [
+        "Das eigene Land gegen die Sueben halten",
+        "Weideland für die Pferde"
+      ],
+      "raid_range_km": 160,
+      "settlements": [
+        {
+          "id": "s1",
+          "name": "Höfe im Bergland",
+          "lat": 51.05,
+          "lon": 8.05,
+          "population": 420,
+          "fields": 120,
+          "ore": false,
+          "food_bonus": 0.0,
+          "buildings": {
+            "longhouse": 21,
+            "granary": 1,
+            "smithy": 1,
+            "palisade": 0,
+            "hall": 1,
+            "watchpost": 1
+          }
+        }
+      ],
+      "expansion_sites": [],
+      "stock": {
+        "food": 3400,
+        "cattle": 260,
+        "wood": 150,
+        "ore": 10,
+        "iron": 10,
+        "wealth": 25,
+        "spear": 8,
+        "shield": 6,
+        "axe": 1,
+        "javelin": 6,
+        "blade": 1,
+        "horse": 22
+      },
+      "troops": {
+        "aufgebot": {
+          "count": 40,
+          "gear": {
+            "spear": 24,
+            "javelin": 8,
+            "axe": 1
+          }
+        },
+        "speerkrieger": 35,
+        "plaenkler": 15,
+        "axtkrieger": 1,
+        "schwertkaempfer": 1,
+        "reiter": 35,
+        "gefolgsmann": 7
+      },
+      "morale": 50
+    },
+    "eichenhang": {
+      "name": "Leute vom Eichenhang",
+      "people": "",
+      "kind": "tribe",
+      "culture": "germanic_rhine",
+      "canon_kind": "fictional_local_clan",
+      "source": [],
+      "source_note": "Fiktiver Hofverband im Bergland zwischen Ubiern und Sugambrern.",
+      "atlas_region": "germania",
+      "leader": "p_eic_wulfhard",
+      "families": {
+        "f1": "Sippe des Wulfhard",
+        "f2": "Sippe am Quellbach"
+      },
+      "traits": {
+        "boldness": 0.65,
+        "caution": 0.3,
+        "pride": 0.8,
+        "trade": 0.2,
+        "faith": 0.4
+      },
+      "goals": [
+        "Ansehen gegenüber den großen Nachbarn",
+        "Zollrecht an der Furt von Ravensteg"
+      ],
+      "raid_range_km": 100,
+      "settlements": [
+        {
+          "id": "s1",
+          "name": "Hof am Eichenhang",
+          "lat": 50.65,
+          "lon": 7.85,
+          "population": 220,
+          "fields": 70,
+          "ore": true,
+          "food_bonus": 0.0,
+          "buildings": {
+            "longhouse": 11,
+            "granary": 1,
+            "smithy": 1,
+            "palisade": 1,
+            "hall": 1,
+            "watchpost": 0
+          }
+        }
+      ],
+      "expansion_sites": [
+        {
+          "name": "Rodung am Quellbach",
+          "lat": 50.72,
+          "lon": 7.98,
+          "fields": 35,
+          "ore": false,
+          "food_bonus": 0.0
+        }
+      ],
+      "stock": {
+        "food": 2100,
+        "cattle": 140,
+        "wood": 160,
+        "ore": 20,
+        "iron": 8,
+        "wealth": 15,
+        "spear": 6,
+        "shield": 4,
+        "axe": 2,
+        "javelin": 4,
+        "blade": 0,
+        "horse": 4
+      },
+      "troops": {
+        "aufgebot": {
+          "count": 22,
+          "gear": {
+            "spear": 14,
+            "javelin": 3,
+            "axe": 1
+          }
+        },
+        "speerkrieger": 18,
+        "plaenkler": 6,
+        "axtkrieger": 1,
+        "schwertkaempfer": 0,
+        "reiter": 3,
+        "gefolgsmann": 4
+      },
+      "morale": 60
+    },
+    "ravensteg": {
+      "name": "Furtleute von Ravensteg",
+      "people": "",
+      "kind": "tribe",
+      "culture": "germanic_rhine",
+      "canon_kind": "fictional_local_clan",
+      "source": [],
+      "source_note": "Fiktive Fähr- und Fischergemeinschaft am rechten Rheinufer.",
+      "atlas_region": "germania",
+      "leader": "p_rav_ortwin",
+      "families": {
+        "f1": "Fährsippe",
+        "f2": "Fischersippe"
+      },
+      "traits": {
+        "boldness": 0.2,
+        "caution": 0.75,
+        "pride": 0.3,
+        "trade": 0.9,
+        "faith": 0.8
+      },
+      "goals": [
+        "Die Furt offen und sicher halten",
+        "Wohlstand durch Fährdienst und Tausch"
+      ],
+      "raid_range_km": 80,
+      "settlements": [
+        {
+          "id": "s1",
+          "name": "Ravensteg an der Furt",
+          "lat": 50.58,
+          "lon": 7.3,
+          "population": 180,
+          "fields": 52,
+          "ore": false,
+          "food_bonus": 0.2,
+          "buildings": {
+            "longhouse": 9,
+            "granary": 1,
+            "smithy": 0,
+            "palisade": 1,
+            "hall": 0,
+            "watchpost": 1
+          }
+        }
+      ],
+      "expansion_sites": [
+        {
+          "name": "Uferhöfe flussab",
+          "lat": 50.66,
+          "lon": 7.2,
+          "fields": 25,
+          "ore": false,
+          "food_bonus": 0.2
+        }
+      ],
+      "stock": {
+        "food": 1900,
+        "cattle": 90,
+        "wood": 140,
+        "ore": 0,
+        "iron": 6,
+        "wealth": 80,
+        "spear": 4,
+        "shield": 4,
+        "axe": 1,
+        "javelin": 4,
+        "blade": 0,
+        "horse": 2
+      },
+      "troops": {
+        "aufgebot": {
+          "count": 16,
+          "gear": {
+            "spear": 9,
+            "javelin": 3,
+            "axe": 0
+          }
+        },
+        "speerkrieger": 10,
+        "plaenkler": 8,
+        "axtkrieger": 0,
+        "schwertkaempfer": 0,
+        "reiter": 2,
+        "gefolgsmann": 0
+      },
+      "morale": 60
+    },
+    "mercatores": {
+      "name": "Händler aus Gallien",
+      "people": "",
+      "kind": "market",
+      "culture": "",
+      "canon_kind": "documented_category",
+      "source": [
+        "caesar_bg_4"
+      ],
+      "source_note": "Händler kamen zu den Ubiern; die Sueben ließen Händler vor allem zum Verkauf von Beute zu (BG 4,2–3). Mengen und Personen sind Spielannahmen.",
+      "atlas_region": "gallia",
+      "leader": "",
+      "families": {},
+      "traits": {
+        "boldness": 0.0,
+        "caution": 1.0,
+        "pride": 0.0,
+        "trade": 1.0,
+        "faith": 0.7
+      },
+      "goals": [
+        "Eisen und Schmuck gegen Vieh und Beute tauschen"
+      ],
+      "raid_range_km": 0,
+      "settlements": [
+        {
+          "id": "s1",
+          "name": "Handelsplatz am linken Ufer",
+          "lat": 50.36,
+          "lon": 7.58,
+          "population": 0,
+          "fields": 0,
+          "ore": false,
+          "food_bonus": 0.0,
+          "buildings": {}
+        }
+      ],
+      "expansion_sites": [],
+      "stock": {
+        "food": 0,
+        "cattle": 0,
+        "wood": 0,
+        "ore": 0,
+        "iron": 20,
+        "wealth": 30,
+        "spear": 0,
+        "shield": 0,
+        "axe": 0,
+        "javelin": 0,
+        "blade": 2,
+        "horse": 0
+      },
+      "seasonal_arrival": {
+        "iron": 20,
+        "wealth": 30,
+        "blade": 2
+      },
+      "seasonal_cap": {
+        "iron": 60,
+        "wealth": 90,
+        "blade": 6
+      },
+      "troops": {},
+      "morale": 50
+    },
+    "red_seal_riders": {
+      "name": "Reiter ohne Feldzeichen",
+      "people": "",
+      "kind": "band",
+      "culture": "mounted_band",
+      "canon_kind": "fictional_band",
+      "source": [
+        "campaign_arc"
+      ],
+      "source_note": "Fiktive Gruppe von etwa dreißig Reitern für I-10. Herkunft und Auftraggeber bleiben Storyentscheidung (I-08, I-15, I-20).",
+      "atlas_region": "italia",
+      "leader": "p_riders_leader",
+      "families": {
+        "f1": "Reitergruppe"
+      },
+      "traits": {
+        "boldness": 0.7,
+        "caution": 0.4,
+        "pride": 0.3,
+        "trade": 0.1,
+        "faith": 0.3
+      },
+      "goals": [
+        "Bezahlte Aufträge erfüllen"
+      ],
+      "raid_range_km": 120,
+      "settlements": [
+        {
+          "id": "s1",
+          "name": "Versteck im Hügelland",
+          "lat": 45.98,
+          "lon": 13.5,
+          "population": 34,
+          "fields": 0,
+          "ore": false,
+          "food_bonus": 0.0,
+          "buildings": {}
+        }
+      ],
+      "expansion_sites": [],
+      "stock": {
+        "food": 0,
+        "cattle": 0,
+        "wood": 0,
+        "ore": 0,
+        "iron": 0,
+        "wealth": 40,
+        "spear": 4,
+        "shield": 2,
+        "axe": 0,
+        "javelin": 0,
+        "blade": 0,
+        "horse": 6
+      },
+      "troops": {
+        "band_rider": 30
+      },
+      "morale": 55,
+      "upkeep": {
+        "wealth_per_week": 0.4
+      }
+    }
+  },
+  "persons": {
+    "p_ubii_adalgar": {
+      "name": "Adalgar",
+      "group": "ubii_rhine",
+      "family": "f1",
+      "role": "chief",
+      "age": 46,
+      "traits": {
+        "ambition": 0.4,
+        "boldness": 0.3,
+        "caution": 0.65,
+        "pride": 0.4,
+        "trade": 0.85
+      },
+      "prestige": 55
+    },
+    "p_ubii_wigmund": {
+      "name": "Wigmund",
+      "group": "ubii_rhine",
+      "family": "f1",
+      "role": "heir",
+      "age": 19,
+      "traits": {
+        "ambition": 0.55,
+        "boldness": 0.5,
+        "caution": 0.45,
+        "pride": 0.5,
+        "trade": 0.6
+      },
+      "prestige": 18
+    },
+    "p_ubii_hrodwin": {
+      "name": "Hrodwin",
+      "group": "ubii_rhine",
+      "family": "f2",
+      "role": "rival",
+      "age": 37,
+      "traits": {
+        "ambition": 0.75,
+        "boldness": 0.65,
+        "caution": 0.35,
+        "pride": 0.7,
+        "trade": 0.3
+      },
+      "prestige": 42
+    },
+    "p_suebi_theudmar": {
+      "name": "Theudmar",
+      "group": "suebi_gau",
+      "family": "f1",
+      "role": "chief",
+      "age": 41,
+      "traits": {
+        "ambition": 0.7,
+        "boldness": 0.85,
+        "caution": 0.2,
+        "pride": 0.9,
+        "trade": 0.1
+      },
+      "prestige": 65
+    },
+    "p_suebi_gerwald": {
+      "name": "Gerwald",
+      "group": "suebi_gau",
+      "family": "f1",
+      "role": "heir",
+      "age": 21,
+      "traits": {
+        "ambition": 0.6,
+        "boldness": 0.8,
+        "caution": 0.3,
+        "pride": 0.8,
+        "trade": 0.15
+      },
+      "prestige": 22
+    },
+    "p_suebi_ingwald": {
+      "name": "Ingwald",
+      "group": "suebi_gau",
+      "family": "f2",
+      "role": "rival",
+      "age": 33,
+      "traits": {
+        "ambition": 0.6,
+        "boldness": 0.55,
+        "caution": 0.55,
+        "pride": 0.6,
+        "trade": 0.4
+      },
+      "prestige": 40
+    },
+    "p_sug_ragnald": {
+      "name": "Ragnald",
+      "group": "sugambri_sieg",
+      "family": "f1",
+      "role": "chief",
+      "age": 50,
+      "traits": {
+        "ambition": 0.5,
+        "boldness": 0.7,
+        "caution": 0.35,
+        "pride": 0.75,
+        "trade": 0.3
+      },
+      "prestige": 58
+    },
+    "p_sug_odmar": {
+      "name": "Odmar",
+      "group": "sugambri_sieg",
+      "family": "f1",
+      "role": "heir",
+      "age": 24,
+      "traits": {
+        "ambition": 0.5,
+        "boldness": 0.75,
+        "caution": 0.3,
+        "pride": 0.7,
+        "trade": 0.3
+      },
+      "prestige": 25
+    },
+    "p_sug_sigiwald": {
+      "name": "Sigiwald",
+      "group": "sugambri_sieg",
+      "family": "f2",
+      "role": "rival",
+      "age": 39,
+      "traits": {
+        "ambition": 0.7,
+        "boldness": 0.5,
+        "caution": 0.5,
+        "pride": 0.6,
+        "trade": 0.55
+      },
+      "prestige": 45
+    },
+    "p_usi_hadugar": {
+      "name": "Hadugar",
+      "group": "usipetes_tencteri",
+      "family": "f1",
+      "role": "chief",
+      "age": 52,
+      "traits": {
+        "ambition": 0.35,
+        "boldness": 0.5,
+        "caution": 0.6,
+        "pride": 0.5,
+        "trade": 0.35
+      },
+      "prestige": 50
+    },
+    "p_usi_folkwin": {
+      "name": "Folkwin",
+      "group": "usipetes_tencteri",
+      "family": "f1",
+      "role": "heir",
+      "age": 26,
+      "traits": {
+        "ambition": 0.55,
+        "boldness": 0.6,
+        "caution": 0.5,
+        "pride": 0.5,
+        "trade": 0.3
+      },
+      "prestige": 24
+    },
+    "p_usi_ansfrid": {
+      "name": "Ansfrid",
+      "group": "usipetes_tencteri",
+      "family": "f2",
+      "role": "rival",
+      "age": 35,
+      "traits": {
+        "ambition": 0.7,
+        "boldness": 0.7,
+        "caution": 0.35,
+        "pride": 0.6,
+        "trade": 0.2
+      },
+      "prestige": 38
+    },
+    "p_eic_wulfhard": {
+      "name": "Wulfhard",
+      "group": "eichenhang",
+      "family": "f1",
+      "role": "chief",
+      "age": 38,
+      "traits": {
+        "ambition": 0.75,
+        "boldness": 0.7,
+        "caution": 0.25,
+        "pride": 0.85,
+        "trade": 0.2
+      },
+      "prestige": 40
+    },
+    "p_eic_eburwin": {
+      "name": "Eburwin",
+      "group": "eichenhang",
+      "family": "f1",
+      "role": "heir",
+      "age": 17,
+      "traits": {
+        "ambition": 0.5,
+        "boldness": 0.6,
+        "caution": 0.4,
+        "pride": 0.7,
+        "trade": 0.3
+      },
+      "prestige": 10
+    },
+    "p_eic_gerhart": {
+      "name": "Gerhart",
+      "group": "eichenhang",
+      "family": "f2",
+      "role": "rival",
+      "age": 44,
+      "traits": {
+        "ambition": 0.45,
+        "boldness": 0.35,
+        "caution": 0.65,
+        "pride": 0.45,
+        "trade": 0.55
+      },
+      "prestige": 34
+    },
+    "p_rav_ortwin": {
+      "name": "Ortwin",
+      "group": "ravensteg",
+      "family": "f1",
+      "role": "chief",
+      "age": 55,
+      "traits": {
+        "ambition": 0.3,
+        "boldness": 0.2,
+        "caution": 0.75,
+        "pride": 0.3,
+        "trade": 0.9
+      },
+      "prestige": 45
+    },
+    "p_rav_swanahild": {
+      "name": "Swanahild",
+      "group": "ravensteg",
+      "family": "f1",
+      "role": "heir",
+      "age": 23,
+      "traits": {
+        "ambition": 0.6,
+        "boldness": 0.35,
+        "caution": 0.6,
+        "pride": 0.4,
+        "trade": 0.85
+      },
+      "prestige": 26
+    },
+    "p_rav_rumold": {
+      "name": "Rumold",
+      "group": "ravensteg",
+      "family": "f2",
+      "role": "rival",
+      "age": 40,
+      "traits": {
+        "ambition": 0.55,
+        "boldness": 0.45,
+        "caution": 0.5,
+        "pride": 0.55,
+        "trade": 0.6
+      },
+      "prestige": 30
+    },
+    "p_riders_leader": {
+      "name": "Anführer der Reiter (Name unbekannt)",
+      "group": "red_seal_riders",
+      "family": "f1",
+      "role": "chief",
+      "age": 35,
+      "traits": {
+        "ambition": 0.6,
+        "boldness": 0.7,
+        "caution": 0.45,
+        "pride": 0.3,
+        "trade": 0.2
+      },
+      "prestige": 30
+    }
+  },
+  "name_pools": {
+    "germanic_rhine": [
+      "Adalwin",
+      "Berold",
+      "Eburhart",
+      "Folkmar",
+      "Gerbald",
+      "Hadumar",
+      "Liutwin",
+      "Nordbert",
+      "Odwin",
+      "Ragnmar",
+      "Theudwin",
+      "Wigbald",
+      "Ansbert",
+      "Baldwin",
+      "Dagmar",
+      "Ermenold",
+      "Frodwin",
+      "Gisbald",
+      "Hunold",
+      "Isanbert",
+      "Landolf",
+      "Meginhart",
+      "Ratbod",
+      "Sigbert",
+      "Thiadmar",
+      "Uodalric",
+      "Waldmar",
+      "Wolfram",
+      "Hildrun",
+      "Gerlind",
+      "Walburg",
+      "Swanhild"
+    ],
+    "mounted_band": [
+      "Unbekannter Reiter"
+    ]
+  },
+  "targets": {
+    "valdora": {
+      "name": "Valdora",
+      "kind": "community",
+      "canon_kind": "fictional_community_documented_region",
+      "lat": 45.85,
+      "lon": 13.25,
+      "atlas_region": "italia",
+      "raidable": true,
+      "source_note": "Fiktive Gemeinschaft im Raum Aquileia (campaign_arc.json, 58 v. Chr.). Ihre Güter führt das Dorfledger; dieses Modell bucht nur gemeldete Abflüsse und Zuflüsse."
+    },
+    "player": {
+      "name": "Spielfigur",
+      "kind": "person",
+      "canon_kind": "player",
+      "lat": 45.85,
+      "lon": 13.25,
+      "atlas_region": "italia",
+      "raidable": false,
+      "source_note": "Die Spielfigur beginnt als Kind in Valdora."
+    },
+    "rome": {
+      "name": "Rom · Heer Caesars in Gallien",
+      "kind": "power",
+      "canon_kind": "documented_actor",
+      "lat": 47.24,
+      "lon": 6.02,
+      "atlas_region": "gallia",
+      "raidable": false,
+      "source_note": "Caesar führt 58 v. Chr. Krieg gegen Helvetier und Ariovist (BG 1). Rom handelt in diesem Modell nur über datierte Anker."
+    },
+    "red_seal_house": {
+      "name": "Handelshaus mit dem roten Siegel",
+      "kind": "organisation",
+      "canon_kind": "fictional_story_pending",
+      "lat": 45.77,
+      "lon": 13.37,
+      "atlas_region": "italia",
+      "raidable": false,
+      "source_note": "Fiktive Handelsorganisation aus I-15/I-20. Beteiligte Personen und Schuld sind eine offene Storyentscheidung."
+    }
+  },
+  "relations": [
+    {
+      "observer": "ubii_rhine",
+      "subject": "suebi_gau",
+      "values": {
+        "fear": 50,
+        "grievance": 35,
+        "trust": -15
+      },
+      "source": "caesar_bg_4",
+      "note": "Tributpflicht gegenüber den Sueben (BG 4,3); Werte sind Spielannahmen."
+    },
+    {
+      "observer": "suebi_gau",
+      "subject": "ubii_rhine",
+      "values": {
+        "respect": -20,
+        "trust": 5
+      },
+      "source": "caesar_bg_4",
+      "note": "Tributherr gegenüber den Ubiern (BG 4,3)."
+    },
+    {
+      "observer": "usipetes_tencteri",
+      "subject": "suebi_gau",
+      "values": {
+        "fear": 55,
+        "grievance": 55,
+        "trust": -25
+      },
+      "source": "caesar_bg_4",
+      "note": "Viele Jahre von den Sueben bedrängt (BG 4,1)."
+    },
+    {
+      "observer": "suebi_gau",
+      "subject": "usipetes_tencteri",
+      "values": {
+        "grievance": 15,
+        "respect": -10
+      },
+      "source": "caesar_bg_4",
+      "note": "Gegner der Sueben (BG 4,1)."
+    },
+    {
+      "observer": "ubii_rhine",
+      "subject": "ravensteg",
+      "values": {
+        "trust": 35
+      },
+      "source": "",
+      "note": "Fiktiver Handelsbund."
+    },
+    {
+      "observer": "ravensteg",
+      "subject": "ubii_rhine",
+      "values": {
+        "trust": 40
+      },
+      "source": "",
+      "note": "Fiktiver Handelsbund."
+    },
+    {
+      "observer": "eichenhang",
+      "subject": "ravensteg",
+      "values": {
+        "grievance": 25,
+        "envy": 20,
+        "trust": -10
+      },
+      "source": "",
+      "note": "Fiktiver Streit um den Furtzoll."
+    },
+    {
+      "observer": "ravensteg",
+      "subject": "eichenhang",
+      "values": {
+        "fear": 25,
+        "trust": -10
+      },
+      "source": "",
+      "note": "Fiktiver Streit um den Furtzoll."
+    },
+    {
+      "observer": "eichenhang",
+      "subject": "sugambri_sieg",
+      "values": {
+        "trust": 25
+      },
+      "source": "",
+      "note": "Fiktive Gastfreundschaft."
+    },
+    {
+      "observer": "sugambri_sieg",
+      "subject": "eichenhang",
+      "values": {
+        "trust": 25
+      },
+      "source": "",
+      "note": "Fiktive Gastfreundschaft."
+    },
+    {
+      "observer": "ubii_rhine",
+      "subject": "mercatores",
+      "values": {
+        "trust": 30
+      },
+      "source": "caesar_bg_4",
+      "note": "Händlerkontakte der Ubier (BG 4,3)."
+    },
+    {
+      "observer": "mercatores",
+      "subject": "ubii_rhine",
+      "values": {
+        "trust": 30
+      },
+      "source": "caesar_bg_4",
+      "note": "Händlerkontakte der Ubier (BG 4,3)."
+    },
+    {
+      "observer": "suebi_gau",
+      "subject": "mercatores",
+      "values": {
+        "trust": -10
+      },
+      "source": "caesar_bg_4",
+      "note": "Die Sueben lassen Händler nur eingeschränkt zu (BG 4,2)."
+    },
+    {
+      "observer": "red_seal_riders",
+      "subject": "red_seal_house",
+      "values": {
+        "obligation": 30
+      },
+      "source": "campaign_arc",
+      "note": "Fiktiver Auftrag; Kenntnis haben nur die Beteiligten."
+    },
+    {
+      "observer": "red_seal_house",
+      "subject": "red_seal_riders",
+      "values": {
+        "trust": 10
+      },
+      "source": "campaign_arc",
+      "note": "Fiktiver Auftrag; Kenntnis haben nur die Beteiligten."
+    }
+  ],
+  "contact_radius_km": 80,
+  "rome_known_by": [
+    "ubii_rhine",
+    "suebi_gau",
+    "sugambri_sieg",
+    "usipetes_tencteri"
+  ],
+  "agreements": [
+    {
+      "kind": "tribute",
+      "a": "ubii_rhine",
+      "b": "suebi_gau",
+      "duration": 52,
+      "terms": {
+        "cattle": 10,
+        "wealth": 4
+      },
+      "every": 13,
+      "canon_kind": "documented_relation_game_terms",
+      "source": "caesar_bg_4"
+    },
+    {
+      "kind": "trade_pact",
+      "a": "ubii_rhine",
+      "b": "ravensteg",
+      "duration": 52,
+      "terms": {},
+      "every": 0,
+      "canon_kind": "fictional",
+      "source": ""
+    },
+    {
+      "kind": "guest_friendship",
+      "a": "eichenhang",
+      "b": "sugambri_sieg",
+      "duration": 156,
+      "terms": {},
+      "every": 0,
+      "canon_kind": "fictional",
+      "source": ""
+    },
+    {
+      "kind": "commission",
+      "a": "red_seal_house",
+      "b": "red_seal_riders",
+      "duration": 104,
+      "terms": {
+        "wealth": 60
+      },
+      "every": 0,
+      "target": "valdora",
+      "story": "I-10",
+      "canon_kind": "fictional_story_pending",
+      "source": "campaign_arc"
+    }
+  ],
+  "anchors": [
+    {
+      "id": "ariovistus_defeat_58",
+      "tick": 28,
+      "year": -58,
+      "canon_kind": "documented_anchor",
+      "magnitude_kind": "game_interpretation",
+      "source": "caesar_bg_1",
+      "text": "Caesar besiegt Ariovist nahe dem Rhein. Die Sueben, die an den Rhein gekommen waren, kehren um (Caesar, BG 1,53–54).",
+      "requires": {
+        "active": [
+          "suebi_gau"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "relation",
+          "observer": "*rome_known",
+          "subject": "rome",
+          "values": {
+            "fear": 15
+          }
+        },
+        {
+          "kind": "relation",
+          "observer": "suebi_gau",
+          "subject": "rome",
+          "values": {
+            "grievance": 20,
+            "fear": 10
+          }
+        },
+        {
+          "kind": "relation",
+          "observer": "ubii_rhine",
+          "subject": "rome",
+          "values": {
+            "respect": 15
+          }
+        },
+        {
+          "kind": "morale",
+          "group": "suebi_gau",
+          "amount": -10
+        }
+      ]
+    },
+    {
+      "id": "usipetes_cross_56",
+      "tick": 148,
+      "year": -56,
+      "canon_kind": "documented_anchor",
+      "magnitude_kind": "documented",
+      "source": "caesar_bg_4",
+      "text": "Usipeter und Tenkterer, von den Sueben bedrängt, überqueren im Winter den Rhein (Caesar, BG 4,1–4). Ihre Höfe hier bleiben verlassen.",
+      "requires": {
+        "active": [
+          "usipetes_tencteri"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "depart",
+          "group": "usipetes_tencteri"
+        }
+      ]
+    },
+    {
+      "id": "usipetes_remnant_55",
+      "tick": 166,
+      "year": -55,
+      "canon_kind": "documented_anchor",
+      "magnitude_kind": "documented",
+      "source": "caesar_bg_4",
+      "text": "Nach der Niederlage gegen Caesar zieht die Reiterei der Usipeter und Tenkterer zu den Sugambrern; die übrigen verlassen den Raum dieses Modells (Caesar, BG 4,14–16).",
+      "requires": {
+        "departed": [
+          "usipetes_tencteri"
+        ],
+        "active": [
+          "sugambri_sieg"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "refugees",
+          "from": "usipetes_tencteri",
+          "to": "sugambri_sieg",
+          "troop": "reiter"
+        },
+        {
+          "kind": "relation",
+          "observer": "sugambri_sieg",
+          "subject": "rome",
+          "values": {
+            "grievance": 20
+          }
+        },
+        {
+          "kind": "leave_area",
+          "group": "usipetes_tencteri"
+        }
+      ]
+    },
+    {
+      "id": "rhine_bridge_55",
+      "tick": 176,
+      "year": -55,
+      "canon_kind": "documented_anchor",
+      "magnitude_kind": "game_interpretation",
+      "source": "caesar_bg_4",
+      "text": "Caesar überquert den Rhein auf einer Brücke. Die Ubier schließen Freundschaft mit Rom; die Sugambrer weichen in die Wälder, ihre Dörfer und Felder werden verwüstet (Caesar, BG 4,16–19).",
+      "requires": {
+        "active": [
+          "ubii_rhine"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "agreement",
+          "agreement": "amicitia",
+          "a": "ubii_rhine",
+          "b": "rome",
+          "duration": 520
+        },
+        {
+          "kind": "relation",
+          "observer": "ubii_rhine",
+          "subject": "rome",
+          "values": {
+            "trust": 25,
+            "obligation": 10
+          }
+        },
+        {
+          "kind": "war_damage",
+          "group": "sugambri_sieg",
+          "damage": 30,
+          "food_share": 0.2,
+          "by": "rome"
+        },
+        {
+          "kind": "refuge",
+          "group": "sugambri_sieg",
+          "ticks": 3
+        },
+        {
+          "kind": "relation",
+          "observer": "sugambri_sieg",
+          "subject": "rome",
+          "values": {
+            "grievance": 25,
+            "fear": 25
+          }
+        },
+        {
+          "kind": "relation",
+          "observer": "suebi_gau",
+          "subject": "rome",
+          "values": {
+            "fear": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "rhine_crossing_53",
+      "tick": 280,
+      "year": -53,
+      "canon_kind": "documented_anchor",
+      "magnitude_kind": "game_interpretation",
+      "source": "caesar_bg_6",
+      "text": "Caesar überquert den Rhein ein zweites Mal. Die Ubier melden die Lage der Sueben; diese sammeln sich am Rand ihres Waldgebiets (Caesar, BG 6,9–10; 6,29).",
+      "requires": {
+        "active": [
+          "suebi_gau"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "relation",
+          "observer": "ubii_rhine",
+          "subject": "rome",
+          "values": {
+            "trust": 5
+          }
+        },
+        {
+          "kind": "relation",
+          "observer": "suebi_gau",
+          "subject": "rome",
+          "values": {
+            "fear": 10,
+            "grievance": 10
+          }
+        },
+        {
+          "kind": "refuge",
+          "group": "suebi_gau",
+          "ticks": 4
+        }
+      ]
+    },
+    {
+      "id": "ubii_resettled_38",
+      "tick": 1040,
+      "year": -38,
+      "canon_kind": "documented_anchor",
+      "magnitude_kind": "game_interpretation",
+      "source": "strabo_ubii",
+      "text": "Unter Agrippa siedeln die Ubier auf das linke Rheinufer über (Strabon 4,3,4; Tacitus, Annales 12,27).",
+      "requires": {
+        "active": [
+          "ubii_rhine"
+        ],
+        "agreement": [
+          "amicitia",
+          "ubii_rhine",
+          "rome"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "relocate",
+          "group": "ubii_rhine",
+          "name": "Siedlung am linken Ufer",
+          "lat": 50.94,
+          "lon": 6.96,
+          "atlas_region": "gallia",
+          "damage": 40
+        }
+      ]
+    }
+  ],
+  "story_raids": {
+    "I-10": {
+      "attacker": "red_seal_riders",
+      "target": "valdora",
+      "visible_raiders": 30,
+      "protected": true,
+      "recovery_ticks": 26,
+      "note": "Die Nacht der Reiter bleibt ein geschütztes Storyereignis. Ergebnis, Opfer und Familienpfade bestimmt das Drehbuch; dieses Modell übernimmt nur gemeldete Verluste und Beute."
+    }
+  },
+  "bands": [
+    {
+      "band": 1,
+      "roman": "I",
+      "from": -58,
+      "to": -52
+    },
+    {
+      "band": 2,
+      "roman": "II",
+      "from": -51,
+      "to": -47
+    },
+    {
+      "band": 3,
+      "roman": "III",
+      "from": -47,
+      "to": -44
+    },
+    {
+      "band": 4,
+      "roman": "IV",
+      "from": -44,
+      "to": -27
+    }
+  ]
+}
