@@ -43,6 +43,22 @@ class MotionGateTests(unittest.TestCase):
                 file.write_bytes(b"x")
             self.assertEqual(GATE.inventory(p), ({"assets/new_horse.glb"}, {"scripts/new_motion.gd"}))
 
+    def test_support_scene_cannot_hide_clips_rigs_or_instances(self):
+        with tempfile.TemporaryDirectory() as directory:
+            scene = Path(directory) / "mode.tscn"
+            scene.write_text('[gd_scene format=3]\n[ext_resource type="Script" path="res://m.gd" id="1"]\n'
+                             '[node name="Mode" type="Node3D"]\nscript = ExtResource("1")\n')
+            self.assertEqual(GATE.support_scene_errors(scene), [])
+            for hidden in ('[sub_resource type="Animation" id="a"]\n', '[node name="P" type="AnimationPlayer" parent="."]\n',
+                           '[node name="R" type="Skeleton3D" parent="."]\n', '[ext_resource type="PackedScene" path="res://x.glb" id="2"]\n',
+                           '[node name="X" parent="." instance=ExtResource("2")]\n'):
+                with self.subTest(hidden=hidden):
+                    scene.write_text('[gd_scene format=3]\n' + hidden)
+                    self.assertTrue(GATE.support_scene_errors(scene))
+        for path in ("main.tscn", "scenes/city_support_district.tscn"):
+            self.assertIn(path, GATE.SUPPORT)
+            self.assertEqual(GATE.support_scene_errors(Path(__file__).resolve().parents[1] / "prototype" / path), [])
+
     def test_missing_or_stale_or_failed_proof_stops_export(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)
@@ -116,6 +132,42 @@ class MotionGateTests(unittest.TestCase):
             path.parent.mkdir(parents=True)
             path.write_text("extends Node\n")
             self.assertEqual(GATE.inventory(project), (set(), {"scripts/android/motion.gd"}))
+
+    def test_only_proven_data_logic_scripts_skip_the_reviewed_list(self):
+        data = 'extends RefCounted\n# moves nothing: Node3D position\nconst NOTE := "Skeleton3D.position"\n' \
+               'static func cost(a: float) -> float:\n\treturn lerpf(a, 2.0, 0.5)\n'
+        cases = {
+            "scripts/domain/table.gd": data,
+            "scripts/domain/child.gd": 'extends "res://scripts/domain/table.gd"\nconst T = preload("res://scripts/domain/table.gd")\n',
+            "scripts/domain/uses_reviewed.gd": 'extends RefCounted\nconst R = preload("res://scripts/reviewed.gd")\n',
+            # Everything below can reach the scene, a rig or a transform and stays unclassified.
+            "scripts/node.gd": "extends Node\n",
+            "scripts/no_base.gd": "var x := 1\n",
+            "scripts/class_base.gd": "extends Soldier\n",
+            "scripts/spatial.gd": "extends RefCounted\nfunc f(a):\n\ta.position.x += 1.0\n",
+            "scripts/spaced.gd": "extends RefCounted\nfunc f(a):\n\ta . global_transform = a.t\n",
+            "scripts/vector.gd": "extends RefCounted\nfunc f() -> Vector3:\n\treturn Vector3.ZERO\n",
+            "scripts/player.gd": "extends RefCounted\nfunc f(a):\n\ta.play(\"march\")\n",
+            "scripts/dynamic.gd": "extends RefCounted\nfunc f(a):\n\ta.set(\"position\", 1)\n",
+            "scripts/dynamic_call.gd": "extends RefCounted\nfunc f(a):\n\ta.call(\"look_at\", 1)\n",
+            "scripts/tree.gd": "extends RefCounted\nfunc f():\n\treturn Engine.get_main_loop()\n",
+            "scripts/scene.gd": 'extends RefCounted\nconst S = preload("res://scenes/x.tscn")\n',
+            "scripts/computed.gd": 'extends RefCounted\nfunc f(p):\n\treturn load(p)\n',
+            "scripts/loads_node.gd": 'extends RefCounted\nconst N = preload("res://scripts/node.gd")\n',
+            "scripts/loads_missing.gd": 'extends RefCounted\nconst N = preload("res://scripts/absent.gd")\n',
+            "scripts/chain.gd": 'extends RefCounted\nconst N = preload("res://scripts/loads_node.gd")\n',
+            "scripts/base_node.gd": 'extends "res://scripts/node.gd"\n',
+            "scripts/unique.gd": "extends RefCounted\nfunc f(a):\n\treturn a.%Rig\n",
+            "shaders/sway.gdshader": "shader_type spatial;\n",
+            "scripts/reviewed.gd": "extends Node3D\n",
+        }
+        with tempfile.TemporaryDirectory() as work:
+            project = Path(work)
+            for name, text in cases.items():
+                (project / name).parent.mkdir(parents=True, exist_ok=True)
+                (project / name).write_text(text)
+            self.assertEqual(GATE.data_logic_scripts(project, set(cases), {"scripts/reviewed.gd"}),
+                             {"scripts/domain/table.gd", "scripts/domain/child.gd", "scripts/domain/uses_reviewed.gd"})
 
     @unittest.skipUnless(shutil.which("ffmpeg") and shutil.which("ffprobe"), "video tools unavailable")
     def test_capture_requires_real_decodable_frames(self):
