@@ -116,7 +116,7 @@ Die etwa dreißig Reiter für I-10 sind keinem Volk und keinem Stamm zugeordnet.
 
 ## 6d. Regionale Völker um Aquileia (Vorbereitung)
 
-`prototype/assets/world/tribes/regional_candidates_aquileia.json` enthält Karner, Histrer, Taurisker/Noriker, Iapyden und Veneter als **ungeprüfte Kandidaten**. Jeder Eintrag hat Prüfaufträge (Quellenstellen) und offene Fragen, aber keine Zahlen und keine behaupteten Ereignisse; nichts davon wird simuliert, bevor es geprüft und freigegeben ist. Kulturen, Kriegerbäume und Namen sind im Szenarioformat bereits je Kultur angelegt.
+`prototype/assets/world/tribes/regional_peoples_aquileia.json` enthält Karner, Histrer, Taurisker/Noriker, Iapyden und Veneter (Adria) als Rosterdaten mit Quellenbeleg. Jede historische Aussage nennt Quelle, Stelle und den am 26.11.2026 in der verlinkten Ausgabe geprüften Wortlaut (Caesar BG 1,5; 1,10; 1,53; Hirtius BG 8,24; Caesar BC 1,18; Livius 40,34; 41,4; 41,11; 43,5; Polybios 2,17–24; Strabon 4,6,9–12; 5,1,4–9; 7,5,2–4; Plinius NH 3,126–133; Appian, Illyrike 16–19; Fasti triumphales; Cassius Dio 41,36). `documented` ist am Wortlaut geprüft, `inferred` ist ein Schluss aus den genannten Stellen, `secondary` stützt sich auf Sekundärliteratur (nur das latinische Recht von 89 v. Chr.). Herrschaftsform, Rolle und Truppen stehen getrennt unter `design_hooks` als Spielannahmen. Die Datei ist noch kein Szenario: Siedlungszahlen, Bestände, Truppen und Namenspools fehlen bewusst, nichts davon wird simuliert, und kein Test liest die Datei bisher. Quellengestützter Kandidat für eine natürliche Feindschaft (D-048) sind nur die Iapyden gegen Tergeste und Aquileia (Einfall 52 v. Chr.); die Reiter von I-10 bleiben ohne Volk (D-040). Eine Fachprüfung steht aus.
 
 ## 7. Entscheidungen
 
@@ -160,7 +160,7 @@ Inhalte tragen `from_year`/`to_year`. Datierte Anker mit Quelle und Größenmark
 
 Die Zahlen stammen aus den Testläufen dieses Branches; sie sind keine Gerätemessung.
 
-- `tribal_world`: 147 Prüfungen bestanden, `tribal_save`: 24, `tribal_atlas`: 29.
+- `tribal_world`: 181 Prüfungen bestanden, `tribal_save`: 38, `tribal_atlas`: 40 (Lauf vom 26.11.2026 auf Stand 8268328).
 - Determinismus: gleicher Seed → identischer Zustand nach 200 Wochen; Speichern und Laden nach Woche 100 → bitgleiche Fortsetzung. Godots JSON überträgt nur korrekt gerundete Dezimalzahlen exakt; alle gespeicherten Bruchwerte werden deshalb auf vier Dezimalen gerundet.
 - Ledger: vollständige Wiederholung aller Buchungen über 200 Wochen ergibt jeden Bestand, jede getragene Ausrüstung und jede Bevölkerungszahl; jeder Transfer hat genau Sender und Empfänger.
 - 400 Wochen, Seeds 1, 2026, 58: gültig, keine Gemeinschaft unter 30 % oder über 200 % der Anfangsbevölkerung, keine gegenseitige Feindschaft länger als drei Jahre, höchstens 12 Überfälle je Gruppe und Jahr (gemessen: 7–16 Überfälle der ganzen Region in 400 Wochen, Seeds 1/2026/58), Erholungsfrist eingehalten, Frieden, Handel und Bau finden statt.
@@ -209,7 +209,7 @@ Qualitätsmaßstab ist die Lesbarkeit und Dichte, die der Eigentümer mit Assass
 ## 15. Risiken
 
 - Schema v6 berührt Tests anderer Pakete (sechs Prüfungen auf `schema_version == 5` wurden auf `SCHEMA_VERSION` umgestellt); ein paralleler Branch mit eigener Schemaanhebung muss die Migrationskette zusammenführen.
-- Leistung auf dem Fold7 ist nicht gemessen; der Catch-up ist auf 2 Wochen je Bild begrenzt.
+- Leistung auf dem Fold7 ist nicht gemessen; das Aufholen ist auf 6 Arbeitseinheiten je Bild begrenzt.
 - Die Balance (Ertrag, Geburten, Überfallnutzen) ist nur gegen Stabilitätskriterien geprüft, nicht gegen Spielspaß.
 - Die fixen Bezugstexte in `village_life.gd` ändern sich parallel; die Zeilenangaben in Abschnitt 8 sind vor dem Anschluss zu prüfen.
 - Stammeszustand v2 (Herrschaftsformen, Streitregister): `TribalWorld.migrate()` hebt Stände des ersten #99-Builds an. Dabei kehren Kriegszüge ohne gebuchten Anlass heim, und alte Konfliktereignisse werden als `legacy` (vor D-048) markiert.
