@@ -60,6 +60,7 @@
 | D-054 | Vorgabe (26.11.2026) | Stimmen: ElevenLabs oder andere kostenpflichtige Dienste nur, wenn verfügbar und mit genehmigtem Kostenrahmen; sonst lizenzierte lokale Werkzeuge. Lippensynchronisation über Forced Alignment, Phoneme und Viseme, keine bloße Kieferbewegung. | Audio-Paket; Kostenrahmen offen. |
 | D-055 | Vorgabe (26.11.2026) | Große Binärdateien und hochauflösende Originalassets über Git LFS oder genehmigten Objektspeicher; Gesamtgröße 40–100 GB zulässig bei tragfähiger Paketarchitektur; kostenpflichtige Speicheroperationen nur mit Kostenrahmen. | Paket- und Speicherarchitektur. |
 | D-056 | Vorgabe (26.11.2026) | Kontingent gezielt einsetzen (etwa 50 % verbleibend): Integration, Grafik, Animation/Film, anspruchsvolle Mechaniken und ungelöste Fehler zuerst; keine redundanten Analysen oder parallelen Bearbeitungen derselben Dateien. | Priorisierung der Arbeitspakete. |
+| D-057 | Vorgabe (26.11.2026) | Die Iapyden werden im Szenario Aquileia 58 v. Chr. als quellengestützte natürliche Feindschaft (`natural_enemy`) im Raum Valdora geführt; Beleg: Einfall bei Tergeste 52 v. Chr. (Hirtius, BG 8,24; Appian, Illyrike 18). Antwort des Auftraggebers: „Ja so soll es sein“. Fachprüfung durch einen Althistoriker bleibt offen. | Roster `regional_peoples_aquileia.json` (#99). |
 
 ## Änderungen an Entscheidungen
 
