@@ -80,7 +80,7 @@ func _frame(view: Viewport) -> Image:
 	return view.get_texture().get_image()
 
 
-func _projection(label: String, mesh: Mesh, scale: float, card := false) -> void:
+func _projection(label: String, mesh: Mesh, scale: float, card := false, cpu_grass := false) -> void:
 	if mesh == null:
 		_check(false,label+" imported geometry missing")
 		return
@@ -114,9 +114,9 @@ func _projection(label: String, mesh: Mesh, scale: float, card := false) -> void
 	var rectangles: Array[Rect2] = []
 	for t in transforms:
 		rectangles.append(_bounds_rect(camera,mesh.get_aabb(),t))
-	if card:
+	if card or cpu_grass:
 		var instance := MeshInstance3D.new()
-		instance.mesh = Safe.merge_cards(mesh,data,2,centre)
+		instance.mesh = Safe.merge_cards(mesh,data,2,centre,not cpu_grass)
 		_check(instance.mesh != null,label+" native CPU card batch exists")
 		if instance.mesh == null:
 			view.free()
@@ -173,7 +173,11 @@ func _assert_field(label: String) -> void:
 			_check(chunk.node.mesh != null and chunk.render_count > 0,label+" visible chunk has real geometry")
 	for cell: Dictionary in field.grass._cells.values():
 		if cell.has("node"):
-			_check(not cell.node.multimesh.use_custom_data and not cell.node.multimesh.use_colors,label+" native grass instance format")
+			_check(cell.node is MeshInstance3D,label+" grass bypasses GPU instancing")
+			if cell.node.visible:
+				_check(cell.node.mesh != null and cell.render_count > 0,label+" grass contains baked local geometry")
+				if cell.node.mesh != null:
+					_check(cell.node.mesh.get_aabb().size.x < 12.0 and cell.node.mesh.get_aabb().size.z < 12.0,label+" grass stays inside its world cell")
 	# Every material in the actual field must use the independent static shaders.
 	for material: ShaderMaterial in Library.materials():
 		_check(material.shader in [Safe.BARK,Safe.LEAF,Safe.CARD,Safe.GRASS,Safe.IMPOSTOR],label+" static material selected")
@@ -203,8 +207,8 @@ func _run() -> void:
 	var oak := Library.asset("quercus_robur")
 	_check(grass_near != null and grass_far != null and card != null and oak.lods.size()==4,"All original geometry families are available")
 	if graphical and failures.is_empty():
-		await _projection("isolated-grass-near",grass_near,1.25)
-		await _projection("isolated-grass-far",grass_far,1.25)
+		await _projection("isolated-grass-near",grass_near,1.25,false,true)
+		await _projection("isolated-grass-far",grass_far,1.25,false,true)
 		await _projection("isolated-herbs",card,1.0,true)
 		await _projection("isolated-tree-lod3",oak.lods[3],.16)
 		await _projection("isolated-tree-impostor",oak.impostor,.16)
@@ -224,8 +228,11 @@ func _run() -> void:
 	await process_frame
 	_check(game.screen=="opening" and game.opening_sequence.id=="i00_aquileia","Actual I-00 introduction")
 	await _shot("game-prologue")
+	_check(not game.world.vegetation.visible,"Historical camp does not render unrelated village vegetation")
+	_check(game.opening_director.camera.environment != null,"Historical camera has an independent readable exposure")
 	game.opening_overlay._request_skip()
 	await _shot("game-family-handoff")
+	_check(game.world.vegetation.visible,"Village vegetation is restored for the handoff")
 	game.opening_overlay._request_advance()
 	_check(game.screen=="opening" and game.opening_sequence.id=="childhood_home","Actual I-01 family scene")
 	game.opening_overlay._request_skip()
@@ -233,6 +240,7 @@ func _run() -> void:
 	game.opening_overlay._request_skip()
 	game.opening_overlay._request_advance()
 	_check(game.screen=="playing","Actual opening hands off to the playable village")
+	_check(game.world.vegetation.visible,"Vegetation is not globally disabled in gameplay")
 	var at: Vector2 = I01.POINTS.well + Vector2(1.5,.3)
 	game.world.get_node("Player").position = Vector3(at.x,1.35,at.y)
 	game.model.set_player_position(game.world.get_player_position())

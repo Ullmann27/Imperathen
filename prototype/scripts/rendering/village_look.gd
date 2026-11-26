@@ -3,6 +3,7 @@ extends Node3D
 ## renderer. Presentation only: it never changes collision, cover, sight
 ## lines, navigation, simulation or saved state, in any quality profile.
 
+const SafeVegetation := preload("res://scripts/vegetation/vegetation_safe.gd")
 const PROFILE_DATA = preload("res://assets/quality_profiles.json")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Surfaces = preload("res://scripts/rendering/village_surfaces.gd")
@@ -325,7 +326,7 @@ func _build_window_glow() -> void:
 
 
 func _update_window_glow() -> void:
-	_glow.visible = night > .25
+	_glow.visible = night > .25 and not SafeVegetation.active()
 	_glow.material_override.set_shader_parameter("strength", float(VALUES.interior.window_glow_strength) * smoothstep(.25, 1.0, night))
 	var lit := _torches_lit()
 	_flames.visible = lit > 0.0
@@ -569,7 +570,7 @@ func _apply_interior(value: float) -> void:
 	_window.visible = _bounce.visible
 	_window.light_color = (VALUES.interior.window_colour as Color).lerp(MOON.color, night)
 	_window.light_energy = window_energy * interior * lerpf(1.0, .08, night)
-	_shafts.visible = _shafts_allowed and interior > .5 and night < .5 and _shafts.mesh != null
+	_shafts.visible = not SafeVegetation.active() and _shafts_allowed and interior > .5 and night < .5 and _shafts.mesh != null
 	var beam: ShaderMaterial = _shafts.material_override
 	beam.set_shader_parameter("beam_color", sun.light_color)
 	beam.set_shader_parameter("strength", float(VALUES.interior.sunbeam_strength) * clampf(sun.light_energy / 2.0, 0.0, 1.2) * (1.0 - night))

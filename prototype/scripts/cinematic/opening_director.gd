@@ -5,6 +5,7 @@ extends Node3D
 signal shot_started(shot_id: String)
 signal shot_finished(shot_id: String)
 
+const SafeVegetation := preload("res://scripts/vegetation/vegetation_safe.gd")
 const HistoricalStage = preload("res://scripts/cinematic/i00_stage.gd")
 const I01Props = preload("res://scripts/world/village/i01_props.gd")
 const SHOT_IDS := ["aquileia_detail", "legions_rain", "caesar_orders", "labienus_orders", "legions_depart", "valley", "market", "well", "plot", "player", "mission_dialogue", "mission_reaction", "i01_table_detail", "i01_shelf_cups", "i01_bed", "i01_choice", "i01_table_wide", "i01_topic_choice", "i01_cups_insert", "i01_close_speaker", "i01_react_boy", "i01_two_shot", "i01_react_julia", "duo_wide", "duo_close", "duo_react", "duo_ots", "duo_hands", "prop_insert"]
@@ -50,6 +51,9 @@ var _mission_rotations: Array[Dictionary] = []
 var _cinematic_cast: Array[Node3D] = []
 var _sun: DirectionalLight3D
 var _environment: Environment
+var _film_environment: Environment
+var _vegetation_hidden := false
+var _vegetation_was_visible := true
 var _lighting: Dictionary = {}
 var _i00_stage: Node3D
 var _rig: Node3D
@@ -134,6 +138,10 @@ func finish() -> void:
 	_interior_film = false
 	_apply_grade(0.0)
 	_lighting.clear()
+	_restore_film_vegetation()
+	if is_instance_valid(camera):
+		camera.environment = null
+	_film_environment = null
 	if is_instance_valid(_i00_stage):
 		_i00_stage.visible = false
 	paused = false
@@ -602,6 +610,18 @@ func _apply_grade(amount: float) -> void:
 	var weight := clampf(amount, 0.0, 1.0)
 	var historical := shot_id in ["aquileia_detail","legions_rain","caesar_orders","labienus_orders","legions_depart"]
 	var interior := _interior_weight()
+	# The historical camp is a separate authored stage, not the Valdora
+	# ecology. Do not draw village plants across the cinematic platform.
+	if SafeVegetation.active() and active and historical and weight > 0.001:
+		var plants := _world.get("vegetation") as Node3D
+		if is_instance_valid(plants) and not _vegetation_hidden:
+			_vegetation_was_visible = plants.visible
+			plants.hide()
+			_vegetation_hidden = true
+	else:
+		_restore_film_vegetation()
+	if is_instance_valid(_i00_stage) and not historical:
+		_i00_stage.hide()
 	if is_instance_valid(_sun) and _lighting.has("sun_color"):
 		var grade := Color(0.70, 0.76, 0.83) if historical else Color(1.0, 0.89, 0.75)
 		var strength := 0.42 if historical else 0.26
@@ -609,8 +629,41 @@ func _apply_grade(amount: float) -> void:
 	if _environment and _lighting.has("ambient_energy"):
 		var floor_level := 0.72 if historical else lerpf(0.90, INTERIOR_AMBIENT, interior)
 		_environment.ambient_light_energy = float(_lighting.ambient_energy) * lerpf(1.0, floor_level, weight)
+	_apply_safe_camera_grade(weight,historical,interior)
 	_apply_interior_rig(weight * interior)
 	_apply_forge_glow(weight)
+
+
+func _restore_film_vegetation() -> void:
+	if not _vegetation_hidden:
+		return
+	if is_instance_valid(_world):
+		var plants := _world.get("vegetation") as Node3D
+		if is_instance_valid(plants):
+			plants.visible = _vegetation_was_visible
+	_vegetation_hidden = false
+
+
+func _apply_safe_camera_grade(weight: float,historical: bool,interior: float) -> void:
+	if not is_instance_valid(camera):
+		return
+	if not SafeVegetation.active() or not active or weight <= .001 or (not historical and interior < .5) or _environment == null:
+		camera.environment = null
+		return
+	if _film_environment == null:
+		_film_environment = _environment.duplicate() as Environment
+	# Camera-local exposure and ambient source: do not stack the village's
+	# dynamic eye adaptation, a cinematic light rig and an HDR bloom pass.
+	_film_environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	_film_environment.ambient_light_color = Color(.70,.78,.90) if historical else Color(.86,.78,.67)
+	_film_environment.ambient_light_sky_contribution = 0.0
+	_film_environment.ambient_light_energy = .78 if historical else .48
+	_film_environment.tonemap_exposure = .98 if historical else .82
+	_film_environment.glow_enabled = false
+	_film_environment.ssao_enabled = false
+	_film_environment.adjustment_enabled = false
+	_film_environment.fog_enabled = historical and _environment.fog_enabled
+	camera.environment = _film_environment
 
 
 const INTERIOR_AMBIENT := 0.50
@@ -697,12 +750,13 @@ func _apply_interior_rig(weight: float) -> void:
 	var key := _rig.get_node("WindowKey") as SpotLight3D
 	key.global_position = table + Vector3(1.15, 1.45, -1.75)
 	key.look_at(table + Vector3(-0.1, 0.25, 0.55), Vector3.UP)
-	key.light_energy = 2.6 * weight
+	key.shadow_enabled = not SafeVegetation.active()
+	key.light_energy = (0.85 if SafeVegetation.active() else 2.6) * weight
 	var hearth_light := _rig.get_node("HearthWarm") as OmniLight3D
 	hearth_light.global_position = table + Vector3(-1.25, 0.55, 1.95)
 	# A slow, shallow breathing of the fire; no flicker in reduced motion.
 	var breathe := 1.0 if reduced_motion else 1.0 + 0.05 * sin(elapsed * 2.3) + 0.03 * sin(elapsed * 5.1 + 1.0)
-	hearth_light.light_energy = 1.25 * weight * breathe
+	hearth_light.light_energy = (0.45 if SafeVegetation.active() else 1.25) * weight * breathe
 	var fill_light := _rig.get_node("CameraFill") as OmniLight3D
 	fill_light.global_position = camera.global_position + Vector3.UP * 0.25
-	fill_light.light_energy = 0.30 * weight
+	fill_light.light_energy = (0.18 if SafeVegetation.active() else 0.30) * weight
