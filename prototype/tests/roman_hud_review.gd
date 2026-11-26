@@ -299,8 +299,11 @@ func _draws(control: Control) -> bool:
 	if control is PanelContainer or control is Panel:
 		var box := control.get_theme_stylebox("panel")
 		return box != null and not box is StyleBoxEmpty
-	if script != null and script.has_method("_draw"):
-		return true
+	# Custom-drawn controls (compass, map, pad, medallions) draw in _draw().
+	if script != null:
+		for method: Dictionary in script.get_script_method_list():
+			if str(method.get("name", "")) == "_draw":
+				return true
 	return false
 
 
