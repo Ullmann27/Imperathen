@@ -4,6 +4,7 @@ extends Node3D
 const Art = preload("res://scripts/world/village_art.gd")
 const PROFILE_DATA = preload("res://assets/quality_profiles.json")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
+const Look = preload("res://scripts/rendering/village_look.gd")
 const WORKSHOP := Vector3(-9.2,0,-7.35)
 const STORE := Vector3(-10.6,0,15.6)
 const MARKET := Vector3(-9,0,0)
@@ -86,17 +87,8 @@ func apply_season(index: int, sun: DirectionalLight3D, environment: Environment)
 	grass_material.set_shader_parameter("gust",GUST[season])
 	for material in [ground_material,water_material]:
 		material.set_shader_parameter("wetness",WET[season])
-	sun.light_color = [Color("#fff1d6"),Color("#ffebc7"),Color("#eee5d1"),Color("#e6edfa")][season]
-	sun.light_energy = [.46,.55,.32,.44][season]
-	sun.rotation_degrees = Vector3([-43.0,-56.0,-32.0,-27.0][season],[-34.0,-29.0,-47.0,-39.0][season],0)
-	environment.ambient_light_color = [Color("#cbd6da"),Color("#d9d5c0"),Color("#c2cdd2"),Color("#d0dbe3")][season]
-	environment.ambient_light_energy = [.60,.55,.65,.62][season]
-	environment.fog_density = [.0020,.0027,.0055,.0046][season]
-	environment.fog_light_color = [Color("#a6b3b0"),Color("#c4b8a0"),Color("#a5ada7"),Color("#b7bfc4")][season]
-	sky_material.set_shader_parameter("coverage",[.43,.30,.86,.61][season])
-	sky_material.set_shader_parameter("zenith",[Color("#3676aa"),Color("#4d83ac"),Color("#637e91"),Color("#62849c")][season])
-	sky_material.set_shader_parameter("horizon",[Color("#92b8c8"),Color("#b2c2c3"),Color("#aab6b7"),Color("#a6bac3")][season])
-	sky_material.set_shader_parameter("cloud_color",[Color("#efead9"),Color("#efe3cf"),Color("#bec7c4"),Color("#dae0dc")][season])
+	# Sun, sky, ambient and haze presets are owned by the look script.
+	Look.apply_season_light(season,sun,environment,sky_material)
 	if _rain:
 		_rain.visible = season == 2 and profile != "low"
 
