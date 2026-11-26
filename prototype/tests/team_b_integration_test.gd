@@ -72,7 +72,7 @@ func _test_initial_staff_and_migration() -> void:
 	_check(_person(model.data, "cassia").assignment == "trade" and _person(model.data, "antonia").assignment == "trade", "Neue Kindheit: zwei vorhandene Erwachsene am Handelsplatz")
 	_check(_person(model.data, "antonia").profession == "Töpferin" and model.data.village.economy.people.size() == 14, "Beruf und Identität bleiben erhalten; keine zusätzliche Arbeitskraft erfunden")
 	_check(_person(model.data, "silvanus").assignment == "idle", "Vater und Begleiter wird nicht als zweite Handelsarbeitskraft gebunden")
-	_check(model.data.schema_version == 5 and model._validate_state(model.data).is_empty(), "Neue Partie bewahrt Weltvertrag v5")
+	_check(model.data.schema_version == Model.SCHEMA_VERSION and model._validate_state(model.data).is_empty(), "Neue Partie bewahrt den aktuellen Weltvertrag")
 	var legacy: Dictionary = model.data.duplicate(true)
 	legacy.village.behavior.erase("social")
 	_person(legacy, "antonia").assignment = "idle"

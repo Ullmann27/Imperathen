@@ -2,6 +2,11 @@ extends RefCounted
 ## Seasonal board-game campaign. Its regional mandate is independent of the protagonist's rank.
 
 const Atlas := preload("res://scripts/strategy/atlas_data.gd")
+const WorldCalendar := preload("res://scripts/domain/world_calendar.gd")
+## The round's own year count for callers without a world clock (the free
+## scenario): the 100 AD timeline, without a year zero. Saved worlds show the
+## date of the world clock instead (WorldModel.world_time()).
+const LEGACY_START_YEAR := 100
 const HOMES := ["italia","germania","han","wa","vistula"]
 const SEASONS := ["Frühling", "Sommer", "Herbst", "Winter"]
 const MANDATES := ["Ortsmandat", "Provinzmandat", "Reichsmandat"]
@@ -203,7 +208,7 @@ static func summary(data: Dictionary) -> Dictionary:
 		var state := _story(data)
 		title = ORIGIN_EVENTS[data.home].title
 		story_text = ORIGIN_EVENTS[data.home].intro if state.log.is_empty() else state.log.back().text
-	return {"story_title":title,"story_text":story_text, "year":100 + floori(turn / 4.0), "season":SEASONS[turn % 4], "winter_need":needed,
+	return {"story_title":title,"story_text":story_text, "year":WorldCalendar.add_years(LEGACY_START_YEAR, floori(turn / 4.0)), "season":SEASONS[turn % 4], "winter_need":needed,
 		"harvest_yield":harvest, "warning":warning, "mission_season":SEASONS[local_season],
 		"mandate_name":MANDATES[int(data.mandate)]}
 

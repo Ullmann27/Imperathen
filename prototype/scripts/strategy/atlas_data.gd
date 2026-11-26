@@ -1,6 +1,12 @@
 extends RefCounted
 ## Site coordinates anchor representative regions. Edges are fictional campaign routes.
 ## Named communities and archaeological traditions do not imply unified states.
+## REGIONS carries the names and notes of the 100 AD reference timeline.
+## ERA_VARIANTS replaces a name or note where it would be an anachronism on
+## the world date (58 BC campaign); `region_view` chooses by the era registry
+## where it has a state for the region, otherwise by year. First match wins.
+const Era = preload("res://scripts/domain/era_registry.gd")
+const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
 const REGIONS := {
 	"italia":{"name":"Rom · Italia","lat":41.9,"lon":12.5,"links":["gallia","germania","aegyptus","greek","africa"],"note":"Unter Trajan ist Rom das Zentrum des Reiches. Beginn der Referenzkampagne um 100 n. Chr."},
 	"gallia":{"name":"Lugdunum · Gallien","lat":45.76,"lon":4.83,"links":["italia","britannia","hispania","germania"],"note":"Römische Provinzlandschaft am Zusammenfluss von Rhône und Saône."},
@@ -35,3 +41,54 @@ const REGIONS := {
 	"andes":{"name":"Anden · Nordküste","lat":-8.1,"lon":-79.0,"links":["maya","pacific","amazon"],"note":"Regionale Gesellschaften der Andenküste in einer Zeit früher Moche-Traditionen."},
 	"amazon":{"name":"Amazonasbecken","lat":-3.15,"lon":-59.9,"links":["andes"],"note":"Vielfältige Flussgemeinschaften. Der Kartenknoten fasst ein sehr großes Gebiet zusammen."}
 }
+
+## "state": [slot, id] matches the registry state of the date ("" = none);
+## "before": year matches dates before 1 January of that historical year.
+## Variants without a registry state are authored defaults (literature not
+## verified: Hispania Ulterior, pre-Roman Iron Age, Africa/Utica, Gandhāra,
+## Andean coast); see docs/37_world_calendar/WORLD_STATE.md.
+const ERA_VARIANTS := {
+	"italia": [
+		{"state": ["rome.power_bloc", "political.rome.first_triumvirate"], "name": "Rom · Italia", "note": "Rom ist das Zentrum der Republik. Caesar, Pompeius und Crassus teilen die Macht. Die Kampagne beginnt 58 v. Chr. im Raum Aquileia."},
+		{"state": ["rome.dictatorship", "political.rome.caesar_dictatorship"], "name": "Rom · Italia", "note": "Rom ist das Zentrum der Republik. Caesar herrscht als Diktator."},
+		{"state": ["rome.princeps", "political.rome.principate_augustus"], "name": "Rom · Italia", "note": "Rom ist das Zentrum des Reiches unter Augustus."},
+		{"before": 98, "name": "Rom · Italia", "note": "Rom ist das Zentrum der römischen Welt."}],
+	"gallia": [
+		{"state": ["gallia.status", "political.gallia.gallic_war"], "name": "Gallien · Rhône und Saône", "note": "Gallische Stammesgebiete am Zusammenfluss von Rhône und Saône. Caesar führt Krieg in Gallien."},
+		{"state": ["gallia.lugdunum", ""], "name": "Gallien · Rhône und Saône", "note": "Gallische Stammesgebiete am Zusammenfluss von Rhône und Saône."}],
+	"britannia": [
+		{"state": ["britannia.rule", ""], "name": "Britannien · Themse", "note": "Britannische Stammesgebiete an der Themse, außerhalb römischer Herrschaft. Die Atlantikpassage ist ein späteres Spielziel."}],
+	"hispania": [
+		{"before": -27, "name": "Hispania Ulterior · Baetis", "note": "Städte und Landgüter der römischen Provinz Hispania Ulterior am Baetis."}],
+	"northern": [
+		{"before": 1, "name": "Südskandinavien", "note": "Höfe und Austauschplätze der vorrömischen Eisenzeit im Norden."}],
+	"greek": [
+		{"state": ["achaia.rule", ""], "name": "Ägäis · Griechenland", "note": "Griechische Städte unter der Aufsicht des römischen Statthalters von Macedonia."}],
+	"africa": [
+		{"before": -44, "name": "Africa · Utica", "note": "Römische Provinz Africa mit dem Statthaltersitz Utica. Karthago liegt seit 146 v. Chr. zerstört."}],
+	"aegyptus": [
+		{"state": ["aegyptus.rule", "region.aegyptus.ptolemaic_kingdom"], "name": "Alexandria · Ägypten", "note": "Hafen und Hauptstadt des Ptolemäerreiches."}],
+	"indus": [
+		{"state": ["indus.rule", ""], "name": "Gandhāra", "note": "Indo-griechische und sakische Herrschaften im Nordwesten des indischen Subkontinents."}],
+	"han": [
+		{"state": ["china.dynasty", "region.han.western_han"], "name": "Westliche Han · Luoyang", "note": "Luoyang ist eine der großen Städte der Westlichen Han; Hauptstadt ist Chang'an. Die Dynastie regiert von 202 v. Chr. bis 9 n. Chr."},
+		{"state": ["china.dynasty", "region.han.xin"], "name": "Xin · Luoyang", "note": "Wang Mang regiert als Kaiser der Xin von Chang'an aus."}],
+	"andes": [
+		{"before": 100, "name": "Anden · Nordküste", "note": "Regionale Gesellschaften der Andenküste vor den Moche-Zentren."}]
+}
+
+
+## Name and note of a region on a world date. `jdn` < 0 (no clock) keeps the
+## reference timeline.
+static func region_view(id: String, jdn: int = -1) -> Dictionary:
+	var base: Dictionary = REGIONS[id]
+	if jdn >= 0:
+		for variant: Dictionary in ERA_VARIANTS.get(id, []):
+			var matches := false
+			if variant.has("state"):
+				matches = Era.state_at(str(variant.state[0]), jdn) == str(variant.state[1])
+			elif variant.has("before"):
+				matches = jdn < WorldCalendar.to_jdn(int(variant.before), 1, 1)
+			if matches:
+				return {"name": str(variant.name), "note": str(variant.note)}
+	return {"name": str(base.name), "note": str(base.note)}

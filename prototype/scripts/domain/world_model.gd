@@ -16,7 +16,24 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
 const CityTrade = preload("res://scripts/city_trade.gd")
-const SCHEMA_VERSION := 5
+const TribalWorld = preload("res://scripts/domain/tribal_world.gd")
+const WorldClock = preload("res://scripts/domain/world_clock.gd")
+const WorldState = preload("res://scripts/domain/world_state.gd")
+const PersonRegistry = preload("res://scripts/domain/person_registry.gd")
+const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
+const TimeJump = preload("res://scripts/domain/time_jump_contract.gd")
+const CalendarAgeing = preload("res://scripts/domain/calendar_ageing_participant.gd")
+const TroopCatalog = preload("res://scripts/battle/troop_catalog.gd")
+## v6 (D-045): one schema step for the shared world calendar (#98), the tribal
+## world (#99) and the integration ledger `world_state` (time ledger, raid
+## bookings, battle aftercare). Older saves migrate v1 -> ... -> v5 -> v6.
+const SCHEMA_VERSION := 6
+## Work units of the tribal world per frame. A week is copied, simulated and
+## fully validated in fixed slices (TribalWorld "sliced work") and replaces
+## the committed tribal state only when all slices of that week are done.
+## Six units are about 1.5 ms (95th percentile) on the development desktop;
+## no single slice costs more (TribalWorld.MAX_SLICE_UNITS). See the test log.
+const TRIBE_UNITS_PER_FRAME := 6
 const SAVE_FORMAT := "imperathen-offline-save"
 const MAX_SAVE_BYTES := 2097152
 const MAX_COMMAND_IDS := 1024
@@ -48,6 +65,12 @@ var raid_observations: Callable
 var npc_sight_check: Callable
 # A city session owns this verified runtime map; ordinary campaign/test worlds keep it empty.
 var city_trade_sites: Dictionary = {}
+## The week in progress; never saved. Only its finished, validated result is
+## committed, so a rejected candidate or a save mid-week cannot leak it.
+var _tribe_job: Dictionary = {}
+## Work units spent by the last pump; observable for budget tests.
+var tribe_units_last_pump := 0
+var tribe_job_error := ""
 
 
 func _init() -> void:
@@ -75,7 +98,7 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 		"chronicle": [{"time": 0.0, "text": origin.intro}],
 		"story": {"title": origin.calling, "text": "Sammle Holz, sprich mit %s und baue deine erste Unterkunft östlich des Weges." % origin.companion, "choices": [], "choice": ""},
 		"origin_id":origin_id, "strategy":Seasons.new_game(origin_id), "valley": {}, "command_log": {},
-		"frontier": Frontier.new_state()
+		"frontier": Frontier.new_state(), "calendar": {}, "world_state": WorldState.new_state()
 	}
 	for index in NODE_POSITIONS.size():
 		data.resource_nodes.append({"id": "timber_%d" % index, "x": NODE_POSITIONS[index][0], "z": NODE_POSITIONS[index][1], "amount": 16})
@@ -106,6 +129,12 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 		CombatActions.start(data)
 	if data.village.enabled and childhood_enabled:
 		NpcBehavior.start(data)
+	# The tribal world follows the campaign era: 58 BC childhood games get the
+	# Rhine roster; the Trajan-era careers have no roster yet (empty world).
+	data.tribes = TribalWorld.new_state(TribalWorld.seed_from_text(str(data.world_id)), TribalWorld.scenario_for_world(data))
+	# One world clock: 1 May 58 BC for the campaign, spring 100 AD for the
+	# legacy careers, which keep their own timeline (D-044).
+	WorldClock.start(data)
 	changed.emit()
 
 
@@ -145,6 +174,7 @@ func execute(command: String, args: Dictionary = {}, command_id: String = "") ->
 	result.message = _regional_text(candidate, result.message)
 	if not result.ok:
 		return result
+	_after_command(data, candidate, command, result)
 	candidate.story.text = _regional_text(candidate,candidate.story.text)
 	candidate.revision = int(data.revision) + 1
 	result["revision"] = candidate.revision
@@ -247,12 +277,220 @@ func advance(delta: float) -> void:
 		var frontier_event := Frontier.advance(candidate, delta)
 		if not frontier_event.is_empty():
 			_record(candidate, frontier_event)
+	# The village economy day (legacy) and the played battle are derived
+	# passages of the one world clock; ages follow the clock, never a counter.
+	WorldClock.sync(candidate)
+	notify_ui = WorldState.bridge_raids(candidate) or notify_ui
+	notify_ui = _pump_tribes(candidate, TRIBE_UNITS_PER_FRAME) or notify_ui
 	candidate.revision = int(data.revision) + 1
 	if not _validate_state(candidate).is_empty():
 		return
 	data = candidate
 	if notify_ui:
 		changed.emit()
+
+
+## The tribal world's calendar day: days of the one world clock since the
+## tribal epoch (1 March of the scenario year). Nothing else counts days.
+func calendar_day(state: Dictionary) -> int:
+	return TribalWorld.world_calendar_day(state)
+
+
+## Date, season, year label and age for every screen (HUD, atlas, panels).
+func world_time() -> Dictionary:
+	return {} if data.is_empty() else WorldClock.view(data)
+
+
+## Advances the tribal world by at most `budget` work units. A new week is
+## started only when the shared calendar has passed it; its working copy is
+## private to this model until every slice, including the full validation,
+## is done. Returns true when a finished week was committed into `state`.
+func _pump_tribes(state: Dictionary, budget: int) -> bool:
+	tribe_units_last_pump = 0
+	if not _tribe_job.is_empty() and not is_same(_tribe_job.base, state.tribes):
+		_tribe_job = {} # The committed world changed under the job: start again.
+	if _tribe_job.is_empty():
+		if (int(state.tribes.tick) + 1) * TribalWorld.TICK_DAYS > calendar_day(state):
+			return false
+		_tribe_job = {"base": state.tribes, "stage": "copy", "runner": TribalWorld.copy_begin(state.tribes), "work": {}}
+	if _tribe_job.stage == "failed":
+		return false
+	while true:
+		var job := _tribe_job
+		if job.stage == "commit":
+			if tribe_units_last_pump > 0 and tribe_units_last_pump + 1 > budget:
+				return false
+			state.tribes = job.work
+			tribe_units_last_pump += 1
+			_tribe_job = {}
+			return true
+		var runner: Dictionary = job.runner
+		var cost := TribalWorld.next_units(runner)
+		if tribe_units_last_pump > 0 and tribe_units_last_pump + cost > budget:
+			return false
+		tribe_units_last_pump += TribalWorld.step(runner)
+		if bool(runner.done):
+			match str(job.stage):
+				"copy":
+					job.work = runner.target
+					job.stage = "week"
+					job.runner = TribalWorld.week_begin(job.work)
+				"week":
+					job.stage = "check"
+					job.runner = TribalWorld.check_begin(job.work)
+				"check":
+					if str(runner.error) != "":
+						tribe_job_error = str(runner.error)
+						push_error("Stammeswoche verworfen: " + tribe_job_error)
+						job.stage = "failed"
+						return false
+					TribalWorld.mark_validated(job.work)
+					job.stage = "commit"
+	return false
+
+
+## Weeks the tribal world still has to live through to reach the calendar.
+func tribes_pending_weeks() -> int:
+	if data.is_empty():
+		return 0
+	return maxi(0, floori(calendar_day(data) / float(TribalWorld.TICK_DAYS)) - int(data.tribes.tick))
+
+
+## For screens that pause the world (strategy atlas, loading): spends one
+## frame budget on the tribal world of the accepted state.
+func pump_tribes(budget: int = TRIBE_UNITS_PER_FRAME) -> Dictionary:
+	var committed := false
+	if not data.is_empty() and not data.progress.career_terminal:
+		committed = _pump_tribes(data, budget)
+		if committed:
+			data.revision = int(data.revision) + 1
+			changed.emit()
+	return {"tribes": data.get("tribes", {}), "pending_weeks": tribes_pending_weeks(), "committed": committed, "units": tribe_units_last_pump}
+
+
+## Tests and tools: pump frame budgets until the calendar is reached.
+func finish_tribes(max_frames: int = 100000) -> int:
+	var frames := 0
+	while frames < max_frames and tribes_pending_weeks() > 0 and tribe_job_error.is_empty():
+		pump_tribes()
+		frames += 1
+	return frames
+
+
+## Travel, waiting or sleeping away from the village book their days on the
+## one world clock; the tribal world (in frame budgets), recovering soldiers
+## and every date reader then live through them like any other time.
+func pass_calendar_days(days: int, reason: String = "", cause: String = "travel") -> Dictionary:
+	if days < 1 or days > WorldClock.MAX_PASS_DAYS or data.is_empty() or data.progress.career_terminal:
+		return _fail("Ungültige Zeitspanne.")
+	if cause not in WorldClock.PASS_CAUSES:
+		return _fail("Unbekannte Ursache der Zeitspanne.")
+	if data.get("village", {}).get("raid", {}).get("status", "") in ["warning", "active"] or data.encounter.active:
+		return _fail("Eine laufende Gefahr kann nicht übersprungen werden.")
+	var candidate := _world_copy()
+	var label := reason if not reason.is_empty() else str(WorldClock.PASS_LABELS[cause])
+	WorldClock.book(candidate, str(WorldClock.PASS_CAUSES[cause]), days * WorldClock.DAY, label)
+	candidate.revision = int(data.revision) + 1
+	var error := _validate_state(candidate)
+	if not error.is_empty():
+		return _fail("Zeitspanne verworfen: " + error)
+	data = candidate
+	changed.emit()
+	return _ok("%d Tage vergehen (%s) · %s" % [days, label, WorldClock.view(data).date_label])
+
+
+## Time a command takes on the world clock, booked inside its transaction:
+## the narrated childhood days end with sleep, a shop transaction takes its
+## haggling time, and a village raid carried by a tribal band is booked once.
+func _after_command(before: Dictionary, state: Dictionary, command: String, result: Dictionary) -> void:
+	if Childhood.enabled(state):
+		var child: Dictionary = state.village.childhood
+		var slept := int(child.day) - int(before.village.childhood.day)
+		for night_index in maxi(0, slept):
+			WorldClock.sleep(state, "Schlaf im Familienhaus")
+		if "night_rest" in child.completed and not "night_rest" in before.village.childhood.completed:
+			WorldClock.night(state, "Nachtruhe vor der Nacht der Reiter")
+	if command in ["city_buy", "city_sell"] and bool(result.get("ok", false)):
+		WorldClock.book(state, "trade", WorldClock.TRADE_SECONDS, "Handel am Stand")
+	WorldState.bridge_raids(state)
+	WorldClock.sync(state)
+
+
+# --- shared world state: soldiers and relations ------------------------------------------
+
+## The soldiers of the fought battle on today's world date (recovered on the
+## clock, promotions applied). Read-only; the battle snapshot stays untouched.
+func soldiers() -> Array:
+	return [] if data.is_empty() else WorldState.soldiers(data)
+
+
+## Recruitment, wounds, recovery, death and retirement of the soldiers as
+## events for their home settlements, and the summed effect per settlement
+## on today's world date (D-043). Each event exists once: the list is derived
+## from the battle record and the clock.
+func settlement_events() -> Array:
+	return [] if data.is_empty() else WorldState.settlement_events(data)
+
+
+func settlement_effects() -> Dictionary:
+	return {} if data.is_empty() else WorldState.settlement_effects(data)
+
+
+## Promotion on world time: only after the battle, only for a recovered,
+## living soldier still in service, and through the catalog's upgrade path.
+## `inventory` and `authorities` are those of TroopCatalog.plan_upgrade; the
+## returned `take` lists the pieces the caller's store has to hand out.
+func promote_soldier(uid: String, to_id: String, inventory: Array = [], authorities: Array = []) -> Dictionary:
+	if data.is_empty() or data.progress.career_terminal:
+		return _fail("Keine Beförderung möglich.")
+	var reason := WorldState.promotion_reason(data, uid)
+	if not reason.is_empty():
+		return _fail(reason)
+	var record := WorldState.soldier(data, uid)
+	var catalog := TroopCatalog.load_default()
+	var plan := TroopCatalog.plan_upgrade(catalog, record, to_id, WorldClock.year(data), inventory, authorities)
+	if not plan.ok:
+		return _fail(str(plan.message))
+	var candidate := _world_copy()
+	WorldState.record_promotion(candidate, uid, str(record.troop_id), to_id)
+	candidate.revision = int(data.revision) + 1
+	var error := _validate_state(candidate)
+	if not error.is_empty():
+		return _fail("Beförderung verworfen: " + error)
+	data = candidate
+	_record(data, "%s wird befördert (%s) · %s." % [str(record.name), to_id, WorldClock.view(data).date_label])
+	changed.emit()
+	var result := _ok("%s ist befördert." % str(record.name))
+	result["take"] = plan.take
+	return result
+
+
+## The one write path into the relation graph for everything outside the
+## tribal simulation (D-048): a witnessed deed of a person towards a group.
+func relation_event(actor: String, group_id: String, kind: String, note: String = "") -> Dictionary:
+	return _world_state_write(func(candidate: Dictionary) -> Dictionary: return WorldState.relation_event(candidate, actor, group_id, kind, note))
+
+
+## A mission or quest records the dispute it created; without such a record
+## (or a natural enmity, an alliance duty, a retaliation, a need) no tribe attacks.
+func mission_dispute(a: String, b: String, source: String, note: String = "", weeks: int = 52) -> Dictionary:
+	return _world_state_write(func(candidate: Dictionary) -> Dictionary: return WorldState.mission_dispute(candidate, a, b, source, note, weeks))
+
+
+func _world_state_write(write: Callable) -> Dictionary:
+	if data.is_empty() or data.progress.career_terminal:
+		return _fail("Kein Weltzustand.")
+	var candidate := _world_copy()
+	var result: Dictionary = write.call(candidate)
+	if not bool(result.get("ok", false)):
+		return _fail(str(result.get("message", "Abgelehnt.")))
+	candidate.revision = int(data.revision) + 1
+	var error := _validate_state(candidate)
+	if not error.is_empty():
+		return _fail("Verworfen: " + error)
+	data = candidate
+	changed.emit()
+	return result
 
 
 func _advance_construction(candidate: Dictionary, delta: float) -> bool:
@@ -292,11 +530,21 @@ func checkpoint_valley(battle) -> bool:
 	if battle.steps < previous_steps or previous.get("outcome","ongoing") != "ongoing":
 		return false
 	data.world_seconds += (battle.steps - previous_steps) * BattleModel.STEP
+	# The muster is dated before the battle's own seconds count.
+	WorldState.battle_started(data)
 	data.valley = {"snapshot":battle.snapshot(), "outcome":battle.outcome,
 		"allied_losses":summary.ally.losses, "enemy_losses":summary.enemy.losses}
+	# Battle seconds are a derived passage of the world clock; the first final
+	# checkpoint dates the end of the battle for recovery on world time.
+	WorldClock.sync(data)
+	WorldState.battle_ended(data)
 	if battle.outcome != "ongoing":
 		var result: String = {"victory":"Die Grenzlegion hält die Talstraße.", "defeat":"Der Höhenbund kontrolliert die Talstraße.", "draw":"Die Talstraße bleibt umkämpft."}[battle.outcome]
 		_record(data, "%s Ausfälle: Legion %d, Höhenbund %d." % [result,summary.ally.losses,summary.enemy.losses])
+		# What the battle means at home (D-043), from the same soldier records.
+		var home := WorldState.settlement_report(data)
+		if not home.is_empty():
+			_record(data, "Nachricht in die Heimatorte (%s) · %s" % [WorldClock.view(data).date_label, " · ".join(home)])
 	data.revision += 1
 	changed.emit()
 	return true
@@ -322,6 +570,8 @@ func save_game(path: String) -> Dictionary:
 	if absolute.is_empty():
 		return _fail("Speichern benötigt einen Benutzerpfad oder absoluten Dateipfad außerhalb der Projektressourcen.")
 	var state_error := _validate_state(data)
+	if state_error.is_empty():
+		state_error = PersonRegistry.validate(data)
 	if not state_error.is_empty():
 		return _fail("Der Spielstand wurde nicht gespeichert: " + state_error)
 	if npc_observations.is_valid():
@@ -385,6 +635,10 @@ func load_game(path: String) -> Dictionary:
 		return _fail("Kein gültiger Spielstand geladen. Hauptdatei: %s Sicherung: %s" % [primary_error, loaded.message])
 	# Validate the entire candidate before touching the active world.
 	data = loaded.state.duplicate(true)
+	# The copy has the content the loader just validated; the first frame after
+	# loading need not repeat the full tribal check.
+	if TribalWorld.is_validated(loaded.state.tribes):
+		TribalWorld.mark_validated(data.tribes)
 	changed.emit()
 	var result := _ok("Geprüfte Sicherung geladen; die Hauptdatei war nicht nutzbar." if recovered else "Spielstand geladen.")
 	result["recovered_backup"] = recovered
@@ -415,6 +669,44 @@ func _apply_combat_hit(state: Dictionary, target_id: String, damage: int) -> boo
 	if _all_enemies_defeated(state):
 		_resolve_skirmish(state)
 	return true
+
+
+## The time-jump contract (#98) moves the world clock in season steps. Ages
+## come only from the calendar-ageing participant and must equal the clock's
+## own derivation, so a jump ages every person exactly once. The tribal world
+## and battle aftercare are not stepped here: they derive from the clock and
+## live through the jump in frame slices afterwards (D-045 7).
+func _time_jump(state: Dictionary, years: int, reason: String) -> Dictionary:
+	var clock: Dictionary = state.calendar.clock
+	var target := WorldCalendar.add_calendar_years(int(clock.jdn), years)
+	var pending := []
+	if Childhood.enabled(state) and str(state.village.childhood.screenplay.get("i10", "")) != "complete":
+		pending.append({"id": "I-10", "jdn": int(clock.jdn) + 1})
+	var plan := TimeJump.plan(clock, target, {"reason": reason, "pending_protected": pending, "era_overrides": state.calendar.divergences})
+	if not plan.ok:
+		return _fail("Der Zeitsprung ist nicht zulässig (%s)." % str(plan.reason))
+	var actors := {}
+	for actor: String in ["player", "companion"]:
+		var birth: Dictionary = state.calendar.births[actor]
+		var age := WorldCalendar.world_time_age(state.calendar, actor)
+		actors[actor] = {"birth": birth.duplicate(true), "death_jdn": null, "age": age, "life_phase": TimeJump.life_phase(age)}
+	var missing := {}
+	for domain: String in ["relations", "settlements", "property", "politics", "equipment"]:
+		missing[domain] = "Noch keine Simulation dieses Bereichs; Bestand bleibt unverändert erhalten."
+	var outcome := TimeJump.run({"world_id": str(state.world_id), "domains": {"characters": {"actors": actors}}}, [CalendarAgeing.new()], plan, {"allow_missing": missing})
+	if not outcome.ok:
+		return _fail("Der Zeitsprung wurde verworfen (%s)." % str(outcome.reason))
+	var days := int(plan.days)
+	WorldClock.book(state, "jump", days * WorldClock.DAY, reason)
+	var aged: Dictionary = outcome.world.domains.characters.actors
+	if int(aged.player.age) != int(state.player.age) or int(aged.companion.age) != int(state.companion.age):
+		return _fail("Zeitsprung und Weltuhr ergeben verschiedene Alter; der Sprung wurde verworfen.")
+	var changes := 0
+	for entry: Dictionary in outcome.ledger:
+		if entry.domain == "characters":
+			changes += 1
+	return {"ok": true, "message": reason, "days": days, "digest": str(outcome.digest),
+		"summary": "%d Tage, %d Altersschritte; nicht simuliert: Beziehungen, Siedlungen, Besitz, Politik, Ausrüstung (unverändert)." % [days, changes]}
 
 
 func _apply_training_contact(state: Dictionary) -> Dictionary:
@@ -541,14 +833,15 @@ func _apply_command(state: Dictionary, command: String, args: Dictionary) -> Dic
 					return _fail("Beende deine offenen Baustellen vor dem Übergang in die nächsten Jahre.")
 			if _distance_to(state, 0.0, -7.0) > INTERACTION_RANGE:
 				return _fail("Der Ausbilder wartet am Übungsplatz nördlich des Dorfes.")
+			var jump := _time_jump(state, 6, "Sechs Jahre später: Ausbildung zum Soldaten")
+			if not jump.ok:
+				return jump
+			# world_seconds stays the technical simulation clock of the village systems.
 			state.world_seconds = float(state.world_seconds) + 6.0 * YEAR_SECONDS
-			state.player.age = 18
 			state.player.role = "trainee"
-			state.companion.age = 18
-			state.progress.years_elapsed = 6
 			state.progress.stage = "training"
-			_record(state, "Sechs Jahre später: Du und Marcus sind erwachsen. Deine Unterkunft und deine frühere Entscheidung bleiben Teil dieser Welt.")
-			_set_story(state, "Sechs Jahre später", "Du bist jetzt 18. Übe am Ziel drei kontrollierte Treffer. Abstand und Erholung zählen.")
+			_record(state, "Sechs Jahre später (%s): Du und Marcus sind erwachsen. Deine Unterkunft und deine frühere Entscheidung bleiben Teil dieser Welt. %s" % [WorldClock.view(state).date_label, jump.summary])
+			_set_story(state, "Sechs Jahre später", "Du bist jetzt %d. Übe am Ziel drei kontrollierte Treffer. Abstand und Erholung zählen." % int(state.player.age))
 			return _ok("Sechs Jahre später: Die erwachsene Ausbildung beginnt.")
 		"training_hit":
 			return _apply_training_contact(state)
@@ -734,10 +1027,17 @@ func _validate_arguments(command: String, args: Dictionary) -> String:
 
 
 func _validate_state(state: Variant) -> String:
-	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley", "origin_id", "strategy", "frontier", "village"]):
+	if not _exact_keys(state, ["schema_version", "world_id", "revision", "world_seconds", "resources", "player", "companion", "progress", "buildings", "resource_nodes", "squad", "population", "encounter", "timers", "chronicle", "story", "command_log", "valley", "origin_id", "strategy", "frontier", "village", "tribes", "calendar", "world_state"]):
 		return "Unvollständiger oder unbekannter Datenvertrag."
 	if not _integer(state.schema_version, SCHEMA_VERSION, SCHEMA_VERSION):
 		return "Diese Schemaversion wird nicht unterstützt; es wurde keine Migration ausgeführt."
+	if not WorldCalendar.validate_world_time(state.calendar) or typeof(state.world_state) != TYPE_DICTIONARY or typeof(state.world_state.get("time")) != TYPE_DICTIONARY or not state.world_state.time.has("epoch"):
+		return "Die gemeinsame Weltzeit fehlt oder ist ungültig."
+	var tribal_error := TribalWorld.validate_cached(state.tribes)
+	if not tribal_error.is_empty():
+		return "Stammeswelt: " + tribal_error
+	if TribalWorld.day(state.tribes) > calendar_day(state):
+		return "Die Stammeswelt läuft der gemeinsamen Weltzeit voraus."
 	if typeof(state.origin_id) != TYPE_STRING or not Origins.PEOPLES.has(state.origin_id) or typeof(state.strategy) != TYPE_DICTIONARY or not Seasons.validate(state.strategy) or state.strategy.home != state.origin_id:
 		return "Unbekannte Herkunft oder ungültige Regionalkampagne."
 	if state.strategy.turn > 0 and (typeof(state.progress) != TYPE_DICTIONARY or not state.progress.get("skirmish_won",false)):
@@ -800,10 +1100,15 @@ func _validate_state(state: Variant) -> String:
 		if typeof(progress[key]) != TYPE_BOOL:
 			return "Kapitelmerkmale müssen Wahrheitswerte sein."
 	var adult: bool = progress.stage not in ["prologue", "settlement"]
-	var elapsed_years := (6 if adult else 0) + floori(state.strategy.turn / 4.0)
-	if state.player.age != 12 + elapsed_years or progress.years_elapsed != elapsed_years:
+	# Ages, elapsed years, seasons, sleep and jumps are checked against the one
+	# world clock and its time ledger; no counter may age anyone on its own.
+	var world_error := WorldState.validate(state)
+	if not world_error.is_empty():
+		return world_error
+	var jumps := int(state.world_state.time.counts.jump)
+	if adult != (jumps == 1) or (adult and int(state.player.age) < 18):
 		return "Alterssprung und Weltphase widersprechen sich."
-	if float(state.world_seconds) < float(progress.years_elapsed) * YEAR_SECONDS:
+	if float(state.world_seconds) < float(jumps) * 6.0 * YEAR_SECONDS:
 		return "Der Alterssprung fehlt in der gemeinsamen Weltzeit."
 	var expected_role := "child" if not adult else ("trainee" if progress.stage == "training" else "soldier")
 	if state.player.role != expected_role:
@@ -1008,7 +1313,11 @@ func _read_save(path: String) -> Dictionary:
 		state.village.enabled = false
 		state.village.health_delta = 0
 		state.village.militia = []
-		state.schema_version = SCHEMA_VERSION
+		state.schema_version = 5
+	# Tribal state v1 (first #99 build) gains forms of government and the
+	# D-048 dispute register before strict validation.
+	if typeof(state) == TYPE_DICTIONARY and typeof(state.get("tribes")) == TYPE_DICTIONARY:
+		TribalWorld.migrate(state.tribes)
 	# Nested childhood actor IDs changed when the production screenplay fixed
 	# Julia/Silvanus/Sextus as mother/father/smith. Migrate only version-1
 	# childhood saves before strict state validation; all other saves are untouched.
@@ -1019,6 +1328,9 @@ func _read_save(path: String) -> Dictionary:
 		# Schema v5 saves written before chapter abilities existed gain the record
 		# derived from their already saved story facts; the schema stays v5.
 		Abilities.ensure(state)
+		# v5 -> v6 after the childhood fixes, which can still move the timeline
+		# anchor of version-1 childhood saves to 58 BC.
+		_migrate_world_state(state)
 	var error := _validate_state(state)
 	# Only an already valid old childhood save may initialize decisions. The
 	# initializer reads family and economy data, so malformed legacy input must
@@ -1033,6 +1345,8 @@ func _read_save(path: String) -> Dictionary:
 		error = _validate_state(state)
 	if error.is_empty() and not _valid_valley(state):
 		error = "Das gespeicherte Talgefecht enthält widersprüchliche Daten."
+	if error.is_empty():
+		error = PersonRegistry.validate(state)
 	if not error.is_empty():
 		return _fail(error)
 	# JSON numbers may arrive as floats. Restore schema-defined integer types only
@@ -1041,8 +1355,97 @@ func _read_save(path: String) -> Dictionary:
 	return {"ok": true, "message": "Spielstand vollständig geprüft.", "state": payload_parser.data, "envelope": text}
 
 
+## v5 -> v6 (D-045): the tribal world (#99), the world clock (#98) and the
+## integration ledger. Nothing that a v5 save already decided is changed: the
+## clock is placed on the date the save already implied (childhood: start +
+## narrated days; legacy careers: spring of 100 AD + elapsed years and the
+## season of the regional campaign), every passage is booked under its cause,
+## and 100 AD careers stay on their own timeline (D-044). A pre-release #99 v6
+## save without a calendar folds its reported tribal days into travel time.
+func _migrate_world_state(state: Dictionary) -> void:
+	var version: Variant = state.get("schema_version")
+	if typeof(state.get("village")) != TYPE_DICTIONARY or typeof(state.get("progress")) != TYPE_DICTIONARY or typeof(state.get("strategy")) != TYPE_DICTIONARY:
+		return
+	if not (version == 5 or (version == 6 and state.has("tribes") and not state.has("calendar") and not state.has("world_state"))):
+		return
+	if typeof(state.village.get("history")) != TYPE_DICTIONARY or not WorldCalendar.is_integral(state.progress.get("years_elapsed")) or not WorldCalendar.is_integral(state.strategy.get("turn")):
+		return
+	if not state.has("tribes"):
+		state.tribes = TribalWorld.new_state(TribalWorld.seed_from_text(str(state.get("world_id", ""))), TribalWorld.scenario_for_world(state))
+	var reported := 0
+	if typeof(state.tribes) == TYPE_DICTIONARY and WorldCalendar.is_integral(state.tribes.get("extra_days")):
+		reported = int(state.tribes.extra_days)
+		state.tribes.extra_days = 0
+	state.world_state = WorldState.new_state()
+	state.calendar = {}
+	var origin := WorldClock.origin_year_of(state)
+	var epoch := WorldClock.start_jdn(origin)
+	var turn := int(state.strategy.turn)
+	var years := int(state.progress.years_elapsed)
+	var adult: bool = str(state.progress.get("stage", "")) not in ["prologue", "settlement"]
+	var target := epoch * WorldClock.DAY + WorldClock.MORNING
+	var ledger := WorldClock.new_ledger(epoch, WorldClock.MORNING)
+	if Childhood.enabled(state):
+		var days := maxi(0, int(state.village.childhood.get("day", 1)) - 1)
+		ledger.passed.sleep = days * WorldClock.DAY
+		ledger.counts.sleep = days
+		target += days * WorldClock.DAY
+		if "night_rest" in state.village.childhood.get("completed", []):
+			ledger.passed.night = WorldClock.NIGHT - WorldClock.MORNING
+			ledger.counts.night = 1
+			target += WorldClock.NIGHT - WorldClock.MORNING
+	else:
+		# The legacy formula: year origin + years_elapsed, season turn % 4.
+		var season_jdn := WorldCalendar.season_start(WorldCalendar.add_years(origin, years), posmod(turn, 4))
+		target = maxi(target, season_jdn * WorldClock.DAY + WorldClock.MORNING)
+		if adult:
+			var jump_end := WorldCalendar.add_calendar_years(epoch, 6)
+			ledger.passed.jump = (jump_end - epoch) * WorldClock.DAY
+			ledger.counts.jump = 1
+		ledger.counts.season = turn
+	ledger.passed.travel = reported * WorldClock.DAY
+	ledger.counts.travel = 1 if reported > 0 else 0
+	target += reported * WorldClock.DAY
+	ledger.last = {"cause": "migration", "reason": "Spielstand v%d übernommen" % int(version), "seconds": 0}
+	state.world_state.time = ledger
+	# A battle already fought is dated on the day the save reaches the clock;
+	# recovery on world time starts there (older builds tracked none).
+	if typeof(state.get("valley")) == TYPE_DICTIONARY and not state.valley.is_empty():
+		var battle_day := floori(target / float(WorldClock.DAY))
+		state.world_state.military.battle_start_jdn = battle_day
+		if str(state.valley.get("outcome", "ongoing")) != "ongoing":
+			state.world_state.military.battle_end_jdn = battle_day
+	var age := int(state.player.get("age", WorldClock.START_AGE)) if typeof(state.get("player")) == TYPE_DICTIONARY else WorldClock.START_AGE
+	var year := WorldCalendar.year_of(floori(target / float(WorldClock.DAY)))
+	var birth_year := WorldCalendar.birth_year_for_age(age, year)
+	state.calendar = WorldClock.new_calendar(origin, floori(target / float(WorldClock.DAY)), posmod(target, WorldClock.DAY), {"player": {"year": birth_year}, "companion": {"year": birth_year}})
+	if state.calendar.is_empty():
+		return
+	# Whatever the booked causes do not explain (the season lengths of a
+	# legacy campaign, village economy days already lived) is booked so that
+	# the clock lands exactly on the save's own date.
+	var start := epoch * WorldClock.DAY + WorldClock.MORNING
+	var rest := target - WorldClock.total_seconds(state)
+	if turn > 0:
+		ledger.passed.season = maxi(1, rest)
+		rest -= int(ledger.passed.season)
+	if rest > 0:
+		ledger.passed.migration = rest
+	elif rest < 0:
+		# Village days lived before the save's own date: the epoch moves back.
+		var moved := start + rest
+		ledger.epoch = {"jdn": floori(moved / float(WorldClock.DAY)), "second": posmod(moved, WorldClock.DAY)}
+	if reported > 0:
+		# Only the unpublished #99 interim form: its reported days now count
+		# on the clock, so the elapsed years follow the clock.
+		state.progress.years_elapsed = WorldClock.elapsed_years(state)
+	state.schema_version = SCHEMA_VERSION
+
+
 func _restore_integer_fields(state: Dictionary) -> void:
 	CityTrade.restore_integer_fields(state)
+	TribalWorld.normalize(state.tribes)
+	WorldState.normalize(state)
 	for key in ["schema_version", "revision"]:
 		state[key] = int(state[key])
 	state.frontier.schema = int(state.frontier.schema)
@@ -1272,7 +1675,7 @@ func _world_copy() -> Dictionary:
 	var candidate := {}
 	for key in data:
 		var value: Variant = data[key]
-		if key not in ["strategy","valley"] and typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY]:
+		if key not in ["strategy","valley","tribes"] and typeof(value) in [TYPE_DICTIONARY, TYPE_ARRAY]:
 			candidate[key] = value.duplicate(true)
 		else:
 			candidate[key] = value
@@ -1289,9 +1692,11 @@ func act_region(command: String,target: String) -> Dictionary:
 			data.strategy.last_event = result.message
 		if command == "advance":
 			data.world_seconds += YEAR_SECONDS/4.0
-			data.progress.years_elapsed = 6 + floori(data.strategy.turn/4.0)
-			data.player.age = 12 + data.progress.years_elapsed
-			data.companion.age = data.player.age
+			# The season moves the one world clock to the next season start;
+			# ages and elapsed years follow the clock (no separate counter).
+			# Its thirteen tribal weeks follow in frame budgets (advance() in
+			# the world, pump_tribes() while a menu pauses it).
+			WorldClock.season(data, "Jahreszeit der Regionalkampagne")
 		_record(data,result.message)
 		data.revision += 1
 		changed.emit()

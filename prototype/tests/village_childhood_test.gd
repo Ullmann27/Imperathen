@@ -173,7 +173,7 @@ func _test_fresh_opt_in_and_legacy() -> void:
 	v4.erase("village")
 	_write(_path("legacy-v4"), v4)
 	_ok(model.load_game(_path("legacy-v4")), "Run existing version-four migration")
-	_check(model.data.schema_version == 5 and not Childhood.enabled(model.data) and not model.data.village.enabled, "Version migration preserves legacy adulthood rules without inventing a childhood history")
+	_check(model.data.schema_version == WorldModel.SCHEMA_VERSION and not Childhood.enabled(model.data) and not model.data.village.enabled, "Version migration preserves legacy adulthood rules without inventing a childhood history")
 
 
 func _test_idle_and_bypasses() -> void:

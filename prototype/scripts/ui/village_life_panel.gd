@@ -7,6 +7,9 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Plan = preload("res://scripts/world/world_stream_plan.gd")
 const NpcBehavior = preload("res://scripts/domain/npc_behavior.gd")
 const Abilities = preload("res://scripts/story/chapter_abilities.gd")
+const WorldCalendar = preload("res://scripts/domain/world_calendar.gd")
+const WorldClock = preload("res://scripts/domain/world_clock.gd")
+const AGE_WORDS := {12: "zwölf", 13: "dreizehn", 14: "vierzehn", 15: "fünfzehn", 16: "sechzehn", 17: "siebzehn"}
 
 class RegionalMap extends Control:
 	var position_world := Vector3.ZERO
@@ -39,6 +42,16 @@ class RegionalMap extends Control:
 		var player := point([position_world.x, position_world.y, position_world.z])
 		draw_circle(player, 8, Color(0.4, 0.85, 0.85, 0.25))
 		draw_circle(player, 3, Color("9fe0d8"))
+
+
+## The world date of the save (one clock for HUD, atlas and this panel).
+static func _date(data: Dictionary) -> String:
+	var time := WorldClock.view(data)
+	return str(time.date_label) if not time.is_empty() else WorldCalendar.format_year(int(data.get("village", {}).get("history", {}).get("start_year", 100)))
+
+
+static func _age_word(age: int) -> String:
+	return str(AGE_WORDS.get(age, "%d Jahre alt" % age))
 
 
 static func _text(ui, column: VBoxContainer, value: String, size := 16, muted := false) -> void:
@@ -127,7 +140,7 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 		var chapter:=Childhood.view(data)
 		_text(ui,column,str(chapter.get("title","Ein Morgen zu Hause")),22)
 		_text(ui,column,str(chapter.get("objective","")),18)
-		_text(ui,column,"Dorftag %d · Du bist zwölf. Der nächste Tag beginnt, wenn du zu Hause bewusst schlafen gehst."%int(chapter.get("day",1)),15,true)
+		_text(ui,column,"%s · Dorftag %d · Du bist %s. Der nächste Tag beginnt, wenn du zu Hause bewusst schlafen gehst."%[_date(data),int(chapter.get("day",1)),_age_word(int(data.player.age))],15,true)
 		if not chapter.get("carried",[]).is_empty():
 			_text(ui,column,"Bei dir: "+", ".join(chapter.carried),16)
 		_text(ui,column,"Deine Lehre: "+str(chapter.get("apprenticeship","none")).replace("none","noch offen").replace("smith","bei Sextus"),16)
@@ -139,7 +152,7 @@ static func _overview(ui, column: VBoxContainer, data: Dictionary, economy: Dict
 	_text(ui, column, "Dorftag %d · %d Menschen im Aufbau · Vorrat: %d Holz / %d Stein / %d Getreide / %d Denare" % [economy.get("day", 1), economy.get("people", []).size(), data.resources.wood, data.resources.stone, data.resources.grain, data.resources.denarii])
 	_text(ui, column, "Ein Dorftag dauert in dieser Prüfphase zwei Spielminuten; Gespräche und Pausen halten ihn an.", 13, true)
 	var history: Dictionary = life.get("history", {})
-	_text(ui, column, "Historischer Rahmen: %s n. Chr. · %s. Dorf und Bewohner sind eigene fiktionale Figuren." % [history.get("current_year", 100), life.get("ruler", "Historischer Rahmen")], 14, true)
+	_text(ui, column, "Historischer Rahmen: %s · %s. Dorf und Bewohner sind eigene fiktionale Figuren." % [history.get("year_label", WorldCalendar.format_year(int(history.get("current_year", 100)))), life.get("ruler", "Historischer Rahmen")], 14, true)
 	_text(ui, column, str(economy.get("last_report", "")), 15)
 	var stats: Dictionary = data.get("village", {}).get("attributes", {})
 	_text(ui, column, "Mut %s · Kampf %s · Scharfsinn %s · Taktik %s" % [stats.get("courage", 0), stats.get("combat", 0), stats.get("insight", 0), stats.get("tactics", 0)], 17)
