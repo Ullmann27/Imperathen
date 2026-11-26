@@ -33,7 +33,7 @@ const MARKET := "ValdoraMarket"
 # Open-air work places furnished like rooms: origin and yaw in village space.
 const SITES := {
 	"VillageForge": {"at": Vector3(34.1, 0, -26.2), "yaw": 0.0, "kind": "smithy", "node": "VillageForge",
-		"label": "Schmiede des Nerva (offener Anbau vor dem Schmiedehaus)"},
+		"label": "Dorfschmiede (offener Anbau vor dem Schmiedehaus)"},
 	"ValdoraMarket": {"at": Vector3(25, 0, 24), "yaw": 0.0, "kind": "market", "node": "MarketDeliveries",
 		"label": "Marktstände an der Südstraße: Lebensmittel sowie Töpfer- und Tuchware"},
 }
