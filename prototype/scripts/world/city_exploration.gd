@@ -9,6 +9,7 @@ const CityDetailAdapter := preload("res://scripts/rendering/city_exploration_det
 const CityCharacterFinish := preload("res://scripts/rendering/city_character_detail.gd")
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
 const CityMarketBridge := preload("res://scripts/world/city_market_bridge.gd")
+const CityLifeSession := preload("res://scripts/world/city_life_session.gd")
 const CitySurfaceMicrodetail := preload("res://scripts/rendering/city_surface_microdetail.gd")
 const VivaCloseupProps := preload("res://scripts/rendering/city_viva_closeup_props.gd")
 const CityAmbientPeople := preload("res://scripts/world/city_ambient_people.gd")
@@ -45,6 +46,10 @@ const BRAKING_DECELERATION := 8.0
 var profile := "balanced"
 var persist := true
 var enable_riding_trial := false
+# Only explicit, non-persistent QA callers may attach the new city economy.
+var enable_living_city_qa := false
+var living_city: CityLifeSession
+var _living_city_clock: Dictionary = {}
 # Callers entering a dated scenario assign its authoritative JDN before add_child.
 var world_jdn := Calendar.campaign_start_jdn()
 # Review toggle: keep an exact legacy light/ground path for comparison.
@@ -119,6 +124,15 @@ func _ready() -> void:
 	market.message.connect(_market_message)
 	market.closed.connect(_close_market)
 	market.setup(get_node_or_null("RomanCity") as Node3D, player, persist, quarter.stable_trader if quarter != null else null)
+	if enable_living_city_qa and not persist and market.available:
+		var session := CityLifeSession.new()
+		var clock := Calendar.new_clock(world_jdn, 12 * 3600)
+		var node_exists := func(node_name: String) -> bool: return is_instance_valid(find_child(node_name, true, false))
+		if session.start(clock, 20261126, node_exists) and market.attach_living_city(session):
+			living_city = session
+			_living_city_clock = clock
+		else:
+			push_warning("City life QA could not be attached: " + session.error)
 	if enable_riding_trial:
 		_start_riding_trial()
 	_bag_button.disabled = not market.available
@@ -649,7 +663,20 @@ func _step_up(motion: Vector3) -> bool:
 	player.velocity.y = 0
 	return true
 
+## The QA owner supplies calendar instants, never a second autonomous clock.
+## The ordinary free-walk mode and campaign saves remain unaffected.
+func set_living_city_clock(clock: Dictionary) -> bool:
+	if living_city == null or not Calendar.validate_clock(clock):
+		return false
+	var result := living_city.sync_to(clock)
+	if not bool(result.get("ok", false)):
+		return false
+	_living_city_clock = clock.duplicate(true)
+	return true
+
 func _process(delta: float) -> void:
+	if living_city != null and not paused and not market.is_open() and not bool(living_city.last_sync.get("done", false)):
+		living_city.sync_to(_living_city_clock)
 	_catalog_elapsed += delta
 	if _catalog_elapsed>=0.15:
 		_catalog_elapsed = 0

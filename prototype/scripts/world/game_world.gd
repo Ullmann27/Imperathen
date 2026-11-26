@@ -18,6 +18,9 @@ const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
 const CameraObstruction = preload("res://scripts/world/camera_obstruction.gd")
 var village_life_world: Node3D
 var regional_terrain: Node3D
+var _political_survey_pending := false
+var _political_survey_at := Vector2.ZERO
+var _political_survey_range := 1.6
 var _village_focus := ""
 var _dodge_remaining := 0.0
 var _dodge_direction := Vector3.ZERO
@@ -1539,6 +1542,22 @@ func _handle_touch_drag(event: InputEventScreenDrag) -> void:
 	get_viewport().set_input_as_handled()
 
 
+func set_political_context(view: Dictionary) -> void:
+	_political_survey_pending = bool(view.get("survey_pending", false))
+	_political_survey_at = view.get("report_point", Vector2.ZERO)
+	_political_survey_range = float(view.get("report_radius", 1.6))
+	if village_life_world != null:
+		village_life_world.update_south_road(view)
+
+
+func _at_political_survey() -> bool:
+	return _political_survey_pending and Vector2(_player.position.x, _player.position.z).distance_to(_political_survey_at) <= _political_survey_range
+
+
+func _at_council_records() -> bool:
+	return village_life_world != null and village_life_world.at_council_records(_player.position)
+
+
 func _interact() -> void:
 	if _mode != "person":
 		return
@@ -1563,6 +1582,12 @@ func _interact() -> void:
 			return
 		var villager: String = _objective_villager()
 		if villager.is_empty():
+			if _at_political_survey():
+				action_requested.emit("politics_survey", {})
+				return
+			if _at_council_records():
+				action_requested.emit("politics_records", {})
+				return
 			villager = village_life_world.nearest(_player.position)
 		if not villager.is_empty():
 			action_requested.emit("village_npc", {"npc_id":villager})
@@ -1724,6 +1749,12 @@ func _update_context_hint() -> void:
 	var objective_villager := _objective_villager()
 	if not objective_villager.is_empty():
 		_hint.text = "Mit %s sprechen" % str(village_life_world.actors[objective_villager].get_meta("display_name", objective_villager))
+		return
+	if _at_political_survey():
+		_hint.text = "Bohle am Südweg prüfen"
+		return
+	if _at_council_records():
+		_hint.text = "Amtstafel ansehen"
 		return
 	if village_life_world != null:
 		var village_hint: String = village_life_world.hint(_player.position)

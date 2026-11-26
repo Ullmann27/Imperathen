@@ -10,6 +10,11 @@ const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Strike = preload("res://scripts/domain/raider_strike.gd")
+const COUNCIL := "res://assets/politics/council/valdora_council.glb"
+const COUNCIL_COLLISION := "res://assets/politics/council/valdora_council_collision.glb"
+const COUNCIL_ENTRANCE := Vector3(16.0, 0.012, 9.5)
+const SOUTH_ROAD := "res://assets/politics/suedweg/suedweg_bohlen.glb"
+const SUPPLIED_PLANKS := "res://assets/politics/suedweg/suedweg_ersatzbohlen.glb"
 const PLACES := {"farm":Vector2(24,-30), "woodcamp":Vector2(-43,14),
 	"quarry":Vector2(48,-12), "trade":Vector2(25,24), "watchpost":Vector2(0,-48)}
 var actors: Dictionary = {}
@@ -24,6 +29,9 @@ var _ready_scene := false
 var _wood: StandardMaterial3D
 var _stone: StandardMaterial3D
 var _linen: StandardMaterial3D
+var _council: Node3D
+var _south_road: Node3D
+var _supplied_planks: Node3D
 # Domain targets arrive every Life.STEP. Only spawn/restore places a body;
 # ordinary play sweeps towards those targets on the physics clock.
 const RAIDER_SPEED := 0.12 / Life.STEP
@@ -353,6 +361,7 @@ func sync_state(data: Dictionary, profile: String) -> void:
 		return
 	if not _ready_scene:
 		_create()
+	_sync_council(Childhood.enabled(data))
 	_set_collisions(true)
 	var people: Array = data.village.economy.people
 	for person: Dictionary in people:
@@ -366,6 +375,66 @@ func sync_state(data: Dictionary, profile: String) -> void:
 		item.repaired.visible = int(place.condition) == 100
 		item.label.modulate = Color("d8e2a8") if place.working else Color("e1c493")
 	_sync_raiders()
+
+
+func _sync_council(show_room: bool) -> void:
+	if not show_room:
+		if is_instance_valid(_council):
+			remove_child(_council)
+			_council.queue_free()
+			_council = null
+		return
+	if is_instance_valid(_council):
+		return
+	if not ResourceLoader.exists(COUNCIL, "PackedScene") or not ResourceLoader.exists(COUNCIL_COLLISION, "PackedScene"):
+		return
+	var model := load(COUNCIL) as PackedScene
+	var hulls := load(COUNCIL_COLLISION) as PackedScene
+	if model == null or hulls == null:
+		return
+	var room := model.instantiate() as Node3D
+	var collisions := hulls.instantiate() as Node3D
+	room.name = "ValdoraCouncilRoom"
+	room.position = COUNCIL_ENTRANCE
+	room.add_child(collisions)
+	add_child(room)
+	if collisions.find_children("*", "StaticBody3D", true, false).is_empty():
+		for surface: MeshInstance3D in collisions.find_children("*", "MeshInstance3D", true, false):
+			if surface.mesh != null:
+				surface.create_trimesh_collision()
+	collisions.hide()
+	_council = room
+
+
+func at_council_records(point: Vector3) -> bool:
+	if not is_instance_valid(_council) or not _council.is_visible_in_tree():
+		return false
+	var local := _council.to_local(point)
+	return absf(local.y - 0.9) < 0.5 and Vector2(local.x, local.z).distance_to(Vector2(3.56, 1.94)) < 0.75
+
+
+func update_south_road(view: Dictionary) -> void:
+	var playable := Childhood.enabled(state) and bool(view.get("available", false))
+	if playable and not is_instance_valid(_south_road):
+		_south_road = _road_detail(SOUTH_ROAD, "LooseSouthRoadBoards", Vector3(1.95, 0.005, 17.0))
+		_supplied_planks = _road_detail(SUPPLIED_PLANKS, "SuppliedSouthRoadBoards", Vector3(2.23, 0.005, 18.05))
+	if is_instance_valid(_south_road):
+		_south_road.visible = playable
+	if is_instance_valid(_supplied_planks):
+		_supplied_planks.visible = playable and view.get("recommendation", {}).get("route", "") == "wood"
+
+
+func _road_detail(path: String, label: String, at: Vector3) -> Node3D:
+	if not ResourceLoader.exists(path, "PackedScene"):
+		return null
+	var scene := load(path) as PackedScene
+	if scene == null:
+		return null
+	var detail := scene.instantiate() as Node3D
+	detail.name = label
+	detail.position = at
+	add_child(detail)
+	return detail
 
 
 func _set_collisions(enabled: bool) -> void:
