@@ -8,6 +8,7 @@ const SPEAKER_ALIASES := {"chronik": "narrator", "wachmann": "severus"}
 
 static var _manifest: Dictionary = {}
 static var _by_key: Dictionary = {}
+static var _by_id: Dictionary = {}
 
 
 static func text_key(text: String) -> String:
@@ -25,7 +26,10 @@ static func manifest() -> Dictionary:
 		if typeof(parsed) == TYPE_DICTIONARY:
 			_manifest = parsed
 			for line: Dictionary in _manifest.get("lines", []):
-				_by_key[str(line.text_key)] = line
+				_by_id[str(line.line_id)] = line
+				# Barks share texts between voices; only story lines are found by text.
+				if str(line.get("kind", "story")) == "story":
+					_by_key[str(line.text_key)] = line
 	return _manifest
 
 
@@ -33,6 +37,11 @@ static func manifest() -> Dictionary:
 static func find(text: String) -> Dictionary:
 	manifest()
 	return _by_key.get(text_key(text), {})
+
+
+static func find_line_id(line_id: String) -> Dictionary:
+	manifest()
+	return _by_id.get(line_id, {})
 
 
 static func all_lines() -> Array:

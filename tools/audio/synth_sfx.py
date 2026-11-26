@@ -271,6 +271,11 @@ def finish(x, peak_db=-3.0):
     x = hp(x, 30, order=2)
     idx = np.where(np.abs(x) > 1e-4 * np.max(np.abs(x)))[0]
     x = x[: idx[-1] + 1] if idx.size else x
+    # 0.5 ms raised-cosine fade-in removes the step at sample 0 without
+    # softening the transient (contact pulses last 0.15-7 ms); 5 ms fade-out.
+    fi = min(int(0.0005 * SR), len(x) // 8)
+    if fi > 0:
+        x[:fi] *= 0.5 - 0.5 * np.cos(np.pi * np.arange(fi) / fi)
     f = min(int(0.005 * SR), len(x) // 4)
     if f > 0:
         x[-f:] *= np.linspace(1, 0, f)

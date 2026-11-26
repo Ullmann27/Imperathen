@@ -81,7 +81,7 @@ def age_transform(wave, sr, post):
     from parselmouth.praat import call
     snd = parselmouth.Sound(np.asarray(wave, dtype=np.float64), sampling_frequency=sr)
     out = call(snd, "Change gender", 75, 600, float(post["formant_ratio"]), float(post["pitch_median_hz"]),
-               float(post.get("pitch_range_factor", 1.0)), 1.0)
+               float(post.get("pitch_range_factor", 1.0)), float(post.get("duration_factor", 1.0)))
     return out.values[0]
 
 
@@ -138,14 +138,14 @@ def main():
     # 1) Design references.
     refs_meta_path = work / "refs.json"
     refs_meta = json.loads(refs_meta_path.read_text()) if refs_meta_path.exists() else {}
-    need_design = [s for s in speakers if (wanted is None or s in wanted) and s not in refs_meta]
+    need_design = [s for s in speakers if (wanted is None or s in wanted) and s not in refs_meta and "derive_from" not in speakers[s]]
     if need_design:
         design = Qwen3TTSModel.from_pretrained(DESIGN[0], revision=DESIGN[1], dtype=torch.float32, device_map="cpu")
         for sid in need_design:
             spec = speakers[sid]
             lo, hi = spec["f0_target"]
             best = None
-            for attempt in range(4):
+            for attempt in range(int(spec.get("attempts", 4))):
                 seed = spec["seed"] + attempt * 1000
                 torch.manual_seed(seed)
                 w, sr = design.generate_voice_design(text=ref_text, language="German", instruct=spec["instruct"], max_new_tokens=token_budget(ref_text))
@@ -166,6 +166,24 @@ def main():
         del design
         import gc
         gc.collect()
+
+    # 1b) Derived references: one base timbre shifted to another age stage
+    # (pitch/formant/tempo by PSOLA). The clone model re-synthesises every
+    # line from this reference, so lines carry no PSOLA processing themselves.
+    for sid, spec in speakers.items():
+        if "derive_from" not in spec or sid in refs_meta or (wanted is not None and sid not in wanted):
+            continue
+        base = refs_meta[spec["derive_from"]]
+        wave, sr = sf.read(base["file"])
+        shifted = age_transform(wave, sr, spec["transform"])
+        p = work / "refs" / f"{sid}_from_{spec['derive_from']}.wav"
+        sf.write(p, shifted, sr)
+        m = measure(str(p))
+        err = wer(ref_text, transcribe(p))
+        print(f"derive {sid} from {spec['derive_from']} f0={m.get('f0_median_hz')} wer={err:.2f}", flush=True)
+        refs_meta[sid] = {"seed": base["seed"], "file": str(p), "metrics": m, "wer": round(err, 3), "sha256": sha256(p),
+                          "derived_from": spec["derive_from"], "transform": spec["transform"]}
+        refs_meta_path.write_text(json.dumps(refs_meta, indent=2, ensure_ascii=False))
 
     # 2) + 3) Clone and render lines.
     base = Qwen3TTSModel.from_pretrained(BASE[0], revision=BASE[1], dtype=torch.float32, device_map="cpu")
@@ -210,7 +228,7 @@ def main():
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(master_wav), "-c:a", "libvorbis", "-q:a", "6", "-map_metadata", "-1", "-fflags", "+bitexact", "-flags:a", "+bitexact", str(ogg)], check=True)
         meta[line["line_id"]] = {
             "line_id": line["line_id"], "speaker_id": sid, "text": line["text"], "text_key": line["text_key"],
-            "spoken_text": text, "model": BASE[0] + "@" + BASE[1][:12], "voice_design_model": DESIGN[0] + "@" + DESIGN[1][:12],
+            "kind": line.get("kind", "story"), "spoken_text": text, "model": BASE[0] + "@" + BASE[1][:12], "voice_design_model": DESIGN[0] + "@" + DESIGN[1][:12],
             "reference_seed": refs_meta[sid]["seed"], "seed": seed, "asr_wer": round(err, 3), "asr_text": hyp.strip(),
             "lufs_integrated": round(lufs, 2), "duration_s": round(len(mastered) / sr, 3), "sample_rate": sr,
             "master_wav_sha256": sha256(master_wav), "file": f"lines/{ogg.name}", "sha256": sha256(ogg),

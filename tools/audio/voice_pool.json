@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "note": "Stimmfamilie der Spielfigur und Stimmpool für namenlose Bewohner. Alle Stimmen sind aus Beschreibungen entworfen (keine realen Personen). Altersstufen der Spielfigur entstehen aus EINER Basisreferenz durch gemessene PSOLA-Verschiebung von F0 und Formanten; das Klonmodell spricht danach jede Stufe neu ein.",
+  "hero_family": {
+    "base": {"id": "hero_base", "name": "Spielfigur (Basis, Mitte zwanzig)", "age": 25, "class": "adult_male", "seed": 2501, "f0_target": [95, 145],
+      "instruct": "Junger Mann Mitte zwanzig, warme, klare, leicht helle Baritonstimme, offen und aufmerksam, ruhig, natürlich gesprochen."},
+    "stages": [
+      {"id": "hero", "name": "Spielfigur mit 12", "age": 12, "class": "child", "f0_target": [215, 300], "transform": {"pitch_median_hz": 250, "formant_ratio": 1.17, "pitch_range_factor": 1.1, "duration_factor": 0.97}},
+      {"id": "hero_youth", "name": "Spielfigur mit 16", "age": 16, "class": "youth_male", "f0_target": [115, 170], "transform": {"pitch_median_hz": 140, "formant_ratio": 1.06, "pitch_range_factor": 1.0, "duration_factor": 1.0}},
+      {"id": "hero_adult", "name": "Spielfigur mit 30", "age": 30, "class": "adult_male", "f0_target": [95, 145], "transform": {"pitch_median_hz": 118, "formant_ratio": 1.0, "pitch_range_factor": 1.0, "duration_factor": 1.0}},
+      {"id": "hero_old", "name": "Spielfigur mit 70", "age": 70, "class": "elder_male", "f0_target": [105, 160], "transform": {"pitch_median_hz": 128, "formant_ratio": 0.97, "pitch_range_factor": 0.85, "duration_factor": 1.08}}
+    ],
+    "barks": {
+      "greeting": "Salve! Ich bin wieder da.",
+      "acknowledge": "Verstanden. Ich kümmere mich darum.",
+      "effort": "Gleich, noch ein Stück!",
+      "alarm": "Achtung! Da kommt jemand!"
+    }
+  },
+  "npc_pool": {
+    "categories": {
+      "woman": {"age": [25, 50], "class": "adult_female", "f0_target": [160, 250], "count": 4,
+        "base": "Frau zwischen fünfundzwanzig und fünfzig aus einem Dorf",
+        "timbres": ["warme, volle Stimme, freundlich", "helle, schnelle Stimme, lebhaft", "tiefe, ruhige Frauenstimme, bestimmt", "weiche, etwas heisere Stimme, gelassen"]},
+      "man": {"age": [25, 50], "class": "adult_male", "f0_target": [85, 150], "count": 4,
+        "base": "Mann zwischen fünfundzwanzig und fünfzig aus einem Dorf",
+        "timbres": ["tiefe, raue Stimme, wortkarg", "klare, helle Tenorstimme, gesprächig", "volle, ruhige Baritonstimme, freundlich", "gepresste, leicht nasale Stimme, geschäftig"]},
+      "girl": {"age": [8, 12], "class": "child", "f0_target": [220, 340], "count": 4,
+        "base": "Kinderstimme eines Mädchens von etwa zehn Jahren, deutlich ein Kind, keine erwachsene Frau",
+        "timbres": ["hell und fröhlich", "leise und schüchtern", "frech und schnell", "klar und ernst"]},
+      "boy": {"age": [8, 12], "class": "child", "f0_target": [215, 330], "count": 4,
+        "base": "Kinderstimme eines Jungen von etwa zehn Jahren vor dem Stimmbruch, deutlich ein Kind, keine erwachsene Frau",
+        "timbres": ["hell und übermütig", "ruhig und nachdenklich", "laut und frech", "etwas heiser und vorsichtig"]},
+      "old_woman": {"age": [65, 80], "class": "elder_female", "f0_target": [140, 230], "count": 4,
+        "base": "Alte Frau über fünfundsechzig, ältere Stimme",
+        "timbres": ["brüchig und sanft", "kräftig und resolut", "zittrig und leise", "trocken und spöttisch"]},
+      "old_man": {"age": [65, 80], "class": "elder_male", "f0_target": [95, 170], "count": 4,
+        "base": "Alter Mann über fünfundsechzig, ältere Stimme",
+        "timbres": ["heiser und langsam", "kräftig, aber brüchig", "dünn und zittrig", "tief und behäbig"]}
+    },
+    "barks": {
+      "greeting": ["Salve!", "Guten Morgen.", "Sei gegrüßt.", "Ah, du bist es."],
+      "market": ["Frisches Brot! Wer will frisches Brot?", "Äpfel, gute Äpfel, heute billig!", "Wolle und Leinen, kommt und seht!", "Gesalzener Fisch, frisch vom Fluss!"],
+      "refusal": ["Nein, heute nicht.", "Dafür habe ich keine Zeit.", "Frag jemand anderen.", "Das kann ich nicht machen."],
+      "alarm": ["Alarm! Zu den Toren!", "Reiter! Reiter kommen!", "Feuer! Holt Wasser!", "Lauft! Ins Haus, schnell!"]
+    }
+  }
+}

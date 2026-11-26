@@ -53,8 +53,17 @@ func _ready() -> void:
 ## mouth_height: emitter-local height of the mouth (adult ~1.55 m, 12-year-old ~1.30 m).
 ## Returns the line record (voiced or unvoiced).
 func play(text: String, speaker_label: String, emitter: Node3D = null, mouth_height := 1.55) -> Dictionary:
+	return _start(VoiceLines.find(text), text, speaker_label, emitter, mouth_height)
+
+
+## Plays a manifest line by id (barks of the NPC pool, hero age stages).
+func play_line_id(line_id: String, emitter: Node3D = null, mouth_height := 1.55) -> Dictionary:
+	var entry := VoiceLines.find_line_id(line_id)
+	return _start(entry, str(entry.get("text", "")), str(entry.get("speaker_id", "")), emitter, mouth_height)
+
+
+func _start(entry: Dictionary, text: String, speaker_label: String, emitter: Node3D, mouth_height: float) -> Dictionary:
 	stop()
-	var entry := VoiceLines.find(text)
 	current = {"text": text, "speaker": speaker_label, "voiced": not entry.is_empty(),
 		"line_id": str(entry.get("line_id", "")), "speaker_id": VoiceLines.speaker_id(speaker_label)}
 	_frame_time = 0.0
