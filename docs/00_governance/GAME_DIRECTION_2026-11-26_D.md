@@ -1,0 +1,162 @@
+# Stammeszivilisationen, Überfallverschwörung und militärische Weiterentwicklung – 26.11.2026
+
+Status: **Vorgabe des Auftraggebers** nach Durchsicht von PR #99 und #100. Die Entscheidungen stehen als D-040 bis D-047 im [Entscheidungsprotokoll](DECISION_LOG.md). Sie ergänzen das Masterhandbuch 3.0 und die Anweisungen [A](GAME_DIRECTION_2026-11-26.md), [B](GAME_DIRECTION_2026-11-26_B.md) und [C](GAME_DIRECTION_2026-11-26_C.md). Die Zuordnung unten ist Planung, kein Umsetzungsnachweis.
+
+## Wortlaut
+
+> IMPERATHEN – GAME DIRECTION
+>
+> Stammeszivilisationen, Überfallverschwörung und militärische Weiterentwicklung
+>
+> Die Entwicklungen in PR #99 und #100 entsprechen unserer grundsätzlichen Zielsetzung. Arbeite mit sämtlichen Agents und bisherigen Produktionsaufträgen weiter.
+>
+> 1. Überfall auf Valdora
+>
+> Bestätigt: etwa 30 Reiter zunächst ungeklärter Herkunft.
+>
+> Das entspricht I-10 „Die Nacht der Reiter“. Die Angreifer dürfen nicht automatisch einem bestimmten germanischen Stamm zugeordnet werden.
+>
+> Die Verbindung zur fiktiven Handelsgesellschaft und zum roten Siegel bleibt Bestandteil der langfristigen Verschwörung. Der Lagervertrag aus I-20 nennt Gaius Varro Serranus, beweist seine Schuld jedoch noch nicht.
+>
+> Entwickle daraus eine weitreichende kriminalistische und politische Handlung:
+>
+> - Unterschiedliche Zeugenaussagen.
+> - Widersprüchliche Hinweise.
+> - Verdächtige Handelsbeziehungen.
+> - Persönliche Verbindungen zwischen Charakteren.
+> - Unschuldige Verdächtige.
+> - Beweismittel und langfristige Konsequenzen.
+> - Möglichkeiten zur Aufklärung durch Scharfsinn, Kontakte, Handel, Diplomatie und spätere militärische Laufbahnen.
+>
+> Der Spieler soll die Zusammenhänge selbst entdecken können. Keine automatische Offenlegung der gesamten Verschwörung.
+>
+> Schütze die verbindlichen Familien- und Überlebenszweige aus dem Originaldrehbuch.
+>
+> 2. Germanische Truppen
+>
+> Speerwerfer werden als reguläre Fernkampfvariante entwickelt. Bogenschützen bleiben als seltenere, quellenkritisch gekennzeichnete Designvariante erhalten.
+>
+> Erweitere den Truppenkatalog um unterschiedliche Ausbildungs-, Ausrüstungs- und Erfahrungsstufen.
+>
+> Erstelle sämtliche benötigten Modelle, Waffen, Schilde, Skelette und Animationen mit Blender und geeigneten weiteren Werkzeugen.
+>
+> Die örtliche Passwache bleibt als fiktives, regionales Aufgebot erhalten.
+>
+> Keine pauschal identischen germanischen Gruppen. Wohlstand, Handelsbeziehungen, Rohstoffvorkommen und kulturelle Entwicklung bestimmen ihre tatsächlichen militärischen Möglichkeiten.
+>
+> 3. Kampfwertformel
+>
+> Die Kampfwertformel aus Seite 79 des Masterhandbuchs wird jetzt verbindlich implementiert.
+>
+> Schaden = Waffenbasis × Qualität × Kompetenz × Trefferzone × Schutzfaktor.
+>
+> Berücksichtige zusätzlich Ausdauer, Verletzungen, Waffenverschleiß, Schildposition und tatsächlichen Kontaktzeitpunkt.
+>
+> Hochwertige Ausrüstung muss spürbare Vorteile bringen, aber niemals fehlende Ausbildung vollständig ersetzen.
+>
+> Ein erfahrener Krieger mit gewöhnlicher Ausrüstung kann einen unerfahrenen Gegner mit hochwertiger Ausrüstung besiegen.
+>
+> Verbinde das System mit Shops, Handwerk, militärischen Ernennungen, Inventar und Fähigkeiten.
+>
+> Verhindere unkontrollierte Multiplikatoren und doppelte Boni. Alle Balanceparameter müssen zentral konfigurierbar und reproduzierbar testbar sein.
+>
+> 4. Militärische Persönlichkeiten
+>
+> Führe die individuellen Soldatenidentitäten weiter aus.
+>
+> Soldaten können Freundschaften schließen, gemeinsame Feldzüge erleben, sich gegenseitig retten, Vertrauen verlieren, befördert werden oder das Heer verlassen.
+>
+> Ihre Familien, Herkunft und wirtschaftlichen Verhältnisse bleiben Bestandteil der Welt.
+>
+> Rekrutierung, Verwundung, Genesung und Tod müssen Auswirkungen auf die tatsächlichen Siedlungen haben.
+>
+> Verknüpfe Erscheinungsvarianten mit appearance_seed und militärischem Rang statt ausschließlich mit dem bisherigen Modellindex.
+>
+> 5. Eigenständige Zivilisationen
+>
+> Die weibliche Erbin der fiktiven Gemeinschaft Ravensteg kann erhalten bleiben.
+>
+> Unterschiedliche Regierungs- und Nachfolgemodelle sollen verschiedene politische Entwicklungen ermöglichen.
+>
+> Germanische Gruppen sollen sich langfristig zu größeren Siedlungen, Handelsgemeinschaften, Bündnissen oder konkurrierenden Machtzentren entwickeln können.
+>
+> Die Konfliktdichte wird durch tatsächliche Spieltests bewertet. Vermeide eine künstlich erzwungene Anzahl von Überfällen.
+>
+> Ältere Kampagnen um 100 n. Chr. bleiben als getrennte historische Spielstände erhalten. Kein nachträgliches Umschreiben auf 58 v. Chr.
+>
+> 6. Gemeinsamer Weltzustand
+>
+> Führe den Kalender aus PR #98, die Stammeswelt aus PR #99 und die militärische Simulation aus PR #100 kontrolliert zusammen.
+>
+> Es darf nur eine autoritative Weltzeit, einen konsistenten Speichervertrag und eindeutige Personenidentitäten geben.
+>
+> Verhindere doppelte Alterung, doppelte Ressourcenbuchungen, wiederbelebte Soldaten und widersprüchliche Spielstände.
+>
+> Verknüpfe auch Genesung, Beförderungen, Handel, Reisen, Schlaf und historische Ereignisse mit dieser gemeinsamen Weltzeit.
+>
+> 7. Leistungsoptimierung
+>
+> Die Verteilung des wöchentlichen Simulationsticks auf mehrere Frames ist ausdrücklich erwünscht.
+>
+> Zielwert: ungefähr 2 ms Simulationsarbeit pro Frame als zunächst zu überprüfendes Budget.
+>
+> Die Aufteilung darf Determinismus, Ereignisreihenfolge und Transaktionskonsistenz nicht gefährden. Speichern und Laden während eines laufenden Simulationsticks müssen abgesichert sein.
+>
+> Die tatsächliche Leistung auf dem Fold7 ist später gesondert zu messen.
+>
+> 8. Weitere Produktion
+>
+> Arbeite weiterhin an hochwertigen Städten, Landschaften, Charakteren, Innenräumen, Ausrüstung, Filmsequenzen, Stimmen und Animationen.
+>
+> Behalte unsere zehn Zielbilder und das 311-seitige Masterhandbuch als verbindliche Qualitätsorientierung.
+>
+> Die neuen Systeme dürfen nicht nur im Hintergrund existieren. Der Spieler muss ihre Auswirkungen in der begehbaren Welt tatsächlich sehen und erleben können.
+>
+> Dokumentiere sämtliche Ergebnisse, überprüfe alle Integrationen und führe die vollständige Regression sowie das Motion-Gate aus.
+>
+> Keine eigenmächtigen Main-Merges und keine vorgetäuschten Fertigstellungen.
+>
+> Arbeite selbstständig weiter und denke bei jeder Funktion mindestens drei Entwicklungsebenen voraus.
+
+## Zuordnung (Stand 26.11.2026, 06:45 UTC)
+
+| Punkt | Arbeitspaket | Stand |
+|---|---|---|
+| 1 Überfallverschwörung | neu: `feat/raid-conspiracy-investigation-20261126` (Ermittlungsstruktur: Zeugen, Widersprüche, Beweise, unschuldige Verdächtige, Aufklärungswege; Schutz der Familien- und Überlebenszweige); Reiter offener Herkunft bereits in #99 | neu beauftragt |
+| 2 Germanische Truppen | Simulation und Katalog: #100 (Speerwerfer regulär, Bogner selten und gekennzeichnet, Stufen); Modelle, Waffen, Schilde, Skelette, Animationen: `feat/germanic-warrior-families-20261126` | Folgeauftrag |
+| 3 Kampfwertformel | zentrales Modul und Balancekonfiguration in #100; Anschluss Nahkampf Ebene A (`feat/melee-combat-core-20261126`), Shops, Handwerk, Inventar und Fähigkeiten über die Integration | Folgeauftrag |
+| 4 Militärische Persönlichkeiten | #100 (Beziehungen, Rettung, Vertrauen, Beförderung, Austritt; `appearance_seed` und Rang für die Darstellung); Auswirkungen auf Siedlungen über den gemeinsamen Weltzustand | Folgeauftrag |
+| 5 Zivilisationen | #99 (Regierungs- und Nachfolgemodelle, Wachstum zu Machtzentren, keine erzwungene Überfallzahl); 100-n.-Chr.-Stände bleiben getrennt | Folgeauftrag |
+| 6 Gemeinsamer Weltzustand | neu: `integ/world-state-20261126` (Kalender #98 + Stammeswelt #99 + Militär #100: eine Weltzeit, ein Speichervertrag, eindeutige Personen-IDs) | neu beauftragt |
+| 7 Leistung | #99 (Wochentick auf Frames verteilt, ca. 2 ms je Frame; Speichern/Laden während eines laufenden Ticks abgesichert) | in Arbeit |
+| 8 Produktion und Regression | alle Pakete; vollständige Regression und Motion-Gate auf dem Integrationsstand | laufend |
+
+## Nachtrag: Entstehung von Konflikten (D-048)
+
+Wortlaut des Auftraggebers:
+
+> Konflikte werden ausschließlich durch Streitigkeiten in jeweiligen Missionen oder Quests befeuert und entstehen dadurch. Es gibt auch schon natürliche Feinde natürlich, aber der Rest der Völker, und wir machen mehrere Völker und mehrere Stämme, und ergibt sich eben aus der Freundschaftsanalyse, also Freundschaftsbeziehung zu den jeweiligen Stämmen durch Missionen, Quests und Verbündete in Angriffen oder Verteidigung, Eroberungen. Das ergibt sich allein aus dem ganzen Spielverlauf. So kannst du denken.
+
+Umsetzungsregel, wie der Lead sie versteht (Korrektur durch den Auftraggeber jederzeit möglich):
+- Ein Konflikt zwischen Völkern oder Stämmen (Überfall, Fehde, Krieg, Eroberungszug) braucht eine nachgewiesene Ursache. Zulässige Ursachen sind ein Streit aus einer Mission oder Quest, eine vorab festgelegte natürliche Feindschaft, eine Bündnispflicht in Angriff oder Verteidigung, eine Vergeltung für einen früheren Konflikt dieser Art oder ein Eroberungszug, der aus einer solchen Kette folgt.
+- Not, Hunger oder ein günstiges Kräfteverhältnis allein lösen keinen Angriff aus. Sie führen zu Handel, Abwanderung, Verhandlung oder Tributbitten.
+- Alle übrigen Beziehungen entstehen aus dem Spielverlauf: Missionen, Quests, gemeinsame Angriffe und Verteidigungen, Eroberungen, Handel und gebrochene oder gehaltene Vereinbarungen.
+- Es gibt mehrere Völker und Stämme, nicht nur germanische Gruppen.
+- Jedes Konfliktereignis speichert seine Ursache und ist im Spiel nachvollziehbar.
+
+## Nachtrag: Not als Konfliktursache, Grafik „Ultra“, Stimmen und Klang (D-049, D-050)
+
+Wortlaut des Auftraggebers:
+
+> Sicher kannst du Hungerzüge und alles einführen als Not oder wenn man Strategien entwickeln muss zum Aufbauen und zum Weiterbauen. Ich will jetzt einmal auf jeden Fall wenn ich jetzt dann nach deiner Arbeit, du arbeitest jetzt schon seit 11 Stunden, ich erwarte massive Ergebnisse in der Grafik. Ich will, dass du dich wirklich grafisch in die Ebene begibst, dass du schaust, dass das wirklich detailliert und GTA sexy Stil hat und dass das für ein Handy im Ultra-Hochmodus, also Ultra können wir das dann nennen, nur mit PC zum Schaffen ist. Also ich will auf Android, weil RDR2, Red Dead Redemption, hat es auch geschafft bei Rockstar Games, so ein Spiel PC-Modus mäßig aufs Android zu bekommen. Schau dir das an nebenbei, wie Rockstar Games das gemacht hat bei Red Dead Redemption in Android Play Store. Und das ist schon echt Niveau von PC. Also wenn du das einfach nur nachbildest von der Grafik oder die Tipps holst oder Tricks oder was auch immer aus dem Internet, wie du das umsetzen kannst, dann mach es auch und such danach. Und das gilt für jede Aufgabenerteilung, das gilt für alles, was wir bis jetzt gemacht haben oder machen oder noch machen werden. Du suchst dir immer die besten und neuesten Hightech-Techniken raus, die was entwickelt worden sind oder die noch ein menschlicheres Verhalten zeigen sollten, was Beta-Funktionen sind. Es ist egal, aber wir brauchen eine Mundanimation. Du kannst Stimmen einbauen, du kannst doch sehr gute Stimmen einbauen. Mach das bitte, schau, dass bei der kindlichen Stimme kindliche Stimmen sind, bei mittelerwachsenen Stimmen, bei alten Stimmen alte Stimmen, bei Julius Caesar zum Beispiel eine mächtigere Stimme, aber schon noch menschlich, also wie gesagt menschlich muss sowieso zwingend sein. Und die Effekte und Soundeffekte beim Schlagen, beim Kämpfen, beim Schwertkampf, beim Bogenschießen, beim Armbrustschießen. Ich weiß nicht, was für Waffen, ich will mich auch nicht aufs Zeitalter, Epochenalter umlegen, weil im Laufe der Geschichte, denke ich mal, damit wir von Epoche zu Epoche switchen können, werden wir dann was weiterentwickeln und das ist jetzt mal uninteressant. Wir werden jetzt einmal, wie gesagt, ich will deine Top-Leistung in der Grafik sehen.
+
+Umsetzung:
+- **D-049** ergänzt D-048: Not (Hunger, Mangel) und strategische Notwendigkeit beim Aufbau und Ausbau sind zulässige Konfliktursachen (`need`). Auch sie werden mit Anlass gespeichert. Hunger führt also nicht zwingend zu Handel, sondern kann je nach Lage, Charakter und Beziehungen auch einen Hungerzug auslösen.
+- **D-050:**
+  - Das höchste Grafikprofil heißt **Ultra**. Auf leistungsfähigen Android-Geräten zielt es auf PC-nahe Darstellung.
+  - Für jede Aufgabe werden die besten und neuesten Techniken recherchiert und eingesetzt, Beta-Funktionen eingeschlossen, soweit sie messbar funktionieren.
+  - Mundanimation und Stimmen: kindlich, mittleres Alter, alt; Caesar mächtiger, aber menschlich.
+  - Soundeffekte für Schlag, Schwertkampf, Bogen und Armbrust.
+  - Das Waffensystem ist epochenübergreifend erweiterbar und nicht auf eine Zeit festgelegt.
+- **Recherchebefund des Leads (26.11.2026):** Auf Android und iOS ist **Red Dead Redemption** (Teil 1, mit Undead Nightmare) erschienen, nicht RDR2. Rockstar verlangt mindestens Snapdragon-888-Leistung und bietet einen Grafikmodus mit 30 fps. RDR2 läuft auf Handys nur über PC-Emulation. Quellen: [Rockstar Support: Graphics mode](https://support.rockstargames.com/articles/4NCHWpHnBC2LIgZX6ymvcx/graphics-mode-for-red-dead-redemption-on-android-ios), [Rockstar Support: Android Device Support](https://support.rockstargames.com/en-US/articles/5VamcWitbDNFnFUjSBMMLq/red-dead-redemption-android-device-support), [Notebookcheck](https://www.notebookcheck.net/Red-Dead-Redemption-mobile-performance-tested-This-is-the-best-Apple-mobile-device-to-play-it-on.1178960.0.html), [GamingBible](https://gamingbible.com/news/red-dead-redemption-2-mobile-pc-emulation-447806-20260406).
+- **Lizenzen:** Stimmen entstehen nur mit lokal lauffähigen Open-Source-Modellen mit geprüfter Lizenz, etwa Chatterbox Multilingual (MIT, laut Modellkarte mit Deutsch) oder Piper mit CC0-Stimmen. Echte, identifizierbare Personen werden nicht geklont. Kostenpflichtige Stimmdienste bleiben ohne Freigabe ausgeschlossen.
