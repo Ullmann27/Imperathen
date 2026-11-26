@@ -10,6 +10,7 @@ const Field := preload("res://scripts/battle/valley_field.gd")
 const Slots := preload("res://scripts/battle/formation_slots.gd")
 const Catalog := preload("res://scripts/battle/troop_catalog.gd")
 const Roster := preload("res://scripts/battle/soldier_roster.gd")
+const Formula := preload("res://scripts/battle/combat_formula.gd")
 ## Formations that can be drawn along a front. SHAPES adds the all-round orbis.
 const FORMATIONS := Slots.NAMES
 const SHAPES := {"line": "Linie", "column": "Marschkolonne", "shield_wall": "Schildwall",
@@ -43,13 +44,11 @@ const ADVANCE_STANDOFF := 6.0
 const FALL_BACK_DISTANCE := 10.0
 const FALL_BACK_SPEED := 1.0
 const CHARGE_SPEED := 2.65
-const CHARGE_BONUS := 1.25
 const CHARGE_COHESION := 15.0
 const PILA_RANGE := 12.0
 const PILA_FOUL_STEPS := 50
 const PILA_BANDS := [0.60, 0.30]
-const ORBIS_POWER := 0.85
-const SCHEMA := 3
+const SCHEMA := 4
 const DEFAULT_SEED := 58
 ## Per-soldier speed cap. No member, and therefore no company anchor, moves faster.
 const MEMBER_SPEED := 2.65
@@ -74,9 +73,10 @@ const CONTAGION_RADIUS := 12.0
 const CONTAGION_SHOCK := 8.0
 const REAR_FACTOR := 1.5
 const BANNER_SHOCK := 15.0
-## Squad keys added by schema 3. A legacy save carries none of them (or all of them).
+## Squad keys added by schema 3 and 4. A legacy save carries none of them (or all of them).
 const SCHEMA3_KEYS := ["troop_id", "loadout", "drills", "uids", "people", "memories", "signifer_id", "rally_from",
 	"commandable_by", "pila", "shields_fouled_until", "charge_bonus"]
+const SCHEMA4_KEYS := ["wear"]
 ## Data hook for later scenarios (outnumbered, defence, reinforcement, retreat,
 ## negotiation, capture). Only this test bench exists so far; build none of them here.
 ## Command rights follow appointments (D-023, D-025): order() acts for an appointment,
@@ -160,11 +160,18 @@ func _troop_for(id: String, kind: String) -> Dictionary:
 	return {"troop_id": "", "tier": 2, "culture": "", "battle_kind": kind, "loadout": loadout, "drills": {}}
 
 
-func _kit(troop: Dictionary) -> Dictionary:
+## Issued kit of a company: each slot at the troop's minimum quality, unless the scenario
+## names the quality of the actual items (kit_quality 0-4; the hook for shops, crafting
+## and inventory: the world-state integration passes the quality of real item instances).
+func _kit(troop: Dictionary, id: String = "") -> Dictionary:
 	var kit := {}
+	var plan: Dictionary = _plans.get(id, {})
 	for slot in troop.loadout:
 		var item: Dictionary = troop.loadout[slot]
-		kit[slot] = {"family_id": item.family_id, "quality": int(item.q_min), "count": int(item.get("count", 1))}
+		var quality := int(item.q_min)
+		if plan.has("kit_quality"):
+			quality = clampi(int(plan.kit_quality), 0, 4)
+		kit[slot] = {"family_id": item.family_id, "quality": quality, "count": int(item.get("count", 1))}
 	return kit
 
 
@@ -210,10 +217,11 @@ func _add_squad(id: String, title: String, side: String, kind: String, shape: St
 		"pending_formation": "", "formation_at": 0,
 		"last_action": "", "action_step": -1, "hit_step": -1, "block_step": -1,
 		"wounded": 0, "dead": 0, "cohesion": 100.0, "reaction_seconds": 0.4, "ready_at": 0,
-		"troop_id": troop.troop_id, "loadout": _kit(troop), "drills": troop.drills.duplicate(true),
+		"troop_id": troop.troop_id, "loadout": _kit(troop, id), "drills": troop.drills.duplicate(true),
 		"uids": [], "people": {}, "memories": [],
 		"signifer_id": _soldier_id(id, count - 2) if count >= 5 else "", "rally_from": 0,
-		"commandable_by": _rights(id), "pila": 0, "shields_fouled_until": 0, "charge_bonus": false}
+		"commandable_by": _rights(id), "pila": 0, "shields_fouled_until": 0, "charge_bonus": false,
+		"wear": {"weapon": 0.0, "shield": 0.0, "armor": 0.0}}
 	if s.loadout.has("missile") and s.loadout.missile.family_id == "pilum":
 		s.pila = s.loadout.missile.count
 	var catalog := Catalog.load_default()
@@ -978,10 +986,9 @@ func _act(s: Dictionary, nearest: Dictionary, hits: Dictionary) -> void:
 				s.next_volley = steps + VOLLEY_STEPS
 			if _shield_factor(s, enemy, ranged) < 1.0:
 				enemy.block_step = steps
-			var damage := _attack_power(s, enemy, ranged) * STEP * interval
+			var damage := _strike(s, enemy, "ranged" if ranged else "melee")
 			if s.command == "charge" and s.charge_bonus and not ranged:
-				# The impact of the charge counts once; then it is an ordinary melee.
-				damage *= CHARGE_BONUS
+				# The charge factor counted once inside the formula; now it is an ordinary melee.
 				s.charge_bonus = false
 				s.command = "attack"
 				_remember(s, "charge_impact", enemy.id)
@@ -1036,7 +1043,7 @@ func _throw_pila(s: Dictionary, enemy: Dictionary, hits: Dictionary) -> void:
 	s.last_action = "throw"
 	if _shield_factor(s, enemy, true) < 1.0:
 		enemy.block_step = steps
-	_add_hit(hits, s, enemy, _attack_power(s, enemy, true) * STEP * VOLLEY_STEPS, "pila")
+	_add_hit(hits, s, enemy, _strike(s, enemy, "pila"), "pila")
 	enemy.shields_fouled_until = steps + PILA_FOUL_STEPS
 	_credit(s, true)
 	_remember(s, "pila_volley", enemy.id)
@@ -1058,31 +1065,85 @@ func _follow_spot(s: Dictionary, leader: Dictionary) -> Vector2:
 	return Field.project(_pos(leader) - _front(leader) * gap)
 
 
-func _attack_power(s: Dictionary, enemy: Dictionary, ranged: bool) -> float:
-	var power: float = s.strength * (0.75 + s.morale * 0.0025) * (1.0 - s.fatigue * 0.002)
-	power *= (0.88 + s.cohesion * 0.0012) * (0.92 + s.experience * 0.0016)
-	var elevation := ground_height(s.x, s.z) - ground_height(enemy.x, enemy.z)
-	power *= clampf(1.0 + 0.1 * elevation, 0.85, 1.15)
-	var guard := 0.76 if enemy.command in ["defend", "hold"] else 1.0
-	guard *= _shield_factor(s, enemy, ranged)
-	if s.formation == "phalanx" and s.kind == "spear":
-		power *= 1.12
-	if s.formation == "orbis":
-		power *= ORBIS_POWER
-	return power * guard * (0.043 if ranged else 0.075)
+## Everything the combat formula needs for one strike interval of `s` against `enemy`.
+## Competence and defence come from the soldiers' own skills, quality and wear from the
+## issued kit; tactical state (morale, cohesion, formation, charge, height) is passed as
+## is. All weighting happens in combat_formula.gd, nowhere in this file.
+func strike_input(s: Dictionary, enemy: Dictionary, mode: String) -> Dictionary:
+	var weapon := _weapon(s, mode)
+	var to_attacker := _pos(enemy).direction_to(_pos(s))
+	return {"mode": mode,
+		"attackers": {"count": s.strength, "skill": _mean_skill(s, "melee" if mode == "melee" else "missile"),
+			"stamina": 100.0 - float(s.fatigue), "weapon": weapon, "morale": s.morale, "cohesion": s.cohesion,
+			"formation": s.formation, "kind": s.kind, "charge": mode == "melee" and s.command == "charge" and s.charge_bonus,
+			"elevation": ground_height(s.x, s.z) - ground_height(enemy.x, enemy.z)},
+		"defenders": {"skill": _mean_skill(enemy, "melee"), "armor": _armor(enemy), "shield": _shield(enemy),
+			"formation": enemy.formation, "braced": enemy.command in ["defend", "hold"],
+			"fouled": enemy.shields_fouled_until > steps, "facing_dot": _front(enemy).dot(to_attacker)}}
 
 
+func _mean_skill(s: Dictionary, skill: String) -> float:
+	var total := 0.0
+	for uid in s.uids:
+		total += float(s.people[uid].skills[skill])
+	return total / maxi(1, s.uids.size())
+
+
+## The weapon a company uses for this kind of strike. Bowmen in melee fall back to a
+## sidearm, or fight unarmed.
+func _weapon(s: Dictionary, mode: String) -> Dictionary:
+	var slot := ""
+	if mode == "pila":
+		slot = "missile"
+	elif mode == "ranged":
+		slot = "missile" if s.loadout.get("missile", {}).get("family_id", "") in ["javelin"] and not s.loadout.get("main_hand", {}).get("family_id", "") in ["bow", "sling"] else "main_hand"
+	else:
+		for candidate in ["main_hand", "sidearm", "missile"]:
+			var family: String = s.loadout.get(candidate, {}).get("family_id", "")
+			if family != "" and not family in ["bow", "sling", "pilum"]:
+				slot = candidate
+				break
+	if slot == "":
+		return {"family": "fist", "quality": 2, "wear": 0.0}
+	var item: Dictionary = s.loadout[slot]
+	return {"family": item.family_id, "quality": item.quality, "wear": s.wear.weapon}
+
+
+func _armor(s: Dictionary) -> Dictionary:
+	var armor := {}
+	for slot in ["head", "torso"]:
+		if s.loadout.has(slot):
+			armor[slot] = {"family": s.loadout[slot].family_id, "quality": s.loadout[slot].quality, "wear": s.wear.armor}
+	return armor
+
+
+func _shield(s: Dictionary) -> Dictionary:
+	if not s.loadout.has("shield"):
+		return {}
+	return {"family": s.loadout.shield.family_id, "quality": s.loadout.shield.quality, "wear": s.wear.shield}
+
+
+## Casualty-equivalent damage of one strike interval (combat formula, levels B/C). The
+## wear it causes is booked on both kits.
+func _strike(s: Dictionary, enemy: Dictionary, mode: String) -> float:
+	var result := Formula.unit_strike(strike_input(s, enemy, mode))
+	var blows: float = float(result.factors.get("blows", 0.0)) * float(result.factors.get("engaged", 0.0))
+	s.wear.weapon = clampf(s.wear.weapon + result.wear.weapon * blows / maxi(1, s.strength), 0.0, 1.0)
+	enemy.wear.shield = clampf(enemy.wear.shield + result.wear.shield * blows / maxi(1, enemy.strength), 0.0, 1.0)
+	enemy.wear.armor = clampf(enemy.wear.armor + result.wear.armor * blows / maxi(1, enemy.strength), 0.0, 1.0)
+	return result.casualties
+
+
+## Expected casualties of one strike interval without booking wear (for comparisons).
+func _attack_power(s: Dictionary, enemy: Dictionary, ranged: bool, mode: String = "") -> float:
+	return Formula.unit_strike(strike_input(s, enemy, mode if mode != "" else ("ranged" if ranged else "melee"))).casualties
+
+
+## Share of a blow that passes the enemy's shields from s's direction (1.0 = no cover).
 func _shield_factor(s: Dictionary, enemy: Dictionary, ranged: bool) -> float:
-	if enemy.shields_fouled_until > steps:
-		return 1.0
-	if ranged and enemy.formation == "testudo":
-		return 0.62
-	if enemy.formation == "orbis":
-		return 0.72 if ranged else 0.87
-	var front := Vector2(-sin(enemy.facing), -cos(enemy.facing))
-	if enemy.formation == "shield_wall" and front.dot(_pos(enemy).direction_to(_pos(s))) > 0.25:
-		return 0.72 if ranged else 0.87
-	return 1.0
+	var b := Formula.balance()
+	var defenders: Dictionary = strike_input(s, enemy, "ranged" if ranged else "melee").defenders
+	return 1.0 - Formula.shield_cover(b, defenders, defenders.facing_dot, ranged) * Formula.shield_block(b, defenders)
 
 
 func _walk(s: Dictionary, dest: Vector2, speed: float, keep_facing: bool = false) -> bool:
@@ -1260,6 +1321,19 @@ func _migrate_v2(s: Dictionary, original: Dictionary) -> Variant:
 	return s
 
 
+## Schema 3 had no wear: kits start the migrated battle unworn.
+func _migrate_v3(s: Dictionary) -> Variant:
+	var present := 0
+	for key in SCHEMA4_KEYS:
+		present += int(s.has(key))
+	if present == SCHEMA4_KEYS.size():
+		return s
+	if present > 0:
+		return null
+	s.wear = {"weapon": 0.0, "shield": 0.0, "armor": 0.0}
+	return s
+
+
 func _valid_people(s: Dictionary, original: Dictionary, save_steps: int) -> bool:
 	if typeof(s.get("uids")) != TYPE_ARRAY or s.uids.size() != s.strength or typeof(s.get("people")) != TYPE_DICTIONARY:
 		return false
@@ -1293,7 +1367,7 @@ func restore(save: Dictionary) -> bool:
 	if not _number(save.get("schema"), 1, SCHEMA, true) or typeof(save.get("squads")) != TYPE_DICTIONARY:
 		return false
 	# Schema 3 adds the seed. Older saves ran on the default seed.
-	if save.size() != (8 if save.has("seed") else 7) or (save.schema == SCHEMA and not save.has("seed")):
+	if save.size() != (8 if save.has("seed") else 7) or (save.schema >= 3 and not save.has("seed")):
 		return false
 	if save.has("seed") and not _number(save.seed, 0, 2147483647, true):
 		return false
@@ -1322,6 +1396,10 @@ func restore(save: Dictionary) -> bool:
 				return false
 		if save.schema <= 2:
 			s = _migrate_v2(s, original)
+			if s == null:
+				return false
+		if save.schema <= 3:
+			s = _migrate_v3(s)
 			if s == null:
 				return false
 		if s.size() != original.size() or not s.has_all(original.keys()):
@@ -1369,6 +1447,12 @@ func restore(save: Dictionary) -> bool:
 			return false
 		if s.charge_bonus and s.get("command") != "charge":
 			return false
+		var wear: Variant = s.get("wear")
+		if typeof(wear) != TYPE_DICTIONARY or wear.size() != 3 or not wear.has_all(["weapon", "shield", "armor"]):
+			return false
+		for part in wear:
+			if not _number(wear[part], 0.0, 1.0):
+				return false
 		for key in ["action_step", "hit_step", "block_step"]:
 			if not _number(s[key], -1, save.steps, true) or s[key] == 0:
 				return false

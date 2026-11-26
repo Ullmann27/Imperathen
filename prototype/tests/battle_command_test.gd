@@ -6,6 +6,7 @@ const Battle := preload("res://scripts/battle/battle_model.gd")
 const Slots := preload("res://scripts/battle/formation_slots.gd")
 const Catalog := preload("res://scripts/battle/troop_catalog.gd")
 const Roster := preload("res://scripts/battle/soldier_roster.gd")
+const Formula := preload("res://scripts/battle/combat_formula.gd")
 const LEGACY := "res://tests/fixtures/valley_schema2_60s.json"
 const GUARD := "valley_guard"
 const ENEMY := "ridge_guard"
@@ -39,6 +40,7 @@ func _initialize() -> void:
 	_test_invalid_orders()
 	_test_order_determinism()
 	_test_wounds_and_recovery()
+	_test_formula_battle()
 	print("BATTLE_COMMAND_RESULT checks=%d failures=%d metrics=%s" % [checks, failures, JSON.stringify(metrics)])
 	quit(1 if failures else 0)
 
@@ -308,7 +310,7 @@ func _test_legacy_save() -> void:
 		if person.status != "active":
 			unrecorded = unrecorded and person.wound.severity == "unrecorded" and person.service.back().event == "legacy_casualty"
 	check(unrecorded, "Legacy casualties are marked unrecorded instead of inventing wounds")
-	check(m.snapshot().schema == 3 and Battle.new().restore(JSON.parse_string(JSON.stringify(m.snapshot()))), "A migrated save is written as schema 3")
+	check(m.snapshot().schema == Battle.SCHEMA and Battle.new().restore(JSON.parse_string(JSON.stringify(m.snapshot()))), "A migrated save is written in the current schema")
 	m.tick(20)
 	check(Battle.new().restore(m.snapshot()), "A migrated battle continues validly")
 	var partial := legacy.duplicate(true)
@@ -568,9 +570,11 @@ func _test_charge() -> void:
 		m.order([BOWS], "cease_fire")
 	var charged := _strike(a, "charge")
 	var plain := _strike(b, "attack")
-	var expected: float = Battle.CHARGE_BONUS * (0.88 + 0.0012 * charged.get("cohesion", 0.0)) / (0.88 + 0.0012 * plain.get("cohesion", 0.0))
+	var cfg := Formula.balance()
+	var expected: float = float(cfg.unit.charge) * Formula.unit_factor(cfg, "cohesion", {"attackers": {"cohesion": charged.get("cohesion", 0.0)}}) \
+		/ Formula.unit_factor(cfg, "cohesion", {"attackers": {"cohesion": plain.get("cohesion", 0.0)}})
 	check(not charged.is_empty() and not plain.is_empty() and charged.step == plain.step and absf(charged.damage / plain.damage - expected) < 0.000001,
-		"The first charge strike hits 1.25x harder, less what the loosened ranks cost")
+		"The first charge strike hits by the configured charge factor harder, less what the loosened ranks cost")
 	var g: Dictionary = a.squads[GUARD]
 	var impacts := 0
 	for memory: Dictionary in g.memories:
@@ -637,7 +641,9 @@ func _test_pila() -> void:
 		m.tick(Battle.STEP)
 	check(g.pila == 1, "No further throw without a new order")
 	m.steps = foe.shields_fouled_until
-	check(m._shield_factor(g, foe, true) == guarded, "Shields work again after 10 s")
+	var restored := m._shield_factor(g, foe, true)
+	metrics["shield_after_pila"] = {"before": snappedf(guarded, 0.0001), "after_10s": snappedf(restored, 0.0001), "shield_wear": snappedf(foe.wear.shield, 0.0001)}
+	check(restored < 1.0 and restored >= guarded and restored - guarded < 0.01, "Shields work again after 10 s, only a little worn (%.4f -> %.4f)" % [guarded, restored])
 	var far := Battle.new()
 	check(_place(far, {GUARD: Vector2(-7, 8), ENEMY: Vector2(-7, -14)}), "Distant pila fixture loads")
 	var fg: Dictionary = far.squads[GUARD]
@@ -675,7 +681,10 @@ func _test_orbis_and_testudo() -> void:
 		outward = outward and Vector2(-sin(man.facing), -cos(man.facing)).dot(out.normalized()) > 0.95
 	check(outward, "Every soldier of the orbis faces outwards")
 	var behind := Vector2(g.x, g.z) - m._front(g) * 3.0
-	check(not m._from_rear(g, behind) and m._shield_factor(m.squads[ENEMY], g, false) == 0.87, "The orbis has no rear and its shields cover every side")
+	var ring := {"shield": m._shield(g), "formation": "orbis"}
+	var b := Formula.balance()
+	check(not m._from_rear(g, behind) and Formula.shield_cover(b, ring, -1.0, false) == Formula.shield_cover(b, ring, 1.0, false) and m._shield_factor(m.squads[ENEMY], g, false) < 1.0,
+		"The orbis has no rear and its shields cover every side")
 	check(Battle.new().restore(JSON.parse_string(JSON.stringify(m.snapshot()))), "The orbis saves")
 	check(m.order([GUARD], "form", "line").ok, "The orbis can be left by re-forming")
 	check(not m.order([SPEARS], "form", "orbis").ok and not m.order([BOWS], "form", "orbis").ok, "Undrilled militia and archers cannot form the orbis")
@@ -774,3 +783,56 @@ func _test_wounds_and_recovery() -> void:
 	person.status = "dead"
 	person.wound = {"severity": "fatal", "recovery_days": 0, "impairment": "", "outcome": "dead", "step": 5}
 	check(Roster.recover(person, 400, -50).status == "dead", "The dead do not recover")
+
+
+func _duel_scenario(ally: Dictionary, enemy: Dictionary) -> Dictionary:
+	var scenario: Dictionary = Battle.VALLEY_SCENARIO.duplicate(true)
+	scenario.id = "duel_bench"
+	scenario.companies = [
+		{"id": GUARD, "title": "Veteranen", "side": "ally", "kind": "infantry", "shape": "line", "at": Vector2(-7, 8), "count": 12,
+			"troop_id": ally.troop, "kit_quality": ally.q, "origin": "gallia_cisalpina", "commandable_by": ["legatus_valdora"]},
+		{"id": ENEMY, "title": "Rekruten", "side": "enemy", "kind": "infantry", "shape": "line", "at": Vector2(-7, 4.6), "count": 12,
+			"troop_id": enemy.troop, "kit_quality": enemy.q, "origin": "gallia_cisalpina", "commandable_by": ["dux_hoehenbund"]},
+	]
+	return scenario
+
+
+func _fight(ally: Dictionary, enemy: Dictionary, seed_value: int) -> Dictionary:
+	var m := Battle.new(seed_value, _duel_scenario(ally, enemy))
+	m.order([GUARD], "attack", ENEMY)
+	m.tick(120)
+	return {"outcome": m.outcome, "ally_left": m.squads[GUARD].strength, "enemy_left": m.squads[ENEMY].strength, "seconds": m.steps * Battle.STEP}
+
+
+func _test_formula_battle() -> void:
+	var m := Battle.new()
+	check(_place(m, {GUARD: Vector2(-7, 8), ENEMY: Vector2(-7, 5.2)}), "Formula contact fixture loads")
+	m.order([BOWS], "cease_fire")
+	var g: Dictionary = m.squads[GUARD]
+	var foe: Dictionary = m.squads[ENEMY]
+	m.order([GUARD], "attack", ENEMY)
+	var matched := false
+	for i in 20:
+		var expected: float = Formula.unit_strike(m.strike_input(g, foe, "melee")).casualties
+		var dealt: float = foe.initial_strength - foe.strength + foe.damage
+		m.tick(Battle.STEP)
+		if g.action_step == m.steps:
+			matched = absf(foe.initial_strength - foe.strength + foe.damage - dealt - expected) < 0.000001
+			break
+	check(matched, "A company's strike deals exactly what the combat formula returns (no other multiplier in the battle)")
+	check(g.wear.weapon > 0.0 and foe.wear.shield > 0.0, "Strikes wear the attacker's weapons and the defender's shields")
+	var duels := {}
+	var won := true
+	for seed_value in [3, 17, 58]:
+		var forward := _fight({"troop": "roman_veteranus", "q": 1}, {"troop": "roman_tiro", "q": 4}, seed_value)
+		var mirrored := _fight({"troop": "roman_tiro", "q": 4}, {"troop": "roman_veteranus", "q": 1}, seed_value)
+		duels["seed_%d" % seed_value] = [forward, mirrored]
+		won = won and forward.outcome == "victory" and mirrored.outcome == "defeat"
+	metrics["veterans_q1_vs_recruits_q4"] = duels
+	check(won, "Veterans in ordinary kit beat as many recruits in master kit, on either side of the bench")
+	var gear := true
+	for seed_value in [3, 17]:
+		gear = gear and _fight({"troop": "roman_tiro", "q": 4}, {"troop": "roman_tiro", "q": 1}, seed_value).outcome == "victory"
+		gear = gear and _fight({"troop": "roman_tiro", "q": 1}, {"troop": "roman_tiro", "q": 4}, seed_value).outcome == "defeat"
+	check(gear, "Between equally trained companies the better kit wins")
+	check(_fight({"troop": "roman_veteranus", "q": 1}, {"troop": "roman_tiro", "q": 4}, 3) == duels.seed_3[0], "Company duels are reproducible")
