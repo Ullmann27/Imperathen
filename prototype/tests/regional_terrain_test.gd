@@ -96,7 +96,38 @@ func _test_mesh(terrain: Node3D, position: Vector3) -> void:
 	_check(all_up,"Generated normals point above terrain")
 	_check(clockwise,"Godot clockwise front faces match upward normals")
 	_check(finite and height_correct,"All mesh vertices match finite global terrain heights")
-	_check(ground.material_override.vertex_color_use_as_albedo and ground.material_override.cull_mode == BaseMaterial3D.CULL_BACK,"Production material renders colored front faces")
+	# The land shader takes its colours from source_color textures and
+	# uniforms; vertex colours are weights (open ground: no scrub, no stone),
+	# so no renderer has to guess the colour space of vertex data.
+	var material := ground.material_override as ShaderMaterial
+	_check(material != null and material == terrain.ground_material and material.shader == Terrain.LandSurface.TERRAIN_SHADER,"Production material is the shared land shader")
+	_check(material.shader.code.contains("cull_back") and not material.shader.code.contains("unshaded"),"Land shader renders lit front faces")
+	var open_ground := true
+	for color in colors:
+		open_ground = open_ground and color == Terrain.OPEN_GROUND
+	_check(open_ground,"Every open terrain vertex carries zero scrub and stone weights")
+	for key: String in ["verge_color","road_color","verge_relief","road_relief","macro_field","scree_color"]:
+		_check(material.get_shader_parameter(key) is Texture2D,"Land shader input %s is set" % key)
+	# The static surface helper (used by grid-aligned scenery) reproduces the
+	# actual triangles, including the diagonal split.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 2027
+	var step := Plan.SECTOR_SIZE_M/float(Terrain.GRID)
+	var helper_error := 0.0
+	for sample in 300:
+		var local := Vector2(rng.randf_range(0.0,Plan.SECTOR_SIZE_M-.001),rng.randf_range(0.0,Plan.SECTOR_SIZE_M-.001))
+		var ix := floori(local.x/step)
+		var iz := floori(local.y/step)
+		var fx := local.x/step-ix
+		var fz := local.y/step-iz
+		var base := (iz*Terrain.GRID+ix)*6
+		var a: Vector3 = vertices[base]
+		var b: Vector3 = vertices[base+1]
+		var c: Vector3 = vertices[base+2]
+		var d: Vector3 = vertices[base+4]
+		var mesh_height := a.y+(b.y-a.y)*fx+(c.y-a.y)*fz if fx+fz <= 1.0 else d.y+(c.y-d.y)*(1.0-fx)+(b.y-d.y)*(1.0-fz)
+		helper_error = maxf(helper_error,absf(Terrain.surface_height(Vector2(sector.position.x+local.x,sector.position.z+local.y))-mesh_height))
+	_check(helper_error < .001,"Terrain.surface_height matches the generated triangles (%.6f m)" % helper_error)
 	_check(sector.has_node("GroundCollision"),"Player sector owns a real collision body")
 
 
@@ -113,7 +144,22 @@ func _check_residency(terrain: Node3D, position: Vector3, quality: String) -> vo
 		_check(terrain.sectors[id].has_node("GroundCollision") == desired[id].collision,"Physics follows current near ring")
 	var report: Dictionary = terrain.report()
 	_check(report.loaded_sectors <= report.active_limit and report.collision_sectors == collisions,"Actual nodes obey active and collision budgets")
-	_check(report.triangles == desired.size()*Terrain.GRID*Terrain.GRID*2,"Triangle report matches created geometry")
+	var built := 0
+	var open_cells := 0
+	for id in terrain.sectors:
+		var faces: int = (terrain.sectors[id].get_node("Ground") as MeshInstance3D).mesh.get_faces().size()/3
+		built += faces
+		open_cells += Terrain.GRID*Terrain.GRID-faces/2
+	_check(report.triangles == built and built == (desired.size()*Terrain.GRID*Terrain.GRID-open_cells)*2,"Triangle report matches created geometry")
+	# Only the cells that authored ground replaces (the sunk brook bed) are open.
+	var expected_open := 0
+	for id in terrain.sectors:
+		var origin: Vector3 = terrain.sectors[id].position
+		var step := Plan.SECTOR_SIZE_M/float(Terrain.GRID)
+		for z in Terrain.GRID:
+			for x in Terrain.GRID:
+				expected_open += int(Terrain.AuthoredGround.replaces_terrain(Vector2(origin.x+(x+.5)*step,origin.z+(z+.5)*step)))
+	_check(open_cells == expected_open and open_cells <= 13,"Terrain is open only under authored ground (%d cells)" % open_cells)
 
 
 func _test_shared_edge(terrain: Node3D) -> void:
