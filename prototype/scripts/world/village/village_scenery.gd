@@ -5,10 +5,13 @@ const Art = preload("res://scripts/world/village_art.gd")
 const PROFILE_DATA = preload("res://assets/quality_profiles.json")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Look = preload("res://scripts/rendering/village_look.gd")
+const Grove = preload("res://scripts/visuals/grove.gd")
 const WORKSHOP := Vector3(-9.2,0,-7.35)
 const STORE := Vector3(-10.6,0,15.6)
 const MARKET := Vector3(-9,0,0)
 const RANGES := {"low":24.0,"balanced":40.0,"high":58.0,"very_high":72.0}
+const FLORA_SITES := 5600
+const CELL := 14.0
 const GUST := [.78,.55,1.48,1.04]
 const WET := [.2,.03,.83,.42]
 var profile := "balanced"
@@ -19,6 +22,8 @@ var grass_material := ShaderMaterial.new()
 var rain_material := ShaderMaterial.new()
 var sky_material := ShaderMaterial.new()
 var _plants: Array[MultiMeshInstance3D] = []
+var _plant_kinds: Dictionary = {}
+var _plant_meshes: Dictionary = {}
 var _stockade: Array[MultiMeshInstance3D] = []
 var _fence_near: Mesh
 var _fence_far: Mesh
@@ -43,6 +48,7 @@ func _init() -> void:
 
 func set_presentation_time(seconds: float) -> void:
 	_fixed_time = seconds
+	Grove.set_wind_time(seconds)
 	for material in [water_material,grass_material,rain_material]:
 		material.set_shader_parameter("fixed_time",seconds)
 	sky_material.set_shader_parameter("phase",seconds if seconds >= 0 else _time)
@@ -67,9 +73,15 @@ func set_quality(next_profile: String) -> void:
 	profile = next_profile if RANGES.has(next_profile) else "balanced"
 	var budget: Dictionary = PROFILE_DATA.data.profiles[profile]
 	var fraction := float(budget.decoration_fraction)
+	var sparse := profile in ["low","balanced"]
 	for patch in _plants:
 		patch.multimesh.visible_instance_count = ceili(patch.multimesh.instance_count * fraction)
 		patch.visibility_range_end = RANGES[profile]
+		# Mobile profiles draw each clump with about 60% of the blades.
+		var pair: Array = _plant_meshes.get(_plant_kinds.get(patch,""),[])
+		if not pair.is_empty():
+			patch.multimesh.mesh = pair[1] if sparse else pair[0]
+	grass_material.set_shader_parameter("fade_end",RANGES[profile])
 	for bay in _stockade:
 		bay.multimesh.mesh = _fence_far if profile == "low" else _fence_near
 	ground_material.set_shader_parameter("relief_strength",.44 if profile == "low" else .78)
@@ -85,6 +97,7 @@ func apply_season(index: int, sun: DirectionalLight3D, environment: Environment)
 	ground_material.set_shader_parameter("season_tint",soil[season])
 	grass_material.set_shader_parameter("season_tint",leaves[season])
 	grass_material.set_shader_parameter("gust",GUST[season])
+	grass_material.set_shader_parameter("bloom",[1.0,.85,.25,0.0][season])
 	for material in [ground_material,water_material]:
 		material.set_shader_parameter("wetness",WET[season])
 	# Sun, sky, ambient and haze presets are owned by the look script.
@@ -163,42 +176,66 @@ func _ridge_height(p: Vector2) -> float:
 	return -.15+rise*(11.0+4.2*sin(p.x*.069)+2.5*sin(p.x*.16+p.y*.079)+1.45*cos(p.x*.22-p.y*.14)+1.05*sin(p.x*.473+p.y*.24))
 
 func _make_flora() -> void:
+	# Dense mixed verges: fine meadow grass with clover, flowering clumps,
+	# taller seed grass at walls, fences and field edges, and rushes on the
+	# banks. Clumps right beside a trodden lane are smaller (worn edge).
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 48117
 	var clusters := {}
-	for i in 2200:
+	for i in FLORA_SITES:
 		var p: Vector2
 		var z := rng.randf_range(-36,32)
 		var side := -1 if i%2 else 1
 		var kind := "meadow"
-		if i<670:
-			p = Vector2(side*rng.randf_range(2.05,4.55)+.21*sin(z*.17),z)
-		elif i<1080:
-			p = Vector2(rng.randf_range(-24,27),4+side*rng.randf_range(1.65,3.50))
-		elif i<1410:
+		var trodden := 1.0
+		if i<1500:
+			var offset := rng.randf_range(1.92,5.6)
+			p = Vector2(side*offset+.21*sin(z*.17),z)
+			trodden = smoothstep(1.85,3.3,offset)
+		elif i<2250:
+			var offset := rng.randf_range(1.58,4.2)
+			p = Vector2(rng.randf_range(-24,27),4+side*offset)
+			trodden = smoothstep(1.5,2.9,offset)
+		elif i<2700:
 			z = rng.randf_range(-56,38)
 			p = Vector2(_bank(z,side).x+side*rng.randf_range(.08,.90),z)
 			kind = "rush"
+		elif i<3500:
+			# Uncut grass at the foot of house walls, away from the door side.
+			var home: Dictionary = Layout.HOMES[i%Layout.HOMES.size()]
+			var rect := Layout.house_footprint(home,rng.randf_range(.5,.95))
+			var edge := rng.randi_range(0,2)
+			var t := rng.randf()
+			var corners := [rect.position,Vector2(rect.end.x,rect.position.y),rect.end,Vector2(rect.position.x,rect.end.y)]
+			var front := 2 if is_zero_approx(float(home.yaw)) else 3
+			var from: Vector2 = corners[(front+1+edge)%4]
+			var to: Vector2 = corners[(front+2+edge)%4]
+			p = from.lerp(to,t)
+			kind = "tall" if rng.randf()<.55 else "meadow"
 		else:
-			p = Vector2(rng.randf_range(-40,42),z)
+			p = Vector2(rng.randf_range(-42,44),rng.randf_range(-48,34))
 		if not _free_verge(p,kind):
 			continue
-		if kind == "meadow" and i%9 == 0:
-			kind = "flowers"
-		var key := "%s_%d_%d" % [kind,floori(p.x/12),floori(p.y/12)]
+		if kind == "meadow":
+			var roll := rng.randf()
+			if roll < .17*trodden:
+				kind = "flowers"
+			elif roll > 1.0-.13*trodden:
+				kind = "tall"
+		var key := "%s_%d_%d" % [kind,floori(p.x/CELL),floori(p.y/CELL)]
 		if not clusters.has(key):
 			clusters[key] = {"kind":kind,"sites":[]}
-		var size := rng.randf_range(.67,1.34)
-		var basis := Basis(Vector3.UP,rng.randf_range(0,TAU)).scaled(Vector3.ONE*size)
+		var size := rng.randf_range(.72,1.30)*lerpf(.52,1.0,trodden)
+		var basis := Basis(Vector3.UP,rng.randf_range(0,TAU)).scaled(Vector3(size,size*rng.randf_range(.85,1.18),size))
 		clusters[key].sites.append(Transform3D(basis,Vector3(p.x,.002,p.y)))
-	var prototypes := {}
-	for kind in ["meadow","rush","flowers"]:
-		prototypes[kind] = _plant_mesh(kind)
+	for kind in ["meadow","rush","flowers","tall"]:
+		_plant_meshes[kind] = [_plant_mesh(kind),_plant_mesh(kind,.6)]
 	for key: String in clusters:
-		var patch := _batch(prototypes[clusters[key].kind],clusters[key].sites)
+		var patch := _batch(_plant_meshes[clusters[key].kind][0],clusters[key].sites)
+		_plant_kinds[patch] = clusters[key].kind
 		patch.name = key
 		patch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		patch.extra_cull_margin = .15
+		patch.extra_cull_margin = .25
 		_plants.append(patch)
 		add_child(patch)
 
@@ -218,49 +255,78 @@ func _free_verge(p: Vector2,kind: String) -> bool:
 			Rect2(-11.0,-1.2,4.0,2.4),Rect2(-3.2,-9.7,6.4,5.4)]:
 		if rect.has_point(p):
 			return false
+	# Trodden squares and the western lane (see ground.gdshader) stay bare.
+	if absf(p.x+7.0)<1.3 and p.y>-37.0 and p.y<-20.0:
+		return false
+	for square: Rect2 in [Rect2(-12.4,-5.3,13.4,10.9),Rect2(5.3,-25.8,14.4,5.6),Rect2(2.2,21.0,9.6,6.0)]:
+		if square.has_point(p):
+			return false
 	return p.distance_squared_to(Vector2(-7,6))>1.48
 
-func _leaf_vertex(mesh: SurfaceTool,p: Vector3,color: Color,tip: float) -> void:
-	mesh.set_uv(Vector2(0,tip))
+func _leaf_vertex(mesh: SurfaceTool,p: Vector3,color: Color,tip: float,flower := false) -> void:
+	mesh.set_uv(Vector2(1.0 if flower else 0.0,tip))
 	mesh.set_color(color)
 	mesh.set_normal(Vector3(.13,.98,.10))
 	mesh.add_vertex(p)
 
-func _plant_mesh(kind: String) -> ArrayMesh:
+func _blade(mesh: SurfaceTool,base: Vector3,axis: Vector3,height: float,width: float,lean: float,color: Color) -> Vector3:
+	var cross := Vector3(-axis.z,0,axis.x)*width
+	var middle := base+axis*height*lean*.26+Vector3.UP*height*.55
+	var tip := base+axis*height*lean+Vector3.UP*height
+	for v in [base-cross,base+cross,middle-cross*.67,base+cross,middle+cross*.67,middle-cross*.67,middle-cross*.67,middle+cross*.67,tip]:
+		_leaf_vertex(mesh,v,color,clampf(v.y/height,0,1))
+	return tip
+
+func _plant_mesh(kind: String,share := 1.0) -> ArrayMesh:
 	var rng := RandomNumberGenerator.new()
-	rng.seed = {"meadow":81,"flowers":47,"rush":224,"wheat":57}[kind]
+	rng.seed = {"meadow":81,"flowers":47,"rush":224,"wheat":57,"tall":133}[kind]
 	var mesh := SurfaceTool.new()
 	mesh.begin(Mesh.PRIMITIVE_TRIANGLES)
 	mesh.set_material(grass_material)
 	var reeds := kind == "rush"
 	var crop := kind == "wheat"
-	for i in (11 if reeds or crop else 17):
+	var tall := kind == "tall"
+	var count: int = {"meadow":26,"flowers":20,"rush":11,"wheat":11,"tall":18}[kind]
+	for i in ceili(count*share):
 		var a := rng.randf_range(0,TAU)
 		var axis := Vector3(cos(a),0,sin(a))
-		var base := axis*rng.randf_range(.015,.19)
-		var height := rng.randf_range(.14,.32)*(2.55 if reeds or crop else 1.0)
-		var width := rng.randf_range(.011,.024)*(1.40 if reeds else 1.0)
-		var cross := Vector3(-axis.z,0,axis.x)*width
-		var middle := base+axis*height*.18+Vector3.UP*height*.53
-		var tip := base+axis*height*(.23 if crop else .71)+Vector3.UP*height
-		var color := Color("#646f3b").lerp(Color("#a6ac63"),rng.randf())
+		var base := axis*rng.randf_range(.01,.24 if tall else .21)
+		var height := rng.randf_range(.13,.34)*(2.55 if reeds or crop else (2.1 if tall else 1.0))
+		# Fewer blades in a sparse clump are a little wider to keep the coverage.
+		var width := rng.randf_range(.008,.019)*(1.40 if reeds else 1.0)*(1.0+(1.0-share)*.7)
+		var color := Color("#56622f").lerp(Color("#a3ab5c"),rng.randf())
 		if crop:
 			color = Color("#9c8844").lerp(Color("#bda75c"),rng.randf())
-		for v in [base-cross,base+cross,middle-cross*.67,base+cross,middle+cross*.67,middle-cross*.67,middle-cross*.67,middle+cross*.67,tip]:
-			_leaf_vertex(mesh,v,color,clampf(v.y/height,0,1))
-		if crop or (reeds and i%4==0):
-			var seed_color := Color("#af944d") if crop else Color("#705e40")
+		elif tall and i%3 == 0:
+			color = Color("#8d8a4c").lerp(Color("#b8a565"),rng.randf())
+		var tip := _blade(mesh,base,axis,height,width,.23 if crop else rng.randf_range(.45,.85),color)
+		if crop or (reeds and i%4==0) or (tall and i%2==0):
+			var seed_color := Color("#af944d") if crop else (Color("#705e40") if reeds else Color("#a89a66"))
 			for j in 4:
 				var seed := tip-Vector3.UP*(.035*j)
-				var fan := cross*(1.3 if j%2 else -1.3)
+				var fan := Vector3(-axis.z,0,axis.x)*.016*(1.3 if j%2 else -1.3)
 				for v in [seed-Vector3.UP*.06,seed+fan,seed+Vector3.UP*.025]:
 					_leaf_vertex(mesh,v,seed_color,.95)
-		if kind=="flowers" and i%4==0:
+		if kind=="flowers" and i%3==0:
+			# Petal colour comes from the instance (white, yellow, violet, poppy, blue).
+			var bloom_at := tip+Vector3.UP*.012
 			for j in 5:
-				var petal := Vector3(cos(j*TAU/5),.1,sin(j*TAU/5))*.047
-				var edge := Vector3(-petal.z,0,petal.x)*.41
-				for v in [tip,tip+petal+edge,tip+petal-edge]:
-					_leaf_vertex(mesh,v,Color("#ded4a0") if i%8 else Color("#ddb461"),1.0)
+				var petal := Vector3(cos(j*TAU/5),.12,sin(j*TAU/5))*.05
+				var edge := Vector3(-petal.z,0,petal.x)*.45
+				for v in [bloom_at,bloom_at+petal+edge,bloom_at+petal-edge]:
+					_leaf_vertex(mesh,v,Color(1,1,1) if i%2 else Color(.94,.94,.9),1.0,true)
+	if kind in ["meadow","flowers"]:
+		# Low clover and plantain leaves fill the ground between the blades.
+		for i in ceili(5*share):
+			var a := rng.randf_range(0,TAU)
+			var at := Vector3(cos(a),0,sin(a))*rng.randf_range(.04,.2)+Vector3.UP*.012
+			var leaf_color := Color("#46552a").lerp(Color("#6f7a3c"),rng.randf())
+			for j in 3:
+				var dir := Vector3(cos(a+j*TAU/3),0,sin(a+j*TAU/3))
+				var side := Vector3(-dir.z,0,dir.x)*.026
+				var reach := at+dir*.07+Vector3.UP*.018
+				for v in [at,at+dir*.035+side,reach,at,reach,at+dir*.035-side]:
+					_leaf_vertex(mesh,v,leaf_color,.12)
 	mesh.index()
 	return mesh.commit()
 
