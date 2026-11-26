@@ -103,9 +103,11 @@ class RepositoryMeshyContractTest(unittest.TestCase):
         loadouts = ROOT / "prototype/assets/meshy/loadouts.json"
         manifest_report = MANIFEST_VALIDATOR.validate(manifest)
         loadout_report = LOADOUT_VALIDATOR.validate(manifest, loadouts)
-        self.assertEqual(manifest_report["assets"], 29)
-        self.assertEqual(manifest_report["categories"]["mount"], 1)
-        self.assertEqual(manifest_report["states"]["ready_in_meshy"], 27)
+        # 29 text-to-3D assets plus the nine image-to-3D outputs registered on 26.11.2026.
+        self.assertEqual(manifest_report["assets"], 38)
+        self.assertEqual(manifest_report["categories"]["mount"], 2)
+        self.assertEqual(manifest_report["categories"]["building"], 1)
+        self.assertEqual(manifest_report["states"]["ready_in_meshy"], 36)
         self.assertEqual(manifest_report["states"]["geometry_ready_untextured"], 2)
         self.assertEqual(loadout_report["loadouts"], 7)
         self.assertEqual(loadout_report["resource_bindings"], 6)
