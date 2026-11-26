@@ -193,6 +193,7 @@ func _test_brook_ground() -> void:
 	var worst := 0.0
 	var worst_formula := 0.0
 	var wrong_body := 0
+	var dry_tree_probes := 0
 	var probes := 0
 	var wet := 0
 	var deepest := 0.0
@@ -208,6 +209,15 @@ func _test_brook_ground() -> void:
 				continue
 			var hit := _floor(p.x, p.y)
 			probes += 1
+			# The extended dry fen apron legitimately contains trees. This is
+			# a terrain-surface measurement, not a demand to remove those trees.
+			# Only re-probe below an actual vegetation body on fully dry land;
+			# a tree in the wet channel or sloping bank still fails this test.
+			if not hit.is_empty() and is_instance_valid(world.vegetation) and hit.collider == world.vegetation and Land.water_distance(p, source) > Land.BANK_WIDTH_M:
+				var excluded: Array[RID] = [hit.rid]
+				print("VILLAGE_LANDSCAPE_DRY_TREE point=%s shape=%s" % [p, hit.shape])
+				hit = _space().intersect_ray(PhysicsRayQueryParameters3D.create(Vector3(p.x, 60, p.y), Vector3(p.x, -30, p.y), 1, excluded))
+				dry_tree_probes += 1
 			if hit.is_empty() or hit.collider != bed:
 				wrong_body += 1
 				var collider: Variant = hit.get("collider")
@@ -223,8 +233,8 @@ func _test_brook_ground() -> void:
 				wet += 1
 				deepest = maxf(deepest, Land.WATER_SURFACE_Y - hit.position.y)
 				worst_formula = maxf(worst_formula, absf((Land.WATER_SURFACE_Y - hit.position.y) - depth))
-	print("VILLAGE_LANDSCAPE brook probes=%d not_bed_body=%d max_collision_to_visible_m=%.4f wet=%d deepest_walkable_m=%.3f max_depth_vs_mask_m=%.3f" % [probes, wrong_body, worst, wet, deepest, worst_formula])
-	_check(probes > 400 and wrong_body == 0, "Across the brook the first surface a foot meets is the bed (the terrain is open beneath it)")
+	print("VILLAGE_LANDSCAPE brook probes=%d not_bed_body=%d max_collision_to_visible_m=%.4f wet=%d deepest_walkable_m=%.3f max_depth_vs_mask_m=%.3f dry_tree_reprobes=%d" % [probes, wrong_body, worst, wet, deepest, worst_formula, dry_tree_probes])
+	_check(probes > 400 and wrong_body == 0, "Across the brook the bed is the first ground surface; only dry-bank vegetation may be re-probed")
 	_check(worst <= .012, "Bed collision lies on the drawn bed within 12 mm (%.4f)" % worst)
 	_check(wet > 150 and deepest > .40 and worst_formula < .06, "The walkable bed is really under water and follows the shared mask (deepest %.2f m)" % deepest)
 	# Water sheet: level, between the waterlines, over a bed that is below it.
