@@ -1,0 +1,159 @@
+{
+  "adapter": "llvmpipe (LLVM 20.1.2, 256 bits)",
+  "conversation_layout": {
+    "camera": "(-15.82, 4.975, 12.3)",
+    "partner": "(-15.3, 0.0, 14.8)",
+    "partner_facing": "(0.0, 0.0, -1.0)",
+    "player": "(-15.3, 4.255078, 13.45)"
+  },
+  "conversation_partner": "julia",
+  "driver": "opengl3",
+  "engine": "4.7.2-stable (official)",
+  "errors": [
+    "World state changed in balanced: [\"/revision\"]",
+    "World state changed in very_high: [\"/revision\"]"
+  ],
+  "frames_per_measurement": 3,
+  "note": "Frame times are relative indicators on this renderer/driver, not device performance.",
+  "output_pixels": [
+    1280,
+    720
+  ],
+  "player_lift": 0.900078237056732,
+  "renderer": "gl_compatibility",
+  "shots": {
+    "conversation": {
+      "balanced": {
+        "buffer_mib": 29.935546875,
+        "camera": "[X: (-0.990878, 0.0, 0.134759), Y: (0.010649, 0.996873, 0.078302), Z: (-0.134338, 0.079022, -0.98778), O: (-15.82, 4.975, 12.3)]",
+        "draw_calls": 172.0,
+        "objects": 176.0,
+        "primitives": 180774.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 216845,
+        "texture_mib": 216.361351966858,
+        "video_mib": 246.296898841858,
+        "viewport_cpu_ms_p50": 5306.98779296875,
+        "viewport_gpu_ms_p50": 5305.69580078125,
+        "wall_ms_p50": 7041.918
+      },
+      "very_high": {
+        "buffer_mib": 38.2023429870605,
+        "camera": "[X: (-0.990878, 0.0, 0.134759), Y: (0.010649, 0.996873, 0.078302), Z: (-0.134338, 0.079022, -0.98778), O: (-15.82, 4.975, 12.3)]",
+        "draw_calls": 207.0,
+        "objects": 211.0,
+        "primitives": 190603.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 252559,
+        "texture_mib": 274.840500831604,
+        "video_mib": 313.042843818665,
+        "viewport_cpu_ms_p50": 9187.17578125,
+        "viewport_gpu_ms_p50": 9186.9169921875,
+        "wall_ms_p50": 8064.137
+      }
+    },
+    "overview": {
+      "balanced": {
+        "buffer_mib": 21.8927707672119,
+        "camera": "[X: (0.768221, 0.0, -0.640184), Y: (-0.184968, 0.95735, -0.221962), Z: (0.612881, 0.28893, 0.735457), O: (31.0, 17.5, 33.0)]",
+        "draw_calls": 1275.0,
+        "objects": 1349.0,
+        "primitives": 720774.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 335609,
+        "texture_mib": 137.528106689453,
+        "video_mib": 159.420877456665,
+        "viewport_cpu_ms_p50": 9735.4208984375,
+        "viewport_gpu_ms_p50": 9733.1494140625,
+        "wall_ms_p50": 10693.109
+      },
+      "very_high": {
+        "buffer_mib": 27.5624504089355,
+        "camera": "[X: (0.768221, 0.0, -0.640184), Y: (-0.184968, 0.95735, -0.221962), Z: (0.612881, 0.28893, 0.735457), O: (31.0, 17.5, 33.0)]",
+        "draw_calls": 2550.0,
+        "objects": 2624.0,
+        "primitives": 884737.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 1189956,
+        "texture_mib": 190.590571403503,
+        "video_mib": 218.153021812439,
+        "viewport_cpu_ms_p50": 14016.2626953125,
+        "viewport_gpu_ms_p50": 14012.1767578125,
+        "wall_ms_p50": 11253.299
+      }
+    },
+    "path": {
+      "balanced": {
+        "buffer_mib": 27.7691669464111,
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.990828, -0.135127), Z: (0.0, 0.135127, 0.990828), O: (1.26, 2.235071, 15.46258)]",
+        "draw_calls": 1033.0,
+        "objects": 1061.0,
+        "primitives": 616893.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 461015,
+        "texture_mib": 203.778027534485,
+        "video_mib": 231.547194480896,
+        "viewport_cpu_ms_p50": 9522.17578125,
+        "viewport_gpu_ms_p50": 9521.853515625,
+        "wall_ms_p50": 7394.692
+      },
+      "very_high": {
+        "buffer_mib": 37.5325260162354,
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.990828, -0.135127), Z: (0.0, 0.135127, 0.990828), O: (1.26, 2.235071, 15.46258)]",
+        "draw_calls": 2504.0,
+        "objects": 2532.0,
+        "primitives": 784816.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 1649283,
+        "texture_mib": 264.507176399231,
+        "video_mib": 302.039702415466,
+        "viewport_cpu_ms_p50": 12824.025390625,
+        "viewport_gpu_ms_p50": 12818.1083984375,
+        "wall_ms_p50": 15564.468
+      }
+    },
+    "start": {
+      "balanced": {
+        "buffer_mib": 29.9604873657227,
+        "camera": "[X: (0.830949, 0.0, -0.556349), Y: (-0.039793, 0.997439, -0.059433), Z: (0.554924, 0.071524, 0.82882), O: (-10.86016, 2.121331, 12.94984)]",
+        "draw_calls": 635.0,
+        "objects": 653.0,
+        "primitives": 428097.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 511058,
+        "texture_mib": 216.361351966858,
+        "video_mib": 246.321839332581,
+        "viewport_cpu_ms_p50": 7378.64697265625,
+        "viewport_gpu_ms_p50": 7375.97021484375,
+        "wall_ms_p50": 9543.149
+      },
+      "very_high": {
+        "buffer_mib": 38.4575157165527,
+        "camera": "[X: (0.830949, 0.0, -0.556349), Y: (-0.039793, 0.997439, -0.059433), Z: (0.554924, 0.071524, 0.82882), O: (-10.86016, 2.121331, 12.94984)]",
+        "draw_calls": 955.0,
+        "objects": 973.0,
+        "primitives": 529527.0,
+        "render_scale": 1.0,
+        "shadow_draw_calls": 0,
+        "shadow_primitives": 987394,
+        "texture_mib": 274.840500831604,
+        "video_mib": 313.298016548157,
+        "viewport_cpu_ms_p50": 10677.291015625,
+        "viewport_gpu_ms_p50": 10676.51171875,
+        "wall_ms_p50": 13668.028
+      }
+    }
+  },
+  "start_state": {
+    "camera": "[X: (0.830949, 0.0, -0.556349), Y: (-0.039793, 0.997439, -0.059433), Z: (0.554924, 0.071524, 0.82882), O: (-10.86016, 2.121331, 12.94984)]",
+    "player": "(-12.0, 1.292578, 11.7)",
+    "world_sha256": "41b0dc6e400615ac705917e589d0ec332578219f3e231749b3a44b39d224bb7d"
+  }
+}
