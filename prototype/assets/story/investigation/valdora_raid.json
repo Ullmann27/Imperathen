@@ -1,0 +1,2000 @@
+{
+  "schema_version": 1,
+  "case_id": "valdora_raid",
+  "title": "Die Nacht der Reiter",
+  "decisions": [
+    "D-040",
+    "D-047",
+    "D-048"
+  ],
+  "source": "Masterhandbuch 3.0: I-08 (PDF-S. 133 = Fassung 2.0 S. 075), I-10 (PDF-S. 135 = S. 077, Beat-Blatt PDF-S. 16), I-12 (S. 079), I-14 (S. 081), I-15 (PDF-S. 140 = S. 082), I-20 (PDF-S. 145 = S. 087), Anschlussregister PDF-S. 49, Questvertrag PDF-S. 10, Konsequenzvertrag PDF-S. 12, Ermittlungsregeln PDF-S. 19. Dialogzeilen sind eigene Produktionsentwürfe, kein Wortlaut des Originaldrehbuchs.",
+  "canon_legend": {
+    "canon": "Wörtlich oder sinngemäß aus Masterhandbuch 3.0 oder Auftraggebervorgabe D-040/D-048.",
+    "plausible": "Historisch plausible Einzelheit mit genannter Quelle; Spielinterpretation.",
+    "design": "Eigene Designannahme ohne Quellenbeleg; jederzeit durch den Auftraggeber änderbar."
+  },
+  "phases": {
+    "night": "Nach dem Angriff bis zum Abschluss von I-13 (Morgen ohne Stimmen).",
+    "morning": "Nach I-13 bis zum Schwur in I-14.",
+    "after_oath": "Nach dem Schwur (I-14); spätere Missionen I-15 bis I-20."
+  },
+  "reliability_scale": {
+    "sicher": "Selbst untersuchter Gegenstand ohne Deutungsspielraum.",
+    "stark": "Unabhängige Beobachtung oder Aussage gegen das eigene Interesse.",
+    "mittel": "Beobachtung unter schlechter Sicht oder aus einer Richtung.",
+    "schwach": "Wahrnehmung unter Angst, Dunkelheit oder großer Entfernung.",
+    "gerücht": "Übernommene Behauptung ohne eigene Beobachtung.",
+    "gekauft": "Gegen Bezahlung gegeben; belegt nichts."
+  },
+  "truth": {
+    "graph": "valdora_raid_v1",
+    "note": "Verborgener Wahrheitsgraph. Wird beim Eröffnen des Falls in den Spielstand kopiert und nie in Ansichten, Journal oder Dialogen ausgegeben.",
+    "facts": {
+      "t_band": {
+        "text": "Die etwa dreißig Reiter sind eine bezahlte Reitergruppe gemischter Herkunft (frühere Hilfsreiter, Hügelleute, entlaufene Knechte). Kein Stamm und kein Volk steht hinter ihnen.",
+        "canon": "canon+design",
+        "ref": "D-040: etwa 30 Reiter ungeklärter Herkunft; Zusammensetzung Designannahme",
+        "tribal_actor": "red_seal_riders"
+      },
+      "t_leader_auxiliary": {
+        "text": "Der Anführer ist ein früherer Hilfsreiter, der lateinisch befiehlt.",
+        "canon": "design"
+      },
+      "t_north_feint": {
+        "text": "Die Reiter kamen über den Nordweg, damit man Leute aus dem Norden verdächtigt, und zogen nach Süden zur Straße nach Aquileia ab.",
+        "canon": "design"
+      },
+      "t_target_store": {
+        "text": "Ziel war der Vorratsspeicher mit Saatgut und den Wachstafeln der Dorfrechte, nicht beliebige Beute.",
+        "canon": "design"
+      },
+      "t_scouting": {
+        "text": "Beschlagene Pferde derselben Gruppe erkundeten den Nordweg Tage vor dem Angriff (die Spuren aus I-08).",
+        "canon": "canon+design",
+        "ref": "I-08 Hufspuren (PDF-S. 133)"
+      },
+      "t_insider_carter": {
+        "text": "Der Fuhrmann Tertius, der am Vortag eine Kiste des Lagerhauses zu Cassia brachte, fragte den Wachmann nach Wachwechsel und Speicher aus.",
+        "canon": "design"
+      },
+      "t_seal_pouch": {
+        "text": "Das Wachsbruchstück stammt vom versiegelten Zahlbeutel des Anführers, nicht von Cassias Kiste.",
+        "canon": "design"
+      },
+      "t_commission": {
+        "text": "Das Handelshaus mit dem roten Siegel bezahlte die Reiter für den Angriff auf Valdora.",
+        "canon": "canon+design",
+        "ref": "I-15/I-20: Spur führt zu einer fiktiven Handelsgesellschaft (PDF-S. 140, 145); PR #99 commission red_seal_house→red_seal_riders",
+        "tribal_actor": "red_seal_house"
+      },
+      "t_procurator": {
+        "text": "Den Auftrag vermittelte der Prokurator Gaius Varro Philon, ein Freigelassener, der das rote Siegel des Hauses führt.",
+        "canon": "design"
+      },
+      "t_serranus_lease": {
+        "text": "Gaius Varro Serranus ist Pächter des Lagerhauses am Natiso in Aquileia.",
+        "canon": "canon",
+        "ref": "I-20: Lagervertrag nennt Gaius Varro Serranus (PDF-S. 145)"
+      },
+      "t_serranus_motive": {
+        "text": "Serranus will Valdoras Speicher- und Furtrecht an der Straße nach Aquileia über die Schulden des Dorfes erwerben.",
+        "canon": "design"
+      },
+      "t_serranus_ordered": {
+        "text": "Serranus kannte und billigte den Auftrag; beweisbar erst mit Mitteln aus Band II und III.",
+        "canon": "canon_direction",
+        "ref": "III-07 bis III-10 (PDF-S. 189-192) setzen genügend Spuren gegen Serranus voraus; Owner-Entscheidung zur Art der Schuld offen"
+      },
+      "t_decimus_debt": {
+        "text": "Decimus hat nach einer schlechten Ernte einen Schuldschein des Dorfes beim Lagerhaus unterschrieben; er weiß nichts vom Überfall.",
+        "canon": "design",
+        "ref": "II-02 nennt Schuldschein und Lagervertrag (PDF-S. 159)"
+      },
+      "t_stolen_iron": {
+        "text": "Gestohlene Eisenwaren mit Sextus' Werkstattzeichen lagern später im Lagerhaus am Natiso.",
+        "canon": "design",
+        "ref": "I-20 nennt gestohlene Objekte als Beweiskategorie"
+      }
+    },
+    "edges": [
+      [
+        "t_commission",
+        "t_band",
+        "bezahlt"
+      ],
+      [
+        "t_procurator",
+        "t_commission",
+        "vermittelt"
+      ],
+      [
+        "t_serranus_ordered",
+        "t_procurator",
+        "beauftragt"
+      ],
+      [
+        "t_serranus_motive",
+        "t_target_store",
+        "begründet"
+      ],
+      [
+        "t_insider_carter",
+        "t_target_store",
+        "verrät Lage"
+      ],
+      [
+        "t_scouting",
+        "t_band",
+        "dieselbe Gruppe"
+      ],
+      [
+        "t_seal_pouch",
+        "t_commission",
+        "Zahlbeutel"
+      ],
+      [
+        "t_leader_auxiliary",
+        "t_band",
+        "führt"
+      ],
+      [
+        "t_north_feint",
+        "t_band",
+        "Täuschung"
+      ],
+      [
+        "t_stolen_iron",
+        "t_serranus_lease",
+        "lagert im gepachteten Haus"
+      ],
+      [
+        "t_decimus_debt",
+        "t_serranus_motive",
+        "Hebel"
+      ]
+    ],
+    "guilt": {
+      "sus_germani": false,
+      "sus_cassia": false,
+      "sus_guard": false,
+      "sus_decimus": false,
+      "sus_carter": true,
+      "sus_riders": true,
+      "sus_house": true,
+      "sus_procurator": true,
+      "sus_serranus": true
+    }
+  },
+  "props": {
+    "prop_hoofprints": {
+      "title": "Hufspuren im Schlamm",
+      "place": "Weg südlich des Vorratsspeichers",
+      "position": [
+        -8.6,
+        19.2
+      ],
+      "radius": 1.6,
+      "mission": "I-10",
+      "slice": true,
+      "examine": [
+        {
+          "clue": "c_hoof_exit",
+          "label": "Hufspuren untersuchen"
+        },
+        {
+          "clue": "c_hoof_shoe",
+          "label": "Den Beschlag eines Abdrucks genauer ansehen",
+          "requires": {
+            "any": [
+              {
+                "ability": "ch1_read_tracks"
+              },
+              {
+                "insight_min": 3
+              }
+            ]
+          },
+          "missing": "Allein erkennst du an diesem Abdruck nicht mehr. Jemand, der Spuren liest, könnte ihn dir deuten."
+        }
+      ],
+      "canon": "canon+design",
+      "ref": "I-15 Pferdebeschlag (PDF-S. 140); I-08 Spuren als beobachtbare Weltobjekte (PDF-S. 133)"
+    },
+    "prop_seal_fragment": {
+      "title": "Rotes Wachsbruchstück",
+      "place": "Vor der Tür des Vorratsspeichers",
+      "position": [
+        -10.25,
+        13.75
+      ],
+      "radius": 1.6,
+      "mission": "I-10",
+      "slice": true,
+      "examine": [
+        {
+          "clue": "c_seal_fragment",
+          "label": "Das rote Wachsstück aufheben und ansehen"
+        }
+      ],
+      "canon": "canon+design",
+      "ref": "I-15 rotes Wachssiegel (PDF-S. 140); I-20 rotes Siegel als konkrete Spur (PDF-S. 145)"
+    }
+  },
+  "clues": {
+    "c_i08_tracks": {
+      "kind": "memory",
+      "title": "Hufspuren am Nordweg (I-08)",
+      "mission": "I-08",
+      "slice": true,
+      "text": "Tage vor dem Angriff hast du am Nordweg frische Spuren mehrerer Pferde gesichert. Mindestens ein Abdruck hatte einen harten, gleichmäßigen Rand wie von Eisen.",
+      "reliability": "sicher",
+      "source_label": "Eigene Beobachtung in I-08 oder Varros Erinnerung",
+      "paths": [
+        {
+          "type": "screenplay_flag",
+          "flag": "hoof_evidence"
+        },
+        {
+          "type": "witness",
+          "npc": "varro",
+          "topic": "present:c_hoof_shoe"
+        }
+      ],
+      "canon": "canon+design",
+      "ref": "I-08 Hinweis-Fact ohne Täter (PDF-S. 133); Eisenrand Designannahme"
+    },
+    "c_own_defend": {
+      "kind": "memory",
+      "title": "Was du draußen gesehen hast",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Im Feuerschein sahst du einen Reiter ohne Helm, der mit kurzen Handzeichen die anderen zum Vorratsspeicher schickte.",
+      "reliability": "mittel",
+      "source_label": "Eigene Beobachtung, Nacht und Rauch",
+      "paths": [
+        {
+          "type": "raid_path",
+          "path": "defend"
+        }
+      ],
+      "canon": "design"
+    },
+    "c_own_hide": {
+      "kind": "memory",
+      "title": "Was du im Versteck gehört hast",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Durch die Hauswand hörtest du eine Männerstimme auf Latein: »Zum Speicher! Lasst die Häuser!«",
+      "reliability": "mittel",
+      "source_label": "Eigenes Hören, ohne Sicht",
+      "paths": [
+        {
+          "type": "raid_path",
+          "path": "hide"
+        }
+      ],
+      "canon": "design"
+    },
+    "c_hoof_exit": {
+      "kind": "physical",
+      "title": "Hufspuren am Speicherweg",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Dutzende Abdrücke, die frischesten über den älteren. Sie führen vom Speicher nach Süden zur Straße nach Aquileia, nicht zurück zum Nordweg.",
+      "reliability": "sicher",
+      "source_label": "Selbst untersucht",
+      "paths": [
+        {
+          "type": "prop",
+          "prop": "prop_hoofprints",
+          "detail": 0
+        }
+      ],
+      "canon": "design"
+    },
+    "c_hoof_shoe": {
+      "kind": "physical",
+      "title": "Ein Beschlag mit Quersteg",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Ein Pferd trägt ein genageltes Eisen mit Quersteg. In Valdora laufen die Pferde unbeschlagen; ein solcher Beschlag kostet Geld und kommt aus einer Stadtschmiede.",
+      "reliability": "sicher",
+      "source_label": "Selbst untersucht oder von Varro gedeutet",
+      "paths": [
+        {
+          "type": "prop",
+          "prop": "prop_hoofprints",
+          "detail": 1
+        },
+        {
+          "type": "witness",
+          "npc": "varro",
+          "topic": "present:c_hoof_exit"
+        }
+      ],
+      "canon": "canon+design",
+      "ref": "Pferdebeschlag als I-15-Beweis (PDF-S. 140). Quellenkritisch: genagelte Hufeisen sind für 58 v. Chr. unsicher belegt; im Spiel deshalb ausdrücklich selten und teuer."
+    },
+    "c_seal_fragment": {
+      "kind": "physical",
+      "title": "Rotes Wachsbruchstück",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Ein daumenbreites Stück roten Siegelwachses. Auf der Vorderseite der halbe Abdruck eines Schiffsbugs über Wellen, auf der Rückseite die Rinne einer dünnen Schnur.",
+      "reliability": "sicher",
+      "source_label": "Selbst gefunden vor dem Speicher",
+      "paths": [
+        {
+          "type": "prop",
+          "prop": "prop_seal_fragment",
+          "detail": 0
+        }
+      ],
+      "canon": "canon+design",
+      "ref": "Rotes Wachssiegel (I-15, I-20); Bildmotiv Schiff und Schnurrinne Designannahme"
+    },
+    "w_aurelia_brief": {
+      "kind": "testimony",
+      "witness": "aurelia",
+      "title": "Aurelia: Befehle auf Latein",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Aurelia hatte Verletzte vor sich und sah kaum hinaus. Sie hörte aber, dass einer der Reiter auf Latein Befehle gab.",
+      "reliability": "stark",
+      "source_label": "Aurelia, Heilerin · in der Nacht",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "aurelia",
+          "topic": "night"
+        }
+      ],
+      "canon": "design"
+    },
+    "w_aurelia_latin": {
+      "kind": "testimony",
+      "witness": "aurelia",
+      "title": "Aurelia: »Ad horreum!«",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Am Morgen erinnert sich Aurelia genau: Ein Reiter rief »Ad horreum!« – zum Speicher – wie einer, der Befehle gewohnt ist. Andere antworteten in Sprachen, die sie nicht kannte.",
+      "reliability": "stark",
+      "source_label": "Aurelia, Heilerin · am Morgen",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "aurelia",
+          "topic": "night"
+        }
+      ],
+      "canon": "design"
+    },
+    "w_fabius_raw": {
+      "kind": "testimony",
+      "witness": "fabius",
+      "title": "Fabius: Hosen und lange Haare",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Fabius sah die Reiter vom Holzlager aus gegen das Feuer: lange Haare, Hosen, Geschrei, das er nicht verstand. Gesichter sah er nicht.",
+      "reliability": "schwach",
+      "source_label": "Fabius, Holzfäller · in der Nacht, voller Angst",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "fabius",
+          "topic": "night"
+        }
+      ],
+      "canon": "design"
+    },
+    "w_fabius_germani": {
+      "kind": "testimony",
+      "witness": "fabius",
+      "title": "Fabius: »Germanen waren das«",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Am Morgen ist Fabius sicher: Germanen aus dem Norden, Leute Ariovists. Decimus sage es auch, und in Aquileia rede man von nichts anderem.",
+      "reliability": "gerücht",
+      "source_label": "Fabius, Holzfäller · nach dem Dorfgerede",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "fabius",
+          "topic": "night"
+        }
+      ],
+      "canon": "plausible",
+      "ref": "58 v. Chr. führt Caesar Krieg gegen Ariovist (Caesar, BG 1,31-54); Caesar zieht drei bei Aquileia überwinternde Legionen ab (BG 1,10). Das Gerücht ist Spielinterpretation."
+    },
+    "w_fabius_admits": {
+      "kind": "testimony",
+      "witness": "fabius",
+      "title": "Fabius nimmt das Wort »Germanen« zurück",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Mit Aurelias Aussage konfrontiert, gibt Fabius zu: Er hat nur Hosen und Haare gesehen. Hosen tragen auch die Leute aus den Bergen und die Gallier auf dem Markt.",
+      "reliability": "stark",
+      "source_label": "Fabius, Holzfäller · nach Gegenüberstellung",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "fabius",
+          "topic": "present:w_aurelia_latin"
+        },
+        {
+          "type": "witness",
+          "npc": "fabius",
+          "topic": "present:w_aurelia_brief"
+        },
+        {
+          "type": "witness",
+          "npc": "fabius",
+          "topic": "present:c_own_hide"
+        }
+      ],
+      "canon": "design"
+    },
+    "w_fabius_paid": {
+      "kind": "testimony",
+      "witness": "fabius",
+      "title": "Fabius gegen einen Denar",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Für einen Denar erzählt Fabius bereitwillig, was man hören will: riesige Germanen, Feuer aus ihren Mündern. Die Geschichte wird mit jedem Satz größer.",
+      "reliability": "gekauft",
+      "source_label": "Fabius, Holzfäller · gegen Bezahlung",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "fabius",
+          "topic": "pay"
+        }
+      ],
+      "canon": "design"
+    },
+    "w_guard_north": {
+      "kind": "testimony",
+      "witness": "severus",
+      "title": "Wachmann: »Von Norden, zurück in die Berge«",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Der Wachmann zählte etwa dreißig Reiter vom Nordweg her. Sie seien wieder in die Berge verschwunden. Niemand hätte sie aufhalten können.",
+      "reliability": "mittel",
+      "source_label": "Wachmann am Nordtor · aus Angst vor Schuld",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "severus",
+          "topic": "night"
+        }
+      ],
+      "canon": "canon+design",
+      "ref": "Etwa dreißig Reiter (I-10, PDF-S. 135)"
+    },
+    "w_guard_carter": {
+      "kind": "testimony",
+      "witness": "severus",
+      "title": "Wachmann: der Fuhrmann am Vortag",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Am Tag vor dem Angriff brachte ein Fuhrmann eine Kiste für Cassia. Er fragte, wann die Wache wechselt und wo das Dorf sein Korn lagert. Der Wachmann hat es ihm gesagt.",
+      "reliability": "stark",
+      "source_label": "Wachmann · Aussage gegen das eigene Interesse",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "severus",
+          "topic": "night"
+        },
+        {
+          "type": "witness",
+          "npc": "severus",
+          "topic": "present:c_hoof_exit"
+        }
+      ],
+      "canon": "design"
+    },
+    "w_cassia_crate": {
+      "kind": "testimony",
+      "witness": "cassia",
+      "title": "Cassia erkennt das Wachs",
+      "mission": "I-10",
+      "slice": true,
+      "text": "So siegelt das Lagerhaus am Natiso in Aquileia, bei dem Cassia Tuch und Öl bezieht. Ihre letzte Kiste von dort steht noch versiegelt in ihrem Haus.",
+      "reliability": "stark",
+      "source_label": "Cassia, Händlerin",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "cassia",
+          "topic": "present:c_seal_fragment"
+        }
+      ],
+      "canon": "plausible",
+      "ref": "Aquileias Flusshafen lag am Natiso (Natisone/Torre); Lagerhaus fiktiv"
+    },
+    "c_crate_intact": {
+      "kind": "physical",
+      "title": "Cassias Kiste, unversehrt versiegelt",
+      "mission": "I-10",
+      "slice": true,
+      "text": "Cassia zeigt dir die Kiste: dasselbe Schiffsbild im roten Wachs, aber das Siegel ist ganz und sitzt auf dem Deckelspalt, nicht an einer Schnur.",
+      "reliability": "sicher",
+      "source_label": "Gemeinsam mit Cassia geprüft",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "cassia",
+          "topic": "present:w_cassia_crate"
+        }
+      ],
+      "canon": "design"
+    },
+    "c_delivery_mark": {
+      "kind": "document",
+      "title": "Liefermarke auf Cassias Kiste",
+      "mission": "I-10",
+      "slice": true,
+      "text": "In das Holz geritzt: Lager am Natiso, Fuhrmann Tertius. Cassia sagt, er kam einen Tag früher als vereinbart.",
+      "reliability": "stark",
+      "source_label": "Cassia, Händlerin · Lieferbeleg",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "cassia",
+          "topic": "present:w_guard_carter"
+        }
+      ],
+      "canon": "canon+design",
+      "ref": "Liefermarke als I-15-Beweis (PDF-S. 140); Name des Fuhrmanns Designannahme"
+    },
+    "w_julia_pouch": {
+      "kind": "testimony",
+      "witness": "julia",
+      "title": "Julia: der Beutel mit rotem Wachs",
+      "mission": "I-12",
+      "slice": true,
+      "text": "Der Reiter, der Julia beinahe niederritt, trug am Gürtel einen Lederbeutel, an dessen Schnur rotes Wachs hing. Als er ihn verlor, sprang er nicht ab.",
+      "reliability": "mittel",
+      "source_label": "Julia · nur wenn sie die Nacht überlebt hat",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "julia",
+          "topic": "night"
+        }
+      ],
+      "canon": "design"
+    },
+    "c_sextus_marks": {
+      "kind": "physical",
+      "title": "Sextus' gezeichnete Werkstücke fehlen",
+      "mission": "I-11",
+      "slice": false,
+      "text": "Aus der ausgebrannten Schmiede fehlen Messer und Beschläge mit Sextus' Zeichen: ein Hammer über drei Punkten.",
+      "reliability": "sicher",
+      "source_label": "Schmiede nach I-11",
+      "paths": [
+        {
+          "type": "place",
+          "place": "valdora_forge"
+        }
+      ],
+      "canon": "design"
+    },
+    "c_cloth_scrap": {
+      "kind": "physical",
+      "title": "Stoffrest an der Bachfurt",
+      "mission": "I-15",
+      "slice": false,
+      "text": "Ein Fetzen krappgefärbter Wolle mit Ledersaum, an einem Dornbusch an der Bachfurt.",
+      "reliability": "sicher",
+      "source_label": "Bachfurt, I-15",
+      "paths": [
+        {
+          "type": "place",
+          "place": "valdora_ford"
+        }
+      ],
+      "canon": "canon+design",
+      "ref": "Stoffrest als I-15-Beweis (PDF-S. 140)"
+    },
+    "w_sabina_cloth": {
+      "kind": "testimony",
+      "witness": "sabina",
+      "title": "Die Tuchhändlerin erkennt den Mantel",
+      "mission": "I-15",
+      "slice": false,
+      "text": "Solche Mäntel verkauft man in Aquileia an Reitknechte und entlassene Hilfsreiter, nicht an Leute aus dem Norden.",
+      "reliability": "stark",
+      "source_label": "Tuchhändlerin, Kontaktweg",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "sabina",
+          "topic": "present:c_cloth_scrap"
+        }
+      ],
+      "canon": "design"
+    },
+    "c_ford_tracks": {
+      "kind": "physical",
+      "title": "Furtspuren nach Südosten",
+      "mission": "I-15",
+      "slice": false,
+      "text": "An der Bachfurt queren dieselben Abdrücke das Wasser Richtung Südosten.",
+      "reliability": "sicher",
+      "source_label": "Bachfurt, I-15",
+      "paths": [
+        {
+          "type": "place",
+          "place": "valdora_ford"
+        }
+      ],
+      "canon": "design"
+    },
+    "c_house_offer": {
+      "kind": "document",
+      "title": "Das Angebot des Prokurators",
+      "mission": "I-16",
+      "slice": false,
+      "text": "Ein Brief mit rotem Schiffssiegel bietet Decimus einen Kredit für den Wiederaufbau, gesichert auf Speicher und Furtrecht des Dorfes.",
+      "reliability": "sicher",
+      "source_label": "Decimus' Wachstafeln, I-16",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "decimus",
+          "topic": "present:d_warehouse_lead"
+        }
+      ],
+      "canon": "design"
+    },
+    "w_decimus_debt": {
+      "kind": "testimony",
+      "witness": "decimus",
+      "title": "Decimus' Schuldschein",
+      "mission": "I-16",
+      "slice": false,
+      "text": "Decimus gesteht, dass das Dorf dem Lagerhaus seit der schlechten Ernte Saatgut schuldet. Er hat geschwiegen, um keine Unruhe zu stiften.",
+      "reliability": "stark",
+      "source_label": "Decimus, I-16",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "decimus",
+          "topic": "present:c_house_offer"
+        }
+      ],
+      "canon": "design",
+      "ref": "Schuldschein als Beweisform in II-02 (PDF-S. 159)"
+    },
+    "c_wood_prices": {
+      "kind": "document",
+      "title": "Holzpreise vor und nach dem Überfall",
+      "mission": "I-17",
+      "slice": false,
+      "text": "Cassias Bücher zeigen: Das Lagerhaus kaufte Wochen vor dem Überfall Bauholz in der Gegend auf.",
+      "reliability": "stark",
+      "source_label": "Handelsweg, I-17",
+      "paths": [
+        {
+          "type": "trade",
+          "partner": "cassia"
+        }
+      ],
+      "canon": "design"
+    },
+    "w_officer_contact": {
+      "kind": "testimony",
+      "witness": "aquileia_clerk",
+      "title": "Der Zöllner an der Natisobrücke",
+      "mission": "I-19",
+      "slice": false,
+      "text": "Am Morgen nach dem Überfall ritten etwa dreißig Männer über die Brücke in die Stadt, mit Beutepferden. Bezahlt hat einer mit rotem Wachs am Beutel.",
+      "reliability": "stark",
+      "source_label": "Kontakt aus tatsächlicher Empfehlung, I-19",
+      "paths": [
+        {
+          "type": "contact",
+          "via": "recommendation"
+        }
+      ],
+      "canon": "design",
+      "ref": "I-19: Kontaktkante, kein sofortiger Rang (PDF-S. 144)"
+    },
+    "c_lease_contract": {
+      "kind": "document",
+      "title": "Lagervertrag am Natiso",
+      "mission": "I-20",
+      "slice": false,
+      "text": "Der Pachtvertrag des Lagerhauses nennt als Pächter Gaius Varro Serranus. Gesiegelt hat ihn der Prokurator Gaius Varro Philon mit dem roten Schiffssiegel.",
+      "reliability": "sicher",
+      "source_label": "Lagerhaus in Aquileia, I-20",
+      "paths": [
+        {
+          "type": "place",
+          "place": "aquileia_warehouse"
+        }
+      ],
+      "canon": "canon+design",
+      "ref": "I-20: Lagervertrag nennt Gaius Varro Serranus, beweist seine Schuld nicht (PDF-S. 145; D-040). Prokurator Designannahme."
+    },
+    "c_warehouse_iron": {
+      "kind": "physical",
+      "title": "Sextus' Zeichen im Lagerhaus",
+      "mission": "I-20",
+      "slice": false,
+      "text": "Zwischen Fässern liegen Messer und Beschläge mit dem Hammer über drei Punkten.",
+      "reliability": "sicher",
+      "source_label": "Lagerhaus in Aquileia, I-20",
+      "paths": [
+        {
+          "type": "place",
+          "place": "aquileia_warehouse"
+        }
+      ],
+      "canon": "canon+design",
+      "ref": "Gestohlene Objekte als I-20-Kategorie (PDF-S. 145)"
+    },
+    "w_warehouse_guard": {
+      "kind": "testimony",
+      "witness": "warehouse_guard",
+      "title": "Die Wachroute des Lagerhauses",
+      "mission": "I-20",
+      "slice": false,
+      "text": "Der Nachtwächter sagt, Philon empfange nachts Reiter am Hintertor; den Herrn Serranus habe er dort nie gesehen.",
+      "reliability": "mittel",
+      "source_label": "Lagerwache, I-20",
+      "paths": [
+        {
+          "type": "witness",
+          "npc": "warehouse_guard",
+          "topic": "night"
+        }
+      ],
+      "canon": "design"
+    }
+  },
+  "witnesses": {
+    "aurelia": {
+      "role": "Heilerin",
+      "perspective": "Stand an der Tür ihres Hauses und versorgte Verletzte; hörte mehr, als sie sah.",
+      "fear": 0.1,
+      "ties": [
+        "Versorgte den Wachmann in I-07 (Arzneipäckchen) und bürgt für ihn.",
+        "Empfahl Cassia an Julia (Kontaktkette Julia → Aurelia → Cassia)."
+      ],
+      "canon": "design",
+      "statements": [
+        {
+          "topic": "night",
+          "when": {
+            "phase": [
+              "night"
+            ]
+          },
+          "clue": "w_aurelia_brief",
+          "line_id": "INV_AUR_NIGHT_01",
+          "speaker_id": "aurelia",
+          "text": "»Ich habe nicht hinausgesehen, ich hatte Verletzte unter den Händen. Aber einer von ihnen gab Befehle. Auf Latein, so wie du und ich reden. Frag mich morgen noch einmal, wenn meine Hände still sind.«"
+        },
+        {
+          "topic": "night",
+          "when": {
+            "phase": [
+              "morning",
+              "after_oath"
+            ]
+          },
+          "clue": "w_aurelia_latin",
+          "line_id": "INV_AUR_MORNING_01",
+          "speaker_id": "aurelia",
+          "text": "»Jetzt, wo es hell ist, höre ich es wieder: ›Ad horreum!‹ – zum Speicher. So ruft einer, der Befehle gewohnt ist. Die anderen antworteten in Sprachen, die ich nicht kenne. Fremd waren sie, ja. Aber nicht alle von derselben Fremde.«"
+        },
+        {
+          "topic": "present:c_seal_fragment",
+          "line_id": "INV_AUR_SEAL",
+          "speaker_id": "aurelia",
+          "text": "»Rotes Wachs. Damit siegeln Kaufleute, keine Bauern und keine Krieger. Cassia kennt sich mit so etwas aus.«"
+        },
+        {
+          "topic": "present:w_guard_north",
+          "line_id": "INV_AUR_GUARD",
+          "speaker_id": "aurelia",
+          "text": "»Er hat Angst, dass man ihm die Schuld gibt. Ich habe ihn im Fieber gepflegt; er ist kein Verräter. Aber er redet gern, wenn ihm jemand zuhört.«"
+        }
+      ],
+      "default_present": {
+        "line_id": "INV_AUR_DEFAULT",
+        "text": "»Dazu kann ich dir nichts sagen. Ich habe nur gehört, was vor meiner Tür geschah.«"
+      }
+    },
+    "fabius": {
+      "role": "Holzfäller",
+      "perspective": "Sah die Reiter vom Holzlager am Westrand gegen das Feuer, aus fünfzig Schritt, in Panik.",
+      "fear": 0.8,
+      "ties": [
+        "Wiederholt, was Decimus und die Leute aus Aquileia sagen."
+      ],
+      "canon": "design",
+      "statements": [
+        {
+          "topic": "night",
+          "when": {
+            "phase": [
+              "night"
+            ]
+          },
+          "clue": "w_fabius_raw",
+          "line_id": "INV_FAB_NIGHT_01",
+          "speaker_id": "fabius",
+          "text": "»Lange Haare, Hosen, Geschrei, das ich nicht verstand. Gegen das Feuer sahen sie riesig aus. Von jenseits der Berge, sage ich. Mehr habe ich nicht gesehen – ich bin gerannt.«"
+        },
+        {
+          "topic": "night",
+          "when": {
+            "phase": [
+              "morning",
+              "after_oath"
+            ]
+          },
+          "clue": "w_fabius_germani",
+          "line_id": "INV_FAB_MORNING_01",
+          "speaker_id": "fabius",
+          "text": "»Germanen waren das. Ariovists Leute. Decimus sagt es auch, und in Aquileia reden sie seit dem Winter von nichts anderem. Wer sonst reitet so in ein Dorf?«"
+        },
+        {
+          "topic": "present:w_aurelia_latin",
+          "when": {
+            "known_any": [
+              "w_fabius_germani",
+              "w_fabius_raw"
+            ]
+          },
+          "clue": "w_fabius_admits",
+          "line_id": "INV_FAB_ADMIT_01",
+          "speaker_id": "fabius",
+          "text": "»Latein? … Ich habe ihre Gesichter nicht gesehen. Nur Hosen und Haare gegen das Feuer. Hosen tragen auch die Leute aus den Bergen. Und die Gallier, die Cassia ihr Tuch abkaufen.«"
+        },
+        {
+          "topic": "present:w_aurelia_brief",
+          "when": {
+            "known_any": [
+              "w_fabius_germani",
+              "w_fabius_raw"
+            ]
+          },
+          "clue": "w_fabius_admits",
+          "line_id": "INV_FAB_ADMIT_02",
+          "speaker_id": "fabius",
+          "text": "»Befehle auf Latein, sagt Aurelia? Dann … dann weiß ich nicht, wer sie waren. Gesehen habe ich nur Umrisse.«"
+        },
+        {
+          "topic": "present:c_own_hide",
+          "when": {
+            "known_any": [
+              "w_fabius_germani",
+              "w_fabius_raw"
+            ]
+          },
+          "clue": "w_fabius_admits",
+          "line_id": "INV_FAB_ADMIT_03",
+          "speaker_id": "fabius",
+          "text": "»Du hast Latein gehört? Durch die Wand? … Gut. Dann sage ich nur noch, was ich gesehen habe: Hosen, Haare, Feuer. Mehr nicht.«"
+        }
+      ],
+      "pay": {
+        "cost": {
+          "denarii": 1
+        },
+        "clue": "w_fabius_paid",
+        "event": "I-10.bribe.fabius",
+        "line_id": "INV_FAB_PAID",
+        "speaker_id": "fabius",
+        "label": "Fabius einen Denar geben, damit er mehr erzählt",
+        "text": "»Ein Denar? Dann hör gut zu: Riesen waren das, Germanen, mit Feuer in den Augen, und einer hatte einen Bären an der Kette …«"
+      },
+      "default_present": {
+        "line_id": "INV_FAB_DEFAULT",
+        "text": "»Davon verstehe ich nichts. Ich fälle Bäume.«"
+      }
+    },
+    "severus": {
+      "role": "Wachmann",
+      "perspective": "Stand am Nordtor; sah die Ankunft, nicht den Abzug. Fürchtet, dass man ihm die Schuld gibt.",
+      "fear": 0.7,
+      "ties": [
+        "Wurde in I-07 vom Spieler mit Arznei versorgt (Vertrauen aus tatsächlicher Hilfe).",
+        "Unterhielt sich am Vortag mit dem Fuhrmann des Lagerhauses."
+      ],
+      "canon": "design",
+      "statements": [
+        {
+          "topic": "night",
+          "clue": "w_guard_north",
+          "line_id": "INV_GRD_NIGHT_01",
+          "speaker_id": "severus",
+          "text": "»Vom Nordweg kamen sie, etwa dreißig. Ich habe gerufen, aber da brannte schon das erste Dach. Danach sind sie zurück in die Berge. Niemand hätte sie aufgehalten. Niemand.«"
+        },
+        {
+          "topic": "night",
+          "when": {
+            "trust_min": 10,
+            "known": [
+              "w_guard_north"
+            ]
+          },
+          "clue": "w_guard_carter",
+          "line_id": "INV_GRD_TRUST_01",
+          "speaker_id": "severus",
+          "text": "»Dir sage ich es, weil du mir das Fieber vertrieben hast. Am Tag davor kam ein Fuhrmann mit einer Kiste für Cassia. Er fragte, wann wir die Wache wechseln und wo das Dorf sein Korn lagert. Ich habe es ihm gesagt. Ich dachte, er will liefern.«"
+        },
+        {
+          "topic": "present:c_hoof_exit",
+          "when": {
+            "known": [
+              "w_guard_north"
+            ]
+          },
+          "clue": "w_guard_carter",
+          "line_id": "INV_GRD_CONFRONT_01",
+          "speaker_id": "severus",
+          "text": "»Nach Süden? Zur Straße? … Dann sind sie nicht in die Berge. Dann wussten sie, wohin. – Am Tag davor hat mich ein Fuhrmann ausgefragt. Wann die Wache wechselt. Wo das Korn liegt. Ich habe es ihm gesagt.«"
+        }
+      ],
+      "default_present": {
+        "line_id": "INV_GRD_DEFAULT",
+        "text": "»Das habe ich nicht gesehen. Ich stand am Tor, nicht im Dorf.«"
+      }
+    },
+    "cassia": {
+      "role": "Händlerin",
+      "perspective": "Verlor Waren aus ihrem Haus am Markt; kennt Siegel, Lieferwege und das Lagerhaus in Aquileia.",
+      "fear": 0.3,
+      "ties": [
+        "Bezieht Tuch und Öl vom Lagerhaus am Natiso (verdächtige Handelsbeziehung).",
+        "Kennt den Prokurator Philon flüchtig vom Hafen.",
+        "Vertraut dem Spieler nach den Marktgeschäften aus I-03 und I-06."
+      ],
+      "canon": "design",
+      "statements": [
+        {
+          "topic": "night",
+          "when": {
+            "accused": [
+              "sus_cassia"
+            ]
+          },
+          "line_id": "INV_CAS_ACCUSED",
+          "speaker_id": "cassia",
+          "text": "»Du hast Decimus erzählt, ich hätte mit diesen Reitern zu tun. Solange du das glaubst, rede ich nicht mit dir über meine Kisten.«"
+        },
+        {
+          "topic": "night",
+          "line_id": "INV_CAS_NIGHT_01",
+          "speaker_id": "cassia",
+          "text": "»Sie haben meinen Laden nicht angerührt, nur den Speicher. Seltsam, nicht? Plünderer nehmen, was offen liegt. Diese wussten, was sie wollten.«"
+        },
+        {
+          "topic": "present:c_seal_fragment",
+          "when": {
+            "not_accused": [
+              "sus_cassia"
+            ]
+          },
+          "clue": "w_cassia_crate",
+          "line_id": "INV_CAS_SEAL_01",
+          "speaker_id": "cassia",
+          "text": "»Dieses Wachs kenne ich. So siegelt das Lagerhaus am Natiso in Aquileia, bei dem ich Tuch und Öl beziehe. – Schau mich nicht so an. Meine letzte Kiste von dort steht noch zu.«"
+        },
+        {
+          "topic": "present:w_cassia_crate",
+          "when": {
+            "not_accused": [
+              "sus_cassia"
+            ]
+          },
+          "clue": "c_crate_intact",
+          "line_id": "INV_CAS_CRATE_01",
+          "speaker_id": "cassia",
+          "text": "»Hier. Dasselbe Schiff, dasselbe Rot. Und das Siegel ist ganz. Es sitzt auf dem Deckelspalt, nicht an einer Schnur.«"
+        },
+        {
+          "topic": "present:w_guard_carter",
+          "when": {
+            "not_accused": [
+              "sus_cassia"
+            ],
+            "trust_min": 8
+          },
+          "clue": "c_delivery_mark",
+          "line_id": "INV_CAS_MARK_01",
+          "speaker_id": "cassia",
+          "text": "»Der Fuhrmann? Das war Tertius vom Lager am Natiso – es steht auf der Liefermarke. Er kam einen Tag zu früh und wollte unbedingt wissen, wo ich mein Korn kaufe. Ich dachte, er sucht neue Kunden.«"
+        },
+        {
+          "topic": "present:w_guard_carter",
+          "when": {
+            "not_accused": [
+              "sus_cassia"
+            ]
+          },
+          "line_id": "INV_CAS_MARK_LOW",
+          "speaker_id": "cassia",
+          "text": "»Ein Fuhrmann? Viele Fuhrleute kommen hierher. Meine Lieferbelege zeige ich nur Leuten, die ich kenne.«"
+        }
+      ],
+      "default_present": {
+        "line_id": "INV_CAS_DEFAULT",
+        "text": "»Davon weiß ich nichts. Ich handle mit Waren, nicht mit Gerüchten.«"
+      }
+    },
+    "varro": {
+      "role": "Späher und Jäger",
+      "perspective": "War in der Nacht am Waldrand und kam erst zurück, als es brannte; liest Spuren.",
+      "fear": 0.2,
+      "ties": [
+        "Kontaktweg: deutet Spuren, wenn der eigene Scharfsinn nicht reicht."
+      ],
+      "canon": "design",
+      "statements": [
+        {
+          "topic": "night",
+          "line_id": "INV_VAR_NIGHT_01",
+          "speaker_id": "varro",
+          "text": "»Ich war draußen am Waldrand und kam zu spät. Wenn du Spuren gefunden hast, zeig sie mir. Spuren lügen nicht, aber sie sagen auch nicht alles.«"
+        },
+        {
+          "topic": "present:c_hoof_exit",
+          "clue": "c_hoof_shoe",
+          "line_id": "INV_VAR_TRACKS_01",
+          "speaker_id": "varro",
+          "text": "»Komm, ich zeig's dir. Siehst du diesen Abdruck? Eisen, genagelt, mit einem Steg quer durch. Unsere Pferde laufen barfuß. So einen Beschlag bezahlt man in der Stadt.«"
+        },
+        {
+          "topic": "present:c_i08_tracks",
+          "line_id": "INV_VAR_I08",
+          "speaker_id": "varro",
+          "text": "»Die Spuren am Nordweg, ja. Ich habe sie auch gesehen. Damals dachte ich an Händler, die sich verirrt haben.«"
+        },
+        {
+          "topic": "present:c_hoof_shoe",
+          "clue": "c_i08_tracks",
+          "line_id": "INV_VAR_SHOE_I08",
+          "speaker_id": "varro",
+          "text": "»Diesen Steg kenne ich. Vor ein paar Tagen standen solche Abdrücke am Nordweg, frisch, mehrere Pferde. Ich dachte damals an Händler, die sich verirrt hatten. Jetzt glaube ich das nicht mehr.«"
+        }
+      ],
+      "default_present": {
+        "line_id": "INV_VAR_DEFAULT",
+        "text": "»Das ist keine Spur. Damit kann ich dir nicht helfen.«"
+      }
+    },
+    "julia": {
+      "role": "Deine Mutter",
+      "perspective": "Wurde in der Nacht beinahe niedergeritten; nur verfügbar, wenn sie überlebt hat.",
+      "fear": 0.5,
+      "ties": [
+        "Familienzweig: existiert als Zeugin nur im Mitwirkungsweg mit tatsächlicher Rettung (I-10/I-12)."
+      ],
+      "canon": "canon+design",
+      "ref": "Julia überlebt nur beim Mitwirkungsweg (PDF-S. 16, 135)",
+      "statements": [
+        {
+          "topic": "night",
+          "when": {
+            "raid_path": [
+              "defend"
+            ]
+          },
+          "clue": "w_julia_pouch",
+          "line_id": "INV_JUL_NIGHT_01",
+          "speaker_id": "julia",
+          "text": "»Der eine, der mich fast niederritt … an seinem Gürtel hing ein Lederbeutel, an der Schnur rotes Wachs. Er hat ihn verloren und ist nicht abgestiegen. Als ob ihm das Geld darin nicht gehörte.«"
+        }
+      ],
+      "default_present": {
+        "line_id": "INV_JUL_DEFAULT",
+        "text": "»Ich weiß es nicht, mein Junge. Ich habe nur dich gesucht.«"
+      }
+    }
+  },
+  "contradictions": {
+    "k_who": {
+      "title": "Germanen oder Lateiner?",
+      "text": "Fabius spricht von Germanen aus dem Norden. Andere hörten lateinische Befehle.",
+      "between": [
+        [
+          "w_fabius_germani",
+          "w_aurelia_latin"
+        ],
+        [
+          "w_fabius_germani",
+          "w_aurelia_brief"
+        ],
+        [
+          "w_fabius_germani",
+          "c_own_hide"
+        ]
+      ],
+      "resolved_by": [
+        "d_mixed_band"
+      ],
+      "canon": "canon+design",
+      "ref": "I-08: widersprüchliche Aussagen, kein Volk vorschnell festlegen (PDF-S. 133)"
+    },
+    "k_direction": {
+      "title": "Zurück in die Berge?",
+      "text": "Der Wachmann sagt, die Reiter seien nach Norden in die Berge verschwunden.",
+      "between": [
+        [
+          "w_guard_north",
+          "c_hoof_exit"
+        ]
+      ],
+      "resolved_by": [
+        "d_exit_south"
+      ],
+      "canon": "design"
+    },
+    "k_seal": {
+      "title": "Cassias Siegel am Tatort?",
+      "text": "Das Wachs vom Speicher trägt dasselbe Bild wie das Siegel auf Cassias Ware.",
+      "between": [
+        [
+          "c_seal_fragment",
+          "w_cassia_crate"
+        ]
+      ],
+      "resolved_by": [
+        "d_seal_not_crate"
+      ],
+      "canon": "design"
+    }
+  },
+  "deductions": {
+    "d_mixed_band": {
+      "title": "Eine gemischte Truppe",
+      "text": "Ein Anführer, der lateinisch befiehlt, und Reiter mit Hosen und langen Haaren: Die Gruppe ist gemischt. Ihre Herkunft bleibt offen. »Germanen« ist ein Gerücht, keine Beobachtung.",
+      "requires": [
+        [
+          "w_aurelia_latin",
+          "w_fabius_admits"
+        ],
+        [
+          "w_aurelia_brief",
+          "w_fabius_admits"
+        ],
+        [
+          "c_own_hide",
+          "w_fabius_admits"
+        ],
+        [
+          "w_aurelia_latin",
+          "w_fabius_raw"
+        ],
+        [
+          "w_aurelia_brief",
+          "w_fabius_raw"
+        ],
+        [
+          "c_own_hide",
+          "w_fabius_raw"
+        ]
+      ],
+      "strength": "beleg",
+      "resolves": [
+        "k_who"
+      ],
+      "clears": [],
+      "implicates": [],
+      "canon": "design"
+    },
+    "d_exit_south": {
+      "title": "Abzug nach Süden",
+      "text": "Die Reiter kamen über den Nordweg, verließen das Dorf aber nach Süden zur Straße nach Aquileia. Die Berge waren eine Vermutung des Wachmanns, nicht seine Beobachtung.",
+      "requires": [
+        [
+          "w_guard_north",
+          "c_hoof_exit"
+        ]
+      ],
+      "strength": "beleg",
+      "resolves": [
+        "k_direction"
+      ],
+      "clears": [],
+      "implicates": [],
+      "canon": "design"
+    },
+    "d_no_northern_trail": {
+      "title": "Keine Spur nach Norden",
+      "text": "Gemischte Truppe, lateinische Befehle, Abzug zur Straße nach Aquileia: Nichts von dem, was du belegen kannst, führt zu einem Volk im Norden.",
+      "requires": [
+        [
+          "d_mixed_band",
+          "d_exit_south"
+        ]
+      ],
+      "strength": "beleg",
+      "resolves": [],
+      "clears": [
+        "sus_germani"
+      ],
+      "implicates": [],
+      "canon": "design"
+    },
+    "d_store_target": {
+      "title": "Der Speicher war das Ziel",
+      "text": "Befehle zum Speicher und Spuren, die vom Speicher wegführen: Die Reiter kamen für den Vorratsspeicher, nicht für beliebige Beute.",
+      "requires": [
+        [
+          "w_aurelia_latin",
+          "c_hoof_exit"
+        ],
+        [
+          "c_own_defend",
+          "c_hoof_exit"
+        ],
+        [
+          "c_own_hide",
+          "c_hoof_exit"
+        ]
+      ],
+      "strength": "beleg",
+      "resolves": [],
+      "clears": [],
+      "implicates": [],
+      "canon": "design"
+    },
+    "d_planned": {
+      "title": "Ein vorbereiteter Überfall",
+      "text": "Beschlagene Pferde am Nordweg Tage vorher und derselbe teure Beschlag in der Nacht: Jemand hat den Weg vorher erkundet.",
+      "requires": [
+        [
+          "c_hoof_shoe",
+          "c_i08_tracks"
+        ]
+      ],
+      "strength": "beleg",
+      "resolves": [],
+      "clears": [],
+      "implicates": [
+        "sus_riders"
+      ],
+      "canon": "design"
+    },
+    "d_paid_riders": {
+      "title": "Jemand mit Geld",
+      "text": "Stadtbeschläge und Kaufmannswachs bei Plünderern: Hinter den Reitern könnte jemand mit Geld stehen. Das ist eine Vermutung, noch kein Beweis.",
+      "requires": [
+        [
+          "c_hoof_shoe",
+          "c_seal_fragment"
+        ],
+        [
+          "c_hoof_shoe",
+          "w_julia_pouch"
+        ]
+      ],
+      "strength": "hypothese",
+      "resolves": [],
+      "clears": [],
+      "implicates": [
+        "sus_house"
+      ],
+      "canon": "design",
+      "ref": "I-15: Handelsnetz als Hypothese (PDF-S. 49)"
+    },
+    "d_hired_band": {
+      "title": "Eine bezahlte Reitergruppe",
+      "text": "Ein vorbereiteter Überfall auf den Speicher durch eine gemischte, gut ausgerüstete Truppe: Das waren keine hungrigen Nachbarn, sondern bezahlte Reiter ohne Feldzeichen.",
+      "requires": [
+        [
+          "d_planned",
+          "d_store_target"
+        ]
+      ],
+      "strength": "beleg",
+      "resolves": [],
+      "clears": [],
+      "implicates": [
+        "sus_riders"
+      ],
+      "canon": "design",
+      "reveals_band": true
+    },
+    "d_seal_house": {
+      "title": "Das Wachs des Lagerhauses",
+      "text": "Das Bild im Wachs gleicht dem Siegel des Lagerhauses am Natiso, von dem Cassia Ware bezieht. Cassia hat also eine Verbindung zu diesem Haus. Das allein beweist nichts.",
+      "requires": [
+        [
+          "c_seal_fragment",
+          "w_cassia_crate"
+        ]
+      ],
+      "strength": "hypothese",
+      "resolves": [],
+      "clears": [],
+      "implicates": [
+        "sus_cassia",
+        "sus_house"
+      ],
+      "canon": "design"
+    },
+    "d_seal_not_crate": {
+      "title": "Nicht von Cassias Kiste",
+      "text": "Cassias Siegel ist ganz und sitzt auf dem Deckel. Das Bruchstück trägt den Abdruck einer Schnur: Es stammt von einem Beutel oder Täfelchen, nicht von ihrer Ware.",
+      "requires": [
+        [
+          "c_seal_fragment",
+          "c_crate_intact"
+        ],
+        [
+          "c_seal_fragment",
+          "w_julia_pouch"
+        ]
+      ],
+      "strength": "beleg",
+      "resolves": [
+        "k_seal"
+      ],
+      "clears": [],
+      "implicates": [],
+      "canon": "design"
+    },
+    "d_carter_insider": {
+      "title": "Der Fuhrmann fragte aus",
+      "text": "Der Fuhrmann Tertius vom Lager am Natiso kam einen Tag zu früh und fragte nach Wachwechsel und Speicher. Er hat die Reiter mit Wissen versorgt – nicht Cassia und nicht der Wachmann.",
+      "requires": [
+        [
+          "w_guard_carter",
+          "c_delivery_mark"
+        ]
+      ],
+      "strength": "beleg",
+      "resolves": [],
+      "clears": [
+        "sus_guard"
+      ],
+      "implicates": [
+        "sus_carter"
+      ],
+      "canon": "design"
+    },
+    "d_cassia_cleared": {
+      "title": "Cassia ist Kundin, keine Komplizin",
+      "text": "Das Wachs stammt nicht von ihrer Kiste, und gefragt hat der Fuhrmann, nicht sie. Cassia ist selbst getäuscht worden.",
+      "requires": [
+        [
+          "d_seal_not_crate",
+          "d_carter_insider"
+        ]
+      ],
+      "strength": "beleg",
+      "resolves": [],
+      "clears": [
+        "sus_cassia"
+      ],
+      "implicates": [],
+      "canon": "design"
+    },
+    "d_warehouse_lead": {
+      "title": "Die Spur nach Aquileia",
+      "text": "Wachs und Liefermarke führen zum Lager am Natiso in Aquileia. Wer dort das Siegel führt, ist offen.",
+      "requires": [
+        [
+          "d_seal_house",
+          "c_delivery_mark"
+        ]
+      ],
+      "strength": "hypothese",
+      "resolves": [],
+      "clears": [],
+      "implicates": [
+        "sus_house"
+      ],
+      "canon": "canon+design",
+      "ref": "I-15 → I-20: Handelsnetz als Hypothese, nicht automatisch Schuld (PDF-S. 49)",
+      "opens_mission": "I-20"
+    },
+    "d_auxiliary_cloak": {
+      "title": "Ein Hilfsreitermantel",
+      "text": "Stoffrest und Händlerauskunft: Mindestens einer der Reiter trug einen Mantel, wie ihn entlassene Hilfsreiter in Aquileia kaufen.",
+      "requires": [
+        [
+          "c_cloth_scrap",
+          "w_sabina_cloth"
+        ]
+      ],
+      "slice": false,
+      "strength": "beleg",
+      "resolves": [],
+      "clears": [
+        "sus_germani"
+      ],
+      "implicates": [
+        "sus_riders"
+      ],
+      "canon": "design"
+    },
+    "d_motive_rights": {
+      "title": "Wem nützt der leere Speicher?",
+      "text": "Ohne Saatgut braucht Valdora einen Kredit. Das Lagerhaus bietet ihn an – gegen Speicher und Furtrecht.",
+      "requires": [
+        [
+          "c_house_offer",
+          "w_decimus_debt"
+        ]
+      ],
+      "slice": false,
+      "strength": "hypothese",
+      "resolves": [],
+      "clears": [
+        "sus_decimus"
+      ],
+      "implicates": [
+        "sus_house"
+      ],
+      "canon": "design"
+    },
+    "d_stolen_goods": {
+      "title": "Beute im Lagerhaus",
+      "text": "Sextus' gezeichnete Werkstücke liegen im Lagerhaus am Natiso. Die Beute aus Valdora ist dort angekommen.",
+      "requires": [
+        [
+          "c_sextus_marks",
+          "c_warehouse_iron"
+        ]
+      ],
+      "slice": false,
+      "strength": "beleg",
+      "resolves": [],
+      "clears": [],
+      "implicates": [
+        "sus_house",
+        "sus_procurator"
+      ],
+      "canon": "canon+design",
+      "ref": "I-20 Beweis mit Provenienz (PDF-S. 145)"
+    },
+    "d_contract_names": {
+      "title": "Ein Name auf dem Vertrag",
+      "text": "Der Lagervertrag nennt Gaius Varro Serranus als Pächter. Gesiegelt hat Philon. Ein Name auf einem Vertrag ist kein Befehl zum Überfall.",
+      "requires": [
+        [
+          "c_lease_contract",
+          "d_stolen_goods"
+        ]
+      ],
+      "slice": false,
+      "strength": "hypothese",
+      "resolves": [],
+      "clears": [],
+      "implicates": [
+        "sus_serranus",
+        "sus_procurator"
+      ],
+      "canon": "canon",
+      "ref": "D-040; I-20 (PDF-S. 145)"
+    }
+  },
+  "suspects": {
+    "sus_germani": {
+      "name": "»Germanen aus dem Norden«",
+      "kind": "group",
+      "accuse_label": "Melden: Germanen aus dem Norden haben Valdora überfallen",
+      "suspicion": [
+        "w_fabius_germani",
+        "w_fabius_paid"
+      ],
+      "proof": [],
+      "exculpation": [
+        "d_no_northern_trail",
+        "d_auxiliary_cloak"
+      ],
+      "canon": "plausible",
+      "ref": "Gerücht im Jahr des Ariovistkriegs (BG 1,31-54); D-040 verbietet automatische Stammeszuordnung"
+    },
+    "sus_cassia": {
+      "name": "Cassia, Händlerin",
+      "kind": "person",
+      "actor": "cassia",
+      "accuse_label": "Melden: Cassia steckt mit dem Lagerhaus und den Reitern unter einer Decke",
+      "suspicion": [
+        "d_seal_house"
+      ],
+      "proof": [],
+      "exculpation": [
+        "d_cassia_cleared"
+      ],
+      "canon": "design"
+    },
+    "sus_guard": {
+      "name": "Der Wachmann",
+      "kind": "person",
+      "actor": "severus",
+      "accuse_label": "Melden: Der Wachmann hat die Reiter hereingelassen",
+      "suspicion": [
+        "w_guard_carter"
+      ],
+      "proof": [],
+      "exculpation": [
+        "d_carter_insider"
+      ],
+      "canon": "design"
+    },
+    "sus_carter": {
+      "name": "Fuhrmann Tertius",
+      "kind": "person",
+      "actor": "carter_tertius",
+      "accuse_label": "Melden: Der Fuhrmann Tertius hat die Reiter mit Wissen versorgt",
+      "suspicion": [
+        "d_carter_insider"
+      ],
+      "proof": [
+        [
+          "d_carter_insider"
+        ]
+      ],
+      "exculpation": [],
+      "canon": "design"
+    },
+    "sus_riders": {
+      "name": "Bezahlte Reiter ohne Feldzeichen",
+      "kind": "band",
+      "actor": "red_seal_riders",
+      "accuse_label": "Melden: Eine bezahlte Reitergruppe ohne Feldzeichen hat den Speicher überfallen",
+      "suspicion": [
+        "d_planned",
+        "d_hired_band"
+      ],
+      "proof": [
+        [
+          "d_hired_band"
+        ]
+      ],
+      "exculpation": [],
+      "canon": "canon+design",
+      "ref": "PR #99: red_seal_riders, Reiter ohne Feldzeichen"
+    },
+    "sus_house": {
+      "name": "Das Haus mit dem roten Siegel",
+      "kind": "organisation",
+      "actor": "red_seal_house",
+      "accuse_label": "Melden: Das Lagerhaus mit dem roten Siegel hat den Überfall bezahlt",
+      "suspicion": [
+        "d_paid_riders",
+        "d_seal_house",
+        "d_warehouse_lead"
+      ],
+      "proof": [
+        [
+          "d_stolen_goods",
+          "d_motive_rights"
+        ]
+      ],
+      "exculpation": [],
+      "canon": "canon+design",
+      "ref": "PR #99: red_seal_house; I-15/I-20"
+    },
+    "sus_decimus": {
+      "name": "Decimus, Dorfverwalter",
+      "kind": "person",
+      "actor": "decimus",
+      "accuse_label": "Melden: Decimus hat das Dorf an das Lagerhaus verkauft",
+      "suspicion": [
+        "w_decimus_debt"
+      ],
+      "proof": [],
+      "exculpation": [
+        "d_motive_rights"
+      ],
+      "canon": "design",
+      "slice": false
+    },
+    "sus_procurator": {
+      "name": "Gaius Varro Philon, Prokurator",
+      "kind": "person",
+      "actor": "procurator_philon",
+      "accuse_label": "Melden: Der Prokurator Philon hat die Reiter bezahlt",
+      "suspicion": [
+        "d_stolen_goods",
+        "d_contract_names"
+      ],
+      "proof": [
+        [
+          "d_stolen_goods",
+          "w_warehouse_guard"
+        ]
+      ],
+      "exculpation": [],
+      "canon": "design",
+      "slice": false
+    },
+    "sus_serranus": {
+      "name": "Gaius Varro Serranus",
+      "kind": "person",
+      "actor": "serranus",
+      "accuse_label": "Melden: Gaius Varro Serranus hat den Überfall befohlen",
+      "suspicion": [
+        "c_lease_contract",
+        "d_contract_names"
+      ],
+      "proof": [
+        [
+          "d_serranus_order"
+        ]
+      ],
+      "exculpation": [],
+      "canon": "canon",
+      "slice": false,
+      "ref": "D-040: Der Lagervertrag nennt ihn, beweist aber keine Schuld. Beweis nicht vor Band III (III-07 bis III-10)."
+    }
+  },
+  "accusation": {
+    "authority": "decimus",
+    "rule": "Das Urteil des Dorfes folgt den Belegen des Spielers, nicht der verborgenen Wahrheit. Unbelegte Anschuldigungen sehen im Moment gleich aus; ob sie falsch oder nur verfrüht waren, zeigt sich erst über die verzögerten Folgen.",
+    "verdicts": {
+      "belegt": "Alle Belege einer Beweisvariante sind verknüpft.",
+      "unbelegt": "Es fehlt mindestens ein Beleg."
+    }
+  },
+  "disputes": {
+    "rule": "D-048: Konflikte entstehen nur aus Streit in Missionen oder Quests. Jede Anschuldigung erzeugt eine nachvollziehbare quest_dispute-Ursache gegen die beschuldigte Person oder Gruppe; eine Rücknahme schreibt eine Auflösung. Die Reiter werden nie automatisch einem Stamm zugeordnet; nur eine Spielerhandlung erzeugt einen Bezug, und dieser trägt seinen Belegstatus.",
+    "targets": {
+      "sus_germani": {
+        "against": "suebi_gau",
+        "against_kind": "tribe",
+        "note": "Das Gerücht verbindet Reiter aus dem Norden mit Ariovists Sueben. Kein Germane war beteiligt."
+      },
+      "sus_cassia": {
+        "against": "cassia",
+        "against_kind": "person",
+        "group": "valdora"
+      },
+      "sus_guard": {
+        "against": "severus",
+        "against_kind": "person",
+        "group": "valdora"
+      },
+      "sus_carter": {
+        "against": "red_seal_house",
+        "against_kind": "organisation",
+        "person": "carter_tertius"
+      },
+      "sus_riders": {
+        "against": "red_seal_riders",
+        "against_kind": "band"
+      },
+      "sus_house": {
+        "against": "red_seal_house",
+        "against_kind": "organisation"
+      },
+      "sus_decimus": {
+        "against": "decimus",
+        "against_kind": "person",
+        "group": "valdora"
+      },
+      "sus_procurator": {
+        "against": "red_seal_house",
+        "against_kind": "organisation",
+        "person": "procurator_philon"
+      },
+      "sus_serranus": {
+        "against": "red_seal_house",
+        "against_kind": "organisation",
+        "person": "serranus"
+      }
+    },
+    "causes": {
+      "proven": "proven_guilt",
+      "false": "false_accusation",
+      "premature": "unproven_accusation",
+      "withdrawn": "accusation_withdrawn"
+    },
+    "severity": {
+      "group": 2,
+      "band": 3,
+      "organisation": 2,
+      "tribe": 1,
+      "person": 1
+    }
+  },
+  "consequences": {
+    "I-10.bribe.fabius": {
+      "speaker_id": "fabius",
+      "line_id": "INV_FAB_PAID",
+      "immediate_effect": "Ein Denar wechselt den Besitzer; Fabius erzählt eine immer größere Geschichte.",
+      "delayed_hook": "Fabius erzählt im Dorf, dass du für Geschichten bezahlst; Aurelia hört davon.",
+      "long_term_effect": "Gekaufte Aussagen gelten nie als Beleg. Zeugen erwarten künftig Geld von dir.",
+      "relationship": {
+        "aurelia": {
+          "trust": -1
+        }
+      }
+    },
+    "I-10.accuse.sus_germani.false": {
+      "speaker_id": "decimus",
+      "line_id": "INV_DEC_ACC_GERMANI",
+      "immediate_effect": "Decimus schreibt nach Aquileia: Germanen aus dem Norden. Das Dorf atmet auf, weil es einen Namen hat.",
+      "delayed_hook": "Aquileia schickt eine Streife nach Norden; Händler aus dem Norden meiden den Markt (I-16/I-17).",
+      "long_term_effect": "quest_dispute gegen die Sueben aus einer falschen Anschuldigung; die wahre Spur nach Süden bleibt ungenutzt, bis du sie selbst belegst.",
+      "relationship": {
+        "decimus": {
+          "trust": 1
+        }
+      }
+    },
+    "I-10.accuse.sus_cassia.false": {
+      "speaker_id": "cassia",
+      "line_id": "INV_CAS_ACC",
+      "immediate_effect": "Decimus lässt Cassias Laden schließen, bis die Sache geklärt ist. Cassia spricht nicht mehr über ihre Kisten.",
+      "delayed_hook": "Ihr Handelsweg nach Aquileia ruht; der Liefernachweis ist nur nach einer Entschuldigung mit Entlastungsbeweis wieder zugänglich.",
+      "long_term_effect": "Cassia vergisst die Anschuldigung nicht; spätere Handelsangebote (I-17, II-02) bleiben vorsichtig.",
+      "relationship": {
+        "cassia": {
+          "trust": -8
+        },
+        "julia": {
+          "trust": -1
+        }
+      }
+    },
+    "I-10.accuse.sus_guard.false": {
+      "speaker_id": "severus",
+      "line_id": "INV_GRD_ACC",
+      "immediate_effect": "Decimus nimmt dem Wachmann den Torposten. Das Tor ist schwächer besetzt.",
+      "delayed_hook": "Aurelia bürgt für ihn; das Dorf ist gespalten.",
+      "long_term_effect": "Der Wachmann misstraut dir, bis du die Anschuldigung belegt zurücknimmst.",
+      "relationship": {
+        "severus": {
+          "trust": -6
+        },
+        "aurelia": {
+          "trust": -2
+        }
+      }
+    },
+    "I-10.accuse.sus_carter.proven": {
+      "speaker_id": "decimus",
+      "line_id": "INV_DEC_ACC_CARTER",
+      "immediate_effect": "Decimus schickt Wachmann und Boten mit deiner Beweiskette nach Aquileia: Der Fuhrmann Tertius soll befragt werden.",
+      "delayed_hook": "In Aquileia ist Tertius verschwunden; das Lagerhaus bestreitet jede Verbindung (I-19/I-20).",
+      "long_term_effect": "Rechtmäßiger quest_dispute zwischen Valdora und dem Haus mit dem roten Siegel; das Haus weiß nun, dass jemand ermittelt.",
+      "relationship": {
+        "decimus": {
+          "trust": 2
+        },
+        "severus": {
+          "trust": 2
+        }
+      }
+    },
+    "I-10.accuse.sus_carter.premature": {
+      "speaker_id": "decimus",
+      "line_id": "INV_DEC_ACC_CARTER_WEAK",
+      "immediate_effect": "Decimus zögert: Ein Name ohne Beleg. Er schreibt trotzdem nach Aquileia.",
+      "delayed_hook": "Das Lagerhaus ist gewarnt; Tertius ist fort, bevor jemand fragt.",
+      "long_term_effect": "Unbelegter quest_dispute; das Haus sieht in Valdora einen Gegner.",
+      "relationship": {
+        "decimus": {
+          "trust": -1
+        }
+      }
+    },
+    "I-10.accuse.sus_riders.proven": {
+      "speaker_id": "decimus",
+      "line_id": "INV_DEC_ACC_RIDERS",
+      "immediate_effect": "Decimus meldet nach Aquileia: eine bezahlte Reitergruppe ohne Feldzeichen, keine Stammesfehde.",
+      "delayed_hook": "Aquileias Straßenwachen achten auf beschlagene Reiterpferde (I-19).",
+      "long_term_effect": "Rechtmäßiger quest_dispute zwischen Valdora und den Reitern ohne Feldzeichen; die Gruppe ist für den Spieler sichtbar.",
+      "relationship": {
+        "decimus": {
+          "trust": 2
+        }
+      }
+    },
+    "I-10.accuse.sus_riders.premature": {
+      "speaker_id": "decimus",
+      "line_id": "INV_DEC_ACC_RIDERS_WEAK",
+      "immediate_effect": "»Bezahlte Reiter? Wer soll sie bezahlt haben?« Decimus glaubt dir nicht ohne Beleg.",
+      "delayed_hook": "Die Reiter erfahren aus dem Dorfgerede, dass jemand Fragen stellt.",
+      "long_term_effect": "Unbelegter quest_dispute; spätere Belege wiegen schwerer, wenn sie die frühe Behauptung bestätigen.",
+      "relationship": {
+        "decimus": {
+          "trust": -1
+        }
+      }
+    },
+    "I-10.accuse.sus_house.premature": {
+      "speaker_id": "decimus",
+      "line_id": "INV_DEC_ACC_HOUSE_WEAK",
+      "immediate_effect": "Decimus wird blass: »Weißt du, wem wir dort Geld schulden?« Er verbietet dir, darüber zu reden.",
+      "delayed_hook": "Der Prokurator erfährt von der Beschuldigung und bietet Decimus seinen Kredit schneller an (I-16).",
+      "long_term_effect": "Unbelegter quest_dispute gegen das Haus; dessen Patronage wird dir gegenüber feindselig.",
+      "relationship": {
+        "decimus": {
+          "trust": -3
+        }
+      }
+    },
+    "I-10.withdraw.sus_germani": {
+      "speaker_id": "decimus",
+      "line_id": "INV_DEC_WITHDRAW_GERMANI",
+      "immediate_effect": "Decimus schreibt einen zweiten Brief nach Aquileia: Die Herkunft der Reiter ist ungeklärt, die Spur führt nach Süden.",
+      "delayed_hook": "Die Streife nach Norden wird zurückgerufen; Händler aus dem Norden kehren zögernd zurück.",
+      "long_term_effect": "Der quest_dispute gegen die Sueben wird mit Begründung zurückgenommen.",
+      "relationship": {
+        "decimus": {
+          "trust": -1
+        }
+      }
+    },
+    "I-10.withdraw.sus_cassia": {
+      "speaker_id": "cassia",
+      "line_id": "INV_CAS_WITHDRAW",
+      "immediate_effect": "Du nimmst die Anschuldigung vor Decimus zurück und zeigst die Entlastung. Cassias Laden öffnet wieder.",
+      "delayed_hook": "Cassia redet wieder mit dir über Lieferwege; ihr Vertrauen kehrt nur teilweise zurück.",
+      "long_term_effect": "Die Erinnerung an die falsche Anschuldigung bleibt; eine Entschuldigung macht sie nicht ungeschehen.",
+      "relationship": {
+        "cassia": {
+          "trust": 4
+        }
+      }
+    },
+    "I-10.withdraw.sus_guard": {
+      "speaker_id": "severus",
+      "line_id": "INV_GRD_WITHDRAW",
+      "immediate_effect": "Der Wachmann erhält seinen Torposten zurück.",
+      "delayed_hook": "Er erzählt dir mehr über Fremde am Tor, wenn sie wiederkommen.",
+      "long_term_effect": "Vertrauen kehrt teilweise zurück.",
+      "relationship": {
+        "severus": {
+          "trust": 3
+        }
+      }
+    }
+  },
+  "lines": {
+    "INV_DEC_ACCUSE_PROMPT": {
+      "speaker_id": "decimus",
+      "text": "»Du willst eine Anschuldigung erheben? Dann sag mir, wen – und zeig mir, was du weißt. Ich schreibe nach Aquileia nur, was ich vertreten kann.«"
+    },
+    "INV_DEC_CLEARED_REFUSE": {
+      "speaker_id": "decimus",
+      "text": "»Du hast mir selbst gezeigt, dass das nicht stimmt. Ich schreibe nichts gegen besseres Wissen.«"
+    },
+    "INV_LINK_ACCEPT": {
+      "speaker_id": "chronik",
+      "text": "Die Verbindung hält: %s"
+    },
+    "INV_LINK_CONTRADICTION": {
+      "speaker_id": "chronik",
+      "text": "Diese beiden widersprechen sich. Du brauchst mehr, um zu entscheiden, wer sich irrt."
+    },
+    "INV_LINK_REJECT": {
+      "speaker_id": "chronik",
+      "text": "Mit dem, was du weißt, lässt sich diese Verbindung nicht belegen."
+    },
+    "INV_LINK_BOUGHT": {
+      "speaker_id": "chronik",
+      "text": "Gekaufte Worte belegen nichts."
+    }
+  },
+  "missions": {
+    "I-08": {
+      "page": "PDF-S. 133 (Fassung 2.0 S. 075)",
+      "role": "Erste Spuren und Aussagen; Quellen trennen, kein Täter.",
+      "clues": [
+        "c_i08_tracks"
+      ],
+      "status": "Daten (Domänenskript und Tests ausstehend)"
+    },
+    "I-09": {
+      "page": "PDF-S. 134 (S. 076)",
+      "role": "Abendpositionen und Besitzlage werden gespeichert; später Alibi-Grundlage.",
+      "clues": [],
+      "status": "Design"
+    },
+    "I-10": {
+      "page": "PDF-S. 135 (S. 077); Beat-Blatt PDF-S. 16",
+      "role": "Etwa dreißig Reiter; eigene Wahrnehmung je Familienweg; Spuren und Siegelwachs am Speicher; vier Zeugen.",
+      "clues": [
+        "c_own_defend",
+        "c_own_hide",
+        "c_hoof_exit",
+        "c_hoof_shoe",
+        "c_seal_fragment",
+        "w_aurelia_brief",
+        "w_fabius_raw",
+        "w_guard_north"
+      ],
+      "status": "Daten (Domänenskript und Tests ausstehend)"
+    },
+    "I-11": {
+      "page": "PDF-S. 136 (S. 078)",
+      "role": "Sextus stirbt; fehlende gezeichnete Werkstücke als späterer Abgleich.",
+      "clues": [
+        "c_sextus_marks"
+      ],
+      "status": "Daten"
+    },
+    "I-12": {
+      "page": "PDF-S. 137 (S. 079)",
+      "role": "Freie Wahl ›Zeugen befragen‹; Julia als Zeugin nur bei Überleben.",
+      "clues": [
+        "w_julia_pouch"
+      ],
+      "status": "Daten (Domänenskript und Tests ausstehend)"
+    },
+    "I-13": {
+      "page": "PDF-S. 138 (S. 080)",
+      "role": "Morgen: Aussagen verändern sich (Erinnerung, Dorfgerede).",
+      "clues": [
+        "w_aurelia_latin",
+        "w_fabius_germani"
+      ],
+      "status": "Daten (Domänenskript und Tests ausstehend)"
+    },
+    "I-14": {
+      "page": "PDF-S. 139 (S. 081)",
+      "role": "Der Schwur eröffnet Ermittlungsabsicht; kein Beruf, keine Waffe.",
+      "clues": [],
+      "status": "Daten (Domänenskript und Tests ausstehend)"
+    },
+    "I-15": {
+      "page": "PDF-S. 140 (S. 082)",
+      "role": "Pferdebeschlag, Stoffrest, Liefermarke, rotes Wachssiegel methodisch vergleichen; Handelsnetz als Hypothese.",
+      "clues": [
+        "c_cloth_scrap",
+        "w_sabina_cloth",
+        "c_ford_tracks",
+        "c_delivery_mark"
+      ],
+      "status": "Daten (Domänenskript und Tests ausstehend)"
+    },
+    "I-16": {
+      "page": "PDF-S. 141 (S. 083)",
+      "role": "Wiederaufbau; Kreditangebot des Prokurators; Decimus' Schuldschein.",
+      "clues": [
+        "c_house_offer",
+        "w_decimus_debt"
+      ],
+      "status": "Daten"
+    },
+    "I-17": {
+      "page": "PDF-S. 142 (S. 084)",
+      "role": "Holzpreise als Handelsspur.",
+      "clues": [
+        "c_wood_prices"
+      ],
+      "status": "Daten"
+    },
+    "I-18": {
+      "page": "PDF-S. 143 (S. 085)",
+      "role": "Winter; Käufer für die Schmiede; Julia nur gemäß I-10.",
+      "clues": [],
+      "status": "Design"
+    },
+    "I-19": {
+      "page": "PDF-S. 144 (S. 086)",
+      "role": "Aquileia; Kontakt aus tatsächlicher Empfehlung; Zöllner an der Brücke.",
+      "clues": [
+        "w_officer_contact"
+      ],
+      "status": "Daten"
+    },
+    "I-20": {
+      "page": "PDF-S. 145 (S. 087)",
+      "role": "Lagervertrag nennt Serranus ohne Schuldbeweis; Beute mit Provenienz; Wachrouten.",
+      "clues": [
+        "c_lease_contract",
+        "c_warehouse_iron",
+        "w_warehouse_guard"
+      ],
+      "status": "Daten"
+    }
+  }
+}
