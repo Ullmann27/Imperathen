@@ -6,6 +6,7 @@ signal closed
 signal message(text: String)
 const Model = preload("res://scripts/domain/world_model.gd")
 const Trade = preload("res://scripts/city_trade.gd")
+const LifeSession = preload("res://scripts/world/city_life_session.gd")
 const MarketPanel = preload("res://scripts/city_support_panel.gd")
 const MANIFEST := "res://assets/city_detail/shops/city_market_anchors.json"
 const SAVE_PATH := "user://imperathen_city_trade.json"
@@ -18,6 +19,8 @@ var sites: Dictionary = {}
 var model
 var panel
 var _serial := 0
+var _living_city: LifeSession
+
 
 static func verified_sites(city: Node3D) -> Dictionary:
 	if not is_instance_valid(city) or city.name != "RomanCity" or not city.is_inside_tree():
@@ -87,6 +90,14 @@ func setup(city: Node3D, body: CharacterBody3D, persistent: bool, stable_trader:
 	_sync()
 	return true
 
+## Opt-in QA bridge. Never attach to the persisted legacy free-city wallet:
+## campaign and city simulation must eventually be committed in ONE save.
+func attach_living_city(session: LifeSession) -> bool:
+	if not available or persist or is_open() or _living_city != null or session == null or session.life == null:
+		return false
+	_living_city = session
+	return true
+
 func is_open() -> bool:
 	return available and is_instance_valid(panel) and panel.is_open()
 
@@ -141,11 +152,33 @@ func execute(command: String, args: Dictionary) -> Dictionary:
 		return {"ok": false, "message": "Kein aktiver Handelsdialog."}
 	if args.has("shop_id") and str(args.shop_id) != str(panel.shop_id):
 		return {"ok": false, "message": "Der Auftrag gehört zu einem anderen Marktstand."}
+	var coupled := _living_city != null and command in ["city_buy", "city_sell"]
+	var buying := command == "city_buy"
+	var amount := 0
+	if coupled:
+		var problem: String = Trade.validate_arguments(command, args)
+		if not problem.is_empty():
+			panel.notify(problem)
+			message.emit(problem)
+			return {"ok": false, "message": problem}
+		var item: Dictionary = Trade.item_catalog()[str(args.item_id)]
+		amount = int(args.quantity) * int(item.price if buying else item.sell_price)
+		var issue: String = _living_city.trade_error(str(args.shop_id), str(args.item_id), int(args.quantity), amount, buying)
+		if not issue.is_empty():
+			var notice := "Stadtwirtschaft: Handel nicht möglich (%s)." % issue
+			panel.notify(notice)
+			message.emit(notice)
+			return {"ok": false, "message": notice}
 	model.set_player_position(player.global_position)
 	var before: Dictionary = model.data.duplicate(true)
 	_serial += 1
 	var id := "city-%d-%d-%d" % [Time.get_ticks_usec(), int(model.data.revision), _serial]
 	var result: Dictionary = model.execute(command, args, id)
+	if result.get("ok", false) and coupled:
+		if not _living_city.book_trade(str(args.shop_id), str(args.item_id), int(args.quantity), amount, buying):
+			model.data = before
+			model.changed.emit()
+			result = {"ok": false, "message": "Handel zurückgenommen: Stadtwirtschaft konnte nicht buchen."}
 	if result.get("ok", false) and persist:
 		var saved: Dictionary = model.save_game(save_path)
 		if not saved.get("ok", false):

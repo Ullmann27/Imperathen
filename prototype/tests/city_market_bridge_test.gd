@@ -4,6 +4,8 @@ extends SceneTree
 const Bridge = preload("res://scripts/world/city_market_bridge.gd")
 const Model = preload("res://scripts/domain/world_model.gd")
 const Trade = preload("res://scripts/city_trade.gd")
+const Session = preload("res://scripts/world/city_life_session.gd")
+const Calendar = preload("res://scripts/domain/world_calendar.gd")
 var failures := 0
 var checks := 0
 
@@ -44,14 +46,46 @@ func _run() -> void:
 		_check(not bridge.model.execute("city_buy", args).ok, "old miniature district cannot buy in real city")
 		_check(not bridge.open_shop(), "cannot open a distant shop")
 		player.position = bakery
+		var session := Session.new()
+		var clock := Calendar.new_clock(Calendar.campaign_start_jdn(), 12 * 3600)
+		var ready := session.start(clock, 20261126)
+		_check(ready, "city life session starts from the supplied calendar")
+		if ready:
+			for _slice in range(100):
+				if bool(session.sync_to(clock).get("done", false)):
+					break
+			_check(bool(session.last_sync.get("done", false)), "city simulation reaches supplied clock")
+			_check(not session.sync_to(Calendar.new_clock(int(clock.jdn), int(clock.second) - 1)).ok, "clock rollback refused")
+			_check(not session.sync_to(Calendar.new_clock(Calendar.first_day_of_year(-57), 0)).ok, "unimplemented era migration refused")
+			bridge.persist = true
+			_check(not bridge.attach_living_city(session), "separate persistent save is refused")
+			bridge.persist = false
+			_check(bridge.attach_living_city(session), "QA bridge attaches to city life")
+		var business := -1 if not ready else session.life.business_for_shop("bakery")
+		_check(business >= 0, "mapped bakery business exists")
+		var stock := int(session.life.state.businesses[business].stock.bread) if business >= 0 else -1
+		var till := int(session.life.state.businesses[business].till) if business >= 0 else -1
 		_check(bridge.open_shop(), "real shop opens at its authored frontage")
 		_check(bridge.panel.shop_id == "bakery" and not bridge.panel.pad.visible, "one embedded modal, no extra touch stick")
 		_check(bridge.execute("city_buy", args).ok, "buy bread at actual frontage")
 		_check(int(bridge.model.data.resources.denarii) == initial - 2, "authoritative debit")
 		_check(int(bridge.model.data.village.city_trade.inventory.bread) == 1, "authoritative inventory")
+		if business >= 0:
+			_check(int(session.life.state.businesses[business].stock.bread) == stock - 1, "city population and player shop share the booked stock movement")
+			_check(int(session.life.state.businesses[business].till) == till + 2 * 64, "city cash equals authoritative player debit")
+			_check(session.life.audit().ok, "city ledger balances")
 		player.position += Vector3(8, 0, 0)
+		var before_rejection := JSON.stringify(session.save_state(), "", true)
 		_check(not bridge.execute("city_buy", args).ok, "open modal does not bypass proximity")
+		_check(JSON.stringify(session.save_state(), "", true) == before_rejection, "failed WorldModel command leaves city simulation unchanged")
 		_check(int(bridge.model.data.resources.denarii) == initial - 2, "rejected purchase did not charge")
+		player.position = bakery
+		_check(bridge.execute("city_sell", args).ok, "sale is booked through the same bridge")
+		_check(int(bridge.model.data.resources.denarii) == initial - 1, "sale credits exact catalog price")
+		if business >= 0:
+			_check(int(session.life.state.businesses[business].stock.bread) == stock, "sale restores simulated stock")
+			_check(int(session.life.state.businesses[business].till) == till + 64, "net cash matches purchase and sale")
+			_check(session.life.audit().ok, "ledger remains balanced after sale")
 		bridge.close()
 		_check(bridge.open_inventory(), "inventory opens independently of shop")
 		bridge.close()
