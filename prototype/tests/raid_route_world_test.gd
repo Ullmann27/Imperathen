@@ -2,7 +2,7 @@ extends SceneTree
 ## Raiders approach through the real north gate of the production village.
 ## Real GameWorld geometry and colliders, 60-Hz physics, the authoritative raid
 ## clock in WorldModel.advance and the production observe/advance/sync order.
-## Usage: --script res://tests/raid_route_world_test.gd -- part=a|b|c
+## Usage: --script res://tests/raid_route_world_test.gd -- part=a|b|c|d
 ##   part a: obstacle-model drift guard, street edges swept in physics,
 ##           rules-only route (raids 1-4), physical raids 1 and 2.
 ##   part b: physical raids 3 and 4 (five and six raiders).
@@ -18,7 +18,8 @@ const Route = preload("res://scripts/domain/raid_route.gd")
 const Strike = preload("res://scripts/domain/raider_strike.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
-const SCREENPLAY_ACTIONS := {"i02_basket":"basket_check", "i02_correct":"basket_correct", "i03_marcus":"marcus_friend",
+const I03Support = preload("res://tests/i03_support.gd")
+const SCREENPLAY_ACTIONS := {"i02_basket":"basket_check", "i02_correct":"basket_correct",
 	"i07_water_fetch":"i07_water_fetch", "i07_water_bring":"i07_water_bring", "i08_tracks":"i08_inspect", "i08_report":"i08_report"}
 const DT := 1.0/60.0
 const PLAYER_AT := Vector3(-14.0,0.91,-2.0)
@@ -106,8 +107,8 @@ func _raid_model(number: int, childhood: bool, action_combat := true) -> Model:
 
 
 func _play_childhood_to_night(model: Model) -> bool:
-	# Same command sequence as tests/village_childhood_test.gd (_complete).
-	for _attempt in Childhood.STEPS.size()+16:
+	# The authored errands contribute additional steps between the legacy chapter milestones.
+	for _attempt in Childhood.STEPS.size() + 40:
 		var view: Dictionary = Childhood.view(model.data)
 		if view.is_empty():
 			return false
@@ -116,6 +117,15 @@ func _play_childhood_to_night(model: Model) -> bool:
 		var stage := str(view.get("stage",""))
 		var point: Vector2 = view.point
 		model.set_player_position(Vector3(point.x,1.0,point.y))
+		if stage.begins_with("i01_") or stage.begins_with("i04_"):
+			var authored: Dictionary = model.execute("village_childhood_action", view.actions[0].payload)
+			if not _check_authored_step(stage, authored):
+				return false
+			continue
+		if stage.begins_with("i03_"):
+			if not _check_authored_step(stage, I03Support.play_stage(model)):
+				return false
+			continue
 		if SCREENPLAY_ACTIONS.has(stage):
 			if not _meet(model,str(view.get("target_npc",""))):
 				return false
@@ -134,6 +144,13 @@ func _play_childhood_to_night(model: Model) -> bool:
 		var action := "market_fair" if step.id == "market_trade" else str(step.id)
 		if not model.execute("village_childhood_action",{"action_id":action}).ok:
 			return false
+	return false
+
+
+func _check_authored_step(stage: String, result: Dictionary) -> bool:
+	if bool(result.get("ok", false)):
+		return true
+	printerr("Childhood route stalled at %s: %s" % [stage, result.get("message", "")])
 	return false
 
 
