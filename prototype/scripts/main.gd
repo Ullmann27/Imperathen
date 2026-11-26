@@ -1547,6 +1547,9 @@ func _open_city_exploration(campaign_visit := false, from_road := false, imperia
 		city_exploration.party_visit.passengers = passengers
 		city_exploration.campaign_path = SAVE_PATH
 		city_exploration.world_jdn = int(model.data.calendar.clock.jdn)
+		# The same authored monument is available in the persistent campaign
+		# whenever the authoritative historical date permits it.
+		city_exploration.use_flavian_kit = true
 	elif imperial_visit:
 		city_exploration.world_jdn = preload("res://scripts/domain/world_calendar.gd").to_jdn(100, 6, 1)
 		city_exploration.use_flavian_kit = true

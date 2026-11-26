@@ -14,6 +14,9 @@ const UNLOAD_BUDGET := 8
 ## Keep the adjacent ground ready within one meter, including low quality.
 const SUPPORT_MARGIN_M := 1.0
 const MAX_RESIDENT_SECTORS := 145
+const LandSurface = preload("res://scripts/world/land/land_surface.gd")
+const AuthoredGround = preload("res://scripts/world/village/brook.gd")
+const OPEN_GROUND := Color(0, 0, 0, 1)
 ## Authored sRGB ground albedo; the material declares vertex_color_is_srgb, which
 ## is a no-op in the Compatibility renderer and converts in Forward+/Mobile.
 ## These are the former #67704b/#9b9868/#8c8877 values taken through one
@@ -34,7 +37,7 @@ var _retiring: Array[String] = []
 var _support_ids: Array[String] = []
 var _collision_targets: Dictionary = {}
 var _collision_order: Array[String] = []
-var _ground: StandardMaterial3D
+var ground_material: ShaderMaterial
 var loaded_triangles := 0
 var _last_mesh_builds := 0
 var _last_collider_builds := 0
@@ -45,11 +48,7 @@ func _ready() -> void:
 	waystation.name = "Weidenhof"
 	add_child(waystation)
 	waystation.setup(surface_height)
-	_ground = StandardMaterial3D.new()
-	_ground.vertex_color_use_as_albedo = true
-	_ground.vertex_color_is_srgb = true
-	_ground.roughness = 0.95
-	_ground.cull_mode = BaseMaterial3D.CULL_BACK
+	ground_material = LandSurface.make_terrain()
 
 
 func follow(position: Vector3, quality: String) -> void:
@@ -116,7 +115,9 @@ func follow(position: Vector3, quality: String) -> void:
 		if sectors.has(id) and not sectors[id].has_node("GroundCollision"):
 			_set_collision(sectors[id], true)
 			_last_collider_builds += 1
-	loaded_triangles = sectors.size() * GRID * GRID * 2
+	loaded_triangles = 0
+	for node: Node3D in sectors.values():
+		loaded_triangles += int(node.get_meta("triangles"))
 
 
 func _support_sectors(position: Vector3, cell: Vector2i) -> Array[String]:
@@ -164,26 +165,43 @@ func _make_sector(entry: Dictionary) -> Node3D:
 	node.name = "Terrain_" + str(entry.id).replace(":", "_")
 	var origin: Array = entry.origin
 	node.position = Vector3(float(origin[0]), 0, float(origin[2]))
-	var surface := SurfaceTool.new()
-	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
-	surface.set_smooth_group(0)
+	# Heights on the sector grid plus one cell of margin: every vertex takes
+	# its normal from the height field itself, so shading continues across
+	# sector borders (per-sector smoothing would leave a lighting seam).
 	var step := Plan.SECTOR_SIZE_M / float(GRID)
+	var side := GRID + 3
+	var heights := PackedFloat32Array()
+	heights.resize(side * side)
+	for z in side:
+		for x in side:
+			heights[z * side + x] = Plan.terrain_height(Vector2(node.position.x + (x - 1) * step, node.position.z + (z - 1) * step))
+	var vertices := PackedVector3Array()
+	var normals := PackedVector3Array()
+	var colors := PackedColorArray()
+	var uvs := PackedVector2Array()
 	for z in GRID:
 		for x in GRID:
-			var a := _vertex(node.position, x * step, z * step)
-			var b := _vertex(node.position, (x + 1) * step, z * step)
-			var c := _vertex(node.position, x * step, (z + 1) * step)
-			var d := _vertex(node.position, (x + 1) * step, (z + 1) * step)
-			for point: Vector3 in [a, b, c, b, d, c]:
-				var global_point := point + node.position
-				surface.set_color(ground_color(global_point))
-				surface.set_uv(Vector2(global_point.x, global_point.z) * 0.04)
-				surface.add_vertex(point)
-	surface.generate_normals()
+			if AuthoredGround.replaces_terrain(Vector2(node.position.x + (x + .5) * step, node.position.z + (z + .5) * step)):
+				continue
+			for corner: Vector2i in [Vector2i(x, z), Vector2i(x + 1, z), Vector2i(x, z + 1), Vector2i(x + 1, z), Vector2i(x + 1, z + 1), Vector2i(x, z + 1)]:
+				var index := (corner.y + 1) * side + corner.x + 1
+				vertices.append(Vector3(corner.x * step, heights[index] - 0.06, corner.y * step))
+				normals.append(Vector3(heights[index - 1] - heights[index + 1], 2.0 * step, heights[index - side] - heights[index + side]).normalized())
+				colors.append(OPEN_GROUND)
+				uvs.append(Vector2(node.position.x + corner.x * step, node.position.z + corner.y * step) * 0.04)
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = vertices
+	arrays[Mesh.ARRAY_NORMAL] = normals
+	arrays[Mesh.ARRAY_COLOR] = colors
+	arrays[Mesh.ARRAY_TEX_UV] = uvs
+	node.set_meta("triangles", vertices.size() / 3)
+	var ground_mesh := ArrayMesh.new()
+	ground_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	var mesh := MeshInstance3D.new()
 	mesh.name = "Ground"
-	mesh.mesh = surface.commit()
-	mesh.material_override = _ground
+	mesh.mesh = ground_mesh
+	mesh.material_override = ground_material
 	node.add_child(mesh)
 	Footpath.add_entrance(node, Plan.SECTOR_SIZE_M)
 	Footpath.add_tracks(node,Plan.SECTOR_SIZE_M,surface_height)

@@ -228,6 +228,7 @@ def main():
             ("world_state", ["--script", "res://tests/world_state_test.gd"], "WORLD_STATE_PASS"),
             ("figure_gallery", ["--fixed-fps", "60", "--script", "res://tests/figure_gallery_test.gd"], "failures=0 real_textures=true"),
             ("landscape", ["--script", str(ROOT / "art/landscape/verify.gd")], None),
+            ("village_landscape", ["--fixed-fps", "60", "--script", "res://tests/village_landscape_test.gd"], "VILLAGE_LANDSCAPE_PASS"),
             ("vegetation", ["--script", "res://tests/vegetation_test.gd"], "VEGETATION_PASS"),
             ("valdora_house_family", ["--script", str(ROOT / "art/architecture/valdora_family/verify_family.gd")], "VALDORA_FAMILY errors []"),
             ("regional_workers", ["--fixed-fps", "60", "--script", "res://tests/regional_worker_test.gd"], "REGIONAL_WORKERS_PASS"),

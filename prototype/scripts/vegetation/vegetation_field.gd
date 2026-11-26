@@ -95,9 +95,20 @@ func _build_cells() -> void:
 		var box := AABB(at - Vector3(reach, 0.5, reach), Vector3(reach * 2.0, info.height * s + 1.0, reach * 2.0))
 		cell.aabb = cell.aabb.merge(box)
 		placed_trees += 1
-	if ecology.colliders.is_empty() or not is_inside_tree():
+	_attach_collision()
+
+
+func _enter_tree() -> void:
+	# A campaign city visit temporarily detaches the entire village.
+	if ecology != null:
+		_attach_collision.call_deferred()
+
+
+func _attach_collision() -> void:
+	if _body.is_valid() or ecology == null or ecology.colliders.is_empty() or not is_inside_tree():
 		return
 	_body = PhysicsServer3D.body_create()
+	PhysicsServer3D.body_attach_object_instance_id(_body, get_instance_id())
 	PhysicsServer3D.body_set_mode(_body, PhysicsServer3D.BODY_MODE_STATIC)
 	PhysicsServer3D.body_set_collision_layer(_body, 1)
 	PhysicsServer3D.body_set_collision_mask(_body, 0)

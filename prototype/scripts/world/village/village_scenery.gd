@@ -5,9 +5,10 @@ const Art = preload("res://scripts/world/village_art.gd")
 const PROFILE_DATA = preload("res://assets/quality_profiles.json")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Hills = preload("res://scripts/world/village/backdrop_hills.gd")
-const WATER_LEVEL := .021
-## The brook surfaces at a spring whose rounded end narrows over this length.
-const SPRING_ROUNDING_M := 3.5
+const Land = preload("res://scripts/world/village/valdora_land.gd")
+const LandSurface = preload("res://scripts/world/land/land_surface.gd")
+const Brook = preload("res://scripts/world/village/brook.gd")
+const WATER_LEVEL := Land.WATER_SURFACE_Y
 const Look = preload("res://scripts/rendering/village_look.gd")
 const HouseFamily = preload("res://scripts/world/village/architecture/valdora_house_family.gd")
 const Grove = preload("res://scripts/visuals/grove.gd")
@@ -38,6 +39,8 @@ var _sky_tick := 0.0
 var _fixed_time := -1.0
 ## Northern end of the visible brook water, at the foot of the backdrop hills.
 var brook_source_z := -95.0
+var land_materials: Array[ShaderMaterial] = []
+var _season_tint := Color.WHITE
 
 func _init() -> void:
 	ground_material.shader = preload("res://scripts/world/village/ground.gdshader")
@@ -47,7 +50,10 @@ func _init() -> void:
 	ground_material.set_shader_parameter("verge_color",preload("res://assets/village/look/meadow_sod_color.png"))
 	ground_material.set_shader_parameter("road_relief",preload("res://assets/village/look/trodden_earth_relief.png"))
 	ground_material.set_shader_parameter("verge_relief",preload("res://assets/village/look/meadow_sod_relief.png"))
+	LandSurface.dress_village_ground(ground_material)
+	land_materials.append(ground_material)
 	water_material.shader = preload("res://scripts/world/village/water.gdshader")
+	water_material.set_shader_parameter("ripple",preload("res://assets/landscape/water_ripple.png"))
 	grass_material.shader = preload("res://scripts/world/village/breeze.gdshader")
 	rain_material.shader = preload("res://scripts/world/village/drizzle.gdshader")
 	sky_material.shader = preload("res://scripts/world/village/clouds.gdshader")
@@ -67,6 +73,7 @@ func _process(delta: float) -> void:
 	if not is_visible_in_tree():
 		return
 	_time += delta
+	_sync_atmosphere()
 	_sky_tick += delta
 	if _sky_tick >= 2.0 and _fixed_time < 0 and profile != "low":
 		_sky_tick = 0
@@ -102,6 +109,8 @@ func apply_season(index: int, sun: DirectionalLight3D, environment: Environment)
 	var soil := [Color("#e4ecb4"),Color("#e9d29e"),Color("#d8bea5"),Color("#c1c9c9")]
 	var leaves := [Color("#f0ffcf"),Color("#f3daa1"),Color("#cca67a"),Color("#b6b9a4")]
 	ground_material.set_shader_parameter("season_tint",soil[season])
+	_season_tint = soil[season]
+	LandSurface.apply_season(land_materials,season,_season_tint)
 	grass_material.set_shader_parameter("season_tint",leaves[season])
 	grass_material.set_shader_parameter("gust",GUST[season])
 	grass_material.set_shader_parameter("bloom",[1.0,.85,.25,0.0][season])
@@ -114,46 +123,30 @@ func apply_season(index: int, sun: DirectionalLight3D, environment: Environment)
 		_rain.visible = season == 2 and profile != "low"
 
 func create_land() -> void:
+	brook_source_z = _brook_source()
+	# One continuous ground: level land either side of the brook and the sunk
+	# brook bed between them. The bed's collision is its visible surface.
 	var ground := MeshInstance3D.new()
 	ground.name = "TrackAndVerge"
-	var plain := PlaneMesh.new()
-	plain.size = Vector2(180,170)
-	ground.mesh = plain
+	ground.mesh = Brook.ground_mesh(brook_source_z)
 	ground.material_override = ground_material
-	ground.position = Vector3(0,-.008,-15)
 	add_child(ground)
-	# Keep the same solid ground and bridge crossing under the continuous visual surface.
-	Art.box_collider(self,Vector3(180,.50,170),Vector3(0,-.26,-15))
-	brook_source_z = _brook_source()
-	# The outer edges and the hill foot hand the ground colour over to the
-	# regional terrain, which lies 5.2 cm lower and carries no texture.
+	for span: Vector2 in [Vector2(Brook.PLANE.position.x,Brook.STRIP_WEST_X),Vector2(Brook.STRIP_EAST_X,Brook.PLANE.end.x)]:
+		Art.box_collider(self,Vector3(span.y-span.x,.50,Brook.PLANE.size.y),
+			Vector3((span.x+span.y)*.5,-.26,Brook.PLANE.get_center().y))
+	var bed := StaticBody3D.new()
+	bed.name = "BrookBedCollision"
+	bed.collision_layer = 1
+	bed.collision_mask = 0
+	var bed_shape := CollisionShape3D.new()
+	bed_shape.shape = Brook.collision_shape(brook_source_z)
+	bed.add_child(bed_shape)
+	add_child(bed)
 	ground_material.set_shader_parameter("brook_source_z",brook_source_z)
-	ground_material.set_shader_parameter("handoff_bounds",Vector4(ground.position.x-plain.size.x*.5,
-		ground.position.x+plain.size.x*.5,Hills.FOOT_Z-Hills.FOOT_VARIATION_M,ground.position.z+plain.size.y*.5))
-	ground_material.set_shader_parameter("terrain_dry",Hills.Terrain.EARTH_DRY)
-	ground_material.set_shader_parameter("terrain_fresh",Hills.Terrain.EARTH_FRESH)
-	var water := SurfaceTool.new()
-	water.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var rows: Array[float] = []
-	var z_row := brook_source_z
-	while z_row < 65.0:
-		rows.append(z_row)
-		var regular := -95.0+ceilf((z_row+95.0001)/2.0)*2.0
-		z_row = minf(z_row+.5,regular) if z_row < brook_source_z+SPRING_ROUNDING_M else regular
-	rows.append(65.0)
-	for row in rows.size()-1:
-		var a := _spring_bank(rows[row],-1)
-		var b := _spring_bank(rows[row],1)
-		var c := _spring_bank(rows[row+1],1)
-		var d := _spring_bank(rows[row+1],-1)
-		for v in [a,b,d,b,c,d]:
-			water.set_normal(Vector3.UP)
-			water.set_uv(Vector2(v.x,v.z))
-			water.set_tangent(Plane(1,0,0,1))
-			water.add_vertex(v)
+	ground_material.set_shader_parameter("water_surface_y",WATER_LEVEL)
 	var stream := MeshInstance3D.new()
 	stream.name = "Stream"
-	stream.mesh = water.commit()
+	stream.mesh = Brook.water_mesh(brook_source_z)
 	stream.material_override = water_material
 	stream.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(stream)
@@ -162,24 +155,39 @@ func create_land() -> void:
 	_make_rain()
 	set_quality(profile)
 
+## Adds a material of the shared land shader (terrain, far relief): it then
+## follows the village ground's textures, the season and the haze.
+func register_land(material: ShaderMaterial) -> void:
+	if material == null or land_materials.has(material):
+		return
+	land_materials.append(material)
+	LandSurface.follow_village_ground(ground_material,land_materials.slice(1))
+	LandSurface.apply_season(land_materials,season,_season_tint)
+
+func _sync_atmosphere() -> void:
+	var world := get_world_3d()
+	var environment := world.environment if world else null
+	var horizon: Variant = sky_material.get_shader_parameter("horizon")
+	var zenith: Variant = sky_material.get_shader_parameter("zenith")
+	LandSurface.sync_haze(land_materials,environment,horizon if horizon is Color else Color("92b8c8"))
+	water_material.set_shader_parameter("sky_horizon",horizon if horizon is Color else Color("92b8c8"))
+	water_material.set_shader_parameter("sky_zenith",zenith if zenith is Color else Color("3676aa"))
+
 func _bank(z: float, side: int) -> Vector3:
 	var x := -28.0+.52*sin(z*.18)+.23*sin(z*.46)
 	return Vector3(x+side*(3.78+.18*sin(z*.56+side)),WATER_LEVEL,z)
 
-## Water edge with a rounded end at the spring.
-func _spring_bank(z: float, side: int) -> Vector3:
-	var centre := _bank(z,0)
-	var t := clampf((z-brook_source_z)/SPRING_ROUNDING_M,0,1)
-	return centre.lerp(_bank(z,side),sqrt(t*(2.0-t)))
-
-## Northernmost water row whose whole width still lies above the hill surface.
+## Northernmost row at which the brook and its banks lie on open ground:
+## no lifted hill triangle reaches over them.
 func _brook_source() -> float:
 	var z := -60.0
-	while z > -95.0:
+	var limit := Brook.TERRAIN_OPENINGS[0].position.y+2.0
+	while z > limit:
 		var next := z-.1
-		for side in [-1,0,1]:
-			var bank := _bank(next,side)
-			if Hills.surface_height(Vector2(bank.x,next)) > WATER_LEVEL-.004:
+		var reach := Land.brook_half_width(next)+Land.BANK_WIDTH_M+.3
+		for side in [-1.0,-.5,0.0,.5,1.0]:
+			var p := Vector2(Land.brook_x(next)+side*reach,next)
+			if Hills.surface_height(p) > Hills.Terrain.surface_height(p)+.0001:
 				return z
 		z = next
 	return z
@@ -190,7 +198,9 @@ func _make_ridge() -> void:
 	var ridge := MeshInstance3D.new()
 	ridge.name = "Foothills"
 	ridge.mesh = Hills.build_mesh()
-	ridge.material_override = Hills.material()
+	var hill_material := Hills.material()
+	ridge.material_override = hill_material
+	register_land(hill_material)
 	ridge.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(ridge)
 	var body := StaticBody3D.new()
