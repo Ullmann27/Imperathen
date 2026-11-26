@@ -78,7 +78,7 @@
         "chapter": "Ein Morgen zu Hause",
         "label": "Was tust du zuerst?",
         "objective": "Julia steht am Frühstückstisch im Familienhaus. Entscheide, ob du mit ihr redest, beim Tischdecken hilfst oder zuerst in den Hof gehst.",
-        "text": "»Du bist wach. Das Brot ist geschnitten, die drei Becher stehen noch oben im Regal. Willst du mir helfen, mit mir reden – oder erst hinaus in den Hof?«",
+        "text": "»Du bist wach. Das Brot liegt bereit, die drei Becher stehen noch oben im Regal. Willst du mir helfen, mit mir reden – oder erst hinaus in den Hof?«",
         "options": [
           {
             "id": "i01_talk",
@@ -293,7 +293,7 @@
     "lines": {
       "I01_A_TABLE": {
         "speaker_id": "chronik",
-        "text": "Valdora bei Aquileia, ein Frühjahrsmorgen 58 v. Chr. Julia schneidet das Brot. Oben im Regal warten drei Becher."
+        "text": "Valdora bei Aquileia, ein Frühjahrsmorgen 58 v. Chr. Julia steht mit dem Brot am Tisch. Oben im Regal warten drei Becher."
       },
       "I01_A_JOKE": {
         "speaker_id": "silvanus",
@@ -301,7 +301,7 @@
       },
       "I01_A_BED": {
         "speaker_id": "julia",
-        "text": "»Du bist wach. Das Brot ist geschnitten, die drei Becher stehen noch oben im Regal. Willst du mir helfen, mit mir reden – oder erst hinaus in den Hof?«"
+        "text": "»Du bist wach. Das Brot liegt bereit, die drei Becher stehen noch oben im Regal. Willst du mir helfen, mit mir reden – oder erst hinaus in den Hof?«"
       },
       "I01_A_REACT_TALK": {
         "speaker_id": "julia",

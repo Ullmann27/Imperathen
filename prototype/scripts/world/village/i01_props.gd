@@ -56,7 +56,7 @@ func _build() -> void:
 		var cup := MeshInstance3D.new()
 		cup.name = "FamilyCup_" + owner
 		# The boy's cup is the "crooked" one from Silvanus' joke: its rim leans.
-		cup.mesh = _vessel([Vector2(.07,0),Vector2(.075,.02),Vector2(.095,.13),Vector2(.105,.15),Vector2(.083,.15),Vector2(.071,.035)], 0.13 if owner == "player" else 0.0)
+		cup.mesh = _vessel([Vector2(.07,0),Vector2(.075,.02),Vector2(.095,.13),Vector2(.105,.15),Vector2(.083,.15),Vector2(.071,.035)], 0.42 if owner == "player" else 0.0)
 		cup.material_override = clay[owner]
 		cup.set_meta("i01_cup", owner)
 		add_child(cup)
@@ -70,7 +70,7 @@ func _build() -> void:
 		disc.radial_segments = 12
 		surface.mesh = disc
 		surface.material_override = water
-		surface.position = Vector3(0.006 if owner == "player" else 0.0, .118, 0)
+		surface.position = Vector3(0.033 if owner == "player" else 0.0, .118, 0)
 		cup.add_child(surface)
 		_water[owner] = surface
 	_jug = MeshInstance3D.new()

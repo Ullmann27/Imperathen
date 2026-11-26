@@ -359,8 +359,9 @@ func _i01_framing(id: String) -> Array:
 	var table := _anchor("i01_table")
 	match id:
 		"i01_table_detail":
-			return [table + Vector3(0.75, 0.42, 0.95), table + Vector3(0.25, 0.30, 0.72),
-				table + Vector3(0.10, 0.02, 0.05), table + Vector3(-0.05, 0.02, -0.80), 40.0, 34.0]
+			# Over the bread toward Julia's hands and upper body at the far side.
+			return [table + Vector3(0.80, 0.62, 1.05), table + Vector3(0.35, 0.55, 0.95),
+				table + Vector3(0.0, 0.05, -0.15), table + Vector3(-0.05, 0.28, -0.85), 44.0, 38.0]
 		"i01_shelf_cups":
 			var shelf := _anchor("i01_shelf")
 			return [shelf + Vector3(1.45, 0.25, -0.55), shelf + Vector3(1.0, 0.12, -0.30),
@@ -421,8 +422,9 @@ func _change_speaker(next_shot: String) -> void:
 		if figure and figure.has_method("sample_pose") and figure.has_method("reset_motion"):
 			_speaker = figure
 	elif next_shot in I01_SHOTS:
-		# The named speaker of an I-01 shot uses the existing talk pose; the
-		# face pair turns only inside the dialogue shots below.
+		# The named speaker of an I-01 shot uses the existing talk pose and
+		# turns toward the boy (restored when the film releases the figures).
+		_face_mission_pair()
 		var speaking := _mission_figure(mission_actor_id)
 		if is_instance_valid(speaking) and speaking.has_method("sample_pose") and speaking.has_method("reset_motion"):
 			_speaker = speaking
