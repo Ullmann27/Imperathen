@@ -217,13 +217,13 @@ Erzeugt mit `tools/art/build_meshy_gear.py` (Blender 4.3.2) aus den in `lock.jso
 | `gear_roman_scutum` | `scutum` | 8455 / 1900 / 479 | 2048 / 512 / 256 | 972 px/m | 867.876 | nur Maßstab und Griffpunkt |
 | `gear_roman_cavalry_oval_shield` | `cavalry_shield` | 8901 | 2048 | 1212 px/m | 1.001.724 | Quelle ist kreisrund; Brett auf 1,10 × 0,72 m oval gestaucht, Buckel und Nieten bleiben rund |
 | `mount_legacy_bay_horse` | `riding_horse` | 13971 / 5163 / 1430 | 2048 / 1024 / 512 | 473 px/m | 3.790.540 | nur Maßstab, Bodenkontakt, Anker; statisch ohne Skelett |
-| `resource_firewood` | Requisit | 5997 / 2193 / 478 | 1024 / 512 / 256 | 99 px/m | 915.508 | nur Maßstab, Bodenkontakt und Kollisionshülle |
+| `resource_firewood` | Requisit | 9230 / 4195 / 1991 | 1024 / 512 / 256 | 105 px/m | 1.247.596 | nur Maßstab, Bodenkontakt und Kollisionshülle |
 | `resource_iron_ore` | Requisit | 2524 / 1200 / 400 | 1024 / 512 / 256 | 286 px/m | 389.592 | nur Maßstab, Bodenkontakt und Kollisionshülle |
 | `resource_clay` | Requisit | 6000 / 2185 / 541 | 1024 / 512 / 256 | 134 px/m | 607.032 | nur Maßstab, Bodenkontakt und Kollisionshülle |
 | `resource_limestone` | Requisit | 5999 / 2200 / 599 | 1024 / 512 / 256 | 131 px/m | 645.064 | nur Maßstab, Bodenkontakt und Kollisionshülle |
 | `resource_copper_ore` | Requisit | 6000 / 2200 / 600 | 1024 / 512 / 256 | 223 px/m | 539.532 | nur Maßstab, Bodenkontakt und Kollisionshülle |
 
-Neu hinzugekommen: **12.149.824 Bytes** in 43 GLB-Dateien (ohne die sechs bereits vorhandenen Ausrüstungsdateien). Die Rohquellen (892 MB) bleiben unversioniert.
+Neu hinzugekommen: **12.481.912 Bytes** in 43 GLB-Dateien (ohne die sechs bereits vorhandenen Ausrüstungsdateien). Die Rohquellen (892 MB) bleiben unversioniert.
 
 ### Zurückgehalten
 

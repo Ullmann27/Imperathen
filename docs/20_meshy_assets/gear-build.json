@@ -1676,40 +1676,66 @@
         {
           "tier": 0,
           "path": "prototype/assets/meshy/props/resource_firewood_0.glb",
-          "triangles": 5997,
+          "triangles": 9230,
           "accent_triangles_max": 0,
           "texture_edges": {
             "base_color": 1024,
             "normal": 512,
             "metallic_roughness": 512
           },
-          "texel_density_px_per_m": 99.4,
+          "texel_density_px_per_m": 104.6,
           "bounds_blender": [
             [
               -0.8,
-              -0.80128,
-              -0.00084
+              -0.8,
+              0.0
             ],
             [
-              0.80098,
-              0.80021,
+              0.8,
+              0.8,
               1.3141
             ]
           ],
-          "size_bytes": 584576,
-          "sha256": "f5b270058ceaedba61fab8a1829a77f84152dbfad8538a65ea5cdff54fb55e44"
+          "size_bytes": 688940,
+          "sha256": "bf0f4270f4de2b1ce3b307cd2edcb00810b29537ef88e67628981750609a0e79"
         },
         {
           "tier": 1,
           "path": "prototype/assets/meshy/props/resource_firewood_1.glb",
-          "triangles": 2193,
+          "triangles": 4195,
           "accent_triangles_max": 0,
           "texture_edges": {
             "base_color": 512,
             "normal": 256,
             "metallic_roughness": 256
           },
-          "texel_density_px_per_m": 42.2,
+          "texel_density_px_per_m": 47.2,
+          "bounds_blender": [
+            [
+              -0.80331,
+              -0.80212,
+              -0.00084
+            ],
+            [
+              0.80098,
+              0.80001,
+              1.3141
+            ]
+          ],
+          "size_bytes": 360464,
+          "sha256": "a44e6027309e9708daf0ca8ae5318b19d96ffb072a2d6be9461b21b8343f5b43"
+        },
+        {
+          "tier": 2,
+          "path": "prototype/assets/meshy/props/resource_firewood_2.glb",
+          "triangles": 1991,
+          "accent_triangles_max": 0,
+          "texture_edges": {
+            "base_color": 256,
+            "normal": 128,
+            "metallic_roughness": 128
+          },
+          "texel_density_px_per_m": 20.7,
           "bounds_blender": [
             [
               -0.80331,
@@ -1719,37 +1745,11 @@
             [
               0.80295,
               0.80278,
-              1.30736
+              1.29758
             ]
           ],
-          "size_bytes": 255264,
-          "sha256": "b486a4f786a6bc0bb25b8b2164ef538eab8b5c9b0029c52f1ed736e549a357e3"
-        },
-        {
-          "tier": 2,
-          "path": "prototype/assets/meshy/props/resource_firewood_2.glb",
-          "triangles": 478,
-          "accent_triangles_max": 0,
-          "texture_edges": {
-            "base_color": 256,
-            "normal": 128,
-            "metallic_roughness": 128
-          },
-          "texel_density_px_per_m": 17.1,
-          "bounds_blender": [
-            [
-              -0.80702,
-              -0.801,
-              0.00025
-            ],
-            [
-              0.802,
-              0.81711,
-              1.31039
-            ]
-          ],
-          "size_bytes": 75668,
-          "sha256": "3d29a97aeac679520fa78fe653b444ac8c90ce2830fb2383a4ae5652382fc175"
+          "size_bytes": 198192,
+          "sha256": "05962e78594d76afad237cdfd3243aeb1a115756ca322bbc8dc5234296357c8a"
         }
       ],
       "collision": "convex hull, at most 96 triangles (Godot -convcolonly)"
