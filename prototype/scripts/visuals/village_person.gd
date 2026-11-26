@@ -14,6 +14,7 @@ const PracticeGear := preload("res://scripts/visuals/practice_gear.gd")
 const ServiceGear := preload("res://scripts/visuals/service_gear.gd")
 const MeshyCharacters := preload("res://scripts/visuals/meshy_character_registry.gd")
 const MeshyEquipment := preload("res://scripts/visuals/meshy_equipment.gd")
+const RaiderStrike := preload("res://scripts/domain/raider_strike.gd")
 const HERO_PATH := "res://assets/characters/hero_quality_%d.glb"
 const MESHY_YOUTH_PATH := "res://assets/characters/hero_meshy_italia_%d.glb"
 # ACCAD measured cycle distance, retargeted to the original 1.50 m youth.
@@ -63,6 +64,11 @@ var meshy_asset_id := ""
 var _meshy_youth := false
 var _conversation_focused := false
 var _armed_style := ""
+## Retimed raider blow: the clip's measured contact frame is reached after
+## _strike_windup seconds, then the follow-through plays at its own speed.
+var _strike_windup := 0.0
+var _strike_contact := 0.0
+var _strike_elapsed := 0.0
 var _armed_sequence := 0
 var _service_gear := false
 var _service_nodes: Array[Node3D] = []
@@ -479,6 +485,7 @@ func cue_combat(technique: String, duration: float) -> void:
 
 
 func cancel_action() -> void:
+	_strike_windup = 0.0
 	_service_external = false
 	_conversation_focused = false
 	_combat_id = ""
@@ -490,8 +497,38 @@ func cancel_action() -> void:
 	_play("idle", 0.0, 0.12)
 
 
+func strike_contact_seconds() -> float:
+	var length := animator.get_animation("attack").length if animator and animator.has_animation("attack") else 0.8
+	return RaiderStrike.clip_contact_seconds(active_model_path, length)
+
+
+func cue_strike(seconds_to_contact: float) -> float:
+	# Presentation of a domain-timed raider blow. The wind-up is stretched or
+	# compressed so the weapon's contact frame coincides with the rule tick
+	# that resolves the blow; the follow-through keeps the clip's own speed.
+	cue("attack")
+	if clip != "attack" or not animator or animator.current_animation == "" or not is_finite(seconds_to_contact) or seconds_to_contact <= 0.0:
+		return 0.0
+	var length := animator.current_animation_length
+	_strike_contact = clampf(strike_contact_seconds(), 0.05, length)
+	_strike_windup = seconds_to_contact
+	_strike_elapsed = 0.0
+	_remaining = _strike_windup+length-_strike_contact
+	return _strike_windup
+
+
+func strike_progress() -> Dictionary:
+	return {"active":_strike_windup > 0.0 and clip == "attack", "elapsed":_strike_elapsed, "windup":_strike_windup,
+		"contact":_strike_contact, "clip_time":animator.current_animation_position if animator and animator.current_animation != "" else 0.0}
+
+
+func _strike_clip_time(elapsed: float) -> float:
+	return RaiderStrike.clip_time(elapsed, _strike_windup, _strike_contact)
+
+
 func cue(action: String, preferred_style: String = "") -> void:
 	if action == "death" and clip == "death": return
+	_strike_windup = 0.0
 	_service_external = false
 	if action != "talk":
 		_conversation_focused = false
@@ -560,6 +597,7 @@ func _sync_loaned_gear() -> void:
 
 
 func reset_motion() -> void:
+	_strike_windup = 0.0
 	_motion.reset_world_contacts()
 	_service_external = false
 	_conversation_focused = false
@@ -667,6 +705,8 @@ func sample_pose(action: String, normalized: float) -> void:
 
 
 func _play(action: String, normalized: float, blend: float) -> void:
+	if action != "attack":
+		_strike_windup = 0.0
 	_motion.capture_transition(blend if action != clip else 0.0)
 	clip = action
 	if action not in ["attack","train","block"]:
@@ -820,6 +860,9 @@ func _process(delta: float) -> void:
 		if clip in ["march","run"]:
 			var stride := locomotion_stride(clip)
 			advance *= speed * animator.current_animation_length / stride
+		elif clip == "attack" and _strike_windup > 0.0:
+			advance = _strike_clip_time(_strike_elapsed+delta)-_strike_clip_time(_strike_elapsed)
+			_strike_elapsed += delta
 		animator.advance(advance)
 		if animator.current_animation != "":
 			phase = animator.current_animation_position / animator.current_animation_length

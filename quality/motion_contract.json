@@ -514,7 +514,11 @@
       "required_checks": [
         "combat_model",
         "action_adapter",
-        "npc_behavior_world"
+        "npc_behavior_world",
+        "raid_route_world_a",
+        "raid_route_world_b",
+        "raid_route_world_c",
+        "raid_strike_timing"
       ],
       "review_scope": [
         "world_displacement",
@@ -668,6 +672,8 @@
     "scripts/cinematic/opening_director.gd",
     "scripts/domain/combat_actions.gd",
     "scripts/domain/npc_behavior.gd",
+    "scripts/domain/raid_route.gd",
+    "scripts/domain/raider_strike.gd",
     "scripts/domain/unarmed_combat.gd",
     "scripts/domain/village_economy.gd",
     "scripts/domain/world_model.gd",
