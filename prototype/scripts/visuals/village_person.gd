@@ -5,7 +5,10 @@ const COLORS := {"italia":"a45c47","germania":"809081","han":"ad9865","wa":"e0d1
 const COMPANION_COLORS := {"italia":"ddd0ab","germania":"91907a","han":"8197a4","wa":"d4c7ac","vistula":"ac6853"}
 const HAIR := {"italia":["",""],"germania":["","braid"],"han":["knot","knot"],"wa":["tie","tie"],"vistula":["braid","braid"]}
 const COMPANIONS := {"italia":"marcus","germania":"albrun","han":"lin","wa":"aki","vistula":"mira"}
-const LOOPS := ["idle","march","run","talk","work"]
+const LOOPS := ["idle","march","run","talk","work","retreat"]
+# Company-authored locomotion cycles: one full cycle advances this many metres
+# (art/soldiers/build.py STRIDES, shared by the battle soldiers).
+const COMPANY_STRIDES := {"march":1.30,"run":1.75,"retreat":1.48}
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
 const YouthSoleContact := preload("res://scripts/visuals/youth_sole_contact.gd")
@@ -617,7 +620,11 @@ func keep_working() -> void:
 
 
 func _locomotion_clip() -> String:
-	var stop_threshold := 0.06 if clip in ["march", "run"] else 0.10
+	var stop_threshold := 0.06 if clip in ["march", "run", "retreat"] else 0.10
+	# The company retreat is an authored travelling cycle, not a one-shot pose.
+	# Once played it continues while the body actually moves, then stops.
+	if clip == "retreat" and animator and animator.has_animation("retreat"):
+		return "retreat" if speed >= stop_threshold else "idle"
 	var run_threshold := 2.25 if clip == "run" else 2.55
 	return "idle" if speed < stop_threshold else ("march" if speed < run_threshold else "run")
 
@@ -654,7 +661,7 @@ func locomotion_stride(action: String) -> float:
 	soldier_gait = soldier_gait or (active_model_path.begins_with("res://assets/characters/frontier_") and _frontier_identity() in ["legionary", "officer", "spearman", "archer"])
 	for family: String in ["heavy", "officer", "spear"]:
 		soldier_gait = soldier_gait or active_model_path.begins_with("res://assets/village_characters/" + family + "_")
-	var stride := (1.30 if action == "march" else 1.75) if soldier_gait else (1.10 if action == "march" else 1.49)
+	var stride := float(COMPANY_STRIDES.get(action, 1.75)) if soldier_gait else (1.10 if action == "march" else 1.49)
 	return stride * model_scale
 
 
@@ -823,7 +830,7 @@ func _process(delta: float) -> void:
 				_play(next, carry_phase, 0.20 if _uses_youth_mocap() else 0.13)
 	if animator and animator.is_playing():
 		var advance := delta
-		if clip in ["march","run"]:
+		if clip in ["march","run","retreat"]:
 			var stride := locomotion_stride(clip)
 			advance *= speed * animator.current_animation_length / stride
 		animator.advance(advance)
@@ -846,7 +853,7 @@ func _plant_contacts(delta: float) -> void:
 	if _uses_youth_mocap() and clip in ["idle","block"]:
 		_motion.reset_world_contacts()
 		return
-	var stance := 0.40 if clip == "run" else 0.58
+	var stance := 0.40 if clip == "run" else (0.51 if clip == "retreat" else 0.58)
 	if _motion.civilian:
 		stance = 0.32 if clip == "run" else 0.53
 	elif active_model_path.contains("meshy/") or active_model_path.begins_with("res://assets/characters/hero_meshy_italia_"):

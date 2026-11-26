@@ -93,12 +93,21 @@ func _observe_person(sample: Dictionary, actor: Node3D, figure: Node3D) -> void:
 		sample.finite = bool(sample.finite) and transform.is_finite()
 	_maximum(sample,"max_collision_overlap_m",_collision_depth(actor),context)
 	if not previous.is_empty():
-		_maximum(sample,"max_root_step_m",at.distance_to(previous.root),context)
+		var root_step: Vector3 = at-Vector3(previous.root)
+		context["root_step_m"] = root_step.length()
+		_maximum(sample,"max_root_step_m",root_step.length(),context)
 		if previous.pose.size() == pose.size():
 			for bone in pose.size():
 				var old: Transform3D = previous.pose[bone]
 				context["bone"] = rig.get_bone_name(bone)
 				_maximum(sample,"max_transition_position_jump_m",pose[bone].origin.distance_to(old.origin),context)
+				# Diagnostic only, never a gate metric: the same bone step with the
+				# actor's own travel removed separates a pose pop from plain speed.
+				var relative := (pose[bone].origin-old.origin-root_step).length()
+				if relative > float(sample.worst.get("root_relative_position_jump",{}).get("value_m",0.0)):
+					var record := context.duplicate()
+					record["value_m"] = relative
+					sample.worst["root_relative_position_jump"] = record
 				var angle := rad_to_deg(pose[bone].basis.orthonormalized().get_rotation_quaternion().angle_to(old.basis.orthonormalized().get_rotation_quaternion()))
 				_maximum(sample,"max_transition_rotation_jump_deg",angle,context)
 	var contacts: Dictionary = previous.get("contacts",{})

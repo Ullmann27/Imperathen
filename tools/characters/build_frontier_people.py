@@ -491,6 +491,8 @@ def export(kind):
         death_ground = soldier.death_ground.ground(path)
         gather_ground = soldier.death_ground.ground(path, None, "gather")
         seam = skirt_seam.smooth(path)
+        # Civilian tunics whose local smoothing would expose the body stay as exported.
+        tunic = skirt_seam.smooth(path, cloth="HeroTunic", strict=False)
         rivets = kit_rivets.rebind(path)
         count = 0
         for obj in bpy.context.scene.objects:
@@ -502,6 +504,7 @@ def export(kind):
                         "face_morphs": level < 2, "belt_fit": belt_fit,
                         "death_ground_contact": {key: death_ground[key] for key in ("before", "after", "maximum_floor_correction_m")},
                         "skirt_seam": {key: seam[key] for key in ("before", "after", "unchanged") if key in seam},
+                        "tunic_seam": {key: tunic[key] for key in ("before", "after", "unchanged") if key in tunic},
                         "gather_ground_contact": {key: gather_ground[key] for key in ("before", "after", "unchanged") if key in gather_ground},
                         "kit_rivets": {"rebound": sum(entry["applied"] for entry in rivets.get("islands", [])),
                                        "snapped": len(rivets.get("snapped", [])), **({"unchanged": rivets["unchanged"]} if "unchanged" in rivets else {})}})

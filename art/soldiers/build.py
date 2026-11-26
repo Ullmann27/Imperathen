@@ -478,7 +478,12 @@ def pose(clip,t,role):
         swing=max(0,1-abs(t-.59)/.28)
         angles={"Spine":(8*swing,0,24*wind-31*swing),"Arm_R":(-65*wind-42*swing,-23*wind,14*swing),
                 "Forearm_R":(-41*wind-18*swing,0,0),"Hand_R":(15*wind-63*swing,0,0),
-                "Arm_L":(-21*swing,0,0),"Thigh_L":(-12*swing,0,0)}
+                "Arm_L":(-21*swing,0,0)}
+        # No Thigh_L sweep: with a static pelvis and no knee/ankle compensation
+        # it skated the straight lead leg's sole 13-19 cm over the floor. The
+        # planted lead foot keeps its contact; the cut's weight transfer is in
+        # the spine and arms (tools/characters/plant_company_attack.py applies
+        # the same to existing exports).
         if role=="spear":
             angles["Hand_R"]=(-48*swing+25*wind,0,0)
             angles["Arm_R"]=(-57*swing+12*wind,0,0)
