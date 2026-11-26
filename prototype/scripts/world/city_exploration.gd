@@ -20,6 +20,8 @@ const TouchPad := preload("res://scripts/ui/touch_pad.gd")
 const TouchLook := preload("res://scripts/ui/touch_look.gd")
 const TouchAction := preload("res://scripts/ui/touch_action.gd")
 const SafeArea := preload("res://scripts/ui/safe_area.gd")
+const Calendar := preload("res://scripts/domain/world_calendar.gd")
+const EraRegistry := preload("res://scripts/domain/era_registry.gd")
 const CITY_PATH := "res://assets/world/roman_city_test.glb"
 const CITY_COLLISION := "res://assets/world/roman_city_collision.glb"
 const TEMPLE_PATH := "res://assets/world/roman_meshy_temple_%d.glb"
@@ -40,6 +42,8 @@ const RUN_ACCELERATION := 6.0
 const BRAKING_DECELERATION := 8.0
 var profile := "balanced"
 var persist := true
+# Callers entering a dated scenario assign its authoritative JDN before add_child.
+var world_jdn := Calendar.campaign_start_jdn()
 # Review toggle: keep an exact legacy light/ground path for comparison.
 var viva_visuals := true
 var save_path := State.PATH
@@ -143,8 +147,10 @@ func _scene(path: String) -> Node3D:
 
 func _load_city() -> void:
 	var city := _scene(CITY_PATH)
+	var excluded := {}
 	if city!=null:
 		city.name = "RomanCity"
+		prune_future_city_nodes(city, world_jdn, excluded)
 		add_child(city)
 		city_available = true
 		var reach := 270.0 if profile in ["low","balanced"] else 450.0
@@ -153,6 +159,8 @@ func _load_city() -> void:
 			mesh.visibility_range_end_margin = VISIBILITY_MARGIN
 	var collision := _scene(CITY_COLLISION)
 	if collision!=null:
+		# Apply chronology before converting collision meshes into live bodies.
+		prune_future_city_nodes(collision, world_jdn, excluded)
 		add_child(collision)
 		_add_static_colliders(collision,"CityCollision_")
 		collision.queue_free()
@@ -196,6 +204,25 @@ func _load_city() -> void:
 	print("IMPERATHEN_FACADE_DETAIL " + JSON.stringify(CitySurfaceMicrodetail.install(city, profile)))
 	# Use real already-exported close-up GLBs. No extra collision bodies or economy.
 	print("IMPERATHEN_VIVA_PROPS " + JSON.stringify(VivaCloseupProps.install(city, profile)))
+
+## The builder exports dates on both visual and collision nodes. Keep the
+## names removed from the visual GLB for older collision imports without extras.
+static func prune_future_city_nodes(root: Node, jdn: int, excluded: Dictionary) -> void:
+	for node: Node in root.get_children():
+		var identity := str(node.name).trim_suffix("-colonly").trim_suffix("_collision")
+		var extras: Dictionary = node.get_meta("extras", {})
+		var year: Variant = extras.get("era_min_ce")
+		if year == null and node.has_meta("era_min_ce"):
+			year = node.get_meta("era_min_ce")
+		var future := year != null and not EraRegistry.era_min_visible(int(year), jdn)
+		# Older RomanCity exports did not always carry the registry metadata.
+		if identity == "Colosseum" or identity.begins_with("Colosseum_"):
+			future = future or not EraRegistry.available("building.amphitheatrum_flavium", jdn)
+		if future or excluded.has(identity):
+			excluded[identity] = true
+			node.free()
+		else:
+			prune_future_city_nodes(node, jdn, excluded)
 
 ## Godot culls by the camera distance to a mesh's AABB centre. A flat ground
 ## tile is 136-188 m wide, so its centre can be out of range while a house standing

@@ -2,6 +2,8 @@ extends SceneTree
 ## An actual CityExploration session using the Blender-built 50MB RomanCity GLB.
 ## This is NOT an FPS measurement or an Android/physical Fold7 playthrough.
 const City = preload("res://scripts/world/city_exploration.gd")
+const Calendar = preload("res://scripts/domain/world_calendar.gd")
+const EraRegistry = preload("res://scripts/domain/era_registry.gd")
 const SiteManifest := "res://assets/city_detail/shops/city_market_anchors.json"
 const WALK_SPEED_MAX := 1.46
 var checks := 0
@@ -38,6 +40,12 @@ func _run() -> void:
 	root.add_child(scene)
 	await _physics_frames(8)
 	_check(scene.city_available,"Actual 50MB authored RomanCity is loaded into production CityExploration")
+	_check(scene.world_jdn == Calendar.campaign_start_jdn(), "The standard city entry uses the campaign epoch")
+	_check(scene.find_children("*Colosseum*", "", true, false).is_empty()
+		and scene.find_children("*Thermae_Imperiales*", "", true, false).is_empty(),
+		"Caesar-era city contains neither later monuments nor their baked collision bodies")
+	_check(scene.find_children("CityCollision_*Ground*", "StaticBody3D", true, false).size() >= 1,
+		"Filtering future structures preserves the walkable street and ground colliders")
 	_check(scene.get_node("RomanCity").find_child("Forum_Worn_Stonework",true,false) is MeshInstance3D
 		and scene.find_children("ForumPavingDetail","Node3D",true,false).is_empty(),
 		"Actual forum paving uses the original city once, without duplicate overlay")
@@ -52,8 +60,23 @@ func _run() -> void:
 			"Twelve-year-old boy's source sword is removed from visibility until adult equipment authorization")
 	_check(is_instance_valid(scene.camera) and scene.camera.current,
 		"Production third-person camera remains the active world camera")
-	var scenery := scene.find_children("CityCollision_*","StaticBody3D",true,false)
-	_check(scenery.size() > 300,"Full original collision GLB created real static world bodies")
+	var collision_source := (load(City.CITY_COLLISION) as PackedScene).instantiate()
+	var baked := collision_source.find_children("*", "StaticBody3D", true, false)
+	if baked.is_empty():
+		baked = collision_source.find_children("*", "MeshInstance3D", true, false)
+	_check(baked.size() > 300, "Full original collision GLB contains the authored set across all eras")
+	var expected: Array[String] = []
+	for node: Node in baked:
+		var extras: Dictionary = node.get_meta("extras", {})
+		if not extras.has("era_min_ce") or EraRegistry.era_min_visible(int(extras.era_min_ce), scene.world_jdn):
+			expected.append("CityCollision_" + str(node.name))
+	collision_source.free()
+	var actual: Array[String] = []
+	for node: Node in scene.find_children("CityCollision_*", "StaticBody3D", true, false):
+		actual.append(str(node.name))
+	expected.sort()
+	actual.sort()
+	_check(actual == expected, "Every eligible authored collider and only eligible colliders are live (%d/%d)" % [actual.size(), expected.size()])
 	_check(is_instance_valid(scene.ambient_people) and not scene.ambient_people.citizens.is_empty(),
 		"Several real adult market pedestrians are connected to the same free city")
 	_check(scene.market.available and scene.market.sites.size()==6,
