@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 95,
+  "version": 96,
   "tasks": [
     {
       "id": "K101",
@@ -445,26 +445,39 @@
     {
       "id": "I01-RENDER-CHECKPOINT",
       "owner": "Coordinator",
-      "status": "review_pending",
-      "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
+      "status": "done",
+      "revision": "e1fde65250271592d6309a056d1c4d5e352a87bd",
       "run_id": "46029016493",
       "scope": [
         "prototype/tests/i01_flow_test.gd"
       ],
       "access": "edit",
-      "note": "Independent I-01 software-render evidence timeout 46020295748/job 140577885552 (1500s after continued). Scoped opt-in checkpoint rasterization on isolated branch and matching CI invocation, preserve every simulation step, all existing asserts, required real 1280x720 captures, no FPS/temporal or physical claim; continuous mode remains available. Map formatting already corrected on campaign head. Actual isolated commit e1fde65250271592d6309a056d1c4d5e352a87bd, PR #178, CI 46029016493 (in_progress); all original capture checkpoints retained and CI PNG dimensions additionally verified. No integration before success. Actual run completed success: I01_FLOW_PASS 287/287, 19 logged 1280x720 captures, artifact 15214470708 (22,272,307 bytes). No visual/device acceptance."
+      "note": "Independent I-01 software-render evidence timeout 46020295748/job 140577885552 (1500s after continued). Scoped opt-in checkpoint rasterization on isolated branch and matching CI invocation, preserve every simulation step, all existing asserts, required real 1280x720 captures, no FPS/temporal or physical claim; continuous mode remains available. Map formatting already corrected on campaign head. Actual isolated commit e1fde65250271592d6309a056d1c4d5e352a87bd, PR #178, CI 46029016493 (in_progress); all original capture checkpoints retained and CI PNG dimensions additionally verified. No integration before success. Actual run completed success: I01_FLOW_PASS 287/287, 19 logged 1280x720 captures, artifact 15214470708 (22,272,307 bytes). No visual/device acceptance. Verified actual story CI 46029016558 success, ARM64 and Fold7 full failure signatures match 2e761e5 baseline (commerce 5, backdrop 2, strict companion foot, render 8, formation 7/4, muster 1). Complete recursive tree comparison showed only i01_flow_test.gd and its visual workflow changed. Fast-forwarded campaign-continuity branch via expected-head lease to exact tested e1fde65; campaign CI 46037854829 in progress. #162 and main unchanged; no release or physical acceptance."
     },
     {
       "id": "HOUSE-WINDOW-HIT-PROVENANCE",
       "owner": "Coordinator",
-      "status": "submitted",
-      "revision": "1b87724a9fe62c751d02a04668f8c924b7c7c7a0",
+      "status": "blocked",
+      "revision": "c1f0dfb7755c2fb86d6af40237f6f606ac6d3d1f",
       "run_id": "46032488245",
       "scope": [
         "prototype/tests/house_interiors_test.gd"
       ],
       "access": "edit",
-      "note": "Independent diagnostic-only correction: identify exact rendered shell/item collider and every failed quarter-point ray instead of short-circuiting after first hit. Preserve all prior 7989 assertions, geometry, collision and quality limits. No fix or acceptance before new engine evidence. PR #179 exact head c1f0dfb7755c2fb86d6af40237f6f606ac6d3d1f; focused push CI observed in_progress. Workflow also preserves JSON on failed checks. All four N23–N26 outcomes already recorded. No geometry modification yet."
+      "note": "Independent diagnostic-only correction: identify exact rendered shell/item collider and every failed quarter-point ray instead of short-circuiting after first hit. Preserve all prior 7989 assertions, geometry, collision and quality limits. No fix or acceptance before new engine evidence. PR #179 exact head c1f0dfb7755c2fb86d6af40237f6f606ac6d3d1f; focused push CI observed in_progress. Workflow also preserves JSON on failed checks. All four N23–N26 outcomes already recorded. No geometry modification yet. Completed failure: 7989 checks, 3 original failures, twelve actual ray hits from weaver_home/valdora_t2_eave_detail (south z=2.364399 and east x=2.8644), not imaginary collider. Geometry asset/source regeneration needed on independent scope; no geometry changed."
+    },
+    {
+      "id": "GUARD-WEATHER-FIXTURE",
+      "owner": "Coordinator",
+      "status": "submitted",
+      "revision": "fde8360c5662e0ba3f3d94479ae54061368aef0d",
+      "run_id": "46038078352",
+      "scope": [
+        "prototype/tests/commerce_transaction_test.gd",
+        ".github/workflows/aeterna-guard-weather-fixture.yml"
+      ],
+      "access": "edit",
+      "note": "N25 provider batch returned no usable output. Independent test-only investigation after repeated commerce failures: legacy calendar starts spring 100 AD and weather can legally suspend outdoor work. Select bounded actual dry/wet windows using LocalWeather and the public calendar transaction; preserve original five dry-work/ledger assertions, add actual wet case requiring no paid repair progress or stock/wood changes. No gameplay or quality gate changes. PR #182, exact CI run observed in_progress. Do not claim solved before engine evidence."
     }
   ]
 }
