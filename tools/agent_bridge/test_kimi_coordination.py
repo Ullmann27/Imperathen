@@ -29,6 +29,21 @@ class CoordinationTests(unittest.TestCase):
             register.update(d,{"expected_version":2,"task":t})
         d=register.update(d,{"expected_version":2,"task":dict(t,run_id="123")})
         self.assertEqual(d["tasks"][0]["run_id"],"123")
+    def test_coordinator_workflow_scope_is_record_only(self):
+        path=".github/workflows/aeterna-guard-weather-fixture.yml"
+        task=self.task("CI","Coordinator",path)
+        d=register.update(self.data(),{"expected_version":1,"task":task})
+        self.assertEqual(d["tasks"][0]["scope"],[path])
+        self.assertFalse(register.path_ok(path))
+        for owner in ("Kimi","Nemotron","A1"):
+            with self.assertRaises(ValueError):
+                register.update(self.data(),{"expected_version":1,"task":self.task("CI",owner,path)})
+        for bad in (".github/workflows/../secrets.yml",".github/workflows/nested/file.yml",
+                    ".github/workflows/hidden.py",".github/secrets.yml"):
+            with self.assertRaises(ValueError):
+                register.update(self.data(),{"expected_version":1,"task":self.task("CI","Coordinator",bad)})
+        with self.assertRaises(ValueError):
+            register.update(d,{"expected_version":2,"task":self.task("CI2","Coordinator",path)})
     def test_repository_register(self):
         path=Path(register.__file__).with_name("team_work_register.json")
         self.assertTrue(register.validate(json.loads(path.read_text()))["tasks"])
