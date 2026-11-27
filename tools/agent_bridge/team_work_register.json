@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 183,
+  "version": 185,
   "tasks": [
     {
       "id": "K101",
@@ -866,14 +866,27 @@
       "id": "N29-SOCKET-DIAGNOSTIC",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "6d1aad82174764751cb2e2d3c0f610804518d512",
       "run_id": "46076143096",
       "scope": [
         "prototype/tests/valley_muster_test.gd",
         ".github/workflows/aeterna-mounted-socket-diagnostic.yml"
       ],
-      "note": "Draft PR #196 exact f79a2dc092ea7374fff7f94d7eff6c162fb60103, two files only (test and isolated CI), original 3cm battle check unchanged. Actual 12 direct gait/phase samples with independent skeleton bone, attachment and pelvis, immediate/deferred, plus first UID/pool availability. Run 46076143096 observed in_progress. No runtime patch, no gate relaxation; determine actual cause before modifying renderer. Nemotron response fully verified but internal/deprecated API not blindly executed."
+      "note": "Actual run 46076143096 job 140764201920 failed: 67/78. Twelve authored gait samples expose delayed BoneAttachment update; five transitions exceed 3 cm (maximum 0.1144407317 m). Bone updates immediately, attachment catches up next frame, pelvis remains stale. Separate first cavalry UID detail=3, absent rig, 1 pool deferral; three other cavalry rigs present. Artifact 15235615747. No gate change. Separate synchronous socket candidate; allocation remains independent."
+    },
+    {
+      "id": "N29-SOCKET-SYNC",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "f79a2dc092ea7374fff7f94d7eff6c162fb60103",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/visuals/valley_rider.gd",
+        "prototype/tests/valley_muster_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent minimal runtime correction after N29 direct engine evidence: synchronize BoneAttachment local transform to actual skeleton-local pose immediately after manual seek before saddle/pelvis alignment; add transformed-root and independent bone/pelvis and saddle regression. Existing 3 cm limits, allocation test and budgets unchanged. No edits to formation allocation or Kimi branches except shared register."
     }
   ]
 }
