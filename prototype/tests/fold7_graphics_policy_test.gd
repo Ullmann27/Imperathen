@@ -47,6 +47,17 @@ func _run() -> void:
 		holding = Policy.step("high",holding,16.5,5.0,80,true)
 	_check(float(holding.ratio)>0.94,"Confirmed GPU render headroom permits cautious recovery")
 	_check(float(holding.ratio)<=1.0,"Recovery never supersamples beyond the chosen preset")
+	# Slow wall time with observed GPU reserve is not proof of GPU overload.
+	var reserve: Dictionary = Policy.initial("high")
+	for i in 30:
+		reserve = Policy.step("high",reserve,32.0,5.0,80,true)
+	_check(is_equal_approx(float(reserve.ratio),1.0),"Observed GPU reserve preserves resolution during wall-time pressure")
+	var sparse: Array[float] = [4.0,5.0,NAN,INF,-1.0]
+	var sparse_stats := Policy.observation_summary(sparse,5)
+	_check(float(sparse_stats.p95)<0.0 and int(sparse_stats.count)==2,"Sparse/invalid timing cannot establish headroom")
+	var measured: Array[float] = [1.0,2.0,3.0,4.0,20.0]
+	var stats := Policy.observation_summary(measured,5)
+	_check(float(stats.p50)==3.0 and float(stats.p95)==20.0 and float(stats.p99)==20.0,"Nearest-rank timing distribution retains spikes")
 	var worst: Dictionary = Policy.initial("very_high")
 	for i in 150:
 		worst = Policy.step("very_high",worst,65.0,51.0,90,true)
@@ -80,6 +91,16 @@ func _run() -> void:
 			"Sustained city measures invisible diagnostics without showing a debug HUD")
 		_check(Engine.max_fps==60 and display.quality_report().selected=="high",
 			"High preserves the selected 60 FPS limit and public quality report")
+		# Synthetic deterministic inputs exercise production window consumption;
+		# they are not device FPS or GPU measurements.
+		for i in 100:
+			display._sample_governor(20.0,5.0)
+		_check(int(display._governor.windows)==1 and display._governor_frame_times.is_empty(),
+			"One two-second window consumed exactly once")
+		for i in 50:
+			display._sample_governor(20.0,5.0)
+		_check(int(display._governor.windows)==1 and display._governor_frame_times.size()==50,
+			"Half of the next window cannot reuse previous observations")
 		display._governor.ratio = 0.76
 		root.size = Vector2i(2160,2160)
 		display._on_size_changed()
@@ -88,6 +109,14 @@ func _run() -> void:
 		var cap: float = minf(1.0,sqrt(pixel_budget / float(root.size.x*root.size.y)))
 		_check(is_equal_approx(root.scaling_3d_scale,cap*0.76),
 			"Square unfolded viewport preserves aspect and scales only the 3D buffer")
+		_check(display._governor_frame_times.is_empty() and display._governor_gpu_times.is_empty(),
+			"Fold resize invalidates pending timing observations")
+		display.apply_quality("very_high")
+		for i in 60:
+			display._sample_governor(34.0,18.0)
+		_check(int(display._governor.windows)==1,"Thirty-FPS profile collects a complete independent window")
+		display.apply_quality("high")
+		display._governor.ratio = 0.76
 		display.set_sustained_paused(true)
 		_check(not display.is_processing() and is_equal_approx(float(display._governor.ratio),0.76),
 			"Paused game stops hidden monitoring without resetting selected image detail")

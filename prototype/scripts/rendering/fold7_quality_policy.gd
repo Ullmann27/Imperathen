@@ -11,6 +11,7 @@ const SLOW_WINDOWS := 3
 const FAST_WINDOWS := 12
 const COOLDOWN_WINDOWS := 5
 const MIN_SAMPLES := 45
+const MIN_OBSERVATION_COVERAGE := 0.80
 
 
 static func recommended_profile(is_android: bool, gpu_adapter: String) -> String:
@@ -31,6 +32,25 @@ static func adaptive(profile: String) -> bool:
 	return P95_TARGET_MS.has(profile)
 
 
+## Renderer timings are observations of the latest reported value, not
+## timestamp-matched GPU frames. Sparse/invalid observations cannot prove
+## headroom. Return -1 internally when coverage is insufficient.
+static func observation_summary(values: Array[float], total: int) -> Dictionary:
+	var valid: Array[float] = []
+	for value: float in values:
+		if is_finite(value) and value > 0.0:
+			valid.append(value)
+	var n := valid.size()
+	var result := {"count":n,"total":total,"p50":-1.0,"p95":-1.0,"p99":-1.0}
+	if total <= 0 or n == 0 or n > total or float(n) / float(total) < MIN_OBSERVATION_COVERAGE:
+		return result
+	valid.sort()
+	result.p50 = valid[ceili(float(n)*0.50)-1]
+	result.p95 = valid[ceili(float(n)*0.95)-1]
+	result.p99 = valid[ceili(float(n)*0.99)-1]
+	return result
+
+
 static func step(profile: String, previous: Dictionary, p95_frame_ms: float,
 		gpu_render_ms: float, frames: int, foreground: bool) -> Dictionary:
 	var next := previous.duplicate(true)
@@ -45,17 +65,21 @@ static func step(profile: String, previous: Dictionary, p95_frame_ms: float,
 	var gpu_valid := is_finite(gpu_render_ms) and gpu_render_ms > 0.0
 	next.windows = int(next.windows)+1
 	next.cooldown = maxi(0,int(next.cooldown)-1)
-	# A frame rate cap influences whole-frame time. Do not pretend that FPS
-	# alone measures available GPU headroom; recovery requires real GPU time.
-	var over_budget := p95_frame_ms > threshold
-	over_budget = over_budget or (gpu_valid and gpu_render_ms > float(GPU_TARGET_MS[profile])*1.10)
-	var recovered_headroom := gpu_valid and gpu_render_ms < float(GPU_TARGET_MS[profile])*0.64
+	# CPU and GPU render work can overlap; wall time minus GPU time is not
+	# a CPU measurement. Hold image detail if reliable observed GPU timing
+	# has clear headroom even when the frame is late. With unavailable GPU
+	# timing, retain the established conservative wall-time fallback.
+	var gpu_target := float(GPU_TARGET_MS[profile])
+	var gpu_headroom := gpu_valid and gpu_render_ms < gpu_target * 0.80
+	var over_budget := (p95_frame_ms > threshold and not gpu_headroom)
+	over_budget = over_budget or (gpu_valid and gpu_render_ms > gpu_target * 1.10)
+	var recovered_headroom := gpu_valid and gpu_render_ms < gpu_target * 0.64
 	recovered_headroom = recovered_headroom and p95_frame_ms < threshold*1.04
 	if over_budget:
-		next.slow = int(next.slow)+1
+		next.slow = mini(SLOW_WINDOWS,int(next.slow)+1)
 		next.fast = 0
 	elif recovered_headroom:
-		next.fast = int(next.fast)+1
+		next.fast = mini(FAST_WINDOWS,int(next.fast)+1)
 		next.slow = 0
 	else:
 		next.slow = 0
