@@ -76,6 +76,7 @@ func _turn_and_retarget(hz: int, sign: float) -> void:
 	var max_step := 0.0
 	var previous_speed := 0.0
 	var maximum_acceleration := 0.0
+	var maximum_lateral_speed := 0.0
 	await physics_frame
 	await physics_frame
 	for frame in hz * 8:
@@ -88,6 +89,8 @@ func _turn_and_retarget(hz: int, sign: float) -> void:
 		nav.move(actor, target, dt, 4.1, 0.18)
 		var travel := actor.global_position - before
 		var speed := Vector2(travel.x, travel.z).length() / dt
+		var lateral := Vector3.RIGHT.rotated(Vector3.UP,actor.rotation.y)
+		maximum_lateral_speed = maxf(maximum_lateral_speed,absf(travel.dot(lateral))/dt)
 		maximum_acceleration = maxf(maximum_acceleration,(speed-previous_speed)/dt)
 		previous_speed = speed
 		figure.drive(speed)
@@ -115,13 +118,16 @@ func _turn_and_retarget(hz: int, sign: float) -> void:
 	_check(backward_speed <= 0.001, label + "a rearward destination turns on the spot before forward travel")
 	_check(backwards_running == 0, label + "the actual pose driver leaves running for the grounded turn")
 	_check(aligned_speed >= 4.09, label + "aligned travel retains the full requested running speed")
+	# max(cos(theta)^2 * sin(theta)) = 2/(3*sqrt(3)); flat test floor.
+	_check(maximum_lateral_speed <= 4.1*2.0/(3.0*sqrt(3.0))+0.01, label + "actual transverse travel obeys the bounded steering envelope")
 	_check(maximum_acceleration <= 8.1, label + "a start or retarget uses the existing player running acceleration")
 	_check(max_turn <= Follow.MAX_TURN_RATE * dt + 0.00001, label + "keeps the existing angular limit")
 	_check(max_step <= 4.1 * dt + 0.0001, label + "turns and retargets never teleport the body")
 	_check(nav.status == "arrived" and Vector2(actor.position.x - target.x, actor.position.z - target.z).length() <= 0.185, label + "reaches the changed destination through physics")
 	_check(sample.finite and sample.contact_samples > hz, label + "samples finite actual bones and planted feet")
 	_check(float(sample.metrics.max_support_slip_m) <= 0.015, label + "turning and starting retain the strict planted-foot limit")
-	metrics.append({"hz":hz, "turn":sign, "backward_speed_m_s":backward_speed,
+	print("COMPANION_CASE ", JSON.stringify({"hz":hz,"turn":sign,"max_support_slip_m":sample.metrics.max_support_slip_m,"worst_support":sample.worst.get("max_support_slip_m",{}),"maximum_lateral_speed_m_s":maximum_lateral_speed}))
+	metrics.append({"hz":hz, "turn":sign, "maximum_lateral_speed_m_s":maximum_lateral_speed, "backward_speed_m_s":backward_speed,
 		"backwards_running_frames":backwards_running, "aligned_speed_m_s":aligned_speed,
 		"maximum_acceleration_m_s2":maximum_acceleration, "maximum_root_turn_deg":rad_to_deg(max_turn), "world_motion":sample.metrics,
 		"world_worst":sample.worst})
