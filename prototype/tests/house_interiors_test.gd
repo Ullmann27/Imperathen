@@ -566,7 +566,7 @@ func _check_forge(interiors: Node3D, region: Node3D) -> void:
 					continue
 				var fixture_name: String = Family.FORGE_FIXTURES[prop]
 				var fixture := shell.find_child(fixture_name, true, false) as MeshInstance3D
-				var fitted := is_instance_valid(fixture) and fixture.mesh != null and fixture.is_visible_in_tree() and record.get("authored_visual", "") == fixture_name
+				var fitted: bool = is_instance_valid(fixture) and fixture.mesh != null and fixture.is_visible_in_tree() and record.get("authored_visual", "") == fixture_name
 				_check(fitted, prop + " uses its fitted original mesh instead of the kit visual")
 				if not fitted:
 					continue
