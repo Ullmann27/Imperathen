@@ -99,8 +99,26 @@ static func run(tree: SceneTree, check: Callable) -> void:
 	player.drive(0.0)
 	_tick(player, 0.8)
 	check.call(absf(_angle(player)) < 3.0, "Idle recovers after combat")
-	# Fallback is explicit rather than assuming that painted eyes can rotate.
-	check.call(player._gaze.eyes.is_empty() and first._gaze.eyes.is_empty(), "Current source rigs expose no independent eye pair")
+	# The private Meshy youth still has no independently weighted globes.
+	check.call(player._gaze.eyes.is_empty(), "Private youth uses honest head-only fallback")
+	check.call(first._gaze.eyes.size() == 2, "Marcus binds the two independently weighted eyeballs")
+	if first._gaze.eyes.size() == 2:
+		first.position = Vector3.ZERO
+		first.clear_gaze_target()
+		_tick(first, 0.8)
+		second.position = Vector3(-1.2, 0, -2)
+		first.set_gaze_target(second)
+		_tick(first, 1.0 / 60.0)
+		var eye: int = first._gaze.eyes[0]
+		var head_yaw := _angle(first)
+		var eye_yaw := rad_to_deg(Gaze.angles_for(first._gaze.direction_world(eye), first.global_basis).x)
+		check.call(eye_yaw > head_yaw + 2.0 and eye_yaw - head_yaw <= 14.5, "Actual eye joint leads head on new speaker")
+		_tick(first, 0.7)
+		first.clear_gaze_target()
+		_tick(first, 0.9)
+		check.call(absf(_angle(first)) < 3.0, "Marcus returns to neutral")
+		first.configure("companion", "italia", 18)
+		check.call(first._gaze.eyes.size() == 2 and first._gaze._eye_offsets.size() == 2, "Adult eye centre calibration survives rig rebind")
 	print("HEAD_FOCUS_ACTUAL_MODELS ", player.active_model_path, " | ", first.active_model_path)
 	print("HEAD_FOCUS_RIGS player=", player._gaze.skeleton.get_bone_count(), " neck=", player._gaze.neck, " eyes=", player._gaze.eyes.size(), " marcus=", first._gaze.skeleton.get_bone_count(), " neck=", first._gaze.neck, " eyes=", first._gaze.eyes.size())
 	scene.free()

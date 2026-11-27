@@ -12,30 +12,37 @@ var neck := -1
 var eyes: Array[int] = []
 var _saved: Dictionary = {}
 var _written: Dictionary = {}
+var _saved_positions: Dictionary = {}
+var _written_positions: Dictionary = {}
+var _eye_offsets: Dictionary = {}
 var _head_angles := Vector2.ZERO
 var _eye_angles := Vector2.ZERO
 var _initialized := false
 var _time := 0.0
 
-func bind(rig: Skeleton3D, preserve_angles: bool = false) -> void:
+func bind(rig: Skeleton3D, preserve_angles: bool = false, mature_offsets: Dictionary = {}) -> void:
 	restore()
 	skeleton = rig
 	head = -1
 	neck = -1
 	eyes.clear()
+	_eye_offsets.clear()
 	_initialized = _initialized and preserve_angles
 	if not is_instance_valid(rig):
 		_initialized = false
 		return
 	head = rig.find_bone("Head")
 	neck = rig.find_bone("Neck")
-	# Only complete, independently deforming eye pairs are eligible. Current
-	# Marcus and the original youth use the head-only fallback.
+	# The authored Marcus pair is independently weighted; the private youth
+	# still uses the head-only fallback. Require an actual head hierarchy.
 	for names: Array in [["Eye_L", "Eye_R"], ["LeftEye", "RightEye"]]:
 		var left := rig.find_bone(names[0])
 		var right := rig.find_bone(names[1])
-		if left >= 0 and right >= 0:
+		if left >= 0 and right >= 0 and rig.get_bone_parent(left) == head and rig.get_bone_parent(right) == head:
 			eyes.assign([left, right])
+			for eye: int in eyes:
+				var offset: Vector3 = mature_offsets.get(String(rig.get_bone_name(eye)), Vector3.ZERO)
+				_eye_offsets[eye] = rig.get_bone_global_rest(eye).basis.orthonormalized().inverse() * offset
 			break
 
 func available() -> bool:
@@ -49,9 +56,15 @@ func restore() -> void:
 			var last: Quaternion = _written[index]
 			if absf(skeleton.get_bone_pose_rotation(index).dot(last)) > 0.999999:
 				skeleton.set_bone_pose_rotation(index, _saved[index])
+		for index: int in _saved_positions:
+			var last_position: Vector3 = _written_positions[index]
+			if skeleton.get_bone_pose_position(index).is_equal_approx(last_position):
+				skeleton.set_bone_pose_position(index, _saved_positions[index])
 		skeleton.force_update_all_bone_transforms()
 	_saved.clear()
 	_written.clear()
+	_saved_positions.clear()
+	_written_positions.clear()
 
 func suspend() -> void:
 	restore()
@@ -65,11 +78,15 @@ func direction_world(bone: int = -1) -> Vector3:
 	var posed := skeleton.get_bone_global_pose(index).basis.orthonormalized()
 	return (skeleton.global_basis * (posed * (rest.inverse() * Vector3.BACK))).normalized()
 
+func eye_center_world(index: int) -> Vector3:
+	var offset: Vector3 = _eye_offsets.get(index, Vector3.ZERO)
+	return skeleton.to_global(skeleton.get_bone_global_pose(index) * offset)
+
 func anchor_world() -> Vector3:
 	if not available():
 		return Vector3.INF
 	if eyes.size() == 2:
-		return skeleton.to_global((skeleton.get_bone_global_pose(eyes[0]).origin + skeleton.get_bone_global_pose(eyes[1]).origin) * 0.5)
+		return (eye_center_world(eyes[0]) + eye_center_world(eyes[1])) * 0.5
 	var rest := skeleton.get_bone_global_rest(head)
 	var posed := skeleton.get_bone_global_pose(head)
 	# Estimate the eye line from the head joint, scaled to the authored rig.
@@ -104,8 +121,19 @@ func _aim(index: int, world_direction: Vector3, weight: float = 1.0) -> void:
 	if parent >= 0:
 		target = skeleton.get_bone_global_pose(parent).basis.orthonormalized().inverse() * target
 	var rotation := target.get_rotation_quaternion().normalized()
-	_saved[index] = skeleton.get_bone_pose_rotation(index)
+	var base_rotation := skeleton.get_bone_pose_rotation(index)
+	_saved[index] = base_rotation
 	_written[index] = rotation
+	if _eye_offsets.has(index):
+		var offset: Vector3 = _eye_offsets[index]
+		if not offset.is_zero_approx():
+			var base_position := skeleton.get_bone_pose_position(index)
+			# Rotate about the actual age-morphed globe centre; the lid and
+			# skull remain untouched. Remove this translation before sampling.
+			var corrected := base_position + Basis(base_rotation) * offset - Basis(rotation) * offset
+			_saved_positions[index] = base_position
+			_written_positions[index] = corrected
+			skeleton.set_bone_pose_position(index, corrected)
 	skeleton.set_bone_pose_rotation(index, rotation)
 	skeleton.force_update_all_bone_transforms()
 
@@ -141,4 +169,16 @@ func apply(delta: float, actor_basis: Basis, point: Vector3, action: String, ena
 			clampf(angle_difference(_head_angles.x, _eye_angles.x), -EYE_YAW, EYE_YAW),
 			clampf(_eye_angles.y - _head_angles.y, -EYE_PITCH, EYE_PITCH))
 		for eye: int in eyes:
-			_aim(eye, direction_for(eye_goal, actor_basis))
+			var adjusted := eye_goal
+			if point.is_finite():
+				var centre := eye_center_world(eye)
+				var eye_direction := point - centre
+				var midpoint_direction := point - anchor_world()
+				if eye_direction.length_squared() > 0.01 and midpoint_direction.length_squared() > 0.01:
+					var per_eye := angles_for(eye_direction, actor_basis)
+					var midpoint := angles_for(midpoint_direction, actor_basis)
+					adjusted.x += clampf(angle_difference(midpoint.x, per_eye.x), -deg_to_rad(4.0), deg_to_rad(4.0))
+					adjusted.y += clampf(per_eye.y - midpoint.y, -deg_to_rad(2.0), deg_to_rad(2.0))
+			adjusted.x = _head_angles.x + clampf(angle_difference(_head_angles.x, adjusted.x), -EYE_YAW, EYE_YAW)
+			adjusted.y = _head_angles.y + clampf(adjusted.y - _head_angles.y, -EYE_PITCH, EYE_PITCH)
+			_aim(eye, direction_for(adjusted, actor_basis))

@@ -3,8 +3,8 @@
 
 All source files are read-only. The four runtime meshes, a separate editable
 Blend and matched-camera renders are produced in scratch/output directories.
-The existing hero exporter preserves the 15-joint rig, age/face shape keys,
-cloth weights, embedded PBR maps and grounded animation keys.
+The existing hero exporter preserves the 15 locomotion joints and adds two
+independent eyeball joints; age/face morphs, PBR and animation keys remain.
 """
 from __future__ import annotations
 
@@ -147,7 +147,69 @@ def shape_identity():
             "head_height_m": height, "bones": list(arm.data.bones.keys())}
 
 
-def render(output, arm, label, mature=0.0, action=None, frame=0):
+def install_eye_rig(arm):
+    """Rebind the two actual MakeHuman eye surfaces, never the eyelid skin."""
+    obj = bpy.data.objects["HeroEyes"]
+    if obj.parent != arm or not obj.data.shape_keys:
+        raise ValueError("Expected authored skinned eye mesh and age morph")
+    keys = obj.data.shape_keys.key_blocks
+    basis, mature = keys["Basis"], keys["Mature"]
+    points = np.array([tuple(v.co) for v in basis.data], dtype=float)
+    grown = np.array([tuple(v.co) for v in mature.data], dtype=float)
+    if points.shape != grown.shape or not np.isfinite(points).all() or not np.isfinite(grown).all():
+        raise ValueError("Invalid eye geometry")
+    if np.any(np.abs(points[:, 0]) < .005):
+        raise ValueError("Eye surface crosses the anatomical midline")
+    records = {}
+    for side, sign in (("L", 1), ("R", -1)):
+        ids = np.flatnonzero(points[:, 0] * sign > 0)
+        surface = points[ids]
+        adult = grown[ids]
+        span = np.ptp(surface, axis=0)
+        if len(ids) < 40 or not np.all((span > .010) & (span < .055)):
+            raise ValueError("Unrecognised eyeball geometry " + side)
+        # Fit the centre to the actual eye surface bounds rather than a guessed
+        # head joint offset. The source contains separate cornea/sclera islands
+        # for each eye, all of which move together.
+        centre = (surface.min(0) + surface.max(0)) * .5
+        adult_centre = (adult.min(0) + adult.max(0)) * .5
+        if np.linalg.norm(adult_centre - centre) > .035:
+            raise ValueError("Unrecognised mature eye displacement " + side)
+        if any(len({int(points[i, 0] > 0) for i in poly.vertices}) != 1 for poly in obj.data.polygons):
+            raise ValueError("An eye polygon joins both eyes")
+        delta = adult_centre - centre
+        records[side] = {"ids": ids.tolist(), "centre": centre.tolist(),
+                         "span_m": span.tolist(), "adult_delta": [float(delta[0]), float(delta[2]), float(-delta[1])]}
+    old = {b.name: (b.matrix_local.copy(), b.parent.name if b.parent else None) for b in arm.data.bones}
+    bpy.ops.object.select_all(action="DESELECT")
+    arm.select_set(True)
+    bpy.context.view_layer.objects.active = arm
+    bpy.ops.object.mode_set(mode="EDIT")
+    try:
+        for side, row in records.items():
+            bone = arm.data.edit_bones.new("Eye_" + side)
+            bone.head = Vector(row["centre"])
+            bone.tail = bone.head + Vector((0.0, -.025, 0.0))
+            bone.parent = arm.data.edit_bones["Head"]
+            bone.use_connect = False
+            bone.use_deform = True
+    finally:
+        bpy.ops.object.mode_set(mode="OBJECT")
+    for name, (matrix, parent) in old.items():
+        bone = arm.data.bones[name]
+        if any(abs(a - b) > 1e-6 for ar, br in zip(matrix, bone.matrix_local) for a, b in zip(ar, br)) or (bone.parent.name if bone.parent else None) != parent:
+            raise ValueError("Existing locomotion rest changed: " + name)
+    for group in list(obj.vertex_groups):
+        obj.vertex_groups.remove(group)
+    for side, row in records.items():
+        name = "Eye_" + side
+        group = obj.vertex_groups.new(name=name)
+        group.add(row.pop("ids"), 1.0, "REPLACE")
+        arm.pose.bones[name].rotation_mode = "QUATERNION"
+    return records
+
+
+def render(output, arm, label, mature=0.0, action=None, frame=0, eye_yaw=0.0, views=None):
     scene = bpy.context.scene
     # Original studio camera and light setup; identical views for before/after.
     camera = scene.camera
@@ -179,6 +241,13 @@ def render(output, arm, label, mature=0.0, action=None, frame=0):
             bone.location = (0,0,0)
             bone.scale = (1,1,1)
     scene.frame_set(frame)
+    if eye_yaw:
+        from mathutils import Quaternion
+        for side in ('L', 'R'):
+            bone = arm.pose.bones['Eye_' + side]
+            axis = bone.bone.matrix_local.to_3x3().inverted() @ Vector((0, 0, 1))
+            bone.rotation_quaternion = Quaternion(axis.normalized(), math.radians(eye_yaw))
+        bpy.context.view_layer.update()
     camera_poses = {
         "front": ((0,-1.16,1.43),(0,-.015,1.36),78),
         "three-quarter": ((.52,-1.08,1.45),(0,-.015,1.36),78),
@@ -186,6 +255,8 @@ def render(output, arm, label, mature=0.0, action=None, frame=0):
         "side": ((1.12,-.08,1.43),(0,0,1.36),78),
     }
     for name, (pos,target,lens) in camera_poses.items():
+        if views is not None and name not in views:
+            continue
         hero.camera_at(camera,pos,target,lens)
         scene.render.filepath = str(output / f"{label}-{name}.png")
         bpy.ops.render.render(write_still=True)
@@ -210,6 +281,13 @@ def main():
         if len(arm.data.bones) != 15:
             raise ValueError("Marcus must retain the existing compatible skeleton")
         identity = shape_identity()
+        eye_rig = install_eye_rig(arm)
+        identity["bones"] = list(arm.data.bones.keys())
+        identity["eyes"] = eye_rig
+        # Runtime age-offset calibration uses the exported Y-up rest frame.
+        (args.output/"marcus_eye_calibration.json").write_text(json.dumps({
+            "schema": 1, "mature_rest_offsets": {"Eye_"+side: row["adult_delta"] for side, row in eye_rig.items()}
+        }, indent=2)+"\n")
         # Persist the modified source BEFORE activating any review pose.
         # Use the original exporter in a separate scratch directory.
         bpy.context.preferences.filepaths.save_version = 0
@@ -220,6 +298,10 @@ def main():
             render(args.evidence,bpy.data.objects["HeroRig"],"anatomical-base")
             bpy.ops.wm.open_mainfile(filepath=str(scratch/"hero.blend"))
             render(args.evidence,bpy.data.objects["HeroRig"],"marcus-youth")
+            bpy.ops.wm.open_mainfile(filepath=str(scratch/"hero.blend"))
+            render(args.evidence,bpy.data.objects["HeroRig"],"marcus-eye-left",eye_yaw=12.0,views=("front","three-quarter"))
+            bpy.ops.wm.open_mainfile(filepath=str(scratch/"hero.blend"))
+            render(args.evidence,bpy.data.objects["HeroRig"],"marcus-eye-right",eye_yaw=-12.0,views=("front",))
             bpy.ops.wm.open_mainfile(filepath=str(scratch/"hero.blend"))
             render(args.evidence,bpy.data.objects["HeroRig"],"marcus-adult",mature=1.0)
             bpy.ops.wm.open_mainfile(filepath=str(scratch/"hero.blend"))

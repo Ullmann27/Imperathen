@@ -364,7 +364,8 @@ func _reload(level: int) -> void:
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
 	_motion.bind(body, civilian_motion and not imported_youth, identity)
 	var keep_gaze := _motion_identity == identity and not previous_path.is_empty()
-	_gaze.bind(_motion.skeleton if is_instance_valid(_motion.skeleton) else null, keep_gaze)
+	var eye_offsets := MarcusModel.eye_offsets(age >= 18) if MarcusModel.owns(path) else {}
+	_gaze.bind(_motion.skeleton if is_instance_valid(_motion.skeleton) else null, keep_gaze, eye_offsets)
 	_youth_soles.bind(body if imported_youth else null,detail,String(MESHY_YOUTH_OUTFITS[youth_outfit].motion))
 	_motion_identity = identity
 	_motion.restore_world_contacts(contacts)

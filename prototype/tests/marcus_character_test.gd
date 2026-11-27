@@ -52,7 +52,8 @@ func _run() -> void:
 		_check(friend.active_model_path == Person.MarcusModel.PATH % level,"Actual Marcus LOD %d" % level)
 		var body := friend.body.find_child("HeroBody",true,false) as MeshInstance3D
 		var rigs := friend.body.find_children("*","Skeleton3D",true,false)
-		_check(body != null and body.skin != null and not rigs.is_empty() and (rigs[0] as Skeleton3D).get_bone_count() == 15,"Compatible skinned anatomy")
+		_check(body != null and body.skin != null and not rigs.is_empty() and (rigs[0] as Skeleton3D).get_bone_count() == 17,"Compatible skinned anatomy with two eye joints")
+		_check(friend._gaze.eyes.size() == 2,"Actual eye pair is bound at LOD %d" % level)
 		if body:
 			var mature := body.find_blend_shape_by_name("Mature")
 			var jaw := body.find_blend_shape_by_name("JawOpen")
@@ -78,6 +79,7 @@ func _run() -> void:
 	friend.configure("companion","italia",18)
 	_check(Person.MarcusModel.owns(friend.active_model_path),"Adult Marcus retains his own identity")
 	var adult := friend.body.find_child("HeroBody",true,false) as MeshInstance3D
+	_check(Person.MarcusModel.eye_offsets(true).size() == 2,"Mature eye centres calibrated from real source")
 	if adult:
 		var slot := adult.find_blend_shape_by_name("Mature")
 		_check(slot >= 0 and adult.get_blend_shape_value(slot) > .99,"Adult morphology is active")
