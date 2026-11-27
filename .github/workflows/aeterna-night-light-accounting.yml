@@ -1,0 +1,51 @@
+name: AETERNA night benchmark – authored light accounting
+on:
+  push:
+    branches: ['fix/aeterna-night-bench-light-accounting-20261127']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot" artifacts/night-accounting
+          git rev-parse HEAD > artifacts/night-accounting/source.txt
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Actual Godot night protocol, route lifecycle and village lighting
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import render_bench_views route_fire village_look --report artifacts/night-accounting/headless
+          grep -F 'RENDER_BENCH_VIEWS_PASS' artifacts/night-accounting/headless/render_bench_views.log
+          grep -F 'ROUTE_FIRE_PASS' artifacts/night-accounting/headless/route_fire.log
+          grep -F 'VILLAGE_LOOK_PASS' artifacts/night-accounting/headless/village_look.log
+          if grep -Eq 'SCRIPT ERROR:|^ERROR:' artifacts/night-accounting/headless/render_bench_views.log; then exit 1; fi
+      - name: Preserve source-bound test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aeterna-night-accounting-${{ github.run_id }}
+          path: artifacts/night-accounting/
+          if-no-files-found: warn
+          retention-days: 30
