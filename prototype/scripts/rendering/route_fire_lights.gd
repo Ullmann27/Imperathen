@@ -16,6 +16,7 @@ var sites: Array[Vector3] = []
 var _candidates: Array[Vector3] = []
 var _pool: Array[OmniLight3D] = []
 var _flames: MultiMeshInstance3D
+var _holders: MultiMeshInstance3D
 var _clock := 0.0
 var _night := 0.0
 var _elapsed := 0.0
@@ -80,12 +81,35 @@ static func city_candidates() -> Array[Vector3]:
 	return result
 
 func configure(points: Array[Vector3], profile: String) -> void:
-	_candidates = points.duplicate()
+	# Dispose only the visuals owned by this installation, not external children.
+	for light: OmniLight3D in _pool:
+		if is_instance_valid(light):
+			light.free()
+	_pool.clear()
+	if is_instance_valid(_holders):
+		_holders.free()
+	if is_instance_valid(_flames):
+		_flames.free()
+	_holders = null
+	_flames = null
+	sites.clear()
+	_installed = false
+	_route_player = Vector3.INF
+	_route_samples.clear()
+	_elapsed = 0.0
+	_candidates.clear()
+	for point: Vector3 in points:
+		if point.is_finite():
+			_candidates.append(point)
 	set_quality(profile)
 	set_physics_process(true)
 
 func set_quality(profile: String) -> void:
 	_budget = int({"low":1, "balanced":2, "high":3, "very_high":4}.get(profile, 2))
+	# Lower quality takes effect immediately, even between selection ticks.
+	for i in range(_budget, _pool.size()):
+		_pool[i].hide()
+	_elapsed = 0.0
 
 func set_darkness(value: float) -> void:
 	var next := clampf(value,0.0,1.0)
@@ -102,10 +126,12 @@ func set_darkness(value: float) -> void:
 ## by path distance, not straight lines through houses. No light is invented
 ## at a mission marker: only verified, fixed roadside fixtures may illuminate.
 func set_route_context(player_at: Vector3, route: PackedVector2Array) -> void:
+	_route_samples=PackedVector2Array()
+	_elapsed=0.0
 	if not player_at.is_finite():
+		_route_player=Vector3.INF
 		return
 	_route_player=player_at
-	_route_samples=PackedVector2Array()
 	var last:=Vector2(player_at.x,player_at.z)
 	var distance:=0.0
 	var next_sample:=4.0
@@ -131,7 +157,12 @@ func _physics_process(_delta: float) -> void:
 		return
 	# Wait until the actual authored ground/static structures are present in
 	# the physics world. A candidate that cannot be grounded is rejected.
-	var space := get_world_3d().direct_space_state
+	if not is_inside_tree():
+		return
+	var world := get_world_3d()
+	if world == null or world.direct_space_state == null:
+		return
+	var space := world.direct_space_state
 	var shape := CylinderShape3D.new()
 	shape.radius = 0.27
 	shape.height = 1.40
@@ -192,9 +223,9 @@ func _build_batches() -> void:
 	material.roughness = 0.77
 	material.metallic = 0.48
 	tool.set_material(material)
-	var holders := _batch("RoadsideBraziers", tool.commit())
+	_holders = _batch("RoadsideBraziers", tool.commit())
 	for i: int in sites.size():
-		holders.multimesh.set_instance_transform(i, Transform3D(Basis.IDENTITY, to_local(sites[i])))
+		_holders.multimesh.set_instance_transform(i, Transform3D(Basis.IDENTITY, to_local(sites[i])))
 	var card := QuadMesh.new()
 	card.size = Vector2.ONE
 	_flames = _batch("RoadsideFlames", card)
@@ -236,10 +267,13 @@ func _update_flames() -> void:
 	_flames.material_override.set_shader_parameter("lit", lit)
 
 func _process(delta: float) -> void:
-	if not _installed or not is_visible_in_tree() or _night <= 0.04:
+	if not _installed or not is_inside_tree() or not is_visible_in_tree() or _night <= 0.04 or not is_finite(delta) or delta < 0.0:
 		return
 	var camera := get_viewport().get_camera_3d()
-	if not is_instance_valid(camera):
+	if not is_instance_valid(camera) or not camera.global_position.is_finite():
+		for light: OmniLight3D in _pool:
+			light.hide()
+		_elapsed = 0.0
 		return
 	_clock += delta
 	_elapsed -= delta
