@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 128,
+  "version": 129,
   "tasks": [
     {
       "id": "K101",
@@ -626,6 +626,20 @@
       ],
       "access": "edit",
       "note": "Nutzerbilder 27.11.2026: I-01/I-03 Gesicht verdeckt bzw. Rumpf statt Gesicht, I-00 leere Einstellungen, Hand-/Prop-Artefakte. Isolierter erster Fix für belegte starre Augenhöhenheuristik: tatsächlichen gaze_anchor der Figuren verwenden, Regressionen für Kopfposition, Framing und Fallback. Separater visueller QA-Vertrag für alle Bildbefunde. Kein Anspruch auf vollständige Occlusion- oder Arm-/Prop-Reparatur; keine private Asset- oder Bildveröffentlichung."
+    },
+    {
+      "id": "VIS-MARKET-JUG-GRIP",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/world/village/i03_props.gd",
+        "prototype/tests/i03_flow_test.gd",
+        ".github/workflows/aeterna-market-jug-regression.yml"
+      ],
+      "access": "edit",
+      "note": "VIS-002 market service: I03 uses old fixed root-relative offset on same measured pitcher as I01. Align actual handle grip point with live left wrist/palm offset, preserve upright vessel and LOD ownership; no finger/skin/occlusion acceptance. Real I03 flow regression before/after LOD change and delivery. Separate branch and CI; no provider dispatch."
     }
   ]
 }
