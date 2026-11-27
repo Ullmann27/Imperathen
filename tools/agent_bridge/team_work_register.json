@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 173,
+  "version": 174,
   "tasks": [
     {
       "id": "K101",
@@ -811,7 +811,7 @@
     {
       "id": "RAIN-SURFACE-IMPORT-GATE",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "review_pending",
       "revision": "6e15e33edaffe951bf3dc35529207953b58a148c",
       "run_id": "46069363087",
       "scope": [
@@ -820,7 +820,20 @@
         ".github/workflows/aeterna-rain-surface-contract.yml"
       ],
       "access": "edit",
-      "note": "PR #194, exact prior 46066632490 failure. Follow-up uses real village_look group, independent headless import before Compatibility, Dummy audio, source/run receipt provenance; no simulation/threshold changes. Commit compared to previous candidate: exactly one workflow file changed (+7/-4). Actual focused push run 46069363087 observed in_progress; no success or visual/device claim. Additional PR checks triggered by draft creation; do not duplicate."
+      "note": "PR #194, exact prior 46066632490 failure. Follow-up uses real village_look group, independent headless import before Compatibility, Dummy audio, source/run receipt provenance; no simulation/threshold changes. Commit compared to previous candidate: exactly one workflow file changed (+7/-4). Actual focused push run 46069363087 observed in_progress; no success or visual/device claim. Additional PR checks triggered by draft creation; do not duplicate. Actual completed success 46069363087/job 140742330382: import/village_scenery/village_look pass; physical surface error 0.0m all four profiles, headless readback invalid (13.5–15.1m), real Compatibility X11 readback 0.0m for all 450 sampled visible supports (36/80/135/199); artifact 15231798222. Exact candidate ahead 2 behind 0 relative to Preview 1327bd6, three changed files. Independent review confirms 1mm real renderer and 2cm surface tests, unchanged profile budgets; no device/visual acceptance or integration yet."
+    },
+    {
+      "id": "NIGHT-BENCH-LIGHT-ACCOUNTING",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "submitted",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/render_bench_views_test.gd",
+        ".github/workflows/aeterna-night-light-accounting.yml"
+      ],
+      "note": "Independent correction of stale fixed benchmark fixture after actual 46055915040/job 140698245043: eight night accounting failures. Preserve exact existing shadow and atlas checks, require exact authored door and pooled route identities and daylight cleanup. No runtime edits or overlaps with campaign lighting; focused test only; no visual acceptance."
     }
   ]
 }
