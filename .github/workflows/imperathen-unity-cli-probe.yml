@@ -1,0 +1,301 @@
+name: IMPERATHEN Unity CLI connectivity (isolated and read-only)
+on:
+  push:
+    branches:
+      - integration/unity-cli-exploration-20261127
+    paths:
+      - .github/workflows/imperathen-unity-cli-probe.yml
+      - docs/00_governance/UNITY_CLI_ROUTE_20261127.md
+      - tools/unity_bridge/**
+      - tests/unity_bridge_*_test.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: imperathen-unity-cli-exploration
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fetch official Unity CLI installer; record provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p unity-cli-evidence
+          curl --fail --silent --show-error --location --retry 2 --connect-timeout 20 --max-time 120 \
+            https://public-cdn.cloud.unity3d.com/hub/prod/cli/install.sh \
+            --output "$RUNNER_TEMP/unity-cli-install.sh"
+          test -s "$RUNNER_TEMP/unity-cli-install.sh"
+          sha256sum "$RUNNER_TEMP/unity-cli-install.sh" > unity-cli-evidence/installer-sha256.txt
+          bash -n "$RUNNER_TEMP/unity-cli-install.sh"
+      - name: Install official Unity CLI without signing in or installing an Editor
+        shell: bash
+        run: |
+          set -euo pipefail
+          UNITY_CLI_CHANNEL=beta bash "$RUNNER_TEMP/unity-cli-install.sh"
+          export PATH="$HOME/.local/bin:$PATH"
+          test -x "$HOME/.local/bin/unity"
+          unity --version | tee unity-cli-evidence/version.txt
+          unity --help > unity-cli-evidence/cli-help.txt
+          echo "UNITY_CLI_BINARY_INSTALLED" >> unity-cli-evidence/checks.txt
+      - name: Check tooling readiness without credentials, projects, paid AI calls or uploads
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.local/bin:$PATH"
+          unity auth status > "$RUNNER_TEMP/unity-auth-status.txt" 2>&1 && auth=0 || auth=$?
+          unity editors -i > "$RUNNER_TEMP/unity-editors.txt" 2>&1 && editor=0 || editor=$?
+          printf 'auth_status_exit_code=%s\neditor_list_exit_code=%s\n' "$auth" "$editor" >> unity-cli-evidence/checks.txt
+          if test "$auth" -ne 0; then echo "UNITY_ACCOUNT_NOT_AUTHENTICATED_IN_CI" >> unity-cli-evidence/checks.txt; fi
+          echo "NO_UNITY_EDITOR_INSTALLED_BY_THIS_JOB" >> unity-cli-evidence/checks.txt
+          echo "NO_UNITY_LICENSE_ACCESSED_OR_MODIFIED" >> unity-cli-evidence/checks.txt
+          echo "NO_UNITY_PROJECT_OR_IMPERATHEN_GAME_FILE_MODIFIED" >> unity-cli-evidence/checks.txt
+          echo "NO_CLOUD_AI_GENERATION_REQUESTED" >> unity-cli-evidence/checks.txt
+          cat unity-cli-evidence/checks.txt
+      - name: Legacy Unity Cloud CLI compatibility diagnostic (non-gating)
+        continue-on-error: true
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${UNITY_SERVICE_ACCOUNT_ID:-}" && -z "${UNITY_SERVICE_ACCOUNT_SECRET:-}" ]]; then
+            echo "UNITY_SERVICE_ACCOUNT_NOT_YET_CONFIGURED" >> unity-cli-evidence/checks.txt
+            echo "Unity CI credentials are missing from repository Actions secrets" >&2
+            exit 1
+          fi
+          if [[ -z "${UNITY_SERVICE_ACCOUNT_ID:-}" || -z "${UNITY_SERVICE_ACCOUNT_SECRET:-}" ]]; then
+            echo "UNITY_SERVICE_ACCOUNT_INCOMPLETE" >> unity-cli-evidence/checks.txt
+            exit 1
+          fi
+          export PATH="$HOME/.local/bin:$PATH"
+          # Unity CLI automatically uses these two environment variables for
+          # service-account authentication; never print token-bearing output.
+          if unity auth status --format json > "$RUNNER_TEMP/unity-account-status-private.json" 2>&1; then
+            echo "UNITY_SERVICE_ACCOUNT_AUTHENTICATED" >> unity-cli-evidence/checks.txt
+          else
+            echo "UNITY_SERVICE_ACCOUNT_AUTH_FAILED" >> unity-cli-evidence/checks.txt
+            exit 1
+          fi
+          # An auth-status success can mean environment credentials are
+          # configured but does not establish a successful Cloud token exchange.
+          # Try the documented non-persistent service-account login exactly once.
+          # The secret is passed via stdin and never appears on the command line.
+          if printf '%s' "$UNITY_SERVICE_ACCOUNT_SECRET" | unity --non-interactive auth login --client-id "$UNITY_SERVICE_ACCOUNT_ID" --secret-from-stdin --no-store > "$RUNNER_TEMP/unity-explicit-auth-private.json" 2>&1; then
+            echo "UNITY_EXPLICIT_SERVICE_LOGIN_SUCCEEDED" >> unity-cli-evidence/checks.txt
+          else
+            echo "UNITY_EXPLICIT_SERVICE_LOGIN_FAILED" >> unity-cli-evidence/checks.txt
+          fi
+          # Current Unity CLI 1.0 uses the bare plural group, not the removed
+          # 'unity cloud project list' subcommand (October 2026 change).
+          if unity cloud projects --format json > "$RUNNER_TEMP/unity-cloud-projects-private.json" 2>&1; then
+            echo "UNITY_CLOUD_PROJECT_QUERY_SUCCEEDED" >> unity-cli-evidence/checks.txt
+          else
+            echo "UNITY_CLOUD_PROJECT_QUERY_FAILED" >> unity-cli-evidence/checks.txt
+            # Keep full Unity response private. Publish only bounded error classes,
+            # never original messages, keys, org IDs or authentication tokens.
+            python3 - "$RUNNER_TEMP/unity-cloud-projects-private.json" <<'PY'
+          import json, pathlib, sys
+          value = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")
+          try:
+              root = json.loads(value)
+          except (ValueError, TypeError):
+              root = {}
+          error = root.get("error", {}) if isinstance(root, dict) else {}
+          code = str(error.get("code", root.get("code", ""))) if isinstance(error, dict) else ""
+          code = code.upper()
+          allowed_codes = {"FORBIDDEN", "UNAUTHORIZED", "INSUFFICIENT_PERMISSIONS", "ORG_NOT_FOUND",
+                           "ORGANIZATION_REQUIRED", "NOT_FOUND", "ACCESS_DENIED", "NO_DEFAULT_ORG",
+                           "NETWORK_ERROR", "TIMEOUT", "AUTH_REQUIRED", "AUTH_EXPIRED"}
+          safe = code if code in allowed_codes else "UNCLASSIFIED"
+          import re
+          # Never publish the original CLI response: classify HTTP errors and
+          # known conditions using a fixed allowlist of generic, nonsensitive labels.
+          http_status = re.search(r"(?<![0-9])(401|403|404|409|429|500|502|503)(?![0-9])", value)
+          lowered = value.lower()
+          if http_status:
+              safe = "HTTP_" + http_status.group(1)
+          elif "not authorized" in lowered or "unauthorized" in lowered:
+              safe = "UNAUTHORIZED"
+          elif "permission" in lowered or "forbidden" in lowered or "access denied" in lowered:
+              safe = "PERMISSION_DENIED"
+          elif "organization" in lowered and ("select" in lowered or "required" in lowered or "default" in lowered):
+              safe = "ORGANIZATION_SELECTION_REQUIRED"
+          elif "not signed in" in lowered or "sign in" in lowered or "login" in lowered:
+              safe = "AUTHENTICATION_NEEDED"
+          elif "network" in lowered or "connection" in lowered or "timeout" in lowered:
+              safe = "NETWORK_OR_TIMEOUT"
+          with open("unity-cli-evidence/checks.txt", "a", encoding="utf-8") as file:
+              file.write("UNITY_CLOUD_PROJECT_ERROR_CLASS=" + safe + "\n")
+          PY
+            if unity cloud orgs --format json > "$RUNNER_TEMP/unity-cloud-orgs-private.json" 2>&1; then
+              echo "UNITY_CLOUD_ORG_QUERY_SUCCEEDED" >> unity-cli-evidence/checks.txt
+            else
+              echo "UNITY_CLOUD_ORG_QUERY_FAILED" >> unity-cli-evidence/checks.txt
+            fi
+            unity cloud projects --help > unity-cli-evidence/cloud-projects-help.txt 2>&1 || true
+            exit 1
+          fi
+          python3 - "$RUNNER_TEMP/unity-cloud-projects-private.json" <<'PY'
+          import json, pathlib, sys
+          report = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+          try:
+              root = json.loads(report)
+          except json.JSONDecodeError:
+              raise SystemExit("Unity Cloud did not return valid JSON")
+          if root.get("success") is not True:
+              raise SystemExit("Unity Cloud returned an unsuccessful query")
+          def named(obj):
+              if isinstance(obj, dict):
+                  for key in ("name", "projectName", "displayName"):
+                      if str(obj.get(key, "")).casefold() == "imperathen":
+                          return True
+                  return any(named(value) for value in obj.values())
+              if isinstance(obj, list):
+                  return any(named(value) for value in obj)
+              return False
+          if not named(root.get("data")):
+              raise SystemExit("Expected Unity Cloud project Imperathen was not accessible")
+          with open("unity-cli-evidence/checks.txt", "a", encoding="utf-8") as file:
+              file.write("UNITY_CLOUD_IMPERATHEN_PROJECT_VISIBLE\n")
+          PY
+          # The raw response and authentication details remain in runner temp,
+          # are never printed and are never uploaded as an artifact.
+      - name: Probe free Unity AI CLI readiness without generating or spending credits
+        if: always()
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+          UNITY_NON_INTERACTIVE: "1"
+        run: |
+          set -euo pipefail
+          if [[ -z "${UNITY_SERVICE_ACCOUNT_ID:-}" || -z "${UNITY_SERVICE_ACCOUNT_SECRET:-}" ]]; then
+            echo "UNITY_AI_PROBE_SKIPPED_MISSING_SECRETS" >> unity-cli-evidence/checks.txt
+            exit 0
+          fi
+          export PATH="$HOME/.local/bin:$PATH"
+          if ! command -v unity >/dev/null 2>&1; then
+            echo "UNITY_AI_PROBE_SKIPPED_NO_CLI" >> unity-cli-evidence/checks.txt
+            exit 0
+          fi
+          # Plugin installation and doctor are not asset generation commands;
+          # no consent, quote, AI job, or Unity-Credits spending is requested.
+          if unity --non-interactive plugin install ai > "$RUNNER_TEMP/unity-ai-install-private.log" 2>&1; then
+            echo "UNITY_AI_PLUGIN_INSTALLED" >> unity-cli-evidence/checks.txt
+            if unity --non-interactive ai doctor --format json > "$RUNNER_TEMP/unity-ai-doctor-private.json" 2>&1; then
+              echo "UNITY_AI_DOCTOR_PASS" >> unity-cli-evidence/checks.txt
+            else
+              echo "UNITY_AI_DOCTOR_NEEDS_SETUP" >> unity-cli-evidence/checks.txt
+            fi
+          else
+            echo "UNITY_AI_PLUGIN_INSTALL_UNAVAILABLE" >> unity-cli-evidence/checks.txt
+          fi
+          # Never publish service account credentials, AI usage, org data or raw errors.
+      - name: Diagnose Unity Cloud project and organization permissions without exposing data
+        if: always()
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+          UNITY_NON_INTERACTIVE: "1"
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p 'unity_bridge_*_test.py' -v
+          export PATH="$HOME/.local/bin:$PATH"
+          python3 tools/unity_bridge/probe_access.py \
+            --output unity-cli-evidence/cloud-probe-sanitized.json \
+            --org-candidate "heinzullmann2212"
+      - name: Verify Asset Manager direct REST API with service-account read-only rights
+        id: asset_api
+        if: always()
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+          UNITY_CLOUD_ORG_ID: ${{ vars.UNITY_CLOUD_ORG_ID }}
+          UNITY_NON_INTERACTIVE: "1"
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p 'unity_bridge_asset_api_test.py' -v
+          export PATH="$HOME/.local/bin:$PATH"
+          python3 tools/unity_bridge/probe_asset_manager_api.py \
+            --report unity-cli-evidence/unity-asset-api-sanitized.json
+      - name: Gate real Imperathen project visibility (fail closed)
+        if: always()
+        shell: bash
+        env:
+          ASSET_API_STEP_OUTCOME: ${{ steps.asset_api.outcome }}
+        run: |
+          set -euo pipefail
+          if [[ "$ASSET_API_STEP_OUTCOME" != "success" ]]; then
+            echo "UNITY_PROJECT_VISIBILITY_BLOCKED_API_STEP_FAILED"
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("unity-cli-evidence/unity-asset-api-sanitized.json")
+          if not path.is_file():
+              raise SystemExit("UNITY_PROJECT_VISIBILITY_BLOCKED_MISSING_REPORT")
+          report = json.loads(path.read_text(encoding="utf-8"))
+          if (report.get("provider") != "unity_asset_manager_api"
+                  or report.get("read_only") is not True
+                  or report.get("result") != "IMPERATHEN_VISIBLE"
+                  or report.get("project_seen") is not True
+                  or report.get("project_count_on_page", 0) < 1):
+              raise SystemExit("UNITY_PROJECT_VISIBILITY_BLOCKED_NOT_PROVEN")
+          with Path("unity-cli-evidence/checks.txt").open("a", encoding="utf-8") as out:
+              out.write("UNITY_IMPERATHEN_ASSET_MANAGER_API_CONFIRMED\\n")
+          print("UNITY_IMPERATHEN_ASSET_MANAGER_API_CONFIRMED")
+          PY
+      - name: Validate the first original Unity art production queue without generating assets
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/unity_bridge/validate_production_queue.py \
+            --report unity-cli-evidence/production-queue-validated.json
+      - name: Inspect real Imperathen Unity Asset Manager inventory (read-only)
+        if: always()
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+          UNITY_CLOUD_ORG_ID: ${{ vars.UNITY_CLOUD_ORG_ID }}
+        run: |
+          set -euo pipefail
+          python3 tools/unity_bridge/inventory_asset_manager.py \
+            --report unity-cli-evidence/unity-inventory-sanitized.json
+      - name: Inspect Unity AI generator production readiness (read-only, zero credits)
+        if: always()
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+          UNITY_CLOUD_ORG_ID: ${{ vars.UNITY_CLOUD_ORG_ID }}
+          UNITY_NON_INTERACTIVE: "1"
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.local/bin:$PATH"
+          python3 tools/unity_bridge/probe_ai_readiness.py \
+            --report unity-cli-evidence/unity-ai-readiness-sanitized.json
+      - name: Keep only sanitized CLI evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: imperathen-unity-cli-probe-${{ github.run_id }}
+          path: unity-cli-evidence/
+          if-no-files-found: warn
+          retention-days: 7
