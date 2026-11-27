@@ -29,7 +29,7 @@ report=json.loads((root/"vegetation-safe-report.json").read_text())
 assert not report["failures"],report
 assert report["renderer"]=="gl_compatibility",report
 required={"isolated-grass-near","isolated-grass-far","isolated-herbs","isolated-tree-lod3","isolated-tree-impostor",
-          "game-menu","game-prologue","game-family-handoff","game-well","game-meadow-ultra"}
+          "game-menu","game-prologue","game-family-handoff","game-well","game-meadow-ultra","game-lane-day","game-lane-night"}
 samples={s["name"]:s for s in report["samples"]}
 assert set(samples)==required,(required-set(samples),set(samples)-required)
 for sample in samples.values():

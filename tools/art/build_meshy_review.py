@@ -10,12 +10,15 @@ bpy.ops.import_scene.gltf(filepath=str(source))
 objects = [obj for obj in bpy.context.scene.objects if obj.type == "MESH" and len(obj.data.polygons)]
 if not objects:
     raise RuntimeError("no_meshes")
+transforms = {obj.name: obj.matrix_world.copy() for obj in objects}
 for obj in objects:
-    transform = obj.matrix_world.copy()
+    transform = transforms[obj.name]
     obj.data = obj.data.copy()
     obj.parent = None
     obj.matrix_world = Matrix.Identity(4)
     obj.data.transform(transform)
+    obj.data.update()
+bpy.context.view_layer.update()
 for obj in list(bpy.context.scene.objects):
     if obj not in objects:
         bpy.data.objects.remove(obj, do_unlink=True)
