@@ -1,0 +1,15 @@
+{
+  "revision": "e1a374f6b40ea16801ea2dc616266eba24c314d1",
+  "task": "Analysiere die tatsächlichen IMPERATHEN-Rendering- und Frame-Pacing-Systeme für Android, Samsung Galaxy Z Fold7, Adreno 830, Godot 4.7.2. Ziel: konsolenartige Spielbarkeit mit hochwertiger Grafik, stabile Framezeiten und thermische Nachhaltigkeit. Priorisiere eine konkret integrierbare Änderung an der vorhandenen Qualitätsregelung: disjunkte Messfenster, echte GPU-Perzentile, CPU/GPU-Unterscheidung, 30/60-FPS-Modi, keine Auflösungsreduktion bei CPU-Engpässen, sichere Wiederherstellung bei fehlenden GPU-Timings. Liefere vollständigen GDScript-Patch, Regressionstests und A/B-Messverfahren. Erfinde keine Geräteergebnisse und empfehle keine NVIDIA-GPU-spezifischen Features für Adreno. Keine neuen parallelen Systeme. Danach nenne die drei nächsten konkreten GPU-/World-Streaming-Experimente.",
+  "files": [
+    "prototype/project.godot",
+    "prototype/assets/quality_profiles.json",
+    "prototype/scripts/rendering/fold7_quality_policy.gd",
+    "prototype/scripts/ui/runtime_display.gd",
+    "prototype/scripts/rendering/render_profile.gd",
+    "prototype/tests/fold7_graphics_policy_test.gd",
+    "prototype/tests/runtime_display_lifecycle_test.gd",
+    "tools/fold7_physical_qa.py"
+  ],
+  "max_tokens": 16384
+}
