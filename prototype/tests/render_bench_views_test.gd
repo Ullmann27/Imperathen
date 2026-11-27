@@ -66,9 +66,52 @@ func _run() -> void:
 			var sources: Array = engine.lights.scene_omni_paths
 			var weaver_hearth: bool = row.quality == "very_high" and row.view != "village_overview"
 			var expected_scene := 1 if weaver_hearth else 0
-			_check(sources.size() == expected_scene and (not weaver_hearth or
-				str(sources[0]).ends_with("/south_weaver_home/Interior/HearthGlow")),
-				"%s/%s has the expected authored lights: %s" % [row.quality, row.view, sources])
+			if row.view == "night_torch":
+				# This fixed lane shot uses the production night lighting, not
+				# just the six synthetic benchmark torches. Independent exact
+				# identities guard the authored 1/3/5/7 door and 1/2/3/4 route
+				# budgets, including the nearest pool slots; no unknown light
+				# may be silently counted as an authored source.
+				var door_ids: Dictionary = {
+					"low": [0], "balanced": [0, 12, 13],
+					"high": [0, 1, 12, 13, 14],
+					"very_high": [0, 1, 2, 11, 12, 13, 14]}
+				var route_counts: Dictionary = {"low": 1, "balanced": 2, "high": 3, "very_high": 4}
+				var expected_doors: Array[String] = []
+				for id: int in door_ids[row.quality]:
+					expected_doors.append("VillageLook/DoorTorchLight%d" % id)
+				var expected_route: Array[String] = []
+				for id in int(route_counts[row.quality]):
+					expected_route.append("VillageLook/ValdoraRouteFires/NearbyBrazierLight%d" % id)
+				var actual_doors: Array[String] = []
+				var actual_route: Array[String] = []
+				var hearths := 0
+				var unexpected: Array[String] = []
+				for raw in sources:
+					var path := str(raw)
+					if path.begins_with("VillageLook/DoorTorchLight"):
+						actual_doors.append(path)
+					elif path.begins_with("VillageLook/ValdoraRouteFires/NearbyBrazierLight"):
+						actual_route.append(path)
+					elif path.ends_with("/south_weaver_home/Interior/HearthGlow"):
+						hearths += 1
+					else:
+						unexpected.append(path)
+				actual_doors.sort()
+				expected_doors.sort()
+				actual_route.sort()
+				expected_route.sort()
+				_check(actual_doors == expected_doors, "%s/night exact door identities: %s" % [row.quality, actual_doors])
+				_check(actual_route == expected_route, "%s/night exact route pool identities: %s" % [row.quality, actual_route])
+				expected_scene += expected_doors.size() + expected_route.size()
+				_check(sources.size() == expected_scene and hearths == (1 if weaver_hearth else 0) and unexpected.is_empty(),
+					"%s/night exact authored inventory (hearths=%d, unknown=%s): %s" % [row.quality, hearths, unexpected, sources])
+			else:
+				# Daylight views retain the original strict inventory and also
+				# reject any leaked night-only door or route light.
+				_check(sources.size() == expected_scene and (not weaver_hearth or
+					str(sources[0]).ends_with("/south_weaver_home/Interior/HearthGlow")),
+					"%s/%s has the expected authored lights: %s" % [row.quality, row.view, sources])
 			var expected_torches := Bench.TORCH_OFFSETS.size() if row.view == "night_torch" else 0
 			_check(int(engine.lights.harness_omni) == expected_torches, "Exact harness torch count for " + str(row.view))
 			_check(int(engine.lights.omni) == expected_scene + expected_torches, "Every visible omni light is accounted for")
