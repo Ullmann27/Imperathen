@@ -1,6 +1,6 @@
 # Kimi K3.1 Pro – permanenter Entwicklungsauftrag
 
-60 initiale, adaptive Arbeitspakete (K01–K60). K01–K06 sind die erste bereits eingereichte Spezialrunde. Die folgenden IDs sind **Backlog**, nicht bereits gestartete API-Anfragen oder fertiggestellte Änderungen. Nach jeder Runde Status, aktuellsten Branch, Abhängigkeiten und reale Tests prüfen; neue Aufgaben ergänzen, obsolete schließen, Konflikte vermeiden. Nacht K07–K12 sowie Alterung K13–K22 haben nächste Priorität. Kanonische Storydateien und vorhandene Alters-/Kalenderlogik sind verbindlich, keine willkürlichen Storyänderungen.
+90 initiale, adaptive Arbeitspakete (K01–K90). K01–K06 sind die erste bereits eingereichte Spezialrunde. Die folgenden IDs sind **Backlog**, nicht bereits gestartete API-Anfragen oder fertiggestellte Änderungen. Nach jeder Runde Status, aktuellsten Branch, Abhängigkeiten und reale Tests prüfen; neue Aufgaben ergänzen, obsolete schließen, Konflikte vermeiden. Nacht K07–K12, Alterung K13–K22 und individuelle Haushalte K61–K70 haben nächste Priorität. Kanonische Storydateien und vorhandene Alters-/Kalenderlogik sind verbindlich, keine willkürlichen Storyänderungen.
 
 ## Produktionsvertrag
 
@@ -86,3 +86,53 @@ Kimi erhält gepinnte, öffentliche Quelltexte und ausgewählte echte Review-Bil
 - [ ] **K58 – Asset-Pipeline:** Blender-Originaldatei, GLB-Export, Rig-/Material-Validierung, Renderbelege und Lizenzprovenienz.
 - [ ] **K59 – Integrationsprüfung:** Alle freigegebenen Änderungen zusammenführen, Story/Save/Motion/GPU-Regressionsprüfungen, keine Doppelimplementierung.
 - [ ] **K60 – Abnahme und nächste Runde:** Offene Defekte aus Tests, tatsächlichen Captures und Nutzerfeedback neu priorisieren; nur geprüfte Kandidaten für APK.
+
+
+## Direkter Kimi-Editor
+
+Kimi ist Lead 3D World, Character, Animation and Graphics Engineer. Der direkte Editor `kimi_editor.py` stellt list_files, read_file, replace_text und create_file für explizit freigegebene Quelldateien bereit. `kimi_editor_request.json` bestimmt eine gepinnte Revision und erlaubte Pfade. Der Workflow erzeugt vollständige geänderte Dateien, Diff und Provenienz als unreviewte Kandidaten. Keine Shell-Ausführung, GitHub-Schreibrechte oder API-Schlüssel für das Modell. Die Entwicklungsleitung prüft und committet akzeptierte Kandidaten auf isolierte Entwicklungsbranches, führt reale Blender/Godot-/CI-Tests aus und aktualisiert den Backlog. K61 ist die erste echte Editor-Anfrage; Erfolg erst bei belegten Toolcalls und verwertbaren Dateiänderungen. Weitere Aufgaben werden aus bestätigten Fehlern, Storyfortschritt und Renderbelegen fortlaufend ergänzt. Bestehende Haushalte und originale Assets nicht neu erfinden oder duplizieren.
+
+## Vertiefung Innenräume und Haushalte
+
+- [ ] **K61:** Generische modulare Einrichtungsbibliothek für Dorf und Stadt; vorhandene individuelle Haushalte erhalten.
+- [ ] **K62:** Möbel, Textilien, Holz-, Keramik-, Bronze- und Eisenobjekte mit echter Geometrie, Material und Maßstab.
+- [ ] **K63:** Einfache Wohnhäuser: Schlafstellen, Kochstelle, Vorratslager und Bewohnergeschichte.
+- [ ] **K64:** Mittlere Wohnhäuser: berufsbezogene Räume und plausible Ablagen.
+- [ ] **K65:** Wohlhabende Häuser: historisch passende Möbel, Atrium und funktionale Raumfolgen.
+- [ ] **K66:** Gasthäuser: Schlafplätze, Schankbereich, Vorräte und Besucherführung.
+- [ ] **K67:** Schmiede: Werkzeuge, Rohstoffe, sichere Interaktions- und Kollisionsverträge.
+- [ ] **K68:** Lager und Wirtschaftsgebäude: Behälter, Regale, Waren und freie Wege.
+- [ ] **K69:** Küchen und Essbereiche: Gefäße, Nahrungsmittel, Herd und Kontaktanimationen.
+- [ ] **K70:** Schlafbereiche: Lager, Betten, Decken, Truhen und familiäre Gegenstände.
+
+## Storyfiguren und Identität
+
+- [ ] **K71:** Protagonist in allen kanonischen Altersstufen: persistente Gesichts- und Körpermerkmale.
+- [ ] **K72:** Eltern, Schmied, Freunde und weitere Storyfiguren: individuelle Identität und korrekte Szenenbindung.
+- [ ] **K73:** Gesichtslandmarken, Mimik und wiedererkennbare Augen/Haarmerkmale.
+- [ ] **K74:** Eigenständige kindliche Anatomie und altersgerechte Animation.
+- [ ] **K75:** Bevölkerungsvielfalt: Berufe, Altersgruppen, Geschlechter, Körperbau und Tagesablauf.
+- [ ] **K76:** Kleidung und Besitz nach sozialem Stand, Region und Zeitepoche.
+
+## Historische Gegenstände und Umgebungserzählung
+
+- [ ] **K77:** Vorräte, Amphoren, Körbe, Werkzeuge, Behälter und ihre physischen Auflagepunkte.
+- [ ] **K78:** Militärische Ablagen, Schildhalter, Waffen und Ausrüstungsgegenstände.
+- [ ] **K79:** Marktstände, Waren, Stoffe, Nahrung und maßstäbliche Originalmodelle.
+- [ ] **K80:** Zeitlich belegte religiöse/rituelle Gegenstände ohne historische Erfindungen.
+- [ ] **K81:** Individuelle Haushaltserzählung durch platzierte und benutzbare Objekte.
+
+## Nacht und Licht
+
+- [ ] **K82:** Dorf bei Nacht: vorhandene Feuer- und Lampensysteme sinnvoll vernetzen.
+- [ ] **K83:** Stadt bei Nacht: Straßenführung und lokale Lichtquellen.
+- [ ] **K84:** Mondlicht, Waldränder, Wege und Gelände-Kontrast ohne Tageslook.
+- [ ] **K85:** Reiten bei Nacht: Sichtweite, Weglesbarkeit, Schatten und Kameratest.
+- [ ] **K86:** Fackeln, Öllichter und Lagerfeuer: echte Quellen, begrenztes Lichtbudget.
+- [ ] **K87:** Wohnraumbeleuchtung: Feuerlicht, Raumlesbarkeit und kein Durchscheinen durch Wände.
+
+## Alltagsanimation und Integration
+
+- [ ] **K88:** Arbeit im Haus: Griff-, Werkzeug- und Objektkontakte.
+- [ ] **K89:** Sitzen, Essen, Schlafen, Gespräche: IK und Synchronisierung.
+- [ ] **K90:** Objektinteraktionen, Story-/Weltintegration und reproduzierbare Regressionen.
