@@ -17,7 +17,10 @@
       "source_sha256": "9f972cab24f3ea8dd896e7d19058dc2c83688942c2cfffd46357670c2aa947e0",
       "source_bytes": 8350208,
       "role": "Sextus, Dorfschmied",
-      "status": "four_blender_lods_exported_engine_qa_pending"
+      "status": "checksum_staged_story_runtime_candidate_godot_device_qa_pending",
+      "verified_pose_samples": 3044,
+      "tear_events": 0,
+      "runtime_manifest": "SEXTUS_RUNTIME_CANDIDATE.json"
     },
     {
       "stable_id": "unit_legacy_tunic_villager",
@@ -25,7 +28,10 @@
       "source_sha256": "a7b1bcbe364ae636d7571886401d298099f5472bec2a82f0df45401d6e7e9507",
       "source_bytes": 8958280,
       "role": "Vibius, ziviler Dorfbewohner / Feldarbeiter",
-      "status": "blocked_deformation_859_torn_edges"
+      "status": "checksum_staged_story_runtime_candidate_godot_device_qa_pending",
+      "verified_pose_samples": 3044,
+      "tear_events": 0,
+      "runtime_manifest": "VIBIUS_RUNTIME_CANDIDATE.json"
     },
     {
       "stable_id": "unit_legacy_roman_legionary_segmentata",

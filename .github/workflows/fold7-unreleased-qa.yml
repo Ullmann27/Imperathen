@@ -78,6 +78,8 @@ jobs:
           set -euo pipefail
           python3 tools/characters/stage_owner_runtime.py --archive "$RUNNER_TEMP/sextus-runtime.zip" --report artifacts/qa/sextus-stage.json
           echo "IMPERATHEN_REQUIRE_SEXTUS=1" >> "$GITHUB_ENV"
+          python3 tools/characters/stage_owner_runtime.py --family vibius --archive "$RUNNER_TEMP/vibius-runtime.zip" --report "artifacts/qa/vibius-stage.json"
+          echo "IMPERATHEN_REQUIRE_VIBIUS=1" >> "$GITHUB_ENV"
       - name: Import the user's already rigged original boy without new secrets
         shell: bash
         run: |

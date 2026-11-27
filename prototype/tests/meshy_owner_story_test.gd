@@ -85,6 +85,26 @@ func _run() -> void:
 		figure._process(1.0/60.0)
 		check(is_instance_valid(figure._resident_prop) and figure._resident_prop.visible,"Actual hand carries existing prop")
 		figure.set_resident_prop("")
+	var farmer := village.get_node_or_null("Resident_vibius/Figure") as Person
+	check(is_instance_valid(farmer) and farmer.resident_id=="vibius","Actual named farmer survives")
+	if OS.get_environment("IMPERATHEN_REQUIRE_VIBIUS")=="1":
+		check(Registry.has_complete_set("unit_legacy_tunic_villager"),"All four Vibius original derivative tiers imported")
+	if is_instance_valid(farmer) and Registry.has_complete_set("unit_legacy_tunic_villager"):
+		farmer.set_process(false)
+		check(farmer._uses_owner_civilian() and farmer.active_model_path.contains("unit_legacy_tunic_villager"),"Original villager assigned to Vibius, not Sextus")
+		for level in 4:
+			farmer._reload(level)
+			check(farmer.active_model_path==Registry.PATH%["unit_legacy_tunic_villager",level],"Vibius actual LOD "+str(level))
+			var skin := SkinTest.new()
+			skin.bind(farmer.body)
+			check(skin.errors.is_empty(),"Vibius actual rig binds")
+			for action: String in ["march","run","work","talk","gather","attack","death"]:
+				farmer.sample_pose(action,0.37)
+				var measured: Dictionary = skin.sample()
+				check(bool(measured.finite) and int(measured.skin_edge_violations)==0,"Vibius actual posed mesh "+action)
+		farmer.reset_motion()
+		farmer.keep_working()
+		check(farmer.clip=="work","Vibius actual farm work animation")
 	var other := Person.new()
 	root.add_child(other)
 	other.configure_resident("italia",40,"civilian_man",1,null,"vil:vibius")

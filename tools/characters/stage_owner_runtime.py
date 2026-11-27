@@ -8,7 +8,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools/art"))
 from inspect_meshy_glb import inspect_glb
-MANIFEST = ROOT / "docs/20_meshy_assets/SEXTUS_RUNTIME_CANDIDATE.json"
+FAMILIES = {"sextus":"unit_legacy_blacksmith", "vibius":"unit_legacy_tunic_villager"}
+MANIFESTS = ROOT / "docs/20_meshy_assets"
 DEST = ROOT / "prototype/assets/meshy/characters"
 
 def digest(data):
@@ -16,10 +17,13 @@ def digest(data):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--family", choices=sorted(FAMILIES), default="sextus")
     ap.add_argument("--archive", type=Path, required=True)
     ap.add_argument("--report", type=Path, required=True)
     args = ap.parse_args()
-    cfg = json.loads(MANIFEST.read_text())
+    cfg = json.loads((MANIFESTS / (args.family.upper()+"_RUNTIME_CANDIDATE.json")).read_text())
+    if cfg["story_id"] != args.family or cfg["asset"] != FAMILIES[args.family]:
+        raise ValueError("Unexpected story model assignment")
     archive = cfg["archive"]
     if not args.archive.exists():
         url = urlsplit(archive["url"])
@@ -36,7 +40,7 @@ def main():
         raise ValueError("Runtime archive mismatch")
     expected = cfg["files"]
     names = [x["name"] for x in expected]
-    if names != [f"unit_legacy_blacksmith_{i}.glb" for i in range(4)]:
+    if names != [f"{FAMILIES[args.family]}_{i}.glb" for i in range(4)]:
         raise ValueError("Unexpected model family")
     with zipfile.ZipFile(args.archive) as z, tempfile.TemporaryDirectory(prefix="owner-runtime-") as temporary:
         if sorted(z.namelist()) != sorted(names+["validation.json"]) or sum(x.file_size for x in z.infolist()) > 15_000_000:
@@ -71,7 +75,7 @@ def main():
             (DEST/name).write_bytes(data)
     args.report.parent.mkdir(parents=True,exist_ok=True)
     args.report.write_text(json.dumps({"status":"STAGED_VERIFIED_QA_CANDIDATE","asset":cfg["asset"],"story_id":cfg["story_id"],"files":expected},indent=2)+"\n")
-    print("OWNER_SEXTUS_RUNTIME_STAGED lods=4 clips=11")
+    print("OWNER_"+args.family.upper()+"_RUNTIME_STAGED lods=4 clips=11")
 
 if __name__ == "__main__":
     main()

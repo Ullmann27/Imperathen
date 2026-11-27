@@ -6,6 +6,7 @@ const PATH := "res://assets/meshy/equipment/%s_%d.glb"
 const LOADOUTS := {
 	# Civilian apprenticeships must not grant military equipment.
 	"unit_legacy_blacksmith": [],
+	"unit_legacy_tunic_villager": [],
 	"unit_germanic_axe_fighter":[
 		{"asset":"weap_germanic_hand_axe", "bone":"Hand_R", "socket":"SOCKET_RIGHT_HAND", "offset":Vector3(0.02,-0.055,0.095), "yaw":PI/2},
 		{"asset":"gear_germanic_round_shield", "bone":"Hand_L", "socket":"SOCKET_LEFT_HAND", "offset":Vector3(-0.02,-0.055,0.095), "yaw":0.0}],

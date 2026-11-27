@@ -3,9 +3,9 @@ extends RefCounted
 ## Four imported tiers are required together so distance cannot swap identity.
 
 const PATH := "res://assets/meshy/characters/%s_%d.glb"
-const SUPPORTED := ["unit_roman_signifer", "unit_germanic_axe_fighter", "unit_legacy_blacksmith"]
+const SUPPORTED := ["unit_roman_signifer", "unit_germanic_axe_fighter", "unit_legacy_blacksmith", "unit_legacy_tunic_villager"]
 ## A recovered story face belongs to that person, not to a random crowd slot.
-const OWNER_STORY := {"sextus": "unit_legacy_blacksmith"}
+const OWNER_STORY := {"sextus": "unit_legacy_blacksmith", "vibius": "unit_legacy_tunic_villager"}
 
 static func story_asset(id: String, origin: String, years: int, appearance: String) -> String:
 	if origin != "italia" or years < 18 or appearance != "civilian_man":

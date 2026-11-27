@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "asset": "unit_legacy_tunic_villager",
+  "story_id": "vibius",
+  "task_id": "01a208fe-0855-74e0-b2ad-2f5c2791c0d0",
+  "source_sha256": "a7b1bcbe364ae636d7571886401d298099f5472bec2a82f0df45401d6e7e9507",
+  "archive": {
+    "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JBiq3Q9vttoZVrKhdbYLuTHXre/a221a72c-78a8-49c5-b0f4-536a3e14dd24.zip",
+    "bytes": 9641307,
+    "sha256": "c7a942df0fad9218998ac15a4bb7d512eb9f58b092e1f34717b831686b20026f"
+  },
+  "bones": 15,
+  "clips": [
+    "idle",
+    "march",
+    "run",
+    "talk",
+    "work",
+    "gather",
+    "train",
+    "attack",
+    "block",
+    "hit",
+    "death"
+  ],
+  "files": [
+    {
+      "name": "unit_legacy_tunic_villager_0.glb",
+      "sha256": "38def67d17497244ea9b066f137480c106f97c40a55e833861253c5e4dece9b0",
+      "bytes": 9312776,
+      "triangles": 14231,
+      "tested_frames": 761,
+      "tear_events": 0
+    },
+    {
+      "name": "unit_legacy_tunic_villager_1.glb",
+      "sha256": "dd92e8f710dab8a06582586a4a8be96ee9bc0975f305244a3fdb790e88caa487",
+      "bytes": 1130372,
+      "triangles": 9975,
+      "tested_frames": 761,
+      "tear_events": 0
+    },
+    {
+      "name": "unit_legacy_tunic_villager_2.glb",
+      "sha256": "51a40cf1fc1532f257a4f95402da2c8be717e41342aae5d369756560cf2a010c",
+      "bytes": 490216,
+      "triangles": 3438,
+      "tested_frames": 761,
+      "tear_events": 0
+    },
+    {
+      "name": "unit_legacy_tunic_villager_3.glb",
+      "sha256": "18277372f3b3bf56665e1461b57e6b2b422820aac464151a0012a223d62d5c86",
+      "bytes": 270392,
+      "triangles": 1136,
+      "tested_frames": 761,
+      "tear_events": 0
+    }
+  ],
+  "status": "qa_candidate_only",
+  "scope": "Owner-authorized optimized derivative build inputs only; no raw source or private backup."
+}

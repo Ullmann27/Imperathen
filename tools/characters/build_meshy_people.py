@@ -33,7 +33,7 @@ PROFILES = {
                                 "sha256": "9f972cab24f3ea8dd896e7d19058dc2c83688942c2cfffd46357670c2aa947e0"},
     "unit_legacy_tunic_villager": {"height": 1.73, "head": .84, "shoulder": .80, "hip": .53,
                                 "elbow": .66, "wrist": .54, "hand_x": .214, "elbow_x": .166,
-                                "shoulder_x": .102, "lower_arm_start": .142, "separated_downarms": True, "wrist_support": (.420,.445),
+                                "shoulder_x": .102, "lower_arm_start": .134, "separated_downarms": True, "wrist_support": (.370,.405),
                                 "sha256": "a7b1bcbe364ae636d7571886401d298099f5472bec2a82f0df45401d6e7e9507"},
     "unit_roman_signifer": {"height": 1.85, "head": .79, "shoulder": .755, "hip": .51,
                             "elbow": .61, "wrist": .475, "hand_x": .145, "shoulder_x": .113,
