@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 96,
+  "version": 97,
   "tasks": [
     {
       "id": "K101",
@@ -478,6 +478,18 @@
       ],
       "access": "edit",
       "note": "N25 provider batch returned no usable output. Independent test-only investigation after repeated commerce failures: legacy calendar starts spring 100 AD and weather can legally suspend outdoor work. Select bounded actual dry/wet windows using LocalWeather and the public calendar transaction; preserve original five dry-work/ledger assertions, add actual wet case requiring no paid repair progress or stock/wood changes. No gameplay or quality gate changes. PR #182, exact CI run observed in_progress. Do not claim solved before engine evidence."
+    },
+    {
+      "id": "HOUSE-GRILLE-CONTRACT",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "c1f0dfb7755c2fb86d6af40237f6f606ac6d3d1f",
+      "run_id": null,
+      "scope": [
+        "prototype/tests/house_interiors_test.gd"
+      ],
+      "access": "edit",
+      "note": "Independent follow-up to #179. Actual twelve rays hit authored three-bar iron grille: family_houses.py and family_kit.py calculate bars at quarter widths. Preserve original rays as expected grille-hit checks, add full-mesh clear gap probes and shell-behind-bar probes, preserve solid adjacent wall and all other assertions. No mesh/physical/profile change. New isolated branch with focused CI; no acceptance before tests."
     }
   ]
 }
