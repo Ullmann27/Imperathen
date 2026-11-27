@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 137,
+  "version": 138,
   "tasks": [
     {
       "id": "K101",
@@ -654,6 +654,20 @@
       ],
       "access": "edit",
       "note": "PR #188 c48b0121e2173cc22937b0abdd0ce102a890e74c: I01 old offset branch removed, measured 2 mm grip and upright assertions for empty/full/father handoff, extra father-delivery screenshot. Existing graphical PR workflow 46063412333 observed in_progress; no result, no finger/visual/device claim. Separate from failed market PR."
+    },
+    {
+      "id": "VIS-MARKET-JUG-PHYSICS-SYNC",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "c9fe2960008cf52787fa51c4afe09c4528d236b1",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/world/village/i03_props.gd",
+        "prototype/tests/i03_flow_test.gd",
+        ".github/workflows/aeterna-market-jug-regression.yml"
+      ],
+      "access": "edit",
+      "note": "Follow-up to measured I03 grip failure before LOD in 46062934470 (54.444 mm). Runtime GameWorld physics changes player root before regular idle callbacks; props only update on idle and skeleton_updated. Hypothesis of stale world transform, not proven. Add late physics attachment update only while carrying, retain original idle and skeleton synchronization and strict 5mm assertions, measure several successive frames. No visual/finger/device acceptance; stack on #187, no merge."
     }
   ]
 }
