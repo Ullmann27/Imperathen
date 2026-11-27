@@ -148,6 +148,7 @@ func _shell_geometry(house: Node3D, id: String) -> void:
 		var body := StaticBody3D.new()
 		body.collision_layer = TEST_LAYER
 		body.collision_mask = 0
+		body.set_meta("opening_probe_source", String(mesh.get_path()))
 		var shape := CollisionShape3D.new()
 		shape.shape = mesh.mesh.create_trimesh_shape()
 		body.add_child(shape)
@@ -159,6 +160,7 @@ func _item_body(house: Node3D, record: Dictionary) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.collision_layer = TEST_LAYER
 	body.collision_mask = 0
+	body.set_meta("opening_probe_source", "%s/interior/%s" % [house.get_path(), record.prop])
 	var shape := CollisionShape3D.new()
 	shape.shape = (Kit.meshes[record.prop] as Mesh).create_trimesh_shape()
 	body.add_child(shape)
@@ -623,6 +625,7 @@ func _check_openings(house: Node3D) -> void:
 	var frame := Designs.shell(house.name)
 	var room: Transform3D = house.get_node("Interior").global_transform
 	var total := 0
+	var probes: Array[Dictionary] = []
 	for side: String in frame.openings:
 		var plane: float = frame.wall[side]
 		var out := signf(plane)
@@ -639,7 +642,17 @@ func _check_openings(house: Node3D) -> void:
 						a = hole.position.x + hole.size.x * lerpf(.4, .9, u)
 					var from := Vector3(a, y, plane - out * .05) if side in ["N", "S"] else Vector3(plane - out * .05, y, a)
 					var to := from + (Vector3(0, 0, out) if side in ["N", "S"] else Vector3(out, 0, 0)) * .5
-					open = open and space.intersect_ray(PhysicsRayQueryParameters3D.create(room * from, room * to, TEST_LAYER)).is_empty()
+					# Always execute each ray, even after an earlier blocked quarter.
+					var hit: Dictionary = space.intersect_ray(PhysicsRayQueryParameters3D.create(room * from, room * to, TEST_LAYER))
+					var probe: Dictionary = {"side": side, "opening": str(hole), "from": str(from), "to": str(to), "blocked": not hit.is_empty()}
+					if not hit.is_empty():
+						var collider := hit.get("collider") as Node
+						probe["source"] = String(collider.get_meta("opening_probe_source", str(collider.get_path()))) if is_instance_valid(collider) else "unknown"
+						probe["hit_local"] = str(room.affine_inverse() * (hit.position as Vector3))
+						probe["face_index"] = int(hit.get("face_index", -1))
+						print("HOUSE_OPENING_BLOCKED ", JSON.stringify(probe))
+						open = false
+					probes.append(probe)
 			_check(open, "%s wall opening %s is open in the drawn shell" % [side, hole])
 			for beside: float in [hole.position.x - .2, hole.end.x + .2]:
 				var y := hole.position.y + hole.size.y * .5
@@ -647,6 +660,8 @@ func _check_openings(house: Node3D) -> void:
 				var to := from + (Vector3(0, 0, out) if side in ["N", "S"] else Vector3(out, 0, 0)) * .5
 				_check(not space.intersect_ray(PhysicsRayQueryParameters3D.create(room * from, room * to, TEST_LAYER)).is_empty(),
 					"%s wall is solid beside the opening %s (at %.2f)" % [side, hole, beside])
+	report["opening_probe_house"] = String(house.get_path())
+	report["opening_probes"] = probes
 	_check(total == 5, "One door and four windows are recorded for the shared shell (%d)" % total)
 
 
