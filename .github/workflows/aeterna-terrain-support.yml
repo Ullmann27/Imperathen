@@ -7,7 +7,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 18
+    timeout-minutes: 25
     env:
       GODOT_VERSION: '4.7.2'
       IMPERATHEN_ISOLATED_TEST: '1'
@@ -35,7 +35,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only world_stream_plan regional_terrain regional_footpath --report artifacts/terrain-support
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only world_stream_plan regional_terrain --report artifacts/terrain-support
+      - name: Replay the actual long-distance footpath with movement prediction
+        shell: bash
+        run: |
+          set -euo pipefail
+          state="$(mktemp -d "$RUNNER_TEMP/terrain-route.XXXXXX")"
+          mkdir -p "$state"/{data,config,cache}
+          XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache" timeout --kill-after=10s 600s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/regional_footpath_test.gd 2>&1 | tee artifacts/terrain-support/regional_footpath.log
+          grep -Fq 'REGIONAL_FOOTPATH ' artifacts/terrain-support/regional_footpath.log
+          python3 - <<'PY'
+          import json, pathlib
+          line = next(s for s in pathlib.Path('artifacts/terrain-support/regional_footpath.log').read_text().splitlines() if s.startswith('REGIONAL_FOOTPATH '))
+          report = json.loads(line.removeprefix('REGIONAL_FOOTPATH '))
+          assert report['failures'] == [], report['failures']
+          PY
       - name: Preserve exact logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

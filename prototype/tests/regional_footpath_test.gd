@@ -98,7 +98,7 @@ func _replay(world: Node3D, body: CharacterBody3D, terrain: Node3D, speed: float
 		await physics_frame
 		var before := _flat(body.position)
 		var direction: Vector2 = before.direction_to(Footpath.WAYPOINTS[next_waypoint])
-		terrain.follow(body.position, "low")
+		terrain.follow(body.position, "low", body.get_real_velocity())
 		if use_player_walk:
 			world.set_touch_move(direction)
 			world._move_player(DELTA)
