@@ -218,6 +218,12 @@ class MapCanvas extends Control:
 			else:
 				draw_polyline(clipped,color,width,true)
 
+	# All current kilometre rulers are whole numbers. Avoid unsupported %g,
+	# which raised a Godot runtime error while the graphical test still passed.
+	func scale_caption() -> String:
+		var ruler := int([20,100,500,2000,8000][level])
+		return "%d km" % int(float(ruler) / 1000.0) if ruler >= 1000 else "%d m" % ruler
+
 	func _draw() -> void:
 		draw_rect(Rect2(Vector2.ZERO,size),Color("34443c"))
 		var scale := pixels_per_m()
@@ -284,4 +290,4 @@ class MapCanvas extends Control:
 		var ruler := float([20.0,100.0,500.0,2000.0,8000.0][level])
 		var start := Vector2(14,size.y-20)
 		draw_line(start,start+Vector2(ruler*scale,0),Color("fff0cf"),2.0)
-		draw_string(font,start+Vector2(0,-5),("%g km" % (ruler/1000.0)) if ruler>=1000 else ("%d m" % int(ruler)),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("fff0cf"))
+		draw_string(font,start+Vector2(0,-5),scale_caption(),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("fff0cf"))

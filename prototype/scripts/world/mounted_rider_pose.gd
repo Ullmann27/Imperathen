@@ -4,21 +4,32 @@ extends "res://scripts/visuals/character_motion.gd"
 
 var _figure: Node3D
 var _figure_processed := false
+var _figure_physics_processed := false
 var _animators: Dictionary = {}
 
 
 func start(figure: Node3D) -> bool:
+	if not is_instance_valid(figure) or is_instance_valid(_figure):
+		return false
 	bind(figure, false, "mounted_rider")
 	if not available:
 		return false
 	_figure = figure
 	_figure_processed = figure.is_processing()
+	_figure_physics_processed = figure.is_physics_processing()
 	_figure.set_process(false)
+	# VillagePerson's physics gaze driver can turn the same figure root while
+	# the mounted controller owns heading and the seated rig.
+	_figure.set_physics_process(false)
 	_mute_animators()
 	return true
 
 
 func _mute_animators() -> void:
+	for identity: int in _animators.keys():
+		var saved: Array = _animators[identity]
+		if not is_instance_valid((saved[0] as WeakRef).get_ref()):
+			_animators.erase(identity)
 	for node in _figure.find_children("*", "AnimationPlayer", true, false):
 		var mixer := node as AnimationPlayer
 		var identity := mixer.get_instance_id()
@@ -38,6 +49,8 @@ func seated(lean: float) -> bool:
 		_mute_animators()
 	if not available:
 		return false
+	_figure.set_process(false)
+	_figure.set_physics_process(false)
 	_reset()
 	var size := clampf(_height / 1.5, 0.72, 1.38)
 	var pitch := deg_to_rad(4.0 + 7.0 * clampf(lean, 0.0, 1.0))
@@ -72,7 +85,8 @@ func stop() -> void:
 			mixer.active = bool(saved[1])
 	_animators.clear()
 	if is_instance_valid(_figure):
-		_figure.set_process(_figure_processed)
 		if _figure.has_method("reset_motion"):
 			_figure.call("reset_motion")
+		_figure.set_process(_figure_processed)
+		_figure.set_physics_process(_figure_physics_processed)
 	_figure = null
