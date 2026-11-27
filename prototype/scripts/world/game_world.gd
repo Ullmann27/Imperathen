@@ -1369,7 +1369,12 @@ func _move_player(delta: float) -> void:
 	var focus: Control = get_viewport().gui_get_focus_owner()
 	var editing_text := focus is LineEdit or focus is TextEdit
 	var running := _running or (not editing_text and Input.is_physical_key_pressed(KEY_SHIFT))
+	var full_family_jug: bool = is_instance_valid(i01_props) and i01_props.full_jug_carried()
+	if full_family_jug:
+		running = false
 	var top_speed := (CHILD_RUN_SPEED if int(_state.get("player", {}).get("age", 12)) < 18 else PLAYER_SPEED) if running else WALK_SPEED
+	if full_family_jug:
+		top_speed *= 0.76
 	var in_action := CombatActions.busy(_actions.state)
 	var previous_yaw := _figure.rotation.y
 	if direction.length_squared() > 0.01 and not in_action:

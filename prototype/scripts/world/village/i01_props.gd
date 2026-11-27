@@ -32,6 +32,7 @@ var _bench_jug: Node3D
 var _carrier: Node3D
 var _held_cups: Array[String] = []
 var _holding_jug := false
+var _full_jug := false
 var _jug_mode := ""
 var _jug_pending := ""
 var _jug_action := ""
@@ -41,11 +42,14 @@ var _jug_from := Transform3D.IDENTITY
 var _jug_goal := Transform3D.IDENTITY
 
 func begin_jug_action(action: String) -> void:
-	if action in ["i01_well","i01_park_jug","i01_pour","fill_water","father_morning","i07_water_fetch","i07_water_bring"]:
+	if action in ["i01_take_jug","i01_well","i01_park_jug","i01_pour","fill_water","father_morning","i07_water_fetch","i07_water_bring"]:
 		_jug_pending = action
 
 func jug_in_hand() -> bool:
 	return visible and _holding_jug
+
+func full_jug_carried() -> bool:
+	return jug_in_hand() and _full_jug
 
 func jug_animating() -> bool:
 	return not _jug_action.is_empty()
@@ -114,6 +118,7 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 	_carrier = figure
 	_held_cups.clear()
 	_holding_jug = false
+	_full_jug = false
 	if not enabled:
 		_jug_action = ""
 		_jug_pending = ""
@@ -124,6 +129,7 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 			_bench_jug.visible = true
 		return
 	var view := I01.presentation(state)
+	_full_jug = str(view.water) == "jug"
 	var cup_state: Dictionary = view.cups
 	var filled: bool = str(view.water) in ["poured", "silvanus"] or str(view.status) == "legacy"
 	for owner: String in I01.CUPS:
