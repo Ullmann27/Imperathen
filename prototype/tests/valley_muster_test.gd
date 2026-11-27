@@ -90,6 +90,7 @@ func _run() -> void:
 	for _i in 50:
 		adult.tick(Battle.STEP)
 	print("MUSTER_MEASURE ", JSON.stringify({"initial_people": 69, "fixed_steps": 50, "cpu_usec": Time.get_ticks_usec() - begin, "mounted_move_m": d1, "dismounted_move_m": d2}))
+	await _mounted_socket_probe()
 	await _highland_initial(bench)
 	await _ui(bench)
 	print("VALLEY_MUSTER_RESULT checks=%d failures=%d" % [tests, failures])
@@ -97,6 +98,42 @@ func _run() -> void:
 		print("VALLEY_MUSTER_PASS")
 	quit(1 if failures else 0)
 
+
+
+
+## Use the same authored horse and rider without the battle rig pool. Manual
+## seek is sampled immediately and after a tree frame, independently of LOD.
+func _mounted_socket_probe() -> void:
+	var probe := Valley.Rider.new()
+	root.add_child(probe)
+	var skeleton := probe._seat.get_parent() as Skeleton3D
+	var index := skeleton.find_bone("SOCKET_RIDER") if skeleton != null else -1
+	check(index >= 0 and probe._pose.available, "Direct production cavalry rig exposes its skeletal socket and rider pose")
+	if index >= 0 and probe._pose.available:
+		for state: String in ["idle", "march", "run"]:
+			for phase: float in [0.0, 0.25, 0.5, 0.75]:
+				probe.present(state, phase, 0.0)
+				var immediate := _socket_residuals(probe, skeleton, index)
+				await process_frame
+				var deferred := _socket_residuals(probe, skeleton, index)
+				print("VALLEY_SOCKET_PROBE ", JSON.stringify({"state": state, "phase": phase,
+					"immediate": immediate, "after_frame": deferred}))
+				# Keep the battle's existing 3 cm contact gate and additionally
+				# compare to the independently sampled underlying bone.
+				check(float(immediate.pelvis_seat_m) < 0.03 and float(deferred.pelvis_seat_m) < 0.03,
+					"Direct rider keeps 3 cm seat contact at %s/%.2f" % [state, phase])
+				check(float(immediate.bone_seat_m) < 0.03 and float(deferred.bone_seat_m) < 0.03,
+					"Attachment follows the independently measured bone at %s/%.2f" % [state, phase])
+	probe.queue_free()
+	await process_frame
+
+
+func _socket_residuals(probe: Node3D, skeleton: Skeleton3D, index: int) -> Dictionary:
+	var bone := skeleton.to_global(skeleton.get_bone_global_pose(index).origin)
+	var seat: Vector3 = probe._seat.global_position
+	var pelvis: Vector3 = probe._pose.pelvis_world()
+	return {"bone_seat_m": bone.distance_to(seat), "pelvis_seat_m": pelvis.distance_to(seat),
+		"bone_pelvis_m": bone.distance_to(pelvis), "bone": str(bone), "seat": str(seat), "pelvis": str(pelvis)}
 
 
 ## A fresh, production scene focused on the enemy isolates asset/pool identity
@@ -156,6 +193,21 @@ func _ui(bench: Dictionary) -> void:
 	scene._process(0.0)
 	var first: String = scene.model.squads[UNIT].uids[0]
 	var rider: Node3D = scene.actors.get(first)
+	var first_agent = scene.agents.agents.get(first)
+	var first_has_pose: bool = rider != null and rider._pose.available
+	var first_residual := -1.0
+	if first_has_pose:
+		first_residual = rider._pose.pelvis_world().distance_to(rider._seat.global_position)
+	var mounted_rows: Array = []
+	for uid: String in scene.model.squads[UNIT].uids:
+		var agent = scene.agents.agents.get(uid)
+		mounted_rows.append({"uid": uid, "rig": scene.actors.has(uid),
+			"detail": agent.detail if agent != null else -1,
+			"visible": agent.visible if agent != null else false})
+	print("VALLEY_SOCKET_ALLOCATION ", JSON.stringify({"first_uid": first, "first_rig": rider != null,
+		"first_pose": first_has_pose, "pelvis_seat_m": first_residual,
+		"first_detail": first_agent.detail if first_agent != null else -1,
+		"pool_deferrals": scene.pool_deferrals, "rows": mounted_rows}))
 	check(rider != null and rider._pose.available and rider._pose.pelvis_world().distance_to(rider._seat.global_position) < 0.03, "Visible mounted soldier sits on moving skeletal socket")
 	await _capture("reiteraufgebot")
 	scene._action("rolls")

@@ -1,0 +1,55 @@
+name: AETERNA mounted socket – independent N29 diagnostics
+on:
+  push:
+    branches: ['fix/aeterna-mounted-socket-diagnostic-20261127']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GODOT_VERSION: '4.7.2'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install checksum-verified Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Original muster gate and independent socket/rig provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/mounted-socket-diagnostic
+          git rev-parse HEAD > artifacts/mounted-socket-diagnostic/source-commit.txt
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import valley_muster --report artifacts/mounted-socket-diagnostic
+      - name: Print source-bound identity evidence
+        if: always()
+        shell: bash
+        run: |
+          if test -f artifacts/mounted-socket-diagnostic/valley_muster.log; then
+            grep -E 'VALLEY_SOCKET_|VALLEY_HIGHLAND_IDENTITY|VALLEY_MUSTER_|^ERROR:' artifacts/mounted-socket-diagnostic/valley_muster.log || true
+          fi
+      - name: Preserve actual identity evidence even if the gate fails
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aeterna-mounted-socket-diagnostic-${{ github.run_id }}
+          path: artifacts/mounted-socket-diagnostic/
+          if-no-files-found: warn
+          retention-days: 30
