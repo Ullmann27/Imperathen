@@ -260,6 +260,13 @@ jobs:
               out.write("UNITY_IMPERATHEN_ASSET_MANAGER_API_CONFIRMED\\n")
           print("UNITY_IMPERATHEN_ASSET_MANAGER_API_CONFIRMED")
           PY
+      - name: Validate the first original Unity art production queue without generating assets
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/unity_bridge/validate_production_queue.py \
+            --report unity-cli-evidence/production-queue-validated.json
       - name: Inspect real Imperathen Unity Asset Manager inventory (read-only)
         if: always()
         shell: bash
