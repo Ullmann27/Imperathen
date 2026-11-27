@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "source_revision": "2a286cec428940e4c7d09d0c12745e2cac5a30f8",
+  "capture": "actual Godot menu and production New Life I-01 playthrough",
+  "renderer": "gl_compatibility / Linux software",
+  "physical_device_pass": false,
+  "visual_acceptance": false,
+  "stages": [
+    {
+      "name": "import",
+      "exit_code": 0,
+      "timeout": false,
+      "marker_found": true,
+      "passed": true,
+      "log": "import.log"
+    },
+    {
+      "name": "menu",
+      "exit_code": 0,
+      "timeout": false,
+      "marker_found": true,
+      "passed": true,
+      "log": "menu.log"
+    },
+    {
+      "name": "playthrough",
+      "exit_code": 0,
+      "timeout": false,
+      "marker_found": true,
+      "passed": true,
+      "log": "playthrough.log"
+    }
+  ],
+  "images": [
+    {
+      "file": "menu.png",
+      "sha256": "8390daf18d2f0fe8e140e89fdb7975627bfae6e33ea23929eeb84478f620236e",
+      "width": 1280,
+      "height": 720,
+      "bytes": 408281
+    },
+    {
+      "file": "01-prolog.png",
+      "sha256": "a56dfa4553a92df9f01342d3a5d495e82d37e71908cd9a88106fc0821de9ed8f",
+      "width": 1280,
+      "height": 720,
+      "bytes": 666091
+    },
+    {
+      "file": "02-morgenwahl.png",
+      "sha256": "afa3e63bfc81189ffb5e82d3d4b253cb23fab18fde5a6b54e60d559d2ed95427",
+      "width": 1280,
+      "height": 720,
+      "bytes": 892586
+    },
+    {
+      "file": "03-familienhaus.png",
+      "sha256": "4e79100ed2d97bd1d19d30291cf48b9ae18645c0f3a37ae11bd58c447b231f91",
+      "width": 1280,
+      "height": 720,
+      "bytes": 1087449
+    },
+    {
+      "file": "04-brunnen.png",
+      "sha256": "821a645faa433fe3aaead9128efdab97d63c0d8b0b6abaa699776061a0571131",
+      "width": 1280,
+      "height": 720,
+      "bytes": 1778396
+    },
+    {
+      "file": "04b-gefuellter-krug.png",
+      "sha256": "a13f354be355d720ef577d5665e001ebcad091b55e9227c79c031aada3909658",
+      "width": 1280,
+      "height": 720,
+      "bytes": 1779295
+    },
+    {
+      "file": "05-tischgespraech.png",
+      "sha256": "775d1d3ca6ea81e467efc3127df8ffdddbdc0d90e929a8c2fc1cf94716d6d2d5",
+      "width": 1280,
+      "height": 720,
+      "bytes": 914800
+    },
+    {
+      "file": "06-auf-der-schwelle.png",
+      "sha256": "388df3c71a8c27235f11cb1ef8d101dbbe4db5870fd6681cc88e97ad98b7ec45",
+      "width": 1280,
+      "height": 720,
+      "bytes": 1699934
+    }
+  ],
+  "missing_or_invalid_images": [],
+  "engine_pass": true,
+  "workflow_run_id": "46012575656"
+}
