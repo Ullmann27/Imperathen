@@ -97,11 +97,14 @@ def check_api(org_id: str, key_id: str, secret: str) -> dict:
     if not isinstance(projects, list):
         return {"result": "INVALID_RESPONSE_SHAPE"}
     seen = any(
-        isinstance(p, dict) and str(p.get("name", "")).casefold() == "imperathen"
+        isinstance(p, dict) and str(p.get("name", "")).strip().casefold() == "imperathen"
         for p in projects
     )
-    return {"result": "IMPERATHEN_VISIBLE" if seen else "PROJECT_NOT_IN_PAGE",
-            "project_seen": seen}
+    count = len(projects)
+    # Count is safe diagnostic metadata; do not expose project names, IDs, or Cloud metadata.
+    return {"result": ("IMPERATHEN_VISIBLE" if seen else "NO_PROJECTS_VISIBLE" if count == 0
+                       else "IMPERATHEN_NOT_IN_RETURNED_PAGE"),
+            "project_seen": seen, "project_count_on_page": count}
 
 def main():
     parser = argparse.ArgumentParser()
