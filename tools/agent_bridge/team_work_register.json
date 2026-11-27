@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 144,
+  "version": 145,
   "tasks": [
     {
       "id": "K101",
@@ -700,6 +700,21 @@
       ],
       "access": "edit",
       "note": "PR #191 exact 6d593cbbd2fc94247f6751a4f0b8f2a1a1005e04, four commits; actual focused push 46065039724/job 140728194211 in_progress. Seven new physics assertions. 1.05m provisional horizontal normal shoulder spacing, capped to 85% of requested distance, bounded alternate sweeps retain all previous collision safety. Actual I01 source image still visual failure. No acceptance. Separate from #186/#190. M03 I00 terrain job 140726953601 independently verified 87/87, stage y=5.981636, min mud clearance 0.332749m, old buried vertices 16128; capture job 140726954021 still running."
+    },
+    {
+      "id": "VIS-YOUTH-CAP-BINDING",
+      "owner": "Coordinator",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "tools/art/youth_cap_binding.py",
+        "tools/art/test_youth_cap_binding.py",
+        ".github/workflows/aeterna-youth-cap-binding.yml",
+        "docs/44_integration/YOUTH_CAP_BINDING_20261127.md"
+      ],
+      "access": "edit",
+      "note": "M10/M11: source review finds cap position snapping without corresponding binding update in build_youth_civil_outfit.py. Hypothesis only. Read-only actual original staged civilian LOD audit and separate candidate cap-weight correction limited to exactly coincident unambiguous original hand-cut seams. No body/geometry/motion/texture/identity modifications; numerical before/after, negative controls and real Godot evidence. No private GLB publication or production-builder modifications until measured evidence."
     }
   ]
 }
