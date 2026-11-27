@@ -90,11 +90,56 @@ func _run() -> void:
 	for _i in 50:
 		adult.tick(Battle.STEP)
 	print("MUSTER_MEASURE ", JSON.stringify({"initial_people": 69, "fixed_steps": 50, "cpu_usec": Time.get_ticks_usec() - begin, "mounted_move_m": d1, "dismounted_move_m": d2}))
+	await _highland_initial(bench)
 	await _ui(bench)
 	print("VALLEY_MUSTER_RESULT checks=%d failures=%d" % [tests, failures])
 	if failures == 0:
 		print("VALLEY_MUSTER_PASS")
 	quit(1 if failures else 0)
+
+
+
+## A fresh, production scene focused on the enemy isolates asset/pool identity
+## from the later mounted combat camera, casualties and action-held LODs.
+func _highland_initial(bench: Dictionary) -> void:
+	var scene := Valley.new()
+	scene.model = Battle.new(58, bench)
+	var enemy: Dictionary = scene.model.squads.ridge_guard
+	scene.focus = Vector2(enemy.x, enemy.z)
+	scene.distance = 12.0
+	scene.azimuth = 0.72
+	root.add_child(scene)
+	await process_frame
+	var rows := _highland_rows(scene, "initial_enemy_focus")
+	var correct := 0
+	for row: Dictionary in rows:
+		if row.has("actor_path"):
+			check(row.actor_family == "forest_swordsman" and str(row.actor_path).begins_with("res://assets/germanic_warriors/forest_swordsman_"), "Initial enemy rig retains the original Germanic body: " + str(row.uid))
+			correct += int(row.actor_family == "forest_swordsman" and str(row.actor_path).begins_with("res://assets/germanic_warriors/forest_swordsman_"))
+	check(correct > 0, "A fresh close enemy view actually materializes an authored highland swordsman")
+	scene.queue_free()
+	await process_frame
+
+
+func _highland_rows(scene: Node, context: String) -> Array:
+	var rows := []
+	for uid: String in scene.model.squads.ridge_guard.uids:
+		var row := {"uid": uid, "far_instance": scene.far_index.has(uid), "dying": scene.dying_actors.has(uid)}
+		var agent = scene.agents.agents.get(uid)
+		if agent != null:
+			row.merge({"troop_id": agent.troop_id, "visual_family": scene._visual_family(agent),
+				"level": agent.level, "detail": agent.detail, "visible": agent.visible,
+				"camera_distance": agent.camera_distance, "pose": agent.pose})
+		var figure = scene.actors.get(uid)
+		if figure != null:
+			row["actor_class"] = figure.get_script().resource_path
+			row["pool_key"] = str(figure.get_meta("formation_pool_key", ""))
+			row["actor_family"] = figure.family if figure is Valley.TribalFigure else ""
+			row["actor_path"] = figure._body.scene_file_path if figure is Valley.TribalFigure and is_instance_valid(figure._body) else ""
+		rows.append(row)
+	print("VALLEY_HIGHLAND_IDENTITY ", JSON.stringify({"context": context, "rows": rows,
+		"budget": scene.levels.last, "pool_deferrals": scene.pool_deferrals, "camera": str(scene.camera.global_position)}))
+	return rows
 
 
 func _ui(bench: Dictionary) -> void:
@@ -154,6 +199,7 @@ func _ui(bench: Dictionary) -> void:
 			var figure = scene.actors.get(uid)
 			if figure is Valley.TribalFigure and figure.family == "forest_swordsman" and figure._body.scene_file_path.contains("germanic_warriors"):
 				saw_highland = true
+		_highland_rows(scene, "original_combat_camera")
 		check(saw_highland, "Höhenbund uses the authored Germanic swordsman with distinct clothing, weapon and shield")
 		await _capture("gemeinsames-gefecht")
 		if OS.get_cmdline_user_args().size() > 1 and DisplayServer.get_name() != "headless":
