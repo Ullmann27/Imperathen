@@ -12,6 +12,7 @@ const Childhood = preload("res://scripts/story/village_childhood.gd")
 const OpeningStory = preload("res://scripts/story/opening_story.gd")
 const VillageWorld = preload("res://scripts/world/village_life_world.gd")
 const Combat = preload("res://scripts/domain/combat_actions.gd")
+const Tracks = preload("res://scripts/domain/melee/melee_tracks.gd")
 var game
 var checks := 0
 var failures: Array[String] = []
@@ -297,6 +298,7 @@ func _run() -> void:
 			var health_before := int(current.health)
 			var player_health_before := int(game.model.data.player.health)
 			game.ui.action_requested.emit("attack",{"technique":"jab_left"})
+			_check(str(game.model.data.village.unarmed.target_id) == str(current.id), "Actual input selects the intended reachable living raider")
 			_check(int(game.model.data.village.raid.enemies[index].health)==health_before,"An actual attack input starts a motion without instant damage")
 			_advance(0.25)
 			var interrupted: bool = int(game.model.data.player.health)<player_health_before and game.model.data.village.unarmed.technique==""
@@ -335,6 +337,11 @@ func _run() -> void:
 		game.opening_overlay._request_skip()
 		game.opening_overlay._request_advance()
 	await _frames()
+	game.world._figure.rotation.y = 0.0
+	game.ui.action_requested.emit("attack",{"technique":"jab_left"})
+	_advance(0.7)
+	_check(int(game.model.data.progress.training_hits) == 0, "Training introduction distance alone grants no contact")
+	_move(Vector3(0,1,-6.4))
 	game.world._figure.rotation.y = 0.0
 	for index in 3:
 		game.ui.action_requested.emit("attack",{"technique":"jab_left"})
@@ -448,43 +455,44 @@ func _advance_real_motion(seconds: float) -> void:
 
 
 func _approach_combat_target(target: Dictionary) -> bool:
-	# These tests teleport for travel, but never through a wall to fabricate a
-	# melee hit. The north palisade can separate a raider from the old +Z fixture.
+	# Fixture placement remains collision checked. Old one-metre approaches
+	# predated the measured strike capsules and cannot reach with this jab.
 	var point := Vector2(float(target.x), float(target.z))
 	var shape: CapsuleShape3D = game.world._player.get_child(0).shape
-	for index in 8:
-		var offset := Vector2(0.0, 1.0).rotated(float(index) * PI / 4.0)
-		var candidate := point + offset
-		if not game.world.combat_sight_clear(candidate, point):
-			continue
-		# Raiders now converge on the same gate and street. Approach from a side
-		# where this raider, not a neighbour, is the jab's nearest target.
-		if _other_raider_targeted(target, candidate, point):
-			continue
-		var query := PhysicsShapeQueryParameters3D.new()
-		query.shape = shape
-		query.transform = Transform3D(Basis.IDENTITY, Vector3(candidate.x, 1.0, candidate.y))
-		query.collision_mask = 1 | 4
-		query.exclude = [game.world._player.get_rid()]
-		if not game.world.get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty():
-			continue
-		_move(Vector3(candidate.x, 1.0, candidate.y))
-		var direction := (point - candidate).normalized()
-		game.world._figure.rotation.y = atan2(-direction.x, -direction.y)
-		return true
-	return false
-
-
-func _other_raider_targeted(target: Dictionary, from: Vector2, point: Vector2) -> bool:
-	var spec: Dictionary = Combat.TECHNIQUES.jab_left
-	var facing := (point - from).normalized()
-	for enemy: Dictionary in game.model.data.village.raid.enemies:
-		if str(enemy.id) == str(target.id) or int(enemy.health) <= 0:
-			continue
-		var offset := Vector2(float(enemy.x), float(enemy.z)) - from
-		if offset.length() <= from.distance_to(point) + 0.05 and offset.length() < float(spec.reach) + 0.3 and facing.dot(offset.normalized()) >= float(spec.arc_dot):
+	for distance: float in [0.70, 0.65, 0.60]:
+		for index in 16:
+			var offset := Vector2(0.0, distance).rotated(float(index) * TAU / 16.0)
+			var candidate := point + offset
+			var direction := (point - candidate).normalized()
+			if not game.world.combat_sight_clear(candidate, point):
+				continue
+			var frame := _jab_contact_frame(candidate, point, direction)
+			if frame < 0 or frame > 15:
+				continue
+			if game.world._actions._select_enemy_target(candidate, direction, game.model.data.village.raid.enemies, "jab_left") != str(target.id):
+				continue
+			var query := PhysicsShapeQueryParameters3D.new()
+			query.shape = shape
+			query.transform = Transform3D(Basis.IDENTITY, Vector3(candidate.x, 1.0, candidate.y))
+			query.collision_mask = 1 | 4 | 8
+			query.exclude = [game.world._player.get_rid()]
+			if not game.world.get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty():
+				continue
+			_move(Vector3(candidate.x, 1.0, candidate.y))
+			game.world._figure.rotation.y = atan2(-direction.x, -direction.y)
 			return true
 	return false
+
+
+func _jab_contact_frame(source: Vector2, point: Vector2, direction: Vector2) -> int:
+	var timing := Combat.measured("jab_left")
+	var scale := Combat.strike_scale(game.model.data, "jab_left")
+	var body := Tracks.kit("raider")
+	for frame in range(maxi(1, int(timing.start)), int(timing.end) + 1):
+		var hit := Tracks.sweep_body(Combat.strike_kit("jab_left"), "jab_left", scale, Vector3(source.x, 0.0, source.y), atan2(-direction.x, -direction.y), frame, Vector3(point.x, 0.0, point.y), float(body.radius), float(body.height))
+		if not hit.is_empty():
+			return frame
+	return -1
 
 
 func _move(position: Vector3) -> void:

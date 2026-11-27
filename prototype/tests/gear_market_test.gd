@@ -292,6 +292,12 @@ func _trained_villager():
 	model.set_player_position(Vector3(0, 1, -6))
 	model.advance(maxf(0.0, 240.0 - float(model.data.village.social.seconds)))
 	_ok(model.execute("train"), "Adult transition")
+	# The old 1 m position is beyond even the scaled adult left jab.
+	var practice_before := int(model.data.village.unarmed.practice_hits)
+	_ok(_attack(model, "practice"), "Out-of-reach training attempt can start")
+	model.advance(0.7)
+	_check(model.data.progress.training_hits == 0 and int(model.data.village.unarmed.practice_hits) == practice_before, "The old one-metre fixture earns no imaginary training or practice")
+	model.set_player_position(Vector3(0, 1, -6.4))
 	for i in 3:
 		_ok(_attack(model, "practice"), "Adult training contact")
 		model.advance(0.7)
