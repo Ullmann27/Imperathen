@@ -22,7 +22,7 @@ jobs:
         run: python3 -m unittest discover -s tools/agent_bridge -p 'test_*.py' -v
       - name: Ask NVIDIA Nemotron for implementation on pinned public source
         env:
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.IMPERATUM_NVIDIA }}
         run: python3 tools/agent_bridge/nemotron_bridge.py --request tools/agent_bridge/request.json --output artifacts/nemotron
       - name: Save unexecuted engineering answer and provenance
         if: always()

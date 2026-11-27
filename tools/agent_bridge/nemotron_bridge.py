@@ -149,7 +149,7 @@ def main():
     args = parser.parse_args()
     key = os.environ.get("NVIDIA_API_KEY", "").strip()
     if not key:
-        print("NVIDIA_BRIDGE_NOT_CONFIGURED: add the NVIDIA_API_KEY GitHub Actions secret.")
+        print("NVIDIA_BRIDGE_NOT_CONFIGURED: add the IMPERATUM_NVIDIA GitHub Actions secret.")
         return 2
     if len(key) > 512 or any(ord(c) < 33 or ord(c) > 126 for c in key):
         print("NVIDIA_BRIDGE_ERROR: invalid credential format", file=sys.stderr)
