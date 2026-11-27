@@ -11,6 +11,7 @@ const LOOPS := ["idle","march","run","talk","work","retreat"]
 const COMPANY_STRIDES := {"march":1.30,"run":1.75,"retreat":1.48}
 const FacialMotion := preload("res://scripts/visuals/facial_motion.gd")
 const HeadGaze := preload("res://scripts/visuals/head_gaze.gd")
+const PoseDress := preload("res://scripts/visuals/pose_dress.gd")
 const SocialFocus := preload("res://scripts/visuals/social_focus.gd")
 const ResidentIdentity := preload("res://scripts/visuals/resident_identity.gd")
 const CharacterMotion := preload("res://scripts/visuals/character_motion.gd")
@@ -78,6 +79,7 @@ var _gaze := HeadGaze.new()
 var _social_focus := SocialFocus.new()
 var _cloth_targets: Array[Dictionary] = []
 var _cloth_weight := Vector2.ZERO
+var _pose_dress := PoseDress.new()
 var _motion := CharacterMotion.new()
 var _carrying_jug := false
 const ResidentActivity := preload("res://scripts/visuals/resident_activity.gd")
@@ -393,6 +395,9 @@ func _reload(level: int) -> void:
 	var imported_youth := active_model_path.begins_with("res://assets/characters/hero_meshy_italia_")
 	var civilian_motion := role in ["player", "companion", "regional_worker"] or (role == "resident" and _frontier_identity() in ["", "civilian_man", "civilian_woman", "elder"])
 	_motion.bind(body, civilian_motion and not imported_youth and not _uses_owner_civilian(), identity)
+	_pose_dress.clear()
+	if resident_id == "julia":
+		_pose_dress.bind(body)
 	var keep_gaze := _motion_identity == identity and not previous_path.is_empty()
 	var eye_offsets := MarcusModel.eye_offsets(age >= 18) if MarcusModel.owns(path) else {}
 	_gaze.bind(_motion.skeleton if is_instance_valid(_motion.skeleton) else null, keep_gaze, eye_offsets)
@@ -428,6 +433,7 @@ func _reload(level: int) -> void:
 		_motion.restore_lod_transition(transition)
 	if keep_gaze and not _posed:
 		_apply_gaze(0.0)
+	_update_pose_dress()
 	# Retaining every hero PackedScene would also retain every embedded texture
 	# tier. Live instances keep their own references; inactive tiers may unload.
 	if path.begins_with("res://assets/characters/hero_quality_") or previous_path.begins_with("res://assets/characters/hero_quality_"):
@@ -884,6 +890,7 @@ func sample_pose(action: String, normalized: float) -> void:
 	_play(action,normalized,0)
 	_face.pose(action,normalized,detail)
 	_apply_motion(true)
+	_update_pose_dress()
 
 
 func _play(action: String, normalized: float, blend: float) -> void:
@@ -908,6 +915,7 @@ func _play(action: String, normalized: float, blend: float) -> void:
 	animator.seek(phase*animation.length,true)
 	animator.advance(0)
 	_apply_motion()
+	_update_pose_dress()
 
 
 func _playback_animation(name_in_file: String, looping: bool) -> Animation:
@@ -1177,6 +1185,7 @@ func _process(delta: float) -> void:
 		# is applied only after the authored pose. Combat samples stay pure.
 		if not _service_external and is_instance_valid(_social_focus.target()):
 			_apply_gaze(delta)
+		_update_pose_dress()
 		return
 	if clip != "death":
 		_remaining = maxf(0,_remaining - delta)
@@ -1291,7 +1300,13 @@ func _set_cloth_sway(weights: Vector2) -> void:
 			mesh.set_blend_shape_value(int(entry.right), weights.y)
 
 
+func _update_pose_dress() -> void:
+	if _pose_dress.bound() and is_instance_valid(body):
+		_pose_dress.apply(body.global_position.y)
+
+
 func _update_cloth_sway(delta: float) -> void:
+	_update_pose_dress()
 	if _cloth_targets.is_empty():
 		return
 	var swing := 0.0

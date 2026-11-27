@@ -210,7 +210,7 @@ def texture_material(name, color=(1,1,1,1), texture=None, normal=None, roughness
     return mat
 
 
-def generated_maps():
+def generated_maps(tunic_colour=None):
     """Native material maps: microscopic relief and woven linen, no baked light."""
     size=512;y,x=np.mgrid[0:size,0:size]
     rng=np.random.default_rng(22112026)
@@ -220,7 +220,7 @@ def generated_maps():
         img=bpy.data.images.new(name,width=size,height=size,is_data=colorspace=='Non-Color')
         rgba=np.ones((size,size,4),dtype=np.float32);rgba[:,:,:3]=data
         img.pixels.foreach_set(rgba.ravel());img.pack();return img
-    linen=image('HeroLinen_woven_base',np.clip(np.array([.39,.35,.28])[None,None,:]*(1+weave[:,:,None]+grain[:,:,None]),0,1))
+    linen=image('HeroLinen_woven_base',np.clip(np.array(tunic_colour if tunic_colour is not None else [.39,.35,.28])[None,None,:]*(1+weave[:,:,None]+grain[:,:,None]),0,1))
     rough=image('HeroLinen_roughness',np.repeat(np.clip(.83+grain,0,1)[:,:,None],3,axis=2),'Non-Color')
     normal=image('HeroSkin_micro_normal',np.stack((.5+grain,.5+np.roll(grain,1,0),np.ones_like(grain)),axis=2),'Non-Color')
     linen_normal=image('HeroLinen_weave_normal',np.stack((.5+.04*np.cos(x*1.7),.5+.04*np.cos(y*1.7),np.ones_like(grain)),axis=2),'Non-Color')
@@ -970,6 +970,58 @@ def preserve_grounded_death_keys(path, arm):
     return len(frames)
 
 
+def child_hair_style(kind, anatomy, arm):
+    """Independent, fitted child hair silhouettes; no changes to original hero.
+    The shared short02 scalp source remains licensed and head-bound. Hair is
+    displaced by anatomical height/rear masks, with a separate braided mesh
+    for the older girl. This is an art candidate, not an AAA claim.
+    """
+    hair=bpy.data.objects.get('HeroHair')
+    if hair is None:return
+    coords=np.array([tuple(v.co) for v in hair.data.vertices],dtype=float)
+    lo=coords.min(axis=0);hi=coords.max(axis=0)
+    center=(lo+hi)/2
+    neck=anatomy['joints']['Head'][0].z
+    def deform(point):
+        p=Vector(point)
+        side=min(1.,abs(p.x-center[0])/max(.001,(hi[0]-lo[0])/2))
+        rear=max(0.,min(1.,(p.y-center[1]+.015)/.10))
+        lower=max(0.,min(1.,(hi[2]-p.z)/max(.001,hi[2]-lo[2])))
+        if kind=='boy_child':
+            p.z-=.012*lower*rear
+        elif kind=='boy_teen':
+            p.x+=.014*(1-lower)*(.4+rear)
+            p.z+=.018*(1-lower)
+        elif kind=='girl_child':
+            amount=max(rear,.80*side)*lower*lower
+            p.z=max(neck-.055,p.z-.15*amount)
+            p.y+=.014*rear*lower
+        elif kind=='girl_teen':
+            p.y+=.026*rear*lower
+            p.x*=1.-.07*side*lower
+        return p
+    for v in hair.data.vertices:v.co=deform(v.co)
+    if hair.data.shape_keys:
+        for key in hair.data.shape_keys.key_blocks:
+            for v in key.data:v.co=deform(v.co)
+    hair.data.update()
+    if kind=='girl_teen':
+        # Three woven strands along a curved, head-bound braid at the rear.
+        # Braid is separate geometry, tapered and fitted to the actual scalp.
+        mat=hair.data.materials[0]
+        z0=float(center[2]-.025);y0=float(hi[1]-.010)
+        for strand in range(3):
+            vertices=[];radii=[]
+            for i in range(33):
+                t=i/32.;phase=math.tau*(4.0*t+strand/3.)
+                radius=.015*(1.-.55*t)
+                vertices.append(Vector((center[0]+.012*math.sin(phase)*(1-.65*t),
+                                        y0+.035*math.sin(math.pi*t)+.010*math.cos(phase),
+                                        z0-.18*t)))
+                radii.append(radius)
+            tube('YouthBraidedHair_'+str(strand),vertices,radii,mat,arm,'Head',n=8)
+
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--preview-only',action='store_true');parser.add_argument('--export',action='store_true');parser.add_argument('--no-render',action='store_true');parser.add_argument('--clay',action='store_true')
     parser.add_argument('--refit-existing', action='store_true', help='Preserve the authored hero geometry/materials and correct its skirt weights and fall')
@@ -1021,8 +1073,12 @@ def main():
         return
     bpy.ops.wm.read_factory_settings(use_empty=True)
     anatomy=load_anatomy(args.adult_candidate,child_candidate=args.child_candidate);arm=make_rig(anatomy['joints'])
-    maps=generated_maps()
-    skin_path=SRC/'system_assets/skins/young_caucasian_female/young_lightskinned_female_diffuse.png'
+    child_colours={'boy_child':(.50,.43,.31),'girl_child':(.36,.17,.14),
+                   'boy_teen':(.22,.29,.19),'girl_teen':(.20,.30,.42)}
+    maps=generated_maps(child_colours.get(args.child_candidate))
+    masculine=args.adult_candidate=='silvanus' or str(args.child_candidate).startswith('boy_')
+    skin_path=SRC/('system_assets/skins/young_caucasian_male/young_lightskinned_male_diffuse.png'
+                   if masculine else 'system_assets/skins/young_caucasian_female/young_lightskinned_female_diffuse.png')
     if not skin_path.is_file() and not args.clay:raise FileNotFoundError(skin_path)
     skin=texture_material('HeroSkin',texture=skin_path if skin_path.is_file() else None,color=(.55,.40,.30,1),roughness=.63)
     attach_map(skin,maps[2],'Normal',True);attach_map(skin,maps[4],'Roughness')
@@ -1035,6 +1091,15 @@ def main():
     if not args.clay:
         hairmat=texture_material('HeroHair',texture=hairpath/'short02_diffuse.png',normal=hairpath/'short02_normal.png',roughness=.71,alpha=True)
         accessory('HeroHair',hairpath/'short02.obj',hairpath/'short02.mhclo',anatomy,arm,hairmat)
+    if args.child_candidate and not args.clay:
+        # Use the fitted, licensed brow and lash meshes, rather than painted
+        # identical eye outlines. Keep this change in independent child art.
+        for label,folder,stem in [('HeroEyebrows','eyebrows/eyebrow001','eyebrow001'),
+                                  ('HeroEyelashes','eyelashes/eyelashes01','eyelashes01')]:
+            path=SRC/'system_assets'/folder
+            material=texture_material(label,texture=path/(stem+'.png'),roughness=.76,alpha=True)
+            accessory(label,path/(stem+'.obj'),path/(stem+'.mhclo'),anatomy,arm,material)
+        child_hair_style(args.child_candidate,anatomy,arm)
     clothing(anatomy,arm,linen,leather)
     if args.child_candidate:
         blade=bpy.data.objects.get('PracticeBlade')
@@ -1064,10 +1129,11 @@ def main():
         levels=export_lods(connector_delivery=False,source_file=destination,output_dir=candidate_dir,file_prefix='city_'+args.child_candidate)
         (candidate_dir/'candidate.json').write_text(json.dumps({
             'candidate':args.child_candidate,'blender':bpy.app.version_string,
-            'normalized_height_m':1.50,'joints':list(anatomy['joints']),
+            'normalized_height_m':1.50,'suggested_height_m':{'boy_child':1.22,'girl_child':1.20,'boy_teen':1.57,'girl_teen':1.53}[args.child_candidate],
+            'joints':list(anatomy['joints']),
             'lods':levels,'death_contact':death_contact,
             'acceptance':'ART_REVIEW_REQUIRED',
-            'limitations':['Shared hair and skin textures; individual identity needs art review.',
+            'limitations':['Fitted hair silhouettes, separate dyes and sex-specific licensed skin sources; all require visual review.',
                            'No runtime installation; age-dependent height, gait and cloth clearance need QA.',
                            'Technical animation library is not a child behavior policy.']},indent=2)+'\n')
         print('CHILD_ANATOMY_CANDIDATE',args.child_candidate,len(levels))
