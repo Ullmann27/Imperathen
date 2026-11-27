@@ -38,7 +38,7 @@ func _run() -> void:
 	data.village.behavior.people.flavia.observed = false
 	data.village.behavior.people.flavia.fatigue = 12.0
 	data.village.behavior.people.flavia.social_need = 10.0
-	var ledger := data.resources.duplicate(true)
+	var ledger: Dictionary = data.resources.duplicate(true)
 	Behavior._decide_all(data,0.0)
 	check(Behavior.view(data,"flavia").activity=="meal","Actual resident decision chooses midday break")
 	check(Behavior.view(data,"lucius").activity!="meal","Guard retains duty")
