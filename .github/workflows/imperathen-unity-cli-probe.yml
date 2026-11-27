@@ -7,7 +7,7 @@ on:
       - .github/workflows/imperathen-unity-cli-probe.yml
       - docs/00_governance/UNITY_CLI_ROUTE_20261127.md
       - tools/unity_bridge/**
-      - tests/unity_bridge_probe_access_test.py
+      - tests/unity_bridge_*_test.py
   workflow_dispatch:
 
 permissions:
@@ -211,7 +211,7 @@ jobs:
           UNITY_NON_INTERACTIVE: "1"
         run: |
           set -euo pipefail
-          python3 -m unittest discover -s tests -p 'unity_bridge_probe_access_test.py' -v
+          python3 -m unittest discover -s tests -p 'unity_bridge_*_test.py' -v
           export PATH="$HOME/.local/bin:$PATH"
           python3 tools/unity_bridge/probe_access.py \
             --output unity-cli-evidence/cloud-probe-sanitized.json \
