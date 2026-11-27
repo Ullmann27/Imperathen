@@ -467,6 +467,7 @@ def garment_weights(joint_names, gv, kind, gparam, gf, old_v, old_j, old_w, rig)
     # Skirt: wool hangs from the pelvis; the lower it is the more it follows
     # the thigh on its own side. No arm influence at all.
     m = kind == PART_KIND["skirt"]
+    skirt_mask = m.copy()
     skirt_ids = [joint_names.index(x) for x in ("Pelvis","Lumbar","Thigh_L","Thigh_R")]
     allowed[np.ix_(m, skirt_ids)] = True
     y = gv[m, 1]
@@ -513,7 +514,7 @@ def garment_weights(joint_names, gv, kind, gparam, gf, old_v, old_j, old_w, rig)
     order = np.argsort(-dense, axis=1)[:, :4]
     wts = np.take_along_axis(dense, order, 1)
     wts /= wts.sum(1, keepdims=True)
-    if np.any((wts[m] > 1e-7) & ~np.isin(order[m], skirt_ids)):
+    if np.any((wts[skirt_mask] > 1e-7) & ~np.isin(order[skirt_mask], skirt_ids)):
         raise ValueError("Skirt weights escaped the pelvis/thigh contract")
     forbidden = [i for i,n in enumerate(joint_names) if n.startswith(("Forearm_","Hand_","Palm_","FingerCurl_","Thumb_","ForearmTwist_"))]
     if np.any((wts > 1e-7) & np.isin(order, forbidden)):
