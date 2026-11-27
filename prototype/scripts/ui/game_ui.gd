@@ -370,11 +370,11 @@ func show_menu(can_continue: bool) -> void:
 	var new_button := _roman_button("Neues Leben", _request_new_game, not can_continue, font_size, button_height)
 	life.add_child(new_button)
 	var demo_button := _roman_button("Talgefecht erproben", func(): _emit("valley_demo"), false, font_size, button_height)
-	var city_button := _roman_button("Stadt frei erkunden", func(): _emit("city_exploration"), true, font_size, button_height)
+	var city_button := _roman_button("Stadt frei erkunden", func(): _emit("city_exploration"), false, font_size, button_height)
 	city_button.name = "FreeCityExploration"
 	city_button.tooltip_text = "Freie Erkundung der vollständigen Stadt um 100 n. Chr. mit Kolosseum und eigener Speicherung."
 	life.add_child(city_button)
-	var imperial_button := _roman_button("Rom 100 n. Chr. · Kolosseum", func(): _emit("imperial_city_exploration"), true, font_size, button_height)
+	var imperial_button := _roman_button("Rom 100 n. Chr. · Kolosseum", func(): _emit("imperial_city_exploration"), false, font_size, button_height)
 	imperial_button.name = "ImperialCityExploration"
 	imperial_button.tooltip_text = "Direkt am begehbaren Kolosseum beginnen; verändert deinen Kampagnenspielstand nicht."
 	more.add_child(imperial_button)
