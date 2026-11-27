@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 189,
+  "version": 190,
   "tasks": [
     {
       "id": "K101",
@@ -891,14 +891,14 @@
     {
       "id": "N29-MUSTER-BOUNDED-PROMOTION",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "9e8a0b26fe1e5aacfcd94df016f317675f6e39fe",
-      "run_id": null,
+      "run_id": "46081941328",
       "scope": [
         "prototype/tests/valley_muster_test.gd"
       ],
       "access": "edit",
-      "note": "Verify actual paused production _process cadence at 60 Hz, with 0.5s maximum to materialize eligible four riders. Preserve original UID and 3cm seat assertion; add all four contacts and per-pass three-instance quota checks. Diagnostic test only, not visual or device acceptance."
+      "note": "Verify actual paused production _process cadence at 60 Hz, with 0.5s maximum to materialize eligible four riders. Preserve original UID and 3cm seat assertion; add all four contacts and per-pass three-instance quota checks. Diagnostic test only, not visual or device acceptance. Actual commit 32bedab0817b135ec7a6cd6a9e38845b8cb82847, exactly one test file +36/-0 compared to pinned revision; PR #196 updated with lease, focused CI queued. Original assertion remains verbatim; additionally verifies each rider, no duplicates, no simulation advance, unchanged rig budget. No model resubmit, no visual acceptance."
     }
   ]
 }
