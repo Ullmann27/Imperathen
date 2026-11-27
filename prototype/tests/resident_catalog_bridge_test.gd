@@ -38,6 +38,12 @@ func _run() -> void:
 		first._reload(level)
 		second._reload(level)
 		_check(first.body != null and second.body != null and first.detail == level and second.detail == level, "both actors retain actual LOD %d" % level)
+		var expected_path := "res://assets/characters/frontier_civilian_woman_%d.glb" % level
+		_check(first.body != null and first.active_model_path == expected_path and first.body.scene_file_path == expected_path, "named resident uses exact original civilian woman GLB at LOD %d" % level)
+		_check(second.body != null and second.active_model_path == expected_path and second.body.scene_file_path == expected_path, "second resident uses same original family, separate appearance at LOD %d" % level)
+		var digest := FileAccess.get_sha256(expected_path)
+		_check(digest.length() == 64, "original civilian model bytes available for provenance")
+		print("AETERNA_ATELIER_RUNTIME ", JSON.stringify({"family": "civilian_woman", "lod": level, "path": expected_path, "sha256": digest, "actor": first.resident_id, "instantiated_scene": first.body.scene_file_path if first.body != null else ""}))
 		var a := _cloth(first)
 		var b := _cloth(second)
 		_check(a != null and b != null and a != b and a.albedo_color != b.albedo_color, "same base model displays distinct named clothing at LOD %d" % level)

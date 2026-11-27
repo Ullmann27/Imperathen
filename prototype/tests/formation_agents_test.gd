@@ -500,10 +500,14 @@ func _test_identity_across_switches(profile: String, large: bool) -> void:
 					var a = v.agents.agents[uid]
 					stats.worst_step = {"uid": uid, "t": t, "level": state.level, "previous_level": previous.level,
 						"detail": state.detail, "previous_detail": previous.detail, "speed": a.speed,
-						"correction": a.correction.length(), "contact": a.contact, "pose": state.pose}
+						"correction": a.correction.length(), "contact": a.contact, "pose": state.pose,
+						"previous_position": str(previous.position), "position": str(state.position), "camera_focus": str(v.focus), "camera_distance": v.distance}
 				stats.max_step = maxf(stats.max_step, step)
 				if state.pose in Soldier.STRIDES and previous.pose in Soldier.STRIDES:
-					stats.max_phase_step = maxf(stats.max_phase_step, absf(wrapf(float(state.phase) - float(previous.phase), -0.5, 0.5)))
+					var phase_step := absf(wrapf(float(state.phase) - float(previous.phase), -0.5, 0.5))
+					if phase_step > stats.max_phase_step:
+						stats.worst_phase = {"uid": uid, "t": t, "family": state.visual_family, "previous_phase": previous.phase, "phase": state.phase, "previous_pose": previous.pose, "pose": state.pose, "previous_level": previous.level, "level": state.level, "previous_detail": previous.detail, "detail": state.detail}
+					stats.max_phase_step = maxf(stats.max_phase_step, phase_step)
 				if int(state.detail) != int(previous.detail):
 					stats.switches += 1
 					var jump := -1.0
@@ -513,6 +517,8 @@ func _test_identity_across_switches(profile: String, large: bool) -> void:
 						jump = _foot_jump(feet[state.visual_family], _sole_points(v.actors[uid]), v.formation_far_gait(uid))
 					if jump >= 0.0:
 						stats.measured += 1
+						if jump > stats.max_jump:
+							stats.worst_foot_switch = {"uid": uid, "t": t, "family": state.visual_family, "jump_m": jump, "previous_detail": previous.detail, "detail": state.detail, "previous_pose": previous.pose, "pose": state.pose, "previous_phase": previous.phase, "phase": state.phase, "camera_focus": str(v.focus), "camera_distance": v.distance}
 						stats.max_jump = maxf(stats.max_jump, jump)
 		last = states
 		if v.model.outcome != "ongoing":

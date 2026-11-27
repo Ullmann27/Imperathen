@@ -90,6 +90,12 @@ func _test_animation_isolation() -> void:
 		soldier.detail = level
 		root.add_child(soldier)
 		soldier.set_process(false)
+		var original_path := "res://assets/characters/frontier_legionary_%d.glb" % level
+		var digest := FileAccess.get_sha256(original_path)
+		_check(person.body != null and person.active_model_path == original_path and person.body.scene_file_path == original_path, "resident legionary uses original GLB at LOD " + str(level))
+		_check(soldier._body != null and soldier._body.scene_file_path == original_path, "battle soldier uses original GLB at LOD " + str(level))
+		_check(digest.length() == 64, "original legionary model bytes available for provenance")
+		print("AETERNA_ATELIER_RUNTIME ", JSON.stringify({"family": "legionary", "lod": level, "path": original_path, "sha256": digest, "resident_scene": person.body.scene_file_path if person.body != null else "", "battle_scene": soldier._body.scene_file_path if soldier._body != null else ""}))
 		soldier.play_state("block", .7)
 		person.cue("block")
 		var soldier_block := soldier.player.get_animation("block")

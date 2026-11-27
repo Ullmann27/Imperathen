@@ -8,6 +8,7 @@ extends SceneTree
 
 const Bench = preload("res://scripts/rendering/render_bench.gd")
 const Probe = preload("res://scripts/ui/android_graphics_probe.gd")
+const ProfileData = preload("res://assets/quality_profiles.json")
 var checks := 0
 var failures: Array[String] = []
 
@@ -57,6 +58,10 @@ func _run() -> void:
 	var atlas := {}
 	for row in views:
 		var engine: Dictionary = row.metrics.engine
+		# Report actual visible scene and harness light ownership before the
+		# original strict assertions. No light-count gate is relaxed here.
+		var limits: Dictionary = ProfileData.data.profiles[row.quality].review_limits
+		print("AETERNA_LIGHT_EVIDENCE ", JSON.stringify({"profile": row.quality, "view": row.view, "camera": engine.camera, "sun": engine.sun, "environment": engine.environment, "lights": engine.lights, "review_visible_lights": limits.visible_lights, "review_shadow_lights": limits.shadow_casting_lights}))
 		_check(engine.profile == row.quality, "%s/%s rendered with the requested profile" % [row.quality, row.view])
 		_check(int(row.metrics.frames) == 2, "Measured frame count recorded")
 		atlas[row.quality] = int(engine.viewport.positional_shadow_atlas_size)

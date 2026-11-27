@@ -21,6 +21,12 @@ func run() -> void:
 	var sun := DirectionalLight3D.new()
 	scenery.add_child(sun)
 	var environment := Environment.new()
+	# Weather is independent of the seasonal baseline. The production rain
+	# renderer needs a real active camera and static support ray hits.
+	var camera := Camera3D.new()
+	scenery.add_child(camera)
+	camera.position = Vector3(0, 2, 12)
+	camera.current = true
 	var shared_color: Texture2D
 	for label in NAMES:
 		var scene := load("res://assets/village/%s.glb" % label) as PackedScene
@@ -49,7 +55,13 @@ func run() -> void:
 	var previous := 0
 	for profile in ["low","balanced","high","very_high"]:
 		scenery.set_quality(profile)
+		scenery.set_weather_state({"rain": 0.0, "wetness": 0.0, "wind": 1.0})
 		scenery.apply_season(2,sun,environment)
+		require(not scenery._rain.visible, profile + " dry autumn has no active rain")
+		require(is_equal_approx(float(scenery.ground_material.get_shader_parameter("wetness")), 0.249), profile + " dry autumn seasonal moisture")
+		scenery.set_weather_state({"rain": 0.55, "wetness": 0.90, "wind": 1.2})
+		for tick in range(16):
+			await physics_frame
 		require(scenery._stockade[0].multimesh.mesh == (scenery._fence_far if profile=="low" else scenery._fence_near),profile+" fence detail")
 		var count := 0
 		for patch in scenery._plants:
@@ -58,8 +70,21 @@ func run() -> void:
 		require(count>=previous and count<=allocated,profile+" density")
 		print("VILLAGE_PROFILE ",profile," visible_budget=",count," allocated=",allocated," batches=",scenery._plants.size()," range_m=",Scenery.RANGES[profile]," wetness=",scenery.water_material.get_shader_parameter("wetness"))
 		previous=count
-		require(scenery._rain.visible==(profile!="low"),profile+" drizzle")
-		require(scenery.ground_material.get_shader_parameter("wetness")>.8,"autumn mud")
+		var visible_rain: int = scenery._rain.multimesh.visible_instance_count
+		var expected_rain: int = mini(scenery._rain_valid, ceili(float(Scenery.RAIN_BUDGET[profile]) * 0.55))
+		require(scenery._rain_valid > 0 and visible_rain > 0 and scenery._rain.visible, profile + " actual ray-grounded drizzle")
+		require(visible_rain == expected_rain, profile + " rain count respects physical support and profile budget")
+		require(is_equal_approx(float(scenery.rain_material.get_shader_parameter("intensity")), 0.55), profile + " authoritative precipitation intensity")
+		require(scenery.ground_material.get_shader_parameter("wetness") > .8, "autumn mud during explicit rain")
+		require(is_equal_approx(float(scenery.water_material.get_shader_parameter("wetness")), 0.90), profile + " wetness reaches water shader")
+		var physics := root.world_3d.direct_space_state
+		for i in range(mini(12, visible_rain)):
+			var actual: Vector3 = scenery._rain.to_global(scenery._rain.multimesh.get_instance_transform(i).origin)
+			var anchor := Vector3(actual.x, scenery._rain_anchor.y, actual.z)
+			var hit := physics.intersect_ray(PhysicsRayQueryParameters3D.create(anchor + Vector3.UP * 16.0, anchor - Vector3.UP * 14.0, 1))
+			require(not hit.is_empty() and actual.distance_to(hit.get("position", Vector3.INF)) <= .02, profile + " rain column rests on measured static surface")
+		print("AETERNA_RAIN_EVIDENCE ", JSON.stringify({"profile": profile, "supported": scenery._rain_valid, "visible": visible_rain, "budget": Scenery.RAIN_BUDGET[profile], "wetness": scenery.ground_material.get_shader_parameter("wetness")}))
+	scenery.set_weather_state({"rain": 0.0, "wetness": 0.0, "wind": 1.0})
 	scenery.apply_season(1,sun,environment)
 	require(not scenery._rain.visible and scenery.water_material.get_shader_parameter("wetness")<.1,"summer dries")
 	scenery.set_presentation_time(4)
