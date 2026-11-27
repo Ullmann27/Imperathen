@@ -34,7 +34,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -q
-          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy xvfb xauth libgl1-mesa-dri
+          sudo apt-get install -y --no-install-recommends blender python3-numpy python3-scipy xvfb xauth libgl1-mesa-dri zstd
           mkdir -p "$RUNNER_TEMP/godot"
           cd "$RUNNER_TEMP/godot"
           base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
