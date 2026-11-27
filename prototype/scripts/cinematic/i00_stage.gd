@@ -40,6 +40,8 @@ func ensure_built() -> void:
 		return
 	_built = true
 	position = OFFSET
+	# The authored camp is above the existing regional ground, not world y=0.
+	position.y = CampScenery.grounded_elevation(Vector2(OFFSET.x, OFFSET.z))
 	_iron = Art.material(Color("5e625f"), 0.62)
 	_iron.metallic = 0.42
 	_shield = Art.material(Color("6d3029"), 0.70)
