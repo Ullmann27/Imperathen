@@ -210,9 +210,45 @@ func _ui(bench: Dictionary) -> void:
 	root.add_child(scene)
 	await process_frame
 	var popup: PopupMenu = scene.hud.muster_button.get_popup()
+	var created_before_muster: int = scene.rig_instantiations
 	popup.index_pressed.emit(0)
 	check(scene.selected == [UNIT] and scene.standards.has(UNIT) and scene.hud.card_by_id.has(UNIT), "Tap on the muster menu creates a real selectable company")
+	var max_created_per_frame: int = scene.rig_instantiations - created_before_muster
+	var mounted_uids: Array = scene.model.squads[UNIT].uids.duplicate()
+	var initial_steps: int = scene.model.steps
+	var initial_identities: int = scene.agents.counters.created
+	var before_frame: int = scene.rig_instantiations
 	scene._process(0.0)
+	max_created_per_frame = maxi(max_created_per_frame, scene.rig_instantiations - before_frame)
+	# Four mounts can require two materialization passes under the hard
+	# three-new-rigs cap. Drive the actual paused frame path, not _sync_units
+	# directly, and verify bounded progress without hiding a missing UID.
+	var ready_after_frames := -1
+	for frame in range(31):
+		var ready := true
+		for uid: String in mounted_uids:
+			if not scene.actors.has(uid):
+				ready = false
+		if ready:
+			ready_after_frames = frame
+			break
+		if frame == 30:
+			break
+		before_frame = scene.rig_instantiations
+		scene._process(1.0 / 60.0)
+		max_created_per_frame = maxi(max_created_per_frame, scene.rig_instantiations - before_frame)
+	print("VALLEY_MUSTER_PROMOTION ", JSON.stringify({"ready_after_frames": ready_after_frames,
+		"max_new_rigs_per_frame": max_created_per_frame, "uids": mounted_uids,
+		"pool_deferrals": scene.pool_deferrals, "elapsed_limit_s": 0.5}))
+	check(ready_after_frames >= 0, "All four cavalry identities materialize within 30 paused 60Hz frames")
+	check(max_created_per_frame <= scene.INSTANCES_PER_PASS, "Muster and subsequent frames preserve the three-rig creation budget")
+	check(scene.model.steps == initial_steps and scene.agents.counters.created == initial_identities
+		and scene.formation_duplicate_count() == 0, "Paused materialization preserves simulation step and unique roster identities")
+	for uid: String in mounted_uids:
+		var mounted_rig = scene.actors.get(uid)
+		check(mounted_rig != null and mounted_rig._pose.available
+			and mounted_rig._pose.pelvis_world().distance_to(mounted_rig._seat.global_position) < 0.03,
+			"Every materialized cavalry UID meets the existing 3 cm seat gate: " + uid)
 	var first: String = scene.model.squads[UNIT].uids[0]
 	var rider: Node3D = scene.actors.get(first)
 	var first_agent = scene.agents.agents.get(first)
