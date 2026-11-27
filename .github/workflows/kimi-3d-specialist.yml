@@ -16,12 +16,20 @@ jobs:
   verify:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    outputs:
+      tasks: ${{ steps.plan.outputs.tasks }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
       - name: Verify request boundaries and API contract offline
-        run: python3 -m unittest discover -s tools/agent_bridge -p 'test_kimi_bridge.py' -v
+        id: plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/agent_bridge -p 'test_kimi_bridge.py' -v
+          tasks="$(PYTHONPATH=tools/agent_bridge python3 -c 'import json; from pathlib import Path; import kimi_bridge as k; print(json.dumps(list(k.load_tasks(Path("tools/agent_bridge/kimi_tasks.json")))))')"
+          printf 'tasks=%s\n' "$tasks" >> "$GITHUB_OUTPUT"
   consult:
     needs: verify
     name: Kimi / ${{ matrix.task }}
@@ -31,7 +39,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        task: [K01, K02, K03, K04, K05, K06]
+        task: ${{ fromJSON(needs.verify.outputs.tasks) }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:

@@ -70,5 +70,46 @@ class KimiBridgeTests(unittest.TestCase):
                 k.parse_json(raw)
 
 
+class AdaptiveTransportTests(unittest.TestCase):
+    def test_adaptive_manifest_and_effort(self):
+        manifest = k.load_tasks(Path(k.__file__).with_name("kimi_tasks.json"))
+        task = dict(manifest["K01"], max_tokens=4096, reasoning_effort="high")
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "manifest.json"
+            path.write_text(json.dumps({"K07": task}), encoding="utf-8")
+            self.assertEqual(list(k.load_tasks(path)), ["K07"])
+            path.write_text(json.dumps({"invalid": task}), encoding="utf-8")
+            with self.assertRaises(common.BridgeError):
+                k.load_tasks(path)
+            task["reasoning_effort"] = "invalid"
+            with self.assertRaises(common.BridgeError):
+                k.validate_task(task)
+        self.assertEqual(k.build_payload("task", [], 4096, "high")["reasoning_effort"], "high")
+
+    def test_failure_diagnostics_are_redacted(self):
+        self.assertEqual(k.failure_kind(common.BridgeError("NVIDIA response deadline exceeded")), "response_deadline")
+        self.assertEqual(k.failure_kind(common.BridgeError("API result pending (202)")), "pending_202")
+        self.assertEqual(k.failure_kind(TimeoutError("secret")), "socket_timeout")
+        self.assertEqual(k.failure_kind(common.BridgeError("untrusted provider text")), "bridge_validation")
+
+    def test_pending_response_is_not_retried(self):
+        class Pending:
+            status = 202
+            headers = {}
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                return False
+        class Opener:
+            calls = 0
+            def open(self, request, timeout):
+                self.calls += 1
+                return Pending()
+        opener = Opener()
+        with self.assertRaisesRegex(common.BridgeError, "pending"):
+            k.consult("task", [], 4096, "test-key", opener, "high")
+        self.assertEqual(opener.calls, 1)
+
+
 if __name__ == "__main__":
     unittest.main()

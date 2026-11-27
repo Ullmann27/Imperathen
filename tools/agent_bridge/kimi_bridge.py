@@ -19,6 +19,9 @@ import nemotron_bridge as common
 
 MODEL = "moonshotai/kimi-k3.1-pro"
 TASK_IDS = ("K01", "K02", "K03", "K04", "K05", "K06")
+TASK_ID = re.compile(r"K[0-9]{2,4}")
+EFFORTS = {"low", "high", "max"}
+MAX_TASKS = 6
 MAX_IMAGE = 2_200_000
 MAX_IMAGES = 3_800_000
 MAX_JSON = 2_000_000
@@ -47,9 +50,12 @@ def allowed_image(path):
 
 
 def validate_task(task):
-    if not isinstance(task, dict) or set(task) != {"revision", "task", "files", "images", "max_tokens"}:
+    required = {"revision", "task", "files", "images", "max_tokens"}
+    if not isinstance(task, dict) or not required <= set(task) or set(task) - required - {"reasoning_effort"}:
         raise common.BridgeError("Unexpected task fields")
-    common.validate_request({k: v for k, v in task.items() if k != "images"})
+    if task.get("reasoning_effort", "max") not in EFFORTS:
+        raise common.BridgeError("Unsupported reasoning effort")
+    common.validate_request({k: v for k, v in task.items() if k not in ("images", "reasoning_effort")})
     images = task["images"]
     if (not isinstance(images, list) or not 1 <= len(images) <= 2
             or not all(allowed_image(x) for x in images) or len(set(images)) != len(images)):
@@ -58,7 +64,8 @@ def validate_task(task):
 
 def load_tasks(path):
     tasks = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(tasks, dict) or set(tasks) != set(TASK_IDS):
+    if (not isinstance(tasks, dict) or not 1 <= len(tasks) <= MAX_TASKS
+            or not all(isinstance(name, str) and TASK_ID.fullmatch(name) for name in tasks)):
         raise common.BridgeError("Unexpected specialist manifest")
     for task in tasks.values():
         validate_task(task)
@@ -89,11 +96,11 @@ def collect_images(task, opener):
     return parts, hashes
 
 
-def build_payload(prompt, images, tokens):
+def build_payload(prompt, images, tokens, effort="max"):
     return {"model": MODEL, "messages": [
         {"role": "system", "content": SYSTEM},
         {"role": "user", "content": [{"type": "text", "text": prompt}, *images]},
-    ], "max_tokens": tokens, "reasoning_effort": "max", "stream": True,
+    ], "max_tokens": tokens, "reasoning_effort": effort, "stream": True,
         "stream_options": {"include_usage": True}}
 
 
@@ -119,15 +126,17 @@ def parse_json(raw):
                             "finish_reason": finish, "usage": value.get("usage"), "complete": finish == "stop"}
 
 
-def consult(prompt, images, tokens, key, opener):
-    request = Request(common.ENDPOINT, data=json.dumps(build_payload(prompt, images, tokens)).encode("utf-8"),
+def consult(prompt, images, tokens, key, opener, effort="max"):
+    request = Request(common.ENDPOINT, data=json.dumps(build_payload(prompt, images, tokens, effort)).encode("utf-8"),
                       method="POST", headers={"Authorization": "Bearer " + key,
                                                "Content-Type": "application/json",
                                                "Accept": "text/event-stream, application/json"})
     deadline = time.monotonic() + common.MAX_SECONDS
     with opener.open(request, timeout=180) as response:
+        if response.status == 202:
+            raise common.BridgeError("API result pending (202)")
         if response.status != 200:
-            raise common.BridgeError("API result not immediate; no automatic retry or polling")
+            raise common.BridgeError("Unexpected API status")
         mime = response.headers.get("Content-Type", "").lower()
         if "text/event-stream" in mime:
             return common.parse_stream(response, deadline)
@@ -136,9 +145,40 @@ def consult(prompt, images, tokens, key, opener):
         raise common.BridgeError("Unexpected response type")
 
 
+# Only controlled internal error categories are emitted. Never expose an
+# arbitrary provider exception/body, source text, URL, or credentials.
+SAFE_ERRORS = {
+    "NVIDIA response deadline exceeded": "response_deadline",
+    "Missing or incomplete final NVIDIA response": "incomplete_stream",
+    "NVIDIA stream returned an error": "provider_stream_error",
+    "Oversized stream event": "event_budget",
+    "API result pending (202)": "pending_202",
+    "Unexpected API status": "unexpected_status",
+    "Unexpected response type": "unexpected_content_type",
+    "Missing or incomplete answer": "incomplete_json",
+    "Missing completion": "missing_completion",
+    "API error": "provider_json_error",
+    "Image is not a supported raster; LFS pointers are rejected": "invalid_image",
+    "Review image byte budget exceeded": "image_budget",
+    "Source size limit exceeded; split the task": "source_budget",
+}
+
+
+def failure_kind(exc):
+    if isinstance(exc, common.BridgeError):
+        return SAFE_ERRORS.get(str(exc), "bridge_validation")
+    if isinstance(exc, TimeoutError):
+        return "socket_timeout"
+    if isinstance(exc, URLError):
+        return "socket_timeout" if isinstance(exc.reason, TimeoutError) else "transport_error"
+    if isinstance(exc, (ValueError, TypeError, KeyError, AttributeError)):
+        return "response_or_config_validation"
+    return "io_error"
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--task", choices=TASK_IDS, required=True)
+    parser.add_argument("--task", required=True)
     parser.add_argument("--manifest", type=Path, default=Path(__file__).with_name("kimi_tasks.json"))
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -146,14 +186,24 @@ def main():
     if not key or len(key) > 512 or any(ord(c) < 33 or ord(c) > 126 for c in key):
         print("KIMI_NOT_CONFIGURED: missing or invalid Actions secret.", file=sys.stderr)
         return 2
+    started = time.monotonic()
+    stage = "manifest"
     try:
         task = load_tasks(args.manifest)[args.task]
+        effort = task.get("reasoning_effort", "max")
         opener = build_opener(common.NoRedirect())
+        stage = "source"
+        print(f"KIMI_PHASE {stage}", flush=True)
         prompt, source_hashes = common.collect(task, opener)
+        stage = "images"
+        print(f"KIMI_PHASE {stage} sources={len(source_hashes)}", flush=True)
         images, image_hashes = collect_images(task, opener)
-        answer, meta = consult(prompt, images, task["max_tokens"], key, opener)
+        stage = "inference"
+        print(f"KIMI_PHASE {stage} images={len(image_hashes)} max_tokens={task['max_tokens']} effort={effort}", flush=True)
+        answer, meta = consult(prompt, images, task["max_tokens"], key, opener, effort)
+        stage = "archive"
         answer = common.KEY_PATTERN.sub("[REDACTED]", answer.replace(key, "[REDACTED]"))
-        receipt = {"task": args.task, "requested_model": MODEL, "reasoning_effort": "max",
+        receipt = {"task": args.task, "requested_model": MODEL, "reasoning_effort": effort,
                    "source_revision": task["revision"], "source_sha256": source_hashes,
                    "image_sha256": image_hashes, "answer_sha256": hashlib.sha256(answer.encode()).hexdigest(),
                    "status": "answered" if meta["complete"] else "truncated", **meta}
@@ -167,9 +217,9 @@ def main():
         print("KIMI_RECEIPT " + json.dumps({"task": args.task, "status": receipt["status"], "source_revision": task["revision"]}))
         return 0 if meta["complete"] else 3
     except HTTPError as exc:
-        print(f"KIMI_ERROR: HTTP {exc.code}; inspect access/quota/schema.", file=sys.stderr)
-    except (common.BridgeError, URLError, TimeoutError, OSError, ValueError, TypeError, KeyError, AttributeError):
-        print("KIMI_ERROR: bounded source/image, transport or response validation failed.", file=sys.stderr)
+        print(f"KIMI_ERROR stage={stage} kind=http_{exc.code} elapsed={time.monotonic()-started:.1f}s", file=sys.stderr)
+    except (common.BridgeError, URLError, TimeoutError, OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+        print(f"KIMI_ERROR stage={stage} kind={failure_kind(exc)} elapsed={time.monotonic()-started:.1f}s", file=sys.stderr)
     return 1
 
 

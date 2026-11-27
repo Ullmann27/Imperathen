@@ -1,0 +1,28 @@
+{
+  "K01": {
+    "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+    "task": "Ein eng begrenzter Folgeauftrag: verbessere exakt ein belegtes Problem der Figurengeometrie oder des Gesichtsmaterials. Lies den vorhandenen Blender-Generator und vorhandene Tests; das Review-Bild kann älter sein. Liefere vollständigen kleinen Diff und Test. Keine Änderung von Rigs, Story- oder Ausrüstungslogik ohne Beleg.",
+    "files": [
+      "tools/art/build_characters.py",
+      "prototype/tests/hero_face_test.gd"
+    ],
+    "images": [
+      "art/frontier_people/runtime_review/legionary-face.png"
+    ],
+    "max_tokens": 4096,
+    "reasoning_effort": "high"
+  },
+  "K02": {
+    "revision": "5855a2336983ba03acbb81621dea4cd608d6c7c9",
+    "task": "Ein eng begrenzter Folgeauftrag: verbessere genau eine belegte geometrische Schwäche im vorhandenen Blender-Gebäudegenerator. Erhalte bestehende Maßstäbe und Export-/Materialverträge. Keine Innenraumänderungen (K61 separat). Liefere vollständigen kleinen Diff und einen reproduzierbaren Blender-Test; keine erfundenen Renderbelege.",
+    "files": [
+      "tools/art/build_architecture.py",
+      "tools/art/common.py"
+    ],
+    "images": [
+      "art/architecture/review/strasse_after.png"
+    ],
+    "max_tokens": 4096,
+    "reasoning_effort": "high"
+  }
+}

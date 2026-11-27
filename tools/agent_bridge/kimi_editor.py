@@ -157,12 +157,16 @@ class Workspace:
 
 def request_model(messages, key, opener):
     body = {"model": visual.MODEL, "messages": messages, "tools": TOOLS,
-            "tool_choice": "auto", "reasoning_effort": "max", "max_tokens": TOKENS_PER_ROUND,
+            "reasoning_effort": "high", "max_tokens": TOKENS_PER_ROUND,
             "stream": False}
     req = Request(common.ENDPOINT, data=json.dumps(body).encode("utf-8"), method="POST",
                   headers={"Authorization": "Bearer " + key, "Content-Type": "application/json",
                            "Accept": "application/json"})
     with opener.open(req, timeout=160) as response:
+        if response.status == 202:
+            raise common.BridgeError("API result pending (202)")
+        if response.status != 200:
+            raise common.BridgeError("Unexpected API status")
         raw = response.read(visual.MAX_JSON + 1)
     if len(raw) > visual.MAX_JSON:
         raise common.BridgeError("Oversized API response")
@@ -187,7 +191,8 @@ def edit(task, key, opener):
         {"type": "text", "text": instructions}, *images]}]
     count = 0
     final = ""
-    for _ in range(MAX_ROUNDS):
+    for index in range(MAX_ROUNDS):
+        print(f"KIMI_EDITOR_ROUND {index + 1}/{MAX_ROUNDS} prior_tool_calls={count}", flush=True)
         message, finish = request_model(messages, key, opener)
         calls = message.get("tool_calls") or []
         if not isinstance(calls, list) or len(calls) + count > MAX_TOOL_CALLS:
@@ -249,8 +254,8 @@ def main():
         return 0
     except HTTPError as exc:
         print(f"KIMI_EDITOR_ERROR HTTP {exc.code}", file=sys.stderr)
-    except (common.BridgeError, URLError, TimeoutError, OSError, ValueError, TypeError, KeyError, AttributeError):
-        print("KIMI_EDITOR_ERROR validation, transport or budget", file=sys.stderr)
+    except (common.BridgeError, URLError, TimeoutError, OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+        print(f"KIMI_EDITOR_ERROR kind={visual.failure_kind(exc)}", file=sys.stderr)
     return 1
 
 
