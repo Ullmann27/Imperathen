@@ -10,6 +10,9 @@ class SpeakingFigure:
 	var sample_count := 0
 	var age := 22
 	var pinned := false
+	var eyes := Vector3.INF
+	func gaze_anchor() -> Vector3:
+		return eyes
 	func set_cinematic_detail(enabled: bool) -> void:
 		pinned = enabled
 	func sample_pose(action: String, phase: float) -> void:
@@ -174,6 +177,27 @@ func _run() -> void:
 	_check(speaking.sampled == "idle" and speaking.reset_count == resets + 1 and listener.sample_count == listener_samples, "A new silent beat releases the prior speaker without animating the listener")
 	director.finish()
 	_check(not listener.pinned and not speaking.pinned, "Beat-owned cast is released")
+	# Explicitly separate the actor root from its actual eye line, as in the
+	# imported youth and adult rigs. The old constant-height framing fails.
+	stage.cast["player"] = listener
+	speaking.eyes = speaking.global_position + Vector3(0.06, 1.24, -0.02)
+	listener.eyes = listener.global_position + Vector3(-0.02, 0.91, 0.03)
+	director.mission_actor_id = "julia"
+	_check(Vector3(director._duo_framing("duo_close")[2]).is_equal_approx(speaking.eyes), "Adult close frames the live eye anchor")
+	_check(Vector3(director._duo_framing("duo_react")[2]).is_equal_approx(listener.eyes), "Youth reverse shot frames its own live eye anchor")
+	_check(Vector3(director._duo_framing("duo_ots")[2]).is_equal_approx(speaking.eyes), "OTS aims at the live speaker's eyes")
+	_check(Vector3(director._i01_framing("i01_close_speaker")[2]).is_equal_approx(speaking.eyes), "Family close frames the live adult eyes")
+	_check(Vector3(director._i01_framing("i01_react_boy")[2]).is_equal_approx(listener.eyes), "Family reaction frames the live youth eyes")
+	director.begin_beat("")
+	for t: float in [0.0, 0.25, 0.5, 0.75, 1.0]:
+		director.sample("mission_dialogue",t,0.0)
+		var expected := speaking.eyes + Vector3.UP * 0.02 * (t*t*(3.0-2.0*t))
+		var aim := (expected - director.camera.global_position).normalized()
+		_check((-director.camera.global_basis.z).normalized().dot(aim) > 0.999, "Mission close tracks the real eye line over the cut")
+	director.finish()
+	speaking.eyes = Vector3.INF
+	_check(Vector3(director._duo_framing("duo_close")[2]).is_equal_approx(speaking.global_position + Vector3.UP * 0.42), "Invalid eye anchor retains the authored finite fallback")
+	listener.eyes = Vector3.INF
 	stage.cast.erase("player")
 	stage.cast.erase("marcus")
 	director.play("market", 11.0)
