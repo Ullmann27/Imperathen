@@ -1,0 +1,58 @@
+name: Free-tier specialist access and engineering
+on:
+  push:
+    branches: ['feat/kimi-3d-special-operations-20261127']
+    paths:
+      - 'tools/agent_bridge/external_specialists.json'
+      - '.github/workflows/external-specialists.yml'
+permissions:
+  contents: read
+concurrency:
+  group: imperathen-external-specialists
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      owners: ${{ steps.plan.outputs.owners }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s tools/agent_bridge -p 'test_external_specialists.py' -v
+      - name: Validate isolated work scopes
+        id: plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          owners="$(python3 tools/agent_bridge/external_specialists.py --plan)"
+          printf 'owners=%s\n' "$owners" >> "$GITHUB_OUTPUT"
+  consult:
+    needs: verify
+    name: Specialist / ${{ matrix.owner }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        owner: ${{ fromJSON(needs.verify.outputs.owners) }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Access probe then one bounded engineering review
+        timeout-minutes: 20
+        env:
+          SPECIALIST_OWNER: ${{ matrix.owner }}
+          SPECIALIST_API_KEY: ${{ (matrix.owner == 'Gemini' && secrets.IMPERATHEN_GEMINI_FREE_API_KEY) || (matrix.owner == 'GPTOSS' && secrets.IMPERATHEN_GROQ_FREE_API_KEY) || ((matrix.owner == 'ERNIE' || matrix.owner == 'SuperVL') && (secrets.IMPERATHEN_OPENROUTER_API_KEY || secrets.OPENROUTER_API_KEY)) || '' }}
+        run: python3 tools/agent_bridge/external_specialists.py --owner "$SPECIALIST_OWNER" --output artifacts/specialist
+      - name: Preserve final answer or precise blocker
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: specialist-${{ matrix.owner }}-${{ github.run_id }}
+          path: artifacts/specialist/
+          if-no-files-found: warn
+          retention-days: 14

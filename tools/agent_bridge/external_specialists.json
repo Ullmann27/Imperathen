@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "tasks": [
+    {
+      "id": "G001",
+      "owner": "Gemini",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "files": [
+        "prototype/scripts/cinematic/opening_director.gd",
+        "prototype/tests/opening_director_test.gd"
+      ],
+      "images": [],
+      "evidence_images": [
+        {
+          "revision": "8a2d2304d55bdd3adf78c8b6c45dc66889c594a7",
+          "path": "art/review/campaign-start/01-prolog.png",
+          "sha256": "a56dfa4553a92df9f01342d3a5d495e82d37e71908cd9a88106fc0821de9ed8f",
+          "label": "baseline"
+        }
+      ],
+      "max_tokens": 8192,
+      "task": "Prolog I-00: Prüfe die echte Godot-Aufnahme und den vorhandenen Kameradirektor. Entwickle eine gezielte Verbesserung der ersten Einstellung: allgemein erkennbare, historisch plausible römische Standarte bereits zu Beginn, natürliche Staffelung der Soldaten, Blickachsen und bessere Komposition. Bestehende Kamera-/Story-/Pause-/Skip-Verträge und originalen Stoffasset erhalten. Ein vollständiger kleiner Patch mit Regression, oder ein konkret belegter Befund mit exaktem nächsten Arbeitsschritt. Die Aufnahme ist Linux/Godot, kein physischer Fold7-Test. Keine erfundenen Renderbelege. Keine neue Modellgeometrie vortäuschen."
+    },
+    {
+      "id": "E001",
+      "owner": "ERNIE",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "files": [
+        "prototype/scripts/domain/npc_behavior.gd",
+        "prototype/tests/npc_behavior_test.gd"
+      ],
+      "images": [],
+      "evidence_images": [],
+      "max_tokens": 8192,
+      "task": "Lebendige NPCs in Valdora: Prüfe vorhandene individuelle Bedürfnisse, Interessen, Arbeitszeiten, Beobachtungen und soziale Entscheidungslogik. Verbessere genau einen konkret nachgewiesenen Mangel bei alltäglichen Entscheidungen oder Arbeit/Erholung/sozialen Beziehungen, ohne neue autoritative Simulation, Waren/Belohnungen aus dem Nichts, doppelte NPCs oder Eingriffe in Kalender, Regenlogik der Stadt oder geschützte Story. Vollständiger kleiner Patch und Regression, keine bloße Konzeptliste. Erhalte deterministisches Save/Load und den bestehenden 42-Bewohner-Vertrag."
+    },
+    {
+      "id": "V001",
+      "owner": "SuperVL",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "files": [
+        "prototype/scripts/world/village/household_designs.gd",
+        "prototype/scripts/world/village/house_interiors.gd"
+      ],
+      "images": [],
+      "evidence_images": [
+        {
+          "revision": "8a2d2304d55bdd3adf78c8b6c45dc66889c594a7",
+          "path": "art/review/campaign-start/03-familienhaus.png",
+          "sha256": "4e79100ed2d97bd1d19d30291cf48b9ae18645c0f3a37ae11bd58c447b231f91",
+          "label": "baseline"
+        },
+        {
+          "revision": "8a2d2304d55bdd3adf78c8b6c45dc66889c594a7",
+          "path": "art/review/campaign-start/05-tischgespraech.png",
+          "sha256": "775d1d3ca6ea81e467efc3127df8ffdddbdc0d90e929a8c2fc1cf94716d6d2d5",
+          "label": "baseline"
+        }
+      ],
+      "max_tokens": 4096,
+      "task": "Unabhängige visuelle Qualitätsabnahme V1 der echten I-01-Spielaufnahmen. Analysiere sichtbare Anatomie, Gesichter, Kleidung, Kontakt zum Boden/Mobiliar, Proportionen, Beleuchtung, Raumgestaltung, Krüge/Becher und Gebrauchsspuren. Beschreibe höchstens drei konkrete, im Bild belegte Defekte mit Position und Priorität. Gib für den wichtigsten einen implementierbaren, kleinen Korrekturauftrag mit relevanten Quellankern und A/B-Aufnahmekriterien. Nicht aus Standbildern Animation, Geräte-FPS oder historische Gewissheit ableiten. Keine automatische Abnahme, kein hypothetischer Render als Beweis."
+    },
+    {
+      "id": "O001",
+      "owner": "GPTOSS",
+      "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
+      "files": [
+        "prototype/tests/companion_turn_motion_test.gd"
+      ],
+      "images": [],
+      "evidence_images": [],
+      "max_tokens": 2048,
+      "task": "P0 ARM64-Blocker aus GitHub-Run 46008252806, Job 140536812176: ERROR 60 Hz, turn -1: turning and starting retain the strict planted-foot limit. Prüfe den tatsächlichen vorhandenen Regressionstest. Liefere genau einen kleinen vollständigen Diagnosepatch, der beim Fehlschlag Frame, Animation, Drehrichtung, vorhandene world_worst-Messdaten und max_support_slip_m nachvollziehbar ausgibt, ohne das bestehende 0,015-m-Limit oder andere Prüfungen zu schwächen. Keine erfundene Fehlerursache im nicht bereitgestellten Pose-Controller. Falls die vorhandenen Metriken genügen, beschreibe den exakten nächsten Quellpfad und Testauftrag. Keine Änderung der Spielphysik in dieser Etappe."
+    }
+  ]
+}
