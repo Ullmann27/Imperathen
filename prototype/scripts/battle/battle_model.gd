@@ -899,9 +899,17 @@ func _apply_hits(hits: Dictionary) -> void:
 func _take_losses(s: Dictionary, fallen: Array, sources: Array) -> bool:
 	var led_by: String = s.officer_id
 	var banner: String = s.signifer_id
+	# The pre-loss ranks are the real identities' places before the gap.
+	# Ordinary movement keeps the rank order; a loss is the explicit reason
+	# to dress the ranks once, not to shuffle the whole company every tick.
+	var previous_ranks := {}
+	var ranks := Slots.ranks(s.formation, s.strength, s.width)
+	for index in s.uids.size():
+		previous_ranks[s.uids[index]] = ranks[index]
 	for uid in fallen:
 		_fall(s, uid)
 	s.strength -= fallen.size()
+	_close_casualty_gaps(s, previous_ranks)
 	_count_losses(s)
 	s.officer_id = _expected_officer(s)
 	if s.officer_id != led_by:
@@ -916,6 +924,57 @@ func _take_losses(s: Dictionary, fallen: Array, sources: Array) -> bool:
 		_remember(s, "banner_lost", banner)
 	s.morale = maxf(0, s.morale - casualty_morale(s, fallen.size(), sources))
 	return _check_rout(s, "")
+
+
+## Reassign the actual survivors to the new layout without moving a body.
+## Fill the front first: keep surviving members of each rank whenever its
+## new capacity permits, then select the nearest appropriate reserve for a
+## vacant place. A later rank cannot consume a reserve needed in the front.
+## The next ordinary _align_members tick still enforces the same step cap.
+func _close_casualty_gaps(s: Dictionary, previous_ranks: Dictionary) -> void:
+	var count: int = int(s.strength)
+	if count <= 0:
+		return
+	var ranks := Slots.ranks(s.formation, count, s.width)
+	var goals := _company_slots(s, s.formation, s.width, _pos(s), float(s.facing))
+	if ranks.size() != count or goals.size() != count:
+		return
+	for index in count:
+		goals[index] = Field.project(goals[index])
+	var member_of := PackedInt32Array()
+	member_of.resize(count)
+	member_of.fill(-1)
+	var used := {}
+	for rank in range(int(ranks.max()) + 1):
+		for same_rank_only: bool in [true, false]:
+			var pairs := []
+			for slot in count:
+				if ranks[slot] != rank or member_of[slot] >= 0:
+					continue
+				for member in count:
+					if used.has(member):
+						continue
+					var rank_gap := absi(int(previous_ranks.get(s.uids[member], rank)) - rank)
+					if same_rank_only and rank_gap != 0:
+						continue
+					var at := Vector2(s.members[member][0], s.members[member][1])
+					pairs.append([rank_gap, at.distance_squared_to(goals[slot]), member, slot])
+			pairs.sort()
+			for pair: Array in pairs:
+				var member: int = pair[2]
+				var slot: int = pair[3]
+				if member_of[slot] == -1 and not used.has(member):
+					member_of[slot] = member
+					used[member] = true
+	var positions := []
+	var identities := []
+	for member in member_of:
+		if member < 0:
+			return
+		positions.append(s.members[member])
+		identities.append(s.uids[member])
+	s.members = positions
+	s.uids = identities
 
 
 ## Morale cost of casualties; the share of damage that came from behind weighs 1.5x.
