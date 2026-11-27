@@ -53,9 +53,10 @@ func _run() -> void:
 	check(fire._pool[0].global_position.is_equal_approx(Vector3(0,1.46,-4)),"Invalid route restores camera-nearest fixture")
 	fire.set_quality("low")
 	check(not fire._pool[1].visible,"Lower quality immediately disables excess lights")
-	var previous_holder := weakref(fire._holders)
-	var previous_flames := weakref(fire._flames)
-	var previous_light := weakref(fire._pool[0])
+	var previous_holder: WeakRef = weakref(fire._holders)
+	var previous_flames: WeakRef = weakref(fire._flames)
+	var previous_light: WeakRef = weakref(fire._pool[0])
+	check(previous_holder.get_ref() == fire._holders and previous_flames.get_ref() == fire._flames and previous_light.get_ref() == fire._pool[0],"Weak references identify the original live visual nodes before replacement")
 	var replacement: Array[Vector3] = [Vector3(20,0,0),Vector3(30,0,0)]
 	fire.configure(replacement,"high")
 	check(previous_holder.get_ref() == null and previous_flames.get_ref() == null and previous_light.get_ref() == null,"Reconfiguration releases previous batches and light pool")
