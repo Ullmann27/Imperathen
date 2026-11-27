@@ -107,6 +107,23 @@ jobs:
                            "ORGANIZATION_REQUIRED", "NOT_FOUND", "ACCESS_DENIED", "NO_DEFAULT_ORG",
                            "NETWORK_ERROR", "TIMEOUT", "AUTH_REQUIRED", "AUTH_EXPIRED"}
           safe = code if code in allowed_codes else "UNCLASSIFIED"
+          import re
+          # Never publish the original CLI response: classify HTTP errors and
+          # known conditions using a fixed allowlist of generic, nonsensitive labels.
+          http_status = re.search(r"(?<![0-9])(401|403|404|409|429|500|502|503)(?![0-9])", value)
+          lowered = value.lower()
+          if http_status:
+              safe = "HTTP_" + http_status.group(1)
+          elif "not authorized" in lowered or "unauthorized" in lowered:
+              safe = "UNAUTHORIZED"
+          elif "permission" in lowered or "forbidden" in lowered or "access denied" in lowered:
+              safe = "PERMISSION_DENIED"
+          elif "organization" in lowered and ("select" in lowered or "required" in lowered or "default" in lowered):
+              safe = "ORGANIZATION_SELECTION_REQUIRED"
+          elif "not signed in" in lowered or "sign in" in lowered or "login" in lowered:
+              safe = "AUTHENTICATION_NEEDED"
+          elif "network" in lowered or "connection" in lowered or "timeout" in lowered:
+              safe = "NETWORK_OR_TIMEOUT"
           with open("unity-cli-evidence/checks.txt", "a", encoding="utf-8") as file:
               file.write("UNITY_CLOUD_PROJECT_ERROR_CLASS=" + safe + "\n")
           PY
