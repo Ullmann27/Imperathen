@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 162,
+  "version": 173,
   "tasks": [
     {
       "id": "K101",
@@ -569,9 +569,9 @@
         ".github/workflows/aeterna-parallel-stability.yml",
         "docs/44_integration/AETERNA_PARALLEL_STABILITY_20261127.md"
       ],
-      "note": "Roadmap 01.3. Old run 46038086118: night_torch 8/86 failures after genuine managed door/route lights. Keep existing light counts, shadow checks, all limits and gameplay unchanged; add profile-bound evidence and real compatibility framebuffers. Do not edit active CAMPAIGN-CONTINUITY route_fire_lights.gd or loosen review ceilings. Candidate 0e996ed8cb2af81ef721572e223786c457cee253; observed four independent GitHub jobs in_progress. QA #221 is separately successful on 1327bd6, artifact 15226547072, no physical device acceptance. This candidate has no results yet.",
+      "note": "Actual job 140698245043 in 46055915040 failed authored light accounting in all four profiles (8 night_torch failures); visible door and route fires recorded. village_look passed. Separate actual render errors/timeout; no accepted night visual. Keep counts/shadow/profile limits; coordinate with CAMPAIGN-CONTINUITY before runtime changes.",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46055915040",
       "access": "edit"
@@ -593,9 +593,9 @@
       "scope": [
         "prototype/tests/formation_agents_test.gd"
       ],
-      "note": "Roadmap 01.4. Old full regression 46038086118: 60/180 foot jump, phase and position discontinuities, wheel issue. Preserve every original numerical limit and rule/identity test. Add worst measured switch provenance; run both original check groups in independent CI. No active runtime edit; N28 is separate read-only model task. Candidate 0e996ed8cb2af81ef721572e223786c457cee253; observed four independent GitHub jobs in_progress. QA #221 is separately successful on 1327bd6, artifact 15226547072, no physical device acceptance. This candidate has no results yet.",
+      "note": "Actual job 140698244797 in 46055915040 failed formation_agents 7/87 and formation_levels 4/22: missing matching, wheeling/rank placement, discontinuity 0.092799m vs 0.04m, phase 0.0892/0.0976, max position step 0.1207/0.3189m; no threshold changes, no runtime fix. Keep evidence for separate formation contract.",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46055915040",
       "access": "edit"
@@ -705,7 +705,7 @@
     {
       "id": "VIS-YOUTH-CAP-BINDING",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46065635264",
       "scope": [
@@ -715,11 +715,11 @@
         "docs/44_integration/YOUTH_CAP_BINDING_20261127.md"
       ],
       "access": "edit",
-      "note": "PR #193 head 4d518cb8600a4a3636e10dd9c02d9b88b412e776, actual push run 46065635264/job 140730144100 in_progress. 5 synthetic controls, owner-derived staging, four-LOD 60Hz seam A/B; no actual measurement result yet. Private GLBs excluded."
+      "note": "PR #193 head 4d518cb8600a4a3636e10dd9c02d9b88b412e776. Actual run 46065635264/job 140730144100 failure exit 124; five synthetic controls passed; owner-derived four civilian LODs measured 105570 samples with zero cap binding mismatches/zero changed bindings; input and candidate hashes identical. YOUTH_OUTFIT_SKIN_PASS 548 checks; not proof of arm seam repair. Render timed out. Artifact 15230594556; investigate body deformation and seam beyond cap matching, no generated replacement or visual/device acceptance."
     },
     {
       "id": "VALLEY-MUSTER-IDENTITY",
-      "owner": "Nemotron coordinator",
+      "owner": "Coordinator",
       "status": "blocked",
       "revision": "a80af59fd222619f5bdd911f16e27130b820e7d6",
       "run_id": "46065570928",
@@ -728,7 +728,7 @@
         ".github/workflows/aeterna-valley-muster-identity.yml"
       ],
       "access": "edit",
-      "note": "Roadmap 01: N28 truncated (46055347080), old full regression failed authored Germanic swordsman assertion. Independent focused actual engine reproduction with identity, LOD and real scene provenance; retain original assertion and all budgets, no automatic model retry. No edits to formation runtime or concurrent visual tasks. Exact candidate a80af59f on fix/aeterna-valley-muster-identity-20261127, focused run 46065570928 observed in_progress. 46 lines added to test; original combat-camera assertion unchanged. Fresh production camera focused on enemy independently validates actual Germanic near/mid rig, per-UID family, scene path, LOD, frustum, pool deferrals at both contexts. No runtime changes; result pending. Actual 46065570928 failure, 49/50. Fresh enemy view: 12 authentic forest_swordsman rigs. Combat camera: 11 visible living enemy agents at 14.1–16m, all detail 2 far instances; 25 pool deferrals. Original assertion remains red. No runtime fix yet."
+      "note": "Roadmap 01: N28 truncated (46055347080), old full regression failed authored Germanic swordsman assertion. Independent focused actual engine reproduction with identity, LOD and real scene provenance; retain original assertion and all budgets, no automatic model retry. No edits to formation runtime or concurrent visual tasks. Exact candidate a80af59f on fix/aeterna-valley-muster-identity-20261127, focused run 46065570928 observed in_progress. 46 lines added to test; original combat-camera assertion unchanged. Fresh production camera focused on enemy independently validates actual Germanic near/mid rig, per-UID family, scene path, LOD, frustum, pool deferrals at both contexts. No runtime changes; result pending. Actual 46065570928 failure, 49/50. Fresh enemy view: 12 authentic forest_swordsman rigs. Combat camera: 11 visible living enemy agents at 14.1–16m, all detail 2 far instances; 25 pool deferrals. Original assertion remains red. No runtime fix yet. Administrative schema repair only: legacy label 'Nemotron coordinator' normalized to Coordinator; no scope, status or run change."
     },
     {
       "id": "VIS-I00-FRAMING-V2",
@@ -745,10 +745,10 @@
         ".github/workflows/aeterna-i00-terrain-clearance.yml",
         "docs/44_integration/AETERNA_VISUAL_30_MILESTONES_20261127.md"
       ],
-      "note": "PR #190 head ce523afa28bd165699ab8f6b93d4348bb94227f8; terrain and 30 actual two-aspect captures running; strict all-three-block criterion in every wide sample. Prior 30 captures independently reviewed, departure and lighting defects documented; no visual acceptance.",
+      "note": "PR #190 head ce523afa28bd165699ab8f6b93d4348bb94227f8. Actual run 46065939951 terrain and capture success; 140/140 capture checks, 30 PNGs, both 1280x720 and 1180x1312. Independently downloaded and verified all 30 SHA256 entries, source receipt, 30 V1 hashes (V1 9d3a08cc, artifact 15231060416). V2 artifact 15231471041 ZIP SHA256 ae988d568be13f6f59a92be3c102f54c14e124b25c2ce773fa027240020dd679. Real A/B: last portrait departure now shows all three formations rather than empty terrain, 18/18/18 projected. Vexillum visible first shot. Remaining visual defects: overbright foliage/horizon, sunny appearance under rain, simple armor/silhouette, sparse camp, dialogue views show backs. Frame gate passed; RQG visual NOT accepted, physical DEVICE_PENDING; no main merge.",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "review_pending",
       "run_id": "46065939951"
     },
     {
@@ -759,10 +759,10 @@
         "prototype/tests/i03_flow_test.gd",
         ".github/workflows/aeterna-market-jug-regression.yml"
       ],
-      "note": "PR #189 head 9f8504f5eb03188e64175f5e88d2c9eeb7a302fb; 88/88 prior headless, render timed out; on-demand capture now retains the original warmups, real frame, size checks and simulation. Actual job running; no capture acceptance.",
+      "note": "PR #189 head 9f8504f5eb03188e64175f5e88d2c9eeb7a302fb. Actual run 46066036841: headless 88/88, real graphical 112/112, 12 PNGs. Independently verified all 12 SHA256 entries and source receipt; ZIP artifact 15231266949 SHA256 06704937dfebe332798c8bba740daf542632f41ba7a557bd50dbd5171e909a7a. Reviewed all images: market/well, coins/pot and transactions visible; reaction shot obstructed by huge foreground arm, hand/fingers not clearly seen, simplified character and overbright lighting. 5mm physics gate preserved; physical device and RQG visual still pending.",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "review_pending",
       "run_id": "46066036841"
     },
     {
@@ -774,17 +774,17 @@
         "prototype/tests/camera_collision_test.gd",
         ".github/workflows/aeterna-indoor-camera-spacing.yml"
       ],
-      "note": "PR #191 head 9d795174e8f71508d14c7bf58bcf3db889edbde6; exact measured typed Array[RID] test failure corrected; actual regression running, no pass claim.",
+      "note": "PR #191 head 9d795174e8f71508d14c7bf58bcf3db889edbde6; actual run 46065957068/job 140731193724 success: CAMERA_COLLISION_RESULT checks=55 failures=0; artifact 15230359346. Corrected typed Array[RID] test invocation, not weakened collision thresholds. Independent visual and device review pending, no runtime integration claimed.",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "review_pending",
       "run_id": "46065957068"
     },
     {
       "id": "VALLEY-MUSTER-RIG-FAIRNESS",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "6d1aad82174764751cb2e2d3c0f610804518d512",
       "run_id": "46066402676",
       "scope": [
@@ -792,13 +792,13 @@
         "prototype/tests/valley_muster_test.gd",
         ".github/workflows/aeterna-valley-muster-identity.yml"
       ],
-      "note": "Independent follow-up to 49/50 diagnostic. Reserve valley_scene runtime + existing muster regression on same isolated branch. Investigate deterministic bounded rig materialization: prioritize a visible eligible agent from each otherwise unrepresented side then camera distance. Preserve max 3 new rigs per ordinary sync, total profile budgets, action holds, authoritative identity, and original failing assertion. Existing formation test scope remains separate. No preview modification until actual successful related tests and current blob comparison. Exact candidate committed and read-back compared: runtime ordering, original test plus 3 assertions (per-pass instantiation cap, existing profile caps, no duplicate UIDs), existing focused workflow extended to both original formation groups. Actual run 46066402676 observed in_progress. No integration/green claim; independent formation baseline red. Prior diagnostic run 46065570928 red."
+      "note": "Actual run 46066402676/job 140732645272 failure. Valley 52/53, 'Visible mounted soldier sits on moving skeletal socket' failed; original formation regressions remain 7/87 and 4/22 (0.0928m balanced foot jump vs 0.04m, high-detail 0.1514m at 60 case). Artifact 15231097047. No gate weakening or runtime integration; diagnose mounted socket and formation continuity independently."
     },
     {
       "id": "RAIN-SURFACE-CONTRACT",
       "owner": "Coordinator",
       "access": "edit",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "d4dabb8f6890b0b3a2acc472dcb550dd141577e4",
       "run_id": "46066632490",
       "scope": [
@@ -806,7 +806,21 @@
         "art/village/verify.gd",
         ".github/workflows/aeterna-rain-surface-contract.yml"
       ],
-      "note": "Reserve independent rain support provenance candidate; same submitted CPU transforms stored in bounded array and independently re-raycast, plus actual Compatibility MultiMesh readback and matching real captures. Keep 0.02m physical threshold, all original geometry, seasonal/density/doorway checks and render budgets. Hypothesis only: headless dummy getter may not preserve instance data. No production visual claim or integration before both checks. Exact candidate committed on fix/aeterna-rain-surface-contract-20261127; compared to Preview (three files only). CI observed in_progress. CPU surface check covers all visible instances, 2cm threshold, explicit rain/dry transitions and original geometry; real Compatibility renderer must match submitted transform within 1mm and produce four PNG receipts. Headless readback difference recorded, not silently counted as GPU success. No runtime visual change or device acceptance claimed."
+      "note": "Actual run 46066632490/job 140733410851 failed before physical test: check_prototype.py rejected unknown group local_weather, exit 2. Subsequent Compatibility run had no imported textures/GLBs, script compile errors and exit 124. Artifact 15231626290. No evidence that physical threshold or GPU readback failed; no acceptance. Follow-up fixes workflow only."
+    },
+    {
+      "id": "RAIN-SURFACE-IMPORT-GATE",
+      "owner": "Coordinator",
+      "status": "submitted",
+      "revision": "6e15e33edaffe951bf3dc35529207953b58a148c",
+      "run_id": "46069363087",
+      "scope": [
+        "prototype/scripts/world/village/village_scenery.gd",
+        "art/village/verify.gd",
+        ".github/workflows/aeterna-rain-surface-contract.yml"
+      ],
+      "access": "edit",
+      "note": "PR #194, exact prior 46066632490 failure. Follow-up uses real village_look group, independent headless import before Compatibility, Dummy audio, source/run receipt provenance; no simulation/threshold changes. Commit compared to previous candidate: exactly one workflow file changed (+7/-4). Actual focused push run 46069363087 observed in_progress; no success or visual/device claim. Additional PR checks triggered by draft creation; do not duplicate."
     }
   ]
 }
