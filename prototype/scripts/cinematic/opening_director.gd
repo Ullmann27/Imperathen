@@ -63,6 +63,11 @@ var focus_key := ""
 ## False during silent pause and reaction beats (set by the film owner).
 var speaking := true
 var _speaker_posed := false
+# Main owns the absolute beat clock and the identity of the spoken line.
+# Standalone playback/review retains its original shot-clock contract.
+var _beat_owned := false
+var _line_actor_id := ""
+var _acting_seconds := 0.0
 var _interior_film := false
 
 
@@ -86,35 +91,47 @@ func setup(world: Node3D) -> bool:
 	return true
 
 
-func play(next_shot: String, seconds: float, reduce_motion := false) -> bool:
-	if next_shot not in SHOT_IDS or not is_finite(seconds) or not is_instance_valid(_world) or not is_instance_valid(_game_camera):
+func play(next_shot: String, seconds: float, reduce_motion := false, beat_seconds: float = -1.0, shot_fraction: float = 0.0) -> bool:
+	if next_shot not in SHOT_IDS or not is_finite(seconds) or not is_finite(beat_seconds) or not is_finite(shot_fraction) or not is_instance_valid(_world) or not is_instance_valid(_game_camera):
 		return false
 	_begin()
 	_change_speaker(next_shot)
 	shot_id = next_shot
 	duration = maxf(0.1, seconds)
-	elapsed = 0.0
+	elapsed = clampf(shot_fraction, 0.0, 1.0) * duration
 	reduced_motion = reduce_motion
 	paused = false
 	_completed = false
-	_apply_sample(0.0)
-	set_process(true)
+	_acting_seconds = beat_seconds if beat_seconds >= 0.0 else elapsed
+	_apply_sample(elapsed / duration)
+	# Main drives beat-owned shots explicitly, including the first frame
+	# of a reaction cut. Standalone playback still owns its own process.
+	set_process(beat_seconds < 0.0)
 	shot_started.emit(shot_id)
 	return true
+
+
+## Establish the line identity separately from the actor framed by the camera.
+## The following cuts can change framing without resetting the same speaker.
+func begin_beat(actor_id: String) -> void:
+	_beat_owned = true
+	_line_actor_id = actor_id
+	speaking = not actor_id.is_empty()
 
 
 func set_paused(value: bool) -> void:
 	paused = value
 
 
-func sample(next_shot: String, normalized_time: float) -> Dictionary:
+func sample(next_shot: String, normalized_time: float, beat_seconds: float = -1.0) -> Dictionary:
 	# Deterministic sampling uses the same shot code as playback, for render review.
-	if next_shot not in SHOT_IDS or not is_finite(normalized_time) or not is_instance_valid(_game_camera):
+	if next_shot not in SHOT_IDS or not is_finite(normalized_time) or not is_finite(beat_seconds) or not is_instance_valid(_game_camera):
 		return {}
 	_begin()
 	_change_speaker(next_shot)
 	shot_id = next_shot
 	elapsed = clampf(normalized_time, 0.0, 1.0) * duration
+	_acting_seconds = beat_seconds if beat_seconds >= 0.0 else elapsed
 	_apply_sample(clampf(normalized_time, 0.0, 1.0))
 	return snapshot()
 
@@ -125,7 +142,7 @@ func snapshot() -> Dictionary:
 	return {"shot_id": shot_id, "time": elapsed, "duration": duration,
 		"position": camera.global_position, "transform": camera.global_transform,
 		"fov": camera.fov, "active": active, "paused": paused,
-		"reduced_motion": reduced_motion}
+		"reduced_motion": reduced_motion, "acting_seconds": _acting_seconds}
 
 
 func finish() -> void:
@@ -134,6 +151,9 @@ func finish() -> void:
 		return
 	active = false
 	_release_speaker()
+	_beat_owned = false
+	_line_actor_id = ""
+	_acting_seconds = 0.0
 	_release_cinematic_cast()
 	_interior_film = false
 	_apply_grade(0.0)
@@ -184,6 +204,7 @@ func _process(delta: float) -> void:
 	if not active or paused or _completed:
 		return
 	elapsed = minf(duration, elapsed + maxf(0.0, delta))
+	_acting_seconds = elapsed
 	_apply_sample(elapsed / duration)
 	if elapsed >= duration:
 		_completed = true
@@ -385,7 +406,7 @@ func _apply_sample(normalized_time: float) -> void:
 	_apply_grade(1.0 - eased if shot_id == "player" else 1.0)
 	if is_instance_valid(_speaker):
 		if speaking:
-			_speaker.sample_pose("talk", fposmod(elapsed / 1.7, 1.0))
+			_speaker.sample_pose("talk", fposmod(_acting_seconds / 1.7, 1.0))
 			_speaker_posed = true
 		elif _speaker_posed:
 			# A silent pause or reaction: nobody mouths a line.
@@ -535,8 +556,8 @@ func _mission_figure(actor_id: String) -> Node3D:
 	return null
 
 
-func _face_mission_pair() -> void:
-	var npc := _mission_figure(mission_actor_id)
+func _face_mission_pair(actor_id: String) -> void:
+	var npc := _mission_figure(actor_id)
 	var player := _mission_figure("player")
 	if not is_instance_valid(npc) or not is_instance_valid(player) or npc == player:
 		return
@@ -580,6 +601,21 @@ func _release_cinematic_cast() -> void:
 
 func _change_speaker(next_shot: String) -> void:
 	prepare_cinematic_cast(next_shot, mission_actor_id)
+	if _beat_owned and (next_shot in I01_SHOTS or next_shot in DUO_SHOTS or next_shot in ["mission_dialogue", "mission_reaction"]):
+		# Camera actor and actual speaker can be different (Cassia's line
+		# with a cut to Marcus). Keep the line actor's real rig and gaze.
+		var pair_actor := _line_actor_id if not _line_actor_id.is_empty() else mission_actor_id
+		prepare_cinematic_cast(next_shot, pair_actor)
+		var line_figure := _mission_figure(_line_actor_id)
+		if is_instance_valid(line_figure) and (not line_figure.has_method("sample_pose") or not line_figure.has_method("reset_motion")):
+			line_figure = null
+		if _speaker == line_figure and _speaker_actor == pair_actor:
+			return
+		_release_speaker()
+		_speaker_actor = pair_actor
+		_face_mission_pair(pair_actor)
+		_speaker = line_figure
+		return
 	if next_shot == shot_id and _speaker_actor == mission_actor_id and (is_instance_valid(_speaker) or next_shot in ["mission_dialogue","mission_reaction"]):
 		return
 	_release_speaker()
@@ -592,12 +628,12 @@ func _change_speaker(next_shot: String) -> void:
 	elif next_shot in I01_SHOTS or next_shot in DUO_SHOTS:
 		# The named speaker of an I-01 shot uses the existing talk pose and
 		# turns toward the boy (restored when the film releases the figures).
-		_face_mission_pair()
+		_face_mission_pair(mission_actor_id)
 		var speaking := _mission_figure(mission_actor_id)
 		if is_instance_valid(speaking) and speaking.has_method("sample_pose") and speaking.has_method("reset_motion"):
 			_speaker = speaking
 	elif next_shot in ["mission_dialogue","mission_reaction"]:
-		_face_mission_pair()
+		_face_mission_pair(mission_actor_id)
 		if next_shot == "mission_dialogue":
 			var figure := _mission_figure(mission_actor_id)
 			if is_instance_valid(figure) and figure.has_method("sample_pose") and figure.has_method("reset_motion"):
@@ -612,6 +648,8 @@ func _release_speaker() -> void:
 	if is_instance_valid(_speaker):
 		_speaker.reset_motion()
 	_speaker = null
+	_speaker_posed = false
+	_speaker_actor = ""
 	for entry: Dictionary in _mission_rotations:
 		if is_instance_valid(entry.node):
 			if entry.node.has_method("clear_gaze_target"):

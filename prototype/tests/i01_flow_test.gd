@@ -387,6 +387,26 @@ func _check_vid_b_direction() -> void:
 	# Restore the running beat exactly.
 	director.mission_actor_id = str(_beat().get("actor_id", ""))
 	director.sample(str(_beat().shot_id), 0.0)
+	# Drive the actual production Main through one continuous spoken beat,
+	# including both reaction cuts. Restore the original beat afterwards.
+	var original_index: int = game.opening_index
+	game.opening_index = ids.find("I01_B_SEXTUS")
+	game._opening_present()
+	var father: Node3D = game.world.get_cinematic_figure("silvanus")
+	var total: float = maxf(float(_beat().duration), game.opening_voice_duration)
+	var current_face: Node = game.opening_voice.face
+	var line_id := str(game.opening_voice.current.get("line_id",""))
+	game._opening_process(total * 0.45)
+	var before_cut: float = game.opening_elapsed
+	var first_phase: float = father.get("phase")
+	game._opening_process(total * 0.02)
+	check(director.shot_id == "i01_react_boy" and director._speaker == father, "Production reaction cut retains the original speaking figure")
+	check(is_equal_approx(float(father.get("phase")), fposmod(float(game.opening_elapsed) / 1.7, 1.0)) and is_equal_approx(first_phase, fposmod(before_cut / 1.7, 1.0)), "Body animation phase follows absolute beat seconds on both sides of the cut")
+	check(game.opening_voice.face == current_face and str(game.opening_voice.current.get("line_id","")) == line_id, "Camera cut does not rebind the voice or viseme track")
+	game._opening_process(total * 0.25)
+	check(director.shot_id == "i01_close_speaker" and director._speaker == father and is_equal_approx(float(father.get("phase")), fposmod(float(game.opening_elapsed) / 1.7, 1.0)), "Returning to the speaker retains continuous beat timing")
+	game.opening_index = original_index
+	game._opening_present()
 
 
 func _test_vid_b_interrupted() -> void:

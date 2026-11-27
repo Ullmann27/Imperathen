@@ -6,12 +6,16 @@ class SpeakingFigure:
 	extends Node3D
 	var sampled := "idle"
 	var reset_count := 0
+	var sampled_phase := 0.0
+	var sample_count := 0
 	var age := 22
 	var pinned := false
 	func set_cinematic_detail(enabled: bool) -> void:
 		pinned = enabled
-	func sample_pose(action: String, _phase: float) -> void:
+	func sample_pose(action: String, phase: float) -> void:
 		sampled = action
+		sampled_phase = phase
+		sample_count += 1
 	func reset_motion() -> void:
 		sampled = "idle"
 		reset_count += 1
@@ -143,6 +147,35 @@ func _run() -> void:
 	_check(gameplay.current and label.visible and not hidden.visible, "Repeated finish restores the camera and original label visibility")
 	_check(sun.light_color.is_equal_approx(original_light) and is_equal_approx(environment.environment.ambient_light_energy, 0.6), "Finish restores the original light and ambient energy")
 	_check(not director.active and not director.is_processing(), "Finished director consumes no per-frame work")
+	# Beat ownership is exercised with a separate listener and a real actor
+	# switch in the framing. Preserve every standalone assertion above.
+	var listener := SpeakingFigure.new()
+	stage.add_child(listener)
+	listener.position = Vector3(1, 0.9, 6)
+	stage.cast["player"] = actor
+	stage.cast["marcus"] = listener
+	director.begin_beat("julia")
+	director.mission_actor_id = "julia"
+	_check(director.play("duo_close", 3.0, false, 1.21, 0.40), "Beat-owned speaker shot starts")
+	var resets := speaking.reset_count
+	var samples := speaking.sample_count
+	var listener_samples := listener.sample_count
+	var phase_before := speaking.sampled_phase
+	var turn_before := speaking.global_rotation
+	_check(is_equal_approx(phase_before, fposmod(1.21 / 1.7, 1.0)) and not director.is_processing(), "Absolute line seconds drive acting while Main owns playback")
+	director.mission_actor_id = "marcus"
+	director.play("duo_close", 0.8, false, 1.21, 0.0)
+	_check(speaking.reset_count == resets and speaking.sample_count == samples + 1 and is_equal_approx(speaking.sampled_phase, phase_before), "Reaction cut retains real speaker phase and avoids resetting their pose")
+	_check(listener.sample_count == listener_samples and speaking.global_rotation.is_equal_approx(turn_before), "Camera subject is not made to speak or change the speaker's gaze axis")
+	director.sample("duo_close", 0.5, 1.61)
+	_check(is_equal_approx(speaking.sampled_phase, fposmod(1.61 / 1.7, 1.0)), "Offscreen speaker continues in absolute beat time")
+	director.begin_beat("")
+	director.play("duo_react", 2.0, false, 0.0)
+	_check(speaking.sampled == "idle" and speaking.reset_count == resets + 1 and listener.sample_count == listener_samples, "A new silent beat releases the prior speaker without animating the listener")
+	director.finish()
+	_check(not listener.pinned and not speaking.pinned, "Beat-owned cast is released")
+	stage.cast.erase("player")
+	stage.cast.erase("marcus")
 	director.play("market", 11.0)
 	director.free()
 	_check(gameplay.current and label.visible and not hidden.visible, "Unexpected director teardown restores the world")
