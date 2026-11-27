@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 86,
+  "version": 87,
   "tasks": [
     {
       "id": "K101",
@@ -445,14 +445,14 @@
     {
       "id": "I01-RENDER-CHECKPOINT",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "2e761e544022d03b0a813ee7cbc0c3f095ce7329",
-      "run_id": null,
+      "run_id": "46029016493",
       "scope": [
         "prototype/tests/i01_flow_test.gd"
       ],
       "access": "edit",
-      "note": "Independent I-01 software-render evidence timeout 46020295748/job 140577885552 (1500s after continued). Scoped opt-in checkpoint rasterization on isolated branch and matching CI invocation, preserve every simulation step, all existing asserts, required real 1280x720 captures, no FPS/temporal or physical claim; continuous mode remains available. Map formatting already corrected on campaign head."
+      "note": "Independent I-01 software-render evidence timeout 46020295748/job 140577885552 (1500s after continued). Scoped opt-in checkpoint rasterization on isolated branch and matching CI invocation, preserve every simulation step, all existing asserts, required real 1280x720 captures, no FPS/temporal or physical claim; continuous mode remains available. Map formatting already corrected on campaign head. Actual isolated commit e1fde65250271592d6309a056d1c4d5e352a87bd, PR #178, CI 46029016493 (in_progress); all original capture checkpoints retained and CI PNG dimensions additionally verified. No integration before success."
     }
   ]
 }
