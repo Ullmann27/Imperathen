@@ -5,8 +5,10 @@ API: https://build.nvidia.com/nvidia/nemotron-3-ultra-550b-a55b/apireference
 
 1. Generate an NVIDIA Build API key. Never paste it into a public issue, chat, request JSON or source file.
 2. Open https://github.com/Ullmann27/Imperathen/settings/secrets/actions/new
-   and save an Actions secret named IMPERATUM_NVIDIA. The bridge does not need
-   any GitHub secret other than this credential.
+   and save an Actions secret named IMPERATHEN_ROME_NVIDIA or IMPERATHEN_NVIDIA. The bridge also accepts
+   spelling variants IMPERATEN_ROME_NVIDIA, IMPERATEN_NVIDIA, IMPERATHENROME_NVIDIA,
+   IMPERATENROME_NVIDIA, and the previously used IMPERATUM_NVIDIA or NVIDIA_API_KEY.
+   Only the first populated secret is used. No credential value is logged.
 3. Rerun the NVIDIA Nemotron engineering bridge job if its initial connection
    failed because no secret was set. Subsequent questions update request.json
    on the dedicated branch; its push triggers the bridge. No main merge.
