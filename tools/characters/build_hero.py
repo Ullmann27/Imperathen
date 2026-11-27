@@ -87,12 +87,35 @@ def normalize_weights(values):
     return {name:w/total for name,w in pairs} if total>0 else {'Head':1.}
 
 
-def load_anatomy():
+def verified_parent_target(name, count):
+    receipt = json.loads((SRC/'parent_anatomy_provenance.json').read_text(encoding='utf-8'))
+    record = receipt['targets'][name]
+    path = SRC/name
+    data = path.read_bytes()
+    git_hash = hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+    if len(data) != record['bytes'] or git_hash != record['git_blob_sha']:
+        raise ValueError('Parent anatomy source checksum mismatch: '+name)
+    return target(path, count)
+
+
+def load_anatomy(adult_candidate=None):
     raw,uv,faces,groups,uvfaces=obj_data(SRC/'base.obj')
     child=target(SRC/'caucasian-male-child.target',len(raw))
     adult=target(SRC/'caucasian-male-young.target',len(raw))
     muscle=target(SRC/'universal-male-young-maxmuscle-averageweight.target',len(raw))
-    variants=[raw+.78*child+.22*adult,raw+adult+.20*muscle]
+    adult_points = raw+adult+.20*muscle
+    # Keep the original child anatomy and common rest-rig contract untouched.
+    # Adult candidate age mixtures are artistic controls, not clinical ages.
+    if adult_candidate == 'julia':
+        young = verified_parent_target('caucasian-female-young.target', len(raw))
+        old = verified_parent_target('caucasian-female-old.target', len(raw))
+        adult_points = raw+.78*young+.22*old
+    elif adult_candidate == 'silvanus':
+        old = verified_parent_target('caucasian-male-old.target', len(raw))
+        adult_points = raw+.70*adult+.30*old+.12*muscle
+    elif adult_candidate is not None:
+        raise ValueError('Unknown adult candidate: '+str(adult_candidate))
+    variants=[raw+.78*child+.22*adult,adult_points]
     facegroups=defaultdict(set)
     for face,group in zip(faces,groups):facegroups[group].update(face)
     weights_json=json.loads((SRC/'default_weights.mhw').read_text())['weights']
@@ -940,7 +963,18 @@ def preserve_grounded_death_keys(path, arm):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--preview-only',action='store_true');parser.add_argument('--export',action='store_true');parser.add_argument('--no-render',action='store_true');parser.add_argument('--clay',action='store_true')
     parser.add_argument('--refit-existing', action='store_true', help='Preserve the authored hero geometry/materials and correct its skirt weights and fall')
+    parser.add_argument('--adult-candidate', choices=('julia','silvanus'))
+    parser.add_argument('--candidate-dir', type=Path)
     args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+    if args.adult_candidate:
+        if not args.candidate_dir or args.refit_existing or args.export or args.clay:
+            parser.error('Adult candidate requires --candidate-dir and cannot export or replace the original hero')
+        candidate_dir = args.candidate_dir.resolve()
+        if candidate_dir == ART.resolve() or candidate_dir == OUT.resolve() or candidate_dir.is_relative_to(SRC.resolve()):
+            parser.error('Candidate must not overwrite original hero sources')
+        candidate_dir.mkdir(parents=True, exist_ok=False)
+    elif args.candidate_dir:
+        parser.error('--candidate-dir requires --adult-candidate')
     for d in (ART,OUT,REVIEW):d.mkdir(parents=True,exist_ok=True)
     if args.refit_existing:
         bpy.ops.wm.open_mainfile(filepath=str(ART/'hero.blend'))
@@ -971,7 +1005,7 @@ def main():
         print('HERO_MOTION_REFIT_COMPLETE',json.dumps({'skirt':skirt_fit,'tunic':tunic_fit,'death':death_contact,'lods':len(levels)}))
         return
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    anatomy=load_anatomy();arm=make_rig(anatomy['joints'])
+    anatomy=load_anatomy(args.adult_candidate);arm=make_rig(anatomy['joints'])
     maps=generated_maps()
     skin_path=SRC/'system_assets/skins/young_caucasian_female/young_lightskinned_female_diffuse.png'
     if not skin_path.is_file() and not args.clay:raise FileNotFoundError(skin_path)
@@ -991,6 +1025,18 @@ def main():
     death_contact = fit_death_ground_contact(arm)
     camera=setup_scene()
     bpy.context.preferences.filepaths.save_version=0
+    if args.adult_candidate:
+        destination = candidate_dir/'hero.blend'
+        bpy.ops.wm.save_as_mainfile(filepath=str(destination),compress=True)
+        packaging = pack_blend_lossless(destination)
+        (candidate_dir/'anatomy.json').write_text(json.dumps({
+            'candidate':args.adult_candidate,'source_receipt':'art/hero_quality/source/parent_anatomy_provenance.json',
+            'common_joints':list(anatomy['joints']),'child_anatomy_preserved':True,
+            'blend_sha256':hashlib.sha256(destination.read_bytes()).hexdigest(),
+            'source_packaging':packaging,'acceptance':'unreviewed anatomy candidate, not release asset'
+        },indent=2)+'\n')
+        print('PARENT_ANATOMY_SOURCE_CANDIDATE',args.adult_candidate,destination)
+        return
     bpy.ops.wm.save_as_mainfile(filepath=str(ART/'hero.blend'),compress=True)
     source_packaging=pack_blend_lossless(ART/'hero.blend')
     if not args.no_render:
