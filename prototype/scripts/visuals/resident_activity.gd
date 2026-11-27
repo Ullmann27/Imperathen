@@ -49,6 +49,31 @@ static func partner_id(resident: Dictionary, now: int) -> int:
 		return partner
 	return -1
 
+## Match only saved conversation intentions. Mutual social conversations
+## take priority; a buyer may request a vendor without a reciprocal intent.
+## Stable IDs break ties so streaming order cannot change the selected pairs.
+static func conversation_pairs(requests: Dictionary, buyers: Dictionary) -> Dictionary:
+	var pairs: Dictionary = {}
+	var ids: Array = requests.keys()
+	ids.sort()
+	for person: int in ids:
+		var peer := int(requests[person])
+		if peer == person or peer < 0 or pairs.has(person) or pairs.has(peer):
+			continue
+		if int(requests.get(peer, -1)) == person:
+			pairs[person] = peer
+			pairs[peer] = person
+	for person: int in ids:
+		if not bool(buyers.get(person, false)) or pairs.has(person):
+			continue
+		var peer := int(requests[person])
+		if peer == person or peer < 0 or pairs.has(peer):
+			continue
+		pairs[person] = peer
+		pairs[peer] = person
+	return pairs
+
+
 static func speaker(first: int, second: int, now: int) -> int:
 	# Stable alternating turns instead of both people speaking continuously.
 	var lower := mini(first,second)
