@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 94,
+  "version": 95,
   "tasks": [
     {
       "id": "K101",
@@ -457,14 +457,14 @@
     {
       "id": "HOUSE-WINDOW-HIT-PROVENANCE",
       "owner": "Coordinator",
-      "status": "reserved",
+      "status": "submitted",
       "revision": "1b87724a9fe62c751d02a04668f8c924b7c7c7a0",
-      "run_id": null,
+      "run_id": "46032488245",
       "scope": [
         "prototype/tests/house_interiors_test.gd"
       ],
       "access": "edit",
-      "note": "Independent diagnostic-only correction: identify exact rendered shell/item collider and every failed quarter-point ray instead of short-circuiting after first hit. Preserve all prior 7989 assertions, geometry, collision and quality limits. No fix or acceptance before new engine evidence."
+      "note": "Independent diagnostic-only correction: identify exact rendered shell/item collider and every failed quarter-point ray instead of short-circuiting after first hit. Preserve all prior 7989 assertions, geometry, collision and quality limits. No fix or acceptance before new engine evidence. PR #179 exact head c1f0dfb7755c2fb86d6af40237f6f606ac6d3d1f; focused push CI observed in_progress. Workflow also preserves JSON on failed checks. All four N23–N26 outcomes already recorded. No geometry modification yet."
     }
   ]
 }
