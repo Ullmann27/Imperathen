@@ -1,0 +1,99 @@
+name: I-00 original Blender vexillum and legion candidate
+on:
+  push:
+    branches: ['feat/aeterna-i00-vexillum-legion-20261127']
+permissions:
+  contents: read
+concurrency:
+  group: aeterna-i00-vexillum
+  cancel-in-progress: false
+jobs:
+  generate-and-verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      IMPERATHEN_REQUIRE_I00_VEXILLUM: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Build original Blender mesh and transparent PNG render
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/i00/generated prototype/assets/cinematic
+          git rev-parse HEAD > artifacts/i00/source-commit.txt
+          bash tools/characters/install_marcus_blender.sh "$RUNNER_TEMP/i00-blender"
+          python3 -m py_compile tools/art/build_i00_vexillum.py
+          timeout --kill-after=15s 900s "$RUNNER_TEMP/i00-blender/blender" -b --factory-startup -t 4 --python-exit-code 1 -P tools/art/build_i00_vexillum.py -- --output "$PWD/artifacts/i00/generated" 2>&1 | tee artifacts/i00/blender.log
+          grep -Fq I00_BLENDER_ASSET_PASS artifacts/i00/blender.log
+          cp artifacts/i00/generated/i00_vexillum.glb prototype/assets/cinematic/
+      - name: Install official Godot and verify its checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Verify the imported original cloth and live prolog staging
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/check_prototype.py --godot "$GODOT_BIN" --keep-going --only import i00_stage opening_director --report artifacts/i00/engine
+          grep -Fq I00_STAGE_PASS artifacts/i00/engine/i00_stage.log
+      - name: Keep source and genuine Blender renders
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: i00-blender-original-${{ github.run_id }}
+          path: artifacts/i00/
+          if-no-files-found: warn
+          retention-days: 30
+  stage-tested-original:
+    needs: generate-and-verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/aeterna-i00-vexillum-legion-20261127'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@v4
+        with:
+          name: i00-blender-original-${{ github.run_id }}
+          path: verified
+      - name: Stage exact original asset as an isolated candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(cat verified/source-commit.txt)" = "$GITHUB_SHA"
+          test "$(git ls-remote origin "$GITHUB_REF" | cut -f1)" = "$GITHUB_SHA"
+          grep -Fq I00_STAGE_PASS verified/engine/i00_stage.log
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          p=pathlib.Path("verified/generated")
+          m=json.loads((p/"i00_vexillum.json").read_text())
+          assert m["alpha_min"]<.01 and m["alpha_max"]>.99
+          for name, info in m["files"].items():
+              f=p/name
+              assert f.stat().st_size==info["bytes"]
+              assert hashlib.sha256(f.read_bytes()).hexdigest()==info["sha256"]
+          PY
+          mkdir -p prototype/assets/cinematic art/cinematic/i00
+          cp verified/generated/i00_vexillum.glb prototype/assets/cinematic/
+          cp verified/generated/i00_vexillum.{blend,json} art/cinematic/i00/
+          cp verified/generated/i00_vexillum_{transparent,detail,textile}.png art/cinematic/i00/
+          git add prototype/assets/cinematic/i00_vexillum.glb art/cinematic/i00/
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "Stage verified original Blender vexillum with transparent render evidence (CI $GITHUB_RUN_ID)"
+          git push origin HEAD:"$GITHUB_REF"

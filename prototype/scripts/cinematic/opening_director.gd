@@ -121,6 +121,8 @@ func begin_beat(actor_id: String) -> void:
 
 func set_paused(value: bool) -> void:
 	paused = value
+	if is_instance_valid(_i00_stage):
+		_i00_stage.call("set_presentation_paused",value)
 
 
 func sample(next_shot: String, normalized_time: float, beat_seconds: float = -1.0) -> Dictionary:
@@ -218,6 +220,7 @@ func _ensure_i00_stage() -> Node3D:
 		add_child(_i00_stage)
 		_i00_stage.call("ensure_built")
 	_i00_stage.visible = true
+	_i00_stage.call("set_presentation_paused",paused)
 	return _i00_stage
 
 
@@ -257,18 +260,19 @@ func _apply_sample(normalized_time: float) -> void:
 	match shot_id:
 		"aquileia_detail":
 			var anchor := _anchor("i00_standard")
-			start = anchor + Vector3(0.85, 1.35, 1.55)
-			end = anchor + Vector3(0.48, 1.15, 1.0)
-			target_start = anchor + Vector3(0.0, 2.0, 0.0)
-			target_end = anchor + Vector3(0.0, 1.75, -0.1)
-			fov_start = 42.0
-			fov_end = 38.0
+			# Compose around the real fabric, then pull back to reveal the ranks.
+			start = anchor+Vector3(.32,2.53,1.50)
+			end = anchor+Vector3(1.25,2.26,3.60)
+			target_start = anchor+Vector3(0,2.48,.13)
+			target_end = anchor+Vector3(0,2.05,-2.0)
+			fov_start = 41.0
+			fov_end = 49.0
 		"legions_rain":
 			var anchor := _anchor("i00_legions")
-			start = anchor + Vector3(17.0, 8.4, 18.0)
-			end = anchor + Vector3(12.0, 6.2, 13.5)
-			target_start = anchor + Vector3(0.0, 1.2, -5.5)
-			target_end = anchor + Vector3(0.0, 1.0, -8.0)
+			start = anchor+Vector3(12.5,5.9,15.0)
+			end = anchor+Vector3(7.5,3.5,10.6)
+			target_start = anchor+Vector3(-3.2,1.35,-1.7)
+			target_end = anchor+Vector3(-2.2,1.45,.8)
 			fov_start = 57.0
 			fov_end = 51.0
 		"caesar_orders":
