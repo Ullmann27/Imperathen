@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 160,
+  "version": 161,
   "tasks": [
     {
       "id": "K101",
@@ -581,9 +581,9 @@
       "scope": [
         "art/village/verify.gd"
       ],
-      "note": "Roadmap 01.2. Old run 46038086118: autumn mud and drizzle fixture fails. Actual scenery uses continuous weather state and physically grounded rain rather than season alone. Preserve mesh, PBR, density and doorway tests; supply explicit dry/rain states, camera and real ground rays. Candidate fixture only, no claim of runtime repair. Candidate 0e996ed8cb2af81ef721572e223786c457cee253; observed four independent GitHub jobs in_progress. QA #221 is separately successful on 1327bd6, artifact 15226547072, no physical device acceptance. This candidate has no results yet.",
+      "note": "Roadmap 01.2. Old run 46038086118: autumn mud and drizzle fixture fails. Actual scenery uses continuous weather state and physically grounded rain rather than season alone. Preserve mesh, PBR, density and doorway tests; supply explicit dry/rain states, camera and real ground rays. Candidate fixture only, no claim of runtime repair. Candidate 0e996ed8cb2af81ef721572e223786c457cee253; observed four independent GitHub jobs in_progress. QA #221 is separately successful on 1327bd6, artifact 15226547072, no physical device acceptance. This candidate has no results yet. Actual job 140698244798 failed village_scenery. All four profiles had 360 physical supports and expected visible counts; all 48 original renderer-readback support checks failed. Need distinguish headless dummy readback from real surface/transform issue, not change rain threshold or hide failures.",
       "owner": "Coordinator",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
       "run_id": "46055915040",
       "access": "edit"
@@ -793,6 +793,20 @@
         ".github/workflows/aeterna-valley-muster-identity.yml"
       ],
       "note": "Independent follow-up to 49/50 diagnostic. Reserve valley_scene runtime + existing muster regression on same isolated branch. Investigate deterministic bounded rig materialization: prioritize a visible eligible agent from each otherwise unrepresented side then camera distance. Preserve max 3 new rigs per ordinary sync, total profile budgets, action holds, authoritative identity, and original failing assertion. Existing formation test scope remains separate. No preview modification until actual successful related tests and current blob comparison. Exact candidate committed and read-back compared: runtime ordering, original test plus 3 assertions (per-pass instantiation cap, existing profile caps, no duplicate UIDs), existing focused workflow extended to both original formation groups. Actual run 46066402676 observed in_progress. No integration/green claim; independent formation baseline red. Prior diagnostic run 46065570928 red."
+    },
+    {
+      "id": "RAIN-SURFACE-CONTRACT",
+      "owner": "Coordinator",
+      "access": "edit",
+      "status": "reserved",
+      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
+      "run_id": null,
+      "scope": [
+        "prototype/scripts/world/village/village_scenery.gd",
+        "art/village/verify.gd",
+        ".github/workflows/aeterna-rain-surface-contract.yml"
+      ],
+      "note": "Reserve independent rain support provenance candidate; same submitted CPU transforms stored in bounded array and independently re-raycast, plus actual Compatibility MultiMesh readback and matching real captures. Keep 0.02m physical threshold, all original geometry, seasonal/density/doorway checks and render budgets. Hypothesis only: headless dummy getter may not preserve instance data. No production visual claim or integration before both checks."
     }
   ]
 }
