@@ -1,0 +1,30 @@
+{
+  "design": "Original Roman-inspired reconstruction, not a surviving historically authenticated flag",
+  "blender": "4.3.2",
+  "cloth_vertices": 721,
+  "cloth_triangles": 1200,
+  "alpha_min": 0.0,
+  "alpha_max": 1.0,
+  "files": {
+    "i00_vexillum.glb": {
+      "sha256": "49ca430af66239c9d74b719afd82b325cdf4486b7d38890624743a2683240649",
+      "bytes": 666872
+    },
+    "i00_vexillum.blend": {
+      "sha256": "638c812506635a86d8649b444a652a7fca0a15aea70203293954853ce3c2eec6",
+      "bytes": 1348116
+    },
+    "i00_vexillum_transparent.png": {
+      "sha256": "0f481ef43a76977144a51e025cad0b965824149776ed8784a202c58d3900812d",
+      "bytes": 544832
+    },
+    "i00_vexillum_detail.png": {
+      "sha256": "04e3fc521d7ea8f852f1b54556c38d35789fcb906514814da74b2cedac0e6f56",
+      "bytes": 949022
+    },
+    "i00_vexillum_textile.png": {
+      "sha256": "85a993862a3fdea08e83ac65befca7d673bc189fb1cb891668ed15b3c4dd43bf",
+      "bytes": 568950
+    }
+  }
+}

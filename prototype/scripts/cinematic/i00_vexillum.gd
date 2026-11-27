@@ -57,6 +57,8 @@ static func has_original_textile(candidate: MeshInstance3D) -> bool:
 	if mesh.get_surface_count() != 1 or mesh.surface_get_array_len(0) <= 500:
 		return false
 	var arrays := mesh.surface_get_arrays(0)
+	if not arrays[Mesh.ARRAY_VERTEX] is PackedVector3Array or not arrays[Mesh.ARRAY_TEX_UV] is PackedVector2Array:
+		return false
 	var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
 	var uvs: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV]
 	if vertices.is_empty() or uvs.size() != vertices.size():
