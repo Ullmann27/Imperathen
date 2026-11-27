@@ -92,7 +92,10 @@ func run() -> void:
 			var hero_asset := person.active_model_path.begins_with("res://assets/characters/hero_quality_") or Person.MarcusModel.owns(person.active_model_path)
 			var civilian: MeshInstance3D = person.body.find_child("HeroBody" if hero_asset else "Civilian",true,false)
 			var skeleton: Skeleton3D = person.body.find_children("*","Skeleton3D",true,false)[0]
-			check(civilian.skin != null and skeleton.get_bone_count() == 15,home+" uses the imported skin")
+			var required_bones := 17 if Person.MarcusModel.owns(person.active_model_path) else 15
+			check(civilian.skin != null and skeleton.get_bone_count() == required_bones,home+" uses the imported skin")
+			if required_bones == 17:
+				check(skeleton.find_bone("Eye_L") >= 0 and skeleton.find_bone("Eye_R") >= 0,"Marcus has both independent eye joints")
 			var face := surface(civilian,"HeroSkin" if hero_asset else "PortraitSkin")
 			var expected: String = "hero_"+home if person == hero else Person.COMPANIONS[home]
 			if hero_asset:

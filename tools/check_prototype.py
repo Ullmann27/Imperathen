@@ -208,6 +208,7 @@ def main():
             ("village_scenery", ["--script", str(ROOT / "art/village/verify.gd")], "VILLAGE_SCENERY errors []"),
             ("village_look", ["--script", "res://tests/village_look_test.gd"], "VILLAGE_LOOK_PASS"),
             ("route_fire", ["--script", "res://tests/route_fire_test.gd"], "ROUTE_FIRE_PASS"),
+            ("resident_activity", ["--script", "res://tests/resident_activity_test.gd"], "RESIDENT_ACTIVITY_PASS"),
             ("atrium", ["--script", str(ROOT / "art/architecture/verify_atrium.gd")], "ATR_VISUAL errors []"),
             ("seasons", ["--script", "res://tests/season_campaign_test.gd"], "failures=0"),
             ("world_calendar", ["--script", "res://tests/world_calendar_test.gd"], "WORLD_CALENDAR_PASS"),

@@ -8,6 +8,7 @@ const Person = preload("res://scripts/visuals/village_person.gd")
 const Art = preload("res://scripts/world/village_art.gd")
 const Layout = preload("res://scripts/world/village/village_layout.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
+const Activities := preload("res://scripts/visuals/resident_activity.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const Strike = preload("res://scripts/domain/raider_strike.gd")
 const COUNCIL := "res://assets/politics/council/valdora_council.glb"
@@ -211,6 +212,10 @@ func _update_attention(delta: float) -> void:
 	for id: String in actors:
 		var actor: Node3D = actors[id]
 		if not actor.visible or actor.get_meta("companion_controlled",false):
+			var inactive_figure := actor.get_node_or_null("Figure")
+			if is_instance_valid(inactive_figure):
+				inactive_figure.clear_gaze_target()
+				inactive_figure.set_resident_prop("")
 			_set_social_pose(actor,false)
 			continue
 		var intent := Behavior.view(state,id)
@@ -232,6 +237,7 @@ func _update_attention(delta: float) -> void:
 					if is_instance_valid(body):
 						partner = body.get_node_or_null("Figure") as Node3D
 			figure.set_gaze_target(partner)
+			figure.set_resident_prop(Activities.village_prop(activity))
 		var target := player
 		if activity in ["greet","socialize"]:
 			# A social decision is not a conversation until the two *visible*

@@ -76,6 +76,9 @@ var _gaze := HeadGaze.new()
 var _social_focus := SocialFocus.new()
 var _motion := CharacterMotion.new()
 var _carrying_jug := false
+const ResidentActivity := preload("res://scripts/visuals/resident_activity.gd")
+var _resident_prop_kind := ""
+var _resident_prop: Node3D
 var _hands := HandPose.new()
 var _turn_rate := 0.0
 var _combat_id := ""
@@ -133,6 +136,7 @@ func configure(kind: String, origin: String, years: int) -> void:
 	if role == kind and home == origin and age == years and body:
 		return
 	if role != kind or home != origin:
+		set_resident_prop("")
 		clear_gaze_target()
 	role = kind
 	_sync_gaze_physics()
@@ -910,6 +914,67 @@ func set_jug_carry(enabled: bool) -> void:
 	_apply_motion()
 
 
+## Existing authored objects follow the actual left wrist. The prop stays
+## outside the replaceable Model node, so an LOD swap never loses its owner.
+func set_resident_prop(kind: String) -> void:
+	var next := kind if role == "resident" and ResidentActivity.PROPS.has(kind) else ""
+	if next == _resident_prop_kind:
+		return
+	_resident_prop_kind = next
+	if is_instance_valid(_resident_prop):
+		_resident_prop.free()
+	_resident_prop = null
+	if next.is_empty():
+		return
+	var path := str(ResidentActivity.PROPS[next])
+	if not ResourceLoader.exists(path,"PackedScene"):
+		return
+	var packed := load(path) as PackedScene
+	if packed == null:
+		return
+	var instance := packed.instantiate()
+	if not instance is Node3D:
+		instance.free()
+		return
+	_resident_prop = instance as Node3D
+	_resident_prop.name = "DailyActivityProp"
+	_resident_prop.set_meta("activity_prop", next)
+	add_child(_resident_prop)
+	_resident_prop.hide()
+
+
+func _sync_resident_prop() -> void:
+	if not is_instance_valid(_resident_prop):
+		return
+	_resident_prop.hide()
+	if role != "resident" or not _motion.civilian or not _motion.available or not _combat_id.is_empty() or _service_external or _posed or clip not in ["idle","march","talk"]:
+		return
+	var skeleton := _motion.skeleton
+	if not is_instance_valid(skeleton):
+		return
+	var hand := skeleton.find_bone("Hand_L")
+	if hand < 0:
+		return
+	_motion.carry_left()
+	_hands.set_grip(.65)
+	var correction := skeleton.get_bone_global_rest(hand).basis.orthonormalized().inverse()
+	var pose := skeleton.global_transform * skeleton.get_bone_global_pose(hand)
+	var offset := Vector3(0,-.24,.055)
+	var size := .75
+	match _resident_prop_kind:
+		"water":
+			offset = Vector3(0,-.34,.06)
+			size = .9
+		"amphora":
+			offset = Vector3(0,-.32,.075)
+			size = .55
+		"cup":
+			offset = Vector3(0,-.07,.055)
+			size = .82
+	_resident_prop.global_transform = Transform3D((pose.basis*correction).orthonormalized().scaled(Vector3.ONE*size),pose*(correction*offset))
+	_resident_prop.show()
+
+
 func _apply_jug_carry() -> void:
 	if _carrying_jug and role == "player" and clip in ["idle","march","run","talk"] and _combat_id.is_empty() and not _service_external:
 		_motion.carry_left()
@@ -1053,6 +1118,8 @@ func _process(delta: float) -> void:
 		_check_lod = 0.32
 		refresh_lod(get_viewport().get_camera_3d())
 	if not _combat_id.is_empty():
+		if is_instance_valid(_resident_prop):
+			_resident_prop.hide()
 		if not _combat_external and _combat_duration > 0.0:
 			_combat_progress = minf(1.0, _combat_progress + delta / _combat_duration)
 			phase = _combat_progress
@@ -1064,6 +1131,8 @@ func _process(delta: float) -> void:
 		_ground_youth()
 		return
 	if _posed or _service_external:
+		if is_instance_valid(_resident_prop):
+			_resident_prop.hide()
 		_ground_youth()
 		# Cinematic talk poses remain manually sampled; explicit social gaze
 		# is applied only after the authored pose. Combat samples stay pure.
@@ -1097,6 +1166,7 @@ func _process(delta: float) -> void:
 		if animator.current_animation != "":
 			phase = animator.current_animation_position / animator.current_animation_length
 	_apply_motion()
+	_sync_resident_prop()
 	_plant_contacts(delta)
 	_ground_youth()
 	_face.advance(delta,clip,detail)

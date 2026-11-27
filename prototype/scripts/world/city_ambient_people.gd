@@ -178,6 +178,7 @@ func _physics_process(delta: float) -> void:
 		var near_interval := phase >= 5.0 and phase < 10.0
 		var moving_to_counter := phase < 5.0
 		var leaving := phase >= 10.0 and phase < 15.0
+		visitor_figure.set_resident_prop("basket" if phase < 15.0 else "")
 		var destination: Vector3 = record.near if moving_to_counter or near_interval else record.far
 		var displacement := destination-character.position
 		var horizontal := Vector3(displacement.x,0,displacement.z)
@@ -216,9 +217,13 @@ func _physics_process(delta: float) -> void:
 			else:
 				visitor_figure.clear_gaze_target()
 				vendor_figure.clear_gaze_target()
-			visitor_figure.set_conversation_focus(meets)
-			vendor_figure.set_conversation_focus(meets)
+			visitor_figure.set_conversation_focus(false)
+			vendor_figure.set_conversation_focus(false)
 			record.talking = meets
+		if meets:
+			var visitor_speaks := fposmod(phase-5.0,3.0)<1.5
+			visitor_figure.set_conversation_focus(visitor_speaks)
+			vendor_figure.set_conversation_focus(not visitor_speaks)
 		if not meets:
 			vendor_figure.keep_working()
 
