@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 5,
+  "version": 6,
   "tasks": [
     {
       "id": "K101",
@@ -80,7 +80,7 @@
     {
       "id": "D001",
       "owner": "DeepSeek",
-      "status": "submitted",
+      "status": "blocked",
       "revision": "9fa7b141fe7800e1e04a6142a6fd56d4f3c7505c",
       "run_id": "46018153691",
       "scope": [
@@ -88,7 +88,7 @@
         "prototype/tests/regional_map_test.gd"
       ],
       "access": "read",
-      "note": "Actual GitHub workflow created at 645a268854ce66ee3bd2872fbb3f29b8238828f3. Preflight in progress at verification; live API access not yet proven."
+      "note": "Verified workflow 46018153691/job 140570837683: preflight passed, authenticated probe returned HTTP 410 before engineering request. Specific NVIDIA model page labels Free Endpoint Deprecated: https://build.nvidia.com/deepseek-ai/deepseek-v4.1-flash . Do not retry retired hosted route. Keep independent map task open for verified alternative; no paid fallback."
     }
   ]
 }
