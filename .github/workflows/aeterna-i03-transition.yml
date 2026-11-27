@@ -1,0 +1,77 @@
+name: Aeterna I-03 real transition regression
+on:
+  push:
+    branches: ['fix/aeterna-i03-water-transition-20261127']
+    paths:
+      - 'prototype/tests/i03_flow_test.gd'
+      - '.github/workflows/aeterna-i03-transition.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: aeterna-well-evidence-45989884335
+          run-id: 45989884335
+          github-token: ${{ github.token }}
+          path: recovered-well
+      - name: Recover source-bound original well candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/i03-transition
+          test "$(cat recovered-well/source-commit.txt)" = "e1a374f6b40ea16801ea2dc616266eba24c314d1"
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          p = pathlib.Path('recovered-well/generated')
+          m = json.loads((p/'village_well.json').read_text())
+          assert hashlib.sha256((p/'village_well.glb').read_bytes()).hexdigest() == m['sha256']
+          PY
+          python3 tools/art/validate_interactive_well.py recovered-well/generated/village_well.glb > artifacts/i03-transition/well-validation.json
+          cp recovered-well/generated/village_well.glb prototype/assets/architecture/village_well.glb
+          git rev-parse HEAD > artifacts/i03-transition/source-commit.txt
+      - name: Install official Godot and verify checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Run actual I-03 flow including normal I-01 water completion
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/i03-transition"
+          state="$(mktemp -d "$RUNNER_TEMP/i03.XXXXXX")"
+          export XDG_DATA_HOME="$state/data" XDG_CONFIG_HOME="$state/config" XDG_CACHE_HOME="$state/cache"
+          mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
+          timeout --kill-after=10s 300s "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          timeout --kill-after=10s 240s "$GODOT_BIN" --headless --path prototype --fixed-fps 60 --script res://tests/i03_flow_test.gd 2>&1 | tee "$out/i03-flow.log"
+          grep -Fq I03_FLOW_PASS "$out/i03-flow.log"
+      - name: Preserve regression evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: i03-transition-${{ github.run_id }}
+          path: artifacts/i03-transition/
+          if-no-files-found: warn
+          retention-days: 30
