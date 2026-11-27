@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": 146,
+  "version": 147,
   "tasks": [
     {
       "id": "K101",
@@ -556,10 +556,11 @@
       "revision": "ffbea5820907f8c517818235d435ffea9638ec48",
       "run_id": "46061712090",
       "scope": [
-        "prototype/tests/village_backdrop_test.gd"
+        "prototype/tests/village_backdrop_test.gd",
+        ".github/workflows/aeterna-backdrop-ray-provenance.yml"
       ],
       "access": "edit",
-      "note": "Actual focused Godot run 46061712090/job 140717292534 passed import and village_backdrop, artifact 15228458606. Prior candidate ffbea582 reconciles vegetation collider provenance while preserving original measured terrain/walking gates; no runtime change or device/visual acceptance. Independent review remains required."
+      "note": "Actual focused Godot run 46061712090/job 140717292534 passed import and village_backdrop, artifact 15228458606. Prior candidate ffbea582 reconciles vegetation collider provenance while preserving original measured terrain/walking gates; no runtime change or device/visual acceptance. Independent review remains required. Independent exact base comparison: ahead 2 behind 0 relative to Preview 1327bd6, only test and isolated workflow changed; all 23 original static _check lines identical plus 2 new checks. Verified physical trunk RID/shape source in vegetation_field.gd. Draft PR #192 records passing focused run and is ready for next consolidated integration; do not trigger duplicate full QA export for test-only patch. No runtime/game change or Fold7 acceptance."
     },
     {
       "id": "PARALLEL-NIGHT-EVIDENCE",
@@ -719,15 +720,15 @@
     {
       "id": "VALLEY-MUSTER-IDENTITY",
       "owner": "Nemotron coordinator",
-      "status": "reserved",
-      "revision": "1327bd623dc5a67ce1b3611a743b481addd8bf26",
-      "run_id": null,
+      "status": "submitted",
+      "revision": "a80af59fd222619f5bdd911f16e27130b820e7d6",
+      "run_id": "46065570928",
       "scope": [
         "prototype/tests/valley_muster_test.gd",
         ".github/workflows/aeterna-valley-muster-identity.yml"
       ],
       "access": "edit",
-      "note": "Roadmap 01: N28 truncated (46055347080), old full regression failed authored Germanic swordsman assertion. Independent focused actual engine reproduction with identity, LOD and real scene provenance; retain original assertion and all budgets, no automatic model retry. No edits to formation runtime or concurrent visual tasks."
+      "note": "Roadmap 01: N28 truncated (46055347080), old full regression failed authored Germanic swordsman assertion. Independent focused actual engine reproduction with identity, LOD and real scene provenance; retain original assertion and all budgets, no automatic model retry. No edits to formation runtime or concurrent visual tasks. Exact candidate a80af59f on fix/aeterna-valley-muster-identity-20261127, focused run 46065570928 observed in_progress. 46 lines added to test; original combat-camera assertion unchanged. Fresh production camera focused on enemy independently validates actual Germanic near/mid rig, per-UID family, scene path, LOD, frustum, pool deferrals at both contexts. No runtime changes; result pending."
     }
   ]
 }
