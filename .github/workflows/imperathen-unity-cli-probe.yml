@@ -216,6 +216,20 @@ jobs:
           python3 tools/unity_bridge/probe_access.py \
             --output unity-cli-evidence/cloud-probe-sanitized.json \
             --org-candidate "heinzullmann2212"
+      - name: Verify Asset Manager direct REST API with service-account read-only rights
+        if: always()
+        shell: bash
+        env:
+          UNITY_SERVICE_ACCOUNT_ID: ${{ secrets.IMPERATHEN_UNITY_SA_ID }}
+          UNITY_SERVICE_ACCOUNT_SECRET: ${{ secrets.IMPERATHEN_UNITY_SA_SECRET }}
+          UNITY_CLOUD_ORG_ID: ${{ vars.UNITY_CLOUD_ORG_ID }}
+          UNITY_NON_INTERACTIVE: "1"
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p 'unity_bridge_asset_api_test.py' -v
+          export PATH="$HOME/.local/bin:$PATH"
+          python3 tools/unity_bridge/probe_asset_manager_api.py \
+            --report unity-cli-evidence/unity-asset-api-sanitized.json
       - name: Keep only sanitized CLI evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
