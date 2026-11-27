@@ -124,6 +124,26 @@ func _mounted_socket_probe() -> void:
 					"Direct rider keeps 3 cm seat contact at %s/%.2f" % [state, phase])
 				check(float(immediate.bone_seat_m) < 0.03 and float(deferred.bone_seat_m) < 0.03,
 					"Attachment follows the independently measured bone at %s/%.2f" % [state, phase])
+				check(float(immediate.bone_pelvis_m) < 0.03 and float(deferred.bone_pelvis_m) < 0.03,
+					"Pelvis follows actual horse bone at %s/%.2f" % [state, phase])
+				check(float(immediate.saddle_seat_m) < 0.03 and float(deferred.saddle_seat_m) < 0.03,
+					"Saddle follows the same animated socket at %s/%.2f" % [state, phase])
+		# World translation and yaw must not turn a skeleton-local pose into
+		# a world-space attachment transform or introduce a one-frame lag.
+		probe.position = Vector3(7.5, 2.0, -4.25)
+		probe.rotation.y = 1.13
+		for state: String in ["idle", "march", "run"]:
+			for phase: float in [0.0, 0.25, 0.5, 0.75]:
+				probe.present(state, phase, 0.0)
+				var immediate := _socket_residuals(probe, skeleton, index)
+				await process_frame
+				var deferred := _socket_residuals(probe, skeleton, index)
+				print("VALLEY_SOCKET_PROBE ", JSON.stringify({"state": state, "phase": phase,
+					"transformed": true, "immediate": immediate, "after_frame": deferred}))
+				for measurement: Dictionary in [immediate, deferred]:
+					check(float(measurement.bone_seat_m) < 0.03 and float(measurement.bone_pelvis_m) < 0.03
+						and float(measurement.pelvis_seat_m) < 0.03 and float(measurement.saddle_seat_m) < 0.03,
+						"Translated and rotated cavalry rig retains all contact anchors at %s/%.2f" % [state, phase])
 	probe.queue_free()
 	await process_frame
 
@@ -133,7 +153,9 @@ func _socket_residuals(probe: Node3D, skeleton: Skeleton3D, index: int) -> Dicti
 	var seat: Vector3 = probe._seat.global_position
 	var pelvis: Vector3 = probe._pose.pelvis_world()
 	return {"bone_seat_m": bone.distance_to(seat), "pelvis_seat_m": pelvis.distance_to(seat),
-		"bone_pelvis_m": bone.distance_to(pelvis), "bone": str(bone), "seat": str(seat), "pelvis": str(pelvis)}
+		"bone_pelvis_m": bone.distance_to(pelvis),
+		"saddle_seat_m": (probe._saddle.global_position + Vector3.UP * 0.08).distance_to(seat),
+		"bone": str(bone), "seat": str(seat), "pelvis": str(pelvis)}
 
 
 ## A fresh, production scene focused on the enemy isolates asset/pool identity
