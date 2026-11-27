@@ -195,12 +195,17 @@ func _run() -> void:
 	for i in 3:
 		await _interact("Becher abstellen")
 	check(game.model.data.village.childhood.screenplay.i01_table_by == "player", "Three cups set on the table by walking and interacting")
-	await _walk("Tisch -> Brunnen", to_well)
+	await _walk("Tisch -> Krug", [Vector2(-12.0, 11.55), I01.POINTS.home_jug])
+	await _interact("Den leeren Familienkrug aufnehmen")
+	check(game.model.data.village.childhood.screenplay.i01_water == "empty_jug", "Empty jug is actually collected before leaving")
+	await _walk("Krug -> Brunnen", to_well)
 	await _capture("04-brunnen")
 	await _interact("Wasser schöpfen")
+	for i in 410:
+		await process_frame
+	await _capture("04b-gefuellter-krug")
 	await _walk("Brunnen -> Tisch", from_well)
 	await _interact("Becher füllen")
-	await _interact("Frühstück")
 	check(game.screen == "opening" and game.opening_sequence.id == "i01_vid_b", "Breakfast opens VID-B")
 	await _watch("VID-B bis zur Themenwahl")
 	await _capture("05-tischgespraech")

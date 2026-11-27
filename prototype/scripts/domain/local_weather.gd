@@ -51,6 +51,18 @@ static func sample(clock: Variant, origin: String, legacy_season: int = 0) -> Di
 static func settled_wetness(day: int, block: int, origin: String) -> float:
 	return maxf(float(WET[kind_for(day,block,origin)]),maxf(float(WET[kind_for(day,block-1,origin)])*0.18,float(WET[kind_for(day,block-2,origin)])*0.04))
 
+## Shared city shelter classification. Do not treat the first half of a rain
+## crossfade as a fully wet street. "cloudy" preserves old city save vocabulary.
+static func city_kind(clock: Variant, origin: String = "italia") -> String:
+	var conditions := sample(clock,origin)
+	var kind := str(conditions.kind)
+	if float(conditions.rain)>=0.35:
+		return "storm" if kind=="storm" else "rain"
+	if kind in ["rain","storm","overcast"]:
+		return "cloudy"
+	return kind
+
+
 static func for_state(data: Dictionary) -> Dictionary:
 	var clock: Variant = data.get("calendar",{}).get("clock")
 	if Calendar.validate_clock(clock):

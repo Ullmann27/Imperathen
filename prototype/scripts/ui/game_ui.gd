@@ -27,6 +27,7 @@ const VillagePanel = preload("res://scripts/ui/village_life_panel.gd")
 const Childhood = preload("res://scripts/story/village_childhood.gd")
 const WorldClock = preload("res://scripts/domain/world_clock.gd")
 const Navigation = preload("res://scripts/ui/village_navigation.gd")
+const RegionalMap := preload("res://scripts/ui/regional_map.gd")
 const RomanStyle = preload("res://scripts/ui/roman_style.gd")
 const ImperialIntro = preload("res://scripts/ui/imperial_intro.gd")
 const Fx = preload("res://scripts/ui/imperial_fx.gd")
@@ -152,6 +153,7 @@ var _confirm_data: Dictionary = {}
 var _screen_scale := 1.0
 var _director: Node
 var _local_map: Control
+var _regional_map: Control
 var _vitals: Control
 var _prompt_panel: PanelContainer
 var _prompt_label: Label
@@ -1157,6 +1159,8 @@ func update_navigation(value: Dictionary) -> void:
 		return
 	_set_context(str(value.get("context", "")))
 	_update_chrome()
+	if is_instance_valid(_regional_map):
+		_regional_map.update_view(value)
 	if not is_instance_valid(_navigation):
 		return
 	_navigation.update_view(value)
@@ -1167,7 +1171,7 @@ func update_navigation(value: Dictionary) -> void:
 	# compass steps aside; it returns as soon as either is outside.
 	var in_home := func(point: Variant) -> bool:
 		return typeof(point) == TYPE_VECTOR2 and FAMILY_HOME.has_point(point)
-	_navigation.visible = (Childhood.active(_state) or value.has("destination_name")) and not (_child_first_mission(_state) and in_home.call(value.get("player")) and in_home.call(value.get("target")))
+	_navigation.visible = not (_child_first_mission(_state) and in_home.call(value.get("player")) and in_home.call(value.get("target")))
 	if not _navigation.visible and is_instance_valid(_local_map):
 		_local_map.hide()
 
@@ -1290,6 +1294,26 @@ func set_mode(mode: String) -> void:
 	if is_instance_valid(_director):
 		_director.context["mode"] = mode
 	_update_touch_visibility()
+	_show_regional_map(mode=="map")
+
+
+func _show_regional_map(open: bool) -> void:
+	if not open:
+		if is_instance_valid(_regional_map):
+			_regional_map.queue_free()
+			_regional_map = null
+		return
+	if is_instance_valid(_regional_map):
+		return
+	_regional_map = RegionalMap.new()
+	_screen.add_child(_regional_map)
+	_regional_map.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_regional_map.close_requested.connect(func(): _emit("mode_person",{}))
+	_regional_map.atlas_requested.connect(func(): _emit("atlas",{}))
+	_regional_map.destination_selected.connect(func(id: String): _emit("map_route",{"id":id}))
+	if is_instance_valid(_navigation):
+		_regional_map.update_view(_navigation.view)
+	_regional_map.canvas.focus_player()
 
 
 func _update_map_objective() -> void:
@@ -1359,6 +1383,7 @@ func _open_screen(screen_name: String, darken: bool, menu_style := false) -> voi
 	_touch_actions.clear()
 	_cancel_build_button = null
 	_local_map = null
+	_regional_map = null
 	_vitals = null
 	_prompt_panel = null
 	_prompt_label = null

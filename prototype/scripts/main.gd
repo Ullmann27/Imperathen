@@ -87,6 +87,7 @@ func _ready() -> void:
 	world.setup(model.data)
 	world.action_requested.connect(_on_world_action)
 	model.combat_sight_check = world.combat_sight_clear
+	model.confirmed_combat_contact.connect(_on_confirmed_combat_contact)
 	model.npc_sight_check = world.npc_sight_clear
 	model.combat_motion_check = world.combat_safe_motion
 	model.npc_observations = world.npc_observations
@@ -156,6 +157,11 @@ func _physics_process(delta: float) -> void:
 	else:
 		model.advance(delta)
 	world.sync_combat_state(model.data)
+
+
+func _on_confirmed_combat_contact(event: Dictionary) -> void:
+	if screen=="playing" and is_instance_valid(world) and is_instance_valid(ui):
+		world.show_confirmed_impact(event,int(model.data.player.age),not bool(ui.opening_preferences().reduce_motion))
 
 
 func _flush_simulation() -> void:
@@ -482,6 +488,10 @@ func _on_ui_action(action: String, payload: Dictionary) -> void:
 		"mode_person": _set_mode("person")
 		"mode_city": _set_mode("city")
 		"mode_map": _set_mode("map")
+		"map_route":
+			if screen=="playing" and mode=="map":
+				world.select_route(str(payload.get("id","mission")))
+				_set_mode("person")
 		"quality_changed":
 			var selected_profile: String = str(payload.get("profile", "balanced"))
 			world.set_quality(selected_profile)
@@ -576,6 +586,8 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 	var gear_choice := screen == "gear_panel" and GearMarket.COMMAND_FIELDS.has(command)
 	if screen != "playing" and not chapter_choice and not village_choice and not political_choice and not party_choice and not gear_choice and not _film_committing:
 		return {"ok": false, "message": "Die Welt ist pausiert."}
+	if command == "village_childhood_action" and screen == "playing" and is_instance_valid(world.i01_props) and world.i01_props.water_interaction_active() and str(payload.get("action_id","")) != "i01_meal":
+		return {"ok":false,"message":"Warte, bis die Wasserhandlung abgeschlossen ist."}
 	_flush_simulation()
 	model.set_player_position(world.get_player_position())
 	command_serial += 1
@@ -613,6 +625,14 @@ func _command(command: String, payload: Dictionary) -> Dictionary:
 				save_feedback = "Der Ladeschein konnte nicht gespeichert werden. Getreide und Denare bleiben am Ausgangsort."
 			ui.notify(save_feedback)
 			return {"ok": false, "message": save_feedback}
+	# The return with water starts the next film; do not make the boy repeat
+	# breakfast as a second interaction after his actual pouring action.
+	if result.get("ok",false) and persisted and screen == "playing" and command == "village_childhood_action" and str(payload.get("action_id","")) == "i01_pour":
+		world.i01_props.begin_film_pour()
+		var breakfast := _command("village_childhood_action",{"action_id":"i01_meal"})
+		if not breakfast.get("ok",false):
+			world.i01_props.settle_film_pour()
+		return result
 	if result.get("ok", false) and command == "train" and not Childhood.enabled(model.data):
 		if persisted:
 			_begin_opening(OpeningStory.adulthood(model.data))
@@ -1025,6 +1045,8 @@ func _opening_present() -> void:
 	if screen != "opening" or not is_instance_valid(opening_overlay):
 		return
 	var beat: Dictionary = opening_sequence.beats[opening_index]
+	if is_instance_valid(world.i01_props) and (opening_sequence.id != I01Film.VID_B or opening_index > 0):
+		world.i01_props.settle_film_pour()
 	if bool(beat.get("await_choice", false)) and not _film_choice_open(beat) and opening_index < opening_sequence.beats.size() - 1:
 		# Resumed after the choice was committed: never offer or commit it twice.
 		opening_index += 1
@@ -1042,7 +1064,7 @@ func _opening_present() -> void:
 	_update_opening_voice(beat)
 	opening_director.mission_actor_id = str(cut.actor_id)
 	opening_director.focus_key = str(beat.get("anchor", ""))
-	opening_director.speaking = not bool(beat.get("silent", false))
+	opening_director.speaking = _film_actor_speaks(beat,str(cut.actor_id))
 	opening_director.play(str(cut.shot_id), maxf(0.1, maxf(float(beat.duration), opening_voice_duration) * float(cut.span)), bool(ui.opening_preferences().reduce_motion))
 	# One clock drives subtitle timing and camera travel. Reading mode can hold
 	# the finished composition without skipping a sentence or simulating time.
@@ -1063,7 +1085,7 @@ func _update_opening_voice(beat: Dictionary) -> void:
 		return
 	var phrase := str(beat.get("text", ""))
 	var speaker := str(beat.get("speaker", ""))
-	var line := VoiceLines.find(phrase)
+	var line := VoiceLines.find(phrase,speaker)
 	if line.is_empty() or str(line.speaker_id) != VoiceLines.speaker_id(speaker):
 		return
 	var stream := VoiceLines.stream_for(line)
@@ -1098,10 +1120,13 @@ func _opening_process(delta: float) -> void:
 		return
 	var duration := maxf(0.1, maxf(float(beat.duration), opening_voice_duration))
 	opening_elapsed = minf(duration, opening_elapsed + maxf(0.0, delta))
+	if opening_sequence.id == I01Film.VID_B and opening_index == 0 and is_instance_valid(world.i01_props):
+		world.i01_props.sample_film_pour(opening_elapsed)
 	var cut := _beat_cut(beat, opening_elapsed / duration)
 	if str(cut.shot_id) != opening_director.shot_id or str(cut.actor_id) != opening_director.mission_actor_id:
 		# A cut inside the line (reaction shot): same clock, new composition.
 		opening_director.mission_actor_id = str(cut.actor_id)
+		opening_director.speaking = _film_actor_speaks(beat,str(cut.actor_id))
 		opening_director.play(str(cut.shot_id), maxf(0.1, duration * float(cut.span)), bool(ui.opening_preferences().reduce_motion))
 		opening_director.set_process(false)
 		opening_director.set_paused(opening_paused)
@@ -1117,6 +1142,15 @@ func _opening_process(delta: float) -> void:
 ## ([{at, shot_id, actor_id}], ascending "at" in 0..1) to change the shot size
 ## or show a reaction while the same line continues. Returns the shot, the
 ## actor it frames, the cut's share of the beat and the time inside the cut.
+func _film_actor_speaks(beat: Dictionary, actor_id: String) -> bool:
+	if bool(beat.get("silent",false)) or bool(beat.get("final",false)) or bool(beat.get("await_choice",false)):
+		return false
+	var speaker := VoiceLines.speaker_id(str(beat.get("speaker_id",beat.get("speaker",""))))
+	if speaker in ["","narrator","player"]:
+		return false
+	return actor_id.is_empty() or VoiceLines.speaker_id(actor_id) == speaker
+
+
 func _beat_cut(beat: Dictionary, fraction: float) -> Dictionary:
 	var result := {"shot_id":str(beat.shot_id), "actor_id":str(beat.get("actor_id", "")), "span":1.0, "local":clampf(fraction, 0.0, 1.0)}
 	var cuts: Array = beat.get("cuts", [])
@@ -1320,6 +1354,8 @@ func _opening_finish() -> void:
 
 
 func _release_opening() -> void:
+	if not opening_sequence.is_empty() and is_instance_valid(world.i01_props):
+		world.i01_props.settle_film_pour()
 	_stop_opening_voice()
 	if is_instance_valid(opening_director):
 		opening_director.finish()

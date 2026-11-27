@@ -26,7 +26,7 @@ const POINTS := {
 	"patrol_road":Vector2(0.0,-35.0), "patrol_gate":Vector2(0.0,-46.0),
 	"sick_guard":Vector2(10.0,18.5), "marcus":Vector2(-3.0,4.0),
 	"hoof_tracks":Vector2(0.0,-35.0), "oath_ridge":Vector2(-16.0,-19.0),
-	"home_shelf":Vector2(-15.32,12.05), "home_table":Vector2(-14.1,10.39), "well":Vector2(-7.0,6.0)
+	"home_shelf":Vector2(-15.32,12.05), "home_table":Vector2(-14.1,10.39), "home_jug":I01.POINTS.home_jug, "well":Vector2(-7.0,6.0)
 }
 const EXTRA_NPCS := {
 	"julia":{"name":"Julia", "role":"Deine Mutter", "point":"mother", "profession":""},
@@ -645,7 +645,9 @@ static func view(data: Dictionary) -> Dictionary:
 	var cup_state: Dictionary = I01.cups(data)
 	if cup_state.values().has("hand"):
 		items.append("Drei Becher vom Regal")
-	if str(child.screenplay.get("i01_water", "")) == "jug":
+	if str(child.screenplay.get("i01_water", "")) == "empty_jug":
+		items.append("Leerer Familienkrug")
+	elif str(child.screenplay.get("i01_water", "")) == "jug":
 		items.append("Familienkrug mit Brunnenwasser")
 	if bool(child.screenplay.get("i04_hand", false)):
 		items.append("Ein Arm voll Kleinholz")

@@ -275,6 +275,11 @@ func _test_hud_and_props() -> void:
 	await _interact()
 	check(_childhood().screenplay.i01_table_by == "player", "All three cups set by the player")
 	await capture("table-set")
+	_place(I01.POINTS.home_jug)
+	await _interact()
+	check(_childhood().screenplay.i01_water == "empty_jug" and props.jug_in_hand() and not props.full_jug_carried(), "Real pickup gives the empty jug")
+	await frames(40)
+	await capture("empty-jug")
 	_place(I01.POINTS.well + Vector2(1.5, 0.3))
 	await _interact()
 	check(_childhood().screenplay.i01_water == "jug", "Real well action fills the jug")
@@ -283,19 +288,34 @@ func _test_hud_and_props() -> void:
 	actor._reload((actor.detail + 1) % 4)
 	# The fixed fixture positions the capsule above the floor. Inspect the
 	# next stable hand pose after it lands and the replacement enters the rig.
-	await frames(40)
-	check(not props.jug_animating(),"Pickup has completed")
+	await frames(120)
+	check(props.get_meta("well_visual_bound",false), "Real imported bucket and rope are bound")
+	await capture("well-rope-lift")
+	await frames(145)
+	await capture("well-bucket-pour")
+	await frames(160)
+	check(not props.jug_animating(),"Well lift and filling have completed")
 	check(is_instance_valid(carried_jug) and props.jug_node() == carried_jug
-		and carried_jug.get_parent() == props and _prop_at_hand(carried_jug, "Hand_L", props.JUG_HAND),
-		"The filled jug survives a second model replacement and follows its left hand")
+		and carried_jug.get_parent() == props and props.full_jug_carried(),
+		"The filled jug survives a second model replacement and remains in two-hand carry")
 	_place(I01.POINTS.player_table)
 	await _interact()
-	check(_childhood().screenplay.i01_water == "poured" and game.world.i01_props._water.julia.visible, "Poured water is visible in the cups")
-	check(not props.jug_in_hand() and props.jug_animating(),"Pour releases the saved carry state and plays the setdown transition")
-	await frames(40)
+	check(_childhood().screenplay.i01_water == "poured" and game.screen == "opening" and game.opening_sequence.id == I01Film.VID_B, "Return with water directly opens the continuation film")
+	check(not props.jug_in_hand() and props.jug_animating(),"Film owns the actual sequential pour")
+	game._opening_process(1.55)
+	check(props._water.julia.visible and not props._water.silvanus.visible and not props._water.player.visible,"Only first cup is filling")
+	check(props._water_motion.stream.any(func(item: MeshInstance3D)->bool: return item.visible),"The water stream is actual visible geometry")
+	await capture("film-first-cup-pour")
+	game._opening_process(1.75)
+	check(props._water.julia.visible and props._water.silvanus.visible and not props._water.player.visible,"Second cup starts after first, not before")
+	await capture("film-second-cup-pour")
+	game._opening_process(1.75)
+	check(props._water.player.visible,"Third cup is now filling")
+	await capture("film-third-cup-pour")
+	game._opening_process(1.60)
 	check(not props.jug_animating() and carried_jug.global_position.distance_to(props.world_point(props.JUG_TABLE)) < .025,"The same jug settles at the real table")
-	await _interact()
-	check(game.screen == "opening" and game.opening_sequence.id == I01Film.VID_B, "Breakfast at the table opens VID-B")
+	for owner: String in I01.CUPS:
+		check(props._water[owner].visible,"Filled water remains visible in "+owner)
 
 
 ## D-052 film dialogue: several shot sizes, reaction shots inside a line,

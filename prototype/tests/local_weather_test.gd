@@ -3,6 +3,8 @@ const Weather := preload("res://scripts/domain/local_weather.gd")
 const Calendar := preload("res://scripts/domain/world_calendar.gd")
 const Look := preload("res://scripts/rendering/village_look.gd")
 const Fires := preload("res://scripts/rendering/route_fire_lights.gd")
+const Clock := preload("res://scripts/domain/world_clock.gd")
+const Model := preload("res://scripts/domain/world_model.gd")
 var failures:=0
 var checks:=0
 func _initialize()->void:
@@ -15,6 +17,22 @@ func check(ok:bool,why:String)->void:
 func _run()->void:
 	var start:=Calendar.date_to_jdn(Calendar.CAMPAIGN_START)
 	check(Weather.sample(Calendar.new_clock(start,6*3600),"italia").rain==0.0,"Authored first morning is dry")
+	var model := Model.new()
+	model.new_game("italia",true,true,false,true)
+	check(int(model.data.calendar.clock.second)==Clock.CAMPAIGN_OPENING_SECOND,"Player-facing campaign starts at 09:00")
+	check(Clock.validate(model.data).is_empty(),"Bright start is booked in the real calendar, not a cosmetic override")
+	check(Weather.for_state(model.data).kind=="clear","Opening has clear sky")
+	var sun := DirectionalLight3D.new()
+	var env := Environment.new()
+	var darkness := Look.apply_solar_time(9.0,Calendar.season_index(start),sun,env,null)
+	check(darkness==0.0 and sun.light_energy>0.5 and env.ambient_light_energy>0.1,"Opening solar state is daylight")
+	var dry_energy := sun.light_energy
+	var storm := {"from":"storm","to":"storm","mix":1.0}
+	Look.apply_city_weather(sun,env,darkness,storm)
+	check(sun.light_energy<dry_energy,"City lighting reacts to storm")
+	Look.apply_solar_time(9.0,Calendar.season_index(start),sun,env,null)
+	check(is_equal_approx(sun.light_energy,dry_energy),"Solar reset prevents cumulative storm darkening")
+	sun.free()
 	var seen:Dictionary={}
 	for day in range(start,start+366):
 		for hour in [3,9,15,21]:

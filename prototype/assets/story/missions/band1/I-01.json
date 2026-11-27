@@ -110,13 +110,13 @@
         "point": "well",
         "chapter": "Ein Morgen zu Hause",
         "label": "Am Brunnen Wasser schöpfen",
-        "objective": "Hol am Brunnen im Hof frisches Wasser für das Frühstück."
+        "objective": "Zieh den Wassereimer am Brunnen hoch und fülle den mitgebrachten Familienkrug."
       },
       "i01_pour": {
         "point": "home_table",
         "chapter": "Ein Morgen zu Hause",
         "label": "Die Becher am Tisch füllen",
-        "objective": "Bring das Wasser zum Frühstückstisch im Familienhaus und fülle die drei Becher."
+        "objective": "Trage den vollen Krug zurück ins Familienhaus und schenke das Wasser am Frühstückstisch ein."
       },
       "i01_meal": {
         "point": "home_table",
@@ -150,6 +150,12 @@
         "chapter": "Ein Morgen zu Hause",
         "label": "Gefüllten Krug abstellen",
         "objective": "Stell den gefüllten Krug auf den Frühstückstisch, bevor du die Becher vom Regal holst."
+      },
+      "i01_take_jug": {
+        "point": "home_jug",
+        "chapter": "Ein Morgen zu Hause",
+        "label": "Den leeren Familienkrug aufnehmen",
+        "objective": "Nimm den leeren Krug von der Bank im Familienhaus. Trage ihn zum Brunnen im Hof."
       }
     },
     "consequences": {
@@ -283,7 +289,8 @@
         "long_term_effect": "Erzählte Begegnung als Erinnerung.",
         "relationship": {}
       },
-      "I-01.water.parked": {}
+      "I-01.water.parked": {},
+      "I-01.jug.taken": {}
     },
     "hooks": [
       {

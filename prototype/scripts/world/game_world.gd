@@ -21,6 +21,9 @@ const RegionalTerrain = preload("res://scripts/world/regional_terrain.gd")
 const FarRelief = preload("res://scripts/world/land/far_relief.gd")
 const ValdoraLand = preload("res://scripts/world/village/valdora_land.gd")
 const CombatActions = preload("res://scripts/domain/combat_actions.gd")
+const ImpactCamera := preload("res://scripts/rendering/confirmed_impact_camera.gd")
+var _impact_remaining := 0.0
+var _impact_target := Vector2.ZERO
 const GearMarket = preload("res://scripts/domain/gear_market.gd")
 const PlayerActionWorld = preload("res://scripts/world/player_action_world.gd")
 const CameraObstruction = preload("res://scripts/world/camera_obstruction.gd")
@@ -276,6 +279,7 @@ func sync_state(state: Dictionary) -> void:
 
 
 func set_mode(mode: String) -> void:
+	_impact_remaining = 0.0
 	if mode not in ["person", "city", "map"]:
 		return
 	_mode = mode
@@ -317,6 +321,8 @@ func is_menu_flight() -> bool:
 
 
 func set_active(active: bool) -> void:
+	if not active:
+		_impact_remaining = 0.0
 	regional.set_active(active)
 	_active = active
 	if active:
@@ -587,12 +593,14 @@ func set_touch_camera_managed(value: bool) -> void:
 
 func apply_camera_look(relative: Vector2) -> void:
 	if _active and _mode == "person" and relative.is_finite():
+		_impact_remaining = 0.0
 		_camera_yaw = wrapf(_camera_yaw - relative.x * 0.006, -PI, PI)
 		_camera_pitch = clampf(_camera_pitch + relative.y * 0.004, 0.12, 1.10)
 
 
 func apply_camera_zoom(factor: float) -> void:
 	if _active and _mode == "person" and is_finite(factor) and factor > 0.0:
+		_impact_remaining = 0.0
 		_person_zoom = clampf(_person_zoom * clampf(factor, 0.5, 2.0), PERSON_ZOOM_MIN, PERSON_ZOOM_MAX)
 
 
@@ -1365,11 +1373,18 @@ func _at_active_work_station() -> bool:
 
 func _move_player(delta: float) -> void:
 	var axis := _movement_axis()
+	if is_instance_valid(i01_props) and i01_props.water_interaction_active():
+		axis = Vector2.ZERO
 	var direction := Vector3(axis.x, 0, axis.y).rotated(Vector3.UP, _camera_yaw)
 	var focus: Control = get_viewport().gui_get_focus_owner()
 	var editing_text := focus is LineEdit or focus is TextEdit
 	var running := _running or (not editing_text and Input.is_physical_key_pressed(KEY_SHIFT))
+	var full_family_jug: bool = is_instance_valid(i01_props) and i01_props.full_jug_carried()
+	if full_family_jug:
+		running = false
 	var top_speed := (CHILD_RUN_SPEED if int(_state.get("player", {}).get("age", 12)) < 18 else PLAYER_SPEED) if running else WALK_SPEED
+	if full_family_jug:
+		top_speed *= 0.76
 	var in_action := CombatActions.busy(_actions.state)
 	var previous_yaw := _figure.rotation.y
 	if direction.length_squared() > 0.01 and not in_action:
@@ -1409,7 +1424,19 @@ func _pan_city_camera(delta: float) -> void:
 	_city_focus.z = clampf(_city_focus.z, -48, 30)
 
 
+func show_confirmed_impact(event: Dictionary, age: int, enabled: bool) -> void:
+	if not _active or _mode!="person" or not ImpactCamera.eligible(event,age,enabled):
+		return
+	var point: Vector2 = event.target_position
+	var here := get_player_position()
+	if Vector2(here.x,here.z).distance_to(point)>3.5:
+		return
+	_impact_target = point
+	_impact_remaining = ImpactCamera.DURATION
+
+
 func _update_camera(delta: float) -> void:
+	_impact_remaining = maxf(0.0,_impact_remaining-maxf(delta,0.0))
 	var target: Vector3
 	var desired: Vector3
 	var collision_anchor := Vector3.INF
@@ -1433,6 +1460,18 @@ func _update_camera(delta: float) -> void:
 		desired = target + offset.rotated(Vector3.UP, _camera_yaw)
 		# Look beyond the shoulder so the horizon and the path remain visible.
 		target += Vector3(0.36, 0.05, -3.6).rotated(Vector3.UP, _camera_yaw)
+		if _active and _impact_remaining>0.0 and _movement_axis().length_squared()<.01:
+			var weight := ImpactCamera.weight(_impact_remaining)
+			var opponent := Vector3(_impact_target.x,_player.global_position.y+.18,_impact_target.y)
+			var axis := opponent-collision_anchor
+			axis.y = 0.0
+			if axis.length_squared()>.01:
+				var side := axis.normalized().cross(Vector3.UP)
+				var center := (opponent+collision_anchor)*.5
+				target = target.lerp(center,weight)
+				desired = desired.lerp(center+side*2.6+Vector3.UP*.55-axis.normalized()*.55,weight)
+		elif _movement_axis().length_squared()>=.01:
+			_impact_remaining = 0.0
 	elif _mode == "city":
 		target = _city_focus
 		var orbit := Vector3(10, 38, 28)

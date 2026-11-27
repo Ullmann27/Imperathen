@@ -7,6 +7,7 @@ const I01Film = preload("res://scripts/story/i01_film.gd")
 const I03 = preload("res://scripts/story/i03_shortcut.gd")
 const I03Film = preload("res://scripts/story/i03_film.gd")
 const I04Film = preload("res://scripts/story/i04_film.gd")
+const Direction := preload("res://scripts/story/campaign_direction.gd")
 const PREFIX := "mission_transition_"
 const KEY_DIALOGUES := ["deliver_kindling","smith_trial","smith_apprentice","deliver_hinge","patrol_brief","watch_permission","borrow_gear","return_gear"]
 
@@ -55,11 +56,13 @@ static func sequence_for(data: Dictionary, previous: Dictionary, following: Dict
 	var chapter := Childhood.mission_heading(next_mission,str(following.get("chapter","Dein nächster Schritt")))
 	var location := "Valdora · Aquileia-Region"
 	var beats: Array[Dictionary] = []
+	# The player already heard the instruction during the completed step.
+	# Preserve its position in old film checkpoints with a silent reaction,
+	# rather than playing the completed dialogue again.
 	if not actor.is_empty() and not dialogue.is_empty():
-		var caption := str(Childhood.EXTRA_NPCS.get(actor,Childhood.NEIGHBORS.get(actor,{})).get("name",actor))
-		beats.append({"id":id+"_dialogue","shot_id":"mission_dialogue","actor_id":actor,
-			"speaker":caption,"role":"Gespräch · Auftrag abgeschlossen","text":dialogue,
-			"duration":maxf(5.0,2.0+dialogue.length()/17.0),"chapter":chapter,"location":location})
+		beats.append({"id":id+"_dialogue","shot_id":"mission_reaction","actor_id":actor,
+			"speaker":"","speaker_id":"","role":"","text":"","silent":true,
+			"duration":2.6,"chapter":chapter,"location":location})
 	if id == "smith_trial":
 		# I-04 VID-C: Sextus' farewell names what the boy asked about.
 		beats.append_array(I04Film.vid_c_beats(data, chapter, location))
@@ -71,10 +74,13 @@ static func sequence_for(data: Dictionary, previous: Dictionary, following: Dict
 		beats.append({"id":id+"_reaction","shot_id":"mission_reaction","actor_id":actor,
 			"speaker":"Chronik","role":"Dein nächster Weg","text":result,
 			"duration":maxf(3.5,1.5+result.length()/19.0),"chapter":chapter,"location":location})
-	if beats.is_empty():
-		beats.append({"id":id+"_transition","shot_id":"mission_reaction","actor_id":actor,
-			"speaker":"Chronik","role":"Ein neuer Auftrag","text":objective,
-			"duration":maxf(3.5,1.5+objective.length()/19.0),"chapter":chapter,"location":location})
+	if boundary or beats.is_empty():
+		var introduction := Direction.introduction(next_mission) if boundary else ""
+		if introduction.is_empty():
+			introduction = objective
+		beats.append({"id":id+"_transition","shot_id":"mission_reaction","actor_id":"",
+			"speaker":"Chronik","speaker_id":"chronik","role":"Ein neuer Auftrag","text":introduction,
+			"duration":maxf(4.0,1.5+introduction.length()/19.0),"chapter":chapter,"location":location})
 	return {"id":PREFIX+id,"version":1,"origin_id":str(data.get("origin_id","italia")),
 		"title":chapter,"chapter":chapter,"location":location,"beats":beats,
 		"objective_title":str(following.get("label",chapter)),"objective_text":objective,

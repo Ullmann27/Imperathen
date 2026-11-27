@@ -1011,6 +1011,17 @@ func _sync_resident_prop() -> void:
 	_resident_prop.show()
 
 
+## Late water-interaction layer, after the authored locomotion pose. This uses
+## the fitted live rig rather than replacing the character or scaling its arms.
+func apply_water_wrists(left: Vector3, right: Vector3, orientation: Basis) -> void:
+	if role != "player" or not _motion.available or not _combat_id.is_empty() or _service_external:
+		return
+	var left_error := _motion.reach_world_wrist("L",left,orientation) if left.is_finite() else 0.0
+	var right_error := _motion.reach_world_wrist("R",right,orientation) if right.is_finite() else 0.0
+	_hands.set_grip(.72)
+	set_meta("water_wrist_residual_m",Vector2(left_error,right_error))
+
+
 func _apply_jug_carry() -> void:
 	if _carrying_jug and role == "player" and clip in ["idle","march","run","talk"] and _combat_id.is_empty() and not _service_external:
 		_motion.carry_left()

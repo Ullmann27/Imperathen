@@ -11,6 +11,7 @@ const CityCharacterFinish := preload("res://scripts/rendering/city_character_det
 const CityMarketSignage := preload("res://scripts/world/city_market_signage.gd")
 const CityMarketBridge := preload("res://scripts/world/city_market_bridge.gd")
 const Daylight := preload("res://scripts/rendering/village_look.gd")
+const LocalWeather := preload("res://scripts/domain/local_weather.gd")
 const RouteFires := preload("res://scripts/rendering/route_fire_lights.gd")
 const BakeryDisplay := preload("res://scripts/world/city_bakery_display.gd")
 const ResidentView := preload("res://scripts/world/city_resident_view.gd")
@@ -857,16 +858,18 @@ func _update_market_daylight() -> void:
 	if minute == _solar_minute:
 		return
 	_solar_minute = minute
-	set_solar_hour(float(clock.second) / 3600.0, Calendar.season_index(clock.jdn))
+	set_solar_hour(float(clock.second) / 3600.0, Calendar.season_index(clock.jdn),LocalWeather.for_state(campaign.data))
 	_safe.get_node("Heading").text = "STADTMARKT · %s · %02d:%02d" % [
 		Calendar.format_date(clock.jdn), floori(float(clock.second) / 3600.0), minute % 60]
 
 
 ## Free-city QA uses the same solar path as the authoritative campaign.
 ## This changes presentation only, never the campaign clock.
-func set_solar_hour(hours: float, season: int = 0) -> void:
+func set_solar_hour(hours: float, season: int = 0, weather_sample: Dictionary = {}) -> void:
 	var darkness := Daylight.apply_solar_time(fposmod(hours, 24.0), clampi(season,0,3),
 		_market_sun, camera.environment, null)
+	if not weather_sample.is_empty():
+		Daylight.apply_city_weather(_market_sun,camera.environment,darkness,weather_sample)
 	if is_instance_valid(_route_fires):
 		_route_fires.set_darkness(darkness)
 

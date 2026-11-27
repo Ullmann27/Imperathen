@@ -36,6 +36,9 @@ const Era = preload("res://scripts/domain/era_registry.gd")
 
 const VERSION := 1
 const MORNING := 21600
+## First playable family morning is full daylight, not twilight. Sleep and
+## legacy career epochs retain their independent established contracts.
+const CAMPAIGN_OPENING_SECOND := 9*3600
 const NIGHT := 79200
 const DAY := 86400
 ## Balance value (central, D-045 3): haggling and paying in a shop.
@@ -115,11 +118,12 @@ static func new_ledger(epoch_jdn: int, epoch_second: int) -> Dictionary:
 
 
 ## A new world: calendar and ledger at the start date of its timeline.
-static func start(world: Dictionary) -> void:
+static func start(world: Dictionary, regular_opening: bool = false) -> void:
 	var origin := origin_year_of(world)
 	var jdn := start_jdn(origin)
-	world.calendar = new_calendar(origin, jdn, MORNING, births_for(origin))
-	world.world_state.time = new_ledger(jdn, MORNING)
+	var opening_second := CAMPAIGN_OPENING_SECOND if regular_opening and origin==CAMPAIGN_ORIGIN_YEAR else MORNING
+	world.calendar = new_calendar(origin, jdn, opening_second, births_for(origin))
+	world.world_state.time = new_ledger(jdn, opening_second)
 
 
 # --- derived passages -------------------------------------------------------------

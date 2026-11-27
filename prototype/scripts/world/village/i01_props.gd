@@ -7,6 +7,7 @@ extends Node3D
 const Objects := preload("res://scripts/story/mission_documents.gd")
 const I01 = preload("res://scripts/story/i01_three_cups.gd")
 const Art = preload("res://scripts/world/village_art.gd")
+const WaterMotion := preload("res://scripts/world/village/i01_water_motion.gd")
 const FLOOR := 0.3925
 ## Family home baker_home sits at (-13, 0, 11) with yaw 0; room-local offsets.
 const ROOM := Vector3(-13.0, FLOOR, 11.0)
@@ -17,6 +18,12 @@ const TABLE_SLOTS := {"julia":Vector3(-1.35, 0.865, -0.98), "silvanus":Vector3(-
 const JUG_TABLE := Vector3(-0.55, 0.865, -0.85)
 const JUG_BENCH := Vector3(1.93, 0.515, 0.18)
 const JUG_HAND := Vector3(0.0, -0.34, 0.06)
+# Measured from water_pitcher.glb: handle is on +X; rim is 0.389 m high.
+const JUG_GRIP := Vector3(.168,.28,0)
+const JUG_SUPPORT := Vector3(-.085,.055,0)
+const JUG_MOUTH := Vector3(0,.389,0)
+const WELL_DURATION := 6.6
+const POUR_DURATION := 6.6
 const HAND_CUPS := {"julia":Vector3(0.0, -0.02, 0.05), "silvanus":Vector3(0.0, 0.10, 0.05), "player":Vector3(0.0, 0.22, 0.05)}
 
 var _cups: Dictionary = {}
@@ -32,6 +39,11 @@ var _bench_jug: Node3D
 var _carrier: Node3D
 var _held_cups: Array[String] = []
 var _holding_jug := false
+var _full_jug := false
+var _family_carry := false
+var _water_motion := WaterMotion.new()
+var _solving_grip := false
+var _film_pour := false
 var _jug_mode := ""
 var _jug_pending := ""
 var _jug_action := ""
@@ -41,14 +53,34 @@ var _jug_from := Transform3D.IDENTITY
 var _jug_goal := Transform3D.IDENTITY
 
 func begin_jug_action(action: String) -> void:
-	if action in ["i01_well","i01_park_jug","i01_pour","fill_water","father_morning","i07_water_fetch","i07_water_bring"]:
+	if action in ["i01_take_jug","i01_well","i01_park_jug","i01_pour","fill_water","father_morning","i07_water_fetch","i07_water_bring"]:
 		_jug_pending = action
 
 func jug_in_hand() -> bool:
 	return visible and _holding_jug
 
+func full_jug_carried() -> bool:
+	return jug_in_hand() and _full_jug
+
 func jug_animating() -> bool:
 	return not _jug_action.is_empty()
+
+func water_interaction_active() -> bool:
+	return _jug_action in ["i01_well","i01_pour","i01_take_jug"]
+
+func begin_film_pour() -> void:
+	_film_pour = _jug_action == "i01_pour"
+
+func sample_film_pour(seconds: float) -> void:
+	if _film_pour and _jug_action == "i01_pour":
+		_jug_clock = clampf(seconds,0.0,_jug_duration)
+		_sample_water_action()
+
+func settle_film_pour() -> void:
+	if _film_pour and _jug_action == "i01_pour":
+		_jug_clock = _jug_duration
+		_sample_water_action()
+	_film_pour = false
 
 
 
@@ -101,6 +133,7 @@ func _build() -> void:
 	_jug = (load(Objects.ENTRIES.water_jug.model) as PackedScene).instantiate() as Node3D
 	_jug.name = "FamilyJug"
 	add_child(_jug)
+	_water_motion.setup(self)
 
 
 ## Called from GameWorld.sync_state with the authoritative state.
@@ -114,7 +147,11 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 	_carrier = figure
 	_held_cups.clear()
 	_holding_jug = false
+	_full_jug = false
+	_family_carry = false
 	if not enabled:
+		_water_motion.finish()
+		_film_pour = false
 		_jug_action = ""
 		_jug_pending = ""
 		_jug_mode = ""
@@ -124,6 +161,8 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 			_bench_jug.visible = true
 		return
 	var view := I01.presentation(state)
+	_full_jug = str(view.water) == "jug"
+	_family_carry = str(view.water) in ["empty_jug","jug"]
 	var cup_state: Dictionary = view.cups
 	var filled: bool = str(view.water) in ["poured", "silvanus"] or str(view.status) == "legacy"
 	for owner: String in I01.CUPS:
@@ -135,7 +174,9 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 			_place(cup, world_point(TABLE_SLOTS[owner]), Basis(Vector3.UP, 0.35 * I01.CUPS.find(owner)))
 		else:
 			_place(cup, world_point(SHELF_ORIGIN + SHELF_SLOTS[owner]), Basis.IDENTITY)
-		_water[owner].visible = filled and where == "table"
+		if _jug_action != "i01_pour" and _jug_pending != "i01_pour":
+			_water[owner].visible = filled and where == "table"
+			_water[owner].position.y = .118
 	var next_mode := str(view.jug)
 	# The same family vessel also supplies the later supervised gate watch.
 	# Do not inject a second inventory item or keep the I-01 carry flag alive.
@@ -147,12 +188,14 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 		next_mode = "gate"
 	if next_mode != _jug_mode and _jug_pending.is_empty():
 		_jug_action = ""
+		_water_motion.finish()
+		_film_pour = false
 	_jug_mode = next_mode
 	_holding_jug = next_mode == "hand"
 	if _holding_jug:
 		_ensure_hands()
 		if _left_bone >= 0:
-			_jug_goal = _hand_transform(_left_bone,_left_rest,JUG_HAND,1.0)
+			_jug_goal = _carry_transform()
 	elif next_mode == "away":
 		_jug_goal = prior
 		if _jug_pending == "father_morning" and is_instance_valid(_carrier):
@@ -167,19 +210,22 @@ func sync_state(state: Dictionary, figure: Node3D) -> void:
 		_jug_action = _jug_pending
 		_jug_pending = ""
 		_jug_clock = 0.0
-		_jug_duration = .50 if _jug_action == "i01_pour" else .32
+		_jug_duration = POUR_DURATION if _jug_action == "i01_pour" else WELL_DURATION if _jug_action == "i01_well" else .32
 		_jug_from = prior
-		if _holding_jug and (_jug_action in ["i01_well","i07_water_fetch"] or not prior_visible or prior.origin.distance_to(_jug_goal.origin) > .85):
+		if _holding_jug and (_jug_action == "i07_water_fetch" or not prior_visible or prior.origin.distance_to(_jug_goal.origin) > 1.25):
 			# The well action starts locally, never flies from the family bench.
 			_jug_from = _jug_goal
 			_jug_from.origin.y -= .24
-		if not _holding_jug and next_mode in ["table","gate"] and prior.origin.distance_to(_jug_goal.origin) > .85:
+		if not _holding_jug and _jug_action != "i01_pour" and next_mode in ["table","gate"] and prior.origin.distance_to(_jug_goal.origin) > .85:
 			# Interaction range exceeds arm reach: use a local tabletop
 			# approach rather than stretching the model or flying a prop.
 			_jug_from = _jug_goal
 			_jug_from.origin.y += .18
 		_jug.global_transform = _jug_from
 		_jug.show()
+		if _jug_action == "i01_pour":
+			for owner: String in I01.CUPS:
+				_set_water_level(owner,0.0)
 	elif _jug_action.is_empty():
 		_jug.global_transform = _jug_goal
 		_jug.visible = next_mode != "away" and (not _holding_jug or _left_bone >= 0)
@@ -225,19 +271,165 @@ func _place(item: Node3D, at: Vector3, basis: Basis) -> void:
 func _process(delta: float) -> void:
 	_sync_hands()
 	if jug_animating():
-		_jug_clock += maxf(delta,0.0)
-		var t := clampf(_jug_clock/_jug_duration,0.0,1.0)
-		var eased := t*t*(3.0-2.0*t)
-		var pose := _jug_from.interpolate_with(_jug_goal,eased)
+		if not _film_pour:
+			_jug_clock += maxf(delta,0.0)
+		_sample_water_action()
+	elif _family_carry and _holding_jug:
+		_grip(_jug.global_transform,_full_jug)
+
+
+func _sample_water_action() -> void:
+	var t := clampf(_jug_clock/_jug_duration,0.0,1.0)
+	match _jug_action:
+		"i01_well": _sample_well(_jug_clock)
+		"i01_pour": _sample_pour(_jug_clock)
+		_:
+			_jug.global_transform = _jug_from.interpolate_with(_jug_goal,smoothstep(0,1,t))
+			if _jug_action == "i01_take_jug":
+				_grip(_jug.global_transform,false)
+	if t >= 1.0:
 		if _jug_action == "i01_pour":
-			pose.basis = pose.basis*Basis(Vector3.RIGHT,.68*sin(PI*t))
-			pose.origin.y += .10*sin(PI*t)
+			for owner: String in I01.CUPS:
+				_set_water_level(owner,1.0)
+		_water_motion.finish()
+		_jug_action = ""
+		_film_pour = false
+		_jug.global_transform = _jug_goal
+		_jug.visible = _jug_mode != "away"
+		set_process(_holding_jug or not _held_cups.is_empty())
+
+
+func _set_water_level(owner: String, amount: float) -> void:
+	var surface: MeshInstance3D = _water[owner]
+	surface.visible = amount > .001
+	surface.position.y = lerpf(.024,.118,clampf(amount,0,1))
+
+
+func _carry_transform() -> Transform3D:
+	if not _family_carry:
+		return _hand_transform(_left_bone,_left_rest,JUG_HAND,1.0)
+	var wrist := _skeleton.to_global(_skeleton.get_bone_global_pose(_left_bone).origin)
+	var basis := _skeleton.global_basis.orthonormalized()
+	# The mesh handle is +X; rotate it to the left side of the actual rig.
+	if _skeleton.get_bone_global_rest(_left_bone).origin.x < 0.0:
+		basis *= Basis(Vector3.UP,PI)
+	return Transform3D(basis,wrist+basis*Vector3(0,0,.035)-basis*JUG_GRIP)
+
+
+func _grip(pose: Transform3D, support: bool) -> void:
+	if not is_instance_valid(_carrier) or not _carrier.has_method("apply_water_wrists"):
+		return
+	var palm := pose.basis*Vector3(0,0,.035)
+	_wrists(pose*JUG_GRIP-palm,pose*JUG_SUPPORT-palm if support else Vector3.INF,pose.basis)
+
+
+func _wrists(left: Vector3, right: Vector3, basis: Basis) -> void:
+	if not is_instance_valid(_carrier) or not _carrier.has_method("apply_water_wrists"):
+		return
+	_solving_grip = true
+	_carrier.apply_water_wrists(left,right,basis)
+	_solving_grip = false
+
+
+func _sample_well(seconds: float) -> void:
+	if not _water_motion.bind_well():
+		# Missing imported parts are a QA failure, not a fabricated replacement.
+		_jug.global_transform = _jug_from.interpolate_with(_jug_goal,smoothstep(0,1,seconds/WELL_DURATION))
+		set_meta("well_visual_bound",false)
+		return
+	set_meta("well_visual_bound",true)
+	var well := _water_motion.well
+	var center := well.global_position
+	var outward := _carrier.global_position-center if is_instance_valid(_carrier) else Vector3.RIGHT
+	outward.y = 0
+	outward = outward.normalized() if outward.length()>.01 else Vector3.RIGHT
+	var jar_at := center+outward*.85+Vector3.UP*1.05
+	var jar_pose := Transform3D(Basis.IDENTITY,jar_at)
+	var base := _water_motion.bucket_base()
+	var raised := base
+	raised.origin.y = center.y+1.08
+	var lowered := base
+	lowered.origin.y = center.y+.09
+	var bucket := base
+	var amount := 0.0
+	var tilt := 0.0
+	_water_motion.clear_stream()
+	if seconds < .75:
+		_jug.global_transform = _jug_from.interpolate_with(jar_pose,smoothstep(0,.75,seconds))
+		_grip(_jug.global_transform,false)
+		bucket = base.interpolate_with(lowered,smoothstep(0,.75,seconds))
+	elif seconds < 3.15:
+		_jug.global_transform = jar_pose
+		var lift := smoothstep(.75,3.15,seconds)
+		bucket = lowered.interpolate_with(raised,lift)
+		amount = 1.0
+		# Animate the existing windlass, not a fictitious rope in empty air.
+		# Reach residual is retained for visual QA; long arms are never invented.
+		var crank_contact := _water_motion.windlass(bucket.origin.y-lowered.origin.y)
+		if crank_contact.is_finite():
+			_wrists(Vector3.INF,crank_contact,Basis.IDENTITY)
+	elif seconds < 5.35:
+		_jug.global_transform = jar_pose
+		var phase := (seconds-3.15)/2.2
+		var rotate := smoothstep(.20,.42,phase)*(1.0-smoothstep(.70,.88,phase))
+		tilt = rotate*1.05
+		var facing := Basis(Vector3.UP,atan2(outward.x,outward.z))
+		var basis := facing*Basis(Vector3.RIGHT,tilt)
+		var lip := jar_pose*JUG_MOUTH+Vector3.UP*.15-outward*.04
+		var aimed := Transform3D(basis,lip-basis*WaterMotion.BUCKET_LIP)
+		var reach := smoothstep(0,.22,phase)*(1.0-smoothstep(.86,1,phase))
+		bucket = raised.interpolate_with(aimed,reach)
+		var flow := smoothstep(.42,.47,phase)*(1.0-smoothstep(.64,.70,phase))
+		amount = 1.0-smoothstep(.43,.68,phase)
+		_water_motion.water_between(bucket*WaterMotion.BUCKET_LIP,jar_pose*JUG_MOUTH,flow)
+		_wrists(bucket*WaterMotion.BUCKET_HANDLE,bucket*Vector3(-.12,.17,0),bucket.basis)
+	else:
+		var retreat := smoothstep(5.35,WELL_DURATION,seconds)
+		bucket = raised.interpolate_with(base,retreat)
+		_jug.global_transform = jar_pose.interpolate_with(_jug_goal,retreat)
+		_grip(_jug.global_transform,true)
+	_water_motion.bucket_at(bucket,amount,tilt)
+
+
+func _cup_mouth(owner: String) -> Vector3:
+	var cup: Node3D = _cups[owner]
+	return cup.to_global(Vector3(.033 if owner == "player" else 0.0,.147,0))
+
+
+func _pour_pose(owner: String, tilt: float) -> Transform3D:
+	var mouth := _cup_mouth(owner)
+	var direction := mouth-_carrier.global_position if is_instance_valid(_carrier) else Vector3.FORWARD
+	direction.y = 0.0
+	direction = direction.normalized() if direction.length()>.01 else Vector3.FORWARD
+	var basis := Basis(Vector3.UP,atan2(direction.x,direction.z))*Basis(Vector3.RIGHT,tilt*1.08)
+	var lip := mouth+Vector3.UP*.21-direction*.055
+	return Transform3D(basis,lip-basis*JUG_MOUTH)
+
+
+func _sample_pour(seconds: float) -> void:
+	_water_motion.clear_stream()
+	var start := .45
+	var span := 1.75
+	for i in I01.CUPS.size():
+		var owner: String = I01.CUPS[i]
+		var local := clampf((seconds-start-float(i)*span)/span,0,1)
+		_set_water_level(owner,smoothstep(.48,.79,local))
+	if seconds < start:
+		_jug.global_transform = _jug_from.interpolate_with(_pour_pose(I01.CUPS[0],0),smoothstep(0,start,seconds))
+	elif seconds < start+span*I01.CUPS.size():
+		var index := mini(int((seconds-start)/span),I01.CUPS.size()-1)
+		var owner: String = I01.CUPS[index]
+		var phase := fposmod(seconds-start,span)/span
+		var tilt := smoothstep(.25,.48,phase)*(1.0-smoothstep(.79,1,phase))
+		var previous := _pour_pose(I01.CUPS[maxi(index-1,0)],0)
+		var pose := previous.interpolate_with(_pour_pose(owner,tilt),smoothstep(0,.25,phase))
 		_jug.global_transform = pose
-		if t >= 1.0:
-			_jug_action = ""
-			_jug.global_transform = _jug_goal
-			_jug.visible = _jug_mode != "away"
-			set_process(_holding_jug or not _held_cups.is_empty())
+		var flow := smoothstep(.48,.53,phase)*(1.0-smoothstep(.74,.79,phase))
+		_water_motion.water_between(pose*JUG_MOUTH,_cup_mouth(owner),flow)
+	else:
+		var end_pose := _pour_pose(I01.CUPS[-1],0)
+		_jug.global_transform = end_pose.interpolate_with(_jug_goal,smoothstep(start+span*I01.CUPS.size(),POUR_DURATION,seconds))
+	_grip(_jug.global_transform,true)
 
 
 func _sync_hands() -> void:
@@ -246,10 +438,12 @@ func _sync_hands() -> void:
 
 
 func _move_held_props() -> void:
+	if _solving_grip:
+		return
 	for owner in _held_cups:
 		_follow_hand(_cups[owner], _right_bone, _right_rest, HAND_CUPS[owner], 1.0)
 	if _holding_jug and is_instance_valid(_skeleton) and _left_bone >= 0:
-		_jug_goal = _hand_transform(_left_bone,_left_rest,JUG_HAND,1.0)
+		_jug_goal = _carry_transform()
 		if not jug_animating():
 			_jug.global_transform = _jug_goal
 			_jug.show()

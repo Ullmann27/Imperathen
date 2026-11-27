@@ -4,6 +4,8 @@ extends RefCounted
 ## Save hashes detect corruption, not deliberate editing by the owner of a save.
 
 signal changed
+## Presentation-only event emitted after the complete candidate validates.
+signal confirmed_combat_contact(event: Dictionary)
 
 const BattleModel = preload("res://scripts/battle/battle_model.gd")
 const Seasons = preload("res://scripts/strategy/season_campaign.gd")
@@ -162,7 +164,7 @@ func new_game(origin_id := "italia", extended_village := false, childhood_enable
 	# legacy careers, which keep their own timeline (D-044).
 	data.population.total = _reserve_size(data)
 	data.population.workers = data.population.total
-	WorldClock.start(data)
+	WorldClock.start(data, regular_start)
 	changed.emit()
 
 
@@ -324,6 +326,7 @@ func advance(delta: float) -> void:
 	if float(data.world_seconds) + delta > 1000000000000.0:
 		return
 	var candidate := _world_copy()
+	var confirmed_contact: Dictionary = {}
 	var observed_raiders := _observe_raid_positions(candidate)
 	var notify_ui := int(candidate.world_seconds) != int(float(candidate.world_seconds) + delta)
 	if npc_observations.is_valid():
@@ -352,6 +355,8 @@ func advance(delta: float) -> void:
 			if int(candidate.player.health) < previous_health:
 				CombatActions.interrupt(candidate)
 			var contact := CombatActions.advance(candidate, step, combat_sight_check, _apply_combat_hit)
+			if contact.hit:
+				confirmed_contact = contact.duplicate(true)
 			if contact.practice and int(candidate.player.age) >= 18 and candidate.progress.stage == "training":
 				_apply_training_contact(candidate)
 			candidate.village.health_delta += int(candidate.player.health) - previous_health
@@ -374,6 +379,8 @@ func advance(delta: float) -> void:
 	if not _validate_state(candidate).is_empty():
 		return
 	data = candidate
+	if not confirmed_contact.is_empty():
+		confirmed_combat_contact.emit(confirmed_contact)
 	if notify_ui:
 		changed.emit()
 

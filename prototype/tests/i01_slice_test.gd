@@ -113,7 +113,13 @@ func _test_help_path() -> void:
 	for owner: String in ["julia", "silvanus", "player"]:
 		_check(_act(model, "i01_place_" + owner).ok, "Cup placed: " + owner)
 	_check(_sp(model).i01_table_by == "player" and _trust(model, "julia") == julia_before + 1, "Actually set table records help and one trust")
-	_check(_stage(model) == "i01_well", "Next objective is the well in the yard")
+	_check(_stage(model) == "i01_take_jug", "Next objective is the actual empty jug at home")
+	_at(model, I01.POINTS.well)
+	_check(not _act(model, "i01_well").ok and not _act(model, "i01_take_jug").ok, "No water without collecting the real jug; no remote pickup")
+	_at(model, I01.POINTS.home_jug)
+	_check(_act(model, "i01_take_jug").ok and _sp(model).i01_water == "empty_jug" and I01.presentation(model.data).jug == "hand", "Empty jug is held before the well")
+	_check(not _act(model, "i01_take_jug").ok and _stage(model) == "i01_well", "No repeated pickup; well is the next objective")
+	_check(model._validate_state(model.data).is_empty(), "Empty carried jug survives state validation")
 	_at(model, I01.POINTS.well + Vector2(1.6, 0.0))
 	_check(_act(model, "i01_well").ok and _sp(model).i01_water == "jug", "Water fetched at the real well")
 	_check(not _act(model, "i01_pour").ok, "Pouring needs the table")
@@ -128,7 +134,7 @@ func _test_help_path() -> void:
 	_check(Life.actor_position(model.data, "julia") == I01.POINTS.julia_table and Life.actor_position(model.data, "silvanus") == Childhood.POINTS.father, "After breakfast Julia clears the table and Silvanus goes to his door work")
 	_check(I01.presentation(model.data).cups.values() == ["table", "table", "table"], "Cups stay where they were placed")
 	var events: Array = _sp(model).i01_events
-	_check(events.size() == 10 and events.has("I-01.topic.workshop") and events.has("I-01.cups.table"), "Event ledger holds each decision exactly once: " + str(events))
+	_check(events.size() == 11 and events.count("I-01.jug.taken") == 1 and events.has("I-01.topic.workshop") and events.has("I-01.cups.table"), "Event ledger holds each decision exactly once: " + str(events))
 	_check(model.data.village.history.events.any(func(e): return e.kind == "I-01.meal"), "Chronicle event carries the ledger event id")
 	# Delayed hook: the workshop question returns in I-04.
 	var hook := I01.hook_lines(model.data, "woodcutter_request")
@@ -172,7 +178,7 @@ func _test_refused_help() -> void:
 	var before := _trust(model, "julia")
 	_check(_act(model, "i01_talk").ok, "Talk choice commits")
 	_check(I01.cups(model.data).values() == ["table", "table", "table"] and _sp(model).i01_table_by == "julia", "Julia sets the table herself")
-	_check(_stage(model) == "i01_well", "Julia's request for water is the next objective")
+	_check(_stage(model) == "i01_take_jug", "Julia's request first requires collecting the jug")
 	_at(model, I01.POINTS.player_table)
 	var optional: Array = Childhood.interactables(model.data).map(func(i): return i.action_id)
 	_check(optional.has("i01_meal"), "Refusing remains possible: breakfast is offered at the table")

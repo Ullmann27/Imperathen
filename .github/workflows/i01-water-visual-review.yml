@@ -1,0 +1,79 @@
+name: I-01 actual water and film image evidence
+on:
+  pull_request:
+    paths:
+      - 'prototype/scripts/world/village/i01_*.gd'
+      - 'prototype/scripts/world/regional_village.gd'
+      - 'prototype/scripts/story/i01_*.gd'
+      - 'prototype/scripts/main.gd'
+      - 'prototype/tests/i01_flow_test.gd'
+      - 'prototype/scripts/visuals/character_motion.gd'
+      - '.github/workflows/i01-water-visual-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: i01-water-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GODOT_VERSION: '4.7.2'
+      GODOT_SILENCE_ROOT_WARNING: '1'
+      IMPERATHEN_ISOLATED_TEST: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install official verified Godot and display
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          file="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL --retry 3 "$base/$file" -o "$file"
+          expected="$(awk -v name="$file" '$NF == name || $NF == "*" name {print $1}' SHA512-SUMS.txt)"
+          test -n "$expected" && test "$expected" = "$(sha512sum "$file" | awk '{print $1}')"
+          unzip -q "$file"
+          chmod +x "${file%.zip}"
+          echo "GODOT_BIN=$PWD/${file%.zip}" >> "$GITHUB_ENV"
+      - name: Actual imported meshes and graphical opening playthrough
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/artifacts/i01-water"
+          mkdir -p "$out" "$RUNNER_TEMP/i01-state"/{data,config,cache}
+          export XDG_DATA_HOME="$RUNNER_TEMP/i01-state/data"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/i01-state/config"
+          export XDG_CACHE_HOME="$RUNNER_TEMP/i01-state/cache"
+          git rev-parse HEAD > "$out/commit.txt"
+          "$GODOT_BIN" --headless --path prototype --import --quit 2>&1 | tee "$out/import.log"
+          timeout --kill-after=10s 120s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --resolution 1280x720 --script res://tests/regional_map_test.gd -- "$out" 2>&1 | tee "$out/map.log"
+          grep -Fq REGIONAL_MAP_PASS "$out/map.log"
+          timeout --kill-after=15s 1500s xvfb-run -a -s '-screen 0 1280x720x24' "$GODOT_BIN" --path prototype --audio-driver Dummy --rendering-method gl_compatibility --fixed-fps 60 --script res://tests/i01_flow_test.gd -- --capture-dir="$out" --size=1280x720 2>&1 | tee "$out/flow.log"
+          grep -Fq I01_FLOW_PASS "$out/flow.log"
+          python3 - "$out" <<'PY'
+          import json, pathlib, sys
+          out = pathlib.Path(sys.argv[1])
+          report = json.loads((out / "i01-flow-report.json").read_text())
+          assert not report["failures"], report["failures"]
+          for name in ("empty-jug", "well-rope-lift", "well-bucket-pour", "film-first-cup-pour", "film-second-cup-pour", "film-third-cup-pour"):
+              files = list(out.glob("*" + name + "*.png"))
+              assert files and all(p.stat().st_size > 1024 for p in files), name
+          PY
+      - name: Preserve actual rendered evidence (no APK release)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: i01-water-engine-frames-${{ github.run_id }}
+          path: artifacts/i01-water/
+          if-no-files-found: error
+          retention-days: 30

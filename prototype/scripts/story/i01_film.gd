@@ -20,7 +20,7 @@ static func _beat(id: String, shot_id: String, line_id: String, minimum: float, 
 	var speaker_id := str(override.get("speaker_id", line.get("speaker_id", "chronik")))
 	var text := str(override.get("text", line.get("text", "")))
 	var names: Array = SPEAKERS.get(speaker_id, [speaker_id.capitalize(), ""])
-	var recorded := VoiceLines.find(text)
+	var recorded := VoiceLines.find(text,speaker_id)
 	var has_recording: bool = not recorded.is_empty() and str(recorded.get("speaker_id", "")) == VoiceLines.speaker_id(speaker_id)
 	return {"id":id, "shot_id":shot_id, "line_id":line_id, "speaker_id":speaker_id,
 		"speaker":names[0], "role":names[1], "text":text, "actor_id":actor_id,
@@ -95,8 +95,14 @@ static func vid_b(data: Dictionary) -> Dictionary:
 		{"speaker_id":reply_speaker, "text":str(reply.get("text", "…"))})
 	answer["cuts"] = [{"at":0.0, "shot_id":"i01_close_speaker", "actor_id":reply_speaker},
 		{"at":0.72, "shot_id":"i01_react_boy", "actor_id":reply_speaker}]
+	var arrival := _beat("i01_b_table", "i01_table_wide", "I01_B_TABLE", 5.0, "silvanus")
+	if str(screenplay.get("i01_water","")) == "poured":
+		arrival.duration = maxf(float(arrival.duration),7.2)
+		arrival["cuts"] = [{"at":0.0,"shot_id":"i01_table_wide","actor_id":"silvanus"},
+			{"at":.10,"shot_id":"i01_cups_insert","actor_id":"silvanus"},
+			{"at":.87,"shot_id":"i01_table_wide","actor_id":"silvanus"}]
 	var beats: Array[Dictionary] = [
-		_beat("i01_b_table", "i01_table_wide", "I01_B_TABLE", 5.0, "silvanus"),
+		arrival,
 		_pause("i01_b_cups", "i01_cups_insert", 2.8, "silvanus"),
 		telling,
 		_pause("i01_b_listen", "i01_react_julia", 2.4, "silvanus"),
