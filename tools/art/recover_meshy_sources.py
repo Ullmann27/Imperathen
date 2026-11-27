@@ -72,17 +72,44 @@ def fetch(row, key, directory):
         raise ValueError("invalid_source_glb")
     return target
 
+def fetch_backup(row, directory, backup):
+    """Recover only the exact pinned original; do not modify the backup."""
+    task = row["task_id"]
+    if not re.fullmatch(r"[0-9a-f-]{36}", task):
+        raise ValueError("invalid_task_id")
+    original = backup / (task + ".glb")
+    target = directory / (row["stable_id"] + ".glb")
+    digest = hashlib.sha256()
+    size = 0
+    with original.open("rb") as source, target.open("wb") as output:
+        while chunk := source.read(1024 * 1024):
+            size += len(chunk)
+            if size > row["source_bytes"] or size > LIMIT:
+                raise ValueError("source_size_exceeded")
+            digest.update(chunk)
+            output.write(chunk)
+    if size != row["source_bytes"] or digest.hexdigest() != row["source_sha256"]:
+        raise ValueError("source_hash_or_size_mismatch")
+    metrics = inspect_glb(target)
+    if not metrics["self_contained"] or metrics["triangles"] <= 0:
+        raise ValueError("invalid_source_glb")
+    return target
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--report", required=True, type=Path)
     parser.add_argument("--blender", default="blender")
+    parser.add_argument("--local-models", type=Path, help="Private, extracted task-ID GLBs; preferred over provider downloads")
     args = parser.parse_args()
+    if args.local_models is not None and not args.local_models.is_dir():
+        parser.error("--local-models must be an existing directory")
     rows = candidates(json.loads(AUDIT.read_text())["rows"])
     key = os.getenv("MESHY_API_KEY", "").strip()
     dest = ROOT / "prototype/assets/meshy/recovery"
     catalog = dest.parent / "recovery_catalog.json"
     dest.mkdir(parents=True, exist_ok=True)
     report = {"mode": "existing_tasks_read_only", "credential_available": bool(key),
+              "local_backup_available": args.local_models is not None,
               "requested": len(rows), "assets": []}
     families = []
     with tempfile.TemporaryDirectory(prefix="meshy-source-") as scratch:
@@ -91,10 +118,13 @@ def main():
             entry = {"stable_id": name, "task_id": row["task_id"], "source_sha256": row["source_sha256"],
                      "status": "missing_repository_credential"}
             report["assets"].append(entry)
-            if not key:
+            local = args.local_models is not None and (args.local_models / (row["task_id"] + ".glb")).is_file()
+            if not local and not key:
+                entry["status"] = "source_not_available"
                 continue
             try:
-                source = fetch(row, key, Path(scratch))
+                entry["source_origin"] = "verified_local_backup" if local else "meshy_api"
+                source = fetch_backup(row, Path(scratch), args.local_models) if local else fetch(row, key, Path(scratch))
                 path = dest / (name + "_1.glb")
                 path.unlink(missing_ok=True)
                 with tempfile.TemporaryDirectory(prefix="meshy-optimized-") as output_dir:

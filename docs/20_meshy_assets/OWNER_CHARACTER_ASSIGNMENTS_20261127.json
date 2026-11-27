@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "date": "2026-11-27",
+  "evidence": {
+    "account_saved_glb": 130,
+    "project_tasks": 71,
+    "project_found": 71,
+    "hash_pinned": 42,
+    "hash_matched": 42,
+    "source_renders": 35,
+    "other_project_renders": 28
+  },
+  "assignments": [
+    {
+      "stable_id": "unit_legacy_blacksmith",
+      "task_id": "01a208fe-236f-731b-97da-2cd94a6e2e09",
+      "source_sha256": "9f972cab24f3ea8dd896e7d19058dc2c83688942c2cfffd46357670c2aa947e0",
+      "source_bytes": 8350208,
+      "role": "Sextus, Dorfschmied",
+      "status": "four_blender_lods_exported_engine_qa_pending"
+    },
+    {
+      "stable_id": "unit_legacy_tunic_villager",
+      "task_id": "01a208fe-0855-74e0-b2ad-2f5c2791c0d0",
+      "source_sha256": "a7b1bcbe364ae636d7571886401d298099f5472bec2a82f0df45401d6e7e9507",
+      "source_bytes": 8958280,
+      "role": "Vibius, ziviler Dorfbewohner / Feldarbeiter",
+      "status": "blocked_deformation_859_torn_edges"
+    },
+    {
+      "stable_id": "unit_legacy_roman_legionary_segmentata",
+      "task_id": "01a208f9-5601-7111-8751-e447499039dc",
+      "source_sha256": "ed81d048a87d9c6e1118e56093c0dea130c9ad1a33f327efe74f111962858230",
+      "source_bytes": 8853336,
+      "role": "Legionär der späteren Epoche, nicht 58 v. Chr.",
+      "status": "source_review_only"
+    },
+    {
+      "stable_id": "unit_legacy_mail_soldier",
+      "task_id": "01a20913-d021-722f-a1e0-10095201c6da",
+      "source_sha256": "3549d86c63a26fb90af84aa4241d3f04139a9c2e5552add7b6fc353954d20f6f",
+      "source_bytes": 8518648,
+      "role": "Kettenhemdsoldat nach Epochenprüfung",
+      "status": "source_review_only"
+    },
+    {
+      "stable_id": "unit_legacy_gladiator",
+      "task_id": "01a20913-e8fb-7039-9639-f72d1d54cfdd",
+      "source_sha256": "977e0cc2190b9267711a8a353593f21173335460015a41b80a207f30471585b5",
+      "source_bytes": 8040208,
+      "role": "Gladiator / Arena",
+      "status": "source_review_only"
+    },
+    {
+      "stable_id": "mount_legacy_bay_horse",
+      "task_id": "01a208ff-057d-73d6-8f70-1c3636ccaf6f",
+      "source_sha256": "dca7e438402e71e4c86f5c81d4f1fd38ca7ebd1a29202bd9339f610b74ef1d41",
+      "source_bytes": 6342220,
+      "role": "Reitpferd / Stall",
+      "status": "family_present_in_repository"
+    },
+    {
+      "stable_id": "historical_caesar_image",
+      "task_id": "daf2d776-1be5-4960-bdec-bbab84523699",
+      "source_sha256": "9b0889c2397296aa4ffc4ca83182a7ad64e5c0703b9a59de20e453be0ca0d051",
+      "source_bytes": 97248940,
+      "role": "Gaius Julius Caesar, historische Szenen",
+      "status": "source_review_only_high_poly"
+    }
+  ],
+  "generated_character_scope": [
+    "Julia",
+    "Silvanus"
+  ],
+  "source_storage": "private_backup_only"
+}
