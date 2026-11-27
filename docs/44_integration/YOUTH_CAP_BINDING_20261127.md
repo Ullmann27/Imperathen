@@ -1,0 +1,9 @@
+# Jugend-Arme: Prüfung der tatsächlichen Hand-Cap-Skins (M10/M11)
+
+Basis 1327bd623dc5a67ce1b3611a743b481addd8bf26. Nutzerbilder zeigen unterbrochene Armflächen. Konkrete Codebeobachtung: build_youth_civil_outfit.py versetzt die Positionen überlebender Hand-Cap-Vertices auf die umgebauten Shell-Vertices, belässt jedoch die vorherigen JOINTS_0/WEIGHTS_0. Ob dies die sichtbaren Fehler verursacht, muss an den echten Assets gemessen werden.
+
+Der neue isolierte Kandidat sucht ausschließlich benutzte Vertices der Materialgruppe Youth hand cut repair, die innerhalb von 20 µm mit einem Shell-Vertex zusammenfallen. Mehrdeutige Gewichte an einer Position oder fehlende Matches werden protokolliert, nicht geraten. Der Kandidat kopiert nur die unzweideutig passende Skelettbindung bei einem messbaren Gewichtsunterschied; unveränderte Positionen, Meshzahl, Skin-Joints, inverse Bindematrizen und Originaldateien sind Pflicht. Die Zahlen werden mit den vorhandenen exportierten Animationen bei 60 Hz vor/nach Änderung gemessen. 2 mm ist ein zusätzlicher vorläufiger Seam-Kandidatengrenzwert, keine Lockerung eines bestehenden Gates.
+
+Der Workflow nutzt die bereits vorhandene autorisierte Staging-Pipeline für alle vier echten zivilen LODs, führt zuerst fünf synthetische Negativ-/Positivkontrollen aus und erzeugt danach tatsächliche Messbelege. Nur im isolierten Runner darf ein Kandidat für einen erneuten Godot-Import und Bildvergleich eingesetzt werden. Keine privaten GLBs, Rohassets oder API-Schlüssel werden als Artefakte veröffentlicht. Geometrie, Texturen, offene Meshlöcher, Fingerkontakt, Beleuchtung und Sichtbarkeit sind weiterhin unabhängig zu prüfen. Ein Nullbefund bedeutet, dass die Hypothese nicht bestätigt wurde; keine automatische Übernahme in die Produktion.
+
+Status: CANDIDATE. Keine visuelle oder Geräteabnahme, kein Merge. Bei erfolgreicher Messung den Original-Builder gezielt korrigieren und die bestehende Produktionspipeline erneut prüfen.
