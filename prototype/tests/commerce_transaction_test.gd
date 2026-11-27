@@ -5,6 +5,8 @@ const Economy = preload("res://scripts/domain/village_economy.gd")
 const Model = preload("res://scripts/domain/world_model.gd")
 const Life = preload("res://scripts/story/village_life.gd")
 const Behavior = preload("res://scripts/domain/npc_behavior.gd")
+const Weather = preload("res://scripts/domain/local_weather.gd")
+const Calendar = preload("res://scripts/domain/world_calendar.gd")
 
 var checks := 0
 var failures: Array[String] = []
@@ -17,7 +19,8 @@ func _initialize() -> void:
 	_test_failed_purchases_are_atomic()
 	_test_staff_and_raid_pause()
 	_test_civilian_alarm_and_guard_duty()
-	_test_guard_reassignment_through_world()
+	_test_guard_reassignment_through_world(false)
+	_test_guard_reassignment_through_world(true)
 	_test_partitioned_treasury_exhaustion()
 	_test_world_save_and_replay()
 	_cleanup()
@@ -209,9 +212,38 @@ func _test_world_save_and_replay() -> void:
 	_check(loaded.data.resources.denarii + loaded.data.village.economy.stocks.merchant_denarii == money_total and loaded._validate_state(loaded.data).is_empty(), "The complete world still balances after the two-sided cash flow")
 
 
-func _test_guard_reassignment_through_world() -> void:
+# Select an actual deterministic climate window via the public world-time
+# transaction. Never overwrite weather, the clock, resources or production.
+# Legacy 120-second economy days advance the date by 720 seconds per tick
+# second, so cover the full 60.5-second scenario, not merely its first frame.
+func _weather_fixture_day(data: Dictionary, wet: bool) -> int:
+	var clock: Dictionary = data.calendar.clock
+	var horizon := ceili(61.0 * Calendar.DAY_SECONDS / Economy.day_length(data))
+	for offset: int in range(181):
+		var start := Calendar.new_clock(int(clock.jdn) + offset, int(clock.second))
+		var matches := true
+		for elapsed: int in range(0, horizon + 300, 300):
+			var instant := Calendar.advance_clock(start, elapsed)
+			var raining := float(Weather.sample(instant, str(data.origin_id)).rain) >= 0.35
+			if raining != wet:
+				matches = false
+				break
+		if matches:
+			return offset
+	return -1
+
+
+func _test_guard_reassignment_through_world(wet: bool) -> void:
 	var model := Model.new()
 	model.new_game("italia", true)
+	var offset := _weather_fixture_day(model.data, wet)
+	_check(offset >= 0, "A real deterministic climate window exists: wet=" + str(wet))
+	if offset < 0:
+		return
+	if offset > 0:
+		_check(model.pass_calendar_days(offset, "Regression climate window", "wait").ok, "Select the climate window using the authoritative calendar transaction")
+	_check((float(Weather.for_state(model.data).rain) >= 0.35) == wet, "The selected calendar has the expected actual precipitation")
+	print("GUARD_WEATHER_FIXTURE wet=", wet, " date=", Calendar.format_date(int(model.data.calendar.clock.jdn)), " rain=", Weather.for_state(model.data).rain)
 	Behavior.start(model.data)
 	_check(Behavior.enabled(model.data) and model._validate_state(model.data).is_empty(), "Legacy village work can be tested with the real NPC decision system active")
 	var steward: Vector2 = Life.actor_position(model.data, "decimus")
@@ -236,10 +268,25 @@ func _test_guard_reassignment_through_world() -> void:
 	model.set_player_position(Vector3(0.0, 1.0, 60.0))
 	_check(model.execute("village_repair", {"workplace_id":"woodcamp"}, "guard-civilian-repair").ok, "The civilian crew's repair is paid from gathered material")
 	var wood_after_payment: int = model.data.resources.wood
+	var forest_after_payment: int = model.data.village.economy.stocks.forest
+	var initial_project: Dictionary = model.data.village.economy.workplaces.woodcamp.project.duplicate(true)
+	var initial_condition: int = model.data.village.economy.workplaces.woodcamp.condition
 	model.advance(0.5)
 	for id: String in ["severus", "valeria"]:
 		var actor: Dictionary = Behavior.view(model.data, id)
-		_check(actor.observed and actor.activity == "work", "Observed former guard now performs civilian work rather than patrol: " + id)
+		print("GUARD_WEATHER_DECISION ", id, " wet=", wet, " activity=", actor.activity, " observed=", actor.observed)
+		if wet:
+			_check(actor.observed and actor.activity == "weather_pause", "Observed reassigned outdoor worker shelters from actual rain: " + id)
+		else:
+			_check(actor.observed and actor.activity == "work", "Observed former guard now performs civilian work rather than patrol: " + id)
+	if wet:
+		model.advance(30.0)
+		model.advance(30.0)
+		var place: Dictionary = model.data.village.economy.workplaces.woodcamp
+		_check(place.project == initial_project and place.condition == initial_condition and place.produced_cycles == 0, "Rain pauses paid repairs without silently completing or canceling them")
+		_check(model.data.resources.wood == wood_after_payment and model.data.village.economy.stocks.forest == forest_after_payment, "Rain cannot create timber or consume forest stock")
+		_check(model.data.village.economy.people.size() == 14 and model._validate_state(model.data).is_empty(), "Wet-weather suspension preserves people and the authoritative world ledger")
+		return
 	model.advance(30.0)
 	_check(model.data.village.economy.workplaces.woodcamp.condition == 100 and model.data.resources.wood == wood_after_payment, "Two reclassified guards complete only the paid repair, without premature lumber")
 	model.advance(30.0)
